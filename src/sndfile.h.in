@@ -217,7 +217,7 @@ enum
 	SFM_RDWR	= 0x30
 } ;
 
-/* Pubic error values. These are guaranteed to remain unchanged for the duration
+/* Public error values. These are guaranteed to remain unchanged for the duration
 ** of the library major version number.
 ** There are also a large number of private error numbers which are internal to
 ** the library which can change at any time.

@@ -1,3 +1,8 @@
+2004-08-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in
+    Fix typo in comments (thanks Tommi Sakari Uimonen).
+
 2004-07-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/(a|u)law_test.c
