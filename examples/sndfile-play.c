@@ -615,19 +615,20 @@ macosx_play (int argc, char *argv [])
 #define	WIN32_BUFFER_LEN	(1<<15)
 
 typedef struct
-{	HWAVEOUT		hwave ;
-	WAVEHDR			whdr [2] ;
+{	HWAVEOUT	hwave ;
+	WAVEHDR		whdr [2] ;
 
-	int				BuffersInUse ;
-	HANDLE			Event ;
+	CRITICAL_SECTION	mutex ;		/* to control access to BuffersInUSe */
+	HANDLE		Event ;			/* signal that a buffer is free */
 
-	short			buffer [WIN32_BUFFER_LEN / sizeof (short)] ;
-	int				current, bufferlen ;
+	short		buffer [WIN32_BUFFER_LEN / sizeof (short)] ;
+	int			current, bufferlen ;
+	int			BuffersInUse ;
 
-	SNDFILE 		*sndfile ;
-	SF_INFO 		sfinfo ;
+	SNDFILE 	*sndfile ;
+	SF_INFO 	sfinfo ;
 
-	sf_count_t		remaining ;
+	sf_count_t	remaining ;
 } Win32_Audio_Data ;
 
 
@@ -651,7 +652,9 @@ win32_play_data (Win32_Audio_Data *audio_data)
 		waveOutWrite (audio_data->hwave, (LPWAVEHDR) &(audio_data->whdr [audio_data->current]), sizeof (WAVEHDR)) ;
 
 		/* count another buffer in use */
+		EnterCriticalSection (&audio_data->mutex) ;
 		audio_data->BuffersInUse ++ ;
+		LeaveCriticalSection (&audio_data->mutex) ;
 
 		/* use the other buffer next time */
 		audio_data->current = (audio_data->current + 1) % 2 ;
@@ -664,26 +667,26 @@ static void CALLBACK
 win32_audio_out_callback (HWAVEOUT hwave, UINT msg, DWORD data, DWORD param1, DWORD param2)
 {	Win32_Audio_Data	*audio_data ;
 
-	if (data == 0)
-		return ;
-
 	/* Prevent compiler warnings. */
 	hwave = hwave ;
 	param1 = param2 ;
 
-	if (data != 0)
-	{	/*
-		** I consider this technique of passing a pointer via an integer as
-		** fundamentally broken but thats the way microsoft has defined the
-		** interface.
-		*/
-		audio_data = (Win32_Audio_Data*) data ;
+	if (data == 0)
+		return ;
 
-		/* let main loop know a buffer is free */
-		if (msg == MM_WOM_DONE)
-		{	audio_data->BuffersInUse -- ;
-			SetEvent (audio_data->Event) ;
-			} ;
+	/*
+	** I consider this technique of passing a pointer via an integer as
+	** fundamentally broken but thats the way microsoft has defined the
+	** interface.
+	*/
+	audio_data = (Win32_Audio_Data*) data ;
+
+	/* let main loop know a buffer is free */
+	if (msg == MM_WOM_DONE)
+	{	EnterCriticalSection (&audio_data->mutex) ;
+		audio_data->BuffersInUse -- ;
+		LeaveCriticalSection (&audio_data->mutex) ;
+		SetEvent (audio_data->Event) ;
 		} ;
 
 	return ;
@@ -715,6 +718,7 @@ win32_play (int argc, char *argv [])
 		audio_data.remaining = audio_data.sfinfo.frames ;
 		audio_data.current = 0 ;
 
+		InitializeCriticalSection (&audio_data.mutex) ;
 		audio_data.Event = CreateEvent (0, FALSE, FALSE, 0) ;
 
 		wf.nChannels = audio_data.sfinfo.channels ;
@@ -782,6 +786,8 @@ win32_play (int argc, char *argv [])
 
 		waveOutClose (audio_data.hwave) ;
 		audio_data.hwave = 0 ;
+
+		DeleteCriticalSection (&audio_data.mutex) ;
 
 		sf_close (audio_data.sndfile) ;
 		} ;
