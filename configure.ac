@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.53)
 
-AC_INIT(libsndfile,1.0.12pre5,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.12pre6,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
@@ -438,7 +438,7 @@ AC_CONFIG_FILES([ \
 			man/Makefile examples/Makefile tests/Makefile \
 			doc/Makefile doc/libsndfile.css \
 			Win32/Makefile Win32/Makefile.mingw \
-			MacOS9/Makefile Octave/Makefile \
+			Octave/Makefile \
 			Makefile libsndfile.spec sndfile.pc \
 			])
 AC_OUTPUT
