@@ -278,8 +278,6 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					{	psf_log_printf (psf, "RIFF : %u (should be %D)\n", RIFFsize, psf->filelength - 2 * SIGNED_SIZEOF (dword)) ;
 						RIFFsize = dword ;
 						}
-					else if (RIFFsize < 100)
-						psf_log_printf (psf, "RIFF : %u (should probably be bigger)\n", RIFFsize) ;
 					else
 						psf_log_printf (psf, "RIFF : %u\n", RIFFsize) ;
 
@@ -330,9 +328,11 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						psf->datalength = psf->filelength - psf->dataoffset ;
 						}
 					else
-					{	psf_log_printf (psf, "data : %D\n", psf->datalength) ;
+						psf_log_printf (psf, "data : %D\n", psf->datalength) ;
+
+					/* Only set dataend if there really is data at the end. */
+					if (psf->datalength + psf->dataoffset < psf->filelength)
 						psf->dataend = psf->datalength + psf->dataoffset ;
-						} ;
 
 					if (format == WAVE_FORMAT_MS_ADPCM && psf->datalength % 2)
 					{	psf->datalength ++ ;
@@ -413,6 +413,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						} ;
 
 					psf->has_peak = SF_TRUE ; /* Found PEAK chunk. */
+					psf->peak_loc = ((parsestage & HAVE_data) == 0) ? SF_PEAK_START : SF_PEAK_END ;
 					break ;
 
 			case cue_MARKER :
@@ -619,7 +620,6 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 		if (psf->bytewidth > 0)
 			psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
 		} ;
-
 
 	/* Reset the current header length to zero. */
 	psf->header [0] = 0 ;

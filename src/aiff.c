@@ -418,9 +418,11 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						psf->datalength = psf->filelength - psf->dataoffset ;
 						}
 					else
-					{	psf_log_printf (psf, " SSND : %u\n", SSNDsize) ;
+						psf_log_printf (psf, " SSND : %u\n", SSNDsize) ;
+
+					/* Only set dataend if there really is data at the end. */
+					if (psf->datalength + psf->dataoffset < psf->filelength)
 						psf->dataend = psf->datalength + psf->dataoffset ;
-						} ;
 
 					psf_log_printf (psf, "  Offset     : %u\n", ssnd_fmt.offset) ;
 					psf_log_printf (psf, "  Block Size : %u\n", ssnd_fmt.blocksize) ;
@@ -710,7 +712,7 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 	psf_log_printf (psf, " COMM : %d\n", comm_fmt->size) ;
 	psf_log_printf (psf, "  Sample Rate : %d\n", tenbytefloat2int (comm_fmt->sampleRate)) ;
-	psf_log_printf (psf, "  Frames      : %u%s\n", comm_fmt->numSampleFrames, (comm_fmt->numSampleFrames == 0) ? " (Should not be 0)" : "") ;
+	psf_log_printf (psf, "  Frames      : %u%s\n", comm_fmt->numSampleFrames, (comm_fmt->numSampleFrames == 0 && psf->filelength > 100) ? " (Should not be 0)" : "") ;
 	psf_log_printf (psf, "  Channels    : %d\n", comm_fmt->numChannels) ;
 
 	/*	Found some broken 'fl32' files with comm.samplesize == 16. Fix it here. */
