@@ -45,7 +45,7 @@
 #endif
 
 #define	SF_BUFFER_LEN			(8192*2)
-#define	SF_FILENAME_LEN			(256)
+#define	SF_FILENAME_LEN			(512)
 #define	SF_HEADER_LEN			(4096)
 #define	SF_TEXT_LEN				(1024)
 #define SF_SYSERR_LEN			(256)
@@ -181,6 +181,7 @@ typedef struct sf_private_tag
 		} u ;
 
 	char			filename	[SF_FILENAME_LEN] ;
+	char			rsrcname	[SF_FILENAME_LEN] ;
 
 	char			syserr		[SF_SYSERR_LEN] ;
 
@@ -208,7 +209,8 @@ typedef struct sf_private_tag
 	int				has_text ;
 	int				do_not_close_descriptor ;
 
-	int 			filedes ;
+	/* File descriptors for the file and (possibly) the resource fork. */
+	int 			filedes, rsrcdes ;
 
 	int				end_of_file ;
 	int				error ;
@@ -533,6 +535,7 @@ int macos_guess_file_type (SF_PRIVATE *psf, const char *filename) ;
 */
 
 int psf_fopen (SF_PRIVATE *psf, const char *pathname, int flags) ;
+int psf_open_rsrc (SF_PRIVATE *psf, const char *pathname, int flags) ;
 int psf_set_stdio (SF_PRIVATE *psf, int mode) ;
 int psf_filedes_valid (SF_PRIVATE *psf) ;
 void psf_set_file (SF_PRIVATE *psf, int fd) ;

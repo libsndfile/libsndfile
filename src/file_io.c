@@ -50,6 +50,7 @@ typedef int ssize_t ;
 
 #define	SENSIBLE_SIZE	(0x40000000)
 
+static int psf_open (const char * path, int mode) ;
 static void psf_log_syserr (SF_PRIVATE *psf, int error) ;
 
 #if ((defined (WIN32) || defined (_WIN32)) == 0)
@@ -60,8 +61,7 @@ static void psf_log_syserr (SF_PRIVATE *psf, int error) ;
 
 int
 psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
-{	int oflag, mode ;
-
+{
 	/*
 	** Sanity check. If everything is OK, this test and the printfs will
 	** be optimised out. This is meant to catch the problems caused by
@@ -73,41 +73,35 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 		exit (1) ;
 		} ;
 
-	switch (open_mode)
-	{	case SFM_READ :
-				oflag = O_RDONLY ;
-				mode = 0 ;
-				break ;
+	psf->filedes = psf_open (pathname, open_mode) ;
 
-		case SFM_WRITE :
-				oflag = O_WRONLY | O_CREAT | O_TRUNC ;
-				mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH ;
-				break ;
-
-		case SFM_RDWR :
-				oflag = O_RDWR | O_CREAT ;
-				mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH ;
-				break ;
-
-		default :
-				psf->error = SFE_BAD_OPEN_MODE ;
-				return psf->error ;
-				break ;
+	if (psf->filedes == - SFE_BAD_OPEN_MODE)
+	{	psf->error = psf->filedes ;
+		psf->filedes = -1 ;
+		return psf->error ;
 		} ;
-
-#if defined (__CYGWIN__)
-	oflag |= O_BINARY ;
-#endif
-
-	if (mode == 0)
-		psf->filedes = open (pathname, oflag) ;
-	else
-		psf->filedes = open (pathname, oflag, mode) ;
 
 	if (psf->filedes == -1)
 		psf_log_syserr (psf, errno) ;
 
 	psf->mode = open_mode ;
+
+	return psf->error ;
+} /* psf_fopen */
+
+int
+psf_open_rsrc (SF_PRIVATE *psf, const char *pathname, int open_mode)
+{
+	psf->rsrcdes = psf_open (pathname, open_mode) ;
+
+	if (psf->rsrcdes == - SFE_BAD_OPEN_MODE)
+	{	psf->error = psf->rsrcdes ;
+		psf->rsrcdes = -1 ;
+		return psf->error ;
+		} ;
+
+	if (psf->rsrcdes == -1)
+		psf_log_syserr (psf, errno) ;
 
 	return psf->error ;
 } /* psf_fopen */
@@ -418,6 +412,42 @@ psf_ftruncate (SF_PRIVATE *psf, sf_count_t len)
 	return retval ;
 } /* psf_ftruncate */
 
+static int
+psf_open (const char * pathname, int open_mode)
+{	int fd, oflag, mode ;
+
+	switch (open_mode)
+	{	case SFM_READ :
+				oflag = O_RDONLY ;
+				mode = 0 ;
+				break ;
+
+		case SFM_WRITE :
+				oflag = O_WRONLY | O_CREAT | O_TRUNC ;
+				mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH ;
+				break ;
+
+		case SFM_RDWR :
+				oflag = O_RDWR | O_CREAT ;
+				mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH ;
+				break ;
+
+		default :
+				return - SFE_BAD_OPEN_MODE ;
+				break ;
+		} ;
+
+#if defined (__CYGWIN__)
+	oflag |= O_BINARY ;
+#endif
+
+	if (mode == 0)
+		fd = open (pathname, oflag) ;
+	else
+		fd = open (pathname, oflag, mode) ;
+
+	return fd ;
+} /* psf_open */
 
 static void
 psf_log_syserr (SF_PRIVATE *psf, int error)
