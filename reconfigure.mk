@@ -12,7 +12,8 @@ src/config.h.in: configure.ac libtool
 libtool ltmain.sh: aclocal.m4
 	libtoolize --copy --force
 	
-aclocal.m4:
+# Need to re-run aclocal whenever acinclude.m4 is modified.
+aclocal.m4: acinclude.m4
 	aclocal
 
 clean:
