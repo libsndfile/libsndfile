@@ -8,13 +8,8 @@ AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
 if test "x$target_os" = "xcygwin" ; then
-	echo
-	echo "** Compiling libsndfile under Cygwin is unlikely to work."
-	echo "** However, compiling under MinGW is known to work and significant"
-	echo "** effort goes into maintaining the MinGW build."
-	echo "** Please use MinGW instead."
-	echo
-	AC_MSG_ERROR([[Cannot continue.]])
+	echo "adding -mno-cygwin to CFLAGS"
+	CFLAGS="$CFLAGS -mno-cygwin"
 	fi
 
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
@@ -131,7 +126,7 @@ unset ac_cv_sizeof_off_t
 AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
 
 case "$target_os" in
-	mingw32*)
+	mingw32* | cygwin*)
 		TYPEOF_SF_COUNT_T="__int64"
 		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 		SIZEOF_SF_COUNT_T=8
@@ -281,7 +276,7 @@ case "$target_os" in
 		OS_SPECIFIC_CFLAGS="-fpascal-strings -I/Developer/Headers/FlatCarbon"
 		OS_SPECIFIC_LINKS="-framework CoreAudio"
 		;;
-	mingw32*)
+	mingw32* | cygwin*)
 		os_is_win32=1
 		OS_SPECIFIC_LINKS="-lwinmm"
 		;;
