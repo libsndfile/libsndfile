@@ -8,11 +8,11 @@ noinst_PROGRAMS = make_sine sfprocess list_formats cooledit-fixer generate
 # compiler.
 EXTRA_DIST = sndfile-play-beos.cpp
 
-OS_SPECIFIC_INCLUDES = @OS_SPECIFIC_INCLUDES@
+OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 
 SNDFILEDIR =../src
-INCLUDES = -I$(srcdir)/$(SNDFILEDIR) $(OS_SPECIFIC_INCLUDES)
+INCLUDES = -I$(srcdir)/$(SNDFILEDIR) $(OS_SPECIFIC_CFLAGS)
 
 sndfile_info_SOURCES = sndfile-info.c 
 sndfile_info_LDADD = $(SNDFILEDIR)/libsndfile.la

@@ -196,7 +196,7 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 	/* Prevent compiler warnings. */
 	device = device ;
 	current_time = current_time ;
-	data_in = data _in ;
+	data_in = data_in ;
 	time_in = time_in ;
 	time_out = time_out ;
 

@@ -5,6 +5,9 @@ SUBDIRS = GSM610 G72x
 lib_LTLIBRARIES = libsndfile.la
 include_HEADERS = sndfile.h
 
+OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
+OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
+
 EXTRA_DIST = sndfile.h.in config.h.in create_symbols_file.sh
 
 noinst_HEADERS = common.h sfendian.h float_cast.h wav_w64.h au.h sf_unistd.h
