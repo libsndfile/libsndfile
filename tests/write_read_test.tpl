@@ -583,7 +583,6 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 	else
 		test_seek_or_die (file, 3 * DATA_LENGTH, SFM_WRITE | SEEK_SET, 3 * DATA_LENGTH, sfinfo.channels, __LINE__) ;
 
-
 	for (pass = 1 ; pass <= 3 ; pass ++)
 	{	orig [20] = pass * 2 ;
 
@@ -741,6 +740,37 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 	delete_file (format, filename) ;
 
 	check_open_file_count_or_die (__LINE__) ;
+
+	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_PAF && (format & SF_FORMAT_TYPEMASK) != SF_FORMAT_VOC)
+	{
+		SNDFILE *wfile, *rwfile ;
+
+		sfinfo.samplerate	= 44100 ;
+		sfinfo.frames		= SILLY_WRITE_COUNT ; /* Wrong length. Library should correct this on sf_close. */
+		sfinfo.channels		= 2 ;
+		sfinfo.format		= format ;
+
+		frames = items / sfinfo.channels ;
+
+		wfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__) ;
+		sf_command (wfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE) ;
+		test_writef_[+ (get "data_type") +]_or_die (wfile, 1, orig, frames, __LINE__) ;
+		test_writef_[+ (get "data_type") +]_or_die (wfile, 2, orig, frames, __LINE__) ;
+
+		rwfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__) ;
+		if (sfinfo.frames != 2 * frames)
+		{	printf ("\n\nLine %d : incorrect number of frames in file (%ld shold be %d)\n\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), frames) ;
+			exit (1) ;
+			} ;
+
+		test_writef_[+ (get "data_type") +]_or_die (wfile, 3, orig, frames, __LINE__) ;
+
+		test_readf_[+ (get "data_type") +]_or_die (rwfile, 1, test, frames, __LINE__) ;
+		test_readf_[+ (get "data_type") +]_or_die (rwfile, 2, test, frames, __LINE__) ;
+
+		sf_close (wfile) ;
+		sf_close (rwfile) ;
+		} ;
 
 	puts ("ok") ;
 	return ;

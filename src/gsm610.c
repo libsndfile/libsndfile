@@ -353,7 +353,7 @@ gsm610_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	if (psf->dataoffset < 0)
 	{	psf->error = SFE_BAD_SEEK ;
-		return	((sf_count_t) -1) ;
+		return	PSF_SEEK_ERROR ;
 		} ;
 
 	if (offset == 0)
@@ -374,7 +374,7 @@ gsm610_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	if (offset < 0 || offset > pgsm610->blocks * pgsm610->samplesperblock)
 	{	psf->error = SFE_BAD_SEEK ;
-		return	((sf_count_t) -1) ;
+		return	PSF_SEEK_ERROR ;
 		} ;
 
 	newblock	= offset / pgsm610->samplesperblock ;
@@ -393,7 +393,7 @@ gsm610_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	/* What to do about write??? */
 	psf->error = SFE_BAD_SEEK ;
-	return	((sf_count_t) -1) ;
+	return	PSF_SEEK_ERROR ;
 } /* gsm610_seek */
 
 /*==========================================================================================

@@ -674,17 +674,17 @@ sds_seek (SF_PRIVATE *psf, int mode, sf_count_t seek_from_start)
 
 	if ((psds = psf->fdata) == NULL)
 	{	psf->error = SFE_INTERNAL ;
-		return SF_SEEK_ERROR ;
+		return PSF_SEEK_ERROR ;
 		} ;
 
 	if (psf->datalength < 0 || psf->dataoffset < 0)
 	{	psf->error = SFE_BAD_SEEK ;
-		return SF_SEEK_ERROR ;
+		return PSF_SEEK_ERROR ;
 		} ;
 
 	if (seek_from_start < 0 || seek_from_start > psf->sf.frames)
 	{	psf->error = SFE_BAD_SEEK ;
-		return SF_SEEK_ERROR ;
+		return PSF_SEEK_ERROR ;
 		} ;
 
 	if (mode == SFM_READ && psds->write_count > 0)
@@ -697,14 +697,14 @@ sds_seek (SF_PRIVATE *psf, int mode, sf_count_t seek_from_start)
 	{	case SFM_READ :
 			if (newblock > psds->total_blocks)
 			{	psf->error = SFE_BAD_SEEK ;
-				return SF_SEEK_ERROR ;
+				return PSF_SEEK_ERROR ;
 				} ;
 
 			file_offset = psf->dataoffset + newblock * SDS_BLOCK_SIZE ;
 
 			if (psf_fseek (psf, file_offset, SEEK_SET) != file_offset)
 			{	psf->error = SFE_SEEK_FAILED ;
-				return SF_SEEK_ERROR ;
+				return PSF_SEEK_ERROR ;
 				} ;
 
 			psds->read_block = newblock ;
@@ -715,14 +715,14 @@ sds_seek (SF_PRIVATE *psf, int mode, sf_count_t seek_from_start)
 		case SFM_WRITE :
 			if (newblock > psds->total_blocks)
 			{	psf->error = SFE_BAD_SEEK ;
-				return SF_SEEK_ERROR ;
+				return PSF_SEEK_ERROR ;
 				} ;
 
 			file_offset = psf->dataoffset + newblock * SDS_BLOCK_SIZE ;
 
 			if (psf_fseek (psf, file_offset, SEEK_SET) != file_offset)
 			{	psf->error = SFE_SEEK_FAILED ;
-				return SF_SEEK_ERROR ;
+				return PSF_SEEK_ERROR ;
 				} ;
 
 			psds->write_block = newblock ;
@@ -732,7 +732,7 @@ sds_seek (SF_PRIVATE *psf, int mode, sf_count_t seek_from_start)
 
 		default :
 			psf->error = SFE_BAD_SEEK ;
-			return SF_SEEK_ERROR ;
+			return PSF_SEEK_ERROR ;
 			break ;
 		} ;
 

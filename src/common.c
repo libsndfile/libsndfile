@@ -1071,19 +1071,19 @@ psf_default_seek (SF_PRIVATE *psf, int mode, sf_count_t samples_from_start)
 
 	if (! (psf->blockwidth && psf->dataoffset >= 0))
 	{	psf->error = SFE_BAD_SEEK ;
-		return	((sf_count_t) -1) ;
+		return	PSF_SEEK_ERROR ;
 		} ;
 
 	if (! psf->sf.seekable)
 	{	psf->error = SFE_NOT_SEEKABLE ;
-		return	((sf_count_t) -1) ;
+		return	PSF_SEEK_ERROR ;
 		} ;
 
 	position = psf->dataoffset + psf->blockwidth * samples_from_start ;
 
 	if ((retval = psf_fseek (psf, position, SEEK_SET)) != position)
 	{	psf->error = SFE_SEEK_FAILED ;
-		return ((sf_count_t) -1) ;
+		return PSF_SEEK_ERROR ;
 		} ;
 
 	mode = mode ;

@@ -422,7 +422,7 @@ paf24_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	if (psf->fdata == NULL)
 	{	psf->error = SFE_INTERNAL ;
-		return SF_SEEK_ERROR ;
+		return PSF_SEEK_ERROR ;
 		} ;
 
 	ppaf24 = (PAF24_PRIVATE*) psf->fdata ;
@@ -447,7 +447,7 @@ paf24_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 		case SFM_WRITE :
 				if (offset > ppaf24->sample_count)
 				{	psf->error = SFE_BAD_SEEK ;
-					return SF_SEEK_ERROR ;
+					return PSF_SEEK_ERROR ;
 					} ;
 
 				if (psf->last_op == SFM_WRITE && ppaf24->write_count)
@@ -461,7 +461,7 @@ paf24_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 		default :
 				psf->error = SFE_BAD_SEEK ;
-				return SF_SEEK_ERROR ;
+				return PSF_SEEK_ERROR ;
 		} ;
 
 	return newblock * ppaf24->samplesperblock + newsample ;

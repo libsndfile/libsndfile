@@ -566,7 +566,7 @@ pogg_seek (SF_PRIVATE *psf, int mode, sf_count_t seek_from_start)
 
 	if (mode != SFM_READ)
 	{	psf->error = SFE_BAD_SEEK ;
-		return SF_SEEK_ERROR ;
+		return PSF_SEEK_ERROR ;
 		} ;
 
 	oggz_seek_units (pogg->oggz, units, SEEK_SET) ;

@@ -51,7 +51,7 @@
 #define SF_SYSERR_LEN			(256)
 #define SF_MAX_STRINGS			(16)
 
-#define	SF_SEEK_ERROR			((sf_count_t) -1)
+#define	PSF_SEEK_ERROR			((sf_count_t) -1)
 
 
 #define	BITWIDTH2BYTES(x)	(((x) + 7) / 8)

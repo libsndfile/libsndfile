@@ -442,7 +442,7 @@ msadpcm_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	if (psf->datalength < 0 || psf->dataoffset < 0)
 	{	psf->error = SFE_BAD_SEEK ;
-		return	((sf_count_t) -1) ;
+		return	PSF_SEEK_ERROR ;
 		} ;
 
 	if (offset == 0)
@@ -455,7 +455,7 @@ msadpcm_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	if (offset < 0 || offset > pms->blocks * pms->samplesperblock)
 	{	psf->error = SFE_BAD_SEEK ;
-		return	((sf_count_t) -1) ;
+		return	PSF_SEEK_ERROR ;
 		} ;
 
 	newblock	= offset / pms->samplesperblock ;
@@ -470,7 +470,7 @@ msadpcm_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 	else
 	{	/* What to do about write??? */
 		psf->error = SFE_BAD_SEEK ;
-		return	((sf_count_t) -1) ;
+		return	PSF_SEEK_ERROR ;
 		} ;
 
 	return newblock * pms->samplesperblock + newsample ;

@@ -155,7 +155,7 @@ dwvw_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	if (! psf->fdata)
 	{	psf->error = SFE_INTERNAL ;
-		return ((sf_count_t) -1) ;
+		return PSF_SEEK_ERROR ;
 		} ;
 
 	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
@@ -167,7 +167,7 @@ dwvw_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 		} ;
 
 	psf->error = SFE_BAD_SEEK ;
-	return	((sf_count_t) -1) ;
+	return	PSF_SEEK_ERROR ;
 } /* dwvw_seek */
 
 

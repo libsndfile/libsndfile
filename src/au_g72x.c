@@ -383,7 +383,7 @@ au_g72x_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 **
 **		if (! (psf->datalength && psf->dataoffset))
 **		{	psf->error = SFE_BAD_SEEK ;
-**			return	((sf_count_t) -1) ;
+**			return	PSF_SEEK_ERROR ;
 **			} ;
 **
 **		samplecount = (8 * psf->datalength) / G721_32_BITS_PER_SAMPLE ;
@@ -392,7 +392,7 @@ au_g72x_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 **		{	case SEEK_SET :
 **					if (offset < 0 || offset > samplecount)
 **					{	psf->error = SFE_BAD_SEEK ;
-**						return	((sf_count_t) -1) ;
+**						return	PSF_SEEK_ERROR ;
 **						} ;
 **					newblock  = offset / pg72x->samplesperblock ;
 **					newsample = offset % pg72x->samplesperblock ;
@@ -401,7 +401,7 @@ au_g72x_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 **			case SEEK_CUR :
 **					if (psf->current + offset < 0 || psf->current + offset > samplecount)
 **					{	psf->error = SFE_BAD_SEEK ;
-**						return	((sf_count_t) -1) ;
+**						return	PSF_SEEK_ERROR ;
 **						} ;
 **					newblock  = (8 * (psf->current + offset)) / pg72x->samplesperblock ;
 **					newsample = (8 * (psf->current + offset)) % pg72x->samplesperblock ;
@@ -410,7 +410,7 @@ au_g72x_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 **			case SEEK_END :
 **					if (offset > 0 || samplecount + offset < 0)
 **					{	psf->error = SFE_BAD_SEEK ;
-**						return	((sf_count_t) -1) ;
+**						return	PSF_SEEK_ERROR ;
 **						} ;
 **					newblock  = (samplecount + offset) / pg72x->samplesperblock ;
 **					newsample = (samplecount + offset) % pg72x->samplesperblock ;
@@ -418,7 +418,7 @@ au_g72x_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 **
 **			default :
 **					psf->error = SFE_BAD_SEEK ;
-**					return	((sf_count_t) -1) ;
+**					return	PSF_SEEK_ERROR ;
 **			} ;
 **
 **		if (psf->mode == SFM_READ)
@@ -430,7 +430,7 @@ au_g72x_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 **		else
 **		{	/+* What to do about write??? *+/
 **			psf->error = SFE_BAD_SEEK ;
-**			return	((sf_count_t) -1) ;
+**			return	PSF_SEEK_ERROR ;
 **			} ;
 **
 **		psf->current = newblock * pg72x->samplesperblock + newsample ;

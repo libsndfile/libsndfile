@@ -977,7 +977,7 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 
 	if (! psf->sf.seekable)
 	{	psf->error = SFE_NOT_SEEKABLE ;
-		return	((sf_count_t) -1) ;
+		return	PSF_SEEK_ERROR ;
 		} ;
 
 	/* If the whence parameter has a mode ORed in, check to see that
@@ -986,7 +986,7 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 	if (((whence & SFM_MASK) == SFM_WRITE && psf->mode == SFM_READ) ||
 			((whence & SFM_MASK) == SFM_WRITE && psf->mode == SFM_WRITE))
 	{	psf->error = SFE_WRONG_SEEK ;
-		return ((sf_count_t) -1) ;
+		return PSF_SEEK_ERROR ;
 		} ;
 
 	/* Convert all SEEK_CUR and SEEK_END into seek_from_start to be
@@ -1042,11 +1042,11 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 		} ;
 
 	if (psf->error)
-		return ((sf_count_t) -1) ;
+		return PSF_SEEK_ERROR ;
 
 	if (seek_from_start < 0 || seek_from_start > psf->sf.frames)
 	{	psf->error = SFE_BAD_SEEK ;
-		return ((sf_count_t) -1) ;
+		return PSF_SEEK_ERROR ;
 		} ;
 
 	if (psf->seek)
@@ -1074,7 +1074,7 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 		} ;
 
 	psf->error = SFE_AMBIGUOUS_SEEK ;
-	return ((sf_count_t) -1) ;
+	return PSF_SEEK_ERROR ;
 } /* sf_seek */
 
 /*------------------------------------------------------------------------------
