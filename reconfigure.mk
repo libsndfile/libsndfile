@@ -1,5 +1,12 @@
 #!/usr/bin/make -f
 
+ifneq ($(shell uname -s), Darwin)
+  LIBTOOLIZE = libtoolize
+else
+  # Fuck Apple! Why the hell did they rename libtoolize????
+  LIBTOOLIZE = glibtoolize
+endif
+
 config.status: configure
 	./configure --enable-gcc-werror
 
