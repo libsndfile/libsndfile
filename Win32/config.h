@@ -43,14 +43,10 @@
 #define ENABLE_EXPERIMENTAL_CODE 0
 
 /* Major version of GCC or 3 otherwise. */
-<<<<<<< diff from left file
 /* #undef GCC_MAJOR_VERSION */
-========
-#define GCC_MAJOR_VERSION 3
 
 /* Define to 1 if you have the <alsa/asoundlib.h> header file. */
-#define HAVE_ALSA_ASOUNDLIB_H 1
->>>>>>> diff from right file
+/* #undef HAVE_ALSA_ASOUNDLIB_H */
 
 /* Define to 1 if you have the `calloc' function. */
 #define HAVE_CALLOC 1
