@@ -1,3 +1,18 @@
+2004-10-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/file_io.c src/common.h
+    Add functions psf_close_rsrc() and read length of resourse fork into
+    rsrclength field of SF_PRIVATE.
+
+    * src/sd2.c
+    Make sure resource fork gets closed.
+
+    * tests/util.tpl
+    Add functions to check for file descriptor leakage.
+
+    * src/write_read_test.tpl
+    Use the file descriptor leak checks.
+
 2004-10-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sd2.c

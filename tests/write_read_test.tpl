@@ -57,6 +57,8 @@ main (int argc, char **argv)
 {	int		do_all = 0 ;
 	int		test_count = 0 ;
 
+	count_open_files () ;
+
 	if (argc != 2)
 	{	printf ("Usage : %s <test>\n", argv [0]) ;
 		printf ("    Where <test> is one of the following:\n") ;
@@ -234,7 +236,9 @@ main (int argc, char **argv)
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "mat5"))
-	{	empty_file_test ("empty_char.mat5", SF_FORMAT_MAT5 | SF_FORMAT_PCM_U8) ;
+	{	increment_open_file_count () ;
+
+		empty_file_test ("empty_char.mat5", SF_FORMAT_MAT5 | SF_FORMAT_PCM_U8) ;
 		empty_file_test ("empty_short.mat5", SF_FORMAT_MAT5 | SF_FORMAT_PCM_16) ;
 		empty_file_test ("empty_float.mat5", SF_FORMAT_MAT5 | SF_FORMAT_FLOAT) ;
 
@@ -307,6 +311,9 @@ main (int argc, char **argv)
 		printf ("Mono : ************************************\n") ;
 		return 1 ;
 		} ;
+
+	/* Only open file descriptors should be stdin, stdout and stderr. */
+	check_open_file_count_or_die (__LINE__) ;
 
 	return 0 ;
 } /* main */
@@ -732,6 +739,8 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 	sf_close (file) ;
 	delete_file (format, filename) ;
 
+	check_open_file_count_or_die (__LINE__) ;
+
 	puts ("ok") ;
 	return ;
 } /* pcm_test_[+ (get "type_name") +] */
@@ -800,7 +809,9 @@ empty_file_test (const char *filename, int format)
 
 	sf_close (file) ;
 
-	unlink (filename) ;		
+	check_open_file_count_or_die (__LINE__) ;
+
+	unlink (filename) ;
 	puts ("ok") ;
 
 	return ;

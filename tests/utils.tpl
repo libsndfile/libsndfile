@@ -57,6 +57,10 @@ void	print_test_name (const char *test, const char *filename) ;
 
 void	delete_file (int format, const char *filename) ;
 
+void	count_open_files (void) ;
+void	increment_open_file_count (void) ;
+void	check_open_file_count_or_die (int lineno) ;
+
 #ifdef SNDFILE_H
 
 void 	dump_log_buffer (SNDFILE *file) ;
@@ -559,6 +563,56 @@ delete_file (int format, const char *filename)
 
 	unlink (rsrc_name) ;
 } /* delete_file */
+
+static int allowed_open_files = -1;
+
+void
+count_open_files (void)
+{
+#if (defined (WIN32) || defined (_WIN32))
+	return ;
+#else
+	int k, count = 0 ;
+	struct stat statbuf ;
+
+	if (allowed_open_files > 0)
+		return ;
+
+	for (k = 0 ; k < 1024 ; k++)
+		if (fstat (k, &statbuf) == 0)
+			count ++ ;
+
+	allowed_open_files = count ;
+#endif
+} /* count_open_files */
+
+void
+increment_open_file_count (void)
+{	allowed_open_files ++ ;
+} /* increment_open_file_count */
+
+void
+check_open_file_count_or_die (int lineno)
+{
+#if (defined (WIN32) || defined (_WIN32))
+	return ;
+#else
+	int k, count = 0 ;
+	struct stat statbuf ;
+
+	if (allowed_open_files < 0)
+		count_open_files () ;
+
+	for (k = 0 ; k < 1024 ; k++)
+		if (fstat (k, &statbuf) == 0)
+			count ++ ;
+
+	if (count > allowed_open_files)
+	{	printf ("\nLine %d : number of open files (%d) > allowed (%d).\n\n", lineno, count, allowed_open_files) ;
+		exit (1) ;
+		} ;
+#endif
+} /* check_open_file_count_or_die */
 
 [+ ESAC +]
 
