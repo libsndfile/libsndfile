@@ -96,6 +96,11 @@ main (int argc, char *argv [])
 	float_scaled_test	("pcm_16.sds", allow_exit, SF_FALSE, SF_FORMAT_SDS | SF_FORMAT_PCM_16, -140.0) ;
 	float_scaled_test	("pcm_24.sds", allow_exit, SF_FALSE, SF_FORMAT_SDS | SF_FORMAT_PCM_24, -170.0) ;
 
+	float_scaled_test	("vorbis.ogg", allow_exit, SF_FALSE, SF_FORMAT_OGG | SF_FORMAT_VORBIS, -170.0) ;
+	float_scaled_test	("speex.ogg", allow_exit, SF_FALSE, SF_FORMAT_OGG | SF_FORMAT_SPEEX, -170.0) ;
+	float_scaled_test	("vorbis.anx", allow_exit, SF_FALSE, SF_FORMAT_ANX | SF_FORMAT_VORBIS, -170.0) ;
+	float_scaled_test	("speex.anx", allow_exit, SF_FALSE, SF_FORMAT_ANX | SF_FORMAT_SPEEX, -170.0) ;
+
 	float_scaled_test	("replace_float.raw", allow_exit, SF_TRUE, SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_FLOAT, -163.0) ;
 
 	/*==============================================================================
@@ -139,6 +144,11 @@ main (int argc, char *argv [])
 	double_scaled_test	("pcm_s8.sds", allow_exit, SF_FALSE, SF_FORMAT_SDS | SF_FORMAT_PCM_S8, -90.0) ;
 	double_scaled_test	("pcm_16.sds", allow_exit, SF_FALSE, SF_FORMAT_SDS | SF_FORMAT_PCM_16, -140.0) ;
 	double_scaled_test	("pcm_24.sds", allow_exit, SF_FALSE, SF_FORMAT_SDS | SF_FORMAT_PCM_24, -180.0) ;
+
+	double_scaled_test	("vorbis.ogg", allow_exit, SF_FALSE, SF_FORMAT_OGG | SF_FORMAT_VORBIS, -170.0) ;
+	double_scaled_test	("speex.ogg", allow_exit, SF_FALSE, SF_FORMAT_OGG | SF_FORMAT_SPEEX, -170.0) ;
+	double_scaled_test	("vorbis.anx", allow_exit, SF_FALSE, SF_FORMAT_ANX | SF_FORMAT_VORBIS, -170.0) ;
+	double_scaled_test	("speex.anx", allow_exit, SF_FALSE, SF_FORMAT_ANX | SF_FORMAT_SPEEX, -170.0) ;
 
 	double_scaled_test	("replace_double.raw", allow_exit, SF_TRUE, SF_FORMAT_RAW | SF_FORMAT_DOUBLE, -300.0) ;
 
