@@ -16,6 +16,9 @@
     * tests/header_test.tpl
     Fix uninitialised variable.
 
+    * src/GSM610/short_term.c
+    Fix compiler warning on MSVC++.
+
 2004-05-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c
