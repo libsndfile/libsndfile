@@ -123,14 +123,14 @@ dnl Determine endian-ness of target processor.
 dnl @version 1.1	Mar 03 2002
 dnl @author Erik de Castro Lopo <erikd AT mega-nerd DOT com>
 dnl
-dnl Majority written from scratch to replace the standard autoconf macro
+dnl Majority written from scratch to replace the standard autoconf macro 
 dnl AC_C_BIGENDIAN. Only part remaining from the original it the invocation
 dnl of the AC_TRY_RUN macro.
 dnl
-dnl Permission to use, copy, modify, distribute, and sell this file for any
-dnl purpose is hereby granted without fee, provided that the above copyright
+dnl Permission to use, copy, modify, distribute, and sell this file for any 
+dnl purpose is hereby granted without fee, provided that the above copyright 
 dnl and this permission notice appear in all copies.  No representations are
-dnl made about the suitability of this software for any purpose.  It is
+dnl made about the suitability of this software for any purpose.  It is 
 dnl provided "as is" without express or implied warranty.
 
 dnl Find endian-ness in the following way:
@@ -140,7 +140,7 @@ dnl    3) If 1) and 2) fails and not cross compiling run a test program.
 dnl    4) If 1) and 2) fails and cross compiling then guess based on target.
 
 AC_DEFUN([AC_C_FIND_ENDIAN],
-[AC_CACHE_CHECK(processor byte ordering,
+[AC_CACHE_CHECK(processor byte ordering, 
 	ac_cv_c_byte_order,
 
 # Initialize to unknown
@@ -155,16 +155,16 @@ if test x$ac_cv_header_endian_h = xyes ; then
 		#if BYTE_ORDER != LITTLE_ENDIAN
 			not big endian
 		#endif
-		], return 0 ;,
+		], return 0 ;, 
 			ac_cv_c_byte_order=little
 		)]
-
+				
 	[AC_TRY_LINK([
 		#include <endian.h>
 		#if BYTE_ORDER != BIG_ENDIAN
 			not big endian
 		#endif
-		], return 0 ;,
+		], return 0 ;, 
 			ac_cv_c_byte_order=big
 		)]
 
@@ -178,7 +178,7 @@ if test $ac_cv_c_byte_order = unknown ; then
 		#if !BYTE_ORDER || !BIG_ENDIAN || !LITTLE_ENDIAN
 			bogus endian macros
 		#endif
-		], return 0 ;,
+		], return 0 ;, 
 
 		[AC_TRY_LINK([
 			#include <sys/types.h>
@@ -186,17 +186,17 @@ if test $ac_cv_c_byte_order = unknown ; then
 			#if BYTE_ORDER != LITTLE_ENDIAN
 				not big endian
 			#endif
-			], return 0 ;,
+			], return 0 ;, 
 				ac_cv_c_byte_order=little
 			)]
-
+				
 		[AC_TRY_LINK([
 			#include <sys/types.h>
 			#include <sys/param.h>
 			#if BYTE_ORDER != LITTLE_ENDIAN
 				not big endian
 			#endif
-			], return 0 ;,
+			], return 0 ;, 
 				ac_cv_c_byte_order=little
 			)]
 
@@ -207,25 +207,25 @@ if test $ac_cv_c_byte_order = unknown ; then
 if test $ac_cv_c_byte_order = unknown ; then
 	if test $cross_compiling = yes ; then
 		# This is the last resort. Try to guess the target processor endian-ness
-		# by looking at the target CPU type.
+		# by looking at the target CPU type.	
 		[
 		case "$target_cpu" in
 			alpha* | i?86* | mipsel* | ia64*)
 				ac_cv_c_big_endian=0
 				ac_cv_c_little_endian=1
 				;;
-
+			
 			m68* | mips* | powerpc* | hppa* | sparc*)
 				ac_cv_c_big_endian=1
 				ac_cv_c_little_endian=0
 				;;
-
+	
 			esac
 		]
 	else
 		AC_TRY_RUN(
 		[[
-		int main (void)
+		int main (void) 
 		{	/* Are we little or big endian?  From Harbison&Steele.  */
 			union
 			{	long l ;
@@ -234,12 +234,12 @@ if test $ac_cv_c_byte_order = unknown ; then
 			u.l = 1 ;
 			return (u.c [sizeof (long) - 1] == 1);
 			}
-			]], , ac_cv_c_byte_order=big,
+			]], , ac_cv_c_byte_order=big, 
 			ac_cv_c_byte_order=unknown
 			)
 
 		AC_TRY_RUN(
-		[[int main (void)
+		[[int main (void) 
 		{	/* Are we little or big endian?  From Harbison&Steele.  */
 			union
 			{	long l ;
@@ -247,10 +247,10 @@ if test $ac_cv_c_byte_order = unknown ; then
 			} u ;
 			u.l = 1 ;
 			return (u.c [0] == 1);
-			}]], , ac_cv_c_byte_order=little,
+			}]], , ac_cv_c_byte_order=little, 
 			ac_cv_c_byte_order=unknown
 			)
-		fi
+		fi	
 	fi
 
 )
@@ -285,10 +285,10 @@ dnl Check whether C99's lrint function is available.
 dnl @version 1.3	Feb 12 2002
 dnl @author Erik de Castro Lopo <erikd AT mega-nerd DOT com>
 dnl
-dnl Permission to use, copy, modify, distribute, and sell this file for any
-dnl purpose is hereby granted without fee, provided that the above copyright
+dnl Permission to use, copy, modify, distribute, and sell this file for any 
+dnl purpose is hereby granted without fee, provided that the above copyright 
 dnl and this permission notice appear in all copies.  No representations are
-dnl made about the suitability of this software for any purpose.  It is
+dnl made about the suitability of this software for any purpose.  It is 
 dnl provided "as is" without express or implied warranty.
 dnl
 AC_DEFUN([AC_C99_FUNC_LRINT],
@@ -314,11 +314,6 @@ if test "$ac_cv_c99_lrint" = yes; then
   AC_DEFINE(HAVE_LRINT, 1,
             [Define if you have C99's lrint function.])
 fi
-
-
-
-
-
 ])# AC_C99_FUNC_LRINT
 dnl @synopsis AC_C99_FUNC_LRINTF
 dnl
@@ -326,10 +321,10 @@ dnl Check whether C99's lrintf function is available.
 dnl @version 1.3	Feb 12 2002
 dnl @author Erik de Castro Lopo <erikd AT mega-nerd DOT com>
 dnl
-dnl Permission to use, copy, modify, distribute, and sell this file for any
-dnl purpose is hereby granted without fee, provided that the above copyright
+dnl Permission to use, copy, modify, distribute, and sell this file for any 
+dnl purpose is hereby granted without fee, provided that the above copyright 
 dnl and this permission notice appear in all copies.  No representations are
-dnl made about the suitability of this software for any purpose.  It is
+dnl made about the suitability of this software for any purpose.  It is 
 dnl provided "as is" without express or implied warranty.
 dnl
 AC_DEFUN([AC_C99_FUNC_LRINTF],
@@ -366,10 +361,10 @@ dnl Check whether C99's llrint function is available.
 dnl @version 1.1	Sep 30 2002
 dnl @author Erik de Castro Lopo <erikd AT mega-nerd DOT com>
 dnl
-dnl Permission to use, copy, modify, distribute, and sell this file for any
-dnl purpose is hereby granted without fee, provided that the above copyright
+dnl Permission to use, copy, modify, distribute, and sell this file for any 
+dnl purpose is hereby granted without fee, provided that the above copyright 
 dnl and this permission notice appear in all copies.  No representations are
-dnl made about the suitability of this software for any purpose.  It is
+dnl made about the suitability of this software for any purpose.  It is 
 dnl provided "as is" without express or implied warranty.
 dnl
 AC_DEFUN([AC_C99_FUNC_LLRINT],
@@ -406,10 +401,10 @@ dnl Determine the clipping mode when converting float to int.
 dnl @version 1.0	May 17 2003
 dnl @author Erik de Castro Lopo <erikd AT mega-nerd DOT com>
 dnl
-dnl Permission to use, copy, modify, distribute, and sell this file for any
-dnl purpose is hereby granted without fee, provided that the above copyright
+dnl Permission to use, copy, modify, distribute, and sell this file for any 
+dnl purpose is hereby granted without fee, provided that the above copyright 
 dnl and this permission notice appear in all copies.  No representations are
-dnl made about the suitability of this software for any purpose.  It is
+dnl made about the suitability of this software for any purpose.  It is 
 dnl provided "as is" without express or implied warranty.
 
 
@@ -419,7 +414,7 @@ dnl    1) If we are not cross compiling test it.
 dnl    2) IF we are cross compiling, assume that clipping isn't done correctly.
 
 AC_DEFUN([AC_C_CLIP_MODE],
-[AC_CACHE_CHECK(processor clipping capabilities,
+[AC_CACHE_CHECK(processor clipping capabilities, 
 	ac_cv_c_clip_type,
 
 # Initialize to unknown
@@ -433,7 +428,6 @@ if test $ac_cv_c_clip_positive = unknown ; then
 	#define _ISOC99_SOURCE	1
 	#define	__USE_ISOC99	1
 	#define __USE_ISOC9X	1
-	#include <stdio.h>
 	#include <math.h>
 	int main (void)
 	{	double	fval ;
@@ -444,11 +438,11 @@ if test $ac_cv_c_clip_positive = unknown ; then
 		{	ival = (lrint (fval)) >> 24 ;
 			if (ival != 127)
 				return 1 ;
-
+		
 			fval *= 1.2499999 ;
 			} ;
-
-		return 0 ;
+		
+			return 0 ;
 		}
 		]],
 		ac_cv_c_clip_positive=yes,
@@ -462,7 +456,6 @@ if test $ac_cv_c_clip_positive = unknown ; then
 	#define _ISOC99_SOURCE	1
 	#define	__USE_ISOC99	1
 	#define __USE_ISOC9X	1
-	#include <stdio.h>
 	#include <math.h>
 	int main (void)
 	{	double	fval ;
@@ -473,11 +466,11 @@ if test $ac_cv_c_clip_positive = unknown ; then
 		{	ival = (lrint (fval)) >> 24 ;
 			if (ival != -128)
 				return 1 ;
-
+		
 			fval *= 1.2499999 ;
 			} ;
-
-		return 0 ;
+		
+			return 0 ;
 		}
 		]],
 		ac_cv_c_clip_negative=yes,
@@ -521,10 +514,12 @@ case "$ac_cv_c_clip_positive$ac_cv_c_clip_negative" in
 )# AC_C_CLIP_MODE
 
 
-ifelse(dnl
+
+
+ifelse(dnl	
 
  Do not edit or modify anything in this comment block.
- The arch-tag line is a file identity tag for the GNU Arch
+ The arch-tag line is a file identity tag for the GNU Arch 
  revision control system.
 
  arch-tag: bc38294d-bb5c-42ad-90b9-779def5eaab7
