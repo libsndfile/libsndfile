@@ -43,7 +43,14 @@
 #define ENABLE_EXPERIMENTAL_CODE 0
 
 /* Major version of GCC or 3 otherwise. */
+<<<<<<< diff from left file
 /* #undef GCC_MAJOR_VERSION */
+========
+#define GCC_MAJOR_VERSION 3
+
+/* Define to 1 if you have the <alsa/asoundlib.h> header file. */
+#define HAVE_ALSA_ASOUNDLIB_H 1
+>>>>>>> diff from right file
 
 /* Define to 1 if you have the `calloc' function. */
 #define HAVE_CALLOC 1
@@ -184,13 +191,13 @@
 #define PACKAGE_NAME "libsndfile"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsndfile 1.0.8"
+#define PACKAGE_STRING "libsndfile 1.0.9"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsndfile"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.0.8"
+#define PACKAGE_VERSION "1.0.9"
 
 /* Set to maximum allowed value of sf_count_t type. */
 #define SF_COUNT_MAX 0x7FFFFFFFFFFFFFFFi64
@@ -238,7 +245,7 @@
 #define TYPEOF_SF_COUNT_T __int64_t
 
 /* Version number of package */
-#define VERSION "1.0.8"
+#define VERSION "1.0.9"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS 64 */

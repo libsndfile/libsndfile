@@ -68,6 +68,8 @@ enum
 	SF_FORMAT_XI			= 0x0F0000,		/* Fasttracker 2 Extended Instrument */
 	SF_FORMAT_HTK			= 0x100000,		/* HMM Tool Kit format */
 	SF_FORMAT_SDS			= 0x110000,		/* Midi Sample Dump Standard */
+	SF_FORMAT_AVR			= 0x120000,		/* Audio Visual Research */
+	SF_FORMAT_WAVEX			= 0x130000,		/* MS WAVE with WAVEFORMATEX */
 
 	/* Subtypes from here on. */
 
