@@ -1,3 +1,22 @@
+2004-10-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/file_io.h
+    Update file_io.c to include win32 psf_rsrc_open().
+
+    * tests/floating_point_test.tpl
+    Remove use of __func__ in test programs (MSVC++ doesn't grok this).
+
+    * Win32/(config|sndfile).h MacOS9/(config|sndfile).h
+    Updates.
+
+2004-10-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sfendian.h
+    Fix endswap_int64_t_(array|copy).
+
+    * src/test_endswap.(tpl|def)
+    Add tests for above and inprove all tests.
+
 2004-10-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sfendian.h
