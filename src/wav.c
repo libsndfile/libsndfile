@@ -1030,12 +1030,10 @@ wav_close (SF_PRIVATE *psf)
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	wav_write_tailer (psf) ;
 
-            /* DV dont know if thats right with you */
-			if ((psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAV)
-				wav_write_header (psf, SF_TRUE) ;
-			else
-				wavex_write_header (psf, SF_TRUE) ;
-
+		if ((psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAV)
+			wav_write_header (psf, SF_TRUE) ;
+		else
+			wavex_write_header (psf, SF_TRUE) ;
 		} ;
 
 	return 0 ;
