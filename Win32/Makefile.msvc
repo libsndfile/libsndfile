@@ -13,7 +13,7 @@ LINK32=link.exe
 DLL_LINK_FLAGS=/nologo /dll /incremental:no /libpath:"$(MSVCDir)\Lib" /pdb:"libsndfile.pdb" /implib:".\libsndfile.lib" /machine:I386 /out:"libsndfile.dll"
 PROG_LINK_FLAGS=/nologo /incremental:no /libpath:"$(MSVCDir)\Lib" /pdb:"libsndfile.pdb" /machine:I386 /exetype:dynamic
 
-CFLAGS=/nologo /MD /W1 /GX /O2 /I "$(MSVCDir)\Include" /I "src" /D "WIN32" /D "_USRDLL" /YX /FD
+CFLAGS=/nologo /MD /W1 /GX /O2 /I "$(MSVCDir)\Include" /I "src" /D "WIN32" /D "_USRDLL" /D "inline=__inline" /YX /FD
 
 #====================================================================
 # Targets
