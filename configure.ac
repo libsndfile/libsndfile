@@ -48,17 +48,16 @@ AC_DEFINE_UNQUOTED([HAVE_DECL_S_IRGRP],${HAVE_DECL_S_IRGRP},
 #====================================================================================
 # Check for support of the struct hack.
 
-AC_C_STRUCT_HACK
+AC_C99_FLEXIBLE_ARRAY
 
-if test x$ac_cv_c_struct_hack = xno ; then
+if test x$ac_cv_c99_flexible_array = xno ; then
 	AC_MSG_ERROR([[
-	**************************************************************
-	*** This compiler does not support the 1999 ISO C Standard ***
-	*** feature known as the "struct hack".                    ***
-	*** Try GNU GCC-3.1 or later as they are known to work.    ***
-	**************************************************************
-	]]
-	)
+	**********************************************************************
+	*** This compiler does not support the 1999 ISO C Standard feature ***
+	*** feature known as struct flexible array (or the "struct hack"). ***
+	*** Try GNU GCC-3.1 or later as they are known to work.            ***
+	**********************************************************************
+	]])
 	fi
 
 #====================================================================================

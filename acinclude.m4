@@ -279,7 +279,7 @@ else
 
 
 
-dnl @synopsis AC_C_STRUCT_HACK
+dnl @synopsis AC_C99_FLEXIBLE_ARRAY
 dnl
 dnl Dose the compiler support the 1999 ISO C Standard "stuct hack".
 dnl @version 1.1	Mar 15 2004
@@ -291,12 +291,12 @@ dnl and this permission notice appear in all copies.  No representations are
 dnl made about the suitability of this software for any purpose.  It is 
 dnl provided "as is" without express or implied warranty.
 
-AC_DEFUN([AC_C_STRUCT_HACK],
-[AC_CACHE_CHECK(struct hack support, 
-	ac_cv_c_struct_hack,
+AC_DEFUN([AC_C99_FLEXIBLE_ARRAY],
+[AC_CACHE_CHECK(C99 struct flexible array support, 
+	ac_cv_c99_flexible_array,
 
 # Initialize to unknown
-ac_cv_c_struct_hack=no
+ac_cv_c99_flexible_array=no
 
 AC_TRY_LINK([[
 	#include <stdlib.h>
@@ -306,10 +306,10 @@ AC_TRY_LINK([[
 	} MY_STRUCT ;
 	]], 
 	[  MY_STRUCT *p = calloc (1, sizeof (MY_STRUCT) + 42); ],
-	ac_cv_c_struct_hack=yes,
-	ac_cv_c_struct_hack=no
+	ac_cv_c99_flexible_array=yes,
+	ac_cv_c99_flexible_array=no
 	))]
-) # AC_C_STRUCT_HACK
+) # AC_C99_FLEXIBLE_ARRAY
 
 
      
