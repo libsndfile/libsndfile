@@ -94,6 +94,10 @@ AC_ARG_ENABLE(cpu-clip,
 	AC_HELP_STRING([--disable-cpu-clip], [disable tricky cpu specific clipper]),
 	ac_arg_cpu_clip="N", ac_arg_cpu_clip="Y")
 
+AC_ARG_ENABLE(bow-docs,
+	AC_HELP_STRING([--enable-bow-docs], [enable black-on-white html docs]),
+	ac_arg_bow_docs="Y", ac_arg_bow_docs="N")
+
 #====================================================================================
 # Check types and their sizes.
 
@@ -335,6 +339,25 @@ if test x"$ac_cv_prog_autogen" = "xno" ; then
 	fi
 
 #====================================================================================
+# Settings for the HTML documentation.
+
+htmldocdir=$prefix/share/doc/libsndfile1-dev/html
+
+if test $prefix = "NONE" ; then
+	htmldocdir=/usr/local/share/doc/libsndfile1-dev/html
+else
+	htmldocdir=$prefix/share/doc/libsndfile1-dev/html
+	fi
+
+if test x$ac_arg_bow_docs = "xY" ; then
+	HTML_BGCOLOUR="white"
+	HTML_FGCOLOUR="black"
+else
+	HTML_BGCOLOUR="black"
+	HTML_FGCOLOUR="white"
+	fi
+
+#====================================================================================
 # Now use the information from the checking stage.
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
@@ -381,15 +404,9 @@ if test x"$CFLAGS" = x ; then
 	exit
 	fi
 
-htmldocdir=$prefix/share/doc/libsndfile1-dev/html
-
-if test $prefix = "NONE" ; then
-	htmldocdir=/usr/local/share/doc/libsndfile1-dev/html
-else
-	htmldocdir=$prefix/share/doc/libsndfile1-dev/html
-	fi
-
 AC_SUBST(htmldocdir)
+AC_SUBST(HTML_BGCOLOUR)
+AC_SUBST(HTML_FGCOLOUR)
 
 AC_SUBST(SHLIB_VERSION_ARG)
 AC_SUBST(SHARED_VERSION_INFO)
@@ -401,11 +418,13 @@ AC_SUBST(ENABLE_EXPERIMENTAL_CODE)
 AC_SUBST(COMPILER_IS_GCC)
 AC_SUBST(GCC_MAJOR_VERSION)
 
-AC_CONFIG_FILES([Makefile src/sndfile.h \
-			src/Makefile src/GSM610/Makefile src/G72x/Makefile \
-			man/Makefile examples/Makefile tests/Makefile doc/Makefile \
+AC_CONFIG_FILES([ \
+			src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
+			man/Makefile examples/Makefile tests/Makefile \
+			doc/Makefile doc/libsndfile.css \
 			Win32/Makefile MacOS9/Makefile Octave/Makefile \
-			libsndfile.spec sndfile.pc])
+			Makefile libsndfile.spec sndfile.pc \
+			])
 AC_OUTPUT
 
 #====================================================================================

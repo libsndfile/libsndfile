@@ -6,6 +6,13 @@
 	* doc/win32.html
     Started adding instructions for compiling libsndfile under MinGW.
 
+    * configure.ac
+    Add --enable-bow-docs to enable black text on a white background HTML docs.
+
+    * doc/libsndfile.css.in
+    This is now a template file for configure which sets the foreground and
+    background colours.
+ 
 2004-04-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
