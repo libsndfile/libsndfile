@@ -29,6 +29,10 @@
 #include <stdint.h>
 #endif
 
+#ifdef __cplusplus
+#error "This code is not designed to be compiled with a C++ compiler."
+#endif
+
 #ifdef UNUSED
 #elif defined (__GNUC__)
 #	define UNUSED(x) UNUSED_ ## x __attribute__ ((unused))

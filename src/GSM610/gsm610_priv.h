@@ -10,7 +10,11 @@
 /* Added by Erik de Castro Lopo */
 #define	USE_FLOAT_MUL
 #define	FAST
-#define	WAV49  
+#define	WAV49
+
+#ifdef __cplusplus
+#error "This code is not designed to be compiled with a C++ compiler."
+#endif
 /* Added by Erik de Castro Lopo */
 
 
@@ -21,7 +25,7 @@ typedef int					longword;	/* 32 bit signed int	*/
 typedef unsigned short		uword;		/* unsigned word	*/
 typedef unsigned int		ulongword;	/* unsigned longword	*/
 
-struct gsm_state 
+struct gsm_state
 {	word			dp0[ 280 ] ;
 
 	word			z1;			/* preprocessing.c, Offset_com. */
@@ -93,7 +97,7 @@ longword gsm_L_asr  	(longword a, int n) ;
 word	gsm_asr  		(word a, int n) ;
 
 /*
- *  Inlined functions from add.h 
+ *  Inlined functions from add.h
  */
 
 static inline longword
@@ -114,17 +118,17 @@ GSM_L_MULT (word a, word b)
 static inline longword
 GSM_L_ADD (longword a, longword b)
 {	ulongword utmp ;
-	
+
 	if (a < 0 && b < 0)
 	{	utmp = (ulongword)-((a) + 1) + (ulongword)-((b) + 1) ;
 		return (utmp >= (ulongword) MAX_LONGWORD) ? MIN_LONGWORD : -(longword)utmp-2 ;
 		} ;
-	
+
 	if (a > 0 && b > 0)
 	{	utmp = (ulongword) a + (ulongword) b ;
 		return (utmp >= (ulongword) MAX_LONGWORD) ? MAX_LONGWORD : utmp ;
 		} ;
-	
+
 	return a + b ;
 } /* GSM_L_ADD */
 
@@ -147,12 +151,12 @@ GSM_SUB (word a, word b)
 {	longword ltmp ;
 
 	ltmp = ((longword) a) - ((longword) b) ;
-	
+
 	if (ltmp >= MAX_WORD)
 		ltmp = MAX_WORD ;
 	else if (ltmp <= MIN_WORD)
 		ltmp = MIN_WORD ;
-	
+
 	return ltmp ;
 } /* GSM_SUB */
 
@@ -200,10 +204,10 @@ void Gsm_Preprocess (
 
 void Gsm_Encoding (
 		struct gsm_state * S,
-		word	* e,	
-		word	* ep,	
+		word	* e,
+		word	* ep,
 		word	* xmaxc,
-		word	* Mc,	
+		word	* Mc,
 		word	* xMc) ;
 
 void Gsm_Short_Term_Analysis_Filter (
@@ -296,7 +300,7 @@ extern word gsm_FAC [8] ;
 #endif	/* PRIVATE_H */
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 8bc5fdf2-e8c8-4686-9bd7-a30b512bef0c
