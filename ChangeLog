@@ -1,3 +1,8 @@
+2004-04-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/command.html
+    Fix minor error. Thanks to Simon Burton.
+
 2004-04-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac

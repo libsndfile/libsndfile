@@ -751,7 +751,7 @@ Example:
         for (k = 0 ; k &lt; count ; k++)
         {   format_info.format = k ;
             sf_command (sndfile, SFC_GET_FORMAT_SUBTYPE, &amp;format_info, sizeof (format_info)) ;
-            if (! sf_format_check (format.info | SF_FORMAT_WAV))
+            if (! sf_format_check (format_info.format | SF_FORMAT_WAV))
                continue ;
             printf ("%08x  %s\n", format_info.format, format_info.name) ;
             } ;
