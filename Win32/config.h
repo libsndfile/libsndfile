@@ -58,13 +58,16 @@
 #define HAVE_DECL_S_IRGRP 0
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
-#define HAVE_DLFCN_H 1
+/* #undef HAVE_DLFCN_H */
 
 /* Define to 1 if you have the <endian.h> header file. */
-#define HAVE_ENDIAN_H 1
+/* #undef HAVE_ENDIAN_H */
 
 /* Define to 1 if you have the `fdatasync' function. */
-#define HAVE_FDATASYNC 1
+/* #undef HAVE_FDATASYNC */
+
+/* Set to 1 if the compile supports the struct hack. */
+#define HAVE_FLEXIBLE_ARRAY 1
 
 /* Define to 1 if you have the `floor' function. */
 #define HAVE_FLOOR 1
@@ -115,19 +118,16 @@
 #define HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `mmap' function. */
-#define HAVE_MMAP 1
-
-/* Define to 1 if you have the <mmreg.h> header file. */
-#define HAVE_MMREG_H 1
+/* #undef HAVE_MMAP */
 
 /* Define to 1 if you have the `open' function. */
 #define HAVE_OPEN 1
 
 /* Define to 1 if you have the `pread' function. */
-#define HAVE_PREAD 1
+/* #undef HAVE_PREAD */
 
 /* Define to 1 if you have the `pwrite' function. */
-#define HAVE_PWRITE 1
+/* #undef HAVE_PWRITE */
 
 /* Define to 1 if you have the `read' function. */
 #define HAVE_READ 1
@@ -160,7 +160,7 @@
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
-/* #define HAVE_SYS_WAIT_H */
+/* #undef HAVE_SYS_WAIT_H */
 
 /* Define to 1 if you have the <unistd.h> header file. */
 /* #undef HAVE_UNISTD_H */
@@ -187,13 +187,13 @@
 #define PACKAGE_NAME "libsndfile"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsndfile 1.0.9"
+#define PACKAGE_STRING "libsndfile 1.0.10pre6"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsndfile"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.0.9"
+#define PACKAGE_VERSION "1.0.10pre6"
 
 /* Set to maximum allowed value of sf_count_t type. */
 #define SF_COUNT_MAX 0x7FFFFFFFFFFFFFFFi64
@@ -241,7 +241,7 @@
 #define TYPEOF_SF_COUNT_T __int64_t
 
 /* Version number of package */
-#define VERSION "1.0.9"
+#define VERSION "1.0.10pre6"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS 64 */
