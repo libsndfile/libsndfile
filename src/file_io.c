@@ -287,12 +287,6 @@ int
 psf_fclose (SF_PRIVATE *psf)
 {	int retval ;
 
-#if ((defined (__MWERKS__) && defined (macintosh)) == 0)
-	/* Must be MacOS9 which doesn't have fsync(). */
-	if (fsync (psf->filedes) == -1 && errno == EBADF)
-		return 0 ;
-#endif
-
 	if (psf->do_not_close_descriptor)
 	{	psf->filedes = -1 ;
 		return 0 ;
