@@ -492,7 +492,7 @@ test_seek_or_die (SNDFILE *file, sf_count_t offset, int whence, sf_count_t new_p
 	channel_name = (channels == 1) ? "Mono" : "Stereo" ;
 
 	if ((position = sf_seek (file, offset, whence)) != new_pos)
-	{	printf ("\n\nLine %d : %s : sf_seek (file, %ld, %s) returned %ld (should be %ld).\n\n", 
+	{	printf ("\n\nLine %d : %s : sf_seek (file, %ld, %s) returned %ld (should be %ld).\n\n",
 					line_num, channel_name, SF_COUNT_TO_LONG (offset), whence_name,
 					SF_COUNT_TO_LONG (position), SF_COUNT_TO_LONG (new_pos)) ;
 		exit (1) ;
