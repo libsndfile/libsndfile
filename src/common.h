@@ -31,17 +31,17 @@
 
 #ifdef UNUSED
 #elif defined (__GNUC__)
-# define UNUSED(x) UNUSED_ ## x __attribute__ ((unused))
+#	define UNUSED(x) UNUSED_ ## x __attribute__ ((unused))
 #elif defined (__LCLINT__)
-# define UNUSED(x) /*@unused@*/ x
+#	define UNUSED(x) /*@unused@*/ x
 #else
-# define UNUSED(x) x
+#	define UNUSED(x) x
 #endif
 
 #ifdef __GNUC__
-# define WARN_UNUSED	__attribute__((warn_unused_result))
+#	define WARN_UNUSED	__attribute__((warn_unused_result))
 #else
-# define WARN_UNUSED
+#	define WARN_UNUSED
 #endif
 
 #define	SF_BUFFER_LEN			(8192*2)
@@ -239,6 +239,9 @@ typedef struct sf_private_tag
 	int				has_peak ;		/* Has a PEAK chunk (AIFF and WAVE) been read? */
 	int				peak_loc ;		/* Write a PEAK chunk at the start or end of the file? */
 	PEAK_CHUNK		*pchunk ;
+
+	/* Loop Info */
+	SF_LOOP_INFO	*loop_info ;
 
 	sf_count_t		filelength ;	/* Overall length of (embedded) file. */
 	sf_count_t		fileoffset ;	/* Offset in number of bytes from beginning of file. */
