@@ -35,6 +35,9 @@
 	#define DOUBLE64_WRITE	double64_be_write
 #endif
 
+/* A 32 number which will not overflow when multiplied by sizeof (double). */
+#define SENSIBLE_LEN   (0x8000000)
+
 /*--------------------------------------------------------------------------------------------
 **	Processor floating point capabilities. double64_get_capability () returns one of the
 **	latter three values.
@@ -534,7 +537,7 @@ host_read_d2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 		readcount = psf_fread (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, bufferlen) ;
+			endswap_double_array (psf->u.dbuf, readcount) ;
 
 		d2s_array (psf->u.dbuf, readcount, ptr + total, scale) ;
 		total += readcount ;
@@ -560,7 +563,7 @@ host_read_d2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		readcount = psf_fread (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, bufferlen) ;
+			endswap_double_array (psf->u.dbuf, bufferlen) ;
 
 		d2i_array (psf->u.dbuf, readcount, ptr + total, scale) ;
 		total += readcount ;
@@ -585,7 +588,7 @@ host_read_d2f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 		readcount = psf_fread (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, bufferlen) ;
+			endswap_double_array (psf->u.dbuf, bufferlen) ;
 
 		d2f_array (psf->u.dbuf, readcount, ptr + total) ;
 		total += readcount ;
@@ -599,25 +602,29 @@ host_read_d2f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 static sf_count_t
 host_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
-	sf_count_t	total = 0 ;
+{	int			bufferlen ;
+	sf_count_t	readcount, total = 0 ;
+
+	readcount = psf_fread (ptr, sizeof (double), len, psf) ;
 
 	if (psf->float_endswap != SF_TRUE)
-		return psf_fread (ptr, sizeof (double), len, psf) ;
+		return readcount ;
 
-	bufferlen = ARRAY_LEN (psf->u.dbuf) ;
+	/* If the read length was sensible, endswap output in one go. */
+	if (readcount < SENSIBLE_LEN)
+	{	endswap_double_array (ptr, readcount) ;
+		return readcount ;
+		} ;
 
+	bufferlen = SENSIBLE_LEN ;
 	while (len > 0)
 	{	if (len < bufferlen)
 			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 
-		endswap_long_copy ((void*) (ptr + total), psf->u.lbuf, readcount) ;
+		endswap_double_array (ptr + total, bufferlen) ;
 
-		total += readcount ;
-		len -= readcount ;
-		if (readcount < bufferlen)
-			break ;
+		total += bufferlen ;
+		len -= bufferlen ;
 		} ;
 
 	return total ;
@@ -640,7 +647,7 @@ host_write_s2d	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 			double64_peak_update (psf, psf->u.dbuf, bufferlen, (int) (total / psf->sf.channels)) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, bufferlen) ;
+			endswap_double_array (psf->u.dbuf, bufferlen) ;
 
 		writecount = psf_fwrite (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 		total += writecount ;
@@ -668,7 +675,7 @@ host_write_i2d	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 			double64_peak_update (psf, psf->u.dbuf, bufferlen, (int) (total / psf->sf.channels)) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, bufferlen) ;
+			endswap_double_array (psf->u.dbuf, bufferlen) ;
 
 		writecount = psf_fwrite (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 		total += writecount ;
@@ -696,7 +703,7 @@ host_write_f2d	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 			double64_peak_update (psf, psf->u.dbuf, bufferlen, (int) (total / psf->sf.channels)) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, bufferlen) ;
+			endswap_double_array (psf->u.dbuf, bufferlen) ;
 
 		writecount = psf_fwrite (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 		total += writecount ;
@@ -725,7 +732,7 @@ host_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	{	if (len < bufferlen)
 			bufferlen = (int) len ;
 
-		endswap_long_copy (psf->u.lbuf, (void*) (ptr + total), bufferlen) ;
+		endswap_double_copy (psf->u.dbuf, ptr + total, bufferlen) ;
 
 		writecount = psf_fwrite (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 		total += writecount ;
@@ -755,7 +762,7 @@ replace_read_d2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 		readcount = psf_fread (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, bufferlen) ;
+			endswap_double_array (psf->u.dbuf, bufferlen) ;
 
 		d2bd_read (psf->u.dbuf, bufferlen) ;
 
@@ -784,7 +791,7 @@ replace_read_d2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		readcount = psf_fread (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, bufferlen) ;
+			endswap_double_array (psf->u.dbuf, bufferlen) ;
 
 		d2bd_read (psf->u.dbuf, bufferlen) ;
 
@@ -811,7 +818,7 @@ replace_read_d2f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 		readcount = psf_fread (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, bufferlen) ;
+			endswap_double_array (psf->u.dbuf, bufferlen) ;
 
 		d2bd_read (psf->u.dbuf, bufferlen) ;
 
@@ -840,7 +847,7 @@ replace_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 		readcount = psf_fread (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, readcount) ;
+			endswap_double_array (psf->u.dbuf, readcount) ;
 
 		d2bd_read (psf->u.dbuf, readcount) ;
 
@@ -873,7 +880,7 @@ replace_write_s2d	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 		bd2d_write (psf->u.dbuf, bufferlen) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, bufferlen) ;
+			endswap_double_array (psf->u.dbuf, bufferlen) ;
 
 		writecount = psf_fwrite (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 		total += writecount ;
@@ -903,7 +910,7 @@ replace_write_i2d	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		bd2d_write (psf->u.dbuf, bufferlen) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, bufferlen) ;
+			endswap_double_array (psf->u.dbuf, bufferlen) ;
 
 		writecount = psf_fwrite (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 		total += writecount ;
@@ -930,7 +937,7 @@ replace_write_f2d	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 		bd2d_write (psf->u.dbuf, bufferlen) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, bufferlen) ;
+			endswap_double_array (psf->u.dbuf, bufferlen) ;
 
 		writecount = psf_fwrite (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 		total += writecount ;
@@ -962,7 +969,7 @@ replace_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 		bd2d_write (psf->u.dbuf, bufferlen) ;
 
 		if (psf->float_endswap == SF_TRUE)
-			endswap_long_array (psf->u.lbuf, bufferlen) ;
+			endswap_double_array (psf->u.dbuf, bufferlen) ;
 
 		writecount = psf_fwrite (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 		total += writecount ;
