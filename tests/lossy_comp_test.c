@@ -190,8 +190,10 @@ main (int argc, char *argv [])
 	if (do_all || ! strcmp (argv [1], "aiff_ima"))
 	{	lcomp_test_short	("ima.aiff", SF_FORMAT_AIFF | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
 		lcomp_test_int		("ima.aiff", SF_FORMAT_AIFF | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
+		/* Lite remove start */
 		lcomp_test_float	("ima.aiff", SF_FORMAT_AIFF | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
 		lcomp_test_double	("ima.aiff", SF_FORMAT_AIFF | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
+		/* Lite remove end */
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "au_ulaw"))

@@ -469,7 +469,7 @@ fix_configure_ac_file ('configure.ac')
 
 print "Building and testing source."
 	# Try --disable-shared --disable-gcc-opt
-if os.system ("./reconf && ./configure --disable-shared --disable-gcc-opt && make check"):
+if os.system ("./reconfigure.mk && ./configure --disable-shared --disable-gcc-opt && make check"):
 	os.system ('PS1="FIX > " bash --norc')
 	sys.exit (1)
 
@@ -480,6 +480,7 @@ if os.system ("make distcheck"):
 
 print "Copying tarball"
 if os.system ("cp %s.tar.gz %s" % (lite_version, source_dir)):
+	print "??? %s.tar.gz ???" % lite_version
 	os.system ('PS1="FIX > " bash --norc')
 	sys.exit (1)
 
