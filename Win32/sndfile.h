@@ -302,7 +302,7 @@ typedef struct
 {	int basenote ;
 	int gain ;
 	int	sustain_mode ;
-	int sustain_start, sustain_end;
+	int sustain_start, sustain_end ;
 	int release_mode ;
 	int release_start, reslease_end ;
 } SF_INSTRUMENT ;

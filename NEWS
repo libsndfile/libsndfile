@@ -1,3 +1,7 @@
+Version 1.0.8 (2004-03-14)
+  * Correct peak chunk handing for files with > 16 tracks.
+  * Fix for WAV files with huge number of CUE chunks.
+  
 Version 1.0.7 (2004-02-25)
   * Fix clip mode detection on ia64, MIPS and other CPUs.
   * Fix two MacOSX build problems.

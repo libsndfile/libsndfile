@@ -112,6 +112,9 @@
 /* Define to 1 if you have the `snprintf' function. */
 #define HAVE_SNPRINTF 1
 
+/* Define to 1 if the system has the type `ssize_t'. */
+/*#undef HAVE_SSIZE_T */
+
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
 
@@ -139,9 +142,6 @@
 /* Define to 1 if you have the `vsnprintf' function. */
 #define HAVE_VSNPRINTF 1
 
-/* Define to 1 if you have the <wintypes.h> header file. */
-/* #undef HAVE_WINTYPES_H */
-
 /* Define to 1 if you have the `write' function. */
 #define HAVE_WRITE 1
 
@@ -161,13 +161,13 @@
 #define PACKAGE_NAME "libsndfile"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsndfile 1.0.7"
+#define PACKAGE_STRING "libsndfile 1.0.8"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsndfile"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.0.7"
+#define PACKAGE_VERSION "1.0.8"
 
 /* Set to maximum allowed value of sf_count_t type. */
 #define SF_COUNT_MAX 0x7FFFFFFFFFFFFFFFLL
@@ -215,7 +215,7 @@
 #define TYPEOF_SF_COUNT_T off_t
 
 /* Version number of package */
-#define VERSION "1.0.6"
+#define VERSION "1.0.8"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */

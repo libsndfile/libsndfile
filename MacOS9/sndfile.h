@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2003 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -302,7 +302,7 @@ typedef struct
 {	int basenote ;
 	int gain ;
 	int	sustain_mode ;
-	int sustain_start, sustain_end;
+	int sustain_start, sustain_end ;
 	int release_mode ;
 	int release_start, reslease_end ;
 } SF_INSTRUMENT ;
