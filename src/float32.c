@@ -61,14 +61,6 @@ static sf_count_t	host_write_i2f	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t	host_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t	host_write_d2f	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static	void	f2s_array 	(float *src, int count, short *dest) ;
-static	void	f2i_array 	(float *src, int count, int *dest) ;
-static	void	f2d_array 	(float *src, int count, double *dest) ;
-
-static 	void	s2f_array 	(short *src, float *dest, int count) ;
-static 	void	i2f_array 	(int *src, float *dest, int count) ;
-static 	void	d2f_array 	(double *src, float *dest, int count) ;
-
 static void		float32_peak_update	(SF_PRIVATE *psf, float *buffer, int count, int indx) ;
 
 static sf_count_t	replace_read_f2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
@@ -432,6 +424,52 @@ float32_get_capability	(SF_PRIVATE *psf)
 	return (CPU_IS_LITTLE_ENDIAN) ? FLOAT_BROKEN_LE : FLOAT_BROKEN_BE ;
 } /* float32_get_capability */
 
+/*=======================================================================================
+*/
+
+static inline void
+f2s_array (float *src, int count, short *dest)
+{	while (--count >= 0)
+	{	dest [count] = lrintf (src [count]) ;
+		} ;
+} /* f2s_array */
+
+static inline void
+f2i_array (float *src, int count, int *dest)
+{	while (--count >= 0)
+	{	dest [count] = lrintf (src [count]) ;
+		} ;
+} /* f2i_array */
+
+static inline void
+f2d_array (float *src, int count, double *dest)
+{	while (--count >= 0)
+	{	dest [count] = src [count] ;
+		} ;
+} /* f2d_array */
+
+static inline void
+s2f_array (short *src, float *dest, int count)
+{	while (--count >= 0)
+	{	dest [count] = src [count] ;
+		} ;
+
+} /* s2f_array */
+
+static inline void
+i2f_array (int *src, float *dest, int count)
+{	while (--count >= 0)
+	{	dest [count] = src [count] ;
+		} ;
+} /* i2f_array */
+
+static inline void
+d2f_array (double *src, float *dest, int count)
+{	while (--count >= 0)
+	{	dest [count] = src [count] ;
+		} ;
+} /* d2f_array */
+
 /*----------------------------------------------------------------------------------------------
 */
 
@@ -651,52 +689,6 @@ host_write_d2f	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 	return total ;
 } /* host_write_d2f */
-
-/*=======================================================================================
-*/
-
-static void
-f2s_array (float *src, int count, short *dest)
-{	while (--count >= 0)
-	{	dest [count] = lrintf (src [count]) ;
-		} ;
-} /* f2s_array */
-
-static void
-f2i_array (float *src, int count, int *dest)
-{	while (--count >= 0)
-	{	dest [count] = lrintf (src [count]) ;
-		} ;
-} /* f2i_array */
-
-static void
-f2d_array (float *src, int count, double *dest)
-{	while (--count >= 0)
-	{	dest [count] = src [count] ;
-		} ;
-} /* f2d_array */
-
-static void
-s2f_array (short *src, float *dest, int count)
-{	while (--count >= 0)
-	{	dest [count] = src [count] ;
-		} ;
-
-} /* s2f_array */
-
-static void
-i2f_array (int *src, float *dest, int count)
-{	while (--count >= 0)
-	{	dest [count] = src [count] ;
-		} ;
-} /* i2f_array */
-
-static void
-d2f_array (double *src, float *dest, int count)
-{	while (--count >= 0)
-	{	dest [count] = src [count] ;
-		} ;
-} /* d2f_array */
 
 /*=======================================================================================
 */
