@@ -47,6 +47,7 @@ static int truncate (const char *filename, int ignored) ;
 +]static void	pcm_test_[+ (get "type_name") +] (const char *str, int filetype, int long_file_ok) ;
 [+ ENDFOR data_type
 +]
+static void empty_file_test (const char *filename, int format) ;
 
 static	double	orig_data [DATA_LENGTH] ;
 static	double	test_data [DATA_LENGTH] ;
@@ -77,7 +78,11 @@ main (int argc, char **argv)
 	do_all = !strcmp (argv [1], "all") ;
 
 	if (do_all || ! strcmp (argv [1], "wav"))
-	{	pcm_test_char	("char.wav"		, SF_FORMAT_WAV | SF_FORMAT_PCM_U8, SF_FALSE) ;
+	{	empty_file_test ("empty_char.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_U8) ;
+		empty_file_test ("empty_short.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+		empty_file_test ("empty_float.wav", SF_FORMAT_WAV | SF_FORMAT_FLOAT) ;
+
+		pcm_test_char	("char.wav"		, SF_FORMAT_WAV | SF_FORMAT_PCM_U8, SF_FALSE) ;
 		pcm_test_short	("short.wav"	, SF_FORMAT_WAV | SF_FORMAT_PCM_16, SF_FALSE) ;
 		pcm_test_24bit	("24bit.wav"	, SF_FORMAT_WAV | SF_FORMAT_PCM_24, SF_FALSE) ;
 		pcm_test_int	("int.wav"		, SF_FORMAT_WAV | SF_FORMAT_PCM_32, SF_FALSE) ;
@@ -96,7 +101,11 @@ main (int argc, char **argv)
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "aiff"))
-	{	pcm_test_char	("char_u8.aiff"	, SF_FORMAT_AIFF | SF_FORMAT_PCM_U8, SF_FALSE) ;
+	{	empty_file_test ("empty_char.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_U8) ;
+		empty_file_test ("empty_short.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_16) ;
+		empty_file_test ("empty_float.aiff", SF_FORMAT_AIFF | SF_FORMAT_FLOAT) ;
+
+		pcm_test_char	("char_u8.aiff"	, SF_FORMAT_AIFF | SF_FORMAT_PCM_U8, SF_FALSE) ;
 		pcm_test_char	("char_s8.aiff"	, SF_FORMAT_AIFF | SF_FORMAT_PCM_S8, SF_FALSE) ;
 		pcm_test_short	("short.aiff"	, SF_FORMAT_AIFF | SF_FORMAT_PCM_16, SF_FALSE) ;
 		pcm_test_24bit	("24bit.aiff"	, SF_FORMAT_AIFF | SF_FORMAT_PCM_24, SF_FALSE) ;
@@ -174,7 +183,10 @@ main (int argc, char **argv)
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "svx"))
-	{	pcm_test_char	("char.svx" , SF_FORMAT_SVX | SF_FORMAT_PCM_S8, SF_FALSE) ;
+	{	empty_file_test ("empty_char.svx", SF_FORMAT_SVX | SF_FORMAT_PCM_S8) ;
+		empty_file_test ("empty_short.svx", SF_FORMAT_SVX | SF_FORMAT_PCM_16) ;
+
+		pcm_test_char	("char.svx" , SF_FORMAT_SVX | SF_FORMAT_PCM_S8, SF_FALSE) ;
 		pcm_test_short	("short.svx", SF_FORMAT_SVX | SF_FORMAT_PCM_16, SF_FALSE) ;
 		test_count++ ;
 		} ;
@@ -207,7 +219,10 @@ main (int argc, char **argv)
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "mat4"))
-	{	pcm_test_short	("short_be.mat4"	, SF_ENDIAN_BIG	| SF_FORMAT_MAT4 | SF_FORMAT_PCM_16, SF_FALSE) ;
+	{	empty_file_test ("empty_short.mat4", SF_FORMAT_MAT4 | SF_FORMAT_PCM_16) ;
+		empty_file_test ("empty_float.mat4", SF_FORMAT_MAT4 | SF_FORMAT_FLOAT) ;
+
+		pcm_test_short	("short_be.mat4"	, SF_ENDIAN_BIG	| SF_FORMAT_MAT4 | SF_FORMAT_PCM_16, SF_FALSE) ;
 		pcm_test_short	("short_le.mat4"	, SF_ENDIAN_LITTLE	| SF_FORMAT_MAT4 | SF_FORMAT_PCM_16, SF_FALSE) ;
 		pcm_test_int	("int_be.mat4"		, SF_ENDIAN_BIG	| SF_FORMAT_MAT4 | SF_FORMAT_PCM_32, SF_FALSE) ;
 		pcm_test_int 	("int_le.mat4"		, SF_ENDIAN_LITTLE	| SF_FORMAT_MAT4 | SF_FORMAT_PCM_32, SF_FALSE) ;
@@ -219,7 +234,11 @@ main (int argc, char **argv)
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "mat5"))
-	{	pcm_test_char 	("char_be.mat5"		, SF_ENDIAN_BIG	| SF_FORMAT_MAT5 | SF_FORMAT_PCM_U8, SF_FALSE) ;
+	{	empty_file_test ("empty_char.mat5", SF_FORMAT_MAT5 | SF_FORMAT_PCM_U8) ;
+		empty_file_test ("empty_short.mat5", SF_FORMAT_MAT5 | SF_FORMAT_PCM_16) ;
+		empty_file_test ("empty_float.mat5", SF_FORMAT_MAT5 | SF_FORMAT_FLOAT) ;
+
+		pcm_test_char 	("char_be.mat5"		, SF_ENDIAN_BIG	| SF_FORMAT_MAT5 | SF_FORMAT_PCM_U8, SF_FALSE) ;
 		pcm_test_char 	("char_le.mat5"		, SF_ENDIAN_LITTLE	| SF_FORMAT_MAT5 | SF_FORMAT_PCM_U8, SF_FALSE) ;
 		pcm_test_short	("short_be.mat5"	, SF_ENDIAN_BIG	| SF_FORMAT_MAT5 | SF_FORMAT_PCM_16, SF_FALSE) ;
 		pcm_test_short	("short_le.mat5"	, SF_ENDIAN_LITTLE	| SF_FORMAT_MAT5 | SF_FORMAT_PCM_16, SF_FALSE) ;
@@ -253,7 +272,11 @@ main (int argc, char **argv)
 	/* Lite remove end */
 
 	if (do_all || ! strcmp (argv [1], "w64"))
-	{	pcm_test_char	("char.w64"		, SF_FORMAT_W64 | SF_FORMAT_PCM_U8, SF_FALSE) ;
+	{	empty_file_test ("empty_char.w64", SF_FORMAT_W64 | SF_FORMAT_PCM_U8) ;
+		empty_file_test ("empty_short.w64", SF_FORMAT_W64 | SF_FORMAT_PCM_16) ;
+		empty_file_test ("empty_float.w64", SF_FORMAT_W64 | SF_FORMAT_FLOAT) ;
+
+		pcm_test_char	("char.w64"		, SF_FORMAT_W64 | SF_FORMAT_PCM_U8, SF_FALSE) ;
 		pcm_test_short	("short.w64"	, SF_FORMAT_W64 | SF_FORMAT_PCM_16, SF_FALSE) ;
 		pcm_test_24bit	("24bit.w64"	, SF_FORMAT_W64 | SF_FORMAT_PCM_24, SF_FALSE) ;
 		pcm_test_int	("int.w64"		, SF_FORMAT_W64 | SF_FORMAT_PCM_32, SF_FALSE) ;
@@ -710,6 +733,71 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 */
 
 static void
+empty_file_test (const char *filename, int format)
+{	SNDFILE		*file ;
+	SF_INFO	info ;
+
+	print_test_name ("empty_file_test", filename) ;
+
+	unlink (filename) ;
+
+	info.samplerate = 48000 ;
+	info.channels = 2 ;
+	info.format = format ;
+
+	if (sf_format_check (&info) == SF_FALSE)
+	{	info.channels = 1 ;
+		if (sf_format_check (&info) == SF_FALSE)
+		{	puts ("invalid file format") ;
+			return ;
+			} ;
+		} ;
+
+	/* Create an empty file. */
+	file = test_open_file_or_die (filename, SFM_WRITE, &info, __LINE__) ;
+	sf_close (file) ;
+
+	/* Open for read and check the length. */
+	file = test_open_file_or_die (filename, SFM_READ, &info, __LINE__) ;
+
+	if (SF_COUNT_TO_LONG (info.frames) != 0)
+	{	printf ("\n\nError : frame count (%ld) should be zero.\n", SF_COUNT_TO_LONG (info.frames)) ;
+			exit (1) ;
+			} ;
+
+	sf_close (file) ;
+
+	/* Open for read/write and check the length. */
+	file = test_open_file_or_die (filename, SFM_RDWR, &info, __LINE__) ;
+
+	if (SF_COUNT_TO_LONG (info.frames) != 0)
+	{	printf ("\n\nError : frame count (%ld) should be zero.\n", SF_COUNT_TO_LONG (info.frames)) ;
+		exit (1) ;
+		} ;
+
+	sf_close (file) ;
+
+	/* Open for read and check the length. */
+	file = test_open_file_or_die (filename, SFM_READ, &info, __LINE__) ;
+
+	if (SF_COUNT_TO_LONG (info.frames) != 0)
+	{	printf ("\n\nError : frame count (%ld) should be zero.\n", SF_COUNT_TO_LONG (info.frames)) ;
+		exit (1) ;
+		} ;
+
+	sf_close (file) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+
+	return ;
+} /* empty_file_test */
+
+
+/*----------------------------------------------------------------------------------------
+*/
+
+static void
 create_short_file (const char *filename)
 {	FILE *file ;
 
@@ -751,7 +839,7 @@ truncate (const char *filename, int ignored)
 [+ COMMENT
 
  Do not edit or modify anything in this comment block.
- The following line is a file identity tag for the GNU Arch 
+ The following line is a file identity tag for the GNU Arch
  revision control system.
 
  arch-tag: 4187de93-d434-41a2-93a9-4f6e2995b5c1

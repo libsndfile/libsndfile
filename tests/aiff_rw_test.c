@@ -36,9 +36,9 @@ static unsigned char aifc_data [] =
 	0x43, 0x4F, 0x4D, 0x4D, /* COMM */
 	0x00, 0x00, 0x00, 0x26, /* COMM length */
 	0x00, 0x01, 0x00, 0x00, 0x00, 0xAE, 0x00, 0x10, 0x40, 0x0D, 0xAC, 0x44,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4E, 0x4F, 0x4E, 0x45, 0x0D, 'N' , 
-	'o' , 't' , ' ' , 'c' , 'o' , 'm' , 'p' , 'r' , 'e' , 's' , 's' , 'e' , 
-	'd' , 0x00, 
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4E, 0x4F, 0x4E, 0x45, 0x0D, 'N' ,
+	'o' , 't' , ' ' , 'c' , 'o' , 'm' , 'p' , 'r' , 'e' , 's' , 's' , 'e' ,
+	'd' , 0x00,
 
 	'F' , 'V' , 'E' , 'R' , 0x00, 0x00, 0x00, 0x04, 0xA2, 0x80, 0x51, 0x40,
 
@@ -87,10 +87,10 @@ main (void)
 	print_test_name ("aiff_rw_test", filename) ;
 
 	dump_data_to_file (filename, aifc_data, sizeof (aifc_data)) ;
-	
+
 	rw_test (filename) ;
 
-    unlink (filename) ;
+	unlink (filename) ;
 
 	puts ("ok") ;
 	return 0 ;
@@ -172,7 +172,7 @@ rw_test (const char *filename)
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 12561248-1ad1-4ba6-941c-029f1333c080

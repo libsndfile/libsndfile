@@ -834,13 +834,11 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
 		} ;
 
-	if (psf->mode == SFM_RDWR && psf->dataoffset > 0 && psf->datalength > 0)
+	if (psf->mode == SFM_RDWR && psf->dataoffset > 0)
 	{	/* Assuming here that the header has already been written and just
 		** needs to be corrected for new data length. That means that we
 		** only change the length fields of the FORM and SSND chunks;
 		** everything else can be skipped over.
-		**
-		** FIXME: Also need to write frames field of COMM chunk.
 		*/
 
 		/* First write new FORM chunk. */
@@ -850,7 +848,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "Etm8", FORM_MARKER, psf->filelength - 8) ;
 		psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 
-		/* Now write farme count field of COMM chunk header. */
+		/* Now write frame count field of COMM chunk header. */
 		psf->headindex = 0 ;
 		psf_fseek (psf, 22, SEEK_SET) ;
 
