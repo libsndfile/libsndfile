@@ -469,7 +469,6 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 			case c_MARKER :
 					psf_binheader_readf (psf, "E4", &dword) ;
-					dword += (dword & 1) ;
 					if (dword == 0)
 						break ;
 					if (dword > SIGNED_SIZEOF (psf->u.scbuf))
@@ -562,7 +561,6 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 			case ANNO_MARKER :
 					psf_binheader_readf (psf, "E4", &dword) ;
-					dword += (dword & 1) ;
 					if (dword == 0)
 						break ;
 					if (dword > SIGNED_SIZEOF (psf->u.scbuf))
@@ -613,14 +611,15 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case basc_MARKER :
-					psf_binheader_readf (psf, "e4", &dword) ;
-					psf_log_printf (psf, "basc : %u\n", dword) ;
+					psf_binheader_readf (psf, "E4", &dword) ;
 
 					if (dword != SIZEOF_basc_CHUNK)
 					{	psf_log_printf (psf, " %M : %d (should be %d)\n", marker, dword, SIZEOF_basc_CHUNK) ;
 						psf_binheader_readf (psf, "j", dword) ;
 						break ;
 						} ;
+
+					psf_log_printf (psf, " basc : %u\n", dword) ;
 
 					if ((error = aiff_read_basc_chunk (psf)))
 						return error ;
@@ -670,7 +669,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					if (isprint ((marker >> 24) & 0xFF) && isprint ((marker >> 16) & 0xFF)
 						&& isprint ((marker >> 8) & 0xFF) && isprint (marker & 0xFF))
 					{	psf_binheader_readf (psf, "E4", &dword) ;
-						psf_log_printf (psf, "%M : %d (unknown marker)\n", marker, dword) ;
+						psf_log_printf (psf, " %M : %d (unknown marker)\n", marker, dword) ;
 
 						psf_binheader_readf (psf, "j", dword) ;
 						break ;
@@ -1265,13 +1264,11 @@ aiff_read_basc_chunk (SF_PRIVATE * psf)
 {	const char * type_str ;
 	basc_CHUNK bc ;
 
-	psf_log_printf (psf, " basc (Apple Loop)\n") ;
-
 	psf_binheader_readf (psf, "E442", &bc.version, &bc.numBeats, &bc.rootNote) ;
 	psf_binheader_readf (psf, "E222", &bc.scaleType, &bc.sigNumerator, &bc.sigDenominator) ;
 	psf_binheader_readf (psf, "E2b", &bc.loopType, &bc.zero_bytes, SIZEOF_basc_CHUNK_PADDING) ;
 
-	psf_log_printf (psf, "  Version?  : %u\n  Num Beats : %u\n  Root Note : 0x%x\n",
+	psf_log_printf (psf, "  Version ? : %u\n  Num Beats : %u\n  Root Note : 0x%x\n",
 						bc.version, bc.numBeats, bc.rootNote) ;
 
 	switch (bc.scaleType)
