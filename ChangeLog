@@ -1,3 +1,16 @@
+2004-07-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/pcm.c
+    Inline x2y_array() functions where possible.
+
+    * configure.ac
+    Detect presence of type int64_t.
+
+    * src/sfendian.c src/sfendian.h
+    Move functions in the first file to the sfendian.h as static inline
+    functions.
+    Improve endswap_long_*() where possible.
+
 2004-07-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/pcm.c
