@@ -59,7 +59,7 @@ int 	string_in_log_buffer (SNDFILE *file, const char *s) ;
 void	hexdump_file (const char * filename, sf_count_t offset, sf_count_t length) ;
 
 SNDFILE *test_open_file_or_die
-			(const char *filename, int mode, SF_INFO *sfinfo, int line_num) ;
+			(const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num) ;
 
 void 	test_read_write_position_or_die
 			(SNDFILE *file, int line_num, int pass, sf_count_t read_pos, sf_count_t write_pos) ;
@@ -353,7 +353,7 @@ dump_log_buffer (SNDFILE *file)
 } /* dump_log_buffer */
 
 SNDFILE *
-test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int line_num)
+test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num)
 {	static int count = 0 ;
 
 	SNDFILE *file ;
@@ -364,7 +364,6 @@ test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int line
 	** Need to test both sf_open() and sf_open_fd().
 	** Do so alternately.
 	*/
-
 	switch (mode)
 	{	case SFM_READ :
 				modestr = "SFM_READ" ;
@@ -394,7 +393,7 @@ test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int line
 	oflags |= O_BINARY ;
 #endif
 
-	if (((++count) & 1) == 1)
+	if (allow_fd && ((++count) & 1) == 1)
 	{	int fd ;
 
 		if (omode == 0)
