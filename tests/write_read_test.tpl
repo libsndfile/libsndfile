@@ -339,13 +339,15 @@ static void	create_short_file (const char *filename) ;
 /*======================================================================================
 */
 
+static void mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int long_file_ok, int allow_fd) ;
+
 static void
 pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_file_ok)
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	[+ (get "data_type") +]		*orig, *test ;
 	sf_count_t	count ;
-	int			k, items, frames, pass, allow_fd ;
+	int			k, items, frames, allow_fd ;
 
 	/* Sd2 files cannot be opened from an existing file descriptor. */
 	allow_fd = ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2) ? SF_FALSE : SF_TRUE ;
@@ -491,117 +493,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 	** Now test Mono RDWR.
 	*/
 
-	sfinfo.samplerate	= SAMPLE_RATE ;
-	sfinfo.frames		= DATA_LENGTH ;
-	sfinfo.channels		= 1 ;
-	sfinfo.format		= format ;
-
-	if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW || (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
-		unlink (filename) ;
-	else
-	{	/* Create a short file. */
-		create_short_file (filename) ;
-
-		/* Opening a already existing short file (ie invalid header) RDWR is disallowed.
-		** If this returns a valif pointer sf_open() screwed up.
-		*/
-		if ((file = sf_open (filename, SFM_RDWR, &sfinfo)))
-		{	printf ("\n\nLine %d: sf_open should (SFM_RDWR) have failed but didn't.\n", __LINE__) ;
-			exit (1) ;
-			} ;
-
-		/* Truncate the file to zero bytes. */
-		if (truncate (filename, 0) < 0)
-		{	printf ("\n\nLine %d: truncate (%s) failed", __LINE__, filename) ;
-			perror (NULL) ;
-			exit (1) ;
-			} ;
-		} ;
-
-	/* Opening a zero length file RDWR is allowed, but the SF_INFO struct must contain
-	** all the usual data required when opening the file in WRITE mode.
-	*/
-	sfinfo.samplerate	= SAMPLE_RATE ;
-	sfinfo.frames		= DATA_LENGTH ;
-	sfinfo.channels		= 1 ;
-	sfinfo.format		= format ;
-
-	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__) ;
-
-	/* Do 3 writes followed by reads. After each, check the data and the current
-	** read and write offsets.
-	*/
-	for (pass = 1 ; pass <= 3 ; pass ++)
-	{	orig [20] = pass * 2 ;
-
-		/* Write some data. */
-		test_write_[+ (get "data_type") +]_or_die (file, pass, orig, DATA_LENGTH, __LINE__) ;
-
-		test_read_write_position_or_die (file, __LINE__, pass, (pass - 1) * DATA_LENGTH, pass * DATA_LENGTH) ;
-
-		/* Read what we just wrote. */
-		test_read_[+ (get "data_type") +]_or_die (file, 0, test, DATA_LENGTH, __LINE__) ;
-
-		/* Check the data. */
-		for (k = 0 ; k < DATA_LENGTH ; k++)
-			if ([+ (get "error_func") +] (orig [k], test [k]))
-			{	printf ("\n\nLine %d (pass %d): Error at sample %d ([+ (get "format_char") +] => [+ (get "format_char") +]).\n", __LINE__, pass, k, orig [k], test [k]) ;
-				oct_save_[+ (get "data_type") +] (orig, test, DATA_LENGTH) ;
-				exit (1) ;
-				} ;
-
-		test_read_write_position_or_die (file, __LINE__, pass, pass * DATA_LENGTH, pass * DATA_LENGTH) ;
-		} ; /* for (pass ...) */
-
-	sf_close (file) ;
-
-	/* Open the file again to check the data. */
-	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__) ;
-
-	if (sfinfo.format != format)
-	{	printf ("\n\nLine %d : Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, format, sfinfo.format) ;
-		exit (1) ;
-		} ;
-
-	if (sfinfo.frames < 3 * DATA_LENGTH)
-	{	printf ("\n\nLine %d : Not enough frames in file. (%ld < %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), 3 * DATA_LENGTH ) ;
-		exit (1) ;
-		}
-
-	if (! long_file_ok && sfinfo.frames != 3 * DATA_LENGTH)
-	{	printf ("\n\nLine %d : Incorrect number of frames in file. (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), 3 * DATA_LENGTH ) ;
-		exit (1) ;
-		} ;
-
-	if (sfinfo.channels != 1)
-	{	printf ("\n\nLine %d : Incorrect number of channels in file.\n", __LINE__) ;
-		exit (1) ;
-		} ;
-
-	if (! long_file_ok)
-		test_read_write_position_or_die (file, __LINE__, 0, 0, 3 * DATA_LENGTH) ;
-	else
-		test_seek_or_die (file, 3 * DATA_LENGTH, SFM_WRITE | SEEK_SET, 3 * DATA_LENGTH, sfinfo.channels, __LINE__) ;
-
-	for (pass = 1 ; pass <= 3 ; pass ++)
-	{	orig [20] = pass * 2 ;
-
-		test_read_write_position_or_die (file, __LINE__, pass, (pass - 1) * DATA_LENGTH, 3 * DATA_LENGTH) ;
-
-		/* Read what we just wrote. */
-		test_read_[+ (get "data_type") +]_or_die (file, pass, test, DATA_LENGTH, __LINE__) ;
-
-		/* Check the data. */
-		for (k = 0 ; k < DATA_LENGTH ; k++)
-			if ([+ (get "error_func") +] (orig [k], test [k]))
-			{	printf ("\n\nLine %d (pass %d): Error at sample %d ([+ (get "format_char") +] => [+ (get "format_char") +]).\n", __LINE__, pass, k, orig [k], test [k]) ;
-				oct_save_[+ (get "data_type") +] (orig, test, DATA_LENGTH) ;
-				exit (1) ;
-				} ;
-
-		} ; /* for (pass ...) */
-
-	sf_close (file) ;
+	mono_rdwr_[+ (get "type_name") +]_test (filename, format, long_file_ok, allow_fd) ;
 
 	/*==================================================================================
 	** Now test Stereo.
@@ -737,6 +629,9 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 			} ;
 
 	sf_close (file) ;
+	delete_file (format, filename) ;
+
+	check_open_file_count_or_die (__LINE__) ;
 
 	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_PAF && (format & SF_FORMAT_TYPEMASK) != SF_FORMAT_VOC)
 	{
@@ -769,12 +664,133 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 		sf_close (rwfile) ;
 		} ;
 
-	delete_file (format, filename) ;
-	check_open_file_count_or_die (__LINE__) ;
-
 	puts ("ok") ;
 	return ;
 } /* pcm_test_[+ (get "type_name") +] */
+
+
+static void
+mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int long_file_ok, int allow_fd)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	[+ (get "data_type") +]		*orig, *test ;
+	int			k, pass ;
+
+	orig = ([+ (get "data_type") +]*) orig_data ;
+	test = ([+ (get "data_type") +]*) test_data ;
+
+	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.frames		= DATA_LENGTH ;
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= format ;
+
+	if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW || (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
+		unlink (filename) ;
+	else
+	{	/* Create a short file. */
+		create_short_file (filename) ;
+
+		/* Opening a already existing short file (ie invalid header) RDWR is disallowed.
+		** If this returns a valif pointer sf_open() screwed up.
+		*/
+		if ((file = sf_open (filename, SFM_RDWR, &sfinfo)))
+		{	printf ("\n\nLine %d: sf_open should (SFM_RDWR) have failed but didn't.\n", __LINE__) ;
+			exit (1) ;
+			} ;
+
+		/* Truncate the file to zero bytes. */
+		if (truncate (filename, 0) < 0)
+		{	printf ("\n\nLine %d: truncate (%s) failed", __LINE__, filename) ;
+			perror (NULL) ;
+			exit (1) ;
+			} ;
+		} ;
+
+	/* Opening a zero length file RDWR is allowed, but the SF_INFO struct must contain
+	** all the usual data required when opening the file in WRITE mode.
+	*/
+	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.frames		= DATA_LENGTH ;
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= format ;
+
+	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__) ;
+
+	/* Do 3 writes followed by reads. After each, check the data and the current
+	** read and write offsets.
+	*/
+	for (pass = 1 ; pass <= 3 ; pass ++)
+	{	orig [20] = pass * 2 ;
+
+		/* Write some data. */
+		test_write_[+ (get "data_type") +]_or_die (file, pass, orig, DATA_LENGTH, __LINE__) ;
+
+		test_read_write_position_or_die (file, __LINE__, pass, (pass - 1) * DATA_LENGTH, pass * DATA_LENGTH) ;
+
+		/* Read what we just wrote. */
+		test_read_[+ (get "data_type") +]_or_die (file, 0, test, DATA_LENGTH, __LINE__) ;
+
+		/* Check the data. */
+		for (k = 0 ; k < DATA_LENGTH ; k++)
+			if ([+ (get "error_func") +] (orig [k], test [k]))
+			{	printf ("\n\nLine %d (pass %d): Error at sample %d ([+ (get "format_char") +] => [+ (get "format_char") +]).\n", __LINE__, pass, k, orig [k], test [k]) ;
+				oct_save_[+ (get "data_type") +] (orig, test, DATA_LENGTH) ;
+				exit (1) ;
+				} ;
+
+		test_read_write_position_or_die (file, __LINE__, pass, pass * DATA_LENGTH, pass * DATA_LENGTH) ;
+		} ; /* for (pass ...) */
+
+	sf_close (file) ;
+
+	/* Open the file again to check the data. */
+	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__) ;
+
+	if (sfinfo.format != format)
+	{	printf ("\n\nLine %d : Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, format, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames < 3 * DATA_LENGTH)
+	{	printf ("\n\nLine %d : Not enough frames in file. (%ld < %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), 3 * DATA_LENGTH ) ;
+		exit (1) ;
+		}
+
+	if (! long_file_ok && sfinfo.frames != 3 * DATA_LENGTH)
+	{	printf ("\n\nLine %d : Incorrect number of frames in file. (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), 3 * DATA_LENGTH ) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d : Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	if (! long_file_ok)
+		test_read_write_position_or_die (file, __LINE__, 0, 0, 3 * DATA_LENGTH) ;
+	else
+		test_seek_or_die (file, 3 * DATA_LENGTH, SFM_WRITE | SEEK_SET, 3 * DATA_LENGTH, sfinfo.channels, __LINE__) ;
+
+	for (pass = 1 ; pass <= 3 ; pass ++)
+	{	orig [20] = pass * 2 ;
+
+		test_read_write_position_or_die (file, __LINE__, pass, (pass - 1) * DATA_LENGTH, 3 * DATA_LENGTH) ;
+
+		/* Read what we just wrote. */
+		test_read_[+ (get "data_type") +]_or_die (file, pass, test, DATA_LENGTH, __LINE__) ;
+
+		/* Check the data. */
+		for (k = 0 ; k < DATA_LENGTH ; k++)
+			if ([+ (get "error_func") +] (orig [k], test [k]))
+			{	printf ("\n\nLine %d (pass %d): Error at sample %d ([+ (get "format_char") +] => [+ (get "format_char") +]).\n", __LINE__, pass, k, orig [k], test [k]) ;
+				oct_save_[+ (get "data_type") +] (orig, test, DATA_LENGTH) ;
+				exit (1) ;
+				} ;
+
+		} ; /* for (pass ...) */
+
+	sf_close (file) ;
+} /* mono_rdwr_[+ (get "data_type") +]_test */
 
 [+ ENDFOR data_type +]
 
