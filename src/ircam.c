@@ -268,12 +268,12 @@ ircam_write_header (SF_PRIVATE *psf, int calc_length)
 	switch (psf->endian)
 	{	case SF_ENDIAN_BIG :
 			psf_binheader_writef (psf, "Emf", IRCAM_02B_MARKER, samplerate) ;
-		psf_binheader_writef (psf, "E44", psf->sf.channels, encoding) ;
+			psf_binheader_writef (psf, "E44", psf->sf.channels, encoding) ;
 			break ;
 
 		case SF_ENDIAN_LITTLE :
 			psf_binheader_writef (psf, "emf", IRCAM_03L_MARKER, samplerate) ;
-		psf_binheader_writef (psf, "e44", psf->sf.channels, encoding) ;
+			psf_binheader_writef (psf, "e44", psf->sf.channels, encoding) ;
 			break ;
 
 		default : return SFE_BAD_OPEN_FORMAT ;
