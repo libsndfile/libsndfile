@@ -1,4 +1,4 @@
-Version 1.0.10 (2004-05-15)
+Version 1.0.10 (2004-06-15)
   * Fix AIFF read/write mode bugs.
   * Add support for compiling Win32 DLLS using MinGW.
   * Fix problems resulting in failed compiles with gcc-2.95.
