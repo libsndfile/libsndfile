@@ -23,8 +23,9 @@ FILESPECIFIC = aiff.c au.c au_g72x.c avr.c ircam.c macbinary3.c macos.c mat4.c \
 				mat5.c nist.c paf.c pvf.c raw.c svx.c voc.c htk.c dwd.c ogg.c \
 				rx2.c sd2.c sds.c txw.c wve.c w64.c wav_w64.c wav.c xi.c
 				
-libsndfile_la_SOURCES = $(COMMON) $(FILESPECIFIC) $(noinst_HEADERS) sndfile.h
+# MinGW requires -no-undefined if a DLL is to be built.
 libsndfile_la_LDFLAGS = -no-undefined -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@
+libsndfile_la_SOURCES = $(COMMON) $(FILESPECIFIC) $(noinst_HEADERS) sndfile.h
 libsndfile_la_LIBADD  = GSM610/libgsm.la G72x/libg72x.la -lm
 
 test_file_io_CFLAGS = $(AM_CFLAGS)

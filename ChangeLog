@@ -1,3 +1,11 @@
+2004-10-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/configure.ac src/makefile.am
+    Finally fix the bulding of DLLs on Win32/MinGW.
+
+    * tests/makefile.am
+    Fix running of tests on Win32/MinGW.
+
 2004-10-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in src/sndfile.c tests/floating_point_test.tpl
