@@ -307,10 +307,16 @@ main (int argc, char **argv)
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "flac"))
-	{	pcm_test_char	("char.flac"	, SF_FORMAT_FLAC | SF_FORMAT_FLAC_8, SF_TRUE) ;
+	{
+#ifdef HAVE_FLAC_ALL_H
+		pcm_test_char	("char.flac"	, SF_FORMAT_FLAC | SF_FORMAT_FLAC_8, SF_TRUE) ;
 		pcm_test_short	("short.flac"	, SF_FORMAT_FLAC | SF_FORMAT_FLAC_16, SF_TRUE) ;
 		pcm_test_24bit	("24bit.flac"	, SF_FORMAT_FLAC | SF_FORMAT_FLAC_24, SF_TRUE) ;
 		test_count++ ;
+#else
+		printf ("    **** flac not supported in this binary. ****\n") ;
+		test_count ++;
+#endif
 		} ;
 
 	if (test_count == 0)

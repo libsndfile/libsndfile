@@ -23,12 +23,26 @@
 #include	<string.h>
 #include	<ctype.h>
 
+#include        "sndfile.h"
+#include        "config.h"
+#include        "common.h"
+
+
+#ifndef HAVE_FLAC_ALL_H
+
+int
+flac_open (SF_PRIVATE *psf)
+{	if (psf)
+		return SFE_UNIMPLEMENTED ;
+	return (psf && 0) ;
+} /* flac_open */
+
+
+#else
+
 #include	<FLAC/all.h>
 
-#include	"sndfile.h"
-#include	"config.h"
 #include	"sfendian.h"
-#include	"common.h"
 #include	"float_cast.h"
 
 /*------------------------------------------------------------------------------
@@ -1088,6 +1102,8 @@ flac_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 
 	return ((sf_count_t) -1) ;
 } /* flac_seek */
+
+#endif
 
 /*
 ** Do not edit or modify anything in this comment block.
