@@ -51,53 +51,68 @@ main (void)
 ** Actual test functions.
 */
 
-[+ FOR int_type +]
+[+ FOR int_type
++]static void
+dump_[+ (get "name") +]_array (const char * name, [+ (get "name") +] * data, int datalen)
+{	int k ;
+
+	printf ("%-6s : ", name) ;
+	for (k = 0 ; k < datalen ; k++)
+		printf ("[+ (get "format") +] ", data [k]) ;
+	putchar ('\n') ;
+} /* dump_[+ (get "name") +]_array */
+
 static void
 test_endswap_[+ (get "name") +] (void)
-{	[+ (get "name") +] buffer [4] ;
+{	[+ (get "name") +] orig [4], first [4], second [4] ;
 	int k ;
 
 	printf ("    %-24s : ", "test_endswap_[+ (get "name") +]") ;
 	fflush (stdout) ;
 
-	for (k = 0 ; k < ARRAY_LEN (buffer) ; k++)
-		buffer [k] = [+ (get "value") +] + k ;
+	for (k = 0 ; k < ARRAY_LEN (orig) ; k++)
+		orig [k] = [+ (get "value") +] + k ;
 
-	endswap_[+ (get "name") +]_array (buffer, ARRAY_LEN (buffer)) ;
+	endswap_[+ (get "name") +]_copy (first, orig, ARRAY_LEN (first)) ;
+	endswap_[+ (get "name") +]_copy (second, first, ARRAY_LEN (second)) ;
 
-	for (k = 0 ; k < ARRAY_LEN (buffer) ; k++)
-		if (buffer [k] == k + 1 || buffer [k] != [+ (get "swapper") +] ([+ (get "value") +] + k))
-		{	printf ("\n\nLine %d : \n\n", __LINE__) ;
-			exit (1) ;
-			} ;
+	if (memcmp (orig, first, sizeof (orig)) == 0)
+	{	printf ("\n\nLine %d : test 1 : these two array should not be the same:\n\n", __LINE__) ;
+		dump_[+ (get "name") +]_array ("orig", orig, ARRAY_LEN (orig));
+		dump_[+ (get "name") +]_array ("first", first, ARRAY_LEN (first));
+		exit (1) ;
+		} ;
 
-	endswap_[+ (get "name") +]_array (buffer, ARRAY_LEN (buffer)) ;
+	if (memcmp (orig, second, sizeof (orig)) != 0)
+	{	printf ("\n\nLine %d : test 2 : these two array should be the same:\n\n", __LINE__) ;
+		dump_[+ (get "name") +]_array ("orig", orig, ARRAY_LEN (orig));
+		dump_[+ (get "name") +]_array ("second", second, ARRAY_LEN (second));
+		exit (1) ;
+		} ;
 
-	for (k = 0 ; k < ARRAY_LEN (buffer) ; k++)
-		if (buffer [k] != [+ (get "value") +] + k)
-		{	printf ("\n\nLine %d : \n\n", __LINE__) ;
-			exit (1) ;
-			} ;
+	endswap_[+ (get "name") +]_array (first, ARRAY_LEN (first)) ;
 
-	endswap_[+ (get "name") +]_copy (buffer, buffer, ARRAY_LEN (buffer)) ;
+	if (memcmp (orig, first, sizeof (orig)) != 0)
+	{	printf ("\n\nLine %d : test 3 : these two array should be the same:\n\n", __LINE__) ;
+		dump_[+ (get "name") +]_array ("orig", orig, ARRAY_LEN (orig));
+		dump_[+ (get "name") +]_array ("first", first, ARRAY_LEN (first));
+		exit (1) ;
+		} ;
 
-	for (k = 0 ; k < ARRAY_LEN (buffer) ; k++)
-		if (buffer [k] == k + 1 || buffer [k] != [+ (get "swapper") +] ([+ (get "value") +] + k))
-		{	printf ("\n\nLine %d : \n\n", __LINE__) ;
-			exit (1) ;
-			} ;
+	endswap_[+ (get "name") +]_copy (first, orig, ARRAY_LEN (first)) ;
+	endswap_[+ (get "name") +]_copy (first, first, ARRAY_LEN (first)) ;
 
-	endswap_[+ (get "name") +]_copy (buffer, buffer, ARRAY_LEN (buffer)) ;
-
-	for (k = 0 ; k < ARRAY_LEN (buffer) ; k++)
-		if (buffer [k] != [+ (get "value") +] + k)
-		{	printf ("\n\nLine %d : \n\n", __LINE__) ;
-			exit (1) ;
-			} ;
+	if (memcmp (orig, first, sizeof (orig)) != 0)
+	{	printf ("\n\nLine %d : test 4 : these two array should be the same:\n\n", __LINE__) ;
+		dump_[+ (get "name") +]_array ("orig", orig, ARRAY_LEN (orig));
+		dump_[+ (get "name") +]_array ("first", first, ARRAY_LEN (first));
+		exit (1) ;
+		} ;
 
 	puts ("ok") ;
 } /* test_endswap_[+ (get "name") +] */
-[+ ENDFOR int_type +]
+[+ ENDFOR int_type
++]
 
 
 [+ COMMENT
