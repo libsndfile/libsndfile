@@ -190,7 +190,7 @@
 #define PACKAGE_NAME "libsndfile"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsndfile 1.0.11pre11"
+#define PACKAGE_STRING "libsndfile 1.0.11"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsndfile"
@@ -250,7 +250,7 @@
 #define TYPEOF_SF_COUNT_T __int64_t
 
 /* Version number of package */
-#define VERSION "1.0.11pre11"
+#define VERSION "1.0.11"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */

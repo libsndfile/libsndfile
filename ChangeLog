@@ -1,3 +1,8 @@
+2004-11-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Win32/sndfile.h Win32/config.h MacOS9/sndfile.h MacOS9/config.h
+    Updates from autoconfig versions.
+	
 2004-11-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c
