@@ -14,8 +14,8 @@ libg72x_la_SOURCES = $(CFILES) $(noinst_HEADERS)
 g72x_test_SOURCES = g72x_test.c
 g72x_test_LDADD = ./libg72x.la -lm
 
-check: g72x_test$(EXEEXT)
-	./g72x_test$(EXEEXT) all
+check: g72x_test
+	./g72x_test all
 
 # Disable autoheader.
 AUTOHEADER=echo
