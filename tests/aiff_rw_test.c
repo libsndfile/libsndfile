@@ -103,7 +103,7 @@ static void
 dump_data_to_file (const char *filename, void *data, unsigned int datalen)
 {	FILE *file ;
 
-	if ((file = fopen (filename, "w")) == NULL)
+	if ((file = fopen (filename, "wb")) == NULL)
 	{	printf ("\n\nLine %d : could not open file : %s\n\n", __LINE__, filename) ;
 		exit (1) ;
 		} ;
