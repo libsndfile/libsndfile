@@ -382,6 +382,13 @@ if test x"$CFLAGS" = x ; then
 	fi
 
 htmldocdir=$prefix/share/doc/libsndfile1-dev/html
+
+if test $prefix = "NONE" ; then
+	htmldocdir=/usr/local/share/doc/libsndfile1-dev/html
+else
+	htmldocdir=$prefix/share/doc/libsndfile1-dev/html
+	fi
+
 AC_SUBST(htmldocdir)
 
 AC_SUBST(SHLIB_VERSION_ARG)
