@@ -412,8 +412,10 @@ this:
 <P>
 Notice how the file itself looks like a directory containing a single file
 named <B>rsrc</B>.
-When libsndfile is compiled for MacOSX, it should open SD2 file with
-resource forks like this without any problems.
+When libsndfile is compiled for MacOSX, it should open (for write and read)
+SD2 file with resource forks like this without any problems.
+It will also handle files with the resource fork in a separate file as
+described below.
 </P>
 
 <P>
@@ -440,8 +442,11 @@ same directory like this:
 <P>
 Regardless of what platform it is running on, when libsndfile is asked to
 open a file named <B>"foo"</B> and it can't recognize the file type from
-the data in the file, it then tries to open a file named <B>"._foo"</B>
-to see if the file has a valid resource fork.
+the data in the file, it will attempt to open the resource fork and if
+that fails, it then tries to open a file named <B>"._foo"</B> to see if
+the file has a valid resource fork.
+This is the same regardless of whether the file is being opened for read
+or write.
 </P>
 
 <P>

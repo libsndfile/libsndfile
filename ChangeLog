@@ -1,3 +1,8 @@
+2004-11-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/FAQ.html
+    Remove some ambiguities in the SD2 FAQ answer.
+
 2004-11-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Win32/sndfile.h Win32/config.h MacOS9/sndfile.h MacOS9/config.h
