@@ -140,6 +140,9 @@ floating_point_test.c: floating_point_test.def floating_point_test.tpl
 benchmark.c: benchmark.def benchmark.tpl
 	autogen --writable --source-time benchmark.def
 
+genfiles : write_read_test.c pcm_test.c header_test.c utils.c command_test.c \
+		scale_clip_test.c pipe_test.c floating_point_test.c benchmark.c
+
 #===============================================================================
 
 check: generic-tests wav-tests aiff-tests au-tests raw-tests paf-tests \

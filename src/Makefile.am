@@ -39,6 +39,8 @@ test_log_printf_SOURCES = test_log_printf.c
 test_endswap.c: test_endswap.def test_endswap.tpl
 	autogen --writable --source-time test_endswap.def
 
+genfiles : test_endswap.c Symbols.linux Symbols.darwin libsndfile.def
+
 # Two test programs.
 # It is not possible to place these in the tests/ directory because they
 # need access to the internals of the SF_PRIVATE struct.
