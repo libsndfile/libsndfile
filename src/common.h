@@ -180,8 +180,9 @@ typedef struct sf_private_tag
 		unsigned char	ucbuf	[SF_BUFFER_LEN / sizeof (signed char)] ;
 		} u ;
 
-	char			filename	[SF_FILENAME_LEN] ;
-	char			rsrcname	[SF_FILENAME_LEN] ;
+	char			filepath	[SF_FILENAME_LEN] ;
+	char			rsrcpath	[SF_FILENAME_LEN] ;
+	char			filename	[SF_FILENAME_LEN / 4] ;
 
 	char			syserr		[SF_SYSERR_LEN] ;
 

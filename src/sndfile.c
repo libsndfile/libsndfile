@@ -1926,34 +1926,34 @@ static int
 try_resource_fork (SF_PRIVATE * psf, const char * pathname)
 {
 	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
-	LSF_SNPRINTF (psf->rsrcname, sizeof (psf->rsrcname), "%s/rsrc", pathname) ;
+	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s/rsrc", pathname) ;
 
-	if (psf_open_rsrc (psf, psf->rsrcname, SFM_READ) != 0)
+	if (psf_open_rsrc (psf, psf->rsrcpath, SFM_READ) != 0)
 	{	/* Now try for re a resource fork stored as a separate file. */
 		char *fname ;
 
 		/* Grab the un-adulterated filename again. */
-		LSF_SNPRINTF (psf->rsrcname, sizeof (psf->rsrcname), "%s", pathname) ;
+		LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s", pathname) ;
 
-		if ((fname = strrchr (psf->rsrcname, '/')) != NULL)
+		if ((fname = strrchr (psf->rsrcpath, '/')) != NULL)
 			fname ++ ;
-		else if ((fname = strrchr (psf->rsrcname, '\\')) != NULL)
+		else if ((fname = strrchr (psf->rsrcpath, '\\')) != NULL)
 			fname ++ ;
 		else
-			fname = psf->rsrcname ;
+			fname = psf->rsrcpath ;
 
 		memmove (fname + 2, fname, strlen (fname) + 1) ;
 		fname [0] = '.' ;
 		fname [1] = '_' ;
 
-		if (psf_open_rsrc (psf, psf->rsrcname, SFM_READ) != 0)
-		{	memset (psf->rsrcname, 0, sizeof (psf->rsrcname)) ;
+		if (psf_open_rsrc (psf, psf->rsrcpath, SFM_READ) != 0)
+		{	memset (psf->rsrcpath, 0, sizeof (psf->rsrcpath)) ;
 			return 0 ;
 			} ;
 		} ;
 
 	/* More checking here. */
-	psf_log_printf (psf, "Resource fork : %s\n", psf->rsrcname) ;
+	psf_log_printf (psf, "Resource fork : %s\n", psf->rsrcpath) ;
 
 	return SF_FORMAT_SD2 ;
 } /* try_resource_fork */
@@ -1998,7 +1998,7 @@ format_from_extension (const char *filename)
 } /* format_from_extension */
 
 static int
-guess_file_type (SF_PRIVATE *psf, const char *pathname)
+guess_file_type (SF_PRIVATE *psf, const char *filename)
 {	int buffer [3], format ;
 
 	if (psf_binheader_readf (psf, "b", &buffer, SIGNED_SIZEOF (buffer)) != SIGNED_SIZEOF (buffer))
@@ -2098,11 +2098,11 @@ guess_file_type (SF_PRIVATE *psf, const char *pathname)
 		return SF_FORMAT_AVR ;
 
 	/* This must be the second last one. */
-	if (psf->filelength > 0 && (format = try_resource_fork (psf, pathname)) != 0)
+	if (psf->filelength > 0 && (format = try_resource_fork (psf, psf->filepath)) != 0)
 		return format ;
 
 	/* This must be the last one. */
-	if ((format = format_from_extension (pathname)) != 0)
+	if ((format = format_from_extension (filename)) != 0)
 		return format ;
 
 	/* Default to header-less RAW PCM file type. */
@@ -2155,12 +2155,14 @@ static void
 copy_filename (SF_PRIVATE *psf, const char *path)
 {	const char *cptr ;
 
+	LSF_SNPRINTF (psf->filepath, sizeof (psf->filepath), "%s", path) ;
+
 	if ((cptr = strrchr (path, '/')) || (cptr = strrchr (path, '\\')))
 		cptr ++ ;
 	else
 		cptr = path ;
 
-	memset (psf->filename, 0, SF_FILENAME_LEN) ;
+	memset (psf->filename, 0, sizeof (psf->filename)) ;
 
 	LSF_SNPRINTF (psf->filename, sizeof (psf->filename), "%s", cptr) ;
 
