@@ -1,7 +1,10 @@
 2004-04-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
+    * doc/index.html
+    Add link to pre-release location.
+
     * src/sndfile.h.in
-    Remove comman after last element of enum.
+    Remove comma after last element of enum.
 
     * src/float32.c src/double64.c
     Fix read/write of float/double encoded raw files to/from pipes.
@@ -12,6 +15,11 @@
 
     * tests/Makefile.am
     Hook tests/pipe_test.* into build system.
+
+2004-04-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac acinclude.m4
+    Rename AC_C_STRUCT_HACK macro to AC_C99_FLEXIBLE_ARRAY.
 
 2004-03-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
