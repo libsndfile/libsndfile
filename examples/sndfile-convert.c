@@ -17,14 +17,14 @@
 */
 
 
-#include	<stdio.h>
-#include	<stdlib.h>
-#include	<string.h>
-#include	<ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
-#include	<sndfile.h>
+#include <sndfile.h>
 
-#define	 BUFFER_LEN      1024
+#define	 BUFFER_LEN	1024
 
 
 typedef	struct
@@ -34,10 +34,11 @@ typedef	struct
 
 typedef struct
 {	const char	*ext ;
-	int  		len  ;
-	int  		format ;
+	int			len ;
+	int			format ;
 } OUTPUT_FORMAT_MAP ;
 
+static void copy_metadata (SNDFILE *outfile, SNDFILE *infile) ;
 static void copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels) ;
 static void copy_data_int (SNDFILE *outfile, SNDFILE *infile, int channels) ;
 
@@ -127,16 +128,16 @@ print_usage (char *progname)
 	for (k = 0 ; k < (int) (sizeof (format_map) / sizeof (format_map [0])) ; k++)
 	{	info.format = format_map [k].format ;
 		sf_command (NULL, SFC_GET_FORMAT_INFO, &info, sizeof (info)) ;
-		printf ("        %-10s : %s\n",  format_map [k].ext, info.name) ;
+		printf ("        %-10s : %s\n", format_map [k].ext, info.name) ;
 		} ;
 
 	puts ("") ;
 } /* print_usage */
 
 int
-main (int argc, char *argv[])
+main (int argc, char * argv [])
 {	char 		*progname, *infilename, *outfilename ;
-	SNDFILE	 	*infile, *outfile ;
+	SNDFILE	 	*infile = NULL, *outfile = NULL ;
 	SF_INFO	 	sfinfo ;
 	int			k, outfilemajor, outfileminor = 0, infileminor ;
 
@@ -145,7 +146,7 @@ main (int argc, char *argv[])
 
 	if (argc < 3 || argc > 5)
 	{	print_usage (progname) ;
-		return  1 ;
+		return 1 ;
 		} ;
 
 	infilename = argv [argc-2] ;
@@ -154,19 +155,19 @@ main (int argc, char *argv[])
 	if (! strcmp (infilename, outfilename))
 	{	printf ("Error : Input and output filenames are the same.\n\n") ;
 		print_usage (progname) ;
-		return  1 ;
+		return 1 ;
 		} ;
 
 	if (infilename [0] == '-')
 	{	printf ("Error : Input filename (%s) looks like an option.\n\n", infilename) ;
 		print_usage (progname) ;
-		return  1 ;
+		return 1 ;
 		} ;
 
 	if (outfilename [0] == '-')
 	{	printf ("Error : Output filename (%s) looks like an option.\n\n", outfilename) ;
 		print_usage (progname) ;
-		return  1 ;
+		return 1 ;
 		} ;
 
 	for (k = 1 ; k < argc - 2 ; k++)
@@ -234,9 +235,9 @@ main (int argc, char *argv[])
 	if (! (infile = sf_open (infilename, SFM_READ, &sfinfo)))
 	{	printf ("Not able to open input file %s.\n", infilename) ;
 		puts (sf_strerror (NULL)) ;
-		return  1 ;
+		return 1 ;
 		} ;
-	
+
 	infileminor = sfinfo.format & SF_FORMAT_SUBMASK ;
 
 	if (! (sfinfo.format = guess_output_file_type (outfilename, sfinfo.format)))
@@ -268,10 +269,13 @@ main (int argc, char *argv[])
 		return 1 ;
 		} ;
 
+	/* Copy the metadata */
+	copy_metadata (outfile, infile) ;
+
 	/* Open the output file. */
 	if ((outfile = sf_open (outfilename, SFM_WRITE, &sfinfo)) == NULL)
 	{	printf ("Not able to open output file %s : %s\n", outfilename, sf_strerror (NULL)) ;
-		return  1 ;
+		return 1 ;
 		} ;
 
 	if ((outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT) ||
@@ -287,6 +291,17 @@ main (int argc, char *argv[])
 } /* main */
 
 static void
+copy_metadata (SNDFILE *outfile, SNDFILE *infile)
+{	const char *str ;
+	int k, err = 0 ;
+
+	for (k = 1 ; err == 0 ; k++)
+	{	str = sf_get_string (infile, k) ;
+		err = sf_set_string (outfile, k, (str != NULL) ? str : "") ;
+		}
+} /* copy_metadata */
+
+static void
 copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels)
 {	static double	data [BUFFER_LEN], max ;
 	int		frames, readcount, k ;
@@ -295,7 +310,7 @@ copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels)
 	readcount = frames ;
 
 	sf_command (infile, SFC_CALC_SIGNAL_MAX, &max, sizeof (max)) ;
-	
+
 	if (max < 1.0)
 	{	while (readcount > 0)
 		{	readcount = sf_readf_double (infile, data, frames) ;
@@ -332,7 +347,7 @@ copy_data_int (SNDFILE *outfile, SNDFILE *infile, int channels)
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 259682b3-2887-48a6-b5bb-3cde00521ba3

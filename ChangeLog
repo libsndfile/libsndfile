@@ -2,10 +2,14 @@
 
     * src/strings.c
     If adding an SF_STR_SOFTWARE string, only append libsndfile-X.Y.Z if the
-    string does not already have libsndfile in the string.
+    string does not already have libsndfile in the string. Thanks to Conrad
+	Parker.
 
     * tests/string_test.c
     Add test to verify the above.
+
+    * examples/sndfile-convert.c
+    Add ability to transcode meta data as well (Conrad Parker).
 
 2004-04-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
