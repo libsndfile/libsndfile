@@ -150,7 +150,6 @@ enum
 enum
 {	basc_TYPE_LOOP = 0,
 	basc_TYPE_ONE_SHOT,
-	
 } ;
 
 
@@ -502,20 +501,32 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case COMT_MARKER :
-					psf_binheader_readf (psf, "E4", &dword) ;
+				{	unsigned short count, id, len ;
+					unsigned int timestamp ;
+
+					psf_binheader_readf (psf, "E42", &dword, &count) ;
+					psf_log_printf (psf, " %M : %d\n  count  : %d\n", marker, dword, count) ;
 					dword += (dword & 1) ;
 					if (dword == 0)
 						break ;
-					if (dword > SIGNED_SIZEOF (psf->u.scbuf))
-					{	psf_log_printf (psf, " %M : %d (too big)\n", marker, dword) ;
-						return SFE_INTERNAL ;
-						} ;
 
-					cptr = psf->u.scbuf ;
-					psf_binheader_readf (psf, "b", cptr, dword) ;
-					cptr [dword - 1] = 0 ;
-					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
-					psf_store_string (psf, SF_STR_COMMENT, cptr) ;
+					for (k = 0 ; k < count ; k++)
+					{	psf_binheader_readf (psf, "E422", &timestamp, &id, &len) ;
+
+						psf_log_printf (psf, "   time   : 0x%x\n   marker : %x\n   length : %d\n", timestamp, id, len) ;
+
+						if (len + 1 > SIGNED_SIZEOF (psf->u.scbuf))
+						{	psf_log_printf (psf, "\nError : string length (%d) too big.\n", len) ;
+							return SFE_INTERNAL ;
+							} ;
+
+						cptr = psf->u.scbuf ;
+						psf_binheader_readf (psf, "b", cptr, len) ;
+						cptr [len] = 0 ;
+						psf_log_printf (psf, "   string : %s\n", cptr) ;
+						psf_store_string (psf, SF_STR_COMMENT, cptr) ;
+						} ;
+					} ;
 					break ;
 
 			case APPL_MARKER :
@@ -726,6 +737,8 @@ aiff_close	(SF_PRIVATE *psf)
 static int
 aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 {	int error = 0, bytesread, subformat ;
+
+	psf->u.scbuf [0] = 0 ;
 
 	bytesread = psf_binheader_readf (psf, "E4", &(comm_fmt->size)) ;
 
