@@ -46,6 +46,10 @@ static SF_FORMAT_INFO const simple_formats [] =
 		"AU (Sun/Next 8-bit u-law)", "au"
 		},
 
+	{	SF_FORMAT_FLAC | SF_FORMAT_FLAC_16,
+		"FLAC 16 bit", "flac"
+		},
+
 	{	SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM,
 		"OKI Dialogic VOX ADPCM", "vox"
 		},
@@ -99,6 +103,7 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_AIFF,		"AIFF (Apple/SGI)",						"aiff" 	},
 	{	SF_FORMAT_AU,		"AU (Sun/NeXT)", 						"au"	},
 	{	SF_FORMAT_AVR,		"AVR (Audio Visual Research)",	 		"avr"	},
+	{	SF_FORMAT_FLAC,		"FLAC (FLAC Lossless Audio Codec)",	 	"flac"	},
 	{	SF_FORMAT_HTK,		"HTK (HMM Tool Kit)",					"htk"	},
 	{	SF_FORMAT_SVX,		"IFF (Amiga IFF/SVX8/SV16)",			"iff"	},
 	{	SF_FORMAT_MAT4,		"MAT4 (GNU Octave 2.0 / Matlab 4.2)",	"mat"	},
@@ -106,10 +111,8 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_PAF,		"PAF (Ensoniq PARIS)", 					"paf"	},
 	{	SF_FORMAT_PVF,		"PVF (Portable Voice Format)",			"pvf"	},
 	{	SF_FORMAT_RAW,		"RAW (header-less)",				 	"raw"	},
+	{	SF_FORMAT_SD2,		"SD2 (Sound Designer II)", 				"sd2"	},
 	{	SF_FORMAT_SDS,		"SDS (Midi Sample Dump Standard)", 		"sds"	},
-	/* Not ready for mainstream use yet.
-	{	SF_FORMAT_SD2,		"SD2 (Sound Designer II)", 			"sd2"	},
-	*/
 	{	SF_FORMAT_IRCAM,	"SF (Berkeley/IRCAM/CARL)",				"sf"	},
 	{	SF_FORMAT_VOC,		"VOC (Creative Labs)",					"voc"	},
 	{	SF_FORMAT_W64,		"W64 (SoundFoundry WAVE 64)",			"w64"	},
@@ -171,6 +174,10 @@ static SF_FORMAT_INFO subtype_formats [] =
 
 	{	SF_FORMAT_DPCM_16,		"16 bit DPCM",			NULL 	},
 	{	SF_FORMAT_DPCM_8,		"8 bit DPCM",			NULL 	},
+
+	{	SF_FORMAT_FLAC_8,		"8 bit FLAC",			NULL	},
+	{	SF_FORMAT_FLAC_16,		"16 bit FLAC",			NULL	},
+	{	SF_FORMAT_FLAC_24,		"24 bit FLAC",			NULL	}
 } ; /* subtype_formats */
 
 int
