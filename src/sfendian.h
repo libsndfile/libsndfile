@@ -75,16 +75,24 @@ typedef __int64 int64_t ;
 #if (CPU_IS_LITTLE_ENDIAN == 1)
 	#define LES2H_SHORT(x)			(x)
 	#define LEI2H_INT(x)			(x)
-
 	#define BES2H_SHORT(x)			ENDSWAP_SHORT(x)
 	#define BEI2H_INT(x)			ENDSWAP_INT(x)
+
+	#define H2BE_SHORT(x)			ENDSWAP_SHORT(x)
+	#define H2BE_INT(x)				ENDSWAP_INT(x)
+	#define H2LE_SHORT(x)			(x)
+	#define H2LE_INT(x)				(x)
 
 #elif (CPU_IS_BIG_ENDIAN == 1)
 	#define LES2H_SHORT(x)			ENDSWAP_SHORT(x)
 	#define LEI2H_INT(x)			ENDSWAP_INT(x)
-
 	#define BES2H_SHORT(x)			(x)
 	#define BEI2H_INT(x)			(x)
+
+	#define H2BE_SHORT(x)			(x)
+	#define H2BE_INT(x)				(x)
+	#define H2LE_SHORT(x)			ENDSWAP_SHORT(x)
+	#define H2LE_INT(x)				ENDSWAP_INT(x)
 
 #else
 	#error "Target CPU endian-ness unknown. May need to hand edit src/config.h"
