@@ -106,13 +106,22 @@ word	gsm_asr  		(word a, int n) ;
 # define GSM_L_MULT(a, b) /* word a, word b */	\
 	(((longword)(a) * (longword)(b)) << 1)
 
-# define GSM_L_ADD(a, b)	\
-	( (a) <  0 ? ( (b) >= 0 ? (a) + (b)	\
-		 : (utmp = (ulongword)-((a) + 1) + (ulongword)-((b) + 1)) \
-		   >= ((ulongword) MAX_LONGWORD) ? MIN_LONGWORD : -(longword)utmp-2 )   \
-	: ((b) <= 0 ? (a) + (b)   \
-		: (utmp = (ulongword)(a) + (ulongword)(b)) >= ((ulongword) MAX_LONGWORD) \
-			? MAX_LONGWORD : utmp))
+static inline longword
+GSM_L_ADD (longword a, longword b)
+{	ulongword utmp ;
+	
+	if (a < 0 && b < 0)
+	{	utmp = (ulongword)-((a) + 1) + (ulongword)-((b) + 1) ;
+		return (utmp >= (ulongword) MAX_LONGWORD) ? MIN_LONGWORD : -(longword)utmp-2 ;
+		} ;
+	
+	if (a > 0 && b > 0)
+	{	utmp = (ulongword) a + (ulongword) b ;
+		return (utmp >= (ulongword) MAX_LONGWORD) ? MAX_LONGWORD : utmp ;
+		} ;
+	
+	return a + b ;
+} /* GSM_L_ADD */
 
 /*
  * # define GSM_ADD(a, b)	\
@@ -129,7 +138,19 @@ word	gsm_asr  		(word a, int n) ;
 	((ltmp = (longword)(a) - (longword)(b)) >= MAX_WORD \
 	? MAX_WORD : ltmp <= MIN_WORD ? MIN_WORD : ltmp)
 
+#if 0
 # define GSM_ABS(a)	((a) < 0 ? ((a) == MIN_WORD ? MAX_WORD : -(a)) : (a))
+#else
+static inline word
+GSM_ABS (word a)
+{
+	if (a > 0)
+		return a ;
+	if (a == MIN_WORD)
+		return MAX_WORD ;
+	return -a ;
+} /* GSM_ADD */
+#endif
 
 /* Use these if necessary:
 
