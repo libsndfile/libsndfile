@@ -349,7 +349,7 @@ static int paf24_close (SF_PRIVATE *psf) ;
 static int
 paf24_init (SF_PRIVATE *psf)
 {	PAF24_PRIVATE	*ppaf24 ;
-	int	paf24size, max_blocks ;
+	int	paf24size ;
 
 	paf24size = sizeof (PAF24_PRIVATE) + psf->sf.channels *
 					(PAF24_BLOCK_SIZE + PAF24_SAMPLES_PER_BLOCK * sizeof (int)) ;
@@ -398,18 +398,18 @@ paf24_init (SF_PRIVATE *psf)
 	if (psf->datalength % PAF24_BLOCK_SIZE)
 	{	if (psf->mode == SFM_READ)
 			psf_log_printf (psf, "*** Warning : file seems to be truncated.\n") ;
-		max_blocks = psf->datalength / ppaf24->blocksize + 1 ;
+		ppaf24->max_blocks = psf->datalength / ppaf24->blocksize + 1 ;
 		}
 	else
-		max_blocks = psf->datalength / ppaf24->blocksize ;
+		ppaf24->max_blocks = psf->datalength / ppaf24->blocksize ;
 
 	ppaf24->read_block = 0 ;
 	if (psf->mode == SFM_RDWR)
-		ppaf24->write_block = max_blocks ;
+		ppaf24->write_block = ppaf24->max_blocks ;
 	else
 		ppaf24->write_block = 0 ;
 
-	psf->sf.frames = ppaf24->samplesperblock * max_blocks ;
+	psf->sf.frames = ppaf24->samplesperblock * ppaf24->max_blocks ;
 	ppaf24->sample_count = psf->sf.frames ;
 
 	return 0 ;
@@ -435,11 +435,6 @@ paf24_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	switch (mode)
 	{	case SFM_READ :
-				if (offset > ppaf24->read_block * ppaf24->samplesperblock + ppaf24->read_count)
-				{	psf->error = SFE_BAD_SEEK ;
-					return SF_SEEK_ERROR ;
-					} ;
-
 				if (psf->last_op == SFM_WRITE && ppaf24->write_count)
 					paf24_write_block (psf, ppaf24) ;
 
