@@ -770,8 +770,13 @@ header_seek (SF_PRIVATE *psf, sf_count_t position, int whence)
 			break ;
 
 		case SEEK_CUR :
-			if (psf->headindex + position < 0 || psf->headindex >= SIGNED_SIZEOF (psf->header))
+			if (psf->headindex + position < 0)
 				break ;
+
+			if (psf->headindex >= SIGNED_SIZEOF (psf->header))
+			{	psf_fseek (psf, position, whence) ;
+				return ;
+				} ;
 
 			if (psf->headindex + position <= psf->headend)
 			{	psf->headindex += position ;
