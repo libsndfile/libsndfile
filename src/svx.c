@@ -279,6 +279,7 @@ svx_read_header	(SF_PRIVATE *psf)
 					psf_log_printf (psf, " %M : %d\n", marker, dword) ;
 
 					bytecount += psf_binheader_readf (psf, "E4", &channels) ;
+					psf->sf.channels = channels ;
 
 					psf_log_printf (psf, "  Channels : %d\n", channels) ;
 
