@@ -44,7 +44,7 @@ static int truncate (const char *filename, int ignored) ;
 #define	SILLY_WRITE_COUNT	(234)
 
 [+ FOR data_type
-+]static void	pcm_test_[+ (get "type_name") +] (const char *str, int filetype, int long_file_ok) ;
++]static void	pcm_test_[+ (get "type_name") +] (const char *str, int format, int long_file_okz) ;
 [+ ENDFOR data_type
 +]
 static void empty_file_test (const char *filename, int format) ;
@@ -294,6 +294,13 @@ main (int argc, char **argv)
 		test_count++ ;
 		} ;
 
+	if (do_all || ! strcmp (argv [1], "sd2"))
+	{	pcm_test_char	("char.sd2"		, SF_FORMAT_SD2 | SF_FORMAT_PCM_S8, SF_TRUE) ;
+		pcm_test_short	("short.sd2"	, SF_FORMAT_SD2 | SF_FORMAT_PCM_16, SF_TRUE) ;
+		pcm_test_24bit	("24bit.sd2"	, SF_FORMAT_SD2 | SF_FORMAT_PCM_24, SF_TRUE) ;
+		test_count++ ;
+		} ;
+
 	if (test_count == 0)
 	{	printf ("Mono : ************************************\n") ;
 		printf ("Mono : *  No '%s' test defined.\n", argv [1]) ;
@@ -326,19 +333,22 @@ static void	create_short_file (const char *filename) ;
 */
 
 static void
-pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_file_ok)
+pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_file_ok)
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	[+ (get "data_type") +]		*orig, *test ;
 	sf_count_t	count ;
-	int			k, items, frames, pass ;
+	int			k, items, frames, pass, allow_fd ;
+
+	/* Sd2 files cannot be opened from an existing file descriptor. */
+	allow_fd = ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2) ? SF_FALSE : SF_TRUE ;
 
 	print_test_name ("pcm_test_[+ (get "type_name") +]", filename) ;
 
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= SILLY_WRITE_COUNT ; /* Wrong length. Library should correct this on sf_close. */
 	sfinfo.channels		= 1 ;
-	sfinfo.format		= filetype ;
+	sfinfo.format		= format ;
 
 	gen_windowed_sine_double (orig_data, DATA_LENGTH, [+ (get "max_val") +]) ;
 
@@ -350,7 +360,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 
 	items = DATA_LENGTH ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__) ;
 
 	sf_set_string (file, SF_STR_ARTIST, "Your name here") ;
 
@@ -363,13 +373,13 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 
 	memset (test, 0, items * sizeof ([+ (get "data_type") +])) ;
 
-	if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
+	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
 		memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, allow_fd, __LINE__) ;
 
-	if (sfinfo.format != filetype)
-	{	printf ("\n\nLine %d : Mono : Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+	if (sfinfo.format != format)
+	{	printf ("\n\nLine %d : Mono : Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, format, sfinfo.format) ;
 		exit (1) ;
 		} ;
 
@@ -407,8 +417,8 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 			exit (1) ;
 			} ;
 
-	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_16 ||
-			(filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_24)
+	if ((format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_16 ||
+			(format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_24)
 	{	sf_close (file) ;
 		unlink (filename) ;
 		printf ("ok\n") ;
@@ -476,9 +486,9 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= DATA_LENGTH ;
 	sfinfo.channels		= 1 ;
-	sfinfo.format		= filetype ;
+	sfinfo.format		= format ;
 
-	if ((filetype & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW)
+	if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW)
 		unlink (filename) ;
 	else
 	{	/* Create a short file. */
@@ -506,9 +516,9 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= DATA_LENGTH ;
 	sfinfo.channels		= 1 ;
-	sfinfo.format		= filetype ;
+	sfinfo.format		= format ;
 
-	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__) ;
 
 	/* Do 3 writes followed by reads. After each, check the data and the current
 	** read and write offsets.
@@ -538,10 +548,10 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 	sf_close (file) ;
 
 	/* Open the file again to check the data. */
-	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__) ;
 
-	if (sfinfo.format != filetype)
-	{	printf ("\n\nLine %d : Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+	if (sfinfo.format != format)
+	{	printf ("\n\nLine %d : Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, format, sfinfo.format) ;
 		exit (1) ;
 		} ;
 
@@ -593,7 +603,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= SILLY_WRITE_COUNT ; /* Wrong length. Library should correct this on sf_close. */
 	sfinfo.channels		= 2 ;
-	sfinfo.format		= filetype ;
+	sfinfo.format		= format ;
 
 	if (! sf_format_check (&sfinfo))
 	{	unlink (filename) ;
@@ -612,7 +622,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 	items = DATA_LENGTH ;
 	frames = items / sfinfo.channels ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__) ;
 
 	sf_set_string (file, SF_STR_ARTIST, "Your name here") ;
 
@@ -624,14 +634,14 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 
 	memset (test, 0, items * sizeof ([+ (get "data_type") +])) ;
 
-	if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
+	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
 		memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, allow_fd, __LINE__) ;
 
-	if (sfinfo.format != filetype)
+	if (sfinfo.format != format)
 	{	printf ("\n\nLine %d : Stereo : Returned format incorrect (0x%08X => 0x%08X).\n",
-				__LINE__, filetype, sfinfo.format) ;
+				__LINE__, format, sfinfo.format) ;
 		exit (1) ;
 		} ;
 
@@ -735,6 +745,10 @@ static void
 empty_file_test (const char *filename, int format)
 {	SNDFILE		*file ;
 	SF_INFO	info ;
+	int allow_fd ;
+
+	/* Sd2 files cannot be opened from an existing file descriptor. */
+	allow_fd = ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2) ? SF_FALSE : SF_TRUE ;
 
 	print_test_name ("empty_file_test", filename) ;
 
@@ -753,11 +767,11 @@ empty_file_test (const char *filename, int format)
 		} ;
 
 	/* Create an empty file. */
-	file = test_open_file_or_die (filename, SFM_WRITE, &info, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &info, allow_fd, __LINE__) ;
 	sf_close (file) ;
 
 	/* Open for read and check the length. */
-	file = test_open_file_or_die (filename, SFM_READ, &info, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &info, allow_fd, __LINE__) ;
 
 	if (SF_COUNT_TO_LONG (info.frames) != 0)
 	{	printf ("\n\nError : frame count (%ld) should be zero.\n", SF_COUNT_TO_LONG (info.frames)) ;
@@ -767,7 +781,7 @@ empty_file_test (const char *filename, int format)
 	sf_close (file) ;
 
 	/* Open for read/write and check the length. */
-	file = test_open_file_or_die (filename, SFM_RDWR, &info, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_RDWR, &info, allow_fd, __LINE__) ;
 
 	if (SF_COUNT_TO_LONG (info.frames) != 0)
 	{	printf ("\n\nError : frame count (%ld) should be zero.\n", SF_COUNT_TO_LONG (info.frames)) ;
@@ -777,7 +791,7 @@ empty_file_test (const char *filename, int format)
 	sf_close (file) ;
 
 	/* Open for read and check the length. */
-	file = test_open_file_or_die (filename, SFM_READ, &info, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &info, allow_fd, __LINE__) ;
 
 	if (SF_COUNT_TO_LONG (info.frames) != 0)
 	{	printf ("\n\nError : frame count (%ld) should be zero.\n", SF_COUNT_TO_LONG (info.frames)) ;
