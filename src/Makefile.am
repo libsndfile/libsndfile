@@ -16,7 +16,7 @@ noinst_HEADERS = common.h sfendian.h float_cast.h wav_w64.h au.h sf_unistd.h
 noinst_PROGRAMS = test_file_io test_log_printf
 
 COMMON = sndfile.c common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
-		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c sfendian.c vox_adpcm.c \
+		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
 		interleave.c strings.c dither.c
 
 FILESPECIFIC = aiff.c au.c au_g72x.c avr.c ircam.c macbinary3.c macos.c mat4.c \

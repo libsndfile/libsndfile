@@ -32,6 +32,14 @@
 
 #endif
 
+#if defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8)
+
+#define HAVE_SF_INT64_T 1
+
+#else
+#define HAVE_SF_INT64_T 0
+#endif
+
 /*
 ** Many file types (ie WAV, AIFF) use sets of four consecutive bytes as a
 ** marker indicating different sections of the file.
@@ -78,19 +86,139 @@
 #define BET2H_SHORT_PTR(x)		(((x) [0] << 8) + (x) [1])
 #define BET2H_INT_PTR(x)		(((x) [0] << 24) + ((x) [1] << 16) + ((x) [2] << 8))
 
-/* Endian swapping routines implemented in sfendian.c. */
+/*-----------------------------------------------------------------------------------------------
+** Generic functions for performing endian swapping on integer arrays.
+*/
 
-void	endswap_short_array	(short *ptr, int len) ;
-void	endswap_int_array	(int *ptr, int len) ;
+static inline void
+endswap_short_array (short *ptr, int len)
+{	short	temp ;
 
-/* Always swaps 8 byte values whether sizeof (long) == 8 or not. */
-void	endswap_long_array	(long *ptr, int len) ;
+	while (--len >= 0)
+	{	temp = ptr [len] ;
+		ptr [len] = ENDSWAP_SHORT (temp) ;
+		} ;
+} /* endswap_short_array */
 
-void	endswap_short_copy	(short *dest, short *src, int len) ;
-void	endswap_int_copy	(int *dest, int *src, int len) ;
+static inline void
+endswap_int_array (int *ptr, int len)
+{	int temp ;
 
-/* Always swaps 8 byte values whether sizeof (long) == 8 or not. */
-void	endswap_long_copy	(long *dest, long *src, int len) ;
+	while (--len >= 0)
+	{	temp = ptr [len] ;
+		ptr [len] = ENDSWAP_INT (temp) ;
+		} ;
+} /* endswap_int_array */
+
+#if  (defined (HAVE_BYTESWAP_T) && defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
+
+static inline void
+endswap_long_array (void *ptr, int len)
+{	int64_t *array, value ;
+
+	array = ptr ;
+	while (--len >= 0)
+	{	value = array [len] ;
+		array [len] = bswap_64 (value) ;
+		} ;
+} /* endswap_long_array */
+
+#else
+
+/*	This function assumes that sizeof (long) == 8, but works correctly even
+**	is sizeof (long) == 4.
+*/
+static inline void
+endswap_long_array (long *ptr, int len)
+{	unsigned char *ucptr, temp ;
+
+	ucptr = (unsigned char *) ptr + 8 * len ;
+	while (--len >= 0)
+	{	ucptr -= 8 ;
+
+		temp = ucptr [0] ;
+		ucptr [0] = ucptr [7] ;
+		ucptr [7] = temp ;
+
+		temp = ucptr [1] ;
+		ucptr [1] = ucptr [6] ;
+		ucptr [6] = temp ;
+
+		temp = ucptr [2] ;
+		ucptr [2] = ucptr [5] ;
+		ucptr [5] = temp ;
+
+		temp = ucptr [3] ;
+		ucptr [3] = ucptr [4] ;
+		ucptr [4] = temp ;
+		} ;
+} /* endswap_long_array */
+
+#endif
+
+/*========================================================================================
+*/
+
+static inline void
+endswap_short_copy (short *dest, const short *src, int len)
+{
+	while (--len >= 0)
+	{	dest [len] = ENDSWAP_SHORT (src [len]) ;
+		} ;
+} /* endswap_short_copy */
+
+static inline void
+endswap_int_copy (int *dest, const int *src, int len)
+{
+	while (--len >= 0)
+	{	dest [len] = ENDSWAP_INT (src [len]) ;
+		} ;
+} /* endswap_int_copy */
+
+#if  (defined (HAVE_BYTESWAP_T) && defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
+
+static inline void
+endswap_long_copy (void *dest, const void *src, int len)
+{	const int64_t *from ;
+	int64_t *to, value ;
+
+	from = src ;
+	to = dest ;
+	while (--len >= 0)
+	{	value = from [len] ;
+		to [len] = bswap_64 (value) ;
+		} ;
+} /* endswap_long_copy */
+
+#else
+
+/*
+**	This function assumes that sizeof (long) == 8, but works correctly even
+**	if sizeof (long) == 4.
+*/
+static inline void
+endswap_long_copy (void *dest, const void *src, int len)
+{	const unsigned char *psrc ;
+	unsigned char *pdest ;
+
+	psrc = ((const unsigned char *) src) + 8 * len ;
+	pdest = ((unsigned char *) dest) + 8 * len ;
+	while (--len >= 0)
+	{	psrc -= 8 ;
+		pdest -= 8 ;
+
+		pdest [0] = psrc [7] ;
+		pdest [1] = psrc [6] ;
+		pdest [2] = psrc [5] ;
+		pdest [3] = psrc [4] ;
+		pdest [4] = psrc [3] ;
+		pdest [5] = psrc [2] ;
+		pdest [6] = psrc [1] ;
+		pdest [7] = psrc [0] ;
+		} ;
+} /* endswap_long_copy */
+
+#endif
 
 /*
 ** Do not edit or modify anything in this comment block.
