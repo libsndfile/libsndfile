@@ -52,6 +52,7 @@ void	print_test_name (const char *test, const char *filename) ;
 void 	dump_log_buffer (SNDFILE *file) ;
 void 	check_log_buffer_or_die (SNDFILE *file) ;
 int 	string_in_log_buffer (SNDFILE *file, const char *s) ;
+void	hexdump_file (const char * filename, sf_count_t offset, sf_count_t length) ;
 
 SNDFILE *test_open_file_or_die
 			(const char *filename, int mode, SF_INFO *sfinfo, int line_num) ;
@@ -85,7 +86,9 @@ void	test_seek_or_die
 #include <sf_unistd.h>
 #endif
 
+#include <errno.h>
 #include <string.h>
+#include <ctype.h>
 #include <math.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -98,7 +101,8 @@ void	test_seek_or_die
 #define	M_PI		3.14159265358979323846264338
 #endif
 
-#define		LOG_BUFFER_SIZE		2048
+#define SIGNED_SIZEOF(x)	((int)(sizeof (x)))
+#define	LOG_BUFFER_SIZE		2048
 
 void
 gen_windowed_sine (double *data, int len, double maximum)
@@ -272,6 +276,58 @@ string_in_log_buffer (SNDFILE *file, const char *s)
 	/* Look for string */
 	return strstr (buffer, s) ? SF_TRUE : SF_FALSE ;
 } /* string_in_log_buffer */
+
+void
+hexdump_file (const char * filename, sf_count_t offset, sf_count_t length)
+{
+	FILE * file ;
+	char buffer [16] ;
+	int k, m, ch, readcount ;
+
+	if (length > 1000000)
+	{	printf ("\n\nError : length (%ld) too long.\n\n", SF_COUNT_TO_LONG (offset)) ;
+		exit (1) ;
+		} ;
+
+	if ((file = fopen (filename, "r")) == NULL)
+	{	printf ("\n\nError : hexdump_file (%s) could not open file for read.\n\n", filename) ;
+		exit (1) ;
+		} ;
+
+	if (fseek (file, offset, SEEK_SET) != 0)
+	{	printf ("\n\nError : fseek(file, %ld, SEEK_SET) failed : %s\n\n", SF_COUNT_TO_LONG (offset), strerror (errno)) ;
+		exit (1) ;
+		} ;
+
+	puts ("\n\n") ;
+
+	for (k = 0 ; k < length ; k+= sizeof (buffer))
+	{	readcount = fread (buffer, 1, sizeof (buffer), file) ;
+		
+		printf ("%08lx : ", SF_COUNT_TO_LONG (offset + k)) ;
+
+		for (m = 0 ; m < readcount ; m++)
+			printf ("%02x ", buffer [m] & 0xFF) ;
+
+		for (m = readcount ; m < SIGNED_SIZEOF (buffer) ; m++)
+			printf ("   ") ;
+
+		printf ("  ") ;
+		for (m = 0 ; m < readcount ; m++)
+		{	ch = isprint (buffer [m]) ? buffer [m] : '.' ;
+			putchar (ch) ;
+			} ;
+		
+		if (readcount < SIGNED_SIZEOF (buffer))
+			break ;
+
+		putchar ('\n') ;
+		} ;
+
+	puts ("\n") ;
+
+	fclose (file) ;
+} /* hexdump_file */
 
 void
 dump_log_buffer (SNDFILE *file)
@@ -470,7 +526,7 @@ test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die (SNDFILE *file, in
 [+ COMMENT
 
  Do not edit or modify anything in this comment block.
- The following line is a file identity tag for the GNU Arch 
+ The following line is a file identity tag for the GNU Arch
  revision control system.
 
  arch-tag: b1183d5d-ebd4-4bc5-af50-60d774d6b1f5
