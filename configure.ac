@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.53)
 
-AC_INIT(libsndfile,1.0.10pre3,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.10pre4,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
@@ -115,65 +115,70 @@ unset ac_cv_sizeof_off_t
 
 AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
 
-if test "x$target_os" = "xmingw32msvc" ; then
+case "$target_os" in
+	mingw32*)
 		TYPEOF_SF_COUNT_T="__int64"
 		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 		SIZEOF_SF_COUNT_T=8
-elif test "x$ac_cv_sizeof_off_t" = "x8" ; then
-	# If sizeof (off_t) is 8, no further checking is needed.
-	TYPEOF_SF_COUNT_T="off_t"
-	SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
-	SIZEOF_SF_COUNT_T=8
-else
-	# Check for common 64 bit file offset types.
-	AC_CHECK_SIZEOF(loff_t,1)	# Fake default value.
-	AC_CHECK_SIZEOF(off64_t,1)	# Fake default value.
-
-	TYPEOF_SF_COUNT_T="unknown"
-	if test "x$ac_cv_sizeof_loff_t" = "x8" ; then
-		TYPEOF_SF_COUNT_T="loff_t"
-		SIZEOF_SF_COUNT_T=8
-	elif test "x$ac_cv_sizeof_off64_t" = "x8" ; then
-		TYPEOF_SF_COUNT_T="off64_t"
-		SIZEOF_SF_COUNT_T=8
-		fi
-
-	# Save the old sizeof (off_t) value  and then unset it to see if it
-	# changes when Large File Support is enabled.
-
-	pre_largefile_sizeof_off_t=$ac_cv_sizeof_off_t
-	unset ac_cv_sizeof_off_t
-
-	AC_SYS_EXTRA_LARGEFILE
-
-	if test "x$ac_cv_sys_largefile_CFLAGS" = "xno" ; then
-		ac_cv_sys_largefile_CFLAGS=""
-		fi
-	if test "x$ac_cv_sys_largefile_LDFLAGS" = "xno" ; then
-		ac_cv_sys_largefile_LDFLAGS=""
-		fi
-	if test "x$ac_cv_sys_largefile_LIBS" = "xno" ; then
-		ac_cv_sys_largefile_LIBS=""
-		fi
-
-	AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
-
-	if test "x$ac_cv_sizeof_off_t" = "x8" ; then
-		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
-	elif test "x$ac_cv_sizeof_off_t" = "x$pre_largefile_sizeof_off_t" ; then
-		AC_MSG_WARN([[This machine does not seem to support 64 bit file offsets.]])
-		TYPEOF_SF_COUNT_T="off_t"
-		SIZEOF_SF_COUNT_T=$ac_cv_sizeof_off_t
-	elif test "x$TYPEOF_SF_COUNT_T" = "xunknown" ; then
-		echo
-		echo "*** The configure process has determined that this system is capable"
-		echo "*** of Large File Support but has not been able to find a type which"
-		echo "*** is an unambiguous 64 bit file offset."
-		echo "*** Please contact the author to help resolve this problem."
-		echo
-		AC_MSG_ERROR([[Bad file offset type.]])
-		fi
-	fi
+		;;
+	*)
+		if test "x$ac_cv_sizeof_off_t" = "x8" ; then
+			# If sizeof (off_t) is 8, no further checking is needed.
+			TYPEOF_SF_COUNT_T="off_t"
+			SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
+			SIZEOF_SF_COUNT_T=8
+		else
+			# Check for common 64 bit file offset types.
+			AC_CHECK_SIZEOF(loff_t,1)	# Fake default value.
+			AC_CHECK_SIZEOF(off64_t,1)	# Fake default value.
+		
+			TYPEOF_SF_COUNT_T="unknown"
+			if test "x$ac_cv_sizeof_loff_t" = "x8" ; then
+				TYPEOF_SF_COUNT_T="loff_t"
+				SIZEOF_SF_COUNT_T=8
+			elif test "x$ac_cv_sizeof_off64_t" = "x8" ; then
+				TYPEOF_SF_COUNT_T="off64_t"
+				SIZEOF_SF_COUNT_T=8
+				fi
+		
+			# Save the old sizeof (off_t) value  and then unset it to see if it
+			# changes when Large File Support is enabled.
+		
+			pre_largefile_sizeof_off_t=$ac_cv_sizeof_off_t
+			unset ac_cv_sizeof_off_t
+		
+			AC_SYS_EXTRA_LARGEFILE
+		
+			if test "x$ac_cv_sys_largefile_CFLAGS" = "xno" ; then
+				ac_cv_sys_largefile_CFLAGS=""
+				fi
+			if test "x$ac_cv_sys_largefile_LDFLAGS" = "xno" ; then
+				ac_cv_sys_largefile_LDFLAGS=""
+				fi
+			if test "x$ac_cv_sys_largefile_LIBS" = "xno" ; then
+				ac_cv_sys_largefile_LIBS=""
+				fi
+		
+			AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
+		
+			if test "x$ac_cv_sizeof_off_t" = "x8" ; then
+				SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
+			elif test "x$ac_cv_sizeof_off_t" = "x$pre_largefile_sizeof_off_t" ; then
+				AC_MSG_WARN([[This machine does not seem to support 64 bit file offsets.]])
+				TYPEOF_SF_COUNT_T="off_t"
+				SIZEOF_SF_COUNT_T=$ac_cv_sizeof_off_t
+			elif test "x$TYPEOF_SF_COUNT_T" = "xunknown" ; then
+				echo
+				echo "*** The configure process has determined that this system is capable"
+				echo "*** of Large File Support but has not been able to find a type which"
+				echo "*** is an unambiguous 64 bit file offset."
+				echo "*** Please contact the author to help resolve this problem."
+				echo
+				AC_MSG_ERROR([[Bad file offset type.]])
+				fi
+			fi
+		;;
+	esac
 
 if test $SIZEOF_SF_COUNT_T = 4 ; then
 	SF_COUNT_MAX="0x7FFFFFFF"
@@ -261,7 +266,7 @@ case "$target_os" in
 		OS_SPECIFIC_CFLAGS="-fpascal-strings -I/Developer/Headers/FlatCarbon"
 		OS_SPECIFIC_LINKS="-framework CoreAudio"
 		;;
-	mingw32msvc)
+	mingw32*)
 		os_is_win32=1
 		## AC_CHECK_HEADERS(wintypes.h)
 		AC_CHECK_HEADERS(mmreg.h)
