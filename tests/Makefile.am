@@ -132,182 +132,182 @@ check: generic-tests ulaw_test alaw_test floating_point_test scale_clip_test \
 		ircam-tests voc-tests w64-tests mat4-tests mat5-tests pvf-tests \
 		xi-tests htk-tests sds-tests stdio-tests aiff_rw_test
 
-generic-tests : error_test ulaw_test alaw_test command_test floating_point_test pcm_test
+generic-tests : error_test$(EXEEXT) ulaw_test$(EXEEXT) alaw_test$(EXEEXT) command_test$(EXEEXT) floating_point_test$(EXEEXT) pcm_test$(EXEEXT)
 	uname -a
-	./error_test
-	./pcm_test
-	./ulaw_test
-	./alaw_test
-	./dwvw_test
-	./command_test ver
-	./command_test norm
-	./command_test format
-	./command_test peak
-	./command_test trunc
-	./floating_point_test
-	./scale_clip_test
-	./headerless_test
+	./error_test$(EXEEXT)
+	./pcm_test$(EXEEXT)
+	./ulaw_test$(EXEEXT)
+	./alaw_test$(EXEEXT)
+	./dwvw_test$(EXEEXT)
+	./command_test$(EXEEXT) ver
+	./command_test$(EXEEXT) norm
+	./command_test$(EXEEXT) format
+	./command_test$(EXEEXT) peak
+	./command_test$(EXEEXT) trunc
+	./floating_point_test$(EXEEXT)
+	./scale_clip_test$(EXEEXT)
+	./headerless_test$(EXEEXT)
 	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed common tests."
-	@echo "----------------------------------------------------------------------"
-
-wav-tests: write_read_test lossy_comp_test peak_chunk_test misc_test multi_file_test
-	./write_read_test wav
-	./lossy_comp_test wav_ima
-	./lossy_comp_test wav_msadpcm
-	./lossy_comp_test wav_ulaw
-	./lossy_comp_test wav_alaw
-	./lossy_comp_test wav_gsm610
-	./peak_chunk_test wav
-	./misc_test wav
-	./string_test wav
-	./multi_file_test wav
-	./open_fail_test wav
-	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on WAV files."
+	@echo "  `./sfversion$(EXEEXT)` passed common tests."
 	@echo "----------------------------------------------------------------------"
 
-aiff-tests: write_read_test lossy_comp_test peak_chunk_test misc_test aiff_rw_test
-	./write_read_test aiff
-	./lossy_comp_test aiff_ulaw
-	./lossy_comp_test aiff_alaw
-	./lossy_comp_test aiff_gsm610
+wav-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) peak_chunk_test$(EXEEXT) misc_test$(EXEEXT) multi_file_test$(EXEEXT)
+	./write_read_test$(EXEEXT) wav
+	./lossy_comp_test$(EXEEXT) wav_ima
+	./lossy_comp_test$(EXEEXT) wav_msadpcm
+	./lossy_comp_test$(EXEEXT) wav_ulaw
+	./lossy_comp_test$(EXEEXT) wav_alaw
+	./lossy_comp_test$(EXEEXT) wav_gsm610
+	./peak_chunk_test$(EXEEXT) wav
+	./misc_test$(EXEEXT) wav
+	./string_test$(EXEEXT) wav
+	./multi_file_test$(EXEEXT) wav
+	./open_fail_test$(EXEEXT) wav
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion$(EXEEXT)` passed tests on WAV files."
+	@echo "----------------------------------------------------------------------"
+
+aiff-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) peak_chunk_test$(EXEEXT) misc_test$(EXEEXT) aiff_rw_test$(EXEEXT)
+	./write_read_test$(EXEEXT) aiff
+	./lossy_comp_test$(EXEEXT) aiff_ulaw
+	./lossy_comp_test$(EXEEXT) aiff_alaw
+	./lossy_comp_test$(EXEEXT) aiff_gsm610
 	@echo "=========================="
-	@echo "./lossy_comp_test aiff_ima"
+	@echo "./lossy_comp_test$(EXEEXT) aiff_ima"
 	@echo "=========================="
-	./peak_chunk_test aiff
-	./misc_test aiff
-	./string_test aiff
-	./multi_file_test aiff
-	./aiff_rw_test
+	./peak_chunk_test$(EXEEXT) aiff
+	./misc_test$(EXEEXT) aiff
+	./string_test$(EXEEXT) aiff
+	./multi_file_test$(EXEEXT) aiff
+	./aiff_rw_test$(EXEEXT)
 	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on AIFF files."
-	@echo "----------------------------------------------------------------------"
-
-au-tests: write_read_test lossy_comp_test misc_test
-	./write_read_test au
-	./lossy_comp_test au_ulaw
-	./lossy_comp_test au_alaw
-	./lossy_comp_test au_g721
-	./lossy_comp_test au_g723
-	./misc_test au
-	./multi_file_test wav
-	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on AU files."
+	@echo "  `./sfversion$(EXEEXT)` passed tests on AIFF files."
 	@echo "----------------------------------------------------------------------"
 
-raw-tests: write_read_test lossy_comp_test raw_test
-	./write_read_test raw
-	./lossy_comp_test raw_ulaw
-	./lossy_comp_test raw_alaw
-	./lossy_comp_test vox_adpcm
+au-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) misc_test$(EXEEXT)
+	./write_read_test$(EXEEXT) au
+	./lossy_comp_test$(EXEEXT) au_ulaw
+	./lossy_comp_test$(EXEEXT) au_alaw
+	./lossy_comp_test$(EXEEXT) au_g721
+	./lossy_comp_test$(EXEEXT) au_g723
+	./misc_test$(EXEEXT) au
+	./multi_file_test$(EXEEXT) wav
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion$(EXEEXT)` passed tests on AU files."
+	@echo "----------------------------------------------------------------------"
+
+raw-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) raw_test$(EXEEXT)
+	./write_read_test$(EXEEXT) raw
+	./lossy_comp_test$(EXEEXT) raw_ulaw
+	./lossy_comp_test$(EXEEXT) raw_alaw
+	./lossy_comp_test$(EXEEXT) vox_adpcm
 	./raw_test
 	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on RAW (header-less) files."
+	@echo "  `./sfversion$(EXEEXT)` passed tests on RAW (header-less) files."
 	@echo "----------------------------------------------------------------------"
 
-w64-tests: write_read_test lossy_comp_test misc_test
-	./write_read_test w64
-	./lossy_comp_test w64_ima
-	./lossy_comp_test w64_msadpcm
-	./lossy_comp_test w64_ulaw
-	./lossy_comp_test w64_alaw
-	./lossy_comp_test w64_gsm610
-	./misc_test w64
+w64-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) misc_test$(EXEEXT)
+	./write_read_test$(EXEEXT) w64
+	./lossy_comp_test$(EXEEXT) w64_ima
+	./lossy_comp_test$(EXEEXT) w64_msadpcm
+	./lossy_comp_test$(EXEEXT) w64_ulaw
+	./lossy_comp_test$(EXEEXT) w64_alaw
+	./lossy_comp_test$(EXEEXT) w64_gsm610
+	./misc_test$(EXEEXT) w64
 	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on W64 files."
+	@echo "  `./sfversion$(EXEEXT)` passed tests on W64 files."
 	@echo "----------------------------------------------------------------------"
 
 # Lite remove start
-paf-tests: write_read_test misc_test
-	./write_read_test paf
-	./misc_test paf
+paf-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
+	./write_read_test$(EXEEXT) paf
+	./misc_test$(EXEEXT) paf
 	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on PAF files."
-	@echo "----------------------------------------------------------------------"
-
-svx-tests: write_read_test misc_test
-	./write_read_test svx
-	./misc_test svx
-	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on SVX files."
+	@echo "  `./sfversion$(EXEEXT)` passed tests on PAF files."
 	@echo "----------------------------------------------------------------------"
 
-nist-tests: write_read_test lossy_comp_test misc_test
-	./write_read_test nist
-	./lossy_comp_test nist_ulaw
-	./lossy_comp_test nist_alaw
-	./misc_test nist
+svx-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
+	./write_read_test$(EXEEXT) svx
+	./misc_test$(EXEEXT) svx
 	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on NIST files."
+	@echo "  `./sfversion$(EXEEXT)` passed tests on SVX files."
 	@echo "----------------------------------------------------------------------"
 
-ircam-tests: write_read_test lossy_comp_test misc_test
-	./write_read_test ircam
-	./lossy_comp_test ircam_ulaw
-	./lossy_comp_test ircam_alaw
-	./misc_test ircam
+nist-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) misc_test$(EXEEXT)
+	./write_read_test$(EXEEXT) nist
+	./lossy_comp_test$(EXEEXT) nist_ulaw
+	./lossy_comp_test$(EXEEXT) nist_alaw
+	./misc_test$(EXEEXT) nist
 	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on IRCAM files."
-	@echo "----------------------------------------------------------------------"
-
-voc-tests: write_read_test lossy_comp_test misc_test
-	./write_read_test voc
-	./lossy_comp_test voc_ulaw
-	./lossy_comp_test voc_alaw
-	./misc_test voc
-	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on VOC files."
+	@echo "  `./sfversion$(EXEEXT)` passed tests on NIST files."
 	@echo "----------------------------------------------------------------------"
 
-mat4-tests: write_read_test misc_test
-	./write_read_test mat4
-	./misc_test mat4
+ircam-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) misc_test$(EXEEXT)
+	./write_read_test$(EXEEXT) ircam
+	./lossy_comp_test$(EXEEXT) ircam_ulaw
+	./lossy_comp_test$(EXEEXT) ircam_alaw
+	./misc_test$(EXEEXT) ircam
 	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on MAT4 files."
-	@echo "----------------------------------------------------------------------"
-
-mat5-tests: write_read_test misc_test
-	./write_read_test mat5
-	./misc_test mat5
-	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on MAT5 files."
+	@echo "  `./sfversion$(EXEEXT)` passed tests on IRCAM files."
 	@echo "----------------------------------------------------------------------"
 
-pvf-tests: write_read_test misc_test
-	./write_read_test pvf
-	./misc_test pvf
+voc-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) misc_test$(EXEEXT)
+	./write_read_test$(EXEEXT) voc
+	./lossy_comp_test$(EXEEXT) voc_ulaw
+	./lossy_comp_test$(EXEEXT) voc_alaw
+	./misc_test$(EXEEXT) voc
 	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on PVF files."
-	@echo "----------------------------------------------------------------------"
-
-xi-tests: lossy_comp_test
-	./lossy_comp_test xi_dpcm
-	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on XI files."
+	@echo "  `./sfversion$(EXEEXT)` passed tests on VOC files."
 	@echo "----------------------------------------------------------------------"
 
-htk-tests: write_read_test misc_test
-	./write_read_test htk
-	./misc_test htk
+mat4-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
+	./write_read_test$(EXEEXT) mat4
+	./misc_test$(EXEEXT) mat4
 	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on HTK files."
+	@echo "  `./sfversion$(EXEEXT)` passed tests on MAT4 files."
 	@echo "----------------------------------------------------------------------"
 
-sds-tests: write_read_test misc_test
-	./write_read_test sds
-	./misc_test sds
+mat5-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
+	./write_read_test$(EXEEXT) mat5
+	./misc_test$(EXEEXT) mat5
 	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on SDS files."
+	@echo "  `./sfversion$(EXEEXT)` passed tests on MAT5 files."
+	@echo "----------------------------------------------------------------------"
+
+pvf-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
+	./write_read_test$(EXEEXT) pvf
+	./misc_test$(EXEEXT) pvf
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion$(EXEEXT)` passed tests on PVF files."
+	@echo "----------------------------------------------------------------------"
+
+xi-tests: lossy_comp_test$(EXEEXT)
+	./lossy_comp_test$(EXEEXT) xi_dpcm
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion$(EXEEXT)` passed tests on XI files."
+	@echo "----------------------------------------------------------------------"
+
+htk-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
+	./write_read_test$(EXEEXT) htk
+	./misc_test$(EXEEXT) htk
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion$(EXEEXT)` passed tests on HTK files."
+	@echo "----------------------------------------------------------------------"
+
+sds-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
+	./write_read_test$(EXEEXT) sds
+	./misc_test$(EXEEXT) sds
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion$(EXEEXT)` passed tests on SDS files."
 	@echo "----------------------------------------------------------------------"
 
 # Lite remove end
 
-stdio-tests: stdio_test stdin_test stdout_test pipe_test
-	./stdio_test
-	./pipe_test
+stdio-tests: stdio_test$(EXEEXT) stdin_test$(EXEEXT) stdout_test$(EXEEXT) pipe_test$(EXEEXT)
+	./stdio_test$(EXEEXT)
+	./pipe_test$(EXEEXT)
 	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed stdio and pipe tests."
+	@echo "  `./sfversion$(EXEEXT)` passed stdio and pipe tests."
 	@echo "----------------------------------------------------------------------"
 
 

@@ -37,13 +37,13 @@ test_log_printf_SOURCES = test_log_printf.c
 # It is not possible to place these in the tests/ directory because they
 # need access to the internals of the SF_PRIVATE struct.
 
-check: test_file_io
+check: test_file_io$(EXEEXT) test_log_printf$(EXEEXT)
 	@echo
 	@echo
 	@echo
 	@echo "============================================================"
-	./test_file_io
-	./test_log_printf
+	./test_file_io$(EXEEXT)
+	./test_log_printf$(EXEEXT)
 	@echo "============================================================"
 	@echo
 	@echo
