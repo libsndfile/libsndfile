@@ -1,3 +1,11 @@
+2004-10-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/sndfile.c
+    Add error numbers and messages for sd2 files.
+
+    * src/sd2.c
+    Reading of sd2 (resource fork version) now seems to be working.
+
 2004-10-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/file_io.h
