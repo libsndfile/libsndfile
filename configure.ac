@@ -7,7 +7,7 @@ AC_INIT(libsndfile,1.0.10pre8,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
-AC_CONFIG_HEADERS(src/config.h)
+AM_CONFIG_HEADER(src/config.h)
 
 #------------------------------------------------------------------------------------
 # Rules for library version information:
@@ -33,7 +33,7 @@ AC_PROG_CC
 AC_PROG_INSTALL
 
 AC_PROG_LN_S
-AM_PROG_LIBTOOL
+AC_PROG_LIBTOOL
 
 if test "x-$build_os-$host_os-$target_os" = x-mingw32-mingw32-mingw32 ; then
 	AC_CHECK_PROG(DLLTOOL, dlltool, dlltool)
