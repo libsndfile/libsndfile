@@ -1360,6 +1360,7 @@ exponent(char *p0, int exp, int fmtch)
 #endif /* FLOATING_POINT */
 
 #endif /* #if (! defined (HAVE_SNPRINTF)) || (! defined (HAVE_VSNPRINTF)) */
+
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch 
