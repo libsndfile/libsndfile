@@ -595,6 +595,7 @@ void
 check_open_file_count_or_die (int lineno)
 {
 #if (defined (WIN32) || defined (_WIN32))
+	lineno = 0 ;
 	return ;
 #else
 	int k, count = 0 ;

@@ -70,6 +70,7 @@ enum
 	SF_FORMAT_SDS			= 0x110000,		/* Midi Sample Dump Standard */
 	SF_FORMAT_AVR			= 0x120000,		/* Audio Visual Research */
 	SF_FORMAT_WAVEX			= 0x130000,		/* MS WAVE with WAVEFORMATEX */
+	SF_FORMAT_SD2			= 0x160000,		/* Sound Designer 2 */
 
 	/* Subtypes from here on. */
 
@@ -130,6 +131,7 @@ enum
 	SFC_GET_NORM_FLOAT				= 0x1011,
 	SFC_SET_NORM_DOUBLE				= 0x1012,
 	SFC_SET_NORM_FLOAT				= 0x1013,
+	SFC_SET_SCALE_FLOAT_INT_READ	= 0x1014,
 
 	SFC_GET_SIMPLE_FORMAT_COUNT		= 0x1020,
 	SFC_GET_SIMPLE_FORMAT			= 0x1021,
@@ -168,6 +170,8 @@ enum
 
 	SFC_GET_INSTRUMENT				= 0x10D0,
 	SFC_SET_INSTRUMENT				= 0x10D1,
+
+	SFC_GET_LOOP_INFO				= 0x10E0,
 
 	/* Following commands for testing only. */
 	SFC_TEST_IEEE_FLOAT_REPLACE		= 0x6001,
@@ -217,7 +221,7 @@ enum
 	SFM_RDWR	= 0x30
 } ;
 
-/* Pubic error values. These are guaranteed to remain unchanged for the duration
+/* Public error values. These are guaranteed to remain unchanged for the duration
 ** of the library major version number.
 ** There are also a large number of private error numbers which are internal to
 ** the library which can change at any time.
@@ -324,6 +328,25 @@ enum
 	SF_LOOP_FORWARD,
 	SF_LOOP_BACKWARD
 } ;
+
+/* Struct used to retrieve loop information from a file.*/
+typedef struct
+{
+	short	time_sig_num ;	/* any positive integer    >0  */
+	short	time_sig_den ;	/* any positive power of 2 >0  */
+	int		loop_mode ;		/* see SF_LOOP enum            */
+
+	int		num_beats ;		/* this is NOT the amount of quarter notes !!!*/
+							/* a full bar of 4/4 is 4 beats */
+							/* a full bar of 7/8 is 7 beats */
+
+	float	bpm ;			/* suggestion, as it can be calculated using other fields:*/
+							/* file's lenght, file's sampleRate and our time_sig_den*/
+							/* -> bpms are always the amount of _quarter notes_ per minute */
+
+	int	root_key ;			/* MIDI note, or -1 for None */
+	int future [6] ;
+} SF_LOOP_INFO ;
 
 /* Open the specified file for read, write or both. On error, this will
 ** return a NULL pointer. To find the error number, pass a NULL SNDFILE
