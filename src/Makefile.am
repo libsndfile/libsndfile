@@ -76,8 +76,8 @@ aiff.c au.c au_g72x.c ircam.c mat4.c mat5.c nist.c paf.c pvf.c : sndfile.h commo
 raw.c svx.c voc.c w64.c wav.c wav_w64.c htk.c sd2.c rx2.c txw.c : sndfile.h common.h
 sds.c wve.c dwd.c ogg.c xi.c sndfile.c common.c file_io.c : sndfile.h common.h
 command.c pcm.c ulaw.c alaw.c float32.c double64.c ima_adpcm.c : sndfile.h common.h 
-ms_adpcm.c gsm610.c dwvw.c sfendian.c vox_adpcm.c interleave.c : sndfile.h common.h
-strings.c dither.c : sndfile.h common.h
+ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c interleave.c strings.c : sndfile.h common.h
+dither.c : sndfile.h common.h
 
 ## Do not edit or modify anything in this comment block.
 ## The arch-tag line is a file identity tag for the GNU Arch 

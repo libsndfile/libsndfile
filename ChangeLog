@@ -1,3 +1,15 @@
+2004-08-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-play.c
+    Fixes for Win32. Thanks to Denis Cote.
+
+    * Win32/Win32/Makefile.(msvc|mingw.in)
+    Fix build system after removal of sfendian.h.
+    Build sndfile-convert.
+
+    * src/Makefile.am
+    Remove sfendian.c from dependancies.
+
 2004-08-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in

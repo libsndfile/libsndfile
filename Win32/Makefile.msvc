@@ -20,6 +20,7 @@ CFLAGS=/nologo /MD /W1 /GX /O2 /I "$(MSVCDir)\Include" /I "src" /D "WIN32" /D "_
 
 ALL : libsndfile.dll \
 	"sndfile-info.exe" \
+	"sndfile-convert.exe" \
 	"sndfile-play.exe" \
 	"generate.exe"
 
@@ -74,7 +75,6 @@ LINK32_OBJS= \
 	".\src\raw.obj" \
 	".\src\rx2.obj" \
 	".\src\sd2.obj" \
-	".\src\sfendian.obj" \
 	".\src\sndfile.obj" \
 	".\src\svx.obj" \
 	".\src\txw.obj" \
@@ -101,6 +101,11 @@ libsndfile.dll : $(LINK32_OBJS) ".\src\libsndfile.def"
 "sndfile-info.exe" : ".\examples\sndfile-info.c"
     $(CPP) $(CFLAGS) /Fo".\examples\sndfile-info.obj" /c ".\examples\sndfile-info.c"
     $(LINK32) $(PROG_LINK_FLAGS) /out:"sndfile-info.exe" ".\examples\sndfile-info.obj" libsndfile.lib
+
+"sndfile-convert.exe" : ".\examples\sndfile-convert.c"
+    $(CPP) $(CFLAGS) /Fo".\examples\sndfile-convert.obj" /c ".\examples\sndfile-convert.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:"sndfile-convert.exe" ".\examples\sndfile-convert.obj" libsndfile.lib
+
 "sndfile-play.exe" : ".\examples\sndfile-play.c"
     $(CPP) $(CFLAGS) /Fo".\examples\sndfile-play.obj" /c ".\examples\sndfile-play.c"
     $(LINK32) $(PROG_LINK_FLAGS) /out:"sndfile-play.exe" ".\examples\sndfile-play.obj" libsndfile.lib winmm.lib
@@ -392,9 +397,6 @@ CHECK: $(TEST_PROGS)
 
 ".\src\sd2.obj" : ".\src\sd2.c"
     $(CPP) $(CFLAGS) /Fo".\src\sd2.obj" /c ".\src\sd2.c"
-
-".\src\sfendian.obj" : ".\src\sfendian.c"
-    $(CPP) $(CFLAGS) /Fo".\src\sfendian.obj" /c ".\src\sfendian.c"
 
 ".\src\sndfile.obj" : ".\src\sndfile.c"
     $(CPP) $(CFLAGS) /Fo".\src\sndfile.obj" /c ".\src\sndfile.c"

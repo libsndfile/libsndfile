@@ -1,4 +1,4 @@
-TARGETS = libsndfile.dll sndfile-info.exe sndfile-play.exe
+TARGETS = libsndfile.dll sndfile-info.exe sndfile-play.exe sndfile-convert.exe
 
 AR = @AR@
 CC = @CC@
@@ -76,7 +76,6 @@ LINK_OBJS = \
 	src/raw.o \
 	src/rx2.o \
 	src/sd2.o \
-	src/sfendian.o \
 	src/sndfile.o \
 	src/svx.o \
 	src/txw.o \
@@ -102,6 +101,9 @@ libsndfile.dll libsndfile.lib : $(LINK_OBJS)
 	$(STRIP) libsndfile.dll
 
 sndfile-info.exe : examples/sndfile-info.o libsndfile.lib
+	$(CC) $+ -o $@
+
+sndfile-convert.exe : examples/sndfile-convert.o libsndfile.lib
 	$(CC) $+ -o $@
 
 sndfile-play.exe : examples/sndfile-play.o libsndfile.lib
