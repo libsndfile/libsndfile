@@ -1,3 +1,8 @@
+2004-02-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/command.html
+    Document SFC_SET_CLIPPING and SFC_GET_CLIPPING.
+
 2004-02-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/*.html

@@ -139,6 +139,16 @@
 	<TD>Change the data start offset for files opened up as SF_FORMAT_RAW.</TD>
 </TR>
 
+<TR>
+	<TD><A HREF="#SFC_SET_CLIPPING">SFC_SET_CLIPPING</A></TD>
+	<TD>Turn on/off automatic clipping when doing floating point to integer 
+		conversion.</TD>
+</TR>
+
+<TR>
+	<TD><A HREF="#SFC_GET_CLIPPING">SFC_GET_CLIPPING</A></TD>
+	<TD>Retreive current clipping setting.</TD>
+</TR>
 
 
 <!--
@@ -927,6 +937,65 @@ Example:
 <DL>
 <DT>Return value:</DT>
 	<DD>Zero on sucess, non-zero otherwise.
+</DL>
+
+<!-- ========================================================================= -->
+<A NAME="SFC_SET_CLIPPING"></A>
+<H2><BR><B>SFC_SET_CLIPPING</B></H2>
+<P>
+Turn on/off automatic clipping when doing floating point to integer conversion.
+</P>
+<P>
+Parameters:
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_SET_CLIPPING
+        data     : NULL
+        datasize : SF_TRUE or SF_FALSE.
+</PRE>
+
+<P>
+Turn on (datasize == SF_TRUE) or off (datasize == SF_FALSE) clipping.
+</P>
+<P>
+Example:
+</P>
+<PRE>
+        sf_command (sndfile, SFC_SET_CLIPPING, NULL, SF_TRUE) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<DD>Clipping mode (SF_TRUE or SF_FALSE).
+</DL>
+
+
+<!-- ========================================================================= -->
+<A NAME="SFC_GET_CLIPPING"></A>
+<H2><BR><B>SFC_GET_CLIPPING</B></H2>
+<P>
+Turn on/off automatic clipping when doing floating point to integer conversion.
+</P>
+<P>
+Parameters:
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_GET_CLIPPING
+        data     : NULL
+        datasize : 0
+</PRE>
+
+<P>
+Retrieve the current cliiping setting.
+</P>
+<P>
+Example:
+</P>
+<PRE>
+        sf_command (sndfile, SFC_GET_CLIPPING, NULL, 0) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<DD>Clipping mode (SF_TRUE or SF_FALSE).
 </DL>
 
 <!-- ========================================================================= -->
