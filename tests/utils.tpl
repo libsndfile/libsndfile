@@ -27,6 +27,7 @@
 [+ CASE (suffix) +]
 [+ ==  h  +]
 #define SF_COUNT_TO_LONG(x)	((long) (x))
+#define	ARRAY_LEN(x)		((int) (sizeof (x)) / (sizeof ((x) [0])))
 
 #define	PIPE_INDEX(x)	((x) + 500)
 #define	PIPE_TEST_LEN	12345
@@ -101,7 +102,7 @@ void	test_seek_or_die
 #define	M_PI		3.14159265358979323846264338
 #endif
 
-#define SIGNED_SIZEOF(x)	((int)(sizeof (x)))
+#define SIGNED_SIZEOF(x)	((int) (sizeof (x)))
 #define	LOG_BUFFER_SIZE		2048
 
 void
@@ -139,7 +140,7 @@ check_file_hash_or_die (const char *filename, unsigned int target_hash, int line
 
 	/* The 'b' in the mode string means binary for Win32. */
 	if (! (file = fopen (filename, "rb")))
-	{	printf ("\n\nLine %d: could not open file '%s'\n", line_num, filename) ;
+	{	printf ("\n\nLine %d: could not open file '%s'\n\n", line_num, filename) ;
 		exit (1) ;
 		} ;
 
@@ -162,7 +163,7 @@ check_file_hash_or_die (const char *filename, unsigned int target_hash, int line
 		} ;
 
 	if (hash1 != target_hash)
-	{	printf ("\n\nLine %d: incorrect hash value 0x%08x should be 0x%08x\n", line_num, hash1, target_hash) ;
+	{	printf ("\n\nLine %d: incorrect hash value 0x%08x should be 0x%08x\n\n", line_num, hash1, target_hash) ;
 		exit (1) ;
 		}
 
@@ -303,7 +304,7 @@ hexdump_file (const char * filename, sf_count_t offset, sf_count_t length)
 
 	for (k = 0 ; k < length ; k+= sizeof (buffer))
 	{	readcount = fread (buffer, 1, sizeof (buffer), file) ;
-		
+
 		printf ("%08lx : ", SF_COUNT_TO_LONG (offset + k)) ;
 
 		for (m = 0 ; m < readcount ; m++)
@@ -317,7 +318,7 @@ hexdump_file (const char * filename, sf_count_t offset, sf_count_t length)
 		{	ch = isprint (buffer [m]) ? buffer [m] : '.' ;
 			putchar (ch) ;
 			} ;
-		
+
 		if (readcount < SIGNED_SIZEOF (buffer))
 			break ;
 
@@ -411,8 +412,7 @@ test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int line
 		} ;
 
 	if (file == NULL)
-	{	printf ("\n\nLine %d: %s (%s) failed : ", line_num, func_name, modestr) ;
-		puts (sf_strerror (NULL)) ;
+	{	printf ("\n\nLine %d: %s (%s) failed : %s\n\n", line_num, func_name, modestr, sf_strerror (NULL)) ;
 		dump_log_buffer (file) ;
 		exit (1) ;
 		} ;
@@ -492,7 +492,7 @@ test_seek_or_die (SNDFILE *file, sf_count_t offset, int whence, sf_count_t new_p
 	channel_name = (channels == 1) ? "Mono" : "Stereo" ;
 
 	if ((position = sf_seek (file, offset, whence)) != new_pos)
-	{	printf ("Line %d : %s : sf_seek (file, %ld, %s) returned %ld.\n", line_num,
+	{	printf ("\n\nLine %d : %s : sf_seek (file, %ld, %s) returned %ld.\n\n", line_num,
 					channel_name, SF_COUNT_TO_LONG (offset), whence_name,
 					SF_COUNT_TO_LONG (position)) ;
 		exit (1) ;

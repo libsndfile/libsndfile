@@ -40,7 +40,6 @@
 #include "utils.h"
 
 #define	DATA_LENGTH 		(512)
-#define	ARRAY_LEN(x)		(sizeof (x)) / (sizeof ((x) [0]))
 
 static off_t get_file_length (int fd) ;
 static void write_file_at_end (int fd, int filetype, int channels, int file_num) ;
