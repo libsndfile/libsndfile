@@ -295,10 +295,12 @@ copy_metadata (SNDFILE *outfile, SNDFILE *infile)
 {	const char *str ;
 	int k, err = 0 ;
 
-	for (k = 1 ; err == 0 ; k++)
+	for (k = SF_STR_FIRST ; k <= SF_STR_FIRST ; k++)
 	{	str = sf_get_string (infile, k) ;
-		err = sf_set_string (outfile, k, (str != NULL) ? str : "") ;
-		}
+		if (str != NULL)
+			err = sf_set_string (outfile, k, str) ;
+		} ;
+
 } /* copy_metadata */
 
 static void

@@ -202,6 +202,14 @@ enum
 	SF_STR_DATE						= 0x06
 } ;
 
+/*
+** Use the following as the start and end index when doing metadata
+** transcoding.
+*/
+
+#define	SF_STR_FIRST	SF_STR_TITLE
+#define	SF_STR_LAST		SF_STR_DATE
+
 enum
 {	/* True and false */
 	SF_FALSE	= 0,

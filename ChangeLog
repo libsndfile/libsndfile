@@ -1,3 +1,15 @@
+2004-06-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-convert.c
+    Fix a bug which caused the program to go into an infinite loop if the source
+    file has no meta-data. Thanks to Ron Parker for reporting this.
+
+    * src/sndfile.h.in
+    Add SF_STR_FIRST and SF_STR_LAST to allow enumeration of string types.
+
+    * Win32/sndfile.h MacOS9/sndfile.h
+    Update these as per the above file.
+
 2004-06-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac src/common.h src/ogg.c src/sndfile.c src/sndfile.h.in
