@@ -66,15 +66,15 @@ AC_ARG_ENABLE(gcc-werror,
 		[  --enable-gcc-werror        enable -Werror in all Makefiles],
 		ac_arg_gcc_werror=yes, ac_arg_gcc_werror=no)
 
-AC_ARG_ENABLE(gcc-pipe, 
+AC_ARG_ENABLE(gcc-pipe,
 		[  --disable-gcc-pipe           disable gcc -pipe option],
 		ac_arg_gcc_pipe="N", ac_arg_gcc_pipe="Y")
 
-AC_ARG_ENABLE(gcc-opt,  
+AC_ARG_ENABLE(gcc-opt,
 		[  --disable-gcc-opt            disable gcc optimisations],
 		ac_arg_gcc_opt="N", ac_arg_gcc_opt="Y")
 
-AC_ARG_ENABLE(cpu-clip,  
+AC_ARG_ENABLE(cpu-clip,
 		[  --disable-cpu-clip           disable tricky cpu specific clipper],
 		ac_arg_cpu_clip="N", ac_arg_cpu_clip="Y")
 
@@ -241,6 +241,8 @@ case "$target_os" in
 		AC_CHECK_HEADERS(wintypes.h mmreg.h)
 		OS_SPECIFIC_CFLAGS=""
 		OS_SPECIFIC_LINKS=""
+		TYPEOF_SF_COUNT_T="__int64"
+		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFi64"
 		;;
 	*)
 		OS_SPECIFIC_CFLAGS=""
@@ -288,7 +290,7 @@ if test $ac_cv_sizeof_double != 8 ; then
 
 if test x"$ac_cv_prog_autogen" = "xno" ; then
 	AC_MSG_WARN([[Touching files in directory tests/.]])
-	touch tests/*.c tests/*.h 
+	touch tests/*.c tests/*.h
 	fi
 
 #====================================================================================
@@ -391,10 +393,10 @@ if test x$prefix != "x/usr" ; then
 	fi
 
 
-ifelse(dnl	
+ifelse(dnl
 
  Do not edit or modify anything in this comment block.
- The arch-tag line is a file identity tag for the GNU Arch 
+ The arch-tag line is a file identity tag for the GNU Arch
  revision control system.
 
  arch-tag: 6391b316-6cfc-43c2-a18a-8defdc4ee359

@@ -55,13 +55,13 @@ check: test_file_io
 # end user to create these files.
 
 Symbols.linux: create_symbols_file.py
-	$(srcdir)/create_symbols_file.py linux $(VERSION) > Symbols.linux
+	./create_symbols_file.py linux $(VERSION) > Symbols.linux
 	
 Symbols.darwin: create_symbols_file.py
-	$(srcdir)/create_symbols_file.py darwin $(VERSION) > Symbols.darwin
+	./create_symbols_file.py darwin $(VERSION) > Symbols.darwin
 
 libsndfile.def: create_symbols_file.py
-	$(srcdir)/create_symbols_file.py win32 $(VERSION) > libsndfile.def
+	./create_symbols_file.py win32 $(VERSION) > libsndfile.def
 
 # Fake dependancy to force the creation of these files.
 sndfile.c : Symbols.linux Symbols.darwin libsndfile.def
