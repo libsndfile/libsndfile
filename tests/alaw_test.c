@@ -51,7 +51,7 @@ main (void)
 	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
 	sfinfo.channels		= 1 ;
 
-	if (! (file = sf_open (filename, SFM_WRITE, &sfinfo)))
+	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
 	{	printf ("sf_open_write failed with error : ") ;
 		fflush (stdout) ;
 		puts (sf_strerror (NULL)) ;
@@ -72,7 +72,7 @@ main (void)
 	** with what they should be.
 	*/
 
-	if (! (file = sf_open (filename, SFM_READ, &sfinfo)))
+	if ((file = sf_open (filename, SFM_READ, &sfinfo)) == NULL)
 	{	printf ("sf_open_write failed with error : ") ;
 		puts (sf_strerror (NULL)) ;
 		exit (1) ;

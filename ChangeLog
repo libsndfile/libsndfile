@@ -1,3 +1,8 @@
+2004-07-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/(a|u)law_test.c
+    Minor cleanup.
+
 2004-07-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/(pcm|float|double64|ulaw|alaw|xi).c

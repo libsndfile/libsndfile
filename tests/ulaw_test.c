@@ -51,7 +51,7 @@ main (void)
 	sfinfo.frames		= 123456789 ;
 	sfinfo.channels		= 1 ;
 
-	if (! (file = sf_open (filename, SFM_WRITE, &sfinfo)))
+	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
 	{	printf ("sf_open_write failed with error : ") ;
 		fflush (stdout) ;
 		puts (sf_strerror (NULL)) ;
@@ -72,7 +72,7 @@ main (void)
 	** with what they should be.
 	*/
 
-	if (! (file = sf_open (filename, SFM_READ, &sfinfo)))
+	if ((file = sf_open (filename, SFM_READ, &sfinfo)) == NULL)
 	{	printf ("sf_open_write failed with error : ") ;
 		puts (sf_strerror (NULL)) ;
 		exit (1) ;
@@ -94,7 +94,7 @@ main (void)
 
 	sf_close (file) ;
 
-	printf ("    alaw_test : encoder ... ok\n") ;
+	printf ("    ulaw_test : encoder ... ok\n") ;
 
 	/* Now generate a file containing all possible 8 bit encoded
 	** sample values and write it to disk as ulaw encoded.frames.
