@@ -8,7 +8,6 @@
 #define	PRIVATE_H
 
 /* Added by Erik de Castro Lopo */
-#define	SASR  
 #define	USE_FLOAT_MUL
 #define	FAST
 #define	WAV49  
@@ -57,12 +56,10 @@ typedef struct gsm_state GSM_STATE ;
 #define	MIN_LONGWORD	(-2147483647 - 1)
 #define	MAX_LONGWORD	  2147483647
 
-#ifdef	SASR		/* flag: >> is a signed arithmetic shift right */
-#undef	SASR
-#define	SASR(x, by)	((x) >> (by))
-#else
-#define	SASR(x, by)	((x) >= 0 ? (x) >> (by) : (~(-((x) + 1) >> (by))))
-#endif	/* SASR */
+static inline longword
+SASR (longword x, longword by)
+{	return (x >> by) ;
+} /* SASR */
 
 /*
  *	Prototypes from add.c
@@ -93,18 +90,20 @@ word	gsm_asr  		(word a, int n) ;
  *  Inlined functions from add.h 
  */
 
-/* 
- * #define GSM_MULT_R(a, b) (* word a, word b, !(a == b == MIN_WORD) *)	\
- *	(0x0FFFF & SASR(((longword)(a) * (longword)(b) + 16384), 15))
- */
-#define GSM_MULT_R(a, b) /* word a, word b, !(a == b == MIN_WORD) */	\
-	(SASR( ((longword)(a) * (longword)(b) + 16384), 15 ))
+static inline longword
+GSM_MULT_R (word a, word b)
+{	return (((longword) (a)) * ((longword) (b)) + 16384) >> 15 ;
+} /* GSM_MULT_R */
 
-# define GSM_MULT(a,b)	 /* word a, word b, !(a == b == MIN_WORD) */	\
-	(SASR( ((longword)(a) * (longword)(b)), 15 ))
+static inline longword
+GSM_MULT (word a, word b)
+{	return (((longword) (a)) * ((longword) (b))) >> 15 ;
+} /* GSM_MULT */
 
-# define GSM_L_MULT(a, b) /* word a, word b */	\
-	(((longword)(a) * (longword)(b)) << 1)
+static inline longword
+GSM_L_MULT (word a, word b)
+{	return ((longword) (a)) * ((longword) (b)) << 1 ;
+} /* GSM_L_MULT */
 
 static inline longword
 GSM_L_ADD (longword a, longword b)
@@ -123,24 +122,34 @@ GSM_L_ADD (longword a, longword b)
 	return a + b ;
 } /* GSM_L_ADD */
 
-/*
- * # define GSM_ADD(a, b)	\
- * 	((ltmp = (longword)(a) + (longword)(b)) >= MAX_WORD \
- * 	? MAX_WORD : ltmp <= MIN_WORD ? MIN_WORD : ltmp)
- */
-/* Nonportable, but faster: */
+static inline longword
+GSM_ADD (word a, word b)
+{	longword ltmp ;
 
-#define	GSM_ADD(a, b)	\
-	((ulongword)((ltmp = (longword)(a) + (longword)(b)) - MIN_WORD) > \
-		MAX_WORD - MIN_WORD ? (ltmp > 0 ? MAX_WORD : MIN_WORD) : ltmp)
+	ltmp = ((longword) a) + ((longword) b) ;
 
-# define GSM_SUB(a, b)	\
-	((ltmp = (longword)(a) - (longword)(b)) >= MAX_WORD \
-	? MAX_WORD : ltmp <= MIN_WORD ? MIN_WORD : ltmp)
+	if (ltmp >= MAX_WORD)
+		return MAX_WORD ;
+	if (ltmp <= MIN_WORD)
+		return MIN_WORD ;
 
-#if 0
-# define GSM_ABS(a)	((a) < 0 ? ((a) == MIN_WORD ? MAX_WORD : -(a)) : (a))
-#else
+	return ltmp ;
+} /* GSM_ADD */
+
+static inline longword
+GSM_SUB (word a, word b)
+{	longword ltmp ;
+
+	ltmp = ((longword) a) - ((longword) b) ;
+	
+	if (ltmp >= MAX_WORD)
+		ltmp = MAX_WORD ;
+	else if (ltmp <= MIN_WORD)
+		ltmp = MIN_WORD ;
+	
+	return ltmp ;
+} /* GSM_SUB */
+
 static inline word
 GSM_ABS (word a)
 {
@@ -150,21 +159,7 @@ GSM_ABS (word a)
 		return MAX_WORD ;
 	return -a ;
 } /* GSM_ADD */
-#endif
 
-/* Use these if necessary:
-
-# define GSM_MULT_R(a, b)	gsm_mult_r(a, b)
-# define GSM_MULT(a, b)		gsm_mult(a, b)
-# define GSM_L_MULT(a, b)	gsm_L_mult(a, b)
-
-# define GSM_L_ADD(a, b)	gsm_L_add(a, b)
-# define GSM_ADD(a, b)		gsm_add(a, b)
-# define GSM_SUB(a, b)		gsm_sub(a, b)
-
-# define GSM_ABS(a)		gsm_abs(a)
-
-*/
 
 /*
  *  More prototypes from implementations..

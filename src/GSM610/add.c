@@ -31,8 +31,10 @@ word gsm_sub ( word a, word b)
 
 word gsm_mult ( word a, word b)
 {
-	if (a == MIN_WORD && b == MIN_WORD) return MAX_WORD;
-	else return SASR( (longword)a * (longword)b, 15 );
+	if (a == MIN_WORD && b == MIN_WORD)
+		return MAX_WORD;
+	
+	return SASR( (longword)a * (longword)b, 15 );
 }
 
 word gsm_mult_r ( word a, word b)
@@ -161,12 +163,7 @@ word gsm_asr (word a, int n)
 	if (n <= -16) return 0;
 	if (n < 0) return a << -n;
 
-#	ifdef	SASR
-		return a >> n;
-#	else
-		if (a >= 0) return a >> n;
-		else return -(word)( -(uword)a >> n );
-#	endif
+	return SASR (a, n);
 }
 
 word gsm_asl (word a, int n)
@@ -183,12 +180,7 @@ longword gsm_L_asr (longword a, int n)
 	if (n <= -32) return 0;
 	if (n < 0) return a << -n;
 
-#	ifdef	SASR
-		return a >> n;
-#	else
-		if (a >= 0) return a >> n;
-		else return -(longword)( -(ulongword)a >> n );
-#	endif
+	return SASR (a, n);
 }
 
 /*

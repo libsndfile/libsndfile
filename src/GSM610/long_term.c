@@ -843,7 +843,6 @@ static void Long_term_analysis_filtering (
  */
 {
 	register int      k;
-	register longword ltmp;
 
 #	undef STEP
 #	define STEP(BP)					\
@@ -912,7 +911,6 @@ void Gsm_Long_Term_Synthesis_Filtering (
  *  table 4.3b.
  */
 {
-	register longword	ltmp;	/* for ADD */
 	register int 		k;
 	word			brp, drpp, Nr;
 

@@ -46,9 +46,6 @@ void Gsm_Preprocess (
 	word		msp, lsp;
 	word		SO;
 
-	longword	ltmp;		/* for   ADD */
-	ulongword	utmp;		/* for L_ADD */
-
 	register int		k = 160;
 
 	while (k--) {

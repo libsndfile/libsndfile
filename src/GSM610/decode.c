@@ -19,7 +19,6 @@ static void Postprocessing (
 {
 	register int		k;
 	register word		msr = S->msr;
-	register longword	ltmp;	/* for GSM_ADD */
 	register word		tmp;
 
 	for (k = 160; k--; s++) {

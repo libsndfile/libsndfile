@@ -355,7 +355,6 @@ static void APCM_inverse_quantization (
 {
 	int	i;
 	word	temp, temp1, temp2, temp3;
-	longword	ltmp;
 
 	assert( mant >= 0 && mant <= 7 ); 
 

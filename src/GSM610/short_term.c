@@ -22,7 +22,6 @@ static void Decoding_of_the_coded_Log_Area_Ratios (
 	word	* LARpp)	/* out: decoded ..			*/
 {
 	register word	temp1 /* , temp2 */;
-	register long	ltmp;	/* for GSM_ADD */
 
 	/*  This procedure requires for efficient implementation
 	 *  two tables.
@@ -91,7 +90,6 @@ static void Coefficients_0_12 (
 	register word * LARp)
 {
 	register int 	i;
-	register longword ltmp;
 
 	for (i = 1; i <= 8; i++, LARp++, LARpp_j_1++, LARpp_j++) {
 		*LARp = GSM_ADD( SASR( *LARpp_j_1, 2 ), SASR( *LARpp_j, 2 ));
@@ -105,7 +103,6 @@ static void Coefficients_13_26 (
 	register word * LARp)
 {
 	register int i;
-	register longword ltmp;
 	for (i = 1; i <= 8; i++, LARpp_j_1++, LARpp_j++, LARp++) {
 		*LARp = GSM_ADD( SASR( *LARpp_j_1, 1), SASR( *LARpp_j, 1 ));
 	}
@@ -117,7 +114,6 @@ static void Coefficients_27_39 (
 	register word * LARp)
 {
 	register int i;
-	register longword ltmp;
 
 	for (i = 1; i <= 8; i++, LARpp_j_1++, LARpp_j++, LARp++) {
 		*LARp = GSM_ADD( SASR( *LARpp_j_1, 2 ), SASR( *LARpp_j, 2 ));
@@ -148,7 +144,6 @@ static void LARp_to_rp (
 {
 	register int 		i;
 	register word		temp;
-	register longword	ltmp;
 
 	for (i = 1; i <= 8; i++, LARp++) {
 
@@ -197,7 +192,6 @@ static void Short_term_analysis_filtering (
 	register word		* u = S->u;
 	register int		i;
 	register word		di, zzz, ui, sav, rpi;
-	register longword 	ltmp;
 
 	for (; k_n--; s++) {
 
@@ -270,7 +264,6 @@ static void Short_term_synthesis_filtering (
 	register word		* v = S->v;
 	register int		i;
 	register word		sri, tmp1, tmp2;
-	register longword	ltmp;	/* for GSM_ADD  & GSM_SUB */
 
 	while (k--) {
 		sri = *wt++;

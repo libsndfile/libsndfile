@@ -176,7 +176,6 @@ static void Reflection_coefficients (
 {
 	register int	i, m, n;
 	register word	temp;
-	register longword ltmp;
 	word		ACF[9];	/* 0..8 */
 	word		P[  9];	/* 0..8 */
 	word		K[  9]; /* 2..8 */
@@ -284,8 +283,6 @@ static void Quantization_and_coding (
 )
 {
 	register word	temp;
-	longword	ltmp;
-
 
 	/*  This procedure needs four tables; the following equations
 	 *  give the optimum scaling for the constants:
