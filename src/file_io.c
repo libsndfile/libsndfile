@@ -25,6 +25,7 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
@@ -60,6 +61,17 @@ static void psf_log_syserr (SF_PRIVATE *psf, int error) ;
 int
 psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 {	int oflag, mode ;
+
+	/*
+	** Sanity check. If everything is OK, this test and the printfs will
+	** be optimised out. This is meant to catch the problems caused by
+	** "config.h" being included after <stdio.h>.
+	*/
+	if (sizeof (off_t) != sizeof (sf_count_t))
+	{	puts ("\n\n*** Fatal error : sizeof (off_t) != sizeof (sf_count_t)") ;
+	    puts ("*** This means that libsndfile was not configured correctly.\n") ;
+		exit (1) ;
+		} ;
 
 	switch (open_mode)
 	{	case SFM_READ :
