@@ -1,7 +1,11 @@
 2004-02-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
-    * acinclude.m4
-    Fix clip mode detection (hopefully).
+    * acinclude.m4 configure.ac
+    Fix clip mode detection (tested in one of HP's testdrive Itanium II boxes).
+
+    * src/file_io.c
+    Added check for sizeof (off_t) != sizeof (sf_count_t) to prevent recurrence
+    of missing large file support on Linux and Solaris.
 
 2004-02-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

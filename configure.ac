@@ -1,7 +1,7 @@
 # Copyright (C) 1999-2004 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
 
 dnl Require autoconf version
-AC_PREREQ(2.54)
+AC_PREREQ(2.53)
 
 AC_INIT(libsndfile,1.0.7,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
@@ -209,22 +209,6 @@ AC_DEFINE_UNQUOTED(CPU_IS_LITTLE_ENDIAN, ${ac_cv_c_little_endian},
 	[Target processor is little endian.])
 
 #====================================================================================
-# Determine if the processor can do clipping on float to int conversions.
-
-if test x$ac_arg_cpu_clip = "xY" ; then
-	AC_C_CLIP_MODE
-else
-	echo "checking processor clipping capabilities... disabled"
-	ac_cv_c_clip_positive=0
-	ac_cv_c_clip_negative=0
-	fi
-
-AC_DEFINE_UNQUOTED(CPU_CLIPS_POSITIVE, ${ac_cv_c_clip_positive},
-	[Target processor clips on positive float to int conversion.])
-AC_DEFINE_UNQUOTED(CPU_CLIPS_NEGATIVE, ${ac_cv_c_clip_negative},
-	[Target processor clips on negative float to int conversion.])
-
-#====================================================================================
 # Check for functions.
 
 AC_CHECK_FUNCS(malloc calloc realloc free)
@@ -251,6 +235,22 @@ case "$target_os" in
 			fi
 		;;
 	esac
+
+#====================================================================================
+# Determine if the processor can do clipping on float to int conversions.
+
+if test x$ac_arg_cpu_clip = "xY" ; then
+	AC_C_CLIP_MODE
+else
+	echo "checking processor clipping capabilities... disabled"
+	ac_cv_c_clip_positive=0
+	ac_cv_c_clip_negative=0
+	fi
+
+AC_DEFINE_UNQUOTED(CPU_CLIPS_POSITIVE, ${ac_cv_c_clip_positive},
+	[Target processor clips on positive float to int conversion.])
+AC_DEFINE_UNQUOTED(CPU_CLIPS_NEGATIVE, ${ac_cv_c_clip_negative},
+	[Target processor clips on negative float to int conversion.])
 
 #====================================================================================
 # Target OS specific stuff.
