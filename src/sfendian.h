@@ -24,9 +24,9 @@
 
 #if (defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
 /* Good, we have int64_t. */
-#elif (defined  (SIZEOF_LONG_LONG) && (SIZEOF_LONG_LONG == 8))
+#elif (defined (SIZEOF_LONG_LONG) && (SIZEOF_LONG_LONG == 8))
 typedef long long int64_t ;
-#elif (defined  (SIZEOF_LONG) && (SIZEOF_LONG == 8))
+#elif (defined (SIZEOF_LONG) && (SIZEOF_LONG == 8))
 typedef long int64_t ;
 #elif (defined (WIN32) || defined (_WIN32))
 typedef __int64 int64_t ;
@@ -47,7 +47,7 @@ typedef __int64 int64_t ;
 
 #define	ENDSWAP_SHORT(x)	((((x)>>8)&0xFF)+(((x)&0xFF)<<8))
 #define	ENDSWAP_INT(x)		((((x)>>24)&0xFF)+(((x)>>8)&0xFF00)+(((x)&0xFF00)<<8)+(((x)&0xFF)<<24))
-	
+
 #endif
 
 /*
@@ -58,9 +58,9 @@ typedef __int64 int64_t ;
 */
 
 #if (CPU_IS_LITTLE_ENDIAN == 1)
-	#define	MAKE_MARKER(a,b,c,d)	((a)|((b)<<8)|((c)<<16)|((d)<<24))
+	#define	MAKE_MARKER(a,b,c,d)	((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 #elif (CPU_IS_BIG_ENDIAN == 1)
-	#define	MAKE_MARKER(a,b,c,d)	(((a)<<24)|((b)<<16)|((c)<<8)|(d))
+	#define	MAKE_MARKER(a,b,c,d)	(((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
 #else
 	#error "Target CPU endian-ness unknown. May need to hand edit src/config.h"
 #endif
@@ -75,24 +75,22 @@ typedef __int64 int64_t ;
 #if (CPU_IS_LITTLE_ENDIAN == 1)
 	#define LES2H_SHORT(x)			(x)
 	#define LEI2H_INT(x)			(x)
-	#define BES2H_SHORT(x)			ENDSWAP_SHORT(x)
-	#define BEI2H_INT(x)			ENDSWAP_INT(x)
 
-	#define H2BE_SHORT(x)			ENDSWAP_SHORT(x)
-	#define H2BE_INT(x)				ENDSWAP_INT(x)
-	#define H2LE_SHORT(x)			(x)
-	#define H2LE_INT(x)				(x)
+	#define BES2H_SHORT(x)			ENDSWAP_SHORT (x)
+	#define BEI2H_INT(x)			ENDSWAP_INT (x)
+
+	#define H2BE_SHORT(x)			ENDSWAP_SHORT (x)
+	#define H2BE_INT(x)				ENDSWAP_INT (x)
 
 #elif (CPU_IS_BIG_ENDIAN == 1)
-	#define LES2H_SHORT(x)			ENDSWAP_SHORT(x)
-	#define LEI2H_INT(x)			ENDSWAP_INT(x)
+	#define LES2H_SHORT(x)			ENDSWAP_SHORT (x)
+	#define LEI2H_INT(x)			ENDSWAP_INT (x)
+
 	#define BES2H_SHORT(x)			(x)
 	#define BEI2H_INT(x)			(x)
 
-	#define H2BE_SHORT(x)			(x)
-	#define H2BE_INT(x)				(x)
-	#define H2LE_SHORT(x)			ENDSWAP_SHORT(x)
-	#define H2LE_INT(x)				ENDSWAP_INT(x)
+	#define H2LE_SHORT(x)			ENDSWAP_SHORT (x)
+	#define H2LE_INT(x)				ENDSWAP_INT (x)
 
 #else
 	#error "Target CPU endian-ness unknown. May need to hand edit src/config.h"
@@ -202,7 +200,7 @@ static inline void
 endswap_int64_t_copy (int64_t *dest, const int64_t *src, int len)
 {	const unsigned char *psrc ;
 	unsigned char *pdest ;
-	
+
 	if (dest == src)
 	{	endswap_int64_t_array (dest, len) ;
 		return ;

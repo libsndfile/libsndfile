@@ -36,7 +36,7 @@
 #endif
 
 /* A 32 number which will not overflow when multiplied by sizeof (double). */
-#define SENSIBLE_LEN   (0x8000000)
+#define SENSIBLE_LEN	(0x8000000)
 
 /*--------------------------------------------------------------------------------------------
 **	Processor floating point capabilities. double64_get_capability () returns one of the
