@@ -138,7 +138,7 @@ svx_read_header	(SF_PRIVATE *psf)
 
 	psf_binheader_readf (psf, "p", 0) ;
 
-	/* Set default number of channels. */
+	/* Set default number of channels. Currently can't handle stereo SVX files. */
 	psf->sf.channels = 1 ;
 
 	psf->sf.format = SF_FORMAT_SVX ;
@@ -280,7 +280,7 @@ svx_read_header	(SF_PRIVATE *psf)
 
 					bytecount += psf_binheader_readf (psf, "E4", &channels) ;
 
-					psf_log_printf (psf, "  Channels : %d => %d\n", channels) ;
+					psf_log_printf (psf, "  Channels : %d\n", channels) ;
 
 					psf_binheader_readf (psf, "j", dword - bytecount) ;
 					break ;
