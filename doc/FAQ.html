@@ -38,8 +38,9 @@
 <A HREF="#Q014">Q14 : I'd like to statically link libsndfile to my closed source
 	application. Can I buy a license so that this is possible?</A><BR>
 <A HREF="#Q015">Q15 : My program is crashing during a call to a function in libsndfile.
-	Is this a bug in libsndfile?
-</A><BR>
+	Is this a bug in libsndfile?</A><BR>
+<A HREF="#Q016">Q16 : Will you accept a fix for compiling libsndfile with compiler X?
+	</A><BR>
 <HR>
 
 <!-- ========================================================================= -->
@@ -520,6 +521,27 @@ following:
 		also shows how all variables passed to/returned from sf_open()
 		are defined.
 	</UL>
+
+<!-- ========================================================================= -->
+<A NAME="Q016"></A>
+<H2><BR><B>Q16 : Will you accept a fix for compiling libsndfile with compiler X?
+</B></H2>
+
+<P>
+If compiler X is a C++ compiler then no.
+C and C++ are different enough to make writing code that compiles as valid C
+and valid C++ too difficult.
+I would rather spend my time fixing bugs and adding features.
+</P>
+
+<P>
+If compiler X is a C compiler then I will do what I can as long as that does
+not hamper the correctness, portability and maintainability of the existing
+code.
+It should be noted however that libsndfile uses features specified by the 1999
+ISO C Standard.
+This can make compiling libsndfile with some older compilers difficult.
+</P>
 
 <!-- ========================================================================= -->
 <HR>
