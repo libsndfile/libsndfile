@@ -4,6 +4,9 @@
     Make sure these programs compile (even though they do nothing) on Win32
     and add them to the "make check" target.
 
+    * src/sfendian.h
+    Fix warning on Sparc CPU and code cleanup.
+
 2004-05-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/file_io.c
