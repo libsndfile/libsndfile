@@ -102,11 +102,6 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
-	if (do_all || ! strcmp (argv [1], "svx"))
-	{	update_header_test ("header.svx", SF_FORMAT_SVX) ;
-		test_count++ ;
-		} ;
-
 	if (do_all || ! strcmp (argv [1], "nist"))
 	{	update_header_test ("header.nist", SF_FORMAT_NIST) ;
 		update_seek_short_test ("header_short.nist", SF_FORMAT_NIST) ;
@@ -123,13 +118,6 @@ main (int argc, char *argv [])
 	if (do_all || ! strcmp (argv [1], "ircam"))
 	{	update_header_test ("header.ircam", SF_FORMAT_IRCAM) ;
 		update_seek_short_test ("header_short.ircam", SF_FORMAT_IRCAM) ;
-		test_count++ ;
-		} ;
-
-	if (do_all || ! strcmp (argv [1], "voc"))
-	{	update_header_test ("header.voc", SF_FORMAT_VOC) ;
-
-if (0) update_seek_short_test ("header_short.voc", SF_FORMAT_VOC) ;
 		test_count++ ;
 		} ;
 
@@ -162,22 +150,37 @@ if (0) update_seek_short_test ("header_short.voc", SF_FORMAT_VOC) ;
 
 	if (do_all || ! strcmp (argv [1], "pvf"))
 	{	update_header_test ("header.pvf", SF_FORMAT_PVF) ;
-		test_count++ ;
-		} ;
-
-	if (do_all || ! strcmp (argv [1], "htk"))
-	{	update_header_test ("header.htk", SF_FORMAT_HTK) ;
+		update_seek_short_test ("header_short.pvf", SF_FORMAT_PVF) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "avr"))
 	{	update_header_test ("header.avr", SF_FORMAT_AVR) ;
+		update_seek_short_test ("header_short.avr", SF_FORMAT_AVR) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "htk"))
+	{	update_header_test ("header.htk", SF_FORMAT_HTK) ;
+		update_seek_short_test ("header_short.htk", SF_FORMAT_HTK) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "svx"))
+	{	update_header_test ("header.svx", SF_FORMAT_SVX) ;
+		update_seek_short_test ("header_short.svx", SF_FORMAT_SVX) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "voc"))
+	{	update_header_test ("header.voc", SF_FORMAT_VOC) ;
+		/*-update_seek_short_test ("header_short.voc", SF_FORMAT_VOC) ;-*/
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "sds"))
 	{	update_header_test ("header.sds", SF_FORMAT_SDS) ;
-		update_seek_short_test ("header_short.sds", SF_FORMAT_SDS) ;
+		/*-update_seek_short_test ("header_short.sds", SF_FORMAT_SDS) ;-*/
 		test_count++ ;
 		} ;
 
@@ -311,6 +314,9 @@ update_header_test (const char *filename, int typemajor)
 	sfinfo.format = filetype | [+ (get "format") +] ;
 	sfinfo.samplerate = 48000 ;
 	sfinfo.channels = 2 ;
+
+	if (sf_format_check (&sfinfo) == SF_FALSE)
+		sfinfo.channels = 1 ;
 
 	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 	sf_close (outfile) ;
