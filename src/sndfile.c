@@ -206,6 +206,14 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_SDS_NOT_SDS			, "Error : not an SDS file." },
 	{	SFE_SDS_BAD_BIT_WIDTH	, "Error : bad bit width for SDS file." },
 
+	{	SFE_SD2_RSRC_SIZE		, "Error : resource too long." },
+	{	SFE_SD2_BAD_DATA_OFFSET	, "Error : bad data offset." },
+	{	SFE_SD2_BAD_MAP_OFFSET	, "Error : bad map offset." },
+	{	SFE_SD2_BAD_DATA_LENGTH	, "Error : bad data length." },
+	{	SFE_SD2_BAD_MAP_LENGTH	, "Error : bad map length." },
+	{	SFE_SD2_BAD_RSRC		, "Error : bad resource fork." },
+	{	SFE_SD2_BAD_SAMPLE_SIZE	, "Error : bad sample size." },
+
 	{	SFE_DWVW_BAD_BITWIDTH	, "Error : Bad bit width for DWVW encoding. Must be 12, 16 or 24." },
 	{	SFE_G72X_NOT_MONO		, "Error : G72x encoding does not support more than 1 channel." },
 
