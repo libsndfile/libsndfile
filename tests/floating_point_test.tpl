@@ -342,6 +342,7 @@ static void
 		exit (1) ;
 		} ;
 
+	unlink (filename) ;
 	puts ("ok") ;
 } /* [+ (get "float_name") +]_[+ (get "int_name") +]_test */
 [+ ENDFOR int_type +][+ ENDFOR float_type +]
