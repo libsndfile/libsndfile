@@ -414,6 +414,10 @@ AC_SUBST(ENABLE_EXPERIMENTAL_CODE)
 AC_SUBST(COMPILER_IS_GCC)
 AC_SUBST(GCC_MAJOR_VERSION)
 
+dnl The following line causes the libtool distributed with the source 
+dnl to be replaced if the build system has a more recent version.
+AC_SUBST(LIBTOOL_DEPS)
+
 AC_CONFIG_FILES([ \
 			src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
 			man/Makefile examples/Makefile tests/Makefile \
