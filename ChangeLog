@@ -1,7 +1,8 @@
 2004-03-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
-    Fix bug which occurred when configuring for MinGW.
+    Fix bug which occurres when configuring for MinGW.
+    If compiler is gcc and cross compiling use -nostdinc.
 
 2004-03-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

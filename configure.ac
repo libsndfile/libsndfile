@@ -270,7 +270,7 @@ AC_DEFINE_UNQUOTED(OS_IS_MACOSX, ${os_is_macosx}, [Set to 1 if compiling for Mac
 #====================================================================================
 # Test for sanity when cross-compiling.
 
-if test $cross_compiling = yes ; then
+if test x$cross_compiling = xyes ; then
 	AC_MSG_WARN([[******************************************************************]])
 	AC_MSG_WARN([[*** We are cross-compiling, so have to assume sizeof (short) == 2 ]])
 	AC_MSG_WARN([[*** and sizeof (int) == 4. If this is not the case there is no    ]])
@@ -340,6 +340,10 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 
 	if test x$ac_arg_gcc_werror = "xyes" ; then
 		CFLAGS="-Werror $CFLAGS"
+		fi
+
+	if test x$cross_compiling = xyes ; then
+		CFLAGS="$CFLAGS -nostdinc"
 		fi
 
 	AC_DEFINE([COMPILER_IS_GCC],1, [Set to 1 if the compile is GNU GCC.])
