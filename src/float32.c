@@ -480,7 +480,6 @@ host_read_f2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	float		scale ;
 
 	bufferlen = ARRAY_LEN (psf->u.fbuf) ;
-
 	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max ;
 
 	while (len > 0)
@@ -509,7 +508,6 @@ host_read_f2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	float		scale ;
 
 	bufferlen = ARRAY_LEN (psf->u.fbuf) ;
-
 	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFFFFFF / psf->float_max ;
 
 	while (len > 0)
@@ -706,7 +704,6 @@ replace_read_f2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	float		scale ;
 
 	bufferlen = ARRAY_LEN (psf->u.fbuf) ;
-
 	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max ;
 
 	while (len > 0)
@@ -736,7 +733,6 @@ replace_read_f2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	float		scale ;
 
 	bufferlen = ARRAY_LEN (psf->u.fbuf) ;
-
 	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max ;
 
 	while (len > 0)

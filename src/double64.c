@@ -475,16 +475,16 @@ double64_get_capability	(SF_PRIVATE *psf)
 */
 
 static inline void
-d2s_array (double *src, int count, short *dest)
+d2s_array (double *src, int count, short *dest, double scale)
 {	while (--count >= 0)
-	{	dest [count] = lrint (src [count]) ;
+	{	dest [count] = lrint (scale * src [count]) ;
 		} ;
 } /* d2s_array */
 
 static inline void
-d2i_array (double *src, int count, int *dest)
+d2i_array (double *src, int count, int *dest, double scale)
 {	while (--count >= 0)
-	{	dest [count] = lrint (src [count]) ;
+	{	dest [count] = lrint (scale * src [count]) ;
 		} ;
 } /* d2i_array */
 
@@ -523,8 +523,10 @@ static sf_count_t
 host_read_d2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 {	int			bufferlen, readcount ;
 	sf_count_t	total = 0 ;
+	double		scale ;
 
 	bufferlen = ARRAY_LEN (psf->u.dbuf) ;
+	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max ;
 
 	while (len > 0)
 	{	if (len < bufferlen)
@@ -534,7 +536,7 @@ host_read_d2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 		if (psf->float_endswap == SF_TRUE)
 			endswap_long_array (psf->u.lbuf, bufferlen) ;
 
-		d2s_array (psf->u.dbuf, readcount, ptr + total) ;
+		d2s_array (psf->u.dbuf, readcount, ptr + total, scale) ;
 		total += readcount ;
 		len -= readcount ;
 		if (readcount < bufferlen)
@@ -548,8 +550,9 @@ static sf_count_t
 host_read_d2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 {	int			bufferlen, readcount ;
 	sf_count_t	total = 0 ;
-
+	double		scale ;
 	bufferlen = ARRAY_LEN (psf->u.dbuf) ;
+	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFFFFFF / psf->float_max ;
 
 	while (len > 0)
 	{	if (len < bufferlen)
@@ -559,7 +562,7 @@ host_read_d2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		if (psf->float_endswap == SF_TRUE)
 			endswap_long_array (psf->u.lbuf, bufferlen) ;
 
-		d2i_array (psf->u.dbuf, readcount, ptr + total) ;
+		d2i_array (psf->u.dbuf, readcount, ptr + total, scale) ;
 		total += readcount ;
 		len -= readcount ;
 		if (readcount < bufferlen)
@@ -741,8 +744,10 @@ static sf_count_t
 replace_read_d2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 {	int			bufferlen, readcount ;
 	sf_count_t	total = 0 ;
+	double		scale ;
 
 	bufferlen = ARRAY_LEN (psf->u.dbuf) ;
+	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max ;
 
 	while (len > 0)
 	{	if (len < bufferlen)
@@ -754,7 +759,7 @@ replace_read_d2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 
 		d2bd_read (psf->u.dbuf, bufferlen) ;
 
-		d2s_array (psf->u.dbuf, readcount, ptr + total) ;
+		d2s_array (psf->u.dbuf, readcount, ptr + total, scale) ;
 		total += readcount ;
 		if (readcount < bufferlen)
 			break ;
@@ -768,8 +773,10 @@ static sf_count_t
 replace_read_d2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 {	int			bufferlen, readcount ;
 	sf_count_t	total = 0 ;
+	double		scale ;
 
 	bufferlen = ARRAY_LEN (psf->u.dbuf) ;
+	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFFFFFF / psf->float_max ;
 
 	while (len > 0)
 	{	if (len < bufferlen)
@@ -781,7 +788,7 @@ replace_read_d2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 
 		d2bd_read (psf->u.dbuf, bufferlen) ;
 
-		d2i_array (psf->u.dbuf, readcount, ptr + total) ;
+		d2i_array (psf->u.dbuf, readcount, ptr + total, scale) ;
 		total += readcount ;
 		if (readcount < bufferlen)
 			break ;
