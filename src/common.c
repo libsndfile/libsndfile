@@ -377,6 +377,8 @@ psf_asciiheader_printf (SF_PRIVATE *psf, const char *format, ...)
 **		psf_binheader_writef ("b", &bindata, sizeof (bindata)) ;
 **
 **	To write N zero bytes use:
+**			NOTE: due to platform issues (ie x86-64) you should cast the
+**			argument to size_t or ensure the variable type is size_t.
 **		psf_binheader_writef ("z", N) ;
 */
 
