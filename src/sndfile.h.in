@@ -314,7 +314,7 @@ typedef struct
 enum
 {	SF_LOOP_NONE = 800,
 	SF_LOOP_FORWARD,
-	SF_LOOP_BACKWARD,
+	SF_LOOP_BACKWARD
 } ;
 
 /* Open the specified file for read, write or both. On error, this will
