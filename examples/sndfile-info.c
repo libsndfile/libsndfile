@@ -49,6 +49,7 @@ print_usage (char *progname)
 		printf ("This is a Unix style command line application which\n"
 				"should be run in a MSDOS box or Command Shell window.\n\n") ;
 		printf ("Sleeping for 5 seconds before exiting.\n\n") ;
+		fflush (stdout) ;
 
 		/* This is the officially blessed by microsoft way but I can't get
 		** it to link.
