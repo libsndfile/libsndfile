@@ -475,7 +475,7 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 	switch (open_mode)
 	{	case SFM_READ :
 				dwDesiredAccess = GENERIC_READ ;
-				dwShareMode = FILE_SHARE_READ ;
+				dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE ;
 				dwCreationDistribution = OPEN_EXISTING ;
 				break ;
 
@@ -487,7 +487,7 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 
 		case SFM_RDWR :
 				dwDesiredAccess = GENERIC_READ | GENERIC_WRITE ;
-				dwShareMode = FILE_SHARE_READ ;
+				dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE ;
 				dwCreationDistribution = OPEN_ALWAYS ;
 				break ;
 
@@ -649,7 +649,7 @@ psf_fwrite (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 	{	/* Break the writes down to a sensible size. */
 		count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : (ssize_t) items ;
 
-		if (WriteFile ((HANDLE) psf->filedes, ((char*) ptr) + total, count, &dwNumberOfBytesWritten, 0) == 0) 
+		if (WriteFile ((HANDLE) psf->filedes, ((char*) ptr) + total, count, &dwNumberOfBytesWritten, 0) == 0)
 		{	psf_log_syserr (psf, GetLastError ()) ;
 			break ;
 			}
@@ -1213,7 +1213,7 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 749740d7-ecc7-47bd-8cf7-600f31d32e6d

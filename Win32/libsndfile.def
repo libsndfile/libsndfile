@@ -67,11 +67,14 @@ sf_set_string		@61
 
 sf_open_fd			@70
 
+
 ; Maybe one day. Maybe.
-; sf_dither_short		@70
-; sf_dither_int		@71
-; sf_dither_float		@72
-; sf_dither_double	@73
+;
+; sf_dither_short	@80
+; sf_dither_int		@81
+; sf_dither_float	@82
+; sf_dither_double	@83
+
 
 ; Do not edit or modify anything in this comment block.
 ; The arch-tag line is a file identity tag for the GNU Arch 

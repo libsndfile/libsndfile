@@ -1,6 +1,7 @@
 @echo off
 
 if "%1"=="check" GOTO CHECK
+if "%1"=="clean" GOTO CLEAN
 
 copy /y Win32\sndfile.h src\sndfile.h
 copy /y Win32\config.h src\config.h
@@ -13,7 +14,13 @@ goto END
 nmake -f Win32\Makefile.msvc check
 goto END
 
+:CLEAN
+nmake -f Win32\Makefile.msvc clean
+goto END
+
+
 :END
+
 
 goto skipArchTag
 
@@ -23,4 +30,4 @@ goto skipArchTag
 
  arch-tag: 8700080b-8d9a-4852-ad8a-8ecd027f1f61
 
-skipArchTag
+:skipArchTag

@@ -164,6 +164,9 @@ enum
 	SFC_SET_CLIPPING				= 0x10C0,
 	SFC_GET_CLIPPING				= 0x10C1,
 
+	SFC_GET_INSTRUMENT				= 0x10D0,
+	SFC_SET_INSTRUMENT				= 0x10D1,
+
 	/* Following commands for testing only. */
 	SFC_TEST_IEEE_FLOAT_REPLACE		= 0x6001,
 
@@ -218,20 +221,16 @@ enum
 
 /* A SNDFILE* pointer can be passed around much like stdio.h's FILE* pointer. */
 
-typedef	void	SNDFILE ;
+typedef	struct SNDFILE_tag	SNDFILE ;
 
-<<<<<<< diff from left file
-typedef off_t	sf_count_t ;
-========
 /* The following typedef is system specific and is defined when libsndfile is.
 ** compiled. sf_count_t can be one of loff_t (Linux), off_t (*BSD), 
 ** off64_t (Solaris), __int64_t (Win32) etc.
 */
 
-typedef loff_t	sf_count_t ;
+typedef off_t	sf_count_t ;
 
-#define SF_COUNT_MAX		0x7FFFFFFFFFFFFFFFLL
->>>>>>> diff from right file
+#define SF_COUNT_MAX		0x7FFFFFFF
 
 /* A pointer to a SF_INFO structure is passed to sf_open_read () and filled in.
 ** On write, the SF_INFO structure is filled in by the user and passed into
@@ -296,6 +295,25 @@ typedef struct
 	sf_count_t	length ;
 } SF_EMBED_FILE_INFO ;
 
+/* Struct used to retrieve music sample information from a file.
+*/
+
+typedef struct
+{	int basenote ;
+	int gain ;
+	int	sustain_mode ;
+	int sustain_start, sustain_end;
+	int release_mode ;
+	int release_start, reslease_end ;
+} SF_INSTRUMENT ;
+
+/* sustain_mode and release_mode will be one of the following. */
+
+enum
+{	SF_LOOP_NONE = 800,
+	SF_LOOP_FORWARD,
+	SF_LOOP_BACKWARD,
+} ;
 
 /* Open the specified file for read, write or both. On error, this will
 ** return a NULL pointer. To find the error number, pass a NULL SNDFILE
@@ -333,6 +351,7 @@ const char* sf_strerror (SNDFILE *sndfile) ;
 
 /* sf_error_number () allows the retrieval of the error string for each internal
 ** error number.
+**
 */
 
 const char*	sf_error_number	(int errnum) ;
@@ -405,7 +424,7 @@ sf_count_t	sf_writef_int 	(SNDFILE *sndfile, int *ptr, sf_count_t frames) ;
 sf_count_t	sf_readf_float	(SNDFILE *sndfile, float *ptr, sf_count_t frames) ;
 sf_count_t	sf_writef_float	(SNDFILE *sndfile, float *ptr, sf_count_t frames) ;
 
-sf_count_t	sf_readf_double		(SNDFILE *sndfile, double *ptr, sf_count_t frames) ;
+sf_count_t	sf_readf_double	(SNDFILE *sndfile, double *ptr, sf_count_t frames) ;
 sf_count_t	sf_writef_double	(SNDFILE *sndfile, double *ptr, sf_count_t frames) ;
 
 /* Functions for reading and writing the data chunk in terms of items.
@@ -426,8 +445,8 @@ sf_count_t	sf_read_double	(SNDFILE *sndfile, double *ptr, sf_count_t items) ;
 sf_count_t	sf_write_double	(SNDFILE *sndfile, double *ptr, sf_count_t items) ;
 
 /* Close the SNDFILE and clean up all memory allocations associated with this
-** file.
-** Returns 0 on success, or an error number.
+** file. 
+** Returns 0 on success, or an error number. 
 */
 
 int		sf_close		(SNDFILE *sndfile) ;
@@ -437,6 +456,7 @@ int		sf_close		(SNDFILE *sndfile) ;
 #endif	/* __cplusplus */
 
 #endif	/* SNDFILE_H */
+
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch 

@@ -27,6 +27,7 @@ CLEAN :
     -@erase "src\*.obj"
     -@erase "src\G72x\*.obj"
     -@erase "src\GSM610\*.obj"
+    -@erase "tests\*.obj"
     -@erase "tests\*.exe"
 
 #====================================================================

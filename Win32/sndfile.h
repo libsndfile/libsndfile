@@ -68,7 +68,7 @@ enum
 	SF_FORMAT_XI			= 0x0F0000,		/* Fasttracker 2 Extended Instrument */
 	SF_FORMAT_HTK			= 0x100000,		/* HMM Tool Kit format */
 	SF_FORMAT_SDS			= 0x110000,		/* Midi Sample Dump Standard */
-
+	
 	/* Subtypes from here on. */
 
 	SF_FORMAT_PCM_S8		= 0x0001,		/* Signed 8 bit data */
@@ -100,7 +100,7 @@ enum
 
 	SF_FORMAT_DPCM_8		= 0x0050,		/* 8 bit differential PCM (XI only) */
 	SF_FORMAT_DPCM_16		= 0x0051,		/* 16 bit differential PCM (XI only) */
-
+	
 
 	/* Endian-ness options. */
 
@@ -150,7 +150,7 @@ enum
 	SFC_SET_UPDATE_HEADER_AUTO		= 0x1061,
 
 	SFC_FILE_TRUNCATE				= 0x1080,
-
+	
 	SFC_SET_RAW_START_OFFSET		= 0x1090,
 
 	SFC_SET_DITHER_ON_WRITE			= 0x10A0,
@@ -160,18 +160,21 @@ enum
 	SFC_GET_DITHER_INFO				= 0x10A3,
 
 	SFC_GET_EMBED_FILE_INFO			= 0x10B0,
-
+	
 	SFC_SET_CLIPPING				= 0x10C0,
 	SFC_GET_CLIPPING				= 0x10C1,
+
+	SFC_GET_INSTRUMENT				= 0x10D0,
+	SFC_SET_INSTRUMENT				= 0x10D1,
 
 	/* Following commands for testing only. */
 	SFC_TEST_IEEE_FLOAT_REPLACE		= 0x6001,
 
 	/*
 	** SFC_SET_ADD_* values are deprecated and will disappear at some
-	** time in the future. They are guaranteed to be here up to and
-	** including version 1.0.8 to avoid breakage of existng software.
-	** They currently do nothing and will continue to do nothing.
+	** time in the future. They are guaranteed to be here up to and 
+	** including version 1.0.8 to avoid breakage of existng software. 
+	** They currently do nothing and will continue to do nothing. 
 	*/
 	SFC_SET_ADD_DITHER_ON_WRITE		= 0x1070,
 	SFC_SET_ADD_DITHER_ON_READ		= 0x1071
@@ -205,21 +208,20 @@ enum
 } ;
 
 /* Pubic error values. These are guaranteed to remain unchanged for the duration
-** of the library major version number.
+** of the library major version number. 
 ** There are also a large number of private error numbers which are internal to
 ** the library which can change at any time.
 */
 
 enum
-{	SF_ERR_NO_ERROR				= 0,
+{	SF_ERR_NO_ERROR     		= 0,
 	SF_ERR_UNRECOGNISED_FORMAT	= 1,
 	SF_ERR_SYSTEM				= 2
 } ;
 
 /* A SNDFILE* pointer can be passed around much like stdio.h's FILE* pointer. */
 
-typedef	void	SNDFILE ;
-
+typedef	struct SNDFILE_tag	SNDFILE ;
 
 /* The following typedef is system specific and is defined when libsndfile is.
 ** compiled. sf_count_t can be one of loff_t (Linux), off_t (*BSD), 
@@ -264,8 +266,8 @@ typedef struct
 } SF_FORMAT_INFO ;
 
 /*
-** Enums and typedefs for adding dither on read and write.
-** See the html documentation for sf_command(), SFC_SET_DITHER_ON_WRITE
+** Enums and typedefs for adding dither on read and write. 
+** See the html documentation for sf_command(), SFC_SET_DITHER_ON_WRITE 
 ** and SFC_SET_DITHER_ON_READ.
 */
 
@@ -293,6 +295,25 @@ typedef struct
 	sf_count_t	length ;
 } SF_EMBED_FILE_INFO ;
 
+/* Struct used to retrieve music sample information from a file.
+*/
+
+typedef struct
+{	int basenote ;
+	int gain ;
+	int	sustain_mode ;
+	int sustain_start, sustain_end;
+	int release_mode ;
+	int release_start, reslease_end ;
+} SF_INSTRUMENT ;
+
+/* sustain_mode and release_mode will be one of the following. */
+
+enum
+{	SF_LOOP_NONE = 800,
+	SF_LOOP_FORWARD,
+	SF_LOOP_BACKWARD,
+} ;
 
 /* Open the specified file for read, write or both. On error, this will
 ** return a NULL pointer. To find the error number, pass a NULL SNDFILE
@@ -308,7 +329,7 @@ SNDFILE* 	sf_open		(const char *path, int mode, SF_INFO *sfinfo) ;
 ** When passed a descriptor like this, the library will assume that the start
 ** of file header is at the current file offset. This allows sound files within
 ** larger container files to be read and/or written.
-** On error, this will return a NULL pointer. To find the error number, pass a
+** On error, this will return a NULL pointer. To find the error number, pass a 
 ** NULL SNDFILE to sf_perror () or sf_error_str ().
 ** All calls to sf_open_fd() should be matched with a call to sf_close().
 
@@ -316,20 +337,21 @@ SNDFILE* 	sf_open		(const char *path, int mode, SF_INFO *sfinfo) ;
 
 SNDFILE* 	sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc) ;
 
-/* sf_error () returns a error number which can be translated to a text
+/* sf_error () returns a error number which can be translated to a text 
 ** string using sf_error_number().
 */
 
 int		sf_error		(SNDFILE *sndfile) ;
 
-/* sf_strerror () returns to the caller a pointer to the current error message for
+/* sf_strerror () returns to the caller a pointer to the current error message for 
 ** the given SNDFILE.
 */
 
 const char* sf_strerror (SNDFILE *sndfile) ;
 
 /* sf_error_number () allows the retrieval of the error string for each internal
-** error number.
+** error number. 
+**
 */
 
 const char*	sf_error_number	(int errnum) ;

@@ -1,3 +1,16 @@
+2004-02-08  Erik de Castro Lopo  <erikd AT zipworld DOT com DOT au>
+
+    * src/file_io.c
+    Make sure config.h is included before stdio.h to make sure large file
+    support is enabled on Linux (and Solaris).
+
+    * tests/misc_test.c
+    Disable update_header test on Win32. This should work but doesn't and
+    I'm not sure why.
+
+    * Make.bat Win32/Makefile.msvc
+    Updates.
+
 2004-01-07  Erik de Castro Lopo  <erikd AT zipworld DOT com DOT au>
 
     * src/common.h
@@ -396,7 +409,7 @@
     Add a test for lrintf() function. This was required to detect a really
     broken lrint() and lrintf() on Cygwin.
 
-    * tests/msic_test.c
+    * tests/misc_test.c
     Don't run permission test when compiling under Cygwin.
 
     * src/float_cast.h

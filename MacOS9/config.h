@@ -58,6 +58,9 @@
 /* Define to 1 if you have the `ftruncate' function. */
 #define HAVE_FTRUNCATE 1
 
+/* Define to 1 if you have the `getpagesize' function. */
+#define HAVE_GETPAGESIZE 1
+
 /* Define to 1 if you have the `gmtime' function. */
 #define HAVE_GMTIME 1
 
@@ -84,6 +87,9 @@
 
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
+
+/* Define to 1 if you have the `mmap' function. */
+#define HAVE_MMAP 1
 
 /* Define to 1 if you have the <mmreg.h> header file. */
 /* #undef HAVE_MMREG_H */
@@ -139,6 +145,9 @@
 /* Define to 1 if you have the `write' function. */
 #define HAVE_WRITE 1
 
+/* Set to 1 if compiling for MacOSX */
+#define OS_IS_MACOSX 0
+
 /* Set to 1 if compiling for Win32 */
 #define OS_IS_WIN32 0
 
@@ -152,13 +161,13 @@
 #define PACKAGE_NAME "libsndfile"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsndfile 1.1.0pre1"
+#define PACKAGE_STRING "libsndfile 1.0.6"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsndfile"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.1.0pre1"
+#define PACKAGE_VERSION "1.0.6"
 
 /* Set to maximum allowed value of sf_count_t type. */
 #define SF_COUNT_MAX 0x7FFFFFFFFFFFFFFFLL
@@ -206,7 +215,16 @@
 #define TYPEOF_SF_COUNT_T off_t
 
 /* Version number of package */
-#define VERSION "1.0.6pre14"
+#define VERSION "1.0.6"
+
+/* Number of bits in a file offset, on hosts where this is settable. */
+/* #undef _FILE_OFFSET_BITS */
+
+/* Define to make fseeko etc. visible, on some hosts. */
+/* #undef _LARGEFILE_SOURCE */
+
+/* Define for large files, on AIX-style hosts. */
+/* #undef _LARGE_FILES */
 
 /*
 ** Do not edit or modify anything in this comment block.
@@ -215,4 +233,3 @@
 **
 ** arch-tag: d0eaac82-82be-4d81-984e-a86744f18100
 */
-
