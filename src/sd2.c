@@ -1,5 +1,6 @@
 /*
 ** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004 Paavo Jumppanen
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -17,6 +18,11 @@
 */
 
 /*
+** The sd2 support implemented in this file was partially sponsored
+** (financially) by Paavo Jumppanen.
+*/
+
+/*
 ** Documentation on the Mac resource fork was obtained here :
 ** http://developer.apple.com/documentation/mac/MoreToolbox/MoreToolbox-99.html
 */
@@ -30,18 +36,6 @@
 #include	"config.h"
 #include	"sfendian.h"
 #include	"common.h"
-
-
-#if (ENABLE_EXPERIMENTAL_CODE == 1)
-
-int
-sd2_open	(SF_PRIVATE *psf)
-{	if (psf)
-		return SFE_UNIMPLEMENTED ;
-	return (psf && 0) ;
-} /* sd2_open */
-
-#else
 
 /*------------------------------------------------------------------------------
  * Markers.
@@ -151,15 +145,11 @@ sd2_close	(SF_PRIVATE *psf)
 } /* sd2_close */
 
 static int
-sd2_write_rsrc_fork (SF_PRIVATE *psf, int calc_length)
+sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 {
-	psf = psf ;
-	calc_length = 0 ;
+	psf_log_printf (psf, "Writing of SD2 files not implemented yet.\n", __func__) ;
 
-	printf ("%s : not implemented yet.\n", __func__) ;
-	psf = NULL ;
-	psf->header [0] = 0 ;
-	return 0 ;
+	return SFE_UNIMPLEMENTED ;
 } /* sd2_write_rsrc_fork */
 
 /*------------------------------------------------------------------------------
@@ -344,9 +334,6 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc, int rsrc_filelen)
 
 	return 0 ;
 } /* parse_str_rsrc */
-
-
-#endif
 
 /*
 ** Do not edit or modify anything in this comment block.
