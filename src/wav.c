@@ -1332,8 +1332,9 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 ** 2 bytes (short)      ??? always set to 0x8000
 ** 4 bytes (float)      ??? seems to be always 0
 ** 4 bytes (int)        number of beats
-** 2 bytes (short)      meter numerator - always 4 in SF/ACID
-** 2 bytes (short)      meter denominator - always 4 in SF/ACID
+** 2 bytes (short)      meter denominator   //always 4 in SF/ACID
+** 2 bytes (short)      meter numerator     //always 4 in SF/ACID
+**                      //are we sure about the order?? usually its num/denom
 ** 4 bytes (float)      tempo
 **
 */
@@ -1367,6 +1368,16 @@ wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 				beats, meter_numer, meter_denom, psf->u.cbuf) ;
 
 	psf_binheader_readf (psf, "j", chunklen - bytesread) ;
+
+	if ((psf->loop_info = calloc (1, sizeof (SF_LOOP_INFO))) == NULL)
+		return SFE_MALLOC_FAILED ;
+
+	psf->loop_info->time_sig_num	= meter_numer ;
+	psf->loop_info->time_sig_den	= meter_denom ;
+	psf->loop_info->loop_mode		= (flags & 0x01) ? SF_LOOP_NONE : SF_LOOP_FORWARD ;
+	psf->loop_info->num_beats		= beats ;
+	psf->loop_info->bpm				= tempo ;
+	psf->loop_info->root_key		= (flags & 0x02) ? rootnote : -1 ;
 
 	return 0 ;
 } /* wav_read_acid_chunk */

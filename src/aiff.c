@@ -50,6 +50,7 @@
 #define SFX_MARKER	(MAKE_MARKER ('S', 'F', 'X', '!'))
 
 #define PEAK_MARKER	(MAKE_MARKER ('P', 'E', 'A', 'K'))
+#define basc_MARKER	(MAKE_MARKER ('b', 'a', 's', 'c'))
 
 /* Supported AIFC encodings.*/
 #define NONE_MARKER	(MAKE_MARKER ('N', 'O', 'N', 'E'))
@@ -85,6 +86,10 @@
 #define SIZEOF_AIFC_COMM		24
 #define SIZEOF_SSND_CHUNK		8
 #define SIZEOF_INST_CHUNK		20
+
+/* Is it constant? */
+#define SIZEOF_basc_CHUNK				0x54
+#define SIZEOF_basc_CHUNK_PADDING		66
 
 /* AIFC/IMA4 defines. */
 #define AIFC_IMA4_BLOCK_LEN				34
@@ -134,6 +139,31 @@ typedef struct
 	INST_LOOP	release_loop ;
 } INST_CHUNK ;
 
+
+enum
+{	basc_SCALE_MINOR = 1,
+	basc_SCALE_MAJOR,
+	basc_SCALE_NEITHER,
+	basc_SCALE_BOTH,
+} ;
+
+enum
+{	basc_TYPE_ONE_SHOT = 1,
+	basc_TYPE_LOOP
+} ;
+
+
+typedef struct
+{	unsigned int	version ;
+	unsigned int	numBeats ;
+	unsigned short	rootNote ;
+	unsigned short	scaleType ;
+	unsigned short	sigNumerator ;
+	unsigned short	sigDenominator ;
+	unsigned short	loopType ;
+	char			zero_bytes [SIZEOF_basc_CHUNK_PADDING] ;
+} basc_CHUNK ;
+
 /*------------------------------------------------------------------------------
  * Private static functions.
  */
@@ -155,6 +185,7 @@ static int	aiff_command (SF_PRIVATE *psf, int command, void *data, int datasize)
 
 static const char *get_loop_mode_str (short mode) ;
 
+static int aiff_read_basc_chunk (SF_PRIVATE * psf) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -579,6 +610,20 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						psf_log_printf (psf, 	"  Release\n   mode  : %d => %s\n   begin : %u\n   end   : %u\n",
 								mode, loop_mode, begin, end) ;
 						} ;
+					break ;
+
+			case basc_MARKER :
+					psf_binheader_readf (psf, "e4", &dword) ;
+					psf_log_printf (psf, "basc : %u\n", dword) ;
+
+					if (dword != SIZEOF_basc_CHUNK)
+					{	psf_log_printf (psf, " %M : %d (should be %d)\n", marker, dword, SIZEOF_basc_CHUNK) ;
+						psf_binheader_readf (psf, "j", dword) ;
+						break ;
+						} ;
+
+					if ((error = aiff_read_basc_chunk (psf)))
+						return error ;
 					break ;
 
 			case MARK_MARKER :
@@ -1214,6 +1259,71 @@ uint2tenbytefloat (unsigned int num, unsigned char *bytes)
 	bytes [5] = num & 0xFF ;
 
 } /* uint2tenbytefloat */
+
+static int
+aiff_read_basc_chunk (SF_PRIVATE * psf)
+{	const char * type_str ;
+	basc_CHUNK bc ;
+
+	psf_log_printf (psf, " basc (Apple Loop)\n") ;
+
+	psf_binheader_readf (psf, "E442", &bc.version, &bc.numBeats, &bc.rootNote) ;
+	psf_binheader_readf (psf, "E222", &bc.scaleType, &bc.sigNumerator, &bc.sigDenominator) ;
+	psf_binheader_readf (psf, "E2b", &bc.loopType, &bc.zero_bytes, SIZEOF_basc_CHUNK_PADDING) ;
+
+	psf_log_printf (psf, "  Version?  : %u\n  Num Beats : %u\n  Root Note : 0x%x\n",
+						bc.version, bc.numBeats, bc.rootNote) ;
+
+	switch (bc.scaleType)
+	{	case basc_SCALE_MINOR :
+				type_str = "MINOR" ;
+				break ;
+		case basc_SCALE_MAJOR :
+				type_str = "MAJOR" ;
+				break ;
+		case basc_SCALE_NEITHER :
+				type_str = "NEITHER" ;
+				break ;
+		case basc_SCALE_BOTH :
+				type_str = "BOTH" ;
+				break ;
+		default :
+				type_str = "!!WRONG!!" ;
+				break ;
+		} ;
+
+	psf_log_printf (psf, 	"  ScaleType : 0x%x (%s)\n", bc.scaleType, type_str) ;
+	psf_log_printf (psf, 	"  Time Sig  : %d/%d\n", bc.sigNumerator, bc.sigDenominator) ;
+
+	switch (bc.loopType)
+	{	case basc_TYPE_ONE_SHOT :
+				type_str = "One Shot" ;
+				break ;
+		case basc_TYPE_LOOP :
+				type_str = "Loop" ;
+				break ;
+		default:
+				type_str = "!!WRONG!!" ;
+				break ;
+		} ;
+
+	psf_log_printf (psf, "  Loop Type : 0x%x (%s)\n", bc.loopType, type_str) ;
+
+	if ((psf->loop_info = calloc (1, sizeof (SF_LOOP_INFO))) == NULL)
+		return SFE_MALLOC_FAILED ;
+
+	psf->loop_info->time_sig_num	= bc.sigNumerator ;
+	psf->loop_info->time_sig_den	= bc.sigDenominator ;
+	psf->loop_info->loop_mode		= (bc.loopType == basc_TYPE_ONE_SHOT) ? SF_LOOP_NONE : SF_LOOP_FORWARD ;
+	psf->loop_info->num_beats		= bc.numBeats ;
+
+	/* Can always be recalculated from other known fields. */
+	psf->loop_info->bpm = (1.0 / psf->sf.frames) * psf->sf.samplerate
+							* ((bc.numBeats * 4.0) / bc.sigDenominator) * 60.0 ;
+	psf->loop_info->root_key = bc.rootNote ;
+
+	return 0 ;
+} /* aiff_read_basc_chunk */
 
 /*
 ** Do not edit or modify anything in this comment block.
