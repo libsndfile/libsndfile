@@ -677,7 +677,6 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 **	additions:
 **
 **		p   - jump a given number of position from start of file.
-**		j   - jump a given number of bytes forward in the file.
 **
 **	If format is NULL, psf_binheader_readf returns the current offset.
 */
