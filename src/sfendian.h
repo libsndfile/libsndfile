@@ -72,23 +72,11 @@
 	#error "Target CPU endian-ness unknown. May need to hand edit src/config.h"
 #endif
 
-#define LES2H_SHORT_PTR(x)		((x) [0] + ((x) [1] << 8))
-#define LES2H_INT_PTR(x)		(((x) [0] << 16) + ((x) [1] << 24))
-
 #define LET2H_SHORT_PTR(x)		((x) [1] + ((x) [2] << 8))
 #define LET2H_INT_PTR(x)		(((x) [0] << 8) + ((x) [1] << 16) + ((x) [2] << 24))
 
-#define	LEI2H_SHORT_PTR(x)		((x) [2] + ((x) [3] << 8))
-#define	LEI2H_INT_PTR(x)		((x) [0] + ((x) [1] << 8) + ((x) [2] << 16) + ((x) [3] << 24))
-
-#define BES2H_SHORT_PTR(x)		(((x) [0] << 8) + (x) [1])
-#define BES2H_INT_PTR(x)		(((x) [0] << 24) + ((x) [1] << 16))
-
 #define BET2H_SHORT_PTR(x)		(((x) [0] << 8) + (x) [1])
 #define BET2H_INT_PTR(x)		(((x) [0] << 24) + ((x) [1] << 16) + ((x) [2] << 8))
-
-#define BEI2H_SHORT_PTR(x)		(((x) [0] << 8) + (x) [1])
-#define BEI2H_INT_PTR(x)		(((x) [0] << 24) + ((x) [1] << 16) + ((x) [2] << 8) + (x) [3])
 
 /* Endian swapping routines implemented in sfendian.c. */
 

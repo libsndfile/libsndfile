@@ -2500,23 +2500,21 @@ bet2s_array (tribyte *src, int count, short *dest)
 
 static void
 lei2s_array (int *src, int count, short *dest)
-{	unsigned char	*ucptr ;
+{	int value ;
 
-	ucptr = ((unsigned char*) src) + 4 * count ;
 	while (--count >= 0)
-	{	ucptr -= 4 ;
-		dest [count] = LEI2H_SHORT_PTR (ucptr) ;
+	{	value = LEI2H_INT (src [count]) ;
+		dest [count] = value >> 16 ;
 		} ;
 } /* lei2s_array */
 
 static void
 bei2s_array (int *src, int count, short *dest)
-{	unsigned char	*ucptr ;
+{	int value ;
 
-	ucptr = ((unsigned char*) src) + 4 * count ;
 	while (--count >= 0)
-	{	ucptr -= 4 ;
-		dest [count] = BEI2H_SHORT_PTR (ucptr) ;
+	{	value = BEI2H_INT (src [count]) ;
+		dest [count] = value >> 16 ;
 		} ;
 } /* bei2s_array */
 
@@ -2539,24 +2537,22 @@ uc2i_array	(unsigned char *src, int count, int *dest)
 
 static void
 bes2i_array (short *src, int count, int *dest)
-{	unsigned char	*ucptr ;
+{	short value ;
 
-	ucptr = ((unsigned char*) src) + 2 * count ;
 	while (--count >= 0)
-	{	ucptr -= 2 ;
-		dest [count] = BES2H_INT_PTR (ucptr) ;
+	{	value = BES2H_SHORT (src [count]) ;
+		dest [count] = value << 16 ;
 		} ;
 } /* bes2i_array */
 
 static	void
 les2i_array (short *src, int count, int *dest)
-{	unsigned char	*ucptr ;
+{	short value ;
 
-	ucptr = ((unsigned char*) src) + 2 * count ;
 	while (--count >= 0)
-	{	ucptr -= 2 ;
-		dest [count] = LES2H_INT_PTR (ucptr) ;
-			} ;
+	{	value = LES2H_SHORT (src [count]) ;
+		dest [count] = value << 16 ;
+		} ;
 } /* les2i_array */
 
 static void
