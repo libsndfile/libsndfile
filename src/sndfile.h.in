@@ -70,6 +70,8 @@ enum
 	SF_FORMAT_SDS			= 0x110000,		/* Midi Sample Dump Standard */
 	SF_FORMAT_AVR			= 0x120000,		/* Audio Visual Research */
 	SF_FORMAT_WAVEX			= 0x130000,		/* MS WAVE with WAVEFORMATEX */
+	SF_FORMAT_OGG			= 0x140000,		/* Ogg encapsulation */
+	SF_FORMAT_ANX			= 0x150000,		/* Annodex.net encapsulation */
 
 	/* Subtypes from here on. */
 
@@ -102,6 +104,8 @@ enum
 
 	SF_FORMAT_DPCM_8		= 0x0050,		/* 8 bit differential PCM (XI only) */
 	SF_FORMAT_DPCM_16		= 0x0051,		/* 16 bit differential PCM (XI only) */
+	SF_FORMAT_VORBIS		= 0x0060,		/* Vorbis encoding */
+	SF_FORMAT_SPEEX			= 0x0061,		/* Speex encoding */
 
 
 	/* Endian-ness options. */

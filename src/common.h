@@ -85,8 +85,6 @@ enum
 	SF_FORMAT_DWD			= 0x4040000,		/* DiamondWare Digirized */
 
 	/* Following are detected but not supported. */
-	SF_FORMAT_OGG			= 0x4090000,
-
 	SF_FORMAT_REX			= 0x40A0000,		/* Propellorheads Rex/Rcy */
 	SF_FORMAT_SD2			= 0x40C0000,		/* Sound Designer 2 */
 	SF_FORMAT_REX2			= 0x40D0000,		/* Propellorheads Rex2 */
@@ -96,8 +94,6 @@ enum
 	SF_FORMAT_FLAC			= 0x4120000,
 
 	/* Unsupported encodings. */
-	SF_FORMAT_VORBIS		= 0x1001,
-
 	SF_FORMAT_SVX_FIB		= 0x1020, 		/* SVX Fibonacci Delta encoding. */
 	SF_FORMAT_SVX_EXP		= 0x1021, 		/* SVX Exponential Delta encoding. */
 

@@ -1,3 +1,10 @@
+2004-06-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac src/common.h src/ogg.c src/sndfile.c src/sndfile.h.in
+      src/Makefile.am
+    Apply large patch from Conrad Parker implementing Ogg Vorbis, Ogg Speex and
+    Annodex support via liboggz and libfishsound. Thanks Conrad.
+
 2004-06-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/avr.c src/ircam.c src/nist.c src/paf.c src/xi.c
