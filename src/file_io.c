@@ -765,14 +765,12 @@ psf_is_pipe (SF_PRIVATE *psf)
 /* Win32 */ sf_count_t
 psf_get_filelen (SF_PRIVATE *psf)
 {	sf_count_t filelen ;
-	DWORD dwFileSizeLow, dwFileSizeHigh, dwError ;
+	DWORD dwFileSizeLow, dwFileSizeHigh, dwError = NO_ERROR ;
 
 	dwFileSizeLow = GetFileSize ((HANDLE) psf->filedes, &dwFileSizeHigh) ;
 
 	if (dwFileSizeLow == 0xFFFFFFFF)
 		dwError = GetLastError () ;
-	else
-		dwError = NO_ERROR ;
 
 	if (dwError != NO_ERROR)
 	{	psf_log_syserr (psf, GetLastError ()) ;
