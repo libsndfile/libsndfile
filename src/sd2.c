@@ -247,7 +247,7 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 		goto parse_rsrc_fork_cleanup ;
 		} ;
 
-	rsrc.string_offset = rsrc.map_offset + read_short (psf->header, rsrc.map_offset + 26) ;
+	rsrc.string_offset = rsrc.map_offset + read_short (rsrc.rsrc_data, rsrc.map_offset + 26) ;
 	if (rsrc.string_offset > rsrc.rsrc_len)
 	{	psf_log_printf (psf, "Bad string offset (%d).\n", rsrc.string_offset) ;
 		error = SFE_SD2_BAD_RSRC ;
@@ -256,7 +256,7 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 
 	rsrc.type_offset = rsrc.map_offset + 30 ;
 
-	rsrc.type_count = read_short (psf->header, rsrc.map_offset + 28) + 1 ;
+	rsrc.type_count = read_short (rsrc.rsrc_data, rsrc.map_offset + 28) + 1 ;
 	if (rsrc.type_count < 1)
 	{	printf ("Bad type count.\n") ;
 		error = SFE_SD2_BAD_RSRC ;
@@ -272,11 +272,11 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 
 	rsrc.str_index = -1 ;
 	for (k = 0 ; k < rsrc.type_count ; k ++)
-	{	marker = read_int (psf->header, rsrc.type_offset + k * 8) ;
+	{	marker = read_int (rsrc.rsrc_data, rsrc.type_offset + k * 8) ;
 
 		if (marker == STR_MARKER)
 		{	rsrc.str_index = k ;
-			rsrc.str_count = read_short (psf->header, rsrc.type_offset + k * 8 + 4) + 1 ;
+			rsrc.str_count = read_short (rsrc.rsrc_data, rsrc.type_offset + k * 8 + 4) + 1 ;
 			error = parse_str_rsrc (psf, &rsrc) ;
 			goto parse_rsrc_fork_cleanup ;
 			} ;
