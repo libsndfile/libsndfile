@@ -240,10 +240,14 @@ float32_init	(SF_PRIVATE *psf)
 			} ;
 		} ;
 
-	psf->filelength = psf_get_filelen (psf) ;
-	psf->datalength = (psf->dataend) ? psf->dataend - psf->dataoffset :
+	if (psf->filelength > psf->dataoffset)
+	{	psf->datalength = (psf->dataend > 0) ? psf->dataend - psf->dataoffset :
 							psf->filelength - psf->dataoffset ;
-	psf->sf.frames = psf->datalength / (psf->sf.channels * sizeof (float)) ;
+		}
+	else
+		psf->datalength = 0 ;
+
+	psf->sf.frames = psf->datalength / psf->blockwidth ;
 
 	return 0 ;
 } /* float32_init */
