@@ -420,7 +420,7 @@ if test $libdir = "\${exec_prefix}/lib" ; then
 	fi
 
 if test $bindir = "\${exec_prefix}/bin" ; then
-	bindir="$prefix/lib"
+	bindir="$prefix/bin"
 	fi
 
 AC_MSG_RESULT([[
