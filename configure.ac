@@ -69,7 +69,7 @@ SHLIB_VERSION_ARG=""
 # Finished checking, handle options.
 
 AC_ARG_ENABLE(experimental,
-		[  --enable-experimental        enable experimental code],
+		AC_HELP_STRING([--enable-experimental], [enable experimental code]),
 		ac_arg_experimental=yes, ac_arg_experimental=no)
 
 EXPERIMENTAL_CODE=0
@@ -79,19 +79,19 @@ if test x$ac_arg_experimental = xyes ; then
 AC_DEFINE_UNQUOTED([ENABLE_EXPERIMENTAL_CODE],${EXPERIMENTAL_CODE}, [Set to 1 to enable experimental code.])
 
 AC_ARG_ENABLE(gcc-werror,
-		[  --enable-gcc-werror        enable -Werror in all Makefiles],
+		AC_HELP_STRING([--enable-gcc-werror], [enable -Werror in all Makefiles]),
 		ac_arg_gcc_werror=yes, ac_arg_gcc_werror=no)
 
 AC_ARG_ENABLE(gcc-pipe,
-		[  --disable-gcc-pipe           disable gcc -pipe option],
+		AC_HELP_STRING([--disable-gcc-pipe], [disable gcc -pipe option]),
 		ac_arg_gcc_pipe="N", ac_arg_gcc_pipe="Y")
 
 AC_ARG_ENABLE(gcc-opt,
-		[  --disable-gcc-opt            disable gcc optimisations],
+		AC_HELP_STRING([--disable-gcc-opt], [disable gcc optimisations]),
 		ac_arg_gcc_opt="N", ac_arg_gcc_opt="Y")
 
 AC_ARG_ENABLE(cpu-clip,
-		[  --disable-cpu-clip           disable tricky cpu specific clipper],
+		AC_HELP_STRING([--disable-cpu-clip], [disable tricky cpu specific clipper]),
 		ac_arg_cpu_clip="N", ac_arg_cpu_clip="Y")
 
 #====================================================================================
