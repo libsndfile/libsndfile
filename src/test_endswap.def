@@ -2,20 +2,14 @@ autogen definitions test_endswap.tpl;
 
 int_type = {
 	name		= short ;
-	value		= 0x3210 ;
-	format		= FMT_SHORT ;
+	swapper		= ENDSWAP_SHORT ;
+	value		= 0x0201 ;
 	} ;
 
 int_type = {
 	name		= int ;
-	value		= 0x76543210 ;
-	format		= FMT_INT ;
-	} ;
-
-int_type = {
-	name		= int64_t ;
-	value		= "0x0807050540302010LL" ;
-	format		= FMT_INT64 ;
+	swapper		= ENDSWAP_INT ;
+	value		= 0x04030201 ;
 	} ;
 
 /*

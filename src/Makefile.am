@@ -8,8 +8,8 @@ include_HEADERS = sndfile.h
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 
-EXTRA_DIST = sndfile.h.in config.h.in Symbols.linux Symbols.darwin \
-			libsndfile.def create_symbols_file.py
+EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
+			Symbols.linux Symbols.darwin libsndfile.def create_symbols_file.py 
 
 noinst_HEADERS = common.h sfendian.h float_cast.h wav_w64.h au.h sf_unistd.h
 
@@ -28,23 +28,29 @@ libsndfile_la_LDFLAGS = -no-undefined -version-info @SHARED_VERSION_INFO@ @SHLIB
 libsndfile_la_SOURCES = $(COMMON) $(FILESPECIFIC) $(noinst_HEADERS) sndfile.h
 libsndfile_la_LIBADD  = GSM610/libgsm.la G72x/libg72x.la -lm
 
+test_endswap_SOURCES = test_endswap.c
+
 test_file_io_CFLAGS = $(AM_CFLAGS)
 test_file_io_SOURCES = file_io.c test_file_io.c
 
 test_log_printf_CFLAGS = $(AM_CFLAGS)
 test_log_printf_SOURCES = test_log_printf.c
 
+test_endswap.c: test_endswap.def test_endswap.tpl
+	autogen --writable --source-time test_endswap.def
+
 # Two test programs.
 # It is not possible to place these in the tests/ directory because they
 # need access to the internals of the SF_PRIVATE struct.
 
-check: test_file_io$(EXEEXT) test_log_printf$(EXEEXT)
+check: test_file_io test_log_printf
 	@echo
 	@echo
 	@echo
 	@echo "============================================================"
-	./test_file_io$(EXEEXT)
-	./test_log_printf$(EXEEXT)
+	./test_endswap
+	./test_file_io
+	./test_log_printf
 	@echo "============================================================"
 	@echo
 	@echo
