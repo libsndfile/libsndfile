@@ -13,7 +13,7 @@
     Detect presence of <byteswap.h>.
 
     * src/sfendian.h
-    Use <byteswap.h> if present.
+    Use <byteswap.h> if present as suggested by Stefan Briesenick.
 
     * src/pcm.c
     Update bytewapping.
