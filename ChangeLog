@@ -1,3 +1,12 @@
+2004-02-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-play.c
+    Fix a MacOSX specific bug which was caused by a space being inserted in
+    the middle of a file name.
+
+    * configure.ac src/Makefile.am examples/Makefile.am
+    Fix a couple of MacOSX build issues.
+
 2004-02-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/command.html

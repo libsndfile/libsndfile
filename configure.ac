@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.54)
 
-AC_INIT(libsndfile,1.0.6,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.7pre1,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
@@ -88,9 +88,9 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		darwin* | rhapsody*)
 			# Disable -Wall, -pedantic and -Wshadow for Apple Darwin/Rhapsody.
 			# System headers on these systems are broken.
-			temp_CFLAGS=`echo $CFLAGS | sed "s/-Wall -pedantic//" | sed "s/-Wshadow//"`
-			SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,Symbols"
+			temp_CFLAGS=`echo $CFLAGS | sed "s/-Wall -pedantic//" | sed "s/-Wshadow//" | sed "s/-Waggregate-return//"`
 			CFLAGS=$temp_CFLAGS
+			SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,Symbols"
 			;;
 		linux*)
 			SHLIB_VERSION_ARG="-Wl,--version-script=Symbols"
@@ -255,24 +255,24 @@ case "$target_os" in
 #====================================================================================
 # Target OS specific stuff.
 
-OS_SPECIFIC_INCLUDES=""
+OS_SPECIFIC_CFLAGS=""
 os_is_win32=0
 os_is_macosx=0
 
 case "$target_os" in
 	darwin* | rhapsody*)
 		os_is_macosx=1
-		OS_SPECIFIC_INCLUDES="-fpascal-strings -I/Developer/Headers/FlatCarbon"
+		OS_SPECIFIC_CFLAGS="-fpascal-strings -I/Developer/Headers/FlatCarbon"
 		OS_SPECIFIC_LINKS="-framework CoreAudio"
 		;;
 	mingw32msvc)
 		os_is_win32=1
 		AC_CHECK_HEADERS(wintypes.h mmreg.h)
-		OS_SPECIFIC_INCLUDES=""
+		OS_SPECIFIC_CFLAGS=""
 		OS_SPECIFIC_LINKS=""
 		;;
 	*)
-		OS_SPECIFIC_INCLUDES=""
+		OS_SPECIFIC_CFLAGS=""
 		OS_SPECIFIC_LINKS=""
 		;;
 	esac
@@ -323,18 +323,16 @@ if test x"$ac_cv_prog_autogen" = "xno" ; then
 #====================================================================================
 # Now use the information from the checking stage.
 
+CFLAGS="$CFLAGS $OS_SPECIFIC_CFLAGS"
+
 if test x"$CFLAGS" = x ; then
 	echo "Error in configure script. CFLAGS has been screwed up."
 	exit
 	fi
 
-# if test x$ac_cv_c_compiler_gnu = xyes ; then
-# 	CFLAGS="$CFLAGS -Werror"
-# 	fi
-
 AC_SUBST(SHLIB_VERSION_ARG)
 AC_SUBST(SHARED_VERSION_INFO)
-AC_SUBST(OS_SPECIFIC_INCLUDES)
+AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(ENABLE_EXPERIMENTAL_CODE)
 
