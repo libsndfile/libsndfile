@@ -27,19 +27,13 @@ AM_CONFIG_HEADER(src/config.h)
 
 SHARED_VERSION_INFO="1:11:0"
 
+AC_PROG_CC
+AM_PROG_LIBTOOL
+
 AC_CHECK_PROG(autogen, autogen, yes, no)
 
-AC_PROG_CC
 AC_PROG_INSTALL
-
 AC_PROG_LN_S
-AC_PROG_LIBTOOL
-
-if test "x-$build_os-$host_os-$target_os" = x-mingw32-mingw32-mingw32 ; then
-	AC_CHECK_PROG(DLLTOOL, dlltool, dlltool)
-	AC_CHECK_PROG(DLLWRAP, dllwrap, dllwrap)
-	AC_CHECK_PROG(PEXPORTS, pexports, pexports)
-	fi
 
 AC_HEADER_STDC
 
@@ -466,12 +460,6 @@ AC_MSG_RESULT([[
     Pkgconfig directory : ......... $libdir/pkgconfig
     HTML docs directory : ......... $htmldocdir
 ]])
-
-if test "x-$build_os-$host_os-$target_os" = x-mingw32-mingw32-mingw32 ; then
-	echo "Using a Win32 specific Makefile."
-	cp -f Win32/Makefile.mingw Makefile
-	exit 0
-	fi
 
 if test x$prefix != "x/usr" ; then
 	echo "Compiling some other packages against libsndfile may require"
