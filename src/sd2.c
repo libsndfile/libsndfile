@@ -118,29 +118,29 @@ sd2_open	(SF_PRIVATE *psf)
 		return SFE_INTERNAL ;
 		} ;
 
-	memset (psf->buffer, 0, sizeof (psf->buffer)) ;
+	memset (psf->u.cbuf, 0, sizeof (psf->u.cbuf)) ;
 
 	psf_binheader_readf (psf, "Ep41", rsrc_data_offset, &len, &slen) ;
 	if (slen + 1 == len)
-	{	psf_binheader_readf (psf, "Eb", psf->buffer, len - 1) ;
-		((char*) psf->buffer) [len - 1] = 0 ;
-		if (sscanf ((char*) psf->buffer, "%d", &len) == 1)
+	{	psf_binheader_readf (psf, "Eb", psf->u.cbuf, len - 1) ;
+		psf->u.cbuf [len - 1] = 0 ;
+		if (sscanf (psf->u.cbuf, "%d", &len) == 1)
 			psf->bytewidth = len ;
 		} ;
 
 	psf_binheader_readf (psf, "E41", &len, &slen) ;
 	if (slen + 1 == len)
-	{	psf_binheader_readf (psf, "Eb", psf->buffer, len - 1) ;
-		((char*) psf->buffer) [len - 1] = 0 ;
-		if (sscanf ((char*) psf->buffer, "%f", &srate) == 1)
+	{	psf_binheader_readf (psf, "Eb", psf->u.cbuf, len - 1) ;
+		psf->u.cbuf [len - 1] = 0 ;
+		if (sscanf (psf->u.cbuf, "%f", &srate) == 1)
 			psf->sf.samplerate = srate ;
 		} ;
 
 	psf_binheader_readf (psf, "E41", &len, &slen) ;
 	if (slen + 1 == len)
-	{	psf_binheader_readf (psf, "Eb", psf->buffer, len - 1) ;
-		((char*) psf->buffer) [len - 1] = 0 ;
-		if (sscanf ((char*) psf->buffer, "%d", &len) == 1)
+	{	psf_binheader_readf (psf, "Eb", psf->u.cbuf, len - 1) ;
+		psf->u.cbuf [len - 1] = 0 ;
+		if (sscanf (psf->u.cbuf, "%d", &len) == 1)
 			psf->sf.channels = len ;
 		} ;
 

@@ -127,10 +127,10 @@ txw_read_header	(SF_PRIVATE *psf)
 	char	*strptr ;
 
 	memset (&txwh, 0, sizeof (txwh)) ;
-	memset (psf->buffer, 0, sizeof (psf->buffer)) ;
-	psf_binheader_readf (psf, "pb", 0, psf->buffer, 16) ;
+	memset (psf->u.cbuf, 0, sizeof (psf->u.cbuf)) ;
+	psf_binheader_readf (psf, "pb", 0, psf->u.cbuf, 16) ;
 
-	if (memcmp (psf->buffer, "LM8953\0\0\0\0\0\0\0\0\0\0", 16) != 0)
+	if (memcmp (psf->u.cbuf, "LM8953\0\0\0\0\0\0\0\0\0\0", 16) != 0)
 		return ERROR_666 ;
 
 	psf_log_printf (psf, "Read only : Yamaha TX-16 Sampler (.txw)\nLM8953\n") ;
@@ -239,13 +239,13 @@ txw_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	int				k, bufferlen, readcount, count ;
 	sf_count_t		total = 0 ;
 
-	bufferlen = sizeof (psf->buffer) / 3 ;
+	bufferlen = sizeof (psf->u.cbuf) / 3 ;
 	bufferlen -= (bufferlen & 1) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
-		count = psf_fread (psf->buffer, 3, readcount, psf) ;
+		count = psf_fread (psf->u.cbuf, 3, readcount, psf) ;
 
-		ucptr = (unsigned char *) psf->buffer ;
+		ucptr = psf->u.ucbuf ;
 		for (k = 0 ; k < readcount ; k += 2)
 		{	sample = (ucptr [0] << 8) | (ucptr [1] & 0xF0) ;
 			ptr [total + k] = sample ;
@@ -268,13 +268,13 @@ txw_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	int				k, bufferlen, readcount, count ;
 	sf_count_t		total = 0 ;
 
-	bufferlen = sizeof (psf->buffer) / 3 ;
+	bufferlen = sizeof (psf->u.cbuf) / 3 ;
 	bufferlen -= (bufferlen & 1) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
-		count = psf_fread (psf->buffer, 3, readcount, psf) ;
+		count = psf_fread (psf->u.cbuf, 3, readcount, psf) ;
 
-		ucptr = (unsigned char *) psf->buffer ;
+		ucptr = psf->u.ucbuf ;
 		for (k = 0 ; k < readcount ; k += 2)
 		{	sample = (ucptr [0] << 8) | (ucptr [1] & 0xF0) ;
 			ptr [total + k] = sample << 16 ;
@@ -303,13 +303,13 @@ txw_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	else
 		normfact = 1.0 / 0x10 ;
 
-	bufferlen = sizeof (psf->buffer) / 3 ;
+	bufferlen = sizeof (psf->u.cbuf) / 3 ;
 	bufferlen -= (bufferlen & 1) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
-		count = psf_fread (psf->buffer, 3, readcount, psf) ;
+		count = psf_fread (psf->u.cbuf, 3, readcount, psf) ;
 
-		ucptr = (unsigned char *) psf->buffer ;
+		ucptr = psf->u.ucbuf ;
 		for (k = 0 ; k < readcount ; k += 2)
 		{	sample = (ucptr [0] << 8) | (ucptr [1] & 0xF0) ;
 			ptr [total + k] = normfact * sample ;
@@ -338,13 +338,13 @@ txw_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	else
 		normfact = 1.0 / 0x10 ;
 
-	bufferlen = sizeof (psf->buffer) / 3 ;
+	bufferlen = sizeof (psf->u.cbuf) / 3 ;
 	bufferlen -= (bufferlen & 1) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
-		count = psf_fread (psf->buffer, 3, readcount, psf) ;
+		count = psf_fread (psf->u.cbuf, 3, readcount, psf) ;
 
-		ucptr = (unsigned char *) psf->buffer ;
+		ucptr = psf->u.ucbuf ;
 		for (k = 0 ; k < readcount ; k += 2)
 		{	sample = (ucptr [0] << 8) | (ucptr [1] & 0xF0) ;
 			ptr [total + k] = normfact * sample ;

@@ -74,7 +74,7 @@ static int	rx2_close	(SF_PRIVATE *psf) ;
 
 int
 rx2_open	(SF_PRIVATE *psf)
-{	static char *marker_type [4] =
+{	static const char *marker_type [4] =
 	{	"Original Enabled", "Enabled Hidden",
 		"Additional/PencilTool", "Disabled"
 		} ;
@@ -118,14 +118,14 @@ rx2_open	(SF_PRIVATE *psf)
 	/* Get name length */
 	length = 0 ;
 	psf_binheader_readf (psf, "1", &length) ;
-	if (length >= SIGNED_SIZEOF (psf->buffer))
+	if (length >= SIGNED_SIZEOF (psf->u.cbuf))
 	{	psf_log_printf (psf, "  Text : %d *** Error : Too sf_count_t!\n") ;
 		return -1001 ;
 		}
 
-	memset (psf->buffer, 0, SIGNED_SIZEOF (psf->buffer)) ;
-	psf_binheader_readf (psf, "b", psf->buffer, length) ;
-	psf_log_printf (psf, " Text : \"%s\"\n", psf->buffer) ;
+	memset (psf->u.cbuf, 0, sizeof (psf->u.cbuf)) ;
+	psf_binheader_readf (psf, "b", psf->u.cbuf, length) ;
+	psf_log_printf (psf, " Text : \"%s\"\n", psf->u.cbuf) ;
 
 	/* Jump to GLOB offset position. */
 	if (glob_offset & 1)

@@ -127,14 +127,14 @@ static int
 dwd_read_header (SF_PRIVATE *psf)
 {	DWD_HEADER	dwdh ;
 
-	memset (psf->buffer, 0, sizeof (psf->buffer)) ;
+	memset (psf->u.cbuf, 0, sizeof (psf->u.cbuf)) ;
 	/* Set position to start of file to begin reading header. */
-	psf_binheader_readf (psf, "pb", 0, psf->buffer, DWD_IDENTIFIER_LEN) ;
+	psf_binheader_readf (psf, "pb", 0, psf->u.cbuf, DWD_IDENTIFIER_LEN) ;
 
-	if (memcmp (psf->buffer, DWD_IDENTIFIER, DWD_IDENTIFIER_LEN) != 0)
+	if (memcmp (psf->u.cbuf, DWD_IDENTIFIER, DWD_IDENTIFIER_LEN) != 0)
 		return SFE_DWD_NO_DWD ;
 
-	psf_log_printf (psf, "Read only : DiamondWare Digitized (.dwd)\n", psf->buffer) ;
+	psf_log_printf (psf, "Read only : DiamondWare Digitized (.dwd)\n", psf->u.cbuf) ;
 
 	psf_binheader_readf (psf, "11", &dwdh.major, &dwdh.minor) ;
 	psf_binheader_readf (psf, "e4j1", &dwdh.id, 1, &dwdh.compression) ;
