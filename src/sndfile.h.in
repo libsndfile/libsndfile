@@ -105,10 +105,6 @@ enum
 	SF_FORMAT_DPCM_8		= 0x0050,		/* 8 bit differential PCM (XI only) */
 	SF_FORMAT_DPCM_16		= 0x0051,		/* 16 bit differential PCM (XI only) */
 
-	SF_FORMAT_FLAC_8		= 0x0070,		/* 8 bit FLAC encoding. */
-	SF_FORMAT_FLAC_16		= 0x0071,		/* 16 bit FLAC encdoing. */
-	SF_FORMAT_FLAC_24		= 0x0072,		/* 24 bit FLAC encoding. */
-
 	/* Endian-ness options. */
 
 	SF_ENDIAN_FILE			= 0x00000000,	/* Default file endian-ness. */

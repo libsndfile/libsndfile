@@ -46,7 +46,7 @@ static SF_FORMAT_INFO const simple_formats [] =
 		"AU (Sun/Next 8-bit u-law)", "au"
 		},
 
-	{	SF_FORMAT_FLAC | SF_FORMAT_FLAC_16,
+	{	SF_FORMAT_FLAC | SF_FORMAT_PCM_16,
 		"FLAC 16 bit", "flac"
 		},
 
@@ -173,11 +173,7 @@ static SF_FORMAT_INFO subtype_formats [] =
 	{	SF_FORMAT_VOX_ADPCM,	"VOX ADPCM",			"vox" 	},
 
 	{	SF_FORMAT_DPCM_16,		"16 bit DPCM",			NULL 	},
-	{	SF_FORMAT_DPCM_8,		"8 bit DPCM",			NULL 	},
-
-	{	SF_FORMAT_FLAC_8,		"8 bit FLAC",			NULL	},
-	{	SF_FORMAT_FLAC_16,		"16 bit FLAC",			NULL	},
-	{	SF_FORMAT_FLAC_24,		"24 bit FLAC",			NULL	}
+	{	SF_FORMAT_DPCM_8,		"8 bit DPCM",			NULL 	}
 } ; /* subtype_formats */
 
 int

@@ -701,7 +701,7 @@ sf_format_check	(const SF_INFO *info)
 				/* FLAC can't do more than 8 channels. */
 				if (info->channels > 8)
 					return 0 ;
-				if (subformat == SF_FORMAT_FLAC_8 || subformat == SF_FORMAT_FLAC_16 || subformat == SF_FORMAT_FLAC_24)
+				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24)
 					return 1 ;
 				break ;
 

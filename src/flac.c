@@ -365,13 +365,13 @@ sf_flac_meta_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), con
 
 			switch (metadata->data.stream_info.bits_per_sample)
 			{	case 8 :
-					psf->sf.format |= SF_FORMAT_FLAC_8 ;
+					psf->sf.format |= SF_FORMAT_PCM_S8 ;
 					break ;
 				case 16 :
-					psf->sf.format |= SF_FORMAT_FLAC_16 ;
+					psf->sf.format |= SF_FORMAT_PCM_16 ;
 					break ;
 				case 24 :
-					psf->sf.format |= SF_FORMAT_FLAC_24 ;
+					psf->sf.format |= SF_FORMAT_PCM_24 ;
 					break ;
 				default :
 					break ;
@@ -485,9 +485,9 @@ flac_open	(SF_PRIVATE *psf)
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
 	switch (subformat)
-	{	case SF_FORMAT_FLAC_8 :		/* 8-bit FLAC.  */
-		case SF_FORMAT_FLAC_16 :	/* 16-bit FLAC. */
-		case SF_FORMAT_FLAC_24 :	/* 24-bit FLAC. */
+	{	case SF_FORMAT_PCM_S8 :		/* 8-bit FLAC.  */
+		case SF_FORMAT_PCM_16 :	/* 16-bit FLAC. */
+		case SF_FORMAT_PCM_24 :	/* 24-bit FLAC. */
 			error = flac_init (psf) ;
 			break ;
 
@@ -559,13 +559,13 @@ flac_enc_init (SF_PRIVATE *psf)
 	FLAC__seekable_stream_encoder_set_sample_rate (pflac->fse, psf->sf.samplerate) ;
 
 	switch (psf->sf.format & SF_FORMAT_SUBMASK)
-	{	case SF_FORMAT_FLAC_8 :
+	{	case SF_FORMAT_PCM_S8 :
 			bps = 8 ;
 			break ;
-		case SF_FORMAT_FLAC_16 :
+		case SF_FORMAT_PCM_16 :
 			bps = 16 ;
 			break ;
-		case SF_FORMAT_FLAC_24 :
+		case SF_FORMAT_PCM_24 :
 			bps = 24 ;
 			break ;
 
@@ -734,13 +734,13 @@ flac_write_s2flac (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	FLAC__int32* buffer = pflac->encbuffer ;
 
 	switch (psf->sf.format & SF_FORMAT_SUBMASK)
-	{	case SF_FORMAT_FLAC_8 :
+	{	case SF_FORMAT_PCM_S8 :
 			convert = s2flac8_array ;
 			break ;
-		case SF_FORMAT_FLAC_16 :
+		case SF_FORMAT_PCM_16 :
 			convert = s2flac16_array ;
 			break ;
-			case SF_FORMAT_FLAC_24 :
+			case SF_FORMAT_PCM_24 :
 			convert = s2flac24_array ;
 			break ;
 		default :
@@ -776,13 +776,13 @@ flac_write_i2flac (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	FLAC__int32* buffer = pflac->encbuffer ;
 
 	switch (psf->sf.format & SF_FORMAT_SUBMASK)
-	{	case SF_FORMAT_FLAC_8 :
+	{	case SF_FORMAT_PCM_S8 :
 			convert = i2flac8_array ;
 			break ;
-		case SF_FORMAT_FLAC_16 :
+		case SF_FORMAT_PCM_16 :
 			convert = i2flac16_array ;
 			break ;
-		case SF_FORMAT_FLAC_24 :
+		case SF_FORMAT_PCM_24 :
 			convert = i2flac24_array ;
 			break ;
 		default :
@@ -818,13 +818,13 @@ flac_write_f2flac (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	FLAC__int32* buffer = pflac->encbuffer ;
 
 	switch (psf->sf.format & SF_FORMAT_SUBMASK)
-	{	case SF_FORMAT_FLAC_8 :
+	{	case SF_FORMAT_PCM_S8 :
 			convert = (psf->add_clipping) ? f2flac8_clip_array : f2flac8_array ;
 			break ;
-		case SF_FORMAT_FLAC_16 :
+		case SF_FORMAT_PCM_16 :
 			convert = (psf->add_clipping) ? f2flac16_clip_array : f2flac16_array ;
 			break ;
-		case SF_FORMAT_FLAC_24 :
+		case SF_FORMAT_PCM_24 :
 			convert = (psf->add_clipping) ? f2flac24_clip_array : f2flac24_array ;
 			break ;
 		default :
@@ -950,13 +950,13 @@ flac_write_d2flac (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	FLAC__int32* buffer = pflac->encbuffer ;
 
 	switch (psf->sf.format & SF_FORMAT_SUBMASK)
-	{	case SF_FORMAT_FLAC_8 :
+	{	case SF_FORMAT_PCM_S8 :
 			convert = (psf->add_clipping) ? d2flac8_clip_array : d2flac8_array ;
 			break ;
-		case SF_FORMAT_FLAC_16 :
+		case SF_FORMAT_PCM_16 :
 			convert = (psf->add_clipping) ? d2flac16_clip_array : d2flac16_array ;
 			break ;
-		case SF_FORMAT_FLAC_24 :
+		case SF_FORMAT_PCM_24 :
 			convert = (psf->add_clipping) ? d2flac24_clip_array : d2flac24_array ;
 			break ;
 		default :
