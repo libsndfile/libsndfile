@@ -7,10 +7,13 @@ COMPILER_IS_GCC = @COMPILER_IS_GCC@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
+DLLTOOL = @DLLTOOL@
+DLLWRAP = @DLLWRAP@
 LDFLAGS = @LDFLAGS@
 LN_S = @LN_S@
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
+PEXPORTS = @PEXPORTS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -26,7 +29,8 @@ STRIP = @STRIP@
 all : $(TARGETS)
 
 clean :
-	rm -f  $(TARGETS) src/*.o src/G72x/*.o src/GSM610/*.o tests/*.o tests/*.exe
+	rm -f  $(TARGETS) *.del *.lib src/*.o src/G72x/*.o \
+		src/GSM610/*.o tests/*.o tests/*.exe
 
 #====================================================================
 
@@ -94,14 +98,14 @@ LINK_OBJS = \
 	src/htk.o
 
 libsndfile.dll libsndfile.lib : $(LINK_OBJS)
-	dllwrap --def src/libsndfile.def $(LINK_OBJS) --output-lib libsndfile.lib -o libsndfile.dll
+	$(DLLWRAP) --def src/libsndfile.def $(LINK_OBJS) --output-lib libsndfile.lib -o libsndfile.dll
 	$(STRIP) libsndfile.dll
 
 sndfile-info.exe : examples/sndfile-info.o libsndfile.lib
 	$(CC) $+ -o $@
 
-sndfile-play.exe : examples/sndfile-play.o libsndfile.lib winmm.lib
-	$(CC) $+ -o $@
+sndfile-play.exe : examples/sndfile-play.o libsndfile.lib
+	$(CC) $+ -lwinmm -o $@
 
 generate.exe : examples/generate.o libsndfile.lib
 	$(CC) $+ -o $@
@@ -112,8 +116,10 @@ generate.exe : examples/generate.o libsndfile.lib
 # create the winmm.lib and then delete the copy of the DLL.
 
 winmm.lib :
+	rm -f Makefile src/Makefile tests/Makefile examples/Makefile
 	cp /c/WINDOWS/SYSTEM/WINMM.DLL winmm.dll
-	dlltool -l winmm.lib winmm.dll
+	$(DLLTOOL) -l winmm.lib winmm.dll
+	$(PEXPORTS) -o winmm.dll > winmm.def
 	rm -f winmm.dll
 
 #====================================================================

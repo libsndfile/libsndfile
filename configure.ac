@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.53)
 
-AC_INIT(libsndfile,1.0.10pre5,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.10pre6,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
@@ -32,9 +32,14 @@ AC_CHECK_PROG(autogen, autogen, yes, no)
 AC_PROG_CC
 AC_PROG_INSTALL
 
-AC_PROG_MAKE_SET
 AC_PROG_LN_S
 AM_PROG_LIBTOOL
+
+if test "x-$build_os-$host_os-$target_os" = x-mingw32-mingw32-mingw32 ; then
+	AC_CHECK_PROG(DLLTOOL, dlltool, dlltool)
+	AC_CHECK_PROG(DLLWRAP, dllwrap, dllwrap)
+	AC_CHECK_PROG(PEXPORTS, pexports, pexports)
+	fi
 
 AC_HEADER_STDC
 
@@ -426,11 +431,17 @@ AC_CONFIG_FILES([ \
 			])
 AC_OUTPUT
 
-if test x$target_os = "xmingw32" ; then
+#====================================================================================
+# Special case for MinGW32.
+
+if test "x-$build_os-$host_os-$target_os" = x-mingw32-mingw32-mingw32 ; then
 	cp -f Win32/Makefile.mingw Makefile
 	echo
 	echo "Now run \"make\" and \"make check\"."
 	echo
+	echo "There is no automatic install script on this platform."
+	echo
+	
 	exit 0
 	fi
 
