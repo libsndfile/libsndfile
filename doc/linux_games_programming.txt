@@ -95,7 +95,7 @@ HTH,
 Erik
 -- 
 +-----------------------------------------------------------+
-  Erik de Castro Lopo  nospam@mega-nerd.com (Yes it's valid)
+  Erik de Castro Lopo      nospam@fake-domain-name.com
 +-----------------------------------------------------------+
 "There is no reason why anyone would want a computer in their home"
 Ken Olson, DEC, 1977
@@ -180,7 +180,7 @@ files use SF_FORMAT_PCM_S8. Thats all there is to it.
 Erik
 -- 
 +-----------------------------------------------------------+
-  Erik de Castro Lopo  nospam@mega-nerd.com (Yes it's valid)
+  Erik de Castro Lopo      nospam@fake-domain-name.com
 +-----------------------------------------------------------+
 "Python addresses true pseudocode's two major failings: that it
 isn't standardized, and it isn't executable."
@@ -425,7 +425,7 @@ out.
 Erik
 -- 
 +-----------------------------------------------------------+
-  Erik de Castro Lopo  nospam@mega-nerd.com (Yes it's valid)
+  Erik de Castro Lopo      nospam@fake-domain-name.com
 +-----------------------------------------------------------+
 Microsoft is finally bringing all of its Windows operating system families
 under one roof. It will combine all of the features of CE, stability and
