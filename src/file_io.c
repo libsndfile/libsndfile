@@ -105,10 +105,6 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	psf->error = SFE_NO_ERROR ;
 	if ((psf->rsrcdes = psf_open_fd (psf->rsrcpath, open_mode)) >= 0)
 	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrcdes) ;
-		if (psf->rsrclength < 100)
-		{	psf->error = SFE_SD2_BAD_RSRC ;
-			return psf->error ;
-			} ;
 		return SFE_NO_ERROR ;
 		} ;
 

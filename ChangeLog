@@ -16,6 +16,9 @@
     * src/common.h src/sndfile.c
     Remove SFE_LOG_OVERRIN error and its associated error message.
 
+    * src/file_io.c
+    Fix a rsrc fork problem on MacOSX.
+
 2004-12-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile-play.c
