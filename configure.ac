@@ -275,14 +275,20 @@ case "$target_os" in
 			AC_MSG_WARN([[******************************************************************]])
 			fi
 		;;
-	*)
-		OS_SPECIFIC_CFLAGS=""
-		OS_SPECIFIC_LINKS=""
-		;;
 	esac
 
 AC_DEFINE_UNQUOTED(OS_IS_WIN32, ${os_is_win32}, [Set to 1 if compiling for Win32])
 AC_DEFINE_UNQUOTED(OS_IS_MACOSX, ${os_is_macosx}, [Set to 1 if compiling for MacOSX])
+
+#====================================================================================
+# Check for ALSA.
+
+ALSA_LIBS=""
+
+AC_CHECK_HEADERS(alsa/asoundlib.h)
+if test x$ac_cv_header_alsa_asoundlib_h = xyes ; then
+	ALSA_LIBS="-lasound"
+	fi
 
 #====================================================================================
 # Test for sanity when cross-compiling.
@@ -379,6 +385,7 @@ AC_SUBST(SHLIB_VERSION_ARG)
 AC_SUBST(SHARED_VERSION_INFO)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
+AC_SUBST(ALSA_LIBS)
 AC_SUBST(ENABLE_EXPERIMENTAL_CODE)
 
 AC_SUBST(COMPILER_IS_GCC)
