@@ -371,7 +371,7 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 static int
 w64_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t 	fmt_size, current ;
-	size_t		fmt_pad  = 0 ;
+	size_t		fmt_pad = 0 ;
 	int 		subformat, add_fact_chunk = SF_FALSE ;
 
 	current = psf_ftell (psf) ;

@@ -365,7 +365,7 @@ count ++ ;
 
 		pima->block [blockindx] = (pima->samples [chan] >> 8) & 0xFF ;
 		pima->block [blockindx + 1] = (pima->samples [chan] & 0x80) + (pima->stepindx [chan] & 0x7F) ;
-		
+
 		pima->previous [chan] = pima->samples [chan] ;
 		} ;
 
@@ -416,11 +416,11 @@ count ++ ;
 
 	for (chan = 0 ; chan < pima->channels ; chan ++)
 	{	for (indx = pima->channels ; indx < pima->channels * pima->samplesperblock ; indx += 2 * pima->channels)
-		{	blockindx = chan * pima->blocksize + 2  + indx / 2;
+		{	blockindx = chan * pima->blocksize + 2 + indx / 2 ;
 
 if (0 && count ++ < 5)
 	printf ("chan: %d    blockindx: %3d    indx: %3d\n", chan, blockindx, indx) ;
-		
+
 			pima->block [blockindx] = pima->samples [indx] & 0x0F ;
 			pima->block [blockindx] |= (pima->samples [indx + pima->channels] << 4) & 0xF0 ;
 			} ;

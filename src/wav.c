@@ -86,7 +86,7 @@ enum
 	HAVE_fact	= 0x08,
 	HAVE_PEAK	= 0x10,
 	HAVE_data	= 0x20,
-	HAVE_other  = 0x80000000
+	HAVE_other	= 0x80000000
 } ;
 
 

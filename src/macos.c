@@ -36,7 +36,7 @@ macos_guess_file_type (SF_PRIVATE *psf, const char *filename)
 
 	psf = psf ;
 
-	snprintf (rsrc_name, sizeof (rsrc_name), "%s/rsrc", filename);
+	snprintf (rsrc_name, sizeof (rsrc_name), "%s/rsrc", filename) ;
 
 	/* If there is no resource fork, just return. */
 	if (stat (rsrc_name, &statbuf) != 0)
