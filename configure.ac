@@ -58,8 +58,8 @@ AC_C99_FLEXIBLE_ARRAY
 if test x$ac_cv_c99_flexible_array = xyes ; then
 	AC_DEFINE([HAVE_FLEXIBLE_ARRAY],1, [Set to 1 if the compile supports the struct hack.])
 else
-	AC_MSG_WARN([[*** This compiler does not support the 1999 ISO C Standard feature ***]])
-	AC_MSG_WARN([[*** feature known as struct flexible array (or the "struct hack"). ***]])
+	AC_MSG_WARN([[*** This compiler does not support the 1999 ISO C Standard ***]])
+	AC_MSG_WARN([[*** feature known as the flexible array struct member.     ***]])
 	AC_DEFINE([HAVE_FLEXIBLE_ARRAY],0)
 	fi
 
