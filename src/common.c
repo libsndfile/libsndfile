@@ -326,8 +326,9 @@ psf_asciiheader_printf (SF_PRIVATE *psf, const char *format, ...)
 	int		maxlen ;
 	char	*start ;
 
-	start	= (char*) psf->header + strlen ((char*) psf->header) ;
-	maxlen	= sizeof (psf->header) - strlen ((char*) psf->header) ;
+	maxlen = strlen ((char*) psf->header) ;
+	start	= (char*) psf->header + maxlen ;
+	maxlen	= sizeof (psf->header) - maxlen ;
 
 	va_start (argptr, format) ;
 	LSF_VSNPRINTF (start, maxlen, format, argptr) ;
