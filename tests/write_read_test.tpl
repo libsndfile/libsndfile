@@ -339,16 +339,16 @@ static void	create_short_file (const char *filename) ;
 /*======================================================================================
 */
 
+static void mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_file_ok, int allow_fd) ;
 static void stereo_[+ (get "type_name") +]_test (const char *filename, int format, int long_file_ok, int allow_fd) ;
 static void mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int long_file_ok, int allow_fd) ;
+static void new_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int allow_fd) ;
 
 static void
 pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_file_ok)
-{	SNDFILE		*file ;
-	SF_INFO		sfinfo ;
+{	SF_INFO		sfinfo ;
 	[+ (get "data_type") +]		*orig, *test ;
-	sf_count_t	count ;
-	int			k, items, frames, allow_fd ;
+	int			k, items, allow_fd ;
 
 	/* Sd2 files cannot be opened from an existing file descriptor. */
 	allow_fd = ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2) ? SF_FALSE : SF_TRUE ;
@@ -367,6 +367,57 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 
 	/* Make this a macro so gdb steps over it in one go. */
 	CONVERT_DATA (k, DATA_LENGTH, orig, orig_data) ;
+
+	items = DATA_LENGTH ;
+
+	/* Some test broken out here. */
+
+	mono_[+ (get "type_name") +]_test (filename, format, long_file_ok, allow_fd) ;
+
+	/* Sub format DWVW does not allow seeking. */
+	if ((format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_16 ||
+			(format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_24)
+	{	unlink (filename) ;
+		printf ("no seek : ok\n") ;
+		return ;
+		} ;
+
+	mono_rdwr_[+ (get "type_name") +]_test (filename, format, long_file_ok, allow_fd) ;
+
+	/* If the format doesn't support stereo we're done. */
+	sfinfo.channels = 2 ;
+	if (sf_format_check (&sfinfo) == 0)
+	{	unlink (filename) ;
+		puts ("no stereo : ok") ;
+		return ;
+		} ;
+
+	stereo_[+ (get "type_name") +]_test (filename, format, long_file_ok, allow_fd) ;
+
+	/* New read/write test. Not sure if this is needed yet. */
+
+	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_PAF && (format & SF_FORMAT_TYPEMASK) != SF_FORMAT_VOC)
+		new_rdwr_[+ (get "type_name") +]_test (filename, format, allow_fd) ;
+
+	puts ("ok") ;
+	return ;
+} /* pcm_test_[+ (get "type_name") +] */
+
+static void
+mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_file_ok, int allow_fd)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	[+ (get "data_type") +]		*orig, *test ;
+	sf_count_t	count ;
+	int			k, items ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= SILLY_WRITE_COUNT ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= format ;
+
+	orig = ([+ (get "data_type") +]*) orig_data ;
+	test = ([+ (get "data_type") +]*) test_data ;
 
 	items = DATA_LENGTH ;
 
@@ -432,7 +483,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 			(format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_24)
 	{	sf_close (file) ;
 		unlink (filename) ;
-		printf ("ok\n") ;
+		printf ("no seek : ") ;
 		return ;
 		} ;
 
@@ -490,57 +541,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 
 	sf_close (file) ;
 
-	/* Some test broken out here. */
-
-	mono_rdwr_[+ (get "type_name") +]_test (filename, format, long_file_ok, allow_fd) ;
-
-	/* If the format doesn't support stereo we're done. */
-	sfinfo.channels = 2 ;
-	if (sf_format_check (&sfinfo) == 0)
-	{	unlink (filename) ;
-		puts ("no stereo : ok") ;
-		return ;
-		} ;
-
-	stereo_[+ (get "type_name") +]_test (filename, format, long_file_ok, allow_fd) ;
-
-	/* New read/write test. Not sure if this is needed yet. */
-
-	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_PAF && (format & SF_FORMAT_TYPEMASK) != SF_FORMAT_VOC)
-	{
-		SNDFILE *wfile, *rwfile ;
-
-		sfinfo.samplerate	= 44100 ;
-		sfinfo.frames		= SILLY_WRITE_COUNT ; /* Wrong length. Library should correct this on sf_close. */
-		sfinfo.channels		= 2 ;
-		sfinfo.format		= format ;
-
-		frames = items / sfinfo.channels ;
-
-		wfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__) ;
-		sf_command (wfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE) ;
-		test_writef_[+ (get "data_type") +]_or_die (wfile, 1, orig, frames, __LINE__) ;
-		test_writef_[+ (get "data_type") +]_or_die (wfile, 2, orig, frames, __LINE__) ;
-
-		rwfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__) ;
-		if (sfinfo.frames != 2 * frames)
-		{	printf ("\n\nLine %d : incorrect number of frames in file (%ld shold be %d)\n\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), frames) ;
-			exit (1) ;
-			} ;
-
-		test_writef_[+ (get "data_type") +]_or_die (wfile, 3, orig, frames, __LINE__) ;
-
-		test_readf_[+ (get "data_type") +]_or_die (rwfile, 1, test, frames, __LINE__) ;
-		test_readf_[+ (get "data_type") +]_or_die (rwfile, 2, test, frames, __LINE__) ;
-
-		sf_close (wfile) ;
-		sf_close (rwfile) ;
-		} ;
-
-	puts ("ok") ;
-	return ;
-} /* pcm_test_[+ (get "type_name") +] */
-
+} /* mono_[+ (get "type_name") +]_test */
 
 static void
 stereo_[+ (get "type_name") +]_test (const char *filename, int format, int long_file_ok, int allow_fd)
@@ -800,6 +801,44 @@ mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int lo
 
 	sf_close (file) ;
 } /* mono_rdwr_[+ (get "data_type") +]_test */
+
+static void
+new_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int allow_fd)
+{	SNDFILE *wfile, *rwfile ;
+	SF_INFO	sfinfo ;
+	[+ (get "data_type") +]		*orig, *test ;
+	int		items, frames ;
+	
+	orig = ([+ (get "data_type") +]*) orig_data ;
+	test = ([+ (get "data_type") +]*) test_data ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= SILLY_WRITE_COUNT ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 2 ;
+	sfinfo.format		= format ;
+
+	items = DATA_LENGTH ;
+	frames = items / sfinfo.channels ;
+
+	wfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__) ;
+	sf_command (wfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE) ;
+	test_writef_[+ (get "data_type") +]_or_die (wfile, 1, orig, frames, __LINE__) ;
+	test_writef_[+ (get "data_type") +]_or_die (wfile, 2, orig, frames, __LINE__) ;
+
+	rwfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__) ;
+	if (sfinfo.frames != 2 * frames)
+	{	printf ("\n\nLine %d : incorrect number of frames in file (%ld shold be %d)\n\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), frames) ;
+		exit (1) ;
+		} ;
+
+	test_writef_[+ (get "data_type") +]_or_die (wfile, 3, orig, frames, __LINE__) ;
+
+	test_readf_[+ (get "data_type") +]_or_die (rwfile, 1, test, frames, __LINE__) ;
+	test_readf_[+ (get "data_type") +]_or_die (rwfile, 2, test, frames, __LINE__) ;
+
+	sf_close (wfile) ;
+	sf_close (rwfile) ;
+} /* new_rdwr_[+ (get "type_name") +]_test */
 
 [+ ENDFOR data_type +]
 
