@@ -365,10 +365,6 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		CFLAGS="-Werror $CFLAGS"
 		fi
 
-	if test x$cross_compiling = xyes ; then
-		CFLAGS="$CFLAGS -nostdinc"
-		fi
-
 	AC_DEFINE([COMPILER_IS_GCC],1, [Set to 1 if the compile is GNU GCC.])
 	GCC_MAJOR_VERSION=`$CC -dumpversion | sed "s/\..*//"`
 	AC_DEFINE_UNQUOTED([GCC_MAJOR_VERSION],${GCC_MAJOR_VERSION}, [Major version of GCC or 3 otherwise.])
