@@ -1,3 +1,14 @@
+2004-10-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sd2.c
+    Further cleanup: remove printfs, change snprintf to LSF_SNPRINTF.
+
+    * Win32/config.h Win32/sndfile.h
+    Updates.
+
+    * tests/util.tpl
+    Add win32 macro for snprintf.
+
 2004-10-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sfendian.h
