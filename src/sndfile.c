@@ -2175,6 +2175,11 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	if (sfinfo == NULL)
 		return SFE_BAD_SF_INFO_PTR ;
 
+	/* Zero out these fields. */
+	sfinfo->frames = 0 ;
+	sfinfo->sections = 0 ;
+	sfinfo->seekable = 0 ;
+
 	if (mode == SFM_READ)
 	{	if ((sfinfo->format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW)
 		{	if (sf_format_check (sfinfo) == 0)
