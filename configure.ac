@@ -275,6 +275,7 @@ case "$target_os" in
 		;;
 	mingw32*)
 		os_is_win32=1
+		OS_SPECIFIC_LINKS="-lwinmm"
 		;;
 	esac
 
