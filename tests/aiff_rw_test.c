@@ -162,19 +162,9 @@ rw_test (const char *filename)
 		} ;
 
 	if (sfinfo_rd.frames != sfinfo_rw.frames)
-	{
-#if 1
-		printf ("\n\nLine %d : frame count mismatch (%ld != %ld).\n\n", __LINE__,
+	{	printf ("\n\nLine %d : frame count mismatch (%ld != %ld).\n\n", __LINE__,
 			SF_COUNT_TO_LONG (sfinfo_rd.frames), SF_COUNT_TO_LONG (sfinfo_rw.frames)) ;
 		exit (1) ;
-#else
-		puts ("\n*********************************************") ;
-		printf ("\n\nLine %d : frame count mismatch (%ld != %ld).\n\n", __LINE__,
-			SF_COUNT_TO_LONG (sfinfo_rd.frames), SF_COUNT_TO_LONG (sfinfo_rw.frames)) ;
-		/*-exit (1) ;-*/
-		puts ("*********************************************\n") ;
-		sleep (20) ;
-#endif
 		} ;
 
 	return ;
