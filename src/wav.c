@@ -112,12 +112,13 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_MULAW =
 {	0x00000007, 0x0000, 0x0010, {	0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 }
 } ;
 
+#if 0
 /* maybe interesting one day to read the following through sf_read_raw */
 /* http://www.bath.ac.uk/~masrwd/pvocex/pvocex.html */
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_PVOCEX =
 {	0x8312B9C2, 0x2E6E, 0x11d4, {	0xA8, 0x24, 0xDE, 0x5B, 0x96, 0xC3, 0xAB, 0x21 }
 } ;
-
+#endif
 
 /*------------------------------------------------------------------------------
 ** Private static functions.
