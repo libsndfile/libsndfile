@@ -771,10 +771,13 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 		case SFC_GET_NORM_DOUBLE :
 			return psf->norm_double ;
 
-		case SFC_SET_FLOAT_INT_MULTIPLIER :
-			psf->float_int_mult = (datasize != 0) ? SF_TRUE : SF_FALSE ;
-			if (psf->float_int_mult && psf->float_max == 0.0)
-				psf->float_max = psf_calc_signal_max (psf, SF_FALSE) ;
+		case SFC_SET_SCALE_FLOAT_INT_READ :
+			{	int old_value ;
+				psf->float_int_mult = (datasize != 0) ? SF_TRUE : SF_FALSE ;
+				if (psf->float_int_mult && psf->float_max == 0.0)
+					psf->float_max = psf_calc_signal_max (psf, SF_FALSE) ;
+				return old_value ;
+				}
 			break ;
 
 		case SFC_SET_ADD_PEAK_CHUNK :

@@ -327,7 +327,7 @@ static void
 		exit (1) ;
 		} ;
 
-	sf_command (file, SFC_SET_FLOAT_INT_MULTIPLIER, NULL, SF_TRUE) ;
+	sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
 
 	test_read_[+ (get "int_name") +]_or_die (file, 0, [+ (get "int_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), __LINE__) ;
 	sf_close (file) ;
