@@ -319,12 +319,12 @@ static void
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 
 	if (sfinfo.frames != ARRAY_LEN ([+ (get "float_name") +]_data))
-	{	printf ("\n\nError (%s %d): Incorrect number of frames in file (too short). (%ld should be %d)\n", __func__, __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), DFT_DATA_LENGTH) ;
+	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), DFT_DATA_LENGTH) ;
 		exit (1) ;
 		} ;
 
 	if (sfinfo.channels != 1)
-	{	printf ("\n\nError (%s %d): Incorrect number of channels in file.\n", __func__, __LINE__) ;
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
 		exit (1) ;
 		} ;
 
@@ -339,7 +339,7 @@ static void
 			max = abs ([+ (get "int_name") +]_data [k]) ;
 
 	if (1.0 * abs (max - [+ (get "int_max") +]) / [+ (get "int_max") +] > 0.01)
-	{	printf ("\n\nError (%s %d): Bad maximum (%d should be %d).\n\n", __func__, __LINE__, max, [+ (get "int_max") +]) ;
+	{	printf ("\n\nLine %d: Bad maximum (%d should be %d).\n\n", __LINE__, max, [+ (get "int_max") +]) ;
 		exit (1) ;
 		} ;
 
