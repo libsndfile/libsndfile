@@ -16,9 +16,9 @@
 <BR>
 <H1><B>libsndfile</B></H1>
 <P>
-	Libsndfile is a library designed to allow the reading and writing of many 
-	different sampled sound file formats (such as MS Windows WAV and the Apple/SGI 
-	AIFF format) through one standard library interface. 
+	Libsndfile is a library designed to allow the reading and writing of many
+	different sampled sound file formats (such as MS Windows WAV and the Apple/SGI
+	AIFF format) through one standard library interface.
 </P>
 <!-- pepper -->
 <P>
@@ -30,9 +30,9 @@
 </P>
 <!-- pepper -->
 <P>
-	Every effort is made to keep these documents up-to-date, error free and 
-	unambiguous. 
-	However, since maintaining the documentation is the least fun part of working 
+	Every effort is made to keep these documents up-to-date, error free and
+	unambiguous.
+	However, since maintaining the documentation is the least fun part of working
 	on libsndfile, these docs can and do fall behind the behaviour of library.
 	If any errors omissions or ambiguities are found, please notify
 		<A HREF="m&#97;ilt&#111;:&#101;rikd&#64;z&#105;p.&#99;om.au">
@@ -41,7 +41,7 @@
 <!-- pepper -->
 <P>
 	<B> Finally, if you think there is some feature missing from libsndfile, check that
-	it isn't already implemented (and documented)  
+	it isn't already implemented (and documented)
 		<A HREF="command.html">here</A>.
 	</B>
 </P>
@@ -54,10 +54,10 @@ The functions of linbsndfile are defined as follows:
 <PRE>
       #include &lt;stdio.h&gt;
       #include &lt;sndfile.h&gt;
-        
+
       SNDFILE*    <A HREF="#open">sf_open</A>          (const char *path, int mode, SF_INFO *sfinfo) ;
       SNDFILE*    <A HREF="#open_fd">sf_open_fd</A>       (int fd, int mode, SF_INFO *sfinfo, int close_desc) ;
-        
+
       int         <A HREF="#check">sf_format_check</A>  (const SF_INFO *info) ;
 
       sf_count_t  <A HREF="#seek">sf_seek</A>          (SNDFILE *sndfile, sf_count_t frames, int whence) ;
@@ -72,7 +72,7 @@ The functions of linbsndfile are defined as follows:
       int         <A HREF="#error">sf_error_str</A>     (SNDFILE *sndfile, char* str, size_t len) ;
 
       int         <A HREF="#close">sf_close</A>         (SNDFILE *sndfile) ;
-	  
+
       sf_count_t  <A HREF="#read">sf_read_short</A>    (SNDFILE *sndfile, short *ptr, sf_count_t items) ;
       sf_count_t  <A HREF="#read">sf_read_int</A>      (SNDFILE *sndfile, int *ptr, sf_count_t items) ;
       sf_count_t  <A HREF="#read">sf_read_float</A>    (SNDFILE *sndfile, float *ptr, sf_count_t items) ;
@@ -142,23 +142,23 @@ The mode parameter for this function can be any one of the following three value
 <P>
 When opening a file for read, the <b>format</B> field should be set to zero before
 calling sf_open().
-The only exception to this is the case of RAW files where the caller has to set 
+The only exception to this is the case of RAW files where the caller has to set
 the channels and format fields to valid values.
 All other fields of the structure are filled in by the library.
 </P>
 <!-- pepper -->
 <P>
 When opening a file for write, the caller must fill in structure members samplerate,
-channels, and format. 
+channels, and format.
 </P>
 <!-- pepper -->
 <P>
-The format field in the above SF_INFO structure is made up of the bit-wise OR of a 
-major format type (values between 0x10000 and 0x08000000), a minor format type 
-(with values less than 0x10000) and an optional endian-ness value. 
-The currently understood formats are listed in sndfile.h as follows and also include 
+The format field in the above SF_INFO structure is made up of the bit-wise OR of a
+major format type (values between 0x10000 and 0x08000000), a minor format type
+(with values less than 0x10000) and an optional endian-ness value.
+The currently understood formats are listed in sndfile.h as follows and also include
 bitmasks for separating major and minor file types.
-Not all combinations of endian-ness and major and minor file types are valid. 
+Not all combinations of endian-ness and major and minor file types are valid.
 </P>
 <!-- pepper -->
 <PRE>
@@ -176,19 +176,19 @@ Not all combinations of endian-ness and major and minor file types are valid.
           SF_FORMAT_W64          = 0x0B0000,     /* Sonic Foundry's 64 bit RIFF/WAV */
           SF_FORMAT_MAT4         = 0x0C0000,     /* Matlab (tm) V4.2 / GNU Octave 2.0 */
           SF_FORMAT_MAT5         = 0x0D0000,     /* Matlab (tm) V5.0 / GNU Octave 2.1 */
-          
+
           /* Subtypes from here on. */
-      
+
           SF_FORMAT_PCM_S8       = 0x0001,       /* Signed 8 bit data */
           SF_FORMAT_PCM_16       = 0x0002,       /* Signed 16 bit data */
           SF_FORMAT_PCM_24       = 0x0003,       /* Signed 24 bit data */
           SF_FORMAT_PCM_32       = 0x0004,       /* Signed 32 bit data */
-      
+
           SF_FORMAT_PCM_U8       = 0x0005,       /* Unsigned 8 bit data (WAV and RAW only) */
-      
+
           SF_FORMAT_FLOAT        = 0x0006,       /* 32 bit float data */
           SF_FORMAT_DOUBLE       = 0x0007,       /* 64 bit float data */
-      
+
           SF_FORMAT_ULAW         = 0x0010,       /* U-Law encoded. */
           SF_FORMAT_ALAW         = 0x0011,       /* A-Law encoded. */
           SF_FORMAT_IMA_ADPCM    = 0x0012,       /* IMA ADPCM. */
@@ -196,23 +196,23 @@ Not all combinations of endian-ness and major and minor file types are valid.
 
           SF_FORMAT_GSM610       = 0x0020,       /* GSM 6.10 encoding. */
           SF_FORMAT_VOX_ADPCM    = 0x0021,       /* Oki Dialogic ADPCM encoding. */
-      
+
           SF_FORMAT_G721_32      = 0x0030,       /* 32kbs G721 ADPCM encoding. */
           SF_FORMAT_G723_24      = 0x0031,       /* 24kbs G723 ADPCM encoding. */
           SF_FORMAT_G723_40      = 0x0032,       /* 40kbs G723 ADPCM encoding. */
-      
+
           SF_FORMAT_DWVW_12      = 0x0040,       /* 12 bit Delta Width Variable Word encoding. */
           SF_FORMAT_DWVW_16      = 0x0041,       /* 16 bit Delta Width Variable Word encoding. */
           SF_FORMAT_DWVW_24      = 0x0042,       /* 24 bit Delta Width Variable Word encoding. */
           SF_FORMAT_DWVW_N       = 0x0043,       /* N bit Delta Width Variable Word encoding. */
-      
+
           /* Endian-ness options. */
-      
+
           SF_ENDIAN_FILE         = 0x00000000,   /* Default file endian-ness. */
           SF_ENDIAN_LITTLE       = 0x10000000,   /* Force little endian-ness. */
           SF_ENDIAN_BIG          = 0x20000000,   /* Force big endian-ness. */
           SF_ENDIAN_CPU          = 0x30000000,   /* Force CPU endian-ness. */
-      
+
           SF_FORMAT_SUBMASK      = 0x0000FFFF,
           SF_FORMAT_TYPEMASK     = 0x0FFF0000,
           SF_FORMAT_ENDMASK      = 0x30000000
@@ -225,8 +225,8 @@ memory allocated during the call to sf_open().
 </P>
 <!-- pepper -->
 <P>
-On success, the sf_open function returns a non NULL pointer which should be 
-passed as the first parameter to all subsequent libsndfile calls dealing with 
+On success, the sf_open function returns a non NULL pointer which should be
+passed as the first parameter to all subsequent libsndfile calls dealing with
 that audio file.
 On fail, the sf_open function returns a NULL pointer.
 </P>
@@ -239,9 +239,9 @@ On fail, the sf_open function returns a NULL pointer.
 </PRE>
 
 <P>
-The second open function takes a file descriptor of a file that has already been 
-opened. 
-Care should be taken to ensure that the mode of the file represented by the 
+The second open function takes a file descriptor of a file that has already been
+opened.
+Care should be taken to ensure that the mode of the file represented by the
 descriptor matches the mode argument.
 This function is useful in the following circumstances:
 </P>
@@ -252,7 +252,7 @@ This function is useful in the following circumstances:
 		which is then passed to libsndfile).
 	<LI>Opening files with file names using OS specific character encodings
 		and then passing the file descriptor to sf_open_fd().
-	<LI>Opening sound files embedded within larger files. 
+	<LI>Opening sound files embedded within larger files.
 			<A HREF="embedded_files.html">More info</A>.
 </UL>
 
@@ -267,8 +267,8 @@ parameter was TRUE when the sf_open_fd() function was called.
 </P>
 
 <P>
-On success, the sf_open_fd function returns a non NULL pointer which should be 
-passed as the first parameter to all subsequent libsndfile calls dealing with 
+On success, the sf_open_fd function returns a non NULL pointer which should be
+passed as the first parameter to all subsequent libsndfile calls dealing with
 that audio file.
 On fail, the sf_open_fd function returns a NULL pointer.
 </P>
@@ -297,10 +297,10 @@ sf_format_check returns TRUE if the parameters are valid and FALSE otherwise.
 
 <P>
 The file seek functions work much like lseek in unistd.h with the exception that
-the non-audio data is ignored and the seek only moves within the audio data section of 
-the file. 
+the non-audio data is ignored and the seek only moves within the audio data section of
+the file.
 In addition, seeks are defined in number of (multichannel) frames.
-Therefore, a seek in a stereo file from the current position forward with an offset 
+Therefore, a seek in a stereo file from the current position forward with an offset
 of 1 would skip forward by one sample of both channels.
 </P>
 
@@ -315,18 +315,18 @@ like lseek(), the whence parameter can be any one of the following three values:
 </PRE>
 <!-- pepper -->
 <P>
-Internally, libsndfile keeps track of the read and write locations using separate 
-read and write pointers. 
-If a file has been opened with a mode of SFM_RDWR, bitwise OR-ing the standard whence 
-values above with either SFM_READ or SFM_WRITE allows the read and write pointers to 
+Internally, libsndfile keeps track of the read and write locations using separate
+read and write pointers.
+If a file has been opened with a mode of SFM_RDWR, bitwise OR-ing the standard whence
+values above with either SFM_READ or SFM_WRITE allows the read and write pointers to
 be modified separately.
 If the SEEK_* values are used on their own, the read and write pointers are
 both modified.
 </P>
 
 <P>
-Note that the frames offset can be negative and in fact should be when SEEK_END is used for the 
-whence parameter. 
+Note that the frames offset can be negative and in fact should be when SEEK_END is used for the
+whence parameter.
 </P>
 <P>
 sf_seek will return the offset in (multichannel) frames from the start of the audio data
@@ -341,8 +341,8 @@ or -1 if an error occured (ie an attempt is made to seek beyond the start or end
 </PRE>
 
 <P>
-This function allows the caller to retrieve information from or change aspects of the 
-library behaviour on a per file basis. Examples include reading or writing text descriptions 
+This function allows the caller to retrieve information from or change aspects of the
+library behaviour on a per file basis. Examples include reading or writing text descriptions
 to a file or changing the scaling applied to sample data during read and write.
 </P>
 <!-- pepper -->
@@ -354,7 +354,7 @@ pointer. For some calls no data is required in which case data should be NULL an
 datasize may be used for some other purpose.
 </P>
 <P>
-The return value of sf_command () depends on the value of the cmd parameter, but it is 
+The return value of sf_command () depends on the value of the cmd parameter, but it is
 usually non-zero for success and zero on error.
 </P>
 <P>
@@ -382,7 +382,7 @@ The error number may be one of the following:
 <P>
 or any one of many other internal error values.
 Applications should only test the return value against error values defined in
-&lt;sndfile.h&gt; as the internal error values are subject to change at any 
+&lt;sndfile.h&gt; as the internal error values are subject to change at any
 time.
 For errors not in the above list, the function sf_error_number() can be used to
 convert it to an error string.
@@ -394,8 +394,8 @@ convert it to an error string.
 </PRE>
 
 <P>
-The error functions sf_strerror() and sf_error_number() convert the library's internal 
-error enumerations into text strings. 
+The error functions sf_strerror() and sf_error_number() convert the library's internal
+error enumerations into text strings.
 </P>
 <PRE>
       int         sf_perror     (SNDFILE *sndfile) ;
@@ -432,8 +432,8 @@ The close function closes the file, deallocates its internal buffers and returns
 
 <P>
 The file read items functions fill the array pointed to by ptr with the requested
-number of items. The items parameter must be an integer product of the number 
-of channels or an error will occur. 
+number of items. The items parameter must be an integer product of the number
+of channels or an error will occur.
 </P>
 <!-- pepper -->
 <P>
@@ -445,14 +445,14 @@ seamlessly converts between the two formats on-the-fly. See
 </P>
 <!-- pepper -->
 <P>
-The sf_read_XXXX functions return the number of items read. 
-Unless the end of the file was reached during the read, the return value should 
-equal the number of items requested. 
-Attempts to read beyond the end of the file will not result in an error but will 
-cause the sf_read_XXXX functions to return less than the number of items requested 
-or 0 if already at the end of the file. 
+The sf_read_XXXX functions return the number of items read.
+Unless the end of the file was reached during the read, the return value should
+equal the number of items requested.
+Attempts to read beyond the end of the file will not result in an error but will
+cause the sf_read_XXXX functions to return less than the number of items requested
+or 0 if already at the end of the file.
 </P>
-	
+
 <A NAME="readf"></A>
 <H2><BR><B>File Read Functions (Frames)</B></H2>
 
@@ -475,14 +475,14 @@ ptr, to take (frames * channels) number of items (shorts, ints, floats or double
 </B></P>
 
 <P>
-The sf_readf_XXXX functions return the number of frames read. 
-Unless the end of the file was reached during the read, the return value should equal 
-the number of frames requested. 
-Attempts to read beyond the end of the file will not result in an error but will cause 
-the sf_readf_XXXX functions to return less than the number of frames requested or 0 if 
-already at the end of the file. 
+The sf_readf_XXXX functions return the number of frames read.
+Unless the end of the file was reached during the read, the return value should equal
+the number of frames requested.
+Attempts to read beyond the end of the file will not result in an error but will cause
+the sf_readf_XXXX functions to return less than the number of frames requested or 0 if
+already at the end of the file.
 </P>
-	
+
 <A NAME="write"></A>
 <H2><BR><B>File Write Functions (Items)</B></H2>
 
@@ -495,7 +495,7 @@ already at the end of the file.
 
 <P>
 The file write items functions write the data in the array pointed to by ptr to the file.
-The items parameter must be an integer product of the number of channels or an error 
+The items parameter must be an integer product of the number of channels or an error
 will occur.
 </P>
 <!-- pepper -->
@@ -510,7 +510,7 @@ seamlessly converts between the two formats on-the-fly. See
 The sf_write_XXXX functions return the number of items written (which should be the
 same as the items parameter).
 </P>
-	
+
 <A NAME="writef"></A>
 <H2><BR><B>File Write Functions (Frames)</B></H2>
 
@@ -527,9 +527,9 @@ The array must be large enough to hold the product of frames and the number of c
 </P>
 <P>
 The sf_writef_XXXX functions return the number of frames written (which should be the
-same as the frames parameter). 
+same as the frames parameter).
 </P>
-	
+
 <A NAME="raw"></A>
 <H2><BR><B>Raw File Read and Write Functions</B></H2>
 <!-- pepper -->
@@ -540,19 +540,19 @@ same as the frames parameter).
 
 <P>
 The raw read and write functions read raw audio data from the audio file (not to be
-confused with reading RAW header-less PCM files). The number of bytes read or written 
-must always be an integer multiple of the number of channels multiplied by the number 
+confused with reading RAW header-less PCM files). The number of bytes read or written
+must always be an integer multiple of the number of channels multiplied by the number
 of bytes required to represent one sample from one channel.
 </P>
 <!-- pepper -->
 <P>
-The raw read and write functions return the number of bytes read or written (which 
-should be the same as the bytes parameter). 
+The raw read and write functions return the number of bytes read or written (which
+should be the same as the bytes parameter).
 </P>
 
 <P>
 <B>
-Note : The result of using of both regular reads/writes and raw reads/writes on 
+Note : The result of using of both regular reads/writes and raw reads/writes on
 compressed file formats other than SF_FORMAT_ALAW and SF_FORMAT_ULAW is undefined.
 </B>
 </P>
@@ -567,7 +567,7 @@ compressed file formats other than SF_FORMAT_ALAW and SF_FORMAT_ULAW is undefine
 </PRE>
 
 <P>
-These functions allow strings to be set on files opened for write and to be 
+These functions allow strings to be set on files opened for write and to be
 retrieved from files opened for read where supported by the given file type.
 The <B>str_type</B> parameter can be any one of the following string types:
 </P>
@@ -584,13 +584,16 @@ The <B>str_type</B> parameter can be any one of the following string types:
 </PRE>
 
 <P>
-The sf_get_string() function returns the specificed string if it exists and a 
+The sf_get_string() function returns the specificed string if it exists and a
 NULL pointer otherwise.
+In addition to the string ids above, SF_STR_FIRST (== SF_STR_TITLE) and
+SF_STR_LAST (always the same as the highest numbers string id) are also
+available to allow iteration over all the available string ids.
 </P>
 
 <P>
 The sf_set_string() function sets the string data.
-It returns zero on success and non-zero on error. 
+It returns zero on success and non-zero on error.
 The error code can be converted to a string using sf_error_number().
 </P>
 
@@ -605,21 +608,21 @@ The error code can be converted to a string using sf_error_number().
 <H2><BR><B>Note 1</B></H2>
 <!-- pepper -->
 <P>
-When converting between integer PCM formats of differing size (ie using sf_read_int() 
-to read a 16 bit PCM encoded WAV file) libsndfile obeys one simple rule: 
+When converting between integer PCM formats of differing size (ie using sf_read_int()
+to read a 16 bit PCM encoded WAV file) libsndfile obeys one simple rule:
 </P>
 
 <P CLASS=indent_block>
-Whenever integer data is moved from one sized container to another sized container, 
-the most significant bit in the source container will become the most significant bit 
-in the destination container. 
+Whenever integer data is moved from one sized container to another sized container,
+the most significant bit in the source container will become the most significant bit
+in the destination container.
 </P>
 
 <P>
 When converting between integer data and floating point data, different rules apply.
-The default behaviour when reading floating point data (sf_read_float() or 
-sf_read_double ()) from a file with integer data is normalisation. Regardless of 
-whether data in the file is 8, 16, 24 or 32 bit wide, the data will be read as 
+The default behaviour when reading floating point data (sf_read_float() or
+sf_read_double ()) from a file with integer data is normalisation. Regardless of
+whether data in the file is 8, 16, 24 or 32 bit wide, the data will be read as
 floating point data in the range [-1.0, 1.0]. Similarly, data in the range [-1.0, 1.0]
 will be written to an integer PCM file so that a data value of 1.0 will be the largest
 allowable integer for the given bit width. This normalisation can be turned on or off
@@ -630,8 +633,8 @@ using the <A HREF="command.html">sf_command</A> interface.
 <H2><BR><B>Note 2</B></H2>
 
 <P>
-Reading a file containg floating point data (allowable with WAV, AIFF, AU and other 
-file formats) using integer read methods (sf_read_short() or sf_read_int()) is 
+Reading a file containg floating point data (allowable with WAV, AIFF, AU and other
+file formats) using integer read methods (sf_read_short() or sf_read_int()) is
 discouraged as the library cannot guarantee sensible results. For instance the data
 in the file may have a maximum absolute value &lt; 1.0 which would mean that all sample
 values read from the file will be zero.
@@ -640,7 +643,7 @@ values read from the file will be zero.
 <HR>
 <!-- pepper -->
 <P>
-	The libsndfile home page is 
+	The libsndfile home page is
 		<A HREF="http://www.mega-nerd.com/libsndfile/">here</A>.
 </P>
 <P>
@@ -656,8 +659,8 @@ Version : 1.0.10
 
 <!--
   Do not edit or modify anything in this comment block.
-  The arch-tag line is a file identity tag for the GNU Arch 
+  The arch-tag line is a file identity tag for the GNU Arch
   revision control system.
- 
+
   arch-tag: f6d3aa8f-983a-4ad3-9681-346e122d815e
 -->
