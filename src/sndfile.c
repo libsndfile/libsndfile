@@ -775,7 +775,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			{	int old_value = psf->float_int_mult ;
 
 				psf->float_int_mult = (datasize != 0) ? SF_TRUE : SF_FALSE ;
-				if (psf->float_int_mult && psf->float_max == 0.0)
+				if (psf->float_int_mult && psf->float_max < 0.0)
 					psf->float_max = psf_calc_signal_max (psf, SF_FALSE) ;
 				return old_value ;
 				}
@@ -2216,6 +2216,8 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	psf->auto_header 	= SF_FALSE ;
 	psf->rwf_endian		= SF_ENDIAN_LITTLE ;
 	psf->seek			= psf_default_seek ;
+	psf->float_int_mult = 0 ;
+	psf->float_max		= -1.0 ;
 
 	psf->sf.sections = 1 ;
 
