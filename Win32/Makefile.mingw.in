@@ -1,4 +1,9 @@
-TARGETS = libsndfile.dll sndfile-info.exe sndfile-play.exe sndfile-convert.exe
+# MinGW specific Makefile for libsndfile.
+
+@SET_MAKE@
+
+PROGRAMS = sndfile-info.exe sndfile-play.exe sndfile-convert.exe
+TARGETS = libsndfile.dll $(PROGRAMS) sndfile.pc src/sndfile.h
 
 AR = @AR@
 CC = @CC@
@@ -9,6 +14,9 @@ CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
 DLLTOOL = @DLLTOOL@
 DLLWRAP = @DLLWRAP@
+INSTALL = @INSTALL@
+INSTALL_DATA = ${INSTALL} -m 644
+install_sh = @install_sh@
 LDFLAGS = @LDFLAGS@
 LN_S = @LN_S@
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
@@ -24,6 +32,17 @@ RANLIB = @RANLIB@
 STRIP = @STRIP@
 
 #====================================================================
+# Target directories.
+
+bindir = @bindir@
+exec_prefix = @exec_prefix@
+htmldocdir = @htmldocdir@
+includedir = @includedir@
+libdir = @libdir@
+pkgconfigdir = @libdir@/pkgconfig
+prefix = @prefix@
+
+#====================================================================
 # Targets
 
 all : $(TARGETS)
@@ -31,6 +50,23 @@ all : $(TARGETS)
 clean :
 	rm -f  $(TARGETS) *.del *.lib src/*.o src/G72x/*.o \
 		src/GSM610/*.o tests/*.o tests/*.exe
+
+install : $(TARGETS)
+	$(install_sh) -c libsndfile.dll $(libdir)
+	$(install_sh) -c sndfile.pc $(pkgconfigdir)
+	@for prog in $(PROGRAMS); do \
+		echo "installing ... $$prog" ; \
+		$(install_sh) -c "$$prog" $(bindir) ; \
+		done;
+	$(install_sh) -c src/sndfile.h $(includedir)
+
+uninstall :
+	rm -f $(libdir)/libsndfile.dll
+	rm -f $(pkgconfigdir)/sndfile.pc
+	@for prog in $(PROGRAMS); do \
+		rm -f $(bindir)/"$$prog" ; \
+		done;
+	rm -f $(includedir)/sndfile.h
 
 #====================================================================
 
@@ -112,17 +148,11 @@ sndfile-play.exe : examples/sndfile-play.o libsndfile.lib
 generate.exe : examples/generate.o libsndfile.lib
 	$(CC) $+ -o $@
 
-#====================================================================
-# Create a winmm.lib (required by sndfile-play.exe) from the
-# system's winmm.dll. We copy the system DLL to the local dir,
-# create the winmm.lib and then delete the copy of the DLL.
+sndfile.pc : sndfile.pc.in config.status
+	@./config.status $@
 
-winmm.lib :
-	rm -f Makefile src/Makefile tests/Makefile examples/Makefile
-	cp /c/WINDOWS/SYSTEM/WINMM.DLL winmm.dll
-	$(DLLTOOL) -l winmm.lib winmm.dll
-	$(PEXPORTS) -o winmm.dll > winmm.def
-	rm -f winmm.dll
+config.status :
+	./configure
 
 #====================================================================
 # Testing programs.

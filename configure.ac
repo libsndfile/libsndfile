@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.53)
 
-AC_INIT(libsndfile,1.0.11pre6,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.11pre7,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
@@ -425,20 +425,6 @@ AC_CONFIG_FILES([ \
 AC_OUTPUT
 
 #====================================================================================
-# Special case for MinGW32.
-
-if test "x-$build_os-$host_os-$target_os" = x-mingw32-mingw32-mingw32 ; then
-	cp -f Win32/Makefile.mingw Makefile
-	echo
-	echo "Now run \"make\" and \"make check\"."
-	echo
-	echo "There is no automatic install script on this platform."
-	echo
-	
-	exit 0
-	fi
-
-#====================================================================================
 
 AC_MSG_RESULT([
 -=-=-=-=-=-=-=-=-=-= Configuration Complete =-=-=-=-=-=-=-=-=-=-
@@ -477,11 +463,19 @@ AC_MSG_RESULT([[
     HTML docs directory : ......... $htmldocdir
 ]])
 
+if test "x-$build_os-$host_os-$target_os" = x-mingw32-mingw32-mingw32 ; then
+	echo "Using a Win32 specific Makefile."
+	cp -f Win32/Makefile.mingw Makefile
+	exit 0
+	fi
+
 if test x$prefix != "x/usr" ; then
 	echo "Compiling some other packages against libsndfile may require"
 	echo -e "the addition of \"$libdir/pkgconfig\" to the"
 	echo -e "PKG_CONFIG_PATH environment variable.\n"
 	fi
+
+#====================================================================================
 
 ifelse(dnl
 
