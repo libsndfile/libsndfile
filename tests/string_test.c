@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003,2004 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,9 +80,9 @@ main (int argc, char *argv [])
 static const char
 	software	[]	= "software",
 	artist		[]	= "The Artist",
-	copyright	[]	= "Copyright (c) 2003 The Artist",
+	copyright	[]	= "Copyright (c) 2003,2004 The Artist",
 	comment		[]	= "Comment goes here!!!",
-	date		[]	= "2003/01/27" ;
+	date		[]	= "2003,2004/01/27" ;
 
 static	short	data_out [BUFFER_LEN] ;
 

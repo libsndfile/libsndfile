@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (C) 2003 Erik de Castro Lopo <erikd@zip.com.au>
+# Copyright (C) 2003,2004 Erik de Castro Lopo <erikd@zip.com.au>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
