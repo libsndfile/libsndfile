@@ -431,7 +431,7 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 	/* Only log an error if no error has been set yet. */
 	if (psf->error == 0)
 	{	psf->error = SFE_SYSTEM ;
-		LSF_SNPRINTF (psf->syserr, sizeof (psf->syserr), "System error : %s", strerror (error)) ;
+		LSF_SNPRINTF (psf->syserr, sizeof (psf->syserr), "System error : %s.", strerror (error)) ;
 		} ;
 
 	return ;
@@ -811,7 +811,7 @@ psf_get_filelen (SF_PRIVATE *psf)
 psf_ftruncate (SF_PRIVATE *psf, sf_count_t len)
 {	int retval = 0 ;
 	LONG lDistanceToMoveLow, lDistanceToMoveHigh ;
-	DWORD dwResult, dwError ;
+	DWORD dwResult, dwError = NO_ERROR ;
 
 	/* This implementation trashes the current file position.
 	** should it save and restore it? what if the current position is past
