@@ -2,7 +2,7 @@ autogen definitions floating_point_test.tpl;
 
 endian_type = {
 	end_name		= little ;
-	end_type		= SF_ENDIAN_BIG ;
+	end_type		= SF_ENDIAN_LITTLE ;
 	} ;
 
 endian_type = {
