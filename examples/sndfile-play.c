@@ -235,7 +235,7 @@ alsa_open (int channels, int samplerate)
 	snd_pcm_sw_params_free (sw_params) ;
 
 	snd_pcm_reset (alsa_dev) ;
-	
+
 	return alsa_dev ;
 } /* alsa_open */
 
@@ -391,15 +391,15 @@ linux_open_dsp_device (int channels, int srate)
 
 	if ((fd = open ("/dev/dsp", O_WRONLY, 0)) == -1 &&
 		(fd = open ("/dev/sound/dsp", O_WRONLY, 0)) == -1)
-	{	perror("linux_open_dsp_device : open ") ;
+	{	perror ("linux_open_dsp_device : open ") ;
 		exit (1) ;
 		} ;
 
 	stereo = 0 ;
 	if (ioctl (fd, SNDCTL_DSP_STEREO, &stereo) == -1)
 	{ 	/* Fatal error */
-		perror("linux_open_dsp_device : stereo ") ;
-		exit (1);
+		perror ("linux_open_dsp_device : stereo ") ;
+		exit (1) ;
 		} ;
 
 	if (ioctl (fd, SNDCTL_DSP_RESET, 0))
@@ -440,10 +440,10 @@ linux_open_dsp_device (int channels, int srate)
 #if (defined (__MACH__) && defined (__APPLE__)) /* MacOSX */
 
 typedef struct
-{	AudioStreamBasicDescription		format;
+{	AudioStreamBasicDescription		format ;
 
-	UInt32 			buf_size;
-	AudioDeviceID 	device;
+	UInt32 			buf_size ;
+	AudioDeviceID 	device ;
 
 	SNDFILE 		*sndfile ;
 	SF_INFO 		sfinfo ;
@@ -471,19 +471,19 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 
 	audio_data = (MacOSXAudioData*) client_data ;
 
-	size = data_out->mBuffers[0].mDataByteSize ;
-	sample_count = size / sizeof(float) ;
+	size = data_out->mBuffers [0].mDataByteSize ;
+	sample_count = size / sizeof (float) ;
 
 	buffer = (float*) data_out->mBuffers [0].mData ;
 
 	read_count = sf_read_float (audio_data->sndfile, buffer, sample_count) ;
-	
+
 	if (read_count < sample_count)
 	{	memset (&(buffer [read_count]), 0, (sample_count - read_count) * sizeof (float)) ;
 		/* Tell the main application to terminate. */
 		audio_data->done_playing = SF_TRUE ;
 		} ;
-	
+
 	return noErr ;
 } /* macosx_audio_out_callback */
 
@@ -536,7 +536,7 @@ macosx_play (int argc, char *argv [])
 
 		audio_data.format.mSampleRate = audio_data.sfinfo.samplerate ;
 		audio_data.format.mChannelsPerFrame = audio_data.sfinfo.channels ;
-		
+
 		if ((err = AudioDeviceSetProperty (audio_data.device, NULL, 0, false, kAudioDevicePropertyStreamFormat,
 					sizeof (AudioStreamBasicDescription), &(audio_data.format))) != noErr)
 		{	printf ("AudioDeviceSetProperty (kAudioDevicePropertyStreamFormat) failed.\n") ;
@@ -548,7 +548,7 @@ macosx_play (int argc, char *argv [])
 			return ;
 
 		/* Fire off the device. */
-		if ((err = AudioDeviceAddIOProc (audio_data.device, macosx_audio_out_callback, 
+		if ((err = AudioDeviceAddIOProc (audio_data.device, macosx_audio_out_callback,
 				(void *) &audio_data)) != noErr)
 		{	printf ("AudioDeviceAddIOProc failed.\n") ;
 			return ;
@@ -567,7 +567,7 @@ macosx_play (int argc, char *argv [])
 		{	printf ("AudioDeviceStop failed.\n") ;
 			return ;
 			} ;
-    
+
 		err = AudioDeviceRemoveIOProc (audio_data.device, macosx_audio_out_callback) ;
         if (err != noErr)
 		{	printf ("AudioDeviceRemoveIOProc failed.\n") ;
@@ -598,23 +598,23 @@ macosx_play (int argc, char *argv [])
 typedef struct
 {	HWAVEOUT		hwave ;
 	WAVEHDR			whdr [2] ;
-	
+
 	HANDLE			Event ;
-	
+
 	short			buffer [WIN32_BUFFER_LEN / sizeof (short)] ;
 	int				current, bufferlen ;
 
 	SNDFILE 		*sndfile ;
 	SF_INFO 		sfinfo ;
 
-	sf_count_t		remaining ;	
+	sf_count_t		remaining ;
 } Win32_Audio_Data ;
 
 
 static void
 win32_play_data (Win32_Audio_Data *audio_data)
 {	int thisread, readcount ;
-		
+
 	readcount = (audio_data->remaining > audio_data->bufferlen) ? audio_data->bufferlen : (int) audio_data->remaining ;
 
 	thisread = (int) sf_read_short (audio_data->sndfile, (short *) (audio_data->whdr [audio_data->current].lpData), readcount) ;
@@ -651,23 +651,23 @@ win32_audio_out_callback (HWAVEOUT hwave, UINT msg, DWORD data, DWORD param1, DW
 	hwave = hwave ;
 	param1 = param2 ;
 
-	/* 
-	** I consider this technique of passing a pointer via an integer as 
-	** fundamentally broken but thats the way microsoft has defined the 
+	/*
+	** I consider this technique of passing a pointer via an integer as
+	** fundamentally broken but thats the way microsoft has defined the
 	** interface.
 	*/
 	audio_data = (Win32_Audio_Data*) data ;
-	
+
 	if (msg == MM_WOM_DONE)
 		win32_play_data (audio_data) ;
-		
+
   return 0 ;
 } /* win32_audio_out_callback */
 
 static void
 win32_play (int argc, char *argv [])
 {	Win32_Audio_Data	audio_data ;
-	
+
 	WAVEFORMATEX wf ;
 	int	k, error ;
 
@@ -681,24 +681,24 @@ win32_play (int argc, char *argv [])
 		{	puts (sf_strerror (NULL)) ;
 			continue ;
 			} ;
-			
+
 		audio_data.remaining = audio_data.sfinfo.frames ;
 		audio_data.current = 0 ;
-		
+
 		audio_data.Event = CreateEvent (0, FALSE, FALSE, 0) ;
-			
+
 		wf.nChannels = audio_data.sfinfo.channels ;
 		wf.wFormatTag = WAVE_FORMAT_PCM ;
 		wf.cbSize = 0 ;
 		wf.wBitsPerSample = 16 ;
 
 		wf.nSamplesPerSec = audio_data.sfinfo.samplerate ;
-		
+
 		wf.nBlockAlign = audio_data.sfinfo.channels * sizeof (short) ;
-		
+
 		wf.nAvgBytesPerSec = wf.nBlockAlign * wf.nSamplesPerSec ;
 
-		error = waveOutOpen (&(audio_data.hwave), WAVE_MAPPER, &wf, (DWORD) win32_audio_out_callback, 
+		error = waveOutOpen (&(audio_data.hwave), WAVE_MAPPER, &wf, (DWORD) win32_audio_out_callback,
 							(DWORD) &audio_data, CALLBACK_FUNCTION) ;
 		if (error)
 		{	puts ("waveOutOpen failed.") ;
@@ -710,22 +710,25 @@ win32_play (int argc, char *argv [])
 
 		audio_data.whdr [0].lpData = (char*) audio_data.buffer ;
 		audio_data.whdr [1].lpData = ((char*) audio_data.buffer) + sizeof (audio_data.buffer) / 2 ;
-		
+
 		audio_data.whdr [0].dwBufferLength = sizeof (audio_data.buffer) / 2 ;
 		audio_data.whdr [1].dwBufferLength = sizeof (audio_data.buffer) / 2 ;
-		
-		audio_data.bufferlen = sizeof (audio_data.buffer) / 2 / sizeof (short) ; 		
+
+		audio_data.whdr [0].dwFlags = 0 ;
+		audio_data.whdr [1].dwFlags = 0 ;
+
+		audio_data.bufferlen = sizeof (audio_data.buffer) / 2 / sizeof (short) ;
 
 		/* Prepare the WAVEHDRs */
 		if ((error = waveOutPrepareHeader (audio_data.hwave, &(audio_data.whdr [0]), sizeof (WAVEHDR))))
-		{	printf("waveOutPrepareHeader [0] failed : %08X\n", error) ;
+		{	printf ("waveOutPrepareHeader [0] failed : %08X\n", error) ;
 			waveOutClose (audio_data.hwave) ;
 			continue ;
 			} ;
 
 		if ((error = waveOutPrepareHeader (audio_data.hwave, &(audio_data.whdr [1]), sizeof (WAVEHDR))))
-		{	printf("waveOutPrepareHeader [1] failed : %08X\n", error) ;
-			waveOutUnprepareHeader (audio_data.hwave, &(audio_data.whdr [0]), sizeof(WAVEHDR)) ;
+		{	printf ("waveOutPrepareHeader [1] failed : %08X\n", error) ;
+			waveOutUnprepareHeader (audio_data.hwave, &(audio_data.whdr [0]), sizeof (WAVEHDR)) ;
 			waveOutClose (audio_data.hwave) ;
 			continue ;
 			} ;
@@ -737,15 +740,15 @@ win32_play (int argc, char *argv [])
 		win32_play_data (&audio_data) ;
 
 		/* Wait for playback to finish. My callback notifies me when all wave data has been played */
-		WaitForSingleObject (audio_data.Event, INFINITE);
+		WaitForSingleObject (audio_data.Event, INFINITE) ;
 
 		waveOutPause (audio_data.hwave) ;
-		waveOutReset (audio_data.hwave);
+		waveOutReset (audio_data.hwave) ;
 
-		waveOutUnprepareHeader (audio_data.hwave, &(audio_data.whdr [0]), sizeof(WAVEHDR)) ;
-		waveOutUnprepareHeader (audio_data.hwave, &(audio_data.whdr [1]), sizeof(WAVEHDR)) ;
+		waveOutUnprepareHeader (audio_data.hwave, &(audio_data.whdr [0]), sizeof (WAVEHDR)) ;
+		waveOutUnprepareHeader (audio_data.hwave, &(audio_data.whdr [1]), sizeof (WAVEHDR)) ;
 
-		waveOutClose (audio_data.hwave) ;  
+		waveOutClose (audio_data.hwave) ;
 		audio_data.hwave = 0 ;
 
 		sf_close (audio_data.sndfile) ;
@@ -770,7 +773,7 @@ solaris_play (int argc, char *argv [])
 	unsigned long	delay_time ;
 	long			k, start_count, output_count, write_count, read_count ;
 	int				audio_fd, error, done ;
-	
+
 	for (k = 1 ; k < argc ; k++)
 	{	printf ("Playing %s\n", argv [k]) ;
 		if (! (sndfile = sf_open (argv [k], SFM_READ, &sfinfo)))
@@ -788,25 +791,25 @@ solaris_play (int argc, char *argv [])
 		{	perror ("open (/dev/audio) failed") ;
 			return ;
 			} ;
-	
+
 		/*	Retrive standard values. */
 		AUDIO_INITINFO (&audio_info) ;
-	
+
 		audio_info.play.sample_rate = sfinfo.samplerate ;
 		audio_info.play.channels = sfinfo.channels ;
 		audio_info.play.precision = 16 ;
 		audio_info.play.encoding = AUDIO_ENCODING_LINEAR ;
 		audio_info.play.gain = AUDIO_MAX_GAIN ;
 		audio_info.play.balance = AUDIO_MID_BALANCE ;
-		
+
 		if ((error = ioctl (audio_fd, AUDIO_SETINFO, &audio_info)))
 		{	perror ("ioctl (AUDIO_SETINFO) failed") ;
 			return ;
 			} ;
-	
+
 		/* Delay time equal to 1/4 of a buffer in microseconds. */
 		delay_time = (BUFFER_LEN * 1000000) / (audio_info.play.sample_rate * 4) ;
-					
+
 		done = 0 ;
 		while (! done)
 		{	read_count = sf_read_short (sndfile, buffer, BUFFER_LEN) ;
@@ -818,7 +821,7 @@ solaris_play (int argc, char *argv [])
 
 			start_count = 0 ;
 			output_count = BUFFER_LEN * sizeof (short) ;
-	
+
 			while (output_count > 0)
 			{	/* write as much data as possible */
 				write_count = write (audio_fd, &(buffer [start_count]), output_count) ;
@@ -832,7 +835,7 @@ solaris_play (int argc, char *argv [])
 					} ;
 				} ; /* while (outpur_count > 0) */
 			} ; /* while (! done) */
-	
+
 		close (audio_fd) ;
 		} ;
 
@@ -849,7 +852,7 @@ int
 main (int argc, char *argv [])
 {
 	if (argc < 2)
-	{	
+	{
 		printf ("\nUsage : %s <input sound file>\n\n", argv [0]) ;
 #if (OS_IS_WIN32 == 1)
 		printf ("This is a Unix style command line application which\n"
@@ -893,7 +896,7 @@ main (int argc, char *argv [])
 } /* main */
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 8fc4110d-6cec-4e03-91df-0f384cabedac
