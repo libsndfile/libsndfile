@@ -174,18 +174,15 @@ endswap_int_copy (int *dest, const int *src, int len)
 		} ;
 } /* endswap_int_copy */
 
-#if  (defined (HAVE_BYTESWAP_T) && defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
+#if  (defined (HAVE_BYTESWAP_H) && defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
 
 static inline void
-endswap_long_copy (void *dest, const void *src, int len)
-{	const int64_t *from ;
-	int64_t *to, value ;
+endswap_long_copy (int64_t *dest, const int64_t *src, int len)
+{	int64_t value ;
 
-	from = src ;
-	to = dest ;
 	while (--len >= 0)
-	{	value = from [len] ;
-		to [len] = bswap_64 (value) ;
+	{	value = src [len] ;
+		dest [len] = bswap_64 (value) ;
 		} ;
 } /* endswap_long_copy */
 

@@ -612,7 +612,7 @@ host_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 			bufferlen = (int) len ;
 		readcount = psf_fread (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 
-		endswap_long_copy ((long*) (ptr + total), psf->u.lbuf, readcount) ;
+		endswap_long_copy ((void*) (ptr + total), psf->u.lbuf, readcount) ;
 
 		total += readcount ;
 		len -= readcount ;
@@ -725,7 +725,7 @@ host_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	{	if (len < bufferlen)
 			bufferlen = (int) len ;
 
-		endswap_long_copy (psf->u.lbuf, (long*) (ptr + total), bufferlen) ;
+		endswap_long_copy (psf->u.lbuf, (void*) (ptr + total), bufferlen) ;
 
 		writecount = psf_fwrite (psf->u.dbuf, sizeof (double), bufferlen, psf) ;
 		total += writecount ;
