@@ -279,7 +279,7 @@ file_read_write_test (const char *filename)
 static void
 file_truncate_test (const char *filename)
 {	SF_PRIVATE sf_data, *psf ;
-	char buffer [256] ;
+	unsigned char buffer [256] ;
 	int k ;
 
 	/*
@@ -314,13 +314,13 @@ file_truncate_test (const char *filename)
 
 	for (k = 0 ; k < SIGNED_SIZEOF (buffer) / 2 ; k++)
 		if (buffer [k] != 0xEE)
-		{	printf ("\n\nError : buffer [%d] = %d (should be 0xEE)\n\n", k, buffer [k]) ;
+		{	printf ("\n\nLine %d : buffer [%d] = %d (should be 0xEE)\n\n", __LINE__, k, buffer [k]) ;
 			exit (1) ;
 			} ;
 
 	for (k = SIGNED_SIZEOF (buffer) / 2 ; k < SIGNED_SIZEOF (buffer) ; k++)
 		if (buffer [k] != 0)
-		{	printf ("\n\nError : buffer [%d] = %d (should be 0)\n\n", k, buffer [k]) ;
+		{	printf ("\n\nLine %d : buffer [%d] = %d (should be 0)\n\n", __LINE__, k, buffer [k]) ;
 			exit (1) ;
 			} ;
 
