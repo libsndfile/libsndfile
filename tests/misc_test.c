@@ -53,8 +53,8 @@ static void	permission_test (const char *filename, int typemajor) ;
 /* Force the start of this buffer to be double aligned. Sparc-solaris will
 ** choke if its not.
 */
-static	short	data_out [BUFFER_LEN] ;
-static	short	data_in	[BUFFER_LEN] ;
+static	int	data_out [BUFFER_LEN] ;
+static	int	data_in	[BUFFER_LEN] ;
 
 int
 main (int argc, char *argv [])
@@ -208,24 +208,10 @@ main (int argc, char *argv [])
 */
 
 static void
-update_header_test (const char *filename, int typemajor)
+update_header_sub (const char *filename, int typemajor, int write_mode)
 {	SNDFILE		*outfile, *infile ;
 	SF_INFO		sfinfo ;
 	int			k, frames ;
-
-	print_test_name ("update_header_test", filename) ;
-
-#if (defined (WIN32) || defined (_WIN32))
-	if (typemajor == SF_FORMAT_PAF)
-	{	/*
-		** I think this is a bug in the win32 file I/O code in src/file_io.c.
-		** I didn't write that code and I don't have the time to debug and
-		** fix it. Patches will gladly be accepted. Erik
-		*/
-		puts ("doesn't work on win32") ;
-		return ;
-		} ;
-#endif
 
 	sfinfo.samplerate  = 44100 ;
 	sfinfo.format 	   = (typemajor | SF_FORMAT_PCM_16) ;
@@ -234,11 +220,11 @@ update_header_test (const char *filename, int typemajor)
 
 	frames = BUFFER_LEN / sfinfo.channels ;
 
-	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	outfile = test_open_file_or_die (filename, write_mode, &sfinfo, __LINE__) ;
 
 	for (k = 0 ; k < BUFFER_LEN ; k++)
 		data_out [k] = k + 1 ;
-	test_write_short_or_die (outfile, 0, data_out, BUFFER_LEN, __LINE__) ;
+	test_write_int_or_die (outfile, 0, data_out, BUFFER_LEN, __LINE__) ;
 
 	if (typemajor != SF_FORMAT_HTK)
 	{	/* The HTK header is not correct when the file is first written. */
@@ -261,7 +247,7 @@ update_header_test (const char *filename, int typemajor)
 		exit (1) ;
 		} ;
 
-	test_read_short_or_die (infile, 0, data_in, BUFFER_LEN, __LINE__) ;
+	test_read_int_or_die (infile, 0, data_in, BUFFER_LEN, __LINE__) ;
 	for (k = 0 ; k < BUFFER_LEN ; k++)
 		if (data_out [k] != k + 1)
 			printf ("Error : line %d\n", __LINE__) ;
@@ -274,7 +260,7 @@ update_header_test (const char *filename, int typemajor)
 	/* Write more data_out. */
 	for (k = 0 ; k < BUFFER_LEN ; k++)
 		data_out [k] = k + 2 ;
-	test_write_short_or_die (outfile, 0, data_out, BUFFER_LEN, __LINE__) ;
+	test_write_int_or_die (outfile, 0, data_out, BUFFER_LEN, __LINE__) ;
 
 	/* Open file again and make sure no errors in log buffer. */
 	infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
@@ -289,6 +275,29 @@ update_header_test (const char *filename, int typemajor)
 	sf_close (infile) ;
 
 	sf_close (outfile) ;
+
+	unlink (filename) ;
+} /* update_header_sub */
+
+static void
+update_header_test (const char *filename, int typemajor)
+{
+	print_test_name ("update_header_test", filename) ;
+
+#if (defined (WIN32) || defined (_WIN32))
+	if (typemajor == SF_FORMAT_PAF)
+	{	/*
+		** I think this is a bug in the win32 file I/O code in src/file_io.c.
+		** I didn't write that code and I don't have the time to debug and
+		** fix it. Patches will gladly be accepted. Erik
+		*/
+		puts ("doesn't work on win32") ;
+		return ;
+		} ;
+#endif
+
+	update_header_sub (filename, typemajor, SFM_WRITE) ;
+	update_header_sub (filename, typemajor, SFM_RDWR) ;
 
 	unlink (filename) ;
 	puts ("ok") ;
