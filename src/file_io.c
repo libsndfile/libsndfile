@@ -94,14 +94,12 @@ psf_fclose (SF_PRIVATE *psf)
 
 int
 psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
-{	char *fname ;
-
+{
 	if (psf->rsrcdes > 0)
 		return 0 ;
 
 	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
 	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s/rsrc", psf->filepath) ;
-
 	psf->error = SFE_NO_ERROR ;
 	if ((psf->rsrcdes = psf_open_fd (psf->rsrcpath, open_mode)) >= 0)
 	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrcdes) ;
@@ -114,28 +112,28 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 		} ;
 
 	/*
-	** Now try for a resource fork stored as a separate file.
-	** Grab the un-adulterated filename again.
+	** Now try for a resource fork stored as a separate file in the same
+	** directory, but preceded with a dot underscore.
 	*/
-	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s", psf->filepath) ;
-
-	if ((fname = strrchr (psf->rsrcpath, '/')) != NULL)
-		fname ++ ;
-	else if ((fname = strrchr (psf->rsrcpath, '\\')) != NULL)
-		fname ++ ;
-	else
-		fname = psf->rsrcpath ;
-
-	memmove (fname + 2, fname, strlen (fname) + 1) ;
-	fname [0] = '.' ;
-	fname [1] = '_' ;
-
+	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s._%s", psf->directory, psf->filename) ;
 	psf->error = SFE_NO_ERROR ;
 	if ((psf->rsrcdes = psf_open_fd (psf->rsrcpath, open_mode)) >= 0)
 	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrcdes) ;
 		return SFE_NO_ERROR ;
 		} ;
 
+	/*
+	** Now try for a resource fork stored in a separate file in the 
+	** .AppleDouble/ directory.
+	*/
+	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s.AppleDouble/%s", psf->directory, psf->filename) ;
+	psf->error = SFE_NO_ERROR ;
+	if ((psf->rsrcdes = psf_open_fd (psf->rsrcpath, open_mode)) >= 0)
+	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrcdes) ;
+		return SFE_NO_ERROR ;
+		} ;
+
+	/* No resource file found. */
 	if (psf->rsrcdes == -1)
 		psf_log_syserr (psf, errno) ;
 
@@ -290,7 +288,7 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 		return 0 ;
 
 	while (items > 0)
-	{	/* Break the writes down to a sensible size. */
+	{	/* Break the read down to a sensible size. */
 		count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : (ssize_t) items ;
 
 		count = read (psf->filedes, ((char*) ptr) + total, (size_t) count) ;

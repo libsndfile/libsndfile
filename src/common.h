@@ -184,6 +184,7 @@ typedef struct sf_private_tag
 
 	char			filepath	[SF_FILENAME_LEN] ;
 	char			rsrcpath	[SF_FILENAME_LEN] ;
+	char			directory	[SF_FILENAME_LEN] ;
 	char			filename	[SF_FILENAME_LEN / 4] ;
 
 	char			syserr		[SF_SYSERR_LEN] ;

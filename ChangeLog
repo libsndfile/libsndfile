@@ -1,3 +1,16 @@
+2005-03-09 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h
+    Add a directory field for storing the file directory to the SF_PRIVATE
+    struct.
+
+    * src/sndfile.c
+    Grab the directory name when copying the file path.
+
+    * src/file_io.c
+    Cleanup psf_open_rsrc() and also check for resource fork in
+    .AppleDouble/filename.
+
 2005-03-01 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/svx.c

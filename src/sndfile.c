@@ -2168,19 +2168,25 @@ save_header_info (SF_PRIVATE *psf)
 
 static void
 copy_filename (SF_PRIVATE *psf, const char *path)
-{	const char *cptr ;
+{	const char *ccptr ;
+	char *cptr ;
 
 	LSF_SNPRINTF (psf->filepath, sizeof (psf->filepath), "%s", path) ;
-
-	if ((cptr = strrchr (path, '/')) || (cptr = strrchr (path, '\\')))
-		cptr ++ ;
+	if ((ccptr = strrchr (path, '/')) || (ccptr = strrchr (path, '\\')))
+		ccptr ++ ;
 	else
-		cptr = path ;
+		ccptr = path ;
 
-	memset (psf->filename, 0, sizeof (psf->filename)) ;
+	LSF_SNPRINTF (psf->filename, sizeof (psf->filename), "%s", ccptr) ;
 
-	LSF_SNPRINTF (psf->filename, sizeof (psf->filename), "%s", cptr) ;
+	/* Now grab the directory. */
+	LSF_SNPRINTF (psf->directory, sizeof (psf->directory), "%s", path) ;
+	if ((cptr = strrchr (psf->directory, '/')) || (cptr = strrchr (psf->directory, '\\')))
+		cptr [1] = 0 ;
+	else
+		psf->directory [0] = 0 ;
 
+	return ;
 } /* copy_filename */
 
 /*==============================================================================
@@ -2188,7 +2194,7 @@ copy_filename (SF_PRIVATE *psf, const char *path)
 
 static int
 psf_close (SF_PRIVATE *psf)
-{	int			error ;
+{	int	error ;
 
 	if (psf->close)
 		error = psf->close (psf) ;
