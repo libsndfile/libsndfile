@@ -51,7 +51,6 @@
 #elif (OS_IS_WIN32 == 1)
 	#include <windows.h>
 	#include <mmsystem.h>
-	#include <mmreg.h>
 
 #endif
 
