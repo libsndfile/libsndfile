@@ -206,7 +206,6 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_SDS_NOT_SDS			, "Error : not an SDS file." },
 	{	SFE_SDS_BAD_BIT_WIDTH	, "Error : bad bit width for SDS file." },
 
-	{	SFE_SD2_RSRC_SIZE		, "Error : resource too long." },
 	{	SFE_SD2_BAD_DATA_OFFSET	, "Error : bad data offset." },
 	{	SFE_SD2_BAD_MAP_OFFSET	, "Error : bad map offset." },
 	{	SFE_SD2_BAD_DATA_LENGTH	, "Error : bad data length." },
