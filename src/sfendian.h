@@ -110,16 +110,15 @@ endswap_int_array (int *ptr, int len)
 		} ;
 } /* endswap_int_array */
 
-#if  (defined (HAVE_BYTESWAP_T) && defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
+#if  (defined (HAVE_BYTESWAP_H) && defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
 
 static inline void
-endswap_long_array (void *ptr, int len)
-{	int64_t *array, value ;
+endswap_long_array (int64_t *ptr, int len)
+{	int64_t value ;
 
-	array = ptr ;
 	while (--len >= 0)
-	{	value = array [len] ;
-		array [len] = bswap_64 (value) ;
+	{	value = ptr [len] ;
+		ptr [len] = bswap_64 (value) ;
 		} ;
 } /* endswap_long_array */
 
@@ -129,7 +128,7 @@ endswap_long_array (void *ptr, int len)
 **	is sizeof (long) == 4.
 */
 static inline void
-endswap_long_array (long *ptr, int len)
+endswap_long_array (void *ptr, int len)
 {	unsigned char *ucptr, temp ;
 
 	ucptr = (unsigned char *) ptr + 8 * len ;
