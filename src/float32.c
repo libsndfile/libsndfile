@@ -56,22 +56,22 @@ static sf_count_t	host_read_f2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t	host_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t	host_read_f2d	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static sf_count_t	host_write_s2f	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
-static sf_count_t	host_write_i2f	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
-static sf_count_t	host_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
-static sf_count_t	host_write_d2f	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t	host_write_s2f	(SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
+static sf_count_t	host_write_i2f	(SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+static sf_count_t	host_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+static sf_count_t	host_write_d2f	(SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
-static void		float32_peak_update	(SF_PRIVATE *psf, float *buffer, int count, int indx) ;
+static void		float32_peak_update	(SF_PRIVATE *psf, const float *buffer, int count, int indx) ;
 
 static sf_count_t	replace_read_f2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
 static sf_count_t	replace_read_f2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t	replace_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t	replace_read_f2d	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static sf_count_t	replace_write_s2f	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
-static sf_count_t	replace_write_i2f	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
-static sf_count_t	replace_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
-static sf_count_t	replace_write_d2f	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t	replace_write_s2f	(SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
+static sf_count_t	replace_write_i2f	(SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+static sf_count_t	replace_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+static sf_count_t	replace_write_d2f	(SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static	void	bf2f_array (float *buffer, int count) ;
 static	void	f2bf_array (float *buffer, int count) ;
@@ -375,7 +375,7 @@ float32_be_write (float in, unsigned char *out)
 */
 
 static void
-float32_peak_update	(SF_PRIVATE *psf, float *buffer, int count, int indx)
+float32_peak_update	(SF_PRIVATE *psf, const float *buffer, int count, int indx)
 {	int 	chan ;
 	int		k, position ;
 	float	fmaxval ;
@@ -428,28 +428,28 @@ float32_get_capability	(SF_PRIVATE *psf)
 */
 
 static inline void
-f2s_array (float *src, int count, short *dest, float scale)
+f2s_array (const float *src, int count, short *dest, float scale)
 {	while (--count >= 0)
 	{	dest [count] = lrintf (scale * src [count]) ;
 		} ;
 } /* f2s_array */
 
 static inline void
-f2i_array (float *src, int count, int *dest, float scale)
+f2i_array (const float *src, int count, int *dest, float scale)
 {	while (--count >= 0)
 	{	dest [count] = lrintf (scale * src [count]) ;
 		} ;
 } /* f2i_array */
 
 static inline void
-f2d_array (float *src, int count, double *dest)
+f2d_array (const float *src, int count, double *dest)
 {	while (--count >= 0)
 	{	dest [count] = src [count] ;
 		} ;
 } /* f2d_array */
 
 static inline void
-s2f_array (short *src, float *dest, int count)
+s2f_array (const short *src, float *dest, int count)
 {	while (--count >= 0)
 	{	dest [count] = src [count] ;
 		} ;
@@ -457,14 +457,14 @@ s2f_array (short *src, float *dest, int count)
 } /* s2f_array */
 
 static inline void
-i2f_array (int *src, float *dest, int count)
+i2f_array (const int *src, float *dest, int count)
 {	while (--count >= 0)
 	{	dest [count] = src [count] ;
 		} ;
 } /* i2f_array */
 
 static inline void
-d2f_array (double *src, float *dest, int count)
+d2f_array (const double *src, float *dest, int count)
 {	while (--count >= 0)
 	{	dest [count] = src [count] ;
 		} ;
@@ -581,7 +581,7 @@ host_read_f2d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 } /* host_read_f2d */
 
 static sf_count_t
-host_write_s2f	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+host_write_s2f	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 
@@ -609,7 +609,7 @@ host_write_s2f	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 } /* host_write_s2f */
 
 static sf_count_t
-host_write_i2f	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+host_write_i2f	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 
@@ -637,7 +637,7 @@ host_write_i2f	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 } /* host_write_i2f */
 
 static sf_count_t
-host_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+host_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 
@@ -653,7 +653,7 @@ host_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	{	if (len < bufferlen)
 			bufferlen = (int) len ;
 
-		endswap_int_copy (psf->u.ibuf, (int*) (ptr + total), bufferlen) ;
+		endswap_int_copy (psf->u.ibuf, (const int*) (ptr + total), bufferlen) ;
 
 		writecount = psf_fwrite (psf->u.fbuf, sizeof (float), bufferlen, psf) ;
 		total += writecount ;
@@ -666,7 +666,7 @@ host_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 } /* host_write_f */
 
 static sf_count_t
-host_write_d2f	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+host_write_d2f	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 
@@ -813,7 +813,7 @@ replace_read_f2d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 } /* replace_read_f2d */
 
 static sf_count_t
-replace_write_s2f	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+replace_write_s2f	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 
@@ -843,7 +843,7 @@ replace_write_s2f	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 } /* replace_write_s2f */
 
 static sf_count_t
-replace_write_i2f	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+replace_write_i2f	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 
@@ -873,7 +873,7 @@ replace_write_i2f	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 } /* replace_write_i2f */
 
 static sf_count_t
-replace_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+replace_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 
@@ -905,7 +905,7 @@ replace_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 } /* replace_write_f */
 
 static sf_count_t
-replace_write_d2f	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+replace_write_d2f	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 

@@ -29,9 +29,6 @@
 #include "au.h"
 #include "G72x/g72x.h"
 
-static	int au_g72x_read_block	(SF_PRIVATE *psf, G72x_DATA *pg72x, short *ptr, int len) ;
-static	int au_g72x_write_block	(SF_PRIVATE *psf, G72x_DATA *pg72x, short *ptr, int len) ;
-
 static	int	au_g72x_decode_block	(SF_PRIVATE *psf, G72x_DATA *pg72x) ;
 static	int	au_g72x_encode_block	(SF_PRIVATE *psf, G72x_DATA *pg72x) ;
 
@@ -40,10 +37,10 @@ static	sf_count_t	au_g72x_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static	sf_count_t	au_g72x_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static	sf_count_t	au_g72x_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static	sf_count_t	au_g72x_write_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
-static	sf_count_t	au_g72x_write_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
-static	sf_count_t	au_g72x_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
-static	sf_count_t	au_g72x_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static	sf_count_t	au_g72x_write_s	(SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
+static	sf_count_t	au_g72x_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+static	sf_count_t	au_g72x_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+static	sf_count_t	au_g72x_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static	sf_count_t au_g72x_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 
@@ -467,7 +464,7 @@ au_g72x_encode_block	(SF_PRIVATE *psf, G72x_DATA *pg72x)
 } /* au_g72x_encode_block */
 
 static int
-au_g72x_write_block	(SF_PRIVATE *psf, G72x_DATA *pg72x, short *ptr, int len)
+au_g72x_write_block	(SF_PRIVATE *psf, G72x_DATA *pg72x, const short *ptr, int len)
 {	int	count, total = 0, indx = 0 ;
 
 	while (indx < len)
@@ -489,7 +486,7 @@ au_g72x_write_block	(SF_PRIVATE *psf, G72x_DATA *pg72x, short *ptr, int len)
 } /* au_g72x_write_block */
 
 static sf_count_t
-au_g72x_write_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+au_g72x_write_s	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	G72x_DATA 	*pg72x ;
 	int			writecount, count ;
 	sf_count_t	total = 0 ;
@@ -513,7 +510,7 @@ au_g72x_write_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 } /* au_g72x_write_s */
 
 static sf_count_t
-au_g72x_write_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+au_g72x_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	G72x_DATA *pg72x ;
 	short		*sptr ;
 	int			k, bufferlen, writecount = 0, count ;
@@ -540,7 +537,7 @@ au_g72x_write_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 } /* au_g72x_write_i */
 
 static sf_count_t
-au_g72x_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+au_g72x_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	G72x_DATA *pg72x ;
 	short		*sptr ;
 	int			k, bufferlen, writecount = 0, count ;
@@ -571,7 +568,7 @@ au_g72x_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 } /* au_g72x_write_f */
 
 static sf_count_t
-au_g72x_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+au_g72x_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	G72x_DATA *pg72x ;
 	short		*sptr ;
 	int			k, bufferlen, writecount = 0, count ;

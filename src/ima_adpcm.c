@@ -68,17 +68,17 @@ static int ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock
 static int ima_writer_init (SF_PRIVATE *psf, int blockalign) ;
 
 static int ima_read_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima, short *ptr, int len) ;
-static int ima_write_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima, short *ptr, int len) ;
+static int ima_write_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima, const short *ptr, int len) ;
 
 static sf_count_t ima_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
 static sf_count_t ima_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t ima_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t ima_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static sf_count_t ima_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
-static sf_count_t ima_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
-static sf_count_t ima_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
-static sf_count_t ima_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t ima_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
+static sf_count_t ima_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+static sf_count_t ima_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+static sf_count_t ima_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static sf_count_t	ima_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 
@@ -866,7 +866,7 @@ ima_writer_init (SF_PRIVATE *psf, int blockalign)
 */
 
 static int
-ima_write_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima, short *ptr, int len)
+ima_write_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima, const short *ptr, int len)
 {	int		count, total = 0, indx = 0 ;
 
 	while (indx < len)
@@ -888,7 +888,7 @@ ima_write_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima, short *ptr, int len)
 } /* ima_write_block */
 
 static sf_count_t
-ima_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
+ima_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	IMA_ADPCM_PRIVATE 	*pima ;
 	int			writecount, count ;
 	sf_count_t	total = 0 ;
@@ -912,7 +912,7 @@ ima_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 } /* ima_write_s */
 
 static sf_count_t
-ima_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
+ima_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	IMA_ADPCM_PRIVATE *pima ;
 	short		*sptr ;
 	int			k, bufferlen, writecount, count ;
@@ -939,7 +939,7 @@ ima_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 } /* ima_write_i */
 
 static sf_count_t
-ima_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
+ima_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	IMA_ADPCM_PRIVATE *pima ;
 	short		*sptr ;
 	int			k, bufferlen, writecount, count ;
@@ -969,7 +969,7 @@ ima_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 } /* ima_write_f */
 
 static sf_count_t
-ima_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
+ima_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	IMA_ADPCM_PRIVATE *pima ;
 	short		*sptr ;
 	int			k, bufferlen, writecount, count ;

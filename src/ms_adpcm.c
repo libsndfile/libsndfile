@@ -104,17 +104,17 @@ static	int	msadpcm_decode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms) ;
 static sf_count_t msadpcm_read_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, short *ptr, int len) ;
 
 static	int	msadpcm_encode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms) ;
-static sf_count_t msadpcm_write_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, short *ptr, int len) ;
+static sf_count_t msadpcm_write_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, const short *ptr, int len) ;
 
 static sf_count_t	msadpcm_read_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
 static sf_count_t	msadpcm_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t	msadpcm_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t	msadpcm_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static sf_count_t	msadpcm_write_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
-static sf_count_t	msadpcm_write_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
-static sf_count_t	msadpcm_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
-static sf_count_t	msadpcm_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t	msadpcm_write_s	(SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
+static sf_count_t	msadpcm_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+static sf_count_t	msadpcm_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+static sf_count_t	msadpcm_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static sf_count_t msadpcm_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 static	int	msadpcm_close	(SF_PRIVATE *psf) ;
@@ -613,7 +613,7 @@ msadpcm_encode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 } /* msadpcm_encode_block */
 
 static sf_count_t
-msadpcm_write_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, short *ptr, int len)
+msadpcm_write_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, const short *ptr, int len)
 {	int		count, total = 0, indx = 0 ;
 
 	while (indx < len)
@@ -635,7 +635,7 @@ msadpcm_write_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, short *ptr, int len)
 } /* msadpcm_write_block */
 
 static sf_count_t
-msadpcm_write_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+msadpcm_write_s	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	MSADPCM_PRIVATE *pms ;
 	int			writecount, count ;
 	sf_count_t	total = 0 ;
@@ -659,7 +659,7 @@ msadpcm_write_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 } /* msadpcm_write_s */
 
 static sf_count_t
-msadpcm_write_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+msadpcm_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	MSADPCM_PRIVATE *pms ;
 	short		*sptr ;
 	int			k, bufferlen, writecount, count ;
@@ -685,7 +685,7 @@ msadpcm_write_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 } /* msadpcm_write_i */
 
 static sf_count_t
-msadpcm_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+msadpcm_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	MSADPCM_PRIVATE *pms ;
 	short		*sptr ;
 	int			k, bufferlen, writecount, count ;
@@ -714,7 +714,7 @@ msadpcm_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 } /* msadpcm_write_f */
 
 static sf_count_t
-msadpcm_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+msadpcm_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	MSADPCM_PRIVATE *pms ;
 	short		*sptr ;
 	int			k, bufferlen, writecount, count ;

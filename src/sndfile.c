@@ -1555,7 +1555,7 @@ sf_readf_double	(SNDFILE *sndfile, double *ptr, sf_count_t frames)
 */
 
 sf_count_t
-sf_write_raw	(SNDFILE *sndfile, void *ptr, sf_count_t len)
+sf_write_raw	(SNDFILE *sndfile, const void *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
 	int			bytewidth, blockwidth ;
@@ -1595,7 +1595,7 @@ sf_write_raw	(SNDFILE *sndfile, void *ptr, sf_count_t len)
 */
 
 sf_count_t
-sf_write_short	(SNDFILE *sndfile, short *ptr, sf_count_t len)
+sf_write_short	(SNDFILE *sndfile, const short *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
 
@@ -1640,7 +1640,7 @@ sf_write_short	(SNDFILE *sndfile, short *ptr, sf_count_t len)
 } /* sf_write_short */
 
 sf_count_t
-sf_writef_short	(SNDFILE *sndfile, short *ptr, sf_count_t frames)
+sf_writef_short	(SNDFILE *sndfile, const short *ptr, sf_count_t frames)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
 
@@ -1683,7 +1683,7 @@ sf_writef_short	(SNDFILE *sndfile, short *ptr, sf_count_t frames)
 */
 
 sf_count_t
-sf_write_int	(SNDFILE *sndfile, int *ptr, sf_count_t len)
+sf_write_int	(SNDFILE *sndfile, const int *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
 
@@ -1728,7 +1728,7 @@ sf_write_int	(SNDFILE *sndfile, int *ptr, sf_count_t len)
 } /* sf_write_int */
 
 sf_count_t
-sf_writef_int	(SNDFILE *sndfile, int *ptr, sf_count_t frames)
+sf_writef_int	(SNDFILE *sndfile, const int *ptr, sf_count_t frames)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
 
@@ -1771,7 +1771,7 @@ sf_writef_int	(SNDFILE *sndfile, int *ptr, sf_count_t frames)
 */
 
 sf_count_t
-sf_write_float	(SNDFILE *sndfile, float *ptr, sf_count_t len)
+sf_write_float	(SNDFILE *sndfile, const float *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
 
@@ -1816,7 +1816,7 @@ sf_write_float	(SNDFILE *sndfile, float *ptr, sf_count_t len)
 } /* sf_write_float */
 
 sf_count_t
-sf_writef_float	(SNDFILE *sndfile, float *ptr, sf_count_t frames)
+sf_writef_float	(SNDFILE *sndfile, const float *ptr, sf_count_t frames)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
 
@@ -1859,7 +1859,7 @@ sf_writef_float	(SNDFILE *sndfile, float *ptr, sf_count_t frames)
 */
 
 sf_count_t
-sf_write_double	(SNDFILE *sndfile, double *ptr, sf_count_t len)
+sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
 
@@ -1904,7 +1904,7 @@ sf_write_double	(SNDFILE *sndfile, double *ptr, sf_count_t len)
 } /* sf_write_double */
 
 sf_count_t
-sf_writef_double	(SNDFILE *sndfile, double *ptr, sf_count_t frames)
+sf_writef_double	(SNDFILE *sndfile, const double *ptr, sf_count_t frames)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
 

@@ -282,10 +282,10 @@ typedef struct sf_private_tag
 	sf_count_t		(*read_float)	(struct sf_private_tag*, float *ptr, sf_count_t len) ;
 	sf_count_t		(*read_double)	(struct sf_private_tag*, double *ptr, sf_count_t len) ;
 
-	sf_count_t		(*write_short)	(struct sf_private_tag*, short *ptr, sf_count_t len) ;
-	sf_count_t		(*write_int)	(struct sf_private_tag*, int *ptr, sf_count_t len) ;
-	sf_count_t		(*write_float)	(struct sf_private_tag*, float *ptr, sf_count_t len) ;
-	sf_count_t		(*write_double)	(struct sf_private_tag*, double *ptr, sf_count_t len) ;
+	sf_count_t		(*write_short)	(struct sf_private_tag*, const short *ptr, sf_count_t len) ;
+	sf_count_t		(*write_int)	(struct sf_private_tag*, const int *ptr, sf_count_t len) ;
+	sf_count_t		(*write_float)	(struct sf_private_tag*, const float *ptr, sf_count_t len) ;
+	sf_count_t		(*write_double)	(struct sf_private_tag*, const double *ptr, sf_count_t len) ;
 
 	sf_count_t		(*seek) 		(struct sf_private_tag*, int mode, sf_count_t samples_from_start) ;
 	int				(*write_header)	(struct sf_private_tag*, int calc_length) ;

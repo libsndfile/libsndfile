@@ -76,10 +76,10 @@ static sf_count_t sds_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t sds_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t sds_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static sf_count_t sds_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
-static sf_count_t sds_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
-static sf_count_t sds_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
-static sf_count_t sds_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t sds_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
+static sf_count_t sds_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+static sf_count_t sds_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+static sf_count_t sds_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static sf_count_t sds_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 
@@ -93,7 +93,7 @@ static int sds_2byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds) ;
 static int sds_3byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds) ;
 static int sds_4byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds) ;
 
-static int sds_write (SF_PRIVATE *psf, SDS_PRIVATE *psds, int *iptr, int writecount) ;
+static int sds_write (SF_PRIVATE *psf, SDS_PRIVATE *psds, const int *iptr, int writecount) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -866,7 +866,7 @@ sds_4byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 } /* sds_4byte_write */
 
 static sf_count_t
-sds_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
+sds_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	SDS_PRIVATE	*psds ;
 	int			*iptr ;
 	int			k, bufferlen, writecount, count ;
@@ -891,7 +891,7 @@ sds_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 } /* sds_write_s */
 
 static sf_count_t
-sds_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
+sds_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	SDS_PRIVATE *psds ;
 	int			total ;
 
@@ -905,7 +905,7 @@ sds_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 } /* sds_write_i */
 
 static sf_count_t
-sds_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
+sds_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	SDS_PRIVATE	*psds ;
 	int			*iptr ;
 	int			k, bufferlen, writecount, count ;
@@ -936,7 +936,7 @@ sds_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 } /* sds_write_f */
 
 static sf_count_t
-sds_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
+sds_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	SDS_PRIVATE	*psds ;
 	int			*iptr ;
 	int			k, bufferlen, writecount, count ;
@@ -967,7 +967,7 @@ sds_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 } /* sds_write_d */
 
 static int
-sds_write (SF_PRIVATE *psf, SDS_PRIVATE *psds, int *ptr, int len)
+sds_write (SF_PRIVATE *psf, SDS_PRIVATE *psds, const int *ptr, int len)
 {	int	count, total = 0 ;
 
 	while (total < len)

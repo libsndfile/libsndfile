@@ -51,13 +51,13 @@ static sf_count_t	gsm610_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t	gsm610_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t	gsm610_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static sf_count_t	gsm610_write_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
-static sf_count_t	gsm610_write_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
-static sf_count_t	gsm610_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
-static sf_count_t	gsm610_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t	gsm610_write_s	(SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
+static sf_count_t	gsm610_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+static sf_count_t	gsm610_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+static sf_count_t	gsm610_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static	int gsm610_read_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610, short *ptr, int len) ;
-static	int gsm610_write_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610, short *ptr, int len) ;
+static	int gsm610_write_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610, const short *ptr, int len) ;
 
 static	int	gsm610_decode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610) ;
 static	int	gsm610_encode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610) ;
@@ -442,7 +442,7 @@ gsm610_wav_encode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
 } /* gsm610_wav_encode_block */
 
 static int
-gsm610_write_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610, short *ptr, int len)
+gsm610_write_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610, const short *ptr, int len)
 {	int		count, total = 0, indx = 0 ;
 
 	while (indx < len)
@@ -464,7 +464,7 @@ gsm610_write_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610, short *ptr, int le
 } /* gsm610_write_block */
 
 static sf_count_t
-gsm610_write_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+gsm610_write_s	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	GSM610_PRIVATE 	*pgsm610 ;
 	int			writecount, count ;
 	sf_count_t	total = 0 ;
@@ -489,7 +489,7 @@ gsm610_write_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 } /* gsm610_write_s */
 
 static sf_count_t
-gsm610_write_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+gsm610_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	GSM610_PRIVATE *pgsm610 ;
 	short		*sptr ;
 	int			k, bufferlen, writecount = 0, count ;
@@ -514,7 +514,7 @@ gsm610_write_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 } /* gsm610_write_i */
 
 static sf_count_t
-gsm610_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+gsm610_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	GSM610_PRIVATE *pgsm610 ;
 	short		*sptr ;
 	int			k, bufferlen, writecount = 0, count ;
@@ -542,7 +542,7 @@ gsm610_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 } /* gsm610_write_f */
 
 static sf_count_t
-gsm610_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+gsm610_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	GSM610_PRIVATE *pgsm610 ;
 	short		*sptr ;
 	int			k, bufferlen, writecount = 0, count ;

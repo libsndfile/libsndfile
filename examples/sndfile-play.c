@@ -65,7 +65,7 @@
 
 #if HAVE_ALSA_ASOUNDLIB_H
 
-static snd_pcm_t * alsa_open (int channels, int srate) ;
+static snd_pcm_t * alsa_open (int channels, int srate, int realtime) ;
 static int alsa_write_float (snd_pcm_t *alsa_dev, float *data, int frames, int channels) ;
 
 static void
@@ -90,7 +90,7 @@ alsa_play (int argc, char *argv [])
 			continue ;
 			} ;
 
-		alsa_dev = alsa_open (sfinfo.channels, sfinfo.samplerate) ;
+		alsa_dev = alsa_open (sfinfo.channels, sfinfo.samplerate, SF_FALSE) ;
 
 		subformat = sfinfo.format & SF_FORMAT_SUBMASK ;
 
@@ -124,7 +124,7 @@ alsa_play (int argc, char *argv [])
 } /* alsa_play */
 
 static snd_pcm_t *
-alsa_open (int channels, int samplerate)
+alsa_open (int channels, int samplerate, int realtime)
 {	const char * device = "plughw:0" ;
 	snd_pcm_t *alsa_dev ;
 	snd_pcm_hw_params_t *hw_params ;
@@ -134,8 +134,14 @@ alsa_open (int channels, int samplerate)
 
 	int err ;
 
-	alsa_period_size = 512 ;
-	alsa_buffer_frames = 3 * alsa_period_size ;
+	if (realtime)
+	{	alsa_period_size = 256 ;
+		alsa_buffer_frames = 3 * alsa_period_size ;
+		}
+	else
+	{	alsa_period_size = 1024 ;
+		alsa_buffer_frames = 6 * alsa_period_size ;
+		} ;
 
 	if ((err = snd_pcm_open (&alsa_dev, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
 	{	fprintf (stderr, "cannot open audio device \"%s\" (%s)\n", device, snd_strerror (err)) ;

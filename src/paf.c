@@ -85,10 +85,10 @@ static sf_count_t paf24_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t paf24_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t paf24_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static sf_count_t paf24_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
-static sf_count_t paf24_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
-static sf_count_t paf24_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
-static sf_count_t paf24_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t paf24_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
+static sf_count_t paf24_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+static sf_count_t paf24_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+static sf_count_t paf24_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static sf_count_t paf24_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 
@@ -707,7 +707,7 @@ paf24_write_block (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
 } /* paf24_write_block */
 
 static int
-paf24_write (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, int *ptr, int len)
+paf24_write (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, const int *ptr, int len)
 {	int		count, total = 0 ;
 
 	while (total < len)
@@ -728,7 +728,7 @@ paf24_write (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, int *ptr, int len)
 } /* paf24_write */
 
 static sf_count_t
-paf24_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
+paf24_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	PAF24_PRIVATE 	*ppaf24 ;
 	int				*iptr ;
 	int				k, bufferlen, writecount = 0, count ;
@@ -754,7 +754,7 @@ paf24_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 } /* paf24_write_s */
 
 static sf_count_t
-paf24_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
+paf24_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	PAF24_PRIVATE 	*ppaf24 ;
 	int				writecount, count ;
 	sf_count_t		total = 0 ;
@@ -778,7 +778,7 @@ paf24_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 } /* paf24_write_i */
 
 static sf_count_t
-paf24_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
+paf24_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	PAF24_PRIVATE 	*ppaf24 ;
 	int				*iptr ;
 	int				k, bufferlen, writecount = 0, count ;
@@ -808,7 +808,7 @@ paf24_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 } /* paf24_write_f */
 
 static sf_count_t
-paf24_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
+paf24_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	PAF24_PRIVATE 	*ppaf24 ;
 	int				*iptr ;
 	int				k, bufferlen, writecount = 0, count ;

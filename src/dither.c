@@ -66,10 +66,10 @@ typedef struct
 	sf_count_t	(*read_float)	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 	sf_count_t	(*read_double)	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-	sf_count_t	(*write_short)	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
-	sf_count_t	(*write_int)	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
-	sf_count_t	(*write_float)	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
-	sf_count_t	(*write_double)	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+	sf_count_t	(*write_short)	(SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
+	sf_count_t	(*write_int)	(SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+	sf_count_t	(*write_float)	(SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+	sf_count_t	(*write_double)	(SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 	double buffer [SF_BUFFER_LEN / sizeof (double)] ;
 } DITHER_DATA ;
@@ -77,10 +77,10 @@ typedef struct
 static sf_count_t dither_read_short		(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
 static sf_count_t dither_read_int		(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 
-static sf_count_t dither_write_short	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
-static sf_count_t dither_write_int		(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
-static sf_count_t dither_write_float	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
-static sf_count_t dither_write_double	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t dither_write_short	(SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
+static sf_count_t dither_write_int		(SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+static sf_count_t dither_write_float	(SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+static sf_count_t dither_write_double	(SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 int
 dither_init (SF_PRIVATE *psf, int mode)
@@ -210,7 +210,7 @@ dither_read_int (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 */
 
 static sf_count_t
-dither_write_short	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+dither_write_short	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	DITHER_DATA *pdither ;
 	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
@@ -250,7 +250,7 @@ dither_write_short	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 } /* dither_write_short */
 
 static sf_count_t
-dither_write_int	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+dither_write_int	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	DITHER_DATA *pdither ;
 	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
@@ -295,7 +295,7 @@ dither_write_int	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 } /* dither_write_int */
 
 static sf_count_t
-dither_write_float	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+dither_write_float	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	DITHER_DATA *pdither ;
 	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
@@ -339,7 +339,7 @@ dither_write_float	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 } /* dither_write_float */
 
 static sf_count_t
-dither_write_double	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+dither_write_double	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	DITHER_DATA *pdither ;
 	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;

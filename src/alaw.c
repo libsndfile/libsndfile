@@ -25,20 +25,20 @@ static sf_count_t alaw_read_alaw2i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t alaw_read_alaw2f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t alaw_read_alaw2d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static sf_count_t alaw_write_s2alaw (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
-static sf_count_t alaw_write_i2alaw (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
-static sf_count_t alaw_write_f2alaw (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
-static sf_count_t alaw_write_d2alaw (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t alaw_write_s2alaw (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
+static sf_count_t alaw_write_i2alaw (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+static sf_count_t alaw_write_f2alaw (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+static sf_count_t alaw_write_d2alaw (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static void alaw2s_array (unsigned char *buffer, int count, short *ptr) ;
 static void alaw2i_array (unsigned char *buffer, int count, int *ptr) ;
 static void alaw2f_array (unsigned char *buffer, int count, float *ptr, float normfact) ;
 static void alaw2d_array (unsigned char *buffer, int count, double *ptr, double normfact) ;
 
-static void s2alaw_array (short *buffer, int count, unsigned char *ptr) ;
-static void i2alaw_array (int *buffer, int count, unsigned char *ptr) ;
-static void f2alaw_array (float *buffer, int count, unsigned char *ptr, float normfact) ;
-static void d2alaw_array (double *buffer, int count, unsigned char *ptr, double normfact) ;
+static void s2alaw_array (const short *buffer, int count, unsigned char *ptr) ;
+static void i2alaw_array (const int *buffer, int count, unsigned char *ptr) ;
+static void f2alaw_array (const float *buffer, int count, unsigned char *ptr, float normfact) ;
+static void d2alaw_array (const double *buffer, int count, unsigned char *ptr, double normfact) ;
 
 
 int
@@ -311,7 +311,7 @@ alaw2d_array (unsigned char *buffer, int count, double *ptr, double normfact)
 } /* alaw2d_array */
 
 static inline void
-s2alaw_array (short *ptr, int count, unsigned char *buffer)
+s2alaw_array (const short *ptr, int count, unsigned char *buffer)
 {	while (--count >= 0)
 	{	if (ptr [count] >= 0)
 			buffer [count] = alaw_encode [ptr [count] / 16] ;
@@ -321,7 +321,7 @@ s2alaw_array (short *ptr, int count, unsigned char *buffer)
 } /* s2alaw_array */
 
 static inline void
-i2alaw_array (int *ptr, int count, unsigned char *buffer)
+i2alaw_array (const int *ptr, int count, unsigned char *buffer)
 {	while (--count >= 0)
 	{	if (ptr [count] >= 0)
 			buffer [count] = alaw_encode [ptr [count] >> (16 + 4)] ;
@@ -331,7 +331,7 @@ i2alaw_array (int *ptr, int count, unsigned char *buffer)
 } /* i2alaw_array */
 
 static inline void
-f2alaw_array (float *ptr, int count, unsigned char *buffer, float normfact)
+f2alaw_array (const float *ptr, int count, unsigned char *buffer, float normfact)
 {	while (--count >= 0)
 	{	if (ptr [count] >= 0)
 			buffer [count] = alaw_encode [lrintf (normfact * ptr [count])] ;
@@ -341,7 +341,7 @@ f2alaw_array (float *ptr, int count, unsigned char *buffer, float normfact)
 } /* f2alaw_array */
 
 static inline void
-d2alaw_array (double *ptr, int count, unsigned char *buffer, double normfact)
+d2alaw_array (const double *ptr, int count, unsigned char *buffer, double normfact)
 {	while (--count >= 0)
 	{	if (ptr [count] >= 0)
 			buffer [count] = alaw_encode [lrint (normfact * ptr [count])] ;
@@ -446,7 +446,7 @@ alaw_read_alaw2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 */
 
 static sf_count_t
-alaw_write_s2alaw	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+alaw_write_s2alaw	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 
@@ -467,7 +467,7 @@ alaw_write_s2alaw	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 } /* alaw_write_s2alaw */
 
 static sf_count_t
-alaw_write_i2alaw	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+alaw_write_i2alaw	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 
@@ -488,7 +488,7 @@ alaw_write_i2alaw	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 } /* alaw_write_i2alaw */
 
 static sf_count_t
-alaw_write_f2alaw	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+alaw_write_f2alaw	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 	float	normfact ;
@@ -512,7 +512,7 @@ alaw_write_f2alaw	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 } /* alaw_write_f2alaw */
 
 static sf_count_t
-alaw_write_d2alaw	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+alaw_write_d2alaw	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 	double	normfact ;
