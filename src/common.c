@@ -731,13 +731,11 @@ header_read (SF_PRIVATE *psf, void *ptr, int bytes)
 	if (psf->headindex + bytes > SIGNED_SIZEOF (psf->header))
 	{	if (psf->headend < SIGNED_SIZEOF (psf->header))
 			psf_log_printf (psf, "Warning : Further header read would overflow buffer.\n") ;
+		psf->headend = SIGNED_SIZEOF (psf->header) ;
 
-		bytes = sizeof (psf->header) - psf->headindex ;
-		if (bytes <= 0)
-			return 0;
-		printf ("\nR sizeof (header): %d    headindex: %4u    bytes: %d\n", SIGNED_SIZEOF (psf->header), psf->headindex, bytes) ;
+		/* This is the best that we can do. */
+		return psf_fread (ptr, 1, bytes, psf) ;
 		} ;
-
 
 	if (psf->headindex + bytes > psf->headend)
 	{	count = psf_fread (psf->header + psf->headend, 1, bytes - (psf->headend - psf->headindex), psf) ;
@@ -757,6 +755,7 @@ header_read (SF_PRIVATE *psf, void *ptr, int bytes)
 static void
 header_seek (SF_PRIVATE *psf, sf_count_t position, int whence)
 {
+
 	switch (whence)
 	{	case SEEK_SET :
 			if (position > SIGNED_SIZEOF (psf->header))
@@ -833,9 +832,8 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 	char			*charptr ;
 	float			*floatptr ;
 	double			*doubleptr ;
-	size_t			size ;
 	char			c ;
-	int				count = 0, position ;
+	int				byte_count = 0, count ;
 
 	if (! format)
 		return psf_ftell (psf) ;
@@ -855,14 +853,14 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 			case 'm' :
 					intptr = va_arg (argptr, unsigned int*) ;
 					ucptr = (unsigned char*) intptr ;
-					count += header_read (psf, ucptr, sizeof (int)) ;
+					byte_count += header_read (psf, ucptr, sizeof (int)) ;
 					*intptr = GET_MARKER (ucptr) ;
 					break ;
 
 			case 'h' :
 					intptr = va_arg (argptr, unsigned int*) ;
 					ucptr = (unsigned char*) intptr ;
-					count += header_read (psf, sixteen_bytes, sizeof (sixteen_bytes)) ;
+					byte_count += header_read (psf, sixteen_bytes, sizeof (sixteen_bytes)) ;
 					{	int k ;
 						intdata = 0 ;
 						for (k = 0 ; k < 16 ; k++)
@@ -873,13 +871,13 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 			case '1' :
 					charptr = va_arg (argptr, char*) ;
-					count += header_read (psf, charptr, sizeof (char)) ;
+					byte_count += header_read (psf, charptr, sizeof (char)) ;
 					break ;
 
 			case '2' :
 					shortptr = va_arg (argptr, unsigned short*) ;
 					ucptr = (unsigned char*) shortptr ;
-					count += header_read (psf, ucptr, sizeof (short)) ;
+					byte_count += header_read (psf, ucptr, sizeof (short)) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						*shortptr = GET_BE_SHORT (ucptr) ;
 					else
@@ -888,7 +886,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 			case '3' :
 					intptr = va_arg (argptr, unsigned int*) ;
-					count += header_read (psf, sixteen_bytes, 3) ;
+					byte_count += header_read (psf, sixteen_bytes, 3) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						*intptr = GET_BE_3BYTE (sixteen_bytes) ;
 					else
@@ -898,7 +896,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 			case '4' :
 					intptr = va_arg (argptr, unsigned int*) ;
 					ucptr = (unsigned char*) intptr ;
-					count += header_read (psf, ucptr, sizeof (int)) ;
+					byte_count += header_read (psf, ucptr, sizeof (int)) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						*intptr = GET_BE_INT (ucptr) ;
 					else
@@ -907,7 +905,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 			case '8' :
 					countptr = va_arg (argptr, sf_count_t*) ;
-					count += header_read (psf, sixteen_bytes, 8) ;
+					byte_count += header_read (psf, sixteen_bytes, 8) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						countdata = GET_BE_8BYTE (sixteen_bytes) ;
 					else
@@ -918,7 +916,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 			case 'f' : /* Float conversion */
 					floatptr = va_arg (argptr, float *) ;
 					*floatptr = 0.0 ;
-					count += header_read (psf, floatptr, sizeof (float)) ;
+					byte_count += header_read (psf, floatptr, sizeof (float)) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						*floatptr = float32_be_read ((unsigned char*) floatptr) ;
 					else
@@ -928,7 +926,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 			case 'd' : /* double conversion */
 					doubleptr = va_arg (argptr, double *) ;
 					*doubleptr = 0.0 ;
-					count += header_read (psf, doubleptr, sizeof (double)) ;
+					byte_count += header_read (psf, doubleptr, sizeof (double)) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						*doubleptr = double64_be_read ((unsigned char*) doubleptr) ;
 					else
@@ -950,16 +948,16 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 			case 'b' :
 					charptr = va_arg (argptr, char*) ;
-					size = va_arg (argptr, int) ;
-					if (size > 0)
-						count += header_read (psf, charptr, size) ;
+					count = va_arg (argptr, int) ;
+					if (count > 0)
+						byte_count += header_read (psf, charptr, count) ;
 					break ;
 
 			case 'G' :
 					charptr = va_arg (argptr, char*) ;
-					size = va_arg (argptr, int) ;
-					if (size > 0)
-						count += header_gets (psf, charptr, size) ;
+					count = va_arg (argptr, int) ;
+					if (count > 0)
+						byte_count += header_gets (psf, charptr, count) ;
 					break ;
 
 			case 'z' :
@@ -976,16 +974,16 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 			case 'p' :
 					/* Get the seek position first. */
-					position = va_arg (argptr, int) ;
-					header_seek (psf, position, SEEK_SET) ;
-					count = position ;
+					count = va_arg (argptr, int) ;
+					header_seek (psf, count, SEEK_SET) ;
+					byte_count = count ;
 					break ;
 
 			case 'j' :
 					/* Get the seek position first. */
-					position = va_arg (argptr, int) ;
-					header_seek (psf, position, SEEK_CUR) ;
-					count += position ;
+					count = va_arg (argptr, int) ;
+					header_seek (psf, count, SEEK_CUR) ;
+					byte_count += count ;
 					break ;
 
 			default :
@@ -997,7 +995,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 	va_end (argptr) ;
 
-	return count ;
+	return byte_count ;
 } /* psf_binheader_readf */
 
 /*-----------------------------------------------------------------------------------------------
