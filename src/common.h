@@ -25,10 +25,14 @@
 #include <sndfile.h>
 #endif
 
+#if HAVE_STDINT_H
+#include <stdint.h>
+#endif
+
 #ifdef UNUSED
-#elif defined(__GNUC__)
-# define UNUSED(x) UNUSED_ ## x __attribute__((unused))
-#elif defined(__LCLINT__)
+#elif defined (__GNUC__)
+# define UNUSED(x) UNUSED_ ## x __attribute__ ((unused))
+#elif defined (__LCLINT__)
 # define UNUSED(x) /*@unused@*/ x
 #else
 # define UNUSED(x) x
@@ -212,7 +216,7 @@ typedef struct sf_private_tag
 	int				mode ;			/* Open mode : SFM_READ, SFM_WRITE or SFM_RDWR. */
 	int				endian ;		/* File endianness : SF_ENDIAN_LITTLE or SF_ENDIAN_BIG. */
 	int				float_endswap ;	/* Need to endswap float32s? */
-	
+
 	/*
 	** Maximum float value for calculating the multiplier for
 	** float/double to short/int conversions.
