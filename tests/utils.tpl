@@ -51,7 +51,7 @@ void	print_test_name (const char *test, const char *filename) ;
 #ifdef SNDFILE_H
 
 void 	dump_log_buffer (SNDFILE *file) ;
-void 	check_log_buffer_or_die (SNDFILE *file) ;
+void 	check_log_buffer_or_die (SNDFILE *file, int line_num) ;
 int 	string_in_log_buffer (SNDFILE *file, const char *s) ;
 void	hexdump_file (const char * filename, sf_count_t offset, sf_count_t length) ;
 
@@ -228,7 +228,7 @@ oct_save_[+ (get "io_element") +]	([+ (get "io_element") +] *a, [+ (get "io_elem
 +]
 
 void
-check_log_buffer_or_die (SNDFILE *file)
+check_log_buffer_or_die (SNDFILE *file, int line_num)
 {	static char	buffer [LOG_BUFFER_SIZE] ;
 	int			count ;
 
@@ -238,20 +238,20 @@ check_log_buffer_or_die (SNDFILE *file)
 	count = sf_command	(file, SFC_GET_LOG_INFO, buffer, LOG_BUFFER_SIZE) ;
 
 	if (LOG_BUFFER_SIZE - count < 2)
-	{	printf ("Possible long log buffer.\n") ;
+	{	printf ("\n\nLine %d : Possible long log buffer.\n", line_num) ;
 		exit (1) ;
 		}
 
 	/* Look for "Should" */
 	if (strstr (buffer, "ould"))
-	{	puts ("\n\nLog buffer contains `ould'. Dumping.\n") ;
+	{	printf ("\n\nLine %d : Log buffer contains `ould'. Dumping.\n", line_num) ;
 		puts (buffer) ;
 		exit (1) ;
 		} ;
 
 	/* Look for "**" */
 	if (strstr (buffer, "*"))
-	{	puts ("\n\nLog buffer contains `*'. Dumping.\n") ;
+	{	printf ("\n\nLine %d : Log buffer contains `*'. Dumping.\n", line_num) ;
 		puts (buffer) ;
 		exit (1) ;
 		} ;
@@ -492,9 +492,9 @@ test_seek_or_die (SNDFILE *file, sf_count_t offset, int whence, sf_count_t new_p
 	channel_name = (channels == 1) ? "Mono" : "Stereo" ;
 
 	if ((position = sf_seek (file, offset, whence)) != new_pos)
-	{	printf ("\n\nLine %d : %s : sf_seek (file, %ld, %s) returned %ld.\n\n", line_num,
-					channel_name, SF_COUNT_TO_LONG (offset), whence_name,
-					SF_COUNT_TO_LONG (position)) ;
+	{	printf ("\n\nLine %d : %s : sf_seek (file, %ld, %s) returned %ld (should be %ld).\n\n", 
+					line_num, channel_name, SF_COUNT_TO_LONG (offset), whence_name,
+					SF_COUNT_TO_LONG (position), SF_COUNT_TO_LONG (new_pos)) ;
 		exit (1) ;
 		} ;
 
