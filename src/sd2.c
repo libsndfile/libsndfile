@@ -189,12 +189,12 @@ write_char (unsigned char * data, int offset, char value)
 
 static inline void
 write_short (unsigned char * data, int offset, short value)
-{	((short *) (data + offset)) [0] = value ;
+{	((short *) (data + offset)) [0] = H2BE_SHORT (value) ;
 } /* read_char */
 
 static inline void
 write_int (unsigned char * data, int offset, int value)
-{	((int *) (data + offset)) [0] = value ;
+{	((int *) (data + offset)) [0] = H2BE_INT (value) ;
 } /* read_int */
 
 static void
