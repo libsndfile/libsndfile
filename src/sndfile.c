@@ -2169,6 +2169,9 @@ psf_close (SF_PRIVATE *psf)
 
 	psf_fclose (psf) ;
 
+	if (psf->rsrcdes >= 0)
+		psf_close_rsrc (psf) ;
+
 	if (psf->fdata)
 		free (psf->fdata) ;
 

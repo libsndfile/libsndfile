@@ -99,44 +99,45 @@ int
 sd2_open (SF_PRIVATE *psf)
 {	int saved_filedes, subformat, error = 0 ;
 
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
-		psf_open_rsrc (psf, psf->mode) ;
+	/* SD2 is always big endian. */
+	psf->endian = SF_ENDIAN_BIG ;
 
-	if (psf->rsrcdes < 0)
+	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->rsrclength > 0))
+	{	if (psf->rsrcdes < 0)
 	{	psf_log_printf (psf, "sd2_open : psf->rsrcdes < 0\n") ;
 		return SFE_SD2_BAD_RSRC ;
 		} ;
 
-	/* SD2 is always big endian. */
-	psf->endian = SF_ENDIAN_BIG ;
-
-	/* Only supoprt SFM_READ and SFM_WRITE, not SFM_RDWR. */
-	if (psf->mode == SFM_READ || psf->mode == SFM_RDWR)
-	{	saved_filedes = psf->filedes ;
+		saved_filedes = psf->filedes ;
 		psf->filedes = psf->rsrcdes ;
 
 		error = sd2_parse_rsrc_fork (psf) ;
 
 		psf->filedes = saved_filedes ;
 		if (error)
-			return error ;
+			goto error_cleanup ;
 		} ;
 
 	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_SD2)
-		return	SFE_BAD_OPEN_FORMAT ;
+	{	error = SFE_BAD_OPEN_FORMAT ;
+		goto error_cleanup ;
+		} ;
 
 	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 	psf->dataoffset = 0 ;
 
-	if (psf->mode == SFM_WRITE)
-	{	saved_filedes = psf->filedes ;
+	/* Only open and write the resource in RDWR mode is its current length is zero. */
+	if (psf->mode == SFM_WRITE || (psf->mode == SFM_RDWR && psf->rsrclength == 0))
+	{	psf_open_rsrc (psf, psf->mode) ;
+
+		saved_filedes = psf->filedes ;
 		psf->filedes = psf->rsrcdes ;
 
 		error = sd2_write_rsrc_fork (psf, SF_FALSE) ;
 
 		psf->filedes = saved_filedes ;
 		if (error)
-			return error ;
+			goto error_cleanup ;
 
 		/* Not needed. */
 		psf->write_header = NULL ;
@@ -159,6 +160,11 @@ sd2_open (SF_PRIVATE *psf)
 		} ;
 
 	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
+
+error_cleanup:
+
+	/* Close the resource fork regardless. We won't need it again. */
+	psf_close_rsrc (psf) ;
 
 	return error ;
 } /* sd2_open */
