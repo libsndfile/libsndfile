@@ -213,6 +213,13 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_SD2_BAD_RSRC		, "Error : bad resource fork." },
 	{	SFE_SD2_BAD_SAMPLE_SIZE	, "Error : bad sample size." },
 
+	{	SFE_FLAC_BAD_HEADER		, "Error: bad flac header." },
+	{	SFE_FLAC_NEW_DECODER	, "Error: problem while creating flac decoder." },
+	{	SFE_FLAC_INIT_DECODER	, "Error: problem while initialization of the flac decoder." },
+	{	SFE_FLAC_LOST_SYNC		, "Error: flac decoder lost sync." },
+	{	SFE_FLAC_BAD_SAMPLE_RATE, "Error : flac does not support this sample rate." },
+	{	SFE_FLAC_UNKOWN_ERROR	, "Error: unkown error in flac decoder." },
+
 	{	SFE_DWVW_BAD_BITWIDTH	, "Error : Bad bit width for DWVW encoding. Must be 12, 16 or 24." },
 	{	SFE_G72X_NOT_MONO		, "Error : G72x encoding does not support more than 1 channel." },
 
@@ -684,9 +691,17 @@ sf_format_check	(const SF_INFO *info)
 				/* SDS is strictly big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
 					return 0 ;
-				if (info->channels < 1 || info->channels > 2)
+				if (info->channels > 2)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
+					return 1 ;
+				break ;
+
+		case SF_FORMAT_FLAC :
+				/* FLAC can't do more than 8 channels. */
+				if (info->channels > 8)
+					return 0 ;
+				if (subformat == SF_FORMAT_FLAC_8 || subformat == SF_FORMAT_FLAC_16 || subformat == SF_FORMAT_FLAC_24)
 					return 1 ;
 				break ;
 
@@ -2082,7 +2097,7 @@ guess_file_type (SF_PRIVATE *psf, const char *filename)
 		return SF_FORMAT_HTK ;
 
 	if (buffer [0] == MAKE_MARKER ('f', 'L', 'a', 'C'))
-		return 0 /*-SF_FORMAT_FLAC-*/ ;
+		return SF_FORMAT_FLAC ;
 
 	/* Turtle Beach SMP 16-bit */
 	if (buffer [0] == MAKE_MARKER ('S', 'O', 'U', 'N') && buffer [1] == MAKE_MARKER ('D', ' ', 'S', 'A'))
@@ -2433,6 +2448,10 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 
 		case	SF_FORMAT_AVR :
 				error = avr_open (psf) ;
+				break ;
+
+		case	SF_FORMAT_FLAC :
+				error = flac_open (psf) ;
 				break ;
 
 		/* Lite remove end */

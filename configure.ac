@@ -296,6 +296,19 @@ if test x$ac_cv_header_alsa_asoundlib_h = xyes ; then
 	fi
 
 #====================================================================================
+# Check for FLAC
+
+FLAC_LIBS=""
+AC_CHECK_HEADERS(FLAC/all.h)
+if test x$ac_cv_header_FLAC_all_h = xyes ; then
+        AC_CHECK_LIB(FLAC, FLAC__seekable_stream_encoder_set_tell_callback, HAVE_FLAC_1_1_1="yes")
+        if test "x$HAVE_FLAC_1_1_1" = xyes ; then
+           AC_DEFINE(HAVE_FLAC_1_1_1, [1], [Define to 1 if you have libflac 1.1.1])
+           fi
+	FLAC_LIBS="-lFLAC"
+	fi
+
+#====================================================================================
 # Test for sanity when cross-compiling.
 
 if test x$cross_compiling = xyes ; then
@@ -410,6 +423,7 @@ AC_SUBST(SHARED_VERSION_INFO)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(ALSA_LIBS)
+AC_SUBST(FLAC_LIBS)
 AC_SUBST(ENABLE_EXPERIMENTAL_CODE)
 
 AC_SUBST(COMPILER_IS_GCC)

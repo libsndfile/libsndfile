@@ -71,6 +71,7 @@ enum
 	SF_FORMAT_AVR			= 0x120000,		/* Audio Visual Research */
 	SF_FORMAT_WAVEX			= 0x130000,		/* MS WAVE with WAVEFORMATEX */
 	SF_FORMAT_SD2			= 0x160000,		/* Sound Designer 2 */
+	SF_FORMAT_FLAC			= 0x170000,		/* FLAC lossless file format */
 
 	/* Subtypes from here on. */
 
@@ -104,6 +105,9 @@ enum
 	SF_FORMAT_DPCM_8		= 0x0050,		/* 8 bit differential PCM (XI only) */
 	SF_FORMAT_DPCM_16		= 0x0051,		/* 16 bit differential PCM (XI only) */
 
+	SF_FORMAT_FLAC_8		= 0x0070,		/* 8 bit FLAC encoding. */
+	SF_FORMAT_FLAC_16		= 0x0071,		/* 16 bit FLAC encdoing. */
+	SF_FORMAT_FLAC_24		= 0x0072,		/* 24 bit FLAC encoding. */
 
 	/* Endian-ness options. */
 

@@ -73,6 +73,7 @@ main (int argc, char **argv)
 		printf ("           ircam - test IRCAM file functions\n") ;
 		printf ("           voc   - Create Voice file functions\n") ;
 		printf ("           w64   - Sonic Foundry's W64 file functions\n") ;
+		printf ("           flac  - test FLAC file functions\n") ;
 		printf ("           all   - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -305,6 +306,13 @@ main (int argc, char **argv)
 		test_count++ ;
 		} ;
 
+	if (do_all || ! strcmp (argv [1], "flac"))
+	{	pcm_test_char	("char.flac"	, SF_FORMAT_FLAC | SF_FORMAT_FLAC_8, SF_TRUE) ;
+		pcm_test_short	("short.flac"	, SF_FORMAT_FLAC | SF_FORMAT_FLAC_16, SF_TRUE) ;
+		pcm_test_24bit	("24bit.flac"	, SF_FORMAT_FLAC | SF_FORMAT_FLAC_24, SF_TRUE) ;
+		test_count++ ;
+		} ;
+
 	if (test_count == 0)
 	{	printf ("Mono : ************************************\n") ;
 		printf ("Mono : *  No '%s' test defined.\n", argv [1]) ;
@@ -382,7 +390,8 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 		return ;
 		} ;
 
-	mono_rdwr_[+ (get "type_name") +]_test (filename, format, long_file_ok, allow_fd) ;
+	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_FLAC)
+		mono_rdwr_[+ (get "type_name") +]_test (filename, format, long_file_ok, allow_fd) ;
 
 	/* If the format doesn't support stereo we're done. */
 	sfinfo.channels = 2 ;
@@ -396,7 +405,9 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 
 	/* New read/write test. Not sure if this is needed yet. */
 
-	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_PAF && (format & SF_FORMAT_TYPEMASK) != SF_FORMAT_VOC)
+	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_PAF &&
+			(format & SF_FORMAT_TYPEMASK) != SF_FORMAT_VOC &&
+			(format & SF_FORMAT_TYPEMASK) != SF_FORMAT_FLAC)
 		new_rdwr_[+ (get "type_name") +]_test (filename, format, allow_fd) ;
 
 	puts ("ok") ;

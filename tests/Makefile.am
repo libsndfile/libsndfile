@@ -145,7 +145,7 @@ benchmark.c: benchmark.def benchmark.tpl
 check: generic-tests wav-tests aiff-tests au-tests raw-tests paf-tests \
 	svx-tests nist-tests ircam-tests voc-tests w64-tests mat4-tests \
 	mat5-tests pvf-tests xi-tests htk-tests avr-tests sds-tests sd2-tests \
-	stdio-tests
+	flac-tests stdio-tests
 
 generic-tests : error_test ulaw_test alaw_test command_test floating_point_test pcm_test
 	uname -a
@@ -342,6 +342,12 @@ sd2-tests: write_read_test
 	./write_read_test sd2
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on SD2 files."
+	@echo "----------------------------------------------------------------------"
+
+flac-tests: write_read_test
+	./write_read_test flac
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion` passed tests on FLAC files."
 	@echo "----------------------------------------------------------------------"
 
 # Lite remove end

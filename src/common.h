@@ -111,7 +111,6 @@ enum
 	SF_FORMAT_KRZ			= 0x40E0000,		/* Kurzweil sampler file */
 	SF_FORMAT_WMA			= 0x4100000,		/* Windows Media Audio. */
 	SF_FORMAT_SHN			= 0x4110000,		/* Shorten. */
-	SF_FORMAT_FLAC			= 0x4120000,
 
 	/* Unsupported encodings. */
 	SF_FORMAT_VORBIS		= 0x1001,
@@ -467,6 +466,13 @@ enum
 	SFE_SD2_BAD_RSRC,
 	SFE_SD2_BAD_SAMPLE_SIZE,
 
+	SFE_FLAC_BAD_HEADER,
+	SFE_FLAC_NEW_DECODER,
+	SFE_FLAC_INIT_DECODER,
+	SFE_FLAC_LOST_SYNC,
+	SFE_FLAC_BAD_SAMPLE_RATE,
+	SFE_FLAC_UNKOWN_ERROR,
+
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
 
@@ -595,6 +601,7 @@ int		voc_open	(SF_PRIVATE *psf) ;
 int		w64_open	(SF_PRIVATE *psf) ;
 int		wav_open	(SF_PRIVATE *psf) ;
 int		xi_open		(SF_PRIVATE *psf) ;
+int		flac_open	(SF_PRIVATE *psf) ;
 
 /* In progress. Do not currently work. */
 
@@ -610,14 +617,15 @@ int		macbinary3_open (SF_PRIVATE *psf) ;
 **	Init functions for a number of common data encodings.
 */
 
-int 	pcm_init		(SF_PRIVATE *psf) ;
-int 	ulaw_init		(SF_PRIVATE *psf) ;
-int 	alaw_init		(SF_PRIVATE *psf) ;
-int 	float32_init	(SF_PRIVATE *psf) ;
-int 	double64_init	(SF_PRIVATE *psf) ;
-int 	dwvw_init		(SF_PRIVATE *psf, int bitwidth) ;
-int		gsm610_init 	(SF_PRIVATE *psf) ;
-int		vox_adpcm_init 	(SF_PRIVATE *psf) ;
+int		pcm_init		(SF_PRIVATE *psf) ;
+int		ulaw_init		(SF_PRIVATE *psf) ;
+int		alaw_init		(SF_PRIVATE *psf) ;
+int		float32_init	(SF_PRIVATE *psf) ;
+int		double64_init	(SF_PRIVATE *psf) ;
+int		dwvw_init		(SF_PRIVATE *psf, int bitwidth) ;
+int		gsm610_init		(SF_PRIVATE *psf) ;
+int		vox_adpcm_init	(SF_PRIVATE *psf) ;
+int		flac_init		(SF_PRIVATE *psf) ;
 
 int 	dither_init		(SF_PRIVATE *psf, int mode) ;
 
