@@ -382,17 +382,21 @@ filesystem_full_test (int typemajor)
 
 static void
 permission_test (const char *filename, int typemajor)
-{	FILE		*textfile ;
+{
+#if (OS_IS_WIN32)
+	/* Avoid compiler warnings. */
+	filename = filename ;
+	typemajor = typemajor ;
+
+	/* Can't run this test on Win32 so return. */
+	return ;
+#else
+
+	FILE		*textfile ;
 	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	const char	*errorstr ;
-
 	int			frames ;
-
-#if (defined (WIN32) || defined (_WIN32) || defined (__CYGWIN__))
-	/* Can't run this test on Win32 so return. */
-	return ;
-#endif
 
 	if (getuid () == 0)
 	{	/* If running as root bypass this test.
@@ -447,6 +451,8 @@ permission_test (const char *filename, int typemajor)
 	unlink (filename) ;
 
 	puts ("ok") ;
+
+#endif
 } /* permission_test */
 
 
