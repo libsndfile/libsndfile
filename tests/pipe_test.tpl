@@ -21,7 +21,7 @@
 ** This is a test program which tests reading from and writing to pipes.
 */
 
-#include "sfconfig.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,13 +32,14 @@
 int
 main (void)
 {
-	puts ("    pipe_test  : this test doesn't work on win32.") ;
+
+	puts ("This test doesn't work on win32.") ;
 	return 0 ;
 } /* main */
 
 #else
 
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
@@ -135,7 +136,7 @@ pipe_read_test (int filetype, const char *ext)
 	for (k = 0 ; k < PIPE_TEST_LEN ; k++)
 		data [k] = PIPE_INDEX (k) ;
 
-	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 	test_writef_short_or_die (outfile, 0, data, PIPE_TEST_LEN, __LINE__) ;
 	sf_close (outfile) ;
 
@@ -334,7 +335,7 @@ pipe_test_others (FILETYPE* list1, FILETYPE* list2)
 			sfinfo.channels = 1 ;
 			sfinfo.samplerate = 44100 ;
 
-			outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+			outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 			test_writef_short_or_die (outfile, 0, data, PIPE_TEST_LEN, __LINE__) ;
 			sf_close (outfile) ;
 
