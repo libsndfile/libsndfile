@@ -275,16 +275,6 @@ case "$target_os" in
 		;;
 	mingw32*)
 		os_is_win32=1
-		## AC_CHECK_HEADERS(wintypes.h)
-		AC_CHECK_HEADERS(mmreg.h)
-		if test x$ac_cv_header_mmreg_h != xyes ; then
-			AC_MSG_WARN([[******************************************************************]])
-			AC_MSG_WARN([[*** Can't find mmreg.h which means that we can't build a working  ]])
-			AC_MSG_WARN([[*** sndfile-play program. The library can however be built.       ]])
-			AC_MSG_WARN([[*** To correct this, you can grab the mmmreg.h file from the      ]])
-			AC_MSG_WARN([[*** WINE project : http://www.winehq.com/.                        ]])
-			AC_MSG_WARN([[******************************************************************]])
-			fi
 		;;
 	esac
 
