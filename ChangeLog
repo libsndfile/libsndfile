@@ -1,3 +1,11 @@
+2004-10-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in src/sndfile.c tests/floating_point_test.tpl
+    Rename SFC_SET_FLOAT_INT_MULTIPLIER to SFC_SET_SCALE_FLOAT_INT_READ.
+
+    * doc/command.html
+    Document SFC_SET_SCALE_FLOAT_INT_READ.
+
 2004-09-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/floating_point_test.(tpl|def)
