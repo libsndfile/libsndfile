@@ -1,58 +1,41 @@
 #!/usr/bin/make -f
 
-# The auto tools MUST be run in the following order:
-#
-#	1.  aclocal
-#	2.  libtoolize (if you use libtool)
-#	3.  autoconf
-#	4.  autoheader (if you use autoheader)
-#	5.  automake (if you use automake)
-#
-# The following makefile runs these in the correct order according to their
-# dependancies. It also makes up for Mac OSX's fucked-upped-ness.
+Makefile.am: configure
+	automake --copy --add-missing
 
-ACLOCAL = aclocal
-
-ifneq ($(shell uname -s), Darwin)
-  LIBTOOLIZE = libtoolize
-else
-  # Fuck Apple! Why the hell did they rename libtoolize????
-  LIBTOOLIZE = glibtoolize
-  # Fink (and DarwinPorts/MacPorts) sucks as well, but this seems necessary.
-  ACLOCAL_INC = -I /opt/local/share/aclocal
-endif
-
-genfiles : config.status
-	(cd src && make genfiles)
-	(cd tests && make genfiles)
-
-config.status: configure src/config.h.in Makefile.in src/Makefile.in tests/Makefile.in
-	./configure --enable-gcc-werror
-
-configure: ltmain.sh
+configure: configure.ac src/config.h.in libtool ltmain.sh
 	autoconf
 
-Makefile.in: Makefile.am	
-	automake --copy --add-missing
-
-src/Makefile.in: src/Makefile.am	
-	automake --copy --add-missing
-
-tests/Makefile.in: tests/Makefile.am	
-	automake --copy --add-missing
-
-src/config.h.in: configure
+src/config.h.in: configure.ac libtool
 	autoheader
 
 libtool ltmain.sh: aclocal.m4
-	$(LIBTOOLIZE) --copy --force
+	libtoolize --copy --force
 	
-# Need to re-run aclocal whenever acinclude.m4 is modified.
 aclocal.m4: acinclude.m4
-	$(ACLOCAL) $(ACLOCAL_INC)
+	aclocal
+
+acinclude.m4:
+	@echo "acinclude.m4"
+	@if [ -d $(HOME)/Proj/M4 ] ; then \
+		cat $(HOME)/Proj/M4/extra_largefile.m4 >acinclude.m4.new ; \
+		cat $(HOME)/Proj/M4/endian.m4 >>acinclude.m4.new ; \
+		cat $(HOME)/Proj/M4/lrint.m4 >>acinclude.m4.new ; \
+		cat $(HOME)/Proj/M4/lrintf.m4 >>acinclude.m4.new ; \
+		cat $(HOME)/Proj/M4/llrint.m4 >>acinclude.m4.new ; \
+		cat $(HOME)/Proj/M4/clip_mode.m4 >>acinclude.m4.new ; \
+		mv -f acinclude.m4.new acinclude.m4 ; \
+	else \
+		touch acinclude.m4 ; \
+		fi
 
 clean:
-	rm -f libtool ltmain.sh aclocal.m4 Makefile.in src/config.h.in config.cache config.status
-	find . -name .deps -type d -exec rm -rf {} \;
+	rm -f libtool ltmain.sh aclocal.m4 Makefile.in src/config.h.in config.cache
 
+
+# Do not edit or modify anything in this comment block.
+# The arch-tag line is a file identity tag for the GNU Arch 
+# revision control system.
+#
+# arch-tag: 2b02bfd0-d5ed-489b-a554-2bf36903cca9
 
