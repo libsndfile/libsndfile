@@ -107,7 +107,6 @@ enum
 	SF_FORMAT_OGG			= 0x4090000,
 
 	SF_FORMAT_REX			= 0x40A0000,		/* Propellorheads Rex/Rcy */
-	SF_FORMAT_SD2			= 0x40C0000,		/* Sound Designer 2 */
 	SF_FORMAT_REX2			= 0x40D0000,		/* Propellorheads Rex2 */
 	SF_FORMAT_KRZ			= 0x40E0000,		/* Kurzweil sampler file */
 	SF_FORMAT_WMA			= 0x4100000,		/* Windows Media Audio. */
@@ -456,6 +455,7 @@ enum
 	SFE_SDS_NOT_SDS,
 	SFE_SDS_BAD_BIT_WIDTH,
 
+	SFE_SD2_FD_DISALLOWED,
 	SFE_SD2_BAD_DATA_OFFSET,
 	SFE_SD2_BAD_MAP_OFFSET,
 	SFE_SD2_BAD_DATA_LENGTH,
@@ -543,7 +543,7 @@ int macos_guess_file_type (SF_PRIVATE *psf, const char *filename) ;
 */
 
 int psf_fopen (SF_PRIVATE *psf, const char *pathname, int flags) ;
-int psf_open_rsrc (SF_PRIVATE *psf, const char *pathname, int flags) ;
+int psf_open_rsrc (SF_PRIVATE *psf, int mode) ;
 int psf_set_stdio (SF_PRIVATE *psf, int mode) ;
 int psf_filedes_valid (SF_PRIVATE *psf) ;
 void psf_set_file (SF_PRIVATE *psf, int fd) ;

@@ -206,6 +206,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_SDS_NOT_SDS			, "Error : not an SDS file." },
 	{	SFE_SDS_BAD_BIT_WIDTH	, "Error : bad bit width for SDS file." },
 
+	{	SFE_SD2_FD_DISALLOWED	, "Error : cannot open SD2 file without a file name." },
 	{	SFE_SD2_BAD_DATA_OFFSET	, "Error : bad data offset." },
 	{	SFE_SD2_BAD_MAP_OFFSET	, "Error : bad map offset." },
 	{	SFE_SD2_BAD_DATA_LENGTH	, "Error : bad data length." },
@@ -232,7 +233,7 @@ static void	copy_filename (SF_PRIVATE *psf, const char *path) ;
 static int	psf_close (SF_PRIVATE *psf) ;
 static int	psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo) ;
 
-static int	try_resource_fork (SF_PRIVATE * psf, const char * pathname) ;
+static int	try_resource_fork (SF_PRIVATE * psf, int mode) ;
 
 /*------------------------------------------------------------------------------
 ** Private (static) variables.
@@ -277,6 +278,7 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 		} ;
 
 	memset (psf, 0, sizeof (SF_PRIVATE)) ;
+	psf->rsrcdes = -1 ;
 
 	psf_log_printf (psf, "File : %s\n", path) ;
 
@@ -309,12 +311,18 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 {	SF_PRIVATE 	*psf ;
 	int			error ;
 
+	if ((sfinfo->format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
+	{	sf_errno = SFE_SD2_FD_DISALLOWED ;
+		return	NULL ;
+		} ;
+
 	if ((psf = calloc (1, sizeof (SF_PRIVATE))) == NULL)
 	{	sf_errno = SFE_MALLOC_FAILED ;
 		return	NULL ;
 		} ;
 
 	psf_set_file (psf, fd) ;
+	psf->rsrcdes = -1 ;
 	psf->is_pipe = psf_is_pipe (psf) ;
 	psf->fileoffset = psf_ftell (psf) ;
 
@@ -683,15 +691,13 @@ sf_format_check	(const SF_INFO *info)
 					return 1 ;
 				break ;
 
-		/*-
 		case SF_FORMAT_SD2 :
-				/+* SD2 is strictly big endian. *+/
+				/* SD2 is strictly big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
 					return 0 ;
-				if (subformat == SF_FORMAT_PCM_16)
+				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24)
 					return 1 ;
 				break ;
-		-*/
 
 		default : break ;
 		} ;
@@ -1930,34 +1936,10 @@ sf_writef_double	(SNDFILE *sndfile, double *ptr, sf_count_t frames)
 */
 
 static int
-try_resource_fork (SF_PRIVATE * psf, const char * pathname)
+try_resource_fork (SF_PRIVATE * psf, int mode)
 {
-	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
-	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s/rsrc", pathname) ;
-
-	if (psf_open_rsrc (psf, psf->rsrcpath, SFM_READ) != 0)
-	{	/* Now try for re a resource fork stored as a separate file. */
-		char *fname ;
-
-		/* Grab the un-adulterated filename again. */
-		LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s", pathname) ;
-
-		if ((fname = strrchr (psf->rsrcpath, '/')) != NULL)
-			fname ++ ;
-		else if ((fname = strrchr (psf->rsrcpath, '\\')) != NULL)
-			fname ++ ;
-		else
-			fname = psf->rsrcpath ;
-
-		memmove (fname + 2, fname, strlen (fname) + 1) ;
-		fname [0] = '.' ;
-		fname [1] = '_' ;
-
-		if (psf_open_rsrc (psf, psf->rsrcpath, SFM_READ) != 0)
-		{	memset (psf->rsrcpath, 0, sizeof (psf->rsrcpath)) ;
-			return 0 ;
-			} ;
-		} ;
+	if (psf_open_rsrc (psf, mode) != 0)
+		return 0 ;
 
 	/* More checking here. */
 	psf_log_printf (psf, "Resource fork : %s\n", psf->rsrcpath) ;
@@ -2105,7 +2087,7 @@ guess_file_type (SF_PRIVATE *psf, const char *filename)
 		return SF_FORMAT_AVR ;
 
 	/* This must be the second last one. */
-	if (psf->filelength > 0 && (format = try_resource_fork (psf, psf->filepath)) != 0)
+	if (psf->filelength > 0 && (format = try_resource_fork (psf, SFM_READ)) != 0)
 		return format ;
 
 	/* This must be the last one. */

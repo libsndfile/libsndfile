@@ -1,3 +1,15 @@
+2004-10-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c src/file_io.c
+    Move resource filename construction and testing to psf_open_rsrc().
+
+    * src/common.h src/sndfile.c
+    Add error SFE_SD2_FD_DISALLOWED.
+
+    * tests/util.tpl tests/*.(c|tpl)
+    Add and allow_fd parameter to test_open_file_or_die() so that use of
+    sf_open_fd() can be avoided when opening SD2 files.
+
 2004-10-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c

@@ -74,19 +74,45 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 } /* psf_fopen */
 
 int
-psf_open_rsrc (SF_PRIVATE *psf, const char *pathname, int open_mode)
-{
+psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
+{	char *fname ;
+
+	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
+	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s/rsrc", psf->filepath) ;
+
 	psf->error = 0 ;
-	psf->rsrcdes = psf_open (pathname, open_mode) ;
+	if ((psf->rsrcdes = psf_open (psf->rsrcpath, open_mode)) >= 0)
+		return 0 ;
 
 	if (psf->rsrcdes == - SFE_BAD_OPEN_MODE)
 	{	psf->error = SFE_BAD_OPEN_MODE ;
-		psf->rsrcdes = -1 ;
 		return psf->error ;
 		} ;
 
+	/*
+	** Now try for a resource fork stored as a separate file.
+	** Grab the un-adulterated filename again.
+	*/
+	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s", psf->filepath) ;
+
+	if ((fname = strrchr (psf->rsrcpath, '/')) != NULL)
+		fname ++ ;
+	else if ((fname = strrchr (psf->rsrcpath, '\\')) != NULL)
+		fname ++ ;
+	else
+		fname = psf->rsrcpath ;
+
+	memmove (fname + 2, fname, strlen (fname) + 1) ;
+	fname [0] = '.' ;
+	fname [1] = '_' ;
+
+	if ((psf->rsrcdes = psf_open (psf->rsrcpath, open_mode)) >= 0)
+		return 0 ;
+
 	if (psf->rsrcdes == -1)
 		psf_log_syserr (psf, errno) ;
+
+	psf->rsrcdes = -1 ;
 
 	return psf->error ;
 } /* psf_open_rsrc */

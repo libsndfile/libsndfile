@@ -44,7 +44,15 @@
 #define	Sd2f_MARKER			MAKE_MARKER ('S', 'd', '2', 'f')
 #define	Sd2a_MARKER			MAKE_MARKER ('S', 'd', '2', 'a')
 #define	ALCH_MARKER			MAKE_MARKER ('A', 'L', 'C', 'H')
+#define lsf1_MARKER			MAKE_MARKER ('l', 's', 'f', '1')
+
 #define STR_MARKER			MAKE_MARKER ('S', 'T', 'R', ' ')
+#define sdML_MARKER			MAKE_MARKER ('s', 'd', 'M', 'L')
+
+enum
+{	RSRC_STR = 111,
+	RSRC_BIN
+} ;
 
 typedef struct
 {	unsigned char * rsrc_data ;
@@ -64,15 +72,24 @@ typedef struct
 	int sample_size, sample_rate, channels ;
 } SD2_RSRC ;
 
+typedef struct
+{	int type ;
+	int id ;
+	char name [32] ;
+	char value [32] ;
+	int value_len ;
+} STR_RSRC ;
+
 /*------------------------------------------------------------------------------
  * Private static functions.
 */
 
 static int sd2_close	(SF_PRIVATE *psf) ;
-static int sd2_write_rsrc_fork (SF_PRIVATE *psf, int calc_length) ;
 
 static int sd2_parse_rsrc_fork (SF_PRIVATE *psf) ;
 static int parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc) ;
+
+static int sd2_write_rsrc_fork (SF_PRIVATE *psf, int calc_length) ;
 
 /*------------------------------------------------------------------------------
 ** Public functions.
@@ -82,10 +99,19 @@ int
 sd2_open (SF_PRIVATE *psf)
 {	int saved_filedes, subformat, error = 0 ;
 
+	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+		psf_open_rsrc (psf, psf->mode) ;
+
+	if (psf->rsrcdes < 0)
+	{	printf ("\n\n%s : psf->rsrcdes < 0\n\n", __func__) ;
+		return SFE_SD2_BAD_RSRC ;
+		} ;
+
 	/* SD2 is always big endian. */
 	psf->endian = SF_ENDIAN_BIG ;
 
-	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
+	/* Only supoprt SFM_READ and SFM_WRITE, not SFM_RDWR. */
+	if (psf->mode == SFM_READ || psf->mode == SFM_RDWR)
 	{	saved_filedes = psf->filedes ;
 		psf->filedes = psf->rsrcdes ;
 
@@ -100,8 +126,9 @@ sd2_open (SF_PRIVATE *psf)
 		return	SFE_BAD_OPEN_FORMAT ;
 
 	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	psf->dataoffset = 0 ;
 
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->mode == SFM_WRITE)
 	{	saved_filedes = psf->filedes ;
 		psf->filedes = psf->rsrcdes ;
 
@@ -111,7 +138,8 @@ sd2_open (SF_PRIVATE *psf)
 		if (error)
 			return error ;
 
-		psf->write_header = sd2_write_rsrc_fork ;
+		/* Not needed. */
+		psf->write_header = NULL ;
 		} ;
 
 	psf->close = sd2_close ;
@@ -125,8 +153,12 @@ sd2_open (SF_PRIVATE *psf)
 				error = pcm_init (psf) ;
 				break ;
 
-		default :	break ;
+		default :
+				error = SFE_UNIMPLEMENTED ;
+				break ;
 		} ;
+
+	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 
 	return error ;
 } /* sd2_open */
@@ -147,12 +179,163 @@ sd2_close	(SF_PRIVATE *psf)
 	return 0 ;
 } /* sd2_close */
 
+/*------------------------------------------------------------------------------
+*/
+
+static inline void
+write_char (unsigned char * data, int offset, char value)
+{	data [offset] = value ;
+} /* read_char */
+
+static inline void
+write_short (unsigned char * data, int offset, short value)
+{	((short *) (data + offset)) [0] = value ;
+} /* read_char */
+
+static inline void
+write_int (unsigned char * data, int offset, int value)
+{	((int *) (data + offset)) [0] = value ;
+} /* read_int */
+
+static void
+write_str (unsigned char * data, int offset, char * buffer, int buffer_len)
+{	memcpy (data + offset, buffer, buffer_len) ;
+} /* read_str */
+
 static int
 sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
-{
-	psf_log_printf (psf, "Writing of SD2 files not implemented yet.\n", __func__) ;
+{	SD2_RSRC rsrc ;
+	STR_RSRC str_rsrc [] =
+	{	{ RSRC_STR, 1000, "_sample-size", "", 0 },
+		{ RSRC_STR, 1001, "_sample-rate", "", 0 },
+		{ RSRC_STR, 1002, "_channels", "", 0 },
+		{ RSRC_BIN, 1000, "_Markers", "", 8 }
+		} ;
 
-	return SFE_UNIMPLEMENTED ;
+	int k, str_offset, data_offset, next_str ;
+
+	memset (&rsrc, 0, sizeof (rsrc)) ;
+
+	rsrc.sample_rate = psf->sf.samplerate ;
+	rsrc.sample_size = psf->bytewidth ;
+	rsrc.channels = psf->sf.channels ;
+
+	rsrc.rsrc_data = psf->header ;
+	rsrc.rsrc_len = sizeof (psf->header) ;
+	memset (rsrc.rsrc_data, 0xea, rsrc.rsrc_len) ;
+
+	snprintf (str_rsrc [0].value, sizeof (str_rsrc [0].value), "_%d", rsrc.sample_size) ;
+	snprintf (str_rsrc [1].value, sizeof (str_rsrc [1].value), "_%d.000000", rsrc.sample_rate) ;
+	snprintf (str_rsrc [2].value, sizeof (str_rsrc [2].value), "_%d", rsrc.channels) ;
+
+	for (k = 0 ; k < ARRAY_LEN (str_rsrc) ; k++)
+	{	if (str_rsrc [k].value_len == 0)
+		{	str_rsrc [k].value_len = strlen (str_rsrc [k].value) ;
+			str_rsrc [k].value [0] = str_rsrc [k].value_len - 1 ;
+			} ;
+
+		/* Turn name string into a pascal string. */
+		str_rsrc [k].name [0] = strlen (str_rsrc [k].name) - 1 ;
+		} ;
+
+	rsrc.data_offset = 0x100 ;
+
+	/*
+	** Calculate data length :
+	**		length of strings, plus the length of the sdML chunk.
+	*/
+	rsrc.data_length = 0 ;
+	for (k = 0 ; k < ARRAY_LEN (str_rsrc) ; k++)
+		rsrc.data_length += str_rsrc [k].value_len + 4 ;
+
+	rsrc.map_offset = rsrc.data_offset + rsrc.data_length ;
+
+	/* Very start of resource fork. */
+	write_int (rsrc.rsrc_data, 0, rsrc.data_offset) ;
+	write_int (rsrc.rsrc_data, 4, rsrc.map_offset) ;
+	write_int (rsrc.rsrc_data, 8, rsrc.data_length) ;
+
+	write_char (rsrc.rsrc_data, 0x30, strlen (psf->filename)) ;
+	write_str (rsrc.rsrc_data, 0x31, psf->filename, strlen (psf->filename)) ;
+
+	write_short (rsrc.rsrc_data, 0x50, 0) ;
+	write_int (rsrc.rsrc_data, 0x52, Sd2f_MARKER) ;
+	write_int (rsrc.rsrc_data, 0x56, lsf1_MARKER) ;
+
+	/* Very start of resource map. */
+	write_int (rsrc.rsrc_data, rsrc.map_offset + 0, rsrc.data_offset) ;
+	write_int (rsrc.rsrc_data, rsrc.map_offset + 4, rsrc.map_offset) ;
+	write_int (rsrc.rsrc_data, rsrc.map_offset + 8, rsrc.data_length) ;
+
+	/* These I don't currently understand. */
+	if (1)
+	{	write_char (rsrc.rsrc_data, rsrc.map_offset+ 16, 1) ;
+		/* Next resource map. */
+		write_int (rsrc.rsrc_data, rsrc.map_offset + 17, 0x12345678) ;
+		/* File ref number. */
+		write_short (rsrc.rsrc_data, rsrc.map_offset + 21, 0xabcd) ;
+		/* Fork attributes. */
+		write_short (rsrc.rsrc_data, rsrc.map_offset + 23, 0) ;
+		} ;
+
+	/* Resource type offset. */
+	rsrc.type_offset = rsrc.map_offset + 30 ;
+	write_short (rsrc.rsrc_data, rsrc.map_offset + 24, rsrc.type_offset - rsrc.map_offset - 2) ;
+
+	/* Type index max. */
+	rsrc.type_count = 2 ;
+	write_short (rsrc.rsrc_data, rsrc.map_offset + 28, rsrc.type_count - 1) ;
+
+	rsrc.item_offset = rsrc.type_offset + rsrc.type_count * 8 ;
+
+	rsrc.str_count = ARRAY_LEN (str_rsrc) ;
+	rsrc.string_offset = rsrc.item_offset + (rsrc.str_count + 1) * 12 - rsrc.map_offset ;
+	write_short (rsrc.rsrc_data, rsrc.map_offset + 26, rsrc.string_offset) ;
+
+	/* Write 'STR ' resource type. */
+	rsrc.str_count = 3 ;
+	write_int (rsrc.rsrc_data, rsrc.type_offset, STR_MARKER) ;
+	write_short (rsrc.rsrc_data, rsrc.type_offset + 4, rsrc.str_count - 1) ;
+	write_short (rsrc.rsrc_data, rsrc.type_offset + 6, 0x12) ;
+
+	/* Write 'sdML' resource type. */
+	write_int (rsrc.rsrc_data, rsrc.type_offset + 8, sdML_MARKER) ;
+	write_short (rsrc.rsrc_data, rsrc.type_offset + 12, 0) ;
+	write_short (rsrc.rsrc_data, rsrc.type_offset + 14, 0x36) ;
+
+	str_offset = rsrc.map_offset + rsrc.string_offset ;
+	next_str = 0 ;
+	data_offset = rsrc.data_offset ;
+	for (k = 0 ; k < ARRAY_LEN (str_rsrc) ; k++)
+	{	write_str (rsrc.rsrc_data, str_offset, str_rsrc [k].name, strlen (str_rsrc [k].name)) ;
+
+		write_short (rsrc.rsrc_data, rsrc.item_offset + k * 12, str_rsrc [k].id) ;
+		write_short (rsrc.rsrc_data, rsrc.item_offset + k * 12 + 2, next_str) ;
+
+		str_offset += strlen (str_rsrc [k].name) ;
+		next_str += strlen (str_rsrc [k].name) ;
+
+		write_int (rsrc.rsrc_data, rsrc.item_offset + k * 12 + 4, data_offset - rsrc.data_offset) ;
+
+		write_int (rsrc.rsrc_data, data_offset, str_rsrc [k].value_len) ;
+		write_str (rsrc.rsrc_data, data_offset + 4, str_rsrc [k].value, str_rsrc [k].value_len) ;
+		data_offset += 4 + str_rsrc [k].value_len ;
+		} ;
+
+	/* Finally, calculate and set map length. */
+	rsrc.map_length = str_offset - rsrc.map_offset ;
+	write_int (rsrc.rsrc_data, 12, rsrc.map_length) ;
+	write_int (rsrc.rsrc_data, rsrc.map_offset + 12, rsrc.map_length) ;
+
+	rsrc.rsrc_len = rsrc.map_offset + rsrc.map_length ;
+
+	if (psf_fwrite (rsrc.rsrc_data, rsrc.rsrc_len, 1, psf) != 1)
+	{	psf_log_printf (psf, "Writing SD2 resource fork failed.\n") ;
+	puts (psf->logbuffer) ;
+	exit (1) ;
+		}
+
+	return 0 ;
 } /* sd2_write_rsrc_fork */
 
 /*------------------------------------------------------------------------------
@@ -348,7 +531,6 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 	psf->sf.samplerate = rsrc->sample_rate ;
 	psf->sf.channels = rsrc->channels ;
 	psf->bytewidth = rsrc->sample_size ;
-	psf->dataoffset = 0 ;
 
 	switch (rsrc->sample_size)
 	{	case 1 :
