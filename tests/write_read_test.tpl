@@ -372,6 +372,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 	sf_set_string (file, SF_STR_ARTIST, "Your name here") ;
 
 	test_write_[+ (get "data_type") +]_or_die (file, 0, orig, items, __LINE__) ;
+	test_write_[+ (get "data_type") +]_or_die (file, 0, orig, items, __LINE__) ;
 
 	/* Add non-audio data after the audio. */
 	sf_set_string (file, SF_STR_COPYRIGHT, "Copyright (c) 2003") ;
@@ -390,12 +391,12 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 		exit (1) ;
 		} ;
 
-	if (sfinfo.frames < items)
+	if (sfinfo.frames < 2 * items)
 	{	printf ("\n\nLine %d : Mono : Incorrect number of frames in file (too short). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), items) ;
 		exit (1) ;
 		} ;
 
-	if (! long_file_ok && sfinfo.frames > items)
+	if (! long_file_ok && sfinfo.frames > 2 * items)
 	{	printf ("\n\nLine %d : Mono : Incorrect number of frames in file (too long). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), items) ;
 		exit (1) ;
 		} ;
@@ -433,7 +434,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 		} ;
 
 	/* Seek to offset from start of file. */
-	test_seek_or_die (file, 10, SEEK_SET, 10, sfinfo.channels, __LINE__) ;
+	test_seek_or_die (file, items + 10, SEEK_SET, items + 10, sfinfo.channels, __LINE__) ;
 
 	test_read_[+ (get "data_type") +]_or_die (file, 0, test + 10, 4, __LINE__) ;
 	for (k = 10 ; k < 14 ; k++)
@@ -443,7 +444,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 			} ;
 
 	/* Seek to offset from current position. */
-	test_seek_or_die (file, 6, SEEK_CUR, 20, sfinfo.channels, __LINE__) ;
+	test_seek_or_die (file, 6, SEEK_CUR, items + 20, sfinfo.channels, __LINE__) ;
 
 	test_read_[+ (get "data_type") +]_or_die (file, 0, test + 20, 4, __LINE__) ;
 	for (k = 20 ; k < 24 ; k++)
