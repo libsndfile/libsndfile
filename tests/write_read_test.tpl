@@ -340,7 +340,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;
 
-	gen_windowed_sine (orig_data, DATA_LENGTH, [+ (get "max_val") +]) ;
+	gen_windowed_sine_double (orig_data, DATA_LENGTH, [+ (get "max_val") +]) ;
 
 	orig = ([+ (get "data_type") +]*) orig_data ;
 	test = ([+ (get "data_type") +]*) test_data ;
@@ -601,7 +601,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 		return ;
 		} ;
 
-	gen_windowed_sine (orig_data, DATA_LENGTH, [+ (get "max_val") +]) ;
+	gen_windowed_sine_double (orig_data, DATA_LENGTH, [+ (get "max_val") +]) ;
 
 	orig = ([+ (get "data_type") +]*) orig_data ;
 	test = ([+ (get "data_type") +]*) test_data ;
