@@ -1312,14 +1312,28 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 ** The acid chunk goes a little something like this:
 **
 ** 4 bytes          'acid'
-** 4 bytes (int)     length of chunk
-** 4 bytes (int)     ???
+** 4 bytes (int)     length of chunk starting at next byte
+**
+** 4 bytes (int)     type of file:
+**        this appears to be a bit mask,however some combinations
+**        are probably impossible and/or qualified as "errors"
+**
+**        0x01 On: One Shot         Off: Loop
+**        0x02 On: Root note is Set Off: No root
+**        0x04 On: Stretch is On,   Off: Strech is OFF
+**        0x08 On: Disk Based       Off: Ram based
+**        0x10 On: ??????????       Off: ????????? (Acidizer puts that ON)
+**
 ** 2 bytes (short)      root note
-** 2 bytes (short)      ???
-** 4 bytes (float)      ???
-** 4 bytes (int)     number of beats
-** 2 bytes (short)      meter denominator
-** 2 bytes (short)      meter numerator
+**        if type 0x10 is OFF : [C,C#,(...),B] -> [0x30 to 0x3B]
+**        if type 0x10 is ON  : [C,C#,(...),B] -> [0x3C to 0x47]
+**         (both types fit on same MIDI pitch albeit different octaves, so who cares)
+**
+** 2 bytes (short)      ??? always set to 0x8000
+** 4 bytes (float)      ??? seems to be always 0
+** 4 bytes (int)        number of beats
+** 2 bytes (short)      meter numerator - always 4 in SF/ACID
+** 2 bytes (short)      meter denominator - always 4 in SF/ACID
 ** 4 bytes (float)      tempo
 **
 */
@@ -1327,26 +1341,36 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 static int
 wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 {	unsigned int bytesread = 0 ;
-	int	beats ;
+	int	beats, flags ;
 	short rootnote, q1, meter_denom, meter_numer ;
-	float q2, q3, tempo ;
+	float q2, tempo ;
 
 	chunklen += (chunklen & 1) ;
 
-	bytesread += psf_binheader_readf (psf, "e224f", &rootnote, &q1, &q2, &q3) ;
+	bytesread += psf_binheader_readf (psf, "e422f", &flags, &rootnote, &q1, &q2) ;
+
 	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%f", q2) ;
-	psf_log_printf (psf, "  Root note : %d\n  ????      : %d\n  ????      : %s\n  ????      : %d\n",
-				rootnote, q1, psf->u.cbuf, q3) ;
+
+	psf_log_printf (psf, "  Flags     : 0x%04x (%s,%s,%s,%s,%s)\n", flags,
+			(flags & 0x01) ? "OneShot" : "Loop",
+			(flags & 0x02) ? "RootNoteValid" : "RootNoteInvalid",
+			(flags & 0x04) ? "StretchOn" : "StretchOff",
+			(flags & 0x08) ? "DiskBased" : "RAMBased",
+			(flags & 0x10) ? "??On" : "??Off") ;
+
+	psf_log_printf (psf, "  Root note : 0x%x\n  ????      : 0x%04x\n  ????      : %s\n",
+				rootnote, q1, psf->u.cbuf) ;
 
 	bytesread += psf_binheader_readf (psf, "e422f", &beats, &meter_denom, &meter_numer, &tempo) ;
 	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%f", tempo) ;
 	psf_log_printf (psf, "  Beats     : %d\n  Meter     : %d/%d\n  Tempo     : %s\n",
-				beats, meter_denom, meter_numer, psf->u.cbuf) ;
+				beats, meter_numer, meter_denom, psf->u.cbuf) ;
 
 	psf_binheader_readf (psf, "j", chunklen - bytesread) ;
 
 	return 0 ;
 } /* wav_read_acid_chunk */
+
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch
