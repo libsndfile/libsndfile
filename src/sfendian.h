@@ -18,7 +18,25 @@
 
 #include "config.h"
 
-#if defined (HAVE_BYTESWAP_H)
+#if HAVE_STDINT_H
+#include <stdint.h>
+#endif
+
+#if (defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
+/* Good, we have int64_t. */
+#elif (defined  (SIZEOF_LONG_LONG) && (SIZEOF_LONG_LONG == 8))
+typedef long long int64_t ;
+#elif (defined  (SIZEOF_LONG) && (SIZEOF_LONG == 8))
+typedef long int64_t ;
+#elif (defined (WIN32) || defined (_WIN32))
+typedef __int64 int64_t ;
+#else
+#error "No 64 bit integer type."
+#endif
+
+#undef HAVE_BYTESWAP_H
+
+#if HAVE_BYTESWAP_H
 
 #include <byteswap.h>
 
@@ -29,15 +47,7 @@
 
 #define	ENDSWAP_SHORT(x)	((((x)>>8)&0xFF)+(((x)&0xFF)<<8))
 #define	ENDSWAP_INT(x)		((((x)>>24)&0xFF)+(((x)>>8)&0xFF00)+(((x)&0xFF00)<<8)+(((x)&0xFF)<<24))
-
-#endif
-
-#if defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8)
-
-#define HAVE_SF_INT64_T 1
-
-#else
-#define HAVE_SF_INT64_T 0
+	
 #endif
 
 /*
@@ -86,13 +96,6 @@
 #define BET2H_SHORT_PTR(x)		(((x) [0] << 8) + (x) [1])
 #define BET2H_INT_PTR(x)		(((x) [0] << 24) + ((x) [1] << 16) + ((x) [2] << 8))
 
-
-#if (defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
-	#define  INT_64_TYPE	int64_t
-#else
-	#define  INT_64_TYPE	void
-#endif
-
 /*-----------------------------------------------------------------------------------------------
 ** Generic functions for performing endian swapping on integer arrays.
 */
@@ -136,32 +139,32 @@ endswap_int_copy (int *dest, const int *src, int len)
 /*========================================================================================
 */
 
-#if  (0 && defined (HAVE_BYTESWAP_H) && defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
+#if	(HAVE_BYTESWAP_H && defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
 
 static inline void
-endswap_int64_array (int64_t *ptr, int len)
+endswap_int64_t_array (int64_t *ptr, int len)
 {	int64_t value ;
 
 	while (--len >= 0)
 	{	value = ptr [len] ;
 		ptr [len] = bswap_64 (value) ;
 		} ;
-} /* endswap_int64_array */
+} /* endswap_int64_t_array */
 
 static inline void
-endswap_int64_copy (int64_t *dest, const int64_t *src, int len)
+endswap_int64_t_copy (int64_t *dest, const int64_t *src, int len)
 {	int64_t value ;
 
 	while (--len >= 0)
 	{	value = src [len] ;
 		dest [len] = bswap_64 (value) ;
 		} ;
-} /* endswap_int64_copy */
+} /* endswap_int64_t_copy */
 
 #else
 
 static inline void
-endswap_int64_array (INT_64_TYPE *ptr, int len)
+endswap_int64_t_array (int64_t *ptr, int len)
 {	unsigned char *ucptr, temp ;
 
 	ucptr = (unsigned char *) ptr ;
@@ -185,12 +188,17 @@ endswap_int64_array (INT_64_TYPE *ptr, int len)
 		ucptr [3] = ucptr [4] ;
 		ucptr [4] = temp ;
 		} ;
-} /* endswap_int64_array */
+} /* endswap_int64_t_array */
 
 static inline void
-endswap_int64_copy (INT_64_TYPE *dest, const INT_64_TYPE *src, int len)
+endswap_int64_t_copy (int64_t *dest, const int64_t *src, int len)
 {	const unsigned char *psrc ;
 	unsigned char *pdest ;
+	
+	if (dest == src)
+	{	endswap_int64_t_array (dest, len) ;
+		return ;
+		} ;
 
 	psrc = ((const unsigned char *) src) + 8 * len ;
 	pdest = ((unsigned char *) dest) + 8 * len ;
@@ -207,7 +215,7 @@ endswap_int64_copy (INT_64_TYPE *dest, const INT_64_TYPE *src, int len)
 		pdest [3] = psrc [4] ;
 		pdest [5] = psrc [2] ;
 		} ;
-} /* endswap_int64_copy */
+} /* endswap_int64_t_copy */
 
 #endif
 
@@ -220,7 +228,7 @@ endswap_float_array (float *ptr, int len)
 
 static inline void
 endswap_double_array (double *ptr, int len)
-{	endswap_int64_array ((void *) ptr, len) ;
+{	endswap_int64_t_array ((void *) ptr, len) ;
 } /* endswap_double_array */
 
 static inline void
@@ -230,10 +238,8 @@ endswap_float_copy (float *dest, const float *src, int len)
 
 static inline void
 endswap_double_copy (double *dest, const double *src, int len)
-{	endswap_int64_copy ((INT_64_TYPE *) dest, (const INT_64_TYPE *) src, len) ;
+{	endswap_int64_t_copy ((int64_t *) dest, (const int64_t *) src, len) ;
 } /* endswap_double_copy */
-
-#undef INT_64_TYPE
 
 /*
 ** Do not edit or modify anything in this comment block.
