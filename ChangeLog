@@ -1,3 +1,15 @@
+2004-09-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-play.c
+    Appy patch from Conrad Parker to make Mac OSX error messages more consitent
+    and informative.
+
+    * doc/api.html
+    Fix a HTML HREF which was wrong.
+
+    * doc/win32.html
+    Add information about when nmake fails.
+
 2004-09-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-play.c

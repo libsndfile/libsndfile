@@ -514,7 +514,7 @@ macosx_play (int argc, char *argv [])
 	count = sizeof (AudioDeviceID) ;
 	if ((err = AudioHardwareGetProperty (kAudioHardwarePropertyDefaultOutputDevice,
 				&count, (void *) &(audio_data.device))) != noErr)
-	{	printf ("AudioHardwareGetProperty failed.\n") ;
+	{	printf ("AudioHardwareGetProperty (kAudioDevicePropertyDefaultOutputDevice) failed.\n") ;
 		return ;
 		} ;
 
@@ -522,7 +522,7 @@ macosx_play (int argc, char *argv [])
 	count = sizeof (UInt32) ;
 	if ((err = AudioDeviceGetProperty (audio_data.device, 0, false, kAudioDevicePropertyBufferSize,
 				&count, &buffer_size)) != noErr)
-	{	printf ("AudioDeviceGetProperty (AudioDeviceGetProperty) failed.\n") ;
+	{	printf ("AudioDeviceGetProperty (kAudioDevicePropertyBufferSize) failed.\n") ;
 		return ;
 		} ;
 
