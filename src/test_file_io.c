@@ -34,6 +34,7 @@ static void make_data (int *data, int len, int seed) ;
 
 static void file_open_test (const char *filename) ;
 static void file_read_write_test (const char *filename) ;
+static void file_truncate_test (const char *filename) ;
 
 static void test_open_or_die (SF_PRIVATE *psf, int linenum) ;
 static void test_close_or_die (SF_PRIVATE *psf, int linenum) ;
@@ -51,6 +52,7 @@ main (void)
 
 	file_open_test	(filename) ;
 	file_read_write_test	(filename) ;
+	file_truncate_test (filename) ;
 
 	unlink (filename) ;
 
@@ -274,6 +276,69 @@ file_read_write_test (const char *filename)
 	puts ("ok") ;
 } /* file_read_write_test */
 
+static void
+file_truncate_test (const char *filename)
+{	SF_PRIVATE sf_data, *psf ;
+	char buffer [256] ;
+	int k ;
+
+	/*
+	** Open a new file and write two blocks of data to the file. After each
+	** write, test that psf_get_filelen() returns the new length.
+	*/
+
+	printf ("    %-24s : ", "file_truncate_test") ;
+	fflush (stdout) ;
+
+	memset (&sf_data, 0, sizeof (sf_data)) ;
+	memset (buffer, 0xEE, sizeof (buffer)) ;
+
+	psf = &sf_data ;
+	strncpy (psf->filename, filename, sizeof (psf->filename)) ;
+
+	/*
+	** Open the file write mode, write 0xEE data and then extend the file
+	** using truncate (the extended data should be 0x00).
+	*/
+	psf->mode = SFM_WRITE ;
+	test_open_or_die (psf, __LINE__) ;
+	test_write_or_die (psf, buffer, sizeof (buffer) / 2, 1, sizeof (buffer) / 2, __LINE__) ;
+	psf_ftruncate (psf, sizeof (buffer)) ;
+	test_close_or_die (psf, __LINE__) ;
+
+	/* Open the file in read mode and check the data. */
+	psf->mode = SFM_READ ;
+	test_open_or_die (psf, __LINE__) ;
+	test_read_or_die (psf, buffer, sizeof (buffer), 1, sizeof (buffer), __LINE__) ;
+	test_close_or_die (psf, __LINE__) ;
+
+	for (k = 0 ; k < SIGNED_SIZEOF (buffer) / 2 ; k++)
+		if (buffer [k] != 0xEE)
+		{	printf ("\n\nError : buffer [%d] = %d (should be 0xEE)\n\n", k, buffer [k]) ;
+			exit (1) ;
+			} ;
+
+	for (k = SIGNED_SIZEOF (buffer) / 2 ; k < SIGNED_SIZEOF (buffer) ; k++)
+		if (buffer [k] != 0)
+		{	printf ("\n\nError : buffer [%d] = %d (should be 0)\n\n", k, buffer [k]) ;
+			exit (1) ;
+			} ;
+
+	/* Open the file in read/write and shorten the file using truncate. */
+	psf->mode = SFM_RDWR ;
+	test_open_or_die (psf, __LINE__) ;
+	psf_ftruncate (psf, sizeof (buffer) / 4) ;
+	test_close_or_die (psf, __LINE__) ;
+
+	/* Check the file length. */
+	psf->mode = SFM_READ ;
+	test_open_or_die (psf, __LINE__) ;
+	test_seek_or_die (psf, 0, SEEK_END, SIGNED_SIZEOF (buffer) / 4, __LINE__) ;
+	test_close_or_die (psf, __LINE__) ;
+
+	puts ("ok") ;
+} /* file_truncate_test */
+
 /*==============================================================================
 ** Testing helper functions.
 */
@@ -376,7 +441,7 @@ make_data (int *data, int len, int seed)
 } /* make_data */
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 0a21fb93-78dd-4f72-8338-4bca9e77b8c8
