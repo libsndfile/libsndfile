@@ -47,7 +47,7 @@ install tla") you can do:
 <!-- pepper -->
 <PRE>
 	tla register-archive http://www.mega-nerd.com/Arch/2004/
-	tla get erikd@mega-nerd.com/libsndfile--hack--0 libsndfile
+	tla get erikd@mega-nerd.com--2004/libsndfile--hack--0 libsndfile
 	cd libsndfile
 	./reconfigure.mk
 </PRE>
@@ -55,6 +55,9 @@ install tla") you can do:
 <P>
 to get a copy of whats currently in the public archive and configure it ready
 for building.
+Some later versions of aclocal (I see this with 1.9.4) may spew out a bunch
+of warning messages about underquoted defintions in AC_WHATEVER, but these
+can safely be ignored.
 </P>
 <P>
 To build and check it:
