@@ -18,7 +18,7 @@ sndfile_info_SOURCES = sndfile-info.c
 sndfile_info_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 sndfile_play_SOURCES = sndfile-play.c 
-sndfile_play_LDADD = $(SNDFILEDIR)/libsndfile.la $(OS_SPECIFIC_LINKS)
+sndfile_play_LDADD = $(SNDFILEDIR)/libsndfile.la $(OS_SPECIFIC_LINKS) $(ALSA_LIBS)
 
 sndfile_convert_SOURCES = sndfile-convert.c 
 sndfile_convert_LDADD = $(SNDFILEDIR)/libsndfile.la
