@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 config.status: configure
-	./configure
+	./configure --enable-gcc-werror
 
 configure: configure.ac aclocal.m4 Makefile.am src/config.h.in libtool ltmain.sh
 	automake --copy --add-missing
