@@ -115,7 +115,7 @@ string_test (const char *filename, int typemajor)
 
 	frames = BUFFER_LEN / sfinfo.channels ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 
 	/* Write stuff at start of file. */
 	sf_set_string (file, SF_STR_TITLE, filename) ;
@@ -133,7 +133,7 @@ string_test (const char *filename, int typemajor)
 
 	sf_close (file) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 
 	check_log_buffer_or_die (file, __LINE__) ;
 

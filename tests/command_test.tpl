@@ -469,13 +469,13 @@ calc_peak_test (int filetype, const char *filename)
 	for (k = 0 ; k < BUFFER_LEN ; k++)
 		double_data [k] = (k + 1) / (2.0 * BUFFER_LEN) ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 
 	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
 
 	sf_close (file) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 
 	if (sfinfo.format != format)
 	{	printf ("Line %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, format, sfinfo.format) ;
@@ -516,13 +516,13 @@ calc_peak_test (int filetype, const char *filename)
 	for (k = 0 ; k < BUFFER_LEN ; k++)
 		double_data [k] = (k + 1) / (2.0 * BUFFER_LEN) ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 
 	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
 
 	sf_close (file) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 
 	if (sfinfo.format != format)
 	{	printf ("Line %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, format, sfinfo.format) ;
@@ -573,7 +573,7 @@ truncate_test (const char *filename, int filetype)
 
 	int_data = (int*) double_data ;
 
-	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__) ;
 
 	test_write_int_or_die (file, 0, int_data, BUFFER_LEN, __LINE__) ;
 

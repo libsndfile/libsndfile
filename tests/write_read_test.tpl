@@ -488,7 +488,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= format ;
 
-	if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW)
+	if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW || (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
 		unlink (filename) ;
 	else
 	{	/* Create a short file. */

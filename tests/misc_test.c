@@ -200,13 +200,13 @@ zero_data_test (const char *filename, int typemajor)
 
 	frames = BUFFER_LEN / sfinfo.channels ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 
 	sf_close (file) ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 
 	sf_close (file) ;
 

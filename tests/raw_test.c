@@ -71,7 +71,7 @@ raw_offset_test (const char *filename, int typeminor)
 
 	frames = BUFFER_LEN / sfinfo.channels ;
 
-	sndfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, __LINE__) ;
+	sndfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__) ;
 
 	start = 0 ;
 	sf_command (sndfile, SFC_FILE_TRUNCATE, &start, sizeof (start)) ;
@@ -82,7 +82,7 @@ raw_offset_test (const char *filename, int typeminor)
 
 	sf_close (sndfile) ;
 
-	sndfile = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+	sndfile = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 	check_log_buffer_or_die (sndfile, __LINE__) ;
 
 	if (abs (BUFFER_LEN - sfinfo.frames) > 1)

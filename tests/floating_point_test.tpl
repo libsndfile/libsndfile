@@ -188,7 +188,7 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 
 	test_write_float_or_die (file, 0, float_orig, DFT_DATA_LENGTH, __LINE__) ;
@@ -197,7 +197,7 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 
 	memset (float_test, 0, sizeof (float_test)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 
 	if (sfinfo.format != filetype)
@@ -249,7 +249,7 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 
 	test_write_double_or_die (file, 0, double_data, DFT_DATA_LENGTH, __LINE__) ;
@@ -258,7 +258,7 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 
 	memset (test_data, 0, sizeof (test_data)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 
 	if (sfinfo.format != filetype)
@@ -312,11 +312,11 @@ static void
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= [+ (get "end_type") +] | SF_FORMAT_AU | [+ (get "minor_type") +] ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 	test_write_[+ (get "float_name") +]_or_die (file, 0, [+ (get "float_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), __LINE__) ;
 	sf_close (file) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 
 	if (sfinfo.frames != ARRAY_LEN ([+ (get "float_name") +]_data))
 	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), DFT_DATA_LENGTH) ;

@@ -135,7 +135,7 @@ pipe_read_test (int filetype, const char *ext)
 	for (k = 0 ; k < PIPE_TEST_LEN ; k++)
 		data [k] = PIPE_INDEX (k) ;
 
-	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 	test_writef_short_or_die (outfile, 0, data, PIPE_TEST_LEN, __LINE__) ;
 	sf_close (outfile) ;
 
@@ -334,7 +334,7 @@ pipe_test_others (FILETYPE* list1, FILETYPE* list2)
 			sfinfo.channels = 1 ;
 			sfinfo.samplerate = 44100 ;
 
-			outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+			outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 			test_writef_short_or_die (outfile, 0, data, PIPE_TEST_LEN, __LINE__) ;
 			sf_close (outfile) ;
 
