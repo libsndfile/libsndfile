@@ -13,7 +13,7 @@ EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 
 noinst_HEADERS = common.h sfendian.h float_cast.h wav_w64.h au.h sf_unistd.h
 
-noinst_PROGRAMS = test_file_io test_log_printf
+noinst_PROGRAMS = test_endswap test_file_io test_log_printf
 
 COMMON = sndfile.c common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
