@@ -225,6 +225,8 @@ static void	copy_filename (SF_PRIVATE *psf, const char *path) ;
 static int	psf_close (SF_PRIVATE *psf) ;
 static int	psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo) ;
 
+static int	try_resource_fork (SF_PRIVATE * psf, const char * pathname) ;
+
 /*------------------------------------------------------------------------------
 ** Private (static) variables.
 */
@@ -1921,6 +1923,42 @@ sf_writef_double	(SNDFILE *sndfile, double *ptr, sf_count_t frames)
 */
 
 static int
+try_resource_fork (SF_PRIVATE * psf, const char * pathname)
+{
+	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
+	LSF_SNPRINTF (psf->rsrcname, sizeof (psf->rsrcname), "%s/rsrc", pathname) ;
+
+	if (psf_open_rsrc (psf, psf->rsrcname, SFM_READ) != 0)
+	{	/* Now try for re a resource fork stored as a separate file. */
+		char *fname ;
+
+		/* Grab the un-adulterated filename again. */
+		LSF_SNPRINTF (psf->rsrcname, sizeof (psf->rsrcname), "%s", pathname) ;
+
+		if ((fname = strrchr (psf->rsrcname, '/')) != NULL)
+			fname ++ ;
+		else if ((fname = strrchr (psf->rsrcname, '\\')) != NULL)
+			fname ++ ;
+		else
+			fname = psf->rsrcname ;
+
+		memmove (fname + 2, fname, strlen (fname) + 1) ;
+		fname [0] = '.' ;
+		fname [1] = '_' ;
+
+		if (psf_open_rsrc (psf, psf->rsrcname, SFM_READ) != 0)
+		{	memset (psf->rsrcname, 0, sizeof (psf->rsrcname)) ;
+			return 0 ;
+			} ;
+		} ;
+
+	/* More checking here. */
+	psf_log_printf (psf, "Resource fork : %s\n", psf->rsrcname) ;
+
+	return SF_FORMAT_SD2 ;
+} /* try_resource_fork */
+
+static int
 format_from_extension (const char *filename)
 {	char *cptr ;
 	char buffer [16] ;
@@ -1960,9 +1998,8 @@ format_from_extension (const char *filename)
 } /* format_from_extension */
 
 static int
-guess_file_type (SF_PRIVATE *psf, const char *filename)
-{	int 			buffer [3], format ;
-	unsigned char	cptr [0x40] ;
+guess_file_type (SF_PRIVATE *psf, const char *pathname)
+{	int buffer [3], format ;
 
 	if (psf_binheader_readf (psf, "b", &buffer, SIGNED_SIZEOF (buffer)) != SIGNED_SIZEOF (buffer))
 	{	psf->error = SFE_BAD_FILE_READ ;
@@ -2060,24 +2097,12 @@ guess_file_type (SF_PRIVATE *psf, const char *filename)
 	if (buffer [0] == MAKE_MARKER ('2', 'B', 'I', 'T'))
 		return SF_FORMAT_AVR ;
 
-	if (OS_IS_MACOSX && (format = macos_guess_file_type (psf, filename)) != 0)
+	/* This must be the second last one. */
+	if (psf->filelength > 0 && (format = try_resource_fork (psf, pathname)) != 0)
 		return format ;
 
-	/*	Detect wacky MacOS header stuff. This might be "Sound Designer II". */
-	memcpy (cptr , buffer, sizeof (buffer)) ;
-	if (cptr [0] == 0 && cptr [1] > 0 && psf->sf.seekable)
-	{	psf_binheader_readf (psf, "pb", 0, &cptr, SIGNED_SIZEOF (cptr)) ;
-
-		if (cptr [1] < (sizeof (cptr) - 3) && cptr [cptr [1] + 2] == 0 && strlen (((char*) cptr) + 2) == cptr [1])
-		{	psf_log_printf (psf, "Weird MacOS Header.\n") ;
-			psf_binheader_readf (psf, "em", &buffer) ;
-			if (buffer [0] == MAKE_MARKER (0, 'S', 'd', '2'))
-				return SF_FORMAT_SD2 ;
-			} ;
-		} ;
-
 	/* This must be the last one. */
-	if ((format = format_from_extension (filename)) != 0)
+	if ((format = format_from_extension (pathname)) != 0)
 		return format ;
 
 	/* Default to header-less RAW PCM file type. */
