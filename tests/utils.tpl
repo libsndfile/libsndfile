@@ -399,7 +399,7 @@ test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allo
 				exit (1) ;
 		} ;
 
-#if (defined (__CYGWIN__) || defined (WIN32) || defined (_WIN32))
+#if (defined (WIN32) || defined (_WIN32))
 	/* Stupid fscking windows. */
 	oflags |= O_BINARY ;
 #endif

@@ -437,11 +437,6 @@ psf_get_filelen_fd (int fd)
 	if (sizeof (statbuf.st_size) == 4 && sizeof (sf_count_t) == 8)
 		return (sf_count_t) -SFE_BAD_STAT_SIZE ;
 
-/* Cygwin seems to need this. */
-#if (defined (__CYGWIN__) && HAVE_FSYNC)
-	fsync (psf->filedes) ;
-#endif
-
 	if (fstat (fd, &statbuf) == -1)
 		return (sf_count_t) -1 ;
 
@@ -507,7 +502,7 @@ psf_open_fd (const char * pathname, int open_mode)
 				break ;
 		} ;
 
-#if defined (__CYGWIN__)
+#if OS_IS_WIN32
 	oflag |= O_BINARY ;
 #endif
 
