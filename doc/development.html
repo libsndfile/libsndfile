@@ -23,53 +23,40 @@ where most of the discussion about new features takes place.
 <!-- pepper -->
 <P>
 libsndfile is being developed using the
-	<A HREF="http://bazaar-vcs.org/">Bzr</A>
+	<A HREF="http://www.gnu.org/software/gnu-arch/">Gnu Arch</A>
 revision control system which is especially well suited to distributed
 development.
-In most respects, Bzr is significantly better than most other revision
+In most respects, Arch is significantly better than most other revision
 control systems.
-It is even available for windows, but I (Erik) have not personally used 
-it on windows.
+One of the few places it is lacking is support for windows.
+There is a native windows binary, but it has significant problems due
+to limitations on path name lengths in the windows.
+There is also a Cygwin binary available, but I have not tried it.
 </P>
 <!-- pepper -->
 <P>
 The main archive archive can be found at:
-<A HREF="http://www.mega-nerd.com/Bzr/libsndfile-mdev/">
-			http://www.mega-nerd.com/Bzr/libsndfile-mdev/</A>
+<A HREF="http://www.mega-nerd.com/Arch/2004/">
+			http://www.mega-nerd.com/Arch/2004/</A>
 </P>
 <!-- pepper -->
 <P>
-Assuming that you have Bzr installed (on Debian GNU/Linux "apt-get install bzr") 
-you can do:
+Assuming that you have the Gnu Arch client installed (on Debian GNU/Linux "apt-get
+install tla") you can do:
 </P>
 <!-- pepper -->
 <PRE>
-	bzr get http://www.mega-nerd.com/Bzr/libsndfile-mdev/
-</PRE>
-<!-- pepper -->
-<P>
-to retreive a copy of whats currently in the public archive.
-To configure, build and verify the build you can do:
-</P>
-<!-- pepper -->
-<PRE>
+	tla register-archive http://www.mega-nerd.com/Arch/2004/
+	tla get erikd@mega-nerd.com/libsndfile--hack--0 libsndfile
 	./reconfigure.mk
-	./configure
-	make
-	make check
 </PRE>
 <!-- pepper -->
-
 <P>
-During the configuration stage, some later versions of aclocal (I see this 
-with 1.9.X) may spew out a bunch of warning messages about underquoted 
-defintions in AC_WHATEVER, but these can safely be ignored.
+to get a copy of whats currently in the public archive and configure it ready
+for building.
 </P>
-<P>
-In order to build the sources from the Bzr archive, you will need the
-Python interpreter and GNU Autogen which is  available
-	<A HREF="http://autogen.sf.net">here</A>.
-</P>
+<!-- pepper -->
+<BR>
 <!-- pepper -->
 </BODY>
 </HTML>
