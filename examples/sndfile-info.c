@@ -81,6 +81,41 @@ get_signal_max (SNDFILE *file)
 	return max ;
 } /* get_signal_max */
 
+static double
+calc_decibels (SF_INFO * sfinfo, double max)
+{	double decibels ;
+
+	switch (sfinfo->format & SF_FORMAT_SUBMASK)
+	{	case SF_FORMAT_PCM_U8 :
+		case SF_FORMAT_PCM_S8 :
+			decibels = max / 0x80 ;
+			break ;
+
+		case SF_FORMAT_PCM_16 :
+			decibels = max / 0x8000 ;
+			break ;
+
+		case SF_FORMAT_PCM_24 :
+			decibels = max / 0x800000 ;
+			break ;
+
+		case SF_FORMAT_PCM_32 :
+			decibels = max / 0x80000000 ;
+			break ;
+
+		case SF_FORMAT_FLOAT :
+		case SF_FORMAT_DOUBLE :
+			decibels = max / 1.0 ;
+			break ;
+
+		default :
+			decibels = max / 0x8000 ;
+			break ;
+		} ;
+
+	return 20.0 * log10 (decibels) ;
+} /* calc_decibels */
+
 static const char *
 generate_duration_str (SF_INFO *sfinfo)
 {	static char str [128] ;
@@ -96,7 +131,7 @@ generate_duration_str (SF_INFO *sfinfo)
 		return "unknown" ;
 
 	seconds = sfinfo->frames / sfinfo->samplerate ;
-	
+
 	snprintf (str, sizeof (str) - 1, "%02d:", seconds / 60 / 60) ;
 
 	seconds = seconds % (60 * 60) ;
@@ -118,6 +153,7 @@ main (int argc, char *argv[])
 	SNDFILE	 	*infile ;
 	SF_INFO	 	sfinfo ;
 	int			k ;
+	double		signal_max, decibels ;
 
 	progname = strrchr (argv [0], '/') ;
 	progname = progname ? progname + 1 : argv [0] ;
@@ -141,9 +177,6 @@ main (int argc, char *argv[])
 
 		infile = sf_open (infilename, SFM_READ, &sfinfo) ;
 
-/*-if (sfinfo.format != (SF_FORMAT_AIFF | SF_FORMAT_IMA_ADPCM))
-{	puts ("Temporary check : Not SF_FORMAT_AIFF | SF_FORMAT_IMA_ADPCM.\n") ; /+*-exit (1) ;-*+/ }
--*/
 		printf ("========================================\n") ;
 		sf_command (infile, SFC_GET_LOG_INFO, strbuffer, BUFFER_LEN) ;
 		puts (strbuffer) ;
@@ -168,7 +201,9 @@ main (int argc, char *argv[])
 			printf ("Duration    : %s\n", generate_duration_str (&sfinfo)) ;
 
 			/* Do not use sf_signal_max because it doesn work for non-seekable files . */
-			printf ("Signal Max  : %g\n\n", get_signal_max (infile)) ;
+			signal_max = get_signal_max (infile) ;
+			decibels = calc_decibels (&sfinfo, signal_max) ;
+			printf ("Signal Max  : %g (%4.2f dB)\n\n", signal_max, decibels) ;
 			} ;
 
 		sf_close (infile) ;
@@ -179,7 +214,7 @@ main (int argc, char *argv[])
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: f59a05db-a182-41de-aedd-d717ce2bb099
