@@ -48,8 +48,7 @@
 	#include <sys/ioctl.h>
 	#include <sys/audioio.h>
 
-#elif (defined (_WIN32) || defined (WIN32)) && HAVE_MMREG_H
-	#define WIN32_WITH_MMREG_H 1
+#elif (OS_IS_WIN32 == 1)
 	#include <windows.h>
 	#include <mmsystem.h>
 	#include <mmreg.h>
@@ -593,7 +592,7 @@ macosx_play (int argc, char *argv [])
 **  point to data instead of short*. It plain sucks!
 */
 
-#if WIN32_WITH_MMREG_H
+#if (OS_IS_WIN32 == 1)
 
 #define	WIN32_BUFFER_LEN	(1<<15)
 
@@ -849,7 +848,7 @@ main (int argc, char *argv [])
 	if (argc < 2)
 	{	
 		printf ("\nUsage : %s <input sound file>\n\n", argv [0]) ;
-#if WIN32_WITH_MMREG_H
+#if (OS_IS_WIN32 == 1)
 		printf ("This is a Unix style command line application which\n"
 				"should be run in a MSDOS box or Command Shell window.\n\n") ;
 		printf ("Sleeping for 5 seconds before exiting.\n\n") ;
@@ -875,7 +874,7 @@ main (int argc, char *argv [])
 	macosx_play (argc, argv) ;
 #elif (defined (sun) && defined (unix))
 	solaris_play (argc, argv) ;
-#elif WIN32_WITH_MMREG_H
+#elif (OS_IS_WIN32 == 1)
 	win32_play (argc, argv) ;
 #elif defined (__BEOS__)
 	printf ("This program cannot be compiled on BeOS.\n") ;
