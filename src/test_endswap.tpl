@@ -78,15 +78,15 @@ test_endswap_[+ (get "name") +] (void)
 
 	if (memcmp (orig, first, sizeof (orig)) == 0)
 	{	printf ("\n\nLine %d : test 1 : these two array should not be the same:\n\n", __LINE__) ;
-		dump_[+ (get "name") +]_array ("orig", orig, ARRAY_LEN (orig));
-		dump_[+ (get "name") +]_array ("first", first, ARRAY_LEN (first));
+		dump_[+ (get "name") +]_array ("orig", orig, ARRAY_LEN (orig)) ;
+		dump_[+ (get "name") +]_array ("first", first, ARRAY_LEN (first)) ;
 		exit (1) ;
 		} ;
 
 	if (memcmp (orig, second, sizeof (orig)) != 0)
 	{	printf ("\n\nLine %d : test 2 : these two array should be the same:\n\n", __LINE__) ;
-		dump_[+ (get "name") +]_array ("orig", orig, ARRAY_LEN (orig));
-		dump_[+ (get "name") +]_array ("second", second, ARRAY_LEN (second));
+		dump_[+ (get "name") +]_array ("orig", orig, ARRAY_LEN (orig)) ;
+		dump_[+ (get "name") +]_array ("second", second, ARRAY_LEN (second)) ;
 		exit (1) ;
 		} ;
 
@@ -94,8 +94,8 @@ test_endswap_[+ (get "name") +] (void)
 
 	if (memcmp (orig, first, sizeof (orig)) != 0)
 	{	printf ("\n\nLine %d : test 3 : these two array should be the same:\n\n", __LINE__) ;
-		dump_[+ (get "name") +]_array ("orig", orig, ARRAY_LEN (orig));
-		dump_[+ (get "name") +]_array ("first", first, ARRAY_LEN (first));
+		dump_[+ (get "name") +]_array ("orig", orig, ARRAY_LEN (orig)) ;
+		dump_[+ (get "name") +]_array ("first", first, ARRAY_LEN (first)) ;
 		exit (1) ;
 		} ;
 
@@ -104,8 +104,8 @@ test_endswap_[+ (get "name") +] (void)
 
 	if (memcmp (orig, first, sizeof (orig)) != 0)
 	{	printf ("\n\nLine %d : test 4 : these two array should be the same:\n\n", __LINE__) ;
-		dump_[+ (get "name") +]_array ("orig", orig, ARRAY_LEN (orig));
-		dump_[+ (get "name") +]_array ("first", first, ARRAY_LEN (first));
+		dump_[+ (get "name") +]_array ("orig", orig, ARRAY_LEN (orig)) ;
+		dump_[+ (get "name") +]_array ("first", first, ARRAY_LEN (first)) ;
 		exit (1) ;
 		} ;
 
