@@ -384,12 +384,6 @@ float32_peak_update	(SF_PRIVATE *psf, float *buffer, int count, int indx)
 	int		k, position ;
 	float	fmaxval ;
 
-if (psf->pchunk == NULL)
-{
-	printf ("%s : psf->pchunk == NULL.\n", __func__);
-	exit (1);
-}
-
 	for (chan = 0 ; chan < psf->sf.channels ; chan++)
 	{	fmaxval = fabs (buffer [chan]) ;
 		position = 0 ;
