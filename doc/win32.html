@@ -14,6 +14,77 @@
 <H1><BR>Building libsndfile on Win32</H1>
 
 <P>
+There are currently two ways of building libsndfile under Win32:
+</P>
+<UL>
+	<LI> Using the free <A HREF="#MinGW">MinGW</A> tools.
+	<LI> Using Microsoft's own <A HREF="#MSVC">Visual C++</A> tools.
+</UL>
+
+<P>
+The free MinGW tools are the preferred option because they are a free (as in
+beer and speech), easily obtainable and much closer the the Linux/GCC
+environment on which libsndfile is developed.
+At some time in the near future I intend to drop support for Microsoft's
+tools.
+Yes, I know there is now a free (as in beer, but not as in speech) version
+of Microsoft's tools, but I believe that the only reason Microsoft released
+these free tools was because of the growing popularity of the MinGW tools.
+</P>
+
+<A NAME="MinGW"></A>
+<H2><BR>Building libsndfile using MinGW.</H1>
+<P>
+The MinGW tools are available from <A HREF="http://www.mingw.org/">
+http://www.mingw.org/</A>.
+The files you will need will be named something like:
+</P>
+<UL>
+	<LI> msysDTK-1.0.1.exe
+	<LI> MSYS-1.0.10.exe
+	<LI> gcc-core-3.3.1-20030804-1.tar.gz
+	<LI> gcc-g++-3.3.1-20030804-1.tar.gz 
+	<LI> binutils-2.13.90-20030111-1.tar.gz
+	<LI> mingw-runtime-3.2.tar.gz
+	<LI> w32api-2.5.tar.gz
+</UL>
+
+<P>
+They should be installed using the directions on the MinGW site.
+I know the instructions aren't great, but I don't have the time or expertise
+to write better ones.
+</P>
+
+<P>
+Once you have the tools installed you will get an icon named <B>MSYS</B> on
+your desktop.
+Clicking on that icon will bring up something that looks a little like an
+xterm.
+</P>
+
+<P>
+Assuming that you have downloaded the <B>.tar.gz</B> file into the 
+<B>C:\temp\</B> directory you should now be able to execute the following
+commands:
+</P>
+
+<PRE>
+		tar zxf /c/temp/libsndfile.X.Y.Z.tar.gz
+		cd libsndfile-X.Y.Z
+		./configure
+		make
+		make check
+</PRE>
+
+<P>
+which will result in ????????????????????
+</P>
+
+<!--===========================================================================-->
+
+<A NAME="MSVC"></A>
+<H2><BR>Building libsndfile using MSVC++ 6.</H1>
+<P>
 For Win32 there is a Microsoft Visual C++ compatible makefile in the <B>Win32\</B>
 directory of the distribution. Building the libsndfile DLL on Win32 involves 
 the following:
@@ -75,6 +146,7 @@ If you are using some other method to compile the libsndfile DLL you are on your
 <!-- pepper -->
 <!-- pepper -->
 <!-- pepper -->
+
 </BODY>
 </HTML>
 

@@ -3,6 +3,9 @@
     * doc/command.html
     Fix minor error. Thanks to Simon Burton.
 
+	* doc/win32.html
+    Started adding instructions for compiling libsndfile under MinGW.
+
 2004-04-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
