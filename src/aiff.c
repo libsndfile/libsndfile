@@ -509,10 +509,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					dword += (dword & 1) ;
 					if (dword == 0)
 						break ;
+					dword -= 2 ;
 
 					for (k = 0 ; k < count ; k++)
-					{	psf_binheader_readf (psf, "E422", &timestamp, &id, &len) ;
-
+					{	dword -= psf_binheader_readf (psf, "E422", &timestamp, &id, &len) ;
 						psf_log_printf (psf, "   time   : 0x%x\n   marker : %x\n   length : %d\n", timestamp, id, len) ;
 
 						if (len + 1 > SIGNED_SIZEOF (psf->u.scbuf))
@@ -521,10 +521,13 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 							} ;
 
 						cptr = psf->u.scbuf ;
-						psf_binheader_readf (psf, "b", cptr, len) ;
+						dword -= psf_binheader_readf (psf, "b", cptr, len) ;
 						cptr [len] = 0 ;
 						psf_log_printf (psf, "   string : %s\n", cptr) ;
 						} ;
+
+					if (dword > 0)
+						psf_binheader_readf (psf, "j", dword) ;
 					} ;
 					break ;
 
