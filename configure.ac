@@ -3,9 +3,20 @@
 dnl Require autoconf version
 AC_PREREQ(2.53)
 
-AC_INIT(libsndfile,1.0.11,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.12pre1,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
+
+if test "x$target_os" = "xcygwin" ; then
+	echo
+	echo "** Compiling libsndfile under Cygwin is unlikely to work."
+	echo "** However, compiling under MinGW is known to work and significant"
+	echo "** effort goes into maintaining the MinGW build."
+	echo "** Please use MinGW instead."
+	echo
+	AC_MSG_ERROR([[Cannot continue.]])
+	fi
+
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
 AM_CONFIG_HEADER(src/config.h)
 
@@ -25,7 +36,7 @@ AM_CONFIG_HEADER(src/config.h)
 #  6. If any interfaces have been removed since the last public release, then set age
 #     to 0.
 
-SHARED_VERSION_INFO="1:11:0"
+SHARED_VERSION_INFO="1:12:0"
 
 AC_PROG_CC
 AM_PROG_LIBTOOL
