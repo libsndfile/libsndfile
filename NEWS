@@ -1,5 +1,5 @@
 Version 1.0.9 (2004-03-30)
-  * Add handling of AVR (Audio Visual Resaerch) files.
+  * Add handling of AVR (Audio Visual Research) files.
   * Improve handling of WAVEFORMATEXTENSIBLE WAV files.
   * Fix for using pipes on Win32.
 
