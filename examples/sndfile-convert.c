@@ -295,7 +295,7 @@ copy_metadata (SNDFILE *outfile, SNDFILE *infile)
 {	const char *str ;
 	int k, err = 0 ;
 
-	for (k = SF_STR_FIRST ; k <= SF_STR_FIRST ; k++)
+	for (k = SF_STR_FIRST ; k <= SF_STR_LAST ; k++)
 	{	str = sf_get_string (infile, k) ;
 		if (str != NULL)
 			err = sf_set_string (outfile, k, str) ;
