@@ -94,6 +94,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_STR_NO_ADD_END		, "Error : file type does not support strings added at end of file." },
 	{	SFE_STR_BAD_STRING		, "Error : bad string." },
 	{	SFE_STR_WEIRD			, "Error : Weird string error." },
+	{	SFE_RDWR_BAD_HEADER		, "Error : Cannot open file in read/write mode due to string data in header." },
 
 	{	SFE_WAV_NO_RIFF			, "Error in WAV file. No 'RIFF' chunk marker." },
 	{	SFE_WAV_NO_WAVE			, "Error in WAV file. No 'WAVE' chunk marker." },
