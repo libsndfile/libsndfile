@@ -4,6 +4,9 @@
     Integrate code supplied by David Viens for supporting microsoft's
     WAVEFORMATEXTENSIBLE stuff. Thanks David for supplying this.
 
+    * configure.ac
+    Bump version to 1.0.9.
+
 2004-03-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/command.c src/sndfile.c src/sndfile.h.in src/wav.c
