@@ -3,8 +3,8 @@
 noinst_PROGRAMS = sfversion floating_point_test write_read_test \
 	lossy_comp_test error_test ulaw_test alaw_test dwvw_test \
 	peak_chunk_test command_test stdin_test stdout_test stdio_test \
-	pcm_test headerless_test pipe_test benchmark misc_test raw_test \
-	string_test open_fail_test multi_file_test dither_test \
+	pcm_test headerless_test pipe_test benchmark header_test misc_test \
+	raw_test string_test open_fail_test multi_file_test dither_test \
 	scale_clip_test win32_test fix_this aiff_rw_test
 
 SNDFILEDIR = ../src
@@ -13,6 +13,7 @@ noinst_HEADERS = dft_cmp.h utils.h
 
 autogen_sources = write_read_test.tpl write_read_test.def	\
 					pcm_test.tpl pcm_test.def				\
+					header_test.tpl header_test.def			\
 					utils.tpl utils.def						\
 					command_test.tpl command_test.def		\
 					scale_clip_test.tpl scale_clip_test.def	\
@@ -71,6 +72,9 @@ pipe_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 benchmark_SOURCES = benchmark.c
 benchmark_LDADD = $(SNDFILEDIR)/libsndfile.la
 
+header_test_SOURCES = header_test.c utils.c
+header_test_LDADD = $(SNDFILEDIR)/libsndfile.la
+
 misc_test_SOURCES = misc_test.c utils.c
 misc_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
@@ -114,6 +118,9 @@ write_read_test.c: write_read_test.def write_read_test.tpl
 pcm_test.c: pcm_test.def pcm_test.tpl
 	autogen --writable --source-time pcm_test.def
 
+header_test.c: header_test.def header_test.tpl
+	autogen --writable --source-time header_test.def
+
 utils.c: utils.def utils.tpl
 	autogen --writable --source-time utils.def
 
@@ -155,7 +162,7 @@ generic-tests : error_test$(EXEEXT) ulaw_test$(EXEEXT) alaw_test$(EXEEXT) comman
 	@echo "  `./sfversion$(EXEEXT)` passed common tests."
 	@echo "----------------------------------------------------------------------"
 
-wav-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) peak_chunk_test$(EXEEXT) misc_test$(EXEEXT) multi_file_test$(EXEEXT)
+wav-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) peak_chunk_test$(EXEEXT) header_test$(EXEEXT) misc_test$(EXEEXT) multi_file_test$(EXEEXT)
 	./write_read_test$(EXEEXT) wav
 	./lossy_comp_test$(EXEEXT) wav_ima
 	./lossy_comp_test$(EXEEXT) wav_msadpcm
@@ -163,6 +170,7 @@ wav-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) peak_chunk_test$(EX
 	./lossy_comp_test$(EXEEXT) wav_alaw
 	./lossy_comp_test$(EXEEXT) wav_gsm610
 	./peak_chunk_test$(EXEEXT) wav
+	./header_test$(EXEEXT) wav
 	./misc_test$(EXEEXT) wav
 	./string_test$(EXEEXT) wav
 	./multi_file_test$(EXEEXT) wav
@@ -171,7 +179,7 @@ wav-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) peak_chunk_test$(EX
 	@echo "  `./sfversion$(EXEEXT)` passed tests on WAV files."
 	@echo "----------------------------------------------------------------------"
 
-aiff-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) peak_chunk_test$(EXEEXT) misc_test$(EXEEXT) aiff_rw_test$(EXEEXT)
+aiff-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) peak_chunk_test$(EXEEXT) header_test$(EXEEXT) misc_test$(EXEEXT) aiff_rw_test$(EXEEXT)
 	./write_read_test$(EXEEXT) aiff
 	./lossy_comp_test$(EXEEXT) aiff_ulaw
 	./lossy_comp_test$(EXEEXT) aiff_alaw
@@ -180,6 +188,7 @@ aiff-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) peak_chunk_test$(E
 	@echo "./lossy_comp_test$(EXEEXT) aiff_ima"
 	@echo "=========================="
 	./peak_chunk_test$(EXEEXT) aiff
+	./header_test$(EXEEXT) aiff
 	./misc_test$(EXEEXT) aiff
 	./string_test$(EXEEXT) aiff
 	./multi_file_test$(EXEEXT) aiff
@@ -188,12 +197,13 @@ aiff-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) peak_chunk_test$(E
 	@echo "  `./sfversion$(EXEEXT)` passed tests on AIFF files."
 	@echo "----------------------------------------------------------------------"
 
-au-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) misc_test$(EXEEXT)
+au-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) header_test$(EXEEXT) misc_test$(EXEEXT)
 	./write_read_test$(EXEEXT) au
 	./lossy_comp_test$(EXEEXT) au_ulaw
 	./lossy_comp_test$(EXEEXT) au_alaw
 	./lossy_comp_test$(EXEEXT) au_g721
 	./lossy_comp_test$(EXEEXT) au_g723
+	./header_test$(EXEEXT) au
 	./misc_test$(EXEEXT) au
 	./multi_file_test$(EXEEXT) wav
 	@echo "----------------------------------------------------------------------"
@@ -217,6 +227,7 @@ w64-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) misc_test$(EXEEXT)
 	./lossy_comp_test$(EXEEXT) w64_ulaw
 	./lossy_comp_test$(EXEEXT) w64_alaw
 	./lossy_comp_test$(EXEEXT) w64_gsm610
+	./header_test$(EXEEXT) w64
 	./misc_test$(EXEEXT) w64
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed tests on W64 files."
@@ -225,6 +236,7 @@ w64-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) misc_test$(EXEEXT)
 # Lite remove start
 paf-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 	./write_read_test$(EXEEXT) paf
+	./header_test$(EXEEXT) paf
 	./misc_test$(EXEEXT) paf
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed tests on PAF files."
@@ -232,6 +244,7 @@ paf-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 
 svx-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 	./write_read_test$(EXEEXT) svx
+	./header_test$(EXEEXT) svx
 	./misc_test$(EXEEXT) svx
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed tests on SVX files."
@@ -241,6 +254,7 @@ nist-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) misc_test$(EXEEXT)
 	./write_read_test$(EXEEXT) nist
 	./lossy_comp_test$(EXEEXT) nist_ulaw
 	./lossy_comp_test$(EXEEXT) nist_alaw
+	./header_test$(EXEEXT) nist
 	./misc_test$(EXEEXT) nist
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed tests on NIST files."
@@ -250,6 +264,7 @@ ircam-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) misc_test$(EXEEXT
 	./write_read_test$(EXEEXT) ircam
 	./lossy_comp_test$(EXEEXT) ircam_ulaw
 	./lossy_comp_test$(EXEEXT) ircam_alaw
+	./header_test$(EXEEXT) ircam
 	./misc_test$(EXEEXT) ircam
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed tests on IRCAM files."
@@ -259,6 +274,7 @@ voc-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) misc_test$(EXEEXT)
 	./write_read_test$(EXEEXT) voc
 	./lossy_comp_test$(EXEEXT) voc_ulaw
 	./lossy_comp_test$(EXEEXT) voc_alaw
+	./header_test$(EXEEXT) voc
 	./misc_test$(EXEEXT) voc
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed tests on VOC files."
@@ -266,6 +282,7 @@ voc-tests: write_read_test$(EXEEXT) lossy_comp_test$(EXEEXT) misc_test$(EXEEXT)
 
 mat4-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 	./write_read_test$(EXEEXT) mat4
+	./header_test$(EXEEXT) mat4
 	./misc_test$(EXEEXT) mat4
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed tests on MAT4 files."
@@ -273,6 +290,7 @@ mat4-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 
 mat5-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 	./write_read_test$(EXEEXT) mat5
+	./header_test$(EXEEXT) mat5
 	./misc_test$(EXEEXT) mat5
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed tests on MAT5 files."
@@ -280,6 +298,7 @@ mat5-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 
 pvf-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 	./write_read_test$(EXEEXT) pvf
+	./header_test$(EXEEXT) pvf
 	./misc_test$(EXEEXT) pvf
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed tests on PVF files."
@@ -293,6 +312,7 @@ xi-tests: lossy_comp_test$(EXEEXT)
 
 htk-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 	./write_read_test$(EXEEXT) htk
+	./header_test$(EXEEXT) htk
 	./misc_test$(EXEEXT) htk
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed tests on HTK files."
@@ -300,6 +320,7 @@ htk-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 
 avr-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 	./write_read_test$(EXEEXT) avr
+	./header_test$(EXEEXT) avr
 	./misc_test$(EXEEXT) avr
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed tests on AVR files."
@@ -307,6 +328,7 @@ avr-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 
 sds-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 	./write_read_test$(EXEEXT) sds
+	./header_test$(EXEEXT) sds
 	./misc_test$(EXEEXT) sds
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed tests on SDS files."
@@ -320,8 +342,6 @@ stdio-tests: stdio_test$(EXEEXT) stdin_test$(EXEEXT) stdout_test$(EXEEXT) pipe_t
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed stdio and pipe tests."
 	@echo "----------------------------------------------------------------------"
-
-
 
 ## Do not edit or modify anything in this comment block.
 ## The arch-tag line is a file identity tag for the GNU Arch 

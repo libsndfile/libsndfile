@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 2001-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include "sfconfig.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,7 +26,7 @@
 #include <sys/stat.h>
 #include <math.h>
 
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
@@ -52,8 +52,6 @@ static void	update_header_test (const char *filename, int typemajor) ;
 +]static void	update_seek_[+ (get "name") +]_test	(const char *filename, int filetype) ;
 [+ ENDFOR data_type
 +]
-
-static void extra_header_test (const char *filename, int filetype) ;
 
 /* Force the start of this buffer to be double aligned. Sparc-solaris will
 ** choke if its not.
@@ -83,7 +81,6 @@ main (int argc, char *argv [])
 		update_seek_int_test ("header_int.wav", SF_FORMAT_WAV) ;
 		update_seek_float_test ("header_float.wav", SF_FORMAT_WAV) ;
 		update_seek_double_test ("header_double.wav", SF_FORMAT_WAV) ;
-		extra_header_test ("extra.wav", SF_FORMAT_WAV) ;
 		test_count++ ;
 		} ;
 
@@ -93,108 +90,71 @@ main (int argc, char *argv [])
 		update_seek_int_test ("header_int.aiff", SF_FORMAT_AIFF) ;
 		update_seek_float_test ("header_float.aiff", SF_FORMAT_AIFF) ;
 		update_seek_double_test ("header_double.aiff", SF_FORMAT_AIFF) ;
-		extra_header_test ("extra.aiff", SF_FORMAT_AIFF) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "au"))
 	{	update_header_test ("header.au", SF_FORMAT_AU) ;
-		update_seek_short_test ("header_short.au", SF_FORMAT_AU) ;
-		update_seek_int_test ("header_int.au", SF_FORMAT_AU) ;
-		update_seek_float_test ("header_float.au", SF_FORMAT_AU) ;
-		update_seek_double_test ("header_double.au", SF_FORMAT_AU) ;
-		test_count++ ;
-		} ;
-
-	if (do_all || ! strcmp (argv [1], "caf"))
-	{	update_header_test ("header.caf", SF_FORMAT_CAF) ;
-		update_seek_short_test ("header_short.caf", SF_FORMAT_CAF) ;
-		update_seek_int_test ("header_int.caf", SF_FORMAT_CAF) ;
-		update_seek_float_test ("header_float.caf", SF_FORMAT_CAF) ;
-		update_seek_double_test ("header_double.caf", SF_FORMAT_CAF) ;
-		/* extra_header_test ("extra.caf", SF_FORMAT_CAF) ; */
-		test_count++ ;
-		} ;
-
-	if (do_all || ! strcmp (argv [1], "nist"))
-	{	update_header_test ("header.nist", SF_FORMAT_NIST) ;
-		update_seek_short_test ("header_short.nist", SF_FORMAT_NIST) ;
-		update_seek_int_test ("header_int.nist", SF_FORMAT_NIST) ;
-		test_count++ ;
-		} ;
-
-	if (do_all || ! strcmp (argv [1], "paf"))
-	{	update_header_test ("header.paf", SF_FORMAT_PAF) ;
-		update_seek_short_test ("header_short.paf", SF_FORMAT_PAF) ;
-		test_count++ ;
-		} ;
-
-	if (do_all || ! strcmp (argv [1], "ircam"))
-	{	update_header_test ("header.ircam", SF_FORMAT_IRCAM) ;
-		update_seek_short_test ("header_short.ircam", SF_FORMAT_IRCAM) ;
-		test_count++ ;
-		} ;
-
-	if (do_all || ! strcmp (argv [1], "w64"))
-	{	update_header_test ("header.w64", SF_FORMAT_W64) ;
-		update_seek_short_test ("header_short.w64", SF_FORMAT_W64) ;
-		update_seek_int_test ("header_int.w64", SF_FORMAT_W64) ;
-		update_seek_float_test ("header_float.w64", SF_FORMAT_W64) ;
-		update_seek_double_test ("header_double.w64", SF_FORMAT_W64) ;
-		test_count++ ;
-		} ;
-
-	if (do_all || ! strcmp (argv [1], "mat4"))
-	{	update_header_test ("header.mat4", SF_FORMAT_MAT4) ;
-		update_seek_short_test ("header_short.mat4", SF_FORMAT_MAT4) ;
-		update_seek_int_test ("header_int.mat4", SF_FORMAT_MAT4) ;
-		update_seek_float_test ("header_float.mat4", SF_FORMAT_MAT4) ;
-		update_seek_double_test ("header_double.mat4", SF_FORMAT_MAT4) ;
-		test_count++ ;
-		} ;
-
-	if (do_all || ! strcmp (argv [1], "mat5"))
-	{	update_header_test ("header.mat5", SF_FORMAT_MAT5) ;
-		update_seek_short_test ("header_short.mat5", SF_FORMAT_MAT5) ;
-		update_seek_int_test ("header_int.mat5", SF_FORMAT_MAT5) ;
-		update_seek_float_test ("header_float.mat5", SF_FORMAT_MAT5) ;
-		update_seek_double_test ("header_double.mat5", SF_FORMAT_MAT5) ;
-		test_count++ ;
-		} ;
-
-	if (do_all || ! strcmp (argv [1], "pvf"))
-	{	update_header_test ("header.pvf", SF_FORMAT_PVF) ;
-		update_seek_short_test ("header_short.pvf", SF_FORMAT_PVF) ;
-		test_count++ ;
-		} ;
-
-	if (do_all || ! strcmp (argv [1], "avr"))
-	{	update_header_test ("header.avr", SF_FORMAT_AVR) ;
-		update_seek_short_test ("header_short.avr", SF_FORMAT_AVR) ;
-		test_count++ ;
-		} ;
-
-	if (do_all || ! strcmp (argv [1], "htk"))
-	{	update_header_test ("header.htk", SF_FORMAT_HTK) ;
-		update_seek_short_test ("header_short.htk", SF_FORMAT_HTK) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "svx"))
 	{	update_header_test ("header.svx", SF_FORMAT_SVX) ;
-		update_seek_short_test ("header_short.svx", SF_FORMAT_SVX) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "nist"))
+	{	update_header_test ("header.nist", SF_FORMAT_NIST) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "paf"))
+	{	update_header_test ("header.paf", SF_FORMAT_PAF) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "ircam"))
+	{	update_header_test ("header.ircam", SF_FORMAT_IRCAM) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "voc"))
 	{	update_header_test ("header.voc", SF_FORMAT_VOC) ;
-		/*-update_seek_short_test ("header_short.voc", SF_FORMAT_VOC) ;-*/
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "w64"))
+	{	update_header_test ("header.w64", SF_FORMAT_W64) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "mat4"))
+	{	update_header_test ("header.mat4", SF_FORMAT_MAT4) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "mat5"))
+	{	update_header_test ("header.mat5", SF_FORMAT_MAT5) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "pvf"))
+	{	update_header_test ("header.pvf", SF_FORMAT_PVF) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "htk"))
+	{	update_header_test ("header.htk", SF_FORMAT_HTK) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "avr"))
+	{	update_header_test ("header.avr", SF_FORMAT_AVR) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "sds"))
 	{	update_header_test ("header.sds", SF_FORMAT_SDS) ;
-		/*-update_seek_short_test ("header_short.sds", SF_FORMAT_SDS) ;-*/
 		test_count++ ;
 		} ;
 
@@ -226,7 +186,7 @@ update_header_sub (const char *filename, int typemajor, int write_mode)
 
 	frames = BUFFER_LEN / sfinfo.channels ;
 
-	outfile = test_open_file_or_die (filename, write_mode, &sfinfo, SF_TRUE, __LINE__) ;
+	outfile = test_open_file_or_die (filename, write_mode, &sfinfo, __LINE__) ;
 
 	for (k = 0 ; k < BUFFER_LEN ; k++)
 		data_out [k] = k + 1 ;
@@ -234,7 +194,7 @@ update_header_sub (const char *filename, int typemajor, int write_mode)
 
 	if (typemajor != SF_FORMAT_HTK)
 	{	/* The HTK header is not correct when the file is first written. */
-		infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+		infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 		sf_close (infile) ;
 		} ;
 
@@ -244,8 +204,8 @@ update_header_sub (const char *filename, int typemajor, int write_mode)
 	** Open file and check log buffer for an error. If header update failed
 	** the the log buffer will contain errors.
 	*/
-	infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
-	check_log_buffer_or_die (infile, __LINE__) ;
+	infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+	check_log_buffer_or_die (infile) ;
 
 	if (sfinfo.frames < BUFFER_LEN || sfinfo.frames > BUFFER_LEN + 50)
 	{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), BUFFER_LEN) ;
@@ -269,8 +229,8 @@ update_header_sub (const char *filename, int typemajor, int write_mode)
 	test_write_int_or_die (outfile, 0, data_out, BUFFER_LEN, __LINE__) ;
 
 	/* Open file again and make sure no errors in log buffer. */
-	infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
-	check_log_buffer_or_die (infile, __LINE__) ;
+	infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+	check_log_buffer_or_die (infile) ;
 
 	if (sfinfo.frames < 2 * BUFFER_LEN || sfinfo.frames > 2 * BUFFER_LEN + 50)
 	{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), 2 * BUFFER_LEN) ;
@@ -290,7 +250,7 @@ update_header_test (const char *filename, int typemajor)
 {
 	print_test_name ("update_header_test", filename) ;
 
-#if 0 /*-(OS_IS_WIN32 == 0)-*/
+#if (defined (WIN32) || defined (_WIN32))
 	if (typemajor == SF_FORMAT_PAF)
 	{	/*
 		** I think this is a bug in the win32 file I/O code in src/file_io.c.
@@ -313,39 +273,35 @@ update_header_test (const char *filename, int typemajor)
 */
 
 [+ FOR data_type
-+]static void
-update_seek_[+ (get "name") +]_test	(const char *filename, int filetype)
-{	SNDFILE *outfile, *infile ;
++]static void	update_seek_[+ (get "name") +]_test	(const char *filename, int filetype)
+{	SNDFILE *file ;
 	SF_INFO sfinfo ;
     sf_count_t frames ;
-    [+ (get "name") +] buffer [8] ;
+    [+ (get "name") +] buffer [16] ;
 	int k ;
 
 	print_test_name ("update_seek_[+ (get "name") +]_test", filename) ;
 
 	memset (buffer, 0, sizeof (buffer)) ;
 
-	/* Create sound outfile with no data. */
+	/* Create sound file with no data. */
 	sfinfo.format = filetype | [+ (get "format") +] ;
 	sfinfo.samplerate = 48000 ;
 	sfinfo.channels = 2 ;
 
-	if (sf_format_check (&sfinfo) == SF_FALSE)
-		sfinfo.channels = 1 ;
-
-	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
-	sf_close (outfile) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	sf_close (file) ;
 
 	/* Open again for read/write. */
-	outfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, __LINE__) ;
 
 	/*
 	** In auto header update mode, seeking to the end of the file with
     ** SEEK_SET will fail from the 2nd seek on.  seeking to 0, SEEK_END
 	** will seek to 0 anyway
 	*/
-	if (sf_command (outfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE) == 0)
-    {	printf ("\n\nError : sf_command (SFC_SET_UPDATE_HEADER_AUTO) return error : %s\n\n", sf_strerror (outfile)) ;
+	if (sf_command (file, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE) == 0)
+    {	printf ("\n\nError : sf_command (SFC_SET_UPDATE_HEADER_AUTO) return error : %s\n\n", sf_strerror (file)) ;
 		exit (1) ;
 		} ;
 
@@ -353,27 +309,16 @@ update_seek_[+ (get "name") +]_test	(const char *filename, int filetype)
 	frames = ARRAY_LEN (buffer) / sfinfo.channels ;
 
 	for (k = 0 ; k < 6 ; k++)
-	{	test_seek_or_die (outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, __LINE__) ;
-		test_seek_or_die (outfile, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__) ;
-
-		/* Open file again and make sure no errors in log buffer. */
-		infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
-		check_log_buffer_or_die (infile, __LINE__) ;
-		sf_close (infile) ;
-
-		if (sfinfo.frames != k * frames)
-		{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %ld)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), SF_COUNT_TO_LONG (k + frames)) ;
-			dump_log_buffer (infile) ;
-			exit (1) ;
-			} ;
+	{	test_seek_or_die (file, k * frames, SEEK_SET, k * frames, sfinfo.channels, __LINE__) ;
+		test_seek_or_die (file, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__) ;
 
 		if ((k & 1) == 0)
-			test_write_[+ (get "name") +]_or_die (outfile, k, buffer, sfinfo.channels * frames, __LINE__) ;
+			test_write_[+ (get "name") +]_or_die (file, k, buffer, sfinfo.channels * frames, __LINE__) ;
 		else
-			test_writef_[+ (get "name") +]_or_die (outfile, k, buffer, frames, __LINE__) ;
+			test_writef_[+ (get "name") +]_or_die (file, k, buffer, frames, __LINE__) ;
 		} ;
 
-	sf_close (outfile) ;
+	sf_close (file) ;
 	unlink (filename) ;
 
 	puts ("ok") ;
@@ -382,110 +327,6 @@ update_seek_[+ (get "name") +]_test	(const char *filename, int filetype)
 [+ ENDFOR data_type
 +]
 
-
-
-
-
-static void
-extra_header_test (const char *filename, int filetype)
-{	SNDFILE *outfile, *infile ;
-	SF_INFO sfinfo ;
-    sf_count_t frames ;
-    short buffer [8] ;
-	int k = 0 ;
-
-	print_test_name ("extra_header_test", filename) ;
-
-	sfinfo.samplerate = 44100 ;
-	sfinfo.format = (filetype | SF_FORMAT_PCM_16) ;
-	sfinfo.channels = 1 ;
-
-	memset (buffer, 0xA0, sizeof (buffer)) ;
-
-	/* Now write some frames. */
-	frames = ARRAY_LEN (buffer) / sfinfo.channels ;
-
-	/* Test the file with extra header data. */
-	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, [+ (tpl-file-line "%2$d") +]) ;
-	sf_set_string (outfile, SF_STR_TITLE, filename) ;
-	test_writef_short_or_die (outfile, k, buffer, frames, [+ (tpl-file-line "%2$d") +]) ;
-	sf_set_string (outfile, SF_STR_COPYRIGHT, "(c) 1980 Erik") ;
-	sf_close (outfile) ;
-
-#if 1
-	/*
-	**  Erik de Castro Lopo <erikd@mega-nerd.com> May 23 2004.
-	**
-	** This file has extra string data in the header and therefore cannot
-	** currently be opened in SFM_RDWR mode. This is fixable, but its in
-	** a part of the code I don't want to fiddle with until the Ogg/Vorbis
-	** integration is done.
-	*/
-
-	if ((infile = sf_open (filename, SFM_RDWR, &sfinfo)) != NULL)
-	{	printf ("\n\nError : should not be able to open this file in SFM_RDWR.\n\n") ;
-		exit (1) ;
-		} ;
-
-	unlink (filename) ;
-	puts ("ok") ;
-	return ;
-#else
-
-	hexdump_file (filename, 0, 100000) ;
-
-	/* Open again for read/write. */
-	outfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, [+ (tpl-file-line "%2$d") +]) ;
-
-	/*
-	** In auto header update mode, seeking to the end of the file with
-    ** SEEK_SET will fail from the 2nd seek on.  seeking to 0, SEEK_END
-	** will seek to 0 anyway
-	*/
-	if (sf_command (outfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE) == 0)
-    {	printf ("\n\nError : sf_command (SFC_SET_UPDATE_HEADER_AUTO) return error : %s\n\n", sf_strerror (outfile)) ;
-		exit (1) ;
-		} ;
-
-	/* Now write some frames. */
-	frames = ARRAY_LEN (buffer) / sfinfo.channels ;
-
-	for (k = 1 ; k < 6 ; k++)
-	{
-		printf ("\n*** pass %d\n", k) ;
-		memset (buffer, 0xA0 + k, sizeof (buffer)) ;
-
-
-		test_seek_or_die (outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, [+ (tpl-file-line "%2$d") +]) ;
-		test_seek_or_die (outfile, 0, SEEK_END, k * frames, sfinfo.channels, [+ (tpl-file-line "%2$d") +]) ;
-
-		/* Open file again and make sure no errors in log buffer. */
-		if (0)
-		{	infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, [+ (tpl-file-line "%2$d") +]) ;
-			check_log_buffer_or_die (infile, [+ (tpl-file-line "%2$d") +]) ;
-			sf_close (infile) ;
-			} ;
-
-		if (sfinfo.frames != k * frames)
-		{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %ld)\n", [+ (tpl-file-line "%2$d") +], SF_COUNT_TO_LONG (sfinfo.frames), SF_COUNT_TO_LONG (k + frames)) ;
-			dump_log_buffer (infile) ;
-			exit (1) ;
-			} ;
-
-		if ((k & 1) == 0)
-			test_write_short_or_die (outfile, k, buffer, sfinfo.channels * frames, [+ (tpl-file-line "%2$d") +]) ;
-		else
-			test_writef_short_or_die (outfile, k, buffer, frames, [+ (tpl-file-line "%2$d") +]) ;
-		hexdump_file (filename, 0, 100000) ;
-		} ;
-
-	sf_close (outfile) ;
-	unlink (filename) ;
-
-	puts ("ok") ;
-	return ;
-#endif
-} /* extra_header_test */
 
 [+ COMMENT
 
