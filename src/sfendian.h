@@ -18,7 +18,7 @@
 
 #include "config.h"
 
-#if HAVE_BYTESWAP_H
+#if defined (HAVE_BYTESWAP_H)
 
 #include <byteswap.h>
 
