@@ -50,8 +50,8 @@ typedef int ssize_t ;
 
 #define	SENSIBLE_SIZE	(0x40000000)
 
-static int psf_open (const char * path, int mode) ;
-static int psf_close (int fd) ;
+static int psf_open_fd (const char * path, int mode) ;
+static int psf_close_fd (int fd) ;
 static void psf_log_syserr (SF_PRIVATE *psf, int error) ;
 static sf_count_t psf_get_filelen_fd (int fd) ;
 
@@ -59,7 +59,7 @@ int
 psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 {
 	psf->error = 0 ;
-	psf->filedes = psf_open (pathname, open_mode) ;
+	psf->filedes = psf_open_fd (pathname, open_mode) ;
 
 	if (psf->filedes == - SFE_BAD_OPEN_MODE)
 	{	psf->error = SFE_BAD_OPEN_MODE ;
@@ -84,7 +84,7 @@ psf_fclose (SF_PRIVATE *psf)
 		return 0 ;
 		} ;
 
-	if ((retval = psf_close (psf->filedes)) == -1)
+	if ((retval = psf_close_fd (psf->filedes)) == -1)
 		psf_log_syserr (psf, errno) ;
 
 	psf->filedes = -1 ;
@@ -103,7 +103,7 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s/rsrc", psf->filepath) ;
 
 	psf->error = SFE_NO_ERROR ;
-	if ((psf->rsrcdes = psf_open (psf->rsrcpath, open_mode)) >= 0)
+	if ((psf->rsrcdes = psf_open_fd (psf->rsrcpath, open_mode)) >= 0)
 	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrcdes) ;
 		if (psf->rsrclength < 100)
 		{	psf->error = SFE_SD2_BAD_RSRC ;
@@ -134,7 +134,7 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	fname [0] = '.' ;
 	fname [1] = '_' ;
 
-	if ((psf->rsrcdes = psf_open (psf->rsrcpath, open_mode)) >= 0)
+	if ((psf->rsrcdes = psf_open_fd (psf->rsrcpath, open_mode)) >= 0)
 	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrcdes) ;
 		if (psf->rsrclength < 100)
 		{	psf->error = SFE_SD2_BAD_RSRC ;
@@ -154,7 +154,7 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 int
 psf_close_rsrc (SF_PRIVATE *psf)
 {
-	psf_close (psf->rsrcdes) ;
+	psf_close_fd (psf->rsrcdes) ;
 	psf->rsrcdes = -1 ;
 	return 0 ;
 } /* psf_close_rsrc */
@@ -379,14 +379,14 @@ psf_ftell (SF_PRIVATE *psf)
 } /* psf_ftell */
 
 int
-psf_close (int fd)
+psf_close_fd (int fd)
 {	int retval ;
 
 	while ((retval = close (fd)) == -1 && errno == EINTR)
 		/* Do nothing. */ ;
 
 	return retval ;
-} /* psf_close */
+} /* psf_close_fd */
 
 sf_count_t
 psf_fgets (char *buffer, sf_count_t bufsize, SF_PRIVATE *psf)
@@ -475,7 +475,7 @@ psf_ftruncate (SF_PRIVATE *psf, sf_count_t len)
 } /* psf_ftruncate */
 
 static int
-psf_open (const char * pathname, int open_mode)
+psf_open_fd (const char * pathname, int open_mode)
 {	int fd, oflag, mode ;
 
 	/*
@@ -520,7 +520,7 @@ psf_open (const char * pathname, int open_mode)
 		fd = open (pathname, oflag, mode) ;
 
 	return fd ;
-} /* psf_open */
+} /* psf_open_fd */
 
 static void
 psf_log_syserr (SF_PRIVATE *psf, int error)
@@ -546,7 +546,7 @@ typedef long ssize_t ;
 #endif
 
 /* Win32 */ static int
-psf_open (const char * pathname, int open_mode)
+psf_open_fd (const char * pathname, int open_mode)
 {	DWORD dwDesiredAccess ;
 	DWORD dwShareMode ;
 	DWORD dwCreationDistribution ;
@@ -589,7 +589,7 @@ psf_open (const char * pathname, int open_mode)
 		return -1 ;
 
 	return (int) handle ;
-} /* psf_open */
+} /* psf_open_fd */
 
 /* Win32 */ static void
 psf_log_syserr (SF_PRIVATE *psf, int error)
@@ -811,23 +811,12 @@ psf_ftell (SF_PRIVATE *psf)
 } /* psf_ftell */
 
 /* Win32 */ int
-psf_fclose (SF_PRIVATE *psf)
-{	int retval = 0 ;
+psf_close_fd (int fd)
+{	if (CloseHandle ((HANDLE) fd) == 0)
+		return -1 ;
 
-	if (psf->do_not_close_descriptor)
-	{	(HANDLE) psf->filedes = INVALID_HANDLE_VALUE ;
-		return 0 ;
-		} ;
-
-	if (CloseHandle ((HANDLE) psf->filedes) == 0)
-	{	retval = -1 ;
-		psf_log_syserr (psf, GetLastError ()) ;
-		} ;
-
-	psf->filedes = (int) INVALID_HANDLE_VALUE ;
-
-	return retval ;
-} /* psf_fclose */
+	return 0 ;
+} /* psf_close_fd */
 
 /* Win32 */ sf_count_t
 psf_fgets (char *buffer, sf_count_t bufsize, SF_PRIVATE *psf)
@@ -848,7 +837,7 @@ psf_fgets (char *buffer, sf_count_t bufsize, SF_PRIVATE *psf)
 			} ;
 		} ;
 
-	buffer [k] = '\0' ;
+	buffer [k] = 0 ;
 
 	return k ;
 } /* psf_fgets */
@@ -863,47 +852,22 @@ psf_is_pipe (SF_PRIVATE *psf)
 } /* psf_is_pipe */
 
 /* Win32 */ sf_count_t
-psf_get_filelen (SF_PRIVATE *psf)
+psf_get_filelen_fd (int fd)
 {	sf_count_t filelen ;
 	DWORD dwFileSizeLow, dwFileSizeHigh, dwError = NO_ERROR ;
 
-	dwFileSizeLow = GetFileSize ((HANDLE) psf->filedes, &dwFileSizeHigh) ;
+	dwFileSizeLow = GetFileSize ((HANDLE) fd, &dwFileSizeHigh) ;
 
 	if (dwFileSizeLow == 0xFFFFFFFF)
 		dwError = GetLastError () ;
 
 	if (dwError != NO_ERROR)
-	{	psf_log_syserr (psf, GetLastError ()) ;
-		return 0 ;
-		}
-	else
-		filelen = dwFileSizeLow + ((__int64) dwFileSizeHigh << 32) ;
+		return (sf_count_t) -1 ;
 
-	switch (psf->mode)
-	{	case SFM_WRITE :
-			filelen = filelen - psf->fileoffset ;
-			break ;
-
-		case SFM_READ :
-			if (psf->fileoffset > 0 && psf->filelength > 0)
-				filelen = psf->filelength ;
-			break ;
-
-		case SFM_RDWR :
-			/*
-			** Cannot open embedded files SFM_RDWR so we don't need to
-			** subtract psf->fileoffset. We already have the answer we
-			** need.
-			*/
-			break ;
-
-		default :
-			/* Shouldn't be here, so return error. */
-			filelen = -1 ;
-		} ;
+	filelen = dwFileSizeLow + ((__int64) dwFileSizeHigh << 32) ;
 
 	return filelen ;
-} /* psf_get_filelen */
+} /* psf_get_filelen_fd */
 
 /* Win32 */ int
 psf_ftruncate (SF_PRIVATE *psf, sf_count_t len)
