@@ -380,9 +380,9 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 
 	sf_close (file) ;
 	/* Lite remove end */
-
-	printf ("ok\n") ;
 	unlink (filename) ;
+
+	puts ("ok") ;
 } /* pcm_test_[+ (get "name") +] */
 
 [+ ENDFOR data_type
