@@ -18,6 +18,7 @@ autogen_sources = write_read_test.tpl write_read_test.def	\
 					command_test.tpl command_test.def		\
 					scale_clip_test.tpl scale_clip_test.def	\
 					pipe_test.tpl pipe_test.def				\
+					floating_point_test.tpl floating_point_test.def	\
 					benchmark.tpl benchmark.def
 
 EXTRA_DIST = $(autogen_sources)
@@ -132,6 +133,9 @@ scale_clip_test.c: scale_clip_test.def scale_clip_test.tpl
 
 pipe_test.c: pipe_test.def pipe_test.tpl
 	autogen --writable --source-time pipe_test.def
+
+floating_point_test.c: floating_point_test.def floating_point_test.tpl
+	autogen --writable --source-time floating_point_test.def
 
 benchmark.c: benchmark.def benchmark.tpl
 	autogen --writable --source-time benchmark.def

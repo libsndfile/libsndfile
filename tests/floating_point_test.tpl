@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include "sfconfig.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,14 +35,14 @@
 
 #include "float_cast.h"
 
-#define	SAMPLE_RATE			16000
+#define	SAMPLE_RATE			11025
 
 static void	float_scaled_test	(const char *filename, int allow_exit, int replace_float, int filetype, double target_snr) ;
 static void	double_scaled_test	(const char *filename, int allow_exit, int replace_float, int filetype, double target_snr) ;
 
-[+ FOR float_type +][+ FOR int_type +][+ FOR endian_type 
-+]static void [+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test (const char * filename) ;
-[+ ENDFOR endian_type +][+ ENDFOR int_type +][+ ENDFOR float_type 
+[+ FOR float_type +][+ FOR int_type
++]static void [+ (get "float_name") +]_[+ (get "int_name") +]_test (const char * filename) ;
+[+ ENDFOR int_type +][+ ENDFOR float_type
 +]
 
 static	double	double_data [DFT_DATA_LENGTH] ;
@@ -106,10 +106,6 @@ main (int argc, char *argv [])
 	float_scaled_test	("pcm_16.sds", allow_exit, SF_FALSE, SF_FORMAT_SDS | SF_FORMAT_PCM_16, -140.0) ;
 	float_scaled_test	("pcm_24.sds", allow_exit, SF_FALSE, SF_FORMAT_SDS | SF_FORMAT_PCM_24, -170.0) ;
 
-	float_scaled_test	("flac_8.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_S8, -39.0) ;
-	float_scaled_test	("flac_16.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_16, -87.0) ;
-	float_scaled_test	("flac_24.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_24, -138.0) ;
-
 	float_scaled_test	("replace_float.raw", allow_exit, SF_TRUE, SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_FLOAT, -163.0) ;
 
 	/*==============================================================================
@@ -154,19 +150,14 @@ main (int argc, char *argv [])
 	double_scaled_test	("pcm_16.sds", allow_exit, SF_FALSE, SF_FORMAT_SDS | SF_FORMAT_PCM_16, -140.0) ;
 	double_scaled_test	("pcm_24.sds", allow_exit, SF_FALSE, SF_FORMAT_SDS | SF_FORMAT_PCM_24, -180.0) ;
 
-	double_scaled_test	("flac_8.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_S8, -39.0) ;
-	double_scaled_test	("flac_16.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_16, -87.0) ;
-	double_scaled_test	("flac_24.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_24, -138.0) ;
-
 	double_scaled_test	("replace_double.raw", allow_exit, SF_TRUE, SF_FORMAT_RAW | SF_FORMAT_DOUBLE, -300.0) ;
 
 	putchar ('\n') ;
 	/* Float int tests. */
-[+ FOR float_type +][+ FOR int_type +][+ FOR endian_type 
-+]	[+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test ("[+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +].au") ;
-[+ ENDFOR endian_type +][+ ENDFOR int_type +][+ ENDFOR float_type 
+[+ FOR float_type +][+ FOR int_type
++]	[+ (get "float_name") +]_[+ (get "int_name") +]_test ("[+ (get "float_name") +]_[+ (get "int_name") +].au") ;
+[+ ENDFOR int_type +][+ ENDFOR float_type
 +]
-
 	return 0 ;
 } /* main */
 
@@ -196,7 +187,7 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 
 	test_write_float_or_die (file, 0, float_orig, DFT_DATA_LENGTH, __LINE__) ;
@@ -205,12 +196,23 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 
 	memset (float_test, 0, sizeof (float_test)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 
-	exit_if_true (sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
-	exit_if_true (sfinfo.frames < DFT_DATA_LENGTH, "\n\nLine %d: Incorrect number of frames in file (too short). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), DFT_DATA_LENGTH) ;
-	exit_if_true (sfinfo.channels != 1, "\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames < DFT_DATA_LENGTH)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), DFT_DATA_LENGTH) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
 
 	check_log_buffer_or_die (file, __LINE__) ;
 
@@ -223,9 +225,8 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 
 	snr = dft_cmp (__LINE__, double_data, test_data, DFT_DATA_LENGTH, target_snr, allow_exit) ;
 
-	exit_if_true (snr > target_snr, "% 6.1fdB SNR\n\n    Error : should be better than % 6.1fdB\n\n", snr, target_snr) ;
-
-	printf ("% 6.1fdB SNR ... ok\n", snr) ;
+	if (snr < target_snr)
+		printf ("% 6.1fdB SNR ... ok\n", snr) ;
 
 	unlink (filename) ;
 
@@ -247,7 +248,7 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 
 	test_write_double_or_die (file, 0, double_data, DFT_DATA_LENGTH, __LINE__) ;
@@ -256,57 +257,15 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 
 	memset (test_data, 0, sizeof (test_data)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 
-	exit_if_true (sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
-	exit_if_true (sfinfo.frames < DFT_DATA_LENGTH, "\n\nLine %d: Incorrect number of frames in file (too short). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), DFT_DATA_LENGTH) ;
-	exit_if_true (sfinfo.channels != 1, "\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
 
-	check_log_buffer_or_die (file, __LINE__) ;
-
-	test_read_double_or_die (file, 0, test_data, DFT_DATA_LENGTH, __LINE__) ;
-
-	sf_close (file) ;
-
-	snr = dft_cmp (__LINE__, double_data, test_data, DFT_DATA_LENGTH, target_snr, allow_exit) ;
-
-	exit_if_true (snr > target_snr, "% 6.1fdB SNR\n\n    Error : should be better than % 6.1fdB\n\n", snr, target_snr) ;
-
-	printf ("% 6.1fdB SNR ... ok\n", snr) ;
-
-	unlink (filename) ;
-
-	return ;
-} /* double_scaled_test */
-
-/*==============================================================================
-*/
-
-[+ FOR float_type +][+ FOR int_type +][+ FOR endian_type 
-+]
-static void
-[+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test (const char * filename)
-{	SNDFILE		*file ;
-	SF_INFO		sfinfo ;
-	unsigned	k, max ;
-
-	print_test_name ("[+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test", filename) ;
-
-	gen_windowed_sine_[+ (get "float_name") +] ([+ (get "float_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), 0.98) ;
-
-	sfinfo.samplerate	= SAMPLE_RATE ;
-	sfinfo.frames		= ARRAY_LEN ([+ (get "int_name") +]_data) ;
-	sfinfo.channels		= 1 ;
-	sfinfo.format		= [+ (get "end_type") +] | SF_FORMAT_AU | [+ (get "minor_type") +] ;
-
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
-	test_write_[+ (get "float_name") +]_or_die (file, 0, [+ (get "float_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), __LINE__) ;
-	sf_close (file) ;
-
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
-
-	if (sfinfo.frames != ARRAY_LEN ([+ (get "float_name") +]_data))
+	if (sfinfo.frames < DFT_DATA_LENGTH)
 	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), DFT_DATA_LENGTH) ;
 		exit (1) ;
 		} ;
@@ -316,9 +275,61 @@ static void
 		exit (1) ;
 		} ;
 
-	sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
-	test_read_[+ (get "int_name") +]_or_die (file, 0, [+ (get "int_name") +]_data, ARRAY_LEN ([+ (get "int_name") +]_data), __LINE__) ;
+	test_read_double_or_die (file, 0, test_data, DFT_DATA_LENGTH, __LINE__) ;
+
+	sf_close (file) ;
+
+	snr = dft_cmp (__LINE__, double_data, test_data, DFT_DATA_LENGTH, target_snr, allow_exit) ;
+
+	if (snr < target_snr)
+		printf ("% 6.1fdB SNR ... ok\n", snr) ;
+
+	unlink (filename) ;
+
+	return ;
+} /* double_scaled_test */
+
+/*==============================================================================
+*/
+
+[+ FOR float_type +][+ FOR int_type
++]
+static void
+[+ (get "float_name") +]_[+ (get "int_name") +]_test (const char * filename)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	unsigned	k, max ;
+
+	print_test_name ("[+ (get "float_name") +]_[+ (get "int_name") +]_test", filename) ;
+
+	gen_windowed_sine_[+ (get "float_name") +] ([+ (get "float_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), 0.98) ;
+
+	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.frames		= ARRAY_LEN ([+ (get "int_name") +]_data) ;
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= SF_FORMAT_AU | [+ (get "minor_type") +] ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	test_write_double_or_die (file, 0, double_data, ARRAY_LEN ([+ (get "float_name") +]_data), __LINE__) ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+
+	if (sfinfo.frames != ARRAY_LEN ([+ (get "float_name") +]_data))
+	{	printf ("\n\nError (%s %d): Incorrect number of frames in file (too short). (%ld should be %d)\n", __func__, __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), DFT_DATA_LENGTH) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nError (%s %d): Incorrect number of channels in file.\n", __func__, __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sf_command (file, SFC_SET_FLOAT_INT_MULTIPLIER, NULL, SF_TRUE) ;
+
+	test_read_[+ (get "int_name") +]_or_die (file, 0, [+ (get "int_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), __LINE__) ;
 	sf_close (file) ;
 
 	max = 0 ;
@@ -327,14 +338,13 @@ static void
 			max = abs ([+ (get "int_name") +]_data [k]) ;
 
 	if (1.0 * abs (max - [+ (get "int_max") +]) / [+ (get "int_max") +] > 0.01)
-	{	printf ("\n\nLine %d: Bad maximum (%d should be %d).\n\n", __LINE__, max, [+ (get "int_max") +]) ;
+	{	printf ("\n\nError (%s %d): Bad maximum (%d should be %d).\n\n", __func__, __LINE__, max, [+ (get "int_max") +]) ;
 		exit (1) ;
 		} ;
 
-	unlink (filename) ;
 	puts ("ok") ;
-} /* [+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test */
-[+ ENDFOR endian_type +][+ ENDFOR int_type +][+ ENDFOR float_type +]
+} /* [+ (get "float_name") +]_[+ (get "int_name") +]_test */
+[+ ENDFOR int_type +][+ ENDFOR float_type +]
 
 [+ COMMENT
 
