@@ -99,9 +99,14 @@ unset ac_cv_sizeof_off_t
 
 AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
 
-if test "x$ac_cv_sizeof_off_t" = "x8" ; then
+if test "x$target_os" = "xmingw32msvc" ; then
+		TYPEOF_SF_COUNT_T="__int64"
+		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
+		SIZEOF_SF_COUNT_T=8
+elif test "x$ac_cv_sizeof_off_t" = "x8" ; then
 	# If sizeof (off_t) is 8, no further checking is needed.
 	TYPEOF_SF_COUNT_T="off_t"
+	SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 	SIZEOF_SF_COUNT_T=8
 else
 	# Check for common 64 bit file offset types.
@@ -137,7 +142,9 @@ else
 
 	AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
 
-	if test "x$ac_cv_sizeof_off_t" = "x$pre_largefile_sizeof_off_t" ; then
+	if test "x$ac_cv_sizeof_off_t" = "x8" ; then
+		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
+	elif test "x$ac_cv_sizeof_off_t" = "x$pre_largefile_sizeof_off_t" ; then
 		AC_MSG_WARN([[This machine does not seem to support 64 bit file offsets.]])
 		TYPEOF_SF_COUNT_T="off_t"
 		SIZEOF_SF_COUNT_T=$ac_cv_sizeof_off_t
@@ -152,9 +159,7 @@ else
 		fi
 	fi
 
-if test $SIZEOF_SF_COUNT_T = 8 ; then
-	SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
-elif test $SIZEOF_SF_COUNT_T = 4 ; then
+if test $SIZEOF_SF_COUNT_T = 4 ; then
 	SF_COUNT_MAX="0x7FFFFFFF"
 	fi
 
@@ -167,6 +172,7 @@ AC_SUBST(SIZEOF_SF_COUNT_T)
 AC_DEFINE_UNQUOTED([SF_COUNT_MAX],${SF_COUNT_MAX}, [Set to maximum allowed value of sf_count_t type.])
 AC_SUBST(SF_COUNT_MAX)
 
+AC_CHECK_TYPES(ssize_t)
 AC_CHECK_SIZEOF(ssize_t,4)
 
 #====================================================================================
@@ -200,9 +206,11 @@ case "$target_os" in
 		AC_C99_FUNC_LRINT
 		AC_C99_FUNC_LRINTF
 
-		if test x$ac_cv_c99_lrint = xno || test x$ac_cv_c99_lrintf = xno ; then
-			AC_MSG_WARN([[*** Missing C99 standard functions lrint() and lrintf().]])
-			AC_MSG_WARN([[*** This may cause benign compiler warnings on some systems (ie Solaris).]])
+		if test "x$ac_cv_c99_lrint" = "xno" ; then
+			if test "x$ac_cv_c99_lrintf" = "xno" ; then
+				AC_MSG_WARN([[*** Missing C99 standard functions lrint() and lrintf().]])
+				AC_MSG_WARN([[*** This may cause benign compiler warnings on some systems (ie Solaris).]])
+				fi
 			fi
 		;;
 	esac
@@ -227,6 +235,7 @@ AC_DEFINE_UNQUOTED(CPU_CLIPS_NEGATIVE, ${ac_cv_c_clip_negative},
 # Target OS specific stuff.
 
 OS_SPECIFIC_CFLAGS=""
+OS_SPECIFIC_LINKS=""
 os_is_win32=0
 os_is_macosx=0
 
@@ -238,11 +247,16 @@ case "$target_os" in
 		;;
 	mingw32msvc)
 		os_is_win32=1
-		AC_CHECK_HEADERS(wintypes.h mmreg.h)
-		OS_SPECIFIC_CFLAGS=""
-		OS_SPECIFIC_LINKS=""
-		TYPEOF_SF_COUNT_T="__int64"
-		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFi64"
+		## AC_CHECK_HEADERS(wintypes.h)
+		AC_CHECK_HEADERS(mmreg.h)
+		if x$ac_cv_header_mmreg_h != xyes ; then
+			AC_MSG_WARN([[******************************************************************]])
+			AC_MSG_WARN([[*** Can't find mmreg.h which means that we can't build a working  ]])
+			AC_MSG_WARN([[*** sndfile-play program. The library can however be built.       ]])
+			AC_MSG_WARN([[*** To correct this, you can grab the mmmreg.h file from the      ]])
+			AC_MSG_WARN([[*** WINE project : http://www.winehq.com/.                        ]])
+			AC_MSG_WARN([[******************************************************************]])
+			fi
 		;;
 	*)
 		OS_SPECIFIC_CFLAGS=""

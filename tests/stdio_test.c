@@ -33,9 +33,20 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#if HAVE_SYS_WAIT_H
 #include <sys/wait.h>
+#endif
 
 #include "utils.h"
+
+#ifndef WIFEXITED
+#define WIFEXITED(s) (((s) & 0xff) == 0)
+#endif
+#ifndef WEXITSTATUS
+#define WEXITSTATUS(s) (((s) & 0xff00) >> 8)
+#endif
+
 
 static size_t	file_length (const char *filename) ;
 static int		file_exists (const char *filename) ;
@@ -71,7 +82,7 @@ stdio_test (const char *filetype)
 
 	snprintf (buffer, sizeof (buffer), "./stdout_test %s > stdio.%s", filetype, filetype) ;
 	if ((retval = system (buffer)))
-	{	retval = WEXITSTATUS (retval) ;
+	{	retval = WIFEXITED (retval) ? WEXITSTATUS (retval) : 1 ;
 		printf ("%s : %s", buffer, (strerror (retval))) ;
 		exit (1) ;
 		} ;
@@ -84,14 +95,14 @@ stdio_test (const char *filetype)
 
 	snprintf (buffer, sizeof (buffer), "./stdin_test %s < stdio.%s", filetype, filetype) ;
 	if ((retval = system (buffer)))
-	{	retval = WEXITSTATUS (retval) ;
+	{	retval = WIFEXITED (retval) ? WEXITSTATUS (retval) : 1 ;
 		printf ("%s : %s", buffer, (strerror (retval))) ;
 		exit (1) ;
 		} ;
 
 	snprintf (buffer, sizeof (buffer), "rm stdio.%s", filetype) ;
 	if ((retval = system (buffer)))
-	{	retval = WEXITSTATUS (retval) ;
+	{	retval = WIFEXITED (retval) ? WEXITSTATUS (retval) : 1 ;
 		printf ("%s : %s", buffer, (strerror (retval))) ;
 		exit (1) ;
 		} ;

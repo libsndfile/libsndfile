@@ -449,7 +449,7 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 #include <io.h>
 
 #ifndef HAVE_SSIZE_T
-typedef int ssize_t ;
+typedef long ssize_t ;
 #endif
 
 /* Win32 */ static void
@@ -870,7 +870,7 @@ psf_ftruncate (SF_PRIVATE *psf, sf_count_t len)
 #include <direct.h>
 
 #ifndef HAVE_SSIZE_T
-typedef int ssize_t ;
+typedef long ssize_t ;
 #endif
 
 /* Win32 */ int

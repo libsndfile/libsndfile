@@ -26,6 +26,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#if (OS_IS_WIN32 == 0)
+
+/* This test program doesn't work on win32. */
+
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -331,6 +335,19 @@ file_exists (const char *filename)
 
 	return 1 ;
 } /* file_exists */
+
+#else
+
+int
+main (void)
+{	
+
+	puts ("This test doesn't work on win32.") ;
+	return 0 ;
+}
+
+#endif
+
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch 
