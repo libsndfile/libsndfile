@@ -42,7 +42,24 @@ AC_CHECK_HEADERS(endian.h)
 AC_HEADER_SYS_WAIT
 
 AC_CHECK_DECLS(S_IRGRP)
-AC_DEFINE_UNQUOTED([HAVE_DECL_S_IRGRP],${HAVE_DECL_S_IRGRP}, [Set to 1 if S_IRGRP is defined.])
+AC_DEFINE_UNQUOTED([HAVE_DECL_S_IRGRP],${HAVE_DECL_S_IRGRP},
+		[Set to 1 if S_IRGRP is defined.])
+
+#====================================================================================
+# Check for support of the struct hack.
+
+AC_C_STRUCT_HACK
+
+if test x$ac_cv_c_struct_hack = xno ; then
+	AC_MSG_ERROR([[
+	**************************************************************
+	*** This compiler does not support the 1999 ISO C Standard ***
+	*** feature known as the "struct hack".                    ***
+	*** Try GNU GCC-3.1 or later as they are known to work.    ***
+	**************************************************************
+	]]
+	)
+	fi
 
 #====================================================================================
 # Couple of initializations here. Fill in real values later.

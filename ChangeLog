@@ -1,3 +1,15 @@
+2004-03-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * acinclude.m4
+    Add new macro (AC_C_STRUCT_HACK) to detect whether the C compiler allows
+    the use of the what is known as the struct hack introduced by the 1999 ISO
+    C Standard.
+
+    * configure.ac
+    The last release would not compile with gcc-2.95 due to the use of features
+    (ie struct hack) introduced by the 1999 ISO C Standard.
+    Add check to make sure compiler handles this and bomb out if it doesn't.
+
 2004-03-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/write_read_test.tpl
