@@ -382,7 +382,7 @@ extra_header_test (const char *filename, int filetype)
 	SF_INFO sfinfo ;
     sf_count_t frames ;
     short buffer [8] ;
-	int k ;
+	int k = 0 ;
 
 	print_test_name ("extra_header_test", filename) ;
 

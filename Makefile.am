@@ -2,8 +2,8 @@
 
 SUBDIRS = man doc Win32 MacOS9 Octave src examples tests
 DIST_SUBDIRS = $(SUBDIRS)
-EXTRA_DIST = reconfigure.mk acinclude.m4 libsndfile.spec.in sndfile.pc.in \
-			check_libsndfile.py libsndfile_version_convert.py Make.bat
+EXTRA_DIST = reconfigure.mk acinclude.m4 libsndfile.spec.in \
+			sndfile.pc.in Make.bat
 			
 			 
 pkgconfigdir = $(libdir)/pkgconfig
