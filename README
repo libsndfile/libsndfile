@@ -22,9 +22,6 @@ and test its functionality.
 The Win32/ directory contains files and documentation to allow libsndfile
 to compile under Win32 with the Microsoft Visual C++ compiler.
 
-The MacOS/ directory contains files and documentation to allow libsndfile
-to compile under MacOS with the Metrowerks compiler.
-
 The src/GSM610 directory contains code written by Jutta Degener and Carsten 
 Bormann. Their original code can be found at :
     http://kbs.cs.tu-berlin.de/~jutta/toast.html
