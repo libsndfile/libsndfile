@@ -479,6 +479,7 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 {	DWORD dwDesiredAccess ;
 	DWORD dwShareMode ;
 	DWORD dwCreationDistribution ;
+	HANDLE handle ;
 
 	switch (open_mode)
 	{	case SFM_READ :
@@ -504,7 +505,7 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 				return psf->error ;
 		} ;
 
-	psf->filedes = (int) CreateFile (
+	handle = CreateFile (
 			pathname,					/* pointer to name of the file */
 			dwDesiredAccess,			/* access (read-write) mode */
 			dwShareMode,				/* share mode */
@@ -514,11 +515,12 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 			NULL						/* handle to file with attributes to copy */
 			) ;
 
-	if (((HANDLE) psf->filedes) == INVALID_HANDLE_VALUE)
+	if (handle == INVALID_HANDLE_VALUE)
 	{	psf_log_syserr (psf, GetLastError ()) ;
 		return psf->error ;
 		} ;
 
+	psf->filedes = (int) handle ;
 	psf->mode = open_mode ;
 
 	return psf->error ;
@@ -526,7 +528,8 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 
 /* Win32 */ int
 psf_set_stdio (SF_PRIVATE *psf, int mode)
-{	int	error = 0 ;
+{	HANDLE	handle = NULL ;
+	int	error = 0 ;
 
 	switch (mode)
 	{	case SFM_RDWR :
@@ -534,12 +537,12 @@ psf_set_stdio (SF_PRIVATE *psf, int mode)
 				break ;
 
 		case SFM_READ :
-				psf->filedes = (int) GetStdHandle (STD_INPUT_HANDLE) ;
+				handle = GetStdHandle (STD_INPUT_HANDLE) ;
 				psf->do_not_close_descriptor = 1 ;
 				break ;
 
 		case SFM_WRITE :
-				psf->filedes = (int) GetStdHandle (STD_OUTPUT_HANDLE) ;
+				handle = GetStdHandle (STD_OUTPUT_HANDLE) ;
 				psf->do_not_close_descriptor = 1 ;
 				break ;
 
@@ -548,6 +551,7 @@ psf_set_stdio (SF_PRIVATE *psf, int mode)
 				break ;
 		} ;
 
+	psf->filedes = (int) handle ;
 	psf->filelength = 0 ;
 
 	return error ;
@@ -555,10 +559,14 @@ psf_set_stdio (SF_PRIVATE *psf, int mode)
 
 /* Win32 */ void
 psf_set_file (SF_PRIVATE *psf, int fd)
-{	HANDLE temp = _get_osfhandle (fd) ;
+{	HANDLE handle ;
+	long osfhandle ;
 
-	if (GetFileType (temp) == FILE_TYPE_DISK)
-		psf->filedes = (int) temp ;
+	osfhandle = _get_osfhandle (fd) ;
+	handle = (HANDLE) osfhandle ;
+
+	if (GetFileType (handle) == FILE_TYPE_DISK)
+		psf->filedes = (int) handle ;
 	else
 		psf->filedes = fd ;
 } /* psf_set_file */
