@@ -737,9 +737,6 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 			} ;
 
 	sf_close (file) ;
-	delete_file (format, filename) ;
-
-	check_open_file_count_or_die (__LINE__) ;
 
 	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_PAF && (format & SF_FORMAT_TYPEMASK) != SF_FORMAT_VOC)
 	{
@@ -771,6 +768,9 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 		sf_close (wfile) ;
 		sf_close (rwfile) ;
 		} ;
+
+	delete_file (format, filename) ;
+	check_open_file_count_or_die (__LINE__) ;
 
 	puts ("ok") ;
 	return ;
