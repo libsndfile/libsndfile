@@ -148,8 +148,9 @@ enum
 } ;
 
 enum
-{	basc_TYPE_ONE_SHOT = 1,
-	basc_TYPE_LOOP
+{	basc_TYPE_LOOP = 0,
+	basc_TYPE_ONE_SHOT,
+	
 } ;
 
 
