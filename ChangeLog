@@ -1,3 +1,8 @@
+2004-07-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/(pcm|float|double64|ulaw|alaw|xi).c
+    Optimise read/write loops by removing a redundant variable.
+
 2004-07-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/file_io.c

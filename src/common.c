@@ -36,7 +36,7 @@
 */
 
 #define LOG_PUTCHAR(a,b)									\
-		{	if ((a)->logindex < SIGNED_SIZEOF ((a)->logbuffer) - 1)\
+		{	if ((a)->logindex < SIGNED_SIZEOF ((a)->logbuffer) - 1) \
 			{	(a)->logbuffer [(a)->logindex++] = (b) ;	\
 				(a)->logbuffer [(a)->logindex] = 0 ;		\
 				}											\
