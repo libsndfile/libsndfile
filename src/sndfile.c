@@ -78,12 +78,12 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_BAD_SEEK			, "Internal psf_fseek() failed." },
 	{	SFE_NOT_SEEKABLE		, "Seek attempted on unseekable file type." },
-	{	SFE_AMBIGUOUS_SEEK		, "Error: combination of file open mode and seek command is ambiguous." },
-	{	SFE_WRONG_SEEK			, "Error: invalid seek parameters." },
-	{	SFE_SEEK_FAILED			, "Error: parameters OK, but psf_seek() failed." },
+	{	SFE_AMBIGUOUS_SEEK		, "Error : combination of file open mode and seek command is ambiguous." },
+	{	SFE_WRONG_SEEK			, "Error : invalid seek parameters." },
+	{	SFE_SEEK_FAILED			, "Error : parameters OK, but psf_seek() failed." },
 
-	{	SFE_BAD_OPEN_MODE		, "Error: bad mode parameter for file open." },
-	{	SFE_OPEN_PIPE_RDWR		, "Error: attempt toopen a pipe in read/write mode." },
+	{	SFE_BAD_OPEN_MODE		, "Error : bad mode parameter for file open." },
+	{	SFE_OPEN_PIPE_RDWR		, "Error : attempt toopen a pipe in read/write mode." },
 	{	SFE_RDWR_POSITION		, "Error on RDWR position (cryptic)." },
 	{	SFE_RDWR_BAD_HEADER		, "Error : Cannot open file in read/write mode due to string data in header." },
 
@@ -213,12 +213,12 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_SD2_BAD_RSRC		, "Error : bad resource fork." },
 	{	SFE_SD2_BAD_SAMPLE_SIZE	, "Error : bad sample size." },
 
-	{	SFE_FLAC_BAD_HEADER		, "Error: bad flac header." },
-	{	SFE_FLAC_NEW_DECODER	, "Error: problem while creating flac decoder." },
-	{	SFE_FLAC_INIT_DECODER	, "Error: problem while initialization of the flac decoder." },
-	{	SFE_FLAC_LOST_SYNC		, "Error: flac decoder lost sync." },
+	{	SFE_FLAC_BAD_HEADER		, "Error : bad flac header." },
+	{	SFE_FLAC_NEW_DECODER	, "Error : problem while creating flac decoder." },
+	{	SFE_FLAC_INIT_DECODER	, "Error : problem while initialization of the flac decoder." },
+	{	SFE_FLAC_LOST_SYNC		, "Error : flac decoder lost sync." },
 	{	SFE_FLAC_BAD_SAMPLE_RATE, "Error : flac does not support this sample rate." },
-	{	SFE_FLAC_UNKOWN_ERROR	, "Error: unkown error in flac decoder." },
+	{	SFE_FLAC_UNKOWN_ERROR	, "Error : unkown error in flac decoder." },
 
 	{	SFE_DWVW_BAD_BITWIDTH	, "Error : Bad bit width for DWVW encoding. Must be 12, 16 or 24." },
 	{	SFE_G72X_NOT_MONO		, "Error : G72x encoding does not support more than 1 channel." },
