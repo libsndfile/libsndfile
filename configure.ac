@@ -112,6 +112,7 @@ AC_CHECK_SIZEOF(float,4)
 AC_CHECK_SIZEOF(double,4)
 AC_CHECK_SIZEOF(void*,8)
 AC_CHECK_SIZEOF(size_t,4)
+AC_CHECK_SIZEOF(int64_t,8)
 
 #====================================================================================
 # Find an appropriate type for sf_count_t.
