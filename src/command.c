@@ -38,6 +38,14 @@ static SF_FORMAT_INFO const simple_formats [] =
 		"AIFF (Apple/SGI 8 bit PCM)", "aiff"
 		},
 
+	{	SF_FORMAT_ANX | SF_FORMAT_SPEEX,
+		"ANX (Annodex Speex)", "anx"
+		},
+
+	{	SF_FORMAT_ANX | SF_FORMAT_VORBIS,
+		"ANX (Annodex Vorbis)", "anx"
+		},
+
 	{	SF_FORMAT_AU | SF_FORMAT_PCM_16,
 		"AU (Sun/Next 16 bit PCM)", "au"
 		},
@@ -48,6 +56,14 @@ static SF_FORMAT_INFO const simple_formats [] =
 
 	{	SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM,
 		"OKI Dialogic VOX ADPCM", "vox"
+		},
+
+	{	SF_FORMAT_OGG | SF_FORMAT_SPEEX,
+		"Ogg Speex", "ogg"
+		},
+
+	{	SF_FORMAT_OGG | SF_FORMAT_VORBIS,
+		"Ogg Vorbis", "ogg"
 		},
 
 	{	SF_FORMAT_WAV | SF_FORMAT_PCM_16,
@@ -97,12 +113,14 @@ psf_get_format_simple (SF_FORMAT_INFO *data)
 static SF_FORMAT_INFO const major_formats [] =
 {
 	{	SF_FORMAT_AIFF,		"AIFF (Apple/SGI)",						"aiff" 	},
+	{	SF_FORMAT_ANX,		"ANX (Annodex)",						"anx" 	},
 	{	SF_FORMAT_AU,		"AU (Sun/NeXT)", 						"au"	},
 	{	SF_FORMAT_AVR,		"AVR (Audio Visual Research)",	 		"avr"	},
 	{	SF_FORMAT_HTK,		"HTK (HMM Tool Kit)",					"htk"	},
 	{	SF_FORMAT_SVX,		"IFF (Amiga IFF/SVX8/SV16)",			"iff"	},
 	{	SF_FORMAT_MAT4,		"MAT4 (GNU Octave 2.0 / Matlab 4.2)",	"mat"	},
 	{	SF_FORMAT_MAT5,		"MAT5 (GNU Octave 2.1 / Matlab 5.0)",	"mat"	},
+	{	SF_FORMAT_OGG,		"Ogg (Xiph Foundation Ogg)", 			"ogg"	},
 	{	SF_FORMAT_PAF,		"PAF (Ensoniq PARIS)", 					"paf"	},
 	{	SF_FORMAT_PVF,		"PVF (Portable Voice Format)",			"pvf"	},
 	{	SF_FORMAT_RAW,		"RAW (header-less)",				 	"raw"	},
@@ -168,6 +186,9 @@ static SF_FORMAT_INFO subtype_formats [] =
 	{	SF_FORMAT_DWVW_16,		"16 bit DWVW",			NULL 	},
 	{	SF_FORMAT_DWVW_24,		"24 bit DWVW",			NULL 	},
 	{	SF_FORMAT_VOX_ADPCM,	"VOX ADPCM",			"vox" 	},
+
+	{	SF_FORMAT_VORBIS,		"Vorbis",				NULL 	},
+	{	SF_FORMAT_SPEEX,		"Speex",				NULL 	},
 
 	{	SF_FORMAT_DPCM_16,		"16 bit DPCM",			NULL 	},
 	{	SF_FORMAT_DPCM_8,		"8 bit DPCM",			NULL 	},

@@ -370,7 +370,7 @@ format_tests	(void)
 
 	sf_command (NULL, SFC_GET_SIMPLE_FORMAT_COUNT, &count, sizeof (int)) ;
 
-	if (count < 0 || count > 20)
+	if (count < 0 || count > 30)
 	{	printf ("Line %d: Weird count.\n", __LINE__) ;
 		exit (1) ;
 		} ;
@@ -404,7 +404,7 @@ format_tests	(void)
 	/* Now test major formats. */
 	sf_command (NULL, SFC_GET_FORMAT_MAJOR_COUNT, &count, sizeof (int)) ;
 
-	if (count < 0 || count > 20)
+	if (count < 0 || count > 30)
 	{	printf ("Line %d: Weird count.\n", __LINE__) ;
 		exit (1) ;
 		} ;
@@ -429,7 +429,7 @@ format_tests	(void)
 	/* Now test subtype formats. */
 	sf_command (NULL, SFC_GET_FORMAT_SUBTYPE_COUNT, &count, sizeof (int)) ;
 
-	if (count < 0 || count > 20)
+	if (count < 0 || count > 30)
 	{	printf ("Line %d: Weird count.\n", __LINE__) ;
 		exit (1) ;
 		} ;
