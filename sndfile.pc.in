@@ -4,7 +4,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: sndfile
-Description: A library for reading and writing audio files.
+Description: A library for reading and writing audio files
 Requires: 
 Version: @VERSION@
 Libs: -L${libdir} -lsndfile

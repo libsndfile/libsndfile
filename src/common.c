@@ -737,7 +737,7 @@ header_read (SF_PRIVATE *psf, void *ptr, int bytes)
 			return 0;
 		printf ("\nR sizeof (header): %u    headindex: %4u    bytes: %d\n", sizeof (psf->header), psf->headindex, bytes) ;
 		} ;
-		
+
 
 	if (psf->headindex + bytes > psf->headend)
 	{	count = psf_fread (psf->header + psf->headend, 1, bytes - (psf->headend - psf->headindex), psf) ;
@@ -762,13 +762,11 @@ header_seek (SF_PRIVATE *psf, sf_count_t position, int whence)
 			if (position > sizeof (psf->header))
 			{	/* Too much header to cache so just seek instead. */
 				psf_fseek (psf, position, whence) ;
-//printf ("A sizeof (header): %u    headindex: %4u\n", sizeof (psf->header), psf->headindex) ;
 				return ;
 				} ;
 			if (position > psf->headend)
 				psf->headend += psf_fread (psf->header + psf->headend, 1, position - psf->headend, psf) ;
 			psf->headindex = position ;
-//printf ("B sizeof (header): %u    headindex: %4u\n", sizeof (psf->header), psf->headindex) ;
 			break ;
 
 		case SEEK_CUR :
@@ -781,10 +779,9 @@ header_seek (SF_PRIVATE *psf, sf_count_t position, int whence)
 				} ;
 
 			if (psf->headindex + position > SIGNED_SIZEOF (psf->header))
-			{	psf->headend += psf_fread (psf->header + psf->headend, 1, SIGNED_SIZEOF (psf->header) - psf->headend, psf) ;
-				psf->headindex = psf->headend = SIGNED_SIZEOF (psf->header) ;
-
-				psf_fseek (psf, position - (SIGNED_SIZEOF (psf->header) - psf->headend), SEEK_CUR) ;
+			{	/* Need to jump this without caching it. */
+				psf->headindex = psf->headend ;
+				psf_fseek (psf, position, SEEK_CUR) ;
 				break ;
 				} ;
 
@@ -1177,7 +1174,7 @@ u_bitwidth_to_subformat (int bits)
 #endif /* PSF_LOG_PRINTF_ONLY */
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 33e9795e-f717-461a-9feb-65d083a56395

@@ -234,7 +234,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						psf_log_printf (psf, "RIFF : %u\n", RIFFsize) ;
 						}
 					else if (psf->filelength < RIFFsize + 2 * SIGNED_SIZEOF (dword))
-					{	psf_log_printf (psf, "RIFF : %u (should be %D)\n", (sf_count_t) RIFFsize, psf->filelength - 2 * SIGNED_SIZEOF (dword)) ;
+					{	psf_log_printf (psf, "RIFF : %u (should be %D)\n", RIFFsize, psf->filelength - 2 * SIGNED_SIZEOF (dword)) ;
 						RIFFsize = dword ;
 						}
 					else if (RIFFsize < 100)

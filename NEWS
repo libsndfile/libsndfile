@@ -1,7 +1,7 @@
 Version 1.0.6 (2004-02-08)
   * Added support for native Win32 file access API (Ross Bencina).
-  * New mode to add clippling then a converstion from float/double to
-    integer would otherwise wrap around.
+  * New mode to add clippling then a converting from float/double to integer
+    would otherwise wrap around.
   * Fixed a bug in reading/writing files > 2Gig on Linux, Solaris and others.
   * Many minor bug fixes.
   * Other random fixes for Win32.
