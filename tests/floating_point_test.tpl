@@ -309,10 +309,10 @@ static void
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= ARRAY_LEN ([+ (get "int_name") +]_data) ;
 	sfinfo.channels		= 1 ;
-	sfinfo.format		= SF_FORMAT_AU | [+ (get "minor_type") +] ;
+	sfinfo.format		= SF_ENDIAN_CPU | SF_FORMAT_AU | [+ (get "minor_type") +] ;
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
-	test_write_double_or_die (file, 0, double_data, ARRAY_LEN ([+ (get "float_name") +]_data), __LINE__) ;
+	test_write_[+ (get "float_name") +]_or_die (file, 0, [+ (get "float_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), __LINE__) ;
 	sf_close (file) ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
@@ -329,7 +329,7 @@ static void
 
 	sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
 
-	test_read_[+ (get "int_name") +]_or_die (file, 0, [+ (get "int_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), __LINE__) ;
+	test_read_[+ (get "int_name") +]_or_die (file, 0, [+ (get "int_name") +]_data, ARRAY_LEN ([+ (get "int_name") +]_data), __LINE__) ;
 	sf_close (file) ;
 
 	max = 0 ;
