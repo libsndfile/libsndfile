@@ -155,7 +155,7 @@
 #define PACKAGE "libsndfile"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "<erikd@mega-nerd.com>"
+#define PACKAGE_BUGREPORT "erikd@mega-nerd.com"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "libsndfile"

@@ -129,7 +129,7 @@ sds_open	(SF_PRIVATE *psf)
 
 		psf_fseek (psf, SDS_DATA_OFFSET, SEEK_SET) ;
 		} ;
-	
+
 	if ((error = sds_init (psf, psds)) != 0)
 		return error ;
 
@@ -149,7 +149,7 @@ sds_close	(SF_PRIVATE *psf)
 {
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	SDS_PRIVATE *psds ;
-	
+
 		if ((psds = (SDS_PRIVATE *) psf->fdata) == NULL)
 		{	psf_log_printf (psf, "*** Bad psf->fdata ptr.\n") ;
 			return SFE_INTERNAL ;
@@ -205,7 +205,7 @@ sds_init (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 		psf->write_double	= sds_write_d ;
 		} ;
 
-	return 0 ;	
+	return 0 ;
 } /* sds_init */
 
 static int
@@ -344,11 +344,11 @@ sds_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psds->write_count > 0)
 	{	int current_count = psds->write_count ;
 		int current_block = psds->write_block ;
-	
+
 		psds->writer (psf, psds) ;
-		
+
 		psf_fseek (psf, -1 * SDS_BLOCK_SIZE, SEEK_CUR) ;
-	
+
 		psds->write_count = current_count ;
 		psds->write_block = current_block ;
 		} ;
@@ -729,7 +729,7 @@ sds_seek (SF_PRIVATE *psf, int mode, sf_count_t seek_from_start)
 			psds->reader (psf, psds) ;
 			psds->write_count = newsample ;
 			break ;
-		
+
 		default :
 			psf->error = SFE_BAD_SEEK ;
 			return SF_SEEK_ERROR ;
@@ -988,7 +988,7 @@ sds_write (SF_PRIVATE *psf, SDS_PRIVATE *psds, int *ptr, int len)
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: d5d26aa3-368c-4ca6-bb85-377e5a2578cc

@@ -759,7 +759,7 @@ header_seek (SF_PRIVATE *psf, sf_count_t position, int whence)
 {
 	switch (whence)
 	{	case SEEK_SET :
-			if (position > sizeof (psf->header))
+			if (position > SIGNED_SIZEOF (psf->header))
 			{	/* Too much header to cache so just seek instead. */
 				psf_fseek (psf, position, whence) ;
 				return ;

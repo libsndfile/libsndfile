@@ -346,7 +346,7 @@ sf_error_number	(int errnum)
 {	static const char *bad_errnum =
 		"No error defined for this error number. This is a bug in libsndfile." ;
 	int	k ;
-	
+
 	if (errnum == SFE_MAX_ERROR)
 		return SndfileErrors [0].str ;
 
@@ -2033,7 +2033,7 @@ guess_file_type (SF_PRIVATE *psf, const char *filename)
 
 	if (buffer [0] == MAKE_MARKER ('a', 'j', 'k', 'g'))
 		return 0 /*-SF_FORMAT_SHN-*/ ;
-	
+
 	if (OS_IS_MACOSX && (format = macos_guess_file_type (psf, filename)) != 0)
 		return format ;
 
@@ -2404,9 +2404,10 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 
 	return 0 ;
 } /* psf_open_file */
+
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: cd4f9e91-a8ec-4154-9bf6-fe4b8c69a615

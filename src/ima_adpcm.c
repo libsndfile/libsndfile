@@ -36,7 +36,7 @@ typedef struct IMA_ADPCM_PRIVATE_tag
 	int				stepindx [2] ;
 	unsigned char	*block ;
 	short			*samples ;
-	unsigned char	data	[4] ; /* Dummy size */
+	unsigned short	data	[2] ; /* Dummy size */
 } IMA_ADPCM_PRIVATE ;
 
 /*============================================================================================
@@ -211,8 +211,8 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 
 	memset (pima, 0, pimasize) ;
 
-	pima->block		= (unsigned char*) pima->data ;
-	pima->samples	= (short*) (pima->data + blockalign * psf->sf.channels) ;
+	pima->samples	= pima->data ;
+	pima->block		= (unsigned char*) (pima->data + samplesperblock * psf->sf.channels) ;
 
 	pima->channels			= psf->sf.channels ;
 	pima->blocksize			= blockalign ;

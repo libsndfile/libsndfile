@@ -69,7 +69,7 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 	*/
 	if (sizeof (off_t) != sizeof (sf_count_t))
 	{	puts ("\n\n*** Fatal error : sizeof (off_t) != sizeof (sf_count_t)") ;
-	    puts ("*** This means that libsndfile was not configured correctly.\n") ;
+		puts ("*** This means that libsndfile was not configured correctly.\n") ;
 		exit (1) ;
 		} ;
 
