@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.53)
 
-AC_INIT(libsndfile,1.0.8pre3,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.8pre4,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
@@ -249,7 +249,7 @@ case "$target_os" in
 		os_is_win32=1
 		## AC_CHECK_HEADERS(wintypes.h)
 		AC_CHECK_HEADERS(mmreg.h)
-		if x$ac_cv_header_mmreg_h != xyes ; then
+		if test x$ac_cv_header_mmreg_h != xyes ; then
 			AC_MSG_WARN([[******************************************************************]])
 			AC_MSG_WARN([[*** Can't find mmreg.h which means that we can't build a working  ]])
 			AC_MSG_WARN([[*** sndfile-play program. The library can however be built.       ]])

@@ -1,3 +1,47 @@
+2004-03-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Fix bug which occurred when configuring for MinGW.
+
+2004-03-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/aiff.c src/wav.c src/float32.c src/double64.c
+      src/sndfile.c
+    Fix a bug with PEAK chunk handling for files with more than 16 channels.
+    Thanks to Remy Bruno for finding this.
+
+2004-03-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.c
+    Fix a bug which was preventing WAV files being openned correctly if the
+    file had a very large header. Thanks to Eldad Zack for finding this.
+
+2004-03-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac src/file_io.c
+    Fix cross-compiling from Linux to Win32 using the MinGW tools.
+
+2004-03-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/create_symbols_file.sh
+    Christian Weisgerber pointed out that the shell script did not run on a
+    real Bourne shell although it did run under Bash in Bourne shell mode.
+
+    * src/create_symbols_file.py
+    Rewrite of above in Python. Also add support for writing Win32 .def files.
+    The Python script generates Symbols.linux, Symbols.darwin and
+    libsndfile.def (Win32 version). These files get shipped with the tarball
+    so there should not be necessary to run the Python script when building
+    the code from the tarball.
+
+    * configure.ac src/Makefile.am Win32/Makefile.am
+    Hook new Python script into the build system.
+
+2004-02-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/configure.ac
+    Add --enable-gcc-werror option and move GCC specific stuff down.
+
 2004-02-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * acinclude.m4 configure.ac
@@ -49,7 +93,7 @@
 
     * src/common.h
     Changed logindex, headindex and headend files of SF_PRIVATE from unsigned
-    int to int to prevent weird arithmetic bugs. 
+    int to int to prevent weird arithmetic bugs.
 
     * src/common.c src/aiff.c src/wav.c src/w64.c
     Fixed compiler warnings resulting from above change.
