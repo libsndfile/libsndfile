@@ -808,7 +808,7 @@ ulaw2f_array (unsigned char *buffer, int count, float *ptr, float normfact)
 static inline void
 ulaw2d_array (unsigned char *buffer, int count, double *ptr, double normfact)
 {	while (--count >= 0)
-	ptr [count] = normfact * ulaw_decode [(int) buffer [count]] ;
+		ptr [count] = normfact * ulaw_decode [(int) buffer [count]] ;
 } /* ulaw2d_array */
 
 static inline void
@@ -835,9 +835,9 @@ static inline void
 f2ulaw_array (float *ptr, int count, unsigned char *buffer, float normfact)
 {	while (--count >= 0)
 	{	if (ptr [count] >= 0)
-			buffer [count] = ulaw_encode [(lrintf (normfact * ptr [count])) / 4] ;
+			buffer [count] = ulaw_encode [lrintf (normfact * ptr [count])] ;
 		else
-			buffer [count] = 0x7F & ulaw_encode [(lrintf (normfact * ptr [count])) / -4] ;
+			buffer [count] = 0x7F & ulaw_encode [- lrintf (normfact * ptr [count])] ;
 		} ;
 } /* f2ulaw_array */
 
@@ -845,9 +845,9 @@ static inline void
 d2ulaw_array (double *ptr, int count, unsigned char *buffer, double normfact)
 {	while (--count >= 0)
 	{	if (ptr [count] >= 0)
-			buffer [count] = ulaw_encode [(lrint (normfact * ptr [count])) / 4] ;
+			buffer [count] = ulaw_encode [lrint (normfact * ptr [count])] ;
 		else
-			buffer [count] = 0x7F & ulaw_encode [(lrint (normfact * ptr [count])) / -4] ;
+			buffer [count] = 0x7F & ulaw_encode [- lrint (normfact * ptr [count])] ;
 		} ;
 } /* d2ulaw_array */
 
@@ -994,7 +994,8 @@ ulaw_write_f2ulaw	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float	normfact ;
 
-	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
+	/* Factor in a divide by 4. */
+	normfact = (psf->norm_float == SF_TRUE) ? (0.25 * 0x7FFF) : 0.25 ;
 
 	bufferlen = ARRAY_LEN (psf->ucbuf) ;
 
@@ -1018,7 +1019,8 @@ ulaw_write_d2ulaw	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	double	normfact ;
 
-	normfact = (psf->norm_double) ? (1.0 * 0x7FFF) : 1.0 ;
+	/* Factor in a divide by 4. */
+	normfact = (psf->norm_double) ? (0.25 * 0x7FFF) : 0.25 ;
 
 	bufferlen = ARRAY_LEN (psf->ucbuf) ;
 

@@ -344,9 +344,9 @@ static inline void
 d2alaw_array (double *ptr, int count, unsigned char *buffer, double normfact)
 {	while (--count >= 0)
 	{	if (ptr [count] >= 0)
-			buffer [count] = alaw_encode [(lrint (normfact * ptr [count])) / 16] ;
+			buffer [count] = alaw_encode [lrint (normfact * ptr [count])] ;
 		else
-			buffer [count] = 0x7F & alaw_encode [(lrint (normfact * ptr [count])) / -16] ;
+			buffer [count] = 0x7F & alaw_encode [- lrint (normfact * ptr [count])] ;
 		} ;
 } /* d2alaw_array */
 
@@ -517,7 +517,7 @@ alaw_write_d2alaw	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	double	normfact ;
 
-	normfact = (psf->norm_double) ? (1.0 * 0x7FFF) : 1.0 ;
+	normfact = (psf->norm_double) ? (1.0 * 0x7FFF) / 16.0 : 1.0 / 16.0 ;
 
 	bufferlen = ARRAY_LEN (psf->ucbuf) ;
 
