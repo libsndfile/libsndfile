@@ -1,3 +1,9 @@
+2004-11-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c
+    Fix parsing of COMT chunks. Store SF_STR_COMMENT data in ANNO chunks
+    instead of COMT chunk.
+
 2004-11-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/file_io.c src/common.h

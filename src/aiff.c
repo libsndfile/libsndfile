@@ -524,7 +524,6 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						psf_binheader_readf (psf, "b", cptr, len) ;
 						cptr [len] = 0 ;
 						psf_log_printf (psf, "   string : %s\n", cptr) ;
-						psf_store_string (psf, SF_STR_COMMENT, cptr) ;
 						} ;
 					} ;
 					break ;
@@ -584,6 +583,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					psf_binheader_readf (psf, "b", cptr, dword) ;
 					cptr [dword] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
+					psf_store_string (psf, SF_STR_COMMENT, cptr) ;
 					break ;
 
 			case INST_MARKER :
@@ -1162,7 +1162,7 @@ aiff_write_strings (SF_PRIVATE *psf, int location)
 				break ;
 
 			case SF_STR_COMMENT :
-				psf_binheader_writef (psf, "Ems", COMT_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "Ems", ANNO_MARKER, psf->strings [k].str) ;
 				break ;
 
 			/*
