@@ -1,5 +1,15 @@
 autogen definitions utils.tpl;
 
+float_type = {
+	name = float ;
+	};
+
+float_type = {
+	name = double ;
+	};
+
+/*----------------------------------*/
+
 io_type = { 
 	io_element	= short ;
 	format_str		= "\"% d\\n\"" ;

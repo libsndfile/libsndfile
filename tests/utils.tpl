@@ -32,7 +32,10 @@
 #define	PIPE_INDEX(x)	((x) + 500)
 #define	PIPE_TEST_LEN	12345
 
-void	gen_windowed_sine (double *data, int len, double maximum) ;
+[+ FOR float_type
++]void gen_windowed_sine_[+ (get "name") +] ([+ (get "name") +] *data, int len, double maximum) ;
+[+ ENDFOR float_type
++]
 
 void	check_file_hash_or_die	(const char *filename, unsigned int target_hash, int line_num) ;
 
@@ -105,11 +108,12 @@ void	test_seek_or_die
 #define SIGNED_SIZEOF(x)	((int) (sizeof (x)))
 #define	LOG_BUFFER_SIZE		2048
 
+[+ FOR float_type +]
 void
-gen_windowed_sine (double *data, int len, double maximum)
+gen_windowed_sine_[+ (get "name") +] ([+ (get "name") +] *data, int len, double maximum)
 {	int k ;
 
-	memset (data, 0, len * sizeof (double)) ;
+	memset (data, 0, len * sizeof ([+ (get "name") +])) ;
 	/*
 	**	Choose a frequency of 1/32 so that it aligns perfectly with a DFT
 	**	bucket to minimise spreading of energy over more than one bucket.
@@ -126,8 +130,8 @@ gen_windowed_sine (double *data, int len, double maximum)
 		}
 
 	return ;
-} /* gen_windowed_sine */
-
+} /* gen_windowed_sine_[+ (get "name") +] */
+[+ ENDFOR float_type +]
 
 void
 check_file_hash_or_die (const char *filename, unsigned int target_hash, int line_num)
