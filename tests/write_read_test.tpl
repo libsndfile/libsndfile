@@ -730,7 +730,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 			} ;
 
 	sf_close (file) ;
-	unlink (filename) ;
+	delete_file (format, filename) ;
 
 	puts ("ok") ;
 	return ;
@@ -800,7 +800,7 @@ empty_file_test (const char *filename, int format)
 
 	sf_close (file) ;
 
-	unlink (filename) ;
+	unlink (filename) ;		
 	puts ("ok") ;
 
 	return ;

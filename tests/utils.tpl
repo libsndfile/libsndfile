@@ -51,12 +51,15 @@ void	print_test_name (const char *test, const char *filename) ;
 [+ ENDFOR io_type
 +]
 
+void	delete_file (int format, const char *filename) ;
+
 #ifdef SNDFILE_H
 
 void 	dump_log_buffer (SNDFILE *file) ;
 void 	check_log_buffer_or_die (SNDFILE *file, int line_num) ;
 int 	string_in_log_buffer (SNDFILE *file, const char *s) ;
 void	hexdump_file (const char * filename, sf_count_t offset, sf_count_t length) ;
+
 
 SNDFILE *test_open_file_or_die
 			(const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num) ;
@@ -523,6 +526,35 @@ test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die (SNDFILE *file, in
 	return ;
 } /* test_[+ (get "op_element") +]_[+ (get "io_element") +] */
 [+ ENDFOR io_type +][+ ENDFOR io_operation +]
+
+void
+delete_file (int format, const char *filename)
+{	char rsrc_name [512], *fname ;
+
+	unlink (filename) ;
+
+	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_SD2)
+		return ;
+
+	/*
+	** Now try for a resource fork stored as a separate file.
+	** Grab the un-adulterated filename again.
+	*/
+	snprintf (rsrc_name, sizeof (rsrc_name), "%s", filename) ;
+
+	if ((fname = strrchr (rsrc_name, '/')) != NULL)
+		fname ++ ;
+	else if ((fname = strrchr (rsrc_name, '\\')) != NULL)
+		fname ++ ;
+	else
+		fname = rsrc_name ;
+
+	memmove (fname + 2, fname, strlen (fname) + 1) ;
+	fname [0] = '.' ;
+	fname [1] = '_' ;
+
+	unlink (rsrc_name) ;
+} /* delete_file */
 
 [+ ESAC +]
 
