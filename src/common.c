@@ -735,7 +735,7 @@ header_read (SF_PRIVATE *psf, void *ptr, int bytes)
 		bytes = sizeof (psf->header) - psf->headindex ;
 		if (bytes <= 0)
 			return 0;
-		printf ("\nR sizeof (header): %u    headindex: %4u    bytes: %d\n", sizeof (psf->header), psf->headindex, bytes) ;
+		printf ("\nR sizeof (header): %d    headindex: %4u    bytes: %d\n", SIGNED_SIZEOF (psf->header), psf->headindex, bytes) ;
 		} ;
 
 
