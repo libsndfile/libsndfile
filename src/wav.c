@@ -525,9 +525,6 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		{	psf_log_printf (psf, "End\n") ;
 			break ;
 			} ;
-
-		if (psf->logindex >= SIGNED_SIZEOF (psf->logbuffer) - 2)
-			return SFE_LOG_OVERRUN ;
 		} ; /* while (1) */
 
 	if (! psf->dataoffset)
@@ -1197,9 +1194,6 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 					psf_store_string (psf, SF_STR_DATE, psf->u.cbuf) ;
 					break ;
 			} ;
-
-		if (psf->logindex >= SIGNED_SIZEOF (psf->logbuffer) - 2)
-			return SFE_LOG_OVERRUN ;
 		} ;
 
 	current_pos = psf_fseek (psf, 0, SEEK_CUR) - current_pos ;

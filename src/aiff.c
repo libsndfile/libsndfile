@@ -705,9 +705,6 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 		if (psf_ftell (psf) >= psf->filelength - (2 * SIGNED_SIZEOF (dword)))
 			break ;
-
-		if (psf->logindex >= SIGNED_SIZEOF (psf->logbuffer) - 2)
-			return SFE_LOG_OVERRUN ;
 		} ; /* while (1) */
 
 	if (! (found_chunk & HAVE_FORM))

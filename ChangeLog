@@ -1,3 +1,13 @@
+2005-01-25 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c src/w64.c src/wav.c
+    Do not return a header parse error when the log buffer overflows.
+    Continuing parsing works even on files where the log buffer does overflow.
+    This avoids a bug on some weirdo WAV (and other) files.
+
+    * src/common.h src/sndfile.c
+    Remove SFE_LOG_OVERRIN error and its associated error message.
+
 2004-12-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile-play.c

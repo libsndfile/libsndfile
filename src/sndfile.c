@@ -72,7 +72,6 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_INTERLEAVE_READ		, "Bad karma in read during interleave read operation." },
 
 	{	SFE_INTERNAL			, "Unspecified internal error." },
-	{	SFE_LOG_OVERRUN			, "Log buffer has overrun. File probably broken." },
 	{	SFE_BAD_CONTROL_CMD		, "Bad command passed to function sf_command()." },
 	{	SFE_BAD_ENDIAN			, "Bad endian-ness. Try default endian-ness" },
 	{	SFE_CHANNEL_COUNT		, "Too many channels specified." },
