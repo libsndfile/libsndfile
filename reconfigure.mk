@@ -3,10 +3,10 @@
 config.status: configure
 	./configure
 
-configure: configure.ac src/config.h.in libtool ltmain.sh
+configure: configure.ac Makefile.am src/config.h.in libtool ltmain.sh
 	autoconf
 
-Makefile.am: configure
+Makefile.am: configure.ac
 	automake --copy --add-missing
 
 src/config.h.in: configure.ac libtool
