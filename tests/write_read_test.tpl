@@ -410,6 +410,8 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 			(format & SF_FORMAT_TYPEMASK) != SF_FORMAT_FLAC)
 		new_rdwr_[+ (get "type_name") +]_test (filename, format, allow_fd) ;
 
+	delete_file (format, filename) ;
+
 	puts ("ok") ;
 	return ;
 } /* pcm_test_[+ (get "type_name") +] */
