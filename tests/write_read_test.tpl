@@ -720,10 +720,9 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 			} ;
 
 	sf_close (file) ;
-
 	unlink (filename) ;
-	printf ("ok\n") ;
 
+	puts ("ok") ;
 	return ;
 } /* pcm_test_[+ (get "type_name") +] */
 
