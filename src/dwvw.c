@@ -83,12 +83,10 @@ dwvw_init (SF_PRIVATE *psf, int bitwidth)
 	if (psf->mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
-	if (! (pdwvw = malloc (sizeof (DWVW_PRIVATE))))
+	if ((pdwvw = calloc (1, sizeof (DWVW_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 
 	psf->fdata = (void*) pdwvw ;
-
-	memset (pdwvw, 0, sizeof (DWVW_PRIVATE)) ;
 
 	pdwvw->bit_width 	= bitwidth ;
 	pdwvw->dwm_maxsize	= bitwidth / 2 ;
@@ -129,7 +127,7 @@ static int
 dwvw_close (SF_PRIVATE *psf)
 {	DWVW_PRIVATE *pdwvw ;
 
-	if (! psf->fdata)
+	if (psf->fdata == NULL)
 		return 0 ;
 	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
 

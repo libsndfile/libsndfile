@@ -371,7 +371,8 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 
 	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_16 ||
 			(filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_24)
-	{	unlink (filename) ;
+	{	sf_close (file) ;
+		unlink (filename) ;
 		printf ("ok\n") ;
 		return ;
 		} ;
