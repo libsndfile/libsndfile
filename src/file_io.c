@@ -559,7 +559,12 @@ psf_set_stdio (SF_PRIVATE *psf, int mode)
 
 /* Win32 */ void
 psf_set_file (SF_PRIVATE *psf, int fd)
-{	psf->filedes = _get_osfhandle (fd) ;
+{	HANDLE temp = _get_osfhandle (fd) ;
+
+	if (GetFileType (temp) == FILE_TYPE_DISK)
+		psf->filedes = (int) temp ;
+	else
+		psf->filedes = fd ;
 } /* psf_set_file */
 
 /* Win32 */ int
