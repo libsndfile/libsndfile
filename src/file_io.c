@@ -437,11 +437,7 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 	return ;
 } /* psf_log_syserr */
 
-#else
-
-/* Win32 ##################################################################### */
-
-#if	OS_IS_WIN32
+#elif	OS_IS_WIN32
 
 /* Win32 file i/o functions implemented using native Win32 API */
 
@@ -1220,7 +1216,6 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 	return ;
 } /* psf_log_syserr */
 
-#endif
 #endif
 
 /*==============================================================================
