@@ -190,7 +190,7 @@ read_str (const unsigned char * data, int offset, char * buffer, int buffer_len)
 static int
 sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 {	SD2_RSRC rsrc ;
-	int k, marker ;
+	int k, marker, error = 0 ;
 
 	memset (&rsrc, 0, sizeof (rsrc)) ;
 
@@ -198,12 +198,9 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 	psf_log_printf (psf, "Resource length : %d (0x%04X)\n", rsrc.rsrc_len, rsrc.rsrc_len) ;
 
 	if (rsrc.rsrc_len > SIGNED_SIZEOF (psf->header))
-	{	psf_log_printf (psf, "Resource length > sizeof (psf->header).\n") ;
-		return SFE_SD2_RSRC_SIZE ;
-		} ;
-
-	rsrc.rsrc_data = psf->header ;
-	rsrc.rsrc_len = rsrc.rsrc_len ;
+		rsrc.rsrc_data = calloc (1, rsrc.rsrc_len) ;
+	else
+		rsrc.rsrc_data = psf->header ;
 
 	/* Read in the whole lot. */
 	psf_fread (rsrc.rsrc_data, rsrc.rsrc_len, 1, psf) ;
@@ -221,23 +218,40 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 				rsrc.data_offset, rsrc.map_offset, rsrc.data_length, rsrc.map_length) ;
 
 	if (rsrc.data_offset > rsrc.rsrc_len)
-		return SFE_SD2_BAD_DATA_OFFSET ;
+	{	psf_log_printf (psf, "Error : rsrc.data_offset > len\n") ;
+		error = SFE_SD2_BAD_DATA_OFFSET ;
+		goto parse_rsrc_fork_cleanup ;
+		} ;
+
 	if (rsrc.map_offset > rsrc.rsrc_len)
-		return SFE_SD2_BAD_MAP_OFFSET ;
+	{	psf_log_printf (psf, "Error : rsrc.map_offset > len\n") ;
+		error = SFE_SD2_BAD_MAP_OFFSET ;
+		goto parse_rsrc_fork_cleanup ;
+		} ;
+
 	if (rsrc.data_length > rsrc.rsrc_len)
-		return SFE_SD2_BAD_DATA_LENGTH ;
+	{	psf_log_printf (psf, "Error : rsrc.data_length > len\n") ;
+		error = SFE_SD2_BAD_DATA_LENGTH ;
+		goto parse_rsrc_fork_cleanup ;
+		} ;
+
 	if (rsrc.map_length > rsrc.rsrc_len)
-		return SFE_SD2_BAD_MAP_LENGTH ;
+	{	psf_log_printf (psf, "Error : rsrc.map_length > len\n") ;
+		error = SFE_SD2_BAD_MAP_LENGTH ;
+		goto parse_rsrc_fork_cleanup ;
+		} ;
 
 	if (rsrc.data_offset + rsrc.data_length != rsrc.map_offset || rsrc.map_offset + rsrc.map_length != rsrc.rsrc_len)
 	{	psf_log_printf (psf, "Error : This does not look like a MacOSX resource fork.\n") ;
-		return SFE_SD2_BAD_RSRC ;
+		error = SFE_SD2_BAD_RSRC ;
+		goto parse_rsrc_fork_cleanup ;
 		} ;
 
 	rsrc.string_offset = rsrc.map_offset + read_short (psf->header, rsrc.map_offset + 26) ;
 	if (rsrc.string_offset > rsrc.rsrc_len)
 	{	psf_log_printf (psf, "Bad string offset (%d).\n", rsrc.string_offset) ;
-		return SFE_SD2_BAD_RSRC ;
+		error = SFE_SD2_BAD_RSRC ;
+		goto parse_rsrc_fork_cleanup ;
 		} ;
 
 	rsrc.type_offset = rsrc.map_offset + 30 ;
@@ -245,13 +259,15 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 	rsrc.type_count = read_short (psf->header, rsrc.map_offset + 28) + 1 ;
 	if (rsrc.type_count < 1)
 	{	printf ("Bad type count.\n") ;
-		return SFE_SD2_BAD_RSRC ;
+		error = SFE_SD2_BAD_RSRC ;
+		goto parse_rsrc_fork_cleanup ;
 		} ;
 
 	rsrc.item_offset = rsrc.type_offset + rsrc.type_count * 8 ;
 	if (rsrc.item_offset < 0 || rsrc.item_offset > rsrc.rsrc_len)
 	{	psf_log_printf (psf, "Bad item offset (%d).\n", rsrc.item_offset) ;
-		return SFE_SD2_BAD_RSRC ;
+		error = SFE_SD2_BAD_RSRC ;
+		goto parse_rsrc_fork_cleanup ;
 		} ;
 
 	rsrc.str_index = -1 ;
@@ -261,12 +277,20 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 		if (marker == STR_MARKER)
 		{	rsrc.str_index = k ;
 			rsrc.str_count = read_short (psf->header, rsrc.type_offset + k * 8 + 4) + 1 ;
-			return parse_str_rsrc (psf, &rsrc) ;
+			error = parse_str_rsrc (psf, &rsrc) ;
+			goto parse_rsrc_fork_cleanup ;
 			} ;
 		} ;
 
 	psf_log_printf (psf, "No 'STR ' resource.\n") ;
-	return SFE_SD2_BAD_RSRC ;
+	error = SFE_SD2_BAD_RSRC ;
+
+parse_rsrc_fork_cleanup :
+
+	if ((void *) rsrc.rsrc_data < (void *) psf || (void *) rsrc.rsrc_data > (void *) (psf + 1))
+		free (rsrc.rsrc_data) ;
+
+	return error ;
 } /* sd2_parse_rsrc_fork */
 
 static int
