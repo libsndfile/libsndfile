@@ -24,7 +24,7 @@
 
 #include	<sndfile.h>
 
-#define	 BUFFER_LEN      (1 << 16)
+#define	BUFFER_LEN		(1 << 16)
 
 #if (defined (WIN32) || defined (_WIN32))
 #define	snprintf	_snprintf
@@ -147,7 +147,7 @@ generate_duration_str (SF_INFO *sfinfo)
 } /* generate_duration_str */
 
 int
-main (int argc, char *argv[])
+main (int argc, char *argv [])
 {	static	char	strbuffer [BUFFER_LEN] ;
 	char 		*progname, *infilename ;
 	SNDFILE	 	*infile ;
@@ -162,7 +162,7 @@ main (int argc, char *argv[])
 
 	if (argc < 2)
 	{	print_usage (progname) ;
-		return  1 ;
+		return 1 ;
 		} ;
 
 	for (k = 1 ; k < argc ; k++)

@@ -1,18 +1,18 @@
 /*
 ** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
-**  
+**
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
 ** the Free Software Foundation; either version 2 of the License, or
 ** (at your option) any later version.
-** 
+**
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
-** 
+**
 ** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software 
+** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
@@ -29,7 +29,7 @@
 static void usage_exit (char *progname) ;
 static int is_data_really_float (SNDFILE *sndfile) ;
 static void fix_file (char *filename) ;
-static off_t  file_size (char *filename) ;
+static off_t file_size (char *filename) ;
 
 static	int buffer [BUFFER_LEN] ;
 
@@ -43,13 +43,13 @@ main (int argc, char *argv [])
 
 	if (argc < 2)
 		usage_exit (argv [0]) ;
-		
+
 	for (k = 1 ; k < argc ; k++)
 	{	if ((sndfile = sf_open (argv [k], SFM_READ, &sfinfo)) == NULL)
 		{	/*-printf ("Failed to open : %s\n", argv [k]) ;-*/
 			continue ;
 			} ;
-		
+
 		if (sfinfo.format != (SF_FORMAT_WAV | SF_FORMAT_PCM_32))
 		{	/*-printf ("%-50s : not a 32 bit PCM WAV file.\n", argv [k]) ;-*/
 			sf_close (sndfile) ;
@@ -78,7 +78,7 @@ main (int argc, char *argv [])
 } /* main */
 
 
-static void 
+static void
 usage_exit (char *progname)
 {	char *cptr ;
 
@@ -86,7 +86,7 @@ usage_exit (char *progname)
 		progname = cptr + 1 ;
 	if ((cptr = strrchr (progname, '\\')))
 		progname = cptr + 1 ;
-		
+
 	printf ("\n    Usage : %s <filename>\n", progname) ;
 	puts ("\n"
 		"Fix broken files created by Syntrillium's Cooledit. These files are \n"
@@ -104,23 +104,23 @@ static int
 is_data_really_float (SNDFILE *sndfile)
 {	float	*fptr ;
 	int 	k, readcount ;
-	
+
 	fptr = (float *) buffer ;
 
 	while ((readcount = sf_read_int (sndfile, buffer, BUFFER_LEN)) > 0)
 	{	for (k = 0 ; k < readcount ; k++)
 		{	if (buffer [k] == 0)
 				continue ;
-			
+
 			if (fabs (fptr [k]) > 32768.0)
 				return SF_FALSE ;
 			} ;
 		} ;
-	
+
 	return SF_TRUE ;
 } /* is_data_really_float */
 
-static void 
+static void
 fix_file (char *filename)
 {	static	char	newfilename [512] ;
 
@@ -129,38 +129,38 @@ fix_file (char *filename)
 	int		readcount, k ;
 	float	*fptr, normfactor ;
 	char	*cptr ;
-	
+
 	printf ("\nFixing : %s\n", filename) ;
 
 	if ((infile = sf_open (filename, SFM_READ, &sfinfo)) == NULL)
 	{	printf ("Not able to open input file %s\n", filename) ;
 		exit (1) ;
 		} ;
-	
+
 	if (strlen (filename) >= sizeof (newfilename) - 1)
 	{	puts ("Error : Path name too long.\n") ;
-		exit (1) ;	
+		exit (1) ;
 		} ;
-		
+
 	strncpy (newfilename, filename, sizeof (newfilename)) ;
 	newfilename [sizeof (newfilename) - 1] = 0 ;
-	
+
 	if ((cptr = strrchr (newfilename, '/')) == NULL)
 		cptr = strrchr (newfilename, '\\') ;
-	
+
 	if (cptr)
 	{	cptr [1] = 0 ;
 		strncat (newfilename, "fixed.wav", sizeof (newfilename) - strlen (newfilename) - 1) ;
 		}
 	else
 		strncpy (newfilename, "fixed.wav", sizeof (newfilename) - 1) ;
-	
+
 	newfilename [sizeof (newfilename) - 1] = 0 ;
 
 	printf ("    Output   : %s\n", newfilename) ;
-	
+
 	sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_FLOAT ;
-	
+
 	if ((outfile = sf_open (newfilename, SFM_WRITE, &sfinfo)) == NULL)
 	{	printf ("Not able to output open file %s\n", filename) ;
 		exit (1) ;
@@ -171,7 +171,7 @@ fix_file (char *filename)
 	fptr = (float *) buffer ;
 
 	normfactor = 0.0 ;
-	
+
 	while ((readcount = sf_read_int (infile, buffer, BUFFER_LEN)) > 0)
 	{	for (k = 0 ; k < readcount ; k++)
 			if (fabs (fptr [k]) > normfactor)
@@ -179,11 +179,11 @@ fix_file (char *filename)
 		} ;
 
 	printf ("    Peak     : %g\n", normfactor) ;
-	
+
 	normfactor = 1.0 / normfactor ;
-	
+
 	sf_seek (infile, 0, SEEK_SET) ;
-	
+
 	while ((readcount = sf_read_int (infile, buffer, BUFFER_LEN)) > 0)
 	{	for (k = 0 ; k < readcount ; k++)
 			fptr [k] *= normfactor ;
@@ -192,10 +192,10 @@ fix_file (char *filename)
 
 	sf_close (infile) ;
 	sf_close (outfile) ;
-	
+
 	if (abs (file_size (filename) - file_size (newfilename)) > 50)
 	{	puts ("Error : file size mismatch.\n") ;
-		exit (1) ;	
+		exit (1) ;
 		} ;
 
 	printf ("    Renaming : %s\n", filename) ;
@@ -226,7 +226,7 @@ file_size (char *filename)
 } /* file_size */
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 5475655e-3898-40ff-969b-c8ab2351b0e4
