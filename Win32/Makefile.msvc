@@ -94,8 +94,8 @@ LINK32_OBJS= \
 	".\src\xi.obj" \
 	".\src\htk.obj"
 
-libsndfile.dll : $(LINK32_OBJS) ".\Win32\libsndfile.def"
-    $(LINK32) $(DLL_LINK_FLAGS) /def:".\Win32\libsndfile.def" $(LINK32_OBJS)
+libsndfile.dll : $(LINK32_OBJS) ".\src\libsndfile.def"
+    $(LINK32) $(DLL_LINK_FLAGS) /def:".\src\libsndfile.def" $(LINK32_OBJS)
 
 "sndfile-info.exe" : ".\examples\sndfile-info.c"
     $(CPP) $(CFLAGS) /Fo".\examples\sndfile-info.obj" /c ".\examples\sndfile-info.c"

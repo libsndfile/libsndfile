@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.53)
 
-AC_INIT(libsndfile,1.0.7,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.8pre1,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
@@ -25,7 +25,7 @@ AC_CONFIG_HEADERS(src/config.h)
 #  6. If any interfaces have been removed since the last public release, then set age
 #     to 0.
 
-SHARED_VERSION_INFO="1:7:0"
+SHARED_VERSION_INFO="1:8:0"
 
 AC_CHECK_PROG(autogen, autogen, yes, no)
 
@@ -310,10 +310,10 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 			# System headers on these systems are broken.
 			temp_CFLAGS=`echo $CFLAGS | sed "s/-Wall -pedantic//" | sed "s/-Wshadow//" | sed "s/-Waggregate-return//"`
 			CFLAGS=$temp_CFLAGS
-			SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,Symbols"
+			SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,\$(srcdir)/Symbols.darwin"
 			;;
 		linux*)
-			SHLIB_VERSION_ARG="-Wl,--version-script=Symbols"
+			SHLIB_VERSION_ARG="-Wl,--version-script=\$(srcdir)/Symbols.linux"
 			;;
 		*)
 			;;

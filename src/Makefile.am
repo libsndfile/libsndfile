@@ -8,7 +8,8 @@ include_HEADERS = sndfile.h
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 
-EXTRA_DIST = sndfile.h.in config.h.in create_symbols_file.sh
+EXTRA_DIST = sndfile.h.in config.h.in Symbols.linux Symbols.darwin \
+			libsndfile.def create_symbols_file.py
 
 noinst_HEADERS = common.h sfendian.h float_cast.h wav_w64.h au.h sf_unistd.h
 
@@ -50,16 +51,28 @@ check: test_file_io
 	@echo
 	@echo
 
-# Generate an OS specific Symbols file.
-Symbols: create_symbols_file.sh
-	$(SHELL) $(srcdir)/create_symbols_file.sh $(target_os) $(VERSION) > Symbols
+#======================================================================
+# Generate an OS specific Symbols files. This is done when the author
+# builds the distribution tarball. There should be not need for the
+# end user to create these files.
 
+Symbols.linux: create_symbols_file.py
+	./create_symbols_file.py linux $(VERSION) > Symbols.linux
+	
+Symbols.darwin: create_symbols_file.py
+	./create_symbols_file.py darwin $(VERSION) > Symbols.darwin
+
+libsndfile.def: create_symbols_file.py
+	./create_symbols_file.py win32 $(VERSION) > libsndfile.def
+
+# Fake dependancy to force the creation of these files.
+sndfile.c : Symbols.linux Symbols.darwin libsndfile.def
+
+#======================================================================
 # Disable autoheader. 
 AUTOHEADER=echo
 
 # Dependancies.
-
-sndfile.c : Symbols
 
 aiff.c au.c au_g72x.c ircam.c mat4.c mat5.c nist.c paf.c pvf.c : sndfile.h common.h
 raw.c svx.c voc.c w64.c wav.c wav_w64.c htk.c sd2.c rx2.c txw.c : sndfile.h common.h
