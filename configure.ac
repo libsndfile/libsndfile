@@ -62,6 +62,10 @@ if test x$ac_arg_experimental = xyes ; then
 	fi
 AC_DEFINE_UNQUOTED([ENABLE_EXPERIMENTAL_CODE],${EXPERIMENTAL_CODE}, [Set to 1 to enable experimental code.])
 
+AC_ARG_ENABLE(gcc-werror,
+		[  --enable-gcc-werror        enable -Werror in all Makefiles],
+		ac_arg_gcc_werror=yes, ac_arg_gcc_werror=no)
+
 AC_ARG_ENABLE(gcc-pipe, 
 		[  --disable-gcc-pipe           disable gcc -pipe option],
 		ac_arg_gcc_pipe="N", ac_arg_gcc_pipe="Y")
@@ -73,39 +77,6 @@ AC_ARG_ENABLE(gcc-opt,
 AC_ARG_ENABLE(cpu-clip,  
 		[  --disable-cpu-clip           disable tricky cpu specific clipper],
 		ac_arg_cpu_clip="N", ac_arg_cpu_clip="Y")
-
-if test x$ac_cv_c_compiler_gnu = xyes ; then
-	CFLAGS="$CFLAGS -W -Wall -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return -Wcast-align -Wcast-qual -Wnested-externs -Wshadow -Wbad-function-cast -Wwrite-strings"
-	# -Wpointer-arith -Wundef -Wmissing-declarations -Winline -Wconversion"
-	if test "$ac_arg_gcc_opt" = "N" ; then
-		temp_CFLAGS=`echo $CFLAGS | sed "s/O2/O0/"`
-		CFLAGS=$temp_CFLAGS
-		AC_MSG_WARN([[*** Compiler optimisations switched off. ***]])
-		fi
-
-	# OS specific tweaks.
-	case "$target_os" in
-		darwin* | rhapsody*)
-			# Disable -Wall, -pedantic and -Wshadow for Apple Darwin/Rhapsody.
-			# System headers on these systems are broken.
-			temp_CFLAGS=`echo $CFLAGS | sed "s/-Wall -pedantic//" | sed "s/-Wshadow//" | sed "s/-Waggregate-return//"`
-			CFLAGS=$temp_CFLAGS
-			SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,Symbols"
-			;;
-		linux*)
-			SHLIB_VERSION_ARG="-Wl,--version-script=Symbols"
-			;;
-		*)
-			;;
-		esac
-	if test x$ac_arg_gcc_pipe != "xN" ; then
-	 	CFLAGS="$CFLAGS -pipe"
-	 	fi
-
-	AC_DEFINE([COMPILER_IS_GCC],1, [Set to 1 if the compile is GNU GCC.])
-	GCC_MAJOR_VERSION=`$CC -dumpversion | sed "s/\..*//"`
-	AC_DEFINE_UNQUOTED([GCC_MAJOR_VERSION],${GCC_MAJOR_VERSION}, [Major version of GCC or 3 otherwise.])
-	fi
 
 #====================================================================================
 # Check types and their sizes.
@@ -322,6 +293,43 @@ if test x"$ac_cv_prog_autogen" = "xno" ; then
 
 #====================================================================================
 # Now use the information from the checking stage.
+
+if test x$ac_cv_c_compiler_gnu = xyes ; then
+	CFLAGS="$CFLAGS -W -Wall -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return -Wcast-align -Wcast-qual -Wnested-externs -Wshadow -Wbad-function-cast -Wwrite-strings"
+	# -Wpointer-arith -Wundef -Wmissing-declarations -Winline -Wconversion"
+	if test "$ac_arg_gcc_opt" = "N" ; then
+		temp_CFLAGS=`echo $CFLAGS | sed "s/O2/O0/"`
+		CFLAGS=$temp_CFLAGS
+		AC_MSG_WARN([[*** Compiler optimisations switched off. ***]])
+		fi
+
+	# OS specific tweaks.
+	case "$target_os" in
+		darwin* | rhapsody*)
+			# Disable -Wall, -pedantic and -Wshadow for Apple Darwin/Rhapsody.
+			# System headers on these systems are broken.
+			temp_CFLAGS=`echo $CFLAGS | sed "s/-Wall -pedantic//" | sed "s/-Wshadow//" | sed "s/-Waggregate-return//"`
+			CFLAGS=$temp_CFLAGS
+			SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,Symbols"
+			;;
+		linux*)
+			SHLIB_VERSION_ARG="-Wl,--version-script=Symbols"
+			;;
+		*)
+			;;
+		esac
+	if test x$ac_arg_gcc_pipe != "xN" ; then
+	 	CFLAGS="$CFLAGS -pipe"
+	 	fi
+
+	if test x$ac_arg_gcc_werror = "xyes" ; then
+		CFLAGS="-Werror $CFLAGS"
+		fi
+
+	AC_DEFINE([COMPILER_IS_GCC],1, [Set to 1 if the compile is GNU GCC.])
+	GCC_MAJOR_VERSION=`$CC -dumpversion | sed "s/\..*//"`
+	AC_DEFINE_UNQUOTED([GCC_MAJOR_VERSION],${GCC_MAJOR_VERSION}, [Major version of GCC or 3 otherwise.])
+	fi
 
 CFLAGS="$CFLAGS $OS_SPECIFIC_CFLAGS"
 
