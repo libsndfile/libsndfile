@@ -36,7 +36,11 @@ typedef struct IMA_ADPCM_PRIVATE_tag
 	int				stepindx [2] ;
 	unsigned char	*block ;
 	short			*samples ;
-	unsigned short	data	[] ; /* ISO C99 struct hack */
+#if HAVE_FLEIBLE_ARRAY
+	unsigned short	data	[] ; /* ISO C99 struct flexible array. */
+#else
+	unsigned short	data	[1] ; /* This is a hack and might not work. */
+#endif
 } IMA_ADPCM_PRIVATE ;
 
 /*============================================================================================

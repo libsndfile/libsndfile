@@ -43,7 +43,11 @@ typedef struct
 	sf_count_t			samplecount ;
 	short			*samples ;
 	unsigned char	*block ;
-	unsigned short	dummydata [] ; /* ISO C99 struct hack */
+#if HAVE_FLEIBLE_ARRAY
+	unsigned short	dummydata [] ; /* ISO C99 struct flexible array. */
+#else
+	unsigned short	dummydata [1] ; /* This is a hack an might not work. */
+#endif
 } MSADPCM_PRIVATE ;
 
 /*============================================================================================

@@ -64,7 +64,11 @@ typedef struct
 	sf_count_t		sample_count ;
 	int				*samples ;
 	unsigned char	*block ;
-	int				data [] ; /* ISO C99 struct hack */
+#if HAVE_FLEIBLE_ARRAY
+	int				data [] ; /* ISO C99 struct flexible array. */
+#else
+	int				data [1] ; /* This is a hack and may not work. */
+#endif
 } PAF24_PRIVATE ;
 
 /*------------------------------------------------------------------------------

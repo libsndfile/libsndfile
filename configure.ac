@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.53)
 
-AC_INIT(libsndfile,1.0.10pre4,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.10pre5,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
@@ -50,14 +50,12 @@ AC_DEFINE_UNQUOTED([HAVE_DECL_S_IRGRP],${HAVE_DECL_S_IRGRP},
 
 AC_C99_FLEXIBLE_ARRAY
 
-if test x$ac_cv_c99_flexible_array = xno ; then
-	AC_MSG_ERROR([[
-	**********************************************************************
-	*** This compiler does not support the 1999 ISO C Standard feature ***
-	*** feature known as struct flexible array (or the "struct hack"). ***
-	*** Try GNU GCC-3.1 or later as they are known to work.            ***
-	**********************************************************************
-	]])
+if test x$ac_cv_c99_flexible_array = xyes ; then
+	AC_DEFINE([HAVE_FLEXIBLE_ARRAY],1, [Set to 1 if the compile supports the struct hack.])
+else
+	AC_MSG_WARN([[*** This compiler does not support the 1999 ISO C Standard feature ***]])
+	AC_MSG_WARN([[*** feature known as struct flexible array (or the "struct hack"). ***]])
+	AC_DEFINE([HAVE_FLEXIBLE_ARRAY],0)
 	fi
 
 #====================================================================================

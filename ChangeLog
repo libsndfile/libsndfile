@@ -1,9 +1,19 @@
+2004-05-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Set HAVE_FLEXIBLE_ARRAY in src/config.h depending on whether the compiler
+    accepts the flexible array struct member as per 1999 ISO C standard.
+
+    * src/common.h src/ima_adpcm.c src/paf.c src/ms_adpcm.c
+    Added ugly #if HAVE_FLEXIBLE_ARRAY and provided a non-standards compliant
+    hack for non 1999 ISO C compliant compilers.
+
 2004-04-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/strings.c
     If adding an SF_STR_SOFTWARE string, only append libsndfile-X.Y.Z if the
     string does not already have libsndfile in the string. Thanks to Conrad
-	Parker.
+    Parker.
 
     * tests/string_test.c
     Add test to verify the above.
@@ -16,7 +26,7 @@
     * doc/command.html
     Fix minor error. Thanks to Simon Burton.
 
-	* doc/win32.html
+    * doc/win32.html
     Started adding instructions for compiling libsndfile under MinGW.
 
     * configure.ac
@@ -25,7 +35,7 @@
     * doc/libsndfile.css.in
     This is now a template file for configure which sets the foreground and
     background colours.
- 
+
 2004-04-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
