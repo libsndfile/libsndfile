@@ -1,27 +1,15 @@
-# MinGW specific Makefile for libsndfile.
-
-@SET_MAKE@
-
-PROGRAMS = sndfile-info.exe sndfile-play.exe sndfile-convert.exe
-TARGETS = libsndfile.dll $(PROGRAMS) sndfile.pc src/sndfile.h
 
 AR = @AR@
 CC = @CC@
-CFLAGS = @CFLAGS@ -Isrc
+CFLAGS = @CFLAGS@
 COMPILER_IS_GCC = @COMPILER_IS_GCC@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CXX = @CXX@
-DLLTOOL = @DLLTOOL@
-DLLWRAP = @DLLWRAP@
-INSTALL = @INSTALL@
-INSTALL_DATA = ${INSTALL} -m 644
-install_sh = @install_sh@
 LDFLAGS = @LDFLAGS@
 LN_S = @LN_S@
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
-PEXPORTS = @PEXPORTS@
 PACKAGE = @PACKAGE@
 PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -31,42 +19,18 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 RANLIB = @RANLIB@
 STRIP = @STRIP@
 
-#====================================================================
-# Target directories.
-
-bindir = @bindir@
-exec_prefix = @exec_prefix@
-htmldocdir = @htmldocdir@
-includedir = @includedir@
-libdir = @libdir@
-pkgconfigdir = @libdir@/pkgconfig
-prefix = @prefix@
+DEF_INC = -Isrc
 
 #====================================================================
 # Targets
 
-all : $(TARGETS)
+all : libsndfile.dll \
+	sndfile-info.exe \
+	sndfile-play.exe \
+	generate.exe
 
 clean :
-	rm -f  $(TARGETS) *.del *.lib src/*.o src/G72x/*.o \
-		src/GSM610/*.o tests/*.o tests/*.exe
-
-install : $(TARGETS)
-	$(install_sh) -c libsndfile.dll $(libdir)
-	$(install_sh) -c sndfile.pc $(pkgconfigdir)
-	@for prog in $(PROGRAMS); do \
-		echo "installing ... $$prog" ; \
-		$(install_sh) -c "$$prog" $(bindir) ; \
-		done;
-	$(install_sh) -c src/sndfile.h $(includedir)
-
-uninstall :
-	rm -f $(libdir)/libsndfile.dll
-	rm -f $(pkgconfigdir)/sndfile.pc
-	@for prog in $(PROGRAMS); do \
-		rm -f $(bindir)/"$$prog" ; \
-		done;
-	rm -f $(includedir)/sndfile.h
+	rm -f src/*.o src/G72x/*.o src/GSM610/*.o tests/*.o tests/*.exe
 
 #====================================================================
 
@@ -112,6 +76,7 @@ LINK_OBJS = \
 	src/raw.o \
 	src/rx2.o \
 	src/sd2.o \
+	src/sfendian.o \
 	src/sndfile.o \
 	src/svx.o \
 	src/txw.o \
@@ -132,30 +97,21 @@ LINK_OBJS = \
 	src/xi.o \
 	src/htk.o
 
-libsndfile.dll libsndfile.lib : $(LINK_OBJS)
-	$(DLLWRAP) --def src/libsndfile.def $(LINK_OBJS) --output-lib libsndfile.lib -o libsndfile.dll
-	$(STRIP) libsndfile.dll
+libsndfile.dll : $(LINK_OBJS)
+	echo $(LINK_OBJS)
+	$(CC) -shared $(LINK_OBJS) -Wl,--output-def,libsndfile.def,--out-implib,libsndfile.lib -o libsndfile.dll
 
-sndfile-info.exe : examples/sndfile-info.o libsndfile.lib
-	$(CC) $+ -o $@
+sndfile-info.exe : examples/sndfile-info.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o examples/sndfile-info.o -c examples/sndfile-info.c
+	$(CC) -o sndfile-info.exe examples/sndfile-info.o libsndfile.lib
 
-sndfile-convert.exe : examples/sndfile-convert.o libsndfile.lib
-	$(CC) $+ -o $@
+sndfile-play.exe : examples/sndfile-play.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o examples/sndfile-play.o -c examples/sndfile-play.c
+	$(CC) -o sndfile-play.exe examples/sndfile-play.o libsndfile.lib winmm.lib
 
-sndfile-play.exe : examples/sndfile-play.o libsndfile.lib
-	$(CC) $+ -lwinmm -o $@
-
-generate.exe : examples/generate.o libsndfile.lib
-	$(CC) $+ -o $@
-
-sndfile.pc : sndfile.pc.in config.status
-	@./config.status $@
-
-config.status :
-	./configure
-
-#====================================================================
-# Testing programs.
+generate.exe : examples/generate.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o examples/generate.o -c examples/generate.c
+	$(CC) -o generate.exe examples/generate.o libsndfile.lib
 
 TEST_PROGS = \
 	src/test_file_io.exe \
@@ -322,75 +278,296 @@ check : $(TEST_PROGS)
 	@echo "----------------------------------------------------------------------"
 
 #====================================================================
+# C files in src/GSM610.
+
+src/GSM610/add.o : src/Gsm610/add.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/add.o -c src/Gsm610/add.c
+
+src/GSM610/code.o : src/Gsm610/code.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/code.o -c src/Gsm610/code.c
+
+src/GSM610/decode.o : src/Gsm610/decode.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/decode.o -c src/Gsm610/decode.c
+
+src/GSM610/gsm_create.o : src/Gsm610/gsm_create.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/gsm_create.o -c src/Gsm610/gsm_create.c
+
+src/GSM610/gsm_decode.o : src/Gsm610/gsm_decode.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/gsm_decode.o -c src/Gsm610/gsm_decode.c
+
+src/GSM610/gsm_destroy.o : src/Gsm610/gsm_destroy.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/gsm_destroy.o -c src/Gsm610/gsm_destroy.c
+
+src/GSM610/gsm_encode.o : src/Gsm610/gsm_encode.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/gsm_encode.o -c src/Gsm610/gsm_encode.c
+
+src/GSM610/gsm_option.o : src/Gsm610/gsm_option.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/gsm_option.o -c src/Gsm610/gsm_option.c
+
+src/GSM610/long_term.o : src/Gsm610/long_term.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/long_term.o -c src/Gsm610/long_term.c
+
+src/GSM610/lpc.o : src/Gsm610/lpc.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/lpc.o -c src/Gsm610/lpc.c
+
+src/GSM610/preprocess.o : src/Gsm610/preprocess.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/preprocess.o -c src/Gsm610/preprocess.c
+
+src/GSM610/rpe.o : src/Gsm610/rpe.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/rpe.o -c src/Gsm610/rpe.c
+
+src/GSM610/short_term.o : src/Gsm610/short_term.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/short_term.o -c src/Gsm610/short_term.c
+
+src/GSM610/table.o : src/Gsm610/table.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/Gsm610/table.o -c src/Gsm610/table.c
+
+#====================================================================
+# C files in src/G72x.
+
+src/G72x/g721.o : src/G72x/g721.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/G72x/g721.o -c src/G72x/g721.c
+
+src/G72x/g723_16.o : src/G72x/g723_16.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/G72x/g723_16.o -c src/G72x/g723_16.c
+
+src/G72x/g723_24.o : src/G72x/g723_24.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/G72x/g723_24.o -c src/G72x/g723_24.c
+
+src/G72x/g723_40.o : src/G72x/g723_40.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/G72x/g723_40.o -c src/G72x/g723_40.c
+
+src/G72x/g72x.o : src/G72x/g72x.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/G72x/g72x.o -c src/G72x/g72x.c
+
+#====================================================================
+# C files in src.
+
+src/aiff.o : src/aiff.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/aiff.o -c src/aiff.c
+
+src/alaw.o : src/alaw.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/alaw.o -c src/alaw.c
+
+src/au.o : src/au.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/au.o -c src/au.c
+
+src/au_g72x.o : src/au_g72x.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/au_g72x.o -c src/au_g72x.c
+
+src/avr.o : src/avr.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/avr.o -c src/avr.c
+
+src/common.o : src/common.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/common.o -c src/common.c
+
+src/double64.o : src/double64.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/double64.o -c src/double64.c
+
+src/dwvw.o : src/dwvw.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/dwvw.o -c src/dwvw.c
+
+src/file_io.o : src/file_io.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/file_io.o -c src/file_io.c
+
+src/dither.o : src/dither.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/dither.o -c src/dither.c
+
+src/float32.o : src/float32.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/float32.o -c src/float32.c
+
+src/command.o : src/command.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/command.o -c src/command.c
+
+src/strings.o : src/strings.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/strings.o -c src/strings.c
+
+src/ima_adpcm.o : src/ima_adpcm.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/ima_adpcm.o -c src/ima_adpcm.c
+
+src/ircam.o : src/ircam.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/ircam.o -c src/ircam.c
+
+src/ms_adpcm.o : src/ms_adpcm.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/ms_adpcm.o -c src/ms_adpcm.c
+
+src/nist.o : src/nist.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/nist.o -c src/nist.c
+
+src/paf.o : src/paf.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/paf.o -c src/paf.c
+
+src/pcm.o : src/pcm.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/pcm.o -c src/pcm.c
+
+src/raw.o : src/raw.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/raw.o -c src/raw.c
+
+src/rx2.o : src/rx2.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/rx2.o -c src/rx2.c
+
+src/sd2.o : src/sd2.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/sd2.o -c src/sd2.c
+
+src/sfendian.o : src/sfendian.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/sfendian.o -c src/sfendian.c
+
+src/sndfile.o : src/sndfile.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/sndfile.o -c src/sndfile.c
+
+src/svx.o : src/svx.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/svx.o -c src/svx.c
+
+src/txw.o : src/txw.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/txw.o -c src/txw.c
+
+src/sds.o : src/sds.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/sds.o -c src/sds.c
+
+src/ulaw.o : src/ulaw.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/ulaw.o -c src/ulaw.c
+
+src/voc.o : src/voc.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/voc.o -c src/voc.c
+
+src/w64.o : src/w64.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/w64.o -c src/w64.c
+
+src/wav.o : src/wav.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/wav.o -c src/wav.c
+
+src/gsm610.o : src/gsm610.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/gsm610.o -c src/gsm610.c
+
+src/wav_w64.o : src/wav_w64.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/wav_w64.o -c src/wav_w64.c
+
+src/dwd.o : src/dwd.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/dwd.o -c src/dwd.c
+
+src/wve.o : src/wve.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/wve.o -c src/wve.c
+
+src/mat4.o : src/mat4.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/mat4.o -c src/mat4.c
+
+src/mat5.o : src/mat5.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/mat5.o -c src/mat5.c
+
+src/vox_adpcm.o : src/vox_adpcm.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/vox_adpcm.o -c src/vox_adpcm.c
+
+src/ogg.o : src/ogg.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/ogg.o -c src/ogg.c
+
+src/pvf.o : src/pvf.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/pvf.o -c src/pvf.c
+
+src/xi.o : src/xi.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/xi.o -c src/xi.c
+
+src/htk.o : src/htk.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/htk.o -c src/htk.c
+
+#====================================================================
+# Object files for test programs.
+
+tests/utils.o : tests/utils.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/utils.o -c tests/utils.c
+
+tests/dft_cmp.o : tests/dft_cmp.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/dft_cmp.o -c tests/dft_cmp.c
+
+#====================================================================
 # Test programs.
 
-src/test_file_io.exe : src/file_io.o src/test_file_io.o libsndfile.lib
-	$(CC) $+ -o $@
+src/test_file_io.exe : src/file_io.o src/test_file_io.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/test_file_io.o -c src/test_file_io.c
+	$(CC) -o src/test_file_io.exe src/test_file_io.o src/file_io.o
 
-# Special case : test_log_printf.c #includes common.c
-src/test_log_printf.exe : src/test_log_printf.c src/common.c libsndfile.lib
-	$(CC) $(CFLAGS) -c src/test_log_printf.c -o src/test_log_printf.o
-	$(CC) src/test_log_printf.o libsndfile.lib -o $@
+src/test_log_printf.exe : src/test_log_printf.c src/common.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o src/test_log_printf.o -c src/test_log_printf.c
+	$(CC) -o src/test_log_printf.exe src/test_log_printf.o
 
-tests/sfversion.exe : tests/sfversion.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/sfversion.exe : tests/sfversion.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/sfversion.o -c tests/sfversion.c
+	$(CC) -o tests/sfversion.exe tests/sfversion.o libsndfile.lib
 
-tests/error_test.exe : tests/error_test.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/error_test.exe : tests/error_test.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/error_test.o -c tests/error_test.c
+	$(CC) -o tests/error_test.exe tests/error_test.o libsndfile.lib
 
-tests/pcm_test.exe : tests/pcm_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/pcm_test.exe : tests/pcm_test.c tests/utils.o libsndfile.dll
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/pcm_test.o -c tests/pcm_test.c
+	$(CC) -o tests/pcm_test.exe tests/pcm_test.o tests/utils.o libsndfile.lib
 
-tests/ulaw_test.exe : tests/ulaw_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/ulaw_test.exe : tests/ulaw_test.c tests/utils.o libsndfile.dll
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/ulaw_test.o -c tests/ulaw_test.c
+	$(CC) -o tests/ulaw_test.exe tests/ulaw_test.o tests/utils.o libsndfile.lib
 
-tests/alaw_test.exe : tests/alaw_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/alaw_test.exe : tests/alaw_test.c tests/utils.o libsndfile.dll
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/alaw_test.o -c tests/alaw_test.c
+	$(CC) -o tests/alaw_test.exe tests/alaw_test.o tests/utils.o libsndfile.lib
 
-tests/dwvw_test.exe : tests/dwvw_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/dwvw_test.exe : tests/dwvw_test.c tests/utils.o
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/dwvw_test.o -c tests/dwvw_test.c
+	$(CC) -o tests/dwvw_test.exe tests/dwvw_test.o tests/utils.o libsndfile.lib
 
-tests/command_test.exe : tests/command_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/command_test.exe : tests/command_test.c tests/utils.o
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/command_test.o -c tests/command_test.c
+	$(CC) -o tests/command_test.exe tests/command_test.o tests/utils.o libsndfile.lib
 
-tests/floating_point_test.exe : tests/floating_point_test.o tests/utils.o tests/dft_cmp.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/floating_point_test.exe : tests/floating_point_test.c tests/utils.o tests/dft_cmp.o
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/floating_point_test.o -c tests/floating_point_test.c
+	$(CC) -o tests/floating_point_test.exe tests/floating_point_test.o tests/utils.o tests/dft_cmp.o libsndfile.lib
 
-tests/headerless_test.exe : tests/headerless_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/headerless_test.exe : tests/headerless_test.c tests/utils.o
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/headerless_test.o -c tests/headerless_test.c
+	$(CC) -o tests/headerless_test.exe tests/headerless_test.o tests/utils.o libsndfile.lib
 
-tests/write_read_test.exe : tests/write_read_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/write_read_test.exe : tests/write_read_test.c tests/utils.o
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/write_read_test.o -c tests/write_read_test.c
+	$(CC) -o tests/write_read_test.exe tests/write_read_test.o tests/utils.o libsndfile.lib
 
-tests/lossy_comp_test.exe : tests/lossy_comp_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/lossy_comp_test.exe : tests/lossy_comp_test.c tests/utils.o
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/lossy_comp_test.o -c tests/lossy_comp_test.c
+	$(CC) -o tests/lossy_comp_test.exe tests/lossy_comp_test.o tests/utils.o libsndfile.lib
 
-tests/peak_chunk_test.exe : tests/peak_chunk_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/peak_chunk_test.exe : tests/peak_chunk_test.c tests/utils.o
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/peak_chunk_test.o -c tests/peak_chunk_test.c
+	$(CC) -o tests/peak_chunk_test.exe tests/peak_chunk_test.o tests/utils.o libsndfile.lib
 
-tests/misc_test.exe : tests/misc_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/misc_test.exe : tests/misc_test.c tests/utils.o
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/misc_test.o -c tests/misc_test.c
+	$(CC) -o tests/misc_test.exe tests/misc_test.o tests/utils.o libsndfile.lib
 
-tests/string_test.exe : tests/string_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/string_test.exe : tests/string_test.c tests/utils.o
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/string_test.o -c tests/string_test.c
+	$(CC) -o tests/string_test.exe tests/string_test.o tests/utils.o libsndfile.lib
 
-tests/win32_test.exe : tests/win32_test.o
-	$(CC) $+ -o $@
+tests/win32_test.exe : tests/win32_test.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/win32_test.o -c tests/win32_test.c
+	$(CC) -o tests/win32_test.exe tests/win32_test.o
 
-tests/stdio_test.exe : tests/stdio_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/stdio_test.exe : tests/stdio_test.c tests/utils.o
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/stdio_test.o -c tests/stdio_test.c
+	$(CC) -o tests/stdio_test.exe tests/stdio_test.o tests/utils.o libsndfile.lib
 
-tests/pipe_test.exe : tests/pipe_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/pipe_test.exe : tests/pipe_test.c tests/utils.o
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/pipe_test.o -c tests/pipe_test.c
+	$(CC) -o tests/pipe_test.exe tests/pipe_test.o tests/utils.o libsndfile.lib
 
-tests/stdin_test.exe : tests/stdin_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/stdin_test.exe : tests/stdin_test.c tests/utils.o
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/stdin_test.o -c tests/stdin_test.c
+	$(CC) -o tests/stdin_test.exe tests/stdin_test.o tests/utils.o libsndfile.lib
 
-tests/stdout_test.exe : tests/stdout_test.o tests/utils.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/stdout_test.exe : tests/stdout_test.c tests/utils.o
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/stdout_test.o -c tests/stdout_test.c
+	$(CC) -o tests/stdout_test.exe tests/stdout_test.o tests/utils.o libsndfile.lib
 
-tests/benchmark.exe : tests/benchmark.o libsndfile.lib
-	$(CC) $+ -o $@
+tests/benchmark.exe : tests/benchmark.c
+	$(CC) $(CFLAGS) $(DEF_INC) -o tests/benchmark.o -c tests/benchmark.c
+	$(CC) -o tests/benchmark.exe tests/benchmark.o tests/utils.o libsndfile.lib
 
 # End of Makefile
 #====================================================================

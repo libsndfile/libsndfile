@@ -420,10 +420,19 @@ AC_CONFIG_FILES([ \
 			src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
 			man/Makefile examples/Makefile tests/Makefile \
 			doc/Makefile doc/libsndfile.css \
-			Win32/Makefile MacOS9/Makefile Octave/Makefile \
+			Win32/Makefile Win32/Makefile.mingw \
+			MacOS9/Makefile Octave/Makefile \
 			Makefile libsndfile.spec sndfile.pc \
 			])
 AC_OUTPUT
+
+if test x$target_os = "xmingw32" ; then
+	cp -f Win32/Makefile.mingw Makefile
+	echo
+	echo "Now run \"make\" and \"make check\"."
+	echo
+	exit 0
+	fi
 
 #====================================================================================
 
