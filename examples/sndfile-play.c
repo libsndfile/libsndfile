@@ -76,8 +76,6 @@ alsa_play (int argc, char *argv [])
 	snd_pcm_t * alsa_dev ;
 	int		k, readcount, subformat ;
 
-puts (__func__) ;
-
 	for (k = 1 ; k < argc ; k++)
 	{	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
