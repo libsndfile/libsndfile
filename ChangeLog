@@ -1,3 +1,8 @@
+2004-06-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-convert.c
+    Move copy_metadata() after the second sf_open().
+
 2004-06-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-convert.c

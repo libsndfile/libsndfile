@@ -269,14 +269,14 @@ main (int argc, char * argv [])
 		return 1 ;
 		} ;
 
-	/* Copy the metadata */
-	copy_metadata (outfile, infile) ;
-
 	/* Open the output file. */
 	if ((outfile = sf_open (outfilename, SFM_WRITE, &sfinfo)) == NULL)
 	{	printf ("Not able to open output file %s : %s\n", outfilename, sf_strerror (NULL)) ;
 		return 1 ;
 		} ;
+
+	/* Copy the metadata */
+	copy_metadata (outfile, infile) ;
 
 	if ((outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT) ||
 				(infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT))
