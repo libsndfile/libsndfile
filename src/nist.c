@@ -331,7 +331,7 @@ nist_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_asciiheader_printf (psf, "end_head\n") ;
 
 	/* Zero fill to dataoffset. */
-	psf_binheader_writef (psf, "z", NIST_HEADER_LENGTH - psf->headindex) ;
+	psf_binheader_writef (psf, "z", (size_t) (NIST_HEADER_LENGTH - psf->headindex)) ;
 
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 

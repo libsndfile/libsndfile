@@ -320,7 +320,7 @@ paf_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	/* Zero fill to dataoffset. */
-	psf_binheader_writef (psf, "z", (int) (psf->dataoffset - psf->headindex)) ;
+	psf_binheader_writef (psf, "z", (size_t) (psf->dataoffset - psf->headindex)) ;
 
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 

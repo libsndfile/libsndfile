@@ -279,7 +279,7 @@ ircam_write_header (SF_PRIVATE *psf, int calc_length)
 		default : return SFE_BAD_OPEN_FORMAT ;
 		} ;
 
-	psf_binheader_writef (psf, "z", IRCAM_DATA_OFFSET - psf->headindex) ;
+	psf_binheader_writef (psf, "z", (size_t) (IRCAM_DATA_OFFSET - psf->headindex)) ;
 
 	/* Header construction complete so write it out. */
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;

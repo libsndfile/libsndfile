@@ -220,7 +220,7 @@ avr_write_header (SF_PRIVATE *psf, int calc_length)
 
 	datalength = (int) (psf->datalength & 0x7FFFFFFF) ;
 
-	psf_binheader_writef (psf, "Emz22", TWOBIT_MARKER, 8,
+	psf_binheader_writef (psf, "Emz22", TWOBIT_MARKER, (size_t) 8,
 			psf->sf.channels == 2 ? 0xFFFF : 0, psf->bytewidth * 8) ;
 
 	sign = ((psf->sf.format & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_U8) ? 0 : 0xFFFF ;
@@ -228,7 +228,7 @@ avr_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_binheader_writef (psf, "E222", sign, 0, 0xFFFF) ;
 	psf_binheader_writef (psf, "E4444", psf->sf.samplerate, psf->sf.frames, 0, 0) ;
 
-	psf_binheader_writef (psf, "E222zz", 0, 0, 0, 20, 64) ;
+	psf_binheader_writef (psf, "E222zz", 0, 0, 0, (size_t) 20, (size_t) 64) ;
 
 	/* Header construction complete so write it out. */
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;

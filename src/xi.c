@@ -298,12 +298,12 @@ xi_write_header (SF_PRIVATE *psf, int calc_length)
 	** Jump note numbers (96), volume envelope (48), pan envelope (48),
 	** volume points (1), pan points (1)
 	*/
-	psf_binheader_writef (psf, "z", 96 + 48 + 48 + 1 + 1) ;
+	psf_binheader_writef (psf, "z", (size_t) (96 + 48 + 48 + 1 + 1)) ;
 
 	/* Jump volume loop (3 bytes), pan loop (3), envelope flags (3), vibrato (3)
 	** fade out (2), 22 unknown bytes, and then write sample_count (2 bytes).
 	*/
-	psf_binheader_writef (psf, "ez2z2", 4 * 3, 0x1234, 22, 1) ;
+	psf_binheader_writef (psf, "ez2z2", (size_t) (4 * 3), 0x1234, (size_t) 22, 1) ;
 
 psf->sf.frames = 12 ;
 pxi->loop_begin = 0 ;

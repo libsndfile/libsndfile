@@ -528,7 +528,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 
 	/* Pad to 8 bytes with zeros. */
 	if (fmt_size % 8)
-		psf_binheader_writef (psf, "z", 8 - (fmt_size % 8)) ;
+		psf_binheader_writef (psf, "z", (size_t) (8 - (fmt_size % 8))) ;
 
 	if (add_fact_chunk)
 		psf_binheader_writef (psf, "eh88", fact_MARKER16, 16 + 8 + 8, psf->sf.frames) ;
