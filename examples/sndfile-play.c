@@ -448,7 +448,8 @@ typedef struct
 	SNDFILE 		*sndfile ;
 	SF_INFO 		sfinfo ;
 
-	int 			done_playing ;
+	int				fake_stereo ;
+	int				done_playing ;
 } MacOSXAudioData ;
 
 #include <math.h>
@@ -459,7 +460,7 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 	AudioBufferList*	data_out, const AudioTimeStamp* time_out,
 	void* client_data)
 {	MacOSXAudioData	*audio_data ;
-	int		size, sample_count, read_count ;
+	int		size, sample_count, read_count, k ;
 	float	*buffer ;
 
 	/* Prevent compiler warnings. */
@@ -476,10 +477,22 @@ macosx_audio_out_callback (AudioDeviceID device, const AudioTimeStamp* current_t
 
 	buffer = (float*) data_out->mBuffers [0].mData ;
 
-	read_count = sf_read_float (audio_data->sndfile, buffer, sample_count) ;
+	if (audio_data->fake_stereo != 0)
+	{	read_count = sf_read_float (audio_data->sndfile, buffer, sample_count / 2) ;
 
+		for (k = read_count - 1 ; k >= 0 ; k--)
+		{	buffer [2 * k	] = buffer [k] ;
+			buffer [2 * k + 1] = buffer [k] ;
+			} ;
+		read_count *= 2 ;
+		}
+	else
+		read_count = sf_read_float (audio_data->sndfile, buffer, sample_count) ;
+
+	/* Fill the remainder with zeroes. */
 	if (read_count < sample_count)
-	{	memset (&(buffer [read_count]), 0, (sample_count - read_count) * sizeof (float)) ;
+	{	if (audio_data->fake_stereo == 0)
+			memset (&(buffer [read_count]), 0, (sample_count - read_count) * sizeof (float)) ;
 		/* Tell the main application to terminate. */
 		audio_data->done_playing = SF_TRUE ;
 		} ;
@@ -494,6 +507,7 @@ macosx_play (int argc, char *argv [])
 	UInt32		count, buffer_size ;
 	int 		k ;
 
+	audio_data.fake_stereo = 0 ;
 	audio_data.device = kAudioDeviceUnknown ;
 
 	/*  get the default output device for the HAL */
@@ -533,8 +547,13 @@ macosx_play (int argc, char *argv [])
 			continue ;
 			} ;
 
-
 		audio_data.format.mSampleRate = audio_data.sfinfo.samplerate ;
+
+		if (audio_data.sfinfo.channels == 1)
+		{	audio_data.format.mChannelsPerFrame = 2 ;
+			audio_data.fake_stereo = 1 ;
+			}
+		else
 		audio_data.format.mChannelsPerFrame = audio_data.sfinfo.channels ;
 
 		if ((err = AudioDeviceSetProperty (audio_data.device, NULL, 0, false, kAudioDevicePropertyStreamFormat,
@@ -647,7 +666,7 @@ win32_audio_out_callback (HWAVEOUT hwave, UINT msg, DWORD data, DWORD param1, DW
 	if (data == 0)
 		return 1 ;
 
-	/* Preent compiler warnings. */
+	/* Prevent compiler warnings. */
 	hwave = hwave ;
 	param1 = param2 ;
 
