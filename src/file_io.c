@@ -51,7 +51,9 @@ typedef int ssize_t ;
 #define	SENSIBLE_SIZE	(0x40000000)
 
 static int psf_open (const char * path, int mode) ;
+static int psf_close (int fd) ;
 static void psf_log_syserr (SF_PRIVATE *psf, int error) ;
+static sf_count_t psf_get_filelen_fd (int fd) ;
 
 int
 psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
@@ -74,15 +76,41 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 } /* psf_fopen */
 
 int
+psf_fclose (SF_PRIVATE *psf)
+{	int retval ;
+
+	if (psf->do_not_close_descriptor)
+	{	psf->filedes = -1 ;
+		return 0 ;
+		} ;
+
+	if ((retval = psf_close (psf->filedes)) == -1)
+		psf_log_syserr (psf, errno) ;
+
+	psf->filedes = -1 ;
+
+	return retval ;
+} /* psf_fclose */
+
+int
 psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 {	char *fname ;
+
+	if (psf->rsrcdes > 0)
+		return 0 ;
 
 	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
 	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s/rsrc", psf->filepath) ;
 
-	psf->error = 0 ;
+	psf->error = SFE_NO_ERROR ;
 	if ((psf->rsrcdes = psf_open (psf->rsrcpath, open_mode)) >= 0)
-		return 0 ;
+	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrcdes) ;
+		if (psf->rsrclength < 100)
+		{	psf->error = SFE_SD2_BAD_RSRC ;
+			return psf->error ;
+			} ;
+		return SFE_NO_ERROR ;
+		} ;
 
 	if (psf->rsrcdes == - SFE_BAD_OPEN_MODE)
 	{	psf->error = SFE_BAD_OPEN_MODE ;
@@ -107,7 +135,13 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	fname [1] = '_' ;
 
 	if ((psf->rsrcdes = psf_open (psf->rsrcpath, open_mode)) >= 0)
-		return 0 ;
+	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrcdes) ;
+		if (psf->rsrclength < 100)
+		{	psf->error = SFE_SD2_BAD_RSRC ;
+			return psf->error ;
+			} ;
+		return SFE_NO_ERROR ;
+		} ;
 
 	if (psf->rsrcdes == -1)
 		psf_log_syserr (psf, errno) ;
@@ -117,6 +151,55 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	return psf->error ;
 } /* psf_open_rsrc */
 
+int
+psf_close_rsrc (SF_PRIVATE *psf)
+{
+	psf_close (psf->rsrcdes) ;
+	psf->rsrcdes = -1 ;
+	return 0 ;
+} /* psf_close_rsrc */
+
+sf_count_t
+psf_get_filelen (SF_PRIVATE *psf)
+{	sf_count_t	filelen ;
+
+	filelen = psf_get_filelen_fd (psf->filedes) ;
+
+	if (filelen == -1)
+	{	psf_log_syserr (psf, errno) ;
+		return (sf_count_t) -1 ;
+		} ;
+
+	if (filelen == -SFE_BAD_STAT_SIZE)
+	{	psf->error = SFE_BAD_STAT_SIZE ;
+		return (sf_count_t) -1 ;
+		} ;
+
+	switch (psf->mode)
+	{	case SFM_WRITE :
+			filelen = filelen - psf->fileoffset ;
+			break ;
+
+		case SFM_READ :
+			if (psf->fileoffset > 0 && psf->filelength > 0)
+				filelen = psf->filelength ;
+			break ;
+
+		case SFM_RDWR :
+			/*
+			** Cannot open embedded files SFM_RDWR so we don't need to
+			** subtract psf->fileoffset. We already have the answer we
+			** need.
+			*/
+			break ;
+
+		default :
+			/* Shouldn't be here, so return error. */
+			filelen = -1 ;
+		} ;
+
+	return filelen ;
+} /* psf_get_filelen */
 
 #if ((defined (WIN32) || defined (_WIN32)) == 0)
 
@@ -296,24 +379,14 @@ psf_ftell (SF_PRIVATE *psf)
 } /* psf_ftell */
 
 int
-psf_fclose (SF_PRIVATE *psf)
+psf_close (int fd)
 {	int retval ;
 
-	if (psf->do_not_close_descriptor)
-	{	psf->filedes = -1 ;
-		return 0 ;
-		} ;
-
-	while ((retval = close (psf->filedes)) == -1 && errno == EINTR)
+	while ((retval = close (fd)) == -1 && errno == EINTR)
 		/* Do nothing. */ ;
 
-	if (retval == -1)
-		psf_log_syserr (psf, errno) ;
-
-	psf->filedes = -1 ;
-
 	return retval ;
-} /* psf_fclose */
+} /* psf_close */
 
 sf_count_t
 psf_fgets (char *buffer, sf_count_t bufsize, SF_PRIVATE *psf)
@@ -356,56 +429,27 @@ psf_is_pipe (SF_PRIVATE *psf)
 	return SF_FALSE ;
 } /* psf_is_pipe */
 
-sf_count_t
-psf_get_filelen (SF_PRIVATE *psf)
+static sf_count_t
+psf_get_filelen_fd (int fd)
 {	struct stat statbuf ;
-	sf_count_t	filelen ;
 
 	/*
 	** Sanity check.
 	** If everything is OK, this will be optimised out.
 	*/
 	if (sizeof (statbuf.st_size) == 4 && sizeof (sf_count_t) == 8)
-		return SFE_BAD_STAT_SIZE ;
+		return (sf_count_t) -SFE_BAD_STAT_SIZE ;
 
 /* Cygwin seems to need this. */
 #if (defined (__CYGWIN__) && HAVE_FSYNC)
 	fsync (psf->filedes) ;
 #endif
 
-	if (fstat (psf->filedes, &statbuf) == -1)
-	{	psf_log_syserr (psf, errno) ;
+	if (fstat (fd, &statbuf) == -1)
 		return (sf_count_t) -1 ;
-		} ;
 
-	switch (psf->mode)
-	{	case SFM_WRITE :
-			filelen = statbuf.st_size - psf->fileoffset ;
-			break ;
-
-		case SFM_READ :
-			if (psf->fileoffset > 0 && psf->filelength > 0)
-				filelen = psf->filelength ;
-			else
-				filelen = statbuf.st_size ;
-			break ;
-
-		case SFM_RDWR :
-			/*
-			** Cannot open embedded files SFM_RDWR so we don't need to
-			** subtract psf->fileoffset. We already have the answer we
-			** need.
-			*/
-			filelen = statbuf.st_size ;
-			break ;
-
-		default :
-			/* Shouldn't be here, so return error. */
-			filelen = -1 ;
-		} ;
-
-	return filelen ;
-} /* psf_get_filelen */
+	return statbuf.st_size ;
+} /* psf_get_filelen_fd */
 
 int
 psf_ftruncate (SF_PRIVATE *psf, sf_count_t len)

@@ -243,6 +243,8 @@ typedef struct sf_private_tag
 	sf_count_t		filelength ;	/* Overall length of (embedded) file. */
 	sf_count_t		fileoffset ;	/* Offset in number of bytes from beginning of file. */
 
+	sf_count_t		rsrclength ;	/* Length of the resource fork (if it exists). */
+
 	sf_count_t		dataoffset ;	/* Offset in number of bytes from beginning of file. */
 	sf_count_t		datalength ;	/* Length in bytes of the audio data. */
 	sf_count_t		dataend ;		/* Offset to file tailer. */
@@ -543,7 +545,6 @@ int macos_guess_file_type (SF_PRIVATE *psf, const char *filename) ;
 */
 
 int psf_fopen (SF_PRIVATE *psf, const char *pathname, int flags) ;
-int psf_open_rsrc (SF_PRIVATE *psf, int mode) ;
 int psf_set_stdio (SF_PRIVATE *psf, int mode) ;
 int psf_filedes_valid (SF_PRIVATE *psf) ;
 void psf_set_file (SF_PRIVATE *psf, int fd) ;
@@ -559,6 +560,10 @@ int psf_is_pipe (SF_PRIVATE *psf) ;
 
 int psf_ftruncate (SF_PRIVATE *psf, sf_count_t len) ;
 int psf_fclose (SF_PRIVATE *psf) ;
+
+/* Open and close the resource fork of a file. */
+int psf_open_rsrc (SF_PRIVATE *psf, int mode) ;
+int psf_close_rsrc (SF_PRIVATE *psf) ;
 
 /*
 void psf_fclearerr (SF_PRIVATE *psf) ;
