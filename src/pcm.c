@@ -1033,21 +1033,21 @@ pcm_write_s2bes	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 		return psf_fwrite (ptr, sizeof (short), len, psf) ;
 	else
 	{	int			bufferlen, writecount, thiswrite ;
-		sf_count_t	total = 0 ;
+	sf_count_t	total = 0 ;
 
-		bufferlen = ARRAY_LEN (psf->sbuf) ;
+	bufferlen = ARRAY_LEN (psf->sbuf) ;
 
-		while (len > 0)
+	while (len > 0)
 		{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 			endswap_short_copy (psf->sbuf, ptr + total, writecount) ;
 			thiswrite = psf_fwrite (psf->sbuf, sizeof (short), writecount, psf) ;
 			total += thiswrite ;
 			len -= thiswrite ;
 			if (thiswrite < writecount)
-				break ;
-			} ;
+			break ;
+		} ;
 
-		return total ;
+	return total ;
 		} ;
 } /* pcm_write_s2bes */
 
@@ -1058,21 +1058,21 @@ pcm_write_s2les	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 		return psf_fwrite (ptr, sizeof (short), len, psf) ;
 	else
 	{	int			bufferlen, writecount, thiswrite ;
-		sf_count_t	total = 0 ;
+	sf_count_t	total = 0 ;
 
-		bufferlen = ARRAY_LEN (psf->sbuf) ;
+	bufferlen = ARRAY_LEN (psf->sbuf) ;
 
-		while (len > 0)
+	while (len > 0)
 		{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 			endswap_short_copy (psf->sbuf, ptr + total, writecount) ;
 			thiswrite = psf_fwrite (psf->sbuf, sizeof (short), writecount, psf) ;
 			total += thiswrite ;
 			len -= thiswrite ;
 			if (thiswrite < writecount)
-				break ;
-			} ;
+			break ;
+		} ;
 
-		return total ;
+	return total ;
 		} ;
 } /* pcm_write_s2les */
 
@@ -1286,21 +1286,21 @@ pcm_write_i2bei	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		return psf_fwrite (ptr, sizeof (int), len, psf) ;
 	else
 	{	int			bufferlen, writecount, thiswrite ;
-		sf_count_t	total = 0 ;
+	sf_count_t	total = 0 ;
 
-		bufferlen = ARRAY_LEN (psf->ibuf) ;
+	bufferlen = ARRAY_LEN (psf->ibuf) ;
 
-		while (len > 0)
+	while (len > 0)
 		{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 			endswap_int_copy (psf->ibuf, ptr + total, writecount) ;
 			thiswrite = psf_fwrite (psf->ibuf, sizeof (int), writecount, psf) ;
 			total += thiswrite ;
 			len -= thiswrite ;
 			if (thiswrite < writecount)
-				break ;
-			} ;
+			break ;
+		} ;
 
-		return total ;
+	return total ;
 		} ;
 } /* pcm_write_i2bei */
 
@@ -1311,21 +1311,21 @@ pcm_write_i2lei	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		return psf_fwrite (ptr, sizeof (int), len, psf) ;
 	else
 	{	int			bufferlen, writecount, thiswrite ;
-		sf_count_t	total = 0 ;
+	sf_count_t	total = 0 ;
 
-		bufferlen = ARRAY_LEN (psf->ibuf) ;
+	bufferlen = ARRAY_LEN (psf->ibuf) ;
 
-		while (len > 0)
+	while (len > 0)
 		{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 			endswap_int_copy (psf->ibuf, ptr + total, writecount) ;
 			thiswrite = psf_fwrite (psf->ibuf, sizeof (int), writecount, psf) ;
 			total += thiswrite ;
 			len -= thiswrite ;
 			if (thiswrite < writecount)
-				break ;
-			} ;
+			break ;
+		} ;
 
-		return total ;
+	return total ;
 		} ;
 } /* pcm_write_i2lei */
 
@@ -1467,7 +1467,7 @@ f2bes_array (float *src, short *dest, int count, int normalize)
 		value = lrintf (src [count] * normfact) ;
 		ucptr [1] = value ;
 		ucptr [0] = value >> 8 ;
-		} ;
+			} ;
 } /* f2bes_array */
 
 static void
@@ -1487,7 +1487,7 @@ f2bes_clip_array (float *src, short *dest, int count, int normalize)
 		{	ucptr [1] = 0xFF ;
 			ucptr [0] = 0x7F ;
 			continue ;
-			} ;
+		} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [1] = 0x00 ;
 			ucptr [0] = 0x80 ;
@@ -1504,22 +1504,22 @@ static sf_count_t
 pcm_write_f2bes	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 {	void		(*convert) (float *, short *t, int, int) ;
 	int			bufferlen, writecount, thiswrite ;
-	sf_count_t	total = 0 ;
+		sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? f2bes_clip_array : f2bes_array ;
-	bufferlen = ARRAY_LEN (psf->sbuf) ;
+		bufferlen = ARRAY_LEN (psf->sbuf) ;
 
-	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		while (len > 0)
+		{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		convert (ptr + total, psf->sbuf, writecount, psf->norm_float) ;
-		thiswrite = psf_fwrite (psf->sbuf, sizeof (short), writecount, psf) ;
-		total += thiswrite ;
-		len -= thiswrite ;
-		if (thiswrite < writecount)
-			break ;
-		} ;
+			thiswrite = psf_fwrite (psf->sbuf, sizeof (short), writecount, psf) ;
+			total += thiswrite ;
+			len -= thiswrite ;
+			if (thiswrite < writecount)
+				break ;
+			} ;
 
-	return total ;
+		return total ;
 } /* pcm_write_f2bes */
 
 /*==============================================================================
@@ -1641,7 +1641,7 @@ f2let_clip_array (float *src, tribyte *dest, int count, int normalize)
 			ucptr [1] = 0x00 ;
 			ucptr [2] = 0x80 ;
 			continue ;
-			} ;
+		} ;
 
 		value = lrintf (scaled_value) ;
 		ucptr [0] = value >> 8 ;
@@ -1718,7 +1718,7 @@ f2bet_clip_array (float *src, tribyte *dest, int count, int normalize)
 			ucptr [1] = 0x00 ;
 			ucptr [2] = 0x00 ;
 			continue ;
-			} ;
+		} ;
 
 		value = lrint (scaled_value) ;
 		ucptr [0] = value >> 24 ;
@@ -1797,7 +1797,7 @@ f2bei_clip_array (float *src, int *dest, int count, int normalize)
 			ucptr [2] = 0x00 ;
 			ucptr [3] = 0x00 ;
 			continue ;
-			} ;
+		} ;
 
 		value = lrintf (scaled_value) ;
 		ucptr [0] = value >> 24 ;
@@ -1892,28 +1892,28 @@ static sf_count_t
 pcm_write_f2lei	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 {	void		(*convert) (float *, int *, int, int) ;
 	int			bufferlen, writecount, thiswrite ;
-	sf_count_t	total = 0 ;
+		sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? f2lei_clip_array : f2lei_array ;
-	bufferlen = ARRAY_LEN (psf->ibuf) ;
+		bufferlen = ARRAY_LEN (psf->ibuf) ;
 
-	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		while (len > 0)
+		{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		convert (ptr + total, psf->ibuf, writecount, psf->norm_float) ;
-		thiswrite = psf_fwrite (psf->ibuf, sizeof (int), writecount, psf) ;
-		total += thiswrite ;
-		len -= thiswrite ;
-		if (thiswrite < writecount)
-			break ;
-		} ;
+			thiswrite = psf_fwrite (psf->ibuf, sizeof (int), writecount, psf) ;
+			total += thiswrite ;
+			len -= thiswrite ;
+			if (thiswrite < writecount)
+				break ;
+			} ;
 
-	return total ;
+		return total ;
 } /* pcm_write_f2lei */
 
 /*==============================================================================
 */
 
-static	void
+static void
 d2sc_array	(double *src, signed char *dest, int count, int normalize)
 {	double	normfact ;
 
@@ -1925,7 +1925,7 @@ d2sc_array	(double *src, signed char *dest, int count, int normalize)
 		} ;
 } /* d2sc_array */
 
-static	void
+static void
 d2sc_clip_array	(double *src, signed char *dest, int count, int normalize)
 {	double	normfact, scaled_value ;
 
@@ -2522,7 +2522,7 @@ let2s_array (tribyte *src, int count, short *dest)
 		} ;
 } /* let2s_array */
 
-static void
+static	void
 bet2s_array (tribyte *src, int count, short *dest)
 {	unsigned char	*ucptr ;
 
@@ -2531,7 +2531,7 @@ bet2s_array (tribyte *src, int count, short *dest)
 	{	count -- ;
 		ucptr -= 3 ;
 		dest [count] = BET2H_SHORT_PTR (ucptr) ;
-		} ;
+			} ;
 } /* bet2s_array */
 
 static void
@@ -2589,7 +2589,7 @@ bes2i_array (short *src, int count, int *dest)
 		} ;
 } /* bes2i_array */
 
-static void
+static	void
 les2i_array (short *src, int count, int *dest)
 {	unsigned char	*ucptr ;
 
@@ -2598,7 +2598,7 @@ les2i_array (short *src, int count, int *dest)
 	{	count -- ;
 		ucptr -= 2 ;
 		dest [count] = LES2H_INT_PTR (ucptr) ;
-		} ;
+			} ;
 } /* les2i_array */
 
 static void
@@ -2610,7 +2610,7 @@ bet2i_array (tribyte *src, int count, int *dest)
 	{	count -- ;
 		ucptr -= 3 ;
 		dest [count] = BET2H_INT_PTR (ucptr) ;
-		} ;
+			} ;
 } /* bet2i_array */
 
 static void
@@ -2641,7 +2641,7 @@ static	void
 uc2f_array	(unsigned char *src, int count, float *dest, float normfact)
 {	while (count)
 	{	count -- ;
-		dest [count] = (((float) src [count]) - 128.0) * normfact ;
+		dest [count] = (((int) src [count]) - 128) * normfact ;
 		} ;
 } /* uc2f_array */
 
@@ -2686,7 +2686,7 @@ let2f_array (tribyte *src, int count, float *dest, float normfact)
 static void
 bet2f_array (tribyte *src, int count, float *dest, float normfact)
 {	unsigned char	*ucptr ;
-	int 	value ;
+	int				value ;
 
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (count)
@@ -2694,7 +2694,7 @@ bet2f_array (tribyte *src, int count, float *dest, float normfact)
 		ucptr -= 3 ;
 		value = BET2H_INT_PTR (ucptr) ;
 		dest [count] = ((float) value) * normfact ;
-		} ;
+			} ;
 } /* bet2f_array */
 
 static void
@@ -2724,7 +2724,7 @@ bei2f_array (int *src, int count, float *dest, float normfact)
 /*-----------------------------------------------------------------------------------------------
 */
 
-static	void
+static void
 sc2d_array	(signed char *src, int count, double *dest, double normfact)
 {	while (count)
 	{	count -- ;
@@ -2732,11 +2732,11 @@ sc2d_array	(signed char *src, int count, double *dest, double normfact)
 		} ;
 } /* sc2d_array */
 
-static	void
+static void
 uc2d_array	(unsigned char *src, int count, double *dest, double normfact)
 {	while (count)
 	{	count -- ;
-		dest [count] = (((double) src [count]) - 128.0) * normfact ;
+		dest [count] = (((int) src [count]) - 128) * normfact ;
 		} ;
 } /* uc2d_array */
 
@@ -2767,7 +2767,7 @@ bes2d_array (short *src, int count, double *dest, double normfact)
 static void
 let2d_array (tribyte *src, int count, double *dest, double normfact)
 {	unsigned char	*ucptr ;
-	int 	value ;
+	int				value ;
 
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (count)
@@ -2781,7 +2781,7 @@ let2d_array (tribyte *src, int count, double *dest, double normfact)
 static void
 bet2d_array (tribyte *src, int count, double *dest, double normfact)
 {	unsigned char	*ucptr ;
-	int 	value ;
+	int				value ;
 
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (count)
@@ -2789,7 +2789,7 @@ bet2d_array (tribyte *src, int count, double *dest, double normfact)
 		ucptr -= 3 ;
 		value = (ucptr [0] << 24) | (ucptr [1] << 16) | (ucptr [2] << 8) ;
 		dest [count] = ((double) value) * normfact ;
-		} ;
+			} ;
 } /* bet2d_array */
 
 static void
@@ -2890,7 +2890,7 @@ s2bei_array (short *src, int *dest, int count)
 		ucptr [1] = src [count] ;
 		ucptr [2] = 0 ;
 		ucptr [3] = 0 ;
-		} ;
+			} ;
 } /* s2bei_array */
 
 /*-----------------------------------------------------------------------------------------------
@@ -2970,14 +2970,6 @@ i2bet_array (int *src, tribyte *dest, int count)
 		} ;
 } /* i2bet_array */
 
-/*-----------------------------------------------------------------------------------------------
-*/
-
-/*-----------------------------------------------------------------------------------------------
-*/
-
-/*==============================================================================
-*/
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch 
