@@ -1,3 +1,9 @@
+2004-11-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/file_io.c src/common.h
+    Change the ptr argument to psf_write() from "void*" to a "const void*".
+    Thanks to Tobias Gehrig for suggesting this.
+
 2004-10-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/file_io.c src/common.h

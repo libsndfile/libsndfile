@@ -554,7 +554,7 @@ void psf_set_file (SF_PRIVATE *psf, int fd) ;
 
 sf_count_t psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence) ;
 sf_count_t psf_fread (void *ptr, sf_count_t bytes, sf_count_t count, SF_PRIVATE *psf) ;
-sf_count_t psf_fwrite (void *ptr, sf_count_t bytes, sf_count_t count, SF_PRIVATE *psf) ;
+sf_count_t psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t count, SF_PRIVATE *psf) ;
 sf_count_t psf_fgets (char *buffer, sf_count_t bufsize, SF_PRIVATE *psf) ;
 sf_count_t psf_ftell (SF_PRIVATE *psf) ;
 sf_count_t psf_get_filelen (SF_PRIVATE *psf) ;

@@ -324,7 +324,7 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 } /* psf_fread */
 
 sf_count_t
-psf_fwrite (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
+psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 {	sf_count_t total = 0 ;
 	ssize_t	count ;
 
@@ -338,7 +338,7 @@ psf_fwrite (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 	{	/* Break the writes down to a sensible size. */
 		count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : items ;
 
-		count = write (psf->filedes, ((char*) ptr) + total, count) ;
+		count = write (psf->filedes, ((const char*) ptr) + total, count) ;
 
 		if (count == -1)
 		{	if (errno == EINTR)
@@ -746,7 +746,7 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 } /* psf_fread */
 
 /* Win32 */ sf_count_t
-psf_fwrite (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
+psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 {	sf_count_t total = 0 ;
 	ssize_t	 count ;
 	DWORD dwNumberOfBytesWritten ;
@@ -761,7 +761,7 @@ psf_fwrite (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 	{	/* Break the writes down to a sensible size. */
 		count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : (ssize_t) items ;
 
-		if (WriteFile ((HANDLE) psf->filedes, ((char*) ptr) + total, count, &dwNumberOfBytesWritten, 0) == 0)
+		if (WriteFile ((HANDLE) psf->filedes, ((const char*) ptr) + total, count, &dwNumberOfBytesWritten, 0) == 0)
 		{	psf_log_syserr (psf, GetLastError ()) ;
 			break ;
 			}
@@ -1059,7 +1059,7 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 } /* psf_fread */
 
 /* Win32 */ sf_count_t
-psf_fwrite (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
+psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 {	sf_count_t total = 0 ;
 	ssize_t	 count ;
 
@@ -1073,7 +1073,7 @@ psf_fwrite (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 	{	/* Break the writes down to a sensible size. */
 		count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : items ;
 
-		count = write (psf->filedes, ((char*) ptr) + total, count) ;
+		count = write (psf->filedes, ((const char*) ptr) + total, count) ;
 
 		if (count == -1)
 		{	if (errno == EINTR)
