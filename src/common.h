@@ -574,6 +574,7 @@ int		nist_open	(SF_PRIVATE *psf) ;
 int		paf_open	(SF_PRIVATE *psf) ;
 int		pvf_open	(SF_PRIVATE *psf) ;
 int		raw_open	(SF_PRIVATE *psf) ;
+int		sd2_open	(SF_PRIVATE *psf) ;
 int		sds_open	(SF_PRIVATE *psf) ;
 int		svx_open	(SF_PRIVATE *psf) ;
 int		voc_open	(SF_PRIVATE *psf) ;
@@ -585,7 +586,6 @@ int		xi_open		(SF_PRIVATE *psf) ;
 
 int		ogg_open	(SF_PRIVATE *psf) ;
 int		rx2_open	(SF_PRIVATE *psf) ;
-int		sd2_open	(SF_PRIVATE *psf) ;
 int		txw_open	(SF_PRIVATE *psf) ;
 int		wve_open	(SF_PRIVATE *psf) ;
 int		dwd_open	(SF_PRIVATE *psf) ;

@@ -249,6 +249,7 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					LOG_PUTCHAR (psf, c) ;
 					break ;
 
+			case 'x': /* hex */
 			case 'X': /* hex */
 					d = va_arg (ap, int) ;
 
