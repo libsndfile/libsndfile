@@ -12,22 +12,8 @@ src/config.h.in: configure.ac libtool
 libtool ltmain.sh: aclocal.m4
 	libtoolize --copy --force
 	
-aclocal.m4: acinclude.m4
+aclocal.m4:
 	aclocal
-
-acinclude.m4:
-	@echo "acinclude.m4"
-	@if [ -d $(HOME)/Proj/M4 ] ; then \
-		cat $(HOME)/Proj/M4/extra_largefile.m4 >acinclude.m4.new ; \
-		cat $(HOME)/Proj/M4/endian.m4 >>acinclude.m4.new ; \
-		cat $(HOME)/Proj/M4/lrint.m4 >>acinclude.m4.new ; \
-		cat $(HOME)/Proj/M4/lrintf.m4 >>acinclude.m4.new ; \
-		cat $(HOME)/Proj/M4/llrint.m4 >>acinclude.m4.new ; \
-		cat $(HOME)/Proj/M4/clip_mode.m4 >>acinclude.m4.new ; \
-		mv -f acinclude.m4.new acinclude.m4 ; \
-	else \
-		touch acinclude.m4 ; \
-		fi
 
 clean:
 	rm -f libtool ltmain.sh aclocal.m4 Makefile.in src/config.h.in config.cache
