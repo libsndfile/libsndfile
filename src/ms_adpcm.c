@@ -46,7 +46,7 @@ typedef struct
 #if HAVE_FLEXIBLE_ARRAY
 	unsigned short	dummydata [] ; /* ISO C99 struct flexible array. */
 #else
-	unsigned short	dummydata [1] ; /* This is a hack an might not work. */
+	unsigned short	dummydata [0] ; /* This is a hack an might not work. */
 #endif
 } MSADPCM_PRIVATE ;
 

@@ -120,7 +120,7 @@ enum
 } ;
 
 /*---------------------------------------------------------------------------------------
-**	PEAK_CHUNK_OLD - This chunk type is common to both AIFF and WAVE files although their
+**	PEAK_CHUNK - This chunk type is common to both AIFF and WAVE files although their
 **	endian encodings are different.
 */
 
@@ -133,9 +133,17 @@ typedef struct
 {	unsigned int	version ;	/* version of the PEAK chunk */
 	unsigned int	timestamp ;	/* secs since 1/1/1970  */
 #if HAVE_FLEXIBLE_ARRAY
-	PEAK_POS		peaks [] ;	/* the per channel peak info */
+	/* the per channel peak info */
+	PEAK_POS		peaks [] ;
 #else
-	PEAK_POS		peaks [1] ;	/* the per channel peak info */
+	/*
+	** This is not ISO compliant C. It works on some compilers which
+	** don't support the ISO standard flexible struct array which is
+	** used above. If your compiler doesn't ike this I suggest you find
+	** youself a 1999 ISO C standards compilant compiler. GCC-3.X is
+	** highly recommended.
+	*/
+	PEAK_POS		peaks [0] ;
 #endif
 } PEAK_CHUNK ;
 

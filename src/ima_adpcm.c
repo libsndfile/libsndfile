@@ -39,7 +39,7 @@ typedef struct IMA_ADPCM_PRIVATE_tag
 #if HAVE_FLEXIBLE_ARRAY
 	unsigned short	data	[] ; /* ISO C99 struct flexible array. */
 #else
-	unsigned short	data	[1] ; /* This is a hack and might not work. */
+	unsigned short	data	[0] ; /* This is a hack and might not work. */
 #endif
 } IMA_ADPCM_PRIVATE ;
 
