@@ -64,7 +64,7 @@ typedef struct
 	sf_count_t		sample_count ;
 	int				*samples ;
 	unsigned char	*block ;
-#if HAVE_FLEIBLE_ARRAY
+#if HAVE_FLEXIBLE_ARRAY
 	int				data [] ; /* ISO C99 struct flexible array. */
 #else
 	int				data [1] ; /* This is a hack and may not work. */

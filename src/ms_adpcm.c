@@ -43,7 +43,7 @@ typedef struct
 	sf_count_t			samplecount ;
 	short			*samples ;
 	unsigned char	*block ;
-#if HAVE_FLEIBLE_ARRAY
+#if HAVE_FLEXIBLE_ARRAY
 	unsigned short	dummydata [] ; /* ISO C99 struct flexible array. */
 #else
 	unsigned short	dummydata [1] ; /* This is a hack an might not work. */

@@ -117,7 +117,7 @@ typedef struct
 typedef struct
 {	unsigned int	version ;	/* version of the PEAK chunk */
 	unsigned int	timestamp ;	/* secs since 1/1/1970  */
-#if HAVE_FLEIBLE_ARRAY
+#if HAVE_FLEXIBLE_ARRAY
 	PEAK_POS		peaks [] ;	/* the per channel peak info */
 #else
 	PEAK_POS		peaks [1] ;	/* the per channel peak info */
