@@ -44,6 +44,7 @@ if test "x-$build_os-$host_os-$target_os" = x-mingw32-mingw32-mingw32 ; then
 AC_HEADER_STDC
 
 AC_CHECK_HEADERS(endian.h)
+AC_CHECK_HEADERS(byteswap.h)
 AC_HEADER_SYS_WAIT
 
 AC_CHECK_DECLS(S_IRGRP)

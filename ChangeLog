@@ -1,3 +1,20 @@
+2004-07-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/pcm.c
+    When converting from unsigned char to float or double, subtract 128 before
+    converting to float/double rather than after to save a floating point
+    operation as suggested by Stefan Briesenick.
+
+    * src/(pcm|sfendian|alaw|ulaw|double64|float32).c
+    Optimize inner loops by changing the loop counting slightly as suggested
+    by Stefan Briesenick.
+
+    * configure.ac
+    Detect presence of <byteswap.h>.
+
+    * src/sfendian.h
+    Use <byteswap.h> if present.
+
 2004-07-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/*.c

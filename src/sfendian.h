@@ -16,7 +16,21 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	"config.h"
+#include "config.h"
+
+#if HAVE_BYTESWAP_H
+
+#include <byteswap.h>
+
+#define	ENDSWAP_SHORT(x)	bswap_16 (x)
+#define	ENDSWAP_INT(x)		bswap_32 (x)
+
+#else
+
+#define	ENDSWAP_SHORT(x)	((((x)>>8)&0xFF)+(((x)&0xFF)<<8))
+#define	ENDSWAP_INT(x)		((((x)>>24)&0xFF)+(((x)>>8)&0xFF00)+(((x)&0xFF00)<<8)+(((x)&0xFF)<<24))
+
+#endif
 
 /*
 ** Many file types (ie WAV, AIFF) use sets of four consecutive bytes as a
@@ -33,10 +47,6 @@
 	#error "Target CPU endian-ness unknown. May need to hand edit src/config.h"
 #endif
 
-/* wo standard endswap macros. */
-
-#define	ENDSWAP_SHORT(x)	((((x)>>8)&0xFF)+(((x)&0xFF)<<8))
-#define	ENDSWAP_INT(x)		((((x)>>24)&0xFF)+(((x)>>8)&0xFF00)+(((x)&0xFF00)<<8)+(((x)&0xFF)<<24))
 /*
 ** Macros to handle reading of data of a specific endian-ness into host endian
 ** shorts and ints. The single input is an unsigned char* pointer to the start
@@ -96,7 +106,7 @@ void	endswap_long_copy	(long *dest, long *src, int len) ;
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: f0c5cd54-42d3-4237-90ec-11fe24995de7
