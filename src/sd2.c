@@ -191,22 +191,26 @@ sd2_close	(SF_PRIVATE *psf)
 static inline void
 write_char (unsigned char * data, int offset, char value)
 {	data [offset] = value ;
-} /* read_char */
+} /* write_char */
 
 static inline void
 write_short (unsigned char * data, int offset, short value)
-{	((short *) (data + offset)) [0] = H2BE_SHORT (value) ;
-} /* read_char */
+{	data [offset] = value >> 8 ;
+	data [offset + 1] = value ;
+} /* write_char */
 
 static inline void
 write_int (unsigned char * data, int offset, int value)
-{	((int *) (data + offset)) [0] = H2BE_INT (value) ;
-} /* read_int */
+{	data [offset] = value >> 24 ;
+	data [offset + 1] = value >> 16 ;
+	data [offset + 2] = value >> 8 ;
+	data [offset + 3] = value ;
+} /* write_int */
 
 static void
 write_str (unsigned char * data, int offset, char * buffer, int buffer_len)
 {	memcpy (data + offset, buffer, buffer_len) ;
-} /* read_str */
+} /* write_str */
 
 static int
 sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
@@ -335,11 +339,9 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 
 	rsrc.rsrc_len = rsrc.map_offset + rsrc.map_length ;
 
-	if (psf_fwrite (rsrc.rsrc_data, rsrc.rsrc_len, 1, psf) != 1)
-	{	psf_log_printf (psf, "Writing SD2 resource fork failed.\n") ;
-	puts (psf->logbuffer) ;
-	exit (1) ;
-		}
+	psf_fwrite (rsrc.rsrc_data, rsrc.rsrc_len, 1, psf) ;
+	if (psf->error)
+		return psf->error ;
 
 	return 0 ;
 } /* sd2_write_rsrc_fork */
@@ -354,12 +356,12 @@ read_char (const unsigned char * data, int offset)
 
 static inline int
 read_short (const unsigned char * data, int offset)
-{	return BES2H_SHORT (((const short *) (data + offset)) [0]) ;
+{	return (data [offset] << 8) + data [offset + 1] ;
 } /* read_char */
 
 static inline int
 read_int (const unsigned char * data, int offset)
-{	return BEI2H_INT (((const int *) (data + offset)) [0]) ;
+{	return (data [offset] << 24) + (data [offset + 1] << 16) + (data [offset + 2] << 8) + data [offset + 3] ;
 } /* read_char */
 
 static void
