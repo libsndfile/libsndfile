@@ -25,6 +25,15 @@
 #include <sndfile.h>
 #endif
 
+#ifdef UNUSED
+#elif defined(__GNUC__)
+# define UNUSED(x) UNUSED_ ## x __attribute__((unused))
+#elif defined(__LCLINT__)
+# define UNUSED(x) /*@unused@*/ x
+#else
+# define UNUSED(x) x
+#endif
+
 #define	SF_BUFFER_LEN			(8192*2)
 #define	SF_FILENAME_LEN			(256)
 #define	SF_HEADER_LEN			(4096)
