@@ -73,10 +73,11 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 		exit (1) ;
 		} ;
 
+	psf->error = 0 ;
 	psf->filedes = psf_open (pathname, open_mode) ;
 
 	if (psf->filedes == - SFE_BAD_OPEN_MODE)
-	{	psf->error = psf->filedes ;
+	{	psf->error = SFE_BAD_OPEN_MODE ;
 		psf->filedes = -1 ;
 		return psf->error ;
 		} ;
@@ -92,10 +93,11 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 int
 psf_open_rsrc (SF_PRIVATE *psf, const char *pathname, int open_mode)
 {
+	psf->error = 0 ;
 	psf->rsrcdes = psf_open (pathname, open_mode) ;
 
 	if (psf->rsrcdes == - SFE_BAD_OPEN_MODE)
-	{	psf->error = psf->rsrcdes ;
+	{	psf->error = SFE_BAD_OPEN_MODE ;
 		psf->rsrcdes = -1 ;
 		return psf->error ;
 		} ;
