@@ -86,15 +86,16 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_BAD_OPEN_MODE		, "Error: bad mode parameter for file open." },
 	{	SFE_OPEN_PIPE_RDWR		, "Error: attempt toopen a pipe in read/write mode." },
 	{	SFE_RDWR_POSITION		, "Error on RDWR position (cryptic)." },
+	{	SFE_RDWR_BAD_HEADER		, "Error : Cannot open file in read/write mode due to string data in header." },
 
 	{	SFE_STR_NO_SUPPORT		, "Error : File type does not support string data." },
+	{	SFE_STR_NOT_WRITE		, "Error : Trying to set a string when file is not in write mode." },
 	{	SFE_STR_MAX_DATA		, "Error : Maximum string data storage reached." },
 	{	SFE_STR_MAX_COUNT		, "Error : Maximum string data count reached." },
 	{	SFE_STR_BAD_TYPE		, "Error : Bad string data type." },
 	{	SFE_STR_NO_ADD_END		, "Error : file type does not support strings added at end of file." },
 	{	SFE_STR_BAD_STRING		, "Error : bad string." },
 	{	SFE_STR_WEIRD			, "Error : Weird string error." },
-	{	SFE_RDWR_BAD_HEADER		, "Error : Cannot open file in read/write mode due to string data in header." },
 
 	{	SFE_WAV_NO_RIFF			, "Error in WAV file. No 'RIFF' chunk marker." },
 	{	SFE_WAV_NO_WAVE			, "Error in WAV file. No 'WAVE' chunk marker." },
@@ -1061,7 +1062,7 @@ sf_set_string (SNDFILE *sndfile, int str_type, const char* str)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	return psf_store_string (psf, str_type, str) ;
+	return psf_set_string (psf, str_type, str) ;
 } /* sf_get_string */
 
 /*==============================================================================

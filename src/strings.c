@@ -151,6 +151,14 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	return 0 ;
 } /* psf_store_string */
 
+int
+psf_set_string (SF_PRIVATE *psf, int str_type, const char *str)
+{	if (psf->mode == SFM_READ)
+		return SFE_STR_NOT_WRITE ;
+
+	return psf_store_string (psf, str_type, str) ;
+} /* psf_set_string */
+
 const char*
 psf_get_string (SF_PRIVATE *psf, int str_type)
 {	int k ;

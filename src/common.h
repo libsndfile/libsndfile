@@ -315,15 +315,16 @@ enum
 	SFE_BAD_OPEN_MODE,
 	SFE_OPEN_PIPE_RDWR,
 	SFE_RDWR_POSITION,
+	SFE_RDWR_BAD_HEADER,
 
 	SFE_STR_NO_SUPPORT,
+	SFE_STR_NOT_WRITE,
 	SFE_STR_MAX_DATA,
 	SFE_STR_MAX_COUNT,
 	SFE_STR_BAD_TYPE,
 	SFE_STR_NO_ADD_END,
 	SFE_STR_BAD_STRING,
 	SFE_STR_WEIRD,
-	SFE_RDWR_BAD_HEADER,
 
 	SFE_WAV_NO_RIFF,
 	SFE_WAV_NO_WAVE,
@@ -492,6 +493,7 @@ int		psf_calc_max_all_channels	(SF_PRIVATE *psf, double *peaks, int normalize) ;
 /* Functions in strings.c. */
 
 const char* psf_get_string (SF_PRIVATE *psf, int str_type) ;
+int psf_set_string (SF_PRIVATE *psf, int str_type, const char *str) ;
 int psf_store_string (SF_PRIVATE *psf, int str_type, const char *str) ;
 
 /* Default seek function. Use for PCM and float encoded data. */
