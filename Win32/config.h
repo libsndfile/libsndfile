@@ -48,6 +48,9 @@
 /* Define to 1 if you have the <alsa/asoundlib.h> header file. */
 /* #undef HAVE_ALSA_ASOUNDLIB_H */
 
+/* Define to 1 if you have the <byteswap.h> header file. */
+/* #undef HAVE_BYTESWAP_H */
+
 /* Define to 1 if you have the `calloc' function. */
 #define HAVE_CALLOC 1
 
@@ -82,10 +85,10 @@
 #define HAVE_FSTAT 1
 
 /* Define to 1 if you have the `fsync' function. */
-#define HAVE_FSYNC 1
+/* #undef HAVE_FSYNC */
 
 /* Define to 1 if you have the `ftruncate' function. */
-#define HAVE_FTRUNCATE 1
+/* #undef HAVE_FTRUNCATE */
 
 /* Define to 1 if you have the `getpagesize' function. */
 #define HAVE_GETPAGESIZE 1
@@ -94,7 +97,7 @@
 #define HAVE_GMTIME 1
 
 /* Define to 1 if you have the `gmtime_r' function. */
-/* #undefine HAVE_GMTIME_R */
+/* #undef HAVE_GMTIME_R */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
@@ -142,7 +145,7 @@
 /* #undef HAVE_SSIZE_T */
 
 /* Define to 1 if you have the <stdint.h> header file. */
-#define HAVE_STDINT_H 1
+/* #undef HAVE_STDINT_H */
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -187,13 +190,13 @@
 #define PACKAGE_NAME "libsndfile"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsndfile 1.0.10"
+#define PACKAGE_STRING "libsndfile 1.0.11pre7"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsndfile"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.0.10"
+#define PACKAGE_VERSION "1.0.11pre7"
 
 /* Set to maximum allowed value of sf_count_t type. */
 #define SF_COUNT_MAX 0x7FFFFFFFFFFFFFFFi64
@@ -207,14 +210,20 @@
 /* The size of a `int', as computed by sizeof. */
 #define SIZEOF_INT 4
 
+/* The size of a `int64_t', as computed by sizeof. */
+#define SIZEOF_INT64_T 0
+
 /* The size of a `loff_t', as computed by sizeof. */
 #define SIZEOF_LOFF_T 0
 
 /* The size of a `long', as computed by sizeof. */
 #define SIZEOF_LONG 4
 
+/* The size of a `long long', as computed by sizeof. */
+#define SIZEOF_LONG_LONG 0
+
 /* The size of a `off64_t', as computed by sizeof. */
-#define SIZEOF_OFF64_T 0
+/* #undef SIZEOF_OFF64_T */
 
 /* The size of a `off_t', as computed by sizeof. */
 #define SIZEOF_OFF_T 4
@@ -241,10 +250,10 @@
 #define TYPEOF_SF_COUNT_T __int64_t
 
 /* Version number of package */
-#define VERSION "1.0.10"
+#define VERSION "1.0.11pre7"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
-/* #undef _FILE_OFFSET_BITS 64 */
+/* #undef _FILE_OFFSET_BITS */
 
 /* Define to make fseeko etc. visible, on some hosts. */
 /* #undef _LARGEFILE_SOURCE */

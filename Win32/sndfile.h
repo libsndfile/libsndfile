@@ -130,6 +130,7 @@ enum
 	SFC_GET_NORM_FLOAT				= 0x1011,
 	SFC_SET_NORM_DOUBLE				= 0x1012,
 	SFC_SET_NORM_FLOAT				= 0x1013,
+	SFC_SET_SCALE_FLOAT_INT_READ	= 0x1014,
 
 	SFC_GET_SIMPLE_FORMAT_COUNT		= 0x1020,
 	SFC_GET_SIMPLE_FORMAT			= 0x1021,
@@ -217,7 +218,7 @@ enum
 	SFM_RDWR	= 0x30
 } ;
 
-/* Pubic error values. These are guaranteed to remain unchanged for the duration
+/* Public error values. These are guaranteed to remain unchanged for the duration
 ** of the library major version number. 
 ** There are also a large number of private error numbers which are internal to
 ** the library which can change at any time.

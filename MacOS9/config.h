@@ -25,6 +25,9 @@
 /* Define to 1 if you have the <alsa/asoundlib.h> header file. */
 /* #undef HAVE_ALSA_ASOUNDLIB_H */
 
+/* Define to 1 if you have the <byteswap.h> header file. */
+/* #undef HAVE_BYTESWAP_H */
+
 /* Define to 1 if you have the `calloc' function. */
 #define HAVE_CALLOC 1
 
@@ -35,10 +38,10 @@
 #define HAVE_DECL_S_IRGRP 1
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
-#define HAVE_DLFCN_H 1
+/* #undef HAVE_DLFCN_H */
 
 /* Define to 1 if you have the <endian.h> header file. */
-#define HAVE_ENDIAN_H 1
+/* #undef HAVE_ENDIAN_H */
 
 /* Define to 1 if you have the `fdatasync' function. */
 #define HAVE_FDATASYNC 1
@@ -101,10 +104,10 @@
 #define HAVE_OPEN 1
 
 /* Define to 1 if you have the `pread' function. */
-#define HAVE_PREAD 1
+/* #undef HAVE_PREAD */
 
 /* Define to 1 if you have the `pwrite' function. */
-#define HAVE_PWRITE 1
+/* #undef HAVE_PWRITE */
 
 /* Define to 1 if you have the `read' function. */
 #define HAVE_READ 1
@@ -164,13 +167,13 @@
 #define PACKAGE_NAME "libsndfile"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsndfile 1.0.10"
+#define PACKAGE_STRING "libsndfile 1.0.11pre7"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsndfile"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.0.10"
+#define PACKAGE_VERSION "1.0.11pre7"
 
 /* Set to maximum allowed value of sf_count_t type. */
 #define SF_COUNT_MAX 0x7FFFFFFFFFFFFFFFLL
@@ -184,11 +187,17 @@
 /* The size of a `int', as computed by sizeof. */
 #define SIZEOF_INT 4
 
+/* The size of a `int64_t', as computed by sizeof. */
+#define SIZEOF_INT64_T 8
+
 /* The size of a `loff_t', as computed by sizeof. */
 #define SIZEOF_LOFF_T 0
 
 /* The size of a `long', as computed by sizeof. */
 #define SIZEOF_LONG 4
+
+/* The size of a `long long', as computed by sizeof. */
+#define SIZEOF_LONG_LONG 8
 
 /* The size of a `off64_t', as computed by sizeof. */
 #define SIZEOF_OFF64_T 0
@@ -218,7 +227,7 @@
 #define TYPEOF_SF_COUNT_T off_t
 
 /* Version number of package */
-#define VERSION "1.0.10"
+#define VERSION "1.0.11pre7"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */
