@@ -53,26 +53,9 @@ typedef int ssize_t ;
 static int psf_open (const char * path, int mode) ;
 static void psf_log_syserr (SF_PRIVATE *psf, int error) ;
 
-#if ((defined (WIN32) || defined (_WIN32)) == 0)
-
-/*------------------------------------------------------------------------------
-** Win32 stuff at the bottom of the file. Unix and other sensible OSes here.
-*/
-
 int
 psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 {
-	/*
-	** Sanity check. If everything is OK, this test and the printfs will
-	** be optimised out. This is meant to catch the problems caused by
-	** "config.h" being included after <stdio.h>.
-	*/
-	if (sizeof (off_t) != sizeof (sf_count_t))
-	{	puts ("\n\n*** Fatal error : sizeof (off_t) != sizeof (sf_count_t)") ;
-		puts ("*** This means that libsndfile was not configured correctly.\n") ;
-		exit (1) ;
-		} ;
-
 	psf->error = 0 ;
 	psf->filedes = psf_open (pathname, open_mode) ;
 
@@ -106,7 +89,14 @@ psf_open_rsrc (SF_PRIVATE *psf, const char *pathname, int open_mode)
 		psf_log_syserr (psf, errno) ;
 
 	return psf->error ;
-} /* psf_fopen */
+} /* psf_open_rsrc */
+
+
+#if ((defined (WIN32) || defined (_WIN32)) == 0)
+
+/*------------------------------------------------------------------------------
+** Win32 stuff at the bottom of the file. Unix and other sensible OSes here.
+*/
 
 int
 psf_set_stdio (SF_PRIVATE *psf, int mode)
@@ -418,6 +408,17 @@ static int
 psf_open (const char * pathname, int open_mode)
 {	int fd, oflag, mode ;
 
+	/*
+	** Sanity check. If everything is OK, this test and the printfs will
+	** be optimised out. This is meant to catch the problems caused by
+	** "config.h" being included after <stdio.h>.
+	*/
+	if (sizeof (off_t) != sizeof (sf_count_t))
+	{	puts ("\n\n*** Fatal error : sizeof (off_t) != sizeof (sf_count_t)") ;
+		puts ("*** This means that libsndfile was not configured correctly.\n") ;
+		exit (1) ;
+		} ;
+
 	switch (open_mode)
 	{	case SFM_READ :
 				oflag = O_RDONLY ;
@@ -474,34 +475,8 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 typedef long ssize_t ;
 #endif
 
-/* Win32 */ static void
-psf_log_syserr (SF_PRIVATE *psf, int error)
-{	LPVOID lpMsgBuf ;
-
-	/* Only log an error if no error has been set yet. */
-	if (psf->error == 0)
-	{	psf->error = SFE_SYSTEM ;
-
-		FormatMessage (
-			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-			NULL,
-			error,
-			MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-			(LPTSTR) &lpMsgBuf,
-			0,
-			NULL
-			) ;
-
-		LSF_SNPRINTF (psf->syserr, sizeof (psf->syserr), "System error : %s", lpMsgBuf) ;
-		LocalFree (lpMsgBuf) ;
-		} ;
-
-	return ;
-} /* psf_log_syserr */
-
-
-/* Win32 */ int
-psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
+/* Win32 */ static int
+psf_open (const char * pathname, int open_mode)
 {	DWORD dwDesiredAccess ;
 	DWORD dwShareMode ;
 	DWORD dwCreationDistribution ;
@@ -527,8 +502,7 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 				break ;
 
 		default :
-				psf->error = SFE_BAD_OPEN_MODE ;
-				return psf->error ;
+				return - SFE_BAD_OPEN_MODE ;
 		} ;
 
 	handle = CreateFile (
@@ -542,15 +516,36 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 			) ;
 
 	if (handle == INVALID_HANDLE_VALUE)
-	{	psf_log_syserr (psf, GetLastError ()) ;
-		return psf->error ;
+		return -1 ;
+
+	return (int) handle ;
+} /* psf_open */
+
+/* Win32 */ static void
+psf_log_syserr (SF_PRIVATE *psf, int error)
+{	LPVOID lpMsgBuf ;
+
+	/* Only log an error if no error has been set yet. */
+	if (psf->error == 0)
+	{	psf->error = SFE_SYSTEM ;
+
+		FormatMessage (
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+			NULL,
+			error,
+			MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+			(LPTSTR) &lpMsgBuf,
+			0,
+			NULL
+			) ;
+
+		LSF_SNPRINTF (psf->syserr, sizeof (psf->syserr), "System error : %s", lpMsgBuf) ;
+		LocalFree (lpMsgBuf) ;
 		} ;
 
-	psf->filedes = (int) handle ;
-	psf->mode = open_mode ;
+	return ;
+} /* psf_log_syserr */
 
-	return psf->error ;
-} /* psf_fopen */
 
 /* Win32 */ int
 psf_set_stdio (SF_PRIVATE *psf, int mode)
@@ -1251,9 +1246,6 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 } /* psf_log_syserr */
 
 #endif
-
-/*==============================================================================
-*/
 
 /*
 ** Do not edit or modify anything in this comment block.
