@@ -24,7 +24,7 @@
 </P>
 <!-- pepper -->
 <P>
-	During read and write operations, formats are seamless converted between the
+	During read and write operations, formats are seamlessly converted between the
 	format the application program has requested or supplied and the file's data
 	format. The application programmer can remain blissfully unaware of issues
 	such as file endian-ness and data format. See <A HREF="#note1">Note 1</A> and
@@ -117,7 +117,7 @@ SNDFILE* is an anonymous pointer to data which is private to the library.
 
 <P>
 The SF_INFO structure is for passing data between the calling function and the library
-when opening a file for read or writing. It is defined in sndfile.h as follows:
+when opening a file for reading or writing. It is defined in sndfile.h as follows:
 </P>
 <!-- pepper -->
 <PRE>
@@ -144,7 +144,7 @@ The mode parameter for this function can be any one of the following three value
 <P>
 When opening a file for read, the <b>format</B> field should be set to zero before
 calling sf_open().
-The only exception to this is the case of RAW files where the caller has to set in 
+The only exception to this is the case of RAW files where the caller has to set 
 the channels and format fields to valid values.
 All other fields of the structure are filled in by the library.
 </P>
@@ -157,8 +157,8 @@ channels, and format.
 <P>
 The format field in the above SF_INFO structure is made up of the bit-wise OR of a 
 major format type (values between 0x10000 and 0x08000000), a minor format type 
-with (values less than 0x10000) and an optional endian-ness value. 
-The currently understood formats are listed in sndfile.h as follows and also includes 
+(with values less than 0x10000) and an optional endian-ness value. 
+The currently understood formats are listed in sndfile.h as follows and also include 
 bitmasks for separating major and minor file types.
 Not all combinations of endian-ness and major and minor file types are valid. 
 </P>
@@ -223,14 +223,14 @@ Not all combinations of endian-ness and major and minor file types are valid.
 <!-- pepper -->
 <P>
 Every call to sf_open() should be matched with a call to sf_close() to free up
-memory allocated by during the call to sf_open().
+memory allocated during the call to sf_open().
 </P>
 <!-- pepper -->
 <P>
 On success, the sf_open function returns a non NULL pointer which should be 
 passed as the first parameter to all subsequent libsndfile calls dealing with 
 that audio file.
-On fail, the sf_open functions return a NULL pointer.
+On fail, the sf_open function returns a NULL pointer.
 </P>
 
 <A NAME="open_fd"></A>
@@ -260,7 +260,7 @@ This function is useful in the following circumstances:
 
 <P>
 Every call to sf_open_fd() should be matched with a call to sf_close() to free up
-memory allocated by during the call to sf_open().
+memory allocated during the call to sf_open().
 The file descriptor is only closed if the close_desc parameter was TRUE when the 
 sf_open_fd() function was called.
 </P>
@@ -269,7 +269,7 @@ sf_open_fd() function was called.
 On success, the sf_open_fd function returns a non NULL pointer which should be 
 passed as the first parameter to all subsequent libsndfile calls dealing with 
 that audio file.
-On fail, the sf_open_fd functions return a NULL pointer.
+On fail, the sf_open_fd function returns a NULL pointer.
 </P>
 
 <A NAME="check"></A>
@@ -299,7 +299,7 @@ The file seek functions work much like lseek in unistd.h with the exception that
 the non-audio data is ignored and the seek only moves within the audio data section of 
 the file. 
 In addition, seeks are defined in number of (multichannel) frames.
-Therefore, for a seek in a stereo file from the current position forward with an offset 
+Therefore, a seek in a stereo file from the current position forward with an offset 
 of 1 would skip forward by one sample of both channels.
 </P>
 
@@ -324,12 +324,12 @@ both modified.
 </P>
 
 <P>
-Note that frames offset can be negative and in fact should be when SEEK_END is used for the 
+Note that the frames offset can be negative and in fact should be when SEEK_END is used for the 
 whence parameter. 
 </P>
 <P>
 sf_seek will return the offset in (multichannel) frames from the start of the audio data
-or -1 if an error occurs (ie an attempt is made to seek beyond the start or end of the file).
+or -1 if an error occured (ie an attempt is made to seek beyond the start or end of the file).
 </P>
 
 <A NAME="command"></A>
@@ -402,7 +402,7 @@ error enumerations into text strings.
 </PRE>
 
 <P>
-The functions sf_perror() and sf_error_str() are depricated and will be dropped
+The functions sf_perror() and sf_error_str() are deprecated and will be dropped
 from the library at some later date.
 </P>
 
@@ -414,8 +414,8 @@ from the library at some later date.
 </PRE>
 <!-- pepper -->
 <P>
-The close function closes the file, deallocates it's internal buffers and returns
-0 on success or an error value.
+The close function closes the file, deallocates its internal buffers and returns
+0 on success or an error value otherwise.
 </P>
 <BR><BR>
 
@@ -436,10 +436,10 @@ of channels or an error will occur.
 </P>
 <!-- pepper -->
 <P>
-It is important to note that the data type used by the calling progarm and the data
+It is important to note that the data type used by the calling program and the data
 format of the file do not need to be the same. For instance, it is possible to open
 a 16 bit PCM encoded WAV file and read the data using sf_read_float(). The library
-seamleassly converts between the two formats on-the-fly. See
+seamlessly converts between the two formats on-the-fly. See
 <A HREF="#note1">Note 1</A>.
 </P>
 <!-- pepper -->
@@ -469,7 +469,7 @@ frames and the number of channels.
 </P>
 
 <P><B>
-Care must be taken insure that there is enough space in the array pointed to by
+Care must be taken to ensure that there is enough space in the array pointed to by
 ptr, to take (frames * channels) number of items (shorts, ints, floats or doubles).
 </B></P>
 
@@ -499,10 +499,10 @@ will occur.
 </P>
 <!-- pepper -->
 <P>
-It is important to note that the data type used by the calling progarm and the data
+It is important to note that the data type used by the calling program and the data
 format of the file do not need to be the same. For instance, it is possible to open
 a 16 bit PCM encoded WAV file and write the data using sf_write_float(). The library
-seamleassly converts between the two formats on-the-fly. See
+seamlessly converts between the two formats on-the-fly. See
 <A HREF="#note1">Note 1</A>.
 </P>
 <P>
@@ -538,7 +538,7 @@ same as the frames parameter).
 </PRE>
 
 <P>
-The raw write and write functions read raw audio data from the audio file (not to be
+The raw read and write functions read raw audio data from the audio file (not to be
 confused with reading RAW header-less PCM files). The number of bytes read or written 
 must always be an integer multiple of the number of channels multiplied by the number 
 of bytes required to represent one sample from one channel.
@@ -551,7 +551,7 @@ should be the same as the bytes parameter).
 
 <P>
 <B>
-Note : The result of using of both regular reads/writes and raw reads/wites on 
+Note : The result of using of both regular reads/writes and raw reads/writes on 
 compressed file formats other than SF_FORMAT_ALAW and SF_FORMAT_ULAW is undefined.
 </B>
 </P>
@@ -566,8 +566,8 @@ compressed file formats other than SF_FORMAT_ALAW and SF_FORMAT_ULAW is undefine
 </PRE>
 
 <P>
-These functions allow strings to be set on files open for write and to be 
-retrieved from files open for read where supported by the given file type.
+These functions allow strings to be set on files opened for write and to be 
+retrieved from files opened for read where supported by the given file type.
 The <B>str_type</B> parameter can be any one of the following string types:
 </P>
 
@@ -632,7 +632,7 @@ using the <A HREF="command.html">sf_command</A> interface.
 Reading a file containg floating point data (allowable with WAV, AIFF, AU and other 
 file formats) using integer read methods (sf_read_short() or sf_read_int()) is 
 discouraged as the library cannot guarantee sensible results. For instance the data
-in the file may have a maximum absolute value < 1.0 which would mean that all samples
+in the file may have a maximum absolute value &lt; 1.0 which would mean that all sample
 values read from the file will be zero.
 </P>
 <!-- pepper -->

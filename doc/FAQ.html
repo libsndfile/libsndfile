@@ -131,9 +131,9 @@ Bash is designed to behave as a Bourne shell when is is called as /bin/sh.
 This problem is bigger than it may seem at first.
 </P>
 <P>
-For a stereo file, it a pretty safe bet that a simple interleaving/de-interleaving
+For a stereo file, it is a pretty safe bet that a simple interleaving/de-interleaving
 could satisfy most users.
-However, for file with more than 2 channels this is unlikely to be the case.
+However, for files with more than 2 channels this is unlikely to be the case.
 If the user has a 4 channel file and want to play that file on a stereo output 
 sound card they either want the first two channels or they want some mixed combination 
 of the 4 channels.
@@ -161,13 +161,13 @@ When you want to store temporary data there are a number of requirements;
 	<LI> Able to store data in either endian-ness.
 </UL>
 <P>
-The format which best means these requirements is AU, which allows data to be
-stored in any one of short, int, float and double (among others).
+The format which best meets these requirements is AU, which allows data to be
+stored in any one of short, int, float and double (among others) formats.
 </P>
 <P>
-For instance, if an application uses float data internally, it temporary files
+For instance, if an application uses float data internally, its temporary files
 should use a format of (SF_ENDIAN_CPU | SF_FORMAT_AU | SF_FORMAT_FLOAT) which
-will store big endian float data in big endian CPUs and little float endian data
+will store big endian float data in big endian CPUs and little endian float data
 on little endian CPUs.
 Reading and writing this format will not require any conversions or byte swapping
 regardless of the host CPU.
@@ -204,7 +204,7 @@ variables which can be used in Makefile.am like this:
 </PRE>
 <P>
 If you install libsndfile from source, you will probably need to set the
-<B>PKG_CONFIG_PATH</B> environment variable's suggested at the end of the
+<B>PKG_CONFIG_PATH</B> environment variable as suggested at the end of the
 libsndfile configure process. For instance on my system I get this:
 </P>
 <PRE>
@@ -240,11 +240,11 @@ libsndfile configure process. For instance on my system I get this:
 <P>
 I have a had a number of requests like this over the last 18 months.
 As yet, no-one has been able to justify why this is a good idea and why this
-cannot be done a different way.
+cannot be done in a different way.
 </P>
 <P>
-One example of different way is temporary files stored on a temporary file
-systems (ie tmpfs on both Linux and Solaris).
+One example of a different way is temporary files stored on a temporary file
+system (ie tmpfs on both Linux and Solaris).
 These require no changes to libsndfile, no extra code in libsndfile, achieve
 exactly what is required and work now.
 </P>
@@ -259,7 +259,7 @@ exactly what is required and work now.
 This is caused by the fact that the conversion from 16 bit short to float is
 done by dividing by 32768 (0x8000 in hexadecimal) while the conversion from
 float to 16 bit short is done by multiplying by 32767 (0x7FFF in hex).
-So for instance, a value in a 16 bit PCM file of 20000, gets read as a floating
+So for instance, a value in a 16 bit PCM file of 20000 gets read as a floating
 point number of 0.6103515625 (20000.0 / 0x8000). 
 Converting that back to a 16 bit short results in a value of 19999.3896484375
 (0.6103515625 * 0x7FFF) which then gets rounded down to 19999.
@@ -281,11 +281,11 @@ subtle.
 <P>
 In a file containing 16 bit PCM samples, the values are restricted to the range
 [-32768, 32767] while we want floating point values in the range [-1.0, 1.0].
-The only way to do this conversion is to do a floating point divide by a value
-0x8000.
+The only way to do this conversion is to do a floating point division by a value
+of 0x8000.
 Converting the other way, the only way to ensure that floating point values in
 the range [-1.0, 1.0] are within the valid range allowed by a 16 bit short is
-to multiply 0x7FFF.
+to multiply by 0x7FFF.
 </P>
 <P>
 Some people would say that this is a severe short-coming of libsndfile.
@@ -315,7 +315,7 @@ storage format (and which is also supported by most common file types).
 This is actually a Winamp problem.
 The official Microsoft spec suggests that the 'fmt ' chunk should be 18 bytes.
 Unfortunately at least one of Microsoft's own applications (Sound Recorder on
-Win98 I believe), did not accept 18 bytes 'fmt ' chunks.
+Win98 I believe) did not accept 18 bytes 'fmt ' chunks.
 </P>
 <P>
 Michael Lee did some experimenting and found that:
@@ -328,8 +328,8 @@ Michael Lee did some experimenting and found that:
 </PRE>
 
 <P>
-Even this is s very small sampling of all the players out there.
-For that reason its probably not a good idea to change this now because there
+Even this is a very small sampling of all the players out there.
+For that reason it is probably not a good idea to change this now because there
 is the risk of breaking something that currently works.
 </P>
 

@@ -1,7 +1,13 @@
+2004-02-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/*.html
+    Applied patch from Frank Neumann (author of lakai) which fixes many minor
+    typos in documentation. Thanks Frank.
+
 2004-02-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * ChangeLog
-    Modified my email address.
+    Changed my email address throughout source and docs.
 
 2004-02-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

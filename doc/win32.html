@@ -15,7 +15,7 @@
 
 <P>
 For Win32 there is a Microsoft Visual C++ compatible makefile in the <B>Win32\</B>
-directory of the distribution. Making the libsndfile DLL on Win32 involves 
+directory of the distribution. Building the libsndfile DLL on Win32 involves 
 the following:
 </P>
 <!-- pepper -->
@@ -48,11 +48,11 @@ the following:
 			<CENTER><PRE>C:\libsndfile-1.X.Y> nmake -f Win32\Makefile.msvc check
 			</PRE></CENTER>
 			which will compile a set of test programs and run them. If any of the 
-			programs fail the error message will be help in debugging the problem.
+			programs fail the error message will be helpful in debugging the problem.
 </OL>
 <!-- pepper -->
 <P>
-At the end of the above procedure, you will find the DLL, <B>libsndfile.dll</B>, a
+At the end of the above procedure, you will find the DLL, <B>libsndfile.dll</B> and a
 LIB file <B>libsndfile.lib</B> in the current directory. These two files, along
 with the header file <B>sndfile.h</B> (in the <B>Win32\</B> directory) are all that 
 you need to copy to your project in order to use libsndfile.
