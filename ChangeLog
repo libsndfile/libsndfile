@@ -1,3 +1,11 @@
+2004-08-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h
+    Change the unnamed union into a named union so gcc-2.95 will compile it.
+
+    * src/*.c
+    Fixes to allow for the above change.
+
 2004-08-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-play.c

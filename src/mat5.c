@@ -203,11 +203,11 @@ mat5_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	psf_binheader_writef (psf, "S", "MATLAB 5.0 MAT-file, written by " PACKAGE "-" VERSION ", ") ;
-	psf_get_date_str (psf->scbuf, sizeof (psf->scbuf)) ;
-	psf_binheader_writef (psf, "jS", -1, psf->scbuf) ;
+	psf_get_date_str (psf->u.scbuf, sizeof (psf->u.scbuf)) ;
+	psf_binheader_writef (psf, "jS", -1, psf->u.scbuf) ;
 
-	memset (psf->scbuf, ' ', 124 - psf->headindex) ;
-	psf_binheader_writef (psf, "b", psf->scbuf, 124 - psf->headindex) ;
+	memset (psf->u.scbuf, ' ', 124 - psf->headindex) ;
+	psf_binheader_writef (psf, "b", psf->u.scbuf, 124 - psf->headindex) ;
 
 	psf->rwf_endian = psf->endian ;
 
@@ -260,15 +260,15 @@ mat5_read_header (SF_PRIVATE *psf)
 	short	version, endian ;
 	int		type, size, flags1, flags2, rows, cols ;
 
-	psf_binheader_readf (psf, "pb", 0, psf->scbuf, 124) ;
+	psf_binheader_readf (psf, "pb", 0, psf->u.scbuf, 124) ;
 
-	psf->scbuf [125] = 0 ;
+	psf->u.scbuf [125] = 0 ;
 
-	if (strlen (psf->scbuf) >= 124)
+	if (strlen (psf->u.scbuf) >= 124)
 		return SFE_UNIMPLEMENTED ;
 
-	if (strstr (psf->cbuf, "MATLAB 5.0 MAT-file") == psf->cbuf)
-		psf_log_printf (psf, "%s\n", psf->scbuf) ;
+	if (strstr (psf->u.cbuf, "MATLAB 5.0 MAT-file") == psf->u.cbuf)
+		psf_log_printf (psf, "%s\n", psf->u.scbuf) ;
 
 
 	psf_binheader_readf (psf, "E22", &version, &endian) ;

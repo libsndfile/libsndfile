@@ -252,9 +252,9 @@ psf_calc_signal_max (SF_PRIVATE *psf, int normalize)
 	position = sf_seek ((SNDFILE*) psf, 0, SEEK_CUR) ; /* Get current position in file */
 	sf_seek ((SNDFILE*) psf, 0, SEEK_SET) ;			/* Go to start of file. */
 
-	len = ARRAY_LEN (psf->dbuf) ;
+	len = ARRAY_LEN (psf->u.dbuf) ;
 
-	data = psf->dbuf ;
+	data = psf->u.dbuf ;
 
 	readcount = len ;
 	while (readcount > 0)
@@ -295,9 +295,9 @@ psf_calc_max_all_channels (SF_PRIVATE *psf, double *peaks, int normalize)
 	position = sf_seek ((SNDFILE*) psf, 0, SEEK_CUR) ; /* Get current position in file */
 	sf_seek ((SNDFILE*) psf, 0, SEEK_SET) ;			/* Go to start of file. */
 
-	len = ARRAY_LEN (psf->dbuf) ;
+	len = ARRAY_LEN (psf->u.dbuf) ;
 
-	data = psf->dbuf ;
+	data = psf->u.dbuf ;
 
 	chan = 0 ;
 	readcount = len ;

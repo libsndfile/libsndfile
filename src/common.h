@@ -162,7 +162,7 @@ typedef struct sf_private_tag
 		char			cbuf	[SF_BUFFER_LEN / sizeof (char)] ;
 		signed char		scbuf	[SF_BUFFER_LEN / sizeof (signed char)] ;
 		unsigned char	ucbuf	[SF_BUFFER_LEN / sizeof (signed char)] ;
-		} ;
+		} u ;
 
 	char			filename	[SF_FILENAME_LEN] ;
 

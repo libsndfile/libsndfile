@@ -359,8 +359,8 @@ msadpcm_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		return 0 ;
 	pms = (MSADPCM_PRIVATE*) psf->fdata ;
 
-	sptr = psf->sbuf ;
-	bufferlen = ARRAY_LEN (psf->sbuf) ;
+	sptr = psf->u.sbuf ;
+	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = msadpcm_read_block (psf, pms, sptr, readcount) ;
@@ -387,8 +387,8 @@ msadpcm_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	pms = (MSADPCM_PRIVATE*) psf->fdata ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x8000) : 1.0 ;
-	sptr = psf->sbuf ;
-	bufferlen = ARRAY_LEN (psf->sbuf) ;
+	sptr = psf->u.sbuf ;
+	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = msadpcm_read_block (psf, pms, sptr, readcount) ;
@@ -416,8 +416,8 @@ msadpcm_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 		return 0 ;
 	pms = (MSADPCM_PRIVATE*) psf->fdata ;
 
-	sptr = psf->sbuf ;
-	bufferlen = ARRAY_LEN (psf->sbuf) ;
+	sptr = psf->u.sbuf ;
+	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = msadpcm_read_block (psf, pms, sptr, readcount) ;
@@ -669,8 +669,8 @@ msadpcm_write_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		return 0 ;
 	pms = (MSADPCM_PRIVATE*) psf->fdata ;
 
-	sptr = psf->sbuf ;
-	bufferlen = ARRAY_LEN (psf->sbuf) ;
+	sptr = psf->u.sbuf ;
+	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -698,8 +698,8 @@ msadpcm_write_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
 
-	sptr = psf->sbuf ;
-	bufferlen = ARRAY_LEN (psf->sbuf) ;
+	sptr = psf->u.sbuf ;
+	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -727,8 +727,8 @@ msadpcm_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 		return 0 ;
 	pms = (MSADPCM_PRIVATE*) psf->fdata ;
 
-	sptr = psf->sbuf ;
-	bufferlen = ARRAY_LEN (psf->sbuf) ;
+	sptr = psf->u.sbuf ;
+	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)

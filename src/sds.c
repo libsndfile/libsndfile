@@ -549,8 +549,8 @@ sds_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 		return 0 ;
 	psds = (SDS_PRIVATE*) psf->fdata ;
 
-	iptr = psf->ibuf ;
-	bufferlen = ARRAY_LEN (psf->ibuf) ;
+	iptr = psf->u.ibuf ;
+	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = sds_read (psf, psds, iptr, readcount) ;
@@ -594,8 +594,8 @@ sds_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	else
 		normfact = 1.0 / (1 << psds->bitwidth) ;
 
-	iptr = psf->ibuf ;
-	bufferlen = ARRAY_LEN (psf->ibuf) ;
+	iptr = psf->u.ibuf ;
+	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = sds_read (psf, psds, iptr, readcount) ;
@@ -625,8 +625,8 @@ sds_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	else
 		normfact = 1.0 / (1 << psds->bitwidth) ;
 
-	iptr = psf->ibuf ;
-	bufferlen = ARRAY_LEN (psf->ibuf) ;
+	iptr = psf->u.ibuf ;
+	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = sds_read (psf, psds, iptr, readcount) ;
@@ -876,8 +876,8 @@ sds_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 		return 0 ;
 	psds = (SDS_PRIVATE*) psf->fdata ;
 
-	iptr = psf->ibuf ;
-	bufferlen = ARRAY_LEN (psf->ibuf) ;
+	iptr = psf->u.ibuf ;
+	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -921,8 +921,8 @@ sds_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	else
 		normfact = 1.0 * (1 << psds->bitwidth) ;
 
-	iptr = psf->ibuf ;
-	bufferlen = ARRAY_LEN (psf->ibuf) ;
+	iptr = psf->u.ibuf ;
+	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -952,8 +952,8 @@ sds_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	else
 		normfact = 1.0 * (1 << psds->bitwidth) ;
 
-	iptr = psf->ibuf ;
-	bufferlen = ARRAY_LEN (psf->ibuf) ;
+	iptr = psf->u.ibuf ;
+	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)

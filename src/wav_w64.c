@@ -151,8 +151,8 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 				for (k = 0 ; k < wav_fmt->msadpcm.numcoeffs ; k++)
 				{	bytesread +=
 					psf_binheader_readf (psf, "e22", &(wav_fmt->msadpcm.coeffs [k].coeff1), &(wav_fmt->msadpcm.coeffs [k].coeff2)) ;
-					LSF_SNPRINTF (psf->cbuf, sizeof (psf->cbuf), "     %2d     %7d   %7d\n", k, wav_fmt->msadpcm.coeffs [k].coeff1, wav_fmt->msadpcm.coeffs [k].coeff2) ;
-					psf_log_printf (psf, psf->cbuf) ;
+					LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "     %2d     %7d   %7d\n", k, wav_fmt->msadpcm.coeffs [k].coeff1, wav_fmt->msadpcm.coeffs [k].coeff2) ;
+					psf_log_printf (psf, psf->u.cbuf) ;
 					} ;
 				break ;
 

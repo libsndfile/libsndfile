@@ -125,7 +125,7 @@ nist_read_header (SF_PRIVATE *psf)
 
 	psf->sf.format = SF_FORMAT_NIST ;
 
-	psf_header = psf->cbuf ;
+	psf_header = psf->u.cbuf ;
 
 	if (sizeof (psf->header) <= NIST_HEADER_LENGTH)
 		return SFE_INTERNAL ;

@@ -412,14 +412,14 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					psf_log_printf (psf, "  time stamp : %d\n", psf->pchunk->timestamp) ;
 					psf_log_printf (psf, "    Ch   Position       Value\n") ;
 
-					cptr = psf->cbuf ;
+					cptr = psf->u.cbuf ;
 					for (dword = 0 ; dword < psf->sf.channels ; dword++)
 					{	psf_binheader_readf (psf, "ef4", & (psf->pchunk->peaks [dword].value),
 														& (psf->pchunk->peaks [dword].position)) ;
 
-						LSF_SNPRINTF (cptr, sizeof (psf->cbuf), "    %2d   %-12d   %g\n",
+						LSF_SNPRINTF (cptr, sizeof (psf->u.cbuf), "    %2d   %-12d   %g\n",
 								dword, psf->pchunk->peaks [dword].position, psf->pchunk->peaks [dword].value) ;
-						cptr [sizeof (psf->cbuf) - 1] = 0 ;
+						cptr [sizeof (psf->u.cbuf) - 1] = 0 ;
 						psf_log_printf (psf, cptr) ;
 						} ;
 
@@ -1123,12 +1123,12 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 			case ISRC_MARKER :
 					bytesread += psf_binheader_readf (psf, "e4", &dword) ;
 					dword += (dword & 1) ;
-					if (dword > SIGNED_SIZEOF (psf->cbuf))
+					if (dword > SIGNED_SIZEOF (psf->u.cbuf))
 					{	psf_log_printf (psf, "  *** %M : %d (too big)\n", chunk, dword) ;
 						return SFE_INTERNAL ;
 						} ;
 
-					cptr = psf->cbuf ;
+					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword) ;
 					bytesread += dword ;
 					cptr [dword - 1] = 0 ;
@@ -1141,12 +1141,12 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 						bytesread += psf_binheader_readf (psf, "e44", &dword, &mark_id) ;
 						dword -= 4 ;
 						dword += (dword & 1) ;
-						if (dword > SIGNED_SIZEOF (psf->cbuf))
+						if (dword > SIGNED_SIZEOF (psf->u.cbuf))
 						{	psf_log_printf (psf, "  *** %M : %d (too big)\n", chunk, dword) ;
 							return SFE_INTERNAL ;
 							} ;
 
-						cptr = psf->cbuf ;
+						cptr = psf->u.cbuf ;
 						psf_binheader_readf (psf, "b", cptr, dword) ;
 						bytesread += dword ;
 						cptr [dword - 1] = 0 ;
@@ -1179,22 +1179,22 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 
 		switch (chunk)
 		{	case ISFT_MARKER :
-					psf_store_string (psf, SF_STR_SOFTWARE, psf->cbuf) ;
+					psf_store_string (psf, SF_STR_SOFTWARE, psf->u.cbuf) ;
 					break ;
 			case ICOP_MARKER :
-					psf_store_string (psf, SF_STR_COPYRIGHT, psf->cbuf) ;
+					psf_store_string (psf, SF_STR_COPYRIGHT, psf->u.cbuf) ;
 					break ;
 			case INAM_MARKER :
-					psf_store_string (psf, SF_STR_TITLE, psf->cbuf) ;
+					psf_store_string (psf, SF_STR_TITLE, psf->u.cbuf) ;
 					break ;
 			case IART_MARKER :
-					psf_store_string (psf, SF_STR_ARTIST, psf->cbuf) ;
+					psf_store_string (psf, SF_STR_ARTIST, psf->u.cbuf) ;
 					break ;
 			case ICMT_MARKER :
-					psf_store_string (psf, SF_STR_COMMENT, psf->cbuf) ;
+					psf_store_string (psf, SF_STR_COMMENT, psf->u.cbuf) ;
 					break ;
 			case ICRD_MARKER :
-					psf_store_string (psf, SF_STR_DATE, psf->cbuf) ;
+					psf_store_string (psf, SF_STR_DATE, psf->u.cbuf) ;
 					break ;
 			} ;
 
@@ -1231,9 +1231,9 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 
 	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
 	if (dword != 0)
-	{	LSF_SNPRINTF (psf->cbuf, sizeof (psf->cbuf), "%f",
+	{	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%f",
 				 (1.0 * 0x80000000) / ((unsigned int) dword)) ;
-		psf_log_printf (psf, "  Pitch Fract. : %s\n", psf->cbuf) ;
+		psf_log_printf (psf, "  Pitch Fract. : %s\n", psf->u.cbuf) ;
 		}
 	else
 		psf_log_printf (psf, "  Pitch Fract. : 0\n") ;
@@ -1242,9 +1242,9 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	psf_log_printf (psf, "  SMPTE Format : %u\n", dword) ;
 
 	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
-	LSF_SNPRINTF (psf->cbuf, sizeof (psf->cbuf), "%02d:%02d:%02d %02d",
+	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%02d:%02d:%02d %02d",
 		 (dword >> 24) & 0x7F, (dword >> 16) & 0x7F, (dword >> 8) & 0x7F, dword & 0x7F) ;
-	psf_log_printf (psf, "  SMPTE Offset : %s\n", psf->cbuf) ;
+	psf_log_printf (psf, "  SMPTE Offset : %s\n", psf->u.cbuf) ;
 
 	bytesread += psf_binheader_readf (psf, "e4", &loop_count) ;
 	psf_log_printf (psf, "  Loop Count   : %u\n", loop_count) ;
@@ -1334,14 +1334,14 @@ wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	chunklen += (chunklen & 1) ;
 
 	bytesread += psf_binheader_readf (psf, "e224f", &rootnote, &q1, &q2, &q3) ;
-	LSF_SNPRINTF (psf->cbuf, sizeof (psf->cbuf), "%f", q2) ;
+	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%f", q2) ;
 	psf_log_printf (psf, "  Root note : %d\n  ????      : %d\n  ????      : %s\n  ????      : %d\n",
-				rootnote, q1, psf->cbuf, q3) ;
+				rootnote, q1, psf->u.cbuf, q3) ;
 
 	bytesread += psf_binheader_readf (psf, "e422f", &beats, &meter_denom, &meter_numer, &tempo) ;
-	LSF_SNPRINTF (psf->cbuf, sizeof (psf->cbuf), "%f", tempo) ;
+	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%f", tempo) ;
 	psf_log_printf (psf, "  Beats     : %d\n  Meter     : %d/%d\n  Tempo     : %s\n",
-				beats, meter_denom, meter_numer, psf->cbuf) ;
+				beats, meter_denom, meter_numer, psf->u.cbuf) ;
 
 	psf_binheader_readf (psf, "j", chunklen - bytesread) ;
 
