@@ -89,7 +89,7 @@ static void Cut_Calculation_of_the_LTP_parameters (
 	 */
 	L_max = 0;
 	Nc    = 40;	/* index for the maximum cross-correlation */
-	wt_k  = SASR(d[best_k], scal);
+	wt_k  = SASR_W(d[best_k], scal);
 
 	for (lambda = 40; lambda <= 120; lambda++) {
 		L_result = (longword)wt_k * dp[best_k - lambda];
@@ -116,7 +116,7 @@ static void Cut_Calculation_of_the_LTP_parameters (
 
 		register longword L_temp;
 
-		L_temp   = SASR( dp[k - Nc], 3 );
+		L_temp   = SASR_W( dp[k - Nc], 3 );
 		L_power += L_temp * L_temp;
 	}
 	L_power <<= 1;	/* from L_MULT */
@@ -190,7 +190,7 @@ static void Calculation_of_the_LTP_parameters (
 	/*  Initialization of a working array wt
 	 */
 
-	for (k = 0; k <= 39; k++) wt[k] = SASR( d[k], scal );
+	for (k = 0; k <= 39; k++) wt[k] = SASR_W( d[k], scal );
 
 	/* Search for the maximum cross-correlation and coding of the LTP lag
 	 */
@@ -251,7 +251,7 @@ static void Calculation_of_the_LTP_parameters (
 
 		register longword L_temp;
 
-		L_temp   = SASR( dp[k - Nc], 3 );
+		L_temp   = SASR_W( dp[k - Nc], 3 );
 		L_power += L_temp * L_temp;
 	}
 	L_power <<= 1;	/* from L_MULT */
@@ -270,8 +270,8 @@ static void Calculation_of_the_LTP_parameters (
 
 	temp = gsm_norm( L_power );
 
-	R = SASR( L_max   << temp, 16 );
-	S = SASR( L_power << temp, 16 );
+	R = SASR_L( L_max   << temp, 16 );
+	S = SASR_L( L_power << temp, 16 );
 
 	/*  Coding of the LTP gain
 	 */
@@ -327,14 +327,14 @@ static void Cut_Calculation_of_the_LTP_parameters (
 	else scal = 6 - temp;
 
 	assert(scal >= 0);
-	ltp_cut = (longword)SASR(dmax, scal) * st->ltp_cut / 100; 
+	ltp_cut = (longword)SASR_W(dmax, scal) * st->ltp_cut / 100; 
 
 
 	/*  Initialization of a working array wt
 	 */
 
 	for (k = 0; k < 40; k++) {
-		register word w = SASR( d[k], scal );
+		register word w = SASR_W( d[k], scal );
 		if (w < 0 ? w > -ltp_cut : w < ltp_cut) {
 			wt_float[k] = 0.0;
 		}
@@ -431,7 +431,7 @@ static void Cut_Calculation_of_the_LTP_parameters (
 
 		register longword L_temp;
 
-		L_temp   = SASR( dp[k - Nc], 3 );
+		L_temp   = SASR_W( dp[k - Nc], 3 );
 		L_power += L_temp * L_temp;
 	}
 	L_power <<= 1;	/* from L_MULT */
@@ -507,7 +507,7 @@ static void Calculation_of_the_LTP_parameters (
 	/*  Initialization of a working array wt
 	 */
 
-	for (k =    0; k < 40; k++) wt_float[k] =  SASR (din [k], scal) ;
+	for (k =    0; k < 40; k++) wt_float[k] =  SASR_W (din [k], scal) ;
 	for (k = -120; k <  0; k++) dp_float[k] =  dp[k];
 
 	/* Search for the maximum cross-correlation and coding of the LTP lag
@@ -596,7 +596,7 @@ static void Calculation_of_the_LTP_parameters (
 
 		register longword L_temp;
 
-		L_temp   = SASR( dp[k - Nc], 3 );
+		L_temp   = SASR_W( dp[k - Nc], 3 );
 		L_power += L_temp * L_temp;
 	}
 	L_power <<= 1;	/* from L_MULT */
@@ -615,8 +615,8 @@ static void Calculation_of_the_LTP_parameters (
 
 	temp = gsm_norm( L_power );
 
-	R = SASR( L_max   << temp, 16 );
-	S = SASR( L_power << temp, 16 );
+	R = SASR_L ( L_max   << temp, 16 );
+	S = SASR_L ( L_power << temp, 16 );
 
 	/*  Coding of the LTP gain
 	 */

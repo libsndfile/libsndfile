@@ -52,7 +52,7 @@ void Gsm_Preprocess (
 
 	/*  4.2.1   Downscaling of the input signal
 	 */
-		SO = SASR( *s, 3 ) << 2;
+		SO = SASR_W( *s, 3 ) << 2;
 		s++;
 
 		assert (SO >= -0x4000);	/* downscaled by     */
@@ -82,7 +82,7 @@ void Gsm_Preprocess (
 		/*   Execution of a 31 bv 16 bits multiplication
 		 */
 
-		msp = SASR( L_z2, 15 );
+		msp = SASR_L( L_z2, 15 );
 		lsp = L_z2-((longword)msp<<15); /* gsm_L_sub(L_z2,(msp<<15)); */
 
 		L_s2  += GSM_MULT_R( lsp, 32735 );
@@ -97,7 +97,7 @@ void Gsm_Preprocess (
 	 */
 
 		msp   = GSM_MULT_R( mp, -28180 );
-		mp    = SASR( L_temp, 15 );
+		mp    = SASR_L( L_temp, 15 );
 		*so++ = GSM_ADD( mp, msp );
 	}
 

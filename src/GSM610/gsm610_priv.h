@@ -56,8 +56,14 @@ typedef struct gsm_state GSM_STATE ;
 #define	MIN_LONGWORD	(-2147483647 - 1)
 #define	MAX_LONGWORD	  2147483647
 
+/* Signed arithmetic shift right. */
+static inline word
+SASR_W (word x, word by)
+{	return (x >> by) ;
+} /* SASR */
+
 static inline longword
-SASR (longword x, longword by)
+SASR_L (longword x, word by)
 {	return (x >> by) ;
 } /* SASR */
 

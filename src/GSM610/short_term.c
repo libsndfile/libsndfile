@@ -92,8 +92,8 @@ static void Coefficients_0_12 (
 	register int 	i;
 
 	for (i = 1; i <= 8; i++, LARp++, LARpp_j_1++, LARpp_j++) {
-		*LARp = GSM_ADD( SASR( *LARpp_j_1, 2 ), SASR( *LARpp_j, 2 ));
-		*LARp = GSM_ADD( *LARp,  SASR( *LARpp_j_1, 1));
+		*LARp = GSM_ADD( SASR_W( *LARpp_j_1, 2 ), SASR_W( *LARpp_j, 2 ));
+		*LARp = GSM_ADD( *LARp,  SASR_W( *LARpp_j_1, 1));
 	}
 }
 
@@ -104,7 +104,7 @@ static void Coefficients_13_26 (
 {
 	register int i;
 	for (i = 1; i <= 8; i++, LARpp_j_1++, LARpp_j++, LARp++) {
-		*LARp = GSM_ADD( SASR( *LARpp_j_1, 1), SASR( *LARpp_j, 1 ));
+		*LARp = GSM_ADD( SASR_W( *LARpp_j_1, 1), SASR_W( *LARpp_j, 1 ));
 	}
 }
 
@@ -116,8 +116,8 @@ static void Coefficients_27_39 (
 	register int i;
 
 	for (i = 1; i <= 8; i++, LARpp_j_1++, LARpp_j++, LARp++) {
-		*LARp = GSM_ADD( SASR( *LARpp_j_1, 2 ), SASR( *LARpp_j, 2 ));
-		*LARp = GSM_ADD( *LARp, SASR( *LARpp_j, 1 ));
+		*LARp = GSM_ADD( SASR_W( *LARpp_j_1, 2 ), SASR_W( *LARpp_j, 2 ));
+		*LARp = GSM_ADD( *LARp, SASR_W( *LARpp_j, 1 ));
 	}
 }
 
