@@ -105,7 +105,11 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 					memcpy (psf->str_end, str, str_len + 1) ;
 					psf->str_end += str_len ;
 
-					if (len_remaining > (int) (strlen (bracket_name) + str_len + 2))
+					/*
+					** If the supplied string does not already contain a
+					** libsndfile-X.Y.Z component, then add it.
+					*/
+					if (strstr (str, PACKAGE) == NULL && len_remaining > (int) (strlen (bracket_name) + str_len + 2))
 					{	if (strlen (str) == 0)
 							strncat (psf->str_end, lsf_name, len_remaining) ;
 						else

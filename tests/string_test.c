@@ -36,6 +36,8 @@
 
 static void	string_test (const char *filename, int typemajor) ;
 
+static int libsndfile_str_count (const char * cptr) ;
+
 int
 main (int argc, char *argv [])
 {	int		do_all = 0 ;
@@ -78,11 +80,11 @@ main (int argc, char *argv [])
 */
 
 static const char
-	software	[]	= "software",
+	software	[]	= "software (libsndfile-X.Y.Z)",
 	artist		[]	= "The Artist",
-	copyright	[]	= "Copyright (c) 2003,2004 The Artist",
+	copyright	[]	= "Copyright (c) 2001 The Artist",
 	comment		[]	= "Comment goes here!!!",
-	date		[]	= "2003,2004/01/27" ;
+	date		[]	= "2001/01/27" ;
 
 static	short	data_out [BUFFER_LEN] ;
 
@@ -161,6 +163,12 @@ string_test (const char *filename, int typemajor)
 		printf ("    Bad software  : %s\n", cptr) ;
 		} ;
 
+	if (libsndfile_str_count (cptr) != 1)
+	{	if (errors++ == 0)
+			puts ("\n") ;
+		printf ("    Bad software  : %s\n", cptr) ;
+		} ;
+
 	cptr = sf_get_string (file, SF_STR_ARTIST) ;
 	if (cptr == NULL || strcmp (artist, cptr) != 0)
 	{	if (errors++ == 0)
@@ -196,9 +204,23 @@ string_test (const char *filename, int typemajor)
 	puts ("ok") ;
 } /* string_test */
 
+static int
+libsndfile_str_count (const char * str)
+{	const char * cptr ;
+
+	if ((cptr = strstr (str, "libsndfile")) == NULL)
+		return 0 ;
+
+	if ((cptr = strstr (cptr + 1, "libsndfile")) == NULL)
+		return 1 ;
+
+	return 2 ;
+} /* libsndfile_str_count */
+
+
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 0260b3db-c250-4244-95a0-d288a913729a
