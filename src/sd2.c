@@ -239,9 +239,13 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 	rsrc->type_offset = rsrc->map_offset + 30 ;
 
 	rsrc->type_count = read_short (psf->header, rsrc->map_offset + 28) + 1 ;
-	rsrc->item_offset = rsrc->type_offset + rsrc->type_count * 8 ;
+	if (rsrc->type_count < 1)
+	{	printf ("Bad type count.\n") ;
+		return SFE_SD2_BAD_RSRC ;
+		} ;
 
-	if (rsrc->item_offset > rsrc_filelen)
+	rsrc->item_offset = rsrc->type_offset + rsrc->type_count * 8 ;
+	if (rsrc->item_offset < 0 || rsrc->item_offset > rsrc_filelen)
 	{	psf_log_printf (psf, "Bad item offset (%d).\n", rsrc->item_offset) ;
 		return SFE_SD2_BAD_RSRC ;
 		} ;
@@ -264,7 +268,7 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 static int
 parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc, int rsrc_filelen)
 {	char name [32], value [32] ;
-	int k, str_offset, data_offset, data_len ;
+	int k, str_offset, data_offset, data_len, rsrc_id ;
 
 	psf_log_printf (psf, "Finding parameters :\n") ;
 
@@ -276,18 +280,24 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc, int rsrc_filelen)
 		read_str (psf->header, str_offset + 1, name, SF_MIN (SIGNED_SIZEOF (name), slen + 1)) ;
 		str_offset += slen + 1 ;
 
-		data_offset = rsrc->data_offset + read_int (psf->header, rsrc->item_offset + k * 12 + 4) ;
+		rsrc_id = read_short (psf->header, rsrc->item_offset + k * 12) ;
 
-		if (data_offset > rsrc_filelen)
+		data_offset = rsrc->data_offset + read_int (psf->header, rsrc->item_offset + k * 12 + 4) ;
+		if (data_offset < 0 || data_offset > rsrc_filelen)
 		{	psf_log_printf (psf, "Bad data offset (%d)\n", data_offset) ;
 			return SFE_SD2_BAD_DATA_OFFSET ;
 			} ;
 
 		data_len = read_int (psf->header, data_offset) ;
+		if (data_len < 0 || data_len > SIGNED_SIZEOF (psf->header))
+		{	psf_log_printf (psf, "%s : Bad data length (%d).\n", __func__, data_len) ;
+			return SFE_SD2_BAD_RSRC ;
+			} ;
+
 		slen = read_char (psf->header, data_offset + 4) ;
 		read_str (psf->header, data_offset + 5, value, SF_MIN (SIGNED_SIZEOF (value), slen + 1)) ;
 
-		psf_log_printf (psf, "  %-12s   0x%04x    %2d    %2d    '%s'\n", name, data_offset, data_len, slen, value) ;
+		psf_log_printf (psf, "  %-12s   0x%04x    %4d    %2d    %2d    '%s'\n", name, data_offset, rsrc_id, data_len, slen, value) ;
 
 		if (strcmp (name, "sample-size") == 0 && rsrc->sample_size == 0)
 			rsrc->sample_size = strtol (value, NULL, 10) ;
