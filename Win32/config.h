@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002,2003 Erik de Castro Lopo <erikd@zip.com.au>
+** Copyright (C) 2002,2003 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -178,7 +178,7 @@
 #define PACKAGE "libsndfile"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "<erikd@zip.com.au>"
+#define PACKAGE_BUGREPORT "<erikd@mega-nerd.com>"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "libsndfile"

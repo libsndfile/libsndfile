@@ -1,9 +1,9 @@
-# Copyright (C) 1999-2003 Erik de Castro Lopo (erikd AT zip DOT com DOT au).
+# Copyright (C) 1999-2004 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
 
 dnl Require autoconf version
 AC_PREREQ(2.54)
 
-AC_INIT(libsndfile,1.0.6,<erikd@zip.com.au>)
+AC_INIT(libsndfile,1.0.6,<erikd@mega-nerd.com>)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)

@@ -19,7 +19,7 @@
 ## Load data from the file given by @var{filename}.
 ## @end deftypefn
 
-## Author: Erik de Castro Lopo <erikd@zip.com.au>
+## Author: Erik de Castro Lopo <erikd@mega-nerd.com>
 ## Description: Load the sound data from the given file name
 
 function [data fs] = sndfile_load (filename)

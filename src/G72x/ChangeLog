@@ -1,15 +1,15 @@
-2001-06-05  Erik de Castro Lopo  <erikd@zip.com.au>
+2001-06-05  Erik de Castro Lopo  <erikd@mega-nerd.com>
 
 	* g72x.c
 	Added {} in function update () to prevent 'ambiguous else' warning messages.
 
-2000-07-14  Erik de Castro Lopo  <erikd@zip.com.au>
+2000-07-14  Erik de Castro Lopo  <erikd@mega-nerd.com>
 
 	* g72x.c
 	Modified g72x_init_state () to fit in with the new structure of the code.
 	Implemented g72x_encode_block () and g72x_decode_block ().
 
-2000-07-12  Erik de Castro Lopo  <erikd@zip.com.au>
+2000-07-12  Erik de Castro Lopo  <erikd@mega-nerd.com>
 
     * g72x.h
     Moved nearly all definitions and function prototypes from this file have been 
@@ -24,7 +24,7 @@
     Changed struct g72x_state to a typedef struct { .. } G72x_PRIVATE.
     Added fields to G72x_PRIVATE required for working on blocks of samples.
 
-2000-06-07  Erik de Castro Lopo  <erikd@zip.com.au>
+2000-06-07  Erik de Castro Lopo  <erikd@mega-nerd.com>
 
     * g72x.c
     Fixed all compiler warnings.

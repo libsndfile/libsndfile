@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2003 Erik de Castro Lopo <erikd@zip.com.au>
+** Copyright (C) 1999-2003 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -20,7 +20,7 @@
 ** sndfile.h -- system-wide definitions
 **
 ** API documentation is in the doc/ directory of the source code tarball
-** and at http://www.zip.com.au/~erikd/libsndfile/api.html.
+** and at http://www.mega-nerd.com/libsndfile/api.html.
 */
 
 #ifndef SNDFILE_H
