@@ -95,6 +95,10 @@ main (int argc, char *argv [])
 
 	if (do_all || ! strcmp (argv [1], "au"))
 	{	update_header_test ("header.au", SF_FORMAT_AU) ;
+		update_seek_short_test ("header_short.au", SF_FORMAT_AU) ;
+		update_seek_int_test ("header_int.au", SF_FORMAT_AU) ;
+		update_seek_float_test ("header_float.au", SF_FORMAT_AU) ;
+		update_seek_double_test ("header_double.au", SF_FORMAT_AU) ;
 		test_count++ ;
 		} ;
 
@@ -105,36 +109,54 @@ main (int argc, char *argv [])
 
 	if (do_all || ! strcmp (argv [1], "nist"))
 	{	update_header_test ("header.nist", SF_FORMAT_NIST) ;
+		update_seek_short_test ("header_short.nist", SF_FORMAT_NIST) ;
+		update_seek_int_test ("header_int.nist", SF_FORMAT_NIST) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "paf"))
 	{	update_header_test ("header.paf", SF_FORMAT_PAF) ;
+		update_seek_short_test ("header_short.paf", SF_FORMAT_PAF) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "ircam"))
 	{	update_header_test ("header.ircam", SF_FORMAT_IRCAM) ;
+		update_seek_short_test ("header_short.ircam", SF_FORMAT_IRCAM) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "voc"))
 	{	update_header_test ("header.voc", SF_FORMAT_VOC) ;
+
+if (0) update_seek_short_test ("header_short.voc", SF_FORMAT_VOC) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "w64"))
 	{	update_header_test ("header.w64", SF_FORMAT_W64) ;
+		update_seek_short_test ("header_short.w64", SF_FORMAT_W64) ;
+		update_seek_int_test ("header_int.w64", SF_FORMAT_W64) ;
+		update_seek_float_test ("header_float.w64", SF_FORMAT_W64) ;
+		update_seek_double_test ("header_double.w64", SF_FORMAT_W64) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "mat4"))
 	{	update_header_test ("header.mat4", SF_FORMAT_MAT4) ;
+		update_seek_short_test ("header_short.mat4", SF_FORMAT_MAT4) ;
+		update_seek_int_test ("header_int.mat4", SF_FORMAT_MAT4) ;
+		update_seek_float_test ("header_float.mat4", SF_FORMAT_MAT4) ;
+		update_seek_double_test ("header_double.mat4", SF_FORMAT_MAT4) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "mat5"))
 	{	update_header_test ("header.mat5", SF_FORMAT_MAT5) ;
+		update_seek_short_test ("header_short.mat5", SF_FORMAT_MAT5) ;
+		update_seek_int_test ("header_int.mat5", SF_FORMAT_MAT5) ;
+		update_seek_float_test ("header_float.mat5", SF_FORMAT_MAT5) ;
+		update_seek_double_test ("header_double.mat5", SF_FORMAT_MAT5) ;
 		test_count++ ;
 		} ;
 
@@ -155,6 +177,7 @@ main (int argc, char *argv [])
 
 	if (do_all || ! strcmp (argv [1], "sds"))
 	{	update_header_test ("header.sds", SF_FORMAT_SDS) ;
+		update_seek_short_test ("header_short.sds", SF_FORMAT_SDS) ;
 		test_count++ ;
 		} ;
 
@@ -205,7 +228,7 @@ update_header_sub (const char *filename, int typemajor, int write_mode)
 	** the the log buffer will contain errors.
 	*/
 	infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
-	check_log_buffer_or_die (infile) ;
+	check_log_buffer_or_die (infile, __LINE__) ;
 
 	if (sfinfo.frames < BUFFER_LEN || sfinfo.frames > BUFFER_LEN + 50)
 	{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), BUFFER_LEN) ;
@@ -230,7 +253,7 @@ update_header_sub (const char *filename, int typemajor, int write_mode)
 
 	/* Open file again and make sure no errors in log buffer. */
 	infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
-	check_log_buffer_or_die (infile) ;
+	check_log_buffer_or_die (infile, __LINE__) ;
 
 	if (sfinfo.frames < 2 * BUFFER_LEN || sfinfo.frames > 2 * BUFFER_LEN + 50)
 	{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), 2 * BUFFER_LEN) ;
@@ -250,7 +273,7 @@ update_header_test (const char *filename, int typemajor)
 {
 	print_test_name ("update_header_test", filename) ;
 
-#if (defined (WIN32) || defined (_WIN32))
+#if 0 /*-(OS_IS_WIN32 == 0)-*/
 	if (typemajor == SF_FORMAT_PAF)
 	{	/*
 		** I think this is a bug in the win32 file I/O code in src/file_io.c.
@@ -274,34 +297,34 @@ update_header_test (const char *filename, int typemajor)
 
 [+ FOR data_type
 +]static void	update_seek_[+ (get "name") +]_test	(const char *filename, int filetype)
-{	SNDFILE *file ;
+{	SNDFILE *outfile, *infile ;
 	SF_INFO sfinfo ;
     sf_count_t frames ;
-    [+ (get "name") +] buffer [16] ;
+    [+ (get "name") +] buffer [8] ;
 	int k ;
 
 	print_test_name ("update_seek_[+ (get "name") +]_test", filename) ;
 
 	memset (buffer, 0, sizeof (buffer)) ;
 
-	/* Create sound file with no data. */
+	/* Create sound outfile with no data. */
 	sfinfo.format = filetype | [+ (get "format") +] ;
 	sfinfo.samplerate = 48000 ;
 	sfinfo.channels = 2 ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
-	sf_close (file) ;
+	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
+	sf_close (outfile) ;
 
 	/* Open again for read/write. */
-	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, __LINE__) ;
+	outfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, __LINE__) ;
 
 	/*
 	** In auto header update mode, seeking to the end of the file with
     ** SEEK_SET will fail from the 2nd seek on.  seeking to 0, SEEK_END
 	** will seek to 0 anyway
 	*/
-	if (sf_command (file, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE) == 0)
-    {	printf ("\n\nError : sf_command (SFC_SET_UPDATE_HEADER_AUTO) return error : %s\n\n", sf_strerror (file)) ;
+	if (sf_command (outfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE) == 0)
+    {	printf ("\n\nError : sf_command (SFC_SET_UPDATE_HEADER_AUTO) return error : %s\n\n", sf_strerror (outfile)) ;
 		exit (1) ;
 		} ;
 
@@ -309,16 +332,27 @@ update_header_test (const char *filename, int typemajor)
 	frames = ARRAY_LEN (buffer) / sfinfo.channels ;
 
 	for (k = 0 ; k < 6 ; k++)
-	{	test_seek_or_die (file, k * frames, SEEK_SET, k * frames, sfinfo.channels, __LINE__) ;
-		test_seek_or_die (file, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__) ;
+	{	test_seek_or_die (outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, __LINE__) ;
+		test_seek_or_die (outfile, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__) ;
+
+		/* Open file again and make sure no errors in log buffer. */
+		infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
+		check_log_buffer_or_die (infile, __LINE__) ;
+		sf_close (infile) ;
+
+		if (sfinfo.frames != k * frames)
+		{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %ld)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), SF_COUNT_TO_LONG (k + frames)) ;
+			dump_log_buffer (infile) ;
+			exit (1) ;
+			} ;
 
 		if ((k & 1) == 0)
-			test_write_[+ (get "name") +]_or_die (file, k, buffer, sfinfo.channels * frames, __LINE__) ;
+			test_write_[+ (get "name") +]_or_die (outfile, k, buffer, sfinfo.channels * frames, __LINE__) ;
 		else
-			test_writef_[+ (get "name") +]_or_die (file, k, buffer, frames, __LINE__) ;
+			test_writef_[+ (get "name") +]_or_die (outfile, k, buffer, frames, __LINE__) ;
 		} ;
 
-	sf_close (file) ;
+	sf_close (outfile) ;
 	unlink (filename) ;
 
 	puts ("ok") ;
