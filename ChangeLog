@@ -1,3 +1,8 @@
+2004-02-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * acinclude.m4
+    Fix clip mode detection (hopefully).
+
 2004-02-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-play.c

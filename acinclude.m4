@@ -392,10 +392,6 @@ dnl provided "as is" without express or implied warranty.
 
 
 
-
-
-
-
 dnl Find the clipping mode in the following way:
 dnl    1) If we are not cross compiling test it.
 dnl    2) IF we are cross compiling, assume that clipping isn't done correctly.
@@ -408,7 +404,6 @@ AC_DEFUN([AC_C_CLIP_MODE],
 ac_cv_c_clip_positive=unknown
 ac_cv_c_clip_negative=unknown
 
-
 if test $ac_cv_c_clip_positive = unknown ; then
 	AC_TRY_RUN(
 	[[
@@ -418,23 +413,21 @@ if test $ac_cv_c_clip_positive = unknown ; then
 	#define __USE_ISOC9X	1
 	#include <math.h>
 	int main (void)
-	{	double	fval [] = { 1.0 * 0x7FFFFFFF, 1.1 * 0x7FFFFFFF, 1.2 * 0x7FFFFFFF } ;
+	{	double	fval = 1.0 * 0x7FFFFFFF ;
+		int k ;
+		
+		for (k = 0 ; k < 60 ; k++)
+		{	if (lrint (fval) < 0)
+				return 0 ;
+			
+			fval *= 1.5 ;
+			} ;
 
-		if (lrint (fval [0]) < 0)
-			return 0 ;
-		
-		if (lrint (fval [1]) < 0)
-			return 0 ;
-		
-		if (lrint (fval [2]) < 0)
-			return 0 ;
-		
 		return 1 ;
 		}
 		]], , ac_cv_c_clip_positive=yes, 
 		ac_cv_c_clip_positive=unknown
 		)
-
 
 	AC_TRY_RUN(
 	[[
@@ -444,23 +437,21 @@ if test $ac_cv_c_clip_positive = unknown ; then
 	#define __USE_ISOC9X	1
 	#include <math.h>
 	int main (void)
-	{	double	fval [] = { -8.0 * 0x10000000, -8.8 * 0x10000000, -9.6 * 0x10000000 } ;
+	{	double	fval = -8.0 * 0x10000000 ;
+		int k ;
 
-		if (lrint (fval [0]) > 0)
-			return 0 ;
-		
-		if (lrint (fval [1]) > 0)
-			return 0 ;
-		
-		if (lrint (fval [2]) > 0)
-			return 0 ;
-		
+		for (k = 0 ; k < 60 ; k++)
+		{	if (lrint (fval) > 0)
+				return 0 ;
+
+			fval *= 1.5 ;
+			} ;
+
 		return 1 ;
 		}
 		]], , ac_cv_c_clip_negative=yes, 
 		ac_cv_c_clip_negative=unknown
 		)
-
 	fi
 
 if test $ac_cv_c_clip_positive = yes ; then
