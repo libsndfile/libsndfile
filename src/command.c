@@ -115,6 +115,7 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_W64,		"W64 (SoundFoundry WAVE 64)",			"w64"	},
 	{	SF_FORMAT_WAV,		"WAV (Microsoft)",						"wav"	},
 	{	SF_FORMAT_NIST,		"WAV (NIST Sphere)",	 				"wav"	},
+	{	SF_FORMAT_WAVEX,	"WAVEX (Microsoft)",					"wav"	},
 	{	SF_FORMAT_XI,		"XI (FastTracker 2)",					"xi"	},
 
 } ; /* major_formats */

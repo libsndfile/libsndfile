@@ -329,6 +329,7 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	switch (format)
 	{	case WAVE_FORMAT_PCM :
 		case WAVE_FORMAT_EXTENSIBLE :
+					/* extensible might be FLOAT, MULAW, etc as well! */
 					psf->sf.format = SF_FORMAT_W64 | u_bitwidth_to_subformat (psf->bytewidth * 8) ;
 					break ;
 
@@ -558,7 +559,7 @@ w64_close (SF_PRIVATE *psf)
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 9aa4e141-538a-4dd9-99c9-b3f0f2dd4f4a

@@ -1,3 +1,14 @@
+2004-03-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav.c src/w64.c src/wav_w64.c
+    Integrate code supplied by David Viens for supporting microsoft's
+    WAVEFORMATEXTENSIBLE stuff. Thanks David for supplying this.
+
+2004-03-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/command.c src/sndfile.c src/sndfile.h.in src/wav.c
+    Started work on supporting microsoft's WAVEFORMATEXTENSIBLE gunk.
+
 2004-03-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/avr.c

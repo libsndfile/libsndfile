@@ -1,5 +1,6 @@
 /*
 ** Copyright (C) 1999-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -33,46 +34,46 @@
  * Macros to handle big/little endian issues.
  */
 
-#define RIFF_MARKER	(MAKE_MARKER ('R', 'I', 'F', 'F'))
-#define WAVE_MARKER	(MAKE_MARKER ('W', 'A', 'V', 'E'))
-#define fmt_MARKER	(MAKE_MARKER ('f', 'm', 't', ' '))
-#define data_MARKER	(MAKE_MARKER ('d', 'a', 't', 'a'))
-#define fact_MARKER	(MAKE_MARKER ('f', 'a', 'c', 't'))
-#define PEAK_MARKER	(MAKE_MARKER ('P', 'E', 'A', 'K'))
+#define RIFF_MARKER	 (MAKE_MARKER ('R', 'I', 'F', 'F'))
+#define WAVE_MARKER	 (MAKE_MARKER ('W', 'A', 'V', 'E'))
+#define fmt_MARKER	 (MAKE_MARKER ('f', 'm', 't', ' '))
+#define data_MARKER	 (MAKE_MARKER ('d', 'a', 't', 'a'))
+#define fact_MARKER	 (MAKE_MARKER ('f', 'a', 'c', 't'))
+#define PEAK_MARKER	 (MAKE_MARKER ('P', 'E', 'A', 'K'))
 
-#define cue_MARKER	(MAKE_MARKER ('c', 'u', 'e', ' '))
-#define LIST_MARKER	(MAKE_MARKER ('L', 'I', 'S', 'T'))
-#define slnt_MARKER	(MAKE_MARKER ('s', 'l', 'n', 't'))
-#define wavl_MARKER	(MAKE_MARKER ('w', 'a', 'v', 'l'))
-#define INFO_MARKER	(MAKE_MARKER ('I', 'N', 'F', 'O'))
-#define plst_MARKER	(MAKE_MARKER ('p', 'l', 's', 't'))
-#define adtl_MARKER	(MAKE_MARKER ('a', 'd', 't', 'l'))
-#define labl_MARKER	(MAKE_MARKER ('l', 'a', 'b', 'l'))
-#define ltxt_MARKER	(MAKE_MARKER ('l', 't', 'x', 't'))
-#define note_MARKER	(MAKE_MARKER ('n', 'o', 't', 'e'))
-#define smpl_MARKER	(MAKE_MARKER ('s', 'm', 'p', 'l'))
-#define bext_MARKER	(MAKE_MARKER ('b', 'e', 'x', 't'))
-#define MEXT_MARKER	(MAKE_MARKER ('M', 'E', 'X', 'T'))
-#define DISP_MARKER	(MAKE_MARKER ('D', 'I', 'S', 'P'))
-#define acid_MARKER	(MAKE_MARKER ('a', 'c', 'i', 'd'))
-#define strc_MARKER	(MAKE_MARKER ('s', 't', 'r', 'c'))
-#define PAD_MARKER	(MAKE_MARKER ('P', 'A', 'D', ' '))
-#define afsp_MARKER	(MAKE_MARKER ('a', 'f', 's', 'p'))
-#define clm_MARKER	(MAKE_MARKER ('c', 'l', 'm', ' '))
+#define cue_MARKER	 (MAKE_MARKER ('c', 'u', 'e', ' '))
+#define LIST_MARKER	 (MAKE_MARKER ('L', 'I', 'S', 'T'))
+#define slnt_MARKER	 (MAKE_MARKER ('s', 'l', 'n', 't'))
+#define wavl_MARKER	 (MAKE_MARKER ('w', 'a', 'v', 'l'))
+#define INFO_MARKER	 (MAKE_MARKER ('I', 'N', 'F', 'O'))
+#define plst_MARKER	 (MAKE_MARKER ('p', 'l', 's', 't'))
+#define adtl_MARKER	 (MAKE_MARKER ('a', 'd', 't', 'l'))
+#define labl_MARKER	 (MAKE_MARKER ('l', 'a', 'b', 'l'))
+#define ltxt_MARKER	 (MAKE_MARKER ('l', 't', 'x', 't'))
+#define note_MARKER	 (MAKE_MARKER ('n', 'o', 't', 'e'))
+#define smpl_MARKER	 (MAKE_MARKER ('s', 'm', 'p', 'l'))
+#define bext_MARKER	 (MAKE_MARKER ('b', 'e', 'x', 't'))
+#define MEXT_MARKER	 (MAKE_MARKER ('M', 'E', 'X', 'T'))
+#define DISP_MARKER	 (MAKE_MARKER ('D', 'I', 'S', 'P'))
+#define acid_MARKER	 (MAKE_MARKER ('a', 'c', 'i', 'd'))
+#define strc_MARKER	 (MAKE_MARKER ('s', 't', 'r', 'c'))
+#define PAD_MARKER	 (MAKE_MARKER ('P', 'A', 'D', ' '))
+#define afsp_MARKER	 (MAKE_MARKER ('a', 'f', 's', 'p'))
+#define clm_MARKER	 (MAKE_MARKER ('c', 'l', 'm', ' '))
 
-#define ISFT_MARKER	(MAKE_MARKER ('I', 'S', 'F', 'T'))
-#define ICRD_MARKER	(MAKE_MARKER ('I', 'C', 'R', 'D'))
-#define ICOP_MARKER	(MAKE_MARKER ('I', 'C', 'O', 'P'))
-#define IARL_MARKER	(MAKE_MARKER ('I', 'A', 'R', 'L'))
-#define IART_MARKER	(MAKE_MARKER ('I', 'A', 'R', 'T'))
-#define INAM_MARKER	(MAKE_MARKER ('I', 'N', 'A', 'M'))
-#define IENG_MARKER	(MAKE_MARKER ('I', 'E', 'N', 'G'))
-#define IART_MARKER	(MAKE_MARKER ('I', 'A', 'R', 'T'))
-#define ICOP_MARKER	(MAKE_MARKER ('I', 'C', 'O', 'P'))
-#define IPRD_MARKER	(MAKE_MARKER ('I', 'P', 'R', 'D'))
-#define ISRC_MARKER	(MAKE_MARKER ('I', 'S', 'R', 'C'))
-#define ISBJ_MARKER	(MAKE_MARKER ('I', 'S', 'B', 'J'))
-#define ICMT_MARKER	(MAKE_MARKER ('I', 'C', 'M', 'T'))
+#define ISFT_MARKER	 (MAKE_MARKER ('I', 'S', 'F', 'T'))
+#define ICRD_MARKER	 (MAKE_MARKER ('I', 'C', 'R', 'D'))
+#define ICOP_MARKER	 (MAKE_MARKER ('I', 'C', 'O', 'P'))
+#define IARL_MARKER	 (MAKE_MARKER ('I', 'A', 'R', 'L'))
+#define IART_MARKER	 (MAKE_MARKER ('I', 'A', 'R', 'T'))
+#define INAM_MARKER	 (MAKE_MARKER ('I', 'N', 'A', 'M'))
+#define IENG_MARKER	 (MAKE_MARKER ('I', 'E', 'N', 'G'))
+#define IART_MARKER	 (MAKE_MARKER ('I', 'A', 'R', 'T'))
+#define ICOP_MARKER	 (MAKE_MARKER ('I', 'C', 'O', 'P'))
+#define IPRD_MARKER	 (MAKE_MARKER ('I', 'P', 'R', 'D'))
+#define ISRC_MARKER	 (MAKE_MARKER ('I', 'S', 'R', 'C'))
+#define ISBJ_MARKER	 (MAKE_MARKER ('I', 'S', 'B', 'J'))
+#define ICMT_MARKER	 (MAKE_MARKER ('I', 'C', 'M', 'T'))
 
 /* Weird WAVPACK marker which can show up at the start of the DATA section. */
 #define wvpk_MARKER (MAKE_MARKER ('w', 'v', 'p', 'k'))
@@ -87,29 +88,64 @@ enum
 	HAVE_data	= 0x20
 } ;
 
+
+
+/*  known WAVEFORMATEXTENSIBLE GUIDS  */
+static const EXT_SUBFORMAT MSGUID_SUBTYPE_PCM =
+{	0x00000001, 0x0000, 0x0010, {	0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 }
+} ;
+
+static const EXT_SUBFORMAT MSGUID_SUBTYPE_MS_ADPCM =
+{	0x00000002, 0x0000, 0x0010, {	0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 }
+} ;
+
+static const EXT_SUBFORMAT MSGUID_SUBTYPE_IEEE_FLOAT =
+{	0x00000003, 0x0000, 0x0010, {	0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 }
+} ;
+
+static const EXT_SUBFORMAT MSGUID_SUBTYPE_ALAW =
+{	0x00000006, 0x0000, 0x0010, {	0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 }
+} ;
+
+static const EXT_SUBFORMAT MSGUID_SUBTYPE_MULAW =
+{	0x00000007, 0x0000, 0x0010, {	0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 }
+} ;
+
+/* maybe interesting one day to read the following through sf_read_raw */
+/* http://www.bath.ac.uk/~masrwd/pvocex/pvocex.html */
+static const EXT_SUBFORMAT MSGUID_SUBTYPE_PVOCEX =
+{	0x8312B9C2, 0x2E6E, 0x11d4, {	0xA8, 0x24, 0xDE, 0x5B, 0x96, 0xC3, 0xAB, 0x21 }
+} ;
+
+
 /*------------------------------------------------------------------------------
 ** Private static functions.
 */
 
-static int	wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock) ;
+static int	wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock) ;
 static int	wav_write_header (SF_PRIVATE *psf, int calc_length) ;
+
+static void wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat) ;
+static int	wavex_write_header (SF_PRIVATE *psf, int calc_length) ;
+
 static int	wav_write_tailer (SF_PRIVATE *psf) ;
 static void wav_write_strings (SF_PRIVATE *psf, int location) ;
 static int	wav_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
+static int	wav_close (SF_PRIVATE *psf) ;
 
-static int	wav_close	(SF_PRIVATE *psf) ;
-
-static int 	wav_subchunk_parse	(SF_PRIVATE *psf, int chunk) ;
+static int 	wav_subchunk_parse	 (SF_PRIVATE *psf, int chunk) ;
 static int	wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
 static int	wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
+
+static int wavex_write_guid_equal (const EXT_SUBFORMAT * first, const EXT_SUBFORMAT * second) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
 */
 
 int
-wav_open	(SF_PRIVATE *psf)
-{	int	subformat, error, blockalign = 0, framesperblock = 0 ;
+wav_open	 (SF_PRIVATE *psf)
+{	int	format, subformat, error, blockalign = 0, framesperblock = 0 ;
 
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = wav_read_header (psf, &blockalign, &framesperblock)))
@@ -122,7 +158,8 @@ wav_open	(SF_PRIVATE *psf)
 	{	if (psf->is_pipe)
 			return SFE_NO_PIPE_WRITE ;
 
-		if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_WAV)
+		format = psf->sf.format & SF_FORMAT_TYPEMASK ;
+		if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX)
 			return	SFE_BAD_OPEN_FORMAT ;
 
 		psf->endian = SF_ENDIAN_LITTLE ;	/* All WAV files are little endian. */
@@ -154,7 +191,7 @@ wav_open	(SF_PRIVATE *psf)
 			psf->peak_loc = SF_PEAK_START ;
 			} ;
 
-		psf->write_header = wav_write_header ;
+		psf->write_header = (format == SF_FORMAT_WAV) ? wav_write_header : wavex_write_header ;
 		} ;
 
 	psf->close = wav_close ;
@@ -212,7 +249,7 @@ wav_open	(SF_PRIVATE *psf)
 */
 
 static int
-wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
+wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 {	WAV_FMT		wav_fmt ;
 	FACT_CHUNK	fact_chunk ;
 	int			dword, marker, RIFFsize, done = 0 ;
@@ -322,7 +359,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if ((parsestage & HAVE_fmt) != HAVE_fmt)
 						psf_log_printf (psf, "*** Should have 'fmt ' chunk before 'fact'\n") ;
 
-					psf_binheader_readf (psf, "e44", &dword, &(fact_chunk.frames)) ;
+					psf_binheader_readf (psf, "e44", &dword, & (fact_chunk.frames)) ;
 
 					if (dword > SIGNED_SIZEOF (fact_chunk))
 						psf_binheader_readf (psf, "j", (int) (dword - SIGNED_SIZEOF (fact_chunk))) ;
@@ -354,7 +391,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						return SFE_MALLOC_FAILED ;
 
 					/* read in rest of PEAK chunk. */
-					psf_binheader_readf (psf, "e44", &(psf->pchunk->version), &(psf->pchunk->timestamp)) ;
+					psf_binheader_readf (psf, "e44", & (psf->pchunk->version), & (psf->pchunk->timestamp)) ;
 
 					if (psf->pchunk->version != 1)
 						psf_log_printf (psf, "  version    : %d *** (should be version 1)\n", psf->pchunk->version) ;
@@ -366,8 +403,8 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 					cptr = (char *) psf->buffer ;
 					for (dword = 0 ; dword < psf->sf.channels ; dword++)
-					{	psf_binheader_readf (psf, "ef4", &(psf->pchunk->peaks [dword].value),
-														&(psf->pchunk->peaks [dword].position)) ;
+					{	psf_binheader_readf (psf, "ef4", & (psf->pchunk->peaks [dword].value),
+														& (psf->pchunk->peaks [dword].position)) ;
 
 						LSF_SNPRINTF (cptr, sizeof (psf->buffer), "    %2d   %-12d   %g\n",
 								dword, psf->pchunk->peaks [dword].position, psf->pchunk->peaks [dword].value) ;
@@ -501,8 +538,29 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		} ;
 
 	switch (format)
-	{	case WAVE_FORMAT_PCM :
+	{
+
 		case WAVE_FORMAT_EXTENSIBLE :
+			/* compare GUIDs for known ones */
+			if (wavex_write_guid_equal (&wav_fmt.ext.esf, &MSGUID_SUBTYPE_PCM))
+				psf->sf.format = SF_FORMAT_WAVEX | u_bitwidth_to_subformat (psf->bytewidth * 8) ;
+			else
+			if (wavex_write_guid_equal (&wav_fmt.ext.esf, &MSGUID_SUBTYPE_MS_ADPCM))
+			{	psf->sf.format = (SF_FORMAT_WAVEX | SF_FORMAT_MS_ADPCM) ;
+				*blockalign = wav_fmt.msadpcm.blockalign ;
+				*framesperblock = wav_fmt.msadpcm.samplesperblock ;
+				}
+			else if (wavex_write_guid_equal (&wav_fmt.ext.esf, &MSGUID_SUBTYPE_IEEE_FLOAT))
+				psf->sf.format = SF_FORMAT_WAVEX | ((psf->bytewidth == 8) ? SF_FORMAT_DOUBLE : SF_FORMAT_FLOAT) ;
+			else if (wavex_write_guid_equal (&wav_fmt.ext.esf, &MSGUID_SUBTYPE_ALAW))
+				psf->sf.format = (SF_FORMAT_WAVEX | SF_FORMAT_ALAW) ;
+			else if (wavex_write_guid_equal (&wav_fmt.ext.esf, &MSGUID_SUBTYPE_MULAW))
+				psf->sf.format = (SF_FORMAT_WAVEX | SF_FORMAT_ULAW) ;
+			else
+				return SFE_UNIMPLEMENTED ;
+			break ;
+
+		case WAVE_FORMAT_PCM :
 					psf->sf.format = SF_FORMAT_WAV | u_bitwidth_to_subformat (psf->bytewidth * 8) ;
 					break ;
 
@@ -738,6 +796,157 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 	return psf->error ;
 } /* wav_write_header */
 
+
+
+static int
+wavex_write_guid_equal (const EXT_SUBFORMAT * first, const EXT_SUBFORMAT * second)
+{	return !memcmp (first, second, sizeof (EXT_SUBFORMAT)) ;
+} /* wavex_write_guid_equal */
+
+
+static void
+wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat)
+{
+	psf_binheader_writef (psf, "e422b", subformat->esf_field1,
+					subformat->esf_field2, subformat->esf_field3) ;
+					subformat->esf_field4, 8) ;
+} /* wavex_write_guid */
+
+
+static int
+wavex_write_header (SF_PRIVATE *psf, int calc_length)
+{	sf_count_t	current ;
+	int 		fmt_size, k, subformat, add_fact_chunk = SF_FALSE ;
+
+	current = psf_ftell (psf) ;
+
+	if (calc_length)
+	{	psf->filelength = psf_get_filelen (psf) ;
+
+		psf->datalength = psf->filelength - psf->dataoffset ;
+
+		if (psf->dataend)
+			psf->datalength -= psf->filelength - psf->dataend ;
+
+		if (psf->bytewidth > 0)
+			psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
+		} ;
+
+
+	/* Reset the current header length to zero. */
+	psf->header [0] = 0 ;
+	psf->headindex = 0 ;
+	psf_fseek (psf, 0, SEEK_SET) ;
+
+	/* RIFF marker, length, WAVE and 'fmt ' markers. */
+	if (psf->filelength < 8)
+		psf_binheader_writef (psf, "etm8", RIFF_MARKER, 8) ;
+	else
+		psf_binheader_writef (psf, "etm8", RIFF_MARKER, psf->filelength - 8) ;
+
+	/* WAVE and 'fmt ' markers. */
+	psf_binheader_writef (psf, "emm", WAVE_MARKER, fmt_MARKER) ;
+
+	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+
+	/* initial section (same for all, it appears) */
+	switch (subformat)
+	{	case SF_FORMAT_PCM_U8 :
+		case SF_FORMAT_PCM_16 :
+		case SF_FORMAT_PCM_24 :
+		case SF_FORMAT_PCM_32 :
+		case SF_FORMAT_FLOAT :
+		case SF_FORMAT_DOUBLE :
+		case SF_FORMAT_ULAW :
+		case SF_FORMAT_ALAW :
+			fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 + 4 + 4 + 2 + 2 + 8 ;
+
+			/* fmt : format, channels, samplerate */
+			psf_binheader_writef (psf, "e4224", fmt_size, WAVE_FORMAT_EXTENSIBLE, psf->sf.channels, psf->sf.samplerate) ;
+			/*  fmt : bytespersec */
+			psf_binheader_writef (psf, "e4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
+			/*  fmt : blockalign, bitwidth */
+			psf_binheader_writef (psf, "e22", psf->bytewidth * psf->sf.channels, psf->bytewidth * 8) ;
+
+			/* cbSize 22 is sizeof (WAVEFORMATEXTENSIBLE) - sizeof (WAVEFORMATEX) */
+			psf_binheader_writef (psf, "e2", 22) ;
+
+			/* wValidBitsPerSample, for our use same as bitwidth as we use it fully */
+			psf_binheader_writef (psf, "e2", psf->bytewidth * 8) ;
+
+			if (psf->sf.channels == 2)
+				psf_binheader_writef (psf, "e4", 0x1 | 0x2 ) ;	/* dwChannelMask front left and right */
+			else
+				psf_binheader_writef (psf, "e4", 0) ;			/* dwChannelMask = 0 when in doubt */
+			break ;
+
+		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists might have different header as per wav_write_header */
+		default : return SFE_UNIMPLEMENTED ;
+		} ;
+
+	/* GUI section, different for each */
+
+	switch (subformat)
+	{	case SF_FORMAT_PCM_U8 :
+		case SF_FORMAT_PCM_16 :
+		case SF_FORMAT_PCM_24 :
+		case SF_FORMAT_PCM_32 :
+			wavex_write_guid (psf, &MSGUID_SUBTYPE_PCM) ;
+			break ;
+
+		case SF_FORMAT_FLOAT :
+		case SF_FORMAT_DOUBLE :
+			wavex_write_guid (psf, &MSGUID_SUBTYPE_IEEE_FLOAT) ;
+			add_fact_chunk = SF_TRUE ;
+			break ;
+
+		case SF_FORMAT_ULAW :
+			wavex_write_guid (psf, &MSGUID_SUBTYPE_MULAW) ;
+			add_fact_chunk = SF_TRUE ;
+			break ;
+
+		case SF_FORMAT_ALAW :
+			wavex_write_guid (psf, &MSGUID_SUBTYPE_ALAW) ;
+			add_fact_chunk = SF_TRUE ;
+			break ;
+
+		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists */
+
+		default : return SFE_UNIMPLEMENTED ;
+		} ;
+
+
+	if (add_fact_chunk)
+		psf_binheader_writef (psf, "etm48", fact_MARKER, 4, psf->sf.frames) ;
+
+	if (psf->str_flags & SF_STR_LOCATE_START)
+		wav_write_strings (psf, SF_STR_LOCATE_START) ;
+
+	if (psf->has_peak && psf->peak_loc == SF_PEAK_START)
+	{	psf_binheader_writef (psf, "em4", PEAK_MARKER,
+			sizeof (PEAK_CHUNK) + psf->sf.channels * sizeof (PEAK_POS)) ;
+		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;
+		for (k = 0 ; k < psf->sf.channels ; k++)
+			psf_binheader_writef (psf, "ef4", psf->pchunk->peaks [k].value, psf->pchunk->peaks [k].position) ;
+		} ;
+
+	psf_binheader_writef (psf, "etm8", data_MARKER, psf->datalength) ;
+	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	if (psf->error)
+		return psf->error ;
+
+	psf->dataoffset = psf->headindex ;
+
+	if (current < psf->dataoffset)
+		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
+	else if (current > 0)
+		psf_fseek (psf, current, SEEK_SET) ;
+
+	return psf->error ;
+} /* wav_write_header */
+
+
+
 static int
 wav_write_tailer (SF_PRIVATE *psf)
 {	int		k ;
@@ -821,7 +1030,12 @@ wav_close (SF_PRIVATE *psf)
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	wav_write_tailer (psf) ;
 
-		wav_write_header (psf, SF_TRUE) ;
+            /* DV dont know if thats right with you */
+			if ((psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAV)
+				wav_write_header (psf, SF_TRUE) ;
+			else
+				wavex_write_header (psf, SF_TRUE) ;
+
 		} ;
 
 	return 0 ;
@@ -999,7 +1213,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
 	if (dword != 0)
 	{	LSF_SNPRINTF ((char*) psf->buffer, sizeof (psf->buffer), "%f",
-				(1.0 * 0x80000000) / ((unsigned int) dword)) ;
+				 (1.0 * 0x80000000) / ((unsigned int) dword)) ;
 		psf_log_printf (psf, "  Pitch Fract. : %s\n", (char*) psf->buffer) ;
 		}
 	else
@@ -1010,7 +1224,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 
 	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
 	LSF_SNPRINTF ((char*) psf->buffer, sizeof (psf->buffer), "%02d:%02d:%02d %02d",
-		(dword >> 24) & 0x7F, (dword >> 16) & 0x7F, (dword >> 8) & 0x7F, dword & 0x7F) ;
+		 (dword >> 24) & 0x7F, (dword >> 16) & 0x7F, (dword >> 8) & 0x7F, dword & 0x7F) ;
 	psf_log_printf (psf, "  SMPTE Offset : %s\n", psf->buffer) ;
 
 	bytesread += psf_binheader_readf (psf, "e4", &loop_count) ;

@@ -194,6 +194,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 				psf_binheader_readf (psf, "e422", &(wav_fmt->ext.esf.esf_field1), &(wav_fmt->ext.esf.esf_field2),
 						&(wav_fmt->ext.esf.esf_field3)) ;
 
+                /* compare the esf_fields with each known GUID? and print?*/
 				psf_log_printf (psf, "  Subformat\n") ;
 				psf_log_printf (psf, "    esf_field1 : 0x%X\n", wav_fmt->ext.esf.esf_field1) ;
 				psf_log_printf (psf, "    esf_field2 : 0x%X\n", wav_fmt->ext.esf.esf_field2) ;
@@ -337,6 +338,8 @@ static WAV_FORMAT_DESC wave_descs [] =
 	FORMAT_TYPE (WAVE_FORMAT_NORRIS),
 	FORMAT_TYPE (WAVE_FORMAT_SOUNDSPACE_MUSICOMPRESS),
 	FORMAT_TYPE (WAVE_FORMAT_DVM),
+	FORMAT_TYPE (WAVE_FORMAT_INTERWAV_VSC112),
+	FORMAT_TYPE (WAVE_FORMAT_EXTENSIBLE),
 } ;
 
 char const*
@@ -376,7 +379,7 @@ wav_w64_srate2blocksize (int srate_chan_product)
 } /* srate2blocksize */
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 43c1b1dd-8abd-43da-a8cd-44da914b64a5

@@ -476,6 +476,7 @@ sf_format_check	(const SF_INFO *info)
 
 	switch (info->format & SF_FORMAT_TYPEMASK)
 	{	case SF_FORMAT_WAV :
+		case SF_FORMAT_WAVEX :
 				/* WAV is strictly little endian. */
 				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
 					return 0 ;
@@ -772,7 +773,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			{	int format = psf->sf.format & SF_FORMAT_TYPEMASK ;
 
 				/* Only WAV and AIFF support the PEAK chunk. */
-				if (format != SF_FORMAT_WAV && format != SF_FORMAT_AIFF)
+				if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX && format != SF_FORMAT_AIFF)
 					return SF_FALSE ;
 
 				format = psf->sf.format & SF_FORMAT_SUBMASK ;
@@ -2165,7 +2166,7 @@ psf_close (SF_PRIVATE *psf)
 
 static int
 psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
-{	int		error ;
+{	int		error, format ;
 
 	if (mode != SFM_READ && mode != SFM_WRITE && mode != SFM_RDWR)
 		return SFE_BAD_OPEN_MODE ;
@@ -2288,6 +2289,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	/* Call the initialisation function for the relevant file type. */
 	switch (psf->sf.format & SF_FORMAT_TYPEMASK)
 	{	case	SF_FORMAT_WAV :
+		case	SF_FORMAT_WAVEX :
 				error = wav_open (psf) ;
 				break ;
 
@@ -2394,10 +2396,10 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		return error ;
 
 	/* For now, check whether embedding is supported. */
+	format = psf->sf.format & SF_FORMAT_TYPEMASK ;
 	if (psf->fileoffset > 0 &&
-			((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_WAV) &&
-			((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_AIFF) &&
-			((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_AU)
+			(format != SF_FORMAT_WAV) && (format != SF_FORMAT_WAVEX) &&
+			(format != SF_FORMAT_AIFF) && (format != SF_FORMAT_AU)
 			)
 		return SFE_NO_EMBED_SUPPORT ;
 

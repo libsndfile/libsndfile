@@ -81,9 +81,16 @@ main (int argc, char **argv)
 		pcm_test_short	("short.wav"	, SF_FORMAT_WAV | SF_FORMAT_PCM_16, SF_FALSE) ;
 		pcm_test_24bit	("24bit.wav"	, SF_FORMAT_WAV | SF_FORMAT_PCM_24, SF_FALSE) ;
 		pcm_test_int	("int.wav"		, SF_FORMAT_WAV | SF_FORMAT_PCM_32, SF_FALSE) ;
+
+		pcm_test_24bit	("24bit.wavex"	, SF_FORMAT_WAVEX | SF_FORMAT_PCM_24, SF_FALSE) ;
+		pcm_test_int	("int.wavex"	, SF_FORMAT_WAVEX | SF_FORMAT_PCM_32, SF_FALSE) ;
+
 		/* Lite remove start */
 		pcm_test_float	("float.wav"	, SF_FORMAT_WAV | SF_FORMAT_FLOAT , SF_FALSE) ;
 		pcm_test_double	("double.wav"	, SF_FORMAT_WAV | SF_FORMAT_DOUBLE, SF_FALSE) ;
+
+		pcm_test_float	("float.wavex"	, SF_FORMAT_WAVEX | SF_FORMAT_FLOAT , SF_FALSE) ;
+		pcm_test_double	("double.wavex"	, SF_FORMAT_WAVEX | SF_FORMAT_DOUBLE, SF_FALSE) ;
 		/* Lite remove end */
 		test_count++ ;
 		} ;
