@@ -942,6 +942,18 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 		case SFC_GET_CLIPPING :
 			return psf->add_clipping ;
 
+		case SFC_GET_LOOP_INFO :
+			if (datasize != sizeof (SF_LOOP_INFO))
+				return SF_FALSE ;
+			if (psf->loop_info != NULL)
+			{	SF_LOOP_INFO *temp = (SF_LOOP_INFO *) data ;
+				memcpy (temp, psf->loop_info, sizeof (SF_LOOP_INFO)) ;
+
+				return SF_TRUE ;
+				} ;
+
+			return SF_FALSE ;
+
 		default :
 			/* Must be a file specific command. Pass it on. */
 			if (psf->command)
