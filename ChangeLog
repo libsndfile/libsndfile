@@ -3,6 +3,9 @@
     * configure.ac
     Do some MinGW fixes.
 
+    * configure.ac doc/Makefile.am
+    Install HTML docs when doing make install.
+
 2004-04-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-info.c

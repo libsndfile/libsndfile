@@ -69,8 +69,8 @@ SHLIB_VERSION_ARG=""
 # Finished checking, handle options.
 
 AC_ARG_ENABLE(experimental,
-		AC_HELP_STRING([--enable-experimental], [enable experimental code]),
-		ac_arg_experimental=yes, ac_arg_experimental=no)
+	AC_HELP_STRING([--enable-experimental], [enable experimental code]),
+	ac_arg_experimental=yes, ac_arg_experimental=no)
 
 EXPERIMENTAL_CODE=0
 if test x$ac_arg_experimental = xyes ; then
@@ -79,20 +79,20 @@ if test x$ac_arg_experimental = xyes ; then
 AC_DEFINE_UNQUOTED([ENABLE_EXPERIMENTAL_CODE],${EXPERIMENTAL_CODE}, [Set to 1 to enable experimental code.])
 
 AC_ARG_ENABLE(gcc-werror,
-		AC_HELP_STRING([--enable-gcc-werror], [enable -Werror in all Makefiles]),
-		ac_arg_gcc_werror=yes, ac_arg_gcc_werror=no)
+	AC_HELP_STRING([--enable-gcc-werror], [enable -Werror in all Makefiles]),
+	ac_arg_gcc_werror=yes, ac_arg_gcc_werror=no)
 
 AC_ARG_ENABLE(gcc-pipe,
-		AC_HELP_STRING([--disable-gcc-pipe], [disable gcc -pipe option]),
-		ac_arg_gcc_pipe="N", ac_arg_gcc_pipe="Y")
+	AC_HELP_STRING([--disable-gcc-pipe], [disable gcc -pipe option]),
+	ac_arg_gcc_pipe="N", ac_arg_gcc_pipe="Y")
 
 AC_ARG_ENABLE(gcc-opt,
-		AC_HELP_STRING([--disable-gcc-opt], [disable gcc optimisations]),
-		ac_arg_gcc_opt="N", ac_arg_gcc_opt="Y")
+	AC_HELP_STRING([--disable-gcc-opt], [disable gcc optimisations]),
+	ac_arg_gcc_opt="N", ac_arg_gcc_opt="Y")
 
 AC_ARG_ENABLE(cpu-clip,
-		AC_HELP_STRING([--disable-cpu-clip], [disable tricky cpu specific clipper]),
-		ac_arg_cpu_clip="N", ac_arg_cpu_clip="Y")
+	AC_HELP_STRING([--disable-cpu-clip], [disable tricky cpu specific clipper]),
+	ac_arg_cpu_clip="N", ac_arg_cpu_clip="Y")
 
 #====================================================================================
 # Check types and their sizes.
@@ -381,6 +381,9 @@ if test x"$CFLAGS" = x ; then
 	exit
 	fi
 
+htmldocdir=$prefix/share/doc/libsndfile1-dev/html
+AC_SUBST(htmldocdir)
+
 AC_SUBST(SHLIB_VERSION_ARG)
 AC_SUBST(SHARED_VERSION_INFO)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
@@ -434,6 +437,7 @@ AC_MSG_RESULT([[
     Library directory : ........... $libdir
     Program directory : ........... $bindir
     Pkgconfig directory : ......... $libdir/pkgconfig
+    HTML docs directory : ......... $htmldocdir
 ]])
 
 if test x$prefix != "x/usr" ; then
