@@ -720,6 +720,8 @@ static int
 truncate (const char *filename, int ignored)
 {	int fd ;
 
+	ignored = 0 ;
+
 	if ((fd = open (filename, O_RDWR | O_TRUNC | O_BINARY)) < 0)
 		return 0 ;
 
