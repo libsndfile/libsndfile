@@ -176,6 +176,14 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
+	if (do_all || ! strcmp (argv [1], "avr"))
+	{	update_header_test ("header.avr", SF_FORMAT_AVR) ;
+		zero_data_test ("zerolen.avr", SF_FORMAT_AVR) ;
+		filesystem_full_test (SF_FORMAT_AVR) ;
+		permission_test ("readonly.avr", SF_FORMAT_AVR) ;
+		test_count++ ;
+		} ;
+
 	if (do_all || ! strcmp (argv [1], "sds"))
 	{	update_header_test ("header.sds", SF_FORMAT_SDS) ;
 		zero_data_test ("zerolen.sds", SF_FORMAT_SDS) ;

@@ -62,6 +62,7 @@ main (int argc, char **argv)
 		printf ("           wav   - test WAV file functions (little endian)\n") ;
 		printf ("           aiff  - test AIFF file functions (big endian)\n") ;
 		printf ("           au    - test AU file functions\n") ;
+		printf ("           avr   - test AVR file functions\n") ;
 		printf ("           raw   - test RAW header-less PCM file functions\n") ;
 		printf ("           paf   - test PAF file functions\n") ;
 		printf ("           svx   - test 8SVX/16SV file functions\n") ;
@@ -233,6 +234,13 @@ main (int argc, char **argv)
 
 	if (do_all || ! strcmp (argv [1], "htk"))
 	{	pcm_test_short	("short.htk", SF_FORMAT_HTK | SF_FORMAT_PCM_16, SF_FALSE) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "avr"))
+	{	pcm_test_char 	("char_u8.avr"	, SF_FORMAT_AVR | SF_FORMAT_PCM_U8, SF_FALSE) ;
+		pcm_test_char 	("char_s8.avr"	, SF_FORMAT_AVR | SF_FORMAT_PCM_S8, SF_FALSE) ;
+		pcm_test_short	("short.avr"	, SF_FORMAT_AVR | SF_FORMAT_PCM_16, SF_FALSE) ;
 		test_count++ ;
 		} ;
 	/* Lite remove end */

@@ -128,8 +128,9 @@ benchmark.c: benchmark.def benchmark.tpl
 #===============================================================================
 
 check: generic-tests wav-tests aiff-tests au-tests raw-tests paf-tests \
-		svx-tests nist-tests ircam-tests voc-tests w64-tests mat4-tests \
-		mat5-tests pvf-tests xi-tests htk-tests sds-tests stdio-tests
+	svx-tests nist-tests ircam-tests voc-tests w64-tests mat4-tests \
+	mat5-tests pvf-tests xi-tests htk-tests avr-tests sds-tests \
+	stdio-tests
 
 generic-tests : error_test$(EXEEXT) ulaw_test$(EXEEXT) alaw_test$(EXEEXT) command_test$(EXEEXT) floating_point_test$(EXEEXT) pcm_test$(EXEEXT)
 	uname -a
@@ -291,6 +292,13 @@ htk-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
 	./misc_test$(EXEEXT) htk
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion$(EXEEXT)` passed tests on HTK files."
+	@echo "----------------------------------------------------------------------"
+
+avr-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)
+	./write_read_test$(EXEEXT) avr
+	./misc_test$(EXEEXT) avr
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion$(EXEEXT)` passed tests on AVR files."
 	@echo "----------------------------------------------------------------------"
 
 sds-tests: write_read_test$(EXEEXT) misc_test$(EXEEXT)

@@ -661,6 +661,16 @@ sf_format_check	(const SF_INFO *info)
 					return 1 ;
 				break ;
 
+		case SF_FORMAT_AVR :
+				/* SDS is strictly big endian. */
+				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
+					return 0 ;
+				if (info->channels < 1 || info->channels > 2)
+					return 0 ;
+				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
+					return 1 ;
+				break ;
+
 		/*-
 		case SF_FORMAT_SD2 :
 				/+* SD2 is strictly big endian. *+/
@@ -2034,6 +2044,9 @@ guess_file_type (SF_PRIVATE *psf, const char *filename)
 	if (buffer [0] == MAKE_MARKER ('a', 'j', 'k', 'g'))
 		return 0 /*-SF_FORMAT_SHN-*/ ;
 
+	if (buffer [0] == MAKE_MARKER ('2', 'B', 'I', 'T'))
+		return SF_FORMAT_AVR ;
+
 	if (OS_IS_MACOSX && (format = macos_guess_file_type (psf, filename)) != 0)
 		return format ;
 
@@ -2366,6 +2379,11 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		case	SF_FORMAT_REX2 :
 				error = rx2_open (psf) ;
 				break ;
+
+		case	SF_FORMAT_AVR :
+				error = avr_open (psf) ;
+				break ;
+
 		/* Lite remove end */
 
 		default :
