@@ -102,8 +102,7 @@ enum
 } ;
 
 typedef struct
-{	unsigned int	type ;
-	unsigned int	size ;
+{	unsigned int	size ;
 	short			numChannels ;
 	unsigned int	numSampleFrames ;
 	short			sampleSize ;
@@ -317,7 +316,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	while (! done)
 	{	psf_binheader_readf (psf, "m", &marker) ;
 
-		if (psf->mode == SFM_RDWR &&  (found_chunk & HAVE_SSND))
+		if (psf->mode == SFM_RDWR && (found_chunk & HAVE_SSND))
 			return SFE_AIFF_RW_SSND_NOT_LAST ;
 
 		switch (marker)
@@ -840,6 +839,8 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		** needs to be corrected for new data length. That means that we
 		** only change the length fields of the FORM and SSND chunks;
 		** everything else can be skipped over.
+		**
+		** FIXME: Also need to write frames field of COMM chunk.
 		*/
 
 		/* First write new FORM chunk. */
@@ -849,12 +850,24 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "Etm8", FORM_MARKER, psf->filelength - 8) ;
 		psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 
+		/* Now write farme count field of COMM chunk header. */
+		psf->headindex = 0 ;
+		psf_fseek (psf, 22, SEEK_SET) ;
+
+		psf_binheader_writef (psf, "Et8", psf->sf.frames) ;
+		psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+
 		/* Now write new SSND chunk header. */
 		psf->headindex = 0 ;
 		psf_fseek (psf, psf->dataoffset - 16, SEEK_SET) ;
 
 		psf_binheader_writef (psf, "Etm8", SSND_MARKER, psf->datalength + SIZEOF_SSND_CHUNK) ;
 		psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+
+		if (current < psf->dataoffset)
+			psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
+		else if (current > 0)
+			psf_fseek (psf, current, SEEK_SET) ;
 
 		return 0 ;
 		} ;
@@ -1030,7 +1043,6 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 	else if (current > 0)
 		psf_fseek (psf, current, SEEK_SET) ;
-
 
 	return psf->error ;
 } /* aiff_write_header */
