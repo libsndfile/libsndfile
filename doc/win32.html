@@ -18,12 +18,12 @@ There are currently two ways of building libsndfile under Win32:
 </P>
 <UL>
 	<LI> Using the free <A HREF="#MinGW">MinGW</A> tools.
-	<LI> Using Microsoft's own <A HREF="#MSVC">Visual C++</A> tools.
+	<LI> Using Microsoft's <A HREF="#MSVC">Visual C++</A> tools.
 </UL>
 
 <P>
 The free MinGW tools are the preferred option because they are a free (as in
-beer and speech), easily obtainable and much closer the the Linux/GCC
+beer and speech), easily obtainable and much closer to the Linux/GCC
 environment on which libsndfile is developed.
 At some time in the near future I intend to drop support for Microsoft's
 tools.
@@ -43,7 +43,7 @@ The files you will need will be named something like:
 	<LI> msysDTK-1.0.1.exe
 	<LI> MSYS-1.0.10.exe
 	<LI> gcc-core-3.3.1-20030804-1.tar.gz
-	<LI> gcc-g++-3.3.1-20030804-1.tar.gz 
+	<LI> gcc-g++-3.3.1-20030804-1.tar.gz
 	<LI> binutils-2.13.90-20030111-1.tar.gz
 	<LI> mingw-runtime-3.2.tar.gz
 	<LI> w32api-2.5.tar.gz
@@ -63,7 +63,7 @@ xterm.
 </P>
 
 <P>
-Assuming that you have downloaded the <B>.tar.gz</B> file into the 
+Assuming that you have downloaded the <B>.tar.gz</B> file into the
 <B>C:\temp\</B> directory you should now be able to execute the following
 commands:
 </P>
@@ -77,8 +77,22 @@ commands:
 </PRE>
 
 <P>
-which will result in ????????????????????
+If there is a failure during compiling or the "make check" stage, you should
+check that you are using the current stable version of the MinGW tools, and
+the latest version of libsndfile before sending the author a bug report.
 </P>
+
+<P>
+Once this is done, anyone interested in using libsndfile in other projects
+will be interested in the following files:
+</P>
+<UL>
+	<LI> libsndfile.dll
+	<LI> libsndfile.lib
+	<LI> libsndfile.def
+	<LI> src/sndfile.h
+	<LI> doc/*.html
+</UL>
 
 <!--===========================================================================-->
 
@@ -86,17 +100,17 @@ which will result in ????????????????????
 <H2><BR>Building libsndfile using MSVC++ 6.</H2>
 <P>
 For Win32 there is a Microsoft Visual C++ compatible makefile in the <B>Win32\</B>
-directory of the distribution. Building the libsndfile DLL on Win32 involves 
+directory of the distribution. Building the libsndfile DLL on Win32 involves
 the following:
 </P>
 <!-- pepper -->
 <OL>
-	<LI> Using WinZip in the GUI, open the libsndfile-1.X.Y.tar.gz file and 
-			extract the files into a directory. The following example assumes 
+	<LI> Using WinZip in the GUI, open the libsndfile-1.X.Y.tar.gz file and
+			extract the files into a directory. The following example assumes
 		<B>C:\</B>.
-	<LI> In the directory containing the extracted files, find the file 
-	    	<B>Win32\Makefile.msvc</B> and open it in a text editor (ie Notepad or 
-			similar). 
+	<LI> In the directory containing the extracted files, find the file
+	    	<B>Win32\Makefile.msvc</B> and open it in a text editor (ie Notepad or
+			similar).
 	<LI> Find the line which starts with <B>MSVCDir</B> and modify the directory
 		    path to point to the location of MSVC++ on your machine. This allows the
 			makefile to inform the compiler of the location of the standard header
@@ -107,33 +121,33 @@ the following:
 	<LI> Copy the file named <B>config.h</B> from the <B>Win32\</B> directory to the
 			<B>src\</B> directory replacing the one that was originally there.
 	<LI> Open a DOS window and cd into the libsndfile-1.X.Y directory.
-	<LI> Make sure that the program <B>nmake</B> (which is part of the MSCV++ 
+	<LI> Make sure that the program <B>nmake</B> (which is part of the MSCV++
 			package) is in a directory which is part of your <B>PATH</B> variable.
-	<LI> Type in the command 
-			<CENTER><PRE>C:\libsndfile-1.X.Y> nmake -f Win32\Makefile.msvc      
+	<LI> Type in the command
+			<CENTER><PRE>C:\libsndfile-1.X.Y> nmake -f Win32\Makefile.msvc
 			</PRE></CENTER>
 			and press &lt;return&gt;. You should now see a a large number of compile
-			commands as libsndfile.dll is built. 
+			commands as libsndfile.dll is built.
 	<LI> To check that the built DLL has been compiled correctly type in and run the
 			command
 			<CENTER><PRE>C:\libsndfile-1.X.Y> nmake -f Win32\Makefile.msvc check
 			</PRE></CENTER>
-			which will compile a set of test programs and run them. If any of the 
+			which will compile a set of test programs and run them. If any of the
 			programs fail the error message will be helpful in debugging the problem.
 </OL>
 <!-- pepper -->
 <P>
 At the end of the above procedure, you will find the DLL, <B>libsndfile.dll</B> and a
 LIB file <B>libsndfile.lib</B> in the current directory. These two files, along
-with the header file <B>sndfile.h</B> (in the <B>Win32\</B> directory) are all that 
+with the header file <B>sndfile.h</B> (in the <B>Win32\</B> directory) are all that
 you need to copy to your project in order to use libsndfile.
 </P>
 <!-- pepper -->
 <H2><BR>Compile Problems</H2>
 <!-- pepper -->
 <P>
-Compile problems using the above method of building the libsndfile DLL on Win32 should 
-be emailed to 
+Compile problems using the above method of building the libsndfile DLL on Win32 should
+be emailed to
 	<A HREF="m&#97;ilt&#111;:&#101;rikd&#64;z&#105;p.&#99;om.au">Erik de Castro Lopo</a>.
 This includes error messages generated during step 7 above.
 </P>
@@ -152,8 +166,8 @@ If you are using some other method to compile the libsndfile DLL you are on your
 
 <!--
   Do not edit or modify anything in this comment block.
-  The arch-tag line is a file identity tag for the GNU Arch 
+  The arch-tag line is a file identity tag for the GNU Arch
   revision control system.
- 
+
   arch-tag: b32ddb11-eb51-425f-9d39-b8b66284f129
 -->
