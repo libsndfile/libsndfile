@@ -2136,6 +2136,9 @@ psf_close (SF_PRIVATE *psf)
 	if (psf->dither)
 		free (psf->dither) ;
 
+	if (psf->pchunk)
+		free (psf->pchunk) ;
+
 	if (psf->format_desc)
 	{	memset (psf->format_desc, 0, strlen (psf->format_desc)) ;
 		free (psf->format_desc) ;

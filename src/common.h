@@ -31,7 +31,6 @@
 #define	SF_TEXT_LEN				(1024)
 #define SF_SYSERR_LEN			(256)
 #define SF_MAX_STRINGS			(16)
-#define	PEAK_CHANNEL_COUNT		(16)
 
 #define	SF_SEEK_ERROR			((sf_count_t) -1)
 
@@ -106,7 +105,7 @@ enum
 } ;
 
 /*---------------------------------------------------------------------------------------
-**	PEAK_CHUNK - This chunk type is common to both AIFF and WAVE files although their
+**	PEAK_CHUNK_OLD - This chunk type is common to both AIFF and WAVE files although their
 **	endian encodings are different.
 */
 
@@ -116,9 +115,9 @@ typedef struct
 } PEAK_POS ;
 
 typedef struct
-{	unsigned int	version ;					/* version of the PEAK chunk */
-	unsigned int	timestamp ;					/* secs since 1/1/1970  */
-	PEAK_POS		peak [PEAK_CHANNEL_COUNT] ;	/* the peak info */
+{	unsigned int	version ;	/* version of the PEAK chunk */
+	unsigned int	timestamp ;	/* secs since 1/1/1970  */
+	PEAK_POS		peaks [] ;	/* the per channel peak info */
 } PEAK_CHUNK ;
 
 typedef struct
@@ -185,7 +184,7 @@ typedef struct sf_private_tag
 	int				have_written ;	/* Has a single write been done to the file? */
 	int				has_peak ;		/* Has a PEAK chunk (AIFF and WAVE) been read? */
 	int				peak_loc ;		/* Write a PEAK chunk at the start or end of the file? */
-	PEAK_CHUNK		peak ;
+	PEAK_CHUNK		*pchunk ;
 
 	sf_count_t		filelength ;	/* Overall length of (embedded) file. */
 	sf_count_t		fileoffset ;	/* Offset in number of bytes from beginning of file. */
@@ -610,7 +609,7 @@ int sf_dither_double	(const SF_DITHER_INFO *dither, const double *in, double *ou
 #endif
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 7b45c0ee-5835-4a18-a4ef-994e4cd95b67

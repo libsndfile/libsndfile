@@ -146,7 +146,10 @@ wav_open	(SF_PRIVATE *psf)
 		** can be switched off using sf_command (SFC_SET_PEAK_CHUNK, SF_FALSE).
 		*/
 		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
-		{	psf->has_peak = SF_TRUE ;
+		{	psf->pchunk = calloc (1, sizeof (PEAK_CHUNK) * psf->sf.channels * sizeof (PEAK_POS)) ;
+			if (psf->pchunk == NULL)
+				return SFE_MALLOC_FAILED ;
+			psf->has_peak = SF_TRUE ;
 			psf->peak_loc = SF_PEAK_START ;
 			} ;
 
@@ -339,34 +342,34 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					psf_binheader_readf (psf, "e4", &dword) ;
 
 					psf_log_printf (psf, "%M : %d\n", marker, dword) ;
-					if (dword > SIGNED_SIZEOF (psf->peak))
-					{	psf_binheader_readf (psf, "j", dword) ;
-						psf_log_printf (psf, "*** File PEAK chunk bigger than sizeof (PEAK_CHUNK).\n") ;
-						return SFE_WAV_BAD_PEAK ;
-						} ;
-					if (dword != SIGNED_SIZEOF (psf->peak) - SIGNED_SIZEOF (psf->peak.peak) + psf->sf.channels * SIGNED_SIZEOF (PEAK_POS))
+					if (dword != SIGNED_SIZEOF (PEAK_CHUNK) + psf->sf.channels * SIGNED_SIZEOF (PEAK_POS))
 					{	psf_binheader_readf (psf, "j", dword) ;
 						psf_log_printf (psf, "*** File PEAK chunk size doesn't fit with number of channels.\n") ;
 						return SFE_WAV_BAD_PEAK ;
 						} ;
 
-					psf_binheader_readf (psf, "e44", &(psf->peak.version), &(psf->peak.timestamp)) ;
+					psf->pchunk = calloc (1, sizeof (PEAK_CHUNK) * psf->sf.channels * sizeof (PEAK_POS)) ;
+					if (psf->pchunk == NULL)
+						return SFE_MALLOC_FAILED ;
 
-					if (psf->peak.version != 1)
-						psf_log_printf (psf, "  version    : %d *** (should be version 1)\n", psf->peak.version) ;
+					/* read in rest of PEAK chunk. */
+					psf_binheader_readf (psf, "e44", &(psf->pchunk->version), &(psf->pchunk->timestamp)) ;
+
+					if (psf->pchunk->version != 1)
+						psf_log_printf (psf, "  version    : %d *** (should be version 1)\n", psf->pchunk->version) ;
 					else
-						psf_log_printf (psf, "  version    : %d\n", psf->peak.version) ;
+						psf_log_printf (psf, "  version    : %d\n", psf->pchunk->version) ;
 
-					psf_log_printf (psf, "  time stamp : %d\n", psf->peak.timestamp) ;
+					psf_log_printf (psf, "  time stamp : %d\n", psf->pchunk->timestamp) ;
 					psf_log_printf (psf, "    Ch   Position       Value\n") ;
 
 					cptr = (char *) psf->buffer ;
 					for (dword = 0 ; dword < psf->sf.channels ; dword++)
-					{	psf_binheader_readf (psf, "ef4", &(psf->peak.peak [dword].value),
-														&(psf->peak.peak [dword].position)) ;
+					{	psf_binheader_readf (psf, "ef4", &(psf->pchunk->peaks [dword].value),
+														&(psf->pchunk->peaks [dword].position)) ;
 
 						LSF_SNPRINTF (cptr, sizeof (psf->buffer), "    %2d   %-12d   %g\n",
-								dword, psf->peak.peak [dword].position, psf->peak.peak [dword].value) ;
+								dword, psf->pchunk->peaks [dword].position, psf->pchunk->peaks [dword].value) ;
 						cptr [sizeof (psf->buffer) - 1] = 0 ;
 						psf_log_printf (psf, cptr) ;
 						} ;
@@ -713,10 +716,10 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 
 	if (psf->has_peak && psf->peak_loc == SF_PEAK_START)
 	{	psf_binheader_writef (psf, "em4", PEAK_MARKER,
-			sizeof (psf->peak) - sizeof (psf->peak.peak) + psf->sf.channels * sizeof (PEAK_POS)) ;
+			sizeof (PEAK_CHUNK) + psf->sf.channels * sizeof (PEAK_POS)) ;
 		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
-			psf_binheader_writef (psf, "ef4", psf->peak.peak [k].value, psf->peak.peak [k].position) ;
+			psf_binheader_writef (psf, "ef4", psf->pchunk->peaks [k].value, psf->pchunk->peaks [k].position) ;
 		} ;
 
 	psf_binheader_writef (psf, "etm8", data_MARKER, psf->datalength) ;
@@ -747,10 +750,10 @@ wav_write_tailer (SF_PRIVATE *psf)
 	/* Add a PEAK chunk if requested. */
 	if (psf->has_peak && psf->peak_loc == SF_PEAK_END)
 	{	psf_binheader_writef (psf, "em4", PEAK_MARKER,
-			sizeof (psf->peak) - sizeof (psf->peak.peak) + psf->sf.channels * sizeof (PEAK_POS)) ;
+			sizeof (PEAK_CHUNK) + psf->sf.channels * sizeof (PEAK_POS)) ;
 		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
-			psf_binheader_writef (psf, "ef4", psf->peak.peak [k].value, psf->peak.peak [k].position) ;
+			psf_binheader_writef (psf, "ef4", psf->pchunk->peaks [k].value, psf->pchunk->peaks [k].position) ;
 		} ;
 
 	if (psf->str_flags & SF_STR_LOCATE_END)
@@ -1112,7 +1115,7 @@ wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 } /* wav_read_acid_chunk */
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 9c551689-a1d8-4905-9f56-26a204374f18

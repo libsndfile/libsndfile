@@ -384,6 +384,12 @@ float32_peak_update	(SF_PRIVATE *psf, float *buffer, int count, int indx)
 	int		k, position ;
 	float	fmaxval ;
 
+if (psf->pchunk == NULL)
+{
+	printf ("%s : psf->pchunk == NULL.\n", __func__);
+	exit (1);
+}
+
 	for (chan = 0 ; chan < psf->sf.channels ; chan++)
 	{	fmaxval = fabs (buffer [chan]) ;
 		position = 0 ;
@@ -393,9 +399,9 @@ float32_peak_update	(SF_PRIVATE *psf, float *buffer, int count, int indx)
 				position = k ;
 				} ;
 
-		if (fmaxval > psf->peak.peak [chan].value)
-		{	psf->peak.peak [chan].value = fmaxval ;
-			psf->peak.peak [chan].position = psf->write_current + indx + (position / psf->sf.channels) ;
+		if (fmaxval > psf->pchunk->peaks [chan].value)
+		{	psf->pchunk->peaks [chan].value = fmaxval ;
+			psf->pchunk->peaks [chan].position = psf->write_current + indx + (position / psf->sf.channels) ;
 			} ;
 		} ;
 
@@ -941,7 +947,7 @@ f2bf_array (float *buffer, int count)
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: b6c34917-488c-4145-9648-f4371fc4c889
