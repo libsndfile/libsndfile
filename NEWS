@@ -1,3 +1,7 @@
+Version 1.0.7 (2004-02-25)
+  * Fix clip mode detection on ia64, MIPS and other CPUs.
+  * Fix two MacOSX build problems.
+  
 Version 1.0.6 (2004-02-08)
   * Added support for native Win32 file access API (Ross Bencina).
   * New mode to add clippling then a converting from float/double to integer
