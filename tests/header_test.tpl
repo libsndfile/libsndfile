@@ -53,6 +53,8 @@ static void	update_header_test (const char *filename, int typemajor) ;
 [+ ENDFOR data_type
 +]
 
+static void extra_header_test (const char *filename, int filetype) ;
+
 /* Force the start of this buffer to be double aligned. Sparc-solaris will
 ** choke if its not.
 */
@@ -81,6 +83,7 @@ main (int argc, char *argv [])
 		update_seek_int_test ("header_int.wav", SF_FORMAT_WAV) ;
 		update_seek_float_test ("header_float.wav", SF_FORMAT_WAV) ;
 		update_seek_double_test ("header_double.wav", SF_FORMAT_WAV) ;
+		extra_header_test ("extra.wav", SF_FORMAT_WAV) ;
 		test_count++ ;
 		} ;
 
@@ -90,6 +93,7 @@ main (int argc, char *argv [])
 		update_seek_int_test ("header_int.aiff", SF_FORMAT_AIFF) ;
 		update_seek_float_test ("header_float.aiff", SF_FORMAT_AIFF) ;
 		update_seek_double_test ("header_double.aiff", SF_FORMAT_AIFF) ;
+		extra_header_test ("extra.aiff", SF_FORMAT_AIFF) ;
 		test_count++ ;
 		} ;
 
@@ -299,7 +303,8 @@ update_header_test (const char *filename, int typemajor)
 */
 
 [+ FOR data_type
-+]static void	update_seek_[+ (get "name") +]_test	(const char *filename, int filetype)
++]static void
+update_seek_[+ (get "name") +]_test	(const char *filename, int filetype)
 {	SNDFILE *outfile, *infile ;
 	SF_INFO sfinfo ;
     sf_count_t frames ;
@@ -367,6 +372,110 @@ update_header_test (const char *filename, int typemajor)
 [+ ENDFOR data_type
 +]
 
+
+
+
+
+static void
+extra_header_test (const char *filename, int filetype)
+{	SNDFILE *outfile, *infile ;
+	SF_INFO sfinfo ;
+    sf_count_t frames ;
+    short buffer [8] ;
+	int k ;
+
+	print_test_name ("extra_header_test", filename) ;
+
+	sfinfo.samplerate = 44100 ;
+	sfinfo.format = (filetype | SF_FORMAT_PCM_16) ;
+	sfinfo.channels = 1 ;
+
+	memset (buffer, 0xA0, sizeof (buffer)) ;
+
+	/* Now write some frames. */
+	frames = ARRAY_LEN (buffer) / sfinfo.channels ;
+
+	/* Test the file with extra header data. */
+	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, [+ (tpl-file-line "%2$d") +]) ;
+	sf_set_string (outfile, SF_STR_TITLE, filename) ;
+	test_writef_short_or_die (outfile, k, buffer, frames, [+ (tpl-file-line "%2$d") +]) ;
+	sf_set_string (outfile, SF_STR_COPYRIGHT, "(c) 1980 Erik") ;
+	sf_close (outfile) ;
+
+#if 1
+	/*
+	**  Erik de Castro Lopo <erikd@mega-nerd.com> May 23 2004.
+	**
+	** This file has extra string data in the header and therefore cannot
+	** currently be opened in SFM_RDWR mode. This is fixable, but its in
+	** a part of the code I don't want to fiddle with until the Ogg/Vorbis
+	** integration is done.
+	*/
+
+	if ((infile = sf_open (filename, SFM_RDWR, &sfinfo)) != NULL)
+	{	printf ("\n\nError : should not be able to open this file in SFM_RDWR.\n\n") ;
+		exit (1) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+	return ;
+#else
+
+	hexdump_file (filename, 0, 100000) ;
+
+	/* Open again for read/write. */
+	outfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, [+ (tpl-file-line "%2$d") +]) ;
+
+	/*
+	** In auto header update mode, seeking to the end of the file with
+    ** SEEK_SET will fail from the 2nd seek on.  seeking to 0, SEEK_END
+	** will seek to 0 anyway
+	*/
+	if (sf_command (outfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE) == 0)
+    {	printf ("\n\nError : sf_command (SFC_SET_UPDATE_HEADER_AUTO) return error : %s\n\n", sf_strerror (outfile)) ;
+		exit (1) ;
+		} ;
+
+	/* Now write some frames. */
+	frames = ARRAY_LEN (buffer) / sfinfo.channels ;
+
+	for (k = 1 ; k < 6 ; k++)
+	{
+		printf ("\n*** pass %d\n", k) ;
+		memset (buffer, 0xA0 + k, sizeof (buffer)) ;
+
+
+		test_seek_or_die (outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, [+ (tpl-file-line "%2$d") +]) ;
+		test_seek_or_die (outfile, 0, SEEK_END, k * frames, sfinfo.channels, [+ (tpl-file-line "%2$d") +]) ;
+
+		/* Open file again and make sure no errors in log buffer. */
+		if (0)
+		{	infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, [+ (tpl-file-line "%2$d") +]) ;
+			check_log_buffer_or_die (infile, [+ (tpl-file-line "%2$d") +]) ;
+			sf_close (infile) ;
+			} ;
+
+		if (sfinfo.frames != k * frames)
+		{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %ld)\n", [+ (tpl-file-line "%2$d") +], SF_COUNT_TO_LONG (sfinfo.frames), SF_COUNT_TO_LONG (k + frames)) ;
+			dump_log_buffer (infile) ;
+			exit (1) ;
+			} ;
+
+		if ((k & 1) == 0)
+			test_write_short_or_die (outfile, k, buffer, sfinfo.channels * frames, [+ (tpl-file-line "%2$d") +]) ;
+		else
+			test_writef_short_or_die (outfile, k, buffer, frames, [+ (tpl-file-line "%2$d") +]) ;
+		hexdump_file (filename, 0, 100000) ;
+		} ;
+
+	sf_close (outfile) ;
+	unlink (filename) ;
+
+	puts ("ok") ;
+	return ;
+#endif
+} /* extra_header_test */
 
 [+ COMMENT
 
