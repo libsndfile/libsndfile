@@ -213,10 +213,10 @@ update_header_sub (const char *filename, int typemajor, int write_mode)
 	SF_INFO		sfinfo ;
 	int			k, frames ;
 
-	sfinfo.samplerate  = 44100 ;
-	sfinfo.format 	   = (typemajor | SF_FORMAT_PCM_16) ;
-	sfinfo.channels    = 1 ;
-	sfinfo.frames      = 0 ;
+	sfinfo.samplerate = 44100 ;
+	sfinfo.format = (typemajor | SF_FORMAT_PCM_16) ;
+	sfinfo.channels = 1 ;
+	sfinfo.frames = 0 ;
 
 	frames = BUFFER_LEN / sfinfo.channels ;
 
@@ -311,10 +311,10 @@ zero_data_test (const char *filename, int typemajor)
 
 	print_test_name ("zero_data_test", filename) ;
 
-	sfinfo.samplerate  = 44100 ;
-	sfinfo.format 	   = (typemajor | SF_FORMAT_PCM_16) ;
-	sfinfo.channels    = 1 ;
-	sfinfo.frames     = 0 ;
+	sfinfo.samplerate = 44100 ;
+	sfinfo.format = (typemajor | SF_FORMAT_PCM_16) ;
+	sfinfo.channels = 1 ;
+	sfinfo.frames = 0 ;
 
 	frames = BUFFER_LEN / sfinfo.channels ;
 
@@ -359,9 +359,9 @@ filesystem_full_test (int typemajor)
 		} ;
 
 	sfinfo.samplerate = 44100 ;
-	sfinfo.format 	  = (typemajor | SF_FORMAT_PCM_16) ;
-	sfinfo.channels   = 1 ;
-	sfinfo.frames     = 0 ;
+	sfinfo.format = (typemajor | SF_FORMAT_PCM_16) ;
+	sfinfo.channels = 1 ;
+	sfinfo.frames = 0 ;
 
 	frames = BUFFER_LEN / sfinfo.channels ;
 
@@ -419,9 +419,9 @@ permission_test (const char *filename, int typemajor)
 		} ;
 
 	sfinfo.samplerate = 44100 ;
-	sfinfo.format 	  = (typemajor | SF_FORMAT_PCM_16) ;
-	sfinfo.channels   = 1 ;
-	sfinfo.frames     = 0 ;
+	sfinfo.format = (typemajor | SF_FORMAT_PCM_16) ;
+	sfinfo.channels = 1 ;
+	sfinfo.frames = 0 ;
 
 	frames = BUFFER_LEN / sfinfo.channels ;
 
