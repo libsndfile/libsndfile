@@ -37,6 +37,9 @@
 	file?</A><BR>
 <A HREF="#Q014">Q14 : I'd like to statically link libsndfile to my closed source
 	application. Can I buy a license so that this is possible?</A><BR>
+<A HREF="#Q015">Q15 : My program is crashing during a call to a function in libsndfile.
+	Is this a bug in libsndfile?
+</A><BR>
 <HR>
 
 <!-- ========================================================================= -->
@@ -484,6 +487,39 @@ dividing up the payments fairly.
 The <B>only</B> way you can legally use libsndfile as a statically linked
 library is if your application is released under the GNU GPL or LGPL.
 </P>
+
+<!-- ========================================================================= -->
+<A NAME="Q015"></A>
+<H2><BR><B>Q15 : My program is crashing during a call to a function in libsndfile.
+	Is this a bug in libsndfile?
+</B></H2>
+
+<P>
+libsndfile is being used by large numbers of people all over the world
+without any problems like this. That means that it is much more likely
+that your code has a bug than libsndfile. However, it is still possible
+that there is a bug in libsndfile.
+</P>
+<P>
+To figure out whether it is your code or libsndfile you should do the
+following:
+</P>
+	<UL>
+	<LI>Make sure you are compiling your code with warnings switched on and
+		that you fix as many warnings as possible.
+		With the GNU compiler (gcc) I would recommend at least
+		<B>-W -Wall -Werror</B> which will force you to fix all warnings
+		before you can run the code.
+	<LI>Try using a memory debugger.
+		<A HREF="http://valgrind.kde.org/">Valgrind</A> on x86 Linux is excellent.
+		<A HREF="http://www.ibm.com/software/awdtools/purify/">Purify</A>also
+		has a good reputation.
+	<LI>If the code is clean after the above two steps and you still get
+		a crash in libsndfile, then send me a small snippet of code (no
+		more than 30-40 lines) which includes the call to sf_open() and
+		also shows how all variables passed to/returned from sf_open()
+		are defined.
+	</UL>
 
 <!-- ========================================================================= -->
 <HR>
