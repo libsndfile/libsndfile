@@ -103,7 +103,7 @@ sd2_open (SF_PRIVATE *psf)
 		psf_open_rsrc (psf, psf->mode) ;
 
 	if (psf->rsrcdes < 0)
-	{	printf ("\n\n%s : psf->rsrcdes < 0\n\n", __func__) ;
+	{	psf_log_printf (psf, "sd2_open : psf->rsrcdes < 0\n") ;
 		return SFE_SD2_BAD_RSRC ;
 		} ;
 
@@ -224,9 +224,9 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 	rsrc.rsrc_len = sizeof (psf->header) ;
 	memset (rsrc.rsrc_data, 0xea, rsrc.rsrc_len) ;
 
-	snprintf (str_rsrc [0].value, sizeof (str_rsrc [0].value), "_%d", rsrc.sample_size) ;
-	snprintf (str_rsrc [1].value, sizeof (str_rsrc [1].value), "_%d.000000", rsrc.sample_rate) ;
-	snprintf (str_rsrc [2].value, sizeof (str_rsrc [2].value), "_%d", rsrc.channels) ;
+	LSF_SNPRINTF (str_rsrc [0].value, sizeof (str_rsrc [0].value), "_%d", rsrc.sample_size) ;
+	LSF_SNPRINTF (str_rsrc [1].value, sizeof (str_rsrc [1].value), "_%d.000000", rsrc.sample_rate) ;
+	LSF_SNPRINTF (str_rsrc [2].value, sizeof (str_rsrc [2].value), "_%d", rsrc.channels) ;
 
 	for (k = 0 ; k < ARRAY_LEN (str_rsrc) ; k++)
 	{	if (str_rsrc [k].value_len == 0)
@@ -441,7 +441,7 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 
 	rsrc.type_count = read_short (rsrc.rsrc_data, rsrc.map_offset + 28) + 1 ;
 	if (rsrc.type_count < 1)
-	{	printf ("Bad type count.\n") ;
+	{	psf_log_printf (psf, "Bad type count.\n") ;
 		error = SFE_SD2_BAD_RSRC ;
 		goto parse_rsrc_fork_cleanup ;
 		} ;
@@ -501,7 +501,7 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 
 		data_len = read_int (rsrc->rsrc_data, data_offset) ;
 		if (data_len < 0 || data_len > rsrc->rsrc_len)
-		{	psf_log_printf (psf, "%s : Bad data length (%d).\n", __func__, data_len) ;
+		{	psf_log_printf (psf, "Bad data length (%d).\n", data_len) ;
 			return SFE_SD2_BAD_RSRC ;
 			} ;
 
