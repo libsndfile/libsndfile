@@ -1,10 +1,13 @@
 #!/usr/bin/make -f
 
-Makefile.am: configure
-	automake --copy --add-missing
+config.status: configure
+	./configure
 
 configure: configure.ac src/config.h.in libtool ltmain.sh
 	autoconf
+
+Makefile.am: configure
+	automake --copy --add-missing
 
 src/config.h.in: configure.ac libtool
 	autoheader
