@@ -25,7 +25,7 @@ FILESPECIFIC = aiff.c au.c au_g72x.c avr.c ircam.c macbinary3.c macos.c mat4.c \
 				
 libsndfile_la_SOURCES = $(COMMON) $(FILESPECIFIC) $(noinst_HEADERS) sndfile.h
 libsndfile_la_LDFLAGS = -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@
-libsndfile_la_LIBADD  = GSM610/libgsm.la G72x/libg72x.la -lm $(OGGZ_LIBS) $(FISHSOUND_LIBS)
+libsndfile_la_LIBADD  = GSM610/libgsm.la G72x/libg72x.la -lm
 
 test_file_io_CFLAGS = $(AM_CFLAGS)
 test_file_io_SOURCES = file_io.c test_file_io.c

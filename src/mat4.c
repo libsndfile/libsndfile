@@ -25,6 +25,7 @@
 #include	"config.h"
 #include	"sfendian.h"
 #include	"common.h"
+#include	"float_cast.h"
 
 /*------------------------------------------------------------------------------
 ** Information on how to decode and encode this file was obtained in a PDF
@@ -241,13 +242,13 @@ mat4_read_header (SF_PRIVATE *psf)
 
 	psf_binheader_readf (psf, "d", &value) ;
 
-	LSF_SNPRINTF ((char*) psf->buffer, sizeof (psf->buffer), " Value : %f\n", value) ;
-	psf_log_printf (psf, (char*) psf->buffer) ;
+	LSF_SNPRINTF (psf->scbuf, sizeof (psf->scbuf), " Value : %f\n", value) ;
+	psf_log_printf (psf, psf->scbuf) ;
 
 	if ((rows != 1) || (cols != 1))
 		return SFE_MAT4_NO_SAMPLERATE ;
 
-	psf->sf.samplerate = (int) value ;
+	psf->sf.samplerate = lrint (value) ;
 
 	/* Now write out the audio data. */
 

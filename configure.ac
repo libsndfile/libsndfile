@@ -244,65 +244,6 @@ case "$target_os" in
 	esac
 
 #====================================================================================
-# Check for libraries
-
-PKG_CHECK_MODULES(OGGZ, oggz >= 0.8.2, HAVE_OGGZ="yes", HAVE_OGGZ="no")
-
-if test "x$HAVE_OGGZ" = "xyes" ; then
-	AC_DEFINE(HAVE_OGGZ, [1], [Define to 1 if liboggz is installed])
-	AC_SUBST(OGGZ_LIBS)
-else
-	AC_CHECK_LIB(oggz, oggz_open, HAVE_OGGZ="maybe")
-	if test "x$HAVE_OGGZ" = "maybe" ; then
-		AC_MSG_ERROR([
-***
-*** liboggz seems to exist on your system, however the pkg-config tool
-*** cannot find its build information.
-***
-*** Please set your PKG_CONFIG_PATH environment variable to include the
-*** directory in which oggz.pc was installed. For example, oggz.pc
-*** is installed in /usr/local/lib/pkgconfig by default; if that is the
-*** case do:
-***
-***   export PKG_CONFIG_PATH="\$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig"
-***
-*** then run this ./configure again. If you configured liboggz with a
-*** different --prefix option, replace /usr/local above with that prefix.
-***
-])
-		fi
-	fi
-AM_CONDITIONAL(HAVE_OGGZ, [test "x$HAVE_OGGZ" = "xyes"])
-
-PKG_CHECK_MODULES(FISHSOUND, fishsound >= 0.6.0, HAVE_FISHSOUND="yes", HAVE_FISHSOUND="no")
-
-if test "x$HAVE_FISHSOUND" = "xyes" ; then
-	AC_DEFINE(HAVE_FISHSOUND, [1], [Define to 1 if libfishsound is installed])
-	AC_SUBST(FISHSOUND_LIBS)
-else
-	AC_CHECK_LIB(fishsound, fish_sound_open, HAVE_FISHSOUND="maybe")
-	if test "x$HAVE_FISHSOUND" = "maybe" ; then
-		AC_MSG_ERROR([
-***
-*** libfishsound seems to exist on your system, however the pkg-config tool
-*** cannot find its build information.
-***
-*** Please set your PKG_CONFIG_PATH environment variable to include the
-*** directory in which fishsound.pc was installed. For example, fishsound.pc
-*** is installed in /usr/local/lib/pkgconfig by default; if that is the
-*** case do:
-***
-***   export PKG_CONFIG_PATH="\$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig"
-***
-*** then run this ./configure again. If you configured libfishsound with a
-*** different --prefix option, replace /usr/local above with that prefix.
-***
-])
-		fi
-	fi
-AM_CONDITIONAL(HAVE_FISHSOUND, [test "x$HAVE_FISHSOUND" = "xyes"])
-
-#====================================================================================
 # Determine if the processor can do clipping on float to int conversions.
 
 if test x$ac_arg_cpu_clip = "xY" ; then
@@ -450,7 +391,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	AC_DEFINE_UNQUOTED([GCC_MAJOR_VERSION],${GCC_MAJOR_VERSION}, [Major version of GCC or 3 otherwise.])
 	fi
 
-CFLAGS="$CFLAGS $OGGZ_CFLAGS $FISHSOUND_CFLAGS $OS_SPECIFIC_CFLAGS"
+CFLAGS="$CFLAGS $OS_SPECIFIC_CFLAGS"
 
 if test x"$CFLAGS" = x ; then
 	echo "Error in configure script. CFLAGS has been screwed up."

@@ -673,12 +673,6 @@ sf_format_check	(const SF_INFO *info)
 					return 1 ;
 				break ;
 
-		case SF_FORMAT_OGG :
-		case SF_FORMAT_ANX :
-				if (subformat == SF_FORMAT_VORBIS || subformat == SF_FORMAT_SPEEX)
-					return 1 ;
-				break ;
-
 		/*-
 		case SF_FORMAT_SD2 :
 				/+* SD2 is strictly big endian. *+/
@@ -2012,7 +2006,7 @@ guess_file_type (SF_PRIVATE *psf, const char *filename)
 								buffer [2] == MAKE_MARKER (' ', 'I', 'n', 's'))
 		return SF_FORMAT_XI ;
 
-	if (buffer [0] == MAKE_MARKER ('O', 'g', 'g', 'S'))
+	if (ENABLE_EXPERIMENTAL_CODE && buffer [0] == MAKE_MARKER ('O', 'g', 'g', 'S'))
 		return SF_FORMAT_OGG ;
 
 	if (buffer [0] == MAKE_MARKER ('A', 'L', 'a', 'w') && buffer [1] == MAKE_MARKER ('S', 'o', 'u', 'n')
@@ -2295,102 +2289,101 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 
 	/* Call the initialisation function for the relevant file type. */
 	switch (psf->sf.format & SF_FORMAT_TYPEMASK)
-	{	case SF_FORMAT_WAV :
-		case SF_FORMAT_WAVEX :
+	{	case	SF_FORMAT_WAV :
+		case	SF_FORMAT_WAVEX :
 				error = wav_open (psf) ;
 				break ;
 
-		case SF_FORMAT_AIFF :
+		case	SF_FORMAT_AIFF :
 				error = aiff_open (psf) ;
 				break ;
 
-		case SF_FORMAT_AU :
+		case	SF_FORMAT_AU :
 				error = au_open (psf) ;
 				break ;
 
-		case SF_FORMAT_AU | SF_FORMAT_ULAW :
+		case	SF_FORMAT_AU | SF_FORMAT_ULAW :
 				error = au_nh_open (psf) ;
 				break ;
 
-		case SF_FORMAT_RAW :
+		case	SF_FORMAT_RAW :
 				error = raw_open (psf) ;
 				break ;
 
-		case SF_FORMAT_W64 :
+		case	SF_FORMAT_W64 :
 				error = w64_open (psf) ;
 				break ;
 
 		/* Lite remove start */
-		case SF_FORMAT_PAF :
+		case	SF_FORMAT_PAF :
 				error = paf_open (psf) ;
 				break ;
 
-		case SF_FORMAT_SVX :
+		case	SF_FORMAT_SVX :
 				error = svx_open (psf) ;
 				break ;
 
-		case SF_FORMAT_NIST :
+		case	SF_FORMAT_NIST :
 				error = nist_open (psf) ;
 				break ;
 
-		case SF_FORMAT_IRCAM :
+		case	SF_FORMAT_IRCAM :
 				error = ircam_open (psf) ;
 				break ;
 
-		case SF_FORMAT_VOC :
+		case	SF_FORMAT_VOC :
 				error = voc_open (psf) ;
 				break ;
 
-		case SF_FORMAT_SDS :
+		case	SF_FORMAT_SDS :
 				error = sds_open (psf) ;
 				break ;
 
-		case SF_FORMAT_OGG :
-		case SF_FORMAT_ANX :
+		case	SF_FORMAT_OGG :
 				error = ogg_open (psf) ;
 				break ;
 
-		case SF_FORMAT_TXW :
+		case	SF_FORMAT_TXW :
 				error = txw_open (psf) ;
 				break ;
 
-		case SF_FORMAT_WVE :
+		case	SF_FORMAT_WVE :
 				error = wve_open (psf) ;
 				break ;
 
-		case SF_FORMAT_DWD :
+		case	SF_FORMAT_DWD :
 				error = dwd_open (psf) ;
 				break ;
 
-		case SF_FORMAT_MAT4 :
+		case	SF_FORMAT_MAT4 :
 				error = mat4_open (psf) ;
 				break ;
 
-		case SF_FORMAT_MAT5 :
+		case	SF_FORMAT_MAT5 :
 				error = mat5_open (psf) ;
 				break ;
 
-		case SF_FORMAT_PVF :
+		case	SF_FORMAT_PVF :
 				error = pvf_open (psf) ;
 				break ;
 
-		case SF_FORMAT_XI :
+		case	SF_FORMAT_XI :
 				error = xi_open (psf) ;
 				break ;
 
-		case SF_FORMAT_HTK :
+		case	SF_FORMAT_HTK :
 				error = htk_open (psf) ;
 				break ;
 
-		case SF_FORMAT_SD2 :
+		case	SF_FORMAT_SD2 :
 				error = sd2_open (psf) ;
 				break ;
 
-		case SF_FORMAT_REX2 :
+		case	SF_FORMAT_REX2 :
 				error = rx2_open (psf) ;
 				break ;
 
-		case SF_FORMAT_AVR :
+		case	SF_FORMAT_AVR :
 				error = avr_open (psf) ;
 				break ;
 

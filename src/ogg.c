@@ -17,18 +17,16 @@
 */
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
 #include <ctype.h>
-#include <limits.h>
 
 #include "sndfile.h"
 #include "config.h"
 #include "sfendian.h"
 #include "common.h"
 
-#if (HAVE_OGGZ == 0 || HAVE_FISHSOUND == 0)
+#if (ENABLE_EXPERIMENTAL_CODE == 0)
 
 int
 ogg_open	(SF_PRIVATE *psf)
@@ -39,99 +37,21 @@ ogg_open	(SF_PRIVATE *psf)
 
 #else
 
-#include <oggz/oggz.h>
-#include <fishsound/fishsound.h>
-
 #define	SFE_OGG_NOT_OGG	666
 
-#define POGG_VORBIS_CONTENT_TYPE "audio/x-vorbis"
-#define POGG_SPEEX_CONTENT_TYPE "audio/x-speex"
-
-#define POGG_ANX_VERSION_MAJOR 2
-#define POGG_ANX_VERSION_MINOR 0
-
 /*------------------------------------------------------------------------------
-** Typedefs.
+** Macros to handle big/little endian issues.
 */
 
-typedef enum tag_POGG_PCM
-{	POGG_PCM_SHORT = 0,
-	POGG_PCM_INT = 1,
-	POGG_PCM_FLOAT = 2,
-	POGG_PCM_DOUBLE = 3
-} POGG_PCM ;
-
-typedef struct tag_OGG_PRIVATE
-{	OGGZ * oggz ;
-	FishSound * fsound ;
-
-	/** serialno of the logical bitstream that we are using */
-	long serialno ;
-
-	/** PCM datatype */
-	POGG_PCM pcmtype ;
-
-	/** READ/SEEK related */
-
-	/** cache of last decoded pcm block */
-	float ** cache_pcm ;
-
-	/** size of pcm block in bytes */
-	size_t cache_size ;
-
-	/** frameno of END of cached block, if known, else -1 */
-	ogg_int64_t cache_granulepos ;
-
-	/** count of frames in the cached block */
-	long cache_frames ;
-
-	/** count of frames remaining to provide from cached block */
-	long cache_remaining ;
-
-	/** destination of reads */
-	void * ptr ;
-
-	/** count of frames remaining for current user request */
-	sf_count_t remaining ;
-
-	/** last value of seek_from_start ; reset when a seek is fully completed */
-	sf_count_t seek_from_start ;
-
-	/** WRITE related */
-	int b_o_s ;
-
-	int comments_written ;
-
-	ogg_int64_t granulepos ;
-
-	/** Small floating point buffer for feeding pcm to the encoder */
-	float * fptr ;
-} OGG_PRIVATE ;
+#define ALAW_MARKER		MAKE_MARKER ('A', 'L', 'a', 'w')
+#define SOUN_MARKER		MAKE_MARKER ('S', 'o', 'u', 'n')
+#define DFIL_MARKER		MAKE_MARKER ('d', 'F', 'i', 'l')
 
 /*------------------------------------------------------------------------------
 ** Private static functions.
 */
 
-static int pogg_init (SF_PRIVATE * psf) ;
-static int pogg_close (SF_PRIVATE * psf) ;
-
-static int pogg_read_header (SF_PRIVATE *psf) ;
-static int pogg_write_header (SF_PRIVATE *psf) ;
-
-static int pogg_decode (FishSound * fsound, float ** pcm, long frames, void * user_data) ;
-static int pogg_read_packet (OGGZ * oggz, ogg_packet * op, long serialno, void * data) ;
-
-static sf_count_t pogg_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
-static sf_count_t pogg_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
-static sf_count_t pogg_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
-static sf_count_t pogg_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
-
-static sf_count_t pogg_seek (SF_PRIVATE *psf, int mode, sf_count_t seek_from_start) ;
-
-static sf_count_t pogg_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
-static sf_count_t pogg_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
-static sf_count_t pogg_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
-static sf_count_t pogg_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static int	ogg_read_header (SF_PRIVATE *psf) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -861,7 +781,7 @@ pogg_write_comments (SF_PRIVATE *psf)
 					break ;
 				} ;
 
-			} /* if type !0 */
+			} ; /* if type !0 */
 		} ;
 
 	pogg->comments_written = 1 ;

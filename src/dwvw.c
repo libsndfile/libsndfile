@@ -185,8 +185,8 @@ dwvw_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 		return 0 ;
 	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
 
-	iptr = (int*) psf->buffer ;
-	bufferlen = SF_BUFFER_LEN / sizeof (int) ;
+	iptr = psf->ibuf ;
+	bufferlen = ARRAY_LEN (psf->ibuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
@@ -241,8 +241,8 @@ dwvw_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x80000000) : 1.0 ;
 
-	iptr = (int*) psf->buffer ;
-	bufferlen = SF_BUFFER_LEN / sizeof (int) ;
+	iptr = psf->ibuf ;
+	bufferlen = ARRAY_LEN (psf->ibuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
@@ -272,8 +272,8 @@ dwvw_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x80000000) : 1.0 ;
 
-	iptr = (int*) psf->buffer ;
-	bufferlen = SF_BUFFER_LEN / sizeof (int) ;
+	iptr = psf->ibuf ;
+	bufferlen = ARRAY_LEN (psf->ibuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
@@ -552,8 +552,8 @@ dwvw_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 		return 0 ;
 	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
 
-	iptr = (int*) psf->buffer ;
-	bufferlen = SF_BUFFER_LEN / sizeof (int) ;
+	iptr = psf->ibuf ;
+	bufferlen = ARRAY_LEN (psf->ibuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -608,8 +608,8 @@ dwvw_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 
-	iptr = (int*) psf->buffer ;
-	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
+	iptr = psf->ibuf ;
+	bufferlen = ARRAY_LEN (psf->ibuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -639,8 +639,8 @@ dwvw_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 	normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 
-	iptr = (int*) psf->buffer ;
-	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
+	iptr = psf->ibuf ;
+	bufferlen = ARRAY_LEN (psf->ibuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -655,6 +655,7 @@ dwvw_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 	return total ;
 } /* dwvw_write_d */
+
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch 

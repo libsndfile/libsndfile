@@ -317,8 +317,8 @@ vox_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		return 0 ;
 	pvox = (VOX_ADPCM_PRIVATE*) psf->fdata ;
 
-	sptr = (short*) psf->buffer ;
-	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
+	sptr = psf->sbuf ;
+	bufferlen = ARRAY_LEN (psf->sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = vox_read_block (psf, pvox, sptr, readcount) ;
@@ -347,8 +347,8 @@ vox_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x8000) : 1.0 ;
 
-	sptr = (short*) psf->buffer ;
-	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
+	sptr = psf->sbuf ;
+	bufferlen = ARRAY_LEN (psf->sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = vox_read_block (psf, pvox, sptr, readcount) ;
@@ -377,8 +377,8 @@ vox_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x8000) : 1.0 ;
 
-	sptr = (short*) psf->buffer ;
-	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
+	sptr = psf->sbuf ;
+	bufferlen = ARRAY_LEN (psf->sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = vox_read_block (psf, pvox, sptr, readcount) ;
@@ -451,8 +451,8 @@ vox_write_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		return 0 ;
 	pvox = (VOX_ADPCM_PRIVATE*) psf->fdata ;
 
-	sptr = (short*) psf->buffer ;
-	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
+	sptr = psf->sbuf ;
+	bufferlen = ARRAY_LEN (psf->sbuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -481,8 +481,8 @@ vox_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
 
-	sptr = (short*) psf->buffer ;
-	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
+	sptr = psf->sbuf ;
+	bufferlen = ARRAY_LEN (psf->sbuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -511,8 +511,8 @@ vox_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 	normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
 
-	sptr = (short*) psf->buffer ;
-	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
+	sptr = psf->sbuf ;
+	bufferlen = ARRAY_LEN (psf->sbuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
