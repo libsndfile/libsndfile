@@ -645,8 +645,12 @@ static DWORD CALLBACK
 win32_audio_out_callback (HWAVEOUT hwave, UINT msg, DWORD data, DWORD param1, DWORD param2)
 {	Win32_Audio_Data	*audio_data ;
 
-	if (! data)
+	if (data == 0)
 		return 1 ;
+
+	/* Preent compiler warnings. */
+	hwave = hwave ;
+	param1 = param2 ;
 
 	/* 
 	** I consider this technique of passing a pointer via an integer as 
