@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.53)
 
-AC_INIT(libsndfile,1.0.10pre2,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.10pre3,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
@@ -409,26 +409,33 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	echo "    Compiler is GCC : ............. ${ac_cv_c_compiler_gnu}"
 	echo "    GCC major version : ........... ${GCC_MAJOR_VERSION}"
 	if test $GCC_MAJOR_VERSION -lt 3 ; then
-		echo -e "\n    ** This compiler version allows applications to write "
+		echo -e "\n    ** This compiler version allows applications to write"
 		echo "    ** to static strings within the library."
 		echo "    ** Compile with GCC version 3.X to avoid this problem."
 		fi
 	fi
 
-AC_MSG_RESULT([
-  Installation directories :
-
-    Library directory : ........... ${prefix}/lib
-    Program directory : ........... ${prefix}/bin
-    Pkgconfig directory : ......... ${prefix}/lib/pkgconfig
-])
-
-if test x$prefix != "x/usr" ; then
-	echo "Compiling some other packages against libsndfile may require "
-	echo -e "the addition of \"${prefix}/lib/pkgconfig\" to the "
-	echo -e "PKG_CONFIG_PATH environment variable.\n"
+if test $libdir = "\${exec_prefix}/lib" ; then
+	libdir="$prefix/lib"
 	fi
 
+if test $bindir = "\${exec_prefix}/bin" ; then
+	bindir="$prefix/lib"
+	fi
+
+AC_MSG_RESULT([[
+  Installation directories :
+
+    Library directory : ........... $libdir
+    Program directory : ........... $bindir
+    Pkgconfig directory : ......... $libdir/pkgconfig
+]])
+
+if test x$prefix != "x/usr" ; then
+	echo "Compiling some other packages against libsndfile may require"
+	echo -e "the addition of \"$libdir/pkgconfig\" to the"
+	echo -e "PKG_CONFIG_PATH environment variable.\n"
+	fi
 
 ifelse(dnl
 

@@ -1,5 +1,8 @@
 2004-04-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
+    * configure.ac
+    Improve printout configuration summary (as suggested by Axel Röbel).
+
     * doc/index.html
     Add link to pre-release location.
 
