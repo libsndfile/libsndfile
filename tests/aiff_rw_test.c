@@ -128,7 +128,7 @@ rw_test (const char *filename)
 	{	printf ("\n\nLine %d : sf_open SFM_READ failed : %s\n\n", __LINE__, sf_strerror (NULL)) ;
 		exit (1) ;
 		} ;
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 	sf_close (file) ;
 
 	/* Now open read/write and close the file. */
@@ -136,7 +136,7 @@ rw_test (const char *filename)
 	{	printf ("\n\nLine %d : sf_open SFM_RDWR failed : %s\n\n", __LINE__, sf_strerror (NULL)) ;
 		exit (1) ;
 		} ;
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 	sf_close (file) ;
 
 	/* Open again as read only again and fill in a new SF_INFO struct.  */
@@ -145,7 +145,7 @@ rw_test (const char *filename)
 	{	printf ("\n\nLine %d : sf_open SFM_RDWR failed : %s\n\n", __LINE__, sf_strerror (NULL)) ;
 		exit (1) ;
 		} ;
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 	sf_close (file) ;
 
 	/* Now compare the two. */

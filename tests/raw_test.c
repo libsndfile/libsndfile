@@ -83,7 +83,7 @@ raw_offset_test (const char *filename, int typeminor)
 	sf_close (sndfile) ;
 
 	sndfile = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
-	check_log_buffer_or_die (sndfile) ;
+	check_log_buffer_or_die (sndfile, __LINE__) ;
 
 	if (abs (BUFFER_LEN - sfinfo.frames) > 1)
 	{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), BUFFER_LEN) ;

@@ -97,7 +97,7 @@ main (void)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	if ((k = sf_read_short (file, buffer, BUFFER_SIZE)) != BUFFER_SIZE)
 	{	printf ("Line %d: short read (%d).\n", __LINE__, k) ;

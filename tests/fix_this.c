@@ -132,7 +132,7 @@ lcomp_test_int (const char *str, const char *filename, int filetype, double marg
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	if ((k = sf_readf_int (file, data, datalen)) != datalen)
 	{	printf ("Line %d: short read (%d should be %ld).\n", __LINE__, k, datalen) ;

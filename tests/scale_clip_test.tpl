@@ -147,7 +147,7 @@ main (void)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	test_read_[+ (get "type_name") +]_or_die (file, 0, data_in, HALF_BUFFER_SIZE, __LINE__) ;
 	sf_command (file, SFC_SET_NORM_[+ (get "upper_name") +], NULL, SF_FALSE) ;

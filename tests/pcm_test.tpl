@@ -178,7 +178,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	test_read_short_or_die (file, 0, short_in, items, __LINE__) ;
 
@@ -240,7 +240,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	test_read_int_or_die (file, 0, int_in, items, __LINE__) ;
 
@@ -302,7 +302,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 
@@ -366,7 +366,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
 
@@ -456,7 +456,7 @@ pcm_test_float (const char *filename, int filetype, int hash, int replace_float)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	test_read_double_or_die (file, 0, data, items, __LINE__) ;
 
@@ -580,7 +580,7 @@ pcm_test_float (const char *filename, int filetype, int hash, int replace_float)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	test_readf_double_or_die (file, 0, data, frames, __LINE__) ;
 	for (sign = -1, k = 0 ; k < items ; k++)
@@ -719,7 +719,7 @@ pcm_test_double (const char *filename, int	filetype, int hash, int replace_float
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	test_read_double_or_die (file, 0, data, items, __LINE__) ;
 
@@ -853,7 +853,7 @@ pcm_test_double (const char *filename, int	filetype, int hash, int replace_float
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	test_readf_double_or_die (file, 0, data, frames, __LINE__) ;
 

@@ -135,7 +135,7 @@ string_test (const char *filename, int typemajor)
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	if (sfinfo.frames != BUFFER_LEN)
 	{	printf ("***** Bad frame count %d (should be %d)\n\n", (int) sfinfo.frames, BUFFER_LEN) ;

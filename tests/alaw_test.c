@@ -78,7 +78,7 @@ main (void)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	if (sf_read_raw (file, alaw_buffer, BUFFER_SIZE) != BUFFER_SIZE)
 	{	printf ("sf_read_raw : ") ;
@@ -122,7 +122,7 @@ main (void)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	if (sf_read_short (file, short_buffer, 256) != 256)
 	{	printf ("sf_read_short : ") ;

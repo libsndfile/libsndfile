@@ -388,7 +388,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	test_read_[+ (get "data_type") +]_or_die (file, 0, test, items, __LINE__) ;
 	for (k = 0 ; k < items ; k++)
@@ -652,7 +652,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int filetype, int long_f
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	test_readf_[+ (get "data_type") +]_or_die (file, 0, test, frames, __LINE__) ;
 	for (k = 0 ; k < items ; k++)

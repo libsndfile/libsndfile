@@ -198,7 +198,7 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	test_read_float_or_die (file, 0, float_test, DFT_DATA_LENGTH, __LINE__) ;
 
@@ -259,7 +259,7 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	test_read_double_or_die (file, 0, test_data, DFT_DATA_LENGTH, __LINE__) ;
 

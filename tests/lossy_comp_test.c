@@ -500,7 +500,7 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	if ((k = sf_readf_short (file, data, datalen)) != datalen)
 	{	printf ("Line %d: short read (%d should be %ld).\n", __LINE__, k, datalen) ;
@@ -707,7 +707,7 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	if ((k = sf_readf_int (file, data, datalen)) != datalen)
 	{	printf ("Line %d: short read (%d should be %ld).\n", __LINE__, k, datalen) ;
@@ -914,7 +914,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 
@@ -1123,7 +1123,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 
 	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
 
@@ -1333,7 +1333,7 @@ channels = 1 ;
 
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	if ((k = sf_read_short (file, data, datalen)) != datalen)
 	{	printf ("Line %d: short read (%d should be %ld).\n", __LINE__, k, datalen) ;
@@ -1538,7 +1538,7 @@ channels = 1 ;
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	if ((k = sf_readf_int (file, data, datalen)) != datalen)
 	{	printf ("int read (%d).\n", k) ;
@@ -1751,7 +1751,7 @@ printf ("** fix this ** ") ;
 
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	if ((k = sf_read_float (file, data, datalen)) != datalen)
 	{	printf ("int read (%d).\n", k) ;
@@ -1956,7 +1956,7 @@ channels = 1 ;
 
 	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
 
-	check_log_buffer_or_die (file) ;
+	check_log_buffer_or_die (file, __LINE__) ;
 
 	if ((k = sf_read_double (file, data, datalen)) != datalen)
 	{	printf ("int read (%d).\n", k) ;
