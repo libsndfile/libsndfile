@@ -215,20 +215,22 @@ update_header_test (const char *filename, int typemajor)
 
 	print_test_name ("update_header_test", filename) ;
 
-#ifdef _WIN32
-	/*
-	** I think this is a bug in the win32 file I/O code in src/file_io.c.
-	** I didn't write that code and I don't have the time to debug and
-	** fix it. Patches will gladly be accepted. Erik
-	*/
-	puts ("doesn't work on win32") ;
-	return ;
+#if (defined (WIN32) || defined (_WIN32))
+	if (typemajor == SF_FORMAT_PAF)
+	{	/*
+		** I think this is a bug in the win32 file I/O code in src/file_io.c.
+		** I didn't write that code and I don't have the time to debug and
+		** fix it. Patches will gladly be accepted. Erik
+		*/
+		puts ("doesn't work on win32") ;
+		return ;
+		} ;
 #endif
 
 	sfinfo.samplerate  = 44100 ;
 	sfinfo.format 	   = (typemajor | SF_FORMAT_PCM_16) ;
 	sfinfo.channels    = 1 ;
-	sfinfo.frames     = 0 ;
+	sfinfo.frames      = 0 ;
 
 	frames = BUFFER_LEN / sfinfo.channels ;
 
@@ -239,14 +241,15 @@ update_header_test (const char *filename, int typemajor)
 	test_write_short_or_die (outfile, 0, data_out, BUFFER_LEN, __LINE__) ;
 
 	if (typemajor != SF_FORMAT_HTK)
-	{	/* The HTK header is not correct when the file is firstw written. */
+	{	/* The HTK header is not correct when the file is first written. */
 		infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 		sf_close (infile) ;
 		} ;
 
 	sf_command (outfile, SFC_UPDATE_HEADER_NOW, NULL, 0) ;
 
-	/* Open file and check log buffer for an error. If header update failed
+	/*
+	** Open file and check log buffer for an error. If header update failed
 	** the the log buffer will contain errors.
 	*/
 	infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
