@@ -115,7 +115,7 @@
 #define HAVE_MMAP 1
 
 /* Define to 1 if you have the <mmreg.h> header file. */
-/* #undef HAVE_MMREG_H */
+#define HAVE_MMREG_H 1
 
 /* Define to 1 if you have the `open' function. */
 #define HAVE_OPEN 1

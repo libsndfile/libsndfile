@@ -42,7 +42,7 @@
 	#include <sys/audioio.h>
 
 #elif (defined (_WIN32) || defined (WIN32)) && HAVE_MMREG_H
-	#define WIN32_WITH_MMREG_H
+	#define WIN32_WITH_MMREG_H 1
 	#include <windows.h>
 	#include <mmsystem.h>
 	#include <mmreg.h>
@@ -612,9 +612,8 @@ main (int argc, char *argv [])
 	printf ("Instead, compile the file sfplay_beos.cpp.\n") ;
 	return 1 ;
 #else
-	#warning "*** Playing sound not yet supported on this platform."
-	#warning "*** Please feel free to submit a patch."
-	printf ("Error : Playing sound not yet supported on this platform.\n") ;
+	puts ("*** Playing sound not yet supported on this platform.") ;
+	puts ("*** Please feel free to submit a patch.") ;
 	return 1 ;
 #endif
 
