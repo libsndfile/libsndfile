@@ -127,10 +127,9 @@ benchmark.c: benchmark.def benchmark.tpl
 
 #===============================================================================
 
-check: generic-tests ulaw_test alaw_test floating_point_test scale_clip_test \
-		wav-tests aiff-tests au-tests raw-tests paf-tests svx-tests nist-tests \
-		ircam-tests voc-tests w64-tests mat4-tests mat5-tests pvf-tests \
-		xi-tests htk-tests sds-tests stdio-tests aiff_rw_test
+check: generic-tests wav-tests aiff-tests au-tests raw-tests paf-tests \
+		svx-tests nist-tests ircam-tests voc-tests w64-tests mat4-tests \
+		mat5-tests pvf-tests xi-tests htk-tests sds-tests stdio-tests
 
 generic-tests : error_test$(EXEEXT) ulaw_test$(EXEEXT) alaw_test$(EXEEXT) command_test$(EXEEXT) floating_point_test$(EXEEXT) pcm_test$(EXEEXT)
 	uname -a
