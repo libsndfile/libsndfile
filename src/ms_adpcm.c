@@ -43,7 +43,7 @@ typedef struct
 	sf_count_t			samplecount ;
 	short			*samples ;
 	unsigned char	*block ;
-	unsigned char	dummydata [4] ; /* Dummy size */
+	unsigned short	dummydata [] ; /* ISO C99 struct hack */
 } MSADPCM_PRIVATE ;
 
 /*============================================================================================
@@ -137,8 +137,8 @@ wav_w64_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 	pms = (MSADPCM_PRIVATE*) psf->fdata ;
 	memset (pms, 0, pmssize) ;
 
-	pms->block		= (unsigned char*) pms->dummydata ;
-	pms->samples	= (short*) (pms->dummydata + blockalign) ;
+	pms->samples	= pms->dummydata ;
+	pms->block		= (unsigned char*) (pms->dummydata + psf->sf.channels * samplesperblock) ;
 
 	pms->channels	= psf->sf.channels ;
 	pms->blocksize	= blockalign ;
@@ -169,7 +169,7 @@ wav_w64_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 		} ;
 
 	if (psf->mode == SFM_WRITE)
-	{	pms->samples = (short*) (pms->dummydata + blockalign) ;
+	{	pms->samples = pms->dummydata ;
 
 		pms->samplecount = 0 ;
 

@@ -712,15 +712,15 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 #define	GET_BE_8BYTE(ptr)	( 	((ptr) [4] << 24)	| ((ptr) [5] << 16) |	\
 								((ptr) [6] << 8)	| ((ptr) [7]) )
 #else
-#define	GET_LE_8BYTE(ptr)	( 	((ptr) [7] << 56L)	| ((ptr) [6] << 48L) |	\
-							 	((ptr) [5] << 40L)	| ((ptr) [4] << 32L) |	\
-							 	((ptr) [3] << 24L)	| ((ptr) [2] << 16L) |	\
-							 	((ptr) [1] << 8L)	| ((ptr) [0] ))
+#define	GET_LE_8BYTE(ptr)	( 	(((ptr) [7] * 1L) << 56) | (((ptr) [6] * 1L) << 48) |	\
+							 	(((ptr) [5] * 1L) << 40) | (((ptr) [4] * 1L) << 32) |	\
+							 	(((ptr) [3] * 1L) << 24) | (((ptr) [2] * 1L) << 16) |	\
+							 	(((ptr) [1] * 1L) << 8 ) | ((ptr) [0]))
 
-#define	GET_BE_8BYTE(ptr)	( 	((ptr) [0] << 56L)	| ((ptr) [1] << 48L) |	\
-							 	((ptr) [2] << 40L)	| ((ptr) [3] << 32L) |	\
-							 	((ptr) [4] << 24L)	| ((ptr) [5] << 16L) |	\
-							 	((ptr) [6] << 8L)	| ((ptr) [7] ))
+#define	GET_BE_8BYTE(ptr)	( 	(((ptr) [0] * 1L) << 56) | (((ptr) [1] * 1L) << 48) |	\
+							 	(((ptr) [2] * 1L) << 40) | (((ptr) [3] * 1L) << 32) |	\
+							 	(((ptr) [4] * 1L) << 24) | (((ptr) [5] * 1L) << 16) |	\
+							 	(((ptr) [6] * 1L) << 8 ) | ((ptr) [7]))
 
 #endif
 

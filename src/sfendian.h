@@ -48,14 +48,14 @@
 	#define LES2H_SHORT(x)			(x)
 	#define LEI2H_INT(x)			(x)
 
-	#define LES2H_SHORT_PTR(x)		(((short*) x) [0])
-	#define LES2H_INT_PTR(x)		((((short*) x) [0]) << 16)
+	#define LES2H_SHORT_PTR(x)		((x) [0] + ((x) [1] << 8))
+	#define LES2H_INT_PTR(x)		(((x) [0] << 16) + ((x) [1] << 24))
 
 	#define LET2H_SHORT_PTR(x)		((x) [1] + ((x) [2] << 8))
 	#define LET2H_INT_PTR(x)		(((x) [0] << 8) + ((x) [1] << 16) + ((x) [2] << 24))
 
-	#define	LEI2H_SHORT_PTR(x)		((((int*) x) [0]) >> 16)
-	#define	LEI2H_INT_PTR(x)		(((int*) x) [0])
+	#define	LEI2H_SHORT_PTR(x)		((x) [2] + ((x) [3] << 8))
+	#define	LEI2H_INT_PTR(x)		((x) [0] + ((x) [1] << 8) + ((x) [2] << 16) + ((x) [3] << 24))
 
 	#define BES2H_SHORT(x)			ENDSWAP_SHORT(x)
 	#define BEI2H_INT(x)			ENDSWAP_INT(x)

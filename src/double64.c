@@ -464,8 +464,8 @@ double64_get_capability	(SF_PRIVATE *psf)
 			return DOUBLE_CAN_RW_LE ;
 
 		/* If this test is true ints and floats are compatible and big endian. */
-		if (data.i [0] == 0x3ff3c0ca && data.i [1] == 0x428c59fb &&
-			data.c [0] == 0x3f && data.c [2] == 0xc0 && data.c [4] == 0x42 && data.c [6] == 0x59)
+		if ((data.i [0] == 0x3ff3c0ca && data.i [1] == 0x428c59fb) &&
+			(data.c [0] == 0x3f && data.c [2] == 0xc0 && data.c [4] == 0x42 && data.c [6] == 0x59))
 			return DOUBLE_CAN_RW_BE ;
 		} ;
 

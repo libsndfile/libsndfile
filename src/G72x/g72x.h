@@ -71,7 +71,7 @@ enum
 
 typedef struct 
 {	/* Private data. Don't mess with it. */
-	unsigned char	private [256] ;  
+	unsigned long	private [256 / sizeof (long)] ;  
 
 	/* Public data. Read only. */
 	int				blocksize, max_bytes, samplesperblock, bytesperblock ;

@@ -308,7 +308,7 @@ void
 float32_le_write (float in, unsigned char *out)
 {	int		exponent, mantissa, negative = 0 ;
 
-	*((int*) out) = 0 ;
+	memset (out, 0, sizeof (int)) ;
 
 	if (in == 0.0)
 		return ;
@@ -343,7 +343,7 @@ void
 float32_be_write (float in, unsigned char *out)
 {	int		exponent, mantissa, negative = 0 ;
 
-	*((int*) out) = 0 ;
+	memset (out, 0, sizeof (int)) ;
 
 	if (in == 0.0)
 		return ;

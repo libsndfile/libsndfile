@@ -36,7 +36,7 @@ typedef struct IMA_ADPCM_PRIVATE_tag
 	int				stepindx [2] ;
 	unsigned char	*block ;
 	short			*samples ;
-	unsigned short	data	[2] ; /* Dummy size */
+	unsigned short	data	[] ; /* ISO C99 struct hack */
 } IMA_ADPCM_PRIVATE ;
 
 /*============================================================================================

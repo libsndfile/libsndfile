@@ -64,7 +64,7 @@ typedef struct
 	sf_count_t		sample_count ;
 	int				*samples ;
 	unsigned char	*block ;
-	int				data [1] ; /* Data size fixed during malloc (). */
+	int				data [] ; /* ISO C99 struct hack */
 } PAF24_PRIVATE ;
 
 /*------------------------------------------------------------------------------
@@ -363,8 +363,8 @@ paf24_init (SF_PRIVATE *psf)
 	memset (ppaf24, 0, paf24size) ;
 
 	ppaf24->channels	= psf->sf.channels ;
-	ppaf24->block		= (unsigned char*) ppaf24->data ;
-	ppaf24->samples		= (int*) (ppaf24->block + PAF24_BLOCK_SIZE * ppaf24->channels) ;
+	ppaf24->samples		= ppaf24->data ;
+	ppaf24->block		= (unsigned char*) (ppaf24->data + PAF24_SAMPLES_PER_BLOCK * ppaf24->channels) ;
 
 	ppaf24->blocksize = PAF24_BLOCK_SIZE * ppaf24->channels ;
 	ppaf24->samplesperblock = PAF24_SAMPLES_PER_BLOCK ;
