@@ -127,10 +127,6 @@ TEST_PROGS= \
      ".\tests\string_test.exe" \
      ".\tests\win32_test.exe" \
      ".\tests\benchmark.exe"
-     # ".\tests\stdio_test.exe" \
-     # ".\tests\stdin_test.exe" \
-     # ".\tests\stdout_test.exe" \
-     # ".\tests\pipe_test.exe" \
 
 CHECK: $(TEST_PROGS)
     ".\src\test_file_io.exe"
