@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,12 +16,12 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include "sfconfig.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
@@ -51,7 +51,7 @@ main (void)
 	sfinfo.frames		= 123456789 ;
 	sfinfo.channels		= 1 ;
 
-	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
+	if (! (file = sf_open (filename, SFM_WRITE, &sfinfo)))
 	{	printf ("sf_open_write failed with error : ") ;
 		fflush (stdout) ;
 		puts (sf_strerror (NULL)) ;
@@ -72,13 +72,13 @@ main (void)
 	** with what they should be.
 	*/
 
-	if ((file = sf_open (filename, SFM_READ, &sfinfo)) == NULL)
+	if (! (file = sf_open (filename, SFM_READ, &sfinfo)))
 	{	printf ("sf_open_write failed with error : ") ;
 		puts (sf_strerror (NULL)) ;
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 
 	if (sf_read_raw (file, ulaw_buffer, BUFFER_SIZE) != BUFFER_SIZE)
 	{	printf ("sf_read_raw : ") ;
@@ -94,7 +94,7 @@ main (void)
 
 	sf_close (file) ;
 
-	printf ("    ulaw_test : encoder ... ok\n") ;
+	printf ("    alaw_test : encoder ... ok\n") ;
 
 	/* Now generate a file containing all possible 8 bit encoded
 	** sample values and write it to disk as ulaw encoded.frames.
@@ -122,7 +122,7 @@ main (void)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 
 	if (sf_read_short (file, short_buffer, 256) != 256)
 	{	printf ("sf_read_short : ") ;

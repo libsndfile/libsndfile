@@ -1,29 +1,15 @@
 autogen definitions scale_clip_test.tpl;
 
 float_type = {
-	float_type_name		= "float" ;
-	float_short_name	= "flt" ;
-	float_upper_name	= "FLOAT" ;
+	type_name	= "float" ;
+	short_name	= "flt" ;
+	upper_name	= "FLOAT" ;
 	} ;
 
 float_type = {
-	float_type_name		= "double" ;
-	float_short_name	= "dbl" ;
-	float_upper_name	= "DOUBLE" ;
-	} ;
-
-
-
-int_type = {
-	int_type_name	= "short" ;
-	int_short_name	= "s" ;
-	int_max_value	= 0x7FFFF ;
-	} ;
-
-int_type = {
-	int_type_name	= "int" ;
-	int_short_name	= "i" ;
-	int_max_value	= 0x7FFFFFFF ;
+	type_name	= "double" ;
+	short_name	= "dbl" ;
+	upper_name	= "DOUBLE" ;
 	} ;
 
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002,2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -45,12 +45,6 @@
 /* Major version of GCC or 3 otherwise. */
 /* #undef GCC_MAJOR_VERSION */
 
-/* Define to 1 if you have the <alsa/asoundlib.h> header file. */
-/* #undef HAVE_ALSA_ASOUNDLIB_H */
-
-/* Define to 1 if you have the <byteswap.h> header file. */
-/* #undef HAVE_BYTESWAP_H */
-
 /* Define to 1 if you have the `calloc' function. */
 #define HAVE_CALLOC 1
 
@@ -61,23 +55,13 @@
 #define HAVE_DECL_S_IRGRP 0
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
-/* #undef HAVE_DLFCN_H */
+#define HAVE_DLFCN_H 1
 
 /* Define to 1 if you have the <endian.h> header file. */
-/* #undef HAVE_ENDIAN_H */
+#define HAVE_ENDIAN_H 1
 
 /* Define to 1 if you have the `fdatasync' function. */
-
-/* #undef HAVE_FDATASYNC */
-
-/* Define to 1 if you have libflac 1.1.1 */
-/* #undef HAVE_FLAC_1_1_1 1 */
-
-/* Define to 1 if you have the <FLAC/all.h> header file. */
-/* #undef HAVE_FLAC_ALL_H 1 */
-
-/* Set to 1 if the compile supports the struct hack. */
-#define HAVE_FLEXIBLE_ARRAY 1
+#define HAVE_FDATASYNC 1
 
 /* Define to 1 if you have the `floor' function. */
 #define HAVE_FLOOR 1
@@ -92,28 +76,22 @@
 #define HAVE_FSTAT 1
 
 /* Define to 1 if you have the `fsync' function. */
-/* #undef HAVE_FSYNC */
+#define HAVE_FSYNC 1
 
 /* Define to 1 if you have the `ftruncate' function. */
-/* #undef HAVE_FTRUNCATE */
-
-/* Define to 1 if you have the `getpagesize' function. */
-#define HAVE_GETPAGESIZE 1
+#define HAVE_FTRUNCATE 1
 
 /* Define to 1 if you have the `gmtime' function. */
 #define HAVE_GMTIME 1
 
 /* Define to 1 if you have the `gmtime_r' function. */
-/* #undef HAVE_GMTIME_R */
+/* #undefine HAVE_GMTIME_R */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-/* #undef HAVE_INTTYPES_H */
+#define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the `m' library (-lm). */
 #define HAVE_LIBM 1
-
-/* Define to 1 if you have the <locale.h> header file. */
-/* #undef HAVE_LOCALE_H */
 
 /* Define if you have C99's lrint function. */
 /* #undef HAVE_LRINT */
@@ -130,17 +108,17 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
 
-/* Define to 1 if you have the `mmap' function. */
-/* #undef HAVE_MMAP */
+/* Define to 1 if you have the <mmreg.h> header file. */
+/* #undef HAVE_MMREG_H */
 
 /* Define to 1 if you have the `open' function. */
 #define HAVE_OPEN 1
 
 /* Define to 1 if you have the `pread' function. */
-/* #undef HAVE_PREAD */
+#define HAVE_PREAD 1
 
 /* Define to 1 if you have the `pwrite' function. */
-/* #undef HAVE_PWRITE */
+#define HAVE_PWRITE 1
 
 /* Define to 1 if you have the `read' function. */
 #define HAVE_READ 1
@@ -148,20 +126,11 @@
 /* Define to 1 if you have the `realloc' function. */
 #define HAVE_REALLOC 1
 
-/* Define to 1 if you have the `setlocale' function. */
-/* #undef HAVE_SETLOCALE */
-
 /* Define to 1 if you have the `snprintf' function. */
 #define HAVE_SNPRINTF 1
 
-/* Set to 1 if you have libsqlite3. */
-/* #undef HAVE_SQLITE3 */
-
-/* Define to 1 if the system has the type `ssize_t'. */
-/* #undef HAVE_SSIZE_T */
-
 /* Define to 1 if you have the <stdint.h> header file. */
-/* #undef HAVE_STDINT_H */
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
@@ -179,7 +148,7 @@
 #define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
-/* #undef HAVE_SYS_WAIT_H */
+#define HAVE_SYS_WAIT_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
 /* #undef HAVE_UNISTD_H */
@@ -187,11 +156,11 @@
 /* Define to 1 if you have the `vsnprintf' function. */
 #define HAVE_VSNPRINTF 1
 
+/* Define to 1 if you have the <wintypes.h> header file. */
+/* #undef HAVE_WINTYPES_H */
+
 /* Define to 1 if you have the `write' function. */
 #define HAVE_WRITE 1
-
-/* Set to 1 if compiling for MacOSX */
-#define OS_IS_MACOSX 0
 
 /* Set to 1 if compiling for Win32 */
 #define OS_IS_WIN32 1
@@ -200,22 +169,26 @@
 #define PACKAGE "libsndfile"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "erikd@mega-nerd.com"
+#define PACKAGE_BUGREPORT "<erikd@zip.com.au>"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "libsndfile"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsndfile 1.0.13"
+#define PACKAGE_STRING "libsndfile 1.1.0pre1"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsndfile"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.0.13"
+<<<<<<< diff from left file
+#define PACKAGE_VERSION ""
+========
+#define PACKAGE_VERSION "1.1.0pre1"
 
 /* Set to maximum allowed value of sf_count_t type. */
-#define SF_COUNT_MAX 0x7FFFFFFFFFFFFFFFi64
+#define SF_COUNT_MAX 0x7FFFFFFFFFFFFFFFLL
+>>>>>>> diff from right file
 
 /* The size of a `double', as computed by sizeof. */
 #define SIZEOF_DOUBLE 8
@@ -226,20 +199,14 @@
 /* The size of a `int', as computed by sizeof. */
 #define SIZEOF_INT 4
 
-/* The size of a `int64_t', as computed by sizeof. */
-#define SIZEOF_INT64_T 0
-
 /* The size of a `loff_t', as computed by sizeof. */
 #define SIZEOF_LOFF_T 0
 
 /* The size of a `long', as computed by sizeof. */
 #define SIZEOF_LONG 4
 
-/* The size of a `long long', as computed by sizeof. */
-#define SIZEOF_LONG_LONG 0
-
 /* The size of a `off64_t', as computed by sizeof. */
-/* #undef SIZEOF_OFF64_T */
+#define SIZEOF_OFF64_T 0
 
 /* The size of a `off_t', as computed by sizeof. */
 #define SIZEOF_OFF_T 4
@@ -263,23 +230,21 @@
 #define STDC_HEADERS 1
 
 /* Set to long if unknown. */
-#define TYPEOF_SF_COUNT_T loff_t
-
-/* Set to 1 to use the native windows API */
-#define USE_WINDOWS_API 1
+#define TYPEOF_SF_COUNT_T __int64_t
 
 /* Version number of package */
-#define VERSION "1.0.13"
+#define VERSION "1.1.0pre1"
 
-/* Number of bits in a file offset, on hosts where this is settable. */
-/* #undef _FILE_OFFSET_BITS */
+/*
+   [Number], [of], [bits], [in], [a], [file], [offset,], [on], [hosts], [where], [this], [is], [settable.]
+   */
+/* #undef _FILE_OFFSET_BITS 64 */
 
 /* Define to make fseeko etc. visible, on some hosts. */
 /* #undef _LARGEFILE_SOURCE */
 
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */
-
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002,2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,17 +16,15 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	"sfconfig.h"
-
 #include	<stdio.h>
 #include	<fcntl.h>
 #include	<string.h>
 #include	<ctype.h>
 
 #include	"sndfile.h"
+#include	"config.h"
 #include	"sfendian.h"
 #include	"common.h"
-#include	"float_cast.h"
 
 /*------------------------------------------------------------------------------
 ** Information on how to decode and encode this file was obtained in a PDF
@@ -102,7 +100,7 @@ mat4_open	(SF_PRIVATE *psf)
 		psf->write_header = mat4_write_header ;
 		} ;
 
-	psf->container_close = mat4_close ;
+	psf->close = mat4_close ;
 
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
@@ -177,15 +175,15 @@ mat4_write_header (SF_PRIVATE *psf, int calc_length)
 
 	if (psf->endian == SF_ENDIAN_BIG)
 	{	psf_binheader_writef (psf, "Em444", MAT4_BE_DOUBLE, 1, 1, 0) ;
-		psf_binheader_writef (psf, "E4bd", 11, "samplerate", make_size_t (11), samplerate) ;
+		psf_binheader_writef (psf, "E4bd", 11, "samplerate", 11, samplerate) ;
 		psf_binheader_writef (psf, "tEm484", encoding, psf->sf.channels, psf->sf.frames, 0) ;
-		psf_binheader_writef (psf, "E4b", 9, "wavedata", make_size_t (9)) ;
+		psf_binheader_writef (psf, "E4b", 9, "wavedata", 9) ;
 		}
 	else if (psf->endian == SF_ENDIAN_LITTLE)
 	{	psf_binheader_writef (psf, "em444", MAT4_LE_DOUBLE, 1, 1, 0) ;
-		psf_binheader_writef (psf, "e4bd", 11, "samplerate", make_size_t (11), samplerate) ;
+		psf_binheader_writef (psf, "e4bd", 11, "samplerate", 11, samplerate) ;
 		psf_binheader_writef (psf, "tem484", encoding, psf->sf.channels, psf->sf.frames, 0) ;
-		psf_binheader_writef (psf, "e4b", 9, "wavedata", make_size_t (9)) ;
+		psf_binheader_writef (psf, "e4b", 9, "wavedata", 9) ;
 		}
 	else
 		return SFE_BAD_OPEN_FORMAT ;
@@ -206,8 +204,7 @@ mat4_write_header (SF_PRIVATE *psf, int calc_length)
 
 static int
 mat4_read_header (SF_PRIVATE *psf)
-{	int		marker, rows, cols, imag ;
-	unsigned namesize ;
+{	int		marker, namesize, rows, cols, imag ;
 	double	value ;
 	const char *marker_str ;
 	char	name [64] ;
@@ -244,13 +241,13 @@ mat4_read_header (SF_PRIVATE *psf)
 
 	psf_binheader_readf (psf, "d", &value) ;
 
-	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), " Value : %f\n", value) ;
-	psf_log_printf (psf, psf->u.cbuf) ;
+	LSF_SNPRINTF ((char*) psf->buffer, sizeof (psf->buffer), " Value : %f\n", value) ;
+	psf_log_printf (psf, (char*) psf->buffer) ;
 
 	if ((rows != 1) || (cols != 1))
 		return SFE_MAT4_NO_SAMPLERATE ;
 
-	psf->sf.samplerate = lrint (value) ;
+	psf->sf.samplerate = (int) value ;
 
 	/* Now write out the audio data. */
 

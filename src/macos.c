@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,7 +16,7 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	"sfconfig.h"
+#include	"config.h"
 
 #include	<stdlib.h>
 #include	<string.h>
@@ -29,24 +29,23 @@
 #define	STR_MARKER	MAKE_MARKER ('S', 'T', 'R', ' ')
 
 int
-macos_guess_file_type (SF_PRIVATE * psf, const char *filename)
+macos_guess_file_type (SF_PRIVATE *psf, const char *filename)
 {	static char rsrc_name [1024] ;
 	struct stat statbuf ;
+	int format ;
 
-	snprintf (rsrc_name, sizeof (rsrc_name), "%s/rsrc", filename) ;
+	snprintf (rsrc_name, sizeof (rsrc_name), "%s/rsrc", filename);
 
 	/* If there is no resource fork, just return. */
 	if (stat (rsrc_name, &statbuf) != 0)
-	{	psf_log_printf (psf, "No resource fork.\n") ;
 		return 0 ;
-		} ;
 
 	if (statbuf.st_size == 0)
-	{	psf_log_printf (psf, "Have zero size resource fork.\n") ;
 		return 0 ;
-		} ;
 
-	return 0 ;
+	format = 0 ;
+
+	return format ;
 } /* macos_guess_file_type */
 
 /*

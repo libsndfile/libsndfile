@@ -20,7 +20,7 @@
 ## program.
 ## @end deftypefn
 
-## Author: Erik de Castro Lopo <erikd@mega-nerd.com>
+## Author: Erik de Castro Lopo <erikd@zip.com.au>
 ## Description: Play the given data as a sound file
 
 function sndfile_play (data, fs)

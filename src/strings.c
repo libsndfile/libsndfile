@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,13 +16,12 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	"sfconfig.h"
-
 #include	<stdio.h>
 #include	<string.h>
 #include	<math.h>
 
 #include	"sndfile.h"
+#include	"config.h"
 #include	"common.h"
 
 #define STRINGS_DEBUG 0
@@ -85,9 +84,9 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 
 
 #if STRINGS_DEBUG
-	psf_log_printf (psf, "str_storage          : %X\n", (int) psf->str_storage) ;
-	psf_log_printf (psf, "str_end              : %X\n", (int) psf->str_end) ;
-	psf_log_printf (psf, "sizeof (str_storage) : %d\n", SIGNED_SIZEOF (psf->str_storage)) ;
+	psf_log_printf (psf, "str_storage      : %X\n", (int) psf->str_storage) ;
+	psf_log_printf (psf, "str_end          : %X\n", (int) psf->str_end) ;
+	psf_log_printf (psf, "sizeof (storage) : %d\n", SIGNED_SIZEOF (psf->str_storage)) ;
 #endif
 
 	len_remaining = SIGNED_SIZEOF (psf->str_storage) - (psf->str_end - psf->str_storage) ;
@@ -106,11 +105,7 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 					memcpy (psf->str_end, str, str_len + 1) ;
 					psf->str_end += str_len ;
 
-					/*
-					** If the supplied string does not already contain a
-					** libsndfile-X.Y.Z component, then add it.
-					*/
-					if (strstr (str, PACKAGE) == NULL && len_remaining > (int) (strlen (bracket_name) + str_len + 2))
+					if (len_remaining > (int) (strlen (bracket_name) + str_len + 2))
 					{	if (strlen (str) == 0)
 							strncat (psf->str_end, lsf_name, len_remaining) ;
 						else
@@ -151,14 +146,6 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 
 	return 0 ;
 } /* psf_store_string */
-
-int
-psf_set_string (SF_PRIVATE *psf, int str_type, const char *str)
-{	if (psf->mode == SFM_READ)
-		return SFE_STR_NOT_WRITE ;
-
-	return psf_store_string (psf, str_type, str) ;
-} /* psf_set_string */
 
 const char*
 psf_get_string (SF_PRIVATE *psf, int str_type)

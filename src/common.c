@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2004 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -35,14 +35,12 @@
 ** logbuffer array.
 */
 
-static inline void
-log_putchar (SF_PRIVATE *psf, char ch)
-{	if (psf->logindex < SIGNED_SIZEOF (psf->logbuffer) - 1)
-	{	psf->logbuffer [psf->logindex++] = ch ;
-		psf->logbuffer [psf->logindex] = 0 ;
-		} ;
-	return ;
-} /* log_putchar */
+#define LOG_PUTCHAR(a,b)									\
+		{	if ((a)->logindex < SIGNED_SIZEOF ((a)->logbuffer) - 1)\
+			{	(a)->logbuffer [(a)->logindex++] = (b) ;	\
+				(a)->logbuffer [(a)->logindex] = 0 ;		\
+				}											\
+			}
 
 void
 psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
@@ -55,12 +53,12 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 
 	while ((c = *format++))
 	{	if (c != '%')
-		{	log_putchar (psf, c) ;
+		{	LOG_PUTCHAR (psf, c) ;
 			continue ;
 			} ;
 
 		if (format [0] == '%') /* Handle %% */
-		{ 	log_putchar (psf, '%') ;
+		{ 	LOG_PUTCHAR (psf, '%') ;
 			format ++ ;
 			continue ;
 			} ;
@@ -109,11 +107,11 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					width_specifier -= strlen (strptr) ;
 					if (left_align == SF_FALSE)
 						while (width_specifier -- > 0)
-							log_putchar (psf, ' ') ;
+							LOG_PUTCHAR (psf, ' ') ;
 					while (*strptr)
-						log_putchar (psf, *strptr++) ;
+						LOG_PUTCHAR (psf, *strptr++) ;
 					while (width_specifier -- > 0)
-						log_putchar (psf, ' ') ;
+						LOG_PUTCHAR (psf, ' ') ;
 					break ;
 
 			case 'd': /* int */
@@ -136,7 +134,7 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					width_specifier -= width ;
 
 					if (sign_char == ' ')
-					{	log_putchar (psf, ' ') ;
+					{	LOG_PUTCHAR (psf, ' ') ;
 						width_specifier -- ;
 						} ;
 
@@ -145,26 +143,26 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 							width_specifier -- ;
 
 						while (width_specifier -- > 0)
-							log_putchar (psf, lead_char) ;
+							LOG_PUTCHAR (psf, lead_char) ;
 						} ;
 
 					if (sign_char == '+' || sign_char == '-')
-					{	log_putchar (psf, sign_char) ;
+					{	LOG_PUTCHAR (psf, sign_char) ;
 						width_specifier -- ;
 						} ;
 
 					if (left_align == SF_FALSE)
 						while (width_specifier -- > 0)
-							log_putchar (psf, lead_char) ;
+							LOG_PUTCHAR (psf, lead_char) ;
 
 					while (tens > 0)
-					{	log_putchar (psf, '0' + d / tens) ;
+					{	LOG_PUTCHAR (psf, '0' + d / tens) ;
 						d %= tens ;
 						tens /= 10 ;
 						} ;
 
 					while (width_specifier -- > 0)
-						log_putchar (psf, lead_char) ;
+						LOG_PUTCHAR (psf, lead_char) ;
 					break ;
 
 			case 'D': /* sf_count_t */
@@ -174,12 +172,12 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 
 						if (D == 0)
 						{	while (-- width_specifier > 0)
-								log_putchar (psf, lead_char) ;
-							log_putchar (psf, '0') ;
+								LOG_PUTCHAR (psf, lead_char) ;
+							LOG_PUTCHAR (psf, '0') ;
 							break ;
 							}
 						if (D < 0)
-						{	log_putchar (psf, '-') ;
+						{	LOG_PUTCHAR (psf, '-') ;
 							D = -D ;
 							} ;
 						Tens = 1 ;
@@ -190,12 +188,12 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 							} ;
 
 						while (width_specifier > width)
-						{	log_putchar (psf, lead_char) ;
+						{	LOG_PUTCHAR (psf, lead_char) ;
 							width_specifier-- ;
 							} ;
 
 						while (Tens > 0)
-						{	log_putchar (psf, '0' + D / Tens) ;
+						{	LOG_PUTCHAR (psf, '0' + D / Tens) ;
 							D %= Tens ;
 							Tens /= 10 ;
 							} ;
@@ -215,7 +213,7 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					width_specifier -= width ;
 
 					if (sign_char == ' ')
-					{	log_putchar (psf, ' ') ;
+					{	LOG_PUTCHAR (psf, ' ') ;
 						width_specifier -- ;
 						} ;
 
@@ -224,41 +222,40 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 							width_specifier -- ;
 
 						while (width_specifier -- > 0)
-							log_putchar (psf, lead_char) ;
+							LOG_PUTCHAR (psf, lead_char) ;
 						} ;
 
 					if (sign_char == '+' || sign_char == '-')
-					{	log_putchar (psf, sign_char) ;
+					{	LOG_PUTCHAR (psf, sign_char) ;
 						width_specifier -- ;
 						} ;
 
 					if (left_align == SF_FALSE)
 						while (width_specifier -- > 0)
-							log_putchar (psf, lead_char) ;
+							LOG_PUTCHAR (psf, lead_char) ;
 
 					while (tens > 0)
-					{	log_putchar (psf, '0' + u / tens) ;
+					{	LOG_PUTCHAR (psf, '0' + u / tens) ;
 						u %= tens ;
 						tens /= 10 ;
 						} ;
 
 					while (width_specifier -- > 0)
-						log_putchar (psf, lead_char) ;
+						LOG_PUTCHAR (psf, lead_char) ;
 					break ;
 
 			case 'c': /* char */
 					c = va_arg (ap, int) & 0xFF ;
-					log_putchar (psf, c) ;
+					LOG_PUTCHAR (psf, c) ;
 					break ;
 
-			case 'x': /* hex */
 			case 'X': /* hex */
 					d = va_arg (ap, int) ;
 
 					if (d == 0)
 					{	while (--width_specifier > 0)
-							log_putchar (psf, lead_char) ;
-						log_putchar (psf, '0') ;
+							LOG_PUTCHAR (psf, lead_char) ;
+						LOG_PUTCHAR (psf, '0') ;
 						break ;
 						} ;
 					shift = 28 ;
@@ -269,13 +266,13 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 						} ;
 
 					while (width > 0 && width_specifier > width)
-					{	log_putchar (psf, lead_char) ;
+					{	LOG_PUTCHAR (psf, lead_char) ;
 						width_specifier-- ;
 						} ;
 
 					while (shift >= 0)
 					{	c = (d >> shift) & 0xF ;
-						log_putchar (psf, (c > 9) ? c + 'A' - 10 : c + '0') ;
+						LOG_PUTCHAR (psf, (c > 9) ? c + 'A' - 10 : c + '0') ;
 						shift -= 4 ;
 						} ;
 					break ;
@@ -298,14 +295,14 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					strptr = istr ;
 					while (*strptr)
 					{	c = *strptr++ ;
-						log_putchar (psf, c) ;
+						LOG_PUTCHAR (psf, c) ;
 						} ;
 					break ;
 
 			default :
-					log_putchar (psf, '*') ;
-					log_putchar (psf, c) ;
-					log_putchar (psf, '*') ;
+					LOG_PUTCHAR (psf, '*') ;
+					LOG_PUTCHAR (psf, c) ;
+					LOG_PUTCHAR (psf, '*') ;
 					break ;
 			} /* switch */
 		} /* while */
@@ -314,6 +311,7 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 	return ;
 } /* psf_log_printf */
 
+#ifndef PSF_LOG_PRINTF_ONLY
 /*-----------------------------------------------------------------------------------------------
 **  ASCII header printf functions.
 **  Some formats (ie NIST) use ascii text in their headers.
@@ -328,9 +326,8 @@ psf_asciiheader_printf (SF_PRIVATE *psf, const char *format, ...)
 	int		maxlen ;
 	char	*start ;
 
-	maxlen = strlen ((char*) psf->header) ;
-	start	= ((char*) psf->header) + maxlen ;
-	maxlen	= sizeof (psf->header) - maxlen ;
+	start	= (char*) psf->header + strlen ((char*) psf->header) ;
+	maxlen	= sizeof (psf->header) - strlen ((char*) psf->header) ;
 
 	va_start (argptr, format) ;
 	LSF_VSNPRINTF (start, maxlen, format, argptr) ;
@@ -379,8 +376,6 @@ psf_asciiheader_printf (SF_PRIVATE *psf, const char *format, ...)
 **		psf_binheader_writef ("b", &bindata, sizeof (bindata)) ;
 **
 **	To write N zero bytes use:
-**			NOTE: due to platform issues (ie x86-64) you should cast the
-**			argument to size_t or ensure the variable type is size_t.
 **		psf_binheader_writef ("z", N) ;
 */
 
@@ -388,153 +383,99 @@ psf_asciiheader_printf (SF_PRIVATE *psf, const char *format, ...)
 ** seg. fault when asked to write an int or short to a non-int/short aligned address.
 */
 
-static inline void
-header_put_byte (SF_PRIVATE *psf, char x)
-{	if (psf->headindex < SIGNED_SIZEOF (psf->header) - 1)
-		psf->header [psf->headindex++] = x ;
-} /* header_put_byte */
+#define	PUT_BYTE(psf,x)		if ((psf)->headindex < SIGNED_SIZEOF ((psf)->header) - 1)	\
+							{ (psf)->header [(psf)->headindex++] = (x) ; }
 
 #if (CPU_IS_BIG_ENDIAN == 1)
-static inline void
-header_put_marker (SF_PRIVATE *psf, int x)
-{	if (psf->headindex < SIGNED_SIZEOF (psf->header) - 4)
-	{	psf->header [psf->headindex++] = (x >> 24) ;
-		psf->header [psf->headindex++] = (x >> 16) ;
-		psf->header [psf->headindex++] = (x >> 8) ;
-		psf->header [psf->headindex++] = x ;
-		} ;
-} /* header_put_marker */
+#define	PUT_MARKER(psf,x)	if ((psf)->headindex < SIGNED_SIZEOF ((psf)->header) - 4)	\
+							{	(psf)->header [(psf)->headindex++] = ((x) >> 24) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 16) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 8) ;		\
+								(psf)->header [(psf)->headindex++] = (x) ;	}
 
 #elif (CPU_IS_LITTLE_ENDIAN == 1)
-static inline void
-header_put_marker (SF_PRIVATE *psf, int x)
-{	if (psf->headindex < SIGNED_SIZEOF (psf->header) - 4)
-	{	psf->header [psf->headindex++] = x ;
-		psf->header [psf->headindex++] = (x >> 8) ;
-		psf->header [psf->headindex++] = (x >> 16) ;
-		psf->header [psf->headindex++] = (x >> 24) ;
-		} ;
-} /* header_put_marker */
+#define	PUT_MARKER(psf,x)	if ((psf)->headindex < SIGNED_SIZEOF ((psf)->header) - 4)	\
+							{	(psf)->header [(psf)->headindex++] = (x) ;				\
+								(psf)->header [(psf)->headindex++] = ((x) >> 8) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 16) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 24) ;	}
 
 #else
 #	error "Cannot determine endian-ness of processor."
 #endif
 
 
-static inline void
-header_put_be_short (SF_PRIVATE *psf, int x)
-{	if (psf->headindex < SIGNED_SIZEOF (psf->header) - 2)
-	{	psf->header [psf->headindex++] = (x >> 8) ;
-		psf->header [psf->headindex++] = x ;
-		} ;
-} /* header_put_be_short */
+#define	PUT_BE_SHORT(psf,x)	if ((psf)->headindex < SIGNED_SIZEOF ((psf)->header) - 2)	\
+							{	(psf)->header [(psf)->headindex++] = ((x) >> 8) ;		\
+								(psf)->header [(psf)->headindex++] = (x) ; 		}
 
-static inline void
-header_put_le_short (SF_PRIVATE *psf, int x)
-{	if (psf->headindex < SIGNED_SIZEOF (psf->header) - 2)
-	{	psf->header [psf->headindex++] = x ;
-		psf->header [psf->headindex++] = (x >> 8) ;
-		} ;
-} /* header_put_le_short */
+#define	PUT_LE_SHORT(psf,x)	if ((psf)->headindex < SIGNED_SIZEOF ((psf)->header) - 2)	\
+							{	(psf)->header [(psf)->headindex++] = (x) ;				\
+								(psf)->header [(psf)->headindex++] = ((x) >> 8) ;	}
 
-static inline void
-header_put_be_3byte (SF_PRIVATE *psf, int x)
-{	if (psf->headindex < SIGNED_SIZEOF (psf->header) - 3)
-	{	psf->header [psf->headindex++] = (x >> 16) ;
-		psf->header [psf->headindex++] = (x >> 8) ;
-		psf->header [psf->headindex++] = x ;
-		} ;
-} /* header_put_be_3byte */
+#define	PUT_BE_3BYTE(psf,x)	if ((psf)->headindex < SIGNED_SIZEOF ((psf)->header) - 3)	\
+							{	(psf)->header [(psf)->headindex++] = ((x) >> 16) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 8) ;		\
+								(psf)->header [(psf)->headindex++] = (x) ;		}
 
-static inline void
-header_put_le_3byte (SF_PRIVATE *psf, int x)
-{	if (psf->headindex < SIGNED_SIZEOF (psf->header) - 3)
-	{	psf->header [psf->headindex++] = x ;
-		psf->header [psf->headindex++] = (x >> 8) ;
-		psf->header [psf->headindex++] = (x >> 16) ;
-		} ;
-} /* header_put_le_3byte */
+#define	PUT_LE_3BYTE(psf,x)	if ((psf)->headindex < SIGNED_SIZEOF ((psf)->header) - 3)	\
+							{	(psf)->header [(psf)->headindex++] = (x) ;				\
+								(psf)->header [(psf)->headindex++] = ((x) >> 8) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 16) ;	}
 
-static inline void
-header_put_be_int (SF_PRIVATE *psf, int x)
-{	if (psf->headindex < SIGNED_SIZEOF (psf->header) - 4)
-	{	psf->header [psf->headindex++] = (x >> 24) ;
-		psf->header [psf->headindex++] = (x >> 16) ;
-		psf->header [psf->headindex++] = (x >> 8) ;
-		psf->header [psf->headindex++] = x ;
-		} ;
-} /* header_put_be_int */
+#define	PUT_BE_INT(psf,x)	if ((psf)->headindex < SIGNED_SIZEOF ((psf)->header) - 4)	\
+							{	(psf)->header [(psf)->headindex++] = ((x) >> 24) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 16) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 8) ;		\
+								(psf)->header [(psf)->headindex++] = (x) ;		}
 
-static inline void
-header_put_le_int (SF_PRIVATE *psf, int x)
-{	if (psf->headindex < SIGNED_SIZEOF (psf->header) - 4)
-	{	psf->header [psf->headindex++] = x ;
-		psf->header [psf->headindex++] = (x >> 8) ;
-		psf->header [psf->headindex++] = (x >> 16) ;
-		psf->header [psf->headindex++] = (x >> 24) ;
-		} ;
-} /* header_put_le_int */
+#define	PUT_LE_INT(psf,x)	if ((psf)->headindex < SIGNED_SIZEOF ((psf)->header) - 4)	\
+							{	(psf)->header [(psf)->headindex++] = (x) ;				\
+								(psf)->header [(psf)->headindex++] = ((x) >> 8) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 16) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 24) ;	}
 
 #if (SIZEOF_SF_COUNT_T == 4)
+#define	PUT_BE_8BYTE(psf,x)	if ((psf)->headindex < SIGNED_SIZEOF ((psf)->header) - 8)	\
+							{	(psf)->header [(psf)->headindex++] = 0 ;				\
+								(psf)->header [(psf)->headindex++] = 0 ;				\
+								(psf)->header [(psf)->headindex++] = 0 ;				\
+								(psf)->header [(psf)->headindex++] = 0 ;				\
+								(psf)->header [(psf)->headindex++] = ((x) >> 24) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 16) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 8) ;		\
+								(psf)->header [(psf)->headindex++] = (x) ;		}
 
-static inline void
-header_put_be_8byte (SF_PRIVATE *psf, sf_count_t x)
-{	if (psf->headindex < SIGNED_SIZEOF (psf->header) - 8)
-	{	psf->header [psf->headindex++] = 0 ;
-		psf->header [psf->headindex++] = 0 ;
-		psf->header [psf->headindex++] = 0 ;
-		psf->header [psf->headindex++] = 0 ;
-		psf->header [psf->headindex++] = (x >> 24) ;
-		psf->header [psf->headindex++] = (x >> 16) ;
-		psf->header [psf->headindex++] = (x >> 8) ;
-		psf->header [psf->headindex++] = x ;
-		} ;
-} /* header_put_be_8byte */
-
-static inline void
-header_put_le_8byte (SF_PRIVATE *psf, sf_count_t x)
-{	if (psf->headindex < SIGNED_SIZEOF (psf->header) - 8)
-	{	psf->header [psf->headindex++] = x ;
-		psf->header [psf->headindex++] = (x >> 8) ;
-		psf->header [psf->headindex++] = (x >> 16) ;
-		psf->header [psf->headindex++] = (x >> 24) ;
-		psf->header [psf->headindex++] = 0 ;
-		psf->header [psf->headindex++] = 0 ;
-		psf->header [psf->headindex++] = 0 ;
-		psf->header [psf->headindex++] = 0 ;
-		} ;
-} /* header_put_le_8byte */
+#define	PUT_LE_8BYTE(psf,x)	if ((psf)->headindex < SIGNED_SIZEOF ((psf)->header) - 8)	\
+							{	(psf)->header [(psf)->headindex++] = (x) ;				\
+								(psf)->header [(psf)->headindex++] = ((x) >> 8) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 16) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 24) ;		\
+								(psf)->header [(psf)->headindex++] = 0 ;				\
+								(psf)->header [(psf)->headindex++] = 0 ;				\
+								(psf)->header [(psf)->headindex++] = 0 ;				\
+								(psf)->header [(psf)->headindex++] = 0 ;	}
 
 #elif (SIZEOF_SF_COUNT_T == 8)
+#define	PUT_BE_8BYTE(psf,x)	if ((psf)->headindex < SIGNED_SIZEOF ((psf)->header) - 8)	\
+							{	(psf)->header [(psf)->headindex++] = ((x) >> 56) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 48) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 40) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 32) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 24) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 16) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 8) ;		\
+								(psf)->header [(psf)->headindex++] = (x) ;		}
 
-static inline void
-header_put_be_8byte (SF_PRIVATE *psf, sf_count_t x)
-{	if (psf->headindex < SIGNED_SIZEOF (psf->header) - 8)
-	{	psf->header [psf->headindex++] = (x >> 56) ;
-		psf->header [psf->headindex++] = (x >> 48) ;
-		psf->header [psf->headindex++] = (x >> 40) ;
-		psf->header [psf->headindex++] = (x >> 32) ;
-		psf->header [psf->headindex++] = (x >> 24) ;
-		psf->header [psf->headindex++] = (x >> 16) ;
-		psf->header [psf->headindex++] = (x >> 8) ;
-		psf->header [psf->headindex++] = x ;
-		} ;
-} /* header_put_be_8byte */
-
-static inline void
-header_put_le_8byte (SF_PRIVATE *psf, sf_count_t x)
-{	if (psf->headindex < SIGNED_SIZEOF (psf->header) - 8)
-	{	psf->header [psf->headindex++] = x ;
-		psf->header [psf->headindex++] = (x >> 8) ;
-		psf->header [psf->headindex++] = (x >> 16) ;
-		psf->header [psf->headindex++] = (x >> 24) ;
-		psf->header [psf->headindex++] = (x >> 32) ;
-		psf->header [psf->headindex++] = (x >> 40) ;
-		psf->header [psf->headindex++] = (x >> 48) ;
-		psf->header [psf->headindex++] = (x >> 56) ;
-		} ;
-} /* header_put_le_8byte */
-
+#define	PUT_LE_8BYTE(psf,x)	if ((psf)->headindex < SIGNED_SIZEOF ((psf)->header) - 8)	\
+							{	(psf)->header [(psf)->headindex++] = (x) ;				\
+								(psf)->header [(psf)->headindex++] = ((x) >> 8) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 16) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 24) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 32) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 40) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 48) ;		\
+								(psf)->header [(psf)->headindex++] = ((x) >> 56) ;	}
 #else
 #error "SIZEOF_SF_COUNT_T is not defined."
 #endif
@@ -558,10 +499,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 
 	while ((c = *format++))
 	{	switch (c)
-		{	case ' ' : /* Do nothing. Just used to space out format string. */
-					break ;
-
-			case 'e' : /* All conversions are now from LE to host. */
+		{	case 'e' : /* All conversions are now from LE to host. */
 					psf->rwf_endian = SF_ENDIAN_LITTLE ;
 					break ;
 
@@ -579,23 +517,23 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 
 			case 'm' :
 					data = va_arg (argptr, unsigned int) ;
-					header_put_marker (psf, data) ;
+					PUT_MARKER (psf, data) ;
 					count += 4 ;
 					break ;
 
 			case '1' :
 					data = va_arg (argptr, unsigned int) ;
-					header_put_byte (psf, data) ;
+					PUT_BYTE (psf, data) ;
 					count += 1 ;
 					break ;
 
 			case '2' :
 					data = va_arg (argptr, unsigned int) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
-					{	header_put_be_short (psf, data) ;
+					{	PUT_BE_SHORT (psf, data) ;
 						}
 					else
-					{	header_put_le_short (psf, data) ;
+					{	PUT_LE_SHORT (psf, data) ;
 						} ;
 					count += 2 ;
 					break ;
@@ -603,10 +541,10 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 			case '3' : /* tribyte */
 					data = va_arg (argptr, unsigned int) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
-					{	header_put_be_3byte (psf, data) ;
+					{	PUT_BE_3BYTE (psf, data) ;
 						}
 					else
-					{	header_put_le_3byte (psf, data) ;
+					{	PUT_LE_3BYTE (psf, data) ;
 						} ;
 					count += 3 ;
 					break ;
@@ -614,10 +552,10 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 			case '4' :
 					data = va_arg (argptr, unsigned int) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
-					{	header_put_be_int (psf, data) ;
+					{	PUT_BE_INT (psf, data) ;
 						}
 					else
-					{	header_put_le_int (psf, data) ;
+					{	PUT_LE_INT (psf, data) ;
 						} ;
 					count += 4 ;
 					break ;
@@ -625,21 +563,21 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 			case '8' :
 					countdata = va_arg (argptr, sf_count_t) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG && trunc_8to4 == SF_FALSE)
-					{	header_put_be_8byte (psf, countdata) ;
+					{	PUT_BE_8BYTE (psf, countdata) ;
 						count += 8 ;
 						}
 					else if (psf->rwf_endian == SF_ENDIAN_LITTLE && trunc_8to4 == SF_FALSE)
-					{	header_put_le_8byte (psf, countdata) ;
+					{	PUT_LE_8BYTE (psf, countdata) ;
 						count += 8 ;
 						}
 					else if (psf->rwf_endian == SF_ENDIAN_BIG && trunc_8to4 == SF_TRUE)
 					{	longdata = countdata & 0xFFFFFFFF ;
-						header_put_be_int (psf, longdata) ;
+						PUT_BE_INT (psf, longdata) ;
 						count += 4 ;
 						}
 					else if (psf->rwf_endian == SF_ENDIAN_LITTLE && trunc_8to4 == SF_TRUE)
 					{	longdata = countdata & 0xFFFFFFFF ;
-						header_put_le_int (psf, longdata) ;
+						PUT_LE_INT (psf, longdata) ;
 						count += 4 ;
 						}
 					break ;
@@ -666,14 +604,15 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					break ;
 
 			case 's' :
-					/* Write a C string (guaranteed to have a zero terminator). */
 					strptr = va_arg (argptr, char *) ;
 					size = strlen (strptr) + 1 ;
 					size += (size & 1) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
-						header_put_be_int (psf, size) ;
+					{	PUT_BE_INT (psf, size) ;
+						}
 					else
-						header_put_le_int (psf, size) ;
+					{	PUT_LE_INT (psf, size) ;
+						} ;
 					memcpy (&(psf->header [psf->headindex]), strptr, size) ;
 					psf->headindex += size ;
 					psf->header [psf->headindex - 1] = 0 ;
@@ -681,21 +620,11 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					break ;
 
 			case 'S' :
-					/*
-					**	Write an AIFF style string (no zero terminator but possibly
-					**	an extra pad byte if the string length is odd).
-					*/
-					strptr = va_arg (argptr, char *) ;
-					size = strlen (strptr) ;
-					if (psf->rwf_endian == SF_ENDIAN_BIG)
-						header_put_be_int (psf, size) ;
-					else
-						header_put_le_int (psf, size) ;
-					memcpy (&(psf->header [psf->headindex]), strptr, size + 1) ;
-					size += (size & 1) ;
+					strptr	= va_arg (argptr, char *) ;
+					size	= strlen (strptr) + 1 ;
+					memcpy (&(psf->header [psf->headindex]), strptr, size) ;
 					psf->headindex += size ;
-					psf->header [psf->headindex] = 0 ;
-					count += 4 + size ;
+					count += size ;
 					break ;
 
 			case 'b' :
@@ -724,7 +653,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					break ;
 
 			case 'j' :
-					size = va_arg (argptr, size_t) ;
+					size = va_arg (argptr, int) ;
 					psf->headindex += size ;
 					count = size ;
 					break ;
@@ -747,6 +676,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 **	additions:
 **
 **		p   - jump a given number of position from start of file.
+**		j   - jump a given number of bytes forward in the file.
 **
 **	If format is NULL, psf_binheader_readf returns the current offset.
 */
@@ -775,40 +705,39 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 #define	GET_BE_INT(ptr)		( 	((ptr) [0] << 24)	| ((ptr) [1] << 16) |	\
 							 	((ptr) [2] << 8)	| ((ptr) [3]) )
 
-#define	GET_LE_8BYTE(ptr)	( 	(((sf_count_t) (ptr) [7]) << 56) | (((sf_count_t) (ptr) [6]) << 48) |	\
-							 	(((sf_count_t) (ptr) [5]) << 40) | (((sf_count_t) (ptr) [4]) << 32) |	\
-							 	(((sf_count_t) (ptr) [3]) << 24) | (((sf_count_t) (ptr) [2]) << 16) |	\
-							 	(((sf_count_t) (ptr) [1]) << 8 ) | ((ptr) [0]))
+#if (SIZEOF_LONG == 4)
+#define	GET_LE_8BYTE(ptr)	( 	((ptr) [3] << 24)	| ((ptr) [2] << 16) |	\
+							 	((ptr) [1] << 8)	| ((ptr) [0]) )
 
-#define	GET_BE_8BYTE(ptr)	( 	(((sf_count_t) (ptr) [0]) << 56) | (((sf_count_t) (ptr) [1]) << 48) |	\
-							 	(((sf_count_t) (ptr) [2]) << 40) | (((sf_count_t) (ptr) [3]) << 32) |	\
-							 	(((sf_count_t) (ptr) [4]) << 24) | (((sf_count_t) (ptr) [5]) << 16) |	\
-							 	(((sf_count_t) (ptr) [6]) << 8 ) | ((ptr) [7]))
+#define	GET_BE_8BYTE(ptr)	( 	((ptr) [4] << 24)	| ((ptr) [5] << 16) |	\
+								((ptr) [6] << 8)	| ((ptr) [7]) )
+#else
+#define	GET_LE_8BYTE(ptr)	( 	((ptr) [7] << 56L)	| ((ptr) [6] << 48L) |	\
+							 	((ptr) [5] << 40L)	| ((ptr) [4] << 32L) |	\
+							 	((ptr) [3] << 24L)	| ((ptr) [2] << 16L) |	\
+							 	((ptr) [1] << 8L)	| ((ptr) [0] ))
 
+#define	GET_BE_8BYTE(ptr)	( 	((ptr) [0] << 56L)	| ((ptr) [1] << 48L) |	\
+							 	((ptr) [2] << 40L)	| ((ptr) [3] << 32L) |	\
+							 	((ptr) [4] << 24L)	| ((ptr) [5] << 16L) |	\
+							 	((ptr) [6] << 8L)	| ((ptr) [7] ))
 
+#endif
 
 static int
 header_read (SF_PRIVATE *psf, void *ptr, int bytes)
 {	int count = 0 ;
 
-	if (psf->headindex >= SIGNED_SIZEOF (psf->header))
-	{	memset (ptr, 0, SIGNED_SIZEOF (psf->header) - psf->headindex) ;
-
-		/* This is the best that we can do. */
-		psf_fseek (psf, bytes, SEEK_CUR) ;
-		return bytes ;
-		} ;
-
 	if (psf->headindex + bytes > SIGNED_SIZEOF (psf->header))
-	{	int most ;
+	{	if (psf->headend < SIGNED_SIZEOF (psf->header))
+			psf_log_printf (psf, "Warning : Further header read would overflow buffer.\n") ;
 
-		most = SIGNED_SIZEOF (psf->header) - psf->headindex ;
-		psf_fread (psf->header + psf->headend, 1, most, psf) ;
-		memset ((char *) ptr + most, 0, bytes - most) ;
-
-		psf_fseek (psf, bytes - most, SEEK_CUR) ;
-		return bytes ;
+		bytes = sizeof (psf->header) - psf->headindex ;
+		if (bytes <= 0)
+			return 0;
+		printf ("\nR sizeof (header): %u    headindex: %4u    bytes: %d\n", sizeof (psf->header), psf->headindex, bytes) ;
 		} ;
+		
 
 	if (psf->headindex + bytes > psf->headend)
 	{	count = psf_fread (psf->header + psf->headend, 1, bytes - (psf->headend - psf->headindex), psf) ;
@@ -828,27 +757,23 @@ header_read (SF_PRIVATE *psf, void *ptr, int bytes)
 static void
 header_seek (SF_PRIVATE *psf, sf_count_t position, int whence)
 {
-
 	switch (whence)
 	{	case SEEK_SET :
-			if (position > SIGNED_SIZEOF (psf->header))
+			if (position > sizeof (psf->header))
 			{	/* Too much header to cache so just seek instead. */
 				psf_fseek (psf, position, whence) ;
+//printf ("A sizeof (header): %u    headindex: %4u\n", sizeof (psf->header), psf->headindex) ;
 				return ;
 				} ;
 			if (position > psf->headend)
 				psf->headend += psf_fread (psf->header + psf->headend, 1, position - psf->headend, psf) ;
 			psf->headindex = position ;
+//printf ("B sizeof (header): %u    headindex: %4u\n", sizeof (psf->header), psf->headindex) ;
 			break ;
 
 		case SEEK_CUR :
-			if (psf->headindex + position < 0)
+			if (psf->headindex + position < 0 || psf->headindex >= SIGNED_SIZEOF (psf->header))
 				break ;
-
-			if (psf->headindex >= SIGNED_SIZEOF (psf->header))
-			{	psf_fseek (psf, position, whence) ;
-				return ;
-				} ;
 
 			if (psf->headindex + position <= psf->headend)
 			{	psf->headindex += position ;
@@ -856,9 +781,10 @@ header_seek (SF_PRIVATE *psf, sf_count_t position, int whence)
 				} ;
 
 			if (psf->headindex + position > SIGNED_SIZEOF (psf->header))
-			{	/* Need to jump this without caching it. */
-				psf->headindex = psf->headend ;
-				psf_fseek (psf, position, SEEK_CUR) ;
+			{	psf->headend += psf_fread (psf->header + psf->headend, 1, SIGNED_SIZEOF (psf->header) - psf->headend, psf) ;
+				psf->headindex = psf->headend = SIGNED_SIZEOF (psf->header) ;
+
+				psf_fseek (psf, position - (SIGNED_SIZEOF (psf->header) - psf->headend), SEEK_CUR) ;
 				break ;
 				} ;
 
@@ -910,8 +836,9 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 	char			*charptr ;
 	float			*floatptr ;
 	double			*doubleptr ;
+	size_t			size ;
 	char			c ;
-	int				byte_count = 0, count ;
+	int				count = 0, position ;
 
 	if (! format)
 		return psf_ftell (psf) ;
@@ -931,14 +858,14 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 			case 'm' :
 					intptr = va_arg (argptr, unsigned int*) ;
 					ucptr = (unsigned char*) intptr ;
-					byte_count += header_read (psf, ucptr, sizeof (int)) ;
+					count += header_read (psf, ucptr, sizeof (int)) ;
 					*intptr = GET_MARKER (ucptr) ;
 					break ;
 
 			case 'h' :
 					intptr = va_arg (argptr, unsigned int*) ;
 					ucptr = (unsigned char*) intptr ;
-					byte_count += header_read (psf, sixteen_bytes, sizeof (sixteen_bytes)) ;
+					count += header_read (psf, sixteen_bytes, sizeof (sixteen_bytes)) ;
 					{	int k ;
 						intdata = 0 ;
 						for (k = 0 ; k < 16 ; k++)
@@ -949,15 +876,13 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 			case '1' :
 					charptr = va_arg (argptr, char*) ;
-					*charptr = 0 ;
-					byte_count += header_read (psf, charptr, sizeof (char)) ;
+					count += header_read (psf, charptr, sizeof (char)) ;
 					break ;
 
 			case '2' :
 					shortptr = va_arg (argptr, unsigned short*) ;
-					*shortptr = 0 ;
 					ucptr = (unsigned char*) shortptr ;
-					byte_count += header_read (psf, ucptr, sizeof (short)) ;
+					count += header_read (psf, ucptr, sizeof (short)) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						*shortptr = GET_BE_SHORT (ucptr) ;
 					else
@@ -966,8 +891,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 			case '3' :
 					intptr = va_arg (argptr, unsigned int*) ;
-					*intptr = 0 ;
-					byte_count += header_read (psf, sixteen_bytes, 3) ;
+					count += header_read (psf, sixteen_bytes, 3) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						*intptr = GET_BE_3BYTE (sixteen_bytes) ;
 					else
@@ -976,9 +900,8 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 			case '4' :
 					intptr = va_arg (argptr, unsigned int*) ;
-					*intptr = 0 ;
 					ucptr = (unsigned char*) intptr ;
-					byte_count += header_read (psf, ucptr, sizeof (int)) ;
+					count += header_read (psf, ucptr, sizeof (int)) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						*intptr = GET_BE_INT (ucptr) ;
 					else
@@ -986,9 +909,8 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 					break ;
 
 			case '8' :
-					countptr = va_arg (argptr, sf_count_t *) ;
-					*countptr = 0 ;
-					byte_count += header_read (psf, sixteen_bytes, 8) ;
+					countptr = va_arg (argptr, sf_count_t*) ;
+					count += header_read (psf, sixteen_bytes, 8) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						countdata = GET_BE_8BYTE (sixteen_bytes) ;
 					else
@@ -999,7 +921,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 			case 'f' : /* Float conversion */
 					floatptr = va_arg (argptr, float *) ;
 					*floatptr = 0.0 ;
-					byte_count += header_read (psf, floatptr, sizeof (float)) ;
+					count += header_read (psf, floatptr, sizeof (float)) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						*floatptr = float32_be_read ((unsigned char*) floatptr) ;
 					else
@@ -1009,7 +931,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 			case 'd' : /* double conversion */
 					doubleptr = va_arg (argptr, double *) ;
 					*doubleptr = 0.0 ;
-					byte_count += header_read (psf, doubleptr, sizeof (double)) ;
+					count += header_read (psf, doubleptr, sizeof (double)) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						*doubleptr = double64_be_read ((unsigned char*) doubleptr) ;
 					else
@@ -1031,16 +953,16 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 			case 'b' :
 					charptr = va_arg (argptr, char*) ;
-					count = va_arg (argptr, int) ;
-					if (count > 0)
-						byte_count += header_read (psf, charptr, count) ;
+					size = va_arg (argptr, int) ;
+					if (size > 0)
+						count += header_read (psf, charptr, size) ;
 					break ;
 
 			case 'G' :
 					charptr = va_arg (argptr, char*) ;
-					count = va_arg (argptr, int) ;
-					if (count > 0)
-						byte_count += header_gets (psf, charptr, count) ;
+					size = va_arg (argptr, int) ;
+					if (size > 0)
+						count += header_gets (psf, charptr, size) ;
 					break ;
 
 			case 'z' :
@@ -1057,16 +979,16 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 			case 'p' :
 					/* Get the seek position first. */
-					count = va_arg (argptr, int) ;
-					header_seek (psf, count, SEEK_SET) ;
-					byte_count = count ;
+					position = va_arg (argptr, int) ;
+					header_seek (psf, position, SEEK_SET) ;
+					count = position ;
 					break ;
 
 			case 'j' :
 					/* Get the seek position first. */
-					count = va_arg (argptr, int) ;
-					header_seek (psf, count, SEEK_CUR) ;
-					byte_count += count ;
+					position = va_arg (argptr, int) ;
+					header_seek (psf, position, SEEK_CUR) ;
+					count += position ;
 					break ;
 
 			default :
@@ -1078,32 +1000,34 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 	va_end (argptr) ;
 
-	return byte_count ;
+	return count ;
 } /* psf_binheader_readf */
 
 /*-----------------------------------------------------------------------------------------------
 */
 
 sf_count_t
-psf_default_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t samples_from_start)
+psf_default_seek (SF_PRIVATE *psf, int mode, sf_count_t samples_from_start)
 {	sf_count_t position, retval ;
 
 	if (! (psf->blockwidth && psf->dataoffset >= 0))
 	{	psf->error = SFE_BAD_SEEK ;
-		return	PSF_SEEK_ERROR ;
+		return	((sf_count_t) -1) ;
 		} ;
 
 	if (! psf->sf.seekable)
 	{	psf->error = SFE_NOT_SEEKABLE ;
-		return	PSF_SEEK_ERROR ;
+		return	((sf_count_t) -1) ;
 		} ;
 
 	position = psf->dataoffset + psf->blockwidth * samples_from_start ;
 
 	if ((retval = psf_fseek (psf, position, SEEK_SET)) != position)
 	{	psf->error = SFE_SEEK_FAILED ;
-		return PSF_SEEK_ERROR ;
+		return ((sf_count_t) -1) ;
 		} ;
+
+	mode = mode ;
 
 	return samples_from_start ;
 } /* psf_default_seek */
@@ -1112,9 +1036,8 @@ psf_default_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t samples_from_st
 */
 
 void
-psf_hexdump (const void *ptr, int len)
-{	const char *data ;
-	char	ascii [17] ;
+psf_hexdump (void *ptr, int len)
+{	char	ascii [17], *data ;
 	int		k, m ;
 
 	if ((data = ptr) == NULL)
@@ -1147,7 +1070,7 @@ psf_log_SF_INFO (SF_PRIVATE *psf)
 {	psf_log_printf (psf, "---------------------------------\n") ;
 
 	psf_log_printf (psf, " Sample rate :   %d\n", psf->sf.samplerate) ;
-	psf_log_printf (psf, " Frames      :   %D\n", psf->sf.frames) ;
+	psf_log_printf (psf, " Frames      :   %C\n", psf->sf.frames) ;
 	psf_log_printf (psf, " Channels    :   %d\n", psf->sf.channels) ;
 
 	psf_log_printf (psf, " Format      :   0x%X\n", psf->sf.format) ;
@@ -1179,38 +1102,7 @@ psf_memset (void *s, int c, sf_count_t len)
 	return s ;
 } /* psf_memset */
 
-SF_INSTRUMENT *
-psf_instrument_alloc (void)
-{	SF_INSTRUMENT *instr ;
-
-	instr = calloc (1, sizeof (SF_INSTRUMENT)) ;
-
-	if (instr == NULL)
-		return NULL ;
-
-	/* Set non-zero default values. */
-	instr->basenote = -1 ;
-	instr->velocity_lo = -1 ;
-	instr->velocity_hi = -1 ;
-	instr->key_lo = -1 ;
-	instr->key_hi = -1 ;
-
-	return instr ;
-} /* psf_instrument_alloc */
-
-void
-psf_sanitize_string (char * cptr, int len)
-{
-	do
-	{
-		len -- ;
-		cptr [len] = isprint (cptr [len]) ? cptr [len] : '.' ;
-	}
-	while (len > 0) ;
-} /* psf_sanitize_string */
-
-void
-psf_get_date_str (char *str, int maxlen)
+void psf_get_date_str (char *str, int maxlen)
 {	time_t		current ;
 	struct tm	timedata, *tmptr ;
 
@@ -1282,9 +1174,10 @@ u_bitwidth_to_subformat (int bits)
 	return array [((bits + 7) / 8) - 1] ;
 } /* bitwidth_to_subformat */
 
+#endif /* PSF_LOG_PRINTF_ONLY */
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
+** The arch-tag line is a file identity tag for the GNU Arch 
 ** revision control system.
 **
 ** arch-tag: 33e9795e-f717-461a-9feb-65d083a56395

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,43 +21,21 @@
 ** stdout.
 */
 
-#include "sfconfig.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
-
-#if HAVE_SYS_WAIT_H
 #include <sys/wait.h>
-#endif
 
 #include "utils.h"
-
-#if (OS_IS_WIN32)
-
-int
-main (void)
-{
-	puts ("    stdio_test : this test doesn't work on win32.") ;
-	return 0 ;
-} /* main */
-
-#else
-
-#ifndef WIFEXITED
-#define WIFEXITED(s) (((s) & 0xff) == 0)
-#endif
-#ifndef WEXITSTATUS
-#define WEXITSTATUS(s) (((s) & 0xff00) >> 8)
-#endif
-
 
 static size_t	file_length (const char *filename) ;
 static int		file_exists (const char *filename) ;
@@ -93,7 +71,7 @@ stdio_test (const char *filetype)
 
 	snprintf (buffer, sizeof (buffer), "./stdout_test %s > stdio.%s", filetype, filetype) ;
 	if ((retval = system (buffer)))
-	{	retval = WIFEXITED (retval) ? WEXITSTATUS (retval) : 1 ;
+	{	retval = WEXITSTATUS (retval) ;
 		printf ("%s : %s", buffer, (strerror (retval))) ;
 		exit (1) ;
 		} ;
@@ -106,14 +84,14 @@ stdio_test (const char *filetype)
 
 	snprintf (buffer, sizeof (buffer), "./stdin_test %s < stdio.%s", filetype, filetype) ;
 	if ((retval = system (buffer)))
-	{	retval = WIFEXITED (retval) ? WEXITSTATUS (retval) : 1 ;
+	{	retval = WEXITSTATUS (retval) ;
 		printf ("%s : %s", buffer, (strerror (retval))) ;
 		exit (1) ;
 		} ;
 
 	snprintf (buffer, sizeof (buffer), "rm stdio.%s", filetype) ;
 	if ((retval = system (buffer)))
-	{	retval = WIFEXITED (retval) ? WEXITSTATUS (retval) : 1 ;
+	{	retval = WEXITSTATUS (retval) ;
 		printf ("%s : %s", buffer, (strerror (retval))) ;
 		exit (1) ;
 		} ;
@@ -147,9 +125,6 @@ file_exists (const char *filename)
 
 	return 1 ;
 } /* file_exists */
-
-#endif
-
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch 

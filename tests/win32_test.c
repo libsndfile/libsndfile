@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,13 +16,13 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include "sfconfig.h"
+#include "config.h"
 #include "sndfile.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
@@ -35,8 +35,6 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
-#define SIGNED_SIZEOF(x)	((int) sizeof (x))
 
 #if defined (__CYGWIN__)
 
@@ -111,7 +109,7 @@ show_fstat_error (void)
 
 	puts ("\n64 bit fstat() test.\n--------------------") ;
 
-	printf ("0) Create a file, write %d bytes and close it.\n", SIGNED_SIZEOF (data)) ;
+	printf ("0) Create a file, write %d bytes and close it.\n", sizeof (data)) ;
 	mode = O_WRONLY | O_CREAT | O_TRUNC | O_BINARY ;
 	flags = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH ;
 	if ((fd = open (filename, mode, flags)) < 0)
@@ -121,7 +119,7 @@ show_fstat_error (void)
 	write (fd, data, sizeof (data)) ;
 	close (fd) ;
 
-	printf ("1) Re-open file in read/write mode and write another %d bytes at the end.\n", SIGNED_SIZEOF (data)) ;
+	printf ("1) Re-open file in read/write mode and write another %d bytes at the end.\n", sizeof (data)) ;
 	mode = O_RDWR | O_BINARY ;
 	flags = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH ;
 	if ((fd = open (filename, mode, flags)) < 0)
@@ -165,7 +163,7 @@ show_lseek_error (void)
 
 	puts ("\n64 bit lseek() test.\n--------------------") ;
 
-	printf ("0) Create a file, write %d bytes and close it.\n", SIGNED_SIZEOF (data)) ;
+	printf ("0) Create a file, write %d bytes and close it.\n", sizeof (data)) ;
 	mode = O_WRONLY | O_CREAT | O_TRUNC | O_BINARY ;
 	flags = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH ;
 	if ((fd = open (filename, mode, flags)) < 0)
@@ -175,7 +173,7 @@ show_lseek_error (void)
 	write (fd, data, sizeof (data)) ;
 	close (fd) ;
 
-	printf ("1) Re-open file in read/write mode and write another %d bytes at the end.\n", SIGNED_SIZEOF (data)) ;
+	printf ("1) Re-open file in read/write mode and write another %d bytes at the end.\n", sizeof (data)) ;
 	mode = O_RDWR | O_BINARY ;
 	flags = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH ;
 	if ((fd = open (filename, mode, flags)) < 0)

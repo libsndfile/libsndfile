@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002,2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,14 +16,13 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	"sfconfig.h"
-
 #include	<stdio.h>
 #include	<fcntl.h>
 #include	<string.h>
 #include	<ctype.h>
 
 #include	"sndfile.h"
+#include	"config.h"
 #include	"sfendian.h"
 #include	"common.h"
 

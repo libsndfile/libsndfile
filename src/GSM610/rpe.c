@@ -102,7 +102,7 @@ static void Weighting_filter (
 		 * those we lost when replacing L_MULT by '*'.
 		 */
 
-		L_result = SASR_L( L_result, 13 );
+		L_result = SASR( L_result, 13 );
 		x[k] =  (  L_result < MIN_WORD ? MIN_WORD
 			: (L_result > MAX_WORD ? MAX_WORD : L_result ));
 	}
@@ -137,7 +137,7 @@ static void RPE_grid_selection (
 	 *
 	 *	for (i = 0; i <= 12; i++) {
 	 *
-	 *		temp1    = SASR_W( x[m + 3*i], 2 );
+	 *		temp1    = SASR( x[m + 3*i], 2 );
 	 *
 	 *		assert(temp1 != MIN_WORD);
 	 *
@@ -153,7 +153,7 @@ static void RPE_grid_selection (
 	 */
 
 #undef	STEP
-#define	STEP( m, i )		L_temp = SASR_W( x[m + 3 * i], 2 );	\
+#define	STEP( m, i )		L_temp = SASR( x[m + 3 * i], 2 );	\
 				L_result += L_temp * L_temp;
 
 	/* common part of 0 and 3 */
@@ -228,7 +228,7 @@ static void APCM_quantization_xmaxc_to_exp_mant (
 	 */
 
 	expon = 0;
-	if (xmaxc > 15) expon = SASR_W(xmaxc, 3) - 1;
+	if (xmaxc > 15) expon = SASR(xmaxc, 3) - 1;
 	mant = xmaxc - (expon << 3);
 
 	if (mant == 0) {
@@ -278,13 +278,13 @@ static void APCM_quantization (
 	 */
 
 	expon   = 0;
-	temp  = SASR_W( xmax, 9 );
+	temp  = SASR( xmax, 9 );
 	itest = 0;
 
 	for (i = 0; i <= 5; i++) {
 
 		itest |= (temp <= 0);
-		temp = SASR_W( temp, 1 );
+		temp = SASR( temp, 1 );
 
 		assert(expon <= 5);
 		if (itest == 0) expon++;		/* expon = add (expon, 1) */
@@ -294,7 +294,7 @@ static void APCM_quantization (
 	temp = expon + 5;
 
 	assert(temp <= 11 && temp >= 0);
-	xmaxc = gsm_add( SASR_W(xmax, temp), (word) (expon << 3) );
+	xmaxc = gsm_add( SASR(xmax, temp), expon << 3 );
 
 	/*   Quantizing and coding of the xM[0..12] RPE sequence
 	 *   to get the xMc[0..12]
@@ -328,7 +328,7 @@ static void APCM_quantization (
 
 		temp = xM[i] << temp1;
 		temp = GSM_MULT( temp, temp2 );
-		temp = SASR_W(temp, 12);
+		temp = SASR(temp, 12);
 		xMc[i] = temp + 4;		/* see note below */
 	}
 
@@ -355,6 +355,7 @@ static void APCM_inverse_quantization (
 {
 	int	i;
 	word	temp, temp1, temp2, temp3;
+	longword	ltmp;
 
 	assert( mant >= 0 && mant <= 7 ); 
 

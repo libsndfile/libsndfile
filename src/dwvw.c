@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002,2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -26,13 +26,12 @@
 ** Lidstrom and is copyright 1993 by NuEdge Development".
 */
 
-#include	"sfconfig.h"
-
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
 
 #include	"sndfile.h"
+#include	"config.h"
 #include	"sfendian.h"
 #include	"float_cast.h"
 #include	"common.h"
@@ -55,10 +54,10 @@ static sf_count_t dwvw_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t dwvw_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t dwvw_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static sf_count_t dwvw_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
-static sf_count_t dwvw_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
-static sf_count_t dwvw_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
-static sf_count_t dwvw_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
+static sf_count_t dwvw_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
+static sf_count_t dwvw_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
+static sf_count_t dwvw_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
+static sf_count_t dwvw_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
 static sf_count_t	dwvw_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 static int	dwvw_close	(SF_PRIVATE *psf) ;
@@ -66,7 +65,7 @@ static int	dwvw_close	(SF_PRIVATE *psf) ;
 static int	dwvw_decode_data (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int *ptr, int len) ;
 static int	dwvw_decode_load_bits (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int bit_count) ;
 
-static int	dwvw_encode_data (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, const int *ptr, int len) ;
+static int	dwvw_encode_data (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int *ptr, int len) ;
 static void dwvw_encode_store_bits (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int data, int new_bits) ;
 static void dwvw_read_reset (DWVW_PRIVATE *pdwvw) ;
 
@@ -78,21 +77,18 @@ int
 dwvw_init (SF_PRIVATE *psf, int bitwidth)
 {	DWVW_PRIVATE	*pdwvw ;
 
-	if (psf->codec_data != NULL)
-	{	psf_log_printf (psf, "*** psf->codec_data is not NULL.\n") ;
-		return SFE_INTERNAL ;
-		} ;
-
 	if (bitwidth > 24)
 		return SFE_DWVW_BAD_BITWIDTH ;
 
 	if (psf->mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
-	if ((pdwvw = calloc (1, sizeof (DWVW_PRIVATE))) == NULL)
+	if (! (pdwvw = malloc (sizeof (DWVW_PRIVATE))))
 		return SFE_MALLOC_FAILED ;
 
-	psf->codec_data = (void*) pdwvw ;
+	psf->fdata = (void*) pdwvw ;
+
+	memset (pdwvw, 0, sizeof (DWVW_PRIVATE)) ;
 
 	pdwvw->bit_width 	= bitwidth ;
 	pdwvw->dwm_maxsize	= bitwidth / 2 ;
@@ -115,13 +111,13 @@ dwvw_init (SF_PRIVATE *psf, int bitwidth)
 		psf->write_double	= dwvw_write_d ;
 		} ;
 
-	psf->codec_close = dwvw_close ;
-	psf->seek = dwvw_seek ;
+	psf->seek	= dwvw_seek ;
+	psf->close	= dwvw_close ;
 
-	/* FIXME : This is bogus. */
+	/* FIXME : This s bogus. */
 	psf->sf.frames = SF_COUNT_MAX ;
 	psf->datalength = psf->sf.frames ;
-	/* EMXIF : This is bogus. */
+	/* EMXIF : This s bogus. */
 
 	return 0 ;
 } /* dwvw_init */
@@ -133,9 +129,9 @@ static int
 dwvw_close (SF_PRIVATE *psf)
 {	DWVW_PRIVATE *pdwvw ;
 
-	if (psf->codec_data == NULL)
+	if (! psf->fdata)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
+	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
 
 	if (psf->mode == SFM_WRITE)
 	{	static int last_values [12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } ;
@@ -154,15 +150,17 @@ dwvw_close (SF_PRIVATE *psf)
 } /* dwvw_close */
 
 static sf_count_t
-dwvw_seek	(SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
+dwvw_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 {	DWVW_PRIVATE *pdwvw ;
 
-	if (! psf->codec_data)
+	mode = mode ;
+
+	if (! psf->fdata)
 	{	psf->error = SFE_INTERNAL ;
-		return PSF_SEEK_ERROR ;
+		return ((sf_count_t) -1) ;
 		} ;
 
-	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
+	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
 
 	if (offset == 0)
 	{	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
@@ -171,7 +169,7 @@ dwvw_seek	(SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 		} ;
 
 	psf->error = SFE_BAD_SEEK ;
-	return	PSF_SEEK_ERROR ;
+	return	((sf_count_t) -1) ;
 } /* dwvw_seek */
 
 
@@ -185,12 +183,12 @@ dwvw_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	int		k, bufferlen, readcount = 0, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->codec_data)
+	if (! psf->fdata)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
+	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = (int*) psf->buffer ;
+	bufferlen = SF_BUFFER_LEN / sizeof (int) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
@@ -212,9 +210,9 @@ dwvw_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	int			readcount, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->codec_data)
+	if (! psf->fdata)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
+	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
 
 	while (len > 0)
 	{	readcount = (len > 0x10000000) ? 0x10000000 : (int) len ;
@@ -239,14 +237,14 @@ dwvw_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float	normfact ;
 
-	if (! psf->codec_data)
+	if (! psf->fdata)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
+	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x80000000) : 1.0 ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = (int*) psf->buffer ;
+	bufferlen = SF_BUFFER_LEN / sizeof (int) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
@@ -270,14 +268,14 @@ dwvw_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	double 	normfact ;
 
-	if (! psf->codec_data)
+	if (! psf->fdata)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
+	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x80000000) : 1.0 ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = (int*) psf->buffer ;
+	bufferlen = SF_BUFFER_LEN / sizeof (int) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
@@ -471,7 +469,7 @@ dump_bits (DWVW_PRIVATE *pdwvw)
 				} ;
 
 static int
-dwvw_encode_data (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, const int *ptr, int len)
+dwvw_encode_data (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int *ptr, int len)
 {	int	count ;
 	int delta_width_modifier, delta, delta_negative, delta_width, extra_bit ;
 
@@ -546,18 +544,18 @@ dwvw_encode_data (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, const int *ptr, int len)
 } /* dwvw_encode_data */
 
 static sf_count_t
-dwvw_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
+dwvw_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 {	DWVW_PRIVATE *pdwvw ;
 	int		*iptr ;
 	int		k, bufferlen, writecount = 0, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->codec_data)
+	if (! psf->fdata)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
+	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = (int*) psf->buffer ;
+	bufferlen = SF_BUFFER_LEN / sizeof (int) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -574,14 +572,14 @@ dwvw_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 } /* dwvw_write_s */
 
 static sf_count_t
-dwvw_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
+dwvw_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 {	DWVW_PRIVATE *pdwvw ;
 	int			writecount, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->codec_data)
+	if (! psf->fdata)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
+	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
 
 	while (len > 0)
 	{	writecount = (len > 0x10000000) ? 0x10000000 : (int) len ;
@@ -599,21 +597,21 @@ dwvw_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 } /* dwvw_write_i */
 
 static sf_count_t
-dwvw_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
+dwvw_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 {	DWVW_PRIVATE *pdwvw ;
 	int			*iptr ;
 	int			k, bufferlen, writecount = 0, count ;
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (! psf->codec_data)
+	if (! psf->fdata)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
+	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = (int*) psf->buffer ;
+	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -630,21 +628,21 @@ dwvw_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 } /* dwvw_write_f */
 
 static sf_count_t
-dwvw_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
+dwvw_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 {	DWVW_PRIVATE *pdwvw ;
 	int			*iptr ;
 	int			k, bufferlen, writecount = 0, count ;
 	sf_count_t	total = 0 ;
 	double 		normfact ;
 
-	if (! psf->codec_data)
+	if (! psf->fdata)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
+	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = (int*) psf->buffer ;
+	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -659,7 +657,6 @@ dwvw_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 	return total ;
 } /* dwvw_write_d */
-
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch 

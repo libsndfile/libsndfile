@@ -27,21 +27,18 @@
 #ifndef G72X_PRIVATE_H
 #define G72X_PRIVATE_H
 
-#ifdef __cplusplus
-#error "This code is not designed to be compiled with a C++ compiler."
-#endif
 
 /*
 ** The following is the definition of the state structure used by the
 ** G.721/G.723 encoder and decoder to preserve their internal state
-** between successive calls.  The meanings of the majority of the state
-** structure fields are explained in detail in the CCITT Recommendation
-** G.721.  The field names are essentially identical to variable names
-** in the bit level description of the coding algorithm included in this
+** between successive calls.  The meanings of the majority of the state 
+** structure fields are explained in detail in the CCITT Recommendation 
+** G.721.  The field names are essentially identical to variable names 
+** in the bit level description of the coding algorithm included in this 
 ** Recommendation.
 */
 
-struct g72x_state
+typedef struct private_g72x
 {	long  yl;	/* Locked or steady state step size multiplier. */
 	short yu;	/* Unlocked or non-steady state step size multiplier. */
 	short dms;	/* Short term energy estimate. */
@@ -65,20 +62,22 @@ struct g72x_state
 					** format.
 					*/
 	char td;	/* delayed tone detect, new in 1988 version */
-
-	/*	The following struct members were added for libsndfile. The original
-	**	code worked by calling a set of functions on a sample by sample basis
-	**	which is slow on architectures like Intel x86. For libsndfile, this
+	
+	/*	The following struct members were added for libsndfile. The original 
+	**	code worked by calling a set of functions on a sample by sample basis 
+	**	which is slow on architectures like Intel x86. For libsndfile, this 
 	**	was changed so that the encoding and decoding routines could work on
 	**	a block of samples at a time to reduce the function call overhead.
 	*/
-	int		(*encoder) (int, struct g72x_state* state) ;
-	int		(*decoder) (int, struct g72x_state* state) ;
+	int		(*encoder) (int, struct private_g72x* state) ;
+	int		(*decoder) (int, struct private_g72x* state) ;
+	
+	int		codec_bits ;
+	int		byte_index, sample_index ;
+	
+} G72x_STATE ;
 
-	int		codec_bits, blocksize, samplesperblock ;
-} ;
 
-typedef struct g72x_state G72x_STATE ;
 
 int	predictor_zero (G72x_STATE *state_ptr);
 
@@ -104,13 +103,15 @@ int g723_24_decoder	(int code, G72x_STATE *state_ptr);
 int g723_40_encoder	(int sample, G72x_STATE *state_ptr);
 int g723_40_decoder	(int code, G72x_STATE *state_ptr);
 
+int unpack_bytes (G72x_DATA *data, int bits) ;
+int pack_bytes (G72x_DATA *data, int bits) ;
+
 void private_init_state (G72x_STATE *state_ptr) ;
 
 #endif /* G72X_PRIVATE_H */
-
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
+** The arch-tag line is a file identity tag for the GNU Arch 
 ** revision control system.
 **
 ** arch-tag: d9ad4da7-0fa3-471d-8020-720b5cfb5e5b

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,16 +16,16 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	"sfconfig.h"
-
 #include	<stdio.h>
 #include	<fcntl.h>
 #include	<string.h>
 #include	<ctype.h>
 
 #include	"sndfile.h"
+#include	"config.h"
 #include	"sfendian.h"
 #include	"common.h"
+#include	"au.h"
 
 /*------------------------------------------------------------------------------
 ** Macros to handle big/little endian issues.
@@ -129,7 +129,7 @@ au_open	(SF_PRIVATE *psf)
 		psf->write_header = au_write_header ;
 		} ;
 
-	psf->container_close = au_close ;
+	psf->close = au_close ;
 
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
@@ -162,17 +162,26 @@ au_open	(SF_PRIVATE *psf)
 				break ;
 
 		case SF_FORMAT_G721_32 :
-				error = g72x_init (psf) ;
+				if (psf->mode == SFM_READ)
+					error = au_g72x_reader_init (psf, AU_H_G721_32) ;
+				else if (psf->mode == SFM_WRITE)
+					error = au_g72x_writer_init (psf, AU_H_G721_32) ;
 				psf->sf.seekable = SF_FALSE ;
 				break ;
 
 		case SF_FORMAT_G723_24 :
-				error = g72x_init (psf) ;
+				if (psf->mode == SFM_READ)
+					error = au_g72x_reader_init (psf, AU_H_G723_24) ;
+				else if (psf->mode == SFM_WRITE)
+					error = au_g72x_writer_init (psf, AU_H_G723_24) ;
 				psf->sf.seekable = SF_FALSE ;
 				break ;
 
 		case SF_FORMAT_G723_40 :
-				error = g72x_init (psf) ;
+				if (psf->mode == SFM_READ)
+					error = au_g72x_reader_init (psf, AU_H_G723_40) ;
+				else if (psf->mode == SFM_WRITE)
+					error = au_g72x_writer_init (psf, AU_H_G723_40) ;
 				psf->sf.seekable = SF_FALSE ;
 				break ;
 		/* Lite remove end */
@@ -182,6 +191,37 @@ au_open	(SF_PRIVATE *psf)
 
 	return error ;
 } /* au_open */
+
+int
+au_nh_open	(SF_PRIVATE *psf)
+{
+	if (psf->mode == SFM_RDWR)
+		return SFE_BAD_OPEN_FORMAT ;
+
+	if (psf_fseek (psf, psf->dataoffset, SEEK_SET))
+		return SFE_BAD_SEEK ;
+
+	psf_log_printf (psf, "Header-less u-law encoded file.\n") ;
+	psf_log_printf (psf, "Setting up for 8kHz, mono, u-law.\n") ;
+
+	psf->sf.format = SF_FORMAT_AU | SF_FORMAT_ULAW ;
+
+ 	psf->dataoffset		= 0 ;
+	psf->endian			= 0 ;	/* Irrelevant but it must be something. */
+	psf->sf.samplerate	= 8000 ;
+	psf->sf.channels	= 1 ;
+	psf->bytewidth		= 1 ;	/* Before decoding */
+
+	ulaw_init (psf) ;
+
+	psf->close = au_close ;
+
+	psf->blockwidth = 1 ;
+	psf->sf.frames = psf->filelength ;
+	psf->datalength = psf->filelength - AU_DATA_OFFSET ;
+
+	return 0 ;
+} /* au_nh_open */
 
 /*------------------------------------------------------------------------------
 */
@@ -294,7 +334,6 @@ au_read_header (SF_PRIVATE *psf)
 {	AU_FMT	au_fmt ;
 	int		marker, dword ;
 
-	memset (&au_fmt, 0, sizeof (au_fmt)) ;
 	psf_binheader_readf (psf, "pm", 0, &marker) ;
 	psf_log_printf (psf, "%M\n", marker) ;
 
@@ -340,6 +379,8 @@ au_read_header (SF_PRIVATE *psf)
 
 	if (psf_ftell (psf) < psf->dataoffset)
 		psf_binheader_readf (psf, "j", psf->dataoffset - psf_ftell (psf)) ;
+
+	psf->close = au_close ;
 
 	psf->sf.samplerate	= au_fmt.samplerate ;
 	psf->sf.channels 	= au_fmt.channels ;

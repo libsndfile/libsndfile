@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,9 +16,8 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	"sfconfig.h"
-
 #include	"sndfile.h"
+#include	"config.h"
 #include	"sfendian.h"
 #include	"float_cast.h"
 #include	"common.h"
@@ -67,41 +66,88 @@ static sf_count_t	pcm_read_let2d	(SF_PRIVATE *psf, double *ptr, sf_count_t len) 
 static sf_count_t	pcm_read_bei2d	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 static sf_count_t	pcm_read_lei2d	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static sf_count_t	pcm_write_s2sc	(SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_s2uc	(SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_s2bes (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_s2les (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_s2bet (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_s2let (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_s2bei (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_s2lei (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
 
-static sf_count_t	pcm_write_i2sc	(SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_i2uc	(SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_i2bes (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_i2les (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_i2bet (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_i2let (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_i2bei (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_i2lei (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_s2sc	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_s2uc	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_s2bes (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_s2les (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_s2bet (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_s2let (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_s2bei (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_s2lei (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
 
-static sf_count_t	pcm_write_f2sc	(SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_f2uc	(SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_f2bes (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_f2les (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_f2bet (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_f2let (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_f2bei (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_f2lei (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_i2sc	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_i2uc	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_i2bes (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_i2les (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_i2bet (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_i2let (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_i2bei (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_i2lei (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 
-static sf_count_t	pcm_write_d2sc	(SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_d2uc	(SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_d2bes (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_d2les (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_d2bet (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_d2let (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_d2bei (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
-static sf_count_t	pcm_write_d2lei (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_f2sc	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_f2uc	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_f2bes (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_f2les (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_f2bet (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_f2let (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_f2bei (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_f2lei (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
+
+static sf_count_t	pcm_write_d2sc	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_d2uc	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_d2bes (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_d2les (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_d2bet (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_d2let (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_d2bei (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t	pcm_write_d2lei (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+
+static void sc2s_array	(signed char *src, int count, short *dest) ;
+static void uc2s_array	(unsigned char *src, int count, short *dest) ;
+static void bet2s_array (tribyte *src, int count, short *dest) ;
+static void let2s_array (tribyte *src, int count, short *dest) ;
+static void bei2s_array (int *src, int count, short *dest) ;
+static void lei2s_array (int *src, int count, short *dest) ;
+
+static void sc2i_array	(signed char *src, int count, int *dest) ;
+static void uc2i_array	(unsigned char *src, int count, int *dest) ;
+static void bes2i_array (short *src, int count, int *dest) ;
+static void les2i_array (short *src, int count, int *dest) ;
+static void bet2i_array (tribyte *src, int count, int *dest) ;
+static void let2i_array (tribyte *src, int count, int *dest) ;
+
+static void sc2f_array	(signed char *src, int count, float *dest, float normfact) ;
+static void uc2f_array	(unsigned char *src, int count, float *dest, float normfact) ;
+static void bes2f_array (short *src, int count, float *dest, float normfact) ;
+static void les2f_array (short *src, int count, float *dest, float normfact) ;
+static void bet2f_array (tribyte *src, int count, float *dest, float normfact) ;
+static void let2f_array (tribyte *src, int count, float *dest, float normfact) ;
+static void bei2f_array (int *src, int count, float *dest, float normfact) ;
+static void lei2f_array (int *src, int count, float *dest, float normfact) ;
+
+static void sc2d_array	(signed char *src, int count, double *dest, double normfact) ;
+static void uc2d_array	(unsigned char *src, int count, double *dest, double normfact) ;
+static void bes2d_array (short *src, int count, double *dest, double normfact) ;
+static void les2d_array (short *src, int count, double *dest, double normfact) ;
+static void bet2d_array (tribyte *src, int count, double *dest, double normfact) ;
+static void let2d_array (tribyte *src, int count, double *dest, double normfact) ;
+static void bei2d_array (int *src, int count, double *dest, double normfact) ;
+static void lei2d_array (int *src, int count, double *dest, double normfact) ;
+
+static void s2sc_array	(short *src, signed char *dest, int count) ;
+static void s2uc_array	(short *src, unsigned char *dest, int count) ;
+static void s2bet_array (short *src, tribyte *dest, int count) ;
+static void s2let_array (short *src, tribyte *dest, int count) ;
+static void s2bei_array (short *src, int *dest, int count) ;
+static void s2lei_array (short *src, int *dest, int count) ;
+
+static void i2sc_array	(int *src, signed char *dest, int count) ;
+static void i2uc_array	(int *src, unsigned char *dest, int count) ;
+static void i2bes_array (int *src, short *dest, int count) ;
+static void i2les_array (int *src, short *dest, int count) ;
+static void i2bet_array (int *src, tribyte *dest, int count) ;
+static void i2let_array (int *src, tribyte *dest, int count) ;
 
 /*-----------------------------------------------------------------------------------------------
 */
@@ -120,9 +166,8 @@ pcm_init (SF_PRIVATE *psf)
 {	int chars = 0 ;
 
 	if (psf->bytewidth == 0 || psf->sf.channels == 0)
-	{	psf_log_printf (psf, "pcm_init : internal error : bytewitdh = %d, channels = %d\n", psf->bytewidth, psf->sf.channels) ;
 		return SFE_INTERNAL ;
-		} ;
+
 
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
@@ -269,451 +314,24 @@ pcm_init (SF_PRIVATE *psf)
 	return 0 ;
 } /* pcm_init */
 
-/*==============================================================================
-*/
-
-static inline void
-sc2s_array	(signed char *src, int count, short *dest)
-{	while (--count >= 0)
-	{	dest [count] = src [count] << 8 ;
-		} ;
-} /* sc2s_array */
-
-static inline void
-uc2s_array	(unsigned char *src, int count, short *dest)
-{	while (--count >= 0)
-	{	dest [count] = (((short) src [count]) - 0x80) << 8 ;
-		} ;
-} /* uc2s_array */
-
-static inline void
-let2s_array (tribyte *src, int count, short *dest)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		dest [count] = LET2H_SHORT_PTR (ucptr) ;
-		} ;
-} /* let2s_array */
-
-static inline void
-bet2s_array (tribyte *src, int count, short *dest)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		dest [count] = BET2H_SHORT_PTR (ucptr) ;
-			} ;
-} /* bet2s_array */
-
-static inline void
-lei2s_array (int *src, int count, short *dest)
-{	int value ;
-
-	while (--count >= 0)
-	{	value = LEI2H_INT (src [count]) ;
-		dest [count] = value >> 16 ;
-		} ;
-} /* lei2s_array */
-
-static inline void
-bei2s_array (int *src, int count, short *dest)
-{	int value ;
-
-	while (--count >= 0)
-	{	value = BEI2H_INT (src [count]) ;
-		dest [count] = value >> 16 ;
-		} ;
-} /* bei2s_array */
-
-/*--------------------------------------------------------------------------
-*/
-
-static inline void
-sc2i_array	(signed char *src, int count, int *dest)
-{	while (--count >= 0)
-	{	dest [count] = ((int) src [count]) << 24 ;
-		} ;
-} /* sc2i_array */
-
-static inline void
-uc2i_array	(unsigned char *src, int count, int *dest)
-{	while (--count >= 0)
-	{	dest [count] = (((int) src [count]) - 128) << 24 ;
-		} ;
-} /* uc2i_array */
-
-static inline void
-bes2i_array (short *src, int count, int *dest)
-{	short value ;
-
-	while (--count >= 0)
-	{	value = BES2H_SHORT (src [count]) ;
-		dest [count] = value << 16 ;
-		} ;
-} /* bes2i_array */
-
-static inline void
-les2i_array (short *src, int count, int *dest)
-{	short value ;
-
-	while (--count >= 0)
-	{	value = LES2H_SHORT (src [count]) ;
-		dest [count] = value << 16 ;
-		} ;
-} /* les2i_array */
-
-static inline void
-bet2i_array (tribyte *src, int count, int *dest)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		dest [count] = BET2H_INT_PTR (ucptr) ;
-			} ;
-} /* bet2i_array */
-
-static inline void
-let2i_array (tribyte *src, int count, int *dest)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		dest [count] = LET2H_INT_PTR (ucptr) ;
-		} ;
-} /* let2i_array */
-
-/*--------------------------------------------------------------------------
-*/
-
-static inline void
-sc2f_array	(signed char *src, int count, float *dest, float normfact)
-{	while (--count >= 0)
-		dest [count] = ((float) src [count]) * normfact ;
-} /* sc2f_array */
-
-static inline void
-uc2f_array	(unsigned char *src, int count, float *dest, float normfact)
-{	while (--count >= 0)
-		dest [count] = (((int) src [count]) - 128) * normfact ;
-} /* uc2f_array */
-
-static inline void
-les2f_array (short *src, int count, float *dest, float normfact)
-{	short	value ;
-
-	while (--count >= 0)
-	{	value = src [count] ;
-		value = LES2H_SHORT (value) ;
-		dest [count] = ((float) value) * normfact ;
-		} ;
-} /* les2f_array */
-
-static inline void
-bes2f_array (short *src, int count, float *dest, float normfact)
-{	short			value ;
-
-	while (--count >= 0)
-	{	value = src [count] ;
-		value = BES2H_SHORT (value) ;
-		dest [count] = ((float) value) * normfact ;
-		} ;
-} /* bes2f_array */
-
-static inline void
-let2f_array (tribyte *src, int count, float *dest, float normfact)
-{	unsigned char	*ucptr ;
-	int 			value ;
-
-	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = LET2H_INT_PTR (ucptr) ;
-		dest [count] = ((float) value) * normfact ;
-		} ;
-} /* let2f_array */
-
-static inline void
-bet2f_array (tribyte *src, int count, float *dest, float normfact)
-{	unsigned char	*ucptr ;
-	int				value ;
-
-	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = BET2H_INT_PTR (ucptr) ;
-		dest [count] = ((float) value) * normfact ;
-			} ;
-} /* bet2f_array */
-
-static inline void
-lei2f_array (int *src, int count, float *dest, float normfact)
-{	int 			value ;
-
-	while (--count >= 0)
-	{	value = src [count] ;
-		value = LEI2H_INT (value) ;
-		dest [count] = ((float) value) * normfact ;
-		} ;
-} /* lei2f_array */
-
-static inline void
-bei2f_array (int *src, int count, float *dest, float normfact)
-{	int 			value ;
-
-	while (--count >= 0)
-	{	value = src [count] ;
-		value = BEI2H_INT (value) ;
-		dest [count] = ((float) value) * normfact ;
-		} ;
-} /* bei2f_array */
-
-/*--------------------------------------------------------------------------
-*/
-
-static inline void
-sc2d_array	(signed char *src, int count, double *dest, double normfact)
-{	while (--count >= 0)
-		dest [count] = ((double) src [count]) * normfact ;
-} /* sc2d_array */
-
-static inline void
-uc2d_array	(unsigned char *src, int count, double *dest, double normfact)
-{	while (--count >= 0)
-		dest [count] = (((int) src [count]) - 128) * normfact ;
-} /* uc2d_array */
-
-static inline void
-les2d_array (short *src, int count, double *dest, double normfact)
-{	short	value ;
-
-	while (--count >= 0)
-	{	value = src [count] ;
-		value = LES2H_SHORT (value) ;
-		dest [count] = ((double) value) * normfact ;
-		} ;
-} /* les2d_array */
-
-static inline void
-bes2d_array (short *src, int count, double *dest, double normfact)
-{	short	value ;
-
-	while (--count >= 0)
-	{	value = src [count] ;
-		value = BES2H_SHORT (value) ;
-		dest [count] = ((double) value) * normfact ;
-		} ;
-} /* bes2d_array */
-
-static inline void
-let2d_array (tribyte *src, int count, double *dest, double normfact)
-{	unsigned char	*ucptr ;
-	int				value ;
-
-	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = LET2H_INT_PTR (ucptr) ;
-		dest [count] = ((double) value) * normfact ;
-		} ;
-} /* let2d_array */
-
-static inline void
-bet2d_array (tribyte *src, int count, double *dest, double normfact)
-{	unsigned char	*ucptr ;
-	int				value ;
-
-	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = (ucptr [0] << 24) | (ucptr [1] << 16) | (ucptr [2] << 8) ;
-		dest [count] = ((double) value) * normfact ;
-		} ;
-} /* bet2d_array */
-
-static inline void
-lei2d_array (int *src, int count, double *dest, double normfact)
-{	int 	value ;
-
-	while (--count >= 0)
-	{	value = src [count] ;
-		value = LEI2H_INT (value) ;
-		dest [count] = ((double) value) * normfact ;
-		} ;
-} /* lei2d_array */
-
-static inline void
-bei2d_array (int *src, int count, double *dest, double normfact)
-{	int 	value ;
-
-	while (--count >= 0)
-	{	value = src [count] ;
-		value = BEI2H_INT (value) ;
-		dest [count] = ((double) value) * normfact ;
-		} ;
-} /* bei2d_array */
-
-/*--------------------------------------------------------------------------
-*/
-
-static inline void
-s2sc_array	(const short *src, signed char *dest, int count)
-{	while (--count >= 0)
-		dest [count] = src [count] >> 8 ;
-} /* s2sc_array */
-
-static inline void
-s2uc_array	(const short *src, unsigned char *dest, int count)
-{	while (--count >= 0)
-		dest [count] = (src [count] >> 8) + 0x80 ;
-} /* s2uc_array */
-
-static inline void
-s2let_array (const short *src, tribyte *dest, int count)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) dest) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		ucptr [0] = 0 ;
-		ucptr [1] = src [count] ;
-		ucptr [2] = src [count] >> 8 ;
-		} ;
-} /* s2let_array */
-
-static inline void
-s2bet_array (const short *src, tribyte *dest, int count)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) dest) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		ucptr [2] = 0 ;
-		ucptr [1] = src [count] ;
-		ucptr [0] = src [count] >> 8 ;
-		} ;
-} /* s2bet_array */
-
-static inline void
-s2lei_array (const short *src, int *dest, int count)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) dest) + 4 * count ;
-	while (--count >= 0)
-	{	ucptr -= 4 ;
-		ucptr [0] = 0 ;
-		ucptr [1] = 0 ;
-		ucptr [2] = src [count] ;
-		ucptr [3] = src [count] >> 8 ;
-		} ;
-} /* s2lei_array */
-
-static inline void
-s2bei_array (const short *src, int *dest, int count)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) dest) + 4 * count ;
-	while (--count >= 0)
-	{	ucptr -= 4 ;
-		ucptr [0] = src [count] >> 8 ;
-		ucptr [1] = src [count] ;
-		ucptr [2] = 0 ;
-		ucptr [3] = 0 ;
-		} ;
-} /* s2bei_array */
-
-/*--------------------------------------------------------------------------
-*/
-
-static inline void
-i2sc_array	(const int *src, signed char *dest, int count)
-{	while (--count >= 0)
-		dest [count] = (src [count] >> 24) ;
-} /* i2sc_array */
-
-static inline void
-i2uc_array	(const int *src, unsigned char *dest, int count)
-{	while (--count >= 0)
-		dest [count] = ((src [count] >> 24) + 128) ;
-} /* i2uc_array */
-
-static inline void
-i2bes_array (const int *src, short *dest, int count)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) dest) + 2 * count ;
-	while (--count >= 0)
-	{	ucptr -= 2 ;
-		ucptr [0] = src [count] >> 24 ;
-		ucptr [1] = src [count] >> 16 ;
-		} ;
-} /* i2bes_array */
-
-static inline void
-i2les_array (const int *src, short *dest, int count)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) dest) + 2 * count ;
-	while (--count >= 0)
-	{	ucptr -= 2 ;
-		ucptr [0] = src [count] >> 16 ;
-		ucptr [1] = src [count] >> 24 ;
-		} ;
-} /* i2les_array */
-
-static inline void
-i2let_array (const int *src, tribyte *dest, int count)
-{	unsigned char	*ucptr ;
-	int				value ;
-
-	ucptr = ((unsigned char*) dest) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = src [count] >> 8 ;
-		ucptr [0] = value ;
-		ucptr [1] = value >> 8 ;
-		ucptr [2] = value >> 16 ;
-		} ;
-} /* i2let_array */
-
-static inline void
-i2bet_array (const int *src, tribyte *dest, int count)
-{	unsigned char	*ucptr ;
-	int				value ;
-
-	ucptr = ((unsigned char*) dest) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = src [count] >> 8 ;
-		ucptr [2] = value ;
-		ucptr [1] = value >> 8 ;
-		ucptr [0] = value >> 16 ;
-		} ;
-} /* i2bet_array */
-
-/*===============================================================================================
+/*-----------------------------------------------------------------------------------------------
 */
 
 static sf_count_t
 pcm_read_sc2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.scbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (signed char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.scbuf, sizeof (signed char), bufferlen, psf) ;
-		sc2s_array (psf->u.scbuf, readcount, ptr + total) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (signed char), readcount, psf) ;
+		sc2s_array ((signed char*) (psf->buffer), thisread, ptr + total) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -721,20 +339,19 @@ pcm_read_sc2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_uc2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ucbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (unsigned char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ucbuf, sizeof (unsigned char), bufferlen, psf) ;
-		uc2s_array (psf->u.ucbuf, readcount, ptr + total) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (unsigned char), readcount, psf) ;
+		uc2s_array ((unsigned char*) (psf->buffer), thisread, ptr + total) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -764,20 +381,19 @@ pcm_read_les2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_bet2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		bet2s_array ((tribyte*) (psf->u.ucbuf), readcount, ptr + total) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, SIZEOF_TRIBYTE, readcount, psf) ;
+		bet2s_array ((tribyte*) (psf->buffer), thisread, ptr + total) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -785,20 +401,19 @@ pcm_read_bet2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_let2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		let2s_array ((tribyte*) (psf->u.ucbuf), readcount, ptr + total) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, SIZEOF_TRIBYTE, readcount, psf) ;
+		let2s_array ((tribyte*) (psf->buffer), thisread, ptr + total) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -806,20 +421,19 @@ pcm_read_let2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_bei2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		bei2s_array (psf->u.ibuf, readcount, ptr + total) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (int), readcount, psf) ;
+		bei2s_array ((int*) (psf->buffer), thisread, ptr + total) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -827,20 +441,19 @@ pcm_read_bei2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_lei2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		lei2s_array (psf->u.ibuf, readcount, ptr + total) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (int), readcount, psf) ;
+		lei2s_array ((int*) (psf->buffer), thisread, ptr + total) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -851,20 +464,19 @@ pcm_read_lei2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_sc2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.scbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (signed char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.scbuf, sizeof (signed char), bufferlen, psf) ;
-		sc2i_array (psf->u.scbuf, readcount, ptr + total) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (signed char), readcount, psf) ;
+		sc2i_array ((signed char*) (psf->buffer), thisread, ptr + total) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -872,20 +484,19 @@ pcm_read_sc2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_uc2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ucbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (unsigned char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ucbuf, sizeof (unsigned char), bufferlen, psf) ;
-		uc2i_array (psf->u.ucbuf, readcount, ptr + total) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (unsigned char), readcount, psf) ;
+		uc2i_array ((unsigned char*) (psf->buffer), thisread, ptr + total) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -893,20 +504,19 @@ pcm_read_uc2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_bes2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		bes2i_array (psf->u.sbuf, readcount, ptr + total) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (short), readcount, psf) ;
+		bes2i_array ((short*) (psf->buffer), thisread, ptr + total) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -914,20 +524,19 @@ pcm_read_bes2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_les2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		les2i_array (psf->u.sbuf, readcount, ptr + total) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (short), readcount, psf) ;
+		les2i_array ((short*) (psf->buffer), thisread, ptr + total) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -935,20 +544,19 @@ pcm_read_les2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_bet2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		bet2i_array ((tribyte*) (psf->u.ucbuf), readcount, ptr + total) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, SIZEOF_TRIBYTE, readcount, psf) ;
+		bet2i_array ((tribyte*) (psf->buffer), thisread, ptr + total) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -956,20 +564,19 @@ pcm_read_bet2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_let2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		let2i_array ((tribyte*) (psf->u.ucbuf), readcount, ptr + total) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, SIZEOF_TRIBYTE, readcount, psf) ;
+		let2i_array ((tribyte*) (psf->buffer), thisread, ptr + total) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1002,23 +609,22 @@ pcm_read_lei2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_sc2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	float	normfact ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x80) : 1.0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.scbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (signed char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.scbuf, sizeof (signed char), bufferlen, psf) ;
-		sc2f_array (psf->u.scbuf, readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (signed char), readcount, psf) ;
+		sc2f_array ((signed char*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1026,23 +632,22 @@ pcm_read_sc2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_uc2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	float	normfact ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x80) : 1.0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ucbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (unsigned char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ucbuf, sizeof (unsigned char), bufferlen, psf) ;
-		uc2f_array (psf->u.ucbuf, readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (unsigned char), readcount, psf) ;
+		uc2f_array ((unsigned char*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1050,23 +655,22 @@ pcm_read_uc2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_bes2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	float	normfact ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x8000) : 1.0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		bes2f_array (psf->u.sbuf, readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (short), readcount, psf) ;
+		bes2f_array ((short*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1074,23 +678,22 @@ pcm_read_bes2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_les2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	float	normfact ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x8000) : 1.0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		les2f_array (psf->u.sbuf, readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (short), readcount, psf) ;
+		les2f_array ((short*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1098,24 +701,23 @@ pcm_read_les2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_bet2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	float	normfact ;
 
 	/* Special normfactor because tribyte value is read into an int. */
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x80000000) : 1.0 / 256.0 ;
 
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		bet2f_array ((tribyte*) (psf->u.ucbuf), readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, SIZEOF_TRIBYTE, readcount, psf) ;
+		bet2f_array ((tribyte*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1123,24 +725,23 @@ pcm_read_bet2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_let2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	float	normfact ;
 
 	/* Special normfactor because tribyte value is read into an int. */
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x80000000) : 1.0 / 256.0 ;
 
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		let2f_array ((tribyte*) (psf->u.ucbuf), readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, SIZEOF_TRIBYTE, readcount, psf) ;
+		let2f_array ((tribyte*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1148,23 +749,22 @@ pcm_read_let2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_bei2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	float	normfact ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x80000000) : 1.0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		bei2f_array (psf->u.ibuf, readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (int), readcount, psf) ;
+		bei2f_array ((int*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1172,23 +772,22 @@ pcm_read_bei2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_lei2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	float	normfact ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x80000000) : 1.0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		lei2f_array (psf->u.ibuf, readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (int), readcount, psf) ;
+		lei2f_array ((int*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1199,23 +798,22 @@ pcm_read_lei2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_sc2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x80) : 1.0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.scbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (signed char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.scbuf, sizeof (signed char), bufferlen, psf) ;
-		sc2d_array (psf->u.scbuf, readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (signed char), readcount, psf) ;
+		sc2d_array ((signed char*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1223,23 +821,22 @@ pcm_read_sc2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_uc2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x80) : 1.0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ucbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (unsigned char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ucbuf, sizeof (unsigned char), bufferlen, psf) ;
-		uc2d_array (psf->u.ucbuf, readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (unsigned char), readcount, psf) ;
+		uc2d_array ((unsigned char*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1247,23 +844,22 @@ pcm_read_uc2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_bes2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x8000) : 1.0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		bes2d_array (psf->u.sbuf, readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (short), readcount, psf) ;
+		bes2d_array ((short*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1271,23 +867,22 @@ pcm_read_bes2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_les2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x8000) : 1.0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		les2d_array (psf->u.sbuf, readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (short), readcount, psf) ;
+		les2d_array ((short*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1295,23 +890,22 @@ pcm_read_les2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_bet2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x80000000) : 1.0 / 256.0 ;
 
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		bet2d_array ((tribyte*) (psf->u.ucbuf), readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, SIZEOF_TRIBYTE, readcount, psf) ;
+		bet2d_array ((tribyte*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1319,24 +913,23 @@ pcm_read_bet2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_let2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
 	/* Special normfactor because tribyte value is read into an int. */
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x80000000) : 1.0 / 256.0 ;
 
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		let2d_array ((tribyte*) (psf->u.ucbuf), readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, SIZEOF_TRIBYTE, readcount, psf) ;
+		let2d_array ((tribyte*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1344,23 +937,22 @@ pcm_read_let2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_bei2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x80000000) : 1.0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		bei2d_array (psf->u.ibuf, readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (int), readcount, psf) ;
+		bei2d_array ((int*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1368,23 +960,22 @@ pcm_read_bei2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 static sf_count_t
 pcm_read_lei2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	int			bufferlen, readcount, thisread ;
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x80000000) : 1.0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		readcount = psf_fread (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		lei2d_array (psf->u.ibuf, readcount, ptr + total, normfact) ;
-		total += readcount ;
-		if (readcount < bufferlen)
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
+		thisread = psf_fread (psf->buffer, sizeof (int), readcount, psf) ;
+		lei2d_array ((int*) (psf->buffer), thisread, ptr + total, normfact) ;
+		total += thisread ;
+		len -= thisread ;
+		if (thisread < readcount)
 			break ;
-		len -= readcount ;
 		} ;
 
 	return total ;
@@ -1396,175 +987,170 @@ pcm_read_lei2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 */
 
 static sf_count_t
-pcm_write_s2sc	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
+pcm_write_s2sc	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+{	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.scbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (signed char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		s2sc_array (ptr + total, psf->u.scbuf, bufferlen) ;
-		writecount = psf_fwrite (psf->u.scbuf, sizeof (signed char), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		s2sc_array (ptr + total, (signed char*) (psf->buffer), writecount) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (signed char), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
 } /* pcm_write_s2sc */
 
 static sf_count_t
-pcm_write_s2uc	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
+pcm_write_s2uc	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+{	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ucbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (unsigned char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		s2uc_array (ptr + total, psf->u.ucbuf, bufferlen) ;
-		writecount = psf_fwrite (psf->u.ucbuf, sizeof (unsigned char), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		s2uc_array (ptr + total, (unsigned char*) (psf->buffer), writecount) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (unsigned char), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
 } /* pcm_write_s2uc */
 
 static sf_count_t
-pcm_write_s2bes	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
-	sf_count_t	total = 0 ;
-
+pcm_write_s2bes	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+{
 	if (CPU_IS_BIG_ENDIAN)
 		return psf_fwrite (ptr, sizeof (short), len, psf) ;
 	else
+	{	int			bufferlen, writecount, thiswrite ;
+		sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+		bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
-	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		endswap_short_copy (psf->u.sbuf, ptr + total, bufferlen) ;
-		writecount = psf_fwrite (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
-			break ;
-		len -= writecount ;
+		while (len > 0)
+		{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+			endswap_short_copy ((short*) (psf->buffer), ptr + total, writecount) ;
+			thiswrite = psf_fwrite (psf->buffer, sizeof (short), writecount, psf) ;
+			total += thiswrite ;
+			len -= thiswrite ;
+			if (thiswrite < writecount)
+				break ;
+			} ;
+
+		return total ;
 		} ;
-
-	return total ;
 } /* pcm_write_s2bes */
 
 static sf_count_t
-pcm_write_s2les	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
-	sf_count_t	total = 0 ;
-
+pcm_write_s2les	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+{
 	if (CPU_IS_LITTLE_ENDIAN)
 		return psf_fwrite (ptr, sizeof (short), len, psf) ;
+	else
+	{	int			bufferlen, writecount, thiswrite ;
+		sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+		bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
-	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		endswap_short_copy (psf->u.sbuf, ptr + total, bufferlen) ;
-		writecount = psf_fwrite (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
-			break ;
-		len -= writecount ;
+		while (len > 0)
+		{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+			endswap_short_copy ((short*) (psf->buffer), ptr + total, writecount) ;
+			thiswrite = psf_fwrite (psf->buffer, sizeof (short), writecount, psf) ;
+			total += thiswrite ;
+			len -= thiswrite ;
+			if (thiswrite < writecount)
+				break ;
+			} ;
+
+		return total ;
 		} ;
-
-	return total ;
 } /* pcm_write_s2les */
 
 static sf_count_t
-pcm_write_s2bet	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
+pcm_write_s2bet	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+{	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		s2bet_array (ptr + total, (tribyte*) (psf->u.ucbuf), bufferlen) ;
-		writecount = psf_fwrite (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		s2bet_array (ptr + total, (tribyte*) (psf->buffer), writecount) ;
+		thiswrite = psf_fwrite (psf->buffer, SIZEOF_TRIBYTE, writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
 } /* pcm_write_s2bet */
 
 static sf_count_t
-pcm_write_s2let	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
+pcm_write_s2let	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+{	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		s2let_array (ptr + total, (tribyte*) (psf->u.ucbuf), bufferlen) ;
-		writecount = psf_fwrite (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		s2let_array (ptr + total, (tribyte*) (psf->buffer), writecount) ;
+		thiswrite = psf_fwrite (psf->buffer, SIZEOF_TRIBYTE, writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
 } /* pcm_write_s2let */
 
 static sf_count_t
-pcm_write_s2bei	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
+pcm_write_s2bei	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+{	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		s2bei_array (ptr + total, psf->u.ibuf, bufferlen) ;
-		writecount = psf_fwrite (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		s2bei_array (ptr + total, (int*) (psf->buffer), writecount) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (int), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
 } /* pcm_write_s2bei */
 
 static sf_count_t
-pcm_write_s2lei	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
+pcm_write_s2lei	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+{	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		s2lei_array (ptr + total, psf->u.ibuf, bufferlen) ;
-		writecount = psf_fwrite (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		s2lei_array (ptr + total, (int*) (psf->buffer), writecount) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (int), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -1574,177 +1160,173 @@ pcm_write_s2lei	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 */
 
 static sf_count_t
-pcm_write_i2sc	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
+pcm_write_i2sc	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+{	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.scbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (signed char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		i2sc_array (ptr + total, psf->u.scbuf, bufferlen) ;
-		writecount = psf_fwrite (psf->u.scbuf, sizeof (signed char), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		i2sc_array (ptr + total, (signed char*) (psf->buffer), writecount) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (signed char), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
 } /* pcm_write_i2sc */
 
 static sf_count_t
-pcm_write_i2uc	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
+pcm_write_i2uc	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+{	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ucbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (unsigned char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		i2uc_array (ptr + total, psf->u.ucbuf, bufferlen) ;
-		writecount = psf_fwrite (psf->u.ucbuf, sizeof (signed char), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		i2uc_array (ptr + total, (unsigned char*) (psf->buffer), writecount) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (signed char), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
 } /* pcm_write_i2uc */
 
 static sf_count_t
-pcm_write_i2bes	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
+pcm_write_i2bes	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+{	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		i2bes_array (ptr + total, psf->u.sbuf, bufferlen) ;
-		writecount = psf_fwrite (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		i2bes_array (ptr + total, (short*) (psf->buffer), writecount) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (short), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
 } /* pcm_write_i2bes */
 
 static sf_count_t
-pcm_write_i2les	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
+pcm_write_i2les	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+{	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		i2les_array (ptr + total, psf->u.sbuf, bufferlen) ;
-		writecount = psf_fwrite (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		i2les_array (ptr + total, (short*) (psf->buffer), writecount) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (short), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
 } /* pcm_write_i2les */
 
 static sf_count_t
-pcm_write_i2bet	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
+pcm_write_i2bet	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+{	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		i2bet_array (ptr + total, (tribyte*) (psf->u.ucbuf), bufferlen) ;
-		writecount = psf_fwrite (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		i2bet_array (ptr + total, (tribyte*) (psf->buffer), writecount) ;
+		thiswrite = psf_fwrite (psf->buffer, SIZEOF_TRIBYTE, writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
 } /* pcm_write_i2bet */
 
 static sf_count_t
-pcm_write_i2let	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
+pcm_write_i2let	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+{	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		i2let_array (ptr + total, (tribyte*) (psf->u.ucbuf), bufferlen) ;
-		writecount = psf_fwrite (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		i2let_array (ptr + total, (tribyte*) (psf->buffer), writecount) ;
+		thiswrite = psf_fwrite (psf->buffer, SIZEOF_TRIBYTE, writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
 } /* pcm_write_i2les */
 
 static sf_count_t
-pcm_write_i2bei	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
-	sf_count_t	total = 0 ;
-
+pcm_write_i2bei	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+{
 	if (CPU_IS_BIG_ENDIAN)
 		return psf_fwrite (ptr, sizeof (int), len, psf) ;
+	else
+	{	int			bufferlen, writecount, thiswrite ;
+		sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+		bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
-	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		endswap_int_copy (psf->u.ibuf, ptr + total, bufferlen) ;
-		writecount = psf_fwrite (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
-			break ;
-		len -= writecount ;
+		while (len > 0)
+		{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+			endswap_int_copy ((int*) (psf->buffer), ptr + total, writecount) ;
+			thiswrite = psf_fwrite (psf->buffer, sizeof (int), writecount, psf) ;
+			total += thiswrite ;
+			len -= thiswrite ;
+			if (thiswrite < writecount)
+				break ;
+			} ;
+
+		return total ;
 		} ;
-
-	return total ;
 } /* pcm_write_i2bei */
 
 static sf_count_t
-pcm_write_i2lei	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
-{	int			bufferlen, writecount ;
-	sf_count_t	total = 0 ;
-
+pcm_write_i2lei	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+{
 	if (CPU_IS_LITTLE_ENDIAN)
 		return psf_fwrite (ptr, sizeof (int), len, psf) ;
+	else
+	{	int			bufferlen, writecount, thiswrite ;
+		sf_count_t	total = 0 ;
 
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+		bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
-	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		endswap_int_copy (psf->u.ibuf, ptr + total, bufferlen) ;
-		writecount = psf_fwrite (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
-			break ;
-		len -= writecount ;
+		while (len > 0)
+		{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+			endswap_int_copy ((int*) (psf->buffer), ptr + total, writecount) ;
+			thiswrite = psf_fwrite (psf->buffer, sizeof (int), writecount, psf) ;
+			total += thiswrite ;
+			len -= thiswrite ;
+			if (thiswrite < writecount)
+				break ;
+			} ;
+
+		return total ;
 		} ;
-
-	return total ;
 } /* pcm_write_i2lei */
 
 /*------------------------------------------------------------------------------
@@ -1753,24 +1335,26 @@ pcm_write_i2lei	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 */
 
 static void
-f2sc_array (const float *src, signed char *dest, int count, int normalize)
+f2sc_array (float *src, signed char *dest, int count, int normalize)
 {	float normfact ;
 
 	normfact = normalize ? (1.0 * 0x7F) : 1.0 ;
 
-	while (--count >= 0)
-	{	dest [count] = lrintf (src [count] * normfact) ;
+	while (count)
+	{	count -- ;
+		dest [count] = lrintf (src [count] * normfact) ;
 		} ;
 } /* f2sc_array */
 
 static void
-f2sc_clip_array (const float *src, signed char *dest, int count, int normalize)
+f2sc_clip_array (float *src, signed char *dest, int count, int normalize)
 {	float	normfact, scaled_value ;
 
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x1000000) ;
 
-	while (--count >= 0)
-	{	scaled_value = src [count] * normfact ;
+	while (count)
+	{	count -- ;
+		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 127 ;
 			continue ;
@@ -1785,23 +1369,22 @@ f2sc_clip_array (const float *src, signed char *dest, int count, int normalize)
 } /* f2sc_clip_array */
 
 static sf_count_t
-pcm_write_f2sc	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
-{	void		(*convert) (const float *, signed char *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_f2sc	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+{	void		(*convert) (float *, signed char *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? f2sc_clip_array : f2sc_array ;
-	bufferlen = ARRAY_LEN (psf->u.scbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (signed char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, psf->u.scbuf, bufferlen, psf->norm_float) ;
-		writecount = psf_fwrite (psf->u.scbuf, sizeof (signed char), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (signed char*) (psf->buffer), writecount, psf->norm_float) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (signed char), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -1811,24 +1394,26 @@ pcm_write_f2sc	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 */
 
 static	void
-f2uc_array	(const float *src, unsigned char *dest, int count, int normalize)
+f2uc_array	(float *src, unsigned char *dest, int count, int normalize)
 {	float normfact ;
 
 	normfact = normalize ? (1.0 * 0x7F) : 1.0 ;
 
-	while (--count >= 0)
-	{	dest [count] = lrintf (src [count] * normfact) + 128 ;
+	while (count)
+	{	count -- ;
+		dest [count] = lrintf (src [count] * normfact) + 128 ;
 		} ;
 } /* f2uc_array */
 
 static	void
-f2uc_clip_array	(const float *src, unsigned char *dest, int count, int normalize)
+f2uc_clip_array	(float *src, unsigned char *dest, int count, int normalize)
 {	float	normfact, scaled_value ;
 
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x1000000) ;
 
-	while (--count >= 0)
-	{	scaled_value = src [count] * normfact ;
+	while (count)
+	{	count -- ;
+		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 0xFF ;
 			continue ;
@@ -1843,23 +1428,22 @@ f2uc_clip_array	(const float *src, unsigned char *dest, int count, int normalize
 } /* f2uc_clip_array */
 
 static sf_count_t
-pcm_write_f2uc	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
-{	void		(*convert) (const float *, unsigned char *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_f2uc	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+{	void		(*convert) (float *, unsigned char *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? f2uc_clip_array : f2uc_array ;
-	bufferlen = ARRAY_LEN (psf->u.ucbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (unsigned char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, psf->u.ucbuf, bufferlen, psf->norm_float) ;
-		writecount = psf_fwrite (psf->u.ucbuf, sizeof (unsigned char), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (unsigned char*) (psf->buffer), writecount, psf->norm_float) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (unsigned char), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -1869,7 +1453,7 @@ pcm_write_f2uc	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 */
 
 static void
-f2bes_array (const float *src, short *dest, int count, int normalize)
+f2bes_array (float *src, short *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	float 			normfact ;
 	short			value ;
@@ -1877,16 +1461,17 @@ f2bes_array (const float *src, short *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 2 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 2 ;
 		value = lrintf (src [count] * normfact) ;
 		ucptr [1] = value ;
 		ucptr [0] = value >> 8 ;
-			} ;
+		} ;
 } /* f2bes_array */
 
 static void
-f2bes_clip_array (const float *src, short *dest, int count, int normalize)
+f2bes_clip_array (float *src, short *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	float			normfact, scaled_value ;
 	int				value ;
@@ -1894,14 +1479,15 @@ f2bes_clip_array (const float *src, short *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x10000) ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 2 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 2 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [1] = 0xFF ;
 			ucptr [0] = 0x7F ;
 			continue ;
-		} ;
+			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [1] = 0x00 ;
 			ucptr [0] = 0x80 ;
@@ -1915,23 +1501,22 @@ f2bes_clip_array (const float *src, short *dest, int count, int normalize)
 } /* f2bes_clip_array */
 
 static sf_count_t
-pcm_write_f2bes	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
-{	void		(*convert) (const float *, short *t, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_f2bes	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+{	void		(*convert) (float *, short *t, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? f2bes_clip_array : f2bes_array ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, psf->u.sbuf, bufferlen, psf->norm_float) ;
-		writecount = psf_fwrite (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
-				break ;
-		len -= writecount ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (short*) (psf->buffer), writecount, psf->norm_float) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (short), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
+			break ;
 		} ;
 
 	return total ;
@@ -1941,7 +1526,7 @@ pcm_write_f2bes	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 */
 
 static void
-f2les_array (const float *src, short *dest, int count, int normalize)
+f2les_array (float *src, short *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	float			normfact ;
 	int				value ;
@@ -1949,8 +1534,9 @@ f2les_array (const float *src, short *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 2 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 2 ;
 		value = lrintf (src [count] * normfact) ;
 		ucptr [0] = value ;
 		ucptr [1] = value >> 8 ;
@@ -1958,7 +1544,7 @@ f2les_array (const float *src, short *dest, int count, int normalize)
 } /* f2les_array */
 
 static void
-f2les_clip_array (const float *src, short *dest, int count, int normalize)
+f2les_clip_array (float *src, short *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	float			normfact, scaled_value ;
 	int				value ;
@@ -1966,8 +1552,9 @@ f2les_clip_array (const float *src, short *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x10000) ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 2 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 2 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
@@ -1987,23 +1574,22 @@ f2les_clip_array (const float *src, short *dest, int count, int normalize)
 } /* f2les_clip_array */
 
 static sf_count_t
-pcm_write_f2les	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
-{	void		(*convert) (const float *, short *t, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_f2les	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+{	void		(*convert) (float *, short *t, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? f2les_clip_array : f2les_array ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, psf->u.sbuf, bufferlen, psf->norm_float) ;
-		writecount = psf_fwrite (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (short*) (psf->buffer), writecount, psf->norm_float) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (short), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -2013,7 +1599,7 @@ pcm_write_f2les	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 */
 
 static void
-f2let_array (const float *src, tribyte *dest, int count, int normalize)
+f2let_array (float *src, tribyte *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	float 			normfact ;
 	int				value ;
@@ -2021,8 +1607,9 @@ f2let_array (const float *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 3 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
 		value = lrintf (src [count] * normfact) ;
 		ucptr [0] = value ;
 		ucptr [1] = value >> 8 ;
@@ -2031,7 +1618,7 @@ f2let_array (const float *src, tribyte *dest, int count, int normalize)
 } /* f2let_array */
 
 static void
-f2let_clip_array (const float *src, tribyte *dest, int count, int normalize)
+f2let_clip_array (float *src, tribyte *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	float			normfact, scaled_value ;
 	int				value ;
@@ -2039,8 +1626,9 @@ f2let_clip_array (const float *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100) ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 3 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
@@ -2053,7 +1641,7 @@ f2let_clip_array (const float *src, tribyte *dest, int count, int normalize)
 			ucptr [1] = 0x00 ;
 			ucptr [2] = 0x80 ;
 			continue ;
-		} ;
+			} ;
 
 		value = lrintf (scaled_value) ;
 		ucptr [0] = value >> 8 ;
@@ -2063,23 +1651,22 @@ f2let_clip_array (const float *src, tribyte *dest, int count, int normalize)
 } /* f2let_clip_array */
 
 static sf_count_t
-pcm_write_f2let	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
-{	void		(*convert) (const float *, tribyte *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_f2let	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+{	void		(*convert) (float *, tribyte *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? f2let_clip_array : f2let_array ;
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, (tribyte*) (psf->u.ucbuf), bufferlen, psf->norm_float) ;
-		writecount = psf_fwrite (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (tribyte*) (psf->buffer), writecount, psf->norm_float) ;
+		thiswrite = psf_fwrite (psf->buffer, SIZEOF_TRIBYTE, writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -2089,7 +1676,7 @@ pcm_write_f2let	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 */
 
 static void
-f2bet_array (const float *src, tribyte *dest, int count, int normalize)
+f2bet_array (float *src, tribyte *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	float 			normfact ;
 	int				value ;
@@ -2097,8 +1684,9 @@ f2bet_array (const float *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 3 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
 		value = lrintf (src [count] * normfact) ;
 		ucptr [0] = value >> 16 ;
 		ucptr [1] = value >> 8 ;
@@ -2107,7 +1695,7 @@ f2bet_array (const float *src, tribyte *dest, int count, int normalize)
 } /* f2bet_array */
 
 static void
-f2bet_clip_array (const float *src, tribyte *dest, int count, int normalize)
+f2bet_clip_array (float *src, tribyte *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	float			normfact, scaled_value ;
 	int				value ;
@@ -2115,8 +1703,9 @@ f2bet_clip_array (const float *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100) ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 3 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0x7F ;
@@ -2129,7 +1718,7 @@ f2bet_clip_array (const float *src, tribyte *dest, int count, int normalize)
 			ucptr [1] = 0x00 ;
 			ucptr [2] = 0x00 ;
 			continue ;
-		} ;
+			} ;
 
 		value = lrint (scaled_value) ;
 		ucptr [0] = value >> 24 ;
@@ -2139,23 +1728,22 @@ f2bet_clip_array (const float *src, tribyte *dest, int count, int normalize)
 } /* f2bet_clip_array */
 
 static sf_count_t
-pcm_write_f2bet	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
-{	void		(*convert) (const float *, tribyte *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_f2bet	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+{	void		(*convert) (float *, tribyte *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? f2bet_clip_array : f2bet_array ;
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, (tribyte*) (psf->u.ucbuf), bufferlen, psf->norm_float) ;
-		writecount = psf_fwrite (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (tribyte*) (psf->buffer), writecount, psf->norm_float) ;
+		thiswrite = psf_fwrite (psf->buffer, SIZEOF_TRIBYTE, writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -2165,15 +1753,16 @@ pcm_write_f2bet	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 */
 
 static void
-f2bei_array (const float *src, int *dest, int count, int normalize)
+f2bei_array (float *src, int *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	float			normfact ;
 	int				value ;
 
 	normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
-	while (--count >= 0)
-	{	ucptr -= 4 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 4 ;
 		value = lrintf (src [count] * normfact) ;
 		ucptr [0] = value >> 24 ;
 		ucptr [1] = value >> 16 ;
@@ -2183,7 +1772,7 @@ f2bei_array (const float *src, int *dest, int count, int normalize)
 } /* f2bei_array */
 
 static void
-f2bei_clip_array (const float *src, int *dest, int count, int normalize)
+f2bei_clip_array (float *src, int *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	float			normfact, scaled_value ;
 	int				value ;
@@ -2191,8 +1780,9 @@ f2bei_clip_array (const float *src, int *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 4 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 4 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= 1.0 * 0x7FFFFFFF)
 		{	ucptr [0] = 0x7F ;
@@ -2207,7 +1797,7 @@ f2bei_clip_array (const float *src, int *dest, int count, int normalize)
 			ucptr [2] = 0x00 ;
 			ucptr [3] = 0x00 ;
 			continue ;
-		} ;
+			} ;
 
 		value = lrintf (scaled_value) ;
 		ucptr [0] = value >> 24 ;
@@ -2218,23 +1808,22 @@ f2bei_clip_array (const float *src, int *dest, int count, int normalize)
 } /* f2bei_clip_array */
 
 static sf_count_t
-pcm_write_f2bei	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
-{	void		(*convert) (const float *, int *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_f2bei	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+{	void		(*convert) (float *, int *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? f2bei_clip_array : f2bei_array ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, psf->u.ibuf, bufferlen, psf->norm_float) ;
-		writecount = psf_fwrite (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (int*) (psf->buffer), writecount, psf->norm_float) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (int), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -2244,7 +1833,7 @@ pcm_write_f2bei	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 */
 
 static void
-f2lei_array (const float *src, int *dest, int count, int normalize)
+f2lei_array (float *src, int *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	float			normfact ;
 	int				value ;
@@ -2252,8 +1841,9 @@ f2lei_array (const float *src, int *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 4 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 4 ;
 		value = lrintf (src [count] * normfact) ;
 		ucptr [0] = value ;
 		ucptr [1] = value >> 8 ;
@@ -2263,7 +1853,7 @@ f2lei_array (const float *src, int *dest, int count, int normalize)
 } /* f2lei_array */
 
 static void
-f2lei_clip_array (const float *src, int *dest, int count, int normalize)
+f2lei_clip_array (float *src, int *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	float			normfact, scaled_value ;
 	int				value ;
@@ -2271,8 +1861,9 @@ f2lei_clip_array (const float *src, int *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 4 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 4 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
@@ -2298,23 +1889,22 @@ f2lei_clip_array (const float *src, int *dest, int count, int normalize)
 } /* f2lei_clip_array */
 
 static sf_count_t
-pcm_write_f2lei	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
-{	void		(*convert) (const float *, int *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_f2lei	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+{	void		(*convert) (float *, int *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? f2lei_clip_array : f2lei_array ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, psf->u.ibuf, bufferlen, psf->norm_float) ;
-		writecount = psf_fwrite (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (int*) (psf->buffer), writecount, psf->norm_float) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (int), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -2323,25 +1913,27 @@ pcm_write_f2lei	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 /*==============================================================================
 */
 
-static void
-d2sc_array	(const double *src, signed char *dest, int count, int normalize)
+static	void
+d2sc_array	(double *src, signed char *dest, int count, int normalize)
 {	double	normfact ;
 
 	normfact = normalize ? (1.0 * 0x7F) : 1.0 ;
 
-	while (--count >= 0)
-	{	dest [count] = lrint (src [count] * normfact) ;
+	while (count)
+	{	count -- ;
+		dest [count] = lrint (src [count] * normfact) ;
 		} ;
 } /* d2sc_array */
 
-static void
-d2sc_clip_array	(const double *src, signed char *dest, int count, int normalize)
+static	void
+d2sc_clip_array	(double *src, signed char *dest, int count, int normalize)
 {	double	normfact, scaled_value ;
 
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x1000000) ;
 
-	while (--count >= 0)
-	{	scaled_value = src [count] * normfact ;
+	while (count)
+	{	count -- ;
+		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 127 ;
 			continue ;
@@ -2356,23 +1948,22 @@ d2sc_clip_array	(const double *src, signed char *dest, int count, int normalize)
 } /* d2sc_clip_array */
 
 static sf_count_t
-pcm_write_d2sc	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
-{	void		(*convert) (const double *, signed char *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_d2sc	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+{	void		(*convert) (double *, signed char *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? d2sc_clip_array : d2sc_array ;
-	bufferlen = ARRAY_LEN (psf->u.scbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (signed char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, psf->u.scbuf, bufferlen, psf->norm_double) ;
-		writecount = psf_fwrite (psf->u.scbuf, sizeof (signed char), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (signed char*) (psf->buffer), writecount, psf->norm_double) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (signed char), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -2382,24 +1973,26 @@ pcm_write_d2sc	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 */
 
 static	void
-d2uc_array	(const double *src, unsigned char *dest, int count, int normalize)
+d2uc_array	(double *src, unsigned char *dest, int count, int normalize)
 {	double normfact ;
 
 	normfact = normalize ? (1.0 * 0x7F) : 1.0 ;
 
-	while (--count >= 0)
-	{	dest [count] = lrint (src [count] * normfact) + 128 ;
+	while (count)
+	{	count -- ;
+		dest [count] = lrint (src [count] * normfact) + 128 ;
 		} ;
 } /* d2uc_array */
 
 static	void
-d2uc_clip_array	(const double *src, unsigned char *dest, int count, int normalize)
+d2uc_clip_array	(double *src, unsigned char *dest, int count, int normalize)
 {	double	normfact, scaled_value ;
 
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x1000000) ;
 
-	while (--count >= 0)
-	{	scaled_value = src [count] * normfact ;
+	while (count)
+	{	count -- ;
+		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 255 ;
 			continue ;
@@ -2413,24 +2006,24 @@ d2uc_clip_array	(const double *src, unsigned char *dest, int count, int normaliz
 		} ;
 } /* d2uc_clip_array */
 
+
 static sf_count_t
-pcm_write_d2uc	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
-{	void		(*convert) (const double *, unsigned char *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_d2uc	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+{	void		(*convert) (double *, unsigned char *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? d2uc_clip_array : d2uc_array ;
-	bufferlen = ARRAY_LEN (psf->u.ucbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (unsigned char) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, psf->u.ucbuf, bufferlen, psf->norm_double) ;
-		writecount = psf_fwrite (psf->u.ucbuf, sizeof (unsigned char), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (unsigned char*) (psf->buffer), writecount, psf->norm_double) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (unsigned char), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -2440,7 +2033,7 @@ pcm_write_d2uc	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 */
 
 static void
-d2bes_array (const double *src, short *dest, int count, int normalize)
+d2bes_array (double *src, short *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	short			value ;
 	double			normfact ;
@@ -2448,8 +2041,9 @@ d2bes_array (const double *src, short *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 2 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 2 ;
 		value = lrint (src [count] * normfact) ;
 		ucptr [1] = value ;
 		ucptr [0] = value >> 8 ;
@@ -2457,7 +2051,7 @@ d2bes_array (const double *src, short *dest, int count, int normalize)
 } /* d2bes_array */
 
 static void
-d2bes_clip_array (const double *src, short *dest, int count, int normalize)
+d2bes_clip_array (double *src, short *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	double			normfact, scaled_value ;
 	int				value ;
@@ -2465,8 +2059,9 @@ d2bes_clip_array (const double *src, short *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x10000) ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 2 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 2 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [1] = 0xFF ;
@@ -2486,23 +2081,22 @@ d2bes_clip_array (const double *src, short *dest, int count, int normalize)
 } /* d2bes_clip_array */
 
 static sf_count_t
-pcm_write_d2bes	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
-{	void		(*convert) (const double *, short *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_d2bes	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+{	void		(*convert) (double *, short *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? d2bes_clip_array : d2bes_array ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, psf->u.sbuf, bufferlen, psf->norm_double) ;
-		writecount = psf_fwrite (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (short*) (psf->buffer), writecount, psf->norm_double) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (short), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -2512,7 +2106,7 @@ pcm_write_d2bes	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 */
 
 static void
-d2les_array (const double *src, short *dest, int count, int normalize)
+d2les_array (double *src, short *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	short			value ;
 	double			normfact ;
@@ -2520,8 +2114,9 @@ d2les_array (const double *src, short *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 2 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 2 ;
 		value = lrint (src [count] * normfact) ;
 		ucptr [0] = value ;
 		ucptr [1] = value >> 8 ;
@@ -2529,7 +2124,7 @@ d2les_array (const double *src, short *dest, int count, int normalize)
 } /* d2les_array */
 
 static void
-d2les_clip_array (const double *src, short *dest, int count, int normalize)
+d2les_clip_array (double *src, short *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	int				value ;
 	double			normfact, scaled_value ;
@@ -2537,8 +2132,9 @@ d2les_clip_array (const double *src, short *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x10000) ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 2 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 2 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
@@ -2558,23 +2154,22 @@ d2les_clip_array (const double *src, short *dest, int count, int normalize)
 } /* d2les_clip_array */
 
 static sf_count_t
-pcm_write_d2les	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
-{	void		(*convert) (const double *, short *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_d2les	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+{	void		(*convert) (double *, short *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? d2les_clip_array : d2les_array ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (short) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, psf->u.sbuf, bufferlen, psf->norm_double) ;
-		writecount = psf_fwrite (psf->u.sbuf, sizeof (short), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (short*) (psf->buffer), writecount, psf->norm_double) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (short), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -2584,7 +2179,7 @@ pcm_write_d2les	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 */
 
 static void
-d2let_array (const double *src, tribyte *dest, int count, int normalize)
+d2let_array (double *src, tribyte *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	int				value ;
 	double			normfact ;
@@ -2592,8 +2187,9 @@ d2let_array (const double *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 3 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
 		value = lrint (src [count] * normfact) ;
 		ucptr [0] = value ;
 		ucptr [1] = value >> 8 ;
@@ -2602,7 +2198,7 @@ d2let_array (const double *src, tribyte *dest, int count, int normalize)
 } /* d2let_array */
 
 static void
-d2let_clip_array (const double *src, tribyte *dest, int count, int normalize)
+d2let_clip_array (double *src, tribyte *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	int				value ;
 	double			normfact, scaled_value ;
@@ -2610,8 +2206,9 @@ d2let_clip_array (const double *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100) ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 3 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
@@ -2634,23 +2231,22 @@ d2let_clip_array (const double *src, tribyte *dest, int count, int normalize)
 } /* d2let_clip_array */
 
 static sf_count_t
-pcm_write_d2let	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
-{	void		(*convert) (const double *, tribyte *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_d2let	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+{	void		(*convert) (double *, tribyte *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? d2let_clip_array : d2let_array ;
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, (tribyte*) (psf->u.ucbuf), bufferlen, psf->norm_double) ;
-		writecount = psf_fwrite (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (tribyte*) (psf->buffer), writecount, psf->norm_double) ;
+		thiswrite = psf_fwrite (psf->buffer, SIZEOF_TRIBYTE, writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -2660,7 +2256,7 @@ pcm_write_d2let	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 */
 
 static void
-d2bet_array (const double *src, tribyte *dest, int count, int normalize)
+d2bet_array (double *src, tribyte *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	int				value ;
 	double			normfact ;
@@ -2668,8 +2264,9 @@ d2bet_array (const double *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 3 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
 		value = lrint (src [count] * normfact) ;
 		ucptr [2] = value ;
 		ucptr [1] = value >> 8 ;
@@ -2678,7 +2275,7 @@ d2bet_array (const double *src, tribyte *dest, int count, int normalize)
 } /* d2bet_array */
 
 static void
-d2bet_clip_array (const double *src, tribyte *dest, int count, int normalize)
+d2bet_clip_array (double *src, tribyte *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	int				value ;
 	double			normfact, scaled_value ;
@@ -2686,8 +2283,9 @@ d2bet_clip_array (const double *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100) ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 3 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [2] = 0xFF ;
@@ -2710,23 +2308,22 @@ d2bet_clip_array (const double *src, tribyte *dest, int count, int normalize)
 } /* d2bet_clip_array */
 
 static sf_count_t
-pcm_write_d2bet	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
-{	void		(*convert) (const double *, tribyte *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_d2bet	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+{	void		(*convert) (double *, tribyte *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? d2bet_clip_array : d2bet_array ;
-	bufferlen = sizeof (psf->u.ucbuf) / SIZEOF_TRIBYTE ;
+	bufferlen = sizeof (psf->buffer) / SIZEOF_TRIBYTE ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, (tribyte*) (psf->u.ucbuf), bufferlen, psf->norm_double) ;
-		writecount = psf_fwrite (psf->u.ucbuf, SIZEOF_TRIBYTE, bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (tribyte*) (psf->buffer), writecount, psf->norm_double) ;
+		thiswrite = psf_fwrite (psf->buffer, SIZEOF_TRIBYTE, writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -2736,7 +2333,7 @@ pcm_write_d2bet	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 */
 
 static void
-d2bei_array (const double *src, int *dest, int count, int normalize)
+d2bei_array (double *src, int *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	int				value ;
 	double			normfact ;
@@ -2744,8 +2341,9 @@ d2bei_array (const double *src, int *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 4 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 4 ;
 		value = lrint (src [count] * normfact) ;
 		ucptr [0] = value >> 24 ;
 		ucptr [1] = value >> 16 ;
@@ -2755,7 +2353,7 @@ d2bei_array (const double *src, int *dest, int count, int normalize)
 } /* d2bei_array */
 
 static void
-d2bei_clip_array (const double *src, int *dest, int count, int normalize)
+d2bei_clip_array (double *src, int *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	int				value ;
 	double			normfact, scaled_value ;
@@ -2763,8 +2361,9 @@ d2bei_clip_array (const double *src, int *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 4 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 4 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [3] = 0xFF ;
@@ -2790,23 +2389,22 @@ d2bei_clip_array (const double *src, int *dest, int count, int normalize)
 } /* d2bei_clip_array */
 
 static sf_count_t
-pcm_write_d2bei	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
-{	void		(*convert) (const double *, int *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_d2bei	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+{	void		(*convert) (double *, int *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? d2bei_clip_array : d2bei_array ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, psf->u.ibuf, bufferlen, psf->norm_double) ;
-		writecount = psf_fwrite (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (int*) (psf->buffer), writecount, psf->norm_double) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (int), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
@@ -2816,7 +2414,7 @@ pcm_write_d2bei	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 */
 
 static void
-d2lei_array (const double *src, int *dest, int count, int normalize)
+d2lei_array (double *src, int *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	int				value ;
 	double			normfact ;
@@ -2824,8 +2422,9 @@ d2lei_array (const double *src, int *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 4 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 4 ;
 		value = lrint (src [count] * normfact) ;
 		ucptr [0] = value ;
 		ucptr [1] = value >> 8 ;
@@ -2835,7 +2434,7 @@ d2lei_array (const double *src, int *dest, int count, int normalize)
 } /* d2lei_array */
 
 static void
-d2lei_clip_array (const double *src, int *dest, int count, int normalize)
+d2lei_clip_array (double *src, int *dest, int count, int normalize)
 {	unsigned char	*ucptr ;
 	int				value ;
 	double			normfact, scaled_value ;
@@ -2843,8 +2442,9 @@ d2lei_clip_array (const double *src, int *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (--count >= 0)
-	{	ucptr -= 4 ;
+	while (count)
+	{	count -- ;
+		ucptr -= 4 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
@@ -2870,28 +2470,514 @@ d2lei_clip_array (const double *src, int *dest, int count, int normalize)
 } /* d2lei_clip_array */
 
 static sf_count_t
-pcm_write_d2lei	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
-{	void		(*convert) (const double *, int *, int, int) ;
-	int			bufferlen, writecount ;
+pcm_write_d2lei	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+{	void		(*convert) (double *, int *, int, int) ;
+	int			bufferlen, writecount, thiswrite ;
 	sf_count_t	total = 0 ;
 
 	convert = (psf->add_clipping) ? d2lei_clip_array : d2lei_array ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 
 	while (len > 0)
-	{	if (len < bufferlen)
-			bufferlen = (int) len ;
-		convert (ptr + total, psf->u.ibuf, bufferlen, psf->norm_double) ;
-		writecount = psf_fwrite (psf->u.ibuf, sizeof (int), bufferlen, psf) ;
-		total += writecount ;
-		if (writecount < bufferlen)
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
+		convert (ptr + total, (int*) (psf->buffer), writecount, psf->norm_double) ;
+		thiswrite = psf_fwrite (psf->buffer, sizeof (int), writecount, psf) ;
+		total += thiswrite ;
+		len -= thiswrite ;
+		if (thiswrite < writecount)
 			break ;
-		len -= writecount ;
 		} ;
 
 	return total ;
 } /* pcm_write_d2lei */
 
+/*==============================================================================
+*/
+
+static	void
+sc2s_array	(signed char *src, int count, short *dest)
+{	while (count)
+	{	count -- ;
+		dest [count] = src [count] << 8 ;
+		} ;
+} /* sc2s_array */
+
+static	void
+uc2s_array	(unsigned char *src, int count, short *dest)
+{	while (count)
+	{	count -- ;
+		dest [count] = (((short) src [count]) - 0x80) << 8 ;
+		} ;
+} /* uc2s_array */
+
+static void
+let2s_array (tribyte *src, int count, short *dest)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) src) + 3 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
+		dest [count] = LET2H_SHORT_PTR (ucptr) ;
+		} ;
+} /* let2s_array */
+
+static void
+bet2s_array (tribyte *src, int count, short *dest)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) src) + 3 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
+		dest [count] = BET2H_SHORT_PTR (ucptr) ;
+		} ;
+} /* bet2s_array */
+
+static void
+lei2s_array (int *src, int count, short *dest)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) src) + 4 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 4 ;
+		dest [count] = LEI2H_SHORT_PTR (ucptr) ;
+		} ;
+} /* lei2s_array */
+
+static void
+bei2s_array (int *src, int count, short *dest)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) src) + 4 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 4 ;
+		dest [count] = BEI2H_SHORT_PTR (ucptr) ;
+		} ;
+} /* bei2s_array */
+
+/*-----------------------------------------------------------------------------------------------
+*/
+
+static	void
+sc2i_array	(signed char *src, int count, int *dest)
+{	while (count)
+	{	count -- ;
+		dest [count] = ((int) src [count]) << 24 ;
+		} ;
+} /* sc2i_array */
+
+static	void
+uc2i_array	(unsigned char *src, int count, int *dest)
+{	while (count)
+	{	count -- ;
+		dest [count] = (((int) src [count]) - 128) << 24 ;
+		} ;
+} /* uc2i_array */
+
+static void
+bes2i_array (short *src, int count, int *dest)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) src) + 2 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 2 ;
+		dest [count] = BES2H_INT_PTR (ucptr) ;
+		} ;
+} /* bes2i_array */
+
+static void
+les2i_array (short *src, int count, int *dest)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) src) + 2 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 2 ;
+		dest [count] = LES2H_INT_PTR (ucptr) ;
+		} ;
+} /* les2i_array */
+
+static void
+bet2i_array (tribyte *src, int count, int *dest)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) src) + 3 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
+		dest [count] = BET2H_INT_PTR (ucptr) ;
+		} ;
+} /* bet2i_array */
+
+static void
+let2i_array (tribyte *src, int count, int *dest)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) src) + 3 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
+		dest [count] = LET2H_INT_PTR (ucptr) ;
+		} ;
+} /* let2i_array */
+
+/*-----------------------------------------------------------------------------------------------
+*/
+
+
+static	void
+sc2f_array	(signed char *src, int count, float *dest, float normfact)
+{	while (count)
+	{	count -- ;
+		dest [count] = ((float) src [count]) * normfact ;
+		} ;
+} /* sc2f_array */
+
+static	void
+uc2f_array	(unsigned char *src, int count, float *dest, float normfact)
+{	while (count)
+	{	count -- ;
+		dest [count] = (((float) src [count]) - 128.0) * normfact ;
+		} ;
+} /* uc2f_array */
+
+static void
+les2f_array (short *src, int count, float *dest, float normfact)
+{	short	value ;
+
+	while (count)
+	{	count -- ;
+		value = src [count] ;
+		value = LES2H_SHORT (value) ;
+		dest [count] = ((float) value) * normfact ;
+		} ;
+} /* les2f_array */
+
+static void
+bes2f_array (short *src, int count, float *dest, float normfact)
+{	short			value ;
+
+	while (count)
+	{	count -- ;
+		value = src [count] ;
+		value = BES2H_SHORT (value) ;
+		dest [count] = ((float) value) * normfact ;
+		} ;
+} /* bes2f_array */
+
+static void
+let2f_array (tribyte *src, int count, float *dest, float normfact)
+{	unsigned char	*ucptr ;
+	int 			value ;
+
+	ucptr = ((unsigned char*) src) + 3 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
+		value = LET2H_INT_PTR (ucptr) ;
+		dest [count] = ((float) value) * normfact ;
+		} ;
+} /* let2f_array */
+
+static void
+bet2f_array (tribyte *src, int count, float *dest, float normfact)
+{	unsigned char	*ucptr ;
+	int 	value ;
+
+	ucptr = ((unsigned char*) src) + 3 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
+		value = BET2H_INT_PTR (ucptr) ;
+		dest [count] = ((float) value) * normfact ;
+		} ;
+} /* bet2f_array */
+
+static void
+lei2f_array (int *src, int count, float *dest, float normfact)
+{	int 			value ;
+
+	while (count)
+	{	count -- ;
+		value = src [count] ;
+		value = LEI2H_INT (value) ;
+		dest [count] = ((float) value) * normfact ;
+		} ;
+} /* lei2f_array */
+
+static void
+bei2f_array (int *src, int count, float *dest, float normfact)
+{	int 			value ;
+
+	while (count)
+	{	count -- ;
+		value = src [count] ;
+		value = BEI2H_INT (value) ;
+		dest [count] = ((float) value) * normfact ;
+		} ;
+} /* bei2f_array */
+
+/*-----------------------------------------------------------------------------------------------
+*/
+
+static	void
+sc2d_array	(signed char *src, int count, double *dest, double normfact)
+{	while (count)
+	{	count -- ;
+		dest [count] = ((double) src [count]) * normfact ;
+		} ;
+} /* sc2d_array */
+
+static	void
+uc2d_array	(unsigned char *src, int count, double *dest, double normfact)
+{	while (count)
+	{	count -- ;
+		dest [count] = (((double) src [count]) - 128.0) * normfact ;
+		} ;
+} /* uc2d_array */
+
+static void
+les2d_array (short *src, int count, double *dest, double normfact)
+{	short	value ;
+
+	while (count)
+	{	count -- ;
+		value = src [count] ;
+		value = LES2H_SHORT (value) ;
+		dest [count] = ((double) value) * normfact ;
+		} ;
+} /* les2d_array */
+
+static void
+bes2d_array (short *src, int count, double *dest, double normfact)
+{	short	value ;
+
+	while (count)
+	{	count -- ;
+		value = src [count] ;
+		value = BES2H_SHORT (value) ;
+		dest [count] = ((double) value) * normfact ;
+		} ;
+} /* bes2d_array */
+
+static void
+let2d_array (tribyte *src, int count, double *dest, double normfact)
+{	unsigned char	*ucptr ;
+	int 	value ;
+
+	ucptr = ((unsigned char*) src) + 3 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
+		value = LET2H_INT_PTR (ucptr) ;
+		dest [count] = ((double) value) * normfact ;
+		} ;
+} /* let2d_array */
+
+static void
+bet2d_array (tribyte *src, int count, double *dest, double normfact)
+{	unsigned char	*ucptr ;
+	int 	value ;
+
+	ucptr = ((unsigned char*) src) + 3 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
+		value = (ucptr [0] << 24) | (ucptr [1] << 16) | (ucptr [2] << 8) ;
+		dest [count] = ((double) value) * normfact ;
+		} ;
+} /* bet2d_array */
+
+static void
+lei2d_array (int *src, int count, double *dest, double normfact)
+{	int 	value ;
+
+	while (count)
+	{	count -- ;
+		value = src [count] ;
+		value = LEI2H_INT (value) ;
+		dest [count] = ((double) value) * normfact ;
+		} ;
+} /* lei2d_array */
+
+static void
+bei2d_array (int *src, int count, double *dest, double normfact)
+{	int 	value ;
+
+	while (count)
+	{	count -- ;
+		value = src [count] ;
+		value = BEI2H_INT (value) ;
+		dest [count] = ((double) value) * normfact ;
+		} ;
+} /* bei2d_array */
+
+/*-----------------------------------------------------------------------------------------------
+*/
+
+static	void
+s2sc_array	(short *src, signed char *dest, int count)
+{	while (count)
+	{	count -- ;
+		dest [count] = src [count] >> 8 ;
+		} ;
+} /* s2sc_array */
+
+static	void
+s2uc_array	(short *src, unsigned char *dest, int count)
+{	while (count)
+	{	count -- ;
+		dest [count] = (src [count] >> 8) + 0x80 ;
+		} ;
+} /* s2uc_array */
+
+static void
+s2let_array (short *src, tribyte *dest, int count)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) dest) + 3 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
+		ucptr [0] = 0 ;
+		ucptr [1] = src [count] ;
+		ucptr [2] = src [count] >> 8 ;
+		} ;
+} /* s2let_array */
+
+static void
+s2bet_array (short *src, tribyte *dest, int count)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) dest) + 3 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
+		ucptr [2] = 0 ;
+		ucptr [1] = src [count] ;
+		ucptr [0] = src [count] >> 8 ;
+		} ;
+} /* s2bet_array */
+
+static void
+s2lei_array (short *src, int *dest, int count)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) dest) + 4 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 4 ;
+		ucptr [0] = 0 ;
+		ucptr [1] = 0 ;
+		ucptr [2] = src [count] ;
+		ucptr [3] = src [count] >> 8 ;
+		} ;
+} /* s2lei_array */
+
+static void
+s2bei_array (short *src, int *dest, int count)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) dest) + 4 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 4 ;
+		ucptr [0] = src [count] >> 8 ;
+		ucptr [1] = src [count] ;
+		ucptr [2] = 0 ;
+		ucptr [3] = 0 ;
+		} ;
+} /* s2bei_array */
+
+/*-----------------------------------------------------------------------------------------------
+*/
+
+static	void
+i2sc_array	(int *src, signed char *dest, int count)
+{	while (count)
+	{	count -- ;
+		dest [count] = (src [count] >> 24) ;
+		} ;
+} /* i2sc_array */
+
+static	void
+i2uc_array	(int *src, unsigned char *dest, int count)
+{	while (count)
+	{	count -- ;
+		dest [count] = ((src [count] >> 24) + 128) ;
+		} ;
+} /* i2uc_array */
+
+static void
+i2bes_array (int *src, short *dest, int count)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) dest) + 2 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 2 ;
+		ucptr [0] = src [count] >> 24 ;
+		ucptr [1] = src [count] >> 16 ;
+		} ;
+} /* i2bes_array */
+
+static void
+i2les_array (int *src, short *dest, int count)
+{	unsigned char	*ucptr ;
+
+	ucptr = ((unsigned char*) dest) + 2 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 2 ;
+		ucptr [0] = src [count] >> 16 ;
+		ucptr [1] = src [count] >> 24 ;
+		} ;
+} /* i2les_array */
+
+static void
+i2let_array (int *src, tribyte *dest, int count)
+{	unsigned char	*ucptr ;
+	int				value ;
+
+	ucptr = ((unsigned char*) dest) + 3 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
+		value = src [count] >> 8 ;
+		ucptr [0] = value ;
+		ucptr [1] = value >> 8 ;
+		ucptr [2] = value >> 16 ;
+		} ;
+} /* i2let_array */
+
+static void
+i2bet_array (int *src, tribyte *dest, int count)
+{	unsigned char	*ucptr ;
+	int				value ;
+
+	ucptr = ((unsigned char*) dest) + 3 * count ;
+	while (count)
+	{	count -- ;
+		ucptr -= 3 ;
+		value = src [count] >> 8 ;
+		ucptr [2] = value ;
+		ucptr [1] = value >> 8 ;
+		ucptr [0] = value >> 16 ;
+		} ;
+} /* i2bet_array */
+
+/*-----------------------------------------------------------------------------------------------
+*/
+
+/*-----------------------------------------------------------------------------------------------
+*/
+
+/*==============================================================================
+*/
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch 

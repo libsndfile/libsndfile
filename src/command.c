@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,13 +16,12 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	"sfconfig.h"
-
 #include	<stdio.h>
 #include	<string.h>
 #include	<math.h>
 
 #include	"sndfile.h"
+#include	"config.h"
 #include	"common.h"
 
 static SF_FORMAT_INFO const simple_formats [] =
@@ -45,14 +44,6 @@ static SF_FORMAT_INFO const simple_formats [] =
 
 	{	SF_FORMAT_AU | SF_FORMAT_ULAW,
 		"AU (Sun/Next 8-bit u-law)", "au"
-		},
-
-	{	SF_FORMAT_CAF | SF_FORMAT_PCM_16,
-		"CAF (Apple 16 bit PCM)", "caf"
-		},
-
-	{	SF_FORMAT_FLAC | SF_FORMAT_PCM_16,
-		"FLAC 16 bit", "flac"
 		},
 
 	{	SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM,
@@ -107,9 +98,6 @@ static SF_FORMAT_INFO const major_formats [] =
 {
 	{	SF_FORMAT_AIFF,		"AIFF (Apple/SGI)",						"aiff" 	},
 	{	SF_FORMAT_AU,		"AU (Sun/NeXT)", 						"au"	},
-	{	SF_FORMAT_AVR,		"AVR (Audio Visual Research)",	 		"avr"	},
-	{	SF_FORMAT_CAF,		"CAF (Apple Core Audio File)",	 		"caf"	},
-	{	SF_FORMAT_FLAC,		"FLAC (FLAC Lossless Audio Codec)",	 	"flac"	},
 	{	SF_FORMAT_HTK,		"HTK (HMM Tool Kit)",					"htk"	},
 	{	SF_FORMAT_SVX,		"IFF (Amiga IFF/SVX8/SV16)",			"iff"	},
 	{	SF_FORMAT_MAT4,		"MAT4 (GNU Octave 2.0 / Matlab 4.2)",	"mat"	},
@@ -117,14 +105,15 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_PAF,		"PAF (Ensoniq PARIS)", 					"paf"	},
 	{	SF_FORMAT_PVF,		"PVF (Portable Voice Format)",			"pvf"	},
 	{	SF_FORMAT_RAW,		"RAW (header-less)",				 	"raw"	},
-	{	SF_FORMAT_SD2,		"SD2 (Sound Designer II)", 				"sd2"	},
 	{	SF_FORMAT_SDS,		"SDS (Midi Sample Dump Standard)", 		"sds"	},
+	/* Not ready for mainstream use yet.
+	{	SF_FORMAT_SD2,		"SD2 (Sound Designer II)", 			"sd2"	},
+	*/
 	{	SF_FORMAT_IRCAM,	"SF (Berkeley/IRCAM/CARL)",				"sf"	},
 	{	SF_FORMAT_VOC,		"VOC (Creative Labs)",					"voc"	},
 	{	SF_FORMAT_W64,		"W64 (SoundFoundry WAVE 64)",			"w64"	},
 	{	SF_FORMAT_WAV,		"WAV (Microsoft)",						"wav"	},
 	{	SF_FORMAT_NIST,		"WAV (NIST Sphere)",	 				"wav"	},
-	{	SF_FORMAT_WAVEX,	"WAVEX (Microsoft)",					"wav"	},
 	{	SF_FORMAT_XI,		"XI (FastTracker 2)",					"xi"	},
 
 } ; /* major_formats */
@@ -179,7 +168,7 @@ static SF_FORMAT_INFO subtype_formats [] =
 	{	SF_FORMAT_VOX_ADPCM,	"VOX ADPCM",			"vox" 	},
 
 	{	SF_FORMAT_DPCM_16,		"16 bit DPCM",			NULL 	},
-	{	SF_FORMAT_DPCM_8,		"8 bit DPCM",			NULL 	}
+	{	SF_FORMAT_DPCM_8,		"8 bit DPCM",			NULL 	},
 } ; /* subtype_formats */
 
 int
@@ -239,7 +228,7 @@ psf_get_format_info (SF_FORMAT_INFO *data)
 double
 psf_calc_signal_max (SF_PRIVATE *psf, int normalize)
 {	sf_count_t	position ;
-	double 		max_val, temp, *data ;
+	double 		max_val = 0.0, temp, *data ;
 	int			k, len, readcount, save_state ;
 
 	/* If the file is not seekable, there is nothing we can do. */
@@ -254,18 +243,19 @@ psf_calc_signal_max (SF_PRIVATE *psf, int normalize)
 		} ;
 
 	save_state = sf_command ((SNDFILE*) psf, SFC_GET_NORM_DOUBLE, NULL, 0) ;
+
 	sf_command ((SNDFILE*) psf, SFC_SET_NORM_DOUBLE, NULL, normalize) ;
 
 	/* Brute force. Read the whole file and find the biggest sample. */
-	/* Get current position in file */
-	position = sf_seek ((SNDFILE*) psf, 0, SEEK_CUR) ;
-	/* Go to start of file. */
-	sf_seek ((SNDFILE*) psf, 0, SEEK_SET) ;
+	position = sf_seek ((SNDFILE*) psf, 0, SEEK_CUR) ; /* Get current position in file */
+	sf_seek ((SNDFILE*) psf, 0, SEEK_SET) ;			/* Go to start of file. */
 
-	data = psf->u.dbuf ;
-	len = ARRAY_LEN (psf->u.dbuf) ;
+	len = sizeof (psf->buffer) / sizeof (double) ;
 
-	for (readcount = 1, max_val = 0.0 ; readcount > 0 ; /* nothing */)
+	data = (double*) psf->buffer ;
+
+	readcount = len ;
+	while (readcount > 0)
 	{	readcount = sf_read_double ((SNDFILE*) psf, data, len) ;
 		for (k = 0 ; k < readcount ; k++)
 		{	temp = fabs (data [k]) ;
@@ -273,8 +263,8 @@ psf_calc_signal_max (SF_PRIVATE *psf, int normalize)
 			} ;
 		} ;
 
-	/* Return to SNDFILE to original state. */
-	sf_seek ((SNDFILE*) psf, position, SEEK_SET) ;
+	sf_seek ((SNDFILE*) psf, position, SEEK_SET) ;		/* Return to original position. */
+
 	sf_command ((SNDFILE*) psf, SFC_SET_NORM_DOUBLE, NULL, save_state) ;
 
 	return	max_val ;
@@ -303,9 +293,9 @@ psf_calc_max_all_channels (SF_PRIVATE *psf, double *peaks, int normalize)
 	position = sf_seek ((SNDFILE*) psf, 0, SEEK_CUR) ; /* Get current position in file */
 	sf_seek ((SNDFILE*) psf, 0, SEEK_SET) ;			/* Go to start of file. */
 
-	len = ARRAY_LEN (psf->u.dbuf) ;
+	len = sizeof (psf->buffer) / sizeof (double) ;
 
-	data = psf->u.dbuf ;
+	data = (double*) psf->buffer ;
 
 	chan = 0 ;
 	readcount = len ;
@@ -323,36 +313,7 @@ psf_calc_max_all_channels (SF_PRIVATE *psf, double *peaks, int normalize)
 	sf_command ((SNDFILE*) psf, SFC_SET_NORM_DOUBLE, NULL, save_state) ;
 
 	return	0 ;
-} /* psf_calc_max_all_channels */
-
-int
-psf_get_signal_max (SF_PRIVATE *psf, double *peak)
-{	int k ;
-
-	if (psf->peak_info == NULL)
-		return SF_FALSE ;
-
-	peak [0] = psf->peak_info->peaks [0].value ;
-
-	for (k = 1 ; k < psf->sf.channels ; k++)
-		peak [0] = SF_MAX (peak [0], psf->peak_info->peaks [k].value) ;
-
-	return SF_TRUE ;
-} /* psf_get_signal_max */
-
-int
-psf_get_max_all_channels (SF_PRIVATE *psf, double *peaks)
-{	int k ;
-
-	if (psf->peak_info == NULL)
-		return SF_FALSE ;
-
-	for (k = 0 ; k < psf->sf.channels ; k++)
-		peaks [k] = psf->peak_info->peaks [k].value ;
-
-	return SF_TRUE ;
-} /* psf_get_max_all_channels */
-
+} /* psf_calc_signal_max */
 
 /*
 ** Do not edit or modify anything in this comment block.

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,15 +16,20 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include "sfconfig.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
 
-#include "common.h"
+#include "config.h"
+
+/* 
+** This is a bit rough, but it is the nicest way to do it.
+*/
+#define PSF_LOG_PRINTF_ONLY
+#include "common.c"
+
 
 #define	CMP_0_ARGS(line,err,fmt)	\
 	{	psf->logindex = 0 ;			\

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -144,9 +144,6 @@ enum
 	WAVE_FORMAT_SOUNDSPACE_MUSICOMPRESS	= 0x1500,		/* AT&T Labs, Inc. */
 	WAVE_FORMAT_DVM						= 0x2000,		/* FAST Multimedia AG */
 	WAVE_FORMAT_INTERWAV_VSC112			= 0x7150,		/* ????? */
-
-	WAVE_FORMAT_IPP_ITU_G_723_1			= 0x7230,		/* Intel Performance Primitives g723 codec. */
-
 	WAVE_FORMAT_EXTENSIBLE				= 0xFFFE
 } ;
 
@@ -256,12 +253,6 @@ typedef struct
 {	int frames ;
 } FACT_CHUNK ;
 
-typedef struct
-{	/* Set to true when 'fmt ' chunk is ambiguous.*/
-	int fmt_is_broken ;
-	WAV_FMT wav_fmt ;
-} WAV_PRIVATE ;
-
 #define		WAV_W64_GSM610_BLOCKSIZE	65
 #define		WAV_W64_GSM610_SAMPLES		320
 
@@ -274,14 +265,12 @@ typedef struct
 void	msadpcm_write_adapt_coeffs (SF_PRIVATE *psf) ;
 
 /*------------------------------------------------------------------------------------
-**	Functions defined in wav_w64.c
+**	Functions defined in wav_gsm610.c
 */
 
 int 	wav_w64_srate2blocksize (int srate_chan_product) ;
 char const* wav_w64_format_str (int k) ;
-int		wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize) ;
-void	wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat) ;
-void	wav_w64_analyze (SF_PRIVATE *psf) ;
+int		wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize) ;
 
 #endif
 /*

@@ -1,6 +1,6 @@
 [+ AutoGen5 template h c +]
 /*
-** Copyright (C) 2002-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,45 +26,16 @@
 
 [+ CASE (suffix) +]
 [+ ==  h  +]
-
-#ifdef __cplusplus
-extern "C" {
-#endif	/* __cplusplus */
-
-#include <stdarg.h>
-
 #define SF_COUNT_TO_LONG(x)	((long) (x))
-#define	ARRAY_LEN(x)		((int) (sizeof (x)) / (sizeof ((x) [0])))
-#define SIGNED_SIZEOF(x)	((int64_t) (sizeof (x)))
 
 #define	PIPE_INDEX(x)	((x) + 500)
 #define	PIPE_TEST_LEN	12345
 
-#if (defined (WIN32) || defined (_WIN32))
-#define	snprintf	_snprintf
-#endif
-
-[+ FOR float_type
-+]void gen_windowed_sine_[+ (get "name") +] ([+ (get "name") +] *data, int len, double maximum) ;
-[+ ENDFOR float_type
-+]
+void	gen_windowed_sine (double *data, int len, double maximum) ;
 
 void	check_file_hash_or_die	(const char *filename, unsigned int target_hash, int line_num) ;
 
 void	print_test_name (const char *test, const char *filename) ;
-
-void	dump_data_to_file (const char *filename, void *data, unsigned int datalen) ;
-
-static inline void
-exit_if_true (int test, const char *format, ...)
-{	if (test)
-	{	va_list	argptr ;
-		va_start (argptr, format) ;
-		vprintf (format, argptr) ;
-		va_end (argptr) ;
-		exit (1) ;
-		} ;
-} /* exit_if_true */
 
 /*
 **	Functions for saving two vectors of data in an ascii text file which
@@ -76,22 +47,14 @@ exit_if_true (int test, const char *format, ...)
 [+ ENDFOR io_type
 +]
 
-void	delete_file (int format, const char *filename) ;
-
-void	count_open_files (void) ;
-void	increment_open_file_count (void) ;
-void	check_open_file_count_or_die (int lineno) ;
-
 #ifdef SNDFILE_H
 
 void 	dump_log_buffer (SNDFILE *file) ;
-void 	check_log_buffer_or_die (SNDFILE *file, int line_num) ;
+void 	check_log_buffer_or_die (SNDFILE *file) ;
 int 	string_in_log_buffer (SNDFILE *file, const char *s) ;
-void	hexdump_file (const char * filename, sf_count_t offset, sf_count_t length) ;
-
 
 SNDFILE *test_open_file_or_die
-			(const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num) ;
+			(const char *filename, int mode, SF_INFO *sfinfo, int line_num) ;
 
 void 	test_read_write_position_or_die
 			(SNDFILE *file, int line_num, int pass, sf_count_t read_pos, sf_count_t write_pos) ;
@@ -99,32 +62,22 @@ void 	test_read_write_position_or_die
 void	test_seek_or_die
 			(SNDFILE *file, sf_count_t offset, int whence, sf_count_t new_pos, int channels, int line_num) ;
 
-[+ FOR read_op +]
+[+ FOR io_operation +]
 [+ FOR io_type
 +]void 	test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die
 			(SNDFILE *file, int pass, [+ (get "io_element") +] *test, sf_count_t [+ (get "count_name") +], int line_num) ;
-[+ ENDFOR io_type +][+ ENDFOR read_op +]
-
-[+ FOR write_op +]
-[+ FOR io_type
-+]void 	test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die
-			(SNDFILE *file, int pass, const [+ (get "io_element") +] *test, sf_count_t [+ (get "count_name") +], int line_num) ;
-[+ ENDFOR io_type +][+ ENDFOR write_op +]
+[+ ENDFOR io_type +][+ ENDFOR io_operation +]
 
 #endif
 
-#ifdef __cplusplus
-}		/* extern "C" */
-#endif	/* __cplusplus */
-
 [+  ==  c  +]
 
-#include "sfconfig.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
@@ -132,9 +85,7 @@ void	test_seek_or_die
 #include <sf_unistd.h>
 #endif
 
-#include <errno.h>
 #include <string.h>
-#include <ctype.h>
 #include <math.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -147,14 +98,13 @@ void	test_seek_or_die
 #define	M_PI		3.14159265358979323846264338
 #endif
 
-#define	LOG_BUFFER_SIZE		2048
+#define		LOG_BUFFER_SIZE		2048
 
-[+ FOR float_type +]
 void
-gen_windowed_sine_[+ (get "name") +] ([+ (get "name") +] *data, int len, double maximum)
+gen_windowed_sine (double *data, int len, double maximum)
 {	int k ;
 
-	memset (data, 0, len * sizeof ([+ (get "name") +])) ;
+	memset (data, 0, len * sizeof (double)) ;
 	/*
 	**	Choose a frequency of 1/32 so that it aligns perfectly with a DFT
 	**	bucket to minimise spreading of energy over more than one bucket.
@@ -171,8 +121,8 @@ gen_windowed_sine_[+ (get "name") +] ([+ (get "name") +] *data, int len, double 
 		}
 
 	return ;
-} /* gen_windowed_sine_[+ (get "name") +] */
-[+ ENDFOR float_type +]
+} /* gen_windowed_sine */
+
 
 void
 check_file_hash_or_die (const char *filename, unsigned int target_hash, int line_num)
@@ -185,7 +135,7 @@ check_file_hash_or_die (const char *filename, unsigned int target_hash, int line
 
 	/* The 'b' in the mode string means binary for Win32. */
 	if (! (file = fopen (filename, "rb")))
-	{	printf ("\n\nLine %d: could not open file '%s'\n\n", line_num, filename) ;
+	{	printf ("\n\nLine %d: could not open file '%s'\n", line_num, filename) ;
 		exit (1) ;
 		} ;
 
@@ -208,7 +158,7 @@ check_file_hash_or_die (const char *filename, unsigned int target_hash, int line
 		} ;
 
 	if (hash1 != target_hash)
-	{	printf ("\n\nLine %d: incorrect hash value 0x%08x should be 0x%08x\n\n", line_num, hash1, target_hash) ;
+	{	printf ("\n\nLine %d: incorrect hash value 0x%08x should be 0x%08x\n", line_num, hash1, target_hash) ;
 		exit (1) ;
 		}
 
@@ -224,7 +174,7 @@ print_test_name (const char *test, const char *filename)
 		exit (1) ;
 		} ;
 
-	printf ("    %-25s : %s ", test, filename) ;
+	printf ("    %-20s : %s ", test, filename) ;
 
 	count = 24 - strlen (filename) ;
 	while (count -- > 0)
@@ -233,24 +183,6 @@ print_test_name (const char *test, const char *filename)
 
 	fflush (stdout) ;
 } /* print_test_name */
-
-void
-dump_data_to_file (const char *filename, void *data, unsigned int datalen)
-{	FILE *file ;
-
-	if ((file = fopen (filename, "wb")) == NULL)
-	{	printf ("\n\nLine %d : could not open file : %s\n\n", __LINE__, filename) ;
-		exit (1) ;
-		} ;
-
-	if (fwrite (data, 1, datalen, file) != datalen)
-	{	printf ("\n\nLine %d : fwrite failed.\n\n", __LINE__) ;
-		exit (1) ;
-		} ;
-
-	fclose (file) ;
-
-} /* dump_data_to_file */
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 */
@@ -291,7 +223,7 @@ oct_save_[+ (get "io_element") +]	([+ (get "io_element") +] *a, [+ (get "io_elem
 +]
 
 void
-check_log_buffer_or_die (SNDFILE *file, int line_num)
+check_log_buffer_or_die (SNDFILE *file)
 {	static char	buffer [LOG_BUFFER_SIZE] ;
 	int			count ;
 
@@ -301,27 +233,20 @@ check_log_buffer_or_die (SNDFILE *file, int line_num)
 	count = sf_command	(file, SFC_GET_LOG_INFO, buffer, LOG_BUFFER_SIZE) ;
 
 	if (LOG_BUFFER_SIZE - count < 2)
-	{	printf ("\n\nLine %d : Possible long log buffer.\n", line_num) ;
+	{	printf ("Possible long log buffer.\n") ;
 		exit (1) ;
 		}
 
 	/* Look for "Should" */
 	if (strstr (buffer, "ould"))
-	{	printf ("\n\nLine %d : Log buffer contains `ould'. Dumping.\n", line_num) ;
+	{	puts ("\n\nLog buffer contains `ould'. Dumping.\n") ;
 		puts (buffer) ;
 		exit (1) ;
 		} ;
 
 	/* Look for "**" */
 	if (strstr (buffer, "*"))
-	{	printf ("\n\nLine %d : Log buffer contains `*'. Dumping.\n", line_num) ;
-		puts (buffer) ;
-		exit (1) ;
-		} ;
-
-	/* Look for "Should" */
-	if (strstr (buffer, "nknown marker"))
-	{	printf ("\n\nLine %d : Log buffer contains `nknown marker'. Dumping.\n", line_num) ;
+	{	puts ("\n\nLog buffer contains `*'. Dumping.\n") ;
 		puts (buffer) ;
 		exit (1) ;
 		} ;
@@ -349,58 +274,6 @@ string_in_log_buffer (SNDFILE *file, const char *s)
 } /* string_in_log_buffer */
 
 void
-hexdump_file (const char * filename, sf_count_t offset, sf_count_t length)
-{
-	FILE * file ;
-	char buffer [16] ;
-	int k, m, ch, readcount ;
-
-	if (length > 1000000)
-	{	printf ("\n\nError : length (%ld) too long.\n\n", SF_COUNT_TO_LONG (offset)) ;
-		exit (1) ;
-		} ;
-
-	if ((file = fopen (filename, "r")) == NULL)
-	{	printf ("\n\nError : hexdump_file (%s) could not open file for read.\n\n", filename) ;
-		exit (1) ;
-		} ;
-
-	if (fseek (file, offset, SEEK_SET) != 0)
-	{	printf ("\n\nError : fseek(file, %ld, SEEK_SET) failed : %s\n\n", SF_COUNT_TO_LONG (offset), strerror (errno)) ;
-		exit (1) ;
-		} ;
-
-	puts ("\n\n") ;
-
-	for (k = 0 ; k < length ; k+= sizeof (buffer))
-	{	readcount = fread (buffer, 1, sizeof (buffer), file) ;
-
-		printf ("%08lx : ", SF_COUNT_TO_LONG (offset + k)) ;
-
-		for (m = 0 ; m < readcount ; m++)
-			printf ("%02x ", buffer [m] & 0xFF) ;
-
-		for (m = readcount ; m < SIGNED_SIZEOF (buffer) ; m++)
-			printf ("   ") ;
-
-		printf ("  ") ;
-		for (m = 0 ; m < readcount ; m++)
-		{	ch = isprint (buffer [m]) ? buffer [m] : '.' ;
-			putchar (ch) ;
-			} ;
-
-		if (readcount < SIGNED_SIZEOF (buffer))
-			break ;
-
-		putchar ('\n') ;
-		} ;
-
-	puts ("\n") ;
-
-	fclose (file) ;
-} /* hexdump_file */
-
-void
 dump_log_buffer (SNDFILE *file)
 {	static char	buffer [LOG_BUFFER_SIZE] ;
 	int			count ;
@@ -419,7 +292,7 @@ dump_log_buffer (SNDFILE *file)
 } /* dump_log_buffer */
 
 SNDFILE *
-test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num)
+test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int line_num)
 {	static int count = 0 ;
 
 	SNDFILE *file ;
@@ -430,6 +303,7 @@ test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allo
 	** Need to test both sf_open() and sf_open_fd().
 	** Do so alternately.
 	*/
+
 	switch (mode)
 	{	case SFM_READ :
 				modestr = "SFM_READ" ;
@@ -454,12 +328,12 @@ test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allo
 				exit (1) ;
 		} ;
 
-#if (defined (WIN32) || defined (_WIN32))
+#if (defined (__CYGWIN__) || defined (WIN32) || defined (_WIN32))
 	/* Stupid fscking windows. */
 	oflags |= O_BINARY ;
 #endif
 
-	if (allow_fd && ((++count) & 1) == 1)
+	if (((++count) & 1) == 1)
 	{	int fd ;
 
 		if (omode == 0)
@@ -481,7 +355,8 @@ test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allo
 		} ;
 
 	if (file == NULL)
-	{	printf ("\n\nLine %d: %s (%s) failed : %s\n\n", line_num, func_name, modestr, sf_strerror (NULL)) ;
+	{	printf ("\n\nLine %d: %s (%s) failed : ", line_num, func_name, modestr) ;
+		puts (sf_strerror (NULL)) ;
 		dump_log_buffer (file) ;
 		exit (1) ;
 		} ;
@@ -561,15 +436,15 @@ test_seek_or_die (SNDFILE *file, sf_count_t offset, int whence, sf_count_t new_p
 	channel_name = (channels == 1) ? "Mono" : "Stereo" ;
 
 	if ((position = sf_seek (file, offset, whence)) != new_pos)
-	{	printf ("\n\nLine %d : %s : sf_seek (file, %ld, %s) returned %ld (should be %ld).\n\n",
-					line_num, channel_name, SF_COUNT_TO_LONG (offset), whence_name,
-					SF_COUNT_TO_LONG (position), SF_COUNT_TO_LONG (new_pos)) ;
+	{	printf ("Line %d : %s : sf_seek (file, %ld, %s) returned %ld.\n", line_num,
+					channel_name, SF_COUNT_TO_LONG (offset), whence_name,
+					SF_COUNT_TO_LONG (position)) ;
 		exit (1) ;
 		} ;
 
 } /* test_seek_or_die */
 
-[+ FOR read_op +]
+[+ FOR io_operation +]
 [+ FOR io_type +]
 void
 test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die (SNDFILE *file, int pass, [+ (get "io_element") +] *test, sf_count_t [+ (get "count_name") +], int line_num)
@@ -588,115 +463,14 @@ test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die (SNDFILE *file, in
 
 	return ;
 } /* test_[+ (get "op_element") +]_[+ (get "io_element") +] */
-[+ ENDFOR io_type +][+ ENDFOR read_op +]
-
-[+ FOR write_op +]
-[+ FOR io_type +]
-void
-test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die (SNDFILE *file, int pass, const [+ (get "io_element") +] *test, sf_count_t [+ (get "count_name") +], int line_num)
-{	sf_count_t count ;
-
-	if ((count = sf_[+ (get "op_element") +]_[+ (get "io_element") +] (file, test, [+ (get "count_name") +])) != [+ (get "count_name") +])
-	{	printf ("\n\nLine %d", line_num) ;
-		if (pass > 0)
-			printf (" (pass %d)", pass) ;
-		printf (" : sf_[+ (get "op_element") +]_[+ (get "io_element") +] failed with short [+ (get "op_element") +] (%ld => %ld).\n",
-						SF_COUNT_TO_LONG ([+ (get "count_name") +]), SF_COUNT_TO_LONG (count)) ;
-		fflush (stdout) ;
-		puts (sf_strerror (file)) ;
-		exit (1) ;
-		} ;
-
-	return ;
-} /* test_[+ (get "op_element") +]_[+ (get "io_element") +] */
-[+ ENDFOR io_type +][+ ENDFOR write_op +]
-
-void
-delete_file (int format, const char *filename)
-{	char rsrc_name [512], *fname ;
-
-	unlink (filename) ;
-
-	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_SD2)
-		return ;
-
-	/*
-	** Now try for a resource fork stored as a separate file.
-	** Grab the un-adulterated filename again.
-	*/
-	snprintf (rsrc_name, sizeof (rsrc_name), "%s", filename) ;
-
-	if ((fname = strrchr (rsrc_name, '/')) != NULL)
-		fname ++ ;
-	else if ((fname = strrchr (rsrc_name, '\\')) != NULL)
-		fname ++ ;
-	else
-		fname = rsrc_name ;
-
-	memmove (fname + 2, fname, strlen (fname) + 1) ;
-	fname [0] = '.' ;
-	fname [1] = '_' ;
-
-	unlink (rsrc_name) ;
-} /* delete_file */
-
-static int allowed_open_files = -1 ;
-
-void
-count_open_files (void)
-{
-#if (defined (WIN32) || defined (_WIN32))
-	return ;
-#else
-	int k, count = 0 ;
-	struct stat statbuf ;
-
-	if (allowed_open_files > 0)
-		return ;
-
-	for (k = 0 ; k < 1024 ; k++)
-		if (fstat (k, &statbuf) == 0)
-			count ++ ;
-
-	allowed_open_files = count ;
-#endif
-} /* count_open_files */
-
-void
-increment_open_file_count (void)
-{	allowed_open_files ++ ;
-} /* increment_open_file_count */
-
-void
-check_open_file_count_or_die (int lineno)
-{
-#if (defined (WIN32) || defined (_WIN32))
-	lineno = 0 ;
-	return ;
-#else
-	int k, count = 0 ;
-	struct stat statbuf ;
-
-	if (allowed_open_files < 0)
-		count_open_files () ;
-
-	for (k = 0 ; k < 1024 ; k++)
-		if (fstat (k, &statbuf) == 0)
-			count ++ ;
-
-	if (count > allowed_open_files)
-	{	printf ("\nLine %d : number of open files (%d) > allowed (%d).\n\n", lineno, count, allowed_open_files) ;
-		exit (1) ;
-		} ;
-#endif
-} /* check_open_file_count_or_die */
+[+ ENDFOR io_type +][+ ENDFOR io_operation +]
 
 [+ ESAC +]
 
 [+ COMMENT
 
  Do not edit or modify anything in this comment block.
- The following line is a file identity tag for the GNU Arch
+ The following line is a file identity tag for the GNU Arch 
  revision control system.
 
  arch-tag: b1183d5d-ebd4-4bc5-af50-60d774d6b1f5

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002,2003,2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,14 +16,13 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	"sfconfig.h"
-
 #include	<stdio.h>
 #include	<fcntl.h>
 #include	<string.h>
 #include	<ctype.h>
 
 #include	"sndfile.h"
+#include	"config.h"
 #include	"sfendian.h"
 #include	"common.h"
 
@@ -70,7 +69,7 @@ pvf_open	(SF_PRIVATE *psf)
 		psf->write_header = pvf_write_header ;
 		} ;
 
-	psf->container_close = pvf_close ;
+	psf->close = pvf_close ;
 
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
@@ -91,17 +90,21 @@ pvf_open	(SF_PRIVATE *psf)
 */
 
 static int
-pvf_close	(SF_PRIVATE * UNUSED (psf))
+pvf_close	(SF_PRIVATE *psf)
 {
+	psf = psf ;
+
 	return 0 ;
 } /* pvf_close */
 
 static int
-pvf_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
+pvf_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t	current ;
 
 	if (psf->pipeoffset > 0)
 		return 0 ;
+
+	calc_length = calc_length ; /* Avoid a compiler warning. */
 
 	current = psf_ftell (psf) ;
 
@@ -180,6 +183,8 @@ pvf_read_header (SF_PRIVATE *psf)
 
 	psf->datalength = psf->filelength - psf->dataoffset ;
 	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
+
+	psf->close = pvf_close ;
 
 	if (! psf->sf.frames && psf->blockwidth)
 		psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;

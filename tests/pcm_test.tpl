@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 1999-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2002 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include "sfconfig.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
@@ -32,7 +32,7 @@
 #include "float_cast.h"
 #include "utils.h"
 
-#define	BUFFER_SIZE		(1<<12)
+#define	BUFFER_SIZE		(1<<15)
 
 static void	lrintf_test (void) ;
 
@@ -43,18 +43,11 @@ static void	lrintf_test (void) ;
 static void pcm_test_float	(const char *filename, int filetype, int hash, int replace_float) ;
 static void pcm_test_double	(const char *filename, int filetype, int hash, int replace_float) ;
 
-typedef union
-{	double	d [BUFFER_SIZE + 1];
-	float	f [BUFFER_SIZE + 1];
-	int		i [BUFFER_SIZE + 1];
-	short	s [BUFFER_SIZE + 1];
-} BUFFER ;
-
 /* Data written to the file. */
-static	BUFFER	data_out ;
+static	double	data_out [(BUFFER_SIZE / sizeof (double)) + 1] ;
 
 /* Data read back from the file. */
-static	BUFFER	data_in ;
+static	double	data_in	[(BUFFER_SIZE / sizeof (double)) + 1] ;
 
 int
 main (void)
@@ -106,8 +99,8 @@ lrintf_test (void)
 
 	items = 1024 ;
 
-	float_data = data_out.f ;
-	int_data = data_in.i ;
+	float_data = (float*) data_out ;
+	int_data = (int*) data_in ;
 
 	for (k = 0 ; k < items ; k++)
 		float_data [k] = (k * ((k % 2) ? 333333.0 : -333333.0)) ;
@@ -141,8 +134,8 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 
 	items = [+ (get "item_count") +] ;
 
-	short_out = data_out.s ;
-	short_in = data_in.s ;
+	short_out = (short*) data_out ;
+	short_in = (short*) data_in ;
 
 	zero_count = 0 ;
 	for (k = 0 ; k < items ; k++)
@@ -160,7 +153,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 
 	test_write_short_or_die (file, 0, short_out, items, __LINE__) ;
 
@@ -168,7 +161,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 
 	memset (short_in, 0, items * sizeof (short)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 
 	if (sfinfo.format != filetype)
 	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
@@ -185,7 +178,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 
 	test_read_short_or_die (file, 0, short_in, items, __LINE__) ;
 
@@ -205,8 +198,8 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 	*/
 	zero_count = 0 ;
 
-	int_out = data_out.i ;
-	int_in = data_in.i ;
+	int_out = (int*) data_out ;
+	int_in = (int*) data_in ;
 	for (k = 0 ; k < items ; k++)
 	{	int_out [k] = [+ (get "int_func") +] ;
 		zero_count = int_out [k] ? zero_count : zero_count + 1 ;
@@ -222,7 +215,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 
 	test_write_int_or_die (file, 0, int_out, items, __LINE__) ;
 
@@ -230,7 +223,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 
 	memset (int_in, 0, items * sizeof (int)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 
 	if (sfinfo.format != filetype)
 	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
@@ -247,7 +240,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 
 	test_read_int_or_die (file, 0, int_in, items, __LINE__) ;
 
@@ -265,8 +258,8 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 	*/
 	zero_count = 0 ;
 
-	float_out = data_out.f ;
-	float_in = data_in.f ;
+	float_out = (float*) data_out ;
+	float_in = (float*) data_in ;
 	for (k = 0 ; k < items ; k++)
 	{	float_out [k] = [+ (get "float_func") +] ;
 		zero_count = (fabs (float_out [k]) > 1e-10) ? zero_count : zero_count + 1 ;
@@ -282,7 +275,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 
@@ -292,7 +285,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 
 	memset (float_in, 0, items * sizeof (float)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 
 	if (sfinfo.format != filetype)
 	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
@@ -309,7 +302,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 
@@ -329,8 +322,8 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 	*/
 	zero_count = 0 ;
 
-	double_out = data_out.d ;
-	double_in = data_in.d ;
+	double_out = (double*) data_out ;
+	double_in = (double*) data_in ;
 	for (k = 0 ; k < items ; k++)
 	{	double_out [k] = [+ (get "float_func") +] ;
 		zero_count = (fabs (double_out [k]) > 1e-10) ? zero_count : zero_count + 1 ;
@@ -346,7 +339,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 
 	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
 
@@ -356,7 +349,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 
 	memset (double_in, 0, items * sizeof (double)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 
 	if (sfinfo.format != filetype)
 	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
@@ -373,7 +366,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 
 	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
 
@@ -387,9 +380,9 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, int hash)
 
 	sf_close (file) ;
 	/* Lite remove end */
-	unlink (filename) ;
 
-	puts ("ok") ;
+	printf ("ok\n") ;
+	unlink (filename) ;
 } /* pcm_test_[+ (get "name") +] */
 
 [+ ENDFOR data_type
@@ -408,9 +401,9 @@ pcm_test_float (const char *filename, int filetype, int hash, int replace_float)
 
 	print_test_name ("pcm_test_float", filename) ;
 
-	items = BUFFER_SIZE ;
+	items = BUFFER_SIZE / sizeof (double) ;
 
-	data = data_out.d ;
+	data = (double*) data_out ;
 	for (sign = 1, k = 0 ; k < items ; k++)
 	{	data [k] = ((double) (k * sign)) / 100.0 ;
 		sign = (sign > 0) ? -1 : 1 ;
@@ -421,7 +414,7 @@ pcm_test_float (const char *filename, int filetype, int hash, int replace_float)
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 	if (replace_float && string_in_log_buffer (file, "Using IEEE replacement") == 0)
 	{	printf ("\n\nLine %d : Float replacement code not working.\n\n", __LINE__) ;
@@ -440,7 +433,7 @@ pcm_test_float (const char *filename, int filetype, int hash, int replace_float)
 	if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
 		memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 	if (replace_float && string_in_log_buffer (file, "Using IEEE replacement") == 0)
 	{	printf ("\n\nLine %d : Float replacement code not working.\n\n", __LINE__) ;
@@ -463,7 +456,7 @@ pcm_test_float (const char *filename, int filetype, int hash, int replace_float)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 
 	test_read_double_or_die (file, 0, data, items, __LINE__) ;
 
@@ -532,9 +525,9 @@ pcm_test_float (const char *filename, int filetype, int hash, int replace_float)
 		return ;
 		} ;
 
-	items = BUFFER_SIZE ;
+	items = BUFFER_SIZE / sizeof (double) ;
 
-	data = data_out.d ;
+	data = (double*) data_out ;
 	for (sign = -1, k = 0 ; k < items ; k++)
 		data [k] = ((double) k) / 100.0 * (sign *= -1) ;
 
@@ -545,7 +538,7 @@ pcm_test_float (const char *filename, int filetype, int hash, int replace_float)
 
 	frames = items / sfinfo.channels ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 	if (replace_float && string_in_log_buffer (file, "Using IEEE replacement") == 0)
 	{	printf ("\n\nLine %d : Float replacement code not working.\n\n", __LINE__) ;
@@ -564,7 +557,7 @@ pcm_test_float (const char *filename, int filetype, int hash, int replace_float)
 	if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
 		memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 	if (replace_float && string_in_log_buffer (file, "Using IEEE replacement") == 0)
 	{	printf ("\n\nLine %d : Float replacement code not working.\n\n", __LINE__) ;
@@ -587,7 +580,7 @@ pcm_test_float (const char *filename, int filetype, int hash, int replace_float)
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 
 	test_readf_double_or_die (file, 0, data, frames, __LINE__) ;
 	for (sign = -1, k = 0 ; k < items ; k++)
@@ -664,9 +657,9 @@ pcm_test_double (const char *filename, int	filetype, int hash, int replace_float
 
 	print_test_name ("pcm_test_double", filename) ;
 
-	items = BUFFER_SIZE ;
+	items = BUFFER_SIZE / sizeof (double) ;
 
-	data = data_out.d ;
+	data = (double*) data_out ;
 	for (sign = 1, k = 0 ; k < items ; k++)
 	{	data [k] = ((double) (k * sign)) / 100.0 ;
 		sign = (sign > 0) ? -1 : 1 ;
@@ -677,7 +670,7 @@ pcm_test_double (const char *filename, int	filetype, int hash, int replace_float
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 	if (replace_float && string_in_log_buffer (file, "Using IEEE replacement") == 0)
 	{	printf ("\n\nLine %d : Float replacement code not working.\n\n", __LINE__) ;
@@ -703,7 +696,7 @@ pcm_test_double (const char *filename, int	filetype, int hash, int replace_float
 	if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
 		memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 	if (replace_float && string_in_log_buffer (file, "Using IEEE replacement") == 0)
 	{	printf ("\n\nLine %d : Float replacement code not working.\n\n", __LINE__) ;
@@ -726,7 +719,7 @@ pcm_test_double (const char *filename, int	filetype, int hash, int replace_float
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 
 	test_read_double_or_die (file, 0, data, items, __LINE__) ;
 
@@ -798,9 +791,9 @@ pcm_test_double (const char *filename, int	filetype, int hash, int replace_float
 		return ;
 		} ;
 
-	items = BUFFER_SIZE ;
+	items = BUFFER_SIZE / sizeof (double) ;
 
-	data = data_out.d ;
+	data = (double*) data_out ;
 	for (sign = -1, k = 0 ; k < items ; k++)
 		data [k] = ((double) k) / 100.0 * (sign *= -1) ;
 
@@ -811,7 +804,7 @@ pcm_test_double (const char *filename, int	filetype, int hash, int replace_float
 
 	frames = items / sfinfo.channels ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 	if (replace_float && string_in_log_buffer (file, "Using IEEE replacement") == 0)
 	{	printf ("\n\nLine %d : Float replacement code not working.\n\n", __LINE__) ;
@@ -837,7 +830,7 @@ pcm_test_double (const char *filename, int	filetype, int hash, int replace_float
 	if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
 		memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 	if (replace_float && string_in_log_buffer (file, "Using IEEE replacement") == 0)
 	{	printf ("\n\nLine %d : Float replacement code not working.\n\n", __LINE__) ;
@@ -860,7 +853,7 @@ pcm_test_double (const char *filename, int	filetype, int hash, int replace_float
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 
 	test_readf_double_or_die (file, 0, data, frames, __LINE__) ;
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -23,14 +23,13 @@
 **	However, no code from that package was used.
 */
 
-#include	"sfconfig.h"
-
 #include	<stdio.h>
 #include	<fcntl.h>
 #include	<string.h>
 #include	<ctype.h>
 
 #include	"sndfile.h"
+#include	"config.h"
 #include	"sfendian.h"
 #include	"common.h"
 
@@ -52,12 +51,14 @@ static	int nist_read_header	(SF_PRIVATE *psf) ;
 
 int
 nist_open	(SF_PRIVATE *psf)
-{	int error ;
+{	int subformat, error ;
 
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = nist_read_header (psf)))
 			return error ;
 		} ;
+
+	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	if (psf->is_pipe)
@@ -71,7 +72,6 @@ nist_open	(SF_PRIVATE *psf)
 			psf->endian = (CPU_IS_BIG_ENDIAN) ? SF_ENDIAN_BIG : SF_ENDIAN_LITTLE ;
 
 		psf->blockwidth = psf->bytewidth * psf->sf.channels ;
-		psf->sf.frames = 0 ;
 
 		if ((error = nist_write_header (psf, SF_FALSE)))
 			return error ;
@@ -79,7 +79,7 @@ nist_open	(SF_PRIVATE *psf)
 		psf->write_header = nist_write_header ;
 		} ;
 
-	psf->container_close = nist_close ;
+	psf->close = nist_close ;
 
 	switch (psf->sf.format & SF_FORMAT_SUBMASK)
 	{	case SF_FORMAT_PCM_S8 :
@@ -125,7 +125,7 @@ nist_read_header (SF_PRIVATE *psf)
 
 	psf->sf.format = SF_FORMAT_NIST ;
 
-	psf_header = psf->u.cbuf ;
+	psf_header = (char*) psf->header ;
 
 	if (sizeof (psf->header) <= NIST_HEADER_LENGTH)
 		return SFE_INTERNAL ;
@@ -146,16 +146,9 @@ nist_read_header (SF_PRIVATE *psf)
 		return SFE_NIST_CRLF_CONVERISON ;
 
 	/* Make sure its a NIST file. */
-	if (strstr (psf_header, "NIST_1A\n") != psf_header)
+	if (strstr (psf_header, "NIST_1A\n   1024\n") != psf_header)
 	{	psf_log_printf (psf, "Not a NIST file.\n") ;
 		return SFE_NIST_BAD_HEADER ;
-		} ;
-
-	if (sscanf (psf_header, "NIST_1A\n%d\n", &count) == 1)
-		psf->dataoffset = count ;
-	else
-	{	psf_log_printf (psf, "*** Suspicious header length.\n") ;
-		psf->dataoffset = NIST_HEADER_LENGTH ;
 		} ;
 
 	/* Determine sample encoding, start by assuming PCM. */
@@ -224,8 +217,11 @@ nist_read_header (SF_PRIVATE *psf)
 		return SFE_NIST_BAD_ENCODING ;
 		} ;
 
+ 	psf->dataoffset = NIST_HEADER_LENGTH ;
 	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
 	psf->datalength = psf->filelength - psf->dataoffset ;
+
+	psf->close = nist_close ;
 
 	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 
@@ -278,17 +274,8 @@ nist_write_header (SF_PRIVATE *psf, int calc_length)
 
 	current = psf_ftell (psf) ;
 
-	if (calc_length)
-	{	psf->filelength = psf_get_filelen (psf) ;
-
-		psf->datalength = psf->filelength - psf->dataoffset ;
-
-		if (psf->dataend)
-			psf->datalength -= psf->filelength - psf->dataend ;
-
-		if (psf->bytewidth > 0)
-			psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
-		} ;
+	/* Prevent compiler warning. */
+	calc_length = calc_length ;
 
 	if (psf->endian == SF_ENDIAN_BIG)
 		end_str = "10" ;
@@ -344,7 +331,7 @@ nist_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_asciiheader_printf (psf, "end_head\n") ;
 
 	/* Zero fill to dataoffset. */
-	psf_binheader_writef (psf, "z", (size_t) (NIST_HEADER_LENGTH - psf->headindex)) ;
+	psf_binheader_writef (psf, "z", NIST_HEADER_LENGTH - psf->headindex) ;
 
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 

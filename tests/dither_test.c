@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003,2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,7 +147,7 @@ dither_test (const char *filename, int filetype)
 
 	frames = BUFFER_LEN / sfinfo.channels ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 
 	/* Check for old version of the dither API. */
 	if (sf_command (file, SFC_SET_DITHER_ON_WRITE, NULL, SF_TRUE) == 0)
@@ -171,7 +171,7 @@ dither_test (const char *filename, int filetype)
 
 	sf_close (file) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 
 	if (sfinfo.frames != BUFFER_LEN)
 	{	printf ("\n\nLine %d: Bad frame count %d (should be %d)\n\n", __LINE__, (int) sfinfo.frames, BUFFER_LEN) ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002,2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include "sfconfig.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -71,7 +71,7 @@ dwvw_test (const char *filename, int format, int bit_width)
 	sfinfo.frames		= -1 ; /* Unknown! */
 	sfinfo.channels		= 1 ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 
 	/* Generate random.frames. */
 	k = 0 ;
@@ -86,7 +86,7 @@ dwvw_test (const char *filename, int format, int bit_width)
 	sf_write_int (file, write_buf, BUFFER_SIZE) ;
 	sf_close (file) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 
 	if ((k = sf_read_int (file, read_buf, BUFFER_SIZE)) != BUFFER_SIZE)
 	{	printf ("Error (line %d) : Only read %d/%d.frames.\n", __LINE__, k, BUFFER_SIZE) ;

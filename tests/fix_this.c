@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,14 +43,8 @@ static	void	gen_signal_double (double *data, double scale, int datalen) ;
 /* Force the start of these buffers to be double aligned. Sparc-solaris will
 ** choke if they are not.
 */
-
-typedef union
-{	double	d [BUFFER_SIZE + 1];
-	int 	i [BUFFER_SIZE + 1];
-} BUFFER ;
-
-static	BUFFER	data_buffer ;
-static	BUFFER	orig_buffer ;
+static	double	data_buffer [BUFFER_SIZE + 1] ;
+static	double	orig_buffer [BUFFER_SIZE + 1] ;
 
 int
 main (void)
@@ -82,12 +76,12 @@ lcomp_test_int (const char *str, const char *filename, int filetype, double marg
 
 	scale = 1.0 * 0x10000 ;
 
-	data = data_buffer.i ;
-	orig = orig_buffer.i ;
+	data = (int*) data_buffer ;
+	orig = (int*) orig_buffer ;
 
-	gen_signal_double (orig_buffer.d, 32000.0 * scale, datalen) ;
+	gen_signal_double (orig_buffer, 32000.0 * scale, datalen) ;
 	for (k = 0 ; k < datalen ; k++)
-		orig [k] = orig_buffer.d [k] ;
+		orig [k] = orig_buffer [k] ;
 
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
@@ -138,7 +132,7 @@ lcomp_test_int (const char *str, const char *filename, int filetype, double marg
 		exit (1) ;
 		} ;
 
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 
 	if ((k = sf_readf_int (file, data, datalen)) != datalen)
 	{	printf ("Line %d: short read (%d should be %ld).\n", __LINE__, k, datalen) ;

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+(cd src ; make ) && \
+(cd examples ; make sndfile-convert sndfile-info ) && \
+(cd mntest ; make check )
+

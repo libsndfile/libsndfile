@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002,2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,14 +16,13 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	"sfconfig.h"
-
 #include	<stdio.h>
 #include	<fcntl.h>
 #include	<string.h>
 #include	<ctype.h>
 
 #include	"sndfile.h"
+#include	"config.h"
 #include	"sfendian.h"
 #include	"common.h"
 #include	"float_cast.h"
@@ -112,7 +111,7 @@ mat5_open	(SF_PRIVATE *psf)
 		psf->write_header = mat5_write_header ;
 		} ;
 
-	psf->container_close = mat5_close ;
+	psf->close = mat5_close ;
 
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
@@ -154,8 +153,7 @@ mat5_close	(SF_PRIVATE *psf)
 
 static int
 mat5_write_header (SF_PRIVATE *psf, int calc_length)
-{	static const char	*filename = "MATLAB 5.0 MAT-file, written by " PACKAGE "-" VERSION ", " ;
-	static const char	*sr_name = "samplerate\0\0\0\0\0\0\0\0\0\0\0" ;
+{	static const char	*sr_name = "samplerate\0\0\0\0\0\0\0\0\0\0\0" ;
 	static const char	*wd_name = "wavedata\0" ;
 	sf_count_t	current, datasize ;
 	int			encoding ;
@@ -204,22 +202,23 @@ mat5_write_header (SF_PRIVATE *psf, int calc_length)
 	psf->headindex = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
-	psf_get_date_str (psf->u.cbuf, sizeof (psf->u.scbuf)) ;
-	psf_binheader_writef (psf, "bb", filename, strlen (filename), psf->u.cbuf, strlen (psf->u.cbuf) + 1) ;
+	psf_binheader_writef (psf, "S", "MATLAB 5.0 MAT-file, written by " PACKAGE "-" VERSION ", ") ;
+	psf_get_date_str ((char*) psf->buffer, sizeof (psf->buffer)) ;
+	psf_binheader_writef (psf, "jS", -1, psf->buffer) ;
 
-	memset (psf->u.scbuf, ' ', 124 - psf->headindex) ;
-	psf_binheader_writef (psf, "b", psf->u.scbuf, make_size_t (124 - psf->headindex)) ;
+	memset (psf->buffer, ' ', 124 - psf->headindex) ;
+	psf_binheader_writef (psf, "b", psf->buffer, 124 - psf->headindex) ;
 
 	psf->rwf_endian = psf->endian ;
 
 	if (psf->rwf_endian == SF_ENDIAN_BIG)
-		psf_binheader_writef (psf, "2b", 0x0100, "MI", make_size_t (2)) ;
+		psf_binheader_writef (psf, "2b", 0x0100, "MI", 2) ;
 	else
-		psf_binheader_writef (psf, "2b", 0x0100, "IM", make_size_t (2)) ;
+		psf_binheader_writef (psf, "2b", 0x0100, "IM", 2) ;
 
 	psf_binheader_writef (psf, "444444", MAT5_TYPE_ARRAY, 64, MAT5_TYPE_UINT32, 8, 6, 0) ;
 	psf_binheader_writef (psf, "4444", MAT5_TYPE_INT32, 8, 1, 1) ;
-	psf_binheader_writef (psf, "44b", MAT5_TYPE_SCHAR, strlen (sr_name), sr_name, make_size_t (16)) ;
+	psf_binheader_writef (psf, "44b", MAT5_TYPE_SCHAR, strlen (sr_name), sr_name, 16) ;
 
 	if (psf->sf.samplerate > 0xFFFF)
 		psf_binheader_writef (psf, "44", MAT5_TYPE_COMP_UINT, psf->sf.samplerate) ;
@@ -261,15 +260,15 @@ mat5_read_header (SF_PRIVATE *psf)
 	short	version, endian ;
 	int		type, size, flags1, flags2, rows, cols ;
 
-	psf_binheader_readf (psf, "pb", 0, psf->u.cbuf, 124) ;
+	psf_binheader_readf (psf, "pb", 0, psf->buffer, 124) ;
 
-	psf->u.scbuf [125] = 0 ;
+	psf->buffer [125] = 0 ;
 
-	if (strlen (psf->u.cbuf) >= 124)
+	if (strlen ((char*) psf->buffer) >= 124)
 		return SFE_UNIMPLEMENTED ;
 
-	if (strstr (psf->u.cbuf, "MATLAB 5.0 MAT-file") == psf->u.cbuf)
-		psf_log_printf (psf, "%s\n", psf->u.scbuf) ;
+	if (strstr ((char*) psf->buffer, "MATLAB 5.0 MAT-file") == (char*) psf->buffer)
+		psf_log_printf (psf, "%s\n", psf->buffer) ;
 
 
 	psf_binheader_readf (psf, "E22", &version, &endian) ;

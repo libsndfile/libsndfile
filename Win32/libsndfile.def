@@ -1,0 +1,81 @@
+LIBRARY  libsndfile.dll
+EXPORTS
+
+;
+; open, close, command
+;
+sf_command			@1
+sf_open				@2
+sf_close			@3
+
+;
+; seeking
+;
+sf_seek				@4
+
+;
+; error functions
+;
+sf_error			@7
+sf_perror			@8
+sf_error_str		@9
+sf_error_number		@10
+
+;
+; misc stuff
+;
+sf_format_check		@11
+
+;
+; reading
+;
+sf_read_raw			@16
+
+sf_readf_short		@17
+sf_readf_int		@18
+sf_readf_float		@19
+sf_readf_double		@20
+
+sf_read_short		@21
+sf_read_int			@22
+sf_read_float		@23
+sf_read_double		@24
+
+;
+; writing
+;
+sf_write_raw		@32
+
+sf_writef_short		@33
+sf_writef_int		@34
+sf_writef_float		@35
+sf_writef_double	@36
+
+sf_write_short		@37
+sf_write_int		@38
+sf_write_float		@39
+sf_write_double		@40
+
+
+;
+; Added more recently
+;
+sf_strerror			@50
+
+sf_get_string		@60
+sf_set_string		@61
+
+sf_open_fd			@70
+
+; Maybe one day. Maybe.
+; sf_dither_short		@70
+; sf_dither_int		@71
+; sf_dither_float		@72
+; sf_dither_double	@73
+
+; Do not edit or modify anything in this comment block.
+; The arch-tag line is a file identity tag for the GNU Arch 
+; revision control system.
+;
+; arch-tag: ba9144f1-6018-4751-a642-e531257f2296
+

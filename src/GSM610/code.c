@@ -77,6 +77,7 @@ void Gsm_Coder (
 		 */
 
 		{ register int i;
+		  register longword ltmp;
 		  for (i = 0; i <= 39; i++)
 			dp[ i ] = GSM_ADD( State->e[5 + i], dpp[i] );
 		}

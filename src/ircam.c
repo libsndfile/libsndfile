@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,14 +16,13 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	"sfconfig.h"
-
 #include	<stdio.h>
 #include	<fcntl.h>
 #include	<string.h>
 #include	<ctype.h>
 
 #include	"sndfile.h"
+#include	"config.h"
 #include	"sfendian.h"
 #include	"common.h"
 
@@ -41,7 +40,7 @@
 #define IRCAM_LE_MASK		(MAKE_MARKER (0xFF, 0x00, 0xFF, 0xFF))
 #define IRCAM_LE_MARKER		(MAKE_MARKER (0x00, 0x00, 0xA3, 0x64))
 
-#define IRCAM_02B_MARKER	(MAKE_MARKER (0x64, 0xA3, 0x02, 0x00))
+#define IRCAM_02B_MARKER	(MAKE_MARKER (0x00, 0x02, 0xA3, 0x64))
 #define IRCAM_03L_MARKER	(MAKE_MARKER (0x64, 0xA3, 0x03, 0x00))
 
 #define IRCAM_DATA_OFFSET	(1024)
@@ -103,7 +102,7 @@ ircam_open	(SF_PRIVATE *psf)
 		psf->write_header = ircam_write_header ;
 		} ;
 
-	psf->container_close = ircam_close ;
+	psf->close = ircam_close ;
 
 	switch (subformat)
 	{	case SF_FORMAT_ULAW :		/* 8-bit Ulaw encoding. */
@@ -140,7 +139,8 @@ ircam_read_header	(SF_PRIVATE *psf)
 
 	psf_binheader_readf (psf, "epmf44", 0, &marker, &samplerate, &(psf->sf.channels), &encoding) ;
 
-	if (((marker & IRCAM_BE_MASK) != IRCAM_BE_MARKER) && ((marker & IRCAM_LE_MASK) != IRCAM_LE_MARKER))
+	if (((marker & IRCAM_LE_MASK) != IRCAM_LE_MARKER) &&
+		((marker & IRCAM_BE_MASK) != IRCAM_BE_MARKER))
 	{	psf_log_printf (psf, "marker: 0x%X\n", marker) ;
 		return SFE_IRCAM_NO_MARKER ;
 		} ;
@@ -238,7 +238,7 @@ ircam_close	(SF_PRIVATE *psf)
 } /* ircam_close */
 
 static int
-ircam_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
+ircam_write_header (SF_PRIVATE *psf, int calc_length)
 {	int			encoding ;
 	float		samplerate ;
 	sf_count_t	current ;
@@ -247,6 +247,8 @@ ircam_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		return 0 ;
 
 	current = psf_ftell (psf) ;
+
+	calc_length = calc_length ;
 
 	/* This also sets psf->endian. */
 	encoding = get_encoding (psf->sf.format & SF_FORMAT_SUBMASK) ;
@@ -266,18 +268,18 @@ ircam_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 	switch (psf->endian)
 	{	case SF_ENDIAN_BIG :
 			psf_binheader_writef (psf, "Emf", IRCAM_02B_MARKER, samplerate) ;
-			psf_binheader_writef (psf, "E44", psf->sf.channels, encoding) ;
+		psf_binheader_writef (psf, "E44", psf->sf.channels, encoding) ;
 			break ;
 
 		case SF_ENDIAN_LITTLE :
 			psf_binheader_writef (psf, "emf", IRCAM_03L_MARKER, samplerate) ;
-			psf_binheader_writef (psf, "e44", psf->sf.channels, encoding) ;
+		psf_binheader_writef (psf, "e44", psf->sf.channels, encoding) ;
 			break ;
 
 		default : return SFE_BAD_OPEN_FORMAT ;
 		} ;
 
-	psf_binheader_writef (psf, "z", (size_t) (IRCAM_DATA_OFFSET - psf->headindex)) ;
+	psf_binheader_writef (psf, "z", IRCAM_DATA_OFFSET - psf->headindex) ;
 
 	/* Header construction complete so write it out. */
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;

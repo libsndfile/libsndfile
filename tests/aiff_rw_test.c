@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003,2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,25 +30,17 @@
 
 static unsigned char aifc_data [] =
 {	'F' , 'O' , 'R' , 'M' ,
-	0x00, 0x00, 0x01, 0xE8, /* FORM length */
+	0x00, 0x00, 0x01, 0xAA, /* FORM length */
 
 	'A' , 'I' , 'F' , 'C' ,
 	0x43, 0x4F, 0x4D, 0x4D, /* COMM */
 	0x00, 0x00, 0x00, 0x26, /* COMM length */
 	0x00, 0x01, 0x00, 0x00, 0x00, 0xAE, 0x00, 0x10, 0x40, 0x0D, 0xAC, 0x44,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4E, 0x4F, 0x4E, 0x45, 0x0D, 'N' ,
-	'o' , 't' , ' ' , 'c' , 'o' , 'm' , 'p' , 'r' , 'e' , 's' , 's' , 'e' ,
-	'd' , 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x4E, 0x4F, 0x4E, 0x45, 0x0D, 'N' , 
+	'o' , 't' , ' ' , 'c' , 'o' , 'm' , 'p' , 'r' , 'e' , 's' , 's' , 'e' , 
+	'd' , 0x00, 
 
 	'F' , 'V' , 'E' , 'R' , 0x00, 0x00, 0x00, 0x04, 0xA2, 0x80, 0x51, 0x40,
-
-	/* A 'MARK' chunk. */
-	'M' , 'A' , 'R' , 'K' , 0x00, 0x00, 0x00, 0x36, 0x00, 0x05,
-	0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x01, 'A' ,
-	0x00, 0x02, 0x00, 0x00, 0x11, 0x3A, 0x02, 'B' , 'C' , 0x00,
-	0x00, 0x03, 0x00, 0x00, 0x22, 0x74, 0x03, 'D' , 'E' , 'F',
-	0x00, 0x04, 0x00, 0x00, 0x33, 0xAE, 0x04, 'G' , 'H' , 'I', 'J' , 0x00,
-	0x00, 0x05, 0x00, 0x00, 0x44, 0xE8, 0x05, 'K' , 'L' , 'M', 'N' , 'O' ,
 
 	'S' , 'S' , 'N' , 'D' ,
 	0x00, 0x00, 0x01, 0x64, /* SSND length */
@@ -84,6 +76,8 @@ static unsigned char aifc_data [] =
 	0x0B, 0x61, 0x33, 0x19, 0xCE, 0x37, 0xEF, 0xD4, 0x21, 0x9D, 0xFA, 0xAE,
 } ;
 
+static void dump_data_to_file (const char *filename, void *data, unsigned int datalen) ;
+
 static void rw_test (const char *filename) ;
 
 int
@@ -93,10 +87,10 @@ main (void)
 	print_test_name ("aiff_rw_test", filename) ;
 
 	dump_data_to_file (filename, aifc_data, sizeof (aifc_data)) ;
-
+	
 	rw_test (filename) ;
 
-	unlink (filename) ;
+    unlink (filename) ;
 
 	puts ("ok") ;
 	return 0 ;
@@ -106,19 +100,35 @@ main (void)
 */
 
 static void
+dump_data_to_file (const char *filename, void *data, unsigned int datalen)
+{	FILE *file ;
+
+	if ((file = fopen (filename, "w")) == NULL)
+	{	printf ("\n\nLine %d : could not open file : %s\n\n", __LINE__, filename) ;
+		exit (1) ;
+		} ;
+
+	if (fwrite (data, 1, datalen, file) != datalen)
+	{	printf ("\n\nLine %d : fwrite failed.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	fclose (file) ;
+
+} /* dump_data_to_file */
+
+static void
 rw_test (const char *filename)
 {	SNDFILE *file ;
 	SF_INFO	sfinfo_rd, sfinfo_rw ;
 
-	memset (&sfinfo_rd, 0, sizeof (sfinfo_rd)) ;
-	memset (&sfinfo_rw, 0, sizeof (sfinfo_rw)) ;
-
 	/* Open the file in read only mode and fill in the SF_INFO struct. */
+	memset (&sfinfo_rd, 0, sizeof (sfinfo_rd)) ;
 	if ((file = sf_open (filename, SFM_READ, &sfinfo_rd)) == NULL)
 	{	printf ("\n\nLine %d : sf_open SFM_READ failed : %s\n\n", __LINE__, sf_strerror (NULL)) ;
 		exit (1) ;
 		} ;
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 	sf_close (file) ;
 
 	/* Now open read/write and close the file. */
@@ -126,7 +136,7 @@ rw_test (const char *filename)
 	{	printf ("\n\nLine %d : sf_open SFM_RDWR failed : %s\n\n", __LINE__, sf_strerror (NULL)) ;
 		exit (1) ;
 		} ;
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 	sf_close (file) ;
 
 	/* Open again as read only again and fill in a new SF_INFO struct.  */
@@ -135,7 +145,7 @@ rw_test (const char *filename)
 	{	printf ("\n\nLine %d : sf_open SFM_RDWR failed : %s\n\n", __LINE__, sf_strerror (NULL)) ;
 		exit (1) ;
 		} ;
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 	sf_close (file) ;
 
 	/* Now compare the two. */
@@ -152,9 +162,19 @@ rw_test (const char *filename)
 		} ;
 
 	if (sfinfo_rd.frames != sfinfo_rw.frames)
-	{	printf ("\n\nLine %d : frame count mismatch (%ld != %ld).\n\n", __LINE__,
+	{
+#if 1
+		printf ("\n\nLine %d : frame count mismatch (%ld != %ld).\n\n", __LINE__,
 			SF_COUNT_TO_LONG (sfinfo_rd.frames), SF_COUNT_TO_LONG (sfinfo_rw.frames)) ;
 		exit (1) ;
+#else
+		puts ("\n*********************************************") ;
+		printf ("\n\nLine %d : frame count mismatch (%ld != %ld).\n\n", __LINE__,
+			SF_COUNT_TO_LONG (sfinfo_rd.frames), SF_COUNT_TO_LONG (sfinfo_rw.frames)) ;
+		/*-exit (1) ;-*/
+		puts ("*********************************************\n") ;
+		sleep (20) ;
+#endif
 		} ;
 
 	return ;
@@ -162,7 +182,7 @@ rw_test (const char *filename)
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
+** The arch-tag line is a file identity tag for the GNU Arch 
 ** revision control system.
 **
 ** arch-tag: 12561248-1ad1-4ba6-941c-029f1333c080

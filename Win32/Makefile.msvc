@@ -1,7 +1,7 @@
 
 # Set the value of $(MSVCDir) for your installation. 
 # Please note that none of the directory names are allowed to have spaces 
-# in them. You must use the short name.
+# in them. You must use the short name 
 #
 # "C:\Program Files\Microsoft Visual Studio\VC98" will not work.
 # "C:\Progra~1\Micros~1\VC98" will work.
@@ -13,14 +13,13 @@ LINK32=link.exe
 DLL_LINK_FLAGS=/nologo /dll /incremental:no /libpath:"$(MSVCDir)\Lib" /pdb:"libsndfile.pdb" /implib:".\libsndfile.lib" /machine:I386 /out:"libsndfile.dll"
 PROG_LINK_FLAGS=/nologo /incremental:no /libpath:"$(MSVCDir)\Lib" /pdb:"libsndfile.pdb" /machine:I386 /exetype:dynamic
 
-CFLAGS=/nologo /MD /W1 /GX /O2 /I "$(MSVCDir)\Include" /I "src" /D "WIN32" /D "_USRDLL" /D "inline=__inline" /YX /FD
+CFLAGS=/nologo /MD /W1 /GX /O2 /I "$(MSVCDir)\Include" /I "src" /D "WIN32" /D "_USRDLL" /YX /FD
 
 #====================================================================
 # Targets
 
 ALL : libsndfile.dll \
 	"sndfile-info.exe" \
-	"sndfile-convert.exe" \
 	"sndfile-play.exe" \
 	"generate.exe"
 
@@ -28,7 +27,6 @@ CLEAN :
     -@erase "src\*.obj"
     -@erase "src\G72x\*.obj"
     -@erase "src\GSM610\*.obj"
-    -@erase "tests\*.obj"
     -@erase "tests\*.exe"
 
 #====================================================================
@@ -56,8 +54,7 @@ LINK32_OBJS= \
 	".\src\aiff.obj" \
 	".\src\alaw.obj" \
 	".\src\au.obj" \
-	".\src\g72x.obj" \
-	".\src\avr.obj" \
+	".\src\au_g72x.obj" \
 	".\src\common.obj" \
 	".\src\double64.obj" \
 	".\src\dwvw.obj" \
@@ -75,6 +72,7 @@ LINK32_OBJS= \
 	".\src\raw.obj" \
 	".\src\rx2.obj" \
 	".\src\sd2.obj" \
+	".\src\sfendian.obj" \
 	".\src\sndfile.obj" \
 	".\src\svx.obj" \
 	".\src\txw.obj" \
@@ -93,21 +91,14 @@ LINK32_OBJS= \
 	".\src\ogg.obj" \
 	".\src\pvf.obj" \
 	".\src\xi.obj" \
-	".\src\htk.obj" \
-	".\src\flac.obj" \
-	".\src\caf.obj"
+	".\src\htk.obj"
 
-libsndfile.dll : $(LINK32_OBJS) ".\src\libsndfile.def"
-    $(LINK32) $(DLL_LINK_FLAGS) /def:".\src\libsndfile.def" $(LINK32_OBJS)
+libsndfile.dll : $(LINK32_OBJS) ".\Win32\libsndfile.def"
+    $(LINK32) $(DLL_LINK_FLAGS) /def:".\Win32\libsndfile.def" $(LINK32_OBJS)
 
 "sndfile-info.exe" : ".\examples\sndfile-info.c"
     $(CPP) $(CFLAGS) /Fo".\examples\sndfile-info.obj" /c ".\examples\sndfile-info.c"
     $(LINK32) $(PROG_LINK_FLAGS) /out:"sndfile-info.exe" ".\examples\sndfile-info.obj" libsndfile.lib
-
-"sndfile-convert.exe" : ".\examples\sndfile-convert.c"
-    $(CPP) $(CFLAGS) /Fo".\examples\sndfile-convert.obj" /c ".\examples\sndfile-convert.c"
-    $(LINK32) $(PROG_LINK_FLAGS) /out:"sndfile-convert.exe" ".\examples\sndfile-convert.obj" libsndfile.lib
-
 "sndfile-play.exe" : ".\examples\sndfile-play.c"
     $(CPP) $(CFLAGS) /Fo".\examples\sndfile-play.obj" /c ".\examples\sndfile-play.c"
     $(LINK32) $(PROG_LINK_FLAGS) /out:"sndfile-play.exe" ".\examples\sndfile-play.obj" libsndfile.lib winmm.lib
@@ -133,8 +124,6 @@ TEST_PROGS= \
      ".\tests\misc_test.exe" \
      ".\tests\string_test.exe" \
      ".\tests\win32_test.exe" \
-     ".\tests\stdio_test.exe" \
-     ".\tests\pipe_test.exe" \
      ".\tests\benchmark.exe"
 
 CHECK: $(TEST_PROGS)
@@ -184,13 +173,6 @@ CHECK: $(TEST_PROGS)
     -@echo ----------------------------------------------------------------------
     -@".\tests\sfversion.exe"
     -@echo " passed tests on AU files."
-    -@echo ----------------------------------------------------------------------
-	".\tests\write_read_test" caf
-	".\tests\lossy_comp_test" caf_ulaw
-	".\tests\lossy_comp_test" caf_alaw
-	".\tests\misc_test" caf
-    -@echo ----------------------------------------------------------------------
-    -@echo   `./sfversion` passed tests on CAF files."
     -@echo ----------------------------------------------------------------------
     ".\tests\write_read_test" raw
     ".\tests\lossy_comp_test" raw_ulaw
@@ -255,24 +237,6 @@ CHECK: $(TEST_PROGS)
     -@echo ----------------------------------------------------------------------
     -@".\tests\sfversion.exe"
     -@echo " passed tests on MAT5 files."
-    -@echo ----------------------------------------------------------------------
-    ".\tests\write_read_test" htk
-    ".\tests\misc_test" htk
-    -@echo ----------------------------------------------------------------------
-    -@".\tests\sfversion.exe"
-    -@echo " passed tests on HTK files."
-    -@echo ----------------------------------------------------------------------
-    ".\tests\write_read_test" avr
-    ".\tests\misc_test" avr
-    -@echo ----------------------------------------------------------------------
-    -@".\tests\sfversion.exe"
-    -@echo " passed tests on AVR files."
-    -@echo ----------------------------------------------------------------------
-    -@".\tests\stdio_test.exe"
-    -@".\tests\pipe_test.exe"
-    -@echo ----------------------------------------------------------------------
-    -@".\tests\sfversion.exe"
-    -@echo " passed all tests."
     -@echo ----------------------------------------------------------------------
 
 #====================================================================
@@ -350,11 +314,8 @@ CHECK: $(TEST_PROGS)
 ".\src\au.obj" : ".\src\au.c"
     $(CPP) $(CFLAGS) /Fo".\src\au.obj" /c ".\src\au.c"
 
-".\src\g72x.obj" : ".\src\g72x.c"
-    $(CPP) $(CFLAGS) /Fo".\src\g72x.obj" /c ".\src\g72x.c"
-
-".\src\avr.obj" : ".\src\avr.c"
-    $(CPP) $(CFLAGS) /Fo".\src\avr.obj" /c ".\src\avr.c"
+".\src\au_g72x.obj" : ".\src\au_g72x.c"
+    $(CPP) $(CFLAGS) /Fo".\src\au_g72x.obj" /c ".\src\au_g72x.c"
 
 ".\src\common.obj" : ".\src\common.c"
     $(CPP) $(CFLAGS) /Fo".\src\common.obj" /c ".\src\common.c"
@@ -406,6 +367,9 @@ CHECK: $(TEST_PROGS)
 
 ".\src\sd2.obj" : ".\src\sd2.c"
     $(CPP) $(CFLAGS) /Fo".\src\sd2.obj" /c ".\src\sd2.c"
+
+".\src\sfendian.obj" : ".\src\sfendian.c"
+    $(CPP) $(CFLAGS) /Fo".\src\sfendian.obj" /c ".\src\sfendian.c"
 
 ".\src\sndfile.obj" : ".\src\sndfile.c"
     $(CPP) $(CFLAGS) /Fo".\src\sndfile.obj" /c ".\src\sndfile.c"
@@ -463,12 +427,6 @@ CHECK: $(TEST_PROGS)
 
 ".\src\htk.obj" : ".\src\htk.c"
     $(CPP) $(CFLAGS) /Fo".\src\htk.obj" /c ".\src\htk.c"
-
-".\src\flac.obj" : ".\src\flac.c"
-    $(CPP) $(CFLAGS) /Fo".\src\flac.obj" /c ".\src\flac.c"
-
-".\src\caf.obj" : ".\src\caf.c"
-    $(CPP) $(CFLAGS) /Fo".\src\caf.obj" /c ".\src\caf.c"
 
 #====================================================================
 # Object files for test programs.
@@ -545,22 +503,6 @@ CHECK: $(TEST_PROGS)
 ".\tests\win32_test.exe" : ".\tests\win32_test.c"
     $(CPP) $(CFLAGS) /Fo".\tests\win32_test.obj" /c ".\tests\win32_test.c"
     $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\win32_test.exe" ".\tests\win32_test.obj"
-
-".\tests\stdio_test.exe" : ".\tests\stdio_test.c" ".\tests\utils.obj"
-    $(CPP) $(CFLAGS) /Fo".\tests\stdio_test.obj" /c ".\tests\stdio_test.c"
-    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\stdio_test.exe" ".\tests\stdio_test.obj" ".\tests\utils.obj" libsndfile.lib
-
-".\tests\pipe_test.exe" : ".\tests\pipe_test.c" ".\tests\utils.obj"
-    $(CPP) $(CFLAGS) /Fo".\tests\pipe_test.obj" /c ".\tests\pipe_test.c"
-    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\pipe_test.exe" ".\tests\pipe_test.obj" ".\tests\utils.obj" libsndfile.lib
-
-# ".\tests\stdin_test.exe" : ".\tests\stdin_test.c" ".\tests\utils.obj"
-#     $(CPP) $(CFLAGS) /Fo".\tests\stdin_test.obj" /c ".\tests\stdin_test.c"
-#     $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\stdin_test.exe" ".\tests\stdin_test.obj" ".\tests\utils.obj" libsndfile.lib
-# 
-# ".\tests\stdout_test.exe" : ".\tests\stdout_test.c" ".\tests\utils.obj"
-#     $(CPP) $(CFLAGS) /Fo".\tests\stdout_test.obj" /c ".\tests\stdout_test.c"
-#     $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\stdout_test.exe" ".\tests\stdout_test.obj" ".\tests\utils.obj" libsndfile.lib
 
 ".\tests\benchmark.exe" : ".\tests\benchmark.c"
     $(CPP) $(CFLAGS) /Fo".\tests\benchmark.obj" /c ".\tests\benchmark.c"

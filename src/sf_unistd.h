@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002,2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -18,27 +18,14 @@
 
 /* Some defines that microsoft 'forgot' to implement. */
 
-#ifndef S_IRWXU
 #define	S_IRWXU 	0000700	/* rwx, owner */
-#endif
-
-#ifndef		S_IRUSR
 #define		S_IRUSR	0000400	/* read permission, owner */
-#endif
-
-#ifndef		S_IWUSR
 #define		S_IWUSR	0000200	/* write permission, owner */
-#endif
-
-#ifndef		S_IXUSR
 #define		S_IXUSR	0000100	/* execute/search permission, owner */
-#endif
-
 #define	S_IRWXG		0000070	/* rwx, group */
 #define		S_IRGRP	0000040	/* read permission, group */
 #define		S_IWGRP	0000020	/* write permission, grougroup */
 #define		S_IXGRP	0000010	/* execute/search permission, group */
-
 #define	S_IRWXO		0000007	/* rwx, other */
 #define		S_IROTH	0000004	/* read permission, other */
 #define		S_IWOTH	0000002	/* write permission, other */

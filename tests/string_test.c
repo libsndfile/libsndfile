@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003,2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,14 +16,14 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include "sfconfig.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
-#if HAVE_UNISTD_H
+#ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
@@ -35,8 +35,6 @@
 #define LOG_BUFFER_SIZE		1024
 
 static void	string_test (const char *filename, int typemajor) ;
-
-static int libsndfile_str_count (const char * cptr) ;
 
 int
 main (int argc, char *argv [])
@@ -80,11 +78,11 @@ main (int argc, char *argv [])
 */
 
 static const char
-	software	[]	= "software (libsndfile-X.Y.Z)",
+	software	[]	= "software",
 	artist		[]	= "The Artist",
-	copyright	[]	= "Copyright (c) 2001 The Artist",
+	copyright	[]	= "Copyright (c) 2003 The Artist",
 	comment		[]	= "Comment goes here!!!",
-	date		[]	= "2001/01/27" ;
+	date		[]	= "2003/01/27" ;
 
 static	short	data_out [BUFFER_LEN] ;
 
@@ -115,7 +113,7 @@ string_test (const char *filename, int typemajor)
 
 	frames = BUFFER_LEN / sfinfo.channels ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, __LINE__) ;
 
 	/* Write stuff at start of file. */
 	sf_set_string (file, SF_STR_TITLE, filename) ;
@@ -133,9 +131,9 @@ string_test (const char *filename, int typemajor)
 
 	sf_close (file) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, __LINE__) ;
 
-	check_log_buffer_or_die (file, __LINE__) ;
+	check_log_buffer_or_die (file) ;
 
 	if (sfinfo.frames != BUFFER_LEN)
 	{	printf ("***** Bad frame count %d (should be %d)\n\n", (int) sfinfo.frames, BUFFER_LEN) ;
@@ -158,12 +156,6 @@ string_test (const char *filename, int typemajor)
 
 	cptr = sf_get_string (file, SF_STR_SOFTWARE) ;
 	if (cptr == NULL || strstr (cptr, software) != cptr)
-	{	if (errors++ == 0)
-			puts ("\n") ;
-		printf ("    Bad software  : %s\n", cptr) ;
-		} ;
-
-	if (libsndfile_str_count (cptr) != 1)
 	{	if (errors++ == 0)
 			puts ("\n") ;
 		printf ("    Bad software  : %s\n", cptr) ;
@@ -204,23 +196,9 @@ string_test (const char *filename, int typemajor)
 	puts ("ok") ;
 } /* string_test */
 
-static int
-libsndfile_str_count (const char * str)
-{	const char * cptr ;
-
-	if ((cptr = strstr (str, "libsndfile")) == NULL)
-		return 0 ;
-
-	if ((cptr = strstr (cptr + 1, "libsndfile")) == NULL)
-		return 1 ;
-
-	return 2 ;
-} /* libsndfile_str_count */
-
-
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
+** The arch-tag line is a file identity tag for the GNU Arch 
 ** revision control system.
 **
 ** arch-tag: 0260b3db-c250-4244-95a0-d288a913729a

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,14 +16,13 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	"sfconfig.h"
-
 #include	<stdio.h>
 #include	<string.h>
 #include	<ctype.h>
 #include	<stdarg.h>
 
 #include	"sndfile.h"
+#include	"config.h"
 #include	"sfendian.h"
 #include	"common.h"
 
@@ -33,7 +32,7 @@ int
 rx2_open	(SF_PRIVATE *psf)
 {	if (psf)
 		return SFE_UNIMPLEMENTED ;
-	return 0 ;
+	return (psf && 0) ;
 } /* rx2_open */
 
 #else
@@ -75,7 +74,7 @@ static int	rx2_close	(SF_PRIVATE *psf) ;
 
 int
 rx2_open	(SF_PRIVATE *psf)
-{	static const char *marker_type [4] =
+{	static char *marker_type [4] =
 	{	"Original Enabled", "Enabled Hidden",
 		"Additional/PencilTool", "Disabled"
 		} ;
@@ -119,14 +118,14 @@ rx2_open	(SF_PRIVATE *psf)
 	/* Get name length */
 	length = 0 ;
 	psf_binheader_readf (psf, "1", &length) ;
-	if (length >= SIGNED_SIZEOF (psf->u.cbuf))
+	if (length >= SIGNED_SIZEOF (psf->buffer))
 	{	psf_log_printf (psf, "  Text : %d *** Error : Too sf_count_t!\n") ;
 		return -1001 ;
 		}
 
-	memset (psf->u.cbuf, 0, sizeof (psf->u.cbuf)) ;
-	psf_binheader_readf (psf, "b", psf->u.cbuf, length) ;
-	psf_log_printf (psf, " Text : \"%s\"\n", psf->u.cbuf) ;
+	memset (psf->buffer, 0, SIGNED_SIZEOF (psf->buffer)) ;
+	psf_binheader_readf (psf, "b", psf->buffer, length) ;
+	psf_log_printf (psf, " Text : \"%s\"\n", psf->buffer) ;
 
 	/* Jump to GLOB offset position. */
 	if (glob_offset & 1)
@@ -290,7 +289,7 @@ rx2_open	(SF_PRIVATE *psf)
 	if ((error = dwvw_init (psf, 16)))
 		return error ;
 
-	psf->container_close = rx2_close ;
+	psf->close = rx2_close ;
 
 	if (! psf->sf.frames && psf->blockwidth)
 		psf->sf.frames = psf->datalength / psf->blockwidth ;

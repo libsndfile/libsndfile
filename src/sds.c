@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002,2003 Erik de Castro Lopo <erikd@zip.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,7 +16,7 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include "sfconfig.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -76,10 +76,10 @@ static sf_count_t sds_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t sds_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t sds_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static sf_count_t sds_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
-static sf_count_t sds_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
-static sf_count_t sds_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
-static sf_count_t sds_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
+static sf_count_t sds_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
+static sf_count_t sds_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
+static sf_count_t sds_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
+static sf_count_t sds_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
 static sf_count_t sds_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 
@@ -93,7 +93,7 @@ static int sds_2byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds) ;
 static int sds_3byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds) ;
 static int sds_4byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds) ;
 
-static int sds_write (SF_PRIVATE *psf, SDS_PRIVATE *psds, const int *iptr, int writecount) ;
+static int sds_write (SF_PRIVATE *psf, SDS_PRIVATE *psds, int *iptr, int writecount) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -102,14 +102,14 @@ static int sds_write (SF_PRIVATE *psf, SDS_PRIVATE *psds, const int *iptr, int w
 int
 sds_open	(SF_PRIVATE *psf)
 {	SDS_PRIVATE	*psds ;
-	int			error = 0 ;
+	int			subformat, error = 0 ;
 
 	/* Hmmmm, need this here to pass update_header_test. */
 	psf->sf.frames = 0 ;
 
 	if (! (psds = calloc (1, sizeof (SDS_PRIVATE))))
 		return SFE_MALLOC_FAILED ;
-	psf->codec_data = psds ;
+	psf->fdata = psds ;
 
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = sds_read_header (psf, psds)))
@@ -119,6 +119,8 @@ sds_open	(SF_PRIVATE *psf)
 	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_SDS)
 		return	SFE_BAD_OPEN_FORMAT ;
 
+	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	if (sds_write_header (psf, SF_FALSE))
 			return psf->error ;
@@ -127,12 +129,12 @@ sds_open	(SF_PRIVATE *psf)
 
 		psf_fseek (psf, SDS_DATA_OFFSET, SEEK_SET) ;
 		} ;
-
+	
 	if ((error = sds_init (psf, psds)) != 0)
 		return error ;
 
 	psf->seek = sds_seek ;
-	psf->container_close = sds_close ;
+	psf->close = sds_close ;
 
 	psf->blockwidth = 0 ;
 
@@ -147,9 +149,9 @@ sds_close	(SF_PRIVATE *psf)
 {
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	SDS_PRIVATE *psds ;
-
-		if ((psds = (SDS_PRIVATE *) psf->codec_data) == NULL)
-		{	psf_log_printf (psf, "*** Bad psf->codec_data ptr.\n") ;
+	
+		if ((psds = (SDS_PRIVATE *) psf->fdata) == NULL)
+		{	psf_log_printf (psf, "*** Bad psf->fdata ptr.\n") ;
 			return SFE_INTERNAL ;
 			} ;
 
@@ -203,7 +205,7 @@ sds_init (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 		psf->write_double	= sds_write_d ;
 		} ;
 
-	return 0 ;
+	return 0 ;	
 } /* sds_init */
 
 static int
@@ -326,8 +328,8 @@ sds_write_header (SF_PRIVATE *psf, int calc_length)
 	int samp_period, data_length, sustain_loop_start, sustain_loop_end ;
 	unsigned char loop_type = 0 ;
 
-	if ((psds = (SDS_PRIVATE *) psf->codec_data) == NULL)
-	{	psf_log_printf (psf, "*** Bad psf->codec_data ptr.\n") ;
+	if ((psds = (SDS_PRIVATE *) psf->fdata) == NULL)
+	{	psf_log_printf (psf, "*** Bad psf->fdata ptr.\n") ;
 		return SFE_INTERNAL ;
 		} ;
 
@@ -342,11 +344,11 @@ sds_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psds->write_count > 0)
 	{	int current_count = psds->write_count ;
 		int current_block = psds->write_block ;
-
+	
 		psds->writer (psf, psds) ;
-
+		
 		psf_fseek (psf, -1 * SDS_BLOCK_SIZE, SEEK_CUR) ;
-
+	
 		psds->write_count = current_count ;
 		psds->write_block = current_block ;
 		} ;
@@ -543,12 +545,12 @@ sds_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	int			k, bufferlen, readcount, count ;
 	sf_count_t	total = 0 ;
 
-	if (psf->codec_data == NULL)
+	if (psf->fdata == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->codec_data ;
+	psds = (SDS_PRIVATE*) psf->fdata ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = (int*) psf->buffer ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = sds_read (psf, psds, iptr, readcount) ;
@@ -566,9 +568,9 @@ sds_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 {	SDS_PRIVATE *psds ;
 	int			total ;
 
-	if (psf->codec_data == NULL)
+	if (psf->fdata == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->codec_data ;
+	psds = (SDS_PRIVATE*) psf->fdata ;
 
 	total = sds_read (psf, psds, ptr, len) ;
 
@@ -583,17 +585,17 @@ sds_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (psf->codec_data == NULL)
+	if (psf->fdata == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->codec_data ;
+	psds = (SDS_PRIVATE*) psf->fdata ;
 
 	if (psf->norm_float == SF_TRUE)
 		normfact = 1.0 / 0x80000000 ;
 	else
 		normfact = 1.0 / (1 << psds->bitwidth) ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = (int*) psf->buffer ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = sds_read (psf, psds, iptr, readcount) ;
@@ -614,17 +616,17 @@ sds_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
-	if (psf->codec_data == NULL)
+	if (psf->fdata == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->codec_data ;
+	psds = (SDS_PRIVATE*) psf->fdata ;
 
 	if (psf->norm_double == SF_TRUE)
 		normfact = 1.0 / 0x80000000 ;
 	else
 		normfact = 1.0 / (1 << psds->bitwidth) ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = (int*) psf->buffer ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = sds_read (psf, psds, iptr, readcount) ;
@@ -670,19 +672,19 @@ sds_seek (SF_PRIVATE *psf, int mode, sf_count_t seek_from_start)
 	sf_count_t	file_offset ;
 	int			newblock, newsample ;
 
-	if ((psds = psf->codec_data) == NULL)
+	if ((psds = psf->fdata) == NULL)
 	{	psf->error = SFE_INTERNAL ;
-		return PSF_SEEK_ERROR ;
+		return SF_SEEK_ERROR ;
 		} ;
 
 	if (psf->datalength < 0 || psf->dataoffset < 0)
 	{	psf->error = SFE_BAD_SEEK ;
-		return PSF_SEEK_ERROR ;
+		return SF_SEEK_ERROR ;
 		} ;
 
 	if (seek_from_start < 0 || seek_from_start > psf->sf.frames)
 	{	psf->error = SFE_BAD_SEEK ;
-		return PSF_SEEK_ERROR ;
+		return SF_SEEK_ERROR ;
 		} ;
 
 	if (mode == SFM_READ && psds->write_count > 0)
@@ -695,14 +697,14 @@ sds_seek (SF_PRIVATE *psf, int mode, sf_count_t seek_from_start)
 	{	case SFM_READ :
 			if (newblock > psds->total_blocks)
 			{	psf->error = SFE_BAD_SEEK ;
-				return PSF_SEEK_ERROR ;
+				return SF_SEEK_ERROR ;
 				} ;
 
 			file_offset = psf->dataoffset + newblock * SDS_BLOCK_SIZE ;
 
 			if (psf_fseek (psf, file_offset, SEEK_SET) != file_offset)
 			{	psf->error = SFE_SEEK_FAILED ;
-				return PSF_SEEK_ERROR ;
+				return SF_SEEK_ERROR ;
 				} ;
 
 			psds->read_block = newblock ;
@@ -713,24 +715,24 @@ sds_seek (SF_PRIVATE *psf, int mode, sf_count_t seek_from_start)
 		case SFM_WRITE :
 			if (newblock > psds->total_blocks)
 			{	psf->error = SFE_BAD_SEEK ;
-				return PSF_SEEK_ERROR ;
+				return SF_SEEK_ERROR ;
 				} ;
 
 			file_offset = psf->dataoffset + newblock * SDS_BLOCK_SIZE ;
 
 			if (psf_fseek (psf, file_offset, SEEK_SET) != file_offset)
 			{	psf->error = SFE_SEEK_FAILED ;
-				return PSF_SEEK_ERROR ;
+				return SF_SEEK_ERROR ;
 				} ;
 
 			psds->write_block = newblock ;
 			psds->reader (psf, psds) ;
 			psds->write_count = newsample ;
 			break ;
-
+		
 		default :
 			psf->error = SFE_BAD_SEEK ;
-			return PSF_SEEK_ERROR ;
+			return SF_SEEK_ERROR ;
 			break ;
 		} ;
 
@@ -864,18 +866,18 @@ sds_4byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 } /* sds_4byte_write */
 
 static sf_count_t
-sds_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
+sds_write_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 {	SDS_PRIVATE	*psds ;
 	int			*iptr ;
 	int			k, bufferlen, writecount, count ;
 	sf_count_t	total = 0 ;
 
-	if (psf->codec_data == NULL)
+	if (psf->fdata == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->codec_data ;
+	psds = (SDS_PRIVATE*) psf->fdata ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = (int*) psf->buffer ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -889,13 +891,13 @@ sds_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 } /* sds_write_s */
 
 static sf_count_t
-sds_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
+sds_write_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 {	SDS_PRIVATE *psds ;
 	int			total ;
 
-	if (psf->codec_data == NULL)
+	if (psf->fdata == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->codec_data ;
+	psds = (SDS_PRIVATE*) psf->fdata ;
 
 	total = sds_write (psf, psds, ptr, len) ;
 
@@ -903,24 +905,24 @@ sds_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 } /* sds_write_i */
 
 static sf_count_t
-sds_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
+sds_write_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 {	SDS_PRIVATE	*psds ;
 	int			*iptr ;
 	int			k, bufferlen, writecount, count ;
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (psf->codec_data == NULL)
+	if (psf->fdata == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->codec_data ;
+	psds = (SDS_PRIVATE*) psf->fdata ;
 
 	if (psf->norm_float == SF_TRUE)
 		normfact = 1.0 * 0x80000000 ;
 	else
 		normfact = 1.0 * (1 << psds->bitwidth) ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = (int*) psf->buffer ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -934,24 +936,24 @@ sds_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 } /* sds_write_f */
 
 static sf_count_t
-sds_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
+sds_write_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 {	SDS_PRIVATE	*psds ;
 	int			*iptr ;
 	int			k, bufferlen, writecount, count ;
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
-	if (psf->codec_data == NULL)
+	if (psf->fdata == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->codec_data ;
+	psds = (SDS_PRIVATE*) psf->fdata ;
 
 	if (psf->norm_double == SF_TRUE)
 		normfact = 1.0 * 0x80000000 ;
 	else
 		normfact = 1.0 * (1 << psds->bitwidth) ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = (int*) psf->buffer ;
+	bufferlen = sizeof (psf->buffer) / sizeof (int) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -965,7 +967,7 @@ sds_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 } /* sds_write_d */
 
 static int
-sds_write (SF_PRIVATE *psf, SDS_PRIVATE *psds, const int *ptr, int len)
+sds_write (SF_PRIVATE *psf, SDS_PRIVATE *psds, int *ptr, int len)
 {	int	count, total = 0 ;
 
 	while (total < len)
@@ -986,7 +988,7 @@ sds_write (SF_PRIVATE *psf, SDS_PRIVATE *psds, const int *ptr, int len)
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
+** The arch-tag line is a file identity tag for the GNU Arch 
 ** revision control system.
 **
 ** arch-tag: d5d26aa3-368c-4ca6-bb85-377e5a2578cc
