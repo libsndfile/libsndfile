@@ -85,7 +85,8 @@ enum
 	HAVE_fmt	= 0x04,
 	HAVE_fact	= 0x08,
 	HAVE_PEAK	= 0x10,
-	HAVE_data	= 0x20
+	HAVE_data	= 0x20,
+	HAVE_other  = 0x80000000
 } ;
 
 
@@ -267,6 +268,8 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if (parsestage)
 						return SFE_WAV_NO_RIFF ;
 
+					parsestage |= HAVE_RIFF ;
+
 					psf_binheader_readf (psf, "e4", &RIFFsize) ;
 
 					if (psf->fileoffset > 0 && psf->filelength > RIFFsize + 8)
@@ -281,14 +284,14 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					else
 						psf_log_printf (psf, "RIFF : %u\n", RIFFsize) ;
 
-					parsestage |= HAVE_RIFF ;
 					break ;
 
 			case WAVE_MARKER :
 					if ((parsestage & HAVE_RIFF) != HAVE_RIFF)
 						return SFE_WAV_NO_WAVE ;
-					psf_log_printf (psf, "WAVE\n") ;
 					parsestage |= HAVE_WAVE ;
+
+					psf_log_printf (psf, "WAVE\n") ;
 					break ;
 
 			case fmt_MARKER :
@@ -299,6 +302,8 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if (parsestage & HAVE_fmt)
 						break ;
 
+					parsestage |= HAVE_fmt ;
+
 					psf_binheader_readf (psf, "e4", &dword) ;
 					psf_log_printf (psf, "fmt  : %d\n", dword) ;
 
@@ -306,12 +311,16 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						return error ;
 
 					format = wav_fmt.format ;
-					parsestage |= HAVE_fmt ;
 					break ;
 
 			case data_MARKER :
 					if ((parsestage & (HAVE_RIFF | HAVE_WAVE | HAVE_fmt)) != (HAVE_RIFF | HAVE_WAVE | HAVE_fmt))
 						return SFE_WAV_NO_DATA ;
+
+					if (psf->mode == SFM_RDWR && (parsestage & HAVE_other) != 0)
+						return SFE_RDWR_BAD_HEADER ;
+
+					parsestage |= HAVE_data ;
 
 					psf_binheader_readf (psf, "e4", &dword) ;
 
@@ -339,8 +348,6 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						psf_log_printf (psf, "*** Data length odd. Increasing it by 1.\n") ;
 						} ;
 
-					parsestage |= HAVE_data ;
-
 					if (! psf->sf.seekable)
 						break ;
 
@@ -356,6 +363,8 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if ((parsestage & (HAVE_RIFF | HAVE_WAVE)) != (HAVE_RIFF | HAVE_WAVE))
 						return SFE_WAV_BAD_FACT ;
 
+					parsestage |= HAVE_fact ;
+
 					if ((parsestage & HAVE_fmt) != HAVE_fmt)
 						psf_log_printf (psf, "*** Should have 'fmt ' chunk before 'fact'\n") ;
 
@@ -370,12 +379,13 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						psf_log_printf (psf, "%M : %d (should not be zero)\n", marker, dword) ;
 
 					psf_log_printf (psf, "  frames  : %d\n", fact_chunk.frames) ;
-					parsestage |= HAVE_fact ;
 					break ;
 
 			case PEAK_MARKER :
 					if ((parsestage & (HAVE_RIFF | HAVE_WAVE | HAVE_fmt)) != (HAVE_RIFF | HAVE_WAVE | HAVE_fmt))
 						return SFE_WAV_PEAK_B4_FMT ;
+
+					parsestage |= HAVE_PEAK ;
 
 					psf_binheader_readf (psf, "e4", &dword) ;
 
@@ -417,6 +427,8 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					break ;
 
 			case cue_MARKER :
+					parsestage |= HAVE_other ;
+
 					{	int bytesread, cue_count ;
 						int id, position, chunk_id, chunk_start, block_start, offset ;
 
@@ -443,6 +455,8 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					break ;
 
 			case smpl_MARKER :
+					parsestage |= HAVE_other ;
+
 					psf_binheader_readf (psf, "e4", &dword) ;
 					psf_log_printf (psf, "smpl : %u\n", dword) ;
 
@@ -451,6 +465,8 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					break ;
 
 			case acid_MARKER :
+					parsestage |= HAVE_other ;
+
 					psf_binheader_readf (psf, "e4", &dword) ;
 					psf_log_printf (psf, "acid : %u\n", dword) ;
 
@@ -460,7 +476,9 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 			case INFO_MARKER :
 			case LIST_MARKER :
-					if ((error = wav_subchunk_parse (psf, marker)))
+					parsestage |= HAVE_other ;
+
+					if ((error = wav_subchunk_parse (psf, marker)) != 0)
 						return error ;
 					break ;
 
@@ -473,6 +491,8 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case DISP_MARKER :
 			case MEXT_MARKER :
 			case PAD_MARKER :
+					parsestage |= HAVE_other ;
+
 					psf_binheader_readf (psf, "e4", &dword) ;
 					psf_log_printf (psf, "%M : %u\n", marker, dword) ;
 					dword += (dword & 1) ;
@@ -943,7 +963,7 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_fseek (psf, current, SEEK_SET) ;
 
 	return psf->error ;
-} /* wav_write_header */
+} /* wavex_write_header */
 
 
 
