@@ -747,7 +747,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			return psf_get_format_info (data) ;
 		} ;
 
-	if (! sndfile && command == SFC_GET_LOG_INFO)
+	if (sndfile == NULL && command == SFC_GET_LOG_INFO)
 	{	if (data == NULL)
 			return (psf->error = SFE_BAD_CONTROL_CMD) ;
 		LSF_SNPRINTF (data, datasize, "%s", sf_logbuffer) ;
@@ -770,6 +770,12 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_GET_NORM_DOUBLE :
 			return psf->norm_double ;
+
+		case SFC_SET_FLOAT_INT_MULTIPLIER :
+			psf->float_int_mult = (datasize != 0) ? SF_TRUE : SF_FALSE ;
+			if (psf->float_int_mult && psf->float_max == 0.0)
+				psf->float_max = psf_calc_signal_max (psf, SF_FALSE) ;
+			break ;
 
 		case SFC_SET_ADD_PEAK_CHUNK :
 			{	int format = psf->sf.format & SF_FORMAT_TYPEMASK ;

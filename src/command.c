@@ -315,7 +315,7 @@ psf_calc_max_all_channels (SF_PRIVATE *psf, double *peaks, int normalize)
 	sf_command ((SNDFILE*) psf, SFC_SET_NORM_DOUBLE, NULL, save_state) ;
 
 	return	0 ;
-} /* psf_calc_signal_max */
+} /* psf_calc_max_all_channels */
 
 /*
 ** Do not edit or modify anything in this comment block.
