@@ -1,8 +1,12 @@
 2004-06-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
-    * src/avr.c src/ircam.c src/nist.c src/paf.c src/w64.c src/xi.c
+    * src/avr.c src/ircam.c src/nist.c src/paf.c src/xi.c
     Add cast to size_t for some parameters passed to psf_binheader_writef. This
     is Debian bug number 253490. Thanks to Anand Kumria and Andreas Jochens.
+
+    * src/w64.c
+    Found and fixed a bug resulting from use of size_t when writing W64 'fmt '
+    chunk.
 
 2004-06-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

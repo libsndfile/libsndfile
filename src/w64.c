@@ -371,6 +371,7 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 static int
 w64_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t 	fmt_size, current ;
+	size_t		fmt_pad  = 0 ;
 	int 		subformat, add_fact_chunk = SF_FALSE ;
 
 	current = psf_ftell (psf) ;
@@ -402,6 +403,8 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		case	SF_FORMAT_PCM_24 :
 		case	SF_FORMAT_PCM_32 :
 					fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 ;
+					fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+					fmt_size += fmt_pad ;
 
 					/* fmt : format, channels, samplerate */
 					psf_binheader_writef (psf, "e8224", fmt_size, WAVE_FORMAT_PCM, psf->sf.channels, psf->sf.samplerate) ;
@@ -414,6 +417,8 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		case SF_FORMAT_FLOAT :
 		case SF_FORMAT_DOUBLE :
 					fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 ;
+					fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+					fmt_size += fmt_pad ;
 
 					/* fmt : format, channels, samplerate */
 					psf_binheader_writef (psf, "e8224", fmt_size, WAVE_FORMAT_IEEE_FLOAT, psf->sf.channels, psf->sf.samplerate) ;
@@ -427,6 +432,8 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 
 		case SF_FORMAT_ULAW :
 					fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 ;
+					fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+					fmt_size += fmt_pad ;
 
 					/* fmt : format, channels, samplerate */
 					psf_binheader_writef (psf, "e8224", fmt_size, WAVE_FORMAT_MULAW, psf->sf.channels, psf->sf.samplerate) ;
@@ -440,6 +447,8 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 
 		case SF_FORMAT_ALAW :
 					fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 ;
+					fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+					fmt_size += fmt_pad ;
 
 					/* fmt : format, channels, samplerate */
 					psf_binheader_writef (psf, "e8224", fmt_size, WAVE_FORMAT_ALAW, psf->sf.channels, psf->sf.samplerate) ;
@@ -461,6 +470,8 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 
 						/* fmt chunk. */
 						fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 ;
+						fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+						fmt_size += fmt_pad ;
 
 						/* fmt : size, WAV format type, channels. */
 						psf_binheader_writef (psf, "e822", fmt_size, WAVE_FORMAT_IMA_ADPCM, psf->sf.channels) ;
@@ -485,6 +496,8 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 						/* fmt chunk. */
 						extrabytes	= 2 + 2 + MSADPCM_ADAPT_COEFF_COUNT * (2 + 2) ;
 						fmt_size	= 24 + 2 + 2 + 4 + 4 + 2 + 2 + 2 + extrabytes ;
+						fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+						fmt_size += fmt_pad ;
 
 						/* fmt : size, W64 format type, channels. */
 						psf_binheader_writef (psf, "e822", fmt_size, WAVE_FORMAT_MS_ADPCM, psf->sf.channels) ;
@@ -509,6 +522,8 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 
 						/* fmt chunk. */
 						fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 ;
+						fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+						fmt_size += fmt_pad ;
 
 						/* fmt : size, WAV format type, channels. */
 						psf_binheader_writef (psf, "e822", fmt_size, WAVE_FORMAT_GSM610, psf->sf.channels) ;
@@ -527,8 +542,8 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	/* Pad to 8 bytes with zeros. */
-	if (fmt_size % 8)
-		psf_binheader_writef (psf, "z", (size_t) (8 - (fmt_size % 8))) ;
+	if (fmt_pad > 0)
+		psf_binheader_writef (psf, "z", fmt_pad) ;
 
 	if (add_fact_chunk)
 		psf_binheader_writef (psf, "eh88", fact_MARKER16, 16 + 8 + 8, psf->sf.frames) ;
