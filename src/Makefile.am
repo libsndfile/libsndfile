@@ -15,8 +15,6 @@ noinst_HEADERS = common.h sfendian.h float_cast.h wav_w64.h au.h sf_unistd.h
 
 noinst_PROGRAMS = test_file_io test_log_printf
 
-CLEANFILES = Symbols
-
 COMMON = sndfile.c common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c sfendian.c vox_adpcm.c \
 		interleave.c strings.c dither.c
@@ -57,13 +55,13 @@ check: test_file_io
 # end user to create these files.
 
 Symbols.linux: create_symbols_file.py
-	./create_symbols_file.py linux $(VERSION) > Symbols.linux
+	$(srcdir)/create_symbols_file.py linux $(VERSION) > Symbols.linux
 	
 Symbols.darwin: create_symbols_file.py
-	./create_symbols_file.py darwin $(VERSION) > Symbols.darwin
+	$(srcdir)/create_symbols_file.py darwin $(VERSION) > Symbols.darwin
 
 libsndfile.def: create_symbols_file.py
-	./create_symbols_file.py win32 $(VERSION) > libsndfile.def
+	$(srcdir)/create_symbols_file.py win32 $(VERSION) > libsndfile.def
 
 # Fake dependancy to force the creation of these files.
 sndfile.c : Symbols.linux Symbols.darwin libsndfile.def
