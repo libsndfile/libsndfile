@@ -1629,7 +1629,7 @@ sf_write_short	(SNDFILE *sndfile, const short *ptr, sf_count_t len)
 
 	psf->last_op = SFM_WRITE ;
 
-	if (psf->auto_header)
+	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
 
 	if (psf->write_current > psf->sf.frames)
@@ -1669,7 +1669,7 @@ sf_writef_short	(SNDFILE *sndfile, const short *ptr, sf_count_t frames)
 
 	psf->last_op = SFM_WRITE ;
 
-	if (psf->auto_header)
+	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
 
 	if (psf->write_current > psf->sf.frames)
@@ -1717,7 +1717,7 @@ sf_write_int	(SNDFILE *sndfile, const int *ptr, sf_count_t len)
 
 	psf->last_op = SFM_WRITE ;
 
-	if (psf->auto_header)
+	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
 
 	if (psf->write_current > psf->sf.frames)
@@ -1757,7 +1757,7 @@ sf_writef_int	(SNDFILE *sndfile, const int *ptr, sf_count_t frames)
 
 	psf->last_op = SFM_WRITE ;
 
-	if (psf->auto_header)
+	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
 
 	if (psf->write_current > psf->sf.frames)
@@ -1805,7 +1805,7 @@ sf_write_float	(SNDFILE *sndfile, const float *ptr, sf_count_t len)
 
 	psf->last_op = SFM_WRITE ;
 
-	if (psf->auto_header)
+	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
 
 	if (psf->write_current > psf->sf.frames)
@@ -1845,7 +1845,7 @@ sf_writef_float	(SNDFILE *sndfile, const float *ptr, sf_count_t frames)
 
 	psf->last_op = SFM_WRITE ;
 
-	if (psf->auto_header)
+	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
 
 	if (psf->write_current > psf->sf.frames)
@@ -1893,7 +1893,7 @@ sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t len)
 
 	psf->last_op = SFM_WRITE ;
 
-	if (psf->auto_header)
+	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
 
 	if (psf->write_current > psf->sf.frames)
@@ -1933,7 +1933,7 @@ sf_writef_double	(SNDFILE *sndfile, const double *ptr, sf_count_t frames)
 
 	psf->last_op = SFM_WRITE ;
 
-	if (psf->auto_header)
+	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
 
 	if (psf->write_current > psf->sf.frames)
