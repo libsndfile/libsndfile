@@ -40,6 +40,17 @@
 
 #include "utils.h"
 
+#if (OS_IS_WIN32)
+
+int
+main (void)
+{
+	puts ("    stdio_test : this test doesn't work on win32.") ;
+	return 0 ;
+} /* main */
+
+#else
+
 #ifndef WIFEXITED
 #define WIFEXITED(s) (((s) & 0xff) == 0)
 #endif
@@ -136,6 +147,9 @@ file_exists (const char *filename)
 
 	return 1 ;
 } /* file_exists */
+
+#endif
+
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch 

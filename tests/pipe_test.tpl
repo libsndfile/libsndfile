@@ -32,8 +32,7 @@
 int
 main (void)
 {
-
-	puts ("This test doesn't work on win32.") ;
+	puts ("    pipe_test  : this test doesn't work on win32.") ;
 	return 0 ;
 } /* main */
 

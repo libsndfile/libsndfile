@@ -126,6 +126,8 @@ TEST_PROGS= \
      ".\tests\misc_test.exe" \
      ".\tests\string_test.exe" \
      ".\tests\win32_test.exe" \
+     ".\tests\stdio_test.exe" \
+     ".\tests\pipe_test.exe" \
      ".\tests\benchmark.exe"
 
 CHECK: $(TEST_PROGS)
@@ -251,6 +253,12 @@ CHECK: $(TEST_PROGS)
     -@echo ----------------------------------------------------------------------
     -@".\tests\sfversion.exe"
     -@echo " passed tests on AVR files."
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\stdio_test.exe"
+    -@".\tests\pipe_test.exe"
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed all tests."
     -@echo ----------------------------------------------------------------------
 
 #====================================================================
@@ -521,21 +529,21 @@ CHECK: $(TEST_PROGS)
     $(CPP) $(CFLAGS) /Fo".\tests\win32_test.obj" /c ".\tests\win32_test.c"
     $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\win32_test.exe" ".\tests\win32_test.obj"
 
-	# ".\tests\stdio_test.exe" : ".\tests\stdio_test.c" ".\tests\utils.obj"
-	#     $(CPP) $(CFLAGS) /Fo".\tests\stdio_test.obj" /c ".\tests\stdio_test.c"
-	#     $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\stdio_test.exe" ".\tests\stdio_test.obj" ".\tests\utils.obj" libsndfile.lib
-	# 
-	# ".\tests\stdin_test.exe" : ".\tests\stdin_test.c" ".\tests\utils.obj"
-	#     $(CPP) $(CFLAGS) /Fo".\tests\stdin_test.obj" /c ".\tests\stdin_test.c"
-	#     $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\stdin_test.exe" ".\tests\stdin_test.obj" ".\tests\utils.obj" libsndfile.lib
-	# 
-	# ".\tests\stdout_test.exe" : ".\tests\stdout_test.c" ".\tests\utils.obj"
-	#     $(CPP) $(CFLAGS) /Fo".\tests\stdout_test.obj" /c ".\tests\stdout_test.c"
-	#     $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\stdout_test.exe" ".\tests\stdout_test.obj" ".\tests\utils.obj" libsndfile.lib
-	# 
-	# ".\tests\pipe_test.exe" : ".\tests\pipe_test.c" ".\tests\utils.obj"
-	#     $(CPP) $(CFLAGS) /Fo".\tests\pipe_test.obj" /c ".\tests\pipe_test.c"
-	#     $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\pipe_test.exe" ".\tests\pipe_test.obj" ".\tests\utils.obj" libsndfile.lib
+".\tests\stdio_test.exe" : ".\tests\stdio_test.c" ".\tests\utils.obj"
+    $(CPP) $(CFLAGS) /Fo".\tests\stdio_test.obj" /c ".\tests\stdio_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\stdio_test.exe" ".\tests\stdio_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\pipe_test.exe" : ".\tests\pipe_test.c" ".\tests\utils.obj"
+    $(CPP) $(CFLAGS) /Fo".\tests\pipe_test.obj" /c ".\tests\pipe_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\pipe_test.exe" ".\tests\pipe_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+# ".\tests\stdin_test.exe" : ".\tests\stdin_test.c" ".\tests\utils.obj"
+#     $(CPP) $(CFLAGS) /Fo".\tests\stdin_test.obj" /c ".\tests\stdin_test.c"
+#     $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\stdin_test.exe" ".\tests\stdin_test.obj" ".\tests\utils.obj" libsndfile.lib
+# 
+# ".\tests\stdout_test.exe" : ".\tests\stdout_test.c" ".\tests\utils.obj"
+#     $(CPP) $(CFLAGS) /Fo".\tests\stdout_test.obj" /c ".\tests\stdout_test.c"
+#     $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\stdout_test.exe" ".\tests\stdout_test.obj" ".\tests\utils.obj" libsndfile.lib
 
 ".\tests\benchmark.exe" : ".\tests\benchmark.c"
     $(CPP) $(CFLAGS) /Fo".\tests\benchmark.obj" /c ".\tests\benchmark.c"
