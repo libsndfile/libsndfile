@@ -35,12 +35,14 @@
 ** logbuffer array.
 */
 
-#define LOG_PUTCHAR(a,b)									\
-		{	if ((a)->logindex < SIGNED_SIZEOF ((a)->logbuffer) - 1) \
-			{	(a)->logbuffer [(a)->logindex++] = (b) ;	\
-				(a)->logbuffer [(a)->logindex] = 0 ;		\
-				}											\
-			}
+static inline void
+log_putchar (SF_PRIVATE *psf, char ch)
+{	if (psf->logindex < SIGNED_SIZEOF (psf->logbuffer) - 1)
+	{	psf->logbuffer [psf->logindex++] = ch ;
+		psf->logbuffer [psf->logindex] = 0 ;
+		} ;
+	return ;
+} /* log_putchar */
 
 void
 psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
@@ -53,12 +55,12 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 
 	while ((c = *format++))
 	{	if (c != '%')
-		{	LOG_PUTCHAR (psf, c) ;
+		{	log_putchar (psf, c) ;
 			continue ;
 			} ;
 
 		if (format [0] == '%') /* Handle %% */
-		{ 	LOG_PUTCHAR (psf, '%') ;
+		{ 	log_putchar (psf, '%') ;
 			format ++ ;
 			continue ;
 			} ;
@@ -107,11 +109,11 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					width_specifier -= strlen (strptr) ;
 					if (left_align == SF_FALSE)
 						while (width_specifier -- > 0)
-							LOG_PUTCHAR (psf, ' ') ;
+							log_putchar (psf, ' ') ;
 					while (*strptr)
-						LOG_PUTCHAR (psf, *strptr++) ;
+						log_putchar (psf, *strptr++) ;
 					while (width_specifier -- > 0)
-						LOG_PUTCHAR (psf, ' ') ;
+						log_putchar (psf, ' ') ;
 					break ;
 
 			case 'd': /* int */
@@ -134,7 +136,7 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					width_specifier -= width ;
 
 					if (sign_char == ' ')
-					{	LOG_PUTCHAR (psf, ' ') ;
+					{	log_putchar (psf, ' ') ;
 						width_specifier -- ;
 						} ;
 
@@ -143,26 +145,26 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 							width_specifier -- ;
 
 						while (width_specifier -- > 0)
-							LOG_PUTCHAR (psf, lead_char) ;
+							log_putchar (psf, lead_char) ;
 						} ;
 
 					if (sign_char == '+' || sign_char == '-')
-					{	LOG_PUTCHAR (psf, sign_char) ;
+					{	log_putchar (psf, sign_char) ;
 						width_specifier -- ;
 						} ;
 
 					if (left_align == SF_FALSE)
 						while (width_specifier -- > 0)
-							LOG_PUTCHAR (psf, lead_char) ;
+							log_putchar (psf, lead_char) ;
 
 					while (tens > 0)
-					{	LOG_PUTCHAR (psf, '0' + d / tens) ;
+					{	log_putchar (psf, '0' + d / tens) ;
 						d %= tens ;
 						tens /= 10 ;
 						} ;
 
 					while (width_specifier -- > 0)
-						LOG_PUTCHAR (psf, lead_char) ;
+						log_putchar (psf, lead_char) ;
 					break ;
 
 			case 'D': /* sf_count_t */
@@ -172,12 +174,12 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 
 						if (D == 0)
 						{	while (-- width_specifier > 0)
-								LOG_PUTCHAR (psf, lead_char) ;
-							LOG_PUTCHAR (psf, '0') ;
+								log_putchar (psf, lead_char) ;
+							log_putchar (psf, '0') ;
 							break ;
 							}
 						if (D < 0)
-						{	LOG_PUTCHAR (psf, '-') ;
+						{	log_putchar (psf, '-') ;
 							D = -D ;
 							} ;
 						Tens = 1 ;
@@ -188,12 +190,12 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 							} ;
 
 						while (width_specifier > width)
-						{	LOG_PUTCHAR (psf, lead_char) ;
+						{	log_putchar (psf, lead_char) ;
 							width_specifier-- ;
 							} ;
 
 						while (Tens > 0)
-						{	LOG_PUTCHAR (psf, '0' + D / Tens) ;
+						{	log_putchar (psf, '0' + D / Tens) ;
 							D %= Tens ;
 							Tens /= 10 ;
 							} ;
@@ -213,7 +215,7 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					width_specifier -= width ;
 
 					if (sign_char == ' ')
-					{	LOG_PUTCHAR (psf, ' ') ;
+					{	log_putchar (psf, ' ') ;
 						width_specifier -- ;
 						} ;
 
@@ -222,31 +224,31 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 							width_specifier -- ;
 
 						while (width_specifier -- > 0)
-							LOG_PUTCHAR (psf, lead_char) ;
+							log_putchar (psf, lead_char) ;
 						} ;
 
 					if (sign_char == '+' || sign_char == '-')
-					{	LOG_PUTCHAR (psf, sign_char) ;
+					{	log_putchar (psf, sign_char) ;
 						width_specifier -- ;
 						} ;
 
 					if (left_align == SF_FALSE)
 						while (width_specifier -- > 0)
-							LOG_PUTCHAR (psf, lead_char) ;
+							log_putchar (psf, lead_char) ;
 
 					while (tens > 0)
-					{	LOG_PUTCHAR (psf, '0' + u / tens) ;
+					{	log_putchar (psf, '0' + u / tens) ;
 						u %= tens ;
 						tens /= 10 ;
 						} ;
 
 					while (width_specifier -- > 0)
-						LOG_PUTCHAR (psf, lead_char) ;
+						log_putchar (psf, lead_char) ;
 					break ;
 
 			case 'c': /* char */
 					c = va_arg (ap, int) & 0xFF ;
-					LOG_PUTCHAR (psf, c) ;
+					log_putchar (psf, c) ;
 					break ;
 
 			case 'x': /* hex */
@@ -255,8 +257,8 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 
 					if (d == 0)
 					{	while (--width_specifier > 0)
-							LOG_PUTCHAR (psf, lead_char) ;
-						LOG_PUTCHAR (psf, '0') ;
+							log_putchar (psf, lead_char) ;
+						log_putchar (psf, '0') ;
 						break ;
 						} ;
 					shift = 28 ;
@@ -267,13 +269,13 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 						} ;
 
 					while (width > 0 && width_specifier > width)
-					{	LOG_PUTCHAR (psf, lead_char) ;
+					{	log_putchar (psf, lead_char) ;
 						width_specifier-- ;
 						} ;
 
 					while (shift >= 0)
 					{	c = (d >> shift) & 0xF ;
-						LOG_PUTCHAR (psf, (c > 9) ? c + 'A' - 10 : c + '0') ;
+						log_putchar (psf, (c > 9) ? c + 'A' - 10 : c + '0') ;
 						shift -= 4 ;
 						} ;
 					break ;
@@ -296,14 +298,14 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					strptr = istr ;
 					while (*strptr)
 					{	c = *strptr++ ;
-						LOG_PUTCHAR (psf, c) ;
+						log_putchar (psf, c) ;
 						} ;
 					break ;
 
 			default :
-					LOG_PUTCHAR (psf, '*') ;
-					LOG_PUTCHAR (psf, c) ;
-					LOG_PUTCHAR (psf, '*') ;
+					log_putchar (psf, '*') ;
+					log_putchar (psf, c) ;
+					log_putchar (psf, '*') ;
 					break ;
 			} /* switch */
 		} /* while */
