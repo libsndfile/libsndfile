@@ -1340,9 +1340,8 @@ f2sc_array (float *src, signed char *dest, int count, int normalize)
 
 	normfact = normalize ? (1.0 * 0x7F) : 1.0 ;
 
-	while (count)
-	{	count -- ;
-		dest [count] = lrintf (src [count] * normfact) ;
+	while (--count >= 0)
+	{	dest [count] = lrintf (src [count] * normfact) ;
 		} ;
 } /* f2sc_array */
 
@@ -1352,9 +1351,8 @@ f2sc_clip_array (float *src, signed char *dest, int count, int normalize)
 
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x1000000) ;
 
-	while (count)
-	{	count -- ;
-		scaled_value = src [count] * normfact ;
+	while (--count >= 0)
+	{	scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 127 ;
 			continue ;
@@ -1399,9 +1397,8 @@ f2uc_array	(float *src, unsigned char *dest, int count, int normalize)
 
 	normfact = normalize ? (1.0 * 0x7F) : 1.0 ;
 
-	while (count)
-	{	count -- ;
-		dest [count] = lrintf (src [count] * normfact) + 128 ;
+	while (--count >= 0)
+	{	dest [count] = lrintf (src [count] * normfact) + 128 ;
 		} ;
 } /* f2uc_array */
 
@@ -1411,9 +1408,8 @@ f2uc_clip_array	(float *src, unsigned char *dest, int count, int normalize)
 
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x1000000) ;
 
-	while (count)
-	{	count -- ;
-		scaled_value = src [count] * normfact ;
+	while (--count >= 0)
+	{	scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 0xFF ;
 			continue ;
@@ -1461,9 +1457,8 @@ f2bes_array (float *src, short *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 2 ;
+	while (--count >= 0)
+	{	ucptr -= 2 ;
 		value = lrintf (src [count] * normfact) ;
 		ucptr [1] = value ;
 		ucptr [0] = value >> 8 ;
@@ -1479,9 +1474,8 @@ f2bes_clip_array (float *src, short *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x10000) ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 2 ;
+	while (--count >= 0)
+	{	ucptr -= 2 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [1] = 0xFF ;
@@ -1534,9 +1528,8 @@ f2les_array (float *src, short *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 2 ;
+	while (--count >= 0)
+	{	ucptr -= 2 ;
 		value = lrintf (src [count] * normfact) ;
 		ucptr [0] = value ;
 		ucptr [1] = value >> 8 ;
@@ -1552,9 +1545,8 @@ f2les_clip_array (float *src, short *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x10000) ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 2 ;
+	while (--count >= 0)
+	{	ucptr -= 2 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
@@ -1607,9 +1599,8 @@ f2let_array (float *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		value = lrintf (src [count] * normfact) ;
 		ucptr [0] = value ;
 		ucptr [1] = value >> 8 ;
@@ -1626,9 +1617,8 @@ f2let_clip_array (float *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100) ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
@@ -1684,9 +1674,8 @@ f2bet_array (float *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		value = lrintf (src [count] * normfact) ;
 		ucptr [0] = value >> 16 ;
 		ucptr [1] = value >> 8 ;
@@ -1703,9 +1692,8 @@ f2bet_clip_array (float *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100) ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0x7F ;
@@ -1760,9 +1748,8 @@ f2bei_array (float *src, int *dest, int count, int normalize)
 
 	normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 4 ;
+	while (--count >= 0)
+	{	ucptr -= 4 ;
 		value = lrintf (src [count] * normfact) ;
 		ucptr [0] = value >> 24 ;
 		ucptr [1] = value >> 16 ;
@@ -1780,9 +1767,8 @@ f2bei_clip_array (float *src, int *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 4 ;
+	while (--count >= 0)
+	{	ucptr -= 4 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= 1.0 * 0x7FFFFFFF)
 		{	ucptr [0] = 0x7F ;
@@ -1841,9 +1827,8 @@ f2lei_array (float *src, int *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 4 ;
+	while (--count >= 0)
+	{	ucptr -= 4 ;
 		value = lrintf (src [count] * normfact) ;
 		ucptr [0] = value ;
 		ucptr [1] = value >> 8 ;
@@ -1861,9 +1846,8 @@ f2lei_clip_array (float *src, int *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 4 ;
+	while (--count >= 0)
+	{	ucptr -= 4 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
@@ -1919,9 +1903,8 @@ d2sc_array	(double *src, signed char *dest, int count, int normalize)
 
 	normfact = normalize ? (1.0 * 0x7F) : 1.0 ;
 
-	while (count)
-	{	count -- ;
-		dest [count] = lrint (src [count] * normfact) ;
+	while (--count >= 0)
+	{	dest [count] = lrint (src [count] * normfact) ;
 		} ;
 } /* d2sc_array */
 
@@ -1931,9 +1914,8 @@ d2sc_clip_array	(double *src, signed char *dest, int count, int normalize)
 
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x1000000) ;
 
-	while (count)
-	{	count -- ;
-		scaled_value = src [count] * normfact ;
+	while (--count >= 0)
+	{	scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 127 ;
 			continue ;
@@ -1978,9 +1960,8 @@ d2uc_array	(double *src, unsigned char *dest, int count, int normalize)
 
 	normfact = normalize ? (1.0 * 0x7F) : 1.0 ;
 
-	while (count)
-	{	count -- ;
-		dest [count] = lrint (src [count] * normfact) + 128 ;
+	while (--count >= 0)
+	{	dest [count] = lrint (src [count] * normfact) + 128 ;
 		} ;
 } /* d2uc_array */
 
@@ -1990,9 +1971,8 @@ d2uc_clip_array	(double *src, unsigned char *dest, int count, int normalize)
 
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x1000000) ;
 
-	while (count)
-	{	count -- ;
-		scaled_value = src [count] * normfact ;
+	while (--count >= 0)
+	{	scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 255 ;
 			continue ;
@@ -2041,9 +2021,8 @@ d2bes_array (double *src, short *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 2 ;
+	while (--count >= 0)
+	{	ucptr -= 2 ;
 		value = lrint (src [count] * normfact) ;
 		ucptr [1] = value ;
 		ucptr [0] = value >> 8 ;
@@ -2059,9 +2038,8 @@ d2bes_clip_array (double *src, short *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x10000) ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 2 ;
+	while (--count >= 0)
+	{	ucptr -= 2 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [1] = 0xFF ;
@@ -2114,9 +2092,8 @@ d2les_array (double *src, short *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 2 ;
+	while (--count >= 0)
+	{	ucptr -= 2 ;
 		value = lrint (src [count] * normfact) ;
 		ucptr [0] = value ;
 		ucptr [1] = value >> 8 ;
@@ -2132,9 +2109,8 @@ d2les_clip_array (double *src, short *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x10000) ;
 	ucptr = ((unsigned char*) dest) + 2 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 2 ;
+	while (--count >= 0)
+	{	ucptr -= 2 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
@@ -2187,9 +2163,8 @@ d2let_array (double *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		value = lrint (src [count] * normfact) ;
 		ucptr [0] = value ;
 		ucptr [1] = value >> 8 ;
@@ -2206,9 +2181,8 @@ d2let_clip_array (double *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100) ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
@@ -2264,9 +2238,8 @@ d2bet_array (double *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		value = lrint (src [count] * normfact) ;
 		ucptr [2] = value ;
 		ucptr [1] = value >> 8 ;
@@ -2283,9 +2256,8 @@ d2bet_clip_array (double *src, tribyte *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100) ;
 	ucptr = ((unsigned char*) dest) + 3 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [2] = 0xFF ;
@@ -2341,9 +2313,8 @@ d2bei_array (double *src, int *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 4 ;
+	while (--count >= 0)
+	{	ucptr -= 4 ;
 		value = lrint (src [count] * normfact) ;
 		ucptr [0] = value >> 24 ;
 		ucptr [1] = value >> 16 ;
@@ -2361,9 +2332,8 @@ d2bei_clip_array (double *src, int *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 4 ;
+	while (--count >= 0)
+	{	ucptr -= 4 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [3] = 0xFF ;
@@ -2422,9 +2392,8 @@ d2lei_array (double *src, int *dest, int count, int normalize)
 	normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 4 ;
+	while (--count >= 0)
+	{	ucptr -= 4 ;
 		value = lrint (src [count] * normfact) ;
 		ucptr [0] = value ;
 		ucptr [1] = value >> 8 ;
@@ -2442,9 +2411,8 @@ d2lei_clip_array (double *src, int *dest, int count, int normalize)
 	normfact = normalize ? (8.0 * 0x10000000) : 1.0 ;
 	ucptr = ((unsigned char*) dest) + 4 * count ;
 
-	while (count)
-	{	count -- ;
-		ucptr -= 4 ;
+	while (--count >= 0)
+	{	ucptr -= 4 ;
 		scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
@@ -2496,17 +2464,15 @@ pcm_write_d2lei	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 static	void
 sc2s_array	(signed char *src, int count, short *dest)
-{	while (count)
-	{	count -- ;
-		dest [count] = src [count] << 8 ;
+{	while (--count >= 0)
+	{	dest [count] = src [count] << 8 ;
 		} ;
 } /* sc2s_array */
 
 static	void
 uc2s_array	(unsigned char *src, int count, short *dest)
-{	while (count)
-	{	count -- ;
-		dest [count] = (((short) src [count]) - 0x80) << 8 ;
+{	while (--count >= 0)
+	{	dest [count] = (((short) src [count]) - 0x80) << 8 ;
 		} ;
 } /* uc2s_array */
 
@@ -2515,9 +2481,8 @@ let2s_array (tribyte *src, int count, short *dest)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		dest [count] = LET2H_SHORT_PTR (ucptr) ;
 		} ;
 } /* let2s_array */
@@ -2527,9 +2492,8 @@ bet2s_array (tribyte *src, int count, short *dest)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		dest [count] = BET2H_SHORT_PTR (ucptr) ;
 			} ;
 } /* bet2s_array */
@@ -2539,9 +2503,8 @@ lei2s_array (int *src, int count, short *dest)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) src) + 4 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 4 ;
+	while (--count >= 0)
+	{	ucptr -= 4 ;
 		dest [count] = LEI2H_SHORT_PTR (ucptr) ;
 		} ;
 } /* lei2s_array */
@@ -2551,9 +2514,8 @@ bei2s_array (int *src, int count, short *dest)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) src) + 4 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 4 ;
+	while (--count >= 0)
+	{	ucptr -= 4 ;
 		dest [count] = BEI2H_SHORT_PTR (ucptr) ;
 		} ;
 } /* bei2s_array */
@@ -2563,17 +2525,15 @@ bei2s_array (int *src, int count, short *dest)
 
 static	void
 sc2i_array	(signed char *src, int count, int *dest)
-{	while (count)
-	{	count -- ;
-		dest [count] = ((int) src [count]) << 24 ;
+{	while (--count >= 0)
+	{	dest [count] = ((int) src [count]) << 24 ;
 		} ;
 } /* sc2i_array */
 
 static	void
 uc2i_array	(unsigned char *src, int count, int *dest)
-{	while (count)
-	{	count -- ;
-		dest [count] = (((int) src [count]) - 128) << 24 ;
+{	while (--count >= 0)
+	{	dest [count] = (((int) src [count]) - 128) << 24 ;
 		} ;
 } /* uc2i_array */
 
@@ -2582,9 +2542,8 @@ bes2i_array (short *src, int count, int *dest)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) src) + 2 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 2 ;
+	while (--count >= 0)
+	{	ucptr -= 2 ;
 		dest [count] = BES2H_INT_PTR (ucptr) ;
 		} ;
 } /* bes2i_array */
@@ -2594,9 +2553,8 @@ les2i_array (short *src, int count, int *dest)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) src) + 2 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 2 ;
+	while (--count >= 0)
+	{	ucptr -= 2 ;
 		dest [count] = LES2H_INT_PTR (ucptr) ;
 			} ;
 } /* les2i_array */
@@ -2606,9 +2564,8 @@ bet2i_array (tribyte *src, int count, int *dest)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		dest [count] = BET2H_INT_PTR (ucptr) ;
 			} ;
 } /* bet2i_array */
@@ -2618,9 +2575,8 @@ let2i_array (tribyte *src, int count, int *dest)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		dest [count] = LET2H_INT_PTR (ucptr) ;
 		} ;
 } /* let2i_array */
@@ -2631,17 +2587,15 @@ let2i_array (tribyte *src, int count, int *dest)
 
 static	void
 sc2f_array	(signed char *src, int count, float *dest, float normfact)
-{	while (count)
-	{	count -- ;
-		dest [count] = ((float) src [count]) * normfact ;
+{	while (--count >= 0)
+	{	dest [count] = ((float) src [count]) * normfact ;
 		} ;
 } /* sc2f_array */
 
 static	void
 uc2f_array	(unsigned char *src, int count, float *dest, float normfact)
-{	while (count)
-	{	count -- ;
-		dest [count] = (((int) src [count]) - 128) * normfact ;
+{	while (--count >= 0)
+	{	dest [count] = (((int) src [count]) - 128) * normfact ;
 		} ;
 } /* uc2f_array */
 
@@ -2649,9 +2603,8 @@ static void
 les2f_array (short *src, int count, float *dest, float normfact)
 {	short	value ;
 
-	while (count)
-	{	count -- ;
-		value = src [count] ;
+	while (--count >= 0)
+	{	value = src [count] ;
 		value = LES2H_SHORT (value) ;
 		dest [count] = ((float) value) * normfact ;
 		} ;
@@ -2661,9 +2614,8 @@ static void
 bes2f_array (short *src, int count, float *dest, float normfact)
 {	short			value ;
 
-	while (count)
-	{	count -- ;
-		value = src [count] ;
+	while (--count >= 0)
+	{	value = src [count] ;
 		value = BES2H_SHORT (value) ;
 		dest [count] = ((float) value) * normfact ;
 		} ;
@@ -2675,9 +2627,8 @@ let2f_array (tribyte *src, int count, float *dest, float normfact)
 	int 			value ;
 
 	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		value = LET2H_INT_PTR (ucptr) ;
 		dest [count] = ((float) value) * normfact ;
 		} ;
@@ -2689,9 +2640,8 @@ bet2f_array (tribyte *src, int count, float *dest, float normfact)
 	int				value ;
 
 	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		value = BET2H_INT_PTR (ucptr) ;
 		dest [count] = ((float) value) * normfact ;
 			} ;
@@ -2701,9 +2651,8 @@ static void
 lei2f_array (int *src, int count, float *dest, float normfact)
 {	int 			value ;
 
-	while (count)
-	{	count -- ;
-		value = src [count] ;
+	while (--count >= 0)
+	{	value = src [count] ;
 		value = LEI2H_INT (value) ;
 		dest [count] = ((float) value) * normfact ;
 		} ;
@@ -2713,9 +2662,8 @@ static void
 bei2f_array (int *src, int count, float *dest, float normfact)
 {	int 			value ;
 
-	while (count)
-	{	count -- ;
-		value = src [count] ;
+	while (--count >= 0)
+	{	value = src [count] ;
 		value = BEI2H_INT (value) ;
 		dest [count] = ((float) value) * normfact ;
 		} ;
@@ -2726,17 +2674,15 @@ bei2f_array (int *src, int count, float *dest, float normfact)
 
 static void
 sc2d_array	(signed char *src, int count, double *dest, double normfact)
-{	while (count)
-	{	count -- ;
-		dest [count] = ((double) src [count]) * normfact ;
+{	while (--count >= 0)
+	{	dest [count] = ((double) src [count]) * normfact ;
 		} ;
 } /* sc2d_array */
 
 static void
 uc2d_array	(unsigned char *src, int count, double *dest, double normfact)
-{	while (count)
-	{	count -- ;
-		dest [count] = (((int) src [count]) - 128) * normfact ;
+{	while (--count >= 0)
+	{	dest [count] = (((int) src [count]) - 128) * normfact ;
 		} ;
 } /* uc2d_array */
 
@@ -2744,9 +2690,8 @@ static void
 les2d_array (short *src, int count, double *dest, double normfact)
 {	short	value ;
 
-	while (count)
-	{	count -- ;
-		value = src [count] ;
+	while (--count >= 0)
+	{	value = src [count] ;
 		value = LES2H_SHORT (value) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
@@ -2756,9 +2701,8 @@ static void
 bes2d_array (short *src, int count, double *dest, double normfact)
 {	short	value ;
 
-	while (count)
-	{	count -- ;
-		value = src [count] ;
+	while (--count >= 0)
+	{	value = src [count] ;
 		value = BES2H_SHORT (value) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
@@ -2770,9 +2714,8 @@ let2d_array (tribyte *src, int count, double *dest, double normfact)
 	int				value ;
 
 	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		value = LET2H_INT_PTR (ucptr) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
@@ -2784,9 +2727,8 @@ bet2d_array (tribyte *src, int count, double *dest, double normfact)
 	int				value ;
 
 	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		value = (ucptr [0] << 24) | (ucptr [1] << 16) | (ucptr [2] << 8) ;
 		dest [count] = ((double) value) * normfact ;
 			} ;
@@ -2796,9 +2738,8 @@ static void
 lei2d_array (int *src, int count, double *dest, double normfact)
 {	int 	value ;
 
-	while (count)
-	{	count -- ;
-		value = src [count] ;
+	while (--count >= 0)
+	{	value = src [count] ;
 		value = LEI2H_INT (value) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
@@ -2808,9 +2749,8 @@ static void
 bei2d_array (int *src, int count, double *dest, double normfact)
 {	int 	value ;
 
-	while (count)
-	{	count -- ;
-		value = src [count] ;
+	while (--count >= 0)
+	{	value = src [count] ;
 		value = BEI2H_INT (value) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
@@ -2821,17 +2761,15 @@ bei2d_array (int *src, int count, double *dest, double normfact)
 
 static	void
 s2sc_array	(short *src, signed char *dest, int count)
-{	while (count)
-	{	count -- ;
-		dest [count] = src [count] >> 8 ;
+{	while (--count >= 0)
+	{	dest [count] = src [count] >> 8 ;
 		} ;
 } /* s2sc_array */
 
 static	void
 s2uc_array	(short *src, unsigned char *dest, int count)
-{	while (count)
-	{	count -- ;
-		dest [count] = (src [count] >> 8) + 0x80 ;
+{	while (--count >= 0)
+	{	dest [count] = (src [count] >> 8) + 0x80 ;
 		} ;
 } /* s2uc_array */
 
@@ -2840,9 +2778,8 @@ s2let_array (short *src, tribyte *dest, int count)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) dest) + 3 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		ucptr [0] = 0 ;
 		ucptr [1] = src [count] ;
 		ucptr [2] = src [count] >> 8 ;
@@ -2854,9 +2791,8 @@ s2bet_array (short *src, tribyte *dest, int count)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) dest) + 3 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		ucptr [2] = 0 ;
 		ucptr [1] = src [count] ;
 		ucptr [0] = src [count] >> 8 ;
@@ -2868,9 +2804,8 @@ s2lei_array (short *src, int *dest, int count)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) dest) + 4 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 4 ;
+	while (--count >= 0)
+	{	ucptr -= 4 ;
 		ucptr [0] = 0 ;
 		ucptr [1] = 0 ;
 		ucptr [2] = src [count] ;
@@ -2883,9 +2818,8 @@ s2bei_array (short *src, int *dest, int count)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) dest) + 4 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 4 ;
+	while (--count >= 0)
+	{	ucptr -= 4 ;
 		ucptr [0] = src [count] >> 8 ;
 		ucptr [1] = src [count] ;
 		ucptr [2] = 0 ;
@@ -2898,17 +2832,15 @@ s2bei_array (short *src, int *dest, int count)
 
 static	void
 i2sc_array	(int *src, signed char *dest, int count)
-{	while (count)
-	{	count -- ;
-		dest [count] = (src [count] >> 24) ;
+{	while (--count >= 0)
+	{	dest [count] = (src [count] >> 24) ;
 		} ;
 } /* i2sc_array */
 
 static	void
 i2uc_array	(int *src, unsigned char *dest, int count)
-{	while (count)
-	{	count -- ;
-		dest [count] = ((src [count] >> 24) + 128) ;
+{	while (--count >= 0)
+	{	dest [count] = ((src [count] >> 24) + 128) ;
 		} ;
 } /* i2uc_array */
 
@@ -2917,9 +2849,8 @@ i2bes_array (int *src, short *dest, int count)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) dest) + 2 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 2 ;
+	while (--count >= 0)
+	{	ucptr -= 2 ;
 		ucptr [0] = src [count] >> 24 ;
 		ucptr [1] = src [count] >> 16 ;
 		} ;
@@ -2930,9 +2861,8 @@ i2les_array (int *src, short *dest, int count)
 {	unsigned char	*ucptr ;
 
 	ucptr = ((unsigned char*) dest) + 2 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 2 ;
+	while (--count >= 0)
+	{	ucptr -= 2 ;
 		ucptr [0] = src [count] >> 16 ;
 		ucptr [1] = src [count] >> 24 ;
 		} ;
@@ -2944,9 +2874,8 @@ i2let_array (int *src, tribyte *dest, int count)
 	int				value ;
 
 	ucptr = ((unsigned char*) dest) + 3 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		value = src [count] >> 8 ;
 		ucptr [0] = value ;
 		ucptr [1] = value >> 8 ;
@@ -2960,9 +2889,8 @@ i2bet_array (int *src, tribyte *dest, int count)
 	int				value ;
 
 	ucptr = ((unsigned char*) dest) + 3 * count ;
-	while (count)
-	{	count -- ;
-		ucptr -= 3 ;
+	while (--count >= 0)
+	{	ucptr -= 3 ;
 		value = src [count] >> 8 ;
 		ucptr [2] = value ;
 		ucptr [1] = value >> 8 ;

@@ -30,15 +30,15 @@ static sf_count_t	alaw_write_i2alaw (SF_PRIVATE *psf, int *ptr, sf_count_t len) 
 static sf_count_t	alaw_write_f2alaw (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t	alaw_write_d2alaw (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static	void	alaw2s_array	(unsigned char *buffer, unsigned int count, short *ptr) ;
-static	void	alaw2i_array	(unsigned char *buffer, unsigned int count, int *ptr) ;
-static	void	alaw2f_array	(unsigned char *buffer, unsigned int count, float *ptr, float normfact) ;
-static	void	alaw2d_array	(unsigned char *buffer, unsigned int count, double *ptr, double normfact) ;
+static	void	alaw2s_array	(unsigned char *buffer, int count, short *ptr) ;
+static	void	alaw2i_array	(unsigned char *buffer, int count, int *ptr) ;
+static	void	alaw2f_array	(unsigned char *buffer, int count, float *ptr, float normfact) ;
+static	void	alaw2d_array	(unsigned char *buffer, int count, double *ptr, double normfact) ;
 
-static	void	s2alaw_array	(short *buffer, unsigned int count, unsigned char *ptr) ;
-static	void	i2alaw_array	(int *buffer, unsigned int count, unsigned char *ptr) ;
-static	void	f2alaw_array	(float *buffer, unsigned int count, unsigned char *ptr, float normfact) ;
-static	void	d2alaw_array	(double *buffer, unsigned int count, unsigned char *ptr, double normfact) ;
+static	void	s2alaw_array	(short *buffer, int count, unsigned char *ptr) ;
+static	void	i2alaw_array	(int *buffer, int count, unsigned char *ptr) ;
+static	void	f2alaw_array	(float *buffer, int count, unsigned char *ptr, float normfact) ;
+static	void	d2alaw_array	(double *buffer, int count, unsigned char *ptr, double normfact) ;
 
 
 int
@@ -451,10 +451,9 @@ unsigned char	alaw_encode [2049] =
 } ; /* alaw_encode */
 
 static void
-alaw2s_array	(unsigned char *buffer, unsigned int count, short *ptr)
-{	while (count)
-	{	count -- ;
-		if (buffer [count] & 0x80)
+alaw2s_array	(unsigned char *buffer, int count, short *ptr)
+{	while (--count >= 0)
+	{	if (buffer [count] & 0x80)
 			ptr [count] = -1 * alaw_decode [((int) buffer [count]) & 0x7F] ;
 		else
 			ptr [count] = alaw_decode [((int) buffer [count]) & 0x7F] ;
@@ -462,10 +461,9 @@ alaw2s_array	(unsigned char *buffer, unsigned int count, short *ptr)
 } /* alaw2s_array */
 
 static void
-alaw2i_array	(unsigned char *buffer, unsigned int count, int *ptr)
-{	while (count)
-	{	count -- ;
-		if (buffer [count] & 0x80)
+alaw2i_array	(unsigned char *buffer, int count, int *ptr)
+{	while (--count >= 0)
+	{	if (buffer [count] & 0x80)
 			ptr [count] = (-1 * alaw_decode [((int) buffer [count]) & 0x7F]) << 16 ;
 		else
 			ptr [count] = alaw_decode [((int) buffer [count]) & 0x7F] << 16 ;
@@ -473,10 +471,9 @@ alaw2i_array	(unsigned char *buffer, unsigned int count, int *ptr)
 } /* alaw2i_array */
 
 static void
-alaw2f_array	(unsigned char *buffer, unsigned int count, float *ptr, float normfact)
-{	while (count)
-	{	count -- ;
-		if (buffer [count] & 0x80)
+alaw2f_array	(unsigned char *buffer, int count, float *ptr, float normfact)
+{	while (--count >= 0)
+	{	if (buffer [count] & 0x80)
 			ptr [count] = -normfact * alaw_decode [((int) buffer [count]) & 0x7F] ;
 		else
 			ptr [count] = normfact * alaw_decode [((int) buffer [count]) & 0x7F] ;
@@ -484,10 +481,9 @@ alaw2f_array	(unsigned char *buffer, unsigned int count, float *ptr, float normf
 } /* alaw2f_array */
 
 static void
-alaw2d_array	(unsigned char *buffer, unsigned int count, double *ptr, double normfact)
-{	while (count)
-	{	count -- ;
-		if (buffer [count] & 0x80)
+alaw2d_array	(unsigned char *buffer, int count, double *ptr, double normfact)
+{	while (--count >= 0)
+	{	if (buffer [count] & 0x80)
 			ptr [count] = -normfact * alaw_decode [((int) buffer [count]) & 0x7F] ;
 		else
 			ptr [count] = normfact * alaw_decode [((int) buffer [count]) & 0x7F] ;
@@ -495,10 +491,9 @@ alaw2d_array	(unsigned char *buffer, unsigned int count, double *ptr, double nor
 } /* alaw2d_array */
 
 static void
-s2alaw_array	(short *ptr, unsigned int count, unsigned char *buffer)
-{	while (count)
-	{	count -- ;
-		if (ptr [count] >= 0)
+s2alaw_array	(short *ptr, int count, unsigned char *buffer)
+{	while (--count >= 0)
+	{	if (ptr [count] >= 0)
 			buffer [count] = alaw_encode [ptr [count] / 16] ;
 		else
 			buffer [count] = 0x7F & alaw_encode [ptr [count] / -16] ;
@@ -506,10 +501,9 @@ s2alaw_array	(short *ptr, unsigned int count, unsigned char *buffer)
 } /* s2alaw_array */
 
 static void
-i2alaw_array	(int *ptr, unsigned int count, unsigned char *buffer)
-{	while (count)
-	{	count -- ;
-		if (ptr [count] >= 0)
+i2alaw_array	(int *ptr, int count, unsigned char *buffer)
+{	while (--count >= 0)
+	{	if (ptr [count] >= 0)
 			buffer [count] = alaw_encode [ptr [count] >> (16 + 4)] ;
 		else
 			buffer [count] = 0x7F & alaw_encode [- ptr [count] >> (16 + 4)] ;
@@ -517,10 +511,9 @@ i2alaw_array	(int *ptr, unsigned int count, unsigned char *buffer)
 } /* i2alaw_array */
 
 static void
-f2alaw_array	(float *ptr, unsigned int count, unsigned char *buffer, float normfact)
-{	while (count)
-	{	count -- ;
-		if (ptr [count] >= 0)
+f2alaw_array	(float *ptr, int count, unsigned char *buffer, float normfact)
+{	while (--count >= 0)
+	{	if (ptr [count] >= 0)
 			buffer [count] = alaw_encode [(lrintf (normfact * ptr [count])) / 16] ;
 		else
 			buffer [count] = 0x7F & alaw_encode [(lrintf (normfact * ptr [count])) / -16] ;
@@ -528,10 +521,9 @@ f2alaw_array	(float *ptr, unsigned int count, unsigned char *buffer, float normf
 } /* f2alaw_array */
 
 static void
-d2alaw_array	(double *ptr, unsigned int count, unsigned char *buffer, double normfact)
-{	while (count)
-	{	count -- ;
-		if (ptr [count] >= 0)
+d2alaw_array	(double *ptr, int count, unsigned char *buffer, double normfact)
+{	while (--count >= 0)
+	{	if (ptr [count] >= 0)
 			buffer [count] = alaw_encode [(lrint (normfact * ptr [count])) / 16] ;
 		else
 			buffer [count] = 0x7F & alaw_encode [(lrint (normfact * ptr [count])) / -16] ;

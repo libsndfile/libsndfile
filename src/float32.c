@@ -649,50 +649,44 @@ host_write_d2f	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 static void
 f2s_array (float *src, int count, short *dest)
-{	while (count)
-	{	count -- ;
-		dest [count] = lrintf (src [count]) ;
+{	while (--count >= 0)
+	{	dest [count] = lrintf (src [count]) ;
 		} ;
 } /* f2s_array */
 
 static void
 f2i_array (float *src, int count, int *dest)
-{	while (count)
-	{	count -- ;
-		dest [count] = lrintf (src [count]) ;
+{	while (--count >= 0)
+	{	dest [count] = lrintf (src [count]) ;
 		} ;
 } /* f2i_array */
 
 static void
 f2d_array (float *src, int count, double *dest)
-{	while (count)
-	{	count -- ;
-		dest [count] = src [count] ;
+{	while (--count >= 0)
+	{	dest [count] = src [count] ;
 		} ;
 } /* f2d_array */
 
 static void
 s2f_array (short *src, float *dest, int count)
-{	while (count)
-	{	count -- ;
-		dest [count] = src [count] ;
+{	while (--count >= 0)
+	{	dest [count] = src [count] ;
 		} ;
 
 } /* s2f_array */
 
 static void
 i2f_array (int *src, float *dest, int count)
-{	while (count)
-	{	count -- ;
-		dest [count] = src [count] ;
+{	while (--count >= 0)
+	{	dest [count] = src [count] ;
 		} ;
 } /* i2f_array */
 
 static void
 d2f_array (double *src, float *dest, int count)
-{	while (count)
-	{	count -- ;
-		dest [count] = src [count] ;
+{	while (--count >= 0)
+	{	dest [count] = src [count] ;
 		} ;
 } /* d2f_array */
 
@@ -929,17 +923,15 @@ replace_write_d2f	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 static void
 bf2f_array (float *buffer, int count)
-{	while (count)
-	{	count -- ;
-		buffer [count] = FLOAT32_READ ((unsigned char *) (buffer + count)) ;
+{	while (--count >= 0)
+	{	buffer [count] = FLOAT32_READ ((unsigned char *) (buffer + count)) ;
 		} ;
 } /* bf2f_array */
 
 static void
 f2bf_array (float *buffer, int count)
-{	while (count)
-	{	count -- ;
-		FLOAT32_WRITE (buffer [count], (unsigned char*) (buffer + count)) ;
+{	while (--count >= 0)
+	{	FLOAT32_WRITE (buffer [count], (unsigned char*) (buffer + count)) ;
 		} ;
 } /* f2bf_array */
 

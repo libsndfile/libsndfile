@@ -62,13 +62,13 @@ static sf_count_t		host_write_i2d	(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t		host_write_f2d	(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t		host_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
-static	void	d2s_array 	(double *buffer, unsigned int count, short *ptr) ;
-static	void	d2i_array 	(double *buffer, unsigned int count, int *ptr) ;
-static	void	d2f_array 	(double *buffer, unsigned int count, float *ptr) ;
+static	void	d2s_array 	(double *buffer, int count, short *ptr) ;
+static	void	d2i_array 	(double *buffer, int count, int *ptr) ;
+static	void	d2f_array 	(double *buffer, int count, float *ptr) ;
 
-static 	void	s2d_array 	(short *ptr, double *buffer, unsigned int count) ;
-static 	void	i2d_array 	(int *ptr, double *buffer, unsigned int count) ;
-static 	void	f2d_array 	(float *ptr, double *buffer, unsigned int count) ;
+static 	void	s2d_array 	(short *ptr, double *buffer, int count) ;
+static 	void	i2d_array 	(int *ptr, double *buffer, int count) ;
+static 	void	f2d_array 	(float *ptr, double *buffer, int count) ;
 
 static void		double64_peak_update	(SF_PRIVATE *psf, double *buffer, int count, int indx) ;
 
@@ -694,51 +694,45 @@ host_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 */
 
 static void
-d2s_array (double *src, unsigned int count, short *dest)
-{	while (count)
-	{	count -- ;
-		dest [count] = lrint (src [count]) ;
+d2s_array (double *src, int count, short *dest)
+{	while (--count >= 0)
+	{	dest [count] = lrint (src [count]) ;
 		} ;
 } /* d2s_array */
 
 static void
-d2i_array (double *src, unsigned int count, int *dest)
-{	while (count)
-	{	count -- ;
-		dest [count] = lrint (src [count]) ;
+d2i_array (double *src, int count, int *dest)
+{	while (--count >= 0)
+	{	dest [count] = lrint (src [count]) ;
 		} ;
 } /* d2i_array */
 
 static void
-d2f_array (double *src, unsigned int count, float *dest)
-{	while (count)
-	{	count -- ;
-		dest [count] = src [count] ;
+d2f_array (double *src, int count, float *dest)
+{	while (--count >= 0)
+	{	dest [count] = src [count] ;
 		} ;
 } /* d2f_array */
 
 static void
-s2d_array (short *src, double *dest, unsigned int count)
-{	while (count)
-	{	count -- ;
-		dest [count] = src [count] ;
+s2d_array (short *src, double *dest, int count)
+{	while (--count >= 0)
+	{	dest [count] = src [count] ;
 		} ;
 
 } /* s2d_array */
 
 static void
-i2d_array (int *src, double *dest, unsigned int count)
-{	while (count)
-	{	count -- ;
-		dest [count] = src [count] ;
+i2d_array (int *src, double *dest, int count)
+{	while (--count >= 0)
+	{	dest [count] = src [count] ;
 		} ;
 } /* i2d_array */
 
 static void
-f2d_array (float *src, double *dest, unsigned int count)
-{	while (count)
-	{	count -- ;
-		dest [count] = src [count] ;
+f2d_array (float *src, double *dest, int count)
+{	while (--count >= 0)
+	{	dest [count] = src [count] ;
 		} ;
 } /* f2d_array */
 
@@ -972,17 +966,15 @@ replace_write_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 static void
 d2bd_read (double *buffer, int count)
-{	while (count)
-	{	count -- ;
-		buffer [count] = DOUBLE64_READ ((unsigned char *) (buffer + count)) ;
+{	while (--count >= 0)
+	{	buffer [count] = DOUBLE64_READ ((unsigned char *) (buffer + count)) ;
 		} ;
 } /* d2bd_read */
 
 static void
 bd2d_write (double *buffer, int count)
-{	while (count)
-	{	count -- ;
-		DOUBLE64_WRITE (buffer [count], (unsigned char*) (buffer + count)) ;
+{	while (--count >= 0)
+	{	DOUBLE64_WRITE (buffer [count], (unsigned char*) (buffer + count)) ;
 		} ;
 } /* bd2d_write */
 

@@ -24,57 +24,22 @@
 
 void
 endswap_short_array (short *ptr, int len)
-{
+{	short	temp ;
 
-#if 0
-	unsigned char *ucptr, temp ;
-
-	ucptr = ((unsigned char *) ptr) + 2 * len ;
-	while (len > 0)
-	{	len -- ;
-		ucptr -= 2 ;
-		temp = ucptr [0] ;
-		ucptr [0] = ucptr [1] ;
-		ucptr [1] = temp ;
-		} ;
-#else
-	short	temp ;
-	while (len > 0)
-	{	len -- ;
-		temp = ptr [len] ;
+	while (--len >= 0)
+	{	temp = ptr [len] ;
 		ptr [len] = ENDSWAP_SHORT (temp) ;
-		}
-#endif
+		} ;
 } /* endswap_short_array */
 
 void
 endswap_int_array (int *ptr, int len)
-{
-#if 0
-	unsigned char *ucptr, temp ;
+{	int temp ;
 
-	ucptr = ((unsigned char *) ptr) + 4 * len ;
-	while (len > 0)
-	{	len -- ;
-		ucptr -= 4 ;
-
-		temp = ucptr [0] ;
-		ucptr [0] = ucptr [3] ;
-		ucptr [3] = temp ;
-
-		temp = ucptr [1] ;
-		ucptr [1] = ucptr [2] ;
-		ucptr [2] = temp ;
-		} ;
-#else
-	int temp ;
-
-	while (len > 0)
-	{	len -- ;
-		temp = ptr [len] ;
+	while (--len >= 0)
+	{	temp = ptr [len] ;
 		ptr [len] = ENDSWAP_INT (temp) ;
 		} ;
-#endif
 } /* endswap_int_array */
 
 /*	This function assumes that sizeof (long) == 8, but works correctly even
@@ -85,9 +50,8 @@ endswap_long_array (long *ptr, int len)
 {	unsigned char *ucptr, temp ;
 
 	ucptr = (unsigned char *) ptr + 8 * len ;
-	while (len > 0)
-	{	len -- ;
-		ucptr -= 8 ;
+	while (--len >= 0)
+	{	ucptr -= 8 ;
 
 		temp = ucptr [0] ;
 		ucptr [0] = ucptr [7] ;
@@ -113,65 +77,31 @@ endswap_long_array (long *ptr, int len)
 void
 endswap_short_copy (short *dest, short *src, int len)
 {
-#if	0
-	char *psrc, *pdest ;
-
-	psrc = ((char *) src) + 2 * len ;
-	pdest = ((char *) dest) + 2 * len ;
-	while (len > 0)
-	{	len -- ;
-		psrc -= 2 ;
-		pdest -= 2 ;
-
-		pdest [0] = psrc [1] ;
-		pdest [1] = psrc [0] ;
+	while (--len >= 0)
+	{	dest [len] = ENDSWAP_SHORT (src [len]) ;
 		} ;
-#else
-	while (len > 0)
-	{	len -- ;
-		dest [len] = ENDSWAP_SHORT (src [len]) ;
-		} ;
-#endif
 } /* endswap_short_copy */
 
 void
 endswap_int_copy (int *dest, int *src, int len)
 {
-#if	0
-	char *psrc, *pdest ;
-
-	psrc = ((char *) src) + 4 * len ;
-	pdest = ((char *) dest) + 4 * len ;
-	while (len > 0)
-	{	len -- ;
-		psrc -= 4 ;
-		pdest -= 4 ;
-
-		pdest [0] = psrc [3] ;
-		pdest [1] = psrc [2] ;
-		pdest [2] = psrc [1] ;
-		pdest [3] = psrc [0] ;
+	while (--len >= 0)
+	{	dest [len] = ENDSWAP_INT (src [len]) ;
 		} ;
-#else
-	while (len > 0)
-	{	len -- ;
-		dest [len] = ENDSWAP_INT (src [len]) ;
-		} ;
-#endif
 } /* endswap_int_copy */
 
-/*	This function assumes that sizeof (long) == 8, but works correctly even
-**	is sizeof (long) == 4.
+/*
+**	This function assumes that sizeof (long) == 8, but works correctly even
+**	if sizeof (long) == 4.
 */
 void
 endswap_long_copy (long *dest, long *src, int len)
-{	char *psrc, *pdest ;
+{	unsigned char *psrc, *pdest ;
 
-	psrc = (char *) src + 8 * len ;
-	pdest = (char *) dest + 8 * len ;
-	while (len > 0)
-	{	len -- ;
-		psrc -= 8 ;
+	psrc = (unsigned char *) src + 8 * len ;
+	pdest = (unsigned char *) dest + 8 * len ;
+	while (--len >= 0)
+	{	psrc -= 8 ;
 		pdest -= 8 ;
 
 		pdest [0] = psrc [7] ;
