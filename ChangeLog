@@ -1,3 +1,11 @@
+2004-12-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile-play.c
+    In the ALSA output code, added call to snd_pcm_drain() just before 
+    snd_pcm_close() as suggested by Thomas Kaeding.
+    In the OSS output code, added two ioctls (SNDCTL_DSP_POST and 
+    SNDCTL_DSP_SYNC) just before the close of the audio device.
+
 2004-12-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/*.c src/sndfile.h.in

@@ -115,6 +115,7 @@ alsa_play (int argc, char *argv [])
 				alsa_write_float (alsa_dev, buffer, BUFFER_LEN / sfinfo.channels, sfinfo.channels) ;
 			} ;
 
+		snd_pcm_drain (alsa_dev) ;
 		snd_pcm_close (alsa_dev) ;
 
 		sf_close (sndfile) ;
@@ -140,7 +141,7 @@ alsa_open (int channels, int samplerate, int realtime)
 		}
 	else
 	{	alsa_period_size = 1024 ;
-		alsa_buffer_frames = 6 * alsa_period_size ;
+		alsa_buffer_frames = 4 * alsa_period_size ;
 		} ;
 
 	if ((err = snd_pcm_open (&alsa_dev, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
@@ -184,7 +185,6 @@ alsa_open (int channels, int samplerate, int realtime)
 	{	fprintf (stderr, "cannot set buffer size (%s)\n", snd_strerror (err)) ;
 		return NULL ;
 		} ;
-
 
 	if ((err = snd_pcm_hw_params_set_period_size_near (alsa_dev, hw_params, &alsa_period_size, 0)) < 0)
 	{	fprintf (stderr, "cannot set period size (%s)\n", snd_strerror (err)) ;
@@ -380,6 +380,12 @@ linux_play (int argc, char *argv [])
 		{	while ((readcount = sf_read_short (sndfile, buffer, BUFFER_LEN)))
 				write (audio_device, buffer, readcount * sizeof (short)) ;
 			} ;
+
+		if (ioctl (audio_device, SNDCTL_DSP_POST, 0) == -1)
+			perror ("ioctl (SNDCTL_DSP_POST) ") ;
+
+		if (ioctl (audio_device, SNDCTL_DSP_SYNC, 0) == -1)
+			perror ("ioctl (SNDCTL_DSP_SYNC) ") ;
 
 		close (audio_device) ;
 
