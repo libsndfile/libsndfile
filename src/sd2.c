@@ -31,7 +31,7 @@
 #include	"common.h"
 
 
-#if (0 && ENABLE_EXPERIMENTAL_CODE == 0)
+#if (ENABLE_EXPERIMENTAL_CODE == 0)
 
 int
 sd2_open	(SF_PRIVATE *psf)
