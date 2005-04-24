@@ -29,9 +29,11 @@ development.
 In most respects, Arch is significantly better than most other revision
 control systems.
 One of the few places it is lacking is support for windows.
-There is a native windows binary, but it has significant problems due
-to limitations on path name lengths in the windows.
-There is also a Cygwin binary available, but I have not tried it.
+There are a couple of win32 ports, but the only one I have used 
+successfully used is
+	<A HREF="http://ct.radiology.uiowa.edu/~jfmeinel/tla-short-path/">
+		John Meinel's</A>
+cygwin version.
 </P>
 <!-- pepper -->
 <P>
@@ -58,6 +60,12 @@ for building.
 Some later versions of aclocal (I see this with 1.9.4) may spew out a bunch
 of warning messages about underquoted defintions in AC_WHATEVER, but these
 can safely be ignored.
+</P>
+<P>
+In order to build the sources from the Arch archive, you will need GNU
+Autogen which is available
+	<A HREF="http://autogen.sf.net">here</A>.
+Autogen does work under Cygwin. I haven't tried it under MinGW.
 </P>
 <P>
 To build and check it:
