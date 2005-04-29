@@ -33,7 +33,7 @@ There are a couple of win32 ports, but the only one I have used successfully
 used is
 	<A HREF="http://ct.radiology.uiowa.edu/~jfmeinel/tla-short-path/">
 		John Meinel's</A>
-cygwin version.
+cygwin version (tla.exe.bz2, not the .zip file).
 </P>
 <!-- pepper -->
 <P>
@@ -51,7 +51,6 @@ install tla") you can do:
 	tla register-archive http://www.mega-nerd.com/Arch/2004/
 	tla get erikd@mega-nerd.com--2004/libsndfile--hack--0 libsndfile
 	cd libsndfile
-	./reconfigure.mk
 </PRE>
 <!-- pepper -->
 <P>
@@ -62,8 +61,9 @@ of warning messages about underquoted defintions in AC_WHATEVER, but these
 can safely be ignored.
 </P>
 <P>
-In order to build the sources from the Arch archive, you will need GNU
-Autogen which is available
+In order to build the sources from the Arch archive, you will need the
+Python interpreter (available as part of Cygwin) and GNU Autogen which is 
+available
 	<A HREF="http://autogen.sf.net">here</A>.
 Autogen does work under Cygwin (requires libguile and guile-devel to be installed).
 I haven't tried it under MinGW.
@@ -73,11 +73,26 @@ To build and check it:
 </P>
 <!-- pepper -->
 <PRE>
+	./reconfigure.mk
 	make
 	make check
 </PRE>
 <!-- pepper -->
-<BR>
+<H3><BR>Building under MinGW</H3>
+<P>
+To build under MinGW, you need to first get the archive using tla under Cygwin 
+and then do everything above up to and including the <B>./reconfigure.mk</B>
+stage.
+Then you can start an Msys window, change directory into the top level 
+libsndfile source directory.
+Then run:
+</P>
+<!-- pepper -->
+<PRE>
+	./configure
+	make
+	make check
+</PRE>
 <!-- pepper -->
 </BODY>
 </HTML>
