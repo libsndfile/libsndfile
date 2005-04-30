@@ -23,9 +23,9 @@
 #include	<string.h>
 #include	<ctype.h>
 
-#include        "sndfile.h"
-#include        "config.h"
-#include        "common.h"
+#include	"sndfile.h"
+#include	"config.h"
+#include	"common.h"
 
 
 #ifndef HAVE_FLAC_ALL_H
