@@ -892,17 +892,45 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 			/* wValidBitsPerSample, for our use same as bitwidth as we use it fully */
 			psf_binheader_writef (psf, "e2", psf->bytewidth * 8) ;
 
-			if (psf->sf.channels == 2)
-				psf_binheader_writef (psf, "e4", 0x1 | 0x2 ) ;	/* dwChannelMask front left and right */
-			else
-				psf_binheader_writef (psf, "e4", 0) ;			/* dwChannelMask = 0 when in doubt */
+			/*
+			** Ok some liberty is taken here to use the most commonly used channel masks
+			** instead of "no mapping". If you really want to use "no mapping" for 8 channels and less
+			** please don't use wavex. (otherwise we'll have to create a new SF_COMMAND)
+			*/
+			switch (psf->sf.channels)
+			{	case 1 :	/* center channel mono */
+					psf_binheader_writef (psf, "e4", 0x4) ;
+					break ;
+
+				case 2 :	/* front left and right */
+					psf_binheader_writef (psf, "e4", 0x1 | 0x2) ;
+					break ;
+
+				case 4 :	/* Quad */
+					psf_binheader_writef (psf, "e4", 0x1 | 0x2 | 0x10 | 0x20) ;
+					break ;
+
+				case 6 :	/* 5.1 */
+					psf_binheader_writef (psf, "e4", 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20) ;
+					break ;
+
+				case 8 :	/* 7.1 */
+					psf_binheader_writef (psf, "e4", 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20 | 0x40 | 0x80) ;
+					break ;
+
+				default :	/* 0 when in doubt , use direct out, ie NO mapping*/
+					psf_binheader_writef (psf, "e4", 0x0) ;
+					break ;
+				}
+
 			break ;
 
-		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists might have different header as per wav_write_header */
-		default : return SFE_UNIMPLEMENTED ;
+		case SF_FORMAT_MS_ADPCM : /* Todo, GUID exists might have different header as per wav_write_header */
+		default :
+			return SFE_UNIMPLEMENTED ;
 		} ;
 
-	/* GUI section, different for each */
+	/* GUID section, different for each */
 
 	switch (subformat)
 	{	case SF_FORMAT_PCM_U8 :

@@ -1,3 +1,13 @@
+2005-04-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c
+    Apply a patch From David Viens to make the parsing of basc chunks more
+    robust.
+
+    * src/wav.c
+    Another patch from David Viens to write correct wavex channel masks for
+    the most common channel configurations.
+
 2005-04-08 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/command.c
