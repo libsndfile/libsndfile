@@ -1,5 +1,6 @@
 /*
 ** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -88,8 +89,6 @@
 #define SIZEOF_INST_CHUNK		20
 
 /* Is it constant? */
-#define SIZEOF_basc_CHUNK				0x54
-#define SIZEOF_basc_CHUNK_PADDING		66
 
 /* AIFC/IMA4 defines. */
 #define AIFC_IMA4_BLOCK_LEN				34
@@ -161,7 +160,6 @@ typedef struct
 	unsigned short	sigNumerator ;
 	unsigned short	sigDenominator ;
 	unsigned short	loopType ;
-	char			zero_bytes [SIZEOF_basc_CHUNK_PADDING] ;
 } basc_CHUNK ;
 
 /*------------------------------------------------------------------------------
@@ -185,7 +183,7 @@ static int	aiff_command (SF_PRIVATE *psf, int command, void *data, int datasize)
 
 static const char *get_loop_mode_str (short mode) ;
 
-static int aiff_read_basc_chunk (SF_PRIVATE * psf) ;
+static int aiff_read_basc_chunk (SF_PRIVATE * psf, int) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -627,16 +625,9 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 			case basc_MARKER :
 					psf_binheader_readf (psf, "E4", &dword) ;
-
-					if (dword != SIZEOF_basc_CHUNK)
-					{	psf_log_printf (psf, " %M : %d (should be %d)\n", marker, dword, SIZEOF_basc_CHUNK) ;
-						psf_binheader_readf (psf, "j", dword) ;
-						break ;
-						} ;
-
 					psf_log_printf (psf, " basc : %u\n", dword) ;
 
-					if ((error = aiff_read_basc_chunk (psf)))
+					if ((error = aiff_read_basc_chunk (psf, dword)))
 						return error ;
 					break ;
 
@@ -1274,13 +1265,13 @@ uint2tenbytefloat (unsigned int num, unsigned char *bytes)
 } /* uint2tenbytefloat */
 
 static int
-aiff_read_basc_chunk (SF_PRIVATE * psf)
+aiff_read_basc_chunk (SF_PRIVATE * psf, int datasize)
 {	const char * type_str ;
 	basc_CHUNK bc ;
 
 	psf_binheader_readf (psf, "E442", &bc.version, &bc.numBeats, &bc.rootNote) ;
 	psf_binheader_readf (psf, "E222", &bc.scaleType, &bc.sigNumerator, &bc.sigDenominator) ;
-	psf_binheader_readf (psf, "E2b", &bc.loopType, &bc.zero_bytes, SIZEOF_basc_CHUNK_PADDING) ;
+	psf_binheader_readf (psf, "E2j", &bc.loopType, datasize - sizeof (bc)) ;
 
 	psf_log_printf (psf, "  Version ? : %u\n  Num Beats : %u\n  Root Note : 0x%x\n",
 						bc.version, bc.numBeats, bc.rootNote) ;
