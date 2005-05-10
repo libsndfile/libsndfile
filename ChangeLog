@@ -5,7 +5,8 @@
 
     * src/wav.c
     Add workaround for files created by the Peak audio editor on Mac which can
-    produce files with very short LIST chunks.
+    produce files with very short LIST chunks (thanks to Jonathan Segel who 
+    supplied the file).
 
 2005-04-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
