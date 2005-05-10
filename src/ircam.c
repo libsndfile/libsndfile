@@ -40,7 +40,7 @@
 #define IRCAM_LE_MASK		(MAKE_MARKER (0xFF, 0x00, 0xFF, 0xFF))
 #define IRCAM_LE_MARKER		(MAKE_MARKER (0x00, 0x00, 0xA3, 0x64))
 
-#define IRCAM_02B_MARKER	(MAKE_MARKER (0x00, 0x02, 0xA3, 0x64))
+#define IRCAM_02B_MARKER	(MAKE_MARKER (0x64, 0xA3, 0x02, 0x00))
 #define IRCAM_03L_MARKER	(MAKE_MARKER (0x64, 0xA3, 0x03, 0x00))
 
 #define IRCAM_DATA_OFFSET	(1024)
@@ -139,8 +139,7 @@ ircam_read_header	(SF_PRIVATE *psf)
 
 	psf_binheader_readf (psf, "epmf44", 0, &marker, &samplerate, &(psf->sf.channels), &encoding) ;
 
-	if (((marker & IRCAM_LE_MASK) != IRCAM_LE_MARKER) &&
-		((marker & IRCAM_BE_MASK) != IRCAM_BE_MARKER))
+	if (((marker & IRCAM_BE_MASK) != IRCAM_BE_MARKER) && ((marker & IRCAM_LE_MASK) != IRCAM_LE_MARKER))
 	{	psf_log_printf (psf, "marker: 0x%X\n", marker) ;
 		return SFE_IRCAM_NO_MARKER ;
 		} ;
