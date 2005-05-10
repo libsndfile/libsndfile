@@ -109,6 +109,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_WAV_BAD_FORMAT		, "Error in WAV file. Errors in 'fmt ' chunk." },
 	{	SFE_WAV_BAD_BLOCKALIGN	, "Error in WAV file. Block alignment in 'fmt ' chunk is incorrect." },
 	{	SFE_WAV_NO_DATA			, "Error in WAV file. No 'data' chunk marker." },
+	{	SFE_WAV_BAD_LIST		, "Error in WAV file. Malformed LIST chunk." },
 	{	SFE_WAV_UNKNOWN_CHUNK	, "Error in WAV file. File contains an unknown chunk marker." },
 	{	SFE_WAV_WVPK_DATA		, "Error in WAV file. Data is in WAVPACK format." },
 
