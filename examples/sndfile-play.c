@@ -90,7 +90,8 @@ alsa_play (int argc, char *argv [])
 			continue ;
 			} ;
 
-		alsa_dev = alsa_open (sfinfo.channels, sfinfo.samplerate, SF_FALSE) ;
+		if ((alsa_dev = alsa_open (sfinfo.channels, sfinfo.samplerate, SF_FALSE)) == NULL)
+			continue ;
 
 		subformat = sfinfo.format & SF_FORMAT_SUBMASK ;
 
@@ -127,7 +128,7 @@ alsa_play (int argc, char *argv [])
 static snd_pcm_t *
 alsa_open (int channels, int samplerate, int realtime)
 {	const char * device = "plughw:0" ;
-	snd_pcm_t *alsa_dev ;
+	snd_pcm_t *alsa_dev = NULL ;
 	snd_pcm_hw_params_t *hw_params ;
 	snd_pcm_uframes_t buffer_size, xfer_align, start_threshold ;
 	snd_pcm_uframes_t alsa_period_size, alsa_buffer_frames ;
@@ -146,54 +147,54 @@ alsa_open (int channels, int samplerate, int realtime)
 
 	if ((err = snd_pcm_open (&alsa_dev, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
 	{	fprintf (stderr, "cannot open audio device \"%s\" (%s)\n", device, snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	snd_pcm_nonblock (alsa_dev, 0) ;
 
 	if ((err = snd_pcm_hw_params_malloc (&hw_params)) < 0)
 	{	fprintf (stderr, "cannot allocate hardware parameter structure (%s)\n", snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	if ((err = snd_pcm_hw_params_any (alsa_dev, hw_params)) < 0)
 	{	fprintf (stderr, "cannot initialize hardware parameter structure (%s)\n", snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	if ((err = snd_pcm_hw_params_set_access (alsa_dev, hw_params, SND_PCM_ACCESS_RW_INTERLEAVED)) < 0)
 	{	fprintf (stderr, "cannot set access type (%s)\n", snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	if ((err = snd_pcm_hw_params_set_format (alsa_dev, hw_params, SND_PCM_FORMAT_FLOAT)) < 0)
 	{	fprintf (stderr, "cannot set sample format (%s)\n", snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	if ((err = snd_pcm_hw_params_set_rate_near (alsa_dev, hw_params, &samplerate, 0)) < 0)
 	{	fprintf (stderr, "cannot set sample rate (%s)\n", snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	if ((err = snd_pcm_hw_params_set_channels (alsa_dev, hw_params, channels)) < 0)
 	{	fprintf (stderr, "cannot set channel count (%s)\n", snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	if ((err = snd_pcm_hw_params_set_buffer_size_near (alsa_dev, hw_params, &alsa_buffer_frames)) < 0)
 	{	fprintf (stderr, "cannot set buffer size (%s)\n", snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	if ((err = snd_pcm_hw_params_set_period_size_near (alsa_dev, hw_params, &alsa_period_size, 0)) < 0)
 	{	fprintf (stderr, "cannot set period size (%s)\n", snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	if ((err = snd_pcm_hw_params (alsa_dev, hw_params)) < 0)
 	{	fprintf (stderr, "cannot set parameters (%s)\n", snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	/* extra check: if we have only one period, this code won't work */
@@ -201,26 +202,26 @@ alsa_open (int channels, int samplerate, int realtime)
 	snd_pcm_hw_params_get_buffer_size (hw_params, &buffer_size) ;
 	if (alsa_period_size == buffer_size)
 	{	fprintf (stderr, "Can't use period equal to buffer size (%lu == %lu)", alsa_period_size, buffer_size) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	snd_pcm_hw_params_free (hw_params) ;
 
 	if ((err = snd_pcm_sw_params_malloc (&sw_params)) != 0)
 	{	fprintf (stderr, "%s: snd_pcm_sw_params_malloc: %s", __func__, snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	if ((err = snd_pcm_sw_params_current (alsa_dev, sw_params)) != 0)
 	{	fprintf (stderr, "%s: snd_pcm_sw_params_current: %s", __func__, snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	/* note: set start threshold to delay start until the ring buffer is full */
 	snd_pcm_sw_params_current (alsa_dev, sw_params) ;
 	if ((err = snd_pcm_sw_params_get_xfer_align (sw_params, &xfer_align)) < 0)
 	{	fprintf (stderr, "cannot get xfer align (%s)\n", snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	/* round up to closest transfer boundary */
@@ -229,16 +230,24 @@ alsa_open (int channels, int samplerate, int realtime)
 		start_threshold = 1 ;
 	if ((err = snd_pcm_sw_params_set_start_threshold (alsa_dev, sw_params, start_threshold)) < 0)
 	{	fprintf (stderr, "cannot set start threshold (%s)\n", snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
 
 	if ((err = snd_pcm_sw_params (alsa_dev, sw_params)) != 0)
 	{	fprintf (stderr, "%s: snd_pcm_sw_params: %s", __func__, snd_strerror (err)) ;
-		return NULL ;
+		goto catch_error ;
 		} ;
+
 	snd_pcm_sw_params_free (sw_params) ;
 
 	snd_pcm_reset (alsa_dev) ;
+
+catch_error :
+
+	if (err < 0 && alsa_dev != NULL)
+	{	snd_pcm_close (alsa_dev) ;
+		return NULL ;
+		} ;
 
 	return alsa_dev ;
 } /* alsa_open */
