@@ -16,8 +16,8 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#ifndef COMMON_H_INCLUDED
-#define COMMON_H_INCLUDED
+#ifndef SNDFILE_COMMON_H
+#define SNDFILE_COMMON_H
 
 #include "config.h"
 
@@ -671,7 +671,7 @@ int missing_vsnprintf (char *str, size_t n, const char *fmt, ...) ;
 #define	LSF_VSNPRINTF	missing_vsnprintf
 #endif
 
-#endif /* COMMON_H_INCLUDED */
+#endif /* SNDFILE_COMMON_H */
 
 /*------------------------------------------------------------------------------------
 ** Extra commands for sf_command(). Not for public use yet.
