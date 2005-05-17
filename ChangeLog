@@ -1,3 +1,9 @@
+2005-05-17 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav.c src/common.c
+    Fix a regression where long ICMT chunks were causing the WAV parser
+    to exit.
+
 2005-05-15 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * libsndfile.spec.in

@@ -788,12 +788,11 @@ header_read (SF_PRIVATE *psf, void *ptr, int bytes)
 {	int count = 0 ;
 
 	if (psf->headindex + bytes > SIGNED_SIZEOF (psf->header))
-	{	if (psf->headend < SIGNED_SIZEOF (psf->header))
-			psf_log_printf (psf, "Warning : Further header read would overflow buffer.\n") ;
-		psf->headend = SIGNED_SIZEOF (psf->header) ;
+	{	memset (ptr, 0, SIGNED_SIZEOF (psf->header) - psf->headindex) ;
 
 		/* This is the best that we can do. */
-		return psf_fread (ptr, 1, bytes, psf) ;
+		psf_fseek (psf, bytes, SEEK_CUR) ;
+		return bytes ;
 		} ;
 
 	if (psf->headindex + bytes > psf->headend)

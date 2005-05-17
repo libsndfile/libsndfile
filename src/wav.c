@@ -1156,7 +1156,8 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 					dword += (dword & 1) ;
 					if (dword > SIGNED_SIZEOF (psf->u.cbuf))
 					{	psf_log_printf (psf, "  *** %M : %d (too big)\n", chunk, dword) ;
-						return SFE_INTERNAL ;
+						psf_binheader_readf (psf, "j", dword) ;
+						break ;
 						} ;
 
 					cptr = psf->u.cbuf ;
