@@ -2,7 +2,10 @@
 
 bin_PROGRAMS = sndfile-regtest
 
-noinst_HEADERS = database.h
+noinst_HEADERS = regtest.h
+
+SNDFILEDIR =../src
+INCLUDES = -I$(srcdir)/$(SNDFILEDIR) $(OS_SPECIFIC_CFLAGS)
 
 sndfile_regtest_SOURCES = sndfile-regtest.c database.c checksum.c
 sndfile_regtest_LDADD = $(SNDFILEDIR)/libsndfile.la $(SQLITE3_LIBS)

@@ -247,6 +247,21 @@ case "$target_os" in
 	esac
 
 #====================================================================================
+# Check for libsqlite3 (only used in regtest).
+
+PKG_CHECK_MODULES(SQLITE3, sqlite3 >= 3.2, ac_cv_sqlite3=1, ac_cv_sqlite3=0)
+
+AC_DEFINE_UNQUOTED([HAVE_SQLITE3],$ac_cv_sqlite3,[Set to 1 if you have libsqlite3.])
+
+if test x$ac_cv_sqlite3 = x1 ; then
+	ac_cv_sqlite3=yes
+	HAVE_SQLITE3=1
+else
+	ac_cv_sqlite3=no
+	HAVE_SQLITE3=0
+	fi
+
+#====================================================================================
 # Determine if the processor can do clipping on float to int conversions.
 
 if test x$ac_arg_cpu_clip = "xY" ; then

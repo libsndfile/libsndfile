@@ -27,7 +27,7 @@
 
 #include <sndfile.h>
 
-#include "database.h"
+#include "regtest.h"
 
 typedef struct
 {	sqlite3 *sql ;
@@ -84,7 +84,8 @@ db_open (const char * db_name)
 int
 db_create (const char * db_name)
 {	REGTEST_DB * db ;
-	char * errmsg = NULL, *cmd ;
+	const char *cmd ;
+	char * errmsg = NULL ;
 	int err ;
 
 	db = (REGTEST_DB *) db_open (db_name) ;
