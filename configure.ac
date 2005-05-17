@@ -435,7 +435,7 @@ AC_SUBST(LIBTOOL_DEPS)
 
 AC_CONFIG_FILES([ \
 			src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
-			man/Makefile examples/Makefile tests/Makefile \
+			man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
 			doc/Makefile doc/libsndfile.css \
 			Win32/Makefile Win32/Makefile.mingw \
 			Octave/Makefile \

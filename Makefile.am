@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = man doc Win32 Octave src examples tests
+SUBDIRS = man doc Win32 Octave src examples tests regtest
 DIST_SUBDIRS = $(SUBDIRS)
 EXTRA_DIST = reconfigure.mk acinclude.m4 libsndfile.spec.in \
 			sndfile.pc.in Make.bat
