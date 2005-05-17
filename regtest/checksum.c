@@ -20,17 +20,17 @@
 **	A simple checksum for short, int and float data.
 */
 
-#include "config.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#define	_ISOC9X_SOURCE	1
+#define _ISOC99_SOURCE	1
+#define	__USE_ISOC9X	1
+#define	__USE_ISOC99	1
+#include	<math.h>
+
 #include <sndfile.h>
-
-#include "float_cast.h"
-
-#include "regtest.h"
 
 #define	BIG_PRIME		999983
 

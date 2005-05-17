@@ -16,7 +16,6 @@
 **	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,14 +23,11 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sqlite3.h>
 
 #include <sndfile.h>
 
-#include "regtest.h"
-
-#if HAVE_SQLITE3
-
-#include <sqlite3.h>
+#include "database.h"
 
 typedef struct
 {	sqlite3 *sql ;
@@ -88,8 +84,7 @@ db_open (const char * db_name)
 int
 db_create (const char * db_name)
 {	REGTEST_DB * db ;
-	const char *cmd ;
-	char * errmsg = NULL ;
+	char * errmsg = NULL, *cmd ;
 	int err ;
 
 	db = (REGTEST_DB *) db_open (db_name) ;
@@ -185,8 +180,8 @@ db_add_file (REG_DB * db_handle, const char * filepath)
 
 	snprintf (db->cmdbuf, sizeof (db->cmdbuf), "insert into sndfile "
 		"(fname, fpath, srate, frames, channels, format, checksum, logbuf) values"
-		"('%s','%s',%d,'%ld', %d, '0x%08x', '0x%08x', '%s');",
-		db->filename, db->pathname, info.samplerate, (long) info.frames, info.channels, info.format, checksum, db->logbuf) ;
+		"('%s','%s',%d,'%lld', %d, '0x%08x', '0x%08x', '%s');",
+		db->filename, db->pathname, info.samplerate, info.frames, info.channels, info.format, checksum, db->logbuf) ;
 
 	if (strlen (db->cmdbuf) >= sizeof (db->cmdbuf) - 1)
 	{	printf ("strlen (db->cmdbuf) too long.\n") ;
@@ -368,7 +363,7 @@ check_file_by_ekey (REGTEST_DB * db, int ekey)
 		if (strcmp (result [k], "frames") == 0)
 		{	if (strtoll (result [k + cols], NULL, 10) == info.frames)
 				continue ;
-			printf ("\n\nError : frames doesn't match : %s == %ld\n", result [k + cols], (long) info.frames) ;
+			printf ("\n\nError : frames doesn't match : %s == %lld\n", result [k + cols], info.frames) ;
 			} ;
 
 		if (strcmp (result [k], "channels") == 0)
@@ -476,21 +471,6 @@ callback (void *unused, int argc, char **argv, char **colname)
 
 	return 0 ;
 } /* callback */
-
-#else
-
-int dummy (void) ;
-
-int
-dummy (void)
-{	/*
-	**	Empty dummy fnction so tha compiler doesn't winge about an
-	**	empty file.
-	*/
-	return 0 ;
-} /* dummy */
-
-#endif
 
 
 /*
