@@ -1,4 +1,21 @@
+2005-06-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    Fix the return values of sf_commands : SFC_SET_NORM_DOUBLE,
+    SFC_SET_NORM_FLOAT, SFC_GET_LIB_VERSION and SFC_GET_LOG_INFO. Thanks to
+    Kyroz for pointing out these errors.
+
+    * doc/command.html
+    Correct documented return values for SFC_SET_NORM_DOUBLE and
+    SFC_SET_NORM_FLOAT. Thanks to Kyroz again.
+
 2005-05-17 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * regtest/*
+    Add new files for sndfile-regtest program.
+
+    * configure.ac Makefile.am
+    Hook regetest into build.
 
     * src/wav.c src/common.c
     Fix a regression where long ICMT chunks were causing the WAV parser

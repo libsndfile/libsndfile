@@ -725,7 +725,8 @@ sf_format_check	(const SF_INFO *info)
 
 int
 sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
-{	SF_PRIVATE 		*psf = NULL ;
+{	SF_PRIVATE 	*psf = NULL ;
+	int old_value ;
 
 	/* This set of commands do not need the sndfile parameter. */
 	switch (command)
@@ -736,7 +737,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				LSF_SNPRINTF (data, datasize, "%s-%s-exp", PACKAGE_NAME, PACKAGE_VERSION) ;
 			else
 				LSF_SNPRINTF (data, datasize, "%s-%s", PACKAGE_NAME, PACKAGE_VERSION) ;
-			return 0 ;
+			return strlen (data) ;
 
 		case SFC_GET_SIMPLE_FORMAT_COUNT :
 			if (data == NULL || datasize != SIGNED_SIZEOF (int))
@@ -781,19 +782,21 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 	{	if (data == NULL)
 			return (psf->error = SFE_BAD_CONTROL_CMD) ;
 		LSF_SNPRINTF (data, datasize, "%s", sf_logbuffer) ;
-		return 0 ;
+		return strlen (data) ;
 		} ;
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
 	switch (command)
 	{	case SFC_SET_NORM_FLOAT :
+			old_value = psf->norm_float ;
 			psf->norm_float = (datasize) ? SF_TRUE : SF_FALSE ;
-			return psf->norm_float ;
+			return old_value ;
 
 		case SFC_SET_NORM_DOUBLE :
+			old_value = psf->norm_double ;
 			psf->norm_double = (datasize) ? SF_TRUE : SF_FALSE ;
-			return psf->norm_double ;
+			return old_value ;
 
 		case SFC_GET_NORM_FLOAT :
 			return psf->norm_float ;
@@ -802,14 +805,12 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			return psf->norm_double ;
 
 		case SFC_SET_SCALE_FLOAT_INT_READ :
-			{	int old_value = psf->float_int_mult ;
+			old_value = psf->float_int_mult ;
 
-				psf->float_int_mult = (datasize != 0) ? SF_TRUE : SF_FALSE ;
-				if (psf->float_int_mult && psf->float_max < 0.0)
-					psf->float_max = psf_calc_signal_max (psf, SF_FALSE) ;
-				return old_value ;
-				}
-			break ;
+			psf->float_int_mult = (datasize != 0) ? SF_TRUE : SF_FALSE ;
+			if (psf->float_int_mult && psf->float_max < 0.0)
+				psf->float_max = psf_calc_signal_max (psf, SF_FALSE) ;
+			return old_value ;
 
 		case SFC_SET_ADD_PEAK_CHUNK :
 			{	int format = psf->sf.format & SF_FORMAT_TYPEMASK ;
