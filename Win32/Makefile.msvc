@@ -93,7 +93,8 @@ LINK32_OBJS= \
 	".\src\ogg.obj" \
 	".\src\pvf.obj" \
 	".\src\xi.obj" \
-	".\src\htk.obj"
+	".\src\htk.obj" \
+	".\src\flac.obj"
 
 libsndfile.dll : $(LINK32_OBJS) ".\src\libsndfile.def"
     $(LINK32) $(DLL_LINK_FLAGS) /def:".\src\libsndfile.def" $(LINK32_OBJS)
@@ -454,6 +455,9 @@ CHECK: $(TEST_PROGS)
 
 ".\src\htk.obj" : ".\src\htk.c"
     $(CPP) $(CFLAGS) /Fo".\src\htk.obj" /c ".\src\htk.c"
+
+".\src\flac.obj" : ".\src\flac.c"
+    $(CPP) $(CFLAGS) /Fo".\src\flac.obj" /c ".\src\flac.c"
 
 #====================================================================
 # Object files for test programs.

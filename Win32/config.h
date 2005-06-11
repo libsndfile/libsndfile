@@ -141,6 +141,9 @@
 /* Define to 1 if you have the `snprintf' function. */
 #define HAVE_SNPRINTF 1
 
+/* Set to 1 if you have libsqlite3. */
+/* #undef HAVE_SQLITE3 */
+
 /* Define to 1 if the system has the type `ssize_t'. */
 /* #undef HAVE_SSIZE_T */
 
@@ -190,13 +193,13 @@
 #define PACKAGE_NAME "libsndfile"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsndfile 1.0.11"
+#define PACKAGE_STRING "libsndfile 1.0.12pre9"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsndfile"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.0.11pre11"
+#define PACKAGE_VERSION "1.0.12pre9"
 
 /* Set to maximum allowed value of sf_count_t type. */
 #define SF_COUNT_MAX 0x7FFFFFFFFFFFFFFFi64
@@ -250,7 +253,7 @@
 #define TYPEOF_SF_COUNT_T __int64_t
 
 /* Version number of package */
-#define VERSION "1.0.11"
+#define VERSION "1.0.12pre9"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */

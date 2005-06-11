@@ -16,11 +16,15 @@
 **	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <sndfile.h>
+
+#ifdef HAVE_SQLITE3
 
 #include "regtest.h"
 
@@ -103,7 +107,17 @@ print_libsndfile_version (void)
 	printf ("\nsndfile-regtest : using %s\n\n", version) ;
 } /* print_lib_version */
 
+#else
 
+int
+main (void)
+{
+	puts ("\nThis program was not compiled with libsqlite3 and hence doesn't work.\n") ;
+
+	return 0 ;
+} /* main */
+
+#endif
 
 /*
 ** Do not edit or modify anything in this comment block.

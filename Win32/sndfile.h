@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -71,6 +71,7 @@ enum
 	SF_FORMAT_AVR			= 0x120000,		/* Audio Visual Research */
 	SF_FORMAT_WAVEX			= 0x130000,		/* MS WAVE with WAVEFORMATEX */
 	SF_FORMAT_SD2			= 0x160000,		/* Sound Designer 2 */
+	SF_FORMAT_FLAC			= 0x170000,		/* FLAC lossless file format */
 
 	/* Subtypes from here on. */
 
@@ -103,7 +104,6 @@ enum
 
 	SF_FORMAT_DPCM_8		= 0x0050,		/* 8 bit differential PCM (XI only) */
 	SF_FORMAT_DPCM_16		= 0x0051,		/* 16 bit differential PCM (XI only) */
-
 
 	/* Endian-ness options. */
 
@@ -436,7 +436,7 @@ const char* sf_get_string (SNDFILE *sndfile, int str_type) ;
 */
 
 sf_count_t	sf_read_raw		(SNDFILE *sndfile, void *ptr, sf_count_t bytes) ;
-sf_count_t	sf_write_raw 	(SNDFILE *sndfile, void *ptr, sf_count_t bytes) ;
+sf_count_t	sf_write_raw 	(SNDFILE *sndfile, const void *ptr, sf_count_t bytes) ;
 
 /* Functions for reading and writing the data chunk in terms of frames.
 ** The number of items actually read/written = frames * number of channels.
@@ -449,16 +449,16 @@ sf_count_t	sf_write_raw 	(SNDFILE *sndfile, void *ptr, sf_count_t bytes) ;
 */
 
 sf_count_t	sf_readf_short	(SNDFILE *sndfile, short *ptr, sf_count_t frames) ;
-sf_count_t	sf_writef_short	(SNDFILE *sndfile, short *ptr, sf_count_t frames) ;
+sf_count_t	sf_writef_short	(SNDFILE *sndfile, const short *ptr, sf_count_t frames) ;
 
 sf_count_t	sf_readf_int	(SNDFILE *sndfile, int *ptr, sf_count_t frames) ;
-sf_count_t	sf_writef_int 	(SNDFILE *sndfile, int *ptr, sf_count_t frames) ;
+sf_count_t	sf_writef_int 	(SNDFILE *sndfile, const int *ptr, sf_count_t frames) ;
 
 sf_count_t	sf_readf_float	(SNDFILE *sndfile, float *ptr, sf_count_t frames) ;
-sf_count_t	sf_writef_float	(SNDFILE *sndfile, float *ptr, sf_count_t frames) ;
+sf_count_t	sf_writef_float	(SNDFILE *sndfile, const float *ptr, sf_count_t frames) ;
 
 sf_count_t	sf_readf_double		(SNDFILE *sndfile, double *ptr, sf_count_t frames) ;
-sf_count_t	sf_writef_double	(SNDFILE *sndfile, double *ptr, sf_count_t frames) ;
+sf_count_t	sf_writef_double	(SNDFILE *sndfile, const double *ptr, sf_count_t frames) ;
 
 /* Functions for reading and writing the data chunk in terms of items.
 ** Otherwise similar to above.
@@ -466,16 +466,16 @@ sf_count_t	sf_writef_double	(SNDFILE *sndfile, double *ptr, sf_count_t frames) ;
 */
 
 sf_count_t	sf_read_short	(SNDFILE *sndfile, short *ptr, sf_count_t items) ;
-sf_count_t	sf_write_short	(SNDFILE *sndfile, short *ptr, sf_count_t items) ;
+sf_count_t	sf_write_short	(SNDFILE *sndfile, const short *ptr, sf_count_t items) ;
 
 sf_count_t	sf_read_int		(SNDFILE *sndfile, int *ptr, sf_count_t items) ;
-sf_count_t	sf_write_int 	(SNDFILE *sndfile, int *ptr, sf_count_t items) ;
+sf_count_t	sf_write_int 	(SNDFILE *sndfile, const int *ptr, sf_count_t items) ;
 
 sf_count_t	sf_read_float	(SNDFILE *sndfile, float *ptr, sf_count_t items) ;
-sf_count_t	sf_write_float	(SNDFILE *sndfile, float *ptr, sf_count_t items) ;
+sf_count_t	sf_write_float	(SNDFILE *sndfile, const float *ptr, sf_count_t items) ;
 
 sf_count_t	sf_read_double	(SNDFILE *sndfile, double *ptr, sf_count_t items) ;
-sf_count_t	sf_write_double	(SNDFILE *sndfile, double *ptr, sf_count_t items) ;
+sf_count_t	sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t items) ;
 
 /* Close the SNDFILE and clean up all memory allocations associated with this
 ** file.

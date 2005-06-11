@@ -16,6 +16,7 @@
 **	Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,6 +29,8 @@
 #include <sndfile.h>
 
 #include "regtest.h"
+
+#ifdef HAVE_SQLITE3
 
 typedef struct
 {	sqlite3 *sql ;
@@ -472,6 +475,19 @@ callback (void *unused, int argc, char **argv, char **colname)
 
 	return 0 ;
 } /* callback */
+
+#else
+
+int
+dummy (void)
+{	/*
+	**	Empty dummy fnction so tha compiler doesn't winge about an
+	**	empty file.
+	*/
+	return 0 ;
+} /* dummy */
+
+#endif
 
 
 /*
