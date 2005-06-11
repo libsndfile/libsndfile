@@ -1,3 +1,20 @@
+2005-06-11 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/file_io.c
+    Fix psf_is_pipe() and return value of psf_fread() when using virtual i/o.
+
+    * src/sndfile.c
+    Fix VALIDATE_AND_ASSIGN_PSF macro for virtual i/o.
+
+    * tests/virtual_io_test.c
+    Fill in skeleton test program.
+
+    * tests/Makefile.am
+    Move virtual i/o tests to end of tests with stdio/pipe tests.
+
+    * src/(sndfile.h.in|file_io.c|common.h|sndfile.c) tests/virtual_io_test.c
+    Rename some of the virtual i/o functions and data types.
+
 2005-06-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
@@ -46,7 +63,7 @@
 
     * src/wav.c
     Add workaround for files created by the Peak audio editor on Mac which can
-    produce files with very short LIST chunks (thanks to Jonathan Segel who 
+    produce files with very short LIST chunks (thanks to Jonathan Segel who
     supplied the file).
 
 2005-04-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
@@ -62,7 +79,7 @@
 2005-04-08 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/command.c
-    Only allow FLAC in the format arrays if FLAC is enabled. Thanks to 
+    Only allow FLAC in the format arrays if FLAC is enabled. Thanks to
     Leigh Smith.
 
 2005-03-09 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
@@ -112,6 +129,16 @@
     snd_pcm_close() as suggested by Thomas Kaeding.
     In the OSS output code, added two ioctls (SNDCTL_DSP_POST and
     SNDCTL_DSP_SYNC) just before the close of the audio device.
+
+    * tests/virtual_io_test.c tests/Makefile.am
+    Add a new test program (currently empty) and add it to the build.
+
+2004-12-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in src/sndfile.h src/common.h src/file_io.c
+      src/create_symbols_file.py
+    Apply patch from Steve Baker which is the beginnings of a virtual
+    I/O interface.
 
 2004-12-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

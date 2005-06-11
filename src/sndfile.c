@@ -66,6 +66,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_NO_EMBEDDED_RDWR	, "Error : cannot open embedded file read/write." },
 	{	SFE_NO_PIPE_WRITE		, "Error : this file format does not support pipe write." },
 	{	SFE_BAD_RDWR_FORMAT		, "Attempted to open read only format for RDWR." },
+	{	SFE_BAD_VIRTUAL_IO		, "Error : bad pointer on SF_VIRTUAL_IO struct." },
 
 	{	SFE_INTERLEAVE_MODE		, "Attempt to write to file with non-interleaved data." },
 	{	SFE_INTERLEAVE_SEEK		, "Bad karma in seek during interleave read operation." },
@@ -259,7 +260,8 @@ static char	sf_syserr [SF_SYSERR_LEN] = { 0 } ;
 				return 0 ;							\
 				} ;									\
 			(b) = (SF_PRIVATE*) (a) ;				\
-			if (psf_filedes_valid (b) == 0)			\
+			if ((b)->virtual_io == SF_FALSE &&		\
+				psf_filedes_valid (b) == 0)			\
 			{	(b)->error = SFE_BAD_FILE_PTR ;		\
 				return 0 ;							\
 				} ;									\
@@ -351,6 +353,60 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 
 	return (SNDFILE*) psf ;
 } /* sf_open_fd */
+
+SNDFILE*
+sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data)
+{	SF_PRIVATE 	*psf ;
+	int			error = 0 ;
+
+	/* Make sure we have a valid set ot virtual pointers. */
+	if (sfvirtual->get_filelen == NULL || sfvirtual->seek == NULL || sfvirtual->tell == NULL)
+	{	sf_errno = SFE_BAD_VIRTUAL_IO ;
+		LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "Bad vio_get_filelen / vio_seek / vio_tell in SF_VIRTUAL_IO struct.\n") ;
+		return NULL ;
+		} ;
+
+	if ((mode == SFM_READ || mode == SFM_RDWR) && sfvirtual->read == NULL)
+	{	sf_errno = SFE_BAD_VIRTUAL_IO ;
+		LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "Bad vio_read in SF_VIRTUAL_IO struct.\n") ;
+		return NULL ;
+		} ;
+
+	if ((mode == SFM_WRITE || mode == SFM_RDWR) && sfvirtual->write == NULL)
+	{	sf_errno = SFE_BAD_VIRTUAL_IO ;
+		LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "Bad vio_write in SF_VIRTUAL_IO struct.\n") ;
+		return NULL ;
+		} ;
+
+	if ((psf = calloc (1, sizeof (SF_PRIVATE))) == NULL)
+	{	sf_errno = SFE_MALLOC_FAILED ;
+		return	NULL ;
+		} ;
+
+	psf->filedes = -1 ;
+	psf->rsrcdes = -1 ;
+
+	psf->virtual_io = SF_TRUE ;
+	psf->vio = *sfvirtual ;
+	psf->vio_user_data = user_data ;
+
+	psf->mode = mode ;
+
+	error = psf_open_file (psf, mode, sfinfo) ;
+
+	if (error)
+	{	sf_errno = error ;
+		if (error == SFE_SYSTEM)
+			LSF_SNPRINTF (sf_syserr, sizeof (sf_syserr), "%s", psf->syserr) ;
+		LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
+		psf_close (psf) ;
+		return NULL ;
+		} ;
+
+	memcpy (sfinfo, &(psf->sf), sizeof (SF_INFO)) ;
+
+	return (SNDFILE*) psf ;
+} /* sf_open_virtual */
 
 /*------------------------------------------------------------------------------
 */

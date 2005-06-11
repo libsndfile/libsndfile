@@ -348,6 +348,22 @@ typedef struct
 	int future [6] ;
 } SF_LOOP_INFO ;
 
+typedef sf_count_t		(*sf_vio_get_filelen)	(void *user_data) ;
+typedef sf_count_t		(*sf_vio_seek)		(sf_count_t offset, int whence, void *user_data) ;
+typedef sf_count_t		(*sf_vio_read)		(void *ptr, sf_count_t count, void *user_data) ;
+typedef sf_count_t		(*sf_vio_write)		(const void *ptr, sf_count_t count, void *user_data) ;
+typedef sf_count_t		(*sf_vio_tell)		(void *user_data) ;
+
+struct SF_VIRTUAL_IO
+{	sf_vio_get_filelen	get_filelen ;
+	sf_vio_seek			seek ;
+	sf_vio_read			read ;
+	sf_vio_write		write ;
+	sf_vio_tell			tell ;
+} ;
+
+typedef	struct SF_VIRTUAL_IO SF_VIRTUAL_IO ;
+
 /* Open the specified file for read, write or both. On error, this will
 ** return a NULL pointer. To find the error number, pass a NULL SNDFILE
 ** to sf_perror () or sf_error_str ().
@@ -369,6 +385,8 @@ SNDFILE* 	sf_open		(const char *path, int mode, SF_INFO *sfinfo) ;
 */
 
 SNDFILE* 	sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc) ;
+
+SNDFILE* 	sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data) ;
 
 /* sf_error () returns a error number which can be translated to a text
 ** string using sf_error_number().

@@ -16,7 +16,7 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include "sfconfig.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -106,10 +106,10 @@ vfwrite (const void *ptr, sf_count_t count, void *user_data)
 	**	This will break badly for files over 2Gig in length, but
 	**	is sufficient for testing.
 	*/
-	if (vf->offset >= SIGNED_SIZEOF (vf->data))
+	if (vf->offset >= sizeof (vf->data))
 		return 0 ;
 
-	if (vf->offset + count > SIGNED_SIZEOF (vf->data))
+	if (vf->offset + count > sizeof (vf->data))
 		count = sizeof (vf->data) - vf->offset ;
 
 	memcpy (vf->data + vf->offset, ptr, (size_t) count) ;
@@ -152,6 +152,23 @@ check_short_data (short * data, int len, int start, int line)
 			} ;
 } /* gen_short_data */
 
+static void
+dump_data_to_file (const char *fname, const void *ptr, size_t len)
+{	FILE * file ;
+
+	if ((file = fopen (fname, "w")) == NULL)
+	{	printf ("\n\nLine %d : fopen failed.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	if (fwrite (ptr, 1, len, file) != len)
+	{	printf ("\n\nLine %d : short fwrite.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	fclose (file) ;
+} /* dump_data_to_file */
+
 /*------------------------------------------------------------------------------
 */
 
@@ -177,7 +194,6 @@ vio_test (const char *fname, int format)
 	vio_data.offset = 0 ;
 	vio_data.length = 0 ;
 
-	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.format = format ;
 	sfinfo.channels = 2 ;
 	sfinfo.samplerate = 44100 ;

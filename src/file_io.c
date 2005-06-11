@@ -79,6 +79,9 @@ int
 psf_fclose (SF_PRIVATE *psf)
 {	int retval ;
 
+	if (psf->virtual_io)
+		return 0 ;
+
 	if (psf->do_not_close_descriptor)
 	{	psf->filedes = -1 ;
 		return 0 ;
@@ -153,6 +156,9 @@ psf_close_rsrc (SF_PRIVATE *psf)
 sf_count_t
 psf_get_filelen (SF_PRIVATE *psf)
 {	sf_count_t	filelen ;
+
+	if (psf->virtual_io)
+		return psf->vio.get_filelen (psf->vio_user_data) ;
 
 	filelen = psf_get_filelen_fd (psf->filedes) ;
 
@@ -238,6 +244,9 @@ sf_count_t
 psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence)
 {	sf_count_t	new_position ;
 
+	if (psf->virtual_io)
+		return psf->vio.seek (offset, whence, psf->vio_user_data) ;
+
 	switch (whence)
 	{	case SEEK_SET :
 				offset += psf->fileoffset ;
@@ -281,6 +290,9 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 {	sf_count_t total = 0 ;
 	ssize_t	count ;
 
+	if (psf->virtual_io)
+		return psf->vio.read (ptr, bytes*items, psf->vio_user_data) / bytes ;
+
 	items *= bytes ;
 
 	/* Do this check after the multiplication above. */
@@ -319,6 +331,9 @@ psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf
 {	sf_count_t total = 0 ;
 	ssize_t	count ;
 
+	if (psf->virtual_io)
+		return psf->vio.write (ptr, bytes*items, psf->vio_user_data) / bytes ;
+
 	items *= bytes ;
 
 	/* Do this check after the multiplication above. */
@@ -355,6 +370,9 @@ psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf
 sf_count_t
 psf_ftell (SF_PRIVATE *psf)
 {	sf_count_t pos ;
+
+	if (psf->virtual_io)
+		return psf->vio.tell (psf->vio_user_data) ;
 
 	if (psf->is_pipe)
 		return psf->pipeoffset ;
@@ -407,6 +425,9 @@ psf_fgets (char *buffer, sf_count_t bufsize, SF_PRIVATE *psf)
 int
 psf_is_pipe (SF_PRIVATE *psf)
 {	struct stat statbuf ;
+
+	if (psf->virtual_io)
+		return SF_FALSE ;
 
 	if (fstat (psf->filedes, &statbuf) == -1)
 	{	psf_log_syserr (psf, errno) ;
@@ -660,6 +681,9 @@ psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence)
 	DWORD dwMoveMethod ;
 	DWORD dwResult, dwError ;
 
+	if (psf->virtual_io)
+		return psf->vio.seek (offset, whence, psf->vio_user_data) ;
+
 	switch (whence)
 	{	case SEEK_SET :
 				offset += psf->fileoffset ;
@@ -701,6 +725,9 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 	ssize_t count ;
 	DWORD dwNumberOfBytesRead ;
 
+	if (psf->virtual_io)
+		return psf->vio.read (ptr, bytes*items, psf->vio_user_data) / bytes ;
+
 	items *= bytes ;
 
 	/* Do this check after the multiplication above. */
@@ -737,6 +764,9 @@ psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf
 	ssize_t	 count ;
 	DWORD dwNumberOfBytesWritten ;
 
+	if (psf->virtual_io)
+		return psf->vio.write (ptr, bytes * items, psf->vio_user_data) / bytes ;
+
 	items *= bytes ;
 
 	/* Do this check after the multiplication above. */
@@ -772,6 +802,9 @@ psf_ftell (SF_PRIVATE *psf)
 {	sf_count_t pos ;
 	LONG lDistanceToMoveLow, lDistanceToMoveHigh ;
 	DWORD dwResult, dwError ;
+
+	if (psf->virtual_io)
+		return psf->vio.tell (psf->vio_user_data) ;
 
 	if (psf->is_pipe)
 		return psf->pipeoffset ;
@@ -830,7 +863,11 @@ psf_fgets (char *buffer, sf_count_t bufsize, SF_PRIVATE *psf)
 
 /* Win32 */ int
 psf_is_pipe (SF_PRIVATE *psf)
-{	if (GetFileType ((HANDLE) psf->filedes) == FILE_TYPE_DISK)
+{
+	if (psf->virtual_io)
+		return SF_FALSE ;
+
+	if (GetFileType ((HANDLE) psf->filedes) == FILE_TYPE_DISK)
 		return SF_FALSE ;
 
 	/* Default to maximum safety. */
@@ -962,6 +999,9 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence)
 {	sf_count_t	new_position ;
 
+	if (psf->virtual_io)
+		return psf->vio.seek (offset, whence, psf->vio_user_data) ;
+
 	switch (whence)
 	{	case SEEK_SET :
 				offset += psf->fileoffset ;
@@ -1014,6 +1054,9 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 {	sf_count_t total = 0 ;
 	ssize_t	 count ;
 
+	if (psf->virtual_io)
+		return psf->vio.read (ptr, bytes*items, psf->vio_user_data) / bytes ;
+
 	items *= bytes ;
 
 	/* Do this check after the multiplication above. */
@@ -1049,6 +1092,9 @@ psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf
 {	sf_count_t total = 0 ;
 	ssize_t	 count ;
 
+	if (psf->virtual_io)
+		return psf->vio.write (ptr, bytes*items, psf->vio_user_data) / bytes ;
+
 	items *= bytes ;
 
 	/* Do this check after the multiplication above. */
@@ -1082,6 +1128,9 @@ psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf
 /* Win32 */ sf_count_t
 psf_ftell (SF_PRIVATE *psf)
 {	sf_count_t pos ;
+
+	if (psf->virtual_io)
+		return psf->vio.tell (psf->vio_user_data) ;
 
 	pos = _telli64 (psf->filedes) ;
 
@@ -1137,8 +1186,10 @@ psf_fgets (char *buffer, sf_count_t bufsize, SF_PRIVATE *psf)
 psf_is_pipe (SF_PRIVATE *psf)
 {	struct stat statbuf ;
 
-	/* Not sure if this works. */
+	if (psf->virtual_io)
+		return SF_FALSE ;
 
+	/* Not sure if this works. */
 	if (fstat (psf->filedes, &statbuf) == -1)
 	{	psf_log_syserr (psf, errno) ;
 		/* Default to maximum safety. */
@@ -1171,6 +1222,9 @@ psf_get_filelen (SF_PRIVATE *psf)
 	return statbuf.st_size ;
 #else
 	sf_count_t current, filelen ;
+
+	if (psf->virtual_io)
+		return psf->vio.get_filelen (psf->vio_user_data) ;
 
 	if ((current = _telli64 (psf->filedes)) < 0)
 	{	psf_log_syserr (psf, errno) ;

@@ -297,6 +297,11 @@ typedef struct sf_private_tag
 	int				(*close)		(struct sf_private_tag*) ;
 
 	char			*format_desc ;
+
+	/* Virtual I/O functions. */
+	int					virtual_io ;
+	SF_VIRTUAL_IO		vio ;
+	void				*vio_user_data ;
 } SF_PRIVATE ;
 
 
@@ -334,6 +339,8 @@ enum
 	SFE_BAD_ENDIAN,
 	SFE_CHANNEL_COUNT,
 	SFE_BAD_RDWR_FORMAT,
+
+	SFE_BAD_VIRTUAL_IO,
 
 	SFE_INTERLEAVE_MODE,
 	SFE_INTERLEAVE_SEEK,
