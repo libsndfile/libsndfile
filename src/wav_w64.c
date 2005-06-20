@@ -39,8 +39,6 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 
 	if (structsize < 16)
 		return SFE_WAV_FMT_SHORT ;
-	if (structsize > SIGNED_SIZEOF (WAV_FMT))
-		return SFE_WAV_FMT_TOO_BIG ;
 
 	/* Read the minimal WAV file header here. */
 	bytesread =
