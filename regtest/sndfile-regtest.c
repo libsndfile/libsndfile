@@ -24,7 +24,7 @@
 
 #include <sndfile.h>
 
-#ifdef HAVE_SQLITE3
+#if HAVE_SQLITE3
 
 #include "regtest.h"
 

@@ -24,13 +24,14 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <sqlite3.h>
 
 #include <sndfile.h>
 
 #include "regtest.h"
 
-#ifdef HAVE_SQLITE3
+#if HAVE_SQLITE3
+
+#include <sqlite3.h>
 
 typedef struct
 {	sqlite3 *sql ;
@@ -477,6 +478,8 @@ callback (void *unused, int argc, char **argv, char **colname)
 } /* callback */
 
 #else
+
+int dummy (void) ;
 
 int
 dummy (void)
