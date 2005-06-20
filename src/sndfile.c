@@ -103,7 +103,6 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_WAV_NO_FMT			, "Error in WAV file. No 'fmt ' chunk marker." },
 	{	SFE_WAV_FMT_SHORT		, "Error in WAV file. Short 'fmt ' chunk." },
 
-	{	SFE_WAV_FMT_TOO_BIG		, "Error in WAV file. 'fmt ' chunk too large." },
 	{	SFE_WAV_BAD_FACT		, "Error in WAV file. 'fact' chunk out of place." },
 	{	SFE_WAV_BAD_PEAK		, "Error in WAV file. Bad 'PEAK' chunk." },
 	{	SFE_WAV_PEAK_B4_FMT		, "Error in WAV file. 'PEAK' chunk found before 'fmt ' chunk." },
