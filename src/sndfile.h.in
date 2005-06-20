@@ -230,7 +230,8 @@ enum
 enum
 {	SF_ERR_NO_ERROR				= 0,
 	SF_ERR_UNRECOGNISED_FORMAT	= 1,
-	SF_ERR_SYSTEM				= 2
+	SF_ERR_SYSTEM				= 2,
+	SF_ERR_MALFORMED_FILE		= 3
 } ;
 
 /* A SNDFILE* pointer can be passed around much like stdio.h's FILE* pointer. */
