@@ -1,3 +1,12 @@
+2005-06-20 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in src/common.h src/sndfile.c
+    Add public error value SF_ERR_MALFORMED_FILE.
+
+    * src/sndfile.c
+    When parsing a file header fails and we don't have a system error, then set
+    the error number to SF_ERR_MALFORMED_FILE (suggested by Kyroz).
+
 2005-06-11 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/file_io.c

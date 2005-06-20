@@ -2526,7 +2526,13 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		} ;
 
 	if (error)
+	{	if (error != SF_ERR_SYSTEM)
+		{	psf_log_printf (psf, "Parse error : %s\n", sf_error_number (error)) ;
+			error = SF_ERR_MALFORMED_FILE ;
+			} ;
+
 		return error ;
+		} ;
 
 	/* For now, check whether embedding is supported. */
 	format = psf->sf.format & SF_FORMAT_TYPEMASK ;
