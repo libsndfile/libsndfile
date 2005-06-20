@@ -102,6 +102,10 @@ AC_ARG_ENABLE(bow-docs,
 	AC_HELP_STRING([--enable-bow-docs], [enable black-on-white html docs]),
 	ac_arg_bow_docs="Y", ac_arg_bow_docs="N")
 
+AC_ARG_ENABLE(sqlite,
+	AC_HELP_STRING([--disable-sqlite], [disable use of sqlite]),
+	ac_arg_enable_sqlite=no, ac_arg_enable_sqlite=yes)
+
 #====================================================================================
 # Check types and their sizes.
 
@@ -249,7 +253,11 @@ case "$target_os" in
 #====================================================================================
 # Check for libsqlite3 (only used in regtest).
 
-PKG_CHECK_MODULES(SQLITE3, sqlite3 >= 3.2, ac_cv_sqlite3=1, ac_cv_sqlite3=0)
+if test x$ac_arg_enable_sqlite = xyes ; then
+	PKG_CHECK_MODULES(SQLITE3, sqlite3 >= 3.2, ac_cv_sqlite3=1, ac_cv_sqlite3=0)
+else
+	ac_cv_sqlite3=0
+	fi
 
 AC_DEFINE_UNQUOTED([HAVE_SQLITE3],$ac_cv_sqlite3,[Set to 1 if you have libsqlite3.])
 
