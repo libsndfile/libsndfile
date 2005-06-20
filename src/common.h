@@ -21,12 +21,12 @@
 
 #include "config.h"
 
-#ifndef SNDFILE_H
-#include <sndfile.h>
-#endif
-
 #if HAVE_STDINT_H
 #include <stdint.h>
+#endif
+
+#ifndef SNDFILE_H
+#include "sndfile.h"
 #endif
 
 #ifdef __cplusplus
