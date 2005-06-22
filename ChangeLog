@@ -1,7 +1,8 @@
 2005-06-21 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src_wav_w64.c
-    Fix handling of stupidly large 'fmt ' chunks.
+    Fix handling of stupidly large 'fmt ' chunks. Thanks to Vadim Berezniker
+    for supplying an example file.
 
     * src/common.h src/sndfile.c
     Remove redundant error code SFE_WAV_FMT_TOO_BIG.
