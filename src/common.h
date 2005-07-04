@@ -615,6 +615,7 @@ int		w64_open	(SF_PRIVATE *psf) ;
 int		wav_open	(SF_PRIVATE *psf) ;
 int		xi_open		(SF_PRIVATE *psf) ;
 int		flac_open	(SF_PRIVATE *psf) ;
+int		caf_open	(SF_PRIVATE *psf) ;
 
 /* In progress. Do not currently work. */
 

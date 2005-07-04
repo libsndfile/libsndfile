@@ -1,3 +1,14 @@
+2005-07-04 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/(aiff|ima_adpcm|mat4|mat5|ms_adpcm).c examples/sndfile-play.c
+    Fix sign conversion errors reported by gcc-4.0.
+
+    * src/caf.c
+    New file for Apple's Core Audio File format.
+
+    * src/sndfile.c src/common.h src/sndfile.h.in src/Makefile.am
+    Hook new file into build system.
+
 2005-06-21 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src_wav_w64.c

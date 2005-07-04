@@ -2130,6 +2130,9 @@ guess_file_type (SF_PRIVATE *psf, const char *filename)
 	if (ENABLE_EXPERIMENTAL_CODE && buffer [0] == MAKE_MARKER ('O', 'g', 'g', 'S'))
 		return SF_FORMAT_OGG ;
 
+	if (ENABLE_EXPERIMENTAL_CODE && buffer [0] == MAKE_MARKER ('c', 'a', 'f', 'f'))
+		return SF_FORMAT_CAF ;
+
 	if (buffer [0] == MAKE_MARKER ('A', 'L', 'a', 'w') && buffer [1] == MAKE_MARKER ('S', 'o', 'u', 'n')
 			&& buffer [2] == MAKE_MARKER ('d', 'F', 'i', 'l'))
 		return SF_FORMAT_WVE ;
@@ -2516,6 +2519,10 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 
 		case	SF_FORMAT_FLAC :
 				error = flac_open (psf) ;
+				break ;
+
+		case	SF_FORMAT_CAF :
+				error = caf_open (psf) ;
 				break ;
 
 		/* Lite remove end */

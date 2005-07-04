@@ -19,9 +19,10 @@ COMMON = sndfile.c common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
 		interleave.c strings.c dither.c
 
-FILESPECIFIC = aiff.c au.c au_g72x.c avr.c ircam.c macbinary3.c macos.c mat4.c \
-				mat5.c nist.c paf.c pvf.c raw.c svx.c voc.c htk.c dwd.c ogg.c \
-				rx2.c sd2.c sds.c txw.c wve.c w64.c wav_w64.c wav.c xi.c flac.c
+FILESPECIFIC = aiff.c au.c au_g72x.c avr.c caf.c ircam.c macbinary3.c macos.c \
+				mat4.c mat5.c nist.c paf.c pvf.c raw.c svx.c voc.c htk.c dwd.c \
+				ogg.c rx2.c sd2.c sds.c txw.c wve.c w64.c wav_w64.c wav.c xi.c \
+				flac.c
 				
 # MinGW requires -no-undefined if a DLL is to be built.
 libsndfile_la_LDFLAGS = -no-undefined -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@
