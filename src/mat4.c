@@ -242,8 +242,8 @@ mat4_read_header (SF_PRIVATE *psf)
 
 	psf_binheader_readf (psf, "d", &value) ;
 
-	LSF_SNPRINTF (psf->u.scbuf, sizeof (psf->u.scbuf), " Value : %f\n", value) ;
-	psf_log_printf (psf, psf->u.scbuf) ;
+	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), " Value : %f\n", value) ;
+	psf_log_printf (psf, psf->u.cbuf) ;
 
 	if ((rows != 1) || (cols != 1))
 		return SFE_MAT4_NO_SAMPLERATE ;

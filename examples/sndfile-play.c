@@ -65,7 +65,7 @@
 
 #if HAVE_ALSA_ASOUNDLIB_H
 
-static snd_pcm_t * alsa_open (int channels, int srate, int realtime) ;
+static snd_pcm_t * alsa_open (int channels, unsigned srate, int realtime) ;
 static int alsa_write_float (snd_pcm_t *alsa_dev, float *data, int frames, int channels) ;
 
 static void
@@ -90,7 +90,7 @@ alsa_play (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if ((alsa_dev = alsa_open (sfinfo.channels, sfinfo.samplerate, SF_FALSE)) == NULL)
+		if ((alsa_dev = alsa_open (sfinfo.channels, (unsigned) sfinfo.samplerate, SF_FALSE)) == NULL)
 			continue ;
 
 		subformat = sfinfo.format & SF_FORMAT_SUBMASK ;
@@ -126,7 +126,7 @@ alsa_play (int argc, char *argv [])
 } /* alsa_play */
 
 static snd_pcm_t *
-alsa_open (int channels, int samplerate, int realtime)
+alsa_open (int channels, unsigned samplerate, int realtime)
 {	const char * device = "plughw:0" ;
 	snd_pcm_t *alsa_dev = NULL ;
 	snd_pcm_hw_params_t *hw_params ;

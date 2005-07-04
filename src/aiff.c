@@ -422,7 +422,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					psf_log_printf (psf, "  time stamp : %d\n", psf->pchunk->timestamp) ;
 					psf_log_printf (psf, "    Ch   Position       Value\n") ;
 
-					cptr = psf->u.scbuf ;
+					cptr = psf->u.cbuf ;
 					for (dword = 0 ; dword < psf->sf.channels ; dword++)
 					{	psf_binheader_readf (psf, "Ef4", &(psf->pchunk->peaks [dword].value),
 														&(psf->pchunk->peaks [dword].position)) ;
@@ -474,7 +474,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						return SFE_INTERNAL ;
 						} ;
 
-					cptr = psf->u.scbuf ;
+					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
 					cptr [dword] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
@@ -490,7 +490,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						return SFE_INTERNAL ;
 						} ;
 
-					cptr = psf->u.scbuf ;
+					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
 					cptr [dword] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
@@ -517,7 +517,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 							return SFE_INTERNAL ;
 							} ;
 
-						cptr = psf->u.scbuf ;
+						cptr = psf->u.cbuf ;
 						dword -= psf_binheader_readf (psf, "b", cptr, len) ;
 						cptr [len] = 0 ;
 						psf_log_printf (psf, "   string : %s\n", cptr) ;
@@ -538,7 +538,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						break ;
 						} ;
 
-					cptr = psf->u.scbuf ;
+					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
 					cptr [dword] = 0 ;
 
@@ -561,7 +561,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						return SFE_INTERNAL ;
 						} ;
 
-					cptr = psf->u.scbuf ;
+					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
 					cptr [dword] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
@@ -577,7 +577,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						return SFE_INTERNAL ;
 						} ;
 
-					cptr = psf->u.scbuf ;
+					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
 					cptr [dword] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
