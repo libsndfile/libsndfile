@@ -616,6 +616,15 @@ sf_format_check	(const SF_INFO *info)
 					return 1 ;
 				break ;
 
+		case SF_FORMAT_CAF :
+				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
+					return 1 ;
+				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
+					return 1 ;
+				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
+					return 1 ;
+				break ;
+
 		case SF_FORMAT_RAW :
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
 					return 1 ;
