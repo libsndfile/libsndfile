@@ -245,6 +245,11 @@ caf_read_header (SF_PRIVATE *psf)
 	if (marker != desc_MARKER)
 		return SFE_CAF_NO_DESC ;
 
+	if (chunk_size < sizeof (DESC_CHUNK) + sizeof (chunk_size))
+	{	psf_log_printf (psf, "**** Chunk size too small. Should be > 32 bytes.\n") ;
+		return SFE_MALFORMED_FILE ;
+		} ;
+
 	psf->sf.samplerate = lrint (srate) ;
 
 	psf_binheader_readf (psf, "mE44444", &desc.fmt_id, &desc.fmt_flags, &desc.pkt_bytes, &desc.pkt_frames,
@@ -252,6 +257,9 @@ caf_read_header (SF_PRIVATE *psf)
 	psf_log_printf (psf, "  Format id    : %M\n  Format flags : %x\n  Bytes / packet   : %u\n"
 			"  Frames / packet  : %u\n  Channels / frame : %u\n  Bits / channel   : %u\n",
 			desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.pkt_frames, desc.channels_per_frame, desc.bits_per_chan) ;
+
+	if (chunk_size > sizeof (DESC_CHUNK) + sizeof (chunk_size))
+		psf_binheader_readf (psf, "j", (int) (chunk_size - (sizeof (DESC_CHUNK) + sizeof (chunk_size)))) ;
 
 	while (have_data == 0)
 	{	psf_binheader_readf (psf, "mE8", &marker, &chunk_size) ;
