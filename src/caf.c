@@ -41,9 +41,23 @@ caf_open	(SF_PRIVATE *psf)
 ** Macros to handle big/little endian issues.
 */
 
+#define aac_MARKER		MAKE_MARKER ('a', 'a', 'c', ' ')
+#define alac_MARKER		MAKE_MARKER ('a', 'l', 'a', 'c')
+#define alaw_MARKER		MAKE_MARKER ('a', 'l', 'a', 'w')
 #define caff_MARKER		MAKE_MARKER ('c', 'a', 'f', 'f')
+#define data_MARKER		MAKE_MARKER ('c', 'a', 'f', 'f')
+#define desc_MARKER		MAKE_MARKER ('d', 'a', 't', 'a')
+#define free_MARKER		MAKE_MARKER ('f', 'r', 'e', 'e')
+#define kuki_MARKER		MAKE_MARKER ('k', 'u', 'k', 'i')
+#define lpcm_MARKER		MAKE_MARKER ('l', 'p', 'c', 'm')
+#define pakt_MARKER		MAKE_MARKER ('p', 'a', 'k', 't')
+#define ima4_MARKER		MAKE_MARKER ('i', 'm', 'a', '4')
+#define ulaw_MARKER		MAKE_MARKER ('u', 'l', 'a', 'w')
+#define MAC3_MARKER		MAKE_MARKER ('M', 'A', 'C', '3')
+#define MAC6_MARKER		MAKE_MARKER ('M', 'A', 'C', '6')
 
 #define SFE_CAF_NOT_CAF	666
+#define SFE_CAF_NO_DESC	667
 
 /*------------------------------------------------------------------------------
 ** Typedefs.
@@ -83,18 +97,22 @@ caf_open (SF_PRIVATE *psf)
 static int
 caf_read_header (SF_PRIVATE *psf)
 {	short version, flags ;
+	sf_count_t size ;
 	int marker ;
 
 	/* Set position to start of file to begin reading header. */
 	psf_binheader_readf (psf, "pmE2E2", 0, &marker, &version, &flags) ;
+	psf_log_printf (psf, "%M\n  Version : %d\n  Flags   : %x\n", marker, version, flags) ;
 	if (marker != caff_MARKER)
 		return SFE_CAF_NOT_CAF ;
 
-	psf_log_printf (psf, "%M\n"
-			"  Version : 8000\n"
-			"  Flags   : 1\n", marker, version, flags) ;
+	psf_binheader_readf (psf, "mE8", &marker, &size) ;
+	psf_log_printf (psf, " %M : %D\n\n", marker, size) ;
+	if (marker != desc_MARKER)
+		return SFE_CAF_NO_DESC ;
 
-	psf->dataoffset = 0x20 ;
+
+	psf->dataoffset = 0x1000 ;
 	psf->datalength = psf->filelength - psf->dataoffset ;
 
 	psf->sf.format		= SF_FORMAT_CAF | SF_FORMAT_ALAW ;
