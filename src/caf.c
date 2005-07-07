@@ -203,9 +203,12 @@ decode_desc_chunk (SF_PRIVATE *psf, const DESC_CHUNK *desc)
 		{	psf->bytewidth = 8 ;
 			return SF_FORMAT_CAF | SF_FORMAT_DOUBLE ;
 			} ;
+
+		psf_log_printf (psf, "**** Ooops, 'desc' chunk suggests float data, but other info invalid.\n") ;
+		return 0 ;
 		} ;
 
-	if (desc->fmt_id == lpcm_MARKER && (desc->fmt_flags & 1) == 0)
+	if (desc->fmt_id == lpcm_MARKER)
 	{	/* Integer data. */
 		if (desc->bits_per_chan == 32 && desc->pkt_bytes == 4 * desc->channels_per_frame)
 		{	psf->bytewidth = 4 ;
@@ -219,6 +222,21 @@ decode_desc_chunk (SF_PRIVATE *psf, const DESC_CHUNK *desc)
 		{	psf->bytewidth = 2 ;
 			return SF_FORMAT_CAF | SF_FORMAT_PCM_16 ;
 			} ;
+		} ;
+
+	if ((desc->fmt_flags & 1) != 0)
+	{	psf_log_printf (psf, "**** Ooops, 'desc' chunk suggests float data, but other info invalid.\n") ;
+		return 0 ;
+		} ;
+
+	if (desc->fmt_id == alaw_MARKER && desc->bits_per_chan == 8)
+	{	psf->bytewidth = 1 ;
+		return SF_FORMAT_CAF | SF_FORMAT_ALAW ;
+		} ;
+
+	if (desc->fmt_id == ulaw_MARKER && desc->bits_per_chan == 8)
+	{	psf->bytewidth = 1 ;
+		return SF_FORMAT_CAF | SF_FORMAT_ULAW ;
 		} ;
 
 	return 0 ;
@@ -294,7 +312,8 @@ caf_read_header (SF_PRIVATE *psf)
 	psf->datalength = psf->filelength - psf->dataoffset ;
 	psf->endian = (desc.fmt_flags & 2) ? SF_ENDIAN_LITTLE : SF_ENDIAN_BIG ;
 
-	psf->sf.format = decode_desc_chunk (psf, &desc) ;
+	if ((psf->sf.format = decode_desc_chunk (psf, &desc)) == 0)
+		return SFE_UNSUPPORTED_ENCODING ;
 
 	if (psf->bytewidth > 0)
 		psf->sf.frames = psf->datalength / psf->bytewidth ;
