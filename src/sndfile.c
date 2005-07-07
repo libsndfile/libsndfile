@@ -2127,11 +2127,11 @@ guess_file_type (SF_PRIVATE *psf, const char *filename)
 								buffer [2] == MAKE_MARKER (' ', 'I', 'n', 's'))
 		return SF_FORMAT_XI ;
 
+	if (buffer [0] == MAKE_MARKER ('c', 'a', 'f', 'f') && buffer [2] == MAKE_MARKER ('d', 'e', 's', 'c'))
+		return SF_FORMAT_CAF ;
+
 	if (ENABLE_EXPERIMENTAL_CODE && buffer [0] == MAKE_MARKER ('O', 'g', 'g', 'S'))
 		return SF_FORMAT_OGG ;
-
-	if (ENABLE_EXPERIMENTAL_CODE && buffer [0] == MAKE_MARKER ('c', 'a', 'f', 'f'))
-		return SF_FORMAT_CAF ;
 
 	if (buffer [0] == MAKE_MARKER ('A', 'L', 'a', 'w') && buffer [1] == MAKE_MARKER ('S', 'o', 'u', 'n')
 			&& buffer [2] == MAKE_MARKER ('d', 'F', 'i', 'l'))
