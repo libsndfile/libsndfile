@@ -43,7 +43,7 @@ caf_open	(SF_PRIVATE *psf)
 
 #define caff_MARKER		MAKE_MARKER ('c', 'a', 'f', 'f')
 
-#define	SFE_WVE_NOT_CAF	666
+#define SFE_CAF_NOT_CAF	666
 
 /*------------------------------------------------------------------------------
 ** Typedefs.
@@ -69,7 +69,7 @@ caf_open (SF_PRIVATE *psf)
 	if ((error = caf_read_header (psf)))
 			return error ;
 
-	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_WVE)
+	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_CAF)
 		return	SFE_BAD_OPEN_FORMAT ;
 
 	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
@@ -82,30 +82,22 @@ caf_open (SF_PRIVATE *psf)
 
 static int
 caf_read_header (SF_PRIVATE *psf)
-{	int marker ;
+{	short version, flags ;
+	int marker ;
 
 	/* Set position to start of file to begin reading header. */
-	psf_binheader_readf (psf, "pm", 0, &marker) ;
+	psf_binheader_readf (psf, "pmE2E2", 0, &marker, &version, &flags) ;
 	if (marker != caff_MARKER)
-		return SFE_WVE_NOT_CAF ;
+		return SFE_CAF_NOT_CAF ;
 
-	psf_binheader_readf (psf, "m", &marker) ;
-	if (marker != SOUN_MARKER)
-		return SFE_WVE_NOT_WVE ;
-
-	psf_binheader_readf (psf, "m", &marker) ;
-	if (marker != DFIL_MARKER)
-		return SFE_WVE_NOT_WVE ;
-
-	psf_log_printf (psf, "Read only : Psion Alaw\n"
-			"  Sample Rate : 8000\n"
-			"  Channels    : 1\n"
-			"  Encoding    : A-law\n") ;
+	psf_log_printf (psf, "%M\n"
+			"  Version : 8000\n"
+			"  Flags   : 1\n", marker, version, flags) ;
 
 	psf->dataoffset = 0x20 ;
 	psf->datalength = psf->filelength - psf->dataoffset ;
 
-	psf->sf.format		= SF_FORMAT_WVE | SF_FORMAT_ALAW ;
+	psf->sf.format		= SF_FORMAT_CAF | SF_FORMAT_ALAW ;
 	psf->sf.samplerate	= 8000 ;
 	psf->sf.frames		= psf->datalength ;
 	psf->sf.channels	= 1 ;
