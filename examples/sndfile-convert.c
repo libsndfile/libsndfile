@@ -47,6 +47,7 @@ static OUTPUT_FORMAT_MAP format_map [] =
 	{	"aif",		3,	SF_FORMAT_AIFF	},
 	{	"wav", 		0,	SF_FORMAT_WAV	},
 	{	"au",		0,	SF_FORMAT_AU	},
+	{	"caf",		0,	SF_FORMAT_CAF	},
 	{	"flac",		0,	SF_FORMAT_FLAC	},
 	{	"snd",		0,	SF_FORMAT_AU	},
 	{	"svx",		0,	SF_FORMAT_SVX	},
