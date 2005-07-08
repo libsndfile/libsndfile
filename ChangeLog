@@ -1,7 +1,24 @@
+2005-07-08 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    Update sf_check_format() to support CAF.
+
+    * examples/sndfile-convert.c
+    Add support for ".caf" file extension.
+
+    * doc/index.html
+    Add Apple CAF to the support matrix.
+
+    * src/caf.c
+    Add file write support.
+
 2005-07-07 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html
     Fix Q/A about reading/writing memory buffers.
+
+    * src/caf.c
+    Bunch of work to support reading of CAF files.
 
 2005-07-04 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

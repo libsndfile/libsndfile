@@ -28,17 +28,6 @@
 #include	"float_cast.h"
 #include	"common.h"
 
-#if (ENABLE_EXPERIMENTAL_CODE == 1)
-
-int
-caf_open	(SF_PRIVATE *psf)
-{	if (psf)
-		return SFE_UNIMPLEMENTED ;
-	return (psf && 0) ;
-} /* caf_open */
-
-#else
-
 /*------------------------------------------------------------------------------
 ** Macros to handle big/little endian issues.
 */
@@ -82,7 +71,8 @@ caf_open	(SF_PRIVATE *psf)
 */
 
 typedef struct
-{	uint32_t fmt_id ;
+{	unsigned char srate [8] ;
+	uint32_t fmt_id ;
 	uint32_t fmt_flags ;
 	uint32_t pkt_bytes ;
 	uint32_t pkt_frames ;
@@ -94,6 +84,7 @@ typedef struct
 ** Private static functions.
 */
 
+static int	caf_close (SF_PRIVATE *psf) ;
 static int	caf_read_header (SF_PRIVATE *psf) ;
 static int	caf_write_header (SF_PRIVATE *psf, int calc_length) ;
 
@@ -129,7 +120,7 @@ caf_open (SF_PRIVATE *psf)
 			psf->sf.frames = 0 ;
 			} ;
 
-		psf->str_flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END ;
+		psf->str_flags = SF_STR_ALLOW_START ;
 
 		/*
 		**	By default, add the peak chunk to floating point files. Default behaviour
@@ -143,13 +134,14 @@ caf_open (SF_PRIVATE *psf)
 			psf->peak_loc = SF_PEAK_START ;
 			} ;
 
+		if ((error = caf_write_header (psf, SF_FALSE)) != 0)
+			return error ;
+
 		psf->write_header = caf_write_header ;
 		} ;
 
-	/*
 	psf->close = caf_close ;
-	psf->command = caf_command ;
-	*/
+	/*psf->command = caf_command ;*/
 
 	switch (subformat)
 	{	case SF_FORMAT_PCM_16 :
@@ -176,14 +168,21 @@ caf_open (SF_PRIVATE *psf)
 					break ;
 		/* Lite remove end */
 
-		default : 	return SFE_UNIMPLEMENTED ;
+		default :
+			return SFE_UNIMPLEMENTED ;
 		} ;
-
-	if (psf->mode == SFM_WRITE || (psf->mode == SFM_RDWR && psf->filelength == 0))
-		return psf->write_header (psf, SF_FALSE) ;
 
 	return error ;
 } /* caf_open */
+
+static int
+caf_close (SF_PRIVATE *psf)
+{
+	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+		caf_write_header (psf, SF_TRUE) ;
+
+	return 0 ;
+} /* caf_close */
 
 /*------------------------------------------------------------------------------
 */
@@ -203,8 +202,10 @@ decode_desc_chunk (SF_PRIVATE *psf, const DESC_CHUNK *desc)
 		{	psf->bytewidth = 8 ;
 			return SF_FORMAT_CAF | SF_FORMAT_DOUBLE ;
 			} ;
+		} ;
 
-		psf_log_printf (psf, "**** Ooops, 'desc' chunk suggests float data, but other info invalid.\n") ;
+	if ((desc->fmt_flags & 1) != 0)
+	{	psf_log_printf (psf, "**** Ooops, 'desc' chunk suggests float data, but other info invalid.\n") ;
 		return 0 ;
 		} ;
 
@@ -222,11 +223,6 @@ decode_desc_chunk (SF_PRIVATE *psf, const DESC_CHUNK *desc)
 		{	psf->bytewidth = 2 ;
 			return SF_FORMAT_CAF | SF_FORMAT_PCM_16 ;
 			} ;
-		} ;
-
-	if ((desc->fmt_flags & 1) != 0)
-	{	psf_log_printf (psf, "**** Ooops, 'desc' chunk suggests float data, but other info invalid.\n") ;
-		return 0 ;
 		} ;
 
 	if (desc->fmt_id == alaw_MARKER && desc->bits_per_chan == 8)
@@ -250,6 +246,8 @@ caf_read_header (SF_PRIVATE *psf)
 	short version, flags ;
 	int marker, k, have_data = 0 ;
 
+	memset (&desc, 0, sizeof (desc)) ;
+
 	/* Set position to start of file to begin reading header. */
 	psf_binheader_readf (psf, "pmE2E2", 0, &marker, &version, &flags) ;
 	psf_log_printf (psf, "%M\n  Version : %d\n  Flags   : %x\n", marker, version, flags) ;
@@ -263,7 +261,7 @@ caf_read_header (SF_PRIVATE *psf)
 	if (marker != desc_MARKER)
 		return SFE_CAF_NO_DESC ;
 
-	if (chunk_size < sizeof (DESC_CHUNK) + sizeof (chunk_size))
+	if (chunk_size < sizeof (DESC_CHUNK))
 	{	psf_log_printf (psf, "**** Chunk size too small. Should be > 32 bytes.\n") ;
 		return SFE_MALFORMED_FILE ;
 		} ;
@@ -276,10 +274,10 @@ caf_read_header (SF_PRIVATE *psf)
 			"  Frames / packet  : %u\n  Channels / frame : %u\n  Bits / channel   : %u\n",
 			desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.pkt_frames, desc.channels_per_frame, desc.bits_per_chan) ;
 
-	if (chunk_size > sizeof (DESC_CHUNK) + sizeof (chunk_size))
-		psf_binheader_readf (psf, "j", (int) (chunk_size - (sizeof (DESC_CHUNK) + sizeof (chunk_size)))) ;
+	if (chunk_size > sizeof (DESC_CHUNK))
+		psf_binheader_readf (psf, "j", (int) (chunk_size - sizeof (DESC_CHUNK))) ;
 
-	while (have_data == 0)
+	while (have_data == 0 && psf_ftell (psf) < psf->filelength - SIGNED_SIZEOF (marker))
 	{	psf_binheader_readf (psf, "mE8", &marker, &chunk_size) ;
 
 		switch (marker)
@@ -303,10 +301,12 @@ caf_read_header (SF_PRIVATE *psf)
 
 		} ;
 
-	psf_log_printf (psf, "End\n") ;
-
 	if (have_data == 0)
+	{	psf_log_printf (psf, "**** Error, could not find 'data' chunk.\n") ;
 		return SFE_MALFORMED_FILE ;
+		} ;
+
+	psf_log_printf (psf, "End\n") ;
 
 	psf->dataoffset = psf_ftell (psf) ;
 	psf->datalength = psf->filelength - psf->dataoffset ;
@@ -326,12 +326,154 @@ caf_read_header (SF_PRIVATE *psf)
 
 static int
 caf_write_header (SF_PRIVATE *psf, int calc_length)
-{	psf = NULL ;
-	calc_length = 0 ;
-	return 0 ;
-} /* caf_write_header */
+{	DESC_CHUNK desc ;
+	sf_count_t current ;
+	int subformat ;
 
+	memset (&desc, 0, sizeof (desc)) ;
+
+	current = psf_ftell (psf) ;
+
+	if (calc_length)
+	{	psf->filelength = psf_get_filelen (psf) ;
+
+		psf->datalength = psf->filelength - psf->dataoffset ;
+
+		if (psf->dataend)
+			psf->datalength -= psf->filelength - psf->dataend ;
+
+		if (psf->bytewidth > 0)
+			psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
+		} ;
+
+	/* Reset the current header length to zero. */
+	psf->header [0] = 0 ;
+	psf->headindex = 0 ;
+	psf_fseek (psf, 0, SEEK_SET) ;
+
+	/* 'caff' marker, version and flags. */
+	psf_binheader_writef (psf, "Em22", caff_MARKER, 1, 0) ;
+
+	/* 'desc' marker and chunk size. */
+	psf_binheader_writef (psf, "Em8", desc_MARKER, (sf_count_t) (sizeof (DESC_CHUNK))) ;
+
+ 	double64_be_write (1.0 * psf->sf.samplerate, psf->u.ucbuf) ;
+	psf_binheader_writef (psf, "b", psf->u.ucbuf, 8) ;
+
+	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+
+	psf->endian = psf->sf.format & SF_FORMAT_ENDMASK ;
+
+	if (CPU_IS_BIG_ENDIAN && (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU))
+		psf->endian = SF_ENDIAN_BIG ;
+	else if (CPU_IS_LITTLE_ENDIAN && (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU))
+		psf->endian = SF_ENDIAN_LITTLE ;
+
+	if (psf->endian == SF_ENDIAN_LITTLE)
+		desc.fmt_flags = 2 ;
+	else
+		psf->endian = SF_ENDIAN_BIG ;
+
+	/* initial section (same for all, it appears) */
+	switch (subformat)
+	{	case SF_FORMAT_PCM_16 :
+			desc.fmt_id = lpcm_MARKER ;
+			psf->bytewidth = 2 ;
+			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
+			desc.pkt_frames = 1 ;
+			desc.channels_per_frame = psf->sf.channels ;
+			desc.bits_per_chan = 16 ;
+			break ;
+
+		case SF_FORMAT_PCM_24 :
+			psf->bytewidth = 3 ;
+			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
+			desc.pkt_frames = 1 ;
+			desc.channels_per_frame = psf->sf.channels ;
+			desc.bits_per_chan = 24 ;
+			desc.fmt_id = lpcm_MARKER ;
+			break ;
+
+		case SF_FORMAT_PCM_32 :
+			desc.fmt_id = lpcm_MARKER ;
+			psf->bytewidth = 4 ;
+			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
+			desc.pkt_frames = 1 ;
+			desc.channels_per_frame = psf->sf.channels ;
+			desc.bits_per_chan = 24 ;
+			break ;
+
+		case SF_FORMAT_FLOAT :
+			desc.fmt_id = lpcm_MARKER ;
+			desc.fmt_flags |= 1 ;
+			psf->bytewidth = 4 ;
+			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
+			desc.pkt_frames = 1 ;
+			desc.channels_per_frame = psf->sf.channels ;
+			desc.bits_per_chan = 32 ;
+			break ;
+
+		case SF_FORMAT_DOUBLE :
+			desc.fmt_id = lpcm_MARKER ;
+			desc.fmt_flags |= 1 ;
+			psf->bytewidth = 8 ;
+			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
+			desc.pkt_frames = 1 ;
+			desc.channels_per_frame = psf->sf.channels ;
+			desc.bits_per_chan = 64 ;
+			break ;
+
+		case SF_FORMAT_ALAW :
+			desc.fmt_id = alaw_MARKER ;
+			psf->bytewidth = 1 ;
+			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
+			desc.pkt_frames = 1 ;
+			desc.channels_per_frame = psf->sf.channels ;
+			desc.bits_per_chan = 8 ;
+			break ;
+
+		case SF_FORMAT_ULAW :
+			desc.fmt_id = ulaw_MARKER ;
+			psf->bytewidth = 1 ;
+			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
+			desc.pkt_frames = 1 ;
+			desc.channels_per_frame = psf->sf.channels ;
+			desc.bits_per_chan = 8 ;
+			break ;
+
+		default :
+			return SFE_UNIMPLEMENTED ;
+		} ;
+
+	psf_binheader_writef (psf, "E444444", desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.pkt_frames, desc.channels_per_frame, desc.bits_per_chan) ;
+
+#if 0
+	if (psf->str_flags & SF_STR_LOCATE_START)
+		caf_write_strings (psf, SF_STR_LOCATE_START) ;
+
+	if (psf->has_peak && psf->peak_loc == SF_PEAK_START)
+	{	psf_binheader_writef (psf, "em4", PEAK_MARKER,
+			sizeof (PEAK_CHUNK) + psf->sf.channels * sizeof (PEAK_POS)) ;
+		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;
+		for (k = 0 ; k < psf->sf.channels ; k++)
+			psf_binheader_writef (psf, "ef4", psf->pchunk->peaks [k].value, psf->pchunk->peaks [k].position) ;
+		} ;
 #endif
+
+	psf_binheader_writef (psf, "Em84", data_MARKER, psf->datalength, 1) ;
+
+	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	if (psf->error)
+		return psf->error ;
+
+	psf->dataoffset = psf->headindex ;
+	if (current < psf->dataoffset)
+		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
+	else if (current > 0)
+		psf_fseek (psf, current, SEEK_SET) ;
+
+	return psf->error ;
+} /* caf_write_header */
 
 /*
 ** Do not edit or modify anything in this comment block.
