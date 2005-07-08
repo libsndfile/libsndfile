@@ -369,7 +369,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 
 	if (CPU_IS_BIG_ENDIAN && (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU))
 		psf->endian = SF_ENDIAN_BIG ;
-	else if (CPU_IS_LITTLE_ENDIAN && (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU))
+	else if (CPU_IS_LITTLE_ENDIAN && (psf->endian == SF_ENDIAN_LITTLE || psf->endian == SF_ENDIAN_CPU))
 		psf->endian = SF_ENDIAN_LITTLE ;
 
 	if (psf->endian == SF_ENDIAN_LITTLE)
@@ -448,7 +448,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 			return SFE_UNIMPLEMENTED ;
 		} ;
 
-	psf_binheader_writef (psf, "E444444", desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.pkt_frames, desc.channels_per_frame, desc.bits_per_chan) ;
+	psf_binheader_writef (psf, "mE44444", desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.pkt_frames, desc.channels_per_frame, desc.bits_per_chan) ;
 
 #if 0
 	if (psf->str_flags & SF_STR_LOCATE_START)
