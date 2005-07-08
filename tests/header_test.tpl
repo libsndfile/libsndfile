@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,6 +103,16 @@ main (int argc, char *argv [])
 		update_seek_int_test ("header_int.au", SF_FORMAT_AU) ;
 		update_seek_float_test ("header_float.au", SF_FORMAT_AU) ;
 		update_seek_double_test ("header_double.au", SF_FORMAT_AU) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "caf"))
+	{	update_header_test ("header.caf", SF_FORMAT_CAF) ;
+		update_seek_short_test ("header_short.caf", SF_FORMAT_CAF) ;
+		update_seek_int_test ("header_int.caf", SF_FORMAT_CAF) ;
+		update_seek_float_test ("header_float.caf", SF_FORMAT_CAF) ;
+		update_seek_double_test ("header_double.caf", SF_FORMAT_CAF) ;
+		/* extra_header_test ("extra.caf", SF_FORMAT_CAF) ; */
 		test_count++ ;
 		} ;
 

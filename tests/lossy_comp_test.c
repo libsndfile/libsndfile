@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -252,6 +252,27 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 	/* Lite remove end */
+
+	if (do_all || ! strcmp (argv [1], "caf_ulaw"))
+	{	lcomp_test_short	("ulaw.caf", SF_FORMAT_CAF | SF_FORMAT_ULAW, 2, 0.04) ;
+		lcomp_test_int		("ulaw.caf", SF_FORMAT_CAF | SF_FORMAT_ULAW, 2, 0.04) ;
+		/* Lite remove start */
+		lcomp_test_float	("ulaw.caf", SF_FORMAT_CAF | SF_FORMAT_ULAW, 2, 0.04) ;
+		lcomp_test_double	("ulaw.caf", SF_FORMAT_CAF | SF_FORMAT_ULAW, 2, 0.04) ;
+		/* Lite remove end */
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "caf_alaw"))
+	{	lcomp_test_short	("alaw.caf", SF_FORMAT_CAF | SF_FORMAT_ALAW, 2, 0.04) ;
+		lcomp_test_int		("alaw.caf", SF_FORMAT_CAF | SF_FORMAT_ALAW, 2, 0.04) ;
+		/* Lite remove start */
+		lcomp_test_float	("alaw.caf", SF_FORMAT_CAF | SF_FORMAT_ALAW, 2, 0.04) ;
+		lcomp_test_double	("alaw.caf", SF_FORMAT_CAF | SF_FORMAT_ALAW, 2, 0.04) ;
+		/* Lite remove end */
+		test_count++ ;
+		} ;
+
 
 	if (do_all || ! strcmp (argv [1], "raw_ulaw"))
 	{	lcomp_test_short	("ulaw.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_ULAW, 2, 0.04) ;

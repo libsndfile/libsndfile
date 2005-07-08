@@ -148,10 +148,10 @@ genfiles : write_read_test.c pcm_test.c header_test.c utils.c command_test.c \
 
 #===============================================================================
 
-check: generic-tests wav-tests aiff-tests au-tests raw-tests paf-tests \
-	svx-tests nist-tests ircam-tests voc-tests w64-tests mat4-tests \
+check: generic-tests wav-tests aiff-tests au-tests caf-tests raw-tests \
+	paf-tests svx-tests nist-tests ircam-tests voc-tests w64-tests mat4-tests \
 	mat5-tests pvf-tests xi-tests htk-tests avr-tests sds-tests sd2-tests \
-	flac-tests io-tests
+	flac-tests caf-tests io-tests
 
 generic-tests : error_test ulaw_test alaw_test command_test floating_point_test pcm_test
 	uname -a
@@ -205,6 +205,16 @@ aiff-tests: write_read_test lossy_comp_test peak_chunk_test header_test misc_tes
 	./aiff_rw_test
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on AIFF files."
+	@echo "----------------------------------------------------------------------"
+
+caf-tests: write_read_test lossy_comp_test header_test misc_test
+	./write_read_test caf
+	./lossy_comp_test caf_ulaw
+	./lossy_comp_test caf_alaw
+	./header_test caf
+	./misc_test caf
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion` passed tests on CAF files."
 	@echo "----------------------------------------------------------------------"
 
 au-tests: write_read_test lossy_comp_test header_test misc_test

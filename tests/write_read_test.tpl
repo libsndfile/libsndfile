@@ -66,6 +66,7 @@ main (int argc, char **argv)
 		printf ("           aiff  - test AIFF file functions (big endian)\n") ;
 		printf ("           au    - test AU file functions\n") ;
 		printf ("           avr   - test AVR file functions\n") ;
+		printf ("           caf   - test CAF file functions\n") ;
 		printf ("           raw   - test RAW header-less PCM file functions\n") ;
 		printf ("           paf   - test PAF file functions\n") ;
 		printf ("           svx   - test 8SVX/16SV file functions\n") ;
@@ -149,6 +150,25 @@ main (int argc, char **argv)
 		/* Lite remove start */
 		pcm_test_float	("float_le.au"	, SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_FLOAT , SF_FALSE) ;
 		pcm_test_double	("double_le.au"	, SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_DOUBLE, SF_FALSE) ;
+		/* Lite remove end */
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "caf"))
+	{	pcm_test_short	("short.caf"	, SF_FORMAT_CAF | SF_FORMAT_PCM_16, SF_FALSE) ;
+		pcm_test_24bit	("24bit.caf"	, SF_FORMAT_CAF | SF_FORMAT_PCM_24, SF_FALSE) ;
+		pcm_test_int	("int.caf"		, SF_FORMAT_CAF | SF_FORMAT_PCM_32, SF_FALSE) ;
+		/* Lite remove start */
+		pcm_test_float	("float.caf"	, SF_FORMAT_CAF | SF_FORMAT_FLOAT , SF_FALSE) ;
+		pcm_test_double	("double.caf"	, SF_FORMAT_CAF | SF_FORMAT_DOUBLE, SF_FALSE) ;
+		/* Lite remove end */
+
+		pcm_test_short	("short_le.caf"	, SF_ENDIAN_LITTLE | SF_FORMAT_CAF | SF_FORMAT_PCM_16, SF_FALSE) ;
+		pcm_test_24bit	("24bit_le.caf"	, SF_ENDIAN_LITTLE | SF_FORMAT_CAF | SF_FORMAT_PCM_24, SF_FALSE) ;
+		pcm_test_int	("int_le.caf"	, SF_ENDIAN_LITTLE | SF_FORMAT_CAF | SF_FORMAT_PCM_32, SF_FALSE) ;
+		/* Lite remove start */
+		pcm_test_float	("float_le.caf"	, SF_ENDIAN_LITTLE | SF_FORMAT_CAF | SF_FORMAT_FLOAT , SF_FALSE) ;
+		pcm_test_double	("double_le.caf", SF_ENDIAN_LITTLE | SF_FORMAT_CAF | SF_FORMAT_DOUBLE, SF_FALSE) ;
 		/* Lite remove end */
 		test_count++ ;
 		} ;

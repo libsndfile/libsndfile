@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,6 +83,13 @@ main (int argc, char *argv [])
 	{	zero_data_test ("zerolen.au", SF_FORMAT_AU) ;
 		filesystem_full_test (SF_FORMAT_AU) ;
 		permission_test ("readonly.au", SF_FORMAT_AU) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "caf"))
+	{	zero_data_test ("zerolen.caf", SF_FORMAT_CAF) ;
+		filesystem_full_test (SF_FORMAT_CAF) ;
+		permission_test ("readonly.caf", SF_FORMAT_CAF) ;
 		test_count++ ;
 		} ;
 

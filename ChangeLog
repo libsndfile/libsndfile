@@ -12,6 +12,13 @@
     * src/caf.c
     Add file write support.
 
+    * src/common.c
+    Fix printing of Frames.
+
+	* tests/Makefile.am tests/write_read_test.tpl tests/lossy_comp_test.c 
+		tests/header_test.tpl misc_test.c
+    Add tests for CAF files.
+
 2005-07-07 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html
