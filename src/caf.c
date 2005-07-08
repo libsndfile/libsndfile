@@ -189,18 +189,21 @@ caf_close (SF_PRIVATE *psf)
 
 static int
 decode_desc_chunk (SF_PRIVATE *psf, const DESC_CHUNK *desc)
-{
+{	int format ;
+
 	psf->sf.channels = desc->channels_per_frame ;
+
+	format = SF_FORMAT_CAF | (psf->endian == SF_ENDIAN_LITTLE ? SF_ENDIAN_LITTLE : 0) ;
 
 	if (desc->fmt_id == lpcm_MARKER && desc->fmt_flags & 1)
 	{	/* Floating point data. */
 		if (desc->bits_per_chan == 32 && desc->pkt_bytes == 4 * desc->channels_per_frame)
 		{	psf->bytewidth = 4 ;
-			return SF_FORMAT_CAF | SF_FORMAT_FLOAT ;
+			return format | SF_FORMAT_FLOAT ;
 			} ;
 		if (desc->bits_per_chan == 64 && desc->pkt_bytes == 8 * desc->channels_per_frame)
 		{	psf->bytewidth = 8 ;
-			return SF_FORMAT_CAF | SF_FORMAT_DOUBLE ;
+			return format | SF_FORMAT_DOUBLE ;
 			} ;
 		} ;
 
@@ -213,26 +216,26 @@ decode_desc_chunk (SF_PRIVATE *psf, const DESC_CHUNK *desc)
 	{	/* Integer data. */
 		if (desc->bits_per_chan == 32 && desc->pkt_bytes == 4 * desc->channels_per_frame)
 		{	psf->bytewidth = 4 ;
-			return SF_FORMAT_CAF | SF_FORMAT_PCM_32 ;
+			return format | SF_FORMAT_PCM_32 ;
 			} ;
 		if (desc->bits_per_chan == 24 && desc->pkt_bytes == 3 * desc->channels_per_frame)
 		{	psf->bytewidth = 3 ;
-			return SF_FORMAT_CAF | SF_FORMAT_PCM_24 ;
+			return format | SF_FORMAT_PCM_24 ;
 			} ;
 		if (desc->bits_per_chan == 16 && desc->pkt_bytes == 2 * desc->channels_per_frame)
 		{	psf->bytewidth = 2 ;
-			return SF_FORMAT_CAF | SF_FORMAT_PCM_16 ;
+			return format | SF_FORMAT_PCM_16 ;
 			} ;
 		} ;
 
 	if (desc->fmt_id == alaw_MARKER && desc->bits_per_chan == 8)
 	{	psf->bytewidth = 1 ;
-		return SF_FORMAT_CAF | SF_FORMAT_ALAW ;
+		return format | SF_FORMAT_ALAW ;
 		} ;
 
 	if (desc->fmt_id == ulaw_MARKER && desc->bits_per_chan == 8)
 	{	psf->bytewidth = 1 ;
-		return SF_FORMAT_CAF | SF_FORMAT_ULAW ;
+		return format | SF_FORMAT_ULAW ;
 		} ;
 
 	return 0 ;
@@ -400,7 +403,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
 			desc.pkt_frames = 1 ;
 			desc.channels_per_frame = psf->sf.channels ;
-			desc.bits_per_chan = 24 ;
+			desc.bits_per_chan = 32 ;
 			break ;
 
 		case SF_FORMAT_FLOAT :
