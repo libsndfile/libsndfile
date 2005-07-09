@@ -144,7 +144,8 @@ caf_open (SF_PRIVATE *psf)
 	/*psf->command = caf_command ;*/
 
 	switch (subformat)
-	{	case SF_FORMAT_PCM_16 :
+	{	case SF_FORMAT_PCM_S8 :
+		case SF_FORMAT_PCM_16 :
 		case SF_FORMAT_PCM_24 :
 		case SF_FORMAT_PCM_32 :
 					error = pcm_init (psf) ;
@@ -225,6 +226,10 @@ decode_desc_chunk (SF_PRIVATE *psf, const DESC_CHUNK *desc)
 		if (desc->bits_per_chan == 16 && desc->pkt_bytes == 2 * desc->channels_per_frame)
 		{	psf->bytewidth = 2 ;
 			return format | SF_FORMAT_PCM_16 ;
+			} ;
+		if (desc->bits_per_chan == 8 && desc->pkt_bytes == 1 * desc->channels_per_frame)
+		{	psf->bytewidth = 1 ;
+			return format | SF_FORMAT_PCM_S8 ;
 			} ;
 		} ;
 
@@ -379,7 +384,16 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 
 	/* initial section (same for all, it appears) */
 	switch (subformat)
-	{	case SF_FORMAT_PCM_16 :
+	{	case SF_FORMAT_PCM_S8 :
+			desc.fmt_id = lpcm_MARKER ;
+			psf->bytewidth = 1 ;
+			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
+			desc.pkt_frames = 1 ;
+			desc.channels_per_frame = psf->sf.channels ;
+			desc.bits_per_chan = 8 ;
+			break ;
+
+		case SF_FORMAT_PCM_16 :
 			desc.fmt_id = lpcm_MARKER ;
 			psf->bytewidth = 2 ;
 			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
