@@ -335,7 +335,7 @@ caf_read_header (SF_PRIVATE *psf)
 static int
 caf_write_header (SF_PRIVATE *psf, int calc_length)
 {	DESC_CHUNK desc ;
-	sf_count_t current ;
+	sf_count_t current, free_len ;
 	int subformat ;
 
 	memset (&desc, 0, sizeof (desc)) ;
@@ -477,7 +477,11 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 #endif
 
-	psf_binheader_writef (psf, "Em84", data_MARKER, psf->datalength, 1) ;
+	/* Add free chunk so that the actual audio data starts at offset 0x1000. */
+	free_len = 0x1000 - psf->headindex - 16 - 12 ;
+	psf_binheader_writef (psf, "Em8z", free_MARKER, free_len, (int) free_len) ;
+
+	psf_binheader_writef (psf, "Em84", data_MARKER, psf->datalength, 0) ;
 
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 	if (psf->error)
