@@ -2544,7 +2544,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		} ;
 
 	if (error)
-	{	if (error != SF_ERR_SYSTEM)
+	{	if (error != SF_ERR_SYSTEM && error != SF_ERR_UNSUPPORTED_ENCODING)
 		{	psf_log_printf (psf, "Parse error : %s\n", sf_error_number (error)) ;
 			error = SF_ERR_MALFORMED_FILE ;
 			} ;

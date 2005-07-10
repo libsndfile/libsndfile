@@ -1,3 +1,12 @@
+2005-07-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/caf.c
+    Add a 'free' chunk to the written file so that the audio data starts at
+    an offset of 0x1000.
+
+    * src/sndfile.c
+    Allow SFE_UNSUPPORTED_FORMAT as an error from sf_open().
+
 2005-07-09 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/caf.c src/sndfile.c

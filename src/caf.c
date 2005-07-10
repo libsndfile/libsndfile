@@ -170,7 +170,7 @@ caf_open (SF_PRIVATE *psf)
 		/* Lite remove end */
 
 		default :
-			return SFE_UNIMPLEMENTED ;
+			return SFE_UNSUPPORTED_ENCODING ;
 		} ;
 
 	return error ;
