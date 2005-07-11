@@ -46,6 +46,10 @@ static SF_FORMAT_INFO const simple_formats [] =
 		"AU (Sun/Next 8-bit u-law)", "au"
 		},
 
+	{	SF_FORMAT_CAF | SF_FORMAT_PCM_16,
+		"CAF (Apple 16 bit PCM)", "caf"
+		},
+
 #ifdef HAVE_FLAC_ALL_H
 	{	SF_FORMAT_FLAC | SF_FORMAT_PCM_16,
 		"FLAC 16 bit", "flac"
@@ -105,6 +109,7 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_AIFF,		"AIFF (Apple/SGI)",						"aiff" 	},
 	{	SF_FORMAT_AU,		"AU (Sun/NeXT)", 						"au"	},
 	{	SF_FORMAT_AVR,		"AVR (Audio Visual Research)",	 		"avr"	},
+	{	SF_FORMAT_CAF,		"CAF (Apple Core Audio File)",	 		"caf"	},
 #ifdef HAVE_FLAC_ALL_H
 	{	SF_FORMAT_FLAC,		"FLAC (FLAC Lossless Audio Codec)",	 	"flac"	},
 #endif
