@@ -153,7 +153,8 @@ mat5_close	(SF_PRIVATE *psf)
 
 static int
 mat5_write_header (SF_PRIVATE *psf, int calc_length)
-{	static const char	*sr_name = "samplerate\0\0\0\0\0\0\0\0\0\0\0" ;
+{	static const char	*filename = "MATLAB 5.0 MAT-file, written by " PACKAGE "-" VERSION ", " ;
+	static const char	*sr_name = "samplerate\0\0\0\0\0\0\0\0\0\0\0" ;
 	static const char	*wd_name = "wavedata\0" ;
 	sf_count_t	current, datasize ;
 	int			encoding ;
@@ -202,9 +203,8 @@ mat5_write_header (SF_PRIVATE *psf, int calc_length)
 	psf->headindex = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
-	psf_binheader_writef (psf, "S", "MATLAB 5.0 MAT-file, written by " PACKAGE "-" VERSION ", ") ;
 	psf_get_date_str (psf->u.cbuf, sizeof (psf->u.scbuf)) ;
-	psf_binheader_writef (psf, "jS", -1, psf->u.cbuf) ;
+	psf_binheader_writef (psf, "bb", filename, strlen (filename), psf->u.cbuf, strlen (psf->u.cbuf) + 1) ;
 
 	memset (psf->u.scbuf, ' ', 124 - psf->headindex) ;
 	psf_binheader_writef (psf, "b", psf->u.scbuf, 124 - psf->headindex) ;
