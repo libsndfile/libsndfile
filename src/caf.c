@@ -301,6 +301,43 @@ caf_read_header (SF_PRIVATE *psf)
 				have_data = 1 ;
 				break ;
 
+#if 0
+			case peak_MARKER :
+				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+
+typedef struct
+{	float value ;
+    sf_count_t position ;
+} PEAK_POS_64 ;
+
+typedef struct
+{	unsigned int	edit_count ;
+#if HAVE_FLEXIBLE_ARRAY
+	/* the per channel peak info */
+	PEAK_POS_64		peaks [] ;
+#else
+	/*
+	** This is not ISO compliant C. It works on some compilers which
+	** don't support the ISO standard flexible struct array which is
+	** used above. If your compiler doesn't ike this I suggest you find
+	** youself a 1999 ISO C standards compilant compiler. GCC-3.X is
+	** highly recommended.
+	*/
+	PEAK_POS_64		peaks [0] ;
+#endif
+} PEAK_INFO ;
+
+
+				if (chunk_size != SIGNED_SIZEOF (PEAK_CHUNK) + psf->sf.channels * SIGNED_SIZEOF (PEAK_POS))
+				{	psf_binheader_readf (psf, "j", dword) ;
+					psf_log_printf (psf, "*** File PEAK chunk bigger than sizeof (PEAK_CHUNK).\n") ;
+					return SFE_WAV_BAD_PEAK ;
+					} ;
+				printf ("%s %d\nZ", __func__, __LINE__) ;
+				exit (1) ;
+				break ;
+#endif
+
 			default :
 				psf_log_printf (psf, " %M : %D (skipped)\n", marker, chunk_size) ;
 				psf_binheader_readf (psf, "j", (int) chunk_size) ;
