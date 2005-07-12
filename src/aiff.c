@@ -556,7 +556,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					psf_binheader_readf (psf, "E4", &dword) ;
 					if (dword == 0)
 						break ;
-					if (dword > SIGNED_SIZEOF (psf->u.scbuf) - 1)
+					if (dword > SIGNED_SIZEOF (psf->u.scbuf) - 2)
 					{	psf_log_printf (psf, " %M : %d (too big)\n", marker, dword) ;
 						return SFE_INTERNAL ;
 						} ;
@@ -572,7 +572,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					psf_binheader_readf (psf, "E4", &dword) ;
 					if (dword == 0)
 						break ;
-					if (dword > SIGNED_SIZEOF (psf->u.scbuf) - 1)
+					if (dword > SIGNED_SIZEOF (psf->u.scbuf) - 2)
 					{	psf_log_printf (psf, " %M : %d (too big)\n", marker, dword) ;
 						return SFE_INTERNAL ;
 						} ;
@@ -1134,23 +1134,23 @@ aiff_write_strings (SF_PRIVATE *psf, int location)
 
 		switch (psf->strings [k].type)
 		{	case SF_STR_SOFTWARE :
-				psf_binheader_writef (psf, "Ems", APPL_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "EmS", APPL_MARKER, psf->strings [k].str) ;
 				break ;
 
 			case SF_STR_TITLE :
-				psf_binheader_writef (psf, "Ems", NAME_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "EmS", NAME_MARKER, psf->strings [k].str) ;
 				break ;
 
 			case SF_STR_COPYRIGHT :
-				psf_binheader_writef (psf, "Ems", c_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "EmS", c_MARKER, psf->strings [k].str) ;
 				break ;
 
 			case SF_STR_ARTIST :
-				psf_binheader_writef (psf, "Ems", AUTH_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "EmS", AUTH_MARKER, psf->strings [k].str) ;
 				break ;
 
 			case SF_STR_COMMENT :
-				psf_binheader_writef (psf, "Ems", ANNO_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "EmS", ANNO_MARKER, psf->strings [k].str) ;
 				break ;
 
 			/*
