@@ -664,15 +664,14 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					break ;
 
 			case 's' :
+					/* Write a C string (guaranteed to have a zero terminator). */
 					strptr = va_arg (argptr, char *) ;
 					size = strlen (strptr) + 1 ;
 					size += (size & 1) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
-					{	header_put_be_int (psf, size) ;
-						}
+						header_put_be_int (psf, size) ;
 					else
-					{	header_put_le_int (psf, size) ;
-						} ;
+						header_put_le_int (psf, size) ;
 					memcpy (&(psf->header [psf->headindex]), strptr, size) ;
 					psf->headindex += size ;
 					psf->header [psf->headindex - 1] = 0 ;
@@ -680,11 +679,21 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					break ;
 
 			case 'S' :
-					strptr	= va_arg (argptr, char *) ;
-					size	= strlen (strptr) + 1 ;
-					memcpy (&(psf->header [psf->headindex]), strptr, size) ;
+					/*
+					**	Write an AIFF style string (no zero terminator but possibly
+					**	an extra pad byte if the string length is odd).
+					*/
+					strptr = va_arg (argptr, char *) ;
+					size = strlen (strptr) ;
+					if (psf->rwf_endian == SF_ENDIAN_BIG)
+						header_put_be_int (psf, size) ;
+					else
+						header_put_le_int (psf, size) ;
+					memcpy (&(psf->header [psf->headindex]), strptr, size + 1) ;
+					size += (size & 1) ;
 					psf->headindex += size ;
-					count += size ;
+					psf->header [psf->headindex] = 0 ;
+					count += 4 + size ;
 					break ;
 
 			case 'b' :
