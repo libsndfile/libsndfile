@@ -176,6 +176,15 @@ Not all combinations of endian-ness and major and minor file types are valid.
           SF_FORMAT_W64          = 0x0B0000,     /* Sonic Foundry's 64 bit RIFF/WAV */
           SF_FORMAT_MAT4         = 0x0C0000,     /* Matlab (tm) V4.2 / GNU Octave 2.0 */
           SF_FORMAT_MAT5         = 0x0D0000,     /* Matlab (tm) V5.0 / GNU Octave 2.1 */
+          SF_FORMAT_PVF          = 0x0E0000,     /* Portable Voice Format */
+          SF_FORMAT_XI           = 0x0F0000,     /* Fasttracker 2 Extended Instrument */
+          SF_FORMAT_HTK          = 0x100000,     /* HMM Tool Kit format */
+          SF_FORMAT_SDS          = 0x110000,     /* Midi Sample Dump Standard */
+          SF_FORMAT_AVR          = 0x120000,     /* Audio Visual Research */
+          SF_FORMAT_WAVEX        = 0x130000,     /* MS WAVE with WAVEFORMATEX */
+          SF_FORMAT_SD2          = 0x160000,     /* Sound Designer 2 */
+          SF_FORMAT_FLAC         = 0x170000,     /* FLAC lossless file format */
+          SF_FORMAT_CAF          = 0x180000,     /* Core Audio File format */
 
           /* Subtypes from here on. */
 
@@ -205,6 +214,9 @@ Not all combinations of endian-ness and major and minor file types are valid.
           SF_FORMAT_DWVW_16      = 0x0041,       /* 16 bit Delta Width Variable Word encoding. */
           SF_FORMAT_DWVW_24      = 0x0042,       /* 24 bit Delta Width Variable Word encoding. */
           SF_FORMAT_DWVW_N       = 0x0043,       /* N bit Delta Width Variable Word encoding. */
+
+          SF_FORMAT_DPCM_8       = 0x0050,       /* 8 bit differential PCM (XI only) */
+          SF_FORMAT_DPCM_16      = 0x0051,       /* 16 bit differential PCM (XI only) */
 
           /* Endian-ness options. */
 
@@ -375,7 +387,10 @@ The error number may be one of the following:
 <PRE>
         enum
         {   SF_ERR_NO_ERROR             = 0,
-            SF_ERR_UNRECOGNISED_FORMAT  = 1
+            SF_ERR_UNRECOGNISED_FORMAT  = 1,
+            SF_ERR_SYSTEM               = 2,
+            SF_ERR_MALFORMED_FILE       = 3,
+            SF_ERR_UNSUPPORTED_ENCODING = 4
         } ;
 </PRE>
 <!-- pepper -->

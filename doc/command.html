@@ -154,6 +154,11 @@
 	<TD>Retreive current clipping setting.</TD>
 </TR>
 
+<TR>
+	<TD><A HREF="#SFC_GET_EMBED_FILE_INFO">SFC_GET_EMBED_FILE_INFO</A></TD>
+	<TD>Retreive information about audio files embedded inside other files.</TD>
+</TR>
+
 
 <!--
 <TR>
@@ -1032,6 +1037,42 @@ Example:
 </DL>
 
 <!-- ========================================================================= -->
+<A NAME="SFC_GET_EMBED_FILE_INFO"></A>
+<H2><BR><B>SFC_GET_EMBED_FILE_INFO</B></H2>
+<P>
+Get the file offset and file length of a file enbedded within another
+larger file.
+</P>
+<P>
+Parameters:
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_GET_CLIPPING
+        data     : a pointer to an  SF_EMBED_FILE_INFO struct
+        datasize : sizeof (SF_EMBED_FILE_INFO)
+</PRE>
+<P>
+The SF_FORMAT_INFO struct is defined in &lt;sndfile.h&gt; as:
+</P>
+<PRE>
+        typedef struct
+        {   sf_count_t	offset ;
+            sf_count_t	length ;
+        } SF_EMBED_FILE_INFO ;
+</PRE>
+<DT>Return value: </DT>
+	<DD>0 on success and non-zero otherwise.
+	<DD>The value of the offset field of the SF_EMBED_FILE_INFO struct will be 
+		the offsets in bytes from the start of the outer file to the start of
+		the audio file.
+	<DD>The value of the offset field of the SF_EMBED_FILE_INFO struct will be
+		the length in bytes of the embedded file.
+</DL>
+
+
+
+<!-- ========================================================================= -->
+
 
 <HR>
 <P>
