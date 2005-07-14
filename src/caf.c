@@ -18,7 +18,6 @@
 
 #include	<stdio.h>
 #include	<stdlib.h>
-#include	<stdint.h>
 #include	<string.h>
 #include	<ctype.h>
 
@@ -72,12 +71,12 @@
 
 typedef struct
 {	unsigned char srate [8] ;
-	uint32_t fmt_id ;
-	uint32_t fmt_flags ;
-	uint32_t pkt_bytes ;
-	uint32_t pkt_frames ;
-	uint32_t channels_per_frame ;
-	uint32_t bits_per_chan ;
+	unsigned int fmt_id ;
+	unsigned int fmt_flags ;
+	unsigned int pkt_bytes ;
+	unsigned int pkt_frames ;
+	unsigned int channels_per_frame ;
+	unsigned int bits_per_chan ;
 } DESC_CHUNK ;
 
 /*------------------------------------------------------------------------------
