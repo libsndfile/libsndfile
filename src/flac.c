@@ -331,7 +331,7 @@ FLAC__bool
 sf_flac_eof_callback (const FLAC__SeekableStreamDecoder *UNUSED (decoder), void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 
-	if (psf->end_of_file)
+	if (psf_ftell (psf) == psf->filelength)
 		return SF_TRUE ;
 
     return SF_FALSE ;

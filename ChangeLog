@@ -1,3 +1,11 @@
+2005-07-14 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/flac.c
+    Do not use psf->end_of_file because it never gets set to anything.
+
+    * src/common.h
+    Remove unused SF_PRIVATE field end_of_file.
+
 2005-07-12 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.c

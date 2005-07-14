@@ -216,7 +216,6 @@ typedef struct sf_private_tag
 	/* File descriptors for the file and (possibly) the resource fork. */
 	int 			filedes, rsrcdes ;
 
-	int				end_of_file ;
 	int				error ;
 
 	int				mode ;			/* Open mode : SFM_READ, SFM_WRITE or SFM_RDWR. */
