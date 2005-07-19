@@ -501,6 +501,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					break ;
 
 			default :
+					parsestage |= HAVE_other ;
 					if (isprint ((marker >> 24) & 0xFF) && isprint ((marker >> 16) & 0xFF)
 						&& isprint ((marker >> 8) & 0xFF) && isprint (marker & 0xFF))
 					{	psf_binheader_readf (psf, "e4", &dword) ;
