@@ -2,7 +2,8 @@
 
     * src/common.h
     Move the peak_loc field of SF_PRIVATE to the PEAK_CHUNK struct.
-	Remove had_peak field of SF_PRIVATE, use pchunk != NULL instead.
+    Remove had_peak field of SF_PRIVATE, use pchunk != NULL instead.
+    Rename PEAK_CHUNK and PEAK_POS to PEAK_CHUNK_32 and PEAK_POS_32.
 
     * src/aiff.c src/caf.c src/wav.c src/float32.c src/double64.c
     Fix knock on effects from above.

@@ -133,7 +133,7 @@ enum
 typedef struct
 {	float			value ;		/* signed value of peak */
 	unsigned int	position ;	/* the sample frame for the peak */
-} PEAK_POS ;
+} PEAK_POS_32 ;
 
 typedef struct
 {	int				peak_loc ;	/* Write a PEAK chunk at the start or end of the file? */
@@ -142,7 +142,7 @@ typedef struct
 	unsigned int	timestamp ;	/* secs since 1/1/1970  */
 #if HAVE_FLEXIBLE_ARRAY
 	/* the per channel peak info */
-	PEAK_POS		peaks [] ;
+	PEAK_POS_32		peaks [] ;
 #else
 	/*
 	** This is not ISO compliant C. It works on some compilers which
@@ -151,9 +151,9 @@ typedef struct
 	** youself a 1999 ISO C standards compilant compiler. GCC-3.X is
 	** highly recommended.
 	*/
-	PEAK_POS		peaks [0] ;
+	PEAK_POS_32		peaks [0] ;
 #endif
-} PEAK_CHUNK ;
+} PEAK_CHUNK_32 ;
 
 typedef struct
 {	int		type ;
@@ -241,7 +241,7 @@ typedef struct sf_private_tag
 	SF_INFO			sf ;
 
 	int				have_written ;	/* Has a single write been done to the file? */
-	PEAK_CHUNK		*pchunk ;
+	PEAK_CHUNK_32	*pchunk ;
 
 	/* Loop Info */
 	SF_LOOP_INFO	*loop_info ;

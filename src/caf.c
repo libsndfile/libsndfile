@@ -126,7 +126,7 @@ caf_open (SF_PRIVATE *psf)
 		**	can be switched off using sf_command (SFC_SET_PEAK_CHUNK, SF_FALSE).
 		*/
 		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
-		{	psf->pchunk = calloc (1, sizeof (PEAK_CHUNK) * psf->sf.channels * sizeof (PEAK_POS)) ;
+		{	psf->pchunk = calloc (1, 2 * sizeof (int) * psf->sf.channels * sizeof (PEAK_POS_32)) ;
 			if (psf->pchunk == NULL)
 				return SFE_MALLOC_FAILED ;
 			psf->pchunk->peak_loc = SF_PEAK_START ;
@@ -326,9 +326,9 @@ typedef struct
 } PEAK_INFO ;
 
 
-				if (chunk_size != SIGNED_SIZEOF (PEAK_CHUNK) + psf->sf.channels * SIGNED_SIZEOF (PEAK_POS))
+				if (chunk_size != 2 * sizeof (int) + psf->sf.channels * SIGNED_SIZEOF (PEAK_POS_32))
 				{	psf_binheader_readf (psf, "j", dword) ;
-					psf_log_printf (psf, "*** File PEAK chunk bigger than sizeof (PEAK_CHUNK).\n") ;
+					psf_log_printf (psf, "*** File PEAK chunk too big.\n") ;
 					return SFE_WAV_BAD_PEAK ;
 					} ;
 				printf ("%s %d\nZ", __func__, __LINE__) ;
@@ -504,8 +504,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 		caf_write_strings (psf, SF_STR_LOCATE_START) ;
 
 	if (psf->pchunk != NULL && psf->pchunk->peak_loc == SF_PEAK_START)
-	{	psf_binheader_writef (psf, "em4", PEAK_MARKER,
-			sizeof (PEAK_CHUNK) + psf->sf.channels * sizeof (PEAK_POS)) ;
+	{	psf_binheader_writef (psf, "em4", PEAK_MARKER, 2 * sizeof (int) + psf->sf.channels * sizeof (PEAK_POS_32)) ;
 		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
 			psf_binheader_writef (psf, "ef4", psf->pchunk->peaks [k].value, psf->pchunk->peaks [k].position) ;

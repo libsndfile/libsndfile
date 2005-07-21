@@ -211,7 +211,7 @@ aiff_open	(SF_PRIVATE *psf)
 			return	SFE_BAD_OPEN_FORMAT ;
 
 		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
-		{	psf->pchunk = calloc (1, sizeof (PEAK_CHUNK) * psf->sf.channels * sizeof (PEAK_POS)) ;
+		{	psf->pchunk = calloc (1, 2 * sizeof (int) * psf->sf.channels * sizeof (PEAK_POS_32)) ;
 			if (psf->pchunk == NULL)
 				return SFE_MALLOC_FAILED ;
 			psf->pchunk->peak_loc = SF_PEAK_START ;
@@ -400,13 +400,13 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					psf_binheader_readf (psf, "E4", &dword) ;
 
 					psf_log_printf (psf, "%M : %d\n", marker, dword) ;
-					if (dword != SIGNED_SIZEOF (PEAK_CHUNK) + psf->sf.channels * SIGNED_SIZEOF (PEAK_POS))
+					if (dword != 2 * SIGNED_SIZEOF (int) + psf->sf.channels * SIGNED_SIZEOF (PEAK_POS_32))
 					{	psf_binheader_readf (psf, "j", dword) ;
-						psf_log_printf (psf, "*** File PEAK chunk bigger than sizeof (PEAK_CHUNK).\n") ;
+						psf_log_printf (psf, "*** File PEAK chunk too big.\n") ;
 						return SFE_WAV_BAD_PEAK ;
 						} ;
 
-					psf->pchunk = calloc (1, sizeof (PEAK_CHUNK) * psf->sf.channels * sizeof (PEAK_POS)) ;
+					psf->pchunk = calloc (1, 2 * sizeof (int) + psf->sf.channels * sizeof (PEAK_POS_32)) ;
 					if (psf->pchunk == NULL)
 						return SFE_MALLOC_FAILED ;
 
@@ -1065,8 +1065,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		aiff_write_strings (psf, SF_STR_LOCATE_START) ;
 
 	if (psf->pchunk != NULL && psf->pchunk->peak_loc == SF_PEAK_START)
-	{	psf_binheader_writef (psf, "Em4", PEAK_MARKER,
-			sizeof (PEAK_CHUNK) + psf->sf.channels * sizeof (PEAK_POS)) ;
+	{	psf_binheader_writef (psf, "Em4", PEAK_MARKER, 2 * sizeof (int) + psf->sf.channels * sizeof (PEAK_POS_32)) ;
 		psf_binheader_writef (psf, "E44", 1, time (NULL)) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
 			psf_binheader_writef (psf, "Ef4", psf->pchunk->peaks [k].value, psf->pchunk->peaks [k].position) ; /* XXXXX */
@@ -1102,8 +1101,7 @@ aiff_write_tailer (SF_PRIVATE *psf)
 	psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
 
 	if (psf->pchunk != NULL && psf->pchunk->peak_loc == SF_PEAK_END)
-	{	psf_binheader_writef (psf, "Em4", PEAK_MARKER,
-			sizeof (PEAK_CHUNK) + psf->sf.channels * sizeof (PEAK_POS)) ;
+	{	psf_binheader_writef (psf, "Em4", PEAK_MARKER, 2 * sizeof (int) + psf->sf.channels * sizeof (PEAK_POS_32)) ;
 		psf_binheader_writef (psf, "E44", 1, time (NULL)) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
 			psf_binheader_writef (psf, "Ef4", psf->pchunk->peaks [k].value, psf->pchunk->peaks [k].position) ; /* XXXXX */
