@@ -130,7 +130,7 @@ caf_open (SF_PRIVATE *psf)
 			if (psf->pchunk == NULL)
 				return SFE_MALLOC_FAILED ;
 			psf->has_peak = SF_TRUE ;
-			psf->peak_loc = SF_PEAK_START ;
+			psf->pchunk->peak_loc = SF_PEAK_START ;
 			} ;
 
 		if ((error = caf_write_header (psf, SF_FALSE)) != 0)
@@ -504,7 +504,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->str_flags & SF_STR_LOCATE_START)
 		caf_write_strings (psf, SF_STR_LOCATE_START) ;
 
-	if (psf->has_peak && psf->peak_loc == SF_PEAK_START)
+	if (psf->has_peak && psf->pchunk->peak_loc == SF_PEAK_START)
 	{	psf_binheader_writef (psf, "em4", PEAK_MARKER,
 			sizeof (PEAK_CHUNK) + psf->sf.channels * sizeof (PEAK_POS)) ;
 		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;

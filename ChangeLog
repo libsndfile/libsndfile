@@ -1,3 +1,16 @@
+2005-07-21 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h
+    Move the peak_loc field of SF_PRIVATE to the PEAK_CHUNK struct.
+
+    * src/aiff.c src/caf.c src/wav.c
+    Fix knock on effects from above.
+
+2005-07-19 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav.c
+    Prevent files with unknown chunks from being opened read/write.
+
 2005-07-14 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/flac.c

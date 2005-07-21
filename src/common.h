@@ -136,7 +136,9 @@ typedef struct
 } PEAK_POS ;
 
 typedef struct
-{	unsigned int	version ;	/* version of the PEAK chunk */
+{	int				peak_loc ;	/* Write a PEAK chunk at the start or end of the file? */
+
+	unsigned int	version ;	/* version of the PEAK chunk */
 	unsigned int	timestamp ;	/* secs since 1/1/1970  */
 #if HAVE_FLEXIBLE_ARRAY
 	/* the per channel peak info */
@@ -240,7 +242,6 @@ typedef struct sf_private_tag
 
 	int				have_written ;	/* Has a single write been done to the file? */
 	int				has_peak ;		/* Has a PEAK chunk (AIFF and WAVE) been read? */
-	int				peak_loc ;		/* Write a PEAK chunk at the start or end of the file? */
 	PEAK_CHUNK		*pchunk ;
 
 	/* Loop Info */
