@@ -241,7 +241,6 @@ typedef struct sf_private_tag
 	SF_INFO			sf ;
 
 	int				have_written ;	/* Has a single write been done to the file? */
-	int				has_peak ;		/* Has a PEAK chunk (AIFF and WAVE) been read? */
 	PEAK_CHUNK		*pchunk ;
 
 	/* Loop Info */

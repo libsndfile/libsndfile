@@ -189,7 +189,6 @@ wav_open	 (SF_PRIVATE *psf)
 		{	psf->pchunk = calloc (1, sizeof (PEAK_CHUNK) * psf->sf.channels * sizeof (PEAK_POS)) ;
 			if (psf->pchunk == NULL)
 				return SFE_MALLOC_FAILED ;
-			psf->has_peak = SF_TRUE ;
 			psf->pchunk->peak_loc = SF_PEAK_START ;
 			} ;
 
@@ -423,7 +422,6 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						psf_log_printf (psf, cptr) ;
 						} ;
 
-					psf->has_peak = SF_TRUE ; /* Found PEAK chunk. */
 					psf->pchunk->peak_loc = ((parsestage & HAVE_data) == 0) ? SF_PEAK_START : SF_PEAK_END ;
 					break ;
 
@@ -792,7 +790,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->str_flags & SF_STR_LOCATE_START)
 		wav_write_strings (psf, SF_STR_LOCATE_START) ;
 
-	if (psf->has_peak && psf->pchunk->peak_loc == SF_PEAK_START)
+	if (psf->pchunk != NULL && psf->pchunk->peak_loc == SF_PEAK_START)
 	{	psf_binheader_writef (psf, "em4", PEAK_MARKER,
 			sizeof (PEAK_CHUNK) + psf->sf.channels * sizeof (PEAK_POS)) ;
 		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;
@@ -969,7 +967,7 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->str_flags & SF_STR_LOCATE_START)
 		wav_write_strings (psf, SF_STR_LOCATE_START) ;
 
-	if (psf->has_peak && psf->pchunk->peak_loc == SF_PEAK_START)
+	if (psf->pchunk != NULL && psf->pchunk->peak_loc == SF_PEAK_START)
 	{	psf_binheader_writef (psf, "em4", PEAK_MARKER,
 			sizeof (PEAK_CHUNK) + psf->sf.channels * sizeof (PEAK_POS)) ;
 		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;
@@ -1005,7 +1003,7 @@ wav_write_tailer (SF_PRIVATE *psf)
 	psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
 
 	/* Add a PEAK chunk if requested. */
-	if (psf->has_peak && psf->pchunk->peak_loc == SF_PEAK_END)
+	if (psf->pchunk != NULL && psf->pchunk->peak_loc == SF_PEAK_END)
 	{	psf_binheader_writef (psf, "em4", PEAK_MARKER,
 			sizeof (PEAK_CHUNK) + psf->sf.channels * sizeof (PEAK_POS)) ;
 		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;

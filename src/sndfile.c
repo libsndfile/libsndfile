@@ -899,12 +899,13 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				return SF_FALSE ;
 			/* If data has already been written this must fail. */
 			if (psf->have_written)
-				return psf->has_peak ;
+				return SF_FALSE ;
 			/* Everything seems OK, so set psf->has_peak and re-write header. */
-			psf->has_peak = (datasize) ? SF_TRUE : SF_FALSE ;
+			if (datasize)
+				return SF_FALSE ;
 			if (psf->write_header)
 				psf->write_header (psf, SF_TRUE) ;
-			return psf->has_peak ;
+			return SF_TRUE ;
 
 		case SFC_GET_LOG_INFO :
 			if (data == NULL)

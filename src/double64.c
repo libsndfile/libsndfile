@@ -643,7 +643,7 @@ host_write_s2d	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 
 		s2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
 
-		if (psf->has_peak)
+		if (psf->pchunk)
 			double64_peak_update (psf, psf->u.dbuf, bufferlen, (int) (total / psf->sf.channels)) ;
 
 		if (psf->float_endswap == SF_TRUE)
@@ -671,7 +671,7 @@ host_write_i2d	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 			bufferlen = (int) len ;
 		i2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
 
-		if (psf->has_peak)
+		if (psf->pchunk)
 			double64_peak_update (psf, psf->u.dbuf, bufferlen, (int) (total / psf->sf.channels)) ;
 
 		if (psf->float_endswap == SF_TRUE)
@@ -699,7 +699,7 @@ host_write_f2d	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 			bufferlen = (int) len ;
 		f2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
 
-		if (psf->has_peak)
+		if (psf->pchunk)
 			double64_peak_update (psf, psf->u.dbuf, bufferlen, (int) (total / psf->sf.channels)) ;
 
 		if (psf->float_endswap == SF_TRUE)
@@ -720,7 +720,7 @@ host_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 
-	if (psf->has_peak)
+	if (psf->pchunk)
 		double64_peak_update (psf, ptr, len, 0) ;
 
 	if (psf->float_endswap != SF_TRUE)
@@ -874,7 +874,7 @@ replace_write_s2d	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 			bufferlen = (int) len ;
 		s2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
 
-		if (psf->has_peak)
+		if (psf->pchunk)
 			double64_peak_update (psf, psf->u.dbuf, bufferlen, (int) (total / psf->sf.channels)) ;
 
 		bd2d_write (psf->u.dbuf, bufferlen) ;
@@ -904,7 +904,7 @@ replace_write_i2d	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 			bufferlen = (int) len ;
 		i2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
 
-		if (psf->has_peak)
+		if (psf->pchunk)
 			double64_peak_update (psf, psf->u.dbuf, bufferlen, (int) (total / psf->sf.channels)) ;
 
 		bd2d_write (psf->u.dbuf, bufferlen) ;
@@ -955,7 +955,7 @@ replace_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 
 	/* FIXME : This is probably nowhere near optimal. */
-	if (psf->has_peak)
+	if (psf->pchunk)
 		double64_peak_update (psf, ptr, len, 0) ;
 
 	bufferlen = ARRAY_LEN (psf->u.dbuf) ;
