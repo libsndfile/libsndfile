@@ -5,7 +5,10 @@
 
     * src/flac.c
     Add extra debug in sf_flac_meta_callback.
-	Make a bunch of private functions static.
+    Make a bunch of private functions static.
+
+    * src/aiff.c src/wav.c
+    Fix allocation for PEAK_CHUNK (bug found using valgrind).
 
 2005-07-21 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

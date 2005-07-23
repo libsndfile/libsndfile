@@ -211,7 +211,7 @@ aiff_open	(SF_PRIVATE *psf)
 			return	SFE_BAD_OPEN_FORMAT ;
 
 		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
-		{	psf->pchunk = calloc (1, 2 * sizeof (int) * psf->sf.channels * sizeof (PEAK_POS_32)) ;
+		{	psf->pchunk = calloc (1, sizeof (PEAK_CHUNK_32) + psf->sf.channels * sizeof (PEAK_POS_32)) ;
 			if (psf->pchunk == NULL)
 				return SFE_MALLOC_FAILED ;
 			psf->pchunk->peak_loc = SF_PEAK_START ;
@@ -406,7 +406,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						return SFE_WAV_BAD_PEAK ;
 						} ;
 
-					psf->pchunk = calloc (1, 2 * sizeof (int) + psf->sf.channels * sizeof (PEAK_POS_32)) ;
+					psf->pchunk = calloc (1, sizeof (PEAK_CHUNK_32) + psf->sf.channels * sizeof (PEAK_POS_32)) ;
 					if (psf->pchunk == NULL)
 						return SFE_MALLOC_FAILED ;
 
