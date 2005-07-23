@@ -1,3 +1,8 @@
+2005-07-23 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/nist.c
+    Fix a bug where a variable was being used without being initialized.
+
 2005-07-21 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h
