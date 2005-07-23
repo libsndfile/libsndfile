@@ -108,21 +108,21 @@ static void		d2flac24_clip_array (const double *src, FLAC__int32 *dest, int coun
 static int flac_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 
 /* Decoder Callbacks */
-FLAC__SeekableStreamDecoderReadStatus sf_flac_read_callback (const FLAC__SeekableStreamDecoder *decoder, FLAC__byte buffer [], unsigned *bytes, void *client_data) ;
-FLAC__SeekableStreamDecoderSeekStatus sf_flac_seek_callback (const FLAC__SeekableStreamDecoder *decoder, FLAC__uint64 absolute_byte_offset, void *client_data) ;
-FLAC__SeekableStreamDecoderTellStatus sf_flac_tell_callback (const FLAC__SeekableStreamDecoder *decoder, FLAC__uint64 *absolute_byte_offset, void *client_data) ;
-FLAC__SeekableStreamDecoderLengthStatus sf_flac_length_callback (const FLAC__SeekableStreamDecoder *decoder, FLAC__uint64 *stream_length, void *client_data) ;
-FLAC__bool sf_flac_eof_callback (const FLAC__SeekableStreamDecoder *decoder, void *client_data) ;
-FLAC__StreamDecoderWriteStatus sf_flac_write_callback (const FLAC__SeekableStreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer [], void *client_data) ;
-void sf_flac_meta_callback (const FLAC__SeekableStreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data) ;
-void sf_flac_error_callback (const FLAC__SeekableStreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data) ;
+static FLAC__SeekableStreamDecoderReadStatus sf_flac_read_callback (const FLAC__SeekableStreamDecoder *decoder, FLAC__byte buffer [], unsigned *bytes, void *client_data) ;
+static FLAC__SeekableStreamDecoderSeekStatus sf_flac_seek_callback (const FLAC__SeekableStreamDecoder *decoder, FLAC__uint64 absolute_byte_offset, void *client_data) ;
+static FLAC__SeekableStreamDecoderTellStatus sf_flac_tell_callback (const FLAC__SeekableStreamDecoder *decoder, FLAC__uint64 *absolute_byte_offset, void *client_data) ;
+static FLAC__SeekableStreamDecoderLengthStatus sf_flac_length_callback (const FLAC__SeekableStreamDecoder *decoder, FLAC__uint64 *stream_length, void *client_data) ;
+static FLAC__bool sf_flac_eof_callback (const FLAC__SeekableStreamDecoder *decoder, void *client_data) ;
+static FLAC__StreamDecoderWriteStatus sf_flac_write_callback (const FLAC__SeekableStreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer [], void *client_data) ;
+static void sf_flac_meta_callback (const FLAC__SeekableStreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data) ;
+static void sf_flac_error_callback (const FLAC__SeekableStreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data) ;
 
 /* Encoder Callbacks */
-FLAC__SeekableStreamEncoderSeekStatus sf_flac_enc_seek_callback (const FLAC__SeekableStreamEncoder *encoder, FLAC__uint64 absolute_byte_offset, void *client_data) ;
+static FLAC__SeekableStreamEncoderSeekStatus sf_flac_enc_seek_callback (const FLAC__SeekableStreamEncoder *encoder, FLAC__uint64 absolute_byte_offset, void *client_data) ;
 #ifdef HAVE_FLAC_1_1_1
-FLAC__SeekableStreamEncoderTellStatus sf_flac_enc_tell_callback (const FLAC__SeekableStreamEncoder *encoder, FLAC__uint64 *absolute_byte_offset, void *client_data) ;
+static FLAC__SeekableStreamEncoderTellStatus sf_flac_enc_tell_callback (const FLAC__SeekableStreamEncoder *encoder, FLAC__uint64 *absolute_byte_offset, void *client_data) ;
 #endif
-FLAC__StreamEncoderWriteStatus sf_flac_enc_write_callback (const FLAC__SeekableStreamEncoder *encoder, const FLAC__byte buffer [], unsigned bytes, unsigned samples, unsigned current_frame, void *client_data) ;
+static FLAC__StreamEncoderWriteStatus sf_flac_enc_write_callback (const FLAC__SeekableStreamEncoder *encoder, const FLAC__byte buffer [], unsigned bytes, unsigned samples, unsigned current_frame, void *client_data) ;
 
 static const int legal_sample_rates [] =
 {	8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000
@@ -284,7 +284,7 @@ flac_buffer_copy (SF_PRIVATE *psf)
 } /* flac_buffer_copy */
 
 
-FLAC__SeekableStreamDecoderReadStatus
+static FLAC__SeekableStreamDecoderReadStatus
 sf_flac_read_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), FLAC__byte buffer [], unsigned *bytes, void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 
@@ -295,7 +295,7 @@ sf_flac_read_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), FLA
     return FLAC__SEEKABLE_STREAM_DECODER_READ_STATUS_ERROR ;
 } /* sf_flac_read_callback */
 
-FLAC__SeekableStreamDecoderSeekStatus
+static FLAC__SeekableStreamDecoderSeekStatus
 sf_flac_seek_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), FLAC__uint64 absolute_byte_offset, void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 
@@ -306,7 +306,7 @@ sf_flac_seek_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), FLA
 	return FLAC__SEEKABLE_STREAM_DECODER_SEEK_STATUS_OK ;
 } /* sf_flac_seek_callback */
 
-FLAC__SeekableStreamDecoderTellStatus
+static FLAC__SeekableStreamDecoderTellStatus
 sf_flac_tell_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), FLAC__uint64 *absolute_byte_offset, void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 
@@ -317,7 +317,7 @@ sf_flac_tell_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), FLA
 	return FLAC__SEEKABLE_STREAM_DECODER_TELL_STATUS_OK ;
 } /* sf_flac_tell_callback */
 
-FLAC__SeekableStreamDecoderLengthStatus
+static FLAC__SeekableStreamDecoderLengthStatus
 sf_flac_length_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), FLAC__uint64 *stream_length, void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 
@@ -327,7 +327,7 @@ sf_flac_length_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), F
 	return FLAC__SEEKABLE_STREAM_DECODER_LENGTH_STATUS_OK ;
 } /* sf_flac_length_callback */
 
-FLAC__bool
+static FLAC__bool
 sf_flac_eof_callback (const FLAC__SeekableStreamDecoder *UNUSED (decoder), void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 
@@ -337,7 +337,7 @@ sf_flac_eof_callback (const FLAC__SeekableStreamDecoder *UNUSED (decoder), void 
     return SF_FALSE ;
 } /* sf_flac_eof_callback */
 
-FLAC__StreamDecoderWriteStatus
+static FLAC__StreamDecoderWriteStatus
 sf_flac_write_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), const FLAC__Frame *frame, const FLAC__int32 * const buffer [], void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->fdata ;
@@ -353,7 +353,7 @@ sf_flac_write_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), co
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE ;
 } /* sf_flac_write_callback */
 
-void
+static void
 sf_flac_meta_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), const FLAC__StreamMetadata *metadata, void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 
@@ -374,19 +374,20 @@ sf_flac_meta_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), con
 					psf->sf.format |= SF_FORMAT_PCM_24 ;
 					break ;
 				default :
+					psf_log_printf (psf, "sf_flac_meta_callback : bits_per_sample %d not yet implemented.\n", metadata->data.stream_info.bits_per_sample) ;
 					break ;
 				} ;
 			break ;
 
 		default :
-			psf_log_printf (psf, "sf_flac_meta_callback : metadata-type %d not yet implemented type\n", metadata->type) ;
+			psf_log_printf (psf, "sf_flac_meta_callback : metadata-type %d not yet implemented.\n", metadata->type) ;
 		break ;
 		} ;
 
 	return ;
 } /* sf_flac_meta_callback */
 
-void
+static void
 sf_flac_error_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), FLAC__StreamDecoderErrorStatus status, void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 
@@ -407,7 +408,7 @@ sf_flac_error_callback (const FLAC__SeekableStreamDecoder * UNUSED (decoder), FL
 	return ;
 } /* sf_flac_error_callback */
 
-FLAC__SeekableStreamEncoderSeekStatus
+static FLAC__SeekableStreamEncoderSeekStatus
 sf_flac_enc_seek_callback (const FLAC__SeekableStreamEncoder * UNUSED (encoder), FLAC__uint64 absolute_byte_offset, void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 
@@ -419,7 +420,7 @@ sf_flac_enc_seek_callback (const FLAC__SeekableStreamEncoder * UNUSED (encoder),
 } /* sf_flac_enc_seek_callback */
 
 #ifdef HAVE_FLAC_1_1_1
-FLAC__SeekableStreamEncoderTellStatus
+static FLAC__SeekableStreamEncoderTellStatus
 sf_flac_enc_tell_callback (const FLAC__SeekableStreamEncoder *UNUSED (encoder), FLAC__uint64 *absolute_byte_offset, void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 
@@ -431,7 +432,7 @@ sf_flac_enc_tell_callback (const FLAC__SeekableStreamEncoder *UNUSED (encoder), 
 } /* sf_flac_enc_tell_callback */
 #endif
 
-FLAC__StreamEncoderWriteStatus
+static FLAC__StreamEncoderWriteStatus
 sf_flac_enc_write_callback (const FLAC__SeekableStreamEncoder * UNUSED (encoder), const FLAC__byte buffer [], unsigned bytes, unsigned UNUSED (samples), unsigned UNUSED (current_frame), void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 
