@@ -186,7 +186,7 @@ wav_open	 (SF_PRIVATE *psf)
 		** can be switched off using sf_command (SFC_SET_PEAK_CHUNK, SF_FALSE).
 		*/
 		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
-		{	psf->pchunk = calloc (1, sizeof (PEAK_CHUNK_32) + psf->sf.channels * sizeof (PEAK_POS)) ;
+		{	psf->pchunk = calloc (1, sizeof (PEAK_INFO) + psf->sf.channels * sizeof (PEAK_POS)) ;
 			if (psf->pchunk == NULL)
 				return SFE_MALLOC_FAILED ;
 			psf->pchunk->peak_loc = SF_PEAK_START ;
@@ -396,7 +396,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						return SFE_WAV_BAD_PEAK ;
 						} ;
 
-					psf->pchunk = calloc (1, sizeof (PEAK_CHUNK_32) + psf->sf.channels * sizeof (PEAK_POS)) ;
+					psf->pchunk = calloc (1, sizeof (PEAK_INFO) + psf->sf.channels * sizeof (PEAK_POS)) ;
 					if (psf->pchunk == NULL)
 						return SFE_MALLOC_FAILED ;
 

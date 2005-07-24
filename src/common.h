@@ -153,7 +153,7 @@ typedef struct
 	*/
 	PEAK_POS		peaks [0] ;
 #endif
-} PEAK_CHUNK_32 ;
+} PEAK_INFO ;
 
 typedef struct
 {	int		type ;
@@ -241,7 +241,7 @@ typedef struct sf_private_tag
 	SF_INFO			sf ;
 
 	int				have_written ;	/* Has a single write been done to the file? */
-	PEAK_CHUNK_32	*pchunk ;
+	PEAK_INFO	*pchunk ;
 
 	/* Loop Info */
 	SF_LOOP_INFO	*loop_info ;
