@@ -61,9 +61,11 @@
 #define MAC3_MARKER		MAKE_MARKER ('M', 'A', 'C', '3')
 #define MAC6_MARKER		MAKE_MARKER ('M', 'A', 'C', '6')
 
+#define CAF_PEAK_CHUNK_SIZE(ch) 	(sizeof (int) + ch * (sizeof (float) + 8))
 
 #define SFE_CAF_NOT_CAF	666
 #define SFE_CAF_NO_DESC	667
+#define SFE_CAF_BAD_PEAK 668
 
 /*------------------------------------------------------------------------------
 ** Typedefs.
@@ -128,6 +130,12 @@ caf_open (SF_PRIVATE *psf)
 		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
 		{	psf->peak_info = calloc (1, 2 * sizeof (int) * psf->sf.channels * sizeof (PEAK_POS)) ;
 			if (psf->peak_info == NULL)
+				return SFE_MALLOC_FAILED ;
+			psf->peak_info->peak_loc = SF_PEAK_START ;
+			} ;
+
+		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
+		{	if ((psf->peak_info = peak_info_calloc (psf->sf.channels)) == NULL)
 				return SFE_MALLOC_FAILED ;
 			psf->peak_info->peak_loc = SF_PEAK_START ;
 			} ;
@@ -283,11 +291,44 @@ caf_read_header (SF_PRIVATE *psf)
 	if (chunk_size > sizeof (DESC_CHUNK))
 		psf_binheader_readf (psf, "j", (int) (chunk_size - sizeof (DESC_CHUNK))) ;
 
+	psf->sf.channels = desc.channels_per_frame ;
+
 	while (have_data == 0 && psf_ftell (psf) < psf->filelength - SIGNED_SIZEOF (marker))
 	{	psf_binheader_readf (psf, "mE8", &marker, &chunk_size) ;
 
 		switch (marker)
-		{	case free_MARKER :
+		{	case peak_MARKER :
+				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+				if (chunk_size != CAF_PEAK_CHUNK_SIZE (psf->sf.channels))
+				{	psf_binheader_readf (psf, "j", (int) chunk_size) ;
+					psf_log_printf (psf, "*** File PEAK chunk %D should be %d.\n", chunk_size, CAF_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
+					return SFE_CAF_BAD_PEAK ;
+					} ;
+
+				if ((psf->peak_info = peak_info_calloc (psf->sf.channels)) == NULL)
+					return SFE_MALLOC_FAILED ;
+
+				/* read in rest of PEAK chunk. */
+				psf_binheader_readf (psf, "E4", & (psf->peak_info->edit_number)) ;
+				psf_log_printf (psf, "  edit count : %d\n", psf->peak_info->edit_number) ;
+
+				psf_log_printf (psf, "     Ch   Position      Value\n") ;
+				for (k = 0 ; k < psf->sf.channels ; k++)
+				{	sf_count_t position ;
+					float value ;
+
+					psf_binheader_readf (psf, "Ef8", &value, &position) ;
+					psf->peak_info->peaks [k].value = value ;
+					psf->peak_info->peaks [k].position = position ;
+
+					LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "    %2d   %-12ld   %g\n", k, (long) position, value) ;
+					psf_log_printf (psf, psf->u.cbuf) ;
+					} ;
+
+				psf->peak_info->peak_loc = SF_PEAK_START ;
+				break ;
+
+			case free_MARKER :
 				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
 				psf_binheader_readf (psf, "j", (int) chunk_size) ;
 				break ;
@@ -299,49 +340,11 @@ caf_read_header (SF_PRIVATE *psf)
 				have_data = 1 ;
 				break ;
 
-#if 0
-			case peak_MARKER :
-				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
-
-typedef struct
-{	float value ;
-    sf_count_t position ;
-} PEAK_POS_64 ;
-
-typedef struct
-{	unsigned int	edit_count ;
-#if HAVE_FLEXIBLE_ARRAY
-	/* the per channel peak info */
-	PEAK_POS_64		peaks [] ;
-#else
-	/*
-	** This is not ISO compliant C. It works on some compilers which
-	** don't support the ISO standard flexible struct array which is
-	** used above. If your compiler doesn't ike this I suggest you find
-	** youself a 1999 ISO C standards compilant compiler. GCC-3.X is
-	** highly recommended.
-	*/
-	PEAK_POS_64		peaks [0] ;
-#endif
-} PEAK_INFO ;
-
-
-				if (chunk_size != 2 * sizeof (int) + psf->sf.channels * SIGNED_SIZEOF (PEAK_POS))
-				{	psf_binheader_readf (psf, "j", dword) ;
-					psf_log_printf (psf, "*** File PEAK chunk too big.\n") ;
-					return SFE_WAV_BAD_PEAK ;
-					} ;
-				printf ("%s %d\nZ", __func__, __LINE__) ;
-				exit (1) ;
-				break ;
-#endif
-
 			default :
 				psf_log_printf (psf, " %M : %D (skipped)\n", marker, chunk_size) ;
 				psf_binheader_readf (psf, "j", (int) chunk_size) ;
 				break ;
 			} ;
-
 		} ;
 
 	if (have_data == 0)
@@ -502,17 +505,19 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 #if 0
 	if (psf->str_flags & SF_STR_LOCATE_START)
 		caf_write_strings (psf, SF_STR_LOCATE_START) ;
-
-	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
-	{	psf_binheader_writef (psf, "em4", PEAK_MARKER, 2 * sizeof (int) + psf->sf.channels * sizeof (PEAK_POS)) ;
-		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;
-		for (k = 0 ; k < psf->sf.channels ; k++)
-			psf_binheader_writef (psf, "ef4", psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
-		} ;
 #endif
 
-	/* Add free chunk so that the actual audio data starts at offset 0x1000. */
+	if (psf->peak_info != NULL)
+	{	int k ;
+		psf_binheader_writef (psf, "Em84", peak_MARKER, (sf_count_t) CAF_PEAK_CHUNK_SIZE (psf->sf.channels), psf->peak_info->edit_number) ;
+		for (k = 0 ; k < psf->sf.channels ; k++)
+			psf_binheader_writef (psf, "Ef8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
+		} ;
+
+	/* Add free chunk so that the actual audio data starts at a multiple 0x1000. */
 	free_len = 0x1000 - psf->headindex - 16 - 12 ;
+	while (free_len < 0)
+		free_len += 0x1000 ;
 	psf_binheader_writef (psf, "Em8z", free_MARKER, free_len, (int) free_len) ;
 
 	psf_binheader_writef (psf, "Em84", data_MARKER, psf->datalength, 0) ;

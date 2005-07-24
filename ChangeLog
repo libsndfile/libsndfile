@@ -4,8 +4,12 @@
     Change the way PEAK chunk info is stored. Peaks now stored as an sf_count_t
     for position and a double as the value.
 
-    * src/aiff.csrc/caf.c src/wav.c
+    * src/aiff.c src/caf.c src/wav.c
     Fix knock on effects of above changes.
+
+    * src/caf.c
+    Implement 'peak' chunk for file wuth data in SF_FORMAT_FLOAT or
+    SF_FORMAT_DOUBLE format.
 
 2005-07-23 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
