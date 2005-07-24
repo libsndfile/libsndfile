@@ -1,3 +1,12 @@
+2005-07-24 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/double64.c src/float32.c
+    Change the way PEAK chunk info is stored. Peaks now stored as an sf_count_t
+    for position and a double as the value.
+
+    * src/aiff.csrc/caf.c src/wav.c
+    Fix knock on effects of above changes.
+
 2005-07-23 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/nist.c

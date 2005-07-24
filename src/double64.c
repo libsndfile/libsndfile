@@ -65,7 +65,7 @@ static sf_count_t		host_write_i2d	(SF_PRIVATE *psf, const int *ptr, sf_count_t l
 static sf_count_t		host_write_f2d	(SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
 static sf_count_t		host_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
-static void		double64_peak_update	(SF_PRIVATE *psf, const double *buffer, int count, int indx) ;
+static void		double64_peak_update	(SF_PRIVATE *psf, const double *buffer, int count, sf_count_t indx) ;
 
 static int		double64_get_capability	(SF_PRIVATE *psf) ;
 
@@ -423,7 +423,7 @@ double64_le_write (double in, unsigned char *out)
 */
 
 static void
-double64_peak_update	(SF_PRIVATE *psf, const double *buffer, int count, int indx)
+double64_peak_update	(SF_PRIVATE *psf, const double *buffer, int count, sf_count_t indx)
 {	int 	chan ;
 	int		k, position ;
 	float	fmaxval ;
@@ -644,7 +644,7 @@ host_write_s2d	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 		s2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
 
 		if (psf->pchunk)
-			double64_peak_update (psf, psf->u.dbuf, bufferlen, (int) (total / psf->sf.channels)) ;
+			double64_peak_update (psf, psf->u.dbuf, bufferlen, total / psf->sf.channels) ;
 
 		if (psf->float_endswap == SF_TRUE)
 			endswap_double_array (psf->u.dbuf, bufferlen) ;
@@ -672,7 +672,7 @@ host_write_i2d	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 		i2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
 
 		if (psf->pchunk)
-			double64_peak_update (psf, psf->u.dbuf, bufferlen, (int) (total / psf->sf.channels)) ;
+			double64_peak_update (psf, psf->u.dbuf, bufferlen, total / psf->sf.channels) ;
 
 		if (psf->float_endswap == SF_TRUE)
 			endswap_double_array (psf->u.dbuf, bufferlen) ;
@@ -700,7 +700,7 @@ host_write_f2d	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 		f2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
 
 		if (psf->pchunk)
-			double64_peak_update (psf, psf->u.dbuf, bufferlen, (int) (total / psf->sf.channels)) ;
+			double64_peak_update (psf, psf->u.dbuf, bufferlen, total / psf->sf.channels) ;
 
 		if (psf->float_endswap == SF_TRUE)
 			endswap_double_array (psf->u.dbuf, bufferlen) ;
@@ -875,7 +875,7 @@ replace_write_s2d	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 		s2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
 
 		if (psf->pchunk)
-			double64_peak_update (psf, psf->u.dbuf, bufferlen, (int) (total / psf->sf.channels)) ;
+			double64_peak_update (psf, psf->u.dbuf, bufferlen, total / psf->sf.channels) ;
 
 		bd2d_write (psf->u.dbuf, bufferlen) ;
 
@@ -905,7 +905,7 @@ replace_write_i2d	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 		i2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
 
 		if (psf->pchunk)
-			double64_peak_update (psf, psf->u.dbuf, bufferlen, (int) (total / psf->sf.channels)) ;
+			double64_peak_update (psf, psf->u.dbuf, bufferlen, total / psf->sf.channels) ;
 
 		bd2d_write (psf->u.dbuf, bufferlen) ;
 
