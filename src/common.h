@@ -21,6 +21,8 @@
 
 #include "config.h"
 
+#include <stdlib.h>
+
 #if HAVE_STDINT_H
 #include <stdint.h>
 #endif
@@ -43,7 +45,7 @@
 #endif
 
 #ifdef __GNUC__
-#	define WARN_UNUSED	__attribute__((warn_unused_result))
+#	define WARN_UNUSED	__attribute__ ((warn_unused_result))
 #else
 #	define WARN_UNUSED
 #endif
@@ -136,10 +138,16 @@ typedef struct
 } PEAK_POS ;
 
 typedef struct
-{	int				peak_loc ;	/* Write a PEAK chunk at the start or end of the file? */
+{	/* libsndfile internal : write a PEAK chunk at the start or end of the file? */
+	int				peak_loc ;
 
+	/* WAV/AIFF */
 	unsigned int	version ;	/* version of the PEAK chunk */
 	unsigned int	timestamp ;	/* secs since 1/1/1970  */
+
+	/* CAF */
+	unsigned int	edit_number ;
+
 #if HAVE_FLEXIBLE_ARRAY
 	/* the per channel peak info */
 	PEAK_POS		peaks [] ;
@@ -154,6 +162,11 @@ typedef struct
 	PEAK_POS		peaks [0] ;
 #endif
 } PEAK_INFO ;
+
+static inline PEAK_INFO *
+peak_info_calloc (int channels)
+{	return calloc (1, sizeof (PEAK_INFO) + channels * sizeof (PEAK_POS)) ;
+} /* peak_info_calloc */
 
 typedef struct
 {	int		type ;
@@ -241,7 +254,7 @@ typedef struct sf_private_tag
 	SF_INFO			sf ;
 
 	int				have_written ;	/* Has a single write been done to the file? */
-	PEAK_INFO	*pchunk ;
+	PEAK_INFO	*peak_info ;
 
 	/* Loop Info */
 	SF_LOOP_INFO	*loop_info ;

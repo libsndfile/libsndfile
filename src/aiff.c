@@ -94,6 +94,8 @@
 #define AIFC_IMA4_BLOCK_LEN				34
 #define	AIFC_IMA4_SAMPLES_PER_BLOCK		64
 
+#define	AIFF_PEAK_CHUNK_SIZE(ch)	(2 * sizeof (int) + ch * (sizeof (float) + sizeof (int)))
+
 /*------------------------------------------------------------------------------
  * Typedefs for file chunks.
  */
@@ -211,10 +213,9 @@ aiff_open	(SF_PRIVATE *psf)
 			return	SFE_BAD_OPEN_FORMAT ;
 
 		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
-		{	psf->pchunk = calloc (1, sizeof (PEAK_INFO) + psf->sf.channels * sizeof (PEAK_POS)) ;
-			if (psf->pchunk == NULL)
+		{	if ((psf->peak_info = peak_info_calloc (psf->sf.channels)) == NULL)
 				return SFE_MALLOC_FAILED ;
-			psf->pchunk->peak_loc = SF_PEAK_START ;
+			psf->peak_info->peak_loc = SF_PEAK_START ;
 			} ;
 
 		if (psf->mode != SFM_RDWR || psf->filelength < 40)
@@ -324,9 +325,8 @@ aiff_open	(SF_PRIVATE *psf)
 static int
 aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 {	SSND_CHUNK	ssnd_fmt ;
-	int			marker, dword, bytesread, k ;
-	int			FORMsize, SSNDsize ;
-	int			filetype, found_chunk = 0, done = 0, error = 0 ;
+	unsigned	marker, dword, FORMsize, SSNDsize, bytesread ;
+	int			k, filetype, found_chunk = 0, done = 0, error = 0 ;
 	char		*cptr, byte ;
 
 	/* Set position to start of file to begin reading header. */
@@ -400,38 +400,37 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					psf_binheader_readf (psf, "E4", &dword) ;
 
 					psf_log_printf (psf, "%M : %d\n", marker, dword) ;
-					if (dword != 2 * SIGNED_SIZEOF (int) + psf->sf.channels * SIGNED_SIZEOF (PEAK_POS))
+					if (dword != AIFF_PEAK_CHUNK_SIZE (psf->sf.channels))
 					{	psf_binheader_readf (psf, "j", dword) ;
 						psf_log_printf (psf, "*** File PEAK chunk too big.\n") ;
 						return SFE_WAV_BAD_PEAK ;
 						} ;
 
-					psf->pchunk = calloc (1, sizeof (PEAK_INFO) + psf->sf.channels * sizeof (PEAK_POS)) ;
-					if (psf->pchunk == NULL)
+					if ((psf->peak_info = peak_info_calloc (psf->sf.channels)) == NULL)
 						return SFE_MALLOC_FAILED ;
 
 					/* read in rest of PEAK chunk. */
-					psf_binheader_readf (psf, "E44", &(psf->pchunk->version), &(psf->pchunk->timestamp)) ;
+					psf_binheader_readf (psf, "E44", &(psf->peak_info->version), &(psf->peak_info->timestamp)) ;
 
-					if (psf->pchunk->version != 1)
-						psf_log_printf (psf, "  version    : %d *** (should be version 1)\n", psf->pchunk->version) ;
+					if (psf->peak_info->version != 1)
+						psf_log_printf (psf, "  version    : %d *** (should be version 1)\n", psf->peak_info->version) ;
 					else
-						psf_log_printf (psf, "  version    : %d\n", psf->pchunk->version) ;
+						psf_log_printf (psf, "  version    : %d\n", psf->peak_info->version) ;
 
-					psf_log_printf (psf, "  time stamp : %d\n", psf->pchunk->timestamp) ;
+					psf_log_printf (psf, "  time stamp : %d\n", psf->peak_info->timestamp) ;
 					psf_log_printf (psf, "    Ch   Position       Value\n") ;
 
 					cptr = psf->u.cbuf ;
-					for (dword = 0 ; dword < psf->sf.channels ; dword++)
+					for (dword = 0 ; dword < (unsigned) psf->sf.channels ; dword++)
 					{	float value ;
 						unsigned int position ;
-	
+
 						psf_binheader_readf (psf, "Ef4", &value, &position) ;
-						psf->pchunk->peaks [dword].value = value ;
-						psf->pchunk->peaks [dword].position = position ;
+						psf->peak_info->peaks [dword].value = value ;
+						psf->peak_info->peaks [dword].position = position ;
 
 						LSF_SNPRINTF (cptr, sizeof (psf->u.scbuf), "    %2d   %-12ld   %g\n",
-								dword, (long) psf->pchunk->peaks [dword].position, psf->pchunk->peaks [dword].value) ;
+								dword, (long) psf->peak_info->peaks [dword].position, psf->peak_info->peaks [dword].value) ;
 						cptr [sizeof (psf->u.scbuf) - 1] = 0 ;
 						psf_log_printf (psf, cptr) ;
 						} ;
@@ -544,7 +543,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
 					cptr [dword] = 0 ;
 
-					for (k = 0 ; k < dword ; k++)
+					for (k = 0 ; k < (int) dword ; k++)
 						if (! isprint (cptr [k]))
 						{	cptr [k] = 0 ;
 							break ;
@@ -1068,11 +1067,11 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->str_flags & SF_STR_LOCATE_START)
 		aiff_write_strings (psf, SF_STR_LOCATE_START) ;
 
-	if (psf->pchunk != NULL && psf->pchunk->peak_loc == SF_PEAK_START)
-	{	psf_binheader_writef (psf, "Em4", PEAK_MARKER, 2 * sizeof (int) + psf->sf.channels * sizeof (PEAK_POS)) ;
+	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
+	{	psf_binheader_writef (psf, "Em4", PEAK_MARKER, AIFF_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
 		psf_binheader_writef (psf, "E44", 1, time (NULL)) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
-			psf_binheader_writef (psf, "Eft8", (float) psf->pchunk->peaks [k].value, psf->pchunk->peaks [k].position) ;
+			psf_binheader_writef (psf, "Eft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 
 	/* Write SSND chunk. */
@@ -1104,11 +1103,11 @@ aiff_write_tailer (SF_PRIVATE *psf)
 
 	psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
 
-	if (psf->pchunk != NULL && psf->pchunk->peak_loc == SF_PEAK_END)
-	{	psf_binheader_writef (psf, "Em4", PEAK_MARKER, 2 * sizeof (int) + psf->sf.channels * sizeof (PEAK_POS)) ;
+	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_END)
+	{	psf_binheader_writef (psf, "Em4", PEAK_MARKER, AIFF_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
 		psf_binheader_writef (psf, "E44", 1, time (NULL)) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
-			psf_binheader_writef (psf, "Eft8", (float) psf->pchunk->peaks [k].value, psf->pchunk->peaks [k].position) ;
+			psf_binheader_writef (psf, "Eft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 
 	if (psf->str_flags & SF_STR_LOCATE_END)

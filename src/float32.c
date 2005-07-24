@@ -389,9 +389,9 @@ float32_peak_update	(SF_PRIVATE *psf, const float *buffer, int count, sf_count_t
 				position = k ;
 				} ;
 
-		if (fmaxval > psf->pchunk->peaks [chan].value)
-		{	psf->pchunk->peaks [chan].value = fmaxval ;
-			psf->pchunk->peaks [chan].position = psf->write_current + indx + (position / psf->sf.channels) ;
+		if (fmaxval > psf->peak_info->peaks [chan].value)
+		{	psf->peak_info->peaks [chan].value = fmaxval ;
+			psf->peak_info->peaks [chan].position = psf->write_current + indx + (position / psf->sf.channels) ;
 			} ;
 		} ;
 
@@ -592,7 +592,7 @@ host_write_s2f	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 			bufferlen = (int) len ;
 		s2f_array (ptr + total, psf->u.fbuf, bufferlen) ;
 
-		if (psf->pchunk)
+		if (psf->peak_info)
 			float32_peak_update (psf, psf->u.fbuf, bufferlen, total / psf->sf.channels) ;
 
 		if (psf->float_endswap == SF_TRUE)
@@ -620,7 +620,7 @@ host_write_i2f	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 			bufferlen = (int) len ;
 		i2f_array (ptr + total, psf->u.fbuf, bufferlen) ;
 
-		if (psf->pchunk)
+		if (psf->peak_info)
 			float32_peak_update (psf, psf->u.fbuf, bufferlen, total / psf->sf.channels) ;
 
 		if (psf->float_endswap == SF_TRUE)
@@ -641,7 +641,7 @@ host_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
 
-	if (psf->pchunk)
+	if (psf->peak_info)
 		float32_peak_update (psf, ptr, len, 0) ;
 
 	if (psf->float_endswap != SF_TRUE)
@@ -678,7 +678,7 @@ host_write_d2f	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 		d2f_array (ptr + total, psf->u.fbuf, bufferlen) ;
 
-		if (psf->pchunk)
+		if (psf->peak_info)
 			float32_peak_update (psf, psf->u.fbuf, bufferlen, total / psf->sf.channels) ;
 
 		if (psf->float_endswap == SF_TRUE)
@@ -824,7 +824,7 @@ replace_write_s2f	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 			bufferlen = (int) len ;
 		s2f_array (ptr + total, psf->u.fbuf, bufferlen) ;
 
-		if (psf->pchunk)
+		if (psf->peak_info)
 			float32_peak_update (psf, psf->u.fbuf, bufferlen, total / psf->sf.channels) ;
 
 		f2bf_array (psf->u.fbuf, bufferlen) ;
@@ -854,7 +854,7 @@ replace_write_i2f	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 			bufferlen = (int) len ;
 		i2f_array (ptr + total, psf->u.fbuf, bufferlen) ;
 
-		if (psf->pchunk)
+		if (psf->peak_info)
 			float32_peak_update (psf, psf->u.fbuf, bufferlen, total / psf->sf.channels) ;
 
 		f2bf_array (psf->u.fbuf, bufferlen) ;
@@ -878,7 +878,7 @@ replace_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 
 	/* FIX THIS */
-	if (psf->pchunk)
+	if (psf->peak_info)
 		float32_peak_update (psf, ptr, len, 0) ;
 
 	bufferlen = ARRAY_LEN (psf->u.fbuf) ;
@@ -916,7 +916,7 @@ replace_write_d2f	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 			bufferlen = (int) len ;
 		d2f_array (ptr + total, psf->u.fbuf, bufferlen) ;
 
-		if (psf->pchunk)
+		if (psf->peak_info)
 			float32_peak_update (psf, psf->u.fbuf, bufferlen, total / psf->sf.channels) ;
 
 		f2bf_array (psf->u.fbuf, bufferlen) ;

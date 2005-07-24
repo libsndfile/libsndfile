@@ -126,10 +126,10 @@ caf_open (SF_PRIVATE *psf)
 		**	can be switched off using sf_command (SFC_SET_PEAK_CHUNK, SF_FALSE).
 		*/
 		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
-		{	psf->pchunk = calloc (1, 2 * sizeof (int) * psf->sf.channels * sizeof (PEAK_POS)) ;
-			if (psf->pchunk == NULL)
+		{	psf->peak_info = calloc (1, 2 * sizeof (int) * psf->sf.channels * sizeof (PEAK_POS)) ;
+			if (psf->peak_info == NULL)
 				return SFE_MALLOC_FAILED ;
-			psf->pchunk->peak_loc = SF_PEAK_START ;
+			psf->peak_info->peak_loc = SF_PEAK_START ;
 			} ;
 
 		if ((error = caf_write_header (psf, SF_FALSE)) != 0)
@@ -503,11 +503,11 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->str_flags & SF_STR_LOCATE_START)
 		caf_write_strings (psf, SF_STR_LOCATE_START) ;
 
-	if (psf->pchunk != NULL && psf->pchunk->peak_loc == SF_PEAK_START)
+	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
 	{	psf_binheader_writef (psf, "em4", PEAK_MARKER, 2 * sizeof (int) + psf->sf.channels * sizeof (PEAK_POS)) ;
 		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
-			psf_binheader_writef (psf, "ef4", psf->pchunk->peaks [k].value, psf->pchunk->peaks [k].position) ;
+			psf_binheader_writef (psf, "ef4", psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 #endif
 
