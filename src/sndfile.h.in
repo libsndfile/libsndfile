@@ -505,6 +505,13 @@ sf_count_t	sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t item
 
 int		sf_close		(SNDFILE *sndfile) ;
 
+/* If the file is opened SFM_WRITE or SFM_RDWR, call fsync() on the file
+** to force the writing of data to disk. If the file is opened SFM_READ
+** no action is taken.
+*/
+
+void	sf_write_sync	(SNDFILE *sndfile) ;
+
 #ifdef __cplusplus
 }		/* extern "C" */
 #endif	/* __cplusplus */

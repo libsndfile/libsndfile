@@ -466,7 +466,9 @@ mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_fi
 	sf_set_string (file, SF_STR_ARTIST, "Your name here") ;
 
 	test_write_[+ (get "data_type") +]_or_die (file, 0, orig, items, __LINE__) ;
+	sf_write_sync (file) ;
 	test_write_[+ (get "data_type") +]_or_die (file, 0, orig, items, __LINE__) ;
+	sf_write_sync (file) ;
 
 	/* Add non-audio data after the audio. */
 	sf_set_string (file, SF_STR_COPYRIGHT, "Copyright (c) 2003") ;
@@ -863,7 +865,9 @@ new_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int all
 	wfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__) ;
 	sf_command (wfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE) ;
 	test_writef_[+ (get "data_type") +]_or_die (wfile, 1, orig, frames, __LINE__) ;
+	sf_write_sync (wfile) ;
 	test_writef_[+ (get "data_type") +]_or_die (wfile, 2, orig, frames, __LINE__) ;
+	sf_write_sync (wfile) ;
 
 	rwfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__) ;
 	if (sfinfo.frames != 2 * frames)

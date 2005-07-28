@@ -590,6 +590,8 @@ sf_count_t psf_fgets (char *buffer, sf_count_t bufsize, SF_PRIVATE *psf) ;
 sf_count_t psf_ftell (SF_PRIVATE *psf) ;
 sf_count_t psf_get_filelen (SF_PRIVATE *psf) ;
 
+void psf_fsync (SF_PRIVATE *psf) ;
+
 int psf_is_pipe (SF_PRIVATE *psf) ;
 
 int psf_ftruncate (SF_PRIVATE *psf, sf_count_t len) ;

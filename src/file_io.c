@@ -198,6 +198,17 @@ psf_get_filelen (SF_PRIVATE *psf)
 	return filelen ;
 } /* psf_get_filelen */
 
+void
+psf_fsync (SF_PRIVATE *psf)
+{
+#ifdef HAVE_FSYNC
+	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+		fsync (psf->filedes) ;
+#else
+	psf = NULL ;
+#endif
+} /* psf_fsync */
+
 #if ((defined (WIN32) || defined (_WIN32)) == 0)
 
 /*------------------------------------------------------------------------------
@@ -891,6 +902,14 @@ psf_get_filelen_fd (int fd)
 
 	return filelen ;
 } /* psf_get_filelen_fd */
+
+/* Win32 */ void
+psf_fsync (SF_PRIVATE *psf)
+{
+	/* Don't yet know what to do on win32. */
+	psf = NULL ;
+} /* psf_fsync */
+
 
 /* Win32 */ int
 psf_ftruncate (SF_PRIVATE *psf, sf_count_t len)

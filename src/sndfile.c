@@ -409,9 +409,6 @@ sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user
 	return (SNDFILE*) psf ;
 } /* sf_open_virtual */
 
-/*------------------------------------------------------------------------------
-*/
-
 int
 sf_close	(SNDFILE *sndfile)
 {	SF_PRIVATE	*psf ;
@@ -420,6 +417,18 @@ sf_close	(SNDFILE *sndfile)
 
 	return psf_close (psf) ;
 } /* sf_close */
+
+void
+sf_write_sync	(SNDFILE *sndfile)
+{	SF_PRIVATE	*psf ;
+
+	if ((psf = (SF_PRIVATE *) sndfile) == NULL)
+		return ;
+
+	psf_fsync (psf) ;
+
+	return ;
+} /* sf_write_sync */
 
 /*==============================================================================
 */
