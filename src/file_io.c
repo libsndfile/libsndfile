@@ -905,9 +905,7 @@ psf_get_filelen_fd (int fd)
 
 /* Win32 */ void
 psf_fsync (SF_PRIVATE *psf)
-{
-	/* Don't yet know what to do on win32. */
-	psf = NULL ;
+{	FlushFileBuffers ((HANDLE) psf->filedes) ;
 } /* psf_fsync */
 
 
