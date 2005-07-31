@@ -15,7 +15,7 @@
 
 <H1><B>libsndfile : Frequently Asked Questions.</B></H1>
 <P>
-<A HREF="#Q001">Q1 : On Linux, sf_open returns weird info about files. Why?</A><BR>
+<A HREF="#Q001">Q1 : Do you plan on support XYZ codec in libsndfile?</A><BR>
 <A HREF="#Q002">Q2 : In version 0 the SF_INFO struct had a pcmbitwidth field
 		but version 1 does not. Why?</A><BR>
 <A HREF="#Q003">Q3 : Compiling is really slow on MacOSX. Why?</A><BR>
@@ -45,41 +45,24 @@
 
 <!-- ========================================================================= -->
 <A NAME="Q001"></A>
-<H2><BR><B>Q1 : On Linux, sf_open returns weird info about files. Why?</B></H2>
+<H2><BR><B>Q1 : Do you plan on support XYZ codec in libsnfile?</B></H2>
 <P>
-	This simple call to sf_open :
+If source code for XYZ codec is available under a suitable license (LGPL, BSD, 
+MIT etc) then yes, I'd like to add it.
 </P>
-<PRE>
-        file = sf_open (filename, SFM_READ, &amp;sfinfo) ;
-
-        printf ("srate    : %d\n", sfinfo.samplerate) ;
-        printf ("frames   : %d\n", sfinfo.frames) ;
-        printf ("channels : %d\n", sfinfo.channels) ;
-        printf ("format   : %d\n", sfinfo.format) ;
-        printf ("sections : %d\n", sfinfo.sections);
-        printf ("seekable : %d\n", sfinfo.seekable) ;
-</PRE>
 <P>
-returns this weird info:
+If suitable documentation is available on how to decode and enocde the format 
+then maybe, depending on how much work is involved.
 </P>
-<PRE>
-        srate     : 0
-        frames    : 1445760
-        channels  : 44100
-        format    : 2
-        sections  : 65538
-        seekable  : 1
-
-</PRE>
-<H2><B>Answer</B></H2>
 <P>
-This is only a problem on Linux and other 32 bit OSes (possibly 32 bit Solaris)
-which require special compiler command line options to allow access to files
-greater than 2 Gig in size.
-<A HREF="pkgconfig.html">These instructions</A> should show you a way around this
-problem.
+If XYZ is some proprietary codec where no source code or documentation is
+available then no.
 </P>
-
+<P>
+So if you want support for XYZ codec, first find existing source code or
+documentation.
+If you can't find either then the answer is no.
+</P>
 <!-- ========================================================================= -->
 <A NAME="Q002"></A>
 <H2><BR><B>Q2 : In version 0 the SF_INFO struct had a pcmbitwidth field
@@ -280,7 +263,7 @@ the command would be:
 	memory buffers?</B></H2>
 
 <P>
-This has added for version 1.0.12.
+This has been added for version 1.0.12.
 </P>
 
 <!-- ========================================================================= -->
@@ -505,7 +488,7 @@ following:
 		before you can run the code.
 	<LI>Try using a memory debugger.
 		<A HREF="http://valgrind.kde.org/">Valgrind</A> on x86 Linux is excellent.
-		<A HREF="http://www.ibm.com/software/awdtools/purify/">Purify</A>also
+		<A HREF="http://www.ibm.com/software/awdtools/purify/">Purify</A> also
 		has a good reputation.
 	<LI>If the code is clean after the above two steps and you still get
 		a crash in libsndfile, then send me a small snippet of code (no
