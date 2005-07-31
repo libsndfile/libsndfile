@@ -1,3 +1,8 @@
+2005-07-31 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/api.html
+    Document the new function sf_write_sync().
+
 2005-07-28 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in src/sndfile.c

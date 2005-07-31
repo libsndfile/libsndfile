@@ -72,6 +72,7 @@ The functions of linbsndfile are defined as follows:
       int         <A HREF="#error">sf_error_str</A>     (SNDFILE *sndfile, char* str, size_t len) ;
 
       int         <A HREF="#close">sf_close</A>         (SNDFILE *sndfile) ;
+      void        <A HREF="#write_sync">sf_write_sync</A>    (SNDFILE *sndfile) ;
 
       sf_count_t  <A HREF="#read">sf_read_short</A>    (SNDFILE *sndfile, short *ptr, sf_count_t items) ;
       sf_count_t  <A HREF="#read">sf_read_int</A>      (SNDFILE *sndfile, int *ptr, sf_count_t items) ;
@@ -433,7 +434,22 @@ from the library at some later date.
 The close function closes the file, deallocates its internal buffers and returns
 0 on success or an error value otherwise.
 </P>
-<BR><BR>
+<BR>
+
+<A NAME="write_sync"></A>
+<H2><BR><B>Write Sync Function</B></H2>
+
+<PRE>
+      void  sf_write_sync  (SNDFILE *sndfile) ;
+</PRE>
+<!-- pepper -->
+<P>
+If the file is opened SFM_WRITE or SFM_RDWR, call the operating system's function
+to force the writing of all file cache buffers to disk. If the file is opened 
+SFM_READ no action is taken.
+</P>
+<BR>
+
 
 <A NAME="read"></A>
 <H2><BR><B>File Read Functions (Items)</B></H2>
