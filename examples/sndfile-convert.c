@@ -64,6 +64,7 @@ static OUTPUT_FORMAT_MAP format_map [] =
 	{	"mat",		0, 	SF_FORMAT_MAT4 	},
 	{	"pvf",		0, 	SF_FORMAT_PVF 	},
 	{	"sds",		0, 	SF_FORMAT_SDS 	},
+	{	"vox",		0, 	SF_FORMAT_RAW 	},
 	{	"xi",		0, 	SF_FORMAT_XI 	}
 } ; /* format_map */
 
@@ -84,11 +85,10 @@ guess_output_file_type (char *str, int format)
 		buffer [k] = tolower ((buffer [k])) ;
 
 	for (k = 0 ; k < (int) (sizeof (format_map) / sizeof (format_map [0])) ; k++)
-	{	if (format_map [k].len > 0 &&
-			strncmp (buffer, format_map [k].ext, format_map [k].len) == 0)
-				return format_map [k].format | format ;
+	{	if (format_map [k].len > 0 && strncmp (buffer, format_map [k].ext, format_map [k].len) == 0)
+			return format_map [k].format | format ;
 		else if (strcmp (buffer, format_map [k].ext) == 0)
-				return format_map [k].format | format ;
+			return format_map [k].format | format ;
 		} ;
 
 	return	0 ;
@@ -249,7 +249,12 @@ main (int argc, char * argv [])
 
 	outfilemajor = sfinfo.format & (SF_FORMAT_TYPEMASK | SF_FORMAT_ENDMASK) ;
 
-	if (outfileminor)
+	if (outfileminor == 0 && outfilemajor == SF_FORMAT_RAW)
+	{	outfileminor = SF_FORMAT_VOX_ADPCM ;
+		sfinfo.format = outfilemajor | outfileminor ;
+		puts ("SF_FORMAT_VOX_ADPCM") ;
+		}
+	else if (outfileminor != 0)
 		sfinfo.format = outfilemajor | outfileminor ;
 	else
 		sfinfo.format = outfilemajor | (sfinfo.format & SF_FORMAT_SUBMASK) ;

@@ -1,7 +1,18 @@
+2005-08-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/create_symbols_file.py
+    Make sure sf_write_fsync is an exported symbol.
+
+    * examples/sndfile-convert.c
+    Add support for writing VOX adpcm files.
+
 2005-07-31 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/api.html
     Document the new function sf_write_sync().
+
+    * doc/FAQ.html
+    Do you plan to support XYZ codec.
 
 2005-07-28 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
