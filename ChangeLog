@@ -1,3 +1,8 @@
+2005-08-15 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/Makefile.am
+    Apply a patch from Mo DeJong to allow building outside of the source dir.
+
 2005-08-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/create_symbols_file.py
