@@ -6,6 +6,10 @@
     * src/file_io.c
     Fix psf_fsync() for win32.
 
+    * src/wav.c src/wav_w64.(c|h)
+    Move some code from wav.c to wav_w64.c to improve the log output of files of
+    type WAVE_FORMAT_EXTENSIBLE.
+
 2005-08-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/create_symbols_file.py

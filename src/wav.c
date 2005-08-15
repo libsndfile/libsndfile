@@ -1,6 +1,6 @@
 /*
 ** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
-** Copyright (C) 2004 David Viens <davidv@plogue.com>
+** Copyright (C) 2004-2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -129,7 +129,6 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_PVOCEX =
 static int	wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock) ;
 static int	wav_write_header (SF_PRIVATE *psf, int calc_length) ;
 
-static void wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat) ;
 static int	wavex_write_header (SF_PRIVATE *psf, int calc_length) ;
 
 static int	wav_write_tailer (SF_PRIVATE *psf) ;
@@ -140,8 +139,6 @@ static int	wav_close (SF_PRIVATE *psf) ;
 static int 	wav_subchunk_parse	 (SF_PRIVATE *psf, int chunk) ;
 static int	wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
 static int	wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
-
-static int wavex_write_guid_equal (const EXT_SUBFORMAT * first, const EXT_SUBFORMAT * second) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -559,26 +556,11 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		} ;
 
 	switch (format)
-	{
-
-		case WAVE_FORMAT_EXTENSIBLE :
-			/* compare GUIDs for known ones */
-			if (wavex_write_guid_equal (&wav_fmt.ext.esf, &MSGUID_SUBTYPE_PCM))
-				psf->sf.format = SF_FORMAT_WAVEX | u_bitwidth_to_subformat (psf->bytewidth * 8) ;
-			else
-			if (wavex_write_guid_equal (&wav_fmt.ext.esf, &MSGUID_SUBTYPE_MS_ADPCM))
-			{	psf->sf.format = (SF_FORMAT_WAVEX | SF_FORMAT_MS_ADPCM) ;
-				*blockalign = wav_fmt.msadpcm.blockalign ;
+	{	case WAVE_FORMAT_EXTENSIBLE :
+			if (psf->sf.format == (SF_FORMAT_WAVEX | SF_FORMAT_MS_ADPCM))
+			{	*blockalign = wav_fmt.msadpcm.blockalign ;
 				*framesperblock = wav_fmt.msadpcm.samplesperblock ;
-				}
-			else if (wavex_write_guid_equal (&wav_fmt.ext.esf, &MSGUID_SUBTYPE_IEEE_FLOAT))
-				psf->sf.format = SF_FORMAT_WAVEX | ((psf->bytewidth == 8) ? SF_FORMAT_DOUBLE : SF_FORMAT_FLOAT) ;
-			else if (wavex_write_guid_equal (&wav_fmt.ext.esf, &MSGUID_SUBTYPE_ALAW))
-				psf->sf.format = (SF_FORMAT_WAVEX | SF_FORMAT_ALAW) ;
-			else if (wavex_write_guid_equal (&wav_fmt.ext.esf, &MSGUID_SUBTYPE_MULAW))
-				psf->sf.format = (SF_FORMAT_WAVEX | SF_FORMAT_ULAW) ;
-			else
-				return SFE_UNIMPLEMENTED ;
+				} ;
 			break ;
 
 		case WAVE_FORMAT_PCM :
@@ -815,21 +797,6 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 	return psf->error ;
 } /* wav_write_header */
 
-
-
-static int
-wavex_write_guid_equal (const EXT_SUBFORMAT * first, const EXT_SUBFORMAT * second)
-{	return !memcmp (first, second, sizeof (EXT_SUBFORMAT)) ;
-} /* wavex_write_guid_equal */
-
-
-static void
-wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat)
-{
-	psf_binheader_writef (psf, "e422b", subformat->esf_field1,
-					subformat->esf_field2, subformat->esf_field3,
-					subformat->esf_field4, 8) ;
-} /* wavex_write_guid */
 
 
 static int
