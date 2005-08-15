@@ -126,7 +126,7 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 		} ;
 
 	/*
-	** Now try for a resource fork stored in a separate file in the 
+	** Now try for a resource fork stored in a separate file in the
 	** .AppleDouble/ directory.
 	*/
 	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s.AppleDouble/%s", psf->directory, psf->filename) ;
@@ -197,17 +197,6 @@ psf_get_filelen (SF_PRIVATE *psf)
 
 	return filelen ;
 } /* psf_get_filelen */
-
-void
-psf_fsync (SF_PRIVATE *psf)
-{
-#ifdef HAVE_FSYNC
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
-		fsync (psf->filedes) ;
-#else
-	psf = NULL ;
-#endif
-} /* psf_fsync */
 
 #if ((defined (WIN32) || defined (_WIN32)) == 0)
 
@@ -551,6 +540,17 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 
 	return ;
 } /* psf_log_syserr */
+
+void
+psf_fsync (SF_PRIVATE *psf)
+{
+#ifdef HAVE_FSYNC
+    if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+        fsync (psf->filedes) ;
+#else
+    psf = NULL ;
+#endif
+} /* psf_fsync */
 
 #elif	OS_IS_WIN32
 
