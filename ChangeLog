@@ -1,3 +1,8 @@
+2005-08-16 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Use $host_os instead of $target_os (thanks to Mo De Jong).
+
 2005-08-15 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/Makefile.am

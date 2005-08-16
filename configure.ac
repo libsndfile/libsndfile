@@ -129,7 +129,7 @@ unset ac_cv_sizeof_off_t
 
 AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
 
-case "$target_os" in
+case "$host_os" in
 	mingw32* | cygwin*)
 		TYPEOF_SF_COUNT_T="__int64"
 		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
@@ -233,7 +233,7 @@ AC_CHECK_FUNCS(mmap getpagesize)
 AC_CHECK_LIB([m],floor)
 AC_CHECK_FUNCS(floor ceil fmod)
 
-case "$target_os" in
+case "$host_os" in
 	darwin* | rhapsody*)
 		AC_MSG_WARN([[Not using native lrint() and lrintf() because they are missing on 10.1.]])
 		;;
@@ -293,7 +293,7 @@ OS_SPECIFIC_LINKS=""
 os_is_win32=0
 os_is_macosx=0
 
-case "$target_os" in
+case "$host_os" in
 	darwin* | rhapsody*)
 		os_is_macosx=1
 		OS_SPECIFIC_CFLAGS="-fpascal-strings -I/Developer/Headers/FlatCarbon"
@@ -403,7 +403,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		fi
 
 	# OS specific tweaks.
-	case "$target_os" in
+	case "$host_os" in
 		darwin* | rhapsody*)
 			# Disable -Wall, -pedantic and -Wshadow for Apple Darwin/Rhapsody.
 			# System headers on these systems are broken.
