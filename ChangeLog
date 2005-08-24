@@ -1,3 +1,8 @@
+2005-08-25 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/api.html
+    Update Note2 to point to SFC_SET_SCALE_FLOAT_INT_READ.
+
 2005-08-16 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac

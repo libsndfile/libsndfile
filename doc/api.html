@@ -445,7 +445,7 @@ The close function closes the file, deallocates its internal buffers and returns
 <!-- pepper -->
 <P>
 If the file is opened SFM_WRITE or SFM_RDWR, call the operating system's function
-to force the writing of all file cache buffers to disk. If the file is opened 
+to force the writing of all file cache buffers to disk. If the file is opened
 SFM_READ no action is taken.
 </P>
 <BR>
@@ -665,10 +665,16 @@ using the <A HREF="command.html">sf_command</A> interface.
 
 <P>
 Reading a file containg floating point data (allowable with WAV, AIFF, AU and other
-file formats) using integer read methods (sf_read_short() or sf_read_int()) is
-discouraged as the library cannot guarantee sensible results. For instance the data
-in the file may have a maximum absolute value &lt; 1.0 which would mean that all sample
-values read from the file will be zero.
+file formats) using integer read methods (sf_read_short() or sf_read_int()) can
+produce unexpected results.
+For instance the data in the file may have a maximum absolute value &lt; 1.0 which
+would mean that all sample values read from the file will be zero.
+In order to read these files correctly using integer read methods, it is recommended
+that you use the
+     <A HREF="command.html">sf_command</A>
+interface a command of
+     <A HREF="command.html#SFC_SET_SCALE_FLOAT_INT_READ">SFC_SET_SCALE_FLOAT_INT_READ
+and a parameter of SF_TRUE to force correct scaling.
 </P>
 <!-- pepper -->
 <HR>
