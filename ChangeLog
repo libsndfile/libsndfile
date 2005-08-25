@@ -3,6 +3,10 @@
     * examples/sndfile-convert.c
     Allow files to be converted to SD2 format.
 
+    * src/sd2.c
+    Fix a bug in reading and writing of SD2 files on little endian CPUs.
+    Thanks to Matthew Willis for finding this.
+
 2005-08-25 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/api.html

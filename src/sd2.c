@@ -207,6 +207,23 @@ write_int (unsigned char * data, int offset, int value)
 	data [offset + 3] = value ;
 } /* write_int */
 
+static inline void
+write_marker (unsigned char * data, int offset, int value)
+{
+	if (CPU_IS_BIG_ENDIAN)
+	{	data [offset] = value >> 24 ;
+		data [offset + 1] = value >> 16 ;
+		data [offset + 2] = value >> 8 ;
+		data [offset + 3] = value ;
+		}
+	else
+	{	data [offset] = value ;
+		data [offset + 1] = value >> 8 ;
+		data [offset + 2] = value >> 16 ;
+		data [offset + 3] = value >> 24 ;
+		} ;
+} /* write_int */
+
 static void
 write_str (unsigned char * data, int offset, char * buffer, int buffer_len)
 {	memcpy (data + offset, buffer, buffer_len) ;
@@ -269,8 +286,8 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 	write_str (rsrc.rsrc_data, 0x31, psf->filename, strlen (psf->filename)) ;
 
 	write_short (rsrc.rsrc_data, 0x50, 0) ;
-	write_int (rsrc.rsrc_data, 0x52, Sd2f_MARKER) ;
-	write_int (rsrc.rsrc_data, 0x56, lsf1_MARKER) ;
+	write_marker (rsrc.rsrc_data, 0x52, Sd2f_MARKER) ;
+	write_marker (rsrc.rsrc_data, 0x56, lsf1_MARKER) ;
 
 	/* Very start of resource map. */
 	write_int (rsrc.rsrc_data, rsrc.map_offset + 0, rsrc.data_offset) ;
@@ -304,12 +321,12 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 
 	/* Write 'STR ' resource type. */
 	rsrc.str_count = 3 ;
-	write_int (rsrc.rsrc_data, rsrc.type_offset, STR_MARKER) ;
+	write_marker (rsrc.rsrc_data, rsrc.type_offset, STR_MARKER) ;
 	write_short (rsrc.rsrc_data, rsrc.type_offset + 4, rsrc.str_count - 1) ;
 	write_short (rsrc.rsrc_data, rsrc.type_offset + 6, 0x12) ;
 
 	/* Write 'sdML' resource type. */
-	write_int (rsrc.rsrc_data, rsrc.type_offset + 8, sdML_MARKER) ;
+	write_marker (rsrc.rsrc_data, rsrc.type_offset + 8, sdML_MARKER) ;
 	write_short (rsrc.rsrc_data, rsrc.type_offset + 12, 0) ;
 	write_short (rsrc.rsrc_data, rsrc.type_offset + 14, 0x36) ;
 
@@ -362,6 +379,17 @@ read_short (const unsigned char * data, int offset)
 static inline int
 read_int (const unsigned char * data, int offset)
 {	return (data [offset] << 24) + (data [offset + 1] << 16) + (data [offset + 2] << 8) + data [offset + 3] ;
+} /* read_char */
+
+static inline int
+read_marker (const unsigned char * data, int offset)
+{
+	if (CPU_IS_BIG_ENDIAN)
+		return (data [offset] << 24) + (data [offset + 1] << 16) + (data [offset + 2] << 8) + data [offset + 3] ;
+	else if (CPU_IS_LITTLE_ENDIAN)
+		return data [offset] + (data [offset + 1] << 8) + (data [offset + 2] << 16) + (data [offset + 3] << 24) ;
+	else
+		return 0x666 ;
 } /* read_char */
 
 static void
@@ -463,7 +491,7 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 
 	rsrc.str_index = -1 ;
 	for (k = 0 ; k < rsrc.type_count ; k ++)
-	{	marker = read_int (rsrc.rsrc_data, rsrc.type_offset + k * 8) ;
+	{	marker = read_marker (rsrc.rsrc_data, rsrc.type_offset + k * 8) ;
 
 		if (marker == STR_MARKER)
 		{	rsrc.str_index = k ;
