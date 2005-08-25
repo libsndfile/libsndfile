@@ -64,6 +64,7 @@ static OUTPUT_FORMAT_MAP format_map [] =
 	{	"mat",		0, 	SF_FORMAT_MAT4 	},
 	{	"pvf",		0, 	SF_FORMAT_PVF 	},
 	{	"sds",		0, 	SF_FORMAT_SDS 	},
+	{	"sd2",		0, 	SF_FORMAT_SD2 	},
 	{	"vox",		0, 	SF_FORMAT_RAW 	},
 	{	"xi",		0, 	SF_FORMAT_XI 	}
 } ; /* format_map */

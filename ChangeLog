@@ -1,3 +1,8 @@
+2005-08-26 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-convert.c
+    Allow files to be converted to SD2 format.
+
 2005-08-25 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/api.html
