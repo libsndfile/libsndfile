@@ -34,8 +34,6 @@ typedef __int64 int64_t ;
 #error "No 64 bit integer type."
 #endif
 
-#undef HAVE_BYTESWAP_H
-
 #if HAVE_BYTESWAP_H
 
 #include <byteswap.h>
