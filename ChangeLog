@@ -1,3 +1,8 @@
+2005-08-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/command.html
+    Improve documentation of SF_GET_FORMAT_SUBTYPE.
+
 2005-08-26 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-convert.c
