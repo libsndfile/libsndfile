@@ -543,7 +543,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "z", fmt_pad) ;
 
 	if (add_fact_chunk)
-		psf_binheader_writef (psf, "eh88", fact_MARKER16, 16 + 8 + 8, psf->sf.frames) ;
+		psf_binheader_writef (psf, "eh88", fact_MARKER16, (sf_count_t) (16 + 8 + 8), psf->sf.frames) ;
 
 	psf_binheader_writef (psf, "eh8", data_MARKER16, psf->datalength + 24) ;
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;

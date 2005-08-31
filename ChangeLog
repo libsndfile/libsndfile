@@ -1,3 +1,9 @@
+2005-08-31 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/w64.c
+    Cast integer literal to sf_count_t in call to psf_binheader_writef() to
+    prevent Valgrind error.
+
 2005-08-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/command.html
