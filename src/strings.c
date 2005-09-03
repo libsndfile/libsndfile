@@ -21,7 +21,7 @@
 #include	<math.h>
 
 #include	"sndfile.h"
-#include	"config.h"
+#include	"sfconfig.h"
 #include	"common.h"
 
 #define STRINGS_DEBUG 0

@@ -31,7 +31,7 @@
 #include	<string.h>
 
 #include	"sndfile.h"
-#include	"config.h"
+#include	"sfconfig.h"
 #include	"sfendian.h"
 #include	"float_cast.h"
 #include	"common.h"

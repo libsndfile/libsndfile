@@ -23,7 +23,7 @@
 #include	<time.h>
 
 #include	"sndfile.h"
-#include	"config.h"
+#include	"sfconfig.h"
 #include	"sfendian.h"
 #include	"common.h"
 #include	"wav_w64.h"

@@ -21,7 +21,7 @@
 #include	<math.h>
 
 #include	"sndfile.h"
-#include	"config.h"
+#include	"sfconfig.h"
 #include	"common.h"
 
 static SF_FORMAT_INFO const simple_formats [] =

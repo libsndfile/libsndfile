@@ -11,7 +11,7 @@ OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 			Symbols.linux Symbols.darwin libsndfile.def create_symbols_file.py
 
-noinst_HEADERS = common.h sfendian.h float_cast.h wav_w64.h au.h sf_unistd.h
+noinst_HEADERS = common.h sfconfig.h sfendian.h float_cast.h wav_w64.h au.h sf_unistd.h
 
 noinst_PROGRAMS = test_endswap test_file_io test_log_printf
 

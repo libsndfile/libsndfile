@@ -24,7 +24,7 @@
 **	Utterly woeful.
 */
 
-#include "config.h"
+#include "sfconfig.h"
 
 #include <stdio.h>
 #include <stdlib.h>

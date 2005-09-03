@@ -40,7 +40,7 @@
 #ifndef HAVE_ALSA_ASOUNDLIB_H
 #define HAVE_ALSA_ASOUNDLIB_H 0
 #endif
-
+ 
 #ifndef HAVE_BYTESWAP_H
 #define HAVE_BYTESWAP_H 0
 #endif
@@ -55,10 +55,6 @@
 
 #ifndef HAVE_FSYNC
 #define HAVE_FSYNC 0
-#endif
-
-#ifndef HAVE_LOCALE_H
-#define HAVE_LOCALE_H 0
 #endif
 
 #ifndef HAVE_LRINT
@@ -79,10 +75,6 @@
 
 #ifndef HAVE_PWRITE
 #define HAVE_PWRITE 0
-#endif
-
-#ifndef HAVE_SETLOCALE
-#define HAVE_SETLOCALE 0
 #endif
 
 #ifndef HAVE_SQLITE3

@@ -4,6 +4,10 @@
     Replace floating point equality comparisons with greater/less comparisons.
     Found by John Pavel using the Intel compiler.
 
+    * src/sfconfig.h
+    New file to clean up issues surrounding autoconf generated preprocessor
+    symbols.
+
     * src/*.(c|h) tests/*.(c|tpl) examples/*.c
     Fixed a bunch of other stuff found by John Pavel using the Intel compiler.
 

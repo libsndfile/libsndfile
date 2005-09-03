@@ -33,7 +33,7 @@
 #include	<ctype.h>
 
 #include	"sndfile.h"
-#include	"config.h"
+#include	"sfconfig.h"
 #include	"sfendian.h"
 #include	"common.h"
 

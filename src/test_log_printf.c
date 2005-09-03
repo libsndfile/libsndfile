@@ -22,7 +22,7 @@
 #include <stdarg.h>
 #include <errno.h>
 
-#include "config.h"
+#include "sfconfig.h"
 
 /* 
 ** This is a bit rough, but it is the nicest way to do it.

@@ -16,7 +16,7 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include "config.h"
+#include "sfconfig.h"
 
 #if HAVE_STDINT_H
 #include <stdint.h>
@@ -60,7 +60,7 @@ typedef __int64 int64_t ;
 #elif (CPU_IS_BIG_ENDIAN == 1)
 	#define	MAKE_MARKER(a,b,c,d)	(((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
 #else
-	#error "Target CPU endian-ness unknown. May need to hand edit src/config.h"
+	#error "Target CPU endian-ness unknown. May need to hand edit src/sfconfig.h"
 #endif
 
 /*
@@ -91,7 +91,7 @@ typedef __int64 int64_t ;
 	#define H2LE_INT(x)				ENDSWAP_INT (x)
 
 #else
-	#error "Target CPU endian-ness unknown. May need to hand edit src/config.h"
+	#error "Target CPU endian-ness unknown. May need to hand edit src/sfconfig.h"
 #endif
 
 #define LET2H_SHORT_PTR(x)		((x) [1] + ((x) [2] << 8))

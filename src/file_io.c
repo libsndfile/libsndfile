@@ -22,12 +22,12 @@
 ** large file support is enabled.
 */
 
-#include "config.h"
+#include "sfconfig.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef HAVE_UNISTD_H
+#if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
@@ -488,7 +488,7 @@ psf_open_fd (const char * pathname, int open_mode)
 	/*
 	** Sanity check. If everything is OK, this test and the printfs will
 	** be optimised out. This is meant to catch the problems caused by
-	** "config.h" being included after <stdio.h>.
+	** "sfconfig.h" being included after <stdio.h>.
 	*/
 	if (sizeof (off_t) != sizeof (sf_count_t))
 	{	puts ("\n\n*** Fatal error : sizeof (off_t) != sizeof (sf_count_t)") ;
@@ -544,7 +544,7 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 void
 psf_fsync (SF_PRIVATE *psf)
 {
-#ifdef HAVE_FSYNC
+#if HAVE_FSYNC
     if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
         fsync (psf->filedes) ;
 #else

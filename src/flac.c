@@ -24,7 +24,7 @@
 #include	<ctype.h>
 
 #include	"sndfile.h"
-#include	"config.h"
+#include	"sfconfig.h"
 #include	"common.h"
 
 

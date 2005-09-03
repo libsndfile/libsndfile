@@ -19,7 +19,7 @@
 #ifndef SNDFILE_COMMON_H
 #define SNDFILE_COMMON_H
 
-#include "config.h"
+#include "sfconfig.h"
 
 #include <stdlib.h>
 
