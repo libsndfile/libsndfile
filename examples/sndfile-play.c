@@ -23,11 +23,11 @@
 #include <string.h>
 #include <errno.h>
 
-#ifdef HAVE_UNISTD_H
+#if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
-#ifdef HAVE_ALSA_ASOUNDLIB_H
+#if HAVE_ALSA_ASOUNDLIB_H
 	#define ALSA_PCM_NEW_HW_PARAMS_API
 	#define ALSA_PCM_NEW_SW_PARAMS_API
 	#include <alsa/asoundlib.h>
@@ -63,7 +63,7 @@
 **	Linux/OSS functions for playing a sound.
 */
 
-#ifdef HAVE_ALSA_ASOUNDLIB_H
+#if HAVE_ALSA_ASOUNDLIB_H
 
 static snd_pcm_t * alsa_open (int channels, unsigned srate, int realtime) ;
 static int alsa_write_float (snd_pcm_t *alsa_dev, float *data, int frames, int channels) ;
@@ -927,7 +927,7 @@ main (int argc, char *argv [])
 		} ;
 
 #if defined (__linux__)
-	#ifdef HAVE_ALSA_ASOUNDLIB_H
+	#if HAVE_ALSA_ASOUNDLIB_H
 		if (access ("/proc/asound/cards", R_OK) == 0)
 			alsa_play (argc, argv) ;
 		else

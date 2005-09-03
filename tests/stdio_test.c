@@ -34,7 +34,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef HAVE_SYS_WAIT_H
+#if HAVE_SYS_WAIT_H
 #include <sys/wait.h>
 #endif
 

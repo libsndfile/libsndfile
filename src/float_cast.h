@@ -45,14 +45,6 @@
 
 #include "config.h"
 
-#ifndef HAVE_LRINT
-#define	HAVE_LRINT 0
-#endif
-
-#ifndef HAVE_LRINTF
-#define	HAVE_LRINTF 0
-#endif
-
 /*
 **	The presence of the required functions are detected during the configure
 **	process and the values HAVE_LRINT and HAVE_LRINTF are set accordingly in

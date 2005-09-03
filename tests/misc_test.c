@@ -29,7 +29,7 @@
 #include <unistd.h>
 #endif
 
-#ifndef HAVE_DECL_S_IRGRP
+#if (HAVE_DECL_S_IRGRP == 0)
 #include <sf_unistd.h>
 #endif
 
