@@ -11,6 +11,9 @@
     * src/*.(c|h) tests/*.(c|tpl) examples/*.c
     Fixed a bunch of other stuff found by John Pavel using the Intel compiler.
 
+    * src/file_io.c
+    Remove Mac OS9 Metrowerks compiler specific hacks.
+
 2005-08-31 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/w64.c

@@ -40,11 +40,6 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-#if (defined (__MWERKS__) && defined (macintosh))
-typedef int ssize_t ;
-#include <Files.h>
-#endif
-
 #include "sndfile.h"
 #include "common.h"
 
@@ -469,11 +464,7 @@ psf_ftruncate (SF_PRIVATE *psf, sf_count_t len)
 	if ((sizeof (off_t) < sizeof (sf_count_t)) && len > 0x7FFFFFFF)
 		return -1 ;
 
-#if (defined (__MWERKS__) && defined (macintosh))
-	retval = FSSetForkSize (psf->filedes, fsFromStart, len) ;
-#else
 	retval = ftruncate (psf->filedes, len) ;
-#endif
 
 	if (retval == -1)
 		psf_log_syserr (psf, errno) ;
