@@ -18,7 +18,7 @@
 
 #include "config.h"
 
-#if HAVE_STDINT_H
+#ifdef HAVE_STDINT_H
 #include <stdint.h>
 #endif
 
@@ -34,7 +34,7 @@ typedef __int64 int64_t ;
 #error "No 64 bit integer type."
 #endif
 
-#if HAVE_BYTESWAP_H
+#ifdef HAVE_BYTESWAP_H
 
 #include <byteswap.h>
 
@@ -42,6 +42,8 @@ typedef __int64 int64_t ;
 #define	ENDSWAP_INT(x)		((int) bswap_32 (x))
 
 #else
+
+#define HAVE_BYTESWAP_H 0
 
 #define	ENDSWAP_SHORT(x)	((((x)>>8)&0xFF)+(((x)&0xFF)<<8))
 #define	ENDSWAP_INT(x)		((((x)>>24)&0xFF)+(((x)>>8)&0xFF00)+(((x)&0xFF00)<<8)+(((x)&0xFF)<<24))

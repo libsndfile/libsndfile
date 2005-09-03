@@ -80,7 +80,7 @@ static int 	svx_read_header	(SF_PRIVATE *psf) ;
 
 int
 svx_open	(SF_PRIVATE *psf)
-{	int error, subformat ;
+{	int error ;
 
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = svx_read_header (psf)))
@@ -94,8 +94,6 @@ svx_open	(SF_PRIVATE *psf)
 
 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 		} ;
-
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	if (psf->is_pipe)

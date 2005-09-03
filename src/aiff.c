@@ -145,12 +145,12 @@ enum
 {	basc_SCALE_MINOR = 1,
 	basc_SCALE_MAJOR,
 	basc_SCALE_NEITHER,
-	basc_SCALE_BOTH,
+	basc_SCALE_BOTH
 } ;
 
 enum
 {	basc_TYPE_LOOP = 0,
-	basc_TYPE_ONE_SHOT,
+	basc_TYPE_ONE_SHOT
 } ;
 
 
@@ -326,7 +326,7 @@ static int
 aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 {	SSND_CHUNK	ssnd_fmt ;
 	unsigned	marker, dword, FORMsize, SSNDsize, bytesread ;
-	int			k, filetype, found_chunk = 0, done = 0, error = 0 ;
+	int			k, found_chunk = 0, done = 0, error = 0 ;
 	char		*cptr, byte ;
 
 	/* Set position to start of file to begin reading header. */
@@ -371,9 +371,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 			case AIFC_MARKER :
 			case AIFF_MARKER :
-					if (! (found_chunk & HAVE_FORM))
+					if ((found_chunk & HAVE_FORM) == 0)
 						return SFE_AIFF_AIFF_NO_FORM ;
-					filetype = marker ;
 					psf_log_printf (psf, " %M\n", marker) ;
 					found_chunk |= HAVE_AIFF ;
 					break ;

@@ -276,19 +276,20 @@ double64_init	(SF_PRIVATE *psf)
 
 double
 double64_be_read (unsigned char *cptr)
-{	int		exponent, negative ;
+{	int		exponent, negative, upper, lower ;
 	double	dvalue ;
 
 	negative = (cptr [0] & 0x80) ? 1 : 0 ;
 	exponent = ((cptr [0] & 0x7F) << 4) | ((cptr [1] >> 4) & 0xF) ;
 
 	/* Might not have a 64 bit long, so load the mantissa into a double. */
-	dvalue = (((cptr [1] & 0xF) << 24) | (cptr [2] << 16) | (cptr [3] << 8) | cptr [4]) ;
-	dvalue += ((cptr [5] << 16) | (cptr [6] << 8) | cptr [7]) / ((double) 0x1000000) ;
+	upper = (((cptr [1] & 0xF) << 24) | (cptr [2] << 16) | (cptr [3] << 8) | cptr [4]) ;
+	lower = (cptr [5] << 16) | (cptr [6] << 8) | cptr [7] ;
 
-	if (exponent == 0 && dvalue == 0.0)
+	if (exponent == 0 && upper == 0 && lower == 0)
 		return 0.0 ;
 
+	dvalue = upper + lower / ((double) 0x1000000) ;
 	dvalue += 0x10000000 ;
 
 	exponent = exponent - 0x3FF ;
@@ -308,19 +309,20 @@ double64_be_read (unsigned char *cptr)
 
 double
 double64_le_read (unsigned char *cptr)
-{	int		exponent, negative ;
+{	int		exponent, negative, upper, lower ;
 	double	dvalue ;
 
 	negative = (cptr [7] & 0x80) ? 1 : 0 ;
 	exponent = ((cptr [7] & 0x7F) << 4) | ((cptr [6] >> 4) & 0xF) ;
 
 	/* Might not have a 64 bit long, so load the mantissa into a double. */
-	dvalue = (((cptr [6] & 0xF) << 24) | (cptr [5] << 16) | (cptr [4] << 8) | cptr [3]) ;
-	dvalue += ((cptr [2] << 16) | (cptr [1] << 8) | cptr [0]) / ((double) 0x1000000) ;
+	upper = ((cptr [6] & 0xF) << 24) | (cptr [5] << 16) | (cptr [4] << 8) | cptr [3] ;
+	lower = (cptr [2] << 16) | (cptr [1] << 8) | cptr [0] ;
 
-	if (exponent == 0 && dvalue == 0.0)
+	if (exponent == 0 && upper == 0 && lower == 0)
 		return 0.0 ;
 
+	dvalue = upper + lower / ((double) 0x1000000) ;
 	dvalue += 0x10000000 ;
 
 	exponent = exponent - 0x3FF ;
@@ -344,7 +346,7 @@ double64_be_write (double in, unsigned char *out)
 
 	memset (out, 0, sizeof (double)) ;
 
-	if (in == 0.0)
+	if (fabs (in) < 1e-30)
 		return ;
 
 	if (in < 0.0)
@@ -384,7 +386,7 @@ double64_le_write (double in, unsigned char *out)
 
 	memset (out, 0, sizeof (double)) ;
 
-	if (in == 0.0)
+	if (fabs (in) < 1e-30)
 		return ;
 
 	if (in < 0.0)

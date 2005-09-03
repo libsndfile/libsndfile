@@ -78,8 +78,7 @@ static int		avr_write_header (SF_PRIVATE *psf, int calc_length) ;
 
 int
 avr_open	(SF_PRIVATE *psf)
-{	int		subformat ;
-	int		error = 0 ;
+{	int		error = 0 ;
 
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = avr_read_header (psf)))
@@ -88,8 +87,6 @@ avr_open	(SF_PRIVATE *psf)
 
 	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_AVR)
 		return	SFE_BAD_OPEN_FORMAT ;
-
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	psf->endian = psf->sf.format & SF_FORMAT_ENDMASK ;
@@ -150,7 +147,6 @@ avr_read_header (SF_PRIVATE *psf)
 		default :
 			psf_log_printf (psf, "Error : bad rez/sign combination.\n") ;
 			return SFE_AVR_X ;
-			break ;
 		} ;
 
 	psf_binheader_readf (psf, "E4444", &hdr.srate, &hdr.frames, &hdr.lbeg, &hdr.lend) ;
@@ -190,7 +186,7 @@ avr_read_header (SF_PRIVATE *psf)
 static int
 avr_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t	current ;
-	int			sign, datalength ;
+	int			sign ;
 
 	if (psf->pipeoffset > 0)
 		return 0 ;
@@ -217,8 +213,6 @@ avr_write_header (SF_PRIVATE *psf, int calc_length)
 	*/
 	if (psf->is_pipe == SF_FALSE)
 		psf_fseek (psf, 0, SEEK_SET) ;
-
-	datalength = (int) (psf->datalength & 0x7FFFFFFF) ;
 
 	psf_binheader_writef (psf, "Emz22", TWOBIT_MARKER, (size_t) 8,
 			psf->sf.channels == 2 ? 0xFFFF : 0, psf->bytewidth * 8) ;

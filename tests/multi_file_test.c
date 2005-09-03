@@ -25,7 +25,7 @@
 #include <unistd.h>
 #endif
 
-#if (HAVE_DECL_S_IRGRP == 0)
+#ifndef HAVE_DECL_S_IRGRP
 #include <sf_unistd.h>
 #endif
 

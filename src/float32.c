@@ -306,7 +306,7 @@ float32_le_write (float in, unsigned char *out)
 
 	memset (out, 0, sizeof (int)) ;
 
-	if (in == 0.0)
+	if (fabs (in) < 1e-30)
 		return ;
 
 	if (in < 0.0)
@@ -341,7 +341,7 @@ float32_be_write (float in, unsigned char *out)
 
 	memset (out, 0, sizeof (int)) ;
 
-	if (in == 0.0)
+	if (fabs (in) < 1e-30)
 		return ;
 
 	if (in < 0.0)

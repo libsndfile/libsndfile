@@ -29,7 +29,7 @@
 
 #include "regtest.h"
 
-#if HAVE_SQLITE3
+#ifdef HAVE_SQLITE3
 
 #include <sqlite3.h>
 

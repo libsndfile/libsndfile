@@ -102,7 +102,7 @@ static int sds_write (SF_PRIVATE *psf, SDS_PRIVATE *psds, const int *iptr, int w
 int
 sds_open	(SF_PRIVATE *psf)
 {	SDS_PRIVATE	*psds ;
-	int			subformat, error = 0 ;
+	int			error = 0 ;
 
 	/* Hmmmm, need this here to pass update_header_test. */
 	psf->sf.frames = 0 ;
@@ -118,8 +118,6 @@ sds_open	(SF_PRIVATE *psf)
 
 	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_SDS)
 		return	SFE_BAD_OPEN_FORMAT ;
-
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	if (sds_write_header (psf, SF_FALSE))

@@ -51,14 +51,12 @@ static	int nist_read_header	(SF_PRIVATE *psf) ;
 
 int
 nist_open	(SF_PRIVATE *psf)
-{	int subformat, error ;
+{	int error ;
 
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = nist_read_header (psf)))
 			return error ;
 		} ;
-
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	if (psf->is_pipe)
