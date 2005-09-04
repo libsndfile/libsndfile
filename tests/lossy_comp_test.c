@@ -559,7 +559,8 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 			} ;
 
 	if (! sfinfo.seekable)
-	{	unlink (filename) ;
+	{	sf_close (file) ;
+		unlink (filename) ;
 		printf ("ok\n") ;
 		return ;
 		} ;

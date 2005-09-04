@@ -122,8 +122,10 @@ rw_test (const char *filename)
 {	SNDFILE *file ;
 	SF_INFO	sfinfo_rd, sfinfo_rw ;
 
-	/* Open the file in read only mode and fill in the SF_INFO struct. */
 	memset (&sfinfo_rd, 0, sizeof (sfinfo_rd)) ;
+	memset (&sfinfo_rw, 0, sizeof (sfinfo_rw)) ;
+
+	/* Open the file in read only mode and fill in the SF_INFO struct. */
 	if ((file = sf_open (filename, SFM_READ, &sfinfo_rd)) == NULL)
 	{	printf ("\n\nLine %d : sf_open SFM_READ failed : %s\n\n", __LINE__, sf_strerror (NULL)) ;
 		exit (1) ;

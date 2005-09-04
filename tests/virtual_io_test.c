@@ -179,7 +179,7 @@ vio_test (const char *fname, int format)
 
 	SF_VIRTUAL_IO vio ;
 	SNDFILE * file ;
-	SF_INFO sfinfo ;
+	SF_INFO sfinfo = { 0, } ;
 
 	print_test_name ("virtual i/o test", fname) ;
 

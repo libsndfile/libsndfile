@@ -1,3 +1,11 @@
+2005-09-04 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/lossy_comp_test.c
+    Make sure to close SNDFILE when exiting test when file format is not seekable.
+
+    * tests/(aiff_rw_test|virtual_io_test).c
+    Do a few valgrind fix ups.
+
 2005-09-03 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/float32.c src/double64.c
