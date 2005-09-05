@@ -94,7 +94,8 @@ LINK32_OBJS= \
 	".\src\pvf.obj" \
 	".\src\xi.obj" \
 	".\src\htk.obj" \
-	".\src\flac.obj"
+	".\src\flac.obj" \
+	".\src\caf.obj"
 
 libsndfile.dll : $(LINK32_OBJS) ".\src\libsndfile.def"
     $(LINK32) $(DLL_LINK_FLAGS) /def:".\src\libsndfile.def" $(LINK32_OBJS)
@@ -183,6 +184,13 @@ CHECK: $(TEST_PROGS)
     -@echo ----------------------------------------------------------------------
     -@".\tests\sfversion.exe"
     -@echo " passed tests on AU files."
+    -@echo ----------------------------------------------------------------------
+	".\tests\write_read_test" caf
+	".\tests\lossy_comp_test" caf_ulaw
+	".\tests\lossy_comp_test" caf_alaw
+	".\tests\misc_test" caf
+    -@echo ----------------------------------------------------------------------
+    -@echo   `./sfversion` passed tests on CAF files."
     -@echo ----------------------------------------------------------------------
     ".\tests\write_read_test" raw
     ".\tests\lossy_comp_test" raw_ulaw
@@ -458,6 +466,9 @@ CHECK: $(TEST_PROGS)
 
 ".\src\flac.obj" : ".\src\flac.c"
     $(CPP) $(CFLAGS) /Fo".\src\flac.obj" /c ".\src\flac.c"
+
+".\src\caf.obj" : ".\src\caf.c"
+    $(CPP) $(CFLAGS) /Fo".\src\caf.obj" /c ".\src\caf.c"
 
 #====================================================================
 # Object files for test programs.

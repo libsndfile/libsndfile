@@ -72,6 +72,7 @@ enum
 	SF_FORMAT_WAVEX			= 0x130000,		/* MS WAVE with WAVEFORMATEX */
 	SF_FORMAT_SD2			= 0x160000,		/* Sound Designer 2 */
 	SF_FORMAT_FLAC			= 0x170000,		/* FLAC lossless file format */
+	SF_FORMAT_CAF			= 0x180000,		/* Core Audio File format */
 
 	/* Subtypes from here on. */
 
@@ -230,7 +231,9 @@ enum
 enum
 {	SF_ERR_NO_ERROR				= 0,
 	SF_ERR_UNRECOGNISED_FORMAT	= 1,
-	SF_ERR_SYSTEM				= 2
+	SF_ERR_SYSTEM				= 2,
+	SF_ERR_MALFORMED_FILE		= 3,
+	SF_ERR_UNSUPPORTED_ENCODING	= 4
 } ;
 
 /* A SNDFILE* pointer can be passed around much like stdio.h's FILE* pointer. */
@@ -348,6 +351,22 @@ typedef struct
 	int future [6] ;
 } SF_LOOP_INFO ;
 
+typedef sf_count_t		(*sf_vio_get_filelen)	(void *user_data) ;
+typedef sf_count_t		(*sf_vio_seek)		(sf_count_t offset, int whence, void *user_data) ;
+typedef sf_count_t		(*sf_vio_read)		(void *ptr, sf_count_t count, void *user_data) ;
+typedef sf_count_t		(*sf_vio_write)		(const void *ptr, sf_count_t count, void *user_data) ;
+typedef sf_count_t		(*sf_vio_tell)		(void *user_data) ;
+
+struct SF_VIRTUAL_IO
+{	sf_vio_get_filelen	get_filelen ;
+	sf_vio_seek			seek ;
+	sf_vio_read			read ;
+	sf_vio_write		write ;
+	sf_vio_tell			tell ;
+} ;
+
+typedef	struct SF_VIRTUAL_IO SF_VIRTUAL_IO ;
+
 /* Open the specified file for read, write or both. On error, this will
 ** return a NULL pointer. To find the error number, pass a NULL SNDFILE
 ** to sf_perror () or sf_error_str ().
@@ -369,6 +388,8 @@ SNDFILE* 	sf_open		(const char *path, int mode, SF_INFO *sfinfo) ;
 */
 
 SNDFILE* 	sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc) ;
+
+SNDFILE* 	sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data) ;
 
 /* sf_error () returns a error number which can be translated to a text
 ** string using sf_error_number().
@@ -483,6 +504,13 @@ sf_count_t	sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t item
 */
 
 int		sf_close		(SNDFILE *sndfile) ;
+
+/* If the file is opened SFM_WRITE or SFM_RDWR, call fsync() on the file
+** to force the writing of data to disk. If the file is opened SFM_READ
+** no action is taken.
+*/
+
+void	sf_write_sync	(SNDFILE *sndfile) ;
 
 #ifdef __cplusplus
 }		/* extern "C" */

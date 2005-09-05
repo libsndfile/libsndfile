@@ -6,6 +6,9 @@
     * configure.ac
     Simplify and correct configuring for Cygwin.
 
+    * Win32/config.h Win32/sndfile.h Win32/Makefile.msvc
+    Update build for MSVC.
+
 2005-09-04 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/lossy_comp_test.c
