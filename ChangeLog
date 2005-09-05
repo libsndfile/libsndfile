@@ -1,3 +1,11 @@
+2005-09-05 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/(lossy_comp_test|virtual_io_test).c
+    More Valgrind fixups.
+
+    * configure.ac
+    Simplify and correct configuring for Cygwin.
+
 2005-09-04 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/lossy_comp_test.c

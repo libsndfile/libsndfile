@@ -3,14 +3,9 @@
 dnl Require autoconf version
 AC_PREREQ(2.53)
 
-AC_INIT(libsndfile,1.0.12pre11,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.12pre12,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
-
-if test "x$target_os" = "xcygwin" ; then
-	echo "adding -mno-cygwin to CFLAGS"
-	CFLAGS="$CFLAGS -mno-cygwin"
-	fi
 
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
 AM_CONFIG_HEADER(src/config.h)
@@ -130,7 +125,7 @@ unset ac_cv_sizeof_off_t
 AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
 
 case "$host_os" in
-	mingw32* | cygwin*)
+	mingw*)
 		TYPEOF_SF_COUNT_T="__int64"
 		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 		SIZEOF_SF_COUNT_T=8
@@ -234,8 +229,8 @@ AC_CHECK_LIB([m],floor)
 AC_CHECK_FUNCS(floor ceil fmod)
 
 case "$host_os" in
-	darwin* | rhapsody*)
-		AC_MSG_WARN([[Not using native lrint() and lrintf() because they are missing on 10.1.]])
+	cygwin*)
+		AC_MSG_WARN([[Not using lrint() and lrintf() because they are broken on Cygwin.]])
 		;;
 	*)
 		AC_C99_FUNC_LRINT
@@ -253,21 +248,18 @@ case "$host_os" in
 #====================================================================================
 # Check for libsqlite3 (only used in regtest).
 
+ac_cv_sqlite3=no
 if test x$ac_arg_enable_sqlite = xyes ; then
-	PKG_CHECK_MODULES(SQLITE3, sqlite3 >= 3.2, ac_cv_sqlite3=1, ac_cv_sqlite3=0)
-else
-	ac_cv_sqlite3=0
+	PKG_CHECK_MODULES(SQLITE3, sqlite3 >= 3.2, ac_cv_sqlite3=yes, ac_cv_sqlite3=no)
 	fi
 
-AC_DEFINE_UNQUOTED([HAVE_SQLITE3],$ac_cv_sqlite3,[Set to 1 if you have libsqlite3.])
-
-if test x$ac_cv_sqlite3 = x1 ; then
-	ac_cv_sqlite3=yes
+if test x$ac_cv_sqlite3 = "xyes" ; then
 	HAVE_SQLITE3=1
 else
-	ac_cv_sqlite3=no
 	HAVE_SQLITE3=0
 	fi
+
+AC_DEFINE_UNQUOTED([HAVE_SQLITE3],$HAVE_SQLITE3,[Set to 1 if you have libsqlite3.])
 
 #====================================================================================
 # Determine if the processor can do clipping on float to int conversions.
@@ -299,7 +291,7 @@ case "$host_os" in
 		OS_SPECIFIC_CFLAGS="-fpascal-strings -I/Developer/Headers/FlatCarbon"
 		OS_SPECIFIC_LINKS="-framework CoreAudio"
 		;;
-	mingw32* | cygwin*)
+	mingw* | cygwin*)
 		os_is_win32=1
 		OS_SPECIFIC_LINKS="-lwinmm"
 		;;
