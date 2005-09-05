@@ -179,7 +179,7 @@ vio_test (const char *fname, int format)
 
 	SF_VIRTUAL_IO vio ;
 	SNDFILE * file ;
-	SF_INFO sfinfo = { 0, } ;
+	SF_INFO sfinfo ;
 
 	print_test_name ("virtual i/o test", fname) ;
 
@@ -194,6 +194,7 @@ vio_test (const char *fname, int format)
 	vio_data.offset = 0 ;
 	vio_data.length = 0 ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.format = format ;
 	sfinfo.channels = 2 ;
 	sfinfo.samplerate = 44100 ;

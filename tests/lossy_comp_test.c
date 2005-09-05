@@ -768,7 +768,8 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 				} ;
 
 	if (! sfinfo.seekable)
-	{	unlink (filename) ;
+	{	sf_close (file) ;
+		unlink (filename) ;
 		printf ("ok\n") ;
 		return ;
 		} ;
@@ -977,7 +978,8 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 				} ;
 
 	if (! sfinfo.seekable)
-	{	unlink (filename) ;
+	{	sf_close (file) ;
+		unlink (filename) ;
 		printf ("ok\n") ;
 		return ;
 		} ;
@@ -1186,7 +1188,8 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 				} ;
 
 	if (! sfinfo.seekable)
-	{	unlink (filename) ;
+	{	sf_close (file) ;
+		unlink (filename) ;
 		printf ("ok\n") ;
 		return ;
 		} ;
