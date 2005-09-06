@@ -1,3 +1,10 @@
+2005-09-06 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/float_cast.h
+    The lrint and lrintf implementations in Cygwin are both buggy and slow.
+    Add replacements which were pulled from the Public Domain MinGW math.h
+    header file.
+
 2005-09-05 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/(lossy_comp_test|virtual_io_test).c

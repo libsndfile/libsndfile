@@ -16,8 +16,10 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* Version 1.3 */
+/* Version 1.4 */
 
+#ifndef FLOAT_CAST_HEADER
+#define FLOAT_CAST_HEADER
 
 /*============================================================================
 **	On Intel Pentium processors (especially PIII and probably P4), converting
@@ -71,10 +73,59 @@
 
 	#include	<math.h>
 
+#elif (defined (__CYGWIN__))
+
+	#include	<math.h>
+
+	#undef		HAVE_LRINT_REPLACEMENT
+	#define		HAVE_LRINT_REPLACEMENT	1
+
+	#undef	lrint
+	#undef	lrintf
+
+	#define	lrint	double2int
+	#define	lrintf	float2int
+
+	/*
+	**	The native CYGWIN lrint and lrintf functions are buggy:
+	**		http://sourceware.org/ml/cygwin/2005-06/msg00153.html
+	**		http://sourceware.org/ml/cygwin/2005-09/msg00047.html
+	**	and slow.
+	**	These functions (pulled from the Public Domain MinGW math.h header)
+	**	replace the native versions.
+	*/
+
+	static inline long double2int (double in)
+	{	long retval ;
+
+		__asm__ __volatile__
+		(	"fistpl %0"
+			: "=m" (retval)
+			: "t" (in)
+			: "st"
+			) ;
+
+		return retval ;
+	} /* double2int */
+
+	static inline long float2int (float in)
+	{	long retval ;
+
+		__asm__ __volatile__
+		(	"fistpl %0"
+			: "=m" (retval)
+			: "t" (in)
+			: "st"
+			) ;
+
+		return retval ;
+	} /* float2int */
+
 #elif (defined (WIN32) || defined (_WIN32))
 
 	#undef		HAVE_LRINT_REPLACEMENT
 	#define		HAVE_LRINT_REPLACEMENT	1
+
 	#include	<math.h>
 
 	/*
@@ -156,7 +207,7 @@
 	#define lrint	double2int
 	#define lrintf	float2int
 
-	inline static long int
+	inline static long
 	float2int (register float in)
 	{	int res [2] ;
 
@@ -171,7 +222,7 @@
 		return res [1] ;
 	} /* lrintf */
 
-	inline static long int
+	inline static long
 	double2int (register double in)
 	{	int res [2] ;
 
@@ -200,10 +251,11 @@
 #endif
 
 
+#endif /* FLOAT_CAST_HEADER */
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 42db1693-ff61-4051-bac1-e4d24c4e30b7
