@@ -250,7 +250,10 @@
 #define STDC_HEADERS 1
 
 /* Set to long if unknown. */
-#define TYPEOF_SF_COUNT_T __int64_t
+#define TYPEOF_SF_COUNT_T loff_t
+
+/* Set to 1 to use the native windows API */
+#define USE_WINDOWS_API 1
 
 /* Version number of package */
 #define VERSION "1.0.12pre12"

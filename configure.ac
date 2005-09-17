@@ -230,7 +230,7 @@ AC_CHECK_FUNCS(floor ceil fmod)
 
 case "$host_os" in
 	cygwin*)
-		AC_MSG_WARN([[Not using lrint() and lrintf() because they are broken on Cygwin.]])
+		AC_MSG_WARN([[Not using built-in lrint() and lrintf() because they are broken on Cygwin.]])
 		;;
 	*)
 		AC_C99_FUNC_LRINT
@@ -284,6 +284,7 @@ OS_SPECIFIC_CFLAGS=""
 OS_SPECIFIC_LINKS=""
 os_is_win32=0
 os_is_macosx=0
+use_windows_api=0
 
 case "$host_os" in
 	darwin* | rhapsody*)
@@ -291,7 +292,12 @@ case "$host_os" in
 		OS_SPECIFIC_CFLAGS="-fpascal-strings -I/Developer/Headers/FlatCarbon"
 		OS_SPECIFIC_LINKS="-framework CoreAudio"
 		;;
-	mingw* | cygwin*)
+	mingw*)
+		os_is_win32=1
+		use_windows_api=1
+		OS_SPECIFIC_LINKS="-lwinmm"
+		;;
+	cygwin*)
 		os_is_win32=1
 		OS_SPECIFIC_LINKS="-lwinmm"
 		;;
@@ -299,6 +305,7 @@ case "$host_os" in
 
 AC_DEFINE_UNQUOTED(OS_IS_WIN32, ${os_is_win32}, [Set to 1 if compiling for Win32])
 AC_DEFINE_UNQUOTED(OS_IS_MACOSX, ${os_is_macosx}, [Set to 1 if compiling for MacOSX])
+AC_DEFINE_UNQUOTED(USE_WINDOWS_API, ${use_windows_api}, [Set to 1 to use the native windows API])
 
 #====================================================================================
 # Check for ALSA.
