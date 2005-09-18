@@ -262,7 +262,7 @@ static char	sf_syserr [SF_SYSERR_LEN] = { 0 } ;
 				} ;									\
 			(b) = (SF_PRIVATE*) (a) ;				\
 			if ((b)->virtual_io == SF_FALSE &&		\
-				psf_filedes_valid (b) == 0)			\
+				psf_file_valid (b) == 0)			\
 			{	(b)->error = SFE_BAD_FILE_PTR ;		\
 				return 0 ;							\
 				} ;									\
@@ -288,7 +288,7 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 		} ;
 
 	memset (psf, 0, sizeof (SF_PRIVATE)) ;
-	psf->rsrcdes = -1 ;
+	psf_init_files (psf) ;
 
 	psf_log_printf (psf, "File : %s\n", path) ;
 
@@ -331,8 +331,9 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 		return	NULL ;
 		} ;
 
+	psf_init_files (psf) ;
+
 	psf_set_file (psf, fd) ;
-	psf->rsrcdes = -1 ;
 	psf->is_pipe = psf_is_pipe (psf) ;
 	psf->fileoffset = psf_ftell (psf) ;
 
@@ -384,8 +385,7 @@ sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user
 		return	NULL ;
 		} ;
 
-	psf->filedes = -1 ;
-	psf->rsrcdes = -1 ;
+	psf_init_files (psf) ;
 
 	psf->virtual_io = SF_TRUE ;
 	psf->vio = *sfvirtual ;
@@ -2283,9 +2283,7 @@ psf_close (SF_PRIVATE *psf)
 		error = psf->close (psf) ;
 
 	psf_fclose (psf) ;
-
-	if (psf->rsrcdes >= 0)
-		psf_close_rsrc (psf) ;
+	psf_close_rsrc (psf) ;
 
 	if (psf->fdata)
 		free (psf->fdata) ;

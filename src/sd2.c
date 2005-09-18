@@ -97,23 +97,22 @@ static int sd2_write_rsrc_fork (SF_PRIVATE *psf, int calc_length) ;
 
 int
 sd2_open (SF_PRIVATE *psf)
-{	int saved_filedes, subformat, error = 0 ;
+{	int subformat, error = 0, valid ;
 
 	/* SD2 is always big endian. */
 	psf->endian = SF_ENDIAN_BIG ;
 
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->rsrclength > 0))
-	{	if (psf->rsrcdes < 0)
-	{	psf_log_printf (psf, "sd2_open : psf->rsrcdes < 0\n") ;
-		return SFE_SD2_BAD_RSRC ;
-		} ;
-
-		saved_filedes = psf->filedes ;
-		psf->filedes = psf->rsrcdes ;
+	{	psf_use_rsrc (psf, SF_TRUE) ;
+		valid = psf_file_valid (psf) ;
+		psf_use_rsrc (psf, SF_FALSE) ;
+		if (! valid)
+		{	psf_log_printf (psf, "sd2_open : psf->rsrcdes < 0\n") ;
+			return SFE_SD2_BAD_RSRC ;
+			} ;
 
 		error = sd2_parse_rsrc_fork (psf) ;
 
-		psf->filedes = saved_filedes ;
 		if (error)
 			goto error_cleanup ;
 		} ;
@@ -130,12 +129,8 @@ sd2_open (SF_PRIVATE *psf)
 	if (psf->mode == SFM_WRITE || (psf->mode == SFM_RDWR && psf->rsrclength == 0))
 	{	psf_open_rsrc (psf, psf->mode) ;
 
-		saved_filedes = psf->filedes ;
-		psf->filedes = psf->rsrcdes ;
-
 		error = sd2_write_rsrc_fork (psf, SF_FALSE) ;
 
-		psf->filedes = saved_filedes ;
 		if (error)
 			goto error_cleanup ;
 
@@ -222,7 +217,7 @@ write_marker (unsigned char * data, int offset, int value)
 		data [offset + 2] = value >> 16 ;
 		data [offset + 3] = value >> 24 ;
 		} ;
-} /* write_int */
+} /* write_marker */
 
 static void
 write_str (unsigned char * data, int offset, char * buffer, int buffer_len)
@@ -240,6 +235,8 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 		} ;
 
 	int k, str_offset, data_offset, next_str ;
+
+	psf_use_rsrc (psf, SF_TRUE) ;
 
 	memset (&rsrc, 0, sizeof (rsrc)) ;
 
@@ -357,6 +354,9 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 	rsrc.rsrc_len = rsrc.map_offset + rsrc.map_length ;
 
 	psf_fwrite (rsrc.rsrc_data, rsrc.rsrc_len, 1, psf) ;
+
+	psf_use_rsrc (psf, SF_FALSE) ;
+
 	if (psf->error)
 		return psf->error ;
 
@@ -374,12 +374,12 @@ read_char (const unsigned char * data, int offset)
 static inline int
 read_short (const unsigned char * data, int offset)
 {	return (data [offset] << 8) + data [offset + 1] ;
-} /* read_char */
+} /* read_short */
 
 static inline int
 read_int (const unsigned char * data, int offset)
 {	return (data [offset] << 24) + (data [offset + 1] << 16) + (data [offset + 2] << 8) + data [offset + 3] ;
-} /* read_char */
+} /* read_int */
 
 static inline int
 read_marker (const unsigned char * data, int offset)
@@ -390,7 +390,7 @@ read_marker (const unsigned char * data, int offset)
 		return data [offset] + (data [offset + 1] << 8) + (data [offset + 2] << 16) + (data [offset + 3] << 24) ;
 	else
 		return 0x666 ;
-} /* read_char */
+} /* read_marker */
 
 static void
 read_str (const unsigned char * data, int offset, char * buffer, int buffer_len)
@@ -410,6 +410,8 @@ static int
 sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 {	SD2_RSRC rsrc ;
 	int k, marker, error = 0 ;
+
+	psf_use_rsrc (psf, SF_TRUE) ;
 
 	memset (&rsrc, 0, sizeof (rsrc)) ;
 
@@ -505,6 +507,8 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 	error = SFE_SD2_BAD_RSRC ;
 
 parse_rsrc_fork_cleanup :
+
+	psf_use_rsrc (psf, SF_FALSE) ;
 
 	if ((void *) rsrc.rsrc_data < (void *) psf || (void *) rsrc.rsrc_data > (void *) (psf + 1))
 		free (rsrc.rsrc_data) ;

@@ -53,6 +53,7 @@ aclocal.m4: acinclude.m4
 
 clean:
 	rm -f libtool ltmain.sh aclocal.m4 Makefile.in src/config.h.in config.cache config.status
+	find . -name .deps -type d -exec rm -rf {} \;
 
 
 # Do not edit or modify anything in this comment block.

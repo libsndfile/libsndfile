@@ -228,8 +228,16 @@ typedef struct sf_private_tag
 	int				has_text ;
 	int				do_not_close_descriptor ;
 
-	/* File descriptors for the file and (possibly) the resource fork. */
-	int 			filedes, rsrcdes ;
+#if USE_WINDOWS_API
+	/*
+	**	These fields can only be used in src/file_io.c.
+	**	They are basically the same as a windows file HANDLE.
+	*/
+	void 			*hfile, *hrsrc, *hsaved ;
+#else
+	/* These fields can only be used in src/file_io.c. */
+	int 			filedes, rsrcdes, savedes ;
+#endif
 
 	int				error ;
 
@@ -254,7 +262,7 @@ typedef struct sf_private_tag
 	SF_INFO			sf ;
 
 	int				have_written ;	/* Has a single write been done to the file? */
-	PEAK_INFO	*peak_info ;
+	PEAK_INFO		*peak_info ;
 
 	/* Loop Info */
 	SF_LOOP_INFO	*loop_info ;
@@ -580,8 +588,10 @@ int macos_guess_file_type (SF_PRIVATE *psf, const char *filename) ;
 
 int psf_fopen (SF_PRIVATE *psf, const char *pathname, int flags) ;
 int psf_set_stdio (SF_PRIVATE *psf, int mode) ;
-int psf_filedes_valid (SF_PRIVATE *psf) ;
+int psf_file_valid (SF_PRIVATE *psf) ;
 void psf_set_file (SF_PRIVATE *psf, int fd) ;
+void psf_init_files (SF_PRIVATE *psf) ;
+void psf_use_rsrc (SF_PRIVATE *psf, int on_off) ;
 
 sf_count_t psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence) ;
 sf_count_t psf_fread (void *ptr, sf_count_t bytes, sf_count_t count, SF_PRIVATE *psf) ;
@@ -676,7 +686,7 @@ void	*psf_memset (void *s, int c, sf_count_t n) ;
 ** Systems without these functions should use the
 */
 
-#if (defined (WIN32) || defined (_WIN32))
+#if USE_WINDOWS_API
 #define	LSF_SNPRINTF	_snprintf
 #elif		(HAVE_SNPRINTF && ! FORCE_MISSING_SNPRINTF)
 #define	LSF_SNPRINTF	snprintf
@@ -685,7 +695,7 @@ int missing_snprintf (char *str, size_t n, char const *fmt, ...) ;
 #define	LSF_SNPRINTF	missing_snprintf
 #endif
 
-#if (defined (WIN32) || defined (_WIN32))
+#if USE_WINDOWS_API
 #define	LSF_VSNPRINTF	_vsnprintf
 #elif		(HAVE_VSNPRINTF && ! FORCE_MISSING_SNPRINTF)
 #define	LSF_VSNPRINTF	vsnprintf
