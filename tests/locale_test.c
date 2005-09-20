@@ -36,37 +36,30 @@
 typedef struct
 {	const char *locale ;
 	const char *filename ;
-	int	width ;
 } LOCALE_DATA ;
 
-static void locale_test (const char * locname, const char * filename, int width) ;
+static void locale_test (const char * locname, const char * filename) ;
 
 int
 main (void)
 {	LOCALE_DATA ldata [] =
-	{	{	"de_DE", "F\303\274\303\237e.au", 7 },
-		{	"en_AU", "kangaroo.au", 11 },
-		{	"POSIX", "posix.au", 8 },
-		{	"pt_PT", "concei\303\247\303\243o.au", 12 },
-		{	"ja_JP", "\343\201\212\343\201\257\343\202\210\343\201\206\343\201\224\343\201\226\343\201\204\343\201\276\343\201\231.au", 21 },
-		{	"vi_VN", "qu\341\273\221c ng\341\273\257.au", 11 },
-
-		{	NULL, NULL, 0 }
+	{	{	"POSIX",				"posix.au" },
+		{	"en_AU.UTF-8",			"english_AU.au" },
+		{	NULL, NULL }
 		} ;
 	int k ;
 
 	for (k = 0 ; ldata [k].locale != NULL ; k++)
-		locale_test (ldata [k].locale, ldata [k].filename, ldata [k].width) ;
+		locale_test (ldata [k].locale, ldata [k].filename) ;
 
 	return 0 ;
 } /* main */
 
 static void
-locale_test (const char * locname, const char * filename, int width)
+locale_test (const char * locname, const char * filename)
 {
 #if (HAVE_LOCALE_H == 0 || HAVE_SETLOCALE == 0)
 	locname = filename = NULL ;
-	width = 0 ;
 	return ;
 #else
 	const short wdata [] = { 1, 2, 3, 4, 5, 6, 7, 8 } ;
@@ -81,8 +74,7 @@ locale_test (const char * locname, const char * filename, int width)
 	if (setlocale (LC_ALL, locname) == NULL)
 		return ;
 
-	printf ("    locale_test : %-6s   %s%*c : ", locname, filename, 28 - width, ' ') ;
-	fflush (stdout) ;
+	print_test_name ("locale_test", filename) ;
 
 	sfinfo.format = SF_FORMAT_AU | SF_FORMAT_PCM_16 ;
 	sfinfo.channels = 1 ;
@@ -107,7 +99,7 @@ locale_test (const char * locname, const char * filename, int width)
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
+** The arch-tag line is a file identity tag for the GNU Arch 
 ** revision control system.
 **
 ** arch-tag: 087b25a3-03a2-4195-acd2-23fbbc489021

@@ -5,7 +5,8 @@ noinst_PROGRAMS = sfversion floating_point_test write_read_test \
 	peak_chunk_test command_test stdin_test stdout_test stdio_test \
 	pcm_test headerless_test pipe_test benchmark header_test misc_test \
 	raw_test string_test open_fail_test multi_file_test dither_test \
-	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test
+	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
+	locale_test
 
 SNDFILEDIR = ../src
 INCLUDES = -I$(srcdir)/$(SNDFILEDIR)
@@ -51,6 +52,9 @@ aiff_rw_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 command_test_SOURCES = command_test.c utils.c
 command_test_LDADD = $(SNDFILEDIR)/libsndfile.la
+
+locale_test_SOURCES = locale_test.c utils.c
+locale_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 pcm_test_SOURCES = pcm_test.c utils.c
 pcm_test_LDADD = $(SNDFILEDIR)/libsndfile.la
@@ -168,6 +172,7 @@ generic-tests : error_test ulaw_test alaw_test command_test floating_point_test 
 	./floating_point_test
 	./scale_clip_test
 	./headerless_test
+	./locale_test
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed common tests."
 	@echo "----------------------------------------------------------------------"

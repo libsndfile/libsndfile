@@ -1,8 +1,11 @@
 2005-09-20 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac src/sfconfig.h
-	Check for <locale.h> and the function setlocale().
-	Set config variables to zero if not found.
+    Check for <locale.h> and the function setlocale().
+    Set config variables to zero if not found.
+
+    * tests/locale_test.c tests/Makefile.am
+    Add new test program and hook into build/test system.
 
 2005-09-18 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
