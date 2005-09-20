@@ -57,6 +57,10 @@
 #define HAVE_FSYNC 0
 #endif
 
+#ifndef HAVE_LOCALE_H
+#define HAVE_LOCALE_H 0
+#endif
+
 #ifndef HAVE_LRINT
 #define HAVE_LRINT 0
 #endif
@@ -75,6 +79,10 @@
 
 #ifndef HAVE_PWRITE
 #define HAVE_PWRITE 0
+#endif
+
+#ifndef HAVE_SETLOCALE
+#define HAVE_SETLOCALE 0
 #endif
 
 #ifndef HAVE_SQLITE3

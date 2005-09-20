@@ -40,6 +40,7 @@ AC_HEADER_STDC
 
 AC_CHECK_HEADERS(endian.h)
 AC_CHECK_HEADERS(byteswap.h)
+AC_CHECK_HEADERS(locale.h)
 AC_HEADER_SYS_WAIT
 
 AC_CHECK_DECLS(S_IRGRP)
@@ -224,6 +225,7 @@ AC_CHECK_FUNCS(fstat ftruncate fsync fdatasync)
 AC_CHECK_FUNCS(snprintf vsnprintf)
 AC_CHECK_FUNCS(gmtime gmtime_r)
 AC_CHECK_FUNCS(mmap getpagesize)
+AC_CHECK_FUNCS(setlocale)
 
 AC_CHECK_LIB([m],floor)
 AC_CHECK_FUNCS(floor ceil fmod)
