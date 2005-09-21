@@ -43,8 +43,9 @@ static void locale_test (const char * locname, const char * filename) ;
 int
 main (void)
 {	LOCALE_DATA ldata [] =
-	{	{	"POSIX",				"posix.au" },
-		{	"en_AU.UTF-8",			"english_AU.au" },
+	{	{	"de_DE",	"Füße.au" },
+		{	"en_AU",	"kangaroo.au" },
+		{	"POSIX",	"posix.au" },
 		{	NULL, NULL }
 		} ;
 	int k ;
@@ -74,7 +75,8 @@ locale_test (const char * locname, const char * filename)
 	if (setlocale (LC_ALL, locname) == NULL)
 		return ;
 
-	print_test_name ("locale_test", filename) ;
+	printf ("    locale_test : %-14s   %-20s : ", locname, filename) ;
+	fflush (stdout) ;
 
 	sfinfo.format = SF_FORMAT_AU | SF_FORMAT_PCM_16 ;
 	sfinfo.channels = 1 ;
