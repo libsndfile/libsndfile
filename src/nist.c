@@ -145,9 +145,16 @@ nist_read_header (SF_PRIVATE *psf)
 		return SFE_NIST_CRLF_CONVERISON ;
 
 	/* Make sure its a NIST file. */
-	if (strstr (psf_header, "NIST_1A\n   1024\n") != psf_header)
+	if (strstr (psf_header, "NIST_1A\n") != psf_header)
 	{	psf_log_printf (psf, "Not a NIST file.\n") ;
 		return SFE_NIST_BAD_HEADER ;
+		} ;
+
+	if (sscanf (psf_header, "NIST_1A\n%d\n", &count) == 1)
+		psf->dataoffset = count ;
+	else
+	{	psf_log_printf (psf, "*** Suspicious header length.\n") ;
+		psf->dataoffset = NIST_HEADER_LENGTH ;
 		} ;
 
 	/* Determine sample encoding, start by assuming PCM. */
@@ -216,7 +223,6 @@ nist_read_header (SF_PRIVATE *psf)
 		return SFE_NIST_BAD_ENCODING ;
 		} ;
 
- 	psf->dataoffset = NIST_HEADER_LENGTH ;
 	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
 	psf->datalength = psf->filelength - psf->dataoffset ;
 
