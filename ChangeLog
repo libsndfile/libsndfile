@@ -1,3 +1,8 @@
+2005-09-22 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/util.(tpl|def)
+    Make the test_write_*_or_die() functions const safe.
+
 2005-09-21 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/nist.c

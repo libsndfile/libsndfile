@@ -78,11 +78,17 @@ void 	test_read_write_position_or_die
 void	test_seek_or_die
 			(SNDFILE *file, sf_count_t offset, int whence, sf_count_t new_pos, int channels, int line_num) ;
 
-[+ FOR io_operation +]
+[+ FOR read_op +]
 [+ FOR io_type
 +]void 	test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die
 			(SNDFILE *file, int pass, [+ (get "io_element") +] *test, sf_count_t [+ (get "count_name") +], int line_num) ;
-[+ ENDFOR io_type +][+ ENDFOR io_operation +]
+[+ ENDFOR io_type +][+ ENDFOR read_op +]
+
+[+ FOR write_op +]
+[+ FOR io_type
++]void 	test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die
+			(SNDFILE *file, int pass, const [+ (get "io_element") +] *test, sf_count_t [+ (get "count_name") +], int line_num) ;
+[+ ENDFOR io_type +][+ ENDFOR write_op +]
 
 #endif
 
@@ -514,7 +520,7 @@ test_seek_or_die (SNDFILE *file, sf_count_t offset, int whence, sf_count_t new_p
 
 } /* test_seek_or_die */
 
-[+ FOR io_operation +]
+[+ FOR read_op +]
 [+ FOR io_type +]
 void
 test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die (SNDFILE *file, int pass, [+ (get "io_element") +] *test, sf_count_t [+ (get "count_name") +], int line_num)
@@ -533,7 +539,28 @@ test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die (SNDFILE *file, in
 
 	return ;
 } /* test_[+ (get "op_element") +]_[+ (get "io_element") +] */
-[+ ENDFOR io_type +][+ ENDFOR io_operation +]
+[+ ENDFOR io_type +][+ ENDFOR read_op +]
+
+[+ FOR write_op +]
+[+ FOR io_type +]
+void
+test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die (SNDFILE *file, int pass, const [+ (get "io_element") +] *test, sf_count_t [+ (get "count_name") +], int line_num)
+{	sf_count_t count ;
+
+	if ((count = sf_[+ (get "op_element") +]_[+ (get "io_element") +] (file, test, [+ (get "count_name") +])) != [+ (get "count_name") +])
+	{	printf ("\n\nLine %d", line_num) ;
+		if (pass > 0)
+			printf (" (pass %d)", pass) ;
+		printf (" : sf_[+ (get "op_element") +]_[+ (get "io_element") +] failed with short [+ (get "op_element") +] (%ld => %ld).\n",
+						SF_COUNT_TO_LONG ([+ (get "count_name") +]), SF_COUNT_TO_LONG (count)) ;
+		fflush (stdout) ;
+		puts (sf_strerror (file)) ;
+		exit (1) ;
+		} ;
+
+	return ;
+} /* test_[+ (get "op_element") +]_[+ (get "io_element") +] */
+[+ ENDFOR io_type +][+ ENDFOR write_op +]
 
 void
 delete_file (int format, const char *filename)
