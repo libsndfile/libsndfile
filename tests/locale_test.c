@@ -46,6 +46,7 @@ main (void)
 	{	{	"de_DE",	"Füße.au" },
 		{	"en_AU",	"kangaroo.au" },
 		{	"POSIX",	"posix.au" },
+		{	"pt_PT",	"conceição.au" },
 		{	NULL, NULL }
 		} ;
 	int k ;
