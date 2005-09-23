@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.53)
 
-AC_INIT(libsndfile,1.0.12pre13,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.12rc1,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
@@ -141,7 +141,7 @@ case "$host_os" in
 			# Check for common 64 bit file offset types.
 			AC_CHECK_SIZEOF(loff_t,1)	# Fake default value.
 			AC_CHECK_SIZEOF(off64_t,1)	# Fake default value.
-		
+
 			TYPEOF_SF_COUNT_T="unknown"
 			if test "x$ac_cv_sizeof_loff_t" = "x8" ; then
 				TYPEOF_SF_COUNT_T="loff_t"
@@ -150,15 +150,15 @@ case "$host_os" in
 				TYPEOF_SF_COUNT_T="off64_t"
 				SIZEOF_SF_COUNT_T=8
 				fi
-		
+
 			# Save the old sizeof (off_t) value  and then unset it to see if it
 			# changes when Large File Support is enabled.
-		
+
 			pre_largefile_sizeof_off_t=$ac_cv_sizeof_off_t
 			unset ac_cv_sizeof_off_t
-		
+
 			AC_SYS_EXTRA_LARGEFILE
-		
+
 			if test "x$ac_cv_sys_largefile_CFLAGS" = "xno" ; then
 				ac_cv_sys_largefile_CFLAGS=""
 				fi
@@ -168,9 +168,9 @@ case "$host_os" in
 			if test "x$ac_cv_sys_largefile_LIBS" = "xno" ; then
 				ac_cv_sys_largefile_LIBS=""
 				fi
-		
+
 			AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
-		
+
 			if test "x$ac_cv_sizeof_off_t" = "x8" ; then
 				SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 			elif test "x$ac_cv_sizeof_off_t" = "x$pre_largefile_sizeof_off_t" ; then
@@ -395,8 +395,16 @@ else
 # Now use the information from the checking stage.
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
-	CFLAGS="$CFLAGS -W -Wall -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return -Wcast-align -Wcast-qual -Wnested-externs -Wshadow -Wbad-function-cast -Wwrite-strings"
+	CFLAGS="$CFLAGS -W -Wall"
+	if test x$ac_arg_gcc_werror = "xyes" ; then
+		CFLAGS="-Werror $CFLAGS"
+		fi
+
+	AC_ADD_CFLAGS(-Wdeclaration-after-statement)
+
+	CFLAGS="$CFLAGS -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return -Wcast-align -Wcast-qual -Wnested-externs -Wshadow -Wbad-function-cast -Wwrite-strings"
 	# -Wpointer-arith -Wundef -Wmissing-declarations -Winline -Wconversion"
+
 	if test "$ac_arg_gcc_opt" = "N" ; then
 		temp_CFLAGS=`echo $CFLAGS | sed "s/O2/O0/"`
 		CFLAGS=$temp_CFLAGS
@@ -421,10 +429,6 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	if test x$ac_arg_gcc_pipe != "xN" ; then
 	 	CFLAGS="$CFLAGS -pipe"
 	 	fi
-
-	if test x$ac_arg_gcc_werror = "xyes" ; then
-		CFLAGS="-Werror $CFLAGS"
-		fi
 
 	AC_DEFINE([COMPILER_IS_GCC],1, [Set to 1 if the compile is GNU GCC.])
 	GCC_MAJOR_VERSION=`$CC -dumpversion | sed "s/\..*//"`
@@ -453,7 +457,7 @@ AC_SUBST(ENABLE_EXPERIMENTAL_CODE)
 AC_SUBST(COMPILER_IS_GCC)
 AC_SUBST(GCC_MAJOR_VERSION)
 
-dnl The following line causes the libtool distributed with the source 
+dnl The following line causes the libtool distributed with the source
 dnl to be replaced if the build system has a more recent version.
 AC_SUBST(LIBTOOL_DEPS)
 

@@ -1,3 +1,8 @@
+2005-09-23 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac acinclude.m4
+    Add -Wdeclaration-after-statement to CFLAGS if the compilers supports it.
+
 2005-09-22 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/util.(tpl|def)
