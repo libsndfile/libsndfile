@@ -396,11 +396,12 @@ else
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
 	CFLAGS="$CFLAGS -W -Wall"
+
+	AC_ADD_CFLAGS(-Wdeclaration-after-statement)
+
 	if test x$ac_arg_gcc_werror = "xyes" ; then
 		CFLAGS="-Werror $CFLAGS"
 		fi
-
-	AC_ADD_CFLAGS(-Wdeclaration-after-statement)
 
 	CFLAGS="$CFLAGS -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return -Wcast-align -Wcast-qual -Wnested-externs -Wshadow -Wbad-function-cast -Wwrite-strings"
 	# -Wpointer-arith -Wundef -Wmissing-declarations -Winline -Wconversion"

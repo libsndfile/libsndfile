@@ -1,3 +1,9 @@
+2005-09-24 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Make -Wdeclaration-after-statement work with --enable-gcc-werror configure
+    option.
+
 2005-09-23 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac acinclude.m4
