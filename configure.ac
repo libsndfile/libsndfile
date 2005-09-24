@@ -395,6 +395,8 @@ else
 # Now use the information from the checking stage.
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
+	AC_ADD_CFLAGS(-std=gnu99)
+
 	CFLAGS="$CFLAGS -W -Wall"
 
 	AC_ADD_CFLAGS(-Wdeclaration-after-statement)

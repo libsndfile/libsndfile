@@ -3,6 +3,8 @@
     * configure.ac
     Make -Wdeclaration-after-statement work with --enable-gcc-werror configure
     option.
+    Add -std=gnu99 (C99 plus posix style stuff like gmtime_r) to CFLAGS if the
+    compiler supports it.
 
 2005-09-23 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
