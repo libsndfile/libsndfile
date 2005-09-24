@@ -36,32 +36,36 @@
 typedef struct
 {	const char *locale ;
 	const char *filename ;
+	int	width ;
 } LOCALE_DATA ;
 
-static void locale_test (const char * locname, const char * filename) ;
+static void locale_test (const char * locname, const char * filename, int width) ;
 
 int
 main (void)
 {	LOCALE_DATA ldata [] =
-	{	{	"de_DE",	"Füße.au" },
-		{	"en_AU",	"kangaroo.au" },
-		{	"POSIX",	"posix.au" },
-		{	"pt_PT",	"conceição.au" },
-		{	NULL, NULL }
+	{	{	"de_DE",	"F\u00fc\u00dfe.au", 7 },
+		{	"en_AU",	"kangaroo.au", 11 },
+		{	"POSIX",	"posix.au", 8 },
+		{	"pt_PT",	"concei\u00e7\u00e3o.au", 12 },
+		{	"ja_JP",	"\u304a\u306f\u3088\u3046\u3054\u3056\u3044\u307e\u3059.au", 21 },
+		{	"vi_VN",	"qu\u1ed1c ng\u1eef.au", 11 },
+		{	NULL, NULL, 0 }
 		} ;
 	int k ;
 
 	for (k = 0 ; ldata [k].locale != NULL ; k++)
-		locale_test (ldata [k].locale, ldata [k].filename) ;
+		locale_test (ldata [k].locale, ldata [k].filename, ldata [k].width) ;
 
 	return 0 ;
 } /* main */
 
 static void
-locale_test (const char * locname, const char * filename)
+locale_test (const char * locname, const char * filename, int width)
 {
 #if (HAVE_LOCALE_H == 0 || HAVE_SETLOCALE == 0)
 	locname = filename = NULL ;
+	width = 0 ;
 	return ;
 #else
 	const short wdata [] = { 1, 2, 3, 4, 5, 6, 7, 8 } ;
@@ -76,7 +80,7 @@ locale_test (const char * locname, const char * filename)
 	if (setlocale (LC_ALL, locname) == NULL)
 		return ;
 
-	printf ("    locale_test : %-14s   %-20s : ", locname, filename) ;
+	printf ("    locale_test : %-6s   %s%*c : ", locname, filename, 28 - width, ' ') ;
 	fflush (stdout) ;
 
 	sfinfo.format = SF_FORMAT_AU | SF_FORMAT_PCM_16 ;
