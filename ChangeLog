@@ -1,3 +1,8 @@
+2005-09-25 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/(au|paf|aiff|w64|wav|svx).c
+    Make sure structs are initialised.
+
 2005-09-24 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac

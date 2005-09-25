@@ -251,10 +251,11 @@ static int
 wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 {	WAV_FMT		wav_fmt ;
 	FACT_CHUNK	fact_chunk ;
-	unsigned	dword, marker, RIFFsize, done = 0 ;
+	unsigned	dword = 0, marker, RIFFsize, done = 0 ;
 	int			parsestage = 0, error, format = 0 ;
 	char		*cptr ;
 
+	memset (&wav_fmt, 0, sizeof (wav_fmt)) ;
 	/* Set position to start of file to begin reading header. */
 	psf_binheader_readf (psf, "p", 0) ;
 

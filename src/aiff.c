@@ -196,6 +196,8 @@ aiff_open	(SF_PRIVATE *psf)
 {	COMM_CHUNK comm_fmt ;
 	int error, subformat ;
 
+	memset (&comm_fmt, 0, sizeof (comm_fmt)) ;
+
 	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))

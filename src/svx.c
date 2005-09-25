@@ -134,6 +134,7 @@ svx_read_header	(SF_PRIVATE *psf)
 	int				filetype = 0, parsestage = 0, done = 0 ;
 	int 			bytecount = 0, channels ;
 
+	memset (&vhdr, 0, sizeof (vhdr)) ;
 	psf_binheader_readf (psf, "p", 0) ;
 
 	/* Set default number of channels. Currently can't handle stereo SVX files. */

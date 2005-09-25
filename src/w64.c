@@ -201,6 +201,7 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	int			parsestage = 0, error, done = 0 ;
 
 	/* Set position to start of file to begin reading header. */
+	memset (&wav_fmt, 0, sizeof (wav_fmt)) ;
 	psf_binheader_readf (psf, "p", 0) ;
 
 	while (! done)

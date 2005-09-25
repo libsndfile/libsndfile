@@ -335,6 +335,7 @@ au_read_header (SF_PRIVATE *psf)
 {	AU_FMT	au_fmt ;
 	int		marker, dword ;
 
+	memset (&au_fmt, 0, sizeof (au_fmt)) ;
 	psf_binheader_readf (psf, "pm", 0, &marker) ;
 	psf_log_printf (psf, "%M\n", marker) ;
 
