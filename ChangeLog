@@ -1,3 +1,8 @@
+2005-09-26 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/flac.c
+    Fix valgrind error and minor cleanup.
+
 2005-09-25 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/(au|paf|aiff|w64|wav|svx).c

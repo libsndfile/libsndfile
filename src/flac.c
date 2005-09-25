@@ -61,17 +61,16 @@ typedef enum
 typedef struct
 {	FLAC__SeekableStreamDecoder *fsd ;
 	FLAC__SeekableStreamEncoder *fse ;
-	void* ptr ;
-	sf_count_t pos ;
-	sf_count_t remain ;
 	PFLAC_PCM pcmtype ;
+	void* ptr ;
+	unsigned pos, len, remain ;
 
 	const FLAC__int32 * const * wbuffer ;
 	FLAC__int32 * rbuffer [FLAC__MAX_CHANNELS] ;
 
 	FLAC__int32* encbuffer ;
-	sf_count_t bufferpos ;
-	sf_count_t bufferlen ;
+	unsigned bufferpos ;
+
 	const FLAC__Frame *frame ;
 	FLAC__bool bufferbackup ;
 } FLAC_PRIVATE ;
@@ -173,11 +172,9 @@ flac_buffer_copy (SF_PRIVATE *psf)
 	unsigned i = 0, j, offset ;
 
 	if (pflac->ptr == NULL)
-	{
-#if 0
-		/*
-		**	Really not sure if this code is needed.
-		**	Just returning 0 also seems to work.
+	{	/*
+		**	Not sure why this code is here and not elsewhere.
+		**	Removing it causes valgrind errors.
 		*/
 		pflac->bufferbackup = SF_TRUE ;
 		for (i = 0 ; i < frame->header.channels ; i++)
@@ -186,18 +183,18 @@ flac_buffer_copy (SF_PRIVATE *psf)
 			memcpy (pflac->rbuffer [i], buffer [i], frame->header.blocksize * sizeof (FLAC__int32)) ;
 			} ;
 		pflac->wbuffer = (const FLAC__int32* const*) pflac->rbuffer ;
-#endif
+
 		return 0 ;
 		} ;
 
 	switch (pflac->pcmtype)
 	{	case PFLAC_PCM_SHORT :
-			{	short *retpcm = ((short*) pflac->ptr) + pflac->pos ;
+			{	short *retpcm = ((short*) pflac->ptr) ;
 				int shift = 16 - frame->header.bits_per_sample ;
 				if (shift < 0)
 				{	shift = abs (shift) ;
 					for (i = 0 ; i < frame->header.blocksize && pflac->remain > 0 ; i++)
-					{	offset = i * frame->header.channels ;
+					{	offset = pflac->pos + i * frame->header.channels ;
 						for (j = 0 ; j < frame->header.channels ; j++)
 							retpcm [offset + j] = buffer [j][pflac->bufferpos] >> shift ;
 						pflac->remain -= frame->header.channels ;
@@ -206,13 +203,14 @@ flac_buffer_copy (SF_PRIVATE *psf)
 					}
 				else
 				{	for (i = 0 ; i < frame->header.blocksize && pflac->remain > 0 ; i++)
-					{	offset = i * frame->header.channels ;
+					{	offset = pflac->pos + i * frame->header.channels ;
 
 						if (pflac->bufferpos >= frame->header.blocksize)
 							break ;
 
 						for (j = 0 ; j < frame->header.channels ; j++)
 							retpcm [offset + j] = (buffer [j][pflac->bufferpos]) << shift ;
+
 						pflac->remain -= frame->header.channels ;
 						pflac->bufferpos++ ;
 						} ;
@@ -221,10 +219,10 @@ flac_buffer_copy (SF_PRIVATE *psf)
 			break ;
 
 		case PFLAC_PCM_INT :
-			{	int *retpcm = ((int*) pflac->ptr) + pflac->pos ;
+			{	int *retpcm = ((int*) pflac->ptr) ;
 				int shift = 32 - frame->header.bits_per_sample ;
 				for (i = 0 ; i < frame->header.blocksize && pflac->remain > 0 ; i++)
-				{	offset = i * frame->header.channels ;
+				{	offset = pflac->pos + i * frame->header.channels ;
 
 					if (pflac->bufferpos >= frame->header.blocksize)
 						break ;
@@ -238,11 +236,11 @@ flac_buffer_copy (SF_PRIVATE *psf)
 			break ;
 
 		case PFLAC_PCM_FLOAT :
-			{	float *retpcm = ((float*) pflac->ptr) + pflac->pos ;
+			{	float *retpcm = ((float*) pflac->ptr) ;
 				float norm = (psf->norm_float == SF_TRUE) ? 1.0 / (1 << (frame->header.bits_per_sample - 1)) : 1.0 ;
 
 				for (i = 0 ; i < frame->header.blocksize && pflac->remain > 0 ; i++)
-				{	offset = i * frame->header.channels ;
+				{	offset = pflac->pos + i * frame->header.channels ;
 
 					if (pflac->bufferpos >= frame->header.blocksize)
 						break ;
@@ -256,11 +254,11 @@ flac_buffer_copy (SF_PRIVATE *psf)
 			break ;
 
 		case PFLAC_PCM_DOUBLE :
-			{	double *retpcm = ((double*) pflac->ptr) + pflac->pos ;
+			{	double *retpcm = ((double*) pflac->ptr) ;
 				double norm = (psf->norm_double == SF_TRUE) ? 1.0 / (1 << (frame->header.bits_per_sample - 1)) : 1.0 ;
 
 				for (i = 0 ; i < frame->header.blocksize && pflac->remain > 0 ; i++)
-				{	offset = i * frame->header.channels ;
+				{	offset = pflac->pos + i * frame->header.channels ;
 
 					if (pflac->bufferpos >= frame->header.blocksize)
 						break ;
@@ -278,7 +276,7 @@ flac_buffer_copy (SF_PRIVATE *psf)
 		} ;
 
 	offset = i * frame->header.channels ;
-	pflac->pos += offset ;
+	pflac->pos += i * frame->header.channels ;
 
 	return offset ;
 } /* flac_buffer_copy */
@@ -666,16 +664,17 @@ flac_init (SF_PRIVATE *psf)
 	return 0 ;
 } /* flac_init */
 
-static sf_count_t
-flac_read_loop (SF_PRIVATE *psf, sf_count_t len)
+static unsigned
+flac_read_loop (SF_PRIVATE *psf, unsigned len)
 {	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->fdata ;
 
 	pflac->pos = 0 ;
+	pflac->len = len ;
 	pflac->remain = len ;
 	if (pflac->frame != NULL && pflac->bufferpos < pflac->frame->header.blocksize)
 		flac_buffer_copy (psf) ;
 
-	while (pflac->remain > 0)
+	while (pflac->pos < pflac->len)
 	{	if (FLAC__seekable_stream_decoder_process_single (pflac->fsd) == 0)
 			break ;
 		if (FLAC__seekable_stream_decoder_get_state (pflac->fsd) != FLAC__SEEKABLE_STREAM_DECODER_OK)
@@ -683,47 +682,88 @@ flac_read_loop (SF_PRIVATE *psf, sf_count_t len)
 		} ;
 
 	pflac->ptr = NULL ;
+
 	return pflac->pos ;
 } /* flac_read_loop */
 
 static sf_count_t
 flac_read_flac2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 {	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->fdata ;
+	sf_count_t total = 0, current ;
+	unsigned readlen ;
 
 	pflac->pcmtype = PFLAC_PCM_SHORT ;
-	pflac->ptr = ptr ;
 
-	return flac_read_loop (psf, len) ;
+	while (total < len)
+	{	pflac->ptr = ptr + total ;
+		readlen = (len - total > 0x1000000) ? 0x1000000 : (unsigned) (len - total) ;
+		current = flac_read_loop (psf, readlen) ;
+		if (current == 0)
+			break ;
+		total += current ;
+		} ;
+
+	return total ;
 } /* flac_read_flac2s */
 
 static sf_count_t
 flac_read_flac2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 {	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->fdata ;
+	sf_count_t total = 0, current ;
+	unsigned readlen ;
 
 	pflac->pcmtype = PFLAC_PCM_INT ;
-	pflac->ptr = ptr ;
 
-	return flac_read_loop (psf, len) ;
+	while (total < len)
+	{	pflac->ptr = ptr + total ;
+		readlen = (len - total > 0x1000000) ? 0x1000000 : (unsigned) (len - total) ;
+		current = flac_read_loop (psf, readlen) ;
+		if (current == 0)
+			break ;
+		total += current ;
+		} ;
+
+	return total ;
 } /* flac_read_flac2i */
 
 static sf_count_t
 flac_read_flac2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 {	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->fdata ;
+	sf_count_t total = 0, current ;
+	unsigned readlen ;
 
 	pflac->pcmtype = PFLAC_PCM_FLOAT ;
-	pflac->ptr = ptr ;
 
-	return flac_read_loop (psf, len) ;
+	while (total < len)
+	{	pflac->ptr = ptr + total ;
+		readlen = (len - total > 0x1000000) ? 0x1000000 : (unsigned) (len - total) ;
+		current = flac_read_loop (psf, readlen) ;
+		if (current == 0)
+			break ;
+		total += current ;
+		} ;
+
+	return total ;
 } /* flac_read_flac2f */
 
 static sf_count_t
 flac_read_flac2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 {	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->fdata ;
+	sf_count_t total = 0, current ;
+	unsigned readlen ;
 
 	pflac->pcmtype = PFLAC_PCM_DOUBLE ;
-	pflac->ptr = ptr ;
 
-	return flac_read_loop (psf, len) ;
+	while (total < len)
+	{	pflac->ptr = ptr + total ;
+		readlen = (len - total > 0x1000000) ? 0x1000000 : (unsigned) (len - total) ;
+		current = flac_read_loop (psf, readlen) ;
+		if (current == 0)
+			break ;
+		total += current ;
+		} ;
+
+	return total ;
 } /* flac_read_flac2d */
 
 static sf_count_t
