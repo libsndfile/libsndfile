@@ -4,6 +4,9 @@
     Modify the way the unicode strings were encoded so that older compilers
     do not complain. Thanks Axel Roebel.
 
+    * configure.ac
+    Bump the version to 1.0.12 for release.
+
 2005-09-26 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/flac.c
