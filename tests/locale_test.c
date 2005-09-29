@@ -44,12 +44,13 @@ static void locale_test (const char * locname, const char * filename, int width)
 int
 main (void)
 {	LOCALE_DATA ldata [] =
-	{	{	"de_DE",	"F\u00fc\u00dfe.au", 7 },
-		{	"en_AU",	"kangaroo.au", 11 },
-		{	"POSIX",	"posix.au", 8 },
-		{	"pt_PT",	"concei\u00e7\u00e3o.au", 12 },
-		{	"ja_JP",	"\u304a\u306f\u3088\u3046\u3054\u3056\u3044\u307e\u3059.au", 21 },
-		{	"vi_VN",	"qu\u1ed1c ng\u1eef.au", 11 },
+	{	{	"de_DE", "F\303\274\303\237e.au", 7 },
+		{	"en_AU", "kangaroo.au", 11 },
+		{	"POSIX", "posix.au", 8 },
+		{	"pt_PT", "concei\303\247\303\243o.au", 12 },
+		{	"ja_JP", "\343\201\212\343\201\257\343\202\210\343\201\206\343\201\224\343\201\226\343\201\204\343\201\276\343\201\231.au", 21 },
+		{	"vi_VN", "qu\341\273\221c ng\341\273\257.au", 11 },
+
 		{	NULL, NULL, 0 }
 		} ;
 	int k ;
@@ -106,7 +107,7 @@ locale_test (const char * locname, const char * filename, int width)
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 087b25a3-03a2-4195-acd2-23fbbc489021
