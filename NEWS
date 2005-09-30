@@ -1,3 +1,9 @@
+Version 1.0.12 (2005-09-30)
+  * Add support for FLAC and Apple's Core Audio Format (CAF).
+  * Add virtual I/O interface (still needs docs).
+  * Cygwin and other Win32 fixes.
+  * Minor bug fixes and cleanups.
+
 Version 1.0.11 (2004-11-15)
   * Add support for SD2 files.
   * Add read support for loop info in WAV and AIFF files.

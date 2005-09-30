@@ -67,7 +67,14 @@
 /* #undef HAVE_ENDIAN_H */
 
 /* Define to 1 if you have the `fdatasync' function. */
+
 /* #undef HAVE_FDATASYNC */
+
+/* Define to 1 if you have libflac 1.1.1 */
+/* #undef HAVE_FLAC_1_1_1 1 */
+
+/* Define to 1 if you have the <FLAC/all.h> header file. */
+/* #undef HAVE_FLAC_ALL_H 1 */
 
 /* Set to 1 if the compile supports the struct hack. */
 #define HAVE_FLEXIBLE_ARRAY 1
@@ -193,13 +200,13 @@
 #define PACKAGE_NAME "libsndfile"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsndfile 1.0.12pre12"
+#define PACKAGE_STRING "libsndfile 1.0.12"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsndfile"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.0.12pre12"
+#define PACKAGE_VERSION "1.0.12"
 
 /* Set to maximum allowed value of sf_count_t type. */
 #define SF_COUNT_MAX 0x7FFFFFFFFFFFFFFFi64
@@ -256,7 +263,7 @@
 #define USE_WINDOWS_API 1
 
 /* Version number of package */
-#define VERSION "1.0.12pre12"
+#define VERSION "1.0.12"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */

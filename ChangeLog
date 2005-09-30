@@ -7,6 +7,9 @@
     * configure.ac
     Bump the version to 1.0.12 for release.
 
+    * NEWS README Win32/config.h doc/(FAQ|index.html|command|api).html
+    Update version numbers.
+
 2005-09-26 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/flac.c
