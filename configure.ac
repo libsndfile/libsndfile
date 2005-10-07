@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.53)
 
-AC_INIT(libsndfile,1.0.12,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.13pre1,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
@@ -26,7 +26,7 @@ AM_CONFIG_HEADER(src/config.h)
 #  6. If any interfaces have been removed since the last public release, then set age
 #     to 0.
 
-SHARED_VERSION_INFO="1:12:0"
+SHARED_VERSION_INFO="1:13:0"
 
 AC_PROG_CC
 AM_PROG_LIBTOOL
@@ -101,6 +101,14 @@ AC_ARG_ENABLE(bow-docs,
 AC_ARG_ENABLE(sqlite,
 	AC_HELP_STRING([--disable-sqlite], [disable use of sqlite]),
 	ac_arg_enable_sqlite=no, ac_arg_enable_sqlite=yes)
+
+AC_ARG_ENABLE(flac,
+	AC_HELP_STRING([--disable-flac], [disable use of FLAC]),
+	ac_arg_enable_flac=no, ac_arg_enable_flac=yes)
+
+AC_ARG_ENABLE(alsa,
+	AC_HELP_STRING([--disable-alsa], [disable use of ALSA]),
+	ac_arg_enable_alsa=no, ac_arg_enable_alsa=yes)
 
 #====================================================================================
 # Check types and their sizes.
@@ -314,22 +322,27 @@ AC_DEFINE_UNQUOTED(USE_WINDOWS_API, ${use_windows_api}, [Set to 1 to use the nat
 
 ALSA_LIBS=""
 
-AC_CHECK_HEADERS(alsa/asoundlib.h)
-if test x$ac_cv_header_alsa_asoundlib_h = xyes ; then
-	ALSA_LIBS="-lasound"
+if test x$ac_arg_enable_alsa = xyes ; then
+	AC_CHECK_HEADERS(alsa/asoundlib.h)
+	if test x$ac_cv_header_alsa_asoundlib_h = xyes ; then
+		ALSA_LIBS="-lasound"
+		fi
 	fi
 
 #====================================================================================
 # Check for FLAC
 
 FLAC_LIBS=""
-AC_CHECK_HEADERS(FLAC/all.h)
-if test x$ac_cv_header_FLAC_all_h = xyes ; then
-        AC_CHECK_LIB(FLAC, FLAC__seekable_stream_encoder_set_tell_callback, HAVE_FLAC_1_1_1="yes")
-        if test "x$HAVE_FLAC_1_1_1" = xyes ; then
-           AC_DEFINE(HAVE_FLAC_1_1_1, [1], [Define to 1 if you have libflac 1.1.1])
-           fi
-	FLAC_LIBS="-lFLAC"
+
+if test x$ac_arg_enable_flac = xyes ; then
+	AC_CHECK_HEADERS(FLAC/all.h)
+	if test x$ac_cv_header_FLAC_all_h = xyes ; then
+		AC_CHECK_LIB(FLAC, FLAC__seekable_stream_encoder_set_tell_callback, HAVE_FLAC_1_1_1="yes")
+		if test "x$HAVE_FLAC_1_1_1" = xyes ; then
+			AC_DEFINE(HAVE_FLAC_1_1_1, [1], [Define to 1 if you have libflac 1.1.1])
+			fi
+		FLAC_LIBS="-lFLAC"
+		fi
 	fi
 
 #====================================================================================

@@ -1,3 +1,8 @@
+2005-10-07 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Add options to allow disabling of FLAC and ALSA. Suggested by Ben Greear.
+
 2005-09-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/locale_test.c
