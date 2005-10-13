@@ -6,6 +6,9 @@
     * src/file_io.c
     Add comments documenting the three sections of the file.
 
+    * src/gsm610.c
+    Make sure SF_FORMAT_WAVEX are handled correctly.
+
 2005-10-07 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac

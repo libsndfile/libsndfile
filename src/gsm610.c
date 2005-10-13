@@ -100,6 +100,7 @@ Need separate gsm_data structs for encode and decode.
 		return SFE_MALLOC_FAILED ;
 
 	if ((psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAV ||
+				(psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAVEX ||
 				(psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_W64)
 	{	gsm_option (pgsm610->gsm_data, GSM_OPT_WAV49, &true_flag) ;
 
