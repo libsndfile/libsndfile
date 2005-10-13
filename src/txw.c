@@ -23,13 +23,14 @@
 ** and trial and error experimentation. The code here however is all original.
 */
 
+#include	"sfconfig.h"
+
 #include	<stdio.h>
 #include	<fcntl.h>
 #include	<string.h>
 #include	<ctype.h>
 
 #include	"sndfile.h"
-#include	"sfconfig.h"
 #include	"sfendian.h"
 #include	"common.h"
 

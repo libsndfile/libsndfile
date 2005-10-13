@@ -23,13 +23,14 @@
 **	However, no code from that package was used.
 */
 
+#include	"sfconfig.h"
+
 #include	<stdio.h>
 #include	<fcntl.h>
 #include	<string.h>
 #include	<ctype.h>
 
 #include	"sndfile.h"
-#include	"sfconfig.h"
 #include	"sfendian.h"
 #include	"common.h"
 

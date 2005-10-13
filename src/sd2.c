@@ -27,13 +27,14 @@
 ** http://developer.apple.com/documentation/mac/MoreToolbox/MoreToolbox-99.html
 */
 
+#include	"sfconfig.h"
+
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
 #include	<ctype.h>
 
 #include	"sndfile.h"
-#include	"sfconfig.h"
 #include	"sfendian.h"
 #include	"common.h"
 

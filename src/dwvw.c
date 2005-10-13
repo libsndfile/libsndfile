@@ -26,12 +26,13 @@
 ** Lidstrom and is copyright 1993 by NuEdge Development".
 */
 
+#include	"sfconfig.h"
+
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
 
 #include	"sndfile.h"
-#include	"sfconfig.h"
 #include	"sfendian.h"
 #include	"float_cast.h"
 #include	"common.h"

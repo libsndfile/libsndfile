@@ -29,12 +29,13 @@
 **		http://ibiblio.org/pub/linux/apps/sound/convert/vox.tar.gz
 */
 
+#include	"sfconfig.h"
+
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
 
 #include	"sndfile.h"
-#include	"sfconfig.h"
 #include	"sfendian.h"
 #include	"float_cast.h"
 #include	"common.h"
