@@ -18,8 +18,18 @@
 */
 
 /*
-** This header file MUST be included before the others to ensure that
-** large file support is enabled.
+**	The file is split into three sections as follows:
+**		- The top section (USE_WINDOWS_API == 0) for Linux, Unix and MacOSX
+**			systems (including Cygwin).
+**		- The middle section (USE_WINDOWS_API == 1) for microsoft windows
+**			(including MinGW) using the native windows API.
+**		- A legacy windows section which attempted to work around grevious
+**			bugs in microsoft's POSIX implementation.
+*/
+
+/*
+**	The header file sfconfig.h MUST be included before the others to ensure
+**	that large file support is enabled correctly on Unix systems.
 */
 
 #include "sfconfig.h"

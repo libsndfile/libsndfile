@@ -3,6 +3,9 @@
     * src/*.c
     Ensure sfconfig.h is included before any other header file.
 
+    * src/file_io.c
+    Add comments documenting the three sections of the file.
+
 2005-10-07 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
