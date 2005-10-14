@@ -1,3 +1,8 @@
+2005-10-14 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/lossy_comp_test.c
+    Minor cleanup.
+
 2005-10-13 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/*.c
