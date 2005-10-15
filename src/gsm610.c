@@ -83,7 +83,7 @@ gsm610_init	(SF_PRIVATE *psf)
 
 	psf->sf.seekable = SF_FALSE ;
 
-	if (! (pgsm610 = malloc (sizeof (GSM610_PRIVATE))))
+	if ((pgsm610 = calloc (1, sizeof (GSM610_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 
 	psf->fdata = (void*) pgsm610 ;
@@ -96,7 +96,7 @@ Need separate gsm_data structs for encode and decode.
 
 ============================================================*/
 
-	if (! (pgsm610->gsm_data = gsm_create ()))
+	if ((pgsm610->gsm_data = gsm_create ()) == NULL)
 		return SFE_MALLOC_FAILED ;
 
 	if ((psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAV ||
@@ -241,7 +241,7 @@ gsm610_read_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	int			readcount, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (psf->fdata == NULL)
 		return 0 ;
 	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
 
@@ -267,7 +267,7 @@ gsm610_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	int			k, bufferlen, readcount = 0, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (psf->fdata == NULL)
 		return 0 ;
 	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
 
@@ -293,7 +293,7 @@ gsm610_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (! psf->fdata)
+	if (psf->fdata == NULL)
 		return 0 ;
 	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
 
@@ -323,7 +323,7 @@ gsm610_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x8000) : 1.0 ;
 
-	if (! psf->fdata)
+	if (psf->fdata == NULL)
 		return 0 ;
 	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
 
@@ -348,7 +348,7 @@ gsm610_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	mode = mode ;
 
-	if (! psf->fdata)
+	if (psf->fdata == NULL)
 		return 0 ;
 	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
 
@@ -470,7 +470,7 @@ gsm610_write_s	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	int			writecount, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (psf->fdata == NULL)
 		return 0 ;
 	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
 
@@ -496,7 +496,7 @@ gsm610_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	int			k, bufferlen, writecount = 0, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (psf->fdata == NULL)
 		return 0 ;
 	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
 
@@ -522,7 +522,7 @@ gsm610_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (! psf->fdata)
+	if (psf->fdata == NULL)
 		return 0 ;
 	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
 
@@ -550,7 +550,7 @@ gsm610_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
-	if (! psf->fdata)
+	if (psf->fdata == NULL)
 		return 0 ;
 	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
 
@@ -574,7 +574,7 @@ static int
 gsm610_close	(SF_PRIVATE *psf)
 {	GSM610_PRIVATE *pgsm610 ;
 
-	if (! psf->fdata)
+	if (psf->fdata == NULL)
 		return 0 ;
 
 	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
