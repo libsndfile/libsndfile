@@ -124,7 +124,7 @@ typedef struct
 
 typedef struct
 {	short			playMode ;
-    unsigned short	beginLoop ;
+	unsigned short	beginLoop ;
 	unsigned short	endLoop ;
 } INST_LOOP ;
 
@@ -597,6 +597,9 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					{	unsigned char bytes [6] ;
 						short gain ;
 
+						if (psf->instrument == NULL && (psf->instrument = psf_instrument_alloc ()) == NULL)
+							return SFE_MALLOC_FAILED ;
+
 						psf_binheader_readf (psf, "b", bytes, 6) ;
 						psf_log_printf (psf, 	"  Base Note : %u\n  Detune    : %u\n"
 												"  Low  Note : %u\n  High Note : %u\n"
@@ -648,6 +651,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 							bytesread += psf_binheader_readf (psf, "b", psf->u.scbuf, pstr_len) ;
 							psf_log_printf (psf, "   Name     : %s\n", psf->u.scbuf) ;
+
+							/*	TODO if psf->u.scbuf is equal to 
+							**	either Beg_loop, Beg loop or beg loop and spam
+							if (psf->instrument == NULL && (psf->instrument = psf_instrument_alloc()) == NULL)
+								return SFE_MALLOC_FAILED ;
+							*/
 
 							mark_count -- ;
 							} ;

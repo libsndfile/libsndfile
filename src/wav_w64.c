@@ -50,6 +50,20 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_MULAW =
 {	0x00000007, 0x0000, 0x0010, {	0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 }
 } ;
 
+/*
+** the next two are from
+** http://dream.cs.bath.ac.uk/researchdev/wave-ex/bformat.html
+*/
+
+static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM =
+{	0x00000001, 0x0721, 0x11d3, {	0x86, 0x44, 0xC8, 0xC1, 0xCA, 0x00, 0x00, 0x00 }
+} ;
+
+static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT =
+{	0x00000003, 0x0721, 0x11d3, {	0x86, 0x44, 0xC8, 0xC1, 0xCA, 0x00, 0x00, 0x00 }
+} ;
+
+
 #if 0
 /* maybe interesting one day to read the following through sf_read_raw */
 /* http://www.bath.ac.uk/~masrwd/pvocex/pvocex.html */
@@ -230,7 +244,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 				psf_binheader_readf (psf, "e422", &(wav_fmt->ext.esf.esf_field1), &(wav_fmt->ext.esf.esf_field2),
 						&(wav_fmt->ext.esf.esf_field3)) ;
 
-                /* compare the esf_fields with each known GUID? and print?*/
+				/* compare the esf_fields with each known GUID? and print? */
 				psf_log_printf (psf, "  Subformat\n") ;
 				psf_log_printf (psf, "    esf_field1 : 0x%X\n", wav_fmt->ext.esf.esf_field1) ;
 				psf_log_printf (psf, "    esf_field2 : 0x%X\n", wav_fmt->ext.esf.esf_field2) ;
@@ -244,7 +258,8 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 				psf->bytewidth = BITWIDTH2BYTES (wav_fmt->ext.bitwidth) ;
 
 				/* Compare GUIDs for known ones. */
-				if (wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_PCM))
+				if (wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_PCM)
+					|| wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM))
 				{	psf->sf.format = SF_FORMAT_WAVEX | u_bitwidth_to_subformat (psf->bytewidth * 8) ;
 					psf_log_printf (psf, "    format : pcm\n") ;
 					}
@@ -252,7 +267,8 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 				{	psf->sf.format = (SF_FORMAT_WAVEX | SF_FORMAT_MS_ADPCM) ;
 					psf_log_printf (psf, "    format : ms adpcm\n") ;
 					}
-				else if (wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_IEEE_FLOAT))
+				else if (wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_IEEE_FLOAT)
+						|| wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM))
 				{	psf->sf.format = SF_FORMAT_WAVEX | ((psf->bytewidth == 8) ? SF_FORMAT_DOUBLE : SF_FORMAT_FLOAT) ;
 					psf_log_printf (psf, "    format : IEEE float\n") ;
 					}

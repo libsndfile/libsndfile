@@ -114,6 +114,19 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_MULAW =
 {	0x00000007, 0x0000, 0x0010, {	0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 }
 } ;
 
+/*
+** the next two are from
+** http://dream.cs.bath.ac.uk/researchdev/wave-ex/bformat.html
+*/
+static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM =
+{	0x00000001, 0x0721, 0x11d3, {	0x86, 0x44, 0xC8, 0xC1, 0xCA, 0x00, 0x00, 0x00 }
+} ;
+
+static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT =
+{	0x00000003, 0x0721, 0x11d3, {	0x86, 0x44, 0xC8, 0xC1, 0xCA, 0x00, 0x00, 0x00 }
+} ;
+
+
 #if 0
 /* maybe interesting one day to read the following through sf_read_raw */
 /* http://www.bath.ac.uk/~masrwd/pvocex/pvocex.html */
@@ -1208,7 +1221,8 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 static int
 wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 {	unsigned int bytesread = 0, dword, sampler_data, loop_count ;
-	int k ;
+	unsigned int note, start, end, type = -1, count ;
+	int j, k ;
 
 	chunklen += (chunklen & 1) ;
 
@@ -1221,8 +1235,8 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
 	psf_log_printf (psf, "  Period       : %u nsec\n", dword) ;
 
-	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
-	psf_log_printf (psf, "  Midi Note    : %u\n", dword) ;
+	bytesread += psf_binheader_readf (psf, "e4", &note) ;
+	psf_log_printf (psf, "  Midi Note    : %u\n", note) ;
 
 	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
 	if (dword != 0)
@@ -1249,25 +1263,50 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	*/
 	bytesread += psf_binheader_readf (psf, "e4", &sampler_data) ;
 
-	while (loop_count > 0 && chunklen - bytesread >= 24)
-	{
-		bytesread += psf_binheader_readf (psf, "e4", &dword) ;
+	if ((psf->instrument = psf_instrument_alloc ()) == NULL)
+		return SFE_MALLOC_FAILED ;
+
+	psf->instrument->num_loops = loop_count ;
+
+	for (j = 0 ; loop_count > 0 && chunklen - bytesread >= 24 ; j ++)
+	{	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
 		psf_log_printf (psf, "    Cue ID : %2u", dword) ;
 
-		bytesread += psf_binheader_readf (psf, "e4", &dword) ;
-		psf_log_printf (psf, "  Type : %2u", dword) ;
+		bytesread += psf_binheader_readf (psf, "e4", &type) ;
+		psf_log_printf (psf, "  Type : %2u", type) ;
 
-		bytesread += psf_binheader_readf (psf, "e4", &dword) ;
-		psf_log_printf (psf, "  Start : %5u", dword) ;
+		bytesread += psf_binheader_readf (psf, "e4", &start) ;
+		psf_log_printf (psf, "  Start : %5u", start) ;
 
-		bytesread += psf_binheader_readf (psf, "e4", &dword) ;
-		psf_log_printf (psf, "  End : %5u", dword) ;
+		bytesread += psf_binheader_readf (psf, "e4", &end) ;
+		psf_log_printf (psf, "  End : %5u", end) ;
 
 		bytesread += psf_binheader_readf (psf, "e4", &dword) ;
 		psf_log_printf (psf, "  Fraction : %5u", dword) ;
 
-		bytesread += psf_binheader_readf (psf, "e4", &dword) ;
-		psf_log_printf (psf, "  Count : %5u\n", dword) ;
+		bytesread += psf_binheader_readf (psf, "e4", &count) ;
+		psf_log_printf (psf, "  Count : %5u\n", count) ;
+
+		if (j < ARRAY_LEN (psf->instrument->loops))
+		{	psf->instrument->loops [j].start = start ;
+			psf->instrument->loops [j].end = end ;
+			psf->instrument->loops [j].count = count ;
+
+			switch (type)
+			{	case 0 :
+					psf->instrument->loops [j].mode = SF_LOOP_FORWARD ;
+					break ;
+				case 1 :
+					psf->instrument->loops [j].mode = SF_LOOP_ALTERNATING ;
+					break ;
+				case 2 :
+					psf->instrument->loops [j].mode = SF_LOOP_BACKWARD ;
+					break ;
+				default:
+					psf->instrument->loops [j].mode = SF_LOOP_NONE ;
+					break ;
+				} ;
+			} ;
 
 		loop_count -- ;
 		} ;
@@ -1299,6 +1338,9 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 
 		psf_log_printf (psf, "\n") ;
 		} ;
+
+	psf->instrument->basenote = note ;
+	psf->instrument->gain = 1 ;
 
 	return 0 ;
 } /* wav_read_smpl_chunk */
