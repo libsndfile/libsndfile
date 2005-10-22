@@ -266,6 +266,7 @@ typedef struct sf_private_tag
 
 	/* Loop Info */
 	SF_LOOP_INFO	*loop_info ;
+	SF_INSTRUMENT	*instrument ;
 
 	sf_count_t		filelength ;	/* Overall length of (embedded) file. */
 	sf_count_t		fileoffset ;	/* Offset in number of bytes from beginning of file. */
@@ -644,6 +645,7 @@ int		caf_open	(SF_PRIVATE *psf) ;
 
 /* In progress. Do not currently work. */
 
+int		mpeg_open	(SF_PRIVATE *psf) ;
 int		ogg_open	(SF_PRIVATE *psf) ;
 int		rx2_open	(SF_PRIVATE *psf) ;
 int		txw_open	(SF_PRIVATE *psf) ;
@@ -680,6 +682,8 @@ int		interleave_init (SF_PRIVATE *psf) ;
 */
 
 void	*psf_memset (void *s, int c, sf_count_t n) ;
+
+SF_INSTRUMENT * psf_instrument_alloc (void) ;
 
 /*------------------------------------------------------------------------------------
 ** Here's how we fix systems which don't snprintf / vsnprintf.

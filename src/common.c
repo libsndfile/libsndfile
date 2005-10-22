@@ -1150,6 +1150,26 @@ psf_log_SF_INFO (SF_PRIVATE *psf)
 /*========================================================================================
 */
 
+SF_INSTRUMENT *
+psf_instrument_alloc (void)
+{   SF_INSTRUMENT *instr;
+
+	instr = calloc (1, sizeof (SF_INSTRUMENT)) ;
+
+	if (instr == NULL)
+		return NULL;
+
+	/* Set non-zero default values. */
+
+	instr->basenote = -1 ;
+	instr->lovel = -1 ;
+	instr->hivel = -1 ;
+	instr->lokey = -1 ;
+	instr->hikey = -1 ;
+
+	return instr ;
+} /* psf_instrument_alloc */
+
 void*
 psf_memset (void *s, int c, sf_count_t len)
 {	char	*ptr ;

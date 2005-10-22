@@ -315,29 +315,42 @@ typedef struct
 /* Struct used to retrieve music sample information from a file.
 */
 
-typedef struct
-{	int basenote ;
-	int gain ;
-	int	sustain_mode ;
-	int sustain_start, sustain_end ;
-	int release_mode ;
-	int release_start, reslease_end ;
-} SF_INSTRUMENT ;
-
 /* sustain_mode and release_mode will be one of the following. */
 
 enum
 {	SF_LOOP_NONE = 800,
 	SF_LOOP_FORWARD,
-	SF_LOOP_BACKWARD
+	SF_LOOP_BACKWARD,
+	SF_LOOP_ALTERNATING
 } ;
+
+typedef struct
+{	int mode ;
+	unsigned int start ;
+	unsigned int end ;
+	unsigned int count ;
+} SF_INSTRUMENT_LOOP ;
+
+/* Struct used to retrieve music sample information from a file.
+*/
+
+typedef struct
+{	int gain ;
+	char basenote ;
+	char lovel, hivel ;
+	char lokey, hikey ;
+	int num_loops ;
+	SF_INSTRUMENT_LOOP loops [16] ; /* make variable in a sensible way */
+} SF_INSTRUMENT ;
+
+
 
 /* Struct used to retrieve loop information from a file.*/
 typedef struct
 {
-	short	time_sig_num ;	/* any positive integer    >0  */
-	short	time_sig_den ;	/* any positive power of 2 >0  */
-	int		loop_mode ;		/* see SF_LOOP enum            */
+	short	time_sig_num ;	/* any positive integer    > 0  */
+	short	time_sig_den ;	/* any positive power of 2 > 0  */
+	int		loop_mode ;		/* see SF_LOOP enum             */
 
 	int		num_beats ;		/* this is NOT the amount of quarter notes !!!*/
 							/* a full bar of 4/4 is 4 beats */
