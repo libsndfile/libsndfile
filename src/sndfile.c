@@ -1037,16 +1037,30 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			return psf->add_clipping ;
 
 		case SFC_GET_LOOP_INFO :
-			if (datasize != sizeof (SF_LOOP_INFO))
+			if (datasize != sizeof (SF_LOOP_INFO) || data == NULL)
 				return SF_FALSE ;
-			if (psf->loop_info != NULL)
-			{	SF_LOOP_INFO *temp = (SF_LOOP_INFO *) data ;
-				memcpy (temp, psf->loop_info, sizeof (SF_LOOP_INFO)) ;
+			if (psf->loop_info == NULL)
+				return SF_FALSE ;
+			memcpy (data, psf->loop_info, sizeof (SF_LOOP_INFO)) ;
+			return SF_TRUE ;
 
-				return SF_TRUE ;
+		case SFC_GET_INSTRUMENT :
+			if (datasize != sizeof (SF_INSTRUMENT) || data == NULL)
+				return SF_FALSE ;
+			if (psf->instrument == NULL)
+				return SF_FALSE ;
+			memcpy (data, psf->instrument, sizeof (SF_INSTRUMENT)) ;
+			return SF_TRUE ;
+
+		case SFC_SET_INSTRUMENT :
+			if (datasize != sizeof (SF_INSTRUMENT) || data == NULL)
+				return SF_FALSE ;
+			if (psf->instrument == NULL && (psf->instrument = psf_instrument_alloc ()) == NULL)
+			{	psf->error = SFE_MALLOC_FAILED ;
+				return SF_FALSE ;
 				} ;
-
-			return SF_FALSE ;
+			memcpy (psf->instrument, data, sizeof (SF_INSTRUMENT)) ;
+			return SF_TRUE ;
 
 		default :
 			/* Must be a file specific command. Pass it on. */
@@ -2296,6 +2310,12 @@ psf_close (SF_PRIVATE *psf)
 
 	if (psf->peak_info)
 		free (psf->peak_info) ;
+
+	if (psf->loop_info)
+		free (psf->loop_info) ;
+
+	if (psf->instrument)
+		free (psf->instrument) ;
 
 	if (psf->format_desc)
 	{	memset (psf->format_desc, 0, strlen (psf->format_desc)) ;

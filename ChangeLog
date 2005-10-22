@@ -10,6 +10,9 @@
     * src/aiff.c src/wav.c src/wav_w64.c
     Start work on reading/writing the SF_INSTRUMENT data.
 
+    * src/sndfile.c
+    Add code to get and set SF_INSTRUMENT data.
+
 2005-10-15 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/gsm610.c
