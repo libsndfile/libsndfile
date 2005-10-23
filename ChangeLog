@@ -3,6 +3,7 @@
     * src/sndfile.h.in src/common.h src/common.c
     Update definition of SF_INSTRUMENT struct and create a function to allocate
     and initialize the struct (input from David Viens).
+	Clean up definition of SF_INSTRUMENT struct.
 
     * src/wav.c src/wav_w64.c
     Add support for Ambisoncs B WAVEX files (David Viens).
@@ -12,6 +13,10 @@
 
     * src/sndfile.c
     Add code to get and set SF_INSTRUMENT data.
+
+    * tests/command_test.* tests/Makefile.am
+    Start work on adding instrument tests.
+    command_test.c is no longer autogen generated.
 
 2005-10-15 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

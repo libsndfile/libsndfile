@@ -16,7 +16,6 @@ autogen_sources = write_read_test.tpl write_read_test.def	\
 					pcm_test.tpl pcm_test.def				\
 					header_test.tpl header_test.def			\
 					utils.tpl utils.def						\
-					command_test.tpl command_test.def		\
 					scale_clip_test.tpl scale_clip_test.def	\
 					pipe_test.tpl pipe_test.def				\
 					floating_point_test.tpl floating_point_test.def	\
@@ -132,9 +131,6 @@ header_test.c: header_test.def header_test.tpl
 utils.c: utils.def utils.tpl
 	autogen --writable --source-time utils.def
 
-command_test.c: command_test.def command_test.tpl
-	autogen --writable --source-time command_test.def
-
 scale_clip_test.c: scale_clip_test.def scale_clip_test.tpl
 	autogen --writable --source-time scale_clip_test.def
 
@@ -147,7 +143,7 @@ floating_point_test.c: floating_point_test.def floating_point_test.tpl
 benchmark.c: benchmark.def benchmark.tpl
 	autogen --writable --source-time benchmark.def
 
-genfiles : write_read_test.c pcm_test.c header_test.c utils.c command_test.c \
+genfiles : write_read_test.c pcm_test.c header_test.c utils.c \
 		scale_clip_test.c pipe_test.c floating_point_test.c benchmark.c
 
 #===============================================================================

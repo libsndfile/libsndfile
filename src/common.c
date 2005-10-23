@@ -1160,12 +1160,11 @@ psf_instrument_alloc (void)
 		return NULL;
 
 	/* Set non-zero default values. */
-
 	instr->basenote = -1 ;
-	instr->lovel = -1 ;
-	instr->hivel = -1 ;
-	instr->lokey = -1 ;
-	instr->hikey = -1 ;
+	instr->velocity_lo = -1 ;
+	instr->velocity_hi = -1 ;
+	instr->key_lo = -1 ;
+	instr->key_hi = -1 ;
 
 	return instr ;
 } /* psf_instrument_alloc */
