@@ -599,17 +599,17 @@ truncate_test (const char *filename, int filetype)
 
 static	void
 instrument_test (const char *filename, int filetype)
-{	static const SF_INSTRUMENT write_inst =
+{	static SF_INSTRUMENT write_inst =
 	{	1, /* gain */
 		2, /* basenote */
 		3, 4,
 		5, 6,
 		2, /* loop_count */
-	    {	{	1, 2, 3, 4 },
-	    	{	2, 3, 4, 5 },
+		{	{	1, 2, 3, 4 },
+			{	2, 3, 4, 5 },
 			}
 	} ;
-	/*-SF_INSTRUMENT read_inst ;-*/
+	SF_INSTRUMENT read_inst ;
 	SNDFILE 	*file ;
 	SF_INFO		sfinfo ;
 
@@ -621,7 +621,27 @@ instrument_test (const char *filename, int filetype)
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	if (sf_command (file, SFC_SET_INSTRUMENT, &write_inst, sizeof (write_inst)) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_INSTRUMENT) failed.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
 	sf_close (file) ;
+
+	memset (&read_inst, 0, sizeof (read_inst)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_GET_INSTRUMENT, &read_inst, sizeof (read_inst)) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_GET_INSTRUMENT) failed.\n\n", __LINE__) ;
+		/*-exit (1) ;-*/
+		return ;
+		} ;
+	sf_close (file) ;
+
+	if (memcmp (&write_inst, &read_inst, sizeof (write_inst)) != 0)
+	{	printf ("\n\nLine %d : instrument comparison failed.\n\n", __LINE__) ;
+		/*-exit (1) ;-*/
+		return ;
+		} ;
 
 	unlink (filename) ;
 	puts ("ok") ;
@@ -629,7 +649,7 @@ instrument_test (const char *filename, int filetype)
 
 /*
 ** Do not edit or modify anything in this comment block.
-** The following line is a file identity tag for the GNU Arch 
+** The following line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 59e5d452-8dae-45aa-99aa-b78dc0deba1c

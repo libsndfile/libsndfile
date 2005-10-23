@@ -15,8 +15,8 @@
     Add code to get and set SF_INSTRUMENT data.
 
     * tests/command_test.* tests/Makefile.am
-    Start work on adding instrument tests.
-    command_test.c is no longer autogen generated.
+    Add test for set and getof SF_INSTRUMENT data.
+    The file command_test.c is no longer autogen generated.
 
 2005-10-15 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
