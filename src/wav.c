@@ -1266,7 +1266,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	if ((psf->instrument = psf_instrument_alloc ()) == NULL)
 		return SFE_MALLOC_FAILED ;
 
-	psf->instrument->num_loops = loop_count ;
+	psf->instrument->loop_count = loop_count ;
 
 	for (j = 0 ; loop_count > 0 && chunklen - bytesread >= 24 ; j ++)
 	{	bytesread += psf_binheader_readf (psf, "e4", &dword) ;

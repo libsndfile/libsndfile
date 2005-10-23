@@ -312,35 +312,33 @@ typedef struct
 	sf_count_t	length ;
 } SF_EMBED_FILE_INFO ;
 
-/* Struct used to retrieve music sample information from a file.
+/*
+**	Structs used to retrieve music sample information from a file.
 */
 
-/* sustain_mode and release_mode will be one of the following. */
-
 enum
-{	SF_LOOP_NONE = 800,
+{	/*
+	**	The loop mode field in SF_INSTRUMENT will be one of the following.
+	*/
+	SF_LOOP_NONE = 800,
 	SF_LOOP_FORWARD,
 	SF_LOOP_BACKWARD,
 	SF_LOOP_ALTERNATING
 } ;
 
 typedef struct
-{	int mode ;
-	unsigned int start ;
-	unsigned int end ;
-	unsigned int count ;
-} SF_INSTRUMENT_LOOP ;
-
-/* Struct used to retrieve music sample information from a file.
-*/
-
-typedef struct
 {	int gain ;
 	char basenote ;
-	char lovel, hivel ;
-	char lokey, hikey ;
-	int num_loops ;
-	SF_INSTRUMENT_LOOP loops [16] ; /* make variable in a sensible way */
+	char velocity_lo, velocity_hi ;
+	char key_lo, key_hi ;
+	int loop_count ;
+
+	struct
+	{	int mode ;
+		unsigned int start ;
+		unsigned int end ;
+		unsigned int count ;
+	} loops [16] ; /* make variable in a sensible way */
 } SF_INSTRUMENT ;
 
 
