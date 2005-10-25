@@ -1,3 +1,9 @@
+2005-10-25 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-info.c
+    Minor code cleanup.
+    Start work on dumping SF_INSTRUMENT data.
+
 2005-10-23 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in src/common.h src/common.c

@@ -38,13 +38,15 @@ print_version (void)
 
 	sf_command (NULL, SFC_GET_LIB_VERSION, buffer, sizeof (buffer)) ;
 	printf ("\nVersion : %s\n\n", buffer) ;
-} /* print_usage */
+} /* print_version */
 
 
 static void
 print_usage (char *progname)
-{	printf ("\nUsage : %s <file> ...\n", progname) ;
-	printf ("\nPrints out information about one or more sound files.\n\n") ;
+{	printf ("Usage :\n  %s <file> ...\n", progname) ;
+	printf ("    Prints out information about one or more sound files.\n\n") ;
+	printf ("  %s -i <file>\n", progname) ;
+	printf ("    Prints out the instrument data for the given file.\n\n") ;
 #if (defined (_WIN32) || defined (WIN32))
 		printf ("This is a Unix style command line application which\n"
 				"should be run in a MSDOS box or Command Shell window.\n\n") ;
@@ -147,68 +149,99 @@ generate_duration_str (SF_INFO *sfinfo)
 	return str ;
 } /* generate_duration_str */
 
-int
-main (int argc, char *argv [])
+static void
+info_dump (const char *filename)
 {	static	char	strbuffer [BUFFER_LEN] ;
-	char 		*progname, *infilename ;
-	SNDFILE	 	*infile ;
+	SNDFILE	 	*file ;
 	SF_INFO	 	sfinfo ;
-	int			k ;
 	double		signal_max, decibels ;
 
-	progname = strrchr (argv [0], '/') ;
-	progname = progname ? progname + 1 : argv [0] ;
+	sfinfo.format = 0 ;
+
+	file = sf_open (filename, SFM_READ, &sfinfo) ;
+
+	printf ("========================================\n") ;
+	sf_command (file, SFC_GET_LOG_INFO, strbuffer, BUFFER_LEN) ;
+	puts (strbuffer) ;
+	printf ("----------------------------------------\n") ;
+
+	if (file == NULL)
+	{	printf ("Error : Not able to open input file %s.\n", filename) ;
+		fflush (stdout) ;
+		memset (data, 0, sizeof (data)) ;
+		puts (sf_strerror (NULL)) ;
+		}
+	else
+	{	printf ("Sample Rate : %d\n", sfinfo.samplerate) ;
+		if (sfinfo.frames > 0x7FFFFFFF)
+			printf ("Frames      : unknown\n") ;
+		else
+			printf ("Frames      : %ld\n", (long) sfinfo.frames) ;
+		printf ("Channels    : %d\n", sfinfo.channels) ;
+		printf ("Format      : 0x%08X\n", sfinfo.format) ;
+		printf ("Sections    : %d\n", sfinfo.sections) ;
+		printf ("Seekable    : %s\n", (sfinfo.seekable ? "TRUE" : "FALSE")) ;
+		printf ("Duration    : %s\n", generate_duration_str (&sfinfo)) ;
+
+		/* Do not use sf_signal_max because it doesn work for non-seekable files . */
+		signal_max = get_signal_max (file) ;
+		decibels = calc_decibels (&sfinfo, signal_max) ;
+		printf ("Signal Max  : %g (%4.2f dB)\n\n", signal_max, decibels) ;
+		} ;
+
+	sf_close (file) ;
+
+} /* info_dump */
+
+static void
+instrument_dump (const char *filename)
+{	SNDFILE	 *file ;
+	SF_INFO	 sfinfo ;
+	SF_INSTRUMENT inst ;
+	int got_inst ;
+
+	if ((file = sf_open (filename, SFM_READ, &sfinfo)) == NULL)
+	{	printf ("Error : Not able to open input file %s.\n", filename) ;
+		fflush (stdout) ;
+		memset (data, 0, sizeof (data)) ;
+		puts (sf_strerror (NULL)) ;
+		return ;
+		} ;
+
+	got_inst = sf_command (file, SFC_GET_INSTRUMENT, &inst, sizeof (inst)) ;
+	sf_close (file) ;
+
+	if (got_inst == SF_FALSE)
+	{	printf ("Error : File '%s' does not contain instrument data.\n\n", filename) ;
+		return ;
+		} ;
+
+
+} /* instrument_dump */
+
+int
+main (int argc, char *argv [])
+{	int	k ;
 
 	print_version () ;
 
-	if (argc < 2)
-	{	print_usage (progname) ;
+	if (argc < 2 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)
+	{	char *progname ;
+
+		progname = strrchr (argv [0], '/') ;
+		progname = progname ? progname + 1 : argv [0] ;
+
+		print_usage (progname) ;
 		return 1 ;
 		} ;
 
-	for (k = 1 ; k < argc ; k++)
-	{	infilename = argv [k] ;
-
-		if (strcmp (infilename, "--help") == 0 || strcmp (infilename, "-h") == 0)
-		{	print_usage (progname) ;
-			continue ;
-			} ;
-
-		sfinfo.format = 0 ;
-
-		infile = sf_open (infilename, SFM_READ, &sfinfo) ;
-
-		printf ("========================================\n") ;
-		sf_command (infile, SFC_GET_LOG_INFO, strbuffer, BUFFER_LEN) ;
-		puts (strbuffer) ;
-		printf ("----------------------------------------\n") ;
-
-		if (! infile)
-		{	printf ("Error : Not able to open input file %s.\n", infilename) ;
-			fflush (stdout) ;
-			memset (data, 0, sizeof (data)) ;
-			puts (sf_strerror (NULL)) ;
-			}
-		else
-		{	printf ("Sample Rate : %d\n", sfinfo.samplerate) ;
-			if (sfinfo.frames > 0x7FFFFFFF)
-				printf ("Frames      : unknown\n") ;
-			else
-				printf ("Frames      : %ld\n", (long) sfinfo.frames) ;
-			printf ("Channels    : %d\n", sfinfo.channels) ;
-			printf ("Format      : 0x%08X\n", sfinfo.format) ;
-			printf ("Sections    : %d\n", sfinfo.sections) ;
-			printf ("Seekable    : %s\n", (sfinfo.seekable ? "TRUE" : "FALSE")) ;
-			printf ("Duration    : %s\n", generate_duration_str (&sfinfo)) ;
-
-			/* Do not use sf_signal_max because it doesn work for non-seekable files . */
-			signal_max = get_signal_max (infile) ;
-			decibels = calc_decibels (&sfinfo, signal_max) ;
-			printf ("Signal Max  : %g (%4.2f dB)\n\n", signal_max, decibels) ;
-			} ;
-
-		sf_close (infile) ;
+	if (strcmp (argv [1], "-i") == 0)
+	{	instrument_dump (argv [2]) ;
+		return 0 ;
 		} ;
+
+	for (k = 1 ; k < argc ; k++)
+		info_dump (argv [k]) ;
 
 	return 0 ;
 } /* main */
