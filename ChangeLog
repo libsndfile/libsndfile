@@ -3,6 +3,9 @@
     * examples/sndfile-info.c
     Complete dumping SF_INSTRUMENT data.
 
+    * src/dwvw.c src/ima_adpcm.c src/gsm610.c src/ms_adpcm.c
+    Add extra checks in *_init function.
+
 2005-10-25 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-info.c

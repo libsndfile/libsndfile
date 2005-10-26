@@ -78,6 +78,11 @@ gsm610_init	(SF_PRIVATE *psf)
 {	GSM610_PRIVATE	*pgsm610 ;
 	int		true_flag = 1 ;
 
+	if (psf->fdata != NULL)
+	{	psf_log_printf (psf, "*** psf->fdata is not NULL.\n") ;
+		return SFE_INTERNAL ;
+		} ;
+
 	if (psf->mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 

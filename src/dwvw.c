@@ -78,6 +78,11 @@ int
 dwvw_init (SF_PRIVATE *psf, int bitwidth)
 {	DWVW_PRIVATE	*pdwvw ;
 
+	if (psf->fdata != NULL)
+	{	psf_log_printf (psf, "*** psf->fdata is not NULL.\n") ;
+		return SFE_INTERNAL ;
+		} ;
+
 	if (bitwidth > 24)
 		return SFE_DWVW_BAD_BITWIDTH ;
 

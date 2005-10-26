@@ -102,6 +102,11 @@ int
 wav_w64_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 {	int error ;
 
+	if (psf->fdata != NULL)
+	{	psf_log_printf (psf, "*** psf->fdata is not NULL.\n") ;
+		return SFE_INTERNAL ;
+		} ;
+
 	if (psf->mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
