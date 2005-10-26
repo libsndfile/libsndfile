@@ -6,6 +6,10 @@
     * src/dwvw.c src/ima_adpcm.c src/gsm610.c src/ms_adpcm.c
     Add extra checks in *_init function.
 
+    * tests/lossy_comp_test.c
+    Add a string comment to the end of the files to make sure that the decoder
+    doesn't decode beyond the end of the audio data section.
+
 2005-10-25 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-info.c
