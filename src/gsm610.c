@@ -37,6 +37,12 @@ typedef struct gsm610_tag
 	int				blockcount, samplecount ;
 	int				samplesperblock, blocksize ;
 
+	/*
+	**	Stash the container's close function he so we can chain in
+	**	a codec specific close function as well.
+	*/
+	int				(*close)		(SF_PRIVATE *) ;
+
 	int				(*decode_block)	(SF_PRIVATE *psf, struct gsm610_tag *pgsm610) ;
 	int				(*encode_block)	(SF_PRIVATE *psf, struct gsm610_tag *pgsm610) ;
 
@@ -151,7 +157,10 @@ Need separate gsm_data structs for encode and decode.
 		psf->write_double	= gsm610_write_d ;
 		} ;
 
+	if (psf->close != gsm610_close)
+		pgsm610->close = psf->close ;
 	psf->close = gsm610_close ;
+
 	psf->seek = gsm610_seek ;
 
 	psf->filelength = psf_get_filelen (psf) ;
@@ -591,10 +600,11 @@ gsm610_close	(SF_PRIVATE *psf)
 
 		if (pgsm610->samplecount && pgsm610->samplecount < pgsm610->samplesperblock)
 			pgsm610->encode_block (psf, pgsm610) ;
-
-		if (psf->write_header)
-			psf->write_header (psf, SF_TRUE) ;
 		} ;
+
+	/* Call the container's close function. */
+	if (pgsm610->close != NULL)
+		pgsm610->close (psf) ;
 
 	if (pgsm610->gsm_data)
 		gsm_destroy (pgsm610->gsm_data) ;
