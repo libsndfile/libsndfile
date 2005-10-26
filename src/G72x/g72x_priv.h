@@ -41,7 +41,7 @@
 ** Recommendation.
 */
 
-typedef struct private_g72x
+struct g72x_state
 {	long  yl;	/* Locked or steady state step size multiplier. */
 	short yu;	/* Unlocked or non-steady state step size multiplier. */
 	short dms;	/* Short term energy estimate. */
@@ -72,15 +72,13 @@ typedef struct private_g72x
 	**	was changed so that the encoding and decoding routines could work on
 	**	a block of samples at a time to reduce the function call overhead.
 	*/
-	int		(*encoder) (int, struct private_g72x* state) ;
-	int		(*decoder) (int, struct private_g72x* state) ;
+	int		(*encoder) (int, struct g72x_state* state) ;
+	int		(*decoder) (int, struct g72x_state* state) ;
 
-	int		codec_bits ;
-	int		byte_index, sample_index ;
+	int		codec_bits, blocksize, samplesperblock ;
+} ;
 
-} G72x_STATE ;
-
-
+typedef struct g72x_state G72x_STATE ;
 
 int	predictor_zero (G72x_STATE *state_ptr);
 
@@ -106,12 +104,10 @@ int g723_24_decoder	(int code, G72x_STATE *state_ptr);
 int g723_40_encoder	(int sample, G72x_STATE *state_ptr);
 int g723_40_decoder	(int code, G72x_STATE *state_ptr);
 
-int unpack_bytes (G72x_DATA *data, int bits) ;
-int pack_bytes (G72x_DATA *data, int bits) ;
-
 void private_init_state (G72x_STATE *state_ptr) ;
 
 #endif /* G72X_PRIVATE_H */
+
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch

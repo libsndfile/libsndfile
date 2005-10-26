@@ -26,7 +26,6 @@
 #include	"sndfile.h"
 #include	"sfendian.h"
 #include	"common.h"
-#include	"au.h"
 
 /*------------------------------------------------------------------------------
 ** Macros to handle big/little endian issues.
@@ -163,26 +162,17 @@ au_open	(SF_PRIVATE *psf)
 				break ;
 
 		case SF_FORMAT_G721_32 :
-				if (psf->mode == SFM_READ)
-					error = au_g72x_reader_init (psf, AU_H_G721_32) ;
-				else if (psf->mode == SFM_WRITE)
-					error = au_g72x_writer_init (psf, AU_H_G721_32) ;
+				error = g72x_init (psf) ;
 				psf->sf.seekable = SF_FALSE ;
 				break ;
 
 		case SF_FORMAT_G723_24 :
-				if (psf->mode == SFM_READ)
-					error = au_g72x_reader_init (psf, AU_H_G723_24) ;
-				else if (psf->mode == SFM_WRITE)
-					error = au_g72x_writer_init (psf, AU_H_G723_24) ;
+				error = g72x_init (psf) ;
 				psf->sf.seekable = SF_FALSE ;
 				break ;
 
 		case SF_FORMAT_G723_40 :
-				if (psf->mode == SFM_READ)
-					error = au_g72x_reader_init (psf, AU_H_G723_40) ;
-				else if (psf->mode == SFM_WRITE)
-					error = au_g72x_writer_init (psf, AU_H_G723_40) ;
+				error = g72x_init (psf) ;
 				psf->sf.seekable = SF_FALSE ;
 				break ;
 		/* Lite remove end */

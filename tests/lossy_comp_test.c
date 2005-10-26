@@ -133,6 +133,14 @@ main (int argc, char *argv [])
 
 		test_count++ ;
 		} ;
+
+	if (do_all || strcmp (argv [1], "wav_g721") == 0)
+	{	printf ("**** Fix this later : error bound should be 0.06 ****\n") ;
+		lcomp_test_short	("g721.wav", SF_FORMAT_WAV | SF_FORMAT_G721_32, 1, 0.7) ;
+		lcomp_test_int		("g721.wav", SF_FORMAT_WAV | SF_FORMAT_G721_32, 1, 0.7) ;
+
+		test_count++ ;
+		} ;
 	/* Lite remove end */
 
 	if (do_all || strcmp (argv [1], "wav_ulaw") == 0)
@@ -1660,6 +1668,8 @@ printf ("** fix this ** ") ;
 		exit (1) ;
 		} ;
 
+	check_comment (file, filetype, __LINE__) ;
+
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 
 	check_log_buffer_or_die (file, __LINE__) ;
@@ -1842,6 +1852,8 @@ channels = 1 ;
 	{	printf ("Incorrect number of channels in file.\n") ;
 		exit (1) ;
 		} ;
+
+	check_comment (file, filetype, __LINE__) ;
 
 	check_comment (file, filetype, __LINE__) ;
 

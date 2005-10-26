@@ -667,6 +667,7 @@ int		dwvw_init		(SF_PRIVATE *psf, int bitwidth) ;
 int		gsm610_init		(SF_PRIVATE *psf) ;
 int		vox_adpcm_init	(SF_PRIVATE *psf) ;
 int		flac_init		(SF_PRIVATE *psf) ;
+int		g72x_init 		(SF_PRIVATE * psf) ;
 
 int 	dither_init		(SF_PRIVATE *psf, int mode) ;
 
@@ -708,8 +709,6 @@ int missing_vsnprintf (char *str, size_t n, const char *fmt, ...) ;
 #define	LSF_VSNPRINTF	missing_vsnprintf
 #endif
 
-#endif /* SNDFILE_COMMON_H */
-
 /*------------------------------------------------------------------------------------
 ** Extra commands for sf_command(). Not for public use yet.
 */
@@ -732,6 +731,9 @@ int sf_dither_int		(const SF_DITHER_INFO *dither, const int *in, int *out, int c
 int sf_dither_float		(const SF_DITHER_INFO *dither, const float *in, float *out, int count) ;
 int sf_dither_double	(const SF_DITHER_INFO *dither, const double *in, double *out, int count) ;
 #endif
+
+#endif /* SNDFILE_COMMON_H */
+
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch

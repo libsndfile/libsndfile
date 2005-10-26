@@ -29,7 +29,7 @@
  *
  * Common routines for G.721 and G.723 conversions.
  */
- 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,8 +37,11 @@
 #include "g72x.h"
 #include "g72x_priv.h"
 
-static 
-short power2 [15] = 
+static int unpack_bytes (int bits, int blocksize, const unsigned char * block, short * samples) ;
+static int pack_bytes (int bits, const short * samples, unsigned char * block) ;
+
+static
+short power2 [15] =
 {	1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80,
 	0x100, 0x200, 0x400, 0x800, 0x1000, 0x2000, 0x4000
 } ;
@@ -51,7 +54,7 @@ short power2 [15] =
  *
  * Using linear search for simple coding.
  */
-static 
+static
 int quan (int val, short *table, int size)
 {
 	int		i;
@@ -68,7 +71,7 @@ int quan (int val, short *table, int size)
  * returns the integer product of the 14-bit integer "an" and
  * "floating point" representation (4-bit exponent, 6-bit mantessa) "srn".
  */
-static 
+static
 int fmult (int an, int srn)
 {
 	short		anmag, anexp, anmant;
@@ -89,11 +92,15 @@ int fmult (int an, int srn)
 	*/
 
 	wanmant = (anmant * (srn & 0x37)) >> 4 ;
-	
+
 	retval = (wanexp >= 0) ? ((wanmant << wanexp) & 0x7FFF) :
 	    (wanmant >> -wanexp);
 
 	return (((an ^ srn) < 0) ? -retval : retval);
+}
+
+G72x_STATE * g72x_state_new (void)
+{	return calloc (1, sizeof (G72x_STATE)) ;
 }
 
 /*
@@ -124,171 +131,134 @@ void private_init_state (G72x_STATE *state_ptr)
 	state_ptr->td = 0;
 }	/* private_init_state */
 
-int g72x_reader_init (G72x_DATA *data, int codec)
+struct g72x_state * g72x_reader_init (int codec, int *blocksize, int *samplesperblock)
 {	G72x_STATE *pstate ;
 
-	if (sizeof (data->private) < sizeof (G72x_STATE))
-	{	/* This is for safety only. */
-		return 1 ;
-		} ;
+	if ((pstate = g72x_state_new ()) == NULL)
+		return NULL ;
 
-	memset (data, 0, sizeof (G72x_DATA)) ;
-	
-	pstate = (G72x_STATE*) data->private ;
 	private_init_state (pstate) ;
-		
+
 	pstate->encoder = NULL ;
-	
+
 	switch (codec)
 	{	case G723_16_BITS_PER_SAMPLE : /* 2 bits per sample. */
 				pstate->decoder = g723_16_decoder ;
-				data->blocksize = G723_16_BYTES_PER_BLOCK ;
-				data->samplesperblock = G723_16_SAMPLES_PER_BLOCK ;
+				*blocksize = G723_16_BYTES_PER_BLOCK ;
+				*samplesperblock = G723_16_SAMPLES_PER_BLOCK ;
 				pstate->codec_bits = 2 ;
+				pstate->blocksize = G723_16_BYTES_PER_BLOCK ;
+				pstate->samplesperblock = G723_16_SAMPLES_PER_BLOCK ;
 				break ;
-				
-		case G723_24_BITS_PER_SAMPLE : /* 3 bits per sample. */ 
+
+		case G723_24_BITS_PER_SAMPLE : /* 3 bits per sample. */
 				pstate->decoder = g723_24_decoder ;
-				data->blocksize = G723_24_BYTES_PER_BLOCK ;
-				data->samplesperblock = G723_24_SAMPLES_PER_BLOCK ;
+				*blocksize = G723_24_BYTES_PER_BLOCK ;
+				*samplesperblock = G723_24_SAMPLES_PER_BLOCK ;
 				pstate->codec_bits = 3 ;
+				pstate->blocksize = G723_24_BYTES_PER_BLOCK ;
+				pstate->samplesperblock = G723_24_SAMPLES_PER_BLOCK ;
 				break ;
-				
+
 		case G721_32_BITS_PER_SAMPLE : /* 4 bits per sample. */
 				pstate->decoder = g721_decoder ;
-				data->blocksize = G721_32_BYTES_PER_BLOCK ;
-				data->samplesperblock = G721_32_SAMPLES_PER_BLOCK ;
+				*blocksize = G721_32_BYTES_PER_BLOCK ;
+				*samplesperblock = G721_32_SAMPLES_PER_BLOCK ;
 				pstate->codec_bits = 4 ;
+				pstate->blocksize = G721_32_BYTES_PER_BLOCK ;
+				pstate->samplesperblock = G721_32_SAMPLES_PER_BLOCK ;
 				break ;
-				
+
 		case G721_40_BITS_PER_SAMPLE : /* 5 bits per sample. */
 				pstate->decoder = g723_40_decoder ;
-				data->blocksize = G721_40_BYTES_PER_BLOCK ;
-				data->samplesperblock = G721_40_SAMPLES_PER_BLOCK ;
+				*blocksize = G721_40_BYTES_PER_BLOCK ;
+				*samplesperblock = G721_40_SAMPLES_PER_BLOCK ;
 				pstate->codec_bits = 5 ;
+				pstate->blocksize = G721_40_BYTES_PER_BLOCK ;
+				pstate->samplesperblock = G721_40_SAMPLES_PER_BLOCK ;
 				break ;
-				
-		default : return 1 ;
+
+		default :
+				free (pstate) ;
+				return NULL ;
 		} ;
 
-	return 0 ;
+	return pstate ;
 }	/* g72x_reader_init */
 
-int g72x_writer_init (G72x_DATA *data, int codec)
+struct g72x_state * g72x_writer_init (int codec, int *blocksize, int *samplesperblock)
 {	G72x_STATE *pstate ;
 
-	if (sizeof (data->private) < sizeof (G72x_STATE))
-	{	/* This is for safety only. Gets optimised out. */
-		return 1 ;
-		} ;
+	if ((pstate = g72x_state_new ()) == NULL)
+		return NULL ;
 
-	memset (data, 0, sizeof (G72x_DATA)) ;
-	
-	pstate = (G72x_STATE*) data->private ;
 	private_init_state (pstate) ;
-		
 	pstate->decoder = NULL ;
-	
+
 	switch (codec)
 	{	case G723_16_BITS_PER_SAMPLE : /* 2 bits per sample. */
 				pstate->encoder = g723_16_encoder ;
-				data->blocksize = G723_16_BYTES_PER_BLOCK ;
-				data->samplesperblock = G723_16_SAMPLES_PER_BLOCK ;
+				*blocksize = G723_16_BYTES_PER_BLOCK ;
+				*samplesperblock = G723_16_SAMPLES_PER_BLOCK ;
 				pstate->codec_bits = 2 ;
+				pstate->blocksize = G723_16_BYTES_PER_BLOCK ;
+				pstate->samplesperblock = G723_16_SAMPLES_PER_BLOCK ;
 				break ;
-				
-		case G723_24_BITS_PER_SAMPLE : /* 3 bits per sample. */ 
+
+		case G723_24_BITS_PER_SAMPLE : /* 3 bits per sample. */
 				pstate->encoder = g723_24_encoder ;
-				data->blocksize = G723_24_BYTES_PER_BLOCK ;
-				data->samplesperblock = G723_24_SAMPLES_PER_BLOCK ;
+				*blocksize = G723_24_BYTES_PER_BLOCK ;
+				*samplesperblock = G723_24_SAMPLES_PER_BLOCK ;
 				pstate->codec_bits = 3 ;
+				pstate->blocksize = G723_24_BYTES_PER_BLOCK ;
+				pstate->samplesperblock = G723_24_SAMPLES_PER_BLOCK ;
 				break ;
-				
+
 		case G721_32_BITS_PER_SAMPLE : /* 4 bits per sample. */
 				pstate->encoder = g721_encoder ;
-				data->blocksize = G721_32_BYTES_PER_BLOCK ;
-				data->samplesperblock = G721_32_SAMPLES_PER_BLOCK ;
+				*blocksize = G721_32_BYTES_PER_BLOCK ;
+				*samplesperblock = G721_32_SAMPLES_PER_BLOCK ;
 				pstate->codec_bits = 4 ;
+				pstate->blocksize = G721_32_BYTES_PER_BLOCK ;
+				pstate->samplesperblock = G721_32_SAMPLES_PER_BLOCK ;
 				break ;
-				
+
 		case G721_40_BITS_PER_SAMPLE : /* 5 bits per sample. */
 				pstate->encoder = g723_40_encoder ;
-				data->blocksize = G721_40_BYTES_PER_BLOCK ;
-				data->samplesperblock = G721_40_SAMPLES_PER_BLOCK ;
+				*blocksize = G721_40_BYTES_PER_BLOCK ;
+				*samplesperblock = G721_40_SAMPLES_PER_BLOCK ;
 				pstate->codec_bits = 5 ;
+				pstate->blocksize = G721_40_BYTES_PER_BLOCK ;
+				pstate->samplesperblock = G721_40_SAMPLES_PER_BLOCK ;
 				break ;
-				
-		default : return 1 ;
+
+		default :
+				free (pstate) ;
+				return NULL ;
 		} ;
 
-	return 0 ;
+	return pstate ;
 }	/* g72x_writer_init */
 
-int unpack_bytes (G72x_DATA *data, int bits)
-{	unsigned int    in_buffer = 0 ;
-	unsigned char	in_byte ;
-	int				k, in_bits = 0, bindex = 0 ;
-	
-	for (k = 0 ; bindex <= data->blocksize && k < G72x_BLOCK_SIZE ; k++)
-	{	if (in_bits < bits) 
-		{	in_byte = data->block [bindex++] ;
+int g72x_decode_block (G72x_STATE *pstate, const unsigned char *block, short *samples)
+{	int	k, count ;
 
-			in_buffer |= (in_byte << in_bits);
-			in_bits += 8;
-			}
-		data->samples [k] = in_buffer & ((1 << bits) - 1);
-		in_buffer >>= bits;
-		in_bits -= bits;
-		} ;
-		
-	return k ;
-} /* unpack_bytes */
+	count = unpack_bytes (pstate->codec_bits, pstate->blocksize, block, samples) ;
 
-int g72x_decode_block (G72x_DATA *data)
-{	G72x_STATE *pstate ;
-	int	k, count ;
-	
-	pstate = (G72x_STATE*) data->private ;
-	
-	count = unpack_bytes (data, pstate->codec_bits) ;
-	
 	for (k = 0 ; k < count ; k++)
-		data->samples [k] = pstate->decoder (data->samples [k], pstate) ;
-	
+		samples [k] = pstate->decoder (samples [k], pstate) ;
+
 	return 0 ;
 }	/* g72x_decode_block */
 
-int pack_bytes (G72x_DATA *data, int bits)
-{
-	unsigned int	out_buffer = 0 ;
-	int				k, bindex = 0, out_bits = 0 ;
-	unsigned char	out_byte ;
+int g72x_encode_block (G72x_STATE *pstate, short *samples, unsigned char *block)
+{	int k, count ;
 
-	for (k = 0 ; k < G72x_BLOCK_SIZE ; k++)
-	{	out_buffer |= (data->samples [k] << out_bits) ;
-		out_bits += bits ;
-		if (out_bits >= 8) 
-		{	out_byte = out_buffer & 0xFF ;
-			out_bits -= 8 ;
-			out_buffer >>= 8 ;
-			data->block [bindex++] = out_byte ;
-			}
-		} ;
+	for (k = 0 ; k < pstate->samplesperblock ; k++)
+		samples [k] = pstate->encoder (samples [k], pstate) ;
 
-	return bindex ;
-} /* pack_bytes */
+	count = pack_bytes (pstate->codec_bits, samples, block) ;
 
-int g72x_encode_block (G72x_DATA *data)
-{	G72x_STATE *pstate ;
-	int k, count ;
-
-	pstate = (G72x_STATE*) data->private ;
-	
-	for (k = 0 ; k < data->samplesperblock ; k++)
-		data->samples [k] = pstate->encoder (data->samples [k], pstate) ;
-	
-	count = pack_bytes (data, pstate->codec_bits) ;
-	
 	return count ;
 }	/* g72x_encode_block */
 
@@ -622,13 +592,58 @@ update(
 		state_ptr->ap += (0x200 - state_ptr->ap) >> 4;
 	else
 		state_ptr->ap += (-state_ptr->ap) >> 4;
-		
+
 	return ;
 } /* update */
 
+/*------------------------------------------------------------------------------
+*/
+
+static int
+unpack_bytes (int bits, int blocksize, const unsigned char * block, short * samples)
+{	unsigned int    in_buffer = 0 ;
+	unsigned char	in_byte ;
+	int				k, in_bits = 0, bindex = 0 ;
+
+	for (k = 0 ; bindex <= blocksize && k < G72x_BLOCK_SIZE ; k++)
+	{	if (in_bits < bits)
+		{	in_byte = block [bindex++] ;
+
+			in_buffer |= (in_byte << in_bits);
+			in_bits += 8;
+			}
+		samples [k] = in_buffer & ((1 << bits) - 1);
+		in_buffer >>= bits;
+		in_bits -= bits;
+		} ;
+
+	return k ;
+} /* unpack_bytes */
+
+static int
+pack_bytes (int bits, const short * samples, unsigned char * block)
+{
+	unsigned int	out_buffer = 0 ;
+	int				k, bindex = 0, out_bits = 0 ;
+	unsigned char	out_byte ;
+
+	for (k = 0 ; k < G72x_BLOCK_SIZE ; k++)
+	{	out_buffer |= (samples [k] << out_bits) ;
+		out_bits += bits ;
+		if (out_bits >= 8)
+		{	out_byte = out_buffer & 0xFF ;
+			out_bits -= 8 ;
+			out_buffer >>= 8 ;
+			block [bindex++] = out_byte ;
+			}
+		} ;
+
+	return bindex ;
+} /* pack_bytes */
+
 /*
 ** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
+** The arch-tag line is a file identity tag for the GNU Arch
 ** revision control system.
 **
 ** arch-tag: 6298dc75-fd0f-4062-9b90-f73ed69f22d4

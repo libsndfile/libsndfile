@@ -580,6 +580,8 @@ sf_format_check	(const SF_INFO *info)
 					return 1 ;
 				if (subformat == SF_FORMAT_GSM610 && info->channels == 1)
 					return 1 ;
+				if (subformat == SF_FORMAT_G721_32 && info->channels == 1)
+					return 1 ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
 					return 1 ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)

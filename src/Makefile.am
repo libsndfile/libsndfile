@@ -11,7 +11,7 @@ OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 			Symbols.linux Symbols.darwin libsndfile.def create_symbols_file.py
 
-noinst_HEADERS = common.h sfconfig.h sfendian.h float_cast.h wav_w64.h au.h sf_unistd.h
+noinst_HEADERS = common.h sfconfig.h sfendian.h float_cast.h wav_w64.h sf_unistd.h
 
 noinst_PROGRAMS = test_endswap test_file_io test_log_printf
 
@@ -19,7 +19,7 @@ COMMON = sndfile.c common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
 		interleave.c strings.c dither.c
 
-FILESPECIFIC = aiff.c au.c au_g72x.c avr.c caf.c ircam.c macbinary3.c macos.c \
+FILESPECIFIC = aiff.c au.c g72x.c avr.c caf.c ircam.c macbinary3.c macos.c \
 				mat4.c mat5.c nist.c paf.c pvf.c raw.c svx.c voc.c htk.c dwd.c \
 				ogg.c rx2.c sd2.c sds.c txw.c wve.c w64.c wav_w64.c wav.c xi.c \
 				flac.c
@@ -83,7 +83,7 @@ AUTOHEADER=echo
 
 # Dependancies.
 
-aiff.c au.c au_g72x.c ircam.c mat4.c mat5.c nist.c paf.c pvf.c : sndfile.h common.h
+aiff.c au.c g72x.c ircam.c mat4.c mat5.c nist.c paf.c pvf.c : sndfile.h common.h
 raw.c svx.c voc.c w64.c wav.c wav_w64.c htk.c sd2.c rx2.c txw.c : sndfile.h common.h
 sds.c wve.c dwd.c ogg.c xi.c sndfile.c common.c file_io.c : sndfile.h common.h
 command.c pcm.c ulaw.c alaw.c float32.c double64.c ima_adpcm.c : sndfile.h common.h

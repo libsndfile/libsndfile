@@ -241,6 +241,10 @@ wav_open	 (SF_PRIVATE *psf)
 		case SF_FORMAT_MS_ADPCM :
 					error = wav_w64_msadpcm_init (psf, blockalign, framesperblock) ;
 					break ;
+
+		case SF_FORMAT_G721_32 :
+					error = g72x_init (psf) ;
+					break ;
 		/* Lite remove end */
 
 		case SF_FORMAT_GSM610 :
@@ -612,6 +616,10 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					psf->sf.format |= (psf->bytewidth == 8) ? SF_FORMAT_DOUBLE : SF_FORMAT_FLOAT ;
 					break ;
 
+		case WAVE_FORMAT_G721_ADPCM :
+					psf->sf.format = SF_FORMAT_WAV | SF_FORMAT_G721_32 ;
+					break ;
+
 		default : return SFE_UNIMPLEMENTED ;
 		} ;
 
@@ -755,6 +763,22 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 
 					add_fact_chunk = SF_TRUE ;
 					break ;
+
+
+		case SF_FORMAT_G721_32 :
+					/* fmt chunk. */
+					fmt_size = 2 + 2 + 4 + 4 + 2 + 2 ;
+
+					/* fmt : size, WAV format type, channels, samplerate, bytespersec */
+					psf_binheader_writef (psf, "e42244", fmt_size, WAVE_FORMAT_G721_ADPCM,
+								psf->sf.channels, psf->sf.samplerate, psf->sf.samplerate * psf->sf.channels / 2) ;
+
+					/* fmt : blockalign, bitwidth. */
+					psf_binheader_writef (psf, "e22", 64, 4) ;
+
+					add_fact_chunk = SF_TRUE ;
+					break ;
+
 		/* Lite remove end */
 
 		case SF_FORMAT_GSM610 :

@@ -180,6 +180,7 @@ wav-tests: write_read_test lossy_comp_test peak_chunk_test header_test misc_test
 	./lossy_comp_test wav_ulaw
 	./lossy_comp_test wav_alaw
 	./lossy_comp_test wav_gsm610
+	./lossy_comp_test wav_g721
 	./peak_chunk_test wav
 	./header_test wav
 	./misc_test wav
