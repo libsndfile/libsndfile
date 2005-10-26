@@ -1,3 +1,11 @@
+2005-10-27 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/g72x.c src/G72x/*.(c|h) src/common.h src/sndfile.c src/wav.c src/au.c
+    Add support for G721 encoded WAV files.
+
+    * doc/index.html
+    Update support matrix.
+
 2005-10-26 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-info.c
@@ -9,9 +17,6 @@
     * tests/lossy_comp_test.c
     Add a string comment to the end of the files to make sure that the decoder
     doesn't decode beyond the end of the audio data section.
-
-    * src/g72x.c src/G72x/*.(c|h) src/common.h src/sndfile.c src/wav.c src/au.c
-    Add support for G721 encoded WAV files.
 
 2005-10-25 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
