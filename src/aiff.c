@@ -238,8 +238,6 @@ aiff_open	(SF_PRIVATE *psf)
 	psf->close = aiff_close ;
 	psf->command = aiff_command ;
 
-	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
-
 	switch (psf->sf.format & SF_FORMAT_SUBMASK)
 	{	case SF_FORMAT_PCM_U8 :
 				error = pcm_init (psf) ;
@@ -314,8 +312,6 @@ aiff_open	(SF_PRIVATE *psf)
 		default : return SFE_UNIMPLEMENTED ;
 		} ;
 
-	if (psf->mode == SFM_READ)
-		psf->blockwidth = psf->sf.channels * psf->bytewidth ;
 
 	return error ;
 } /* aiff_open */
@@ -1113,6 +1109,12 @@ aiff_write_tailer (SF_PRIVATE *psf)
 
 	psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
 
+	/* Make sure tailer data starts at even byte offset. Pad if necessary. */
+	if (psf->dataend % 2 == 1)
+	{	psf_fwrite (psf->header, 1, 1, psf) ;
+		psf->dataend ++ ;
+		} ;
+
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_END)
 	{	psf_binheader_writef (psf, "Em4", PEAK_MARKER, AIFF_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
 		psf_binheader_writef (psf, "E44", 1, time (NULL)) ;
@@ -1124,7 +1126,7 @@ aiff_write_tailer (SF_PRIVATE *psf)
 		aiff_write_strings (psf, SF_STR_LOCATE_END) ;
 
 	/* Write the tailer. */
-	if (psf->headindex)
+	if (psf->headindex > 0)
 		psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 
 	return 0 ;
