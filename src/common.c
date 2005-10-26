@@ -1152,12 +1152,12 @@ psf_log_SF_INFO (SF_PRIVATE *psf)
 
 SF_INSTRUMENT *
 psf_instrument_alloc (void)
-{   SF_INSTRUMENT *instr;
+{	SF_INSTRUMENT *instr ;
 
 	instr = calloc (1, sizeof (SF_INSTRUMENT)) ;
 
 	if (instr == NULL)
-		return NULL;
+		return NULL ;
 
 	/* Set non-zero default values. */
 	instr->basenote = -1 ;
