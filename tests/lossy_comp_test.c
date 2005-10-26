@@ -1639,6 +1639,7 @@ printf ("** fix this ** ") ;
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 	test_write_float_or_die (file, 0, orig, datalen, __LINE__) ;
+	sf_set_string (file, SF_STR_COMMENT, long_comment) ;
 	sf_close (file) ;
 
 	memset (data, 0, datalen * sizeof (float)) ;
@@ -1824,6 +1825,7 @@ channels = 1 ;
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
 	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
 	test_write_double_or_die (file, 0, orig, datalen, __LINE__) ;
+	sf_set_string (file, SF_STR_COMMENT, long_comment) ;
 	sf_close (file) ;
 
 	memset (data, 0, datalen * sizeof (double)) ;
@@ -2119,14 +2121,11 @@ check_comment (SNDFILE * file, int format, int lineno)
 		return ;
 	if (format == (SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM))
 		return ;
-	if (format == (SF_FORMAT_WAV | SF_FORMAT_GSM610))
-		return ;
-	if (format == (SF_FORMAT_AIFF | SF_FORMAT_GSM610))
-		return ;
 
 	switch (format & SF_FORMAT_TYPEMASK)
 	{	case SF_FORMAT_AIFF :
 		case SF_FORMAT_WAV :
+		case SF_FORMAT_WAVEX :
 			break ;
 		default :
 			return ;

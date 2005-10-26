@@ -6,6 +6,23 @@
     * doc/index.html
     Update support matrix.
 
+    * tests/lossy_comp_test.c
+    For file formats that support it, add string data after the audio data and
+    make sure it isn't treated as audio data on read.
+
+    * src/gsm610.c
+    Add code to ensure that the container close function (ie for WAV files) gets
+    called after the codec's close function. This allows GSM610 encoded WAV files
+    to have string data following the audio data.
+	Add an AIFF specific check on psf->datalength.
+
+    * src/wav.c
+    Simplify wav_close function.
+
+    * src/aiff.c
+    Make sure the tailer data gets written at an even file offset. Pad if
+    necessary.
+
 2005-10-26 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-info.c
