@@ -36,6 +36,10 @@ typedef struct
 {	/* Private data. Don't mess with it. */
 	struct g72x_state * private ;
 
+	/*
+	**	Stash the container's close function he so we can chain in
+	**	a codec specific close function as well.
+	*/
 	int				(*close)		(SF_PRIVATE *) ;
 
 	/* Public data. Read only. */
@@ -175,7 +179,6 @@ g72x_init (SF_PRIVATE * psf)
 
 	if (psf->close != g72x_close)
 		pg72x->close = psf->close ;
-
 	psf->close	= g72x_close ;
 
 	return 0 ;
@@ -605,6 +608,7 @@ g72x_close (SF_PRIVATE *psf)
 			psf->write_header (psf, SF_FALSE) ;
 		} ;
 
+	/* Call the container's close function. */
 	if (pg72x->close != NULL)
 		pg72x->close (psf) ;
 
