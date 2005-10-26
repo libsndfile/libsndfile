@@ -130,12 +130,22 @@ Need separate gsm_data structs for encode and decode.
 		} ;
 
 	if (psf->mode == SFM_READ)
-	{	if (psf->datalength % pgsm610->blocksize)
-		{	psf_log_printf (psf, "*** Warning : data chunk seems to be truncated.\n") ;
-			pgsm610->blocks = psf->datalength / pgsm610->blocksize + 1 ;
+	{	if (psf->datalength % pgsm610->blocksize == 0)
+			pgsm610->blocks = psf->datalength / pgsm610->blocksize ;
+		else if (psf->datalength % pgsm610->blocksize == 1 && pgsm610->blocksize == GSM610_BLOCKSIZE)
+		{	/*
+			**	Weird AIFF specific case.
+			**	AIFF chunks must be at an odd offset from the start of file and
+			**	GSM610_BLOCKSIZE is odd which can result in an odd length SSND
+			**	chunk. The SSND chunk then gets padded on write which means that
+			**	when it is read the datalength is too big by 1.
+			*/
+			pgsm610->blocks = psf->datalength / pgsm610->blocksize ;
 			}
 		else
-			pgsm610->blocks = psf->datalength / pgsm610->blocksize ;
+		{	psf_log_printf (psf, "*** Warning : data chunk seems to be truncated.\n") ;
+			pgsm610->blocks = psf->datalength / pgsm610->blocksize + 1 ;
+			} ;
 
 		psf->sf.frames = pgsm610->samplesperblock * pgsm610->blocks ;
 
