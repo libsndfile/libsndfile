@@ -128,9 +128,6 @@ static int
 wav_w64_ima_close	(SF_PRIVATE *psf)
 {	IMA_ADPCM_PRIVATE *pima ;
 
-	if (! psf->fdata)
-		return 0 ;
-
 	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
 
 	if (psf->mode == SFM_WRITE)
@@ -145,9 +142,6 @@ wav_w64_ima_close	(SF_PRIVATE *psf)
 		if (psf->write_header)
 			psf->write_header (psf, SF_TRUE) ;
 		} ;
-
-	free (psf->fdata) ;
-	psf->fdata = NULL ;
 
 	return 0 ;
 } /* wav_w64_ima_close */
@@ -177,9 +171,6 @@ static int
 aiff_ima_close	(SF_PRIVATE *psf)
 {	IMA_ADPCM_PRIVATE *pima ;
 
-	if (! psf->fdata)
-		return 0 ;
-
 	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
 
 	if (psf->mode == SFM_WRITE)
@@ -193,9 +184,6 @@ aiff_ima_close	(SF_PRIVATE *psf)
 		if (psf->write_header)
 			psf->write_header (psf, SF_TRUE) ;
 		} ;
-
-	free (psf->fdata) ;
-	psf->fdata = NULL ;
 
 	return 0 ;
 } /* aiff_ima_close */
