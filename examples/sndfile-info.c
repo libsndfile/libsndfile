@@ -30,6 +30,43 @@
 #define	snprintf	_snprintf
 #endif
 
+static void print_version (void) ;
+static void print_usage (const char *progname) ;
+
+static void info_dump (const char *filename) ;
+static void instrument_dump (const char *filename) ;
+
+int
+main (int argc, char *argv [])
+{	int	k ;
+
+	print_version () ;
+
+	if (argc < 2 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)
+	{	char *progname ;
+
+		progname = strrchr (argv [0], '/') ;
+		progname = progname ? progname + 1 : argv [0] ;
+
+		print_usage (progname) ;
+		return 1 ;
+		} ;
+
+	if (strcmp (argv [1], "-i") == 0)
+	{	instrument_dump (argv [2]) ;
+		return 0 ;
+		} ;
+
+	for (k = 1 ; k < argc ; k++)
+		info_dump (argv [k]) ;
+
+	return 0 ;
+} /* main */
+
+/*==============================================================================
+**	Print version and usage.
+*/
+
 static double	data [BUFFER_LEN] ;
 
 static void
@@ -42,7 +79,7 @@ print_version (void)
 
 
 static void
-print_usage (char *progname)
+print_usage (const char *progname)
 {	printf ("Usage :\n  %s <file> ...\n", progname) ;
 	printf ("    Prints out information about one or more sound files.\n\n") ;
 	printf ("  %s -i <file>\n", progname) ;
@@ -61,6 +98,12 @@ print_usage (char *progname)
 		_sleep (5 * 1000) ;
 #endif
 } /* print_usage */
+
+/*==============================================================================
+**	Dumping of sndfile info.
+*/
+
+static double	data [BUFFER_LEN] ;
 
 static double
 get_signal_max (SNDFILE *file)
@@ -193,12 +236,29 @@ info_dump (const char *filename)
 
 } /* info_dump */
 
+/*==============================================================================
+**	Dumping of SF_INSTRUMENT data.
+*/
+
+static const char *
+str_of_type (int mode)
+{	switch (mode)
+	{	case SF_LOOP_NONE : return "none" ;
+		case SF_LOOP_FORWARD : return "fwd " ;
+		case SF_LOOP_BACKWARD : return "back" ;
+		case SF_LOOP_ALTERNATING : return "alt " ;
+		default : break ;
+		} ;
+
+	return "????" ;
+} /* str_of_mode */
+
 static void
 instrument_dump (const char *filename)
 {	SNDFILE	 *file ;
 	SF_INFO	 sfinfo ;
 	SF_INSTRUMENT inst ;
-	int got_inst ;
+	int got_inst, k ;
 
 	if ((file = sf_open (filename, SFM_READ, &sfinfo)) == NULL)
 	{	printf ("Error : Not able to open input file %s.\n", filename) ;
@@ -216,35 +276,18 @@ instrument_dump (const char *filename)
 		return ;
 		} ;
 
+	printf ("Instrument : %s\n\n", filename) ;
+	printf ("  Gain        : %d\n", inst.gain) ;
+	printf ("  Base note   : %d\n", inst.basenote) ;
+	printf ("  Velocity    : %d - %d\n", (int) inst.velocity_lo, (int) inst.velocity_hi) ;
+	printf ("  Key         : %d - %d\n", (int) inst.key_lo, (int) inst.key_hi) ;
+	printf ("  Loop points : %d\n", inst.loop_count) ;
 
+	for (k = 0 ; k < inst.loop_count ; k++)
+		printf ("  %-2d    Mode : %s    Start : %6d   End : %6d   Count : %6d\n", k, str_of_type (inst.loops [k].mode), inst.loops [k].start, inst.loops [k].end, inst.loops [k].count) ;
+
+	putchar ('\n') ;
 } /* instrument_dump */
-
-int
-main (int argc, char *argv [])
-{	int	k ;
-
-	print_version () ;
-
-	if (argc < 2 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)
-	{	char *progname ;
-
-		progname = strrchr (argv [0], '/') ;
-		progname = progname ? progname + 1 : argv [0] ;
-
-		print_usage (progname) ;
-		return 1 ;
-		} ;
-
-	if (strcmp (argv [1], "-i") == 0)
-	{	instrument_dump (argv [2]) ;
-		return 0 ;
-		} ;
-
-	for (k = 1 ; k < argc ; k++)
-		info_dump (argv [k]) ;
-
-	return 0 ;
-} /* main */
 
 /*
 ** Do not edit or modify anything in this comment block.
