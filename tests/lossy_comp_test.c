@@ -1282,6 +1282,8 @@ channels = 1 ;
 		exit (1) ;
 		} ;
 
+	check_comment (file, filetype, __LINE__) ;
+
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 
 	check_log_buffer_or_die (file, __LINE__) ;
@@ -1841,6 +1843,8 @@ channels = 1 ;
 		exit (1) ;
 		} ;
 
+	check_comment (file, filetype, __LINE__) ;
+
 	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
 
 	check_log_buffer_or_die (file, __LINE__) ;
@@ -2102,6 +2106,10 @@ check_comment (SNDFILE * file, int format, int lineno)
 	if (format == (SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM))
 		return ;
 	if (format == (SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM))
+		return ;
+	if (format == (SF_FORMAT_WAV | SF_FORMAT_GSM610))
+		return ;
+	if (format == (SF_FORMAT_AIFF | SF_FORMAT_GSM610))
 		return ;
 
 	switch (format & SF_FORMAT_TYPEMASK)
