@@ -129,7 +129,7 @@ au_open	(SF_PRIVATE *psf)
 		psf->write_header = au_write_header ;
 		} ;
 
-	psf->close = au_close ;
+	psf->container_close = au_close ;
 
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
@@ -205,7 +205,7 @@ au_nh_open	(SF_PRIVATE *psf)
 
 	ulaw_init (psf) ;
 
-	psf->close = au_close ;
+	psf->container_close = au_close ;
 
 	psf->blockwidth = 1 ;
 	psf->sf.frames = psf->filelength ;
@@ -371,8 +371,6 @@ au_read_header (SF_PRIVATE *psf)
 
 	if (psf_ftell (psf) < psf->dataoffset)
 		psf_binheader_readf (psf, "j", psf->dataoffset - psf_ftell (psf)) ;
-
-	psf->close = au_close ;
 
 	psf->sf.samplerate	= au_fmt.samplerate ;
 	psf->sf.channels 	= au_fmt.channels ;

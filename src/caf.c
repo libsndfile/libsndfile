@@ -147,7 +147,7 @@ caf_open (SF_PRIVATE *psf)
 		psf->write_header = caf_write_header ;
 		} ;
 
-	psf->close = caf_close ;
+	psf->container_close = caf_close ;
 	/*psf->command = caf_command ;*/
 
 	switch (subformat)

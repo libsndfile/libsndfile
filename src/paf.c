@@ -391,7 +391,7 @@ paf24_init (SF_PRIVATE *psf)
 		} ;
 
 	psf->seek	= paf24_seek ;
-	psf->close	= paf24_close ;
+	psf->container_close	= paf24_close ;
 
 	psf->filelength = psf_get_filelen (psf) ;
 	psf->datalength = psf->filelength - psf->dataoffset ;

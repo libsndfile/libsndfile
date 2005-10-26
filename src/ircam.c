@@ -103,7 +103,7 @@ ircam_open	(SF_PRIVATE *psf)
 		psf->write_header = ircam_write_header ;
 		} ;
 
-	psf->close = ircam_close ;
+	psf->container_close = ircam_close ;
 
 	switch (subformat)
 	{	case SF_FORMAT_ULAW :		/* 8-bit Ulaw encoding. */

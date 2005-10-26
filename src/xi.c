@@ -105,7 +105,7 @@ xi_open	(SF_PRIVATE *psf)
 		psf->write_header = xi_write_header ;
 		} ;
 
-	psf->close = xi_close ;
+	psf->container_close = xi_close ;
 	psf->seek = dpcm_seek ;
 
 	psf->sf.seekable = SF_FALSE ;
@@ -452,8 +452,6 @@ xi_read_header (SF_PRIVATE *psf)
 
  	if (psf_fseek (psf, psf->dataoffset, SEEK_SET) != psf->dataoffset)
 		return SFE_BAD_SEEK ;
-
-	psf->close = xi_close ;
 
 	psf->endian = SF_ENDIAN_LITTLE ;
 	psf->sf.channels = 1 ; /* Always mono */

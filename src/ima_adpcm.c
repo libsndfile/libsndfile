@@ -83,8 +83,7 @@ static sf_count_t ima_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t le
 
 static sf_count_t	ima_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 
-static int	wav_w64_ima_close	(SF_PRIVATE *psf) ;
-static int	aiff_ima_close	(SF_PRIVATE *psf) ;
+static int	ima_close	(SF_PRIVATE *psf) ;
 
 static int wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima) ;
 static int wav_w64_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima) ;
@@ -118,33 +117,11 @@ wav_w64_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 		if ((error = ima_writer_init (psf, blockalign)))
 			return error ;
 
+	psf->codec_close = ima_close ;
 	psf->seek = ima_seek ;
-	psf->close = wav_w64_ima_close ;
 
 	return 0 ;
 } /* wav_w64_ima_init */
-
-static int
-wav_w64_ima_close	(SF_PRIVATE *psf)
-{	IMA_ADPCM_PRIVATE *pima ;
-
-	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
-
-	if (psf->mode == SFM_WRITE)
-	{	/*	If a block has been partially assembled, write it out
-		**	as the final block.
-		*/
-		if (pima->samplecount && pima->samplecount < pima->samplesperblock)
-			pima->encode_block (psf, pima) ;
-
-		psf->sf.frames = pima->samplesperblock * pima->blockcount / psf->sf.channels ;
-
-		if (psf->write_header)
-			psf->write_header (psf, SF_TRUE) ;
-		} ;
-
-	return 0 ;
-} /* wav_w64_ima_close */
 
 int
 aiff_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
@@ -161,14 +138,13 @@ aiff_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 		if ((error = ima_writer_init (psf, blockalign)))
 			return error ;
 
-	psf->seek = ima_seek ;
-	psf->close = aiff_ima_close ;
+	psf->codec_close = ima_close ;
 
 	return 0 ;
 } /* aiff_ima_init */
 
 static int
-aiff_ima_close	(SF_PRIVATE *psf)
+ima_close	(SF_PRIVATE *psf)
 {	IMA_ADPCM_PRIVATE *pima ;
 
 	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
@@ -177,16 +153,14 @@ aiff_ima_close	(SF_PRIVATE *psf)
 	{	/*	If a block has been partially assembled, write it out
 		**	as the final block.
 		*/
-
 		if (pima->samplecount && pima->samplecount < pima->samplesperblock)
 			pima->encode_block (psf, pima) ;
 
-		if (psf->write_header)
-			psf->write_header (psf, SF_TRUE) ;
+		psf->sf.frames = pima->samplesperblock * pima->blockcount / psf->sf.channels ;
 		} ;
 
 	return 0 ;
-} /* aiff_ima_close */
+} /* ima_close */
 
 /*============================================================================================
 ** IMA ADPCM Read Functions.

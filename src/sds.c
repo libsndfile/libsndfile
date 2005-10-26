@@ -132,7 +132,7 @@ sds_open	(SF_PRIVATE *psf)
 		return error ;
 
 	psf->seek = sds_seek ;
-	psf->close = sds_close ;
+	psf->container_close = sds_close ;
 
 	psf->blockwidth = 0 ;
 

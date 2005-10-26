@@ -478,7 +478,7 @@ flac_open	(SF_PRIVATE *psf)
 	psf->blockwidth = 0 ;
 	psf->bytewidth = 1 ;
 
-	psf->close = flac_close ;
+	psf->container_close = flac_close ;
 	psf->seek = flac_seek ;
 	psf->command = flac_command ;
 

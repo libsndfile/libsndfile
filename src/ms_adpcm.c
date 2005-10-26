@@ -189,8 +189,8 @@ wav_w64_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 		psf->write_double	= msadpcm_write_d ;
 		} ;
 
-	psf->seek	= msadpcm_seek ;
-	psf->close		= msadpcm_close ;
+	psf->codec_close = msadpcm_close ;
+	psf->seek = msadpcm_seek ;
 
 	return 0 ;
 } /* wav_w64_msadpcm_init */
@@ -755,9 +755,6 @@ static int
 msadpcm_close	(SF_PRIVATE *psf)
 {	MSADPCM_PRIVATE *pms ;
 
-	if (! psf->fdata)
-		return 0 ;
-
 	pms = (MSADPCM_PRIVATE*) psf->fdata ;
 
 	if (psf->mode == SFM_WRITE)
@@ -767,9 +764,6 @@ msadpcm_close	(SF_PRIVATE *psf)
 
 		if (pms->samplecount && pms->samplecount < pms->samplesperblock)
 			msadpcm_encode_block (psf, pms) ;
-
-		if (psf->write_header)
-			psf->write_header (psf, SF_TRUE) ;
 		} ;
 
 	return 0 ;

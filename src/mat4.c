@@ -102,7 +102,7 @@ mat4_open	(SF_PRIVATE *psf)
 		psf->write_header = mat4_write_header ;
 		} ;
 
-	psf->close = mat4_close ;
+	psf->container_close = mat4_close ;
 
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 

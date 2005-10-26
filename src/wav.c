@@ -206,7 +206,7 @@ wav_open	 (SF_PRIVATE *psf)
 		psf->write_header = (format == SF_FORMAT_WAV) ? wav_write_header : wavex_write_header ;
 		} ;
 
-	psf->close = wav_close ;
+	psf->container_close = wav_close ;
 	psf->command = wav_command ;
 
 	switch (subformat)
@@ -563,8 +563,6 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 	/* Seek to start of DATA section. */
 	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
-
-	psf->close = wav_close ;
 
 	if (psf->blockwidth)
 	{	if (psf->filelength - psf->dataoffset < psf->datalength)

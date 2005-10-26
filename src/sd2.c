@@ -139,7 +139,7 @@ sd2_open (SF_PRIVATE *psf)
 		psf->write_header = NULL ;
 		} ;
 
-	psf->close = sd2_close ;
+	psf->container_close = sd2_close ;
 
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 

@@ -70,7 +70,7 @@ pvf_open	(SF_PRIVATE *psf)
 		psf->write_header = pvf_write_header ;
 		} ;
 
-	psf->close = pvf_close ;
+	psf->container_close = pvf_close ;
 
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
@@ -184,8 +184,6 @@ pvf_read_header (SF_PRIVATE *psf)
 
 	psf->datalength = psf->filelength - psf->dataoffset ;
 	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
-
-	psf->close = pvf_close ;
 
 	if (! psf->sf.frames && psf->blockwidth)
 		psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;

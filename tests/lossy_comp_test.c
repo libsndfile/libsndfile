@@ -2116,12 +2116,6 @@ static void
 check_comment (SNDFILE * file, int format, int lineno)
 {	const char		*comment ;
 
-	/* Just return for these format that don't work yet. */
-	if (format == (SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM))
-		return ;
-	if (format == (SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM))
-		return ;
-
 	switch (format & SF_FORMAT_TYPEMASK)
 	{	case SF_FORMAT_AIFF :
 		case SF_FORMAT_WAV :

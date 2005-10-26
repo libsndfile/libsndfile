@@ -106,7 +106,7 @@ ogg_open (SF_PRIVATE *psf)
 static int
 pogg_init (SF_PRIVATE * psf)
 {
-	psf->close = pogg_close ;
+	psf->container_close = pogg_close ;
 
 	if (psf->mode == SFM_READ)
 	{	/* set the virtual functions for reading */

@@ -79,7 +79,7 @@ nist_open	(SF_PRIVATE *psf)
 		psf->write_header = nist_write_header ;
 		} ;
 
-	psf->close = nist_close ;
+	psf->container_close = nist_close ;
 
 	switch (psf->sf.format & SF_FORMAT_SUBMASK)
 	{	case SF_FORMAT_PCM_S8 :
@@ -226,8 +226,6 @@ nist_read_header (SF_PRIVATE *psf)
 
 	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
 	psf->datalength = psf->filelength - psf->dataoffset ;
-
-	psf->close = nist_close ;
 
 	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 

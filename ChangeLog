@@ -23,6 +23,13 @@
     Make sure the tailer data gets written at an even file offset. Pad if
     necessary.
 
+    * src/common.h
+    Replace the close function pointer in SF_PRIVATE with separate functions
+    codec_close and container_close. The former is always called first.
+
+    *  src/*.c
+    Fix knock on effects of above.
+
 2005-10-26 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-info.c

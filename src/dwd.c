@@ -96,7 +96,7 @@ dwd_open (SF_PRIVATE *psf)
 		-*/
 		} ;
 
-	psf->close = dwd_close ;
+	psf->container_close = dwd_close ;
 
 	/*-psf->blockwidth = psf->bytewidth * psf->sf.channels ;-*/
 

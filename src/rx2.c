@@ -290,7 +290,7 @@ rx2_open	(SF_PRIVATE *psf)
 	if ((error = dwvw_init (psf, 16)))
 		return error ;
 
-	psf->close = rx2_close ;
+	psf->container_close = rx2_close ;
 
 	if (! psf->sf.frames && psf->blockwidth)
 		psf->sf.frames = psf->datalength / psf->blockwidth ;

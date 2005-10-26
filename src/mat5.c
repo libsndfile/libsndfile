@@ -112,7 +112,7 @@ mat5_open	(SF_PRIVATE *psf)
 		psf->write_header = mat5_write_header ;
 		} ;
 
-	psf->close = mat5_close ;
+	psf->container_close = mat5_close ;
 
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 

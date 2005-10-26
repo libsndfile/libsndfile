@@ -116,7 +116,7 @@ svx_open	(SF_PRIVATE *psf)
 		psf->write_header = svx_write_header ;
 		} ;
 
-	psf->close = svx_close ;
+	psf->container_close = svx_close ;
 
 	if ((error = pcm_init (psf)))
 		return error ;

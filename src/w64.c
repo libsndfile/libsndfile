@@ -141,7 +141,7 @@ w64_open	(SF_PRIVATE *psf)
 		psf->write_header = w64_write_header ;
 		} ;
 
-	psf->close = w64_close ;
+	psf->container_close = w64_close ;
 
 	switch (subformat)
 	{	case SF_FORMAT_PCM_U8 :
@@ -315,8 +315,6 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 	if (psf_ftell (psf) != psf->dataoffset)
 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
-
-	psf->close = w64_close ;
 
 	if (psf->blockwidth)
 	{	if (psf->filelength - psf->dataoffset < psf->datalength)

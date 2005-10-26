@@ -235,7 +235,7 @@ aiff_open	(SF_PRIVATE *psf)
 		psf->write_header = aiff_write_header ;
 		} ;
 
-	psf->close = aiff_close ;
+	psf->container_close = aiff_close ;
 	psf->command = aiff_command ;
 
 	switch (psf->sf.format & SF_FORMAT_SUBMASK)

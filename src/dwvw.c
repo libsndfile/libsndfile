@@ -115,13 +115,13 @@ dwvw_init (SF_PRIVATE *psf, int bitwidth)
 		psf->write_double	= dwvw_write_d ;
 		} ;
 
-	psf->seek	= dwvw_seek ;
-	psf->close	= dwvw_close ;
+	psf->codec_close = dwvw_close ;
+	psf->seek = dwvw_seek ;
 
-	/* FIXME : This s bogus. */
+	/* FIXME : This is bogus. */
 	psf->sf.frames = SF_COUNT_MAX ;
 	psf->datalength = psf->sf.frames ;
-	/* EMXIF : This s bogus. */
+	/* EMXIF : This is bogus. */
 
 	return 0 ;
 } /* dwvw_init */

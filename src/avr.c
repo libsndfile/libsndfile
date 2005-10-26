@@ -98,7 +98,7 @@ avr_open	(SF_PRIVATE *psf)
 		psf->write_header = avr_write_header ;
 		} ;
 
-	psf->close = avr_close ;
+	psf->container_close = avr_close ;
 
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
@@ -172,8 +172,6 @@ avr_read_header (SF_PRIVATE *psf)
 
 	if (psf_ftell (psf) != psf->dataoffset)
 		psf_binheader_readf (psf, "j", psf->dataoffset - psf_ftell (psf)) ;
-
-	psf->close = avr_close ;
 
 	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
 

@@ -2295,8 +2295,10 @@ static int
 psf_close (SF_PRIVATE *psf)
 {	int	error ;
 
-	if (psf->close)
-		error = psf->close (psf) ;
+	if (psf->codec_close)
+		error = psf->codec_close (psf) ;
+	if (psf->container_close)
+		error = psf->container_close (psf) ;
 
 	psf_fclose (psf) ;
 	psf_close_rsrc (psf) ;
