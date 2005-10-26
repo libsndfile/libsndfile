@@ -894,6 +894,8 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 		exit (1) ;
 		} ;
 
+	check_comment (file, filetype, __LINE__) ;
+
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 
 	check_log_buffer_or_die (file, __LINE__) ;
@@ -1084,6 +1086,8 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 	{	printf ("Incorrect number of channels in file.\n") ;
 		exit (1) ;
 		} ;
+
+	check_comment (file, filetype, __LINE__) ;
 
 	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
 
