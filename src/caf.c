@@ -129,13 +129,6 @@ caf_open (SF_PRIVATE *psf)
 		**	can be switched off using sf_command (SFC_SET_PEAK_CHUNK, SF_FALSE).
 		*/
 		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
-		{	psf->peak_info = calloc (1, 2 * sizeof (int) * psf->sf.channels * sizeof (PEAK_POS)) ;
-			if (psf->peak_info == NULL)
-				return SFE_MALLOC_FAILED ;
-			psf->peak_info->peak_loc = SF_PEAK_START ;
-			} ;
-
-		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
 		{	if ((psf->peak_info = peak_info_calloc (psf->sf.channels)) == NULL)
 				return SFE_MALLOC_FAILED ;
 			psf->peak_info->peak_loc = SF_PEAK_START ;
