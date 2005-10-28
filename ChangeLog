@@ -1,3 +1,10 @@
+2005-10-28 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/ogg.c
+    Removed the horribly broken and non-functional OGG implementation when
+    --enable-experimental was enabled. When OGG does finally work it will be
+    merged.
+
 2005-10-27 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/g72x.c src/G72x/*.(c|h) src/common.h src/sndfile.c src/wav.c src/au.c
