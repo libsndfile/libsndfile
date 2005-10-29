@@ -112,11 +112,12 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 		wav_fmt->min.bitwidth = 32 ;
 		wav_fmt->format = WAVE_FORMAT_IEEE_FLOAT ;
 		}
+	else if (wav_fmt->format != WAVE_FORMAT_GSM610 && wav_fmt->min.bitwidth == 0)
+		psf_log_printf (psf, "  Bit Width     : %d (should not be 0)\n", wav_fmt->min.bitwidth) ;
 	else if (wav_fmt->format == WAVE_FORMAT_GSM610 && wav_fmt->min.bitwidth != 0)
 		psf_log_printf (psf, "  Bit Width     : %d (should be 0)\n", wav_fmt->min.bitwidth) ;
 	else
 		psf_log_printf (psf, "  Bit Width     : %d\n", wav_fmt->min.bitwidth) ;
-
 
 	psf->sf.samplerate	= wav_fmt->min.samplerate ;
 	psf->sf.frames 		= 0 ;					/* Correct this when reading data chunk. */
@@ -284,7 +285,27 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 					return SFE_UNIMPLEMENTED ;
 				break ;
 
-		default : break ;
+		case WAVE_FORMAT_G721_ADPCM :
+				psf_log_printf (psf, "  Bytes/sec     : %d\n", wav_fmt->g72x.bytespersec) ;
+				if (structsize >= 20)
+				{	bytesread += psf_binheader_readf (psf, "e22", &(wav_fmt->g72x.extrabytes), &(wav_fmt->g72x.auxblocksize)) ;
+					if (wav_fmt->g72x.extrabytes == 0)
+						psf_log_printf (psf, "  Extra Bytes   : %d (should be 2)\n", wav_fmt->g72x.extrabytes) ;
+					else
+						psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->g72x.extrabytes) ;
+						psf_log_printf (psf, "  Aux Blk Size  : %d\n", wav_fmt->g72x.auxblocksize) ;
+					}
+				else if (structsize == 18)
+				{	bytesread += psf_binheader_readf (psf, "e2", &(wav_fmt->g72x.extrabytes)) ;
+					psf_log_printf (psf, "  Extra Bytes   : %d%s\n", wav_fmt->g72x.extrabytes, wav_fmt->g72x.extrabytes != 0 ? " (should be 0)" : "") ;
+					}
+				else
+					psf_log_printf (psf, "*** 'fmt ' chunk should be bigger than this!\n") ;
+				break ;
+
+		default :
+				psf_log_printf (psf, "*** No 'fmt ' chunk dumper for this format!\n") ;
+				break ;
 		} ;
 
 	if (bytesread > structsize)

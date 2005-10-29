@@ -1,3 +1,11 @@
+2005-10-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav_w64.c
+    Add more reporting of 'fmt ' chunk for G721 encoded files.
+
+    * src/wav.c
+    Gernerate a more correct 20 byte 'fmt ' chunk rather than a 16 byte one.
+
 2005-10-29 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/G72x/g72x.[ch]

@@ -765,14 +765,14 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 
 		case SF_FORMAT_G721_32 :
 					/* fmt chunk. */
-					fmt_size = 2 + 2 + 4 + 4 + 2 + 2 ;
+					fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 ;
 
 					/* fmt : size, WAV format type, channels, samplerate, bytespersec */
 					psf_binheader_writef (psf, "e42244", fmt_size, WAVE_FORMAT_G721_ADPCM,
 								psf->sf.channels, psf->sf.samplerate, psf->sf.samplerate * psf->sf.channels / 2) ;
 
-					/* fmt : blockalign, bitwidth. */
-					psf_binheader_writef (psf, "e22", 64, 4) ;
+					/* fmt : blockalign, bitwidth, extrabytes, auxblocksize. */
+					psf_binheader_writef (psf, "e2222", 64, 4, 2, 0) ;
 
 					add_fact_chunk = SF_TRUE ;
 					break ;
