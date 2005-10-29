@@ -37,6 +37,7 @@
 #include "g72x.h"
 #include "g72x_priv.h"
 
+static G72x_STATE * g72x_state_new (void) ;
 static int unpack_bytes (int bits, int blocksize, const unsigned char * block, short * samples) ;
 static int pack_bytes (int bits, const short * samples, unsigned char * block) ;
 
@@ -99,7 +100,7 @@ int fmult (int an, int srn)
 	return (((an ^ srn) < 0) ? -retval : retval);
 }
 
-G72x_STATE * g72x_state_new (void)
+static G72x_STATE * g72x_state_new (void)
 {	return calloc (1, sizeof (G72x_STATE)) ;
 }
 

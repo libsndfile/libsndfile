@@ -59,11 +59,9 @@ enum
 	G721_40_BYTES_PER_BLOCK = (G721_40_BITS_PER_SAMPLE * G72x_BLOCK_SIZE) / 8
 } ;
 
-/* Forward declaration of of g72x_state and the state constructor. */
+/* Forward declaration of of g72x_state. */
 
 struct g72x_state ;
-
-struct g72x_state * g72x_state_new (void) ;
 
 /* External function definitions. */
 

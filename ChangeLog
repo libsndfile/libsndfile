@@ -1,3 +1,8 @@
+2005-10-29 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/G72x/g72x.[ch]
+    Minor cleanup of interface.
+
 2005-10-28 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ogg.c
