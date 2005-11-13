@@ -48,7 +48,7 @@
 
 <H2><B>SYNOPSIS</B></H2>
 <P>
-The functions of linbsndfile are defined as follows:
+The functions of libsndfile are defined as follows:
 </P>
 <!-- pepper -->
 <PRE>
@@ -144,7 +144,7 @@ The mode parameter for this function can be any one of the following three value
 When opening a file for read, the <b>format</B> field should be set to zero before
 calling sf_open().
 The only exception to this is the case of RAW files where the caller has to set
-the channels and format fields to valid values.
+the samplerate, channels and format fields to valid values.
 All other fields of the structure are filled in by the library.
 </P>
 <!-- pepper -->
