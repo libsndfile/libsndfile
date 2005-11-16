@@ -312,15 +312,14 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
-/*-	if (do_all || strcmp (argv [1], "raw_gsm610") == 0)
-	{	/+* Don't do lcomp_test_XXX as the errors are too big. *+/
-		sdlcomp_test_short	("gsm610.raw", SF_FORMAT_RAW | SF_FORMAT_GSM610, 1, 0.24) ;
-		sdlcomp_test_int	("gsm610.raw", SF_FORMAT_RAW | SF_FORMAT_GSM610, 1, 0.24) ;
-		sdlcomp_test_float	("gsm610.raw", SF_FORMAT_RAW | SF_FORMAT_GSM610, 1, 0.24) ;
-		sdlcomp_test_double	("gsm610.raw", SF_FORMAT_RAW | SF_FORMAT_GSM610, 1, 0.24) ;
+	if (do_all || strcmp (argv [1], "raw_gsm610") == 0)
+	{	/* Don't do lcomp_test_XXX as the errors are too big. */
+		sdlcomp_test_short	("raw.gsm", SF_FORMAT_RAW | SF_FORMAT_GSM610, 1, 0.24) ;
+		sdlcomp_test_int	("raw.gsm", SF_FORMAT_RAW | SF_FORMAT_GSM610, 1, 0.24) ;
+		sdlcomp_test_float	("raw.gsm", SF_FORMAT_RAW | SF_FORMAT_GSM610, 1, 0.24) ;
+		sdlcomp_test_double	("raw.gsm", SF_FORMAT_RAW | SF_FORMAT_GSM610, 1, 0.24) ;
 		test_count++ ;
 		} ;
--*/
 
 	/* Lite remove start */
 	if (do_all || strcmp (argv [1], "ircam_ulaw") == 0)

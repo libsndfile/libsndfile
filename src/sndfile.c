@@ -2105,6 +2105,9 @@ format_from_extension (const char *filename)
 	if (strcmp (cptr, "vox") == 0)
 		return SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM ;
 
+	if (strcmp (cptr, "gsm") == 0)
+		return SF_FORMAT_RAW | SF_FORMAT_GSM610 ;
+
 	return 0 ;
 } /* format_from_extension */
 

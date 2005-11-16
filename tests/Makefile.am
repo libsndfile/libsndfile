@@ -236,6 +236,7 @@ raw-tests: write_read_test lossy_comp_test raw_test
 	./write_read_test raw
 	./lossy_comp_test raw_ulaw
 	./lossy_comp_test raw_alaw
+	./lossy_comp_test raw_gsm610
 	./lossy_comp_test vox_adpcm
 	./raw_test
 	@echo "----------------------------------------------------------------------"
