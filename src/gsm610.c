@@ -117,7 +117,12 @@ Need separate gsm_data structs for encode and decode.
 		pgsm610->blocksize = WAV_W64_GSM610_BLOCKSIZE ;
 		}
 	else
-	{	pgsm610->encode_block = gsm610_encode_block ;
+	{	if ((psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW)
+		{	psf->sf.samplerate = 8000 ;
+			psf->sf.channels = 1 ;
+			} ;
+
+		pgsm610->encode_block = gsm610_encode_block ;
 		pgsm610->decode_block = gsm610_decode_block ;
 
 		pgsm610->samplesperblock = GSM610_SAMPLES ;
