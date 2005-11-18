@@ -53,6 +53,7 @@ static OUTPUT_FORMAT_MAP format_map [] =
 	{	"svx",		0,	SF_FORMAT_SVX	},
 	{	"paf",		0,	SF_ENDIAN_BIG | SF_FORMAT_PAF	},
 	{	"fap",		0,	SF_ENDIAN_LITTLE | SF_FORMAT_PAF	},
+	{	"gsm",		0,	SF_FORMAT_RAW	},
 	{	"nist", 	0,	SF_FORMAT_NIST	},
 	{	"ircam",	0,	SF_FORMAT_IRCAM	},
 	{	"sf",		0, 	SF_FORMAT_IRCAM	},
@@ -84,6 +85,12 @@ guess_output_file_type (char *str, int format)
 
 	for (k = 0 ; buffer [k] ; k++)
 		buffer [k] = tolower ((buffer [k])) ;
+
+	if (strcmp (buffer, "gsm") == 0)
+		return SF_FORMAT_RAW | SF_FORMAT_GSM610 ;
+
+	if (strcmp (buffer, "vox") == 0)
+		return SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM ;
 
 	for (k = 0 ; k < (int) (sizeof (format_map) / sizeof (format_map [0])) ; k++)
 	{	if (format_map [k].len > 0 && strncmp (buffer, format_map [k].ext, format_map [k].len) == 0)
@@ -250,12 +257,10 @@ main (int argc, char * argv [])
 
 	outfilemajor = sfinfo.format & (SF_FORMAT_TYPEMASK | SF_FORMAT_ENDMASK) ;
 
-	if (outfileminor == 0 && outfilemajor == SF_FORMAT_RAW)
-	{	outfileminor = SF_FORMAT_VOX_ADPCM ;
-		sfinfo.format = outfilemajor | outfileminor ;
-		puts ("SF_FORMAT_VOX_ADPCM") ;
-		}
-	else if (outfileminor != 0)
+	if (outfileminor == 0)
+		outfileminor = sfinfo.format & SF_FORMAT_SUBMASK ;
+
+	if (outfileminor != 0)
 		sfinfo.format = outfilemajor | outfileminor ;
 	else
 		sfinfo.format = outfilemajor | (sfinfo.format & SF_FORMAT_SUBMASK) ;
