@@ -183,37 +183,6 @@ au_open	(SF_PRIVATE *psf)
 	return error ;
 } /* au_open */
 
-int
-au_nh_open	(SF_PRIVATE *psf)
-{
-	if (psf->mode == SFM_RDWR)
-		return SFE_BAD_OPEN_FORMAT ;
-
-	if (psf_fseek (psf, psf->dataoffset, SEEK_SET))
-		return SFE_BAD_SEEK ;
-
-	psf_log_printf (psf, "Header-less u-law encoded file.\n") ;
-	psf_log_printf (psf, "Setting up for 8kHz, mono, u-law.\n") ;
-
-	psf->sf.format = SF_FORMAT_AU | SF_FORMAT_ULAW ;
-
- 	psf->dataoffset		= 0 ;
-	psf->endian			= 0 ;	/* Irrelevant but it must be something. */
-	psf->sf.samplerate	= 8000 ;
-	psf->sf.channels	= 1 ;
-	psf->bytewidth		= 1 ;	/* Before decoding */
-
-	ulaw_init (psf) ;
-
-	psf->container_close = au_close ;
-
-	psf->blockwidth = 1 ;
-	psf->sf.frames = psf->filelength ;
-	psf->datalength = psf->filelength - AU_DATA_OFFSET ;
-
-	return 0 ;
-} /* au_nh_open */
-
 /*------------------------------------------------------------------------------
 */
 

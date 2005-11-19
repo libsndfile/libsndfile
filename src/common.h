@@ -629,7 +629,6 @@ int psf_ferror (SF_PRIVATE *psf) ;
 
 int		aiff_open	(SF_PRIVATE *psf) ;
 int		au_open		(SF_PRIVATE *psf) ;
-int		au_nh_open	(SF_PRIVATE *psf) ;	/* Headerless version of AU. */
 int		avr_open	(SF_PRIVATE *psf) ;
 int		htk_open	(SF_PRIVATE *psf) ;
 int		ircam_open	(SF_PRIVATE *psf) ;

@@ -2479,10 +2479,6 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 				error = au_open (psf) ;
 				break ;
 
-		case	SF_FORMAT_AU | SF_FORMAT_ULAW :
-				error = au_nh_open (psf) ;
-				break ;
-
 		case	SF_FORMAT_RAW :
 				error = raw_open (psf) ;
 				break ;
