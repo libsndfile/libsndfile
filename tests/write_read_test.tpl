@@ -736,7 +736,9 @@ mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int lo
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= format ;
 
-	if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW || (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
+	if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW
+		|| (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_AU
+		|| (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
 		unlink (filename) ;
 	else
 	{	/* Create a short file. */
@@ -850,7 +852,7 @@ new_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int all
 	SF_INFO	sfinfo ;
 	[+ (get "data_type") +]		*orig, *test ;
 	int		items, frames ;
-	
+
 	orig = ([+ (get "data_type") +]*) orig_data ;
 	test = ([+ (get "data_type") +]*) test_data ;
 
