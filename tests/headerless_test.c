@@ -128,12 +128,7 @@ old_test (void)
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;
 
-	if (! (file = sf_open (filename, SFM_WRITE, &sfinfo)))
-	{	printf ("Line %d: sf_open_write failed with error : ", __LINE__) ;
-		fflush (stdout) ;
-		puts (sf_strerror (NULL)) ;
-		exit (1) ;
-		} ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 
 	if ((k = sf_write_short (file, buffer, BUFFER_SIZE)) != BUFFER_SIZE)
 	{	printf ("Line %d: sf_write_short failed with short write (%d => %d).\n", __LINE__, BUFFER_SIZE, k) ;
@@ -149,12 +144,7 @@ old_test (void)
 	/* Read as RAW but get the bit width and endian-ness correct. */
 	sfinfo.format = filetype = SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_PCM_16 ;
 
-	if (! (file = sf_open (filename, SFM_READ, &sfinfo)))
-	{	printf ("Line %d: sf_open_read failed with error : ", __LINE__) ;
-		fflush (stdout) ;
-		puts (sf_strerror (NULL)) ;
-		exit (1) ;
-		} ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 
 	if (sfinfo.format != filetype)
 	{	printf ("Line %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
