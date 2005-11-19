@@ -233,8 +233,8 @@ ErrorStruct SndfileErrors [] =
 /*------------------------------------------------------------------------------
 */
 
-static int 	format_from_extension (const char *filename) ;
-static int	guess_file_type (SF_PRIVATE *psf, const char *filename) ;
+static int 	format_from_extension (SF_PRIVATE *psf) ;
+static int	guess_file_type (SF_PRIVATE *psf) ;
 static int	validate_sfinfo (SF_INFO *sfinfo) ;
 static int	validate_psf (SF_PRIVATE *psf) ;
 static void	save_header_info (SF_PRIVATE *psf) ;
@@ -2070,14 +2070,14 @@ try_resource_fork (SF_PRIVATE * psf, int mode)
 } /* try_resource_fork */
 
 static int
-format_from_extension (const char *filename)
+format_from_extension (SF_PRIVATE *psf)
 {	char *cptr ;
 	char buffer [16] ;
 
-	if (filename == NULL)
+	if (psf->filename == NULL)
 		return 0 ;
 
-	if ((cptr = strrchr (filename, '.')) == NULL)
+	if ((cptr = strrchr (psf->filename, '.')) == NULL)
 		return 0 ;
 
 	cptr ++ ;
@@ -2097,22 +2097,34 @@ format_from_extension (const char *filename)
 	cptr = buffer ;
 
 	if (strcmp (cptr, "au") == 0)
-		return SF_FORMAT_AU | SF_FORMAT_ULAW ;
+	{	psf->sf.channels = 1 ;
+		psf->sf.samplerate = 8000 ;
+		return SF_FORMAT_RAW | SF_FORMAT_ULAW ;
+		} ;
 
 	if (strcmp (cptr, "snd") == 0)
-		return SF_FORMAT_AU | SF_FORMAT_ULAW ;
+	{	psf->sf.channels = 1 ;
+		psf->sf.samplerate = 8000 ;
+		return SF_FORMAT_RAW | SF_FORMAT_ULAW ;
+		} ;
 
 	if (strcmp (cptr, "vox") == 0)
+	{	psf->sf.channels = 1 ;
+		psf->sf.samplerate = 8000 ;
 		return SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM ;
+		} ;
 
 	if (strcmp (cptr, "gsm") == 0)
+	{	psf->sf.channels = 1 ;
+		psf->sf.samplerate = 8000 ;
 		return SF_FORMAT_RAW | SF_FORMAT_GSM610 ;
+		} ;
 
 	return 0 ;
 } /* format_from_extension */
 
 static int
-guess_file_type (SF_PRIVATE *psf, const char *filename)
+guess_file_type (SF_PRIVATE *psf)
 {	int buffer [3], format ;
 
 	if (psf_binheader_readf (psf, "b", &buffer, SIGNED_SIZEOF (buffer)) != SIGNED_SIZEOF (buffer))
@@ -2218,12 +2230,7 @@ guess_file_type (SF_PRIVATE *psf, const char *filename)
 	if (psf->filelength > 0 && (format = try_resource_fork (psf, SFM_READ)) != 0)
 		return format ;
 
-	/* This must be the last one. */
-	if ((format = format_from_extension (filename)) != 0)
-		return format ;
-
-	/* Default to header-less RAW PCM file type. */
-	return SF_FORMAT_RAW ;
+	return 0 ;
 } /* guess_file_type */
 
 
@@ -2429,7 +2436,10 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		}
 	else if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
 	{	/* If type RAW has not been specified then need to figure out file type. */
-		psf->sf.format = guess_file_type (psf, psf->filename) ;
+		psf->sf.format = guess_file_type (psf) ;
+
+		if (psf->sf.format == 0)
+			psf->sf.format = format_from_extension (psf) ;
 		} ;
 
 	/* Prevent unnecessary seeks */

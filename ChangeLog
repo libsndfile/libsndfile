@@ -1,3 +1,17 @@
+2005-11-19 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-convert.c
+    Allow conversion to raw gsm610.
+
+    * src/common.h src/sndfile.c src/au.c
+    Remove au_nh_open() and all references to it (wasn't working anyway).
+
+    * tests/headerless_test.c
+    Add new test for file extension based detection.
+
+    * src/sndfile.c
+    Rejig file extension based file type detection.
+
 2005-11-16 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
