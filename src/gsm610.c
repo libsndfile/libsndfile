@@ -105,28 +105,31 @@ Need separate gsm_data structs for encode and decode.
 	if ((pgsm610->gsm_data = gsm_create ()) == NULL)
 		return SFE_MALLOC_FAILED ;
 
-	if ((psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAV ||
-				(psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAVEX ||
-				(psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_W64)
-	{	gsm_option (pgsm610->gsm_data, GSM_OPT_WAV49, &true_flag) ;
+	switch (psf->sf.format & SF_FORMAT_TYPEMASK)
+	{	case SF_FORMAT_WAV :
+		case SF_FORMAT_WAVEX :
+		case SF_FORMAT_W64 :
+			gsm_option (pgsm610->gsm_data, GSM_OPT_WAV49, &true_flag) ;
 
-		pgsm610->encode_block = gsm610_wav_encode_block ;
-		pgsm610->decode_block = gsm610_wav_decode_block ;
+			pgsm610->encode_block = gsm610_wav_encode_block ;
+			pgsm610->decode_block = gsm610_wav_decode_block ;
 
-		pgsm610->samplesperblock = WAV_W64_GSM610_SAMPLES ;
-		pgsm610->blocksize = WAV_W64_GSM610_BLOCKSIZE ;
-		}
-	else
-	{	if ((psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW)
-		{	psf->sf.samplerate = 8000 ;
-			psf->sf.channels = 1 ;
-			} ;
+			pgsm610->samplesperblock = WAV_W64_GSM610_SAMPLES ;
+			pgsm610->blocksize = WAV_W64_GSM610_BLOCKSIZE ;
+			break ;
 
-		pgsm610->encode_block = gsm610_encode_block ;
-		pgsm610->decode_block = gsm610_decode_block ;
+		case SF_FORMAT_AIFF :
+		case SF_FORMAT_RAW :
+			pgsm610->encode_block = gsm610_encode_block ;
+			pgsm610->decode_block = gsm610_decode_block ;
 
-		pgsm610->samplesperblock = GSM610_SAMPLES ;
-		pgsm610->blocksize = GSM610_BLOCKSIZE ;
+			pgsm610->samplesperblock = GSM610_SAMPLES ;
+			pgsm610->blocksize = GSM610_BLOCKSIZE ;
+			break ;
+
+		default :
+			return SFE_INTERNAL ;
+			break ;
 		} ;
 
 	if (psf->mode == SFM_READ)
