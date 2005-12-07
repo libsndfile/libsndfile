@@ -1,3 +1,12 @@
+2005-12-07 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/list_formats.c
+    Make sure the SF_INFO struct is memset to all zero before being used.
+    Thanks to Stephen F. Booth.
+
+    * src/sndfile.c
+    Make the return value of sf_error() match the API documentation.
+
 2005-11-19 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-convert.c

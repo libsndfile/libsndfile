@@ -489,14 +489,14 @@ sf_error (SNDFILE *sndfile)
 
 	if (! sndfile)
 	{	if (sf_error != 0)
-			return 1 ;
+			return sf_error ;
 		return 0 ;
 		} ;
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 0) ;
 
 	if (psf->error)
-		return 1 ;
+		return psf->error ;
 
 	return 0 ;
 } /* sf_error */
