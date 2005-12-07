@@ -30,6 +30,7 @@ main (void)
 	char buffer [128] ;
 	int format, major_count, subtype_count, m, s ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	buffer [0] = 0 ;
 	sf_command (NULL, SFC_GET_LIB_VERSION, buffer, sizeof (buffer)) ;
 	if (strlen (buffer) < 1)
