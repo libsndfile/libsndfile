@@ -37,7 +37,7 @@ lossy_comp_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 fix_this_SOURCES = utils.c fix_this.c
 fix_this_LDADD = $(SNDFILEDIR)/libsndfile.la
 
-error_test_SOURCES = error_test.c
+error_test_SOURCES = error_test.c utils.c
 error_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 ulaw_test_SOURCES = utils.c ulaw_test.c
