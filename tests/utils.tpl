@@ -45,6 +45,8 @@ void	check_file_hash_or_die	(const char *filename, unsigned int target_hash, int
 
 void	print_test_name (const char *test, const char *filename) ;
 
+void	dump_data_to_file (const char *filename, void *data, unsigned int datalen) ;
+
 /*
 **	Functions for saving two vectors of data in an ascii text file which
 **	can then be loaded into GNU octave for comparison.
@@ -209,6 +211,24 @@ print_test_name (const char *test, const char *filename)
 
 	fflush (stdout) ;
 } /* print_test_name */
+
+void
+dump_data_to_file (const char *filename, void *data, unsigned int datalen)
+{	FILE *file ;
+
+	if ((file = fopen (filename, "wb")) == NULL)
+	{	printf ("\n\nLine %d : could not open file : %s\n\n", __LINE__, filename) ;
+		exit (1) ;
+		} ;
+
+	if (fwrite (data, 1, datalen, file) != datalen)
+	{	printf ("\n\nLine %d : fwrite failed.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	fclose (file) ;
+
+} /* dump_data_to_file */
 
 /*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 */

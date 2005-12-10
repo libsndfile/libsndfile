@@ -76,8 +76,6 @@ static unsigned char aifc_data [] =
 	0x0B, 0x61, 0x33, 0x19, 0xCE, 0x37, 0xEF, 0xD4, 0x21, 0x9D, 0xFA, 0xAE,
 } ;
 
-static void dump_data_to_file (const char *filename, void *data, unsigned int datalen) ;
-
 static void rw_test (const char *filename) ;
 
 int
@@ -98,24 +96,6 @@ main (void)
 
 /*==============================================================================
 */
-
-static void
-dump_data_to_file (const char *filename, void *data, unsigned int datalen)
-{	FILE *file ;
-
-	if ((file = fopen (filename, "wb")) == NULL)
-	{	printf ("\n\nLine %d : could not open file : %s\n\n", __LINE__, filename) ;
-		exit (1) ;
-		} ;
-
-	if (fwrite (data, 1, datalen, file) != datalen)
-	{	printf ("\n\nLine %d : fwrite failed.\n\n", __LINE__) ;
-		exit (1) ;
-		} ;
-
-	fclose (file) ;
-
-} /* dump_data_to_file */
 
 static void
 rw_test (const char *filename)

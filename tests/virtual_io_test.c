@@ -152,23 +152,6 @@ check_short_data (short * data, int len, int start, int line)
 			} ;
 } /* gen_short_data */
 
-static void
-dump_data_to_file (const char *fname, const void *ptr, size_t len)
-{	FILE * file ;
-
-	if ((file = fopen (fname, "w")) == NULL)
-	{	printf ("\n\nLine %d : fopen failed.\n", __LINE__) ;
-		exit (1) ;
-		} ;
-
-	if (fwrite (ptr, 1, len, file) != len)
-	{	printf ("\n\nLine %d : short fwrite.\n", __LINE__) ;
-		exit (1) ;
-		} ;
-
-	fclose (file) ;
-} /* dump_data_to_file */
-
 /*------------------------------------------------------------------------------
 */
 
