@@ -489,7 +489,7 @@ sf_error (SNDFILE *sndfile)
 
 	if (! sndfile)
 	{	if (sf_error != 0)
-			return sf_error ;
+			return sf_errno ;
 		return 0 ;
 		} ;
 
