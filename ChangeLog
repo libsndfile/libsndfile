@@ -1,7 +1,13 @@
+2005-12-28 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c tests/command_test.c
+    Apply a big patch from John ffitch (Csound project) to add reading and
+    writing of instrument chunks to AIFF files. Also update the test.
+
 2005-12-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/aiff_rw_test.c tests/virtual_io_test.c tests/utils.tpl
-	Move test function dump_data_to_file() to utils.tpl.
+    Move test function dump_data_to_file() to utils.tpl.
 
     * tests/error_test.c tests/Makefile.am
     Updates, including a new test to test that sf_error() returns a valid error
@@ -82,7 +88,7 @@
     Add code to ensure that the container close function (ie for WAV files) gets
     called after the codec's close function. This allows GSM610 encoded WAV files
     to have string data following the audio data.
-	Add an AIFF specific check on psf->datalength.
+    Add an AIFF specific check on psf->datalength.
 
     * src/wav.c
     Simplify wav_close function.
@@ -121,7 +127,7 @@
     * src/sndfile.h.in src/common.h src/common.c
     Update definition of SF_INSTRUMENT struct and create a function to allocate
     and initialize the struct (input from David Viens).
-	Clean up definition of SF_INSTRUMENT struct.
+    Clean up definition of SF_INSTRUMENT struct.
 
     * src/wav.c src/wav_w64.c
     Add support for Ambisoncs B WAVEX files (David Viens).

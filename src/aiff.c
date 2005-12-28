@@ -33,53 +33,53 @@
  * Macros to handle big/little endian issues.
  */
 
-#define FORM_MARKER	(MAKE_MARKER ('F', 'O', 'R', 'M'))
-#define AIFF_MARKER	(MAKE_MARKER ('A', 'I', 'F', 'F'))
-#define AIFC_MARKER	(MAKE_MARKER ('A', 'I', 'F', 'C'))
-#define COMM_MARKER	(MAKE_MARKER ('C', 'O', 'M', 'M'))
-#define SSND_MARKER	(MAKE_MARKER ('S', 'S', 'N', 'D'))
-#define MARK_MARKER	(MAKE_MARKER ('M', 'A', 'R', 'K'))
-#define INST_MARKER	(MAKE_MARKER ('I', 'N', 'S', 'T'))
-#define APPL_MARKER	(MAKE_MARKER ('A', 'P', 'P', 'L'))
+#define FORM_MARKER		(MAKE_MARKER ('F', 'O', 'R', 'M'))
+#define AIFF_MARKER		(MAKE_MARKER ('A', 'I', 'F', 'F'))
+#define AIFC_MARKER		(MAKE_MARKER ('A', 'I', 'F', 'C'))
+#define COMM_MARKER		(MAKE_MARKER ('C', 'O', 'M', 'M'))
+#define SSND_MARKER		(MAKE_MARKER ('S', 'S', 'N', 'D'))
+#define MARK_MARKER		(MAKE_MARKER ('M', 'A', 'R', 'K'))
+#define INST_MARKER		(MAKE_MARKER ('I', 'N', 'S', 'T'))
+#define APPL_MARKER		(MAKE_MARKER ('A', 'P', 'P', 'L'))
 
-#define c_MARKER	(MAKE_MARKER ('(', 'c', ')', ' '))
-#define NAME_MARKER	(MAKE_MARKER ('N', 'A', 'M', 'E'))
-#define AUTH_MARKER	(MAKE_MARKER ('A', 'U', 'T', 'H'))
-#define ANNO_MARKER	(MAKE_MARKER ('A', 'N', 'N', 'O'))
-#define COMT_MARKER	(MAKE_MARKER ('C', 'O', 'M', 'T'))
-#define FVER_MARKER	(MAKE_MARKER ('F', 'V', 'E', 'R'))
-#define SFX_MARKER	(MAKE_MARKER ('S', 'F', 'X', '!'))
+#define c_MARKER		(MAKE_MARKER ('(', 'c', ')', ' '))
+#define NAME_MARKER		(MAKE_MARKER ('N', 'A', 'M', 'E'))
+#define AUTH_MARKER		(MAKE_MARKER ('A', 'U', 'T', 'H'))
+#define ANNO_MARKER		(MAKE_MARKER ('A', 'N', 'N', 'O'))
+#define COMT_MARKER		(MAKE_MARKER ('C', 'O', 'M', 'T'))
+#define FVER_MARKER		(MAKE_MARKER ('F', 'V', 'E', 'R'))
+#define SFX_MARKER		(MAKE_MARKER ('S', 'F', 'X', '!'))
 
-#define PEAK_MARKER	(MAKE_MARKER ('P', 'E', 'A', 'K'))
-#define basc_MARKER	(MAKE_MARKER ('b', 'a', 's', 'c'))
+#define PEAK_MARKER		(MAKE_MARKER ('P', 'E', 'A', 'K'))
+#define basc_MARKER		(MAKE_MARKER ('b', 'a', 's', 'c'))
 
 /* Supported AIFC encodings.*/
-#define NONE_MARKER	(MAKE_MARKER ('N', 'O', 'N', 'E'))
-#define sowt_MARKER	(MAKE_MARKER ('s', 'o', 'w', 't'))
-#define twos_MARKER	(MAKE_MARKER ('t', 'w', 'o', 's'))
-#define raw_MARKER	(MAKE_MARKER ('r', 'a', 'w', ' '))
-#define in32_MARKER	(MAKE_MARKER ('i', 'n', '3', '2'))
-#define ni32_MARKER	(MAKE_MARKER ('2', '3', 'n', 'i'))
+#define NONE_MARKER		(MAKE_MARKER ('N', 'O', 'N', 'E'))
+#define sowt_MARKER		(MAKE_MARKER ('s', 'o', 'w', 't'))
+#define twos_MARKER		(MAKE_MARKER ('t', 'w', 'o', 's'))
+#define raw_MARKER		(MAKE_MARKER ('r', 'a', 'w', ' '))
+#define in32_MARKER		(MAKE_MARKER ('i', 'n', '3', '2'))
+#define ni32_MARKER		(MAKE_MARKER ('2', '3', 'n', 'i'))
 
-#define fl32_MARKER	(MAKE_MARKER ('f', 'l', '3', '2'))
-#define FL32_MARKER	(MAKE_MARKER ('F', 'L', '3', '2'))
-#define fl64_MARKER	(MAKE_MARKER ('f', 'l', '6', '4'))
-#define FL64_MARKER	(MAKE_MARKER ('F', 'L', '6', '4'))
+#define fl32_MARKER		(MAKE_MARKER ('f', 'l', '3', '2'))
+#define FL32_MARKER		(MAKE_MARKER ('F', 'L', '3', '2'))
+#define fl64_MARKER		(MAKE_MARKER ('f', 'l', '6', '4'))
+#define FL64_MARKER		(MAKE_MARKER ('F', 'L', '6', '4'))
 
-#define ulaw_MARKER	(MAKE_MARKER ('u', 'l', 'a', 'w'))
-#define ULAW_MARKER	(MAKE_MARKER ('U', 'L', 'A', 'W'))
-#define alaw_MARKER	(MAKE_MARKER ('a', 'l', 'a', 'w'))
-#define ALAW_MARKER	(MAKE_MARKER ('A', 'L', 'A', 'W'))
+#define ulaw_MARKER		(MAKE_MARKER ('u', 'l', 'a', 'w'))
+#define ULAW_MARKER		(MAKE_MARKER ('U', 'L', 'A', 'W'))
+#define alaw_MARKER		(MAKE_MARKER ('a', 'l', 'a', 'w'))
+#define ALAW_MARKER		(MAKE_MARKER ('A', 'L', 'A', 'W'))
 
-#define DWVW_MARKER	(MAKE_MARKER ('D', 'W', 'V', 'W'))
-#define GSM_MARKER	(MAKE_MARKER ('G', 'S', 'M', ' '))
-#define ima4_MARKER	(MAKE_MARKER ('i', 'm', 'a', '4'))
+#define DWVW_MARKER		(MAKE_MARKER ('D', 'W', 'V', 'W'))
+#define GSM_MARKER		(MAKE_MARKER ('G', 'S', 'M', ' '))
+#define ima4_MARKER		(MAKE_MARKER ('i', 'm', 'a', '4'))
 
 /* Unsupported AIFC encodings.*/
 
-#define MAC3_MARKER	(MAKE_MARKER ('M', 'A', 'C', '3'))
-#define MAC6_MARKER	(MAKE_MARKER ('M', 'A', 'C', '6'))
-#define ADP4_MARKER	(MAKE_MARKER ('A', 'D', 'P', '4'))
+#define MAC3_MARKER		(MAKE_MARKER ('M', 'A', 'C', '3'))
+#define MAC6_MARKER		(MAKE_MARKER ('M', 'A', 'C', '6'))
+#define ADP4_MARKER		(MAKE_MARKER ('A', 'D', 'P', '4'))
 
 /* Predfined chunk sizes. */
 #define SIZEOF_AIFF_COMM		18
@@ -92,19 +92,19 @@
 
 /* AIFC/IMA4 defines. */
 #define AIFC_IMA4_BLOCK_LEN				34
-#define	AIFC_IMA4_SAMPLES_PER_BLOCK		64
+#define AIFC_IMA4_SAMPLES_PER_BLOCK		64
 
-#define	AIFF_PEAK_CHUNK_SIZE(ch)	(2 * sizeof (int) + ch * (sizeof (float) + sizeof (int)))
+#define AIFF_PEAK_CHUNK_SIZE(ch)	(2 * sizeof (int) + ch * (sizeof (float) + sizeof (int)))
 
 /*------------------------------------------------------------------------------
  * Typedefs for file chunks.
  */
 
 enum
-{	HAVE_FORM	= 0x01,
-	HAVE_AIFF	= 0x02,
-	HAVE_COMM	= 0x04,
-	HAVE_SSND	= 0x08
+{	HAVE_FORM		= 0x01,
+	HAVE_AIFF		= 0x02,
+	HAVE_COMM		= 0x04,
+	HAVE_SSND		= 0x08
 } ;
 
 typedef struct
@@ -164,14 +164,19 @@ typedef struct
 	unsigned short	loopType ;
 } basc_CHUNK ;
 
+typedef struct
+{	unsigned short	markerID ;
+	unsigned int	position ;
+} MARK_ID_POS ;
+
 /*------------------------------------------------------------------------------
  * Private static functions.
  */
 
-static int	aiff_close	(SF_PRIVATE *psf) ;
+static int	aiff_close (SF_PRIVATE *psf) ;
 
 static int	tenbytefloat2int (unsigned char *bytes) ;
-static void	uint2tenbytefloat (unsigned int num, unsigned char *bytes) ;
+static void uint2tenbytefloat (unsigned int num, unsigned char *bytes) ;
 
 static int	aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt) ;
 
@@ -179,20 +184,24 @@ static int	aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt) ;
 
 static int	aiff_write_header (SF_PRIVATE *psf, int calc_length) ;
 static int	aiff_write_tailer (SF_PRIVATE *psf) ;
-static void aiff_write_strings (SF_PRIVATE *psf, int location) ;
+static void	aiff_write_strings (SF_PRIVATE *psf, int location) ;
 
 static int	aiff_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 
 static const char *get_loop_mode_str (short mode) ;
 
+static short get_loop_mode (short mode) ;
+
 static int aiff_read_basc_chunk (SF_PRIVATE * psf, int) ;
+
+static unsigned int marker_to_position (const MARK_ID_POS *m, unsigned short n, int marksize) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
 */
 
 int
-aiff_open	(SF_PRIVATE *psf)
+aiff_open (SF_PRIVATE *psf)
 {	COMM_CHUNK comm_fmt ;
 	int error, subformat ;
 
@@ -212,7 +221,7 @@ aiff_open	(SF_PRIVATE *psf)
 			return SFE_NO_PIPE_WRITE ;
 
 		if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_AIFF)
-			return	SFE_BAD_OPEN_FORMAT ;
+			return SFE_BAD_OPEN_FORMAT ;
 
 		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
 		{	if ((psf->peak_info = peak_info_calloc (psf->sf.channels)) == NULL)
@@ -320,12 +329,25 @@ aiff_open	(SF_PRIVATE *psf)
 ** Private functions.
 */
 
+/* This function ought to check size */
+static unsigned int
+marker_to_position (const MARK_ID_POS *m, unsigned short n, int marksize)
+{	int i ;
+
+    for (i = 0 ; i < marksize ; i++)
+		if (m [i].markerID == n)
+			return m [i].position ;
+    return 0 ;
+} /* marker_to_position */
+
 static int
 aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 {	SSND_CHUNK	ssnd_fmt ;
+	MARK_ID_POS *markstr = NULL ;
 	unsigned	marker, dword, FORMsize, SSNDsize, bytesread ;
 	int			k, found_chunk = 0, done = 0, error = 0 ;
 	char		*cptr, byte ;
+	int			instr_found = 0, mark_found = 0, mark_count = 0 ;
 
 	/* Set position to start of file to begin reading header. */
 	psf_binheader_readf (psf, "p", 0) ;
@@ -335,9 +357,9 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	/* Until recently AIF* file were all BIG endian. */
 	psf->endian = SF_ENDIAN_BIG ;
 
-	/* 	AIFF files can apparently have their chunks in any order. However, they
+	/*	AIFF files can apparently have their chunks in any order. However, they
 	**	must have a FORM chunk. Approach here is to read all the chunks one by
-	**  one and then check for the mandatory chunks at the end.
+	**	one and then check for the mandatory chunks at the end.
 	*/
 	while (! done)
 	{	psf_binheader_readf (psf, "m", &marker) ;
@@ -378,10 +400,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 			case COMM_MARKER :
 					error = aiff_read_comm_chunk (psf, comm_fmt) ;
 
-					psf->sf.samplerate 	= tenbytefloat2int (comm_fmt->sampleRate) ;
-					psf->sf.frames 	= comm_fmt->numSampleFrames ;
-					psf->sf.channels 	= comm_fmt->numChannels ;
-					psf->bytewidth 		= BITWIDTH2BYTES (comm_fmt->sampleSize) ;
+					psf->sf.samplerate = tenbytefloat2int (comm_fmt->sampleRate) ;
+					psf->sf.frames = comm_fmt->numSampleFrames ;
+					psf->sf.channels = comm_fmt->numChannels ;
+					psf->bytewidth = BITWIDTH2BYTES (comm_fmt->sampleSize) ;
 
 					if (error)
 						return error ;
@@ -459,7 +481,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					if (! psf->sf.seekable)
 						break ;
 
-					/* 	Seek to end of SSND chunk. */
+					/*      Seek to end of SSND chunk. */
 					psf_fseek (psf, psf->dataoffset + psf->datalength + (SSNDsize & 1), SEEK_SET) ;
 					break ;
 
@@ -597,14 +619,18 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 							return SFE_MALLOC_FAILED ;
 
 						psf_binheader_readf (psf, "b", bytes, 6) ;
-						psf_log_printf (psf, 	"  Base Note : %u\n  Detune    : %u\n"
-												"  Low  Note : %u\n  High Note : %u\n"
-												"  Low  Vel. : %u\n  High Vel. : %u\n",
-								bytes [0], bytes [1], bytes [2], bytes [3], bytes [4], bytes [5]) ;
-
+						psf_log_printf (psf, "  Base Note : %u\n  Detune    : %u\n"
+											"  Low  Note : %u\n  High Note : %u\n"
+											"  Low  Vel. : %u\n  High Vel. : %u\n",
+											bytes [0], bytes [1], bytes [2], bytes [3], bytes [4], bytes [5]) ;
+						psf->instrument->basenote = bytes [0] ;
+						psf->instrument->key_lo = bytes [2] ;
+						psf->instrument->key_hi = bytes [3] ;
+						psf->instrument->velocity_lo = bytes [4] ;
+						psf->instrument->velocity_hi = bytes [5] ;
 						psf_binheader_readf (psf, "E2", &gain) ;
-						psf_log_printf (psf, 	"  Gain (dB) : %d\n", gain) ;
-
+						psf->instrument->gain = gain ;
+						psf_log_printf (psf, "  Gain (dB) : %d\n", gain) ;
 						} ;
 					{	short	mode ; /* 0 - no loop, 1 - forward looping, 2 - backward looping */
 						const char	*loop_mode ;
@@ -612,13 +638,36 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 						psf_binheader_readf (psf, "E222", &mode, &begin, &end) ;
 						loop_mode = get_loop_mode_str (mode) ;
-						psf_log_printf (psf, 	"  Sustain\n   mode  : %d => %s\n   begin : %u\n   end   : %u\n",
-								mode, loop_mode, begin, end) ;
+						mode = get_loop_mode (mode) ;
+						if (mode == SF_LOOP_NONE)
+						{	psf->instrument->loop_count = 0 ;
+							psf->instrument->loops [0].mode = SF_LOOP_NONE ;
+							}
+						else
+						{	psf->instrument->loop_count = 1 ;
+							psf->instrument->loops [0].mode = SF_LOOP_FORWARD ;
+							psf->instrument->loops [0].start = begin ;
+							psf->instrument->loops [0].end = end ;
+							psf->instrument->loops [0].count = 0 ;
+							} ;
+						psf_log_printf (psf, "  Sustain\n   mode  : %d => %s\n   begin : %u\n   end   : %u\n",
+											mode, loop_mode, begin, end) ;
 						psf_binheader_readf (psf, "E222", &mode, &begin, &end) ;
 						loop_mode = get_loop_mode_str (mode) ;
-						psf_log_printf (psf, 	"  Release\n   mode  : %d => %s\n   begin : %u\n   end   : %u\n",
-								mode, loop_mode, begin, end) ;
+						mode = get_loop_mode (mode) ;
+						if (mode == SF_LOOP_NONE)
+							psf->instrument->loops [0].mode = SF_LOOP_NONE ;
+						else
+						{	psf->instrument->loop_count += 1 ;
+							psf->instrument->loops [1].mode = SF_LOOP_FORWARD ;
+							psf->instrument->loops [1].start = begin ;
+							psf->instrument->loops [1].end = end ;
+							psf->instrument->loops [1].count = 0 ;
+							} ;
+						psf_log_printf (psf, "  Release\n   mode  : %d => %s\n   begin : %u\n   end   : %u\n",
+										mode, loop_mode, begin, end) ;
 						} ;
+					instr_found++ ;
 					break ;
 
 			case basc_MARKER :
@@ -632,14 +681,16 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 			case MARK_MARKER :
 					psf_binheader_readf (psf, "E4", &dword) ;
 					psf_log_printf (psf, " %M : %d\n", marker, dword) ;
-					{	unsigned short	mark_count, mark_id ;
-						unsigned char	pstr_len ;
-						unsigned int	position ;
+					{	unsigned short mark_id, n = 0 ;
+						unsigned char pstr_len ;
+						unsigned int position ;
 
-						bytesread = psf_binheader_readf (psf, "E2", &mark_count) ;
+						bytesread = psf_binheader_readf (psf, "E2", &n) ;
+						mark_count = n ;
+						markstr = calloc (mark_count, sizeof (MARK_ID_POS)) ;
 						psf_log_printf (psf, "  Count : %d\n", mark_count) ;
 
-						while (mark_count && bytesread < dword)
+						for (n = 0 ; n < mark_count && bytesread < dword ; n++)
 						{	bytesread += psf_binheader_readf (psf, "E241", &mark_id, &position, &pstr_len) ;
 							psf_log_printf (psf, "   Mark ID  : %u\n   Position : %u\n", mark_id, position) ;
 
@@ -648,15 +699,17 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 							bytesread += psf_binheader_readf (psf, "b", psf->u.scbuf, pstr_len) ;
 							psf_log_printf (psf, "   Name     : %s\n", psf->u.scbuf) ;
 
-							/*	TODO if psf->u.scbuf is equal to 
+							markstr [n].markerID = mark_id ;
+							markstr [n].position = position ;
+							/*
+							**	TODO if psf->u.scbuf is equal to
 							**	either Beg_loop, Beg loop or beg loop and spam
-							if (psf->instrument == NULL && (psf->instrument = psf_instrument_alloc()) == NULL)
-								return SFE_MALLOC_FAILED ;
+							**	if (psf->instrument == NULL && (psf->instrument = psf_instrument_alloc ()) == NULL)
+							**		return SFE_MALLOC_FAILED ;
 							*/
-
-							mark_count -- ;
 							} ;
 						} ;
+					mark_found++ ;
 					psf_binheader_readf (psf, "j", dword - bytesread) ;
 					break ;
 
@@ -702,6 +755,21 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 			break ;
 		} ; /* while (1) */
 
+	if (instr_found && mark_found)
+	{	int j ;
+
+		for (j = 0 ; j<psf->instrument->loop_count ; j ++)
+		{	if (j < ARRAY_LEN (psf->instrument->loops))
+			{	psf->instrument->loops [j].start = marker_to_position (markstr, psf->instrument->loops [j].start, mark_count) ;
+				psf->instrument->loops [j].end = marker_to_position (markstr, psf->instrument->loops [j].end, mark_count) ;
+				psf->instrument->loops [j].mode = SF_LOOP_FORWARD ;
+				} ;
+  			} ;
+		} ;
+
+	if (markstr)
+		free (markstr) ;
+
 	if (! (found_chunk & HAVE_FORM))
 		return SFE_AIFF_NO_FORM ;
 
@@ -718,7 +786,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 } /* aiff_read_header */
 
 static int
-aiff_close	(SF_PRIVATE *psf)
+aiff_close (SF_PRIVATE *psf)
 {
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	aiff_write_tailer (psf) ;
@@ -768,7 +836,7 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	psf_log_printf (psf, "  Frames      : %u%s\n", comm_fmt->numSampleFrames, (comm_fmt->numSampleFrames == 0 && psf->filelength > 100) ? " (Should not be 0)" : "") ;
 	psf_log_printf (psf, "  Channels    : %d\n", comm_fmt->numChannels) ;
 
-	/*	Found some broken 'fl32' files with comm.samplesize == 16. Fix it here. */
+	/*      Found some broken 'fl32' files with comm.samplesize == 16. Fix it here. */
 
 	if ((comm_fmt->encoding == fl32_MARKER || comm_fmt->encoding == FL32_MARKER) && comm_fmt->sampleSize != 32)
 	{	psf_log_printf (psf, "  Sample Size : %d (should be 32)\n", comm_fmt->sampleSize) ;
@@ -868,11 +936,12 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	return error ;
 } /* aiff_read_comm_chunk */
 
+
 static int
 aiff_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t		current ;
-	unsigned char 	comm_sample_rate [10], comm_zero_bytes [2] = { 0, 0 } ;
-	unsigned int 	comm_type, comm_size, comm_encoding, comm_frames ;
+	unsigned char	comm_sample_rate [10], comm_zero_bytes [2] = { 0, 0 } ;
+	unsigned int	comm_type, comm_size, comm_encoding, comm_frames ;
 	int				k, endian ;
 	short			bit_width ;
 
@@ -892,7 +961,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->mode == SFM_RDWR && psf->dataoffset > 0)
 	{	/* Assuming here that the header has already been written and just
 		** needs to be corrected for new data length. That means that we
-		** only change the length fields of the FORM and SSND chunks;
+		** only change the length fields of the FORM and SSND chunks ;
 		** everything else can be skipped over.
 		*/
 
@@ -1061,6 +1130,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	/* Write COMM chunk. */
 	psf_binheader_writef (psf, "Emm4", comm_type, COMM_MARKER, comm_size) ;
 
+	memset (comm_sample_rate, 0, sizeof (comm_sample_rate)) ;
 	uint2tenbytefloat (psf->sf.samplerate, comm_sample_rate) ;
 
 	psf_binheader_writef (psf, "Et242", psf->sf.channels, comm_frames, bit_width) ;
@@ -1069,6 +1139,62 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	/* AIFC chunks have some extra data. */
 	if (comm_type == AIFC_MARKER)
 		psf_binheader_writef (psf, "mb", comm_encoding, comm_zero_bytes, sizeof (comm_zero_bytes)) ;
+
+	if (psf->instrument != NULL)
+	{	MARK_ID_POS	m [4] ;
+		INST_CHUNK ch ;
+		unsigned short ct = 0 ;
+
+		memset (m, 0, sizeof (m)) ;
+
+		ch.baseNote = psf->instrument->basenote ;
+		ch.detune = 0 ;
+		ch.lowNote = psf->instrument->key_lo ;
+		ch.highNote = psf->instrument->key_hi ;
+		ch.lowVelocity = psf->instrument->velocity_lo ;
+		ch.highVelocity = psf->instrument->velocity_hi ;
+		ch.gain = psf->instrument->gain ;
+		if (psf->instrument->loops [0].mode != SF_LOOP_NONE)
+		{	ch.sustain_loop.playMode = 1 ;
+			ch.sustain_loop.beginLoop = ct ;
+			m [0].markerID = ct++ ;
+			m [0].position = psf->instrument->loops [0].start ;
+			ch.sustain_loop.endLoop = ct ;
+			m [1].markerID = ct++ ;
+			m [1].position = psf->instrument->loops [0].end ;
+			} ;
+		if (psf->instrument->loops [1].mode != SF_LOOP_NONE)
+		{	ch.release_loop.playMode = 1 ;
+			ch.release_loop.beginLoop = ct ;
+			m [2].markerID = ct++ ;
+			m [2].position = psf->instrument->loops [1].start ;
+			ch.release_loop.endLoop = ct ;
+			m [3].markerID = ct++ ;
+			m [3].position = psf->instrument->loops [1].end ;
+			}
+		else
+		{	ch.release_loop.playMode = 0 ;
+			ch.release_loop.beginLoop = 0 ;
+			ch.release_loop.endLoop = 0 ;
+			} ;
+		psf_binheader_writef (psf, "Em4b", INST_MARKER, sizeof (INST_CHUNK), &ch.baseNote, 6) ;
+		psf_binheader_writef (psf, "2222222", ch.gain, ch.sustain_loop.playMode,
+				ch.sustain_loop.beginLoop, ch.sustain_loop.endLoop, ch.release_loop.playMode,
+				ch.release_loop.beginLoop, ch.release_loop.endLoop) ;
+
+		if (ct == 2)
+			psf_binheader_writef (psf, "Em42241b241b",
+					MARK_MARKER, 2 * sizeof (MARK_ID_POS) + 16, 2,
+					m [0].markerID, m [0].position, 8, "beg loop", 9,
+					m [1].markerID, m [1].position, 8, "end loop", 9) ;
+		else if (ct == 4)
+			psf_binheader_writef (psf, "Em42241b241b241b241b",
+					MARK_MARKER, 4 * sizeof (MARK_ID_POS) + 34, 4,
+					m [0].markerID, m [0].position, 8, "beg loop", 9,
+					m [1].markerID, m [1].position, 8, "end loop", 9,
+					m [2].markerID, m [2].position, 8, "beg loop", 9,
+					m [3].markerID, m [3].position, 8, "end loop", 9) ;
+		} ;
 
 	if (psf->str_flags & SF_STR_LOCATE_START)
 		aiff_write_strings (psf, SF_STR_LOCATE_START) ;
@@ -1201,6 +1327,17 @@ get_loop_mode_str (short mode)
 	return "*** unknown" ;
 } /* get_loop_mode_str */
 
+static short
+get_loop_mode (short mode)
+{	switch (mode)
+	{	case 0 : return SF_LOOP_NONE ;
+		case 1 : return SF_LOOP_FORWARD ;
+		case 2 : return SF_LOOP_BACKWARD ;
+		} ;
+
+	return SF_LOOP_NONE ;
+} /* get_loop_mode */
+
 /*==========================================================================================
 **	Rough hack at converting from 80 bit IEEE float in AIFF header to an int and
 **	back again. It assumes that all sample rates are between 1 and 800MHz, which
@@ -1238,10 +1375,7 @@ tenbytefloat2int (unsigned char *bytes)
 static void
 uint2tenbytefloat (unsigned int num, unsigned char *bytes)
 {	unsigned int mask = 0x40000000 ;
-	int		count ;
-
-
-	memset (bytes, 0, 10) ;
+	int	count ;
 
 	if (num <= 1)
 	{	bytes [0] = 0x3F ;
@@ -1302,8 +1436,8 @@ aiff_read_basc_chunk (SF_PRIVATE * psf, int datasize)
 				break ;
 		} ;
 
-	psf_log_printf (psf, 	"  ScaleType : 0x%x (%s)\n", bc.scaleType, type_str) ;
-	psf_log_printf (psf, 	"  Time Sig  : %d/%d\n", bc.sigNumerator, bc.sigDenominator) ;
+	psf_log_printf (psf, "  ScaleType : 0x%x (%s)\n", bc.scaleType, type_str) ;
+	psf_log_printf (psf, "  Time Sig  : %d/%d\n", bc.sigNumerator, bc.sigDenominator) ;
 
 	switch (bc.loopType)
 	{	case basc_TYPE_ONE_SHOT :

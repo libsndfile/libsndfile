@@ -597,7 +597,7 @@ truncate_test (const char *filename, int filetype)
 	puts ("ok") ;
 } /* truncate_test */
 
-static	void
+static void
 instrument_test (const char *filename, int filetype)
 {	static SF_INSTRUMENT write_inst =
 	{	1, /* gain */
@@ -605,13 +605,13 @@ instrument_test (const char *filename, int filetype)
 		3, 4,
 		5, 6,
 		2, /* loop_count */
-		{	{	1, 2, 3, 4 },
-			{	2, 3, 4, 5 },
-			}
+		{	{	801, 2, 3, 0 },
+			{	801, 3, 4, 0 },
+		}
 	} ;
 	SF_INSTRUMENT read_inst ;
-	SNDFILE 	*file ;
-	SF_INFO		sfinfo ;
+	SNDFILE	 *file ;
+	SF_INFO	 sfinfo ;
 
 	print_test_name ("instrument_test", filename) ;
 
@@ -639,7 +639,41 @@ instrument_test (const char *filename, int filetype)
 
 	if (memcmp (&write_inst, &read_inst, sizeof (write_inst)) != 0)
 	{	printf ("\n\nLine %d : instrument comparison failed.\n\n", __LINE__) ;
-		/*-exit (1) ;-*/
+		printf ("W Base Note : %u\tDetune    : %u\n"
+			"  Low  Note : %u\tHigh Note : %u\n"
+			"  Low  Vel. : %u\tHigh Vel. : %u\n"
+			"  Gain      : %d\tCount     : %d\n"
+			"  mode      : %d\n"
+			"  start     : %d\tend       : %d\tcount  :%d\n"
+			"  mode      : %d\n"
+			"  start     : %d\tend       : %d\tcount  :%d\n\n",
+			write_inst.basenote, 0,
+			write_inst.key_lo, write_inst.key_hi,
+			write_inst.velocity_lo, write_inst.velocity_hi,
+			write_inst.gain, write_inst.loop_count,
+			write_inst.loops [0].mode, write_inst.loops [0].start,
+			write_inst.loops [0].end, write_inst.loops [0].count,
+			write_inst.loops [1].mode, write_inst.loops [1].start,
+			write_inst.loops [1].end, write_inst.loops [1].count) ;
+		printf ("R Base Note : %u\tDetune    : %u\n"
+			"  Low  Note : %u\tHigh Note : %u\n"
+			"  Low  Vel. : %u\tHigh Vel. : %u\n"
+			"  Gain      : %d\tCount     : %d\n"
+			"  mode      : %d\n"
+			"  start     : %d\tend       : %d\tcount  :%d\n"
+			"  mode      : %d\n"
+			"  start     : %d\tend       : %d\tcount  :%d\n\n",
+			read_inst.basenote, 0,
+			read_inst.key_lo, read_inst.key_hi,
+			read_inst.velocity_lo, read_inst.velocity_hi,
+			read_inst.gain,	read_inst.loop_count,
+			read_inst.loops [0].mode, read_inst.loops [0].start,
+			read_inst.loops [0].end, read_inst.loops [0].count,
+			read_inst.loops [1].mode, read_inst.loops [1].start,
+			read_inst.loops [1].end, read_inst.loops [1].count) ;
+		
+		if ((filetype & SF_FORMAT_TYPEMASK) == SF_FORMAT_AIFF)
+			exit (1) ;
 		return ;
 		} ;
 
