@@ -1,3 +1,11 @@
+2005-12-29 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/error_test.c
+    Make the test distclean correct.
+
+    * src/file_io.c
+    Fix an SD2 MacOSX bug (reported by vince schwarzinger).
+
 2005-12-28 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c tests/command_test.c
