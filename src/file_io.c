@@ -118,7 +118,10 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	psf->error = SFE_NO_ERROR ;
 	if ((psf->rsrcdes = psf_open_fd (psf->rsrcpath, open_mode)) >= 0)
 	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrcdes) ;
-		return SFE_NO_ERROR ;
+		if (psf->rsrclength > 0 || (open_mode & SFM_WRITE))
+			return SFE_NO_ERROR ;
+		psf_close_fd (psf->rsrcdes) ;
+		psf->rsrcdes = -1 ;
 		} ;
 
 	if (psf->rsrcdes == - SFE_BAD_OPEN_MODE)
