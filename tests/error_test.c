@@ -99,6 +99,7 @@ error_value_test (void)
 		exit (1) ;
 		} ;
 
+	remove (filename) ;
 	puts ("ok") ;
 	return ;
 } /* error_value_test */
