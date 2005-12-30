@@ -1,3 +1,11 @@
+2005-12-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/peak_chunk_test.c
+    Extend and clean up tests.
+
+    * src/sndfile.c
+    Fix a bug that prevented the turning off of PEAK chunks.
+
 2005-12-29 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/error_test.c
