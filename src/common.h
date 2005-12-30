@@ -155,7 +155,7 @@ typedef struct
 	/*
 	** This is not ISO compliant C. It works on some compilers which
 	** don't support the ISO standard flexible struct array which is
-	** used above. If your compiler doesn't ike this I suggest you find
+	** used above. If your compiler doesn't like this I suggest you find
 	** youself a 1999 ISO C standards compilant compiler. GCC-3.X is
 	** highly recommended.
 	*/
