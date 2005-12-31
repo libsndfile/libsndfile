@@ -41,17 +41,19 @@
 	Is this a bug in libsndfile?</A><BR>
 <A HREF="#Q016">Q16 : Will you accept a fix for compiling libsndfile with compiler X?
 	</A><BR>
+<A HREF="#Q017">Q17 : Can libsndfile read/write files from/to UNIX pipes?
+	</A><BR>
 <HR>
 
 <!-- ========================================================================= -->
 <A NAME="Q001"></A>
 <H2><BR><B>Q1 : Do you plan to support XYZ codec in libsnfile?</B></H2>
 <P>
-If source code for XYZ codec is available under a suitable license (LGPL, BSD, 
+If source code for XYZ codec is available under a suitable license (LGPL, BSD,
 MIT etc) then yes, I'd like to add it.
 </P>
 <P>
-If suitable documentation is available on how to decode and enocde the format 
+If suitable documentation is available on how to decode and enocde the format
 then maybe, depending on how much work is involved.
 </P>
 <P>
@@ -516,6 +518,41 @@ code.
 It should be noted however that libsndfile uses features specified by the 1999
 ISO C Standard.
 This can make compiling libsndfile with some older compilers difficult.
+</P>
+
+<!-- ========================================================================= -->
+<A NAME="Q017"></A>
+<H2><BR><B>Q17 : Can libsndfile read/write files from/to UNIX pipes?
+</B></H2>
+
+<P>
+Yes, libsndfile can read files from pipes.
+Unfortunately, the write case is much more complicated.
+</P>
+
+<P>
+File formats like AIFF and WAV have information at the start of the file (the
+file header) which states the length of the file, the number of sample frames
+etc.
+This information must be filled in correctly when the file header is written,
+but this information is not reliably known until the file is closed.
+This means that libsndfile cannot write AIFF, WAV and many other file types
+to a pipe.
+</P>
+
+<P>
+However, there is at least one file format (AU) which is specifically designed
+to be written to a pipe.
+Like AIFF and WAV, AU has a header with a sample frames field, but it is
+specifically allowable to set that frames field to 0x7FFFFFFF if the file
+length is not known when the header is written.
+The AU file format can also hold data in many of the standard formats (ie
+SF_FORMAT_PCM_16, SF_FORMAT_PCM_24, SF_FORMAT_FLOAT etc) as well as allowing
+data in both big and little endian format.
+</P>
+
+<P>
+Sell also <A HREF="#Q006">FAQ Q6</A>.
 </P>
 
 <!-- ========================================================================= -->
