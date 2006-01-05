@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.53)
 
-AC_INIT(libsndfile,1.0.13pre4,erikd@mega-nerd.com)
+AC_INIT(libsndfile,1.0.13pre5,erikd@mega-nerd.com)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
@@ -41,6 +41,8 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(endian.h)
 AC_CHECK_HEADERS(byteswap.h)
 AC_CHECK_HEADERS(locale.h)
+AC_CHECK_HEADERS(inttypes.h)
+
 AC_HEADER_SYS_WAIT
 
 AC_CHECK_DECLS(S_IRGRP)

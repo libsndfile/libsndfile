@@ -20,6 +20,8 @@
 
 #if HAVE_STDINT_H
 #include <stdint.h>
+#elif HAVE_INTTYPES_H
+#include <inttypes.h>
 #endif
 
 #if (defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))

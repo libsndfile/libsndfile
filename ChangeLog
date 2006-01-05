@@ -1,3 +1,12 @@
+2006-01-05 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Check for <inttypes.h> because some broken systems (like Solaris) don't have
+    <stdint.h> which is the 1999 ISO C standard file containing int64_t.
+
+    * src/sfendian.h src/common.h
+    Use <inttypes.h> if <stdint.h> is not available.
+
 2005-12-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/peak_chunk_test.c

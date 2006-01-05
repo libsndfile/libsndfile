@@ -29,6 +29,8 @@
 
 #ifndef SNDFILE_H
 #include "sndfile.h"
+#elif HAVE_INTTYPES_H
+#include <inttypes.h>
 #endif
 
 #ifdef __cplusplus
