@@ -1,3 +1,16 @@
+2006-01-09 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in src/aiff.c src/wav.c
+    Apply a patch from John Fitch (Csound project).
+    Add detune field to SF_INSTRUMENT struct.
+    Add reading/writing instrument chunks to WAV files.
+
+    * tests/command_test.c
+    Update SF_INSTRUMENT tests.
+
+    * tests/Makefile.am
+    Hook instrument tests into test suite.
+
 2006-01-05 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac

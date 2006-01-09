@@ -600,11 +600,12 @@ truncate_test (const char *filename, int filetype)
 static void
 instrument_test (const char *filename, int filetype)
 {	static SF_INSTRUMENT write_inst =
-	{	1, /* gain */
-		2, /* basenote */
-		3, 4,
-		5, 6,
-		2, /* loop_count */
+	{	1,		/* gain */
+		2, 		/* detune */
+		3, 		/* basenote */
+		4, 5,	/* key low and high */
+		6, 7,	/* velocity low and high */
+		2,		/* loop_count */
 		{	{	801, 2, 3, 0 },
 			{	801, 3, 4, 0 },
 		}
@@ -632,22 +633,35 @@ instrument_test (const char *filename, int filetype)
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 	if (sf_command (file, SFC_GET_INSTRUMENT, &read_inst, sizeof (read_inst)) == SF_FALSE)
 	{	printf ("\n\nLine %d : sf_command (SFC_GET_INSTRUMENT) failed.\n\n", __LINE__) ;
-		/*-exit (1) ;-*/
+		exit (1) ;
 		return ;
 		} ;
 	sf_close (file) ;
 
+	if ((filetype & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAV)
+	{	/*
+		**	For all the fields that WAV doesn't support, modify the
+		**	write_inst struct to hold the default value that the WAV
+		**	module should hold.
+		*/
+		write_inst.key_lo = write_inst.velocity_lo = 0 ;
+		write_inst.key_hi = write_inst.velocity_hi = 127 ;
+		write_inst.detune = 0 ;
+		} ;
+
 	if (memcmp (&write_inst, &read_inst, sizeof (write_inst)) != 0)
 	{	printf ("\n\nLine %d : instrument comparison failed.\n\n", __LINE__) ;
-		printf ("W Base Note : %u\tDetune    : %u\n"
-			"  Low  Note : %u\tHigh Note : %u\n"
-			"  Low  Vel. : %u\tHigh Vel. : %u\n"
-			"  Gain      : %d\tCount     : %d\n"
-			"  mode      : %d\n"
-			"  start     : %d\tend       : %d\tcount  :%d\n"
-			"  mode      : %d\n"
-			"  start     : %d\tend       : %d\tcount  :%d\n\n",
-			write_inst.basenote, 0,
+		printf ("W  Base Note : %u\n"
+			"   Detune    : %u\n"
+			"   Low  Note : %u\tHigh Note : %u\n"
+			"   Low  Vel. : %u\tHigh Vel. : %u\n"
+			"   Gain      : %d\tCount     : %d\n"
+			"   mode      : %d\n"
+			"   start     : %d\tend       : %d\tcount  :%d\n"
+			"   mode      : %d\n"
+			"   start     : %d\tend       : %d\tcount  :%d\n\n",
+			write_inst.basenote,
+			write_inst.detune,
 			write_inst.key_lo, write_inst.key_hi,
 			write_inst.velocity_lo, write_inst.velocity_hi,
 			write_inst.gain, write_inst.loop_count,
@@ -655,15 +669,17 @@ instrument_test (const char *filename, int filetype)
 			write_inst.loops [0].end, write_inst.loops [0].count,
 			write_inst.loops [1].mode, write_inst.loops [1].start,
 			write_inst.loops [1].end, write_inst.loops [1].count) ;
-		printf ("R Base Note : %u\tDetune    : %u\n"
-			"  Low  Note : %u\tHigh Note : %u\n"
-			"  Low  Vel. : %u\tHigh Vel. : %u\n"
-			"  Gain      : %d\tCount     : %d\n"
-			"  mode      : %d\n"
-			"  start     : %d\tend       : %d\tcount  :%d\n"
-			"  mode      : %d\n"
-			"  start     : %d\tend       : %d\tcount  :%d\n\n",
-			read_inst.basenote, 0,
+		printf ("R  Base Note : %u\n"
+			"   Detune    : %u\n"
+			"   Low  Note : %u\tHigh Note : %u\n"
+			"   Low  Vel. : %u\tHigh Vel. : %u\n"
+			"   Gain      : %d\tCount     : %d\n"
+			"   mode      : %d\n"
+			"   start     : %d\tend       : %d\tcount  :%d\n"
+			"   mode      : %d\n"
+			"   start     : %d\tend       : %d\tcount  :%d\n\n",
+			read_inst.basenote,
+			read_inst.detune,
 			read_inst.key_lo, read_inst.key_hi,
 			read_inst.velocity_lo, read_inst.velocity_hi,
 			read_inst.gain,	read_inst.loop_count,
@@ -671,10 +687,8 @@ instrument_test (const char *filename, int filetype)
 			read_inst.loops [0].end, read_inst.loops [0].count,
 			read_inst.loops [1].mode, read_inst.loops [1].start,
 			read_inst.loops [1].end, read_inst.loops [1].count) ;
-		
-		if ((filetype & SF_FORMAT_TYPEMASK) == SF_FORMAT_AIFF)
-			exit (1) ;
-		return ;
+
+		exit (1) ;
 		} ;
 
 	unlink (filename) ;

@@ -165,6 +165,7 @@ generic-tests : error_test ulaw_test alaw_test command_test floating_point_test 
 	./command_test format
 	./command_test peak
 	./command_test trunc
+	./command_test inst
 	./floating_point_test
 	./scale_clip_test
 	./headerless_test
