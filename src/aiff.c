@@ -624,6 +624,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 											"  Low  Vel. : %u\n  High Vel. : %u\n",
 											bytes [0], bytes [1], bytes [2], bytes [3], bytes [4], bytes [5]) ;
 						psf->instrument->basenote = bytes [0] ;
+						psf->instrument->detune = bytes [1] ;
 						psf->instrument->key_lo = bytes [2] ;
 						psf->instrument->key_hi = bytes [3] ;
 						psf->instrument->velocity_lo = bytes [4] ;
@@ -1148,7 +1149,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		memset (m, 0, sizeof (m)) ;
 
 		ch.baseNote = psf->instrument->basenote ;
-		ch.detune = 0 ;
+		ch.detune = psf->instrument->detune ;
 		ch.lowNote = psf->instrument->key_lo ;
 		ch.highNote = psf->instrument->key_hi ;
 		ch.lowVelocity = psf->instrument->velocity_lo ;
