@@ -818,6 +818,31 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 			psf_binheader_writef (psf, "eft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 
+	if (psf->instrument != NULL)
+	{	int		tmp ;
+		double	dtune = (double) (0x40000000) / 25.0 ;
+
+		psf_binheader_writef (psf, "em4", smpl_MARKER, 9 * 4 + psf->instrument->loop_count * 6 * 4) ;
+		psf_binheader_writef (psf, "e44", 0, 0) ; /* Manufacturer zero is everyone */
+		tmp = (int) (1.0e9 / psf->sf.samplerate) ; /* Sample period in nano seconds */
+		psf_binheader_writef (psf, "e44", tmp, psf->instrument->basenote) ;
+		tmp = (unsigned int) (psf->instrument->detune * dtune + 0.5) ;
+		psf_binheader_writef (psf, "e4", tmp) ;
+		psf_binheader_writef (psf, "e44", 0, 0) ; /* SMTPE format */
+		psf_binheader_writef (psf, "e44", psf->instrument->loop_count, 0) ;
+
+		for (tmp = 0 ; tmp < psf->instrument->loop_count ; tmp++)
+		{	int type ;
+
+			type = psf->instrument->loops [tmp].mode ;
+			type = (type == SF_LOOP_FORWARD ? 0 : type==SF_LOOP_BACKWARD ? 2 : type == SF_LOOP_ALTERNATING ? 1 : 32) ;
+
+			psf_binheader_writef (psf, "e44", tmp, type) ;
+			psf_binheader_writef (psf, "e44", psf->instrument->loops [tmp].start, psf->instrument->loops [tmp].end) ;
+			psf_binheader_writef (psf, "e44", 0, psf->instrument->loops [tmp].count) ;
+			} ;
+		} ;
+
 	psf_binheader_writef (psf, "etm8", data_MARKER, psf->datalength) ;
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 	if (psf->error)
@@ -1360,6 +1385,8 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 
 	psf->instrument->basenote = note ;
 	psf->instrument->gain = 1 ;
+	psf->instrument->velocity_lo = psf->instrument->key_lo = 0 ;
+	psf->instrument->velocity_hi = psf->instrument->key_hi = 127 ;
 
 	return 0 ;
 } /* wav_read_smpl_chunk */
