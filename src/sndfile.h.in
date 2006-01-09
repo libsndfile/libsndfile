@@ -328,7 +328,7 @@ enum
 
 typedef struct
 {	int gain ;
-	char basenote ;
+	char basenote, detune ;
 	char velocity_lo, velocity_hi ;
 	char key_lo, key_hi ;
 	int loop_count ;
