@@ -58,6 +58,7 @@
 #define	SF_TEXT_LEN				(1024)
 #define SF_SYSERR_LEN			(256)
 #define SF_MAX_STRINGS			(16)
+#define SF_STR_BUFFER_LEN		(4096)
 
 #define	PSF_SEEK_ERROR			((sf_count_t) -1)
 
@@ -217,7 +218,7 @@ typedef struct sf_private_tag
 	** sound files.
 	*/
 	STR_DATA		strings [SF_MAX_STRINGS] ;
-	char			str_storage [SF_BUFFER_LEN] ;
+	char			str_storage [SF_STR_BUFFER_LEN] ;
 	char			*str_end ;
 	int				str_flags ;
 

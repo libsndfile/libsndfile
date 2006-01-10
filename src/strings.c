@@ -85,9 +85,9 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 
 
 #if STRINGS_DEBUG
-	psf_log_printf (psf, "str_storage      : %X\n", (int) psf->str_storage) ;
-	psf_log_printf (psf, "str_end          : %X\n", (int) psf->str_end) ;
-	psf_log_printf (psf, "sizeof (storage) : %d\n", SIGNED_SIZEOF (psf->str_storage)) ;
+	psf_log_printf (psf, "str_storage          : %X\n", (int) psf->str_storage) ;
+	psf_log_printf (psf, "str_end              : %X\n", (int) psf->str_end) ;
+	psf_log_printf (psf, "sizeof (str_storage) : %d\n", SIGNED_SIZEOF (psf->str_storage)) ;
 #endif
 
 	len_remaining = SIGNED_SIZEOF (psf->str_storage) - (psf->str_end - psf->str_storage) ;
