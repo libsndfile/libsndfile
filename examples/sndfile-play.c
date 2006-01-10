@@ -734,7 +734,7 @@ win32_play (int argc, char *argv [])
 			continue ;
 			} ;
 
-		audio_data.remaining = audio_data.sfinfo.frames ;
+		audio_data.remaining = audio_data.sfinfo.frames * audio_data.sfinfo.channels ;
 		audio_data.current = 0 ;
 
 		InitializeCriticalSection (&audio_data.mutex) ;
