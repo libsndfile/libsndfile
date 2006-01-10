@@ -1,3 +1,12 @@
+2006-01-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-play.c
+    Fix calculation of samples remaining in win32 code. Thanks Axel Roebel.
+
+    * src/common.h
+    Make sure length of header buffer can hold header plus strings. Thanks Axel
+    Roebel.
+
 2006-01-09 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in src/aiff.c src/wav.c
