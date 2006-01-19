@@ -1,3 +1,16 @@
+2006-01-19 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/xi.c
+    Start work on add read/write of instrument chunks.
+
+    * src/command_test.c
+    Add tests for XI instrument chunk.
+
+    * tests/largefile_test.c tests/Makefile.am
+    Add new test and hook it into the build system. This test will not be run
+    automatically because it requires 3 Gig of disk space and takes 3 minutes
+    to run.
+
 2006-01-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-play.c

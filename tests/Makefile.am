@@ -6,7 +6,7 @@ noinst_PROGRAMS = sfversion floating_point_test write_read_test \
 	pcm_test headerless_test pipe_test benchmark header_test misc_test \
 	raw_test string_test open_fail_test multi_file_test dither_test \
 	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
-	locale_test
+	locale_test largefile_test
 
 SNDFILEDIR = ../src
 INCLUDES = -I$(srcdir)/$(SNDFILEDIR)
@@ -54,6 +54,9 @@ command_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 locale_test_SOURCES = locale_test.c utils.c
 locale_test_LDADD = $(SNDFILEDIR)/libsndfile.la
+
+largefile_test_SOURCES = largefile_test.c utils.c
+largefile_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 pcm_test_SOURCES = pcm_test.c utils.c
 pcm_test_LDADD = $(SNDFILEDIR)/libsndfile.la
