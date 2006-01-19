@@ -109,6 +109,7 @@ main (int argc, char *argv [])
 	if (do_all || strcmp (argv [1], "inst") == 0)
 	{	instrument_test ("instrument.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		instrument_test ("instrument.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
+		instrument_test ("instrument.xi", SF_FORMAT_XI | SF_FORMAT_DPCM_16) ;
 		test_count++ ;
 		} ;
 
@@ -600,11 +601,11 @@ truncate_test (const char *filename, int filetype)
 static void
 instrument_test (const char *filename, int filetype)
 {	static SF_INSTRUMENT write_inst =
-	{	1,		/* gain */
-		2, 		/* detune */
-		3, 		/* basenote */
-		4, 5,	/* key low and high */
-		6, 7,	/* velocity low and high */
+	{	2,		/* gain */
+		3, 		/* detune */
+		4, 		/* basenote */
+		5, 6,	/* key low and high */
+		7, 8,	/* velocity low and high */
 		2,		/* loop_count */
 		{	{	801, 2, 3, 0 },
 			{	801, 3, 4, 0 },
@@ -644,9 +645,23 @@ instrument_test (const char *filename, int filetype)
 		**	write_inst struct to hold the default value that the WAV
 		**	module should hold.
 		*/
+		write_inst.detune = 0 ;
 		write_inst.key_lo = write_inst.velocity_lo = 0 ;
 		write_inst.key_hi = write_inst.velocity_hi = 127 ;
+		write_inst.gain = 1 ;
+		} ;
+
+	if ((filetype & SF_FORMAT_TYPEMASK) == SF_FORMAT_XI)
+	{	/*
+		**	For all the fields that XI doesn't support, modify the
+		**	write_inst struct to hold the default value that the XI
+		**	module should hold.
+		*/
+		write_inst.basenote = 0 ;
 		write_inst.detune = 0 ;
+		write_inst.key_lo = write_inst.velocity_lo = 0 ;
+		write_inst.key_hi = write_inst.velocity_hi = 127 ;
+		write_inst.gain = 1 ;
 		} ;
 
 	if (memcmp (&write_inst, &read_inst, sizeof (write_inst)) != 0)
@@ -687,6 +702,9 @@ instrument_test (const char *filename, int filetype)
 			read_inst.loops [0].end, read_inst.loops [0].count,
 			read_inst.loops [1].mode, read_inst.loops [1].start,
 			read_inst.loops [1].end, read_inst.loops [1].count) ;
+
+if ((filetype & SF_FORMAT_TYPEMASK) == SF_FORMAT_XI)
+	return ;
 
 		exit (1) ;
 		} ;
