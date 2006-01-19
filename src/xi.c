@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -305,9 +305,8 @@ xi_write_header (SF_PRIVATE *psf, int calc_length)
 	*/
 	psf_binheader_writef (psf, "ez2z2", (size_t) (4 * 3), 0x1234, (size_t) 22, 1) ;
 
-psf->sf.frames = 12 ;
-pxi->loop_begin = 0 ;
-pxi->loop_end = 0 ;
+	pxi->loop_begin = 0 ;
+	pxi->loop_end = 0 ;
 
 	psf_binheader_writef (psf, "et844", psf->sf.frames, pxi->loop_begin, pxi->loop_end) ;
 
@@ -389,6 +388,9 @@ xi_read_header (SF_PRIVATE *psf)
 	if (sample_count > MAX_XI_SAMPLES)
 		return SFE_XI_EXCESS_SAMPLES ;
 
+	if (psf->instrument == NULL && (psf->instrument = psf_instrument_alloc ()) == NULL)
+		return SFE_MALLOC_FAILED ;
+
 	/* Log all data for each sample. */
 	for (k = 0 ; k < sample_count ; k++)
 	{	psf_binheader_readf (psf, "e444", &(sample_sizes [k]), &loop_begin, &loop_end) ;
@@ -397,7 +399,12 @@ xi_read_header (SF_PRIVATE *psf)
 		psf_binheader_readf (psf, "bb", buffer, 6, name, 22) ;
 		name [21] = 0 ;
 
-		psf_log_printf (psf, "Sample #%d\n  name    : %s\n  size    : %d\n", k + 1, name, sample_sizes [k]) ;
+		psf_log_printf (psf, "Sample #%d\n  name    : %s\n", k + 1, name) ;
+
+		psf_log_printf (psf, "  size    : %d\n", sample_sizes [k]) ;
+
+
+
 		psf_log_printf (psf, "  loop\n    begin : %d\n    end   : %d\n", loop_begin, loop_end) ;
 
 		psf_log_printf (psf, "  volume  : %u\n  f. tune : %d\n  flags   : 0x%02X ",
@@ -461,6 +468,11 @@ xi_read_header (SF_PRIVATE *psf)
 
 	if (! psf->sf.frames && psf->blockwidth)
 		psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;
+
+	psf->instrument->basenote = 0 ;
+	psf->instrument->gain = 1 ;
+	psf->instrument->velocity_lo = psf->instrument->key_lo = 0 ;
+	psf->instrument->velocity_hi = psf->instrument->key_hi = 127 ;
 
 	return 0 ;
 } /* xi_read_header */
