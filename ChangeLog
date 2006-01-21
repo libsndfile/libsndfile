@@ -6,6 +6,12 @@
     * tests/command_test.c
     Don't exit on error in instrument test for XI files.
 
+    * configure.ac
+    Bump version to 1.0.13.
+
+    * doc/*.html NEWS README
+    Update version numbers.
+
 2006-01-19 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/xi.c

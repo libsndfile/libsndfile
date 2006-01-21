@@ -1,3 +1,9 @@
+Version 1.0.13 (2006-01-21)
+  * Fix form MinGW compiler problems.
+  * Allow readin/write of instrument chunks from WAV and AIFF files.
+  * Compile problem fix for Solaris compiler.
+  * Minor cleanups and bug fixes.
+
 Version 1.0.12 (2005-09-30)
   * Add support for FLAC and Apple's Core Audio Format (CAF).
   * Add virtual I/O interface (still needs docs).

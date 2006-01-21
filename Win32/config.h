@@ -112,6 +112,9 @@
 /* Define to 1 if you have the `m' library (-lm). */
 #define HAVE_LIBM 1
 
+/* Define to 1 if you have the <locale.h> header file. */
+/* #undef HAVE_LOCALE_H */
+
 /* Define if you have C99's lrint function. */
 /* #undef HAVE_LRINT */
 
@@ -144,6 +147,9 @@
 
 /* Define to 1 if you have the `realloc' function. */
 #define HAVE_REALLOC 1
+
+/* Define to 1 if you have the `setlocale' function. */
+/* #undef HAVE_SETLOCALE */
 
 /* Define to 1 if you have the `snprintf' function. */
 #define HAVE_SNPRINTF 1
@@ -200,13 +206,13 @@
 #define PACKAGE_NAME "libsndfile"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libsndfile 1.0.12"
+#define PACKAGE_STRING "libsndfile 1.0.13"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libsndfile"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.0.12"
+#define PACKAGE_VERSION "1.0.13"
 
 /* Set to maximum allowed value of sf_count_t type. */
 #define SF_COUNT_MAX 0x7FFFFFFFFFFFFFFFi64
@@ -263,7 +269,7 @@
 #define USE_WINDOWS_API 1
 
 /* Version number of package */
-#define VERSION "1.0.12"
+#define VERSION "1.0.13"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */

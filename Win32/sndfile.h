@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -312,32 +312,43 @@ typedef struct
 	sf_count_t	length ;
 } SF_EMBED_FILE_INFO ;
 
-/* Struct used to retrieve music sample information from a file.
+/*
+**	Structs used to retrieve music sample information from a file.
 */
 
+enum
+{	/*
+	**	The loop mode field in SF_INSTRUMENT will be one of the following.
+	*/
+	SF_LOOP_NONE = 800,
+	SF_LOOP_FORWARD,
+	SF_LOOP_BACKWARD,
+	SF_LOOP_ALTERNATING
+} ;
+
 typedef struct
-{	int basenote ;
-	int gain ;
-	int	sustain_mode ;
-	int sustain_start, sustain_end ;
-	int release_mode ;
-	int release_start, reslease_end ;
+{	int gain ;
+	char basenote, detune ;
+	char velocity_lo, velocity_hi ;
+	char key_lo, key_hi ;
+	int loop_count ;
+
+	struct
+	{	int mode ;
+		unsigned int start ;
+		unsigned int end ;
+		unsigned int count ;
+	} loops [16] ; /* make variable in a sensible way */
 } SF_INSTRUMENT ;
 
-/* sustain_mode and release_mode will be one of the following. */
 
-enum
-{	SF_LOOP_NONE = 800,
-	SF_LOOP_FORWARD,
-	SF_LOOP_BACKWARD
-} ;
 
 /* Struct used to retrieve loop information from a file.*/
 typedef struct
 {
-	short	time_sig_num ;	/* any positive integer    >0  */
-	short	time_sig_den ;	/* any positive power of 2 >0  */
-	int		loop_mode ;		/* see SF_LOOP enum            */
+	short	time_sig_num ;	/* any positive integer    > 0  */
+	short	time_sig_den ;	/* any positive power of 2 > 0  */
+	int		loop_mode ;		/* see SF_LOOP enum             */
 
 	int		num_beats ;		/* this is NOT the amount of quarter notes !!!*/
 							/* a full bar of 4/4 is 4 beats */
