@@ -703,10 +703,8 @@ instrument_test (const char *filename, int filetype)
 			read_inst.loops [1].mode, read_inst.loops [1].start,
 			read_inst.loops [1].end, read_inst.loops [1].count) ;
 
-if ((filetype & SF_FORMAT_TYPEMASK) == SF_FORMAT_XI)
-	return ;
-
-		exit (1) ;
+		if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_XI)
+			exit (1) ;
 		} ;
 
 	unlink (filename) ;

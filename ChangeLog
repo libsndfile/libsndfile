@@ -1,3 +1,11 @@
+2006-01-21 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Win32/config.h
+    Undef HAVE_INTTYPES_H for win32.
+
+    * tests/command_test.c
+    Don't exit on error in instrument test for XI files.
+
 2006-01-19 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/xi.c
