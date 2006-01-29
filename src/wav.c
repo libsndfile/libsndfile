@@ -60,6 +60,7 @@
 #define PAD_MARKER	 (MAKE_MARKER ('P', 'A', 'D', ' '))
 #define afsp_MARKER	 (MAKE_MARKER ('a', 'f', 's', 'p'))
 #define clm_MARKER	 (MAKE_MARKER ('c', 'l', 'm', ' '))
+#define elmo_MARKER	 (MAKE_MARKER ('e', 'l', 'm', 'o'))
 
 #define ISFT_MARKER	 (MAKE_MARKER ('I', 'S', 'F', 'T'))
 #define ICRD_MARKER	 (MAKE_MARKER ('I', 'C', 'R', 'D'))
@@ -451,7 +452,15 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 						bytesread = psf_binheader_readf (psf, "e44", &dword, &cue_count) ;
 						bytesread -= 4 ; /* Remove bytes for first dword. */
-						psf_log_printf (psf, "%M : %u\n  Count : %d\n", marker, dword, cue_count) ;
+						psf_log_printf (psf, "%M : %u\n", marker, dword) ;
+
+						if (cue_count > 10)
+						{	psf_log_printf (psf, "  Count : %d (skipping)\n", cue_count) ;
+							psf_binheader_readf (psf, "j", cue_count * 24) ;
+							break ;
+							} ;
+
+						psf_log_printf (psf, "  Count : %d\n", cue_count) ;
 
 						while (cue_count)
 						{	bytesread += psf_binheader_readf (psf, "e444444", &id, &position,
@@ -504,6 +513,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case afsp_MARKER :
 			case bext_MARKER :
 			case clm_MARKER :
+			case elmo_MARKER :
 			case plst_MARKER :
 			case DISP_MARKER :
 			case MEXT_MARKER :
@@ -530,7 +540,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						psf_binheader_readf (psf, "j", -3) ;
 						break ;
 						} ;
-					psf_log_printf (psf, "*** Unknown chunk marker : %X. Exiting parser.\n", marker) ;
+					psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D. Exiting parser.\n", marker, psf_ftell (psf) - 4) ;
 					done = SF_TRUE ;
 					break ;
 			} ;	/* switch (dword) */
@@ -1139,8 +1149,15 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 		psf_binheader_readf (psf, "mj", &chunk, length - 4) ;
 		psf_log_printf (psf, "  %M\n", chunk) ;
 		return 0 ;
-		}
-	else if (current_pos + length > psf->filelength)
+		} ;
+
+	if (psf->headindex + length > SIGNED_SIZEOF (psf->header))
+	{	psf_log_printf (psf, "%M : %d (too long)\n", chunk, length) ;
+		psf_binheader_readf (psf, "j", length) ;
+		return 0 ;
+		} ;
+
+	if (current_pos + length > psf->filelength)
 	{	psf_log_printf (psf, "%M : %d (should be %d)\n", chunk, length, (int) (psf->filelength - current_pos)) ;
 		length = psf->filelength - current_pos ;
 		}
@@ -1177,7 +1194,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 			case ISRC_MARKER :
 					bytesread += psf_binheader_readf (psf, "e4", &dword) ;
 					dword += (dword & 1) ;
-					if (dword > SIGNED_SIZEOF (psf->u.cbuf))
+					if (dword < 0 || dword > SIGNED_SIZEOF (psf->u.cbuf))
 					{	psf_log_printf (psf, "  *** %M : %d (too big)\n", chunk, dword) ;
 						psf_binheader_readf (psf, "j", dword) ;
 						break ;
@@ -1196,15 +1213,16 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 						bytesread += psf_binheader_readf (psf, "e44", &dword, &mark_id) ;
 						dword -= 4 ;
 						dword += (dword & 1) ;
-						if (dword > SIGNED_SIZEOF (psf->u.cbuf))
+						if (dword < 1 || dword > SIGNED_SIZEOF (psf->u.cbuf))
 						{	psf_log_printf (psf, "  *** %M : %d (too big)\n", chunk, dword) ;
-							return SFE_INTERNAL ;
+							psf_binheader_readf (psf, "j", dword) ;
+							break ;
 							} ;
 
 						cptr = psf->u.cbuf ;
 						psf_binheader_readf (psf, "b", cptr, dword) ;
 						bytesread += dword ;
-						cptr [dword - 1] = 0 ;
+						cptr [dword - 1] = 0 ;						
 						psf_log_printf (psf, "    %M : %d : %s\n", chunk, mark_id, cptr) ;
 						} ;
 					break ;
