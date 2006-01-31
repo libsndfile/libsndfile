@@ -56,7 +56,7 @@ LINK32_OBJS= \
 	".\src\aiff.obj" \
 	".\src\alaw.obj" \
 	".\src\au.obj" \
-	".\src\au_g72x.obj" \
+	".\src\g72x.obj" \
 	".\src\avr.obj" \
 	".\src\common.obj" \
 	".\src\double64.obj" \
@@ -350,8 +350,8 @@ CHECK: $(TEST_PROGS)
 ".\src\au.obj" : ".\src\au.c"
     $(CPP) $(CFLAGS) /Fo".\src\au.obj" /c ".\src\au.c"
 
-".\src\au_g72x.obj" : ".\src\au_g72x.c"
-    $(CPP) $(CFLAGS) /Fo".\src\au_g72x.obj" /c ".\src\au_g72x.c"
+".\src\g72x.obj" : ".\src\g72x.c"
+    $(CPP) $(CFLAGS) /Fo".\src\g72x.obj" /c ".\src\g72x.c"
 
 ".\src\avr.obj" : ".\src\avr.c"
     $(CPP) $(CFLAGS) /Fo".\src\avr.obj" /c ".\src\avr.c"

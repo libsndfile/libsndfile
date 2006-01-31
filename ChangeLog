@@ -1,3 +1,8 @@
+2006-01-31 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Win32/Makefile.msvc
+    Replace au_g72x.* with g72x.*. Thanks to ussell Borogove.
+
 2006-01-29 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.c
