@@ -440,7 +440,7 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 				rsrc.data_offset, rsrc.map_offset, rsrc.data_length, rsrc.map_length) ;
 
 	if (rsrc.data_offset > rsrc.rsrc_len)
-	{	psf_log_printf (psf, "Error : rsrc.data_offset > len\n") ;
+	{	psf_log_printf (psf, "Error : rsrc.data_offset (%d, 0x%x) > len\n", rsrc.data_offset, rsrc.data_offset) ;
 		error = SFE_SD2_BAD_DATA_OFFSET ;
 		goto parse_rsrc_fork_cleanup ;
 		} ;
