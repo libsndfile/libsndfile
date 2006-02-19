@@ -1,3 +1,17 @@
+2006-02-19 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Mingw-make-dist.sh
+    Add a shell script to build the windows binary/source ZIP file.
+
+    * doc/index.html
+    Add download link for windows binary/source ZIP file.
+
+    * doc/win32.html
+    Remove info about building using microsoft compiler.
+
+    * configure.ac
+    Bump version to 1.0.14.
+
 2006-02-11 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sd2.c

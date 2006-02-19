@@ -1,5 +1,9 @@
+Version 1.0.14 (2006-02-19)
+  * Really fix MinGW compile problems.
+  * Minor bug fixes.
+
 Version 1.0.13 (2006-01-21)
-  * Fix form MinGW compiler problems.
+  * Fix for MinGW compiler problems.
   * Allow readin/write of instrument chunks from WAV and AIFF files.
   * Compile problem fix for Solaris compiler.
   * Minor cleanups and bug fixes.

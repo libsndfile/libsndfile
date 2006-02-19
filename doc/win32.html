@@ -13,23 +13,30 @@
 <!-- pepper -->
 <H1><BR>Building libsndfile on Win32</H1>
 
+<P><B>
+Note : For pre-compiled binaries for windows, see the main web page.
+</B></P>
+
 <P>
 There are currently two ways of building libsndfile under Win32:
 </P>
 <UL>
 	<LI> Using the free <A HREF="#MinGW">MinGW</A> tools.
-	<LI> Using Microsoft's <A HREF="#MSVC">Visual C++</A> tools.
+	<LI> Using Cygwin.
 </UL>
+
+<P><B>
+Building libsndfile using the microsoft compiler does not currently work.
+Microsoft's compiler is a C++ compiler and does not compiler a number of ISO 
+C99 Standard constructs.
+If you insist on compiling libsndfile with the microsoft compiler you are 
+on your own.
+</B></P>
 
 <P>
 The free MinGW tools are the preferred option because they are a free (as in
 beer and speech), easily obtainable and much closer to the Linux/GCC
 environment on which libsndfile is developed.
-At some time in the near future I intend to drop support for Microsoft's
-tools.
-Yes, I know there is now a free (as in beer, but not as in speech) version
-of Microsoft's tools, but I believe that the only reason Microsoft released
-these free tools was because of the growing popularity of the MinGW tools.
 </P>
 
 <A NAME="MinGW"></A>
@@ -97,54 +104,6 @@ will be interested in the following files:
 
 <!--===========================================================================-->
 
-<A NAME="MSVC"></A>
-<H2><BR>Building libsndfile using MSVC++ 6.</H2>
-<P>
-For Win32 there is a Microsoft Visual C++ compatible makefile in the <B>Win32\</B>
-directory of the distribution. Building the libsndfile DLL on Win32 involves
-the following:
-</P>
-<!-- pepper -->
-<OL>
-	<LI> Using WinZip in the GUI, open the libsndfile-1.X.Y.tar.gz file and
-			extract the files into a directory. The following example assumes
-		<B>C:\</B>.
-	<LI> In the directory containing the extracted files, find the file
-	    	<B>Win32\Makefile.msvc</B> and open it in a text editor (ie Notepad or
-			similar).
-	<LI> Find the line which starts with <B>MSVCDir</B> and modify the directory
-		    path to point to the location of MSVC++ on your machine. This allows the
-			makefile to inform the compiler of the location of the standard header
-			files. Note that none of the directory names are allowed to have spaces
-			in them.
-	<LI> Copy the file named <B>sndfile.h</B> from the <B>Win32\</B> directory to the
-			<B>src\</B> directory replacing the one that was originally there.
-	<LI> Copy the file named <B>config.h</B> from the <B>Win32\</B> directory to the
-			<B>src\</B> directory replacing the one that was originally there.
-	<LI> Open a DOS window and cd into the libsndfile-1.X.Y directory.
-	<LI> Make sure that the program <B>nmake</B> (which is part of the MSCV++
-			package) is in a directory which is part of your <B>PATH</B> variable.
-	<LI> Type in the command
-			<CENTER><PRE>C:\libsndfile-1.X.Y> nmake -f Win32\Makefile.msvc
-			</PRE></CENTER>
-			and press &lt;return&gt;. You should now see a a large number of compile
-			commands as libsndfile.dll is built.
-			If this command fails, that may mean that <B>nmake</B> is not in a
-			directory specified by your <B>PATH</B> environment variable.
-	<LI> To check that the built DLL has been compiled correctly type in and run the
-			command
-			<CENTER><PRE>C:\libsndfile-1.X.Y> nmake -f Win32\Makefile.msvc check
-			</PRE></CENTER>
-			which will compile a set of test programs and run them. If any of the
-			programs fail the error message will be helpful in debugging the problem.
-</OL>
-<!-- pepper -->
-<P>
-At the end of the above procedure, you will find the DLL, <B>libsndfile.dll</B> and a
-LIB file <B>libsndfile.lib</B> in the current directory. These two files, along
-with the header file <B>sndfile.h</B> (in the <B>Win32\</B> directory) are all that
-you need to copy to your project in order to use libsndfile.
-</P>
 <!-- pepper -->
 <H2><BR>Compile Problems</H2>
 <!-- pepper -->
@@ -153,7 +112,6 @@ Compile problems using the above method of building the libsndfile DLL on Win32 
 be emailed to
 	<A HREF="m&#97;ilt&#111;:&#101;rikd&#64;&#109;eg&#97;-&#110;erd.&#99;om">
 		Erik de Castro Lopo</a>.
-This includes error messages generated during step 7 above.
 </P>
 <!-- pepper -->
 <P>
