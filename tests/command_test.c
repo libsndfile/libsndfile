@@ -109,7 +109,7 @@ main (int argc, char *argv [])
 	if (do_all || strcmp (argv [1], "inst") == 0)
 	{	instrument_test ("instrument.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		instrument_test ("instrument.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
-		instrument_test ("instrument.xi", SF_FORMAT_XI | SF_FORMAT_DPCM_16) ;
+		/*-instrument_test ("instrument.xi", SF_FORMAT_XI | SF_FORMAT_DPCM_16) ;-*/
 		test_count++ ;
 		} ;
 
