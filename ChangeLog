@@ -4,7 +4,8 @@
     Add a shell script to build the windows binary/source ZIP file.
 
     * doc/index.html
-    Add download link for windows binary/source ZIP file.
+    Add download link for windows binary/source ZIP file. Add links for GPG
+    signatures.
 
     * doc/win32.html
     Remove info about building using microsoft compiler.
