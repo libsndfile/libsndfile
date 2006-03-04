@@ -1,3 +1,13 @@
+2006-03-04 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h
+    Add a static inline function to convert an int to a size_t. This will be
+    a compile to nothing on 32 bit CPUs and a sign extension on 64 bit CPUs.
+
+    * src/aiff.c src/avr.c src/common.c src/xi.c src/gsm610.c
+    Fix an ia64 problem where a varargs function was being passed an int in
+    some places and a size_t in other places.
+
 2006-02-19 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Mingw-make-dist.sh

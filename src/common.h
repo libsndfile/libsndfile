@@ -176,6 +176,11 @@ typedef struct
 	char 	*str ;
 } STR_DATA ;
 
+static inline size_t
+make_size_t (int x)
+{	return (size_t) x ;
+} /* size_t_of_int */
+
 /*=======================================================================================
 **	SF_PRIVATE stuct - a pointer to this struct is passed back to the caller of the
 **	sf_open_XXXX functions. The caller however has no knowledge of the struct's

@@ -722,7 +722,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					break ;
 
 			case 'j' :
-					size = va_arg (argptr, int) ;
+					size = va_arg (argptr, size_t) ;
 					psf->headindex += size ;
 					count = size ;
 					break ;
@@ -991,7 +991,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 					break ;
 
 			case '8' :
-					countptr = va_arg (argptr, sf_count_t*) ;
+					countptr = va_arg (argptr, sf_count_t *) ;
 					*countptr = 0 ;
 					byte_count += header_read (psf, sixteen_bytes, 8) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)

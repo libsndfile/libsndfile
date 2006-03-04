@@ -241,7 +241,7 @@ gsm610_read_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610, short *ptr, int len
 
 	while (indx < len)
 	{	if (pgsm610->blockcount >= pgsm610->blocks && pgsm610->samplecount >= pgsm610->samplesperblock)
-		{	memset (&(ptr [indx]), 0, (size_t) ((len - indx) * sizeof (short))) ;
+		{	memset (&(ptr [indx]), 0, (len - indx) * sizeof (short)) ;
 			return total ;
 			} ;
 
