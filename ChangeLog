@@ -8,6 +8,10 @@
     Fix an ia64 problem where a varargs function was being passed an int in
     some places and a size_t in other places.
 
+    * src/sd2.c
+    Add a workaround for situations where OSX seems to add an extra 0x53 bytes
+    to the start of the resource fork.
+
 2006-02-19 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Mingw-make-dist.sh
