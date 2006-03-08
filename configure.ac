@@ -441,8 +441,11 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		linux*)
 			SHLIB_VERSION_ARG="-Wl,--version-script=\$(srcdir)/Symbols.linux"
 			;;
-		mingw* | cygwin*)
+		mingw*)
 			SHLIB_VERSION_ARG="-Wl,\$(srcdir)/libsndfile.def"
+			;;
+		cygwin*)
+			SHLIB_VERSION_ARG="-Wl,\$(srcdir)/cygsndfile.def"
 			;;
 		*)
 			;;
