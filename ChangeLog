@@ -1,3 +1,11 @@
+2006-03-09 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/create_symbols_file.py
+    Fix the library name in created win32 DEF file.
+
+    * Win32/Makefile.am tests/Makefile.am
+    Remove redundant files, add win32_ordinal_test to test suite.
+
 2006-03-08 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Makefile.am
@@ -5,6 +13,10 @@
 
     * configure.ac
     Fix setting SHLIB_VERSION_ARG for MinGW.
+
+    * tests/win32_ordinal_test.c
+    New test program to test that the win32 DLL ordinals agree with the DEF
+    file.
 
 2006-03-04 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

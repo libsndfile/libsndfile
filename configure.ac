@@ -441,7 +441,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		linux*)
 			SHLIB_VERSION_ARG="-Wl,--version-script=\$(srcdir)/Symbols.linux"
 			;;
-		mingw*)
+		mingw* | cygwin*)
 			SHLIB_VERSION_ARG="-Wl,\$(srcdir)/libsndfile.def"
 			;;
 		*)
@@ -486,8 +486,7 @@ AC_CONFIG_FILES([ \
 			src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
 			man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
 			doc/Makefile doc/libsndfile.css \
-			Win32/Makefile Win32/Makefile.mingw \
-			Octave/Makefile \
+			Win32/Makefile Octave/Makefile \
 			Makefile libsndfile.spec sndfile.pc \
 			])
 AC_OUTPUT

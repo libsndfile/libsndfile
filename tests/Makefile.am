@@ -6,7 +6,7 @@ noinst_PROGRAMS = sfversion floating_point_test write_read_test \
 	pcm_test headerless_test pipe_test benchmark header_test misc_test \
 	raw_test string_test open_fail_test multi_file_test dither_test \
 	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
-	locale_test largefile_test
+	locale_test largefile_test win32_ordinal_test
 
 SNDFILEDIR = ../src
 INCLUDES = -I$(srcdir)/$(SNDFILEDIR)
@@ -104,7 +104,10 @@ virtual_io_test_SOURCES = virtual_io_test.c utils.c
 virtual_io_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 win32_test_SOURCES = win32_test.c
-win32_test_LDADD = 
+win32_test_LDADD =
+
+win32_ordinal_test_SOURCES = win32_ordinal_test.c utils.c
+win32_ordinal_test_LDADD = $(SNDFILEDIR)/libsndfile.la 
 
 # Lite remove start
 dwvw_test_SOURCES = utils.c dwvw_test.c
@@ -156,7 +159,7 @@ check: generic-tests wav-tests aiff-tests au-tests caf-tests raw-tests \
 	mat5-tests pvf-tests xi-tests htk-tests avr-tests sds-tests sd2-tests \
 	flac-tests caf-tests io-tests
 
-generic-tests : error_test ulaw_test alaw_test command_test floating_point_test pcm_test
+generic-tests : error_test ulaw_test alaw_test command_test floating_point_test pcm_test win32_ordinal_test
 	uname -a
 	./error_test
 	./pcm_test
@@ -173,6 +176,7 @@ generic-tests : error_test ulaw_test alaw_test command_test floating_point_test 
 	./scale_clip_test
 	./headerless_test
 	./locale_test
+	./win32_ordinal_test
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed common tests."
 	@echo "----------------------------------------------------------------------"
