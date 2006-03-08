@@ -1,3 +1,11 @@
+2006-03-08 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Makefile.am
+    Add Mingw-make-dist.sh to the extra dist files.
+
+    * configure.ac
+    Fix setting SHLIB_VERSION_ARG for MinGW.
+
 2006-03-04 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h
@@ -9,7 +17,7 @@
     some places and a size_t in other places.
 
     * src/sd2.c
-    Add a workaround for situations where OSX seems to add an extra 0x53 bytes
+    Add a workaround for situations where OSX seems to add an extra 0x52 bytes
     to the start of the resource fork.
 
 2006-02-19 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
