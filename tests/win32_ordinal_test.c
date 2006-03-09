@@ -68,7 +68,7 @@ test_ordinal (HMODULE hmod, const char * func_name, int ordinal)
 	if ((name = GetProcAddress (hmod, func_name)) == NULL)
 	{	FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError (),
 					MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpmsg, 0, NULL) ;
-		puts (lpmsg) ;
+		/*-puts (lpmsg) ;-*/
 		} ;
 
 	if (name != NULL && ord != NULL && name == ord)
@@ -86,7 +86,7 @@ win32_ordinal_test (void)
 	static char func_name [1024] ;
 	HMODULE hmod = NULL ;
 	FILE * file = NULL ;
-	int k, ordinal ;
+	int k, ordinal, errors = 0 ;
 
 	for (k = 0 ; locations [k] != NULL ; k++)
 	{	snprintf (buffer, sizeof (buffer), "%s/%s.def", locations [k], DLL_NAME) ;
@@ -117,12 +117,19 @@ win32_ordinal_test (void)
 		if (sscanf (buffer, "%s @%d", func_name, &ordinal) != 2)
 			continue ;
 
-		test_ordinal (hmod, func_name, ordinal) ;
+		errors += test_ordinal (hmod, func_name, ordinal) ;
 		} ;
 
 	FreeLibrary (hmod) ;
 
 	fclose (file) ;
+
+	if (errors > 0)
+	{	printf ("\n\nErrors : %d\n\n", errors) ;
+		exit (1) ;
+		} ;
+
+	return ;
 } /* win32_ordinal_test */
 
 #endif
