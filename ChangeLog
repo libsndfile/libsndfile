@@ -10,6 +10,9 @@
     * tests/win32_ordinal_test.c
     Update to do test in cygsndfile-1.dll as well.
 
+    * doc/win32.html
+    Fix typo, mention that -mno-cygwin with the Cygwin compiler does not work.
+
 2006-03-08 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Makefile.am
