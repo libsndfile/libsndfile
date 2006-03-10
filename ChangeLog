@@ -1,3 +1,8 @@
+2006-03-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Mingw-make-dist.sh
+    Bunch of improvements.
+
 2006-03-09 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/create_symbols_file.py
