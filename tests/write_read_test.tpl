@@ -91,12 +91,20 @@ main (int argc, char **argv)
 		pcm_test_24bit	("24bit.wav"	, SF_FORMAT_WAV | SF_FORMAT_PCM_24, SF_FALSE) ;
 		pcm_test_int	("int.wav"		, SF_FORMAT_WAV | SF_FORMAT_PCM_32, SF_FALSE) ;
 
+		pcm_test_char	("char.rifx"	, SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_U8, SF_FALSE) ;
+		pcm_test_short	("short.rifx"	, SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16, SF_FALSE) ;
+		pcm_test_24bit	("24bit.rifx"	, SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_24, SF_FALSE) ;
+		pcm_test_int	("int.rifx"		, SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_32, SF_FALSE) ;
+
 		pcm_test_24bit	("24bit.wavex"	, SF_FORMAT_WAVEX | SF_FORMAT_PCM_24, SF_FALSE) ;
 		pcm_test_int	("int.wavex"	, SF_FORMAT_WAVEX | SF_FORMAT_PCM_32, SF_FALSE) ;
 
 		/* Lite remove start */
 		pcm_test_float	("float.wav"	, SF_FORMAT_WAV | SF_FORMAT_FLOAT , SF_FALSE) ;
 		pcm_test_double	("double.wav"	, SF_FORMAT_WAV | SF_FORMAT_DOUBLE, SF_FALSE) ;
+
+		pcm_test_float	("float.rifx"	, SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_FLOAT , SF_FALSE) ;
+		pcm_test_double	("double.rifx"	, SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_DOUBLE, SF_FALSE) ;
 
 		pcm_test_float	("float.wavex"	, SF_FORMAT_WAVEX | SF_FORMAT_FLOAT , SF_FALSE) ;
 		pcm_test_double	("double.wavex"	, SF_FORMAT_WAVEX | SF_FORMAT_DOUBLE, SF_FALSE) ;
@@ -333,11 +341,10 @@ main (int argc, char **argv)
 		pcm_test_char	("char.flac"	, SF_FORMAT_FLAC | SF_FORMAT_PCM_S8, SF_TRUE) ;
 		pcm_test_short	("short.flac"	, SF_FORMAT_FLAC | SF_FORMAT_PCM_16, SF_TRUE) ;
 		pcm_test_24bit	("24bit.flac"	, SF_FORMAT_FLAC | SF_FORMAT_PCM_24, SF_TRUE) ;
-		test_count++ ;
 #else
 		printf ("    **** flac not supported in this binary. ****\n") ;
-		test_count ++;
 #endif
+		test_count++ ;
 		} ;
 
 	if (test_count == 0)

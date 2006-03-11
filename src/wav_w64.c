@@ -92,9 +92,11 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 	if (structsize < 16)
 		return SFE_WAV_FMT_SHORT ;
 
+	/* assume psf->rwf_endian is already properly set */
+
 	/* Read the minimal WAV file header here. */
 	bytesread =
-	psf_binheader_readf (psf, "e224422", &(wav_fmt->format), &(wav_fmt->min.channels),
+	psf_binheader_readf (psf, "224422", &(wav_fmt->format), &(wav_fmt->min.channels),
 			&(wav_fmt->min.samplerate), &(wav_fmt->min.bytespersec),
 			&(wav_fmt->min.blockalign), &(wav_fmt->min.bitwidth)) ;
 
@@ -144,7 +146,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 
 				psf->bytewidth = 1 ;
 				if (structsize >= 18)
-				{	bytesread += psf_binheader_readf (psf, "e2", &(wav_fmt->size20.extrabytes)) ;
+				{	bytesread += psf_binheader_readf (psf, "2", &(wav_fmt->size20.extrabytes)) ;
 					psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->size20.extrabytes) ;
 					} ;
 				break ;
@@ -156,7 +158,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 					return SFE_WAV_ADPCM_CHANNELS ;
 
 				bytesread +=
-				psf_binheader_readf (psf, "e22", &(wav_fmt->ima.extrabytes), &(wav_fmt->ima.samplesperblock)) ;
+				psf_binheader_readf (psf, "22", &(wav_fmt->ima.extrabytes), &(wav_fmt->ima.samplesperblock)) ;
 
 				bytespersec = (wav_fmt->ima.samplerate * wav_fmt->ima.blockalign) / wav_fmt->ima.samplesperblock ;
 				if (wav_fmt->ima.bytespersec != (unsigned) bytespersec)
@@ -176,7 +178,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 					return SFE_WAV_ADPCM_CHANNELS ;
 
 				bytesread +=
-				psf_binheader_readf (psf, "e222", &(wav_fmt->msadpcm.extrabytes),
+				psf_binheader_readf (psf, "222", &(wav_fmt->msadpcm.extrabytes),
 						&(wav_fmt->msadpcm.samplesperblock), &(wav_fmt->msadpcm.numcoeffs)) ;
 
 				bytespersec = (wav_fmt->min.samplerate * wav_fmt->min.blockalign) / wav_fmt->msadpcm.samplesperblock ;
@@ -201,7 +203,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 				psf_log_printf (psf, "    Index   Coeffs1   Coeffs2\n") ;
 				for (k = 0 ; k < wav_fmt->msadpcm.numcoeffs ; k++)
 				{	bytesread +=
-					psf_binheader_readf (psf, "e22", &(wav_fmt->msadpcm.coeffs [k].coeff1), &(wav_fmt->msadpcm.coeffs [k].coeff2)) ;
+					psf_binheader_readf (psf, "22", &(wav_fmt->msadpcm.coeffs [k].coeff1), &(wav_fmt->msadpcm.coeffs [k].coeff2)) ;
 					LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "     %2d     %7d   %7d\n", k, wav_fmt->msadpcm.coeffs [k].coeff1, wav_fmt->msadpcm.coeffs [k].coeff2) ;
 					psf_log_printf (psf, psf->u.cbuf) ;
 					} ;
@@ -212,7 +214,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 					return SFE_WAV_GSM610_FORMAT ;
 
 				bytesread +=
-				psf_binheader_readf (psf, "e22", &(wav_fmt->gsm610.extrabytes), &(wav_fmt->gsm610.samplesperblock)) ;
+				psf_binheader_readf (psf, "22", &(wav_fmt->gsm610.extrabytes), &(wav_fmt->gsm610.samplesperblock)) ;
 
 				if (wav_fmt->gsm610.samplesperblock != 320)
 					return SFE_WAV_GSM610_FORMAT ;
@@ -235,14 +237,14 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 					psf_log_printf (psf, "  Bytes/sec     : %d\n", wav_fmt->ext.bytespersec) ;
 
 				bytesread +=
-				psf_binheader_readf (psf, "e224", &(wav_fmt->ext.extrabytes), &(wav_fmt->ext.validbits),
+				psf_binheader_readf (psf, "224", &(wav_fmt->ext.extrabytes), &(wav_fmt->ext.validbits),
 						&(wav_fmt->ext.channelmask)) ;
 
 				psf_log_printf (psf, "  Valid Bits    : %d\n", wav_fmt->ext.validbits) ;
 				psf_log_printf (psf, "  Channel Mask  : 0x%X\n", wav_fmt->ext.channelmask) ;
 
 				bytesread +=
-				psf_binheader_readf (psf, "e422", &(wav_fmt->ext.esf.esf_field1), &(wav_fmt->ext.esf.esf_field2),
+				psf_binheader_readf (psf, "422", &(wav_fmt->ext.esf.esf_field1), &(wav_fmt->ext.esf.esf_field2),
 						&(wav_fmt->ext.esf.esf_field3)) ;
 
 				/* compare the esf_fields with each known GUID? and print? */
@@ -288,7 +290,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 		case WAVE_FORMAT_G721_ADPCM :
 				psf_log_printf (psf, "  Bytes/sec     : %d\n", wav_fmt->g72x.bytespersec) ;
 				if (structsize >= 20)
-				{	bytesread += psf_binheader_readf (psf, "e22", &(wav_fmt->g72x.extrabytes), &(wav_fmt->g72x.auxblocksize)) ;
+				{	bytesread += psf_binheader_readf (psf, "22", &(wav_fmt->g72x.extrabytes), &(wav_fmt->g72x.auxblocksize)) ;
 					if (wav_fmt->g72x.extrabytes == 0)
 						psf_log_printf (psf, "  Extra Bytes   : %d (should be 2)\n", wav_fmt->g72x.extrabytes) ;
 					else
@@ -296,7 +298,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 						psf_log_printf (psf, "  Aux Blk Size  : %d\n", wav_fmt->g72x.auxblocksize) ;
 					}
 				else if (structsize == 18)
-				{	bytesread += psf_binheader_readf (psf, "e2", &(wav_fmt->g72x.extrabytes)) ;
+				{	bytesread += psf_binheader_readf (psf, "2", &(wav_fmt->g72x.extrabytes)) ;
 					psf_log_printf (psf, "  Extra Bytes   : %d%s\n", wav_fmt->g72x.extrabytes, wav_fmt->g72x.extrabytes != 0 ? " (should be 0)" : "") ;
 					}
 				else
@@ -323,7 +325,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 void
 wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat)
 {
-	psf_binheader_writef (psf, "e422b", subformat->esf_field1,
+	psf_binheader_writef (psf, "422b", subformat->esf_field1,
 					subformat->esf_field2, subformat->esf_field3,
 					subformat->esf_field4, 8) ;
 } /* wavex_write_guid */

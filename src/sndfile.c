@@ -569,9 +569,7 @@ sf_format_check	(const SF_INFO *info)
 	switch (info->format & SF_FORMAT_TYPEMASK)
 	{	case SF_FORMAT_WAV :
 		case SF_FORMAT_WAVEX :
-				/* WAV is strictly little endian. */
-				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
-					return 0 ;
+				/* WAV now allows both endian, RIFF or RIFX (little or big respectively) */
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16)
 					return 1 ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
@@ -2140,7 +2138,8 @@ guess_file_type (SF_PRIVATE *psf)
 		return 0 ;
 		} ;
 
-	if (buffer [0] == MAKE_MARKER ('R', 'I', 'F', 'F') && buffer [2] == MAKE_MARKER ('W', 'A', 'V', 'E'))
+	if ((buffer [0] == MAKE_MARKER ('R', 'I', 'F', 'F') || buffer [0] == MAKE_MARKER ('R', 'I', 'F', 'X'))
+			&& buffer [2] == MAKE_MARKER ('W', 'A', 'V', 'E'))
 		return SF_FORMAT_WAV ;
 
 	if (buffer [0] == MAKE_MARKER ('F', 'O', 'R', 'M'))

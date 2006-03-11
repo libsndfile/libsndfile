@@ -98,6 +98,8 @@ main (int argc, char *argv [])
 	{	/* This is just a sanity test for PCM encoding. */
 		lcomp_test_short	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.00001) ;
 		lcomp_test_int		("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.00001) ;
+		lcomp_test_short	("pcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.00001) ;
+		lcomp_test_int		("pcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.00001) ;
 		/* Lite remove start */
 		lcomp_test_float	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.005) ;
 		lcomp_test_double	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.005) ;
@@ -113,6 +115,11 @@ main (int argc, char *argv [])
 		lcomp_test_float	("ima.wav", SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
 		lcomp_test_double	("ima.wav", SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
 
+		lcomp_test_short	("ima.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
+		lcomp_test_int		("ima.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
+		lcomp_test_float	("ima.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
+		lcomp_test_double	("ima.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
+
 		sdlcomp_test_short	("ima.wav", SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
 		sdlcomp_test_int	("ima.wav", SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
 		sdlcomp_test_float	("ima.wav", SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
@@ -125,6 +132,11 @@ main (int argc, char *argv [])
 		lcomp_test_int		("msadpcm.wav", SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM, 2, 0.36) ;
 		lcomp_test_float	("msadpcm.wav", SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM, 2, 0.36) ;
 		lcomp_test_double	("msadpcm.wav", SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM, 2, 0.36) ;
+
+		lcomp_test_short	("msadpcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM, 2, 0.36) ;
+		lcomp_test_int		("msadpcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM, 2, 0.36) ;
+		lcomp_test_float	("msadpcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM, 2, 0.36) ;
+		lcomp_test_double	("msadpcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM, 2, 0.36) ;
 
 		sdlcomp_test_short	("msadpcm.wav", SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM, 2, 0.36) ;
 		sdlcomp_test_int	("msadpcm.wav", SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM, 2, 0.36) ;
@@ -139,6 +151,9 @@ main (int argc, char *argv [])
 		lcomp_test_short	("g721.wav", SF_FORMAT_WAV | SF_FORMAT_G721_32, 1, 0.7) ;
 		lcomp_test_int		("g721.wav", SF_FORMAT_WAV | SF_FORMAT_G721_32, 1, 0.7) ;
 
+		lcomp_test_short	("g721.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_G721_32, 1, 0.7) ;
+		lcomp_test_int		("g721.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_G721_32, 1, 0.7) ;
+
 		test_count++ ;
 		} ;
 	/* Lite remove end */
@@ -146,6 +161,10 @@ main (int argc, char *argv [])
 	if (do_all || strcmp (argv [1], "wav_ulaw") == 0)
 	{	lcomp_test_short	("ulaw.wav", SF_FORMAT_WAV | SF_FORMAT_ULAW, 2, 0.04) ;
 		lcomp_test_int		("ulaw.wav", SF_FORMAT_WAV | SF_FORMAT_ULAW, 2, 0.04) ;
+
+		lcomp_test_short	("ulaw.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_ULAW, 2, 0.04) ;
+		lcomp_test_int		("ulaw.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_ULAW, 2, 0.04) ;
+
 		/* Lite remove start */
 		lcomp_test_float	("ulaw.wav", SF_FORMAT_WAV | SF_FORMAT_ULAW, 2, 0.04) ;
 		lcomp_test_double	("ulaw.wav", SF_FORMAT_WAV | SF_FORMAT_ULAW, 2, 0.04) ;
@@ -167,6 +186,10 @@ main (int argc, char *argv [])
 	{	/* Don't do lcomp_test_XXX as the errors are too big. */
 		sdlcomp_test_short	("gsm610.wav", SF_FORMAT_WAV | SF_FORMAT_GSM610, 1, 0.24) ;
 		sdlcomp_test_int	("gsm610.wav", SF_FORMAT_WAV | SF_FORMAT_GSM610, 1, 0.24) ;
+
+		sdlcomp_test_short	("gsm610.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_GSM610, 1, 0.24) ;
+		sdlcomp_test_int	("gsm610.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_GSM610, 1, 0.24) ;
+
 		/* Lite remove start */
 		sdlcomp_test_float	("gsm610.wav", SF_FORMAT_WAV | SF_FORMAT_GSM610, 1, 0.24) ;
 		sdlcomp_test_double	("gsm610.wav", SF_FORMAT_WAV | SF_FORMAT_GSM610, 1, 0.24) ;
@@ -1269,7 +1292,7 @@ channels = 1 ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
 
-	if (sfinfo.format != (filetype & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK)))
+	if (sfinfo.format != filetype)
 	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
 		exit (1) ;
 		} ;

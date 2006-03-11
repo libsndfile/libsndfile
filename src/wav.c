@@ -35,6 +35,7 @@
  */
 
 #define RIFF_MARKER	 (MAKE_MARKER ('R', 'I', 'F', 'F'))
+#define RIFX_MARKER	 (MAKE_MARKER ('R', 'I', 'F', 'X'))
 #define WAVE_MARKER	 (MAKE_MARKER ('W', 'A', 'V', 'E'))
 #define fmt_MARKER	 (MAKE_MARKER ('f', 'm', 't', ' '))
 #define data_MARKER	 (MAKE_MARKER ('d', 'a', 't', 'a'))
@@ -177,9 +178,14 @@ wav_open	 (SF_PRIVATE *psf)
 		if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX)
 			return	SFE_BAD_OPEN_FORMAT ;
 
-		psf->endian = SF_ENDIAN_LITTLE ;	/* All WAV files are little endian. */
-
 		psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+
+		/* RIFF WAVs are little-endian, RIFX WAVs are big-endian, default to little */
+		psf->endian = psf->sf.format & SF_FORMAT_ENDMASK ;
+		if (CPU_IS_BIG_ENDIAN && psf->endian == SF_ENDIAN_CPU)
+			psf->endian = SF_ENDIAN_BIG ;
+		else if (psf->endian != SF_ENDIAN_BIG)
+			psf->endian = SF_ENDIAN_LITTLE ;
 
 		if (psf->mode != SFM_RDWR || psf->filelength < 44)
 		{	psf->filelength = 0 ;
@@ -282,25 +288,45 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 		switch (marker)
 		{	case RIFF_MARKER :
+			case RIFX_MARKER :
 					if (parsestage)
 						return SFE_WAV_NO_RIFF ;
 
 					parsestage |= HAVE_RIFF ;
 
-					psf_binheader_readf (psf, "e4", &RIFFsize) ;
+					/* RIFX signifies big-endian format for all header and data
+					** to prevent lots of code copying here, we'll set the psf->rwf_endian
+					** flag once here, and never specify endian-ness for all other header ops
+					*/
+					if (marker == RIFF_MARKER)
+						psf->rwf_endian = SF_ENDIAN_LITTLE ;
+					else
+						psf->rwf_endian = SF_ENDIAN_BIG ;
+
+					psf_binheader_readf (psf, "4", &RIFFsize) ;
 
 					if (psf->fileoffset > 0 && psf->filelength > RIFFsize + 8)
 					{	/* Set file length. */
 						psf->filelength = RIFFsize + 8 ;
-						psf_log_printf (psf, "RIFF : %u\n", RIFFsize) ;
+						if (marker == RIFF_MARKER)
+							psf_log_printf (psf, "RIFF : %u\n", RIFFsize) ;
+						else
+							psf_log_printf (psf, "RIFX : %u\n", RIFFsize) ;
 						}
 					else if (psf->filelength < RIFFsize + 2 * SIGNED_SIZEOF (dword))
-					{	psf_log_printf (psf, "RIFF : %u (should be %D)\n", RIFFsize, psf->filelength - 2 * SIGNED_SIZEOF (dword)) ;
+					{	if (marker == RIFF_MARKER)
+							psf_log_printf (psf, "RIFF : %u (should be %D)\n", RIFFsize, psf->filelength - 2 * SIGNED_SIZEOF (dword)) ;
+						else
+							psf_log_printf (psf, "RIFX : %u (should be %D)\n", RIFFsize, psf->filelength - 2 * SIGNED_SIZEOF (dword)) ;
+
 						RIFFsize = dword ;
 						}
 					else
-						psf_log_printf (psf, "RIFF : %u\n", RIFFsize) ;
-
+					{	if (marker == RIFF_MARKER)
+							psf_log_printf (psf, "RIFF : %u\n", RIFFsize) ;
+						else
+							psf_log_printf (psf, "RIFX : %u\n", RIFFsize) ;
+					} ;
 					break ;
 
 			case WAVE_MARKER :
@@ -321,7 +347,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 					parsestage |= HAVE_fmt ;
 
-					psf_binheader_readf (psf, "e4", &dword) ;
+					psf_binheader_readf (psf, "4", &dword) ;
 					psf_log_printf (psf, "fmt  : %d\n", dword) ;
 
 					if ((error = wav_w64_read_fmt_chunk (psf, &wav_fmt, dword)))
@@ -339,7 +365,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 					parsestage |= HAVE_data ;
 
-					psf_binheader_readf (psf, "e4", &dword) ;
+					psf_binheader_readf (psf, "4", &dword) ;
 
 					psf->datalength = dword ;
 					psf->dataoffset = psf_ftell (psf) ;
@@ -385,7 +411,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if ((parsestage & HAVE_fmt) != HAVE_fmt)
 						psf_log_printf (psf, "*** Should have 'fmt ' chunk before 'fact'\n") ;
 
-					psf_binheader_readf (psf, "e44", &dword, & (fact_chunk.frames)) ;
+					psf_binheader_readf (psf, "44", &dword, & (fact_chunk.frames)) ;
 
 					if (dword > SIGNED_SIZEOF (fact_chunk))
 						psf_binheader_readf (psf, "j", (int) (dword - SIGNED_SIZEOF (fact_chunk))) ;
@@ -404,7 +430,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 					parsestage |= HAVE_PEAK ;
 
-					psf_binheader_readf (psf, "e4", &dword) ;
+					psf_binheader_readf (psf, "4", &dword) ;
 
 					psf_log_printf (psf, "%M : %d\n", marker, dword) ;
 					if (dword != WAV_PEAK_CHUNK_SIZE (psf->sf.channels))
@@ -417,7 +443,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						return SFE_MALLOC_FAILED ;
 
 					/* read in rest of PEAK chunk. */
-					psf_binheader_readf (psf, "e44", & (psf->peak_info->version), & (psf->peak_info->timestamp)) ;
+					psf_binheader_readf (psf, "44", & (psf->peak_info->version), & (psf->peak_info->timestamp)) ;
 
 					if (psf->peak_info->version != 1)
 						psf_log_printf (psf, "  version    : %d *** (should be version 1)\n", psf->peak_info->version) ;
@@ -431,7 +457,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					for (dword = 0 ; dword < (unsigned) psf->sf.channels ; dword++)
 					{	float value ;
 						unsigned int position ;
-						psf_binheader_readf (psf, "ef4", &value, &position) ;
+						psf_binheader_readf (psf, "f4", &value, &position) ;
 						psf->peak_info->peaks [dword].value = value ;
 						psf->peak_info->peaks [dword].position = position ;
 
@@ -450,7 +476,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					{	unsigned bytesread, cue_count ;
 						int id, position, chunk_id, chunk_start, block_start, offset ;
 
-						bytesread = psf_binheader_readf (psf, "e44", &dword, &cue_count) ;
+						bytesread = psf_binheader_readf (psf, "44", &dword, &cue_count) ;
 						bytesread -= 4 ; /* Remove bytes for first dword. */
 						psf_log_printf (psf, "%M : %u\n", marker, dword) ;
 
@@ -463,7 +489,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						psf_log_printf (psf, "  Count : %d\n", cue_count) ;
 
 						while (cue_count)
-						{	bytesread += psf_binheader_readf (psf, "e444444", &id, &position,
+						{	bytesread += psf_binheader_readf (psf, "444444", &id, &position,
 									&chunk_id, &chunk_start, &block_start, &offset) ;
 							psf_log_printf (psf, "   Cue ID : %2d"
 												 "  Pos : %5u  Chunk : %M"
@@ -483,7 +509,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case smpl_MARKER :
 					parsestage |= HAVE_other ;
 
-					psf_binheader_readf (psf, "e4", &dword) ;
+					psf_binheader_readf (psf, "4", &dword) ;
 					psf_log_printf (psf, "smpl : %u\n", dword) ;
 
 					if ((error = wav_read_smpl_chunk (psf, dword)))
@@ -493,7 +519,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case acid_MARKER :
 					parsestage |= HAVE_other ;
 
-					psf_binheader_readf (psf, "e4", &dword) ;
+					psf_binheader_readf (psf, "4", &dword) ;
 					psf_log_printf (psf, "acid : %u\n", dword) ;
 
 					if ((error = wav_read_acid_chunk (psf, dword)))
@@ -520,7 +546,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case PAD_MARKER :
 					parsestage |= HAVE_other ;
 
-					psf_binheader_readf (psf, "e4", &dword) ;
+					psf_binheader_readf (psf, "4", &dword) ;
 					psf_log_printf (psf, "%M : %u\n", marker, dword) ;
 					dword += (dword & 1) ;
 					psf_binheader_readf (psf, "j", dword) ;
@@ -530,7 +556,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					parsestage |= HAVE_other ;
 					if (isprint ((marker >> 24) & 0xFF) && isprint ((marker >> 16) & 0xFF)
 						&& isprint ((marker >> 8) & 0xFF) && isprint (marker & 0xFF))
-					{	psf_binheader_readf (psf, "e4", &dword) ;
+					{	psf_binheader_readf (psf, "4", &dword) ;
 						psf_log_printf (psf, "*** %M : %d (unknown marker)\n", marker, dword) ;
 						psf_binheader_readf (psf, "j", dword) ;
 						break ;
@@ -557,7 +583,8 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	if (! psf->dataoffset)
 		return SFE_WAV_NO_DATA ;
 
-	psf->endian = SF_ENDIAN_LITTLE ;		/* All WAV files are little endian. */
+	/* WAVs can be little or big endian */
+	psf->endian = psf->rwf_endian ;
 
 	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 
@@ -566,7 +593,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		** Check for 'wvpk' at the start of the DATA section. Not able to
 		** handle this.
 		*/
-		psf_binheader_readf (psf, "e4", &marker) ;
+		psf_binheader_readf (psf, "4", &marker) ;
 		if (marker == wvpk_MARKER || marker == OggS_MARKER)
 			return SFE_WAV_WVPK_DATA ;
 		} ;
@@ -631,6 +658,10 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		default : return SFE_UNIMPLEMENTED ;
 		} ;
 
+	/* Only set the format endian-ness if its non-standard big-endian. */
+	if (psf->endian == SF_ENDIAN_BIG)
+		psf->sf.format |= SF_ENDIAN_BIG ;
+
 	return 0 ;
 } /* wav_read_header */
 
@@ -658,14 +689,20 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 	psf->headindex = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
-	/* RIFF marker, length, WAVE and 'fmt ' markers. */
-	if (psf->filelength < 8)
-		psf_binheader_writef (psf, "etm8", RIFF_MARKER, 8) ;
+	/* RIFX signifies big-endian format for all header and data
+	** to prevent lots of code copying here, we'll set the psf->rwf_endian
+	** flag once here, and never specify endian-ness for all other header ops
+	*/
+
+	/* RIFF/RIFX marker, length, WAVE and 'fmt ' markers. */
+
+	if (psf->endian == SF_ENDIAN_LITTLE)
+		psf_binheader_writef (psf, "etm8", RIFF_MARKER, (psf->filelength < 8) ? 8 : psf->filelength - 8) ;
 	else
-		psf_binheader_writef (psf, "etm8", RIFF_MARKER, psf->filelength - 8) ;
+		psf_binheader_writef (psf, "Etm8", RIFX_MARKER, (psf->filelength < 8) ? 8 : psf->filelength - 8) ;
 
 	/* WAVE and 'fmt ' markers. */
-	psf_binheader_writef (psf, "emm", WAVE_MARKER, fmt_MARKER) ;
+	psf_binheader_writef (psf, "mm", WAVE_MARKER, fmt_MARKER) ;
 
 	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 
@@ -677,11 +714,11 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 					fmt_size = 2 + 2 + 4 + 4 + 2 + 2 ;
 
 					/* fmt : format, channels, samplerate */
-					psf_binheader_writef (psf, "e4224", fmt_size, WAVE_FORMAT_PCM, psf->sf.channels, psf->sf.samplerate) ;
+					psf_binheader_writef (psf, "4224", fmt_size, WAVE_FORMAT_PCM, psf->sf.channels, psf->sf.samplerate) ;
 					/*  fmt : bytespersec */
-					psf_binheader_writef (psf, "e4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
+					psf_binheader_writef (psf, "4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
 					/*  fmt : blockalign, bitwidth */
-					psf_binheader_writef (psf, "e22", psf->bytewidth * psf->sf.channels, psf->bytewidth * 8) ;
+					psf_binheader_writef (psf, "22", psf->bytewidth * psf->sf.channels, psf->bytewidth * 8) ;
 					break ;
 
 		case SF_FORMAT_FLOAT :
@@ -689,11 +726,11 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 					fmt_size = 2 + 2 + 4 + 4 + 2 + 2 ;
 
 					/* fmt : format, channels, samplerate */
-					psf_binheader_writef (psf, "e4224", fmt_size, WAVE_FORMAT_IEEE_FLOAT, psf->sf.channels, psf->sf.samplerate) ;
+					psf_binheader_writef (psf, "4224", fmt_size, WAVE_FORMAT_IEEE_FLOAT, psf->sf.channels, psf->sf.samplerate) ;
 					/*  fmt : bytespersec */
-					psf_binheader_writef (psf, "e4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
+					psf_binheader_writef (psf, "4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
 					/*  fmt : blockalign, bitwidth */
-					psf_binheader_writef (psf, "e22", psf->bytewidth * psf->sf.channels, psf->bytewidth * 8) ;
+					psf_binheader_writef (psf, "22", psf->bytewidth * psf->sf.channels, psf->bytewidth * 8) ;
 
 					add_fact_chunk = SF_TRUE ;
 					break ;
@@ -702,11 +739,11 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 					fmt_size = 2 + 2 + 4 + 4 + 2 + 2 ;
 
 					/* fmt : format, channels, samplerate */
-					psf_binheader_writef (psf, "e4224", fmt_size, WAVE_FORMAT_MULAW, psf->sf.channels, psf->sf.samplerate) ;
+					psf_binheader_writef (psf, "4224", fmt_size, WAVE_FORMAT_MULAW, psf->sf.channels, psf->sf.samplerate) ;
 					/*  fmt : bytespersec */
-					psf_binheader_writef (psf, "e4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
+					psf_binheader_writef (psf, "4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
 					/*  fmt : blockalign, bitwidth */
-					psf_binheader_writef (psf, "e22", psf->bytewidth * psf->sf.channels, 8) ;
+					psf_binheader_writef (psf, "22", psf->bytewidth * psf->sf.channels, 8) ;
 
 					add_fact_chunk = SF_TRUE ;
 					break ;
@@ -715,11 +752,11 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 					fmt_size = 2 + 2 + 4 + 4 + 2 + 2 ;
 
 					/* fmt : format, channels, samplerate */
-					psf_binheader_writef (psf, "e4224", fmt_size, WAVE_FORMAT_ALAW, psf->sf.channels, psf->sf.samplerate) ;
+					psf_binheader_writef (psf, "4224", fmt_size, WAVE_FORMAT_ALAW, psf->sf.channels, psf->sf.samplerate) ;
 					/*  fmt : bytespersec */
-					psf_binheader_writef (psf, "e4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
+					psf_binheader_writef (psf, "4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
 					/*  fmt : blockalign, bitwidth */
-					psf_binheader_writef (psf, "e22", psf->bytewidth * psf->sf.channels, 8) ;
+					psf_binheader_writef (psf, "22", psf->bytewidth * psf->sf.channels, 8) ;
 
 					add_fact_chunk = SF_TRUE ;
 					break ;
@@ -736,11 +773,11 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 						fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 ;
 
 						/* fmt : size, WAV format type, channels, samplerate, bytespersec */
-						psf_binheader_writef (psf, "e42244", fmt_size, WAVE_FORMAT_IMA_ADPCM,
+						psf_binheader_writef (psf, "42244", fmt_size, WAVE_FORMAT_IMA_ADPCM,
 									psf->sf.channels, psf->sf.samplerate, bytespersec) ;
 
 						/* fmt : blockalign, bitwidth, extrabytes, framesperblock. */
-						psf_binheader_writef (psf, "e2222", blockalign, 4, 2, framesperblock) ;
+						psf_binheader_writef (psf, "2222", blockalign, 4, 2, framesperblock) ;
 						} ;
 
 					add_fact_chunk = SF_TRUE ;
@@ -758,13 +795,13 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 						fmt_size	= 2 + 2 + 4 + 4 + 2 + 2 + 2 + extrabytes ;
 
 						/* fmt : size, WAV format type, channels. */
-						psf_binheader_writef (psf, "e422", fmt_size, WAVE_FORMAT_MS_ADPCM, psf->sf.channels) ;
+						psf_binheader_writef (psf, "422", fmt_size, WAVE_FORMAT_MS_ADPCM, psf->sf.channels) ;
 
 						/* fmt : samplerate, bytespersec. */
-						psf_binheader_writef (psf, "e44", psf->sf.samplerate, bytespersec) ;
+						psf_binheader_writef (psf, "44", psf->sf.samplerate, bytespersec) ;
 
 						/* fmt : blockalign, bitwidth, extrabytes, framesperblock. */
-						psf_binheader_writef (psf, "e22222", blockalign, 4, extrabytes, framesperblock, 7) ;
+						psf_binheader_writef (psf, "22222", blockalign, 4, extrabytes, framesperblock, 7) ;
 
 						msadpcm_write_adapt_coeffs (psf) ;
 						} ;
@@ -778,11 +815,11 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 					fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 ;
 
 					/* fmt : size, WAV format type, channels, samplerate, bytespersec */
-					psf_binheader_writef (psf, "e42244", fmt_size, WAVE_FORMAT_G721_ADPCM,
+					psf_binheader_writef (psf, "42244", fmt_size, WAVE_FORMAT_G721_ADPCM,
 								psf->sf.channels, psf->sf.samplerate, psf->sf.samplerate * psf->sf.channels / 2) ;
 
 					/* fmt : blockalign, bitwidth, extrabytes, auxblocksize. */
-					psf_binheader_writef (psf, "e2222", 64, 4, 2, 0) ;
+					psf_binheader_writef (psf, "2222", 64, 4, 2, 0) ;
 
 					add_fact_chunk = SF_TRUE ;
 					break ;
@@ -800,13 +837,13 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 						fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 ;
 
 						/* fmt : size, WAV format type, channels. */
-						psf_binheader_writef (psf, "e422", fmt_size, WAVE_FORMAT_GSM610, psf->sf.channels) ;
+						psf_binheader_writef (psf, "422", fmt_size, WAVE_FORMAT_GSM610, psf->sf.channels) ;
 
 						/* fmt : samplerate, bytespersec. */
-						psf_binheader_writef (psf, "e44", psf->sf.samplerate, bytespersec) ;
+						psf_binheader_writef (psf, "44", psf->sf.samplerate, bytespersec) ;
 
 						/* fmt : blockalign, bitwidth, extrabytes, framesperblock. */
-						psf_binheader_writef (psf, "e2222", blockalign, 0, 2, framesperblock) ;
+						psf_binheader_writef (psf, "2222", blockalign, 0, 2, framesperblock) ;
 						} ;
 
 					add_fact_chunk = SF_TRUE ;
@@ -816,30 +853,30 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	if (add_fact_chunk)
-		psf_binheader_writef (psf, "etm48", fact_MARKER, 4, psf->sf.frames) ;
+		psf_binheader_writef (psf, "tm48", fact_MARKER, 4, psf->sf.frames) ;
 
 	if (psf->str_flags & SF_STR_LOCATE_START)
 		wav_write_strings (psf, SF_STR_LOCATE_START) ;
 
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
-	{	psf_binheader_writef (psf, "em4", PEAK_MARKER, WAV_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
-		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;
+	{	psf_binheader_writef (psf, "m4", PEAK_MARKER, WAV_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
+		psf_binheader_writef (psf, "44", 1, time (NULL)) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
-			psf_binheader_writef (psf, "eft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
+			psf_binheader_writef (psf, "ft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 
 	if (psf->instrument != NULL)
 	{	int		tmp ;
 		double	dtune = (double) (0x40000000) / 25.0 ;
 
-		psf_binheader_writef (psf, "em4", smpl_MARKER, 9 * 4 + psf->instrument->loop_count * 6 * 4) ;
-		psf_binheader_writef (psf, "e44", 0, 0) ; /* Manufacturer zero is everyone */
+		psf_binheader_writef (psf, "m4", smpl_MARKER, 9 * 4 + psf->instrument->loop_count * 6 * 4) ;
+		psf_binheader_writef (psf, "44", 0, 0) ; /* Manufacturer zero is everyone */
 		tmp = (int) (1.0e9 / psf->sf.samplerate) ; /* Sample period in nano seconds */
-		psf_binheader_writef (psf, "e44", tmp, psf->instrument->basenote) ;
+		psf_binheader_writef (psf, "44", tmp, psf->instrument->basenote) ;
 		tmp = (unsigned int) (psf->instrument->detune * dtune + 0.5) ;
-		psf_binheader_writef (psf, "e4", tmp) ;
-		psf_binheader_writef (psf, "e44", 0, 0) ; /* SMTPE format */
-		psf_binheader_writef (psf, "e44", psf->instrument->loop_count, 0) ;
+		psf_binheader_writef (psf, "4", tmp) ;
+		psf_binheader_writef (psf, "44", 0, 0) ; /* SMTPE format */
+		psf_binheader_writef (psf, "44", psf->instrument->loop_count, 0) ;
 
 		for (tmp = 0 ; tmp < psf->instrument->loop_count ; tmp++)
 		{	int type ;
@@ -847,13 +884,13 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 			type = psf->instrument->loops [tmp].mode ;
 			type = (type == SF_LOOP_FORWARD ? 0 : type==SF_LOOP_BACKWARD ? 2 : type == SF_LOOP_ALTERNATING ? 1 : 32) ;
 
-			psf_binheader_writef (psf, "e44", tmp, type) ;
-			psf_binheader_writef (psf, "e44", psf->instrument->loops [tmp].start, psf->instrument->loops [tmp].end) ;
-			psf_binheader_writef (psf, "e44", 0, psf->instrument->loops [tmp].count) ;
+			psf_binheader_writef (psf, "44", tmp, type) ;
+			psf_binheader_writef (psf, "44", psf->instrument->loops [tmp].start, psf->instrument->loops [tmp].end) ;
+			psf_binheader_writef (psf, "44", 0, psf->instrument->loops [tmp].count) ;
 			} ;
 		} ;
 
-	psf_binheader_writef (psf, "etm8", data_MARKER, psf->datalength) ;
+	psf_binheader_writef (psf, "tm8", data_MARKER, psf->datalength) ;
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 	if (psf->error)
 		return psf->error ;
@@ -895,14 +932,28 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 	psf->headindex = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
+	/* RIFX signifies big-endian format for all header and data
+	** to prevent lots of code copying here, we'll set the psf->rwf_endian
+	** flag once here, and never specify endian-ness for all other header ops
+	*/
+
 	/* RIFF marker, length, WAVE and 'fmt ' markers. */
-	if (psf->filelength < 8)
-		psf_binheader_writef (psf, "etm8", RIFF_MARKER, 8) ;
+
+	if (psf->endian == SF_ENDIAN_LITTLE)
+	{	if (psf->filelength < 8)
+			psf_binheader_writef (psf, "tm8", RIFF_MARKER, 8) ;
+		else
+			psf_binheader_writef (psf, "tm8", RIFF_MARKER, psf->filelength - 8) ;
+		}
 	else
-		psf_binheader_writef (psf, "etm8", RIFF_MARKER, psf->filelength - 8) ;
+	{	if (psf->filelength < 8)
+			psf_binheader_writef (psf, "Etm8", RIFX_MARKER, 8) ;
+		else
+			psf_binheader_writef (psf, "Etm8", RIFX_MARKER, psf->filelength - 8) ;
+		} ;
 
 	/* WAVE and 'fmt ' markers. */
-	psf_binheader_writef (psf, "emm", WAVE_MARKER, fmt_MARKER) ;
+	psf_binheader_writef (psf, "mm", WAVE_MARKER, fmt_MARKER) ;
 
 	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 
@@ -919,17 +970,17 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 			fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 + 4 + 4 + 2 + 2 + 8 ;
 
 			/* fmt : format, channels, samplerate */
-			psf_binheader_writef (psf, "e4224", fmt_size, WAVE_FORMAT_EXTENSIBLE, psf->sf.channels, psf->sf.samplerate) ;
+			psf_binheader_writef (psf, "4224", fmt_size, WAVE_FORMAT_EXTENSIBLE, psf->sf.channels, psf->sf.samplerate) ;
 			/*  fmt : bytespersec */
-			psf_binheader_writef (psf, "e4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
+			psf_binheader_writef (psf, "4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
 			/*  fmt : blockalign, bitwidth */
-			psf_binheader_writef (psf, "e22", psf->bytewidth * psf->sf.channels, psf->bytewidth * 8) ;
+			psf_binheader_writef (psf, "22", psf->bytewidth * psf->sf.channels, psf->bytewidth * 8) ;
 
 			/* cbSize 22 is sizeof (WAVEFORMATEXTENSIBLE) - sizeof (WAVEFORMATEX) */
-			psf_binheader_writef (psf, "e2", 22) ;
+			psf_binheader_writef (psf, "2", 22) ;
 
 			/* wValidBitsPerSample, for our use same as bitwidth as we use it fully */
-			psf_binheader_writef (psf, "e2", psf->bytewidth * 8) ;
+			psf_binheader_writef (psf, "2", psf->bytewidth * 8) ;
 
 			/*
 			** Ok some liberty is taken here to use the most commonly used channel masks
@@ -938,27 +989,27 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 			*/
 			switch (psf->sf.channels)
 			{	case 1 :	/* center channel mono */
-					psf_binheader_writef (psf, "e4", 0x4) ;
+					psf_binheader_writef (psf, "4", 0x4) ;
 					break ;
 
 				case 2 :	/* front left and right */
-					psf_binheader_writef (psf, "e4", 0x1 | 0x2) ;
+					psf_binheader_writef (psf, "4", 0x1 | 0x2) ;
 					break ;
 
 				case 4 :	/* Quad */
-					psf_binheader_writef (psf, "e4", 0x1 | 0x2 | 0x10 | 0x20) ;
+					psf_binheader_writef (psf, "4", 0x1 | 0x2 | 0x10 | 0x20) ;
 					break ;
 
 				case 6 :	/* 5.1 */
-					psf_binheader_writef (psf, "e4", 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20) ;
+					psf_binheader_writef (psf, "4", 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20) ;
 					break ;
 
 				case 8 :	/* 7.1 */
-					psf_binheader_writef (psf, "e4", 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20 | 0x40 | 0x80) ;
+					psf_binheader_writef (psf, "4", 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20 | 0x40 | 0x80) ;
 					break ;
 
 				default :	/* 0 when in doubt , use direct out, ie NO mapping*/
-					psf_binheader_writef (psf, "e4", 0x0) ;
+					psf_binheader_writef (psf, "4", 0x0) ;
 					break ;
 				}
 
@@ -1001,19 +1052,19 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	if (add_fact_chunk)
-		psf_binheader_writef (psf, "etm48", fact_MARKER, 4, psf->sf.frames) ;
+		psf_binheader_writef (psf, "tm48", fact_MARKER, 4, psf->sf.frames) ;
 
 	if (psf->str_flags & SF_STR_LOCATE_START)
 		wav_write_strings (psf, SF_STR_LOCATE_START) ;
 
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
-	{	psf_binheader_writef (psf, "em4", PEAK_MARKER, WAV_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
-		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;
+	{	psf_binheader_writef (psf, "m4", PEAK_MARKER, WAV_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
+		psf_binheader_writef (psf, "44", 1, time (NULL)) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
-			psf_binheader_writef (psf, "eft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
+			psf_binheader_writef (psf, "ft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 
-	psf_binheader_writef (psf, "etm8", data_MARKER, psf->datalength) ;
+	psf_binheader_writef (psf, "tm8", data_MARKER, psf->datalength) ;
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 	if (psf->error)
 		return psf->error ;
@@ -1042,10 +1093,10 @@ wav_write_tailer (SF_PRIVATE *psf)
 
 	/* Add a PEAK chunk if requested. */
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_END)
-	{	psf_binheader_writef (psf, "em4", PEAK_MARKER, WAV_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
-		psf_binheader_writef (psf, "e44", 1, time (NULL)) ;
+	{	psf_binheader_writef (psf, "m4", PEAK_MARKER, WAV_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
+		psf_binheader_writef (psf, "44", 1, time (NULL)) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
-			psf_binheader_writef (psf, "ef4", psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
+			psf_binheader_writef (psf, "f4", psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 
 	if (psf->str_flags & SF_STR_LOCATE_END)
@@ -1064,7 +1115,7 @@ wav_write_strings (SF_PRIVATE *psf, int location)
 
 	prev_head_index = psf->headindex + 4 ;
 
-	psf_binheader_writef (psf, "em4m", LIST_MARKER, 0xBADBAD, INFO_MARKER) ;
+	psf_binheader_writef (psf, "m4m", LIST_MARKER, 0xBADBAD, INFO_MARKER) ;
 
 	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
 	{	if (psf->strings [k].type == 0)
@@ -1074,34 +1125,34 @@ wav_write_strings (SF_PRIVATE *psf, int location)
 
 		switch (psf->strings [k].type)
 		{	case SF_STR_SOFTWARE :
-				psf_binheader_writef (psf, "ems", ISFT_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "ms", ISFT_MARKER, psf->strings [k].str) ;
 				break ;
 
 			case SF_STR_TITLE :
-				psf_binheader_writef (psf, "ems", INAM_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "ms", INAM_MARKER, psf->strings [k].str) ;
 				break ;
 
 			case SF_STR_COPYRIGHT :
-				psf_binheader_writef (psf, "ems", ICOP_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "ms", ICOP_MARKER, psf->strings [k].str) ;
 				break ;
 
 			case SF_STR_ARTIST :
-				psf_binheader_writef (psf, "ems", IART_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "ms", IART_MARKER, psf->strings [k].str) ;
 				break ;
 
 			case SF_STR_COMMENT :
-				psf_binheader_writef (psf, "ems", ICMT_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "ms", ICMT_MARKER, psf->strings [k].str) ;
 				break ;
 
 			case SF_STR_DATE :
-				psf_binheader_writef (psf, "ems", ICRD_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "ms", ICRD_MARKER, psf->strings [k].str) ;
 				break ;
 			} ;
 		} ;
 
 	saved_head_index = psf->headindex ;
 	psf->headindex = prev_head_index ;
-	psf_binheader_writef (psf, "e4", saved_head_index - prev_head_index - 4) ;
+	psf_binheader_writef (psf, "4", saved_head_index - prev_head_index - 4) ;
 	psf->headindex = saved_head_index ;
 
 } /* wav_write_strings */
@@ -1141,7 +1192,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 
 	current_pos = psf_fseek (psf, 0, SEEK_CUR) ;
 
-	bytesread = psf_binheader_readf (psf, "e4", &length) ;
+	bytesread = psf_binheader_readf (psf, "4", &length) ;
 
 	if (length <= 8)
 	{	/* This case is for broken files generated by PEAK. */
@@ -1192,7 +1243,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 			case IPRD_MARKER :
 			case ISBJ_MARKER :
 			case ISRC_MARKER :
-					bytesread += psf_binheader_readf (psf, "e4", &dword) ;
+					bytesread += psf_binheader_readf (psf, "4", &dword) ;
 					dword += (dword & 1) ;
 					if (dword < 0 || dword > SIGNED_SIZEOF (psf->u.cbuf))
 					{	psf_log_printf (psf, "  *** %M : %d (too big)\n", chunk, dword) ;
@@ -1210,7 +1261,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 			case labl_MARKER :
 					{	int mark_id ;
 
-						bytesread += psf_binheader_readf (psf, "e44", &dword, &mark_id) ;
+						bytesread += psf_binheader_readf (psf, "44", &dword, &mark_id) ;
 						dword -= 4 ;
 						dword += (dword & 1) ;
 						if (dword < 1 || dword > SIGNED_SIZEOF (psf->u.cbuf))
@@ -1222,7 +1273,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 						cptr = psf->u.cbuf ;
 						psf_binheader_readf (psf, "b", cptr, dword) ;
 						bytesread += dword ;
-						cptr [dword - 1] = 0 ;						
+						cptr [dword - 1] = 0 ;
 						psf_log_printf (psf, "    %M : %d : %s\n", chunk, mark_id, cptr) ;
 						} ;
 					break ;
@@ -1231,7 +1282,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 			case DISP_MARKER :
 			case ltxt_MARKER :
 			case note_MARKER :
-					bytesread += psf_binheader_readf (psf, "e4", &dword) ;
+					bytesread += psf_binheader_readf (psf, "4", &dword) ;
 					dword += (dword & 1) ;
 					psf_binheader_readf (psf, "j", dword) ;
 					bytesread += dword ;
@@ -1239,7 +1290,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 					break ;
 
 			default :
-					psf_binheader_readf (psf, "e4", &dword) ;
+					psf_binheader_readf (psf, "4", &dword) ;
 					bytesread += sizeof (dword) ;
 					dword += (dword & 1) ;
 					psf_binheader_readf (psf, "j", dword) ;
@@ -1288,19 +1339,19 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 
 	chunklen += (chunklen & 1) ;
 
-	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
+	bytesread += psf_binheader_readf (psf, "4", &dword) ;
 	psf_log_printf (psf, "  Manufacturer : %X\n", dword) ;
 
-	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
+	bytesread += psf_binheader_readf (psf, "4", &dword) ;
 	psf_log_printf (psf, "  Product      : %u\n", dword) ;
 
-	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
+	bytesread += psf_binheader_readf (psf, "4", &dword) ;
 	psf_log_printf (psf, "  Period       : %u nsec\n", dword) ;
 
-	bytesread += psf_binheader_readf (psf, "e4", &note) ;
+	bytesread += psf_binheader_readf (psf, "4", &note) ;
 	psf_log_printf (psf, "  Midi Note    : %u\n", note) ;
 
-	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
+	bytesread += psf_binheader_readf (psf, "4", &dword) ;
 	if (dword != 0)
 	{	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%f",
 				 (1.0 * 0x80000000) / ((unsigned int) dword)) ;
@@ -1309,21 +1360,21 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	else
 		psf_log_printf (psf, "  Pitch Fract. : 0\n") ;
 
-	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
+	bytesread += psf_binheader_readf (psf, "4", &dword) ;
 	psf_log_printf (psf, "  SMPTE Format : %u\n", dword) ;
 
-	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
+	bytesread += psf_binheader_readf (psf, "4", &dword) ;
 	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%02d:%02d:%02d %02d",
 		 (dword >> 24) & 0x7F, (dword >> 16) & 0x7F, (dword >> 8) & 0x7F, dword & 0x7F) ;
 	psf_log_printf (psf, "  SMPTE Offset : %s\n", psf->u.cbuf) ;
 
-	bytesread += psf_binheader_readf (psf, "e4", &loop_count) ;
+	bytesread += psf_binheader_readf (psf, "4", &loop_count) ;
 	psf_log_printf (psf, "  Loop Count   : %u\n", loop_count) ;
 
 	/* Sampler Data holds the number of data bytes after the CUE chunks which
 	** is not actually CUE data. Display value after CUE data.
 	*/
-	bytesread += psf_binheader_readf (psf, "e4", &sampler_data) ;
+	bytesread += psf_binheader_readf (psf, "4", &sampler_data) ;
 
 	if ((psf->instrument = psf_instrument_alloc ()) == NULL)
 		return SFE_MALLOC_FAILED ;
@@ -1331,22 +1382,22 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	psf->instrument->loop_count = loop_count ;
 
 	for (j = 0 ; loop_count > 0 && chunklen - bytesread >= 24 ; j ++)
-	{	bytesread += psf_binheader_readf (psf, "e4", &dword) ;
+	{	bytesread += psf_binheader_readf (psf, "4", &dword) ;
 		psf_log_printf (psf, "    Cue ID : %2u", dword) ;
 
-		bytesread += psf_binheader_readf (psf, "e4", &type) ;
+		bytesread += psf_binheader_readf (psf, "4", &type) ;
 		psf_log_printf (psf, "  Type : %2u", type) ;
 
-		bytesread += psf_binheader_readf (psf, "e4", &start) ;
+		bytesread += psf_binheader_readf (psf, "4", &start) ;
 		psf_log_printf (psf, "  Start : %5u", start) ;
 
-		bytesread += psf_binheader_readf (psf, "e4", &end) ;
+		bytesread += psf_binheader_readf (psf, "4", &end) ;
 		psf_log_printf (psf, "  End : %5u", end) ;
 
-		bytesread += psf_binheader_readf (psf, "e4", &dword) ;
+		bytesread += psf_binheader_readf (psf, "4", &dword) ;
 		psf_log_printf (psf, "  Fraction : %5u", dword) ;
 
-		bytesread += psf_binheader_readf (psf, "e4", &count) ;
+		bytesread += psf_binheader_readf (psf, "4", &count) ;
 		psf_log_printf (psf, "  Count : %5u\n", count) ;
 
 		if (j < ARRAY_LEN (psf->instrument->loops))
@@ -1449,7 +1500,7 @@ wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 
 	chunklen += (chunklen & 1) ;
 
-	bytesread += psf_binheader_readf (psf, "e422f", &flags, &rootnote, &q1, &q2) ;
+	bytesread += psf_binheader_readf (psf, "422f", &flags, &rootnote, &q1, &q2) ;
 
 	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%f", q2) ;
 
@@ -1463,7 +1514,7 @@ wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	psf_log_printf (psf, "  Root note : 0x%x\n  ????      : 0x%04x\n  ????      : %s\n",
 				rootnote, q1, psf->u.cbuf) ;
 
-	bytesread += psf_binheader_readf (psf, "e422f", &beats, &meter_denom, &meter_numer, &tempo) ;
+	bytesread += psf_binheader_readf (psf, "422f", &beats, &meter_denom, &meter_numer, &tempo) ;
 	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%f", tempo) ;
 	psf_log_printf (psf, "  Beats     : %d\n  Meter     : %d/%d\n  Tempo     : %s\n",
 				beats, meter_numer, meter_denom, psf->u.cbuf) ;

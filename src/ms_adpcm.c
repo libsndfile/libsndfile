@@ -491,7 +491,7 @@ msadpcm_write_adapt_coeffs	(SF_PRIVATE *psf)
 {	int k ;
 
 	for (k = 0 ; k < MSADPCM_ADAPT_COEFF_COUNT ; k++)
-		psf_binheader_writef (psf, "e22", AdaptCoeff1 [k], AdaptCoeff2 [k]) ;
+		psf_binheader_writef (psf, "22", AdaptCoeff1 [k], AdaptCoeff2 [k]) ;
 } /* msadpcm_write_adapt_coeffs */
 
 /*==========================================================================================

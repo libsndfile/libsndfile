@@ -1,3 +1,14 @@
+2006-03-11 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav.c
+    On read, only add the endian flag if the file is big endian.
+
+    * src/ms_adpcm.c
+    Fixed writing of APDCM coeffs in RIFX files.
+
+    * tests/write_read_test.tpl tests/lossy_comp_test.c
+    Add tests for RIFX files.
+
 2006-03-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Mingw-make-dist.sh
@@ -20,6 +31,9 @@
 
     * doc/win32.html
     Fix typo, mention that -mno-cygwin with the Cygwin compiler does not work.
+
+    * src/wav.c src/wav_w64.c src/sndfile.c src/sndfile.h.in
+    Apply large patch from Jesse Chappell which adds support for RIFX files.
 
 2006-03-08 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
