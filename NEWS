@@ -1,3 +1,8 @@
+Version 1.0.15 (2006-03-16)
+  * Fix some ia64 issues.
+  * Fix precompiled DLL.
+  * Minor bug fixes.
+
 Version 1.0.14 (2006-02-19)
   * Really fix MinGW compile problems.
   * Minor bug fixes.
