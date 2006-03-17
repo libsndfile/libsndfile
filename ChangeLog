@@ -1,3 +1,8 @@
+2006-03-17 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/Makefile.am
+    Remove --source-time argument from autogen command lines.
+
 2006-03-16 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Win32/README-precompiled-dll.txt

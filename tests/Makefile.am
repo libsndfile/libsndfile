@@ -126,28 +126,28 @@ scale_clip_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 #===============================================================================
 
 write_read_test.c: write_read_test.def write_read_test.tpl
-	autogen --writable --source-time write_read_test.def
+	autogen --writable write_read_test.def
 
 pcm_test.c: pcm_test.def pcm_test.tpl
-	autogen --writable --source-time pcm_test.def
+	autogen --writable pcm_test.def
 
 header_test.c: header_test.def header_test.tpl
-	autogen --writable --source-time header_test.def
+	autogen --writable header_test.def
 
 utils.c: utils.def utils.tpl
-	autogen --writable --source-time utils.def
+	autogen --writable utils.def
 
 scale_clip_test.c: scale_clip_test.def scale_clip_test.tpl
-	autogen --writable --source-time scale_clip_test.def
+	autogen --writable scale_clip_test.def
 
 pipe_test.c: pipe_test.def pipe_test.tpl
-	autogen --writable --source-time pipe_test.def
+	autogen --writable pipe_test.def
 
 floating_point_test.c: floating_point_test.def floating_point_test.tpl
-	autogen --writable --source-time floating_point_test.def
+	autogen --writable floating_point_test.def
 
 benchmark.c: benchmark.def benchmark.tpl
-	autogen --writable --source-time benchmark.def
+	autogen --writable benchmark.def
 
 genfiles : write_read_test.c pcm_test.c header_test.c utils.c \
 		scale_clip_test.c pipe_test.c floating_point_test.c benchmark.c
