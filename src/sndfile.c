@@ -1061,6 +1061,9 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			return SF_TRUE ;
 
 		case SFC_SET_INSTRUMENT :
+			/* If data has already been written this must fail. */
+			if (psf->have_written)
+				return SF_FALSE ;
 			if (datasize != sizeof (SF_INSTRUMENT) || data == NULL)
 				return SF_FALSE ;
 			if (psf->instrument == NULL && (psf->instrument = psf_instrument_alloc ()) == NULL)

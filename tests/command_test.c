@@ -622,11 +622,11 @@ instrument_test (const char *filename, int filetype)
 	sfinfo.channels		= 1 ;
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
-	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
 	if (sf_command (file, SFC_SET_INSTRUMENT, &write_inst, sizeof (write_inst)) == SF_FALSE)
 	{	printf ("\n\nLine %d : sf_command (SFC_SET_INSTRUMENT) failed.\n\n", __LINE__) ;
 		exit (1) ;
 		} ;
+	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
 	sf_close (file) ;
 
 	memset (&read_inst, 0, sizeof (read_inst)) ;
@@ -637,6 +637,7 @@ instrument_test (const char *filename, int filetype)
 		exit (1) ;
 		return ;
 		} ;
+	check_log_buffer_or_die (file, __LINE__) ;
 	sf_close (file) ;
 
 	if ((filetype & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAV)
