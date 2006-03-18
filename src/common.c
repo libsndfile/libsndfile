@@ -559,7 +559,10 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 
 	while ((c = *format++))
 	{	switch (c)
-		{	case 'e' : /* All conversions are now from LE to host. */
+		{	case ' ' : /* Do nothing. Just used to space out format string. */
+					break ;
+
+			case 'e' : /* All conversions are now from LE to host. */
 					psf->rwf_endian = SF_ENDIAN_LITTLE ;
 					break ;
 
