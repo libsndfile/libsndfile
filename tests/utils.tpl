@@ -297,6 +297,13 @@ check_log_buffer_or_die (SNDFILE *file, int line_num)
 		exit (1) ;
 		} ;
 
+	/* Look for "Should" */
+	if (strstr (buffer, "nknown marker"))
+	{	printf ("\n\nLine %d : Log buffer contains `nknown marker'. Dumping.\n", line_num) ;
+		puts (buffer) ;
+		exit (1) ;
+		} ;
+
 	return ;
 } /* check_log_buffer_or_die */
 
