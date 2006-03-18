@@ -1,13 +1,17 @@
 2006-03-18 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c
-    Fix bug in writting of INST chunk in AIFF files.
+    Fix bug in writing of INST chunk in AIFF files.
+    Fix potential bug in writing MARK chunks.
 
     * src/sndfile.c
     Make sure the instrument chunk can only be written at the start of the file.
 
     * tests/command_test.c
     Add check of log buffer.
+
+    * tests/utils.tpl
+    Add usage of space character to psf_binheader_writef.
 
 2006-03-17 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
