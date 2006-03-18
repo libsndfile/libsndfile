@@ -1180,7 +1180,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			ch.release_loop.endLoop = 0 ;
 			} ;
 
-		psf_binheader_writef (psf, "Em4111111", INST_MARKER, sizeof (INST_CHUNK), ch.baseNote, ch.detune, 
+		psf_binheader_writef (psf, "Em4111111", INST_MARKER, SIZEOF_INST_CHUNK, ch.baseNote, ch.detune, 
 						ch.lowNote, ch.highNote, ch.lowVelocity, ch.highVelocity) ;
 		psf_binheader_writef (psf, "2222222", ch.gain, ch.sustain_loop.playMode,
 						ch.sustain_loop.beginLoop, ch.sustain_loop.endLoop, ch.release_loop.playMode,
