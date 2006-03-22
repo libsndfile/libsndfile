@@ -1,3 +1,9 @@
+2006-03-22 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/win32.html
+    Make it really clear that although the MSVC++ cannot compile libsndfile,
+    the precompiled DLL can be used in C++ programs compiled with MSVC++.
+
 2006-03-18 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c
