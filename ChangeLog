@@ -1,3 +1,9 @@
+2006-03-26 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Fix handling of --enable and --disable configure args. Thanks to Diego
+    'Flameeyes' Pettenò who sent the patch.
+
 2006-03-22 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/win32.html

@@ -71,46 +71,37 @@ SHLIB_VERSION_ARG=""
 # Finished checking, handle options.
 
 AC_ARG_ENABLE(experimental,
-	AC_HELP_STRING([--enable-experimental], [enable experimental code]),
-	ac_arg_experimental=yes, ac_arg_experimental=no)
+	AC_HELP_STRING([--enable-experimental], [enable experimental code]))
 
 EXPERIMENTAL_CODE=0
-if test x$ac_arg_experimental = xyes ; then
+if test x$enable_experimental = xyes ; then
 	EXPERIMENTAL_CODE=1
 	fi
 AC_DEFINE_UNQUOTED([ENABLE_EXPERIMENTAL_CODE],${EXPERIMENTAL_CODE}, [Set to 1 to enable experimental code.])
 
 AC_ARG_ENABLE(gcc-werror,
-	AC_HELP_STRING([--enable-gcc-werror], [enable -Werror in all Makefiles]),
-	ac_arg_gcc_werror=yes, ac_arg_gcc_werror=no)
+	AC_HELP_STRING([--enable-gcc-werror], [enable -Werror in all Makefiles]))
 
 AC_ARG_ENABLE(gcc-pipe,
-	AC_HELP_STRING([--disable-gcc-pipe], [disable gcc -pipe option]),
-	ac_arg_gcc_pipe="N", ac_arg_gcc_pipe="Y")
+	AC_HELP_STRING([--disable-gcc-pipe], [disable gcc -pipe option]))
 
 AC_ARG_ENABLE(gcc-opt,
-	AC_HELP_STRING([--disable-gcc-opt], [disable gcc optimisations]),
-	ac_arg_gcc_opt="N", ac_arg_gcc_opt="Y")
+	AC_HELP_STRING([--disable-gcc-opt], [disable gcc optimisations]))
 
 AC_ARG_ENABLE(cpu-clip,
-	AC_HELP_STRING([--disable-cpu-clip], [disable tricky cpu specific clipper]),
-	ac_arg_cpu_clip="N", ac_arg_cpu_clip="Y")
+	AC_HELP_STRING([--disable-cpu-clip], [disable tricky cpu specific clipper]))
 
 AC_ARG_ENABLE(bow-docs,
-	AC_HELP_STRING([--enable-bow-docs], [enable black-on-white html docs]),
-	ac_arg_bow_docs="Y", ac_arg_bow_docs="N")
+	AC_HELP_STRING([--enable-bow-docs], [enable black-on-white html docs]))
 
 AC_ARG_ENABLE(sqlite,
-	AC_HELP_STRING([--disable-sqlite], [disable use of sqlite]),
-	ac_arg_enable_sqlite=no, ac_arg_enable_sqlite=yes)
+	AC_HELP_STRING([--disable-sqlite], [disable use of sqlite]))
 
 AC_ARG_ENABLE(flac,
-	AC_HELP_STRING([--disable-flac], [disable use of FLAC]),
-	ac_arg_enable_flac=no, ac_arg_enable_flac=yes)
+	AC_HELP_STRING([--disable-flac], [disable use of FLAC]))
 
 AC_ARG_ENABLE(alsa,
-	AC_HELP_STRING([--disable-alsa], [disable use of ALSA]),
-	ac_arg_enable_alsa=no, ac_arg_enable_alsa=yes)
+	AC_HELP_STRING([--disable-alsa], [disable use of ALSA]))
 
 #====================================================================================
 # Check types and their sizes.
@@ -261,7 +252,7 @@ case "$host_os" in
 # Check for libsqlite3 (only used in regtest).
 
 ac_cv_sqlite3=no
-if test x$ac_arg_enable_sqlite = xyes ; then
+if test x$enable_sqlite != xno ; then
 	PKG_CHECK_MODULES(SQLITE3, sqlite3 >= 3.2, ac_cv_sqlite3=yes, ac_cv_sqlite3=no)
 	fi
 
@@ -276,7 +267,7 @@ AC_DEFINE_UNQUOTED([HAVE_SQLITE3],$HAVE_SQLITE3,[Set to 1 if you have libsqlite3
 #====================================================================================
 # Determine if the processor can do clipping on float to int conversions.
 
-if test x$ac_arg_cpu_clip = "xY" ; then
+if test x$enable_cpu_clip != "xno" ; then
 	AC_C_CLIP_MODE
 else
 	echo "checking processor clipping capabilities... disabled"
@@ -324,7 +315,7 @@ AC_DEFINE_UNQUOTED(USE_WINDOWS_API, ${use_windows_api}, [Set to 1 to use the nat
 
 ALSA_LIBS=""
 
-if test x$ac_arg_enable_alsa = xyes ; then
+if test x$enable_alsa != xno ; then
 	AC_CHECK_HEADERS(alsa/asoundlib.h)
 	if test x$ac_cv_header_alsa_asoundlib_h = xyes ; then
 		ALSA_LIBS="-lasound"
@@ -336,7 +327,7 @@ if test x$ac_arg_enable_alsa = xyes ; then
 
 FLAC_LIBS=""
 
-if test x$ac_arg_enable_flac = xyes ; then
+if test x$enable_flac != xno ; then
 	AC_CHECK_HEADERS(FLAC/all.h)
 	if test x$ac_cv_header_FLAC_all_h = xyes ; then
 		AC_CHECK_LIB(FLAC, FLAC__seekable_stream_encoder_set_tell_callback, HAVE_FLAC_1_1_1="yes")
@@ -398,7 +389,7 @@ else
 	htmldocdir=$prefix/share/doc/libsndfile1-dev/html
 	fi
 
-if test x$ac_arg_bow_docs = "xY" ; then
+if test x$enable_bow_docs = "xyes" ; then
 	HTML_BGCOLOUR="white"
 	HTML_FGCOLOUR="black"
 else
@@ -416,14 +407,14 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 
 	AC_ADD_CFLAGS(-Wdeclaration-after-statement)
 
-	if test x$ac_arg_gcc_werror = "xyes" ; then
+	if test x$enable_gcc_werror = "xyes" ; then
 		CFLAGS="-Werror $CFLAGS"
 		fi
 
 	CFLAGS="$CFLAGS -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return -Wcast-align -Wcast-qual -Wnested-externs -Wshadow -Wbad-function-cast -Wwrite-strings"
 	# -Wpointer-arith -Wundef -Wmissing-declarations -Winline -Wconversion"
 
-	if test "$ac_arg_gcc_opt" = "N" ; then
+	if test "x$enable_gcc_opt" = "xno" ; then
 		temp_CFLAGS=`echo $CFLAGS | sed "s/O2/O0/"`
 		CFLAGS=$temp_CFLAGS
 		AC_MSG_WARN([[*** Compiler optimisations switched off. ***]])
@@ -450,7 +441,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		*)
 			;;
 		esac
-	if test x$ac_arg_gcc_pipe != "xN" ; then
+	if test x$enable_gcc_pipe != "xno" ; then
 	 	CFLAGS="$CFLAGS -pipe"
 	 	fi
 
@@ -502,7 +493,7 @@ AC_MSG_RESULT([
   Configuration summary :
 
     Version : ..................... ${VERSION}
-    Experimental code : ........... ${ac_arg_experimental}
+    Experimental code : ........... ${enable_experimental:-no}
 ])
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
