@@ -1052,6 +1052,38 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			memcpy (data, psf->loop_info, sizeof (SF_LOOP_INFO)) ;
 			return SF_TRUE ;
 
+		case SFC_SET_BROADCAST_INFO :
+			{	int format = psf->sf.format & SF_FORMAT_TYPEMASK ;
+
+				/* Only WAV supports the BEXT (Broadcast) chunk. */
+				if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX)
+					return SF_FALSE ;
+				} ;
+
+			/* Can only do this is in SFM_WRITE mode. */
+			if (psf->mode != SFM_WRITE)
+				return SF_FALSE ;
+			/* If data has already been written this must fail. */
+			if (psf->have_written)
+				return SF_FALSE ;
+
+			if (psf->broadcast_info == NULL)
+				psf->broadcast_info = broadcast_info_alloc () ;
+
+			broadcast_info_copy (psf->broadcast_info, data) ;
+			broadcast_add_coding_history (psf->broadcast_info, psf->sf.channels, psf->sf.samplerate) ;
+
+			if (psf->write_header)
+				psf->write_header (psf, SF_TRUE) ;
+			return SF_TRUE ;
+
+		case SFC_GET_BROADCAST_INFO :
+			if (datasize != sizeof (SF_BROADCAST_INFO) || data == NULL)
+				return SF_FALSE ;
+			if (psf->broadcast_info == NULL)
+				return SF_FALSE ;
+			return broadcast_info_copy (data, psf->broadcast_info) ;
+
 		case SFC_GET_INSTRUMENT :
 			if (datasize != sizeof (SF_INSTRUMENT) || data == NULL)
 				return SF_FALSE ;
@@ -2334,6 +2366,9 @@ psf_close (SF_PRIVATE *psf)
 
 	if (psf->peak_info)
 		free (psf->peak_info) ;
+
+	if (psf->broadcast_info)
+		free (psf->broadcast_info) ;
 
 	if (psf->loop_info)
 		free (psf->loop_info) ;

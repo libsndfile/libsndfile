@@ -275,6 +275,9 @@ typedef struct sf_private_tag
 	SF_LOOP_INFO	*loop_info ;
 	SF_INSTRUMENT	*instrument ;
 
+	/* Broadcast (EBU) Info */
+	SF_BROADCAST_INFO *broadcast_info ;
+
 	sf_count_t		filelength ;	/* Overall length of (embedded) file. */
 	sf_count_t		fileoffset ;	/* Offset in number of bytes from beginning of file. */
 
@@ -697,6 +700,11 @@ int		interleave_init (SF_PRIVATE *psf) ;
 void	*psf_memset (void *s, int c, sf_count_t n) ;
 
 SF_INSTRUMENT * psf_instrument_alloc (void) ;
+
+
+SF_BROADCAST_INFO* broadcast_info_alloc (void) ;
+int		broadcast_info_copy (SF_BROADCAST_INFO* dst, SF_BROADCAST_INFO* src) ;
+int		broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, unsigned int samplerate) ;
 
 /*------------------------------------------------------------------------------------
 ** Here's how we fix systems which don't snprintf / vsnprintf.

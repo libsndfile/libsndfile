@@ -18,7 +18,7 @@ noinst_PROGRAMS = test_endswap test_file_io test_log_printf
 
 COMMON = sndfile.c common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
-		interleave.c strings.c dither.c
+		interleave.c strings.c dither.c broadcast.c
 
 FILESPECIFIC = aiff.c au.c g72x.c avr.c caf.c ircam.c macbinary3.c macos.c \
 				mat4.c mat5.c nist.c paf.c pvf.c raw.c svx.c voc.c htk.c dwd.c \

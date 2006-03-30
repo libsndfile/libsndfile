@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -41,6 +42,7 @@ static	void	format_tests		(void) ;
 static	void	calc_peak_test		(int filetype, const char *filename) ;
 static	void	truncate_test		(const char *filename, int filetype) ;
 static	void	instrument_test		(const char *filename, int filetype) ;
+static	void	broadcast_test		(const char *filename, int filetype) ;
 
 /* Force the start of this buffer to be double aligned. Sparc-solaris will
 ** choke if its not.
@@ -110,6 +112,11 @@ main (int argc, char *argv [])
 	{	instrument_test ("instrument.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		instrument_test ("instrument.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
 		/*-instrument_test ("instrument.xi", SF_FORMAT_XI | SF_FORMAT_DPCM_16) ;-*/
+		test_count++ ;
+		} ;
+
+	if (do_all || strcmp (argv [1], "bext") == 0)
+	{	broadcast_test ("broadcast.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		test_count++ ;
 		} ;
 
@@ -711,6 +718,93 @@ instrument_test (const char *filename, int filetype)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* instrument_test */
+
+static void
+broadcast_test (const char *filename, int filetype)
+{	static SF_BROADCAST_INFO bc_write, bc_read ;
+	SNDFILE	 *file ;
+	SF_INFO	 sfinfo ;
+	int errors = 0 ;
+
+	print_test_name ("broadcast_test", filename) ;
+
+	sfinfo.samplerate	= 11025 ;
+	sfinfo.format		= filetype ;
+	sfinfo.channels		= 1 ;
+
+	memset (&bc_write, 0, sizeof (bc_write)) ;
+
+	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
+	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
+	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
+	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
+	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
+	bc_write.coding_history_size = 0 ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_SET_BROADCAST_INFO, &bc_write, sizeof (bc_write)) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_BROADCAST_INFO) failed.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	memset (&bc_read, 0, sizeof (bc_read)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_GET_BROADCAST_INFO, &bc_read, sizeof (bc_read)) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_BROADCAST_INFO) failed.\n\n", __LINE__) ;
+		exit (1) ;
+		return ;
+		} ;
+	check_log_buffer_or_die (file, __LINE__) ;
+	sf_close (file) ;
+
+	if (bc_read.version != 1)
+	{	printf ("\n\nLine %d : Read bad version number %d.\n\n", __LINE__, bc_read.version) ;
+		exit (1) ;
+		return ;
+		} ;
+
+	bc_read.version = bc_write.version = 0 ;
+
+	if (memcmp (bc_write.description, bc_read.description, sizeof (bc_write.description)) != 0)
+	{	printf ("\n\nLine %d : description mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, bc_write.description, bc_read.description) ;
+		errors ++ ;
+		} ;
+
+	if (memcmp (bc_write.originator, bc_read.originator, sizeof (bc_write.originator)) != 0)
+	{	printf ("\n\nLine %d : originator mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, bc_write.originator, bc_read.originator) ;
+		errors ++ ;
+		} ;
+
+	if (memcmp (bc_write.originator_reference, bc_read.originator_reference, sizeof (bc_write.originator_reference)) != 0)
+	{	printf ("\n\nLine %d : originator_reference mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, bc_write.originator_reference, bc_read.originator_reference) ;
+		errors ++ ;
+		} ;
+
+	if (memcmp (bc_write.origination_date, bc_read.origination_date, sizeof (bc_write.origination_date)) != 0)
+	{	printf ("\n\nLine %d : origination_date mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, bc_write.origination_date, bc_read.origination_date) ;
+		errors ++ ;
+		} ;
+
+	if (memcmp (bc_write.origination_time, bc_read.origination_time, sizeof (bc_write.origination_time)) != 0)
+	{	printf ("\n\nLine %d : origination_time mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, bc_write.origination_time, bc_read.origination_time) ;
+		errors ++ ;
+		} ;
+
+	if (memcmp (bc_write.umid, bc_read.umid, sizeof (bc_write.umid)) != 0)
+	{	printf ("\n\nLine %d : umid mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, bc_write.umid, bc_read.umid) ;
+		errors ++ ;
+		} ;
+
+	if (errors)
+		exit (1) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* broadcast_test */
 
 /*
 ** Do not edit or modify anything in this comment block.

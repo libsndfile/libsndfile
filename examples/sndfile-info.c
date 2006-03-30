@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@ static void print_usage (const char *progname) ;
 
 static void info_dump (const char *filename) ;
 static void instrument_dump (const char *filename) ;
+static void broadcast_dump (const char *filename) ;
 
 int
 main (int argc, char *argv [])
@@ -54,6 +55,11 @@ main (int argc, char *argv [])
 
 	if (strcmp (argv [1], "-i") == 0)
 	{	instrument_dump (argv [2]) ;
+		return 0 ;
+		} ;
+
+	if (strcmp (argv [1], "-b") == 0)
+	{	broadcast_dump (argv [2]) ;
 		return 0 ;
 		} ;
 
@@ -84,6 +90,8 @@ print_usage (const char *progname)
 	printf ("    Prints out information about one or more sound files.\n\n") ;
 	printf ("  %s -i <file>\n", progname) ;
 	printf ("    Prints out the instrument data for the given file.\n\n") ;
+	printf ("  %s -b <file>\n", progname) ;
+	printf ("    Prints out the broadcast WAV info for the given file.\n\n") ;
 #if (defined (_WIN32) || defined (WIN32))
 		printf ("This is a Unix style command line application which\n"
 				"should be run in a MSDOS box or Command Shell window.\n\n") ;
@@ -288,6 +296,42 @@ instrument_dump (const char *filename)
 
 	putchar ('\n') ;
 } /* instrument_dump */
+
+static void
+broadcast_dump (const char *filename)
+{	SNDFILE	 *file ;
+	SF_INFO	 sfinfo ;
+	SF_BROADCAST_INFO bext ;
+	int got_bext ;
+
+	if ((file = sf_open (filename, SFM_READ, &sfinfo)) == NULL)
+	{	printf ("Error : Not able to open input file %s.\n", filename) ;
+		fflush (stdout) ;
+		memset (data, 0, sizeof (data)) ;
+		puts (sf_strerror (NULL)) ;
+		return ;
+		} ;
+
+	memset (&bext, 0, sizeof (SF_BROADCAST_INFO)) ;
+
+	got_bext = sf_command (file, SFC_GET_BROADCAST_INFO, &bext, sizeof (bext)) ;
+	sf_close (file) ;
+
+	if (got_bext == SF_FALSE)
+	{	printf ("Error : File '%s' does not contain broadcast information.\n\n", filename) ;
+		return ;
+		} ;
+
+	printf ("Description      : %.*s\n", sizeof (bext.description), bext.description) ;
+	printf ("Originator       : %.*s\n", sizeof (bext.originator), bext.originator) ;
+	printf ("Origination ref  :  %.*s\n", sizeof (bext.originator_reference), bext.originator_reference) ;
+	printf ("Origination date : %.*s\n", sizeof (bext.origination_date), bext.origination_date) ;
+	printf ("Origination time : %.*s\n", sizeof (bext.origination_time), bext.origination_time) ;
+	printf ("BWF version      : %d\n", bext.version) ;
+	printf ("UMID             : %.*s\n", sizeof (bext.umid), bext.umid) ;
+	printf ("Coding history   : %.*s\n", bext.coding_history_size, bext.coding_history) ;
+
+} /* broadcast_dump */
 
 /*
 ** Do not edit or modify anything in this comment block.
