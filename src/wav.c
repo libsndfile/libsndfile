@@ -706,9 +706,10 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 	psf->headindex = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
-	/* RIFX signifies big-endian format for all header and data
-	** to prevent lots of code copying here, we'll set the psf->rwf_endian
-	** flag once here, and never specify endian-ness for all other header ops
+	/*
+	** RIFX signifies big-endian format for all header and data.
+	** To prevent lots of code copying here, we'll set the psf->rwf_endian flag
+	** once here, and never specify endian-ness for all other header operations.
 	*/
 
 	/* RIFF/RIFX marker, length, WAVE and 'fmt ' markers. */
