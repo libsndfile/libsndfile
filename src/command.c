@@ -329,6 +329,35 @@ psf_calc_max_all_channels (SF_PRIVATE *psf, double *peaks, int normalize)
 	return	0 ;
 } /* psf_calc_max_all_channels */
 
+int
+psf_get_signal_max (SF_PRIVATE *psf, double *peak)
+{	int k ;
+
+	if (psf->peak_info == NULL)
+		return SF_FALSE ;
+
+	peak [0] = psf->peak_info->peaks [0].value ;
+
+	for (k = 1 ; k < psf->sf.channels ; k++)
+		peak [0] = SF_MAX (peak [0], psf->peak_info->peaks [k].value) ;
+
+	return SF_TRUE ;
+} /* psf_get_signal_max */
+
+int
+psf_get_max_all_channels (SF_PRIVATE *psf, double *peaks)
+{	int k ;
+
+	if (psf->peak_info == NULL)
+		return SF_FALSE ;
+
+	for (k = 0 ; k < psf->sf.channels ; k++)
+		peaks [k] = psf->peak_info->peaks [k].value ;
+
+	return SF_TRUE ;
+}  /* psf_get_max_all_channels */
+
+
 /*
 ** Do not edit or modify anything in this comment block.
 ** The arch-tag line is a file identity tag for the GNU Arch 

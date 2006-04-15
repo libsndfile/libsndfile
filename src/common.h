@@ -584,6 +584,9 @@ void	psf_generate_format_desc (SF_PRIVATE *psf) ;
 double	psf_calc_signal_max			(SF_PRIVATE *psf, int normalize) ;
 int		psf_calc_max_all_channels	(SF_PRIVATE *psf, double *peaks, int normalize) ;
 
+int		psf_get_signal_max			(SF_PRIVATE *psf, double *peak) ;
+int		psf_get_max_all_channels	(SF_PRIVATE *psf, double *peaks) ;
+
 /* Functions in strings.c. */
 
 const char* psf_get_string (SF_PRIVATE *psf, int str_type) ;

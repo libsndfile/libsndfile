@@ -951,6 +951,20 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				return (psf->error = SFE_BAD_CONTROL_CMD) ;
 			return psf_calc_max_all_channels (psf, (double*) data, SF_TRUE) ;
 
+		case SFC_GET_SIGNAL_MAX :
+			if (data == NULL || datasize != sizeof (double))
+			{	psf->error = SFE_BAD_CONTROL_CMD ;
+				return SF_FALSE ;
+				} ;
+			return psf_get_signal_max (psf, (double *) data) ;
+
+		case SFC_GET_MAX_ALL_CHANNELS :
+			if (data == NULL || datasize != SIGNED_SIZEOF (double) * psf->sf.channels)
+			{	psf->error = SFE_BAD_CONTROL_CMD ;
+				return SF_FALSE ;
+				} ;
+			return psf_get_max_all_channels (psf, (double*) data) ;
+
 		case SFC_UPDATE_HEADER_NOW :
 			if (psf->write_header)
 				psf->write_header (psf, SF_TRUE) ;
