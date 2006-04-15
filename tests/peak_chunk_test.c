@@ -145,6 +145,27 @@ test_float_peak (const char *filename, int filetype)
 		exit (1) ;
 		} ;
 
+	/* Check these two commands. */
+	if (sf_command (file, SFC_GET_SIGNAL_MAX, data, sizeof (double)) == SF_FALSE)
+	{	printf ("\n\nLine %d: Command should have returned SF_TRUE.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	if (fabs (data [0] - (frames / 2) * 0.01) > 0.01)
+	{	printf ("\n\nLine %d: Bad peak value (%f should be %f) for command SFC_GET_SIGNAL_MAX.\n", __LINE__, data [0], (frames / 2) * 0.01) ;
+		exit (1) ;
+		} ;
+
+	if (sf_command (file, SFC_GET_MAX_ALL_CHANNELS, data, sizeof (double) * sfinfo.channels) == SF_FALSE)
+	{	printf ("\n\nLine %d: Command should have returned SF_TRUE.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	if (fabs (data [3] - (frames / 2) * 0.01) > 0.01)
+	{	printf ("\n\nLine %d: Bad peak value (%f should be %f) for command SFC_GET_MAX_ALL_CHANNELS.\n", __LINE__, data [0], (frames / 2) * 0.01) ;
+		exit (1) ;
+		} ;
+
 	/* Get the log buffer data. */
 	log_buffer [0] = 0 ;
 	sf_command	(file, SFC_GET_LOG_INFO, log_buffer, LOG_BUFFER_SIZE) ;
@@ -175,6 +196,17 @@ test_float_peak (const char *filename, int filetype)
 	sf_close (file) ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, 0, __LINE__) ;
+
+	/* Check these two commands. */
+	if (sf_command (file, SFC_GET_SIGNAL_MAX, data, sizeof (double)))
+	{	printf ("\n\nLine %d: Command should have returned SF_FALSE.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	if (sf_command (file, SFC_GET_MAX_ALL_CHANNELS, data, sizeof (double) * sfinfo.channels))
+	{	printf ("\n\nLine %d: Command should have returned SF_FALSE.\n", __LINE__) ;
+		exit (1) ;
+		} ;
 
 	/* Get the log buffer data. */
 	log_buffer [0] = 0 ;

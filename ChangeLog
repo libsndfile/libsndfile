@@ -1,3 +1,14 @@
+2006-04-15 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in src/sndfile.c src/common.h src/command.c
+    Implement new commands SFC_GET_SIGNAL_MAX and SFC_GET_MAX_ALL_CHANNELS.
+
+    * doc/commands.html
+    Document new commands. Other minor updates.
+
+    * tests/peak_chunk_test.c
+    Update tests for new commands.
+
 2006-04-02 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/peak_chunk_test.c
