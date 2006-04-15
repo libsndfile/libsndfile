@@ -50,11 +50,11 @@
 </TR>
 <TR>
 	<TD><A HREF="#SFC_CALC_SIGNAL_MAX">SFC_CALC_SIGNAL_MAX</A></TD>
-	<TD>Retrieve the measured maximum signal value.</TD>
+	<TD>Calculate the measured maximum signal value.</TD>
 </TR>
 <TR>
 	<TD><A HREF="#SFC_CALC_NORM_SIGNAL_MAX">SFC_CALC_NORM_SIGNAL_MAX</A></TD>
-	<TD>Retrieve the measured normalised maximum signal value.</TD>
+	<TD>Calculate the measured normalised maximum signal value.</TD>
 </TR>
 <TR>
 	<TD><A HREF="#SFC_CALC_MAX_ALL_CHANNELS">SFC_CALC_MAX_ALL_CHANNELS</A></TD>
@@ -63,6 +63,15 @@
 <TR>
 	<TD><A HREF="#SFC_CALC_NORM_MAX_ALL_CHANNELS">SFC_CALC_NORM_MAX_ALL_CHANNELS</A></TD>
 	<TD>Calculate the normalised peak for each channel.</TD>
+</TR>
+
+<TR>
+	<TD><A HREF="#SFC_GET_SIGNAL_MAX">SFC_GET_SIGNAL_MAX</A></TD>
+	<TD>Retrieve the peak value for the file (as stored in the file header).</TD>
+</TR>
+<TR>
+	<TD><A HREF="#SFC_GET_MAX_ALL_CHANNELS">SFC_GET_MAX_ALL_CHANNELS</A></TD>
+	<TD>Retrieve the peak value for each channel  (as stored in the file header).</TD>
 </TR>
 
 <TR>
@@ -354,6 +363,59 @@ Example:
 
 
 
+
+<!-- ========================================================================= -->
+<A NAME="SFC_GET_SIGNAL_MAX"></A>
+<H2><BR><B>SFC_GET_SIGNAL_MAX</B></H2>
+<P>
+Retrieve the peak value for the file as stored in the file header.
+</P>
+<P>
+Parameters:
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_GET_SIGNAL_MAX
+        data     : A pointer to a double
+        datasize : sizeof (double)
+</PRE>
+<P>
+Example:
+</P>
+<PRE>
+        double   max_peak ;
+        sf_command (sndfile, SFC_GET_SIGNAL_MAX, &amp;max_peak, sizeof (max_peak)) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<DD>SF_TRUE if the file header contained the peak value. SF_FALSE otherwise.
+</DL>
+
+<!-- ========================================================================= -->
+<A NAME="SFC_GET_MAX_ALL_CHANNELS"></A>
+<H2><BR><B>SFC_GET_MAX_ALL_CHANNELS</B></H2>
+<P>
+Retrieve the peak value for the file as stored in the file header.
+</P>
+<P>
+Parameters:
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_GET_SIGNAL_MAX
+        data     : A pointer to an array of doubles
+        datasize : sizeof (double) * number_of_channels
+</PRE>
+<P>
+Example:
+</P>
+<PRE>
+        double   peaks [number_of_channels] ;
+        sf_command (sndfile, SFC_GET_MAX_ALL_CHANNELS, peaks, sizeof (peaks)) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<DD>SF_TRUE if the file header contains per channel peak values for the file.
+		SF_FALSE otherwise.
+</DL>
 
 
 <!-- ========================================================================= -->
