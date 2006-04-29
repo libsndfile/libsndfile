@@ -212,20 +212,9 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 
-	if (sfinfo.format != filetype)
-	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
-		exit (1) ;
-		} ;
-
-	if (sfinfo.frames < DFT_DATA_LENGTH)
-	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), DFT_DATA_LENGTH) ;
-		exit (1) ;
-		} ;
-
-	if (sfinfo.channels != 1)
-	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
-		exit (1) ;
-		} ;
+	exit_if_true (sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+	exit_if_true (sfinfo.frames < DFT_DATA_LENGTH, "\n\nLine %d: Incorrect number of frames in file (too short). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), DFT_DATA_LENGTH) ;
+	exit_if_true (sfinfo.channels != 1, "\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
 
 	check_log_buffer_or_die (file, __LINE__) ;
 
@@ -238,8 +227,9 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 
 	snr = dft_cmp (__LINE__, double_data, test_data, DFT_DATA_LENGTH, target_snr, allow_exit) ;
 
-	if (snr < target_snr)
-		printf ("% 6.1fdB SNR ... ok\n", snr) ;
+	exit_if_true (snr > target_snr, "% 6.1fdB SNR\n\n    Error : should be better than % 6.1fdB\n\n", snr, target_snr) ;
+
+	printf ("% 6.1fdB SNR ... ok\n", snr) ;
 
 	unlink (filename) ;
 
@@ -273,20 +263,9 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 
-	if (sfinfo.format != filetype)
-	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
-		exit (1) ;
-		} ;
-
-	if (sfinfo.frames < DFT_DATA_LENGTH)
-	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), DFT_DATA_LENGTH) ;
-		exit (1) ;
-		} ;
-
-	if (sfinfo.channels != 1)
-	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
-		exit (1) ;
-		} ;
+	exit_if_true (sfinfo.format != filetype, "\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+	exit_if_true (sfinfo.frames < DFT_DATA_LENGTH, "\n\nLine %d: Incorrect number of frames in file (too short). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), DFT_DATA_LENGTH) ;
+	exit_if_true (sfinfo.channels != 1, "\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
 
 	check_log_buffer_or_die (file, __LINE__) ;
 
@@ -296,8 +275,9 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 
 	snr = dft_cmp (__LINE__, double_data, test_data, DFT_DATA_LENGTH, target_snr, allow_exit) ;
 
-	if (snr < target_snr)
-		printf ("% 6.1fdB SNR ... ok\n", snr) ;
+	exit_if_true (snr > target_snr, "% 6.1fdB SNR\n\n    Error : should be better than % 6.1fdB\n\n", snr, target_snr) ;
+
+	printf ("% 6.1fdB SNR ... ok\n", snr) ;
 
 	unlink (filename) ;
 

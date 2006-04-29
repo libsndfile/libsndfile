@@ -26,6 +26,9 @@
 
 [+ CASE (suffix) +]
 [+ ==  h  +]
+
+#include <stdarg.h>
+
 #define SF_COUNT_TO_LONG(x)	((long) (x))
 #define	ARRAY_LEN(x)		((int) (sizeof (x)) / (sizeof ((x) [0])))
 
@@ -46,6 +49,17 @@ void	check_file_hash_or_die	(const char *filename, unsigned int target_hash, int
 void	print_test_name (const char *test, const char *filename) ;
 
 void	dump_data_to_file (const char *filename, void *data, unsigned int datalen) ;
+
+static inline void
+exit_if_true (int test, const char *format, ...)
+{	if (test)
+	{	va_list	argptr ;
+		va_start (argptr, format) ;
+		vprintf (format, argptr) ;
+		va_end (argptr) ;
+		exit (1) ;
+		} ;
+} /* exit_if_true */
 
 /*
 **	Functions for saving two vectors of data in an ascii text file which
