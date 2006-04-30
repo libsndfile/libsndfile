@@ -3,6 +3,9 @@
     * configure.ac doc/(command|index|api).html NEWS README
     Updates for 1.0.16 release.
 
+    * src/sndfile.h.in
+    Define enums for channel mapping.
+
 2006-04-29 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/util.tpl
