@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.59)
 
-AC_INIT([libsndfile],[1.0.16],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.17pre1],[erikd@mega-nerd.com])
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
@@ -28,7 +28,7 @@ AC_LANG([C])
 #  6. If any interfaces have been removed since the last public release, then set age
 #     to 0.
 
-SHARED_VERSION_INFO="1:16:0"
+SHARED_VERSION_INFO="1:17:0"
 
 AC_PROG_CC
 AM_PROG_LIBTOOL
