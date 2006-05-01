@@ -2389,6 +2389,9 @@ psf_close (SF_PRIVATE *psf)
 	if (psf->instrument)
 		free (psf->instrument) ;
 
+	if (psf->channel_map)
+		free (psf->channel_map) ;
+
 	if (psf->format_desc)
 	{	memset (psf->format_desc, 0, strlen (psf->format_desc)) ;
 		free (psf->format_desc) ;

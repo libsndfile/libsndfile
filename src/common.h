@@ -278,6 +278,9 @@ typedef struct sf_private_tag
 	/* Broadcast (EBU) Info */
 	SF_BROADCAST_INFO *broadcast_info ;
 
+	/* Channel map data (if present) : an array of ints. */
+	int				*channel_map ;
+
 	sf_count_t		filelength ;	/* Overall length of (embedded) file. */
 	sf_count_t		fileoffset ;	/* Offset in number of bytes from beginning of file. */
 

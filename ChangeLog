@@ -1,3 +1,12 @@
+2006-05-01 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/command_test.c
+    Add channel map tests.
+
+    * src/common.h src/sndfile.c
+    Add a pointer the the SF_PRIVATE struct and make sure it gets freed when in
+    sf_close().
+
 2006-04-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac doc/(command|index|api).html NEWS README
