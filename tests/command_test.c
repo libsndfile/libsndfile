@@ -42,6 +42,7 @@ static	void	format_tests		(void) ;
 static	void	calc_peak_test		(int filetype, const char *filename) ;
 static	void	truncate_test		(const char *filename, int filetype) ;
 static	void	instrument_test		(const char *filename, int filetype) ;
+static	void	channel_map_test	(const char *filename, int filetype) ;
 static	void	broadcast_test		(const char *filename, int filetype) ;
 
 /* Force the start of this buffer to be double aligned. Sparc-solaris will
@@ -59,13 +60,14 @@ main (int argc, char *argv [])
 	if (argc != 2)
 	{	printf ("Usage : %s <test>\n", argv [0]) ;
 		printf ("    Where <test> is one of the following:\n") ;
-		printf ("           ver    - test sf_command (SFC_GETLIB_VERSION)\n") ;
-		printf ("           norm   - test floating point normalisation\n") ;
-		printf ("           format - test format string commands\n") ;
-		printf ("           peak   - test peak calculation\n") ;
-		printf ("           trunc  - test file truncation\n") ;
-		printf ("           inst   - test set/get of SF_INSTRUMENT.\n") ;
-		printf ("           all    - perform all tests\n") ;
+		printf ("           ver     - test sf_command (SFC_GETLIB_VERSION)\n") ;
+		printf ("           norm    - test floating point normalisation\n") ;
+		printf ("           format  - test format string commands\n") ;
+		printf ("           peak    - test peak calculation\n") ;
+		printf ("           trunc   - test file truncation\n") ;
+		printf ("           inst    - test set/get of SF_INSTRUMENT.\n") ;
+		printf ("           chanmap - test set/get of channel map data..\n") ;
+		printf ("           all     - perform all tests\n") ;
 		exit (1) ;
 		} ;
 
@@ -111,6 +113,13 @@ main (int argc, char *argv [])
 	if (do_all || strcmp (argv [1], "inst") == 0)
 	{	instrument_test ("instrument.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		instrument_test ("instrument.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
+		/*-instrument_test ("instrument.xi", SF_FORMAT_XI | SF_FORMAT_DPCM_16) ;-*/
+		test_count++ ;
+		} ;
+
+	if (do_all || strcmp (argv [1], "chanmap") == 0)
+	{	channel_map_test ("chanmap.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+		channel_map_test ("chanmap.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
 		/*-instrument_test ("instrument.xi", SF_FORMAT_XI | SF_FORMAT_DPCM_16) ;-*/
 		test_count++ ;
 		} ;
@@ -805,6 +814,64 @@ broadcast_test (const char *filename, int filetype)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* broadcast_test */
+
+static	void
+channel_map_test (const char *filename, int filetype)
+{	SNDFILE	 *file ;
+	SF_INFO	 sfinfo ;
+	int channel_map_read [4], channel_map_write [4] =
+	{	SF_CHANNEL_MAP_FRONT_LEFT, SF_CHANNEL_MAP_FRONT_CENTER,
+		SF_CHANNEL_MAP_REAR_LEFT, SF_CHANNEL_MAP_REAR_RIGHT
+		} ;
+
+	print_test_name ("channel_map_test", filename) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.samplerate	= 11025 ;
+	sfinfo.format		= filetype ;
+	sfinfo.channels		= ARRAY_LEN (channel_map_read) ;
+
+	/* Write file without channel map. */
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	/* Read file making sure no channel map exists. */
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	exit_if_true (
+		sf_command (file, SFC_GET_CHANNEL_MAP_INFO, channel_map_read, sizeof (channel_map_read)) != SF_FALSE,
+		"\n\nLine %d : sf_command (SFC_GET_CHANNEL_MAP_INFO) should have failed.\n\n", __LINE__
+		) ;
+	check_log_buffer_or_die (file, __LINE__) ;
+	sf_close (file) ;
+
+	/* Write file with a channel map. */
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	exit_if_true (
+		sf_command (file, SFC_SET_CHANNEL_MAP_INFO, channel_map_write, sizeof (channel_map_write)) == SF_FALSE,
+		"\n\nLine %d : sf_command (SFC_SET_CHANNEL_MAP_INFO) failed.\n\n", __LINE__
+		) ;
+	sf_close (file) ;
+
+	/* Read file making sure no channel map exists. */
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	exit_if_true (
+		sf_command (file, SFC_GET_CHANNEL_MAP_INFO, channel_map_read, sizeof (channel_map_read)) != SF_TRUE,
+		"\n\nLine %d : sf_command (SFC_GET_CHANNEL_MAP_INFO) failed.\n\n", __LINE__
+		) ;
+	check_log_buffer_or_die (file, __LINE__) ;
+	sf_close (file) ;
+
+	exit_if_true (
+		memcmp (channel_map_read, channel_map_write, sizeof (channel_map_read)) != 0,
+		"\n\nLine %d : Channel map read does not match channel map written.\n\n", __LINE__
+		) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* channel_map_test */
+
 
 /*
 ** Do not edit or modify anything in this comment block.
