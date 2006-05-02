@@ -1,6 +1,6 @@
 2006-05-02 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
-    * src/caf.c examples/sndfile-info.c
+    * src/caf.c src/double64.c examples/sndfile-info.c
     Fix a couple of signed/unsigned problems.
 
 2006-05-01 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>

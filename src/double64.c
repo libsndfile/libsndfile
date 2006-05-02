@@ -452,7 +452,7 @@ static int
 double64_get_capability	(SF_PRIVATE *psf)
 {	union
 	{	double			d ;
-		int				i [2] ;
+		unsigned int	i [2] ;
 		unsigned char	c [8] ;
 	} data ;
 
