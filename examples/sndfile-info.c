@@ -332,13 +332,13 @@ broadcast_dump (const char *filename)
 		return ;
 		} ;
 
-	printf ("Description      : %.*s\n", sizeof (bext.description), bext.description) ;
-	printf ("Originator       : %.*s\n", sizeof (bext.originator), bext.originator) ;
-	printf ("Origination ref  :  %.*s\n", sizeof (bext.originator_reference), bext.originator_reference) ;
-	printf ("Origination date : %.*s\n", sizeof (bext.origination_date), bext.origination_date) ;
-	printf ("Origination time : %.*s\n", sizeof (bext.origination_time), bext.origination_time) ;
+	printf ("Description      : %.*s\n", (int) sizeof (bext.description), bext.description) ;
+	printf ("Originator       : %.*s\n", (int) sizeof (bext.originator), bext.originator) ;
+	printf ("Origination ref  : %.*s\n", (int) sizeof (bext.originator_reference), bext.originator_reference) ;
+	printf ("Origination date : %.*s\n", (int) sizeof (bext.origination_date), bext.origination_date) ;
+	printf ("Origination time : %.*s\n", (int) sizeof (bext.origination_time), bext.origination_time) ;
 	printf ("BWF version      : %d\n", bext.version) ;
-	printf ("UMID             : %.*s\n", sizeof (bext.umid), bext.umid) ;
+	printf ("UMID             : %.*s\n", (int) sizeof (bext.umid), bext.umid) ;
 	printf ("Coding history   : %.*s\n", bext.coding_history_size, bext.coding_history) ;
 
 } /* broadcast_dump */

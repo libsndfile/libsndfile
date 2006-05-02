@@ -1,10 +1,15 @@
+2006-05-02 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/caf.c examples/sndfile-info.c
+    Fix a couple of signed/unsigned problems.
+
 2006-05-01 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/command_test.c
     Add channel map tests.
 
     * src/common.h src/sndfile.c
-    Add a pointer the the SF_PRIVATE struct and make sure it gets freed when in
+    Add a pointer the the SF_PRIVATE struct and make sure it gets freed in
     sf_close().
 
 2006-04-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>

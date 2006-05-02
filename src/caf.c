@@ -62,7 +62,7 @@
 #define MAC3_MARKER		MAKE_MARKER ('M', 'A', 'C', '3')
 #define MAC6_MARKER		MAKE_MARKER ('M', 'A', 'C', '6')
 
-#define CAF_PEAK_CHUNK_SIZE(ch) 	(sizeof (int) + ch * (sizeof (float) + 8))
+#define CAF_PEAK_CHUNK_SIZE(ch) 	((int) (sizeof (int) + ch * (sizeof (float) + 8)))
 
 #define SFE_CAF_NOT_CAF	666
 #define SFE_CAF_NO_DESC	667
@@ -269,7 +269,7 @@ caf_read_header (SF_PRIVATE *psf)
 	if (marker != desc_MARKER)
 		return SFE_CAF_NO_DESC ;
 
-	if (chunk_size < sizeof (DESC_CHUNK))
+	if (chunk_size < SIGNED_SIZEOF (DESC_CHUNK))
 	{	psf_log_printf (psf, "**** Chunk size too small. Should be > 32 bytes.\n") ;
 		return SFE_MALFORMED_FILE ;
 		} ;
@@ -282,7 +282,7 @@ caf_read_header (SF_PRIVATE *psf)
 			"  Frames / packet  : %u\n  Channels / frame : %u\n  Bits / channel   : %u\n",
 			desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.pkt_frames, desc.channels_per_frame, desc.bits_per_chan) ;
 
-	if (chunk_size > sizeof (DESC_CHUNK))
+	if (chunk_size > SIGNED_SIZEOF (DESC_CHUNK))
 		psf_binheader_readf (psf, "j", (int) (chunk_size - sizeof (DESC_CHUNK))) ;
 
 	psf->sf.channels = desc.channels_per_frame ;
