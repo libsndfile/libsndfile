@@ -106,10 +106,10 @@ vfwrite (const void *ptr, sf_count_t count, void *user_data)
 	**	This will break badly for files over 2Gig in length, but
 	**	is sufficient for testing.
 	*/
-	if (vf->offset >= sizeof (vf->data))
+	if (vf->offset >= SIGNED_SIZEOF (vf->data))
 		return 0 ;
 
-	if (vf->offset + count > sizeof (vf->data))
+	if (vf->offset + count > SIGNED_SIZEOF (vf->data))
 		count = sizeof (vf->data) - vf->offset ;
 
 	memcpy (vf->data + vf->offset, ptr, (size_t) count) ;

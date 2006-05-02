@@ -31,6 +31,7 @@
 
 #define SF_COUNT_TO_LONG(x)	((long) (x))
 #define	ARRAY_LEN(x)		((int) (sizeof (x)) / (sizeof ((x) [0])))
+#define SIGNED_SIZEOF(x)	((int64_t) (sizeof (x)))
 
 #define	PIPE_INDEX(x)	((x) + 500)
 #define	PIPE_TEST_LEN	12345
@@ -138,7 +139,6 @@ void	test_seek_or_die
 #define	M_PI		3.14159265358979323846264338
 #endif
 
-#define SIGNED_SIZEOF(x)	((int) (sizeof (x)))
 #define	LOG_BUFFER_SIZE		2048
 
 [+ FOR float_type +]
