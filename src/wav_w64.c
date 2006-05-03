@@ -327,7 +327,7 @@ wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat)
 {
 	psf_binheader_writef (psf, "422b", subformat->esf_field1,
 					subformat->esf_field2, subformat->esf_field3,
-					subformat->esf_field4, 8) ;
+					subformat->esf_field4, make_size_t (8)) ;
 } /* wavex_write_guid */
 
 
