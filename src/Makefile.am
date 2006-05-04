@@ -53,7 +53,7 @@ check: test_endswap test_file_io test_log_printf
 	@echo
 	@echo
 	@echo "============================================================"
-	@if [ -x /usr/bin/python2.4 ]; then ./binheader_writef_check.py *.c ; fi
+	@if [ -x /usr/bin/python2.4 ]; then $(srcdir)/binheader_writef_check.py $(srcdir)/*.c ; fi
 	./test_endswap
 	./test_file_io
 	./test_log_printf
