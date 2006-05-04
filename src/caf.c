@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2005, 2006 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -398,7 +398,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_binheader_writef (psf, "Em8", desc_MARKER, (sf_count_t) (sizeof (DESC_CHUNK))) ;
 
  	double64_be_write (1.0 * psf->sf.samplerate, psf->u.ucbuf) ;
-	psf_binheader_writef (psf, "b", psf->u.ucbuf, 8) ;
+	psf_binheader_writef (psf, "b", psf->u.ucbuf, make_size_t (8)) ;
 
 	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 

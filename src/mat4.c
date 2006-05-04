@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -177,15 +177,15 @@ mat4_write_header (SF_PRIVATE *psf, int calc_length)
 
 	if (psf->endian == SF_ENDIAN_BIG)
 	{	psf_binheader_writef (psf, "Em444", MAT4_BE_DOUBLE, 1, 1, 0) ;
-		psf_binheader_writef (psf, "E4bd", 11, "samplerate", 11, samplerate) ;
+		psf_binheader_writef (psf, "E4bd", 11, "samplerate", make_size_t (11), samplerate) ;
 		psf_binheader_writef (psf, "tEm484", encoding, psf->sf.channels, psf->sf.frames, 0) ;
-		psf_binheader_writef (psf, "E4b", 9, "wavedata", 9) ;
+		psf_binheader_writef (psf, "E4b", 9, "wavedata", make_size_t (9)) ;
 		}
 	else if (psf->endian == SF_ENDIAN_LITTLE)
 	{	psf_binheader_writef (psf, "em444", MAT4_LE_DOUBLE, 1, 1, 0) ;
-		psf_binheader_writef (psf, "e4bd", 11, "samplerate", 11, samplerate) ;
+		psf_binheader_writef (psf, "e4bd", 11, "samplerate", make_size_t (11), samplerate) ;
 		psf_binheader_writef (psf, "tem484", encoding, psf->sf.channels, psf->sf.frames, 0) ;
-		psf_binheader_writef (psf, "e4b", 9, "wavedata", 9) ;
+		psf_binheader_writef (psf, "e4b", 9, "wavedata", make_size_t (9)) ;
 		}
 	else
 		return SFE_BAD_OPEN_FORMAT ;

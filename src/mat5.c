@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -208,18 +208,18 @@ mat5_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_binheader_writef (psf, "bb", filename, strlen (filename), psf->u.cbuf, strlen (psf->u.cbuf) + 1) ;
 
 	memset (psf->u.scbuf, ' ', 124 - psf->headindex) ;
-	psf_binheader_writef (psf, "b", psf->u.scbuf, 124 - psf->headindex) ;
+	psf_binheader_writef (psf, "b", psf->u.scbuf, make_size_t (124 - psf->headindex)) ;
 
 	psf->rwf_endian = psf->endian ;
 
 	if (psf->rwf_endian == SF_ENDIAN_BIG)
-		psf_binheader_writef (psf, "2b", 0x0100, "MI", 2) ;
+		psf_binheader_writef (psf, "2b", 0x0100, "MI", make_size_t (2)) ;
 	else
-		psf_binheader_writef (psf, "2b", 0x0100, "IM", 2) ;
+		psf_binheader_writef (psf, "2b", 0x0100, "IM", make_size_t (2)) ;
 
 	psf_binheader_writef (psf, "444444", MAT5_TYPE_ARRAY, 64, MAT5_TYPE_UINT32, 8, 6, 0) ;
 	psf_binheader_writef (psf, "4444", MAT5_TYPE_INT32, 8, 1, 1) ;
-	psf_binheader_writef (psf, "44b", MAT5_TYPE_SCHAR, strlen (sr_name), sr_name, 16) ;
+	psf_binheader_writef (psf, "44b", MAT5_TYPE_SCHAR, strlen (sr_name), sr_name, make_size_t (16)) ;
 
 	if (psf->sf.samplerate > 0xFFFF)
 		psf_binheader_writef (psf, "44", MAT5_TYPE_COMP_UINT, psf->sf.samplerate) ;

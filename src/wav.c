@@ -1619,7 +1619,7 @@ wav_write_bext_chunk (SF_PRIVATE *psf)
 	psf_binheader_writef (psf, "z", make_size_t (190)) ;
 
 	if (b->coding_history_size > 0)
-		psf_binheader_writef (psf, "b", b->coding_history, b->coding_history_size) ;
+		psf_binheader_writef (psf, "b", b->coding_history, make_size_t (b->coding_history_size)) ;
 
 	return 0 ;
 } /* wav_write_bext_chunk */

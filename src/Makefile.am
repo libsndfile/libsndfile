@@ -10,7 +10,7 @@ OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 
 EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 			Symbols.linux Symbols.darwin libsndfile.def cygsndfile.def \
-			create_symbols_file.py
+			create_symbols_file.py binheader_writef_check.py
 
 noinst_HEADERS = common.h sfconfig.h sfendian.h float_cast.h wav_w64.h sf_unistd.h
 
@@ -53,6 +53,7 @@ check: test_endswap test_file_io test_log_printf
 	@echo
 	@echo
 	@echo "============================================================"
+	@if [ -x /usr/bin/python ]; then ./binheader_writef_check.py *.c ; fi
 	./test_endswap
 	./test_file_io
 	./test_log_printf

@@ -1,3 +1,14 @@
+2006-05-04 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/binhead_check.py
+    New file to check for bad parameters passed to psf_binheader_writef().
+
+    * src/Makefile.am
+    Hook into test suite.
+
+    * src/voc.c src/caf.c src/wav.c src/mat5.c src/mat4.c
+    Fix bugs found by new test program.
+
 2006-05-03 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav_w64.c
