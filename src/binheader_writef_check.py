@@ -96,7 +96,7 @@ def handle_file (fname):
 #===============================================================================
 
 if len (sys.argv) > 1:
-	print "%s\n    binheader_writef_check   : " % sys.argv [0],
+	print "%s\n    binheader_writef_check   :" % sys.argv [0],
 	sys.stdout.flush ()
 	errors = 0
 	for fname in sys.argv [1:]:
