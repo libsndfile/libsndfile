@@ -452,7 +452,6 @@ static int
 double64_get_capability	(SF_PRIVATE *psf)
 {	union
 	{	double			d ;
-		unsigned int	i [2] ;
 		unsigned char	c [8] ;
 	} data ;
 
@@ -460,13 +459,13 @@ double64_get_capability	(SF_PRIVATE *psf)
 
 	if (! psf->ieee_replace)
 	{	/* If this test is true ints and floats are compatible and little endian. */
-		if (data.i [0] == 0x428c59fb && data.i [1] == 0x3ff3c0ca &&
-			data.c [0] == 0xfb && data.c [2] == 0x8c && data.c [4] == 0xca && data.c [6] == 0xf3)
+		if (data.c [0] == 0xfb && data.c [1] == 0x59 && data.c [2] == 0x8c && data.c [3] == 0x42 &&
+			data.c [4] == 0xca && data.c [5] == 0xc0 && data.c [6] == 0xf3 && data.c [7] == 0x3f)
 			return DOUBLE_CAN_RW_LE ;
 
 		/* If this test is true ints and floats are compatible and big endian. */
-		if ((data.i [0] == 0x3ff3c0ca && data.i [1] == 0x428c59fb) &&
-			(data.c [0] == 0x3f && data.c [2] == 0xc0 && data.c [4] == 0x42 && data.c [6] == 0x59))
+		if (data.c [0] == 0x3f && data.c [1] == 0xf3 && data.c [2] == 0xc0 && data.c [3] == 0xca &&
+			data.c [4] == 0x42 && data.c [5] == 0x8c && data.c [6] == 0x59 && data.c [7] == 0xfb)
 			return DOUBLE_CAN_RW_BE ;
 		} ;
 

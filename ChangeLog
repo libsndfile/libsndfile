@@ -9,6 +9,9 @@
     * src/voc.c src/caf.c src/wav.c src/mat5.c src/mat4.c
     Fix bugs found by new test program.
 
+    * src/double64.c
+    Clean up double64_get_capability().
+
 2006-05-03 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav_w64.c
