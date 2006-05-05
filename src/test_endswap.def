@@ -3,19 +3,19 @@ autogen definitions test_endswap.tpl;
 int_type = {
 	name		= short ;
 	value		= 0x3210 ;
-	format		= "0x%04x" ;
+	format		= FMT_SHORT ;
 	} ;
 
 int_type = {
 	name		= int ;
 	value		= 0x76543210 ;
-	format		= "0x%08x" ;
+	format		= FMT_INT ;
 	} ;
 
 int_type = {
 	name		= int64_t ;
 	value		= "0x0807050540302010LL" ;
-	format		= "0x%016llx" ;
+	format		= FMT_INT64 ;
 	} ;
 
 /*

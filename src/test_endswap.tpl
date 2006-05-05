@@ -32,6 +32,15 @@
 #include "common.h"
 #include "sfendian.h"
 
+#define	FMT_SHORT	"0x%04x\n"
+#define	FMT_INT		"0x%08x\n"
+
+#if SIZEOF_INT64_T == SIZEOF_LONG
+#define	FMT_INT64	"0x%016lx\n"
+#else
+#define	FMT_INT64	"0x%016llx\n"
+#endif
+
 [+ FOR int_type
 +]static void test_endswap_[+ (get "name") +] (void) ;
 [+ ENDFOR int_type
@@ -51,14 +60,14 @@ main (void)
 ** Actual test functions.
 */
 
-[+ FOR int_type
-+]static void
+[+ FOR int_type +]
+static void
 dump_[+ (get "name") +]_array (const char * name, [+ (get "name") +] * data, int datalen)
 {	int k ;
 
 	printf ("%-6s : ", name) ;
 	for (k = 0 ; k < datalen ; k++)
-		printf ("[+ (get "format") +] ", data [k]) ;
+		printf ([+ (get "format") +], data [k]) ;
 	putchar ('\n') ;
 } /* dump_[+ (get "name") +]_array */
 

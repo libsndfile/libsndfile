@@ -1,3 +1,8 @@
+2006-05-05 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/test_endswap.(def|tpl)
+    Fix printf formatting for int64_t on 64 bit machines.
+
 2006-05-04 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/binhead_check.py
