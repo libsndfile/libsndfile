@@ -224,7 +224,7 @@ AC_DEFINE_UNQUOTED(CPU_IS_LITTLE_ENDIAN, ${ac_cv_c_little_endian},
 
 AC_CHECK_FUNCS(malloc calloc realloc free)
 AC_CHECK_FUNCS(open read write lseek pread pwrite)
-AC_CHECK_FUNCS(fstat ftruncate fsync fdatasync)
+AC_CHECK_FUNCS(fstat ftruncate fsync)
 AC_CHECK_FUNCS(snprintf vsnprintf)
 AC_CHECK_FUNCS(gmtime gmtime_r)
 AC_CHECK_FUNCS(mmap getpagesize)
