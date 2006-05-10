@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-EXTRA_DIST = README-precompiled-dll.txt
+EXTRA_DIST = README-precompiled-dll.txt testprog.c
 
 ## Do not edit or modify anything in this comment block.
 ## The arch-tag line is a file identity tag for the GNU Arch 

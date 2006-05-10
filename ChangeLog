@@ -1,3 +1,16 @@
+2006-05-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Win32/testprog.c Win32/Makefile.am
+    Add a minimal win32 test program.
+
+    * Win32/README-precompiled-dll.txt Mingw-make-dist.sh
+    Update readme and Mingw build script.
+
+2006-05-09 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac acinclude.m4
+    Minor fixes for Solaris.
+
 2006-05-05 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/test_endswap.(def|tpl)
@@ -27,7 +40,7 @@
 2006-05-02 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/caf.c src/double64.c examples/sndfile-info.c tests/virtual_io_test.c
-			tests/utils.tpl
+            tests/utils.tpl
     Fix a couple of signed/unsigned problems.
 
 2006-05-01 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>

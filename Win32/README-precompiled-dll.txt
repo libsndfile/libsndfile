@@ -8,14 +8,15 @@ This can be achieved as follows:
 
   1) In a CMD window, change to the directory containing this file and
      run the command:
-	 
-	      dumpbin /exports libsndfile-1.dll > libsndfile.def
 
-  2) Now run the command:
-  
-          lib /machine:i386 /def:libsndfile.def
+          lib /machine:i386 /def:libsndfile-1.def
 
-You now have a .LIB and a .DLL file to be used with VisualStudio.
+You now have two files:
+
+        libsndfile-1.dll
+        libsndfile-1.lib
+
+to be used with VisualStudio.
 
 If for some reason these instructions don't work for you or you are still
 not able to use the libsndfile DLL with you project, please do not contact
