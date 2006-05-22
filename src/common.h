@@ -300,6 +300,14 @@ typedef struct sf_private_tag
 	sf_count_t		read_current ;
 	sf_count_t		write_current ;
 
+	void			*container_data ;	/*	This is a pointer to dynamically allocated file
+										**	container format specific data.
+										*/
+
+	void			*codec_data ;		/*	This is a pointer to dynamically allocated file
+										**	codec format specific data.
+										*/
+
 	void			*fdata ;		/*	This is a pointer to dynamically allocated file format
 									**	specific data.
 									*/

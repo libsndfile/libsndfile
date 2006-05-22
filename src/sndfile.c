@@ -2371,6 +2371,12 @@ psf_close (SF_PRIVATE *psf)
 	if (psf->fdata)
 		free (psf->fdata) ;
 
+	if (psf->container_data)
+		free (psf->container_data) ;
+
+	if (psf->codec_data)
+		free (psf->codec_data) ;
+
 	if (psf->interleave)
 		free (psf->interleave) ;
 
