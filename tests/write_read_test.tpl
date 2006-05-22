@@ -82,11 +82,7 @@ main (int argc, char **argv)
 	do_all = !strcmp (argv [1], "all") ;
 
 	if (do_all || ! strcmp (argv [1], "wav"))
-	{	empty_file_test ("empty_char.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_U8) ;
-		empty_file_test ("empty_short.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
-		empty_file_test ("empty_float.wav", SF_FORMAT_WAV | SF_FORMAT_FLOAT) ;
-
-		pcm_test_char	("char.wav"		, SF_FORMAT_WAV | SF_FORMAT_PCM_U8, SF_FALSE) ;
+	{	pcm_test_char	("char.wav"		, SF_FORMAT_WAV | SF_FORMAT_PCM_U8, SF_FALSE) ;
 		pcm_test_short	("short.wav"	, SF_FORMAT_WAV | SF_FORMAT_PCM_16, SF_FALSE) ;
 		pcm_test_24bit	("24bit.wav"	, SF_FORMAT_WAV | SF_FORMAT_PCM_24, SF_FALSE) ;
 		pcm_test_int	("int.wav"		, SF_FORMAT_WAV | SF_FORMAT_PCM_32, SF_FALSE) ;
@@ -109,15 +105,16 @@ main (int argc, char **argv)
 		pcm_test_float	("float.wavex"	, SF_FORMAT_WAVEX | SF_FORMAT_FLOAT , SF_FALSE) ;
 		pcm_test_double	("double.wavex"	, SF_FORMAT_WAVEX | SF_FORMAT_DOUBLE, SF_FALSE) ;
 		/* Lite remove end */
+
+		empty_file_test ("empty_char.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_U8) ;
+		empty_file_test ("empty_short.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+		empty_file_test ("empty_float.wav", SF_FORMAT_WAV | SF_FORMAT_FLOAT) ;
+
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "aiff"))
-	{	empty_file_test ("empty_char.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_U8) ;
-		empty_file_test ("empty_short.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_16) ;
-		empty_file_test ("empty_float.aiff", SF_FORMAT_AIFF | SF_FORMAT_FLOAT) ;
-
-		pcm_test_char	("char_u8.aiff"	, SF_FORMAT_AIFF | SF_FORMAT_PCM_U8, SF_FALSE) ;
+	{	pcm_test_char	("char_u8.aiff"	, SF_FORMAT_AIFF | SF_FORMAT_PCM_U8, SF_FALSE) ;
 		pcm_test_char	("char_s8.aiff"	, SF_FORMAT_AIFF | SF_FORMAT_PCM_S8, SF_FALSE) ;
 		pcm_test_short	("short.aiff"	, SF_FORMAT_AIFF | SF_FORMAT_PCM_16, SF_FALSE) ;
 		pcm_test_24bit	("24bit.aiff"	, SF_FORMAT_AIFF | SF_FORMAT_PCM_24, SF_FALSE) ;
@@ -138,6 +135,11 @@ main (int argc, char **argv)
 		pcm_test_float	("float.aifc"	, SF_FORMAT_AIFF | SF_FORMAT_FLOAT , SF_FALSE) ;
 		pcm_test_double	("double.aifc"	, SF_FORMAT_AIFF | SF_FORMAT_DOUBLE, SF_FALSE) ;
 		/* Lite remove end */
+
+		empty_file_test ("empty_char.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_U8) ;
+		empty_file_test ("empty_short.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_16) ;
+		empty_file_test ("empty_float.aiff", SF_FORMAT_AIFF | SF_FORMAT_FLOAT) ;
+
 		test_count++ ;
 		} ;
 
@@ -215,11 +217,12 @@ main (int argc, char **argv)
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "svx"))
-	{	empty_file_test ("empty_char.svx", SF_FORMAT_SVX | SF_FORMAT_PCM_S8) ;
+	{	pcm_test_char	("char.svx" , SF_FORMAT_SVX | SF_FORMAT_PCM_S8, SF_FALSE) ;
+		pcm_test_short	("short.svx", SF_FORMAT_SVX | SF_FORMAT_PCM_16, SF_FALSE) ;
+
+		empty_file_test ("empty_char.svx", SF_FORMAT_SVX | SF_FORMAT_PCM_S8) ;
 		empty_file_test ("empty_short.svx", SF_FORMAT_SVX | SF_FORMAT_PCM_16) ;
 
-		pcm_test_char	("char.svx" , SF_FORMAT_SVX | SF_FORMAT_PCM_S8, SF_FALSE) ;
-		pcm_test_short	("short.svx", SF_FORMAT_SVX | SF_FORMAT_PCM_16, SF_FALSE) ;
 		test_count++ ;
 		} ;
 
@@ -230,6 +233,7 @@ main (int argc, char **argv)
 		pcm_test_24bit	("24bit_be.nist", SF_ENDIAN_BIG		| SF_FORMAT_NIST | SF_FORMAT_PCM_24, SF_FALSE) ;
 		pcm_test_int	("int_le.nist"	, SF_ENDIAN_LITTLE	| SF_FORMAT_NIST | SF_FORMAT_PCM_32, SF_FALSE) ;
 		pcm_test_int 	("int_be.nist"	, SF_ENDIAN_BIG		| SF_FORMAT_NIST | SF_FORMAT_PCM_32, SF_FALSE) ;
+
 		test_count++ ;
 		} ;
 
@@ -240,6 +244,7 @@ main (int argc, char **argv)
 		pcm_test_int 	("int_le.ircam"		, SF_ENDIAN_LITTLE	| SF_FORMAT_IRCAM | SF_FORMAT_PCM_32, SF_FALSE) ;
 		pcm_test_float	("float_be.ircam"	, SF_ENDIAN_BIG	| SF_FORMAT_IRCAM | SF_FORMAT_FLOAT , SF_FALSE) ;
 		pcm_test_float	("float_le.ircam"	, SF_ENDIAN_LITTLE	| SF_FORMAT_IRCAM | SF_FORMAT_FLOAT , SF_FALSE) ;
+
 		test_count++ ;
 		} ;
 
@@ -251,10 +256,7 @@ main (int argc, char **argv)
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "mat4"))
-	{	empty_file_test ("empty_short.mat4", SF_FORMAT_MAT4 | SF_FORMAT_PCM_16) ;
-		empty_file_test ("empty_float.mat4", SF_FORMAT_MAT4 | SF_FORMAT_FLOAT) ;
-
-		pcm_test_short	("short_be.mat4"	, SF_ENDIAN_BIG	| SF_FORMAT_MAT4 | SF_FORMAT_PCM_16, SF_FALSE) ;
+	{	pcm_test_short	("short_be.mat4"	, SF_ENDIAN_BIG	| SF_FORMAT_MAT4 | SF_FORMAT_PCM_16, SF_FALSE) ;
 		pcm_test_short	("short_le.mat4"	, SF_ENDIAN_LITTLE	| SF_FORMAT_MAT4 | SF_FORMAT_PCM_16, SF_FALSE) ;
 		pcm_test_int	("int_be.mat4"		, SF_ENDIAN_BIG	| SF_FORMAT_MAT4 | SF_FORMAT_PCM_32, SF_FALSE) ;
 		pcm_test_int 	("int_le.mat4"		, SF_ENDIAN_LITTLE	| SF_FORMAT_MAT4 | SF_FORMAT_PCM_32, SF_FALSE) ;
@@ -262,17 +264,14 @@ main (int argc, char **argv)
 		pcm_test_float	("float_le.mat4"	, SF_ENDIAN_LITTLE	| SF_FORMAT_MAT4 | SF_FORMAT_FLOAT , SF_FALSE) ;
 		pcm_test_double	("double_be.mat4"	, SF_ENDIAN_BIG	| SF_FORMAT_MAT4 | SF_FORMAT_DOUBLE, SF_FALSE) ;
 		pcm_test_double	("double_le.mat4"	, SF_ENDIAN_LITTLE	| SF_FORMAT_MAT4 | SF_FORMAT_DOUBLE, SF_FALSE) ;
+
+		empty_file_test ("empty_short.mat4", SF_FORMAT_MAT4 | SF_FORMAT_PCM_16) ;
+		empty_file_test ("empty_float.mat4", SF_FORMAT_MAT4 | SF_FORMAT_FLOAT) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "mat5"))
-	{	increment_open_file_count () ;
-
-		empty_file_test ("empty_char.mat5", SF_FORMAT_MAT5 | SF_FORMAT_PCM_U8) ;
-		empty_file_test ("empty_short.mat5", SF_FORMAT_MAT5 | SF_FORMAT_PCM_16) ;
-		empty_file_test ("empty_float.mat5", SF_FORMAT_MAT5 | SF_FORMAT_FLOAT) ;
-
-		pcm_test_char 	("char_be.mat5"		, SF_ENDIAN_BIG	| SF_FORMAT_MAT5 | SF_FORMAT_PCM_U8, SF_FALSE) ;
+	{	pcm_test_char 	("char_be.mat5"		, SF_ENDIAN_BIG	| SF_FORMAT_MAT5 | SF_FORMAT_PCM_U8, SF_FALSE) ;
 		pcm_test_char 	("char_le.mat5"		, SF_ENDIAN_LITTLE	| SF_FORMAT_MAT5 | SF_FORMAT_PCM_U8, SF_FALSE) ;
 		pcm_test_short	("short_be.mat5"	, SF_ENDIAN_BIG	| SF_FORMAT_MAT5 | SF_FORMAT_PCM_16, SF_FALSE) ;
 		pcm_test_short	("short_le.mat5"	, SF_ENDIAN_LITTLE	| SF_FORMAT_MAT5 | SF_FORMAT_PCM_16, SF_FALSE) ;
@@ -282,6 +281,13 @@ main (int argc, char **argv)
 		pcm_test_float	("float_le.mat5"	, SF_ENDIAN_LITTLE	| SF_FORMAT_MAT5 | SF_FORMAT_FLOAT , SF_FALSE) ;
 		pcm_test_double	("double_be.mat5"	, SF_ENDIAN_BIG	| SF_FORMAT_MAT5 | SF_FORMAT_DOUBLE, SF_FALSE) ;
 		pcm_test_double	("double_le.mat5"	, SF_ENDIAN_LITTLE	| SF_FORMAT_MAT5 | SF_FORMAT_DOUBLE, SF_FALSE) ;
+
+		increment_open_file_count () ;
+
+		empty_file_test ("empty_char.mat5", SF_FORMAT_MAT5 | SF_FORMAT_PCM_U8) ;
+		empty_file_test ("empty_short.mat5", SF_FORMAT_MAT5 | SF_FORMAT_PCM_16) ;
+		empty_file_test ("empty_float.mat5", SF_FORMAT_MAT5 | SF_FORMAT_FLOAT) ;
+
 		test_count++ ;
 		} ;
 
@@ -306,11 +312,7 @@ main (int argc, char **argv)
 	/* Lite remove end */
 
 	if (do_all || ! strcmp (argv [1], "w64"))
-	{	empty_file_test ("empty_char.w64", SF_FORMAT_W64 | SF_FORMAT_PCM_U8) ;
-		empty_file_test ("empty_short.w64", SF_FORMAT_W64 | SF_FORMAT_PCM_16) ;
-		empty_file_test ("empty_float.w64", SF_FORMAT_W64 | SF_FORMAT_FLOAT) ;
-
-		pcm_test_char	("char.w64"		, SF_FORMAT_W64 | SF_FORMAT_PCM_U8, SF_FALSE) ;
+	{	pcm_test_char	("char.w64"		, SF_FORMAT_W64 | SF_FORMAT_PCM_U8, SF_FALSE) ;
 		pcm_test_short	("short.w64"	, SF_FORMAT_W64 | SF_FORMAT_PCM_16, SF_FALSE) ;
 		pcm_test_24bit	("24bit.w64"	, SF_FORMAT_W64 | SF_FORMAT_PCM_24, SF_FALSE) ;
 		pcm_test_int	("int.w64"		, SF_FORMAT_W64 | SF_FORMAT_PCM_32, SF_FALSE) ;
@@ -318,6 +320,11 @@ main (int argc, char **argv)
 		pcm_test_float	("float.w64"	, SF_FORMAT_W64 | SF_FORMAT_FLOAT , SF_FALSE) ;
 		pcm_test_double	("double.w64"	, SF_FORMAT_W64 | SF_FORMAT_DOUBLE, SF_FALSE) ;
 		/* Lite remove end */
+
+		empty_file_test ("empty_char.w64", SF_FORMAT_W64 | SF_FORMAT_PCM_U8) ;
+		empty_file_test ("empty_short.w64", SF_FORMAT_W64 | SF_FORMAT_PCM_16) ;
+		empty_file_test ("empty_float.w64", SF_FORMAT_W64 | SF_FORMAT_FLOAT) ;
+
 		test_count++ ;
 		} ;
 
