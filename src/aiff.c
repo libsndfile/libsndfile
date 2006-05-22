@@ -103,8 +103,10 @@
 enum
 {	HAVE_FORM		= 0x01,
 	HAVE_AIFF		= 0x02,
-	HAVE_COMM		= 0x04,
-	HAVE_SSND		= 0x08
+	HAVE_AIFC		= 0x04,
+	HAVE_FVER		= 0x08,
+	HAVE_COMM		= 0x10,
+	HAVE_SSND		= 0x20
 } ;
 
 typedef struct
@@ -169,6 +171,11 @@ typedef struct
 	unsigned int	position ;
 } MARK_ID_POS ;
 
+typedef struct
+{	sf_count_t	comm_offset ;
+	sf_count_t	ssnd_offset ;
+} AIFF_PRIVATE ;
+
 /*------------------------------------------------------------------------------
  * Private static functions.
  */
@@ -208,6 +215,9 @@ aiff_open (SF_PRIVATE *psf)
 	memset (&comm_fmt, 0, sizeof (comm_fmt)) ;
 
 	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+
+	if ((psf->container_data = calloc (1, sizeof (AIFF_PRIVATE))) == NULL)
+		return SFE_MALLOC_FAILED ;
 
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = aiff_read_header (psf, &comm_fmt)))
@@ -344,10 +354,17 @@ static int
 aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 {	SSND_CHUNK	ssnd_fmt ;
 	MARK_ID_POS *markstr = NULL ;
+	AIFF_PRIVATE *paiff ;
 	unsigned	marker, dword, FORMsize, SSNDsize, bytesread ;
 	int			k, found_chunk = 0, done = 0, error = 0 ;
 	char		*cptr, byte ;
 	int			instr_found = 0, mark_found = 0, mark_count = 0 ;
+
+	if ((paiff = psf->container_data) == NULL)
+		return SFE_INTERNAL ;
+
+	paiff->comm_offset = 0 ;
+	paiff->ssnd_offset = 0 ;
 
 	/* Set position to start of file to begin reading header. */
 	psf_binheader_readf (psf, "p", 0) ;
@@ -394,10 +411,11 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					if ((found_chunk & HAVE_FORM) == 0)
 						return SFE_AIFF_AIFF_NO_FORM ;
 					psf_log_printf (psf, " %M\n", marker) ;
-					found_chunk |= HAVE_AIFF ;
+					found_chunk |= (marker == AIFC_MARKER) ? (HAVE_AIFC | HAVE_AIFF) : HAVE_AIFF ;
 					break ;
 
 			case COMM_MARKER :
+					paiff->comm_offset = psf_ftell (psf) - 4 ;
 					error = aiff_read_comm_chunk (psf, comm_fmt) ;
 
 					psf->sf.samplerate = tenbytefloat2int (comm_fmt->sampleRate) ;
@@ -457,6 +475,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case SSND_MARKER :
+					if ((found_chunk & HAVE_AIFC) && (found_chunk & HAVE_FVER) == 0)
+						psf_log_printf (psf, "*** Valid AIFC files should have an FVER chunk.\n") ;
+			
+					paiff->ssnd_offset = psf_ftell (psf) - 4 ;
 					psf_binheader_readf (psf, "E444", &SSNDsize, &(ssnd_fmt.offset), &(ssnd_fmt.blocksize)) ;
 
 					psf->datalength = SSNDsize - sizeof (ssnd_fmt) ;
@@ -715,6 +737,9 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case FVER_MARKER :
+					found_chunk |= HAVE_FVER ;
+					/* Fall through to next case. */
+
 			case SFX_MARKER :
 					psf_binheader_readf (psf, "E4", &dword) ;
 					psf_log_printf (psf, " %M : %d\n", marker, dword) ;
@@ -791,7 +816,6 @@ aiff_close (SF_PRIVATE *psf)
 {
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	aiff_write_tailer (psf) ;
-
 		aiff_write_header (psf, SF_TRUE) ;
 		} ;
 
@@ -834,11 +858,10 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 	psf_log_printf (psf, " COMM : %d\n", comm_fmt->size) ;
 	psf_log_printf (psf, "  Sample Rate : %d\n", tenbytefloat2int (comm_fmt->sampleRate)) ;
-	psf_log_printf (psf, "  Frames      : %u%s\n", comm_fmt->numSampleFrames, (comm_fmt->numSampleFrames == 0 && psf->filelength > 100) ? " (Should not be 0)" : "") ;
+	psf_log_printf (psf, "  Frames      : %u%s\n", comm_fmt->numSampleFrames, (comm_fmt->numSampleFrames == 0 && psf->filelength > 104) ? " (Should not be 0)" : "") ;
 	psf_log_printf (psf, "  Channels    : %d\n", comm_fmt->numChannels) ;
 
-	/*      Found some broken 'fl32' files with comm.samplesize == 16. Fix it here. */
-
+	/* Found some broken 'fl32' files with comm.samplesize == 16. Fix it here. */
 	if ((comm_fmt->encoding == fl32_MARKER || comm_fmt->encoding == FL32_MARKER) && comm_fmt->sampleSize != 32)
 	{	psf_log_printf (psf, "  Sample Size : %d (should be 32)\n", comm_fmt->sampleSize) ;
 		comm_fmt->sampleSize = 32 ;
@@ -941,10 +964,14 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 static int
 aiff_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t		current ;
+	AIFF_PRIVATE	*paiff ;
 	unsigned char	comm_sample_rate [10], comm_zero_bytes [2] = { 0, 0 } ;
 	unsigned int	comm_type, comm_size, comm_encoding, comm_frames ;
 	int				k, endian ;
 	short			bit_width ;
+
+	if ((paiff = psf->container_data) == NULL)
+		return SFE_INTERNAL ;
 
 	current = psf_ftell (psf) ;
 
@@ -975,14 +1002,14 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 
 		/* Now write frame count field of COMM chunk header. */
 		psf->headindex = 0 ;
-		psf_fseek (psf, 22, SEEK_SET) ;
+		psf_fseek (psf, paiff->comm_offset + 10, SEEK_SET) ;
 
 		psf_binheader_writef (psf, "Et8", psf->sf.frames) ;
 		psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 
 		/* Now write new SSND chunk header. */
 		psf->headindex = 0 ;
-		psf_fseek (psf, psf->dataoffset - 16, SEEK_SET) ;
+		psf_fseek (psf, paiff->ssnd_offset, SEEK_SET) ;
 
 		psf_binheader_writef (psf, "Etm8", SSND_MARKER, psf->datalength + SIZEOF_SSND_CHUNK) ;
 		psf_fwrite (psf->header, psf->headindex, 1, psf) ;
@@ -1128,8 +1155,14 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 
 	psf_binheader_writef (psf, "Etm8", FORM_MARKER, psf->filelength - 8) ;
 
-	/* Write COMM chunk. */
-	psf_binheader_writef (psf, "Emm4", comm_type, COMM_MARKER, comm_size) ;
+	/* Write AIFF/AIFC marker and COM chunk. */
+	if (comm_type == AIFC_MARKER)
+		/* AIFC must have an FVER chunk. */
+		psf_binheader_writef (psf, "Emm44m4", comm_type, FVER_MARKER, 4, 0xA2805140, COMM_MARKER, comm_size) ;
+	else
+		psf_binheader_writef (psf, "Emm4", comm_type, COMM_MARKER, comm_size) ;
+
+	paiff->comm_offset = psf->headindex - 8 ;
 
 	memset (comm_sample_rate, 0, sizeof (comm_sample_rate)) ;
 	uint2tenbytefloat (psf->sf.samplerate, comm_sample_rate) ;
@@ -1211,6 +1244,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	/* Write SSND chunk. */
+	paiff->ssnd_offset = psf->headindex ;
 	psf_binheader_writef (psf, "Etm844", SSND_MARKER, psf->datalength + SIZEOF_SSND_CHUNK, 0, 0) ;
 
 	/* Header construction complete so write it out. */

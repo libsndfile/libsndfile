@@ -1,3 +1,18 @@
+2006-05-22 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/development.html
+    Removed references to tla on windows.
+
+    * src/common.h src/sndfile.c
+    Add separate void pointers for file containter and file codec data to
+    SF_PRIVATE struct. Still need to move all existing fdata pointers.
+
+    * tests/write_read_test.tpl
+    Change the order of some tests.
+
+    * src/aiff.c
+    When writing 'AIFC' files, make sure get an 'FVER' gets added.
+
 2006-05-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Win32/testprog.c Win32/Makefile.am
