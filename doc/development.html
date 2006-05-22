@@ -29,11 +29,7 @@ development.
 In most respects, Arch is significantly better than most other revision
 control systems.
 One of the few places it is lacking is support for windows.
-There are a couple of win32 ports, but the only one I have used successfully
-used is
-	<A HREF="http://ct.radiology.uiowa.edu/~jfmeinel/tla-short-path/">
-		John Meinel's</A>
-cygwin version (tla.exe.bz2, not the .zip file).
+If you're on windows, bad luck.
 </P>
 <!-- pepper -->
 <P>
@@ -74,22 +70,6 @@ To build and check it:
 <!-- pepper -->
 <PRE>
 	./reconfigure.mk
-	make
-	make check
-</PRE>
-<!-- pepper -->
-<H3><BR>Building under MinGW</H3>
-<P>
-To build under MinGW, you need to first get the archive using tla under Cygwin 
-and then do everything above up to and including the <B>./reconfigure.mk</B>
-stage.
-Then you can start an Msys window, change directory into the top level 
-libsndfile source directory.
-Then run:
-</P>
-<!-- pepper -->
-<PRE>
-	./configure
 	make
 	make check
 </PRE>
