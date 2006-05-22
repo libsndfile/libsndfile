@@ -132,8 +132,8 @@ wav_w64_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 	unsigned int	pmssize ;
 	int				count ;
 
-	if (psf->fdata != NULL)
-	{	psf_log_printf (psf, "*** psf->fdata is not NULL.\n") ;
+	if (psf->codec_data != NULL)
+	{	psf_log_printf (psf, "*** psf->codec_data is not NULL.\n") ;
 		return SFE_INTERNAL ;
 		} ;
 
@@ -142,9 +142,9 @@ wav_w64_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 
 	pmssize = sizeof (MSADPCM_PRIVATE) + blockalign + 3 * psf->sf.channels * samplesperblock ;
 
-	if (! (psf->fdata = malloc (pmssize)))
+	if (! (psf->codec_data = malloc (pmssize)))
 		return SFE_MALLOC_FAILED ;
-	pms = (MSADPCM_PRIVATE*) psf->fdata ;
+	pms = (MSADPCM_PRIVATE*) psf->codec_data ;
 	memset (pms, 0, pmssize) ;
 
 	pms->samples	= pms->dummydata ;
@@ -336,9 +336,9 @@ msadpcm_read_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	int			readcount, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pms = (MSADPCM_PRIVATE*) psf->fdata ;
+	pms = (MSADPCM_PRIVATE*) psf->codec_data ;
 
 	while (len > 0)
 	{	readcount = (len > 0x10000000) ? 0x10000000 : (int) len ;
@@ -361,9 +361,9 @@ msadpcm_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	int			k, bufferlen, readcount = 0, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pms = (MSADPCM_PRIVATE*) psf->fdata ;
+	pms = (MSADPCM_PRIVATE*) psf->codec_data ;
 
 	sptr = psf->u.sbuf ;
 	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
@@ -388,9 +388,9 @@ msadpcm_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pms = (MSADPCM_PRIVATE*) psf->fdata ;
+	pms = (MSADPCM_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x8000) : 1.0 ;
 	sptr = psf->u.sbuf ;
@@ -418,9 +418,9 @@ msadpcm_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x8000) : 1.0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pms = (MSADPCM_PRIVATE*) psf->fdata ;
+	pms = (MSADPCM_PRIVATE*) psf->codec_data ;
 
 	sptr = psf->u.sbuf ;
 	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
@@ -442,9 +442,9 @@ msadpcm_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 {	MSADPCM_PRIVATE *pms ;
 	int			newblock, newsample ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pms = (MSADPCM_PRIVATE*) psf->fdata ;
+	pms = (MSADPCM_PRIVATE*) psf->codec_data ;
 
 	if (psf->datalength < 0 || psf->dataoffset < 0)
 	{	psf->error = SFE_BAD_SEEK ;
@@ -646,9 +646,9 @@ msadpcm_write_s	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	int			writecount, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pms = (MSADPCM_PRIVATE*) psf->fdata ;
+	pms = (MSADPCM_PRIVATE*) psf->codec_data ;
 
 	while (len > 0)
 	{	writecount = (len > 0x10000000) ? 0x10000000 : (int) len ;
@@ -671,9 +671,9 @@ msadpcm_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	int			k, bufferlen, writecount, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pms = (MSADPCM_PRIVATE*) psf->fdata ;
+	pms = (MSADPCM_PRIVATE*) psf->codec_data ;
 
 	sptr = psf->u.sbuf ;
 	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
@@ -698,9 +698,9 @@ msadpcm_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pms = (MSADPCM_PRIVATE*) psf->fdata ;
+	pms = (MSADPCM_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
 
@@ -729,9 +729,9 @@ msadpcm_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 	normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pms = (MSADPCM_PRIVATE*) psf->fdata ;
+	pms = (MSADPCM_PRIVATE*) psf->codec_data ;
 
 	sptr = psf->u.sbuf ;
 	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
@@ -755,7 +755,7 @@ static int
 msadpcm_close	(SF_PRIVATE *psf)
 {	MSADPCM_PRIVATE *pms ;
 
-	pms = (MSADPCM_PRIVATE*) psf->fdata ;
+	pms = (MSADPCM_PRIVATE*) psf->codec_data ;
 
 	if (psf->mode == SFM_WRITE)
 	{	/*  Now we know static int for certain the length of the file we can

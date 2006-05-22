@@ -2368,9 +2368,6 @@ psf_close (SF_PRIVATE *psf)
 	psf_fclose (psf) ;
 	psf_close_rsrc (psf) ;
 
-	if (psf->fdata)
-		free (psf->fdata) ;
-
 	if (psf->container_data)
 		free (psf->container_data) ;
 

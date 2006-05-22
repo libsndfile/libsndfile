@@ -186,10 +186,10 @@ voc_read_header	(SF_PRIVATE *psf)
 	if (version != 0x010A && version != 0x0114)
 		return SFE_VOC_BAD_VERSION ;
 
-	if (! (psf->fdata = malloc (sizeof (VOC_DATA))))
+	if (! (psf->codec_data = malloc (sizeof (VOC_DATA))))
 		return SFE_MALLOC_FAILED ;
 
-	pvoc = (VOC_DATA*) psf->fdata ;
+	pvoc = (VOC_DATA*) psf->codec_data ;
 
 	memset (pvoc, 0, sizeof (VOC_DATA)) ;
 

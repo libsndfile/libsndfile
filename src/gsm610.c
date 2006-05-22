@@ -79,8 +79,8 @@ gsm610_init	(SF_PRIVATE *psf)
 {	GSM610_PRIVATE	*pgsm610 ;
 	int		true_flag = 1 ;
 
-	if (psf->fdata != NULL)
-	{	psf_log_printf (psf, "*** psf->fdata is not NULL.\n") ;
+	if (psf->codec_data != NULL)
+	{	psf_log_printf (psf, "*** psf->codec_data is not NULL.\n") ;
 		return SFE_INTERNAL ;
 		} ;
 
@@ -92,7 +92,7 @@ gsm610_init	(SF_PRIVATE *psf)
 	if ((pgsm610 = calloc (1, sizeof (GSM610_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 
-	psf->fdata = (void*) pgsm610 ;
+	psf->codec_data = (void*) pgsm610 ;
 
 	memset (pgsm610, 0, sizeof (GSM610_PRIVATE)) ;
 
@@ -266,9 +266,9 @@ gsm610_read_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	int			readcount, count ;
 	sf_count_t	total = 0 ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
+	pgsm610 = (GSM610_PRIVATE*) psf->codec_data ;
 
 	while (len > 0)
 	{	readcount = (len > 0x10000000) ? 0x1000000 : (int) len ;
@@ -292,9 +292,9 @@ gsm610_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	int			k, bufferlen, readcount = 0, count ;
 	sf_count_t	total = 0 ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
+	pgsm610 = (GSM610_PRIVATE*) psf->codec_data ;
 
 	sptr = psf->u.sbuf ;
 	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
@@ -318,9 +318,9 @@ gsm610_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
+	pgsm610 = (GSM610_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x8000) : 1.0 ;
 
@@ -348,9 +348,9 @@ gsm610_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x8000) : 1.0 ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
+	pgsm610 = (GSM610_PRIVATE*) psf->codec_data ;
 
 	sptr = psf->u.sbuf ;
 	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
@@ -373,9 +373,9 @@ gsm610_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	mode = mode ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
+	pgsm610 = (GSM610_PRIVATE*) psf->codec_data ;
 
 	if (psf->dataoffset < 0)
 	{	psf->error = SFE_BAD_SEEK ;
@@ -495,9 +495,9 @@ gsm610_write_s	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	int			writecount, count ;
 	sf_count_t	total = 0 ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
+	pgsm610 = (GSM610_PRIVATE*) psf->codec_data ;
 
 	while (len > 0)
 	{	writecount = (len > 0x10000000) ? 0x10000000 : (int) len ;
@@ -521,9 +521,9 @@ gsm610_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	int			k, bufferlen, writecount = 0, count ;
 	sf_count_t	total = 0 ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
+	pgsm610 = (GSM610_PRIVATE*) psf->codec_data ;
 
 	sptr = psf->u.sbuf ;
 	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
@@ -547,9 +547,9 @@ gsm610_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
+	pgsm610 = (GSM610_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
 
@@ -575,9 +575,9 @@ gsm610_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
+	pgsm610 = (GSM610_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
 
@@ -599,10 +599,10 @@ static int
 gsm610_close	(SF_PRIVATE *psf)
 {	GSM610_PRIVATE *pgsm610 ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
 
-	pgsm610 = (GSM610_PRIVATE*) psf->fdata ;
+	pgsm610 = (GSM610_PRIVATE*) psf->codec_data ;
 
 	if (psf->mode == SFM_WRITE)
 	{	/*	If a block has been partially assembled, write it out

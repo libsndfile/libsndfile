@@ -101,8 +101,8 @@ int
 wav_w64_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 {	int error ;
 
-	if (psf->fdata != NULL)
-	{	psf_log_printf (psf, "*** psf->fdata is not NULL.\n") ;
+	if (psf->codec_data != NULL)
+	{	psf_log_printf (psf, "*** psf->codec_data is not NULL.\n") ;
 		return SFE_INTERNAL ;
 		} ;
 
@@ -147,7 +147,7 @@ static int
 ima_close	(SF_PRIVATE *psf)
 {	IMA_ADPCM_PRIVATE *pima ;
 
-	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
+	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
 
 	if (psf->mode == SFM_WRITE)
 	{	/*	If a block has been partially assembled, write it out
@@ -179,7 +179,7 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 	if (! (pima = malloc (pimasize)))
 		return SFE_MALLOC_FAILED ;
 
-	psf->fdata = (void*) pima ;
+	psf->codec_data = (void*) pima ;
 
 	memset (pima, 0, pimasize) ;
 
@@ -625,9 +625,9 @@ ima_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	int			readcount, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
+	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
 
 	while (len > 0)
 	{	readcount = (len > 0x10000000) ? 0x10000000 : (int) len ;
@@ -650,9 +650,9 @@ ima_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	int			k, bufferlen, readcount, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
+	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
 
 	sptr = psf->u.sbuf ;
 	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
@@ -678,9 +678,9 @@ ima_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
+	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x8000) : 1.0 ;
 
@@ -708,9 +708,9 @@ ima_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	double 		normfact ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
+	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x8000) : 1.0 ;
 
@@ -735,9 +735,9 @@ ima_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 {	IMA_ADPCM_PRIVATE *pima ;
 	int			newblock, newsample ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
+	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
 
 	if (psf->datalength < 0 || psf->dataoffset < 0)
 	{	psf->error = SFE_BAD_SEEK ;
@@ -795,7 +795,7 @@ ima_writer_init (SF_PRIVATE *psf, int blockalign)
 	if ((pima = calloc (1, pimasize)) == NULL)
 		return SFE_MALLOC_FAILED ;
 
-	psf->fdata = (void*) pima ;
+	psf->codec_data = (void*) pima ;
 
 	pima->channels			= psf->sf.channels ;
 	pima->blocksize			= blockalign ;
@@ -861,9 +861,9 @@ ima_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	int			writecount, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
+	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
 
 	while (len)
 	{	writecount = (len > 0x10000000) ? 0x10000000 : (int) len ;
@@ -886,9 +886,9 @@ ima_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	int			k, bufferlen, writecount, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
+	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
 
 	sptr = psf->u.sbuf ;
 	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
@@ -914,9 +914,9 @@ ima_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
+	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
 
@@ -944,9 +944,9 @@ ima_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	double 		normfact ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pima = (IMA_ADPCM_PRIVATE*) psf->fdata ;
+	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
 

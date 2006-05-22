@@ -361,10 +361,10 @@ paf24_init (SF_PRIVATE *psf)
 	*/
 	psf->last_op = 0 ;
 
-	if (! (psf->fdata = malloc (paf24size)))
+	if (! (psf->codec_data = malloc (paf24size)))
 		return SFE_MALLOC_FAILED ;
 
-	ppaf24 = (PAF24_PRIVATE*) psf->fdata ;
+	ppaf24 = (PAF24_PRIVATE*) psf->codec_data ;
 	memset (ppaf24, 0, paf24size) ;
 
 	ppaf24->channels	= psf->sf.channels ;
@@ -421,12 +421,12 @@ paf24_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 {	PAF24_PRIVATE	*ppaf24 ;
 	int				newblock, newsample ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 	{	psf->error = SFE_INTERNAL ;
 		return PSF_SEEK_ERROR ;
 		} ;
 
-	ppaf24 = (PAF24_PRIVATE*) psf->fdata ;
+	ppaf24 = (PAF24_PRIVATE*) psf->codec_data ;
 
 	if (mode == SFM_READ && ppaf24->write_count > 0)
 		paf24_write_block (psf, ppaf24) ;
@@ -472,10 +472,10 @@ static int
 paf24_close (SF_PRIVATE *psf)
 {	PAF24_PRIVATE *ppaf24 ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
 
-	ppaf24 = (PAF24_PRIVATE*) psf->fdata ;
+	ppaf24 = (PAF24_PRIVATE*) psf->codec_data ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	if (ppaf24->write_count > 0)
@@ -564,9 +564,9 @@ paf24_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	int				k, bufferlen, readcount, count ;
 	sf_count_t		total = 0 ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	ppaf24 = (PAF24_PRIVATE*) psf->fdata ;
+	ppaf24 = (PAF24_PRIVATE*) psf->codec_data ;
 
 	iptr = psf->u.ibuf ;
 	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
@@ -586,9 +586,9 @@ paf24_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 {	PAF24_PRIVATE *ppaf24 ;
 	int				total ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	ppaf24 = (PAF24_PRIVATE*) psf->fdata ;
+	ppaf24 = (PAF24_PRIVATE*) psf->codec_data ;
 
 	total = paf24_read (psf, ppaf24, ptr, len) ;
 
@@ -603,9 +603,9 @@ paf24_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sf_count_t		total = 0 ;
 	float			normfact ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	ppaf24 = (PAF24_PRIVATE*) psf->fdata ;
+	ppaf24 = (PAF24_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? (1.0 / 0x80000000) : (1.0 / 0x100) ;
 
@@ -630,9 +630,9 @@ paf24_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	sf_count_t		total = 0 ;
 	double 			normfact ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	ppaf24 = (PAF24_PRIVATE*) psf->fdata ;
+	ppaf24 = (PAF24_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? (1.0 / 0x80000000) : (1.0 / 0x100) ;
 
@@ -730,9 +730,9 @@ paf24_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	int				k, bufferlen, writecount = 0, count ;
 	sf_count_t		total = 0 ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	ppaf24 = (PAF24_PRIVATE*) psf->fdata ;
+	ppaf24 = (PAF24_PRIVATE*) psf->codec_data ;
 
 	iptr = psf->u.ibuf ;
 	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
@@ -755,9 +755,9 @@ paf24_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	int				writecount, count ;
 	sf_count_t		total = 0 ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	ppaf24 = (PAF24_PRIVATE*) psf->fdata ;
+	ppaf24 = (PAF24_PRIVATE*) psf->codec_data ;
 
 	while (len > 0)
 	{	writecount = (len > 0x10000000) ? 0x10000000 : (int) len ;
@@ -781,9 +781,9 @@ paf24_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	sf_count_t		total = 0 ;
 	float			normfact ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	ppaf24 = (PAF24_PRIVATE*) psf->fdata ;
+	ppaf24 = (PAF24_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : (1.0 / 0x100) ;
 
@@ -811,9 +811,9 @@ paf24_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	sf_count_t		total = 0 ;
 	double			normfact ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	ppaf24 = (PAF24_PRIVATE*) psf->fdata ;
+	ppaf24 = (PAF24_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : (1.0 / 0x100) ;
 

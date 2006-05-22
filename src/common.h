@@ -308,10 +308,6 @@ typedef struct sf_private_tag
 										**	codec format specific data.
 										*/
 
-	void			*fdata ;		/*	This is a pointer to dynamically allocated file format
-									**	specific data.
-									*/
-
 	SF_DITHER_INFO	write_dither ;
 	SF_DITHER_INFO	read_dither ;
 

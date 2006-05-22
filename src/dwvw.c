@@ -78,8 +78,8 @@ int
 dwvw_init (SF_PRIVATE *psf, int bitwidth)
 {	DWVW_PRIVATE	*pdwvw ;
 
-	if (psf->fdata != NULL)
-	{	psf_log_printf (psf, "*** psf->fdata is not NULL.\n") ;
+	if (psf->codec_data != NULL)
+	{	psf_log_printf (psf, "*** psf->codec_data is not NULL.\n") ;
 		return SFE_INTERNAL ;
 		} ;
 
@@ -92,7 +92,7 @@ dwvw_init (SF_PRIVATE *psf, int bitwidth)
 	if ((pdwvw = calloc (1, sizeof (DWVW_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 
-	psf->fdata = (void*) pdwvw ;
+	psf->codec_data = (void*) pdwvw ;
 
 	pdwvw->bit_width 	= bitwidth ;
 	pdwvw->dwm_maxsize	= bitwidth / 2 ;
@@ -133,9 +133,9 @@ static int
 dwvw_close (SF_PRIVATE *psf)
 {	DWVW_PRIVATE *pdwvw ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
+	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
 
 	if (psf->mode == SFM_WRITE)
 	{	static int last_values [12] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } ;
@@ -159,12 +159,12 @@ dwvw_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	mode = mode ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 	{	psf->error = SFE_INTERNAL ;
 		return PSF_SEEK_ERROR ;
 		} ;
 
-	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
+	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
 
 	if (offset == 0)
 	{	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
@@ -187,9 +187,9 @@ dwvw_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	int		k, bufferlen, readcount = 0, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
+	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
 
 	iptr = psf->u.ibuf ;
 	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
@@ -214,9 +214,9 @@ dwvw_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	int			readcount, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
+	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
 
 	while (len > 0)
 	{	readcount = (len > 0x10000000) ? 0x10000000 : (int) len ;
@@ -241,9 +241,9 @@ dwvw_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float	normfact ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
+	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x80000000) : 1.0 ;
 
@@ -272,9 +272,9 @@ dwvw_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	double 	normfact ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
+	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x80000000) : 1.0 ;
 
@@ -554,9 +554,9 @@ dwvw_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	int		k, bufferlen, writecount = 0, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
+	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
 
 	iptr = psf->u.ibuf ;
 	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
@@ -581,9 +581,9 @@ dwvw_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	int			writecount, count ;
 	sf_count_t	total = 0 ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
+	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
 
 	while (len > 0)
 	{	writecount = (len > 0x10000000) ? 0x10000000 : (int) len ;
@@ -608,9 +608,9 @@ dwvw_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
+	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 
@@ -639,9 +639,9 @@ dwvw_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	double 		normfact ;
 
-	if (! psf->fdata)
+	if (! psf->codec_data)
 		return 0 ;
-	pdwvw = (DWVW_PRIVATE*) psf->fdata ;
+	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
 
 	normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 

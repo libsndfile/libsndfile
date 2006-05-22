@@ -109,7 +109,7 @@ sds_open	(SF_PRIVATE *psf)
 
 	if (! (psds = calloc (1, sizeof (SDS_PRIVATE))))
 		return SFE_MALLOC_FAILED ;
-	psf->fdata = psds ;
+	psf->codec_data = psds ;
 
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = sds_read_header (psf, psds)))
@@ -148,8 +148,8 @@ sds_close	(SF_PRIVATE *psf)
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	SDS_PRIVATE *psds ;
 
-		if ((psds = (SDS_PRIVATE *) psf->fdata) == NULL)
-		{	psf_log_printf (psf, "*** Bad psf->fdata ptr.\n") ;
+		if ((psds = (SDS_PRIVATE *) psf->codec_data) == NULL)
+		{	psf_log_printf (psf, "*** Bad psf->codec_data ptr.\n") ;
 			return SFE_INTERNAL ;
 			} ;
 
@@ -326,8 +326,8 @@ sds_write_header (SF_PRIVATE *psf, int calc_length)
 	int samp_period, data_length, sustain_loop_start, sustain_loop_end ;
 	unsigned char loop_type = 0 ;
 
-	if ((psds = (SDS_PRIVATE *) psf->fdata) == NULL)
-	{	psf_log_printf (psf, "*** Bad psf->fdata ptr.\n") ;
+	if ((psds = (SDS_PRIVATE *) psf->codec_data) == NULL)
+	{	psf_log_printf (psf, "*** Bad psf->codec_data ptr.\n") ;
 		return SFE_INTERNAL ;
 		} ;
 
@@ -543,9 +543,9 @@ sds_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	int			k, bufferlen, readcount, count ;
 	sf_count_t	total = 0 ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->fdata ;
+	psds = (SDS_PRIVATE*) psf->codec_data ;
 
 	iptr = psf->u.ibuf ;
 	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
@@ -566,9 +566,9 @@ sds_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 {	SDS_PRIVATE *psds ;
 	int			total ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->fdata ;
+	psds = (SDS_PRIVATE*) psf->codec_data ;
 
 	total = sds_read (psf, psds, ptr, len) ;
 
@@ -583,9 +583,9 @@ sds_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->fdata ;
+	psds = (SDS_PRIVATE*) psf->codec_data ;
 
 	if (psf->norm_float == SF_TRUE)
 		normfact = 1.0 / 0x80000000 ;
@@ -614,9 +614,9 @@ sds_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->fdata ;
+	psds = (SDS_PRIVATE*) psf->codec_data ;
 
 	if (psf->norm_double == SF_TRUE)
 		normfact = 1.0 / 0x80000000 ;
@@ -670,7 +670,7 @@ sds_seek (SF_PRIVATE *psf, int mode, sf_count_t seek_from_start)
 	sf_count_t	file_offset ;
 	int			newblock, newsample ;
 
-	if ((psds = psf->fdata) == NULL)
+	if ((psds = psf->codec_data) == NULL)
 	{	psf->error = SFE_INTERNAL ;
 		return PSF_SEEK_ERROR ;
 		} ;
@@ -870,9 +870,9 @@ sds_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	int			k, bufferlen, writecount, count ;
 	sf_count_t	total = 0 ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->fdata ;
+	psds = (SDS_PRIVATE*) psf->codec_data ;
 
 	iptr = psf->u.ibuf ;
 	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
@@ -893,9 +893,9 @@ sds_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	SDS_PRIVATE *psds ;
 	int			total ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->fdata ;
+	psds = (SDS_PRIVATE*) psf->codec_data ;
 
 	total = sds_write (psf, psds, ptr, len) ;
 
@@ -910,9 +910,9 @@ sds_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	float		normfact ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->fdata ;
+	psds = (SDS_PRIVATE*) psf->codec_data ;
 
 	if (psf->norm_float == SF_TRUE)
 		normfact = 1.0 * 0x80000000 ;
@@ -941,9 +941,9 @@ sds_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	double		normfact ;
 
-	if (psf->fdata == NULL)
+	if (psf->codec_data == NULL)
 		return 0 ;
-	psds = (SDS_PRIVATE*) psf->fdata ;
+	psds = (SDS_PRIVATE*) psf->codec_data ;
 
 	if (psf->norm_double == SF_TRUE)
 		normfact = 1.0 * 0x80000000 ;
