@@ -1,3 +1,8 @@
+2006-05-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * sndfile-convert.c
+    Add conversion SF_INSTRUMENT data when present.
+
 2006-05-22 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/development.html
@@ -15,7 +20,7 @@
 
     * src/common.h src/(dwvw|flac|g72x|gsm610|ima_adpcm|ms_adpcm|paf|sds).c
         src/(sndfile|voc|vox_adpcm|xi).c
-    Remove fdate field from SF_PRIVATE struct and replace it with codec_data.
+    Remove fdata field from SF_PRIVATE struct and replace it with codec_data.
 
 2006-05-10 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

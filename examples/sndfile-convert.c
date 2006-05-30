@@ -305,7 +305,8 @@ main (int argc, char * argv [])
 
 static void
 copy_metadata (SNDFILE *outfile, SNDFILE *infile)
-{	const char *str ;
+{	SF_INSTRUMENT inst ;
+	const char *str ;
 	int k, err = 0 ;
 
 	for (k = SF_STR_FIRST ; k <= SF_STR_LAST ; k++)
@@ -313,6 +314,10 @@ copy_metadata (SNDFILE *outfile, SNDFILE *infile)
 		if (str != NULL)
 			err = sf_set_string (outfile, k, str) ;
 		} ;
+
+	memset (&inst, 0, sizeof (inst)) ;
+	if (sf_command (infile, SFC_GET_INSTRUMENT, &inst, sizeof (inst)) == SF_TRUE)
+		sf_command (outfile, SFC_SET_INSTRUMENT, &inst, sizeof (inst)) ;
 
 } /* copy_metadata */
 
