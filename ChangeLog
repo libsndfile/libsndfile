@@ -1,3 +1,8 @@
+2006-06-04 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Fixed detection of S_IRGRP.
+
 2006-05-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * sndfile-convert.c

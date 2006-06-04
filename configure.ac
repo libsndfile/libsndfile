@@ -48,8 +48,11 @@ AC_CHECK_HEADERS(inttypes.h)
 AC_HEADER_SYS_WAIT
 
 AC_CHECK_DECLS(S_IRGRP)
-AC_DEFINE_UNQUOTED([HAVE_DECL_S_IRGRP],${HAVE_DECL_S_IRGRP},
-		[Set to 1 if S_IRGRP is defined.])
+if test x$ac_cv_have_decl_S_IRGRP = xyes ; then
+	AC_DEFINE_UNQUOTED([HAVE_DECL_S_IRGRP],1,[Set to 1 if S_IRGRP is defined.])
+else
+	AC_DEFINE_UNQUOTED([HAVE_DECL_S_IRGRP],0)
+	fi
 
 #====================================================================================
 # Check for support of the struct hack.
