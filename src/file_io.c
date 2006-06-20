@@ -603,7 +603,7 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 	psf->hfile = psf_open_handle (pathname, open_mode) ;
 
 	if (psf->hfile == NULL)
-		psf_log_syserr (psf, errno) ;
+		psf_log_syserr (psf, GetLastError()) ;
 
 	psf->mode = open_mode ;
 
@@ -623,7 +623,7 @@ psf_fclose (SF_PRIVATE *psf)
 		} ;
 
 	if ((retval = psf_close_handle (psf->hfile)) == -1)
-		psf_log_syserr (psf, errno) ;
+		psf_log_syserr (psf, GetLastError ()) ;
 
 	psf->hfile = NULL ;
 
@@ -668,7 +668,7 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 
 	/* No resource file found. */
 	if (psf->hrsrc == NULL)
-		psf_log_syserr (psf, errno) ;
+		psf_log_syserr (psf, GetLastError ()) ;
 
 	psf->hrsrc = NULL ;
 
