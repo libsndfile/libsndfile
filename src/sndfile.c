@@ -1149,7 +1149,7 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 	** it makes sense.
 	*/
 	if (((whence & SFM_MASK) == SFM_WRITE && psf->mode == SFM_READ) ||
-			((whence & SFM_MASK) == SFM_WRITE && psf->mode == SFM_WRITE))
+			((whence & SFM_MASK) == SFM_READ && psf->mode == SFM_WRITE))
 	{	psf->error = SFE_WRONG_SEEK ;
 		return PSF_SEEK_ERROR ;
 		} ;
