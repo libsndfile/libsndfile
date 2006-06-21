@@ -49,9 +49,14 @@
 [+ ENDFOR data_type
 +][+ ENDFOR float_type +]
 
+typedef union
+{	double	dbl [BUFFER_SIZE] ;
+	float	flt [BUFFER_SIZE] ;
+} BUFFER ;
+
 /* Data buffer. */
-static	double	buffer_out	[BUFFER_SIZE] ;
-static	double	buffer_in	[BUFFER_SIZE] ;
+static	BUFFER	buffer_out ;
+static	BUFFER	buffer_in ;
 
 int
 main (void)
@@ -100,8 +105,8 @@ main (void)
 
 	print_test_name ("[+ (get "short_name") +]_scale_clip_test_[+ (get "name") +]", filename) ;
 
-	data_out = ([+ (get "type_name") +]*) buffer_out ;
-	data_in = ([+ (get "type_name") +]*) buffer_in ;
+	data_out = buffer_out.[+ (get "short_name") +] ;
+	data_in = buffer_in.[+ (get "short_name") +] ;
 
 	for (k = 0 ; k < HALF_BUFFER_SIZE ; k++)
 	{	data_out [k] = SINE_AMP * sin (2 * M_PI * k / HALF_BUFFER_SIZE) ;
@@ -126,7 +131,7 @@ main (void)
 	test_write_[+ (get "type_name") +]_or_die (file, 0, data_out + HALF_BUFFER_SIZE, HALF_BUFFER_SIZE, __LINE__) ;
 	sf_close (file) ;
 
-	memset (buffer_in, 0, sizeof (buffer_in)) ;
+	memset (&buffer_in, 0, sizeof (buffer_in)) ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 

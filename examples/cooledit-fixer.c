@@ -31,7 +31,10 @@ static int is_data_really_float (SNDFILE *sndfile) ;
 static void fix_file (char *filename) ;
 static off_t file_size (char *filename) ;
 
-static	int buffer [BUFFER_LEN] ;
+static union
+{	int i [BUFFER_LEN] ;
+	float f [BUFFER_LEN] ;
+} buffer ;
 
 int
 main (int argc, char *argv [])
@@ -102,17 +105,14 @@ usage_exit (char *progname)
 
 static int
 is_data_really_float (SNDFILE *sndfile)
-{	float	*fptr ;
-	int 	k, readcount ;
+{	int 	k, readcount ;
 
-	fptr = (float *) buffer ;
-
-	while ((readcount = sf_read_int (sndfile, buffer, BUFFER_LEN)) > 0)
+	while ((readcount = sf_read_int (sndfile, buffer.i, BUFFER_LEN)) > 0)
 	{	for (k = 0 ; k < readcount ; k++)
-		{	if (buffer [k] == 0)
+		{	if (buffer.i [k] == 0)
 				continue ;
 
-			if (fabs (fptr [k]) > 32768.0)
+			if (fabs (buffer.f [k]) > 32768.0)
 				return SF_FALSE ;
 			} ;
 		} ;
@@ -127,7 +127,7 @@ fix_file (char *filename)
 	SNDFILE *infile, *outfile ;
 	SF_INFO	sfinfo ;
 	int		readcount, k ;
-	float	*fptr, normfactor ;
+	float	normfactor ;
 	char	*cptr ;
 
 	printf ("\nFixing : %s\n", filename) ;
@@ -168,14 +168,12 @@ fix_file (char *filename)
 
 	/* Find the file peak. sf-command (SFC_CALC_SIGNAL_MAX) cannot be used. */
 
-	fptr = (float *) buffer ;
-
 	normfactor = 0.0 ;
 
-	while ((readcount = sf_read_int (infile, buffer, BUFFER_LEN)) > 0)
+	while ((readcount = sf_read_int (infile, buffer.i, BUFFER_LEN)) > 0)
 	{	for (k = 0 ; k < readcount ; k++)
-			if (fabs (fptr [k]) > normfactor)
-				normfactor = fabs (fptr [k]) ;
+			if (fabs (buffer.f [k]) > normfactor)
+				normfactor = fabs (buffer.f [k]) ;
 		} ;
 
 	printf ("    Peak     : %g\n", normfactor) ;
@@ -184,10 +182,10 @@ fix_file (char *filename)
 
 	sf_seek (infile, 0, SEEK_SET) ;
 
-	while ((readcount = sf_read_int (infile, buffer, BUFFER_LEN)) > 0)
+	while ((readcount = sf_read_int (infile, buffer.i, BUFFER_LEN)) > 0)
 	{	for (k = 0 ; k < readcount ; k++)
-			fptr [k] *= normfactor ;
-		sf_write_float (outfile, fptr, readcount) ;
+			buffer.f [k] *= normfactor ;
+		sf_write_float (outfile, buffer.f, readcount) ;
 		} ;
 
 	sf_close (infile) ;

@@ -64,9 +64,17 @@ static void check_comment (SNDFILE * file, int format, int lineno) ;
 ** Force the start of these buffers to be double aligned. Sparc-solaris will
 ** choke if they are not.
 */
-static	double	data_buffer [BUFFER_SIZE + 1] ;
-static	double	orig_buffer [BUFFER_SIZE + 1] ;
-static	double	smooth_buffer [BUFFER_SIZE + 1] ;
+typedef union
+{	double d [BUFFER_SIZE + 1] ;
+	float f [BUFFER_SIZE + 1] ;
+	int i [BUFFER_SIZE + 1] ;
+	short s [BUFFER_SIZE + 1] ;
+	char c [BUFFER_SIZE + 1] ;
+} BUFFER ;
+
+static	BUFFER	data_buffer ;
+static	BUFFER	orig_buffer ;
+static	BUFFER	smooth_buffer ;
 
 static const char *long_comment =
 	"This is really quite a long comment. It is designed to be long enough "
@@ -505,12 +513,12 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 
 	datalen = BUFFER_SIZE / channels ;
 
-	data = (short*) data_buffer ;
-	orig = (short*) orig_buffer ;
+	data = data_buffer.s ;
+	orig = orig_buffer.s ;
 
-	gen_signal_double (orig_buffer, 32000.0, channels, datalen) ;
+	gen_signal_double (orig_buffer.d, 32000.0, channels, datalen) ;
 	for (k = 0 ; k < channels * datalen ; k++)
-		orig [k] = (short) (orig_buffer [k]) ;
+		orig [k] = (short) (orig_buffer.d [k]) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -693,12 +701,12 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 
 	scale = 1.0 * 0x10000 ;
 
-	data = (int*) data_buffer ;
-	orig = (int*) orig_buffer ;
+	data = data_buffer.i ;
+	orig = orig_buffer.i ;
 
-	gen_signal_double (orig_buffer, 32000.0 * scale, channels, datalen) ;
+	gen_signal_double (orig_buffer.d, 32000.0 * scale, channels, datalen) ;
 	for (k = 0 ; k < channels * datalen ; k++)
-		orig [k] = orig_buffer [k] ;
+		orig [k] = orig_buffer.d [k] ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -879,12 +887,12 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 
 	datalen = BUFFER_SIZE / channels ;
 
-	data = (float*) data_buffer ;
-	orig = (float*) orig_buffer ;
+	data = data_buffer.f ;
+	orig = orig_buffer.f ;
 
-	gen_signal_double (orig_buffer, 32000.0, channels, datalen) ;
+	gen_signal_double (orig_buffer.d, 32000.0, channels, datalen) ;
 	for (k = 0 ; k < channels * datalen ; k++)
-		orig [k] = (float) (orig_buffer [k]) ;
+		orig [k] = (float) (orig_buffer.d [k]) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -1072,12 +1080,12 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 
 	datalen = BUFFER_SIZE / channels ;
 
-	data = (double*) data_buffer ;
-	orig = (double*) orig_buffer ;
+	data = data_buffer.d ;
+	orig = orig_buffer.d ;
 
-	gen_signal_double (orig_buffer, 32000.0, channels, datalen) ;
+	gen_signal_double (orig_buffer.d, 32000.0, channels, datalen) ;
 	for (k = 0 ; k < channels * datalen ; k++)
-		orig [k] = (double) (orig_buffer [k]) ;
+		orig [k] = (double) (orig_buffer.d [k]) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -1267,13 +1275,13 @@ channels = 1 ;
 
 	datalen = BUFFER_SIZE ;
 
-	orig = (short*) orig_buffer ;
-	data = (short*) data_buffer ;
-	smooth = (short*) smooth_buffer ;
+	orig = orig_buffer.s ;
+	data = data_buffer.s ;
+	smooth = smooth_buffer.s ;
 
-	gen_signal_double (orig_buffer, 32000.0, channels, datalen) ;
+	gen_signal_double (orig_buffer.d, 32000.0, channels, datalen) ;
 	for (k = 0 ; k < datalen ; k++)
-		orig [k] = (short) (orig_buffer [k]) ;
+		orig [k] = (short) (orig_buffer.d [k]) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -1456,13 +1464,13 @@ channels = 1 ;
 	datalen = BUFFER_SIZE ;
 	scale = 1.0 * 0x10000 ;
 
-	orig = (int*) orig_buffer ;
-	data = (int*) data_buffer ;
-	smooth = (int*) smooth_buffer ;
+	orig = orig_buffer.i ;
+	data = data_buffer.i ;
+	smooth = smooth_buffer.i ;
 
-	gen_signal_double (orig_buffer, 32000.0 * scale, channels, datalen) ;
+	gen_signal_double (orig_buffer.d, 32000.0 * scale, channels, datalen) ;
 	for (k = 0 ; k < datalen ; k++)
-		orig [k] = (int) (orig_buffer [k]) ;
+		orig [k] = (int) (orig_buffer.d [k]) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -1645,13 +1653,13 @@ printf ("** fix this ** ") ;
 
 	datalen = BUFFER_SIZE ;
 
-	orig = (float*) orig_buffer ;
-	data = (float*) data_buffer ;
-	smooth = (float*) smooth_buffer ;
+	orig = orig_buffer.f ;
+	data = data_buffer.f ;
+	smooth = smooth_buffer.f ;
 
-	gen_signal_double (orig_buffer, 32000.0, channels, datalen) ;
+	gen_signal_double (orig_buffer.d, 32000.0, channels, datalen) ;
 	for (k = 0 ; k < datalen ; k++)
-		orig [k] = (int) (orig_buffer [k]) ;
+		orig [k] = (int) (orig_buffer.d [k]) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -1833,11 +1841,11 @@ channels = 1 ;
 
 	datalen = BUFFER_SIZE ;
 
-	orig = orig_buffer ;
-	data = data_buffer ;
-	smooth = smooth_buffer ;
+	orig = orig_buffer.d ;
+	data = data_buffer.d ;
+	smooth = smooth_buffer.d ;
 
-	gen_signal_double (orig_buffer, 32000.0, channels, datalen) ;
+	gen_signal_double (orig_buffer.d, 32000.0, channels, datalen) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */

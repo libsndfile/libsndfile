@@ -49,6 +49,7 @@ static	void	broadcast_test		(const char *filename, int filetype) ;
 ** choke if its not.
 */
 
+static	int		int_data	[BUFFER_LEN] ;
 static	float	float_data	[BUFFER_LEN] ;
 static	double	double_data	[BUFFER_LEN] ;
 
@@ -585,15 +586,12 @@ truncate_test (const char *filename, int filetype)
 {	SNDFILE 	*file ;
 	SF_INFO		sfinfo ;
 	sf_count_t	len ;
-	int			*int_data ;
 
 	print_test_name ("truncate_test", filename) ;
 
 	sfinfo.samplerate	= 11025 ;
 	sfinfo.format		= filetype ;
 	sfinfo.channels		= 2 ;
-
-	int_data = (int*) double_data ;
 
 	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__) ;
 

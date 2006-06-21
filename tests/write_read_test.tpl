@@ -49,8 +49,16 @@ static int truncate (const char *filename, int ignored) ;
 +]
 static void empty_file_test (const char *filename, int format) ;
 
-static	double	orig_data [DATA_LENGTH] ;
-static	double	test_data [DATA_LENGTH] ;
+typedef union
+{	double d [DATA_LENGTH] ;
+	float f [DATA_LENGTH] ;
+	int i [DATA_LENGTH] ;
+	short s [DATA_LENGTH] ;
+	char c [DATA_LENGTH] ;
+} BUFFER ;
+
+static	BUFFER	orig_data ;
+static	BUFFER	test_data ;
 
 int
 main (int argc, char **argv)
@@ -409,13 +417,13 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= format ;
 
-	gen_windowed_sine_double (orig_data, DATA_LENGTH, [+ (get "max_val") +]) ;
+	gen_windowed_sine_double (orig_data.d, DATA_LENGTH, [+ (get "max_val") +]) ;
 
-	orig = ([+ (get "data_type") +]*) orig_data ;
-	test = ([+ (get "data_type") +]*) test_data ;
+	orig = orig_data.[+ (get "data_field") +] ;
+	test = test_data.[+ (get "data_field") +] ;
 
 	/* Make this a macro so gdb steps over it in one go. */
-	CONVERT_DATA (k, DATA_LENGTH, orig, orig_data) ;
+	CONVERT_DATA (k, DATA_LENGTH, orig, orig_data.d) ;
 
 	items = DATA_LENGTH ;
 
@@ -470,8 +478,8 @@ mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_fi
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= format ;
 
-	orig = ([+ (get "data_type") +]*) orig_data ;
-	test = ([+ (get "data_type") +]*) test_data ;
+	orig = orig_data.[+ (get "data_field") +] ;
+	test = test_data.[+ (get "data_field") +] ;
 
 	items = DATA_LENGTH ;
 
@@ -606,21 +614,18 @@ stereo_[+ (get "type_name") +]_test (const char *filename, int format, int long_
 	[+ (get "data_type") +]		*orig, *test ;
 	int			k, items, frames ;
 
-	orig = ([+ (get "data_type") +]*) orig_data ;
-	test = ([+ (get "data_type") +]*) test_data ;
-
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= SILLY_WRITE_COUNT ; /* Wrong length. Library should correct this on sf_close. */
 	sfinfo.channels		= 2 ;
 	sfinfo.format		= format ;
 
-	gen_windowed_sine_double (orig_data, DATA_LENGTH, [+ (get "max_val") +]) ;
+	gen_windowed_sine_double (orig_data.d, DATA_LENGTH, [+ (get "max_val") +]) ;
 
-	orig = ([+ (get "data_type") +]*) orig_data ;
-	test = ([+ (get "data_type") +]*) test_data ;
+	orig = orig_data.[+ (get "data_field") +] ;
+	test = test_data.[+ (get "data_field") +] ;
 
 	/* Make this a macro so gdb steps over it in one go. */
-	CONVERT_DATA (k, DATA_LENGTH, orig, orig_data) ;
+	CONVERT_DATA (k, DATA_LENGTH, orig, orig_data.d) ;
 
 	items = DATA_LENGTH ;
 	frames = items / sfinfo.channels ;
@@ -742,8 +747,8 @@ mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int lo
 	[+ (get "data_type") +]		*orig, *test ;
 	int			k, pass ;
 
-	orig = ([+ (get "data_type") +]*) orig_data ;
-	test = ([+ (get "data_type") +]*) test_data ;
+	orig = orig_data.[+ (get "data_field") +] ;
+	test = test_data.[+ (get "data_field") +] ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= DATA_LENGTH ;
@@ -867,8 +872,8 @@ new_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int all
 	[+ (get "data_type") +]		*orig, *test ;
 	int		items, frames ;
 
-	orig = ([+ (get "data_type") +]*) orig_data ;
-	test = ([+ (get "data_type") +]*) test_data ;
+	orig = orig_data.[+ (get "data_field") +] ;
+	test = test_data.[+ (get "data_field") +] ;
 
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= SILLY_WRITE_COUNT ; /* Wrong length. Library should correct this on sf_close. */
