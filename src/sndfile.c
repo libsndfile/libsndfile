@@ -2127,6 +2127,7 @@ static int
 format_from_extension (SF_PRIVATE *psf)
 {	char *cptr ;
 	char buffer [16] ;
+	int format = 0 ;
 
 	if (psf->filename == NULL)
 		return 0 ;
@@ -2153,28 +2154,29 @@ format_from_extension (SF_PRIVATE *psf)
 	if (strcmp (cptr, "au") == 0)
 	{	psf->sf.channels = 1 ;
 		psf->sf.samplerate = 8000 ;
-		return SF_FORMAT_RAW | SF_FORMAT_ULAW ;
-		} ;
-
-	if (strcmp (cptr, "snd") == 0)
+		format = SF_FORMAT_RAW | SF_FORMAT_ULAW ;
+		}
+	else if (strcmp (cptr, "snd") == 0)
 	{	psf->sf.channels = 1 ;
 		psf->sf.samplerate = 8000 ;
-		return SF_FORMAT_RAW | SF_FORMAT_ULAW ;
-		} ;
-
-	if (strcmp (cptr, "vox") == 0)
+		format = SF_FORMAT_RAW | SF_FORMAT_ULAW ;
+		}
+	else if (strcmp (cptr, "vox") == 0)
 	{	psf->sf.channels = 1 ;
 		psf->sf.samplerate = 8000 ;
-		return SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM ;
-		} ;
-
-	if (strcmp (cptr, "gsm") == 0)
+		format = SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM ;
+		}
+	else if (strcmp (cptr, "gsm") == 0)
 	{	psf->sf.channels = 1 ;
 		psf->sf.samplerate = 8000 ;
-		return SF_FORMAT_RAW | SF_FORMAT_GSM610 ;
-		} ;
+		format = SF_FORMAT_RAW | SF_FORMAT_GSM610 ;
+		}
 
-	return 0 ;
+	/* For RAW files, make sure the dataoffset if set correctly. */
+	if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW)
+		psf->dataoffset = 0 ;
+
+	return format ;
 } /* format_from_extension */
 
 static int

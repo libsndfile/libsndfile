@@ -92,7 +92,7 @@ gsm610_init	(SF_PRIVATE *psf)
 	if ((pgsm610 = calloc (1, sizeof (GSM610_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 
-	psf->codec_data = (void*) pgsm610 ;
+	psf->codec_data = pgsm610 ;
 
 	memset (pgsm610, 0, sizeof (GSM610_PRIVATE)) ;
 
@@ -138,7 +138,7 @@ Need separate gsm_data structs for encode and decode.
 		else if (psf->datalength % pgsm610->blocksize == 1 && pgsm610->blocksize == GSM610_BLOCKSIZE)
 		{	/*
 			**	Weird AIFF specific case.
-			**	AIFF chunks must be at an odd offset from the start of file and
+			**	AIFF chunks must be at an even offset from the start of file and
 			**	GSM610_BLOCKSIZE is odd which can result in an odd length SSND
 			**	chunk. The SSND chunk then gets padded on write which means that
 			**	when it is read the datalength is too big by 1.
