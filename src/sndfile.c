@@ -256,7 +256,7 @@ static char	sf_syserr [SF_SYSERR_LEN] = { 0 } ;
 */
 
 #define	VALIDATE_SNDFILE_AND_ASSIGN_PSF(a,b,c)		\
-		{	if (! (a))								\
+		{	if ((a) == NULL)						\
 			{	sf_errno = SFE_BAD_SNDFILE_PTR ;	\
 				return 0 ;							\
 				} ;									\
@@ -460,7 +460,7 @@ sf_strerror (SNDFILE *sndfile)
 {	SF_PRIVATE 	*psf = NULL ;
 	int errnum ;
 
-	if (! sndfile)
+	if (sndfile == NULL)
 	{	errnum = sf_errno ;
 		if (errnum == SFE_SYSTEM && sf_syserr [0])
 			return sf_syserr ;
@@ -487,7 +487,7 @@ int
 sf_error (SNDFILE *sndfile)
 {	SF_PRIVATE	*psf ;
 
-	if (! sndfile)
+	if (sndfile == NULL)
 	{	if (sf_error != 0)
 			return sf_errno ;
 		return 0 ;
@@ -509,7 +509,7 @@ sf_perror (SNDFILE *sndfile)
 {	SF_PRIVATE 	*psf ;
 	int 		errnum ;
 
-	if (! sndfile)
+	if (sndfile == NULL)
 	{	errnum = sf_errno ;
 		}
 	else
@@ -530,10 +530,10 @@ sf_error_str (SNDFILE *sndfile, char *str, size_t maxlen)
 {	SF_PRIVATE 	*psf ;
 	int 		errnum ;
 
-	if (! str)
+	if (str == NULL)
 		return SFE_INTERNAL ;
 
-	if (! sndfile)
+	if (sndfile == NULL)
 		errnum = sf_errno ;
 	else
 	{	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 0) ;
@@ -1332,7 +1332,7 @@ sf_read_short	(SNDFILE *sndfile, short *ptr, sf_count_t len)
 		return 0 ; /* End of file. */
 		} ;
 
-	if (! psf->read_short || psf->seek == NULL)
+	if (psf->read_short == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return	0 ;
 		} ;
@@ -1379,7 +1379,7 @@ sf_readf_short		(SNDFILE *sndfile, short *ptr, sf_count_t frames)
 		return 0 ; /* End of file. */
 		} ;
 
-	if (! psf->read_short || psf->seek == NULL)
+	if (psf->read_short == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return 0 ;
 		} ;
@@ -1434,7 +1434,7 @@ sf_read_int		(SNDFILE *sndfile, int *ptr, sf_count_t len)
 		return 0 ;
 		} ;
 
-	if (! psf->read_int || psf->seek == NULL)
+	if (psf->read_int == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return 0 ;
 		} ;
@@ -1481,7 +1481,7 @@ sf_readf_int	(SNDFILE *sndfile, int *ptr, sf_count_t frames)
 		return 0 ;
 		} ;
 
-	if (! psf->read_int || psf->seek == NULL)
+	if (psf->read_int == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return	0 ;
 		} ;
@@ -1536,7 +1536,7 @@ sf_read_float	(SNDFILE *sndfile, float *ptr, sf_count_t len)
 		return 0 ;
 		} ;
 
-	if (! psf->read_float || psf->seek == NULL)
+	if (psf->read_float == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return	0 ;
 		} ;
@@ -1583,7 +1583,7 @@ sf_readf_float	(SNDFILE *sndfile, float *ptr, sf_count_t frames)
 		return 0 ;
 		} ;
 
-	if (! psf->read_float || psf->seek == NULL)
+	if (psf->read_float == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return	0 ;
 		} ;
@@ -1638,7 +1638,7 @@ sf_read_double	(SNDFILE *sndfile, double *ptr, sf_count_t len)
 		return 0 ;
 		} ;
 
-	if (! psf->read_double || psf->seek == NULL)
+	if (psf->read_double == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return	0 ;
 		} ;
@@ -1685,7 +1685,7 @@ sf_readf_double	(SNDFILE *sndfile, double *ptr, sf_count_t frames)
 		return 0 ;
 		} ;
 
-	if (! psf->read_double || psf->seek == NULL)
+	if (psf->read_double == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return	0 ;
 		} ;
@@ -1775,7 +1775,7 @@ sf_write_short	(SNDFILE *sndfile, const short *ptr, sf_count_t len)
 		return 0 ;
 		} ;
 
-	if (! psf->write_short || psf->seek == NULL)
+	if (psf->write_short == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return 0 ;
 		} ;
@@ -1815,7 +1815,7 @@ sf_writef_short	(SNDFILE *sndfile, const short *ptr, sf_count_t frames)
 		return 0 ;
 		} ;
 
-	if (! psf->write_short || psf->seek == NULL)
+	if (psf->write_short == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return 0 ;
 		} ;
@@ -1863,7 +1863,7 @@ sf_write_int	(SNDFILE *sndfile, const int *ptr, sf_count_t len)
 		return 0 ;
 		} ;
 
-	if (! psf->write_int || psf->seek == NULL)
+	if (psf->write_int == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return 0 ;
 		} ;
@@ -1903,7 +1903,7 @@ sf_writef_int	(SNDFILE *sndfile, const int *ptr, sf_count_t frames)
 		return 0 ;
 		} ;
 
-	if (! psf->write_int || psf->seek == NULL)
+	if (psf->write_int == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return 0 ;
 		} ;
@@ -1951,7 +1951,7 @@ sf_write_float	(SNDFILE *sndfile, const float *ptr, sf_count_t len)
 		return 0 ;
 		} ;
 
-	if (! psf->write_float || psf->seek == NULL)
+	if (psf->write_float == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return 0 ;
 		} ;
@@ -1991,7 +1991,7 @@ sf_writef_float	(SNDFILE *sndfile, const float *ptr, sf_count_t frames)
 		return 0 ;
 		} ;
 
-	if (! psf->write_float || psf->seek == NULL)
+	if (psf->write_float == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return 0 ;
 		} ;
@@ -2039,7 +2039,7 @@ sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t len)
 		return	0 ;
 		} ;
 
-	if (! psf->write_double || psf->seek == NULL)
+	if (psf->write_double == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return 0 ;
 		} ;
@@ -2079,7 +2079,7 @@ sf_writef_double	(SNDFILE *sndfile, const double *ptr, sf_count_t frames)
 		return 0 ;
 		} ;
 
-	if (! psf->write_double || psf->seek == NULL)
+	if (psf->write_double == NULL || psf->seek == NULL)
 	{	psf->error = SFE_UNIMPLEMENTED ;
 		return 0 ;
 		} ;
