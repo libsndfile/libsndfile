@@ -213,6 +213,8 @@ info_dump (const char *filename)
 	{	printf ("Error : Not able to open input file %s.\n", filename) ;
 		fflush (stdout) ;
 		memset (data, 0, sizeof (data)) ;
+		sf_command (file, SFC_GET_LOG_INFO, strbuffer, BUFFER_LEN) ;
+		puts (strbuffer) ;
 		puts (sf_strerror (NULL)) ;
 		return ;
 		} ;

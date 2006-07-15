@@ -3,6 +3,9 @@
     * examples/sndfile-play.c
     Explicitly set endian-ness as well as setting 16 bit output.
 
+    * examples/sndfile-info.c
+    Make sure to parse info if file fails to open.
+
 2006-06-23 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
