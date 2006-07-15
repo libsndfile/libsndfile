@@ -406,7 +406,7 @@ linux_play (int argc, char *argv [])
 
 static int
 linux_open_dsp_device (int channels, int srate)
-{	int fd, stereo, temp, error ;
+{	int fd, stereo, fmt ;
 
 	if ((fd = open ("/dev/dsp", O_WRONLY, 0)) == -1 &&
 		(fd = open ("/dev/sound/dsp", O_WRONLY, 0)) == -1)
@@ -426,23 +426,23 @@ linux_open_dsp_device (int channels, int srate)
 		exit (1) ;
 		} ;
 
-	temp = 16 ;
-	if ((error = ioctl (fd, SOUND_PCM_WRITE_BITS, &temp)) != 0)
-	{	perror ("linux_open_dsp_device : bitwidth ") ;
-		exit (1) ;
-		} ;
+	fmt = CPU_IS_BIG_ENDIAN ? AFMT_S16_BE : AFMT_S16_LE ;
+	if (ioctl (fd, SOUND_PCM_SETFMT, &fmt) != 0)
+	{	perror ("linux_open_dsp_device : set format ") ;
+	    exit (1) ;
+  		} ;
 
-	if ((error = ioctl (fd, SOUND_PCM_WRITE_CHANNELS, &channels)) != 0)
+	if (ioctl (fd, SOUND_PCM_WRITE_CHANNELS, &channels) != 0)
 	{	perror ("linux_open_dsp_device : channels ") ;
 		exit (1) ;
 		} ;
 
-	if ((error = ioctl (fd, SOUND_PCM_WRITE_RATE, &srate)) != 0)
+	if (ioctl (fd, SOUND_PCM_WRITE_RATE, &srate) != 0)
 	{	perror ("linux_open_dsp_device : sample rate ") ;
 		exit (1) ;
 		} ;
 
-	if ((error = ioctl (fd, SNDCTL_DSP_SYNC, 0)) != 0)
+	if (ioctl (fd, SNDCTL_DSP_SYNC, 0) != 0)
 	{	perror ("linux_open_dsp_device : sync ") ;
 		exit (1) ;
 		} ;
