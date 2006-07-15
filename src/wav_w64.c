@@ -95,10 +95,10 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 	/* assume psf->rwf_endian is already properly set */
 
 	/* Read the minimal WAV file header here. */
-	bytesread =
-	psf_binheader_readf (psf, "224422", &(wav_fmt->format), &(wav_fmt->min.channels),
-			&(wav_fmt->min.samplerate), &(wav_fmt->min.bytespersec),
-			&(wav_fmt->min.blockalign), &(wav_fmt->min.bitwidth)) ;
+	bytesread = psf_binheader_readf (psf, "224422",
+					&(wav_fmt->format), &(wav_fmt->min.channels),
+					&(wav_fmt->min.samplerate), &(wav_fmt->min.bytespersec),
+					&(wav_fmt->min.blockalign), &(wav_fmt->min.bitwidth)) ;
 
 	psf_log_printf (psf, "  Format        : 0x%X => %s\n", wav_fmt->format, wav_w64_format_str (wav_fmt->format)) ;
 	psf_log_printf (psf, "  Channels      : %d\n", wav_fmt->min.channels) ;
@@ -114,12 +114,26 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 		wav_fmt->min.bitwidth = 32 ;
 		wav_fmt->format = WAVE_FORMAT_IEEE_FLOAT ;
 		}
-	else if (wav_fmt->format != WAVE_FORMAT_GSM610 && wav_fmt->min.bitwidth == 0)
-		psf_log_printf (psf, "  Bit Width     : %d (should not be 0)\n", wav_fmt->min.bitwidth) ;
-	else if (wav_fmt->format == WAVE_FORMAT_GSM610 && wav_fmt->min.bitwidth != 0)
-		psf_log_printf (psf, "  Bit Width     : %d (should be 0)\n", wav_fmt->min.bitwidth) ;
+	else if (wav_fmt->min.bitwidth == 0)
+	{	switch (wav_fmt->format)
+		{	case WAVE_FORMAT_GSM610 :
+			case WAVE_FORMAT_IPP_ITU_G_723_1 :
+					psf_log_printf (psf, "  Bit Width     : %d\n", wav_fmt->min.bitwidth) ;
+					break ;
+			default :
+					psf_log_printf (psf, "  Bit Width     : %d (should not be 0)\n", wav_fmt->min.bitwidth) ;
+			}
+		}
 	else
-		psf_log_printf (psf, "  Bit Width     : %d\n", wav_fmt->min.bitwidth) ;
+	{	switch (wav_fmt->format)
+		{	case WAVE_FORMAT_GSM610 :
+			case WAVE_FORMAT_IPP_ITU_G_723_1 :
+		psf_log_printf (psf, "  Bit Width     : %d (should be 0)\n", wav_fmt->min.bitwidth) ;
+					break ;
+			default :
+					psf_log_printf (psf, "  Bit Width     : %d\n", wav_fmt->min.bitwidth) ;
+			}
+		} ;
 
 	psf->sf.samplerate	= wav_fmt->min.samplerate ;
 	psf->sf.frames 		= 0 ;					/* Correct this when reading data chunk. */
@@ -447,6 +461,7 @@ static WAV_FORMAT_DESC wave_descs [] =
 	FORMAT_TYPE (WAVE_FORMAT_SOUNDSPACE_MUSICOMPRESS),
 	FORMAT_TYPE (WAVE_FORMAT_DVM),
 	FORMAT_TYPE (WAVE_FORMAT_INTERWAV_VSC112),
+	FORMAT_TYPE (WAVE_FORMAT_IPP_ITU_G_723_1),
 	FORMAT_TYPE (WAVE_FORMAT_EXTENSIBLE),
 } ;
 
@@ -458,7 +473,7 @@ wav_w64_format_str (int k)
 	upper = sizeof (wave_descs) / sizeof (WAV_FORMAT_DESC) ;
 
 	/* binary search */
-	if ((wave_descs [0].ID <= k) & (k <= wave_descs [upper - 1].ID))
+	if ((wave_descs [0].ID <= k) && (k <= wave_descs [upper - 1].ID))
 	{
 		while (lower + 1 < upper)
 		{	mid = (upper + lower) / 2 ;

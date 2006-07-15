@@ -144,6 +144,9 @@ enum
 	WAVE_FORMAT_SOUNDSPACE_MUSICOMPRESS	= 0x1500,		/* AT&T Labs, Inc. */
 	WAVE_FORMAT_DVM						= 0x2000,		/* FAST Multimedia AG */
 	WAVE_FORMAT_INTERWAV_VSC112			= 0x7150,		/* ????? */
+
+	WAVE_FORMAT_IPP_ITU_G_723_1			= 0x7230,		/* Intel Performance Primitives g723 codec. */
+
 	WAVE_FORMAT_EXTENSIBLE				= 0xFFFE
 } ;
 

@@ -6,6 +6,12 @@
     * examples/sndfile-info.c
     Make sure to parse info if file fails to open.
 
+    * src/sndfile.c
+    Handle parse error a little better.
+
+    * src/wav_w64.[ch]
+    Minor clean up, add detection of IPP ITU G723.1.
+
 2006-06-23 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
