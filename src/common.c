@@ -812,7 +812,7 @@ header_read (SF_PRIVATE *psf, void *ptr, int bytes)
 
 		most = SIGNED_SIZEOF (psf->header) - psf->headindex ;
 		psf_fread (psf->header + psf->headend, 1, most, psf) ;
-		memset (ptr + most, 0, bytes - most) ;
+		memset ((char *) ptr + most, 0, bytes - most) ;
 
 		psf_fseek (psf, bytes - most, SEEK_CUR) ;
 		return bytes ;
