@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.59)
 
-AC_INIT([libsndfile],[1.0.17pre6],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.17pre7],[erikd@mega-nerd.com])
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
@@ -409,16 +409,19 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	AC_ADD_CFLAGS(-std=gnu99)
 
 	CFLAGS="$CFLAGS -W -Wall"
+	CXXFLAGS="$CXXFLAGS -W -Wall"
 
 	AC_ADD_CFLAGS(-Wdeclaration-after-statement)
 	AC_ADD_CFLAGS(-Wpointer-arith)
 
 	if test x$enable_gcc_werror = "xyes" ; then
 		CFLAGS="-Werror $CFLAGS"
+		CXXFLAGS="-Werror $CXXFLAGS"
 		fi
 
-	CFLAGS="$CFLAGS -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return -Wcast-align -Wcast-qual -Wnested-externs -Wshadow -Wbad-function-cast -Wwrite-strings"
-	# -Wpointer-arith -Wundef -Wmissing-declarations -Winline -Wconversion"
+	CFLAGS="$CFLAGS -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return -Wcast-align -Wcast-qual -Wnested-externs -Wshadow -Wbad-function-cast -Wwrite-strings "
+	# -Wundef -Wmissing-declarations -Winline -Wconversion"
+	CXXFLAGS="$CXXFLAGS -Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo "
 
 	if test "x$enable_gcc_opt" = "xno" ; then
 		temp_CFLAGS=`echo $CFLAGS | sed "s/O2/O0/"`
