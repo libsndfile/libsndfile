@@ -27,6 +27,10 @@
 [+ CASE (suffix) +]
 [+ ==  h  +]
 
+#ifdef __cplusplus
+extern "C" {
+#endif	/* __cplusplus */
+
 #include <stdarg.h>
 
 #define SF_COUNT_TO_LONG(x)	((long) (x))
@@ -108,6 +112,10 @@ void	test_seek_or_die
 [+ ENDFOR io_type +][+ ENDFOR write_op +]
 
 #endif
+
+#ifdef __cplusplus
+}		/* extern "C" */
+#endif	/* __cplusplus */
 
 [+  ==  c  +]
 
