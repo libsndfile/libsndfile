@@ -1,3 +1,17 @@
+2006-07-27 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/utils.tpl
+    Add extern C to generated header file.
+
+    * src/sndfile.hh
+    Work towards completing this.
+
+    * tests/cpp_test.cc tests/Makefile.am
+    Add a C++ test and hook into build.
+
+    * configure.ac
+    Add appropriate CXXFLAGS.
+
 2006-07-26 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
