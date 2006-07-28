@@ -48,8 +48,8 @@ class Sndfile
 		bool openWrite (const char *path) ;
 		bool openReadWrite (const char *path) ;
 
-		static int error (void) ;
-		const char * StrError (void) ;
+		int error (void) ;
+		const char * strError (void) ;
 
 		int command (int cmd, void *data, int datasize) ;
 
@@ -137,9 +137,30 @@ Sndfile::close (void)
 	psf = NULL ;
 } /* Sndfile::close */
 
+inline int
+Sndfile::error (void)
+{	return sf_error (psf) ; }
+
+inline const char *
+Sndfile::strError (void)
+{	return sf_strerror (psf) ; }
+
+inline int
+Sndfile::command (int cmd, void *data, int datasize)
+{	return sf_command (psf, cmd, data, datasize) ; }
+
 inline sf_count_t
 Sndfile::seek (sf_count_t frames, int whence)
 {	return sf_seek (psf, frames, whence) ; }
+
+inline int
+Sndfile::setString (int str_type, const char* str)
+{	return sf_set_string (psf, str_type, str) ; }
+
+inline const char*
+Sndfile::getString (int str_type)
+{	return sf_get_string (psf, str_type) ; }
+
 
 /*---------------------------------------------------------------------*/
 

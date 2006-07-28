@@ -1,3 +1,11 @@
+2006-07-28 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.hh
+    Complete it.
+
+    * tests/cpp_test.cc
+    Add more tests.
+
 2006-07-27 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/utils.tpl

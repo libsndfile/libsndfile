@@ -18,6 +18,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 #include <sndfile.hh>
 
@@ -36,6 +37,8 @@ create_file (const char * filename, int format)
 	file.sfinfo.channels = 2 ;
 	file.sfinfo.samplerate = 48000 ;
 	file.openWrite (filename) ;
+
+	file.setString (SF_STR_TITLE, filename) ;
 
 	/* Item write. */
 	file.write (sbuffer, ARRAY_LEN (sbuffer)) ;
@@ -59,6 +62,8 @@ create_file (const char * filename, int format)
 static void
 read_file (const char * filename, int format)
 {	Sndfile file ;
+	const char *title ;
+	sf_count_t count ;
 
 	file.openRead (filename) ;
 
@@ -78,6 +83,18 @@ read_file (const char * filename, int format)
 		exit (1) ;
 		} ;
 
+	title = file.getString (SF_STR_TITLE) ;
+
+	if (title == NULL)
+	{	printf ("\n\n%s %d : Error : No title.\n\n", __func__, __LINE__) ;
+		exit (1) ;
+		} ;
+
+	if (strcmp (filename, title) != 0)
+	{	printf ("\n\n%s %d : Error : title '%s' should be '%s'\n\n", __func__, __LINE__, title, filename) ;
+		exit (1) ;
+		} ;
+
 	/* Item read. */
 	file.read (sbuffer, ARRAY_LEN (sbuffer)) ;
 	file.read (ibuffer, ARRAY_LEN (ibuffer)) ;
@@ -89,6 +106,20 @@ read_file (const char * filename, int format)
 	file.readf (ibuffer, ARRAY_LEN (ibuffer) / file.sfinfo.channels) ;
 	file.readf (fbuffer, ARRAY_LEN (fbuffer) / file.sfinfo.channels) ;
 	file.readf (dbuffer, ARRAY_LEN (dbuffer) / file.sfinfo.channels) ;
+
+	count = file.seek (file.sfinfo.frames - 10, SEEK_SET) ;
+	if (count != file.sfinfo.frames - 10)
+	{	printf ("\n\n%s %d : Error : offset (%ld) should be %ld\n\n", __func__, __LINE__,
+				SF_COUNT_TO_LONG (count), SF_COUNT_TO_LONG (file.sfinfo.frames - 10)) ;
+		exit (1) ;
+		} ;
+
+	count = file.read (sbuffer, ARRAY_LEN (sbuffer)) ;
+	if (count != 10 * file.sfinfo.channels)
+	{	printf ("\n\n%s %d : Error : count (%ld) should be %ld\n\n", __func__, __LINE__,
+				SF_COUNT_TO_LONG (count), SF_COUNT_TO_LONG (10 * file.sfinfo.channels)) ;
+		exit (1) ;
+		} ;
 
 	/*
 	**	An explict close() call is not really necessary as the Sndfile 
