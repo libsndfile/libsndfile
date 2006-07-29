@@ -6,6 +6,9 @@
     * src/Makefile.am
     Add sndfile.hh to distributed header files.
 
+    * src/sndfile.hh
+    Change the license for the C++ wrapper to BSD.
+
 2006-07-28 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.hh
