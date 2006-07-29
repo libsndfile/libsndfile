@@ -3,6 +3,7 @@
 SUBDIRS = GSM610 G72x
 
 lib_LTLIBRARIES = libsndfile.la
+include_HEADERS = sndfile.hh
 nodist_include_HEADERS = sndfile.h
 
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
