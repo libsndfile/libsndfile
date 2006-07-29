@@ -137,6 +137,7 @@ main (void)
 	create_file (filename, SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 	read_file (filename, SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 
+	remove (filename) ;
 	puts ("ok") ;
 	return 0 ;
 } /* main */
