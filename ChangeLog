@@ -1,3 +1,15 @@
+2006-07-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.hh
+    Templatize the read/write/readf/writef methods as suggested by Lars Luthman.
+    Prevent the potential leak of SNDFILE* pointers in the openRead/openWrite/
+    openReadWrite methods.
+    Add const to SF_INFO pointer in Sndfile constructor.
+    Make the destrictor call the close() method.
+
+    * tests/cpp_test.cc
+    Add more tests.
+
 2006-07-29 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/cpp_test.cc

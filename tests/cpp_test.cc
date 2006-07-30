@@ -33,10 +33,7 @@ static void
 create_file (const char * filename, int format)
 {	Sndfile file ;
 
-	file.sfinfo.format = format ;
-	file.sfinfo.channels = 2 ;
-	file.sfinfo.samplerate = 48000 ;
-	file.openWrite (filename) ;
+	file.open (filename, SFM_WRITE, format, 2, 48000) ;
 
 	file.setString (SF_STR_TITLE, filename) ;
 
@@ -47,10 +44,10 @@ create_file (const char * filename, int format)
 	file.write (dbuffer, ARRAY_LEN (dbuffer)) ;
 
 	/* Frame write. */
-	file.writef (sbuffer, ARRAY_LEN (sbuffer) / file.sfinfo.channels) ;
-	file.writef (ibuffer, ARRAY_LEN (ibuffer) / file.sfinfo.channels) ;
-	file.writef (fbuffer, ARRAY_LEN (fbuffer) / file.sfinfo.channels) ;
-	file.writef (dbuffer, ARRAY_LEN (dbuffer) / file.sfinfo.channels) ;
+	file.writef (sbuffer, ARRAY_LEN (sbuffer) / file.channels ()) ;
+	file.writef (ibuffer, ARRAY_LEN (ibuffer) / file.channels ()) ;
+	file.writef (fbuffer, ARRAY_LEN (fbuffer) / file.channels ()) ;
+	file.writef (dbuffer, ARRAY_LEN (dbuffer) / file.channels ()) ;
 
 	/*
 	**	An explict close() call is not really necessary as the Sndfile 
@@ -65,21 +62,31 @@ read_file (const char * filename, int format)
 	const char *title ;
 	sf_count_t count ;
 
-	file.openRead (filename) ;
-
-	if (file.sfinfo.format != format)
-	{	printf ("\n\n%s %d : Error : format 0x%08x should be 0x%08x.\n\n", __func__, __LINE__, file.sfinfo.format, format) ;
+	if (file)
+	{	printf ("\n\n%s %d : Error : should not be here.\n\n", __func__, __LINE__) ;
 		exit (1) ;
 		} ;
 
-	if (file.sfinfo.channels != 2)
-	{	printf ("\n\n%s %d : Error : channels %d should be 2.\n\n", __func__, __LINE__, file.sfinfo.channels) ;
+	file.open (filename) ;
+
+	if (! file)
+	{	printf ("\n\n%s %d : Error : should not be here.\n\n", __func__, __LINE__) ;
 		exit (1) ;
 		} ;
 
-	if (file.sfinfo.frames != ARRAY_LEN (sbuffer) * 4)
+	if (file.format () != format)
+	{	printf ("\n\n%s %d : Error : format 0x%08x should be 0x%08x.\n\n", __func__, __LINE__, file.format (), format) ;
+		exit (1) ;
+		} ;
+
+	if (file.channels () != 2)
+	{	printf ("\n\n%s %d : Error : channels %d should be 2.\n\n", __func__, __LINE__, file.channels ()) ;
+		exit (1) ;
+		} ;
+
+	if (file.frames () != ARRAY_LEN (sbuffer) * 4)
 	{	printf ("\n\n%s %d : Error : frames %ld should be %d.\n\n", __func__, __LINE__,
-				SF_COUNT_TO_LONG (file.sfinfo.frames), ARRAY_LEN (sbuffer) * 4 / 2) ;
+				SF_COUNT_TO_LONG (file.frames ()), ARRAY_LEN (sbuffer) * 4 / 2) ;
 		exit (1) ;
 		} ;
 
@@ -102,22 +109,22 @@ read_file (const char * filename, int format)
 	file.read (dbuffer, ARRAY_LEN (dbuffer)) ;
 
 	/* Frame read. */
-	file.readf (sbuffer, ARRAY_LEN (sbuffer) / file.sfinfo.channels) ;
-	file.readf (ibuffer, ARRAY_LEN (ibuffer) / file.sfinfo.channels) ;
-	file.readf (fbuffer, ARRAY_LEN (fbuffer) / file.sfinfo.channels) ;
-	file.readf (dbuffer, ARRAY_LEN (dbuffer) / file.sfinfo.channels) ;
+	file.readf (sbuffer, ARRAY_LEN (sbuffer) / file.channels ()) ;
+	file.readf (ibuffer, ARRAY_LEN (ibuffer) / file.channels ()) ;
+	file.readf (fbuffer, ARRAY_LEN (fbuffer) / file.channels ()) ;
+	file.readf (dbuffer, ARRAY_LEN (dbuffer) / file.channels ()) ;
 
-	count = file.seek (file.sfinfo.frames - 10, SEEK_SET) ;
-	if (count != file.sfinfo.frames - 10)
+	count = file.seek (file.frames () - 10, SEEK_SET) ;
+	if (count != file.frames () - 10)
 	{	printf ("\n\n%s %d : Error : offset (%ld) should be %ld\n\n", __func__, __LINE__,
-				SF_COUNT_TO_LONG (count), SF_COUNT_TO_LONG (file.sfinfo.frames - 10)) ;
+				SF_COUNT_TO_LONG (count), SF_COUNT_TO_LONG (file.frames () - 10)) ;
 		exit (1) ;
 		} ;
 
 	count = file.read (sbuffer, ARRAY_LEN (sbuffer)) ;
-	if (count != 10 * file.sfinfo.channels)
+	if (count != 10 * file.channels ())
 	{	printf ("\n\n%s %d : Error : count (%ld) should be %ld\n\n", __func__, __LINE__,
-				SF_COUNT_TO_LONG (count), SF_COUNT_TO_LONG (10 * file.sfinfo.channels)) ;
+				SF_COUNT_TO_LONG (count), SF_COUNT_TO_LONG (10 * file.channels ())) ;
 		exit (1) ;
 		} ;
 
