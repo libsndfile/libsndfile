@@ -54,28 +54,37 @@
 
 #include <sndfile.h>
 
-class Sndfile
-{	private :
-		SF_INFO sfinfo ;
-		SNDFILE *psf ;
+#include <new> // for std::nothrow
 
-		/* Copy constructor and assignment operators are not supported. */
-		Sndfile (const Sndfile&) ;
-		Sndfile & operator = (const Sndfile&) ;
+class SndfileHandle
+{	private :
+		struct SNDFILE_ref
+		{	SNDFILE_ref (SNDFILE *psf) ;
+			~SNDFILE_ref (void) ;
+
+			SNDFILE *sf ;
+			int ref ;
+			} ;
+
+		SF_INFO sfinfo ;
+		SNDFILE_ref *p ;
 
 	public :
 			/* Default constructor */
-			Sndfile (void) ;
-			Sndfile (const char *path, int mode = SFM_READ, int format = 0,
-							int channels = 0, int samplerate = 0) ;
-			~Sndfile (void) ;
+			SndfileHandle (void) ;
+			SndfileHandle (const char *path, int mode = SFM_READ,
+							int format = 0, int channels = 0, int samplerate = 0) ;
+			~SndfileHandle (void) ;
 
-		bool open (const char *path, int mode = SFM_READ, int format = 0,
-							int channels = 0, int samplerate = 0) ;
+			SndfileHandle (const SndfileHandle &orig) ;
+			SndfileHandle & operator = (const SndfileHandle &rhs) ;
 
-		void	close		(void) ;
-		
-		operator bool () const { return (psf != NULL) ; }
+		/* Mainly for debugging/testing. */
+		int refCount (void) const { return (p == NULL) ? 0 : p->ref ; }
+
+		operator bool () const { return (p != NULL) ; }
+
+		bool operator == (const SndfileHandle &rhs) const { return (p == rhs.p) ; }
 
 		sf_count_t	frames (void) const		{ return sfinfo.frames ; }
 		int			format (void) const		{ return sfinfo.format ; }
@@ -89,17 +98,35 @@ class Sndfile
 
 		sf_count_t	seek (sf_count_t frames, int whence) ;
 
+		void writeSync (void) ;
+
 		int setString (int str_type, const char* str) ;
 
 		const char* getString (int str_type) const ;
 
-		template <typename T> sf_count_t read (T *ptr, sf_count_t items) ;
+		sf_count_t read (short *ptr, sf_count_t items) ;
+		sf_count_t read (int *ptr, sf_count_t items) ;
+		sf_count_t read (float *ptr, sf_count_t items) ;
+		sf_count_t read (double *ptr, sf_count_t items) ;
 
-		template <typename T> sf_count_t write (const T *ptr, sf_count_t items) ;
+		sf_count_t write (const short *ptr, sf_count_t items) ;
+		sf_count_t write (const int *ptr, sf_count_t items) ;
+		sf_count_t write (const float *ptr, sf_count_t items) ;
+		sf_count_t write (const double *ptr, sf_count_t items) ;
 
-		template <typename T> sf_count_t readf (T *ptr, sf_count_t frames) ;
+		sf_count_t readf (short *ptr, sf_count_t frames) ;
+		sf_count_t readf (int *ptr, sf_count_t frames) ;
+		sf_count_t readf (float *ptr, sf_count_t frames) ;
+		sf_count_t readf (double *ptr, sf_count_t frames) ;
 
-		template <typename T> sf_count_t writef (const T *ptr, sf_count_t frames) ;
+		sf_count_t writef (const short *ptr, sf_count_t frames) ;
+		sf_count_t writef (const int *ptr, sf_count_t frames) ;
+		sf_count_t writef (const float *ptr, sf_count_t frames) ;
+		sf_count_t writef (const double *ptr, sf_count_t frames) ;
+
+		sf_count_t	readRaw		(void *ptr, sf_count_t bytes) ;
+		sf_count_t	writeRaw	(const void *ptr, sf_count_t bytes) ;
+
 } ;
 
 /*==============================================================================
@@ -107,154 +134,176 @@ class Sndfile
 */
 
 inline
-Sndfile::Sndfile (void)
-: psf (NULL)
+SndfileHandle::SNDFILE_ref::SNDFILE_ref (SNDFILE *psf)
+: sf (psf), ref (1)
+{}
+
+inline
+SndfileHandle::SNDFILE_ref::~SNDFILE_ref (void)
+{	sf_close (sf) ; }
+
+inline
+SndfileHandle::SndfileHandle (void)
+: p (NULL)
 {	sfinfo.frames = 0 ;
 	sfinfo.channels = 0 ;
 	sfinfo.format = 0 ;
+	sfinfo.samplerate = 0 ;
 	sfinfo.sections = 0 ;
-	sfinfo.seekable = 0 ; 
-} /* Sndfile constructor */
+	sfinfo.seekable = 0 ;
+} /* SndfileHandle constructor */
 
 inline
-Sndfile::Sndfile (const char *path, int mode, int fmt, int chans, int srate)
-: psf (NULL)
-{	open (path, mode, fmt, chans, srate) ;
-} /* Sndfile constructor */
-
-inline
-Sndfile::~Sndfile (void)
-{	close () ;
-} /* Sndfile destructor */
-
-inline bool
-Sndfile::open (const char *path, int mode, int fmt, int chans, int srate)
-{	close () ;
-	sfinfo.frames = 0 ;
+SndfileHandle::SndfileHandle (const char *path, int mode, int fmt, int chans, int srate)
+: p (NULL)
+{	sfinfo.frames = 0 ;
 	sfinfo.channels = chans ;
 	sfinfo.format = fmt ;
 	sfinfo.samplerate = srate ;
 	sfinfo.sections = 0 ;
-	sfinfo.seekable = 0 ; 
-	psf = sf_open (path, mode, &sfinfo) ;
-	if (psf == NULL)
-		return false ;
-	return true ;
-} /* Sndfile::open */
+	sfinfo.seekable = 0 ;
 
-inline void
-Sndfile::close (void)
-{	if (psf != NULL)
-		sf_close (psf) ;
-	psf = NULL ;
-} /* Sndfile::close */
+	SNDFILE *psf = sf_open (path, mode, &sfinfo) ;
+	if (psf != NULL)
+	{	p = new (std::nothrow) SNDFILE_ref (psf) ;
+		if (p == NULL)
+			sf_close (psf) ;
+	}
+} /* SndfileHandle constructor */
+
+inline
+SndfileHandle::~SndfileHandle (void)
+{	if (p != NULL && --p->ref == 0)
+		delete p ;
+} /* SndfileHandle destructor */
+
+
+inline
+SndfileHandle::SndfileHandle (const SndfileHandle &orig)
+: sfinfo (orig.sfinfo), p (orig.p)
+{	if (p != NULL)
+		++p->ref ;
+} /* SndfileHandle copy constructor */
+
+inline SndfileHandle &
+SndfileHandle::operator = (const SndfileHandle &rhs)
+{
+	if (&rhs == this)
+		return *this ;
+	if (p != NULL && --p->ref == 0)
+		delete p ;
+
+	sfinfo = rhs.sfinfo ;
+	p = rhs.p ;
+	if (p != NULL)
+		++p->ref ;
+
+	return *this ;
+} /* SndfileHandle assignment operator */
 
 inline int
-Sndfile::error (void) const
-{	return sf_error (psf) ; }
+SndfileHandle::error (void) const
+{	return sf_error (p->sf) ; }
 
 inline const char *
-Sndfile::strError (void) const
-{	return sf_strerror (psf) ; }
+SndfileHandle::strError (void) const
+{	return sf_strerror (p->sf) ; }
 
 inline int
-Sndfile::command (int cmd, void *data, int datasize)
-{	return sf_command (psf, cmd, data, datasize) ; }
+SndfileHandle::command (int cmd, void *data, int datasize)
+{	return sf_command (p->sf, cmd, data, datasize) ; }
 
 inline sf_count_t
-Sndfile::seek (sf_count_t frame_count, int whence)
-{	return sf_seek (psf, frame_count, whence) ; }
+SndfileHandle::seek (sf_count_t frame_count, int whence)
+{	return sf_seek (p->sf, frame_count, whence) ; }
+
+inline void
+SndfileHandle::writeSync (void)
+{	sf_write_sync (p->sf) ; }
 
 inline int
-Sndfile::setString (int str_type, const char* str)
-{	return sf_set_string (psf, str_type, str) ; }
+SndfileHandle::setString (int str_type, const char* str)
+{	return sf_set_string (p->sf, str_type, str) ; }
 
 inline const char*
-Sndfile::getString (int str_type) const
-{	return sf_get_string (psf, str_type) ; }
+SndfileHandle::getString (int str_type) const
+{	return sf_get_string (p->sf, str_type) ; }
 
 
 /*---------------------------------------------------------------------*/
 
-template <>
 inline sf_count_t
-Sndfile::read <short> (short *ptr, sf_count_t items)
-{	return sf_read_short (psf, ptr, items) ; }
+SndfileHandle::read (short *ptr, sf_count_t items)
+{	return sf_read_short (p->sf, ptr, items) ; }
 
-template <>
 inline sf_count_t
-Sndfile::read <int> (int *ptr, sf_count_t items)
-{	return sf_read_int (psf, ptr, items) ; }
+SndfileHandle::read (int *ptr, sf_count_t items)
+{	return sf_read_int (p->sf, ptr, items) ; }
 
-template <>
 inline sf_count_t
-Sndfile::read <float> (float *ptr, sf_count_t items)
-{	return sf_read_float (psf, ptr, items) ; }
+SndfileHandle::read (float *ptr, sf_count_t items)
+{	return sf_read_float (p->sf, ptr, items) ; }
 
-template <>
 inline sf_count_t
-Sndfile::read <double> (double *ptr, sf_count_t items)
-{	return sf_read_double (psf, ptr, items) ; }
+SndfileHandle::read (double *ptr, sf_count_t items)
+{	return sf_read_double (p->sf, ptr, items) ; }
 
-template <>
 inline sf_count_t
-Sndfile::write <short> (const short *ptr, sf_count_t items)
-{	return sf_write_short (psf, ptr, items) ; }
+SndfileHandle::write (const short *ptr, sf_count_t items)
+{	return sf_write_short (p->sf, ptr, items) ; }
 
-template <>
 inline sf_count_t
-Sndfile::write <int> (const int *ptr, sf_count_t items)
-{	return sf_write_int (psf, ptr, items) ; }
+SndfileHandle::write (const int *ptr, sf_count_t items)
+{	return sf_write_int (p->sf, ptr, items) ; }
 
-template <>
 inline sf_count_t
-Sndfile::write <float> (const float *ptr, sf_count_t items)
-{	return sf_write_float (psf, ptr, items) ; }
+SndfileHandle::write (const float *ptr, sf_count_t items)
+{	return sf_write_float (p->sf, ptr, items) ; }
 
-template <>
 inline sf_count_t
-Sndfile::write <double> (const double *ptr, sf_count_t items)
-{	return sf_write_double (psf, ptr, items) ; }
+SndfileHandle::write (const double *ptr, sf_count_t items)
+{	return sf_write_double (p->sf, ptr, items) ; }
 
-template <>
 inline sf_count_t
-Sndfile::readf <short> (short *ptr, sf_count_t frame_count)
-{	return sf_readf_short (psf, ptr, frame_count) ; }
+SndfileHandle::readf (short *ptr, sf_count_t frame_count)
+{	return sf_readf_short (p->sf, ptr, frame_count) ; }
 
-template <>
 inline sf_count_t
-Sndfile::readf <int> (int *ptr, sf_count_t frame_count)
-{	return sf_readf_int (psf, ptr, frame_count) ; }
+SndfileHandle::readf (int *ptr, sf_count_t frame_count)
+{	return sf_readf_int (p->sf, ptr, frame_count) ; }
 
-template <>
 inline sf_count_t
-Sndfile::readf <float> (float *ptr, sf_count_t frame_count)
-{	return sf_readf_float (psf, ptr, frame_count) ; }
+SndfileHandle::readf (float *ptr, sf_count_t frame_count)
+{	return sf_readf_float (p->sf, ptr, frame_count) ; }
 
-template <>
 inline sf_count_t
-Sndfile::readf <double> (double *ptr, sf_count_t frame_count)
-{	return sf_readf_double (psf, ptr, frame_count) ; }
+SndfileHandle::readf (double *ptr, sf_count_t frame_count)
+{	return sf_readf_double (p->sf, ptr, frame_count) ; }
 
-template <>
 inline sf_count_t
-Sndfile::writef <short> (const short *ptr, sf_count_t frame_count)
-{	return sf_writef_short (psf, ptr, frame_count) ; }
+SndfileHandle::writef (const short *ptr, sf_count_t frame_count)
+{	return sf_writef_short (p->sf, ptr, frame_count) ; }
 
-template <>
 inline sf_count_t
-Sndfile::writef <int> (const int *ptr, sf_count_t frame_count)
-{	return sf_writef_int (psf, ptr, frame_count) ; }
+SndfileHandle::writef (const int *ptr, sf_count_t frame_count)
+{	return sf_writef_int (p->sf, ptr, frame_count) ; }
 
-template <>
 inline sf_count_t
-Sndfile::writef <float> (const float *ptr, sf_count_t frame_count)
-{	return sf_writef_float (psf, ptr, frame_count) ; }
+SndfileHandle::writef (const float *ptr, sf_count_t frame_count)
+{	return sf_writef_float (p->sf, ptr, frame_count) ; }
 
-template <>
 inline sf_count_t
-Sndfile::writef <double> (const double *ptr, sf_count_t frame_count)
-{	return sf_writef_double (psf, ptr, frame_count) ; }
+SndfileHandle::writef (const double *ptr, sf_count_t frame_count)
+{	return sf_writef_double (p->sf, ptr, frame_count) ; }
+
+inline sf_count_t
+SndfileHandle::readRaw (void *ptr, sf_count_t bytes)
+{	return sf_read_raw (p->sf, ptr, bytes) ; }
+
+inline sf_count_t
+SndfileHandle::writeRaw (const void *ptr, sf_count_t bytes)
+{	return sf_write_raw (p->sf, ptr, bytes) ; }
+
 
 #endif	/* SNDFILE_HH */
 

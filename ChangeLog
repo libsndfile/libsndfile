@@ -1,3 +1,15 @@
+2006-07-31 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.hh
+    Add writeSync method.
+    Add copy constructor and assignment operator (thanks Daniel Schmitt).
+    Add methods readRaw and writeRaw.
+    Make read/write/readf/writef simple overlaods instead of templates (thanks
+    to Trent Apted for suggesting this).
+
+    * tests/cpp_test.cc
+    Cleanup. Add tests.
+
 2006-07-30 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.hh
@@ -19,7 +31,7 @@
     Add sndfile.hh to distributed header files.
 
     * src/sndfile.hh
-    Change the license for the C++ wrapper to BSD.
+    Change the license for the C++ wrapper to modified BSD.
 
 2006-07-28 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

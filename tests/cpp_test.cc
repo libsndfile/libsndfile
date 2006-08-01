@@ -31,9 +31,19 @@ static double	dbuffer [100] ;
 
 static void
 create_file (const char * filename, int format)
-{	Sndfile file ;
+{	SndfileHandle file ;
 
-	file.open (filename, SFM_WRITE, format, 2, 48000) ;
+	if (file.refCount () != 0)
+	{	printf ("\n\n%s %d : Error : Reference count (%d) should be zero.\n\n", __func__, __LINE__, file.refCount ()) ;
+		exit (1) ;
+		} ;
+
+	file = SndfileHandle (filename, SFM_WRITE, format, 2, 48000) ;
+
+	if (file.refCount () != 1)
+	{	printf ("\n\n%s %d : Error : Reference count (%d) should be 1.\n\n", __func__, __LINE__, file.refCount ()) ;
+		exit (1) ;
+		} ;
 
 	file.setString (SF_STR_TITLE, filename) ;
 
@@ -49,17 +59,31 @@ create_file (const char * filename, int format)
 	file.writef (fbuffer, ARRAY_LEN (fbuffer) / file.channels ()) ;
 	file.writef (dbuffer, ARRAY_LEN (dbuffer) / file.channels ()) ;
 
-	/*
-	**	An explict close() call is not really necessary as the Sndfile 
-	**	destructor closes the file anyway.
-	*/
-	file.close () ;
+	/* RAII takes care of the SndfileHandle. */
 } /* create_file */
 
 static void
+check_title (const SndfileHandle & file, const char * filename)
+{	const char *title = NULL ;
+
+	title = file.getString (SF_STR_TITLE) ;
+
+	if (title == NULL)
+	{	printf ("\n\n%s %d : Error : No title.\n\n", __func__, __LINE__) ;
+		exit (1) ;
+		} ;
+
+	if (strcmp (filename, title) != 0)
+	{	printf ("\n\n%s %d : Error : title '%s' should be '%s'\n\n", __func__, __LINE__, title, filename) ;
+		exit (1) ;
+		} ;
+
+	return ;
+} /* check_title */
+
+static void
 read_file (const char * filename, int format)
-{	Sndfile file ;
-	const char *title ;
+{	SndfileHandle file ;
 	sf_count_t count ;
 
 	if (file)
@@ -67,7 +91,19 @@ read_file (const char * filename, int format)
 		exit (1) ;
 		} ;
 
-	file.open (filename) ;
+	file = SndfileHandle (filename) ;
+
+	SndfileHandle file2 = file ;
+	
+	if (file.refCount () != 2)
+	{	printf ("\n\n%s %d : Error : Reference count (%d) should be zero.\n\n", __func__, __LINE__, file.refCount ()) ;
+		exit (1) ;
+		} ;
+
+	if (file2.refCount () != 2)
+	{	printf ("\n\n%s %d : Error : Reference count (%d) should be zero.\n\n", __func__, __LINE__, file.refCount ()) ;
+		exit (1) ;
+		} ;
 
 	if (! file)
 	{	printf ("\n\n%s %d : Error : should not be here.\n\n", __func__, __LINE__) ;
@@ -90,16 +126,13 @@ read_file (const char * filename, int format)
 		exit (1) ;
 		} ;
 
-	title = file.getString (SF_STR_TITLE) ;
+	switch (format & SF_FORMAT_TYPEMASK)
+	{	case SF_FORMAT_AU :
+				break ;
 
-	if (title == NULL)
-	{	printf ("\n\n%s %d : Error : No title.\n\n", __func__, __LINE__) ;
-		exit (1) ;
-		} ;
-
-	if (strcmp (filename, title) != 0)
-	{	printf ("\n\n%s %d : Error : title '%s' should be '%s'\n\n", __func__, __LINE__, title, filename) ;
-		exit (1) ;
+		default :
+			check_title (file, filename) ;
+			break ;
 		} ;
 
 	/* Item read. */
@@ -128,24 +161,28 @@ read_file (const char * filename, int format)
 		exit (1) ;
 		} ;
 
-	/*
-	**	An explict close() call is not really necessary as the Sndfile 
-	**	destructor closes the file anyway.
-	*/
-	file.close () ;
-} /* create_file */
+	/* RAII takes care of the SndfileHandle. */
+} /* read_file */
 
-int
-main (void)
-{	const char * filename = "cpp_test.wav" ;
+static void
+ceeplusplus_test (const char *filename, int format)
+{
+	print_test_name ("ceeplusplus_test", filename) ;
 
-	print_test_name ("CeePlusPlus test", filename) ;
-
-	create_file (filename, SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
-	read_file (filename, SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+	create_file (filename, format) ;
+	read_file (filename, format) ;
 
 	remove (filename) ;
 	puts ("ok") ;
+} /* ceeplusplus_test */
+
+int
+main (void)
+{
+	ceeplusplus_test ("cpp_test.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+	ceeplusplus_test ("cpp_test.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_S8) ;
+	ceeplusplus_test ("cpp_test.au", SF_FORMAT_AU | SF_FORMAT_FLOAT) ;
+
 	return 0 ;
 } /* main */
 
