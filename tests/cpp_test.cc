@@ -93,15 +93,17 @@ read_file (const char * filename, int format)
 
 	file = SndfileHandle (filename) ;
 
-	SndfileHandle file2 = file ;
-	
-	if (file.refCount () != 2)
-	{	printf ("\n\n%s %d : Error : Reference count (%d) should be zero.\n\n", __func__, __LINE__, file.refCount ()) ;
-		exit (1) ;
+	if (1)
+	{	SndfileHandle file2 = file ;
+
+		if (file.refCount () != 2 || file2.refCount () != 2)
+		{	printf ("\n\n%s %d : Error : Reference count (%d) should be two.\n\n", __func__, __LINE__, file.refCount ()) ;
+			exit (1) ;
+			} ;
 		} ;
 
-	if (file2.refCount () != 2)
-	{	printf ("\n\n%s %d : Error : Reference count (%d) should be zero.\n\n", __func__, __LINE__, file.refCount ()) ;
+	if (file.refCount () != 1)
+	{	printf ("\n\n%s %d : Error : Reference count (%d) should be one.\n\n", __func__, __LINE__, file.refCount ()) ;
 		exit (1) ;
 		} ;
 

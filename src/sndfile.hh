@@ -59,19 +59,19 @@
 class SndfileHandle
 {	private :
 		struct SNDFILE_ref
-		{	SNDFILE_ref (SNDFILE *psf) ;
+		{	SNDFILE_ref (void) ;
 			~SNDFILE_ref (void) ;
 
 			SNDFILE *sf ;
+			SF_INFO sfinfo ;
 			int ref ;
 			} ;
 
-		SF_INFO sfinfo ;
 		SNDFILE_ref *p ;
 
 	public :
 			/* Default constructor */
-			SndfileHandle (void) ;
+			SndfileHandle (void) : p (NULL) {} ;
 			SndfileHandle (const char *path, int mode = SFM_READ,
 							int format = 0, int channels = 0, int samplerate = 0) ;
 			~SndfileHandle (void) ;
@@ -86,10 +86,10 @@ class SndfileHandle
 
 		bool operator == (const SndfileHandle &rhs) const { return (p == rhs.p) ; }
 
-		sf_count_t	frames (void) const		{ return sfinfo.frames ; }
-		int			format (void) const		{ return sfinfo.format ; }
-		int			channels (void) const	{ return sfinfo.channels ; }
-		int			samplerate (void) const { return sfinfo.samplerate ; }
+		sf_count_t	frames (void) const		{ return p ? p->sfinfo.frames : 0 ; }
+		int			format (void) const		{ return p ? p->sfinfo.format : 0 ; }
+		int			channels (void) const	{ return p ? p->sfinfo.channels : 0 ; }
+		int			samplerate (void) const { return p ? p->sfinfo.samplerate : 0 ; }
 
 		int error (void) const ;
 		const char * strError (void) const ;
@@ -134,41 +134,35 @@ class SndfileHandle
 */
 
 inline
-SndfileHandle::SNDFILE_ref::SNDFILE_ref (SNDFILE *psf)
-: sf (psf), ref (1)
+SndfileHandle::SNDFILE_ref::SNDFILE_ref (void)
+: ref (1)
 {}
 
 inline
 SndfileHandle::SNDFILE_ref::~SNDFILE_ref (void)
-{	sf_close (sf) ; }
-
-inline
-SndfileHandle::SndfileHandle (void)
-: p (NULL)
-{	sfinfo.frames = 0 ;
-	sfinfo.channels = 0 ;
-	sfinfo.format = 0 ;
-	sfinfo.samplerate = 0 ;
-	sfinfo.sections = 0 ;
-	sfinfo.seekable = 0 ;
-} /* SndfileHandle constructor */
+{	if (sf != NULL) sf_close (sf) ; }
 
 inline
 SndfileHandle::SndfileHandle (const char *path, int mode, int fmt, int chans, int srate)
 : p (NULL)
-{	sfinfo.frames = 0 ;
-	sfinfo.channels = chans ;
-	sfinfo.format = fmt ;
-	sfinfo.samplerate = srate ;
-	sfinfo.sections = 0 ;
-	sfinfo.seekable = 0 ;
+{
+	p = new (std::nothrow) SNDFILE_ref () ;
 
-	SNDFILE *psf = sf_open (path, mode, &sfinfo) ;
-	if (psf != NULL)
-	{	p = new (std::nothrow) SNDFILE_ref (psf) ;
-		if (p == NULL)
-			sf_close (psf) ;
-	}
+	if (p != NULL)
+	{	p->ref = 1 ;
+
+		p->sfinfo.frames = 0 ;
+		p->sfinfo.channels = chans ;
+		p->sfinfo.format = fmt ;
+		p->sfinfo.samplerate = srate ;
+		p->sfinfo.sections = 0 ;
+		p->sfinfo.seekable = 0 ;
+
+		if ((p->sf = sf_open (path, mode, &p->sfinfo)) == NULL)
+		{	delete p ;
+			p = NULL ;
+			} ;
+		} ;
 } /* SndfileHandle constructor */
 
 inline
@@ -180,7 +174,7 @@ SndfileHandle::~SndfileHandle (void)
 
 inline
 SndfileHandle::SndfileHandle (const SndfileHandle &orig)
-: sfinfo (orig.sfinfo), p (orig.p)
+: p (orig.p)
 {	if (p != NULL)
 		++p->ref ;
 } /* SndfileHandle copy constructor */
@@ -193,7 +187,6 @@ SndfileHandle::operator = (const SndfileHandle &rhs)
 	if (p != NULL && --p->ref == 0)
 		delete p ;
 
-	sfinfo = rhs.sfinfo ;
 	p = rhs.p ;
 	if (p != NULL)
 		++p->ref ;
