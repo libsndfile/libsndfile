@@ -18,6 +18,11 @@ You now have two files:
 
 to be used with VisualStudio.
 
+If the lib command fails with a command saying "'lib' is not recognized as
+an internal or external command, operable program or batch file", you need
+to find the location of "lib.exe" and add that directory to your PATH
+environment variable.
+
 If for some reason these instructions don't work for you or you are still
 not able to use the libsndfile DLL with you project, please do not contact
 the main author of libsndfile. Instead, join the libsndfile-users mailing
