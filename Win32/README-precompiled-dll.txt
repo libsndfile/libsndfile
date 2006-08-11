@@ -21,7 +21,14 @@ to be used with VisualStudio.
 If the lib command fails with a command saying "'lib' is not recognized as
 an internal or external command, operable program or batch file", you need
 to find the location of "lib.exe" and add that directory to your PATH
-environment variable.
+environment variable. Another alternative is to use the "Visual Studio 2005
+Command Prompt" Start menu item:
+
+   Start ->
+   		All Programs ->
+			Visual Studio 2005 ->
+				Visual Studio Tools ->
+					Visual Studio 2005 Command Prompt
 
 If for some reason these instructions don't work for you or you are still
 not able to use the libsndfile DLL with you project, please do not contact
