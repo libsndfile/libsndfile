@@ -72,8 +72,22 @@
 
 #define		ARRAY_LEN(x)	((int) (sizeof (x) / sizeof ((x) [0])))
 
+#if (COMPILER_IS_GCC == 1)
+#define		SF_MAX(x,y)		({ \
+								typeof(x) _x = (x); \
+								typeof(y) _y = (y); \
+								(void) (&_x == &_y); \
+								_x > _y ? _x : _y; })
+
+#define		SF_MIN(x,y)		({ \
+								typeof(x) _x = (x); \
+								typeof(y) _y = (y); \
+								(void) (&_x == &_y); \
+								_x < _y ? _x : _y; })
+#else
 #define		SF_MAX(a,b)		((a) > (b) ? (a) : (b))
 #define		SF_MIN(a,b)		((a) < (b) ? (a) : (b))
+#endif
 
 enum
 {	/* PEAK chunk location. */
