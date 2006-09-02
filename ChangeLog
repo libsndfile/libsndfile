@@ -3,6 +3,9 @@
     * src/common.h
     Make the SF_MIN and SF_MAX macros at least partially type safe.
 
+    * tests/lossy_comp_test.c
+    Fix overflow problems when ensuring that signalis not zero.
+
 2006-08-31 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac docs/*.html

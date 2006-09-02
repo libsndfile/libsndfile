@@ -38,6 +38,8 @@
 #define		M_PI		3.14159265358979323846264338
 #endif
 
+#define		LCT_MAX(x,y)	((x) > (y) ? (x) : (y))
+
 static	void	lcomp_test_short	(const char *filename, int filetype, int chan, double margin) ;
 static	void	lcomp_test_int		(const char *filename, int filetype, int chan, double margin) ;
 static	void	lcomp_test_float	(const char *filename, int filetype, int chan, double margin) ;
@@ -58,18 +60,18 @@ static	void	smoothed_diff_int (int *data, unsigned int datalen) ;
 static	void	smoothed_diff_float (float *data, unsigned int datalen) ;
 static	void	smoothed_diff_double (double *data, unsigned int datalen) ;
 
-static void check_comment (SNDFILE * file, int format, int lineno) ;
+static void		check_comment (SNDFILE * file, int format, int lineno) ;
 
 /*
 ** Force the start of these buffers to be double aligned. Sparc-solaris will
 ** choke if they are not.
 */
 typedef union
-{	double d [BUFFER_SIZE + 1] ;
-	float f [BUFFER_SIZE + 1] ;
-	int i [BUFFER_SIZE + 1] ;
-	short s [BUFFER_SIZE + 1] ;
-	char c [BUFFER_SIZE + 1] ;
+{	double	d [BUFFER_SIZE + 1] ;
+	float	f [BUFFER_SIZE + 1] ;
+	int		i [BUFFER_SIZE + 1] ;
+	short	s [BUFFER_SIZE + 1] ;
+	char	c [BUFFER_SIZE + 1] ;
 } BUFFER ;
 
 static	BUFFER	data_buffer ;
@@ -505,7 +507,7 @@ static void
 lcomp_test_short (const char *filename, int filetype, int channels, double margin)
 {	SNDFILE			*file ;
 	SF_INFO			sfinfo ;
-	int				k, m, seekpos, sum_abs ;
+	int				k, m, seekpos, half_max_abs ;
 	long			datalen ;
 	short			*orig, *data ;
 
@@ -563,17 +565,17 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 
 	test_readf_short_or_die (file, 0, data, datalen, __LINE__) ;
 
-	sum_abs = 0 ;
+	half_max_abs = 0 ;
 	for (k = 0 ; k < datalen ; k++)
 	{	if (error_function (data [k], orig [k], margin))
 		{	printf ("\n\nLine %d: Incorrect sample A (#%d : %d should be %d).\n", __LINE__, k, data [k], orig [k]) ;
 			oct_save_short (orig, data, datalen) ;
 			exit (1) ;
 			} ;
-		sum_abs = abs (sum_abs + abs (data [k])) ;
+		half_max_abs = LCT_MAX (half_max_abs, abs (data [k] / 2)) ;
 		} ;
 
-	if (sum_abs < 1.0)
+	if (half_max_abs < 1.0)
 	{	printf ("\n\nLine %d: Signal is all zeros.\n", __LINE__) ;
 		exit (1) ;
 		} ;
@@ -689,11 +691,11 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 
 static void
 lcomp_test_int (const char *filename, int filetype, int channels, double margin)
-{	SNDFILE		*file ;
-	SF_INFO		sfinfo ;
-	int			k, m, *orig, *data, sum_abs ;
-	long		datalen, seekpos ;
-	double		scale ;
+{	SNDFILE			*file ;
+	SF_INFO			sfinfo ;
+	int				k, m, *orig, *data, half_max_abs ;
+	long			datalen, seekpos ;
+	double			scale ;
 
 	print_test_name ("lcomp_test_int", filename) ;
 
@@ -751,18 +753,18 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 
 	test_readf_int_or_die (file, 0, data, datalen, __LINE__) ;
 
-	sum_abs = 0 ;
+	half_max_abs = 0 ;
 	for (k = 0 ; k < datalen ; k++)
 	{	if (error_function (data [k] / scale, orig [k] / scale, margin))
 		{	printf ("\n\nLine %d: Incorrect sample (#%d : %f should be %f).\n", __LINE__, k, data [k] / scale, orig [k] / scale) ;
 			oct_save_int (orig, data, datalen) ;
 			exit (1) ;
 			} ;
-		sum_abs = abs (sum_abs + abs (abs (data [k]) - 256)) ;
+		half_max_abs = LCT_MAX (half_max_abs, abs (data [k] / 2)) ;
 		} ;
 
-	if (sum_abs < 1.0)
-	{	printf ("\n\nLine %d: Signal is all zeros (%d, 0x%X).\n", __LINE__, sum_abs, sum_abs) ;
+	if (half_max_abs < 1.0)
+	{	printf ("\n\nLine %d: Signal is all zeros (%d, 0x%X).\n", __LINE__, half_max_abs, half_max_abs) ;
 		exit (1) ;
 		} ;
 
@@ -879,9 +881,10 @@ static void
 lcomp_test_float (const char *filename, int filetype, int channels, double margin)
 {	SNDFILE			*file ;
 	SF_INFO			sfinfo ;
-	int				k, m, seekpos, sum_abs ;
+	int				k, m, seekpos ;
 	long			datalen ;
 	float			*orig, *data ;
+	double			half_max_abs ;
 
 	print_test_name ("lcomp_test_float", filename) ;
 
@@ -944,17 +947,17 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 
 	test_readf_float_or_die (file, 0, data, datalen, __LINE__) ;
 
-	sum_abs = 0.0 ;
+	half_max_abs = 0.0 ;
 	for (k = 0 ; k < datalen ; k++)
 	{	if (error_function ((double) data [k], (double) orig [k], margin))
 		{	printf ("\n\nLine %d: Incorrect sample A (#%d : %f should be %f).\n", __LINE__, k, data [k], orig [k]) ;
 			oct_save_float (orig, data, datalen) ;
 			exit (1) ;
 			} ;
-		sum_abs += fabs (data [k]) ;
+		half_max_abs = LCT_MAX (half_max_abs, fabs (0.5 * data [k])) ;
 		} ;
 
-	if (sum_abs < 1.0)
+	if (half_max_abs < 1.0)
 	{	printf ("\n\nLine %d: Signal is all zeros.\n", __LINE__) ;
 		exit (1) ;
 		} ;
@@ -1072,9 +1075,10 @@ static void
 lcomp_test_double (const char *filename, int filetype, int channels, double margin)
 {	SNDFILE			*file ;
 	SF_INFO			sfinfo ;
-	int				k, m, seekpos, sum_abs ;
+	int				k, m, seekpos ;
 	long			datalen ;
 	double			*orig, *data ;
+	double			half_max_abs ;
 
 	print_test_name ("lcomp_test_double", filename) ;
 
@@ -1137,17 +1141,17 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 
 	test_readf_double_or_die (file, 0, data, datalen, __LINE__) ;
 
-	sum_abs = 0.0 ;
+	half_max_abs = 0.0 ;
 	for (k = 0 ; k < datalen ; k++)
 	{	if (error_function ((double) data [k], (double) orig [k], margin))
 		{	printf ("\n\nLine %d: Incorrect sample A (#%d : %f should be %f).\n", __LINE__, k, data [k], orig [k]) ;
 			oct_save_double (orig, data, datalen) ;
 			exit (1) ;
 			} ;
-		sum_abs += fabs (data [k]) ;
+		half_max_abs = LCT_MAX (half_max_abs, abs (0.5 * data [k])) ;
 		} ;
 
-	if (sum_abs < 1.0)
+	if (half_max_abs < 1.0)
 	{	printf ("\n\nLine %d: Signal is all zeros.\n", __LINE__) ;
 		exit (1) ;
 		} ;
@@ -1266,7 +1270,7 @@ static void
 sdlcomp_test_short	(const char *filename, int filetype, int channels, double margin)
 {	SNDFILE			*file ;
 	SF_INFO			sfinfo ;
-	int				k, m, seekpos, sum_abs ;
+	int				k, m, seekpos, half_max_abs ;
 	long			datalen ;
 	short			*orig, *data, *smooth ;
 
@@ -1332,17 +1336,17 @@ channels = 1 ;
 	smoothed_diff_short (data, datalen) ;
 	smoothed_diff_short (smooth, datalen) ;
 
-	sum_abs = abs (data [0]) ;
-	for (k = 1 ; k < datalen ; k++)
+	half_max_abs = 0.0 ;
+	for (k = 0 ; k < datalen ; k++)
 	{	if (error_function ((double) data [k], (double) smooth [k], margin))
 		{	printf ("\n\nLine %d: Incorrect sample (#%d : %d should be %d).\n", __LINE__, k, data [k], smooth [k]) ;
 			oct_save_short (orig, smooth, datalen) ;
 			exit (1) ;
 			} ;
-		sum_abs = abs (sum_abs + abs (data [k])) ;
+		half_max_abs = LCT_MAX (half_max_abs, abs (0.5 * data [k])) ;
 		} ;
 
-	if (sum_abs < 1)
+	if (half_max_abs < 1)
 	{	printf ("\n\nLine %d: Signal is all zeros.\n", __LINE__) ;
 		exit (1) ;
 		} ;
@@ -1452,7 +1456,7 @@ static	void
 sdlcomp_test_int	(const char *filename, int filetype, int channels, double margin)
 {	SNDFILE			*file ;
 	SF_INFO			sfinfo ;
-	int				k, m, seekpos, sum_abs ;
+	int				k, m, seekpos, half_max_abs ;
 	long			datalen ;
 	int				*orig, *data, *smooth ;
 	double			scale ;
@@ -1517,17 +1521,17 @@ channels = 1 ;
 	smoothed_diff_int (data, datalen) ;
 	smoothed_diff_int (smooth, datalen) ;
 
-	sum_abs = abs (data [0] >> 16) ;
+	half_max_abs = abs (data [0] >> 16) ;
 	for (k = 1 ; k < datalen ; k++)
 	{	if (error_function (data [k] / scale, smooth [k] / scale, margin))
 		{	printf ("\n\nLine %d: Incorrect sample (#%d : %d should be %d).\n", __LINE__, k, data [k], smooth [k]) ;
 			oct_save_int (orig, smooth, datalen) ;
 			exit (1) ;
 			} ;
-		sum_abs = abs (sum_abs + abs (data [k] >> 16)) ;
+		half_max_abs = LCT_MAX (half_max_abs, abs (data [k] / 2)) ;
 		} ;
 
-	if (sum_abs < 1)
+	if (half_max_abs < 1)
 	{	printf ("\n\nLine %d: Signal is all zeros.\n", __LINE__) ;
 		exit (1) ;
 		} ;
@@ -1643,7 +1647,7 @@ sdlcomp_test_float	(const char *filename, int filetype, int channels, double mar
 	int				k, m, seekpos ;
 	long			datalen ;
 	float			*orig, *data, *smooth ;
-	double			sum_abs ;
+	double			half_max_abs ;
 
 channels = 1 ;
 
@@ -1711,19 +1715,19 @@ printf ("** fix this ** ") ;
 	smoothed_diff_float (data, datalen) ;
 	smoothed_diff_float (smooth, datalen) ;
 
-	sum_abs = fabs (data [0]) ;
+	half_max_abs = fabs (data [0]) ;
 	for (k = 1 ; k < datalen ; k++)
 	{	if (error_function (data [k], smooth [k], margin))
 		{	printf ("\n\nLine %d: Incorrect sample (#%d : %d should be %d).\n", __LINE__, k, (int) data [k], (int) smooth [k]) ;
 			oct_save_float (orig, smooth, datalen) ;
 			exit (1) ;
 			} ;
-		sum_abs += fabs (data [k]) ;
+		half_max_abs = LCT_MAX (half_max_abs, abs (0.5 * data [k])) ;
 		} ;
 
-	if (sum_abs <= 0.0)
+	if (half_max_abs <= 0.0)
 	{	printf ("\n\nLine %d: Signal is all zeros.\n", __LINE__) ;
-		printf ("sum_abs : % 10.6f\n", sum_abs) ;
+		printf ("half_max_abs : % 10.6f\n", half_max_abs) ;
 		exit (1) ;
 		} ;
 
@@ -1834,7 +1838,7 @@ sdlcomp_test_double	(const char *filename, int filetype, int channels, double ma
 	SF_INFO			sfinfo ;
 	int				k, m, seekpos ;
 	long			datalen ;
-	double			*orig, *data, *smooth, sum_abs ;
+	double			*orig, *data, *smooth, half_max_abs ;
 
 channels = 1 ;
 	print_test_name ("sdlcomp_test_double", filename) ;
@@ -1899,17 +1903,17 @@ channels = 1 ;
 	smoothed_diff_double (data, datalen) ;
 	smoothed_diff_double (smooth, datalen) ;
 
-	sum_abs = fabs (data [0]) ;
-	for (k = 1 ; k < datalen ; k++)
+	half_max_abs = 0.0 ;
+	for (k = 0 ; k < datalen ; k++)
 	{	if (error_function (data [k], smooth [k], margin))
 		{	printf ("\n\nLine %d: Incorrect sample (#%d : %d should be %d).\n", __LINE__, k, (int) data [k], (int) smooth [k]) ;
 			oct_save_double (orig, smooth, datalen) ;
 			exit (1) ;
 			} ;
-		sum_abs += fabs (data [k]) ;
+		half_max_abs = LCT_MAX (half_max_abs, 0.5 * fabs (data [k])) ;
 		} ;
 
-	if (sum_abs < 1.0)
+	if (half_max_abs < 1.0)
 	{	printf ("\n\nLine %d: Signal is all zeros.\n", __LINE__) ;
 		exit (1) ;
 		} ;
