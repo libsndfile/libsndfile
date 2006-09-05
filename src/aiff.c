@@ -477,7 +477,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 			case SSND_MARKER :
 					if ((found_chunk & HAVE_AIFC) && (found_chunk & HAVE_FVER) == 0)
 						psf_log_printf (psf, "*** Valid AIFC files should have an FVER chunk.\n") ;
-			
+
 					paiff->ssnd_offset = psf_ftell (psf) - 4 ;
 					psf_binheader_readf (psf, "E444", &SSNDsize, &(ssnd_fmt.offset), &(ssnd_fmt.blocksize)) ;
 
@@ -717,9 +717,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						{	bytesread += psf_binheader_readf (psf, "E241", &mark_id, &position, &pstr_len) ;
 							psf_log_printf (psf, "   Mark ID  : %u\n   Position : %u\n", mark_id, position) ;
 
-							pstr_len += (pstr_len & 1) + 1 ; /* fudgy, fudgy, hack, hack */
+							pstr_len += (pstr_len & 1) ? 0 : 1 ;
 
 							bytesread += psf_binheader_readf (psf, "b", psf->u.scbuf, pstr_len) ;
+							psf->u.scbuf [pstr_len] = 0 ;
 							psf_log_printf (psf, "   Name     : %s\n", psf->u.scbuf) ;
 
 							markstr [n].markerID = mark_id ;

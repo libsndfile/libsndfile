@@ -1,3 +1,9 @@
+2006-09-05 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c
+    Fix parsing of MARK chunks. Many thanks to Sciss for generating files to
+    help debug the problem.
+
 2006-09-02 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h
