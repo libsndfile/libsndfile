@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -21,6 +21,7 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include	<limits.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
@@ -428,12 +429,27 @@ float32_get_capability	(SF_PRIVATE *psf)
 /*=======================================================================================
 */
 
-static inline void
+static void
 f2s_array (const float *src, int count, short *dest, float scale)
-{	while (--count >= 0)
+{
+	while (--count >= 0)
 	{	dest [count] = lrintf (scale * src [count]) ;
 		} ;
 } /* f2s_array */
+
+static void
+f2s_clip_array (const float *src, int count, short *dest, float scale)
+{	while (--count >= 0)
+	{	float tmp = scale * src [count] ;
+
+		if (CPU_CLIPS_POSITIVE == 0 && tmp > 32767.0)
+			dest [count] = SHRT_MAX ;
+		else if (CPU_CLIPS_NEGATIVE == 0 && tmp < 32768.0)
+			dest [count] = SHRT_MIN ;
+		else
+			dest [count] = lrintf (tmp) ;
+		} ;
+} /* f2s_clip_array */
 
 static inline void
 f2i_array (const float *src, int count, int *dest, float scale)
@@ -441,6 +457,20 @@ f2i_array (const float *src, int count, int *dest, float scale)
 	{	dest [count] = lrintf (scale * src [count]) ;
 		} ;
 } /* f2i_array */
+
+static inline void
+f2i_clip_array (const float *src, int count, int *dest, float scale)
+{	while (--count >= 0)
+	{	float tmp = scale * src [count] ;
+
+		if (CPU_CLIPS_POSITIVE == 0 && tmp > (1.0 * INT_MAX))
+			dest [count] = INT_MAX ;
+		else if (CPU_CLIPS_NEGATIVE == 0 && tmp < (-1.0 * INT_MAX))
+			dest [count] = INT_MIN ;
+		else
+			dest [count] = lrintf (tmp) ;
+		} ;
+} /* f2i_clip_array */
 
 static inline void
 f2d_array (const float *src, int count, double *dest)
@@ -476,10 +506,12 @@ d2f_array (const double *src, float *dest, int count)
 
 static sf_count_t
 host_read_f2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	void		(*convert) (const float *, int, short *, float) ;
+	int			bufferlen, readcount ;
 	sf_count_t	total = 0 ;
 	float		scale ;
 
+	convert = (psf->add_clipping) ? f2s_clip_array : f2s_array ;
 	bufferlen = ARRAY_LEN (psf->u.fbuf) ;
 	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max ;
 
@@ -504,10 +536,12 @@ host_read_f2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 
 static sf_count_t
 host_read_f2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
-{	int			bufferlen, readcount ;
+{	void		(*convert) (const float *, int, int *, float) ;
+	int			bufferlen, readcount ;
 	sf_count_t	total = 0 ;
 	float		scale ;
 
+	convert = (psf->add_clipping) ? f2i_clip_array : f2i_array ;
 	bufferlen = ARRAY_LEN (psf->u.fbuf) ;
 	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFFFFFF / psf->float_max ;
 
@@ -519,7 +553,7 @@ host_read_f2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		if (psf->float_endswap == SF_TRUE)
 			endswap_int_array (psf->u.ibuf, bufferlen) ;
 
-		f2i_array (psf->u.fbuf, readcount, ptr + total, scale) ;
+		convert (psf->u.fbuf, readcount, ptr + total, scale) ;
 		total += readcount ;
 		if (readcount < bufferlen)
 			break ;
