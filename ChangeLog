@@ -1,3 +1,11 @@
+2006-10-03 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/double64.c src/float32.c
+    Add optional clipping on float file data to int read data conversions.
+
+    * tests/tests/scale_clip_test.(def|tpl)
+    Add test for above new code.
+
 2006-09-06 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/aiff_rw_test.c
