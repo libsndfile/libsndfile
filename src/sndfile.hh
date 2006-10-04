@@ -54,6 +54,7 @@
 
 #include <sndfile.h>
 
+#include <string>
 #include <new> // for std::nothrow
 
 class SndfileHandle
@@ -73,6 +74,8 @@ class SndfileHandle
 			/* Default constructor */
 			SndfileHandle (void) : p (NULL) {} ;
 			SndfileHandle (const char *path, int mode = SFM_READ,
+							int format = 0, int channels = 0, int samplerate = 0) ;
+			SndfileHandle (std::string const & path, int mode = SFM_READ,
 							int format = 0, int channels = 0, int samplerate = 0) ;
 			~SndfileHandle (void) ;
 
@@ -163,7 +166,30 @@ SndfileHandle::SndfileHandle (const char *path, int mode, int fmt, int chans, in
 			p = NULL ;
 			} ;
 		} ;
-} /* SndfileHandle constructor */
+} /* SndfileHandle const char * constructor */
+
+inline
+SndfileHandle::SndfileHandle (std::string const & path, int mode, int fmt, int chans, int srate)
+: p (NULL)
+{
+	p = new (std::nothrow) SNDFILE_ref () ;
+
+	if (p != NULL)
+	{	p->ref = 1 ;
+
+		p->sfinfo.frames = 0 ;
+		p->sfinfo.channels = chans ;
+		p->sfinfo.format = fmt ;
+		p->sfinfo.samplerate = srate ;
+		p->sfinfo.sections = 0 ;
+		p->sfinfo.seekable = 0 ;
+
+		if ((p->sf = sf_open (path.c_str (), mode, &p->sfinfo)) == NULL)
+		{	delete p ;
+			p = NULL ;
+			} ;
+		} ;
+} /* SndfileHandle std::string constructor */
 
 inline
 SndfileHandle::~SndfileHandle (void)
