@@ -317,6 +317,7 @@ main (void)
 		max_value = (max_value > abs (data_in [k])) ? max_value : abs (data_in [k]) ;
 		} ;
 
+	unlink (filename) ;
 	puts ("ok") ;
 } /* [+ (get "float_type_name") +]_[+ (get "int_type_name") +]_clip_test */
 [+ ENDFOR int_type
