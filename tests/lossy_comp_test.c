@@ -290,10 +290,10 @@ main (int argc, char *argv [])
 		lcomp_test_float	("g723_24.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_G723_24, 1, 0.7) ;
 		lcomp_test_double	("g723_24.au", SF_ENDIAN_BIG	| SF_FORMAT_AU | SF_FORMAT_G723_24, 1, 0.7) ;
 
-		lcomp_test_short	("g723_40.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_G723_40, 1, 0.21) ;
-		lcomp_test_int		("g723_40.au", SF_ENDIAN_BIG	| SF_FORMAT_AU | SF_FORMAT_G723_40, 1, 0.21) ;
-		lcomp_test_float	("g723_40.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_G723_40, 1, 0.21) ;
-		lcomp_test_double	("g723_40.au", SF_ENDIAN_BIG	| SF_FORMAT_AU | SF_FORMAT_G723_40, 1, 0.21) ;
+		lcomp_test_short	("g723_40.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_G723_40, 1, 0.85) ;
+		lcomp_test_int		("g723_40.au", SF_ENDIAN_BIG	| SF_FORMAT_AU | SF_FORMAT_G723_40, 1, 0.84) ;
+		lcomp_test_float	("g723_40.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_G723_40, 1, 0.86) ;
+		lcomp_test_double	("g723_40.au", SF_ENDIAN_BIG	| SF_FORMAT_AU | SF_FORMAT_G723_40, 1, 0.86) ;
 
 /*-		sdlcomp_test_short	("g723.au", SF_ENDIAN_BIG    | SF_FORMAT_AU | SF_FORMAT_G723_24, 1, 0.15) ;
 		sdlcomp_test_int	("g723.au", SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_G723_24, 1, 0.15) ;

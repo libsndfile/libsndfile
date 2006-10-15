@@ -87,12 +87,12 @@ int fmult (int an, int srn)
 
 	/*
 	** The original was :
-	**		wanmant = (anmant * (srn & 0x37) + 0x30) >> 4 ;
+	**		wanmant = (anmant * (srn & 0x3F) + 0x30) >> 4 ;
 	** but could see no valid reason for the + 0x30.
 	** Removed it and it improved the SNR of the codec.
 	*/
 
-	wanmant = (anmant * (srn & 0x37)) >> 4 ;
+	wanmant = (anmant * (srn & 0x3F)) >> 4 ;
 
 	retval = (wanexp >= 0) ? ((wanmant << wanexp) & 0x7FFF) :
 	    (wanmant >> -wanexp);
