@@ -1,12 +1,18 @@
 ## Process this file with automake to produce Makefile.in
 
+if ENABLE_TEST_COVERAGE
+	CPP_TEST = 
+else
+	CPP_TEST = cpp_test
+endif
+
 noinst_PROGRAMS = sfversion floating_point_test write_read_test \
 	lossy_comp_test error_test ulaw_test alaw_test dwvw_test \
 	peak_chunk_test command_test stdin_test stdout_test stdio_test \
 	pcm_test headerless_test pipe_test benchmark header_test misc_test \
 	raw_test string_test open_fail_test multi_file_test dither_test \
 	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
-	locale_test largefile_test win32_ordinal_test cpp_test
+	locale_test largefile_test win32_ordinal_test $(CPP_TEST)
 
 SNDFILEDIR = ../src
 INCLUDES = -I$(srcdir)/$(SNDFILEDIR)
@@ -163,7 +169,7 @@ check: generic-tests wav-tests aiff-tests au-tests caf-tests raw-tests \
 	flac-tests caf-tests io-tests
 
 generic-tests : error_test ulaw_test alaw_test command_test floating_point_test \
-		pcm_test win32_ordinal_test cpp_test
+		pcm_test win32_ordinal_test $(CPP_TEST)
 	uname -a
 	./error_test
 	./pcm_test
@@ -182,7 +188,11 @@ generic-tests : error_test ulaw_test alaw_test command_test floating_point_test 
 	./headerless_test
 	./locale_test
 	./win32_ordinal_test
+if ENABLE_TEST_COVERAGE
+	@echo "cpp_test not under test coverage"
+else
 	./cpp_test
+endif
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed common tests."
 	@echo "----------------------------------------------------------------------"

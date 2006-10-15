@@ -108,6 +108,10 @@ AC_ARG_ENABLE(flac,
 AC_ARG_ENABLE(alsa,
 	AC_HELP_STRING([--disable-alsa], [disable use of ALSA]))
 
+AC_ARG_ENABLE(test-coverage,
+	AC_HELP_STRING([--enable-test-coverage], [enable test coverage]))
+AM_CONDITIONAL([ENABLE_TEST_COVERAGE], [test "$enable_test_coverage" = yes])
+
 #====================================================================================
 # Check types and their sizes.
 
@@ -411,12 +415,17 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	CFLAGS="$CFLAGS -W -Wall"
 	CXXFLAGS="$CXXFLAGS -W -Wall"
 
-	AC_ADD_CFLAGS(-Wdeclaration-after-statement)
-	AC_ADD_CFLAGS(-Wpointer-arith)
+	AC_ADD_CFLAGS([-Wdeclaration-after-statement])
+	AC_ADD_CFLAGS([-Wpointer-arith])
 
 	if test x$enable_gcc_werror = "xyes" ; then
 		CFLAGS="-Werror $CFLAGS"
 		CXXFLAGS="-Werror $CXXFLAGS"
+		fi
+
+	if test x$enable_test_coverage = "xyes" ; then
+		# AC_ADD_CFLAGS([-ftest-coverage])
+		AC_ADD_CFLAGS([-coverage])
 		fi
 
 	CFLAGS="$CFLAGS -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return -Wcast-align -Wcast-qual -Wnested-externs -Wshadow -Wbad-function-cast -Wwrite-strings "

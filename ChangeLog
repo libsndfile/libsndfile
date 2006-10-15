@@ -1,3 +1,8 @@
+2006-10-15 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac tests/Makefile.am
+    Add --enable-test-coverage configure option.
+
 2006-10-05 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.hh
