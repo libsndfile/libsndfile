@@ -355,7 +355,7 @@ psf_get_max_all_channels (SF_PRIVATE *psf, double *peaks)
 		peaks [k] = psf->peak_info->peaks [k].value ;
 
 	return SF_TRUE ;
-}  /* psf_get_max_all_channels */
+} /* psf_get_max_all_channels */
 
 
 /*

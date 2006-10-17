@@ -603,7 +603,7 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 	psf->hfile = psf_open_handle (pathname, open_mode) ;
 
 	if (psf->hfile == NULL)
-		psf_log_syserr (psf, GetLastError()) ;
+		psf_log_syserr (psf, GetLastError ()) ;
 
 	psf->mode = open_mode ;
 
