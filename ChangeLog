@@ -1,3 +1,8 @@
+2006-10-18 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav_w64.c
+    Apply a patch from Fons Adriaensen which fixes a minor WAVEX GUID issue.
+
 2006-10-17 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/Makefile.am

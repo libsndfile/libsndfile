@@ -285,7 +285,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 					psf_log_printf (psf, "    format : ms adpcm\n") ;
 					}
 				else if (wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_IEEE_FLOAT)
-						|| wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM))
+					|| wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT))
 				{	psf->sf.format = SF_FORMAT_WAVEX | ((psf->bytewidth == 8) ? SF_FORMAT_DOUBLE : SF_FORMAT_FLOAT) ;
 					psf_log_printf (psf, "    format : IEEE float\n") ;
 					}
