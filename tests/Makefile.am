@@ -1,9 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
 if ENABLE_TEST_COVERAGE
-	CPP_TEST = 
+CPP_TEST = 
 else
-	CPP_TEST = cpp_test
+CPP_TEST = cpp_test
 endif
 
 noinst_PROGRAMS = sfversion floating_point_test write_read_test \
