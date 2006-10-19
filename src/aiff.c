@@ -1449,10 +1449,11 @@ static int
 aiff_read_basc_chunk (SF_PRIVATE * psf, int datasize)
 {	const char * type_str ;
 	basc_CHUNK bc ;
+	int count ;
 
-	psf_binheader_readf (psf, "E442", &bc.version, &bc.numBeats, &bc.rootNote) ;
-	psf_binheader_readf (psf, "E222", &bc.scaleType, &bc.sigNumerator, &bc.sigDenominator) ;
-	psf_binheader_readf (psf, "E2j", &bc.loopType, datasize - sizeof (bc)) ;
+	count = psf_binheader_readf (psf, "E442", &bc.version, &bc.numBeats, &bc.rootNote) ;
+	count += psf_binheader_readf (psf, "E222", &bc.scaleType, &bc.sigNumerator, &bc.sigDenominator) ;
+	count += psf_binheader_readf (psf, "E2j", &bc.loopType, datasize - sizeof (bc)) ;
 
 	psf_log_printf (psf, "  Version ? : %u\n  Num Beats : %u\n  Root Note : 0x%x\n",
 						bc.version, bc.numBeats, bc.rootNote) ;
@@ -1504,6 +1505,9 @@ aiff_read_basc_chunk (SF_PRIVATE * psf, int datasize)
 	psf->loop_info->bpm = (1.0 / psf->sf.frames) * psf->sf.samplerate
 							* ((bc.numBeats * 4.0) / bc.sigDenominator) * 60.0 ;
 	psf->loop_info->root_key = bc.rootNote ;
+
+	if (count < datasize)
+		psf_binheader_readf (psf, "j", datasize - count) ;
 
 	return 0 ;
 } /* aiff_read_basc_chunk */
