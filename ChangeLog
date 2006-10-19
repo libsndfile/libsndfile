@@ -4,6 +4,9 @@
     Fix a bug in parsing AIFF files with a slightly unusual 'basc' chunk. Thanks
     to David Viens for providing two example files.
 
+    * src/common.(c|h) src/aiff.c
+    Add a function psf_sanitize_string and use it in aiff.c.
+
 2006-10-18 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav_w64.c

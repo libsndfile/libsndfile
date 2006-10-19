@@ -616,9 +616,6 @@ int psf_store_string (SF_PRIVATE *psf, int str_type, const char *str) ;
 /* Default seek function. Use for PCM and float encoded data. */
 sf_count_t	psf_default_seek (SF_PRIVATE *psf, int mode, sf_count_t samples_from_start) ;
 
-/* Generate the currebt date as a string. */
-void	psf_get_date_str (char *str, int maxlen) ;
-
 int macos_guess_file_type (SF_PRIVATE *psf, const char *filename) ;
 
 /*------------------------------------------------------------------------------------
@@ -724,6 +721,10 @@ void	*psf_memset (void *s, int c, sf_count_t n) ;
 
 SF_INSTRUMENT * psf_instrument_alloc (void) ;
 
+void	psf_sanitize_string (char * cptr, int len) ;
+
+/* Generate the current date as a string. */
+void	psf_get_date_str (char *str, int maxlen) ;
 
 SF_BROADCAST_INFO* broadcast_info_alloc (void) ;
 int		broadcast_info_copy (SF_BROADCAST_INFO* dst, SF_BROADCAST_INFO* src) ;

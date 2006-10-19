@@ -1169,25 +1169,6 @@ psf_log_SF_INFO (SF_PRIVATE *psf)
 /*========================================================================================
 */
 
-SF_INSTRUMENT *
-psf_instrument_alloc (void)
-{	SF_INSTRUMENT *instr ;
-
-	instr = calloc (1, sizeof (SF_INSTRUMENT)) ;
-
-	if (instr == NULL)
-		return NULL ;
-
-	/* Set non-zero default values. */
-	instr->basenote = -1 ;
-	instr->velocity_lo = -1 ;
-	instr->velocity_hi = -1 ;
-	instr->key_lo = -1 ;
-	instr->key_hi = -1 ;
-
-	return instr ;
-} /* psf_instrument_alloc */
-
 void*
 psf_memset (void *s, int c, sf_count_t len)
 {	char	*ptr ;
@@ -1207,7 +1188,38 @@ psf_memset (void *s, int c, sf_count_t len)
 	return s ;
 } /* psf_memset */
 
-void psf_get_date_str (char *str, int maxlen)
+SF_INSTRUMENT *
+psf_instrument_alloc (void)
+{	SF_INSTRUMENT *instr ;
+
+	instr = calloc (1, sizeof (SF_INSTRUMENT)) ;
+
+	if (instr == NULL)
+		return NULL ;
+
+	/* Set non-zero default values. */
+	instr->basenote = -1 ;
+	instr->velocity_lo = -1 ;
+	instr->velocity_hi = -1 ;
+	instr->key_lo = -1 ;
+	instr->key_hi = -1 ;
+
+	return instr ;
+} /* psf_instrument_alloc */
+
+void
+psf_sanitize_string (char * cptr, int len)
+{
+	do
+	{
+		len -- ;
+		cptr [len] = isprint (cptr [len]) ? cptr [len] : '.' ;
+	}
+	while (len > 0) ;
+} /* psf_sanitize_string */
+
+void
+psf_get_date_str (char *str, int maxlen)
 {	time_t		current ;
 	struct tm	timedata, *tmptr ;
 
