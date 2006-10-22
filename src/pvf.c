@@ -99,13 +99,11 @@ pvf_close	(SF_PRIVATE *psf)
 } /* pvf_close */
 
 static int
-pvf_write_header (SF_PRIVATE *psf, int calc_length)
+pvf_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 {	sf_count_t	current ;
 
 	if (psf->pipeoffset > 0)
 		return 0 ;
-
-	calc_length = calc_length ; /* Avoid a compiler warning. */
 
 	current = psf_ftell (psf) ;
 

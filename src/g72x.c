@@ -343,12 +343,8 @@ g72x_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 } /* g72x_read_d */
 
 static sf_count_t
-g72x_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
+g72x_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t UNUSED (offset))
 {
-	/* Prevent compiler warnings. */
-	mode ++ ;
-	offset ++ ;
-
 	psf_log_printf (psf, "seek unsupported\n") ;
 
 	/*	No simple solution. To do properly, would need to seek

@@ -620,17 +620,8 @@ flac_read_header (SF_PRIVATE *psf)
 } /* flac_read_header */
 
 static int
-flac_command (SF_PRIVATE *psf, int command, void *data, int datasize)
+flac_command (SF_PRIVATE * UNUSED (psf), int UNUSED (command), void * UNUSED (data), int UNUSED (datasize))
 {
-	/* Avoid compiler warnings. */
-	psf = psf ;
-	data = data ;
-	datasize = datasize ;
-
-	switch (command)
-	{	default : break ;
-		} ;
-
 	return 0 ;
 } /* flac_command */
 

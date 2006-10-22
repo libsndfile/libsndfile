@@ -1344,17 +1344,8 @@ aiff_write_strings (SF_PRIVATE *psf, int location)
 } /* aiff_write_strings */
 
 static int
-aiff_command (SF_PRIVATE *psf, int command, void *data, int datasize)
+aiff_command (SF_PRIVATE * UNUSED (psf), int UNUSED (command), void * UNUSED (data), int UNUSED (datasize))
 {
-	/* Avoid compiler warnings. */
-	psf = psf ;
-	data = data ;
-	datasize = datasize ;
-
-	switch (command)
-	{	default : break ;
-		} ;
-
 	return 0 ;
 } /* aiff_command */
 

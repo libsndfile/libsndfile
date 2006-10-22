@@ -273,7 +273,7 @@ paf_read_header	(SF_PRIVATE *psf)
 } /* paf_read_header */
 
 static int
-paf_write_header (SF_PRIVATE *psf, int calc_length)
+paf_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 {	int			paf_format ;
 
 	/* PAF header already written so no need to re-write. */
@@ -281,11 +281,6 @@ paf_write_header (SF_PRIVATE *psf, int calc_length)
 		return 0 ;
 
 	psf->dataoffset = PAF_HEADER_LENGTH ;
-
-	psf->dataoffset = PAF_HEADER_LENGTH ;
-
-	/* Prevent compiler warning. */
-	calc_length = calc_length ;
 
 	switch (psf->sf.format & SF_FORMAT_SUBMASK)
 	{	case SF_FORMAT_PCM_S8 :

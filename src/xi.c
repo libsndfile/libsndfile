@@ -270,15 +270,13 @@ dpcm_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 
 static int
-xi_write_header (SF_PRIVATE *psf, int calc_length)
+xi_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 {	XI_PRIVATE	*pxi ;
 	sf_count_t	current ;
 	const char	*string ;
 
 	if ((pxi = psf->codec_data) == NULL)
 		return SFE_INTERNAL ;
-
-	calc_length = calc_length ; /* Avoid a compiler warning. */
 
 	current = psf_ftell (psf) ;
 
