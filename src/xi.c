@@ -128,10 +128,8 @@ xi_open	(SF_PRIVATE *psf)
 */
 
 static int
-xi_close	(SF_PRIVATE *psf)
+xi_close	(SF_PRIVATE * UNUSED (psf))
 {
-	psf = psf ;
-
 	return 0 ;
 } /* xi_close */
 

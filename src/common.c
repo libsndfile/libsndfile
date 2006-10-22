@@ -1093,7 +1093,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 */
 
 sf_count_t
-psf_default_seek (SF_PRIVATE *psf, int mode, sf_count_t samples_from_start)
+psf_default_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t samples_from_start)
 {	sf_count_t position, retval ;
 
 	if (! (psf->blockwidth && psf->dataoffset >= 0))
@@ -1112,8 +1112,6 @@ psf_default_seek (SF_PRIVATE *psf, int mode, sf_count_t samples_from_start)
 	{	psf->error = SFE_SEEK_FAILED ;
 		return PSF_SEEK_ERROR ;
 		} ;
-
-	mode = mode ;
 
 	return samples_from_start ;
 } /* psf_default_seek */

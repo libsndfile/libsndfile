@@ -154,10 +154,8 @@ dwvw_close (SF_PRIVATE *psf)
 } /* dwvw_close */
 
 static sf_count_t
-dwvw_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
+dwvw_seek	(SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 {	DWVW_PRIVATE *pdwvw ;
-
-	mode = mode ;
 
 	if (! psf->codec_data)
 	{	psf->error = SFE_INTERNAL ;

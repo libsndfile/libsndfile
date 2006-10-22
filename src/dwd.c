@@ -107,10 +107,8 @@ dwd_open (SF_PRIVATE *psf)
 */
 
 static int
-dwd_close	(SF_PRIVATE *psf)
+dwd_close	(SF_PRIVATE * UNUSED (psf))
 {
-	psf = psf ;
-
 	return 0 ;
 } /* dwd_close */
 

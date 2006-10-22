@@ -238,7 +238,7 @@ ircam_close	(SF_PRIVATE *psf)
 } /* ircam_close */
 
 static int
-ircam_write_header (SF_PRIVATE *psf, int calc_length)
+ircam_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 {	int			encoding ;
 	float		samplerate ;
 	sf_count_t	current ;
@@ -247,8 +247,6 @@ ircam_write_header (SF_PRIVATE *psf, int calc_length)
 		return 0 ;
 
 	current = psf_ftell (psf) ;
-
-	calc_length = calc_length ;
 
 	/* This also sets psf->endian. */
 	encoding = get_encoding (psf->sf.format & SF_FORMAT_SUBMASK) ;

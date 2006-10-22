@@ -29,12 +29,9 @@
 #define	STR_MARKER	MAKE_MARKER ('S', 'T', 'R', ' ')
 
 int
-macos_guess_file_type (SF_PRIVATE *psf, const char *filename)
+macos_guess_file_type (SF_PRIVATE * psf, const char *filename)
 {	static char rsrc_name [1024] ;
 	struct stat statbuf ;
-	int format ;
-
-	psf = psf ;
 
 	snprintf (rsrc_name, sizeof (rsrc_name), "%s/rsrc", filename) ;
 
@@ -49,9 +46,7 @@ macos_guess_file_type (SF_PRIVATE *psf, const char *filename)
 		return 0 ;
 		} ;
 
-	format = 0 ;
-
-	return format ;
+	return 0 ;
 } /* macos_guess_file_type */
 
 /*

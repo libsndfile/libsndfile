@@ -194,16 +194,14 @@ static void dither_float	(const float *in, float *out, int frames, int channels)
 static void dither_double	(const double *in, double *out, int frames, int channels) ;
 
 static sf_count_t
-dither_read_short (SF_PRIVATE *psf, short *ptr, sf_count_t len)
-{	psf = psf ;
-	ptr = ptr ;
+dither_read_short (SF_PRIVATE * UNUSED (psf), short * UNUSED (ptr), sf_count_t len)
+{
 	return len ;
 } /* dither_read_short */
 
 static sf_count_t
-dither_read_int (SF_PRIVATE *psf, int *ptr, sf_count_t len)
-{	psf = psf ;
-	ptr = ptr ;
+dither_read_int (SF_PRIVATE * UNUSED (psf), int * UNUSED (ptr), sf_count_t len)
+{
 	return len ;
 } /* dither_read_int */
 

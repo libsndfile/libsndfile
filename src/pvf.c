@@ -91,10 +91,8 @@ pvf_open	(SF_PRIVATE *psf)
 */
 
 static int
-pvf_close	(SF_PRIVATE *psf)
+pvf_close	(SF_PRIVATE * UNUSED (psf))
 {
-	psf = psf ;
-
 	return 0 ;
 } /* pvf_close */
 

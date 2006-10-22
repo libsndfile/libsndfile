@@ -367,11 +367,9 @@ gsm610_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 } /* gsm610_read_d */
 
 static sf_count_t
-gsm610_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
+gsm610_seek	(SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 {	GSM610_PRIVATE *pgsm610 ;
 	int			newblock, newsample ;
-
-	mode = mode ;
 
 	if (psf->codec_data == NULL)
 		return 0 ;

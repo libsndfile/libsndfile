@@ -30,20 +30,16 @@
 #include	<CoreServices.h>
 
 int
-macbinary3_open (SF_PRIVATE *psf)
+macbinary3_open (SF_PRIVATE * UNUSED (psf))
 {
-	if (psf)
-		return 0 ;
-
 	return 0 ;
 } /* macbinary3_open */
 
 #else
 
 int
-macbinary3_open (SF_PRIVATE *psf)
+macbinary3_open (SF_PRIVATE * UNUSED (psf))
 {
-	psf = psf ;
 	return 0 ;
 } /* macbinary3_open */
 
