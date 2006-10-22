@@ -1,3 +1,9 @@
+2006-10-22 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in src/wav.c src/wav_w64.c src/common.h doc/command.html
+    Apply a patch from Fons Adriaensen to allow writing on WAVEX Ambisonic
+    files. Still needs a little tweaking before its ready for release.
+
 2006-10-19 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c
@@ -25,7 +31,7 @@
 2006-10-05 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.hh
-    Add an std:string SndfileHandle constructor.
+    Add an std::string SndfileHandle constructor.
 
     * tests/scale_clip_test.tpl
     Fix the 'make distcheck' target.

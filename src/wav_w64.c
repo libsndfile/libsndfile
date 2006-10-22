@@ -299,6 +299,9 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, WAV_FMT *wav_fmt, int structsize)
 					}
 				else
 					return SFE_UNIMPLEMENTED ;
+
+				psf->wavex_ambisonic = wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM)
+							|| wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT) ;
 				break ;
 
 		case WAVE_FORMAT_G721_ADPCM :

@@ -1003,37 +1003,43 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 			/* wValidBitsPerSample, for our use same as bitwidth as we use it fully */
 			psf_binheader_writef (psf, "2", psf->bytewidth * 8) ;
 
-			/*
-			** Ok some liberty is taken here to use the most commonly used channel masks
-			** instead of "no mapping". If you really want to use "no mapping" for 8 channels and less
-			** please don't use wavex. (otherwise we'll have to create a new SF_COMMAND)
+			/* For an Ambisonic file set the channel mask to zero.
+			** Otherwise use a default based on the channel count.
 			*/
-			switch (psf->sf.channels)
-			{	case 1 :	/* center channel mono */
-					psf_binheader_writef (psf, "4", 0x4) ;
-					break ;
+			if (psf->wavex_ambisonic)
+				psf_binheader_writef (psf, "4", 0) ;
+			else
+			{	/*
+				** Ok some liberty is taken here to use the most commonly used channel masks
+				** instead of "no mapping". If you really want to use "no mapping" for 8 channels and less
+				** please don't use wavex. (otherwise we'll have to create a new SF_COMMAND)
+				*/
+				switch (psf->sf.channels)
+				{	case 1 :	/* center channel mono */
+						psf_binheader_writef (psf, "4", 0x4) ;
+						break ;
 
-				case 2 :	/* front left and right */
-					psf_binheader_writef (psf, "4", 0x1 | 0x2) ;
-					break ;
+					case 2 :	/* front left and right */
+						psf_binheader_writef (psf, "4", 0x1 | 0x2) ;
+						break ;
 
-				case 4 :	/* Quad */
-					psf_binheader_writef (psf, "4", 0x1 | 0x2 | 0x10 | 0x20) ;
-					break ;
+					case 4 :	/* Quad */
+						psf_binheader_writef (psf, "4", 0x1 | 0x2 | 0x10 | 0x20) ;
+						break ;
 
-				case 6 :	/* 5.1 */
-					psf_binheader_writef (psf, "4", 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20) ;
-					break ;
+					case 6 :	/* 5.1 */
+						psf_binheader_writef (psf, "4", 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20) ;
+						break ;
 
-				case 8 :	/* 7.1 */
-					psf_binheader_writef (psf, "4", 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20 | 0x40 | 0x80) ;
-					break ;
+					case 8 :	/* 7.1 */
+						psf_binheader_writef (psf, "4", 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20 | 0x40 | 0x80) ;
+						break ;
 
-				default :	/* 0 when in doubt , use direct out, ie NO mapping*/
-					psf_binheader_writef (psf, "4", 0x0) ;
-					break ;
-				}
-
+					default :	/* 0 when in doubt , use direct out, ie NO mapping*/
+						psf_binheader_writef (psf, "4", 0x0) ;
+						break ;
+					} ;
+				} ;
 			break ;
 
 		case SF_FORMAT_MS_ADPCM : /* Todo, GUID exists might have different header as per wav_write_header */
@@ -1048,12 +1054,14 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 		case SF_FORMAT_PCM_16 :
 		case SF_FORMAT_PCM_24 :
 		case SF_FORMAT_PCM_32 :
-			wavex_write_guid (psf, &MSGUID_SUBTYPE_PCM) ;
+			wavex_write_guid (psf, psf->wavex_ambisonic ? &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM
+						: &MSGUID_SUBTYPE_PCM) ;
 			break ;
 
 		case SF_FORMAT_FLOAT :
 		case SF_FORMAT_DOUBLE :
-			wavex_write_guid (psf, &MSGUID_SUBTYPE_IEEE_FLOAT) ;
+			wavex_write_guid (psf, psf->wavex_ambisonic ? &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT
+						: &MSGUID_SUBTYPE_IEEE_FLOAT) ;
 			add_fact_chunk = SF_TRUE ;
 			break ;
 
@@ -1193,14 +1201,22 @@ wav_close (SF_PRIVATE *psf)
 static int
 wav_command (SF_PRIVATE *psf, int command, void *data, int datasize)
 {
-	/* Avoid compiler warnings. */
-	psf = psf ;
-	data = data ;
-	datasize = datasize ;
+	/* All commands use a single 32 value as data */
+	if ((data == NULL) || (datasize != 4))
+		return 1 ;
 
 	switch (command)
-	{	default : break ;
-		} ;
+	{	case SFC_WAVEX_SET_AMBISONIC :
+			psf->wavex_ambisonic = *((int *) data) ;
+			return 0 ;
+
+		case SFC_WAVEX_GET_AMBISONIC :
+			*((int *) data) = psf->wavex_ambisonic ;
+			return 0 ;
+
+		default :
+			return 1 ;
+	} ;
 
 	return 0 ;
 } /* wav_command */

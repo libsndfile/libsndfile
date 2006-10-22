@@ -182,6 +182,10 @@ enum
 	SFC_GET_CHANNEL_MAP_INFO		= 0x1100,
 	SFC_SET_CHANNEL_MAP_INFO		= 0x1101,
 
+	/* Support for Wavex Ambisonics Format */
+	SFC_WAVEX_SET_AMBISONIC			= 0x1200,
+	SFC_WAVEX_GET_AMBISONIC			= 0x1201,
+
 	/* Following commands for testing only. */
 	SFC_TEST_IEEE_FLOAT_REPLACE		= 0x6001,
 
@@ -402,7 +406,7 @@ typedef struct
 } SF_LOOP_INFO ;
 
 
-/*	Struct used to retrieve broadcast (EBU) information from a file. 
+/*	Struct used to retrieve broadcast (EBU) information from a file.
 **	Strongly (!) based on EBU "bext" chunk format used in Broadcast WAVE.
 */
 typedef struct
