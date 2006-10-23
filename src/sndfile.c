@@ -2451,6 +2451,11 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	psf->float_int_mult = 0 ;
 	psf->float_max		= -1.0 ;
 
+	/*
+	**	File formats that support ambisonic should override this default
+	**	and set it to SF_AMBISONIC_NONE.
+	*/
+	psf->wavex_ambisonic = 0 ;
 	psf->sf.sections = 1 ;
 
 	psf->is_pipe = psf_is_pipe (psf) ;

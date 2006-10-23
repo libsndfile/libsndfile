@@ -1170,15 +1170,16 @@ The SF_FORMAT_INFO struct is defined in &lt;sndfile.h&gt; as:
 <A NAME="SFC_WAVEX_GET_AMBISONIC"></A>
 <H2><BR><B>SFC_WAVEX_GET_AMBISONIC</B></H2>
 <P>
-Test the GUID of a WAVEX file for any of the Ambisonic formats.
+Test if the current file has the GUID of a WAVEX file for any of the Ambisonic
+formats.
 </P>
 <P>
 Parameters:
 <PRE>
         sndfile  : A valid SNDFILE* pointer
         cmd      : SFC_WAVEX_GET_AMBISONIC
-        data     : a pointer to a 32-bit integer
-        datasize : 4
+        data     : NULL
+        datasize : 0
 </PRE>
 <P>
 	The Ambisonic WAVEX formats are defined here :
@@ -1187,28 +1188,27 @@ Parameters:
 </P>
 <DL>
 <DT>Return value: </DT>
-	<DD>Zero on success and non-zero otherwise.
-	<DD>The value of the integer pointed to by data will be non-zero if an
-	    Ambisonic GUID was found, and zero otherwise.  
+	<DD>SF_AMBISONIC_NONE or SF_AMBISONIC_B_FORMAT or zero if the file format 
+		does not support ambisonic formats.
 </DL>
 
 <!-- ========================================================================= -->
 <A NAME="SFC_WAVEX_SET_AMBISONIC"></A>
 <H2><BR><B>SFC_WAVEX_SET_AMBISONIC</B></H2>
 <P>
-Determine if the GUID of a new WAVEX file will indicate an Ambisonics format.
+Set the GUID of a new WAVEX file to indicate an Ambisonics format.
 </P>
 <P>
 Parameters:
 <PRE>
         sndfile  : A valid SNDFILE* pointer
         cmd      : SFC_WAVEX_SET_AMBISONIC
-        data     : a pointer to a 32-bit integer
-        datasize : 4
+        data     : NULL
+        datasize : SF_AMBISONIC_NONE or SF_AMBISONIC_B_FORMAT
 </PRE>
 <P>
-If the integer pointed to by data is non-zero, an Ambisonic WAVEX header will
-be written. This has a special GUID and the channelmask set to zero.
+Turn on (SF_AMBISONIC_B_FORMAT) or off (SF_AMBISONIC_NONE) encoding.
+This command is currently only supported for files with SF_FORMAT_WAVEX format.
 </P>
 <P>
 	The Ambisonic WAVEX formats are defined here :
@@ -1217,7 +1217,8 @@ be written. This has a special GUID and the channelmask set to zero.
 </P>
 <DL>
 <DT>Return value: </DT>
-	<DD>Zero on success and non-zero otherwise.
+	<DD>Return the ambisonic value that has just been set or zero if the file
+		format does not support ambisonic encoding.
 </DL>
 
 <!-- ========================================================================= -->

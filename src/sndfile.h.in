@@ -231,7 +231,10 @@ enum
 	/* Modes for opening files. */
 	SFM_READ	= 0x10,
 	SFM_WRITE	= 0x20,
-	SFM_RDWR	= 0x30
+	SFM_RDWR	= 0x30,
+
+	SF_AMBISONIC_NONE		= 0x40,
+	SF_AMBISONIC_B_FORMAT	= 0x41
 } ;
 
 /* Public error values. These are guaranteed to remain unchanged for the duration

@@ -178,6 +178,8 @@ wav_open	 (SF_PRIVATE *psf)
 	{	if (psf->is_pipe)
 			return SFE_NO_PIPE_WRITE ;
 
+		psf->wavex_ambisonic = SF_AMBISONIC_NONE ;
+
 		format = psf->sf.format & SF_FORMAT_TYPEMASK ;
 		if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX)
 			return	SFE_BAD_OPEN_FORMAT ;
@@ -1199,23 +1201,25 @@ wav_close (SF_PRIVATE *psf)
 } /* wav_close */
 
 static int
-wav_command (SF_PRIVATE *psf, int command, void *data, int datasize)
+wav_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
 {
-	/* All commands use a single 32 value as data */
-	if ((data == NULL) || (datasize != 4))
-		return 1 ;
-
 	switch (command)
 	{	case SFC_WAVEX_SET_AMBISONIC :
-			psf->wavex_ambisonic = *((int *) data) ;
-			return 0 ;
+			if ((psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAVEX)
+			{	if (datasize == SF_AMBISONIC_NONE)
+					datasize = SF_AMBISONIC_NONE ;
+				else if (datasize == SF_AMBISONIC_B_FORMAT)
+					datasize = SF_AMBISONIC_B_FORMAT ;
+				else
+					return 0 ;
+				} ;
+			return psf->wavex_ambisonic ;
 
 		case SFC_WAVEX_GET_AMBISONIC :
-			*((int *) data) = psf->wavex_ambisonic ;
-			return 0 ;
+			return psf->wavex_ambisonic ;
 
 		default :
-			return 1 ;
+			break ;
 	} ;
 
 	return 0 ;
