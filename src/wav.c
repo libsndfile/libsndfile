@@ -1579,21 +1579,22 @@ int
 wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 {
 	SF_BROADCAST_INFO* b ;
+	int bytes = 0 ;
 
 	if ((psf->broadcast_info = calloc (1, sizeof (SF_BROADCAST_INFO))) == NULL)
 	{	psf->error = SFE_MALLOC_FAILED ;
-		return -1 ;
+		return psf->error ;
 		} ;
 
 	b = psf->broadcast_info ;
 
-	psf_binheader_readf (psf, "b", b->description, sizeof (b->description)) ;
-	psf_binheader_readf (psf, "b", b->originator, sizeof (b->originator)) ;
-	psf_binheader_readf (psf, "b", b->originator_reference, sizeof (b->originator_reference)) ;
-	psf_binheader_readf (psf, "b", b->origination_date, sizeof (b->origination_date)) ;
-	psf_binheader_readf (psf, "b", b->origination_time, sizeof (b->origination_time)) ;
-	psf_binheader_readf (psf, "442", &b->time_reference_low, &b->time_reference_high, &b->version) ;
-	psf_binheader_readf (psf, "bj", &b->umid, sizeof (b->umid), 190) ;
+	bytes += psf_binheader_readf (psf, "b", b->description, sizeof (b->description)) ;
+	bytes += psf_binheader_readf (psf, "b", b->originator, sizeof (b->originator)) ;
+	bytes += psf_binheader_readf (psf, "b", b->originator_reference, sizeof (b->originator_reference)) ;
+	bytes += psf_binheader_readf (psf, "b", b->origination_date, sizeof (b->origination_date)) ;
+	bytes += psf_binheader_readf (psf, "b", b->origination_time, sizeof (b->origination_time)) ;
+	bytes += psf_binheader_readf (psf, "442", &b->time_reference_low, &b->time_reference_high, &b->version) ;
+	bytes += psf_binheader_readf (psf, "bj", &b->umid, sizeof (b->umid), 190) ;
 
 	if (chunksize > WAV_BEXT_CHUNK_SIZE)
 	{	/* File has coding history data. */
@@ -1601,16 +1602,15 @@ wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 		b->coding_history_size = chunksize - WAV_BEXT_CHUNK_SIZE ;
 
 		if (b->coding_history_size > SIGNED_SIZEOF (b->coding_history))
-		{	free (psf->broadcast_info) ;
-			psf->broadcast_info = NULL ;
-			psf->error = SFE_MALLOC_FAILED ;
-			return -1 ;
-			} ;
+			b->coding_history_size = SIGNED_SIZEOF (b->coding_history) ;
 
 		/* We do not parse the coding history */
-		psf_binheader_readf (psf, "b", b->coding_history, b->coding_history_size) ;
+		bytes += psf_binheader_readf (psf, "b", b->coding_history, b->coding_history_size) ;
 		b->coding_history [sizeof (b->coding_history) - 1] = 0 ;
 		} ;
+
+	if (bytes < chunksize)
+		psf_binheader_readf (psf, "j", chunksize - bytes) ;
 
 	return 0 ;
 } /* wav_read_bext_chunk */
