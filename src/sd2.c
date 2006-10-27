@@ -533,6 +533,8 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 	psf_log_printf (psf, "Finding parameters :\n") ;
 
 	str_offset = rsrc->string_offset ;
+	psf_log_printf (psf, "  Name           Offset    RsrcId    dlen   slen   Value\n") ;
+
 	for (k = 0 ; k < rsrc->str_count ; k++)
 	{	int slen ;
 
@@ -557,7 +559,7 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 		slen = read_char (rsrc->rsrc_data, data_offset + 4) ;
 		read_str (rsrc->rsrc_data, data_offset + 5, value, SF_MIN (SIGNED_SIZEOF (value), slen + 1)) ;
 
-		psf_log_printf (psf, "  %-12s   0x%04x    %4d    %2d    %2d    '%s'\n", name, data_offset, rsrc_id, data_len, slen, value) ;
+		psf_log_printf (psf, "  %-12s   0x%04x     %4d      %2d     %2d    '%s'\n", name, data_offset, rsrc_id, data_len, slen, value) ;
 
 		if (strcmp (name, "sample-size") == 0 && rsrc->sample_size == 0)
 			rsrc->sample_size = strtol (value, NULL, 10) ;
