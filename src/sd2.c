@@ -569,6 +569,15 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 			rsrc->channels = strtol (value, NULL, 10) ;
 		} ;
 
+	if (rsrc->sample_rate <= 4 && rsrc->sample_size > 4)
+	{	int temp ;
+
+		psf_log_printf (psf, "Geez!! Looks like sample rate and sample size got switched.\nCorrecting this screw up.\n") ;
+		temp = rsrc->sample_rate ;
+		rsrc->sample_rate = rsrc->sample_size ;
+		rsrc->sample_size = temp ;
+		} ;
+
 	if (rsrc->sample_rate < 0)
 	{	psf_log_printf (psf, "Bad sample rate (%d)\n", rsrc->sample_rate) ;
 		return SFE_SD2_BAD_RSRC ;
