@@ -1579,7 +1579,7 @@ int
 wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 {
 	SF_BROADCAST_INFO* b ;
-	int bytes = 0 ;
+	unsigned int bytes = 0 ;
 
 	if ((psf->broadcast_info = calloc (1, sizeof (SF_BROADCAST_INFO))) == NULL)
 	{	psf->error = SFE_MALLOC_FAILED ;
