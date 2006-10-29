@@ -1207,9 +1207,9 @@ wav_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
 	{	case SFC_WAVEX_SET_AMBISONIC :
 			if ((psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAVEX)
 			{	if (datasize == SF_AMBISONIC_NONE)
-					datasize = SF_AMBISONIC_NONE ;
+					psf->wavex_ambisonic = SF_AMBISONIC_NONE ;
 				else if (datasize == SF_AMBISONIC_B_FORMAT)
-					datasize = SF_AMBISONIC_B_FORMAT ;
+					psf->wavex_ambisonic = SF_AMBISONIC_B_FORMAT ;
 				else
 					return 0 ;
 				} ;
