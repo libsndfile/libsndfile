@@ -28,4 +28,16 @@
 #  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-SUBDIRS = private protected
+SUFFIXES = .nasm .lo
+
+STRIP_NON_ASM = sh $(top_srcdir)/strip_non_asm_libtool_args.sh
+
+.nasm.lo:
+	$(LIBTOOL) --tag=CC --mode=compile $(STRIP_NON_ASM) $(NASM) -f $(OBJ_FORMAT) -d OBJ_FORMAT_$(OBJ_FORMAT) -i$(srcdir)/ $< -o $@
+
+noinst_LTLIBRARIES = libFLAC-asm.la
+libFLAC_asm_la_SOURCES = \
+	cpu_asm.nasm \
+	fixed_asm.nasm \
+	lpc_asm.nasm \
+	nasm.h

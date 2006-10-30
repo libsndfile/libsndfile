@@ -28,4 +28,22 @@
 #  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-SUBDIRS = private protected
+noinst_HEADERS = \
+	all.h \
+	bitbuffer.h \
+	bitmath.h \
+	cpu.h \
+	crc.h \
+	fixed.h \
+	float.h \
+	format.h \
+	lpc.h \
+	md5.h \
+	memory.h \
+	metadata.h \
+	ogg_decoder_aspect.h \
+	ogg_encoder_aspect.h \
+	ogg_helper.h \
+	ogg_mapping.h \
+	stream_encoder_framing.h \
+	window.h
