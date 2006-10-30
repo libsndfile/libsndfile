@@ -28,25 +28,6 @@
 #  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#@@@
-if FLaC__HAS_GAS__TEMPORARILY_DISABLED
-
-SUFFIXES = .s .lo
-
-STRIP_NON_ASM = sh $(top_srcdir)/strip_non_asm_libtool_args.sh
-
-# For some unknown reason libtool can't figure out the tag for 'gas', so
-# we fake it with --tag=CC and strip out unwanted options.
-.s.lo:
-	$(LIBTOOL) --tag=CC --mode=compile $(STRIP_NON_ASM) gas -force_cpusubtype_ALL -o $@ $<
-
-noinst_LTLIBRARIES = libFLAC-asm.la
-libFLAC_asm_la_SOURCES = \
-	lpc_asm.s
-
-else
 
 EXTRA_DIST = \
 	lpc_asm.s
-
-endif

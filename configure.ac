@@ -289,6 +289,92 @@ AC_DEFINE_UNQUOTED(CPU_CLIPS_POSITIVE, ${ac_cv_c_clip_positive},
 AC_DEFINE_UNQUOTED(CPU_CLIPS_NEGATIVE, ${ac_cv_c_clip_negative},
 	[Target processor clips on negative float to int conversion.])
 
+
+#====================================================================================
+# FLAC defines.
+
+case "$host_cpu" in
+	i*86)
+		cpu_ia32=true
+		AC_DEFINE(FLAC__CPU_IA32)
+		AH_TEMPLATE(FLAC__CPU_IA32, [define if building for ia32/i386])
+		;;
+	powerpc)
+		cpu_ppc=true
+		AC_DEFINE(FLAC__CPU_PPC)
+		AH_TEMPLATE(FLAC__CPU_PPC, [define if building for PowerPC])
+		;;
+	sparc)
+		cpu_sparc=true
+		AC_DEFINE(FLAC__CPU_SPARC)
+		AH_TEMPLATE(FLAC__CPU_SPARC, [define if building for SPARC])
+		;;
+	esac
+
+AM_CONDITIONAL(FLaC__CPU_IA32, test "x$cpu_ia32" = xtrue)
+AM_CONDITIONAL(FLaC__CPU_PPC, test "x$cpu_ppc" = xtrue)
+AM_CONDITIONAL(FLaC__CPU_SPARC, test "x$cpu_sparc" = xtrue)
+
+case "$host" in
+	*-pc-linux-gnu)
+		sys_linux=true
+		AC_DEFINE(FLAC__SYS_LINUX)
+		AH_TEMPLATE(FLAC__SYS_LINUX, [define if building for Linux])
+		;;
+	*-*-darwin*)
+		sys_darwin=true
+		AC_DEFINE(FLAC__SYS_DARWIN)
+		AH_TEMPLATE(FLAC__SYS_DARWIN, [define if building for Darwin / MacOS X])
+		;;
+	esac
+
+AM_CONDITIONAL(FLaC__SYS_DARWIN, test "x$sys_darwin" = xtrue)
+AM_CONDITIONAL(FLaC__SYS_LINUX, test "x$sys_linux" = xtrue)
+
+AC_ARG_ENABLE(asm-optimizations, AC_HELP_STRING([--disable-asm-optimizations], [Don't use any assembly optimization routines]), asm_opt=no, asm_opt=yes)
+AM_CONDITIONAL(FLaC__NO_ASM, test "x$asm_opt" = xno)
+
+if test "x$asm_opt" = xno ; then
+	AC_DEFINE(FLAC__NO_ASM)
+	AH_TEMPLATE(FLAC__NO_ASM, [define to disable use of assembly code])
+	fi
+
+AC_CHECK_PROGS(NASM, nasm)
+AM_CONDITIONAL(FLaC__HAS_NASM, test -n "$NASM")
+
+if test -n "$NASM" ; then
+	AC_DEFINE(FLAC__HAS_NASM)
+	AH_TEMPLATE(FLAC__HAS_NASM, [define if you are compiling for x86 and have the NASM assembler])
+	fi
+
+# only matters for PowerPC
+AC_CHECK_PROGS(AS, as, as)
+AC_CHECK_PROGS(GAS, gas, gas)
+
+test "$AS" = "as" && as --version | grep GNU >/dev/null && AS=gas
+
+AM_CONDITIONAL(FLaC__HAS_AS, test "$AS" = "as")
+AM_CONDITIONAL(FLaC__HAS_GAS, test "$AS" = "gas")
+
+if test "$AS" = "as" ; then
+	AC_DEFINE(FLAC__HAS_AS)
+	AH_TEMPLATE(FLAC__HAS_AS, [define if you are compiling for PowerPC and have the 'as' assembler])
+	fi
+
+if test "$AS" = "gas" ; then
+	# funniest. macro. ever.
+	AC_DEFINE(FLAC__HAS_GAS)
+	AH_TEMPLATE(FLAC__HAS_GAS, [define if you are compiling for PowerPC and have the 'gas' assembler])
+	fi
+
+case "$host" in
+	i386-*-openbsd3.[[0-3]]) OBJ_FORMAT=aoutb ;;
+	*-*-cygwin|*mingw*) OBJ_FORMAT=win32 ;;
+	*) OBJ_FORMAT=elf ;;
+	esac
+
+AC_SUBST(OBJ_FORMAT)
+
 #====================================================================================
 # Target OS specific stuff.
 
@@ -328,22 +414,6 @@ if test x$enable_alsa != xno ; then
 	AC_CHECK_HEADERS(alsa/asoundlib.h)
 	if test x$ac_cv_header_alsa_asoundlib_h = xyes ; then
 		ALSA_LIBS="-lasound"
-		fi
-	fi
-
-#====================================================================================
-# Check for FLAC
-
-FLAC_LIBS=""
-
-if test x$enable_flac != xno ; then
-	AC_CHECK_HEADERS(FLAC/all.h)
-	if test x$ac_cv_header_FLAC_all_h = xyes ; then
-		AC_CHECK_LIB(FLAC, FLAC__seekable_stream_encoder_set_tell_callback, HAVE_FLAC_1_1_1="yes")
-		if test "x$HAVE_FLAC_1_1_1" = xyes ; then
-			AC_DEFINE(HAVE_FLAC_1_1_1, [1], [Define to 1 if you have libflac 1.1.1])
-			fi
-		FLAC_LIBS="-lFLAC"
 		fi
 	fi
 
@@ -484,7 +554,6 @@ AC_SUBST(SHARED_VERSION_INFO)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(ALSA_LIBS)
-AC_SUBST(FLAC_LIBS)
 AC_SUBST(ENABLE_EXPERIMENTAL_CODE)
 
 AC_SUBST(COMPILER_IS_GCC)
@@ -496,6 +565,9 @@ AC_SUBST(LIBTOOL_DEPS)
 
 AC_CONFIG_FILES([ \
 			src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
+			src/FLAC/Makefile src/FLAC/include/Makefile src/FLAC/include/protected/Makefile \
+			src/FLAC/include/private/Makefile src/FLAC/ia32/Makefile src/FLAC/ppc/gas/Makefile \
+			src/FLAC/ppc/Makefile src/FLAC/ppc/as/Makefile src/FLAC/tests/Makefile \
 			man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
 			doc/Makefile doc/libsndfile.css \
 			Win32/Makefile Octave/Makefile \

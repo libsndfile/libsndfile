@@ -30,7 +30,7 @@
 
 SUFFIXES = .nasm .lo
 
-STRIP_NON_ASM = sh $(top_srcdir)/strip_non_asm_libtool_args.sh
+STRIP_NON_ASM = sh $(top_srcdir)/src/FLAC/strip_non_asm_libtool_args.sh
 
 .nasm.lo:
 	$(LIBTOOL) --tag=CC --mode=compile $(STRIP_NON_ASM) $(NASM) -f $(OBJ_FORMAT) -d OBJ_FORMAT_$(OBJ_FORMAT) -i$(srcdir)/ $< -o $@

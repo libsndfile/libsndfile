@@ -1,5 +1,5 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006  Josh Coalson
+ * Copyright (C) 2000,2001,2002,2003,2004,2005,2006 Josh Coalson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,30 +29,52 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef FLAC__PROTECTED__STREAM_DECODER_H
-#define FLAC__PROTECTED__STREAM_DECODER_H
+#ifndef FLAC__ORDINALS_H
+#define FLAC__ORDINALS_H
 
-#include "FLAC/FLAC/stream_decoder.h"
-#ifdef FLAC__HAS_OGG
-#include "FLAC/include/private/ogg_decoder_aspect.h"
+#if !(defined(_MSC_VER) || defined(__EMX__))
+#include <inttypes.h>
 #endif
 
-typedef struct FLAC__StreamDecoderProtected {
-	FLAC__StreamDecoderState state;
-	unsigned channels;
-	FLAC__ChannelAssignment channel_assignment;
-	unsigned bits_per_sample;
-	unsigned sample_rate; /* in Hz */
-	unsigned blocksize; /* in samples (per channel) */
-	FLAC__bool md5_checking; /* if true, generate MD5 signature of decoded data and compare against signature in the STREAMINFO metadata block */
-#ifdef FLAC__HAS_OGG
-	FLAC__OggDecoderAspect ogg_decoder_aspect;
-#endif
-} FLAC__StreamDecoderProtected;
+typedef signed char FLAC__int8;
+typedef unsigned char FLAC__uint8;
 
-/*
- * return the number of input bytes consumed
- */
-unsigned FLAC__stream_decoder_get_input_bytes_unconsumed(const FLAC__StreamDecoder *decoder);
+#if defined _MSC_VER
+typedef __int16 FLAC__int16;
+typedef __int32 FLAC__int32;
+typedef __int64 FLAC__int64;
+typedef unsigned __int16 FLAC__uint16;
+typedef unsigned __int32 FLAC__uint32;
+typedef unsigned __int64 FLAC__uint64;
+#elif defined(__EMX__)
+typedef short FLAC__int16;
+typedef long FLAC__int32;
+typedef long long FLAC__int64;
+typedef unsigned short FLAC__uint16;
+typedef unsigned long FLAC__uint32;
+typedef unsigned long long FLAC__uint64;
+#else
+typedef int16_t FLAC__int16;
+typedef int32_t FLAC__int32;
+typedef int64_t FLAC__int64;
+typedef uint16_t FLAC__uint16;
+typedef uint32_t FLAC__uint32;
+typedef uint64_t FLAC__uint64;
+#endif
+
+typedef int FLAC__bool;
+
+typedef FLAC__uint8 FLAC__byte;
+
+#ifdef true
+#undef true
+#endif
+#ifdef false
+#undef false
+#endif
+#ifndef __cplusplus
+#define true 1
+#define false 0
+#endif
 
 #endif

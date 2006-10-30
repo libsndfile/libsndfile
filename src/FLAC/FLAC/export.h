@@ -1,5 +1,5 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006  Josh Coalson
+ * Copyright (C) 2000,2001,2002,2003,2004,2005,2006 Josh Coalson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,30 +29,60 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef FLAC__PROTECTED__STREAM_DECODER_H
-#define FLAC__PROTECTED__STREAM_DECODER_H
+#ifndef FLAC__EXPORT_H
+#define FLAC__EXPORT_H
 
-#include "FLAC/FLAC/stream_decoder.h"
-#ifdef FLAC__HAS_OGG
-#include "FLAC/include/private/ogg_decoder_aspect.h"
-#endif
-
-typedef struct FLAC__StreamDecoderProtected {
-	FLAC__StreamDecoderState state;
-	unsigned channels;
-	FLAC__ChannelAssignment channel_assignment;
-	unsigned bits_per_sample;
-	unsigned sample_rate; /* in Hz */
-	unsigned blocksize; /* in samples (per channel) */
-	FLAC__bool md5_checking; /* if true, generate MD5 signature of decoded data and compare against signature in the STREAMINFO metadata block */
-#ifdef FLAC__HAS_OGG
-	FLAC__OggDecoderAspect ogg_decoder_aspect;
-#endif
-} FLAC__StreamDecoderProtected;
-
-/*
- * return the number of input bytes consumed
+/** \file include/FLAC/export.h
+ *
+ *  \brief
+ *  This module contains #defines and symbols for exporting function
+ *  calls, and providing version information and compiled-in features.
+ *
+ *  See the \link flac_export export \endlink module.
  */
-unsigned FLAC__stream_decoder_get_input_bytes_unconsumed(const FLAC__StreamDecoder *decoder);
+
+/** \defgroup flac_export FLAC/export.h: export symbols
+ *  \ingroup flac
+ *
+ *  \brief
+ *  This module contains structure definitions for the representation
+ *  of FLAC format components in memory.  These are the basic
+ *  structures used by the rest of the interfaces.
+ *
+ * \{
+ */
+
+#if defined(FLAC__NO_DLL) || !defined(_MSC_VER)
+#define FLAC_API
+
+#else
+
+#ifdef FLAC_API_EXPORTS
+#define	FLAC_API	_declspec(dllexport)
+#else
+#define FLAC_API	_declspec(dllimport)
+
+#endif
+#endif
+
+/** These #defines will mirror the libtool-based library version number, see
+ * http://www.gnu.org/software/libtool/manual.html#Libtool-versioning
+ */
+#define FLAC_API_VERSION_CURRENT 8
+#define FLAC_API_VERSION_REVISION 0 /**< see above */
+#define FLAC_API_VERSION_AGE 0 /**< see above */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/** \c 1 if the library has been compiled with support for Ogg FLAC, else \c 0. */
+extern FLAC_API int FLAC_API_SUPPORTS_OGG_FLAC;
+
+#ifdef __cplusplus
+}
+#endif
+
+/* \} */
 
 #endif

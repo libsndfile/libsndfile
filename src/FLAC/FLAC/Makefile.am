@@ -1,5 +1,5 @@
 #  libFLAC - Free Lossless Audio Codec library
-#  Copyright (C) 2001,2002,2003,2004,2005,2006  Josh Coalson
+#  Copyright (C) 2000,2001,2002,2003,2004,2005,2006 Josh Coalson
 #
 #  Redistribution and use in source and binary forms, with or without
 #  modification, are permitted provided that the following conditions
@@ -28,60 +28,15 @@
 #  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 #  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-noinst_LTLIBRARIES = libFLAC.la
+flaccincludedir = $(includedir)/FLAC
 
-if FLaC__CPU_PPC
-# The -force_cpusubtype_ALL is needed to insert a ppc64 instruction
-# into cpu.c with an asm().
-if FLaC__SYS_DARWIN
-#@@@ PPC optimizations temporarily disabled
-CPUCFLAGS = -faltivec -force_cpusubtype_ALL -DFLAC__NO_ASM
-else
-# Linux-gcc for PPC does not have -force_cpusubtype_ALL, it is Darwin-specific
-#@@@ PPC optimizations temporarily disabled
-CPUCFLAGS = -maltivec -mabi=altivec -DFLAC__NO_ASM
-endif
-endif
-
-AM_CFLAGS = $(CPUCFLAGS) -I include
-
-if FLaC__NO_ASM
-else
-if FLaC__CPU_IA32
-if FLaC__HAS_NASM
-ARCH_SUBDIRS = ia32
-libFLAC_la_LIBADD = ia32/libFLAC-asm.la
-endif
-endif
-if FLaC__CPU_PPC
-ARCH_SUBDIRS = ppc
-endif
-endif
-
-SUBDIRS = $(ARCH_SUBDIRS) include .
-
-extra_ogg_sources = \
-	ogg_decoder_aspect.c \
-	ogg_encoder_aspect.c \
-	ogg_helper.c \
-	ogg_mapping.c
-
-# see 'http://www.gnu.org/software/libtool/manual.html#Libtool-versioning' for numbering convention
-libFLAC_la_SOURCES = \
-	bitbuffer.c \
-	bitmath.c \
-	cpu.c \
-	crc.c \
-	fixed.c \
-	float.c \
-	format.c \
-	lpc.c \
-	md5.c \
-	memory.c \
-	metadata_iterators.c \
-	metadata_object.c \
-	stream_decoder.c \
-	stream_encoder.c \
-	stream_encoder_framing.c \
-	window.c \
-	$(extra_ogg_sources)
+flaccinclude_HEADERS = \
+	all.h \
+	assert.h \
+	callback.h \
+	export.h \
+	format.h \
+	metadata.h \
+	ordinals.h \
+	stream_decoder.h \
+	stream_encoder.h

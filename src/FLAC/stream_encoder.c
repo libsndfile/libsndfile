@@ -315,7 +315,7 @@ static FLAC__StreamEncoderReadStatus file_read_callback_(const FLAC__StreamEncod
 static FLAC__StreamEncoderSeekStatus file_seek_callback_(const FLAC__StreamEncoder *encoder, FLAC__uint64 absolute_byte_offset, void *client_data);
 static FLAC__StreamEncoderTellStatus file_tell_callback_(const FLAC__StreamEncoder *encoder, FLAC__uint64 *absolute_byte_offset, void *client_data);
 static FLAC__StreamEncoderWriteStatus file_write_callback_(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data);
-static FILE *get_binary_stdout_();
+static FILE *get_binary_stdout_(void);
 
 
 /***********************************************************************
@@ -762,12 +762,12 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 #if FLAC__HAS_OGG
 	/* reorder metadata if necessary to ensure that any VORBIS_COMMENT is the first, according to the mapping spec */
 	if(is_ogg && 0 != encoder->protected_->metadata && encoder->protected_->num_metadata_blocks > 1) {
-		unsigned i;
-		for(i = 1; i < encoder->protected_->num_metadata_blocks; i++) {
-			if(0 != encoder->protected_->metadata[i] && encoder->protected_->metadata[i]->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
-				FLAC__StreamMetadata *vc = encoder->protected_->metadata[i];
-				for( ; i > 0; i--)
-					encoder->protected_->metadata[i] = encoder->protected_->metadata[i-1];
+		unsigned i1;
+		for(i1 = 1; i1 < encoder->protected_->num_metadata_blocks; i1++) {
+			if(0 != encoder->protected_->metadata[i1] && encoder->protected_->metadata[i1]->type == FLAC__METADATA_TYPE_VORBIS_COMMENT) {
+				FLAC__StreamMetadata *vc = encoder->protected_->metadata[i1];
+				for( ; i1 > 0; i1--)
+					encoder->protected_->metadata[i1] = encoder->protected_->metadata[i1-1];
 				encoder->protected_->metadata[0] = vc;
 				break;
 			}
@@ -776,10 +776,10 @@ static FLAC__StreamEncoderInitStatus init_stream_internal_(
 #endif
 	/* keep track of any SEEKTABLE block */
 	if(0 != encoder->protected_->metadata && encoder->protected_->num_metadata_blocks > 0) {
-		unsigned i;
-		for(i = 0; i < encoder->protected_->num_metadata_blocks; i++) {
-			if(0 != encoder->protected_->metadata[i] && encoder->protected_->metadata[i]->type == FLAC__METADATA_TYPE_SEEKTABLE) {
-				encoder->private_->seek_table = &encoder->protected_->metadata[i]->data.seek_table;
+		unsigned i2;
+		for(i2 = 0; i2 < encoder->protected_->num_metadata_blocks; i2++) {
+			if(0 != encoder->protected_->metadata[i2] && encoder->protected_->metadata[i2]->type == FLAC__METADATA_TYPE_SEEKTABLE) {
+				encoder->private_->seek_table = &encoder->protected_->metadata[i2]->data.seek_table;
 				break; /* take only the first one */
 			}
 		}
@@ -1677,6 +1677,10 @@ FLAC_API FLAC__bool FLAC__stream_encoder_set_metadata(FLAC__StreamEncoder *encod
  * These three functions are not static, but not publically exposed in
  * include/FLAC/ either.  They are used by the test suite.
  */
+FLAC_API FLAC__bool FLAC__stream_encoder_disable_constant_subframes(FLAC__StreamEncoder *encoder, FLAC__bool value);
+FLAC_API FLAC__bool FLAC__stream_encoder_disable_fixed_subframes(FLAC__StreamEncoder *encoder, FLAC__bool value);
+FLAC_API FLAC__bool FLAC__stream_encoder_disable_verbatim_subframes(FLAC__StreamEncoder *encoder, FLAC__bool value);
+
 FLAC_API FLAC__bool FLAC__stream_encoder_disable_constant_subframes(FLAC__StreamEncoder *encoder, FLAC__bool value)
 {
 	FLAC__ASSERT(0 != encoder);

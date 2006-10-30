@@ -1,5 +1,5 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006  Josh Coalson
+ * Copyright (C) 2001,2002,2003,2004,2005,2006 Josh Coalson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -29,30 +29,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef FLAC__PROTECTED__STREAM_DECODER_H
-#define FLAC__PROTECTED__STREAM_DECODER_H
+#ifndef FLAC__ASSERT_H
+#define FLAC__ASSERT_H
 
-#include "FLAC/FLAC/stream_decoder.h"
-#ifdef FLAC__HAS_OGG
-#include "FLAC/include/private/ogg_decoder_aspect.h"
+/* we need this since some compilers (like MSVC) leave assert()s on release code (and we don't want to use their ASSERT) */
+#ifdef DEBUG
+#include <assert.h>
+#define FLAC__ASSERT(x) assert(x)
+#define FLAC__ASSERT_DECLARATION(x) x
+#else
+#define FLAC__ASSERT(x)
+#define FLAC__ASSERT_DECLARATION(x)
 #endif
-
-typedef struct FLAC__StreamDecoderProtected {
-	FLAC__StreamDecoderState state;
-	unsigned channels;
-	FLAC__ChannelAssignment channel_assignment;
-	unsigned bits_per_sample;
-	unsigned sample_rate; /* in Hz */
-	unsigned blocksize; /* in samples (per channel) */
-	FLAC__bool md5_checking; /* if true, generate MD5 signature of decoded data and compare against signature in the STREAMINFO metadata block */
-#ifdef FLAC__HAS_OGG
-	FLAC__OggDecoderAspect ogg_decoder_aspect;
-#endif
-} FLAC__StreamDecoderProtected;
-
-/*
- * return the number of input bytes consumed
- */
-unsigned FLAC__stream_decoder_get_input_bytes_unconsumed(const FLAC__StreamDecoder *decoder);
 
 #endif

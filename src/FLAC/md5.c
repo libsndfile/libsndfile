@@ -144,7 +144,7 @@ FLAC__MD5Transform(FLAC__uint32 buf[4], FLAC__uint32 const in[16])
 
 #endif
 
-FLaC__INLINE
+static FLaC__INLINE
 void
 byteSwap(FLAC__uint32 *buf, unsigned words)
 {

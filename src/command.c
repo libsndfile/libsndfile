@@ -51,11 +51,9 @@ static SF_FORMAT_INFO const simple_formats [] =
 		"CAF (Apple 16 bit PCM)", "caf"
 		},
 
-#ifdef HAVE_FLAC_ALL_H
 	{	SF_FORMAT_FLAC | SF_FORMAT_PCM_16,
 		"FLAC 16 bit", "flac"
 		},
-#endif
 
 	{	SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM,
 		"OKI Dialogic VOX ADPCM", "vox"
@@ -111,9 +109,7 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_AU,		"AU (Sun/NeXT)", 						"au"	},
 	{	SF_FORMAT_AVR,		"AVR (Audio Visual Research)",	 		"avr"	},
 	{	SF_FORMAT_CAF,		"CAF (Apple Core Audio File)",	 		"caf"	},
-#ifdef HAVE_FLAC_ALL_H
 	{	SF_FORMAT_FLAC,		"FLAC (FLAC Lossless Audio Codec)",	 	"flac"	},
-#endif
 	{	SF_FORMAT_HTK,		"HTK (HMM Tool Kit)",					"htk"	},
 	{	SF_FORMAT_SVX,		"IFF (Amiga IFF/SVX8/SV16)",			"iff"	},
 	{	SF_FORMAT_MAT4,		"MAT4 (GNU Octave 2.0 / Matlab 4.2)",	"mat"	},

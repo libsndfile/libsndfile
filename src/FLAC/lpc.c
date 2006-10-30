@@ -191,7 +191,7 @@ redo_it:
 
 	if(*shift >= 0) {
 		for(i = 0; i < order; i++) {
-			qlp_coeff[i] = (FLAC__int32)floor((FLAC__double)lp_coeff[i] * (FLAC__double)(1 << *shift));
+			qlp_coeff[i] = floor((FLAC__double)lp_coeff[i] * (FLAC__double)(1 << *shift));
 
 			/* double-check the result */
 			if(qlp_coeff[i] > qmax || qlp_coeff[i] < qmin) {
@@ -209,7 +209,7 @@ redo_it:
 		fprintf(stderr,"FLAC__lpc_quantize_coefficients: negative shift = %d\n", *shift);
 #endif
 		for(i = 0; i < order; i++) {
-			qlp_coeff[i] = (FLAC__int32)floor((FLAC__double)lp_coeff[i] / (FLAC__double)(1 << nshift));
+			qlp_coeff[i] = floor((FLAC__double)lp_coeff[i] / (FLAC__double)(1 << nshift));
 
 			/* double-check the result */
 			if(qlp_coeff[i] > qmax || qlp_coeff[i] < qmin) {

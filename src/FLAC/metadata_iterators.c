@@ -877,7 +877,7 @@ FLAC_API const char * const FLAC__Metadata_ChainStatusString[] = {
 };
 
 
-static FLAC__Metadata_Node *node_new_()
+static FLAC__Metadata_Node *node_new_(void)
 {
 	return (FLAC__Metadata_Node*)calloc(1, sizeof(FLAC__Metadata_Node));
 }
@@ -2171,6 +2171,7 @@ FLAC__Metadata_SimpleIteratorStatus read_metadata_block_data_cuesheet_cb_(FLAC__
 	return FLAC__METADATA_SIMPLE_ITERATOR_STATUS_OK;
 }
 
+static
 FLAC__Metadata_SimpleIteratorStatus read_metadata_block_data_picture_cstring_cb_(FLAC__IOHandle handle, FLAC__IOCallback_Read read_cb, FLAC__byte **data, FLAC__uint32 *length, FLAC__uint32 length_len)
 {
 	FLAC__byte buffer[sizeof(FLAC__uint32)];
@@ -2218,7 +2219,7 @@ FLAC__Metadata_SimpleIteratorStatus read_metadata_block_data_picture_cb_(FLAC__I
 	len = FLAC__STREAM_METADATA_PICTURE_TYPE_LEN / 8;
 	if(read_cb(buffer, 1, len, handle) != len)
 		return FLAC__METADATA_SIMPLE_ITERATOR_STATUS_READ_ERROR;
-	block->type = (FLAC__StreamMetadata_Picture_Type)unpack_uint32_(buffer, len);
+	block->type = unpack_uint32_(buffer, len);
 
 	if((status = read_metadata_block_data_picture_cstring_cb_(handle, read_cb, (FLAC__byte**)(&(block->mime_type)), &len, FLAC__STREAM_METADATA_PICTURE_MIME_TYPE_LENGTH_LEN)) != FLAC__METADATA_SIMPLE_ITERATOR_STATUS_OK)
 		return status;
@@ -2519,17 +2520,17 @@ FLAC__bool write_metadata_block_data_cuesheet_cb_(FLAC__IOHandle handle, FLAC__I
 			return false;
 
 		for(j = 0; j < track->num_indices; j++) {
-			FLAC__StreamMetadata_CueSheet_Index *index = track->indices + j;
+			FLAC__StreamMetadata_CueSheet_Index *indx = track->indices + j;
 
 			FLAC__ASSERT(FLAC__STREAM_METADATA_CUESHEET_INDEX_OFFSET_LEN % 8 == 0);
 			len = FLAC__STREAM_METADATA_CUESHEET_INDEX_OFFSET_LEN / 8;
-			pack_uint64_(index->offset, buffer, len);
+			pack_uint64_(indx->offset, buffer, len);
 			if(write_cb(buffer, 1, len, handle) != len)
 				return false;
 
 			FLAC__ASSERT(FLAC__STREAM_METADATA_CUESHEET_INDEX_NUMBER_LEN % 8 == 0);
 			len = FLAC__STREAM_METADATA_CUESHEET_INDEX_NUMBER_LEN / 8;
-			pack_uint32_(index->number, buffer, len);
+			pack_uint32_(indx->number, buffer, len);
 			if(write_cb(buffer, 1, len, handle) != len)
 				return false;
 

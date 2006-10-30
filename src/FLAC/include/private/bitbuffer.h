@@ -56,7 +56,7 @@ typedef struct FLAC__BitBuffer FLAC__BitBuffer;
 /*
  * construction, deletion, initialization, cloning functions
  */
-FLAC__BitBuffer *FLAC__bitbuffer_new();
+FLAC__BitBuffer *FLAC__bitbuffer_new(void);
 void FLAC__bitbuffer_delete(FLAC__BitBuffer *bb);
 FLAC__bool FLAC__bitbuffer_init(FLAC__BitBuffer *bb);
 FLAC__bool FLAC__bitbuffer_init_from(FLAC__BitBuffer *bb, const FLAC__byte buffer[], unsigned bytes);
