@@ -30,6 +30,8 @@
 
 noinst_LTLIBRARIES = libFLAC.la
 
+EXTRA_DIST = strip_non_asm_libtool_args.sh
+
 if FLaC__CPU_PPC
 # The -force_cpusubtype_ALL is needed to insert a ppc64 instruction
 # into cpu.c with an asm().
@@ -43,7 +45,7 @@ CPUCFLAGS = -maltivec -mabi=altivec -DFLAC__NO_ASM
 endif
 endif
 
-AM_CFLAGS = $(CPUCFLAGS) -I include
+AM_CFLAGS = $(CPUCFLAGS) -I$(top_srcdir)/src/FLAC/include
 
 if FLaC__NO_ASM
 else
@@ -58,7 +60,7 @@ ARCH_SUBDIRS = ppc
 endif
 endif
 
-SUBDIRS = $(ARCH_SUBDIRS) include share . test_libs_common tests
+SUBDIRS = $(ARCH_SUBDIRS) include FLAC share test_libs_common . tests
 
 extra_ogg_sources = \
 	ogg_decoder_aspect.c \

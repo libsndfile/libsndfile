@@ -564,21 +564,22 @@ dnl to be replaced if the build system has a more recent version.
 AC_SUBST(LIBTOOL_DEPS)
 
 AC_CONFIG_FILES([ \
-			src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
-			src/FLAC/Makefile src/FLAC/include/Makefile src/FLAC/include/protected/Makefile \
-			src/FLAC/include/private/Makefile src/FLAC/ia32/Makefile src/FLAC/ppc/gas/Makefile \
-			src/FLAC/ppc/Makefile src/FLAC/ppc/as/Makefile src/FLAC/tests/Makefile \
-			src/FLAC/share/Makefile src/FLAC/test_libs_common/Makefile \
-			src/FLAC/share/getopt/Makefile src/FLAC/share/replaygain_analysis/Makefile \
-			src/FLAC/share/replaygain_synthesis/Makefile \
-			src/FLAC/share/replaygain_synthesis/include/Makefile \
-			src/FLAC/share/replaygain_synthesis/include/private/Makefile \
-			src/FLAC/share/grabbag/Makefile src/FLAC/share/utf8/Makefile \
-			man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
-			doc/Makefile doc/libsndfile.css \
-			Win32/Makefile Octave/Makefile \
-			Makefile libsndfile.spec sndfile.pc \
-			])
+		src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
+		src/FLAC/Makefile src/FLAC/FLAC/Makefile src/FLAC/include/Makefile \
+		src/FLAC/include/protected/Makefile src/FLAC/include/test_libs_common/Makefile \
+		src/FLAC/include/share/Makefile src/FLAC/include/share/grabbag/Makefile \
+		src/FLAC/include/private/Makefile src/FLAC/ia32/Makefile src/FLAC/ppc/gas/Makefile \
+		src/FLAC/ppc/Makefile src/FLAC/ppc/as/Makefile src/FLAC/tests/Makefile \
+		src/FLAC/share/Makefile src/FLAC/test_libs_common/Makefile src/FLAC/share/getopt/Makefile \
+		src/FLAC/share/replaygain_analysis/Makefile src/FLAC/share/replaygain_synthesis/Makefile \
+		src/FLAC/share/replaygain_synthesis/include/Makefile \
+		src/FLAC/share/replaygain_synthesis/include/private/Makefile \
+		src/FLAC/share/grabbag/Makefile src/FLAC/share/utf8/Makefile \
+		man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
+		doc/Makefile doc/libsndfile.css \
+		Win32/Makefile Octave/Makefile \
+		Makefile libsndfile.spec sndfile.pc \
+		])
 AC_OUTPUT
 
 #====================================================================================

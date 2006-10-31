@@ -36,7 +36,7 @@
 #include <config.h>
 #endif
 
-#include "FLAC/FLAC/ordinals.h"
+#include "FLAC/ordinals.h"
 
 /*
  * These typedefs make it easier to ensure that integer versions of

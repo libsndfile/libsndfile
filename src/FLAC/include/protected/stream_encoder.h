@@ -32,14 +32,14 @@
 #ifndef FLAC__PROTECTED__STREAM_ENCODER_H
 #define FLAC__PROTECTED__STREAM_ENCODER_H
 
-#include "FLAC/FLAC/stream_encoder.h"
+#include "FLAC/stream_encoder.h"
 #ifdef FLAC__HAS_OGG
-#include "FLAC/include/private/ogg_encoder_aspect.h"
+#include "private/ogg_encoder_aspect.h"
 #endif
 
 #ifndef FLAC__INTEGER_ONLY_LIBRARY
 
-#include "FLAC/include/private/float.h"
+#include "private/float.h"
 
 #define FLAC__MAX_APODIZATION_FUNCTIONS 32
 

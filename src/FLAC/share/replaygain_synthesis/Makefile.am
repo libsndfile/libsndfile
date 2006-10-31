@@ -1,11 +1,11 @@
 ## Process this file with automake to produce Makefile.in
 
-AUTOMAKE_OPTIONS = foreign
-
 SUBDIRS = include .
 
-INCLUDES = -I$(top_srcdir)/src/FLAC/include -I$(top_srcdir)/src/FLAC/include/share \
-	-I$(top_srcdir)/src/FLAC -I$(top_srcdir)/src/FLAC/share/replaygain_synthesis/include
+INCLUDES = -I$(top_srcdir)/src/FLAC/share/replaygain_synthesis/include \
+	-I$(top_srcdir)/src/FLAC -I$(top_srcdir)/src/FLAC/include \
+	-I$(top_srcdir)/src/FLAC/include/share
+	
 
 noinst_LTLIBRARIES = libreplaygain_synthesis.la
 

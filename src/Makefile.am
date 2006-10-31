@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = GSM610 G72x FLAC
+SUBDIRS = FLAC GSM610 G72x
 
 lib_LTLIBRARIES = libsndfile.la
 include_HEADERS = sndfile.hh
@@ -13,6 +13,8 @@ EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 			Symbols.linux Symbols.darwin libsndfile.def cygsndfile.def \
 			create_symbols_file.py binheader_writef_check.py
 
+AM_CFLAGS = -I$(top_srcdir)/src/FLAC
+
 noinst_HEADERS = common.h sfconfig.h sfendian.h float_cast.h wav_w64.h sf_unistd.h
 
 noinst_PROGRAMS = test_endswap test_file_io test_log_printf
@@ -21,16 +23,15 @@ COMMON = sndfile.c common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
 		interleave.c strings.c dither.c broadcast.c
 
-FILESPECIFIC = aiff.c au.c g72x.c avr.c caf.c ircam.c macbinary3.c macos.c \
-				mat4.c mat5.c nist.c paf.c pvf.c raw.c svx.c voc.c htk.c dwd.c \
-				ogg.c rx2.c sd2.c sds.c txw.c wve.c w64.c wav_w64.c wav.c xi.c \
-				flac.c
+FILESPECIFIC = aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c macbinary3.c \
+		macos.c mat4.c mat5.c nist.c ogg.c paf.c pvf.c raw.c rx2.c sd2.c sds.c svx.c \
+		txw.c voc.c wve.c w64.c wav_w64.c wav.c xi.c
 
 # MinGW requires -no-undefined if a DLL is to be built.
 libsndfile_la_LDFLAGS = -no-undefined -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@
-libsndfile_la_SOURCES = $(COMMON) $(FILESPECIFIC) $(noinst_HEADERS)
+libsndfile_la_SOURCES = $(FILESPECIFIC) $(COMMON) $(noinst_HEADERS)
 nodist_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
-libsndfile_la_LIBADD  = GSM610/libgsm.la G72x/libg72x.la FLAC/libFLAC.la -lm -logg
+libsndfile_la_LIBADD  = FLAC/libFLAC.la GSM610/libgsm.la G72x/libg72x.la -lm -logg
 
 test_endswap_SOURCES = test_endswap.c
 

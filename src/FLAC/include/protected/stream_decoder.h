@@ -32,9 +32,9 @@
 #ifndef FLAC__PROTECTED__STREAM_DECODER_H
 #define FLAC__PROTECTED__STREAM_DECODER_H
 
-#include "FLAC/FLAC/stream_decoder.h"
+#include "FLAC/stream_decoder.h"
 #ifdef FLAC__HAS_OGG
-#include "FLAC/include/private/ogg_decoder_aspect.h"
+#include "private/ogg_decoder_aspect.h"
 #endif
 
 typedef struct FLAC__StreamDecoderProtected {
