@@ -15,20 +15,17 @@
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-EXTRA_DIST = \
-	Makefile.lite \
-	test_libFLAC.dsp
-
-INCLUDES = -I$(top_srcdir)/src/libFLAC/include
+INCLUDES = -I$(top_srcdir)/src/FLAC/include -I$(top_srcdir)/src/FLAC
 
 noinst_PROGRAMS = test_libFLAC
 test_libFLAC_LDADD = \
-	$(top_builddir)/src/share/grabbag/libgrabbag.la \
-	$(top_builddir)/src/share/replaygain_analysis/libreplaygain_analysis.la \
-	$(top_builddir)/src/test_libs_common/libtest_libs_common.la \
-	$(top_builddir)/src/libFLAC/libFLAC.la \
-	@OGG_LIBS@ \
+	$(top_builddir)/src/FLAC/share/grabbag/libgrabbag.la \
+	$(top_builddir)/src/FLAC/share/replaygain_analysis/libreplaygain_analysis.la \
+	$(top_builddir)/src/FLAC/test_libs_common/libtest_libs_common.la \
+	$(top_builddir)/src/FLAC/libFLAC.la \
+	-logg \
 	-lm
+
 test_libFLAC_SOURCES = \
 	bitbuffer.c \
 	decoders.c \

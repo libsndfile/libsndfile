@@ -1,5 +1,5 @@
 /* test_libFLAC - Unit tester for libFLAC
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002,2003,2004,2005,2006  Josh Coalson
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef FLAC__TEST_LIBFLAC_METADATA_UTILS_H
-#define FLAC__TEST_LIBFLAC_METADATA_UTILS_H
+#ifndef FLAC__TEST_LIBFLAC_METADATA_H
+#define FLAC__TEST_LIBFLAC_METADATA_H
 
 /*
  * These are not tests, just utility functions used by the metadata tests

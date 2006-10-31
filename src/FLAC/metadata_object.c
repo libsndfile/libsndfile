@@ -1513,7 +1513,7 @@ FLAC_API FLAC__bool FLAC__metadata_object_cuesheet_track_insert_index(FLAC__Stre
 FLAC_API FLAC__bool FLAC__metadata_object_cuesheet_track_insert_blank_index(FLAC__StreamMetadata *object, unsigned track_num, unsigned index_num)
 {
 	FLAC__StreamMetadata_CueSheet_Index indx;
-	memset(&index, 0, sizeof(indx));
+	memset(&indx, 0, sizeof(indx));
 	return FLAC__metadata_object_cuesheet_track_insert_index(object, track_num, index_num, indx);
 }
 

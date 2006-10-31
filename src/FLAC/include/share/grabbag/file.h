@@ -1,19 +1,19 @@
 /* grabbag - Convenience lib for various routines common to several tools
- * Copyright (C) 2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2002,2003,2004,2005,2006 Josh Coalson
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 /* Convenience routines for manipulating files */
@@ -45,8 +45,8 @@ const char *grabbag__file_get_basename(const char *srcpath);
  */
 FLAC__bool grabbag__file_change_stats(const char *filename, FLAC__bool read_only);
 
-/* returns true iff stat() succeeds for both files and they have the same device and inode. */
-/* on windows, uses GetFileInformationByHandle() to compare */
+/* returns true iff stat() succeeds for both files and they have the same device and inode */
+/*@@@ this does not work on windows so for that the function just returns !strcmp(f1,f2) */
 FLAC__bool grabbag__file_are_same(const char *f1, const char *f2);
 
 /* attempts to make writable before unlinking */

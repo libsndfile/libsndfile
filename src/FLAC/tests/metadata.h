@@ -16,11 +16,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-#ifndef FLAC__TEST_LIBFLAC_METADATA_H
-#define FLAC__TEST_LIBFLAC_METADATA_H
+#ifndef FLAC__TEST_LIBFLAC_TEST_METADATA_H
+#define FLAC__TEST_LIBFLAC_TEST_METADATA_H
 
 #include "FLAC/ordinals.h"
 
-FLAC__bool test_metadata();
+FLAC__bool test_metadata(void);
+
+FLAC__bool test_metadata_object(void);
+FLAC__bool test_metadata_file_manipulation(void);
+
+FLAC__bool test_metadata_object(void);
 
 #endif
+
+

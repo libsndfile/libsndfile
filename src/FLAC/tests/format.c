@@ -22,6 +22,7 @@
 
 #include "FLAC/assert.h"
 #include "FLAC/format.h"
+#include "format.h"
 #include <stdio.h>
 
 static const char *true_false_string_[2] = { "false", "true" };
@@ -185,7 +186,7 @@ static struct {
 	{ 5, (const FLAC__byte*)"a=\xe1\xa5\x80", true  }
 };
 
-FLAC__bool test_format()
+FLAC__bool test_format(void)
 {
 	unsigned i;
 

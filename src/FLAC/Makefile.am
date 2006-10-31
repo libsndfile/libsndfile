@@ -58,7 +58,7 @@ ARCH_SUBDIRS = ppc
 endif
 endif
 
-SUBDIRS = $(ARCH_SUBDIRS) include .
+SUBDIRS = $(ARCH_SUBDIRS) include share . test_libs_common tests
 
 extra_ogg_sources = \
 	ogg_decoder_aspect.c \

@@ -42,6 +42,7 @@
 #include "test_libs_common/file_utils_flac.h"
 #include "test_libs_common/metadata_utils.h"
 
+#include "metadata.h"
 
 /******************************************************************************
 	The general strategy of these tests (for interface levels 1 and 2) is
@@ -180,6 +181,7 @@ static void delete_from_our_metadata_(unsigned position)
  * This wad of functions supports filename- and callback-based chain reading/writing.
  * Everything up to set_file_stats_() is copied from libFLAC/metadata_iterators.c
  */
+static
 FLAC__bool open_tempfile_(const char *filename, FILE **tempfile, char **tempfilename)
 {
 	static const char *tempfile_suffix = ".metadata_edit";
@@ -195,6 +197,7 @@ FLAC__bool open_tempfile_(const char *filename, FILE **tempfile, char **tempfile
 	return true;
 }
 
+static
 void cleanup_tempfile_(FILE **tempfile, char **tempfilename)
 {
 	if(0 != *tempfile) {
@@ -209,6 +212,7 @@ void cleanup_tempfile_(FILE **tempfile, char **tempfilename)
 	}
 }
 
+static
 FLAC__bool transport_tempfile_(const char *filename, FILE **tempfile, char **tempfilename)
 {
 	FLAC__ASSERT(0 != filename);
@@ -239,6 +243,7 @@ FLAC__bool transport_tempfile_(const char *filename, FILE **tempfile, char **tem
 	return true;
 }
 
+static
 FLAC__bool get_file_stats_(const char *filename, struct stat *stats)
 {
 	FLAC__ASSERT(0 != filename);
@@ -246,6 +251,7 @@ FLAC__bool get_file_stats_(const char *filename, struct stat *stats)
 	return (0 == stat(filename, stats));
 }
 
+static
 void set_file_stats_(const char *filename, struct stat *stats)
 {
 	struct utimbuf srctime;
@@ -665,7 +671,7 @@ static FLAC__bool remove_file_(const char *filename)
 	return true;
 }
 
-static FLAC__bool test_level_0_()
+static FLAC__bool test_level_0_(void)
 {
 	FLAC__StreamMetadata streaminfo;
 	FLAC__StreamMetadata *tags = 0;
@@ -744,7 +750,7 @@ static FLAC__bool test_level_0_()
 	return true;
 }
 
-static FLAC__bool test_level_1_()
+static FLAC__bool test_level_1_(void)
 {
 	FLAC__Metadata_SimpleIterator *iterator;
 	FLAC__StreamMetadata *block, *app, *padding;
@@ -1911,7 +1917,7 @@ static FLAC__bool test_level_2_(FLAC__bool filename_based)
 	return true;
 }
 
-static FLAC__bool test_level_2_misc_()
+static FLAC__bool test_level_2_misc_(void)
 {
 	FLAC__Metadata_Iterator *iterator;
 	FLAC__Metadata_Chain *chain;
@@ -2073,7 +2079,7 @@ static FLAC__bool test_level_2_misc_()
 	return true;
 }
 
-FLAC__bool test_metadata_file_manipulation()
+FLAC__bool test_metadata_file_manipulation(void)
 {
 	printf("\n+++ libFLAC unit test: metadata manipulation\n\n");
 

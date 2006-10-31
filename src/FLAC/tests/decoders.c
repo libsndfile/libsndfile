@@ -89,12 +89,12 @@ static FLAC__bool die_s_(const char *msg, const FLAC__StreamDecoder *decoder)
 	return false;
 }
 
-static void init_metadata_blocks_()
+static void init_metadata_blocks_(void)
 {
 	mutils__init_metadata_blocks(&streaminfo_, &padding_, &seektable_, &application1_, &application2_, &vorbiscomment_, &cuesheet_, &picture_, &unknown_);
 }
 
-static void free_metadata_blocks_()
+static void free_metadata_blocks_(void)
 {
 	mutils__free_metadata_blocks(&streaminfo_, &padding_, &seektable_, &application1_, &application2_, &vorbiscomment_, &cuesheet_, &picture_, &unknown_);
 }

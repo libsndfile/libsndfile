@@ -58,7 +58,8 @@ static FLAC__bool dummy_read_callback(FLAC__byte buffer[], size_t *bytes, void *
 	return true;
 }
 
-FLAC__bool test_bitbuffer()
+FLAC__bool test_bitbuffer(void);
+FLAC__bool test_bitbuffer(void)
 {
 	FLAC__BitBuffer *bb, *bb_zero, *bb_one, *bbcopy;
 	FLAC__bool ok;
