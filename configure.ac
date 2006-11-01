@@ -575,6 +575,7 @@ AC_CONFIG_FILES([ \
 		src/FLAC/share/replaygain_synthesis/include/Makefile \
 		src/FLAC/share/replaygain_synthesis/include/private/Makefile \
 		src/FLAC/share/grabbag/Makefile src/FLAC/share/utf8/Makefile \
+		src/OGG/include/ogg/Makefile src/OGG/include/Makefile src/OGG/Makefile \
 		man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
 		doc/Makefile doc/libsndfile.css \
 		Win32/Makefile Octave/Makefile \

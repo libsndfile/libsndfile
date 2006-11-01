@@ -1,3 +1,9 @@
+2006-11-01 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/FLAC src/OGG confgure.ac src/Makefile.am
+    Pull in all required FLAC and OGG code so external libraries are not
+    needed. This makes compiling on stupid fscking Windoze easier.
+
 2006-10-27 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sd2.c

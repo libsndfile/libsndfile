@@ -1,3 +1,4 @@
+*.aif
 *.aifc
 *.aiff
 *.au
@@ -5,6 +6,8 @@
 *.lo
 *.loT
 *.paf
+*.sd2
+*.sds
 *.svx
 *.wav
 .deps
@@ -35,15 +38,18 @@ libsndfile.spec
 libtool
 ltmain.sh
 missing
+rc/OGG/include/ogg/config_types.h
 regtest/sndfile-regtest
 sndfile.pc
+src/*sndfile.def
 src/FLAC/tests/test_libFLAC
 src/G72x/g72x_test
+src/OGG/test_bitwise
+src/OGG/test_framing
 src/Symbols.darwin
 src/Symbols.linux
 src/config.h
 src/config.h.in
-src/*sndfile.def
 src/sndfile.h
 src/stamp-h1
 src/test_endswap

@@ -23,7 +23,7 @@ test_libFLAC_LDADD = \
 	$(top_builddir)/src/FLAC/share/replaygain_analysis/libreplaygain_analysis.la \
 	$(top_builddir)/src/FLAC/test_libs_common/libtest_libs_common.la \
 	$(top_builddir)/src/FLAC/libFLAC.la \
-	-logg \
+	$(top_builddir)/src/OGG/libogg.la \
 	-lm
 
 test_libFLAC_SOURCES = \

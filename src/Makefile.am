@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = FLAC GSM610 G72x
+SUBDIRS = OGG FLAC GSM610 G72x
 
 lib_LTLIBRARIES = libsndfile.la
 include_HEADERS = sndfile.hh
@@ -31,7 +31,7 @@ FILESPECIFIC = aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c macbina
 libsndfile_la_LDFLAGS = -no-undefined -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@
 libsndfile_la_SOURCES = $(FILESPECIFIC) $(COMMON) $(noinst_HEADERS)
 nodist_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
-libsndfile_la_LIBADD  = FLAC/libFLAC.la GSM610/libgsm.la G72x/libg72x.la -lm -logg
+libsndfile_la_LIBADD  = FLAC/libFLAC.la GSM610/libgsm.la G72x/libg72x.la OGG/libogg.la -lm
 
 test_endswap_SOURCES = test_endswap.c
 
