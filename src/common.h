@@ -37,6 +37,16 @@
 #error "This code is not designed to be compiled with a C++ compiler."
 #endif
 
+#if OS_IS_WIN32
+#	define	SF_PLATFORM_S64(x)		x##I64
+#elif (SIZEOF_LONG == 8)
+#	define	SF_PLATFORM_S64(x)		x##l
+#else
+#	define	SF_PLATFORM_S64(x)		x##ll
+#endif
+
+
+
 #ifdef UNUSED
 #elif defined (__GNUC__)
 #	define UNUSED(x) UNUSED_ ## x __attribute__ ((unused))
