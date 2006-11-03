@@ -558,7 +558,7 @@ flac_enc_init (SF_PRIVATE *psf)
 	FLAC__stream_encoder_set_bits_per_sample (pflac->fse, bps) ;
 
 	if ((bps = FLAC__stream_encoder_init_stream (pflac->fse, sf_flac_enc_write_callback, sf_flac_enc_seek_callback, sf_flac_enc_tell_callback, NULL, psf)) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
-	{	psf_log_printf (psf, "Error : FLAC encoder init returned error : %s\n", FLAC__StreamEncoderInitStatusString[bps]) ;
+	{	psf_log_printf (psf, "Error : FLAC encoder init returned error : %s\n", FLAC__StreamEncoderInitStatusString [bps]) ;
 		return SFE_FLAC_INIT_DECODER ;
 		} ;
 

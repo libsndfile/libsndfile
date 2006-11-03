@@ -285,6 +285,9 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	int			parsestage = 0, error, format = 0 ;
 	char		*cptr ;
 
+	if (psf->filelength > SF_PLATFORM_S64 (0xffffffff))
+		psf_log_printf (psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n") ;
+
 	memset (&wav_fmt, 0, sizeof (wav_fmt)) ;
 	/* Set position to start of file to begin reading header. */
 	psf_binheader_readf (psf, "p", 0) ;

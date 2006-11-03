@@ -1,3 +1,12 @@
+2006-11-03 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h
+    Add SF_PLATFORM_S64 macro as a platform independant way of doing signed 64
+    bit integers.
+
+    * src/aiff.c src/svx.c src/wav.c
+    Add warning in log if files are larger than 4 gigabytes in size.
+
 2006-11-01 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/FLAC src/OGG confgure.ac src/Makefile.am
