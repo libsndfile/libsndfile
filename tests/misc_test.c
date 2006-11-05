@@ -296,6 +296,11 @@ permission_test (const char *filename, int typemajor)
 
 	print_test_name ("permission_test", filename) ;
 
+	if (access (filename, F_OK) == 0)
+	{	chmod (filename, S_IWUSR) ;
+		unlink (filename) ;
+		} ;
+
 	if ((textfile = fopen (filename, "w")) == NULL)
 	{	printf ("\n\nLine %d : not able to open text file for write.\n", __LINE__) ;
 		exit (1) ;
