@@ -2410,13 +2410,17 @@ psf_close (SF_PRIVATE *psf)
 
 static int
 psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
-{	int		error, format ;
+{	int		error = 0, format ;
 
 	if (mode != SFM_READ && mode != SFM_WRITE && mode != SFM_RDWR)
-		return SFE_BAD_OPEN_MODE ;
+	{	error = SFE_BAD_OPEN_MODE ;
+		goto error_exit ;
+		} ;
 
 	if (sfinfo == NULL)
-		return SFE_BAD_SF_INFO_PTR ;
+	{	error = SFE_BAD_SF_INFO_PTR ;
+		goto error_exit ;
+		} ;
 
 	/* Zero out these fields. */
 	sfinfo->frames = 0 ;
@@ -2426,7 +2430,9 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	if (mode == SFM_READ)
 	{	if ((sfinfo->format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW)
 		{	if (sf_format_check (sfinfo) == 0)
-				return SFE_RAW_BAD_FORMAT ;
+			{	error = SFE_RAW_BAD_FORMAT ;
+				goto error_exit ;
+				} ;
 			}
 		else
 			memset (sfinfo, 0, sizeof (SF_INFO)) ;
@@ -2476,7 +2482,8 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		{	case SFM_READ :
 				if (psf->filelength < 44)
 				{	psf_log_printf (psf, "Short filelength: %D (fileoffset: %D)\n", psf->filelength, psf->fileoffset) ;
-					return SFE_BAD_OFFSET ;
+					error = SFE_BAD_OFFSET ;
+					goto error_exit ;
 					} ;
 				break ;
 
@@ -2487,7 +2494,8 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 				break ;
 
 			case SFM_RDWR :
-				return SFE_NO_EMBEDDED_RDWR ;
+				error = SFE_NO_EMBEDDED_RDWR ;
+				goto error_exit ;
 			} ;
 
 		psf_log_printf (psf, "Embedded file offset : %D\n", psf->fileoffset) ;
@@ -2503,7 +2511,9 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		** empty, then the SF_INFO struct must contain valid data.
 		*/
 		if (sf_format_check (&(psf->sf)) == 0)
-			return SFE_BAD_OPEN_FORMAT ;
+		{	error = SFE_BAD_OPEN_FORMAT ;
+			goto error_exit ;
+			} ;
 		}
 	else if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
 	{	/* If type RAW has not been specified then need to figure out file type. */
@@ -2656,19 +2666,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		} ;
 
 	if (error)
-	{	switch (error)
-		{	case SF_ERR_SYSTEM :
-			case SF_ERR_UNSUPPORTED_ENCODING :
-			case SFE_UNIMPLEMENTED :
-				break ;
-
-			default :
-				psf_log_printf (psf, "Parse error : %s\n", sf_error_number (error)) ;
-				error = SF_ERR_MALFORMED_FILE ;
-			} ;
-
-		return error ;
-		} ;
+		goto error_exit ;
 
 	/* For now, check whether embedding is supported. */
 	format = psf->sf.format & SF_FORMAT_TYPEMASK ;
@@ -2676,23 +2674,29 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 			(format != SF_FORMAT_WAV) && (format != SF_FORMAT_WAVEX) &&
 			(format != SF_FORMAT_AIFF) && (format != SF_FORMAT_AU)
 			)
-		return SFE_NO_EMBED_SUPPORT ;
+	{	error = SFE_NO_EMBED_SUPPORT ;
+		goto error_exit ;
+		} ;
 
 	if (psf->fileoffset > 0)
 		psf_log_printf (psf, "Embedded file length : %D\n", psf->filelength) ;
 
 	if (mode == SFM_RDWR && sf_format_check (&(psf->sf)) == 0)
-		return SFE_BAD_RDWR_FORMAT ;
+	{	error = SFE_BAD_RDWR_FORMAT ;
+		goto error_exit ;
+		} ;
 
 	if (validate_sfinfo (&(psf->sf)) == 0)
 	{	psf_log_SF_INFO (psf) ;
 		save_header_info (psf) ;
-		return SFE_BAD_SF_INFO ;
+		error = SFE_BAD_SF_INFO ;
+		goto error_exit ;
 		} ;
 
 	if (validate_psf (psf) == 0)
 	{	save_header_info (psf) ;
-		return SFE_INTERNAL ;
+		error = SFE_INTERNAL ;
+		goto error_exit ;
 		} ;
 
 	psf->read_current = 0 ;
@@ -2701,6 +2705,25 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	memcpy (sfinfo, &(psf->sf), sizeof (SF_INFO)) ;
 
 	return 0 ;
+
+error_exit :
+	switch (error)
+	{	case SF_ERR_SYSTEM :
+		case SF_ERR_UNSUPPORTED_ENCODING :
+		case SFE_UNIMPLEMENTED :
+			break ;
+
+		case SFE_RAW_BAD_FORMAT :
+			break ;
+
+		default :
+			if (psf->mode == SFM_READ)
+			{	psf_log_printf (psf, "Parse error : %s\n", sf_error_number (error)) ;
+				error = SF_ERR_MALFORMED_FILE ;
+				} ;
+		} ;
+
+	return error ;
 } /* psf_open_file */
 
 /*
