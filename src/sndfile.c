@@ -2410,7 +2410,10 @@ psf_close (SF_PRIVATE *psf)
 
 static int
 psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
-{	int		error = 0, format ;
+{	int		error, format ;
+
+	sf_errno = error = 0 ;
+	sf_logbuffer [0] = 0 ;
 
 	if (mode != SFM_READ && mode != SFM_WRITE && mode != SFM_RDWR)
 	{	error = SFE_BAD_OPEN_MODE ;
@@ -2437,9 +2440,6 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		else
 			memset (sfinfo, 0, sizeof (SF_INFO)) ;
 		} ;
-
-	sf_errno = error = 0 ;
-	sf_logbuffer [0] = 0 ;
 
 	memcpy (&(psf->sf), sfinfo, sizeof (SF_INFO)) ;
 
