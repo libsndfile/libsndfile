@@ -381,7 +381,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 					if (dword == 0 && RIFFsize == 8 && psf->filelength > 44)
 					{	psf_log_printf (psf, "*** Looks like a WAV file which wasn't closed properly. Fixing it.\n") ;
-						psf->datalength = dword = psf->filelength - psf->dataoffset ;
+						psf->datalength = psf->filelength - psf->dataoffset ;
 						} ;
 
 					if (psf->datalength > psf->filelength - psf->dataoffset)
@@ -406,8 +406,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					/* Seek past data and continue reading header. */
 					psf_fseek (psf, psf->datalength, SEEK_CUR) ;
 
-					dword = psf_ftell (psf) ;
-					if (dword != (sf_count_t) (psf->dataoffset + psf->datalength))
+					if (psf_ftell (psf) != psf->datalength + psf->dataoffset)
 						psf_log_printf (psf, "*** psf_fseek past end error ***\n", dword, psf->dataoffset + psf->datalength) ;
 					break ;
 
