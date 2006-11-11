@@ -240,7 +240,7 @@ static int	validate_psf (SF_PRIVATE *psf) ;
 static void	save_header_info (SF_PRIVATE *psf) ;
 static void	copy_filename (SF_PRIVATE *psf, const char *path) ;
 static int	psf_close (SF_PRIVATE *psf) ;
-static int	psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo) ;
+static SNDFILE * psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo) ;
 
 static int	try_resource_fork (SF_PRIVATE * psf, int mode) ;
 
@@ -307,23 +307,12 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 		return NULL ;
 		} ;
 
-	if (error == 0)
-		error = psf_open_file (psf, mode, sfinfo) ;
-
-	if (error)
-	{	psf_close (psf) ;
-		return NULL ;
-		} ;
-
-	memcpy (sfinfo, &(psf->sf), sizeof (SF_INFO)) ;
-
-	return (SNDFILE*) psf ;
+	return psf_open_file (psf, mode, sfinfo) ;
 } /* sf_open */
 
 SNDFILE*
 sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 {	SF_PRIVATE 	*psf ;
-	int			error ;
 
 	if ((sfinfo->format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
 	{	sf_errno = SFE_SD2_FD_DISALLOWED ;
@@ -344,22 +333,12 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 	if (! close_desc)
 		psf->do_not_close_descriptor = SF_TRUE ;
 
-	error = psf_open_file (psf, mode, sfinfo) ;
-
-	if (error)
-	{	psf_close (psf) ;
-		return NULL ;
-		} ;
-
-	memcpy (sfinfo, &(psf->sf), sizeof (SF_INFO)) ;
-
-	return (SNDFILE*) psf ;
+	return psf_open_file (psf, mode, sfinfo) ;
 } /* sf_open_fd */
 
 SNDFILE*
 sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data)
 {	SF_PRIVATE 	*psf ;
-	int			error = 0 ;
 
 	/* Make sure we have a valid set ot virtual pointers. */
 	if (sfvirtual->get_filelen == NULL || sfvirtual->seek == NULL || sfvirtual->tell == NULL)
@@ -393,16 +372,7 @@ sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user
 
 	psf->mode = mode ;
 
-	error = psf_open_file (psf, mode, sfinfo) ;
-
-	if (error)
-	{	psf_close (psf) ;
-		return NULL ;
-		} ;
-
-	memcpy (sfinfo, &(psf->sf), sizeof (SF_INFO)) ;
-
-	return (SNDFILE*) psf ;
+	return psf_open_file (psf, mode, sfinfo) ;
 } /* sf_open_virtual */
 
 int
@@ -2404,7 +2374,7 @@ psf_close (SF_PRIVATE *psf)
 	return 0 ;
 } /* psf_close */
 
-static int
+static SNDFILE *
 psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 {	int		error, format ;
 
@@ -2703,7 +2673,9 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 
 	memcpy (sfinfo, &(psf->sf), sizeof (SF_INFO)) ;
 
-	return 0 ;
+	memcpy (sfinfo, &(psf->sf), sizeof (SF_INFO)) ;
+
+	return (SNDFILE *) psf ;
 
 error_exit :
 	sf_errno = error ;
@@ -2711,7 +2683,7 @@ error_exit :
 	if (error == SFE_SYSTEM)
 		LSF_SNPRINTF (sf_syserr, sizeof (sf_syserr), "%s", psf->syserr) ;
 	LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
-		
+
 	switch (error)
 	{	case SF_ERR_SYSTEM :
 		case SF_ERR_UNSUPPORTED_ENCODING :
@@ -2728,7 +2700,8 @@ error_exit :
 				} ;
 		} ;
 
-	return error ;
+	psf_close (psf) ;
+	return NULL ;
 } /* psf_open_file */
 
 /*

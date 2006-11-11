@@ -1,7 +1,22 @@
+2006-11-11
+
+    * src/sndfile.c
+    More refactoring to clean up psf_open_file() and vairous sf_open()
+    functions.
+
+2006-11-09 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav.c
+    Apply a patch from Jonathan Woithe to allow opening of (malformed) WAV 
+    files of over 4 gigabytes.
+
 2006-11-05 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
     Refactor function psf_open_file() to provide a single return point.
+
+    * tests/misc_test.c
+    Fix permission_test to ensure that read only file can be created.
 
 2006-11-03 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
