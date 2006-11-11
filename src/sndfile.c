@@ -299,15 +299,19 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 	else
 		error = psf_fopen (psf, path, mode) ;
 
+	if (error)
+	{	if (error == SFE_SYSTEM)
+			LSF_SNPRINTF (sf_syserr, sizeof (sf_syserr), "%s", psf->syserr) ;
+		LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
+		psf_close (psf) ;
+		return NULL ;
+		} ;
+
 	if (error == 0)
 		error = psf_open_file (psf, mode, sfinfo) ;
 
 	if (error)
-	{	sf_errno = error ;
-		if (error == SFE_SYSTEM)
-			LSF_SNPRINTF (sf_syserr, sizeof (sf_syserr), "%s", psf->syserr) ;
-		LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
-		psf_close (psf) ;
+	{	psf_close (psf) ;
 		return NULL ;
 		} ;
 
@@ -343,11 +347,7 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 	error = psf_open_file (psf, mode, sfinfo) ;
 
 	if (error)
-	{	sf_errno = error ;
-		if (error == SFE_SYSTEM)
-			LSF_SNPRINTF (sf_syserr, sizeof (sf_syserr), "%s", psf->syserr) ;
-		LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
-		psf_close (psf) ;
+	{	psf_close (psf) ;
 		return NULL ;
 		} ;
 
@@ -396,11 +396,7 @@ sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user
 	error = psf_open_file (psf, mode, sfinfo) ;
 
 	if (error)
-	{	sf_errno = error ;
-		if (error == SFE_SYSTEM)
-			LSF_SNPRINTF (sf_syserr, sizeof (sf_syserr), "%s", psf->syserr) ;
-		LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
-		psf_close (psf) ;
+	{	psf_close (psf) ;
 		return NULL ;
 		} ;
 
@@ -2415,6 +2411,9 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	sf_errno = error = 0 ;
 	sf_logbuffer [0] = 0 ;
 
+	if (psf->error)
+		goto error_exit ;
+
 	if (mode != SFM_READ && mode != SFM_WRITE && mode != SFM_RDWR)
 	{	error = SFE_BAD_OPEN_MODE ;
 		goto error_exit ;
@@ -2707,6 +2706,12 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	return 0 ;
 
 error_exit :
+	sf_errno = error ;
+
+	if (error == SFE_SYSTEM)
+		LSF_SNPRINTF (sf_syserr, sizeof (sf_syserr), "%s", psf->syserr) ;
+	LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
+		
 	switch (error)
 	{	case SF_ERR_SYSTEM :
 		case SF_ERR_UNSUPPORTED_ENCODING :
