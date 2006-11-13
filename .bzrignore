@@ -2,6 +2,7 @@
 *.aifc
 *.aiff
 *.au
+*.bin
 *.la
 *.lo
 *.loT
@@ -52,6 +53,7 @@ src/config.h
 src/config.h.in
 src/sndfile.h
 src/stamp-h1
+src/test_conversions
 src/test_endswap
 src/test_endswap.c
 src/test_file_io

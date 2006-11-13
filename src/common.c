@@ -314,7 +314,6 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 	return ;
 } /* psf_log_printf */
 
-#ifndef PSF_LOG_PRINTF_ONLY
 /*-----------------------------------------------------------------------------------------------
 **  ASCII header printf functions.
 **  Some formats (ie NIST) use ascii text in their headers.
@@ -1288,8 +1287,6 @@ u_bitwidth_to_subformat (int bits)
 
 	return array [((bits + 7) / 8) - 1] ;
 } /* bitwidth_to_subformat */
-
-#endif /* PSF_LOG_PRINTF_ONLY */
 
 /*
 ** Do not edit or modify anything in this comment block.

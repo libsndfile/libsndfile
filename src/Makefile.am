@@ -6,6 +6,8 @@ lib_LTLIBRARIES = libsndfile.la
 include_HEADERS = sndfile.hh
 nodist_include_HEADERS = sndfile.h
 
+noinst_LTLIBRARIES = libcommon.la
+
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 
@@ -15,29 +17,37 @@ EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 
 noinst_HEADERS = common.h sfconfig.h sfendian.h float_cast.h wav_w64.h sf_unistd.h
 
-noinst_PROGRAMS = test_endswap test_file_io test_log_printf
+noinst_PROGRAMS = test_endswap test_file_io test_conversions test_log_printf
 
-COMMON = sndfile.c common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
+COMMON = common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
 		interleave.c strings.c dither.c broadcast.c
 
-FILESPECIFIC = aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c macbinary3.c \
-		macos.c mat4.c mat5.c nist.c ogg.c paf.c pvf.c raw.c rx2.c sd2.c sds.c svx.c \
-		txw.c voc.c wve.c w64.c wav_w64.c wav.c xi.c
+FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c \
+		macbinary3.c macos.c mat4.c mat5.c nist.c ogg.c paf.c pvf.c raw.c rx2.c sd2.c \
+		sds.c svx.c txw.c voc.c wve.c w64.c wav_w64.c wav.c xi.c
 
 # MinGW requires -no-undefined if a DLL is to be built.
 libsndfile_la_LDFLAGS = -no-undefined -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@
-libsndfile_la_SOURCES = $(FILESPECIFIC) $(COMMON) $(noinst_HEADERS)
+libsndfile_la_SOURCES = $(FILESPECIFIC) $(noinst_HEADERS)
 nodist_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
-libsndfile_la_LIBADD  = FLAC/libFLAC.la GSM610/libgsm.la G72x/libg72x.la OGG/libogg.la -lm
+libsndfile_la_LIBADD = libcommon.la FLAC/libFLAC.la GSM610/libgsm.la G72x/libg72x.la OGG/libogg.la -lm
+
+libcommon_la_SOURCES = $(COMMON)
 
 test_endswap_SOURCES = test_endswap.c
 
 test_file_io_CFLAGS = $(AM_CFLAGS)
-test_file_io_SOURCES = file_io.c test_file_io.c
+test_file_io_SOURCES = test_file_io.c
+test_file_io_LDADD = libcommon.la
 
 test_log_printf_CFLAGS = $(AM_CFLAGS)
 test_log_printf_SOURCES = test_log_printf.c
+test_log_printf_LDADD = libcommon.la
+
+test_conversions_CFLAGS = $(AM_CFLAGS)
+test_conversions_SOURCES = test_conversions.c
+test_conversions_LDADD = libcommon.la
 
 test_endswap.c: test_endswap.def test_endswap.tpl
 	autogen --writable test_endswap.def
@@ -48,7 +58,7 @@ genfiles : test_endswap.c Symbols.linux Symbols.darwin libsndfile.def cygsndfile
 # It is not possible to place these in the tests/ directory because they
 # need access to the internals of the SF_PRIVATE struct.
 
-check: test_endswap test_file_io test_log_printf
+check: test_endswap test_file_io test_conversions test_log_printf
 	@echo
 	@echo
 	@echo
@@ -56,6 +66,7 @@ check: test_endswap test_file_io test_log_printf
 	@if [ -x /usr/bin/python2.4 ]; then $(srcdir)/binheader_writef_check.py $(srcdir)/*.c ; fi
 	./test_endswap
 	./test_file_io
+	./test_conversions
 	./test_log_printf
 	@echo "============================================================"
 	@echo

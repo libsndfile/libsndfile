@@ -16,20 +16,15 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include "sfconfig.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
 
-#include "sfconfig.h"
-
-/* 
-** This is a bit rough, but it is the nicest way to do it.
-*/
-#define PSF_LOG_PRINTF_ONLY
-#include "common.c"
-
+#include "common.h"
 
 #define	CMP_0_ARGS(line,err,fmt)	\
 	{	psf->logindex = 0 ;			\

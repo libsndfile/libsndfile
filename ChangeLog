@@ -6,6 +6,12 @@
     * src/Makefile.am src/flac.c
     Clean up include paths.
 
+    * src/test_conversions.c
+    New file to test psf_binheader_readf/writef functions.
+
+    * src/Makefile.am src/test_file_io.c src/test_log_printf.c src/common.c
+    Clean up unit testing.
+
 2006-11-11 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
