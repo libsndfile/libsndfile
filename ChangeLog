@@ -1,4 +1,9 @@
-2006-11-11
+2006-11-13 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sfendian.h
+    Add include guard.
+
+2006-11-11 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
     More refactoring to clean up psf_open_file() and vairous sf_open()

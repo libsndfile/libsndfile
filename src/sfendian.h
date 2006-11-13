@@ -16,6 +16,9 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#ifndef SFENDIAN_INCLUDED
+#define SFENDIAN_INCLUDED
+
 #include "sfconfig.h"
 
 #if HAVE_STDINT_H
@@ -246,6 +249,8 @@ static inline void
 endswap_double_copy (double *dest, const double *src, int len)
 {	endswap_int64_t_copy ((int64_t *) dest, (const int64_t *) src, len) ;
 } /* endswap_double_copy */
+
+#endif /* SFENDIAN_INCLUDED */
 
 /*
 ** Do not edit or modify anything in this comment block.
