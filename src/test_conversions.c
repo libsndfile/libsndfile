@@ -33,22 +33,35 @@
 #define cmp_test(line,ival,tval,str) \
 	if (ival != tval) \
 	{	printf (str, line, ival, tval) ; \
-		/*-exit (1) ;-*/ \
+		exit (1) ; \
 		} ;
 
+static void conversion_test (char endian) ;
 
 int
 main (void)
-{	SF_PRIVATE	sf_private, *psf ;
+{
+	conversion_test ('E') ;
+	conversion_test ('e') ;
+	return 0 ;
+} /* main */
+
+static void
+conversion_test (char endian)
+{
+	SF_PRIVATE	sf_private, *psf ;
 	const char * filename = "conversion.bin" ;
+	long long i64 = SF_PLATFORM_S64 (0x0123456789abcdef), t64 = 0;
+	char format_str [16] ;
 	char i8 = 12, t8 = 0 ;
 	short i16 = 0x123, t16 = 0 ;
 	int i24 = 0x23456, t24 = 0 ;
 	int i32 = 0x0a0b0c0d, t32 = 0 ;
 	int bytes ;
-	long long i64 = SF_PLATFORM_S64 (0x0123456789abcdef), t64 = 0;
 
-	printf ("    %-24s : ", "conversion_test") ;
+	snprintf (format_str, sizeof (format_str), "%c12348", endian) ;
+
+	printf ("    conversion_test_%-8s : ", endian == 'e' ? "le" : "be") ;
 	fflush (stdout) ;
 
 	psf = &sf_private ;
@@ -59,7 +72,7 @@ main (void)
 		exit (1) ;
 		} ;
 
-	psf_binheader_writef (psf, "E12348", i8, i16, i24, i32, i64) ;
+	psf_binheader_writef (psf, format_str, i8, i16, i24, i32, i64) ;
 	psf_fwrite (psf->header, 1, psf->headindex, psf) ;
 	psf_fclose (psf) ;
 
@@ -69,7 +82,7 @@ main (void)
 		exit (1) ;
 		} ;
 
-	bytes = psf_binheader_readf (psf, "E12348", &t8, &t16, &t24, &t32, &t64) ;
+	bytes = psf_binheader_readf (psf, format_str, &t8, &t16, &t24, &t32, &t64) ;
 	psf_fclose (psf) ;
 
 	if (bytes != 18)
@@ -83,8 +96,6 @@ main (void)
 	cmp_test (__LINE__, i32, t32, "\n\nLine %d : 32 bit int failed 0x%x -> 0x%x.\n\n") ;
 	cmp_test (__LINE__, i64, t64, "\n\nLine %d : 64 bit int failed 0x%llx -> 0x%llx.\n\n") ;
 
+	remove (filename) ;
 	puts ("ok") ;
-
-	return 0 ;
-} /* main */
-
+} /* conversion_test */

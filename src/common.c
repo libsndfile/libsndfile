@@ -775,24 +775,17 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 #define	GET_BE_INT(ptr)		( 	((ptr) [0] << 24)	| ((ptr) [1] << 16) |	\
 							 	((ptr) [2] << 8)	| ((ptr) [3]) )
 
-#if (SIZEOF_LONG == 4)
-#define	GET_LE_8BYTE(ptr)	( 	((ptr) [3] << 24)	| ((ptr) [2] << 16) |	\
-							 	((ptr) [1] << 8)	| ((ptr) [0]) )
+#define	GET_LE_8BYTE(ptr)	( 	(((sf_count_t) (ptr) [7]) << 56) | (((sf_count_t) (ptr) [6]) << 48) |	\
+							 	(((sf_count_t) (ptr) [5]) << 40) | (((sf_count_t) (ptr) [4]) << 32) |	\
+							 	(((sf_count_t) (ptr) [3]) << 24) | (((sf_count_t) (ptr) [2]) << 16) |	\
+							 	(((sf_count_t) (ptr) [1]) << 8 ) | ((ptr) [0]))
 
-#define	GET_BE_8BYTE(ptr)	( 	((ptr) [4] << 24)	| ((ptr) [5] << 16) |	\
-								((ptr) [6] << 8)	| ((ptr) [7]) )
-#else
-#define	GET_LE_8BYTE(ptr)	( 	(((ptr) [7] * 1L) << 56) | (((ptr) [6] * 1L) << 48) |	\
-							 	(((ptr) [5] * 1L) << 40) | (((ptr) [4] * 1L) << 32) |	\
-							 	(((ptr) [3] * 1L) << 24) | (((ptr) [2] * 1L) << 16) |	\
-							 	(((ptr) [1] * 1L) << 8 ) | ((ptr) [0]))
+#define	GET_BE_8BYTE(ptr)	( 	(((sf_count_t) (ptr) [0]) << 56) | (((sf_count_t) (ptr) [1]) << 48) |	\
+							 	(((sf_count_t) (ptr) [2]) << 40) | (((sf_count_t) (ptr) [3]) << 32) |	\
+							 	(((sf_count_t) (ptr) [4]) << 24) | (((sf_count_t) (ptr) [5]) << 16) |	\
+							 	(((sf_count_t) (ptr) [6]) << 8 ) | ((ptr) [7]))
 
-#define	GET_BE_8BYTE(ptr)	( 	(((ptr) [0] * 1L) << 56) | (((ptr) [1] * 1L) << 48) |	\
-							 	(((ptr) [2] * 1L) << 40) | (((ptr) [3] * 1L) << 32) |	\
-							 	(((ptr) [4] * 1L) << 24) | (((ptr) [5] * 1L) << 16) |	\
-							 	(((ptr) [6] * 1L) << 8 ) | ((ptr) [7]))
 
-#endif
 
 static int
 header_read (SF_PRIVATE *psf, void *ptr, int bytes)

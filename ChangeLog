@@ -12,6 +12,13 @@
     * src/Makefile.am src/test_file_io.c src/test_log_printf.c src/common.c
     Clean up unit testing.
 
+    * src/common.c
+    Fix a bug reading/writing 64 bit header fields. Thanks to Jonathan Woithe
+    for reporting this.
+
+    * src/test_conversions.c
+    Complete unit test for above fix.
+
 2006-11-11 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
