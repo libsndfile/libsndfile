@@ -45,7 +45,7 @@ CPUCFLAGS = -maltivec -mabi=altivec -DFLAC__NO_ASM
 endif
 endif
 
-INCLUDES = -I$(top_srcdir)/src/FLAC/include -I$(top_srcdir)/src/OGG/include
+INCLUDES = -I$(top_srcdir)/src/FLAC -I$(top_srcdir)/src/FLAC/include -I$(top_srcdir)/src/OGG/include
 AM_CFLAGS = $(CPUCFLAGS)
 
 if FLaC__NO_ASM
