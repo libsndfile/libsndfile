@@ -37,12 +37,14 @@
 #error "This code is not designed to be compiled with a C++ compiler."
 #endif
 
-#if OS_IS_WIN32
-#	define	SF_PLATFORM_S64(x)		x##I64
-#elif (SIZEOF_LONG == 8)
+#if (SIZEOF_LONG == 8)
 #	define	SF_PLATFORM_S64(x)		x##l
-#else
+#elif COMPILER_IS_GCC
 #	define	SF_PLATFORM_S64(x)		x##ll
+#elif OS_IS_WIN32
+#	define	SF_PLATFORM_S64(x)		x##I64
+#else
+#	error "Don't know how to define a 64 bit integer constant."
 #endif
 
 
