@@ -1,3 +1,14 @@
+2006-11-19 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/misc_test.c
+    Force errno to zero at start of some tests.
+
+    * src/sndfile.c
+    Minor clean up of error handling.
+
+    * configure.ac
+    Remove an assembler test which was failing on OSX.
+
 2006-11-15 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h
@@ -36,7 +47,7 @@
 2006-11-09 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c
-    Apply a patch from Jonathan Woithe to allow opening of (malformed) WAV 
+    Apply a patch from Jonathan Woithe to allow opening of (malformed) WAV
     files of over 4 gigabytes.
 
 2006-11-05 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>

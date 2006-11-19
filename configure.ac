@@ -347,11 +347,9 @@ if test -n "$NASM" ; then
 	AH_TEMPLATE(FLAC__HAS_NASM, [define if you are compiling for x86 and have the NASM assembler])
 	fi
 
-# only matters for PowerPC
+# Only matters for PowerPC
 AC_CHECK_PROGS(AS, as, as)
 AC_CHECK_PROGS(GAS, gas, gas)
-
-test "$AS" = "as" && as --version | grep GNU >/dev/null && AS=gas
 
 AM_CONDITIONAL(FLaC__HAS_AS, test "$AS" = "as")
 AM_CONDITIONAL(FLaC__HAS_GAS, test "$AS" = "gas")
