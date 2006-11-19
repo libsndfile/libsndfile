@@ -280,7 +280,6 @@ static char	sf_syserr [SF_SYSERR_LEN] = { 0 } ;
 SNDFILE*
 sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 {	SF_PRIVATE 	*psf ;
-	int			error = 0 ;
 
 	if ((psf = calloc (1, sizeof (SF_PRIVATE))) == NULL)
 	{	sf_errno = SFE_MALLOC_FAILED ;
@@ -295,17 +294,9 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 	copy_filename (psf, path) ;
 
 	if (strcmp (path, "-") == 0)
-		error = psf_set_stdio (psf, mode) ;
+		psf_set_stdio (psf, mode) ;
 	else
-		error = psf_fopen (psf, path, mode) ;
-
-	if (error)
-	{	if (error == SFE_SYSTEM)
-			LSF_SNPRINTF (sf_syserr, sizeof (sf_syserr), "%s", psf->syserr) ;
-		LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
-		psf_close (psf) ;
-		return NULL ;
-		} ;
+		psf_fopen (psf, path, mode) ;
 
 	return psf_open_file (psf, mode, sfinfo) ;
 } /* sf_open */
@@ -2382,7 +2373,9 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	sf_logbuffer [0] = 0 ;
 
 	if (psf->error)
+	{	error = psf->error ;
 		goto error_exit ;
+		} ;
 
 	if (mode != SFM_READ && mode != SFM_WRITE && mode != SFM_RDWR)
 	{	error = SFE_BAD_OPEN_MODE ;
