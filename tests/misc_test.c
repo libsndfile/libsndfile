@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include <sys/stat.h>
 #include <math.h>
@@ -235,6 +236,9 @@ filesystem_full_test (int typemajor)
 	return ;
 #endif
 
+	/* Make sure errno is zero before doing anything else. */
+	errno = 0 ;
+
 	print_test_name ("filesystem_full_test", filename) ;
 
 	if (stat (filename, &buf) != 0)
@@ -286,6 +290,9 @@ permission_test (const char *filename, int typemajor)
 	SF_INFO		sfinfo ;
 	const char	*errorstr ;
 	int			frames ;
+
+	/* Make sure errno is zero before doing anything else. */
+	errno = 0 ;
 
 	if (getuid () == 0)
 	{	/* If running as root bypass this test.
