@@ -1,3 +1,8 @@
+2006-12-16 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-convert.c
+    Add -override-sample-rate command line option.
+
 2006-11-19 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/misc_test.c
