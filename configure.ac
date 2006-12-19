@@ -567,7 +567,7 @@ AC_CONFIG_FILES([ \
 		src/FLAC/include/protected/Makefile src/FLAC/include/test_libs_common/Makefile \
 		src/FLAC/include/share/Makefile src/FLAC/include/share/grabbag/Makefile \
 		src/FLAC/include/private/Makefile src/FLAC/ia32/Makefile src/FLAC/ppc/gas/Makefile \
-		src/FLAC/ppc/Makefile src/FLAC/ppc/as/Makefile src/FLAC/tests/Makefile \
+		src/FLAC/ppc/Makefile src/FLAC/ppc/as/Makefile src/FLAC/test_libFLAC/Makefile \
 		src/FLAC/share/Makefile src/FLAC/test_libs_common/Makefile src/FLAC/share/getopt/Makefile \
 		src/FLAC/share/replaygain_analysis/Makefile src/FLAC/share/replaygain_synthesis/Makefile \
 		src/FLAC/share/replaygain_synthesis/include/Makefile \

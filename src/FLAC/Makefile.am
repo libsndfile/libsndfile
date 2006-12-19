@@ -61,7 +61,7 @@ ARCH_SUBDIRS = ppc
 endif
 endif
 
-SUBDIRS = $(ARCH_SUBDIRS) include FLAC share test_libs_common . tests
+SUBDIRS = $(ARCH_SUBDIRS) include FLAC share test_libs_common . test_libFLAC
 
 extra_ogg_sources = \
 	ogg_decoder_aspect.c \
