@@ -1,3 +1,8 @@
+2007-01-21 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/development.html doc/embedded_files.html man/sndfile-play.1
+    Minor documentation fixes. Thanks Reuben Thomas.
+
 2006-12-16 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-convert.c
