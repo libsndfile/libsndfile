@@ -1,3 +1,8 @@
+2007-01-22 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    Allow writing of WAV/WAVEX 'BEXT' chunks in SFM_RDWR mode.
+
 2007-01-21 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/development.html doc/embedded_files.html man/sndfile-play.1
