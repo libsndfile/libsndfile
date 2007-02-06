@@ -91,7 +91,7 @@ cygsndfile.def: create_symbols_file.py
 	./create_symbols_file.py cygwin $(VERSION) > cygsndfile.def
 
 # Fake dependancy to force the creation of these files.
-sndfile.c : Symbols.linux Symbols.darwin libsndfile.def cygsndfile.def
+sndfile.o : Symbols.linux Symbols.darwin libsndfile.def cygsndfile.def
 
 #======================================================================
 # Disable autoheader.
