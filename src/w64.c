@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -103,7 +103,12 @@ static int	w64_close (SF_PRIVATE *psf) ;
 
 int
 w64_open	(SF_PRIVATE *psf)
-{	int	subformat, error, blockalign = 0, framesperblock = 0 ;
+{	WAV_PRIVATE * wpriv ;
+	int	subformat, error, blockalign = 0, framesperblock = 0 ;
+
+	if ((wpriv = calloc (1, sizeof (WAV_PRIVATE))) == NULL)
+		return SFE_MALLOC_FAILED ;
+	psf->container_data = wpriv ;
 
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR &&psf->filelength > 0))
 	{	if ((error = w64_read_header (psf, &blockalign, &framesperblock)))
@@ -196,13 +201,17 @@ w64_open	(SF_PRIVATE *psf)
 
 static int
 w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
-{	WAV_FMT 	wav_fmt ;
+{	WAV_PRIVATE *wpriv ;
+	WAV_FMT 	*wav_fmt ;
 	int			dword = 0, marker, format = 0 ;
 	sf_count_t	chunk_size, bytesread = 0 ;
 	int			parsestage = 0, error, done = 0 ;
 
+	if ((wpriv = psf->container_data) == NULL)
+		return SFE_INTERNAL ;
+	wav_fmt = &wpriv->wav_fmt ;
+
 	/* Set position to start of file to begin reading header. */
-	memset (&wav_fmt, 0, sizeof (wav_fmt)) ;
 	psf_binheader_readf (psf, "p", 0) ;
 
 	while (! done)
@@ -246,13 +255,13 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					/* size of 16 byte marker and 8 byte chunk_size value. */
 					chunk_size -= 24 ;
 
-					if ((error = wav_w64_read_fmt_chunk (psf, &wav_fmt, (int) chunk_size)))
+					if ((error = wav_w64_read_fmt_chunk (psf, (int) chunk_size)))
 						return error ;
 
 					if (chunk_size % 8)
 						psf_binheader_readf (psf, "j", 8 - (chunk_size % 8)) ;
 
-					format		= wav_fmt.format ;
+					format		= wav_fmt->format ;
 					parsestage |= HAVE_fmt ;
 					break ;
 
@@ -340,14 +349,14 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 		case WAVE_FORMAT_MS_ADPCM :
 					psf->sf.format = (SF_FORMAT_W64 | SF_FORMAT_MS_ADPCM) ;
-					*blockalign = wav_fmt.msadpcm.blockalign ;
-					*framesperblock = wav_fmt.msadpcm.samplesperblock ;
+					*blockalign = wav_fmt->msadpcm.blockalign ;
+					*framesperblock = wav_fmt->msadpcm.samplesperblock ;
 					break ;
 
 		case WAVE_FORMAT_IMA_ADPCM :
 					psf->sf.format = (SF_FORMAT_W64 | SF_FORMAT_IMA_ADPCM) ;
-					*blockalign = wav_fmt.ima.blockalign ;
-					*framesperblock = wav_fmt.ima.samplesperblock ;
+					*blockalign = wav_fmt->ima.blockalign ;
+					*framesperblock = wav_fmt->ima.samplesperblock ;
 					break ;
 
 		case WAVE_FORMAT_GSM610 :
