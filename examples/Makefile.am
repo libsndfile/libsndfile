@@ -2,7 +2,7 @@
 
 bin_PROGRAMS = sndfile-info sndfile-play sndfile-convert
 
-noinst_PROGRAMS = make_sine sfprocess list_formats cooledit-fixer generate
+noinst_PROGRAMS = make_sine sfprocess list_formats generate
 
 # This is the BeOS version of sndfile-play. It needs to be compiled with the C++
 # compiler.
@@ -31,9 +31,6 @@ sfprocess_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 list_formats_SOURCES = list_formats.c 
 list_formats_LDADD = $(SNDFILEDIR)/libsndfile.la
-
-cooledit_fixer_SOURCES = cooledit-fixer.c 
-cooledit_fixer_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 generate_SOURCES = generate.c 
 generate_LDADD = $(SNDFILEDIR)/libsndfile.la
