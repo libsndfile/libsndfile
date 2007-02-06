@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -1201,6 +1201,23 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 
 /*------------------------------------------------------------------------------
 */
+
+int
+sf_get_info (SNDFILE * sndfile, SF_INFO * info)
+{	SF_PRIVATE 	*psf ;
+
+	if (info == NULL)
+		return SF_FALSE ;
+	if ((psf = (SF_PRIVATE*) sndfile) == NULL)
+		return SF_FALSE ;
+	if (psf->Magick != SNDFILE_MAGICK)
+		return SF_FALSE ;
+
+	/* Need to correct psf->sf.frames ???? */
+	memcpy (info, &psf->sf, sizeof (SF_INFO)) ;
+
+	return SF_TRUE ;
+} /* sf_get_info */
 
 const char*
 sf_get_string (SNDFILE *sndfile, int str_type)
