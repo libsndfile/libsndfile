@@ -362,8 +362,7 @@ wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat)
 
 void
 wav_w64_analyze (SF_PRIVATE *psf)
-{	unsigned char buffer [512] ;
-
+{
 	if (psf->is_pipe)
 	{	psf_log_printf (psf, "*** Error : Reading from a pipe. Can't analyze data section to figure out real data format.\n\n") ;
 		return ;
