@@ -751,7 +751,7 @@ typedef struct
 	int endianness ;
 } AUDIO_DETECT ;
 
-int audio_detect (AUDIO_DETECT *ad, unsigned char * data, int datalen) ;
+int audio_detect (SF_PRIVATE * psf, AUDIO_DETECT *ad, const unsigned char * data, int datalen) ;
 
 
 /*------------------------------------------------------------------------------------
