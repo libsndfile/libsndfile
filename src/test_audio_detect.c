@@ -61,8 +61,6 @@ static unsigned char float_le_mono [] =
 	0xA8, 0xD3, 0xB7, 0x45, 0xEB, 0x51, 0xB9, 0x45, 0x6F, 0xAF, 0xBA, 0x45, 0xF5, 0xEB, 0xBB, 0x45,
 	0x41, 0x07, 0xBD, 0x45, 0x21, 0x01, 0xBE, 0x45, 0x64, 0xD9, 0xBE, 0x45, 0xE3, 0x8F, 0xBF, 0x45,
 	0x7E, 0x24, 0xC0, 0x45, 0x15, 0x97, 0xC0, 0x45, 0x92, 0xE7, 0xC0, 0x45, 0xE8, 0x15, 0xC1, 0x45,
-	0x7E, 0x24, 0xC0, 0x45, 0x15, 0x97, 0xC0, 0x45, 0x92, 0xE7, 0xC0, 0x45, 0xE8, 0x15, 0xC1, 0x45,
-	0x7E, 0x24, 0xC0, 0x45, 0x15, 0x97, 0xC0, 0x45, 0x92, 0xE7, 0xC0, 0x45, 0xE8, 0x15, 0xC1, 0x45,
 } ;
 
 static unsigned char int24_32_le_stereo [] =
@@ -90,18 +88,12 @@ static unsigned char int24_32_le_stereo [] =
 static void
 test_audio_detect (void)
 {
-	SF_PRIVATE psf ;
 	AUDIO_DETECT ad ;
 	int errors = 0 ;
 
-	printf ("    test_audio_detect        : ") ;
-	fflush (stdout) ;
-
-	memset (&psf, 0, sizeof (psf)) ;
-
 	ad.endianness = SF_ENDIAN_LITTLE ;
 	ad.channels = 1 ;
-	if (audio_detect (&psf, &ad, float_le_mono, sizeof (float_le_mono)) != SF_FORMAT_FLOAT)
+	if (audio_detect (&ad, float_le_mono, sizeof (float_le_mono)) != SF_FORMAT_FLOAT)
 	{	if (errors == 0) puts ("\nFailed tests :\n") ;
 		puts ("    float_le_mono") ;
 		errors ++ ;
@@ -109,7 +101,7 @@ test_audio_detect (void)
 
 	ad.endianness = SF_ENDIAN_LITTLE ;
 	ad.channels = 2 ;
-	if (audio_detect (&psf, &ad, int24_32_le_stereo, sizeof (int24_32_le_stereo)) != SF_FORMAT_PCM_32)
+	if (audio_detect (&ad, int24_32_le_stereo, sizeof (int24_32_le_stereo)) != SF_FORMAT_PCM_32)
 	{	if (errors == 0) puts ("\nFailed tests :\n") ;
 		puts ("    int24_32_le_stereo") ;
 		errors ++ ;
@@ -119,8 +111,6 @@ test_audio_detect (void)
 	{	printf ("\n    Errors : %d\n\n", errors) ;
 		exit (1) ;
 		} ;
-
-	puts ("ok") ;
 
 	return ;
 } /* test_audio_detect */

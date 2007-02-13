@@ -1,3 +1,11 @@
+2007-02-13 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav.c src/wav_w64.c src/wav_w64.h
+    Start work towards detecting ausio codec type from the actual audio data.
+
+    * src/audio_detect.c src/test_audio_detect.c
+    Add new file and its unit test.
+
 2007-02-07 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/cooledit-fixer.c examples/Makefile.am
