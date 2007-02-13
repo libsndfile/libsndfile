@@ -281,6 +281,7 @@ int 	wav_w64_srate2blocksize (int srate_chan_product) ;
 char const* wav_w64_format_str (int k) ;
 int		wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize) ;
 void	wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat) ;
+void	wav_w64_analyze (SF_PRIVATE *psf) ;
 
 #endif
 /*
