@@ -67,7 +67,7 @@ audio_detect (SF_PRIVATE * psf, AUDIO_DETECT *ad, const unsigned char * data, in
 		return SF_FORMAT_PCM_32 ;
 		} ;
 
-	if (ad->endianness == SF_ENDIAN_LITTLE && stats.four [3].umin > 0x43 && stats.four [3].umax < 0x46)
+	if (ad->endianness == SF_ENDIAN_LITTLE && stats.four [3].umin > 0x43 && stats.four [3].umax < 0x4B)
 	{	/* Almost certainly 32 bit floats. */
 		return SF_FORMAT_FLOAT ;
 		} ;

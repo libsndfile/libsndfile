@@ -94,6 +94,9 @@ test_audio_detect (void)
 	AUDIO_DETECT ad ;
 	int errors = 0 ;
 
+	printf ("    test_audio_detect        : ") ;
+	fflush (stdout) ;
+
 	memset (&psf, 0, sizeof (psf)) ;
 
 	ad.endianness = SF_ENDIAN_LITTLE ;
@@ -116,6 +119,8 @@ test_audio_detect (void)
 	{	printf ("\n    Errors : %d\n\n", errors) ;
 		exit (1) ;
 		} ;
+
+	puts ("ok") ;
 
 	return ;
 } /* test_audio_detect */
