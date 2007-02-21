@@ -58,6 +58,8 @@
 #define sowt_MARKER		(MAKE_MARKER ('s', 'o', 'w', 't'))
 #define twos_MARKER		(MAKE_MARKER ('t', 'w', 'o', 's'))
 #define raw_MARKER		(MAKE_MARKER ('r', 'a', 'w', ' '))
+#define in24_MARKER		(MAKE_MARKER ('i', 'n', '2', '4'))
+#define ni24_MARKER		(MAKE_MARKER ('4', '2', 'n', '1'))
 #define in32_MARKER		(MAKE_MARKER ('i', 'n', '3', '2'))
 #define ni32_MARKER		(MAKE_MARKER ('2', '3', 'n', 'i'))
 
@@ -890,11 +892,13 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 				break ;
 
 		case twos_MARKER :
+		case in24_MARKER :
 		case in32_MARKER :
 				psf->sf.format = (SF_ENDIAN_BIG | SF_FORMAT_AIFF | subformat) ;
 				break ;
 
 		case sowt_MARKER :
+		case ni24_MARKER :
 		case ni32_MARKER :
 				psf->endian = SF_ENDIAN_LITTLE ;
 				psf->sf.format = (SF_ENDIAN_LITTLE | SF_FORMAT_AIFF | subformat) ;
