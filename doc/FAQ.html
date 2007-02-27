@@ -43,6 +43,8 @@
 	</A><BR>
 <A HREF="#Q017">Q17 : Can libsndfile read/write files from/to UNIX pipes?
 	</A><BR>
+<A HREF="#Q018">Q18 : Is it possible to build a Universal Binary on Mac OSX?
+	</A><BR>
 <HR>
 
 <!-- ========================================================================= -->
@@ -552,7 +554,24 @@ data in both big and little endian format.
 </P>
 
 <P>
-Sell also <A HREF="#Q006">FAQ Q6</A>.
+See also <A HREF="#Q006">FAQ Q6</A>.
+</P>
+
+<!-- ========================================================================= -->
+<A NAME="Q018"></A>
+<H2><BR><B>Q18 : Is it possible to build a Universal Binary on Mac OSX?
+</B></H2>
+
+<P>
+Yes, its possible to build it but no, it probably won't work.
+</P>
+
+<P>
+The problem is that the libsndfile build process detects features of the CPU its
+being built for doing the configure process and when building a univeral binary,
+configure is only run once and that data is then used for both PowerPC and Intel 
+CPUs.
+That configure data will be wrong for one of those CPUs.
 </P>
 
 <!-- ========================================================================= -->
