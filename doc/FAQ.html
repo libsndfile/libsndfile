@@ -23,7 +23,7 @@
 		substitution" error during linking. What can I do to fix this?</A><BR>
 <A HREF="#Q005">Q5 : Why doesn't libsndfile do interleaving/de-interleaving?</A><BR>
 <A HREF="#Q006">Q6 : What's the best format for storing temporary files?</A><BR>
-<A HREF="#Q007">Q7 : On Linux/Unix/MaxOSX, what's the best way of detecting the
+<A HREF="#Q007">Q7 : On Linux/Unix/MacOSX, what's the best way of detecting the
 	presence of libsndfile?</A><BR>
 <A HREF="#Q008">Q8 : But I just want a simple Makefile! What do I do?</A><BR>
 <A HREF="#Q009">Q9 : How about adding the ability to write/read sound files to/from
@@ -563,16 +563,52 @@ See also <A HREF="#Q006">FAQ Q6</A>.
 </B></H2>
 
 <P>
-Yes, its possible to build it but no, it probably won't work.
+Yes, but you must do two separate configure/build/test runs; one on PowerPC
+and one on Intel.
+It is then possible to merge the binaries into a single universal binary using
+one of the programs in the Apple tool chain.
+</P>
+
+<P>
+It is <b>not</b> possible to build a working universal binary via a single
+compile/build run on a single CPU.
 </P>
 
 <P>
 The problem is that the libsndfile build process detects features of the CPU its
-being built for doing the configure process and when building a univeral binary,
+being built for doing the configure process and when building a universal binary,
 configure is only run once and that data is then used for both PowerPC and Intel 
 CPUs.
 That configure data will be wrong for one of those CPUs.
+You will still be able to compile libsndfile, and the test suite will pass on
+the machine you compiled it on.
+However, if you take the universal binary test suite programs compiled on one 
+CPU and run them on the other, the test suite will fail.
 </P>
+
+<P>
+Part of the problem is the the CPU endian-ness is detected at configure time.
+Yes, I know the Apple compiler defines one of the macros __LITTLE_ENDIAN__ 
+and __BIG_ENDIAN__, but those macros are not part of the 1999 ISO C Standard
+and they are not portable.
+</P>
+
+<P>
+In addition, endian issues are not the only reason why the cross compiled
+binary will fail.
+The configure script also detects other CPU specific idiosyncrasies to provide
+more optimized code.
+</P>
+
+<P>
+Now, if you have read this far you're probably thinking there must be a way 
+to fix this and there probably is.
+The problem is that its a hell of a lot of work and would require significant
+changes to the configure process, the internal code and the test suite.
+In addition, these changes must not break compilation on any of the platforms
+libsndfile is currently working on.
+</p>
+
 
 <!-- ========================================================================= -->
 <HR>
@@ -581,16 +617,8 @@ That configure data will be wrong for one of those CPUs.
 		<A HREF="http://www.mega-nerd.com/libsndfile/">
 			http://www.mega-nerd.com/libsndfile/</A>.
 <BR>
-Version : 1.0.13
+Version : 1.0.17
 </P>
 
 </BODY>
 </HTML>
-
-<!--
-  Do not edit or modify anything in this comment block.
-  The arch-tag line is a file identity tag for the GNU Arch
-  revision control system.
-
-  arch-tag: 508f827d-b9a7-4a86-8c2f-d82321df91f7
--->
