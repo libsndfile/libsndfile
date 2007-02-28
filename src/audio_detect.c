@@ -33,103 +33,74 @@
 #include "sfendian.h"
 
 typedef struct
-{
-	int smean, umean ;
-	signed char smin, smax ;
-	unsigned char umin, umax ;
-} M_STAT ;
-
-typedef struct
-{	M_STAT three [3] ;
-	M_STAT four [4] ;
-} DATA_STATS ;
+{	int le_float ;
+	int be_float ;
+	int le_int_24_32 ;
+	int be_int_24_32 ;
+} VOTE ;
 
 
-static void generate_stats (DATA_STATS * stats, const unsigned char * data, int datalen) ;
+static void vote_for_format (VOTE * vote, const unsigned char * data, int datalen) ;
 
 int
 audio_detect (SF_PRIVATE * psf, AUDIO_DETECT *ad, const unsigned char * data, int datalen)
-{	DATA_STATS stats ;
+{	VOTE vote ;
 
 	if (psf == NULL)
 		return 0 ;
 
 	if (ad == NULL || datalen < 256)
-	{	printf ("datalen %d\n", datalen) ;
 		return 0 ;
-		} ;
 
-	generate_stats (&stats, data, datalen) ;
+	vote_for_format (&vote, data, datalen) ;
 
-	if (ad->endianness == SF_ENDIAN_LITTLE
-		&& stats.four [0].umean == 0 && stats.four [1].umean > 0 && stats.four [2].umean > 0 && stats.four [3].umean > 0)
-	{	/* Almost certainly 24 bit data stored in 32 bit ints. */
-		return SF_FORMAT_PCM_32 ;
-		} ;
+	psf_log_printf (psf, "audio_detect :\n"
+			"    le_float     : %d\n"
+			"    be_float     : %d\n"
+			"    le_int_24_32 : %d\n"
+			"    be_int_24_32 : %d\n",
+			vote.le_float, vote.be_float, vote.le_int_24_32, vote.be_int_24_32) ;
 
-	if (ad->endianness == SF_ENDIAN_LITTLE && stats.four [3].umin > 0x43 && stats.four [3].umax < 0x4B)
+	if (0) puts (psf->logbuffer) ;
+
+	if (ad->endianness == SF_ENDIAN_LITTLE && vote.le_float > (3 * datalen) / 4)
 	{	/* Almost certainly 32 bit floats. */
 		return SF_FORMAT_FLOAT ;
+		} ;
+
+	if (ad->endianness == SF_ENDIAN_LITTLE && vote.le_int_24_32 > (3 * datalen) / 4)
+	{	/* Almost certainly 24 bit data stored in 32 bit ints. */
+		return SF_FORMAT_PCM_32 ;
 		} ;
 
 	return 0 ;
 } /* data_detect */
 
 static void
-generate_stats (DATA_STATS * stats, const unsigned char * data, int datalen)
+vote_for_format (VOTE * vote, const unsigned char * data, int datalen)
 {
-	int k, indx ;
+	int k ;
 
-	memset (stats, 0, sizeof (stats [0])) ;
+	memset (vote, 0, sizeof (VOTE)) ;
 
-	/* Make sure datalen has both 3 and 4 as a factor. */
-	datalen -= datalen % (3 * 4) ;
+	datalen -= datalen % 4 ;
 
-	for (k = 0 ; k < 3 ; k++)
-	{	stats->three [k].smin = data [k] ;
-		stats->three [k].smax = data [k] ;
-		stats->three [k].umin = data [k] ;
-		stats->three [k].umax = data [k] ;
-		} ;
+	for (k = 0 ; k < datalen ; k ++)
+	{	if ((k % 4) == 0)
+		{	if (data [k] == 0 && data [k + 1] != 0)
+				vote->le_int_24_32 += 4 ;
 
-	for (k = 0 ; k < 4 ; k++)
-	{	stats->four [k].smin = data [k] ;
-		stats->four [k].smax = data [k] ;
-		stats->four [k].umin = data [k] ;
-		stats->four [k].umax = data [k] ;
-		} ;
+			if (data [2] != 0 && data [3] == 0)
+				vote->le_int_24_32 += 4 ;
 
-	for (k = 0 ; k < datalen ; k++)
-	{	signed char schar = data [k] ;
-		unsigned char uchar = data [k] ;
-	
-		indx = k % 3 ;
-		stats->three [indx].smean += schar ;
-		stats->three [indx].umean += uchar ;
-		stats->three [indx].smin = SF_MIN (stats->three [indx].smin, schar) ;
-		stats->three [indx].smax = SF_MAX (stats->three [indx].smax, schar) ;
-		stats->three [indx].umin = SF_MIN (stats->three [indx].umin, uchar) ;
-		stats->three [indx].umax = SF_MAX (stats->three [indx].umax, uchar) ;
+			if (data [0] != 0 && data [3] > 0x43 && data [3] < 0x4B)
+				vote->le_float += 4 ;
 
-		indx = k % 4 ;
-		stats->four [indx].smean += schar ;
-		stats->four [indx].umean += uchar ;
-		stats->four [indx].smin = SF_MIN (stats->four [indx].smin, schar) ;
-		stats->four [indx].smax = SF_MAX (stats->four [indx].smax, schar) ;
-		stats->four [indx].umin = SF_MIN (stats->four [indx].umin, uchar) ;
-		stats->four [indx].umax = SF_MAX (stats->four [indx].umax, uchar) ;
-		} ;
-
-	for (k = 0 ; k < 3 ; k++)
-	{	stats->three [k].smean /= datalen / 3 ;
-		stats->three [k].umean /= datalen / 3 ;
-		} ;
-
-	for (k = 0 ; k < 4 ; k++)
-	{	stats->four [k].smean /= datalen / 4 ;
-		stats->four [k].umean /= datalen / 4 ;
+			if (data [3] != 0 && data [0] > 0x43 && data [0] < 0x4B)
+				vote->be_float += 4 ;
+			} ;
 		} ;
 
 	return ;
-} /* generate_stats */
+} /* vote_for_format */
 
