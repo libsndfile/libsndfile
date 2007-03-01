@@ -91,9 +91,12 @@ and always have the optimal behavior.
 <A NAME="Q003"></A>
 <H2><BR><B>Q3 : Compiling is really slow on MacOSX. Why?</B></H2>
 <P>
-When you configure and compile libsndfile, it uses the Bourne shell for a number
+When you configure and compile libsndfile, it uses the /bin/sh shell for a number
 of tasks (ie configure script and libtool).
-However, Apple has decided to ship their system with a really crappy Bourne shell.
+Older versions of OSX (10.2?) shipped a a really crappy Bourne shell as /bin/sh
+which resulted in <b>really</b> slow compiles.
+New version of OSX ship GNU BASh as /bin/sh and this answer doesn't apply in that
+case.
 </P>
 <P>
 To fix this I suggest that you install the GNU Bash shell, rename /bin/sh to
@@ -576,9 +579,8 @@ compile/build run on a single CPU.
 
 <P>
 The problem is that the libsndfile build process detects features of the CPU its
-being built for doing the configure process and when building a universal binary,
-configure is only run once and that data is then used for both PowerPC and Intel 
-CPUs.
+being built for during the configure process and when building a universal binary,
+configure is only run once and that data is then used for both CPUs.
 That configure data will be wrong for one of those CPUs.
 You will still be able to compile libsndfile, and the test suite will pass on
 the machine you compiled it on.

@@ -3,6 +3,9 @@
     * src/sndfile.c
     Guard agains MacOSX universal binary compiles.
 
+    * doc/FAQ.html
+    Add Q/A 18 and clean up Q3.
+
 2007-02-22 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c
