@@ -1,3 +1,8 @@
+2007-03-01 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    Guard agains MacOSX universal binary compiles.
+
 2007-02-22 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c

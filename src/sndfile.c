@@ -28,6 +28,25 @@
 
 #define		SNDFILE_MAGICK	0x1234C0DE
 
+#ifdef __APPLE__
+	/*
+	**	Detect if a compile for a universal binary is being attempted and barf if it is.
+	**	See the URL below for the rationale.
+	*/
+	#ifdef __BIG_ENDIAN__
+		#if (CPU_IS_LITTLE_ENDIAN == 1)
+			#error "Universal binary compile detected. See http://www.mega-nerd.com/libsndfile/FAQ.html#Q018"
+		#endif
+	#endif
+
+	#ifdef __LITTLE_ENDIAN__
+		#if (CPU_IS_BIG_ENDIAN == 1)
+			#error "Universal binary compile detected. See http://www.mega-nerd.com/libsndfile/FAQ.html#Q018"
+		#endif
+	#endif
+#endif
+
+
 typedef struct
 {	int 		error ;
 	const char	*str ;
