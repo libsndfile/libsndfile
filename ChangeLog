@@ -1,3 +1,8 @@
+2007-03-05 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/FAQ.html
+    Add Q/A 19 on project files.
+
 2007-03-01 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c

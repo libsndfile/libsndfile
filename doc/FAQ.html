@@ -45,6 +45,9 @@
 	</A><BR>
 <A HREF="#Q018">Q18 : Is it possible to build a Universal Binary on Mac OSX?
 	</A><BR>
+<A HREF="#Q019">Q19 : I have project files for Visual Studio / XCode / Whatever. Why
+	don't you distribute them with libsndfile?
+	</A><BR>
 <HR>
 
 <!-- ========================================================================= -->
@@ -584,13 +587,13 @@ configure is only run once and that data is then used for both CPUs.
 That configure data will be wrong for one of those CPUs.
 You will still be able to compile libsndfile, and the test suite will pass on
 the machine you compiled it on.
-However, if you take the universal binary test suite programs compiled on one 
+However, if you take the universal binary test suite programs compiled on one
 CPU and run them on the other, the test suite will fail.
 </P>
 
 <P>
 Part of the problem is the the CPU endian-ness is detected at configure time.
-Yes, I know the Apple compiler defines one of the macros __LITTLE_ENDIAN__ 
+Yes, I know the Apple compiler defines one of the macros __LITTLE_ENDIAN__
 and __BIG_ENDIAN__, but those macros are not part of the 1999 ISO C Standard
 and they are not portable.
 </P>
@@ -603,7 +606,7 @@ more optimized code.
 </P>
 
 <P>
-Now, if you have read this far you're probably thinking there must be a way 
+Now, if you have read this far you're probably thinking there must be a way
 to fix this and there probably is.
 The problem is that its a hell of a lot of work and would require significant
 changes to the configure process, the internal code and the test suite.
@@ -611,6 +614,58 @@ In addition, these changes must not break compilation on any of the platforms
 libsndfile is currently working on.
 </p>
 
+
+<!-- ========================================================================= -->
+<A NAME="Q019"></A>
+<H2><BR><B>Q19 : I have project files for Visual Studio / XCode / Whatever. Why
+	don't you distribute them with libsndfile?
+</B></H2>
+
+<P>
+There's a very good reason for this.
+I will only distribute things that I actually have an ability to test and
+maintain.
+Project files for a bunch of different compilers and Integrated Development
+Environments are simply too difficult to maintain.
+</P>
+
+<P>
+The problem is that every time I add a new file to libsndfile or rename an
+existing file I would have to modify all the project files and then test that
+libsndfile still built with all the different compilers.
+</P>
+
+<P>
+Maintaining these project files is also rather difficult if I don't have access
+to the required compiler/IDE.
+If I just edit the project files without testing them I will almost certainly 
+get it wrong.
+If I release a version of libsndfile with broken project files, I'll get a bunch
+of emails from people complaining about it not building and have no way of 
+fixing or even testing it.
+</P>
+
+<P>
+I currently release sources that I personally test on Win32, Linux and
+MacOSX (PowerPC) using the compiler I trust (GNU GCC).
+Supporting one compiler on three (actually much more because GCC is available
+almost everywhere) platforms is doable without too much pain.
+I also release binaries for Win32 with instructions on how to use those
+binaries with Visual Studio.
+As a guy who is mainly interested in Linux, I'm not to keen to jump through
+a bunch of hoops to support compilers and operating systems I don't use.
+</P>
+
+<P>
+So, I hear you want to volunteer to maintain the project files for Some Crappy
+Compiler 2007?
+Well sorry, that won't work either.
+I have had numerous people over the years offer to maintaining the project
+files for Microsoft's Visual Studio.
+Every single time that happened, they maintained it for a release or two and
+then disappeared off the face of the earth.
+Hence, I'm not willing to enter into an arrangement like that again.
+</P>
 
 <!-- ========================================================================= -->
 <HR>
