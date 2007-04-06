@@ -206,7 +206,8 @@ mat4_write_header (SF_PRIVATE *psf, int calc_length)
 
 static int
 mat4_read_header (SF_PRIVATE *psf)
-{	int		marker, namesize, rows, cols, imag ;
+{	int		marker, rows, cols, imag ;
+	unsigned namesize ;
 	double	value ;
 	const char *marker_str ;
 	char	name [64] ;

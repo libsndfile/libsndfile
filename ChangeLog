@@ -1,3 +1,15 @@
+2007-04-07 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/flac.c
+    Turn off seekable flag when writing, return SFE_BAD_RDWR_FORMAT when
+    opening file for RDWR.
+
+    * src/sndfile.c
+    Improve error message for SFE_BAD_RDWR_FORMAT.
+
+    * src/mat4.c
+    Fix array indexing issue. Thanks to Ben Allison (Nullsoft) for alerting me.
+
 2007-03-05 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html
