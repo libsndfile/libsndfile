@@ -56,8 +56,3 @@ clean:
 	find . -name .deps -type d -exec rm -rf {} \;
 
 
-# Do not edit or modify anything in this comment block.
-# The arch-tag line is a file identity tag for the GNU Arch 
-# revision control system.
-#
-# arch-tag: 2b02bfd0-d5ed-489b-a554-2bf36903cca9

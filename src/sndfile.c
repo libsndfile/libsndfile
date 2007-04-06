@@ -86,7 +86,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_NO_EMBED_SUPPORT	, "Error : embedding not supported for this file format." },
 	{	SFE_NO_EMBEDDED_RDWR	, "Error : cannot open embedded file read/write." },
 	{	SFE_NO_PIPE_WRITE		, "Error : this file format does not support pipe write." },
-	{	SFE_BAD_RDWR_FORMAT		, "Attempted to open read only format for RDWR." },
+	{	SFE_BAD_RDWR_FORMAT		, "Error : File format cannot be opened for RDWR." },
 	{	SFE_BAD_VIRTUAL_IO		, "Error : bad pointer on SF_VIRTUAL_IO struct." },
 
 	{	SFE_INTERLEAVE_MODE		, "Attempt to write to file with non-interleaved data." },
