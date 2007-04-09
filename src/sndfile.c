@@ -892,7 +892,8 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				}
 			else if (psf->peak_info == NULL)
 			{	psf->peak_info = peak_info_calloc (psf->sf.channels) ;
-				psf->peak_info->peak_loc = SF_PEAK_START ;
+				if (psf->peak_info != NULL)
+					psf->peak_info->peak_loc = SF_PEAK_START ;
 				} ;
 
 			if (psf->write_header)
