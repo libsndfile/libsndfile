@@ -1,3 +1,10 @@
+2007-04-09 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    Fixed a bug in sf_error() where the function itself was being compared
+    against zero. Add a check for a NULL return from peak_info_calloc. Fix a
+    possible NULL dereference.
+
 2007-04-07 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/flac.c
