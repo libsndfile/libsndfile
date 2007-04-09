@@ -464,7 +464,7 @@ sf_error (SNDFILE *sndfile)
 {	SF_PRIVATE	*psf ;
 
 	if (sndfile == NULL)
-	{	if (sf_error != 0)
+	{	if (sf_errno != 0)
 			return sf_errno ;
 		return 0 ;
 		} ;
