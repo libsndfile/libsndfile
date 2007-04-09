@@ -902,7 +902,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_GET_LOG_INFO :
 			if (data == NULL)
-				return (psf->error = SFE_BAD_CONTROL_CMD) ;
+				return SFE_BAD_CONTROL_CMD ;
 			LSF_SNPRINTF (data, datasize, "%s", psf->logbuffer) ;
 			break ;
 
