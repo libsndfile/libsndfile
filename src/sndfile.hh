@@ -107,6 +107,8 @@ class SndfileHandle
 
 		const char* getString (int str_type) const ;
 
+		static int formatCheck (int format, int channels, int samplerate) ;
+
 		sf_count_t read (short *ptr, sf_count_t items) ;
 		sf_count_t read (int *ptr, sf_count_t items) ;
 		sf_count_t read (float *ptr, sf_count_t items) ;
@@ -248,6 +250,20 @@ inline const char*
 SndfileHandle::getString (int str_type) const
 {	return sf_get_string (p->sf, str_type) ; }
 
+inline int
+SndfileHandle::formatCheck(int fmt, int chans, int srate)
+{
+	SF_INFO sfinfo ;
+
+	sfinfo.frames = 0 ;
+	sfinfo.channels = chans ;
+	sfinfo.format = fmt ;
+	sfinfo.samplerate = srate ;
+	sfinfo.sections = 0 ;
+	sfinfo.seekable = 0 ;
+
+	return sf_format_check (&sfinfo) ;
+}
 
 /*---------------------------------------------------------------------*/
 

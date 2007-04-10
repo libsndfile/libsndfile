@@ -1,3 +1,9 @@
+2007-04-11 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.hh
+    Add a static SndfileHandle::formatCheck method as suggested by Jorge
+    Jiménez.
+
 2007-04-09 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
