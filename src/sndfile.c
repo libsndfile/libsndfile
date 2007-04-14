@@ -244,6 +244,7 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_DWVW_BAD_BITWIDTH	, "Error : Bad bit width for DWVW encoding. Must be 12, 16 or 24." },
 	{	SFE_G72X_NOT_MONO		, "Error : G72x encoding does not support more than 1 channel." },
+	{	SFE_WVE_NO_PIPE			, "Error : not able to operate on WVE files over a pipe." },
 
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
@@ -764,6 +765,16 @@ sf_format_check	(const SF_INFO *info)
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24)
+					return 1 ;
+				break ;
+
+		case SF_FORMAT_WVE :
+				/* WVE is strictly big endian. */
+				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
+					return 0 ;
+				if (info->channels > 1)
+					return 0 ;
+				if (subformat == SF_FORMAT_ALAW)
 					return 1 ;
 				break ;
 

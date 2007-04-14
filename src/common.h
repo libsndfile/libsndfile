@@ -133,7 +133,6 @@ enum
 {	/* Work in progress. */
 
 	/* Formats supported read only. */
-	SF_FORMAT_WVE			= 0x4020000,		/* Psion ALaw Sound File */
 	SF_FORMAT_TXW			= 0x4030000,		/* Yamaha TX16 sampler file */
 	SF_FORMAT_DWD			= 0x4040000,		/* DiamondWare Digirized */
 
@@ -559,6 +558,8 @@ enum
 	SFE_FLAC_LOST_SYNC,
 	SFE_FLAC_BAD_SAMPLE_RATE,
 	SFE_FLAC_UNKOWN_ERROR,
+
+	SFE_WVE_NO_PIPE,
 
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;

@@ -6,6 +6,10 @@
     * src/GSM610/long_term.c src/macbinary3.c tests/cpp_test.cc
     Add patch from André Pang to clean up compiles on OSX.
 
+    * src/wve.c src/common.h src/sndfile.c src/sndfile.h.in
+        examples/sndfile-convert.c
+    Merge changes from Reuben Thomas to improve WVE support.
+
 2007-04-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.hh

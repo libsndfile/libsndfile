@@ -73,6 +73,7 @@ enum
 	SF_FORMAT_SD2			= 0x160000,		/* Sound Designer 2 */
 	SF_FORMAT_FLAC			= 0x170000,		/* FLAC lossless file format */
 	SF_FORMAT_CAF			= 0x180000,		/* Core Audio File format */
+	SF_FORMAT_WVE			= 0x190000,		/* Psion WVE format */
 
 	/* Subtypes from here on. */
 
