@@ -166,7 +166,7 @@ genfiles : write_read_test.c pcm_test.c header_test.c utils.c \
 check: generic-tests wav-tests aiff-tests au-tests caf-tests raw-tests \
 	paf-tests svx-tests nist-tests ircam-tests voc-tests w64-tests mat4-tests \
 	mat5-tests pvf-tests xi-tests htk-tests avr-tests sds-tests sd2-tests \
-	flac-tests caf-tests io-tests
+	flac-tests caf-tests wve-tests io-tests
 
 generic-tests : error_test ulaw_test alaw_test command_test floating_point_test \
 		pcm_test win32_ordinal_test $(CPP_TEST)
@@ -278,6 +278,12 @@ w64-tests: write_read_test lossy_comp_test misc_test
 	./misc_test w64
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on W64 files."
+	@echo "----------------------------------------------------------------------"
+
+wve-tests: lossy_comp_test
+	./lossy_comp_test wve
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion` passed tests on WVE files."
 	@echo "----------------------------------------------------------------------"
 
 # Lite remove start
@@ -403,9 +409,4 @@ io-tests: stdio_test stdin_test stdout_test pipe_test
 	@echo "  `./sfversion` passed stdio/pipe/vio tests."
 	@echo "----------------------------------------------------------------------"
 
-## Do not edit or modify anything in this comment block.
-## The arch-tag line is a file identity tag for the GNU Arch 
-## revision control system.
-##
-## arch-tag: 820ec297-29b9-48a4-998f-48b17053f435
 

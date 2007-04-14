@@ -98,6 +98,7 @@ main (int argc, char *argv [])
 		printf ("           wav_gsm610  - test GSM 6.10 WAV file functions\n") ;
 		printf ("           wav_ulaw    - test u-law WAV file functions\n") ;
 		printf ("           wav_alaw    - test A-law WAV file functions\n") ;
+		printf ("           wve         - test Psion WVE file functions\n") ;
 		printf ("           all         - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -450,6 +451,17 @@ main (int argc, char *argv [])
 		sdlcomp_test_double	("msadpcm.w64", SF_FORMAT_W64 | SF_FORMAT_MS_ADPCM, 2, 0.36) ;
 		test_count++ ;
 		} ;
+
+	if (do_all || strcmp (argv [1], "wve") == 0)
+	{	lcomp_test_short	("psion.wve", SF_FORMAT_WVE | SF_FORMAT_ALAW, 1, 0.04) ;
+		lcomp_test_int		("psion.wve", SF_FORMAT_WVE | SF_FORMAT_ALAW, 1, 0.04) ;
+		/* Lite remove start */
+		lcomp_test_float	("psion.wve", SF_FORMAT_WVE | SF_FORMAT_ALAW, 1, 0.04) ;
+		lcomp_test_double	("psion.wve", SF_FORMAT_WVE | SF_FORMAT_ALAW, 1, 0.04) ;
+		/* Lite remove end */
+		test_count++ ;
+		} ;
+
 	/* Lite remove end */
 
 	if (do_all || strcmp (argv [1], "w64_gsm610") == 0)
