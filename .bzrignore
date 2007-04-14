@@ -31,6 +31,7 @@ examples/list_formats
 examples/make_sine
 examples/sfprocess
 examples/sndfile-convert
+examples/sndfile-data-trim
 examples/sndfile-info
 examples/sndfile-play
 install-sh
@@ -39,7 +40,6 @@ libsndfile.spec
 libtool
 ltmain.sh
 missing
-rc/OGG/include/ogg/config_types.h
 regtest/sndfile-regtest
 sndfile.pc
 src/*sndfile.def

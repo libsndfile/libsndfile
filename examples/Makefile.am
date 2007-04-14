@@ -2,7 +2,7 @@
 
 bin_PROGRAMS = sndfile-info sndfile-play sndfile-convert
 
-noinst_PROGRAMS = make_sine sfprocess list_formats generate
+noinst_PROGRAMS = sndfile-data-trim make_sine sfprocess list_formats generate
 
 # This is the BeOS version of sndfile-play. It needs to be compiled with the C++
 # compiler.
@@ -22,6 +22,9 @@ sndfile_play_LDADD = $(SNDFILEDIR)/libsndfile.la $(OS_SPECIFIC_LINKS) $(ALSA_LIB
 
 sndfile_convert_SOURCES = sndfile-convert.c 
 sndfile_convert_LDADD = $(SNDFILEDIR)/libsndfile.la
+ 
+sndfile_data_trim_SOURCES = sndfile-data-trim.c 
+sndfile_data_trim_LDADD = $(SNDFILEDIR)/libsndfile.la
  
 make_sine_SOURCES = make_sine.c 
 make_sine_LDADD = $(SNDFILEDIR)/libsndfile.la

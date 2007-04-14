@@ -1,3 +1,8 @@
+2007-04-14 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-data-trim.c
+    New file. Program incomplete.
+
 2007-04-11 Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.hh
