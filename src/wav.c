@@ -63,6 +63,7 @@
 #define afsp_MARKER	 (MAKE_MARKER ('a', 'f', 's', 'p'))
 #define clm_MARKER	 (MAKE_MARKER ('c', 'l', 'm', ' '))
 #define elmo_MARKER	 (MAKE_MARKER ('e', 'l', 'm', 'o'))
+#define cart_MARKER	 (MAKE_MARKER ('c', 'a', 'r', 't'))
 
 #define ISFT_MARKER	 (MAKE_MARKER ('I', 'S', 'F', 'T'))
 #define ICRD_MARKER	 (MAKE_MARKER ('I', 'C', 'R', 'D'))
@@ -569,6 +570,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case afsp_MARKER :
 			case clm_MARKER :
 			case elmo_MARKER :
+			case cart_MARKER :
 			case levl_MARKER :
 			case plst_MARKER :
 			case DISP_MARKER :
