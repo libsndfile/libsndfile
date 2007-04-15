@@ -123,7 +123,7 @@ read_file (const char * filename, int format)
 		} ;
 
 	if (file.frames () != ARRAY_LEN (sbuffer) * 4)
-	{	printf ("\n\n%s %d : Error : frames %ld should be %lu.\n\n", __func__, __LINE__,
+	{	printf ("\n\n%s %d : Error : frames %ld should be %u.\n\n", __func__, __LINE__,
 				SF_COUNT_TO_LONG (file.frames ()), ARRAY_LEN (sbuffer) * 4 / 2) ;
 		exit (1) ;
 		} ;
