@@ -1,3 +1,8 @@
+2007-04-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav.c src/wav_w64.c
+    Use audio detect function when 'fmt ' chunk data is suspicious.
+
 2007-04-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-data-trim.c

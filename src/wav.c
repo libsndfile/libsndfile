@@ -690,12 +690,12 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		default : return SFE_UNIMPLEMENTED ;
 		} ;
 
+	if (wpriv->fmt_is_broken)
+		wav_w64_analyze (psf) ;
+
 	/* Only set the format endian-ness if its non-standard big-endian. */
 	if (psf->endian == SF_ENDIAN_BIG)
 		psf->sf.format |= SF_ENDIAN_BIG ;
-
-	if (wpriv->fmt_is_broken)
-		wav_w64_analyze (psf) ;
 
 	return 0 ;
 } /* wav_read_header */
