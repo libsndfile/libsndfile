@@ -626,3 +626,16 @@ if test x$prefix != "x/usr" ; then
 	echo -e "PKG_CONFIG_PATH environment variable.\n"
 	fi
 
+#==================================================================================
+# Ugly hack to remove -Werror from some Makefiles.
+
+TMPFILE=/tmp/strchange$$
+
+for f in "src/FLAC/Makefile" ; do
+	tmp=`grep -l "\-Werror" "$f"`
+	if test -n "$tmp" ; then
+		if sed -e "s!\-Werror!!g" "$f" > $TMPFILE ; then
+			cp -f $TMPFILE "$f"
+			fi
+		fi
+	done
