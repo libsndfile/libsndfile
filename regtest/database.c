@@ -185,8 +185,8 @@ db_add_file (REG_DB * db_handle, const char * filepath)
 
 	snprintf (db->cmdbuf, sizeof (db->cmdbuf), "insert into sndfile "
 		"(fname, fpath, srate, frames, channels, format, checksum, logbuf) values"
-		"('%s','%s',%d,'%lld', %d, '0x%08x', '0x%08x', '%s');",
-		db->filename, db->pathname, info.samplerate, info.frames, info.channels, info.format, checksum, db->logbuf) ;
+		"('%s','%s',%d,'%ld', %d, '0x%08x', '0x%08x', '%s');",
+		db->filename, db->pathname, info.samplerate, (long) info.frames, info.channels, info.format, checksum, db->logbuf) ;
 
 	if (strlen (db->cmdbuf) >= sizeof (db->cmdbuf) - 1)
 	{	printf ("strlen (db->cmdbuf) too long.\n") ;
@@ -368,7 +368,7 @@ check_file_by_ekey (REGTEST_DB * db, int ekey)
 		if (strcmp (result [k], "frames") == 0)
 		{	if (strtoll (result [k + cols], NULL, 10) == info.frames)
 				continue ;
-			printf ("\n\nError : frames doesn't match : %s == %lld\n", result [k + cols], info.frames) ;
+			printf ("\n\nError : frames doesn't match : %s == %ld\n", result [k + cols], (long) info.frames) ;
 			} ;
 
 		if (strcmp (result [k], "channels") == 0)
