@@ -3,6 +3,9 @@
     * src/double64.c
     Fix clipping of double to short conversions on 64 bit systems.
 
+    * src/flac.c regtest/database.c tests/cpp_test.cc
+    Fix compile warnings for 64 bit systems.
+
 2007-04-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c src/wav_w64.c
