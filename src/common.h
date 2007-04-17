@@ -559,6 +559,7 @@ enum
 	SFE_FLAC_BAD_SAMPLE_RATE,
 	SFE_FLAC_UNKOWN_ERROR,
 
+	SFE_WVE_NOT_WVE,
 	SFE_WVE_NO_PIPE,
 
 	SFE_MAX_ERROR			/* This must be last in list. */

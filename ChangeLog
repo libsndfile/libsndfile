@@ -1,3 +1,8 @@
+2007-04-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wve.c src/common.h src/sndfile.c
+    Complete definition of SfE_WVE_NO_WVE error message.
+
 2007-04-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/double64.c

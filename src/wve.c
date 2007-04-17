@@ -28,8 +28,6 @@
 #include	"sfendian.h"
 #include	"common.h"
 
-#define	SFE_WVE_NOT_WVE	666
-
 /*------------------------------------------------------------------------------
 ** Macros to handle big/little endian issues, and other magic numbers.
 */

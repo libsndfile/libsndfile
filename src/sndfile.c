@@ -242,9 +242,11 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_FLAC_BAD_SAMPLE_RATE, "Error : flac does not support this sample rate." },
 	{	SFE_FLAC_UNKOWN_ERROR	, "Error : unkown error in flac decoder." },
 
+	{	SFE_WVE_NOT_WVE			, "Error : not a WVE file." },
+	{	SFE_WVE_NO_PIPE			, "Error : not able to operate on WVE files over a pipe." },
+
 	{	SFE_DWVW_BAD_BITWIDTH	, "Error : Bad bit width for DWVW encoding. Must be 12, 16 or 24." },
 	{	SFE_G72X_NOT_MONO		, "Error : G72x encoding does not support more than 1 channel." },
-	{	SFE_WVE_NO_PIPE			, "Error : not able to operate on WVE files over a pipe." },
 
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
