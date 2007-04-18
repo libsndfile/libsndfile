@@ -32,11 +32,12 @@
 ** Macros to handle big/little endian issues, and other magic numbers.
 */
 
-#define ALAW_MARKER		MAKE_MARKER ('A', 'L', 'a', 'w')
-#define SOUN_MARKER		MAKE_MARKER ('S', 'o', 'u', 'n')
-#define DFIL_MARKER		MAKE_MARKER ('d', 'F', 'i', 'l')
-#define ESSN_MARKER		MAKE_MARKER ('e', '*', '*', '\0')
+#define ALAW_MARKER			MAKE_MARKER ('A', 'L', 'a', 'w')
+#define SOUN_MARKER			MAKE_MARKER ('S', 'o', 'u', 'n')
+#define DFIL_MARKER			MAKE_MARKER ('d', 'F', 'i', 'l')
+#define ESSN_MARKER			MAKE_MARKER ('e', '*', '*', '\0')
 #define PSION_VERSION		((unsigned short) 3856)
+#define PSION_DATAOFFSET	0x20
 
 /*------------------------------------------------------------------------------
 ** Private static functions.
@@ -95,36 +96,48 @@ wve_read_header (SF_PRIVATE *psf)
 	/* Set position to start of file to begin reading header. */
 	psf_binheader_readf (psf, "pm", 0, &marker) ;
 	if (marker != ALAW_MARKER)
+	{	psf_log_printf (psf, "Could not find '%m'\n", ALAW_MARKER) ;
 		return SFE_WVE_NOT_WVE ;
+		} ;
 
 	psf_binheader_readf (psf, "m", &marker) ;
 	if (marker != SOUN_MARKER)
+	{	psf_log_printf (psf, "Could not find '%m'\n", SOUN_MARKER) ;
 		return SFE_WVE_NOT_WVE ;
+		} ;
 
 	psf_binheader_readf (psf, "m", &marker) ;
 	if (marker != DFIL_MARKER)
+	{	psf_log_printf (psf, "Could not find '%m'\n", DFIL_MARKER) ;
 		return SFE_WVE_NOT_WVE ;
+		} ;
 
 	psf_binheader_readf (psf, "m", &marker) ;
 	if (marker != ESSN_MARKER)
+	{	psf_log_printf (psf, "Could not find '%m'\n", ESSN_MARKER) ;
 		return SFE_WVE_NOT_WVE ;
+		} ;
 
 	psf_binheader_readf (psf, "E2", &version) ;
-	if (version != PSION_VERSION)
-        	return SFE_WVE_NOT_WVE ;
-
-	psf_binheader_readf (psf, "E4", &datalength) ;
-	psf->datalength = datalength ;
-	psf->dataoffset = 0x20 ;
-	if (psf->datalength != psf->filelength - psf->dataoffset)
-		return SFE_WVE_NOT_WVE ;
-
-	psf_binheader_readf (psf, "E2E2222", &padding, &repeats, &trash, &trash, &trash) ;
 
 	psf_log_printf (psf, "Psion Palmtop Alaw (.wve)\n"
 			"  Sample Rate : 8000\n"
 			"  Channels    : 1\n"
 			"  Encoding    : A-law\n") ;
+
+	if (version != PSION_VERSION)
+		psf_log_printf (psf, "Psion version %d should be %d\n", version, PSION_VERSION) ;
+
+	psf_binheader_readf (psf, "E4", &datalength) ;
+	psf->dataoffset = PSION_DATAOFFSET ;
+	if (datalength != psf->filelength - psf->dataoffset)
+	{	psf->datalength = psf->filelength - psf->dataoffset ;
+		psf_log_printf (psf, "Data length %d should be %D\n", datalength, psf->datalength) ;
+		}
+	else
+		psf->datalength = datalength ;
+
+	psf_binheader_readf (psf, "E22222", &padding, &repeats, &trash, &trash, &trash) ;
 
 	psf->sf.format		= SF_FORMAT_WVE | SF_FORMAT_ALAW ;
 	psf->sf.samplerate	= 8000 ;
@@ -140,7 +153,7 @@ wve_read_header (SF_PRIVATE *psf)
 static int
 wve_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t	current ;
-	unsigned short	padding = 0, repeats = 0 ;
+	unsigned datalen ;
 
 	current = psf_ftell (psf) ;
 
@@ -160,7 +173,9 @@ wve_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	/* Write header. */
-	psf_binheader_writef (psf, "Emmmm2422222", ALAW_MARKER, SOUN_MARKER, DFIL_MARKER, ESSN_MARKER, PSION_VERSION, psf->datalength, padding, repeats, 0, 0, 0) ;
+	datalen = psf->datalength ;
+	psf_binheader_writef (psf, "Emmmm", ALAW_MARKER, SOUN_MARKER, DFIL_MARKER, ESSN_MARKER) ;
+	psf_binheader_writef (psf, "E2422222", PSION_VERSION, datalen, 0, 0, 0, 0, 0) ;
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 
 	if (psf->sf.channels != 1)
