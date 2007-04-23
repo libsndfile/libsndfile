@@ -477,6 +477,8 @@ else
 #====================================================================================
 # Now use the information from the checking stage.
 
+win32_target_dll=0
+
 if test x$ac_cv_c_compiler_gnu = xyes ; then
 	AC_ADD_CFLAGS(-std=gnu99)
 
@@ -520,9 +522,17 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 			;;
 		mingw*)
 			SHLIB_VERSION_ARG="-Wl,\$(srcdir)/libsndfile.def"
+			win32_target_dll=1
+			if test x"$enable_shared" = xno ; then
+				win32_target_dll=0
+				fi
 			;;
 		cygwin*)
 			SHLIB_VERSION_ARG="-Wl,\$(srcdir)/cygsndfile.def"
+			win32_target_dll=1
+			if test x"$enable_shared" = xno ; then
+				win32_target_dll=0
+				fi
 			;;
 		*)
 			;;
@@ -536,12 +546,16 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	AC_DEFINE_UNQUOTED([GCC_MAJOR_VERSION],${GCC_MAJOR_VERSION}, [Major version of GCC or 3 otherwise.])
 	fi
 
+AC_DEFINE_UNQUOTED(WIN32_TARGET_DLL, ${win32_target_dll}, [Set to 1 if windows DLL is being built.])
+
 CFLAGS="$CFLAGS $OS_SPECIFIC_CFLAGS"
 
 if test x"$CFLAGS" = x ; then
 	echo "Error in configure script. CFLAGS has been screwed up."
 	exit
 	fi
+
+#-------------------------------------------------------------------------------
 
 AC_SUBST(htmldocdir)
 AC_SUBST(HTML_BGCOLOUR)

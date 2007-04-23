@@ -1,3 +1,12 @@
+2007-04-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac tests/win32_ordinal_test.c
+    Detect if win32 DLL is beging generated and only run win32_ordinal_test if
+    true.
+
+    * src/G72x/Makefile.am src/Makefile.am
+    Use $(EXEEXT) where possible.
+
 2007-04-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wve.c src/common.h src/sndfile.c

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2006, 2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,18 +137,10 @@ win32_ordinal_test (void)
 int
 main (void)
 {
-#if TEST_WIN32
+#if (TEST_WIN32 && WIN32_TARGET_DLL)
 	win32_ordinal_test () ;
 #endif
 
 	return 0 ;
 } /* main */
 
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 708f6815-e787-4143-bb99-f32c1bb5564e
-*/
