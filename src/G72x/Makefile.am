@@ -5,7 +5,7 @@ EXTRA_DIST = README README.original ChangeLog
 noinst_HEADERS = g72x.h g72x_priv.h
 noinst_LTLIBRARIES = libg72x.la
 
-noinst_PROGRAMS = g72x_test
+noinst_PROGRAMS = g72x_test$(EXEEXT)
 
 CFILES = g72x.c g721.c g723_16.c g723_24.c g723_40.c
 
