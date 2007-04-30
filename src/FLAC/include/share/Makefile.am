@@ -1,8 +1,10 @@
 ## Process this file with automake to produce Makefile.in
 
+AUTOMAKE_OPTIONS = foreign
+
 SUBDIRS = grabbag
 
-noinst_HEADERS = \
+EXTRA_DIST = \
 	getopt.h \
 	grabbag.h \
 	replaygain_analysis.h \

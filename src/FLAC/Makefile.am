@@ -1,90 +1,39 @@
-#  libFLAC - Free Lossless Audio Codec library
-#  Copyright (C) 2001,2002,2003,2004,2005,2006  Josh Coalson
+#  FLAC - Free Lossless Audio Codec
+#  Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
 #
-#  Redistribution and use in source and binary forms, with or without
-#  modification, are permitted provided that the following conditions
-#  are met:
+#  This file is part the FLAC project.  FLAC is comprised of several
+#  components distributed under difference licenses.  The codec libraries
+#  are distributed under Xiph.Org's BSD-like license (see the file
+#  COPYING.Xiph in this distribution).  All other programs, libraries, and
+#  plugins are distributed under the GPL (see COPYING.GPL).  The documentation
+#  is distributed under the Gnu FDL (see COPYING.FDL).  Each file in the
+#  FLAC distribution contains at the top the terms under which it may be
+#  distributed.
 #
-#  - Redistributions of source code must retain the above copyright
-#  notice, this list of conditions and the following disclaimer.
+#  Since this particular file is relevant to all components of FLAC,
+#  it may be distributed under the Xiph.Org license, which is the least
+#  restrictive of those mentioned above.  See the file COPYING.Xiph in this
+#  distribution.
+
 #
-#  - Redistributions in binary form must reproduce the above copyright
-#  notice, this list of conditions and the following disclaimer in the
-#  documentation and/or other materials provided with the distribution.
+# automake provides the following useful targets:
 #
-#  - Neither the name of the Xiph.org Foundation nor the names of its
-#  contributors may be used to endorse or promote products derived from
-#  this software without specific prior written permission.
+# all: build all programs and libraries using the current
+# configuration (set by configure)
 #
-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-#  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-#  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR
-#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
-#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
-#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# check: build and run all self-tests
+#
+# clean: remove everything except what's required to build everything
+#
+# distclean: remove everything except what goes in the distribution
+#
 
-noinst_LTLIBRARIES = libFLAC.la
+SUBDIRS = include src test
 
-EXTRA_DIST = strip_non_asm_libtool_args.sh
-
-if FLaC__CPU_PPC
-# The -force_cpusubtype_ALL is needed to insert a ppc64 instruction
-# into cpu.c with an asm().
-if FLaC__SYS_DARWIN
-#@@@ PPC optimizations temporarily disabled
-CPUCFLAGS = -faltivec -force_cpusubtype_ALL -DFLAC__NO_ASM
-else
-# Linux-gcc for PPC does not have -force_cpusubtype_ALL, it is Darwin-specific
-#@@@ PPC optimizations temporarily disabled
-CPUCFLAGS = -maltivec -mabi=altivec -DFLAC__NO_ASM
-endif
-endif
-
-INCLUDES = -I$(top_srcdir)/src/FLAC -I$(top_srcdir)/src/FLAC/include -I$(top_srcdir)/src/OGG/include
-AM_CFLAGS = $(CPUCFLAGS)
-
-if FLaC__NO_ASM
-else
-if FLaC__CPU_IA32
-if FLaC__HAS_NASM
-ARCH_SUBDIRS = ia32
-libFLAC_la_LIBADD = ia32/libFLAC-asm.la
-endif
-endif
-if FLaC__CPU_PPC
-ARCH_SUBDIRS = ppc
-endif
-endif
-
-SUBDIRS = $(ARCH_SUBDIRS) include FLAC share test_libs_common . test_libFLAC
-
-extra_ogg_sources = \
-	ogg_decoder_aspect.c \
-	ogg_encoder_aspect.c \
-	ogg_helper.c \
-	ogg_mapping.c
-
-# see 'http://www.gnu.org/software/libtool/manual.html#Libtool-versioning' for numbering convention
-libFLAC_la_SOURCES = \
-	bitbuffer.c \
-	bitmath.c \
-	cpu.c \
-	crc.c \
-	fixed.c \
-	float.c \
-	format.c \
-	lpc.c \
-	md5.c \
-	memory.c \
-	metadata_iterators.c \
-	metadata_object.c \
-	stream_decoder.c \
-	stream_encoder.c \
-	stream_encoder_framing.c \
-	window.c \
-	$(extra_ogg_sources)
+EXTRA_DIST = \
+	COPYING.FDL \
+	COPYING.GPL \
+	COPYING.LGPL \
+	COPYING.Xiph \
+	README \
+	strip_non_asm_libtool_args.sh

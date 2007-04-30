@@ -220,16 +220,18 @@ static char *posixly_correct;
    whose names are inconsistent.  */
 
 #ifndef getenv
-extern char *getenv (const char *);
+extern char *getenv ();
 #endif
 
-static const char *
-my_index (const char *str, int chr)
+static char *
+my_index (str, chr)
+     const char *str;
+     int chr;
 {
   while (*str)
     {
       if (*str == chr)
-	return str;
+	return (char *) str;
       str++;
     }
   return 0;
@@ -782,7 +784,7 @@ share___getopt_internal (argc, argv, optstring, longopts, longind, long_only)
 
   {
     char c = *nextchar++;
-    const char *temp = my_index (optstring, c);
+    char *temp = my_index (optstring, c);
 
     /* Increment `share__optind' when we start to process its last character.  */
     if (*nextchar == '\0')

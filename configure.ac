@@ -576,23 +576,37 @@ dnl to be replaced if the build system has a more recent version.
 AC_SUBST(LIBTOOL_DEPS)
 
 AC_CONFIG_FILES([ \
-		src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
-		src/FLAC/Makefile src/FLAC/FLAC/Makefile src/FLAC/include/Makefile \
-		src/FLAC/include/protected/Makefile src/FLAC/include/test_libs_common/Makefile \
-		src/FLAC/include/share/Makefile src/FLAC/include/share/grabbag/Makefile \
-		src/FLAC/include/private/Makefile src/FLAC/ia32/Makefile src/FLAC/ppc/gas/Makefile \
-		src/FLAC/ppc/Makefile src/FLAC/ppc/as/Makefile src/FLAC/test_libFLAC/Makefile \
-		src/FLAC/share/Makefile src/FLAC/test_libs_common/Makefile src/FLAC/share/getopt/Makefile \
-		src/FLAC/share/replaygain_analysis/Makefile src/FLAC/share/replaygain_synthesis/Makefile \
-		src/FLAC/share/replaygain_synthesis/include/Makefile \
-		src/FLAC/share/replaygain_synthesis/include/private/Makefile \
-		src/FLAC/share/grabbag/Makefile src/FLAC/share/utf8/Makefile \
-		src/OGG/include/ogg/Makefile src/OGG/include/Makefile src/OGG/Makefile \
-		man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
-		doc/Makefile doc/libsndfile.css \
-		Win32/Makefile Octave/Makefile \
-		Makefile libsndfile.spec sndfile.pc \
-		])
+	src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
+	\
+	src/FLAC/Makefile src/FLAC/include/FLAC/Makefile src/FLAC/include/Makefile \
+	src/FLAC/include/share/grabbag/Makefile src/FLAC/include/share/Makefile \
+	src/FLAC/include/test_libs_common/Makefile src/FLAC/src/Makefile \
+	src/FLAC/src/libFLAC/ia32/Makefile src/FLAC/src/libFLAC/Makefile \
+	src/FLAC/src/libFLAC/include/private/Makefile \
+	src/FLAC/src/libFLAC/include/Makefile \
+	src/FLAC/src/libFLAC/include/protected/Makefile \
+	src/FLAC/src/libFLAC/ppc/as/Makefile src/FLAC/src/libFLAC/ppc/Makefile \
+	src/FLAC/src/libFLAC/ppc/gas/Makefile src/FLAC/src/share/Makefile \
+	src/FLAC/src/share/getopt/Makefile src/FLAC/src/share/grabbag/Makefile \
+	src/FLAC/src/share/replaygain_anal/Makefile \
+	src/FLAC/src/share/replaygain_syn/include/private/Makefile \
+	src/FLAC/src/share/replaygain_syn/include/Makefile \
+	src/FLAC/src/share/replaygain_syn/Makefile \
+	src/FLAC/src/share/utf8/Makefile src/FLAC/src/test_libFLAC/Makefile \
+	src/FLAC/src/test_libs_common/Makefile src/FLAC/src/test_seeking/Makefile \
+	src/FLAC/src/test_streams/Makefile src/FLAC/test/Makefile \
+	src/FLAC/src/monkeys_audio_utilities/Makefile \
+	src/FLAC/src/monkeys_audio_utilities/flac_mac/Makefile \
+	src/FLAC/src/monkeys_audio_utilities/flac_ren/Makefile \
+	src/FLAC/src/test_grabbag/Makefile src/FLAC/src/test_grabbag/cuesheet/Makefile \
+	src/FLAC/src/test_grabbag/picture/Makefile \
+	\
+	src/OGG/include/ogg/Makefile src/OGG/include/Makefile src/OGG/Makefile \
+	man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
+	doc/Makefile doc/libsndfile.css \
+	Win32/Makefile Octave/Makefile \
+	Makefile libsndfile.spec sndfile.pc \
+	])
 AC_OUTPUT
 
 #====================================================================================
@@ -645,7 +659,7 @@ if test x$prefix != "x/usr" ; then
 
 TMPFILE=/tmp/strchange$$
 
-for f in "src/FLAC/Makefile" ; do
+for f in "src/FLAC/src/libFLAC/Makefile" ; do
 	tmp=`grep -l "\-Werror" "$f"`
 	if test -n "$tmp" ; then
 		if sed -e "s!\-Werror!!g" "$f" > $TMPFILE ; then

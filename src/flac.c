@@ -29,8 +29,8 @@
 #include	"common.h"
 
 
-#include	"FLAC/FLAC/stream_decoder.h"
-#include	"FLAC/FLAC/stream_encoder.h"
+#include	"FLAC/include/FLAC/stream_decoder.h"
+#include	"FLAC/include/FLAC/stream_encoder.h"
 
 #include	"sfendian.h"
 #include	"float_cast.h"
