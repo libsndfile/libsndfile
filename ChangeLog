@@ -3,6 +3,12 @@
     * src/FLAC
     Ditch and re-import required FLAC code.
 
+    * configure.ac
+    Force FLAC__HAS_OGG variable to 1.
+
+    * src/FLAC/src/libFLAC/stream_encoder.c
+    Fix compiler warnings.
+
 2007-04-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac tests/win32_ordinal_test.c
