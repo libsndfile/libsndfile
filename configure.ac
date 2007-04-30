@@ -293,6 +293,8 @@ AC_DEFINE_UNQUOTED(CPU_CLIPS_NEGATIVE, ${ac_cv_c_clip_negative},
 #====================================================================================
 # FLAC defines.
 
+AC_DEFINE(FLAC__HAS_OGG, 1, [This is always true.])
+
 case "$host_cpu" in
 	i*86)
 		cpu_ia32=true
