@@ -127,7 +127,7 @@ alsa_play (int argc, char *argv [])
 
 static snd_pcm_t *
 alsa_open (int channels, unsigned samplerate, int realtime)
-{	const char * device = "plughw:0" ;
+{	const char * device = "default" ;
 	snd_pcm_t *alsa_dev = NULL ;
 	snd_pcm_hw_params_t *hw_params ;
 	snd_pcm_uframes_t buffer_size, xfer_align, start_threshold ;

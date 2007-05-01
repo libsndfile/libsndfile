@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.59)
 
-AC_INIT([libsndfile],[1.0.18pre7],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.18pre9],[erikd@mega-nerd.com])
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
@@ -293,6 +293,8 @@ AC_DEFINE_UNQUOTED(CPU_CLIPS_NEGATIVE, ${ac_cv_c_clip_negative},
 #====================================================================================
 # FLAC defines.
 
+AC_DEFINE(FLAC__HAS_OGG, 1, [This is always true.])
+
 case "$host_cpu" in
 	i*86)
 		cpu_ia32=true
@@ -347,11 +349,9 @@ if test -n "$NASM" ; then
 	AH_TEMPLATE(FLAC__HAS_NASM, [define if you are compiling for x86 and have the NASM assembler])
 	fi
 
-# only matters for PowerPC
+# Only matters for PowerPC
 AC_CHECK_PROGS(AS, as, as)
 AC_CHECK_PROGS(GAS, gas, gas)
-
-test "$AS" = "as" && as --version | grep GNU >/dev/null && AS=gas
 
 AM_CONDITIONAL(FLaC__HAS_AS, test "$AS" = "as")
 AM_CONDITIONAL(FLaC__HAS_GAS, test "$AS" = "gas")
@@ -479,6 +479,8 @@ else
 #====================================================================================
 # Now use the information from the checking stage.
 
+win32_target_dll=0
+
 if test x$ac_cv_c_compiler_gnu = xyes ; then
 	AC_ADD_CFLAGS(-std=gnu99)
 
@@ -522,9 +524,17 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 			;;
 		mingw*)
 			SHLIB_VERSION_ARG="-Wl,\$(srcdir)/libsndfile.def"
+			win32_target_dll=1
+			if test x"$enable_shared" = xno ; then
+				win32_target_dll=0
+				fi
 			;;
 		cygwin*)
 			SHLIB_VERSION_ARG="-Wl,\$(srcdir)/cygsndfile.def"
+			win32_target_dll=1
+			if test x"$enable_shared" = xno ; then
+				win32_target_dll=0
+				fi
 			;;
 		*)
 			;;
@@ -538,12 +548,16 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	AC_DEFINE_UNQUOTED([GCC_MAJOR_VERSION],${GCC_MAJOR_VERSION}, [Major version of GCC or 3 otherwise.])
 	fi
 
+AC_DEFINE_UNQUOTED(WIN32_TARGET_DLL, ${win32_target_dll}, [Set to 1 if windows DLL is being built.])
+
 CFLAGS="$CFLAGS $OS_SPECIFIC_CFLAGS"
 
 if test x"$CFLAGS" = x ; then
 	echo "Error in configure script. CFLAGS has been screwed up."
 	exit
 	fi
+
+#-------------------------------------------------------------------------------
 
 AC_SUBST(htmldocdir)
 AC_SUBST(HTML_BGCOLOUR)
@@ -564,23 +578,37 @@ dnl to be replaced if the build system has a more recent version.
 AC_SUBST(LIBTOOL_DEPS)
 
 AC_CONFIG_FILES([ \
-		src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
-		src/FLAC/Makefile src/FLAC/FLAC/Makefile src/FLAC/include/Makefile \
-		src/FLAC/include/protected/Makefile src/FLAC/include/test_libs_common/Makefile \
-		src/FLAC/include/share/Makefile src/FLAC/include/share/grabbag/Makefile \
-		src/FLAC/include/private/Makefile src/FLAC/ia32/Makefile src/FLAC/ppc/gas/Makefile \
-		src/FLAC/ppc/Makefile src/FLAC/ppc/as/Makefile src/FLAC/tests/Makefile \
-		src/FLAC/share/Makefile src/FLAC/test_libs_common/Makefile src/FLAC/share/getopt/Makefile \
-		src/FLAC/share/replaygain_analysis/Makefile src/FLAC/share/replaygain_synthesis/Makefile \
-		src/FLAC/share/replaygain_synthesis/include/Makefile \
-		src/FLAC/share/replaygain_synthesis/include/private/Makefile \
-		src/FLAC/share/grabbag/Makefile src/FLAC/share/utf8/Makefile \
-		src/OGG/include/ogg/Makefile src/OGG/include/Makefile src/OGG/Makefile \
-		man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
-		doc/Makefile doc/libsndfile.css \
-		Win32/Makefile Octave/Makefile \
-		Makefile libsndfile.spec sndfile.pc \
-		])
+	src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
+	\
+	src/FLAC/Makefile src/FLAC/include/FLAC/Makefile src/FLAC/include/Makefile \
+	src/FLAC/include/share/grabbag/Makefile src/FLAC/include/share/Makefile \
+	src/FLAC/include/test_libs_common/Makefile src/FLAC/src/Makefile \
+	src/FLAC/src/libFLAC/ia32/Makefile src/FLAC/src/libFLAC/Makefile \
+	src/FLAC/src/libFLAC/include/private/Makefile \
+	src/FLAC/src/libFLAC/include/Makefile \
+	src/FLAC/src/libFLAC/include/protected/Makefile \
+	src/FLAC/src/libFLAC/ppc/as/Makefile src/FLAC/src/libFLAC/ppc/Makefile \
+	src/FLAC/src/libFLAC/ppc/gas/Makefile src/FLAC/src/share/Makefile \
+	src/FLAC/src/share/getopt/Makefile src/FLAC/src/share/grabbag/Makefile \
+	src/FLAC/src/share/replaygain_anal/Makefile \
+	src/FLAC/src/share/replaygain_syn/include/private/Makefile \
+	src/FLAC/src/share/replaygain_syn/include/Makefile \
+	src/FLAC/src/share/replaygain_syn/Makefile \
+	src/FLAC/src/share/utf8/Makefile src/FLAC/src/test_libFLAC/Makefile \
+	src/FLAC/src/test_libs_common/Makefile src/FLAC/src/test_seeking/Makefile \
+	src/FLAC/src/test_streams/Makefile src/FLAC/test/Makefile \
+	src/FLAC/src/monkeys_audio_utilities/Makefile \
+	src/FLAC/src/monkeys_audio_utilities/flac_mac/Makefile \
+	src/FLAC/src/monkeys_audio_utilities/flac_ren/Makefile \
+	src/FLAC/src/test_grabbag/Makefile src/FLAC/src/test_grabbag/cuesheet/Makefile \
+	src/FLAC/src/test_grabbag/picture/Makefile \
+	\
+	src/OGG/include/ogg/Makefile src/OGG/include/Makefile src/OGG/Makefile \
+	man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
+	doc/Makefile doc/libsndfile.css \
+	Win32/Makefile Octave/Makefile \
+	Makefile libsndfile.spec sndfile.pc \
+	])
 AC_OUTPUT
 
 #====================================================================================
@@ -628,3 +656,16 @@ if test x$prefix != "x/usr" ; then
 	echo -e "PKG_CONFIG_PATH environment variable.\n"
 	fi
 
+#==================================================================================
+# Ugly hack to remove -Werror from some Makefiles.
+
+TMPFILE=/tmp/strchange$$
+
+for f in "src/FLAC/src/libFLAC/Makefile" ; do
+	tmp=`grep -l "\-Werror" "$f"`
+	if test -n "$tmp" ; then
+		if sed -e "s!\-Werror!!g" "$f" > $TMPFILE ; then
+			cp -f $TMPFILE "$f"
+			fi
+		fi
+	done

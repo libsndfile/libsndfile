@@ -40,7 +40,7 @@ int
 txw_open	(SF_PRIVATE *psf)
 {	if (psf)
 		return SFE_UNIMPLEMENTED ;
-	return (psf && 0) ;
+	return 0 ;
 } /* txw_open */
 
 #else

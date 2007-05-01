@@ -23,56 +23,53 @@ where most of the discussion about new features takes place.
 <!-- pepper -->
 <P>
 libsndfile is being developed using the
-	<A HREF="http://www.gnu.org/software/gnu-arch/">Gnu Arch</A>
+	<A HREF="http://bazaar-vcs.org/">Bzr</A>
 revision control system which is especially well suited to distributed
 development.
-In most respects, Arch is significantly better than most other revision
+In most respects, Bzr is significantly better than most other revision
 control systems.
-One of the few places it is lacking is support for windows.
-If you're on windows, bad luck.
+It is even available for windows, but I (Erik) have not personally used 
+it on windows.
 </P>
 <!-- pepper -->
 <P>
 The main archive archive can be found at:
-<A HREF="http://www.mega-nerd.com/Arch/2004/">
-			http://www.mega-nerd.com/Arch/2004/</A>
+<A HREF="http://www.mega-nerd.com/Bzr/libsndfile-mdev/">
+			http://www.mega-nerd.com/Bzr/libsndfile-mdev/</A>
 </P>
 <!-- pepper -->
 <P>
-Assuming that you have the Gnu Arch client installed (on Debian GNU/Linux "apt-get
-install tla") you can do:
+Assuming that you have Bzr installed (on Debian GNU/Linux "apt-get install bzr") 
+you can do:
 </P>
 <!-- pepper -->
 <PRE>
-	tla register-archive http://www.mega-nerd.com/Arch/2004/
-	tla get erikd@mega-nerd.com--2004/libsndfile--hack--0 libsndfile
-	cd libsndfile
+	bzr get http://www.mega-nerd.com/Bzr/libsndfile-mdev/
 </PRE>
 <!-- pepper -->
 <P>
-to get a copy of whats currently in the public archive and configure it ready
-for building.
-Some later versions of aclocal (I see this with 1.9.4) may spew out a bunch
-of warning messages about underquoted defintions in AC_WHATEVER, but these
-can safely be ignored.
-</P>
-<P>
-In order to build the sources from the Arch archive, you will need the
-Python interpreter (available as part of Cygwin) and GNU Autogen which is 
-available
-	<A HREF="http://autogen.sf.net">here</A>.
-Autogen does work under Cygwin (requires libguile and guile-devel to be installed).
-I haven't tried it under MinGW.
-</P>
-<P>
-To build and check it:
+to retreive a copy of whats currently in the public archive.
+To configure, build and verify the build you can do:
 </P>
 <!-- pepper -->
 <PRE>
 	./reconfigure.mk
+	./configure
 	make
 	make check
 </PRE>
+<!-- pepper -->
+
+<P>
+During the configuration stage, some later versions of aclocal (I see this 
+with 1.9.X) may spew out a bunch of warning messages about underquoted 
+defintions in AC_WHATEVER, but these can safely be ignored.
+</P>
+<P>
+In order to build the sources from the Bzr archive, you will need the
+Python interpreter and GNU Autogen which is  available
+	<A HREF="http://autogen.sf.net">here</A>.
+</P>
 <!-- pepper -->
 </BODY>
 </HTML>

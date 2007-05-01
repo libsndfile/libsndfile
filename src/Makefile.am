@@ -17,11 +17,12 @@ EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 
 noinst_HEADERS = common.h sfconfig.h sfendian.h float_cast.h wav_w64.h sf_unistd.h
 
-noinst_PROGRAMS = test_endswap test_file_io test_conversions test_log_printf
+noinst_PROGRAMS = test_endswap test_file_io test_conversions test_log_printf \
+		test_audio_detect
 
 COMMON = common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
-		interleave.c strings.c dither.c broadcast.c
+		interleave.c strings.c dither.c broadcast.c audio_detect.c
 
 FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c \
 		macbinary3.c macos.c mat4.c mat5.c nist.c ogg.c paf.c pvf.c raw.c rx2.c sd2.c \
@@ -31,7 +32,8 @@ FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam
 libsndfile_la_LDFLAGS = -no-undefined -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@
 libsndfile_la_SOURCES = $(FILESPECIFIC) $(noinst_HEADERS)
 nodist_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
-libsndfile_la_LIBADD = libcommon.la FLAC/libFLAC.la GSM610/libgsm.la G72x/libg72x.la OGG/libogg.la -lm
+libsndfile_la_LIBADD = libcommon.la FLAC/src/libFLAC/libFLAC.la GSM610/libgsm.la \
+		G72x/libg72x.la OGG/libogg.la -lm
 
 libcommon_la_SOURCES = $(COMMON)
 
@@ -48,6 +50,10 @@ test_log_printf_LDADD = libcommon.la
 test_conversions_CFLAGS = $(AM_CFLAGS)
 test_conversions_SOURCES = test_conversions.c
 test_conversions_LDADD = libcommon.la
+
+test_audio_detect_CFLAGS = $(AM_CFLAGS)
+test_audio_detect_SOURCES = test_audio_detect.c
+test_audio_detect_LDADD = libcommon.la
 
 test_endswap.c: test_endswap.def test_endswap.tpl
 	autogen --writable test_endswap.def
@@ -68,6 +74,7 @@ check: test_endswap test_file_io test_conversions test_log_printf
 	./test_file_io
 	./test_conversions
 	./test_log_printf
+	./test_audio_detect
 	@echo "============================================================"
 	@echo
 	@echo
@@ -91,7 +98,7 @@ cygsndfile.def: create_symbols_file.py
 	./create_symbols_file.py cygwin $(VERSION) > cygsndfile.def
 
 # Fake dependancy to force the creation of these files.
-sndfile.c : Symbols.linux Symbols.darwin libsndfile.def cygsndfile.def
+sndfile.o : Symbols.linux Symbols.darwin libsndfile.def cygsndfile.def
 
 #======================================================================
 # Disable autoheader.

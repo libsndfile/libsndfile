@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2006,2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -51,7 +51,7 @@ conversion_test (char endian)
 {
 	SF_PRIVATE	sf_private, *psf ;
 	const char * filename = "conversion.bin" ;
-	long long i64 = SF_PLATFORM_S64 (0x0123456789abcdef), t64 = 0;
+	long long i64 = SF_PLATFORM_S64 (0x0123456789abcdef), t64 = 0 ;
 	char format_str [16] ;
 	char i8 = 12, t8 = 0 ;
 	short i16 = 0x123, t16 = 0 ;

@@ -67,7 +67,8 @@ static OUTPUT_FORMAT_MAP format_map [] =
 	{	"sds",		0, 	SF_FORMAT_SDS 	},
 	{	"sd2",		0, 	SF_FORMAT_SD2 	},
 	{	"vox",		0, 	SF_FORMAT_RAW 	},
-	{	"xi",		0, 	SF_FORMAT_XI 	}
+	{	"xi",		0, 	SF_FORMAT_XI 	},
+	{	"wve",		0,	SF_FORMAT_WVE	}
 } ; /* format_map */
 
 static int
@@ -109,7 +110,12 @@ print_usage (char *progname)
 
 	int k ;
 
-	printf ("\nUsage : %s [encoding] <input file> <output file>\n", progname) ;
+	printf ("\nUsage : %s [options] [encoding] <input file> <output file>\n", progname) ;
+	puts ("\n"
+		"    where [option] may be:\n\n"
+		"        -override-sample-rate=X  : force sample rate of input to X\n\n"
+		) ;
+
 	puts ("\n"
 		"    where [encoding] may be one of the following:\n\n"
 		"        -pcms8     : force the output to signed 8 bit pcm\n"
@@ -150,6 +156,7 @@ main (int argc, char * argv [])
 	SNDFILE	 	*infile = NULL, *outfile = NULL ;
 	SF_INFO	 	sfinfo ;
 	int			k, outfilemajor, outfileminor = 0, infileminor ;
+	int			override_sample_rate = 0 ; /* assume no sample rate override. */
 
 	progname = strrchr (argv [0], '/') ;
 	progname = progname ? progname + 1 : argv [0] ;
@@ -238,6 +245,14 @@ main (int argc, char * argv [])
 			continue ;
 			} ;
 
+		if (! strcmp (argv [k], "-override-sample-rate="))
+		{	char *ptr ;
+
+			ptr = argv [k] + strlen ("-override-sample-rate=") ;
+			override_sample_rate = atoi (ptr) ;
+			continue ;
+			} ;
+
 		printf ("Error : Not able to decode argunment '%s'.\n", argv [k]) ;
 		exit (1) ;
 		} ;
@@ -247,6 +262,10 @@ main (int argc, char * argv [])
 		puts (sf_strerror (NULL)) ;
 		return 1 ;
 		} ;
+
+	/* Update sample rate if forced to something else. */
+	if (override_sample_rate)
+		sfinfo.samplerate=override_sample_rate ;
 
 	infileminor = sfinfo.format & SF_FORMAT_SUBMASK ;
 

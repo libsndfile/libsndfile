@@ -29,8 +29,8 @@
 #include	"common.h"
 
 
-#include	"FLAC/FLAC/stream_decoder.h"
-#include	"FLAC/FLAC/stream_encoder.h"
+#include	"FLAC/include/FLAC/stream_decoder.h"
+#include	"FLAC/include/FLAC/stream_encoder.h"
 
 #include	"sfendian.h"
 #include	"float_cast.h"
@@ -422,7 +422,7 @@ static FLAC__StreamEncoderWriteStatus
 sf_flac_enc_write_callback (const FLAC__StreamEncoder * UNUSED (encoder), const FLAC__byte buffer [], size_t bytes, unsigned UNUSED (samples), unsigned UNUSED (current_frame), void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 
-	if (psf_fwrite (buffer, 1, bytes, psf) == bytes && psf->error == 0)
+	if (psf_fwrite (buffer, 1, bytes, psf) == (sf_count_t) bytes && psf->error == 0)
 		return FLAC__STREAM_ENCODER_WRITE_STATUS_OK ;
 
 	return FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR ;
@@ -441,7 +441,7 @@ flac_open	(SF_PRIVATE *psf)
 	psf->codec_data = pflac ;
 
 	if (psf->mode == SFM_RDWR)
-		return SFE_UNIMPLEMENTED ;
+		return SFE_BAD_RDWR_FORMAT ;
 
 	if (psf->mode == SFM_READ)
 	{	if ((error = flac_read_header (psf)))
@@ -455,6 +455,7 @@ flac_open	(SF_PRIVATE *psf)
 			return	SFE_BAD_OPEN_FORMAT ;
 
 		psf->endian = SF_ENDIAN_BIG ;
+		psf->sf.seekable = 0 ;
 
 		if ((error = flac_enc_init (psf)))
 			return error ;

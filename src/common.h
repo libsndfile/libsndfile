@@ -133,7 +133,6 @@ enum
 {	/* Work in progress. */
 
 	/* Formats supported read only. */
-	SF_FORMAT_WVE			= 0x4020000,		/* Psion ALaw Sound File */
 	SF_FORMAT_TXW			= 0x4030000,		/* Yamaha TX16 sampler file */
 	SF_FORMAT_DWD			= 0x4040000,		/* DiamondWare Digirized */
 
@@ -560,6 +559,9 @@ enum
 	SFE_FLAC_BAD_SAMPLE_RATE,
 	SFE_FLAC_UNKOWN_ERROR,
 
+	SFE_WVE_NOT_WVE,
+	SFE_WVE_NO_PIPE,
+
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
 
@@ -745,6 +747,14 @@ void	psf_get_date_str (char *str, int maxlen) ;
 SF_BROADCAST_INFO* broadcast_info_alloc (void) ;
 int		broadcast_info_copy (SF_BROADCAST_INFO* dst, SF_BROADCAST_INFO* src) ;
 int		broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, unsigned int samplerate) ;
+
+typedef struct
+{	int channels ;
+	int endianness ;
+} AUDIO_DETECT ;
+
+int audio_detect (SF_PRIVATE * psf, AUDIO_DETECT *ad, const unsigned char * data, int datalen) ;
+
 
 /*------------------------------------------------------------------------------------
 ** Here's how we fix systems which don't snprintf / vsnprintf.

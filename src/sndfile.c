@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -27,6 +27,25 @@
 #include	"common.h"
 
 #define		SNDFILE_MAGICK	0x1234C0DE
+
+#ifdef __APPLE__
+	/*
+	**	Detect if a compile for a universal binary is being attempted and barf if it is.
+	**	See the URL below for the rationale.
+	*/
+	#ifdef __BIG_ENDIAN__
+		#if (CPU_IS_LITTLE_ENDIAN == 1)
+			#error "Universal binary compile detected. See http://www.mega-nerd.com/libsndfile/FAQ.html#Q018"
+		#endif
+	#endif
+
+	#ifdef __LITTLE_ENDIAN__
+		#if (CPU_IS_BIG_ENDIAN == 1)
+			#error "Universal binary compile detected. See http://www.mega-nerd.com/libsndfile/FAQ.html#Q018"
+		#endif
+	#endif
+#endif
+
 
 typedef struct
 {	int 		error ;
@@ -67,7 +86,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_NO_EMBED_SUPPORT	, "Error : embedding not supported for this file format." },
 	{	SFE_NO_EMBEDDED_RDWR	, "Error : cannot open embedded file read/write." },
 	{	SFE_NO_PIPE_WRITE		, "Error : this file format does not support pipe write." },
-	{	SFE_BAD_RDWR_FORMAT		, "Attempted to open read only format for RDWR." },
+	{	SFE_BAD_RDWR_FORMAT		, "Error : File format cannot be opened for RDWR." },
 	{	SFE_BAD_VIRTUAL_IO		, "Error : bad pointer on SF_VIRTUAL_IO struct." },
 
 	{	SFE_INTERLEAVE_MODE		, "Attempt to write to file with non-interleaved data." },
@@ -223,6 +242,9 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_FLAC_BAD_SAMPLE_RATE, "Error : flac does not support this sample rate." },
 	{	SFE_FLAC_UNKOWN_ERROR	, "Error : unkown error in flac decoder." },
 
+	{	SFE_WVE_NOT_WVE			, "Error : not a WVE file." },
+	{	SFE_WVE_NO_PIPE			, "Error : not able to operate on WVE files over a pipe." },
+
 	{	SFE_DWVW_BAD_BITWIDTH	, "Error : Bad bit width for DWVW encoding. Must be 12, 16 or 24." },
 	{	SFE_G72X_NOT_MONO		, "Error : G72x encoding does not support more than 1 channel." },
 
@@ -280,7 +302,6 @@ static char	sf_syserr [SF_SYSERR_LEN] = { 0 } ;
 SNDFILE*
 sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 {	SF_PRIVATE 	*psf ;
-	int			error = 0 ;
 
 	if ((psf = calloc (1, sizeof (SF_PRIVATE))) == NULL)
 	{	sf_errno = SFE_MALLOC_FAILED ;
@@ -295,17 +316,9 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 	copy_filename (psf, path) ;
 
 	if (strcmp (path, "-") == 0)
-		error = psf_set_stdio (psf, mode) ;
+		psf_set_stdio (psf, mode) ;
 	else
-		error = psf_fopen (psf, path, mode) ;
-
-	if (error)
-	{	if (error == SFE_SYSTEM)
-			LSF_SNPRINTF (sf_syserr, sizeof (sf_syserr), "%s", psf->syserr) ;
-		LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
-		psf_close (psf) ;
-		return NULL ;
-		} ;
+		psf_fopen (psf, path, mode) ;
 
 	return psf_open_file (psf, mode, sfinfo) ;
 } /* sf_open */
@@ -454,7 +467,7 @@ sf_error (SNDFILE *sndfile)
 {	SF_PRIVATE	*psf ;
 
 	if (sndfile == NULL)
-	{	if (sf_error != 0)
+	{	if (sf_errno != 0)
 			return sf_errno ;
 		return 0 ;
 		} ;
@@ -757,6 +770,16 @@ sf_format_check	(const SF_INFO *info)
 					return 1 ;
 				break ;
 
+		case SF_FORMAT_WVE :
+				/* WVE is strictly big endian. */
+				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
+					return 0 ;
+				if (info->channels > 1)
+					return 0 ;
+				if (subformat == SF_FORMAT_ALAW)
+					return 1 ;
+				break ;
+
 		default : break ;
 		} ;
 
@@ -882,7 +905,8 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				}
 			else if (psf->peak_info == NULL)
 			{	psf->peak_info = peak_info_calloc (psf->sf.channels) ;
-				psf->peak_info->peak_loc = SF_PEAK_START ;
+				if (psf->peak_info != NULL)
+					psf->peak_info->peak_loc = SF_PEAK_START ;
 				} ;
 
 			if (psf->write_header)
@@ -891,7 +915,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_GET_LOG_INFO :
 			if (data == NULL)
-				return (psf->error = SFE_BAD_CONTROL_CMD) ;
+				return SFE_BAD_CONTROL_CMD ;
 			LSF_SNPRINTF (data, datasize, "%s", psf->logbuffer) ;
 			break ;
 
@@ -1039,8 +1063,8 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 					return SF_FALSE ;
 				} ;
 
-			/* Can only do this is in SFM_WRITE mode. */
-			if (psf->mode != SFM_WRITE)
+			/* Only makes sense in SFM_WRITE or SFM_RDWR mode. */
+			if ((psf->mode != SFM_WRITE) && (psf->mode != SFM_RDWR))
 				return SF_FALSE ;
 			/* If data has already been written this must fail. */
 			if (psf->have_written)
@@ -1210,6 +1234,23 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 
 /*------------------------------------------------------------------------------
 */
+
+int
+sf_get_info (SNDFILE * sndfile, SF_INFO * info)
+{	SF_PRIVATE 	*psf ;
+
+	if (info == NULL)
+		return SF_FALSE ;
+	if ((psf = (SF_PRIVATE*) sndfile) == NULL)
+		return SF_FALSE ;
+	if (psf->Magick != SNDFILE_MAGICK)
+		return SF_FALSE ;
+
+	/* Need to correct psf->sf.frames ???? */
+	memcpy (info, &psf->sf, sizeof (SF_INFO)) ;
+
+	return SF_TRUE ;
+} /* sf_get_info */
 
 const char*
 sf_get_string (SNDFILE *sndfile, int str_type)
@@ -2382,7 +2423,9 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	sf_logbuffer [0] = 0 ;
 
 	if (psf->error)
+	{	error = psf->error ;
 		goto error_exit ;
+		} ;
 
 	if (mode != SFM_READ && mode != SFM_WRITE && mode != SFM_RDWR)
 	{	error = SFE_BAD_OPEN_MODE ;

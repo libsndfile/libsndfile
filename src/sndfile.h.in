@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -73,6 +73,7 @@ enum
 	SF_FORMAT_SD2			= 0x160000,		/* Sound Designer 2 */
 	SF_FORMAT_FLAC			= 0x170000,		/* FLAC lossless file format */
 	SF_FORMAT_CAF			= 0x180000,		/* Core Audio File format */
+	SF_FORMAT_WVE			= 0x190000,		/* Psion WVE format */
 
 	/* Subtypes from here on. */
 
@@ -516,6 +517,12 @@ int		sf_format_check	(const SF_INFO *info) ;
 */
 
 sf_count_t	sf_seek 		(SNDFILE *sndfile, sf_count_t frames, int whence) ;
+
+/* Retrieve the SF_INFO struct for the given SNDFILE. Returns SF_FALSE on
+** failure, SF_TRUE otherwise.
+*/
+
+int sf_get_info (SNDFILE * sndfile, SF_INFO * info) ;
 
 /* Functions for retrieving and setting string data within sound files.
 ** Not all file types support this features; AIFF and WAV do. For both
