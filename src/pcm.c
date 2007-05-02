@@ -120,7 +120,9 @@ pcm_init (SF_PRIVATE *psf)
 {	int chars = 0 ;
 
 	if (psf->bytewidth == 0 || psf->sf.channels == 0)
+	{	psf_log_printf (psf, "pcm_init : internal error : bytewitdh = %d, channels = %d\n", psf->bytewidth, psf->sf.channels) ;
 		return SFE_INTERNAL ;
+		} ;
 
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
