@@ -587,7 +587,7 @@ void	double64_le_write	(double in, unsigned char *out) ;
 void	psf_log_printf		(SF_PRIVATE *psf, const char *format, ...) ;
 void	psf_log_SF_INFO 	(SF_PRIVATE *psf) ;
 
-void	psf_hexdump (void *ptr, int len) ;
+void	psf_hexdump (const void *ptr, int len) ;
 
 /* Functions used when writing file headers. */
 
