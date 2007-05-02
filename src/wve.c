@@ -96,25 +96,25 @@ wve_read_header (SF_PRIVATE *psf)
 	/* Set position to start of file to begin reading header. */
 	psf_binheader_readf (psf, "pm", 0, &marker) ;
 	if (marker != ALAW_MARKER)
-	{	psf_log_printf (psf, "Could not find '%m'\n", ALAW_MARKER) ;
+	{	psf_log_printf (psf, "Could not find '%M'\n", ALAW_MARKER) ;
 		return SFE_WVE_NOT_WVE ;
 		} ;
 
 	psf_binheader_readf (psf, "m", &marker) ;
 	if (marker != SOUN_MARKER)
-	{	psf_log_printf (psf, "Could not find '%m'\n", SOUN_MARKER) ;
+	{	psf_log_printf (psf, "Could not find '%M'\n", SOUN_MARKER) ;
 		return SFE_WVE_NOT_WVE ;
 		} ;
 
 	psf_binheader_readf (psf, "m", &marker) ;
 	if (marker != DFIL_MARKER)
-	{	psf_log_printf (psf, "Could not find '%m'\n", DFIL_MARKER) ;
+	{	psf_log_printf (psf, "Could not find '%M'\n", DFIL_MARKER) ;
 		return SFE_WVE_NOT_WVE ;
 		} ;
 
 	psf_binheader_readf (psf, "m", &marker) ;
 	if (marker != ESSN_MARKER)
-	{	psf_log_printf (psf, "Could not find '%m'\n", ESSN_MARKER) ;
+	{	psf_log_printf (psf, "Could not find '%M'\n", ESSN_MARKER) ;
 		return SFE_WVE_NOT_WVE ;
 		} ;
 
