@@ -1,3 +1,8 @@
+2007-05-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/new_file_type.HOWTO
+    Minor updates.
+
 2007-05-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wve.c
