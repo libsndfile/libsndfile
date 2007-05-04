@@ -48,6 +48,9 @@
 <A HREF="#Q019">Q19 : I have project files for Visual Studio / XCode / Whatever. Why
 	don't you distribute them with libsndfile?
 	</A><BR>
+<A HREF="#Q020">Q20 : Why doesn't libsndfile support MP3? Lots of other Open Source
+	projects support it!
+	</A><BR>
 <HR>
 
 <!-- ========================================================================= -->
@@ -666,6 +669,42 @@ Every single time that happened, they maintained it for a release or two and
 then disappeared off the face of the earth.
 Hence, I'm not willing to enter into an arrangement like that again.
 </P>
+
+<!-- ========================================================================= -->
+<A NAME="Q020"></A>
+<H2><BR><B>Q20 : Why doesn't libsndfile support MP3? Lots of other Open Source
+	projects support it!
+</B></H2>
+
+<P>
+MP3 is not supported for one very good reason; doing so requires the payment
+of licensing fees.
+As can be seen from
+	<a href="http://www.mp3licensing.com/royalty/software.html">
+	mp3licensing.com</a>
+the required royalty payments are not cheap.
+</P>
+
+<p>
+Yes, I know other libraries ignore the licensing requirements, but their legal
+status is extremely dubious.
+At any time, the body selling the licenses could go after the authors of those
+libraries.
+Some of those authors may be students and hence wouldn't be worth pursuing.
+</P>
+
+<p>
+However, libsndfile is released under the name of a company, Mega Nerd Pty Ltd;
+a company which has income from from libsamplerate licensing, libsndfile based 
+consulting income and other unrelated consulting income.
+Adding MP3 support to libsndfile could place that income would be under legal
+threat.
+</p>
+
+<p>
+Fortunately, Ogg Vorbis exists as an alternative to MP3.
+Support for Ogg Vorbis in libsndfile is currently been worked on.
+</p>
 
 <!-- ========================================================================= -->
 <HR>
