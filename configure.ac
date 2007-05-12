@@ -225,6 +225,8 @@ AC_DEFINE_UNQUOTED(CPU_IS_BIG_ENDIAN, ${ac_cv_c_big_endian},
 	[Target processor is big endian.])
 AC_DEFINE_UNQUOTED(CPU_IS_LITTLE_ENDIAN, ${ac_cv_c_little_endian},
 	[Target processor is little endian.])
+AC_DEFINE_UNQUOTED(WORDS_BIGENDIAN, ${ac_cv_c_big_endian},
+	[Target processor is big endian.])
 
 #====================================================================================
 # Check for functions.
