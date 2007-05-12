@@ -1094,6 +1094,10 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 			break ;
 
 		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists */
+			return SFE_UNIMPLEMENTED ;
+			wavex_write_guid (psf, &MSGUID_SUBTYPE_MS_ADPCM) ;
+			add_fact_chunk = SF_TRUE ;
+			break ;
 
 		default : return SFE_UNIMPLEMENTED ;
 		} ;
