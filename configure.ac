@@ -1,7 +1,7 @@
 # Copyright (C) 1999-2006 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
 
 dnl Require autoconf version
-AC_PREREQ(2.59)
+AC_PREREQ(2.57)
 
 AC_INIT([libsndfile],[1.0.18pre9],[erikd@mega-nerd.com])
 AC_CONFIG_SRCDIR([src/sndfile.c])
