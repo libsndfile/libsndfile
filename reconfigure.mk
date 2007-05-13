@@ -18,8 +18,8 @@ ifneq ($(shell uname -s), Darwin)
 else
   # Fuck Apple! Why the hell did they rename libtoolize????
   LIBTOOLIZE = glibtoolize
-  # Fink sucks as well, but this seems necessary.
-  ACLOCAL_INC = -I /sw/share/aclocal
+  # Fink (and DarwinPorts/MacPorts) sucks as well, but this seems necessary.
+  ACLOCAL_INC = -I /opt/local/share/aclocal
 endif
 
 genfiles : config.status
