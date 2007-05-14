@@ -1,0 +1,401 @@
+# MinGW specific Makefile for libsndfile.
+
+@SET_MAKE@
+
+PROGRAMS = sndfile-info.exe sndfile-play.exe sndfile-convert.exe
+TARGETS = libsndfile.dll $(PROGRAMS) sndfile.pc src/sndfile.h
+
+AR = @AR@
+CC = @CC@
+CFLAGS = @CFLAGS@ -Isrc
+COMPILER_IS_GCC = @COMPILER_IS_GCC@
+CPP = @CPP@
+CPPFLAGS = @CPPFLAGS@
+CXX = @CXX@
+DLLTOOL = @DLLTOOL@
+DLLWRAP = @DLLWRAP@
+INSTALL = @INSTALL@
+INSTALL_DATA = ${INSTALL} -m 644
+install_sh = @install_sh@
+LDFLAGS = @LDFLAGS@
+LN_S = @LN_S@
+OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
+OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
+PEXPORTS = @PEXPORTS@
+PACKAGE = @PACKAGE@
+PACKAGE_BUGREPORT = @PACKAGE_BUGREPORT@
+PACKAGE_NAME = @PACKAGE_NAME@
+PACKAGE_STRING = @PACKAGE_STRING@
+PACKAGE_TARNAME = @PACKAGE_TARNAME@
+PACKAGE_VERSION = @PACKAGE_VERSION@
+RANLIB = @RANLIB@
+STRIP = @STRIP@
+
+#====================================================================
+# Target directories.
+
+bindir = @bindir@
+exec_prefix = @exec_prefix@
+htmldocdir = @htmldocdir@
+includedir = @includedir@
+libdir = @libdir@
+pkgconfigdir = @libdir@/pkgconfig
+prefix = @prefix@
+
+#====================================================================
+# Targets
+
+all : $(TARGETS)
+
+clean :
+	rm -f  $(TARGETS) *.del *.lib src/*.o src/G72x/*.o \
+		src/GSM610/*.o tests/*.o tests/*.exe
+
+install : $(TARGETS)
+	$(install_sh) -c libsndfile.dll $(libdir)
+	$(install_sh) -c sndfile.pc $(pkgconfigdir)
+	@for prog in $(PROGRAMS); do \
+		echo "installing ... $$prog" ; \
+		$(install_sh) -c "$$prog" $(bindir) ; \
+		done;
+	$(install_sh) -c src/sndfile.h $(includedir)
+
+uninstall :
+	rm -f $(libdir)/libsndfile.dll
+	rm -f $(pkgconfigdir)/sndfile.pc
+	@for prog in $(PROGRAMS); do \
+		rm -f $(bindir)/"$$prog" ; \
+		done;
+	rm -f $(includedir)/sndfile.h
+
+#====================================================================
+
+LINK_OBJS = \
+	src/GSM610/add.o \
+	src/GSM610/code.o \
+	src/GSM610/decode.o \
+	src/GSM610/gsm_create.o \
+	src/GSM610/gsm_decode.o \
+	src/GSM610/gsm_destroy.o \
+	src/GSM610/gsm_encode.o \
+	src/GSM610/gsm_option.o \
+	src/GSM610/long_term.o \
+	src/GSM610/lpc.o \
+	src/GSM610/preprocess.o \
+	src/GSM610/rpe.o \
+	src/GSM610/short_term.o \
+	src/GSM610/table.o \
+	src/G72x/g721.o \
+	src/G72x/g723_16.o \
+	src/G72x/g723_24.o \
+	src/G72x/g723_40.o \
+	src/G72x/g72x.o \
+	src/aiff.o \
+	src/alaw.o \
+	src/au.o \
+	src/au_g72x.o \
+	src/avr.o \
+	src/common.o \
+	src/double64.o \
+	src/dwvw.o \
+	src/file_io.o \
+	src/dither.o \
+	src/float32.o \
+	src/command.o \
+	src/strings.o \
+	src/ima_adpcm.o \
+	src/ms_adpcm.o \
+	src/nist.o \
+	src/ircam.o \
+	src/paf.o \
+	src/pcm.o \
+	src/raw.o \
+	src/rx2.o \
+	src/sd2.o \
+	src/sndfile.o \
+	src/svx.o \
+	src/txw.o \
+	src/sds.o \
+	src/ulaw.o \
+	src/voc.o \
+	src/w64.o \
+	src/wav.o \
+	src/gsm610.o \
+	src/wav_w64.o \
+	src/dwd.o \
+	src/wve.o \
+	src/mat4.o \
+	src/mat5.o \
+	src/vox_adpcm.o \
+	src/ogg.o \
+	src/pvf.o \
+	src/xi.o \
+	src/htk.o
+
+libsndfile.dll libsndfile.lib : $(LINK_OBJS)
+	$(DLLWRAP) --def src/libsndfile.def $(LINK_OBJS) --output-lib libsndfile.lib -o libsndfile.dll
+	$(STRIP) libsndfile.dll
+
+sndfile-info.exe : examples/sndfile-info.o libsndfile.lib
+	$(CC) $+ -o $@
+
+sndfile-convert.exe : examples/sndfile-convert.o libsndfile.lib
+	$(CC) $+ -o $@
+
+sndfile-play.exe : examples/sndfile-play.o libsndfile.lib
+	$(CC) $+ -lwinmm -o $@
+
+generate.exe : examples/generate.o libsndfile.lib
+	$(CC) $+ -o $@
+
+sndfile.pc : sndfile.pc.in config.status
+	@./config.status $@
+
+config.status :
+	./configure
+
+#====================================================================
+# Testing programs.
+
+TEST_PROGS = \
+	src/test_file_io.exe \
+	src/test_log_printf.exe \
+	tests/sfversion.exe \
+	tests/error_test.exe \
+	tests/pcm_test.exe \
+	tests/ulaw_test.exe \
+	tests/alaw_test.exe \
+	tests/dwvw_test.exe \
+	tests/command_test.exe \
+	tests/floating_point_test.exe \
+	tests/headerless_test.exe \
+	tests/write_read_test.exe \
+	tests/lossy_comp_test.exe \
+	tests/peak_chunk_test.exe \
+	tests/misc_test.exe \
+	tests/string_test.exe \
+	tests/win32_test.exe \
+	tests/stdio_test.exe \
+	tests/stdin_test.exe \
+	tests/stdout_test.exe \
+	tests/pipe_test.exe \
+	tests/benchmark.exe
+
+check : $(TEST_PROGS)
+	@echo
+	@echo
+	@echo
+	@echo "============================================================"
+	src/test_file_io.exe
+	src/test_log_printf.exe
+	@echo "============================================================"
+	@echo
+	@echo
+	@echo
+	tests/error_test.exe
+	tests/pcm_test.exe
+	tests/ulaw_test.exe
+	tests/alaw_test.exe
+	tests/dwvw_test.exe
+	tests/command_test.exe ver
+	tests/command_test.exe norm
+	tests/command_test.exe format
+	tests/floating_point_test.exe
+	tests/headerless_test.exe
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo "passed common tests"
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test wav
+	tests/lossy_comp_test wav_ima
+	tests/lossy_comp_test wav_msadpcm
+	tests/lossy_comp_test wav_ulaw
+	tests/lossy_comp_test wav_alaw
+	tests/lossy_comp_test wav_gsm610
+	tests/peak_chunk_test wav
+	tests/misc_test wav
+	tests/string_test wav
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo "passed tests on WAV files."
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test aiff
+	tests/lossy_comp_test aiff_ulaw
+	tests/lossy_comp_test aiff_alaw
+	tests/peak_chunk_test aiff
+	tests/misc_test aiff
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed tests on AIFF files."
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test au
+	tests/lossy_comp_test au_ulaw
+	tests/lossy_comp_test au_alaw
+	tests/lossy_comp_test au_g721
+	tests/lossy_comp_test au_g723
+	tests/misc_test au
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed tests on AU files."
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test raw
+	tests/lossy_comp_test raw_ulaw
+	tests/lossy_comp_test raw_alaw
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed tests on RAW (header-less) files."
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test paf
+	tests/misc_test paf
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed tests on PAF files."
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test svx
+	tests/misc_test svx
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed tests on SVX files."
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test nist
+	tests/misc_test nist
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed tests on NIST files."
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test ircam
+	tests/lossy_comp_test ircam_ulaw
+	tests/lossy_comp_test ircam_alaw
+	tests/misc_test ircam
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed tests on IRCAM files."
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test voc
+	tests/lossy_comp_test voc_ulaw
+	tests/lossy_comp_test voc_alaw
+	tests/misc_test voc
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed tests on VOC files."
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test w64
+	tests/lossy_comp_test w64_ima
+	tests/lossy_comp_test w64_msadpcm
+	tests/lossy_comp_test w64_ulaw
+	tests/lossy_comp_test w64_alaw
+	tests/lossy_comp_test w64_gsm610
+	tests/misc_test w64
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed tests on W64 files."
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test mat4
+	tests/misc_test mat4
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed tests on MAT4 files."
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test mat5
+	tests/misc_test mat5
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed tests on MAT5 files."
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test htk
+	tests/misc_test htk
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed tests on HTK files."
+	@echo "----------------------------------------------------------------------"
+	tests/write_read_test avr
+	tests/misc_test avr
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed tests on AVR files."
+	@echo "----------------------------------------------------------------------"
+	@tests/stdio_test.exe
+	@tests/pipe_test.exe
+	@echo "----------------------------------------------------------------------"
+	@tests/sfversion.exe
+	@echo " passed all tests."
+	@echo "----------------------------------------------------------------------"
+
+#====================================================================
+# Test programs.
+
+src/test_file_io.exe : src/file_io.o src/test_file_io.o libsndfile.lib
+	$(CC) $+ -o $@
+
+# Special case : test_log_printf.c #includes common.c
+src/test_log_printf.exe : src/test_log_printf.c src/common.c libsndfile.lib
+	$(CC) $(CFLAGS) -c src/test_log_printf.c -o src/test_log_printf.o
+	$(CC) src/test_log_printf.o libsndfile.lib -o $@
+
+tests/sfversion.exe : tests/sfversion.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/error_test.exe : tests/error_test.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/pcm_test.exe : tests/pcm_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/ulaw_test.exe : tests/ulaw_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/alaw_test.exe : tests/alaw_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/dwvw_test.exe : tests/dwvw_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/command_test.exe : tests/command_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/floating_point_test.exe : tests/floating_point_test.o tests/utils.o tests/dft_cmp.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/headerless_test.exe : tests/headerless_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/write_read_test.exe : tests/write_read_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/lossy_comp_test.exe : tests/lossy_comp_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/peak_chunk_test.exe : tests/peak_chunk_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/misc_test.exe : tests/misc_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/string_test.exe : tests/string_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/win32_test.exe : tests/win32_test.o
+	$(CC) $+ -o $@
+
+tests/stdio_test.exe : tests/stdio_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/pipe_test.exe : tests/pipe_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/stdin_test.exe : tests/stdin_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/stdout_test.exe : tests/stdout_test.o tests/utils.o libsndfile.lib
+	$(CC) $+ -o $@
+
+tests/benchmark.exe : tests/benchmark.o libsndfile.lib
+	$(CC) $+ -o $@
+
+# End of Makefile
+#====================================================================
+# Do not edit or modify anything in this comment block.
+# The arch-tag line is a file identity tag for the GNU Arch
+# revision control system.
+#
+# arch-tag: a588878f-6796-4a47-bbef-83a3aaac0983

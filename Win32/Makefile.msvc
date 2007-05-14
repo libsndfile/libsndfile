@@ -1,0 +1,577 @@
+
+# Set the value of $(MSVCDir) for your installation. 
+# Please note that none of the directory names are allowed to have spaces 
+# in them. You must use the short name.
+#
+# "C:\Program Files\Microsoft Visual Studio\VC98" will not work.
+# "C:\Progra~1\Micros~1\VC98" will work.
+
+MSVCDir="C:\Progra~1\Micros~1\VC98"
+
+CPP=cl.exe
+LINK32=link.exe
+DLL_LINK_FLAGS=/nologo /dll /incremental:no /libpath:"$(MSVCDir)\Lib" /pdb:"libsndfile.pdb" /implib:".\libsndfile.lib" /machine:I386 /out:"libsndfile.dll"
+PROG_LINK_FLAGS=/nologo /incremental:no /libpath:"$(MSVCDir)\Lib" /pdb:"libsndfile.pdb" /machine:I386 /exetype:dynamic
+
+CFLAGS=/nologo /MD /W1 /GX /O2 /I "$(MSVCDir)\Include" /I "src" /D "WIN32" /D "_USRDLL" /D "inline=__inline" /YX /FD
+
+#====================================================================
+# Targets
+
+ALL : libsndfile.dll \
+	"sndfile-info.exe" \
+	"sndfile-convert.exe" \
+	"sndfile-play.exe" \
+	"generate.exe"
+
+CLEAN :
+    -@erase "src\*.obj"
+    -@erase "src\G72x\*.obj"
+    -@erase "src\GSM610\*.obj"
+    -@erase "tests\*.obj"
+    -@erase "tests\*.exe"
+
+#====================================================================
+
+LINK32_OBJS= \
+	".\src\GSM610\add.obj" \
+	".\src\GSM610\code.obj" \
+	".\src\GSM610\decode.obj" \
+	".\src\GSM610\gsm_create.obj" \
+	".\src\GSM610\gsm_decode.obj" \
+	".\src\GSM610\gsm_destroy.obj" \
+	".\src\GSM610\gsm_encode.obj" \
+	".\src\GSM610\gsm_option.obj" \
+	".\src\GSM610\long_term.obj" \
+	".\src\GSM610\lpc.obj" \
+	".\src\GSM610\preprocess.obj" \
+	".\src\GSM610\rpe.obj" \
+	".\src\GSM610\short_term.obj" \
+	".\src\GSM610\table.obj" \
+	".\src\G72x\g721.obj" \
+	".\src\G72x\g723_16.obj" \
+	".\src\G72x\g723_24.obj" \
+	".\src\G72x\g723_40.obj" \
+	".\src\G72x\g72x.obj" \
+	".\src\aiff.obj" \
+	".\src\alaw.obj" \
+	".\src\au.obj" \
+	".\src\g72x.obj" \
+	".\src\avr.obj" \
+	".\src\common.obj" \
+	".\src\double64.obj" \
+	".\src\dwvw.obj" \
+	".\src\file_io.obj" \
+	".\src\dither.obj" \
+	".\src\float32.obj" \
+	".\src\command.obj" \
+	".\src\strings.obj" \
+	".\src\ima_adpcm.obj" \
+	".\src\ms_adpcm.obj" \
+	".\src\nist.obj" \
+	".\src\ircam.obj" \
+	".\src\paf.obj" \
+	".\src\pcm.obj" \
+	".\src\raw.obj" \
+	".\src\rx2.obj" \
+	".\src\sd2.obj" \
+	".\src\sndfile.obj" \
+	".\src\svx.obj" \
+	".\src\txw.obj" \
+	".\src\sds.obj" \
+	".\src\ulaw.obj" \
+	".\src\voc.obj" \
+	".\src\w64.obj" \
+	".\src\wav.obj" \
+	".\src\gsm610.obj" \
+	".\src\wav_w64.obj" \
+	".\src\dwd.obj" \
+	".\src\wve.obj" \
+	".\src\mat4.obj" \
+	".\src\mat5.obj" \
+	".\src\vox_adpcm.obj" \
+	".\src\ogg.obj" \
+	".\src\pvf.obj" \
+	".\src\xi.obj" \
+	".\src\htk.obj" \
+	".\src\flac.obj" \
+	".\src\caf.obj"
+
+libsndfile.dll : $(LINK32_OBJS) ".\src\libsndfile.def"
+    $(LINK32) $(DLL_LINK_FLAGS) /def:".\src\libsndfile.def" $(LINK32_OBJS)
+
+"sndfile-info.exe" : ".\examples\sndfile-info.c"
+    $(CPP) $(CFLAGS) /Fo".\examples\sndfile-info.obj" /c ".\examples\sndfile-info.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:"sndfile-info.exe" ".\examples\sndfile-info.obj" libsndfile.lib
+
+"sndfile-convert.exe" : ".\examples\sndfile-convert.c"
+    $(CPP) $(CFLAGS) /Fo".\examples\sndfile-convert.obj" /c ".\examples\sndfile-convert.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:"sndfile-convert.exe" ".\examples\sndfile-convert.obj" libsndfile.lib
+
+"sndfile-play.exe" : ".\examples\sndfile-play.c"
+    $(CPP) $(CFLAGS) /Fo".\examples\sndfile-play.obj" /c ".\examples\sndfile-play.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:"sndfile-play.exe" ".\examples\sndfile-play.obj" libsndfile.lib winmm.lib
+
+"generate.exe" : ".\examples\generate.c"
+    $(CPP) $(CFLAGS) /Fo".\examples\generate.obj" /c ".\examples\generate.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:"generate.exe" ".\examples\generate.obj" libsndfile.lib
+
+TEST_PROGS= \
+     ".\src\test_file_io.exe" \
+     ".\tests\sfversion.exe" \
+     ".\tests\error_test.exe" \
+     ".\tests\pcm_test.exe" \
+     ".\tests\ulaw_test.exe" \
+     ".\tests\alaw_test.exe" \
+     ".\tests\dwvw_test.exe" \
+     ".\tests\command_test.exe" \
+     ".\tests\floating_point_test.exe" \
+     ".\tests\headerless_test.exe" \
+     ".\tests\write_read_test.exe" \
+     ".\tests\lossy_comp_test.exe" \
+     ".\tests\peak_chunk_test.exe" \
+     ".\tests\misc_test.exe" \
+     ".\tests\string_test.exe" \
+     ".\tests\win32_test.exe" \
+     ".\tests\stdio_test.exe" \
+     ".\tests\pipe_test.exe" \
+     ".\tests\benchmark.exe"
+
+CHECK: $(TEST_PROGS)
+    ".\src\test_file_io.exe"
+    ".\tests\error_test.exe"
+    ".\tests\pcm_test.exe"
+    ".\tests\ulaw_test.exe"
+    ".\tests\alaw_test.exe"
+    ".\tests\dwvw_test.exe"
+    ".\tests\command_test.exe" ver
+    ".\tests\command_test.exe" norm
+    ".\tests\command_test.exe" format
+    ".\tests\floating_point_test.exe"
+    ".\tests\headerless_test.exe"
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo passed common tests
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" wav
+    ".\tests\lossy_comp_test" wav_ima
+    ".\tests\lossy_comp_test" wav_msadpcm
+    ".\tests\lossy_comp_test" wav_ulaw
+    ".\tests\lossy_comp_test" wav_alaw
+    ".\tests\lossy_comp_test" wav_gsm610
+    ".\tests\peak_chunk_test" wav
+    ".\tests\misc_test" wav
+    ".\tests\string_test" wav
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo "passed tests on WAV files.
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" aiff
+    ".\tests\lossy_comp_test" aiff_ulaw
+    ".\tests\lossy_comp_test" aiff_alaw
+    ".\tests\peak_chunk_test" aiff
+    ".\tests\misc_test" aiff
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed tests on AIFF files."
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" au
+    ".\tests\lossy_comp_test" au_ulaw
+    ".\tests\lossy_comp_test" au_alaw
+    ".\tests\lossy_comp_test" au_g721
+    ".\tests\lossy_comp_test" au_g723
+    ".\tests\misc_test" au
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed tests on AU files."
+    -@echo ----------------------------------------------------------------------
+	".\tests\write_read_test" caf
+	".\tests\lossy_comp_test" caf_ulaw
+	".\tests\lossy_comp_test" caf_alaw
+	".\tests\misc_test" caf
+    -@echo ----------------------------------------------------------------------
+    -@echo   `./sfversion` passed tests on CAF files."
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" raw
+    ".\tests\lossy_comp_test" raw_ulaw
+    ".\tests\lossy_comp_test" raw_alaw
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed tests on RAW (header-less) files."
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" paf
+    ".\tests\misc_test" paf
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed tests on PAF files."
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" svx
+    ".\tests\misc_test" svx
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed tests on SVX files."
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" nist
+    ".\tests\misc_test" nist
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed tests on NIST files."
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" ircam
+    ".\tests\lossy_comp_test" ircam_ulaw
+    ".\tests\lossy_comp_test" ircam_alaw
+    ".\tests\misc_test" ircam
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed tests on IRCAM files."
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" voc
+    ".\tests\lossy_comp_test" voc_ulaw
+    ".\tests\lossy_comp_test" voc_alaw
+    ".\tests\misc_test" voc
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed tests on VOC files."
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" w64
+    ".\tests\lossy_comp_test" w64_ima
+    ".\tests\lossy_comp_test" w64_msadpcm
+    ".\tests\lossy_comp_test" w64_ulaw
+    ".\tests\lossy_comp_test" w64_alaw
+    ".\tests\lossy_comp_test" w64_gsm610
+    ".\tests\misc_test" w64
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed tests on W64 files."
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" mat4
+    ".\tests\misc_test" mat4
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed tests on MAT4 files."
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" mat5
+    ".\tests\misc_test" mat5
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed tests on MAT5 files."
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" htk
+    ".\tests\misc_test" htk
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed tests on HTK files."
+    -@echo ----------------------------------------------------------------------
+    ".\tests\write_read_test" avr
+    ".\tests\misc_test" avr
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed tests on AVR files."
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\stdio_test.exe"
+    -@".\tests\pipe_test.exe"
+    -@echo ----------------------------------------------------------------------
+    -@".\tests\sfversion.exe"
+    -@echo " passed all tests."
+    -@echo ----------------------------------------------------------------------
+
+#====================================================================
+# C files in src\GSM610.
+
+".\src\GSM610\add.obj" : ".\src\Gsm610\add.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\add.obj" /c ".\src\Gsm610\add.c"
+
+".\src\GSM610\code.obj" : ".\src\Gsm610\code.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\code.obj" /c ".\src\Gsm610\code.c"
+
+".\src\GSM610\decode.obj" : ".\src\Gsm610\decode.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\decode.obj" /c ".\src\Gsm610\decode.c"
+
+".\src\GSM610\gsm_create.obj" : ".\src\Gsm610\gsm_create.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\gsm_create.obj" /c ".\src\Gsm610\gsm_create.c"
+
+".\src\GSM610\gsm_decode.obj" : ".\src\Gsm610\gsm_decode.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\gsm_decode.obj" /c ".\src\Gsm610\gsm_decode.c"
+
+".\src\GSM610\gsm_destroy.obj" : ".\src\Gsm610\gsm_destroy.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\gsm_destroy.obj" /c ".\src\Gsm610\gsm_destroy.c"
+
+".\src\GSM610\gsm_encode.obj" : ".\src\Gsm610\gsm_encode.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\gsm_encode.obj" /c ".\src\Gsm610\gsm_encode.c"
+
+".\src\GSM610\gsm_option.obj" : ".\src\Gsm610\gsm_option.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\gsm_option.obj" /c ".\src\Gsm610\gsm_option.c"
+
+".\src\GSM610\long_term.obj" : ".\src\Gsm610\long_term.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\long_term.obj" /c ".\src\Gsm610\long_term.c"
+
+".\src\GSM610\lpc.obj" : ".\src\Gsm610\lpc.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\lpc.obj" /c ".\src\Gsm610\lpc.c"
+
+".\src\GSM610\preprocess.obj" : ".\src\Gsm610\preprocess.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\preprocess.obj" /c ".\src\Gsm610\preprocess.c"
+
+".\src\GSM610\rpe.obj" : ".\src\Gsm610\rpe.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\rpe.obj" /c ".\src\Gsm610\rpe.c"
+
+".\src\GSM610\short_term.obj" : ".\src\Gsm610\short_term.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\short_term.obj" /c ".\src\Gsm610\short_term.c"
+
+".\src\GSM610\table.obj" : ".\src\Gsm610\table.c"
+    $(CPP) $(CFLAGS) /Fo".\src\Gsm610\table.obj" /c ".\src\Gsm610\table.c"
+
+#====================================================================
+# C files in src\G72x.
+
+".\src\G72x\g721.obj" : ".\src\G72x\g721.c"
+    $(CPP) $(CFLAGS) /Fo".\src\G72x\g721.obj" /c ".\src\G72x\g721.c"
+
+".\src\G72x\g723_16.obj" : ".\src\G72x\g723_16.c"
+    $(CPP) $(CFLAGS) /Fo".\src\G72x\g723_16.obj" /c ".\src\G72x\g723_16.c"
+
+".\src\G72x\g723_24.obj" : ".\src\G72x\g723_24.c"
+    $(CPP) $(CFLAGS) /Fo".\src\G72x\g723_24.obj" /c ".\src\G72x\g723_24.c"
+
+".\src\G72x\g723_40.obj" : ".\src\G72x\g723_40.c"
+    $(CPP) $(CFLAGS) /Fo".\src\G72x\g723_40.obj" /c ".\src\G72x\g723_40.c"
+
+".\src\G72x\g72x.obj" : ".\src\G72x\g72x.c"
+    $(CPP) $(CFLAGS) /Fo".\src\G72x\g72x.obj" /c ".\src\G72x\g72x.c"
+
+#====================================================================
+# C files in src.
+
+".\src\aiff.obj" : ".\src\aiff.c"
+    $(CPP) $(CFLAGS) /Fo".\src\aiff.obj" /c ".\src\aiff.c"
+
+".\src\alaw.obj" : ".\src\alaw.c"
+    $(CPP) $(CFLAGS) /Fo".\src\alaw.obj" /c ".\src\alaw.c"
+
+".\src\au.obj" : ".\src\au.c"
+    $(CPP) $(CFLAGS) /Fo".\src\au.obj" /c ".\src\au.c"
+
+".\src\g72x.obj" : ".\src\g72x.c"
+    $(CPP) $(CFLAGS) /Fo".\src\g72x.obj" /c ".\src\g72x.c"
+
+".\src\avr.obj" : ".\src\avr.c"
+    $(CPP) $(CFLAGS) /Fo".\src\avr.obj" /c ".\src\avr.c"
+
+".\src\common.obj" : ".\src\common.c"
+    $(CPP) $(CFLAGS) /Fo".\src\common.obj" /c ".\src\common.c"
+
+".\src\double64.obj" : ".\src\double64.c"
+    $(CPP) $(CFLAGS) /Fo".\src\double64.obj" /c ".\src\double64.c"
+
+".\src\dwvw.obj" : ".\src\dwvw.c"
+    $(CPP) $(CFLAGS) /Fo".\src\dwvw.obj" /c ".\src\dwvw.c"
+
+".\src\file_io.obj" : ".\src\file_io.c"
+    $(CPP) $(CFLAGS) /Fo".\src\file_io.obj" /c ".\src\file_io.c"
+
+".\src\dither.obj" : ".\src\dither.c"
+    $(CPP) $(CFLAGS) /Fo".\src\dither.obj" /c ".\src\dither.c"
+
+".\src\float32.obj" : ".\src\float32.c"
+    $(CPP) $(CFLAGS) /Fo".\src\float32.obj" /c ".\src\float32.c"
+
+".\src\command.obj" : ".\src\command.c"
+    $(CPP) $(CFLAGS) /Fo".\src\command.obj" /c ".\src\command.c"
+
+".\src\strings.obj" : ".\src\strings.c"
+    $(CPP) $(CFLAGS) /Fo".\src\strings.obj" /c ".\src\strings.c"
+
+".\src\ima_adpcm.obj" : ".\src\ima_adpcm.c"
+    $(CPP) $(CFLAGS) /Fo".\src\ima_adpcm.obj" /c ".\src\ima_adpcm.c"
+
+".\src\ircam.obj" : ".\src\ircam.c"
+    $(CPP) $(CFLAGS) /Fo".\src\ircam.obj" /c ".\src\ircam.c"
+
+".\src\ms_adpcm.obj" : ".\src\ms_adpcm.c"
+    $(CPP) $(CFLAGS) /Fo".\src\ms_adpcm.obj" /c ".\src\ms_adpcm.c"
+
+".\src\nist.obj" : ".\src\nist.c"
+    $(CPP) $(CFLAGS) /Fo".\src\nist.obj" /c ".\src\nist.c"
+
+".\src\paf.obj" : ".\src\paf.c"
+    $(CPP) $(CFLAGS) /Fo".\src\paf.obj" /c ".\src\paf.c"
+
+".\src\pcm.obj" : ".\src\pcm.c"
+    $(CPP) $(CFLAGS) /Fo".\src\pcm.obj" /c ".\src\pcm.c"
+
+".\src\raw.obj" : ".\src\raw.c"
+    $(CPP) $(CFLAGS) /Fo".\src\raw.obj" /c ".\src\raw.c"
+
+".\src\rx2.obj" : ".\src\rx2.c"
+    $(CPP) $(CFLAGS) /Fo".\src\rx2.obj" /c ".\src\rx2.c"
+
+".\src\sd2.obj" : ".\src\sd2.c"
+    $(CPP) $(CFLAGS) /Fo".\src\sd2.obj" /c ".\src\sd2.c"
+
+".\src\sndfile.obj" : ".\src\sndfile.c"
+    $(CPP) $(CFLAGS) /Fo".\src\sndfile.obj" /c ".\src\sndfile.c"
+
+".\src\svx.obj" : ".\src\svx.c"
+    $(CPP) $(CFLAGS) /Fo".\src\svx.obj" /c ".\src\svx.c"
+
+".\src\txw.obj" : ".\src\txw.c"
+    $(CPP) $(CFLAGS) /Fo".\src\txw.obj" /c ".\src\txw.c"
+
+".\src\sds.obj" : ".\src\sds.c"
+    $(CPP) $(CFLAGS) /Fo".\src\sds.obj" /c ".\src\sds.c"
+
+".\src\ulaw.obj" : ".\src\ulaw.c"
+    $(CPP) $(CFLAGS) /Fo".\src\ulaw.obj" /c ".\src\ulaw.c"
+
+".\src\voc.obj" : ".\src\voc.c"
+    $(CPP) $(CFLAGS) /Fo".\src\voc.obj" /c ".\src\voc.c"
+
+".\src\w64.obj" : ".\src\w64.c"
+    $(CPP) $(CFLAGS) /Fo".\src\w64.obj" /c ".\src\w64.c"
+
+".\src\wav.obj" : ".\src\wav.c"
+    $(CPP) $(CFLAGS) /Fo".\src\wav.obj" /c ".\src\wav.c"
+
+".\src\gsm610.obj" : ".\src\gsm610.c"
+    $(CPP) $(CFLAGS) /Fo".\src\gsm610.obj" /c ".\src\gsm610.c"
+
+".\src\wav_w64.obj" : ".\src\wav_w64.c"
+    $(CPP) $(CFLAGS) /Fo".\src\wav_w64.obj" /c ".\src\wav_w64.c"
+
+".\src\dwd.obj" : ".\src\dwd.c"
+    $(CPP) $(CFLAGS) /Fo".\src\dwd.obj" /c ".\src\dwd.c"
+
+".\src\wve.obj" : ".\src\wve.c"
+    $(CPP) $(CFLAGS) /Fo".\src\wve.obj" /c ".\src\wve.c"
+
+".\src\mat4.obj" : ".\src\mat4.c"
+    $(CPP) $(CFLAGS) /Fo".\src\mat4.obj" /c ".\src\mat4.c"
+
+".\src\mat5.obj" : ".\src\mat5.c"
+    $(CPP) $(CFLAGS) /Fo".\src\mat5.obj" /c ".\src\mat5.c"
+
+".\src\vox_adpcm.obj" : ".\src\vox_adpcm.c"
+    $(CPP) $(CFLAGS) /Fo".\src\vox_adpcm.obj" /c ".\src\vox_adpcm.c"
+
+".\src\ogg.obj" : ".\src\ogg.c"
+    $(CPP) $(CFLAGS) /Fo".\src\ogg.obj" /c ".\src\ogg.c"
+
+".\src\pvf.obj" : ".\src\pvf.c"
+    $(CPP) $(CFLAGS) /Fo".\src\pvf.obj" /c ".\src\pvf.c"
+
+".\src\xi.obj" : ".\src\xi.c"
+    $(CPP) $(CFLAGS) /Fo".\src\xi.obj" /c ".\src\xi.c"
+
+".\src\htk.obj" : ".\src\htk.c"
+    $(CPP) $(CFLAGS) /Fo".\src\htk.obj" /c ".\src\htk.c"
+
+".\src\flac.obj" : ".\src\flac.c"
+    $(CPP) $(CFLAGS) /Fo".\src\flac.obj" /c ".\src\flac.c"
+
+".\src\caf.obj" : ".\src\caf.c"
+    $(CPP) $(CFLAGS) /Fo".\src\caf.obj" /c ".\src\caf.c"
+
+#====================================================================
+# Object files for test programs.
+
+".\tests\utils.obj" : ".\tests\utils.c"
+    $(CPP) $(CFLAGS) /Fo".\tests\utils.obj" /c ".\tests\utils.c"
+
+".\tests\dft_cmp.obj" : ".\tests\dft_cmp.c"
+    $(CPP) $(CFLAGS) /Fo".\tests\dft_cmp.obj" /c ".\tests\dft_cmp.c"
+
+#====================================================================
+# Test programs.
+
+".\src\test_file_io.exe" : ".\src\file_io.obj" ".\src\test_file_io.c"
+    $(CPP) $(CFLAGS) /Fo".\src\test_file_io.obj" /c ".\src\test_file_io.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\src\test_file_io.exe" ".\src\test_file_io.obj" ".\src\file_io.obj"
+
+".\tests\sfversion.exe" : ".\tests\sfversion.c"
+    $(CPP) $(CFLAGS) /Fo".\tests\sfversion.obj" /c ".\tests\sfversion.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\sfversion.exe" ".\tests\sfversion.obj" libsndfile.lib
+
+".\tests\error_test.exe" : ".\tests\error_test.c"
+    $(CPP) $(CFLAGS) /Fo".\tests\error_test.obj" /c ".\tests\error_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\error_test.exe" ".\tests\error_test.obj" libsndfile.lib
+
+".\tests\pcm_test.exe" : ".\tests\pcm_test.c" ".\tests\utils.obj" "libsndfile.dll"
+    $(CPP) $(CFLAGS) /Fo".\tests\pcm_test.obj" /c ".\tests\pcm_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\pcm_test.exe" ".\tests\pcm_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\ulaw_test.exe" : ".\tests\ulaw_test.c" ".\tests\utils.obj" "libsndfile.dll"
+    $(CPP) $(CFLAGS) /Fo".\tests\ulaw_test.obj" /c ".\tests\ulaw_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\ulaw_test.exe" ".\tests\ulaw_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\alaw_test.exe" : ".\tests\alaw_test.c" ".\tests\utils.obj" "libsndfile.dll"
+    $(CPP) $(CFLAGS) /Fo".\tests\alaw_test.obj" /c ".\tests\alaw_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\alaw_test.exe" ".\tests\alaw_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\dwvw_test.exe" : ".\tests\dwvw_test.c" ".\tests\utils.obj"
+    $(CPP) $(CFLAGS) /Fo".\tests\dwvw_test.obj" /c ".\tests\dwvw_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\dwvw_test.exe" ".\tests\dwvw_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\command_test.exe" : ".\tests\command_test.c" ".\tests\utils.obj"
+    $(CPP) $(CFLAGS) /Fo".\tests\command_test.obj" /c ".\tests\command_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\command_test.exe" ".\tests\command_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\floating_point_test.exe" : ".\tests\floating_point_test.c" ".\tests\utils.obj" ".\tests\dft_cmp.obj"
+    $(CPP) $(CFLAGS) /Fo".\tests\floating_point_test.obj" /c ".\tests\floating_point_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\floating_point_test.exe" ".\tests\floating_point_test.obj" ".\tests\utils.obj" ".\tests\dft_cmp.obj" libsndfile.lib
+
+".\tests\headerless_test.exe" : ".\tests\headerless_test.c" ".\tests\utils.obj"
+    $(CPP) $(CFLAGS) /Fo".\tests\headerless_test.obj" /c ".\tests\headerless_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\headerless_test.exe" ".\tests\headerless_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\write_read_test.exe" : ".\tests\write_read_test.c" ".\tests\utils.obj"
+    $(CPP) $(CFLAGS) /Fo".\tests\write_read_test.obj" /c ".\tests\write_read_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\write_read_test.exe" ".\tests\write_read_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\lossy_comp_test.exe" : ".\tests\lossy_comp_test.c" ".\tests\utils.obj"
+    $(CPP) $(CFLAGS) /Fo".\tests\lossy_comp_test.obj" /c ".\tests\lossy_comp_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\lossy_comp_test.exe" ".\tests\lossy_comp_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\peak_chunk_test.exe" : ".\tests\peak_chunk_test.c" ".\tests\utils.obj"
+    $(CPP) $(CFLAGS) /Fo".\tests\peak_chunk_test.obj" /c ".\tests\peak_chunk_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\peak_chunk_test.exe" ".\tests\peak_chunk_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\misc_test.exe" : ".\tests\misc_test.c" ".\tests\utils.obj"
+    $(CPP) $(CFLAGS) /Fo".\tests\misc_test.obj" /c ".\tests\misc_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\misc_test.exe" ".\tests\misc_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\string_test.exe" : ".\tests\string_test.c" ".\tests\utils.obj"
+    $(CPP) $(CFLAGS) /Fo".\tests\string_test.obj" /c ".\tests\string_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\string_test.exe" ".\tests\string_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\win32_test.exe" : ".\tests\win32_test.c"
+    $(CPP) $(CFLAGS) /Fo".\tests\win32_test.obj" /c ".\tests\win32_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\win32_test.exe" ".\tests\win32_test.obj"
+
+".\tests\stdio_test.exe" : ".\tests\stdio_test.c" ".\tests\utils.obj"
+    $(CPP) $(CFLAGS) /Fo".\tests\stdio_test.obj" /c ".\tests\stdio_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\stdio_test.exe" ".\tests\stdio_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\pipe_test.exe" : ".\tests\pipe_test.c" ".\tests\utils.obj"
+    $(CPP) $(CFLAGS) /Fo".\tests\pipe_test.obj" /c ".\tests\pipe_test.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\pipe_test.exe" ".\tests\pipe_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+# ".\tests\stdin_test.exe" : ".\tests\stdin_test.c" ".\tests\utils.obj"
+#     $(CPP) $(CFLAGS) /Fo".\tests\stdin_test.obj" /c ".\tests\stdin_test.c"
+#     $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\stdin_test.exe" ".\tests\stdin_test.obj" ".\tests\utils.obj" libsndfile.lib
+# 
+# ".\tests\stdout_test.exe" : ".\tests\stdout_test.c" ".\tests\utils.obj"
+#     $(CPP) $(CFLAGS) /Fo".\tests\stdout_test.obj" /c ".\tests\stdout_test.c"
+#     $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\stdout_test.exe" ".\tests\stdout_test.obj" ".\tests\utils.obj" libsndfile.lib
+
+".\tests\benchmark.exe" : ".\tests\benchmark.c"
+    $(CPP) $(CFLAGS) /Fo".\tests\benchmark.obj" /c ".\tests\benchmark.c"
+    $(LINK32) $(PROG_LINK_FLAGS) /out:".\tests\benchmark.exe" ".\tests\benchmark.obj" ".\tests\utils.obj" libsndfile.lib
+
+# End of Makefile
+#====================================================================
+
+# Do not edit or modify anything in this comment block.
+# The arch-tag line is a file identity tag for the GNU Arch 
+# revision control system.
+#
+# arch-tag: 9a46d08e-921f-49f7-961e-3f21ea67851e
+

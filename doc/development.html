@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+
+<HEAD>
+	<TITLE>
+	libsndfile Development
+	</TITLE>
+	<META NAME="Author"      CONTENT="Erik de Castro Lopo (erikd AT mega-nerd DOT com)">
+	<LINK REL=StyleSheet HREF="libsndfile.css" TYPE="text/css" MEDIA="all">
+</HEAD>
+
+<BODY>
+<!-- pepper -->
+<H1><BR>libsndfile Development</H1>
+<!-- pepper -->
+<P>
+libsndfile is being developed by a small but growing community of users
+and hackers led by Erik de Castro Lopo.
+People interested in helping should join the libsndfile-devel
+	<A HREF="lists.html">mailing list</A>
+where most of the discussion about new features takes place.
+</P>
+<!-- pepper -->
+<P>
+libsndfile is being developed using the
+	<A HREF="http://bazaar-vcs.org/">Bzr</A>
+revision control system which is especially well suited to distributed
+development.
+In most respects, Bzr is significantly better than most other revision
+control systems.
+It is even available for windows, but I (Erik) have not personally used 
+it on windows.
+</P>
+<!-- pepper -->
+<P>
+The main archive archive can be found at:
+<A HREF="http://www.mega-nerd.com/Bzr/libsndfile-mdev/">
+			http://www.mega-nerd.com/Bzr/libsndfile-mdev/</A>
+</P>
+<!-- pepper -->
+<P>
+Assuming that you have Bzr installed (on Debian GNU/Linux "apt-get install bzr") 
+you can do:
+</P>
+<!-- pepper -->
+<PRE>
+	bzr get http://www.mega-nerd.com/Bzr/libsndfile-mdev/
+</PRE>
+<!-- pepper -->
+<P>
+to retreive a copy of whats currently in the public archive.
+To configure, build and verify the build you can do:
+</P>
+<!-- pepper -->
+<PRE>
+	./reconfigure.mk
+	./configure
+	make
+	make check
+</PRE>
+<!-- pepper -->
+
+<P>
+During the configuration stage, some later versions of aclocal (I see this 
+with 1.9.X) may spew out a bunch of warning messages about underquoted 
+defintions in AC_WHATEVER, but these can safely be ignored.
+</P>
+<P>
+In order to build the sources from the Bzr archive, you will need the
+Python interpreter and GNU Autogen which is  available
+	<A HREF="http://autogen.sf.net">here</A>.
+</P>
+<!-- pepper -->
+</BODY>
+</HTML>
+
+<!--
+  Do not edit or modify anything in this comment block.
+  The arch-tag line is a file identity tag for the GNU Arch
+  revision control system.
+
+  arch-tag: 81e947c2-fb8c-4d8b-93b4-57682d2787b5
+-->
