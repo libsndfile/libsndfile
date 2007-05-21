@@ -1315,7 +1315,10 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword) ;
 					bytesread += dword ;
-					cptr [dword - 1] = 0 ;
+					if (dword > SIGNED_SIZEOF (psf->u.cbuf))
+						cptr [sizeof (psf->u.cbuf) - 1] = 0 ;
+					else
+						cptr [dword > 0 ? dword : 0] = 0 ;
 					psf_log_printf (psf, "    %M : %s\n", chunk, cptr) ;
 					break ;
 
