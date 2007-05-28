@@ -1,3 +1,8 @@
+2007-05-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav.c
+    Fix writing of MSGUID subtypes. Thanks to Bruce Sharpe.
+
 2007-05-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c

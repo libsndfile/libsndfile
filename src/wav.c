@@ -1024,7 +1024,7 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 			/* For an Ambisonic file set the channel mask to zero.
 			** Otherwise use a default based on the channel count.
 			*/
-			if (psf->wavex_ambisonic)
+			if (psf->wavex_ambisonic != SF_AMBISONIC_NONE)
 				psf_binheader_writef (psf, "4", 0) ;
 			else
 			{	/*
@@ -1072,14 +1072,14 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 		case SF_FORMAT_PCM_16 :
 		case SF_FORMAT_PCM_24 :
 		case SF_FORMAT_PCM_32 :
-			wavex_write_guid (psf, psf->wavex_ambisonic ? &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM
-						: &MSGUID_SUBTYPE_PCM) ;
+			wavex_write_guid (psf, psf->wavex_ambisonic == SF_AMBISONIC_NONE ?
+						&MSGUID_SUBTYPE_PCM : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM) ;
 			break ;
 
 		case SF_FORMAT_FLOAT :
 		case SF_FORMAT_DOUBLE :
-			wavex_write_guid (psf, psf->wavex_ambisonic ? &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT
-						: &MSGUID_SUBTYPE_IEEE_FLOAT) ;
+			wavex_write_guid (psf, psf->wavex_ambisonic == SF_AMBISONIC_NONE ?
+						&MSGUID_SUBTYPE_IEEE_FLOAT : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT) ;
 			add_fact_chunk = SF_TRUE ;
 			break ;
 
