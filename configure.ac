@@ -370,12 +370,24 @@ if test "$AS" = "gas" ; then
 	fi
 
 case "$host" in
-	i386-*-openbsd3.[[0-3]]) OBJ_FORMAT=aoutb ;;
-	*-*-cygwin|*mingw*) OBJ_FORMAT=win32 ;;
-	*) OBJ_FORMAT=elf ;;
+	i386-*-openbsd3.[[0-3]])
+		OBJ_FORMAT=aoutb
+		;;
+	*-*-cygwin|*mingw*)
+		OBJ_FORMAT=win32
+		;;
+	i*86-apple-darwin*)
+		OBJ_FORMAT=macho
+		NASM_FLAGS="-DFLAC__PUBLIC_NEEDS_UNDERSCORE"
+		OS_SPECIFIC_LIBLINKS="-Wl,-read_only_relocs -Wl,suppress"
+		;;
+	*)
+		OBJ_FORMAT=elf ;;
 	esac
 
 AC_SUBST(OBJ_FORMAT)
+AC_SUBST(NASM_FLAGS)
+AC_SUBST(OS_SPECIFIC_LIBLINKS)
 
 #====================================================================================
 # Target OS specific stuff.

@@ -3,6 +3,9 @@
     * doc/FAQ.html
     Minor update.
 
+    * configure.ac src/FLAC/src/libFLAC/ia32/Makefile.am src/Makefile.am
+    Apply patch from Trent Apted make it compile on Intel MacOSX. Thanks Trent.
+
 2007-05-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c

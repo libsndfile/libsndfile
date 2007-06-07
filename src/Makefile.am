@@ -29,7 +29,7 @@ FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam
 		sds.c svx.c txw.c voc.c wve.c w64.c wav_w64.c wav.c xi.c
 
 # MinGW requires -no-undefined if a DLL is to be built.
-libsndfile_la_LDFLAGS = -no-undefined -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@
+libsndfile_la_LDFLAGS = -no-undefined -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@ @OS_SPECIFIC_LIBLINKS@
 libsndfile_la_SOURCES = $(FILESPECIFIC) $(noinst_HEADERS)
 nodist_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
 libsndfile_la_LIBADD = libcommon.la FLAC/src/libFLAC/libFLAC.la GSM610/libgsm.la \

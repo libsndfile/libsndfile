@@ -33,7 +33,7 @@ SUFFIXES = .nasm .lo
 STRIP_NON_ASM = sh $(top_srcdir)/src/FLAC/strip_non_asm_libtool_args.sh
 
 .nasm.lo:
-	$(LIBTOOL) --tag=CC --mode=compile $(STRIP_NON_ASM) $(NASM) -f $(OBJ_FORMAT) -d OBJ_FORMAT_$(OBJ_FORMAT) -i$(srcdir)/ $< -o $@
+	$(LIBTOOL) --tag=CC --mode=compile $(STRIP_NON_ASM) $(NASM) $(NASM_FLAGS) -f $(OBJ_FORMAT) -d OBJ_FORMAT_$(OBJ_FORMAT) -i$(srcdir)/ $< -o $@
 
 noinst_LTLIBRARIES = libFLAC-asm.la
 libFLAC_asm_la_SOURCES = \
