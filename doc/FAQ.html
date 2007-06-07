@@ -602,10 +602,19 @@ and they are not portable.
 </P>
 
 <P>
-In addition, endian issues are not the only reason why the cross compiled
-binary will fail.
+Endian issues are not the only reason why the cross compiled binary will fail.
 The configure script also detects other CPU specific idiosyncrasies to provide
 more optimized code.
+</P>
+
+<P>
+Finally, the real show stopper problem with universal binaries is the problem
+with the test suite.
+libsndfile contains a huge, comprehensive test suite.
+When you compile a universal binary and run the test suite, you only test the
+native compile.
+The cross compiled binary (the one with the much higher chance of having 
+problems) cannot be tested.
 </P>
 
 <P>
