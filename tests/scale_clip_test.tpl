@@ -324,16 +324,3 @@ main (void)
 +][+ ENDFOR float_type +]
 
 
-
-
-
-
-[+ COMMENT
-
- Do not edit or modify anything in this comment block.
- The following line is a file identity tag for the GNU Arch
- revision control system.
-
- arch-tag: dc1613fe-2985-462c-a0b4-62143a7570e8
-
-+]

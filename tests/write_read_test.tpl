@@ -340,6 +340,10 @@ main (int argc, char **argv)
 	{	pcm_test_char	("char.sds"		, SF_FORMAT_SDS | SF_FORMAT_PCM_S8, SF_TRUE) ;
 		pcm_test_short	("short.sds"	, SF_FORMAT_SDS | SF_FORMAT_PCM_16, SF_TRUE) ;
 		pcm_test_24bit	("24bit.sds"	, SF_FORMAT_SDS | SF_FORMAT_PCM_24, SF_TRUE) ;
+
+		empty_file_test ("empty_char.sds", SF_FORMAT_SDS | SF_FORMAT_PCM_S8) ;
+		empty_file_test ("empty_short.sds", SF_FORMAT_SDS | SF_FORMAT_PCM_16) ;
+
 		test_count++ ;
 		} ;
 
@@ -1015,12 +1019,6 @@ truncate (const char *filename, int ignored)
 
 #endif
 
-[+ COMMENT
 
- Do not edit or modify anything in this comment block.
- The following line is a file identity tag for the GNU Arch
- revision control system.
 
- arch-tag: 4187de93-d434-41a2-93a9-4f6e2995b5c1
 
-+]

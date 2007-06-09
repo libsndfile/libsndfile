@@ -336,12 +336,3 @@ static void
 } /* [+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test */
 [+ ENDFOR endian_type +][+ ENDFOR int_type +][+ ENDFOR float_type +]
 
-[+ COMMENT
-
- Do not edit or modify anything in this comment block.
- The arch-tag line is a file identity tag for the GNU Arch
- revision control system.
-
- arch-tag: c1043a35-f0aa-44af-9f7f-f193c67f140d
-
-+]

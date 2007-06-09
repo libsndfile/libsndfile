@@ -693,12 +693,3 @@ check_open_file_count_or_die (int lineno)
 
 [+ ESAC +]
 
-[+ COMMENT
-
- Do not edit or modify anything in this comment block.
- The following line is a file identity tag for the GNU Arch
- revision control system.
-
- arch-tag: b1183d5d-ebd4-4bc5-af50-60d774d6b1f5
-
-+]

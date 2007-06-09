@@ -928,13 +928,3 @@ pcm_test_double (const char *filename, int	filetype, int hash, int replace_float
 
 /*==============================================================================
 */
-
-[+ COMMENT
-
- Do not edit or modify anything in this comment block.
- The following line is a file identity tag for the GNU Arch 
- revision control system.
-
- arch-tag: cad1443b-99d9-414e-883f-178817600d40
-
-+]
