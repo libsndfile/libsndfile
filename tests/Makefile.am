@@ -34,7 +34,7 @@ EXTRA_DIST = $(autogen_sources)
 sfversion_SOURCES = sfversion.c
 sfversion_LDADD = $(SNDFILEDIR)/libsndfile.la
 
-write_read_test_SOURCES = utils.c write_read_test.c
+write_read_test_SOURCES = utils.c generate.c write_read_test.c
 write_read_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 lossy_comp_test_SOURCES = utils.c lossy_comp_test.c
