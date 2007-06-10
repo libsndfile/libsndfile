@@ -37,6 +37,7 @@ static int truncate (const char *filename, int ignored) ;
 #include	<sndfile.h>
 
 #include	"utils.h"
+#include	"generate.h"
 
 #define	SAMPLE_RATE			11025
 #define	DATA_LENGTH			(1<<12)
@@ -399,6 +400,7 @@ static void mono_[+ (get "type_name") +]_test (const char *filename, int format,
 static void stereo_[+ (get "type_name") +]_test (const char *filename, int format, int long_file_ok, int allow_fd) ;
 static void mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int long_file_ok, int allow_fd) ;
 static void new_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int allow_fd) ;
+static void multi_seek_test (const char * filename, int format) ;
 
 static void
 pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_file_ok)
@@ -603,6 +605,8 @@ mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_fi
 	test_seek_or_die (file, 0, SEEK_CUR, sfinfo.frames, sfinfo.channels, __LINE__) ;
 
 	sf_close (file) ;
+
+	multi_seek_test (filename, format) ;
 
 } /* mono_[+ (get "type_name") +]_test */
 
@@ -1019,6 +1023,22 @@ truncate (const char *filename, int ignored)
 
 #endif
 
+static void
+multi_seek_test (const char * filename, int format)
+{	SNDFILE * file ;
+	SF_INFO info ;
+	int k ;
 
+	memset (&info, 0, sizeof (info)) ;
+
+	generate_file (filename, format, 88200) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &info, SF_FALSE, __LINE__) ;
+
+	for (k = 0 ; k < 10 ; k++)
+		sf_seek (file, info.frames / (k + 1), SEEK_SET) ;
+
+	sf_close (file) ;
+} /* multi_seek_test */
 
 
