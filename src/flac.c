@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004, 2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Tobias Gehrig <tgehrig@ira.uka.de>
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -40,12 +40,13 @@
 */
 
 #define ENC_BUFFER_SIZE 4096
+#define RBUFFER_LEN		4096
 
 typedef enum
-{	PFLAC_PCM_SHORT = 0,
-	PFLAC_PCM_INT = 1,
-	PFLAC_PCM_FLOAT = 2,
-	PFLAC_PCM_DOUBLE = 3
+{	PFLAC_PCM_SHORT = 50,
+	PFLAC_PCM_INT = 51,
+	PFLAC_PCM_FLOAT = 52,
+	PFLAC_PCM_DOUBLE = 53
 } PFLAC_PCM ;
 
 typedef struct
@@ -168,8 +169,18 @@ flac_buffer_copy (SF_PRIVATE *psf)
 		*/
 		pflac->bufferbackup = SF_TRUE ;
 		for (i = 0 ; i < frame->header.channels ; i++)
-		{	if (pflac->rbuffer [i] == NULL)
-				pflac->rbuffer [i] = calloc (frame->header.blocksize, sizeof (FLAC__int32)) ;
+		{	/*
+			**	frame->header.blocksize is variable so don't use it, use a
+			**	constant and check it.
+			*/
+			if (frame->header.blocksize > RBUFFER_LEN)
+			{	psf_log_printf (psf, "%s %d : frame->header.blocksize > RBUFFER_LEN\n", __func__, __LINE__) ;
+				return 0 ;
+				} ;
+
+			if (pflac->rbuffer [i] == NULL)
+				pflac->rbuffer [i] = calloc (RBUFFER_LEN, sizeof (FLAC__int32)) ;
+
 			memcpy (pflac->rbuffer [i], buffer [i], frame->header.blocksize * sizeof (FLAC__int32)) ;
 			} ;
 		pflac->wbuffer = (const FLAC__int32* const*) pflac->rbuffer ;
@@ -179,12 +190,16 @@ flac_buffer_copy (SF_PRIVATE *psf)
 
 	switch (pflac->pcmtype)
 	{	case PFLAC_PCM_SHORT :
-			{	short *retpcm = ((short*) pflac->ptr) ;
+			{	short *retpcm = (short*) pflac->ptr ;
 				int shift = 16 - frame->header.bits_per_sample ;
 				if (shift < 0)
 				{	shift = abs (shift) ;
 					for (i = 0 ; i < frame->header.blocksize && pflac->remain > 0 ; i++)
 					{	offset = pflac->pos + i * frame->header.channels ;
+
+						if (pflac->bufferpos >= frame->header.blocksize)
+							break ;
+
 						for (j = 0 ; j < frame->header.channels ; j++)
 							retpcm [offset + j] = buffer [j][pflac->bufferpos] >> shift ;
 						pflac->remain -= frame->header.channels ;
@@ -209,7 +224,7 @@ flac_buffer_copy (SF_PRIVATE *psf)
 			break ;
 
 		case PFLAC_PCM_INT :
-			{	int *retpcm = ((int*) pflac->ptr) ;
+			{	int *retpcm = (int*) pflac->ptr ;
 				int shift = 32 - frame->header.bits_per_sample ;
 				for (i = 0 ; i < frame->header.blocksize && pflac->remain > 0 ; i++)
 				{	offset = pflac->pos + i * frame->header.channels ;
@@ -226,7 +241,7 @@ flac_buffer_copy (SF_PRIVATE *psf)
 			break ;
 
 		case PFLAC_PCM_FLOAT :
-			{	float *retpcm = ((float*) pflac->ptr) ;
+			{	float *retpcm = (float*) pflac->ptr ;
 				float norm = (psf->norm_float == SF_TRUE) ? 1.0 / (1 << (frame->header.bits_per_sample - 1)) : 1.0 ;
 
 				for (i = 0 ; i < frame->header.blocksize && pflac->remain > 0 ; i++)
@@ -244,7 +259,7 @@ flac_buffer_copy (SF_PRIVATE *psf)
 			break ;
 
 		case PFLAC_PCM_DOUBLE :
-			{	double *retpcm = ((double*) pflac->ptr) ;
+			{	double *retpcm = (double*) pflac->ptr ;
 				double norm = (psf->norm_double == SF_TRUE) ? 1.0 / (1 << (frame->header.bits_per_sample - 1)) : 1.0 ;
 
 				for (i = 0 ; i < frame->header.blocksize && pflac->remain > 0 ; i++)

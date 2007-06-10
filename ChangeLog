@@ -9,6 +9,10 @@
     * tests/write_read_test.tpl
     Add multi_seek_test.
 
+    * src/flac.c
+    Fix buffer overflow bug. Test provided by Jeremy Friesner and fix provided
+    by David Viens.
+
 2007-06-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html
