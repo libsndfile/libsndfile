@@ -55,7 +55,7 @@ void	print_test_name (const char *test, const char *filename) ;
 
 void	dump_data_to_file (const char *filename, void *data, unsigned int datalen) ;
 
-void	write_mono_file (const char * filename, int srate, float * output, int len) ;
+void	write_mono_file (const char * filename, int format, int srate, float * output, int len) ;
 
 static inline void
 exit_if_true (int test, const char *format, ...)
@@ -694,7 +694,7 @@ check_open_file_count_or_die (int lineno)
 } /* check_open_file_count_or_die */
 
 void
-write_mono_file (const char * filename, int srate, float * output, int len)
+write_mono_file (const char * filename, int format, int srate, float * output, int len)
 {	SNDFILE * file ;
 	SF_INFO sfinfo ;
 
@@ -702,7 +702,7 @@ write_mono_file (const char * filename, int srate, float * output, int len)
 
 	sfinfo.samplerate = srate ;
 	sfinfo.channels = 1 ;
-	sfinfo.format = SF_FORMAT_FLAC | SF_FORMAT_PCM_16 ;
+	sfinfo.format = format ;
 
 	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
 	{	printf ("sf_open (%s) : %s\n", filename, sf_strerror (NULL)) ;
