@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1028,6 +1028,10 @@ multi_seek_test (const char * filename, int format)
 {	SNDFILE * file ;
 	SF_INFO info ;
 	int k ;
+
+	/* This test doesn't work on RAW files. */
+	if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW)
+		return ;
 
 	memset (&info, 0, sizeof (info)) ;
 
