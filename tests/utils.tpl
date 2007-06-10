@@ -55,6 +55,8 @@ void	print_test_name (const char *test, const char *filename) ;
 
 void	dump_data_to_file (const char *filename, void *data, unsigned int datalen) ;
 
+void	write_mono_file (const char * filename, int srate, float * output, int len) ;
+
 static inline void
 exit_if_true (int test, const char *format, ...)
 {	if (test)
@@ -690,6 +692,27 @@ check_open_file_count_or_die (int lineno)
 		} ;
 #endif
 } /* check_open_file_count_or_die */
+
+void
+write_mono_file (const char * filename, int srate, float * output, int len)
+{	SNDFILE * file ;
+	SF_INFO sfinfo ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	sfinfo.samplerate = srate ;
+	sfinfo.channels = 1 ;
+	sfinfo.format = SF_FORMAT_FLAC | SF_FORMAT_PCM_16 ;
+
+	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
+	{	printf ("sf_open (%s) : %s\n", filename, sf_strerror (NULL)) ;
+		exit (1) ;
+		} ;
+
+	sf_write_float (file, output, len) ;
+	
+	sf_close (file) ;
+} /* write_mono_file */
 
 [+ ESAC +]
 

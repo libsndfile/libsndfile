@@ -1,3 +1,8 @@
+2007-06-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/util.tpl
+    Add function write_mono_file.
+
 2007-06-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html
