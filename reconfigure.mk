@@ -52,7 +52,8 @@ aclocal.m4: acinclude.m4
 	$(ACLOCAL) $(ACLOCAL_INC)
 
 clean:
-	rm -f libtool ltmain.sh aclocal.m4 Makefile.in src/config.h.in config.cache config.status
+	rm -f libtool ltmain.sh aclocal.m4 src/config.h.in config.cache config.status
+	rm -rf autom4te.cache
+	find . -name Makefile.in -exec rm -f {} \;
 	find . -name .deps -type d -exec rm -rf {} \;
-
 

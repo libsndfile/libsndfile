@@ -1,3 +1,12 @@
+2007-06-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/cpp_test.cc
+    Add extra tests for when the SndfileHandle constructor fails.
+
+    * src/sndfile.hh
+    Make sure failure to open the file in the constructor does not allow later
+    calls to other methods to fail.
+
 2007-06-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/util.tpl
