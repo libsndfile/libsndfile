@@ -1,3 +1,8 @@
+2007-06-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/FLAC/*
+    Update from upstream CVS.
+
 2007-06-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/cpp_test.cc
