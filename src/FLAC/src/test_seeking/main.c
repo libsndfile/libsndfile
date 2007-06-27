@@ -438,7 +438,7 @@ int main(int argc, char *argv[])
 		count = strtoul(argv[2], 0, 10);
 	if (argc > 3)
 #ifdef _MSC_VER
-		samples = local__strtoull(argv[4]);
+		samples = local__strtoull(argv[3]);
 #else
 		samples = strtoull(argv[3], 0, 10);
 #endif
