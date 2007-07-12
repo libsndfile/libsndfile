@@ -3,6 +3,7 @@
     * src/flac.c
     Apply patch from Ed Schouten to read artist and title metadata from FLAC
     files.
+    Improve reporting of FLAC metadata.
 
     * src/sndfile.h.in tests/string_test.c src/flac.c
     Add string type SF_STR_ALBUM, update test and use for FLAC files.

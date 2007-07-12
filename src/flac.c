@@ -368,6 +368,7 @@ sf_flac_meta_get_vorbiscomment (SF_PRIVATE *psf, int str_type, const FLAC__Strea
 		if ((s = strchr (value, '=')) != NULL)
 			value = s + 1 ;
 
+		psf_log_printf (psf, "  %-10s : %s\n", tag, value) ;
 		psf_store_string (psf, str_type, value) ;
 		} ;
 
@@ -414,6 +415,30 @@ sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC_
 			sf_flac_meta_get_vorbiscomment (psf, SF_STR_ARTIST, metadata, "artist") ;
 			sf_flac_meta_get_vorbiscomment (psf, SF_STR_TITLE, metadata, "title") ;
 			sf_flac_meta_get_vorbiscomment (psf, SF_STR_ALBUM, metadata, "album") ;
+			break ;
+
+		case FLAC__METADATA_TYPE_PADDING :
+			psf_log_printf (psf, "Padding Metadata\n") ;
+			break ;
+
+		case FLAC__METADATA_TYPE_APPLICATION :
+			psf_log_printf (psf, "Application Metadata\n") ;
+			break ;
+
+		case FLAC__METADATA_TYPE_SEEKTABLE :
+			psf_log_printf (psf, "Seektable Metadata\n") ;
+			break ;
+
+		case FLAC__METADATA_TYPE_CUESHEET :
+			psf_log_printf (psf, "Cuesheet Metadata\n") ;
+			break ;
+
+		case FLAC__METADATA_TYPE_PICTURE :
+			psf_log_printf (psf, "Picture Metadata\n") ;
+			break ;
+
+		case FLAC__METADATA_TYPE_UNDEFINED :
+			psf_log_printf (psf, "Undefined Metadata\n") ;
 			break ;
 
 		default :
@@ -626,6 +651,8 @@ flac_read_header (SF_PRIVATE *psf)
 	psf_fseek (psf, 0, SEEK_SET) ;
 	if ((pflac->fsd = FLAC__stream_decoder_new ()) == NULL)
 		return SFE_FLAC_NEW_DECODER ;
+
+	FLAC__stream_decoder_set_metadata_respond_all (pflac->fsd) ;
 
 	if (FLAC__stream_decoder_init_stream (pflac->fsd, sf_flac_read_callback, sf_flac_seek_callback, sf_flac_tell_callback, sf_flac_length_callback, sf_flac_eof_callback, sf_flac_write_callback, sf_flac_meta_callback, sf_flac_error_callback, psf) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
 		return SFE_FLAC_INIT_DECODER ;
