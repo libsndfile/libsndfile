@@ -31,6 +31,7 @@
 
 #include	"FLAC/include/FLAC/stream_decoder.h"
 #include	"FLAC/include/FLAC/stream_encoder.h"
+#include	"FLAC/include/FLAC/metadata.h"
 
 #include	"sfendian.h"
 #include	"float_cast.h"
@@ -357,6 +358,24 @@ sf_flac_write_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC
 } /* sf_flac_write_callback */
 
 static void
+sf_flac_meta_getvorbiscomment (SF_PRIVATE *psf, int str_type, const FLAC__StreamMetadata *metadata, const char *tag)
+{
+	const char *value, *s ;
+	int k ;
+
+	k = FLAC__metadata_object_vorbiscomment_find_entry_from (metadata, 0, tag) ;
+	if (k >= 0)
+	{	value = (const char*) metadata->data.vorbis_comment.comments [k].entry ;
+		if ((s = strchr (value, '=')) != NULL)
+			value = s + 1 ;
+
+		psf_store_string (psf, str_type, value) ;
+		} ;
+
+	return ;
+} /* sf_flac_meta_getvorbiscomment */
+
+static void
 sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC__StreamMetadata *metadata, void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 
@@ -380,6 +399,11 @@ sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC_
 					psf_log_printf (psf, "sf_flac_meta_callback : bits_per_sample %d not yet implemented.\n", metadata->data.stream_info.bits_per_sample) ;
 					break ;
 				} ;
+			break ;
+
+		case FLAC__METADATA_TYPE_VORBIS_COMMENT :
+			sf_flac_meta_getvorbiscomment (psf, SF_STR_ARTIST, metadata, "artist") ;
+			sf_flac_meta_getvorbiscomment (psf, SF_STR_TITLE, metadata, "title") ;
 			break ;
 
 		default :

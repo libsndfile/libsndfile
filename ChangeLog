@@ -1,3 +1,9 @@
+2007-07-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/flac.c
+    Apply patch from Ed Schouten to read artist and title metadata from FLAC
+    files.
+
 2007-06-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/FLAC/*
