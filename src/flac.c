@@ -358,9 +358,8 @@ sf_flac_write_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC
 } /* sf_flac_write_callback */
 
 static void
-sf_flac_meta_getvorbiscomment (SF_PRIVATE *psf, int str_type, const FLAC__StreamMetadata *metadata, const char *tag)
-{
-	const char *value, *s ;
+sf_flac_meta_get_vorbiscomment (SF_PRIVATE *psf, int str_type, const FLAC__StreamMetadata *metadata, const char *tag)
+{	const char *value, *s ;
 	int k ;
 
 	k = FLAC__metadata_object_vorbiscomment_find_entry_from (metadata, 0, tag) ;
@@ -373,11 +372,12 @@ sf_flac_meta_getvorbiscomment (SF_PRIVATE *psf, int str_type, const FLAC__Stream
 		} ;
 
 	return ;
-} /* sf_flac_meta_getvorbiscomment */
+} /* sf_flac_meta_get_vorbiscomment */
 
 static void
 sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC__StreamMetadata *metadata, void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
+	int bitwidth = 0 ;
 
 	switch (metadata->type)
 	{	case FLAC__METADATA_TYPE_STREAMINFO :
@@ -385,31 +385,40 @@ sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC_
 			psf->sf.samplerate = metadata->data.stream_info.sample_rate ;
 			psf->sf.frames = metadata->data.stream_info.total_samples ;
 
+			psf_log_printf (psf, "FLAC Stream Metadata\n  Channels    : %d\n  Sample rate : %d\n  Frames      : %D\n", psf->sf.channels, psf->sf.samplerate, psf->sf.frames) ;
+
 			switch (metadata->data.stream_info.bits_per_sample)
 			{	case 8 :
 					psf->sf.format |= SF_FORMAT_PCM_S8 ;
+					bitwidth = 8 ;
 					break ;
 				case 16 :
 					psf->sf.format |= SF_FORMAT_PCM_16 ;
+					bitwidth = 16 ;
 					break ;
 				case 24 :
 					psf->sf.format |= SF_FORMAT_PCM_24 ;
+					bitwidth = 24 ;
 					break ;
 				default :
 					psf_log_printf (psf, "sf_flac_meta_callback : bits_per_sample %d not yet implemented.\n", metadata->data.stream_info.bits_per_sample) ;
 					break ;
 				} ;
+
+			if (bitwidth > 0)
+				psf_log_printf (psf, "  Bit width   : %d\n", bitwidth) ;
 			break ;
 
 		case FLAC__METADATA_TYPE_VORBIS_COMMENT :
-			sf_flac_meta_getvorbiscomment (psf, SF_STR_ARTIST, metadata, "artist") ;
-			sf_flac_meta_getvorbiscomment (psf, SF_STR_TITLE, metadata, "title") ;
-			sf_flac_meta_getvorbiscomment (psf, SF_STR_ALBUM, metadata, "album") ;
+			psf_log_printf (psf, "Vorbis Comment Metadata\n") ;
+			sf_flac_meta_get_vorbiscomment (psf, SF_STR_ARTIST, metadata, "artist") ;
+			sf_flac_meta_get_vorbiscomment (psf, SF_STR_TITLE, metadata, "title") ;
+			sf_flac_meta_get_vorbiscomment (psf, SF_STR_ALBUM, metadata, "album") ;
 			break ;
 
 		default :
 			psf_log_printf (psf, "sf_flac_meta_callback : metadata-type %d not yet implemented.\n", metadata->type) ;
-		break ;
+			break ;
 		} ;
 
 	return ;
