@@ -84,7 +84,8 @@ static const char
 	artist		[]	= "The Artist",
 	copyright	[]	= "Copyright (c) 2001 The Artist",
 	comment		[]	= "Comment goes here!!!",
-	date		[]	= "2001/01/27" ;
+	date		[]	= "2001/01/27",
+	album		[]	= "The Album" ;
 
 static	short	data_out [BUFFER_LEN] ;
 
@@ -130,6 +131,7 @@ string_test (const char *filename, int typemajor)
 	sf_set_string (file, SF_STR_COPYRIGHT, copyright) ;
 	sf_set_string (file, SF_STR_COMMENT, comment) ;
 	sf_set_string (file, SF_STR_DATE, date) ;
+	sf_set_string (file, SF_STR_ALBUM, album) ;
 
 	sf_close (file) ;
 
@@ -189,6 +191,15 @@ string_test (const char *filename, int typemajor)
 		{	if (errors++ == 0)
 				puts ("\n") ;
 			printf ("    Bad date      : %s\n", cptr) ;
+			} ;
+		} ;
+
+	if (typemajor != SF_FORMAT_WAV && typemajor != SF_FORMAT_AIFF)
+	{	cptr = sf_get_string (file, SF_STR_ALBUM) ;
+		if (cptr == NULL || strcmp (album, cptr) != 0)
+		{	if (errors++ == 0)
+				puts ("\n") ;
+			printf ("    Bad album   : %s\n", cptr) ;
 			} ;
 		} ;
 

@@ -404,6 +404,7 @@ sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC_
 		case FLAC__METADATA_TYPE_VORBIS_COMMENT :
 			sf_flac_meta_getvorbiscomment (psf, SF_STR_ARTIST, metadata, "artist") ;
 			sf_flac_meta_getvorbiscomment (psf, SF_STR_TITLE, metadata, "title") ;
+			sf_flac_meta_getvorbiscomment (psf, SF_STR_ALBUM, metadata, "album") ;
 			break ;
 
 		default :
@@ -512,7 +513,7 @@ flac_open	(SF_PRIVATE *psf)
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
 	switch (subformat)
-	{	case SF_FORMAT_PCM_S8 :		/* 8-bit FLAC.  */
+	{	case SF_FORMAT_PCM_S8 :	/* 8-bit FLAC.  */
 		case SF_FORMAT_PCM_16 :	/* 16-bit FLAC. */
 		case SF_FORMAT_PCM_24 :	/* 24-bit FLAC. */
 			error = flac_init (psf) ;

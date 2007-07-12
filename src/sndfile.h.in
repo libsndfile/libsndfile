@@ -213,7 +213,8 @@ enum
 	SF_STR_SOFTWARE					= 0x03,
 	SF_STR_ARTIST					= 0x04,
 	SF_STR_COMMENT					= 0x05,
-	SF_STR_DATE						= 0x06
+	SF_STR_DATE						= 0x06,
+	SF_STR_ALBUM					= 0x07
 } ;
 
 /*
