@@ -502,6 +502,24 @@ sf_flac_enc_write_callback (const FLAC__StreamEncoder * UNUSED (encoder), const 
 	return FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR ;
 } /* sf_flac_enc_write_callback */
 
+
+static int
+flac_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
+{	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->codec_data ;
+	int err ;
+
+	if ((err = FLAC__stream_encoder_init_stream (pflac->fse, sf_flac_enc_write_callback, sf_flac_enc_seek_callback, sf_flac_enc_tell_callback, NULL, psf)) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
+	{	psf_log_printf (psf, "Error : FLAC encoder init returned error : %s\n", FLAC__StreamEncoderInitStatusString [err]) ;
+		return SFE_FLAC_INIT_DECODER ;
+		} ;
+
+	if (psf->error == 0)
+		psf->dataoffset = psf_ftell (psf) ;
+	pflac->encbuffer = calloc (ENC_BUFFER_SIZE, sizeof (FLAC__int32)) ;
+
+	return psf->error ;
+} /* flac_write_header */
+
 /*------------------------------------------------------------------------------
 ** Public function.
 */
@@ -531,8 +549,11 @@ flac_open	(SF_PRIVATE *psf)
 		psf->endian = SF_ENDIAN_BIG ;
 		psf->sf.seekable = 0 ;
 
+		psf->str_flags = SF_STR_ALLOW_START ;
+
 		if ((error = flac_enc_init (psf)))
 			return error ;
+		psf->write_header = flac_write_header ;
 		} ;
 
 	psf->datalength = psf->filelength ;
@@ -628,20 +649,23 @@ flac_enc_init (SF_PRIVATE *psf)
 
 	if ((pflac->fse = FLAC__stream_encoder_new ()) == NULL)
 		return SFE_FLAC_NEW_DECODER ;
-	FLAC__stream_encoder_set_channels (pflac->fse, psf->sf.channels) ;
-	FLAC__stream_encoder_set_sample_rate (pflac->fse, psf->sf.samplerate) ;
-	FLAC__stream_encoder_set_bits_per_sample (pflac->fse, bps) ;
 
-	if ((bps = FLAC__stream_encoder_init_stream (pflac->fse, sf_flac_enc_write_callback, sf_flac_enc_seek_callback, sf_flac_enc_tell_callback, NULL, psf)) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
-	{	psf_log_printf (psf, "Error : FLAC encoder init returned error : %s\n", FLAC__StreamEncoderInitStatusString [bps]) ;
+	if (! FLAC__stream_encoder_set_channels (pflac->fse, psf->sf.channels))
+	{	psf_log_printf (psf, "FLAC__stream_encoder_set_channels (%d) return false.\n", psf->sf.channels) ;
 		return SFE_FLAC_INIT_DECODER ;
 		} ;
 
-	if (psf->error == 0)
-		psf->dataoffset = psf_ftell (psf) ;
-	pflac->encbuffer = calloc (ENC_BUFFER_SIZE, sizeof (FLAC__int32)) ;
+	if (! FLAC__stream_encoder_set_sample_rate (pflac->fse, psf->sf.samplerate))
+	{	psf_log_printf (psf, "FLAC__stream_encoder_set_sample_rate (%d) returned false.\n", psf->sf.samplerate) ;
+		return SFE_FLAC_BAD_SAMPLE_RATE ;
+		} ;
 
-	return psf->error ;
+	if (! FLAC__stream_encoder_set_bits_per_sample (pflac->fse, bps))
+	{	psf_log_printf (psf, "FLAC__stream_encoder_set_bits_per_sample (%d) return false.\n", bps) ;
+		return SFE_FLAC_INIT_DECODER ;
+		} ;
+
+	return 0 ;
 } /* flac_enc_init */
 
 static int
