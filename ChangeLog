@@ -1,3 +1,8 @@
+2007-07-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/string_test.c
+    Add ability to test strings stored in metadata secion of FLAC files.
+
 2007-07-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/flac.c
