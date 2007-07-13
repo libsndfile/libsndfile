@@ -5,6 +5,10 @@
 
     * src/string.c
     Fix logic for testing if audio data has been written and string is added.
+    Make sure SF_STR_ALBUM actually works.
+
+    * src/flac.c
+    Finalize reading/writing string metadata. Tests pass.
 
 2007-07-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
