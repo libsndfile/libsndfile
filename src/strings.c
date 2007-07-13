@@ -45,7 +45,7 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	if ((psf->str_flags & SF_STR_ALLOW_START) == 0)
 			return SFE_STR_NO_SUPPORT ;
-		if ((psf->str_flags & SF_STR_ALLOW_END) == 0)
+		if (psf->have_written && (psf->str_flags & SF_STR_ALLOW_END) == 0)
 			return SFE_STR_NO_SUPPORT ;
 		/* Only allow zero length strings for software. */
 		if (str_type != SF_STR_SOFTWARE && str_len == 0)

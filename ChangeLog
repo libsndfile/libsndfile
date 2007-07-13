@@ -3,6 +3,9 @@
     * tests/string_test.c
     Add ability to test strings stored in metadata secion of FLAC files.
 
+    * src/string.c
+    Fix logic for testing if audio data has been written and string is added.
+
 2007-07-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/flac.c
