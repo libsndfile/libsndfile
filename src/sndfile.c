@@ -2405,7 +2405,7 @@ psf_close (SF_PRIVATE *psf)
 		free (psf->channel_map) ;
 
 	if (psf->format_desc)
-	{	memset (psf->format_desc, 0, strlen (psf->format_desc)) ;
+	{	psf->format_desc [0] = 0 ;
 		free (psf->format_desc) ;
 		} ;
 
