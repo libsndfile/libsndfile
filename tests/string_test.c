@@ -92,7 +92,8 @@ static const char
 	copyright	[]	= "Copyright (c) 2001 The Artist",
 	comment		[]	= "Comment goes here!!!",
 	date		[]	= "2001/01/27",
-	album		[]	= "The Album" ;
+	album		[]	= "The Album",
+	license		[]	= "The license" ;
 
 static	short	data_out [BUFFER_LEN] ;
 
@@ -130,6 +131,7 @@ string_start_end_test (const char *filename, int typemajor)
 	sf_set_string (file, SF_STR_COMMENT, comment) ;
 	sf_set_string (file, SF_STR_DATE, date) ;
 	sf_set_string (file, SF_STR_ALBUM, album) ;
+	sf_set_string (file, SF_STR_LICENSE, license) ;
 
 	sf_close (file) ;
 
@@ -201,6 +203,15 @@ string_start_end_test (const char *filename, int typemajor)
 			} ;
 		} ;
 
+	if (typemajor != SF_FORMAT_WAV && typemajor != SF_FORMAT_AIFF)
+	{	cptr = sf_get_string (file, SF_STR_LICENSE) ;
+		if (cptr == NULL || strcmp (album, cptr) != 0)
+		{	if (errors++ == 0)
+				puts ("\n") ;
+			printf ("    Bad license : %s\n", cptr) ;
+			} ;
+		} ;
+
 	if (errors > 0)
 	{	printf ("\n*** Error count : %d ***\n\n", errors) ;
 		dump_log_buffer (file) ;
@@ -239,6 +250,7 @@ string_start_test (const char *filename, int typemajor)
 	sf_set_string (file, SF_STR_COMMENT, comment) ;
 	sf_set_string (file, SF_STR_DATE, date) ;
 	sf_set_string (file, SF_STR_ALBUM, album) ;
+	sf_set_string (file, SF_STR_LICENSE, license) ;
 
 	/* Write data to file. */
 	test_write_short_or_die (file, 0, data_out, BUFFER_LEN, __LINE__) ;
@@ -310,6 +322,15 @@ string_start_test (const char *filename, int typemajor)
 		{	if (errors++ == 0)
 				puts ("\n") ;
 			printf ("    Bad album     : %s\n", cptr) ;
+			} ;
+		} ;
+
+	if (typemajor != SF_FORMAT_WAV && typemajor != SF_FORMAT_AIFF)
+	{	cptr = sf_get_string (file, SF_STR_LICENSE) ;
+		if (cptr == NULL || strcmp (album, cptr) != 0)
+		{	if (errors++ == 0)
+				puts ("\n") ;
+			printf ("    Bad license : %s\n", cptr) ;
 			} ;
 		} ;
 

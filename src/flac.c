@@ -373,7 +373,8 @@ sf_flac_meta_get_vorbiscomments (SF_PRIVATE *psf, const FLAC__StreamMetadata *me
 		{ "artist", SF_STR_ARTIST },
 		{ "comment", SF_STR_COMMENT },
 		{ "date", SF_STR_DATE },
-		{ "album", SF_STR_ALBUM }
+		{ "album", SF_STR_ALBUM },
+		{ "license", SF_STR_LICENSE }
 		} ;
 
 	const char *value, *cptr ;
@@ -563,6 +564,9 @@ flac_write_strings (SF_PRIVATE *psf, FLAC_PRIVATE* pflac)
 				break ;
 			case SF_STR_ALBUM :
 				key = "album" ;
+				break ;
+			case SF_STR_LICENSE :
+				key = "license" ;
 				break ;
 			default :
 				continue ;
