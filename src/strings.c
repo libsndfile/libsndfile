@@ -45,7 +45,7 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	if ((psf->str_flags & SF_STR_ALLOW_START) == 0)
 			return SFE_STR_NO_SUPPORT ;
-		if ((psf->str_flags & SF_STR_ALLOW_END) == 0)
+		if (psf->have_written && (psf->str_flags & SF_STR_ALLOW_END) == 0)
 			return SFE_STR_NO_SUPPORT ;
 		/* Only allow zero length strings for software. */
 		if (str_type != SF_STR_SOFTWARE && str_len == 0)
@@ -130,6 +130,7 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 		case SF_STR_ARTIST :
 		case SF_STR_COMMENT :
 		case SF_STR_DATE :
+		case SF_STR_ALBUM :
 				psf->strings [k].type = str_type ;
 				psf->strings [k].str = psf->str_end ;
 				psf->strings [k].flags = str_flags ;
@@ -140,6 +141,7 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 				break ;
 
 		default :
+			psf_log_printf (psf, "%s : SFE_STR_BAD_TYPE\n", __func__) ;
 			return SFE_STR_BAD_TYPE ;
 		} ;
 

@@ -59,6 +59,8 @@ typedef struct
 	void* ptr ;
 	unsigned pos, len, remain ;
 
+	FLAC__StreamMetadata *metadata ;
+
 	const FLAC__int32 * const * wbuffer ;
 	FLAC__int32 * rbuffer [FLAC__MAX_CHANNELS] ;
 
@@ -68,6 +70,11 @@ typedef struct
 	const FLAC__Frame *frame ;
 	FLAC__bool bufferbackup ;
 } FLAC_PRIVATE ;
+
+typedef struct
+{	const char *tag ;
+	int type ;
+} FLAC_TAG ;
 
 static sf_count_t	flac_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 static int			flac_close (SF_PRIVATE *psf) ;
@@ -358,22 +365,36 @@ sf_flac_write_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC
 } /* sf_flac_write_callback */
 
 static void
-sf_flac_meta_get_vorbiscomment (SF_PRIVATE *psf, int str_type, const FLAC__StreamMetadata *metadata, const char *tag)
-{	const char *value, *s ;
-	int k ;
+sf_flac_meta_get_vorbiscomments (SF_PRIVATE *psf, const FLAC__StreamMetadata *metadata)
+{	FLAC_TAG tags [] =
+	{ 	{ "title", SF_STR_TITLE },
+		{ "copyright", SF_STR_COPYRIGHT },
+		{ "software", SF_STR_SOFTWARE },
+		{ "artist", SF_STR_ARTIST },
+		{ "comment", SF_STR_COMMENT },
+		{ "date", SF_STR_DATE },
+		{ "album", SF_STR_ALBUM }
+		} ;
 
-	k = FLAC__metadata_object_vorbiscomment_find_entry_from (metadata, 0, tag) ;
-	if (k >= 0)
-	{	value = (const char*) metadata->data.vorbis_comment.comments [k].entry ;
-		if ((s = strchr (value, '=')) != NULL)
-			value = s + 1 ;
+	const char *value, *cptr ;
+	int k, tag_num ;
 
-		psf_log_printf (psf, "  %-10s : %s\n", tag, value) ;
-		psf_store_string (psf, str_type, value) ;
+	for (k = 0 ; k < ARRAY_LEN (tags) ; k++)
+	{	tag_num = FLAC__metadata_object_vorbiscomment_find_entry_from (metadata, 0, tags [k].tag) ;
+
+		if (tag_num < 0)
+			continue ;
+
+		value = (const char*) metadata->data.vorbis_comment.comments [tag_num].entry ;
+		if ((cptr = strchr (value, '=')) != NULL)
+			value = cptr + 1 ;
+
+		psf_log_printf (psf, "  %-10s : %s\n", tags [k].tag, value) ;
+		psf_store_string (psf, tags [k].type, value) ;
 		} ;
 
 	return ;
-} /* sf_flac_meta_get_vorbiscomment */
+} /* sf_flac_meta_get_vorbiscomments */
 
 static void
 sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC__StreamMetadata *metadata, void *client_data)
@@ -412,9 +433,7 @@ sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC_
 
 		case FLAC__METADATA_TYPE_VORBIS_COMMENT :
 			psf_log_printf (psf, "Vorbis Comment Metadata\n") ;
-			sf_flac_meta_get_vorbiscomment (psf, SF_STR_ARTIST, metadata, "artist") ;
-			sf_flac_meta_get_vorbiscomment (psf, SF_STR_TITLE, metadata, "title") ;
-			sf_flac_meta_get_vorbiscomment (psf, SF_STR_ALBUM, metadata, "album") ;
+			sf_flac_meta_get_vorbiscomments (psf, metadata) ;
 			break ;
 
 		case FLAC__METADATA_TYPE_PADDING :
@@ -502,6 +521,86 @@ sf_flac_enc_write_callback (const FLAC__StreamEncoder * UNUSED (encoder), const 
 	return FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR ;
 } /* sf_flac_enc_write_callback */
 
+static void
+flac_write_strings (SF_PRIVATE *psf, FLAC_PRIVATE* pflac)
+{	FLAC__StreamMetadata_VorbisComment_Entry entry ;
+	int	k, string_count = 0 ;
+
+	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
+	{	if (psf->strings [k].type != 0)
+			string_count ++ ;
+		} ;
+
+	if (string_count == 0)
+		return ;
+
+	if (pflac->metadata == NULL && (pflac->metadata = FLAC__metadata_object_new (FLAC__METADATA_TYPE_VORBIS_COMMENT)) == NULL)
+	{	psf_log_printf (psf, "FLAC__metadata_object_new returned NULL\n") ;
+		return ;
+		} ;
+
+	for (k = 0 ; k < SF_MAX_STRINGS && psf->strings [k].type != 0 ; k++)
+	{	const char * key, * value ;
+
+		switch (psf->strings [k].type)
+		{	case SF_STR_SOFTWARE :
+				key = "software" ;
+				break ;
+			case SF_STR_TITLE :
+				key = "title" ;
+				break ;
+			case SF_STR_COPYRIGHT :
+				key = "copyright" ;
+				break ;
+			case SF_STR_ARTIST :
+				key = "artist" ;
+				break ;
+			case SF_STR_COMMENT :
+				key = "comment" ;
+				break ;
+			case SF_STR_DATE :
+				key = "date" ;
+				break ;
+			case SF_STR_ALBUM :
+				key = "album" ;
+				break ;
+			default :
+				continue ;
+			} ;
+
+		value = psf->strings [k].str ;
+
+		FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair (&entry, key, value) ;
+		FLAC__metadata_object_vorbiscomment_append_comment (pflac->metadata, entry, /* copy */ SF_TRUE) ;
+		} ;
+
+	if (! FLAC__stream_encoder_set_metadata (pflac->fse, &pflac->metadata, 1))
+	{	printf ("%s %d : fail\n", __func__, __LINE__) ;
+		return ;
+		} ;
+
+	return ;
+} /* flac_write_strings */
+
+static int
+flac_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
+{	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->codec_data ;
+	int err ;
+
+	flac_write_strings (psf, pflac) ;
+
+	if ((err = FLAC__stream_encoder_init_stream (pflac->fse, sf_flac_enc_write_callback, sf_flac_enc_seek_callback, sf_flac_enc_tell_callback, NULL, psf)) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
+	{	psf_log_printf (psf, "Error : FLAC encoder init returned error : %s\n", FLAC__StreamEncoderInitStatusString [err]) ;
+		return SFE_FLAC_INIT_DECODER ;
+		} ;
+
+	if (psf->error == 0)
+		psf->dataoffset = psf_ftell (psf) ;
+	pflac->encbuffer = calloc (ENC_BUFFER_SIZE, sizeof (FLAC__int32)) ;
+
+	return psf->error ;
+} /* flac_write_header */
+
 /*------------------------------------------------------------------------------
 ** Public function.
 */
@@ -531,8 +630,12 @@ flac_open	(SF_PRIVATE *psf)
 		psf->endian = SF_ENDIAN_BIG ;
 		psf->sf.seekable = 0 ;
 
+		psf->str_flags = SF_STR_ALLOW_START ;
+
 		if ((error = flac_enc_init (psf)))
 			return error ;
+
+		psf->write_header = flac_write_header ;
 		} ;
 
 	psf->datalength = psf->filelength ;
@@ -569,6 +672,9 @@ flac_close	(SF_PRIVATE *psf)
 
 	if ((pflac = (FLAC_PRIVATE*) psf->codec_data) == NULL)
 		return 0 ;
+
+	if (pflac->metadata != NULL)
+		FLAC__metadata_object_delete (pflac->metadata) ;
 
 	if (psf->mode == SFM_WRITE)
 	{	FLAC__stream_encoder_finish (pflac->fse) ;
@@ -628,20 +734,23 @@ flac_enc_init (SF_PRIVATE *psf)
 
 	if ((pflac->fse = FLAC__stream_encoder_new ()) == NULL)
 		return SFE_FLAC_NEW_DECODER ;
-	FLAC__stream_encoder_set_channels (pflac->fse, psf->sf.channels) ;
-	FLAC__stream_encoder_set_sample_rate (pflac->fse, psf->sf.samplerate) ;
-	FLAC__stream_encoder_set_bits_per_sample (pflac->fse, bps) ;
 
-	if ((bps = FLAC__stream_encoder_init_stream (pflac->fse, sf_flac_enc_write_callback, sf_flac_enc_seek_callback, sf_flac_enc_tell_callback, NULL, psf)) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
-	{	psf_log_printf (psf, "Error : FLAC encoder init returned error : %s\n", FLAC__StreamEncoderInitStatusString [bps]) ;
+	if (! FLAC__stream_encoder_set_channels (pflac->fse, psf->sf.channels))
+	{	psf_log_printf (psf, "FLAC__stream_encoder_set_channels (%d) return false.\n", psf->sf.channels) ;
 		return SFE_FLAC_INIT_DECODER ;
 		} ;
 
-	if (psf->error == 0)
-		psf->dataoffset = psf_ftell (psf) ;
-	pflac->encbuffer = calloc (ENC_BUFFER_SIZE, sizeof (FLAC__int32)) ;
+	if (! FLAC__stream_encoder_set_sample_rate (pflac->fse, psf->sf.samplerate))
+	{	psf_log_printf (psf, "FLAC__stream_encoder_set_sample_rate (%d) returned false.\n", psf->sf.samplerate) ;
+		return SFE_FLAC_BAD_SAMPLE_RATE ;
+		} ;
 
-	return psf->error ;
+	if (! FLAC__stream_encoder_set_bits_per_sample (pflac->fse, bps))
+	{	psf_log_printf (psf, "FLAC__stream_encoder_set_bits_per_sample (%d) return false.\n", bps) ;
+		return SFE_FLAC_INIT_DECODER ;
+		} ;
+
+	return 0 ;
 } /* flac_enc_init */
 
 static int
@@ -658,6 +767,8 @@ flac_read_header (SF_PRIVATE *psf)
 		return SFE_FLAC_INIT_DECODER ;
 
 	FLAC__stream_decoder_process_until_end_of_metadata (pflac->fsd) ;
+
+	psf_log_printf (psf, "End\n") ;
 
 	if (psf->error == 0)
 	{	FLAC__uint64 position ;

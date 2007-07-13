@@ -223,7 +223,7 @@ enum
 */
 
 #define	SF_STR_FIRST	SF_STR_TITLE
-#define	SF_STR_LAST		SF_STR_DATE
+#define	SF_STR_LAST		SF_STR_ALBUM
 
 enum
 {	/* True and false */
