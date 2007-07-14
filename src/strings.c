@@ -131,6 +131,7 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 		case SF_STR_COMMENT :
 		case SF_STR_DATE :
 		case SF_STR_ALBUM :
+		case SF_STR_LICENSE :
 				psf->strings [k].type = str_type ;
 				psf->strings [k].str = psf->str_end ;
 				psf->strings [k].flags = str_flags ;

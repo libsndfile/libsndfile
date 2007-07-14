@@ -205,7 +205,7 @@ string_start_end_test (const char *filename, int typemajor)
 
 	if (typemajor != SF_FORMAT_WAV && typemajor != SF_FORMAT_AIFF)
 	{	cptr = sf_get_string (file, SF_STR_LICENSE) ;
-		if (cptr == NULL || strcmp (album, cptr) != 0)
+		if (cptr == NULL || strcmp (license, cptr) != 0)
 		{	if (errors++ == 0)
 				puts ("\n") ;
 			printf ("    Bad license : %s\n", cptr) ;
@@ -327,7 +327,7 @@ string_start_test (const char *filename, int typemajor)
 
 	if (typemajor != SF_FORMAT_WAV && typemajor != SF_FORMAT_AIFF)
 	{	cptr = sf_get_string (file, SF_STR_LICENSE) ;
-		if (cptr == NULL || strcmp (album, cptr) != 0)
+		if (cptr == NULL || strcmp (license, cptr) != 0)
 		{	if (errors++ == 0)
 				puts ("\n") ;
 			printf ("    Bad license : %s\n", cptr) ;

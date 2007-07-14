@@ -395,6 +395,7 @@ sd2-tests: write_read_test
 
 flac-tests: write_read_test
 	./write_read_test flac
+	./string_test flac
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on FLAC files."
 	@echo "----------------------------------------------------------------------"

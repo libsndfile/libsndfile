@@ -3,6 +3,9 @@
     * src/FLAC
     Merge from FLAC upstream sources.
 
+    * src/strings.c tests/string_test.c tests/Makefile.am
+    Make sure string tests for SF_STR_LICENSE actually works.
+
 2007-07-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/string_test.c
