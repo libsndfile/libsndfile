@@ -215,7 +215,8 @@ enum
 	SF_STR_ARTIST					= 0x04,
 	SF_STR_COMMENT					= 0x05,
 	SF_STR_DATE						= 0x06,
-	SF_STR_ALBUM					= 0x07
+	SF_STR_ALBUM					= 0x07,
+	SF_STR_LICENSE					= 0x08
 } ;
 
 /*
@@ -224,7 +225,7 @@ enum
 */
 
 #define	SF_STR_FIRST	SF_STR_TITLE
-#define	SF_STR_LAST		SF_STR_DATE
+#define	SF_STR_LAST		SF_STR_LICENSE
 
 enum
 {	/* True and false */
