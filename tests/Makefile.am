@@ -16,7 +16,7 @@ noinst_PROGRAMS = sfversion floating_point_test write_read_test \
 
 SNDFILEDIR = ../src
 INCLUDES = -I$(srcdir)/$(SNDFILEDIR)
-noinst_HEADERS = dft_cmp.h utils.h
+noinst_HEADERS = dft_cmp.h utils.h generate.h
 
 autogen_sources = write_read_test.tpl write_read_test.def	\
 					pcm_test.tpl pcm_test.def				\
@@ -34,7 +34,7 @@ EXTRA_DIST = $(autogen_sources)
 sfversion_SOURCES = sfversion.c
 sfversion_LDADD = $(SNDFILEDIR)/libsndfile.la
 
-write_read_test_SOURCES = utils.c write_read_test.c
+write_read_test_SOURCES = utils.c generate.c write_read_test.c
 write_read_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 lossy_comp_test_SOURCES = utils.c lossy_comp_test.c
@@ -395,6 +395,7 @@ sd2-tests: write_read_test
 
 flac-tests: write_read_test
 	./write_read_test flac
+	./string_test flac
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on FLAC files."
 	@echo "----------------------------------------------------------------------"

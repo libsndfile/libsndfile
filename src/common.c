@@ -1112,8 +1112,9 @@ psf_default_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t samples_from_st
 */
 
 void
-psf_hexdump (void *ptr, int len)
-{	char	ascii [17], *data ;
+psf_hexdump (const void *ptr, int len)
+{	const char *data ;
+	char	ascii [17] ;
 	int		k, m ;
 
 	if ((data = ptr) == NULL)

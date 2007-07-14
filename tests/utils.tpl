@@ -55,6 +55,8 @@ void	print_test_name (const char *test, const char *filename) ;
 
 void	dump_data_to_file (const char *filename, void *data, unsigned int datalen) ;
 
+void	write_mono_file (const char * filename, int format, int srate, float * output, int len) ;
+
 static inline void
 exit_if_true (int test, const char *format, ...)
 {	if (test)
@@ -691,14 +693,26 @@ check_open_file_count_or_die (int lineno)
 #endif
 } /* check_open_file_count_or_die */
 
+void
+write_mono_file (const char * filename, int format, int srate, float * output, int len)
+{	SNDFILE * file ;
+	SF_INFO sfinfo ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	sfinfo.samplerate = srate ;
+	sfinfo.channels = 1 ;
+	sfinfo.format = format ;
+
+	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
+	{	printf ("sf_open (%s) : %s\n", filename, sf_strerror (NULL)) ;
+		exit (1) ;
+		} ;
+
+	sf_write_float (file, output, len) ;
+	
+	sf_close (file) ;
+} /* write_mono_file */
+
 [+ ESAC +]
 
-[+ COMMENT
-
- Do not edit or modify anything in this comment block.
- The following line is a file identity tag for the GNU Arch
- revision control system.
-
- arch-tag: b1183d5d-ebd4-4bc5-af50-60d774d6b1f5
-
-+]

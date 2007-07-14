@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ static int truncate (const char *filename, int ignored) ;
 #include	<sndfile.h>
 
 #include	"utils.h"
+#include	"generate.h"
 
 #define	SAMPLE_RATE			11025
 #define	DATA_LENGTH			(1<<12)
@@ -340,6 +341,10 @@ main (int argc, char **argv)
 	{	pcm_test_char	("char.sds"		, SF_FORMAT_SDS | SF_FORMAT_PCM_S8, SF_TRUE) ;
 		pcm_test_short	("short.sds"	, SF_FORMAT_SDS | SF_FORMAT_PCM_16, SF_TRUE) ;
 		pcm_test_24bit	("24bit.sds"	, SF_FORMAT_SDS | SF_FORMAT_PCM_24, SF_TRUE) ;
+
+		empty_file_test ("empty_char.sds", SF_FORMAT_SDS | SF_FORMAT_PCM_S8) ;
+		empty_file_test ("empty_short.sds", SF_FORMAT_SDS | SF_FORMAT_PCM_16) ;
+
 		test_count++ ;
 		} ;
 
@@ -395,6 +400,7 @@ static void mono_[+ (get "type_name") +]_test (const char *filename, int format,
 static void stereo_[+ (get "type_name") +]_test (const char *filename, int format, int long_file_ok, int allow_fd) ;
 static void mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int long_file_ok, int allow_fd) ;
 static void new_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int allow_fd) ;
+static void multi_seek_test (const char * filename, int format) ;
 
 static void
 pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_file_ok)
@@ -599,6 +605,8 @@ mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_fi
 	test_seek_or_die (file, 0, SEEK_CUR, sfinfo.frames, sfinfo.channels, __LINE__) ;
 
 	sf_close (file) ;
+
+	multi_seek_test (filename, format) ;
 
 } /* mono_[+ (get "type_name") +]_test */
 
@@ -1015,12 +1023,26 @@ truncate (const char *filename, int ignored)
 
 #endif
 
-[+ COMMENT
+static void
+multi_seek_test (const char * filename, int format)
+{	SNDFILE * file ;
+	SF_INFO info ;
+	int k ;
 
- Do not edit or modify anything in this comment block.
- The following line is a file identity tag for the GNU Arch
- revision control system.
+	/* This test doesn't work on RAW files. */
+	if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW)
+		return ;
 
- arch-tag: 4187de93-d434-41a2-93a9-4f6e2995b5c1
+	memset (&info, 0, sizeof (info)) ;
 
-+]
+	generate_file (filename, format, 88200) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &info, SF_FALSE, __LINE__) ;
+
+	for (k = 0 ; k < 10 ; k++)
+		sf_seek (file, info.frames / (k + 1), SEEK_SET) ;
+
+	sf_close (file) ;
+} /* multi_seek_test */
+
+

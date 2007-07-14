@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004, 2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Tobias Gehrig <tgehrig@ira.uka.de>
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 
 #include	"FLAC/include/FLAC/stream_decoder.h"
 #include	"FLAC/include/FLAC/stream_encoder.h"
+#include	"FLAC/include/FLAC/metadata.h"
 
 #include	"sfendian.h"
 #include	"float_cast.h"
@@ -40,12 +41,13 @@
 */
 
 #define ENC_BUFFER_SIZE 4096
+#define RBUFFER_LEN		4096
 
 typedef enum
-{	PFLAC_PCM_SHORT = 0,
-	PFLAC_PCM_INT = 1,
-	PFLAC_PCM_FLOAT = 2,
-	PFLAC_PCM_DOUBLE = 3
+{	PFLAC_PCM_SHORT = 50,
+	PFLAC_PCM_INT = 51,
+	PFLAC_PCM_FLOAT = 52,
+	PFLAC_PCM_DOUBLE = 53
 } PFLAC_PCM ;
 
 typedef struct
@@ -57,6 +59,8 @@ typedef struct
 	void* ptr ;
 	unsigned pos, len, remain ;
 
+	FLAC__StreamMetadata *metadata ;
+
 	const FLAC__int32 * const * wbuffer ;
 	FLAC__int32 * rbuffer [FLAC__MAX_CHANNELS] ;
 
@@ -66,6 +70,11 @@ typedef struct
 	const FLAC__Frame *frame ;
 	FLAC__bool bufferbackup ;
 } FLAC_PRIVATE ;
+
+typedef struct
+{	const char *tag ;
+	int type ;
+} FLAC_TAG ;
 
 static sf_count_t	flac_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 static int			flac_close (SF_PRIVATE *psf) ;
@@ -168,8 +177,18 @@ flac_buffer_copy (SF_PRIVATE *psf)
 		*/
 		pflac->bufferbackup = SF_TRUE ;
 		for (i = 0 ; i < frame->header.channels ; i++)
-		{	if (pflac->rbuffer [i] == NULL)
-				pflac->rbuffer [i] = calloc (frame->header.blocksize, sizeof (FLAC__int32)) ;
+		{	/*
+			**	frame->header.blocksize is variable so don't use it, use a
+			**	constant and check it.
+			*/
+			if (frame->header.blocksize > RBUFFER_LEN)
+			{	psf_log_printf (psf, "%s %d : frame->header.blocksize > RBUFFER_LEN\n", __func__, __LINE__) ;
+				return 0 ;
+				} ;
+
+			if (pflac->rbuffer [i] == NULL)
+				pflac->rbuffer [i] = calloc (RBUFFER_LEN, sizeof (FLAC__int32)) ;
+
 			memcpy (pflac->rbuffer [i], buffer [i], frame->header.blocksize * sizeof (FLAC__int32)) ;
 			} ;
 		pflac->wbuffer = (const FLAC__int32* const*) pflac->rbuffer ;
@@ -179,12 +198,16 @@ flac_buffer_copy (SF_PRIVATE *psf)
 
 	switch (pflac->pcmtype)
 	{	case PFLAC_PCM_SHORT :
-			{	short *retpcm = ((short*) pflac->ptr) ;
+			{	short *retpcm = (short*) pflac->ptr ;
 				int shift = 16 - frame->header.bits_per_sample ;
 				if (shift < 0)
 				{	shift = abs (shift) ;
 					for (i = 0 ; i < frame->header.blocksize && pflac->remain > 0 ; i++)
 					{	offset = pflac->pos + i * frame->header.channels ;
+
+						if (pflac->bufferpos >= frame->header.blocksize)
+							break ;
+
 						for (j = 0 ; j < frame->header.channels ; j++)
 							retpcm [offset + j] = buffer [j][pflac->bufferpos] >> shift ;
 						pflac->remain -= frame->header.channels ;
@@ -209,7 +232,7 @@ flac_buffer_copy (SF_PRIVATE *psf)
 			break ;
 
 		case PFLAC_PCM_INT :
-			{	int *retpcm = ((int*) pflac->ptr) ;
+			{	int *retpcm = (int*) pflac->ptr ;
 				int shift = 32 - frame->header.bits_per_sample ;
 				for (i = 0 ; i < frame->header.blocksize && pflac->remain > 0 ; i++)
 				{	offset = pflac->pos + i * frame->header.channels ;
@@ -226,7 +249,7 @@ flac_buffer_copy (SF_PRIVATE *psf)
 			break ;
 
 		case PFLAC_PCM_FLOAT :
-			{	float *retpcm = ((float*) pflac->ptr) ;
+			{	float *retpcm = (float*) pflac->ptr ;
 				float norm = (psf->norm_float == SF_TRUE) ? 1.0 / (1 << (frame->header.bits_per_sample - 1)) : 1.0 ;
 
 				for (i = 0 ; i < frame->header.blocksize && pflac->remain > 0 ; i++)
@@ -244,7 +267,7 @@ flac_buffer_copy (SF_PRIVATE *psf)
 			break ;
 
 		case PFLAC_PCM_DOUBLE :
-			{	double *retpcm = ((double*) pflac->ptr) ;
+			{	double *retpcm = (double*) pflac->ptr ;
 				double norm = (psf->norm_double == SF_TRUE) ? 1.0 / (1 << (frame->header.bits_per_sample - 1)) : 1.0 ;
 
 				for (i = 0 ; i < frame->header.blocksize && pflac->remain > 0 ; i++)
@@ -342,8 +365,42 @@ sf_flac_write_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC
 } /* sf_flac_write_callback */
 
 static void
+sf_flac_meta_get_vorbiscomments (SF_PRIVATE *psf, const FLAC__StreamMetadata *metadata)
+{	FLAC_TAG tags [] =
+	{ 	{ "title", SF_STR_TITLE },
+		{ "copyright", SF_STR_COPYRIGHT },
+		{ "software", SF_STR_SOFTWARE },
+		{ "artist", SF_STR_ARTIST },
+		{ "comment", SF_STR_COMMENT },
+		{ "date", SF_STR_DATE },
+		{ "album", SF_STR_ALBUM },
+		{ "license", SF_STR_LICENSE }
+		} ;
+
+	const char *value, *cptr ;
+	int k, tag_num ;
+
+	for (k = 0 ; k < ARRAY_LEN (tags) ; k++)
+	{	tag_num = FLAC__metadata_object_vorbiscomment_find_entry_from (metadata, 0, tags [k].tag) ;
+
+		if (tag_num < 0)
+			continue ;
+
+		value = (const char*) metadata->data.vorbis_comment.comments [tag_num].entry ;
+		if ((cptr = strchr (value, '=')) != NULL)
+			value = cptr + 1 ;
+
+		psf_log_printf (psf, "  %-10s : %s\n", tags [k].tag, value) ;
+		psf_store_string (psf, tags [k].type, value) ;
+		} ;
+
+	return ;
+} /* sf_flac_meta_get_vorbiscomments */
+
+static void
 sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC__StreamMetadata *metadata, void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
+	int bitwidth = 0 ;
 
 	switch (metadata->type)
 	{	case FLAC__METADATA_TYPE_STREAMINFO :
@@ -351,25 +408,62 @@ sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC_
 			psf->sf.samplerate = metadata->data.stream_info.sample_rate ;
 			psf->sf.frames = metadata->data.stream_info.total_samples ;
 
+			psf_log_printf (psf, "FLAC Stream Metadata\n  Channels    : %d\n  Sample rate : %d\n  Frames      : %D\n", psf->sf.channels, psf->sf.samplerate, psf->sf.frames) ;
+
 			switch (metadata->data.stream_info.bits_per_sample)
 			{	case 8 :
 					psf->sf.format |= SF_FORMAT_PCM_S8 ;
+					bitwidth = 8 ;
 					break ;
 				case 16 :
 					psf->sf.format |= SF_FORMAT_PCM_16 ;
+					bitwidth = 16 ;
 					break ;
 				case 24 :
 					psf->sf.format |= SF_FORMAT_PCM_24 ;
+					bitwidth = 24 ;
 					break ;
 				default :
 					psf_log_printf (psf, "sf_flac_meta_callback : bits_per_sample %d not yet implemented.\n", metadata->data.stream_info.bits_per_sample) ;
 					break ;
 				} ;
+
+			if (bitwidth > 0)
+				psf_log_printf (psf, "  Bit width   : %d\n", bitwidth) ;
+			break ;
+
+		case FLAC__METADATA_TYPE_VORBIS_COMMENT :
+			psf_log_printf (psf, "Vorbis Comment Metadata\n") ;
+			sf_flac_meta_get_vorbiscomments (psf, metadata) ;
+			break ;
+
+		case FLAC__METADATA_TYPE_PADDING :
+			psf_log_printf (psf, "Padding Metadata\n") ;
+			break ;
+
+		case FLAC__METADATA_TYPE_APPLICATION :
+			psf_log_printf (psf, "Application Metadata\n") ;
+			break ;
+
+		case FLAC__METADATA_TYPE_SEEKTABLE :
+			psf_log_printf (psf, "Seektable Metadata\n") ;
+			break ;
+
+		case FLAC__METADATA_TYPE_CUESHEET :
+			psf_log_printf (psf, "Cuesheet Metadata\n") ;
+			break ;
+
+		case FLAC__METADATA_TYPE_PICTURE :
+			psf_log_printf (psf, "Picture Metadata\n") ;
+			break ;
+
+		case FLAC__METADATA_TYPE_UNDEFINED :
+			psf_log_printf (psf, "Undefined Metadata\n") ;
 			break ;
 
 		default :
 			psf_log_printf (psf, "sf_flac_meta_callback : metadata-type %d not yet implemented.\n", metadata->type) ;
-		break ;
+			break ;
 		} ;
 
 	return ;
@@ -428,6 +522,89 @@ sf_flac_enc_write_callback (const FLAC__StreamEncoder * UNUSED (encoder), const 
 	return FLAC__STREAM_ENCODER_WRITE_STATUS_FATAL_ERROR ;
 } /* sf_flac_enc_write_callback */
 
+static void
+flac_write_strings (SF_PRIVATE *psf, FLAC_PRIVATE* pflac)
+{	FLAC__StreamMetadata_VorbisComment_Entry entry ;
+	int	k, string_count = 0 ;
+
+	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
+	{	if (psf->strings [k].type != 0)
+			string_count ++ ;
+		} ;
+
+	if (string_count == 0)
+		return ;
+
+	if (pflac->metadata == NULL && (pflac->metadata = FLAC__metadata_object_new (FLAC__METADATA_TYPE_VORBIS_COMMENT)) == NULL)
+	{	psf_log_printf (psf, "FLAC__metadata_object_new returned NULL\n") ;
+		return ;
+		} ;
+
+	for (k = 0 ; k < SF_MAX_STRINGS && psf->strings [k].type != 0 ; k++)
+	{	const char * key, * value ;
+
+		switch (psf->strings [k].type)
+		{	case SF_STR_SOFTWARE :
+				key = "software" ;
+				break ;
+			case SF_STR_TITLE :
+				key = "title" ;
+				break ;
+			case SF_STR_COPYRIGHT :
+				key = "copyright" ;
+				break ;
+			case SF_STR_ARTIST :
+				key = "artist" ;
+				break ;
+			case SF_STR_COMMENT :
+				key = "comment" ;
+				break ;
+			case SF_STR_DATE :
+				key = "date" ;
+				break ;
+			case SF_STR_ALBUM :
+				key = "album" ;
+				break ;
+			case SF_STR_LICENSE :
+				key = "license" ;
+				break ;
+			default :
+				continue ;
+			} ;
+
+		value = psf->strings [k].str ;
+
+		FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair (&entry, key, value) ;
+		FLAC__metadata_object_vorbiscomment_append_comment (pflac->metadata, entry, /* copy */ SF_TRUE) ;
+		} ;
+
+	if (! FLAC__stream_encoder_set_metadata (pflac->fse, &pflac->metadata, 1))
+	{	printf ("%s %d : fail\n", __func__, __LINE__) ;
+		return ;
+		} ;
+
+	return ;
+} /* flac_write_strings */
+
+static int
+flac_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
+{	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->codec_data ;
+	int err ;
+
+	flac_write_strings (psf, pflac) ;
+
+	if ((err = FLAC__stream_encoder_init_stream (pflac->fse, sf_flac_enc_write_callback, sf_flac_enc_seek_callback, sf_flac_enc_tell_callback, NULL, psf)) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
+	{	psf_log_printf (psf, "Error : FLAC encoder init returned error : %s\n", FLAC__StreamEncoderInitStatusString [err]) ;
+		return SFE_FLAC_INIT_DECODER ;
+		} ;
+
+	if (psf->error == 0)
+		psf->dataoffset = psf_ftell (psf) ;
+	pflac->encbuffer = calloc (ENC_BUFFER_SIZE, sizeof (FLAC__int32)) ;
+
+	return psf->error ;
+} /* flac_write_header */
+
 /*------------------------------------------------------------------------------
 ** Public function.
 */
@@ -457,8 +634,12 @@ flac_open	(SF_PRIVATE *psf)
 		psf->endian = SF_ENDIAN_BIG ;
 		psf->sf.seekable = 0 ;
 
+		psf->str_flags = SF_STR_ALLOW_START ;
+
 		if ((error = flac_enc_init (psf)))
 			return error ;
+
+		psf->write_header = flac_write_header ;
 		} ;
 
 	psf->datalength = psf->filelength ;
@@ -473,7 +654,7 @@ flac_open	(SF_PRIVATE *psf)
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
 	switch (subformat)
-	{	case SF_FORMAT_PCM_S8 :		/* 8-bit FLAC.  */
+	{	case SF_FORMAT_PCM_S8 :	/* 8-bit FLAC.  */
 		case SF_FORMAT_PCM_16 :	/* 16-bit FLAC. */
 		case SF_FORMAT_PCM_24 :	/* 24-bit FLAC. */
 			error = flac_init (psf) ;
@@ -495,6 +676,9 @@ flac_close	(SF_PRIVATE *psf)
 
 	if ((pflac = (FLAC_PRIVATE*) psf->codec_data) == NULL)
 		return 0 ;
+
+	if (pflac->metadata != NULL)
+		FLAC__metadata_object_delete (pflac->metadata) ;
 
 	if (psf->mode == SFM_WRITE)
 	{	FLAC__stream_encoder_finish (pflac->fse) ;
@@ -554,20 +738,23 @@ flac_enc_init (SF_PRIVATE *psf)
 
 	if ((pflac->fse = FLAC__stream_encoder_new ()) == NULL)
 		return SFE_FLAC_NEW_DECODER ;
-	FLAC__stream_encoder_set_channels (pflac->fse, psf->sf.channels) ;
-	FLAC__stream_encoder_set_sample_rate (pflac->fse, psf->sf.samplerate) ;
-	FLAC__stream_encoder_set_bits_per_sample (pflac->fse, bps) ;
 
-	if ((bps = FLAC__stream_encoder_init_stream (pflac->fse, sf_flac_enc_write_callback, sf_flac_enc_seek_callback, sf_flac_enc_tell_callback, NULL, psf)) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
-	{	psf_log_printf (psf, "Error : FLAC encoder init returned error : %s\n", FLAC__StreamEncoderInitStatusString [bps]) ;
+	if (! FLAC__stream_encoder_set_channels (pflac->fse, psf->sf.channels))
+	{	psf_log_printf (psf, "FLAC__stream_encoder_set_channels (%d) return false.\n", psf->sf.channels) ;
 		return SFE_FLAC_INIT_DECODER ;
 		} ;
 
-	if (psf->error == 0)
-		psf->dataoffset = psf_ftell (psf) ;
-	pflac->encbuffer = calloc (ENC_BUFFER_SIZE, sizeof (FLAC__int32)) ;
+	if (! FLAC__stream_encoder_set_sample_rate (pflac->fse, psf->sf.samplerate))
+	{	psf_log_printf (psf, "FLAC__stream_encoder_set_sample_rate (%d) returned false.\n", psf->sf.samplerate) ;
+		return SFE_FLAC_BAD_SAMPLE_RATE ;
+		} ;
 
-	return psf->error ;
+	if (! FLAC__stream_encoder_set_bits_per_sample (pflac->fse, bps))
+	{	psf_log_printf (psf, "FLAC__stream_encoder_set_bits_per_sample (%d) return false.\n", bps) ;
+		return SFE_FLAC_INIT_DECODER ;
+		} ;
+
+	return 0 ;
 } /* flac_enc_init */
 
 static int
@@ -578,10 +765,14 @@ flac_read_header (SF_PRIVATE *psf)
 	if ((pflac->fsd = FLAC__stream_decoder_new ()) == NULL)
 		return SFE_FLAC_NEW_DECODER ;
 
+	FLAC__stream_decoder_set_metadata_respond_all (pflac->fsd) ;
+
 	if (FLAC__stream_decoder_init_stream (pflac->fsd, sf_flac_read_callback, sf_flac_seek_callback, sf_flac_tell_callback, sf_flac_length_callback, sf_flac_eof_callback, sf_flac_write_callback, sf_flac_meta_callback, sf_flac_error_callback, psf) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
 		return SFE_FLAC_INIT_DECODER ;
 
 	FLAC__stream_decoder_process_until_end_of_metadata (pflac->fsd) ;
+
+	psf_log_printf (psf, "End\n") ;
 
 	if (psf->error == 0)
 	{	FLAC__uint64 position ;

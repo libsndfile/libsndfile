@@ -487,12 +487,3 @@ extra_header_test (const char *filename, int filetype)
 #endif
 } /* extra_header_test */
 
-[+ COMMENT
-
- Do not edit or modify anything in this comment block.
- The arch-tag line is a file identity tag for the GNU Arch
- revision control system.
-
- arch-tag: ba02b7d6-8a89-45f3-aad2-a50390f52af5
-
-+]

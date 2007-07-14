@@ -35,6 +35,7 @@
 
 #include <stdio.h>
 #include <stdlib.h> /* for qsort() */
+#include <string.h> /* for memset() */
 #include "FLAC/assert.h"
 #include "FLAC/format.h"
 #include "private/format.h"
@@ -56,13 +57,13 @@
 #endif
 
 /* VERSION should come from configure */
-FLAC_API const char *FLAC__VERSION_STRING = VERSION;
+FLAC_API const char *FLAC__VERSION_STRING = "1.2.0";
 
 #if defined _MSC_VER || defined __BORLANDC__ || defined __MINW32__
 /* yet one more hack because of MSVC6: */
-FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC 1.1.4 20070213";
+FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC 1.2.0 20070707";
 #else
-FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC " VERSION " 20070213";
+FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC " VERSION " 20070707";
 #endif
 
 FLAC_API const FLAC__byte FLAC__STREAM_SYNC_STRING[4] = { 'f','L','a','C' };
@@ -123,7 +124,8 @@ FLAC_API const unsigned FLAC__STREAM_METADATA_LENGTH_LEN = 24; /* bits */
 
 FLAC_API const unsigned FLAC__FRAME_HEADER_SYNC = 0x3ffe;
 FLAC_API const unsigned FLAC__FRAME_HEADER_SYNC_LEN = 14; /* bits */
-FLAC_API const unsigned FLAC__FRAME_HEADER_RESERVED_LEN = 2; /* bits */
+FLAC_API const unsigned FLAC__FRAME_HEADER_RESERVED_LEN = 1; /* bits */
+FLAC_API const unsigned FLAC__FRAME_HEADER_BLOCKING_STRATEGY_LEN = 1; /* bits */
 FLAC_API const unsigned FLAC__FRAME_HEADER_BLOCK_SIZE_LEN = 4; /* bits */
 FLAC_API const unsigned FLAC__FRAME_HEADER_SAMPLE_RATE_LEN = 4; /* bits */
 FLAC_API const unsigned FLAC__FRAME_HEADER_CHANNEL_ASSIGNMENT_LEN = 4; /* bits */
@@ -136,12 +138,15 @@ FLAC_API const unsigned FLAC__FRAME_FOOTER_CRC_LEN = 16; /* bits */
 FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_TYPE_LEN = 2; /* bits */
 FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_ORDER_LEN = 4; /* bits */
 FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_PARAMETER_LEN = 4; /* bits */
+FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2_PARAMETER_LEN = 5; /* bits */
 FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_RAW_LEN = 5; /* bits */
 
 FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_ESCAPE_PARAMETER = 15; /* == (1<<FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE_PARAMETER_LEN)-1 */
+FLAC_API const unsigned FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2_ESCAPE_PARAMETER = 31; /* == (1<<FLAC__ENTROPY_CODING_METHOD_PARTITIONED_RICE2_PARAMETER_LEN)-1 */
 
 FLAC_API const char * const FLAC__EntropyCodingMethodTypeString[] = {
-	"PARTITIONED_RICE"
+	"PARTITIONED_RICE",
+	"PARTITIONED_RICE2"
 };
 
 FLAC_API const unsigned FLAC__SUBFRAME_LPC_QLP_COEFF_PRECISION_LEN = 4; /* bits */
@@ -576,6 +581,7 @@ FLAC__bool FLAC__format_entropy_coding_method_partitioned_rice_contents_ensure_s
 			return false;
 		if(0 == (object->raw_bits = (unsigned*)realloc(object->raw_bits, sizeof(unsigned)*(1 << max_partition_order))))
 			return false;
+		memset(object->raw_bits, 0, sizeof(unsigned)*(1 << max_partition_order));
 		object->capacity_by_order = max_partition_order;
 	}
 

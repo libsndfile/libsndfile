@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2005,2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2005-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -163,11 +163,10 @@ SndfileHandle::SndfileHandle (const char *path, int mode, int fmt, int chans, in
 		p->sfinfo.sections = 0 ;
 		p->sfinfo.seekable = 0 ;
 
-		if ((p->sf = sf_open (path, mode, &p->sfinfo)) == NULL)
-		{	delete p ;
-			p = NULL ;
-			} ;
+		p->sf = sf_open (path, mode, &p->sfinfo) ;
 		} ;
+
+	return ;
 } /* SndfileHandle const char * constructor */
 
 inline
@@ -186,11 +185,10 @@ SndfileHandle::SndfileHandle (std::string const & path, int mode, int fmt, int c
 		p->sfinfo.sections = 0 ;
 		p->sfinfo.seekable = 0 ;
 
-		if ((p->sf = sf_open (path.c_str (), mode, &p->sfinfo)) == NULL)
-		{	delete p ;
-			p = NULL ;
-			} ;
+		p->sf = sf_open (path.c_str (), mode, &p->sfinfo) ;
 		} ;
+
+	return ;
 } /* SndfileHandle std::string constructor */
 
 inline
@@ -342,10 +340,3 @@ SndfileHandle::writeRaw (const void *ptr, sf_count_t bytes)
 
 #endif	/* SNDFILE_HH */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The following line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: a0e9d996-73d7-47c4-a78d-79a3232a9eef
-*/

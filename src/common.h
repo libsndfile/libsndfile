@@ -86,16 +86,16 @@
 
 #if (COMPILER_IS_GCC == 1)
 #define		SF_MAX(x,y)		({ \
-								typeof(x) _x = (x); \
-								typeof(y) _y = (y); \
-								(void) (&_x == &_y); \
-								_x > _y ? _x : _y; })
+								typeof (x) _x = (x) ; \
+								typeof (y) _y = (y) ; \
+								(void) (&_x == &_y) ; \
+								_x > _y ? _x : _y ; })
 
 #define		SF_MIN(x,y)		({ \
-								typeof(x) _x = (x); \
-								typeof(y) _y = (y); \
-								(void) (&_x == &_y); \
-								_x < _y ? _x : _y; })
+								typeof (x) _x = (x) ; \
+								typeof (y) _y = (y) ; \
+								(void) (&_x == &_y) ; \
+								_x < _y ? _x : _y ; })
 #else
 #define		SF_MAX(a,b)		((a) > (b) ? (a) : (b))
 #define		SF_MIN(a,b)		((a) < (b) ? (a) : (b))
@@ -587,7 +587,7 @@ void	double64_le_write	(double in, unsigned char *out) ;
 void	psf_log_printf		(SF_PRIVATE *psf, const char *format, ...) ;
 void	psf_log_SF_INFO 	(SF_PRIVATE *psf) ;
 
-void	psf_hexdump (void *ptr, int len) ;
+void	psf_hexdump (const void *ptr, int len) ;
 
 /* Functions used when writing file headers. */
 
@@ -804,10 +804,3 @@ int sf_dither_double	(const SF_DITHER_INFO *dither, const double *in, double *ou
 
 #endif /* SNDFILE_COMMON_H */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 7b45c0ee-5835-4a18-a4ef-994e4cd95b67
-*/

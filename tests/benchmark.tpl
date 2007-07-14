@@ -350,12 +350,3 @@ get_subtype_str (int subtype)
 	return "UNKNOWN" ;
 } /* get_subtype_str */
 
-[+ COMMENT
-
- Do not edit or modify anything in this comment block.
- The following line is a file identity tag for the GNU Arch 
- revision control system.
-
- arch-tag: 64ccb3fb-c61d-42d7-b14f-0ec3ba303f88
-
-+]

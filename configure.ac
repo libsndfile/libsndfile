@@ -1,9 +1,9 @@
 # Copyright (C) 1999-2006 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
 
 dnl Require autoconf version
-AC_PREREQ(2.59)
+AC_PREREQ(2.57)
 
-AC_INIT([libsndfile],[1.0.18pre9],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.18pre13],[erikd@mega-nerd.com])
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
@@ -225,6 +225,8 @@ AC_DEFINE_UNQUOTED(CPU_IS_BIG_ENDIAN, ${ac_cv_c_big_endian},
 	[Target processor is big endian.])
 AC_DEFINE_UNQUOTED(CPU_IS_LITTLE_ENDIAN, ${ac_cv_c_little_endian},
 	[Target processor is little endian.])
+AC_DEFINE_UNQUOTED(WORDS_BIGENDIAN, ${ac_cv_c_big_endian},
+	[Target processor is big endian.])
 
 #====================================================================================
 # Check for functions.
@@ -368,12 +370,24 @@ if test "$AS" = "gas" ; then
 	fi
 
 case "$host" in
-	i386-*-openbsd3.[[0-3]]) OBJ_FORMAT=aoutb ;;
-	*-*-cygwin|*mingw*) OBJ_FORMAT=win32 ;;
-	*) OBJ_FORMAT=elf ;;
+	i386-*-openbsd3.[[0-3]])
+		OBJ_FORMAT=aoutb
+		;;
+	*-*-cygwin|*mingw*)
+		OBJ_FORMAT=win32
+		;;
+	i*86-apple-darwin*)
+		OBJ_FORMAT=macho
+		NASM_FLAGS="-DFLAC__PUBLIC_NEEDS_UNDERSCORE"
+		OS_SPECIFIC_LIBLINKS="-Wl,-read_only_relocs -Wl,suppress"
+		;;
+	*)
+		OBJ_FORMAT=elf ;;
 	esac
 
 AC_SUBST(OBJ_FORMAT)
+AC_SUBST(NASM_FLAGS)
+AC_SUBST(OS_SPECIFIC_LIBLINKS)
 
 #====================================================================================
 # Target OS specific stuff.

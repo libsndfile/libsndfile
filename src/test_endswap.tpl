@@ -124,12 +124,3 @@ test_endswap_[+ (get "name") +] (void)
 +]
 
 
-[+ COMMENT
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: fd8887e8-8202-4f30-a419-0cf01a0e799b
-*/
-+]
