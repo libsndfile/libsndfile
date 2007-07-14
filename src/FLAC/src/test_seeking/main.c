@@ -142,7 +142,7 @@ static FLAC__bool read_pcm_(FLAC__int32 *pcm[], const char *rawfilename, const c
 			return false;
 		}
 	}
-	if(0 == (f = fopen(rawfilename, "r"))) {
+	if(0 == (f = fopen(rawfilename, "rb"))) {
 		printf("ERROR: opening %s for reading\n", rawfilename);
 		return false;
 	}
@@ -348,9 +348,9 @@ static FLAC__bool seek_barrage(FLAC__bool is_ogg, const char *filename, off_t fi
 		}
 
 #ifdef _MSC_VER
-		printf("seek(%I64u)... ", pos);
+		printf("#%u:seek(%I64u)... ", i, pos);
 #else
-		printf("seek(%llu)... ", (unsigned long long)pos);
+		printf("#%u:seek(%llu)... ", i, (unsigned long long)pos);
 #endif
 		fflush(stdout);
 		if(!FLAC__stream_decoder_seek_absolute(decoder, pos)) {
