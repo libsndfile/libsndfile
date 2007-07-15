@@ -589,6 +589,8 @@ void	psf_log_SF_INFO 	(SF_PRIVATE *psf) ;
 
 void	psf_hexdump (const void *ptr, int len) ;
 
+long	psf_rand_long (void) ;
+
 /* Functions used when writing file headers. */
 
 int		psf_binheader_writef	(SF_PRIVATE *psf, const char *format, ...) ;

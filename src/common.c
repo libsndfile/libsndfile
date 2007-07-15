@@ -1283,9 +1283,21 @@ u_bitwidth_to_subformat (int bits)
 } /* bitwidth_to_subformat */
 
 /*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 33e9795e-f717-461a-9feb-65d083a56395
+**	psf_rand_long : Not crypto quality, but more than adequate for things
+**	like stream serial numbers in Ogg files.
 */
+
+long
+psf_rand_long (void)
+{	static long serial = -1 ;
+	int k, count ;
+
+	if (serial == -1)
+		serial = time (NULL) ;
+
+	count = 4 + (serial & 7) ;
+	for (k = 0 ; k < count ; k++)
+		serial = 11117 * serial + 211231 ;
+	
+	return serial ;
+} /* psf_rand_long */
