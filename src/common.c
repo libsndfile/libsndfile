@@ -1283,21 +1283,21 @@ u_bitwidth_to_subformat (int bits)
 } /* bitwidth_to_subformat */
 
 /*
-**	psf_rand_long : Not crypto quality, but more than adequate for things
+**	psf_rand_int32 : Not crypto quality, but more than adequate for things
 **	like stream serial numbers in Ogg files.
 */
 
-long
-psf_rand_long (void)
-{	static long serial = -1 ;
+int32_t
+psf_rand_int32 (void)
+{	static int32_t value = -1 ;
 	int k, count ;
 
-	if (serial == -1)
-		serial = time (NULL) ;
+	if (value == -1)
+		value = time (NULL) ;
 
-	count = 4 + (serial & 7) ;
+	count = 4 + (value & 7) ;
 	for (k = 0 ; k < count ; k++)
-		serial = 11117 * serial + 211231 ;
+		value = 11117 * value + 211231 ;
 	
-	return serial ;
-} /* psf_rand_long */
+	return value ;
+} /* psf_rand_int32 */

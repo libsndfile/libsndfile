@@ -5,7 +5,7 @@
     FLAC__metadata_object_vorbiscomment_append_comment.
 
     * src/common.[ch]
-    Add function psf_rand_long().
+    Add function psf_rand_int32().
 
 2007-07-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

@@ -589,7 +589,7 @@ void	psf_log_SF_INFO 	(SF_PRIVATE *psf) ;
 
 void	psf_hexdump (const void *ptr, int len) ;
 
-long	psf_rand_long (void) ;
+int32_t	psf_rand_int32 (void) ;
 
 /* Functions used when writing file headers. */
 
