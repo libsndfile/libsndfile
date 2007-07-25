@@ -6,6 +6,8 @@ INCLUDES = -I$(top_srcdir)/src/FLAC/include/share
 
 noinst_LTLIBRARIES = libutf8.la
 
+noinst_HEADERS = iconvert.h
+
 libutf8_la_SOURCES = charset.c charset.h iconvert.c utf8.c
 
 EXTRA_DIST = \
