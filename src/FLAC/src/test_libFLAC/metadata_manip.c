@@ -185,8 +185,7 @@ static void delete_from_our_metadata_(unsigned position)
  * This wad of functions supports filename- and callback-based chain reading/writing.
  * Everything up to set_file_stats_() is copied from libFLAC/metadata_iterators.c
  */
-static
-FLAC__bool open_tempfile_(const char *filename, FILE **tempfile, char **tempfilename)
+static FLAC__bool open_tempfile_(const char *filename, FILE **tempfile, char **tempfilename)
 {
 	static const char *tempfile_suffix = ".metadata_edit";
 
@@ -201,8 +200,7 @@ FLAC__bool open_tempfile_(const char *filename, FILE **tempfile, char **tempfile
 	return true;
 }
 
-static
-void cleanup_tempfile_(FILE **tempfile, char **tempfilename)
+static void cleanup_tempfile_(FILE **tempfile, char **tempfilename)
 {
 	if(0 != *tempfile) {
 		(void)fclose(*tempfile);
@@ -216,8 +214,7 @@ void cleanup_tempfile_(FILE **tempfile, char **tempfilename)
 	}
 }
 
-static
-FLAC__bool transport_tempfile_(const char *filename, FILE **tempfile, char **tempfilename)
+static FLAC__bool transport_tempfile_(const char *filename, FILE **tempfile, char **tempfilename)
 {
 	FLAC__ASSERT(0 != filename);
 	FLAC__ASSERT(0 != tempfile);
@@ -247,16 +244,14 @@ FLAC__bool transport_tempfile_(const char *filename, FILE **tempfile, char **tem
 	return true;
 }
 
-static
-FLAC__bool get_file_stats_(const char *filename, struct stat *stats)
+static FLAC__bool get_file_stats_(const char *filename, struct stat *stats)
 {
 	FLAC__ASSERT(0 != filename);
 	FLAC__ASSERT(0 != stats);
 	return (0 == stat(filename, stats));
 }
 
-static
-void set_file_stats_(const char *filename, struct stat *stats)
+static void set_file_stats_(const char *filename, struct stat *stats)
 {
 	struct utimbuf srctime;
 

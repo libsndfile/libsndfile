@@ -1,3 +1,17 @@
+2007-07-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/FLAC
+    Merge from FLAC upstream sources.
+
+2007-07-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/flac.c
+    Fix memory leak; set copy parameter to FALSE in call to
+    FLAC__metadata_object_vorbiscomment_append_comment.
+
+    * src/common.[ch]
+    Add function psf_rand_int32().
+
 2007-07-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/FLAC
