@@ -1,3 +1,8 @@
+2007-07-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/OGG
+    Merge from OGG upstream sources.
+
 2007-07-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/FLAC

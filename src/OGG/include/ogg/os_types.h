@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: #ifdef jail to whip a few platforms into the UNIX ideal.
- last mod: $Id: os_types.h 7524 2004-08-11 04:20:36Z conrad $
+ last mod: $Id: os_types.h 11511 2006-06-03 22:30:13Z giles $
 
  ********************************************************************/
 #ifndef _OS_TYPES_H
@@ -27,19 +27,20 @@
 #if defined(_WIN32) 
 
 #  if defined(__CYGWIN__)
-#    include <_G_config.h>
-     typedef _G_int64_t ogg_int64_t;
-     typedef _G_int32_t ogg_int32_t;
-     typedef _G_uint32_t ogg_uint32_t;
-     typedef _G_int16_t ogg_int16_t;
-     typedef _G_uint16_t ogg_uint16_t;
+#    include <stdint.h>
+     typedef int16_t ogg_int16_t;
+     typedef uint16_t ogg_uint16_t;
+     typedef int32_t ogg_int32_t;
+     typedef uint32_t ogg_uint32_t;
+     typedef int64_t ogg_int64_t;
+     typedef uint64_t ogg_uint64_t;
 #  elif defined(__MINGW32__)
-     typedef short ogg_int16_t;                                                                             
-     typedef unsigned short ogg_uint16_t;                                                                   
-     typedef int ogg_int32_t;                                                                               
-     typedef unsigned int ogg_uint32_t;                                                                     
-     typedef long long ogg_int64_t;                                                                         
-     typedef unsigned long long ogg_uint64_t;  
+     typedef short ogg_int16_t;
+     typedef unsigned short ogg_uint16_t;
+     typedef int ogg_int32_t;
+     typedef unsigned int ogg_uint32_t;
+     typedef long long ogg_int64_t;
+     typedef unsigned long long ogg_uint64_t;
 #  elif defined(__MWERKS__)
      typedef long long ogg_int64_t;
      typedef int ogg_int32_t;
