@@ -173,7 +173,7 @@ static int ogg_read_header(SF_PRIVATE *psf)
         psf_log_printf(psf,"%s\n",*ptr);
         ++ptr;
       }
-      psf_log_printf(psf,"\nBitstream is %d channel, %ldHz\n",
+      psf_log_printf(psf,"\nBitstream is %d channel, %D Hz\n",
               data->vi.channels,data->vi.rate);
       psf_log_printf(psf,"Encoded by: %s\n\n",data->vc.vendor);
     }
