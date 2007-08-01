@@ -32,8 +32,6 @@ static int ogg_read_header(SF_PRIVATE *psf);
 static int ogg_close(SF_PRIVATE *psf);
 static int ogg_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 static int ogg_pcm_init (SF_PRIVATE *psf) ;
-static int ogg_float32_init (SF_PRIVATE *psf) ;
-static int ogg_double64_init (SF_PRIVATE *psf) ;
 
 typedef struct {
     ogg_sync_state   oy; /* sync and verify incoming physical bitstream */
@@ -179,7 +177,7 @@ static int ogg_read_header(SF_PRIVATE *psf)
     }
     psf->sf.samplerate	= data->vi.rate;
     psf->sf.channels 	= data->vi.channels;
-    //    psf->sf.format      |= SF_FORMAT_VORBIS;
+    psf->sf.format      = SF_FORMAT_OGG | SF_FORMAT_VORBIS;
 
     /* OK, got and parsed all three headers. Initialize the Vorbis
        packet->PCM decoder. */
@@ -240,28 +238,13 @@ ogg_open	(SF_PRIVATE *psf)
 
 	psf->command = ogg_command ;
 	switch (subformat)
-	{	case SF_FORMAT_PCM_S8 :	/* 8-bit linear PCM. */
+	{	case SF_FORMAT_VORBIS :	/* 8-bit linear PCM. */
 				error = ogg_pcm_init (psf) ;
 				break ;
 
-		case SF_FORMAT_PCM_16 :	/* 16-bit linear PCM. */
-		case SF_FORMAT_PCM_24 :	/* 24-bit linear PCM */
-		case SF_FORMAT_PCM_32 :	/* 32-bit linear PCM. */
-				error = ogg_pcm_init (psf) ;
+		default :
+				return SFE_UNIMPLEMENTED ;
 				break ;
-
-		/* Lite remove start */
-		case SF_FORMAT_FLOAT :	/* 32-bit floats. */
-				error = ogg_float32_init (psf) ;
-				break ;
-
-		case SF_FORMAT_DOUBLE :	/* 64-bit double precision floats. */
-				error = ogg_double64_init (psf) ;
-				break ;
-
-		/* Lite remove end */
-
-		default :	break ;
 		} ;
 
 
@@ -279,8 +262,6 @@ ogg_open	(SF_PRIVATE *psf)
 } /* ogg_open */
 
 static int ogg_pcm_init (SF_PRIVATE *UNUSED (psf)) { return 0;}
-static int ogg_float32_init (SF_PRIVATE *UNUSED (psf)) { return 0;}
-static int ogg_double64_init (SF_PRIVATE *UNUSED (psf)) { return 0;}
 
 static float **ogg_read_buffer(SF_PRIVATE *psf)
 {
