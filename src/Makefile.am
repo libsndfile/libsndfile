@@ -33,7 +33,7 @@ libsndfile_la_LDFLAGS = -no-undefined -version-info @SHARED_VERSION_INFO@ @SHLIB
 libsndfile_la_SOURCES = $(FILESPECIFIC) $(noinst_HEADERS)
 nodist_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
 libsndfile_la_LIBADD = libcommon.la FLAC/src/libFLAC/libFLAC.la GSM610/libgsm.la \
-		G72x/libg72x.la OGG/libogg.la -lm
+		G72x/libg72x.la OGG/libogg.la -lvorbis -lm
 
 libcommon_la_SOURCES = $(COMMON)
 

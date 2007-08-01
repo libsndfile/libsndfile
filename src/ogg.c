@@ -24,11 +24,6 @@
 #include <ctype.h>
 #include <vorbis/codec.h>
 
-#ifdef _WIN32 /* We need the following two to set stdin/stdout to binary */
-#include <io.h>
-#include <fcntl.h>
-#endif
-
 #include "sndfile.h"
 #include "sfendian.h"
 #include "common.h"
