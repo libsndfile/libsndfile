@@ -243,11 +243,7 @@ ogg_open	(SF_PRIVATE *psf)
 
 	psf->command = ogg_command ;
 	switch (subformat)
-	{	case SF_FORMAT_ULAW :	/* 8-bit Ulaw encoding. */
-				error = ogg_ulaw_init (psf) ;
-				break ;
-
-		case SF_FORMAT_PCM_S8 :	/* 8-bit linear PCM. */
+	{	case SF_FORMAT_PCM_S8 :	/* 8-bit linear PCM. */
 				error = error = ogg_pcm_init (psf) ;
 				break ;
 
@@ -255,10 +251,6 @@ ogg_open	(SF_PRIVATE *psf)
 		case SF_FORMAT_PCM_24 :	/* 24-bit linear PCM */
 		case SF_FORMAT_PCM_32 :	/* 32-bit linear PCM. */
 				error = ogg_pcm_init (psf) ;
-				break ;
-
-		case SF_FORMAT_ALAW :	/* 8-bit Alaw encoding. */
-				error = ogg_alaw_init (psf) ;
 				break ;
 
 		/* Lite remove start */
@@ -270,20 +262,6 @@ ogg_open	(SF_PRIVATE *psf)
 				error = ogg_double64_init (psf) ;
 				break ;
 
-		case SF_FORMAT_G721_32 :
-				error = ogg_g72x_init (psf) ;
-				psf->sf.seekable = SF_FALSE ;
-				break ;
-
-		case SF_FORMAT_G723_24 :
-				error = ogg_g72x_init (psf) ;
-				psf->sf.seekable = SF_FALSE ;
-				break ;
-
-		case SF_FORMAT_G723_40 :
-				error = ogg_g72x_init (psf) ;
-				psf->sf.seekable = SF_FALSE ;
-				break ;
 		/* Lite remove end */
 
 		default :	break ;
