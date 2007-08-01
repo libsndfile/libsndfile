@@ -575,7 +575,7 @@ flac_write_strings (SF_PRIVATE *psf, FLAC_PRIVATE* pflac)
 		value = psf->strings [k].str ;
 
 		FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair (&entry, key, value) ;
-		FLAC__metadata_object_vorbiscomment_append_comment (pflac->metadata, entry, /* copy */ SF_TRUE) ;
+		FLAC__metadata_object_vorbiscomment_append_comment (pflac->metadata, entry, /* copy */ SF_FALSE) ;
 		} ;
 
 	if (! FLAC__stream_encoder_set_metadata (pflac->fse, &pflac->metadata, 1))
