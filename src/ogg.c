@@ -31,12 +31,9 @@
 static int ogg_read_header(SF_PRIVATE *psf);
 static int ogg_close(SF_PRIVATE *psf);
 static int ogg_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
-static int ogg_ulaw_init (SF_PRIVATE *psf) ;
 static int ogg_pcm_init (SF_PRIVATE *psf) ;
-static int ogg_alaw_init (SF_PRIVATE *psf) ;
 static int ogg_float32_init (SF_PRIVATE *psf) ;
 static int ogg_double64_init (SF_PRIVATE *psf) ;
-static int ogg_g72x_init (SF_PRIVATE *psf) ;
 
 typedef struct {
     ogg_sync_state   oy; /* sync and verify incoming physical bitstream */
@@ -244,7 +241,7 @@ ogg_open	(SF_PRIVATE *psf)
 	psf->command = ogg_command ;
 	switch (subformat)
 	{	case SF_FORMAT_PCM_S8 :	/* 8-bit linear PCM. */
-				error = error = ogg_pcm_init (psf) ;
+				error = ogg_pcm_init (psf) ;
 				break ;
 
 		case SF_FORMAT_PCM_16 :	/* 16-bit linear PCM. */
@@ -267,15 +264,23 @@ ogg_open	(SF_PRIVATE *psf)
 		default :	break ;
 		} ;
 
+
+	/* FIXME, FIXME, FIXME : Hack these here for now and correct later. */
+	psf->sf.frames = 0 ;
+	psf->sf.channels = 2 ;
+	psf->sf.format = SF_FORMAT_OGG | SF_FORMAT_VORBIS ;
+	psf->sf.sections = 1 ;
+
+	psf->datalength = 1 ;
+	psf->dataoffset = 0 ;
+	/* End FIXME. */
+
 	return error ;
 } /* ogg_open */
 
-static int ogg_ulaw_init (SF_PRIVATE *psf) { return 0;}
-static int ogg_pcm_init (SF_PRIVATE *psf) { return 0;}
-static int ogg_alaw_init (SF_PRIVATE *psf) { return 0;}
-static int ogg_float32_init (SF_PRIVATE *psf) { return 0;}
-static int ogg_double64_init (SF_PRIVATE *psf) { return 0;}
-static int ogg_g72x_init (SF_PRIVATE *psf) { return 0;}
+static int ogg_pcm_init (SF_PRIVATE *UNUSED (psf)) { return 0;}
+static int ogg_float32_init (SF_PRIVATE *UNUSED (psf)) { return 0;}
+static int ogg_double64_init (SF_PRIVATE *UNUSED (psf)) { return 0;}
 
 static float **ogg_read_buffer(SF_PRIVATE *psf)
 {
@@ -341,7 +346,7 @@ static float **ogg_read_buffer(SF_PRIVATE *psf)
     }
 }
 
-static int ogg_command (SF_PRIVATE *psf, int command, void *data, int datasize)
+static int ogg_command (SF_PRIVATE *UNUSED (psf), int UNUSED (command), void *UNUSED (data), int UNUSED (datasize))
 {
     return 0;
 }
