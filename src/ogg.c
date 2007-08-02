@@ -32,12 +32,6 @@ static int 	ogg_read_header(SF_PRIVATE *psf) ;
 static int 	ogg_close(SF_PRIVATE *psf) ;
 static int 	ogg_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 static sf_count_t	ogg_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
-static int ogg_ulaw_init (SF_PRIVATE *psf) ;
-static int ogg_pcm_init (SF_PRIVATE *psf) ;
-static int ogg_alaw_init (SF_PRIVATE *psf) ;
-static int ogg_float32_init (SF_PRIVATE *psf) ;
-static int ogg_double64_init (SF_PRIVATE *psf) ;
-static int ogg_g72x_init (SF_PRIVATE *psf) ;
 
 typedef struct {
 	ogg_sync_state   oy ; /* sync and verify incoming physical bitstream */
@@ -54,7 +48,8 @@ typedef struct {
 	int              eos ;
 } OGG_PRIVATE ;
 
-static int ogg_read_header(SF_PRIVATE *psf)
+static int 
+ogg_read_header(SF_PRIVATE *psf)
 {
     char *buffer ;
     int  bytes ;
@@ -146,20 +141,21 @@ static int ogg_read_header(SF_PRIVATE *psf)
       /* Don't complain about missing or corrupt data yet.  We'll
          catch it at the packet output phase */
       else if (result==1) {
-         nn=ogg_stream_pagein(&data->os,&data->og) ; /* we can ignore any errors here
-                                                   as they'll also become apparent
-                                                   at packetout */
-        while (i<2) {
-          result=ogg_stream_packetout(&data->os,&data->op) ;
-          if (result==0) break ;
-          if (result<0) {
-            /* Uh oh; data at some point was corrupted or missing!
-               We can't tolerate that in a header.  Die. */
-            psf_log_printf(psf,"Corrupt secondary header.  Exiting.\n") ;
-            return SFE_MALFORMED_FILE ;
-          }
-          vorbis_synthesis_headerin(&data->vi,&data->vc,&data->op) ;
-          i++ ;
+        /* we can ignore any errors here
+           as they'll also become apparent
+           at packetout */
+         nn=ogg_stream_pagein(&data->os,&data->og) ;
+         while (i<2) {
+           result=ogg_stream_packetout(&data->os,&data->op) ;
+           if (result==0) break ;
+           if (result<0) {
+             /* Uh oh; data at some point was corrupted or missing!
+                We can't tolerate that in a header.  Die. */
+             psf_log_printf(psf,"Corrupt secondary header.  Exiting.\n") ;
+             return SFE_MALFORMED_FILE ;
+           }
+           vorbis_synthesis_headerin(&data->vi,&data->vc,&data->op) ;
+           i++ ;
          }
       }
       else {
@@ -175,13 +171,13 @@ static int ogg_read_header(SF_PRIVATE *psf)
         psf_log_printf(psf,"%s\n",*ptr) ;
         ++ptr ;
       }
-      psf_log_printf(psf,"\nBitstream is %d channel, %ldHz\n",
-              data->vi.channels,data->vi.rate) ;
-      psf_log_printf(psf,"Encoded by: %s\n\n",data->vc.vendor) ;
+      psf_log_printf(psf,"\nBitstream is %d channel, %D Hz\n",
+              data->vi.channels,data->vi.rate);
+      psf_log_printf(psf,"Encoded by: %s\n",data->vc.vendor);
     }
-    psf->sf.samplerate	= data->vi.rate ;
-    psf->sf.channels 	= data->vi.channels ;
-    psf->sf.format = SF_FORMAT_OGG | SF_FORMAT_FLOAT ;
+    psf->sf.samplerate	= data->vi.rate;
+    psf->sf.channels 	= data->vi.channels;
+    psf->sf.format      = SF_FORMAT_OGG | SF_FORMAT_VORBIS | SF_FORMAT_FLOAT;
 
     /* OK, got and parsed all three headers. Initialize the Vorbis
        packet->PCM decoder. */
@@ -195,22 +191,23 @@ static int ogg_read_header(SF_PRIVATE *psf)
     return 0 ;
 }
 
-static int ogg_close(SF_PRIVATE *psf)
+static int 
+ogg_close(SF_PRIVATE *psf)
 {
     OGG_PRIVATE *data = (OGG_PRIVATE*)psf->container_data ;
-    /* clean up this logical bitstream; before exit we see if we're
+    /* clean up this logical bitstream; before exit we shuld see if we're
        followed by another [chained] */
 
     ogg_stream_clear(&data->os) ;
   
     /* ogg_page and ogg_packet structs always point to storage in
-       libvorbis.  They're never freed or manipulated directly */
+       libvorbis.  They are never freed or manipulated directly */
     
     vorbis_block_clear(&data->vb) ;
     vorbis_dsp_clear(&data->vd) ;
     vorbis_comment_clear(&data->vc) ;
     vorbis_info_clear(&data->vi) ;  /* must be called last */
-    /* shoudl look here to reopen if chained */
+    /* should look here to reopen if chained */
 
     /* OK, clean up the framer */
     ogg_sync_clear(&data->oy) ;
@@ -238,8 +235,6 @@ ogg_open	(SF_PRIVATE *psf)
         if (psf->mode == SFM_WRITE)
           return SFE_UNIMPLEMENTED ;
     
-	psf->datalength = psf->filelength ;
-	psf->dataoffset = 0 ;
 	psf->blockwidth = 0 ;
 	psf->bytewidth = 1 ;
         psf->blockwidth = psf->bytewidth * psf->sf.channels ;
@@ -248,42 +243,23 @@ ogg_open	(SF_PRIVATE *psf)
         psf->command = ogg_command ;
 
 	switch (subformat)
-	{	case SF_FORMAT_PCM_S8 :	/* 8-bit linear PCM. */
-				error = ogg_pcm_init (psf) ;
-				break ;
-
-		case SF_FORMAT_PCM_16 :	/* 16-bit linear PCM. */
-		case SF_FORMAT_PCM_24 :	/* 24-bit linear PCM */
-		case SF_FORMAT_PCM_32 :	/* 32-bit linear PCM. */
-				error = ogg_pcm_init (psf) ;
-				break ;
-
-		/* Lite remove start */
-		case SF_FORMAT_FLOAT :	/* 32-bit floats. */
-				error = ogg_float32_init (psf) ;
-				break ;
-
-		case SF_FORMAT_DOUBLE :	/* 64-bit double precision floats. */
-				error = ogg_double64_init (psf) ;
-				break ;
-
-		/* Lite remove end */
-
-		default :	break ;
-		} ;
-
         psf_log_printf(psf, "ogg_open finished\n");
+
+	/* FIXME, FIXME, FIXME : Hack these here for now and correct later. */
+	psf->sf.frames = 0 ;
+/* 	psf->sf.channels = 2 ; Set in open */
+/*	psf->sf.format = SF_FORMAT_OGG | SF_FORMAT_VORBIS ; Set in open */
+	psf->sf.sections = 1 ;
+
+	psf->datalength = 1 ;
+	psf->dataoffset = 0 ;
+	/* End FIXME. */
+
 	return error ;
 } /* ogg_open */
 
-static int ogg_ulaw_init (SF_PRIVATE *psf) { return 0;}
-static int ogg_pcm_init (SF_PRIVATE *psf) { return 0;}
-static int ogg_alaw_init (SF_PRIVATE *psf) { return 0;}
-static int ogg_float32_init (SF_PRIVATE *psf) { return 0;}
-static int ogg_double64_init (SF_PRIVATE *psf) { return 0;}
-static int ogg_g72x_init (SF_PRIVATE *psf) { return 0;}
-
-static float **ogg_read_buffer(SF_PRIVATE *psf)
+static float **
+ogg_read_buffer(SF_PRIVATE *psf)
 {
     OGG_PRIVATE *data = (OGG_PRIVATE*)psf->container_data;
     char *buffer;
@@ -302,28 +278,28 @@ static float **ogg_read_buffer(SF_PRIVATE *psf)
         goto top;
       }
       if (result<0) { /* missing or corrupt data at this page position */
-        psf_printf(psf,"Corrupt or missing data in bitstream; continuing...\n");
+        psf_printf(psf,"Corrupt or missing data in bitstream; continuing...\n") ;
         goto top;
       }
       else {
         ogg_stream_pagein(&data->os,&data->og); /* can safely ignore errors at
                                        this point */
-        result=ogg_stream_packetout(&data->os,&data->op);
+        result=ogg_stream_packetout(&data->os,&data->op) ;
         
         if (result==0) {
           /* need more data */
-          buffer=ogg_sync_buffer(&data->oy,4096);
-          bytes=psf_fread(buffer,1,4096,psf);
-          ogg_sync_wrote(&data->oy,bytes);
-          if (bytes==0) data->eos=1;
-          goto top;
+          buffer=ogg_sync_buffer(&data->oy,4096) ;
+          bytes=psf_fread(buffer,1,4096,psf) ;
+          ogg_sync_wrote(&data->oy,bytes) ;
+          if (bytes==0) data->eos=1 ;
+          goto top ;
         }
         if (result>0) {
           /* we have a packet.  Return it */
-          int samples;
+          int samples ;
 	  
           if (vorbis_synthesis(&data->vb,&data->op)==0) /* test for success! */
-            vorbis_synthesis_blockin(&data->vd,&data->vb);
+            vorbis_synthesis_blockin(&data->vd,&data->vb) ;
           /* 
              
           **pcm is a multichannel float vector.  In stereo, for
@@ -332,13 +308,12 @@ static float **ogg_read_buffer(SF_PRIVATE *psf)
           (-1.<=range<=1.) to whatever PCM format and write it out */
 	  
           if ((samples=vorbis_synthesis_pcmout(&data->vd,&pcm))>0) {
-            vorbis_synthesis_read(&data->vd,samples/psf->sf.channels); /* tell libvorbis how
-                                                many samples we
-                                                actually consumed */
+            /* tell libvorbis how many samples we actually consumed */
+            vorbis_synthesis_read(&data->vd,samples/psf->sf.channels) ;
           }
         }
         else  /* missing or corrupt data at this page position */
-          /* no reason to complain; already complained above */
+              /* no reason to complain; already complained above */
           goto top;
         if (ogg_page_eos(&data->og)) data->eos=1;
         return pcm;
@@ -346,13 +321,22 @@ static float **ogg_read_buffer(SF_PRIVATE *psf)
     }
 }
 
-static int ogg_command (SF_PRIVATE *psf, int command, void *data, int datasize)
+static int 
+ogg_command (SF_PRIVATE *UNUSED (psf), int command,
+             void *UNUSED (data), int UNUSED (datasize))
 {
-    return 0;
-}
+	switch (command)
+	{	case SFC_SET_DITHER_ON_WRITE:
+		case SFC_SET_DITHER_ON_READ:
+                  /* These should be done */
+		default :
+			break ;
+	} ;
+	return 0 ;
+} /* ogg_command */
 
 static sf_count_t
-ogg_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
+ogg_seek (SF_PRIVATE *UNUSED (psf), int UNUSED (mode), sf_count_t UNUSED(offset))
 {
     return 0;
 }
