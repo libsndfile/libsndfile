@@ -22,13 +22,16 @@
 #include <fcntl.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
 #include <vorbis/codec.h>
+#include <vorbis/vorbisenc.h>
 
 #include "sndfile.h"
 #include "sfendian.h"
 #include "common.h"
 
 static int 	ogg_read_header(SF_PRIVATE *psf) ;
+static int 	ogg_write_header(SF_PRIVATE *psf) ;
 static int 	ogg_close(SF_PRIVATE *psf) ;
 static int 	ogg_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 static sf_count_t	ogg_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
@@ -191,6 +194,68 @@ ogg_read_header(SF_PRIVATE *psf)
     return 0 ;
 }
 
+static int
+ogg_write_header(SF_PRIVATE *psf)
+{
+    OGG_PRIVATE *data = (OGG_PRIVATE*)psf->container_data ;
+    int ret ;
+    vorbis_info_init(&data->vi) ;
+    ret = vorbis_encode_init_vbr(&data->vi,2,psf->sf.samplerate,.4) ; /* VBR quality mode */
+#if 0
+    ret = vorbis_encode_init(&data->vi,2,psf->sf.samplerate,-1,128000,-1) ; /* average bitrate mode */
+    ret = ( vorbis_encode_setup_managed(&data->vi,2,psf->sf.samplerate,-1,128000,-1) ||
+            vorbis_encode_ctl(&data->vi,OV_ECTL_RATEMANAGE_AVG,NULL) ||
+            vorbis_encode_setup_init(&data->vi)) ;
+#endif
+    if (ret) return SFE_BAD_OPEN_FORMAT ;
+
+    /* add a comment */
+    vorbis_comment_init(&data->vc) ;
+    vorbis_comment_add_tag(&data->vc,"ENCODER","libsndfile") ;
+
+    /* set up the analysis state and auxiliary encoding storage */
+    vorbis_analysis_init(&data->vd,&data->vi) ;
+    vorbis_block_init(&data->vd,&data->vb) ;
+  
+    /* set up our packet->stream encoder */
+    /* pick a random serial number; that way we can more likely build
+       chained streams just by concatenation */
+    srand(time(NULL)) ;
+    ogg_stream_init(&data->os,rand()) ;
+
+    /* Vorbis streams begin with three headers; the initial header (with
+       most of the codec setup parameters) which is mandated by the Ogg
+       bitstream spec.  The second header holds any comment fields.  The
+       third header holds the bitstream codebook.  We merely need to
+       make the headers, then pass them to libvorbis one at a time;
+       libvorbis handles the additional Ogg bitstream constraints */
+    
+    {
+      ogg_packet header;
+      ogg_packet header_comm;
+      ogg_packet header_code;
+
+      vorbis_analysis_headerout(&data->vd,&data->vc,&header,
+                                &header_comm,&header_code);
+      ogg_stream_packetin(&data->os,&header); /* automatically placed in its own
+                                                 page */
+      ogg_stream_packetin(&data->os,&header_comm);
+      ogg_stream_packetin(&data->os,&header_code);
+
+      /* This ensures the actual
+       * audio data will start on a new page, as per spec
+       */
+      while (1) {
+        int result = ogg_stream_flush(&data->os,&data->og);
+        if (result==0) break ;
+        psf_fwrite(data->og.header,1,data->og.header_len,psf) ;
+        psf_fwrite(data->og.body,1,data->og.body_len,psf) ;
+      }
+      
+    }
+    return 0 ;
+}
+
 static int 
 ogg_close(SF_PRIVATE *psf)
 {
@@ -228,8 +293,10 @@ ogg_open	(SF_PRIVATE *psf)
               return error ;
           } ;
         if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_OGG)
-          return	SFE_BAD_OPEN_FORMAT ;
-
+          {	if ((error = ogg_write_header (psf)))
+		psf->write_header = ogg_write_header ;
+              return error ;
+          } ;
         subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
         psf->container_close = ogg_close ;
         if (psf->mode == SFM_WRITE)

@@ -1,3 +1,4 @@
+
 /*
 ** Copyright (C) 2004-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Tobias Gehrig <tgehrig@ira.uka.de>
