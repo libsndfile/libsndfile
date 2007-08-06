@@ -35,6 +35,15 @@ static int 	ogg_write_header(SF_PRIVATE *psf) ;
 static int 	ogg_close(SF_PRIVATE *psf) ;
 static int 	ogg_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 static sf_count_t	ogg_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
+static sf_count_t	ogg_read_s(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
+static sf_count_t	ogg_read_i(SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
+static sf_count_t	ogg_read_f(SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
+static sf_count_t	ogg_read_d(SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+static sf_count_t	ogg_write_s(SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
+static sf_count_t	ogg_write_i(SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+static sf_count_t	ogg_write_f(SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+static sf_count_t	ogg_write_d(SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
+
 
 typedef struct {
 	ogg_sync_state   oy ; /* sync and verify incoming physical bitstream */
@@ -290,7 +299,11 @@ ogg_open	(SF_PRIVATE *psf)
           return SFE_BAD_MODE_RW ;
         if (psf->mode == SFM_READ)
           {	if ((error = ogg_read_header (psf)))
-              return error ;
+                	return error ;
+		psf->read_short		= ogg_read_s ;
+		psf->read_int		= ogg_read_i ;
+		psf->read_float		= ogg_read_f ;
+		psf->read_double	= ogg_read_d ;
           } ;
         if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_OGG)
           {	if ((error = ogg_write_header (psf)))
@@ -299,10 +312,13 @@ ogg_open	(SF_PRIVATE *psf)
           } ;
         subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
         psf->container_close = ogg_close ;
-        if (psf->mode == SFM_WRITE)
-          return SFE_UNIMPLEMENTED ;
+        if (psf->mode == SFM_WRITE) {
+		psf->write_short	= ogg_write_s ;
+		psf->write_int		= ogg_write_i ;
+		psf->write_float	= ogg_write_f ;
+		psf->write_double	= ogg_write_d ;
+        }
     
-	psf->blockwidth = 0 ;
 	psf->bytewidth = 1 ;
         psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
@@ -404,6 +420,54 @@ ogg_command (SF_PRIVATE *UNUSED (psf), int command,
 
 static sf_count_t
 ogg_seek (SF_PRIVATE *UNUSED (psf), int UNUSED (mode), sf_count_t UNUSED(offset))
+{
+    return 0;
+}
+
+static sf_count_t
+ogg_read_s(SF_PRIVATE *psf, short *ptr, sf_count_t len)
+{
+    return 0;
+}
+
+static sf_count_t
+ogg_read_i(SF_PRIVATE *psf, int *ptr, sf_count_t len)
+{
+    return 0;
+}
+
+static sf_count_t
+ogg_read_f(SF_PRIVATE *psf, float *ptr, sf_count_t len)
+{
+    return 0;
+}
+
+static sf_count_t
+ogg_read_d(SF_PRIVATE *psf, double *ptr, sf_count_t len)
+{
+    return 0;
+}
+
+static sf_count_t
+ogg_write_s(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
+{
+    return 0;
+}
+
+static sf_count_t
+ogg_write_i(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
+{
+    return 0;
+}
+
+static sf_count_t
+ogg_write_f(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
+{
+    return 0;
+}
+
+static sf_count_t
+ogg_write_d(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {
     return 0;
 }
