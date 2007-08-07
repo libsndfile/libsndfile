@@ -400,7 +400,7 @@ ogg_read_buffer(SF_PRIVATE *psf)
           (-1.<=range<=1.) to whatever PCM format and write it out */
 /*           if ((samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm))>0) { */
             /* tell libvorbis how many samples we actually consumed */
-/*             vorbis_synthesis_read(&vdata->vd,samples/psf->sf.channels) ; */
+/*             vorbis_synthesis_read(&vdata->vd,samples) ; */
         }
         else  /* missing or corrupt data at this page position */
               /* no reason to complain; already complained above */
@@ -438,14 +438,14 @@ ogg_read_s(SF_PRIVATE *psf, short *ptr, sf_count_t lens)
     int i = 0, j, n ;
     int samples ;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
-    int len = lens / vdata->vi.channels;
+    int len = lens / psf->sf.channels;
     while (len>0) {
       ogg_read_buffer(psf) ;
       samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm) ;
       if (samples >= len) {    /* Have we finished? count in frames */
         samples = len ;
       }
-      for (n=0; n<vdata->vi.channels; n++) {
+      for (n=0; n<psf->sf.channels; n++) {
         float  *mono=pcm[n] ;
         for (j=0; j<samples; j++) {
           int x = (int)(mono[j]*32767.0f) ;
@@ -466,14 +466,14 @@ ogg_read_i(SF_PRIVATE *psf, int *ptr, sf_count_t lens)
     int samples ;
     int i = 0, j, n ;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
-    int len = lens / vdata->vi.channels;
+    int len = lens / psf->sf.channels;
     while (len>0) {
       ogg_read_buffer(psf) ;
       samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm) ;
       if (samples >= len) {    /* Have we finished? count in frames */
         samples = len ;
       }
-      for (n=0; n<vdata->vi.channels; n++) {
+      for (n=0; n<psf->sf.channels; n++) {
         float  *mono=pcm[n] ;
         for (j=0; j<samples; j++) {
           ptr[i++] = (int)(mono[j]*32767.0f) ;
@@ -493,14 +493,18 @@ ogg_read_f(SF_PRIVATE *psf, float *ptr, sf_count_t lens)
     int samples ;
     int i = 0, j, n ;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
-    int len = lens / vdata->vi.channels;
+    int len = lens / psf->sf.channels;
+    printf("Read %d frames\n", len);
     while (len>0) {
       ogg_read_buffer(psf) ;
       samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm) ;
       if (samples >= len) {    /* Have we finished? count in frames */
         samples = len ;
       }
-      for (n=0; n<vdata->vi.channels; n++) {
+      else if (samples==0) {
+        continue;
+      }
+      for (n=0; n<psf->sf.channels; n++) {
         float  *mono = pcm[n] ;
         for (j=0; j<samples; j++) {
           ptr[i++] = mono[j] ;
@@ -520,14 +524,14 @@ ogg_read_d(SF_PRIVATE *psf, double *ptr, sf_count_t lens)
     int samples ;
     int i = 0, j, n ;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
-    int len = lens / vdata->vi.channels;
+    int len = lens / psf->sf.channels;
     while (len>0) {
       ogg_read_buffer(psf) ;
       samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm) ;
       if (samples >= len) {    /* Have we finished? count in frames */
         samples = len ;
       }
-      for (n=0; n<vdata->vi.channels; n++) {
+      for (n=0; n<psf->sf.channels; n++) {
         float  *mono=pcm[n];
         for (j=0; j<samples; j++) {
           ptr[i++] = (double)mono[j] ;
@@ -558,7 +562,7 @@ ogg_write_f(SF_PRIVATE *psf, const float *ptr, sf_count_t lens)
     int i, m, j=0;
     OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
-    int len = lens / vdata->vi.channels;
+    int len = lens / psf->sf.channels;
     float **buffer=vorbis_analysis_buffer(&vdata->vd,len) ;
     for (i=0; i<len; i++) 
       for (m=0; m<psf->sf.channels; m++)
@@ -600,7 +604,7 @@ ogg_write_d(SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
     int i, m, j=0;
     OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
-    int len = lens / vdata->vi.channels;
+    int len = lens / psf->sf.channels;
     float **buffer=vorbis_analysis_buffer(&vdata->vd,len) ;
     for (i=0; i<len; i++) 
       for (m=0; m<psf->sf.channels; m++)
