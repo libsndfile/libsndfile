@@ -227,7 +227,11 @@ ogg_write_header(SF_PRIVATE *psf, int UNUSED (calc_length))
 
     /* add a comment */
     vorbis_comment_init(&vdata->vc) ;
-    vorbis_comment_add_tag(&vdata->vc,"ENCODER","libsndfile") ;
+	{
+	static char encoder [] = "ENCODER" ;
+	static char libname [] = "libsndfile" ;
+    vorbis_comment_add_tag(&vdata->vc,encoder,libname) ;
+	}
 
     /* set up the analysis state and auxiliary encoding storage */
     vorbis_analysis_init(&vdata->vd,&vdata->vi) ;
@@ -353,23 +357,28 @@ ogg_open	(SF_PRIVATE *psf)
 	return error ;
 } /* ogg_open */
 
-static void
-ogg_read_buffer(SF_PRIVATE *psf)
+int total_bytes = 0;
+static int
+ogg_read_buffer(SF_PRIVATE *psf, int size)
 {
     OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
     char *buffer ;
     int bytes ;
-
+    
  top:
     {
       int result = ogg_sync_pageout(&odata->oy,&odata->og) ;
       if (result==0) {
+        printf("Need more data (%d)\n", __LINE__);
         /* need more data */
-        buffer=ogg_sync_buffer(&odata->oy,4096) ;
-        bytes=psf_fread(buffer,1,4096,psf) ;
+        if(ogg_page_eos(&odata->og)) goto top;//return (odata->eos=1);
+        buffer=ogg_sync_buffer(&odata->oy,size) ;
+        bytes=psf_fread(buffer,1,size,psf) ;
         ogg_sync_wrote(&odata->oy,bytes) ;
-        if (bytes==0) odata->eos=1 ;
+        total_bytes += bytes;
+        fprintf(stderr, "Got %d bytes -> %d (%d)\n", bytes, total_bytes, __LINE__);
+        if (bytes==0) return (odata->eos=1) ;
         goto top ;
       }
       if (result<0) { /* missing or corrupt data at this page position */
@@ -383,10 +392,11 @@ ogg_read_buffer(SF_PRIVATE *psf)
         
         if (result==0) {
           /* need more data */
-          buffer=ogg_sync_buffer(&odata->oy,4096) ;
-          bytes=psf_fread(buffer,1,4096,psf) ;
+          buffer=ogg_sync_buffer(&odata->oy,size) ;
+          bytes=psf_fread(buffer,1,size,psf) ;
           ogg_sync_wrote(&odata->oy,bytes) ;
-          if (bytes==0) odata->eos=1 ;
+          fprintf(stderr, "Got %d bytes (%d)\n", bytes, __LINE__);
+          if (bytes==0) return odata->eos=1 ;
           goto top ;
         }
         if (result>0) {
@@ -404,9 +414,8 @@ ogg_read_buffer(SF_PRIVATE *psf)
         }
         else  /* missing or corrupt data at this page position */
               /* no reason to complain; already complained above */
-          goto top;
-        if (ogg_page_eos(&odata->og)) odata->eos=1 ;
-        return ;
+            odata->eos=1 ;
+        return odata->eos;
       }
     }
 }
@@ -440,15 +449,18 @@ ogg_read_s(SF_PRIVATE *psf, short *ptr, sf_count_t lens)
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
     int len = lens / psf->sf.channels;
     while (len>0) {
-      ogg_read_buffer(psf) ;
       samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm) ;
       if (samples >= len) {    /* Have we finished? count in frames */
         samples = len ;
       }
-      for (n=0; n<psf->sf.channels; n++) {
-        float  *mono=pcm[n] ;
-        for (j=0; j<samples; j++) {
-          int x = (int)(mono[j]*32767.0f) ;
+      else if (samples==0) {    /* Ensure there is data */
+        if (ogg_read_buffer(psf, len)) return i;
+        continue;
+      }
+      for (j=0; j<samples; j++) {
+        float  **mono = pcm ;
+        for (n=0; n<psf->sf.channels; n++) {
+          int x = (int)(mono[n][j]*32767.0f) ;
           ptr[i++] = (short)(x>>16) ;
         }
       }
@@ -468,18 +480,18 @@ ogg_read_i(SF_PRIVATE *psf, int *ptr, sf_count_t lens)
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
     int len = lens / psf->sf.channels;
     while (len>0) {
-      ogg_read_buffer(psf) ;
       samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm) ;
       if (samples >= len) {    /* Have we finished? count in frames */
         samples = len ;
       }
-      for (n=0; n<psf->sf.channels; n++) {
-        float  *mono=pcm[n] ;
-        for (j=0; j<samples; j++) {
-          int val = (int)(mono[j]*32767.0f);
-          if (val>32767) val = 32767;
-          else if (val<-32768) val=-32768;
-          ptr[i++] = (int)(mono[j]*32767.0f) ;
+      else if (samples==0) {    /* Ensure there is data */
+        if (ogg_read_buffer(psf, len)) return i;
+        continue;
+      }
+      for (j=0; j<samples; j++) {
+        float  **mono = pcm ;
+        for (n=0; n<psf->sf.channels; n++) {
+          ptr[i++] = (int)(mono[n][j]*32767.0f) ;
         }
       }
       len -= samples ;
@@ -497,20 +509,19 @@ ogg_read_f(SF_PRIVATE *psf, float *ptr, sf_count_t lens)
     int i = 0, j, n ;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
     int len = lens / psf->sf.channels;
-    printf("Read %d frames\n", len);
     while (len>0) {
-      ogg_read_buffer(psf) ;
       samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm) ;
       if (samples >= len) {    /* Have we finished? count in frames */
         samples = len ;
       }
-      else if (samples==0) {
+      else if (samples==0) {    /* Ensure there is data */
+        if (ogg_read_buffer(psf, len)) return i;
         continue;
       }
-      for (n=0; n<psf->sf.channels; n++) {
-        float  *mono = pcm[n] ;
-        for (j=0; j<samples; j++) {
-          ptr[i++] = mono[j] ;
+      for (j=0; j<samples; j++) {
+        float  **mono = pcm ;
+        for (n=0; n<psf->sf.channels; n++) {
+          ptr[i++] = mono[n][j] ;
         }
       }
       len -= samples ;
@@ -529,15 +540,18 @@ ogg_read_d(SF_PRIVATE *psf, double *ptr, sf_count_t lens)
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
     int len = lens / psf->sf.channels;
     while (len>0) {
-      ogg_read_buffer(psf) ;
       samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm) ;
       if (samples >= len) {    /* Have we finished? count in frames */
         samples = len ;
       }
-      for (n=0; n<psf->sf.channels; n++) {
-        float  *mono=pcm[n];
-        for (j=0; j<samples; j++) {
-          ptr[i++] = (double)mono[j] ;
+      else if (samples==0) {    /* Ensure there is data */
+        if (ogg_read_buffer(psf, len)) return i;
+        continue;
+      }
+      for (j=0; j<samples; j++) {
+        float  **mono = pcm ;
+        for (n=0; n<psf->sf.channels; n++) {
+          ptr[i++] = (double)(mono[n][j]) ;
         }
       }
       len -= samples ;
@@ -548,13 +562,13 @@ ogg_read_d(SF_PRIVATE *psf, double *ptr, sf_count_t lens)
 }
 
 static sf_count_t
-ogg_write_s(SF_PRIVATE *psf, const short *ptr, sf_count_t lens)
+ogg_write_s(SF_PRIVATE * UNUSED (psf), const short * UNUSED (ptr), sf_count_t UNUSED (lens))
 {
     return 0 ;
 }
 
 static sf_count_t
-ogg_write_i(SF_PRIVATE *psf, const int *ptr, sf_count_t lens)
+ogg_write_i(SF_PRIVATE * UNUSED (psf), const int * UNUSED (ptr), sf_count_t UNUSED (lens))
 {
     return 0;
 }
