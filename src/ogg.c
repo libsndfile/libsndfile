@@ -227,7 +227,11 @@ ogg_write_header(SF_PRIVATE *psf, int UNUSED (calc_length))
 
     /* add a comment */
     vorbis_comment_init(&vdata->vc) ;
-    vorbis_comment_add_tag(&vdata->vc,"ENCODER","libsndfile") ;
+	{
+	static char encoder [] = "ENCODER" ;
+	static char libname [] = "libsndfile" ;
+    vorbis_comment_add_tag(&vdata->vc,encoder,libname) ;
+	}
 
     /* set up the analysis state and auxiliary encoding storage */
     vorbis_analysis_init(&vdata->vd,&vdata->vi) ;
@@ -545,13 +549,13 @@ ogg_read_d(SF_PRIVATE *psf, double *ptr, sf_count_t lens)
 }
 
 static sf_count_t
-ogg_write_s(SF_PRIVATE *psf, const short *ptr, sf_count_t lens)
+ogg_write_s(SF_PRIVATE * UNUSED (psf), const short * UNUSED (ptr), sf_count_t UNUSED (lens))
 {
     return 0 ;
 }
 
 static sf_count_t
-ogg_write_i(SF_PRIVATE *psf, const int *ptr, sf_count_t lens)
+ogg_write_i(SF_PRIVATE * UNUSED (psf), const int * UNUSED (ptr), sf_count_t UNUSED (lens))
 {
     return 0;
 }
