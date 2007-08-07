@@ -273,6 +273,8 @@ ogg_close(SF_PRIVATE *psf)
     /* clean up this logical bitstream; before exit we shuld see if we're
        followed by another [chained] */
 
+    if (psf->mode == SFM_WRITE)  vorbis_analysis_wrote(&data->vd,0) ;
+
     ogg_stream_clear(&data->os) ;
   
     /* ogg_page and ogg_packet structs always point to storage in
