@@ -476,6 +476,9 @@ ogg_read_i(SF_PRIVATE *psf, int *ptr, sf_count_t lens)
       for (n=0; n<psf->sf.channels; n++) {
         float  *mono=pcm[n] ;
         for (j=0; j<samples; j++) {
+          int val = (int)(mono[j]*32767.0f);
+          if (val>32767) val = 32767;
+          else if (val<-32768) val=-32768;
           ptr[i++] = (int)(mono[j]*32767.0f) ;
         }
       }
