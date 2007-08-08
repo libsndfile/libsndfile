@@ -1,3 +1,8 @@
+2007-08-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/voc.c
+    Fix bug in handling file supplied by Matt Olenik.
+
 2007-07-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/OGG
