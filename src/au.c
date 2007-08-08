@@ -435,7 +435,12 @@ au_read_header (SF_PRIVATE *psf)
 		} ;
 
 	psf_log_printf (psf, "  Sample Rate : %d\n", au_fmt.samplerate) ;
-	psf_log_printf (psf, "  Channels    : %d\n", au_fmt.channels) ;
+	if (au_fmt.channels < 1)
+	{	psf_log_printf (psf, "  Channels    : %d  **** should be >= 1\n", au_fmt.channels) ;
+		return SFE_CHANNEL_COUNT_ZERO ;
+		}
+	else
+		psf_log_printf (psf, "  Channels    : %d\n", au_fmt.channels) ;
 
 	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
 
