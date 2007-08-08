@@ -96,6 +96,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_INTERNAL			, "Unspecified internal error." },
 	{	SFE_BAD_CONTROL_CMD		, "Bad command passed to function sf_command()." },
 	{	SFE_BAD_ENDIAN			, "Bad endian-ness. Try default endian-ness" },
+	{	SFE_CHANNEL_COUNT_ZERO	, "Channel count is zero." },
 	{	SFE_CHANNEL_COUNT		, "Too many channels specified." },
 
 	{	SFE_BAD_SEEK			, "Internal psf_fseek() failed." },
@@ -207,12 +208,10 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_MAT4_BAD_NAME		, "Error in MAT4 file. No variable name." },
 	{	SFE_MAT4_NO_SAMPLERATE	, "Error in MAT4 file. No sample rate." },
-	{	SFE_MAT4_ZERO_CHANNELS	, "Error in MAT4 file. Channel count is zero." },
 
 	{	SFE_MAT5_BAD_ENDIAN		, "Error in MAT5 file. Not able to determine endian-ness." },
 	{	SFE_MAT5_NO_BLOCK		, "Error in MAT5 file. Bad block structure." },
 	{	SFE_MAT5_SAMPLE_RATE	, "Error in MAT5 file. Not able to determine sample rate." },
-	{	SFE_MAT5_ZERO_CHANNELS	, "Error in MAT5 file. Channel count is zero." },
 
 	{	SFE_PVF_NO_PVF1			, "Error in PVF file. No PVF1 marker." },
 	{	SFE_PVF_BAD_HEADER		, "Error in PVF file. Bad header." },
