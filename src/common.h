@@ -137,8 +137,6 @@ enum
 	SF_FORMAT_DWD			= 0x4040000,		/* DiamondWare Digirized */
 
 	/* Following are detected but not supported. */
-	SF_FORMAT_OGG			= 0x4090000,
-
 	SF_FORMAT_REX			= 0x40A0000,		/* Propellorheads Rex/Rcy */
 	SF_FORMAT_REX2			= 0x40D0000,		/* Propellorheads Rex2 */
 	SF_FORMAT_KRZ			= 0x40E0000,		/* Kurzweil sampler file */
@@ -146,8 +144,6 @@ enum
 	SF_FORMAT_SHN			= 0x4110000,		/* Shorten. */
 
 	/* Unsupported encodings. */
-	SF_FORMAT_VORBIS		= 0x1001,
-
 	SF_FORMAT_SVX_FIB		= 0x1020, 		/* SVX Fibonacci Delta encoding. */
 	SF_FORMAT_SVX_EXP		= 0x1021, 		/* SVX Exponential Delta encoding. */
 
