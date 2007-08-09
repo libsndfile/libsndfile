@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2007 John ffitch
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -357,7 +357,8 @@ ogg_open	(SF_PRIVATE *psf)
 	return error ;
 } /* ogg_open */
 
-int total_bytes = 0;
+#if 0
+/* Erik : This doesn't seem to be used ATM. */
 static int
 ogg_read_buffer(SF_PRIVATE *psf, int size)
 {
@@ -365,6 +366,7 @@ ogg_read_buffer(SF_PRIVATE *psf, int size)
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
     char *buffer ;
     int bytes ;
+	int total_bytes = 0;
 
  top:
     {
@@ -430,6 +432,7 @@ ogg_read_buffer(SF_PRIVATE *psf, int size)
       }
     }
 }
+#endif
 
 static int 
 ogg_command (SF_PRIVATE *UNUSED (psf), int command,
