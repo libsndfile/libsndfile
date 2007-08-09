@@ -510,14 +510,27 @@ ogg_rdouble(int samples, void *vptr, int channels, float **pcm)
 
 
 static sf_count_t
-ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens, int(transfn)(int, void *, int, float **))
+ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
+                int(transfn)(int, void *, int, float **))
 {
     int i = 0 ;
+    float **pcm;
+    int samples;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
     OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
-    int len = lens / psf->sf.channels;
+    int len = lens / psf->sf.channels ;
     fprintf(stdout, "Reading %d samples (%d)\n", (int)lens, __LINE__);
-    goto start;
+    while ((samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm))>0) {
+      if (samples>len) samples = len ;
+      printf("Vread %d frames (%d)\n", samples, __LINE__);
+      i += transfn(samples, ptr, psf->sf.channels, pcm);
+      len -= samples ;
+      /* tell libvorbis how many samples we actually consumed */
+      vorbis_synthesis_read(&vdata->vd,samples) ;
+      fprintf(stdout, " %d needed (%d)\n", len, __LINE__);
+      if (len==0) return i; /* Is this necessary */
+    }	    
+    goto start0 ;                /* Jump into the nasty nest */
     while (len>0 && !odata->eos) {
       while (len>0 && !odata->eos) {
         int result = ogg_sync_pageout(&odata->oy,&odata->og) ;
@@ -531,6 +544,8 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens, int(transfn)(int, v
 	  ogg_stream_pagein(&odata->os,&odata->og); /* can safely ignore errors at
                                                        this point */
 	  fprintf(stdout, "ogg_stream_pagein (%d)\n", __LINE__) ;
+        start0:
+          fprintf(stdout, "**** START0 ****\n");
           while (1) {
 	    result = ogg_stream_packetout(&odata->os,&odata->op) ;
             fprintf(stdout, "ogg_stream_packetout = %d (%d)\n", result, __LINE__);
@@ -541,8 +556,6 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens, int(transfn)(int, v
 	    }
             else {
 	      /* we have a packet.  Decode it */
-	      float **pcm;
-	      int samples;
 	      fprintf(stdout, "Calling vorbis_synthesis (%d)\n", __LINE__);
 	      if (vorbis_synthesis(&vdata->vb,&odata->op)==0) {/* test for success! */
 		vorbis_synthesis_blockin(&vdata->vd,&vdata->vb) ;
