@@ -357,6 +357,9 @@ ogg_open	(SF_PRIVATE *psf)
         subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
         psf->container_close = ogg_close ;
         if (psf->mode == SFM_WRITE) {
+		if ((error = ogg_write_header (psf, 0)))
+                	return error ;
+		psf->write_header = ogg_write_header ;
 		psf->write_short	= ogg_write_s ;
 		psf->write_int		= ogg_write_i ;
 		psf->write_float	= ogg_write_f ;
@@ -521,7 +524,7 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 	      example, pcm[0] is left, and pcm[1] is right.  samples is
 	      the size of each channel.  Convert the float values
 	      (-1.<=range<=1.) to whatever PCM format and write it out */
-            start:
+
 	      while ((samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm))>0) {
                 if (samples>len) samples = len ;
 		printf("Vread %d frames (%d)\n", samples, __LINE__);
@@ -671,10 +674,3 @@ ogg_write_d(SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
     return 0;
 }
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 9ff1fe9c-629e-4e9c-9ef5-3d0eb1e427a0
-*/
