@@ -780,6 +780,9 @@ sf_format_check	(const SF_INFO *info)
 					return 1 ;
 				break ;
 
+		case SF_FORMAT_OGG :
+				return 1 ;
+
 		default : break ;
 		} ;
 
