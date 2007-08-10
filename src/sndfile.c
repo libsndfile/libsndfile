@@ -781,7 +781,9 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_OGG :
-				return 1 ;
+				if (subformat == SF_FORMAT_VORBIS)
+					return 1 ;
+				break ;
 
 		default : break ;
 		} ;
