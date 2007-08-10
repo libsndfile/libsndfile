@@ -7,6 +7,7 @@
 *.la
 *.lo
 *.loT
+*.oga
 *.paf
 *.sd2
 *.sds
@@ -46,6 +47,7 @@ sndfile.pc
 src/*sndfile.def
 src/FLAC/src/test_grabbag/cuesheet/test_cuesheet
 src/FLAC/src/test_grabbag/picture/test_picture
+src/FLAC/src/test_libFLAC/matrix
 src/FLAC/src/test_libFLAC/test_libFLAC
 src/FLAC/src/test_seeking/test_seeking
 src/FLAC/src/test_streams/test_streams
@@ -82,4 +84,3 @@ tests/sfversion
 tests/utils.c
 tests/utils.h
 tests/write_read_test.c
-src/FLAC/src/test_libFLAC/matrix
