@@ -71,6 +71,17 @@ typedef struct {
 } VORBIS_PRIVATE ;
 
 static int
+ogg_store_string (SF_PRIVATE *psf, int str_type, const char *str, int length)
+{
+    char *buff = (char*)malloc(length+4) ;
+    int res ;
+    sprintf(buff, "%*s", length, str) ;
+    res = psf_store_string (psf, str_type, buff) ;
+    free(buff);
+    return res;
+}
+
+static int
 ogg_read_header(SF_PRIVATE *psf)
 {
     char *buffer ;
@@ -78,7 +89,6 @@ ogg_read_header(SF_PRIVATE *psf)
     int i, nn ;
     OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
-    printf("read_header\n");
     ogg_sync_init(&(odata->oy)) ; /* Now we can read pages */
 
     /* grab some data at the head of the stream.  We want the first page
@@ -136,25 +146,44 @@ ogg_read_header(SF_PRIVATE *psf)
 	      "audio data->\n") ;
       return SFE_MALFORMED_FILE ;
     }
+
     psf_log_printf(psf,"JPff: a vorbis file\n") ;
-    printf("vendor=%s\n%d comments\n", vdata->vc.vendor, vdata->vc.comments);
+    /*
+      TITLE	OK
+      VERSION
+      ALBUM
+      TRACKNUMBER
+      ARTIST	OK
+      PERFORMER
+      COPYRIGHT	OK
+      LICENSE
+      ORGANIZATION
+      DESCRIPTION	OK
+      GENRE
+      DATE	OK
+      LOCATION
+      CONTACT
+      ISRC
+*/
+
     {
       int n;
       for (n=0; n<vdata->vc.comments; n++) {
 	char *comment = vdata->vc.user_comments[n];
-	printf("%d: %s\n", n, comment);
-	if (strncmp(comment, "Title=", 6)==0)
-	  psf_store_string(psf, SF_STR_TITLE,comment+6);
-	else if (strncmp(comment, "Copyright=", 10)==0)
-	  psf_store_string(psf, SF_STR_COPYRIGHT, comment+10);
-	else if (strncmp(comment, "Software=", 9)==0)
-	  psf_store_string(psf, SF_STR_SOFTWARE, comment+9);
-	else if (strncmp(comment, "Artist=", 7)==0)
-	  psf_store_string(psf, SF_STR_ARTIST, comment+7);
-	else if (strncmp(comment, "Comment=", 8)==0)
-	  psf_store_string(psf, SF_STR_COMMENT, comment+8);
-	else if (strncmp(comment, "Date=", 5)==0)
-	  psf_store_string(psf, SF_STR_DATE, comment+5);
+        int length = vdata->vc.comment_lengths[n];
+	printf("%d: %*s\n", n, length, comment);
+	if (strncmp(comment, "TITLE=", 6)==0)
+	  ogg_store_string(psf, SF_STR_TITLE, comment+6, length-6);
+	else if (strncmp(comment, "COPYRIGHT=", 10)==0)
+	  ogg_store_string(psf, SF_STR_COPYRIGHT, comment+10, length-10);
+	else if (strncmp(comment, "SOFTWARE=", 9)==0)
+	  ogg_store_string(psf, SF_STR_SOFTWARE, comment+9, length-9);
+	else if (strncmp(comment, "ARTIST=", 7)==0)
+	  ogg_store_string(psf, SF_STR_ARTIST, comment+7, length-7);
+	else if (strncmp(comment, "DESCRIPTION=", 12)==0)
+	  ogg_store_string(psf, SF_STR_COMMENT, comment+12, length-12);
+	else if (strncmp(comment, "DATE=", 5)==0)
+	  ogg_store_string(psf, SF_STR_DATE, comment+5, length-5);
       }
     }
     /* At this point, we're sure we're Vorbis.	We've set up the logical
@@ -265,11 +294,11 @@ ogg_write_header(SF_PRIVATE *psf, int UNUSED (calc_length))
 	{
 	  static char encoder [] = "ENCODER" ;
 	  static char libname [] = "libsndfile" ;
-	  static char *metatypes[] = {NULL, "Title", "Copyright", "Software",
-				      "Artist", "Comment", "Date", "Album",
-				      "Licence"};
+	  static char *metatypes[] = {NULL, "TITLE", "COPYRIGHT", "SOFTWARE",
+				      "ARTIST", "COMMENT", "DATE", "ALBUM",
+				      "LICENCE"};
 	  int k ;
-	  printf("Metadata (%d)\n", __LINE__);
+/* 	  printf("Metadata (%d)\n", __LINE__); */
 	  vorbis_comment_add_tag (&vdata->vc,encoder,libname) ;
 	  for (k = 0 ; k < SF_MAX_STRINGS ; k++)
 	    {	if (psf->strings [k].type == 0)
@@ -519,7 +548,7 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
     OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
     int len = lens / psf->sf.channels ;
-    fprintf(stdout, "Reading %d samples (%d)\n", (int)lens, __LINE__);
+/*     fprintf(stdout, "Reading %d samples (%d)\n", (int)lens, __LINE__); */
     while ((samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm))>0) {
       if (samples>len) samples = len ;
 /*	 printf("Vread %d frames (%d)\n", samples, __LINE__); */
@@ -528,7 +557,7 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
       /* tell libvorbis how many samples we actually consumed */
       vorbis_synthesis_read(&vdata->vd,samples) ;
       vdata->loc += samples ;
-      fprintf(stdout, " %d needed loc now %ld %d(%d)\n", len, vdata->loc, i, __LINE__);
+/*       fprintf(stdout, " %d needed loc now %ld %d(%d)\n", len, vdata->loc, i, __LINE__); */
       if (len==0) return i; /* Is this necessary */
     }
     goto start0 ;		 /* Jump into the nasty nest */
@@ -548,7 +577,7 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 	start0:
 	  while (1) {
 	    result = ogg_stream_packetout(&odata->os,&odata->op) ;
-	    fprintf(stdout, "ogg_stream_packetout = %d (%d)\n", result, __LINE__);
+/* 	    fprintf(stdout, "ogg_stream_packetout = %d (%d)\n", result, __LINE__); */
 
 	    if (result==0) break ; /* need more data */
 	    if (result<0) { /* missing or corrupt data at this page position */
@@ -576,8 +605,8 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 		/* tell libvorbis how many samples we actually consumed */
 		vorbis_synthesis_read(&vdata->vd,samples) ;
 		vdata->loc += samples;
-                fprintf(stdout, " %d needed loc now %ld (%d)\n",
-                        len, vdata->loc, __LINE__);
+/*                 fprintf(stdout, " %d needed loc now %ld (%d)\n", */
+/*                         len, vdata->loc, __LINE__); */
 		if (len==0) return i; /* Is this necessary */
 	      }
 	    }
@@ -592,8 +621,8 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 	buffer = ogg_sync_buffer(&odata->oy,4096) ;
 	bytes = psf_fread(buffer,1,4096,psf) ;
 	ogg_sync_wrote(&odata->oy,bytes) ;
-   fprintf(stdout, "Reading raw %d bytes (%d)\n", bytes, __LINE__) ;
-   fprintf(stdout, "Loc = %ld\n", vdata->loc);
+/*    fprintf(stdout, "Reading raw %d bytes (%d)\n", bytes, __LINE__) ; */
+/*    fprintf(stdout, "Loc = %ld\n", vdata->loc); */
 	if (bytes==0) odata->eos=1;
       }
     }
@@ -718,7 +747,6 @@ ogg_write_f(SF_PRIVATE *psf, const float *ptr, sf_count_t lens)
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
     int len = lens / psf->sf.channels;
     float **buffer=vorbis_analysis_buffer(&vdata->vd,len) ;
-    printf("Got buffer (%d)\n", __LINE__);
     for (i=0; i<len; i++)
       for (m=0; m<psf->sf.channels; m++)
 	buffer[m][i] = ptr[j++] ;
@@ -798,7 +826,7 @@ ogg_write_d(SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
 }
 
 static sf_count_t
-ogg_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
+ogg_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 {
 	OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
