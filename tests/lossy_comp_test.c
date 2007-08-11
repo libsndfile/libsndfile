@@ -355,6 +355,15 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
+	if (do_all || strcmp (argv [1], "ogg_vorbis") == 0)
+	{	/* Don't do lcomp_test_XXX as the errors are too big. */
+		sdlcomp_test_short	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.24) ;
+		sdlcomp_test_int	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.24) ;
+		sdlcomp_test_float	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.24) ;
+		sdlcomp_test_double	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.24) ;
+		test_count++ ;
+		} ;
+
 	/* Lite remove start */
 	if (do_all || strcmp (argv [1], "ircam_ulaw") == 0)
 	{	lcomp_test_short	("ulaw.ircam", SF_ENDIAN_LITTLE | SF_FORMAT_IRCAM | SF_FORMAT_ULAW, 2, 0.04) ;
