@@ -442,9 +442,9 @@ ogg_seek (SF_PRIVATE *UNUSED (psf), int UNUSED (mode), sf_count_t UNUSED(offset)
 }
 
 static int
-ogg_rshort(int samples, void *vptr, int channels, float **pcm)
+ogg_rshort(int samples, void *vptr, int off,int channels, float **pcm)
 {
-    short *ptr = (short*)vptr;
+    short *ptr = (short*)vptr + off ;
     int i = 0, j, n;
     for (j=0; j<samples; j++) {
       for (n=0; n<channels; n++) {
@@ -457,9 +457,9 @@ ogg_rshort(int samples, void *vptr, int channels, float **pcm)
 }
 
 static int
-ogg_rint(int samples, void *vptr, int channels, float **pcm)
+ogg_rint(int samples, void *vptr, int off, int channels, float **pcm)
 {
-	int *ptr = (int*)vptr;
+	int *ptr = (int*)vptr + off ;
 	int i = 0, j, n;
 
 	for (j=0; j<samples; j++) {
@@ -473,9 +473,9 @@ ogg_rint(int samples, void *vptr, int channels, float **pcm)
 }
 
 static int
-ogg_rfloat(int samples, void *vptr, int channels, float **pcm)
+ogg_rfloat(int samples, void *vptr, int off, int channels, float **pcm)
 {
-    float *ptr = (float*)vptr;
+    float *ptr = (float*)vptr + off ;
     int i = 0, j, n;
     printf("read float\n");
     for (j=0; j<samples; j++) {
@@ -489,9 +489,9 @@ ogg_rfloat(int samples, void *vptr, int channels, float **pcm)
 }
 
 static int
-ogg_rdouble(int samples, void *vptr, int channels, float **pcm)
+ogg_rdouble(int samples, void *vptr, int off, int channels, float **pcm)
 {
-    double *ptr = (double*)vptr;
+    double *ptr = (double*)vptr + off ;
     int i = 0, j, n;
     printf("read double\n");
     for (j=0; j<samples; j++) {
@@ -507,7 +507,7 @@ ogg_rdouble(int samples, void *vptr, int channels, float **pcm)
 
 static sf_count_t
 ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
-                int(transfn)(int, void *, int, float **))
+                int(transfn)(int, void *, int, int, float **))
 {
     int i = 0 ;
     float **pcm;
@@ -519,7 +519,7 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
     while ((samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm))>0) {
       if (samples>len) samples = len ;
 /*       printf("Vread %d frames (%d)\n", samples, __LINE__); */
-      i += transfn(samples, &ptr[i], psf->sf.channels, pcm);
+      i += transfn(samples, ptr, i, psf->sf.channels, pcm);
       len -= samples ;
       /* tell libvorbis how many samples we actually consumed */
       vorbis_synthesis_read(&vdata->vd,samples) ;
@@ -566,7 +566,7 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 	      while ((samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm))>0) {
                 if (samples>len) samples = len ;
 /* 		printf("Vread %d frames (%d)\n", samples, __LINE__); */
-                i += transfn(samples, &ptr[i], psf->sf.channels, pcm);
+                i += transfn(samples, ptr, i, psf->sf.channels, pcm);
                 len -= samples ;
                 /* tell libvorbis how many samples we actually consumed */
                 vorbis_synthesis_read(&vdata->vd,samples) ;
