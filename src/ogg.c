@@ -629,6 +629,7 @@ ogg_write_s(SF_PRIVATE *psf, const short *ptr, sf_count_t lens)
       for (m=0; m<psf->sf.channels; m++)
 	buffer[m][i] = (float)(ptr[j++])/32767.0f ;
     vorbis_analysis_wrote(&vdata->vd,len) ;
+    vdata->loc += len;
     /* vorbis does some data preanalysis, then divvies up blocks for
        more involved (potentially parallel) processing.	 Get a single
        block for encoding now */
@@ -671,6 +672,7 @@ ogg_write_i(SF_PRIVATE *psf, const int *ptr, sf_count_t lens)
       for (m=0; m<psf->sf.channels; m++)
 	buffer[m][i] = (float)(ptr[j++])/2147483647.0f ;
     vorbis_analysis_wrote(&vdata->vd,len) ;
+    vdata->loc += len;
     /* vorbis does some data preanalysis, then divvies up blocks for
        more involved (potentially parallel) processing.	 Get a single
        block for encoding now */
@@ -714,6 +716,7 @@ ogg_write_f(SF_PRIVATE *psf, const float *ptr, sf_count_t lens)
       for (m=0; m<psf->sf.channels; m++)
 	buffer[m][i] = ptr[j++] ;
     vorbis_analysis_wrote(&vdata->vd,len) ;
+    vdata->loc += len;
     /* vorbis does some data preanalysis, then divvies up blocks for
        more involved (potentially parallel) processing.	 Get a single
        block for encoding now */
@@ -755,6 +758,7 @@ ogg_write_d(SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
     for (i=0; i<len; i++)
       for (m=0; m<psf->sf.channels; m++)
 	buffer[m][i] = (float)ptr[j++] ;
+    vdata->loc += len;
     vorbis_analysis_wrote(&vdata->vd,len) ;
     /* vorbis does some data preanalysis, then divvies up blocks for
        more involved (potentially parallel) processing.	 Get a single
