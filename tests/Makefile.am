@@ -169,7 +169,7 @@ genfiles : write_read_test.c pcm_test.c header_test.c utils.c \
 check: generic-tests wav-tests aiff-tests au-tests caf-tests raw-tests \
 	paf-tests svx-tests nist-tests ircam-tests voc-tests w64-tests mat4-tests \
 	mat5-tests pvf-tests xi-tests htk-tests avr-tests sds-tests sd2-tests \
-	flac-tests caf-tests wve-tests io-tests
+	flac-tests caf-tests wve-tests vorbis-tests io-tests
 
 generic-tests : error_test ulaw_test alaw_test command_test floating_point_test \
 		pcm_test win32_ordinal_test $(CPP_TEST)
@@ -287,6 +287,13 @@ wve-tests: lossy_comp_test
 	./lossy_comp_test wve
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on WVE files."
+	@echo "----------------------------------------------------------------------"
+
+vorbis-tests: lossy_comp_test ogg_test
+	./ogg_test
+	./lossy_comp_test ogg_vorbis
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion` passed tests on OGG/VORBIS files."
 	@echo "----------------------------------------------------------------------"
 
 # Lite remove start
