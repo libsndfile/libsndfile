@@ -222,7 +222,6 @@ ogg_read_header(SF_PRIVATE *psf)
                                                    We could init multiple
                                                    vorbis_block structures for
                                                    vd here */
-    fprintf(stdout, "ogg_read_header finished\n") ;
     return 0 ;
 }
 
@@ -449,10 +448,8 @@ ogg_rshort(int samples, void *vptr, int off,int channels, float **pcm)
     for (j=0; j<samples; j++) {
       for (n=0; n<channels; n++) {
           ptr[i++] = (short)(pcm[n][j]*32767.0f) ;
-          printf("%d ", ptr[i-1]);
       }
     }
-    printf("\n");
     return i;
 }
 
@@ -465,10 +462,8 @@ ogg_rint(int samples, void *vptr, int off, int channels, float **pcm)
 	for (j=0; j<samples; j++) {
 		for (n=0; n<channels; n++) {
 			ptr[i++] = (int)(pcm[n][j]*2147483647.0f) ;
-			printf("%d ", ptr[i-1]);
                 }
         }
-	printf("\n");
 	return i;
 }
 
@@ -477,14 +472,11 @@ ogg_rfloat(int samples, void *vptr, int off, int channels, float **pcm)
 {
     float *ptr = (float*)vptr + off ;
     int i = 0, j, n;
-    printf("read float\n");
     for (j=0; j<samples; j++) {
       for (n=0; n<channels; n++) {
         ptr[i++] = pcm[n][j] ;
-        printf("%f ", ptr[i-1]);
       }
     }
-    printf("\n");
     return i;
 }
 
@@ -493,14 +485,11 @@ ogg_rdouble(int samples, void *vptr, int off, int channels, float **pcm)
 {
     double *ptr = (double*)vptr + off ;
     int i = 0, j, n;
-    printf("read double\n");
     for (j=0; j<samples; j++) {
       for (n=0; n<channels; n++) {
         ptr[i++] = (double)(pcm[n][j]) ;
-        printf("%lf ", ptr[i-1]);
       }
     }
-    printf("\n");
     return i;
 }
 
