@@ -292,6 +292,7 @@ wve-tests: lossy_comp_test
 vorbis-tests: lossy_comp_test ogg_test
 	./ogg_test
 	./lossy_comp_test ogg_vorbis
+	./string_test ogg
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on OGG/VORBIS files."
 	@echo "----------------------------------------------------------------------"

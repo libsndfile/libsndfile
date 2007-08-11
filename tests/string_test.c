@@ -50,6 +50,7 @@ main (int argc, char *argv [])
 		printf ("           wav  - test adding strings to WAV files\n") ;
 		printf ("           aiff - test adding strings to AIFF files\n") ;
 		printf ("           flac - test adding strings to FLAC files\n") ;
+		printf ("           ogg  - test adding strings to OGG files\n") ;
 		printf ("           all  - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -68,6 +69,11 @@ main (int argc, char *argv [])
 
 	if (do_all || ! strcmp (argv [1], "flac"))
 	{	string_start_test ("strings.flac", SF_FORMAT_FLAC) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "ogg"))
+	{	string_start_test ("vorbis.oga", SF_FORMAT_OGG) ;
 		test_count++ ;
 		} ;
 
@@ -236,7 +242,16 @@ string_start_test (const char *filename, int typemajor)
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 1 ;
 	sfinfo.frames		= 0 ;
-	sfinfo.format		= typemajor | SF_FORMAT_PCM_16 ;
+
+	switch (typemajor)
+	{	case SF_FORMAT_OGG :
+			sfinfo.format = typemajor | SF_FORMAT_VORBIS ;
+			break ;
+
+		default :
+			sfinfo.format = typemajor | SF_FORMAT_PCM_16 ;
+			break ;
+		} ;
 
 	frames = BUFFER_LEN / sfinfo.channels ;
 
@@ -330,7 +345,7 @@ string_start_test (const char *filename, int typemajor)
 		if (cptr == NULL || strcmp (license, cptr) != 0)
 		{	if (errors++ == 0)
 				puts ("\n") ;
-			printf ("    Bad license : %s\n", cptr) ;
+			printf ("    Bad license   : %s\n", cptr) ;
 			} ;
 		} ;
 
