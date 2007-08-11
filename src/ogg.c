@@ -26,6 +26,9 @@
 #include <time.h>
 #include <vorbis/codec.h>
 #include <vorbis/vorbisenc.h>
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
 #include "sndfile.h"
 #include "sfendian.h"
@@ -45,6 +48,8 @@ static sf_count_t	ogg_write_s(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 static sf_count_t	ogg_write_i(SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
 static sf_count_t	ogg_write_f(SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
 static sf_count_t	ogg_write_d(SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
+static sf_count_t	ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
+			int(transfn)(int, void *, int, int, float **)) ;
 
 
 typedef struct {
@@ -57,12 +62,12 @@ typedef struct {
 } OGG_PRIVATE ;
 
 typedef struct {
+	long		 loc; /* Count current location */
 	vorbis_info	 vi ; /* struct that stores all the static vorbis bitstream
 				 settings */
 	vorbis_comment	 vc ; /* struct that stores all the bitstream user comments */
 	vorbis_dsp_state vd ; /* central working state for the packet->PCM decoder */
 	vorbis_block	 vb ; /* local working space for packet->PCM decode */
-	long		 loc; /* Count current location */
 } VORBIS_PRIVATE ;
 
 static int
@@ -73,7 +78,7 @@ ogg_read_header(SF_PRIVATE *psf)
     int i, nn ;
     OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
     VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
-
+    printf("read_header\n");
     ogg_sync_init(&(odata->oy)) ; /* Now we can read pages */
 
     /* grab some data at the head of the stream.  We want the first page
@@ -444,10 +449,10 @@ ogg_command (SF_PRIVATE *UNUSED (psf), int command,
 	return 0 ;
 } /* ogg_command */
 
-static sf_count_t
-ogg_seek (SF_PRIVATE *UNUSED (psf), int UNUSED (mode), sf_count_t UNUSED(offset))
+static int
+ogg_rnull(int samples, void *UNUSED (vptr), int UNUSED (off) ,int channels, float **UNUSED (pcm))
 {
-    return 0 ;
+    return samples*channels;
 }
 
 static int
@@ -523,7 +528,7 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
       /* tell libvorbis how many samples we actually consumed */
       vorbis_synthesis_read(&vdata->vd,samples) ;
       vdata->loc += samples ;
-/*	 fprintf(stdout, " %d needed (%d)\n", len, __LINE__); */
+      fprintf(stdout, " %d needed loc now %ld %d(%d)\n", len, vdata->loc, i, __LINE__);
       if (len==0) return i; /* Is this necessary */
     }
     goto start0 ;		 /* Jump into the nasty nest */
@@ -571,7 +576,8 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 		/* tell libvorbis how many samples we actually consumed */
 		vorbis_synthesis_read(&vdata->vd,samples) ;
 		vdata->loc += samples;
-/*		   fprintf(stdout, " %d needed (%d)\n", len, __LINE__); */
+                fprintf(stdout, " %d needed loc now %ld (%d)\n",
+                        len, vdata->loc, __LINE__);
 		if (len==0) return i; /* Is this necessary */
 	      }
 	    }
@@ -586,7 +592,8 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 	buffer = ogg_sync_buffer(&odata->oy,4096) ;
 	bytes = psf_fread(buffer,1,4096,psf) ;
 	ogg_sync_wrote(&odata->oy,bytes) ;
-/*	   fprintf(stdout, "Reading raw %d bytes (%d)\n", bytes, __LINE__) ; */
+   fprintf(stdout, "Reading raw %d bytes (%d)\n", bytes, __LINE__) ;
+   fprintf(stdout, "Loc = %ld\n", vdata->loc);
 	if (bytes==0) odata->eos=1;
       }
     }
@@ -788,5 +795,38 @@ ogg_write_d(SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
       }
     }
     return lens;
+}
+
+static sf_count_t
+ogg_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
+{
+	OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
+	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
+	if (odata == NULL || vdata == NULL)
+		return 0 ;
+
+        if (offset % psf->sf.channels!=0) 
+          {
+            psf->error = SFE_BAD_SEEK ;
+            return ((sf_count_t) -1) ;
+          }
+        
+	if (psf->mode == SFM_READ)
+          {	sf_count_t target = offset/psf->sf.channels ;
+		float buff[512] ;
+
+                if (target<vdata->loc)
+                  {
+                    lseek (psf->filedes, 0, SEEK_SET) ;
+                    ogg_read_header (psf) ;
+                  }
+                while (target>0) {
+                      	long m = target>512 ? 512 : target ;
+			ogg_read_sample(psf, (void*)buff, m, ogg_rnull) ;
+                        target -= m ;
+                    }
+		return vdata->loc ;
+          }
+	return 0 ;
 }
 
