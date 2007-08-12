@@ -486,7 +486,7 @@ ogg_rnull(int samples, void *UNUSED (vptr), int UNUSED (off) ,int channels, floa
 }
 
 static int
-ogg_rshort(int samples, void *vptr, int off,int channels, float **pcm)
+ogg_rshort(int samples, void *vptr, int off, int channels, float **pcm)
 {
 	short *ptr = (short*)vptr + off ;
         int i = 0, j, n;
