@@ -847,7 +847,8 @@ ogg_length(SF_PRIVATE *psf)
         }
         m = vdata->loc ;
         lseek (psf->filedes, 12, SEEK_SET) ;
-        ogg_read_header (psf, 0) ;
+        odata->eos = 0 ;
+	ogg_read_header (psf, 0) ;
         return m ;
 }
 
