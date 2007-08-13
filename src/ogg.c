@@ -51,6 +51,9 @@ static sf_count_t	ogg_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t le
 static sf_count_t	ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 			int(transfn)(int, void *, int, int, float **)) ;
 static long	ogg_length (SF_PRIVATE *psf) ;
+static char *vorbis_metatypes[] = {NULL, "TITLE", "COPYRIGHT", "SOFTWARE",
+				   "ARTIST", "COMMENT", "DATE", "ALBUM",
+				   "LICENCE"};
 
 typedef struct {
 	ogg_sync_state	 oy ; /* sync and verify incoming physical bitstream */
@@ -69,17 +72,6 @@ typedef struct {
 	vorbis_dsp_state vd ; /* central working state for the packet->PCM decoder */
 	vorbis_block	 vb ; /* local working space for packet->PCM decode */
 } VORBIS_PRIVATE ;
-
-static int
-ogg_store_string (SF_PRIVATE *psf, int str_type, const char *str, int length)
-{
-    char *buff = (char*)malloc(length+4) ;
-    int res ;
-    sprintf(buff, "%*s", length, str) ;
-    res = psf_store_string (psf, str_type, buff) ;
-    free(buff);
-    return res;
-}
 
 static int
 ogg_read_header(SF_PRIVATE *psf, int verb)
@@ -173,28 +165,13 @@ ogg_read_header(SF_PRIVATE *psf, int verb)
 
 	if (verb)
 	{	int n;
-		for (n=0; n<vdata->vc.comments; n++)
-		{	char *comment = vdata->vc.user_comments[n];
-			int length = vdata->vc.comment_lengths[n];
-			printf("%d: %*s\n", n, length, comment);
-			if (strncmp(comment, "TITLE=", 6)==0)
-			  ogg_store_string (psf, SF_STR_TITLE, comment+6, length-6);
-			else if (strncmp(comment, "COPYRIGHT=", 10)==0)
-			  ogg_store_string (psf, SF_STR_COPYRIGHT,
-					    comment+10, length-10);
-			else if (strncmp(comment, "SOFTWARE=", 9)==0)
-			  ogg_store_string (psf, SF_STR_SOFTWARE, comment+9,
-					    length-9);
-			else if (strncmp(comment, "ARTIST=", 7)==0)
-			  ogg_store_string (psf, SF_STR_ARTIST, comment+7,
-					    length-7);
-			else if (strncmp(comment, "DESCRIPTION=", 12)==0)
-			  ogg_store_string (psf, SF_STR_COMMENT, comment+12,
-					    length-12);
-			else if (strncmp(comment, "DATE=", 5)==0)
-			  ogg_store_string (psf, SF_STR_DATE, comment+5, length-5);
-		}
-	}
+         	printf("%d comments\n", vdata->vc.comments);
+                for (n=SF_STR_TITLE; n<=SF_STR_LICENSE; n++) 
+          	{	char *dd = vorbis_comment_query(&vdata->vc, vorbis_metatypes[n], 0);
+                	if (dd!=NULL)
+                	psf_store_string (psf, n, dd) ;
+          	}
+	}       
     /* At this point, we're sure we're Vorbis.	We've set up the logical
        (Ogg) bitstream decoder.	 Get the comment and codebook headers and
        set up the Vorbis decoder */
@@ -247,7 +224,16 @@ ogg_read_header(SF_PRIVATE *psf, int verb)
 	/*	 fprintf(stderr, "JPff:ignoring result=%d\n", result) ; */
 		}
 	}
-
+	if (verb)
+	{	int n;
+         	printf("%d comments\n", vdata->vc.comments);
+                for (n=SF_STR_TITLE; n<=SF_STR_LICENSE; n++) 
+          	{	char *dd = vorbis_comment_query(&vdata->vc, vorbis_metatypes[n], 0);
+                	if (dd!=NULL)
+                	psf_store_string (psf, n, dd) ;
+          	}
+	}       
+ 
     /* Throw the comments plus a few lines about the bitstream we're
        decoding */
 	if (verb)
@@ -309,9 +295,6 @@ ogg_write_header(SF_PRIVATE *psf, int UNUSED (calc_length))
 	{
 		static char encoder [] = "ENCODER" ;
 		static char libname [] = "libsndfile" ;
-		static char *metatypes[] = {NULL, "TITLE", "COPYRIGHT", "SOFTWARE",
-					    "ARTIST", "COMMENT", "DATE", "ALBUM",
-					    "LICENCE"};
 		int k ;
 /*	  printf("Metadata (%d)\n", __LINE__); */
 		vorbis_comment_add_tag (&vdata->vc,encoder,libname) ;
@@ -322,7 +305,7 @@ ogg_write_header(SF_PRIVATE *psf, int UNUSED (calc_length))
 	      /*			continue ; */
 
 			vorbis_comment_add_tag (&vdata->vc,
-						metatypes[psf->strings [k].type],
+						vorbis_metatypes[psf->strings [k].type],
 						psf->strings [k].str) ;
 		}
 	}
@@ -460,6 +443,7 @@ ogg_open	(SF_PRIVATE *psf)
 		psf->write_float	= ogg_write_f ;
 		psf->write_double	= ogg_write_d ;
 		psf->sf.frames = 0x7FFFFFF ; /* Unknown really */
+                psf->str_flags = SF_STR_ALLOW_START ;
 	}
 
 	psf->bytewidth = 1 ;
@@ -857,14 +841,19 @@ ogg_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 
 static long
 ogg_length(SF_PRIVATE *psf)
-{	long m;
-	OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
-	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
+{	if (psf->sf.seekable) {
+		long m;
+                OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
+                VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
 	
-	while (!odata->eos) ogg_read_sample(psf, NULL, 4096, ogg_rnull) ;
-	m = vdata->loc ;
-	lseek (psf->filedes, 12, SEEK_SET) ;
-	ogg_read_header (psf, 0) ;
-	return m ;
+                while (!odata->eos) ogg_read_sample(psf, NULL, 4096, ogg_rnull) ;
+                m = vdata->loc ;
+                lseek (psf->filedes, 12, SEEK_SET) ;
+                ogg_read_header (psf, 0) ;
+                return m ;
+    	}
+        else
+		return 0x7FFFFFF;
+    
 }
 
