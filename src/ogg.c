@@ -486,13 +486,10 @@ ogg_command (SF_PRIVATE *UNUSED (psf), int command,
 	     void *UNUSED (data), int UNUSED (datasize))
 {
 	switch (command)
-	{	case SFC_SET_DITHER_ON_WRITE:
-		case SFC_SET_DITHER_ON_READ:
-		  /* These should be done */
+	{
 		default :
-			break ;
+			return 0;
 	} ;
-	return 0 ;
 } /* ogg_command */
 
 static int
@@ -568,59 +565,59 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 	}
 	goto start0 ;		 /* Jump into the nasty nest */
 	while (len>0 && !odata->eos)
-        {
+	{
 		while (len>0 && !odata->eos)
-                {	int result = ogg_sync_pageout(&odata->oy,&odata->og) ;
+		{	int result = ogg_sync_pageout(&odata->oy,&odata->og) ;
 			if (result==0) break ; /* need more data */
-                        if (result<0)
-                        { /* missing or corrupt data at this page position */
-                          psf_log_printf (psf,"Corrupt or missing data in "
-                                          "bitstream; continuing...\n") ;
-                        }
-                        else
-                        {	ogg_stream_pagein (&odata->os,&odata->og); /* can safely ignore errors at
-                                                                              this point */
+			if (result<0)
+			{ /* missing or corrupt data at this page position */
+			  psf_log_printf (psf,"Corrupt or missing data in "
+					  "bitstream; continuing...\n") ;
+			}
+			else
+			{	ogg_stream_pagein (&odata->os,&odata->og); /* can safely ignore errors at
+									      this point */
 	      /*	  fprintf(stdout, "ogg_stream_pagein (%d)\n", __LINE__) ; */
-                        start0:
-                        	while (1)
-                                {	result = ogg_stream_packetout(&odata->os,&odata->op) ;
+			start0:
+				while (1)
+				{	result = ogg_stream_packetout(&odata->os,&odata->op) ;
 					if (result==0) break ; /* need more data */
-                                        if (result<0) { /* missing or corrupt data at this page position */
-                                          /* no reason to complain; already complained above */
-                                        }
-                                        else
-                                        {
+					if (result<0) { /* missing or corrupt data at this page position */
+					  /* no reason to complain; already complained above */
+					}
+					else
+					{
 		  /* we have a packet.	Decode it */
-                                        	if (vorbis_synthesis (&vdata->vb,&odata->op)==0) /* test for success! */
-                                                	vorbis_synthesis_blockin (&vdata->vd,&vdata->vb) ;
+						if (vorbis_synthesis (&vdata->vb,&odata->op)==0) /* test for success! */
+							vorbis_synthesis_blockin (&vdata->vd,&vdata->vb) ;
 		  /*
 		  **pcm is a multichannel float vector.	 In stereo, for
 		  example, pcm[0] is left, and pcm[1] is right.	 samples is
 		  the size of each channel.	 Convert the float values
 		  (-1.<=range<=1.) to whatever PCM format and write it out */
 		  
-                                                while ((samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm))>0)
+						while ((samples=vorbis_synthesis_pcmout(&vdata->vd,&pcm))>0)
 						{	if (samples>len) samples = len ;
 							i += transfn(samples, ptr, i, psf->sf.channels, pcm);
-                                                        len -= samples ;
-                                                        /* tell libvorbis how many samples we actually consumed */
-                                                        vorbis_synthesis_read (&vdata->vd,samples) ;
-                                                        vdata->loc += samples;
-                                                        if (len==0) return i ; /* Is this necessary */
-                                                }
-                                        }
-                                }
-                                if (ogg_page_eos(&odata->og)) odata->eos=1 ;
-                        }
-                }
+							len -= samples ;
+							/* tell libvorbis how many samples we actually consumed */
+							vorbis_synthesis_read (&vdata->vd,samples) ;
+							vdata->loc += samples;
+							if (len==0) return i ; /* Is this necessary */
+						}
+					}
+				}
+				if (ogg_page_eos(&odata->og)) odata->eos=1 ;
+			}
+		}
 		if (!odata->eos)
-          	{	char *buffer ;
-                	int bytes ;
-                        buffer = ogg_sync_buffer (&odata->oy,4096) ;
-                        bytes = psf_fread (buffer,1,4096,psf) ;
-                        ogg_sync_wrote (&odata->oy,bytes) ;
-                        if (bytes==0) odata->eos=1 ;
-                }
+		{	char *buffer ;
+			int bytes ;
+			buffer = ogg_sync_buffer (&odata->oy,4096) ;
+			bytes = psf_fread (buffer,1,4096,psf) ;
+			ogg_sync_wrote (&odata->oy,bytes) ;
+			if (bytes==0) odata->eos=1 ;
+		}
 	}
 	return i;
 }
@@ -826,7 +823,7 @@ ogg_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 {
 	OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
-/*         printf("ogg_seek from %ld to %d\n", vdata->loc, offset); */
+/*	   printf("ogg_seek from %ld to %d\n", vdata->loc, offset); */
 	if (odata == NULL || vdata == NULL)
 		return 0 ;
 
@@ -838,23 +835,23 @@ ogg_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 	
 	if (psf->mode == SFM_READ)
 	{	sf_count_t target = offset - vdata->loc ;
-          
+	  
 		if (target<0)
 		{		/* 12 to allow for OggS bit */
 		    lseek (psf->filedes, 12, SEEK_SET) ;
 		    ogg_read_header (psf, 0) ; /* Reset state */
-/*                     printf("Rewind loc=%ld\n", vdata->loc); */
-                    target = offset ;
-                }
+/*		       printf("Rewind loc=%ld\n", vdata->loc); */
+		    target = offset ;
+		}
 		while (target>0)
-                {	long m = target>4096 ? 4096 : target ;
+		{	long m = target>4096 ? 4096 : target ;
 			ogg_read_sample(psf, (void*)NULL, m, ogg_rnull) ;
-/*                         printf("skipping loc=%ld\n", vdata->loc); */
+/*			   printf("skipping loc=%ld\n", vdata->loc); */
 			target -= m ;
-                }
-/*                 printf("returning %ld\n", vdata->loc); */
+		}
+/*		   printf("returning %ld\n", vdata->loc); */
 		return vdata->loc ;
-        }
+	}
 	return 0 ;
 }
 
