@@ -17,7 +17,7 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* Much of this code is based on the examples in libvorbis from the 
+/* Much of this code is based on the examples in libvorbis from the
    XIPHOPHORUS Company http://www.xiph.org/ which has a BSD-style Licence
    Copyright (c) 2002, Xiph.org Foundation
 
@@ -82,7 +82,7 @@ static sf_count_t	ogg_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len
 static sf_count_t	ogg_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 static sf_count_t	ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 			int(transfn)(int, void *, int, int, float **)) ;
-static long	ogg_length (SF_PRIVATE *psf) ;
+static sf_count_t	ogg_length (SF_PRIVATE *psf) ;
 static char	*vorbis_metatypes[] = {NULL, "TITLE", "COPYRIGHT", "SOFTWARE",
 				       "ARTIST", "COMMENT", "DATE", "ALBUM",
 				       "LICENCE"};
@@ -97,7 +97,7 @@ typedef struct {
 } OGG_PRIVATE ;
 
 typedef struct {
-	long		 loc; /* Count current location */
+	sf_count_t		loc ; /* Count current location */
 	vorbis_info	 vi ; /* struct that stores all the static vorbis bitstream
 				 settings */
 	vorbis_comment	 vc ; /* struct that stores all the bitstream user comments */
@@ -196,12 +196,12 @@ ogg_read_header(SF_PRIVATE *psf, int verb)
 
 	if (verb)
 	{	int n;
-		for (n=SF_STR_TITLE; n<=SF_STR_LICENSE; n++) 
+		for (n=SF_STR_TITLE; n<=SF_STR_LICENSE; n++)
 		{	char *dd = vorbis_comment_query (&vdata->vc, vorbis_metatypes[n], 0);
 			if (dd!=NULL)
 			psf_store_string (psf, n, dd) ;
 		}
-	}	
+	}
     /* At this point, we're sure we're Vorbis.	We've set up the logical
        (Ogg) bitstream decoder.	 Get the comment and codebook headers and
        set up the Vorbis decoder */
@@ -256,13 +256,13 @@ ogg_read_header(SF_PRIVATE *psf, int verb)
 	}
 	if (verb)
 	{	int n;
-		for (n=SF_STR_TITLE; n<=SF_STR_LICENSE; n++) 
+		for (n=SF_STR_TITLE; n<=SF_STR_LICENSE; n++)
 		{	char *dd = vorbis_comment_query (&vdata->vc, vorbis_metatypes[n], 0);
 			if (dd!=NULL)
 				psf_store_string (psf, n, dd) ;
 		}
-	}	
- 
+	}
+
     /* Throw the comments plus a few lines about the bitstream we're
        decoding */
 	if (verb)
@@ -459,7 +459,7 @@ ogg_open	(SF_PRIVATE *psf)
 	}
 	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 	psf->container_close = ogg_close ;
-	if (psf->mode == SFM_WRITE) 
+	if (psf->mode == SFM_WRITE)
 	{
 		if ((error = ogg_write_init (psf, 0)))
 			return error ;
@@ -468,7 +468,7 @@ ogg_open	(SF_PRIVATE *psf)
 		psf->write_int		= ogg_write_i ;
 		psf->write_float	= ogg_write_f ;
 		psf->write_double	= ogg_write_d ;
-		psf->sf.frames = 0x7FFFFFF ; /* Unknown really */
+		psf->sf.frames = SF_COUNT_MAX ; /* Unknown really */
 		psf->str_flags = SF_STR_ALLOW_START ;
 	}
 
@@ -514,7 +514,7 @@ ogg_rshort(int samples, void *vptr, int off, int channels, float **pcm)
 	short *ptr = (short*)vptr + off ;
 	int i = 0, j, n ;
 	for (j=0; j<samples; j++)
-		for (n=0; n<channels; n++) 
+		for (n=0; n<channels; n++)
 			ptr[i++] = (short)(pcm[n][j]*32767.0f) ;
 	return i ;
 }
@@ -862,21 +862,22 @@ ogg_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 	return 0 ;
 }
 
-static long
-ogg_length(SF_PRIVATE *psf)
-{	if (psf->sf.seekable)
-	{	long m;
-		OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
-		VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
+static sf_count_t
+ogg_length (SF_PRIVATE *psf)
+{	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
+	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
+	sf_count_t length ;
 
-		while (!odata->eos) ogg_read_sample (psf, NULL, 4096, ogg_rnull) ;
-		m = vdata->loc ;
-		lseek (psf->filedes, 12, SEEK_SET) ;
-		ogg_read_header (psf, 0) ;
-		return m ;
-	}
-	else
-		return 0x7FFFFFF;
+	if (psf->sf.seekable == 0)
+		return SF_COUNT_MAX ;
 
-}
+	while (odata->eos == 0)
+		ogg_read_sample (psf, NULL, 4096, ogg_rnull) ;
+
+	length = vdata->loc ;
+	lseek (psf->filedes, 12, SEEK_SET) ;
+	ogg_read_header (psf, 0) ;
+
+	return length ;
+} /* ogg_length */
 
