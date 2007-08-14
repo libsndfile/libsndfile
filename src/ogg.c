@@ -17,6 +17,38 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+/* Much of this code is based on the examples in libvorbis from the 
+   XIPHOPHORUS Company http://www.xiph.org/ which has a BSD-style Licence
+   Copyright (c) 2002, Xiph.org Foundation
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions
+   are met:
+
+   - Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+   - Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+
+   - Neither the name of the Xiph.org Foundation nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION
+   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include "sfconfig.h"
 
 #include <stdio.h>
@@ -51,9 +83,9 @@ static sf_count_t	ogg_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t le
 static sf_count_t	ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 			int(transfn)(int, void *, int, int, float **)) ;
 static long	ogg_length (SF_PRIVATE *psf) ;
-static char *vorbis_metatypes[] = {NULL, "TITLE", "COPYRIGHT", "SOFTWARE",
-				   "ARTIST", "COMMENT", "DATE", "ALBUM",
-				   "LICENCE"};
+static char	*vorbis_metatypes[] = {NULL, "TITLE", "COPYRIGHT", "SOFTWARE",
+				       "ARTIST", "COMMENT", "DATE", "ALBUM",
+				       "LICENCE"};
 
 typedef struct {
 	ogg_sync_state	 oy ; /* sync and verify incoming physical bitstream */
@@ -89,10 +121,10 @@ ogg_read_header(SF_PRIVATE *psf, int verb)
        stream initial header) We need the first page to get the stream
        serialno. */
 
-	buffer = ogg_sync_buffer(&odata->oy,4096L) ; /* Expose the buffer */
+	buffer = ogg_sync_buffer (&odata->oy,4096L) ; /* Expose the buffer */
     /* submit a 4k block to libvorbis' Ogg layer */
     /* need to patch up guess type stuff */
-	memcpy(buffer, "OggS\0\0\0\0\0\0\0\0", 12) ;
+	memcpy (buffer, "OggS\0\0\0\0\0\0\0\0", 12) ;
 	buffer[5]=2 ;
 	bytes=psf_fread (buffer+12,1,4096-12,psf) ;
 	ogg_sync_wrote (&(odata->oy),bytes+12) ;
@@ -110,7 +142,7 @@ ogg_read_header(SF_PRIVATE *psf, int verb)
 
    /* Get the serial number and set up the rest of decode. */
     /* serialno first ; use it to set up a logical stream */
-	ogg_stream_init (&odata->os,ogg_page_serialno(&odata->og)) ;
+	ogg_stream_init (&odata->os,ogg_page_serialno (&odata->og)) ;
 
     /* extract the initial header from the first page and verify that the
        Ogg bitstream is in fact Vorbis data */
@@ -165,7 +197,7 @@ ogg_read_header(SF_PRIVATE *psf, int verb)
 	if (verb)
 	{	int n;
 		for (n=SF_STR_TITLE; n<=SF_STR_LICENSE; n++) 
-		{	char *dd = vorbis_comment_query(&vdata->vc, vorbis_metatypes[n], 0);
+		{	char *dd = vorbis_comment_query (&vdata->vc, vorbis_metatypes[n], 0);
 			if (dd!=NULL)
 			psf_store_string (psf, n, dd) ;
 		}
@@ -204,13 +236,13 @@ ogg_read_header(SF_PRIVATE *psf, int verb)
 	   at packetout */
 			nn = ogg_stream_pagein (&odata->os,&odata->og) ;
 			while (i<2)
-			{	result=ogg_stream_packetout(&odata->os,&odata->op) ;
+			{	result=ogg_stream_packetout (&odata->os,&odata->op) ;
 				if (result==0) break ;
 				if (result<0)
 				{
 	     /* Uh oh; data at some point was corrupted or missing!
 		We can't tolerate that in a header.  Die. */
-					psf_log_printf(psf,"Corrupt secondary header.  Exiting.\n") ;
+					psf_log_printf (psf,"Corrupt secondary header.	Exiting.\n") ;
 					return SFE_MALFORMED_FILE ;
 				}
 				vorbis_synthesis_headerin (&vdata->vi,&vdata->vc,&odata->op) ;
@@ -225,9 +257,9 @@ ogg_read_header(SF_PRIVATE *psf, int verb)
 	if (verb)
 	{	int n;
 		for (n=SF_STR_TITLE; n<=SF_STR_LICENSE; n++) 
-		{	char *dd = vorbis_comment_query(&vdata->vc, vorbis_metatypes[n], 0);
+		{	char *dd = vorbis_comment_query (&vdata->vc, vorbis_metatypes[n], 0);
 			if (dd!=NULL)
-			psf_store_string (psf, n, dd) ;
+				psf_store_string (psf, n, dd) ;
 		}
 	}	
  
@@ -256,7 +288,7 @@ ogg_read_header(SF_PRIVATE *psf, int verb)
 						   We could init multiple
 						   vorbis_block structures for
 						   vd here */
-	vdata->loc = 0;
+	vdata->loc = 0 ;
 	return 0 ;
 }
 
@@ -278,7 +310,7 @@ ogg_write_init(SF_PRIVATE *psf, int UNUSED (calc_length))
 		vorbis_encode_setup_init (&vdata->vi)) ;
 #endif
 	if (ret) return SFE_BAD_OPEN_FORMAT ;
-	vdata->loc = 0;
+	vdata->loc = 0 ;
 	return 0 ;
 }
 
@@ -322,22 +354,22 @@ ogg_write_header(SF_PRIVATE *psf, int UNUSED (calc_length))
 	   make the headers, then pass them to libvorbis one at a time;
 	   libvorbis handles the additional Ogg bitstream constraints */
 
-	{	ogg_packet header;
-		ogg_packet header_comm;
-		ogg_packet header_code;
+	{	ogg_packet header ;
+		ogg_packet header_comm ;
+		ogg_packet header_code ;
 
-		vorbis_analysis_headerout(&vdata->vd,&vdata->vc,&header,
-					  &header_comm,&header_code);
-		ogg_stream_packetin(&odata->os,&header); /* automatically placed in its own
+		vorbis_analysis_headerout (&vdata->vd,&vdata->vc,&header,
+					  &header_comm,&header_code) ;
+		ogg_stream_packetin (&odata->os,&header) ; /* automatically placed in its own
 							    page */
-		ogg_stream_packetin(&odata->os,&header_comm);
-		ogg_stream_packetin(&odata->os,&header_code);
+		ogg_stream_packetin (&odata->os,&header_comm) ;
+		ogg_stream_packetin (&odata->os,&header_code) ;
 
 		/* This ensures the actual
 		 * audio data will start on a new page, as per spec
 		 */
-		while (1) {
-			int result = ogg_stream_flush (&odata->os,&odata->og);
+		while (1)
+		{	int result = ogg_stream_flush (&odata->os,&odata->og) ;
 			if (result==0) break ;
 			psf_fwrite (odata->og.header,1,odata->og.header_len,psf) ;
 			psf_fwrite (odata->og.body,1,odata->og.body_len,psf) ;
@@ -466,7 +498,7 @@ ogg_command (SF_PRIVATE *UNUSED (psf), int command,
 	switch (command)
 	{
 		default :
-			return 0;
+			return 0 ;
 	} ;
 } /* ogg_command */
 
@@ -539,7 +571,7 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 		/* tell libvorbis how many samples we actually consumed */
 		vorbis_synthesis_read (&vdata->vd,samples) ;
 		vdata->loc += samples ;
-		if (len==0) return i; /* Is this necessary */
+		if (len==0) return i ; /* Is this necessary */
 	}
 	goto start0 ;		 /* Jump into the nasty nest */
 	while (len>0 && !odata->eos)
@@ -572,7 +604,7 @@ ogg_read_sample(SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 		  example, pcm[0] is left, and pcm[1] is right.	 samples is
 		  the size of each channel.	 Convert the float values
 		  (-1.<=range<=1.) to whatever PCM format and write it out */
-		  
+
 						while ((samples=vorbis_synthesis_pcmout (&vdata->vd,&pcm))>0)
 						{	if (samples>len) samples = len ;
 							i += transfn (samples, ptr, i, psf->sf.channels, pcm) ;
