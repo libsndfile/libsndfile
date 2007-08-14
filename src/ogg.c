@@ -87,58 +87,71 @@ static char	*vorbis_metatypes[] = {NULL, "TITLE", "COPYRIGHT", "SOFTWARE",
 				       "ARTIST", "COMMENT", "DATE", "ALBUM",
 				       "LICENCE"};
 
-typedef struct {
-	ogg_sync_state	 oy ; /* sync and verify incoming physical bitstream */
-	ogg_stream_state os ; /* take physical pages, weld into a logical
-				 stream of packets */
-	ogg_page	 og ; /* one Ogg bitstream page.  Vorbis packets are inside */
-	ogg_packet	 op ; /* one raw packet of data for decode */
-	int		 eos ;
+typedef struct
+{	/* Sync and verify incoming physical bitstream */
+	ogg_sync_state oy ;
+	/* Take physical pages, weld into a logical stream of packets */
+	ogg_stream_state os ;
+	/* One Ogg bitstream page.  Vorbis packets are inside */
+	ogg_page og ;
+	/* One raw packet of data for decode */
+	ogg_packet op ;
+	int eos ;
 } OGG_PRIVATE ;
 
-typedef struct {
-	sf_count_t		loc ; /* Count current location */
-	vorbis_info	 vi ; /* struct that stores all the static vorbis bitstream
-				 settings */
-	vorbis_comment	 vc ; /* struct that stores all the bitstream user comments */
-	vorbis_dsp_state vd ; /* central working state for the packet->PCM decoder */
-	vorbis_block	 vb ; /* local working space for packet->PCM decode */
+typedef struct
+{	/* Count current location */
+	sf_count_t loc ;
+	/* Struct that stores all the static vorbis bitstream settings */
+	vorbis_info	vi ;
+	/* Struct that stores all the bitstream user comments */
+	vorbis_comment vc ;
+	/* Ventral working state for the packet->PCM decoder */
+	vorbis_dsp_state vd ;
+	/* Local working space for packet->PCM decode */
+	vorbis_block vb ;
 } VORBIS_PRIVATE ;
 
 static int
-ogg_read_header(SF_PRIVATE *psf, int verb)
+ogg_read_header (SF_PRIVATE *psf, int verb)
 {
+	OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
+	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
 	char *buffer ;
 	int	 bytes ;
 	int i, nn ;
-	OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
-	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
+
 	odata->eos = 0 ;
-	ogg_sync_init (&(odata->oy)) ; /* Now we can read pages */
+	/* Now we can read pages */
+	ogg_sync_init (&(odata->oy)) ;
 
-    /* grab some data at the head of the stream.  We want the first page
-       (which is guaranteed to be small and only contain the Vorbis
-       stream initial header) We need the first page to get the stream
-       serialno. */
+    /*
+	**	Grab some data at the head of the stream.  We want the first page
+	**	(which is guaranteed to be small and only contain the Vorbis
+	**	stream initial header) We need the first page to get the stream
+	**	serialno.
+	*/
 
-	buffer = ogg_sync_buffer (&odata->oy,4096L) ; /* Expose the buffer */
-    /* submit a 4k block to libvorbis' Ogg layer */
-    /* need to patch up guess type stuff */
+	/* Expose the buffer */
+	buffer = ogg_sync_buffer (&odata->oy, 4096L) ;
+    /* Submit a 4k block to libvorbis' Ogg layer */
+    /* Need to patch up guess type stuff */
 	memcpy (buffer, "OggS\0\0\0\0\0\0\0\0", 12) ;
-	buffer[5]=2 ;
-	bytes=psf_fread (buffer+12,1,4096-12,psf) ;
-	ogg_sync_wrote (&(odata->oy),bytes+12) ;
+	buffer [5] = 2 ;
+	bytes=psf_fread (buffer + 12, 1, 4096 - 12, psf) ;
+	ogg_sync_wrote (&(odata->oy), bytes + 12) ;
 
     /* Get the first page. */
-	if ((nn=ogg_sync_pageout (&(odata->oy),&(odata->og)))!=1)
+	if ((nn = ogg_sync_pageout (&(odata->oy),&(odata->og))) != 1)
 	{
       /* have we simply run out of data?  If so, we're done. */
-		if (bytes<4096) return 0 ;
+		if (bytes < 4096)
+			return 0 ;
 
       /* error case.  Must not be Vorbis data */
 		psf_log_printf (psf,"Input does not appear to be an Ogg bitstream.\n") ;
 		return SFE_MALFORMED_FILE ;
-	}
+		} ;
 
    /* Get the serial number and set up the rest of decode. */
     /* serialno first ; use it to set up a logical stream */
@@ -341,11 +354,13 @@ ogg_write_header(SF_PRIVATE *psf, int UNUSED (calc_length))
 	vorbis_analysis_init (&vdata->vd,&vdata->vi) ;
 	vorbis_block_init (&vdata->vd,&vdata->vb) ;
 
-	/* set up our packet->stream encoder */
-	/* pick a random serial number; that way we can more likely build
-	   chained streams just by concatenation */
-	srand (time(NULL)) ;
-	ogg_stream_init (&odata->os,rand()) ;
+	/*
+	**	Set up our packet->stream encoder.
+	**	Pick a random serial number; that way we can more likely build
+	**	chained streams just by concatenation.
+	*/
+
+	ogg_stream_init (&odata->os, psf_rand_int32 ()) ;
 
 	/* Vorbis streams begin with three headers; the initial header (with
 	   most of the codec setup parameters) which is mandated by the Ogg
@@ -358,25 +373,23 @@ ogg_write_header(SF_PRIVATE *psf, int UNUSED (calc_length))
 		ogg_packet header_comm ;
 		ogg_packet header_code ;
 
-		vorbis_analysis_headerout (&vdata->vd,&vdata->vc,&header,
-					  &header_comm,&header_code) ;
-		ogg_stream_packetin (&odata->os,&header) ; /* automatically placed in its own
-							    page */
-		ogg_stream_packetin (&odata->os,&header_comm) ;
-		ogg_stream_packetin (&odata->os,&header_code) ;
+		vorbis_analysis_headerout (&vdata->vd, &vdata->vc, &header, &header_comm, &header_code) ;
+		ogg_stream_packetin (&odata->os, &header) ; /* automatically placed in its own page */
+		ogg_stream_packetin (&odata->os, &header_comm) ;
+		ogg_stream_packetin (&odata->os, &header_code) ;
 
 		/* This ensures the actual
 		 * audio data will start on a new page, as per spec
 		 */
 		while (1)
-		{	int result = ogg_stream_flush (&odata->os,&odata->og) ;
+		{	int result = ogg_stream_flush (&odata->os, &odata->og) ;
 			if (result==0) break ;
 			psf_fwrite (odata->og.header,1,odata->og.header_len,psf) ;
 			psf_fwrite (odata->og.body,1,odata->og.body_len,psf) ;
-		}
+			} ;
 	}
 	return 0 ;
-}
+} /* ogg_write_header */
 
 static int
 ogg_close(SF_PRIVATE *psf)
@@ -433,26 +446,29 @@ ogg_close(SF_PRIVATE *psf)
 }
 
 int
-ogg_open	(SF_PRIVATE *psf)
-{	int		error = 0 ;
-	int		subformat ;
+ogg_open (SF_PRIVATE *psf)
+{	int		subformat, error = 0 ;
 
-	OGG_PRIVATE* odata = calloc (1, sizeof(OGG_PRIVATE)) ;
-	VORBIS_PRIVATE* vdata = calloc (1, sizeof(VORBIS_PRIVATE)) ;
+	OGG_PRIVATE* odata = calloc (1, sizeof (OGG_PRIVATE)) ;
+	VORBIS_PRIVATE* vdata = calloc (1, sizeof (VORBIS_PRIVATE)) ;
 
 	psf->container_data = odata ;
 	psf->codec_data = vdata ;
+
 	if (psf->mode == SFM_RDWR)
 	  return SFE_BAD_MODE_RW ;
+
 	if (psf->mode == SFM_READ)
 	{	if ((error = ogg_read_header (psf, 1)))
 			return error ;
+
 		psf->read_short		= ogg_read_s ;
 		psf->read_int		= ogg_read_i ;
 		psf->read_float		= ogg_read_f ;
 		psf->read_double	= ogg_read_d ;
-		psf->sf.frames = ogg_length(psf); /* this call does not work; no idea why */
-	}
+		psf->sf.frames		= ogg_length (psf) ;
+		} ;
+
 	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_OGG)
 	{	if ((error = ogg_write_header (psf, 0)))
 	      psf->write_header = ogg_write_header ;
@@ -832,35 +848,38 @@ ogg_write_d(SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
 static sf_count_t
 ogg_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 {
-	OGG_PRIVATE *odata = (OGG_PRIVATE*)psf->container_data ;
-	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE*)psf->codec_data ;
+	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
+	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
+
 	if (odata == NULL || vdata == NULL)
 		return 0 ;
 
-	if (offset<0)
-	{
-	    psf->error = SFE_BAD_SEEK ;
-	    return ((sf_count_t) -1) ;
-	}
+	if (offset < 0)
+	{	psf->error = SFE_BAD_SEEK ;
+		return ((sf_count_t) -1) ;
+		} ;
 
 	if (psf->mode == SFM_READ)
 	{	sf_count_t target = offset - vdata->loc ;
 
-		if (target<0)
-		{		/* 12 to allow for OggS bit */
-		    lseek (psf->filedes, 12, SEEK_SET) ;
-		    ogg_read_header (psf, 0) ; /* Reset state */
-		    target = offset ;
-		}
-		while (target>0)
-		{	long m = target>4096 ? 4096 : target ;
-			ogg_read_sample (psf, (void*)NULL, m, ogg_rnull) ;
+		if (target < 0)
+		{	/* 12 to allow for OggS bit */
+			psf_fseek (psf, 12, SEEK_SET) ;
+			ogg_read_header (psf, 0) ; /* Reset state */
+			target = offset ;
+			} ;
+
+		while (target > 0)
+		{	sf_count_t m = target > 4096 ? 4096 : target ;
+			ogg_read_sample (psf, (void*) NULL, m, ogg_rnull) ;
 			target -= m ;
-		}
+			} ;
+
 		return vdata->loc ;
-	}
+		} ;
+
 	return 0 ;
-}
+} /* ogg_seek */
 
 static sf_count_t
 ogg_length (SF_PRIVATE *psf)
@@ -875,7 +894,7 @@ ogg_length (SF_PRIVATE *psf)
 		ogg_read_sample (psf, NULL, 4096, ogg_rnull) ;
 
 	length = vdata->loc ;
-	lseek (psf->filedes, 12, SEEK_SET) ;
+	psf_fseek (psf, 12, SEEK_SET) ;
 	ogg_read_header (psf, 0) ;
 
 	return length ;
