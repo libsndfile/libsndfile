@@ -42,8 +42,8 @@
    A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION
    OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES ; LOSS OF USE,
+   DATA, OR PROFITS ; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
@@ -66,7 +66,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-static int	ogg_read_header (SF_PRIVATE *psf, int verb) ;
+static int	ogg_read_header (SF_PRIVATE *psf, int log_data) ;
 static int	ogg_write_init (SF_PRIVATE *psf, int calc_length) ;
 static int	ogg_write_header (SF_PRIVATE *psf, int calc_length) ;
 static int	ogg_close (SF_PRIVATE *psf) ;
@@ -81,7 +81,7 @@ static sf_count_t	ogg_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len) 
 static sf_count_t	ogg_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
 static sf_count_t	ogg_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 static sf_count_t	ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens,
-			int (transfn)(int, void *, int, int, float **)) ;
+			int (transfn) (int, void *, int, int, float **)) ;
 static sf_count_t	ogg_length (SF_PRIVATE *psf) ;
 
 typedef struct
@@ -126,7 +126,7 @@ typedef struct
 } VORBIS_PRIVATE ;
 
 static int
-ogg_read_header (SF_PRIVATE *psf, int verb)
+ogg_read_header (SF_PRIVATE *psf, int log_data)
 {
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
@@ -138,7 +138,7 @@ ogg_read_header (SF_PRIVATE *psf, int verb)
 	/* Now we can read pages */
 	ogg_sync_init (&(odata->oy)) ;
 
-    /*
+	/*
 	**	Grab some data at the head of the stream.  We want the first page
 	**	(which is guaranteed to be small and only contain the Vorbis
 	**	stream initial header) We need the first page to get the stream
@@ -147,80 +147,69 @@ ogg_read_header (SF_PRIVATE *psf, int verb)
 
 	/* Expose the buffer */
 	buffer = ogg_sync_buffer (&odata->oy, 4096L) ;
-    /* Submit a 4k block to libvorbis' Ogg layer */
-    /* Need to patch up guess type stuff */
+
+	/* Submit a 4k block to libvorbis' Ogg layer */
+	/* Need to patch up guess type stuff */
 	memcpy (buffer, "OggS\0\0\0\0\0\0\0\0", 12) ;
 	buffer [5] = 2 ;
-	bytes=psf_fread (buffer + 12, 1, 4096 - 12, psf) ;
+	bytes = psf_fread (buffer + 12, 1, 4096 - 12, psf) ;
 	ogg_sync_wrote (&(odata->oy), bytes + 12) ;
 
-    /* Get the first page. */
-	if ((nn = ogg_sync_pageout (&(odata->oy),&(odata->og))) != 1)
+	/* Get the first page. */
+	if ((nn = ogg_sync_pageout (&(odata->oy), &(odata->og))) != 1)
 	{
-      /* have we simply run out of data?  If so, we're done. */
+		/* Have we simply run out of data?  If so, we're done. */
 		if (bytes < 4096)
 			return 0 ;
 
-      /* error case.  Must not be Vorbis data */
-		psf_log_printf (psf,"Input does not appear to be an Ogg bitstream.\n") ;
+		/* Error case.  Must not be Vorbis data */
+		psf_log_printf (psf, "Input does not appear to be an Ogg bitstream.\n") ;
 		return SFE_MALFORMED_FILE ;
 		} ;
 
-   /* Get the serial number and set up the rest of decode. */
-    /* serialno first ; use it to set up a logical stream */
-	ogg_stream_init (&odata->os,ogg_page_serialno (&odata->og)) ;
+	/*
+	**	Get the serial number and set up the rest of decode.
+	**	Serialno first ; use it to set up a logical stream.
+	*/
+	ogg_stream_init (&odata->os, ogg_page_serialno (&odata->og)) ;
 
-    /* extract the initial header from the first page and verify that the
-       Ogg bitstream is in fact Vorbis data */
-
-    /* I handle the initial header first instead of just having the code
-       read all three Vorbis headers at once because reading the initial
-       header is an easy way to identify a Vorbis bitstream and it's
-       useful to see that functionality seperated out. */
-
+	/*
+	**	Extract the initial header from the first page and verify that the
+	**	Ogg bitstream is in fact Vorbis data.
+	**
+	**	I handle the initial header first instead of just having the code
+	**	read all three Vorbis headers at once because reading the initial
+	**	header is an easy way to identify a Vorbis bitstream and it's
+	**	useful to see that functionality seperated out.
+	*/
 	vorbis_info_init (&vdata->vi) ;
 	vorbis_comment_init (&vdata->vc) ;
-	if (ogg_stream_pagein (&odata->os,&odata->og)<0)
-	{
-	  /* error; stream version mismatch perhaps */
-		psf_log_printf (psf,"Error reading first page of Ogg bitstream data\n") ;
+
+	if (ogg_stream_pagein (&odata->os, &odata->og) < 0)
+	{	/* Error ; stream version mismatch perhaps. */
+		psf_log_printf (psf, "Error reading first page of Ogg bitstream data\n") ;
 		return SFE_MALFORMED_FILE ;
-	}
+		} ;
 
-	if (ogg_stream_packetout (&odata->os,&odata->op)!=1)
-	{
-      /* no page? must not be vorbis */
-		psf_log_printf (psf,"Error reading initial header packet.\n") ;
+	if (ogg_stream_packetout (&odata->os, &odata->op) != 1)
+	{	/* No page? must not be vorbis. */
+		psf_log_printf (psf, "Error reading initial header packet.\n") ;
 		return SFE_MALFORMED_FILE ;
-	}
+		} ;
 
-	if (vorbis_synthesis_headerin (&vdata->vi,&vdata->vc,&odata->op)<0)
-	{
-      /* error case; not a vorbis header */
-		psf_log_printf (psf,"This Ogg bitstream does not contain Vorbis "
-				    "audio data->\n") ;
+	if (vorbis_synthesis_headerin (&vdata->vi, &vdata->vc, &odata->op) < 0)
+	{	/* Error case ; not a vorbis header. */
+		psf_log_printf (psf, "This Ogg bitstream does not contain Vorbis audio data.\n") ;
 		return SFE_MALFORMED_FILE ;
-	}
+		} ;
 
-    /*
-      TITLE	OK
-      VERSION
-      ALBUM
-      TRACKNUMBER
-      ARTIST	OK
-      PERFORMER
-      COPYRIGHT	OK
-      LICENSE
-      ORGANIZATION
-      DESCRIPTION	OK
-      GENRE
-      DATE	OK
-      LOCATION
-      CONTACT
-      ISRC
-*/
+	/*
+	**	Common Ogg metadata fields?
+	**	TITLE, VERSION, ALBUM, TRACKNUMBER, ARTIST, PERFORMER, COPYRIGHT, LICENSE,
+	**	ORGANIZATION, DESCRIPTION, GENRE, DATE, LOCATION, CONTACT, ISRC,
+	*/
 
-	if (verb)
+	if (log_data)
 	{	int k ;
 
 		for (k = 0 ; k < ARRAY_LEN (vorbis_metatypes) ; k++)
@@ -233,7 +222,7 @@ ogg_read_header (SF_PRIVATE *psf, int verb)
 			} ;
 		} ;
 
-    /*
+	/*
 	**	At this point, we're sure we're Vorbis.	We've set up the logical (Ogg)
 	**	bitstream decoder. Get the comment and codebook headers and set up the
 	**	Vorbis decoder.
@@ -241,52 +230,53 @@ ogg_read_header (SF_PRIVATE *psf, int verb)
 	**	The next two packets in order are the comment and codebook headers.
 	**	They're likely large and may span multiple pages.  Thus we reead
 	**	and submit data until we get our two pacakets, watching that no
-	**	pages are missing.  If a page is missing, error out; losing a
+	**	pages are missing.  If a page is missing, error out ; losing a
 	**	header page is the only place where missing data is fatal.
 	*/
 
 	i = 0 ;			 /* Count of number of packets read */
 	while (i < 2)
-	{	int result = ogg_sync_pageout (&odata->oy,&odata->og) ;
-		if (result==0)
-		{
-	/* Need more data */
-			buffer = ogg_sync_buffer (&odata->oy,4096) ;
-			bytes = psf_fread (buffer,1,4096,psf) ;
+	{	int result = ogg_sync_pageout (&odata->oy, &odata->og) ;
+		if (result == 0)
+		{	/* Need more data */
+			buffer = ogg_sync_buffer (&odata->oy, 4096) ;
+			bytes = psf_fread (buffer, 1, 4096, psf) ;
 
 			if (bytes == 0 && i < 2)
-			{	psf_log_printf (psf,"End of file before finding all Vorbis headers!\n") ;
+			{	psf_log_printf (psf, "End of file before finding all Vorbis headers!\n") ;
 				return SFE_MALFORMED_FILE ;
 				} ;
 			nn = ogg_sync_wrote (&odata->oy, bytes) ;
 			}
-		else if (result==1)
-		{
-      /* Don't complain about missing or corrupt data yet.  We'll
-	 catch it at the packet output phase */
-
-	/* we can ignore any errors here
-	   as they'll also become apparent
-	   at packetout */
-			nn = ogg_stream_pagein (&odata->os,&odata->og) ;
-			while (i<2)
-			{	result=ogg_stream_packetout (&odata->os,&odata->op) ;
-				if (result==0) break ;
-				if (result<0)
-				{
-	     /* Uh oh; data at some point was corrupted or missing!
-		We can't tolerate that in a header.  Die. */
-					psf_log_printf (psf,"Corrupt secondary header.	Exiting.\n") ;
+		else if (result == 1)
+		{	/*
+			**	Don't complain about missing or corrupt data yet. We'll
+			**	catch it at the packet output phase.
+			**
+			**	We can ignore any errors here as they'll also become apparent
+			**	at packetout.
+			*/
+			nn = ogg_stream_pagein (&odata->os, &odata->og) ;
+			while (i < 2)
+			{	result = ogg_stream_packetout (&odata->os, &odata->op) ;
+				if (result == 0)
+					break ;
+				if (result < 0)
+				{	/*	Uh oh ; data at some point was corrupted or missing!
+					**	We can't tolerate that in a header. Die. */
+					psf_log_printf (psf, "Corrupt secondary header.	Exiting.\n") ;
 					return SFE_MALFORMED_FILE ;
-				}
-				vorbis_synthesis_headerin (&vdata->vi,&vdata->vc,&odata->op) ;
-				i++ ;
-			}
-		}
-	}
+					} ;
 
-	if (verb)
-	{	int k ;
+				vorbis_synthesis_headerin (&vdata->vi, &vdata->vc, &odata->op) ;
+				i++ ;
+				} ;
+			} ;
+		} ;
+
+	if (log_data)
+	{	char **ptr ;
+		int k ;
 
 		for (k = 0 ; k < ARRAY_LEN (vorbis_metatypes) ; k++)
 		{	char *dd ;
@@ -296,36 +286,35 @@ ogg_read_header (SF_PRIVATE *psf, int verb)
 				continue ;
 			psf_store_string (psf, vorbis_metatypes [k].id, dd) ;
 			} ;
-		} ;
 
-    /* Throw the comments plus a few lines about the bitstream we're
-       decoding */
-	if (verb)
-	{	char **ptr = vdata->vc.user_comments ;
+		/* Throw the comments plus a few lines about the bitstream we're decoding. */
+		ptr = vdata->vc.user_comments ;
 		while (*ptr)
-		{	psf_log_printf (psf,"%s\n",*ptr) ;
-			ptr ++  ;
+		{	psf_log_printf (psf, "%s\n", *ptr) ;
+			ptr ++ ;
 			} ;
 
-		psf_log_printf (psf,"\nBitstream is %d channel, %D Hz\n", vdata->vi.channels, vdata->vi.rate) ;
-		psf_log_printf (psf,"Encoded by: %s\n", vdata->vc.vendor) ;
-	}
-	psf->sf.samplerate	= vdata->vi.rate;
-	psf->sf.channels	= vdata->vi.channels;
-	psf->sf.format	= SF_FORMAT_OGG | SF_FORMAT_VORBIS | SF_FORMAT_FLOAT;
+		psf_log_printf (psf, "\nBitstream is %d channel, %D Hz\n", vdata->vi.channels, vdata->vi.rate) ;
+		psf_log_printf (psf, "Encoded by: %s\n", vdata->vc.vendor) ;
+		} ;
 
-    /* OK, got and parsed all three headers. Initialize the Vorbis
-       packet->PCM decoder. */
-	vorbis_synthesis_init (&vdata->vd,&vdata->vi) ; /* central decode state */
-	vorbis_block_init (&vdata->vd,&vdata->vb) ;	/* Local state for most of the
-						   decode so multiple block
-						   decodes can proceed in parallel.
-						   We could init multiple
-						   vorbis_block structures for
-						   vd here */
+	psf->sf.samplerate	= vdata->vi.rate ;
+	psf->sf.channels	= vdata->vi.channels ;
+	psf->sf.format		= SF_FORMAT_OGG | SF_FORMAT_VORBIS ;
+
+	/*	OK, got and parsed all three headers. Initialize the Vorbis
+	**	packet->PCM decoder.
+	**	Central decode state. */
+	vorbis_synthesis_init (&vdata->vd, &vdata->vi) ;
+
+	/*	Local state for most of the decode so multiple block decodes can
+	**	proceed in parallel. We could init multiple vorbis_block structures
+	**	for vd here. */
+	vorbis_block_init (&vdata->vd, &vdata->vb) ;
 	vdata->loc = 0 ;
+
 	return 0 ;
-}
+} /* ogg_read_header */
 
 static int
 ogg_write_init (SF_PRIVATE *psf, int UNUSED (calc_length))
@@ -336,13 +325,13 @@ ogg_write_init (SF_PRIVATE *psf, int UNUSED (calc_length))
 	vorbis_info_init (&vdata->vi) ;
 
 	/* The style of encoding should be selectable here, VBR quality mode. */
-	ret = vorbis_encode_init_vbr (&vdata->vi,psf->sf.channels, psf->sf.samplerate, 0.4f) ;
+	ret = vorbis_encode_init_vbr (&vdata->vi, psf->sf.channels, psf->sf.samplerate, 0.4f) ;
 
 #if 0
-	ret = vorbis_encode_init (&vdata->vi,psf->sf.channels, psf->sf.samplerate, -1, 128000, -1) ; /* average bitrate mode */
-	ret = ( vorbis_encode_setup_managed (&vdata->vi,psf->sf.channels,
-					     psf->sf.samplerate,-1,128000,-1) ||
-		vorbis_encode_ctl (&vdata->vi,OV_ECTL_RATEMANAGE_AVG,NULL) ||
+	ret = vorbis_encode_init (&vdata->vi, psf->sf.channels, psf->sf.samplerate, -1, 128000, -1) ; /* average bitrate mode */
+	ret = ( vorbis_encode_setup_managed (&vdata->vi, psf->sf.channels,
+						 psf->sf.samplerate, -1, 128000, -1) ||
+		vorbis_encode_ctl (&vdata->vi, OV_ECTL_RATEMANAGE_AVG, NULL) ||
 		vorbis_encode_setup_init (&vdata->vi)) ;
 #endif
 	if (ret)
@@ -386,22 +375,22 @@ ogg_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		} ;
 
 	/* set up the analysis state and auxiliary encoding storage */
-	vorbis_analysis_init (&vdata->vd,&vdata->vi) ;
-	vorbis_block_init (&vdata->vd,&vdata->vb) ;
+	vorbis_analysis_init (&vdata->vd, &vdata->vi) ;
+	vorbis_block_init (&vdata->vd, &vdata->vb) ;
 
 	/*
 	**	Set up our packet->stream encoder.
-	**	Pick a random serial number; that way we can more likely build
+	**	Pick a random serial number ; that way we can more likely build
 	**	chained streams just by concatenation.
 	*/
 
 	ogg_stream_init (&odata->os, psf_rand_int32 ()) ;
 
-	/* Vorbis streams begin with three headers; the initial header (with
+	/* Vorbis streams begin with three headers ; the initial header (with
 	   most of the codec setup parameters) which is mandated by the Ogg
 	   bitstream spec.  The second header holds any comment fields.	 The
 	   third header holds the bitstream codebook.  We merely need to
-	   make the headers, then pass them to libvorbis one at a time;
+	   make the headers, then pass them to libvorbis one at a time ;
 	   libvorbis handles the additional Ogg bitstream constraints */
 
 	{	ogg_packet header ;
@@ -418,9 +407,9 @@ ogg_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		 */
 		while (1)
 		{	int result = ogg_stream_flush (&odata->os, &odata->og) ;
-			if (result==0) break ;
-			psf_fwrite (odata->og.header,1,odata->og.header_len,psf) ;
-			psf_fwrite (odata->og.body,1,odata->og.body_len,psf) ;
+			if (result == 0) break ;
+			psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
+			psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
 			} ;
 	}
 	return 0 ;
@@ -432,28 +421,28 @@ ogg_close (SF_PRIVATE *psf)
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 
-	/* clean up this logical bitstream; before exit we shuld see if we're
+	/* clean up this logical bitstream ; before exit we shuld see if we're
 	   followed by another [chained] */
 
 	if (psf->mode == SFM_WRITE)
-	{	vorbis_analysis_wrote (&vdata->vd,0) ;
-		while (vorbis_analysis_blockout (&vdata->vd,&vdata->vb)==1)
+	{	vorbis_analysis_wrote (&vdata->vd, 0) ;
+		while (vorbis_analysis_blockout (&vdata->vd, &vdata->vb) == 1)
 		{
 
-	    /* analysis, assume we want to use bitrate management */
-			vorbis_analysis (&vdata->vb,NULL) ;
+		/* analysis, assume we want to use bitrate management */
+			vorbis_analysis (&vdata->vb, NULL) ;
 			vorbis_bitrate_addblock (&vdata->vb) ;
 
-			while (vorbis_bitrate_flushpacket (&vdata->vd,&odata->op))
+			while (vorbis_bitrate_flushpacket (&vdata->vd, &odata->op))
 			{	/* weld the packet into the bitstream */
-				ogg_stream_packetin (&odata->os,&odata->op) ;
+				ogg_stream_packetin (&odata->os, &odata->op) ;
 
 				/* write out pages (if any) */
 				while (!odata->eos)
-				{	int result=ogg_stream_pageout (&odata->os,&odata->og) ;
-					if (result==0) break ;
-					psf_fwrite (odata->og.header,1,odata->og.header_len,psf) ;
-					psf_fwrite (odata->og.body,1,odata->og.body_len,psf) ;
+				{	int result=ogg_stream_pageout (&odata->os, &odata->og) ;
+					if (result == 0) break ;
+					psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
+					psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
 
 		/* this could be set above, but for illustrative purposes, I do
 		   it here (to show that vorbis does know where the stream ends) */
@@ -477,20 +466,21 @@ ogg_close (SF_PRIVATE *psf)
 
 	/* OK, clean up the framer */
 	ogg_sync_clear (&odata->oy) ;
+
 	return 0 ;
-}
+} /* ogg_close */
 
 int
 ogg_open (SF_PRIVATE *psf)
 {	OGG_PRIVATE* odata = calloc (1, sizeof (OGG_PRIVATE)) ;
 	VORBIS_PRIVATE* vdata = calloc (1, sizeof (VORBIS_PRIVATE)) ;
 	int	subformat, error = 0 ;
-	
+
 	psf->container_data = odata ;
 	psf->codec_data = vdata ;
 
 	if (psf->mode == SFM_RDWR)
-	  return SFE_BAD_MODE_RW ;
+		return SFE_BAD_MODE_RW ;
 
 	if (psf->mode == SFM_READ)
 	{	if ((error = ogg_read_header (psf, 1)))
@@ -505,8 +495,8 @@ ogg_open (SF_PRIVATE *psf)
 
 	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_OGG)
 	{	if ((error = ogg_write_header (psf, 0)))
-	      psf->write_header = ogg_write_header ;
-	}
+			psf->write_header = ogg_write_header ;
+		} ;
 	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 	psf->container_close = ogg_close ;
 	if (psf->mode == SFM_WRITE)
@@ -520,7 +510,7 @@ ogg_open (SF_PRIVATE *psf)
 		psf->write_double	= ogg_write_d ;
 		psf->sf.frames = SF_COUNT_MAX ; /* Unknown really */
 		psf->str_flags = SF_STR_ALLOW_START ;
-	}
+		} ;
 
 	psf->bytewidth = 1 ;
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
@@ -541,7 +531,7 @@ ogg_open (SF_PRIVATE *psf)
 
 static int
 ogg_command (SF_PRIVATE *UNUSED (psf), int command,
-	     void *UNUSED (data), int UNUSED (datasize))
+		 void *UNUSED (data), int UNUSED (datasize))
 {
 	switch (command)
 	{
@@ -553,60 +543,60 @@ ogg_command (SF_PRIVATE *UNUSED (psf), int command,
 } /* ogg_command */
 
 static int
-ogg_rnull (int samples, void *UNUSED (vptr), int UNUSED (off) ,int channels, float **UNUSED (pcm))
+ogg_rnull (int samples, void *UNUSED (vptr), int UNUSED (off) , int channels, float **UNUSED (pcm))
 {
 	return samples * channels ;
-}
+} /* ogg_rnull */
 
 static int
 ogg_rshort (int samples, void *vptr, int off, int channels, float **pcm)
 {
-	short *ptr = (short*)vptr + off ;
+	short *ptr = (short*) vptr + off ;
 	int i = 0, j, n ;
-	for (j=0; j<samples; j++)
-		for (n=0; n<channels; n++)
-			ptr[i++] = (short)(pcm[n][j]*32767.0f) ;
+	for (j = 0 ; j < samples ; j++)
+		for (n = 0 ; n < channels ; n++)
+			ptr [i++] = (short) (pcm [n][j] * 32767.0f) ;
 	return i ;
-}
+} /* ogg_rshort */
 
 static int
 ogg_rint (int samples, void *vptr, int off, int channels, float **pcm)
 {
-	int *ptr = (int*)vptr + off ;
+	int *ptr = (int*) vptr + off ;
 	int i = 0, j, n ;
 
-	for (j=0; j<samples; j++)
-		for (n=0; n<channels; n++)
-			ptr[i++] = (int)(pcm[n][j]*2147483647.0f) ;
+	for (j = 0 ; j < samples ; j++)
+		for (n = 0 ; n < channels ; n++)
+			ptr [i++] = (int) (pcm [n][j] * 2147483647.0f) ;
 	return i ;
-}
+} /* ogg_rint */
 
 static int
 ogg_rfloat (int samples, void *vptr, int off, int channels, float **pcm)
 {
-	float *ptr = (float*)vptr + off ;
+	float *ptr = (float*) vptr + off ;
 	int i = 0, j, n ;
-	for (j=0; j<samples; j++)
-		for (n=0; n<channels; n++)
-			ptr[i++] = pcm[n][j] ;
+	for (j = 0 ; j < samples ; j++)
+		for (n = 0 ; n < channels ; n++)
+			ptr [i++] = pcm [n][j] ;
 	return i ;
-}
+} /* ogg_rfloat */
 
 static int
 ogg_rdouble (int samples, void *vptr, int off, int channels, float **pcm)
 {
-	double *ptr = (double*)vptr + off ;
+	double *ptr = (double*) vptr + off ;
 	int i = 0, j, n ;
-	for (j=0; j<samples; j++)
-		for (n=0; n<channels; n++)
-			ptr[i++] = (double)(pcm[n][j]) ;
+	for (j = 0 ; j < samples ; j++)
+		for (n = 0 ; n < channels ; n++)
+			ptr [i++] = (double) (pcm [n][j]) ;
 	return i ;
-}
+} /* ogg_rdouble */
 
 
 static sf_count_t
 ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens,
-		int (transfn)(int, void *, int, int, float **))
+		int (transfn) (int, void *, int, int, float **))
 {
 	int i = 0 ;
 	float **pcm ;
@@ -614,56 +604,58 @@ ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	int len = lens / psf->sf.channels ;
-	while ((samples=vorbis_synthesis_pcmout (&vdata->vd,&pcm))>0)
-	{	if (samples>len) samples = len ;
+	while ((samples = vorbis_synthesis_pcmout (&vdata->vd, &pcm)) > 0)
+	{	if (samples > len) samples = len ;
 		i += transfn (samples, ptr, i, psf->sf.channels, pcm) ;
 		len -= samples ;
 		/* tell libvorbis how many samples we actually consumed */
-		vorbis_synthesis_read (&vdata->vd,samples) ;
+		vorbis_synthesis_read (&vdata->vd, samples) ;
 		vdata->loc += samples ;
-		if (len==0) return i ; /* Is this necessary */
+		if (len == 0)
+			return i ; /* Is this necessary */
 	}
 	goto start0 ;		 /* Jump into the nasty nest */
 	while (len>0 && !odata->eos)
 	{
 		while (len>0 && !odata->eos)
-		{	int result = ogg_sync_pageout (&odata->oy,&odata->og) ;
-			if (result==0) break ; /* need more data */
+		{	int result = ogg_sync_pageout (&odata->oy, &odata->og) ;
+			if (result == 0) break ; /* need more data */
 			if (result<0)
-			{ /* missing or corrupt data at this page position */
-			  psf_log_printf (psf,"Corrupt or missing data in "
-					  "bitstream; continuing...\n") ;
-			}
+			{	/* missing or corrupt data at this page position */
+				psf_log_printf (psf, "Corrupt or missing data in bitstream ; continuing...\n") ;
+				}
 			else
-			{	ogg_stream_pagein (&odata->os,&odata->og); /* can safely ignore errors at
-									      this point */
+			{	/* can safely ignore errors at this point */
+				ogg_stream_pagein (&odata->os, &odata->og) ;
 			start0:
 				while (1)
-				{	result = ogg_stream_packetout (&odata->os,&odata->op) ;
-					if (result==0) break ; /* need more data */
-					if (result<0) { /* missing or corrupt data at this page position */
-					  /* no reason to complain; already complained above */
-					}
+				{	result = ogg_stream_packetout (&odata->os, &odata->op) ;
+					if (result == 0)
+						break ; /* need more data */
+					if (result < 0)
+					{	/* missing or corrupt data at this page position */
+						/* no reason to complain ; already complained above */
+						}
 					else
-					{
-		  /* we have a packet.	Decode it */
-						if (vorbis_synthesis (&vdata->vb,&odata->op)==0) /* test for success! */
-							vorbis_synthesis_blockin (&vdata->vd,&vdata->vb) ;
+					{	/* we have a packet.	Decode it */
+						if (vorbis_synthesis (&vdata->vb, &odata->op) == 0) /* test for success! */
+							vorbis_synthesis_blockin (&vdata->vd, &vdata->vb) ;
 		  /*
 		  **pcm is a multichannel float vector.	 In stereo, for
-		  example, pcm[0] is left, and pcm[1] is right.	 samples is
+		  example, pcm [0] is left, and pcm [1] is right.	 samples is
 		  the size of each channel.	 Convert the float values
 		  (-1.<=range<=1.) to whatever PCM format and write it out */
 
-						while ((samples=vorbis_synthesis_pcmout (&vdata->vd,&pcm))>0)
+						while ((samples = vorbis_synthesis_pcmout (&vdata->vd, &pcm)) > 0)
 						{	if (samples>len) samples = len ;
 							i += transfn (samples, ptr, i, psf->sf.channels, pcm) ;
 							len -= samples ;
 							/* tell libvorbis how many samples we actually consumed */
-							vorbis_synthesis_read (&vdata->vd,samples) ;
+							vorbis_synthesis_read (&vdata->vd, samples) ;
 							vdata->loc += samples ;
-							if (len==0) return i ; /* Is this necessary */
-						}
+							if (len == 0)
+								return i ; /* Is this necessary */
+							} ;
 					}
 				}
 				if (ogg_page_eos (&odata->og)) odata->eos=1 ;
@@ -672,38 +664,34 @@ ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 		if (!odata->eos)
 		{	char *buffer ;
 			int bytes ;
-			buffer = ogg_sync_buffer (&odata->oy,4096) ;
-			bytes = psf_fread (buffer,1,4096,psf) ;
-			ogg_sync_wrote (&odata->oy,bytes) ;
+			buffer = ogg_sync_buffer (&odata->oy, 4096) ;
+			bytes = psf_fread (buffer, 1, 4096, psf) ;
+			ogg_sync_wrote (&odata->oy, bytes) ;
 			if (bytes==0) odata->eos=1 ;
 		}
 	}
-	return i;
-}
+	return i ;
+} /* ogg_read_sample */
 
 static sf_count_t
 ogg_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t lens)
-{
-	return ogg_read_sample (psf, (void*)ptr, lens, ogg_rshort) ;
-}
+{	return ogg_read_sample (psf, (void*) ptr, lens, ogg_rshort) ;
+} /* ogg_read_s */
 
 static sf_count_t
 ogg_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t lens)
-{
-	return ogg_read_sample (psf, (void*)ptr, lens, ogg_rint) ;
-}
+{	return ogg_read_sample (psf, (void*) ptr, lens, ogg_rint) ;
+} /* ogg_read_i */
 
 static sf_count_t
 ogg_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t lens)
-{
-	return ogg_read_sample (psf, (void*)ptr, lens, ogg_rfloat) ;
-}
+{	return ogg_read_sample (psf, (void*) ptr, lens, ogg_rfloat) ;
+} /* ogg_read_f */
 
 static sf_count_t
 ogg_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t lens)
-{
-	return ogg_read_sample (psf, (void*)ptr, lens, ogg_rdouble) ;
-}
+{	return ogg_read_sample (psf, (void*) ptr, lens, ogg_rdouble) ;
+} /* ogg_read_d */
 
 static sf_count_t
 ogg_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t lens)
@@ -712,79 +700,80 @@ ogg_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t lens)
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 	int len = lens / psf->sf.channels ;
-	float **buffer=vorbis_analysis_buffer (&vdata->vd,len) ;
-	for (i=0; i<len; i++)
-		for (m=0; m<psf->sf.channels; m++)
-			buffer[m][i] = (float)(ptr[j++])/32767.0f ;
-	vorbis_analysis_wrote (&vdata->vd,len) ;
-	vdata->loc += len;
-    /* vorbis does some data preanalysis, then divvies up blocks for
-       more involved (potentially parallel) processing.	 Get a single
-       block for encoding now */
-	while (vorbis_analysis_blockout (&vdata->vd,&vdata->vb)==1)
+	float **buffer=vorbis_analysis_buffer (&vdata->vd, len) ;
+	for (i = 0 ; i < len ; i++)
+		for (m = 0 ; m < psf->sf.channels ; m++)
+			buffer [m][i] = (float) (ptr [j++]) / 32767.0f ;
+	vorbis_analysis_wrote (&vdata->vd, len) ;
+	vdata->loc += len ;
+	/* vorbis does some data preanalysis, then divvies up blocks for
+	   more involved (potentially parallel) processing.	 Get a single
+	   block for encoding now */
+	while (vorbis_analysis_blockout (&vdata->vd, &vdata->vb) == 1)
 	{
-      /* analysis, assume we want to use bitrate management */
-		vorbis_analysis (&vdata->vb,NULL);
-		vorbis_bitrate_addblock (&vdata->vb);
+		/* analysis, assume we want to use bitrate management */
+		vorbis_analysis (&vdata->vb, NULL) ;
+		vorbis_bitrate_addblock (&vdata->vb) ;
 
-		while (vorbis_bitrate_flushpacket (&vdata->vd,&odata->op))
+		while (vorbis_bitrate_flushpacket (&vdata->vd, &odata->op))
 		{
 
-	/* weld the packet into the bitstream */
-			ogg_stream_packetin (&odata->os,&odata->op) ;
+			/* weld the packet into the bitstream */
+			ogg_stream_packetin (&odata->os, &odata->op) ;
 
-	/* write out pages (if any) */
+			/* write out pages (if any) */
 			while (!odata->eos)
-			{	int result=ogg_stream_pageout (&odata->os,&odata->og) ;
-				if (result==0) break ;
-				psf_fwrite (odata->og.header,1,odata->og.header_len,psf) ;
-				psf_fwrite (odata->og.body,1,odata->og.body_len,psf) ;
+			{	int result=ogg_stream_pageout (&odata->os, &odata->og) ;
+				if (result == 0) break ;
+				psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
+				psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
 
-	      /* this could be set above, but for illustrative purposes, I do
-		 it here (to show that vorbis does know where the stream ends) */
+				/*	This could be set above, but for illustrative purposes, I do
+				**	it here (to show that vorbis does know where the stream ends) */
+				if (ogg_page_eos (&odata->og))
+					odata->eos=1 ;
+				} ;
+			} ;
+		} ;
 
-				if (ogg_page_eos (&odata->og)) odata->eos=1 ;
-			}
-		}
-	}
 	return lens ;
-}
+} /* ogg_write_s */
 
 static sf_count_t
 ogg_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t lens)
-{	int i, m, j=0;
+{	int i, m, j=0 ;
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	int len = lens / psf->sf.channels;
-	float **buffer=vorbis_analysis_buffer (&vdata->vd,len) ;
-	for (i=0; i<len; i++)
-		for (m=0; m<psf->sf.channels; m++)
-			buffer[m][i] = (float)(ptr[j++])/2147483647.0f ;
-	vorbis_analysis_wrote (&vdata->vd,len) ;
-	vdata->loc += len;
-    /* vorbis does some data preanalysis, then divvies up blocks for
-       more involved (potentially parallel) processing.	 Get a single
-       block for encoding now */
-	while (vorbis_analysis_blockout (&vdata->vd,&vdata->vb)==1)
+	int len = lens / psf->sf.channels ;
+	float **buffer=vorbis_analysis_buffer (&vdata->vd, len) ;
+	for (i = 0 ; i < len ; i++)
+		for (m = 0 ; m < psf->sf.channels ; m++)
+			buffer [m][i] = (float) (ptr [j++]) / 2147483647.0f ;
+	vorbis_analysis_wrote (&vdata->vd, len) ;
+	vdata->loc += len ;
+	/* vorbis does some data preanalysis, then divvies up blocks for
+	   more involved (potentially parallel) processing.	 Get a single
+	   block for encoding now */
+	while (vorbis_analysis_blockout (&vdata->vd, &vdata->vb) == 1)
 	{
-      /* analysis, assume we want to use bitrate management */
-		vorbis_analysis (&vdata->vb,NULL) ;
+		/* analysis, assume we want to use bitrate management */
+		vorbis_analysis (&vdata->vb, NULL) ;
 		vorbis_bitrate_addblock (&vdata->vb) ;
 
-		while (vorbis_bitrate_flushpacket (&vdata->vd,&odata->op))
+		while (vorbis_bitrate_flushpacket (&vdata->vd, &odata->op))
 		{
-	/* weld the packet into the bitstream */
-			ogg_stream_packetin (&odata->os,&odata->op) ;
+			/* weld the packet into the bitstream */
+			ogg_stream_packetin (&odata->os, &odata->op) ;
 
-	/* write out pages (if any) */
+			/* write out pages (if any) */
 			while (!odata->eos)
-			{	int result=ogg_stream_pageout (&odata->os,&odata->og) ;
-				if (result==0) break ;
-				psf_fwrite (odata->og.header,1,odata->og.header_len,psf) ;
-				psf_fwrite (odata->og.body,1,odata->og.body_len,psf) ;
+			{	int result=ogg_stream_pageout (&odata->os, &odata->og) ;
+				if (result == 0) break ;
+				psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
+				psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
 
-	  /* this could be set above, but for illustrative purposes, I do
-	     it here (to show that vorbis does know where the stream ends) */
+				/* this could be set above, but for illustrative purposes, I do
+				**	it here (to show that vorbis does know where the stream ends) */
 
 				if (ogg_page_eos (&odata->og)) odata->eos=1 ;
 			}
@@ -798,36 +787,36 @@ ogg_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t lens)
 {	int i, m, j=0 ;
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	int len = lens / psf->sf.channels;
-	float **buffer=vorbis_analysis_buffer (&vdata->vd,len) ;
-	for (i=0; i<len; i++)
-		for (m=0; m<psf->sf.channels; m++)
-			buffer[m][i] = ptr[j++] ;
-	vorbis_analysis_wrote (&vdata->vd,len) ;
-	vdata->loc += len;
-    /* vorbis does some data preanalysis, then divvies up blocks for
-       more involved (potentially parallel) processing.	 Get a single
-       block for encoding now */
-	while (vorbis_analysis_blockout (&vdata->vd,&vdata->vb)==1)
+	int len = lens / psf->sf.channels ;
+	float **buffer=vorbis_analysis_buffer (&vdata->vd, len) ;
+	for (i = 0 ; i < len ; i++)
+		for (m = 0 ; m < psf->sf.channels ; m++)
+			buffer [m][i] = ptr [j++] ;
+	vorbis_analysis_wrote (&vdata->vd, len) ;
+	vdata->loc += len ;
+	/* vorbis does some data preanalysis, then divvies up blocks for
+	   more involved (potentially parallel) processing.	 Get a single
+	   block for encoding now */
+	while (vorbis_analysis_blockout (&vdata->vd, &vdata->vb) == 1)
 	{
-      /* analysis, assume we want to use bitrate management */
-		vorbis_analysis (&vdata->vb,NULL) ;
+		/* analysis, assume we want to use bitrate management */
+		vorbis_analysis (&vdata->vb, NULL) ;
 		vorbis_bitrate_addblock (&vdata->vb) ;
 
-		while (vorbis_bitrate_flushpacket (&vdata->vd,&odata->op))
+		while (vorbis_bitrate_flushpacket (&vdata->vd, &odata->op))
 		{
 	/* weld the packet into the bitstream */
-			ogg_stream_packetin (&odata->os,&odata->op) ;
+			ogg_stream_packetin (&odata->os, &odata->op) ;
 
 	/* write out pages (if any) */
 			while (!odata->eos)
-			{	int result=ogg_stream_pageout (&odata->os,&odata->og) ;
-				if (result==0) break ;
-				psf_fwrite (odata->og.header,1,odata->og.header_len,psf) ;
-				psf_fwrite (odata->og.body,1,odata->og.body_len,psf) ;
+			{	int result=ogg_stream_pageout (&odata->os, &odata->og) ;
+				if (result == 0) break ;
+				psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
+				psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
 
 	  /* this could be set above, but for illustrative purposes, I do
-	     it here (to show that vorbis does know where the stream ends) */
+		 it here (to show that vorbis does know where the stream ends) */
 
 				if (ogg_page_eos (&odata->og)) odata->eos=1 ;
 			}
@@ -841,36 +830,36 @@ ogg_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
 {	int i, m, j=0 ;
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	int len = lens / psf->sf.channels;
-	float **buffer=vorbis_analysis_buffer (&vdata->vd,len) ;
-	for (i=0; i<len; i++)
-		for (m=0; m<psf->sf.channels; m++)
-			buffer[m][i] = (float)ptr[j++] ;
+	int len = lens / psf->sf.channels ;
+	float **buffer=vorbis_analysis_buffer (&vdata->vd, len) ;
+	for (i = 0 ; i < len ; i++)
+		for (m = 0 ; m < psf->sf.channels ; m++)
+			buffer [m][i] = (float) ptr [j++] ;
 	vdata->loc += len ;
-	vorbis_analysis_wrote (&vdata->vd,len) ;
-    /* vorbis does some data preanalysis, then divvies up blocks for
-       more involved (potentially parallel) processing.	 Get a single
-       block for encoding now */
-	while (vorbis_analysis_blockout (&vdata->vd,&vdata->vb)==1)
+	vorbis_analysis_wrote (&vdata->vd, len) ;
+	/* vorbis does some data preanalysis, then divvies up blocks for
+	   more involved (potentially parallel) processing.	 Get a single
+	   block for encoding now */
+	while (vorbis_analysis_blockout (&vdata->vd, &vdata->vb) == 1)
 	{
-      /* analysis, assume we want to use bitrate management */
-		vorbis_analysis (&vdata->vb,NULL) ;
+		/* analysis, assume we want to use bitrate management */
+		vorbis_analysis (&vdata->vb, NULL) ;
 		vorbis_bitrate_addblock (&vdata->vb) ;
 
-		while (vorbis_bitrate_flushpacket (&vdata->vd,&odata->op))
+		while (vorbis_bitrate_flushpacket (&vdata->vd, &odata->op))
 		{
 	/* weld the packet into the bitstream */
-			ogg_stream_packetin (&odata->os,&odata->op) ;
+			ogg_stream_packetin (&odata->os, &odata->op) ;
 
 	/* write out pages (if any) */
 			while (!odata->eos)
-			{	int result=ogg_stream_pageout (&odata->os,&odata->og) ;
-				if (result==0) break ;
-				psf_fwrite (odata->og.header,1,odata->og.header_len,psf) ;
-				psf_fwrite (odata->og.body,1,odata->og.body_len,psf) ;
+			{	int result=ogg_stream_pageout (&odata->os, &odata->og) ;
+				if (result == 0) break ;
+				psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
+				psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
 
 	  /* this could be set above, but for illustrative purposes, I do
-	     it here (to show that vorbis does know where the stream ends) */
+		 it here (to show that vorbis does know where the stream ends) */
 
 				if (ogg_page_eos (&odata->og)) odata->eos=1 ;
 			}
