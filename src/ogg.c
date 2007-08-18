@@ -411,6 +411,7 @@ ogg_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 	{	ogg_packet header ;
 		ogg_packet header_comm ;
 		ogg_packet header_code ;
+		int result ;
 
 		vorbis_analysis_headerout (&vdata->vd, &vdata->vc, &header, &header_comm, &header_code) ;
 		ogg_stream_packetin (&odata->os, &header) ; /* automatically placed in its own page */
@@ -420,13 +421,12 @@ ogg_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		/* This ensures the actual
 		 * audio data will start on a new page, as per spec
 		 */
-		while (1)
-		{	int result = ogg_stream_flush (&odata->os, &odata->og) ;
-			if (result == 0) break ;
-			psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
+		while ((result = ogg_stream_flush (&odata->os, &odata->og)) != 0)
+		{	psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
 			psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
 			} ;
 	}
+
 	return 0 ;
 } /* ogg_write_header */
 
