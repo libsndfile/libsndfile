@@ -17,36 +17,37 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/* Much of this code is based on the examples in libvorbis from the
-   XIPHOPHORUS Company http://www.xiph.org/ which has a BSD-style Licence
-   Copyright (c) 2002, Xiph.org Foundation
-
-   Redistribution and use in source and binary forms, with or without
-   modification, are permitted provided that the following conditions
-   are met:
-
-   - Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-
-   - Redistributions in binary form must reproduce the above copyright
-   notice, this list of conditions and the following disclaimer in the
-   documentation and/or other materials provided with the distribution.
-
-   - Neither the name of the Xiph.org Foundation nor the names of its
-   contributors may be used to endorse or promote products derived from
-   this software without specific prior written permission.
-
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-   A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION
-   OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES ; LOSS OF USE,
-   DATA, OR PROFITS ; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/*
+**  Much of this code is based on the examples in libvorbis from the
+** XIPHOPHORUS Company http://www.xiph.org/ which has a BSD-style Licence
+** Copyright (c) 2002, Xiph.org Foundation
+**
+** Redistribution and use in source and binary forms, with or without
+** modification, are permitted provided that the following conditions
+** are met:
+**
+** - Redistributions of source code must retain the above copyright
+** notice, this list of conditions and the following disclaimer.
+**
+** - Redistributions in binary form must reproduce the above copyright
+** notice, this list of conditions and the following disclaimer in the
+** documentation and/or other materials provided with the distribution.
+**
+** - Neither the name of the Xiph.org Foundation nor the names of its
+** contributors may be used to endorse or promote products derived from
+** this software without specific prior written permission.
+**
+** THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+** ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+** LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+** A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION
+** OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+** SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+** LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES ; LOSS OF USE,
+** DATA, OR PROFITS ; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+** THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+** OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "sfconfig.h"
@@ -696,20 +697,9 @@ ogg_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t lens)
 /*==============================================================================
 */
 
-
-
-static sf_count_t
-ogg_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t lens)
+static void
+ogg_write_samples (SF_PRIVATE *psf, OGG_PRIVATE *odata, VORBIS_PRIVATE *vdata, int in_frames)
 {
-	int i, m, j = 0 ;
-	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
-	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	int in_frames = lens / psf->sf.channels ;
-	float **buffer = vorbis_analysis_buffer (&vdata->vd, in_frames) ;
-	for (i = 0 ; i < in_frames ; i++)
-		for (m = 0 ; m < psf->sf.channels ; m++)
-			buffer [m][i] = (float) (ptr [j++]) / 32767.0f ;
-
 	vorbis_analysis_wrote (&vdata->vd, in_frames) ;
 	vdata->loc += in_frames ;
 	/* vorbis does some data preanalysis, then divvies up blocks for
@@ -742,6 +732,23 @@ ogg_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t lens)
 			} ;
 		} ;
 
+} /* ogg_write_data */
+
+
+static sf_count_t
+ogg_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t lens)
+{
+	int i, m, j = 0 ;
+	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
+	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
+	int in_frames = lens / psf->sf.channels ;
+	float **buffer = vorbis_analysis_buffer (&vdata->vd, in_frames) ;
+	for (i = 0 ; i < in_frames ; i++)
+		for (m = 0 ; m < psf->sf.channels ; m++)
+			buffer [m][i] = (float) (ptr [j++]) / 32767.0f ;
+
+	ogg_write_samples (psf, odata, vdata, in_frames) ;
+
 	return lens ;
 } /* ogg_write_s */
 
@@ -755,38 +762,11 @@ ogg_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t lens)
 	for (i = 0 ; i < in_frames ; i++)
 		for (m = 0 ; m < psf->sf.channels ; m++)
 			buffer [m][i] = (float) (ptr [j++]) / 2147483647.0f ;
-	vorbis_analysis_wrote (&vdata->vd, in_frames) ;
-	vdata->loc += in_frames ;
-	/* vorbis does some data preanalysis, then divvies up blocks for
-	   more involved (potentially parallel) processing.	 Get a single
-	   block for encoding now */
-	while (vorbis_analysis_blockout (&vdata->vd, &vdata->vb) == 1)
-	{
-		/* analysis, assume we want to use bitrate management */
-		vorbis_analysis (&vdata->vb, NULL) ;
-		vorbis_bitrate_addblock (&vdata->vb) ;
 
-		while (vorbis_bitrate_flushpacket (&vdata->vd, &odata->op))
-		{
-			/* weld the packet into the bitstream */
-			ogg_stream_packetin (&odata->os, &odata->op) ;
+	ogg_write_samples (psf, odata, vdata, in_frames) ;
 
-			/* write out pages (if any) */
-			while (!odata->eos)
-			{	int result = ogg_stream_pageout (&odata->os, &odata->og) ;
-				if (result == 0) break ;
-				psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
-				psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
-
-				/* this could be set above, but for illustrative purposes, I do
-				**	it here (to show that vorbis does know where the stream ends) */
-
-				if (ogg_page_eos (&odata->og)) odata->eos = 1 ;
-			}
-		}
-	}
 	return lens ;
-}
+} /* ogg_write_i */
 
 static sf_count_t
 ogg_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t lens)
@@ -798,38 +778,11 @@ ogg_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t lens)
 	for (i = 0 ; i < in_frames ; i++)
 		for (m = 0 ; m < psf->sf.channels ; m++)
 			buffer [m][i] = ptr [j++] ;
-	vorbis_analysis_wrote (&vdata->vd, in_frames) ;
-	vdata->loc += in_frames ;
-	/* vorbis does some data preanalysis, then divvies up blocks for
-	   more involved (potentially parallel) processing.	 Get a single
-	   block for encoding now */
-	while (vorbis_analysis_blockout (&vdata->vd, &vdata->vb) == 1)
-	{
-		/* analysis, assume we want to use bitrate management */
-		vorbis_analysis (&vdata->vb, NULL) ;
-		vorbis_bitrate_addblock (&vdata->vb) ;
 
-		while (vorbis_bitrate_flushpacket (&vdata->vd, &odata->op))
-		{
-	/* weld the packet into the bitstream */
-			ogg_stream_packetin (&odata->os, &odata->op) ;
+	ogg_write_samples (psf, odata, vdata, in_frames) ;
 
-	/* write out pages (if any) */
-			while (!odata->eos)
-			{	int result = ogg_stream_pageout (&odata->os, &odata->og) ;
-				if (result == 0) break ;
-				psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
-				psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
-
-	  /* this could be set above, but for illustrative purposes, I do
-		 it here (to show that vorbis does know where the stream ends) */
-
-				if (ogg_page_eos (&odata->og)) odata->eos = 1 ;
-			}
-		}
-	}
 	return lens ;
-}
+} /* ogg_write_f */
 
 static sf_count_t
 ogg_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
@@ -841,38 +794,11 @@ ogg_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
 	for (i = 0 ; i < in_frames ; i++)
 		for (m = 0 ; m < psf->sf.channels ; m++)
 			buffer [m][i] = (float) ptr [j++] ;
-	vdata->loc += in_frames ;
-	vorbis_analysis_wrote (&vdata->vd, in_frames) ;
-	/* vorbis does some data preanalysis, then divvies up blocks for
-	   more involved (potentially parallel) processing.	 Get a single
-	   block for encoding now */
-	while (vorbis_analysis_blockout (&vdata->vd, &vdata->vb) == 1)
-	{
-		/* analysis, assume we want to use bitrate management */
-		vorbis_analysis (&vdata->vb, NULL) ;
-		vorbis_bitrate_addblock (&vdata->vb) ;
 
-		while (vorbis_bitrate_flushpacket (&vdata->vd, &odata->op))
-		{
-	/* weld the packet into the bitstream */
-			ogg_stream_packetin (&odata->os, &odata->op) ;
+	ogg_write_samples (psf, odata, vdata, in_frames) ;
 
-	/* write out pages (if any) */
-			while (!odata->eos)
-			{	int result = ogg_stream_pageout (&odata->os, &odata->og) ;
-				if (result == 0) break ;
-				psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
-				psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
-
-	  /* this could be set above, but for illustrative purposes, I do
-		 it here (to show that vorbis does know where the stream ends) */
-
-				if (ogg_page_eos (&odata->og)) odata->eos = 1 ;
-			}
-		}
-	}
 	return lens ;
-}
+} /* ogg_write_d */
 
 static sf_count_t
 ogg_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
