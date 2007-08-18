@@ -172,7 +172,7 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 
 	/*
 	**	This function (off_read_header) gets called multiple times, so the OGG
-	**	and vorbis structs have to be cleared every time we pass through to 
+	**	and vorbis structs have to be cleared every time we pass through to
 	**	prevent memory leaks.
 	*/
 	vorbis_block_clear (&vdata->vb) ;
@@ -327,7 +327,7 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 	/*	Local state for most of the decode so multiple block decodes can
 	**	proceed in parallel. We could init multiple vorbis_block structures
 	**	for vd here. */
-	vorbis_block_init (&vdata->vd, &vdata->vb) ;		
+	vorbis_block_init (&vdata->vd, &vdata->vb) ;
 
 	vdata->loc = 0 ;
 
