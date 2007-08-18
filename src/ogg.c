@@ -439,7 +439,7 @@ ogg_close (SF_PRIVATE *psf)
 
 				/* write out pages (if any) */
 				while (!odata->eos)
-				{	int result=ogg_stream_pageout (&odata->os, &odata->og) ;
+				{	int result = ogg_stream_pageout (&odata->os, &odata->og) ;
 					if (result == 0) break ;
 					psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
 					psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
@@ -447,7 +447,7 @@ ogg_close (SF_PRIVATE *psf)
 		/* this could be set above, but for illustrative purposes, I do
 		   it here (to show that vorbis does know where the stream ends) */
 
-					if (ogg_page_eos (&odata->og)) odata->eos=1 ;
+					if (ogg_page_eos (&odata->og)) odata->eos = 1 ;
 				}
 			}
 		}
@@ -658,7 +658,7 @@ ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 							} ;
 					}
 				}
-				if (ogg_page_eos (&odata->og)) odata->eos=1 ;
+				if (ogg_page_eos (&odata->og)) odata->eos = 1 ;
 			}
 		}
 		if (!odata->eos)
@@ -667,7 +667,7 @@ ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 			buffer = ogg_sync_buffer (&odata->oy, 4096) ;
 			bytes = psf_fread (buffer, 1, 4096, psf) ;
 			ogg_sync_wrote (&odata->oy, bytes) ;
-			if (bytes==0) odata->eos=1 ;
+			if (bytes == 0) odata->eos = 1 ;
 		}
 	}
 	return i ;
@@ -693,19 +693,25 @@ ogg_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t lens)
 {	return ogg_read_sample (psf, (void*) ptr, lens, ogg_rdouble) ;
 } /* ogg_read_d */
 
+/*==============================================================================
+*/
+
+
+
 static sf_count_t
 ogg_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t lens)
 {
-	int i, m, j=0 ;
+	int i, m, j = 0 ;
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	int len = lens / psf->sf.channels ;
-	float **buffer=vorbis_analysis_buffer (&vdata->vd, len) ;
-	for (i = 0 ; i < len ; i++)
+	int in_frames = lens / psf->sf.channels ;
+	float **buffer = vorbis_analysis_buffer (&vdata->vd, in_frames) ;
+	for (i = 0 ; i < in_frames ; i++)
 		for (m = 0 ; m < psf->sf.channels ; m++)
 			buffer [m][i] = (float) (ptr [j++]) / 32767.0f ;
-	vorbis_analysis_wrote (&vdata->vd, len) ;
-	vdata->loc += len ;
+
+	vorbis_analysis_wrote (&vdata->vd, in_frames) ;
+	vdata->loc += in_frames ;
 	/* vorbis does some data preanalysis, then divvies up blocks for
 	   more involved (potentially parallel) processing.	 Get a single
 	   block for encoding now */
@@ -723,7 +729,7 @@ ogg_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t lens)
 
 			/* write out pages (if any) */
 			while (!odata->eos)
-			{	int result=ogg_stream_pageout (&odata->os, &odata->og) ;
+			{	int result = ogg_stream_pageout (&odata->os, &odata->og) ;
 				if (result == 0) break ;
 				psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
 				psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
@@ -731,7 +737,7 @@ ogg_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t lens)
 				/*	This could be set above, but for illustrative purposes, I do
 				**	it here (to show that vorbis does know where the stream ends) */
 				if (ogg_page_eos (&odata->og))
-					odata->eos=1 ;
+					odata->eos = 1 ;
 				} ;
 			} ;
 		} ;
@@ -741,16 +747,16 @@ ogg_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t lens)
 
 static sf_count_t
 ogg_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t lens)
-{	int i, m, j=0 ;
+{	int i, m, j = 0 ;
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	int len = lens / psf->sf.channels ;
-	float **buffer=vorbis_analysis_buffer (&vdata->vd, len) ;
-	for (i = 0 ; i < len ; i++)
+	int in_frames = lens / psf->sf.channels ;
+	float **buffer = vorbis_analysis_buffer (&vdata->vd, in_frames) ;
+	for (i = 0 ; i < in_frames ; i++)
 		for (m = 0 ; m < psf->sf.channels ; m++)
 			buffer [m][i] = (float) (ptr [j++]) / 2147483647.0f ;
-	vorbis_analysis_wrote (&vdata->vd, len) ;
-	vdata->loc += len ;
+	vorbis_analysis_wrote (&vdata->vd, in_frames) ;
+	vdata->loc += in_frames ;
 	/* vorbis does some data preanalysis, then divvies up blocks for
 	   more involved (potentially parallel) processing.	 Get a single
 	   block for encoding now */
@@ -767,7 +773,7 @@ ogg_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t lens)
 
 			/* write out pages (if any) */
 			while (!odata->eos)
-			{	int result=ogg_stream_pageout (&odata->os, &odata->og) ;
+			{	int result = ogg_stream_pageout (&odata->os, &odata->og) ;
 				if (result == 0) break ;
 				psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
 				psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
@@ -775,7 +781,7 @@ ogg_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t lens)
 				/* this could be set above, but for illustrative purposes, I do
 				**	it here (to show that vorbis does know where the stream ends) */
 
-				if (ogg_page_eos (&odata->og)) odata->eos=1 ;
+				if (ogg_page_eos (&odata->og)) odata->eos = 1 ;
 			}
 		}
 	}
@@ -784,16 +790,16 @@ ogg_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t lens)
 
 static sf_count_t
 ogg_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t lens)
-{	int i, m, j=0 ;
+{	int i, m, j = 0 ;
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	int len = lens / psf->sf.channels ;
-	float **buffer=vorbis_analysis_buffer (&vdata->vd, len) ;
-	for (i = 0 ; i < len ; i++)
+	int in_frames = lens / psf->sf.channels ;
+	float **buffer = vorbis_analysis_buffer (&vdata->vd, in_frames) ;
+	for (i = 0 ; i < in_frames ; i++)
 		for (m = 0 ; m < psf->sf.channels ; m++)
 			buffer [m][i] = ptr [j++] ;
-	vorbis_analysis_wrote (&vdata->vd, len) ;
-	vdata->loc += len ;
+	vorbis_analysis_wrote (&vdata->vd, in_frames) ;
+	vdata->loc += in_frames ;
 	/* vorbis does some data preanalysis, then divvies up blocks for
 	   more involved (potentially parallel) processing.	 Get a single
 	   block for encoding now */
@@ -810,7 +816,7 @@ ogg_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t lens)
 
 	/* write out pages (if any) */
 			while (!odata->eos)
-			{	int result=ogg_stream_pageout (&odata->os, &odata->og) ;
+			{	int result = ogg_stream_pageout (&odata->os, &odata->og) ;
 				if (result == 0) break ;
 				psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
 				psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
@@ -818,7 +824,7 @@ ogg_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t lens)
 	  /* this could be set above, but for illustrative purposes, I do
 		 it here (to show that vorbis does know where the stream ends) */
 
-				if (ogg_page_eos (&odata->og)) odata->eos=1 ;
+				if (ogg_page_eos (&odata->og)) odata->eos = 1 ;
 			}
 		}
 	}
@@ -827,16 +833,16 @@ ogg_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t lens)
 
 static sf_count_t
 ogg_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
-{	int i, m, j=0 ;
+{	int i, m, j = 0 ;
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	int len = lens / psf->sf.channels ;
-	float **buffer=vorbis_analysis_buffer (&vdata->vd, len) ;
-	for (i = 0 ; i < len ; i++)
+	int in_frames = lens / psf->sf.channels ;
+	float **buffer = vorbis_analysis_buffer (&vdata->vd, in_frames) ;
+	for (i = 0 ; i < in_frames ; i++)
 		for (m = 0 ; m < psf->sf.channels ; m++)
 			buffer [m][i] = (float) ptr [j++] ;
-	vdata->loc += len ;
-	vorbis_analysis_wrote (&vdata->vd, len) ;
+	vdata->loc += in_frames ;
+	vorbis_analysis_wrote (&vdata->vd, in_frames) ;
 	/* vorbis does some data preanalysis, then divvies up blocks for
 	   more involved (potentially parallel) processing.	 Get a single
 	   block for encoding now */
@@ -853,7 +859,7 @@ ogg_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
 
 	/* write out pages (if any) */
 			while (!odata->eos)
-			{	int result=ogg_stream_pageout (&odata->os, &odata->og) ;
+			{	int result = ogg_stream_pageout (&odata->os, &odata->og) ;
 				if (result == 0) break ;
 				psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
 				psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
@@ -861,7 +867,7 @@ ogg_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
 	  /* this could be set above, but for illustrative purposes, I do
 		 it here (to show that vorbis does know where the stream ends) */
 
-				if (ogg_page_eos (&odata->og)) odata->eos=1 ;
+				if (ogg_page_eos (&odata->og)) odata->eos = 1 ;
 			}
 		}
 	}
