@@ -170,6 +170,12 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 		} ;
 
 	/*
+	**	This function (off_read_header) gets called multiple times, so the stream
+	**	must be cleared everytime we pass through to prevent memory leaks.
+	*/
+	ogg_stream_clear (&odata->os) ;
+
+	/*
 	**	Get the serial number and set up the rest of decode.
 	**	Serialno first ; use it to set up a logical stream.
 	*/
