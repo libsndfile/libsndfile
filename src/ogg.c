@@ -84,8 +84,7 @@ static sf_count_t	ogg_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len
 static sf_count_t	ogg_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
 static sf_count_t	ogg_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
 static sf_count_t	ogg_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
-static sf_count_t	ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens,
-			convert_func *transfn) ;
+static sf_count_t	ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *transfn) ;
 static sf_count_t	ogg_length (SF_PRIVATE *psf) ;
 
 typedef struct
@@ -117,7 +116,9 @@ typedef struct
 } OGG_PRIVATE ;
 
 typedef struct
-{	/* Count current location */
+{	int initialized ;
+
+	/* Count current location */
 	sf_count_t loc ;
 	/* Struct that stores all the static vorbis bitstream settings */
 	vorbis_info	vi ;
@@ -170,9 +171,15 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 		} ;
 
 	/*
-	**	This function (off_read_header) gets called multiple times, so the stream
-	**	must be cleared everytime we pass through to prevent memory leaks.
+	**	This function (off_read_header) gets called multiple times, so the OGG
+	**	and vorbis structs have to be cleared every time we pass through to 
+	**	prevent memory leaks.
 	*/
+	vorbis_block_clear (&vdata->vb) ;
+	vorbis_dsp_clear (&vdata->vd) ;
+	vorbis_comment_clear (&vdata->vc) ;
+	vorbis_info_clear (&vdata->vi) ;
+
 	ogg_stream_clear (&odata->os) ;
 
 	/*
@@ -315,10 +322,13 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 	**	Central decode state. */
 	vorbis_synthesis_init (&vdata->vd, &vdata->vi) ;
 
+	vdata->initialized = 1 ;
+
 	/*	Local state for most of the decode so multiple block decodes can
 	**	proceed in parallel. We could init multiple vorbis_block structures
 	**	for vd here. */
-	vorbis_block_init (&vdata->vd, &vdata->vb) ;
+	vorbis_block_init (&vdata->vd, &vdata->vb) ;		
+
 	vdata->loc = 0 ;
 
 	return 0 ;
