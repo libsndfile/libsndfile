@@ -139,8 +139,6 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 	int i, nn ;
 
 	odata->eos = 0 ;
-	/* Now we can read pages */
-	ogg_sync_init (&odata->oy) ;
 
 	/*
 	**	Grab some data at the head of the stream.  We want the first page
@@ -487,7 +485,10 @@ ogg_open (SF_PRIVATE *psf)
 		return SFE_BAD_MODE_RW ;
 
 	if (psf->mode == SFM_READ)
-	{	if ((error = ogg_read_header (psf, 1)))
+	{	/* Call this here so it only gets called once, so no memory is leaked. */
+		ogg_sync_init (&odata->oy) ;
+
+		if ((error = ogg_read_header (psf, 1)))
 			return error ;
 
 		psf->read_short		= ogg_read_s ;
