@@ -116,9 +116,7 @@ typedef struct
 } OGG_PRIVATE ;
 
 typedef struct
-{	int initialized ;
-
-	/* Count current location */
+{	/* Count current location */
 	sf_count_t loc ;
 	/* Struct that stores all the static vorbis bitstream settings */
 	vorbis_info	vi ;
@@ -151,12 +149,13 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 	/* Expose the buffer */
 	buffer = ogg_sync_buffer (&odata->oy, 4096L) ;
 
+	/* Grab the part of the header that has already been read. */
+	memcpy (buffer, psf->header, psf->headindex) ;
+	bytes = psf->headindex ;
+
 	/* Submit a 4k block to libvorbis' Ogg layer */
-	/* Need to patch up guess type stuff */
-	memcpy (buffer, "OggS\0\0\0\0\0\0\0\0", 12) ;
-	buffer [5] = 2 ;
-	bytes = psf_fread (buffer + 12, 1, 4096 - 12, psf) ;
-	ogg_sync_wrote (&odata->oy, bytes + 12) ;
+	bytes += psf_fread (buffer + psf->headindex, 1, 4096 - psf->headindex, psf) ;
+	ogg_sync_wrote (&odata->oy, bytes) ;
 
 	/* Get the first page. */
 	if ((nn = ogg_sync_pageout (&odata->oy, &odata->og)) != 1)
@@ -321,8 +320,6 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 	**	packet->PCM decoder.
 	**	Central decode state. */
 	vorbis_synthesis_init (&vdata->vd, &vdata->vi) ;
-
-	vdata->initialized = 1 ;
 
 	/*	Local state for most of the decode so multiple block decodes can
 	**	proceed in parallel. We could init multiple vorbis_block structures
