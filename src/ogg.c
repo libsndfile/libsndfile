@@ -66,6 +66,9 @@
 #include "sndfile.h"
 #include "sfendian.h"
 #include "common.h"
+#include "float_cast.h"
+
+typedef int convert_func (int, void *, int, int, float **) ;
 
 static int	ogg_read_header (SF_PRIVATE *psf, int log_data) ;
 static int	ogg_write_init (SF_PRIVATE *psf, int calc_length) ;
@@ -82,7 +85,7 @@ static sf_count_t	ogg_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len) 
 static sf_count_t	ogg_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
 static sf_count_t	ogg_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 static sf_count_t	ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens,
-			int (transfn) (int, void *, int, int, float **)) ;
+			convert_func *transfn) ;
 static sf_count_t	ogg_length (SF_PRIVATE *psf) ;
 
 typedef struct
@@ -137,7 +140,7 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 
 	odata->eos = 0 ;
 	/* Now we can read pages */
-	ogg_sync_init (&(odata->oy)) ;
+	ogg_sync_init (&odata->oy) ;
 
 	/*
 	**	Grab some data at the head of the stream.  We want the first page
@@ -154,10 +157,10 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 	memcpy (buffer, "OggS\0\0\0\0\0\0\0\0", 12) ;
 	buffer [5] = 2 ;
 	bytes = psf_fread (buffer + 12, 1, 4096 - 12, psf) ;
-	ogg_sync_wrote (&(odata->oy), bytes + 12) ;
+	ogg_sync_wrote (&odata->oy, bytes + 12) ;
 
 	/* Get the first page. */
-	if ((nn = ogg_sync_pageout (&(odata->oy), &(odata->og))) != 1)
+	if ((nn = ogg_sync_pageout (&odata->oy, &odata->og)) != 1)
 	{
 		/* Have we simply run out of data?  If so, we're done. */
 		if (bytes < 4096)
@@ -556,7 +559,7 @@ ogg_rshort (int samples, void *vptr, int off, int channels, float **pcm)
 	int i = 0, j, n ;
 	for (j = 0 ; j < samples ; j++)
 		for (n = 0 ; n < channels ; n++)
-			ptr [i++] = (short) (pcm [n][j] * 32767.0f) ;
+			ptr [i++] = lrintf (pcm [n][j] * 32767.0f) ;
 	return i ;
 } /* ogg_rshort */
 
@@ -568,7 +571,7 @@ ogg_rint (int samples, void *vptr, int off, int channels, float **pcm)
 
 	for (j = 0 ; j < samples ; j++)
 		for (n = 0 ; n < channels ; n++)
-			ptr [i++] = (int) (pcm [n][j] * 2147483647.0f) ;
+			ptr [i++] = lrintf (pcm [n][j] * 2147483647.0f) ;
 	return i ;
 } /* ogg_rint */
 
@@ -590,21 +593,21 @@ ogg_rdouble (int samples, void *vptr, int off, int channels, float **pcm)
 	int i = 0, j, n ;
 	for (j = 0 ; j < samples ; j++)
 		for (n = 0 ; n < channels ; n++)
-			ptr [i++] = (double) (pcm [n][j]) ;
+			ptr [i++] = pcm [n][j] ;
 	return i ;
 } /* ogg_rdouble */
 
 
 static sf_count_t
-ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens,
-		int (transfn) (int, void *, int, int, float **))
+ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *transfn)
 {
-	int i = 0 ;
-	float **pcm ;
-	int samples ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
-	int len = lens / psf->sf.channels ;
+	int len, samples, i = 0 ;
+	float **pcm ;
+
+	len = lens / psf->sf.channels ;
+
 	while ((samples = vorbis_synthesis_pcmout (&vdata->vd, &pcm)) > 0)
 	{	if (samples > len) samples = len ;
 		i += transfn (samples, ptr, i, psf->sf.channels, pcm) ;
@@ -616,9 +619,9 @@ ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens,
 			return i ; /* Is this necessary */
 	}
 	goto start0 ;		 /* Jump into the nasty nest */
-	while (len>0 && !odata->eos)
+	while (len > 0 && !odata->eos)
 	{
-		while (len>0 && !odata->eos)
+		while (len > 0 && !odata->eos)
 		{	int result = ogg_sync_pageout (&odata->oy, &odata->og) ;
 			if (result == 0) break ; /* need more data */
 			if (result<0)
@@ -701,10 +704,12 @@ static void
 ogg_write_samples (SF_PRIVATE *psf, OGG_PRIVATE *odata, VORBIS_PRIVATE *vdata, int in_frames)
 {
 	vorbis_analysis_wrote (&vdata->vd, in_frames) ;
-	vdata->loc += in_frames ;
-	/* vorbis does some data preanalysis, then divvies up blocks for
-	   more involved (potentially parallel) processing.	 Get a single
-	   block for encoding now */
+
+	/*
+	**	Vorbis does some data preanalysis, then divvies up blocks for
+	**	more involved (potentially parallel) processing. Get a single
+	**	block for encoding now.
+	*/
 	while (vorbis_analysis_blockout (&vdata->vd, &vdata->vb) == 1)
 	{
 		/* analysis, assume we want to use bitrate management */
@@ -713,14 +718,14 @@ ogg_write_samples (SF_PRIVATE *psf, OGG_PRIVATE *odata, VORBIS_PRIVATE *vdata, i
 
 		while (vorbis_bitrate_flushpacket (&vdata->vd, &odata->op))
 		{
-
 			/* weld the packet into the bitstream */
 			ogg_stream_packetin (&odata->os, &odata->op) ;
 
 			/* write out pages (if any) */
 			while (!odata->eos)
 			{	int result = ogg_stream_pageout (&odata->os, &odata->og) ;
-				if (result == 0) break ;
+				if (result == 0)
+					break ;
 				psf_fwrite (odata->og.header, 1, odata->og.header_len, psf) ;
 				psf_fwrite (odata->og.body, 1, odata->og.body_len, psf) ;
 
@@ -732,6 +737,7 @@ ogg_write_samples (SF_PRIVATE *psf, OGG_PRIVATE *odata, VORBIS_PRIVATE *vdata, i
 			} ;
 		} ;
 
+	vdata->loc += in_frames ;
 } /* ogg_write_data */
 
 
