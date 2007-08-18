@@ -221,7 +221,7 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 	for (k = 0 ; k < DFT_DATA_LENGTH ; k++)
 		test_data [k] = float_test [k] ;
 
-	snr = dft_cmp (__LINE__, double_data, test_data, DFT_DATA_LENGTH, target_snr, allow_exit) ;
+	snr = dft_cmp_double (__LINE__, double_data, test_data, DFT_DATA_LENGTH, target_snr, allow_exit) ;
 
 	exit_if_true (snr > target_snr, "% 6.1fdB SNR\n\n    Error : should be better than % 6.1fdB\n\n", snr, target_snr) ;
 
@@ -269,7 +269,7 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 
 	sf_close (file) ;
 
-	snr = dft_cmp (__LINE__, double_data, test_data, DFT_DATA_LENGTH, target_snr, allow_exit) ;
+	snr = dft_cmp_double (__LINE__, double_data, test_data, DFT_DATA_LENGTH, target_snr, allow_exit) ;
 
 	exit_if_true (snr > target_snr, "% 6.1fdB SNR\n\n    Error : should be better than % 6.1fdB\n\n", snr, target_snr) ;
 

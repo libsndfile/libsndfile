@@ -37,18 +37,18 @@ static double calc_max_spectral_difference (double *spec1, double *spec2) ;
 */
 
 double
-dft_cmp (int linenum, double *orig, double *test, int len, double target_snr, int allow_exit)
+dft_cmp_double (int linenum, double *orig, double *test, int len, double target_snr, int allow_exit)
 {	static double orig_spec [DFT_SPEC_LENGTH] ;
 	static double test_spec [DFT_SPEC_LENGTH] ;
 	double		snr ;
 
 	if (! orig || ! test)
-	{	printf ("Error (line % d) : dft_cmp : Bad input arrays.\n", linenum) ;
+	{	printf ("Error (line % d) : dft_cmp_double : Bad input arrays.\n", linenum) ;
 		return 1 ;
 		} ;
 
 	if (len != DFT_DATA_LENGTH)
-	{	printf ("Error (line % d) : dft_cmp : Bad input array length.\n", linenum) ;
+	{	printf ("Error (line % d) : dft_cmp_double : Bad input array length.\n", linenum) ;
 		return 1 ;
 		} ;
 
@@ -68,7 +68,7 @@ dft_cmp (int linenum, double *orig, double *test, int len, double target_snr, in
 		snr = -500.0 ;
 
 	return snr ;
-} /* dft_cmp */
+} /* dft_cmp_double */
 
 /*--------------------------------------------------------------------------------
 **	Quick dirty calculation of magnitude spectrum for real valued data using
@@ -128,10 +128,3 @@ calc_max_spectral_difference (double *orig, double *test)
 
 	return 20.0 * log10 (max_diff / orig_max) ;
 } /* calc_max_spectral_difference */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: cba7ffe2-bafe-44bd-b57a-15def3408410
-*/

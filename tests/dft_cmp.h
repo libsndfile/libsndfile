@@ -19,12 +19,5 @@
 
 #define		DFT_DATA_LENGTH		(2048)
 
-double	dft_cmp (int linenum, double *orig, double *test, int len, double tolerance, int allow_exit) ;
+double	dft_cmp_double (int linenum, double *orig, double *test, int len, double tolerance, int allow_exit) ;
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 10eac7b2-04ef-4d86-b7c0-8f1de57b12a0
-*/
