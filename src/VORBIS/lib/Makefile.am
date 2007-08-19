@@ -15,12 +15,8 @@ libvorbis_la_SOURCES = mdct.c smallft.c block.c envelope.c window.c lsp.c \
 			masking.h os.h mdct.h smallft.h highlevel.h\
 			registry.h scales.h window.h lookup.h lookup_data.h\
 			codec_internal.h backends.h bitrate.h 
-libvorbis_la_LDFLAGS = -no-undefined -version-info @V_LIB_CURRENT@:@V_LIB_REVISION@:@V_LIB_AGE@
-libvorbis_la_LIBADD = @OGG_LIBS@ @VORBIS_LIBS@
 
 libvorbisenc_la_SOURCES = vorbisenc.c 
-libvorbisenc_la_LDFLAGS = -no-undefined -version-info @VE_LIB_CURRENT@:@VE_LIB_REVISION@:@VE_LIB_AGE@
-libvorbisenc_la_LIBADD = libvorbis.la
 
 EXTRA_PROGRAMS = barkmel tone psytune
 CLEANFILES = $(EXTRA_PROGRAMS)
