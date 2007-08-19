@@ -79,7 +79,7 @@ ogg_short_test (void)
 	sf_close (file) ;
 
 	puts ("ok") ;
-	/*-unlink (filename) ;-*/
+	unlink (filename) ;
 } /* ogg_short_test */
 
 static void
@@ -119,7 +119,7 @@ ogg_int_test (void)
 	sf_close (file) ;
 
 	puts ("ok") ;
-	/*-unlink (filename) ;-*/
+	unlink (filename) ;
 } /* ogg_int_test */
 
 static void
@@ -163,7 +163,7 @@ ogg_float_test (void)
 
 	puts ("ok") ;
 
-	/*-unlink (filename) ;-*/
+	unlink (filename) ;
 } /* ogg_float_test */
 
 static void
@@ -207,7 +207,7 @@ ogg_double_test (void)
 
 	puts ("ok") ;
 
-	/*-unlink (filename) ;-*/
+	unlink (filename) ;
 } /* ogg_double_test */
 
 int
