@@ -199,20 +199,26 @@ voc_read_header	(SF_PRIVATE *psf)
 	psf->endian = SF_ENDIAN_LITTLE ;
 
 	while (1)
-	{	offset += psf_binheader_readf (psf, "1", &block_type) ;
+	{	int size ;
+		short count ;
+
+		block_type = 0 ;
+		offset += psf_binheader_readf (psf, "1", &block_type) ;
 
 		switch (block_type)
 		{	case VOC_ASCII :
-					{	int size ;
+					offset += psf_binheader_readf (psf, "e3", &size) ;
 
-						offset += psf_binheader_readf (psf, "e3", &size) ;
+					psf_log_printf (psf, " ASCII : %d\n", size) ;
 
-						psf_log_printf (psf, " ASCII : %d\n", size) ;
+					offset += psf_binheader_readf (psf, "b", psf->header, size) ;
+					psf->header [size] = 0 ;
+					psf_log_printf (psf, "  text : %s\n", psf->header) ;
+					continue ;
 
-						offset += psf_binheader_readf (psf, "b", psf->header, size) ;
-						psf->header [size] = 0 ;
-						psf_log_printf (psf, "  text : %s\n", psf->header) ;
-						} ;
+			case VOC_REPEAT :
+					offset += psf_binheader_readf (psf, "e32", &size, &count) ;
+					psf_log_printf (psf, " Repeat : %d\n", count) ;
 					continue ;
 
 			case VOC_SOUND_DATA :
@@ -242,7 +248,7 @@ voc_read_header	(SF_PRIVATE *psf)
 			psf_log_printf (psf, "offset: %d    size: %d    sum: %d    filelength: %D\n", offset, size, offset + size, psf->filelength) ;
 			return SFE_VOC_BAD_SECTIONS ;
 			}
-		else if (offset + size - 1 < psf->filelength)
+		else if (psf->filelength - offset - size > 4)
 		{	psf_log_printf (psf, "Seems to be a multi-segment file (#1).\n") ;
 			psf_log_printf (psf, "offset: %d    size: %d    sum: %d    filelength: %D\n", offset, size, offset + size, psf->filelength) ;
 			return SFE_VOC_BAD_SECTIONS ;
@@ -869,10 +875,3 @@ BLOCK 9 - data block that supersedes blocks 1 and 8.
         Data is stored left, right
 
 ------------------------------------------------------------------------*/
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 40a50167-a81c-463a-9e1d-3282ff84e09d
-*/

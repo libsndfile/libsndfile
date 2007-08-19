@@ -74,7 +74,7 @@ exit_if_true (int test, const char *format, ...)
 */
 
 [+ FOR io_type
-+]int	oct_save_[+ (get "io_element") +]	([+ (get "io_element") +] *a, [+ (get "io_element") +] *b, int len) ;
++]int	oct_save_[+ (get "io_element") +]	(const [+ (get "io_element") +] *a, const [+ (get "io_element") +] *b, int len) ;
 [+ ENDFOR io_type
 +]
 
@@ -261,7 +261,7 @@ static char octfilename [] = "error.dat" ;
 
 [+ FOR io_type
 +]int
-oct_save_[+ (get "io_element") +]	([+ (get "io_element") +] *a, [+ (get "io_element") +] *b, int len)
+oct_save_[+ (get "io_element") +]	(const [+ (get "io_element") +] *a, const [+ (get "io_element") +] *b, int len)
 {	FILE 	*file ;
 	int		k ;
 

@@ -849,6 +849,14 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	psf_binheader_readf (psf, "E242b", &(comm_fmt->numChannels), &(comm_fmt->numSampleFrames),
 			&(comm_fmt->sampleSize), &(comm_fmt->sampleRate), SIGNED_SIZEOF (comm_fmt->sampleRate)) ;
 
+	if (comm_fmt->size > 0x10000 && (comm_fmt->size & 0xffff) == 0)
+	{	psf_log_printf (psf, " COMM : %d (0x%x) *** should be ", comm_fmt->size, comm_fmt->size) ;
+		comm_fmt->size = ENDSWAP_INT (comm_fmt->size) ;
+		psf_log_printf (psf, "%d (0x%x)\n", comm_fmt->size, comm_fmt->size) ;
+		}
+	else
+		psf_log_printf (psf, " COMM : %d\n", comm_fmt->size) ;
+
 	if (comm_fmt->size == SIZEOF_AIFF_COMM)
 		comm_fmt->encoding = NONE_MARKER ;
 	else if (comm_fmt->size == SIZEOF_AIFC_COMM_MIN)
@@ -865,7 +873,6 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 		psf->u.scbuf [encoding_len] = 0 ;
 		} ;
 
-	psf_log_printf (psf, " COMM : %d\n", comm_fmt->size) ;
 	psf_log_printf (psf, "  Sample Rate : %d\n", tenbytefloat2int (comm_fmt->sampleRate)) ;
 	psf_log_printf (psf, "  Frames      : %u%s\n", comm_fmt->numSampleFrames, (comm_fmt->numSampleFrames == 0 && psf->filelength > 104) ? " (Should not be 0)" : "") ;
 	psf_log_printf (psf, "  Channels    : %d\n", comm_fmt->numChannels) ;
