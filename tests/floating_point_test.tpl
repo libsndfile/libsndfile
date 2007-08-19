@@ -40,9 +40,9 @@
 static void	float_scaled_test	(const char *filename, int allow_exit, int replace_float, int filetype, double target_snr) ;
 static void	double_scaled_test	(const char *filename, int allow_exit, int replace_float, int filetype, double target_snr) ;
 
-[+ FOR float_type +][+ FOR int_type +][+ FOR endian_type 
+[+ FOR float_type +][+ FOR int_type +][+ FOR endian_type
 +]static void [+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test (const char * filename) ;
-[+ ENDFOR endian_type +][+ ENDFOR int_type +][+ ENDFOR float_type 
+[+ ENDFOR endian_type +][+ ENDFOR int_type +][+ ENDFOR float_type
 +]
 
 static	double	double_data [DFT_DATA_LENGTH] ;
@@ -164,9 +164,9 @@ main (int argc, char *argv [])
 
 	putchar ('\n') ;
 	/* Float int tests. */
-[+ FOR float_type +][+ FOR int_type +][+ FOR endian_type 
+[+ FOR float_type +][+ FOR int_type +][+ FOR endian_type
 +]	[+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test ("[+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +].au") ;
-[+ ENDFOR endian_type +][+ ENDFOR int_type +][+ ENDFOR float_type 
+[+ ENDFOR endian_type +][+ ENDFOR int_type +][+ ENDFOR float_type
 +]
 
 	return 0 ;
@@ -275,7 +275,7 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 /*==============================================================================
 */
 
-[+ FOR float_type +][+ FOR int_type +][+ FOR endian_type 
+[+ FOR float_type +][+ FOR int_type +][+ FOR endian_type
 +]
 static void
 [+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test (const char * filename)
