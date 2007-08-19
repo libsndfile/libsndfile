@@ -30,25 +30,49 @@
 #define		DFT_SPEC_LENGTH		(DFT_DATA_LENGTH / 2)
 
 static void	dft_magnitude (const double *data, double *spectrum) ;
-static double calc_max_spectral_difference (double *spec1, double *spec2) ;
+static double calc_max_spectral_difference (const double *spec1, const double *spec2) ;
 
 /*--------------------------------------------------------------------------------
 **	Public functions.
 */
 
 double
-dft_cmp_double (int linenum, double *orig, double *test, int len, double target_snr, int allow_exit)
+dft_cmp_float (int linenum, const float *in_data, const float *test_data, int len, double target_snr, int allow_exit)
+{	static double orig [DFT_DATA_LENGTH] ;
+	static double test [DFT_DATA_LENGTH] ;
+	int		k ;
+
+	if (! orig || ! test)
+	{	printf ("Error (line %d) : dft_cmp_float : Bad input arrays.\n", linenum) ;
+		return 1 ;
+		} ;
+
+	if (len != DFT_DATA_LENGTH)
+	{	printf ("Error (line %d) : dft_cmp_float : Bad input array length.\n", linenum) ;
+		return 1 ;
+		} ;
+
+	for (k = 0 ; k < ARRAY_LEN (orig) ; k++)
+	{	test [k] = test_data [k] ;
+		orig [k] = in_data [k] ;
+		} ;
+
+	return dft_cmp_double (linenum, orig, test, len, target_snr, allow_exit) ;
+} /* dft_cmp_float */
+
+double
+dft_cmp_double (int linenum, const double *orig, const double *test, int len, double target_snr, int allow_exit)
 {	static double orig_spec [DFT_SPEC_LENGTH] ;
 	static double test_spec [DFT_SPEC_LENGTH] ;
 	double		snr ;
 
 	if (! orig || ! test)
-	{	printf ("Error (line % d) : dft_cmp_double : Bad input arrays.\n", linenum) ;
+	{	printf ("Error (line %d) : dft_cmp_double : Bad input arrays.\n", linenum) ;
 		return 1 ;
 		} ;
 
 	if (len != DFT_DATA_LENGTH)
-	{	printf ("Error (line % d) : dft_cmp_double : Bad input array length.\n", linenum) ;
+	{	printf ("Error (line %d) : dft_cmp_double : Bad input array length.\n", linenum) ;
 		return 1 ;
 		} ;
 
@@ -112,7 +136,7 @@ dft_magnitude (const double *data, double *spectrum)
 } /* dft_magnitude */
 
 static double
-calc_max_spectral_difference (double *orig, double *test)
+calc_max_spectral_difference (const double *orig, const double *test)
 {	double orig_max = 0.0, max_diff = 0.0 ;
 	int	k ;
 

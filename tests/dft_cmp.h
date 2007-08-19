@@ -19,5 +19,7 @@
 
 #define		DFT_DATA_LENGTH		(2048)
 
-double	dft_cmp_double (int linenum, double *orig, double *test, int len, double tolerance, int allow_exit) ;
+double	dft_cmp_float (int linenum, const float *orig, const float *test, int len, double tolerance, int allow_exit) ;
+
+double	dft_cmp_double (int linenum, const double *orig, const double *test, int len, double tolerance, int allow_exit) ;
 

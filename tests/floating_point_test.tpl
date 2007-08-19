@@ -46,9 +46,11 @@ static void	double_scaled_test	(const char *filename, int allow_exit, int replac
 +]
 
 static	double	double_data [DFT_DATA_LENGTH] ;
-static	double	test_data [DFT_DATA_LENGTH] ;
+static	double	double_test [DFT_DATA_LENGTH] ;
 
 static float	float_data [DFT_DATA_LENGTH] ;
+static float	float_test [DFT_DATA_LENGTH] ;
+
 static double	double_data [DFT_DATA_LENGTH] ;
 static short	short_data [DFT_DATA_LENGTH] ;
 static int		int_data [DFT_DATA_LENGTH] ;
@@ -176,20 +178,13 @@ main (int argc, char *argv [])
 
 static void
 float_scaled_test (const char *filename, int allow_exit, int replace_float, int filetype, double target_snr)
-{	static	float	float_orig [DFT_DATA_LENGTH] ;
-	static	float	float_test [DFT_DATA_LENGTH] ;
-
-	SNDFILE		*file ;
+{	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
-	int			k ;
 	double		snr ;
 
 	print_test_name ("float_scaled_test", filename) ;
 
-	gen_windowed_sine_double (double_data, DFT_DATA_LENGTH, 1.0) ;
-
-	for (k = 0 ; k < DFT_DATA_LENGTH ; k++)
-		float_orig [k] = double_data [k] ;
+	gen_windowed_sine_float (float_data, DFT_DATA_LENGTH, 1.0) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= DFT_DATA_LENGTH ;
@@ -199,7 +194,7 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
 
-	test_write_float_or_die (file, 0, float_orig, DFT_DATA_LENGTH, __LINE__) ;
+	test_write_float_or_die (file, 0, float_data, DFT_DATA_LENGTH, __LINE__) ;
 
 	sf_close (file) ;
 
@@ -218,10 +213,7 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 
 	sf_close (file) ;
 
-	for (k = 0 ; k < DFT_DATA_LENGTH ; k++)
-		test_data [k] = float_test [k] ;
-
-	snr = dft_cmp_double (__LINE__, double_data, test_data, DFT_DATA_LENGTH, target_snr, allow_exit) ;
+	snr = dft_cmp_float (__LINE__, float_data, float_test, DFT_DATA_LENGTH, target_snr, allow_exit) ;
 
 	exit_if_true (snr > target_snr, "% 6.1fdB SNR\n\n    Error : should be better than % 6.1fdB\n\n", snr, target_snr) ;
 
@@ -254,7 +246,7 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 
 	sf_close (file) ;
 
-	memset (test_data, 0, sizeof (test_data)) ;
+	memset (double_test, 0, sizeof (double_test)) ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 	sf_command (file, SFC_TEST_IEEE_FLOAT_REPLACE, NULL, replace_float) ;
@@ -265,11 +257,11 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 
 	check_log_buffer_or_die (file, __LINE__) ;
 
-	test_read_double_or_die (file, 0, test_data, DFT_DATA_LENGTH, __LINE__) ;
+	test_read_double_or_die (file, 0, double_test, DFT_DATA_LENGTH, __LINE__) ;
 
 	sf_close (file) ;
 
-	snr = dft_cmp_double (__LINE__, double_data, test_data, DFT_DATA_LENGTH, target_snr, allow_exit) ;
+	snr = dft_cmp_double (__LINE__, double_data, double_test, DFT_DATA_LENGTH, target_snr, allow_exit) ;
 
 	exit_if_true (snr > target_snr, "% 6.1fdB SNR\n\n    Error : should be better than % 6.1fdB\n\n", snr, target_snr) ;
 
