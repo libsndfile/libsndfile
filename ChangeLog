@@ -1,3 +1,8 @@
+2007-08-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/dft_cmp.[ch] tests/floating_point_test.tpl
+    Clean up floating point tests.
+
 2007-08-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c
