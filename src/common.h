@@ -49,6 +49,9 @@
 
 
 
+/*
+** Inspiration : http://sourcefrog.net/weblog/software/languages/C/unused.html
+*/
 #ifdef UNUSED
 #elif defined (__GNUC__)
 #	define UNUSED(x) UNUSED_ ## x __attribute__ ((unused))
