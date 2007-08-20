@@ -57,8 +57,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
-#include <vorbis/codec.h>
-#include <vorbis/vorbisenc.h>
+
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -67,6 +66,9 @@
 #include "sfendian.h"
 #include "common.h"
 #include "float_cast.h"
+
+#include "VORBIS/include/vorbis/codec.h"
+#include "VORBIS/include/vorbis/vorbisenc.h"
 
 typedef int convert_func (int, void *, int, int, float **) ;
 
