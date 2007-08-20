@@ -2,6 +2,8 @@
 
 SUBDIRS = OGG VORBIS FLAC GSM610 G72x
 
+INCLUDES = -I$(top_srcdir)/src/OGG/include
+
 lib_LTLIBRARIES = libsndfile.la
 include_HEADERS = sndfile.hh
 nodist_include_HEADERS = sndfile.h
