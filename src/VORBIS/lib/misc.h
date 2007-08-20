@@ -19,12 +19,34 @@
 #define _V_RANDOM_H_
 #include "vorbis/codec.h"
 
+
+/*
+ * Inspiration : http://sourcefrog.net/weblog/software/languages/C/unused.html
+ */
+#ifdef UNUSED
+#elif defined (__GNUC__)
+#	define UNUSED(x) UNUSED_ ## x __attribute__ ((unused))
+#elif defined (__LCLINT__)
+#	define UNUSED(x) /*@unused@*/ x
+#else
+#	define UNUSED(x) x
+#endif
+
+#ifdef __GNUC__
+#	define WARN_UNUSED	__attribute__ ((warn_unused_result))
+#else
+#	define WARN_UNUSED
+#endif
+
+
 extern int analysis_noisy;
 
 extern void *_vorbis_block_alloc(vorbis_block *vb,long bytes);
 extern void _vorbis_block_ripcord(vorbis_block *vb);
 extern void _analysis_output(char *base,int i,float *v,int n,int bark,int dB,
 			     ogg_int64_t off);
+extern void _analysis_output_always(char *base,int i,float *v,int n,int bark,
+				int dB,ogg_int64_t off);
 
 #ifdef DEBUG_MALLOC
 

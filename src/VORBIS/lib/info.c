@@ -42,7 +42,7 @@ static int ilog2(unsigned int v){
   return(ret);
 }
 
-static void _v_writestring(oggpack_buffer *o,char *s, int bytes){
+static void _v_writestring(oggpack_buffer *o,const char *s, int bytes){
 
   while(bytes--){
     oggpack_write(o,*s++,8);

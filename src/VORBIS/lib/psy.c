@@ -52,12 +52,14 @@ void _vp_global_free(vorbis_look_psy_global *look){
   }
 }
 
+#if 0
 void _vi_gpsy_free(vorbis_info_psy_global *i){
   if(i){
     memset(i,0,sizeof(*i));
     _ogg_free(i);
   }
 }
+#endif
 
 void _vi_psy_free(vorbis_info_psy *i){
   if(i){
@@ -236,7 +238,7 @@ static float ***setup_tone_curves(float curveatt_dB[P_BANDS],float binHz,int n,
 
 
       for(j=0;j<EHMER_MAX;j++){
-	int bin=fromOC(j*.125+i*.5-2.)/binHz;
+	bin=fromOC(j*.125+i*.5-2.)/binHz;
 	if(bin<0){
 	  ret[i][m][j+2]=-999.;
 	}else{
@@ -1019,8 +1021,8 @@ float **_vp_quantize_couple_memo(vorbis_block *vb,
 
 /* this is for per-channel noise normalization */
 static int apsort(const void *a, const void *b){
-  float f1=fabs(**(float**)a);
-  float f2=fabs(**(float**)b);
+  float f1=fabs(**(float*const*)a);
+  float f2=fabs(**(float*const*)b);
   return (f1<f2)-(f1>f2);
 }
 
@@ -1217,7 +1219,6 @@ void hf_reduction(vorbis_info_psy_global *g,
  
   int i,j,n=p->n, de=0.3*p->m_val;
   int limit=g->coupling_pointlimit[p->vi->blockflag][PACKETBLOBS/2];
-  int start=p->vi->normal_start;
   
   for(i=0; i<vi->coupling_steps; i++){
     /* for(j=start; j<limit; j++){} // ???*/

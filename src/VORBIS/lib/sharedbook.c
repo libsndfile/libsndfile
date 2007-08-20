@@ -46,31 +46,31 @@ int _ilog(unsigned int v){
 /* doesn't currently guard under/overflow */
 long _float32_pack(float val){
   int sign=0;
-  long exp;
+  long expb;
   long mant;
   if(val<0){
     sign=0x80000000;
     val= -val;
   }
-  exp= floor(log(val)/log(2.f));
-  mant=rint(ldexp(val,(VQ_FMAN-1)-exp));
-  exp=(exp+VQ_FEXP_BIAS)<<VQ_FMAN;
+  expb= floor(log(val)/log(2.f));
+  mant=rint(ldexp(val,(VQ_FMAN-1)-expb));
+  expb=(expb+VQ_FEXP_BIAS)<<VQ_FMAN;
 
-  return(sign|exp|mant);
+  return(sign|expb|mant);
 }
 
 float _float32_unpack(long val){
   double mant=val&0x1fffff;
   int    sign=val&0x80000000;
-  long   exp =(val&0x7fe00000L)>>VQ_FMAN;
+  long   expb =(val&0x7fe00000L)>>VQ_FMAN;
   if(sign)mant= -mant;
-  return(ldexp(mant,exp-(VQ_FMAN-1)-VQ_FEXP_BIAS));
+  return(ldexp(mant,expb-(VQ_FMAN-1)-VQ_FEXP_BIAS));
 }
 
 /* given a list of word lengths, generate a list of codewords.  Works
    for length ordered or unordered, always assigns the lowest valued
    codewords first.  Extended to handle unused entries (length 0) */
-ogg_uint32_t *_make_words(long *l,long n,long sparsecount){
+static ogg_uint32_t *_make_words(long *l,long n,long sparsecount){
   long i,j,count=0;
   ogg_uint32_t marker[33];
   ogg_uint32_t *r=_ogg_malloc((sparsecount?sparsecount:n)*sizeof(*r));
@@ -205,8 +205,8 @@ float *_book_unquantize(const static_codebook *b,int n,int *sparsemap){
 	  float last=0.f;
 	  int indexdiv=1;
 	  for(k=0;k<b->dim;k++){
-	    int index= (j/indexdiv)%quantvals;
-	    float val=b->quantlist[index];
+	    int indx= (j/indexdiv)%quantvals;
+	    float val=b->quantlist[indx];
 	    val=fabs(val)*delta+mindel+last;
 	    if(b->q_sequencep)last=val;	  
 	    if(sparsemap)
@@ -310,8 +310,8 @@ static ogg_uint32_t bitreverse(ogg_uint32_t x){
 }
 
 static int sort32a(const void *a,const void *b){
-  return ( **(ogg_uint32_t **)a>**(ogg_uint32_t **)b)- 
-    ( **(ogg_uint32_t **)a<**(ogg_uint32_t **)b);
+  return ( **(ogg_uint32_t *const *)a>**(ogg_uint32_t * const*)b)- 
+    ( **(ogg_uint32_t * const*)a<**(ogg_uint32_t * const*)b);
 }
 
 /* decode codebook arrangement is more heavily optimized than encode */
@@ -456,7 +456,7 @@ int _best(codebook *book, float *a, int step){
 
   /* do we have a threshhold encode hint? */
   if(tt){
-    int index=0,i;
+    int indx=0,i;
     /* find the quant val of each scalar */
     for(k=0,o=step*(dim-1);k<dim;k++,o-=step){
 
@@ -474,13 +474,13 @@ int _best(codebook *book, float *a, int step){
 
       }
 
-      index=(index*tt->quantvals)+tt->quantmap[i];
+      indx=(indx*tt->quantvals)+tt->quantmap[i];
     }
     /* regular lattices are easy :-) */
-    if(book->c->lengthlist[index]>0) /* is this unused?  If so, we'll
+    if(book->c->lengthlist[indx]>0) /* is this unused?  If so, we'll
 					use a decision tree after all
 					and fall through*/
-      return(index);
+      return(indx);
   }
 
 #if 0

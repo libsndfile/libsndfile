@@ -30,24 +30,6 @@
 
 #define floor1_rangedB 140 /* floor 1 fixed at -140dB to 0dB range */
 
-typedef struct {
-  int sorted_index[VIF_POSIT+2];
-  int forward_index[VIF_POSIT+2];
-  int reverse_index[VIF_POSIT+2];
-  
-  int hineighbor[VIF_POSIT];
-  int loneighbor[VIF_POSIT];
-  int posts;
-
-  int n;
-  int quant_q;
-  vorbis_info_floor1 *vi;
-
-  long phrasebits;
-  long postbits;
-  long frames;
-} vorbis_look_floor1;
-
 typedef struct lsfit_acc{
   long x0;
   long x1;
@@ -190,10 +172,10 @@ static vorbis_info_floor *floor1_unpack (vorbis_info *vi,oggpack_buffer *opb){
 }
 
 static int icomp(const void *a,const void *b){
-  return(**(int **)a-**(int **)b);
+  return(**(int *const*)a-**(int *const*)b);
 }
 
-static vorbis_look_floor *floor1_look(vorbis_dsp_state *vd,
+static vorbis_look_floor *floor1_look(vorbis_dsp_state * UNUSED (vd),
 				      vorbis_info_floor *in){
 
   int *sortpointer[VIF_POSIT+2];
@@ -268,19 +250,19 @@ static vorbis_look_floor *floor1_look(vorbis_dsp_state *vd,
   return(look);
 }
 
-static int render_point(int x0,int x1,int y0,int y1,int x){
-  y0&=0x7fff; /* mask off flag */
-  y1&=0x7fff;
+static int render_point(int x0,int x1,int yp0,int yp1,int x){
+  yp0&=0x7fff; /* mask off flag */
+  yp1&=0x7fff;
     
   {
-    int dy=y1-y0;
+    int dy=yp1-yp0;
     int adx=x1-x0;
     int ady=abs(dy);
     int err=ady*(x-x0);
     
     int off=err/adx;
-    if(dy<0)return(y0-off);
-    return(y0+off);
+    if(dy<0)return(yp0-off);
+    return(yp0+off);
   }
 }
 
@@ -358,14 +340,14 @@ static float FLOOR1_fromdB_LOOKUP[256]={
   0.82788260F, 0.88168307F, 0.9389798F, 1.F, 
 };
 
-static void render_line(int n, int x0,int x1,int y0,int y1,float *d){
-  int dy=y1-y0;
+static void render_line(int n, int x0,int x1,int yp0,int yp1,float *d){
+  int dy=yp1-yp0;
   int adx=x1-x0;
   int ady=abs(dy);
   int base=dy/adx;
   int sy=(dy<0?base-1:base+1);
   int x=x0;
-  int y=y0;
+  int y=yp0;
   int err=0;
 
   ady-=abs(base*adx);
@@ -387,14 +369,14 @@ static void render_line(int n, int x0,int x1,int y0,int y1,float *d){
   }
 }
 
-static void render_line0(int x0,int x1,int y0,int y1,int *d){
-  int dy=y1-y0;
+static void render_line0(int x0,int x1,int yp0,int yp1,int *d){
+  int dy=yp1-yp0;
   int adx=x1-x0;
   int ady=abs(dy);
   int base=dy/adx;
   int sy=(dy<0?base-1:base+1);
   int x=x0;
-  int y=y0;
+  int y=yp0;
   int err=0;
 
   ady-=abs(base*adx);
@@ -417,7 +399,6 @@ static int accumulate_fit(const float *flr,const float *mdct,
 			  int x0, int x1,lsfit_acc *a,
 			  int n,vorbis_info_floor1 *info){
   long i;
-  int quantized=vorbis_dBquant(flr+x0);
 
   long xa=0,ya=0,x2a=0,y2a=0,xya=0,na=0, xb=0,yb=0,x2b=0,y2b=0,xyb=0,nb=0;
 
@@ -469,7 +450,7 @@ static int accumulate_fit(const float *flr,const float *mdct,
   return(na);
 }
 
-static void fit_line(lsfit_acc *a,int fits,int *y0,int *y1){
+static void fit_line(lsfit_acc *a,int fits,int *yp0,int *yp1){
   long x=0,y=0,x2=0,y2=0,xy=0,an=0,i;
   long x0=a[0].x0;
   long x1=a[fits-1].x1;
@@ -483,21 +464,21 @@ static void fit_line(lsfit_acc *a,int fits,int *y0,int *y1){
     an+=a[i].an;
   }
 
-  if(*y0>=0){
+  if(*yp0>=0){
     x+=   x0;
-    y+=  *y0;
+    y+=  *yp0;
     x2+=  x0 *  x0;
-    y2+= *y0 * *y0;
-    xy+= *y0 *  x0;
+    y2+= *yp0 * *yp0;
+    xy+= *yp0 *  x0;
     an++;
   }
 
-  if(*y1>=0){
+  if(*yp1>=0){
     x+=   x1;
-    y+=  *y1;
+    y+=  *yp1;
     x2+=  x1 *  x1;
-    y2+= *y1 * *y1;
-    xy+= *y1 *  x1;
+    y2+= *yp1 * *yp1;
+    xy+= *yp1 *  x1;
     an++;
   }
   
@@ -508,20 +489,20 @@ static void fit_line(lsfit_acc *a,int fits,int *y0,int *y1){
     double fx2=x2;
     double fxy=xy;
     double denom=1./(an*fx2-fx*fx);
-    double a=(fy*fx2-fxy*fx)*denom;
+    double av=(fy*fx2-fxy*fx)*denom;
     double b=(an*fxy-fx*fy)*denom;
-    *y0=rint(a+b*x0);
-    *y1=rint(a+b*x1);
+    *yp0=rint(av+b*x0);
+    *yp1=rint(av+b*x1);
     
     /* limit to our range! */
-    if(*y0>1023)*y0=1023;
-    if(*y1>1023)*y1=1023;
-    if(*y0<0)*y0=0;
-    if(*y1<0)*y1=0;
+    if(*yp0>1023)*yp0=1023;
+    if(*yp1>1023)*yp1=1023;
+    if(*yp0<0)*yp0=0;
+    if(*yp1<0)*yp1=0;
     
   }else{
-    *y0=0;
-    *y1=0;
+    *yp0=0;
+    *yp1=0;
   }
 }
 
@@ -535,16 +516,16 @@ static void fit_line(lsfit_acc *a,int fits,int *y0,int *y1){
   *y0=*y1=y;
   }*/
 
-static int inspect_error(int x0,int x1,int y0,int y1,const float *mask,
+static int inspect_error(int x0,int x1,int yp0,int yp1,const float *mask,
 			 const float *mdct,
 			 vorbis_info_floor1 *info){
-  int dy=y1-y0;
+  int dy=yp1-yp0;
   int adx=x1-x0;
   int ady=abs(dy);
   int base=dy/adx;
   int sy=(dy<0?base-1:base+1);
   int x=x0;
-  int y=y0;
+  int y=yp0;
   int err=0;
   int val=vorbis_dBquant(mask+x);
   int mse=0;
@@ -595,8 +576,6 @@ static int post_Y(int *A,int *B,int pos){
   return (A[pos]+B[pos])>>1;
 }
 
-static int seq=0;
-
 int *floor1_fit(vorbis_block *vb,vorbis_look_floor1 *look,
 			  const float *logmdct,   /* in */
 			  const float *logmask){
@@ -633,14 +612,14 @@ int *floor1_fit(vorbis_block *vb,vorbis_look_floor1 *look,
   
   if(nonzero){
     /* start by fitting the implicit base case.... */
-    int y0=-200;
-    int y1=-200;
-    fit_line(fits,posts-1,&y0,&y1);
+    int yv0=-200;
+    int yv1=-200;
+    fit_line(fits,posts-1,&yv0,&yv1);
 
-    fit_valueA[0]=y0;
-    fit_valueB[0]=y0;
-    fit_valueB[1]=y1;
-    fit_valueA[1]=y1;
+    fit_valueA[0]=yv0;
+    fit_valueB[0]=yv0;
+    fit_valueB[1]=yv1;
+    fit_valueA[1]=yv1;
 
     /* Non degenerate case */
     /* start progressive splitting.  This is a greedy, non-optimal
@@ -671,22 +650,22 @@ int *floor1_fit(vorbis_block *vb,vorbis_look_floor1 *look,
 
 	  if(inspect_error(lx,hx,ly,hy,logmask,logmdct,info)){
 	    /* outside error bounds/begin search area.  Split it. */
-	    int ly0=-200;
-	    int ly1=-200;
-	    int hy0=-200;
-	    int hy1=-200;
-	    fit_line(fits+lsortpos,sortpos-lsortpos,&ly0,&ly1);
-	    fit_line(fits+sortpos,hsortpos-sortpos,&hy0,&hy1);
+	    int lyv0=-200;
+	    int lyv1=-200;
+	    int hyv0=-200;
+	    int hyv1=-200;
+	    fit_line(fits+lsortpos,sortpos-lsortpos,&lyv0,&lyv1);
+	    fit_line(fits+sortpos,hsortpos-sortpos,&hyv0,&hyv1);
 	    
 	    /* store new edge values */
-	    fit_valueB[ln]=ly0;
-	    if(ln==0)fit_valueA[ln]=ly0;
-	    fit_valueA[i]=ly1;
-	    fit_valueB[i]=hy0;
-	    fit_valueA[hn]=hy1;
-	    if(hn==1)fit_valueB[hn]=hy1;
+	    fit_valueB[ln]=lyv0;
+	    if(ln==0)fit_valueA[ln]=lyv0;
+	    fit_valueA[i]=lyv1;
+	    fit_valueB[i]=hyv0;
+	    fit_valueA[hn]=hyv1;
+	    if(hn==1)fit_valueB[hn]=hyv1;
 	    
-	    if(ly1>=0 || hy0>=0){
+	    if(lyv1>=0 || hyv0>=0){
 	      /* store new neighbor values */
 	      for(j=sortpos-1;j>=0;j--)
 		if(hineighbor[j]==hn)
@@ -722,10 +701,10 @@ int *floor1_fit(vorbis_block *vb,vorbis_look_floor1 *look,
       int hn=look->hineighbor[i-2];
       int x0=info->postlist[ln];
       int x1=info->postlist[hn];
-      int y0=output[ln];
-      int y1=output[hn];
+      int yvv0=output[ln];
+      int yvv1=output[hn];
       
-      int predicted=render_point(x0,x1,y0,y1,info->postlist[i]);
+      int predicted=render_point(x0,x1,yvv0,yvv1,info->postlist[i]);
       int vx=post_Y(fit_valueA,fit_valueB,i);
       
       if(vx>=0 && predicted!=vx){ 
@@ -767,7 +746,6 @@ int floor1_encode(oggpack_buffer *opb,vorbis_block *vb,
 
   long i,j;
   vorbis_info_floor1 *info=look->vi;
-  long n=look->n;
   long posts=look->posts;
   codec_setup_info *ci=vb->vd->vi->codec_setup;
   int out[VIF_POSIT+2];
@@ -805,10 +783,10 @@ int floor1_encode(oggpack_buffer *opb,vorbis_block *vb,
       int hn=look->hineighbor[i-2];
       int x0=info->postlist[ln];
       int x1=info->postlist[hn];
-      int y0=post[ln];
-      int y1=post[hn];
+      int yv0=post[ln];
+      int yv1=post[hn];
       
-      int predicted=render_point(x0,x1,y0,y1,info->postlist[i]);
+      int predicted=render_point(x0,x1,yv0,yv1,info->postlist[i]);
       
       if((post[i]&0x8000) || (predicted==post[i])){
 	post[i]=predicted|0x8000; /* in case there was roundoff jitter

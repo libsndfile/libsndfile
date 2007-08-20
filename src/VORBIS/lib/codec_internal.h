@@ -133,5 +133,36 @@ typedef struct codec_setup_info {
 extern vorbis_look_psy_global *_vp_global_look(vorbis_info *vi);
 extern void _vp_global_free(vorbis_look_psy_global *look);
 
+
+
+typedef struct {
+  int sorted_index[VIF_POSIT+2];
+  int forward_index[VIF_POSIT+2];
+  int reverse_index[VIF_POSIT+2];
+  
+  int hineighbor[VIF_POSIT];
+  int loneighbor[VIF_POSIT];
+  int posts;
+
+  int n;
+  int quant_q;
+  vorbis_info_floor1 *vi;
+
+  long phrasebits;
+  long postbits;
+  long frames;
+} vorbis_look_floor1;
+
+
+
+extern int *floor1_fit(vorbis_block *vb,vorbis_look_floor1 *look,
+			  const float *logmdct,   /* in */
+			  const float *logmask);
+extern int *floor1_interpolate_fit(vorbis_block *vb,vorbis_look_floor1 *look,
+			  int *A,int *B,
+			  int del);
+extern int floor1_encode(oggpack_buffer *opb,vorbis_block *vb,
+		  vorbis_look_floor1 *look,
+		  int *post,int *ilogmask);
 #endif
 

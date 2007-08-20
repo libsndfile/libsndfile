@@ -76,7 +76,7 @@ void mdct_init(mdct_lookup *lookup,int n){
   /* bitreverse lookup... */
 
   {
-    int mask=(1<<(log2n-1))-1,i,j;
+    int mask=(1<<(log2n-1))-1,j;
     int msb=1<<(log2n-2);
     for(i=0;i<n/8;i++){
       int acc=0;
@@ -437,28 +437,28 @@ void mdct_backward(mdct_lookup *init, DATA_TYPE *in, DATA_TYPE *out){
   {
     DATA_TYPE *oX1=out+n2+n4;
     DATA_TYPE *oX2=out+n2+n4;
-    DATA_TYPE *iX =out;
+    DATA_TYPE *iX2 =out;
     T             =init->trig+n2;
     
     do{
       oX1-=4;
 
-      oX1[3]  =  MULT_NORM (iX[0] * T[1] - iX[1] * T[0]);
-      oX2[0]  = -MULT_NORM (iX[0] * T[0] + iX[1] * T[1]);
+      oX1[3]  =  MULT_NORM (iX2[0] * T[1] - iX2[1] * T[0]);
+      oX2[0]  = -MULT_NORM (iX2[0] * T[0] + iX2[1] * T[1]);
 
-      oX1[2]  =  MULT_NORM (iX[2] * T[3] - iX[3] * T[2]);
-      oX2[1]  = -MULT_NORM (iX[2] * T[2] + iX[3] * T[3]);
+      oX1[2]  =  MULT_NORM (iX2[2] * T[3] - iX2[3] * T[2]);
+      oX2[1]  = -MULT_NORM (iX2[2] * T[2] + iX2[3] * T[3]);
 
-      oX1[1]  =  MULT_NORM (iX[4] * T[5] - iX[5] * T[4]);
-      oX2[2]  = -MULT_NORM (iX[4] * T[4] + iX[5] * T[5]);
+      oX1[1]  =  MULT_NORM (iX2[4] * T[5] - iX2[5] * T[4]);
+      oX2[2]  = -MULT_NORM (iX2[4] * T[4] + iX2[5] * T[5]);
 
-      oX1[0]  =  MULT_NORM (iX[6] * T[7] - iX[7] * T[6]);
-      oX2[3]  = -MULT_NORM (iX[6] * T[6] + iX[7] * T[7]);
+      oX1[0]  =  MULT_NORM (iX2[6] * T[7] - iX2[7] * T[6]);
+      oX2[3]  = -MULT_NORM (iX2[6] * T[6] + iX2[7] * T[7]);
 
       oX2+=4;
-      iX    +=   8;
+      iX2    +=   8;
       T     +=   8;
-    }while(iX<oX1);
+    }while(iX2<oX1);
 
     iX=out+n2+n4;
     oX1=out+n4;

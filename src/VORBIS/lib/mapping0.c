@@ -229,16 +229,6 @@ static float FLOOR1_fromdB_LOOKUP[256]={
 
 #endif 
 
-extern int *floor1_fit(vorbis_block *vb,vorbis_look_floor *look,
-		       const float *logmdct,   /* in */
-		       const float *logmask);
-extern int *floor1_interpolate_fit(vorbis_block *vb,vorbis_look_floor *look,
-				   int *A,int *B,
-				   int del);
-extern int floor1_encode(oggpack_buffer *opb,vorbis_block *vb,
-			 vorbis_look_floor *look,
-			 int *post,int *ilogmask);
-
 
 static int mapping0_forward(vorbis_block *vb){
   vorbis_dsp_state      *vd=vb->vd;
@@ -586,8 +576,8 @@ static int mapping0_forward(vorbis_block *vb){
     float **couple_bundle=alloca(sizeof(*couple_bundle)*vi->channels);
     int *zerobundle=alloca(sizeof(*zerobundle)*vi->channels);
     int **sortindex=alloca(sizeof(*sortindex)*vi->channels);
-    float **mag_memo;
-    int **mag_sort;
+    float **mag_memo=NULL;
+    int **mag_sort=NULL;
 
     if(info->coupling_steps){
       mag_memo=_vp_quantize_couple_memo(vb,
@@ -735,7 +725,6 @@ static int mapping0_inverse(vorbis_block *vb,vorbis_info_mapping *l){
   codec_setup_info     *ci=vi->codec_setup;
   private_state        *b=vd->backend_state;
   vorbis_info_mapping0 *info=(vorbis_info_mapping0 *)l;
-  int hs=ci->halfrate_flag; 
 
   int                   i,j;
   long                  n=vb->pcmend=ci->blocksizes[vb->W];

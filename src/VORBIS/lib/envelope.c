@@ -91,8 +91,7 @@ static int _ve_amp(envelope_lookup *ve,
 		   vorbis_info_psy_global *gi,
 		   float *data,
 		   envelope_band *bands,
-		   envelope_filter_state *filters,
-		   long pos){
+		   envelope_filter_state *filters){
   long n=ve->winlength;
   int ret=0;
   long i,j;
@@ -240,7 +239,7 @@ long _ve_envelope_search(vorbis_dsp_state *v){
     
     for(i=0;i<ve->ch;i++){
       float *pcm=v->pcm[i]+ve->searchstep*(j);
-      ret|=_ve_amp(ve,gi,pcm,ve->band,ve->filter+i*VE_BANDS,j);
+      ret|=_ve_amp(ve,gi,pcm,ve->band,ve->filter+i*VE_BANDS);
     }
 
     ve->mark[j+VE_POST]=0;

@@ -62,7 +62,7 @@ typedef struct {
 
 } vorbis_look_residue0;
 
-void res0_free_info(vorbis_info_residue *i){
+static void res0_free_info(vorbis_info_residue *i){
   vorbis_info_residue0 *info=(vorbis_info_residue0 *)i;
   if(info){
     memset(info,0,sizeof(*info));
@@ -70,7 +70,7 @@ void res0_free_info(vorbis_info_residue *i){
   }
 }
 
-void res0_free_look(vorbis_look_residue *i){
+static void res0_free_look(vorbis_look_residue *i){
   int j;
   if(i){
 
@@ -167,7 +167,7 @@ static int icount(unsigned int v){
 }
 
 
-void res0_pack(vorbis_info_residue *vr,oggpack_buffer *opb){
+static void res0_pack(vorbis_info_residue *vr,oggpack_buffer *opb){
   vorbis_info_residue0 *info=(vorbis_info_residue0 *)vr;
   int j,acc=0;
   oggpack_write(opb,info->begin,24);
@@ -197,7 +197,7 @@ void res0_pack(vorbis_info_residue *vr,oggpack_buffer *opb){
 }
 
 /* vorbis_info is for range checking */
-vorbis_info_residue *res0_unpack(vorbis_info *vi,oggpack_buffer *opb){
+static vorbis_info_residue *res0_unpack(vorbis_info *vi,oggpack_buffer *opb){
   int j,acc=0;
   vorbis_info_residue0 *info=_ogg_calloc(1,sizeof(*info));
   codec_setup_info     *ci=vi->codec_setup;
@@ -229,7 +229,7 @@ vorbis_info_residue *res0_unpack(vorbis_info *vi,oggpack_buffer *opb){
   return(NULL);
 }
 
-vorbis_look_residue *res0_look(vorbis_dsp_state *vd,
+static vorbis_look_residue *res0_look(vorbis_dsp_state *vd,
 			       vorbis_info_residue *vr){
   vorbis_info_residue0 *info=(vorbis_info_residue0 *)vr;
   vorbis_look_residue0 *look=_ogg_calloc(1,sizeof(*look));
@@ -316,7 +316,7 @@ static int local_book_besterror(codebook *book,float *a){
   
   if(book->c->lengthlist[best]<=0){
     const static_codebook *c=book->c;
-    int i,j;
+    int j;
     float bestf=0.f;
     float *e=book->valuelist;
     best=-1;
@@ -346,7 +346,7 @@ static int local_book_besterror(codebook *book,float *a){
 }
 
 static int _encodepart(oggpack_buffer *opb,float *vec, int n,
-		       codebook *book,long *acc){
+		       codebook *book,long * UNUSED (acc)){
   int i,bits=0;
   int dim=book->dim;
   int step=n/dim;
@@ -371,8 +371,6 @@ static long **_01class(vorbis_block *vb,vorbis_look_residue *vl,
   long i,j,k;
   vorbis_look_residue0 *look=(vorbis_look_residue0 *)vl;
   vorbis_info_residue0 *info=look->info;
-  vorbis_info           *vi=vb->vd->vi;
-  codec_setup_info      *ci=vi->codec_setup;
 
   /* move all this setup out later */
   int samples_per_partition=info->grouping;
@@ -491,7 +489,7 @@ static long **_2class(vorbis_block *vb,vorbis_look_residue *vl,float **in,
 }
 
 static int _01forward(oggpack_buffer *opb,
-		      vorbis_block *vb,vorbis_look_residue *vl,
+		      vorbis_block * UNUSED (vb),vorbis_look_residue *vl,
 		      float **in,int ch,
 		      long **partword,
 		      int (*encode)(oggpack_buffer *,float *,int,
@@ -499,8 +497,6 @@ static int _01forward(oggpack_buffer *opb,
   long i,j,k,s;
   vorbis_look_residue0 *look=(vorbis_look_residue0 *)vl;
   vorbis_info_residue0 *info=look->info;
-
-  vorbis_dsp_state      *vd=vb->vd;
 
   /* move all this setup out later */
   int samples_per_partition=info->grouping;
@@ -716,7 +712,7 @@ int res0_forward(vorbis_block *vb,vorbis_look_residue *vl,
 }
 #endif
 
-int res0_inverse(vorbis_block *vb,vorbis_look_residue *vl,
+static int res0_inverse(vorbis_block *vb,vorbis_look_residue *vl,
 		 float **in,int *nonzero,int ch){
   int i,used=0;
   for(i=0;i<ch;i++)
@@ -728,7 +724,7 @@ int res0_inverse(vorbis_block *vb,vorbis_look_residue *vl,
     return(0);
 }
 
-int res1_forward(oggpack_buffer *opb,vorbis_block *vb,vorbis_look_residue *vl,
+static int res1_forward(oggpack_buffer *opb,vorbis_block *vb,vorbis_look_residue *vl,
 		 float **in,float **out,int *nonzero,int ch,
 		 long **partword){
   int i,j,used=0,n=vb->pcmend/2;
@@ -757,7 +753,7 @@ int res1_forward(oggpack_buffer *opb,vorbis_block *vb,vorbis_look_residue *vl,
   }
 }
 
-long **res1_class(vorbis_block *vb,vorbis_look_residue *vl,
+static long **res1_class(vorbis_block *vb,vorbis_look_residue *vl,
 		  float **in,int *nonzero,int ch){
   int i,used=0;
   for(i=0;i<ch;i++)
@@ -769,7 +765,7 @@ long **res1_class(vorbis_block *vb,vorbis_look_residue *vl,
     return(0);
 }
 
-int res1_inverse(vorbis_block *vb,vorbis_look_residue *vl,
+static int res1_inverse(vorbis_block *vb,vorbis_look_residue *vl,
 		 float **in,int *nonzero,int ch){
   int i,used=0;
   for(i=0;i<ch;i++)
@@ -781,7 +777,7 @@ int res1_inverse(vorbis_block *vb,vorbis_look_residue *vl,
     return(0);
 }
 
-long **res2_class(vorbis_block *vb,vorbis_look_residue *vl,
+static long **res2_class(vorbis_block *vb,vorbis_look_residue *vl,
 		  float **in,int *nonzero,int ch){
   int i,used=0;
   for(i=0;i<ch;i++)
@@ -795,7 +791,7 @@ long **res2_class(vorbis_block *vb,vorbis_look_residue *vl,
 /* res2 is slightly more different; all the channels are interleaved
    into a single vector and encoded. */
 
-int res2_forward(oggpack_buffer *opb,
+static int res2_forward(oggpack_buffer *opb,
 		 vorbis_block *vb,vorbis_look_residue *vl,
 		 float **in,float **out,int *nonzero,int ch,
 		 long **partword){
@@ -831,7 +827,7 @@ int res2_forward(oggpack_buffer *opb,
 }
 
 /* duplicate code here as speed is somewhat more important */
-int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
+static int res2_inverse(vorbis_block *vb,vorbis_look_residue *vl,
 		 float **in,int *nonzero,int ch){
   long i,k,l,s;
   vorbis_look_residue0 *look=(vorbis_look_residue0 *)vl;
