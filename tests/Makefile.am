@@ -12,7 +12,8 @@ noinst_PROGRAMS = sfversion floating_point_test write_read_test \
 	pcm_test headerless_test pipe_test benchmark header_test misc_test \
 	raw_test string_test open_fail_test multi_file_test dither_test \
 	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
-	locale_test largefile_test win32_ordinal_test ogg_test $(CPP_TEST)
+	locale_test largefile_test win32_ordinal_test ogg_test vorbis_test \
+	$(CPP_TEST)
 
 SNDFILEDIR = ../src
 INCLUDES = -I$(srcdir)/$(SNDFILEDIR)
@@ -111,6 +112,9 @@ virtual_io_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 ogg_test_SOURCES = ogg_test.c utils.c
 ogg_test_LDADD = $(SNDFILEDIR)/libsndfile.la
+
+vorbis_test_SOURCES = vorbis_test.c utils.c
+vorbis_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 win32_test_SOURCES = win32_test.c
 win32_test_LDADD =
@@ -289,8 +293,9 @@ wve-tests: lossy_comp_test
 	@echo "  `./sfversion` passed tests on WVE files."
 	@echo "----------------------------------------------------------------------"
 
-vorbis-tests: lossy_comp_test ogg_test
+vorbis-tests: lossy_comp_test ogg_test vorbis_test
 	./ogg_test
+	./vorbis_test
 	./lossy_comp_test ogg_vorbis
 	./string_test ogg
 	@echo "----------------------------------------------------------------------"
