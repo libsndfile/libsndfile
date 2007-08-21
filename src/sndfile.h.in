@@ -30,14 +30,7 @@
 #define	SNDFILE_1
 
 #include <stdio.h>
-
-/* For the Metrowerks CodeWarrior Pro Compiler (mainly MacOS) */
-
-#if	(defined (__MWERKS__))
-#include	<unix.h>
-#else
-#include	<sys/types.h>
-#endif
+#include <sys/types.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -289,14 +282,20 @@ enum
 
 typedef	struct SNDFILE_tag	SNDFILE ;
 
-/* The following typedef is system specific and is defined when libsndfile is.
-** compiled. sf_count_t can be one of loff_t (Linux), off_t (*BSD),
-** off64_t (Solaris), __int64_t (Win32) etc.
+/* The following typedef is system specific and is defined when libsndfile is
+** compiled. sf_count_t can be one of loff_t (Linux), off_t (*BSD), off64_t 
+** (Solaris), __int64_t (Win32) etc. On windows, we need to allow the same
+** header file to be compiler by both GCC and the microsoft compiler.
 */
 
+#ifdef _MSCVER
+typedef __int64_t	sf_count_t ;
+#define SF_COUNT_MAX		0x7fffffffffffffffi64
+#else
 typedef @TYPEOF_SF_COUNT_T@	sf_count_t ;
-
 #define SF_COUNT_MAX		@SF_COUNT_MAX@
+#endif
+
 
 /* A pointer to a SF_INFO structure is passed to sf_open_read () and filled in.
 ** On write, the SF_INFO structure is filled in by the user and passed into

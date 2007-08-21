@@ -1,3 +1,9 @@
+2007-08-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in
+    Remove crufty Metrowerks compiler support. Allow header file to be compiled
+    on windows with both GCC and microsoft compiler.
+
 2007-08-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/dft_cmp.[ch] tests/floating_point_test.tpl
