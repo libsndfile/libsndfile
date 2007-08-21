@@ -31,7 +31,7 @@
 #include	"generate.h"
 #include	"dft_cmp.h"
 
-#define	SAMPLE_RATE		44100
+#define	SAMPLE_RATE		16000
 
 static inline float
 max_float (float a, float b)
@@ -50,7 +50,7 @@ vorbis_test (void)
 	print_test_name ("vorbis_test", filename) ;
 
 	/* Generate float data. */
-	gen_windowed_sine_float (float_data, ARRAY_LEN (float_data), 0.95) ;
+	gen_windowed_sine_float (float_data, ARRAY_LEN (float_data), 1.0) ;
 
 	/* Set up output file type. */
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
@@ -74,7 +74,7 @@ vorbis_test (void)
 	for (k = 0 ; k < ARRAY_LEN (float_data) ; k ++)
 		max_abs = max_float (max_abs, fabs (float_data [k])) ;
 
-	if (max_abs > 1.0)
+	if (max_abs > 1.02)
 	{	printf ("\n\n   max_abs : %f\n\n", max_abs) ;
 		exit (1) ;
 		} ;
