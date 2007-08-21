@@ -99,7 +99,7 @@ static STR_PAIRS vorbis_metatypes [] =
 	{	SF_STR_COPYRIGHT,	"Copyright" },
 	{	SF_STR_SOFTWARE,	"Software" },
 	{	SF_STR_ARTIST,		"Artist" },
-	{	SF_STR_COMMENT,		"Ccomment" },
+	{	SF_STR_COMMENT,		"Comment" },
 	{	SF_STR_DATE,		"Date" },
 	{	SF_STR_ALBUM,		"Album" },
 	{	SF_STR_LICENSE,		"License" },
