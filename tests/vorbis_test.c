@@ -41,7 +41,7 @@ max_float (float a, float b)
 static void
 vorbis_test (void)
 {	static float float_data [DFT_DATA_LENGTH] ;
-	const char * filename = "vorbis.oga" ;
+	const char * filename = "vorbis_test.oga" ;
 	SNDFILE * file ;
 	SF_INFO sfinfo ;
 	float max_abs = 0.0 ;
