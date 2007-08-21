@@ -95,14 +95,14 @@ typedef struct
 } STR_PAIRS ;
 
 static STR_PAIRS vorbis_metatypes [] =
-{	{	SF_STR_TITLE,		"TITLE" },
-	{	SF_STR_COPYRIGHT,	"COPYRIGHT" },
-	{	SF_STR_SOFTWARE,	"SOFTWARE" },
-	{	SF_STR_ARTIST,		"ARTIST" },
-	{	SF_STR_COMMENT,		"COMMENT" },
-	{	SF_STR_DATE,		"DATE" },
-	{	SF_STR_ALBUM,		"ALBUM" },
-	{	SF_STR_LICENSE,		"LICENSE" },
+{	{	SF_STR_TITLE,		"Title" },
+	{	SF_STR_COPYRIGHT,	"Copyright" },
+	{	SF_STR_SOFTWARE,	"Software" },
+	{	SF_STR_ARTIST,		"Artist" },
+	{	SF_STR_COMMENT,		"Ccomment" },
+	{	SF_STR_DATE,		"Date" },
+	{	SF_STR_ALBUM,		"Album" },
+	{	SF_STR_LICENSE,		"License" },
 } ;
 
 typedef struct
@@ -291,8 +291,13 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 		} ;
 
 	if (log_data)
-	{	char **ptr ;
-		int k ;
+	{	int k ;
+
+		psf_log_printf (psf, "\nBitstream is %d channel, %D Hz\n", vdata->vi.channels, vdata->vi.rate) ;
+		psf_log_printf (psf, "Encoded by: %s\n", vdata->vc.vendor) ;
+
+		/* Throw the comments plus a few lines about the bitstream we're decoding. */
+		psf_log_printf (psf, "Metadata :\n") ;
 
 		for (k = 0 ; k < ARRAY_LEN (vorbis_metatypes) ; k++)
 		{	char *dd ;
@@ -301,17 +306,10 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 			if (dd == NULL)
 				continue ;
 			psf_store_string (psf, vorbis_metatypes [k].id, dd) ;
+			psf_log_printf (psf, "  %-10s : %s\n", vorbis_metatypes [k].name, dd) ;
 			} ;
 
-		/* Throw the comments plus a few lines about the bitstream we're decoding. */
-		ptr = vdata->vc.user_comments ;
-		while (*ptr)
-		{	psf_log_printf (psf, "%s\n", *ptr) ;
-			ptr ++ ;
-			} ;
-
-		psf_log_printf (psf, "\nBitstream is %d channel, %D Hz\n", vdata->vi.channels, vdata->vi.rate) ;
-		psf_log_printf (psf, "Encoded by: %s\n", vdata->vc.vendor) ;
+		psf_log_printf (psf, "End\n") ;
 		} ;
 
 	psf->sf.samplerate	= vdata->vi.rate ;
