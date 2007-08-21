@@ -75,7 +75,7 @@ vorbis_test (void)
 		max_abs = max_float (max_abs, fabs (float_data [k])) ;
 
 	if (max_abs > 1.02)
-	{	printf ("\n\n   max_abs : %f\n\n", max_abs) ;
+	{	printf ("\n\n    Error : max_abs %f should be < 1.02.\n\n", max_abs) ;
 		exit (1) ;
 		} ;
 
