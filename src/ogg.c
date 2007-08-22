@@ -445,8 +445,11 @@ ogg_close (SF_PRIVATE *psf)
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 
-	/* clean up this logical bitstream ; before exit we shuld see if we're
-	   followed by another [chained] */
+	if (odata == NULL || vdata == NULL)
+		return 0 ;
+
+	/*	Clean up this logical bitstream ; before exit we shuld see if we're
+	**	followed by another [chained]. */
 
 	if (psf->mode == SFM_WRITE)
 	{	vorbis_analysis_wrote (&vdata->vd, 0) ;
