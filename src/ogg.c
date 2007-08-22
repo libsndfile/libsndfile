@@ -503,7 +503,7 @@ ogg_open (SF_PRIVATE *psf)
 	if (psf->mode == SFM_WRITE && psf->sf.samplerate <= 22050)
 	{
 #if (defined (__amd64__) || defined (__ppc__))
-		psf_log_printf (psf, "Known Vorbis encoder bug for samplerates <= 22050.\n") ;
+		psf_log_printf (psf, "Known Vorbis encoder bug on this platform for sample rates <= 22050.\n") ;
 		psf_log_printf (psf, "See : https://trac.xiph.org/ticket/1229\n") ;
 		return SFE_VORBIS_ENCODER_BUG ;
 #endif
