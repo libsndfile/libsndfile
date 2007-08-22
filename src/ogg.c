@@ -1,4 +1,4 @@
-  /*
+/*
 ** Copyright (C) 2002-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2007 John ffitch
 **
@@ -337,15 +337,6 @@ ogg_write_init (SF_PRIVATE *psf, int UNUSED (calc_length))
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 	int ret ;
 
-	if (psf->sf.samplerate <= 22050)
-	{
-#if (defined (__amd64__) || defined (__ppc__))
-		psf_log_printf (psf, "Known Vorbis encoder bug for samplerates <= 22050.\n") ;
-		psf_log_printf (psf, "See : https://trac.xiph.org/ticket/1229\n") ;
-		return SFE_VORBIS_ENCODER_BUG ;
-#endif
-		} ;
-
 	vorbis_info_init (&vdata->vi) ;
 
 	/* The style of encoding should be selectable here, VBR quality mode. */
@@ -508,6 +499,15 @@ ogg_open (SF_PRIVATE *psf)
 
 	if (psf->mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
+
+	if (psf->mode == SFM_WRITE && psf->sf.samplerate <= 22050)
+	{
+#if (defined (__amd64__) || defined (__ppc__))
+		psf_log_printf (psf, "Known Vorbis encoder bug for samplerates <= 22050.\n") ;
+		psf_log_printf (psf, "See : https://trac.xiph.org/ticket/1229\n") ;
+		return SFE_VORBIS_ENCODER_BUG ;
+#endif
+		} ;
 
 	if (psf->mode == SFM_READ)
 	{	/* Call this here so it only gets called once, so no memory is leaked. */
