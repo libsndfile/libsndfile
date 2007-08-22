@@ -247,6 +247,8 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_DWVW_BAD_BITWIDTH	, "Error : Bad bit width for DWVW encoding. Must be 12, 16 or 24." },
 	{	SFE_G72X_NOT_MONO		, "Error : G72x encoding does not support more than 1 channel." },
 
+	{	SFE_VORIS_ENCODER_BUG	, "Error : Parameters chosen are known to trigger a Vorbis encoder bug." },
+
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
 } ;
