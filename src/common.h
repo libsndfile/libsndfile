@@ -560,7 +560,7 @@ enum
 	SFE_WVE_NOT_WVE,
 	SFE_WVE_NO_PIPE,
 
-	SFE_VORIS_ENCODER_BUG,
+	SFE_VORBIS_ENCODER_BUG,
 
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
