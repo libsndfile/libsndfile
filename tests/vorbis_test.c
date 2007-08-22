@@ -59,7 +59,27 @@ vorbis_test (void)
 	sfinfo.samplerate = SAMPLE_RATE ;
 
 	/* Write the output file. */
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+
+	/*	The Vorbis encoder has a bug on PowerPC and X86-64 with sample rates
+	**	<= 22050. Increasing the sample rate to 32000 avoids triggering it.
+	**	See https://trac.xiph.org/ticket/1229
+	*/
+	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
+	{	const char * errstr ;
+	
+		errstr = sf_strerror (NULL) ;
+		if (strstr (errstr, "Sample rate chosen is known to trigger a Vorbis") == NULL)
+		{	printf ("Line %d: sf_open_fd (SFM_WRITE) failed : %s\n", __LINE__, errstr) ;
+			dump_log_buffer (NULL) ;
+			exit (1) ;
+			} ;
+
+		printf ("\n                                  Sample rate -> 32kHz    ") ;
+		sfinfo.samplerate = 32000 ;
+
+		file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+		} ;
+
 	test_write_float_or_die (file, 0, float_data, ARRAY_LEN (float_data), __LINE__) ;
 	sf_close (file) ;
 
