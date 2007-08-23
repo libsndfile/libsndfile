@@ -12,6 +12,7 @@
 # dependancies. It also makes up for Mac OSX's fucked-upped-ness.
 
 ACLOCAL = aclocal
+ACLOCAL_INC = -I M4
 
 ifneq ($(shell uname -s), Darwin)
   LIBTOOLIZE = libtoolize
@@ -19,7 +20,7 @@ else
   # Fuck Apple! Why the hell did they rename libtoolize????
   LIBTOOLIZE = glibtoolize
   # Fink (and DarwinPorts/MacPorts) sucks as well, but this seems necessary.
-  ACLOCAL_INC = -I /opt/local/share/aclocal
+  ACLOCAL_INC = $(ACLOCAL_INC) -I /opt/local/share/aclocal
 endif
 
 genfiles : config.status
@@ -32,13 +33,13 @@ config.status: configure src/config.h.in Makefile.in src/Makefile.in tests/Makef
 configure: ltmain.sh
 	autoconf
 
-Makefile.in: Makefile.am	
+Makefile.in: Makefile.am
 	automake --copy --add-missing
 
-src/Makefile.in: src/Makefile.am	
+src/Makefile.in: src/Makefile.am
 	automake --copy --add-missing
 
-tests/Makefile.in: tests/Makefile.am	
+tests/Makefile.in: tests/Makefile.am
 	automake --copy --add-missing
 
 src/config.h.in: configure
@@ -46,9 +47,9 @@ src/config.h.in: configure
 
 libtool ltmain.sh: aclocal.m4
 	$(LIBTOOLIZE) --copy --force
-	
-# Need to re-run aclocal whenever acinclude.m4 is modified.
-aclocal.m4: acinclude.m4
+
+# Need to re-run aclocal whenever m4 files are modified.
+aclocal.m4: M4/*.m4
 	$(ACLOCAL) $(ACLOCAL_INC)
 
 clean:
