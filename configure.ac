@@ -619,8 +619,8 @@ AC_CONFIG_FILES([ \
 	\
 	src/OGG/include/ogg/Makefile src/OGG/include/Makefile src/OGG/Makefile \
 	man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
-	doc/Makefile doc/libsndfile.css \
-	Win32/Makefile Octave/Makefile \
+	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile \
+	doc/libsndfile.css \
 	Makefile libsndfile.spec sndfile.pc \
 	])
 AC_OUTPUT
