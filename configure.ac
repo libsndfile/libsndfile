@@ -37,7 +37,6 @@ AC_PROG_CC
 AM_PROG_LIBTOOL
 
 AC_CHECK_PROG(HAVE_AUTOGEN, autogen, yes, no)
-AC_CHECK_PROG(HAVE_MKOCTFILE, mkoctfile, yes, no)
 
 AC_PROG_INSTALL
 AC_PROG_LN_S
@@ -262,6 +261,13 @@ case "$host_os" in
 			fi
 		;;
 	esac
+
+#====================================================================================
+# Check for requirements for building plugins for other languages/enviroments.
+
+dnl Octave maths environment http://www.octave.org/
+AC_OCTAVE_BUILD
+
 
 #====================================================================================
 # Check for libsqlite3 (only used in regtest).
