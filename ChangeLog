@@ -1,3 +1,8 @@
+2007-08-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * acinclude.m4 configure.ac ...
+    Get rid of acinclude.m4 and replace it with an M4 directory.
+
 2007-08-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in
