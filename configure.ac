@@ -33,7 +33,8 @@ SHARED_VERSION_INFO="1:18:0"
 AC_PROG_CC
 AM_PROG_LIBTOOL
 
-AC_CHECK_PROG(autogen, autogen, yes, no)
+AC_CHECK_PROG(HAVE_AUTOGEN, autogen, yes, no)
+AC_CHECK_PROG(HAVE_MKOCTFILE, mkoctfile, yes, no)
 
 AC_PROG_INSTALL
 AC_PROG_LN_S
@@ -466,7 +467,7 @@ if test $ac_cv_sizeof_double != 8 ; then
 	AC_MSG_WARN([[******************************************************************]])
 	fi
 
-if test x"$ac_cv_prog_autogen" = "xno" ; then
+if test x"$ac_cv_prog_HAVE_AUTOGEN" = "xno" ; then
 	AC_MSG_WARN([[Touching files in directory tests/.]])
 	touch tests/*.c tests/*.h
 	fi
