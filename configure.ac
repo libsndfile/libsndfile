@@ -10,6 +10,9 @@ AC_CANONICAL_TARGET([])
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
 AC_CONFIG_HEADERS([src/config.h])
 
+dnl Add parameters for aclocal
+AC_SUBST(ACLOCAL_AMFLAGS, "-I M4")
+
 AC_LANG([C])
 
 #------------------------------------------------------------------------------------
