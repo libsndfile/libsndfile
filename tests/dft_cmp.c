@@ -40,7 +40,7 @@ double
 dft_cmp_float (int linenum, const float *in_data, const float *test_data, int len, double target_snr, int allow_exit)
 {	static double orig [DFT_DATA_LENGTH] ;
 	static double test [DFT_DATA_LENGTH] ;
-	int		k ;
+	unsigned	k ;
 
 	if (! orig || ! test)
 	{	printf ("Error (line %d) : dft_cmp_float : Bad input arrays.\n", linenum) ;
