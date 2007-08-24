@@ -15,9 +15,9 @@ AC_DEFUN([AC_OCTAVE_VERSION],
 [
 
 AC_ARG_WITH(octave,
-	[  --with-octave            choose the octave version], [ with_octave=$withval ])
+	[  --with-octave           choose the octave version], [ with_octave=$withval ])
 
-test -z "$octave_octave" && with_octave=octave
+test -z "$with_octave" && with_octave=octave
 
 AC_CHECK_PROG(HAVE_OCTAVE,$with_octave,yes,no)
 
