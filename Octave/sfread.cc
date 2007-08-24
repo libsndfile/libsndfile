@@ -60,6 +60,9 @@ Read a sound file from disk using libsndfile.\n\
 	dim.resize (2) ;
 	dim (0) = sfinfo.frames ;
 	dim (1) = sfinfo.channels ;
+
+	puts ("Should probably be using Matrix instead.") ;
+
 	NDArray out = NDArray (dim, 0.0) ;
 
 	float buffer [BUFFER_FRAMES * sfinfo.channels] ;
@@ -67,7 +70,7 @@ Read a sound file from disk using libsndfile.\n\
 	sf_count_t total = 0 ;
 
 	do
-	{	readcount = sf_read_float (file, buffer, BUFFER_FRAMES) ;
+	{	readcount = sf_readf_float (file, buffer, BUFFER_FRAMES) ;
 
 		/* Make sure we don't read more frames than we allocated. */
 		if (total + readcount > sfinfo.frames)
