@@ -6,6 +6,8 @@ octconfigdir = $(exec_prefix)/share/octave/site/m
 octconfig_DATA = sndfile_load.m sndfile_save.m sndfile_play.m
 	
 
+sfread.oct : sfread.cc
+	$(MKOCTFILE) $< -lsndfile
 
 %.o: %.c ; $(MKOCTFILE) -c $<
 %.o: %.f ; $(MKOCTFILE) -c $<
