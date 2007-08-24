@@ -16,12 +16,12 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-//#include <cstdio>
 #include <octave/oct.h>
 
 #include "sndfile.h"
 
-#define FOUR_GIG 	(0x100000000LL)
+#define FOUR_GIG 		(0x100000000LL)
+#define	BUFFER_FRAMES	8192
 
 DEFUN_DLD (sfread, args, nargout , "\
 -*- texinfo -*-\n\
@@ -30,44 +30,44 @@ Read a sound file from disk using libsndfile.\n\
 \n\
 @seealso{wavread}\n\
 @end deftypefn\n\
-") {
-    SNDFILE * file ;
+")
+{	SNDFILE * file ;
 	SF_INFO sfinfo ;
 
-    octave_value_list retval ;
+	octave_value_list retval ;
 
-    int nargin  = args.length () ;
+	int nargin  = args.length () ;
 
-    /* Bail out if the input parameters are bad. */
-    if ((nargin != 1) || !args (0) .is_string () || (nargout < 1))
+	/* Bail out if the input parameters are bad. */
+	if ((nargin != 1) || !args (0) .is_string () || (nargout < 1))
 	{	print_usage () ;
 		return retval ;
-    	} ;
+		} ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
-    std::string filename = args (0) .string_value () ;
+	std::string filename = args (0).string_value () ;
 
-    if ((file = sf_open (filename.c_str (), SFM_READ, &sfinfo)) == NULL)
+	if ((file = sf_open (filename.c_str (), SFM_READ, &sfinfo)) == NULL)
 	{	error ("sfread: couldn't open file %s : %s", filename.c_str (), sf_strerror (NULL)) ;
 		return retval ;
-    	} ;
+		} ;
 
 	if (sfinfo.frames > FOUR_GIG)
-		printf ("This is a really huge file (%d Meg).\nYou may run out of memory trying to load it.\n", sfinfo.frames / (1024 * 1024)) ;
+		printf ("This is a really huge file (%lld frames).\nYou may run out of memory trying to load it.\n", sfinfo.frames) ;
 
-    dim_vector dim = dim_vector () ;
-    dim.resize (2) ;
-    dim (0) = sfinfo.frames ;
-    dim (1) = sfinfo.channels ;
-    NDArray out = NDArray (dim, 0.0) ;
+	dim_vector dim = dim_vector () ;
+	dim.resize (2) ;
+	dim (0) = sfinfo.frames ;
+	dim (1) = sfinfo.channels ;
+	NDArray out = NDArray (dim, 0.0) ;
 
-	float buffer [4096 * sfinfo.channels] ;
+	float buffer [BUFFER_FRAMES * sfinfo.channels] ;
 	int readcount ;
 	sf_count_t total = 0 ;
 
 	do
-	{	readcount = sf_read_float (file, buffer, 4096) ;
+	{	readcount = sf_read_float (file, buffer, BUFFER_FRAMES) ;
 
 		/* Make sure we don't read more frames than we allocated. */
 		if (total + readcount > sfinfo.frames)
@@ -81,10 +81,10 @@ Read a sound file from disk using libsndfile.\n\
 		total += readcount ;
 	} while (readcount > 0 && total < sfinfo.frames) ;
 
-    retval.append (out.squeeze ()) ;
+	retval.append (out.squeeze ()) ;
 
-    /* Clean up. */
-    sf_close (file) ;
+	/* Clean up. */
+	sf_close (file) ;
 
-    return retval ;
+	return retval ;
 } /* sfread */
