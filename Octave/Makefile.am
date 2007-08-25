@@ -34,6 +34,15 @@ sfwrite_oct_SOURCES = format.cc sfwrite.cc
 sfwrite_oct_CXXFLAGS = $(OCT_CXXFLAGS) $(INCLUDES)
 sfwrite_oct_LDADD = $(OCT_LIB_DIR) $(OCT_LIBS) $(SNDFILEDIR)/libsndfile.la
 
+
+# Allow for the test being run in the build dir, but the test script
+# being located in the source dir. 
+check :
+	$(srcdir)/octave_test.m
+
+
+# Since the octave modules are installed in a special location, a custom install
+# and uninstall routine must be specified.
 install-exec-local : $(oct_modules)
 	@$(NORMAL_INSTALL)
 	test -z "$(OCTAVE_DEST_ODIR)" || $(mkdir_p) "$(DESTDIR)$(OCTAVE_DEST_ODIR)"
@@ -56,5 +65,3 @@ uninstall-local :
 	  rm -f "$(DESTDIR)$(OCTAVE_DEST_ODIR)/$$f"; \
 	done
 
-check :
-	./octave_test.m
