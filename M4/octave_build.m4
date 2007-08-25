@@ -31,8 +31,8 @@ if test "x$prog_concat" = "xyesyesyes" ; then
 		AC_MSG_WARN([** Mismatch between versions of octave and octave-config. **])
 		AC_MSG_WARN([** Octave libsndfile modules will not be built.           **])
 	else
-		OCTAVE_ODIR=`$OCTAVE_CONFIG --oct-site-dir`
-		OCTAVE_MDIR=`$OCTAVE_CONFIG --m-site-dir`
+		OCTAVE_DEST_ODIR=`$OCTAVE_CONFIG --oct-site-dir | sed 's%^/usr%${prefix}%'`
+		OCTAVE_DEST_MDIR=`$OCTAVE_CONFIG --m-site-dir | sed 's%^/usr%${prefix}%'`
 
 		AC_MSG_RESULT([retrieving compile and link flags from $MKOCTFILE])
 		OCT_CXXFLAGS=`$MKOCTFILE -p ALL_CXXFLAGS`
@@ -44,8 +44,8 @@ if test "x$prog_concat" = "xyesyesyes" ; then
 		fi
 	fi
 
-AC_SUBST(OCTAVE_ODIR)
-AC_SUBST(OCTAVE_MDIR)
+AC_SUBST(OCTAVE_DEST_ODIR)
+AC_SUBST(OCTAVE_DEST_MDIR)
 
 AC_SUBST(OCT_CXXFLAGS)
 AC_SUBST(OCT_LIB_DIR)
