@@ -47,7 +47,7 @@ hash_of_str (const std::string & str)
 {
 	int hash = 0 ;
 
-	for (int k = 0 ; k < str.length () ; k++)
+	for (unsigned k = 0 ; k < str.length () ; k++)
 		hash = (hash * 3) + tolower (str [k]) ;
 
 	return hash ;

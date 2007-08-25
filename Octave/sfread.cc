@@ -77,7 +77,7 @@ Read a sound file from disk using libsndfile.\n\
 		if (total + readcount > sfinfo.frames)
 			readcount = sfinfo.frames - total ;
 
-		for (unsigned ch = 0 ; ch < sfinfo.channels ; ch++)
+		for (int ch = 0 ; ch < sfinfo.channels ; ch++)
 		{	for (int k = 0 ; k < readcount ; k++)
 				out (total + k, ch) = buffer [k * sfinfo.channels + ch] ;
 			} ;
