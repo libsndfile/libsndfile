@@ -17,3 +17,5 @@
 */
 
 int format_of_str (const std::string & fmt) ;
+
+void string_of_format (std::string & fmt, int format) ;

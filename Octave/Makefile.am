@@ -9,7 +9,7 @@ octconfig_DATA = sndfile_load.m sndfile_save.m sndfile_play.m
 
 all : sfread.oct sfwrite.oct
 
-sfread.oct : sfread.cc
+sfread.oct : format.o sfread.cc
 	$(MKOCTFILE) $+ -lsndfile -o $@
 
 sfwrite.oct : format.o sfwrite.cc

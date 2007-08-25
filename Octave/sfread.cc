@@ -20,12 +20,14 @@
 
 #include "sndfile.h"
 
+#include "format.h"
+
 #define FOUR_GIG 		(0x100000000LL)
 #define	BUFFER_FRAMES	8192
 
 DEFUN_DLD (sfread, args, nargout , "\
 -*- texinfo -*-\n\
-@deftypefn {Function File} {@var{I} =} sfread (@var{filename})\n\
+@deftypefn {Function File} {@var{I},@var{srate},@var{format} =} sfread (@var{filename})\n\
 Read a sound file from disk using libsndfile.\n\
 \n\
 @seealso{wavread}\n\
@@ -39,7 +41,7 @@ Read a sound file from disk using libsndfile.\n\
 	int nargin  = args.length () ;
 
 	/* Bail out if the input parameters are bad. */
-	if ((nargin != 1) || !args (0) .is_string () || (nargout < 1))
+	if ((nargin != 1) || !args (0) .is_string () || nargout < 1 || nargout > 3)
 	{	print_usage () ;
 		return retval ;
 		} ;
@@ -61,9 +63,8 @@ Read a sound file from disk using libsndfile.\n\
 	dim (0) = sfinfo.frames ;
 	dim (1) = sfinfo.channels ;
 
-	puts ("Should probably be using Matrix instead.") ;
-
-	NDArray out = NDArray (dim, 0.0) ;
+	/* Should I be using Matrix instead? */
+	NDArray out (dim, 0.0) ;
 
 	float buffer [BUFFER_FRAMES * sfinfo.channels] ;
 	int readcount ;
@@ -85,6 +86,15 @@ Read a sound file from disk using libsndfile.\n\
 	} while (readcount > 0 && total < sfinfo.frames) ;
 
 	retval.append (out.squeeze ()) ;
+
+	if (nargout >= 2)
+		retval.append ((octave_uint32) sfinfo.samplerate) ;
+
+	if (nargout >= 3)
+	{	std::string fmt ("") ;
+		string_of_format (fmt, sfinfo.format) ;
+		retval.append (fmt) ;
+		} ;
 
 	/* Clean up. */
 	sf_close (file) ;
