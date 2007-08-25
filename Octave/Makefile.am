@@ -3,7 +3,8 @@
 # Prevent any extension.
 EXEEXT =
 
-EXTRA_DIST = sndfile_load.m sndfile_save.m sndfile_play.m
+EXTRA_DIST = sndfile_load.m sndfile_save.m sndfile_play.m \
+	octave_test.m
 
 octconfigdir = $(exec_prefix)/share/octave/site/m
 octconfig_DATA = sndfile_load.m sndfile_save.m sndfile_play.m
@@ -54,3 +55,6 @@ uninstall-local :
 	  echo " rm -f '$(DESTDIR)$(OCTAVE_DEST_ODIR)/$$f'"; \
 	  rm -f "$(DESTDIR)$(OCTAVE_DEST_ODIR)/$$f"; \
 	done
+
+check :
+	./octave_test.m
