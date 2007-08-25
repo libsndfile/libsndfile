@@ -37,7 +37,22 @@ if test "x$prog_concat" = "xyesyesyes" ; then
 		AC_MSG_RESULT([retrieving compile and link flags from $MKOCTFILE])
 		OCT_CXXFLAGS=`$MKOCTFILE -p ALL_CXXFLAGS`
 		OCT_LIB_DIR=`$MKOCTFILE -p LFLAGS`
-		OCT_LIBS=`$MKOCTFILE -p OCTAVE_LIBS`
+
+		dnl Pinched from mkoctfile.
+		dnl
+		dnl LINK_DEPS="$LFLAGS $OCTAVE_LIBS $LDFLAGS $BLAS_LIBS $FFTW_LIBS $LIBS $FLIBS"
+		dnl cmd="$DL_LD $DL_LDFLAGS $pass_on_options -o $octfile $objfiles $ldflags $LINK_DEPS"
+
+
+		OCT_LIBS=`$MKOCTFILE -p LFLAGS`
+		OCT_LIBS="$OCT_LIBS `$MKOCTFILE -p OCTAVE_LIBS`"
+		OCT_LIBS="$OCT_LIBS `$MKOCTFILE -p LDFLAGS`"
+		OCT_LIBS="$OCT_LIBS `$MKOCTFILE -p BLAS_LIBS`"
+		OCT_LIBS="$OCT_LIBS `$MKOCTFILE -p FFTW_LIBS`"
+		OCT_LIBS="$OCT_LIBS `$MKOCTFILE -p LIBS`"
+		OCT_LIBS="$OCT_LIBS `$MKOCTFILE -p FLIBS`"
+
+		OCT_LIBS="`$MKOCTFILE -p DL_LDFLAGS` $OCT_LIBS"
 
 		OCTAVE_BUILD=yes
 		AC_MSG_RESULT([building octave libsndfile module... $OCTAVE_BUILD])
