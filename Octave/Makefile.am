@@ -3,8 +3,12 @@
 # Prevent any extension.
 EXEEXT =
 
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+
 EXTRA_DIST = sndfile_load.m sndfile_save.m sndfile_play.m \
-	octave_test.m
+	octave_test.m $(oct_module_srcs)
 
 octconfigdir = $(exec_prefix)/share/octave/site/m
 octconfig_DATA = sndfile_load.m sndfile_save.m sndfile_play.m
@@ -16,23 +20,29 @@ OCT_CXXFLAGS = @OCT_CXXFLAGS@
 OCT_LIB_DIR = @OCT_LIB_DIR@
 OCT_LIBS = @OCT_LIBS@
 
-SNDFILEDIR = ../src
-INCLUDES = -I$(srcdir)/$(SNDFILEDIR)
+SNDFILEDIR = $(top_builddir)/src
+INCLUDES = -I$(SNDFILEDIR)
 
+oct_module_srcs = sfread.cc sfwrite.cc format.cc
 oct_modules = sfread.oct sfwrite.oct
 
 # Make these noinst so they can be installed manually.
-noinst_PROGRAMS = $(oct_modules)
+noinst_DATA = $(oct_modules)
 
 noinst_HEADERS = format.h
 
-sfread_oct_SOURCES = format.cc sfread.cc
-sfread_oct_CXXFLAGS = $(OCT_CXXFLAGS) $(INCLUDES)
-sfread_oct_LDADD = $(OCT_LIB_DIR) $(OCT_LIBS) $(SNDFILEDIR)/libsndfile.la
 
-sfwrite_oct_SOURCES = format.cc sfwrite.cc
-sfwrite_oct_CXXFLAGS = $(OCT_CXXFLAGS) $(INCLUDES)
-sfwrite_oct_LDADD = $(OCT_LIB_DIR) $(OCT_LIBS) $(SNDFILEDIR)/libsndfile.la
+# Need to jump through extra hoops here because we only these Octave
+# modules must be dynamic. However, to make the tests pass, they need
+# to be statically linked to the libsndfile that has just been built.
+#
+# Maybe should create both dynamic and static versions and install
+# the dynamic and test the static.
+sfread.oct : format.cc sfread.cc
+	$(CXXLINK) $(OCT_CXXFLAGS) $(INCLUDES) $+ $(OCT_LIB_DIR) $(OCT_LIBS) -static $(SNDFILEDIR)/libsndfile.la
+
+sfwrite.oct : format.cc sfwrite.cc
+	$(CXXLINK) $(OCT_CXXFLAGS) $(INCLUDES) $+ $(OCT_LIB_DIR) $(OCT_LIBS) -static $(SNDFILEDIR)/libsndfile.la
 
 
 # Allow for the test being run in the build dir, but the test script
@@ -65,3 +75,5 @@ uninstall-local :
 	  rm -f "$(DESTDIR)$(OCTAVE_DEST_ODIR)/$$f"; \
 	done
 
+clean-local :
+	rm -f $(oct_modules)
