@@ -94,7 +94,7 @@ Write a sound file to disk using libsndfile.\n\
 		if (total + writecount > rows)
 			writecount = rows - total ;
 
-		for (unsigned ch = 0 ; ch < sfinfo.channels ; ch++)
+		for (int ch = 0 ; ch < sfinfo.channels ; ch++)
 		{	for (int k = 0 ; k < writecount ; k++)
 				buffer [k * sfinfo.channels + ch] = data (total + k, ch) ;
 			} ;
