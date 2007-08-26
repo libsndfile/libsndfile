@@ -35,7 +35,9 @@ if test "x$prog_concat" = "xyesyesyes" ; then
 		OCTAVE_DEST_MDIR=`$OCTAVE_CONFIG --m-site-dir | sed 's%^/usr%${prefix}%'`
 
 		AC_MSG_RESULT([retrieving compile and link flags from $MKOCTFILE])
+
 		OCT_CXXFLAGS=`$MKOCTFILE -p ALL_CXXFLAGS`
+		OCT_CXXFLAGS="$OCT_CXXFLAGS `$MKOCTFILE -p FPICFLAG`"
 		OCT_LIB_DIR=`$MKOCTFILE -p LFLAGS`
 
 		dnl Pinched from mkoctfile.
