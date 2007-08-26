@@ -48,7 +48,7 @@ sfwrite.oct : format.cc sfwrite.cc
 # Allow for the test being run in the build dir, but the test script
 # being located in the source dir.
 check :
-	$(srcdir)/octave_test.sh
+	octave_src_dir=$(srcdir) $(srcdir)/octave_test.sh
 
 
 # Since the octave modules are installed in a special location, a custom install

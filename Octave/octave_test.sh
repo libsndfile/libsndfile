@@ -6,11 +6,6 @@ if [ -d Octave ]; then
 	cd Octave
 	fi
 
-if [ ! -f sfread.cc ]; then
-	echo "Can't find sfread.cc. Probably being run from incorrect dir."
-	exit 1
-	fi
-
 # Find libsndfile shared object.
 libsndfile_so_location=""
 
@@ -51,7 +46,9 @@ case `file -b $sfread_write_oct_location/sfread.oct` in
 
 LD_LIBRARY_PATH="$libsndfile_so_location:$LD_LIBRARY_PATH"
 
-octave_script="`pwd`/octave_test.m"
+octave_src_dir=`(cd $octave_src_dir && pwd)`
+
+octave_script="$octave_src_dir/octave_test.m"
 
 (cd $sfread_write_oct_location && octave -qH $octave_script)
 
