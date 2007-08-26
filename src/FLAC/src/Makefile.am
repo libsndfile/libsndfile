@@ -18,7 +18,6 @@
 SUBDIRS = \
 	libFLAC \
 	share \
-	monkeys_audio_utilities \
 	test_grabbag \
 	test_libs_common \
 	test_libFLAC \

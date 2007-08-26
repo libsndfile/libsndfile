@@ -621,9 +621,6 @@ AC_CONFIG_FILES([ \
 	src/FLAC/src/share/utf8/Makefile src/FLAC/src/test_libFLAC/Makefile \
 	src/FLAC/src/test_libs_common/Makefile src/FLAC/src/test_seeking/Makefile \
 	src/FLAC/src/test_streams/Makefile src/FLAC/test/Makefile \
-	src/FLAC/src/monkeys_audio_utilities/Makefile \
-	src/FLAC/src/monkeys_audio_utilities/flac_mac/Makefile \
-	src/FLAC/src/monkeys_audio_utilities/flac_ren/Makefile \
 	src/FLAC/src/test_grabbag/Makefile src/FLAC/src/test_grabbag/cuesheet/Makefile \
 	src/FLAC/src/test_grabbag/picture/Makefile \
 	\
