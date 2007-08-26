@@ -38,23 +38,25 @@ if test $ac_cv_c_clip_positive = unknown ; then
 	#define __USE_ISOC9X	1
 	#include <math.h>
 	int main (void)
-	{	double	fval [] = { 1.0 * 0x7FFFFFFF, 1.1 * 0x7FFFFFFF, 1.2 * 0x7FFFFFFF } ;
+	{	double	fval ;
+		int k, ival ;
 
-		if (lrint (fval [0]) < 0)
-			return 0 ;
+		fval = 1.0 * 0x7FFFFFFF ;
+		for (k = 0 ; k < 100 ; k++)
+		{	ival = (lrint (fval)) >> 24 ;
+			if (ival != 127)
+				return 1 ;
 		
-		if (lrint (fval [1]) < 0)
-			return 0 ;
+			fval *= 1.2499999 ;
+			} ;
 		
-		if (lrint (fval [2]) < 0)
 			return 0 ;
-		
-		return 1 ;
 		}
-		]], , ac_cv_c_clip_positive=yes, 
+		]],
+		ac_cv_c_clip_positive=yes,
+		ac_cv_c_clip_positive=no,
 		ac_cv_c_clip_positive=unknown
 		)
-
 
 	AC_TRY_RUN(
 	[[
@@ -64,23 +66,25 @@ if test $ac_cv_c_clip_positive = unknown ; then
 	#define __USE_ISOC9X	1
 	#include <math.h>
 	int main (void)
-	{	double	fval [] = { -8.0 * 0x10000000, -8.8 * 0x10000000, -9.6 * 0x10000000 } ;
+	{	double	fval ;
+		int k, ival ;
 
-		if (lrint (fval [0]) > 0)
-			return 0 ;
+		fval = -8.0 * 0x10000000 ;
+		for (k = 0 ; k < 100 ; k++)
+		{	ival = (lrint (fval)) >> 24 ;
+			if (ival != -128)
+				return 1 ;
 		
-		if (lrint (fval [1]) > 0)
-			return 0 ;
+			fval *= 1.2499999 ;
+			} ;
 		
-		if (lrint (fval [2]) > 0)
 			return 0 ;
-		
-		return 1 ;
 		}
-		]], , ac_cv_c_clip_negative=yes, 
+		]],
+		ac_cv_c_clip_negative=yes,
+		ac_cv_c_clip_negative=no,
 		ac_cv_c_clip_negative=unknown
 		)
-
 	fi
 
 if test $ac_cv_c_clip_positive = yes ; then

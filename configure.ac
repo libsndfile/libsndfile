@@ -36,7 +36,7 @@ SHARED_VERSION_INFO="1:18:0"
 AC_PROG_CC
 AM_PROG_LIBTOOL
 
-AC_CHECK_PROG(autogen, autogen, yes, no)
+AC_CHECK_PROG(HAVE_AUTOGEN, autogen, yes, no)
 
 AC_PROG_INSTALL
 AC_PROG_LN_S
@@ -263,6 +263,13 @@ case "$host_os" in
 	esac
 
 #====================================================================================
+# Check for requirements for building plugins for other languages/enviroments.
+
+dnl Octave maths environment http://www.octave.org/
+AC_OCTAVE_BUILD
+
+
+#====================================================================================
 # Check for libsqlite3 (only used in regtest).
 
 ac_cv_sqlite3=no
@@ -469,7 +476,7 @@ if test $ac_cv_sizeof_double != 8 ; then
 	AC_MSG_WARN([[******************************************************************]])
 	fi
 
-if test x"$ac_cv_prog_autogen" = "xno" ; then
+if test x"$ac_cv_prog_HAVE_AUTOGEN" = "xno" ; then
 	AC_MSG_WARN([[Touching files in directory tests/.]])
 	touch tests/*.c tests/*.h
 	fi

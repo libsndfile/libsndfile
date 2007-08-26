@@ -1,3 +1,9 @@
+2007-08-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac Octave/* M4/octave_*
+    Bunch of changes to add ability to build GNU Octave modules to read/write
+    sound files using libsndfile from Octave.
+
 2007-08-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * acinclude.m4 configure.ac ...
