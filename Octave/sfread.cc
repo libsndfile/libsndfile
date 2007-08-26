@@ -56,7 +56,7 @@ Read a sound file from disk using libsndfile.\n\
 		} ;
 
 	if (sfinfo.frames > FOUR_GIG)
-		printf ("This is a really huge file (%lld frames).\nYou may run out of memory trying to load it.\n", sfinfo.frames) ;
+		printf ("This is a really huge file (%lld frames).\nYou may run out of memory trying to load it.\n", (long long) sfinfo.frames) ;
 
 	dim_vector dim = dim_vector () ;
 	dim.resize (2) ;

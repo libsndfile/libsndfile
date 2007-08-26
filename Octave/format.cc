@@ -28,7 +28,7 @@ static void
 str_split (const std::string & str, const std::string & delim, std::vector <std::string> & output)
 {
     unsigned int offset = 0 ;
-    unsigned int delim_index = 0 ;
+    size_t delim_index = 0 ;
 
     delim_index = str.find (delim, offset) ;
 
