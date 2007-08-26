@@ -2,8 +2,7 @@
 
 SUBDIRS = M4 man doc Win32 src Octave examples regtest tests
 DIST_SUBDIRS = $(SUBDIRS)
-EXTRA_DIST = reconfigure.mk libsndfile.spec.in sndfile.pc.in \
-	Mingw-make-dist.sh
+EXTRA_DIST = libsndfile.spec.in sndfile.pc.in Mingw-make-dist.sh
 			
 			 
 pkgconfigdir = $(libdir)/pkgconfig
