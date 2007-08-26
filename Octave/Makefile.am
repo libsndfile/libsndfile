@@ -8,7 +8,7 @@ CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 EXTRA_DIST = sndfile_load.m sndfile_save.m sndfile_play.m \
-	octave_test.m $(oct_module_srcs)
+	octave_test.m octave_test.sh $(oct_module_srcs)
 
 octconfigdir = $(exec_prefix)/share/octave/site/m
 octconfig_DATA = sndfile_load.m sndfile_save.m sndfile_play.m
@@ -39,16 +39,16 @@ noinst_HEADERS = format.h
 # Maybe should create both dynamic and static versions and install
 # the dynamic and test the static.
 sfread.oct : format.cc sfread.cc
-	$(CXXLINK) $(OCT_CXXFLAGS) $(INCLUDES) $+ $(OCT_LIB_DIR) $(OCT_LIBS) -static $(SNDFILEDIR)/libsndfile.la
+	$(CXXLINK) $(OCT_CXXFLAGS) $(INCLUDES) $+ $(OCT_LIB_DIR) $(OCT_LIBS) $(SNDFILEDIR)/libsndfile.la
 
 sfwrite.oct : format.cc sfwrite.cc
-	$(CXXLINK) $(OCT_CXXFLAGS) $(INCLUDES) $+ $(OCT_LIB_DIR) $(OCT_LIBS) -static $(SNDFILEDIR)/libsndfile.la
+	$(CXXLINK) $(OCT_CXXFLAGS) $(INCLUDES) $+ $(OCT_LIB_DIR) $(OCT_LIBS) $(SNDFILEDIR)/libsndfile.la
 
 
 # Allow for the test being run in the build dir, but the test script
-# being located in the source dir. 
+# being located in the source dir.
 check :
-	$(srcdir)/octave_test.m
+	$(srcdir)/octave_test.sh
 
 
 # Since the octave modules are installed in a special location, a custom install
