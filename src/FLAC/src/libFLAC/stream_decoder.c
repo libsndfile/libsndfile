@@ -2078,7 +2078,7 @@ FLAC__bool read_frame_(FLAC__StreamDecoder *decoder, FLAC__bool *got_a_frame, FL
 						decoder->private_->output[0][i] = (mid + side) >> 1;
 						decoder->private_->output[1][i] = (mid - side) >> 1;
 #else
-						//@@@@@@ OPT: try without 'side' temp variable
+						/* OPT: without 'side' temp variable */
 						mid = (decoder->private_->output[0][i] << 1) | (decoder->private_->output[1][i] & 1); /* i.e. if 'side' is odd... */
 						decoder->private_->output[0][i] = (mid + decoder->private_->output[1][i]) >> 1;
 						decoder->private_->output[1][i] = (mid - decoder->private_->output[1][i]) >> 1;

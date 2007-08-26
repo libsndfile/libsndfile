@@ -577,12 +577,63 @@ FLAC_API FLAC__bool FLAC__metadata_simple_iterator_prev(FLAC__Metadata_SimpleIte
 	return true;
 }
 
+FLAC_API FLAC__bool FLAC__metadata_simple_iterator_is_last(const FLAC__Metadata_SimpleIterator *iterator)
+{
+	FLAC__ASSERT(0 != iterator);
+	FLAC__ASSERT(0 != iterator->file);
+
+	return iterator->is_last;
+}
+
+FLAC_API off_t FLAC__metadata_simple_iterator_get_block_offset(const FLAC__Metadata_SimpleIterator *iterator)
+{
+	FLAC__ASSERT(0 != iterator);
+	FLAC__ASSERT(0 != iterator->file);
+
+	return iterator->offset[iterator->depth];
+}
+
 FLAC_API FLAC__MetadataType FLAC__metadata_simple_iterator_get_block_type(const FLAC__Metadata_SimpleIterator *iterator)
 {
 	FLAC__ASSERT(0 != iterator);
 	FLAC__ASSERT(0 != iterator->file);
 
 	return iterator->type;
+}
+
+FLAC_API unsigned FLAC__metadata_simple_iterator_get_block_length(const FLAC__Metadata_SimpleIterator *iterator)
+{
+	FLAC__ASSERT(0 != iterator);
+	FLAC__ASSERT(0 != iterator->file);
+
+	return iterator->length;
+}
+
+FLAC_API FLAC__bool FLAC__metadata_simple_iterator_get_application_id(FLAC__Metadata_SimpleIterator *iterator, FLAC__byte *id)
+{
+	const unsigned id_bytes = FLAC__STREAM_METADATA_APPLICATION_ID_LEN / 8;
+
+	FLAC__ASSERT(0 != iterator);
+	FLAC__ASSERT(0 != iterator->file);
+	FLAC__ASSERT(0 != id);
+
+	if(iterator->type != FLAC__METADATA_TYPE_APPLICATION) {
+		iterator->status = FLAC__METADATA_SIMPLE_ITERATOR_STATUS_ILLEGAL_INPUT;
+		return false;
+	}
+
+	if(fread(id, 1, id_bytes, iterator->file) != id_bytes) {
+		iterator->status = FLAC__METADATA_SIMPLE_ITERATOR_STATUS_READ_ERROR;
+		return false;
+	}
+
+	/* back up */
+	if(0 != fseeko(iterator->file, -((int)id_bytes), SEEK_CUR)) {
+		iterator->status = FLAC__METADATA_SIMPLE_ITERATOR_STATUS_SEEK_ERROR;
+		return false;
+	}
+
+	return true;
 }
 
 FLAC_API FLAC__StreamMetadata *FLAC__metadata_simple_iterator_get_block(FLAC__Metadata_SimpleIterator *iterator)
@@ -2365,7 +2416,7 @@ FLAC__Metadata_SimpleIteratorStatus read_metadata_block_data_picture_cb_(FLAC__I
 	len = FLAC__STREAM_METADATA_PICTURE_TYPE_LEN / 8;
 	if(read_cb(buffer, 1, len, handle) != len)
 		return FLAC__METADATA_SIMPLE_ITERATOR_STATUS_READ_ERROR;
-	block->type = unpack_uint32_(buffer, len);
+	block->type = (FLAC__StreamMetadata_Picture_Type)unpack_uint32_(buffer, len);
 
 	if((status = read_metadata_block_data_picture_cstring_cb_(handle, read_cb, (FLAC__byte**)(&(block->mime_type)), &len, FLAC__STREAM_METADATA_PICTURE_MIME_TYPE_LENGTH_LEN)) != FLAC__METADATA_SIMPLE_ITERATOR_STATUS_OK)
 		return status;
