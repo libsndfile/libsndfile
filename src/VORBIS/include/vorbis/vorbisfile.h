@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: stdio-based convenience library for opening/seeking/decoding
- last mod: $Id: vorbisfile.h 13293 2007-07-24 00:09:47Z xiphmont $
+ last mod: $Id: vorbisfile.h 13630 2007-08-26 00:38:33Z erikd $
 
  ********************************************************************/
 
@@ -52,6 +52,19 @@ static int _ov_header_fseek_wrap(FILE *f,ogg_int64_t off,int whence){
   if(f==NULL)return(-1);
   return fseek(f,off,whence);
 }
+
+/* These structs below (OV_CALLBACKS_DEFAULT etc)are defined here as static
+ * data. That means that every file which includes this header will get its
+ * own copy of these structs whether it uses them or not.
+ *
+ * It would be *much* better to move these the vorbisfile.c, make them
+ * publicly available and then define them here as externs so that
+ * only one copy of them (the one in the library's vorbisfile.c) is ever
+ * created.
+ *
+ * Unfortunately this cannot be done at the moment because doing so would
+ * break the libvorbisfile ABI. A good time to do that would be at some
+ * other time when the ABI is being broken for some other reason. */
 
 static ov_callbacks OV_CALLBACKS_DEFAULT = {
   (size_t (*)(void *, size_t, size_t, void *))  fread,
