@@ -60,7 +60,7 @@ static FLAC__bool copy_bytes_(FLAC__byte **to, const FLAC__byte *from, unsigned 
 	FLAC__ASSERT(0 != to);
 	if(bytes > 0 && 0 != from) {
 		FLAC__byte *x;
-		if(0 == (x = (FLAC__byte*)malloc(bytes)))
+		if(0 == (x = malloc(bytes)))
 			return false;
 		memcpy(x, from, bytes);
 		*to = x;
