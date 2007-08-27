@@ -1,3 +1,8 @@
+2007-08-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/development.html
+    Add note about bzr repository directory looking empty.
+
 2007-08-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac Octave/* M4/octave_*
