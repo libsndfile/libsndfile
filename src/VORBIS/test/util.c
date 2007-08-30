@@ -21,28 +21,7 @@
 #include <string.h>
 #include <errno.h>
 
-#include <vorbis/codec.h>
-#include <vorbis/vorbisenc.h>
-
 #include "util.h"
-
-void
-gen_windowed_sine (float *data, int len, float maximum)
-{    int k ;
-
-    memset (data, 0, len * sizeof (float)) ;
-
-    len /= 2 ;
-
-    for (k = 0 ; k < len ; k++)
-    {    data [k] = sin (2.0 * k * M_PI * 1.0 / 32.0 + 0.4) ;
-
-        /* Apply Hanning Window. */
-        data [k] *= maximum * (0.5 - 0.5 * cos (2.0 * M_PI * k / ((len) - 1))) ;
-        }
-
-    return ;
-}
 
 void
 set_data_in (float * data, unsigned len, float value)
@@ -50,4 +29,19 @@ set_data_in (float * data, unsigned len, float value)
 
 	for (k = 0 ; k < len ; k++)
 		data [k] = value ;
+} /* set_data_in */
+
+int
+find_max_pos_peaks (PAIRS * pairs, unsigned count, const float * data, unsigned datalen)
+{	unsigned di ;
+
+	memset (pairs, 0, count * sizeof (pairs [0])) ;
+	data = NULL ;
+
+	for (di = 1 ; di < datalen - 1 ; di++)
+	{
+	
+		} ;
+
+	return 0 ;
 }

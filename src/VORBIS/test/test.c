@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #include "util.h"
@@ -24,12 +25,11 @@
 
 #define ARRAY_LEN(x)   (sizeof(x)/sizeof(x[0]))
 
-#define DATA_LEN	2048
-
 #define MAX(a,b)	((a) > (b) ? (a) : (b))
 
 
-static int short_data_test (const char * filename, int srate) ;
+static int mono_short_data_test (const char * filename, int srate) ;
+static int mono_dual_short_test (const char * filename, int srate) ;
 
 int
 main (void)
@@ -48,7 +48,9 @@ main (void)
 		printf ("    %-20s : ", filename) ;
 		fflush (stdout) ;
 
-		if (short_data_test (filename, sample_rates [k]))
+		if (mono_short_data_test (filename, sample_rates [k]))
+			errors ++ ;
+		else if (mono_dual_short_test (filename, sample_rates [k]))
 			errors ++ ;
 
 		if (errors == 0)
@@ -63,18 +65,20 @@ main (void)
 } /* main */
 
 static int
-short_data_test (const char * filename, int srate)
-{	static float data_out [DATA_LEN] ;
-	static float data_in [DATA_LEN] ;
+mono_short_data_test (const char * filename, int srate)
+{	static float data_out [2048] ;
+	static float data_in [2048] ;
 
 	float max_abs = 0.0 ;
-	unsigned k ;
+	unsigned k, len ;
 
-	for (k = 0 ; k < ARRAY_LEN (data_out) ; k++)
+	memset (data_out, 0, sizeof (data_out)) ;
+	len = ARRAY_LEN (data_out) / 2 ;
+	for (k = 0 ; k < len ; k++)
     {    data_out [k] = sin (2.0 * k * M_PI * 1.0 / 32.0 + 0.4) ;
 
         /* Apply Hanning Window. */
-        data_out [k] *= 0.95 * (0.5 - 0.5 * cos (2.0 * M_PI * k / (ARRAY_LEN (data_out) - 1))) ;
+        data_out [k] *= 0.95 * (0.5 - 0.5 * cos (2.0 * M_PI * k / (len - 1))) ;
         } ;
 
 	/* Set to known value. */
@@ -89,13 +93,54 @@ short_data_test (const char * filename, int srate)
   		} ;
 
 	if (max_abs < 0.9)
-	{	printf ("Error : max_abs (%f) too small.\n", max_abs) ;
+	{	printf ("%s : max_abs (%f) too small.\n", __func__, max_abs) ;
     	return 1 ;
   		}
 	else if (max_abs > 1.0)
-	{	printf ("Error : max_abs (%f) too big.\n", max_abs) ;
+	{	printf ("%s : max_abs (%f) too big.\n", __func__, max_abs) ;
     	return 1 ;
   		} ;
 
 	return 0 ;
-} /* short_data_test */
+} /* mono_short_data_test */
+
+static int
+mono_dual_short_test (const char * filename, int srate)
+{	static float data_out [4096] ;
+	static float data_in [4096] ;
+
+	float max_abs = 0.0 ;
+	unsigned k, len ;
+
+	memset (data_out, 0, sizeof (data_out)) ;
+	len = ARRAY_LEN (data_out) ;
+	for (k = 0 ; k < len ; k++)
+    {    data_out [k] = 0.5 * (sin (2.0 * k * M_PI * 1.0 / 32.0) + sin (2.0 * k * M_PI * 1.0 / 64.0)) ;
+
+        /* Apply Hanning Window. */
+        data_out [k] *= 0.5 - 0.5 * cos (2.0 * M_PI * k / (len - 1)) ;
+        } ;
+
+	/* Set to known value. */
+	set_data_in (data_in, ARRAY_LEN (data_in), 3.141) ;
+
+	write_vorbis_data_or_die (filename, srate, data_out, ARRAY_LEN (data_out)) ;
+	read_vorbis_data_or_die (filename, srate, data_in, ARRAY_LEN (data_in)) ;
+
+	for (k = 0 ; k < ARRAY_LEN (data_in) ; k++)
+	{	float temp = fabs (data_in [k]) ;
+    	max_abs = MAX (max_abs, temp) ;
+  		} ;
+
+	if (max_abs < 0.85)
+	{	printf ("%s : max_abs (%f) too small.\n", __func__, max_abs) ;
+    	return 1 ;
+  		}
+	else if (max_abs > 0.9)
+	{	printf ("%s : max_abs (%f) too big.\n", __func__, max_abs) ;
+    	return 1 ;
+  		} ;
+
+	return 0 ;
+} /* mono_dual_short_test */
+

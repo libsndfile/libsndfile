@@ -17,8 +17,13 @@
 
 #define ARRAY_LEN(x)   (sizeof(x)/sizeof(x[0]))
 
-/* Create simple test data consisting of a windowed sine wave. */
-void gen_windowed_sine (float *data, int len, float maximum) ;
+typedef struct
+{	int index ;
+	float value ;
+} PAIRS ;
+
 
 /* Set len values of data array to given value. */
 void set_data_in (float * data, unsigned len, float value) ;
+
+int find_max_pos_peaks (PAIRS * pairs, unsigned count, const float * data, unsigned datalen) ;
