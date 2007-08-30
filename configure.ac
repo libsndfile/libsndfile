@@ -620,7 +620,8 @@ AC_CONFIG_FILES([ \
 	src/VORBIS/Makefile src/VORBIS/lib/Makefile src/VORBIS/include/Makefile \
 	src/VORBIS/include/vorbis/Makefile src/VORBIS/lib/modes/Makefile \
 	src/VORBIS/lib/books/floor/Makefile src/VORBIS/lib/books/coupled/Makefile \
-	src/VORBIS/lib/books/uncoupled/Makefile src/VORBIS/lib/books/Makefile
+	src/VORBIS/lib/books/uncoupled/Makefile src/VORBIS/lib/books/Makefile \
+	src/VORBIS/test/Makefile \
 	\
 	src/OGG/include/ogg/Makefile src/OGG/include/Makefile src/OGG/Makefile \
 	man/Makefile examples/Makefile tests/Makefile regtest/Makefile \

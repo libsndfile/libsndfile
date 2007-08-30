@@ -84,3 +84,4 @@ tests/sfversion
 tests/utils.c
 tests/utils.h
 tests/write_read_test.c
+src/VORBIS/test/test

@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: channel mapping 0 implementation
- last mod: $Id: mapping0.c 13578 2007-08-20 10:44:04Z erikd $
+ last mod: $Id: mapping0.c 13657 2007-08-30 02:40:29Z xiphmont $
 
  ********************************************************************/
 
@@ -280,22 +280,28 @@ static int mapping0_forward(vorbis_block *vb){
                                      next major model upgrade. */
 
 #if 0
-    if(vi->channels==2)
+    if(vi->channels==2){
       if(i==0)
 	_analysis_output("pcmL",seq,pcm,n,0,0,total-n/2);
       else
 	_analysis_output("pcmR",seq,pcm,n,0,0,total-n/2);
+    }else{
+      _analysis_output("pcm",seq,pcm,n,0,0,total-n/2);
+    }
 #endif
   
     /* window the PCM data */
     _vorbis_apply_window(pcm,b->window,ci->blocksizes,vb->lW,vb->W,vb->nW);
 
 #if 0
-    if(vi->channels==2)
+    if(vi->channels==2){
       if(i==0)
 	_analysis_output("windowedL",seq,pcm,n,0,0,total-n/2);
       else
 	_analysis_output("windowedR",seq,pcm,n,0,0,total-n/2);
+    }else{
+      _analysis_output("windowed",seq,pcm,n,0,0,total-n/2);
+    }
 #endif
 
     /* transform the PCM data */
@@ -349,6 +355,8 @@ static int mapping0_forward(vorbis_block *vb){
       }else{
 	_analysis_output("fftR",seq,logfft,n/2,1,0,0);
       }
+    }else{
+      _analysis_output("fft",seq,logfft,n/2,1,0,0);
     }
 #endif
 
@@ -419,6 +427,8 @@ static int mapping0_forward(vorbis_block *vb){
 	  _analysis_output("noiseL",seq,noise,n/2,1,0,0);
 	else
 	  _analysis_output("noiseR",seq,noise,n/2,1,0,0);
+      }else{
+	_analysis_output("noise",seq,noise,n/2,1,0,0);
       }
 #endif
 
@@ -438,6 +448,8 @@ static int mapping0_forward(vorbis_block *vb){
 	  _analysis_output("toneL",seq,tone,n/2,1,0,0);
 	else
 	  _analysis_output("toneR",seq,tone,n/2,1,0,0);
+      }else{
+	_analysis_output("tone",seq,tone,n/2,1,0,0);
       }
 #endif
 
@@ -465,6 +477,8 @@ static int mapping0_forward(vorbis_block *vb){
 	    _analysis_output("aotuvM1_L",seq,aotuv,psy_look->n,1,1,0);
 	  else
 	    _analysis_output("aotuvM1_R",seq,aotuv,psy_look->n,1,1,0);
+	}else{
+	  _analysis_output("aotuvM1",seq,aotuv,psy_look->n,1,1,0);
 	}
       }
 #endif
@@ -476,6 +490,8 @@ static int mapping0_forward(vorbis_block *vb){
 	  _analysis_output("mask1L",seq,logmask,n/2,1,0,0);
 	else
 	  _analysis_output("mask1R",seq,logmask,n/2,1,0,0);
+      }else{
+	_analysis_output("mask1",seq,logmask,n/2,1,0,0);
       }
 #endif
 
@@ -508,6 +524,8 @@ static int mapping0_forward(vorbis_block *vb){
 	    _analysis_output("mask2L",seq,logmask,n/2,1,0,0);
 	  else
 	    _analysis_output("mask2R",seq,logmask,n/2,1,0,0);
+	}else{
+	  _analysis_output("mask2",seq,logmask,n/2,1,0,0);
 	}
 #endif
 	
@@ -526,11 +544,14 @@ static int mapping0_forward(vorbis_block *vb){
 			   logmdct);
 
 #if 0
-	if(vi->channels==2)
+	if(vi->channels==2){
 	  if(i==0)
 	    _analysis_output("mask0L",seq,logmask,n/2,1,0,0);
 	  else
 	    _analysis_output("mask0R",seq,logmask,n/2,1,0,0);
+	}else{
+	  _analysis_output("mask0",seq,logmask,n/2,1,0,0);
+	}
 #endif
 
 	floor_posts[i][0]=
