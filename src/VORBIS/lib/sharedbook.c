@@ -625,7 +625,8 @@ static_codebook test1={
   0,
   0,0,0,0,
   NULL,
-  NULL,NULL
+  NULL,NULL,NULL,
+  0
 };
 static float *test1_result=NULL;
   
@@ -636,7 +637,8 @@ static_codebook test2={
   2,
   -533200896,1611661312,4,0,
   full_quantlist1,
-  NULL,NULL
+  NULL,NULL,NULL,
+  0
 };
 static float test2_result[]={-3,-2,-1,0, 1,2,3,4, 5,0,3,-2};
 
@@ -647,7 +649,8 @@ static_codebook test3={
   2,
   -533200896,1611661312,4,1,
   full_quantlist1,
-  NULL,NULL
+  NULL,NULL,NULL,
+  0
 };
 static float test3_result[]={-3,-5,-6,-6, 1,3,6,10, 5,5,8,6};
 
@@ -658,7 +661,8 @@ static_codebook test4={
   1,
   -533200896,1611661312,4,0,
   partial_quantlist1,
-  NULL,NULL
+  NULL,NULL,NULL,
+  0
 };
 static float test4_result[]={-3,-3,-3, 4,-3,-3, -1,-3,-3,
 			      -3, 4,-3, 4, 4,-3, -1, 4,-3,
@@ -677,7 +681,8 @@ static_codebook test5={
   1,
   -533200896,1611661312,4,1,
   partial_quantlist1,
-  NULL,NULL
+  NULL,NULL,NULL,
+  0
 };
 static float test5_result[]={-3,-6,-9, 4, 1,-2, -1,-4,-7,
 			      -3, 1,-2, 4, 8, 5, -1, 3, 0,
@@ -689,7 +694,7 @@ static float test5_result[]={-3,-6,-9, 4, 1,-2, -1,-4,-7,
 			      -3, 1, 0, 4, 8, 7, -1, 3, 2,
 			      -3,-4,-5, 4, 3, 2, -1,-2,-3};
 
-void run_test(static_codebook *b,float *comp){
+static void run_test(static_codebook *b,float *comp){
   float *out=_book_unquantize(b,b->entries,NULL);
   int i;
 
@@ -715,7 +720,7 @@ void run_test(static_codebook *b,float *comp){
   }
 }
 
-int main(){
+int main(void){
   /* run the nine dequant tests, and compare to the hand-rolled results */
   fprintf(stderr,"Dequant test 1... ");
   run_test(&test1,test1_result);
