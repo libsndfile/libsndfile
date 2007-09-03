@@ -1287,9 +1287,11 @@ FILE *get_binary_stdin_(void)
 	 */
 #if defined _MSC_VER || defined __MINGW32__
 	_setmode(_fileno(stdin), _O_BINARY);
-#elif defined __CYGWIN__ || defined __EMX__
+#elif defined __CYGWIN__ 
 	/* almost certainly not needed for any modern Cygwin, but let's be safe... */
 	setmode(_fileno(stdin), _O_BINARY);
+#elif defined __EMX__
+	setmode(fileno(stdin), O_BINARY);
 #endif
 
 	return stdin;
@@ -2043,6 +2045,8 @@ FLAC__bool read_frame_(FLAC__StreamDecoder *decoder, FLAC__bool *got_a_frame, FL
 	}
 	if(!read_zero_padding_(decoder))
 		return false;
+	if(decoder->protected_->state == FLAC__STREAM_DECODER_SEARCH_FOR_FRAME_SYNC) /* means bad sync or got corruption (i.e. "zero bits" were not all zeroes) */
+		return true;
 
 	/*
 	 * Read the frame CRC-16 from the footer and check
