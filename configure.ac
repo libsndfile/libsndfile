@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.57)
 
-AC_INIT([libsndfile],[1.0.18pre15],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.18pre16],[erikd@mega-nerd.com])
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
