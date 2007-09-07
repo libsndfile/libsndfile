@@ -1,3 +1,8 @@
+2007-09-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Makefile.am M4/octave.m4
+    Fix build when Octave headers are not present.
+
 2007-08-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/development.html

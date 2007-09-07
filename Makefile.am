@@ -1,10 +1,14 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = M4 man doc Win32 src Octave examples regtest tests
-DIST_SUBDIRS = $(SUBDIRS)
+if BUILD_OCTAVE_MOD
+octave_dir = Octave
+endif
+
+SUBDIRS = M4 man doc Win32 src $(octave_dir) examples regtest tests
+DIST_SUBDIRS = M4 man doc Win32 src Octave examples regtest tests
 EXTRA_DIST = libsndfile.spec.in sndfile.pc.in Mingw-make-dist.sh
-			
-			 
+
+
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = sndfile.pc
 
