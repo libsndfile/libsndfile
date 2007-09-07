@@ -1,3 +1,11 @@
+2007-09-08
+
+    * src/FLAC/include/FLAC/metadata.h
+    Include <sys/types.h> to prevent compile error on OSX.
+
+    * Octave/octave_test.sh
+    Disable test on OSX. Can't get it to work.
+
 2007-09-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Makefile.am M4/octave.m4
