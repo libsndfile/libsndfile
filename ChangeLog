@@ -1,4 +1,4 @@
-2007-09-08
+2007-09-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/FLAC/include/FLAC/metadata.h
     Include <sys/types.h> to prevent compile error on OSX.
