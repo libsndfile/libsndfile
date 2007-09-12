@@ -1,3 +1,8 @@
+2007-09-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/FLAC
+    Huge merge from FLAC upstream.
+
 2007-09-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/*.c

@@ -490,16 +490,17 @@ FLAC_API FLAC__bool FLAC__format_cuesheet_is_legal(const FLAC__StreamMetadata_Cu
 
 FLAC_API FLAC__bool FLAC__format_picture_is_legal(const FLAC__StreamMetadata_Picture *picture, const char **violation)
 {
-	FLAC__byte *p, *b;
+	char *p;
+	FLAC__byte *b;
 
-	for(p = (unsigned char *) picture->mime_type; *p; p++) {
+	for(p = picture->mime_type; *p; p++) {
 		if(*p < 0x20 || *p > 0x7e) {
 			if(violation) *violation = "MIME type string must contain only printable ASCII characters (0x20-0x7e)";
 			return false;
 		}
 	}
 
-	for(b = (unsigned char *) picture->description; *b; ) {
+	for(b = picture->description; *b; ) {
 		unsigned n = utf8len_(b);
 		if(n == 0) {
 			if(violation) *violation = "description string must be valid UTF-8";
