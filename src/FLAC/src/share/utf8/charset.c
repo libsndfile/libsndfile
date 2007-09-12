@@ -35,7 +35,7 @@
 
 #include <stdlib.h>
 
-#include "share/alloc.h"
+#include "alloc.h"
 #include "charset.h"
 
 #include "charmaps.h"

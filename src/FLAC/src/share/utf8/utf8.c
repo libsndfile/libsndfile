@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "share/alloc.h"
+#include "alloc.h"
 #include "utf8.h"
 #include "charset.h"
 

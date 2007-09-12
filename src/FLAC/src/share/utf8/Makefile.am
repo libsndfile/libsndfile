@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = foreign
 
-INCLUDES = -I$(top_srcdir)/src/FLAC/include/share -I$(top_srcdir)/src/FLAC/include
+INCLUDES = -I$(top_srcdir)/src/FLAC/include/share
 
 noinst_LTLIBRARIES = libutf8.la
 
