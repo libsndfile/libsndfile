@@ -169,6 +169,17 @@ flac_buffer_copy (SF_PRIVATE *psf)
 	const FLAC__int32* const *buffer = pflac->wbuffer ;
 	unsigned i = 0, j, offset ;
 
+	/*
+	**	frame->header.blocksize is variable and we're using a constant blocksize
+	**	of FLAC__MAX_BLOCK_SIZE.
+	**	Check our assumptions here.
+	*/
+	if (frame->header.blocksize > FLAC__MAX_BLOCK_SIZE)
+	{	psf_log_printf (psf, "Ooops : frame->header.blocksize (%d) > FLAC__MAX_BLOCK_SIZE (%d)\n", __func__, __LINE__, frame->header.blocksize, FLAC__MAX_BLOCK_SIZE) ;
+		psf->error = SFE_INTERNAL ;
+		return 0 ;
+		} ;
+
 	if (pflac->ptr == NULL)
 	{	/*
 		**	Not sure why this code is here and not elsewhere.
@@ -184,17 +195,6 @@ flac_buffer_copy (SF_PRIVATE *psf)
 			} ;
 		pflac->wbuffer = (const FLAC__int32* const*) pflac->rbuffer ;
 
-		return 0 ;
-		} ;
-
-	/*
-	**	frame->header.blocksize is variable and we're using a constant blocksize
-	**	of FLAC__MAX_BLOCK_SIZE.
-	**	Check our assumptions here.
-	*/
-	if (frame->header.blocksize > FLAC__MAX_BLOCK_SIZE)
-	{	psf_log_printf (psf, "Ooops : frame->header.blocksize (%d) > FLAC__MAX_BLOCK_SIZE (%d)\n", __func__, __LINE__, frame->header.blocksize, FLAC__MAX_BLOCK_SIZE) ;
-		psf->error = SFE_INTERNAL ;
 		return 0 ;
 		} ;
 
