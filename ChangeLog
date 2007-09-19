@@ -1,3 +1,8 @@
+2007-09-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/index.html
+    Link to MP3 FAQ entry.
+
 2007-09-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/flac.c
