@@ -226,7 +226,7 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 					bytesread += psf_binheader_readf (psf, "e8", &chunk_size) ;
 
-					if (psf->filelength < chunk_size)
+					if (psf->filelength != chunk_size)
 						psf_log_printf (psf, "riff : %D (should be %D)\n", chunk_size, psf->filelength) ;
 					else
 						psf_log_printf (psf, "riff : %D\n", chunk_size) ;
@@ -399,7 +399,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	/* riff marker, length, wave and 'fmt ' markers. */
-	psf_binheader_writef (psf, "eh8hh", riff_MARKER16, psf->filelength - 8, wave_MARKER16, fmt_MARKER16) ;
+	psf_binheader_writef (psf, "eh8hh", riff_MARKER16, psf->filelength, wave_MARKER16, fmt_MARKER16) ;
 
 	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 
