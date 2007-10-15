@@ -65,6 +65,15 @@
 #define elmo_MARKER	 (MAKE_MARKER ('e', 'l', 'm', 'o'))
 #define cart_MARKER	 (MAKE_MARKER ('c', 'a', 'r', 't'))
 
+#define exif_MARKER	 (MAKE_MARKER ('e', 'x', 'i', 'f'))
+#define ever_MARKER	 (MAKE_MARKER ('e', 'v', 'e', 'r'))
+#define etim_MARKER	 (MAKE_MARKER ('e', 't', 'i', 'm'))
+#define ecor_MARKER	 (MAKE_MARKER ('e', 'c', 'o', 'r'))
+#define emdl_MARKER	 (MAKE_MARKER ('e', 'm', 'd', 'l'))
+#define emnt_MARKER	 (MAKE_MARKER ('e', 'm', 'n', 't'))
+#define erel_MARKER	 (MAKE_MARKER ('e', 'r', 'e', 'l'))
+#define eucm_MARKER	 (MAKE_MARKER ('e', 'u', 'c', 'm'))
+
 #define ISFT_MARKER	 (MAKE_MARKER ('I', 'S', 'F', 'T'))
 #define ICRD_MARKER	 (MAKE_MARKER ('I', 'C', 'R', 'D'))
 #define ICOP_MARKER	 (MAKE_MARKER ('I', 'C', 'O', 'P'))
@@ -155,6 +164,7 @@ static int	wav_command (SF_PRIVATE *psf, int command, void *data, int datasize) 
 static int	wav_close (SF_PRIVATE *psf) ;
 
 static int 	wav_subchunk_parse	 (SF_PRIVATE *psf, int chunk) ;
+static int 	exif_subchunk_parse	 (SF_PRIVATE *psf, unsigned int length) ;
 static int	wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
 static int	wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
 static int	wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
@@ -1286,7 +1296,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 					psf_log_printf (psf, "  %M\n", chunk) ;
 					break ;
 
-			case data_MARKER:
+			case data_MARKER :
 					psf_log_printf (psf, "  %M inside a LIST block??? Backing out.\n", chunk) ;
 					/* Jump back four bytes and return to caller. */
 					psf_binheader_readf (psf, "j", -4) ;
@@ -1351,6 +1361,11 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 					psf_binheader_readf (psf, "j", dword) ;
 					bytesread += dword ;
 					psf_log_printf (psf, "    %M : %d\n", chunk, dword) ;
+					break ;
+
+			case exif_MARKER :
+					psf_log_printf (psf, "  %M\n", chunk) ;
+					bytesread += exif_subchunk_parse (psf, length - bytesread) ;
 					break ;
 
 			default :
@@ -1667,10 +1682,81 @@ wav_write_bext_chunk (SF_PRIVATE *psf)
 	return 0 ;
 } /* wav_write_bext_chunk */
 
+static int
+exif_fill_and_sink (SF_PRIVATE *psf, char* buf, size_t bufsz, size_t toread)
+{
+	size_t bytesread = 0 ;
+
+	buf [0] = 0 ;
+	bufsz -= 1 ;
+	if (toread < bufsz)
+		bufsz = toread ;
+	bytesread = psf_binheader_readf (psf, "b", buf, bufsz) ;
+	buf [bufsz] = 0 ;
+
+	if (bytesread == bufsz && toread > bufsz)
+		bytesread += psf_binheader_readf (psf, "j", toread - bufsz) ;
+
+	return bytesread ;
+} /* exif_fill_and_sink */
+
 /*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 9c551689-a1d8-4905-9f56-26a204374f18
+** Exif specification for audio files, at JEITA CP-3451 Exif 2.2 section 5
+** (Exif Audio File Specification) http://www.exif.org/Exif2-2.PDF
 */
+static int
+exif_subchunk_parse (SF_PRIVATE *psf, unsigned int length)
+{
+	unsigned marker, dword, vmajor = -1, vminor = -1, bytesread = 0 ;
+	char buf [4096] ;
+
+	while (bytesread < length)
+	{
+		bytesread += psf_binheader_readf (psf, "m", &marker) ;
+
+		switch (marker)
+		{
+			case 0 : /* camera padding? */
+				break ;
+
+			case ever_MARKER :
+				bytesread += psf_binheader_readf (psf, "j4", 4, &dword) ;
+				vmajor = 10 * (((dword >> 24) & 0xff) - '0') + (((dword >> 16) & 0xff) - '0') ;
+				vminor = 10 * (((dword >> 8) & 0xff) - '0') + ((dword & 0xff) - '0') ;
+				psf_log_printf (psf, "    EXIF Version : %u.%02u\n", vmajor, vminor) ;
+				break ;
+
+			case emnt_MARKER : /* design information: null-terminated string */
+			case emdl_MARKER : /* model name ; null-terminated string */
+			case ecor_MARKER : /* manufacturer: null-terminated string */
+			case etim_MARKER : /* creation time: null-terminated string in the format "hour:minute:second.subsecond" */
+			case erel_MARKER : /* relation info: null-terminated string (filename) */
+			case eucm_MARKER : /* user comment: 4-byte size follows, then possibly unicode data */
+				psf_binheader_readf (psf, "4", &dword) ;
+				bytesread += sizeof (dword) ;
+				dword += (dword & 1) ;
+
+				bytesread += exif_fill_and_sink (psf, buf, sizeof (buf), dword) ;
+
+				/* BAD - don't know what's going on here -- maybe a bug in the camera */
+				/* field should be NULL-terminated but there's no room for it with the reported number */
+				/*  example output:     emdl : 8 (EX-Z1050) */
+				if (marker == emdl_MARKER && dword == strlen (buf) /* should be >= strlen+1*/)
+				{	psf_log_printf (psf, "    *** field size too small for string (sinking 2 bytes)\n") ;
+					bytesread += psf_binheader_readf (psf, "j", 2) ;
+					} ;
+
+				psf_log_printf (psf, "    %M : %d (%s)\n", marker, dword, buf) ;
+				if (dword > length)
+					return bytesread ;
+				break ;
+
+			default :
+				psf_log_printf (psf, "    *** %M (%d): -- ignored --\n", marker, marker) ;
+				break ;
+			} ;
+		} ;
+
+	return bytesread ;
+} /* exif_subchunk_parse */
+

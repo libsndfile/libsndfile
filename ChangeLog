@@ -1,3 +1,8 @@
+2007-10-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav.c
+    Add parsing of 'exif' chunks. Orignally coded by Trent Apted.
+
 2007-10-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/w64.c
