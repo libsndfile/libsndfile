@@ -4,6 +4,10 @@ dnl Require autoconf version
 AC_PREREQ(2.57)
 
 AC_INIT([libsndfile],[1.0.18pre17],[erikd@mega-nerd.com])
+
+# Put config stuff in Cfg.
+AC_CONFIG_AUX_DIR(Cfg)
+
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
@@ -46,7 +50,6 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(endian.h)
 AC_CHECK_HEADERS(byteswap.h)
 AC_CHECK_HEADERS(locale.h)
-AC_CHECK_HEADERS(inttypes.h)
 
 AC_HEADER_SYS_WAIT
 
