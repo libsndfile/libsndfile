@@ -4,11 +4,18 @@ dnl Require autoconf version
 AC_PREREQ(2.57)
 
 AC_INIT([libsndfile],[1.0.18vorbis1],[erikd@mega-nerd.com])
+
+# Put config stuff in Cfg.
+AC_CONFIG_AUX_DIR(Cfg)
+
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
 AC_CONFIG_HEADERS([src/config.h])
+
+dnl Add parameters for aclocal
+AC_SUBST(ACLOCAL_AMFLAGS, "-I M4")
 
 AC_LANG([C])
 
@@ -33,7 +40,7 @@ SHARED_VERSION_INFO="1:18:0"
 AC_PROG_CC
 AM_PROG_LIBTOOL
 
-AC_CHECK_PROG(autogen, autogen, yes, no)
+AC_CHECK_PROG(HAVE_AUTOGEN, autogen, yes, no)
 
 AC_PROG_INSTALL
 AC_PROG_LN_S
@@ -43,7 +50,6 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(endian.h)
 AC_CHECK_HEADERS(byteswap.h)
 AC_CHECK_HEADERS(locale.h)
-AC_CHECK_HEADERS(inttypes.h)
 
 AC_HEADER_SYS_WAIT
 
@@ -260,6 +266,13 @@ case "$host_os" in
 	esac
 
 #====================================================================================
+# Check for requirements for building plugins for other languages/enviroments.
+
+dnl Octave maths environment http://www.octave.org/
+AC_OCTAVE_BUILD
+
+
+#====================================================================================
 # Check for libsqlite3 (only used in regtest).
 
 ac_cv_sqlite3=no
@@ -466,7 +479,7 @@ if test $ac_cv_sizeof_double != 8 ; then
 	AC_MSG_WARN([[******************************************************************]])
 	fi
 
-if test x"$ac_cv_prog_autogen" = "xno" ; then
+if test x"$ac_cv_prog_HAVE_AUTOGEN" = "xno" ; then
 	AC_MSG_WARN([[Touching files in directory tests/.]])
 	touch tests/*.c tests/*.h
 	fi
@@ -611,9 +624,6 @@ AC_CONFIG_FILES([ \
 	src/FLAC/src/share/utf8/Makefile src/FLAC/src/test_libFLAC/Makefile \
 	src/FLAC/src/test_libs_common/Makefile src/FLAC/src/test_seeking/Makefile \
 	src/FLAC/src/test_streams/Makefile src/FLAC/test/Makefile \
-	src/FLAC/src/monkeys_audio_utilities/Makefile \
-	src/FLAC/src/monkeys_audio_utilities/flac_mac/Makefile \
-	src/FLAC/src/monkeys_audio_utilities/flac_ren/Makefile \
 	src/FLAC/src/test_grabbag/Makefile src/FLAC/src/test_grabbag/cuesheet/Makefile \
 	src/FLAC/src/test_grabbag/picture/Makefile \
 	\
@@ -625,8 +635,8 @@ AC_CONFIG_FILES([ \
 	\
 	src/OGG/include/ogg/Makefile src/OGG/include/Makefile src/OGG/Makefile \
 	man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
-	doc/Makefile doc/libsndfile.css \
-	Win32/Makefile Octave/Makefile \
+	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile \
+	doc/libsndfile.css \
 	Makefile libsndfile.spec sndfile.pc \
 	])
 AC_OUTPUT

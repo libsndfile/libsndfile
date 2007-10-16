@@ -1,14 +1,79 @@
 ## Process this file with automake to produce Makefile.in
 
-EXTRA_DIST = sndfile_load.m sndfile_save.m sndfile_play.m
+# Prevent any extension.
+EXEEXT =
+
+CXXLD = $(CXX)
+CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
+	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+
+EXTRA_DIST = sndfile_load.m sndfile_save.m sndfile_play.m \
+	octave_test.m octave_test.sh $(oct_module_srcs)
 
 octconfigdir = $(exec_prefix)/share/octave/site/m
 octconfig_DATA = sndfile_load.m sndfile_save.m sndfile_play.m
-	
 
-## Do not edit or modify anything in this comment block.
-## The arch-tag line is a file identity tag for the GNU Arch 
-## revision control system.
-##
-## arch-tag: 56f1645a-3a13-4846-acc7-8b4abf2904ff
+OCTAVE_DEST_MDIR = @OCTAVE_DEST_MDIR@
+OCTAVE_DEST_ODIR = @OCTAVE_DEST_ODIR@
 
+OCT_CXXFLAGS = @OCT_CXXFLAGS@
+OCT_LIB_DIR = @OCT_LIB_DIR@
+OCT_LIBS = @OCT_LIBS@
+
+SNDFILEDIR = $(top_builddir)/src
+INCLUDES = -I$(SNDFILEDIR)
+
+oct_module_srcs = sfread.cc sfwrite.cc format.cc
+oct_modules = sfread.oct sfwrite.oct
+
+# Make these noinst so they can be installed manually.
+noinst_DATA = $(oct_modules)
+
+noinst_HEADERS = format.h
+
+
+# Need to jump through extra hoops here because we only these Octave
+# modules must be dynamic. However, to make the tests pass, they need
+# to be statically linked to the libsndfile that has just been built.
+#
+# Maybe should create both dynamic and static versions and install
+# the dynamic and test the static.
+sfread.oct : format.cc sfread.cc
+	$(CXXLINK) $(OCT_CXXFLAGS) $(INCLUDES) $+ $(OCT_LIB_DIR) $(OCT_LIBS) $(SNDFILEDIR)/libsndfile.la
+
+sfwrite.oct : format.cc sfwrite.cc
+	$(CXXLINK) $(OCT_CXXFLAGS) $(INCLUDES) $+ $(OCT_LIB_DIR) $(OCT_LIBS) $(SNDFILEDIR)/libsndfile.la
+
+
+# Allow for the test being run in the build dir, but the test script
+# being located in the source dir.
+check :
+	octave_src_dir=$(srcdir) $(srcdir)/octave_test.sh
+
+
+# Since the octave modules are installed in a special location, a custom install
+# and uninstall routine must be specified.
+install-exec-local : $(oct_modules)
+	@$(NORMAL_INSTALL)
+	test -z "$(OCTAVE_DEST_ODIR)" || $(mkdir_p) "$(DESTDIR)$(OCTAVE_DEST_ODIR)"
+	@list='$(oct_modules)'; for p in $$list; do \
+	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  if test -f $$p \
+	     || test -f $$p1 \
+	  ; then \
+	    f=`echo "$$p1" | sed 's,^.*/,,;$(transform);s/$$/$(EXEEXT)/'`; \
+	   echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL) '$$p' '$(DESTDIR)$(OCTAVE_DEST_ODIR)/$$f'"; \
+	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL) "$$p" "$(DESTDIR)$(OCTAVE_DEST_ODIR)/$$f" || exit 1; \
+	  else :; fi; \
+	done
+
+uninstall-local :
+	@$(NORMAL_UNINSTALL)
+	@list='$(oct_modules)'; for p in $$list; do \
+	  f=`echo "$$p" | sed 's,^.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
+	  echo " rm -f '$(DESTDIR)$(OCTAVE_DEST_ODIR)/$$f'"; \
+	  rm -f "$(DESTDIR)$(OCTAVE_DEST_ODIR)/$$f"; \
+	done
+
+clean-local :
+	rm -f $(oct_modules)
