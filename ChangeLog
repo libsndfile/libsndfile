@@ -1,3 +1,11 @@
+2007-10-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in src/sndfile.c
+    Add command SFC_GET_CURRENT_SF_INFO.
+
+    * tests/command_test.c
+    Add test for SFC_GET_CURRENT_SF_INFO.
+
 2007-10-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c
