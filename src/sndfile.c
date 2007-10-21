@@ -858,6 +858,12 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			psf->norm_float = (datasize) ? SF_TRUE : SF_FALSE ;
 			return old_value ;
 
+		case SFC_GET_CURRENT_SF_INFO :
+			if (data == NULL || datasize != SIGNED_SIZEOF (SF_INFO))
+				return (sf_errno = SFE_BAD_CONTROL_CMD) ;
+			memcpy (data, &psf->sf, sizeof (SF_INFO)) ;
+			break ;
+
 		case SFC_SET_NORM_DOUBLE :
 			old_value = psf->norm_double ;
 			psf->norm_double = (datasize) ? SF_TRUE : SF_FALSE ;
