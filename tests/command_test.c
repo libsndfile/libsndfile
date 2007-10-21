@@ -36,14 +36,15 @@
 #define	BUFFER_LEN		(1<<10)
 #define LOG_BUFFER_SIZE	1024
 
-static	void	float_norm_test		(const char *filename) ;
-static	void	double_norm_test	(const char *filename) ;
-static	void	format_tests		(void) ;
-static	void	calc_peak_test		(int filetype, const char *filename) ;
-static	void	truncate_test		(const char *filename, int filetype) ;
-static	void	instrument_test		(const char *filename, int filetype) ;
-static	void	channel_map_test	(const char *filename, int filetype) ;
-static	void	broadcast_test		(const char *filename, int filetype) ;
+static	void	float_norm_test			(const char *filename) ;
+static	void	double_norm_test		(const char *filename) ;
+static	void	format_tests			(void) ;
+static	void	calc_peak_test			(int filetype, const char *filename) ;
+static	void	truncate_test			(const char *filename, int filetype) ;
+static	void	instrument_test			(const char *filename, int filetype) ;
+static	void	channel_map_test		(const char *filename, int filetype) ;
+static	void	broadcast_test			(const char *filename, int filetype) ;
+static	void	current_sf_info_test	(const char *filename) ;
 
 /* Force the start of this buffer to be double aligned. Sparc-solaris will
 ** choke if its not.
@@ -127,6 +128,11 @@ main (int argc, char *argv [])
 
 	if (do_all || strcmp (argv [1], "bext") == 0)
 	{	broadcast_test ("broadcast.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || strcmp (argv [1], "current_sf_info") == 0)
+	{	current_sf_info_test ("current.wav") ;
 		test_count++ ;
 		} ;
 
@@ -870,11 +876,52 @@ channel_map_test (const char *filename, int filetype)
 	puts ("ok") ;
 } /* channel_map_test */
 
+static	void
+current_sf_info_test	(const char *filename)
+{	SNDFILE *outfile, *infile ;
+	SF_INFO outinfo, ininfo ;
+	sf_count_t last_count ;
 
-/*
-** Do not edit or modify anything in this comment block.
-** The following line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 59e5d452-8dae-45aa-99aa-b78dc0deba1c
-*/
+	print_test_name ("current_sf_info_test", filename) ;
+
+	outinfo.samplerate	= 44100 ;
+	outinfo.format		= (SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+	outinfo.channels	= 1 ;
+	outinfo.frames		= 0 ;
+
+	outfile = test_open_file_or_die (filename, SFM_WRITE, &outinfo, SF_TRUE, __LINE__) ;
+	sf_command (outfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, 0) ;
+
+	exit_if_true (outinfo.frames != 0,
+		"\n\nLine %d : Initial sfinfo.frames is not zero.\n\n", __LINE__
+		) ;
+
+	test_write_double_or_die (outfile, 0, double_data, BUFFER_LEN, __LINE__) ;
+	sf_command (outfile, SFC_GET_CURRENT_SF_INFO, &outinfo, sizeof (outinfo)) ;
+
+	exit_if_true (outinfo.frames != BUFFER_LEN,
+		"\n\nLine %d : Initial sfinfo.frames (%ld) should be %d.\n\n", __LINE__,
+		SF_COUNT_TO_LONG (outinfo.frames), BUFFER_LEN
+		) ;
+
+	/* Read file making sure no channel map exists. */
+	infile = test_open_file_or_die (filename, SFM_READ, &ininfo, SF_TRUE, __LINE__) ;
+
+	last_count = ininfo.frames ;
+
+	test_write_double_or_die (outfile, 0, double_data, BUFFER_LEN, __LINE__) ;
+
+	sf_command (infile, SFC_GET_CURRENT_SF_INFO, &ininfo, sizeof (ininfo)) ;
+
+	exit_if_true (ininfo.frames != BUFFER_LEN,
+		"\n\nLine %d : Initial sfinfo.frames (%ld) should be %d.\n\n", __LINE__,
+		SF_COUNT_TO_LONG (ininfo.frames), BUFFER_LEN
+		) ;
+
+	sf_close (outfile) ;
+	sf_close (infile) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* current_sf_info_test */
+

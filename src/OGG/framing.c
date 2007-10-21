@@ -5,14 +5,14 @@
  * GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
- * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2002             *
+ * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2007             *
  * by the Xiph.Org Foundation http://www.xiph.org/                  *
  *                                                                  *
  ********************************************************************
 
  function: code raw [Vorbis] packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
- last mod: $Id: framing.c 9601 2005-07-23 00:19:14Z giles $
+ last mod: $Id: framing.c 12446 2007-02-08 22:22:43Z xiphmont $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -268,8 +268,12 @@ void ogg_page_checksum_set(ogg_page *og){
 }
 
 /* submit data to the internal buffer of the framing engine */
-int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op){
-  int lacing_vals=op->bytes/255+1,i;
+int ogg_stream_iovecin(ogg_stream_state *os, ogg_iovec_t *iov, int count,
+                       long e_o_s, ogg_int64_t granulepos){
+
+  int bytes = 0, lacing_vals, i;
+  for (i = 0; i < count; ++i) bytes += (int)iov[i].iov_len;
+  lacing_vals=bytes/255+1;
 
   if(os->body_returned){
     /* advance packet data according to the body_returned pointer. We
@@ -284,7 +288,7 @@ int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op){
   }
  
   /* make sure we have the buffer storage */
-  _os_body_expand(os,op->bytes);
+  _os_body_expand(os,bytes);
   _os_lacing_expand(os,lacing_vals);
 
   /* Copy in the submitted packet.  Yes, the copy is a waste; this is
@@ -292,16 +296,18 @@ int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op){
      will actually be fairly easy to eliminate the extra copy in the
      future */
 
-  memcpy(os->body_data+os->body_fill,op->packet,op->bytes);
-  os->body_fill+=op->bytes;
+  for (i = 0; i < count; ++i) {
+    memcpy(os->body_data+os->body_fill, iov[i].iov_base, iov[i].iov_len);
+    os->body_fill += (int)iov[i].iov_len;
+  }
 
   /* Store lacing vals for this packet */
   for(i=0;i<lacing_vals-1;i++){
     os->lacing_vals[os->lacing_fill+i]=255;
     os->granule_vals[os->lacing_fill+i]=os->granulepos;
   }
-  os->lacing_vals[os->lacing_fill+i]=(op->bytes)%255;
-  os->granulepos=os->granule_vals[os->lacing_fill+i]=op->granulepos;
+  os->lacing_vals[os->lacing_fill+i]=bytes%255;
+  os->granulepos=os->granule_vals[os->lacing_fill+i]=granulepos;
 
   /* flag the first segment as the beginning of the packet */
   os->lacing_vals[os->lacing_fill]|= 0x100;
@@ -311,9 +317,16 @@ int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op){
   /* for the sake of completeness */
   os->packetno++;
 
-  if(op->e_o_s)os->e_o_s=1;
+  if(e_o_s)os->e_o_s=1;
 
   return(0);
+}
+
+int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op){
+  ogg_iovec_t iov;
+  iov.iov_base = op->packet;
+  iov.iov_len = op->bytes;
+  return ogg_stream_iovecin(os, &iov, 1, op->e_o_s, op->granulepos);
 }
 
 /* This will flush remaining packets into a page (returning nonzero),
@@ -624,7 +637,7 @@ long ogg_sync_pageseek(ogg_sync_state *oy,ogg_page *og){
   if(!next)
     next=oy->data+oy->fill;
 
-  oy->returned=next-oy->data;
+  oy->returned=(int)(next-oy->data);
   return(-(next-outerpage));
 }
 

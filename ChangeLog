@@ -1,3 +1,115 @@
+2007-10-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in src/sndfile.c
+    Add command SFC_GET_CURRENT_SF_INFO.
+
+    * src/sndfile.h.in src/sndfile.c src/create_symbols_file.py
+    Remove function sf_get_info (only ever in pre-release code).
+
+    * tests/command_test.c
+    Add test for SFC_GET_CURRENT_SF_INFO.
+
+2007-10-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav.c
+    Add parsing of 'exif' chunks. Originally coded by Trent Apted.
+
+    * configure.ac
+    Put config stuff in Cfg directory.
+    Remove check for inttypes.h.
+
+2007-10-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/w64.c
+    Fix writing of 'riff' chunk length and check for correct value in parser.
+
+2007-09-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/index.html
+    Link to MP3 FAQ entry.
+
+2007-09-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/flac.c
+    Move the blocksize check to an earlier stage of flac_buffer_copy.
+
+2007-09-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/FLAC
+    Huge merge from FLAC upstream.
+
+2007-09-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/*.c
+    Change license to all example programs to BSD.
+
+2007-09-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/FLAC/include/FLAC/metadata.h
+    Include <sys/types.h> to prevent compile error on OSX.
+
+    * Octave/octave_test.sh
+    Disable test on OSX. Can't get it to work.
+
+    * src/flac.c
+    Check the blocksize returned from the FLAC decoder to prevent buffer
+    overruns. Reported by Jeremy Friesner. Thanks.
+
+2007-09-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Makefile.am M4/octave.m4
+    Fix build when Octave headers are not present.
+
+2007-08-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/development.html
+    Add note about bzr repository directory looking empty.
+
+2007-08-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac Octave/* M4/octave_*
+    Bunch of changes to add ability to build GNU Octave modules to read/write
+    sound files using libsndfile from Octave.
+
+2007-08-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * acinclude.m4 configure.ac ...
+    Get rid of acinclude.m4 and replace it with an M4 directory.
+
+2007-08-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in
+    Remove crufty Metrowerks compiler support. Allow header file to be compiled
+    on windows with both GCC and microsoft compiler.
+
+2007-08-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/dft_cmp.[ch] tests/floating_point_test.tpl
+    Clean up floating point tests.
+
+2007-08-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c
+    Fix segfault when COMM chunk length is byte swapped.
+
+2007-08-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/mat4.c src/mat5.c src/sndfile.c
+    Add a generic SFE_CHANNEL_COUNT_ZERO error, remove format specific errors.
+
+    * src/au.c
+    Fix crash on AU files with zero channel count. Reported by Ben Alison.
+
+2007-08-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/voc.c
+    Fix bug in handling file supplied by Matt Olenik.
+
+2007-07-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/OGG
+    Merge from OGG upstream sources.
+
 2007-07-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/FLAC

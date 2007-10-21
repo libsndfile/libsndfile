@@ -448,7 +448,7 @@ mat5_read_header (SF_PRIVATE *psf)
 
 	if (rows == 0 && cols == 0)
 	{	psf_log_printf (psf, "*** Error : zero channel count.\n") ;
-		return SFE_MAT5_ZERO_CHANNELS ;
+		return SFE_CHANNEL_COUNT_ZERO ;
 		} ;
 
 	psf->sf.channels	= rows ;

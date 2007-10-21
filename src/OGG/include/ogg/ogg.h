@@ -5,13 +5,13 @@
  * GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE *
  * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.       *
  *                                                                  *
- * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2002             *
+ * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2007             *
  * by the Xiph.Org Foundation http://www.xiph.org/                  *
  *                                                                  *
  ********************************************************************
 
  function: toplevel libogg include
- last mod: $Id: ogg.h 7188 2004-07-20 07:26:04Z xiphmont $
+ last mod: $Id: ogg.h 12446 2007-02-08 22:22:43Z xiphmont $
 
  ********************************************************************/
 #ifndef _OGG_H
@@ -22,6 +22,11 @@ extern "C" {
 #endif
 
 #include <ogg/os_types.h>
+
+typedef struct {
+  void *iov_base; 
+  size_t iov_len;
+} ogg_iovec_t;
 
 typedef struct {
   long endbyte;
@@ -148,6 +153,8 @@ extern unsigned char *oggpackB_get_buffer(oggpack_buffer *b);
 /* Ogg BITSTREAM PRIMITIVES: encoding **************************/
 
 extern int      ogg_stream_packetin(ogg_stream_state *os, ogg_packet *op);
+extern int      ogg_stream_iovecin(ogg_stream_state *os, ogg_iovec_t *iov,
+				   int count, long e_o_s, ogg_int64_t granulepos);
 extern int      ogg_stream_pageout(ogg_stream_state *os, ogg_page *og);
 extern int      ogg_stream_flush(ogg_stream_state *os, ogg_page *og);
 
