@@ -1613,7 +1613,7 @@ wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	return 0 ;
 } /* wav_read_acid_chunk */
 
-int
+static int
 wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 {
 	SF_BROADCAST_INFO* b ;
