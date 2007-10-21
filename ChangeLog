@@ -3,13 +3,16 @@
     * src/sndfile.h.in src/sndfile.c
     Add command SFC_GET_CURRENT_SF_INFO.
 
+    * src/sndfile.h.in src/sndfile.c src/create_symbols_file.py
+    Remove function sf_get_info (only ever in pre-release code).
+
     * tests/command_test.c
     Add test for SFC_GET_CURRENT_SF_INFO.
 
 2007-10-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c
-    Add parsing of 'exif' chunks. Orignally coded by Trent Apted.
+    Add parsing of 'exif' chunks. Originally coded by Trent Apted.
 
     * configure.ac
     Put config stuff in Cfg directory.

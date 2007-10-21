@@ -521,12 +521,6 @@ int		sf_format_check	(const SF_INFO *info) ;
 
 sf_count_t	sf_seek 		(SNDFILE *sndfile, sf_count_t frames, int whence) ;
 
-/* Retrieve the SF_INFO struct for the given SNDFILE. Returns SF_FALSE on
-** failure, SF_TRUE otherwise.
-*/
-
-int sf_get_info (SNDFILE * sndfile, SF_INFO * info) ;
-
 /* Functions for retrieving and setting string data within sound files.
 ** Not all file types support this features; AIFF and WAV do. For both
 ** functions, the str_type parameter must be one of the SF_STR_* values

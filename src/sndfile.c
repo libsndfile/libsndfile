@@ -1240,23 +1240,6 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 /*------------------------------------------------------------------------------
 */
 
-int
-sf_get_info (SNDFILE * sndfile, SF_INFO * info)
-{	SF_PRIVATE 	*psf ;
-
-	if (info == NULL)
-		return SF_FALSE ;
-	if ((psf = (SF_PRIVATE*) sndfile) == NULL)
-		return SF_FALSE ;
-	if (psf->Magick != SNDFILE_MAGICK)
-		return SF_FALSE ;
-
-	/* Need to correct psf->sf.frames ???? */
-	memcpy (info, &psf->sf, sizeof (SF_INFO)) ;
-
-	return SF_TRUE ;
-} /* sf_get_info */
-
 const char*
 sf_get_string (SNDFILE *sndfile, int str_type)
 {	SF_PRIVATE 	*psf ;
