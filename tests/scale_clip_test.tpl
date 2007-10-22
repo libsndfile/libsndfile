@@ -51,7 +51,7 @@
 
 [+ FOR float_type +]
 [+ FOR int_type
-+]static void [+ (get "float_type_name") +]_[+ (get "int_type_name") +]_clip_test (const char *filename, int filetype) ;
++]static void [+ (get "float_short_name") +]_[+ (get "int_type_name") +]_clip_read_test (const char *filename, int filetype) ;
 [+ ENDFOR int_type
 +][+ ENDFOR float_type +]
 
@@ -94,10 +94,10 @@ main (void)
 	dbl_scale_clip_test_32 ("scale_clip_be32.au", SF_ENDIAN_BIG	| SF_FORMAT_AU | SF_FORMAT_PCM_32, 1.0 * 0x80000000) ;
 	dbl_scale_clip_test_32 ("scale_clip_le32.au", SF_ENDIAN_LITTLE	| SF_FORMAT_AU | SF_FORMAT_PCM_32, 1.0 * 0x80000000) ;
 
-	float_int_clip_test		("flt_int.au"	, SF_ENDIAN_LITTLE	| SF_FORMAT_AU | SF_FORMAT_FLOAT) ;
-	float_short_clip_test	("flt_short.au"	, SF_ENDIAN_BIG		| SF_FORMAT_AU | SF_FORMAT_FLOAT) ;
-	double_int_clip_test	("dbl_int.au"	, SF_ENDIAN_LITTLE	| SF_FORMAT_AU | SF_FORMAT_DOUBLE) ;
-	double_short_clip_test	("dbl_short.au"	, SF_ENDIAN_BIG		| SF_FORMAT_AU | SF_FORMAT_DOUBLE) ;
+	flt_int_clip_read_test		("flt_int.au"	, SF_ENDIAN_LITTLE	| SF_FORMAT_AU | SF_FORMAT_FLOAT) ;
+	flt_short_clip_read_test	("flt_short.au"	, SF_ENDIAN_BIG		| SF_FORMAT_AU | SF_FORMAT_FLOAT) ;
+	dbl_int_clip_read_test		("dbl_int.au"	, SF_ENDIAN_LITTLE	| SF_FORMAT_AU | SF_FORMAT_DOUBLE) ;
+	dbl_short_clip_read_test	("dbl_short.au"	, SF_ENDIAN_BIG		| SF_FORMAT_AU | SF_FORMAT_DOUBLE) ;
 
 	return 0 ;
 } /* main */
@@ -247,14 +247,14 @@ main (void)
 
 [+ FOR float_type +]
 [+ FOR int_type
-+]static void [+ (get "float_type_name") +]_[+ (get "int_type_name") +]_clip_test (const char *filename, int filetype)
++]static void [+ (get "float_short_name") +]_[+ (get "int_type_name") +]_clip_read_test (const char *filename, int filetype)
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	[+ (get "float_type_name") +]		*data_out ;
 	[+ (get "int_type_name") +]			*data_in, max_value ;
 	int			k ;
 
-	print_test_name ("[+ (get "float_type_name") +]_[+ (get "int_type_name") +]_clip_test", filename) ;
+	print_test_name ("[+ (get "float_short_name") +]_[+ (get "int_type_name") +]_clip_read_test", filename) ;
 
 	data_out = buffer_out.[+ (get "float_short_name") +] ;
 	data_in = buffer_in.[+ (get "int_short_name") +] ;
@@ -319,7 +319,7 @@ main (void)
 
 	unlink (filename) ;
 	puts ("ok") ;
-} /* [+ (get "float_type_name") +]_[+ (get "int_type_name") +]_clip_test */
+} /* [+ (get "float_short_name") +]_[+ (get "int_type_name") +]_clip_read_test */
 [+ ENDFOR int_type
 +][+ ENDFOR float_type +]
 
