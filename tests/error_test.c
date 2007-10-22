@@ -33,17 +33,6 @@
 #define	BUFFER_SIZE		(1<<15)
 #define	SHORT_BUFFER	(256)
 
-static void error_number_test (void) ;
-static void error_value_test (void) ;
-
-int
-main (void)
-{	error_number_test () ;
-	error_value_test () ;
-
-	return 0 ;
-} /* main */
-
 static void
 error_number_test (void)
 {	const char 	*noerror, *errstr ;
@@ -104,10 +93,90 @@ error_value_test (void)
 	return ;
 } /* error_value_test */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 799eba74-b505-49d9-89a6-22a7f51a31b4
-*/
+static void
+no_file_test (const char * filename)
+{	SNDFILE		*sndfile ;
+	SF_INFO		sfinfo ;
+
+	print_test_name (__func__, filename) ;
+
+	unlink (filename) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sndfile = sf_open (filename, SFM_READ, &sfinfo) ;
+
+	exit_if_true (sndfile != NULL, "\n\nLine %d : should not have received a valid SNDFILE* pointer.\n", __LINE__) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* no_file_test */
+
+static void
+zero_length_test (const char *filename)
+{	SNDFILE		*sndfile ;
+	SF_INFO		sfinfo ;
+	FILE		*file ;
+
+	print_test_name (__func__, filename) ;
+
+	/* Create a zero length file. */
+	file = fopen (filename, "w") ;
+	exit_if_true (file == NULL, "\n\nLine %d : fopen ('%s') failed.\n", __LINE__, filename) ;
+	fclose (file) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sndfile = sf_open (filename, SFM_READ, &sfinfo) ;
+
+	exit_if_true (sndfile != NULL, "\n\nLine %d : should not have received a valid SNDFILE* pointer.\n", __LINE__) ;
+
+	exit_if_true (0 && sf_error (NULL) != SF_ERR_UNRECOGNISED_FORMAT,
+		"\n\nLine %3d : Error : %s\n       should be : %s\n", __LINE__,
+		sf_strerror (NULL), sf_error_number (SF_ERR_UNRECOGNISED_FORMAT)) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* zero_length_test */
+
+static void
+bad_wav_test (const char * filename)
+{	SNDFILE		*sndfile ;
+	SF_INFO		sfinfo ;
+
+	FILE		*file ;
+	const char	data [] = "RIFF    WAVEfmt            " ;
+
+	print_test_name (__func__, filename) ;
+
+	if ((file = fopen (filename, "w")) == NULL)
+	{	printf ("\n\nLine %d : fopen returned NULL.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	fwrite (data, sizeof (data), 1, file) ;
+	fclose (file) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sndfile = sf_open (filename, SFM_READ, &sfinfo) ;
+
+	if (sndfile)
+	{	printf ("\n\nLine %d : should not have received a valid SNDFILE* pointer.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* bad_wav_test */
+
+int
+main (void)
+{
+	error_number_test () ;
+	error_value_test () ;
+
+	no_file_test ("no_file.wav") ;
+	zero_length_test ("zero_length.wav") ;
+	bad_wav_test ("bad_wav.wav") ;
+
+	return 0 ;
+} /* main */
+
