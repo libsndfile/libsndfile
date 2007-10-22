@@ -1,3 +1,11 @@
+2007-10-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/scale_clip_test.(def|tpl)
+    Add tests for SFC_SET_INT_FLOAT_WRITE command.
+
+    * doc/command.html
+    Add docs for SFC_SET_INT_FLOAT_WRITE command.
+
 2007-10-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in src/sndfile.c
