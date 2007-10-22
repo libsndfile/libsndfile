@@ -95,6 +95,13 @@
 	<TD>Set/clear the scale factor when integer (short/int) data is read from a file
 	containing floating point data.</TD>
 </TR>
+
+<TR>
+	<TD><A HREF="#SFC_SET_SCALE_INT_FLOAT_WRITE">SFC_SET_SCALE_INT_FLOAT_WRITE</A></TD>
+	<TD>Set/clear the scale factor when integer (short/int) data is written to a file
+	as floating point data.</TD>
+</TR>
+
 <TR>
 	<TD><A HREF="#SFC_GET_SIMPLE_FORMAT_COUNT">SFC_GET_SIMPLE_FORMAT_COUNT</A></TD>
 	<TD>Retrieve the number of simple formats supported by libsndfile.</TD>
@@ -602,6 +609,33 @@ Example:
 	<DD>Returns the previous SFC_SET_SCALE_FLOAT_INT_READ setting for this file.
 </DL>
 
+
+<!-- ========================================================================= -->
+<A NAME="SFC_SET_SCALE_INT_FLOAT_WRITE"></A>
+<H2><BR><B>SFC_SET_SCALE_INT_FLOAT_WRITE</B></H2>
+<P>
+Set/clear the scale factor when integer (short/int) data is written to a file
+as floating point data.
+</P>
+<P>
+Parameters:
+</P>
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_SET_SCALE_FLOAT_INT_READ
+        data     : NULL
+        datasize : TRUE or FALSE
+</PRE>
+<P>
+Example:
+</P>
+<PRE>
+        sf_command (sndfile, SFC_SET_SCALE_INT_FLOAT_WRITE, NULL, SF_TRUE) ;
+</PRE>
+<DL>
+<DT>Return value: </DT>
+	<DD>Returns the previous SFC_SET_SCALE_INT_FLOAT_WRITE setting for this file.
+</DL>
 
 <!-- ========================================================================= -->
 <A NAME="SFC_GET_SIMPLE_FORMAT_COUNT"></A>

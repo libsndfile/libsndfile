@@ -284,6 +284,8 @@ typedef struct sf_private_tag
 	int				float_int_mult ;
 	float			float_max ;
 
+	int				scale_int_float ;
+
 	/* Vairables for handling pipes. */
 	int				is_pipe ;		/* True if file is a pipe. */
 	sf_count_t		pipeoffset ;	/* Number of bytes read from a pipe. */

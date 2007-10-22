@@ -529,16 +529,16 @@ d2f_array (const double *src, int count, float *dest)
 } /* d2f_array */
 
 static inline void
-s2d_array (const short *src, double *dest, int count)
+s2d_array (const short *src, double *dest, int count, double scale)
 {	while (--count >= 0)
-	{	dest [count] = src [count] ;
+	{	dest [count] = scale * src [count] ;
 		} ;
 } /* s2d_array */
 
 static inline void
-i2d_array (const int *src, double *dest, int count)
+i2d_array (const int *src, double *dest, int count, double scale)
 {	while (--count >= 0)
-	{	dest [count] = src [count] ;
+	{	dest [count] = scale * src [count] ;
 		} ;
 } /* i2d_array */
 
@@ -669,14 +669,16 @@ static sf_count_t
 host_write_s2d	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
+	double		scale ;
 
+	scale = (psf->scale_int_float == 0) ? 1.0 : 1.0 / 0x8000 ;
 	bufferlen = ARRAY_LEN (psf->u.dbuf) ;
 
 	while (len > 0)
 	{	if (len < bufferlen)
 			bufferlen = (int) len ;
 
-		s2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
+		s2d_array (ptr + total, psf->u.dbuf, bufferlen, scale) ;
 
 		if (psf->peak_info)
 			double64_peak_update (psf, psf->u.dbuf, bufferlen, total / psf->sf.channels) ;
@@ -698,13 +700,15 @@ static sf_count_t
 host_write_i2d	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
+	double		scale ;
 
+	scale = (psf->scale_int_float == 0) ? 1.0 : 1.0 / (8.0 * 0x10000000) ;
 	bufferlen = ARRAY_LEN (psf->u.dbuf) ;
 
 	while (len > 0)
 	{	if (len < bufferlen)
 			bufferlen = (int) len ;
-		i2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
+		i2d_array (ptr + total, psf->u.dbuf, bufferlen, scale) ;
 
 		if (psf->peak_info)
 			double64_peak_update (psf, psf->u.dbuf, bufferlen, total / psf->sf.channels) ;
@@ -901,13 +905,15 @@ static sf_count_t
 replace_write_s2d	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
+	double		scale ;
 
+	scale = (psf->scale_int_float == 0) ? 1.0 : 1.0 / 0x8000 ;
 	bufferlen = ARRAY_LEN (psf->u.dbuf) ;
 
 	while (len > 0)
 	{	if (len < bufferlen)
 			bufferlen = (int) len ;
-		s2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
+		s2d_array (ptr + total, psf->u.dbuf, bufferlen, scale) ;
 
 		if (psf->peak_info)
 			double64_peak_update (psf, psf->u.dbuf, bufferlen, total / psf->sf.channels) ;
@@ -931,13 +937,15 @@ static sf_count_t
 replace_write_i2d	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
+	double		scale ;
 
+	scale = (psf->scale_int_float == 0) ? 1.0 : 1.0 / (8.0 * 0x10000000) ;
 	bufferlen = ARRAY_LEN (psf->u.dbuf) ;
 
 	while (len > 0)
 	{	if (len < bufferlen)
 			bufferlen = (int) len ;
-		i2d_array (ptr + total, psf->u.dbuf, bufferlen) ;
+		i2d_array (ptr + total, psf->u.dbuf, bufferlen, scale) ;
 
 		if (psf->peak_info)
 			double64_peak_update (psf, psf->u.dbuf, bufferlen, total / psf->sf.channels) ;

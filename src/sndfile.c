@@ -883,6 +883,11 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				psf->float_max = psf_calc_signal_max (psf, SF_FALSE) ;
 			return old_value ;
 
+		case SFC_SET_SCALE_INT_FLOAT_WRITE :
+			old_value = psf->scale_int_float ;
+			psf->scale_int_float = (datasize != 0) ? SF_TRUE : SF_FALSE ;
+			return old_value ;
+
 		case SFC_SET_ADD_PEAK_CHUNK :
 			{	int format = psf->sf.format & SF_FORMAT_TYPEMASK ;
 
@@ -2735,10 +2740,3 @@ error_exit :
 	return NULL ;
 } /* psf_open_file */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: cd4f9e91-a8ec-4154-9bf6-fe4b8c69a615
-*/
