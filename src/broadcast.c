@@ -116,6 +116,9 @@ broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, un
 			break ;
 		} ;
 
+	/* Make sure its a terminated C string. */
+	bext->coding_history [sizeof (bext->coding_history) - 1] = 0 ;
+
 	current_history_len = strlen (bext->coding_history) ;
 	newline = "" ;
 
