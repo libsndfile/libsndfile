@@ -1,6 +1,6 @@
 /*
 ** Copyright (C) 2006 Paul Davis <paul@linuxaudiosystems.com>
-** Copyright (C) 2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2006, 2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -80,10 +80,3 @@ broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, un
 	return SF_TRUE ;
 } /* broadcast_add_coding_history */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The following line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 4b3b69c7-d710-4424-9da0-5048534a0beb
-*/
