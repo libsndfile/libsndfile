@@ -1084,7 +1084,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				psf->broadcast_info = broadcast_info_alloc () ;
 
 			broadcast_info_copy (psf->broadcast_info, data) ;
-			broadcast_add_coding_history (psf->broadcast_info, psf->sf.channels, psf->sf.samplerate) ;
+			broadcast_add_coding_history (psf->broadcast_info, psf->sf.channels, psf->sf.samplerate, psf->sf.format) ;
 
 			if (psf->write_header)
 				psf->write_header (psf, SF_TRUE) ;

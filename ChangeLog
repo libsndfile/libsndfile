@@ -1,3 +1,9 @@
+2007-10-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/broadcast.c src/common.h src/sndfile.c
+    Improvements to handling of broadcast info in WAV files. Thanks to Frederic
+    Cornu and other for their input.
+
 2007-10-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/FLAC/include/share/alloc.h
