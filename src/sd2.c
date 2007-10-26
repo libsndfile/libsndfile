@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Paavo Jumppanen
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -533,9 +533,9 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 	psf_log_printf (psf, "Finding parameters :\n") ;
 
 	str_offset = rsrc->string_offset ;
-	psf_log_printf (psf, "  Name           Offset    RsrcId    dlen   slen   Value\n") ;
+	psf_log_printf (psf, "  Name           Offset    RsrcId    dlen    slen    Value\n") ;
 
-	for (k = 0 ; k < rsrc->str_count ; k++)
+	for (k = 0 ; k < rsrc->str_count + 2 ; k++)
 	{	int slen ;
 
 		slen = read_char (rsrc->rsrc_data, str_offset) ;
@@ -547,19 +547,19 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 		data_offset = rsrc->data_offset + read_int (rsrc->rsrc_data, rsrc->item_offset + k * 12 + 4) ;
 		if (data_offset < 0 || data_offset > rsrc->rsrc_len)
 		{	psf_log_printf (psf, "Bad data offset (%d)\n", data_offset) ;
-			return SFE_SD2_BAD_DATA_OFFSET ;
+			break ;		
 			} ;
 
 		data_len = read_int (rsrc->rsrc_data, data_offset) ;
 		if (data_len < 0 || data_len > rsrc->rsrc_len)
 		{	psf_log_printf (psf, "Bad data length (%d).\n", data_len) ;
-			return SFE_SD2_BAD_RSRC ;
+			break ;
 			} ;
 
 		slen = read_char (rsrc->rsrc_data, data_offset + 4) ;
 		read_str (rsrc->rsrc_data, data_offset + 5, value, SF_MIN (SIGNED_SIZEOF (value), slen + 1)) ;
 
-		psf_log_printf (psf, "  %-12s   0x%04x     %4d      %2d     %2d    '%s'\n", name, data_offset, rsrc_id, data_len, slen, value) ;
+		psf_log_printf (psf, "  %-12s   0x%04x     %4d      %3d     %3d    '%s'\n", name, data_offset, rsrc_id, data_len, slen, value) ;
 
 		if (strcmp (name, "sample-size") == 0 && rsrc->sample_size == 0)
 			rsrc->sample_size = strtol (value, NULL, 10) ;
@@ -615,10 +615,3 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 	return 0 ;
 } /* parse_str_rsrc */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 1ee183e5-6b9f-4c2c-bd0a-24f35595cefc
-*/
