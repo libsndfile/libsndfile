@@ -533,7 +533,7 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 	psf_log_printf (psf, "Finding parameters :\n") ;
 
 	str_offset = rsrc->string_offset ;
-	psf_log_printf (psf, "  Name           Offset    RsrcId    dlen    slen    Value\n") ;
+	psf_log_printf (psf, "  Offset    RsrcId    dlen    slen    Value\n") ;
 
 	for (k = 0 ; k < rsrc->str_count + 2 ; k++)
 	{	int slen ;
@@ -559,15 +559,20 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 		slen = read_char (rsrc->rsrc_data, data_offset + 4) ;
 		read_str (rsrc->rsrc_data, data_offset + 5, value, SF_MIN (SIGNED_SIZEOF (value), slen + 1)) ;
 
-		psf_log_printf (psf, "  %-12s   0x%04x     %4d      %3d     %3d    '%s'\n", name, data_offset, rsrc_id, data_len, slen, value) ;
+		psf_log_printf (psf, "  0x%04x     %4d      %3d     %3d    '%s'\n", data_offset, rsrc_id, data_len, slen, value) ;
 
-		if (strcmp (name, "sample-size") == 0 && rsrc->sample_size == 0)
+		if (rsrc_id == 1000 && rsrc->sample_size == 0)
 			rsrc->sample_size = strtol (value, NULL, 10) ;
-		else if (strcmp (name, "sample-rate") == 0 && rsrc->sample_rate == 0)
+		else if (rsrc_id == 1001 && rsrc->sample_rate == 0)
 			rsrc->sample_rate = strtol (value, NULL, 10) ;
-		else if (strcmp (name, "channels") == 0 && rsrc->channels == 0)
+		else if (rsrc_id == 1002 && rsrc->channels == 0)
 			rsrc->channels = strtol (value, NULL, 10) ;
 		} ;
+
+	psf_log_printf (psf, "Found Parameters :\n") ;
+	psf_log_printf (psf, "  sample-size : %d\n", rsrc->sample_size) ;
+	psf_log_printf (psf, "  sample-rate : %d\n", rsrc->sample_rate) ;
+	psf_log_printf (psf, "  channels    : %d\n", rsrc->channels) ;
 
 	if (rsrc->sample_rate <= 4 && rsrc->sample_size > 4)
 	{	int temp ;

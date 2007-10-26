@@ -1,3 +1,8 @@
+2007-10-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sd2.c
+    Identify sample-rate/sample-size/channels by resource id.
+
 2007-10-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/broadcast.c src/common.h src/sndfile.c
