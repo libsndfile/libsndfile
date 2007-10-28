@@ -480,17 +480,16 @@ f2d_array (const float *src, int count, double *dest)
 } /* f2d_array */
 
 static inline void
-s2f_array (const short *src, float *dest, int count)
+s2f_array (const short *src, float *dest, int count, float scale)
 {	while (--count >= 0)
-	{	dest [count] = src [count] ;
+	{	dest [count] = scale * src [count] ;
 		} ;
-
 } /* s2f_array */
 
 static inline void
-i2f_array (const int *src, float *dest, int count)
+i2f_array (const int *src, float *dest, int count, float scale)
 {	while (--count >= 0)
-	{	dest [count] = src [count] ;
+	{	dest [count] = scale * src [count] ;
 		} ;
 } /* i2f_array */
 
@@ -619,13 +618,16 @@ static sf_count_t
 host_write_s2f	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
+	float		scale ;
 
+/* Erik */
+	scale = (psf->scale_int_float == 0) ? 1.0 : 1.0 / 0x8000 ;
 	bufferlen = ARRAY_LEN (psf->u.fbuf) ;
 
 	while (len > 0)
 	{	if (len < bufferlen)
 			bufferlen = (int) len ;
-		s2f_array (ptr + total, psf->u.fbuf, bufferlen) ;
+		s2f_array (ptr + total, psf->u.fbuf, bufferlen, scale) ;
 
 		if (psf->peak_info)
 			float32_peak_update (psf, psf->u.fbuf, bufferlen, total / psf->sf.channels) ;
@@ -647,13 +649,15 @@ static sf_count_t
 host_write_i2f	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
+	float		scale ;
 
+	scale = (psf->scale_int_float == 0) ? 1.0 : 1.0 / (8.0 * 0x10000000) ;
 	bufferlen = ARRAY_LEN (psf->u.fbuf) ;
 
 	while (len > 0)
 	{	if (len < bufferlen)
 			bufferlen = (int) len ;
-		i2f_array (ptr + total, psf->u.fbuf, bufferlen) ;
+		i2f_array (ptr + total, psf->u.fbuf, bufferlen, scale) ;
 
 		if (psf->peak_info)
 			float32_peak_update (psf, psf->u.fbuf, bufferlen, total / psf->sf.channels) ;
@@ -851,13 +855,15 @@ static sf_count_t
 replace_write_s2f	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
+	float		scale ;
 
+	scale = (psf->scale_int_float == 0) ? 1.0 : 1.0 / 0x8000 ;
 	bufferlen = ARRAY_LEN (psf->u.fbuf) ;
 
 	while (len > 0)
 	{	if (len < bufferlen)
 			bufferlen = (int) len ;
-		s2f_array (ptr + total, psf->u.fbuf, bufferlen) ;
+		s2f_array (ptr + total, psf->u.fbuf, bufferlen, scale) ;
 
 		if (psf->peak_info)
 			float32_peak_update (psf, psf->u.fbuf, bufferlen, total / psf->sf.channels) ;
@@ -881,13 +887,15 @@ static sf_count_t
 replace_write_i2f	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	int			bufferlen, writecount ;
 	sf_count_t	total = 0 ;
+	float		scale ;
 
+	scale = (psf->scale_int_float == 0) ? 1.0 : 1.0 / (8.0 * 0x10000000) ;
 	bufferlen = ARRAY_LEN (psf->u.fbuf) ;
 
 	while (len > 0)
 	{	if (len < bufferlen)
 			bufferlen = (int) len ;
-		i2f_array (ptr + total, psf->u.fbuf, bufferlen) ;
+		i2f_array (ptr + total, psf->u.fbuf, bufferlen, scale) ;
 
 		if (psf->peak_info)
 			float32_peak_update (psf, psf->u.fbuf, bufferlen, total / psf->sf.channels) ;
@@ -986,10 +994,3 @@ f2bf_array (float *buffer, int count)
 		} ;
 } /* f2bf_array */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: b6c34917-488c-4145-9648-f4371fc4c889
-*/

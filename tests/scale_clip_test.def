@@ -4,12 +4,14 @@ float_type = {
 	float_type_name		= "float" ;
 	float_short_name	= "flt" ;
 	float_upper_name	= "FLOAT" ;
+	float_to_int		= "lrintf" ;
 	} ;
 
 float_type = {
 	float_type_name		= "double" ;
 	float_short_name	= "dbl" ;
 	float_upper_name	= "DOUBLE" ;
+	float_to_int		= "lrint" ;
 	} ;
 
 

@@ -283,6 +283,8 @@ typedef struct sf_private_tag
 	int				float_int_mult ;
 	float			float_max ;
 
+	int				scale_int_float ;
+
 	/* Vairables for handling pipes. */
 	int				is_pipe ;		/* True if file is a pipe. */
 	sf_count_t		pipeoffset ;	/* Number of bytes read from a pipe. */
@@ -748,7 +750,7 @@ void	psf_get_date_str (char *str, int maxlen) ;
 
 SF_BROADCAST_INFO* broadcast_info_alloc (void) ;
 int		broadcast_info_copy (SF_BROADCAST_INFO* dst, SF_BROADCAST_INFO* src) ;
-int		broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, unsigned int samplerate) ;
+int		broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, unsigned int samplerate, int format) ;
 
 typedef struct
 {	int channels ;

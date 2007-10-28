@@ -124,12 +124,15 @@ enum
 enum
 {	SFC_GET_LIB_VERSION				= 0x1000,
 	SFC_GET_LOG_INFO				= 0x1001,
+	SFC_GET_CURRENT_SF_INFO			= 0x1002,
+
 
 	SFC_GET_NORM_DOUBLE				= 0x1010,
 	SFC_GET_NORM_FLOAT				= 0x1011,
 	SFC_SET_NORM_DOUBLE				= 0x1012,
 	SFC_SET_NORM_FLOAT				= 0x1013,
 	SFC_SET_SCALE_FLOAT_INT_READ	= 0x1014,
+	SFC_SET_SCALE_INT_FLOAT_WRITE	= 0x1015,
 
 	SFC_GET_SIMPLE_FORMAT_COUNT		= 0x1020,
 	SFC_GET_SIMPLE_FORMAT			= 0x1021,
@@ -523,12 +526,6 @@ int		sf_format_check	(const SF_INFO *info) ;
 */
 
 sf_count_t	sf_seek 		(SNDFILE *sndfile, sf_count_t frames, int whence) ;
-
-/* Retrieve the SF_INFO struct for the given SNDFILE. Returns SF_FALSE on
-** failure, SF_TRUE otherwise.
-*/
-
-int sf_get_info (SNDFILE * sndfile, SF_INFO * info) ;
 
 /* Functions for retrieving and setting string data within sound files.
 ** Not all file types support this features; AIFF and WAV do. For both

@@ -270,7 +270,6 @@ static int
 alsa_write_float (snd_pcm_t *alsa_dev, float *data, int frames, int channels)
 {	static	int epipe_count = 0 ;
 
-	snd_pcm_status_t *status ;
 	int total = 0 ;
 	int retval ;
 
@@ -302,8 +301,11 @@ alsa_write_float (snd_pcm_t *alsa_dev, float *data, int frames, int channels)
 						} ;
 					epipe_count += 100 ;
 
+#if 0
 					if (0)
-					{	snd_pcm_status_alloca (&status) ;
+					{	snd_pcm_status_t *status ;
+
+						snd_pcm_status_alloca (&status) ;
 						if ((retval = snd_pcm_status (alsa_dev, status)) < 0)
 							fprintf (stderr, "alsa_out: xrun. can't determine length\n") ;
 						else if (snd_pcm_status_get_state (status) == SND_PCM_STATE_XRUN)
@@ -319,6 +321,7 @@ alsa_write_float (snd_pcm_t *alsa_dev, float *data, int frames, int channels)
 						else
 							fprintf (stderr, "alsa_write_float: xrun. can't determine length\n") ;
 						} ;
+#endif
 
 					snd_pcm_prepare (alsa_dev) ;
 					break ;

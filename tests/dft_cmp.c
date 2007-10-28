@@ -42,11 +42,6 @@ dft_cmp_float (int linenum, const float *in_data, const float *test_data, int le
 	static double test [DFT_DATA_LENGTH] ;
 	unsigned	k ;
 
-	if (! orig || ! test)
-	{	printf ("Error (line %d) : dft_cmp_float : Bad input arrays.\n", linenum) ;
-		return 1 ;
-		} ;
-
 	if (len != DFT_DATA_LENGTH)
 	{	printf ("Error (line %d) : dft_cmp_float : Bad input array length.\n", linenum) ;
 		return 1 ;

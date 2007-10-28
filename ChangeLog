@@ -1,7 +1,54 @@
+2007-10-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sd2.c
+    Identify sample-rate/sample-size/channels by resource id.
+
+2007-10-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/broadcast.c src/common.h src/sndfile.c
+    Improvements to handling of broadcast info in WAV files. Thanks to Frederic
+    Cornu and other for their input.
+
+2007-10-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/FLAC/include/share/alloc.h
+    Mingw fix for SIZE_T_MAX from Uli Franke.
+
+2007-10-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/open_fail_test.c tests/error_test.c tests/Makefile.am
+    Move tests from open_fail_test.c to error_test.c and remove the former.
+
+2007-10-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/scale_clip_test.(def|tpl)
+    Add tests for SFC_SET_INT_FLOAT_WRITE command.
+
+    * doc/command.html
+    Add docs for SFC_SET_INT_FLOAT_WRITE command.
+
+    * examples/sndfile-play.c tests/dft_cmp.c
+    Fix gcc-4.2 warning messages.
+
+2007-10-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in src/sndfile.c
+    Add command SFC_GET_CURRENT_SF_INFO.
+
+    * src/sndfile.h.in src/sndfile.c src/create_symbols_file.py
+    Remove function sf_get_info (only ever in pre-release code).
+
+    * tests/command_test.c
+    Add test for SFC_GET_CURRENT_SF_INFO.
+
 2007-10-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c
-    Add parsing of 'exif' chunks. Orignally coded by Trent Apted.
+    Add parsing of 'exif' chunks. Originally coded by Trent Apted.
+
+    * configure.ac
+    Put config stuff in Cfg directory.
+    Remove check for inttypes.h.
 
 2007-10-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
@@ -131,6 +178,12 @@
 
     * src/sndfile.h.in tests/string_test.c src/flac.c
     Add string type SF_STR_LICENSE, update test and use for FLAC files.
+
+    * src/sndfile.h.in
+    Add definition for SFC_SET_SCALE_FLOAT_INT_WRITE command.
+
+    * src/common.h src/double64.c src/float32.c src/sndfile.c
+    Add support for SFC_SET_SCALE_FLOAT_INT_WRITE (still needs testing).
 
 2007-07-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

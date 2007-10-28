@@ -10,7 +10,7 @@ noinst_PROGRAMS = sfversion floating_point_test write_read_test \
 	lossy_comp_test error_test ulaw_test alaw_test dwvw_test \
 	peak_chunk_test command_test stdin_test stdout_test stdio_test \
 	pcm_test headerless_test pipe_test benchmark header_test misc_test \
-	raw_test string_test open_fail_test multi_file_test dither_test \
+	raw_test string_test multi_file_test dither_test \
 	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
 	locale_test largefile_test win32_ordinal_test ogg_test vorbis_test \
 	$(CPP_TEST)
@@ -100,9 +100,6 @@ string_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 dither_test_SOURCES = dither_test.c utils.c
 dither_test_LDADD = $(SNDFILEDIR)/libsndfile.la
-
-open_fail_test_SOURCES = open_fail_test.c utils.c
-open_fail_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 multi_file_test_SOURCES = multi_file_test.c utils.c
 multi_file_test_LDADD = $(SNDFILEDIR)/libsndfile.la
@@ -217,7 +214,6 @@ wav-tests: write_read_test lossy_comp_test peak_chunk_test header_test misc_test
 	./misc_test wav
 	./string_test wav
 	./multi_file_test wav
-	./open_fail_test wav
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on WAV files."
 	@echo "----------------------------------------------------------------------"

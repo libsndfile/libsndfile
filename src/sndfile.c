@@ -865,6 +865,12 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			psf->norm_float = (datasize) ? SF_TRUE : SF_FALSE ;
 			return old_value ;
 
+		case SFC_GET_CURRENT_SF_INFO :
+			if (data == NULL || datasize != SIGNED_SIZEOF (SF_INFO))
+				return (sf_errno = SFE_BAD_CONTROL_CMD) ;
+			memcpy (data, &psf->sf, sizeof (SF_INFO)) ;
+			break ;
+
 		case SFC_SET_NORM_DOUBLE :
 			old_value = psf->norm_double ;
 			psf->norm_double = (datasize) ? SF_TRUE : SF_FALSE ;
@@ -882,6 +888,11 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			psf->float_int_mult = (datasize != 0) ? SF_TRUE : SF_FALSE ;
 			if (psf->float_int_mult && psf->float_max < 0.0)
 				psf->float_max = psf_calc_signal_max (psf, SF_FALSE) ;
+			return old_value ;
+
+		case SFC_SET_SCALE_INT_FLOAT_WRITE :
+			old_value = psf->scale_int_float ;
+			psf->scale_int_float = (datasize != 0) ? SF_TRUE : SF_FALSE ;
 			return old_value ;
 
 		case SFC_SET_ADD_PEAK_CHUNK :
@@ -1080,7 +1091,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				psf->broadcast_info = broadcast_info_alloc () ;
 
 			broadcast_info_copy (psf->broadcast_info, data) ;
-			broadcast_add_coding_history (psf->broadcast_info, psf->sf.channels, psf->sf.samplerate) ;
+			broadcast_add_coding_history (psf->broadcast_info, psf->sf.channels, psf->sf.samplerate, psf->sf.format) ;
 
 			if (psf->write_header)
 				psf->write_header (psf, SF_TRUE) ;
@@ -1240,23 +1251,6 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 
 /*------------------------------------------------------------------------------
 */
-
-int
-sf_get_info (SNDFILE * sndfile, SF_INFO * info)
-{	SF_PRIVATE 	*psf ;
-
-	if (info == NULL)
-		return SF_FALSE ;
-	if ((psf = (SF_PRIVATE*) sndfile) == NULL)
-		return SF_FALSE ;
-	if (psf->Magick != SNDFILE_MAGICK)
-		return SF_FALSE ;
-
-	/* Need to correct psf->sf.frames ???? */
-	memcpy (info, &psf->sf, sizeof (SF_INFO)) ;
-
-	return SF_TRUE ;
-} /* sf_get_info */
 
 const char*
 sf_get_string (SNDFILE *sndfile, int str_type)
@@ -2753,10 +2747,3 @@ error_exit :
 	return NULL ;
 } /* psf_open_file */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: cd4f9e91-a8ec-4154-9bf6-fe4b8c69a615
-*/

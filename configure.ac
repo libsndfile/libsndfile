@@ -108,9 +108,6 @@ AC_ARG_ENABLE(bow-docs,
 AC_ARG_ENABLE(sqlite,
 	AC_HELP_STRING([--disable-sqlite], [disable use of sqlite]))
 
-AC_ARG_ENABLE(flac,
-	AC_HELP_STRING([--disable-flac], [disable use of FLAC]))
-
 AC_ARG_ENABLE(alsa,
 	AC_HELP_STRING([--disable-alsa], [disable use of ALSA]))
 
