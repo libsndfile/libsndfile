@@ -183,6 +183,8 @@ enum
 	SFC_WAVEX_SET_AMBISONIC			= 0x1200,
 	SFC_WAVEX_GET_AMBISONIC			= 0x1201,
 
+	SFC_SET_ENCODING_QUALITY		= 0x1300,
+
 	/* Following commands for testing only. */
 	SFC_TEST_IEEE_FLOAT_REPLACE		= 0x6001,
 
