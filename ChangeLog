@@ -1,3 +1,8 @@
+2007-10-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/sndfile.c
+    Add error codes SFE_ZERO_MAJOR_FORMAT and SFE_ZERO_MINOR_FORMAT.
+
 2007-10-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sd2.c
