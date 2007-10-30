@@ -1298,6 +1298,6 @@ psf_rand_int32 (void)
 	count = 4 + (value & 7) ;
 	for (k = 0 ; k < count ; k++)
 		value = 11117 * value + 211231 ;
-	
+
 	return value ;
 } /* psf_rand_int32 */

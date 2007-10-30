@@ -523,7 +523,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
-					cptr [dword] = 0 ;
+					if (dword > SIGNED_SIZEOF (psf->u.cbuf))
+						cptr [sizeof (psf->u.cbuf) - 1] = 0 ;
+					else
+						cptr [dword > 0 ? dword : 0] = 0 ;
 
 					psf_sanitize_string (cptr, dword) ;
 
@@ -542,7 +545,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
-					cptr [dword] = 0 ;
+					cptr [dword > 0 ? dword : 0] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
 					psf_store_string (psf, SF_STR_ARTIST, cptr) ;
 					break ;
@@ -590,7 +593,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
-					cptr [dword] = 0 ;
+					cptr [dword > 0 ? dword : 0] = 0 ;
 
 					for (k = 0 ; k < (int) dword ; k++)
 						if (! isprint (cptr [k]))
@@ -613,7 +616,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
-					cptr [dword] = 0 ;
+					cptr [dword > 0 : dword : 0] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
 					psf_store_string (psf, SF_STR_TITLE, cptr) ;
 					break ;
@@ -629,7 +632,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
-					cptr [dword] = 0 ;
+					cptr [dword > 0 ? dword : 0] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
 					psf_store_string (psf, SF_STR_COMMENT, cptr) ;
 					break ;
