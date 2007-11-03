@@ -128,7 +128,7 @@ typedef struct
 	/* Local working space for packet->PCM decode */
 	vorbis_block vb ;
 
-	/* Encoding quality in range [0.0, 10.0]. */
+	/* Encoding quality in range [0.0, 1.0]. */
 	double quality ;
 } VORBIS_PRIVATE ;
 
@@ -554,14 +554,10 @@ ogg_command (SF_PRIVATE *psf, int command, void * data, int datasize)
 			if (data == NULL || datasize != sizeof (double))
 				return 1 ;
 
-			/*
-			**	libsndfile range is [0.0, 1.0], Vorbis range is [0.0, 10.0].
-			**	Scale from libsndfile range to Vorbis range.
-			*/
-			vdata->quality = 10.0 * *((double *) data) ;
+			vdata->quality = *((double *) data) ;
 
 			/* Clip range. */
-			vdata->quality = SF_MAX (0.0, SF_MIN (10.0, vdata->quality)) ;
+			vdata->quality = SF_MAX (0.0, SF_MIN (1.0, vdata->quality)) ;
 
 			psf_log_printf (psf, "%s : Setting SFC_SET_ENCODING_QUALITY to %f.\n", __func__, vdata->quality) ;
 			break ;
