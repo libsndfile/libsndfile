@@ -291,20 +291,25 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 		} ;
 
 	if (log_data)
-	{	int k ;
+	{	int printed_metadata_msg = 0 ;
+		int k ;
 
 		psf_log_printf (psf, "\nBitstream is %d channel, %D Hz\n", vdata->vi.channels, vdata->vi.rate) ;
 		psf_log_printf (psf, "Encoded by: %s\n", vdata->vc.vendor) ;
 
 		/* Throw the comments plus a few lines about the bitstream we're decoding. */
-		psf_log_printf (psf, "Metadata :\n") ;
-
 		for (k = 0 ; k < ARRAY_LEN (vorbis_metatypes) ; k++)
 		{	char *dd ;
 
 			dd = vorbis_comment_query (&vdata->vc, vorbis_metatypes [k].name, 0) ;
 			if (dd == NULL)
 				continue ;
+
+			if (printed_metadata_msg == 0)
+			{	psf_log_printf (psf, "Metadata :\n") ;
+				printed_metadata_msg = 1 ;
+				} ;
+
 			psf_store_string (psf, vorbis_metatypes [k].id, dd) ;
 			psf_log_printf (psf, "  %-10s : %s\n", vorbis_metatypes [k].name, dd) ;
 			} ;
