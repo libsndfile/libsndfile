@@ -73,7 +73,6 @@
 typedef int convert_func (int, void *, int, int, float **) ;
 
 static int	ogg_read_header (SF_PRIVATE *psf, int log_data) ;
-static int	ogg_write_init (SF_PRIVATE *psf, int calc_length) ;
 static int	ogg_write_header (SF_PRIVATE *psf, int calc_length) ;
 static int	ogg_close (SF_PRIVATE *psf) ;
 static int	ogg_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
@@ -128,6 +127,9 @@ typedef struct
 	vorbis_dsp_state vd ;
 	/* Local working space for packet->PCM decode */
 	vorbis_block vb ;
+
+	/* Encoding quality in range [0.0, 10.0]. */
+	double quality ;
 } VORBIS_PRIVATE ;
 
 static int
@@ -337,15 +339,16 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 } /* ogg_read_header */
 
 static int
-ogg_write_init (SF_PRIVATE *psf, int UNUSED (calc_length))
+ogg_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 {
+	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	int ret ;
+	int k, ret ;
 
 	vorbis_info_init (&vdata->vi) ;
 
 	/* The style of encoding should be selectable here, VBR quality mode. */
-	ret = vorbis_encode_init_vbr (&vdata->vi, psf->sf.channels, psf->sf.samplerate, 0.4f) ;
+	ret = vorbis_encode_init_vbr (&vdata->vi, psf->sf.channels, psf->sf.samplerate, vdata->quality) ;
 
 #if 0
 	ret = vorbis_encode_init (&vdata->vi, psf->sf.channels, psf->sf.samplerate, -1, 128000, -1) ; /* average bitrate mode */
@@ -358,16 +361,6 @@ ogg_write_init (SF_PRIVATE *psf, int UNUSED (calc_length))
 		return SFE_BAD_OPEN_FORMAT ;
 
 	vdata->loc = 0 ;
-
-	return 0 ;
-} /* ogg_write_init */
-
-static int
-ogg_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
-{
-	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
-	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	int k ;
 
 	/* add a comment */
 	vorbis_comment_init (&vdata->vc) ;
@@ -497,7 +490,7 @@ int
 ogg_open (SF_PRIVATE *psf)
 {	OGG_PRIVATE* odata = calloc (1, sizeof (OGG_PRIVATE)) ;
 	VORBIS_PRIVATE* vdata = calloc (1, sizeof (VORBIS_PRIVATE)) ;
-	int	subformat, error = 0 ;
+	int	error = 0 ;
 
 	psf->container_data = odata ;
 	psf->codec_data = vdata ;
@@ -519,21 +512,18 @@ ogg_open (SF_PRIVATE *psf)
 		psf->sf.frames		= ogg_length (psf) ;
 		} ;
 
-	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_OGG)
-	{	if ((error = ogg_write_header (psf, 0)))
-			psf->write_header = ogg_write_header ;
-		} ;
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 	psf->container_close = ogg_close ;
 	if (psf->mode == SFM_WRITE)
 	{
-		if ((error = ogg_write_init (psf, 0)))
-			return error ;
-		psf->write_header = ogg_write_header ;
+		/* Set the default vorbis quality here. */
+		vdata->quality = 4.0 ;
+
+		psf->write_header	= ogg_write_header ;
 		psf->write_short	= ogg_write_s ;
 		psf->write_int		= ogg_write_i ;
 		psf->write_float	= ogg_write_f ;
 		psf->write_double	= ogg_write_d ;
+
 		psf->sf.frames = SF_COUNT_MAX ; /* Unknown really */
 		psf->str_flags = SF_STR_ALLOW_START ;
 		} ;
@@ -556,11 +546,26 @@ ogg_open (SF_PRIVATE *psf)
 } /* ogg_open */
 
 static int
-ogg_command (SF_PRIVATE *UNUSED (psf), int command,
-		 void *UNUSED (data), int UNUSED (datasize))
-{
+ogg_command (SF_PRIVATE *psf, int command, void * data, int datasize)
+{	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
+
 	switch (command)
-	{
+	{	case SFC_SET_ENCODING_QUALITY :
+			if (data == NULL || datasize != sizeof (double))
+				return 1 ;
+
+			/*
+			**	libsndfile range is [0.0, 1.0], Vorbis range is [0.0, 10.0].
+			**	Scale from libsndfile range to Vorbis range.
+			*/
+			vdata->quality = 10.0 * *((double *) data) ;
+
+			/* Clip range. */
+			vdata->quality = SF_MAX (0.0, SF_MIN (10.0, vdata->quality)) ;
+
+			psf_log_printf (psf, "%s : Setting SFC_SET_ENCODING_QUALITY to %f.\n", __func__, vdata->quality) ;
+			break ;
+
 		default :
 			return 0 ;
 		} ;
