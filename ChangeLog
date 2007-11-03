@@ -1,3 +1,11 @@
+2007-11-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/util.tpl
+    Increase the printing width for print_test_name().
+
+    * tests/command_test.c tests/Makefile.am
+    Add tests for correct updating of broadcast WAV coding history.
+
 2007-10-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/sndfile.c

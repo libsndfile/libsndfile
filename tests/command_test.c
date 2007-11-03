@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,6 +44,7 @@ static	void	truncate_test			(const char *filename, int filetype) ;
 static	void	instrument_test			(const char *filename, int filetype) ;
 static	void	channel_map_test		(const char *filename, int filetype) ;
 static	void	broadcast_test			(const char *filename, int filetype) ;
+static	void	broadcast_coding_history_test	(const char *filename) ;
 static	void	current_sf_info_test	(const char *filename) ;
 
 /* Force the start of this buffer to be double aligned. Sparc-solaris will
@@ -69,6 +70,8 @@ main (int argc, char *argv [])
 		printf ("           trunc   - test file truncation\n") ;
 		printf ("           inst    - test set/get of SF_INSTRUMENT.\n") ;
 		printf ("           chanmap - test set/get of channel map data..\n") ;
+		printf ("           bext    - test set/get of SF_BROADCAST_INFO.\n") ;
+		printf ("           bextch  - test set/get of SF_BROADCAST_INFO coding_history.\n") ;
 		printf ("           all     - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -119,10 +122,8 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
-	if (do_all || strcmp (argv [1], "chanmap") == 0)
-	{	channel_map_test ("chanmap.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
-		channel_map_test ("chanmap.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
-		/*-instrument_test ("instrument.xi", SF_FORMAT_XI | SF_FORMAT_DPCM_16) ;-*/
+	if (do_all || strcmp (argv [1], "current_sf_info") == 0)
+	{	current_sf_info_test ("current.wav") ;
 		test_count++ ;
 		} ;
 
@@ -131,8 +132,14 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
-	if (do_all || strcmp (argv [1], "current_sf_info") == 0)
-	{	current_sf_info_test ("current.wav") ;
+	if (do_all || strcmp (argv [1], "bextch") == 0)
+	{	broadcast_coding_history_test ("coding_history.wav") ;
+		test_count++ ;
+		} ;
+
+	if (do_all || strcmp (argv [1], "chanmap") == 0)
+	{	channel_map_test ("chanmap.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+		channel_map_test ("chanmap.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
 		test_count++ ;
 		} ;
 
@@ -732,6 +739,55 @@ instrument_test (const char *filename, int filetype)
 	puts ("ok") ;
 } /* instrument_test */
 
+static	void
+current_sf_info_test	(const char *filename)
+{	SNDFILE *outfile, *infile ;
+	SF_INFO outinfo, ininfo ;
+	sf_count_t last_count ;
+
+	print_test_name ("current_sf_info_test", filename) ;
+
+	outinfo.samplerate	= 44100 ;
+	outinfo.format		= (SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+	outinfo.channels	= 1 ;
+	outinfo.frames		= 0 ;
+
+	outfile = test_open_file_or_die (filename, SFM_WRITE, &outinfo, SF_TRUE, __LINE__) ;
+	sf_command (outfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, 0) ;
+
+	exit_if_true (outinfo.frames != 0,
+		"\n\nLine %d : Initial sfinfo.frames is not zero.\n\n", __LINE__
+		) ;
+
+	test_write_double_or_die (outfile, 0, double_data, BUFFER_LEN, __LINE__) ;
+	sf_command (outfile, SFC_GET_CURRENT_SF_INFO, &outinfo, sizeof (outinfo)) ;
+
+	exit_if_true (outinfo.frames != BUFFER_LEN,
+		"\n\nLine %d : Initial sfinfo.frames (%ld) should be %d.\n\n", __LINE__,
+		SF_COUNT_TO_LONG (outinfo.frames), BUFFER_LEN
+		) ;
+
+	/* Read file making sure no channel map exists. */
+	infile = test_open_file_or_die (filename, SFM_READ, &ininfo, SF_TRUE, __LINE__) ;
+
+	last_count = ininfo.frames ;
+
+	test_write_double_or_die (outfile, 0, double_data, BUFFER_LEN, __LINE__) ;
+
+	sf_command (infile, SFC_GET_CURRENT_SF_INFO, &ininfo, sizeof (ininfo)) ;
+
+	exit_if_true (ininfo.frames != BUFFER_LEN,
+		"\n\nLine %d : Initial sfinfo.frames (%ld) should be %d.\n\n", __LINE__,
+		SF_COUNT_TO_LONG (ininfo.frames), BUFFER_LEN
+		) ;
+
+	sf_close (outfile) ;
+	sf_close (infile) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* current_sf_info_test */
+
 static void
 broadcast_test (const char *filename, int filetype)
 {	static SF_BROADCAST_INFO bc_write, bc_read ;
@@ -819,6 +875,100 @@ broadcast_test (const char *filename, int filetype)
 	puts ("ok") ;
 } /* broadcast_test */
 
+static void
+broadcast_coding_history_test (const char *filename)
+{	static SF_BROADCAST_INFO bc_write, bc_read ;
+	SNDFILE	 *file ;
+	SF_INFO	 sfinfo ;
+	const char *default_history = "F=22050,A=PCM,M=mono,W=16" ;
+	const char *supplied_history =
+					"A=PCM,M=mono,F=44100,W=24,T=other\r\n"
+					"A=PCM,M=mono,F=22050,W=16,T=yet_another\r\n" ;
+
+	print_test_name ("broadcast_coding_history_test", filename) ;
+
+	sfinfo.samplerate	= 22050 ;
+	sfinfo.format		= SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
+	sfinfo.channels		= 1 ;
+
+	memset (&bc_write, 0, sizeof (bc_write)) ;
+
+	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
+	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
+	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
+	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
+	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
+	bc_write.coding_history_size = 0 ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_SET_BROADCAST_INFO, &bc_write, sizeof (bc_write)) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_BROADCAST_INFO) failed.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	memset (&bc_read, 0, sizeof (bc_read)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_GET_BROADCAST_INFO, &bc_read, sizeof (bc_read)) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_BROADCAST_INFO) failed.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+	check_log_buffer_or_die (file, __LINE__) ;
+	sf_close (file) ;
+
+	if (bc_read.coding_history_size == 0)
+	{	printf ("\n\nLine %d : missing coding history.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	if (bc_read.coding_history_size < strlen (default_history) || memcmp (bc_read.coding_history, default_history, strlen (default_history)) != 0)
+	{	printf ("\n\nLine %d : unexpected coding history '%.*s'.\n\n", __LINE__, bc_read.coding_history_size, bc_read.coding_history) ;
+		exit (1) ;
+		} ;
+
+	bc_write.coding_history_size = strlen (supplied_history) ;
+	snprintf (bc_write.coding_history, sizeof (bc_write.coding_history), "%s", supplied_history) ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_SET_BROADCAST_INFO, &bc_write, sizeof (bc_write)) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_BROADCAST_INFO) failed.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	memset (&bc_read, 0, sizeof (bc_read)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_GET_BROADCAST_INFO, &bc_read, sizeof (bc_read)) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_BROADCAST_INFO) failed.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+	sf_close (file) ;
+
+	if (strstr (bc_read.coding_history, supplied_history) != bc_read.coding_history)
+	{	printf ("\n\nLine %d : unexpected coding history :\n"
+				"----------------------------------------------------\n%s"
+				"----------------------------------------------------\n"
+				"should be this :\n"
+				"----------------------------------------------------\n%s"
+				"----------------------------------------------------\n"
+				"with one more line at the end.\n\n",
+				__LINE__, bc_read.coding_history, supplied_history) ;
+		exit (1) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* broadcast_coding_history_test */
+
 static	void
 channel_map_test (const char *filename, int filetype)
 {	SNDFILE	 *file ;
@@ -875,53 +1025,4 @@ channel_map_test (const char *filename, int filetype)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* channel_map_test */
-
-static	void
-current_sf_info_test	(const char *filename)
-{	SNDFILE *outfile, *infile ;
-	SF_INFO outinfo, ininfo ;
-	sf_count_t last_count ;
-
-	print_test_name ("current_sf_info_test", filename) ;
-
-	outinfo.samplerate	= 44100 ;
-	outinfo.format		= (SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
-	outinfo.channels	= 1 ;
-	outinfo.frames		= 0 ;
-
-	outfile = test_open_file_or_die (filename, SFM_WRITE, &outinfo, SF_TRUE, __LINE__) ;
-	sf_command (outfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, 0) ;
-
-	exit_if_true (outinfo.frames != 0,
-		"\n\nLine %d : Initial sfinfo.frames is not zero.\n\n", __LINE__
-		) ;
-
-	test_write_double_or_die (outfile, 0, double_data, BUFFER_LEN, __LINE__) ;
-	sf_command (outfile, SFC_GET_CURRENT_SF_INFO, &outinfo, sizeof (outinfo)) ;
-
-	exit_if_true (outinfo.frames != BUFFER_LEN,
-		"\n\nLine %d : Initial sfinfo.frames (%ld) should be %d.\n\n", __LINE__,
-		SF_COUNT_TO_LONG (outinfo.frames), BUFFER_LEN
-		) ;
-
-	/* Read file making sure no channel map exists. */
-	infile = test_open_file_or_die (filename, SFM_READ, &ininfo, SF_TRUE, __LINE__) ;
-
-	last_count = ininfo.frames ;
-
-	test_write_double_or_die (outfile, 0, double_data, BUFFER_LEN, __LINE__) ;
-
-	sf_command (infile, SFC_GET_CURRENT_SF_INFO, &ininfo, sizeof (ininfo)) ;
-
-	exit_if_true (ininfo.frames != BUFFER_LEN,
-		"\n\nLine %d : Initial sfinfo.frames (%ld) should be %d.\n\n", __LINE__,
-		SF_COUNT_TO_LONG (ininfo.frames), BUFFER_LEN
-		) ;
-
-	sf_close (outfile) ;
-	sf_close (infile) ;
-
-	unlink (filename) ;
-	puts ("ok") ;
-} /* current_sf_info_test */
 
