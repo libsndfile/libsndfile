@@ -226,7 +226,7 @@ print_test_name (const char *test, const char *filename)
 		exit (1) ;
 		} ;
 
-	printf ("    %-25s : %s ", test, filename) ;
+	printf ("    %-30s : %s ", test, filename) ;
 
 	count = 24 - strlen (filename) ;
 	while (count -- > 0)

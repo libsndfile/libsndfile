@@ -88,3 +88,4 @@ tests/utils.h
 tests/write_read_test.c
 src/FLAC/src/test_libFLAC/matrix
 *.oct
+examples/sndfilehandle

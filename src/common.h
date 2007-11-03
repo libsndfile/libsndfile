@@ -212,7 +212,11 @@ make_size_t (int x)
 */
 
 typedef struct sf_private_tag
-{	/* Force the compiler to double align the start of buffer. */
+{
+	/* Canary in a coal mine. */
+	char canary [64] ;
+
+	/* Force the compiler to double align the start of buffer. */
 	union
 	{	double			dbuf	[SF_BUFFER_LEN / sizeof (double)] ;
 #if (defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
@@ -386,6 +390,8 @@ enum
 	SFE_MALFORMED_FILE			= SF_ERR_MALFORMED_FILE,
 	SFE_UNSUPPORTED_ENCODING	= SF_ERR_UNSUPPORTED_ENCODING,
 
+	SFE_ZERO_MAJOR_FORMAT,
+	SFE_ZERO_MINOR_FORMAT,
 	SFE_BAD_FILE,
 	SFE_BAD_FILE_READ,
 	SFE_OPEN_FAILED,

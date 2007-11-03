@@ -63,6 +63,8 @@ ErrorStruct SndfileErrors [] =
 	{	SF_ERR_UNSUPPORTED_ENCODING	, "Supported file format but unsupported encoding." },
 
 	/* Private error values and their associated strings. */
+	{	SFE_ZERO_MAJOR_FORMAT	, "Error : major format is 0." },
+	{	SFE_ZERO_MINOR_FORMAT	, "Error : major format is 0." },
 	{	SFE_BAD_FILE			, "File does not exist or is not a regular file (possibly a pipe?)." },
 	{	SFE_BAD_FILE_READ		, "File exists but no data could be read." },
 	{	SFE_OPEN_FAILED			, "Could not open file." },
@@ -2522,6 +2524,15 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	{	/* If the file is being opened for write or RDWR and the file is currently
 		** empty, then the SF_INFO struct must contain valid data.
 		*/
+		if ((psf->sf.format & SF_FORMAT_TYPEMASK) == 0)
+		{	error = SFE_ZERO_MAJOR_FORMAT ;
+			goto error_exit ;
+			} ;
+		if ((psf->sf.format & SF_FORMAT_TYPEMASK) == 0)
+		{	error = SFE_ZERO_MINOR_FORMAT ;
+			goto error_exit ;
+			} ;
+
 		if (sf_format_check (&(psf->sf)) == 0)
 		{	error = SFE_BAD_OPEN_FORMAT ;
 			goto error_exit ;
