@@ -32,6 +32,9 @@
 #include	"dft_cmp.h"
 
 #define	SAMPLE_RATE		16000
+#define	DATA_LENGTH		(SAMPLE_RATE / 8)
+
+static float data_out [DATA_LENGTH] ;
 
 static inline float
 max_float (float a, float b)
@@ -103,11 +106,68 @@ vorbis_test (void)
 	unlink (filename) ;
 } /* vorbis_test */
 
+static void
+vorbis_quality_test (void)
+{	/*
+	**	Encode two files, one at quality 0.3 and one at quality 0.5 and then
+	**	make sure that the quality 0.3 files is the smaller of the two.
+	*/
+	const char * q3_fname = "q3_vorbis.oga" ;
+	const char * q5_fname = "q5_vorbis.oga" ;
+
+	SNDFILE *q3_file, *q5_file ;
+	SF_INFO sfinfo ;
+	int q3_size, q5_size ;
+	double quality ;
+	int k ;
+
+	print_test_name (__func__, "q[35]_vorbis.oga") ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	/* Set up output file type. */
+	sfinfo.format = SF_FORMAT_OGG | SF_FORMAT_VORBIS ;
+	sfinfo.channels = 1 ;
+	sfinfo.samplerate = SAMPLE_RATE ;
+
+	/* Write the output file. */
+	q3_file = test_open_file_or_die (q3_fname, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	q5_file = test_open_file_or_die (q5_fname, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+
+	quality = 0.3 ;
+	sf_command (q3_file, SFC_SET_ENCODING_QUALITY, &quality, sizeof (quality)) ;
+	quality = 0.5 ;
+	sf_command (q5_file, SFC_SET_ENCODING_QUALITY, &quality, sizeof (quality)) ;
+
+	for (k = 0 ; k < 5 ; k++)
+	{	gen_lowpass_noise_float (data_out, ARRAY_LEN (data_out)) ;
+		test_write_float_or_die (q3_file, 0, data_out, ARRAY_LEN (data_out), __LINE__) ;
+		test_write_float_or_die (q5_file, 0, data_out, ARRAY_LEN (data_out), __LINE__) ;
+		} ;
+
+	sf_close (q3_file) ;
+	sf_close (q5_file) ;
+
+	q3_size = file_length (q3_fname) ;
+	q5_size = file_length (q5_fname) ;
+
+	if (q3_size >= q5_size)
+	{	printf ("\n\nLine %d : q3 size (%d) >= q5 size (%d)\n\n", __LINE__, q3_size, q5_size) ;
+		exit (1) ;
+		} ;
+
+	puts ("ok") ;
+	unlink (q3_fname) ;
+	unlink (q5_fname) ;
+} /* vorbis_quality_test */
+
+
 
 int
 main (void)
 {
 	vorbis_test () ;
+	vorbis_quality_test () ;
 
 	return 0 ;
 } /* main */
