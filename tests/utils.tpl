@@ -113,6 +113,10 @@ void	test_seek_or_die
 			(SNDFILE *file, int pass, const [+ (get "io_element") +] *test, sf_count_t [+ (get "count_name") +], int line_num) ;
 [+ ENDFOR io_type +][+ ENDFOR write_op +]
 
+void	gen_lowpass_noise_float (float *data, int len) ;
+
+int		file_length (const char * fname) ;
+
 #endif
 
 #ifdef __cplusplus
@@ -713,6 +717,37 @@ write_mono_file (const char * filename, int format, int srate, float * output, i
 	
 	sf_close (file) ;
 } /* write_mono_file */
+
+void
+gen_lowpass_noise_float (float *data, int len)
+{	int32_t value = 0x1243456 ;
+	double sample, last_val = 0.0 ;
+	int k ;
+
+	for (k = 0 ; k < len ; k++)
+	{	/* Not a crypto quality RNG. */
+		value = 11117 * value + 211231 ;
+		value = 11117 * value + 211231 ;
+		value = 11117 * value + 211231 ;
+
+		sample = value / (0x7fffffff * 1.000001) ;
+		sample = 0.2 * sample - 0.9 * last_val ;
+
+		data [k] = last_val = sample ;
+		} ;
+
+} /* gen_lowpass_noise_float */
+
+int
+file_length (const char * fname)
+{	struct stat data ;
+
+	if (stat (fname, &data) != 0)
+		return 0 ;
+
+	return (int) data.st_size ;
+} /* file_length */
+
 
 [+ ESAC +]
 

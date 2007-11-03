@@ -41,7 +41,6 @@
 
 #define	DATA_LENGTH 		(512)
 
-static off_t get_file_length (int fd) ;
 static void write_file_at_end (int fd, int filetype, int channels, int file_num) ;
 
 static void multi_file_test (const char *filename, int *formats, int format_count) ;
@@ -131,7 +130,7 @@ multi_file_test (const char *filename, int *formats, int format_count)
 {	SNDFILE				*sndfile ;
 	SF_INFO				sfinfo ;
 	SF_EMBED_FILE_INFO	embed_info ;
-	off_t				file_length ;
+	off_t				filelen ;
 	int					fd, k, file_count = 0 ;
 
 	print_test_name ("multi_file_test", filename) ;
@@ -148,14 +147,14 @@ multi_file_test (const char *filename, int *formats, int format_count)
 	for (k = 0 ; k < format_count ; k++)
 		write_file_at_end (fd, formats [k], 2, k) ;
 
-	file_length = get_file_length (fd) ;
+	filelen = file_length (filename) ;
 
 	embed_info.offset = 4 ;
 	embed_info.length = 0 ;
 
 	file_count = 0 ;
 
-	while (embed_info.offset + embed_info.length < file_length)
+	while (embed_info.offset + embed_info.length < filelen)
 	{
 		file_count ++ ;
 
@@ -237,22 +236,3 @@ write_file_at_end (int fd, int filetype, int channels, int file_num)
 	sf_close (sndfile) ;
 } /* write_file_at_end */
 
-static off_t
-get_file_length (int fd)
-{	struct stat statbuf ;
-
-	if (fstat (fd, &statbuf) == -1)
-	{	printf ("\n\nError : fstat error : %s\n\n", strerror (errno)) ;
-		exit (1) ;
-		} ;
-
-	return statbuf.st_size ;
-} /* get_file_length */
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: c1a09b0e-57c9-4306-b69e-a865d44eecb3
-*/
