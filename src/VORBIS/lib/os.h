@@ -79,7 +79,7 @@ void *_alloca(size_t size);
 #  define max(x,y)  ((x)<(y)?(y):(x))
 #endif
 
-#if defined(__i386__) && defined(__GNUC__) && !defined(__BEOS__)
+#if (defined(__i386__) || defined (__x86_64__)) && defined(__GNUC__) && !defined(__BEOS__)
 #  define VORBIS_FPU_CONTROL
 /* both GCC and MSVC are kinda stupid about rounding/casting to int.
    Because of encapsulation constraints (GCC can't see inside the asm
