@@ -135,9 +135,9 @@ vorbis_quality_test (void)
 	q5_file = test_open_file_or_die (q5_fname, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
 
 	quality = 0.3 ;
-	sf_command (q3_file, SFC_SET_ENCODING_QUALITY, &quality, sizeof (quality)) ;
+	sf_command (q3_file, SFC_SET_VBR_ENCODING_QUALITY, &quality, sizeof (quality)) ;
 	quality = 0.5 ;
-	sf_command (q5_file, SFC_SET_ENCODING_QUALITY, &quality, sizeof (quality)) ;
+	sf_command (q5_file, SFC_SET_VBR_ENCODING_QUALITY, &quality, sizeof (quality)) ;
 
 	for (k = 0 ; k < 5 ; k++)
 	{	gen_lowpass_noise_float (data_out, ARRAY_LEN (data_out)) ;

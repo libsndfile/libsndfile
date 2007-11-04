@@ -550,7 +550,7 @@ ogg_command (SF_PRIVATE *psf, int command, void * data, int datasize)
 {	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 
 	switch (command)
-	{	case SFC_SET_ENCODING_QUALITY :
+	{	case SFC_SET_VBR_ENCODING_QUALITY :
 			if (data == NULL || datasize != sizeof (double))
 				return 1 ;
 
@@ -559,7 +559,7 @@ ogg_command (SF_PRIVATE *psf, int command, void * data, int datasize)
 			/* Clip range. */
 			vdata->quality = SF_MAX (0.0, SF_MIN (1.0, vdata->quality)) ;
 
-			psf_log_printf (psf, "%s : Setting SFC_SET_ENCODING_QUALITY to %f.\n", __func__, vdata->quality) ;
+			psf_log_printf (psf, "%s : Setting SFC_SET_VBR_ENCODING_QUALITY to %f.\n", __func__, vdata->quality) ;
 			break ;
 
 		default :
