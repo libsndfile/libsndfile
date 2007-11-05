@@ -1,3 +1,13 @@
+2007-11-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * M4/gcc_version.m4
+    Add macro AC_GCC_VERSION to detect GCC_MAJOR_VERSION and GCC_MINOR_VERSION.
+
+    * configure.ac
+    Use AC_GCC_VERSION to work around gcc-4.2 inline warning stupidity.
+    See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=33995
+    Use -fgnu-inline to prevent stupid warnings.
+
 2007-11-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/util.tpl
