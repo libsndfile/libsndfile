@@ -48,6 +48,7 @@ ALL_SYMBOLS = (
 	(	"sf_error_str",		9	),
 	(	"sf_error_number",	10	),
 	(	"sf_format_check",	11	),
+	(	"sf_stop",		12	),
 	(	"sf_read_raw",		16	),
 	(	"sf_readf_short",	17	),
 	(	"sf_readf_int",		18	),

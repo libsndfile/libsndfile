@@ -19,15 +19,15 @@
 /*
 **	This is the OKI / Dialogic ADPCM encoder/decoder. It converts from
 **	12 bit linear sample data to a 4 bit ADPCM.
-**
-**	Implemented from the description found here:
-**
-**		http://www.comptek.ru:8100/telephony/tnotes/tt1-13.html
-**
-**	and compared against the encoder/decoder found here:
-**
-**		http://ibiblio.org/pub/linux/apps/sound/convert/vox.tar.gz
 */
+
+/*
+ * Note: some early Dialogic hardware does not always reset the ADPCM encoder
+ * at the start of each vox file. This can result in clipping and/or DC offset
+ * problems when it comes to decoding the audio. Whilst little can be done
+ * about the clipping, a DC offset can be removed by passing the decoded audio
+ * through a high-pass filter at e.g. 10Hz.
+ */
 
 #include	"sfconfig.h"
 
@@ -39,14 +39,14 @@
 #include	"sfendian.h"
 #include	"float_cast.h"
 #include	"common.h"
+#include	"adpcms.h"
 
 #define		VOX_DATA_LEN	2048
 #define		PCM_DATA_LEN	(VOX_DATA_LEN *2)
 
 typedef struct
-{	short last ;
-	short step_index ;
-
+{
+	adpcm_codec codec ;
 	int		vox_bytes, pcm_samples ;
 
 	unsigned char	vox_data [VOX_DATA_LEN] ;
@@ -55,9 +55,6 @@ typedef struct
 
 static int vox_adpcm_encode_block (VOX_ADPCM_PRIVATE *pvox) ;
 static int vox_adpcm_decode_block (VOX_ADPCM_PRIVATE *pvox) ;
-
-static short vox_adpcm_decode (char code, VOX_ADPCM_PRIVATE *pvox) ;
-static char vox_adpcm_encode (short samp, VOX_ADPCM_PRIVATE *pvox) ;
 
 static sf_count_t vox_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
 static sf_count_t vox_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
@@ -71,23 +68,18 @@ static sf_count_t vox_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t le
 
 static int vox_read_block (SF_PRIVATE *psf, VOX_ADPCM_PRIVATE *pvox, short *ptr, int len) ;
 
-/*============================================================================================
-** Predefined OKI ADPCM encoder/decoder tables.
-*/
-
-static short step_size_table [49] =
-{	16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45, 50, 55, 60,
-	66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173, 190, 209,
-	230, 253, 279, 307, 337, 371, 408, 449, 494, 544, 598, 658,
-	724, 796, 876, 963, 1060, 1166, 1282, 1408, 1552
-} ; /* step_size_table */
-
-static short step_adjust_table [8] =
-{	-1, -1, -1, -1, 2, 4, 6, 8
-} ; /* step_adjust_table */
-
 /*------------------------------------------------------------------------------
 */
+
+static int
+codec_close (SF_PRIVATE * psf)
+{
+	VOX_ADPCM_PRIVATE * p = (VOX_ADPCM_PRIVATE *) psf->codec_data ;
+
+	if (p->codec.errors)
+		psf_log_printf (psf, "*** Warning : ADPCM state errors: %d\n", p->codec.errors) ;
+	return p->codec.errors ;
+} /* code_close */
 
 int
 vox_adpcm_init (SF_PRIVATE *psf)
@@ -129,93 +121,19 @@ vox_adpcm_init (SF_PRIVATE *psf)
 	psf->sf.frames = psf->filelength * 2 ;
 
 	psf->sf.seekable = SF_FALSE ;
+	psf->codec_close = codec_close ;
 
 	/* Seek back to start of data. */
 	if (psf_fseek (psf, 0 , SEEK_SET) == -1)
 		return SFE_BAD_SEEK ;
+
+	adpcm_init (&pvox->codec, ADPCM_OKI) ;
 
 	return 0 ;
 } /* vox_adpcm_init */
 
 /*------------------------------------------------------------------------------
 */
-
-static char
-vox_adpcm_encode (short samp, VOX_ADPCM_PRIVATE *pvox)
-{	short code ;
-	short diff, error, stepsize ;
-
-	stepsize = step_size_table [pvox->step_index] ;
-	code = 0 ;
-
-	diff = samp - pvox->last ;
-	if (diff < 0)
-	{	code = 0x08 ;
-		error = -diff ;
-		}
-	else
-		error = diff ;
-
-	if (error >= stepsize)
-	{	code = code | 0x04 ;
-		error -= stepsize ;
-		} ;
-
-	if (error >= stepsize / 2)
-	{	code = code | 0x02 ;
-		error -= stepsize / 2 ;
-		} ;
-
-	if (error >= stepsize / 4)
-		code = code | 0x01 ;
-
-	/*
-	** To close the feedback loop, the deocder is used to set the
-	** estimate of last sample and in doing so, also set the step_index.
-	*/
-	pvox->last = vox_adpcm_decode (code, pvox) ;
-
-	return code ;
-} /* vox_adpcm_encode */
-
-static short
-vox_adpcm_decode (char code, VOX_ADPCM_PRIVATE *pvox)
-{	short diff, error, stepsize, samp ;
-
-	stepsize = step_size_table [pvox->step_index] ;
-
-	error = stepsize / 8 ;
-
-	if (code & 0x01)
-		error += stepsize / 4 ;
-
-	if (code & 0x02)
-		error += stepsize / 2 ;
-
-	if (code & 0x04)
-		error += stepsize ;
-
-	diff = (code & 0x08) ? -error : error ;
-	samp = pvox->last + diff ;
-
-	/*
-	**  Apply clipping.
-	*/
-	if (samp > 2048)
-		samp = 2048 ;
-	if (samp < -2048)
-		samp = -2048 ;
-
-	pvox->last = samp ;
-	pvox->step_index += step_adjust_table [code & 0x7] ;
-
-	if (pvox->step_index < 0)
-		pvox->step_index = 0 ;
-	if (pvox->step_index > 48)
-		pvox->step_index = 48 ;
-
-	return samp ;
-} /* vox_adpcm_decode */
 
 static int
 vox_adpcm_encode_block (VOX_ADPCM_PRIVATE *pvox)
@@ -227,8 +145,8 @@ vox_adpcm_encode_block (VOX_ADPCM_PRIVATE *pvox)
 		pvox->pcm_data [pvox->pcm_samples++] = 0 ;
 
 	for (j = k = 0 ; k < pvox->pcm_samples ; j++)
-	{	code = vox_adpcm_encode (pvox->pcm_data [k++] / 16, pvox) << 4 ;
-		code |= vox_adpcm_encode (pvox->pcm_data [k++] / 16, pvox) ;
+	{	code = adpcm_encode (&pvox->codec, pvox->pcm_data [k++]) << 4 ;
+		code |= adpcm_encode (&pvox->codec, pvox->pcm_data [k++]) ;
 		pvox->vox_data [j] = code ;
 		} ;
 
@@ -244,8 +162,8 @@ vox_adpcm_decode_block (VOX_ADPCM_PRIVATE *pvox)
 
 	for (j = k = 0 ; j < pvox->vox_bytes ; j++)
 	{	code = pvox->vox_data [j] ;
-		pvox->pcm_data [k++] = 16 * vox_adpcm_decode ((code >> 4) & 0x0f, pvox) ;
-		pvox->pcm_data [k++] = 16 * vox_adpcm_decode (code & 0x0f, pvox) ;
+		pvox->pcm_data [k++] = adpcm_decode (&pvox->codec, code >> 4) ;
+		pvox->pcm_data [k++] = adpcm_decode (&pvox->codec, code) ;
 		} ;
 
 	pvox->pcm_samples = k ;
@@ -264,7 +182,7 @@ vox_read_block (SF_PRIVATE *psf, VOX_ADPCM_PRIVATE *pvox, short *ptr, int len)
 	{	pvox->vox_bytes = (len - indx > PCM_DATA_LEN) ? VOX_DATA_LEN : (len - indx + 1) / 2 ;
 
 		if ((k = psf_fread (pvox->vox_data, 1, pvox->vox_bytes, psf)) != pvox->vox_bytes)
-		{	if (psf_ftell (psf) + k != psf->filelength)
+		{	if (psf_ftell (psf) != psf->filelength)
 				psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, pvox->vox_bytes) ;
 			if (k == 0)
 				break ;
@@ -408,7 +326,7 @@ vox_write_block (SF_PRIVATE *psf, VOX_ADPCM_PRIVATE *pvox, const short *ptr, int
 		vox_adpcm_encode_block (pvox) ;
 
 		if ((k = psf_fwrite (pvox->vox_data, 1, pvox->vox_bytes, psf)) != pvox->vox_bytes)
-			psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, pvox->vox_bytes) ;
+			psf_log_printf (psf, "*** Warning : short write (%d != %d).\n", k, pvox->vox_bytes) ;
 
 		indx += pvox->pcm_samples ;
 		} ;

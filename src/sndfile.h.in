@@ -579,6 +579,13 @@ sf_count_t	sf_write_float	(SNDFILE *sndfile, const float *ptr, sf_count_t items)
 sf_count_t	sf_read_double	(SNDFILE *sndfile, double *ptr, sf_count_t items) ;
 sf_count_t	sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t items) ;
 
+/* Optionally, call before sf_close to stop the codec and container and be
+** able to retrieve any resultant logged messages via SFC_GET_LOG_INFO.
+** Returns 0 on success, or an error number.
+*/
+
+int		sf_stop 		(SNDFILE *sndfile) ;
+
 /* Close the SNDFILE and clean up all memory allocations associated with this
 ** file.
 ** Returns 0 on success, or an error number.

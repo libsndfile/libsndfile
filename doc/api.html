@@ -71,6 +71,7 @@ The functions of libsndfile are defined as follows:
       int         <A HREF="#error">sf_perror</A>        (SNDFILE *sndfile) ;
       int         <A HREF="#error">sf_error_str</A>     (SNDFILE *sndfile, char* str, size_t len) ;
 
+      int         <A HREF="#stop">sf_stop</A>          (SNDFILE *sndfile) ;
       int         <A HREF="#close">sf_close</A>         (SNDFILE *sndfile) ;
       void        <A HREF="#write_sync">sf_write_sync</A>    (SNDFILE *sndfile) ;
 
@@ -422,6 +423,34 @@ error enumerations into text strings.
 The functions sf_perror() and sf_error_str() are deprecated and will be dropped
 from the library at some later date.
 </P>
+
+<A NAME="stop"></A>
+<H2><BR><B>Codec and Container Stop Function</B></H2>
+
+<PRE>
+      int  sf_stop   (SNDFILE *sndfile) ;
+</PRE>
+<!-- pepper -->
+<P>
+The stop function may optionally be called before the close function to allow
+any associated log messages to be retrieved using SFC_GET_LOG_INFO.
+It returns 0 on success or an error value otherwise.
+</P>
+<BR>
+
+<A NAME="stop"></A>
+<H2><BR><B>Codec and Container Stop Function</B></H2>
+
+<PRE>
+      int  sf_stop   (SNDFILE *sndfile) ;
+</PRE>
+<!-- pepper -->
+<P>
+The stop function may optionally be called before the close function to allow
+any associated log messages to be retrieved using SFC_GET_LOG_INFO.
+It returns 0 on success or an error value otherwise.
+</P>
+<BR>
 
 <A NAME="close"></A>
 <H2><BR><B>File Close Function</B></H2>

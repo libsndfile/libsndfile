@@ -262,6 +262,7 @@ static int	validate_sfinfo (SF_INFO *sfinfo) ;
 static int	validate_psf (SF_PRIVATE *psf) ;
 static void	save_header_info (SF_PRIVATE *psf) ;
 static void	copy_filename (SF_PRIVATE *psf, const char *path) ;
+static int	psf_stop (SF_PRIVATE *psf) ;
 static int	psf_close (SF_PRIVATE *psf) ;
 static SNDFILE * psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo) ;
 
@@ -388,6 +389,15 @@ sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user
 
 	return psf_open_file (psf, mode, sfinfo) ;
 } /* sf_open_virtual */
+
+int
+sf_stop	(SNDFILE *sndfile)
+{	SF_PRIVATE	*psf ;
+
+	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
+
+	return psf_stop (psf) ;
+} /* sf_stop */
 
 int
 sf_close	(SNDFILE *sndfile)
@@ -2361,14 +2371,24 @@ copy_filename (SF_PRIVATE *psf, const char *path)
 */
 
 static int
-psf_close (SF_PRIVATE *psf)
-{	int	error ;
+psf_stop (SF_PRIVATE *psf)
+{	int	error = 0 ;
 
 	if (psf->codec_close)
-		error = psf->codec_close (psf) ;
+	{	error = psf->codec_close (psf) ;
+		psf->codec_close = NULL ;
+		}
 	if (psf->container_close)
-		error = psf->container_close (psf) ;
+	{	error = psf->container_close (psf) ;
+		psf->container_close = NULL ;
+		} ;
 
+	return error ;
+} /* psf_stop */
+
+static int
+psf_close (SF_PRIVATE *psf)
+{	psf_stop (psf) ;
 	psf_fclose (psf) ;
 	psf_close_rsrc (psf) ;
 
