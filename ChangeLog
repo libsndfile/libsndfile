@@ -1,3 +1,8 @@
+2007-11-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h
+    Fix symbol class when SF_MIN is nested inside SF_MAX or vice versa.
+
 2007-11-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * M4/gcc_version.m4
