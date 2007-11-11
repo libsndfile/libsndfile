@@ -508,6 +508,18 @@ win32_target_dll=0
 if test x$ac_cv_c_compiler_gnu = xyes ; then
 	AC_ADD_CFLAGS(-std=gnu99)
 
+	AC_GCC_VERSION
+
+	if test "x$GCC_MAJOR_VERSION$GCC_MINOR_VERSION" = "x42" ; then
+		AC_MSG_WARN([****************************************************************])
+		AC_MSG_WARN([** GCC version 4.2 warns about the inline keyword for no good **])
+		AC_MSG_WARN([** reason but the maintainers do not see it as a bug.         **])
+		AC_MSG_WARN([** See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=33995      **])
+		AC_MSG_WARN([** Use -fgnu-inline to avoid this stupidity.                  **])
+		AC_MSG_WARN([****************************************************************])
+		AC_ADD_CFLAGS([-fgnu89-inline])
+		fi
+
 	CFLAGS="$CFLAGS -W -Wall"
 	CXXFLAGS="$CXXFLAGS -W -Wall"
 
@@ -568,8 +580,6 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	 	fi
 
 	AC_DEFINE([COMPILER_IS_GCC],1, [Set to 1 if the compile is GNU GCC.])
-	GCC_MAJOR_VERSION=`$CC -dumpversion | sed "s/\..*//"`
-	AC_DEFINE_UNQUOTED([GCC_MAJOR_VERSION],${GCC_MAJOR_VERSION}, [Major version of GCC or 3 otherwise.])
 	fi
 
 AC_DEFINE_UNQUOTED(WIN32_TARGET_DLL, ${win32_target_dll}, [Set to 1 if windows DLL is being built.])
@@ -646,7 +656,7 @@ AC_MSG_RESULT([
 if test x$ac_cv_c_compiler_gnu = xyes ; then
 	echo -e "  Tools :\n"
 	echo "    Compiler is GCC : ............. ${ac_cv_c_compiler_gnu}"
-	echo "    GCC major version : ........... ${GCC_MAJOR_VERSION}"
+	echo "    GCC version : ................. ${GCC_VERSION}."
 	if test $GCC_MAJOR_VERSION -lt 3 ; then
 		echo -e "\n    ** This compiler version allows applications to write"
 		echo "    ** to static strings within the library."
