@@ -1,3 +1,8 @@
+2007-11-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/file_io.c tests/utils.tpl tests/benchmark.tpl
+    Improve handling of requirements for O_BINARY as suggested by Ed Schouten.
+
 2007-11-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h
