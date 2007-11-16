@@ -1,3 +1,9 @@
+2007-11-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    Fix calculation of internal value psf->read_current when attempting to read
+    past end of audio data.
+
 2007-11-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac src/Makefile.am src/create_symbols_file.py
