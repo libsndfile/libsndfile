@@ -1,3 +1,8 @@
+2007-11-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac src/Makefile.am src/create_symbols_file.py
+    More OS/2 fixes from David Yeo.
+
 2007-11-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/file_io.c tests/utils.tpl tests/benchmark.tpl

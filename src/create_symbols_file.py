@@ -113,7 +113,7 @@ def os2_symbols (progname, version, name):
 	print "DATA PRELOAD MOVEABLE MULTIPLE NONSHARED"
 	print "EXPORTS\n"
 	for name, ordinal in ALL_SYMBOLS:
-        	print "%-20s @%s" % (name, ordinal)
+        	print "_%-20s @%s" % (name, ordinal)
 	print
 	return
 
