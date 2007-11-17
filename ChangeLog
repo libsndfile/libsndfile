@@ -1,7 +1,38 @@
+2007-11-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    Fix calculation of internal value psf->read_current when attempting to read
+    past end of audio data.
+    Remove redundant code.
+
+    * tests/lossy_comp_test.c
+    Add read_raw_test to check that raw reads do not go past the end of the
+    audio data section.
+    Clean up error output messages.
+
+    * src/sndfile.c
+    Add code to prevent sf_read_raw from reading past the end of the audio data.
+
+    * tests/Makefile.am
+    Add the wav_pcm lossy_comp_test.
+
+2007-11-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac src/Makefile.am src/create_symbols_file.py
+    More OS/2 fixes from David Yeo.
+
+2007-11-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/file_io.c tests/utils.tpl tests/benchmark.tpl
+    Improve handling of requirements for O_BINARY as suggested by Ed Schouten.
+
 2007-11-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h
     Fix symbol class when SF_MIN is nested inside SF_MAX or vice versa.
+
+    * src/create_symbols_file.py
+    Add support for OS/2 contributed by David Yeo.
 
 2007-11-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

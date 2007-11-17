@@ -38,6 +38,7 @@ AC_LANG([C])
 SHARED_VERSION_INFO="1:18:0"
 
 AC_PROG_CC
+AC_PROG_CXX
 AM_PROG_LIBTOOL
 
 AC_CHECK_PROG(HAVE_AUTOGEN, autogen, yes, no)
@@ -571,6 +572,9 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 			if test x"$enable_shared" = xno ; then
 				win32_target_dll=0
 				fi
+			;;
+		os2*)
+			SHLIB_VERSION_ARG="-Wl,-export-symbols \$(srcdir)/Symbols.os2"
 			;;
 		*)
 			;;

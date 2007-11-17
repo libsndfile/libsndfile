@@ -198,6 +198,7 @@ endif
 
 wav-tests: write_read_test lossy_comp_test peak_chunk_test header_test misc_test multi_file_test
 	./write_read_test wav
+	./lossy_comp_test wav_pcm
 	./lossy_comp_test wav_ima
 	./lossy_comp_test wav_msadpcm
 	./lossy_comp_test wav_ulaw
