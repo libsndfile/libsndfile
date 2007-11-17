@@ -64,6 +64,8 @@ static	void	smoothed_diff_double (double *data, unsigned int datalen) ;
 
 static void		check_comment (SNDFILE * file, int format, int lineno) ;
 
+static int		is_lossy (int filetype) ;
+
 /*
 ** Force the start of these buffers to be double aligned. Sparc-solaris will
 ** choke if they are not.
@@ -107,15 +109,15 @@ main (int argc, char *argv [])
 
 	do_all = ! strcmp (argv [1], "all") ;
 
-	if (strcmp (argv [1], "wav_pcm") == 0)
+	if (do_all || strcmp (argv [1], "wav_pcm") == 0)
 	{	/* This is just a sanity test for PCM encoding. */
 		lcomp_test_short	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 1e-50) ;
-		lcomp_test_int		("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 1e-50) ;
+		lcomp_test_int		("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_32, 2, 1e-50) ;
 		lcomp_test_short	("pcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 1e-50) ;
-		lcomp_test_int		("pcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 1e-50) ;
+		lcomp_test_int		("pcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_32, 2, 1e-50) ;
 		/* Lite remove start */
-		lcomp_test_float	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 1e-50) ;
-		lcomp_test_double	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 1e-50) ;
+		lcomp_test_float	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_FLOAT, 2, 1e-50) ;
+		lcomp_test_double	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_DOUBLE, 2, 1e-50) ;
 		/* Lite remove end */
 
 		read_raw_test ("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_U8, 2) ;
@@ -126,7 +128,7 @@ main (int argc, char *argv [])
 	/* Lite remove start */
 	if (do_all || strcmp (argv [1], "wav_ima") == 0)
 	{	lcomp_test_short	("ima.wav", SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
-		lcomp_test_int		("ima.wav", SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
+		lcomp_test_int		("ima.wav", SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.65) ;
 		lcomp_test_float	("ima.wav", SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
 		lcomp_test_double	("ima.wav", SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2, 0.18) ;
 
@@ -708,7 +710,7 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 
 	test_readf_short_or_die (file, 0, data, 1, __LINE__) ;
 	if (error_function (1.0 * data [0], 1.0 * orig [5 * channels], margin))
-	{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_readf_short failed (%d should be %d).\n", __LINE__, data [0], orig [5]) ;
+	{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_readf_short failed (%d should be %d).\n", __LINE__, data [0], orig [5 * channels]) ;
 		exit (1) ;
 		} ;
 
@@ -725,22 +727,31 @@ static void
 lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 {	SNDFILE			*file ;
 	SF_INFO			sfinfo ;
-	int				k, m, *orig, *data, half_max_abs ;
+	int				k, m, half_max_abs ;
 	long			datalen, seekpos ;
-	double			scale ;
+	double			scale, max_val ;
+	int				*orig, *data ;
 
 	print_test_name ("lcomp_test_int", filename) ;
 
 	datalen = BUFFER_SIZE / channels ;
 
-	scale = 1.0 * 0x10000 ;
+	if (is_lossy (filetype))
+	{	scale = 1.0 * 0x10000 ;
+		max_val = 32000.0 * scale ;
+		}
+	else
+	{	scale = 1.0 ;
+		max_val = 0x7fffffff * scale ;
+		} ;
 
 	data = data_buffer.i ;
 	orig = orig_buffer.i ;
 
-	gen_signal_double (orig_buffer.d, 32000.0 * scale, channels, datalen) ;
+	gen_signal_double (orig_buffer.d, max_val, channels, datalen) ;
+
 	for (k = 0 ; k < channels * datalen ; k++)
-		orig [k] = orig_buffer.d [k] ;
+		orig [k] = lrint (orig_buffer.d [k]) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -927,7 +938,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 
 	gen_signal_double (orig_buffer.d, 32000.0, channels, datalen) ;
 	for (k = 0 ; k < channels * datalen ; k++)
-		orig [k] = (float) (orig_buffer.d [k]) ;
+		orig [k] = orig_buffer.d [k] ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -1090,7 +1101,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 
 	test_readf_float_or_die (file, 0, data, 1, __LINE__) ;
 	if (error_function (data [0], orig [5 * channels], margin))
-	{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_readf_short failed (%f should be %f).\n", __LINE__, data [0], orig [5]) ;
+	{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_readf_short failed (%f should be %f).\n", __LINE__, data [0], orig [5 * channels]) ;
 		exit (1) ;
 		} ;
 
@@ -1121,7 +1132,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 
 	gen_signal_double (orig_buffer.d, 32000.0, channels, datalen) ;
 	for (k = 0 ; k < channels * datalen ; k++)
-		orig [k] = (double) (orig_buffer.d [k]) ;
+		orig [k] = orig_buffer.d [k] ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -1284,7 +1295,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 
 	test_readf_double_or_die (file, 0, data, 1, __LINE__) ;
 	if (error_function (data [0], orig [5 * channels], margin))
-	{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_readf_short failed (%f should be %f).\n", __LINE__, data [0], orig [5]) ;
+	{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_readf_short failed (%f should be %f).\n", __LINE__, data [0], orig [5 * channels]) ;
 		exit (1) ;
 		} ;
 
@@ -1317,7 +1328,7 @@ channels = 1 ;
 
 	gen_signal_double (orig_buffer.d, 32000.0, channels, datalen) ;
 	for (k = 0 ; k < datalen ; k++)
-		orig [k] = (short) (orig_buffer.d [k]) ;
+		orig [k] = lrint (orig_buffer.d [k]) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -1473,7 +1484,7 @@ channels = 1 ;
 
 		test_read_short_or_die (file, 0, data, channels, __LINE__) ;
 		if (error_function (1.0 * data [0], 1.0 * orig [5 * channels], margin))
-		{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_read_short failed (%d should be %d).\n", __LINE__, data [0], orig [5]) ;
+		{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_read_short failed (%d should be %d).\n", __LINE__, data [0], orig [5 * channels]) ;
 			exit (1) ;
 			} ;
 		} /* if (sfinfo.seekable) */
@@ -1506,7 +1517,7 @@ channels = 1 ;
 
 	gen_signal_double (orig_buffer.d, 32000.0 * scale, channels, datalen) ;
 	for (k = 0 ; k < datalen ; k++)
-		orig [k] = (int) (orig_buffer.d [k]) ;
+		orig [k] = lrint (orig_buffer.d [k]) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -1695,7 +1706,7 @@ printf ("** fix this ** ") ;
 
 	gen_signal_double (orig_buffer.d, 32000.0, channels, datalen) ;
 	for (k = 0 ; k < datalen ; k++)
-		orig [k] = (int) (orig_buffer.d [k]) ;
+		orig [k] = lrint (orig_buffer.d [k]) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -1853,7 +1864,7 @@ printf ("** fix this ** ") ;
 
 		test_read_float_or_die (file, 0, data, channels, __LINE__) ;
 		if (error_function (data [0], orig [5 * channels], margin))
-		{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_read_float failed (%d should be %d).\n", __LINE__, (int) data [0], (int) orig [5]) ;
+		{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_read_float failed (%f should be %f).\n", __LINE__, data [0], orig [5 * channels]) ;
 			exit (1) ;
 			} ;
 		} /* if (sfinfo.seekable) */
@@ -2040,7 +2051,7 @@ channels = 1 ;
 
 		test_read_double_or_die (file, 0, data, channels, __LINE__) ;
 		if (error_function (data [0], orig [5 * channels], margin))
-		{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_read_double failed (%d should be %d).\n", __LINE__, (int) data [0], (int) orig [5]) ;
+		{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_read_double failed (%f should be %f).\n", __LINE__, data [0], orig [5 * channels]) ;
 			exit (1) ;
 			} ;
 		} /* if (sfinfo.seekable) */
@@ -2069,7 +2080,7 @@ read_raw_test (const char *filename, int filetype, int channels)
 
 	gen_signal_double (orig_buffer.d, 32000.0, channels, datalen) ;
 	for (k = 0 ; k < datalen ; k++)
-		orig [k] = (short) (orig_buffer.d [k]) ;
+		orig [k] = lrint (orig_buffer.d [k]) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
@@ -2274,10 +2285,23 @@ check_comment (SNDFILE * file, int format, int lineno)
 	return ;
 } /* check_comment */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 5eb86888-3311-48b8-920e-c2a0393b7ad2
-*/
+static int
+is_lossy (int filetype)
+{
+	switch (SF_FORMAT_SUBMASK & filetype)
+	{	case SF_FORMAT_PCM_U8 :
+		case SF_FORMAT_PCM_S8 :
+		case SF_FORMAT_PCM_16 :
+		case SF_FORMAT_PCM_24 :
+		case SF_FORMAT_PCM_32 :
+		case SF_FORMAT_FLOAT :
+		case SF_FORMAT_DOUBLE :
+			return 0 ;
+
+		default :
+			break ;
+		} ;
+
+	return 1 ;
+} /* is_lossy */
+

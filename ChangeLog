@@ -13,6 +13,9 @@
     * src/sndfile.c
     Add code to prevent sf_read_raw from reading past the end of the audio data.
 
+    * tests/Makefile.am
+    Add the wav_pcm lossy_comp_test.
+
 2007-11-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac src/Makefile.am src/create_symbols_file.py
