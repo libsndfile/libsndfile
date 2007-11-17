@@ -50,6 +50,8 @@ static	void	sdlcomp_test_int	(const char *filename, int filetype, int chan, doub
 static	void	sdlcomp_test_float	(const char *filename, int filetype, int chan, double margin) ;
 static	void	sdlcomp_test_double	(const char *filename, int filetype, int chan, double margin) ;
 
+static void		raw_read_test (const char *filename, int filetype, int chan) ;
+
 static	int		error_function (double data, double orig, double margin) ;
 static	int		decay_response (int k) ;
 
@@ -108,13 +110,15 @@ main (int argc, char *argv [])
 	if (strcmp (argv [1], "wav_pcm") == 0)
 	{	/* This is just a sanity test for PCM encoding. */
 		lcomp_test_short	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.00001) ;
-		lcomp_test_int		("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.00001) ;
+		lcomp_test_int		("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.001) ;
 		lcomp_test_short	("pcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.00001) ;
-		lcomp_test_int		("pcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.00001) ;
+		lcomp_test_int		("pcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.001) ;
 		/* Lite remove start */
 		lcomp_test_float	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.005) ;
 		lcomp_test_double	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.005) ;
 		/* Lite remove end */
+
+		raw_read_test ("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_U8, 2) ;
 		test_count++ ;
 		} ;
 
@@ -180,6 +184,8 @@ main (int argc, char *argv [])
 		lcomp_test_float	("ulaw.wav", SF_FORMAT_WAV | SF_FORMAT_ULAW, 2, 0.04) ;
 		lcomp_test_double	("ulaw.wav", SF_FORMAT_WAV | SF_FORMAT_ULAW, 2, 0.04) ;
 		/* Lite remove end */
+
+		raw_read_test ("ulaw.wav", SF_FORMAT_WAV | SF_FORMAT_ULAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -190,6 +196,8 @@ main (int argc, char *argv [])
 		lcomp_test_float	("alaw.wav", SF_FORMAT_WAV | SF_FORMAT_ALAW, 2, 0.04) ;
 		lcomp_test_double	("alaw.wav", SF_FORMAT_WAV | SF_FORMAT_ALAW, 2, 0.04) ;
 		/* Lite remove end */
+
+		raw_read_test ("alaw.wav", SF_FORMAT_WAV | SF_FORMAT_ALAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -215,6 +223,8 @@ main (int argc, char *argv [])
 		lcomp_test_float	("ulaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ULAW, 2, 0.04) ;
 		lcomp_test_double	("ulaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ULAW, 2, 0.04) ;
 		/* Lite remove end */
+
+		raw_read_test ("ulaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ULAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -225,6 +235,8 @@ main (int argc, char *argv [])
 		lcomp_test_float	("alaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ALAW, 2, 0.04) ;
 		lcomp_test_double	("alaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ALAW, 2, 0.04) ;
 		/* Lite remove end */
+
+		raw_read_test ("alaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ALAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -312,6 +324,8 @@ main (int argc, char *argv [])
 		lcomp_test_float	("ulaw.caf", SF_FORMAT_CAF | SF_FORMAT_ULAW, 2, 0.04) ;
 		lcomp_test_double	("ulaw.caf", SF_FORMAT_CAF | SF_FORMAT_ULAW, 2, 0.04) ;
 		/* Lite remove end */
+
+		raw_read_test ("ulaw.caf", SF_FORMAT_CAF | SF_FORMAT_ULAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -322,6 +336,8 @@ main (int argc, char *argv [])
 		lcomp_test_float	("alaw.caf", SF_FORMAT_CAF | SF_FORMAT_ALAW, 2, 0.04) ;
 		lcomp_test_double	("alaw.caf", SF_FORMAT_CAF | SF_FORMAT_ALAW, 2, 0.04) ;
 		/* Lite remove end */
+
+		raw_read_test ("alaw.caf", SF_FORMAT_CAF | SF_FORMAT_ALAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -412,6 +428,8 @@ main (int argc, char *argv [])
 		lcomp_test_float	("ulaw.w64", SF_FORMAT_W64 | SF_FORMAT_ULAW, 2, 0.04) ;
 		lcomp_test_double	("ulaw.w64", SF_FORMAT_W64 | SF_FORMAT_ULAW, 2, 0.04) ;
 		/* Lite remove end */
+
+		raw_read_test ("ulaw.w64", SF_FORMAT_W64 | SF_FORMAT_ULAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -422,6 +440,8 @@ main (int argc, char *argv [])
 		lcomp_test_float	("alaw.w64", SF_FORMAT_W64 | SF_FORMAT_ALAW, 2, 0.04) ;
 		lcomp_test_double	("alaw.w64", SF_FORMAT_W64 | SF_FORMAT_ALAW, 2, 0.04) ;
 		/* Lite remove end */
+
+		raw_read_test ("alaw.w64", SF_FORMAT_W64 | SF_FORMAT_ALAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -2030,6 +2050,75 @@ channels = 1 ;
 	unlink (filename) ;
 	printf ("ok\n") ;
 } /* sdlcomp_test_double */
+
+static void
+raw_read_test (const char *filename, int filetype, int channels)
+{	SNDFILE			*file ;
+	SF_INFO			sfinfo ;
+	sf_count_t		count ;
+	long			datalen ;
+	short			*orig, *data ;
+	int				k ;
+
+	print_test_name ("raw_read_test", filename) ;
+
+	datalen = ARRAY_LEN (orig_buffer.s) / 2 ;
+
+	orig = orig_buffer.s ;
+	data = data_buffer.s ;
+
+	gen_signal_double (orig_buffer.d, 32000.0, channels, datalen) ;
+	for (k = 0 ; k < datalen ; k++)
+		orig [k] = (short) (orig_buffer.d [k]) ;
+
+	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
+	sfinfo.channels		= channels ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	test_write_short_or_die (file, 0, orig, datalen, __LINE__) ;
+	sf_set_string (file, SF_STR_COMMENT, long_comment) ;
+	sf_close (file) ;
+
+	memset (data, 0, datalen * sizeof (double)) ;
+
+	if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
+		memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+
+	if (sfinfo.format != filetype)
+	{	printf ("Returned format incorrect (0x%08X => 0x%08X).\n", filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames < datalen / channels)
+	{	printf ("Too few.frames in file. (%ld should be a little more than %ld)\n", datalen, SF_COUNT_TO_LONG (sfinfo.frames)) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames > (datalen + 400))
+	{	printf ("Too many.frames in file. (%ld should be a little more than %ld)\n", SF_COUNT_TO_LONG (sfinfo.frames), datalen) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != channels)
+	{	printf ("Incorrect number of channels in file.\n") ;
+		exit (1) ;
+		} ;
+
+	check_comment (file, filetype, __LINE__) ;
+
+	count = sf_read_raw (file, orig_buffer.c, datalen + 5 * channels) ;
+	if (count != sfinfo.channels * sfinfo.frames)
+	{	printf ("\nLine %d : sf_read_raw returned %ld should be %ld\n", __LINE__, SF_COUNT_TO_LONG (count), sfinfo.channels * SF_COUNT_TO_LONG (sfinfo.frames)) ;
+		exit (1) ;
+		} ;
+	
+	unlink (filename) ;
+	printf ("ok\n") ;
+} /* raw_read_test */
 
 /*========================================================================================
 **	Auxiliary functions
