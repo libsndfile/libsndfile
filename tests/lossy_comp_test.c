@@ -702,7 +702,7 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 
 	/* Check seek backward from end. */
 	if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
-	{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
+	{	printf ("\n\nLine %d: sf_seek (SEEK_END) returned %d instead of %d.\n", __LINE__, k, 5) ;
 		exit (1) ;
 		} ;
 
@@ -890,7 +890,7 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 
 	/* Check seek backward from end. */
 	if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
-	{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
+	{	printf ("\n\nLine %d: sf_seek (SEEK_END) returned %d instead of %d.\n", __LINE__, k, 5) ;
 		exit (1) ;
 		} ;
 
@@ -1084,7 +1084,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 
 	/* Check seek backward from end. */
 	if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
-	{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
+	{	printf ("\n\nLine %d: sf_seek (SEEK_END) returned %d instead of %d.\n", __LINE__, k, 5) ;
 		exit (1) ;
 		} ;
 
@@ -1278,7 +1278,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 
 	/* Check seek backward from end. */
 	if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
-	{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
+	{	printf ("\n\nLine %d: sf_seek (SEEK_END) returned %d instead of %d.\n", __LINE__, k, 5) ;
 		exit (1) ;
 		} ;
 
@@ -1435,7 +1435,7 @@ channels = 1 ;
 			} ;
 
 		if ((k = sf_seek (file, 0, SEEK_CUR)) != seekpos + 1)
-		{	printf ("sf_seek (SEEK_CUR) with 0 offset failed (%d should be %d)\n", k, seekpos + 1) ;
+		{	printf ("\n\nLine %d: sf_seek (SEEK_CUR) with 0 offset failed (%d should be %d)\n", __LINE__, k, seekpos + 1) ;
 			exit (1) ;
 			} ;
 
@@ -1467,7 +1467,7 @@ channels = 1 ;
 		/* Check seek backward from end. */
 
 		if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
-		{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
+		{	printf ("\n\nLine %d: sf_seek (SEEK_END) returned %d instead of %d.\n", __LINE__, k, 5) ;
 			exit (1) ;
 			} ;
 
@@ -1623,7 +1623,7 @@ channels = 1 ;
 			} ;
 
 		if ((k = sf_seek (file, 0, SEEK_CUR)) != seekpos + 1)
-		{	printf ("sf_seek (SEEK_CUR) with 0 offset failed (%d should be %d)\n", k, seekpos + 1) ;
+		{	printf ("\n\nLine %d: sf_seek (SEEK_CUR) with 0 offset failed (%d should be %d)\n", __LINE__, k, seekpos + 1) ;
 			exit (1) ;
 			} ;
 
@@ -1655,7 +1655,7 @@ channels = 1 ;
 		/* Check seek backward from end. */
 
 		if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
-		{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
+		{	printf ("\n\nLine %d: sf_seek (SEEK_END) returned %d instead of %d.\n", __LINE__, k, 5) ;
 			exit (1) ;
 			} ;
 
@@ -1815,7 +1815,7 @@ printf ("** fix this ** ") ;
 			} ;
 
 		if ((k = sf_seek (file, 0, SEEK_CUR)) != seekpos + 1)
-		{	printf ("sf_seek (SEEK_CUR) with 0 offset failed (%d should be %d)\n", k, seekpos + 1) ;
+		{	printf ("\n\nLine %d: sf_seek (SEEK_CUR) with 0 offset failed (%d should be %d)\n", __LINE__, k, seekpos + 1) ;
 			exit (1) ;
 			} ;
 
@@ -1847,7 +1847,7 @@ printf ("** fix this ** ") ;
 		/* Check seek backward from end. */
 
 		if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
-		{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
+		{	printf ("\n\nLine %d: sf_seek (SEEK_END) returned %d instead of %d.\n", __LINE__, k, 5) ;
 			exit (1) ;
 			} ;
 
@@ -2002,7 +2002,7 @@ channels = 1 ;
 			} ;
 
 		if ((k = sf_seek (file, 0, SEEK_CUR)) != seekpos + 1)
-		{	printf ("sf_seek (SEEK_CUR) with 0 offset failed (%d should be %d)\n", k, seekpos + 1) ;
+		{	printf ("\n\nLine %d: sf_seek (SEEK_CUR) with 0 offset failed (%d should be %d)\n", __LINE__, k, seekpos + 1) ;
 			exit (1) ;
 			} ;
 
@@ -2034,7 +2034,7 @@ channels = 1 ;
 		/* Check seek backward from end. */
 
 		if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
-		{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
+		{	printf ("\n\nLine %d: sf_seek (SEEK_END) returned %d instead of %d.\n", __LINE__, k, 5) ;
 			exit (1) ;
 			} ;
 
