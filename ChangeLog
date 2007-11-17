@@ -6,7 +6,12 @@
     Remove redundant code.
 
     * tests/lossy_comp_test.c
+    Add raw_read_test to check that raw reads do not go past the end of the
+    audio data section.
     Clean up error output messages.
+
+    * src/sndfile.c
+    Add code to prevent sf_read_raw from reading past the end of the audio data.
 
 2007-11-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

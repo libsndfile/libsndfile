@@ -1274,7 +1274,7 @@ sf_set_string (SNDFILE *sndfile, int str_type, const char* str)
 sf_count_t
 sf_read_raw		(SNDFILE *sndfile, void *ptr, sf_count_t bytes)
 {	SF_PRIVATE 	*psf ;
-	sf_count_t	count ;
+	sf_count_t	count, extra ;
 	int			bytewidth, blockwidth ;
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
@@ -1299,10 +1299,14 @@ sf_read_raw		(SNDFILE *sndfile, void *ptr, sf_count_t bytes)
 
 	count = psf_fread (ptr, 1, bytes, psf) ;
 
-	if (count < bytes)
-		psf_memset (((char*) ptr) + count, 0, bytes - count) ;
-
-	psf->read_current += count / blockwidth ;
+	if (psf->read_current + count / blockwidth <= psf->sf.frames)
+		psf->read_current += count / blockwidth ;
+	else
+	{	count = (psf->sf.frames - psf->read_current) * blockwidth ;
+		extra = bytes - count ;
+		psf_memset (((char *) ptr) + count, 0, extra) ;
+		psf->read_current = psf->sf.frames ;
+		} ;
 
 	psf->last_op = SFM_READ ;
 
