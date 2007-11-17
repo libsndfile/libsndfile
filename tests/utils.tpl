@@ -40,7 +40,7 @@ extern "C" {
 #define	PIPE_INDEX(x)	((x) + 500)
 #define	PIPE_TEST_LEN	12345
 
-#if (defined (WIN32) || defined (_WIN32))
+#if (defined (WIN32) || defined (_WIN32) || defined (__OS2__))
 #define	snprintf	_snprintf
 #endif
 
@@ -154,6 +154,15 @@ int		file_length (const char * fname) ;
 #endif
 
 #define	LOG_BUFFER_SIZE		2048
+
+/*
+**	Neat solution to the Win32/OS2 binary file flage requirement.
+**	If O_BINARY isn't already defined by the inclusion of the system
+**	headers, set it to zero.
+*/
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
 
 [+ FOR float_type +]
 void
@@ -439,19 +448,19 @@ test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allo
 	switch (mode)
 	{	case SFM_READ :
 				modestr = "SFM_READ" ;
-				oflags = O_RDONLY ;
+				oflags = O_RDONLY | O_BINARY ;
 				omode = 0 ;
 				break ;
 
 		case SFM_WRITE :
 				modestr = "SFM_WRITE" ;
-				oflags = O_WRONLY | O_CREAT | O_TRUNC ;
+				oflags = O_WRONLY | O_CREAT | O_TRUNC | O_BINARY ;
 				omode = S_IRUSR | S_IWUSR | S_IRGRP ;
 				break ;
 
 		case SFM_RDWR :
 				modestr = "SFM_RDWR" ;
-				oflags = O_RDWR | O_CREAT ;
+				oflags = O_RDWR | O_CREAT | O_BINARY ;
 				omode = S_IRUSR | S_IWUSR | S_IRGRP ;
 				break ;
 		default :
@@ -459,11 +468,6 @@ test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allo
 				fflush (stdout) ;
 				exit (1) ;
 		} ;
-
-#if (defined (WIN32) || defined (_WIN32))
-	/* Stupid fscking windows. */
-	oflags |= O_BINARY ;
-#endif
 
 	if (allow_fd && ((++count) & 1) == 1)
 	{	int fd ;

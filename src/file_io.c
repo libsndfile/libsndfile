@@ -55,6 +55,15 @@
 
 #define	SENSIBLE_SIZE	(0x40000000)
 
+/*
+**	Neat solution to the Win32/OS2 binary file flage requirement.
+**	If O_BINARY isn't already defined by the inclusion of the system
+**	headers, set it to zero.
+*/
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 static void psf_log_syserr (SF_PRIVATE *psf, int error) ;
 
 #if (USE_WINDOWS_API == 0)
@@ -526,17 +535,17 @@ psf_open_fd (const char * pathname, int open_mode)
 
 	switch (open_mode)
 	{	case SFM_READ :
-				oflag = O_RDONLY ;
+				oflag = O_RDONLY | O_BINARY ;
 				mode = 0 ;
 				break ;
 
 		case SFM_WRITE :
-				oflag = O_WRONLY | O_CREAT | O_TRUNC ;
+				oflag = O_WRONLY | O_CREAT | O_TRUNC | O_BINARY ;
 				mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH ;
 				break ;
 
 		case SFM_RDWR :
-				oflag = O_RDWR | O_CREAT ;
+				oflag = O_RDWR | O_CREAT | O_BINARY ;
 				mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH ;
 				break ;
 
@@ -544,11 +553,6 @@ psf_open_fd (const char * pathname, int open_mode)
 				return - SFE_BAD_OPEN_MODE ;
 				break ;
 		} ;
-
-#if OS_IS_WIN32
-	/* For Cygwin. */
-	oflag |= O_BINARY ;
-#endif
 
 	if (mode == 0)
 		fd = open (pathname, oflag) ;

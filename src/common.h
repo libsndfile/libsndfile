@@ -89,16 +89,16 @@
 
 #if (COMPILER_IS_GCC == 1)
 #define		SF_MAX(x,y)		({ \
-								typeof (x) _xmax = (x) ; \
-								typeof (y) _ymax = (y) ; \
-								(void) (&_xmax == &_ymax) ; \
-								_xmax > _ymax ? _xmax : _ymax ; })
+								typeof (x) _x1 = (x) ; \
+								typeof (y) _y1 = (y) ; \
+								(void) (&_x1 == &_y1) ; \
+								_x1 > _y1 ? _x1 : _y1 ; })
 
 #define		SF_MIN(x,y)		({ \
-								typeof (x) _xmin = (x) ; \
-								typeof (y) _ymin = (y) ; \
-								(void) (&_xmin == &_ymin) ; \
-								_xmin < _ymin ? _xmin : _ymin ; })
+								typeof (x) _x2 = (x) ; \
+								typeof (y) _y2 = (y) ; \
+								(void) (&_x2 == &_y2) ; \
+								_x2 < _y2 ? _x2 : _y2 ; })
 #else
 #define		SF_MAX(a,b)		((a) > (b) ? (a) : (b))
 #define		SF_MIN(a,b)		((a) < (b) ? (a) : (b))

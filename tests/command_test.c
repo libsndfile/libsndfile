@@ -80,12 +80,15 @@ main (int argc, char *argv [])
 
 	if (do_all || strcmp (argv [1], "ver") == 0)
 	{	char buffer [128] ;
+
+		print_test_name ("version_test", "(none)") ;
 		buffer [0] = 0 ;
 		sf_command (NULL, SFC_GET_LIB_VERSION, buffer, sizeof (buffer)) ;
 		if (strlen (buffer) < 1)
 		{	printf ("Line %d: could not retrieve lib version.\n", __LINE__) ;
 			exit (1) ;
 			} ;
+		puts ("ok") ;
 		test_count++ ;
 		} ;
 
