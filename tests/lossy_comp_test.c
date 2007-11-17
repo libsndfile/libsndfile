@@ -50,7 +50,7 @@ static	void	sdlcomp_test_int	(const char *filename, int filetype, int chan, doub
 static	void	sdlcomp_test_float	(const char *filename, int filetype, int chan, double margin) ;
 static	void	sdlcomp_test_double	(const char *filename, int filetype, int chan, double margin) ;
 
-static void		raw_read_test (const char *filename, int filetype, int chan) ;
+static void		read_raw_test (const char *filename, int filetype, int chan) ;
 
 static	int		error_function (double data, double orig, double margin) ;
 static	int		decay_response (int k) ;
@@ -118,7 +118,7 @@ main (int argc, char *argv [])
 		lcomp_test_double	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.005) ;
 		/* Lite remove end */
 
-		raw_read_test ("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_U8, 2) ;
+		read_raw_test ("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_U8, 2) ;
 		test_count++ ;
 		} ;
 
@@ -185,7 +185,7 @@ main (int argc, char *argv [])
 		lcomp_test_double	("ulaw.wav", SF_FORMAT_WAV | SF_FORMAT_ULAW, 2, 0.04) ;
 		/* Lite remove end */
 
-		raw_read_test ("ulaw.wav", SF_FORMAT_WAV | SF_FORMAT_ULAW, 2) ;
+		read_raw_test ("ulaw.wav", SF_FORMAT_WAV | SF_FORMAT_ULAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -197,7 +197,7 @@ main (int argc, char *argv [])
 		lcomp_test_double	("alaw.wav", SF_FORMAT_WAV | SF_FORMAT_ALAW, 2, 0.04) ;
 		/* Lite remove end */
 
-		raw_read_test ("alaw.wav", SF_FORMAT_WAV | SF_FORMAT_ALAW, 2) ;
+		read_raw_test ("alaw.wav", SF_FORMAT_WAV | SF_FORMAT_ALAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -224,7 +224,7 @@ main (int argc, char *argv [])
 		lcomp_test_double	("ulaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ULAW, 2, 0.04) ;
 		/* Lite remove end */
 
-		raw_read_test ("ulaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ULAW, 2) ;
+		read_raw_test ("ulaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ULAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -236,7 +236,7 @@ main (int argc, char *argv [])
 		lcomp_test_double	("alaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ALAW, 2, 0.04) ;
 		/* Lite remove end */
 
-		raw_read_test ("alaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ALAW, 2) ;
+		read_raw_test ("alaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ALAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -325,7 +325,7 @@ main (int argc, char *argv [])
 		lcomp_test_double	("ulaw.caf", SF_FORMAT_CAF | SF_FORMAT_ULAW, 2, 0.04) ;
 		/* Lite remove end */
 
-		raw_read_test ("ulaw.caf", SF_FORMAT_CAF | SF_FORMAT_ULAW, 2) ;
+		read_raw_test ("ulaw.caf", SF_FORMAT_CAF | SF_FORMAT_ULAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -337,7 +337,7 @@ main (int argc, char *argv [])
 		lcomp_test_double	("alaw.caf", SF_FORMAT_CAF | SF_FORMAT_ALAW, 2, 0.04) ;
 		/* Lite remove end */
 
-		raw_read_test ("alaw.caf", SF_FORMAT_CAF | SF_FORMAT_ALAW, 2) ;
+		read_raw_test ("alaw.caf", SF_FORMAT_CAF | SF_FORMAT_ALAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -429,7 +429,7 @@ main (int argc, char *argv [])
 		lcomp_test_double	("ulaw.w64", SF_FORMAT_W64 | SF_FORMAT_ULAW, 2, 0.04) ;
 		/* Lite remove end */
 
-		raw_read_test ("ulaw.w64", SF_FORMAT_W64 | SF_FORMAT_ULAW, 2) ;
+		read_raw_test ("ulaw.w64", SF_FORMAT_W64 | SF_FORMAT_ULAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -441,7 +441,7 @@ main (int argc, char *argv [])
 		lcomp_test_double	("alaw.w64", SF_FORMAT_W64 | SF_FORMAT_ALAW, 2, 0.04) ;
 		/* Lite remove end */
 
-		raw_read_test ("alaw.w64", SF_FORMAT_W64 | SF_FORMAT_ALAW, 2) ;
+		read_raw_test ("alaw.w64", SF_FORMAT_W64 | SF_FORMAT_ALAW, 2) ;
 		test_count++ ;
 		} ;
 
@@ -2052,7 +2052,7 @@ channels = 1 ;
 } /* sdlcomp_test_double */
 
 static void
-raw_read_test (const char *filename, int filetype, int channels)
+read_raw_test (const char *filename, int filetype, int channels)
 {	SNDFILE			*file ;
 	SF_INFO			sfinfo ;
 	sf_count_t		count ;
@@ -2060,7 +2060,7 @@ raw_read_test (const char *filename, int filetype, int channels)
 	short			*orig, *data ;
 	int				k ;
 
-	print_test_name ("raw_read_test", filename) ;
+	print_test_name ("read_raw_test", filename) ;
 
 	datalen = ARRAY_LEN (orig_buffer.s) / 2 ;
 
@@ -2118,7 +2118,7 @@ raw_read_test (const char *filename, int filetype, int channels)
 	
 	unlink (filename) ;
 	printf ("ok\n") ;
-} /* raw_read_test */
+} /* read_raw_test */
 
 /*========================================================================================
 **	Auxiliary functions
