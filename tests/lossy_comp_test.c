@@ -109,13 +109,13 @@ main (int argc, char *argv [])
 
 	if (strcmp (argv [1], "wav_pcm") == 0)
 	{	/* This is just a sanity test for PCM encoding. */
-		lcomp_test_short	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.00001) ;
-		lcomp_test_int		("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.001) ;
-		lcomp_test_short	("pcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.00001) ;
-		lcomp_test_int		("pcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.001) ;
+		lcomp_test_short	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 1e-50) ;
+		lcomp_test_int		("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 1e-50) ;
+		lcomp_test_short	("pcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 1e-50) ;
+		lcomp_test_int		("pcm.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 1e-50) ;
 		/* Lite remove start */
-		lcomp_test_float	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.005) ;
-		lcomp_test_double	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 0.005) ;
+		lcomp_test_float	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 1e-50) ;
+		lcomp_test_double	("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 1e-50) ;
 		/* Lite remove end */
 
 		read_raw_test ("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_U8, 2) ;
@@ -645,7 +645,7 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 	{	test_readf_short_or_die (file, m, data, 11, __LINE__) ;
 
 		for (k = 0 ; k < channels * 11 ; k++)
-			if (error_function ((double) data [k], (double) orig [k + channels * m * 11], margin))
+			if (error_function (1.0 * data [k], 1.0 * orig [k + channels * m * 11], margin))
 			{	printf ("\n\nLine %d: Incorrect sample (m = %d) (#%d : %d => %d).\n", __LINE__, m, k + channels * m * 11, orig [k + channels * m * 11], data [k]) ;
 				for (m = 0 ; m < channels ; m++)
 					printf ("%d ", data [m]) ;
@@ -664,7 +664,7 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 
 	test_readf_short_or_die (file, 0, data, 1, __LINE__) ;
 
-	if (error_function ((double) data [0], (double) orig [seekpos * channels], margin))
+	if (error_function (1.0 * data [0], 1.0 * orig [seekpos * channels], margin))
 	{	printf ("\n\nLine %d: sf_seek (SEEK_SET) followed by sf_readf_short failed (%d, %d).\n", __LINE__, orig [1], data [0]) ;
 		exit (1) ;
 		} ;
@@ -677,7 +677,7 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 	seekpos = sf_seek (file, 0, SEEK_CUR) + BUFFER_SIZE / 5 ;
 	k = sf_seek (file, BUFFER_SIZE / 5, SEEK_CUR) ;
 	test_readf_short_or_die (file, 0, data, 1, __LINE__) ;
-	if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+	if (error_function (1.0 * data [0], 1.0 * orig [seekpos * channels], margin) || k != seekpos)
 	{	printf ("\n\nLine %d: sf_seek (forwards, SEEK_CUR) followed by sf_readf_short failed (%d, %d) (%d, %d).\n", __LINE__, data [0], orig [seekpos * channels], k, seekpos + 1) ;
 		oct_save_short (orig, data, datalen) ;
 		exit (1) ;
@@ -687,7 +687,7 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 	/* Check seek backward from current position. */
 	k = sf_seek (file, -20, SEEK_CUR) ;
 	test_readf_short_or_die (file, 0, data, 1, __LINE__) ;
-	if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+	if (error_function (1.0 * data [0], 1.0 * orig [seekpos * channels], margin) || k != seekpos)
 	{	printf ("\nLine %d: sf_seek (backwards, SEEK_CUR) followed by sf_readf_short failed (%d, %d) (%d, %d).\n", __LINE__, data [0], orig [seekpos * channels], k, seekpos) ;
 		exit (1) ;
 		} ;
@@ -853,7 +853,7 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 
 	test_readf_int_or_die (file, 0, data, 1, __LINE__) ;
 
-	if (error_function ((double) data [0], (double) orig [seekpos * channels], margin))
+	if (error_function (1.0 * data [0], 1.0 * orig [seekpos * channels], margin))
 	{	printf ("\nLine %d: sf_seek (SEEK_SET) followed by sf_readf_int failed (%d, %d).\n", __LINE__, orig [1], data [0]) ;
 		exit (1) ;
 		} ;
@@ -866,7 +866,7 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 	seekpos = sf_seek (file, 0, SEEK_CUR) + BUFFER_SIZE / 5 ;
 	k = sf_seek (file, BUFFER_SIZE / 5, SEEK_CUR) ;
 	test_readf_int_or_die (file, 0, data, 1, __LINE__) ;
-	if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+	if (error_function (1.0 * data [0], 1.0 * orig [seekpos * channels], margin) || k != seekpos)
 	{	printf ("\nLine %d: sf_seek (forwards, SEEK_CUR) followed by sf_readf_int failed (%d, %d) (%d, %ld).\n", __LINE__, data [0], orig [seekpos * channels], k, seekpos + 1) ;
 		exit (1) ;
 		} ;
@@ -875,7 +875,7 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 	/* Check seek backward from current position. */
 	k = sf_seek (file, -20, SEEK_CUR) ;
 	test_readf_int_or_die (file, 0, data, 1, __LINE__) ;
-	if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+	if (error_function (1.0 * data [0], 1.0 * orig [seekpos * channels], margin) || k != seekpos)
 	{	printf ("\nLine %d: sf_seek (backwards, SEEK_CUR) followed by sf_readf_int failed (%d, %d) (%d, %ld).\n", __LINE__, data [0], orig [seekpos * channels], k, seekpos) ;
 		exit (1) ;
 		} ;
@@ -981,7 +981,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 
 	half_max_abs = 0.0 ;
 	for (k = 0 ; k < datalen ; k++)
-	{	if (error_function ((double) data [k], (double) orig [k], margin))
+	{	if (error_function (data [k], orig [k], margin))
 		{	printf ("\nLine %d: Incorrect sample A (#%d : %f should be %f).\n", __LINE__, k, data [k], orig [k]) ;
 			oct_save_float (orig, data, datalen) ;
 			exit (1) ;
@@ -1028,7 +1028,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 	{	test_readf_float_or_die (file, 0, data, 11, __LINE__) ;
 
 		for (k = 0 ; k < channels * 11 ; k++)
-			if (error_function ((double) data [k], (double) orig [k + channels * m * 11], margin))
+			if (error_function (data [k], orig [k + channels * m * 11], margin))
 			{	printf ("\nLine %d: Incorrect sample (m = %d) (#%d : %f => %f).\n", __LINE__, m, k + channels * m * 11, orig [k + channels * m * 11], data [k]) ;
 				for (m = 0 ; m < channels ; m++)
 					printf ("%f ", data [m]) ;
@@ -1047,7 +1047,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 
 	test_readf_float_or_die (file, 0, data, 1, __LINE__) ;
 
-	if (error_function ((double) data [0], (double) orig [seekpos * channels], margin))
+	if (error_function (data [0], orig [seekpos * channels], margin))
 	{	printf ("\nLine %d: sf_seek (SEEK_SET) followed by sf_readf_float failed (%f, %f).\n", __LINE__, orig [1], data [0]) ;
 		exit (1) ;
 		} ;
@@ -1060,7 +1060,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 	seekpos = sf_seek (file, 0, SEEK_CUR) + BUFFER_SIZE / 5 ;
 	k = sf_seek (file, BUFFER_SIZE / 5, SEEK_CUR) ;
 	test_readf_float_or_die (file, 0, data, 1, __LINE__) ;
-	if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+	if (error_function (data [0], orig [seekpos * channels], margin) || k != seekpos)
 	{	printf ("\nLine %d: sf_seek (forwards, SEEK_CUR) followed by sf_readf_float failed (%f, %f) (%d, %d).\n", __LINE__, data [0], orig [seekpos * channels], k, seekpos + 1) ;
 		exit (1) ;
 		} ;
@@ -1069,7 +1069,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 	/* Check seek backward from current position. */
 	k = sf_seek (file, -20, SEEK_CUR) ;
 	test_readf_float_or_die (file, 0, data, 1, __LINE__) ;
-	if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+	if (error_function (data [0], orig [seekpos * channels], margin) || k != seekpos)
 	{	printf ("\nLine %d: sf_seek (backwards, SEEK_CUR) followed by sf_readf_float failed (%f, %f) (%d, %d).\n", __LINE__, data [0], orig [seekpos * channels], k, seekpos) ;
 		exit (1) ;
 		} ;
@@ -1175,7 +1175,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 
 	half_max_abs = 0.0 ;
 	for (k = 0 ; k < datalen ; k++)
-	{	if (error_function ((double) data [k], (double) orig [k], margin))
+	{	if (error_function (data [k], orig [k], margin))
 		{	printf ("\nLine %d: Incorrect sample A (#%d : %f should be %f).\n", __LINE__, k, data [k], orig [k]) ;
 			oct_save_double (orig, data, datalen) ;
 			exit (1) ;
@@ -1222,7 +1222,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 	{	test_readf_double_or_die (file, m, data, 11, __LINE__) ;
 
 		for (k = 0 ; k < channels * 11 ; k++)
-			if (error_function ((double) data [k], (double) orig [k + channels * m * 11], margin))
+			if (error_function (data [k], orig [k + channels * m * 11], margin))
 			{	printf ("\nLine %d: Incorrect sample (m = %d) (#%d : %f => %f).\n", __LINE__, m, k + channels * m * 11, orig [k + channels * m * 11], data [k]) ;
 				for (m = 0 ; m < channels ; m++)
 					printf ("%f ", data [m]) ;
@@ -1241,7 +1241,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 
 	test_readf_double_or_die (file, 0, data, 1, __LINE__) ;
 
-	if (error_function ((double) data [0], (double) orig [seekpos * channels], margin))
+	if (error_function (data [0], orig [seekpos * channels], margin))
 	{	printf ("\nLine %d: sf_seek (SEEK_SET) followed by sf_readf_double failed (%f, %f).\n", __LINE__, orig [1], data [0]) ;
 		exit (1) ;
 		} ;
@@ -1254,7 +1254,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 	seekpos = sf_seek (file, 0, SEEK_CUR) + BUFFER_SIZE / 5 ;
 	k = sf_seek (file, BUFFER_SIZE / 5, SEEK_CUR) ;
 	test_readf_double_or_die (file, 0, data, 1, __LINE__) ;
-	if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+	if (error_function (data [0], orig [seekpos * channels], margin) || k != seekpos)
 	{	printf ("\nLine %d: sf_seek (forwards, SEEK_CUR) followed by sf_readf_double failed (%f, %f) (%d, %d).\n", __LINE__, data [0], orig [seekpos * channels], k, seekpos + 1) ;
 		exit (1) ;
 		} ;
@@ -1263,7 +1263,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 	/* Check seek backward from current position. */
 	k = sf_seek (file, -20, SEEK_CUR) ;
 	test_readf_double_or_die (file, 0, data, 1, __LINE__) ;
-	if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+	if (error_function (data [0], orig [seekpos * channels], margin) || k != seekpos)
 	{	printf ("\nLine %d: sf_seek (backwards, SEEK_CUR) followed by sf_readf_double failed (%f, %f) (%d, %d).\n", __LINE__, data [0], orig [seekpos * channels], k, seekpos) ;
 		exit (1) ;
 		} ;
@@ -1370,7 +1370,7 @@ channels = 1 ;
 
 	half_max_abs = 0.0 ;
 	for (k = 0 ; k < datalen ; k++)
-	{	if (error_function ((double) data [k], (double) smooth [k], margin))
+	{	if (error_function (1.0 * data [k], 1.0 * smooth [k], margin))
 		{	printf ("\nLine %d: Incorrect sample (#%d : %d should be %d).\n", __LINE__, k, data [k], smooth [k]) ;
 			oct_save_short (orig, smooth, datalen) ;
 			exit (1) ;
@@ -1411,7 +1411,7 @@ channels = 1 ;
 			smoothed_diff_short (smooth, datalen / 7) ;
 
 			for (k = 0 ; k < datalen / 7 ; k++)
-				if (error_function ((double) data [k], (double) smooth [k], margin))
+				if (error_function (1.0 * data [k], 1.0 * smooth [k], margin))
 				{	printf ("\nLine %d: Incorrect sample C (#%d (%ld) : %d => %d).\n", __LINE__, k, k + m * (datalen / 7), smooth [k], data [k]) ;
 					for (m = 0 ; m < 10 ; m++)
 						printf ("%d ", data [k]) ;
@@ -1429,7 +1429,7 @@ channels = 1 ;
 			} ;
 		test_readf_short_or_die (file, 0, data, 1, __LINE__) ;
 
-		if (error_function ((double) data [0], (double) orig [seekpos * channels], margin))
+		if (error_function (1.0 * data [0], 1.0 * orig [seekpos * channels], margin))
 		{	printf ("\nLine %d: sf_seek (SEEK_SET) followed by sf_read_short failed (%d, %d).\n", __LINE__, orig [1], data [0]) ;
 			exit (1) ;
 			} ;
@@ -1442,7 +1442,7 @@ channels = 1 ;
 		seekpos = sf_seek (file, 0, SEEK_CUR) + BUFFER_SIZE / 5 ;
 		k = sf_seek (file, BUFFER_SIZE / 5, SEEK_CUR) ;
 		test_readf_short_or_die (file, 0, data, 1, __LINE__) ;
-		if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+		if (error_function (1.0 * data [0], 1.0 * orig [seekpos * channels], margin) || k != seekpos)
 		{	printf ("\nLine %d: sf_seek (forwards, SEEK_CUR) followed by sf_read_short failed (%d, %d) (%d, %d).\n", __LINE__, data [0], orig [seekpos * channels], k, seekpos + 1) ;
 			exit (1) ;
 			} ;
@@ -1451,7 +1451,7 @@ channels = 1 ;
 		/* Check seek backward from current position. */
 		k = sf_seek (file, -20, SEEK_CUR) ;
 		test_readf_short_or_die (file, 0, data, 1, __LINE__) ;
-		if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+		if (error_function (1.0 * data [0], 1.0 * orig [seekpos * channels], margin) || k != seekpos)
 		{	printf ("\nLine %d: sf_seek (backwards, SEEK_CUR) followed by sf_read_short failed (%d, %d) (%d, %d).\n", __LINE__, data [0], orig [seekpos * channels], k, seekpos) ;
 			exit (1) ;
 			} ;
@@ -1617,7 +1617,7 @@ channels = 1 ;
 			} ;
 		test_readf_int_or_die (file, 0, data, 1, __LINE__) ;
 
-		if (error_function ((double) data [0], (double) orig [seekpos * channels], margin))
+		if (error_function (1.0 * data [0], 1.0 * orig [seekpos * channels], margin))
 		{	printf ("\nLine %d: sf_seek (SEEK_SET) followed by sf_readf_int failed (%d, %d).\n", __LINE__, orig [1], data [0]) ;
 			exit (1) ;
 			} ;
@@ -1630,7 +1630,7 @@ channels = 1 ;
 		seekpos = sf_seek (file, 0, SEEK_CUR) + BUFFER_SIZE / 5 ;
 		k = sf_seek (file, BUFFER_SIZE / 5, SEEK_CUR) ;
 		test_readf_int_or_die (file, 0, data, 1, __LINE__) ;
-		if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+		if (error_function (1.0 * data [0], 1.0 * orig [seekpos * channels], margin) || k != seekpos)
 		{	printf ("\nLine %d: sf_seek (forwards, SEEK_CUR) followed by sf_readf_int failed (%d, %d) (%d, %d).\n", __LINE__, data [0], orig [seekpos * channels], k, seekpos + 1) ;
 			exit (1) ;
 			} ;
@@ -1639,7 +1639,7 @@ channels = 1 ;
 		/* Check seek backward from current position. */
 		k = sf_seek (file, -20, SEEK_CUR) ;
 		test_readf_int_or_die (file, 0, data, 1, __LINE__) ;
-		if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+		if (error_function (1.0 * data [0], 1.0 * orig [seekpos * channels], margin) || k != seekpos)
 		{	printf ("\nLine %d: sf_seek (backwards, SEEK_CUR) followed by sf_readf_int failed (%d, %d) (%d, %d).\n", __LINE__, data [0], orig [seekpos * channels], k, seekpos) ;
 			exit (1) ;
 			} ;
@@ -1791,7 +1791,7 @@ printf ("** fix this ** ") ;
 			smoothed_diff_float (smooth, datalen / 7) ;
 
 			for (k = 0 ; k < datalen / 7 ; k++)
-				if (error_function ((float) data [k], (float) smooth [k], margin))
+				if (error_function (data [k], smooth [k], margin))
 				{	printf ("\nLine %d: Incorrect sample C (#%d (%ld) : %d => %d).\n", __LINE__, k, k + m * (datalen / 7), (int) smooth [k], (int) data [k]) ;
 					for (m = 0 ; m < 10 ; m++)
 						printf ("%d ", (int) data [k]) ;
@@ -1809,7 +1809,7 @@ printf ("** fix this ** ") ;
 			} ;
 		test_read_float_or_die (file, 0, data, channels, __LINE__) ;
 
-		if (error_function ((float) data [0], (float) orig [seekpos * channels], margin))
+		if (error_function (data [0], orig [seekpos * channels], margin))
 		{	printf ("\nLine %d: sf_seek (SEEK_SET) followed by sf_read_float failed (%d, %d).\n", __LINE__, (int) orig [1], (int) data [0]) ;
 			exit (1) ;
 			} ;
@@ -1822,7 +1822,7 @@ printf ("** fix this ** ") ;
 		seekpos = sf_seek (file, 0, SEEK_CUR) + BUFFER_SIZE / 5 ;
 		k = sf_seek (file, BUFFER_SIZE / 5, SEEK_CUR) ;
 		test_read_float_or_die (file, 0, data, channels, __LINE__) ;
-		if (error_function ((float) data [0], (float) orig [seekpos * channels], margin) || k != seekpos)
+		if (error_function (data [0], orig [seekpos * channels], margin) || k != seekpos)
 		{	printf ("\nLine %d: sf_seek (forwards, SEEK_CUR) followed by sf_read_float failed (%d, %d) (%d, %d).\n", __LINE__, (int) data [0], (int) orig [seekpos * channels], k, seekpos + 1) ;
 			exit (1) ;
 			} ;
@@ -1831,7 +1831,7 @@ printf ("** fix this ** ") ;
 		/* Check seek backward from current position. */
 		k = sf_seek (file, -20, SEEK_CUR) ;
 		test_read_float_or_die (file, 0, data, channels, __LINE__) ;
-		if (error_function ((float) data [0], (float) orig [seekpos * channels], margin) || k != seekpos)
+		if (error_function (data [0], orig [seekpos * channels], margin) || k != seekpos)
 		{	printf ("\nLine %d: sf_seek (backwards, SEEK_CUR) followed by sf_read_float failed (%d, %d) (%d, %d).\n", __LINE__, (int) data [0], (int) orig [seekpos * channels], k, seekpos) ;
 			exit (1) ;
 			} ;
@@ -1978,7 +1978,7 @@ channels = 1 ;
 			smoothed_diff_double (smooth, datalen / 7) ;
 
 			for (k = 0 ; k < datalen / 7 ; k++)
-				if (error_function ((double) data [k], (double) smooth [k], margin))
+				if (error_function (data [k], smooth [k], margin))
 				{	printf ("\nLine %d: Incorrect sample C (#%d (%ld) : %d => %d).\n", __LINE__, k, k + m * (datalen / 7), (int) smooth [k], (int) data [k]) ;
 					for (m = 0 ; m < 10 ; m++)
 						printf ("%d ", (int) data [k]) ;
@@ -1996,7 +1996,7 @@ channels = 1 ;
 			} ;
 		test_read_double_or_die (file, 0, data, channels, __LINE__) ;
 
-		if (error_function ((double) data [0], (double) orig [seekpos * channels], margin))
+		if (error_function (data [0], orig [seekpos * channels], margin))
 		{	printf ("\nLine %d: sf_seek (SEEK_SET) followed by sf_read_double failed (%d, %d).\n", __LINE__, (int) orig [1], (int) data [0]) ;
 			exit (1) ;
 			} ;
@@ -2009,7 +2009,7 @@ channels = 1 ;
 		seekpos = sf_seek (file, 0, SEEK_CUR) + BUFFER_SIZE / 5 ;
 		k = sf_seek (file, BUFFER_SIZE / 5, SEEK_CUR) ;
 		test_read_double_or_die (file, 0, data, channels, __LINE__) ;
-		if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+		if (error_function (data [0], orig [seekpos * channels], margin) || k != seekpos)
 		{	printf ("\nLine %d: sf_seek (forwards, SEEK_CUR) followed by sf_read_double failed (%d, %d) (%d, %d).\n", __LINE__, (int) data [0], (int) orig [seekpos * channels], k, seekpos + 1) ;
 			exit (1) ;
 			} ;
@@ -2018,7 +2018,7 @@ channels = 1 ;
 		/* Check seek backward from current position. */
 		k = sf_seek (file, -20, SEEK_CUR) ;
 		test_read_double_or_die (file, 0, data, channels, __LINE__) ;
-		if (error_function ((double) data [0], (double) orig [seekpos * channels], margin) || k != seekpos)
+		if (error_function (data [0], orig [seekpos * channels], margin) || k != seekpos)
 		{	printf ("\nLine %d: sf_seek (backwards, SEEK_CUR) followed by sf_read_double failed (%d, %d) (%d, %d).\n", __LINE__, (int) data [0], (int) orig [seekpos * channels], k, seekpos) ;
 			exit (1) ;
 			} ;
