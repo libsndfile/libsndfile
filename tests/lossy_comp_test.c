@@ -707,7 +707,7 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 		} ;
 
 	test_readf_short_or_die (file, 0, data, 1, __LINE__) ;
-	if (error_function ((double) data [0], (double) orig [5], margin))
+	if (error_function (1.0 * data [0], 1.0 * orig [5 * channels], margin))
 	{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_readf_short failed (%d should be %d).\n", __LINE__, data [0], orig [5]) ;
 		exit (1) ;
 		} ;
@@ -895,7 +895,7 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 		} ;
 
 	test_readf_int_or_die (file, 0, data, 1, __LINE__) ;
-	if (error_function (data [0] / scale, orig [5] / scale, margin))
+	if (error_function (data [0] / scale, orig [5 * channels] / scale, margin))
 	{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_readf_short failed (%d should be %d).\n", __LINE__, data [0], orig [5]) ;
 		exit (1) ;
 		} ;
@@ -1089,7 +1089,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 		} ;
 
 	test_readf_float_or_die (file, 0, data, 1, __LINE__) ;
-	if (error_function ((double) data [0], (double) orig [5], margin))
+	if (error_function (data [0], orig [5 * channels], margin))
 	{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_readf_short failed (%f should be %f).\n", __LINE__, data [0], orig [5]) ;
 		exit (1) ;
 		} ;
@@ -1283,7 +1283,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 		} ;
 
 	test_readf_double_or_die (file, 0, data, 1, __LINE__) ;
-	if (error_function ((double) data [0], (double) orig [5], margin))
+	if (error_function (data [0], orig [5 * channels], margin))
 	{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_readf_short failed (%f should be %f).\n", __LINE__, data [0], orig [5]) ;
 		exit (1) ;
 		} ;
@@ -1472,7 +1472,7 @@ channels = 1 ;
 			} ;
 
 		test_read_short_or_die (file, 0, data, channels, __LINE__) ;
-		if (error_function ((double) data [0], (double) orig [5], margin))
+		if (error_function (1.0 * data [0], 1.0 * orig [5 * channels], margin))
 		{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_read_short failed (%d should be %d).\n", __LINE__, data [0], orig [5]) ;
 			exit (1) ;
 			} ;
@@ -1852,7 +1852,7 @@ printf ("** fix this ** ") ;
 			} ;
 
 		test_read_float_or_die (file, 0, data, channels, __LINE__) ;
-		if (error_function ((float) data [0], (float) orig [5], margin))
+		if (error_function (data [0], orig [5 * channels], margin))
 		{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_read_float failed (%d should be %d).\n", __LINE__, (int) data [0], (int) orig [5]) ;
 			exit (1) ;
 			} ;
@@ -2039,7 +2039,7 @@ channels = 1 ;
 			} ;
 
 		test_read_double_or_die (file, 0, data, channels, __LINE__) ;
-		if (error_function ((double) data [0], (double) orig [5], margin))
+		if (error_function (data [0], orig [5 * channels], margin))
 		{	printf ("\nLine %d: sf_seek (SEEK_END) followed by sf_read_double failed (%d should be %d).\n", __LINE__, (int) data [0], (int) orig [5]) ;
 			exit (1) ;
 			} ;
