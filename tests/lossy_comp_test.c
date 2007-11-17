@@ -693,7 +693,7 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 		} ;
 
 	/* Check that read past end of file returns number of items. */
-	sf_seek (file, (short) sfinfo.frames, SEEK_SET) ;
+	sf_seek (file, sfinfo.frames, SEEK_SET) ;
 
  	if ((k = sf_readf_short (file, data, datalen)) != 0)
  	{	printf ("\n\nLine %d: Return value from sf_readf_short past end of file incorrect (%d).\n", __LINE__, k) ;
@@ -701,7 +701,7 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
  		} ;
 
 	/* Check seek backward from end. */
-	if ((k = sf_seek (file, 5 - (short) sfinfo.frames, SEEK_END)) != 5)
+	if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
 	{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
 		exit (1) ;
 		} ;
@@ -881,7 +881,7 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 		} ;
 
 	/* Check that read past end of file returns number of items. */
-	sf_seek (file, (int) sfinfo.frames, SEEK_SET) ;
+	sf_seek (file, sfinfo.frames, SEEK_SET) ;
 
  	if ((k = sf_readf_int (file, data, datalen)) != 0)
  	{	printf ("\n\nLine %d: Return value from sf_readf_int past end of file incorrect (%d).\n", __LINE__, k) ;
@@ -889,7 +889,7 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
  		} ;
 
 	/* Check seek backward from end. */
-	if ((k = sf_seek (file, 5 - (int) sfinfo.frames, SEEK_END)) != 5)
+	if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
 	{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
 		exit (1) ;
 		} ;
@@ -1075,7 +1075,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 		} ;
 
 	/* Check that read past end of file returns number of items. */
-	sf_seek (file, (float) sfinfo.frames, SEEK_SET) ;
+	sf_seek (file, sfinfo.frames, SEEK_SET) ;
 
  	if ((k = sf_readf_float (file, data, datalen)) != 0)
  	{	printf ("\n\nLine %d: Return value from sf_readf_float past end of file incorrect (%d).\n", __LINE__, k) ;
@@ -1083,7 +1083,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
  		} ;
 
 	/* Check seek backward from end. */
-	if ((k = sf_seek (file, 5 - (float) sfinfo.frames, SEEK_END)) != 5)
+	if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
 	{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
 		exit (1) ;
 		} ;
@@ -1269,7 +1269,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 		} ;
 
 	/* Check that read past end of file returns number of items. */
-	sf_seek (file, (double) sfinfo.frames, SEEK_SET) ;
+	sf_seek (file, sfinfo.frames, SEEK_SET) ;
 
  	if ((k = sf_readf_double (file, data, datalen)) != 0)
  	{	printf ("\n\nLine %d: Return value from sf_readf_double past end of file incorrect (%d).\n", __LINE__, k) ;
@@ -1277,7 +1277,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
  		} ;
 
 	/* Check seek backward from end. */
-	if ((k = sf_seek (file, 5 - (double) sfinfo.frames, SEEK_END)) != 5)
+	if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
 	{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
 		exit (1) ;
 		} ;
@@ -1457,7 +1457,7 @@ channels = 1 ;
 			} ;
 
 		/* Check that read past end of file returns number of items. */
-		sf_seek (file, (int) sfinfo.frames, SEEK_SET) ;
+		sf_seek (file, sfinfo.frames, SEEK_SET) ;
 
 	 	if ((k = sf_read_short (file, data, datalen)) != 0)
 	 	{	printf ("\n\nLine %d: Return value from sf_read_short past end of file incorrect (%d).\n", __LINE__, k) ;
@@ -1466,7 +1466,7 @@ channels = 1 ;
 
 		/* Check seek backward from end. */
 
-		if ((k = sf_seek (file, 5 - (int) sfinfo.frames, SEEK_END)) != 5)
+		if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
 		{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
 			exit (1) ;
 			} ;
@@ -1645,7 +1645,7 @@ channels = 1 ;
 			} ;
 
 		/* Check that read past end of file returns number of items. */
-		sf_seek (file, (int) sfinfo.frames, SEEK_SET) ;
+		sf_seek (file, sfinfo.frames, SEEK_SET) ;
 
 	 	if ((k = sf_readf_int (file, data, datalen)) != 0)
 	 	{	printf ("\n\nLine %d: Return value from sf_readf_int past end of file incorrect (%d).\n", __LINE__, k) ;
@@ -1654,7 +1654,7 @@ channels = 1 ;
 
 		/* Check seek backward from end. */
 
-		if ((k = sf_seek (file, 5 - (int) sfinfo.frames, SEEK_END)) != 5)
+		if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
 		{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
 			exit (1) ;
 			} ;
@@ -1837,7 +1837,7 @@ printf ("** fix this ** ") ;
 			} ;
 
 		/* Check that read past end of file returns number of items. */
-		sf_seek (file, (int) sfinfo.frames, SEEK_SET) ;
+		sf_seek (file, sfinfo.frames, SEEK_SET) ;
 
 	 	if ((k = sf_read_float (file, data, datalen)) != 0)
 	 	{	printf ("\n\nLine %d: Return value from sf_read_float past end of file incorrect (%d).\n", __LINE__, k) ;
@@ -1846,7 +1846,7 @@ printf ("** fix this ** ") ;
 
 		/* Check seek backward from end. */
 
-		if ((k = sf_seek (file, 5 - (int) sfinfo.frames, SEEK_END)) != 5)
+		if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
 		{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
 			exit (1) ;
 			} ;
@@ -2024,7 +2024,7 @@ channels = 1 ;
 			} ;
 
 		/* Check that read past end of file returns number of items. */
-		sf_seek (file, (int) sfinfo.frames, SEEK_SET) ;
+		sf_seek (file, sfinfo.frames, SEEK_SET) ;
 
 	 	if ((k = sf_read_double (file, data, datalen)) != 0)
 	 	{	printf ("\n\nLine %d: Return value from sf_read_double past end of file incorrect (%d).\n", __LINE__, k) ;
@@ -2033,7 +2033,7 @@ channels = 1 ;
 
 		/* Check seek backward from end. */
 
-		if ((k = sf_seek (file, 5 - (int) sfinfo.frames, SEEK_END)) != 5)
+		if ((k = sf_seek (file, 5 - sfinfo.frames, SEEK_END)) != 5)
 		{	printf ("sf_seek (SEEK_END) returned %d instead of %d.\n", k, 5) ;
 			exit (1) ;
 			} ;
