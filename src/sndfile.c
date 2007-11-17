@@ -1356,11 +1356,6 @@ sf_read_short	(SNDFILE *sndfile, short *ptr, sf_count_t len)
 
 	psf->last_op = SFM_READ ;
 
-	if (psf->read_current > psf->sf.frames)
-	{	count = psf->sf.channels * (psf->read_current - psf->sf.frames) ;
-		psf->read_current = psf->sf.frames ;
-		} ;
-
 	return count ;
 } /* sf_read_short */
 
@@ -1402,11 +1397,6 @@ sf_readf_short		(SNDFILE *sndfile, short *ptr, sf_count_t frames)
 		} ;
 
 	psf->last_op = SFM_READ ;
-
-	if (psf->read_current > psf->sf.frames)
-	{	count = psf->sf.channels * (psf->read_current - psf->sf.frames) ;
-		psf->read_current = psf->sf.frames ;
-		} ;
 
 	return count / psf->sf.channels ;
 } /* sf_readf_short */
@@ -1458,11 +1448,6 @@ sf_read_int		(SNDFILE *sndfile, int *ptr, sf_count_t len)
 
 	psf->last_op = SFM_READ ;
 
-	if (psf->read_current > psf->sf.frames)
-	{	count = psf->sf.channels * (psf->read_current - psf->sf.frames) ;
-		psf->read_current = psf->sf.frames ;
-		} ;
-
 	return count ;
 } /* sf_read_int */
 
@@ -1504,11 +1489,6 @@ sf_readf_int	(SNDFILE *sndfile, int *ptr, sf_count_t frames)
 		} ;
 
 	psf->last_op = SFM_READ ;
-
-	if (psf->read_current > psf->sf.frames)
-	{	count = psf->sf.channels * (psf->read_current - psf->sf.frames) ;
-		psf->read_current = psf->sf.frames ;
-		} ;
 
 	return count / psf->sf.channels ;
 } /* sf_readf_int */
@@ -1560,11 +1540,6 @@ sf_read_float	(SNDFILE *sndfile, float *ptr, sf_count_t len)
 
 	psf->last_op = SFM_READ ;
 
-	if (psf->read_current > psf->sf.frames)
-	{	count = psf->sf.channels * (psf->read_current - psf->sf.frames) ;
-		psf->read_current = psf->sf.frames ;
-		} ;
-
 	return count ;
 } /* sf_read_float */
 
@@ -1606,11 +1581,6 @@ sf_readf_float	(SNDFILE *sndfile, float *ptr, sf_count_t frames)
 		} ;
 
 	psf->last_op = SFM_READ ;
-
-	if (psf->read_current > psf->sf.frames)
-	{	count = psf->sf.channels * (psf->read_current - psf->sf.frames) ;
-		psf->read_current = psf->sf.frames ;
-		} ;
 
 	return count / psf->sf.channels ;
 } /* sf_readf_float */
@@ -1662,11 +1632,6 @@ sf_read_double	(SNDFILE *sndfile, double *ptr, sf_count_t len)
 
 	psf->last_op = SFM_READ ;
 
-	if (psf->read_current > psf->sf.frames)
-	{	count = psf->sf.channels * (psf->read_current - psf->sf.frames) ;
-		psf->read_current = psf->sf.frames ;
-		} ;
-
 	return count ;
 } /* sf_read_double */
 
@@ -1708,11 +1673,6 @@ sf_readf_double	(SNDFILE *sndfile, double *ptr, sf_count_t frames)
 		} ;
 
 	psf->last_op = SFM_READ ;
-
-	if (psf->read_current > psf->sf.frames)
-	{	count = psf->sf.channels * (psf->read_current - psf->sf.frames) ;
-		psf->read_current = psf->sf.frames ;
-		} ;
 
 	return count / psf->sf.channels ;
 } /* sf_readf_double */

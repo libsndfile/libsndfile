@@ -3,6 +3,7 @@
     * src/sndfile.c
     Fix calculation of internal value psf->read_current when attempting to read
     past end of audio data.
+    Remove redundant code.
 
 2007-11-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
