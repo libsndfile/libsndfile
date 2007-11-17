@@ -21,7 +21,7 @@
 /* Set up for libsndfile environment: */
 #include "common.h"
 
-#include "adpcms.h"
+#include "ima_oki_adpcm.h"
 
 static int const ima_steps [] =	/* ~16-bit precision */
 {	7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45,

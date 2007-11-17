@@ -39,7 +39,7 @@
 #include	"sfendian.h"
 #include	"float_cast.h"
 #include	"common.h"
-#include	"adpcms.h"
+#include	"ima_oki_adpcm.h"
 
 #define		VOX_DATA_LEN	2048
 #define		PCM_DATA_LEN	(VOX_DATA_LEN *2)

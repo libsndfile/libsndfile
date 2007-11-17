@@ -18,12 +18,12 @@ EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 noinst_HEADERS = common.h sfconfig.h sfendian.h float_cast.h wav_w64.h sf_unistd.h
 
 noinst_PROGRAMS = test_endswap test_file_io test_conversions test_log_printf \
-		test_audio_detect test_adpcms
+		test_audio_detect test_ima_oki_adpcm
 
 COMMON = common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
 		interleave.c strings.c dither.c broadcast.c audio_detect.c \
- 		adpcms.c adpcms.h
+ 		ima_oki_adpcm.c ima_oki_adpcm.h
 
 FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c \
 		macbinary3.c macos.c mat4.c mat5.c nist.c ogg.c paf.c pvf.c raw.c rx2.c sd2.c \
@@ -56,8 +56,8 @@ test_audio_detect_CFLAGS = $(AM_CFLAGS)
 test_audio_detect_SOURCES = test_audio_detect.c
 test_audio_detect_LDADD = libcommon.la
 
-test_adpcms_CFLAGS = -DTEST $(AM_CFLAGS)
-test_adpcms_SOURCES = adpcms.c
+test_ima_oki_adpcm_CFLAGS = -DTEST $(AM_CFLAGS)
+test_ima_oki_adpcm_SOURCES = ima_oki_adpcm.c
 
 test_endswap.c: test_endswap.def test_endswap.tpl
 	autogen --writable test_endswap.def
@@ -79,7 +79,7 @@ check: test_endswap test_file_io test_conversions test_log_printf
 	./test_conversions
 	./test_log_printf
 	./test_audio_detect
-	./test_adpcms
+	./test_ima_oki_adpcm
 	@echo "============================================================"
 	@echo
 	@echo
