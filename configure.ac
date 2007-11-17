@@ -516,7 +516,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		AC_MSG_WARN([** GCC version 4.2 warns about the inline keyword for no good **])
 		AC_MSG_WARN([** reason but the maintainers do not see it as a bug.         **])
 		AC_MSG_WARN([** See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=33995      **])
-		AC_MSG_WARN([** Use -fgnu-inline to avoid this stupidity.                  **])
+		AC_MSG_WARN([** Using -fgnu-inline to avoid this stupidity.                **])
 		AC_MSG_WARN([****************************************************************])
 		AC_ADD_CFLAGS([-fgnu89-inline])
 		fi
