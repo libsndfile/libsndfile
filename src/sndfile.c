@@ -2127,9 +2127,15 @@ format_from_extension (SF_PRIVATE *psf)
 		psf->sf.samplerate = 8000 ;
 		format = SF_FORMAT_RAW | SF_FORMAT_ULAW ;
 		}
-	else if (strcmp (cptr, "vox") == 0)
+
+	else if (strcmp (cptr, "vox") == 0 || strcmp (cptr, "vox8") == 0)
 	{	psf->sf.channels = 1 ;
 		psf->sf.samplerate = 8000 ;
+		format = SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM ;
+		}
+	else if (strcmp (cptr, "vox6") == 0)
+	{	psf->sf.channels = 1 ;
+		psf->sf.samplerate = 6000 ;
 		format = SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM ;
 		}
 	else if (strcmp (cptr, "gsm") == 0)
