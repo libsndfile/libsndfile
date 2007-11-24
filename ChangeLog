@@ -1,3 +1,21 @@
+2007-11-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    Recognise files with 'vox6' extension as 6kHz OKI VOX ADPCM files. Also
+    recognise 'vox8' as and 'vox' as 8kHz files.
+
+    * configure.ac
+    Detect libjack (JACK Audio Connect Kit).
+
+    * examples/sndfile-jackplay.c examples/Makefile.am
+    Add new example program to play sound files using the JACK audio server.
+    Thanks to Jonatan Liljedahl for allowing this to be included.
+
+2007-11-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/index.html
+    Update support table with SD2 and FLAC.
+
 2007-11-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c

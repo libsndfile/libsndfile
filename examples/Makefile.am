@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_PROGRAMS = sndfile-info sndfile-play sndfile-convert
+bin_PROGRAMS = sndfile-info sndfile-play sndfile-convert sndfile-jackplay
 
 noinst_PROGRAMS = sndfile-data-trim make_sine sfprocess list_formats generate sndfilehandle
 
@@ -11,7 +11,7 @@ EXTRA_DIST = sndfile-play-beos.cpp
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 
-SNDFILEDIR =../src
+SNDFILEDIR = ../src
 INCLUDES = -I$(srcdir)/$(SNDFILEDIR) $(OS_SPECIFIC_CFLAGS)
 
 sndfile_info_SOURCES = sndfile-info.c
@@ -19,6 +19,10 @@ sndfile_info_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 sndfile_play_SOURCES = sndfile-play.c
 sndfile_play_LDADD = $(SNDFILEDIR)/libsndfile.la $(OS_SPECIFIC_LINKS) $(ALSA_LIBS)
+
+sndfile_jackplay_SOURCES = sndfile-jackplay.c
+sndfile_jackplay_CFLAGS = $(JACK_CFLAGS)
+sndfile_jackplay_LDADD = $(SNDFILEDIR)/libsndfile.la $(JACK_LIBS)
 
 sndfile_convert_SOURCES = sndfile-convert.c
 sndfile_convert_LDADD = $(SNDFILEDIR)/libsndfile.la
