@@ -554,6 +554,9 @@ ogg_command (SF_PRIVATE *psf, int command, void * data, int datasize)
 			if (data == NULL || datasize != sizeof (double))
 				return 1 ;
 
+			if (psf->have_written)
+				return 1 ;
+
 			vdata->quality = *((double *) data) ;
 
 			/* Clip range. */
