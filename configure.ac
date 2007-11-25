@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.57)
 
-AC_INIT([libsndfile],[1.0.18pre18],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.18vorbis1],[erikd@mega-nerd.com])
 
 # Put config stuff in Cfg.
 AC_CONFIG_AUX_DIR(Cfg)
@@ -654,6 +654,12 @@ AC_CONFIG_FILES([ \
 	src/FLAC/src/test_streams/Makefile src/FLAC/test/Makefile \
 	src/FLAC/src/test_grabbag/Makefile src/FLAC/src/test_grabbag/cuesheet/Makefile \
 	src/FLAC/src/test_grabbag/picture/Makefile \
+	\
+	src/VORBIS/Makefile src/VORBIS/lib/Makefile src/VORBIS/include/Makefile \
+	src/VORBIS/include/vorbis/Makefile src/VORBIS/lib/modes/Makefile \
+	src/VORBIS/lib/books/floor/Makefile src/VORBIS/lib/books/coupled/Makefile \
+	src/VORBIS/lib/books/uncoupled/Makefile src/VORBIS/lib/books/Makefile \
+	src/VORBIS/test/Makefile \
 	\
 	src/OGG/include/ogg/Makefile src/OGG/include/Makefile src/OGG/Makefile \
 	man/Makefile examples/Makefile tests/Makefile regtest/Makefile \

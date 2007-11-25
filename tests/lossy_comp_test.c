@@ -373,6 +373,15 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
+	if (do_all || strcmp (argv [1], "ogg_vorbis") == 0)
+	{	/* Don't do lcomp_test_XXX as the errors are too big. */
+		sdlcomp_test_short	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
+		sdlcomp_test_int	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
+		sdlcomp_test_float	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
+		sdlcomp_test_double	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
+		test_count++ ;
+		} ;
+
 	/* Lite remove start */
 	if (do_all || strcmp (argv [1], "ircam_ulaw") == 0)
 	{	lcomp_test_short	("ulaw.ircam", SF_ENDIAN_LITTLE | SF_FORMAT_IRCAM | SF_FORMAT_ULAW, 2, 0.04) ;
@@ -1335,7 +1344,26 @@ channels = 1 ;
 	sfinfo.channels		= channels ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	/*	The Vorbis encoder has a bug on PowerPC and X86-64 with sample rates
+	**	<= 22050. Increasing the sample rate to 32000 avoids triggering it.
+	**	See https://trac.xiph.org/ticket/1229
+	*/
+	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
+	{	const char * errstr ;
+	
+		errstr = sf_strerror (NULL) ;
+		if (strstr (errstr, "Sample rate chosen is known to trigger a Vorbis") == NULL)
+		{	printf ("Line %d: sf_open_fd (SFM_WRITE) failed : %s\n", __LINE__, errstr) ;
+			dump_log_buffer (NULL) ;
+			exit (1) ;
+			} ;
+
+		printf ("\n                                  Sample rate -> 32kHz    ") ;
+		sfinfo.samplerate = 32000 ;
+
+		file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+		} ;
+
 	test_write_short_or_die (file, 0, orig, datalen, __LINE__) ;
 	sf_set_string (file, SF_STR_COMMENT, long_comment) ;
 	sf_close (file) ;
@@ -1524,7 +1552,26 @@ channels = 1 ;
 	sfinfo.channels		= channels ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	/*	The Vorbis encoder has a bug on PowerPC and X86-64 with sample rates
+	**	<= 22050. Increasing the sample rate to 32000 avoids triggering it.
+	**	See https://trac.xiph.org/ticket/1229
+	*/
+	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
+	{	const char * errstr ;
+	
+		errstr = sf_strerror (NULL) ;
+		if (strstr (errstr, "Sample rate chosen is known to trigger a Vorbis") == NULL)
+		{	printf ("Line %d: sf_open_fd (SFM_WRITE) failed : %s\n", __LINE__, errstr) ;
+			dump_log_buffer (NULL) ;
+			exit (1) ;
+			} ;
+
+		printf ("\n                                  Sample rate -> 32kHz    ") ;
+		sfinfo.samplerate = 32000 ;
+
+		file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+		} ;
+
 	test_writef_int_or_die (file, 0, orig, datalen, __LINE__) ;
 	sf_set_string (file, SF_STR_COMMENT, long_comment) ;
 	sf_close (file) ;
@@ -1695,6 +1742,11 @@ sdlcomp_test_float	(const char *filename, int filetype, int channels, double mar
 channels = 1 ;
 
 	print_test_name ("sdlcomp_test_float", filename) ;
+
+	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_VORBIS)
+	{	puts ("Not working for this format.") ;
+		return ;
+		} ;
 
 printf ("** fix this ** ") ;
 
@@ -1885,6 +1937,11 @@ sdlcomp_test_double	(const char *filename, int filetype, int channels, double ma
 
 channels = 1 ;
 	print_test_name ("sdlcomp_test_double", filename) ;
+
+	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_VORBIS)
+	{	puts ("Not working for this format.") ;
+		return ;
+		} ;
 
 	datalen = BUFFER_SIZE ;
 

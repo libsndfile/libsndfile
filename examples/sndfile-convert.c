@@ -81,7 +81,8 @@ static OUTPUT_FORMAT_MAP format_map [] =
 	{	"sd2",		0, 	SF_FORMAT_SD2 	},
 	{	"vox",		0, 	SF_FORMAT_RAW 	},
 	{	"xi",		0, 	SF_FORMAT_XI 	},
-	{	"wve",		0,	SF_FORMAT_WVE	}
+	{	"wve",		0,	SF_FORMAT_WVE	},
+	{	"oga",		0,	SF_FORMAT_OGG	}
 } ; /* format_map */
 
 static int
@@ -147,6 +148,7 @@ print_usage (char *progname)
 		"        -dwvw12    : force the output to 12 bit DWVW (AIFF only)\n"
 		"        -dwvw16    : force the output to 16 bit DWVW (AIFF only)\n"
 		"        -dwvw24    : force the output to 24 bit DWVW (AIFF only)\n"
+		"        -vorbis    : force the output to Vorbis (OGG only)\n"
 		) ;
 
 	puts (
@@ -257,6 +259,10 @@ main (int argc, char * argv [])
 		{	outfileminor = SF_FORMAT_DWVW_24 ;
 			continue ;
 			} ;
+		if (! strcmp (argv [k], "-vorbis"))
+		{	outfileminor = SF_FORMAT_VORBIS ;
+			continue ;
+			} ;
 
 		if (! strcmp (argv [k], "-override-sample-rate="))
 		{	char *ptr ;
@@ -323,8 +329,9 @@ main (int argc, char * argv [])
 	/* Copy the metadata */
 	copy_metadata (outfile, infile) ;
 
-	if ((outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT) ||
-				(infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT))
+	if ((outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT)
+			|| (infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT)
+			|| (infileminor == SF_FORMAT_VORBIS)|| (outfileminor == SF_FORMAT_VORBIS))
 		copy_data_fp (outfile, infile, sfinfo.channels) ;
 	else
 		copy_data_int (outfile, infile, sfinfo.channels) ;

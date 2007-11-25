@@ -249,6 +249,8 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_DWVW_BAD_BITWIDTH	, "Error : Bad bit width for DWVW encoding. Must be 12, 16 or 24." },
 	{	SFE_G72X_NOT_MONO		, "Error : G72x encoding does not support more than 1 channel." },
 
+	{	SFE_VORBIS_ENCODER_BUG	, "Error : Sample rate chosen is known to trigger a Vorbis encoder bug on this CPU." },
+
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
 } ;
@@ -778,6 +780,11 @@ sf_format_check	(const SF_INFO *info)
 				if (info->channels > 1)
 					return 0 ;
 				if (subformat == SF_FORMAT_ALAW)
+					return 1 ;
+				break ;
+
+		case SF_FORMAT_OGG :
+				if (subformat == SF_FORMAT_VORBIS)
 					return 1 ;
 				break ;
 
@@ -2212,7 +2219,7 @@ guess_file_type (SF_PRIVATE *psf)
 	if (buffer [0] == MAKE_MARKER ('c', 'a', 'f', 'f') && buffer [2] == MAKE_MARKER ('d', 'e', 's', 'c'))
 		return SF_FORMAT_CAF ;
 
-	if (ENABLE_EXPERIMENTAL_CODE && buffer [0] == MAKE_MARKER ('O', 'g', 'g', 'S'))
+	if (buffer [0] == MAKE_MARKER ('O', 'g', 'g', 'S'))
 		return SF_FORMAT_OGG ;
 
 	if (buffer [0] == MAKE_MARKER ('A', 'L', 'a', 'w') && buffer [1] == MAKE_MARKER ('S', 'o', 'u', 'n')

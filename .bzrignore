@@ -7,6 +7,7 @@
 *.la
 *.lo
 *.loT
+*.oga
 *.paf
 *.sd2
 *.sds
@@ -46,6 +47,7 @@ sndfile.pc
 src/*sndfile.def
 src/FLAC/src/test_grabbag/cuesheet/test_cuesheet
 src/FLAC/src/test_grabbag/picture/test_picture
+src/FLAC/src/test_libFLAC/matrix
 src/FLAC/src/test_libFLAC/test_libFLAC
 src/FLAC/src/test_seeking/test_seeking
 src/FLAC/src/test_streams/test_streams
@@ -59,6 +61,8 @@ src/OGG/test_bitwise
 src/OGG/test_framing
 src/Symbols.darwin
 src/Symbols.linux
+src/VORBIS/lib/test_sharedbook
+src/VORBIS/test/test
 src/config.h
 src/config.h.in
 src/sndfile.h
