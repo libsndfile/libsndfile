@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.57)
 
-AC_INIT([libsndfile],[1.0.18pre18],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.18pre19],[erikd@mega-nerd.com])
 
 # Put config stuff in Cfg.
 AC_CONFIG_AUX_DIR(Cfg)
@@ -683,11 +683,11 @@ AC_MSG_RESULT([
 if test x$ac_cv_c_compiler_gnu = xyes ; then
 	echo -e "  Tools :\n"
 	echo "    Compiler is GCC : ............. ${ac_cv_c_compiler_gnu}"
-	echo "    GCC version : ................. ${GCC_VERSION}."
+	echo "    GCC version : ................. ${GCC_VERSION}"
 	if test $GCC_MAJOR_VERSION -lt 3 ; then
 		echo -e "\n    ** This compiler version allows applications to write"
 		echo "    ** to static strings within the library."
-		echo "    ** Compile with GCC version 3.X to avoid this problem."
+		echo "    ** Compile with GCC version 3.X or above to avoid this problem."
 		fi
 	fi
 
