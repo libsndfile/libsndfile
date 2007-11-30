@@ -264,8 +264,8 @@ main (int argc, char * argv [])
 			continue ;
 			} ;
 
-		if (! strcmp (argv [k], "-override-sample-rate="))
-		{	char *ptr ;
+		if (strstr (argv [k], "-override-sample-rate=") == argv [k])
+		{	const char *ptr ;
 
 			ptr = argv [k] + strlen ("-override-sample-rate=") ;
 			override_sample_rate = atoi (ptr) ;
@@ -284,7 +284,7 @@ main (int argc, char * argv [])
 
 	/* Update sample rate if forced to something else. */
 	if (override_sample_rate)
-		sfinfo.samplerate=override_sample_rate ;
+		sfinfo.samplerate = override_sample_rate ;
 
 	infileminor = sfinfo.format & SF_FORMAT_SUBMASK ;
 
