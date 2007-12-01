@@ -36,3 +36,6 @@ typedef enum
 void adpcm_init		(adpcm_codec * state, adpcm_type type) ;
 int	adpcm_decode	(adpcm_codec * state, int /* 0..15 */ code) ;
 int	adpcm_encode	(adpcm_codec * state, int /* -32768..32767 */ sample) ;
+
+int	adpcm_decode_block	(adpcm_codec * state, const unsigned char * codes, short * output, int count) ;
+int	adpcm_encode_block	(adpcm_codec * state, const short * input, unsigned char * codes, int count) ;

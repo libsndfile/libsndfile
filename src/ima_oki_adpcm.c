@@ -110,66 +110,165 @@ adpcm_encode (adpcm_codec * state, int sample)
 	return code ;
 } /* adpcm_encode */
 
+
+int
+adpcm_decode_block	(adpcm_codec * state, const unsigned char * codes, short * output, int count)
+{	unsigned char code ;
+	int j, k ;
+
+	for (j = k = 0 ; j < count ; j++)
+	{	code = codes [j] ;
+		output [k++] = adpcm_decode (state, code >> 4) ;
+		output [k++] = adpcm_decode (state, code) ;
+		} ;
+
+	return k ;
+} /* adpcm_decode_block */
+
+
+int
+adpcm_encode_block (adpcm_codec * state, const short * input, unsigned char * codes, int count)
+{	unsigned char code ;
+	int j, k ;
+
+	for (j = k = 0 ; k < count ; j++)
+	{	code = adpcm_encode (state, input [k++]) << 4 ;
+		code |= adpcm_encode (state, input [k++]) ;
+		codes [j] = code ;
+		} ;
+
+	return j ;
+} /* adpcm_encode_block */
+
+
 #ifdef TEST
+
+static const unsigned char test_codes [] =
+{	0x08, 0x08, 0x04, 0x7f, 0x72, 0xf7, 0x9f, 0x7c, 0xd7, 0xbc, 0x7a, 0xa7, 0xb8,
+	0x4b, 0x0b, 0x38, 0xf6, 0x9d, 0x7a, 0xd7, 0xbc, 0x7a, 0xd7, 0xa8, 0x6c, 0x81,
+	0x98, 0xe4, 0x0e, 0x7a, 0xd7, 0x9e, 0x7b, 0xc7, 0xab, 0x7a, 0x85, 0xc0, 0xb3,
+	0x8f, 0x58, 0xd7, 0xad, 0x7a, 0xd7, 0xad, 0x7a, 0x87, 0xd0, 0x2b, 0x0e, 0x48,
+	0xd7, 0xad, 0x78, 0xf7, 0xbc, 0x7a, 0xb7, 0xa8, 0x4b, 0x88, 0x18, 0xd5, 0x8d,
+	0x6a, 0xa4, 0x98, 0x08, 0x00, 0x80, 0x88,
+} ;
+
+static const short test_decodes [] =
+{	32, 0, 32, 0, 32, 320, 880, -336, 2304, 4192, -992, 10128, 5360, -16352,
+	30208, 2272, -31872, 14688, -7040, -32432, 14128, -1392, -15488, 22960,
+	1232, -1584, 21488, -240, 2576, -15360, 960, -1152, -30032, 10320, 1008,
+	-30032, 16528, 1008, -30032, 16528, -5200, -30592, 15968, 448, -30592,
+	15968, 448, -2368, 30960, 3024, -80, 8384, 704, -1616, -29168, -1232, 1872,
+	-32768, 13792, -1728, -32768, 13792, 4480, -32192, 14368, -7360, -32752,
+	13808, -1712, -21456, 16992, 1472, -1344, 26848, -1088, 2016, -17728, 208,
+	-2112, -32768, 1376, -1728, -32768, 13792, -1728, -32768, 13792, -1728,
+	-32768, 13792, -1728, -32768, 13792, -1728, -4544, 32767, -1377, 1727,
+	15823, -2113, 207, -27345, 591, -2513, -32768, 13792, -1728, -32768, 13792,
+	10688, -31632, 14928, -6800, -32192, 14368, -1152, -20896, 17552, 2032,
+	-784, 22288, 560, -2256, -4816, 2176, 64, -21120, 9920, 6816, -24224, 16128,
+	608, -13488, 9584, 272, -2544, 16, -2304, -192, 1728, -16, 1568, 128, -1184,
+} ;
+
+
 static void
 test_oki_adpcm (void)
 {
-	static const char codes [] =
-	{	8, 8, 4, 127, 114, -9, -97, 124, -41, -68, 122, -89, -72, 75, 11, 56, -10,
-		-99, 122, -41, -68, 122, -41, -88, 108, -127, -104, -28, 14, 122, -41, -98,
-		123, -57, -85, 122, -123, -64, -77, -113, 88, -41, -83, 122, -41, -83, 122,
-		-121, -48, 43, 14, 72, -41, -83, 120, -9, -68, 122, -73, -88, 75, -120, 24,
-		-43, -115, 106, -92, -104, 8, 0, -128, -120,
-	} ;
-	static const short decodes [] =
-	{	32, 0, 32, 0, 32, 320, 880, -336, 2304, 4192, -992, 10128, 5360, -16352,
-		30208, 2272, -31872, 14688, -7040, -32432, 14128, -1392, -15488, 22960,
-		1232, -1584, 21488, -240, 2576, -15360, 960, -1152, -30032, 10320, 1008,
-		-30032, 16528, 1008, -30032, 16528, -5200, -30592, 15968, 448, -30592,
-		15968, 448, -2368, 30960, 3024, -80, 8384, 704, -1616, -29168, -1232, 1872,
-		-32768, 13792, -1728, -32768, 13792, 4480, -32192, 14368, -7360, -32752,
-		13808, -1712, -21456, 16992, 1472, -1344, 26848, -1088, 2016, -17728, 208,
-		-2112, -32768, 1376, -1728, -32768, 13792, -1728, -32768, 13792, -1728,
-		-32768, 13792, -1728, -32768, 13792, -1728, -4544, 32767, -1377, 1727,
-		15823, -2113, 207, -27345, 591, -2513, -32768, 13792, -1728, -32768, 13792,
-		10688, -31632, 14928, -6800, -32192, 14368, -1152, -20896, 17552, 2032,
-		-784, 22288, 560, -2256, -4816, 2176, 64, -21120, 9920, 6816, -24224, 16128,
-		608, -13488, 9584, 272, -2544, 16, -2304, -192, 1728, -16, 1568, 128, -1184,
-	} ;
-
 	adpcm_codec adpcm ;
-	int i, j, code ;
+	unsigned char code ;
+	int i, j ;
 
 	printf ("    Testing encoder          : ") ;
 	fflush (stdout) ;
+
 	adpcm_init (&adpcm, ADPCM_OKI) ;
-	for (i = 0 ; i < ARRAY_LEN (codes) ; i++)
-		for (j = 0, code = codes [i] ; j < 2 ; j++, code <<= 4)
-			if (adpcm_decode (&adpcm, code >> 4) != decodes [2 * i + j])
+	for (i = 0 ; i < ARRAY_LEN (test_codes) ; i++)
+		for (j = 0, code = test_codes [i] ; j < 2 ; j++, code <<= 4)
+			if (adpcm_decode (&adpcm, code >> 4) != test_decodes [2 * i + j])
 			{	printf ("\n\nFail at i = %d, j = %d.\n\n", i, j) ;
 				exit (1) ;
 				} ;
+
 	puts ("ok") ;
 
 	printf ("    Testing decoder          : ") ;
 	fflush (stdout) ;
+
 	adpcm_init (&adpcm, ADPCM_OKI) ;
-	for (i = 0 ; i < ARRAY_LEN (decodes) ; i += j)
-	{	for (j = 0 ; j < 2 ; j++)
-			code = (code << 4) | adpcm_encode (&adpcm, decodes [i + j]) ;
-		if ((char) code != codes [i / 2])
-			{	printf ("\n\nFail at i = %d.\n\n", i) ;
+	for (i = 0 ; i < ARRAY_LEN (test_decodes) ; i += j)
+	{	code = adpcm_encode (&adpcm, test_decodes [i]) ;
+		code = (code << 4) | adpcm_encode (&adpcm, test_decodes [i + 1]) ;
+		if (code != test_codes [i / 2])
+			{	printf ("\n\nFail at i = %d, %d should be %d\n\n", i, code, test_codes [i / 2]) ;
 				exit (1) ;
 				} ;
 		} ;
+
+	puts ("ok") ;
+} /* test_oki_adpcm */
+
+static void
+test_oki_adpcm_block (void)
+{
+	static unsigned char code_data [ARRAY_LEN (test_codes)] ;
+	static short short_data [ARRAY_LEN (test_decodes)] ;
+
+	adpcm_codec adpcm ;
+	int count, k ;
+
+	printf ("    Testing block encoder    : ") ;
+	fflush (stdout) ;
+
+	adpcm_init (&adpcm, ADPCM_OKI) ;
+
+	count = adpcm_encode_block (&adpcm, test_decodes, code_data, ARRAY_LEN (test_decodes)) ;
+
+	if (count * 2 != ARRAY_LEN (test_decodes))
+	{	printf ("\n\nError : %d * 2 != %d\n\n", count * 2, ARRAY_LEN (test_decodes)) ;
+		exit (1) ;
+		} ;
+
+	for (k = 0 ; k < ARRAY_LEN (test_codes) ; k++)
+		if (code_data [k] != test_codes [k])
+		{	printf ("\n\nFail at k = %d, %d should be %d\n\n", k, code_data [k], test_codes [k]) ;
+			exit (1) ;
+			} ;
+
 	puts ("ok") ;
 
-} /* test_oki_adpcm */
+	printf ("    Testing block decoder    : ") ;
+	fflush (stdout) ;
+
+	adpcm_init (&adpcm, ADPCM_OKI) ;
+
+	count = adpcm_decode_block (&adpcm, test_codes, short_data, ARRAY_LEN (test_codes)) ;
+
+	if (count != 2 * ARRAY_LEN (test_codes))
+	{	printf ("\n\nError : %d * 2 != %d\n\n", count, 2 * ARRAY_LEN (test_codes)) ;
+		exit (1) ;
+		} ;
+
+	for (k = 0 ; k < ARRAY_LEN (test_decodes) ; k++)
+		if (short_data [k] != test_decodes [k])
+		{	printf ("\n\nFail at i = %d.\n\n", k) ;
+			exit (1) ;
+			} ;
+
+	puts ("ok") ;
+} /* test_oki_adpcm_block */
 
 int
 main (void)
 {
+/*
+	const unsigned char *ptr = (const unsigned char *) test_codes ;
+	int k ;
+
+	puts ("\n") ;
+	for (k = 0 ; k < ARRAY_LEN (test_codes) ; k++)
+		printf ("0x%02x, ", ptr [k] & 0xff) ;
+	puts ("\n") ;
+*/
 	test_oki_adpcm () ;
+	test_oki_adpcm_block () ;
 
 	return 0 ;
 } /* main */
