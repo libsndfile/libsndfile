@@ -8,6 +8,7 @@
 *.lo
 *.loT
 *.oct
+*.oga
 *.paf
 *.sd2
 *.sds
@@ -38,6 +39,7 @@ examples/sfprocess
 examples/sndfile-convert
 examples/sndfile-data-trim
 examples/sndfile-info
+examples/sndfile-jackplay
 examples/sndfile-play
 examples/sndfilehandle
 libsndfile-1.0.*pre*
@@ -62,6 +64,8 @@ src/OGG/test_bitwise
 src/OGG/test_framing
 src/Symbols.darwin
 src/Symbols.linux
+src/VORBIS/lib/test_sharedbook
+src/VORBIS/test/test
 src/config.h
 src/config.h.in
 src/sndfile.h

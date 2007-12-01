@@ -959,11 +959,3 @@ void Gsm_Long_Term_Synthesis_Filtering (
 
 	for (k = 0; k <= 119; k++) drp[ -120 + k ] = drp[ -80 + k ];
 }
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: b369b90d-0284-42a0-87b0-99a25bbd93ac
-*/
-

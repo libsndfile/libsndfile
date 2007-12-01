@@ -67,6 +67,7 @@ enum
 	SF_FORMAT_FLAC			= 0x170000,		/* FLAC lossless file format */
 	SF_FORMAT_CAF			= 0x180000,		/* Core Audio File format */
 	SF_FORMAT_WVE			= 0x190000,		/* Psion WVE format */
+	SF_FORMAT_OGG			= 0x200000,		/* Xiph OGG container */
 
 	/* Subtypes from here on. */
 
@@ -99,6 +100,8 @@ enum
 
 	SF_FORMAT_DPCM_8		= 0x0050,		/* 8 bit differential PCM (XI only) */
 	SF_FORMAT_DPCM_16		= 0x0051,		/* 16 bit differential PCM (XI only) */
+
+	SF_FORMAT_VORBIS		= 0x0060,		/* Xiph Vorbis encoding. */
 
 	/* Endian-ness options. */
 
@@ -182,6 +185,8 @@ enum
 	/* Support for Wavex Ambisonics Format */
 	SFC_WAVEX_SET_AMBISONIC			= 0x1200,
 	SFC_WAVEX_GET_AMBISONIC			= 0x1201,
+
+	SFC_SET_VBR_ENCODING_QUALITY		= 0x1300,
 
 	/* Following commands for testing only. */
 	SFC_TEST_IEEE_FLOAT_REPLACE		= 0x6001,

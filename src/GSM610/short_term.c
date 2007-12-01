@@ -417,11 +417,3 @@ void Gsm_Short_Term_Synthesis_Filter (
 	LARp_to_rp( LARp );
 	FILTER(S, LARp, 120, wt + 40, s + 40);
 }
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 019ac7ba-c6dd-4540-abf0-8644b6c4a633
-*/
-

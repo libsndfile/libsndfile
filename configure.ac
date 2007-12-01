@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.57)
 
-AC_INIT([libsndfile],[1.0.18pre18],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.18pre19],[erikd@mega-nerd.com])
 
 # Put config stuff in Cfg.
 AC_CONFIG_AUX_DIR(Cfg)
@@ -287,6 +287,19 @@ else
 AC_DEFINE_UNQUOTED([HAVE_SQLITE3],$HAVE_SQLITE3,[Set to 1 if you have libsqlite3.])
 
 #====================================================================================
+# Check for JACK (only used for examples/sndfile-jackplay).
+
+PKG_CHECK_MODULES(JACK, jack >= 0.100, ac_cv_jack=yes, ac_cv_jack=no)
+
+if test x$ac_cv_jack = "xyes" ; then
+	HAVE_JACK=1
+else
+	HAVE_JACK=0
+	fi
+
+AC_DEFINE_UNQUOTED([HAVE_JACK],$HAVE_JACK,[Set to 1 if you have JACK.])
+
+#====================================================================================
 # Determine if the processor can do clipping on float to int conversions.
 
 if test x$enable_cpu_clip != "xno" ; then
@@ -505,6 +518,7 @@ else
 # Now use the information from the checking stage.
 
 win32_target_dll=0
+COMPILER_IS_GCC=0
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
 	AC_ADD_CFLAGS(-std=gnu99)
@@ -516,7 +530,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		AC_MSG_WARN([** GCC version 4.2 warns about the inline keyword for no good **])
 		AC_MSG_WARN([** reason but the maintainers do not see it as a bug.         **])
 		AC_MSG_WARN([** See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=33995      **])
-		AC_MSG_WARN([** Use -fgnu-inline to avoid this stupidity.                  **])
+		AC_MSG_WARN([** Using -fgnu-inline to avoid this stupidity.                **])
 		AC_MSG_WARN([****************************************************************])
 		AC_ADD_CFLAGS([-fgnu89-inline])
 		fi
@@ -583,10 +597,11 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	 	CFLAGS="$CFLAGS -pipe"
 	 	fi
 
-	AC_DEFINE([COMPILER_IS_GCC],1, [Set to 1 if the compile is GNU GCC.])
+	COMPILER_IS_GCC=1
 	fi
 
-AC_DEFINE_UNQUOTED(WIN32_TARGET_DLL, ${win32_target_dll}, [Set to 1 if windows DLL is being built.])
+AC_DEFINE_UNQUOTED([WIN32_TARGET_DLL], ${win32_target_dll}, [Set to 1 if windows DLL is being built.])
+AC_DEFINE_UNQUOTED([COMPILER_IS_GCC], ${COMPILER_IS_GCC}, [Set to 1 if the compile is GNU GCC.])
 
 CFLAGS="$CFLAGS $OS_SPECIFIC_CFLAGS"
 
@@ -610,6 +625,8 @@ AC_SUBST(ENABLE_EXPERIMENTAL_CODE)
 
 AC_SUBST(COMPILER_IS_GCC)
 AC_SUBST(GCC_MAJOR_VERSION)
+
+AC_SUBST(HAVE_JACK)
 
 dnl The following line causes the libtool distributed with the source
 dnl to be replaced if the build system has a more recent version.
@@ -638,6 +655,12 @@ AC_CONFIG_FILES([ \
 	src/FLAC/src/test_grabbag/Makefile src/FLAC/src/test_grabbag/cuesheet/Makefile \
 	src/FLAC/src/test_grabbag/picture/Makefile \
 	\
+	src/VORBIS/Makefile src/VORBIS/lib/Makefile src/VORBIS/include/Makefile \
+	src/VORBIS/include/vorbis/Makefile src/VORBIS/lib/modes/Makefile \
+	src/VORBIS/lib/books/floor/Makefile src/VORBIS/lib/books/coupled/Makefile \
+	src/VORBIS/lib/books/uncoupled/Makefile src/VORBIS/lib/books/Makefile \
+	src/VORBIS/test/Makefile \
+	\
 	src/OGG/include/ogg/Makefile src/OGG/include/Makefile src/OGG/Makefile \
 	man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
 	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile \
@@ -660,11 +683,11 @@ AC_MSG_RESULT([
 if test x$ac_cv_c_compiler_gnu = xyes ; then
 	echo -e "  Tools :\n"
 	echo "    Compiler is GCC : ............. ${ac_cv_c_compiler_gnu}"
-	echo "    GCC version : ................. ${GCC_VERSION}."
+	echo "    GCC version : ................. ${GCC_VERSION}"
 	if test $GCC_MAJOR_VERSION -lt 3 ; then
 		echo -e "\n    ** This compiler version allows applications to write"
 		echo "    ** to static strings within the library."
-		echo "    ** Compile with GCC version 3.X to avoid this problem."
+		echo "    ** Compile with GCC version 3.X or above to avoid this problem."
 		fi
 	fi
 

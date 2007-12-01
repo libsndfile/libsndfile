@@ -125,7 +125,7 @@ txw_open	(SF_PRIVATE *psf)
 static int
 txw_read_header	(SF_PRIVATE *psf)
 {	TXW_HEADER txwh ;
-	char	*strptr ;
+	const char	*strptr ;
 
 	memset (&txwh, 0, sizeof (txwh)) ;
 	memset (psf->u.cbuf, 0, sizeof (psf->u.cbuf)) ;

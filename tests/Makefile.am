@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 if ENABLE_TEST_COVERAGE
-CPP_TEST = 
+CPP_TEST =
 else
 CPP_TEST = cpp_test
 endif
@@ -12,7 +12,8 @@ noinst_PROGRAMS = sfversion floating_point_test write_read_test \
 	pcm_test headerless_test pipe_test benchmark header_test misc_test \
 	raw_test string_test multi_file_test dither_test \
 	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
-	locale_test largefile_test win32_ordinal_test $(CPP_TEST)
+	locale_test largefile_test win32_ordinal_test ogg_test vorbis_test \
+	$(CPP_TEST)
 
 SNDFILEDIR = ../src
 INCLUDES = -I$(srcdir)/$(SNDFILEDIR)
@@ -106,14 +107,20 @@ multi_file_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 virtual_io_test_SOURCES = virtual_io_test.c utils.c
 virtual_io_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
+ogg_test_SOURCES = ogg_test.c utils.c
+ogg_test_LDADD = $(SNDFILEDIR)/libsndfile.la
+
+vorbis_test_SOURCES = vorbis_test.c utils.c
+vorbis_test_LDADD = $(SNDFILEDIR)/libsndfile.la
+
 win32_test_SOURCES = win32_test.c
 win32_test_LDADD =
 
 win32_ordinal_test_SOURCES = win32_ordinal_test.c utils.c
-win32_ordinal_test_LDADD = $(SNDFILEDIR)/libsndfile.la 
+win32_ordinal_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 cpp_test_SOURCES = cpp_test.cc utils.c
-cpp_test_LDADD = $(SNDFILEDIR)/libsndfile.la 
+cpp_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 # Lite remove start
 dwvw_test_SOURCES = utils.c dwvw_test.c
@@ -163,7 +170,7 @@ genfiles : write_read_test.c pcm_test.c header_test.c utils.c \
 check: generic-tests wav-tests aiff-tests au-tests caf-tests raw-tests \
 	paf-tests svx-tests nist-tests ircam-tests voc-tests w64-tests mat4-tests \
 	mat5-tests pvf-tests xi-tests htk-tests avr-tests sds-tests sd2-tests \
-	flac-tests caf-tests wve-tests io-tests
+	flac-tests caf-tests wve-tests vorbis-tests io-tests
 
 generic-tests : error_test ulaw_test alaw_test command_test floating_point_test \
 		pcm_test win32_ordinal_test $(CPP_TEST)
@@ -283,6 +290,15 @@ wve-tests: lossy_comp_test
 	./lossy_comp_test wve
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on WVE files."
+	@echo "----------------------------------------------------------------------"
+
+vorbis-tests: lossy_comp_test ogg_test vorbis_test
+	./ogg_test
+	./vorbis_test
+	./lossy_comp_test ogg_vorbis
+	./string_test ogg
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion` passed tests on OGG/VORBIS files."
 	@echo "----------------------------------------------------------------------"
 
 # Lite remove start
