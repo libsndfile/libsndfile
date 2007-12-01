@@ -116,30 +116,30 @@ adpcm_encode (adpcm_codec * state, int sample)
 int
 adpcm_decode_block	(adpcm_codec * state, const unsigned char * codes, short * output, int count)
 {	unsigned char code ;
-	int j, k ;
+	int k ;
 
-	for (j = k = 0 ; j < count ; j++)
-	{	code = codes [j] ;
-		output [k++] = adpcm_decode (state, code >> 4) ;
-		output [k++] = adpcm_decode (state, code) ;
+	for (k = 0 ; k < count ; k++)
+	{	code = codes [k] ;
+		output [2 * k] = adpcm_decode (state, code >> 4) ;
+		output [2 * k + 1] = adpcm_decode (state, code) ;
 		} ;
 
-	return k ;
+	return 2 * k ;
 } /* adpcm_decode_block */
 
 
 int
 adpcm_encode_block (adpcm_codec * state, const short * input, unsigned char * codes, int count)
 {	unsigned char code ;
-	int j, k ;
+	int k ;
 
-	for (j = k = 0 ; k < count ; j++)
-	{	code = adpcm_encode (state, input [k++]) << 4 ;
-		code |= adpcm_encode (state, input [k++]) ;
-		codes [j] = code ;
+	for (k = 0 ; k < count / 2 ; k++)
+	{	code = adpcm_encode (state, input [2 * k]) << 4 ;
+		code |= adpcm_encode (state, input [2 * k + 1]) ;
+		codes [k] = code ;
 		} ;
 
-	return j ;
+	return k ;
 } /* adpcm_encode_block */
 
 
