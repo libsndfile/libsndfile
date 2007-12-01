@@ -258,15 +258,6 @@ test_oki_adpcm_block (void)
 int
 main (void)
 {
-/*
-	const unsigned char *ptr = (const unsigned char *) test_codes ;
-	int k ;
-
-	puts ("\n") ;
-	for (k = 0 ; k < ARRAY_LEN (test_codes) ; k++)
-		printf ("0x%02x, ", ptr [k] & 0xff) ;
-	puts ("\n") ;
-*/
 	test_oki_adpcm () ;
 	test_oki_adpcm_block () ;
 
