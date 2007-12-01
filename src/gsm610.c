@@ -200,12 +200,12 @@ gsm610_wav_decode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
 		psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, WAV_W64_GSM610_BLOCKSIZE) ;
 
 	if (gsm_decode (pgsm610->gsm_data, pgsm610->block, pgsm610->samples) < 0)
-	{	psf_log_printf (psf, "Error from gsm_decode() on frame : %d\n", pgsm610->blockcount) ;
+	{	psf_log_printf (psf, "Error from WAV gsm_decode() on frame : %d\n", pgsm610->blockcount) ;
 		return 0 ;
 		} ;
 
 	if (gsm_decode (pgsm610->gsm_data, pgsm610->block + (WAV_W64_GSM610_BLOCKSIZE + 1) / 2, pgsm610->samples + WAV_W64_GSM610_SAMPLES / 2) < 0)
-	{	psf_log_printf (psf, "Error from gsm_decode() on frame : %d.5\n", pgsm610->blockcount) ;
+	{	psf_log_printf (psf, "Error from WAV gsm_decode() on frame : %d.5\n", pgsm610->blockcount) ;
 		return 0 ;
 		} ;
 
@@ -228,7 +228,7 @@ gsm610_decode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
 		psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, GSM610_BLOCKSIZE) ;
 
 	if (gsm_decode (pgsm610->gsm_data, pgsm610->block, pgsm610->samples) < 0)
-	{	psf_log_printf (psf, "Error from gsm_decode() on frame : %d\n", pgsm610->blockcount) ;
+	{	psf_log_printf (psf, "Error from standard gsm_decode() on frame : %d\n", pgsm610->blockcount) ;
 		return 0 ;
 		} ;
 
