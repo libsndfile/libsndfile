@@ -135,6 +135,15 @@ ima_oki_adpcm_encode_block (IMA_OKI_ADPCM * state)
 {	unsigned char code ;
 	int k ;
 
+	/*
+	**	The codec expects an even number of input samples.
+	**	
+	**	Samples should always be passed in even length blocks. If the last block to
+	**	be encoded is odd length, extend that block by one zero valued sample.
+	*/
+	if (state->pcm_count % 2 == 1)
+		state->pcm [state->pcm_count ++] = 0 ;
+
 	for (k = 0 ; k < state->pcm_count / 2 ; k++)
 	{	code = adpcm_encode (state, state->pcm [2 * k]) << 4 ;
 		code |= adpcm_encode (state, state->pcm [2 * k + 1]) ;
