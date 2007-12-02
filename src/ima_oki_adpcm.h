@@ -1,5 +1,6 @@
 /*
-** Copyright (c) 2007 robs@users.sourceforge.net
+** Copyright (c) 2007 <robs@users.sourceforge.net>
+** Copyright (C) 2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This library is free software; you can redistribute it and/or modify it
 ** under the terms of the GNU Lesser General Public License as published by
@@ -19,6 +20,9 @@
 /* ADPCM: IMA, OKI <==> 16-bit PCM. */
 
 
+#define		IMA_OKI_ADPCM_CODE_LEN	256
+#define		IMA_OKI_ADPCM_PCM_LEN	(IMA_OKI_ADPCM_CODE_LEN *2)
+
 typedef struct
 {
 	/* private: */
@@ -27,8 +31,13 @@ typedef struct
 	int step_index ;
 	int max_step_index ;
 	int const * steps ;
+
 	/* public: */
 	int errors ;
+	int	code_count, pcm_count ;
+
+	unsigned char	codes [IMA_OKI_ADPCM_CODE_LEN] ;
+	short 			pcm [IMA_OKI_ADPCM_PCM_LEN] ;
 } IMA_OKI_ADPCM ;
 
 typedef enum
@@ -40,5 +49,5 @@ void adpcm_init		(IMA_OKI_ADPCM * state, adpcm_type type) ;
 int	adpcm_decode	(IMA_OKI_ADPCM * state, int /* 0..15 */ code) ;
 int	adpcm_encode	(IMA_OKI_ADPCM * state, int /* -32768..32767 */ sample) ;
 
-int	adpcm_decode_block	(IMA_OKI_ADPCM * state, const unsigned char * codes, short * output, int count) ;
-int	adpcm_encode_block	(IMA_OKI_ADPCM * state, const short * input, unsigned char * codes, int count) ;
+void	adpcm_decode_block	(IMA_OKI_ADPCM * state) ;
+void	adpcm_encode_block	(IMA_OKI_ADPCM * state) ;
