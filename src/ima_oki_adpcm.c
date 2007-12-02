@@ -26,6 +26,9 @@
 
 #include "ima_oki_adpcm.h"
 
+#define MIN_SAMPLE	-0x8000
+#define MAX_SAMPLE	0x7fff
+
 static int const ima_steps [] =	/* ~16-bit precision */
 {	7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45,
 	50, 55, 60, 66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173, 190, 209, 230,
@@ -46,11 +49,11 @@ static int const oki_steps [] =	/* ~12-bit precision */
 static int const step_changes [] = { -1, -1, -1, -1, 2, 4, 6, 8 } ;
 
 void
-adpcm_init (IMA_OKI_ADPCM * state, adpcm_type type)
+ima_oki_adpcm_init (IMA_OKI_ADPCM * state, IMA_OKI_ADPCM_TYPE type)
 {
 	memset (state, 0, sizeof (*state)) ;
 
-	if (type == ADPCM_IMA)
+	if (type == IMA_OKI_ADPCM_TYPE_IMA)
 	{	state->max_step_index = ARRAY_LEN (ima_steps) - 1 ;
 		state->steps = ima_steps ;
 		state->mask = (~0) ;
@@ -61,10 +64,8 @@ adpcm_init (IMA_OKI_ADPCM * state, adpcm_type type)
 		state->mask = (~0) << 4 ;
 		} ;
 
-} /* adpcm_init */
+} /* ima_oki_adpcm_init */
 
-#define MIN_SAMPLE	-0x8000
-#define MAX_SAMPLE	0x7fff
 
 int
 adpcm_decode (IMA_OKI_ADPCM * state, int code)
@@ -115,7 +116,7 @@ adpcm_encode (IMA_OKI_ADPCM * state, int sample)
 
 
 void
-adpcm_decode_block	(IMA_OKI_ADPCM * state)
+ima_oki_adpcm_decode_block	(IMA_OKI_ADPCM * state)
 {	unsigned char code ;
 	int k ;
 
@@ -126,11 +127,11 @@ adpcm_decode_block	(IMA_OKI_ADPCM * state)
 		} ;
 
 	state->pcm_count = 2 * k ;
-} /* adpcm_decode_block */
+} /* ima_oki_adpcm_decode_block */
 
 
 void
-adpcm_encode_block (IMA_OKI_ADPCM * state)
+ima_oki_adpcm_encode_block (IMA_OKI_ADPCM * state)
 {	unsigned char code ;
 	int k ;
 
@@ -141,7 +142,7 @@ adpcm_encode_block (IMA_OKI_ADPCM * state)
 		} ;
 
 	state->code_count = k ;
-} /* adpcm_encode_block */
+} /* ima_oki_adpcm_encode_block */
 
 
 #ifdef TEST
@@ -182,7 +183,7 @@ test_oki_adpcm (void)
 	printf ("    Testing encoder          : ") ;
 	fflush (stdout) ;
 
-	adpcm_init (&adpcm, ADPCM_OKI) ;
+	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI) ;
 	for (i = 0 ; i < ARRAY_LEN (test_codes) ; i++)
 		for (j = 0, code = test_codes [i] ; j < 2 ; j++, code <<= 4)
 			if (adpcm_decode (&adpcm, code >> 4) != test_pcm [2 * i + j])
@@ -195,7 +196,7 @@ test_oki_adpcm (void)
 	printf ("    Testing decoder          : ") ;
 	fflush (stdout) ;
 
-	adpcm_init (&adpcm, ADPCM_OKI) ;
+	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI) ;
 	for (i = 0 ; i < ARRAY_LEN (test_pcm) ; i += j)
 	{	code = adpcm_encode (&adpcm, test_pcm [i]) ;
 		code = (code << 4) | adpcm_encode (&adpcm, test_pcm [i + 1]) ;
@@ -227,13 +228,13 @@ test_oki_adpcm_block (void)
 	printf ("    Testing block encoder    : ") ;
 	fflush (stdout) ;
 
-	adpcm_init (&adpcm, ADPCM_OKI) ;
+	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI) ;
 
 	memcpy (adpcm.pcm, test_pcm, sizeof (adpcm.pcm [0]) * ARRAY_LEN (test_pcm)) ;
 	adpcm.pcm_count = ARRAY_LEN (test_pcm) ;
 	adpcm.code_count = 13 ;
 
-	adpcm_encode_block (&adpcm) ;
+	ima_oki_adpcm_encode_block (&adpcm) ;
 
 	if (adpcm.code_count * 2 != ARRAY_LEN (test_pcm))
 	{	printf ("\n\nLine %d : %d * 2 != %d\n\n", __LINE__, adpcm.code_count * 2, ARRAY_LEN (test_pcm)) ;
@@ -251,13 +252,13 @@ test_oki_adpcm_block (void)
 	printf ("    Testing block decoder    : ") ;
 	fflush (stdout) ;
 
-	adpcm_init (&adpcm, ADPCM_OKI) ;
+	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI) ;
 
 	memcpy (adpcm.codes, test_codes, sizeof (adpcm.codes [0]) * ARRAY_LEN (test_codes)) ;
 	adpcm.code_count = ARRAY_LEN (test_codes) ;
 	adpcm.pcm_count = 13 ;
 
-	adpcm_decode_block (&adpcm) ;
+	ima_oki_adpcm_decode_block (&adpcm) ;
 
 	if (adpcm.pcm_count != 2 * ARRAY_LEN (test_codes))
 	{	printf ("\n\nLine %d : %d * 2 != %d\n\n", __LINE__, adpcm.pcm_count, 2 * ARRAY_LEN (test_codes)) ;

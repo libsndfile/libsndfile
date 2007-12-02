@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -127,7 +127,7 @@ vox_adpcm_init (SF_PRIVATE *psf)
 	if (psf_fseek (psf, 0 , SEEK_SET) == -1)
 		return SFE_BAD_SEEK ;
 
-	adpcm_init (&pvox->codec, ADPCM_OKI) ;
+	ima_oki_adpcm_init (&pvox->codec, IMA_OKI_ADPCM_TYPE_OKI) ;
 
 	return 0 ;
 } /* vox_adpcm_init */
@@ -445,11 +445,3 @@ vox_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	return total ;
 } /* vox_write_d */
 
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: e15e97fe-ff9d-4b46-a489-7059fb2d0b1e
-*/

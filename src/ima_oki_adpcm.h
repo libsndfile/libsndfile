@@ -41,13 +41,14 @@ typedef struct
 } IMA_OKI_ADPCM ;
 
 typedef enum
-{	ADPCM_IMA,
-	ADPCM_OKI
-} adpcm_type ;
+{	IMA_OKI_ADPCM_TYPE_IMA,
+	IMA_OKI_ADPCM_TYPE_OKI
+} IMA_OKI_ADPCM_TYPE ;
 
-void adpcm_init		(IMA_OKI_ADPCM * state, adpcm_type type) ;
+void ima_oki_adpcm_init		(IMA_OKI_ADPCM * state, IMA_OKI_ADPCM_TYPE type) ;
+
 int	adpcm_decode	(IMA_OKI_ADPCM * state, int /* 0..15 */ code) ;
 int	adpcm_encode	(IMA_OKI_ADPCM * state, int /* -32768..32767 */ sample) ;
 
-void	adpcm_decode_block	(IMA_OKI_ADPCM * state) ;
-void	adpcm_encode_block	(IMA_OKI_ADPCM * state) ;
+void	ima_oki_adpcm_decode_block	(IMA_OKI_ADPCM * state) ;
+void	ima_oki_adpcm_encode_block	(IMA_OKI_ADPCM * state) ;
