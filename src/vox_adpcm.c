@@ -46,7 +46,7 @@
 
 typedef struct
 {
-	adpcm_codec codec ;
+	IMA_OKI_ADPCM codec ;
 	int		vox_bytes, pcm_samples ;
 
 	unsigned char	vox_data [VOX_DATA_LEN] ;

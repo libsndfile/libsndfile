@@ -29,16 +29,16 @@ typedef struct
 	int const * steps ;
 	/* public: */
 	int errors ;
-} adpcm_codec ;
+} IMA_OKI_ADPCM ;
 
 typedef enum
 {	ADPCM_IMA,
 	ADPCM_OKI
 } adpcm_type ;
 
-void adpcm_init		(adpcm_codec * state, adpcm_type type) ;
-int	adpcm_decode	(adpcm_codec * state, int /* 0..15 */ code) ;
-int	adpcm_encode	(adpcm_codec * state, int /* -32768..32767 */ sample) ;
+void adpcm_init		(IMA_OKI_ADPCM * state, adpcm_type type) ;
+int	adpcm_decode	(IMA_OKI_ADPCM * state, int /* 0..15 */ code) ;
+int	adpcm_encode	(IMA_OKI_ADPCM * state, int /* -32768..32767 */ sample) ;
 
-int	adpcm_decode_block	(adpcm_codec * state, const unsigned char * codes, short * output, int count) ;
-int	adpcm_encode_block	(adpcm_codec * state, const short * input, unsigned char * codes, int count) ;
+int	adpcm_decode_block	(IMA_OKI_ADPCM * state, const unsigned char * codes, short * output, int count) ;
+int	adpcm_encode_block	(IMA_OKI_ADPCM * state, const short * input, unsigned char * codes, int count) ;

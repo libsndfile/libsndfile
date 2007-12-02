@@ -45,7 +45,7 @@ static int const oki_steps [] =	/* ~12-bit precision */
 static int const step_changes [] = { -1, -1, -1, -1, 2, 4, 6, 8 } ;
 
 void
-adpcm_init (adpcm_codec * state, adpcm_type type)
+adpcm_init (IMA_OKI_ADPCM * state, adpcm_type type)
 {
 	memset (state, 0, sizeof (*state)) ;
 
@@ -66,7 +66,7 @@ adpcm_init (adpcm_codec * state, adpcm_type type)
 #define MAX_SAMPLE	0x7fff
 
 int
-adpcm_decode (adpcm_codec * state, int code)
+adpcm_decode (IMA_OKI_ADPCM * state, int code)
 {	int s ;
 
 	s = ((code & 7) << 1) | 1 ;
@@ -95,7 +95,7 @@ adpcm_decode (adpcm_codec * state, int code)
 } /* adpcm_decode */
 
 int
-adpcm_encode (adpcm_codec * state, int sample)
+adpcm_encode (IMA_OKI_ADPCM * state, int sample)
 {	int delta, sign = 0, code ;
 
 	delta = sample - state->last_output ;
@@ -114,7 +114,7 @@ adpcm_encode (adpcm_codec * state, int sample)
 
 
 int
-adpcm_decode_block	(adpcm_codec * state, const unsigned char * codes, short * output, int count)
+adpcm_decode_block	(IMA_OKI_ADPCM * state, const unsigned char * codes, short * output, int count)
 {	unsigned char code ;
 	int k ;
 
@@ -129,7 +129,7 @@ adpcm_decode_block	(adpcm_codec * state, const unsigned char * codes, short * ou
 
 
 int
-adpcm_encode_block (adpcm_codec * state, const short * input, unsigned char * codes, int count)
+adpcm_encode_block (IMA_OKI_ADPCM * state, const short * input, unsigned char * codes, int count)
 {	unsigned char code ;
 	int k ;
 
@@ -174,7 +174,7 @@ static const short test_decodes [] =
 static void
 test_oki_adpcm (void)
 {
-	adpcm_codec adpcm ;
+	IMA_OKI_ADPCM adpcm ;
 	unsigned char code ;
 	int i, j ;
 
@@ -213,7 +213,7 @@ test_oki_adpcm_block (void)
 	static unsigned char code_data [ARRAY_LEN (test_codes)] ;
 	static short short_data [ARRAY_LEN (test_decodes)] ;
 
-	adpcm_codec adpcm ;
+	IMA_OKI_ADPCM adpcm ;
 	int count, k ;
 
 	printf ("    Testing block encoder    : ") ;
@@ -250,7 +250,7 @@ test_oki_adpcm_block (void)
 
 	for (k = 0 ; k < ARRAY_LEN (test_decodes) ; k++)
 		if (short_data [k] != test_decodes [k])
-		{	printf ("\n\nFail at i = %d.\n\n", k) ;
+		{	printf ("\n\nFail at i = %d, %d should be %d.\n\n", k, short_data [k], test_decodes [k]) ;
 			exit (1) ;
 			} ;
 
