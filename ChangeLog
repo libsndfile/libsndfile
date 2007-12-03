@@ -1,3 +1,9 @@
+2007-12-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/vox_adpcm.c src/ima_oki_adpcm.[ch] src/Makefile.am
+    Merge in code from the vox-patch branch. Thanks to Robs for the patch
+    which fixes a long standing bug in the VOX codec.
+
 2007-12-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-convert.c
@@ -2826,7 +2832,7 @@
     * src/*.c examples/*.c tests/*.c
     Fix all compiler warnings arising from the above.
 
-2003-08-02
+2003-08-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/aiff_rw_test.c tests/Makefile.am
     New test program to check for errors re-writing the headers of AIFC files
