@@ -496,12 +496,20 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					else
 						psf_log_printf (psf, " SSND : %u\n", SSNDsize) ;
 
+					if (ssnd_fmt.offset == 0 || psf->dataoffset + ssnd_fmt.offset == ssnd_fmt.blocksize)
+					{	psf_log_printf (psf, "  Offset     : %u\n", ssnd_fmt.offset) ;
+						psf_log_printf (psf, "  Block Size : %u\n", ssnd_fmt.blocksize) ;
+
+						psf->dataoffset += ssnd_fmt.offset ;
+						}
+					else
+					{	psf_log_printf (psf, "  Offset     : %u (Should be zero)\n", ssnd_fmt.offset) ;
+						psf_log_printf (psf, "  Block Size : %u ???\n", ssnd_fmt.blocksize) ;
+						} ;
+
 					/* Only set dataend if there really is data at the end. */
 					if (psf->datalength + psf->dataoffset < psf->filelength)
 						psf->dataend = psf->datalength + psf->dataoffset ;
-
-					psf_log_printf (psf, "  Offset     : %u\n", ssnd_fmt.offset) ;
-					psf_log_printf (psf, "  Block Size : %u\n", ssnd_fmt.blocksize) ;
 
 					found_chunk |= HAVE_SSND ;
 

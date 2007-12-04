@@ -1,3 +1,9 @@
+2007-12-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c
+    Fix a bug where ignoring ssnd_fmt.offset and ssnd_fmt.blocksize caused
+    misaligned reading of 24 bit data. Thanks to Uli Franke for reporting this.
+
 2007-12-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/vox_adpcm.c src/ima_oki_adpcm.[ch] src/Makefile.am
