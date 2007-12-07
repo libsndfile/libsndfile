@@ -31,6 +31,7 @@
 extern "C" {
 #endif	/* __cplusplus */
 
+#include <stdint.h>
 #include <stdarg.h>
 
 #define SF_COUNT_TO_LONG(x)	((long) (x))
