@@ -147,7 +147,7 @@ pcm_test.c: pcm_test.def pcm_test.tpl
 header_test.c: header_test.def header_test.tpl
 	autogen --writable header_test.def
 
-utils.c: utils.def utils.tpl
+utils.c utils.h : utils.def utils.tpl
 	autogen --writable utils.def
 
 scale_clip_test.c: scale_clip_test.def scale_clip_test.tpl
