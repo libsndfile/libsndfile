@@ -1,3 +1,9 @@
+2007-12-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/ogg_test.c
+    Add a test (currently failing) for stereo seeking on Ogg Vorbis files. Test
+    case supplied by Bodo.
+
 2007-12-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c
@@ -18,7 +24,7 @@
 2007-11-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ogg.c src/VORBIS
-    Merge in Ogg Vorbis support from John Fitch of the Csound project.
+    Merge in Ogg Vorbis support from John ffitch of the Csound project.
 
 2007-11-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
@@ -1126,7 +1132,7 @@
 2006-01-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in src/aiff.c src/wav.c
-    Apply a patch from John Fitch (Csound project).
+    Apply a patch from John ffitch (Csound project).
     Add detune field to SF_INSTRUMENT struct.
     Add reading/writing instrument chunks to WAV files.
 
