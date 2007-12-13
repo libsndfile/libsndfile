@@ -214,8 +214,8 @@ ogg_double_test (void)
 
 static void
 ogg_seek_test (void)
-{	static float data [70000] ;
-	static float stereo_out [ARRAY_LEN (data) * 2] ;
+{	static float data [DATA_LENGTH] ;
+	static float stereo_out [DATA_LENGTH * 2] ;
 
 	const char * filename = "vorbis_seek.ogg" ;
 
@@ -246,7 +246,7 @@ ogg_seek_test (void)
 	/* Open file in again for reading. */
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
-	test_seek_or_die (file, 44138, SEEK_SET, 44138, sfinfo.channels, __LINE__) ;
+	test_seek_or_die (file, 442, SEEK_SET, 442, sfinfo.channels, __LINE__) ;
 
 	sf_close (file) ;
 
