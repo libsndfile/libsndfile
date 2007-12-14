@@ -4,6 +4,9 @@
     Add a test (currently failing) for stereo seeking on Ogg Vorbis files. Test
     case supplied by Bodo.
 
+    * tests/utils.(def|tpl)
+    Add compare_XXX_or_die functions.
+
 2007-12-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c

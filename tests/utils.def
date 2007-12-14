@@ -12,22 +12,22 @@ float_type = {
 
 io_type = {
 	io_element	= short ;
-	format_str		= "\"% d\\n\"" ;
+	format_str		= "\"% d\"" ;
 	};
 
 io_type = {
 	io_element	= int ;
-	format_str		= "\"% d\\n\"" ;
+	format_str		= "\"% d\"" ;
 	};
 
 io_type = {
 	io_element	= float ;
-	format_str		= "\"% g\\n\"" ;
+	format_str		= "\"% g\"" ;
 	};
 
 io_type = {
 	io_element 	= double ;
-	format_str		= "\"% g\\n\"" ;
+	format_str		= "\"% g\"" ;
 	};
 
 read_op = {

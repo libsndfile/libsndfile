@@ -1,6 +1,6 @@
 [+ AutoGen5 template h c +]
 /*
-** Copyright (C) 2002-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,6 +113,11 @@ void	test_seek_or_die
 +]void 	test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die
 			(SNDFILE *file, int pass, const [+ (get "io_element") +] *test, sf_count_t [+ (get "count_name") +], int line_num) ;
 [+ ENDFOR io_type +][+ ENDFOR write_op +]
+
+[+ FOR io_type
++]void compare_[+ (get "io_element") +]_or_die (const [+ (get "io_element") +] *left, const [+ (get "io_element") +] *right, unsigned count, int line_num) ;
+[+ ENDFOR io_type +]
+
 
 void	gen_lowpass_noise_float (float *data, int len) ;
 
@@ -290,7 +295,7 @@ oct_save_[+ (get "io_element") +]	(const [+ (get "io_element") +] *a, const [+ (
 	fprintf (file, "# columns: 1\n") ;
 
 	for (k = 0 ; k < len ; k++)
-		fprintf (file, [+ (get "format_str") +], a [k]) ;
+		fprintf (file, [+ (get "format_str") +] "\n", a [k]) ;
 
 	fprintf (file, "# name: b\n") ;
 	fprintf (file, "# type: matrix\n") ;
@@ -298,7 +303,7 @@ oct_save_[+ (get "io_element") +]	(const [+ (get "io_element") +] *a, const [+ (
 	fprintf (file, "# columns: 1\n") ;
 
 	for (k = 0 ; k < len ; k++)
-		fprintf (file, [+ (get "format_str") +], b [k]) ;
+		fprintf (file, [+ (get "format_str") +] "\n", b [k]) ;
 
 	fclose (file) ;
 	return 0 ;
@@ -621,6 +626,23 @@ test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die (SNDFILE *file, in
 	return ;
 } /* test_[+ (get "op_element") +]_[+ (get "io_element") +] */
 [+ ENDFOR io_type +][+ ENDFOR write_op +]
+
+[+ FOR io_type
++]void
+compare_[+ (get "io_element") +]_or_die (const [+ (get "io_element") +] *left, const [+ (get "io_element") +] *right, unsigned count, int line_num)
+{
+	unsigned k ;
+
+	for (k = 0 ; k < count ;k++)
+		if (left [k] != right [k])
+		{	printf ("\n\nLine %d : Error at index %d, " [+ (get "format_str") +] " should be " [+ (get "format_str") +] ".\n\n", line_num, k, left [k], right [k]) ;
+			exit (1) ;
+			} ;
+
+	return ;
+} /* compare_[+ (get "io_element") +]_or_die */
+[+ ENDFOR io_type +]
+
 
 void
 delete_file (int format, const char *filename)
