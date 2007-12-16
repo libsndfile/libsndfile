@@ -174,7 +174,7 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 		} ;
 
 	/*
-	**	This function (off_read_header) gets called multiple times, so the OGG
+	**	This function (ogg_read_header) gets called multiple times, so the OGG
 	**	and vorbis structs have to be cleared every time we pass through to
 	**	prevent memory leaks.
 	*/
@@ -858,7 +858,14 @@ ogg_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 
 		while (target > 0)
 		{	sf_count_t m = target > 4096 ? 4096 : target ;
-			ogg_read_sample (psf, (void*) NULL, m, ogg_rnull) ;
+
+			/*
+			**	Need to multiply by channels here because the seek is done in
+			**	terms of frames and the read function is done in terms of
+			**	samples.
+			*/
+			ogg_read_sample (psf, (void *) NULL, m * psf->sf.channels, ogg_rnull) ;
+
 			target -= m ;
 			} ;
 

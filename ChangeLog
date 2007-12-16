@@ -1,3 +1,8 @@
+2007-12-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/ogg.c
+    Fix seeking on multichannel Ogg Vorbis files. Reported by Bodo.
+
 2007-12-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/ogg_test.c
