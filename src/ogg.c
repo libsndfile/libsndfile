@@ -516,7 +516,7 @@ ogg_open (SF_PRIVATE *psf)
 	if (psf->mode == SFM_WRITE)
 	{
 		/* Set the default vorbis quality here. */
-		vdata->quality = 4.0 ;
+		vdata->quality = 0.4 ;
 
 		psf->write_header	= ogg_write_header ;
 		psf->write_short	= ogg_write_s ;
@@ -627,8 +627,8 @@ ogg_rdouble (int samples, void *vptr, int off, int channels, float **pcm)
 static sf_count_t
 ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *transfn)
 {
-	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
+	VORBIS_PRIVATE *vdata = psf->codec_data ;
+	OGG_PRIVATE *odata = psf->container_data ;
 	int len, samples, i = 0 ;
 	float **pcm ;
 
@@ -650,7 +650,7 @@ ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *tran
 		while (len > 0 && !odata->eos)
 		{	int result = ogg_sync_pageout (&odata->oy, &odata->og) ;
 			if (result == 0) break ; /* need more data */
-			if (result<0)
+			if (result < 0)
 			{	/* missing or corrupt data at this page position */
 				psf_log_printf (psf, "Corrupt or missing data in bitstream ; continuing...\n") ;
 				}

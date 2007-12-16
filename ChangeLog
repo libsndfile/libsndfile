@@ -2,6 +2,7 @@
 
     * src/ogg.c
     Fix seeking on multichannel Ogg Vorbis files. Reported by Bodo.
+    Set the default encoding quality to 0.4 instead of 4.0 (Bodo again).
 
 2007-12-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
