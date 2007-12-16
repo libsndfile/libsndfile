@@ -49,6 +49,7 @@ ogg_short_test (void)
 
 	SNDFILE * file ;
 	SF_INFO sfinfo ;
+	short seek_data [10] ;
 	unsigned k ;
 
 	print_test_name ("ogg_short_test", filename) ;
@@ -80,6 +81,20 @@ ogg_short_test (void)
 	sf_close (file) ;
 
 	puts ("ok") ;
+
+	/* Test seeking. */
+	print_test_name ("ogg_seek_test", filename) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+
+	test_seek_or_die (file, 10, SEEK_SET, 10, sfinfo.channels, __LINE__) ;
+	test_read_short_or_die (file, 0, seek_data, ARRAY_LEN (seek_data), __LINE__) ;
+	compare_short_or_die (seek_data, data_in.s + 10, ARRAY_LEN (seek_data), __LINE__) ;
+
+	sf_close (file) ;
+
+	puts ("ok") ;
+
 	unlink (filename) ;
 } /* ogg_short_test */
 
@@ -89,6 +104,7 @@ ogg_int_test (void)
 
 	SNDFILE * file ;
 	SF_INFO sfinfo ;
+	int seek_data [10] ;
 	unsigned k ;
 
 	print_test_name ("ogg_int_test", filename) ;
@@ -120,6 +136,20 @@ ogg_int_test (void)
 	sf_close (file) ;
 
 	puts ("ok") ;
+
+	/* Test seeking. */
+	print_test_name ("ogg_seek_test", filename) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+
+	test_seek_or_die (file, 10, SEEK_SET, 10, sfinfo.channels, __LINE__) ;
+	test_read_int_or_die (file, 0, seek_data, ARRAY_LEN (seek_data), __LINE__) ;
+	compare_int_or_die (seek_data, data_in.i + 10, ARRAY_LEN (seek_data), __LINE__) ;
+
+	sf_close (file) ;
+
+	puts ("ok") ;
+
 	unlink (filename) ;
 } /* ogg_int_test */
 
@@ -129,6 +159,7 @@ ogg_float_test (void)
 
 	SNDFILE * file ;
 	SF_INFO sfinfo ;
+	float seek_data [10] ;
 
 	print_test_name ("ogg_float_test", filename) ;
 
@@ -159,7 +190,11 @@ ogg_float_test (void)
 	print_test_name ("ogg_seek_test", filename) ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+
 	test_seek_or_die (file, 10, SEEK_SET, 10, sfinfo.channels, __LINE__) ;
+	test_read_float_or_die (file, 0, seek_data, ARRAY_LEN (seek_data), __LINE__) ;
+	compare_float_or_die (seek_data, data_in.f + 10, ARRAY_LEN (seek_data), __LINE__) ;
+
 	sf_close (file) ;
 
 	puts ("ok") ;
@@ -173,6 +208,7 @@ ogg_double_test (void)
 
 	SNDFILE * file ;
 	SF_INFO sfinfo ;
+	double seek_data [10] ;
 
 	print_test_name ("ogg_double_test", filename) ;
 
@@ -203,7 +239,11 @@ ogg_double_test (void)
 	print_test_name ("ogg_seek_test", filename) ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+
 	test_seek_or_die (file, 10, SEEK_SET, 10, sfinfo.channels, __LINE__) ;
+	test_read_double_or_die (file, 0, seek_data, ARRAY_LEN (seek_data), __LINE__) ;
+	compare_double_or_die (seek_data, data_in.d + 10, ARRAY_LEN (seek_data), __LINE__) ;
+
 	sf_close (file) ;
 
 	puts ("ok") ;
@@ -213,17 +253,16 @@ ogg_double_test (void)
 
 
 static void
-ogg_seek_test (void)
-{	static float data [DATA_LENGTH] ;
-	static float stereo_out [DATA_LENGTH * 2] ;
-
-	const char * filename = "vorbis_seek.ogg" ;
+ogg_stereo_seek_test (const char * filename, int format)
+{	static float data [SAMPLE_RATE] ;
+	static float stereo_out [SAMPLE_RATE * 2] ;
 
 	SNDFILE * file ;
 	SF_INFO sfinfo ;
+	sf_count_t pos ;
 	unsigned k ;
 
-	print_test_name ("ogg_seek_test", filename) ;
+	print_test_name (__func__, filename) ;
 
 	gen_windowed_sine_float (data, ARRAY_LEN (data), 0.95) ;
 	for (k = 0 ; k < ARRAY_LEN (data) ; k++)
@@ -234,7 +273,7 @@ ogg_seek_test (void)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	/* Set up output file type. */
-	sfinfo.format = SF_FORMAT_OGG | SF_FORMAT_VORBIS ;
+	sfinfo.format = format ;
 	sfinfo.channels = 2 ;
 	sfinfo.samplerate = SAMPLE_RATE ;
 
@@ -246,13 +285,42 @@ ogg_seek_test (void)
 	/* Open file in again for reading. */
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+
+	/* Read in the whole file. */
+	test_read_float_or_die (file, 0, stereo_out, ARRAY_LEN (stereo_out), __LINE__) ;
+
+	/* Now hammer seeking code. */
+	test_seek_or_die (file, 234, SEEK_SET, 234, sfinfo.channels, __LINE__) ;
+	test_readf_float_or_die (file, 0, data, 10, __LINE__) ;
+	compare_float_or_die (data, stereo_out + (234 * sfinfo.channels), 10, __LINE__) ;
+
 	test_seek_or_die (file, 442, SEEK_SET, 442, sfinfo.channels, __LINE__) ;
+	test_readf_float_or_die (file, 0, data, 10, __LINE__) ;
+	compare_float_or_die (data, stereo_out + (442 * sfinfo.channels), 10, __LINE__) ;
+
+	test_seek_or_die (file, 12, SEEK_CUR, 442 + 10 + 12, sfinfo.channels, __LINE__) ;
+	test_readf_float_or_die (file, 0, data, 10, __LINE__) ;
+	compare_float_or_die (data, stereo_out + ((442 + 10 + 12) * sfinfo.channels), 10, __LINE__) ;
+
+	test_seek_or_die (file, 12, SEEK_CUR, 442 + 20 + 24, sfinfo.channels, __LINE__) ;
+	test_readf_float_or_die (file, 0, data, 10, __LINE__) ;
+	compare_float_or_die (data, stereo_out + ((442 + 20 + 24) * sfinfo.channels), 10, __LINE__) ;
+
+	pos = 500 - sfinfo.frames ;
+	test_seek_or_die (file, pos, SEEK_END, 500, sfinfo.channels, __LINE__) ;
+	test_readf_float_or_die (file, 0, data, 10, __LINE__) ;
+	compare_float_or_die (data, stereo_out + (500 * sfinfo.channels), 10, __LINE__) ;
+
+	pos = 10 - sfinfo.frames ;
+	test_seek_or_die (file, pos, SEEK_END, 10, sfinfo.channels, __LINE__) ;
+	test_readf_float_or_die (file, 0, data, 10, __LINE__) ;
+	compare_float_or_die (data, stereo_out + (10 * sfinfo.channels), 10, __LINE__) ;
 
 	sf_close (file) ;
 
 	puts ("ok") ;
 	unlink (filename) ;
-} /* ogg_seek_test */
+} /* ogg_stereo_seek_test */
 
 
 int
@@ -263,7 +331,9 @@ main (void)
 	ogg_float_test () ;
 	ogg_double_test () ;
 
-	ogg_seek_test () ;
+	/*-ogg_stereo_seek_test ("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;-*/
+	ogg_stereo_seek_test ("vorbis_seek.ogg", SF_FORMAT_OGG | SF_FORMAT_VORBIS) ;
+
 
 	return 0 ;
 } /* main */

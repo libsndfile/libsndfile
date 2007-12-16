@@ -4,6 +4,9 @@
     Fix seeking on multichannel Ogg Vorbis files. Reported by Bodo.
     Set the default encoding quality to 0.4 instead of 4.0 (Bodo again).
 
+    * tests/ogg_test.c
+    Add stereo seek tests.
+
 2007-12-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/ogg_test.c
