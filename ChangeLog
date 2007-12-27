@@ -16,6 +16,9 @@
     * src/wav.c tests/header_test.tpl
     Apply similar fix to above for WAVEX files.
 
+    * src/command.c
+    Add Ogg/Vorbis to 'get format' commands.
+
 2007-12-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ogg.c

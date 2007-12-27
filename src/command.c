@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -59,6 +59,10 @@ static SF_FORMAT_INFO const simple_formats [] =
 		"OKI Dialogic VOX ADPCM", "vox"
 		},
 
+	{	SF_FORMAT_OGG | SF_FORMAT_VORBIS,
+		"Ogg Vorbis (Xiph Foundation)", "oga"
+		},
+
 	{	SF_FORMAT_WAV | SF_FORMAT_PCM_16,
 		"WAV (Microsoft 16 bit PCM)", "wav"
 		},
@@ -114,6 +118,7 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_SVX,		"IFF (Amiga IFF/SVX8/SV16)",			"iff"	},
 	{	SF_FORMAT_MAT4,		"MAT4 (GNU Octave 2.0 / Matlab 4.2)",	"mat"	},
 	{	SF_FORMAT_MAT5,		"MAT5 (GNU Octave 2.1 / Matlab 5.0)",	"mat"	},
+	{	SF_FORMAT_OGG,		"OGG (OGG Container format)",		 	"oga"	},	
 	{	SF_FORMAT_PAF,		"PAF (Ensoniq PARIS)", 					"paf"	},
 	{	SF_FORMAT_PVF,		"PVF (Portable Voice Format)",			"pvf"	},
 	{	SF_FORMAT_RAW,		"RAW (header-less)",				 	"raw"	},
@@ -179,7 +184,9 @@ static SF_FORMAT_INFO subtype_formats [] =
 	{	SF_FORMAT_VOX_ADPCM,	"VOX ADPCM",			"vox" 	},
 
 	{	SF_FORMAT_DPCM_16,		"16 bit DPCM",			NULL 	},
-	{	SF_FORMAT_DPCM_8,		"8 bit DPCM",			NULL 	}
+	{	SF_FORMAT_DPCM_8,		"8 bit DPCM",			NULL 	},
+
+	{	SF_FORMAT_VORBIS,		"Vorbis",				NULL 	},
 } ; /* subtype_formats */
 
 int
