@@ -87,6 +87,14 @@ main (int argc, char *argv [])
 		update_seek_double_test ("header_double.wav", SF_FORMAT_WAV) ;
 		header_shrink_test ("header_shrink.wav", SF_FORMAT_WAV) ;
 		extra_header_test ("extra.wav", SF_FORMAT_WAV) ;
+
+		update_header_test ("header.wavex", SF_FORMAT_WAVEX) ;
+		update_seek_short_test ("header_short.wavex", SF_FORMAT_WAVEX) ;
+		update_seek_int_test ("header_int.wavex", SF_FORMAT_WAVEX) ;
+		update_seek_float_test ("header_float.wavex", SF_FORMAT_WAVEX) ;
+		update_seek_double_test ("header_double.wavex", SF_FORMAT_WAVEX) ;
+		header_shrink_test ("header_shrink.wavex", SF_FORMAT_WAVEX) ;
+		extra_header_test ("extra.wavex", SF_FORMAT_WAVEX) ;
 		test_count++ ;
 		} ;
 
