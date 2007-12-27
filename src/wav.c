@@ -713,9 +713,12 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 static int
 wav_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t	current ;
-	int 		fmt_size, k, subformat, add_fact_chunk = SF_FALSE ;
+	int 		fmt_size, k, subformat, add_fact_chunk = SF_FALSE, has_data = SF_FALSE ;
 
 	current = psf_ftell (psf) ;
+
+	if (current > psf->dataoffset)
+		has_data = SF_TRUE ;
 
 	if (calc_length)
 	{	psf->filelength = psf_get_filelen (psf) ;
@@ -944,9 +947,12 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->error)
 		return psf->error ;
 
+	if (has_data && psf->dataoffset != psf->headindex)
+		return psf->error = SFE_INTERNAL ;
+
 	psf->dataoffset = psf->headindex ;
 
-	if (current < psf->dataoffset)
+	if (! has_data)
 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 	else if (current > 0)
 		psf_fseek (psf, current, SEEK_SET) ;
