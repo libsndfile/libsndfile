@@ -7,9 +7,12 @@
     Add header_shrink_test from Axel Roebel.
 
     * src/wav.c
-	Add fix from Axel Roebel for writing files with float data but no peak
+    Add fix from Axel Roebel for writing files with float data but no peak
     chunk (ie peak chunk gets removed after the file is opened).
- 
+
+    * src/aiff.c tests/header_test.tpl
+    Apply similar fix to above for AIFF files.
+
 2007-12-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ogg.c

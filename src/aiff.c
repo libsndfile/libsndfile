@@ -996,13 +996,16 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	AIFF_PRIVATE	*paiff ;
 	unsigned char	comm_sample_rate [10], comm_zero_bytes [2] = { 0, 0 } ;
 	unsigned int	comm_type, comm_size, comm_encoding, comm_frames ;
-	int				k, endian ;
+	int				k, endian, has_data = SF_FALSE ;
 	short			bit_width ;
 
 	if ((paiff = psf->container_data) == NULL)
 		return SFE_INTERNAL ;
 
 	current = psf_ftell (psf) ;
+
+	if (current > psf->dataoffset)
+		has_data = SF_TRUE ;
 
 	if (calc_length)
 	{	psf->filelength = psf_get_filelen (psf) ;
@@ -1282,9 +1285,12 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->error)
 		return psf->error ;
 
+	if (has_data && psf->dataoffset != psf->headindex)
+		return psf->error = SFE_INTERNAL ;
+
 	psf->dataoffset = psf->headindex ;
 
-	if (current < psf->dataoffset)
+	if (! has_data)
 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 	else if (current > 0)
 		psf_fseek (psf, current, SEEK_SET) ;
