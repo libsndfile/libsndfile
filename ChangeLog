@@ -1,3 +1,8 @@
+2008-01-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sd2.c
+    Fix a rsrc parsing bug. Example file supplied by Uli Franke.
+
 2007-12-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/index.html

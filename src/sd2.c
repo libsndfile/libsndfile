@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Paavo Jumppanen
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -528,14 +528,14 @@ parse_rsrc_fork_cleanup :
 static int
 parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 {	char name [32], value [32] ;
-	int k, str_offset, data_offset, data_len, rsrc_id ;
+	int k, str_offset, rsrc_id, data_offset = 0, data_len = 0 ;
 
 	psf_log_printf (psf, "Finding parameters :\n") ;
 
 	str_offset = rsrc->string_offset ;
 	psf_log_printf (psf, "  Offset    RsrcId    dlen    slen    Value\n") ;
 
-	for (k = 0 ; k < rsrc->str_count + 2 ; k++)
+	for (k = 0 ; data_offset + data_len < rsrc->rsrc_len ; k++)
 	{	int slen ;
 
 		slen = read_char (rsrc->rsrc_data, str_offset) ;
@@ -546,20 +546,20 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 
 		data_offset = rsrc->data_offset + read_int (rsrc->rsrc_data, rsrc->item_offset + k * 12 + 4) ;
 		if (data_offset < 0 || data_offset > rsrc->rsrc_len)
-		{	psf_log_printf (psf, "Bad data offset (%d)\n", data_offset) ;
+		{	psf_log_printf (psf, "Bad data offset (%d). Exiting parser.\n", data_offset) ;
 			break ;
 			} ;
 
 		data_len = read_int (rsrc->rsrc_data, data_offset) ;
 		if (data_len < 0 || data_len > rsrc->rsrc_len)
-		{	psf_log_printf (psf, "Bad data length (%d).\n", data_len) ;
+		{	psf_log_printf (psf, "Bad data length (%d). Exiting parser.\n", data_len) ;
 			break ;
 			} ;
 
 		slen = read_char (rsrc->rsrc_data, data_offset + 4) ;
 		read_str (rsrc->rsrc_data, data_offset + 5, value, SF_MIN (SIGNED_SIZEOF (value), slen + 1)) ;
 
-		psf_log_printf (psf, "  0x%04x     %4d      %3d     %3d    '%s'\n", data_offset, rsrc_id, data_len, slen, value) ;
+		psf_log_printf (psf, "  0x%04x     %4d     %4d     %3d    '%s'\n", data_offset, rsrc_id, data_len, slen, value) ;
 
 		if (rsrc_id == 1000 && rsrc->sample_size == 0)
 			rsrc->sample_size = strtol (value, NULL, 10) ;
