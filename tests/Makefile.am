@@ -257,7 +257,7 @@ au-tests: write_read_test lossy_comp_test header_test misc_test
 	./lossy_comp_test au_g723
 	./header_test au
 	./misc_test au
-	./multi_file_test wav
+	./multi_file_test au
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on AU files."
 	@echo "----------------------------------------------------------------------"
