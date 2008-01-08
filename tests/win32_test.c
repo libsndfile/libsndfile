@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,6 @@
 
 	static char dir_cmd [] = "ls -l" ;
 
-	#define		COMPILE_FULL_TEST	1
 #elif (defined (WIN32) || defined (_WIN32))
 
 	#define		LSEEK	_lseeki64
@@ -59,8 +58,7 @@
 
 	static char dir_cmd [] = "dir" ;
 
-	#define		COMPILE_FULL_TEST	1
-#elif defined (linux)
+#else
 
 	#define		LSEEK	lseek
 	#define		FSTAT	fstat
@@ -71,25 +69,25 @@
 	#define		O_BINARY	0
 	static char dir_cmd [] = "ls -l" ;
 
-	#define		COMPILE_FULL_TEST	1
-#else
-	#define		COMPILE_FULL_TEST	0
 #endif
 
-#if COMPILE_FULL_TEST
 static void show_fstat_error (void) ;
 static void show_lseek_error (void) ;
+static void show_stat_fstat_error (void) ;
 
 int
 main (void)
-{	puts ("\n\n\n\n"
-		"This program shows up some errors in the Win32 implementation of\n"
-		"a couple of POSIX API functions. It can also be compiled on Linux\n"
-		"(which works correctly) just to provide a sanity check.\n"
+{
+	puts ("\n\n\n\n"
+		"This program shows up errors in the Win32 implementation of\n"
+		"a couple of POSIX API functions on some versions of windoze.\n"
+		"It can also be compiled on Linux (which works correctly) and\n"
+		"other OSes just to provide a sanity check.\n"
 		) ;
 
 	show_fstat_error () ;
 	show_lseek_error () ;
+	show_stat_fstat_error () ;
 
 	puts ("\n\n") ;
 
@@ -207,29 +205,53 @@ show_lseek_error (void)
 
 } /* show_lseek_error */
 
-#else
+static void
+show_stat_fstat_error (void)
+{	static const char *filename = "stat_fstat.dat" ;
+	static char data [256] ;
 
-int
-main (void)
-{	puts ("\n"
-		"This program shows up some errors in the Win32 implementation of\n"
-		"a couple of POSIX API functions. It can also be compiled on Linux\n"
-		"and under Cygwin32 (which both work correctly) just to provide a \n"
-		"sanity check.\n"
-		"Unfortunately, it does not compile on this platform."
-		) ;
+	int fd, mode, flags ;
+	int stat_size, fstat_size ;
+	struct stat buf ;
 
-	return 0 ;
-} /* main */
+	/* Known to fail on WinXP. */
+	puts ("\nstat/fstat test.\n----------------") ;
 
-#endif
+	printf ("0) Create a file and write %d bytes.\n", SIGNED_SIZEOF (data)) ;
+
+	mode = O_WRONLY | O_CREAT | O_TRUNC | O_BINARY ;
+	flags = S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH ;
+	if ((fd = open (filename, mode, flags)) < 0)
+	{	printf ("\n\nLine %d: open() failed : %s\n\n", __LINE__, strerror (errno)) ;
+		return ;
+		} ;
+
+	write (fd, data, sizeof (data)) ;
+
+	printf ("1) Now call stat and fstat on the file and retreive the file lengths.\n") ;
+
+	if (stat (filename, &buf) != 0)
+	{	printf ("\n\nLine %d: stat() failed : %s\n\n", __LINE__, strerror (errno)) ;
+		return ;
+		} ;
+	stat_size = buf.st_size ;
+
+	if (fstat (fd, &buf) != 0)
+	{	printf ("\n\nLine %d: fstat() failed : %s\n\n", __LINE__, strerror (errno)) ;
+		return ;
+		} ;
+	fstat_size = buf.st_size ;
+
+	printf ("3) Size returned by stat and fstat is %d and %d, ", stat_size, fstat_size) ;
+
+	if (stat_size == 0 || stat_size != fstat_size)
+		printf ("but thats just plain ***WRONG***.\n\n") ;
+	else
+	{	printf ("which is correct.\n\n") ;
+		unlink (filename) ;
+		} ;
+
+	return ;
+} /* show_stat_fstat_error */
 
 
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 228b9a18-0555-46d9-b9e6-2b37ce048702
-*/

@@ -1,3 +1,8 @@
+2008-01-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * win32_test.c
+    Add another win32 test.
+
 2008-01-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sd2.c
