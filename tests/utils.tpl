@@ -121,7 +121,8 @@ void	test_seek_or_die
 
 void	gen_lowpass_noise_float (float *data, int len) ;
 
-int		file_length (const char * fname) ;
+sf_count_t		file_length (const char * fname) ;
+sf_count_t		file_length_fd (int fd) ;
 
 #endif
 
@@ -765,15 +766,32 @@ gen_lowpass_noise_float (float *data, int len)
 
 } /* gen_lowpass_noise_float */
 
-int
+
+/*
+**	Windows is fucked.
+**	If a file is opened R/W and data is written to it, then fstat will return
+**	the correct file length, but stat will return zero.
+*/
+
+sf_count_t
 file_length (const char * fname)
 {	struct stat data ;
 
 	if (stat (fname, &data) != 0)
 		return 0 ;
 
-	return (int) data.st_size ;
+	return (sf_count_t) data.st_size ;
 } /* file_length */
+
+sf_count_t
+file_length_fd (int fd)
+{	struct stat data ;
+
+	if (fstat (fd, &data) != 0)
+		return 0 ;
+
+	return (sf_count_t) data.st_size ;
+} /* file_length_fd */
 
 
 [+ ESAC +]
