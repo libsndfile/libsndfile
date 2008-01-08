@@ -9,6 +9,10 @@
     * tests/Makefile.am
     Run the multi_file_test on AU files.
 
+    * tests/multi_file_test.c
+    Use function file_length_fd() instead of file_length() to overcome stupid
+    win32 bug. Fscking hell Microsoft sucks so much.
+
 2008-01-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sd2.c

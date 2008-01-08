@@ -130,7 +130,7 @@ multi_file_test (const char *filename, int *formats, int format_count)
 {	SNDFILE				*sndfile ;
 	SF_INFO				sfinfo ;
 	SF_EMBED_FILE_INFO	embed_info ;
-	off_t				filelen ;
+	sf_count_t			filelen ;
 	int					fd, k, file_count = 0 ;
 
 	print_test_name ("multi_file_test", filename) ;
@@ -147,14 +147,13 @@ multi_file_test (const char *filename, int *formats, int format_count)
 	for (k = 0 ; k < format_count ; k++)
 		write_file_at_end (fd, formats [k], 2, k) ;
 
-	filelen = file_length (filename) ;
+	filelen = file_length_fd (fd) ;
 
 	embed_info.offset = 4 ;
 	embed_info.length = 0 ;
 
-	file_count = 0 ;
 
-	while (embed_info.offset + embed_info.length < filelen)
+	for (file_count = 0 ; embed_info.offset + embed_info.length < filelen ; )
 	{
 		file_count ++ ;
 

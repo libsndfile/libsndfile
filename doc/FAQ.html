@@ -51,6 +51,9 @@
 <A HREF="#Q020">Q20 : Why doesn't libsndfile support MP3? Lots of other Open Source
 	projects support it!
 	</A><BR>
+<A HREF="#Q021">Q21 : How do I use libsndfile in a closed source or commercial program
+	and comply with the license?
+	</A><BR>
 <HR>
 
 <!-- ========================================================================= -->
@@ -712,8 +715,38 @@ threat.
 
 <p>
 Fortunately, Ogg Vorbis exists as an alternative to MP3.
-Support for Ogg Vorbis in libsndfile is currently being worked on.
+Support for Ogg Vorbis was added to libsndfile (mostly due to the efforts of
+John ffitch of the Csound project) in version 1.0.18.
 </p>
+
+
+<!-- ========================================================================= -->
+<A NAME="Q021"></A>
+<H2><BR><B>Q21 : How do I use libsndfile in a closed source or commercial program
+	and comply with the license?
+</B></H2>
+
+<p>
+Here is a checklist of things you need to do to make sure your use of libsndfile
+in a closed source or commercial project complies with the license libsndfile is
+released under, the GNU Lesser General Public License (LGPL):
+</p>
+
+<ul>
+<li>Make sure you are linking to a libsndfile as a shared library (Linux and Unix
+	systems), Dynamic Link Library (Microsoft Windows) or dynlib (Mac OSX).
+	If you are using some other operating system that doesn't allow dynamically 
+	linked libraries, you will not be able to use libsndfile unless you release
+	the source code to your program.
+<li>In the licensing documentation for your program, add a statement that your
+	software depends on libsndfile and that libsndfile is released under the GNU
+	Lesser General Public License, either
+		<a href="">version 2.1</a>
+	or optionally
+		<a href="">version 3</a>.
+<li>Include the text for both versions of the license, possibly as separate
+	files named libsndfile_lgpl_v2_1.txt and libsndfile_lgpl_v3.txt.
+</ul>
 
 <!-- ========================================================================= -->
 <HR>
