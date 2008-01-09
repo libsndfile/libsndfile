@@ -1,3 +1,11 @@
+2008-01-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-cmp.c
+    Add new example program contributed by Conrad Parker.
+
+    * examples/Makefile.am
+    Hook into build.
+
 2008-01-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/win32_test.c

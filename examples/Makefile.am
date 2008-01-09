@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_PROGRAMS = sndfile-info sndfile-play sndfile-convert sndfile-jackplay
+bin_PROGRAMS = sndfile-info sndfile-play sndfile-convert sndfile-jackplay sndfile-cmp
 
 noinst_PROGRAMS = sndfile-data-trim make_sine sfprocess list_formats generate sndfilehandle
 
@@ -26,6 +26,9 @@ sndfile_jackplay_LDADD = $(SNDFILEDIR)/libsndfile.la $(JACK_LIBS)
 
 sndfile_convert_SOURCES = sndfile-convert.c
 sndfile_convert_LDADD = $(SNDFILEDIR)/libsndfile.la
+
+sndfile_cmp_SOURCES = sndfile-cmp.c
+sndfile_cmp_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 sndfile_data_trim_SOURCES = sndfile-data-trim.c
 sndfile_data_trim_LDADD = $(SNDFILEDIR)/libsndfile.la
