@@ -6,6 +6,9 @@
     * examples/Makefile.am
     Hook into build.
 
+    * doc/development.html
+    Change use or reconfigure.mk to autogen.sh.
+
 2008-01-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/win32_test.c
