@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -811,6 +811,12 @@ int sf_dither_int		(const SF_DITHER_INFO *dither, const int *in, int *out, int c
 int sf_dither_float		(const SF_DITHER_INFO *dither, const float *in, float *out, int count) ;
 int sf_dither_double	(const SF_DITHER_INFO *dither, const double *in, double *out, int count) ;
 #endif
+
+/* Helper/debug functions. */
+const char * str_of_major_format (int format) ;
+const char * str_of_minor_format (int format) ;
+const char * str_of_open_mode (int mode) ;
+const char * str_of_endianness (int end) ;
 
 #endif /* SNDFILE_COMMON_H */
 

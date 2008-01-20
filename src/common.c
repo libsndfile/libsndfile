@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -1301,3 +1301,102 @@ psf_rand_int32 (void)
 
 	return value ;
 } /* psf_rand_int32 */
+
+/*==============================================================================
+*/
+
+#define CASE_NAME(x)       case x : return #x ; break ;
+
+const char *
+str_of_major_format (int format)
+{	switch (format & SF_FORMAT_TYPEMASK)
+	{	CASE_NAME (SF_FORMAT_WAV) ;
+		CASE_NAME (SF_FORMAT_AIFF) ;
+		CASE_NAME (SF_FORMAT_AU) ;
+		CASE_NAME (SF_FORMAT_RAW) ;
+		CASE_NAME (SF_FORMAT_PAF) ;
+		CASE_NAME (SF_FORMAT_SVX) ;
+		CASE_NAME (SF_FORMAT_NIST) ;
+		CASE_NAME (SF_FORMAT_VOC) ;
+		CASE_NAME (SF_FORMAT_IRCAM) ;
+		CASE_NAME (SF_FORMAT_W64) ;
+		CASE_NAME (SF_FORMAT_MAT4) ;
+		CASE_NAME (SF_FORMAT_MAT5) ;
+		CASE_NAME (SF_FORMAT_PVF) ;
+		CASE_NAME (SF_FORMAT_XI) ;
+		CASE_NAME (SF_FORMAT_HTK) ;
+		CASE_NAME (SF_FORMAT_SDS) ;
+		CASE_NAME (SF_FORMAT_AVR) ;
+		CASE_NAME (SF_FORMAT_WAVEX) ;
+		CASE_NAME (SF_FORMAT_SD2) ;
+		CASE_NAME (SF_FORMAT_FLAC) ;
+		CASE_NAME (SF_FORMAT_CAF) ;
+		CASE_NAME (SF_FORMAT_WVE) ;
+		CASE_NAME (SF_FORMAT_OGG) ;
+		default :
+			break ;
+		} ;
+
+	return "BAD_MAJOR_FORMAT" ;
+} /* str_of_major_format */
+
+const char *
+str_of_minor_format (int format)
+{	switch (format & SF_FORMAT_SUBMASK)
+	{	CASE_NAME (SF_FORMAT_PCM_S8) ;
+		CASE_NAME (SF_FORMAT_PCM_16) ;
+		CASE_NAME (SF_FORMAT_PCM_24) ;
+		CASE_NAME (SF_FORMAT_PCM_32) ;
+		CASE_NAME (SF_FORMAT_PCM_U8) ;
+		CASE_NAME (SF_FORMAT_FLOAT) ;
+		CASE_NAME (SF_FORMAT_DOUBLE) ;
+		CASE_NAME (SF_FORMAT_ULAW) ;
+		CASE_NAME (SF_FORMAT_ALAW) ;
+		CASE_NAME (SF_FORMAT_IMA_ADPCM) ;
+		CASE_NAME (SF_FORMAT_MS_ADPCM) ;
+		CASE_NAME (SF_FORMAT_GSM610) ;
+		CASE_NAME (SF_FORMAT_VOX_ADPCM) ;
+		CASE_NAME (SF_FORMAT_G721_32) ;
+		CASE_NAME (SF_FORMAT_G723_24) ;
+		CASE_NAME (SF_FORMAT_G723_40) ;
+		CASE_NAME (SF_FORMAT_DWVW_12) ;
+		CASE_NAME (SF_FORMAT_DWVW_16) ;
+		CASE_NAME (SF_FORMAT_DWVW_24) ;
+		CASE_NAME (SF_FORMAT_DWVW_N) ;
+		CASE_NAME (SF_FORMAT_DPCM_8) ;
+		CASE_NAME (SF_FORMAT_DPCM_16) ;
+		CASE_NAME (SF_FORMAT_VORBIS) ;
+		default :
+			break ;
+		} ;
+
+	return "BAD_MINOR_FORMAT" ;
+} /* str_of_minor_format */
+
+const char *
+str_of_open_mode (int mode)
+{	switch (mode)
+	{	CASE_NAME (SFM_READ) ;
+		CASE_NAME (SFM_WRITE) ;
+		CASE_NAME (SFM_RDWR) ;
+
+		default :
+			break ;
+		} ;
+
+	return "BAD_MODE" ;
+} /* str_of_open_mode */
+
+const char *
+str_of_endianness (int end)
+{	switch (end)
+	{	CASE_NAME (SF_ENDIAN_BIG) ;
+		CASE_NAME (SF_ENDIAN_LITTLE) ;
+		CASE_NAME (SF_ENDIAN_CPU) ;
+		default :
+			break ;
+		} ;
+
+	/* Zero length string for SF_ENDIAN_FILE. */
+	return "" ;
+} /* str_of_endianness */
