@@ -278,7 +278,7 @@ typedef struct sf_private_tag
 
 	int				mode ;			/* Open mode : SFM_READ, SFM_WRITE or SFM_RDWR. */
 	int				endian ;		/* File endianness : SF_ENDIAN_LITTLE or SF_ENDIAN_BIG. */
-	int				float_endswap ;	/* Need to endswap float32s? */
+	int				data_endswap ;	/* Need to endswap data? */
 
 	/*
 	** Maximum float value for calculating the multiplier for
