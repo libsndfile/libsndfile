@@ -3,6 +3,15 @@
     * examples/sndfile-play.c
     Apply patch from Yair K. to fix compiles with OSS v4.
 
+    * src/common.h src/float32.c src/double64.c
+    Rename psf->float_enswap to psf->data_endswap.
+
+    * src/sndfile.h.in src/sndfile.c src/pcm.c
+    Add command SFC_RAW_NEEDS_ENDSWAP.
+
+    * tests/command.c
+    Add test for SFC_RAW_NEEDS_ENDSWAP.
+
 2008-01-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-cmp.c

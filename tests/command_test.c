@@ -46,6 +46,7 @@ static	void	channel_map_test		(const char *filename, int filetype) ;
 static	void	broadcast_test			(const char *filename, int filetype) ;
 static	void	broadcast_coding_history_test	(const char *filename) ;
 static	void	current_sf_info_test	(const char *filename) ;
+static	void	raw_needs_endswap_test	(const char *filename, int filetype) ;
 
 /* Force the start of this buffer to be double aligned. Sparc-solaris will
 ** choke if its not.
@@ -72,6 +73,7 @@ main (int argc, char *argv [])
 		printf ("           chanmap - test set/get of channel map data..\n") ;
 		printf ("           bext    - test set/get of SF_BROADCAST_INFO.\n") ;
 		printf ("           bextch  - test set/get of SF_BROADCAST_INFO coding_history.\n") ;
+		printf ("           rawend  - test SFC_RAW_NEEDS_ENDSWAP.\n") ;
 		printf ("           all     - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -89,7 +91,7 @@ main (int argc, char *argv [])
 			exit (1) ;
 			} ;
 		puts ("ok") ;
-		test_count++ ;
+		test_count ++ ;
 		} ;
 
 	if (do_all || strcmp (argv [1], "norm") == 0)
@@ -98,52 +100,58 @@ main (int argc, char *argv [])
 		*/
 		float_norm_test		("float.wav") ;
 		double_norm_test	("double.wav") ;
-		test_count++ ;
+		test_count ++ ;
 		} ;
 
 	if (do_all || strcmp (argv [1], "peak") == 0)
 	{	calc_peak_test (SF_ENDIAN_BIG		| SF_FORMAT_RAW, "be-peak.raw") ;
 		calc_peak_test (SF_ENDIAN_LITTLE	| SF_FORMAT_RAW, "le-peak.raw") ;
-		test_count++ ;
+		test_count ++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "format"))
 	{	format_tests () ;
-		test_count++ ;
+		test_count ++ ;
 		} ;
 
 	if (do_all || strcmp (argv [1], "trunc") == 0)
 	{	truncate_test ("truncate.raw", SF_FORMAT_RAW | SF_FORMAT_PCM_32) ;
 		truncate_test ("truncate.au" , SF_FORMAT_AU | SF_FORMAT_PCM_16) ;
-		test_count++ ;
+		test_count ++ ;
 		} ;
 
 	if (do_all || strcmp (argv [1], "inst") == 0)
 	{	instrument_test ("instrument.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		instrument_test ("instrument.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
 		/*-instrument_test ("instrument.xi", SF_FORMAT_XI | SF_FORMAT_DPCM_16) ;-*/
-		test_count++ ;
+		test_count ++ ;
 		} ;
 
 	if (do_all || strcmp (argv [1], "current_sf_info") == 0)
 	{	current_sf_info_test ("current.wav") ;
-		test_count++ ;
+		test_count ++ ;
 		} ;
 
 	if (do_all || strcmp (argv [1], "bext") == 0)
 	{	broadcast_test ("broadcast.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
-		test_count++ ;
+		test_count ++ ;
 		} ;
 
 	if (do_all || strcmp (argv [1], "bextch") == 0)
 	{	broadcast_coding_history_test ("coding_history.wav") ;
-		test_count++ ;
+		test_count ++ ;
 		} ;
 
 	if (do_all || strcmp (argv [1], "chanmap") == 0)
 	{	channel_map_test ("chanmap.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		channel_map_test ("chanmap.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
-		test_count++ ;
+		test_count ++ ;
+		} ;
+
+	if (do_all || strcmp (argv [1], "rawend") == 0)
+	{	raw_needs_endswap_test ("raw_end.wav", SF_FORMAT_WAV) ;
+		raw_needs_endswap_test ("raw_end.aiff", SF_FORMAT_AIFF) ;
+		test_count ++ ;
 		} ;
 
 	if (test_count == 0)
@@ -1029,3 +1037,55 @@ channel_map_test (const char *filename, int filetype)
 	puts ("ok") ;
 } /* channel_map_test */
 
+static	void
+raw_needs_endswap_test (const char *filename, int filetype)
+{	static int subtypes [] =
+	{	SF_FORMAT_FLOAT, SF_FORMAT_DOUBLE,
+		SF_FORMAT_PCM_16, SF_FORMAT_PCM_24, SF_FORMAT_PCM_32
+		} ;
+	SNDFILE	 *file ;
+	SF_INFO	 sfinfo ;
+	unsigned k ;
+	int needs_endswap ;
+
+	print_test_name (__func__, filename) ;
+
+	for (k = 0 ; k < ARRAY_LEN (subtypes) ; k++)
+	{
+		memset (&sfinfo, 0, sizeof (sfinfo)) ;
+		sfinfo.samplerate	= 11025 ;
+		sfinfo.format		= filetype | subtypes [k] ;
+		sfinfo.channels		= 1 ;
+
+		file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+		test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+		sf_close (file) ;
+
+		memset (&sfinfo, 0, sizeof (sfinfo)) ;
+		file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+		needs_endswap = sf_command (file, SFC_RAW_DATA_NEEDS_ENDSWAP, NULL, 0) ;
+
+		switch (filetype)
+		{	case SF_FORMAT_WAV :
+				exit_if_true (needs_endswap != CPU_IS_BIG_ENDIAN,
+					"\n\nLine %d : SFC_RAW_DATA_NEEDS_ENDSWAP failed for SF_FORMAT_WAV format %d.\n\n", __LINE__, k) ;
+				break ;
+
+			case SF_FORMAT_AIFF :
+				exit_if_true (needs_endswap != CPU_IS_LITTLE_ENDIAN,
+					"\n\nLine %d : SFC_RAW_DATA_NEEDS_ENDSWAP failed for SF_FORMAT_AIFF format %d.\n\n", __LINE__, k) ;
+				break ;
+
+			default :
+				printf ("\n\nLine %d : bad format value %d.\n\n", __LINE__, filetype) ;
+				exit (1) ;
+				break ;
+			} ;
+
+		sf_close (file) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* raw_needs_endswap_test */

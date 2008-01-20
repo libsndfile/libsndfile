@@ -36,6 +36,7 @@ examples/generate
 examples/list_formats
 examples/make_sine
 examples/sfprocess
+examples/sndfile-cmp
 examples/sndfile-convert
 examples/sndfile-data-trim
 examples/sndfile-info

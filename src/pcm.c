@@ -131,6 +131,11 @@ pcm_init (SF_PRIVATE *psf)
 	else if ((psf->sf.format & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_U8)
 		chars = SF_CHARS_UNSIGNED ;
 
+	if (CPU_IS_BIG_ENDIAN)
+		psf->data_endswap = (psf->endian == SF_ENDIAN_BIG) ? SF_FALSE : SF_TRUE ;
+	else
+		psf->data_endswap = (psf->endian == SF_ENDIAN_LITTLE) ? SF_FALSE : SF_TRUE ;
+
 	if (psf->mode == SFM_READ || psf->mode == SFM_RDWR)
 	{	switch (psf->bytewidth * 0x10000 + psf->endian + chars)
 		{	case (0x10000 + SF_ENDIAN_BIG + SF_CHARS_SIGNED) :
@@ -161,6 +166,7 @@ pcm_init (SF_PRIVATE *psf)
 					psf->read_double	= pcm_read_bet2d ;
 					break ;
 			case (4 * 0x10000 + SF_ENDIAN_BIG) :
+
 					psf->read_short		= pcm_read_bei2s ;
 					psf->read_int		= pcm_read_bei2i ;
 					psf->read_float		= pcm_read_bei2f ;

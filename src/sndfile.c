@@ -1127,6 +1127,9 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			memcpy (psf->instrument, data, sizeof (SF_INSTRUMENT)) ;
 			return SF_TRUE ;
 
+		case SFC_RAW_DATA_NEEDS_ENDSWAP :
+			return psf->data_endswap ;
+
 		default :
 			/* Must be a file specific command. Pass it on. */
 			if (psf->command)
