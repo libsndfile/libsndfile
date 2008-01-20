@@ -15,6 +15,10 @@
     * doc/command.html
     Document SFC_RAW_NEEDS_ENDSWAP.
 
+    * tests/peak_chunk_test.c
+    Add test function read_write_peak_test. Thanks to Nicolas Castagne for the
+    bug report.
+
 2008-01-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-cmp.c

@@ -36,6 +36,7 @@
 
 
 static	void	test_float_peak	(const char *filename, int filetype) ;
+static	void	read_write_peak_test	(const char *filename, int filetype) ;
 
 static void		check_logged_peaks (char *buffer) ;
 
@@ -65,11 +66,16 @@ main (int argc, char *argv [])
 	{	test_float_peak ("peak_float.wav", SF_FORMAT_WAV | SF_FORMAT_FLOAT) ;
 		test_float_peak ("peak_float.wavex", SF_FORMAT_WAVEX | SF_FORMAT_FLOAT) ;
 		test_float_peak ("peak_float.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_FLOAT) ;
+
+		read_write_peak_test ("rw_peak.wav", SF_FORMAT_WAV | SF_FORMAT_FLOAT) ;
+		read_write_peak_test ("rw_peak.wavex", SF_FORMAT_WAVEX | SF_FORMAT_FLOAT) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "aiff"))
 	{	test_float_peak	("peak_float.aiff", SF_FORMAT_AIFF | SF_FORMAT_FLOAT) ;
+
+		read_write_peak_test ("rw_peak.aiff", SF_FORMAT_AIFF | SF_FORMAT_FLOAT) ;
 		test_count++ ;
 		} ;
 
@@ -95,6 +101,7 @@ test_float_peak (const char *filename, int filetype)
 
 	print_test_name ("test_float_peak", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.format		= filetype ;
 	sfinfo.channels		= 4 ;
@@ -280,10 +287,54 @@ check_logged_peaks (char *buffer)
 		} ;
 
 } /* check_logged_peaks */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: f10ca506-5808-4393-9d58-e3ec201fb7ee
-*/
+
+static	void
+read_write_peak_test (const char *filename, int filetype)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	int			k, frames ;
+	double		max_peak = 0.0 ;
+
+	print_test_name (__func__, filename) ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.format		= filetype ;
+	sfinfo.channels		= 1 ;
+	sfinfo.frames		= 0 ;
+
+	frames = BUFFER_LEN / sfinfo.channels ;
+
+	/* Create some random data with a peak value of 0.66. */
+	for (k = 0 ; k < BUFFER_LEN ; k++)
+		data [k] = (rand () % 2000) / 3000.0 ;
+
+	/* Insert a peak at a known position. */
+	data [frames / 8] = 0.95 ;
+
+	/* Make sure the file doesn't already exist. */
+	unlink (filename) ;
+
+	/* Write a file with PEAK chunks. */
+	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, 0, __LINE__) ;
+
+	sf_command (file, SFC_SET_ADD_PEAK_CHUNK, NULL, SF_TRUE) ;
+
+	test_write_double_or_die (file, 0, data, BUFFER_LEN, BUFFER_LEN) ;
+
+	sf_close (file) ;
+
+	/* Now open the file ..... */
+	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, 0, __LINE__) ;
+
+	/* and check if the PEAK chunk has been written. */
+	if (sf_command (file, SFC_GET_SIGNAL_MAX, &max_peak, sizeof (double)) == SF_FALSE)
+	{	printf ("\n\nLine %d : SFC_GET_SIGNAL_MAX failed.\n\n", __LINE__) ;
+		exit (1) ;
+    	} ;
+
+	sf_close (file) ;
+
+	unlink (filename) ;
+	printf ("ok\n") ;
+} /* read_write_peak_test */
+
