@@ -595,8 +595,6 @@ void	double64_le_write	(double in, unsigned char *out) ;
 void	psf_log_printf		(SF_PRIVATE *psf, const char *format, ...) ;
 void	psf_log_SF_INFO 	(SF_PRIVATE *psf) ;
 
-void	psf_hexdump (const void *ptr, int len) ;
-
 int32_t	psf_rand_int32 (void) ;
 
 /* Functions used when writing file headers. */
@@ -767,6 +765,17 @@ int audio_detect (SF_PRIVATE * psf, AUDIO_DETECT *ad, const unsigned char * data
 
 
 /*------------------------------------------------------------------------------------
+** Helper/debug functions.
+*/
+
+void	psf_hexdump (const void *ptr, int len) ;
+
+const char * str_of_major_format (int format) ;
+const char * str_of_minor_format (int format) ;
+const char * str_of_open_mode (int mode) ;
+const char * str_of_endianness (int end) ;
+
+/*------------------------------------------------------------------------------------
 ** Here's how we fix systems which don't snprintf / vsnprintf.
 ** Systems without these functions should use the
 */
@@ -811,12 +820,6 @@ int sf_dither_int		(const SF_DITHER_INFO *dither, const int *in, int *out, int c
 int sf_dither_float		(const SF_DITHER_INFO *dither, const float *in, float *out, int count) ;
 int sf_dither_double	(const SF_DITHER_INFO *dither, const double *in, double *out, int count) ;
 #endif
-
-/* Helper/debug functions. */
-const char * str_of_major_format (int format) ;
-const char * str_of_minor_format (int format) ;
-const char * str_of_open_mode (int mode) ;
-const char * str_of_endianness (int end) ;
 
 #endif /* SNDFILE_COMMON_H */
 
