@@ -12,6 +12,9 @@
     * tests/command.c
     Add test for SFC_RAW_NEEDS_ENDSWAP.
 
+    * doc/command.html
+    Document SFC_RAW_NEEDS_ENDSWAP.
+
 2008-01-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-cmp.c
