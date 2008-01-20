@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -150,7 +150,10 @@ main (int argc, char *argv [])
 
 	if (do_all || strcmp (argv [1], "rawend") == 0)
 	{	raw_needs_endswap_test ("raw_end.wav", SF_FORMAT_WAV) ;
+		raw_needs_endswap_test ("raw_end.wavex", SF_FORMAT_WAVEX) ;
+		raw_needs_endswap_test ("raw_end.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
 		raw_needs_endswap_test ("raw_end.aiff", SF_FORMAT_AIFF) ;
+		raw_needs_endswap_test ("raw_end.aiff_le", SF_ENDIAN_LITTLE | SF_FORMAT_AIFF) ;
 		test_count ++ ;
 		} ;
 
@@ -1052,6 +1055,16 @@ raw_needs_endswap_test (const char *filename, int filetype)
 
 	for (k = 0 ; k < ARRAY_LEN (subtypes) ; k++)
 	{
+		if (filetype == (SF_ENDIAN_LITTLE | SF_FORMAT_AIFF))
+			switch (subtypes [k])
+			{	/* Little endian AIFF does not AFAIK support fl32 and fl64. */
+				case SF_FORMAT_FLOAT :
+				case SF_FORMAT_DOUBLE :
+					continue ;
+				default :
+					break ;
+				} ;	
+
 		memset (&sfinfo, 0, sizeof (sfinfo)) ;
 		sfinfo.samplerate	= 11025 ;
 		sfinfo.format		= filetype | subtypes [k] ;
@@ -1068,13 +1081,16 @@ raw_needs_endswap_test (const char *filename, int filetype)
 
 		switch (filetype)
 		{	case SF_FORMAT_WAV :
+			case SF_FORMAT_WAVEX :
+			case SF_FORMAT_AIFF | SF_ENDIAN_LITTLE :
 				exit_if_true (needs_endswap != CPU_IS_BIG_ENDIAN,
-					"\n\nLine %d : SFC_RAW_DATA_NEEDS_ENDSWAP failed for SF_FORMAT_WAV format %d.\n\n", __LINE__, k) ;
+					"\n\nLine %d : SFC_RAW_DATA_NEEDS_ENDSWAP failed for (%d | %d).\n\n", __LINE__, filetype, k) ;
 				break ;
 
 			case SF_FORMAT_AIFF :
+			case SF_FORMAT_WAV | SF_ENDIAN_BIG :
 				exit_if_true (needs_endswap != CPU_IS_LITTLE_ENDIAN,
-					"\n\nLine %d : SFC_RAW_DATA_NEEDS_ENDSWAP failed for SF_FORMAT_AIFF format %d.\n\n", __LINE__, k) ;
+					"\n\nLine %d : SFC_RAW_DATA_NEEDS_ENDSWAP failed for (%d | %d).\n\n", __LINE__, filetype, k) ;
 				break ;
 
 			default :
