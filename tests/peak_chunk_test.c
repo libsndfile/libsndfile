@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ main (int argc, char *argv [])
 		exit (1) ;
 		} ;
 
-	do_all=!strcmp (argv [1], "all") ;
+	do_all = ! strcmp (argv [1], "all") ;
 
 	if (do_all || ! strcmp (argv [1], "wav"))
 	{	test_float_peak ("peak_float.wav", SF_FORMAT_WAV | SF_FORMAT_FLOAT) ;
@@ -323,10 +323,10 @@ read_write_peak_test (const char *filename, int filetype)
 
 	sf_close (file) ;
 
-	/* Now open the file ..... */
+	/* Now open the file ... */
 	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, 0, __LINE__) ;
 
-	/* and check if the PEAK chunk has been written. */
+	/* ... and check if the PEAK chunk has been written. */
 	if (sf_command (file, SFC_GET_SIGNAL_MAX, &max_peak, sizeof (double)) == SF_FALSE)
 	{	printf ("\n\nLine %d : SFC_GET_SIGNAL_MAX failed.\n\n", __LINE__) ;
 		exit (1) ;
