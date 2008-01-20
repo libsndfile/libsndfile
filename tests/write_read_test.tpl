@@ -895,7 +895,7 @@ new_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int all
 
 	rwfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__) ;
 	if (sfinfo.frames != 2 * frames)
-	{	printf ("\n\nLine %d : incorrect number of frames in file (%ld shold be %d)\n\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), frames) ;
+	{	printf ("\n\nLine %d : incorrect number of frames in file (%ld should be %d)\n\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), 2 * frames) ;
 		exit (1) ;
 		} ;
 
