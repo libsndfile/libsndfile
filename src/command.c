@@ -130,6 +130,7 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_WAV,		"WAV (Microsoft)",						"wav"	},
 	{	SF_FORMAT_NIST,		"WAV (NIST Sphere)",	 				"wav"	},
 	{	SF_FORMAT_WAVEX,	"WAVEX (Microsoft)",					"wav"	},
+	{	SF_FORMAT_WVE,		"WVE (Psion Series 3)",					"wve"	},
 	{	SF_FORMAT_XI,		"XI (FastTracker 2)",					"xi"	},
 
 } ; /* major_formats */
