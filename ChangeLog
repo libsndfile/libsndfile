@@ -3,6 +3,9 @@
     * src/command.c
     Add WVE to the list of major formats.
 
+    * tests/aiff_rw_test.c
+    Fix error reporting.
+
 2008-01-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.[ch]

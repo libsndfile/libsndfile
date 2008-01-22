@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003,2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -140,7 +140,7 @@ rw_test (const char *filename)
 
 	/* Now compare the two. */
 	if (sfinfo_rd.format != sfinfo_rw.format)
-	{	printf ("\n\nLine %d : channel count mismatch (0x%08X != 0x%08X).\n\n", __LINE__,
+	{	printf ("\n\nLine %d : format mismatch (0x%08X != 0x%08X).\n\n", __LINE__,
 			sfinfo_rd.format, sfinfo_rw.format) ;
 		exit (1) ;
 		} ;
@@ -152,7 +152,7 @@ rw_test (const char *filename)
 		} ;
 
 	if (sfinfo_rd.frames != sfinfo_rw.frames)
-	{	printf ("\n\nLine %d : frame count mismatch (%ld != %ld).\n\n", __LINE__,
+	{	printf ("\n\nLine %d : frame count mismatch (rd %ld != rw %ld).\n\n", __LINE__,
 			SF_COUNT_TO_LONG (sfinfo_rd.frames), SF_COUNT_TO_LONG (sfinfo_rw.frames)) ;
 		exit (1) ;
 		} ;
@@ -160,10 +160,3 @@ rw_test (const char *filename)
 	return ;
 } /* rw_test */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 12561248-1ad1-4ba6-941c-029f1333c080
-*/
