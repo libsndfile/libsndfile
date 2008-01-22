@@ -912,7 +912,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 				} ;
 			/* Can only do this is in SFM_WRITE mode. */
-			if (psf->mode != SFM_WRITE)
+			if (psf->mode != SFM_WRITE && psf->mode != SFM_RDWR)
 				return SF_FALSE ;
 			/* If data has already been written this must fail. */
 			if (psf->have_written)
