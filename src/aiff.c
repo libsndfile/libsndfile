@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -874,14 +874,14 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 		bytesread += psf_binheader_readf (psf, "Em", &(comm_fmt->encoding)) ;
 	else if (comm_fmt->size >= SIZEOF_AIFC_COMM)
 	{	unsigned char encoding_len ;
+		unsigned read_len ;
 
 		bytesread += psf_binheader_readf (psf, "Em1", &(comm_fmt->encoding), &encoding_len) ;
 
 		memset (psf->u.scbuf, 0, comm_fmt->size) ;
-
-		bytesread += psf_binheader_readf (psf, "b", psf->u.scbuf,
-							comm_fmt->size - SIZEOF_AIFC_COMM + 1) ;
-		psf->u.scbuf [encoding_len] = 0 ;
+		read_len = comm_fmt->size - SIZEOF_AIFC_COMM + 1 ;
+		bytesread += psf_binheader_readf (psf, "b", psf->u.scbuf, read_len) ;
+		psf->u.scbuf [read_len + 1] = 0 ;
 		} ;
 
 	psf_log_printf (psf, "  Sample Rate : %d\n", tenbytefloat2int (comm_fmt->sampleRate)) ;
@@ -1537,10 +1537,3 @@ aiff_read_basc_chunk (SF_PRIVATE * psf, int datasize)
 	return 0 ;
 } /* aiff_read_basc_chunk */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 7dec56ca-d6f2-48cf-863b-a72e7e17a5d9
-*/
