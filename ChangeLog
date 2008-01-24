@@ -3,6 +3,13 @@
     * src/aiff.c
     Fix reading of COMM encoding string.
 
+    * src/chunk.c src/common.h src/Makefile.am
+    New file for storing and retrieving info about header chunks. Hook into
+    build.
+
+    * src/aiff.c
+    Use new chunk logging to fix problem with AIFF in RDWR mode.
+
 2008-01-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/command.c
