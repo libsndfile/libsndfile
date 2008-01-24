@@ -531,6 +531,7 @@ mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_fi
 	for (k = 0 ; k < items ; k++)
 		if ([+ (get "error_func") +] (orig [k], test [k]))
 		{	printf ("\n\nLine %d: Mono : Incorrect sample A (#%d : [+ (get "format_char") +] => [+ (get "format_char") +]).\n", __LINE__, k, orig [k], test [k]) ;
+			oct_save_[+ (get "data_type") +] (orig, test, items) ;
 			exit (1) ;
 			} ;
 
@@ -809,7 +810,7 @@ mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int lo
 		/* Check the data. */
 		for (k = 0 ; k < DATA_LENGTH ; k++)
 			if ([+ (get "error_func") +] (orig [k], test [k]))
-			{	printf ("\n\nLine %d (pass %d): Error at sample %d ([+ (get "format_char") +] => [+ (get "format_char") +]).\n", __LINE__, pass, k, orig [k], test [k]) ;
+			{	printf ("\n\nLine %d (pass %d) A : Error at sample %d ([+ (get "format_char") +] => [+ (get "format_char") +]).\n", __LINE__, pass, k, orig [k], test [k]) ;
 				oct_save_[+ (get "data_type") +] (orig, test, DATA_LENGTH) ;
 				exit (1) ;
 				} ;
@@ -858,7 +859,7 @@ mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int lo
 		/* Check the data. */
 		for (k = 0 ; k < DATA_LENGTH ; k++)
 			if ([+ (get "error_func") +] (orig [k], test [k]))
-			{	printf ("\n\nLine %d (pass %d): Error at sample %d ([+ (get "format_char") +] => [+ (get "format_char") +]).\n", __LINE__, pass, k, orig [k], test [k]) ;
+			{	printf ("\n\nLine %d (pass %d) B : Error at sample %d ([+ (get "format_char") +] => [+ (get "format_char") +]).\n", __LINE__, pass, k, orig [k], test [k]) ;
 				oct_save_[+ (get "data_type") +] (orig, test, DATA_LENGTH) ;
 				exit (1) ;
 				} ;
