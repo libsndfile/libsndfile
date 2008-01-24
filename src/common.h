@@ -740,6 +740,23 @@ int		aiff_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;
 int		interleave_init (SF_PRIVATE *psf) ;
 
 /*------------------------------------------------------------------------------------
+** Chunk logging functions.
+*/
+
+typedef struct
+{	struct
+	{	int chunk ;
+		sf_count_t offset ;
+		sf_count_t len ;
+	} l [100] ;
+
+	int count ;
+} PRIV_CHUNK4 ;
+
+void pchk4_store (PRIV_CHUNK4 * pchk, int marker, sf_count_t offset, sf_count_t len) ;
+int pchk4_find (PRIV_CHUNK4 * pchk, int marker) ;
+
+/*------------------------------------------------------------------------------------
 ** Other helper functions.
 */
 

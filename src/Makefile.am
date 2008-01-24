@@ -25,7 +25,7 @@ noinst_PROGRAMS = test_endswap test_file_io test_conversions test_log_printf \
 COMMON = common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
 		interleave.c strings.c dither.c broadcast.c audio_detect.c \
- 		ima_oki_adpcm.c ima_oki_adpcm.h
+ 		ima_oki_adpcm.c ima_oki_adpcm.h chunk.c
 
 FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c \
 		macbinary3.c macos.c mat4.c mat5.c nist.c ogg.c paf.c pvf.c raw.c rx2.c sd2.c \
