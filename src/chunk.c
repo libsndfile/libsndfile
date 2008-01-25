@@ -36,13 +36,6 @@ pchk4_store (PRIV_CHUNK4 * pchk, int marker, sf_count_t offset, sf_count_t len)
 	pchk->l [pchk->count].offset = offset ;
 	pchk->l [pchk->count].len = len ;
 
-	if (0)
-	{	char str [5] ;
-		memcpy (str, &marker, 4) ;
-		str [4] = 0 ;
-		printf ("%s : %lld   %lld\n", str, offset, len) ;
-		} ;
-
 	pchk->count ++ ;
 
 	return ;
