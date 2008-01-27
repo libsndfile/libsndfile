@@ -1,3 +1,12 @@
+2008-01-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/peak_chunk_test.c
+    Improve read_write_peak_test to find more errors. Inspired by example
+    provided by Nicolas Castagne.
+
+    * src/aiff.c
+    Another SFM_RDWR fix shown up by above test.
+
 2008-01-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c
