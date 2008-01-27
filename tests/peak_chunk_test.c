@@ -290,51 +290,59 @@ check_logged_peaks (char *buffer)
 
 static	void
 read_write_peak_test (const char *filename, int filetype)
-{	SNDFILE		*file ;
-	SF_INFO		sfinfo ;
-	int			k, frames ;
-	double		max_peak = 0.0 ;
+{	SNDFILE	*file ;
+    SF_INFO	sfinfo ;
+
+    double   small_data [10] ;
+    double   max_peak = 0.0 ;
+    unsigned k ;
 
 	print_test_name (__func__, filename) ;
 
-	sfinfo.samplerate	= 44100 ;
-	sfinfo.format		= filetype ;
-	sfinfo.channels		= 1 ;
-	sfinfo.frames		= 0 ;
+    for (k = 0 ; k < ARRAY_LEN (small_data) ; k ++)
+        small_data [k] = 0.1 ;
 
-	frames = BUFFER_LEN / sfinfo.channels ;
+    sfinfo.samplerate	= 44100 ;
+    sfinfo.channels		= 2 ;
+    sfinfo.format		= filetype ;
+    sfinfo.frames		= 0 ;
 
-	/* Create some random data with a peak value of 0.66. */
-	for (k = 0 ; k < BUFFER_LEN ; k++)
-		data [k] = (rand () % 2000) / 3000.0 ;
+	/* Open the file, add peak chunk and write samples with value 0.1. */
+    file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
 
-	/* Insert a peak at a known position. */
-	data [frames / 8] = 0.95 ;
+    sf_command (file, SFC_SET_ADD_PEAK_CHUNK, NULL, SF_TRUE) ;
 
-	/* Make sure the file doesn't already exist. */
+	test_write_double_or_die (file, 0, small_data, ARRAY_LEN (small_data), __LINE__) ;
+
+    sf_close (file) ;
+
+    /* Open the fiel RDWR, write sample valied 1.25. */
+    file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__) ;
+
+    for (k = 0 ; k < ARRAY_LEN (small_data) ; k ++)
+        small_data [k] = 1.0 ;
+
+	test_write_double_or_die (file, 0, small_data, ARRAY_LEN (small_data), __LINE__) ;
+
+    sf_command (file, SFC_GET_SIGNAL_MAX, &max_peak, sizeof (max_peak)) ;
+
+    sf_close (file) ;
+
+    exit_if_true (max_peak < 0.1, "\n\nLine %d : max peak (%5.3f) should not be 0.1.\n\n", __LINE__, max_peak) ;
+
+    /* Open the file and test the values written to the PEAK chunk. */
+    file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+
+	exit_if_true (sfinfo.channels * sfinfo.frames != 2 * ARRAY_LEN (small_data),
+			"Line %d : frame count is %ld, should be %d\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), 2 * ARRAY_LEN (small_data)) ;
+
+    sf_command (file, SFC_GET_SIGNAL_MAX, &max_peak, sizeof (double)) ;
+
+    sf_close (file) ;
+
+    exit_if_true (max_peak < 1.0, "\n\nLine %d : max peak (%5.3f) should be 1.0.\n\n", __LINE__, max_peak) ;
+
 	unlink (filename) ;
-
-	/* Write a file with PEAK chunks. */
-	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, 0, __LINE__) ;
-
-	sf_command (file, SFC_SET_ADD_PEAK_CHUNK, NULL, SF_TRUE) ;
-
-	test_write_double_or_die (file, 0, data, BUFFER_LEN, BUFFER_LEN) ;
-
-	sf_close (file) ;
-
-	/* Now open the file ... */
-	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, 0, __LINE__) ;
-
-	/* ... and check if the PEAK chunk has been written. */
-	if (sf_command (file, SFC_GET_SIGNAL_MAX, &max_peak, sizeof (double)) == SF_FALSE)
-	{	printf ("\n\nLine %d : SFC_GET_SIGNAL_MAX failed.\n\n", __LINE__) ;
-		exit (1) ;
-    	} ;
-
-	sf_close (file) ;
-
-	unlink (filename) ;
-	printf ("ok\n") ;
+	puts ("ok") ;
 } /* read_write_peak_test */
 
