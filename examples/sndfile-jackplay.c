@@ -266,8 +266,12 @@ main (int narg, char * args [])
 int
 main (void)
 {
-	puts ("Sorry this program was compiled with libjack and hence doesn't work.") ;
+	puts (
+		"Sorry this program was compiled without libjack (which probably\n"
+		"only exists on Linux and Mac OSX) and hence doesn't work."
+		) ;
 
 	return 0 ;
 } /* main */
+
 #endif

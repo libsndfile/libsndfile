@@ -1,3 +1,8 @@
+2008-02-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-jackplay.c
+    Minor tweaks to warning message printed when compiled without libjack.
+
 2008-01-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/peak_chunk_test.c
