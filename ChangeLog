@@ -3,6 +3,9 @@
     * src/OGG
     Sync to SVN upstream.
 
+    * Makefile.am
+    Add 'DISTCHECK_CONFIGURE_FLAGS = --enable-gcc-werror'.
+
 2008-02-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-jackplay.c

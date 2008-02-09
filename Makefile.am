@@ -1,5 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
+DISTCHECK_CONFIGURE_FLAGS = --enable-gcc-werror
+
 if BUILD_OCTAVE_MOD
 octave_dir = Octave
 endif
