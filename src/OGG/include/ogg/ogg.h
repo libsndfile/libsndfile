@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: toplevel libogg include
- last mod: $Id: ogg.h 12446 2007-02-08 22:22:43Z xiphmont $
+ last mod: $Id: ogg.h 14463 2008-02-09 11:16:55Z erikd $
 
  ********************************************************************/
 #ifndef _OGG_H
@@ -184,14 +184,14 @@ extern int      ogg_stream_eos(ogg_stream_state *os);
 
 extern void     ogg_page_checksum_set(ogg_page *og);
 
-extern int      ogg_page_version(ogg_page *og);
-extern int      ogg_page_continued(ogg_page *og);
-extern int      ogg_page_bos(ogg_page *og);
-extern int      ogg_page_eos(ogg_page *og);
-extern ogg_int64_t  ogg_page_granulepos(ogg_page *og);
-extern int      ogg_page_serialno(ogg_page *og);
-extern long     ogg_page_pageno(ogg_page *og);
-extern int      ogg_page_packets(ogg_page *og);
+extern int      ogg_page_version(const ogg_page *og);
+extern int      ogg_page_continued(const ogg_page *og);
+extern int      ogg_page_bos(const ogg_page *og);
+extern int      ogg_page_eos(const ogg_page *og);
+extern ogg_int64_t  ogg_page_granulepos(const ogg_page *og);
+extern int      ogg_page_serialno(const ogg_page *og);
+extern long     ogg_page_pageno(const ogg_page *og);
+extern int      ogg_page_packets(const ogg_page *og);
 
 extern void     ogg_packet_clear(ogg_packet *op);
 

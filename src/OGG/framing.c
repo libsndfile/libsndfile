@@ -12,7 +12,7 @@
 
  function: code raw [Vorbis] packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
- last mod: $Id: framing.c 12446 2007-02-08 22:22:43Z xiphmont $
+ last mod: $Id: framing.c 14463 2008-02-09 11:16:55Z erikd $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -26,23 +26,23 @@
 
 /* A complete description of Ogg framing exists in docs/framing.html */
 
-int ogg_page_version(ogg_page *og){
+int ogg_page_version(const ogg_page *og){
   return((int)(og->header[4]));
 }
 
-int ogg_page_continued(ogg_page *og){
+int ogg_page_continued(const ogg_page *og){
   return((int)(og->header[5]&0x01));
 }
 
-int ogg_page_bos(ogg_page *og){
+int ogg_page_bos(const ogg_page *og){
   return((int)(og->header[5]&0x02));
 }
 
-int ogg_page_eos(ogg_page *og){
+int ogg_page_eos(const ogg_page *og){
   return((int)(og->header[5]&0x04));
 }
 
-ogg_int64_t ogg_page_granulepos(ogg_page *og){
+ogg_int64_t ogg_page_granulepos(const ogg_page *og){
   unsigned char *page=og->header;
   ogg_int64_t granulepos=page[13]&(0xff);
   granulepos= (granulepos<<8)|(page[12]&0xff);
@@ -55,14 +55,14 @@ ogg_int64_t ogg_page_granulepos(ogg_page *og){
   return(granulepos);
 }
 
-int ogg_page_serialno(ogg_page *og){
+int ogg_page_serialno(const ogg_page *og){
   return(og->header[14] |
 	 (og->header[15]<<8) |
 	 (og->header[16]<<16) |
 	 (og->header[17]<<24));
 }
  
-long ogg_page_pageno(ogg_page *og){
+long ogg_page_pageno(const ogg_page *og){
   return(og->header[18] |
 	 (og->header[19]<<8) |
 	 (og->header[20]<<16) |
@@ -88,7 +88,7 @@ more page packet), the return will be:
   ogg_page_continued(page) !=0
 */
 
-int ogg_page_packets(ogg_page *og){
+int ogg_page_packets(const ogg_page *og){
   int i,n=og->header[26],count=0;
   for(i=0;i<n;i++)
     if(og->header[27+i]<255)count++;
