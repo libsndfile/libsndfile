@@ -327,8 +327,18 @@ between 16 bit shorts and normalised floats is going to suffer other losses
 in audio quality that they should also be concerned about.
 </P>
 <P>
-The correct way to deal with this problem is to consider 16 bit short data as
-a final destination format only, not as an intermediate storage format.
+Since this problem only occurs when converting between integer data on disk and
+normalized floats in the application, it can be avoided by using something
+other than normalized floats in the application.
+Alternatives to normalized floats are the <b>short</b> and <b>int</b> data
+types (ie using sf_read_short or sf_read_int) or using un-normalized floats
+(see
+	<a href="http://www.mega-nerd.com/libsndfile/command.html#SFC_SET_NORM_FLOAT">
+	SFC_SET_NORM_FLOAT</a>).
+</P>
+<P>
+Another way to deal with this problem is to consider 16 bit short data as a
+final destination format only, not as an intermediate storage format.
 All intermediate data (ie which is going to be processed further) should be
 stored in floating point format which is supported by all of the most common
 file formats.
@@ -616,7 +626,7 @@ with the test suite.
 libsndfile contains a huge, comprehensive test suite.
 When you compile a universal binary and run the test suite, you only test the
 native compile.
-The cross compiled binary (the one with the much higher chance of having 
+The cross compiled binary (the one with the much higher chance of having
 problems) cannot be tested.
 </P>
 
@@ -653,10 +663,10 @@ libsndfile still built with all the different compilers.
 <P>
 Maintaining these project files is also rather difficult if I don't have access
 to the required compiler/IDE.
-If I just edit the project files without testing them I will almost certainly 
+If I just edit the project files without testing them I will almost certainly
 get it wrong.
 If I release a version of libsndfile with broken project files, I'll get a bunch
-of emails from people complaining about it not building and have no way of 
+of emails from people complaining about it not building and have no way of
 fixing or even testing it.
 </P>
 
@@ -707,7 +717,7 @@ Some of those authors may be students and hence wouldn't be worth pursuing.
 
 <p>
 However, libsndfile is released under the name of a company, Mega Nerd Pty Ltd;
-a company which has income from from libsamplerate licensing, libsndfile based 
+a company which has income from from libsamplerate licensing, libsndfile based
 consulting income and other unrelated consulting income.
 Adding MP3 support to libsndfile could place that income would be under legal
 threat.
@@ -735,7 +745,7 @@ released under, the GNU Lesser General Public License (LGPL):
 <ul>
 <li>Make sure you are linking to a libsndfile as a shared library (Linux and Unix
 	systems), Dynamic Link Library (Microsoft Windows) or dynlib (Mac OSX).
-	If you are using some other operating system that doesn't allow dynamically 
+	If you are using some other operating system that doesn't allow dynamically
 	linked libraries, you will not be able to use libsndfile unless you release
 	the source code to your program.
 <li>In the licensing documentation for your program, add a statement that your
