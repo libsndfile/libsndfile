@@ -32,7 +32,7 @@ EXTRA_DIST = lookups.pl
 # build and run the self tests on 'make check'
 
 #vorbis_selftests = test_codebook test_sharedbook
-vorbis_selftests = test_sharedbook
+vorbis_selftests = test_sharedbook$(EXEEXT)
 
 TESTS = $(vorbis_selftests)
 noinst_PROGRAMS = $(vorbis_selftests)

@@ -70,18 +70,18 @@ genfiles : test_endswap.c Symbols.linux Symbols.darwin libsndfile.def cygsndfile
 # It is not possible to place these in the tests/ directory because they
 # need access to the internals of the SF_PRIVATE struct.
 
-check: test_endswap test_file_io test_conversions test_log_printf
+check: $(noinst_PROGRAMS)
 	@echo
 	@echo
 	@echo
 	@echo "============================================================"
 	@if [ -x /usr/bin/python2.4 ]; then $(srcdir)/binheader_writef_check.py $(srcdir)/*.c ; fi
-	./test_endswap
-	./test_file_io
-	./test_conversions
-	./test_log_printf
-	./test_audio_detect
-	./test_ima_oki_adpcm
+	./test_endswap$(EXEEXT)
+	./test_file_io$(EXEEXT)
+	./test_conversions$(EXEEXT)
+	./test_log_printf$(EXEEXT)
+	./test_audio_detect$(EXEEXT)
+	./test_ima_oki_adpcm$(EXEEXT)
 	@echo "============================================================"
 	@echo
 	@echo
@@ -122,10 +122,3 @@ sds.c wve.c dwd.c ogg.c xi.c sndfile.c common.c file_io.c : sndfile.h common.h
 command.c pcm.c ulaw.c alaw.c float32.c double64.c ima_adpcm.c : sndfile.h common.h
 ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c interleave.c strings.c : sndfile.h common.h
 dither.c : sndfile.h common.h
-
-## Do not edit or modify anything in this comment block.
-## The arch-tag line is a file identity tag for the GNU Arch
-## revision control system.
-##
-## arch-tag: fc3511e6-4230-4bcb-9c86-f728d7a06fe7
-

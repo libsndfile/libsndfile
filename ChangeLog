@@ -1,3 +1,18 @@
+2008-03-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h
+    Make SF_MIN and SF_MAX macros MinGW friendly.
+
+    * examples/sndfile-(info|play).c
+    Use Sleep function from <windows.h> instead of _sleep.
+
+    * tests/locale_test.c
+    Disable some tests when OS_IS_WIN32.
+
+    * src/FLAC/src/share/replaygain_anal/replaygain_analysis.c
+        src/FLAC/src/share/utf8/utf8.c
+    MinGW fixes.
+
 2008-03-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html

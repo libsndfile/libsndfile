@@ -3,6 +3,7 @@
 *.aiff
 *.au
 *.bin
+*.exe
 *.flac
 *.la
 *.lo

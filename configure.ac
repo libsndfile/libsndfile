@@ -267,8 +267,11 @@ case "$host_os" in
 # Check for requirements for building plugins for other languages/enviroments.
 
 dnl Octave maths environment http://www.octave.org/
-AC_OCTAVE_BUILD
-
+if test x$cross_compiling = xno ; then
+	AC_OCTAVE_BUILD
+else
+	AM_CONDITIONAL(BUILD_OCTAVE_MOD, false)
+	fi
 
 #====================================================================================
 # Check for libsqlite3 (only used in regtest).
