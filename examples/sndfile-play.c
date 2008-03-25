@@ -938,7 +938,7 @@ main (int argc, char *argv [])
 		**     Sleep (15) ;
 		** Instead, use this:
 		*/
-		_sleep (5 * 1000) ;
+		Sleep (5 * 1000) ;
 #endif
 		return 1 ;
 		} ;
