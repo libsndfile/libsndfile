@@ -66,7 +66,7 @@ test_endswap.c: test_endswap.def test_endswap.tpl
 
 genfiles : test_endswap.c Symbols.linux Symbols.darwin libsndfile.def cygsndfile.def
 
-# Two test programs.
+# A couple of test programs.
 # It is not possible to place these in the tests/ directory because they
 # need access to the internals of the SF_PRIVATE struct.
 
