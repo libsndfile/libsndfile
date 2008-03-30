@@ -1,5 +1,5 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007,2008  Josh Coalson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -3237,9 +3237,7 @@ FLAC__bool seek_to_absolute_sample_ogg_(FLAC__StreamDecoder *decoder, FLAC__uint
 				/* @@@ TODO: might want to limit pos to some distance
 				 * before EOF, to make sure we land before the last frame,
 				 * thereby getting a this_frame_sample and so having a better
-				 * estimate.  @@@@@@DELETE:this would also mostly (or totally if we could
-				 * be sure to land before the last frame) avoid the
-				 * end-of-stream case we have to check later.
+				 * estimate.
 				 */
 			}
 
@@ -3280,7 +3278,7 @@ FLAC__bool seek_to_absolute_sample_ogg_(FLAC__StreamDecoder *decoder, FLAC__uint
 			}
 		}
 		/* our write callback will change the state when it gets to the target frame */
-		else if(!decoder->private_->is_seeking/*@@@@@@ && decoder->protected_->state != FLAC__STREAM_DECODER_END_OF_STREAM*/) {
+		else if(!decoder->private_->is_seeking) {
 			break;
 		}
 		else {

@@ -1,5 +1,5 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007,2008  Josh Coalson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -57,13 +57,13 @@
 #endif
 
 /* VERSION should come from configure */
-FLAC_API const char *FLAC__VERSION_STRING = "1.2.0";
+FLAC_API const char *FLAC__VERSION_STRING = "1.2.1";
 
 #if defined _MSC_VER || defined __BORLANDC__ || defined __MINW32__
 /* yet one more hack because of MSVC6: */
-FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC 1.2.0 CVS-20070820";
+FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC 1.2.1 20070917";
 #else
-FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC 1.2.0 CVS-20070820";
+FLAC_API const char *FLAC__VENDOR_STRING = "reference libFLAC 1.2.1 20070917";
 #endif
 
 FLAC_API const FLAC__byte FLAC__STREAM_SYNC_STRING[4] = { 'f','L','a','C' };
@@ -238,6 +238,7 @@ FLAC_API FLAC__bool FLAC__format_sample_rate_is_subset(unsigned sample_rate)
 		return true;
 }
 
+/* @@@@ add to unit tests; it is already indirectly tested by the metadata_object tests */
 FLAC_API FLAC__bool FLAC__format_seektable_is_legal(const FLAC__StreamMetadata_SeekTable *seek_table)
 {
 	unsigned i;
@@ -273,6 +274,7 @@ static int seekpoint_compare_(const FLAC__StreamMetadata_SeekPoint *l, const FLA
 		return 1;
 }
 
+/* @@@@ add to unit tests; it is already indirectly tested by the metadata_object tests */
 FLAC_API unsigned FLAC__format_seektable_sort(FLAC__StreamMetadata_SeekTable *seek_table)
 {
 	unsigned i, j;
@@ -410,6 +412,7 @@ FLAC_API FLAC__bool FLAC__format_vorbiscomment_entry_is_legal(const FLAC__byte *
 	return true;
 }
 
+/* @@@@ add to unit tests; it is already indirectly tested by the metadata_object tests */
 FLAC_API FLAC__bool FLAC__format_cuesheet_is_legal(const FLAC__StreamMetadata_CueSheet *cue_sheet, FLAC__bool check_cd_da_subset, const char **violation)
 {
 	unsigned i, j;
@@ -488,6 +491,7 @@ FLAC_API FLAC__bool FLAC__format_cuesheet_is_legal(const FLAC__StreamMetadata_Cu
 	return true;
 }
 
+/* @@@@ add to unit tests; it is already indirectly tested by the metadata_object tests */
 FLAC_API FLAC__bool FLAC__format_picture_is_legal(const FLAC__StreamMetadata_Picture *picture, const char **violation)
 {
 	char *p;
