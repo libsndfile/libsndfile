@@ -1,5 +1,5 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2000,2001,2002,2003,2004,2005,2006,2007,2008  Josh Coalson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -110,6 +110,9 @@
  * From there you can go on to look at the documentation of
  * individual functions.  You can see different views of the individual
  * functions through the links in top bar across this page.
+ *
+ * If you prefer a more hands-on approach, you can jump right to some
+ * <A HREF="../documentation_example_code.html">example code</A>.
  *
  * \section porting_guide Porting Guide
  *

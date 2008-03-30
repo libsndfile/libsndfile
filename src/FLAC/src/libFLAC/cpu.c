@@ -1,5 +1,5 @@
 /* libFLAC - Free Lossless Audio Codec library
- * Copyright (C) 2001,2002,2003,2004,2005,2006,2007  Josh Coalson
+ * Copyright (C) 2001,2002,2003,2004,2005,2006,2007,2008  Josh Coalson
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -302,9 +302,9 @@ void FLAC__cpu_info(FLAC__CPUInfo *info)
 			int sse = 0;
 			LPTOP_LEVEL_EXCEPTION_FILTER save = SetUnhandledExceptionFilter(sigill_handler_sse_os);
 			/* see GCC version above for explanation */
-			//@@@@@@ http://msdn2.microsoft.com/en-us/library/4ks26t93.aspx
-			//@@@@@@ http://www.codeproject.com/cpp/gccasm.asp
-			//@@@@@@ http://www.hick.org/~mmiller/msvc_inline_asm.html
+			/*  http://msdn2.microsoft.com/en-us/library/4ks26t93.aspx */
+			/*  http://www.codeproject.com/cpp/gccasm.asp */
+			/*  http://www.hick.org/~mmiller/msvc_inline_asm.html */
 			__asm {
 #  if _MSC_VER <= 1200
 				/* VC6 assembler doesn't know SSE, have to emit bytecode instead */
