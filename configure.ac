@@ -1,4 +1,4 @@
-# Copyright (C) 1999-2006 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
+# Copyright (C) 1999-2008 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
 
 dnl Require autoconf version
 AC_PREREQ(2.57)
@@ -270,7 +270,12 @@ case "$host_os" in
 #====================================================================================
 # Check for requirements for building plugins for other languages/enviroments.
 
-AM_CONDITIONAL(BUILD_OCTAVE_MOD, [test "x$cross_compiling" = xno])
+dnl Octave maths environment http://www.octave.org/
+if test x$cross_compiling = xno ; then
+	AC_OCTAVE_BUILD
+else
+	AM_CONDITIONAL(BUILD_OCTAVE_MOD, false)
+	fi
 
 #====================================================================================
 # Check for libsqlite3 (only used in regtest).
