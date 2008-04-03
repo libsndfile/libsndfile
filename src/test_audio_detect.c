@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2007-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -31,20 +31,7 @@
 #include "common.h"
 #include "sfendian.h"
 
-
-static void test_audio_detect (void) ;
-
-int
-main (void)
-{
-	test_audio_detect () ;
-
-	return 0 ;
-} /* main */
-
-/*==============================================================================
-**	Test data.
-*/
+#include "test_main.h"
 
 static unsigned char float_le_mono [] =
 {	0x36, 0x86, 0x21, 0x44, 0xB5, 0xB4, 0x49, 0x44, 0xA2, 0xC0, 0x71, 0x44, 0x7B, 0xD1, 0x8C, 0x44,
@@ -87,15 +74,14 @@ static unsigned char int24_32_le_stereo [] =
 } ;
 
 
-static void
+void
 test_audio_detect (void)
 {
 	SF_PRIVATE psf ;
 	AUDIO_DETECT ad ;
 	int errors = 0 ;
 
-	printf ("    test_audio_detect        : ") ;
-	fflush (stdout) ;
+	print_test_name ("Testing audio detect") ;
 
 	memset (&psf, 0, sizeof (psf)) ;
 

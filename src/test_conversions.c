@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2006,2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2006-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -25,6 +25,8 @@
 #include <errno.h>
 
 #include "common.h"
+#include "test_main.h"
+
 
 /*
 ** This is a bit rough, but it is the nicest way to do it.
@@ -36,16 +38,6 @@
 		exit (1) ; \
 		} ;
 
-static void conversion_test (char endian) ;
-
-int
-main (void)
-{
-	conversion_test ('E') ;
-	conversion_test ('e') ;
-	return 0 ;
-} /* main */
-
 static void
 conversion_test (char endian)
 {
@@ -53,6 +45,7 @@ conversion_test (char endian)
 	const char * filename = "conversion.bin" ;
 	long long i64 = SF_PLATFORM_S64 (0x0123456789abcdef), t64 = 0 ;
 	char format_str [16] ;
+	char test_name [64] ;
 	char i8 = 12, t8 = 0 ;
 	short i16 = 0x123, t16 = 0 ;
 	int i24 = 0x23456, t24 = 0 ;
@@ -61,8 +54,8 @@ conversion_test (char endian)
 
 	snprintf (format_str, sizeof (format_str), "%c12348", endian) ;
 
-	printf ("    conversion_test_%-8s : ", endian == 'e' ? "le" : "be") ;
-	fflush (stdout) ;
+	snprintf (test_name, sizeof (test_name), "Testing %s conversions", endian == 'e' ? "little endian" : "big endian") ;
+	print_test_name (test_name) ;
 
 	psf = &sf_private ;
 	memset (psf, 0, sizeof (sf_private)) ;
@@ -99,3 +92,11 @@ conversion_test (char endian)
 	remove (filename) ;
 	puts ("ok") ;
 } /* conversion_test */
+
+void
+test_conversions (void)
+{
+	conversion_test ('E') ;
+	conversion_test ('e') ;
+} /* test_conversion */
+

@@ -19,8 +19,7 @@ EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 
 noinst_HEADERS = common.h sfconfig.h sfendian.h float_cast.h wav_w64.h sf_unistd.h
 
-noinst_PROGRAMS = test_endswap test_file_io test_conversions test_log_printf \
-		test_audio_detect test_ima_oki_adpcm
+noinst_PROGRAMS = test_main
 
 COMMON = common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
@@ -40,33 +39,17 @@ libsndfile_la_LIBADD = libcommon.la GSM610/libgsm.la G72x/libg72x.la OGG/libogg.
 
 libcommon_la_SOURCES = $(COMMON)
 
-test_endswap_SOURCES = test_endswap.c
+test_main_SOURCES = test_main.c test_conversions.c test_endswap.c test_audio_detect.c \
+					test_log_printf.c test_file_io.c test_ima_oki_adpcm.c
+test_main_LDADD = libcommon.la
 
-test_file_io_CFLAGS = $(AM_CFLAGS)
-test_file_io_SOURCES = test_file_io.c
-test_file_io_LDADD = libcommon.la
-
-test_log_printf_CFLAGS = $(AM_CFLAGS)
-test_log_printf_SOURCES = test_log_printf.c
-test_log_printf_LDADD = libcommon.la
-
-test_conversions_CFLAGS = $(AM_CFLAGS)
-test_conversions_SOURCES = test_conversions.c
-test_conversions_LDADD = libcommon.la
-
-test_audio_detect_CFLAGS = $(AM_CFLAGS)
-test_audio_detect_SOURCES = test_audio_detect.c
-test_audio_detect_LDADD = libcommon.la
-
-test_ima_oki_adpcm_CFLAGS = -DTEST $(AM_CFLAGS)
-test_ima_oki_adpcm_SOURCES = ima_oki_adpcm.c
 
 test_endswap.c: test_endswap.def test_endswap.tpl
 	autogen --writable test_endswap.def
 
 genfiles : test_endswap.c Symbols.linux Symbols.darwin libsndfile.def cygsndfile.def
 
-# A couple of test programs.
+# A single test programs.
 # It is not possible to place these in the tests/ directory because they
 # need access to the internals of the SF_PRIVATE struct.
 
@@ -76,12 +59,7 @@ check: $(noinst_PROGRAMS)
 	@echo
 	@echo "============================================================"
 	@if [ -x /usr/bin/python2.4 ]; then $(srcdir)/binheader_writef_check.py $(srcdir)/*.c ; fi
-	./test_endswap$(EXEEXT)
-	./test_file_io$(EXEEXT)
-	./test_conversions$(EXEEXT)
-	./test_log_printf$(EXEEXT)
-	./test_audio_detect$(EXEEXT)
-	./test_ima_oki_adpcm$(EXEEXT)
+	./test_main$(EXEEXT)
 	@echo "============================================================"
 	@echo
 	@echo
