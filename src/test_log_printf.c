@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -25,6 +25,8 @@
 #include <errno.h>
 
 #include "common.h"
+
+#include "test_main.h"
 
 #define	CMP_0_ARGS(line,err,fmt)	\
 	{	psf->logindex = 0 ;			\
@@ -61,17 +63,29 @@
 		err += compare_strings_or_die (line, fmt, buffer, psf->logbuffer) ;			\
 		}
 
-static int compare_strings_or_die (int linenum, const char *fmt, const char* s1, const char* s3) ;
+static int
+compare_strings_or_die (int linenum, const char *fmt, const char* s1, const char* s2)
+{	int errors = 0 ;
+/*-puts (s1) ;puts (s2) ;-*/
 
-int
-main (void)
+	if (strcmp (s1, s2) != 0)
+	{	printf ("\n\nLine %d: string compare mismatch:\n\t", linenum) ;
+		printf ("\"%s\"\n", fmt) ;
+		printf ("\t\"%s\"\n\t\"%s\"\n", s1, s2) ;
+		errors ++ ;
+		} ;
+
+	return errors ;
+} /* compare_strings_or_die */
+
+void
+test_log_printf (void)
 {	static char buffer [2048] ;
 	SF_PRIVATE	sf_private, *psf ;
 	int			k, errors = 0 ;
 	int			int_values [] = { 0, 1, 12, 123, 1234, 123456, -1, -12, -123, -1234, -123456 } ;
 
-	printf ("    %-24s : ", "psf_log_printf_test") ;
-	fflush (stdout) ;
+	print_test_name ("Testing psf_log_printf") ;
 
 	psf = &sf_private ;
 	memset (psf, 0, sizeof (sf_private)) ;
@@ -105,29 +119,5 @@ main (void)
 		} ;
 
 	puts ("ok") ;
+} /* test_log_printf */
 
-	return 0 ;
-} /* main */
-
-static int
-compare_strings_or_die (int linenum, const char *fmt, const char* s1, const char* s2)
-{	int errors = 0 ;
-/*-puts (s1) ;puts (s2) ;-*/
-
-	if (strcmp (s1, s2) != 0)
-	{	printf ("\n\nLine %d: string compare mismatch:\n\t", linenum) ;
-		printf ("\"%s\"\n", fmt) ;
-		printf ("\t\"%s\"\n\t\"%s\"\n", s1, s2) ;
-		errors ++ ;
-		} ;
-
-	return errors ;
-} /* compare_strings_or_die */
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 45147310-868b-400a-97e8-cc0a572a6270
-*/

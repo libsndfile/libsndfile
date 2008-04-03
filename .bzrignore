@@ -71,13 +71,8 @@ src/config.h
 src/config.h.in
 src/sndfile.h
 src/stamp-h1
-src/test_audio_detect
-src/test_conversions
-src/test_endswap
 src/test_endswap.c
-src/test_file_io
-src/test_ima_oki_adpcm
-src/test_log_printf
+src/test_main
 tests/*_test
 tests/benchmark
 tests/benchmark.c

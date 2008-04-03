@@ -32,6 +32,8 @@
 #include "common.h"
 #include "sfendian.h"
 
+#include "test_main.h"
+
 #define	FMT_SHORT	"0x%04x\n"
 #define	FMT_INT		"0x%08x\n"
 
@@ -41,23 +43,8 @@
 #define	FMT_INT64	"0x%016llx\n"
 #endif
 
-[+ FOR int_type
-+]static void test_endswap_[+ (get "name") +] (void) ;
-[+ ENDFOR int_type
-+]
-
-int
-main (void)
-{
-[+ FOR int_type
-+]	test_endswap_[+ (get "name") +] () ;
-[+ ENDFOR int_type
-+]
-	return 0 ;
-} /* main */
-
 /*==============================================================================
-** Actual test functions.
+** Test functions.
 */
 
 [+ FOR int_type +]
@@ -76,7 +63,7 @@ test_endswap_[+ (get "name") +] (void)
 {	[+ (get "name") +] orig [4], first [4], second [4] ;
 	int k ;
 
-	printf ("    %-24s : ", "test_endswap_[+ (get "name") +]") ;
+	printf ("    %-40s : ", "test_endswap_[+ (get "name") +]") ;
 	fflush (stdout) ;
 
 	for (k = 0 ; k < ARRAY_LEN (orig) ; k++)
@@ -123,4 +110,13 @@ test_endswap_[+ (get "name") +] (void)
 [+ ENDFOR int_type
 +]
 
+
+void
+test_endswap (void)
+{
+[+ FOR int_type
++]	test_endswap_[+ (get "name") +] () ;
+[+ ENDFOR int_type
++]
+} /* test_endswap */
 

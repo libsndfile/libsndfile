@@ -1,3 +1,14 @@
+2008-04-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/test_*
+    Add files test_main.[ch].
+    Collapse all tests into a single executable.
+
+2008-03-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/FLAC
+    Sync to upstream CVS.
+
 2008-03-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html
