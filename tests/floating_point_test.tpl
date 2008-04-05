@@ -33,8 +33,6 @@
 #include "dft_cmp.h"
 #include "utils.h"
 
-#include "float_cast.h"
-
 #define	SAMPLE_RATE			16000
 
 static void	float_scaled_test	(const char *filename, int allow_exit, int replace_float, int filetype, double target_snr) ;
