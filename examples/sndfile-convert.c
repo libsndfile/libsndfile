@@ -406,10 +406,3 @@ copy_data_int (SNDFILE *outfile, SNDFILE *infile, int channels)
 	return ;
 } /* copy_data_int */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 259682b3-2887-48a6-b5bb-3cde00521ba3
-*/

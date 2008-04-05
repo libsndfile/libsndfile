@@ -104,11 +104,3 @@ locale_test (const char * locname, const char * filename, int width)
 #endif
 } /* locale_test */
 
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 087b25a3-03a2-4195-acd2-23fbbc489021
-*/

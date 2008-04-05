@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -29,7 +30,6 @@
 
 #include <sndfile.h>
 
-#include "float_cast.h"
 #include "utils.h"
 
 #define	BUFFER_SIZE		(1<<12)

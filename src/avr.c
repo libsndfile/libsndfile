@@ -245,10 +245,3 @@ avr_close (SF_PRIVATE *psf)
 	return 0 ;
 } /* avr_close */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 0823d454-f39a-4a28-a776-607f1ef33b52
-*/

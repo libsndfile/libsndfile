@@ -22,11 +22,11 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<limits.h>
+#include	<math.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
 #include	"common.h"
-#include	"float_cast.h"
 
 #if CPU_IS_LITTLE_ENDIAN
 	#define FLOAT32_READ	float32_le_read

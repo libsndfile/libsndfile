@@ -57,6 +57,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <math.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -65,7 +66,6 @@
 #include "sndfile.h"
 #include "sfendian.h"
 #include "common.h"
-#include "float_cast.h"
 
 #include "VORBIS/include/vorbis/codec.h"
 #include "VORBIS/include/vorbis/vorbisenc.h"

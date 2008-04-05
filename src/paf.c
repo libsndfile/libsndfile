@@ -23,10 +23,10 @@
 #include <fcntl.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 #include "sndfile.h"
 #include "sfendian.h"
-#include "float_cast.h"
 #include "common.h"
 
 /*------------------------------------------------------------------------------
@@ -828,11 +828,3 @@ paf24_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	return total ;
 } /* paf24_write_d */
 
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 477a5308-451e-4bbd-bab4-fab6caa4e884
-*/

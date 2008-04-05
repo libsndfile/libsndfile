@@ -212,11 +212,3 @@ oct_save_short	(short *a, short *b, int len)
 	return 0 ;
 } /* oct_save_short */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 0597b442-a5b0-4abf-92a4-92f6c24e85a6
-*/
-

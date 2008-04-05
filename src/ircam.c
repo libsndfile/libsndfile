@@ -320,10 +320,3 @@ get_encoding_str (int encoding)
 	return "Unknown encoding" ;
 } /* get_encoding_str */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: f2714ab8-f286-4c94-9740-edaf673a1c71
-*/

@@ -489,11 +489,3 @@ os.chdir (source_dir)
 os.system ("rm -rf /tmp/%s" % lite_version)
 
 print "Done."
-
-
-# Do not edit or modify anything in this comment block.
-# The arch-tag line is a file identity tag for the GNU Arch 
-# revision control system.
-#
-# arch-tag: 4aa63c4d-930b-4ef8-a0f2-d1c63992b60b
-

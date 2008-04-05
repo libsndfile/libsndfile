@@ -569,10 +569,3 @@ wav_w64_srate2blocksize (int srate_chan_product)
 		return 1024 ;
 	return 2048 ;
 } /* srate2blocksize */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 43c1b1dd-8abd-43da-a8cd-44da914b64a5
-*/

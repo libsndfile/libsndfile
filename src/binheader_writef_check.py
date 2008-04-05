@@ -107,8 +107,3 @@ if len (sys.argv) > 1:
 
 print "ok"
 
-# Do not edit or modify anything in this comment block.
-# The following line is a file identity tag for the GNU Arch
-# revision control system.
-#
-# arch-tag: 4ed34789-925a-4135-af90-2e51523ca1ce

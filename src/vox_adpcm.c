@@ -34,10 +34,10 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include	<math.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
-#include	"float_cast.h"
 #include	"common.h"
 #include	"ima_oki_adpcm.h"
 

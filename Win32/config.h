@@ -279,12 +279,3 @@
 
 /* Define for large files, on AIX-style hosts. */
 /* #undef _LARGE_FILES */
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 78a733c0-a430-46bd-81ab-4e479fbcffac
-*/
-

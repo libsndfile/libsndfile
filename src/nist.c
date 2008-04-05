@@ -357,11 +357,3 @@ nist_write_header (SF_PRIVATE *psf, int calc_length)
 	return psf->error ;
 } /* nist_write_header */
 
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: b45ed85d-9e22-4ad9-b78c-4b58b67152a8
-*/

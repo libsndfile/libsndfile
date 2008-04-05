@@ -248,8 +248,3 @@ class lsndf_example {
 
 } //class lsndf_example {}
 
-// Do not edit or modify anything in this comment block.
-// The arch-tag line is a file identity tag for the GNU Arch
-// revision control system.
-//
-// arch-tag: 61a46c48-431c-4a16-97a3-b5485ca0e157

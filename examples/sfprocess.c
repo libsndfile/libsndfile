@@ -135,11 +135,3 @@ process_data (double *data, int count, int channels)
     return ;
 } /* process_data */
 
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: de9fdd1e-b807-41ef-9d51-075ba383e536
-*/

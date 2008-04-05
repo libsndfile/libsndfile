@@ -21,10 +21,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "sndfile.h"
 #include "sfendian.h"
-#include "float_cast.h"
 #include "common.h"
 #include "wav_w64.h"
 #include "GSM610/gsm.h"
@@ -617,10 +617,3 @@ gsm610_close	(SF_PRIVATE *psf)
 	return 0 ;
 } /* gsm610_close */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 8575187d-af4f-4acf-b9dd-6ff705628345
-*/

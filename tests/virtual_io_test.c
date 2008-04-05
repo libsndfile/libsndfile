@@ -229,10 +229,3 @@ vio_test (const char *fname, int format)
 	puts ("ok") ;
 } /* vio_test */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 5569fa52-15dd-496f-ab47-1fd42d76195d
-*/

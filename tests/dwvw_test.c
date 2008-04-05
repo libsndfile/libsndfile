@@ -20,12 +20,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-
-#include <float_cast.h>
 
 #include <sndfile.h>
 
@@ -110,10 +109,4 @@ dwvw_test (const char *filename, int format, int bit_width)
 
 	return ;
 } /* dwvw_test */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 9e7731c3-43cd-4de5-b539-1ce6fa11d937
-*/
+

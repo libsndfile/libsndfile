@@ -150,10 +150,3 @@ file_exists (const char *filename)
 
 #endif
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: f46d84fd-d37b-4d08-b1ba-80f2f1e0cfb9
-*/

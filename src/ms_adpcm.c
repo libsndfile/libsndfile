@@ -21,10 +21,10 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include	<math.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
-#include	"float_cast.h"
 #include	"common.h"
 #include	"wav_w64.h"
 
@@ -825,10 +825,4 @@ choose_predictor (unsigned int channels, short *data, int *block_pred, int *idel
 
 	return ;
 } /* choose_predictor */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: a98908a3-5305-4935-872b-77d6a86c330f
-*/
+

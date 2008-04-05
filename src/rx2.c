@@ -317,10 +317,3 @@ rx2_close	(SF_PRIVATE *psf)
 } /* rx2_close */
 
 #endif
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 7366e813-9fee-4d1f-881e-e4a691469370
-*/

@@ -159,9 +159,3 @@ else:
 
 sys.exit (0)
 
-# Do not edit or modify anything in this comment block.
-# The arch-tag line is a file identity tag for the GNU Arch
-# revision control system.
-#
-# arch-tag: 5814f35c-318f-4023-a0c3-d9cf7c9e5f6c
-

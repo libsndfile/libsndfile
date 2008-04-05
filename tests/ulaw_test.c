@@ -253,10 +253,3 @@ int ulaw_decode (unsigned int ulawbyte)
     return sample ;
 } /* ulaw_decode */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: e764cee1-5a9a-480b-a4ca-34d9b57dea6f
-*/

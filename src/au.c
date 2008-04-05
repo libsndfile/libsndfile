@@ -449,10 +449,4 @@ au_read_header (SF_PRIVATE *psf)
 
 	return 0 ;
 } /* au_read_header */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 31f691b1-cde9-4ed2-9469-6bca60fb9cd0
-*/
+

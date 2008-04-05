@@ -186,10 +186,3 @@ bad_raw_test (void)
 	puts ("ok") ;
 } /* bad_raw_test */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 3dccee22-b0bc-4a1f-966c-8ae96f0921ae
-*/

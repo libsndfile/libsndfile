@@ -577,11 +577,3 @@ w64_close (SF_PRIVATE *psf)
 	return 0 ;
 } /* w64_close */
 
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 9aa4e141-538a-4dd9-99c9-b3f0f2dd4f4a
-*/

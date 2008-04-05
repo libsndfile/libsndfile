@@ -322,10 +322,3 @@ error_function (double data, double orig, double margin)
 	return 0 ;
 } /* error_function */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 368e2777-2848-4e16-a77f-4db841377c73
-*/

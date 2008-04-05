@@ -359,10 +359,3 @@ broadcast_dump (const char *filename)
 
 } /* broadcast_dump */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: f59a05db-a182-41de-aedd-d717ce2bb099
-*/

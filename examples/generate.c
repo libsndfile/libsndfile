@@ -129,11 +129,3 @@ encode_file (const char *infilename, const char *outfilename, int filetype)
 	return ;
 } /* encode_file */
 
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: fe28ef37-ae89-4f61-966b-0b1f68e37425
-*/

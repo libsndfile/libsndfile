@@ -22,11 +22,11 @@
 #include	<fcntl.h>
 #include	<string.h>
 #include	<ctype.h>
+#include	<math.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
 #include	"common.h"
-#include	"float_cast.h"
 
 /*------------------------------------------------------------------------------
 ** Information on how to decode and encode this file was obtained in a PDF
@@ -386,10 +386,4 @@ mat4_marker_to_str (int marker)
 	LSF_SNPRINTF (str, sizeof (str) - 1, "%08X", marker) ;
 	return str ;
 } /* mat4_marker_to_str */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: f7e5f5d6-fc39-452e-bc4a-59627116ff59
-*/
+

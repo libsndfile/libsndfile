@@ -524,10 +524,4 @@ DO_NOT_USE_sf_dither_double (const SF_DITHER_INFO *dither, const double *in, dou
 } /* DO_NOT_USE_sf_dither_double */
 
 #endif
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 673fad58-5314-421c-9144-9d54bfdf104c
-*/
+

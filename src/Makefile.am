@@ -17,7 +17,7 @@ EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 			Symbols.linux Symbols.darwin libsndfile.def cygsndfile.def \
 			create_symbols_file.py binheader_writef_check.py
 
-noinst_HEADERS = common.h sfconfig.h sfendian.h float_cast.h wav_w64.h sf_unistd.h
+noinst_HEADERS = common.h sfconfig.h sfendian.h wav_w64.h sf_unistd.h
 
 noinst_PROGRAMS = test_main
 

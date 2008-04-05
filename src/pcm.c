@@ -18,9 +18,10 @@
 
 #include	"sfconfig.h"
 
+#include <math.h>
+
 #include	"sndfile.h"
 #include	"sfendian.h"
-#include	"float_cast.h"
 #include	"common.h"
 
 /* Need to be able to handle 3 byte (24 bit) integers. So defined a
@@ -2898,10 +2899,3 @@ pcm_write_d2lei	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	return total ;
 } /* pcm_write_d2lei */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: d8bc7c0e-1e2f-4ff3-a28f-10ce1fbade3b
-*/

@@ -491,12 +491,3 @@ dummy (void)
 } /* dummy */
 
 #endif
-
-
-/*
-** Do not edit or modify anything in this comment block.
-** The following line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: c6bcb7cb-0d9e-47b6-a89a-66304df4d462
-*/

@@ -642,11 +642,3 @@ pack_bytes (int bits, const short * samples, unsigned char * block)
 	return bindex ;
 } /* pack_bytes */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 6298dc75-fd0f-4062-9b90-f73ed69f22d4
-*/
-

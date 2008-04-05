@@ -252,10 +252,3 @@ endswap_double_copy (double *dest, const double *src, int len)
 
 #endif /* SFENDIAN_INCLUDED */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: f0c5cd54-42d3-4237-90ec-11fe24995de7
-*/

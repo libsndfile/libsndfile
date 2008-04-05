@@ -362,10 +362,3 @@ psf_get_max_all_channels (SF_PRIVATE *psf, double *peaks)
 } /* psf_get_max_all_channels */
 
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 0aae0d9d-ab2b-4d70-ade3-47a534666f8e
-*/

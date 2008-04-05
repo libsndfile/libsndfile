@@ -284,10 +284,4 @@ void	wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat) ;
 void	wav_w64_analyze (SF_PRIVATE *psf) ;
 
 #endif
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 877fde12-9be3-4a31-8a5a-fdae39958613
-*/
+

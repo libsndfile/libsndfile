@@ -528,12 +528,3 @@ void	sf_write_sync	(SNDFILE *sndfile) ;
 #endif	/* __cplusplus */
 
 #endif	/* SNDFILE_H */
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 906bb197-18f2-4f66-a395-b4722bab5114
-*/
-
