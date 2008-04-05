@@ -81,10 +81,3 @@ largefile_test (int filetype, const char * filename)
 	return ;
 } /* largefile_test */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 4ef10b9a-3356-4b92-8b7b-c60c0c4123fe
-*/

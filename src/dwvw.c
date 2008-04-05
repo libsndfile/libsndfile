@@ -31,10 +31,10 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include	<math.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
-#include	"float_cast.h"
 #include	"common.h"
 
 typedef struct
@@ -660,10 +660,3 @@ dwvw_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	return total ;
 } /* dwvw_write_d */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 1ca09552-b01f-4d7f-9bcf-612f834fe41d
-*/

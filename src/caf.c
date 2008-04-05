@@ -22,10 +22,10 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<ctype.h>
+#include	<math.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
-#include	"float_cast.h"
 #include	"common.h"
 
 /*------------------------------------------------------------------------------
@@ -529,10 +529,3 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 	return psf->error ;
 } /* caf_write_header */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 65883e65-bd3c-4618-9241-d3c02fd630bd
-*/

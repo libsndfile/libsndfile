@@ -106,9 +106,3 @@ dot com). If possible place the file on a web server and email the author
 a link to it.
 
 
---------------------------------------------------------------------------
-# Do not edit or modify anything in this comment block.
-# The arch-tag line is a file identity tag for the GNU Arch
-# revision control system.
-#
-# arch-tag: 174661f1-9874-424e-8d8b-301d0322dfdb

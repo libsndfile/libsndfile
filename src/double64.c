@@ -22,11 +22,11 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<limits.h>
+#include	<math.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
 #include	"common.h"
-#include	"float_cast.h"
 
 #if CPU_IS_LITTLE_ENDIAN
 	#define DOUBLE64_READ	double64_le_read
@@ -1041,10 +1041,3 @@ bd2d_write (double *buffer, int count)
 		} ;
 } /* bd2d_write */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 4ee243b7-8c7a-469b-869c-e9aa0ee3b77f
-*/

@@ -199,10 +199,4 @@ dwd_read_header (SF_PRIVATE *psf)
 */
 
 #endif
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: a5e1d2a6-a840-4039-a0e7-e1a43eb05a4f
-*/
+

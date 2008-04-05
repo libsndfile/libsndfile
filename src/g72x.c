@@ -21,10 +21,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "sndfile.h"
 #include "sfendian.h"
-#include "float_cast.h"
 #include "common.h"
 #include "G72x/g72x.h"
 
@@ -602,10 +602,3 @@ g72x_close (SF_PRIVATE *psf)
 	return 0 ;
 } /* g72x_close */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 3cc5439e-7247-486b-b2e6-11a4affa5744
-*/

@@ -216,10 +216,4 @@ htk_read_header (SF_PRIVATE *psf)
 
 	return 0 ;
 } /* htk_read_header */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: c350e972-082e-4c20-8934-03391a723560
-*/
+

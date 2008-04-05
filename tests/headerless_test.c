@@ -178,10 +178,3 @@ old_test (void)
 	unlink (filename) ;
 } /* old_test */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 0820bc1a-c396-4e66-9997-096999b0bc40
-*/

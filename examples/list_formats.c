@@ -81,10 +81,3 @@ main (void)
 	return 0 ;
 } /* main */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 58127a0c-93a2-46cf-b615-fcb9adacf3f1
-*/

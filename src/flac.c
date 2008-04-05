@@ -24,6 +24,7 @@
 #include	<fcntl.h>
 #include	<string.h>
 #include	<ctype.h>
+#include	<math.h>
 
 #include	"sndfile.h"
 #include	"common.h"
@@ -34,7 +35,6 @@
 #include	"FLAC/include/FLAC/metadata.h"
 
 #include	"sfendian.h"
-#include	"float_cast.h"
 
 /*------------------------------------------------------------------------------
 ** Private static functions.

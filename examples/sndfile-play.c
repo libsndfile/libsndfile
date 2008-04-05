@@ -968,10 +968,4 @@ main (int argc, char *argv [])
 
 	return 0 ;
 } /* main */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 8fc4110d-6cec-4e03-91df-0f384cabedac
-*/
+

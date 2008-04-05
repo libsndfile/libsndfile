@@ -198,10 +198,3 @@ hexdump (void *data, int len)
 } /* hexdump */
 
 #endif
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 04393aa1-9389-46fe-baf2-58a7bd544fd6
-*/

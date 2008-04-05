@@ -102,10 +102,3 @@ raw_open	(SF_PRIVATE *psf)
 
 	return error ;
 } /* raw_open */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: f0066de7-d6ce-4f36-a1e0-e475c07d4e1a
-*/

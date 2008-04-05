@@ -183,10 +183,3 @@ dither_test (const char *filename, int filetype)
 	puts ("ok") ;
 } /* dither_test */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: ad688dd9-5211-48ef-b82d-089eafb1e7ad
-*/

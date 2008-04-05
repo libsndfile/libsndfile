@@ -297,10 +297,4 @@ interleave_seek	(SF_PRIVATE *psf, int mode, sf_count_t samples_from_start)
 
 	return samples_from_start ;
 } /* interleave_seek */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 82314e13-0225-4408-a2f2-e6dab3f38904
-*/
+

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+g#!/usr/bin/python
 
 import re, string, sys
 
@@ -59,11 +59,4 @@ if len (sys.argv) < 2:
 
 for file in sys.argv [1:]:
 	search_for_problems (file)
-
-
-# Do not edit or modify anything in this comment block.
-# The arch-tag line is a file identity tag for the GNU Arch 
-# revision control system.
-#
-# arch-tag: 64d2d700-a787-4843-a342-2bafd0761645
 

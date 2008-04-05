@@ -135,10 +135,3 @@ main (void)
 	return 0 ;
 } /* main */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The following line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 9600906c-fd77-4fdd-a25e-c21a1776ef1f
-*/

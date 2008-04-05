@@ -1532,10 +1532,3 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 
 #endif
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: 749740d7-ecc7-47bd-8cf7-600f31d32e6d
-*/

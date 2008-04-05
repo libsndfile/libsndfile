@@ -21,10 +21,10 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include	<math.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
-#include	"float_cast.h"
 #include	"common.h"
 
 typedef struct IMA_ADPCM_PRIVATE_tag
@@ -966,11 +966,3 @@ ima_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	return total ;
 } /* ima_write_d */
 
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 75a54b82-ad18-4758-9933-64e00a7f24e0
-*/

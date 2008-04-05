@@ -23,11 +23,11 @@
 #include <fcntl.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 #include "sndfile.h"
 #include "sfendian.h"
 #include "common.h"
-#include "float_cast.h"
 
 /*------------------------------------------------------------------------------
 */
@@ -984,10 +984,3 @@ sds_write (SF_PRIVATE *psf, SDS_PRIVATE *psds, const int *ptr, int len)
 	return total ;
 } /* sds_write */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: d5d26aa3-368c-4ca6-bb85-377e5a2578cc
-*/

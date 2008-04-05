@@ -22,11 +22,11 @@
 #include	<fcntl.h>
 #include	<string.h>
 #include	<ctype.h>
+#include	<math.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
 #include	"common.h"
-#include	"float_cast.h"
 
 /*------------------------------------------------------------------------------
 ** Information on how to decode and encode this file was obtained in a PDF
@@ -498,10 +498,3 @@ mat5_read_header (SF_PRIVATE *psf)
 	return 0 ;
 } /* mat5_read_header */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: dfdb6742-b2be-4be8-b390-d0c674e8bc8e
-*/

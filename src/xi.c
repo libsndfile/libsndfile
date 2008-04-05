@@ -23,11 +23,11 @@
 #include <fcntl.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 #include "sndfile.h"
 #include "sfendian.h"
 #include "common.h"
-#include "float_cast.h"
 
 #define	MAX_XI_SAMPLES	16
 
@@ -1191,10 +1191,3 @@ d2dles_array (XI_PRIVATE *pxi, const double *src, short *dest, int count, double
 	pxi->last_16 = last_val ;
 } /* d2dles_array */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 1ab2dbe0-29af-4d80-9c6f-cb21b67521bc
-*/

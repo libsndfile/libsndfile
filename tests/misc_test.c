@@ -356,10 +356,3 @@ permission_test (const char *filename, int typemajor)
 #endif
 } /* permission_test */
 
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch
-** revision control system.
-**
-** arch-tag: efc6c227-8881-4a1d-8680-0d1255975267
-*/

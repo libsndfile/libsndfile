@@ -186,10 +186,3 @@ pvf_read_header (SF_PRIVATE *psf)
 
 	return 0 ;
 } /* pvf_read_header */
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: 20a26761-8bc1-41d7-b1f3-9793bf3d9864
-*/

@@ -403,11 +403,3 @@ svx_write_header (SF_PRIVATE *psf, int calc_length)
 	return psf->error ;
 } /* svx_write_header */
 
-
-/*
-** Do not edit or modify anything in this comment block.
-** The arch-tag line is a file identity tag for the GNU Arch 
-** revision control system.
-**
-** arch-tag: a80ab6fb-7d75-4d32-a6b0-0061a3f05d95
-*/
