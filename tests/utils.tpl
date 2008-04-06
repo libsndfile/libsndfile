@@ -476,13 +476,15 @@ test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allo
 				exit (1) ;
 		} ;
 
+	if (OS_IS_WIN32)
+	{	/* Windows doesn't support Unix file permissions so set it to zero. */
+		omode = 0 ;
+		} ;
+
 	if (allow_fd && ((++count) & 1) == 1)
 	{	int fd ;
 
-		if (omode == 0)
-			fd = open (filename, oflags) ;
-		else
-			fd = open (filename, oflags, omode) ;
+		fd = open (filename, oflags, omode) ;
 
 		if (fd < 0)
 		{	perror ("open") ;

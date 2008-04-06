@@ -3,6 +3,9 @@
     * tests/*.c
     Add calls to sf_close() where needed.
 
+    * tests/utils.tpl tests/multi_file_test.c
+    Always pass 0 as the third argument to open when OS_IS_WIN32.
+
 2008-04-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/test_*
