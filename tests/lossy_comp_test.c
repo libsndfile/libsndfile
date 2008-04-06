@@ -1350,7 +1350,7 @@ channels = 1 ;
 	*/
 	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
 	{	const char * errstr ;
-	
+
 		errstr = sf_strerror (NULL) ;
 		if (strstr (errstr, "Sample rate chosen is known to trigger a Vorbis") == NULL)
 		{	printf ("Line %d: sf_open_fd (SFM_WRITE) failed : %s\n", __LINE__, errstr) ;
@@ -1558,7 +1558,7 @@ channels = 1 ;
 	*/
 	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
 	{	const char * errstr ;
-	
+
 		errstr = sf_strerror (NULL) ;
 		if (strstr (errstr, "Sample rate chosen is known to trigger a Vorbis") == NULL)
 		{	printf ("Line %d: sf_open_fd (SFM_WRITE) failed : %s\n", __LINE__, errstr) ;
@@ -2183,7 +2183,9 @@ read_raw_test (const char *filename, int filetype, int channels)
 	{	printf ("\nLine %d : sf_read_raw returned %ld should be %ld\n", __LINE__, SF_COUNT_TO_LONG (count), sfinfo.channels * SF_COUNT_TO_LONG (sfinfo.frames)) ;
 		exit (1) ;
 		} ;
-	
+
+	sf_close (file) ;
+
 	unlink (filename) ;
 	printf ("ok\n") ;
 } /* read_raw_test */

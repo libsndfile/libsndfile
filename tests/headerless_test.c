@@ -104,6 +104,8 @@ headerless_test (const char * filename, int format, int expected)
 
 	check_log_buffer_or_die (file, __LINE__) ;
 
+	sf_close (file) ;
+
 	printf ("ok\n") ;
 	unlink (filename) ;
 } /* headerless_test */
@@ -173,6 +175,8 @@ old_test (void)
 		{	printf ("Line %d: Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, k, buffer [k]) ;
 			exit (1) ;
 			} ;
+
+	sf_close (file) ;
 
 	printf ("ok\n") ;
 	unlink (filename) ;
