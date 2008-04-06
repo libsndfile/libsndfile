@@ -166,6 +166,22 @@ genfiles : write_read_test.c pcm_test.c header_test.c utils.c \
 		scale_clip_test.c pipe_test.c floating_point_test.c benchmark.c
 
 #===============================================================================
+# If we're cross compiling from Linux to Windows and running the test suite
+# under Wine, we need a symbolic link to the generated libsndfile DLL.
+
+if LINUX_MINGW_CROSS_TEST
+
+$(noinst_PROGRAMS) : libsndfile-1.dll
+
+libsndfile-1.dll :
+	ln -s $(top_builddir)/src/.libs/$@ $@
+
+clean-local :
+	-rm -f libsndfile-1.dll
+
+endif
+
+#===============================================================================
 
 check: generic-tests wav-tests aiff-tests au-tests caf-tests raw-tests \
 	paf-tests svx-tests nist-tests ircam-tests voc-tests w64-tests mat4-tests \
