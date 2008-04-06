@@ -1,4 +1,4 @@
-# Copyright (C) 1999-2006 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
+# Copyright (C) 1999-2008 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
 
 dnl Require autoconf version
 AC_PREREQ(2.57)
@@ -42,6 +42,7 @@ AC_PROG_CXX
 AM_PROG_LIBTOOL
 
 AC_CHECK_PROG(HAVE_AUTOGEN, autogen, yes, no)
+AC_CHECK_PROG(HAVE_WINE, wine, yes, no)
 
 AC_PROG_INSTALL
 AC_PROG_LN_S
@@ -60,6 +61,9 @@ if test x$ac_cv_have_decl_S_IRGRP = xyes ; then
 else
 	AC_DEFINE_UNQUOTED([HAVE_DECL_S_IRGRP],0)
 	fi
+
+AM_CONDITIONAL([LINUX_MINGW_CROSS_TEST],
+	[test "$build_os:$target_os:$host_os:$HAVE_WINE" = "linux-gnu:mingw32msvc:mingw32msvc:yes"])
 
 #====================================================================================
 # Check for support of the struct hack.
@@ -267,8 +271,11 @@ case "$host_os" in
 # Check for requirements for building plugins for other languages/enviroments.
 
 dnl Octave maths environment http://www.octave.org/
-AC_OCTAVE_BUILD
-
+if test x$cross_compiling = xno ; then
+	AC_OCTAVE_BUILD
+else
+	AM_CONDITIONAL(BUILD_OCTAVE_MOD, false)
+	fi
 
 #====================================================================================
 # Check for libsqlite3 (only used in regtest).
@@ -651,7 +658,7 @@ AC_CONFIG_FILES([ \
 	src/FLAC/src/share/replaygain_syn/Makefile \
 	src/FLAC/src/share/utf8/Makefile src/FLAC/src/test_libFLAC/Makefile \
 	src/FLAC/src/test_libs_common/Makefile src/FLAC/src/test_seeking/Makefile \
-	src/FLAC/src/test_streams/Makefile src/FLAC/test/Makefile \
+	src/FLAC/src/test_streams/Makefile \
 	src/FLAC/src/test_grabbag/Makefile src/FLAC/src/test_grabbag/cuesheet/Makefile \
 	src/FLAC/src/test_grabbag/picture/Makefile \
 	\

@@ -40,3 +40,6 @@ test_libFLAC_SOURCES = \
 	encoders.h \
 	format.h \
 	metadata.h
+
+check: $(noinst_PROGRAMS)
+	./test_libFLAC$(EXEEXT)

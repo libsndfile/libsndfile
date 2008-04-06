@@ -15,6 +15,6 @@ debug:
 profile:
 	$(MAKE) all CFLAGS="@PROFILE@"
 
-check: test
-	./test
+check: test$(EXEEXT)
+	./test$(EXEEXT)
 	

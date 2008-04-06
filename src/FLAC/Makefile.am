@@ -28,7 +28,7 @@
 # distclean: remove everything except what goes in the distribution
 #
 
-SUBDIRS = include src test
+SUBDIRS = include src
 
 EXTRA_DIST = \
 	COPYING.FDL \

@@ -41,6 +41,7 @@
 #define	BUFFER_LEN		(1 << 16)
 
 #if (defined (WIN32) || defined (_WIN32))
+#include <windows.h>
 #define	snprintf	_snprintf
 #endif
 
@@ -117,7 +118,7 @@ print_usage (const char *progname)
 		**     Sleep (15) ;
 		** Instead, use this:
 		*/
-		_sleep (5 * 1000) ;
+		Sleep (5 * 1000) ;
 #endif
 } /* print_usage */
 

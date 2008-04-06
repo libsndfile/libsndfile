@@ -155,7 +155,7 @@ int utf8_encode(const char *from, char **to)
 
 	if(wchars == 0)
 	{
-		fprintf(stderr, "Unicode translation error %d\n", GetLastError());
+		fprintf(stderr, "Unicode translation error %d\n", (int) GetLastError());
 		return -1;
 	}
 
@@ -174,14 +174,14 @@ int utf8_encode(const char *from, char **to)
 	if(err != wchars)
 	{
 		free(unicode);
-		fprintf(stderr, "Unicode translation error %d\n", GetLastError());
+		fprintf(stderr, "Unicode translation error %d\n", (int) GetLastError());
 		return -1;
 	}
 
 	/* On NT-based windows systems, we could use WideCharToMultiByte(), but 
 	 * MS doesn't actually have a consistent API across win32.
 	 */
-	*to = make_utf8_string(unicode);
+	*to = (char*) make_utf8_string(unicode);
 
 	free(unicode);
 	return 0;
@@ -195,7 +195,7 @@ int utf8_decode(const char *from, char **to)
     /* On NT-based windows systems, we could use MultiByteToWideChar(CP_UTF8), but 
      * MS doesn't actually have a consistent API across win32.
      */
-    unicode = make_unicode_string(from);
+    unicode = make_unicode_string((const unsigned char *) from);
     if(unicode == NULL) 
     {
         fprintf(stderr, "Out of memory processing string from UTF8 to UNICODE16\n");
@@ -210,7 +210,7 @@ int utf8_decode(const char *from, char **to)
 
     if(chars == 0)
     {
-        fprintf(stderr, "Unicode translation error %d\n", GetLastError());
+        fprintf(stderr, "Unicode translation error %d\n", (int) GetLastError());
         free(unicode);
         return -1;
     }
@@ -227,7 +227,7 @@ int utf8_decode(const char *from, char **to)
             -1, *to, chars, NULL, NULL);
     if(err != chars)
     {
-        fprintf(stderr, "Unicode translation error %d\n", GetLastError());
+        fprintf(stderr, "Unicode translation error %d\n", (int) GetLastError());
         free(unicode);
         free(*to);
         *to = NULL;
