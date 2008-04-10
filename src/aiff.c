@@ -77,6 +77,14 @@
 #define GSM_MARKER		(MAKE_MARKER ('G', 'S', 'M', ' '))
 #define ima4_MARKER		(MAKE_MARKER ('i', 'm', 'a', '4'))
 
+/*
+**	This value is officially assigned to Mega Nerd Pty Ltd by Apple
+**	Corportation as the Application marker for libsndfile.
+**
+**	See : http://developer.apple.com/faq/datatype.html
+*/
+#define m3ga_MARKER		(MAKE_MARKER ('m', '3', 'g', 'a'))
+
 /* Unsupported AIFC encodings.*/
 
 #define MAC3_MARKER		(MAKE_MARKER ('M', 'A', 'C', '3'))
@@ -600,6 +608,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case APPL_MARKER :
+				{	unsigned appl_marker ;
+
 					psf_binheader_readf (psf, "E4", &dword) ;
 					pchk4_store (&paiff->chunk4, marker, psf_ftell (psf) - 8, dword) ;
 					if (dword == 0)
@@ -610,8 +620,14 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						break ;
 						} ;
 
+					if (dword < 4)
+					{	psf_log_printf (psf, " %M : %d (too small, skipping)\n", marker, dword) ;
+						psf_binheader_readf (psf, "j", dword + (dword & 1)) ;
+						break ;
+						} ;
+
 					cptr = psf->u.cbuf ;
-					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
+					psf_binheader_readf (psf, "mb", &appl_marker, cptr, dword + (dword & 1) - 4) ;
 					cptr [dword > 0 ? dword : 0] = 0 ;
 
 					for (k = 0 ; k < (int) dword ; k++)
@@ -620,8 +636,9 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 							break ;
 							} ;
 
-					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
+					psf_log_printf (psf, " %M : %d\n  AppSig : %M\n  Name   : %s\n", marker, dword, appl_marker, cptr) ;
 					psf_store_string (psf, SF_STR_SOFTWARE, cptr) ;
+					} ;
 					break ;
 
 			case NAME_MARKER :
@@ -1031,7 +1048,7 @@ aiff_rewrite_header (SF_PRIVATE *psf, AIFF_PRIVATE * paiff)
 		{	case FORM_MARKER :
 				psf_binheader_writef (psf, "Etm8", FORM_MARKER, psf->filelength - 8) ;
 				break ;
-	
+
 			case COMM_MARKER :
 				psf->headindex = paiff->chunk4.l [k].offset ;
 				comm_frames = psf->sf.frames ;
@@ -1379,7 +1396,7 @@ aiff_write_tailer (SF_PRIVATE *psf)
 
 static void
 aiff_write_strings (SF_PRIVATE *psf, int location)
-{	int	k ;
+{	int	k, slen ;
 
 	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
 	{	if (psf->strings [k].type == 0)
@@ -1390,7 +1407,8 @@ aiff_write_strings (SF_PRIVATE *psf, int location)
 
 		switch (psf->strings [k].type)
 		{	case SF_STR_SOFTWARE :
-				psf_binheader_writef (psf, "EmS", APPL_MARKER, psf->strings [k].str) ;
+				slen = strlen (psf->strings [k].str) ;
+				psf_binheader_writef (psf, "Em4mb", APPL_MARKER, slen + 4, m3ga_MARKER, psf->strings [k].str, make_size_t (slen + (slen & 1))) ;
 				break ;
 
 			case SF_STR_TITLE :

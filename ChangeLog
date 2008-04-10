@@ -1,3 +1,9 @@
+2008-04-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c
+    Fix up handling of 'APPL' chunk. Thanks to Axel Roebel for bringing up
+    this issue.
+
 2008-04-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/*.c
