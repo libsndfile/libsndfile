@@ -1,4 +1,4 @@
-#!/usr/bin/python2.4
+#!/usr/bin/python2.5
 
 # Copyright (C) 2006 Erik de Castro Lopo <erikd@mega-nerd.com>
 #
@@ -29,6 +29,13 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+# This parses C code using regexes (yes, thats horrible) and makes sure
+# that calling conventions to the function psf_binheader_writef are
+# correct.
+
+
 
 import re, string, sys
 
