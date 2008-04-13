@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2007 John ffitch
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -143,6 +143,10 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 
 	odata->eos = 0 ;
 
+	/* Weird stuff happens if these aren't called. */
+	ogg_stream_reset (&odata->os) ;
+	ogg_sync_reset (&odata->oy) ;
+
 	/*
 	**	Grab some data at the head of the stream.  We want the first page
 	**	(which is guaranteed to be small and only contain the Vorbis
@@ -174,6 +178,12 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 		} ;
 
 	/*
+	**	Get the serial number and set up the rest of decode.
+	**	Serialno first ; use it to set up a logical stream.
+	*/
+	ogg_stream_init (&odata->os, ogg_page_serialno (&odata->og)) ;
+
+	/*
 	**	This function (ogg_read_header) gets called multiple times, so the OGG
 	**	and vorbis structs have to be cleared every time we pass through to
 	**	prevent memory leaks.
@@ -182,14 +192,6 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 	vorbis_dsp_clear (&vdata->vd) ;
 	vorbis_comment_clear (&vdata->vc) ;
 	vorbis_info_clear (&vdata->vi) ;
-
-	ogg_stream_clear (&odata->os) ;
-
-	/*
-	**	Get the serial number and set up the rest of decode.
-	**	Serialno first ; use it to set up a logical stream.
-	*/
-	ogg_stream_init (&odata->os, ogg_page_serialno (&odata->og)) ;
 
 	/*
 	**	Extract the initial header from the first page and verify that the
@@ -875,22 +877,261 @@ ogg_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 	return 0 ;
 } /* ogg_seek */
 
+/*==============================================================================
+**	Most of the following code was snipped from Mike Smith's ogginfo utility
+**	which is part of vorbis-tools.
+**	Vorbis tools is released under the GPL but Mike has kindly allowed the
+**	following to be relicensed as LGPL for libsndfile.
+*/
+
+typedef struct
+{
+	int isillegal ;
+	int shownillegal ;
+	int isnew ;
+	int end ;
+
+	uint32_t serial ; /* must be 32 bit unsigned */
+	ogg_stream_state os ;
+
+	vorbis_info vi ;
+	vorbis_comment vc ;
+	sf_count_t lastgranulepos ;
+	int doneheaders ;
+} stream_processor ;
+
+typedef struct
+{
+	stream_processor *streams ;
+	int allocated ;
+	int used ;
+	int in_headers ;
+} stream_set ;
+
+static stream_set *
+create_stream_set (void)
+{	stream_set *set = calloc (1, sizeof (stream_set)) ;
+
+	set->streams = calloc (5, sizeof (stream_processor)) ;
+	set->allocated = 5 ;
+	set->used = 0 ;
+
+	return set ;
+} /* create_stream_set */
+
+static void
+vorbis_end (stream_processor *stream, sf_count_t * len)
+{	*len += stream->lastgranulepos ;
+	vorbis_comment_clear (&stream->vc) ;
+	vorbis_info_clear (&stream->vi) ;
+} /* vorbis_end */
+
+static void
+free_stream_set (stream_set *set, sf_count_t * len)
+{	int i ;
+
+	for (i = 0 ; i < set->used ; i++)
+	{	if (!set->streams [i].end)
+			vorbis_end (&set->streams [i], len) ;
+		ogg_stream_clear (&set->streams [i].os) ;
+		} ;
+
+	free (set->streams) ;
+	free (set) ;
+} /* free_stream_set */
+
+static int
+streams_open (stream_set *set)
+{	int i, res = 0 ;
+
+	for (i = 0 ; i < set->used ; i++)
+		if (!set->streams [i].end)
+			res ++ ;
+	return res ;
+} /* streams_open */
+
+static stream_processor *
+find_stream_processor (stream_set *set, ogg_page *page)
+{	uint32_t serial = ogg_page_serialno (page) ;
+	int i, found = 0 ;
+	int invalid = 0 ;
+
+	stream_processor *stream ;
+
+	for (i = 0 ; i < set->used ; i++)
+	{
+		if (serial == set->streams [i].serial)
+		{	/* We have a match! */
+			found = 1 ;
+			stream = & (set->streams [i]) ;
+
+			set->in_headers = 0 ;
+			/* if we have detected EOS, then this can't occur here. */
+			if (stream->end)
+			{	stream->isillegal = 1 ;
+				return stream ;
+				}
+
+			stream->isnew = 0 ;
+			stream->end = ogg_page_eos (page) ;
+			stream->serial = serial ;
+			return stream ;
+			} ;
+		} ;
+
+	/* If there are streams open, and we've reached the end of the
+	** headers, then we can't be starting a new stream.
+	** XXX: might this sometimes catch ok streams if EOS flag is missing,
+	** but the stream is otherwise ok?
+	*/
+	if (streams_open (set) && !set->in_headers)
+		invalid = 1 ;
+
+	set->in_headers = 1 ;
+
+	if (set->allocated < set->used)
+		stream = &set->streams [set->used] ;
+	else
+	{	set->allocated += 5 ;
+		set->streams = realloc (set->streams, sizeof (stream_processor) * set->allocated) ;
+		stream = &set->streams [set->used] ;
+		} ;
+
+	set->used++ ;
+
+	stream->isnew = 1 ;
+	stream->isillegal = invalid ;
+
+	{
+		int res ;
+		ogg_packet packet ;
+
+		/* We end up processing the header page twice, but that's ok. */
+		ogg_stream_init (&stream->os, serial) ;
+		ogg_stream_pagein (&stream->os, page) ;
+		res = ogg_stream_packetout (&stream->os, &packet) ;
+		if (res <= 0)
+			return NULL ;
+		else if (packet.bytes >= 7 && memcmp (packet.packet, "\x01vorbis", 7) == 0)
+		{
+			stream->lastgranulepos = 0 ;
+			vorbis_comment_init (&stream->vc) ;
+			vorbis_info_init (&stream->vi) ;
+			} ;
+
+		res = ogg_stream_packetout (&stream->os, &packet) ;
+
+		/* re-init, ready for processing */
+		ogg_stream_clear (&stream->os) ;
+		ogg_stream_init (&stream->os, serial) ;
+	}
+
+	stream->end = ogg_page_eos (page) ;
+	stream->serial = serial ;
+
+	return stream ;
+} /* find_stream_processor */
+
+static int
+ogg_length_get_next_page (SF_PRIVATE *psf, ogg_sync_state * osync, ogg_page *page)
+{	static const int CHUNK_SIZE = 4500 ;
+
+	while (ogg_sync_pageout (osync, page) <= 0)
+	{	char * buffer = ogg_sync_buffer (osync, CHUNK_SIZE) ;
+		int bytes = psf_fread (buffer, 1, 4096, psf) ;
+
+		if (bytes <= 0)
+		{	ogg_sync_wrote (osync, 0) ;
+			return 0 ;
+			} ;
+
+		ogg_sync_wrote (osync, bytes) ;
+		} ;
+
+	return 1 ;
+} /* ogg_length_get_next_page */
+
+static sf_count_t
+ogg_length_aux (SF_PRIVATE * psf)
+{
+	ogg_sync_state osync ;
+	ogg_page page ;
+	int gotpage = 0 ;
+	sf_count_t len = 0 ;
+	stream_set *processors ;
+
+	processors = create_stream_set () ;
+	if (processors == NULL)
+		return 0 ;	// out of memory?
+
+	ogg_sync_init (&osync) ;
+
+	while (ogg_length_get_next_page (psf, &osync, &page))
+	{
+		stream_processor *p = find_stream_processor (processors, &page) ;
+		gotpage = 1 ;
+
+		if (!p)
+		{	len = 0 ;
+			break ;
+			} ;
+
+		if (p->isillegal && !p->shownillegal)
+		{
+			p->shownillegal = 1 ;
+			/* If it's a new stream, we want to continue processing this page
+			** anyway to suppress additional spurious errors
+			*/
+			if (!p->isnew) continue ;
+			} ;
+
+		if (!p->isillegal)
+		{	ogg_packet packet ;
+			int header = 0 ;
+
+			ogg_stream_pagein (&p->os, &page) ;
+			if (p->doneheaders < 3)
+				header = 1 ;
+
+			while (ogg_stream_packetout (&p->os, &packet) > 0)
+			{
+				if (p->doneheaders < 3)
+				{	if (vorbis_synthesis_headerin (&p->vi, &p->vc, &packet) < 0)
+						continue ;
+					p->doneheaders ++ ;
+					} ;
+				} ;
+			if (!header)
+			{	sf_count_t gp = ogg_page_granulepos (&page) ;
+				if (gp > 0) p->lastgranulepos = gp ;
+				} ;
+			if (p->end)
+			{	vorbis_end (p, &len) ;
+				p->isillegal = 1 ;
+				} ;
+			} ;
+		} ;
+
+	ogg_sync_clear (&osync) ;
+	free_stream_set (processors, &len) ;
+
+	return len ;
+} /* ogg_length_aux */
+
 static sf_count_t
 ogg_length (SF_PRIVATE *psf)
-{	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
-	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	sf_count_t length ;
+{	sf_count_t length ;
+	int error ;
 
 	if (psf->sf.seekable == 0)
 		return SF_COUNT_MAX ;
 
-	while (odata->eos == 0)
-		ogg_read_sample (psf, NULL, 4096, ogg_rnull) ;
+	psf_fseek (psf, 0, SEEK_SET) ;
+	length = ogg_length_aux (psf) ;
 
-	length = vdata->loc ;
 	psf_fseek (psf, 12, SEEK_SET) ;
-	ogg_read_header (psf, 0) ;
+	if ((error = ogg_read_header (psf, 0)) != 0)
+		psf->error = error ;
 
 	return length ;
 } /* ogg_length */
-
