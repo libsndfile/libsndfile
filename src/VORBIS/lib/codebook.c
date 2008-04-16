@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: basic codebook pack/unpack/code/decode operations
- last mod: $Id: codebook.c 13293 2007-07-24 00:09:47Z xiphmont $
+ last mod: $Id: codebook.c 14604 2008-03-19 08:03:29Z xiphmont $
 
  ********************************************************************/
 
@@ -159,6 +159,8 @@ int vorbis_staticbook_unpack(oggpack_buffer *opb,static_codebook *s){
   s->entries=oggpack_read(opb,24);
   if(s->entries==-1)goto _eofout;
 
+  if(_ilog(s->dim)+_ilog(s->entries)>24)goto _eofout;
+
   /* codeword ordering.... length ordered or unordered? */
   switch((int)oggpack_read(opb,1)){
   case 0:
@@ -225,7 +227,7 @@ int vorbis_staticbook_unpack(oggpack_buffer *opb,static_codebook *s){
       int quantvals=0;
       switch(s->maptype){
       case 1:
-	quantvals=_book_maptype1_quantvals(s);
+	quantvals=(s->dim==0?0:_book_maptype1_quantvals(s));
 	break;
       case 2:
 	quantvals=s->entries*s->dim;
