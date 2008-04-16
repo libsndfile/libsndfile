@@ -11,6 +11,8 @@ AC_CONFIG_AUX_DIR(Cfg)
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
+AC_CONFIG_MACRO_DIR([M4])
+
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
 AC_CONFIG_HEADERS([src/config.h])
 
@@ -250,22 +252,8 @@ AC_CHECK_FUNCS(setlocale)
 AC_CHECK_LIB([m],floor)
 AC_CHECK_FUNCS(floor ceil fmod)
 
-case "$host_os" in
-	cygwin*)
-		AC_MSG_WARN([[Not using built-in lrint() and lrintf() because they are broken on Cygwin.]])
-		;;
-	*)
-		AC_C99_FUNC_LRINT
-		AC_C99_FUNC_LRINTF
-
-		if test "x$ac_cv_c99_lrint" = "xno" ; then
-			if test "x$ac_cv_c99_lrintf" = "xno" ; then
-				AC_MSG_WARN([[*** Missing C99 standard functions lrint() and lrintf().]])
-				AC_MSG_WARN([[*** This may cause benign compiler warnings on some systems (ie Solaris).]])
-				fi
-			fi
-		;;
-	esac
+AC_C99_FUNC_LRINT
+AC_C99_FUNC_LRINTF
 
 #====================================================================================
 # Check for requirements for building plugins for other languages/enviroments.
@@ -734,3 +722,6 @@ for f in "src/FLAC/src/libFLAC/Makefile" ; do
 			fi
 		fi
 	done
+
+(cd src && make genfiles)
+(cd tests && make genfiles)

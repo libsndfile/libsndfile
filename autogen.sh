@@ -2,9 +2,9 @@
 # Run this to set up the build system: configure, makefiles, etc.
 # (based on the version in enlightenment's cvs)
 
-ACLOCAL_FLAGS="-I M4"
-
 package="libsndfile"
+
+ACLOCAL_FLAGS="-I M4"
 
 olddir=`pwd`
 srcdir=`dirname $0`
@@ -127,6 +127,3 @@ autoconf || exit 1
 
 cd $olddir
 $srcdir/configure --enable-maintainer-mode --enable-gcc-werror "$@" && echo
-
-(cd src && make genfiles)
-(cd tests && make genfiles)
