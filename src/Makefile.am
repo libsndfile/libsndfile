@@ -28,7 +28,7 @@ COMMON = common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 
 FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c \
 		macbinary3.c macos.c mat4.c mat5.c nist.c ogg.c paf.c pvf.c raw.c rx2.c sd2.c \
-		sds.c svx.c txw.c voc.c wve.c w64.c wav_w64.c wav.c xi.c
+		sds.c svx.c txw.c voc.c wve.c w64.c wav_w64.c wav.c xi.c mpc2k.c
 
 # MinGW requires -no-undefined if a DLL is to be built.
 libsndfile_la_LDFLAGS = -no-undefined -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@ @OS_SPECIFIC_LIBLINKS@

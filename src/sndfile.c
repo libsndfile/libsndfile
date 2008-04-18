@@ -2239,6 +2239,9 @@ guess_file_type (SF_PRIVATE *psf)
 	if ((buffer [0] & MAKE_MARKER (0xFF, 0xFF, 0x80, 0xFF)) == MAKE_MARKER (0xF0, 0x7E, 0, 0x01))
 		return SF_FORMAT_SDS ;
 
+	if ((buffer [0] & 0xFFFF) == MAKE_MARKER (1, 4, 0, 0))
+		return SF_FORMAT_MPC2K ;
+
 	if (buffer [0] == MAKE_MARKER ('C', 'A', 'T', ' ') && buffer [2] == MAKE_MARKER ('R', 'E', 'X', '2'))
 		return SF_FORMAT_REX2 ;
 
@@ -2653,6 +2656,10 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 
 		case	SF_FORMAT_CAF :
 				error = caf_open (psf) ;
+				break ;
+
+		case	SF_FORMAT_MPC2K :
+				error = mpc2k_open (psf) ;
 				break ;
 
 		/* Lite remove end */
