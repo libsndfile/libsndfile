@@ -82,7 +82,8 @@ static OUTPUT_FORMAT_MAP format_map [] =
 	{	"vox",		0, 	SF_FORMAT_RAW 	},
 	{	"xi",		0, 	SF_FORMAT_XI 	},
 	{	"wve",		0,	SF_FORMAT_WVE	},
-	{	"oga",		0,	SF_FORMAT_OGG	}
+	{	"oga",		0,	SF_FORMAT_OGG	},
+	{	"mpc",		0,	SF_FORMAT_MPC2K	},
 } ; /* format_map */
 
 static int

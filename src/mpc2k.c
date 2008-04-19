@@ -43,7 +43,8 @@
 **	Data are always non compressed 16 bits interleaved
 */
 
-#define HEADER_NAME_LEN	17	/* As above */
+#define HEADER_LENGTH		42	/* Sum of above data fields. */
+#define HEADER_NAME_LEN		17	/* Length of name string. */
 
 #define	SFE_MPC_NO_MARKER	666
 
@@ -105,27 +106,22 @@ mpc2k_close	(SF_PRIVATE *psf)
 
 static int
 mpc2k_write_header (SF_PRIVATE *psf, int calc_length)
-{	sf_count_t	current ;
-	int			encoding, datalength ;
+{	char sample_name [HEADER_NAME_LEN + 1] ;
+	sf_count_t	current ;
 
 	if (psf->pipeoffset > 0)
 		return 0 ;
 
 	current = psf_ftell (psf) ;
-	datalength = 0 ;
 
 	if (calc_length)
 	{	psf->filelength = psf_get_filelen (psf) ;
 
+		psf->dataoffset = HEADER_LENGTH ;
 		psf->datalength = psf->filelength - psf->dataoffset ;
-		if (psf->dataend)
-			psf->datalength -= psf->filelength - psf->dataend ;
 
 		psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
 		} ;
-
-	if (! encoding)
-		return (psf->error = SFE_BAD_OPEN_FORMAT) ;
 
 	/* Reset the current header length to zero. */
 	psf->header [0] = 0 ;
@@ -138,7 +134,28 @@ mpc2k_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->is_pipe == SF_FALSE)
 		psf_fseek (psf, 0, SEEK_SET) ;
 
-	return psf->error ;
+	snprintf (sample_name, sizeof (sample_name), "%s            ", psf->filename) ;
+
+	psf_binheader_writef (psf, "e11b", 1, 4, sample_name, HEADER_NAME_LEN) ;
+	psf_binheader_writef (psf, "e111", 1, 4, 100, 0, (psf->sf.channels - 1) & 1) ;
+	psf_binheader_writef (psf, "et4888", 0, psf->sf.frames, psf->sf.frames, psf->sf.frames) ;
+	psf_binheader_writef (psf, "e112", 0, 1, (uint16_t) psf->sf.samplerate) ;
+
+	/* Always 16 bit little endian data. */
+	psf->bytewidth = 2 ;
+	psf->endian = SF_ENDIAN_LITTLE ;
+
+	if (psf->headindex != HEADER_LENGTH)
+		printf ("psf->headindex != HEADER_LENGTH (%d)\n", psf->headindex) ;
+
+	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+
+	if (psf->error)
+		return psf->error ;
+
+	psf->dataoffset = psf->headindex ;
+
+	return 0 ;
 } /* mpc2k_write_header */
 
 static int
@@ -167,7 +184,7 @@ mpc2k_read_header (SF_PRIVATE *psf)
 
 	psf_binheader_readf (psf, "eb2", bytes, 2, &sample_rate) ;
 
-	psf_log_printf (psf, "  Loop mode    : %s\n  Sample rate  : %d\n", bytes [0] ? "None" : "Fwd", sample_rate) ;
+	psf_log_printf (psf, "  Loop mode    : %s\n  Beats        : %d\n  Sample rate  : %d\nEnd\n", bytes [0] ? "None" : "Fwd", bytes [1], sample_rate) ;
 
 	psf->sf.samplerate = sample_rate ;
 
@@ -180,9 +197,7 @@ mpc2k_read_header (SF_PRIVATE *psf)
 	psf->endian = SF_ENDIAN_LITTLE ;
 
 	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
-
-	if (! psf->sf.frames && psf->blockwidth)
-		psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;
+	psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;
 
 	return 0 ;
 } /* mpc2k_read_header */

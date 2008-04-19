@@ -788,6 +788,16 @@ sf_format_check	(const SF_INFO *info)
 					return 1 ;
 				break ;
 
+		case SF_FORMAT_MPC2K :
+				/* MPC2000 is strictly little endian. */
+				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
+					return 0 ;
+				if (info->channels > 2)
+					return 0 ;
+				if (subformat == SF_FORMAT_PCM_16)
+					return 1 ;
+				break ;
+
 		default : break ;
 		} ;
 
