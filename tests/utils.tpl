@@ -744,7 +744,7 @@ write_mono_file (const char * filename, int format, int srate, float * output, i
 		} ;
 
 	sf_write_float (file, output, len) ;
-	
+
 	sf_close (file) ;
 } /* write_mono_file */
 

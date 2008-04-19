@@ -446,7 +446,7 @@ linux_open_dsp_device (int channels, int srate)
 	fmt = CPU_IS_BIG_ENDIAN ? AFMT_S16_BE : AFMT_S16_LE ;
 	if (ioctl (fd, SNDCTL_DSP_SETFMT, &fmt) != 0)
 	{	perror ("linux_open_dsp_device : set format ") ;
-	    exit (1) ;
+		exit (1) ;
   		} ;
 
 	if (ioctl (fd, SNDCTL_DSP_CHANNELS, &channels) != 0)

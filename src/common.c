@@ -1305,7 +1305,7 @@ psf_rand_int32 (void)
 /*==============================================================================
 */
 
-#define CASE_NAME(x)       case x : return #x ; break ;
+#define CASE_NAME(x)		case x : return #x ; break ;
 
 const char *
 str_of_major_format (int format)

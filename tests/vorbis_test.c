@@ -69,7 +69,7 @@ vorbis_test (void)
 	*/
 	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
 	{	const char * errstr ;
-	
+
 		errstr = sf_strerror (NULL) ;
 		if (strstr (errstr, "Sample rate chosen is known to trigger a Vorbis") == NULL)
 		{	printf ("Line %d: sf_open_fd (SFM_WRITE) failed : %s\n", __LINE__, errstr) ;

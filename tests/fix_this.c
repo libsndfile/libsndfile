@@ -45,8 +45,8 @@ static	void	gen_signal_double (double *data, double scale, int datalen) ;
 */
 
 typedef union
-{	double	d [BUFFER_SIZE + 1];
-	int 	i [BUFFER_SIZE + 1];
+{	double	d [BUFFER_SIZE + 1] ;
+	int 	i [BUFFER_SIZE + 1] ;
 } BUFFER ;
 
 static	BUFFER	data_buffer ;

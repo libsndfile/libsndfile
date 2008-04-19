@@ -1063,7 +1063,7 @@ raw_needs_endswap_test (const char *filename, int filetype)
 					continue ;
 				default :
 					break ;
-				} ;	
+				} ;
 
 		memset (&sfinfo, 0, sizeof (sfinfo)) ;
 		sfinfo.samplerate	= 11025 ;

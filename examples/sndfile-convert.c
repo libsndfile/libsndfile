@@ -332,7 +332,7 @@ main (int argc, char * argv [])
 
 	if ((outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT)
 			|| (infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT)
-			|| (infileminor == SF_FORMAT_VORBIS)|| (outfileminor == SF_FORMAT_VORBIS))
+			|| (infileminor == SF_FORMAT_VORBIS) || (outfileminor == SF_FORMAT_VORBIS))
 		copy_data_fp (outfile, infile, sfinfo.channels) ;
 	else
 		copy_data_int (outfile, infile, sfinfo.channels) ;
