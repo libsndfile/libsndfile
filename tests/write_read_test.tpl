@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 1999-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,6 +84,7 @@ main (int argc, char **argv)
 		printf ("           voc   - Create Voice file functions\n") ;
 		printf ("           w64   - Sonic Foundry's W64 file functions\n") ;
 		printf ("           flac  - test FLAC file functions\n") ;
+		printf ("           mpc2k - test MPC 2000 file functions\n") ;
 		printf ("           all   - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -309,6 +310,11 @@ main (int argc, char **argv)
 
 	if (do_all || ! strcmp (argv [1], "htk"))
 	{	pcm_test_short	("short.htk", SF_FORMAT_HTK | SF_FORMAT_PCM_16, SF_FALSE) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "mpc2k"))
+	{	pcm_test_short	("short.mpc", SF_FORMAT_MPC2K | SF_FORMAT_PCM_16, SF_FALSE) ;
 		test_count++ ;
 		} ;
 

@@ -210,6 +210,12 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
+	if (do_all || ! strcmp (argv [1], "mpc2k"))
+	{	update_header_test ("header.mpc", SF_FORMAT_MPC2K) ;
+		update_seek_short_test ("header_short.mpc", SF_FORMAT_MPC2K) ;
+		test_count++ ;
+		} ;
+
 	if (test_count == 0)
 	{	printf ("Mono : ************************************\n") ;
 		printf ("Mono : *  No '%s' test defined.\n", argv [1]) ;

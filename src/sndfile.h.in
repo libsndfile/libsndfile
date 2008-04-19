@@ -68,6 +68,7 @@ enum
 	SF_FORMAT_CAF			= 0x180000,		/* Core Audio File format */
 	SF_FORMAT_WVE			= 0x190000,		/* Psion WVE format */
 	SF_FORMAT_OGG			= 0x200000,		/* Xiph OGG container */
+	SF_FORMAT_MPC2K			= 0x210000,		/* Akai MPC 2000 sampler */
 
 	/* Subtypes from here on. */
 

@@ -186,7 +186,7 @@ endif
 check: generic-tests wav-tests aiff-tests au-tests caf-tests raw-tests \
 	paf-tests svx-tests nist-tests ircam-tests voc-tests w64-tests mat4-tests \
 	mat5-tests pvf-tests xi-tests htk-tests avr-tests sds-tests sd2-tests \
-	flac-tests caf-tests wve-tests vorbis-tests io-tests
+	flac-tests caf-tests wve-tests vorbis-tests mpc2k-tests io-tests
 
 generic-tests : error_test ulaw_test alaw_test command_test floating_point_test \
 		pcm_test win32_ordinal_test $(CPP_TEST)
@@ -429,6 +429,14 @@ flac-tests: write_read_test
 	./string_test flac
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on FLAC files."
+	@echo "----------------------------------------------------------------------"
+
+mpc2k-tests: write_read_test misc_test
+	./write_read_test mpc2k
+	./header_test mpc2k
+	./misc_test mpc2k
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion` passed tests on MPC 2000 files."
 	@echo "----------------------------------------------------------------------"
 
 # Lite remove end
