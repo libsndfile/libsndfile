@@ -1,4 +1,9 @@
-2008-04-17
+2008-04-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Set object format to aout for OS/2. Thanks to David Yeo.
+
+2008-04-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/VORBIS/lib/codebook.c
     Sync from upstream SVN.

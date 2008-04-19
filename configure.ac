@@ -400,6 +400,9 @@ case "$host" in
 		NASM_FLAGS="-DFLAC__PUBLIC_NEEDS_UNDERSCORE"
 		OS_SPECIFIC_LIBLINKS="-Wl,-read_only_relocs -Wl,suppress"
 		;;
+	*-*-os2-emx)
+		OBJ_FORMAT=aout
+		;;
 	*)
 		OBJ_FORMAT=elf ;;
 	esac
