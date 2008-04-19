@@ -136,17 +136,14 @@ mpc2k_write_header (SF_PRIVATE *psf, int calc_length)
 
 	snprintf (sample_name, sizeof (sample_name), "%s            ", psf->filename) ;
 
-	psf_binheader_writef (psf, "e11b", 1, 4, sample_name, HEADER_NAME_LEN) ;
-	psf_binheader_writef (psf, "e111", 1, 4, 100, 0, (psf->sf.channels - 1) & 1) ;
+	psf_binheader_writef (psf, "e11b", 1, 4, sample_name, make_size_t (HEADER_NAME_LEN)) ;
+	psf_binheader_writef (psf, "e111", 100, 0, (psf->sf.channels - 1) & 1) ;
 	psf_binheader_writef (psf, "et4888", 0, psf->sf.frames, psf->sf.frames, psf->sf.frames) ;
 	psf_binheader_writef (psf, "e112", 0, 1, (uint16_t) psf->sf.samplerate) ;
 
 	/* Always 16 bit little endian data. */
 	psf->bytewidth = 2 ;
 	psf->endian = SF_ENDIAN_LITTLE ;
-
-	if (psf->headindex != HEADER_LENGTH)
-		printf ("psf->headindex != HEADER_LENGTH (%d)\n", psf->headindex) ;
 
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 
@@ -155,7 +152,10 @@ mpc2k_write_header (SF_PRIVATE *psf, int calc_length)
 
 	psf->dataoffset = psf->headindex ;
 
-	return 0 ;
+	if (current > 0)
+		psf_fseek (psf, current, SEEK_SET) ;
+
+	return psf->error ;
 } /* mpc2k_write_header */
 
 static int
@@ -165,7 +165,7 @@ mpc2k_read_header (SF_PRIVATE *psf)
 	uint32_t sample_start, loop_end, sample_frames, loop_length ;
 	uint16_t sample_rate ;
 
-	psf_binheader_readf (psf, "pebb", 0, bytes, 2, sample_name, HEADER_NAME_LEN) ;
+	psf_binheader_readf (psf, "pebb", 0, bytes, 2, sample_name, make_size_t (HEADER_NAME_LEN)) ;
 
 	if (bytes [0] != 1 || bytes [1] != 4)
 		return SFE_MPC_NO_MARKER ;
@@ -178,7 +178,7 @@ mpc2k_read_header (SF_PRIVATE *psf)
 
 	psf->sf.channels = bytes [2] ? 2 : 1 ;
 
-	psf_log_printf (psf, "  Level        : %d\n  Tune         : %d\n  Channels     : %d\n", bytes [0], bytes [1], psf->sf.channels) ;
+	psf_log_printf (psf, "  Level        : %d\n  Tune         : %d\n  Stereo       : %s\n", bytes [0], bytes [1], bytes [2] ? "Yes" : "No") ;
 
 	psf_log_printf (psf, "  Sample start : %d\n  Loop end     : %d\n  Frames       : %d\n  Length       : %d\n", sample_start, loop_end, sample_frames, loop_length) ;
 
@@ -196,7 +196,10 @@ mpc2k_read_header (SF_PRIVATE *psf)
 	psf->bytewidth = 2 ;
 	psf->endian = SF_ENDIAN_LITTLE ;
 
+	psf->datalength = psf->filelength - psf->dataoffset ;
 	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
+	psf->sf.frames = psf->datalength / psf->blockwidth ;
+
 	psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;
 
 	return 0 ;

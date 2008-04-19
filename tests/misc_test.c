@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -175,6 +175,13 @@ main (int argc, char *argv [])
 	{	zero_data_test ("zerolen.sds", SF_FORMAT_SDS) ;
 		filesystem_full_test (SF_FORMAT_SDS) ;
 		permission_test ("readonly.sds", SF_FORMAT_SDS) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "mpc2k"))
+	{	zero_data_test ("zerolen.mpc", SF_FORMAT_MPC2K) ;
+		filesystem_full_test (SF_FORMAT_MPC2K) ;
+		permission_test ("readonly.mpc", SF_FORMAT_MPC2K) ;
 		test_count++ ;
 		} ;
 
