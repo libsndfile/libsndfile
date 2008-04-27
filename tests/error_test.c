@@ -167,11 +167,55 @@ bad_wav_test (const char * filename)
 	puts ("ok") ;
 } /* bad_wav_test */
 
+static void
+error_close_test (void)
+{	static short buffer [SHORT_BUFFER] ;
+	const char	*filename = "error_close.wav" ;
+	SNDFILE		*sndfile ;
+	SF_INFO		sfinfo ;
+	FILE		*file ;
+
+	print_test_name (__func__, filename) ;
+
+	/* Open a FILE* from which we will extract a file descriptor. */
+	if ((file = fopen (filename, "w")) == NULL)
+	{	printf ("\n\nLine %d : fopen returned NULL.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	/* Set parameters for writing the file. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.channels = 1 ;
+	sfinfo.samplerate = 44100 ;
+	sfinfo.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
+
+	sndfile = sf_open_fd (fileno (file), SFM_WRITE, &sfinfo, SF_TRUE) ;
+	if (sndfile == NULL)
+	{	printf ("\n\nLine %d : sf_open_fd failed : %s\n", __LINE__, sf_strerror (NULL)) ;
+		exit (1) ;
+		} ;
+
+	test_write_short_or_die (sndfile, 0, buffer, ARRAY_LEN (buffer), __LINE__) ;
+
+	/* Now close the fd associated with file before calling sf_close. */
+	fclose (file) ;
+
+	if (sf_close (sndfile) == 0)
+	{	printf ("\n\nLine %d : sf_close should not have returned zero.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* error_close_test */
+
 int
 main (void)
 {
 	error_number_test () ;
 	error_value_test () ;
+
+	error_close_test () ;
 
 	no_file_test ("no_file.wav") ;
 	zero_length_test ("zero_length.wav") ;

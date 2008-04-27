@@ -1,3 +1,13 @@
+2008-04-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/error_test.c
+    Add a test to make sure if file opened with sf_open_fd, and then the file
+    descriptor is closed, then sf_close will return an error code. Thanks to
+    Dave Flogeras for the but report.
+
+    * src/sndfile.c
+    Make sf_close return an error is the file descriptor is already closed.
+
 2008-04-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac

@@ -2355,14 +2355,14 @@ copy_filename (SF_PRIVATE *psf, const char *path)
 
 static int
 psf_close (SF_PRIVATE *psf)
-{	int	error ;
+{	int	error = 0 ;
 
 	if (psf->codec_close)
 		error = psf->codec_close (psf) ;
 	if (psf->container_close)
 		error = psf->container_close (psf) ;
 
-	psf_fclose (psf) ;
+	error = psf_fclose (psf) ;
 	psf_close_rsrc (psf) ;
 
 	if (psf->container_data)
@@ -2400,7 +2400,7 @@ psf_close (SF_PRIVATE *psf)
 	memset (psf, 0, sizeof (SF_PRIVATE)) ;
 	free (psf) ;
 
-	return 0 ;
+	return error ;
 } /* psf_close */
 
 static SNDFILE *
