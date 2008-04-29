@@ -653,9 +653,6 @@
 
 2007-04-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
-    * examples/sndfile-data-trim.c
-    New file. Program incomplete.
-
     * src/GSM610/long_term.c src/macbinary3.c tests/cpp_test.cc
     Add patch from André Pang to clean up compiles on OSX.
 
