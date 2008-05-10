@@ -1,3 +1,10 @@
+2008-05-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/api.html doc/command.html
+    Move all information about the sf_command function to command.html and add
+    a link from documentation of the sf_read/write_raw function to the
+    SFC_RAW_NEEDS_ENDSWAP command.
+
 2008-05-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
@@ -8,7 +15,7 @@
     * tests/error_test.c
     Add a test to make sure if file opened with sf_open_fd, and then the file
     descriptor is closed, then sf_close will return an error code. Thanks to
-    Dave Flogeras for the but report.
+    Dave Flogeras for the bug report.
 
     * src/sndfile.c
     Make sf_close return an error is the file descriptor is already closed.
@@ -21,7 +28,7 @@
     * src/mpc2k.c src/sndfile.c src/sndfile.h.in src/common.h src/Makefile.am
     Add ability to read MPC 2000 file.
 
-    * tests/write_read_test.tpl tests/misc_test.c tests/header_test.tpl 
+    * tests/write_read_test.tpl tests/misc_test.c tests/header_test.tpl
         tests/Makefile.am
     Add tests for MPC 2000 file format.
 
