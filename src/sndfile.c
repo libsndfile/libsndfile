@@ -1093,7 +1093,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			if ((psf->mode != SFM_WRITE) && (psf->mode != SFM_RDWR))
 				return SF_FALSE ;
 			/* If data has already been written this must fail. */
-			if (psf->have_written)
+			if (psf->broadcast_info == NULL && psf->have_written)
 				return SF_FALSE ;
 
 			if (psf->broadcast_info == NULL)
@@ -1228,7 +1228,13 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 	if (psf->error)
 		return PSF_SEEK_ERROR ;
 
-	if (seek_from_start < 0 || seek_from_start > psf->sf.frames)
+	if (psf->mode == SFM_RDWR || psf->mode == SFM_WRITE)
+	{	if (seek_from_start < 0)
+		{	psf->error = SFE_BAD_SEEK ;
+			return PSF_SEEK_ERROR ;
+			} ;
+		}
+	else if (seek_from_start < 0 || seek_from_start > psf->sf.frames)
 	{	psf->error = SFE_BAD_SEEK ;
 		return PSF_SEEK_ERROR ;
 		} ;

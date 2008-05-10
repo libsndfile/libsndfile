@@ -1,3 +1,12 @@
+2008-05-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/write_read_test.tpl
+    Add a test for extending a file during write by seeking past the current
+    end of file.
+
+    * src/sndfile.c
+    Allow seeking past end of file during write.
+
 2008-05-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/api.html doc/command.html
