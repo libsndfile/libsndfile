@@ -5,6 +5,9 @@
     a link from documentation of the sf_read/write_raw function to the
     SFC_RAW_NEEDS_ENDSWAP command.
 
+    * doc/FAQ.html doc/libsndfile.css
+    Minor documentation tweaks.
+
 2008-05-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
