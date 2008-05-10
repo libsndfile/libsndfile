@@ -407,6 +407,7 @@ static void stereo_[+ (get "type_name") +]_test (const char *filename, int forma
 static void mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int long_file_ok, int allow_fd) ;
 static void new_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int allow_fd) ;
 static void multi_seek_test (const char * filename, int format) ;
+static void write_seek_extend_test (const char * filename, int format) ;
 
 static void
 pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_file_ok)
@@ -614,6 +615,7 @@ mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_fi
 	sf_close (file) ;
 
 	multi_seek_test (filename, format) ;
+	write_seek_extend_test (filename, format) ;
 
 } /* mono_[+ (get "type_name") +]_test */
 
@@ -1034,11 +1036,17 @@ static void
 multi_seek_test (const char * filename, int format)
 {	SNDFILE * file ;
 	SF_INFO info ;
+	sf_count_t pos ;
 	int k ;
 
-	/* This test doesn't work on RAW files. */
-	if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW)
-		return ;
+	/* This test doesn't work on the following. */
+	switch (format & SF_FORMAT_TYPEMASK)
+	{	case SF_FORMAT_RAW :
+			return ;
+
+		default :
+			break ;
+		} ;
 
 	memset (&info, 0, sizeof (info)) ;
 
@@ -1047,9 +1055,78 @@ multi_seek_test (const char * filename, int format)
 	file = test_open_file_or_die (filename, SFM_READ, &info, SF_FALSE, __LINE__) ;
 
 	for (k = 0 ; k < 10 ; k++)
-		sf_seek (file, info.frames / (k + 1), SEEK_SET) ;
+	{	pos = info.frames / (k + 2) ;
+		test_seek_or_die (file, pos, SEEK_SET, pos, info.channels, __LINE__) ;
+		} ;
 
 	sf_close (file) ;
 } /* multi_seek_test */
+
+static void
+write_seek_extend_test (const char * filename, int format)
+{	SNDFILE * file ;
+	SF_INFO info ;
+	sf_count_t items ;
+	short	*orig, *test ;
+	unsigned k ;
+
+	/* This test doesn't work on the following. */
+	switch (format & SF_FORMAT_TYPEMASK)
+	{	case SF_FORMAT_FLAC :
+		case SF_FORMAT_HTK :
+		case SF_FORMAT_PAF :
+		case SF_FORMAT_SDS :
+		case SF_FORMAT_SVX :
+			return ;
+
+		default :
+			break ;
+		} ;
+
+	memset (&info, 0, sizeof (info)) ;
+
+	info.samplerate = 48000 ;
+	info.channels = 1 ;
+	info.format = format ;
+
+	items = 512 ;
+	exit_if_true (items > ARRAY_LEN (orig_data.s), "Line %d : Bad assumption.\n", __LINE__) ;
+
+	orig = orig_data.s ;
+	test = test_data.s ;
+
+	for (k = 0 ; k < ARRAY_LEN (orig_data.s) ; k++)
+		orig [k] = 0x3fff ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &info, SF_FALSE, __LINE__) ;
+	test_write_short_or_die (file, 0, orig, items, __LINE__) ;
+
+	/* Extend the file using a seek. */
+	test_seek_or_die (file, 2 * items, SEEK_SET, 2 * items, info.channels, __LINE__) ;
+
+	test_writef_short_or_die (file, 0, orig, items, __LINE__) ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &info, SF_FALSE, __LINE__) ;
+	test_read_short_or_die (file, 0, test, 3 * items, __LINE__) ;
+	sf_close (file) ;
+
+	/* Can't do these formats due to scaling. */
+	switch (format & SF_FORMAT_SUBMASK)
+	{	case SF_FORMAT_PCM_S8 :
+		case SF_FORMAT_PCM_U8 :
+			return ;
+		default :
+			break ;
+		} ;
+
+	for (k = 0 ; k < items ; k++)
+	{	exit_if_true (test [k] != 0x3fff, "Line %d : test [%d] == %d, should be 0x3fff.\n", __LINE__, k, test [k]) ;
+		exit_if_true (test [items + k] != 0, "Line %d : test [%d] == %d, should be 0.\n", __LINE__, items + k, test [items + k]) ;
+		exit_if_true (test [2 * items + k] != 0x3fff, "Line %d : test [%d] == %d, should be 0x3fff.\n", __LINE__, 2 * items + k, test [2 * items + k]) ;
+		} ;
+
+	return ;
+} /* write_seek_extend_test */
 
 
