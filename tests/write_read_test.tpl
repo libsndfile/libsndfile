@@ -1066,9 +1066,8 @@ static void
 write_seek_extend_test (const char * filename, int format)
 {	SNDFILE * file ;
 	SF_INFO info ;
-	sf_count_t items ;
 	short	*orig, *test ;
-	unsigned k ;
+	unsigned items, k ;
 
 	/* This test doesn't work on the following. */
 	switch (format & SF_FORMAT_TYPEMASK)
