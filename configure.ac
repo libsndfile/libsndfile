@@ -20,7 +20,6 @@ dnl Add parameters for aclocal
 AC_SUBST(ACLOCAL_AMFLAGS, "-I M4")
 
 AC_LANG([C])
-AM_PROG_CC_C_O
 
 #------------------------------------------------------------------------------------
 # Rules for library version information:
@@ -41,6 +40,7 @@ AM_PROG_CC_C_O
 SHARED_VERSION_INFO="1:18:0"
 
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_CXX
 AM_PROG_LIBTOOL
 
