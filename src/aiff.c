@@ -531,7 +531,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					if (! psf->sf.seekable)
 						break ;
 
-					/*      Seek to end of SSND chunk. */
+					/* Seek to end of SSND chunk. */
 					psf_fseek (psf, psf->dataoffset + psf->datalength + (SSNDsize & 1), SEEK_SET) ;
 					break ;
 
