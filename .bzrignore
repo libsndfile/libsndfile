@@ -31,7 +31,6 @@ autom4te.cache
 config.log
 config.status
 configure
-doc/libsndfile.css
 examples/cooledit-fixer
 examples/generate
 examples/list_formats
