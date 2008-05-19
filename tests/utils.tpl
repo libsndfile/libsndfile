@@ -241,14 +241,20 @@ void
 print_test_name (const char *test, const char *filename)
 {	int count ;
 
-	if (test == NULL || filename == NULL)
+	if (test == NULL)
 	{	printf (__FILE__ ": bad test of filename parameter.\n") ;
 		exit (1) ;
 		} ;
 
-	printf ("    %-30s : %s ", test, filename) ;
+	if (filename == NULL || strlen (filename) == 0)
+	{	printf ("    %-30s : ", test) ;
+		count = 25 ;
+		}
+	else
+	{	printf ("    %-30s : %s ", test, filename) ;
+		count = 24 - strlen (filename) ;
+		} ;
 
-	count = 24 - strlen (filename) ;
 	while (count -- > 0)
 		putchar ('.') ;
 	putchar (' ') ;
