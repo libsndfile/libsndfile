@@ -54,7 +54,7 @@ void	check_file_hash_or_die	(const char *filename, unsigned int target_hash, int
 
 void	print_test_name (const char *test, const char *filename) ;
 
-void	dump_data_to_file (const char *filename, void *data, unsigned int datalen) ;
+void	dump_data_to_file (const char *filename, const void *data, unsigned int datalen) ;
 
 void	write_mono_file (const char * filename, int format, int srate, float * output, int len) ;
 
@@ -263,7 +263,7 @@ print_test_name (const char *test, const char *filename)
 } /* print_test_name */
 
 void
-dump_data_to_file (const char *filename, void *data, unsigned int datalen)
+dump_data_to_file (const char *filename, const void *data, unsigned int datalen)
 {	FILE *file ;
 
 	if ((file = fopen (filename, "wb")) == NULL)
