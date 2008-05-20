@@ -111,6 +111,11 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 	psf_log_printf (psf, "  Sample Rate   : %d\n", wav_fmt->min.samplerate) ;
 	psf_log_printf (psf, "  Block Align   : %d\n", wav_fmt->min.blockalign) ;
 
+	if (wav_fmt->min.blockalign == 0)
+	{	psf_log_printf (psf, "*** Error : wav_fmt->min.blockalign should not be zero.\n") ;
+		return SFE_INTERNAL ;
+		} ;
+
 	if (wav_fmt->format == WAVE_FORMAT_PCM && wav_fmt->min.bitwidth == 24 &&
 			wav_fmt->min.blockalign == 4 * wav_fmt->min.channels)
 	{	psf_log_printf (psf, "  Bit Width     : 24\n") ;
