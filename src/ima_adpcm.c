@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -194,6 +194,11 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 	psf->datalength = (psf->dataend) ? psf->dataend - psf->dataoffset :
 							psf->filelength - psf->dataoffset ;
 
+    if (pima->blocksize == 0)
+	{	psf_log_printf (psf, "*** Error : pima->blocksize should not be zero.\n") ;
+		return SFE_INTERNAL ;
+		} ;
+
 	if (psf->datalength % pima->blocksize)
 		pima->blocks = psf->datalength / pima->blocksize + 1 ;
 	else
@@ -205,7 +210,9 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 				count = 2 * (pima->blocksize - 4 * pima->channels) / pima->channels + 1 ;
 
 				if (pima->samplesperblock != count)
-					psf_log_printf (psf, "*** Warning : samplesperblock should be %d.\n", count) ;
+				{	psf_log_printf (psf, "*** Error : samplesperblock should be %d.\n", count) ;
+					return SFE_INTERNAL ;
+					} ;
 
 				pima->decode_block = wav_w64_ima_decode_block ;
 
