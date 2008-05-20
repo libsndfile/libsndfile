@@ -259,7 +259,8 @@ static int
 mat5_read_header (SF_PRIVATE *psf)
 {	char	name [32] ;
 	short	version, endian ;
-	int		type, size, flags1, flags2, rows, cols ;
+	int		type, flags1, flags2, rows, cols ;
+	unsigned size ;
 
 	psf_binheader_readf (psf, "pb", 0, psf->u.cbuf, 124) ;
 
