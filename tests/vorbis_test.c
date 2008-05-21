@@ -166,8 +166,12 @@ vorbis_quality_test (void)
 int
 main (void)
 {
-	vorbis_test () ;
-	vorbis_quality_test () ;
+	if (HAVE_EXTERNAL_LIBS)
+	{	vorbis_test () ;
+		vorbis_quality_test () ;
+		}
+	else
+		puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
 
 	return 0 ;
 } /* main */

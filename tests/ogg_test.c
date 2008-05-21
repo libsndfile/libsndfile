@@ -326,14 +326,17 @@ ogg_stereo_seek_test (const char * filename, int format)
 int
 main (void)
 {
-	ogg_short_test () ;
-	ogg_int_test () ;
-	ogg_float_test () ;
-	ogg_double_test () ;
+	if (HAVE_EXTERNAL_LIBS)
+	{	ogg_short_test () ;
+		ogg_int_test () ;
+		ogg_float_test () ;
+		ogg_double_test () ;
 
-	/*-ogg_stereo_seek_test ("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;-*/
-	ogg_stereo_seek_test ("vorbis_seek.ogg", SF_FORMAT_OGG | SF_FORMAT_VORBIS) ;
-
+		/*-ogg_stereo_seek_test ("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;-*/
+		ogg_stereo_seek_test ("vorbis_seek.ogg", SF_FORMAT_OGG | SF_FORMAT_VORBIS) ;
+		}
+	else
+		puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
 
 	return 0 ;
 } /* main */

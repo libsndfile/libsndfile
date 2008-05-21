@@ -9,6 +9,10 @@
     * configure.ac src/Makefile.am src/flac.c src/ogg.c
     Link to external versions of FLAC, Ogg and Vorbis.
 
+    * tests/lossy_comp_test.c tests/ogg_test.c tests/string_test.c
+        tests/vorbis_test.c tests/write_read_test.tpl
+    Fix tests when configured with --disable-external-libs.
+
 2008-05-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/write_read_test.tpl
