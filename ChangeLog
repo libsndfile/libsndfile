@@ -16,6 +16,10 @@
     * tests/external_libs_test.c tests/Makefile.am
     Add new test and hook into build and test suite.
 
+    * src/command.c
+    Use HAVE_EXTERNAL_LIBS to ensure that the SFC_GET_FORMAT_* commands return
+    the right data when external libs are disabled.
+
 2008-05-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/write_read_test.tpl
