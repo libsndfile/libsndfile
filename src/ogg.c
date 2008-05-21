@@ -1141,7 +1141,7 @@ ogg_length (SF_PRIVATE *psf)
 #else /* HAVE_EXTERNAL_LIBS */
 
 int
-ogg_open	(SF_PRIVATE * UNUSED (psf))
+ogg_open	(SF_PRIVATE *psf)
 {
 	psf_log_printf (psf, "This version of libsndfile was compiled without Ogg/Vorbis support.\n") ;
 	return SFE_UNIMPLEMENTED ;

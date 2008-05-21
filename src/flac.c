@@ -1307,7 +1307,7 @@ flac_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 #else /* HAVE_EXTERNAL_LIBS */
 
 int
-flac_open	(SF_PRIVATE * UNUSED (psf))
+flac_open	(SF_PRIVATE *psf)
 {
 	psf_log_printf (psf, "This version of libsndfile was compiled without FLAC support.\n") ;
 	return SFE_UNIMPLEMENTED ;
