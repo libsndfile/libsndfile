@@ -782,6 +782,7 @@ current_sf_info_test	(const char *filename)
 		) ;
 
 	/* Read file making sure no channel map exists. */
+	memset (&ininfo, 0, sizeof (ininfo)) ;
 	infile = test_open_file_or_die (filename, SFM_READ, &ininfo, SF_TRUE, __LINE__) ;
 
 	last_count = ininfo.frames ;
