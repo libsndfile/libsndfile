@@ -6,6 +6,9 @@
     * src/ogg.c
     Add call to ogg_stream_clear to fix valgrind warning.
 
+    * src/aiff.c
+    Fix x86_64 compile issue.
+
 2008-05-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/write_read_test.tpl

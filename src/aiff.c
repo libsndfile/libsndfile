@@ -912,7 +912,7 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 		bytesread += psf_binheader_readf (psf, "Em1", &(comm_fmt->encoding), &encoding_len) ;
 
-		comm_fmt->size = SF_MIN (sizeof (psf->u.scbuf), comm_fmt->size) ;
+		comm_fmt->size = SF_MIN (sizeof (psf->u.scbuf), make_size_t (comm_fmt->size)) ;
 		memset (psf->u.scbuf, 0, comm_fmt->size) ;
 		read_len = comm_fmt->size - SIZEOF_AIFC_COMM + 1 ;
 		bytesread += psf_binheader_readf (psf, "b", psf->u.scbuf, read_len) ;
