@@ -181,6 +181,7 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 	**	Get the serial number and set up the rest of decode.
 	**	Serialno first ; use it to set up a logical stream.
 	*/
+	ogg_stream_clear (&odata->os) ;
 	ogg_stream_init (&odata->os, ogg_page_serialno (&odata->og)) ;
 
 	/*
@@ -471,8 +472,6 @@ ogg_close (SF_PRIVATE *psf)
 		}
 	}
 
-	ogg_stream_clear (&odata->os) ;
-
 	/* ogg_page and ogg_packet structs always point to storage in
 	   libvorbis.  They are never freed or manipulated directly */
 
@@ -484,6 +483,7 @@ ogg_close (SF_PRIVATE *psf)
 
 	/* OK, clean up the framer */
 	ogg_sync_clear (&odata->oy) ;
+	ogg_stream_clear (&odata->os) ;
 
 	return 0 ;
 } /* ogg_close */
