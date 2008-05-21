@@ -13,6 +13,9 @@
         tests/vorbis_test.c tests/write_read_test.tpl
     Fix tests when configured with --disable-external-libs.
 
+    * tests/external_libs_test.c tests/Makefile.am
+    Add new test and hook into build and test suite.
+
 2008-05-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/write_read_test.tpl

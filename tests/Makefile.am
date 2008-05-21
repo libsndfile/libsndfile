@@ -13,7 +13,7 @@ noinst_PROGRAMS = sfversion floating_point_test write_read_test \
 	raw_test string_test multi_file_test dither_test \
 	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
 	locale_test largefile_test win32_ordinal_test ogg_test vorbis_test \
-	$(CPP_TEST)
+	external_libs_test $(CPP_TEST)
 
 SNDFILEDIR = ../src
 INCLUDES = -I$(srcdir)/$(SNDFILEDIR)
@@ -119,6 +119,9 @@ win32_test_LDADD =
 win32_ordinal_test_SOURCES = win32_ordinal_test.c utils.c
 win32_ordinal_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
+external_libs_test_SOURCES = external_libs_test.c utils.c
+external_libs_test_LDADD = $(SNDFILEDIR)/libsndfile.la
+
 cpp_test_SOURCES = cpp_test.cc utils.c
 cpp_test_LDADD = $(SNDFILEDIR)/libsndfile.la
 
@@ -189,7 +192,7 @@ check: generic-tests wav-tests aiff-tests au-tests caf-tests raw-tests \
 	flac-tests caf-tests wve-tests vorbis-tests mpc2k-tests io-tests
 
 generic-tests : error_test ulaw_test alaw_test command_test floating_point_test \
-		pcm_test win32_ordinal_test $(CPP_TEST)
+		pcm_test win32_ordinal_test external_libs_test $(CPP_TEST)
 	uname -a
 	./error_test
 	./pcm_test
@@ -210,6 +213,7 @@ generic-tests : error_test ulaw_test alaw_test command_test floating_point_test 
 	./headerless_test
 	./locale_test
 	./win32_ordinal_test
+	./external_libs_test
 if ENABLE_TEST_COVERAGE
 	@echo "cpp_test not under test coverage"
 else
