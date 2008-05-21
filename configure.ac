@@ -277,14 +277,15 @@ else
 # Check for Ogg, Vorbis and FLAC.
 
 HAVE_EXTERNAL_LIBS=0
-ac_cv_external_libs=no
 EXTERNAL_CFLAGS=""
 EXTERNAL_LIBS=""
 
 # Check for pkg-config outside the if statement.
 PKG_PROG_PKG_CONFIG
 
-if test x$enable_external_libs = xyes ; then
+if test x$enable_external_libs = xno ; then
+	AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
+else
 	PKG_CHECK_MODULES(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
 	PKG_CHECK_MODULES(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 	PKG_CHECK_MODULES(VORBIS, vorbis >= 1.2.1, ac_cv_vorbis=yes, ac_cv_vorbis=no)
@@ -386,7 +387,12 @@ if test x$enable_alsa != xno ; then
 	AC_CHECK_HEADERS(alsa/asoundlib.h)
 	if test x$ac_cv_header_alsa_asoundlib_h = xyes ; then
 		ALSA_LIBS="-lasound"
+		enable_alsa=yes
 		fi
+	fi
+
+if test x$enable_alsa != xyes ; then
+	enable_alsa=no
 	fi
 
 #====================================================================================
@@ -585,16 +591,17 @@ AC_MSG_RESULT([
 
   Configuration summary :
 
-    Version : ..................... ${VERSION}
-    Experimental code : ........... ${enable_experimental:-no}
-    External FLAC/Ogg/Vorbis : .... ${ac_cv_external_libs}
+    Version : ............................. ${VERSION}
+    Experimental code : ................... ${enable_experimental:-no}
+    Using ALSA in example programs : ...... ${enable_alsa}
+    External FLAC/Ogg/Vorbis : ............ ${ac_cv_external_libs}
 
 ])
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
 	echo -e "  Tools :\n"
-	echo "    Compiler is GCC : ............. ${ac_cv_c_compiler_gnu}"
-	echo "    GCC version : ................. ${GCC_VERSION}"
+	echo "    Compiler is GCC : ..................... ${ac_cv_c_compiler_gnu}"
+	echo "    GCC version : ......................... ${GCC_VERSION}"
 	if test $GCC_MAJOR_VERSION -lt 3 ; then
 		echo -e "\n    ** This compiler version allows applications to write"
 		echo "    ** to static strings within the library."
@@ -613,10 +620,10 @@ if test $bindir = "\${exec_prefix}/bin" ; then
 AC_MSG_RESULT([[
   Installation directories :
 
-    Library directory : ........... $libdir
-    Program directory : ........... $bindir
-    Pkgconfig directory : ......... $libdir/pkgconfig
-    HTML docs directory : ......... $htmldocdir
+    Library directory : ................... $libdir
+    Program directory : ................... $bindir
+    Pkgconfig directory : ................. $libdir/pkgconfig
+    HTML docs directory : ................. $htmldocdir
 ]])
 
 if test x$prefix != "x/usr" ; then
