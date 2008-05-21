@@ -6,6 +6,9 @@
     * src/ogg.c
     Add call to ogg_stream_clear to fix valgrind warning.
 
+    * configure.ac src/Makefile.am src/flac.c src/ogg.c
+    Link to external versions of FLAC, Ogg and Vorbis.
+
 2008-05-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/write_read_test.tpl
