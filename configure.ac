@@ -123,6 +123,9 @@ AC_ARG_ENABLE(sqlite,
 AC_ARG_ENABLE(alsa,
 	AC_HELP_STRING([--disable-alsa], [disable use of ALSA]))
 
+AC_ARG_ENABLE(external-libs,
+	AC_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis]))
+
 AC_ARG_ENABLE(test-coverage,
 	AC_HELP_STRING([--enable-test-coverage], [enable test coverage]))
 AM_CONDITIONAL([ENABLE_TEST_COVERAGE], [test "$enable_test_coverage" = yes])
@@ -278,18 +281,24 @@ ac_cv_external_libs=no
 EXTERNAL_CFLAGS=""
 EXTERNAL_LIBS=""
 
-PKG_CHECK_MODULES(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
-PKG_CHECK_MODULES(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
-PKG_CHECK_MODULES(VORBIS, vorbis >= 1.2.1, ac_cv_vorbis=yes, ac_cv_vorbis=no)
-PKG_CHECK_MODULES(VORBISENC, vorbisenc >= 1.2.1, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
+# Check for pkg-config outside the if statement.
+PKG_PROG_PKG_CONFIG
+
+if test x$enable_external_libs = xyes ; then
+	PKG_CHECK_MODULES(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
+	PKG_CHECK_MODULES(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
+	PKG_CHECK_MODULES(VORBIS, vorbis >= 1.2.1, ac_cv_vorbis=yes, ac_cv_vorbis=no)
+	PKG_CHECK_MODULES(VORBISENC, vorbisenc >= 1.2.1, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
+	fi
 
 if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
 	HAVE_EXTERNAL_LIBS=1
 	ac_cv_external_libs=yes
-	
+
 	EXTERNAL_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBISENC_CFLAGS"
 	EXTERNAL_LIBS="$FLAC_LIBS $VORBISENC_LIBS"
 	fi
+
 
 AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_LIBS],$HAVE_EXTERNAL_LIBS,[Will be set to 1 if flac, ogg and vorbis are available.])
 
@@ -578,7 +587,7 @@ AC_MSG_RESULT([
 
     Version : ..................... ${VERSION}
     Experimental code : ........... ${enable_experimental:-no}
-    External FLAC/Ogg/Vorbs : ..... ${ac_cv_external_libs}
+    External FLAC/Ogg/Vorbis : .... ${ac_cv_external_libs}
 
 ])
 
