@@ -31,6 +31,8 @@ main (void)
 {
 	test_conversions () ;
 	test_endswap () ;
+	test_float_convert () ;
+	test_double_convert () ;
 
 	test_log_printf () ;
 	test_file_io () ;

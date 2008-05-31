@@ -39,7 +39,7 @@ libsndfile_la_LIBADD = libcommon.la GSM610/libgsm.la G72x/libg72x.la \
 
 libcommon_la_SOURCES = $(COMMON)
 
-test_main_SOURCES = test_main.c test_main.h test_conversions.c test_endswap.c \
+test_main_SOURCES = test_main.c test_main.h test_conversions.c test_float.c test_endswap.c \
 					test_audio_detect.c test_log_printf.c test_file_io.c test_ima_oki_adpcm.c
 test_main_LDADD = libcommon.la
 

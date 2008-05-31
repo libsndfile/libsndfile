@@ -29,5 +29,8 @@ void test_endswap (void) ;
 void test_log_printf (void) ;
 void test_file_io (void) ;
 
+void test_float_convert (void) ;
+void test_double_convert (void) ;
+
 void test_audio_detect (void) ;
 void test_ima_oki_adpcm (void) ;
