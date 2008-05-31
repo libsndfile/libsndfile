@@ -546,13 +546,13 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 
 		data_offset = rsrc->data_offset + read_int (rsrc->rsrc_data, rsrc->item_offset + k * 12 + 4) ;
 		if (data_offset < 0 || data_offset > rsrc->rsrc_len)
-		{	psf_log_printf (psf, "Bad data offset (%d). Exiting parser.\n", data_offset) ;
+		{	psf_log_printf (psf, "Exiting parser on data offset of %d.\n", data_offset) ;
 			break ;
 			} ;
 
 		data_len = read_int (rsrc->rsrc_data, data_offset) ;
 		if (data_len < 0 || data_len > rsrc->rsrc_len)
-		{	psf_log_printf (psf, "Bad data length (%d). Exiting parser.\n", data_len) ;
+		{	psf_log_printf (psf, "Exiting parser on data length of %d.\n", data_len) ;
 			break ;
 			} ;
 

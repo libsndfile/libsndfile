@@ -5,12 +5,20 @@
 	double64_(le|be)_(read|write). Hook into build and testsuite.
 
     * src/double64.c src/float32.c
-    Fix bugs in functions found by test added above.
+    Fix bugs in functions found by test added above. Thanks to Nicolas Castagne
+    for reporting this bug.
+
+    * src/sndfile.h.in
+    Change time_reference_(low|high) entries of SF_BROADCAST_INFO struct to
+    unsigned.
+
+    * examples/sndfile-info.c
+    Print out the BEXT time reference in a sensible format.
 
 2008-05-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/*.c
-    Fizz fixes.
+    Fuzz fixes.
 
     * src/ogg.c
     Add call to ogg_stream_clear to fix valgrind warning.
