@@ -300,6 +300,9 @@ if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; 
 	EXTERNAL_LIBS="$FLAC_LIBS $VORBISENC_LIBS"
 	fi
 
+if test x$enable_external_libs != xyes ; then
+	ac_cv_external_libs=no
+	fi
 
 AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_LIBS],$HAVE_EXTERNAL_LIBS,[Will be set to 1 if flac, ogg and vorbis are available.])
 
@@ -475,8 +478,8 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		AC_ADD_CFLAGS([-fgnu89-inline])
 		fi
 
-	CFLAGS="$CFLAGS -W -Wall"
-	CXXFLAGS="$CXXFLAGS -W -Wall"
+	CFLAGS="$CFLAGS -Wextra -Wall"
+	CXXFLAGS="$CXXFLAGS -Wextra -Wall"
 
 	AC_ADD_CFLAGS([-Wdeclaration-after-statement])
 	AC_ADD_CFLAGS([-Wpointer-arith])
