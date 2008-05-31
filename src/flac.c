@@ -29,10 +29,11 @@
 #include	"sndfile.h"
 #include	"common.h"
 
+#if HAVE_EXTERNAL_LIBS
 
-#include	"FLAC/include/FLAC/stream_decoder.h"
-#include	"FLAC/include/FLAC/stream_encoder.h"
-#include	"FLAC/include/FLAC/metadata.h"
+#include	<FLAC/stream_decoder.h>
+#include	<FLAC/stream_encoder.h>
+#include	<FLAC/metadata.h>
 
 #include	"sfendian.h"
 
@@ -1303,3 +1304,13 @@ flac_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 	return ((sf_count_t) -1) ;
 } /* flac_seek */
 
+#else /* HAVE_EXTERNAL_LIBS */
+
+int
+flac_open	(SF_PRIVATE *psf)
+{
+	psf_log_printf (psf, "This version of libsndfile was compiled without FLAC support.\n") ;
+	return SFE_UNIMPLEMENTED ;
+} /* flac_open */
+
+#endif

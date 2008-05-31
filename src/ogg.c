@@ -67,8 +67,10 @@
 #include "sfendian.h"
 #include "common.h"
 
-#include "VORBIS/include/vorbis/codec.h"
-#include "VORBIS/include/vorbis/vorbisenc.h"
+#if HAVE_EXTERNAL_LIBS
+
+#include <vorbis/codec.h>
+#include <vorbis/vorbisenc.h>
 
 typedef int convert_func (int, void *, int, int, float **) ;
 
@@ -1135,3 +1137,14 @@ ogg_length (SF_PRIVATE *psf)
 
 	return length ;
 } /* ogg_length */
+
+#else /* HAVE_EXTERNAL_LIBS */
+
+int
+ogg_open	(SF_PRIVATE *psf)
+{
+	psf_log_printf (psf, "This version of libsndfile was compiled without Ogg/Vorbis support.\n") ;
+	return SFE_UNIMPLEMENTED ;
+} /* ogg_open */
+
+#endif

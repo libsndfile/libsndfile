@@ -68,12 +68,18 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "flac"))
-	{	string_start_test ("strings.flac", SF_FORMAT_FLAC) ;
+	{	if (HAVE_EXTERNAL_LIBS)
+			string_start_test ("strings.flac", SF_FORMAT_FLAC) ;
+		else
+			puts ("    No FLAC tests because FLAC support was not compiled in.") ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "ogg"))
-	{	string_start_test ("vorbis.oga", SF_FORMAT_OGG) ;
+	{	if (HAVE_EXTERNAL_LIBS)
+			string_start_test ("vorbis.oga", SF_FORMAT_OGG) ;
+		else
+			puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
 		test_count++ ;
 		} ;
 

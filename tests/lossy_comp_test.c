@@ -374,11 +374,16 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || strcmp (argv [1], "ogg_vorbis") == 0)
-	{	/* Don't do lcomp_test_XXX as the errors are too big. */
-		sdlcomp_test_short	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
-		sdlcomp_test_int	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
-		sdlcomp_test_float	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
-		sdlcomp_test_double	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
+	{	if (HAVE_EXTERNAL_LIBS)
+		{	/* Don't do lcomp_test_XXX as the errors are too big. */
+			sdlcomp_test_short	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
+			sdlcomp_test_int	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
+			sdlcomp_test_float	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
+			sdlcomp_test_double	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
+			}
+		else
+			puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
+
 		test_count++ ;
 		} ;
 

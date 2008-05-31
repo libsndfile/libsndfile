@@ -123,6 +123,9 @@ AC_ARG_ENABLE(sqlite,
 AC_ARG_ENABLE(alsa,
 	AC_HELP_STRING([--disable-alsa], [disable use of ALSA]))
 
+AC_ARG_ENABLE(external-libs,
+	AC_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis]))
+
 AC_ARG_ENABLE(test-coverage,
 	AC_HELP_STRING([--enable-test-coverage], [enable test coverage]))
 AM_CONDITIONAL([ENABLE_TEST_COVERAGE], [test "$enable_test_coverage" = yes])
@@ -271,6 +274,36 @@ else
 	fi
 
 #====================================================================================
+# Check for Ogg, Vorbis and FLAC.
+
+HAVE_EXTERNAL_LIBS=0
+EXTERNAL_CFLAGS=""
+EXTERNAL_LIBS=""
+
+# Check for pkg-config outside the if statement.
+PKG_PROG_PKG_CONFIG
+
+if test x$enable_external_libs = xno ; then
+	AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
+else
+	PKG_CHECK_MODULES(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
+	PKG_CHECK_MODULES(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
+	PKG_CHECK_MODULES(VORBIS, vorbis >= 1.2.1, ac_cv_vorbis=yes, ac_cv_vorbis=no)
+	PKG_CHECK_MODULES(VORBISENC, vorbisenc >= 1.2.1, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
+	fi
+
+if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
+	HAVE_EXTERNAL_LIBS=1
+	ac_cv_external_libs=yes
+
+	EXTERNAL_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBISENC_CFLAGS"
+	EXTERNAL_LIBS="$FLAC_LIBS $VORBISENC_LIBS"
+	fi
+
+
+AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_LIBS],$HAVE_EXTERNAL_LIBS,[Will be set to 1 if flac, ogg and vorbis are available.])
+
+#====================================================================================
 # Check for libsqlite3 (only used in regtest).
 
 ac_cv_sqlite3=no
@@ -315,107 +348,6 @@ AC_DEFINE_UNQUOTED(CPU_CLIPS_POSITIVE, ${ac_cv_c_clip_positive},
 AC_DEFINE_UNQUOTED(CPU_CLIPS_NEGATIVE, ${ac_cv_c_clip_negative},
 	[Target processor clips on negative float to int conversion.])
 
-
-#====================================================================================
-# FLAC defines.
-
-AC_DEFINE(FLAC__HAS_OGG, 1, [This is always true.])
-
-case "$host_cpu" in
-	i*86)
-		cpu_ia32=true
-		AC_DEFINE(FLAC__CPU_IA32)
-		AH_TEMPLATE(FLAC__CPU_IA32, [define if building for ia32/i386])
-		;;
-	powerpc)
-		cpu_ppc=true
-		AC_DEFINE(FLAC__CPU_PPC)
-		AH_TEMPLATE(FLAC__CPU_PPC, [define if building for PowerPC])
-		;;
-	sparc)
-		cpu_sparc=true
-		AC_DEFINE(FLAC__CPU_SPARC)
-		AH_TEMPLATE(FLAC__CPU_SPARC, [define if building for SPARC])
-		;;
-	esac
-
-AM_CONDITIONAL(FLaC__CPU_IA32, test "x$cpu_ia32" = xtrue)
-AM_CONDITIONAL(FLaC__CPU_PPC, test "x$cpu_ppc" = xtrue)
-AM_CONDITIONAL(FLaC__CPU_SPARC, test "x$cpu_sparc" = xtrue)
-
-case "$host" in
-	*-pc-linux-gnu)
-		sys_linux=true
-		AC_DEFINE(FLAC__SYS_LINUX)
-		AH_TEMPLATE(FLAC__SYS_LINUX, [define if building for Linux])
-		;;
-	*-*-darwin*)
-		sys_darwin=true
-		AC_DEFINE(FLAC__SYS_DARWIN)
-		AH_TEMPLATE(FLAC__SYS_DARWIN, [define if building for Darwin / MacOS X])
-		;;
-	esac
-
-AM_CONDITIONAL(FLaC__SYS_DARWIN, test "x$sys_darwin" = xtrue)
-AM_CONDITIONAL(FLaC__SYS_LINUX, test "x$sys_linux" = xtrue)
-
-AC_ARG_ENABLE(asm-optimizations, AC_HELP_STRING([--disable-asm-optimizations], [Don't use any assembly optimization routines]), asm_opt=no, asm_opt=yes)
-AM_CONDITIONAL(FLaC__NO_ASM, test "x$asm_opt" = xno)
-
-if test "x$asm_opt" = xno ; then
-	AC_DEFINE(FLAC__NO_ASM)
-	AH_TEMPLATE(FLAC__NO_ASM, [define to disable use of assembly code])
-	fi
-
-AC_CHECK_PROGS(NASM, nasm)
-AM_CONDITIONAL(FLaC__HAS_NASM, test -n "$NASM")
-
-if test -n "$NASM" ; then
-	AC_DEFINE(FLAC__HAS_NASM)
-	AH_TEMPLATE(FLAC__HAS_NASM, [define if you are compiling for x86 and have the NASM assembler])
-	fi
-
-# Only matters for PowerPC
-AC_CHECK_PROGS(AS, as, as)
-AC_CHECK_PROGS(GAS, gas, gas)
-
-AM_CONDITIONAL(FLaC__HAS_AS, test "$AS" = "as")
-AM_CONDITIONAL(FLaC__HAS_GAS, test "$AS" = "gas")
-
-if test "$AS" = "as" ; then
-	AC_DEFINE(FLAC__HAS_AS)
-	AH_TEMPLATE(FLAC__HAS_AS, [define if you are compiling for PowerPC and have the 'as' assembler])
-	fi
-
-if test "$AS" = "gas" ; then
-	# funniest. macro. ever.
-	AC_DEFINE(FLAC__HAS_GAS)
-	AH_TEMPLATE(FLAC__HAS_GAS, [define if you are compiling for PowerPC and have the 'gas' assembler])
-	fi
-
-case "$host" in
-	i386-*-openbsd3.[[0-3]])
-		OBJ_FORMAT=aoutb
-		;;
-	*-*-cygwin|*mingw*)
-		OBJ_FORMAT=win32
-		;;
-	i*86-apple-darwin*)
-		OBJ_FORMAT=macho
-		NASM_FLAGS="-DFLAC__PUBLIC_NEEDS_UNDERSCORE"
-		OS_SPECIFIC_LIBLINKS="-Wl,-read_only_relocs -Wl,suppress"
-		;;
-	*-*-os2-emx)
-		OBJ_FORMAT=aout
-		;;
-	*)
-		OBJ_FORMAT=elf ;;
-	esac
-
-AC_SUBST(OBJ_FORMAT)
-AC_SUBST(NASM_FLAGS)
-AC_SUBST(OS_SPECIFIC_LIBLINKS)
-
 #====================================================================================
 # Target OS specific stuff.
 
@@ -455,7 +387,12 @@ if test x$enable_alsa != xno ; then
 	AC_CHECK_HEADERS(alsa/asoundlib.h)
 	if test x$ac_cv_header_alsa_asoundlib_h = xyes ; then
 		ALSA_LIBS="-lasound"
+		enable_alsa=yes
 		fi
+	fi
+
+if test x$enable_alsa != xyes ; then
+	enable_alsa=no
 	fi
 
 #====================================================================================
@@ -626,6 +563,9 @@ AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(ALSA_LIBS)
 AC_SUBST(ENABLE_EXPERIMENTAL_CODE)
 
+AC_SUBST(EXTERNAL_CFLAGS)
+AC_SUBST(EXTERNAL_LIBS)
+
 AC_SUBST(COMPILER_IS_GCC)
 AC_SUBST(GCC_MAJOR_VERSION)
 
@@ -637,34 +577,6 @@ AC_SUBST(LIBTOOL_DEPS)
 
 AC_CONFIG_FILES([ \
 	src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
-	\
-	src/FLAC/Makefile src/FLAC/include/FLAC/Makefile src/FLAC/include/Makefile \
-	src/FLAC/include/share/grabbag/Makefile src/FLAC/include/share/Makefile \
-	src/FLAC/include/test_libs_common/Makefile src/FLAC/src/Makefile \
-	src/FLAC/src/libFLAC/ia32/Makefile src/FLAC/src/libFLAC/Makefile \
-	src/FLAC/src/libFLAC/include/private/Makefile \
-	src/FLAC/src/libFLAC/include/Makefile \
-	src/FLAC/src/libFLAC/include/protected/Makefile \
-	src/FLAC/src/libFLAC/ppc/as/Makefile src/FLAC/src/libFLAC/ppc/Makefile \
-	src/FLAC/src/libFLAC/ppc/gas/Makefile src/FLAC/src/share/Makefile \
-	src/FLAC/src/share/getopt/Makefile src/FLAC/src/share/grabbag/Makefile \
-	src/FLAC/src/share/replaygain_anal/Makefile \
-	src/FLAC/src/share/replaygain_syn/include/private/Makefile \
-	src/FLAC/src/share/replaygain_syn/include/Makefile \
-	src/FLAC/src/share/replaygain_syn/Makefile \
-	src/FLAC/src/share/utf8/Makefile src/FLAC/src/test_libFLAC/Makefile \
-	src/FLAC/src/test_libs_common/Makefile src/FLAC/src/test_seeking/Makefile \
-	src/FLAC/src/test_streams/Makefile \
-	src/FLAC/src/test_grabbag/Makefile src/FLAC/src/test_grabbag/cuesheet/Makefile \
-	src/FLAC/src/test_grabbag/picture/Makefile \
-	\
-	src/VORBIS/Makefile src/VORBIS/lib/Makefile src/VORBIS/include/Makefile \
-	src/VORBIS/include/vorbis/Makefile src/VORBIS/lib/modes/Makefile \
-	src/VORBIS/lib/books/floor/Makefile src/VORBIS/lib/books/coupled/Makefile \
-	src/VORBIS/lib/books/uncoupled/Makefile src/VORBIS/lib/books/Makefile \
-	src/VORBIS/test/Makefile \
-	\
-	src/OGG/include/ogg/Makefile src/OGG/include/Makefile src/OGG/Makefile \
 	man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
 	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile \
 	doc/libsndfile.css \
@@ -679,14 +591,17 @@ AC_MSG_RESULT([
 
   Configuration summary :
 
-    Version : ..................... ${VERSION}
-    Experimental code : ........... ${enable_experimental:-no}
+    Version : ............................. ${VERSION}
+    Experimental code : ................... ${enable_experimental:-no}
+    Using ALSA in example programs : ...... ${enable_alsa}
+    External FLAC/Ogg/Vorbis : ............ ${ac_cv_external_libs}
+
 ])
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
 	echo -e "  Tools :\n"
-	echo "    Compiler is GCC : ............. ${ac_cv_c_compiler_gnu}"
-	echo "    GCC version : ................. ${GCC_VERSION}"
+	echo "    Compiler is GCC : ..................... ${ac_cv_c_compiler_gnu}"
+	echo "    GCC version : ......................... ${GCC_VERSION}"
 	if test $GCC_MAJOR_VERSION -lt 3 ; then
 		echo -e "\n    ** This compiler version allows applications to write"
 		echo "    ** to static strings within the library."
@@ -705,10 +620,10 @@ if test $bindir = "\${exec_prefix}/bin" ; then
 AC_MSG_RESULT([[
   Installation directories :
 
-    Library directory : ........... $libdir
-    Program directory : ........... $bindir
-    Pkgconfig directory : ......... $libdir/pkgconfig
-    HTML docs directory : ......... $htmldocdir
+    Library directory : ................... $libdir
+    Program directory : ................... $bindir
+    Pkgconfig directory : ................. $libdir/pkgconfig
+    HTML docs directory : ................. $htmldocdir
 ]])
 
 if test x$prefix != "x/usr" ; then
@@ -716,20 +631,6 @@ if test x$prefix != "x/usr" ; then
 	echo -e "the addition of \"$libdir/pkgconfig\" to the"
 	echo -e "PKG_CONFIG_PATH environment variable.\n"
 	fi
-
-#==================================================================================
-# Ugly hack to remove -Werror from some Makefiles.
-
-TMPFILE=/tmp/strchange$$
-
-for f in "src/FLAC/src/libFLAC/Makefile" ; do
-	tmp=`grep -l "\-Werror" "$f"`
-	if test -n "$tmp" ; then
-		if sed -e "s!\-Werror!!g" "$f" > $TMPFILE ; then
-			cp -f $TMPFILE "$f"
-			fi
-		fi
-	done
 
 (cd src && make genfiles)
 (cd tests && make genfiles)
