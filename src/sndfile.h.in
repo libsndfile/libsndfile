@@ -431,8 +431,8 @@ typedef struct
 	char			originator_reference [32] ;
 	char			origination_date [10] ;
 	char			origination_time [8] ;
-	int				time_reference_low ;
-	int				time_reference_high ;
+	unsigned int	time_reference_low ;
+	unsigned int	time_reference_high ;
 	short			version ;
 	char			umid [64] ;
 	char			reserved [190] ;
