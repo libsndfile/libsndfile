@@ -267,9 +267,9 @@ float32_be_read (unsigned char *cptr)
 		fvalue *= -1 ;
 
 	if (exponent > 0)
-		fvalue *= (1 << exponent) ;
+		fvalue *= pow (2.0, exponent) ;
 	else if (exponent < 0)
-		fvalue /= (1 << abs (exponent)) ;
+		fvalue /= pow (2.0, abs (exponent)) ;
 
 	return fvalue ;
 } /* float32_be_read */
@@ -295,9 +295,9 @@ float32_le_read (unsigned char *cptr)
 		fvalue *= -1 ;
 
 	if (exponent > 0)
-		fvalue *= (1 << exponent) ;
+		fvalue *= pow (2.0, exponent) ;
 	else if (exponent < 0)
-		fvalue /= (1 << abs (exponent)) ;
+		fvalue /= pow (2.0, abs (exponent)) ;
 
 	return fvalue ;
 } /* float32_le_read */

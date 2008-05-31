@@ -301,9 +301,9 @@ double64_be_read (unsigned char *cptr)
 		dvalue *= -1 ;
 
 	if (exponent > 0)
-		dvalue *= (1 << exponent) ;
+		dvalue *= pow (2.0, exponent) ;
 	else if (exponent < 0)
-		dvalue /= (1 << abs (exponent)) ;
+		dvalue /= pow (2.0, abs (exponent)) ;
 
 	return dvalue ;
 } /* double64_be_read */
@@ -334,9 +334,9 @@ double64_le_read (unsigned char *cptr)
 		dvalue *= -1 ;
 
 	if (exponent > 0)
-		dvalue *= (1 << exponent) ;
+		dvalue *= pow (2.0, exponent) ;
 	else if (exponent < 0)
-		dvalue /= (1 << abs (exponent)) ;
+		dvalue /= pow (2.0, abs (exponent)) ;
 
 	return dvalue ;
 } /* double64_le_read */

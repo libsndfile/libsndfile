@@ -1,3 +1,12 @@
+2008-05-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/test_float.c src/test_main.(c|h) src/Makefile.am
+    Add new file to test functions float32_(le|be)_(read|write) and
+	double64_(le|be)_(read|write). Hook into build and testsuite.
+
+    * src/double64.c src/float32.c
+    Fix bugs in functions found by test added above.
+
 2008-05-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/*.c
