@@ -327,7 +327,7 @@ broadcast_dump (const char *filename)
 {	SNDFILE	 *file ;
 	SF_INFO	 sfinfo ;
 	SF_BROADCAST_INFO bext ;
-	double time_usec ;
+	double time_ref_sec ;
 	int got_bext ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
@@ -358,7 +358,7 @@ broadcast_dump (const char *filename)
 	**		of the audio sequence.
 	*/
 
-	time_usec = ((pow (2.0, 32) * bext.time_reference_high) + (1.0 * bext.time_reference_low)) / sfinfo.samplerate / 1e6 ;
+	time_ref_sec = ((pow (2.0, 32) * bext.time_reference_high) + (1.0 * bext.time_reference_low)) / sfinfo.samplerate ;
 
 	printf ("Description      : %.*s\n", (int) sizeof (bext.description), bext.description) ;
 	printf ("Originator       : %.*s\n", (int) sizeof (bext.originator), bext.originator) ;
@@ -369,7 +369,7 @@ broadcast_dump (const char *filename)
 	if (bext.time_reference_high == 0 && bext.time_reference_low == 0)
 		printf ("Time ref         : 0\n") ;
 	else
-		printf ("Time ref         : 0x%x%08x (%.4f microseconds)\n", bext.time_reference_high, bext.time_reference_low, time_usec) ;
+		printf ("Time ref         : 0x%x%08x (%.6f seconds)\n", bext.time_reference_high, bext.time_reference_low, time_ref_sec) ;
 
 	printf ("BWF version      : %d\n", bext.version) ;
 	printf ("UMID             : %.*s\n", (int) sizeof (bext.umid), bext.umid) ;
