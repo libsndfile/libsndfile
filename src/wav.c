@@ -54,6 +54,7 @@
 #define note_MARKER	 (MAKE_MARKER ('n', 'o', 't', 'e'))
 #define smpl_MARKER	 (MAKE_MARKER ('s', 'm', 'p', 'l'))
 #define bext_MARKER	 (MAKE_MARKER ('b', 'e', 'x', 't'))
+#define iXML_MARKER	 (MAKE_MARKER ('i', 'X', 'M', 'L'))
 #define levl_MARKER	 (MAKE_MARKER ('l', 'e', 'v', 'l'))
 #define MEXT_MARKER	 (MAKE_MARKER ('M', 'E', 'X', 'T'))
 #define DISP_MARKER	 (MAKE_MARKER ('D', 'I', 'S', 'P'))
@@ -574,6 +575,8 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if ((error = wav_read_bext_chunk (psf, dword)))
 						return error ;
 					break ;
+
+			case iXML_MARKER : /* See http://en.wikipedia.org/wiki/IXML */
 
 			case strc_MARKER : /* Multiple of 32 bytes. */
 
