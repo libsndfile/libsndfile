@@ -288,6 +288,9 @@ if test x$enable_external_libs = xno ; then
 else
 	PKG_CHECK_MODULES(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
 	PKG_CHECK_MODULES(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
+
+	# Yes we really do need vorbis >= 1.2.1 because earlier versions are
+	# not const correct at the API level.
 	PKG_CHECK_MODULES(VORBIS, vorbis >= 1.2.1, ac_cv_vorbis=yes, ac_cv_vorbis=no)
 	PKG_CHECK_MODULES(VORBISENC, vorbisenc >= 1.2.1, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
 	fi
