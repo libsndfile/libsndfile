@@ -17,6 +17,7 @@
 */
 
 #include	<cstdio>
+#include	<cstring>
 
 #include	<sndfile.hh>
 
