@@ -729,7 +729,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						loop_mode = get_loop_mode_str (mode) ;
 						mode = get_loop_mode (mode) ;
 						if (mode == SF_LOOP_NONE)
-							psf->instrument->loops [0].mode = SF_LOOP_NONE ;
+							psf->instrument->loops [1].mode = SF_LOOP_NONE ;
 						else
 						{	psf->instrument->loop_count += 1 ;
 							psf->instrument->loops [1].mode = SF_LOOP_FORWARD ;
