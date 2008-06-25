@@ -297,14 +297,10 @@ else
 
 if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
 	HAVE_EXTERNAL_LIBS=1
-	ac_cv_external_libs=yes
+	enable_external_libs=yes
 
 	EXTERNAL_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBISENC_CFLAGS"
 	EXTERNAL_LIBS="$FLAC_LIBS $VORBISENC_LIBS"
-	fi
-
-if test x$enable_external_libs != xyes ; then
-	ac_cv_external_libs=no
 	fi
 
 AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_LIBS],$HAVE_EXTERNAL_LIBS,[Will be set to 1 if flac, ogg and vorbis are available.])
@@ -395,10 +391,6 @@ if test x$enable_alsa != xno ; then
 		ALSA_LIBS="-lasound"
 		enable_alsa=yes
 		fi
-	fi
-
-if test x$enable_alsa != xyes ; then
-	enable_alsa=no
 	fi
 
 #====================================================================================
@@ -599,8 +591,8 @@ AC_MSG_RESULT([
 
     Version : ............................. ${VERSION}
     Experimental code : ................... ${enable_experimental:-no}
-    Using ALSA in example programs : ...... ${enable_alsa}
-    External FLAC/Ogg/Vorbis : ............ ${ac_cv_external_libs}
+    Using ALSA in example programs : ...... ${enable_alsa:-no}
+    External FLAC/Ogg/Vorbis : ............ ${enable_external_libs:-no}
 
 ])
 
