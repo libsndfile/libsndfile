@@ -1,7 +1,12 @@
-2008-06-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2008-06-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
     Fix detection/enabling of external libs.
+
+    * M4/extra_pkg.m4 M4/Makefile.am
+    Add m4 macro PKG_CHECK_MOD_VERSION which is a hacked version
+    PKG_CHECK_MODULES. The new macro prints the version number of the package
+    it is searching for.
 
 2008-06-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
