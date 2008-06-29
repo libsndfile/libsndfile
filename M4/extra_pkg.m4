@@ -22,14 +22,14 @@
 # the same distribution terms that you use for the rest of that program.
 
 # --------------------------------------------------------------
-# PKG_CHECK_MODULE_VERSION(VARIABLE-PREFIX, MODULES, [ACTION-IF-FOUND],
+# PKG_CHECK_MOD_VERSION(VARIABLE-PREFIX, MODULES, [ACTION-IF-FOUND],
 # [ACTION-IF-NOT-FOUND])
 #
 # This is a very slight modification to the macro PKG_CHECK_MODULES that
 # is in the original pkg.m4 file. It prints the versions in the checking
 # message (erikd@mega-nerd.com).
 
-AC_DEFUN([PKG_CHECK_MODULE_VERSION],
+AC_DEFUN([PKG_CHECK_MOD_VERSION],
 [AC_REQUIRE([PKG_PROG_PKG_CONFIG])dnl
 AC_ARG_VAR([$1][_CFLAGS], [C compiler flags for $1, overriding pkg-config])dnl
 AC_ARG_VAR([$1][_LIBS], [linker flags for $1, overriding pkg-config])dnl
@@ -82,4 +82,4 @@ else
         AC_MSG_RESULT([yes])
 	ifelse([$3], , :, [$3])
 fi[]dnl
-])# PKG_CHECK_MODULE_VERSION
+])# PKG_CHECK_MOD_VERSION

@@ -12,7 +12,7 @@
 
     * src/aiff.c
     Apply a fix from Axel Roebel where if the second loop in the instrument
-	chunk is none, the loop mode is written into the first loop.
+    chunk is none, the loop mode is written into the first loop.
 
 2008-05-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
