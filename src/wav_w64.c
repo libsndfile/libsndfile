@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004-2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -56,11 +56,11 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_MULAW =
 */
 
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM =
-{	0x00000001, 0x0721, 0x11d3, {	0x86, 0x44, 0xC8, 0xC1, 0xCA, 0x00, 0x00, 0x00 }
+{	0x00000001, 0x0721, 0x11d3, {	0x86, 0x44, 0xc8, 0xc1, 0xca, 0x00, 0x00, 0x00 }
 } ;
 
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT =
-{	0x00000003, 0x0721, 0x11d3, {	0x86, 0x44, 0xC8, 0xC1, 0xCA, 0x00, 0x00, 0x00 }
+{	0x00000003, 0x0721, 0x11d3, {	0x86, 0x44, 0xc8, 0xc1, 0xca, 0x00, 0x00, 0x00 }
 } ;
 
 
@@ -68,7 +68,7 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT =
 /* maybe interesting one day to read the following through sf_read_raw */
 /* http://www.bath.ac.uk/~masrwd/pvocex/pvocex.html */
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_PVOCEX =
-{	0x8312B9C2, 0x2E6E, 0x11d4, {	0xA8, 0x24, 0xDE, 0x5B, 0x96, 0xC3, 0xAB, 0x21 }
+{	0x8312b9c2, 0x2e6e, 0x11d4, {	0xa8, 0x24, 0xde, 0x5b, 0x96, 0xc3, 0xab, 0x21 }
 } ;
 #endif
 
@@ -77,9 +77,9 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_PVOCEX =
  */
 
 static int
-wavex_write_guid_equal (const EXT_SUBFORMAT * first, const EXT_SUBFORMAT * second)
+wavex_guid_equal (const EXT_SUBFORMAT * first, const EXT_SUBFORMAT * second)
 {	return !memcmp (first, second, sizeof (EXT_SUBFORMAT)) ;
-} /* wavex_write_guid_equal */
+} /* wavex_guid_equal */
 
 
 
@@ -290,33 +290,39 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				psf->bytewidth = BITWIDTH2BYTES (wav_fmt->ext.bitwidth) ;
 
 				/* Compare GUIDs for known ones. */
-				if (wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_PCM)
-					|| wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM))
+				if (wavex_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_PCM))
 				{	psf->sf.format = SF_FORMAT_WAVEX | u_bitwidth_to_subformat (psf->bytewidth * 8) ;
 					psf_log_printf (psf, "    format : pcm\n") ;
 					}
-				else if (wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_MS_ADPCM))
+				else if (wavex_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_MS_ADPCM))
 				{	psf->sf.format = (SF_FORMAT_WAVEX | SF_FORMAT_MS_ADPCM) ;
 					psf_log_printf (psf, "    format : ms adpcm\n") ;
 					}
-				else if (wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_IEEE_FLOAT)
-					|| wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT))
+				else if (wavex_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_IEEE_FLOAT))
 				{	psf->sf.format = SF_FORMAT_WAVEX | ((psf->bytewidth == 8) ? SF_FORMAT_DOUBLE : SF_FORMAT_FLOAT) ;
 					psf_log_printf (psf, "    format : IEEE float\n") ;
 					}
-				else if (wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_ALAW))
+				else if (wavex_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_ALAW))
 				{	psf->sf.format = (SF_FORMAT_WAVEX | SF_FORMAT_ALAW) ;
 					psf_log_printf (psf, "    format : A-law\n") ;
 					}
-				else if (wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_MULAW))
+				else if (wavex_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_MULAW))
 				{	psf->sf.format = (SF_FORMAT_WAVEX | SF_FORMAT_ULAW) ;
 					psf_log_printf (psf, "    format : u-law\n") ;
+					}
+				else if (wavex_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM))
+				{	psf->sf.format = SF_FORMAT_WAVEX | u_bitwidth_to_subformat (psf->bytewidth * 8) ;
+					psf_log_printf (psf, "    format : pcm (Ambisonic B)\n") ;
+					psf->wavex_ambisonic = SF_AMBISONIC_B_FORMAT ;
+					}
+				else if (wavex_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT))
+				{	psf->sf.format = SF_FORMAT_WAVEX | ((psf->bytewidth == 8) ? SF_FORMAT_DOUBLE : SF_FORMAT_FLOAT) ;
+					psf_log_printf (psf, "    format : IEEE float (Ambisonic B)\n") ;
+					psf->wavex_ambisonic = SF_AMBISONIC_B_FORMAT ;
 					}
 				else
 					return SFE_UNIMPLEMENTED ;
 
-				psf->wavex_ambisonic = wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM)
-							|| wavex_write_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT) ;
 				break ;
 
 		case WAVE_FORMAT_G721_ADPCM :

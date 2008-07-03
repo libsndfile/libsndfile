@@ -184,6 +184,7 @@ wav_open	 (SF_PRIVATE *psf)
 		return SFE_MALLOC_FAILED ;
 	psf->container_data = wpriv ;
 
+	psf->wavex_ambisonic = SF_AMBISONIC_NONE ;
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = wav_read_header (psf, &blockalign, &framesperblock)))
 			return error ;

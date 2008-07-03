@@ -1,3 +1,12 @@
+2008-07-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/misc_test.c
+    Add a test for correct handling of Ambisonic files. Thanks to Fons
+    Adriaensen for the test.
+
+    * src/wav.c src/wav_w64.c
+    Fix handling of Ambisonic files. Thanks to Fons Adriaensen for the patch.
+
 2008-06-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
