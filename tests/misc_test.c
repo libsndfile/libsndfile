@@ -49,6 +49,7 @@
 static void	zero_data_test (const char *filename, int typemajor) ;
 static void	filesystem_full_test (int typemajor) ;
 static void	permission_test (const char *filename, int typemajor) ;
+static void	wavex_amb_test (const char *filename) ;
 
 int
 main (int argc, char *argv [])
@@ -70,6 +71,7 @@ main (int argc, char *argv [])
 	{	zero_data_test ("zerolen.wav", SF_FORMAT_WAV) ;
 		filesystem_full_test (SF_FORMAT_WAV) ;
 		permission_test ("readonly.wav", SF_FORMAT_WAV) ;
+		wavex_amb_test ("ambisonic.wav") ;
 		test_count++ ;
 		} ;
 
@@ -363,3 +365,37 @@ permission_test (const char *filename, int typemajor)
 #endif
 } /* permission_test */
 
+static void
+wavex_amb_test (const char *filename)
+{	static short buffer [800] ;
+	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
+	sf_count_t	frames ;
+
+	print_test_name (__func__, filename) ;
+
+	sfinfo.samplerate = 44100 ;
+	sfinfo.format = SF_FORMAT_WAVEX | SF_FORMAT_PCM_16 ;
+	sfinfo.channels = 4 ;
+
+	frames = ARRAY_LEN (buffer) / sfinfo.channels ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	sf_command (file, SFC_WAVEX_SET_AMBISONIC, NULL, SF_AMBISONIC_B_FORMAT) ;
+	test_writef_short_or_die (file, 0, buffer, frames, __LINE__) ;
+	sf_close (file) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	exit_if_true (
+		sf_command (file, SFC_WAVEX_GET_AMBISONIC, NULL, 0) != SF_AMBISONIC_B_FORMAT,
+		"\n\nLine %d : Error, this file should be in Ambisonic B format.\n", __LINE__
+		) ;
+
+	sf_close (file) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* wavex_amb_test */
