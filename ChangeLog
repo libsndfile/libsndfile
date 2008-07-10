@@ -1,3 +1,8 @@
+2008-07-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/index.html doc/FAQ.html
+    Add notes about which versions of windows libsndfile works on.
+
 2008-07-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/misc_test.c
