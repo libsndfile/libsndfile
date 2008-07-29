@@ -46,8 +46,8 @@
 #define	BUFFER_LEN		(1<<10)
 #define LOG_BUFFER_SIZE	1024
 
-static void	zero_data_test (const char *filename, int typemajor) ;
-static void	filesystem_full_test (int typemajor) ;
+static void	zero_data_test (const char *filename, int format) ;
+static void	filesystem_full_test (int format) ;
 static void	permission_test (const char *filename, int typemajor) ;
 static void	wavex_amb_test (const char *filename) ;
 
@@ -68,122 +68,129 @@ main (int argc, char *argv [])
 	do_all=!strcmp (argv [1], "all") ;
 
 	if (do_all || ! strcmp (argv [1], "wav"))
-	{	zero_data_test ("zerolen.wav", SF_FORMAT_WAV) ;
-		filesystem_full_test (SF_FORMAT_WAV) ;
+	{	zero_data_test ("zerolen.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.wav", SF_FORMAT_WAV) ;
 		wavex_amb_test ("ambisonic.wav") ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "aiff"))
-	{	zero_data_test ("zerolen.aiff", SF_FORMAT_AIFF) ;
-		filesystem_full_test (SF_FORMAT_AIFF) ;
+	{	zero_data_test ("zerolen.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_AIFF | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.aiff", SF_FORMAT_AIFF) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "au"))
-	{	zero_data_test ("zerolen.au", SF_FORMAT_AU) ;
-		filesystem_full_test (SF_FORMAT_AU) ;
+	{	zero_data_test ("zerolen.au", SF_FORMAT_AU | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_AU | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.au", SF_FORMAT_AU) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "caf"))
-	{	zero_data_test ("zerolen.caf", SF_FORMAT_CAF) ;
-		filesystem_full_test (SF_FORMAT_CAF) ;
+	{	zero_data_test ("zerolen.caf", SF_FORMAT_CAF | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_CAF | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.caf", SF_FORMAT_CAF) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "svx"))
-	{	zero_data_test ("zerolen.svx", SF_FORMAT_SVX) ;
-		filesystem_full_test (SF_FORMAT_SVX) ;
+	{	zero_data_test ("zerolen.svx", SF_FORMAT_SVX | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_SVX | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.svx", SF_FORMAT_SVX) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "nist"))
-	{	zero_data_test ("zerolen.nist", SF_FORMAT_NIST) ;
-		filesystem_full_test (SF_FORMAT_NIST) ;
+	{	zero_data_test ("zerolen.nist", SF_FORMAT_NIST | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_NIST | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.nist", SF_FORMAT_NIST) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "paf"))
-	{	zero_data_test ("zerolen.paf", SF_FORMAT_PAF) ;
-		filesystem_full_test (SF_FORMAT_PAF) ;
+	{	zero_data_test ("zerolen.paf", SF_FORMAT_PAF | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_PAF | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.paf", SF_FORMAT_PAF) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "ircam"))
-	{	zero_data_test ("zerolen.ircam", SF_FORMAT_IRCAM) ;
-		filesystem_full_test (SF_FORMAT_IRCAM) ;
+	{	zero_data_test ("zerolen.ircam", SF_FORMAT_IRCAM | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_IRCAM | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.ircam", SF_FORMAT_IRCAM) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "voc"))
-	{	zero_data_test ("zerolen.voc", SF_FORMAT_VOC) ;
-		filesystem_full_test (SF_FORMAT_VOC) ;
+	{	zero_data_test ("zerolen.voc", SF_FORMAT_VOC | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_VOC | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.voc", SF_FORMAT_VOC) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "w64"))
-	{	zero_data_test ("zerolen.w64", SF_FORMAT_W64) ;
-		filesystem_full_test (SF_FORMAT_W64) ;
+	{	zero_data_test ("zerolen.w64", SF_FORMAT_W64 | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_W64 | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.w64", SF_FORMAT_W64) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "mat4"))
-	{	zero_data_test ("zerolen.mat4", SF_FORMAT_MAT4) ;
-		filesystem_full_test (SF_FORMAT_MAT4) ;
+	{	zero_data_test ("zerolen.mat4", SF_FORMAT_MAT4 | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_MAT4 | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.mat4", SF_FORMAT_MAT4) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "mat5"))
-	{	zero_data_test ("zerolen.mat5", SF_FORMAT_MAT5) ;
-		filesystem_full_test (SF_FORMAT_MAT5) ;
+	{	zero_data_test ("zerolen.mat5", SF_FORMAT_MAT5 | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_MAT5 | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.mat5", SF_FORMAT_MAT5) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "pvf"))
-	{	zero_data_test ("zerolen.pvf", SF_FORMAT_PVF) ;
-		filesystem_full_test (SF_FORMAT_PVF) ;
+	{	zero_data_test ("zerolen.pvf", SF_FORMAT_PVF | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_PVF | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.pvf", SF_FORMAT_PVF) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "htk"))
-	{	zero_data_test ("zerolen.htk", SF_FORMAT_HTK) ;
-		filesystem_full_test (SF_FORMAT_HTK) ;
+	{	zero_data_test ("zerolen.htk", SF_FORMAT_HTK | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_HTK | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.htk", SF_FORMAT_HTK) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "avr"))
-	{	zero_data_test ("zerolen.avr", SF_FORMAT_AVR) ;
-		filesystem_full_test (SF_FORMAT_AVR) ;
+	{	zero_data_test ("zerolen.avr", SF_FORMAT_AVR | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_AVR | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.avr", SF_FORMAT_AVR) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "sds"))
-	{	zero_data_test ("zerolen.sds", SF_FORMAT_SDS) ;
-		filesystem_full_test (SF_FORMAT_SDS) ;
+	{	zero_data_test ("zerolen.sds", SF_FORMAT_SDS | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_SDS | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.sds", SF_FORMAT_SDS) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "mpc2k"))
-	{	zero_data_test ("zerolen.mpc", SF_FORMAT_MPC2K) ;
-		filesystem_full_test (SF_FORMAT_MPC2K) ;
+	{	zero_data_test ("zerolen.mpc", SF_FORMAT_MPC2K | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_MPC2K | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.mpc", SF_FORMAT_MPC2K) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "ogg"))
+	{	zero_data_test ("zerolen.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS) ;
+		/*-filesystem_full_test (SF_FORMAT_OGG | SF_FORMAT_VORBIS) ;-*/
+		permission_test ("readonly.oga", SF_FORMAT_OGG) ;
 		test_count++ ;
 		} ;
 
@@ -203,7 +210,7 @@ main (int argc, char *argv [])
 */
 
 static void
-zero_data_test (const char *filename, int typemajor)
+zero_data_test (const char *filename, int format)
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	int			frames ;
@@ -211,7 +218,7 @@ zero_data_test (const char *filename, int typemajor)
 	print_test_name ("zero_data_test", filename) ;
 
 	sfinfo.samplerate = 44100 ;
-	sfinfo.format = (typemajor | SF_FORMAT_PCM_16) ;
+	sfinfo.format = format ;
 	sfinfo.channels = 1 ;
 	sfinfo.frames = 0 ;
 
@@ -232,7 +239,7 @@ zero_data_test (const char *filename, int typemajor)
 } /* zero_data_test */
 
 static void
-filesystem_full_test (int typemajor)
+filesystem_full_test (int format)
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	struct stat buf ;
@@ -261,7 +268,7 @@ filesystem_full_test (int typemajor)
 		} ;
 
 	sfinfo.samplerate = 44100 ;
-	sfinfo.format = (typemajor | SF_FORMAT_PCM_16) ;
+	sfinfo.format = format ;
 	sfinfo.channels = 1 ;
 	sfinfo.frames = 0 ;
 
