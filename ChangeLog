@@ -7,6 +7,9 @@
     Fix segfault when closing an Ogg/Vorbis file that has been opened for write
     but had no actual data written to it. Bug reported by Chinoy Gupta.
 
+    * tests/Makefile.am
+    Make sure to run mist_test on Ogg/Vorbis files.
+
 2008-07-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * regtest/Makefile.am
