@@ -215,6 +215,15 @@ zero_data_test (const char *filename, int format)
 	SF_INFO		sfinfo ;
 	int			frames ;
 
+	switch (format & SF_FORMAT_TYPEMASK)
+	{	case SF_FORMAT_OGG :
+			if (HAVE_EXTERNAL_LIBS == 0)
+				return ;
+			break ;
+		default :
+			break ;
+		} ;
+
 	print_test_name ("zero_data_test", filename) ;
 
 	sfinfo.samplerate = 44100 ;
