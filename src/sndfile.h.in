@@ -458,7 +458,7 @@ typedef	struct SF_VIRTUAL_IO SF_VIRTUAL_IO ;
 
 /* Open the specified file for read, write or both. On error, this will
 ** return a NULL pointer. To find the error number, pass a NULL SNDFILE
-** to sf_perror () or sf_error_str ().
+** to sf_strerror ().
 ** All calls to sf_open() should be matched with a call to sf_close().
 */
 
@@ -471,7 +471,7 @@ SNDFILE* 	sf_open		(const char *path, int mode, SF_INFO *sfinfo) ;
 ** of file header is at the current file offset. This allows sound files within
 ** larger container files to be read and/or written.
 ** On error, this will return a NULL pointer. To find the error number, pass a
-** NULL SNDFILE to sf_perror () or sf_error_str ().
+** NULL SNDFILE to sf_strerror ().
 ** All calls to sf_open_fd() should be matched with a call to sf_close().
 
 */
@@ -499,7 +499,7 @@ const char* sf_strerror (SNDFILE *sndfile) ;
 
 const char*	sf_error_number	(int errnum) ;
 
-/* The following three error functions are deprecated but they will remain in the
+/* The following two error functions are deprecated but they will remain in the
 ** library for the forseeable future. The function sf_strerror() should be used
 ** in their place.
 */
