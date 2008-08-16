@@ -48,13 +48,6 @@
 #define	SAFE_STRNCPY(dest,src) \
 			{ strncpy (dest, src, sizeof (dest)) ; dest [sizeof (dest) - 1] = 0 ; }
 
-static void usage_exit (const char *progname, int exit_code) ;
-static void missing_param (const char * option) ;
-static void read_time (struct tm * timedata) ;
-
-static void broadcast_dump (const SF_BROADCAST_INFO * bext) ;
-
-
 typedef struct
 {	const char * name ;
 	const char * artist ;
@@ -62,14 +55,26 @@ typedef struct
 } TEMP_INFO ;
 
 
+
+static void usage_exit (const char *progname, int exit_code) ;
+static void missing_param (const char * option) ;
+static void read_localtime (struct tm * timedata) ;
+
+static void apply_changes (const char * filenames [2], const SF_BROADCAST_INFO * binfo, int coding_hist_append, const TEMP_INFO * info) ;
+
+static void merge_broadcast_info (SF_BROADCAST_INFO * binfo, const SF_BROADCAST_INFO * new_binfo, int coding_hist_append) ;
+static void update_strings (SNDFILE * file, TEMP_INFO * tinfo, const TEMP_INFO * new_tinfo) ;
+
+
+
 int
 main (int argc, char *argv [])
-{	SF_BROADCAST_INFO new_binfo ;
+{	SF_BROADCAST_INFO binfo ;
 	TEMP_INFO temp_info ;
 	struct tm timedata ;
 	const char *progname ;
-	const char * filename = NULL ;
-	int	k ;
+	const char * filenames [2] = { NULL, NULL } ;
+	int	k, coding_hist_append = 0 ;
 
 	/* Store the program name. */
 	progname = strrchr (argv [0], '/') ;
@@ -80,19 +85,22 @@ main (int argc, char *argv [])
 		usage_exit (progname, 0) ;
 
 	/* Clear set all fields of the struct to zero bytes. */
-	memset (&new_binfo, 0, sizeof (new_binfo)) ;
+	memset (&binfo, 0, sizeof (binfo)) ;
 	memset (&temp_info, 0, sizeof (temp_info)) ;
 
 	/* Get the time in case we need it later. */
-	read_time (&timedata) ;
+	read_localtime (&timedata) ;
 
 	for (k = 1 ; k < argc ; k++)
 	{	if (argv [k][0] != '-')
-		{	if (filename != NULL)
-			{	printf ("Error : have filename '%s' and just found another '%s'.\n\n", filename, argv [k]) ;
+		{	if (filenames [0] == NULL)
+				filenames [0] = argv [k] ;
+			else if (filenames [1] == NULL)
+				filenames [1] = argv [k] ;
+			else
+			{	printf ("Error : Already have two file names on the command line and then found '%s'.\n\n", argv [k]) ;
 				usage_exit (progname, 1) ;
 				} ;
-			filename = argv [k] ;
 			continue ;
 			} ;
 
@@ -100,7 +108,7 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (new_binfo.description, argv [k]) ;
+			SAFE_STRNCPY (binfo.description, argv [k]) ;
 			continue ;
 			} ;
 
@@ -108,7 +116,7 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (new_binfo.originator, argv [k]) ;
+			SAFE_STRNCPY (binfo.originator, argv [k]) ;
 			continue ;
 			} ;
 
@@ -116,7 +124,7 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (new_binfo.originator_reference, argv [k]) ;
+			SAFE_STRNCPY (binfo.originator_reference, argv [k]) ;
 			continue ;
 			} ;
 
@@ -124,7 +132,7 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (new_binfo.umid, argv [k]) ;
+			SAFE_STRNCPY (binfo.umid, argv [k]) ;
 			continue ;
 			} ;
 
@@ -132,7 +140,7 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (new_binfo.origination_date, argv [k]) ;
+			SAFE_STRNCPY (binfo.origination_date, argv [k]) ;
 			continue ;
 			} ;
 
@@ -140,7 +148,16 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (new_binfo.origination_time, argv [k]) ;
+			SAFE_STRNCPY (binfo.origination_time, argv [k]) ;
+			continue ;
+			} ;
+
+		if (strcmp (argv [k], "--coding-hist") == 0)
+		{	k ++ ;
+			if (k == argc) missing_param (argv [k - 1]) ;
+
+			SAFE_STRNCPY (binfo.coding_history, argv [k]) ;
+			binfo.coding_history_size = sizeof (binfo.coding_history) ;
 			continue ;
 			} ;
 
@@ -148,8 +165,10 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (new_binfo.coding_history, argv [k]) ;
-			new_binfo.coding_history_size = sizeof (new_binfo.coding_history) ;
+			SAFE_STRNCPY (binfo.coding_history, argv [k]) ;
+			binfo.coding_history_size = sizeof (binfo.coding_history) ;
+
+			coding_hist_append = 1 ;
 			continue ;
 			} ;
 
@@ -169,7 +188,7 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--info-cr-date") == 0)
+		if (strcmp (argv [k], "--info-create-date") == 0)
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
@@ -181,24 +200,24 @@ main (int argc, char *argv [])
 		if (strcmp (argv [k], "--auto-time-date") == 0)
 		{	char tmp [20] ;
 			snprintf (tmp, sizeof (tmp), "%02d-%02d-%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
-			strncpy (new_binfo.origination_time, tmp, sizeof (new_binfo.origination_time)) ;
+			strncpy (binfo.origination_time, tmp, sizeof (binfo.origination_time)) ;
 
 			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon, timedata.tm_mday) ;
-			strncpy (new_binfo.origination_date, tmp, sizeof (new_binfo.origination_date)) ;
+			strncpy (binfo.origination_date, tmp, sizeof (binfo.origination_date)) ;
 			continue ;
 			} ;
 
 		if (strcmp (argv [k], "--auto-time") == 0)
 		{	char tmp [20] ;
 			snprintf (tmp, sizeof (tmp), "%02d-%02d-%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
-			strncpy (new_binfo.origination_time, tmp, sizeof (new_binfo.origination_time)) ;
+			strncpy (binfo.origination_time, tmp, sizeof (binfo.origination_time)) ;
 			continue ;
 			} ;
 
 		if (strcmp (argv [k], "--auto-date") == 0)
 		{	char tmp [20] ;
 			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon, timedata.tm_mday) ;
-			strncpy (new_binfo.origination_date, tmp, sizeof (new_binfo.origination_date)) ;
+			strncpy (binfo.origination_date, tmp, sizeof (binfo.origination_date)) ;
 			continue ;
 			} ;
 
@@ -206,13 +225,17 @@ main (int argc, char *argv [])
 		usage_exit (progname, 1) ;
 		} ;
 
-	broadcast_dump (&new_binfo) ;
-	if (temp_info.name)
-		printf ("Info Name : %s\n", temp_info.name) ;
-	if (temp_info.artist)
-		printf ("Info Artist : %s\n", temp_info.artist) ;
-	if (temp_info.create_date)
-		printf ("Info Date : %s\n", temp_info.create_date) ;
+	if (filenames [0] == NULL)
+	{	printf ("Error : No input file specificed.\n\n") ;
+		exit (1) ;
+		} ;
+
+	if (strcmp (filenames [0], filenames [1]) == 0)
+	{	printf ("Error : Input and output files are the same.\n\n") ;
+		exit (1) ;
+		} ;
+
+	apply_changes (filenames, &binfo, coding_hist_append, &temp_info) ;
 
 	return 0 ;
 } /* main */
@@ -239,7 +262,7 @@ missing_param (const char * option)
 */
 
 static void
-read_time (struct tm * timedata)
+read_localtime (struct tm * timedata)
 {	time_t		current ;
 	struct tm	*tmptr ;
 
@@ -256,29 +279,143 @@ read_time (struct tm * timedata)
 #endif
 
 	return ;
-} /* read_time */
+} /* read_localtime */
 
 static void
-broadcast_dump (const SF_BROADCAST_INFO * bext)
-{	/*
-	**	From : http://www.ebu.ch/en/technical/publications/userguides/bwf_user_guide.php
-	**
-	**	Time Reference:
-	**		This field is a count from midnight in samples to the first sample
-	**		of the audio sequence.
-	*/
+apply_changes (const char * filenames [2], const SF_BROADCAST_INFO * new_binfo, int coding_hist_append, const TEMP_INFO * new_tinfo)
+{	SNDFILE *infile = NULL, *outfile = NULL ;
+	SF_INFO sfinfo ;
+	SF_BROADCAST_INFO binfo ;
+	TEMP_INFO tinfo ;
+	int error_code = 0 ;
 
-	printf ("Description      : %.*s\n", (int) sizeof (bext->description), bext->description) ;
-	printf ("Originator       : %.*s\n", (int) sizeof (bext->originator), bext->originator) ;
-	printf ("Origination ref  : %.*s\n", (int) sizeof (bext->originator_reference), bext->originator_reference) ;
-	printf ("Origination date : %.*s\n", (int) sizeof (bext->origination_date), bext->origination_date) ;
-	printf ("Origination time : %.*s\n", (int) sizeof (bext->origination_time), bext->origination_time) ;
+	if (filenames [1] == NULL)
+		infile = outfile = sf_open (filenames [0], SFM_RDWR, &sfinfo) ;
+	else
+	{	infile = sf_open (filenames [0], SFM_READ, &sfinfo) ;
 
-	printf ("Time ref         : 0\n") ;
+		/* Output must be WAV. */
+		sfinfo.format = SF_FORMAT_WAV | (SF_FORMAT_SUBMASK & sfinfo.format) ;
+		outfile = sf_open (filenames [1], SFM_WRITE, &sfinfo) ;
+		} ;
 
-	printf ("BWF version      : %d\n", bext->version) ;
-	printf ("UMID             : %.*s\n", (int) sizeof (bext->umid), bext->umid) ;
-	printf ("Coding history   : %.*s\n", bext->coding_history_size, bext->coding_history) ;
+	if (infile == NULL)
+	{	printf ("Error : Not able to open input file '%s' : %s\n", filenames [0], sf_strerror (infile)) ;
+		error_code = 1 ;
+		goto cleanup_exit ;
+		} ;
 
-} /* broadcast_dump */
+	if (outfile == NULL)
+	{	printf ("Error : Not able to open output file '%s' : %s\n", filenames [1], sf_strerror (outfile)) ;
+		error_code = 1 ;
+		goto cleanup_exit ;
+		} ;
+
+	if ((SF_FORMAT_SUBMASK & sfinfo.format) != SF_FORMAT_WAV)
+	{	printf ("Error : This is not a WAV file and hence broadcast info cannot be added to it.\n\n") ;
+		error_code = 1 ;
+		goto cleanup_exit ;
+		} ;
+
+	switch (SF_FORMAT_SUBMASK & sfinfo.format)
+	{	case SF_FORMAT_PCM_16 :
+		case SF_FORMAT_PCM_24 :
+		case SF_FORMAT_PCM_32 :
+			break ;
+
+		default :
+			printf (
+				"Warning : The EBU Technical Recommendation R68-2000 states that the only\n"
+				"          allowed encodings are Linear PCM and MPEG3. This file is not in\n"
+				"          the right format.\n\n"
+				) ;
+			break ;
+		} ;
+
+	tinfo.name = sf_get_string (infile, SF_STR_TITLE) ;
+	tinfo.artist = sf_get_string (infile, SF_STR_ARTIST) ;
+	tinfo.create_date = sf_get_string (infile, SF_STR_DATE) ;
+
+	if (sf_command (infile, SFC_GET_BROADCAST_INFO, &binfo, sizeof (binfo)) == 0)
+		memset (&binfo, 0, sizeof (binfo)) ;
+
+	merge_broadcast_info (&binfo, new_binfo, coding_hist_append) ;
+
+	if (sf_command (outfile, SFC_SET_BROADCAST_INFO, &binfo, sizeof (binfo)) == 0)
+		printf ("Error : Setting of broadcast info chunks failed.\n\n") ;
+	else
+		update_strings (outfile, &tinfo, new_tinfo) ;
+
+cleanup_exit :
+
+	if (outfile != NULL && outfile != infile)
+		sf_close (outfile) ;
+
+	if (infile != NULL)
+		sf_close (infile) ;
+
+	if (error_code)
+		exit (error_code) ;
+
+	return ;
+} /* apply_changes */
+
+static void
+merge_broadcast_info (SF_BROADCAST_INFO * binfo, const SF_BROADCAST_INFO * new_binfo, int coding_hist_append)
+{
+#define REPLACE_IF_NEW(x) \
+		if (strlen (new_binfo->x) > 0) \
+			memcpy (binfo->x, new_binfo->x, sizeof (binfo->x)) ;
+
+
+	REPLACE_IF_NEW (description) ;
+	REPLACE_IF_NEW (originator_reference) ;
+	REPLACE_IF_NEW (origination_date) ;
+	REPLACE_IF_NEW (origination_time) ;
+	REPLACE_IF_NEW (umid) ;
+
+	/* Special case for coding_history because we may want to append. */
+	if (strlen (new_binfo->coding_history) > 0)
+	{	if (coding_hist_append)
+		{	int slen = strlen (binfo->coding_history) ;
+
+			while (slen > 1 && isspace (binfo->coding_history [slen - 1]))
+				slen -- ;
+
+			binfo->coding_history [slen++] = '\n' ;
+			memcpy (binfo->coding_history + slen, new_binfo->coding_history, sizeof (binfo->coding_history) - slen) ;
+			}
+		else
+		{	memcpy (binfo->coding_history, new_binfo->coding_history, sizeof (binfo->coding_history)) ;
+			binfo->coding_history_size = sizeof (binfo->coding_history) ;
+			} ;
+		} ;
+
+} /* merge_broadcast_info*/
+
+static void
+update_strings (SNDFILE * file, TEMP_INFO * tinfo, const TEMP_INFO * new_tinfo)
+{
+	if (new_tinfo->name != NULL)
+	{	if (tinfo->name == NULL)
+			sf_set_string (file, SF_STR_TITLE, new_tinfo->name) ;
+		else
+			printf ("Warning : File already contains INAM info which cannot be overwritten.\n") ;
+		} ;
+
+	if (new_tinfo->artist != NULL)
+	{	if (tinfo->artist == NULL)
+			sf_set_string (file, SF_STR_ARTIST, new_tinfo->artist) ;
+		else
+			printf ("Warning : File already contains IART info which cannot be overwritten.\n") ;
+		} ;
+
+	if (new_tinfo->create_date != NULL)
+	{	if (tinfo->create_date == NULL)
+			sf_set_string (file, SF_STR_DATE, new_tinfo->create_date) ;
+		else
+			printf ("Warning : File already contains ICRD info which cannot be overwritten.\n") ;
+		} ;
+
+} /* update_strings */
 
