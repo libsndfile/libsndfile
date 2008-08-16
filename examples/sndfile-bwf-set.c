@@ -292,6 +292,7 @@ apply_changes (const char * filenames [2], const SF_BROADCAST_INFO * new_binfo, 
 	int error_code = 0, infileminor ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	memset (&tinfo, 0, sizeof (tinfo)) ;
 
 	if (filenames [1] == NULL)
 		infile = outfile = sf_open (filenames [0], SFM_RDWR, &sfinfo) ;
@@ -359,26 +360,23 @@ apply_changes (const char * filenames [2], const SF_BROADCAST_INFO * new_binfo, 
 		printf ("Error : Setting of broadcast info chunks failed.\n\n") ;
 
 	/* Grab the strings from the existing file. */
-#if 0
 	tinfo.name = sf_get_string (infile, SF_STR_TITLE) ;
 	tinfo.artist = sf_get_string (infile, SF_STR_ARTIST) ;
 	tinfo.create_date = sf_get_string (infile, SF_STR_DATE) ;
-#endif
 
 	if (infile == outfile)
 		update_strings (outfile, &tinfo, new_tinfo) ;
 	else
-	{	/* If the input and output files are different we merge the strings and
+	{	TEMP_INFO dummy = { NULL, NULL, NULL } ;
+
+		/* If the input and output files are different we merge the strings and
 		**	then clear the old versions.
 		*/
-#if 0
-		tinfo.name = new_tinfo.name ? new_tinfo.name : tinfo.name ;
-		tinfo.artist = new_tinfo.artist ? new_tinfo.artist : tinfo.artist ;
-		tinfo.create_date = new_tinfo.create_date ? new_tinfo.create_date : tinfo.create_date ;
-		memset (&tinfo, 0, sizeof (tinfo)) ;
-#endif
+		tinfo.name = new_tinfo->name ? new_tinfo->name : tinfo.name ;
+		tinfo.artist = new_tinfo->artist ? new_tinfo->artist : tinfo.artist ;
+		tinfo.create_date = new_tinfo->create_date ? new_tinfo->create_date : tinfo.create_date ;
 
-		update_strings (outfile, &tinfo, new_tinfo) ;
+		update_strings (outfile, &dummy, &tinfo) ;
 		} ;
 
 	if (infile != outfile)
@@ -412,6 +410,7 @@ merge_broadcast_info (SF_BROADCAST_INFO * binfo, const SF_BROADCAST_INFO * new_b
 
 
 	REPLACE_IF_NEW (description) ;
+	REPLACE_IF_NEW (originator) ;
 	REPLACE_IF_NEW (originator_reference) ;
 	REPLACE_IF_NEW (origination_date) ;
 	REPLACE_IF_NEW (origination_time) ;
