@@ -346,6 +346,7 @@ main (int argc, char * argv [])
 static void
 copy_metadata (SNDFILE *outfile, SNDFILE *infile)
 {	SF_INSTRUMENT inst ;
+	SF_BROADCAST_INFO binfo ;
 	const char *str ;
 	int k, err = 0 ;
 
@@ -356,8 +357,13 @@ copy_metadata (SNDFILE *outfile, SNDFILE *infile)
 		} ;
 
 	memset (&inst, 0, sizeof (inst)) ;
+	memset (&binfo, 0, sizeof (binfo)) ;
+
 	if (sf_command (infile, SFC_GET_INSTRUMENT, &inst, sizeof (inst)) == SF_TRUE)
 		sf_command (outfile, SFC_SET_INSTRUMENT, &inst, sizeof (inst)) ;
+
+	if (sf_command (infile, SFC_GET_BROADCAST_INFO, &binfo, sizeof (binfo)) == SF_TRUE)
+		sf_command (outfile, SFC_SET_BROADCAST_INFO, &binfo, sizeof (binfo)) ;
 
 } /* copy_metadata */
 

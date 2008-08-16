@@ -3,6 +3,9 @@
     * configure.ac
     Test for localtime and localtime_r.
 
+    * examples/sndfile-convert.c
+    In function copy_metadata(), copy broadcast info if present.
+
     * examples/sndfile-bwf-set.c examples/Makefile.am
     Add new file examples/sndfile-bwf-set.c and hook into build.
 
