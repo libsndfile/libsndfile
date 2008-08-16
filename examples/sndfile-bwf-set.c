@@ -42,6 +42,8 @@
 
 #include <sndfile.h>
 
+#include "copy_data.h"
+
 #define	BUFFER_LEN		(1 << 16)
 
 
@@ -199,24 +201,24 @@ main (int argc, char *argv [])
 		/* Following options do not take an argument. */
 		if (strcmp (argv [k], "--auto-time-date") == 0)
 		{	char tmp [20] ;
-			snprintf (tmp, sizeof (tmp), "%02d-%02d-%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
+			snprintf (tmp, sizeof (tmp), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
 			strncpy (binfo.origination_time, tmp, sizeof (binfo.origination_time)) ;
 
-			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon, timedata.tm_mday) ;
+			snprintf (tmp, sizeof (tmp), "%04d/%02d/%02d", timedata.tm_year + 1900, timedata.tm_mon, timedata.tm_mday) ;
 			strncpy (binfo.origination_date, tmp, sizeof (binfo.origination_date)) ;
 			continue ;
 			} ;
 
 		if (strcmp (argv [k], "--auto-time") == 0)
 		{	char tmp [20] ;
-			snprintf (tmp, sizeof (tmp), "%02d-%02d-%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
+			snprintf (tmp, sizeof (tmp), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
 			strncpy (binfo.origination_time, tmp, sizeof (binfo.origination_time)) ;
 			continue ;
 			} ;
 
 		if (strcmp (argv [k], "--auto-date") == 0)
 		{	char tmp [20] ;
-			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon, timedata.tm_mday) ;
+			snprintf (tmp, sizeof (tmp), "%04d/%02d/%02d", timedata.tm_year + 1900, timedata.tm_mon, timedata.tm_mday) ;
 			strncpy (binfo.origination_date, tmp, sizeof (binfo.origination_date)) ;
 			continue ;
 			} ;
@@ -230,7 +232,7 @@ main (int argc, char *argv [])
 		exit (1) ;
 		} ;
 
-	if (strcmp (filenames [0], filenames [1]) == 0)
+	if (filenames [1] != NULL && strcmp (filenames [0], filenames [1]) == 0)
 	{	printf ("Error : Input and output files are the same.\n\n") ;
 		exit (1) ;
 		} ;
@@ -287,7 +289,9 @@ apply_changes (const char * filenames [2], const SF_BROADCAST_INFO * new_binfo, 
 	SF_INFO sfinfo ;
 	SF_BROADCAST_INFO binfo ;
 	TEMP_INFO tinfo ;
-	int error_code = 0 ;
+	int error_code = 0, infileminor ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	if (filenames [1] == NULL)
 		infile = outfile = sf_open (filenames [0], SFM_RDWR, &sfinfo) ;
@@ -311,13 +315,15 @@ apply_changes (const char * filenames [2], const SF_BROADCAST_INFO * new_binfo, 
 		goto cleanup_exit ;
 		} ;
 
-	if ((SF_FORMAT_SUBMASK & sfinfo.format) != SF_FORMAT_WAV)
+	if ((SF_FORMAT_TYPEMASK & sfinfo.format) != SF_FORMAT_WAV)
 	{	printf ("Error : This is not a WAV file and hence broadcast info cannot be added to it.\n\n") ;
 		error_code = 1 ;
 		goto cleanup_exit ;
 		} ;
 
-	switch (SF_FORMAT_SUBMASK & sfinfo.format)
+	infileminor = SF_FORMAT_SUBMASK & sfinfo.format ;
+
+	switch (infileminor)
 	{	case SF_FORMAT_PCM_16 :
 		case SF_FORMAT_PCM_24 :
 		case SF_FORMAT_PCM_32 :
@@ -332,19 +338,56 @@ apply_changes (const char * filenames [2], const SF_BROADCAST_INFO * new_binfo, 
 			break ;
 		} ;
 
-	tinfo.name = sf_get_string (infile, SF_STR_TITLE) ;
-	tinfo.artist = sf_get_string (infile, SF_STR_ARTIST) ;
-	tinfo.create_date = sf_get_string (infile, SF_STR_DATE) ;
-
 	if (sf_command (infile, SFC_GET_BROADCAST_INFO, &binfo, sizeof (binfo)) == 0)
-		memset (&binfo, 0, sizeof (binfo)) ;
+	{	if (infile == outfile)
+		{	printf (
+				"Error : Attempting in-place broadcast info update, but file does not\n"
+				"        have a 'bext' chunk to modify. The solution is to specify both\n"
+				"        input and output files on the command line.\n\n"
+				) ;
+			error_code = 1 ;
+			goto cleanup_exit ;
+			} ;
 
+		memset (&binfo, 0, sizeof (binfo)) ;
+		} ;
+
+	/* Merge and write broadcast info. */
 	merge_broadcast_info (&binfo, new_binfo, coding_hist_append) ;
 
 	if (sf_command (outfile, SFC_SET_BROADCAST_INFO, &binfo, sizeof (binfo)) == 0)
 		printf ("Error : Setting of broadcast info chunks failed.\n\n") ;
-	else
+
+	/* Grab the strings from the existing file. */
+#if 0
+	tinfo.name = sf_get_string (infile, SF_STR_TITLE) ;
+	tinfo.artist = sf_get_string (infile, SF_STR_ARTIST) ;
+	tinfo.create_date = sf_get_string (infile, SF_STR_DATE) ;
+#endif
+
+	if (infile == outfile)
 		update_strings (outfile, &tinfo, new_tinfo) ;
+	else
+	{	/* If the input and output files are different we merge the strings and
+		**	then clear the old versions.
+		*/
+#if 0
+		tinfo.name = new_tinfo.name ? new_tinfo.name : tinfo.name ;
+		tinfo.artist = new_tinfo.artist ? new_tinfo.artist : tinfo.artist ;
+		tinfo.create_date = new_tinfo.create_date ? new_tinfo.create_date : tinfo.create_date ;
+		memset (&tinfo, 0, sizeof (tinfo)) ;
+#endif
+
+		update_strings (outfile, &tinfo, new_tinfo) ;
+		} ;
+
+	if (infile != outfile)
+	{	/* If the input file is not the same as the output file, copy the data. */
+		if ((infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT))
+			sfe_copy_data_fp (outfile, infile, sfinfo.channels) ;
+		else
+			sfe_copy_data_int (outfile, infile, sfinfo.channels) ;
+		} ;
 
 cleanup_exit :
 
