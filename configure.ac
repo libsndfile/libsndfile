@@ -253,7 +253,7 @@ AC_CHECK_FUNCS(malloc calloc realloc free)
 AC_CHECK_FUNCS(open read write lseek pread pwrite)
 AC_CHECK_FUNCS(fstat ftruncate fsync)
 AC_CHECK_FUNCS(snprintf vsnprintf)
-AC_CHECK_FUNCS(gmtime gmtime_r)
+AC_CHECK_FUNCS(gmtime gmtime_r localtime localtime_r)
 AC_CHECK_FUNCS(mmap getpagesize)
 AC_CHECK_FUNCS(setlocale)
 
