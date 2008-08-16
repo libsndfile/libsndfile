@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -33,6 +33,7 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
+#include	<inttypes.h>
 #include	<ctype.h>
 #include	<math.h>
 
@@ -247,17 +248,14 @@ info_dump (const char *filename)
 		}
 	else
 	{	printf ("Sample Rate : %d\n", sfinfo.samplerate) ;
-		if (sfinfo.frames > 0x7FFFFFFF)
-			printf ("Frames      : unknown\n") ;
-		else
-			printf ("Frames      : %ld\n", (long) sfinfo.frames) ;
+		printf ("Frames      : %" PRId64 "\n", sfinfo.frames) ;
 		printf ("Channels    : %d\n", sfinfo.channels) ;
 		printf ("Format      : 0x%08X\n", sfinfo.format) ;
 		printf ("Sections    : %d\n", sfinfo.sections) ;
 		printf ("Seekable    : %s\n", (sfinfo.seekable ? "TRUE" : "FALSE")) ;
 		printf ("Duration    : %s\n", generate_duration_str (&sfinfo)) ;
 
-		/* Do not use sf_signal_max because it doesn work for non-seekable files . */
+		/* Do not use sf_signal_max because it doesn't work for non-seekable files . */
 		signal_max = get_signal_max (file) ;
 		decibels = calc_decibels (&sfinfo, signal_max) ;
 		printf ("Signal Max  : %g (%4.2f dB)\n\n", signal_max, decibels) ;
