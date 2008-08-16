@@ -50,6 +50,8 @@ extern "C" {
 [+ ENDFOR float_type
 +]
 
+void	create_short_sndfile (const char *filename, int format, int channels) ;
+
 void	check_file_hash_or_die	(const char *filename, unsigned int target_hash, int line_num) ;
 
 void	print_test_name (const char *test, const char *filename) ;
@@ -195,6 +197,26 @@ gen_windowed_sine_[+ (get "name") +] ([+ (get "name") +] *data, int len, double 
 	return ;
 } /* gen_windowed_sine_[+ (get "name") +] */
 [+ ENDFOR float_type +]
+
+void
+create_short_sndfile (const char *filename, int format, int channels)
+{	SNDFILE *file ;
+	SF_INFO sfinfo ;
+	short data [channels * 100] ;
+
+	sfinfo.samplerate = 44100 ;
+	sfinfo.channels = channels ;
+	sfinfo.format = format ;
+
+	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
+	{	printf ("Error (%s, %d) : sf_open failed : %s\n", __FILE__, __LINE__, sf_strerror (file)) ;
+		exit (1) ;
+		} ;
+
+	sf_write_short (file, data, ARRAY_LEN (data)) ;
+
+	sf_close (file) ;
+} /* create_short_sndfile */
 
 void
 check_file_hash_or_die (const char *filename, unsigned int target_hash, int line_num)
