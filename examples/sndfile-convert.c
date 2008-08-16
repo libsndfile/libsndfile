@@ -37,7 +37,7 @@
 
 #include <sndfile.h>
 
-#define	 BUFFER_LEN	1024
+#include "copy_data.h"
 
 
 typedef	struct
@@ -52,8 +52,6 @@ typedef struct
 } OUTPUT_FORMAT_MAP ;
 
 static void copy_metadata (SNDFILE *outfile, SNDFILE *infile) ;
-static void copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels) ;
-static void copy_data_int (SNDFILE *outfile, SNDFILE *infile, int channels) ;
 
 static OUTPUT_FORMAT_MAP format_map [] =
 {
@@ -333,9 +331,9 @@ main (int argc, char * argv [])
 	if ((outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT)
 			|| (infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT)
 			|| (infileminor == SF_FORMAT_VORBIS) || (outfileminor == SF_FORMAT_VORBIS))
-		copy_data_fp (outfile, infile, sfinfo.channels) ;
+		sfe_copy_data_fp (outfile, infile, sfinfo.channels) ;
 	else
-		copy_data_int (outfile, infile, sfinfo.channels) ;
+		sfe_copy_data_int (outfile, infile, sfinfo.channels) ;
 
 	sf_close (infile) ;
 	sf_close (outfile) ;
@@ -366,50 +364,4 @@ copy_metadata (SNDFILE *outfile, SNDFILE *infile)
 		sf_command (outfile, SFC_SET_BROADCAST_INFO, &binfo, sizeof (binfo)) ;
 
 } /* copy_metadata */
-
-static void
-copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels)
-{	static double	data [BUFFER_LEN], max ;
-	int		frames, readcount, k ;
-
-	frames = BUFFER_LEN / channels ;
-	readcount = frames ;
-
-	sf_command (infile, SFC_CALC_SIGNAL_MAX, &max, sizeof (max)) ;
-
-	if (max < 1.0)
-	{	while (readcount > 0)
-		{	readcount = sf_readf_double (infile, data, frames) ;
-			sf_writef_double (outfile, data, readcount) ;
-			} ;
-		}
-	else
-	{	sf_command (infile, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
-
-		while (readcount > 0)
-		{	readcount = sf_readf_double (infile, data, frames) ;
-			for (k = 0 ; k < readcount * channels ; k++)
-				data [k] /= max ;
-			sf_writef_double (outfile, data, readcount) ;
-			} ;
-		} ;
-
-	return ;
-} /* copy_data_fp */
-
-static void
-copy_data_int (SNDFILE *outfile, SNDFILE *infile, int channels)
-{	static int	data [BUFFER_LEN] ;
-	int		frames, readcount ;
-
-	frames = BUFFER_LEN / channels ;
-	readcount = frames ;
-
-	while (readcount > 0)
-	{	readcount = sf_readf_int (infile, data, frames) ;
-		sf_writef_int (outfile, data, readcount) ;
-		} ;
-
-	return ;
-} /* copy_data_int */
 

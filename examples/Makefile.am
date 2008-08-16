@@ -25,13 +25,13 @@ sndfile_jackplay_SOURCES = sndfile-jackplay.c
 sndfile_jackplay_CFLAGS = $(JACK_CFLAGS)
 sndfile_jackplay_LDADD = $(SNDFILEDIR)/libsndfile.la $(JACK_LIBS)
 
-sndfile_convert_SOURCES = sndfile-convert.c
+sndfile_convert_SOURCES = sndfile-convert.c copy_data.c copy_data.h
 sndfile_convert_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 sndfile_cmp_SOURCES = sndfile-cmp.c
 sndfile_cmp_LDADD = $(SNDFILEDIR)/libsndfile.la
 
-sndfile_bwf_set_SOURCES = sndfile-bwf-set.c
+sndfile_bwf_set_SOURCES = sndfile-bwf-set.c copy_data.c copy_data.h
 sndfile_bwf_set_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 make_sine_SOURCES = make_sine.c
