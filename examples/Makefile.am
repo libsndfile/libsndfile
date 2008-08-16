@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 bin_PROGRAMS = sndfile-info sndfile-play sndfile-convert sndfile-jackplay sndfile-cmp \
-				sndfile-bwf-set
+				sndfile-bwf-set sndfile-bwf-get
 
 noinst_PROGRAMS = make_sine sfprocess list_formats generate sndfilehandle
 
@@ -33,6 +33,9 @@ sndfile_cmp_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 sndfile_bwf_set_SOURCES = sndfile-bwf-set.c copy_data.c copy_data.h
 sndfile_bwf_set_LDADD = $(SNDFILEDIR)/libsndfile.la
+
+sndfile_bwf_get_SOURCES = sndfile-bwf-get.c
+sndfile_bwf_get_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 make_sine_SOURCES = make_sine.c
 make_sine_LDADD = $(SNDFILEDIR)/libsndfile.la
