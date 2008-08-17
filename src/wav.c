@@ -951,7 +951,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->headindex + 8 < psf->dataoffset)
 	{	/* Add PAD data if necessary. */
 		k = psf->dataoffset - 16 - psf->headindex ;
-		psf_binheader_writef (psf, "em4z", PAD_MARKER, k, make_size_t (k)) ;
+		psf_binheader_writef (psf, "m4z", PAD_MARKER, k, make_size_t (k)) ;
 		} ;
 
 	psf_binheader_writef (psf, "tm8", data_MARKER, psf->datalength) ;

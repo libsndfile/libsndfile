@@ -7,6 +7,7 @@
     In RDWR mode, pad the header if necessary (ie LIST chunk has moved or
     length has changed).
     Minor fixes in wav_write_strings.
+	Write PAD chunk with default endian-ness, not a specific endian-ness.
 
     * examples/test-sndfile-bwf-set.py
     Add Python script to test sndfile-bwf-set/get.
