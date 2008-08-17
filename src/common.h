@@ -350,9 +350,6 @@ typedef struct sf_private_tag
 
 	int				ieee_replace ;
 
-	/* For ambisonic commands */
-	int				wavex_ambisonic ;
-
 	/* A set of file specific function pointers */
 	sf_count_t		(*read_short)	(struct sf_private_tag*, short *ptr, sf_count_t len) ;
 	sf_count_t		(*read_int)		(struct sf_private_tag*, int *ptr, sf_count_t len) ;

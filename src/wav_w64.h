@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -257,7 +257,10 @@ typedef struct
 } FACT_CHUNK ;
 
 typedef struct
-{	/* Set to true when 'fmt ' chunk is ambiguous.*/
+{	/* For ambisonic commands */
+	int	wavex_ambisonic ;
+
+	/* Set to true when 'fmt ' chunk is ambiguous.*/
 	int fmt_is_broken ;
 	WAV_FMT wav_fmt ;
 } WAV_PRIVATE ;

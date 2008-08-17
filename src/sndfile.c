@@ -2463,11 +2463,6 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	/* An attempt at a per SF_PRIVATE unique id. */
 	psf->unique_id		= psf_rand_int32 () ;
 
-	/*
-	**	File formats that support ambisonic should override this default
-	**	and set it to SF_AMBISONIC_NONE.
-	*/
-	psf->wavex_ambisonic = 0 ;
 	psf->sf.sections = 1 ;
 
 	psf->is_pipe = psf_is_pipe (psf) ;

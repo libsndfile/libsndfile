@@ -184,7 +184,7 @@ wav_open	 (SF_PRIVATE *psf)
 		return SFE_MALLOC_FAILED ;
 	psf->container_data = wpriv ;
 
-	psf->wavex_ambisonic = SF_AMBISONIC_NONE ;
+	wpriv->wavex_ambisonic = SF_AMBISONIC_NONE ;
 	psf->str_flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END ;
 
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
@@ -198,7 +198,7 @@ wav_open	 (SF_PRIVATE *psf)
 	{	if (psf->is_pipe)
 			return SFE_NO_PIPE_WRITE ;
 
-		psf->wavex_ambisonic = SF_AMBISONIC_NONE ;
+		wpriv->wavex_ambisonic = SF_AMBISONIC_NONE ;
 
 		format = psf->sf.format & SF_FORMAT_TYPEMASK ;
 		if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX)
@@ -969,8 +969,12 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 
 static int
 wavex_write_header (SF_PRIVATE *psf, int calc_length)
-{	sf_count_t	current ;
+{	WAV_PRIVATE	*wpriv ;
+	sf_count_t	current ;
 	int 		fmt_size, k, subformat, add_fact_chunk = SF_FALSE, has_data = SF_FALSE ;
+
+	if ((wpriv = psf->container_data) == NULL)
+		return SFE_INTERNAL ;
 
 	current = psf_ftell (psf) ;
 
@@ -1048,7 +1052,7 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 			/* For an Ambisonic file set the channel mask to zero.
 			** Otherwise use a default based on the channel count.
 			*/
-			if (psf->wavex_ambisonic != SF_AMBISONIC_NONE)
+			if (wpriv->wavex_ambisonic != SF_AMBISONIC_NONE)
 				psf_binheader_writef (psf, "4", 0) ;
 			else
 			{	/*
@@ -1096,13 +1100,13 @@ wavex_write_header (SF_PRIVATE *psf, int calc_length)
 		case SF_FORMAT_PCM_16 :
 		case SF_FORMAT_PCM_24 :
 		case SF_FORMAT_PCM_32 :
-			wavex_write_guid (psf, psf->wavex_ambisonic == SF_AMBISONIC_NONE ?
+			wavex_write_guid (psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE ?
 						&MSGUID_SUBTYPE_PCM : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM) ;
 			break ;
 
 		case SF_FORMAT_FLOAT :
 		case SF_FORMAT_DOUBLE :
-			wavex_write_guid (psf, psf->wavex_ambisonic == SF_AMBISONIC_NONE ?
+			wavex_write_guid (psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE ?
 						&MSGUID_SUBTYPE_IEEE_FLOAT : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT) ;
 			add_fact_chunk = SF_TRUE ;
 			break ;
@@ -1249,21 +1253,25 @@ wav_close (SF_PRIVATE *psf)
 
 static int
 wav_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
-{
+{	WAV_PRIVATE	*wpriv ;
+
+	if ((wpriv = psf->container_data) == NULL)
+		return SFE_INTERNAL ;
+
 	switch (command)
 	{	case SFC_WAVEX_SET_AMBISONIC :
 			if ((psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAVEX)
 			{	if (datasize == SF_AMBISONIC_NONE)
-					psf->wavex_ambisonic = SF_AMBISONIC_NONE ;
+					wpriv->wavex_ambisonic = SF_AMBISONIC_NONE ;
 				else if (datasize == SF_AMBISONIC_B_FORMAT)
-					psf->wavex_ambisonic = SF_AMBISONIC_B_FORMAT ;
+					wpriv->wavex_ambisonic = SF_AMBISONIC_B_FORMAT ;
 				else
 					return 0 ;
 				} ;
-			return psf->wavex_ambisonic ;
+			return wpriv->wavex_ambisonic ;
 
 		case SFC_WAVEX_GET_AMBISONIC :
-			return psf->wavex_ambisonic ;
+			return wpriv->wavex_ambisonic ;
 
 		default :
 			break ;

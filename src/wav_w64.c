@@ -313,12 +313,12 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				else if (wavex_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM))
 				{	psf->sf.format = SF_FORMAT_WAVEX | u_bitwidth_to_subformat (psf->bytewidth * 8) ;
 					psf_log_printf (psf, "    format : pcm (Ambisonic B)\n") ;
-					psf->wavex_ambisonic = SF_AMBISONIC_B_FORMAT ;
+					wpriv->wavex_ambisonic = SF_AMBISONIC_B_FORMAT ;
 					}
 				else if (wavex_guid_equal (&wav_fmt->ext.esf, &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT))
 				{	psf->sf.format = SF_FORMAT_WAVEX | ((psf->bytewidth == 8) ? SF_FORMAT_DOUBLE : SF_FORMAT_FLOAT) ;
 					psf_log_printf (psf, "    format : IEEE float (Ambisonic B)\n") ;
-					psf->wavex_ambisonic = SF_AMBISONIC_B_FORMAT ;
+					wpriv->wavex_ambisonic = SF_AMBISONIC_B_FORMAT ;
 					}
 				else
 					return SFE_UNIMPLEMENTED ;
