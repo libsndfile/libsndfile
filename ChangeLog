@@ -3,6 +3,11 @@
     * tests/string_test.c
     Polish string_multi_set_test.
 
+    * src/wav.c
+    In RDWR mode, pad the header if necessary (ie LIST chunk has moved or
+    length has changed).
+    Minor fixes in wav_write_strings.
+
 2008-08-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/string_test.c

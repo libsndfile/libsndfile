@@ -948,13 +948,21 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 			} ;
 		} ;
 
+	if (psf->headindex + 8 < psf->dataoffset)
+	{	/* Add PAD data if necessary. */
+		k = psf->dataoffset - 16 - psf->headindex ;
+		psf_binheader_writef (psf, "em4z", PAD_MARKER, k, make_size_t (k)) ;
+		} ;
+
 	psf_binheader_writef (psf, "tm8", data_MARKER, psf->datalength) ;
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 	if (psf->error)
 		return psf->error ;
 
 	if (has_data && psf->dataoffset != psf->headindex)
+	{	psf_log_printf (psf, "Oooops : has_data && psf->dataoffset != psf->headindex\n") ;
 		return psf->error = SFE_INTERNAL ;
+		} ;
 
 	psf->dataoffset = psf->headindex ;
 
@@ -1198,6 +1206,9 @@ static void
 wav_write_strings (SF_PRIVATE *psf, int location)
 {	int	k, prev_head_index, saved_head_index ;
 
+	if (psf_location_string_count (psf, location) == 0)
+		return ;
+
 	prev_head_index = psf->headindex + 4 ;
 
 	psf_binheader_writef (psf, "m4m", LIST_MARKER, 0xBADBAD, INFO_MARKER) ;
@@ -1205,7 +1216,7 @@ wav_write_strings (SF_PRIVATE *psf, int location)
 	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
 	{	if (psf->strings [k].type == 0)
 			break ;
-		if (psf->strings [k].flags != location)
+		if (psf->strings [k].type < 0 || psf->strings [k].flags != location)
 			continue ;
 
 		switch (psf->strings [k].type)
@@ -1231,6 +1242,9 @@ wav_write_strings (SF_PRIVATE *psf, int location)
 
 			case SF_STR_DATE :
 				psf_binheader_writef (psf, "ms", ICRD_MARKER, psf->strings [k].str) ;
+				break ;
+
+			default :
 				break ;
 			} ;
 		} ;
