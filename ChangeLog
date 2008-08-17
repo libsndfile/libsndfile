@@ -2,6 +2,7 @@
 
     * tests/string_test.c
     Add a new string_rdwr_test (currently failing for WAV).
+    Add a new string_multi_set_test (currently failing).
 
     * tests/command_test.c
     Add new broadcast_rdwr_test (currently failing).

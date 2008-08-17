@@ -36,9 +36,11 @@
 
 static void	string_start_test (const char *filename, int typemajor) ;
 static void	string_start_end_test (const char *filename, int typemajor) ;
+static void	string_multi_set_test (const char *filename, int typemajor) ;
 static void	string_rdwr_test (const char *filename, int typemajor) ;
 
 static int libsndfile_str_count (const char * cptr) ;
+static int str_count (const char * haystack, const char * needle) ;
 
 int
 main (int argc, char *argv [])
@@ -60,6 +62,7 @@ main (int argc, char *argv [])
 
 	if (do_all || ! strcmp (argv [1], "wav"))
 	{	string_start_end_test ("strings.wav", SF_FORMAT_WAV) ;
+		string_multi_set_test ("multi.wav", SF_FORMAT_WAV) ;
 		string_rdwr_test ("rdwr.wav", SF_FORMAT_WAV) ;
 		test_count++ ;
 		} ;
@@ -103,12 +106,12 @@ main (int argc, char *argv [])
 static const char
 	software	[]	= "software (libsndfile-X.Y.Z)",
 	artist		[]	= "The Artist",
-	copyright	[]	= "Copyright (c) 2001 The Artist",
+	copyright	[]	= "Copyright (c) 2001 Artist",
 	comment		[]	= "Comment goes here!!!",
 	date		[]	= "2001/01/27",
 	album		[]	= "The Album",
 	license		[]	= "The license",
-	title		[] = "This is the title" ;
+	title		[]	= "This is the title" ;
 
 static	short	data_out [BUFFER_LEN] ;
 
@@ -180,7 +183,7 @@ string_start_end_test (const char *filename, int typemajor)
 		printf ("    Bad software  : %s\n", cptr) ;
 		} ;
 
-	if (libsndfile_str_count (cptr) != 1)
+	if (str_count (cptr, "libsndfile") != 1)
 	{	if (errors++ == 0)
 			puts ("\n") ;
 		printf ("    Bad software  : %s\n", cptr) ;
@@ -311,7 +314,7 @@ string_start_test (const char *filename, int typemajor)
 		printf ("    Bad software  : %s\n", cptr) ;
 		} ;
 
-	if (libsndfile_str_count (cptr) != 1)
+	if (str_count (cptr, "libsndfile") != 1)
 	{	if (errors++ == 0)
 			puts ("\n") ;
 		printf ("    Bad software  : %s\n", cptr) ;
@@ -371,6 +374,72 @@ string_start_test (const char *filename, int typemajor)
 } /* string_start_test */
 
 static void
+string_multi_set_test (const char *filename, int typemajor)
+{	static char buffer [2048] ;
+	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	int			count ;
+
+	print_test_name (__func__, filename) ;
+
+	sfinfo.format		= typemajor | SF_FORMAT_PCM_16 ;
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.channels		= 1 ;
+	sfinfo.frames		= 0 ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	/* Write stuff at start of file. */
+	sf_set_string (file, SF_STR_TITLE, title) ;
+	sf_set_string (file, SF_STR_SOFTWARE, software) ;
+	sf_set_string (file, SF_STR_ARTIST, artist) ;
+
+	/* Write data to file. */
+	test_write_short_or_die (file, 0, data_out, BUFFER_LEN, __LINE__) ;
+
+	/* Write it all again. */
+	sf_set_string (file, SF_STR_TITLE, title) ;
+	sf_set_string (file, SF_STR_SOFTWARE, software) ;
+	sf_set_string (file, SF_STR_ARTIST, artist) ;
+	sf_set_string (file, SF_STR_COPYRIGHT, copyright) ;
+	sf_set_string (file, SF_STR_COMMENT, comment) ;
+	sf_set_string (file, SF_STR_DATE, date) ;
+	sf_set_string (file, SF_STR_ALBUM, album) ;
+	sf_set_string (file, SF_STR_LICENSE, license) ;
+	sf_set_string (file, SF_STR_COPYRIGHT, copyright) ;
+	sf_set_string (file, SF_STR_COMMENT, comment) ;
+	sf_set_string (file, SF_STR_DATE, date) ;
+	sf_set_string (file, SF_STR_ALBUM, album) ;
+	sf_set_string (file, SF_STR_LICENSE, license) ;
+
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	sf_command	(file, SFC_GET_LOG_INFO, buffer, sizeof (buffer)) ;
+	sf_close (file) ;
+
+	count = str_count (buffer, title) ;
+	exit_if_true (count < 1, "\n\nLine %d : Could not find title in :\n%s\n", __LINE__, buffer) ;
+	exit_if_true (count > 1, "\n\nLine %d : Title appears %d times in :\n\n%s\n", __LINE__, count, buffer) ;
+
+	count = str_count (buffer, software) ;
+	exit_if_true (count < 1, "\n\nLine %d : Could not find software in :\n%s\n", __LINE__, buffer) ;
+	exit_if_true (count > 1, "\n\nLine %d : Software appears %d times in :\n\n%s\n", __LINE__, count, buffer) ;
+
+	count = str_count (buffer, artist) ;
+	exit_if_true (count < 1, "\n\nLine %d : Could not find artist in :\n%s\n", __LINE__, buffer) ;
+	exit_if_true (count > 1, "\n\nLine %d : Artist appears %d times in :\n\n%s\n", __LINE__, count, buffer) ;
+
+	count = str_count (buffer, copyright) ;
+	exit_if_true (count < 1, "\n\nLine %d : Could not find copyright in :\n%s\n", __LINE__, buffer) ;
+	exit_if_true (count > 1, "\n\nLine %d : Copyright appears %d times in :\n\n%s\n", __LINE__, count, buffer) ;
+
+	unlink (filename) ;
+
+	puts ("ok") ;
+} /* string_multi_set_test */
+
+static void
 string_rdwr_test (const char *filename, int typemajor)
 {	SNDFILE *file ;
 	SF_INFO sfinfo ;
@@ -398,11 +467,12 @@ string_rdwr_test (const char *filename, int typemajor)
 	sf_close (file) ;
 
 	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__) ;
+	str = sf_get_string (file, SF_STR_TITLE) ;
+	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_TITLE string is NULL.\n", __LINE__) ;
 	sf_set_string (file, SF_STR_ARTIST, artist) ;
 	sf_close (file) ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
-	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %lld should be %lld.\n", __LINE__, sfinfo.frames, frames) ;
 
 	str = sf_get_string (file, SF_STR_ARTIST) ;
 	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_ARTIST string is NULL.\n", __LINE__) ;
@@ -412,26 +482,23 @@ string_rdwr_test (const char *filename, int typemajor)
 	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_TITLE string is NULL.\n", __LINE__) ;
 	exit_if_true (strcmp (str, title) != 0, "\n\nLine %d : SF_STR_TITLE doesn't match what was written.\n", __LINE__) ;
 
-	sf_close (file) ;
+	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %lld should be %lld.\n", __LINE__, sfinfo.frames, frames) ;
 
+	sf_close (file) ;
 	unlink (filename) ;
 
 	puts ("ok") ;
 } /* string_rdwr_test */
 
 static int
-libsndfile_str_count (const char * str)
-{	const char * cptr ;
+str_count (const char * haystack, const char * needle)
+{	int count = 0 ;
 
-	if (str != NULL)
-	{	if ((cptr = strstr (str, "libsndfile")) == NULL)
-			return 0 ;
-
-		if ((cptr = strstr (cptr + 1, "libsndfile")) == NULL)
-			return 1 ;
+	while ((haystack = strstr (haystack, needle)) != NULL)
+	{	count ++ ;
+		haystack ++ ;
 		} ;
 
-	return 2 ;
-} /* libsndfile_str_count */
-
+	return count ;
+} /* str_count */
 
