@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003,2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@
 
 static void	string_start_test (const char *filename, int typemajor) ;
 static void	string_start_end_test (const char *filename, int typemajor) ;
+static void	string_rdwr_test (const char *filename, int typemajor) ;
 
 static int libsndfile_str_count (const char * cptr) ;
 
@@ -59,6 +60,7 @@ main (int argc, char *argv [])
 
 	if (do_all || ! strcmp (argv [1], "wav"))
 	{	string_start_end_test ("strings.wav", SF_FORMAT_WAV) ;
+		string_rdwr_test ("rdwr.wav", SF_FORMAT_WAV) ;
 		test_count++ ;
 		} ;
 
@@ -105,7 +107,8 @@ static const char
 	comment		[]	= "Comment goes here!!!",
 	date		[]	= "2001/01/27",
 	album		[]	= "The Album",
-	license		[]	= "The license" ;
+	license		[]	= "The license",
+	title		[] = "This is the title" ;
 
 static	short	data_out [BUFFER_LEN] ;
 
@@ -366,6 +369,55 @@ string_start_test (const char *filename, int typemajor)
 
 	puts ("ok") ;
 } /* string_start_test */
+
+static void
+string_rdwr_test (const char *filename, int typemajor)
+{	SNDFILE *file ;
+	SF_INFO sfinfo ;
+	sf_count_t frames ;
+	const char * str ;
+
+	print_test_name (__func__, filename) ;
+	create_short_sndfile (filename, typemajor | SF_FORMAT_PCM_16, 2) ;
+
+	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__) ;
+	frames = sfinfo.frames ;
+	sf_set_string (file, SF_STR_TITLE, title) ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %lld should be %lld.\n", __LINE__, sfinfo.frames, frames) ;
+	str = sf_get_string (file, SF_STR_TITLE) ;
+	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_TITLE string is NULL.\n", __LINE__) ;
+	exit_if_true (strcmp (str, title) != 0, "\n\nLine %d : SF_STR_TITLE doesn't match what was written.\n", __LINE__) ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__) ;
+	frames = sfinfo.frames ;
+	sf_set_string (file, SF_STR_TITLE, title) ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__) ;
+	sf_set_string (file, SF_STR_ARTIST, artist) ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %lld should be %lld.\n", __LINE__, sfinfo.frames, frames) ;
+
+	str = sf_get_string (file, SF_STR_ARTIST) ;
+	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_ARTIST string is NULL.\n", __LINE__) ;
+	exit_if_true (strcmp (str, artist) != 0, "\n\nLine %d : SF_STR_ARTIST doesn't match what was written.\n", __LINE__) ;
+
+	str = sf_get_string (file, SF_STR_TITLE) ;
+	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_TITLE string is NULL.\n", __LINE__) ;
+	exit_if_true (strcmp (str, title) != 0, "\n\nLine %d : SF_STR_TITLE doesn't match what was written.\n", __LINE__) ;
+
+	sf_close (file) ;
+
+	unlink (filename) ;
+
+	puts ("ok") ;
+} /* string_rdwr_test */
 
 static int
 libsndfile_str_count (const char * str)

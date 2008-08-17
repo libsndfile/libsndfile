@@ -1,3 +1,8 @@
+2008-08-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/string_test.c
+    Add a new string_rdwr_test (currently failing for WAV).
+
 2008-08-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
@@ -6,8 +11,16 @@
     * examples/sndfile-convert.c
     In function copy_metadata(), copy broadcast info if present.
 
-    * examples/sndfile-bwf-set.c examples/Makefile.am
-    Add new file examples/sndfile-bwf-set.c and hook into build.
+    * examples/copy_data.[ch] examples/Makefile.am
+    Break some functionality out of sndfile-convert.c so it can be used in
+    examples/sndfile-bwf-set.c.
+
+    * tests/utils.tpl
+    Add new function create_short_sndfile().
+
+    * examples/sndfile-bwf-set.c examples/sndfile-bwf-get.c
+	    examples/Makefile.am
+    Add new files and hook into build.
 
 2008-08-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
