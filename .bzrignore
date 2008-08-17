@@ -37,6 +37,8 @@ examples/generate
 examples/list_formats
 examples/make_sine
 examples/sfprocess
+examples/sndfile-bwf-get
+examples/sndfile-bwf-set
 examples/sndfile-cmp
 examples/sndfile-convert
 examples/sndfile-data-trim

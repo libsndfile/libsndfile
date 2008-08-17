@@ -8,6 +8,9 @@
     length has changed).
     Minor fixes in wav_write_strings.
 
+    * examples/test-sndfile-bwf-set.py
+    Add Python script to test sndfile-bwf-set/get.
+
 2008-08-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/string_test.c
