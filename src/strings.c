@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2004 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -34,7 +34,7 @@ int
 psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 {	static char lsf_name [] = PACKAGE "-" VERSION ;
 	static char bracket_name [] = " (" PACKAGE "-" VERSION ")" ;
-	int		k, str_len, len_remaining, str_flags ;
+	int		k, str_len, len_remaining, str_flags, str_type_replace = 0 ;
 
 	if (str == NULL)
 		return SFE_STR_BAD_STRING ;
@@ -52,18 +52,23 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 			return SFE_STR_BAD_STRING ;
 		} ;
 
+	/* Find the next free slot in table. */
+	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
+	{	/* If we find a matching entry clear it. */
+		if (psf->strings [k].type == str_type)
+			psf->strings [k].type = -1 ;
+
+		if (psf->strings [k].type == 0)
+			break ;
+		} ;
+
 	/* Determine flags */
 	str_flags = SF_STR_LOCATE_START ;
-	if (psf->have_written)
+	if (psf->mode == SFM_RDWR || psf->have_written || str_type_replace)
 	{	if ((psf->str_flags & SF_STR_ALLOW_END) == 0)
 			return SFE_STR_NO_ADD_END ;
 		str_flags = SF_STR_LOCATE_END ;
 		} ;
-
-	/* Find next free slot in table. */
-	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
-		if (psf->strings [k].type == 0)
-			break ;
 
 	/* More sanity checking. */
 	if (k >= SF_MAX_STRINGS)
@@ -146,7 +151,7 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 			return SFE_STR_BAD_TYPE ;
 		} ;
 
-	psf->str_flags |= (psf->have_written) ? SF_STR_LOCATE_END : SF_STR_LOCATE_START ;
+	psf->str_flags |= str_flags ;
 
 #if STRINGS_DEBUG
 	hexdump (psf->str_storage, 300) ;
@@ -173,6 +178,20 @@ psf_get_string (SF_PRIVATE *psf, int str_type)
 
 	return NULL ;
 } /* psf_get_string */
+
+int
+psf_location_string_count (const SF_PRIVATE * psf, int location)
+{	int k, count = 0 ;
+
+	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
+		if (psf->strings [k].type > 0 && psf->strings [k].flags & location)
+			count ++ ;
+
+	return count ;
+} /* psf_location_string_count */
+
+/*==============================================================================
+*/
 
 #if STRINGS_DEBUG
 
