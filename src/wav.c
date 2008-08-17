@@ -1171,7 +1171,10 @@ wav_write_tailer (SF_PRIVATE *psf)
 	psf->header [0] = 0 ;
 	psf->headindex = 0 ;
 
-	psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
+	if (psf->dataend > 0)
+		psf_fseek (psf, psf->dataend, SEEK_SET) ;
+	else
+		psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
 
 	/* Add a PEAK chunk if requested. */
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_END)

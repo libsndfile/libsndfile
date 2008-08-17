@@ -9,6 +9,7 @@
 
     * src/wav.c
     Fix to WAV parser to allow 'bext' chunk to be updated in place.
+	In wav_write_tailer, seek to psf->dataend if its greater than zero.
 
     * src/sndfile.c
     Make sure psf->have_written gets set correctly in mode SFM_RDWR.
@@ -16,7 +17,7 @@
     * configure.ac
     Test for <sys/time.h> and gettimeofday.
 
-	* src/common.c
+    * src/common.c
     Use gettimeofday() to initialize psf_rand_int32.
 
     * src/common.h src/sndfile.c
@@ -41,7 +42,7 @@
     Add new function create_short_sndfile().
 
     * examples/sndfile-bwf-set.c examples/sndfile-bwf-get.c
-	    examples/Makefile.am
+        examples/Makefile.am
     Add new files and hook into build.
 
 2008-08-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
@@ -100,7 +101,7 @@
 
     * src/test_float.c src/test_main.(c|h) src/Makefile.am
     Add new file to test functions float32_(le|be)_(read|write) and
-	double64_(le|be)_(read|write). Hook into build and testsuite.
+    double64_(le|be)_(read|write). Hook into build and testsuite.
 
     * src/double64.c src/float32.c
     Fix bugs in functions found by test added above. Thanks to Nicolas Castagne
