@@ -771,7 +771,7 @@ void	psf_sanitize_string (char * cptr, int len) ;
 void	psf_get_date_str (char *str, int maxlen) ;
 
 SF_BROADCAST_INFO* broadcast_info_alloc (void) ;
-int		broadcast_info_copy (SF_BROADCAST_INFO* dst, SF_BROADCAST_INFO* src) ;
+int		broadcast_info_copy (SF_BROADCAST_INFO* dst, const SF_BROADCAST_INFO* src) ;
 int		broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, unsigned int samplerate, int format) ;
 
 typedef struct

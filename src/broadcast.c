@@ -37,7 +37,7 @@ broadcast_info_alloc (void)
 } /* broadcast_info_alloc */
 
 int
-broadcast_info_copy (SF_BROADCAST_INFO* dst, SF_BROADCAST_INFO* src)
+broadcast_info_copy (SF_BROADCAST_INFO* dst, const SF_BROADCAST_INFO* src)
 {	memcpy (dst, src, sizeof (SF_BROADCAST_INFO)) ;
 
 	/* Currently writing this version. */
