@@ -59,6 +59,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS(endian.h)
 AC_CHECK_HEADERS(byteswap.h)
 AC_CHECK_HEADERS(locale.h)
+AC_CHECK_HEADERS(sys/time.h)
 
 AC_HEADER_SYS_WAIT
 
@@ -253,7 +254,7 @@ AC_CHECK_FUNCS(malloc calloc realloc free)
 AC_CHECK_FUNCS(open read write lseek pread pwrite)
 AC_CHECK_FUNCS(fstat ftruncate fsync)
 AC_CHECK_FUNCS(snprintf vsnprintf)
-AC_CHECK_FUNCS(gmtime gmtime_r localtime localtime_r)
+AC_CHECK_FUNCS(gmtime gmtime_r localtime localtime_r gettimeofday)
 AC_CHECK_FUNCS(mmap getpagesize)
 AC_CHECK_FUNCS(setlocale)
 
