@@ -2716,7 +2716,11 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		} ;
 
 	psf->read_current = 0 ;
-	psf->write_current = (psf->mode == SFM_RDWR) ? psf->sf.frames : 0 ;
+	psf->write_current = 0 ;
+	if (psf->mode == SFM_RDWR)
+	{	psf->write_current = psf->sf.frames ;
+		psf->have_written = psf->sf.frames > 0 ? SF_TRUE : SF_FALSE ;
+		} ;
 
 	memcpy (sfinfo, &(psf->sf), sizeof (SF_INFO)) ;
 

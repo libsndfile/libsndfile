@@ -9,6 +9,9 @@
     * src/wav.c
     Fix to WAV parser to allow 'bext' chunk to be updated in place.
 
+    * src/sndfile.c
+    Make sure psf->have_written gets set correctly in mode SFM_RDWR.
+
 2008-08-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
