@@ -1,3 +1,8 @@
+2008-08-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/string_test.c
+    Polish string_multi_set_test.
+
 2008-08-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/string_test.c
@@ -9,7 +14,7 @@
 
     * src/wav.c
     Fix to WAV parser to allow 'bext' chunk to be updated in place.
-	In wav_write_tailer, seek to psf->dataend if its greater than zero.
+    In wav_write_tailer, seek to psf->dataend if its greater than zero.
 
     * src/sndfile.c
     Make sure psf->have_written gets set correctly in mode SFM_RDWR.
@@ -25,6 +30,9 @@
 
     * src/common.h src/sndfile.c src/wav.c src/wav_w64.[ch]
     Move wavex_ambisonic field from SF_PRIVATE struct to WAV_PRIVATE struct.
+
+    * src/common.h src/strings.c
+    Add function psf_location_string_count.
 
 2008-08-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

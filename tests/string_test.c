@@ -375,7 +375,13 @@ string_start_test (const char *filename, int typemajor)
 
 static void
 string_multi_set_test (const char *filename, int typemajor)
-{	static char buffer [2048] ;
+{	static const char
+		new_software	[]	= "new software (libsndfile-X.Y.Z)",
+		new_copyright	[]	= "Copyright (c) 2001 New Artist",
+		new_artist		[]	= "The New Artist",
+		new_title		[]	= "This is the new title" ;
+
+	static char buffer [2048] ;
 	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	int			count ;
@@ -398,15 +404,17 @@ string_multi_set_test (const char *filename, int typemajor)
 	test_write_short_or_die (file, 0, data_out, BUFFER_LEN, __LINE__) ;
 
 	/* Write it all again. */
-	sf_set_string (file, SF_STR_TITLE, title) ;
-	sf_set_string (file, SF_STR_SOFTWARE, software) ;
-	sf_set_string (file, SF_STR_ARTIST, artist) ;
+
+	sf_set_string (file, SF_STR_TITLE, new_title) ;
+	sf_set_string (file, SF_STR_SOFTWARE, new_software) ;
+	sf_set_string (file, SF_STR_ARTIST, new_artist) ;
+
 	sf_set_string (file, SF_STR_COPYRIGHT, copyright) ;
 	sf_set_string (file, SF_STR_COMMENT, comment) ;
 	sf_set_string (file, SF_STR_DATE, date) ;
 	sf_set_string (file, SF_STR_ALBUM, album) ;
 	sf_set_string (file, SF_STR_LICENSE, license) ;
-	sf_set_string (file, SF_STR_COPYRIGHT, copyright) ;
+	sf_set_string (file, SF_STR_COPYRIGHT, new_copyright) ;
 	sf_set_string (file, SF_STR_COMMENT, comment) ;
 	sf_set_string (file, SF_STR_DATE, date) ;
 	sf_set_string (file, SF_STR_ALBUM, album) ;
@@ -418,21 +426,21 @@ string_multi_set_test (const char *filename, int typemajor)
 	sf_command	(file, SFC_GET_LOG_INFO, buffer, sizeof (buffer)) ;
 	sf_close (file) ;
 
-	count = str_count (buffer, title) ;
-	exit_if_true (count < 1, "\n\nLine %d : Could not find title in :\n%s\n", __LINE__, buffer) ;
-	exit_if_true (count > 1, "\n\nLine %d : Title appears %d times in :\n\n%s\n", __LINE__, count, buffer) ;
+	count = str_count (buffer, new_title) ;
+	exit_if_true (count < 1, "\n\nLine %d : Could not find new_title in :\n%s\n", __LINE__, buffer) ;
+	exit_if_true (count > 1, "\n\nLine %d : new_title appears %d times in :\n\n%s\n", __LINE__, count, buffer) ;
 
 	count = str_count (buffer, software) ;
-	exit_if_true (count < 1, "\n\nLine %d : Could not find software in :\n%s\n", __LINE__, buffer) ;
-	exit_if_true (count > 1, "\n\nLine %d : Software appears %d times in :\n\n%s\n", __LINE__, count, buffer) ;
+	exit_if_true (count < 1, "\n\nLine %d : Could not find new_software in :\n%s\n", __LINE__, buffer) ;
+	exit_if_true (count > 1, "\n\nLine %d : new_software appears %d times in :\n\n%s\n", __LINE__, count, buffer) ;
 
-	count = str_count (buffer, artist) ;
-	exit_if_true (count < 1, "\n\nLine %d : Could not find artist in :\n%s\n", __LINE__, buffer) ;
-	exit_if_true (count > 1, "\n\nLine %d : Artist appears %d times in :\n\n%s\n", __LINE__, count, buffer) ;
+	count = str_count (buffer, new_artist) ;
+	exit_if_true (count < 1, "\n\nLine %d : Could not find new_artist in :\n%s\n", __LINE__, buffer) ;
+	exit_if_true (count > 1, "\n\nLine %d : new_artist appears %d times in :\n\n%s\n", __LINE__, count, buffer) ;
 
-	count = str_count (buffer, copyright) ;
-	exit_if_true (count < 1, "\n\nLine %d : Could not find copyright in :\n%s\n", __LINE__, buffer) ;
-	exit_if_true (count > 1, "\n\nLine %d : Copyright appears %d times in :\n\n%s\n", __LINE__, count, buffer) ;
+	count = str_count (buffer, new_copyright) ;
+	exit_if_true (count < 1, "\n\nLine %d : Could not find new_copyright in :\n%s\n", __LINE__, buffer) ;
+	exit_if_true (count > 1, "\n\nLine %d : new_copyright appears %d times in :\n\n%s\n", __LINE__, count, buffer) ;
 
 	unlink (filename) ;
 
