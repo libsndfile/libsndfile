@@ -39,7 +39,6 @@ static void	string_start_end_test (const char *filename, int typemajor) ;
 static void	string_multi_set_test (const char *filename, int typemajor) ;
 static void	string_rdwr_test (const char *filename, int typemajor) ;
 
-static int libsndfile_str_count (const char * cptr) ;
 static int str_count (const char * haystack, const char * needle) ;
 
 int
