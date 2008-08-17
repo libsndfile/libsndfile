@@ -44,6 +44,7 @@ static	void	truncate_test			(const char *filename, int filetype) ;
 static	void	instrument_test			(const char *filename, int filetype) ;
 static	void	channel_map_test		(const char *filename, int filetype) ;
 static	void	broadcast_test			(const char *filename, int filetype) ;
+static	void	broadcast_rdwr_test		(const char *filename, int filetype) ;
 static	void	broadcast_coding_history_test	(const char *filename) ;
 static	void	current_sf_info_test	(const char *filename) ;
 static	void	raw_needs_endswap_test	(const char *filename, int filetype) ;
@@ -134,6 +135,7 @@ main (int argc, char *argv [])
 
 	if (do_all || strcmp (argv [1], "bext") == 0)
 	{	broadcast_test ("broadcast.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+		broadcast_rdwr_test	("broadcast.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		test_count ++ ;
 		} ;
 
@@ -889,6 +891,43 @@ broadcast_test (const char *filename, int filetype)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* broadcast_test */
+
+static	void
+broadcast_rdwr_test (const char *filename, int filetype)
+{	SF_BROADCAST_INFO binfo ;
+	SNDFILE *file ;
+	SF_INFO sfinfo ;
+	sf_count_t frames ;
+
+	print_test_name (__func__, filename) ;
+
+	create_short_sndfile (filename, filetype, 2) ;
+
+	memset (&binfo, 0, sizeof (binfo)) ;
+	snprintf (binfo.description, sizeof (binfo.description), "Test description") ;
+	snprintf (binfo.originator, sizeof (binfo.originator), "Test originator") ;
+	snprintf (binfo.originator_reference, sizeof (binfo.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
+	snprintf (binfo.origination_date, sizeof (binfo.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
+	snprintf (binfo.origination_time, sizeof (binfo.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	snprintf (binfo.umid, sizeof (binfo.umid), "Some umid") ;
+	binfo.coding_history_size = 0 ;
+
+	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__) ;
+	frames = sfinfo.frames ;
+	if (sf_command (file, SFC_SET_BROADCAST_INFO, &binfo, sizeof (binfo)) != SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_BROADCAST_INFO) should have failed but didn't.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	sf_close (file) ;
+	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %lld should be %lld.\n", __LINE__, sfinfo.frames, frames) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* broadcast_rdwr_test */
+
 
 static void
 broadcast_coding_history_test (const char *filename)
