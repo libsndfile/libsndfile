@@ -185,6 +185,8 @@ wav_open	 (SF_PRIVATE *psf)
 	psf->container_data = wpriv ;
 
 	psf->wavex_ambisonic = SF_AMBISONIC_NONE ;
+	psf->str_flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END ;
+
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = wav_read_header (psf, &blockalign, &framesperblock)))
 			return error ;
@@ -222,8 +224,6 @@ wav_open	 (SF_PRIVATE *psf)
 		{	blockalign = wav_w64_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
 			framesperblock = -1 ; /* Corrected later. */
 			} ;
-
-		psf->str_flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END ;
 
 		/* By default, add the peak chunk to floating point files. Default behaviour
 		** can be switched off using sf_command (SFC_SET_PEAK_CHUNK, SF_FALSE).
