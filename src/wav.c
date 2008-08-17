@@ -565,8 +565,10 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					break ;
 
 			case bext_MARKER :
+					/*
+					The 'bext' chunk can actually be updated, so don't need to set this.
 					parsestage |= HAVE_other ;
-
+					*/
 					psf_binheader_readf (psf, "4", &dword) ;
 					if (dword < WAV_BEXT_CHUNK_SIZE)
 						psf_log_printf (psf, "bext : %u (should be >= %d)\n", dword, WAV_BEXT_CHUNK_SIZE) ;

@@ -6,6 +6,9 @@
     * tests/command_test.c
     Add new broadcast_rdwr_test (currently failing).
 
+    * src/wav.c
+    Fix to WAV parser to allow 'bext' chunk to be updated in place.
+
 2008-08-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
