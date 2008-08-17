@@ -257,6 +257,8 @@ typedef struct sf_private_tag
 	/* Guard value. If this changes the buffers above have overflowed. */
 	int				Magick ;
 
+	unsigned		unique_id ;
+
 	/* Index variables for maintaining logbuffer and header above. */
 	int				logindex ;
 	int				headindex, headend ;
