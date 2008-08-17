@@ -15,6 +15,9 @@
     * configure.ac
     Test for <sys/time.h> and gettimeofday.
 
+	* src/common.c
+    Use gettimeofday() to initialize psf_rand_int32.
+
 2008-08-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac

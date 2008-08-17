@@ -16,11 +16,14 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+#include	<config.h>
+
 #include	<stdarg.h>
 #include	<string.h>
 #include	<ctype.h>
 #include	<math.h>
 #include	<time.h>
+#include	<sys/time.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
@@ -1284,7 +1287,8 @@ u_bitwidth_to_subformat (int bits)
 
 /*
 **	psf_rand_int32 : Not crypto quality, but more than adequate for things
-**	like stream serial numbers in Ogg files.
+**	like stream serial numbers in Ogg files or the unique_id field of the
+**	SF_PRIVATE struct.
 */
 
 int32_t
@@ -1293,7 +1297,15 @@ psf_rand_int32 (void)
 	int k, count ;
 
 	if (value == -1)
+	{
+#if HAVE_GETTIMEOFDAY
+		struct timeval tv ;
+		gettimeofday (&tv, NULL) ;
+		value = tv.tv_sec + tv.tv_usec ;
+#else
 		value = time (NULL) ;
+#endif
+		} ;
 
 	count = 4 + (value & 7) ;
 	for (k = 0 ; k < count ; k++)
