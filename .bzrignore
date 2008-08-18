@@ -11,10 +11,12 @@
 *.oct
 *.oga
 *.paf
+*.rifx
 *.sd2
 *.sds
 *.svx
 *.wav
+*.wavex
 .deps
 .libs
 Cfg/compile
