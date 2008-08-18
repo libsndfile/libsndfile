@@ -34,6 +34,9 @@
 
 import commands, os, sys
 
+def print_test_name (name):
+	print "    %-30s :" % name,
+
 def assert_info (filename, arg, value):
 	cmd = "./sndfile-bwf-get %s %s" % (arg, filename)
 	status, output = commands.getstatusoutput (cmd)
@@ -53,7 +56,7 @@ def check_executable (name):
 		sys.exit (1)
 
 def test_empty_fail ():
-	print "    Empty fail test    :",
+	print_test_name ("Empty fail test")
 	cmd = "./sndfile-bwf-set --description Alpha sine.wav"
 	status, output = commands.getstatusoutput (cmd)
 	if not status:
@@ -61,7 +64,7 @@ def test_empty_fail ():
 	print "ok"
 
 def test_copy ():
-	print "    Copy test          :",
+	print_test_name ("Copy test")
 	cmd = "./sndfile-bwf-set --description \"First Try\" sine.wav output.wav"
 	status, output = commands.getstatusoutput (cmd)
 	if status:
@@ -70,7 +73,7 @@ def test_copy ():
 	print "ok"
 
 def test_update (tests):
-	print "    Update test        :",
+	print_test_name ("Update test")
 	for arg, value in tests:
 		cmd = "./sndfile-bwf-set %s \"%s\" output.wav" % (arg, value)
 		status, output = commands.getstatusoutput (cmd)
