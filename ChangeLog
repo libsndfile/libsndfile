@@ -15,6 +15,10 @@
     * examples/sndfile-bwf-set.c
     Clean up and fixes.
 
+    * src/wav.c
+    Merge function wavex_write_header into wav_write_header, deleting about 70
+    lines of code.
+
 2008-08-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/string_test.c
