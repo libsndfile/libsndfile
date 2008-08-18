@@ -22,6 +22,12 @@
     * src/common.h
     Double value of SF_MAX_STRINGS.
 
+    * tests/string_test.c
+    Add string tests for WAVEX and RIFX files.
+
+    * tests/command_test.c
+    Add broadcast test for WAVEX files.
+
 2008-08-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/string_test.c
