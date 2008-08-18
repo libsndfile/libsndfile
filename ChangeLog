@@ -19,6 +19,9 @@
     Merge function wavex_write_header into wav_write_header, deleting about 70
     lines of code.
 
+    * src/common.h
+    Double value of SF_MAX_STRINGS.
+
 2008-08-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/string_test.c
