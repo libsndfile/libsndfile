@@ -12,6 +12,9 @@
     * examples/test-sndfile-bwf-set.py
     Add Python script to test sndfile-bwf-set/get.
 
+    * examples/sndfile-bwf-set.c
+    Clean up and fixes.
+
 2008-08-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/string_test.c

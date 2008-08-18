@@ -47,9 +47,6 @@
 #define	BUFFER_LEN		(1 << 16)
 
 
-#define	SAFE_STRNCPY(dest,src) \
-			{ strncpy (dest, src, sizeof (dest)) ; dest [sizeof (dest) - 1] = 0 ; }
-
 typedef struct
 {	const char * name ;
 	const char * artist ;
@@ -65,7 +62,7 @@ static void read_localtime (struct tm * timedata) ;
 static void apply_changes (const char * filenames [2], const SF_BROADCAST_INFO * binfo, int coding_hist_append, const TEMP_INFO * info) ;
 
 static void merge_broadcast_info (SF_BROADCAST_INFO * binfo, const SF_BROADCAST_INFO * new_binfo, int coding_hist_append) ;
-static void update_strings (SNDFILE * file, TEMP_INFO * tinfo, const TEMP_INFO * new_tinfo) ;
+static void update_strings (SNDFILE * file, const TEMP_INFO * new_tinfo) ;
 
 
 
@@ -83,7 +80,7 @@ main (int argc, char *argv [])
 	progname = progname ? progname + 1 : argv [0] ;
 
 	/* Check if we've been asked for help. */
-	if (argc < 2 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)
+	if (argc < 3 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)
 		usage_exit (progname, 0) ;
 
 	/* Clear set all fields of the struct to zero bytes. */
@@ -110,7 +107,7 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (binfo.description, argv [k]) ;
+			strncpy (binfo.description, argv [k], sizeof (binfo.description)) ;
 			continue ;
 			} ;
 
@@ -118,7 +115,7 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (binfo.originator, argv [k]) ;
+			strncpy (binfo.originator, argv [k], sizeof (binfo.originator)) ;
 			continue ;
 			} ;
 
@@ -126,7 +123,7 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (binfo.originator_reference, argv [k]) ;
+			strncpy (binfo.originator_reference, argv [k], sizeof (binfo.originator_reference)) ;
 			continue ;
 			} ;
 
@@ -134,7 +131,7 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (binfo.umid, argv [k]) ;
+			strncpy (binfo.umid, argv [k], sizeof (binfo.umid)) ;
 			continue ;
 			} ;
 
@@ -142,7 +139,7 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (binfo.origination_date, argv [k]) ;
+			strncpy (binfo.origination_date, argv [k], sizeof (binfo.origination_date)) ;
 			continue ;
 			} ;
 
@@ -150,7 +147,7 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (binfo.origination_time, argv [k]) ;
+			strncpy (binfo.origination_time, argv [k], sizeof (binfo.origination_time)) ;
 			continue ;
 			} ;
 
@@ -158,7 +155,7 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (binfo.coding_history, argv [k]) ;
+			strncpy (binfo.coding_history, argv [k], sizeof (binfo.coding_history)) ;
 			binfo.coding_history_size = sizeof (binfo.coding_history) ;
 			continue ;
 			} ;
@@ -167,7 +164,7 @@ main (int argc, char *argv [])
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
-			SAFE_STRNCPY (binfo.coding_history, argv [k]) ;
+			strncpy (binfo.coding_history, argv [k], sizeof (binfo.coding_history)) ;
 			binfo.coding_history_size = sizeof (binfo.coding_history) ;
 
 			coding_hist_append = 1 ;
@@ -364,20 +361,14 @@ apply_changes (const char * filenames [2], const SF_BROADCAST_INFO * new_binfo, 
 	tinfo.artist = sf_get_string (infile, SF_STR_ARTIST) ;
 	tinfo.create_date = sf_get_string (infile, SF_STR_DATE) ;
 
-	if (infile == outfile)
-		update_strings (outfile, &tinfo, new_tinfo) ;
-	else
-	{	TEMP_INFO dummy = { NULL, NULL, NULL } ;
+	/* If the input and output files are different we merge the strings and
+	**	then clear the old versions.
+	*/
+	tinfo.name = new_tinfo->name ? new_tinfo->name : tinfo.name ;
+	tinfo.artist = new_tinfo->artist ? new_tinfo->artist : tinfo.artist ;
+	tinfo.create_date = new_tinfo->create_date ? new_tinfo->create_date : tinfo.create_date ;
 
-		/* If the input and output files are different we merge the strings and
-		**	then clear the old versions.
-		*/
-		tinfo.name = new_tinfo->name ? new_tinfo->name : tinfo.name ;
-		tinfo.artist = new_tinfo->artist ? new_tinfo->artist : tinfo.artist ;
-		tinfo.create_date = new_tinfo->create_date ? new_tinfo->create_date : tinfo.create_date ;
-
-		update_strings (outfile, &dummy, &tinfo) ;
-		} ;
+	update_strings (outfile, &tinfo) ;
 
 	if (infile != outfile)
 	{	/* If the input file is not the same as the output file, copy the data. */
@@ -436,28 +427,16 @@ merge_broadcast_info (SF_BROADCAST_INFO * binfo, const SF_BROADCAST_INFO * new_b
 } /* merge_broadcast_info*/
 
 static void
-update_strings (SNDFILE * file, TEMP_INFO * tinfo, const TEMP_INFO * new_tinfo)
+update_strings (SNDFILE * file, const TEMP_INFO * new_tinfo)
 {
 	if (new_tinfo->name != NULL)
-	{	if (tinfo->name == NULL)
-			sf_set_string (file, SF_STR_TITLE, new_tinfo->name) ;
-		else
-			printf ("Warning : File already contains INAM info which cannot be overwritten.\n") ;
-		} ;
+		sf_set_string (file, SF_STR_TITLE, new_tinfo->name) ;
 
 	if (new_tinfo->artist != NULL)
-	{	if (tinfo->artist == NULL)
-			sf_set_string (file, SF_STR_ARTIST, new_tinfo->artist) ;
-		else
-			printf ("Warning : File already contains IART info which cannot be overwritten.\n") ;
-		} ;
+		sf_set_string (file, SF_STR_ARTIST, new_tinfo->artist) ;
 
 	if (new_tinfo->create_date != NULL)
-	{	if (tinfo->create_date == NULL)
-			sf_set_string (file, SF_STR_DATE, new_tinfo->create_date) ;
-		else
-			printf ("Warning : File already contains ICRD info which cannot be overwritten.\n") ;
-		} ;
+		sf_set_string (file, SF_STR_DATE, new_tinfo->create_date) ;
 
 } /* update_strings */
 
