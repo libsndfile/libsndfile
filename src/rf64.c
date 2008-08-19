@@ -69,8 +69,6 @@ rf64_open (SF_PRIVATE *psf)
 {	WAV_PRIVATE *wpriv ;
 	int	subformat, error = 0, blockalign = 0, framesperblock = 0 ; ;
 
-puts (__func__) ;
-
 	if ((wpriv = calloc (1, sizeof (WAV_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 	psf->container_data = wpriv ;
@@ -167,37 +165,63 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	WAV_FMT 	*wav_fmt ;
 	sf_count_t riff_size, data_size ;
 	unsigned int size32 ;
-	int marker [3], error ;
+	int marker, marks [2], error, done = 0 ;
 
 	if ((wpriv = psf->container_data) == NULL)
 		return SFE_INTERNAL ;
 
 	/* Set position to start of file to begin reading header. */
-	psf_binheader_readf (psf, "pmmm", 0, marker, marker + 1, marker + 2) ;
-	if (marker [0] != RF64_MARKER || marker [1] != FFFF_MARKER || marker [2] != WAVE_MARKER)
+	psf_binheader_readf (psf, "pmmm", 0, &marker, marks, marks + 1) ;
+	if (marker != RF64_MARKER || marks [0] != FFFF_MARKER || marks [1] != WAVE_MARKER)
 		return SFE_WVE_NOT_WVE ;
 
-	psf_log_printf (psf, "%M\n%M\n", RF64_MARKER, WAVE_MARKER) ;
+	psf_log_printf (psf, "%M\n  %M\n", RF64_MARKER, WAVE_MARKER) ;
 
-	psf_binheader_readf (psf, "em4", marker, &size32) ;
-	psf_log_printf (psf, "%M : %u\n", marker [0], size32) ;
+	while (! done)
+	{	psf_binheader_readf (psf, "em4", &marker, &size32) ;
 
-	psf_binheader_readf (psf, "888", &riff_size, &data_size, &psf->sf.frames) ;
-	psf_log_printf (psf, "  Riff size : %D\n  Data size : %D\n  Frames    : %D\n",
-			riff_size, data_size, psf->sf.frames) ;
+		switch (marker)
+		{	case ds64_MARKER :
+					psf_log_printf (psf, "%M : %u\n", marker, size32) ;
 
-	psf_binheader_readf (psf, "4", &size32) ;
-	psf_log_printf (psf, "  Table len : %u\n", size32) ;
+					psf_binheader_readf (psf, "888", &riff_size, &data_size, &psf->sf.frames) ;
+					psf_log_printf (psf, "  Riff size : %D\n  Data size : %D\n  Frames    : %D\n",
+											riff_size, data_size, psf->sf.frames) ;
 
-	psf_binheader_readf (psf, "jm4", size32 + 4, marker, &size32) ;
-	psf_log_printf (psf, "%M : %u\n", marker [0], size32) ;
+					psf_binheader_readf (psf, "4", &size32) ;
+					psf_log_printf (psf, "  Table len : %u\n", size32) ;
 
-	if ((error = wav_w64_read_fmt_chunk (psf, size32)) != 0)
-		return error ;
+					psf_binheader_readf (psf, "jm4", size32 + 4, &marker, &size32) ;
+					psf_log_printf (psf, "%M : %u\n", marker, size32) ;
 
-	psf_binheader_readf (psf, "m4", marker, &size32) ;
-	psf_log_printf (psf, "%M : %x\n", marker [0], size32) ;
-	psf->dataoffset = psf->headindex ;
+					if ((error = wav_w64_read_fmt_chunk (psf, size32)) != 0)
+						return error ;
+					break ;
+
+			case data_MARKER :
+					psf_log_printf (psf, "%M : %x\n", marker, size32) ;
+					psf->dataoffset = psf->headindex ;
+					done = SF_TRUE ;
+					break ;
+
+			default :
+					if (isprint ((marker >> 24) & 0xFF) && isprint ((marker >> 16) & 0xFF)
+						&& isprint ((marker >> 8) & 0xFF) && isprint (marker & 0xFF))
+					{	psf_binheader_readf (psf, "4", &size32) ;
+						psf_log_printf (psf, "*** %M : %d (unknown marker)\n", marker, size32) ;
+						psf_binheader_readf (psf, "j", size32) ;
+						break ;
+						} ;
+					if (psf_ftell (psf) & 0x03)
+					{	psf_log_printf (psf, "  Unknown chunk marker at position %d. Resynching.\n", size32 - 4) ;
+						psf_binheader_readf (psf, "j", -3) ;
+						break ;
+						} ;
+					psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D. Exiting parser.\n", marker, psf_ftell (psf) - 4) ;
+					done = SF_TRUE ;
+				break ;
+			} ;
+		} ;
 
 	wav_fmt = &wpriv->wav_fmt ;
 
