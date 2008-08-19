@@ -2281,6 +2281,9 @@ guess_file_type (SF_PRIVATE *psf)
 	if (buffer [0] == MAKE_MARKER ('2', 'B', 'I', 'T'))
 		return SF_FORMAT_AVR ;
 
+	if (buffer [0] == MAKE_MARKER ('R', 'F', '6', '4') && buffer [2] == MAKE_MARKER ('W', 'A', 'V', 'E'))
+		return SF_FORMAT_RF64 ;
+
 	/* This must be the second last one. */
 	if (psf->filelength > 0 && (format = try_resource_fork (psf, SFM_READ)) != 0)
 		return format ;
@@ -2586,6 +2589,10 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 
 		case	SF_FORMAT_W64 :
 				error = w64_open (psf) ;
+				break ;
+
+		case	SF_FORMAT_RF64 :
+				error = rf64_open (psf) ;
 				break ;
 
 		/* Lite remove start */

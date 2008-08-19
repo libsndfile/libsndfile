@@ -704,6 +704,7 @@ int		xi_open		(SF_PRIVATE *psf) ;
 int		flac_open	(SF_PRIVATE *psf) ;
 int		caf_open	(SF_PRIVATE *psf) ;
 int		mpc2k_open	(SF_PRIVATE *psf) ;
+int		rf64_open	(SF_PRIVATE *psf) ;
 
 /* In progress. Do not currently work. */
 

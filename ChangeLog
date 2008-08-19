@@ -3,6 +3,9 @@
     * src/rf64.c
     New file to handle RF64 (WAV like format supportting > 4Gig files).
 
+    * src/sndfile.h.in src/common.h src/sndfile.c src/Makefile.am
+    Hook the above into build so hacking can begin.
+
 2008-08-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/string_test.c
