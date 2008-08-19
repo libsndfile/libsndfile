@@ -193,7 +193,7 @@ pcm_init (SF_PRIVATE *psf)
 					psf->read_double	= pcm_read_lei2d ;
 					break ;
 			default :
-				psf_log_printf (psf, "pcm.c returning SFE_UNIMPLEMENTED\n") ;
+				psf_log_printf (psf, "pcm.c returning SFE_UNIMPLEMENTED\nbytewidth %d    endian %d\n", psf->bytewidth, psf->endian) ;
 				return SFE_UNIMPLEMENTED ;
 			} ;
 		} ;
@@ -258,7 +258,7 @@ pcm_init (SF_PRIVATE *psf)
 					break ;
 
 			default :
-				psf_log_printf (psf, "pcm.c returning SFE_UNIMPLEMENTED\n") ;
+				psf_log_printf (psf, "pcm.c returning SFE_UNIMPLEMENTED\nbytewidth %s    endian %d\n", psf->bytewidth, psf->endian) ;
 				return SFE_UNIMPLEMENTED ;
 			} ;
 
