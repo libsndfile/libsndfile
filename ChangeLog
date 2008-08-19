@@ -6,6 +6,13 @@
     * src/sndfile.h.in src/common.h src/sndfile.c src/Makefile.am
     Hook the above into build so hacking can begin.
 
+    * src/pcm.c
+    Improve log message when pcm_init fails.
+
+    * src/sndfile-info.c
+    Only calculate and print 'Signal Max' if file is less than 10 megabytes in
+    length.
+
 2008-08-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/string_test.c
@@ -15,7 +22,7 @@
     In RDWR mode, pad the header if necessary (ie LIST chunk has moved or
     length has changed).
     Minor fixes in wav_write_strings.
-	Write PAD chunk with default endian-ness, not a specific endian-ness.
+    Write PAD chunk with default endian-ness, not a specific endian-ness.
 
     * examples/test-sndfile-bwf-set.py
     Add Python script to test sndfile-bwf-set/get.

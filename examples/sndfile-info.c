@@ -255,10 +255,12 @@ info_dump (const char *filename)
 		printf ("Seekable    : %s\n", (sfinfo.seekable ? "TRUE" : "FALSE")) ;
 		printf ("Duration    : %s\n", generate_duration_str (&sfinfo)) ;
 
-		/* Do not use sf_signal_max because it doesn't work for non-seekable files . */
-		signal_max = get_signal_max (file) ;
-		decibels = calc_decibels (&sfinfo, signal_max) ;
-		printf ("Signal Max  : %g (%4.2f dB)\n\n", signal_max, decibels) ;
+		if (sfinfo.frames < 10 * 1024 * 1024)
+		{	/* Do not use sf_signal_max because it doesn't work for non-seekable files . */
+			signal_max = get_signal_max (file) ;
+			decibels = calc_decibels (&sfinfo, signal_max) ;
+			printf ("Signal Max  : %g (%4.2f dB)\n\n", signal_max, decibels) ;
+			} ;
 		} ;
 
 	sf_close (file) ;
