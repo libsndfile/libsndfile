@@ -200,9 +200,10 @@ gen_windowed_sine_[+ (get "name") +] ([+ (get "name") +] *data, int len, double 
 
 void
 create_short_sndfile (const char *filename, int format, int channels)
-{	SNDFILE *file ;
+{	short data [2 * 3 * 4 * 5 * 6 * 7] = { 0, } ;
+	SNDFILE *file ;
 	SF_INFO sfinfo ;
-	short data [channels * 100] ;
+	
 
 	sfinfo.samplerate = 44100 ;
 	sfinfo.channels = channels ;

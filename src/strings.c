@@ -88,13 +88,6 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	if (k == 0)
 		psf->str_end = psf->str_storage ;
 
-
-#if STRINGS_DEBUG
-	psf_log_printf (psf, "str_storage          : %X\n", (int) psf->str_storage) ;
-	psf_log_printf (psf, "str_end              : %X\n", (int) psf->str_end) ;
-	psf_log_printf (psf, "sizeof (str_storage) : %d\n", SIGNED_SIZEOF (psf->str_storage)) ;
-#endif
-
 	len_remaining = SIGNED_SIZEOF (psf->str_storage) - (psf->str_end - psf->str_storage) ;
 
 	if (len_remaining < str_len + 2)
@@ -154,6 +147,12 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	psf->str_flags |= str_flags ;
 
 #if STRINGS_DEBUG
+	psf_log_printf (psf, "str_storage          : %X\n", (int) psf->str_storage) ;
+	psf_log_printf (psf, "str_end              : %X\n", (int) psf->str_end) ;
+	psf_log_printf (psf, "sizeof (str_storage) : %d\n", SIGNED_SIZEOF (psf->str_storage)) ;
+	psf_log_printf (psf, "used                 : %d\n", (int ) (psf->str_end - psf->str_storage)) ;
+	psf_log_printf (psf, "remaining            : %d\n", SIGNED_SIZEOF (psf->str_storage) - (psf->str_end - psf->str_storage)) ;
+
 	hexdump (psf->str_storage, 300) ;
 #endif
 

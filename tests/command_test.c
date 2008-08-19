@@ -136,6 +136,9 @@ main (int argc, char *argv [])
 	if (do_all || strcmp (argv [1], "bext") == 0)
 	{	broadcast_test ("broadcast.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		broadcast_rdwr_test	("broadcast.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+
+		broadcast_test ("broadcast.wavex", SF_FORMAT_WAVEX | SF_FORMAT_PCM_16) ;
+		broadcast_rdwr_test	("broadcast.wavex", SF_FORMAT_WAVEX | SF_FORMAT_PCM_16) ;
 		test_count ++ ;
 		} ;
 

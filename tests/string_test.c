@@ -63,6 +63,14 @@ main (int argc, char *argv [])
 	{	string_start_end_test ("strings.wav", SF_FORMAT_WAV) ;
 		string_multi_set_test ("multi.wav", SF_FORMAT_WAV) ;
 		string_rdwr_test ("rdwr.wav", SF_FORMAT_WAV) ;
+
+		string_start_end_test ("strings.wavex", SF_FORMAT_WAVEX) ;
+		string_multi_set_test ("multi.wavex", SF_FORMAT_WAVEX) ;
+		string_rdwr_test ("rdwr.wavex", SF_FORMAT_WAVEX) ;
+
+		string_start_end_test ("strings.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
+		string_multi_set_test ("multi.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
+		string_rdwr_test ("rdwr.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
 		test_count++ ;
 		} ;
 
@@ -211,22 +219,29 @@ string_start_end_test (const char *filename, int typemajor)
 			} ;
 		} ;
 
-	if (typemajor != SF_FORMAT_WAV && typemajor != SF_FORMAT_AIFF)
-	{	cptr = sf_get_string (file, SF_STR_ALBUM) ;
-		if (cptr == NULL || strcmp (album, cptr) != 0)
-		{	if (errors++ == 0)
-				puts ("\n") ;
-			printf ("    Bad album   : %s\n", cptr) ;
-			} ;
-		} ;
+	switch (typemajor)
+	{	case SF_FORMAT_AIFF :
+		case SF_FORMAT_WAV :
+		case SF_FORMAT_WAVEX :
+		case SF_ENDIAN_BIG | SF_FORMAT_WAV :
+			break ;
 
-	if (typemajor != SF_FORMAT_WAV && typemajor != SF_FORMAT_AIFF)
-	{	cptr = sf_get_string (file, SF_STR_LICENSE) ;
-		if (cptr == NULL || strcmp (license, cptr) != 0)
-		{	if (errors++ == 0)
-				puts ("\n") ;
-			printf ("    Bad license : %s\n", cptr) ;
-			} ;
+		default :
+			cptr = sf_get_string (file, SF_STR_ALBUM) ;
+			if (cptr == NULL || strcmp (album, cptr) != 0)
+			{	if (errors++ == 0)
+					puts ("\n") ;
+				printf ("    Bad album   : %s\n", cptr) ;
+				} ;
+
+			cptr = sf_get_string (file, SF_STR_LICENSE) ;
+			if (cptr == NULL || strcmp (license, cptr) != 0)
+			{	if (errors++ == 0)
+					puts ("\n") ;
+				printf ("    Bad license : %s\n", cptr) ;
+				} ;
+
+			break ;
 		} ;
 
 	if (errors > 0)
@@ -456,6 +471,7 @@ string_rdwr_test (const char *filename, int typemajor)
 	print_test_name (__func__, filename) ;
 	create_short_sndfile (filename, typemajor | SF_FORMAT_PCM_16, 2) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__) ;
 	frames = sfinfo.frames ;
 	sf_set_string (file, SF_STR_TITLE, title) ;

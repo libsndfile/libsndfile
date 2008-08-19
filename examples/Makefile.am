@@ -7,7 +7,7 @@ noinst_PROGRAMS = make_sine sfprocess list_formats generate sndfilehandle
 
 # This is the BeOS version of sndfile-play. It needs to be compiled with the C++
 # compiler.
-EXTRA_DIST = sndfile-play-beos.cpp
+EXTRA_DIST = sndfile-play-beos.cpp test-sndfile-bwf-set.py
 
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
