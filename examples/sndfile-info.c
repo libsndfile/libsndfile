@@ -259,8 +259,9 @@ info_dump (const char *filename)
 		{	/* Do not use sf_signal_max because it doesn't work for non-seekable files . */
 			signal_max = get_signal_max (file) ;
 			decibels = calc_decibels (&sfinfo, signal_max) ;
-			printf ("Signal Max  : %g (%4.2f dB)\n\n", signal_max, decibels) ;
+			printf ("Signal Max  : %g (%4.2f dB)\n", signal_max, decibels) ;
 			} ;
+		putchar ('\n') ;
 		} ;
 
 	sf_close (file) ;
