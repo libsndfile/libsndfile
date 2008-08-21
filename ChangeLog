@@ -7,6 +7,10 @@
     * examples/test-sndfile-bwf-set.py
     Update tests.
 
+    * examples/sndfile-info.c
+    When called with -i or -b option, operate on all files on command line, not
+    just the first.
+
 2008-08-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/string_test.c
