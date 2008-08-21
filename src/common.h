@@ -569,6 +569,8 @@ enum
 
 	SFE_VORBIS_ENCODER_BUG,
 
+	SFE_RF64_NOT_RF64,
+
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
 

@@ -3,6 +3,9 @@
     * examples/sndfile-convert.c
     Add SF_FORMAT_RF64 to format_map.
 
+    * src/common.h src/sndfile.c
+    More RF64 support code.
+
 2008-08-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/rf64.c
