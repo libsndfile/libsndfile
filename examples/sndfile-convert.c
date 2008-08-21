@@ -82,6 +82,7 @@ static OUTPUT_FORMAT_MAP format_map [] =
 	{	"wve",		0,	SF_FORMAT_WVE	},
 	{	"oga",		0,	SF_FORMAT_OGG	},
 	{	"mpc",		0,	SF_FORMAT_MPC2K	},
+	{	"rf64",		0,	SF_FORMAT_RF64	},
 } ; /* format_map */
 
 static int
