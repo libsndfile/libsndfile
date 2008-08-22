@@ -85,6 +85,7 @@ main (int argc, char **argv)
 		printf ("           w64   - Sonic Foundry's W64 file functions\n") ;
 		printf ("           flac  - test FLAC file functions\n") ;
 		printf ("           mpc2k - test MPC 2000 file functions\n") ;
+		printf ("           rf64  - test RF64 file functions\n") ;
 		printf ("           all   - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -370,6 +371,23 @@ main (int argc, char **argv)
 		else
 			puts ("    No FLAC tests because FLAC support was not compiled in.") ;
 		test_count++ ;	
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "rf64"))
+	{	pcm_test_char	("char.rf64"	, SF_FORMAT_RF64 | SF_FORMAT_PCM_U8, SF_FALSE) ;
+		pcm_test_short	("short.rf64"	, SF_FORMAT_RF64 | SF_FORMAT_PCM_16, SF_FALSE) ;
+		pcm_test_24bit	("24bit.rf64"	, SF_FORMAT_RF64 | SF_FORMAT_PCM_24, SF_FALSE) ;
+		pcm_test_int	("int.rf64"		, SF_FORMAT_RF64 | SF_FORMAT_PCM_32, SF_FALSE) ;
+
+		/* Lite remove start */
+		pcm_test_float	("float.rf64"	, SF_FORMAT_RF64 | SF_FORMAT_FLOAT , SF_FALSE) ;
+		pcm_test_double	("double.rf64"	, SF_FORMAT_RF64 | SF_FORMAT_DOUBLE, SF_FALSE) ;
+		empty_file_test ("empty_char.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_U8) ;
+		empty_file_test ("empty_short.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
+		empty_file_test ("empty_float.rf64", SF_FORMAT_RF64 | SF_FORMAT_FLOAT) ;
+		/* Lite remove end */
+
+		test_count++ ;
 		} ;
 
 	if (test_count == 0)
