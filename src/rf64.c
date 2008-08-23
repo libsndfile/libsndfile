@@ -52,7 +52,7 @@
 ** Private static functions.
 */
 
-static int	rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock) ;
+static int	rf64_read_header (SF_PRIVATE *psf) ;
 static int	rf64_write_header (SF_PRIVATE *psf, int calc_length) ;
 static int	rf64_close (SF_PRIVATE *psf) ;
 
@@ -63,14 +63,18 @@ static int	rf64_close (SF_PRIVATE *psf) ;
 int
 rf64_open (SF_PRIVATE *psf)
 {	WAV_PRIVATE *wpriv ;
-	int	subformat, error = 0, blockalign = 0, framesperblock = 0 ; ;
+	int	subformat, error = 0 ;
 
 	if ((wpriv = calloc (1, sizeof (WAV_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 	psf->container_data = wpriv ;
 
+	/* All RF64 files are little endian. */
+	psf->endian = SF_ENDIAN_LITTLE ;
+
+
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
-	{	if ((error = rf64_read_header (psf, &blockalign, &framesperblock)) != 0)
+	{	if ((error = rf64_read_header (psf)) != 0)
 			return error ;
 		} ;
 
@@ -83,21 +87,7 @@ rf64_open (SF_PRIVATE *psf)
 	{	if (psf->is_pipe)
 			return SFE_NO_PIPE_WRITE ;
 
-		psf->endian = SF_ENDIAN_LITTLE ;		/* All RF64 files are little endian. */
-
 		psf->blockwidth = psf->bytewidth * psf->sf.channels ;
-
-		if (subformat == SF_FORMAT_IMA_ADPCM || subformat == SF_FORMAT_MS_ADPCM)
-		{	blockalign = wav_w64_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
-			framesperblock = -1 ;
-
-			/* FIXME : This block must go */
-			psf->filelength = SF_COUNT_MAX ;
-			psf->datalength = psf->filelength ;
-			if (psf->sf.frames <= 0)
-				psf->sf.frames = (psf->blockwidth) ? psf->filelength / psf->blockwidth : psf->filelength ;
-			/* EMXIF : This block must go */
-			} ;
 
 		if ((error = rf64_write_header (psf, SF_FALSE)))
 			return error ;
@@ -144,9 +134,8 @@ rf64_open (SF_PRIVATE *psf)
 */
 
 static int
-rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
+rf64_read_header (SF_PRIVATE *psf)
 {	WAV_PRIVATE *wpriv ;
-	WAV_FMT 	*wav_fmt ;
 	sf_count_t riff_size, data_size ;
 	unsigned int size32 ;
 	int marker, marks [2], error, done = 0 ;
@@ -180,6 +169,7 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 					if ((error = wav_w64_read_fmt_chunk (psf, size32)) != 0)
 						return error ;
+					psf->sf.format = SF_FORMAT_RF64 | (psf->sf.format & SF_FORMAT_SUBMASK) ;
 					break ;
 
 			case data_MARKER :
@@ -206,52 +196,6 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 				break ;
 			} ;
 		} ;
-
-	wav_fmt = &wpriv->wav_fmt ;
-
-	switch (wav_fmt->format)
-	{	case WAVE_FORMAT_PCM :
-		case WAVE_FORMAT_EXTENSIBLE :
-					/* extensible might be FLOAT, MULAW, etc as well! */
-					psf->sf.format = SF_FORMAT_RF64 | u_bitwidth_to_subformat (psf->bytewidth * 8) ;
-					break ;
-
-		case WAVE_FORMAT_MULAW :
-					psf->sf.format = SF_FORMAT_RF64 | SF_FORMAT_ULAW ;
-					break ;
-
-		case WAVE_FORMAT_ALAW :
-					psf->sf.format = SF_FORMAT_RF64 | SF_FORMAT_ALAW ;
-					break ;
-
-		case WAVE_FORMAT_MS_ADPCM :
-					psf->sf.format = SF_FORMAT_RF64 | SF_FORMAT_MS_ADPCM ;
-					*blockalign = wav_fmt->msadpcm.blockalign ;
-					*framesperblock = wav_fmt->msadpcm.samplesperblock ;
-					break ;
-
-		case WAVE_FORMAT_IMA_ADPCM :
-					psf->sf.format = SF_FORMAT_RF64 | SF_FORMAT_IMA_ADPCM ;
-					*blockalign = wav_fmt->ima.blockalign ;
-					*framesperblock = wav_fmt->ima.samplesperblock ;
-					break ;
-
-		case WAVE_FORMAT_GSM610 :
-					psf->sf.format = SF_FORMAT_RF64 | SF_FORMAT_GSM610 ;
-					break ;
-
-		case WAVE_FORMAT_IEEE_FLOAT :
-					psf->sf.format = SF_FORMAT_RF64 ;
-					psf->sf.format |= (psf->bytewidth == 8) ? SF_FORMAT_DOUBLE : SF_FORMAT_FLOAT ;
-					break ;
-
-		default :
-			psf_log_printf (psf, "UNIMPLEMENTED\n") ;
-			return SFE_UNIMPLEMENTED ;
-		} ;
-
-	/* All RF64 files are little endian. */
-	psf->endian = SF_ENDIAN_LITTLE ;
 
 	psf_log_printf (psf, "End\n") ;
 
@@ -386,23 +330,19 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 		case SF_FORMAT_DOUBLE :
 			wavex_write_guid (psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE ?
 						&MSGUID_SUBTYPE_IEEE_FLOAT : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT) ;
-			add_fact_chunk = SF_TRUE ;
 			break ;
 
 		case SF_FORMAT_ULAW :
 			wavex_write_guid (psf, &MSGUID_SUBTYPE_MULAW) ;
-			add_fact_chunk = SF_TRUE ;
 			break ;
 
 		case SF_FORMAT_ALAW :
 			wavex_write_guid (psf, &MSGUID_SUBTYPE_ALAW) ;
-			add_fact_chunk = SF_TRUE ;
 			break ;
 
 		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists */
 			return SFE_UNIMPLEMENTED ;
 			wavex_write_guid (psf, &MSGUID_SUBTYPE_MS_ADPCM) ;
-			add_fact_chunk = SF_TRUE ;
 			break ;
 
 		default : return SFE_UNIMPLEMENTED ;
