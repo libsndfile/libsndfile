@@ -187,9 +187,9 @@ endif
 #===============================================================================
 
 check: generic-tests wav-tests aiff-tests au-tests caf-tests raw-tests \
-	paf-tests svx-tests nist-tests ircam-tests voc-tests w64-tests mat4-tests \
-	mat5-tests pvf-tests xi-tests htk-tests avr-tests sds-tests sd2-tests \
-	flac-tests caf-tests wve-tests vorbis-tests mpc2k-tests io-tests
+	paf-tests svx-tests nist-tests ircam-tests voc-tests w64-tests rf64-tests \
+	mat4-tests mat5-tests pvf-tests xi-tests htk-tests avr-tests sds-tests \
+	sd2-tests flac-tests caf-tests wve-tests vorbis-tests mpc2k-tests io-tests
 
 generic-tests : error_test ulaw_test alaw_test command_test floating_point_test \
 		pcm_test win32_ordinal_test external_libs_test $(CPP_TEST)
@@ -239,6 +239,27 @@ wav-tests: write_read_test lossy_comp_test peak_chunk_test header_test misc_test
 	./multi_file_test wav
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on WAV files."
+	@echo "----------------------------------------------------------------------"
+
+w64-tests: write_read_test lossy_comp_test misc_test
+	./write_read_test w64
+	./lossy_comp_test w64_ima
+	./lossy_comp_test w64_msadpcm
+	./lossy_comp_test w64_ulaw
+	./lossy_comp_test w64_alaw
+	./lossy_comp_test w64_gsm610
+	./header_test w64
+	./misc_test w64
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion` passed tests on W64 files."
+	@echo "----------------------------------------------------------------------"
+
+rf64-tests: write_read_test misc_test
+	./write_read_test rf64
+	./header_test rf64
+	./misc_test rf64
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion` passed tests on RF64 files."
 	@echo "----------------------------------------------------------------------"
 
 aiff-tests: write_read_test lossy_comp_test peak_chunk_test header_test misc_test aiff_rw_test
@@ -293,33 +314,10 @@ raw-tests: write_read_test lossy_comp_test raw_test
 	@echo "  `./sfversion` passed tests on RAW (header-less) files."
 	@echo "----------------------------------------------------------------------"
 
-w64-tests: write_read_test lossy_comp_test misc_test
-	./write_read_test w64
-	./lossy_comp_test w64_ima
-	./lossy_comp_test w64_msadpcm
-	./lossy_comp_test w64_ulaw
-	./lossy_comp_test w64_alaw
-	./lossy_comp_test w64_gsm610
-	./header_test w64
-	./misc_test w64
-	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on W64 files."
-	@echo "----------------------------------------------------------------------"
-
 wve-tests: lossy_comp_test
 	./lossy_comp_test wve
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on WVE files."
-	@echo "----------------------------------------------------------------------"
-
-vorbis-tests: lossy_comp_test ogg_test vorbis_test
-	./ogg_test
-	./vorbis_test
-	./lossy_comp_test ogg_vorbis
-	./string_test ogg
-	./misc_test ogg
-	@echo "----------------------------------------------------------------------"
-	@echo "  `./sfversion` passed tests on OGG/VORBIS files."
 	@echo "----------------------------------------------------------------------"
 
 # Lite remove start
@@ -442,6 +440,16 @@ mpc2k-tests: write_read_test misc_test
 	./misc_test mpc2k
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on MPC 2000 files."
+	@echo "----------------------------------------------------------------------"
+
+vorbis-tests: lossy_comp_test ogg_test vorbis_test
+	./ogg_test
+	./vorbis_test
+	./lossy_comp_test ogg_vorbis
+	./string_test ogg
+	./misc_test ogg
+	@echo "----------------------------------------------------------------------"
+	@echo "  `./sfversion` passed tests on OGG/VORBIS files."
 	@echo "----------------------------------------------------------------------"
 
 # Lite remove end
