@@ -201,7 +201,7 @@ main (int argc, char *argv [])
 			snprintf (tmp, sizeof (tmp), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
 			strncpy (binfo.origination_time, tmp, sizeof (binfo.origination_time)) ;
 
-			snprintf (tmp, sizeof (tmp), "%04d/%02d/%02d", timedata.tm_year + 1900, timedata.tm_mon, timedata.tm_mday) ;
+			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
 			strncpy (binfo.origination_date, tmp, sizeof (binfo.origination_date)) ;
 			continue ;
 			} ;
@@ -215,7 +215,7 @@ main (int argc, char *argv [])
 
 		if (strcmp (argv [k], "--auto-date") == 0)
 		{	char tmp [20] ;
-			snprintf (tmp, sizeof (tmp), "%04d/%02d/%02d", timedata.tm_year + 1900, timedata.tm_mon, timedata.tm_mday) ;
+			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
 			strncpy (binfo.origination_date, tmp, sizeof (binfo.origination_date)) ;
 			continue ;
 			} ;

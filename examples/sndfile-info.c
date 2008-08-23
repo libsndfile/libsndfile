@@ -70,12 +70,14 @@ main (int argc, char *argv [])
 		} ;
 
 	if (strcmp (argv [1], "-i") == 0)
-	{	instrument_dump (argv [2]) ;
+	{	for (k = 2 ; k < argc ; k++)
+			instrument_dump (argv [k]) ;
 		return 0 ;
 		} ;
 
 	if (strcmp (argv [1], "-b") == 0)
-	{	broadcast_dump (argv [2]) ;
+	{	for (k = 2 ; k < argc ; k++)
+			broadcast_dump (argv [k]) ;
 		return 0 ;
 		} ;
 

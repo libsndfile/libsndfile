@@ -33,6 +33,7 @@
 # Simple test script for the sndfile-bwf-set program.
 
 import commands, os, sys
+import time, datetime
 
 def print_test_name (name):
 	print "    %-30s :" % name,
@@ -81,7 +82,23 @@ def test_update (tests):
 			print "\n\nError : command '%s' should not have failed." % cmd
 		assert_info ("output.wav", arg, value)
 	print "ok"
-	
+
+def test_post_mod (tests):
+	print_test_name ("Post mod test")
+	for arg, value in tests:
+		assert_info ("output.wav", arg, value)
+	print "ok"
+
+def test_auto_date ():
+	print_test_name ("Auto date test")
+	cmd = "./sndfile-bwf-set --auto-time-date sine.wav date-time.wav"
+	status, output = commands.getstatusoutput (cmd)
+	if status:
+		print "\n\nError : command '%s' should not have failed." % cmd
+	target = datetime.date.today ().__str__ ()
+	assert_info ("date-time.wav", "--orig-date", target)
+	print "ok"
+
 
 #===============================================================================
 
@@ -96,17 +113,24 @@ if not os.path.isfile ("sine.wav"):
 	print "\n\nError : Can't file file 'sine.wav'."
 	sys.exit (1)
 
+print ""
+
 test_empty_fail ()
 test_copy ()
 
 tests = [
 	("--description", "Alpha"), ("--originator", "Beta"), ("--orig-ref", "Charlie"),
-	("--umid", "Delta"), ("--orig-date", "2001/10/01"),  ("--orig-time", "01:02:03"),
+	("--umid", "Delta"), ("--orig-date", "2001-10-01"),  ("--orig-time", "01:02:03"),
 	("--info-name", "Echo"), ("--info-artist", "Fox trot")
 	]
 
+test_auto_date ()
 test_update (tests)
-assert_info ("output.wav", "--info-name", "Echo")
+test_post_mod (tests)
+
+test_update ([ ("--info-artist", "Fox") ])
+
+print ""
 
 sys.exit (0)
 
