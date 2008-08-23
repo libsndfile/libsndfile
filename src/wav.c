@@ -577,10 +577,19 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						return error ;
 					break ;
 
+			case PAD_MARKER :
+					/*
+					We can eat into a 'PAD ' chunk if we need to.
+					parsestage |= HAVE_other ;
+					*/
+					psf_binheader_readf (psf, "4", &dword) ;
+					psf_log_printf (psf, "%M : %u\n", marker, dword) ;
+					dword += (dword & 1) ;
+					psf_binheader_readf (psf, "j", dword) ;
+					break ;
+
 			case iXML_MARKER : /* See http://en.wikipedia.org/wiki/IXML */
-
 			case strc_MARKER : /* Multiple of 32 bytes. */
-
 			case afsp_MARKER :
 			case clm_MARKER :
 			case elmo_MARKER :
@@ -589,7 +598,6 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case plst_MARKER :
 			case DISP_MARKER :
 			case MEXT_MARKER :
-			case PAD_MARKER :
 					parsestage |= HAVE_other ;
 
 					psf_binheader_readf (psf, "4", &dword) ;
