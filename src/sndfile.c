@@ -939,6 +939,9 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				psf->write_header (psf, SF_TRUE) ;
 			return datasize ;
 
+		case SFC_SET_ADD_HEADER_PAD_CHUNK :
+			return SF_FALSE ;
+
 		case SFC_GET_LOG_INFO :
 			if (data == NULL)
 				return SFE_BAD_CONTROL_CMD ;
