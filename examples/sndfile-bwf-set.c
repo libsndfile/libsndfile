@@ -220,6 +220,15 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
+		if (strcmp (argv [k], "--info-auto-create-date") == 0)
+		{	char tmp [20] ;
+
+			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
+
+			temp_info.create_date = strdup (tmp) ;
+			continue ;
+			} ;
+
 		printf ("Error : Don't know what to do with command line arg '%s'.\n\n", argv [k]) ;
 		usage_exit (progname, 1) ;
 		} ;
