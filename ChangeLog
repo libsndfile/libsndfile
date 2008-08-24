@@ -3,6 +3,10 @@
     * examples/sndfile-bwf-set.c
     Add --info-auto-create-date command line option.
 
+    * examples/sndfile-metadata-set.c examples/sndfile-metadata-get.c
+        examples/Makefile.am examples/test-sndfile-bwf-set.py
+    Rename sndfile-bwf-(set|get).c to sndfile-metadata-(set|get).c.
+
 2008-08-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c

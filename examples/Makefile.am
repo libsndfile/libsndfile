@@ -1,13 +1,13 @@
 ## Process this file with automake to produce Makefile.in
 
 bin_PROGRAMS = sndfile-info sndfile-play sndfile-convert sndfile-jackplay sndfile-cmp \
-				sndfile-bwf-set sndfile-bwf-get
+				sndfile-metadata-set sndfile-metadata-get
 
 noinst_PROGRAMS = make_sine sfprocess list_formats generate sndfilehandle
 
 # This is the BeOS version of sndfile-play. It needs to be compiled with the C++
 # compiler.
-EXTRA_DIST = sndfile-play-beos.cpp test-sndfile-bwf-set.py
+EXTRA_DIST = sndfile-play-beos.cpp test-sndfile-metadata-set.py
 
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
@@ -31,11 +31,11 @@ sndfile_convert_LDADD = $(SNDFILEDIR)/libsndfile.la
 sndfile_cmp_SOURCES = sndfile-cmp.c
 sndfile_cmp_LDADD = $(SNDFILEDIR)/libsndfile.la
 
-sndfile_bwf_set_SOURCES = sndfile-bwf-set.c copy_data.c copy_data.h
-sndfile_bwf_set_LDADD = $(SNDFILEDIR)/libsndfile.la
+sndfile_metadata_set_SOURCES = sndfile-metadata-set.c copy_data.c copy_data.h
+sndfile_metadata_set_LDADD = $(SNDFILEDIR)/libsndfile.la
 
-sndfile_bwf_get_SOURCES = sndfile-bwf-get.c
-sndfile_bwf_get_LDADD = $(SNDFILEDIR)/libsndfile.la
+sndfile_metadata_get_SOURCES = sndfile-metadata-get.c
+sndfile_metadata_get_LDADD = $(SNDFILEDIR)/libsndfile.la
 
 make_sine_SOURCES = make_sine.c
 make_sine_LDADD = $(SNDFILEDIR)/libsndfile.la
