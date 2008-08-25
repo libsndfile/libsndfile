@@ -103,7 +103,7 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--description") == 0)
+		if (strcmp (argv [k], "--bext-description") == 0)
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
@@ -111,7 +111,7 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--originator") == 0)
+		if (strcmp (argv [k], "--bext-originator") == 0)
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
@@ -119,7 +119,7 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--orig-ref") == 0)
+		if (strcmp (argv [k], "--bext-orig-ref") == 0)
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
@@ -127,7 +127,7 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--umid") == 0)
+		if (strcmp (argv [k], "--bext-umid") == 0)
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
@@ -135,7 +135,7 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--orig-date") == 0)
+		if (strcmp (argv [k], "--bext-orig-date") == 0)
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
@@ -143,7 +143,7 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--orig-time") == 0)
+		if (strcmp (argv [k], "--bext-orig-time") == 0)
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
@@ -151,7 +151,7 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--coding-hist") == 0)
+		if (strcmp (argv [k], "--bext-coding-hist") == 0)
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
@@ -160,7 +160,7 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--coding-hist-append") == 0)
+		if (strcmp (argv [k], "--bext-coding-hist-append") == 0)
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
@@ -171,7 +171,7 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--info-name") == 0)
+		if (strcmp (argv [k], "--str-name") == 0)
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
@@ -179,7 +179,7 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--info-artist") == 0)
+		if (strcmp (argv [k], "--str-artist") == 0)
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
@@ -187,7 +187,7 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--info-create-date") == 0)
+		if (strcmp (argv [k], "--str-create-date") == 0)
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
@@ -196,7 +196,7 @@ main (int argc, char *argv [])
 			} ;
 
 		/* Following options do not take an argument. */
-		if (strcmp (argv [k], "--auto-time-date") == 0)
+		if (strcmp (argv [k], "--bext-auto-time-date") == 0)
 		{	char tmp [20] ;
 			snprintf (tmp, sizeof (tmp), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
 			strncpy (binfo.origination_time, tmp, sizeof (binfo.origination_time)) ;
@@ -206,21 +206,21 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--auto-time") == 0)
+		if (strcmp (argv [k], "--bext-auto-time") == 0)
 		{	char tmp [20] ;
 			snprintf (tmp, sizeof (tmp), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
 			strncpy (binfo.origination_time, tmp, sizeof (binfo.origination_time)) ;
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--auto-date") == 0)
+		if (strcmp (argv [k], "--bext-auto-date") == 0)
 		{	char tmp [20] ;
 			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
 			strncpy (binfo.origination_date, tmp, sizeof (binfo.origination_date)) ;
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--info-auto-create-date") == 0)
+		if (strcmp (argv [k], "--str-auto-create-date") == 0)
 		{	char tmp [20] ;
 
 			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;

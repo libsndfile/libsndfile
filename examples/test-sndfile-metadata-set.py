@@ -58,7 +58,7 @@ def check_executable (name):
 
 def test_empty_fail ():
 	print_test_name ("Empty fail test")
-	cmd = "./sndfile-metadata-set --description Alpha sine.wav"
+	cmd = "./sndfile-metadata-set --bext-description Alpha sine.wav"
 	status, output = commands.getstatusoutput (cmd)
 	if not status:
 		print "\n\nError : command '%s' should have failed." % cmd
@@ -66,11 +66,11 @@ def test_empty_fail ():
 
 def test_copy ():
 	print_test_name ("Copy test")
-	cmd = "./sndfile-metadata-set --description \"First Try\" sine.wav output.wav"
+	cmd = "./sndfile-metadata-set --bext-description \"First Try\" sine.wav output.wav"
 	status, output = commands.getstatusoutput (cmd)
 	if status:
 		print "\n\nError : command '%s' should not have failed." % cmd
-	assert_info ("output.wav", "--description", "First Try")
+	assert_info ("output.wav", "--bext-description", "First Try")
 	print "ok"
 
 def test_update (tests):
@@ -91,12 +91,12 @@ def test_post_mod (tests):
 
 def test_auto_date ():
 	print_test_name ("Auto date test")
-	cmd = "./sndfile-metadata-set --auto-time-date sine.wav date-time.wav"
+	cmd = "./sndfile-metadata-set --bext-auto-time-date sine.wav date-time.wav"
 	status, output = commands.getstatusoutput (cmd)
 	if status:
 		print "\n\nError : command '%s' should not have failed." % cmd
 	target = datetime.date.today ().__str__ ()
-	assert_info ("date-time.wav", "--orig-date", target)
+	assert_info ("date-time.wav", "--bext-orig-date", target)
 	print "ok"
 
 
@@ -119,16 +119,16 @@ test_empty_fail ()
 test_copy ()
 
 tests = [
-	("--description", "Alpha"), ("--originator", "Beta"), ("--orig-ref", "Charlie"),
-	("--umid", "Delta"), ("--orig-date", "2001-10-01"),  ("--orig-time", "01:02:03"),
-	("--info-name", "Echo"), ("--info-artist", "Fox trot")
+	("--bext-description", "Alpha"), ("--bext-originator", "Beta"), ("--bext-orig-ref", "Charlie"),
+	("--bext-umid", "Delta"), ("--bext-orig-date", "2001-10-01"),  ("--bext-orig-time", "01:02:03"),
+	("--str-name", "Echo"), ("--str-artist", "Fox trot")
 	]
 
 test_auto_date ()
 test_update (tests)
 test_post_mod (tests)
 
-test_update ([ ("--info-artist", "Fox") ])
+test_update ([ ("--str-artist", "Fox") ])
 
 print ""
 

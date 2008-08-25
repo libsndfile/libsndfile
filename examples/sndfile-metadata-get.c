@@ -112,7 +112,7 @@ process_args (SNDFILE * file, const SF_BROADCAST_INFO * binfo, int argc, char * 
 {	const char * str ;
 	int k, do_all = 0 ;
 
-#define HANDLE_BINFO_ARG(cmd,name,field) \
+#define HANDLE_BEXT_ARG(cmd,name,field) \
 		if (do_all || strcmp (argv [k], cmd) == 0) \
 		{	printf ("%-20s : %.*s\n", name, (int) sizeof (binfo->field), binfo->field) ; \
 			if (! do_all) \
@@ -130,17 +130,17 @@ process_args (SNDFILE * file, const SF_BROADCAST_INFO * binfo, int argc, char * 
 	{	if (do_all || strcmp (argv [k], "--all") == 0)
 			do_all = 1 ;
 
-		HANDLE_BINFO_ARG ("--description", "Description", description) ;
-		HANDLE_BINFO_ARG ("--originator", "Originator", originator) ;
-		HANDLE_BINFO_ARG ("--orig-ref", "Origination ref", originator_reference) ;
-		HANDLE_BINFO_ARG ("--umid", "UMID", umid) ;
-		HANDLE_BINFO_ARG ("--orig-date", "Origination date", origination_date) ;
-		HANDLE_BINFO_ARG ("--orig-time", "Origination time", origination_time) ;
-		HANDLE_BINFO_ARG ("--coding-hist", "Coding history", coding_history) ;
+		HANDLE_BEXT_ARG ("--bext-description", "Description", description) ;
+		HANDLE_BEXT_ARG ("--bext-originator", "Originator", originator) ;
+		HANDLE_BEXT_ARG ("--bext-orig-ref", "Origination ref", originator_reference) ;
+		HANDLE_BEXT_ARG ("--bext-umid", "UMID", umid) ;
+		HANDLE_BEXT_ARG ("--bext-orig-date", "Origination date", origination_date) ;
+		HANDLE_BEXT_ARG ("--bext-orig-time", "Origination time", origination_time) ;
+		HANDLE_BEXT_ARG ("--bext-coding-hist", "Coding history", coding_history) ;
 
-		HANDLE_STR_ARG ("--info-name", "Name", SF_STR_TITLE) ;
-		HANDLE_STR_ARG ("--info-artist", "Artist", SF_STR_ARTIST) ;
-		HANDLE_STR_ARG ("--info-create-date", "Create date", SF_STR_DATE) ;
+		HANDLE_STR_ARG ("--str-name", "Name", SF_STR_TITLE) ;
+		HANDLE_STR_ARG ("--str-artist", "Artist", SF_STR_ARTIST) ;
+		HANDLE_STR_ARG ("--str-create-date", "Create date", SF_STR_DATE) ;
 
 		if (! do_all)
 			printf ("Error : Don't know what to do with command line arg '%s'.\n\n", argv [k]) ;
