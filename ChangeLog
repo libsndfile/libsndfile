@@ -1,3 +1,8 @@
+2008-09-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-bwf-set.c
+    Massive reworking.
+
 2008-08-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-bwf-set.c
