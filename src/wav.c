@@ -190,7 +190,7 @@ wav_open	 (SF_PRIVATE *psf)
 			return error ;
 		} ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	if (psf->is_pipe)
@@ -198,14 +198,14 @@ wav_open	 (SF_PRIVATE *psf)
 
 		wpriv->wavex_ambisonic = SF_AMBISONIC_NONE ;
 
-		format = psf->sf.format & SF_FORMAT_TYPEMASK ;
+		format = SF_CONTAINER (psf->sf.format) ;
 		if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX)
 			return	SFE_BAD_OPEN_FORMAT ;
 
 		psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
 		/* RIFF WAVs are little-endian, RIFX WAVs are big-endian, default to little */
-		psf->endian = psf->sf.format & SF_FORMAT_ENDMASK ;
+		psf->endian = SF_ENDIAN (psf->sf.format) ;
 		if (CPU_IS_BIG_ENDIAN && psf->endian == SF_ENDIAN_CPU)
 			psf->endian = SF_ENDIAN_BIG ;
 		else if (psf->endian != SF_ENDIAN_BIG)
@@ -577,10 +577,19 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						return error ;
 					break ;
 
+			case PAD_MARKER :
+					/*
+					We can eat into a 'PAD ' chunk if we need to.
+					parsestage |= HAVE_other ;
+					*/
+					psf_binheader_readf (psf, "4", &dword) ;
+					psf_log_printf (psf, "%M : %u\n", marker, dword) ;
+					dword += (dword & 1) ;
+					psf_binheader_readf (psf, "j", dword) ;
+					break ;
+
 			case iXML_MARKER : /* See http://en.wikipedia.org/wiki/IXML */
-
 			case strc_MARKER : /* Multiple of 32 bytes. */
-
 			case afsp_MARKER :
 			case clm_MARKER :
 			case elmo_MARKER :
@@ -589,7 +598,6 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case plst_MARKER :
 			case DISP_MARKER :
 			case MEXT_MARKER :
-			case PAD_MARKER :
 					parsestage |= HAVE_other ;
 
 					psf_binheader_readf (psf, "4", &dword) ;
@@ -718,7 +726,7 @@ static int
 wav_write_fmt_chunk (SF_PRIVATE *psf)
 {	int subformat, fmt_size, add_fact_chunk = 0 ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 
 	switch (subformat)
 	{	case SF_FORMAT_PCM_U8 :
@@ -880,7 +888,7 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 	if ((wpriv = psf->container_data) == NULL)
 		return SFE_INTERNAL ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 
 	/* initial section (same for all, it appears) */
 	switch (subformat)
@@ -1039,7 +1047,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_binheader_writef (psf, "mm", WAVE_MARKER, fmt_MARKER) ;
 
 	/* Write the 'fmt ' chunk. */
-	switch (psf->sf.format & SF_FORMAT_TYPEMASK)
+	switch (SF_CONTAINER (psf->sf.format))
 	{	case SF_FORMAT_WAV :
 				if ((error = wav_write_fmt_chunk (psf)) != 0)
 					return error ;
@@ -1093,9 +1101,9 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 			} ;
 		} ;
 
-	if (psf->headindex + 8 < psf->dataoffset)
+	if (psf->headindex + 16 < psf->dataoffset)
 	{	/* Add PAD data if necessary. */
-		k = psf->dataoffset - 16 - psf->headindex ;
+		k = psf->dataoffset - (psf->headindex + 16) ;
 		psf_binheader_writef (psf, "m4z", PAD_MARKER, k, make_size_t (k)) ;
 		} ;
 
@@ -1226,7 +1234,7 @@ wav_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
 
 	switch (command)
 	{	case SFC_WAVEX_SET_AMBISONIC :
-			if ((psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAVEX)
+			if ((SF_CONTAINER (psf->sf.format)) == SF_FORMAT_WAVEX)
 			{	if (datasize == SF_AMBISONIC_NONE)
 					wpriv->wavex_ambisonic = SF_AMBISONIC_NONE ;
 				else if (datasize == SF_AMBISONIC_B_FORMAT)

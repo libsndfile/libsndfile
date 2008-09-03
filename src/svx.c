@@ -99,10 +99,10 @@ svx_open	(SF_PRIVATE *psf)
 	{	if (psf->is_pipe)
 			return SFE_NO_PIPE_WRITE ;
 
-		if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_SVX)
+		if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_SVX)
 			return	SFE_BAD_OPEN_FORMAT ;
 
-		psf->endian = psf->sf.format & SF_FORMAT_ENDMASK ;
+		psf->endian = SF_ENDIAN (psf->sf.format) ;
 
 		if (psf->endian == SF_ENDIAN_LITTLE || (CPU_IS_LITTLE_ENDIAN && psf->endian == SF_ENDIAN_CPU))
 			return SFE_BAD_ENDIAN ;

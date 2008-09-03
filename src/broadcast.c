@@ -87,7 +87,7 @@ broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, un
 			break ;
 		} ;
 
-	switch (format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (format))
 	{	case SF_FORMAT_PCM_U8 :
 		case SF_FORMAT_PCM_S8 :
 			width = 8 ;

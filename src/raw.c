@@ -31,9 +31,9 @@ int
 raw_open	(SF_PRIVATE *psf)
 {	int	subformat, error = SFE_NO_ERROR ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 
-	psf->endian = psf->sf.format & SF_FORMAT_ENDMASK ;
+	psf->endian = SF_ENDIAN (psf->sf.format) ;
 
 	if (CPU_IS_BIG_ENDIAN && (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU))
 		psf->endian = SF_ENDIAN_BIG ;

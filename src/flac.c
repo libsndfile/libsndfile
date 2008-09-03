@@ -628,10 +628,10 @@ flac_open	(SF_PRIVATE *psf)
 			return error ;
 		} ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 
 	if (psf->mode == SFM_WRITE)
-	{	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_FLAC)
+	{	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_FLAC)
 			return	SFE_BAD_OPEN_FORMAT ;
 
 		psf->endian = SF_ENDIAN_BIG ;
@@ -723,7 +723,7 @@ flac_enc_init (SF_PRIVATE *psf)
 
 	psf_fseek (psf, 0, SEEK_SET) ;
 
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
 			bps = 8 ;
 			break ;
@@ -934,7 +934,7 @@ flac_write_s2flac (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	FLAC__int32* buffer = pflac->encbuffer ;
 
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
 			convert = s2flac8_array ;
 			break ;
@@ -976,7 +976,7 @@ flac_write_i2flac (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	FLAC__int32* buffer = pflac->encbuffer ;
 
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
 			convert = i2flac8_array ;
 			break ;
@@ -1018,7 +1018,7 @@ flac_write_f2flac (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	FLAC__int32* buffer = pflac->encbuffer ;
 
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
 			convert = (psf->add_clipping) ? f2flac8_clip_array : f2flac8_array ;
 			break ;
@@ -1150,7 +1150,7 @@ flac_write_d2flac (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	FLAC__int32* buffer = pflac->encbuffer ;
 
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
 			convert = (psf->add_clipping) ? d2flac8_clip_array : d2flac8_array ;
 			break ;

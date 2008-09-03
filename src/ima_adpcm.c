@@ -204,7 +204,7 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 	else
 		pima->blocks = psf->datalength / pima->blocksize ;
 
-	switch (psf->sf.format & SF_FORMAT_TYPEMASK)
+	switch (SF_CONTAINER (psf->sf.format))
 	{	case SF_FORMAT_WAV :
 		case SF_FORMAT_W64 :
 				count = 2 * (pima->blocksize - 4 * pima->channels) / pima->channels + 1 ;
@@ -813,7 +813,7 @@ ima_writer_init (SF_PRIVATE *psf, int blockalign)
 
 	pima->samplecount = 0 ;
 
-	switch (psf->sf.format & SF_FORMAT_TYPEMASK)
+	switch (SF_CONTAINER (psf->sf.format))
 	{	case SF_FORMAT_WAV :
 		case SF_FORMAT_W64 :
 				pima->encode_block = wav_w64_ima_encode_block ;

@@ -112,10 +112,10 @@ voc_open	(SF_PRIVATE *psf)
 			return error ;
 		} ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
-	{	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_VOC)
+	{	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_VOC)
 			return	SFE_BAD_OPEN_FORMAT ;
 
 		psf->endian = SF_ENDIAN_LITTLE ;
@@ -428,7 +428,7 @@ voc_write_header (SF_PRIVATE *psf, int calc_length)
 		psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
 		} ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 	/* Reset the current header length to zero. */
 	psf->header [0] = 0 ;
 	psf->headindex = 0 ;
