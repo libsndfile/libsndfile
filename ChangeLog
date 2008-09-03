@@ -4,6 +4,9 @@
     Add macros SF_CONTAINER, SF_CODEC and SF_ENDIAN useful for splitting format
     field of SF_INFO into component parts.
 
+    * src/*.c
+    Use new macros everywhere it is appropriate.
+
 2008-09-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-bwf-set.c

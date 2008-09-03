@@ -71,10 +71,10 @@ mpc2k_open	(SF_PRIVATE *psf)
 			return error ;
 		} ;
 
-	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_MPC2K)
+	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_MPC2K)
 		return	SFE_BAD_OPEN_FORMAT ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	if (mpc2k_write_header (psf, SF_FALSE))

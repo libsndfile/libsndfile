@@ -66,10 +66,10 @@ new_open (SF_PRIVATE *psf)
 	if ((error = new_read_header (psf)))
 			return error ;
 
-	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_WVE)
+	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_WVE)
 		return	SFE_BAD_OPEN_FORMAT ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 
 	return error ;
 } /* new_open */

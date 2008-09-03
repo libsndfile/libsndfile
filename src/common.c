@@ -1321,7 +1321,7 @@ psf_rand_int32 (void)
 
 const char *
 str_of_major_format (int format)
-{	switch (format & SF_FORMAT_TYPEMASK)
+{	switch (SF_CONTAINER (format))
 	{	CASE_NAME (SF_FORMAT_WAV) ;
 		CASE_NAME (SF_FORMAT_AIFF) ;
 		CASE_NAME (SF_FORMAT_AU) ;
@@ -1354,7 +1354,7 @@ str_of_major_format (int format)
 
 const char *
 str_of_minor_format (int format)
-{	switch (format & SF_FORMAT_SUBMASK)
+{	switch (SF_CODEC (format))
 	{	CASE_NAME (SF_FORMAT_PCM_S8) ;
 		CASE_NAME (SF_FORMAT_PCM_16) ;
 		CASE_NAME (SF_FORMAT_PCM_24) ;

@@ -115,10 +115,10 @@ w64_open	(SF_PRIVATE *psf)
 			return error ;
 		} ;
 
-	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_W64)
+	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_W64)
 		return	SFE_BAD_OPEN_FORMAT ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	if (psf->is_pipe)
@@ -401,7 +401,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 	/* riff marker, length, wave and 'fmt ' markers. */
 	psf_binheader_writef (psf, "eh8hh", riff_MARKER16, psf->filelength, wave_MARKER16, fmt_MARKER16) ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 
 	switch (subformat)
 	{	case	SF_FORMAT_PCM_U8 :

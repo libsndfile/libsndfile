@@ -127,9 +127,9 @@ pcm_init (SF_PRIVATE *psf)
 
 	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
-	if ((psf->sf.format & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_S8)
+	if ((SF_CODEC (psf->sf.format)) == SF_FORMAT_PCM_S8)
 		chars = SF_CHARS_SIGNED ;
-	else if ((psf->sf.format & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_U8)
+	else if ((SF_CODEC (psf->sf.format)) == SF_FORMAT_PCM_U8)
 		chars = SF_CHARS_UNSIGNED ;
 
 	if (CPU_IS_BIG_ENDIAN)

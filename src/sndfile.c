@@ -330,7 +330,7 @@ SNDFILE*
 sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 {	SF_PRIVATE 	*psf ;
 
-	if ((sfinfo->format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
+	if ((SF_CONTAINER (sfinfo->format)) == SF_FORMAT_SD2)
 	{	sf_errno = SFE_SD2_FD_DISALLOWED ;
 		return	NULL ;
 		} ;
@@ -531,8 +531,8 @@ int
 sf_format_check	(const SF_INFO *info)
 {	int	subformat, endian ;
 
-	subformat = info->format & SF_FORMAT_SUBMASK ;
-	endian = info->format & SF_FORMAT_ENDMASK ;
+	subformat = SF_CODEC (info->format) ;
+	endian = SF_ENDIAN (info->format) ;
 
 	/* This is the place where each file format can check if the suppiled
 	** SF_INFO struct is valid.
@@ -545,7 +545,7 @@ sf_format_check	(const SF_INFO *info)
 	if (info->samplerate < 0)
 		return 0 ;
 
-	switch (info->format & SF_FORMAT_TYPEMASK)
+	switch (SF_CONTAINER (info->format))
 	{	case SF_FORMAT_WAV :
 		case SF_FORMAT_WAVEX :
 				/* WAV now allows both endian, RIFF or RIFX (little or big respectively) */
@@ -905,13 +905,13 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			return old_value ;
 
 		case SFC_SET_ADD_PEAK_CHUNK :
-			{	int format = psf->sf.format & SF_FORMAT_TYPEMASK ;
+			{	int format = SF_CONTAINER (psf->sf.format) ;
 
 				/* Only WAV and AIFF support the PEAK chunk. */
 				if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX && format != SF_FORMAT_AIFF)
 					return SF_FALSE ;
 
-				format = psf->sf.format & SF_FORMAT_SUBMASK ;
+				format = SF_CODEC (psf->sf.format) ;
 
 				/* Only files containg the following data types support the PEAK chunk. */
 				if (format != SF_FORMAT_FLOAT && format != SF_FORMAT_DOUBLE)
@@ -1042,7 +1042,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 		case SFC_SET_RAW_START_OFFSET :
 			if (data == NULL || datasize != sizeof (sf_count_t))
 				return (psf->error = SFE_BAD_CONTROL_CMD) ;
-			if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
+			if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_RAW)
 				return (psf->error = SFE_BAD_CONTROL_CMD) ;
 
 			psf->dataoffset = *((sf_count_t*) data) ;
@@ -1060,9 +1060,9 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 		/* Lite remove start */
 		case SFC_TEST_IEEE_FLOAT_REPLACE :
 			psf->ieee_replace = (datasize) ? SF_TRUE : SF_FALSE ;
-			if ((psf->sf.format & SF_FORMAT_SUBMASK) == SF_FORMAT_FLOAT)
+			if ((SF_CODEC (psf->sf.format)) == SF_FORMAT_FLOAT)
 				float32_init (psf) ;
-			else if ((psf->sf.format & SF_FORMAT_SUBMASK) == SF_FORMAT_DOUBLE)
+			else if ((SF_CODEC (psf->sf.format)) == SF_FORMAT_DOUBLE)
 				double64_init (psf) ;
 			else
 				return (psf->error = SFE_BAD_CONTROL_CMD) ;
@@ -1085,7 +1085,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			return SF_TRUE ;
 
 		case SFC_SET_BROADCAST_INFO :
-			{	int format = psf->sf.format & SF_FORMAT_TYPEMASK ;
+			{	int format = SF_CONTAINER (psf->sf.format) ;
 
 				/* Only WAV supports the BEXT (Broadcast) chunk. */
 				if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX)
@@ -2171,7 +2171,7 @@ format_from_extension (SF_PRIVATE *psf)
 		}
 
 	/* For RAW files, make sure the dataoffset if set correctly. */
-	if ((format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW)
+	if ((SF_CONTAINER (format)) == SF_FORMAT_RAW)
 		psf->dataoffset = 0 ;
 
 	return format ;
@@ -2300,9 +2300,9 @@ validate_sfinfo (SF_INFO *sfinfo)
 		return 0 ;
 	if (sfinfo->channels < 1)
 		return 0 ;
-	if ((sfinfo->format & SF_FORMAT_TYPEMASK) == 0)
+	if ((SF_CONTAINER (sfinfo->format)) == 0)
 		return 0 ;
-	if ((sfinfo->format & SF_FORMAT_SUBMASK) == 0)
+	if ((SF_CODEC (sfinfo->format)) == 0)
 		return 0 ;
 	if (sfinfo->sections < 1)
 		return 0 ;
@@ -2437,7 +2437,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	sfinfo->seekable = 0 ;
 
 	if (mode == SFM_READ)
-	{	if ((sfinfo->format & SF_FORMAT_TYPEMASK) == SF_FORMAT_RAW)
+	{	if ((SF_CONTAINER (sfinfo->format)) == SF_FORMAT_RAW)
 		{	if (sf_format_check (sfinfo) == 0)
 			{	error = SFE_RAW_BAD_FORMAT ;
 				goto error_exit ;
@@ -2514,11 +2514,11 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	{	/* If the file is being opened for write or RDWR and the file is currently
 		** empty, then the SF_INFO struct must contain valid data.
 		*/
-		if ((psf->sf.format & SF_FORMAT_TYPEMASK) == 0)
+		if ((SF_CONTAINER (psf->sf.format)) == 0)
 		{	error = SFE_ZERO_MAJOR_FORMAT ;
 			goto error_exit ;
 			} ;
-		if ((psf->sf.format & SF_FORMAT_TYPEMASK) == 0)
+		if ((SF_CONTAINER (psf->sf.format)) == 0)
 		{	error = SFE_ZERO_MINOR_FORMAT ;
 			goto error_exit ;
 			} ;
@@ -2528,7 +2528,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 			goto error_exit ;
 			} ;
 		}
-	else if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RAW)
+	else if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_RAW)
 	{	/* If type RAW has not been specified then need to figure out file type. */
 		psf->sf.format = guess_file_type (psf) ;
 
@@ -2540,7 +2540,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	psf->last_op = psf->mode ;
 
 	/* Set bytewidth if known. */
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
 		case SF_FORMAT_PCM_U8 :
 		case SF_FORMAT_ULAW :
@@ -2569,7 +2569,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		} ;
 
 	/* Call the initialisation function for the relevant file type. */
-	switch (psf->sf.format & SF_FORMAT_TYPEMASK)
+	switch (SF_CONTAINER (psf->sf.format))
 	{	case	SF_FORMAT_WAV :
 		case	SF_FORMAT_WAVEX :
 				error = wav_open (psf) ;
@@ -2686,7 +2686,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		goto error_exit ;
 
 	/* For now, check whether embedding is supported. */
-	format = psf->sf.format & SF_FORMAT_TYPEMASK ;
+	format = SF_CONTAINER (psf->sf.format) ;
 	if (psf->fileoffset > 0 &&
 			(format != SF_FORMAT_WAV) && (format != SF_FORMAT_WAVEX) &&
 			(format != SF_FORMAT_AIFF) && (format != SF_FORMAT_AU)

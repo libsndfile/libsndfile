@@ -80,10 +80,10 @@ xi_open	(SF_PRIVATE *psf)
 			return error ;
 		} ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
-	{	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_XI)
+	{	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_XI)
 			return	SFE_BAD_OPEN_FORMAT ;
 
 		psf->endian = SF_ENDIAN_LITTLE ;
@@ -246,7 +246,7 @@ dpcm_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 
-	if ((psf->sf.format & SF_FORMAT_SUBMASK) == SF_FORMAT_DPCM_16)
+	if ((SF_CODEC (psf->sf.format)) == SF_FORMAT_DPCM_16)
 	{	total = offset ;
 		bufferlen = ARRAY_LEN (psf->u.sbuf) ;
 		while (total > 0)

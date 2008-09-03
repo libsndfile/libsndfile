@@ -116,7 +116,7 @@ sds_open	(SF_PRIVATE *psf)
 			return error ;
 		} ;
 
-	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_SDS)
+	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_SDS)
 		return	SFE_BAD_OPEN_FORMAT ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
@@ -360,7 +360,7 @@ sds_write_header (SF_PRIVATE *psf, int calc_length)
 
 	psf_binheader_writef (psf, "E211", 0xF07E, 0, 1) ;
 
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
 				psds->bitwidth = 8 ;
 				break ;

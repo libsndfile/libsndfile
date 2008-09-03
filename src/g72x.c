@@ -90,7 +90,7 @@ g72x_init (SF_PRIVATE * psf)
 	pg72x->block_curr = 0 ;
 	pg72x->sample_curr = 0 ;
 
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_G721_32 :
 				codec = G721_32_BITS_PER_SAMPLE ;
 				bytesperblock = G721_32_BYTES_PER_BLOCK ;

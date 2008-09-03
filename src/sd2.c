@@ -118,12 +118,12 @@ sd2_open (SF_PRIVATE *psf)
 			goto error_cleanup ;
 		} ;
 
-	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_SD2)
+	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_SD2)
 	{	error = SFE_BAD_OPEN_FORMAT ;
 		goto error_cleanup ;
 		} ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 	psf->dataoffset = 0 ;
 
 	/* Only open and write the resource in RDWR mode is its current length is zero. */

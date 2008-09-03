@@ -85,11 +85,11 @@ avr_open	(SF_PRIVATE *psf)
 			return error ;
 		} ;
 
-	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_AVR)
+	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_AVR)
 		return	SFE_BAD_OPEN_FORMAT ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
-	{	psf->endian = psf->sf.format & SF_FORMAT_ENDMASK ;
+	{	psf->endian = SF_ENDIAN (psf->sf.format) ;
 		psf->endian = SF_ENDIAN_BIG ;
 
 		if (avr_write_header (psf, SF_FALSE))
@@ -215,7 +215,7 @@ avr_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_binheader_writef (psf, "Emz22", TWOBIT_MARKER, make_size_t (8),
 			psf->sf.channels == 2 ? 0xFFFF : 0, psf->bytewidth * 8) ;
 
-	sign = ((psf->sf.format & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_U8) ? 0 : 0xFFFF ;
+	sign = ((SF_CODEC (psf->sf.format)) == SF_FORMAT_PCM_U8) ? 0 : 0xFFFF ;
 
 	psf_binheader_writef (psf, "E222", sign, 0, 0xFFFF) ;
 	psf_binheader_writef (psf, "E4444", psf->sf.samplerate, psf->sf.frames, 0, 0) ;

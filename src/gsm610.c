@@ -105,7 +105,7 @@ Need separate gsm_data structs for encode and decode.
 	if ((pgsm610->gsm_data = gsm_create ()) == NULL)
 		return SFE_MALLOC_FAILED ;
 
-	switch (psf->sf.format & SF_FORMAT_TYPEMASK)
+	switch (SF_CONTAINER (psf->sf.format))
 	{	case SF_FORMAT_WAV :
 		case SF_FORMAT_WAVEX :
 		case SF_FORMAT_W64 :
@@ -387,8 +387,8 @@ gsm610_seek	(SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 		pgsm610->blockcount = 0 ;
 
 		gsm_init (pgsm610->gsm_data) ;
-		if ((psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_WAV ||
-				(psf->sf.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_W64)
+		if ((SF_CONTAINER (psf->sf.format)) == SF_FORMAT_WAV ||
+				(SF_CONTAINER (psf->sf.format)) == SF_FORMAT_W64)
 			gsm_option (pgsm610->gsm_data, GSM_OPT_WAV49, &true_flag) ;
 
 		pgsm610->decode_block (psf, pgsm610) ;

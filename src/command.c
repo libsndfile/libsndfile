@@ -225,8 +225,8 @@ int
 psf_get_format_info (SF_FORMAT_INFO *data)
 {	int k, format ;
 
-	if (data->format & SF_FORMAT_TYPEMASK)
-	{	format = data->format & SF_FORMAT_TYPEMASK ;
+	if (SF_CONTAINER (data->format))
+	{	format = SF_CONTAINER (data->format) ;
 
 		for (k = 0 ; k < (SIGNED_SIZEOF (major_formats) / SIGNED_SIZEOF (SF_FORMAT_INFO)) ; k++)
 		{	if (format == major_formats [k].format)
@@ -235,8 +235,8 @@ psf_get_format_info (SF_FORMAT_INFO *data)
 				} ;
 			} ;
 		}
-	else if (data->format & SF_FORMAT_SUBMASK)
-	{	format = data->format & SF_FORMAT_SUBMASK ;
+	else if (SF_CODEC (data->format))
+	{	format = SF_CODEC (data->format) ;
 
 		for (k = 0 ; k < (SIGNED_SIZEOF (subtype_formats) / SIGNED_SIZEOF (SF_FORMAT_INFO)) ; k++)
 		{	if (format == subtype_formats [k].format)

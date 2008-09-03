@@ -63,10 +63,10 @@ nist_open	(SF_PRIVATE *psf)
 	{	if (psf->is_pipe)
 			return SFE_NO_PIPE_WRITE ;
 
-		if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_NIST)
+		if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_NIST)
 			return	SFE_BAD_OPEN_FORMAT ;
 
-		psf->endian = psf->sf.format & SF_FORMAT_ENDMASK ;
+		psf->endian = SF_ENDIAN (psf->sf.format) ;
 		if (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU)
 			psf->endian = (CPU_IS_BIG_ENDIAN) ? SF_ENDIAN_BIG : SF_ENDIAN_LITTLE ;
 
@@ -81,7 +81,7 @@ nist_open	(SF_PRIVATE *psf)
 
 	psf->container_close = nist_close ;
 
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
 				error = pcm_init (psf) ;
 				break ;
@@ -307,7 +307,7 @@ nist_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_asciiheader_printf (psf, "channel_count -i %d\n", psf->sf.channels) ;
 	psf_asciiheader_printf (psf, "sample_rate -i %d\n", psf->sf.samplerate) ;
 
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
 				psf_asciiheader_printf (psf, "sample_coding -s3 pcm\n") ;
 				psf_asciiheader_printf (psf, "sample_n_bytes -i 1\n"

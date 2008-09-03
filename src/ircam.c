@@ -85,13 +85,13 @@ ircam_open	(SF_PRIVATE *psf)
 			return error ;
 		} ;
 
-	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
+	subformat = SF_CODEC (psf->sf.format) ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
-	{	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_IRCAM)
+	{	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_IRCAM)
 			return	SFE_BAD_OPEN_FORMAT ;
 
-		psf->endian = psf->sf.format & SF_FORMAT_ENDMASK ;
+		psf->endian = SF_ENDIAN (psf->sf.format) ;
 		if (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU)
 			psf->endian = (CPU_IS_BIG_ENDIAN) ? SF_ENDIAN_BIG : SF_ENDIAN_LITTLE ;
 
@@ -249,7 +249,7 @@ ircam_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 	current = psf_ftell (psf) ;
 
 	/* This also sets psf->endian. */
-	encoding = get_encoding (psf->sf.format & SF_FORMAT_SUBMASK) ;
+	encoding = get_encoding (SF_CODEC (psf->sf.format)) ;
 
 	if (encoding == 0)
 		return SFE_BAD_OPEN_FORMAT ;

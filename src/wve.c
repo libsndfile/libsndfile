@@ -64,7 +64,7 @@ wve_open (SF_PRIVATE *psf)
 		} ;
 
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
-	{	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_WVE)
+	{	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_WVE)
 			return	SFE_BAD_OPEN_FORMAT ;
 
 		psf->endian = SF_ENDIAN_BIG ;

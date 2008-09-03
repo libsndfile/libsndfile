@@ -128,7 +128,7 @@ dither_init (SF_PRIVATE *psf, int mode)
 		if (pdither == NULL)
 			return SFE_MALLOC_FAILED ;
 
-		switch (psf->sf.format & SF_FORMAT_SUBMASK)
+		switch (SF_CODEC (psf->sf.format))
 		{	case SF_FORMAT_DOUBLE :
 			case SF_FORMAT_FLOAT :
 					pdither->read_int = psf->read_int ;
@@ -153,7 +153,7 @@ dither_init (SF_PRIVATE *psf, int mode)
 		if (pdither == NULL)
 			return SFE_MALLOC_FAILED ;
 
-		switch (psf->sf.format & SF_FORMAT_SUBMASK)
+		switch (SF_CODEC (psf->sf.format))
 		{	case SF_FORMAT_DOUBLE :
 			case SF_FORMAT_FLOAT :
 					pdither->write_int = psf->write_int ;
@@ -219,7 +219,7 @@ dither_write_short	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 		return 0 ;
 		} ;
 
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
 		case SF_FORMAT_PCM_U8 :
 		case SF_FORMAT_DPCM_8 :
@@ -259,7 +259,7 @@ dither_write_int	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 		return 0 ;
 		} ;
 
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
 		case SF_FORMAT_PCM_U8 :
 		case SF_FORMAT_PCM_16 :
@@ -304,7 +304,7 @@ dither_write_float	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 		return 0 ;
 		} ;
 
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
 		case SF_FORMAT_PCM_U8 :
 		case SF_FORMAT_PCM_16 :
@@ -348,7 +348,7 @@ dither_write_double	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 		return 0 ;
 		} ;
 
-	switch (psf->sf.format & SF_FORMAT_SUBMASK)
+	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
 		case SF_FORMAT_PCM_U8 :
 		case SF_FORMAT_PCM_16 :
