@@ -138,9 +138,13 @@ process_args (SNDFILE * file, const SF_BROADCAST_INFO * binfo, int argc, char * 
 		HANDLE_BEXT_ARG ("--bext-orig-time", "Origination time", origination_time) ;
 		HANDLE_BEXT_ARG ("--bext-coding-hist", "Coding history", coding_history) ;
 
-		HANDLE_STR_ARG ("--str-name", "Name", SF_STR_TITLE) ;
+		HANDLE_STR_ARG ("--str-title", "Name", SF_STR_TITLE) ;
+		HANDLE_STR_ARG ("--str-copyright", "Copyright", SF_STR_COPYRIGHT) ;
 		HANDLE_STR_ARG ("--str-artist", "Artist", SF_STR_ARTIST) ;
-		HANDLE_STR_ARG ("--str-create-date", "Create date", SF_STR_DATE) ;
+		HANDLE_STR_ARG ("--str-comment", "Comment", SF_STR_COMMENT) ;
+		HANDLE_STR_ARG ("--str-date", "Create date", SF_STR_DATE) ;
+		HANDLE_STR_ARG ("--str-album", "Album", SF_STR_ALBUM) ;
+		HANDLE_STR_ARG ("--str-license", "License", SF_STR_LICENSE) ;
 
 		if (! do_all)
 			printf ("Error : Don't know what to do with command line arg '%s'.\n\n", argv [k]) ;

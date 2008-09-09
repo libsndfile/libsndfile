@@ -48,9 +48,14 @@
 
 
 typedef struct
-{	const char * name ;
+{	const char * title ;
+	const char * copyright ;
 	const char * artist ;
-	const char * create_date ;
+	const char * comment ;
+	const char * date ;
+	const char * album ;
+	const char * license ;
+
 
 	/* Stuff to go in the 'bext' chunk of WAV files. */
 	int has_bext_fields ;
@@ -178,29 +183,21 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--str-name") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
+#define HANDLE_STR_ARG(cmd,field) \
+	if (strcmp (argv [k], cmd) == 0) \
+	{	k ++ ; \
+		if (k == argc) missing_param (argv [k - 1]) ; \
+		info.field = argv [k] ; \
+		continue ; \
+		} ;
 
-			info.name = argv [k] ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--str-artist") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.artist = argv [k] ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--str-create-date") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.create_date = argv [k] ;
-			continue ;
-			} ;
+		HANDLE_STR_ARG ("--str-title", title) ;
+		HANDLE_STR_ARG ("--str-copyright", copyright) ;
+		HANDLE_STR_ARG ("--str-artist", artist) ;
+		HANDLE_STR_ARG ("--str-copyright", copyright) ;
+		HANDLE_STR_ARG ("--str-date", date) ;
+		HANDLE_STR_ARG ("--str-album", album) ;
+		HANDLE_STR_ARG ("--str-license", license) ;
 
 		/* Following options do not take an argument. */
 		if (strcmp (argv [k], "--bext-auto-time-date") == 0)
@@ -227,12 +224,12 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--str-auto-create-date") == 0)
+		if (strcmp (argv [k], "--str-auto-date") == 0)
 		{	char tmp [20] ;
 
 			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
 
-			info.create_date = strdup (tmp) ;
+			info.date = strdup (tmp) ;
 			continue ;
 			} ;
 
@@ -284,10 +281,10 @@ has_bext_fields_set (const INFO * info)
 {
 	if (info->description || info->originator || info->originator_reference)
 		return 1 ;
-		
+
 	if (info->origination_date || info->origination_time || info->umid || info->coding_history)
 		return 1 ;
-	
+
 	return 0 ;
 } /* has_bext_fields_set */
 
@@ -451,14 +448,26 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const INF
 static void
 update_strings (SNDFILE * outfile, const INFO * info)
 {
-	if (info->name != NULL)
-		sf_set_string (outfile, SF_STR_TITLE, info->name) ;
+	if (info->title != NULL)
+		sf_set_string (outfile, SF_STR_TITLE, info->title) ;
+
+	if (info->copyright != NULL)
+		sf_set_string (outfile, SF_STR_TITLE, info->copyright) ;
 
 	if (info->artist != NULL)
 		sf_set_string (outfile, SF_STR_ARTIST, info->artist) ;
 
-	if (info->create_date != NULL)
-		sf_set_string (outfile, SF_STR_DATE, info->create_date) ;
+	if (info->comment != NULL)
+		sf_set_string (outfile, SF_STR_TITLE, info->comment) ;
+
+	if (info->date != NULL)
+		sf_set_string (outfile, SF_STR_DATE, info->date) ;
+
+	if (info->album != NULL)
+		sf_set_string (outfile, SF_STR_TITLE, info->album) ;
+
+	if (info->license != NULL)
+		sf_set_string (outfile, SF_STR_TITLE, info->license) ;
 
 } /* update_strings */
 
