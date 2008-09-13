@@ -1,7 +1,15 @@
+2008-09-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/w64.c
+    Add handling/skipping of a couple of new chunk types.
+
 2008-09-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
     Add -funsigned-char to CFLAGS if the compiler supports it.
+
+    * examples/sndfile-metadata-(get|set).c
+    Add handling for more metadata types.
 
 2008-09-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
