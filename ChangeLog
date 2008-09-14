@@ -1,3 +1,8 @@
+2008-09-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-metadata-set.c
+    Clean up handling of bext command line params.
+
 2008-09-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/w64.c

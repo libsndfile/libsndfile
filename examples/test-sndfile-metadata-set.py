@@ -121,7 +121,7 @@ test_copy ()
 tests = [
 	("--bext-description", "Alpha"), ("--bext-originator", "Beta"), ("--bext-orig-ref", "Charlie"),
 	("--bext-umid", "Delta"), ("--bext-orig-date", "2001-10-01"),  ("--bext-orig-time", "01:02:03"),
-	("--str-name", "Echo"), ("--str-artist", "Fox trot")
+	("--str-title", "Echo"), ("--str-artist", "Fox trot")
 	]
 
 test_auto_date ()
