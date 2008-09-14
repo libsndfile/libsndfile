@@ -118,68 +118,28 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--bext-description") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.description = argv [k] ;
-			continue ;
+#define HANDLE_BEXT_ARG(cmd,field) \
+		if (strcmp (argv [k], cmd) == 0) \
+		{	k ++ ; \
+			if (k == argc) missing_param (argv [k - 1]) ; \
+			info.field = argv [k] ; \
+			continue ; \
 			} ;
 
-		if (strcmp (argv [k], "--bext-originator") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.originator = argv [k] ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--bext-orig-ref") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.originator_reference = argv [k] ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--bext-umid") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.umid = argv [k] ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--bext-orig-date") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.origination_date = argv [k] ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--bext-orig-time") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.origination_time = argv [k] ;
-			puts (info.origination_time) ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--bext-coding-hist") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.coding_history = argv [k] ;
-			continue ;
-			} ;
+		HANDLE_BEXT_ARG ("--bext-description", description) ;
+		HANDLE_BEXT_ARG ("--bext-originator", originator) ;
+		HANDLE_BEXT_ARG ("--bext-orig-ref", originator_reference) ;
+		HANDLE_BEXT_ARG ("--bext-umid", umid) ;
+		HANDLE_BEXT_ARG ("--bext-orig-date", origination_date) ;
+		HANDLE_BEXT_ARG ("--bext-orig-time", origination_time) ;
+		HANDLE_BEXT_ARG ("--bext-coding-hist", coding_history) ;
 
 		if (strcmp (argv [k], "--bext-coding-hist-append") == 0)
 		{	k ++ ;
 			if (k == argc) missing_param (argv [k - 1]) ;
 
 			info.coding_history = argv [k] ;
+			info.coding_hist_append = 1 ;
 			continue ;
 			} ;
 
