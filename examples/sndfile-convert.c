@@ -37,7 +37,7 @@
 
 #include <sndfile.h>
 
-#include "copy_data.h"
+#include "common.h"
 
 
 typedef	struct
