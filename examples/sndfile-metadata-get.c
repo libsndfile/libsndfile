@@ -42,8 +42,6 @@
 
 #include <sndfile.h>
 
-#include "copy_data.h"
-
 #define	BUFFER_LEN		(1 << 16)
 
 
