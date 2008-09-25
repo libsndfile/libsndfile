@@ -4,6 +4,9 @@
     Rename copy_data.[ch] to common.[ch]. Fix build.
     Move code from sndfile-metadata-set.c to common.c.
 
+    * examples/Makefile.am tests/Makefile.am regtest/Makefile.am
+    Clean paths.
+
 2008-09-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/tutorial.html doc/Makefile.am
