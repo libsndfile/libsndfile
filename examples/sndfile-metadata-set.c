@@ -47,45 +47,14 @@
 #define	BUFFER_LEN		(1 << 16)
 
 
-typedef struct
-{	const char * title ;
-	const char * copyright ;
-	const char * artist ;
-	const char * comment ;
-	const char * date ;
-	const char * album ;
-	const char * license ;
-
-
-	/* Stuff to go in the 'bext' chunk of WAV files. */
-	int has_bext_fields ;
-	int coding_hist_append ;
-
-	const char * description ;
-	const char * originator ;
-	const char * originator_reference ;
-	const char * origination_date ;
-	const char * origination_time ;
-	const char * umid ;
-	const char * coding_history ;
-} INFO ;
-
-
-
 static void usage_exit (const char *progname, int exit_code) ;
 static void missing_param (const char * option) ;
 static void read_localtime (struct tm * timedata) ;
-
-static void apply_changes (const char * filenames [2], const INFO * info) ;
-
-static int merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const INFO * info) ;
-static void update_strings (SNDFILE * outfile, const INFO * info) ;
-
-static int has_bext_fields_set (const INFO * info) ;
+static int has_bext_fields_set (const METADATA_INFO * info) ;
 
 int
 main (int argc, char *argv [])
-{	INFO info ;
+{	METADATA_INFO info ;
 	struct tm timedata ;
 	const char *progname ;
 	const char * filenames [2] = { NULL, NULL } ;
@@ -210,7 +179,7 @@ main (int argc, char *argv [])
 		exit (1) ;
 		} ;
 
-	apply_changes (filenames, &info) ;
+	sfe_apply_metadata_changes (filenames, &info) ;
 
 	return 0 ;
 } /* main */
@@ -237,7 +206,7 @@ missing_param (const char * option)
 */
 
 static int
-has_bext_fields_set (const INFO * info)
+has_bext_fields_set (const METADATA_INFO * info)
 {
 	if (info->description || info->originator || info->originator_reference)
 		return 1 ;
@@ -267,167 +236,4 @@ read_localtime (struct tm * timedata)
 
 	return ;
 } /* read_localtime */
-
-static void
-apply_changes (const char * filenames [2], const INFO * info)
-{	SNDFILE *infile = NULL, *outfile = NULL ;
-	SF_INFO sfinfo ;
-	INFO tmpinfo ;
-	int error_code = 0 ;
-
-	memset (&sfinfo, 0, sizeof (sfinfo)) ;
-	memset (&tmpinfo, 0, sizeof (tmpinfo)) ;
-
-	if (filenames [1] == NULL)
-		infile = outfile = sf_open (filenames [0], SFM_RDWR, &sfinfo) ;
-	else
-	{	infile = sf_open (filenames [0], SFM_READ, &sfinfo) ;
-
-		/* Output must be WAV. */
-		sfinfo.format = SF_FORMAT_WAV | (SF_FORMAT_SUBMASK & sfinfo.format) ;
-		outfile = sf_open (filenames [1], SFM_WRITE, &sfinfo) ;
-		} ;
-
-	if (infile == NULL)
-	{	printf ("Error : Not able to open input file '%s' : %s\n", filenames [0], sf_strerror (infile)) ;
-		error_code = 1 ;
-		goto cleanup_exit ;
-		} ;
-
-	if (outfile == NULL)
-	{	printf ("Error : Not able to open output file '%s' : %s\n", filenames [1], sf_strerror (outfile)) ;
-		error_code = 1 ;
-		goto cleanup_exit ;
-		} ;
-
-	if (info->has_bext_fields && merge_broadcast_info (infile, outfile, sfinfo.format, info))
-	{	error_code = 1 ;
-		goto cleanup_exit ;
-		} ;
-
-	update_strings (outfile, info) ;
-
-	if (infile != outfile)
-	{	int infileminor = SF_FORMAT_SUBMASK & sfinfo.format ;
-
-		/* If the input file is not the same as the output file, copy the data. */
-		if ((infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT))
-			sfe_copy_data_fp (outfile, infile, sfinfo.channels) ;
-		else
-			sfe_copy_data_int (outfile, infile, sfinfo.channels) ;
-		} ;
-
-cleanup_exit :
-
-	if (outfile != NULL && outfile != infile)
-		sf_close (outfile) ;
-
-	if (infile != NULL)
-		sf_close (infile) ;
-
-	if (error_code)
-		exit (error_code) ;
-
-	return ;
-} /* apply_changes */
-
-static int
-merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const INFO * info)
-{	SF_BROADCAST_INFO binfo ;
-	int infileminor ;
-
-	memset (&binfo, 0, sizeof (binfo)) ;
-
-	if ((SF_FORMAT_TYPEMASK & format) != SF_FORMAT_WAV)
-	{	printf ("Error : This is not a WAV file and hence broadcast info cannot be added to it.\n\n") ;
-		return 1 ;
-		} ;
-
-	infileminor = SF_FORMAT_SUBMASK & format ;
-
-	switch (infileminor)
-	{	case SF_FORMAT_PCM_16 :
-		case SF_FORMAT_PCM_24 :
-		case SF_FORMAT_PCM_32 :
-			break ;
-
-		default :
-			printf (
-				"Warning : The EBU Technical Recommendation R68-2000 states that the only\n"
-				"          allowed encodings are Linear PCM and MPEG3. This file is not in\n"
-				"          the right format.\n\n"
-				) ;
-			break ;
-		} ;
-
-	if (sf_command (infile, SFC_GET_BROADCAST_INFO, &binfo, sizeof (binfo)) == 0)
-	{	if (infile == outfile)
-		{	printf (
-				"Error : Attempting in-place broadcast info update, but file does not\n"
-				"        have a 'bext' chunk to modify. The solution is to specify both\n"
-				"        input and output files on the command line.\n\n"
-				) ;
-			return 1 ;
-			} ;
-		} ;
-
-#define REPLACE_IF_NEW(x) \
-		if (info->x != NULL) \
-			memcpy (binfo.x, info->x, sizeof (binfo.x)) ;
-
-	REPLACE_IF_NEW (description) ;
-	REPLACE_IF_NEW (originator) ;
-	REPLACE_IF_NEW (originator_reference) ;
-	REPLACE_IF_NEW (origination_date) ;
-	REPLACE_IF_NEW (origination_time) ;
-	REPLACE_IF_NEW (umid) ;
-
-	/* Special case for coding_history because we may want to append. */
-	if (info->coding_history != NULL)
-	{	if (info->coding_hist_append)
-		{	int slen = strlen (binfo.coding_history) ;
-
-			while (slen > 1 && isspace (binfo.coding_history [slen - 1]))
-				slen -- ;
-
-			binfo.coding_history [slen++] = '\n' ;
-			memcpy (binfo.coding_history + slen, info->coding_history, sizeof (binfo.coding_history) - slen) ;
-			}
-		else
-		{	memcpy (binfo.coding_history, info->coding_history, sizeof (binfo.coding_history)) ;
-			binfo.coding_history_size = sizeof (binfo.coding_history) ;
-			} ;
-		} ;
-
-	if (sf_command (outfile, SFC_SET_BROADCAST_INFO, &binfo, sizeof (binfo)) == 0)
-		printf ("Error : Setting of broadcast info chunks failed.\n\n") ;
-
-	return 0 ;
-} /* merge_broadcast_info*/
-
-static void
-update_strings (SNDFILE * outfile, const INFO * info)
-{
-	if (info->title != NULL)
-		sf_set_string (outfile, SF_STR_TITLE, info->title) ;
-
-	if (info->copyright != NULL)
-		sf_set_string (outfile, SF_STR_TITLE, info->copyright) ;
-
-	if (info->artist != NULL)
-		sf_set_string (outfile, SF_STR_ARTIST, info->artist) ;
-
-	if (info->comment != NULL)
-		sf_set_string (outfile, SF_STR_TITLE, info->comment) ;
-
-	if (info->date != NULL)
-		sf_set_string (outfile, SF_STR_DATE, info->date) ;
-
-	if (info->album != NULL)
-		sf_set_string (outfile, SF_STR_TITLE, info->album) ;
-
-	if (info->license != NULL)
-		sf_set_string (outfile, SF_STR_TITLE, info->license) ;
-
-} /* update_strings */
 
