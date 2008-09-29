@@ -6,6 +6,9 @@
     * src/test_conversions.c src/test_endswap.tpl
     Fix printing of int64_t values.
 
+    * examples/sndfile-play.c
+    Fix win64 issues.
+
 2008-09-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/*
