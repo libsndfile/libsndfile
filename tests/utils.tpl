@@ -818,6 +818,7 @@ sf_count_t
 file_length_fd (int fd)
 {	struct stat data ;
 
+	memset (&data, 0, sizeof (data)) ;
 	if (fstat (fd, &data) != 0)
 		return 0 ;
 

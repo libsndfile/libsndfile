@@ -12,6 +12,9 @@
     * tests/win32_ordinal_test.c
     Fix calling of GetProcAddress with ordinal under win64.
 
+    * tests/utils.tpl
+    Fix win64 issues.
+
 2008-09-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/*
