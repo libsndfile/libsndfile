@@ -21,13 +21,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <inttypes.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-
-#include <string.h>
-#include <errno.h>
 
 #include "common.h"
 #include "sfendian.h"
@@ -36,12 +36,7 @@
 
 #define	FMT_SHORT	"0x%04x\n"
 #define	FMT_INT		"0x%08x\n"
-
-#if SIZEOF_INT64_T == SIZEOF_LONG
-#define	FMT_INT64	"0x%016lx\n"
-#else
-#define	FMT_INT64	"0x%016llx\n"
-#endif
+#define	FMT_INT64	"0x%016" PRIx64 "\n"
 
 /*==============================================================================
 ** Test functions.

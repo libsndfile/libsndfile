@@ -3,6 +3,9 @@
     * src/file_io.c
     Use intptr_t instead of long for return value of _get_osfhandle.
 
+    * src/test_conversions.c src/test_endswap.tpl
+    Fix printing of int64_t values.
+
 2008-09-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/*

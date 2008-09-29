@@ -23,6 +23,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #include "common.h"
 #include "test_main.h"
@@ -87,7 +88,7 @@ conversion_test (char endian)
 	cmp_test (__LINE__, i16, t16, "\n\nLine %d : 16 bit int failed 0x%x -> 0x%x.\n\n") ;
 	cmp_test (__LINE__, i24, t24, "\n\nLine %d : 24 bit int failed 0x%x -> 0x%x.\n\n") ;
 	cmp_test (__LINE__, i32, t32, "\n\nLine %d : 32 bit int failed 0x%x -> 0x%x.\n\n") ;
-	cmp_test (__LINE__, i64, t64, "\n\nLine %d : 64 bit int failed 0x%llx -> 0x%llx.\n\n") ;
+	cmp_test (__LINE__, i64, t64, "\n\nLine %d : 64 bit int failed 0x%" PRIx64 "x -> 0x%" PRIx64 "x.\n\n") ;
 
 	remove (filename) ;
 	puts ("ok") ;
