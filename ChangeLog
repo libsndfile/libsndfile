@@ -1,3 +1,8 @@
+2008-09-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/file_io.c
+    Use intptr_t instead of long for return value of _get_osfhandle.
+
 2008-09-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/*
