@@ -3,6 +3,9 @@
     * README doc/win32.html
     Bring these up to date.
 
+    * src/aiff.c
+    Fix parsing of REX files.
+
 2008-09-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/file_io.c
