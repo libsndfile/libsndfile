@@ -1,3 +1,8 @@
+2008-09-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * README doc/win32.html
+    Bring these up to date.
+
 2008-09-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/file_io.c
