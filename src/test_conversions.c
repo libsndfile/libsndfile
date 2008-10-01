@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
@@ -44,7 +45,7 @@ conversion_test (char endian)
 {
 	SF_PRIVATE	sf_private, *psf ;
 	const char * filename = "conversion.bin" ;
-	long long i64 = SF_PLATFORM_S64 (0x0123456789abcdef), t64 = 0 ;
+	int64_t i64 = SF_PLATFORM_S64 (0x0123456789abcdef), t64 = 0 ;
 	char format_str [16] ;
 	char test_name [64] ;
 	char i8 = 12, t8 = 0 ;

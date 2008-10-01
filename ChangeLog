@@ -1,3 +1,8 @@
+2008-10-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/test_conversions.c
+	Use int64_t instead of 'long long'.
+
 2008-10-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-metadata-set.c
