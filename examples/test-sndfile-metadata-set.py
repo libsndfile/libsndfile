@@ -100,6 +100,20 @@ def test_auto_date ():
 	print "ok"
 
 
+#-------------------------------------------------------------------------------
+
+def test_coding_history ():
+	print_test_name ("Coding history test")
+	cmd = "./sndfile-metadata-set --bext-coding-hist \"alpha beta\" output.wav"
+	status, output = commands.getstatusoutput (cmd)
+	if status:
+		print "\n\nError : command '%s' should not have failed." % cmd
+	cmd = "./sndfile-metadata-get --bext-coding-hist output.wav"
+	status, output = commands.getstatusoutput (cmd)
+	if status:
+		print "\n\nError : command '%s' should not have failed." % cmd
+	print "ok"
+
 #===============================================================================
 
 if os.path.isdir ("examples"):
@@ -129,6 +143,8 @@ test_update (tests)
 test_post_mod (tests)
 
 test_update ([ ("--str-artist", "Fox") ])
+
+test_coding_history ()
 
 print ""
 

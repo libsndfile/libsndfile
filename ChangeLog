@@ -7,6 +7,9 @@
     * examples/sndfile-metadata-(get|set).c
     Add usage messages.
 
+    * examples/test-sndfile-metadata-set.py
+    Start work on test coding history.
+
 2008-09-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * README doc/win32.html
