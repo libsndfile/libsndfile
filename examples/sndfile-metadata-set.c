@@ -114,7 +114,6 @@ main (int argc, char *argv [])
 		HANDLE_STR_ARG ("--str-title", title) ;
 		HANDLE_STR_ARG ("--str-copyright", copyright) ;
 		HANDLE_STR_ARG ("--str-artist", artist) ;
-		HANDLE_STR_ARG ("--str-copyright", copyright) ;
 		HANDLE_STR_ARG ("--str-date", date) ;
 		HANDLE_STR_ARG ("--str-album", album) ;
 		HANDLE_STR_ARG ("--str-license", license) ;
@@ -181,8 +180,50 @@ main (int argc, char *argv [])
 
 static void
 usage_exit (const char *progname, int exit_code)
-{	printf ("Usage :\n  %s <file> ...\n", progname) ;
-	printf ("    Fill in more later.\n\n") ;
+{	printf ("\nUsage :\n\n"
+		"  %s [options] <file>\n"
+		"  %s [options] <input file> <output file>\n"
+		"\n",
+		progname, progname) ;
+
+	puts (
+		"Where an option is made up of a pair of a field to set (one of\n"
+		"the 'bext' or metadata fields below) and a string. Fields are\n"
+		"as follows :\n"
+		) ;
+
+	puts (
+		"    --bext-description       Set the 'bext' description.\n"
+		"    --bext-originator        Set the 'bext' originator.\n"
+		"    --bext-orig-ref          Set the 'bext' originator reference.\n"
+		"    --bext-umid              Set the 'bext' UMID.\n"
+		"    --bext-orig-date         Set the 'bext' origination date.\n"
+		"    --bext-orig-time         Set the 'bext' origination time.\n"
+		"    --bext-coding-hist       Set the 'bext' coding history\n"
+		"\n"
+		"    --str-title              Set the metadata title.\n"
+		"    --str-copyright          Set the metadata copyright.\n"
+		"    --str-artist             Set the metadata artist.\n"
+		"    --str-date               Set the metadata date.\n"
+		"    --str-album              Set the metadata album.\n"
+		"    --str-license            Set the metadata license.\n"
+		) ;
+
+	puts (
+		"There are also the following arguments which do not take a\n"
+		"parameter :\n\n"
+		"    --bext-auto-time-date    Set the 'bext' time and date to current time/date.\n"
+		"    --bext-auto-time         Set the 'bext' time to current time.\n"
+		"    --bext-auto-date         Set the 'bext' date to current date.\n"
+		"    --str-auto-date          Set the metadata date to current date.\n"
+		) ;
+
+	puts (
+		"Most of the above operations can be done in-place on an existing\n"
+		"file. If any operation cannot be performed, the application will\n"
+		"exit with an appropriate error message.\n"
+		) ;
+
 	exit (exit_code) ;
 } /* usage_exit */
 

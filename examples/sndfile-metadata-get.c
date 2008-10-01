@@ -63,7 +63,7 @@ main (int argc, char *argv [])
 	progname = progname ? progname + 1 : argv [0] ;
 
 	/* Check if we've been asked for help. */
-	if (argc < 2 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)
+	if (argc <= 2 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)
 		usage_exit (progname, 0) ;
 
 	if (argv [argc - 1][0] != '-')
@@ -100,8 +100,28 @@ main (int argc, char *argv [])
 
 static void
 usage_exit (const char *progname, int exit_code)
-{	printf ("Usage :\n  %s <file> ...\n", progname) ;
-	printf ("    Fill in more later.\n\n") ;
+{	printf ("\nUsage :\n  %s [options] <file>\n\nOptions:\n", progname) ;
+
+	puts (
+		"    --bext-description    Print the 'bext' description.\n"
+		"    --bext-originator     Print the 'bext; originator info.\n"
+		"    --bext-orig-ref       Print the 'bext' origination reference.\n"
+		"    --bext-umid           Print the 'bext' UMID.\n"
+		"    --bext-orig-date      Print the 'bext' origination date.\n"
+		"    --bext-orig-time      Print the 'bext' origination time.\n"
+		"    --bext-coding-hist    Print the 'bext' coding history.\n"
+		) ;
+
+	puts (
+		"    --str-title           Print the title metadata.\n"
+		"    --str-copyright       Print the copyright metadata.\n"
+		"    --str-artist          Print the artist metadata.\n"
+		"    --str-comment         Print the comment metadata.\n"
+		"    --str-date            Print the creation date metadata.\n"
+		"    --str-album           Print the album metadata.\n"
+		"    --str-license         Print the license metadata.\n"
+		) ;
+
 	exit (exit_code) ;
 } /* usage_exit */
 

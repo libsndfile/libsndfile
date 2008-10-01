@@ -4,6 +4,9 @@
     Remove --bext-coding-history-append command line option because it didn't
     really make sense.
 
+    * examples/sndfile-metadata-(get|set).c
+    Add usage messages.
+
 2008-09-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * README doc/win32.html
