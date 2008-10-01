@@ -1,3 +1,9 @@
+2008-10-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-metadata-set.c
+    Remove --bext-coding-history-append command line option because it didn't
+    really make sense.
+
 2008-09-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * README doc/win32.html

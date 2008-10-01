@@ -103,15 +103,6 @@ main (int argc, char *argv [])
 		HANDLE_BEXT_ARG ("--bext-orig-time", origination_time) ;
 		HANDLE_BEXT_ARG ("--bext-coding-hist", coding_history) ;
 
-		if (strcmp (argv [k], "--bext-coding-hist-append") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.coding_history = argv [k] ;
-			info.coding_hist_append = 1 ;
-			continue ;
-			} ;
-
 #define HANDLE_STR_ARG(cmd,field) \
 	if (strcmp (argv [k], cmd) == 0) \
 	{	k ++ ; \
