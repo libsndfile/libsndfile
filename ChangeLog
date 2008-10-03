@@ -1,3 +1,8 @@
+2008-10-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/broadcast.c
+    Use '\r\n' newlines in Coding History as required by spec.
+
 2008-10-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/test_conversions.c
