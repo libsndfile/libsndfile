@@ -152,6 +152,8 @@ Need separate gsm_data structs for encode and decode.
 
 		psf->sf.frames = pgsm610->samplesperblock * pgsm610->blocks ;
 
+		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
+
 		pgsm610->decode_block (psf, pgsm610) ;	/* Read first block. */
 
 		psf->read_short		= gsm610_read_s ;

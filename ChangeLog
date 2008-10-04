@@ -1,3 +1,8 @@
+2008-10-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/gsm610.c
+    Seek to psf->dataoffset before decoding first block.
+
 2008-10-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/broadcast.c
