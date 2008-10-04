@@ -3,6 +3,9 @@
     * src/gsm610.c
     Seek to psf->dataoffset before decoding first block.
 
+    * src/sndfile.c
+    Fix detection of mpc2k files on big endian systems.
+
 2008-10-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/broadcast.c
