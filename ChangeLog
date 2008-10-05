@@ -3,6 +3,10 @@
     * tests/utils.tpl tests/pcm_test.tpl
     Update check_file_hash_or_die to use 64 bit hash.
 
+    * tests/checksum_test.c tests/Makefile.am
+    Add new checksum_test specifically for lossy compression of headerless
+    files.
+
 2008-10-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/gsm610.c
@@ -19,7 +23,7 @@
 2008-10-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/test_conversions.c
-	Use int64_t instead of 'long long'.
+    Use int64_t instead of 'long long'.
 
 2008-10-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
@@ -144,7 +148,7 @@
     In RDWR mode, pad the header if necessary (ie LIST chunk has moved or
     length has changed).
     Minor fixes in wav_write_strings.
-	Write PAD chunk with default endian-ness, not a specific endian-ness.
+    Write PAD chunk with default endian-ness, not a specific endian-ness.
 
     * examples/test-sndfile-bwf-set.py
     Add Python script to test sndfile-bwf-set/get.

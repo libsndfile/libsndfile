@@ -13,7 +13,7 @@ noinst_PROGRAMS = sfversion floating_point_test write_read_test \
 	raw_test string_test multi_file_test dither_test \
 	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
 	locale_test largefile_test win32_ordinal_test ogg_test vorbis_test \
-	external_libs_test $(CPP_TEST)
+	checksum_test external_libs_test $(CPP_TEST)
 
 INCLUDES = -I$(top_srcdir)/src
 noinst_HEADERS = dft_cmp.h utils.h generate.h
@@ -124,6 +124,9 @@ external_libs_test_LDADD = $(top_builddir)/src/libsndfile.la
 cpp_test_SOURCES = cpp_test.cc utils.c
 cpp_test_LDADD = $(top_builddir)/src/libsndfile.la
 
+checksum_test_SOURCES = checksum_test.c utils.c
+checksum_test_LDADD = $(top_builddir)/src/libsndfile.la
+
 # Lite remove start
 dwvw_test_SOURCES = utils.c dwvw_test.c
 dwvw_test_LDADD = $(top_builddir)/src/libsndfile.la
@@ -208,6 +211,7 @@ generic-tests : error_test ulaw_test alaw_test command_test floating_point_test 
 	./command_test bext
 	./command_test bextch
 	./floating_point_test
+	./checksum_test
 	./scale_clip_test
 	./headerless_test
 	./locale_test
