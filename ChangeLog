@@ -1,3 +1,8 @@
+2008-10-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/utils.tpl tests/pcm_test.tpl
+    Update check_file_hash_or_die to use 64 bit hash.
+
 2008-10-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/gsm610.c

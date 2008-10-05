@@ -1,6 +1,6 @@
 [+ AutoGen5 template h c +]
 /*
-** Copyright (C) 2002-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ extern "C" {
 
 void	create_short_sndfile (const char *filename, int format, int channels) ;
 
-void	check_file_hash_or_die	(const char *filename, unsigned int target_hash, int line_num) ;
+void	check_file_hash_or_die	(const char *filename, uint64_t target_hash, int line_num) ;
 
 void	print_test_name (const char *test, const char *filename) ;
 
@@ -138,6 +138,7 @@ sf_count_t		file_length_fd (int fd) ;
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -203,7 +204,6 @@ create_short_sndfile (const char *filename, int format, int channels)
 {	short data [2 * 3 * 4 * 5 * 6 * 7] = { 0, } ;
 	SNDFILE *file ;
 	SF_INFO sfinfo ;
-	
 
 	sfinfo.samplerate = 44100 ;
 	sfinfo.channels = channels ;
@@ -220,42 +220,37 @@ create_short_sndfile (const char *filename, int format, int channels)
 } /* create_short_sndfile */
 
 void
-check_file_hash_or_die (const char *filename, unsigned int target_hash, int line_num)
-{	static unsigned char	buffer [2048] ;
-	unsigned int	hash1, hash2 ;
-	FILE 	*file ;
-	int		k, read_count ;
+check_file_hash_or_die (const char *filename, uint64_t target_hash, int line_num)
+{	static unsigned char buf [4096] ;
+	uint64_t	cksum ;
+	FILE 		*file ;
+	int			k, read_count ;
 
-	memset (buffer, 0xEE, sizeof (buffer)) ;
+	memset (buf, 0, sizeof (buf)) ;
 
 	/* The 'b' in the mode string means binary for Win32. */
-	if (! (file = fopen (filename, "rb")))
+	if ((file = fopen (filename, "rb")) == NULL)
 	{	printf ("\n\nLine %d: could not open file '%s'\n\n", line_num, filename) ;
 		exit (1) ;
 		} ;
 
-	hash1 = hash2 = 0 ;
+	cksum = 0 ;
 
-	while ((read_count = fread (buffer, 1, sizeof (buffer), file)))
-	{	for (k = 0 ; k < read_count ; k++)
-		{	hash1 = hash1 + buffer [k] ;
-			hash2 = hash2 ^ (buffer [k] << (k % 25)) ;
-			} ;
-		} ;
+	while ((read_count = fread (buf, 1, sizeof (buf), file)))
+		for (k = 0 ; k < read_count ; k++)
+			cksum = cksum * 511 + buf [k] ;
 
 	fclose (file) ;
 
-	hash1 += hash2 ;
-
 	if (target_hash == 0)
-	{	printf (" 0x%08x ", hash1) ;
+	{	printf (" 0x%016" PRIx64 "\n", cksum) ;
 		return ;
 		} ;
 
-	if (hash1 != target_hash)
-	{	printf ("\n\nLine %d: incorrect hash value 0x%08x should be 0x%08x\n\n", line_num, hash1, target_hash) ;
+	if (cksum != target_hash)
+	{	printf ("\n\nLine %d: incorrect hash value 0x%016" PRIx64 " should be 0x%016" PRIx64 ".\n\n", line_num, cksum, target_hash) ;
 		exit (1) ;
-		}
+		} ;
 
 	return ;
 } /* check_file_hash_or_die */
