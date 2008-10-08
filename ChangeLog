@@ -6,6 +6,9 @@
     * tests/command_test.c
     Update bextch test to cope with previous change.
 
+    * examples/common.c
+    Add extra length check when copying broadcast info data.
+
 2008-10-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/utils.tpl tests/pcm_test.tpl

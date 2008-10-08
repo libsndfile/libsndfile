@@ -42,6 +42,8 @@
 
 #define	 BUFFER_LEN	4096
 
+#define	MIN(x,y)	((x) < (y) ? (x) : (y))
+
 void
 sfe_copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels)
 {	static double	data [BUFFER_LEN], max ;
@@ -133,7 +135,7 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 
 #define REPLACE_IF_NEW(x) \
 		if (info->x != NULL) \
-			memcpy (binfo.x, info->x, sizeof (binfo.x)) ;
+			memcpy (binfo.x, info->x, MIN (strlen (info->x), sizeof (binfo.x))) ;
 
 	REPLACE_IF_NEW (description) ;
 	REPLACE_IF_NEW (originator) ;
