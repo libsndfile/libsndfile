@@ -3,6 +3,9 @@
     * src/broadcast.c
     Changed the order of coding history fields.
 
+    * tests/command_test.c
+    Update bextch test to cope with previous change.
+
 2008-10-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/utils.tpl tests/pcm_test.tpl

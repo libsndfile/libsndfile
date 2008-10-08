@@ -937,7 +937,7 @@ broadcast_coding_history_test (const char *filename)
 {	static SF_BROADCAST_INFO bc_write, bc_read ;
 	SNDFILE	 *file ;
 	SF_INFO	 sfinfo ;
-	const char *default_history = "F=22050,A=PCM,M=mono,W=16" ;
+	const char *default_history = "A=PCM,F=22050,W=16,M=mono" ;
 	const char *supplied_history =
 					"A=PCM,M=mono,F=44100,W=24,T=other\r\n"
 					"A=PCM,M=mono,F=22050,W=16,T=yet_another\r\n" ;
