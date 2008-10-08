@@ -128,7 +128,8 @@ broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, un
 		newline = "\r\n" ;
 
 	memset (history, 0, sizeof (history)) ;
-	count = LSF_SNPRINTF (history, sizeof (history), "%s%sF=%u,A=PCM,M=%s,W=%hu,T=%s-%s\r\n", bext->coding_history, newline, samplerate, chnstr, width, PACKAGE, VERSION) ;
+	count = LSF_SNPRINTF (history, sizeof (history), "%s%sA=PCM,F=%u,W=%hu,M=%s,T=%s-%s\r\n",
+					bext->coding_history, newline, samplerate, width, chnstr, PACKAGE, VERSION) ;
 
 	while (count >= SIGNED_SIZEOF (bext->coding_history))
 	{	/* Coding history is too long, delete oldest part. */
