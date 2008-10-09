@@ -2,6 +2,7 @@
 
     * tests/command_test.c
     Improve error reporting when '\0' is found in coding history.
+    Fix false failure.
 
 2008-10-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
