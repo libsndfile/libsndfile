@@ -1,3 +1,8 @@
+2008-10-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/command_test.c
+    Improve error reporting when '\0' is found in coding history.
+
 2008-10-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/broadcast.c

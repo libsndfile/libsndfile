@@ -988,7 +988,7 @@ check_coding_history_newlines (const char *filename)
 			} ;
 
 		if (bc_read.coding_history [k] == 0)
-		{	printf ("\n\nLine %d : '\\0' within coding history.\n\n", __LINE__) ;
+		{	printf ("\n\nLine %d : '\\0' within coding history at index %d of %d.\n\n", __LINE__, k, bc_read.coding_history_size) ;
 			exit (1) ;
 			} ;
 		} ;
