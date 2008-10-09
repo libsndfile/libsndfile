@@ -3,6 +3,9 @@
     * src/broadcast.c
     Convert all line endings to \r\n.
 
+    * tests/command_test.c
+    Add test to make sure all line endings are converted to \r\n.
+
 2008-10-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/broadcast.c

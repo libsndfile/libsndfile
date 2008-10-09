@@ -931,6 +931,70 @@ broadcast_rdwr_test (const char *filename, int filetype)
 	puts ("ok") ;
 } /* broadcast_rdwr_test */
 
+static void
+check_coding_history_newlines (const char *filename)
+{	static SF_BROADCAST_INFO bc_write, bc_read ;
+	SNDFILE	 *file ;
+	SF_INFO	 sfinfo ;
+	unsigned k ;
+
+	sfinfo.samplerate	= 22050 ;
+	sfinfo.format		= SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
+	sfinfo.channels		= 1 ;
+
+	memset (&bc_write, 0, sizeof (bc_write)) ;
+
+	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
+	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
+	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
+	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
+	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
+	bc_write.coding_history_size = snprintf (bc_write.coding_history, sizeof (bc_write.coding_history), "This has\nUnix\nand\rMac OS9\rline endings.\n") ; ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_SET_BROADCAST_INFO, &bc_write, sizeof (bc_write)) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_BROADCAST_INFO) failed.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	memset (&bc_read, 0, sizeof (bc_read)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_GET_BROADCAST_INFO, &bc_read, sizeof (bc_read)) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_BROADCAST_INFO) failed.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+	check_log_buffer_or_die (file, __LINE__) ;
+	sf_close (file) ;
+
+	if (bc_read.coding_history_size == 0)
+	{	printf ("\n\nLine %d : missing coding history.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	for (k = 1 ; k < bc_read.coding_history_size ; k++)
+	{	if (bc_read.coding_history [k] == '\n' && bc_read.coding_history [k - 1] != '\r')
+		{	printf ("\n\nLine %d : '\\n' without '\\r' before.\n\n", __LINE__) ;
+			exit (1) ;
+			} ;
+
+		if (bc_read.coding_history [k] == '\r' && bc_read.coding_history [k + 1] != '\n')
+		{	printf ("\n\nLine %d : '\\r' without '\\n' after.\n\n", __LINE__) ;
+			exit (1) ;
+			} ;
+
+		if (bc_read.coding_history [k] == 0)
+		{	printf ("\n\nLine %d : '\\0' within coding history.\n\n", __LINE__) ;
+			exit (1) ;
+			} ;
+		} ;		
+
+	return ;
+} /* check_coding_history_newlines */
 
 static void
 broadcast_coding_history_test (const char *filename)
@@ -939,8 +1003,8 @@ broadcast_coding_history_test (const char *filename)
 	SF_INFO	 sfinfo ;
 	const char *default_history = "A=PCM,F=22050,W=16,M=mono" ;
 	const char *supplied_history =
-					"A=PCM,M=mono,F=44100,W=24,T=other\r\n"
-					"A=PCM,M=mono,F=22050,W=16,T=yet_another\r\n" ;
+					"A=PCM,F=44100,W=24,M=mono,T=other\r\n"
+					"A=PCM,F=22050,W=16,M=mono,T=yet_another\r\n" ;
 
 	print_test_name ("broadcast_coding_history_test", filename) ;
 
@@ -988,7 +1052,7 @@ broadcast_coding_history_test (const char *filename)
 		} ;
 
 	bc_write.coding_history_size = strlen (supplied_history) ;
-	snprintf (bc_write.coding_history, sizeof (bc_write.coding_history), "%s", supplied_history) ;
+	bc_write.coding_history_size = snprintf (bc_write.coding_history, sizeof (bc_write.coding_history), "%s", supplied_history) ;
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 	if (sf_command (file, SFC_SET_BROADCAST_INFO, &bc_write, sizeof (bc_write)) == SF_FALSE)
@@ -1021,6 +1085,8 @@ broadcast_coding_history_test (const char *filename)
 				__LINE__, bc_read.coding_history, supplied_history) ;
 		exit (1) ;
 		} ;
+
+	check_coding_history_newlines (filename) ;
 
 	unlink (filename) ;
 	puts ("ok") ;
