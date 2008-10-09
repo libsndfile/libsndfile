@@ -369,7 +369,7 @@ main (int argc, char **argv)
 			}
 		else
 			puts ("    No FLAC tests because FLAC support was not compiled in.") ;
-		test_count++ ;	
+		test_count++ ;
 		} ;
 
 	if (test_count == 0)

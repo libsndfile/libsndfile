@@ -991,7 +991,7 @@ check_coding_history_newlines (const char *filename)
 		{	printf ("\n\nLine %d : '\\0' within coding history.\n\n", __LINE__) ;
 			exit (1) ;
 			} ;
-		} ;		
+		} ;
 
 	return ;
 } /* check_coding_history_newlines */

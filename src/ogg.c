@@ -449,7 +449,7 @@ ogg_close (SF_PRIVATE *psf)
 	{
 		if (psf->write_current <= 0)
 			ogg_write_header (psf, 0) ;
-	
+
 		vorbis_analysis_wrote (&vdata->vd, 0) ;
 		while (vorbis_analysis_blockout (&vdata->vd, &vdata->vb) == 1)
 		{

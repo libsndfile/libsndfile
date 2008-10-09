@@ -44,10 +44,10 @@ static void pcm_test_float	(const char *filename, int filetype, uint64_t hash, i
 static void pcm_test_double	(const char *filename, int filetype, uint64_t hash, int replace_float) ;
 
 typedef union
-{	double	d [BUFFER_SIZE + 1];
-	float	f [BUFFER_SIZE + 1];
-	int		i [BUFFER_SIZE + 1];
-	short	s [BUFFER_SIZE + 1];
+{	double	d [BUFFER_SIZE + 1] ;
+	float	f [BUFFER_SIZE + 1] ;
+	int		i [BUFFER_SIZE + 1] ;
+	short	s [BUFFER_SIZE + 1] ;
 } BUFFER ;
 
 /* Data written to the file. */
