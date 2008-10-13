@@ -644,6 +644,39 @@ truncate_test (const char *filename, int filetype)
 	puts ("ok") ;
 } /* truncate_test */
 
+/*------------------------------------------------------------------------------
+*/
+
+static void
+instrumet_rw_test (const char *filename)
+{	SNDFILE *sndfile ;
+	SF_INFO sfinfo ;
+	SF_INSTRUMENT inst ;
+	memset (&sfinfo, 0, sizeof (SF_INFO)) ;
+
+	sndfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__) ;
+
+	if (sf_command (sndfile, SFC_GET_INSTRUMENT, &inst, sizeof (inst)) == SF_TRUE)
+	{	inst.basenote = 22 ;
+
+		if (sf_command (sndfile, SFC_SET_INSTRUMENT, &inst, sizeof (inst)) == SF_TRUE)
+			printf ("Sucess: [%s] updated\n", filename) ;
+		else
+			printf ("Error: SFC_SET_INSTRUMENT on [%s] [%s]\n", filename, sf_strerror (sndfile)) ;
+		}
+	else
+		printf ("Error: SFC_GET_INSTRUMENT on [%s] [%s]\n", filename, sf_strerror (sndfile)) ;
+
+
+	if (sf_command (sndfile, SFC_UPDATE_HEADER_NOW, NULL, 0) != 0)
+		printf ("Error: SFC_UPDATE_HEADER_NOW on [%s] [%s]\n", filename, sf_strerror (sndfile)) ;
+
+	sf_write_sync (sndfile) ;
+	sf_close (sndfile) ;
+
+	return ;
+} /* instrumet_rw_test */
+
 static void
 instrument_test (const char *filename, int filetype)
 {	static SF_INSTRUMENT write_inst =
@@ -753,6 +786,8 @@ instrument_test (const char *filename, int filetype)
 		if ((filetype & SF_FORMAT_TYPEMASK) != SF_FORMAT_XI)
 			exit (1) ;
 		} ;
+
+	if (0) instrumet_rw_test (filename) ;
 
 	unlink (filename) ;
 	puts ("ok") ;
