@@ -82,13 +82,12 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_UNKNOWN_FORMAT		, "File contains data in an unknown format." },
 	{	SFE_NOT_READMODE		, "Read attempted on file currently open for write." },
 	{	SFE_NOT_WRITEMODE		, "Write attempted on file currently open for read." },
-	{	SFE_BAD_MODE_RW			, "This file format does not support read/write mode." },
+	{	SFE_BAD_MODE_RW			, "Error : This file format does not support read/write mode." },
 	{	SFE_BAD_SF_INFO			, "Internal error : SF_INFO struct incomplete." },
 	{	SFE_BAD_OFFSET			, "Error : supplied offset beyond end of file." },
 	{	SFE_NO_EMBED_SUPPORT	, "Error : embedding not supported for this file format." },
 	{	SFE_NO_EMBEDDED_RDWR	, "Error : cannot open embedded file read/write." },
 	{	SFE_NO_PIPE_WRITE		, "Error : this file format does not support pipe write." },
-	{	SFE_BAD_RDWR_FORMAT		, "Error : File format cannot be opened for RDWR." },
 	{	SFE_BAD_VIRTUAL_IO		, "Error : bad pointer on SF_VIRTUAL_IO struct." },
 
 	{	SFE_INTERLEAVE_MODE		, "Attempt to write to file with non-interleaved data." },
@@ -2709,7 +2708,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		psf_log_printf (psf, "Embedded file length : %D\n", psf->filelength) ;
 
 	if (mode == SFM_RDWR && sf_format_check (&(psf->sf)) == 0)
-	{	error = SFE_BAD_RDWR_FORMAT ;
+	{	error = SFE_BAD_MODE_RW ;
 		goto error_exit ;
 		} ;
 
