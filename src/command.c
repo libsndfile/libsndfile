@@ -99,7 +99,7 @@ psf_get_format_simple (SF_FORMAT_INFO *data)
 {	int indx ;
 
 	if (data->format < 0 || data->format >= (SIGNED_SIZEOF (simple_formats) / SIGNED_SIZEOF (SF_FORMAT_INFO)))
-		return SFE_BAD_CONTROL_CMD ;
+		return SFE_BAD_COMMAND_PARAM ;
 
 	indx = data->format ;
 	memcpy (data, &(simple_formats [indx]), SIGNED_SIZEOF (SF_FORMAT_INFO)) ;
@@ -153,7 +153,7 @@ psf_get_format_major (SF_FORMAT_INFO *data)
 {	int indx ;
 
 	if (data->format < 0 || data->format >= (SIGNED_SIZEOF (major_formats) / SIGNED_SIZEOF (SF_FORMAT_INFO)))
-		return SFE_BAD_CONTROL_CMD ;
+		return SFE_BAD_COMMAND_PARAM ;
 
 	indx = data->format ;
 	memcpy (data, &(major_formats [indx]), SIGNED_SIZEOF (SF_FORMAT_INFO)) ;
@@ -210,7 +210,7 @@ psf_get_format_subtype (SF_FORMAT_INFO *data)
 {	int indx ;
 
 	if (data->format < 0 || data->format >= (SIGNED_SIZEOF (subtype_formats) / SIGNED_SIZEOF (SF_FORMAT_INFO)))
-		return SFE_BAD_CONTROL_CMD ;
+		return SFE_BAD_COMMAND_PARAM ;
 
 	indx = data->format ;
 	memcpy (data, &(subtype_formats [indx]), sizeof (SF_FORMAT_INFO)) ;
@@ -248,7 +248,7 @@ psf_get_format_info (SF_FORMAT_INFO *data)
 
 	memset (data, 0, sizeof (SF_FORMAT_INFO)) ;
 
-	return SFE_BAD_CONTROL_CMD ;
+	return SFE_BAD_COMMAND_PARAM ;
 } /* psf_get_format_info */
 
 /*==============================================================================
