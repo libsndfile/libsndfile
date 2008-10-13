@@ -95,6 +95,16 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
+	if (do_all || ! strcmp (argv [1], "rf64"))
+	{	puts ("\n\n     **** String test not working yet for RF64 format. ****\n") ;
+		/*
+		string_start_end_test ("strings.rf64", SF_FORMAT_RF64) ;
+		string_multi_set_test ("multi.rf64", SF_FORMAT_RF64) ;
+		string_rdwr_test ("rdwr.rf64", SF_FORMAT_RF64) ;
+		*/
+		test_count++ ;
+		} ;
+
 	if (test_count == 0)
 	{	printf ("Mono : ************************************\n") ;
 		printf ("Mono : *  No '%s' test defined.\n", argv [1]) ;

@@ -380,7 +380,7 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	if (! psf->dataoffset)
 		return SFE_W64_NO_DATA ;
 
-	psf->endian = SF_ENDIAN_LITTLE ;		/* All WAV files are little endian. */
+	psf->endian = SF_ENDIAN_LITTLE ;		/* All W64 files are little endian. */
 
 	if (psf_ftell (psf) != psf->dataoffset)
 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;

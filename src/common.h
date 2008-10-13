@@ -578,6 +578,8 @@ enum
 
 	SFE_VORBIS_ENCODER_BUG,
 
+	SFE_RF64_NOT_RF64,
+
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
 
@@ -713,6 +715,7 @@ int		xi_open		(SF_PRIVATE *psf) ;
 int		flac_open	(SF_PRIVATE *psf) ;
 int		caf_open	(SF_PRIVATE *psf) ;
 int		mpc2k_open	(SF_PRIVATE *psf) ;
+int		rf64_open	(SF_PRIVATE *psf) ;
 
 /* In progress. Do not currently work. */
 

@@ -69,6 +69,7 @@ enum
 	SF_FORMAT_WVE			= 0x190000,		/* Psion WVE format */
 	SF_FORMAT_OGG			= 0x200000,		/* Xiph OGG container */
 	SF_FORMAT_MPC2K			= 0x210000,		/* Akai MPC 2000 sampler */
+	SF_FORMAT_RF64			= 0x220000,		/* RF64 WAV file */
 
 	/* Subtypes from here on. */
 

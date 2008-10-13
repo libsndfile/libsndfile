@@ -138,6 +138,13 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
+	if (do_all || ! strcmp (argv [1], "rf64"))
+	{	zero_data_test ("zerolen.rf64", SF_FORMAT_W64 | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_W64 | SF_FORMAT_PCM_16) ;
+		permission_test ("readonly.rf64", SF_FORMAT_W64) ;
+		test_count++ ;
+		} ;
+
 	if (do_all || ! strcmp (argv [1], "mat4"))
 	{	zero_data_test ("zerolen.mat4", SF_FORMAT_MAT4 | SF_FORMAT_PCM_16) ;
 		filesystem_full_test (SF_FORMAT_MAT4 | SF_FORMAT_PCM_16) ;
