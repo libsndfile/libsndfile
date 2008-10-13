@@ -4,9 +4,12 @@
     Add test function instrument_rw_test, but don't hook it into the testing
     yet.
 
-    * src/common.h src/command.c src/sndfile.c
-    Rename SFE_BAD_CONTROL_CMD to SFE_BAD_COMMAND_PARAM and use it in a few new
-    places.
+    * src/common.h src/command.c src/sndfile.c src/flac.c
+    Error code rationalization.
+
+    * src/common.h src/sndfile.c
+    Set psf->error to SFE_CMD_HAS_DATA when adding metadata via sf_command()
+    fails due to psf->have_written being true.
 
 2008-10-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

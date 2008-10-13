@@ -110,7 +110,8 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_OPEN_PIPE_RDWR		, "Error : attempt toopen a pipe in read/write mode." },
 	{	SFE_RDWR_POSITION		, "Error on RDWR position (cryptic)." },
 	{	SFE_RDWR_BAD_HEADER		, "Error : Cannot open file in read/write mode due to string data in header." },
-
+	{	SFE_CMD_HAS_DATA		, "Error : Command fails because file already has audio data." },
+	
 	{	SFE_STR_NO_SUPPORT		, "Error : File type does not support string data." },
 	{	SFE_STR_NOT_WRITE		, "Error : Trying to set a string when file is not in write mode." },
 	{	SFE_STR_MAX_DATA		, "Error : Maximum string data storage reached." },
@@ -922,7 +923,9 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				return SF_FALSE ;
 			/* If data has already been written this must fail. */
 			if (psf->have_written)
+			{	psf->error = SFE_CMD_HAS_DATA ;
 				return SF_FALSE ;
+				} ;
 			/* Everything seems OK, so set psf->has_peak and re-write header. */
 			if (datasize == SF_FALSE && psf->peak_info != NULL)
 			{	free (psf->peak_info) ;
@@ -1099,7 +1102,9 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				return SF_FALSE ;
 			/* If data has already been written this must fail. */
 			if (psf->broadcast_info == NULL && psf->have_written)
+			{	psf->error = SFE_CMD_HAS_DATA ;
 				return SF_FALSE ;
+				} ;
 
 			if (psf->broadcast_info == NULL)
 				psf->broadcast_info = broadcast_info_alloc () ;
@@ -1133,7 +1138,9 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 		case SFC_SET_INSTRUMENT :
 			/* If data has already been written this must fail. */
 			if (psf->have_written)
+			{	psf->error = SFE_CMD_HAS_DATA ;
 				return SF_FALSE ;
+				} ;
 			if (datasize != sizeof (SF_INSTRUMENT) || data == NULL)
 			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
