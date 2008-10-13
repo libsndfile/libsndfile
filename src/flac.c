@@ -621,7 +621,7 @@ flac_open	(SF_PRIVATE *psf)
 	psf->codec_data = pflac ;
 
 	if (psf->mode == SFM_RDWR)
-		return SFE_BAD_RDWR_FORMAT ;
+		return SFE_BAD_MODE_RW ;
 
 	if (psf->mode == SFM_READ)
 	{	if ((error = flac_read_header (psf)))

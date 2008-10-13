@@ -1,3 +1,140 @@
+2008-10-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/command_test.c
+    Add test function instrument_rw_test, but don't hook it into the testing
+    yet.
+
+    * src/common.h src/command.c src/sndfile.c src/flac.c
+    Error code rationalization.
+
+    * src/common.h src/sndfile.c
+    Set psf->error to SFE_CMD_HAS_DATA when adding metadata via sf_command()
+    fails due to psf->have_written being true.
+
+    * doc/command.html
+    Document the SFC_GET/SET_BROADCAST_INFO comamnds.
+
+2008-10-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/command_test.c
+    Improve error reporting when '\0' is found in coding history.
+    Fix false failure.
+
+2008-10-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/broadcast.c
+    Convert all coding history line endings to \r\n.
+
+    * tests/command_test.c
+    Add test to make sure all line endings are converted to \r\n.
+
+2008-10-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/broadcast.c
+    Changed the order of coding history fields.
+
+    * tests/command_test.c
+    Update bextch test to cope with previous change.
+
+    * examples/common.c
+    Add extra length check when copying broadcast info data.
+
+2008-10-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/utils.tpl tests/pcm_test.tpl
+    Update check_file_hash_or_die to use 64 bit hash.
+
+    * tests/checksum_test.c tests/Makefile.am
+    Add new checksum_test specifically for lossy compression of headerless
+    files.
+
+2008-10-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/gsm610.c
+    Seek to psf->dataoffset before decoding first block.
+
+    * src/sndfile.c
+    Fix detection of mpc2k files on big endian systems.
+
+2008-10-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/broadcast.c
+    Use '\r\n' newlines in Coding History as required by spec.
+
+2008-10-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/test_conversions.c
+    Use int64_t instead of 'long long'.
+
+2008-10-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-metadata-set.c
+    Remove --bext-coding-history-append command line option because it didn't
+    really make sense.
+
+    * examples/sndfile-metadata-(get|set).c
+    Add usage messages.
+
+    * examples/test-sndfile-metadata-set.py
+    Start work on test coding history.
+
+2008-09-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * README doc/win32.html
+    Bring these up to date.
+
+    * src/aiff.c
+    Fix parsing of REX files.
+
+2008-09-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/file_io.c
+    Use intptr_t instead of long for return value of _get_osfhandle.
+
+    * src/test_conversions.c src/test_endswap.tpl
+    Fix printing of int64_t values.
+
+    * examples/sndfile-play.c
+    Fix win64 issues.
+
+    * tests/win32_ordinal_test.c
+    Fix calling of GetProcAddress with ordinal under win64.
+
+    * tests/utils.tpl
+    Fix win64 issues.
+
+2008-09-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/*
+    Rename copy_data.[ch] to common.[ch]. Fix build.
+    Move code from sndfile-metadata-set.c to common.c.
+
+    * examples/Makefile.am tests/Makefile.am regtest/Makefile.am
+    Clean paths.
+
+2008-09-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/tutorial.html doc/Makefile.am
+    Add file doc/tutorial.html and hook into build/dist system.
+
+2008-09-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-metadata-set.c
+    Clean up handling of bext command line params.
+
+2008-09-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/w64.c
+    Add handling/skipping of a couple of new chunk types.
+
+2008-09-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Add -funsigned-char to CFLAGS if the compiler supports it.
+
+    * examples/sndfile-metadata-(get|set).c
+    Add handling for more metadata types.
+
 2008-09-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h

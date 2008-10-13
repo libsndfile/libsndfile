@@ -64,7 +64,13 @@ test_ordinal (HMODULE hmod, const char * func_name, int ordinal)
 
 	print_test_name ("win32_ordinal_test", func_name) ;
 
-	ord = GetProcAddress (hmod, (LPSTR) ordinal) ;
+#if SIZEOF_VOIDP == 8
+#define	LPCSTR_OF_ORDINAL(x)	((LPCSTR) ((int64_t) (x)))
+#else
+#define	LPCSTR_OF_ORDINAL(x)	((LPCSTR) (x))
+#endif
+
+	ord = GetProcAddress (hmod, LPCSTR_OF_ORDINAL (ordinal)) ;
 	if ((name = GetProcAddress (hmod, func_name)) == NULL)
 	{	FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, GetLastError (),
 					MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpmsg, 0, NULL) ;

@@ -700,7 +700,7 @@ win32_play_data (Win32_Audio_Data *audio_data)
 } /* win32_play_data */
 
 static void CALLBACK
-win32_audio_out_callback (HWAVEOUT hwave, UINT msg, DWORD data, DWORD param1, DWORD param2)
+win32_audio_out_callback (HWAVEOUT hwave, UINT msg, DWORD_PTR data, DWORD param1, DWORD param2)
 {	Win32_Audio_Data	*audio_data ;
 
 	/* Prevent compiler warnings. */
@@ -727,11 +727,6 @@ win32_audio_out_callback (HWAVEOUT hwave, UINT msg, DWORD data, DWORD param1, DW
 
 	return ;
 } /* win32_audio_out_callback */
-
-/* This is needed for earlier versions of the M$ development tools. */
-#ifndef DWORD_PTR
-#define DWORD_PTR DWORD
-#endif
 
 static void
 win32_play (int argc, char *argv [])

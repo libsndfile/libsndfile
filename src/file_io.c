@@ -592,10 +592,6 @@ psf_fsync (SF_PRIVATE *psf)
 #include <windows.h>
 #include <io.h>
 
-#ifndef HAVE_SSIZE_T
-typedef long ssize_t ;
-#endif
-
 static int psf_close_handle (HANDLE handle) ;
 static HANDLE psf_open_handle (const char * path, int mode) ;
 static sf_count_t psf_get_filelen_handle (HANDLE handle) ;
@@ -862,7 +858,7 @@ psf_set_stdio (SF_PRIVATE *psf, int mode)
 /* USE_WINDOWS_API */ void
 psf_set_file (SF_PRIVATE *psf, int fd)
 {	HANDLE handle ;
-	long osfhandle ;
+	intptr_t osfhandle ;
 
 	osfhandle = _get_osfhandle (fd) ;
 	handle = (HANDLE) osfhandle ;
@@ -1164,10 +1160,6 @@ psf_ftruncate (SF_PRIVATE *psf, sf_count_t len)
 
 #include <io.h>
 #include <direct.h>
-
-#ifndef HAVE_SSIZE_T
-typedef long ssize_t ;
-#endif
 
 /* Win32 */ int
 psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)

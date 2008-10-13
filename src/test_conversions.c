@@ -20,9 +20,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #include "common.h"
 #include "test_main.h"
@@ -43,7 +45,7 @@ conversion_test (char endian)
 {
 	SF_PRIVATE	sf_private, *psf ;
 	const char * filename = "conversion.bin" ;
-	long long i64 = SF_PLATFORM_S64 (0x0123456789abcdef), t64 = 0 ;
+	int64_t i64 = SF_PLATFORM_S64 (0x0123456789abcdef), t64 = 0 ;
 	char format_str [16] ;
 	char test_name [64] ;
 	char i8 = 12, t8 = 0 ;
@@ -87,7 +89,7 @@ conversion_test (char endian)
 	cmp_test (__LINE__, i16, t16, "\n\nLine %d : 16 bit int failed 0x%x -> 0x%x.\n\n") ;
 	cmp_test (__LINE__, i24, t24, "\n\nLine %d : 24 bit int failed 0x%x -> 0x%x.\n\n") ;
 	cmp_test (__LINE__, i32, t32, "\n\nLine %d : 32 bit int failed 0x%x -> 0x%x.\n\n") ;
-	cmp_test (__LINE__, i64, t64, "\n\nLine %d : 64 bit int failed 0x%llx -> 0x%llx.\n\n") ;
+	cmp_test (__LINE__, i64, t64, "\n\nLine %d : 64 bit int failed 0x%" PRIx64 "x -> 0x%" PRIx64 "x.\n\n") ;
 
 	remove (filename) ;
 	puts ("ok") ;

@@ -42,45 +42,19 @@
 
 #include <sndfile.h>
 
-#include "copy_data.h"
+#include "common.h"
 
 #define	BUFFER_LEN		(1 << 16)
-
-
-typedef struct
-{	const char * name ;
-	const char * artist ;
-	const char * create_date ;
-
-	/* Stuff to go in the 'bext' chunk of WAV files. */
-	int has_bext_fields ;
-	int coding_hist_append ;
-
-	const char * description ;
-	const char * originator ;
-	const char * originator_reference ;
-	const char * origination_date ;
-	const char * origination_time ;
-	const char * umid ;
-	const char * coding_history ;
-} INFO ;
-
 
 
 static void usage_exit (const char *progname, int exit_code) ;
 static void missing_param (const char * option) ;
 static void read_localtime (struct tm * timedata) ;
-
-static void apply_changes (const char * filenames [2], const INFO * info) ;
-
-static int merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const INFO * info) ;
-static void update_strings (SNDFILE * outfile, const INFO * info) ;
-
-static int has_bext_fields_set (const INFO * info) ;
+static int has_bext_fields_set (const METADATA_INFO * info) ;
 
 int
 main (int argc, char *argv [])
-{	INFO info ;
+{	METADATA_INFO info ;
 	struct tm timedata ;
 	const char *progname ;
 	const char * filenames [2] = { NULL, NULL } ;
@@ -113,94 +87,36 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--bext-description") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.description = argv [k] ;
-			continue ;
+#define HANDLE_BEXT_ARG(cmd,field) \
+		if (strcmp (argv [k], cmd) == 0) \
+		{	k ++ ; \
+			if (k == argc) missing_param (argv [k - 1]) ; \
+			info.field = argv [k] ; \
+			continue ; \
 			} ;
 
-		if (strcmp (argv [k], "--bext-originator") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
+		HANDLE_BEXT_ARG ("--bext-description", description) ;
+		HANDLE_BEXT_ARG ("--bext-originator", originator) ;
+		HANDLE_BEXT_ARG ("--bext-orig-ref", originator_reference) ;
+		HANDLE_BEXT_ARG ("--bext-umid", umid) ;
+		HANDLE_BEXT_ARG ("--bext-orig-date", origination_date) ;
+		HANDLE_BEXT_ARG ("--bext-orig-time", origination_time) ;
+		HANDLE_BEXT_ARG ("--bext-coding-hist", coding_history) ;
 
-			info.originator = argv [k] ;
-			continue ;
-			} ;
+#define HANDLE_STR_ARG(cmd,field) \
+	if (strcmp (argv [k], cmd) == 0) \
+	{	k ++ ; \
+		if (k == argc) missing_param (argv [k - 1]) ; \
+		info.field = argv [k] ; \
+		continue ; \
+		} ;
 
-		if (strcmp (argv [k], "--bext-orig-ref") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.originator_reference = argv [k] ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--bext-umid") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.umid = argv [k] ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--bext-orig-date") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.origination_date = argv [k] ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--bext-orig-time") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.origination_time = argv [k] ;
-			puts (info.origination_time) ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--bext-coding-hist") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.coding_history = argv [k] ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--bext-coding-hist-append") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.coding_history = argv [k] ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--str-name") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.name = argv [k] ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--str-artist") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.artist = argv [k] ;
-			continue ;
-			} ;
-
-		if (strcmp (argv [k], "--str-create-date") == 0)
-		{	k ++ ;
-			if (k == argc) missing_param (argv [k - 1]) ;
-
-			info.create_date = argv [k] ;
-			continue ;
-			} ;
+		HANDLE_STR_ARG ("--str-title", title) ;
+		HANDLE_STR_ARG ("--str-copyright", copyright) ;
+		HANDLE_STR_ARG ("--str-artist", artist) ;
+		HANDLE_STR_ARG ("--str-date", date) ;
+		HANDLE_STR_ARG ("--str-album", album) ;
+		HANDLE_STR_ARG ("--str-license", license) ;
 
 		/* Following options do not take an argument. */
 		if (strcmp (argv [k], "--bext-auto-time-date") == 0)
@@ -227,12 +143,12 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-		if (strcmp (argv [k], "--str-auto-create-date") == 0)
+		if (strcmp (argv [k], "--str-auto-date") == 0)
 		{	char tmp [20] ;
 
 			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
 
-			info.create_date = strdup (tmp) ;
+			info.date = strdup (tmp) ;
 			continue ;
 			} ;
 
@@ -253,7 +169,7 @@ main (int argc, char *argv [])
 		exit (1) ;
 		} ;
 
-	apply_changes (filenames, &info) ;
+	sfe_apply_metadata_changes (filenames, &info) ;
 
 	return 0 ;
 } /* main */
@@ -264,8 +180,50 @@ main (int argc, char *argv [])
 
 static void
 usage_exit (const char *progname, int exit_code)
-{	printf ("Usage :\n  %s <file> ...\n", progname) ;
-	printf ("    Fill in more later.\n\n") ;
+{	printf ("\nUsage :\n\n"
+		"  %s [options] <file>\n"
+		"  %s [options] <input file> <output file>\n"
+		"\n",
+		progname, progname) ;
+
+	puts (
+		"Where an option is made up of a pair of a field to set (one of\n"
+		"the 'bext' or metadata fields below) and a string. Fields are\n"
+		"as follows :\n"
+		) ;
+
+	puts (
+		"    --bext-description       Set the 'bext' description.\n"
+		"    --bext-originator        Set the 'bext' originator.\n"
+		"    --bext-orig-ref          Set the 'bext' originator reference.\n"
+		"    --bext-umid              Set the 'bext' UMID.\n"
+		"    --bext-orig-date         Set the 'bext' origination date.\n"
+		"    --bext-orig-time         Set the 'bext' origination time.\n"
+		"    --bext-coding-hist       Set the 'bext' coding history\n"
+		"\n"
+		"    --str-title              Set the metadata title.\n"
+		"    --str-copyright          Set the metadata copyright.\n"
+		"    --str-artist             Set the metadata artist.\n"
+		"    --str-date               Set the metadata date.\n"
+		"    --str-album              Set the metadata album.\n"
+		"    --str-license            Set the metadata license.\n"
+		) ;
+
+	puts (
+		"There are also the following arguments which do not take a\n"
+		"parameter :\n\n"
+		"    --bext-auto-time-date    Set the 'bext' time and date to current time/date.\n"
+		"    --bext-auto-time         Set the 'bext' time to current time.\n"
+		"    --bext-auto-date         Set the 'bext' date to current date.\n"
+		"    --str-auto-date          Set the metadata date to current date.\n"
+		) ;
+
+	puts (
+		"Most of the above operations can be done in-place on an existing\n"
+		"file. If any operation cannot be performed, the application will\n"
+		"exit with an appropriate error message.\n"
+		) ;
+
 	exit (exit_code) ;
 } /* usage_exit */
 
@@ -280,14 +238,14 @@ missing_param (const char * option)
 */
 
 static int
-has_bext_fields_set (const INFO * info)
+has_bext_fields_set (const METADATA_INFO * info)
 {
 	if (info->description || info->originator || info->originator_reference)
 		return 1 ;
-		
+
 	if (info->origination_date || info->origination_time || info->umid || info->coding_history)
 		return 1 ;
-	
+
 	return 0 ;
 } /* has_bext_fields_set */
 
@@ -310,155 +268,4 @@ read_localtime (struct tm * timedata)
 
 	return ;
 } /* read_localtime */
-
-static void
-apply_changes (const char * filenames [2], const INFO * info)
-{	SNDFILE *infile = NULL, *outfile = NULL ;
-	SF_INFO sfinfo ;
-	INFO tmpinfo ;
-	int error_code = 0 ;
-
-	memset (&sfinfo, 0, sizeof (sfinfo)) ;
-	memset (&tmpinfo, 0, sizeof (tmpinfo)) ;
-
-	if (filenames [1] == NULL)
-		infile = outfile = sf_open (filenames [0], SFM_RDWR, &sfinfo) ;
-	else
-	{	infile = sf_open (filenames [0], SFM_READ, &sfinfo) ;
-
-		/* Output must be WAV. */
-		sfinfo.format = SF_FORMAT_WAV | (SF_FORMAT_SUBMASK & sfinfo.format) ;
-		outfile = sf_open (filenames [1], SFM_WRITE, &sfinfo) ;
-		} ;
-
-	if (infile == NULL)
-	{	printf ("Error : Not able to open input file '%s' : %s\n", filenames [0], sf_strerror (infile)) ;
-		error_code = 1 ;
-		goto cleanup_exit ;
-		} ;
-
-	if (outfile == NULL)
-	{	printf ("Error : Not able to open output file '%s' : %s\n", filenames [1], sf_strerror (outfile)) ;
-		error_code = 1 ;
-		goto cleanup_exit ;
-		} ;
-
-	if (info->has_bext_fields && merge_broadcast_info (infile, outfile, sfinfo.format, info))
-	{	error_code = 1 ;
-		goto cleanup_exit ;
-		} ;
-
-	update_strings (outfile, info) ;
-
-	if (infile != outfile)
-	{	int infileminor = SF_FORMAT_SUBMASK & sfinfo.format ;
-
-		/* If the input file is not the same as the output file, copy the data. */
-		if ((infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT))
-			sfe_copy_data_fp (outfile, infile, sfinfo.channels) ;
-		else
-			sfe_copy_data_int (outfile, infile, sfinfo.channels) ;
-		} ;
-
-cleanup_exit :
-
-	if (outfile != NULL && outfile != infile)
-		sf_close (outfile) ;
-
-	if (infile != NULL)
-		sf_close (infile) ;
-
-	if (error_code)
-		exit (error_code) ;
-
-	return ;
-} /* apply_changes */
-
-static int
-merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const INFO * info)
-{	SF_BROADCAST_INFO binfo ;
-	int infileminor ;
-
-	memset (&binfo, 0, sizeof (binfo)) ;
-
-	if ((SF_FORMAT_TYPEMASK & format) != SF_FORMAT_WAV)
-	{	printf ("Error : This is not a WAV file and hence broadcast info cannot be added to it.\n\n") ;
-		return 1 ;
-		} ;
-
-	infileminor = SF_FORMAT_SUBMASK & format ;
-
-	switch (infileminor)
-	{	case SF_FORMAT_PCM_16 :
-		case SF_FORMAT_PCM_24 :
-		case SF_FORMAT_PCM_32 :
-			break ;
-
-		default :
-			printf (
-				"Warning : The EBU Technical Recommendation R68-2000 states that the only\n"
-				"          allowed encodings are Linear PCM and MPEG3. This file is not in\n"
-				"          the right format.\n\n"
-				) ;
-			break ;
-		} ;
-
-	if (sf_command (infile, SFC_GET_BROADCAST_INFO, &binfo, sizeof (binfo)) == 0)
-	{	if (infile == outfile)
-		{	printf (
-				"Error : Attempting in-place broadcast info update, but file does not\n"
-				"        have a 'bext' chunk to modify. The solution is to specify both\n"
-				"        input and output files on the command line.\n\n"
-				) ;
-			return 1 ;
-			} ;
-		} ;
-
-#define REPLACE_IF_NEW(x) \
-		if (info->x != NULL) \
-			memcpy (binfo.x, info->x, sizeof (binfo.x)) ;
-
-	REPLACE_IF_NEW (description) ;
-	REPLACE_IF_NEW (originator) ;
-	REPLACE_IF_NEW (originator_reference) ;
-	REPLACE_IF_NEW (origination_date) ;
-	REPLACE_IF_NEW (origination_time) ;
-	REPLACE_IF_NEW (umid) ;
-
-	/* Special case for coding_history because we may want to append. */
-	if (info->coding_history != NULL)
-	{	if (info->coding_hist_append)
-		{	int slen = strlen (binfo.coding_history) ;
-
-			while (slen > 1 && isspace (binfo.coding_history [slen - 1]))
-				slen -- ;
-
-			binfo.coding_history [slen++] = '\n' ;
-			memcpy (binfo.coding_history + slen, info->coding_history, sizeof (binfo.coding_history) - slen) ;
-			}
-		else
-		{	memcpy (binfo.coding_history, info->coding_history, sizeof (binfo.coding_history)) ;
-			binfo.coding_history_size = sizeof (binfo.coding_history) ;
-			} ;
-		} ;
-
-	if (sf_command (outfile, SFC_SET_BROADCAST_INFO, &binfo, sizeof (binfo)) == 0)
-		printf ("Error : Setting of broadcast info chunks failed.\n\n") ;
-
-	return 0 ;
-} /* merge_broadcast_info*/
-
-static void
-update_strings (SNDFILE * outfile, const INFO * info)
-{
-	if (info->name != NULL)
-		sf_set_string (outfile, SF_STR_TITLE, info->name) ;
-
-	if (info->artist != NULL)
-		sf_set_string (outfile, SF_STR_ARTIST, info->artist) ;
-
-	if (info->create_date != NULL)
-		sf_set_string (outfile, SF_STR_DATE, info->create_date) ;
-
-} /* update_strings */
 

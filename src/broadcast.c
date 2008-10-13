@@ -1,6 +1,6 @@
 /*
 ** Copyright (C) 2006 Paul Davis <paul@linuxaudiosystems.com>
-** Copyright (C) 2006, 2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2006-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -21,6 +21,8 @@
 #include <string.h>
 
 #include "common.h"
+
+static void strncpy_crlf (char *dest, const char *src, size_t n) ;
 
 /*
 ** Allocate and initialize a broadcast info structure.
@@ -119,14 +121,23 @@ broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, un
 	/* Make sure its a terminated C string. */
 	bext->coding_history [sizeof (bext->coding_history) - 1] = 0 ;
 
-	current_history_len = strlen (bext->coding_history) ;
+	/* Note newlines in Coding History should be '\r\n' as per the URL above. */
+
+	if (bext->coding_history_size > 0)
+		strncpy_crlf (history, bext->coding_history, sizeof (history)) ;
+	else
+		history [0] = 0 ;
+
+	current_history_len = strlen (history) ;
 	newline = "" ;
 
-	if (current_history_len != 0 && bext->coding_history [current_history_len - 1] != '\n')
-		newline = "\n" ;
+	if (current_history_len != 0 && history [current_history_len - 1] != '\n')
+		newline = "\r\n" ;
 
-	memset (history, 0, sizeof (history)) ;
-	count = LSF_SNPRINTF (history, sizeof (history), "%s%sF=%u,A=PCM,M=%s,W=%hu,T=%s-%s\n", bext->coding_history, newline, samplerate, chnstr, width, PACKAGE, VERSION) ;
+	count = LSF_SNPRINTF (history + current_history_len, sizeof (history) - current_history_len,
+							"%sA=PCM,F=%u,W=%hu,M=%s,T=%s-%s\r\n",
+							newline, samplerate, width, chnstr, PACKAGE, VERSION) ;
+	count += current_history_len ;
 
 	while (count >= SIGNED_SIZEOF (bext->coding_history))
 	{	/* Coding history is too long, delete oldest part. */
@@ -155,3 +166,39 @@ broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, un
 	return SF_TRUE ;
 } /* broadcast_add_coding_history */
 
+/*------------------------------------------------------------------------------
+**	Strncpy which converts all line endings to CR/LF.
+*/
+
+static void
+strncpy_crlf (char *dest, const char *src, size_t max)
+{	char * end = dest + max - 1 ;
+
+	while (dest < end && src [0])
+	{	if ((src [0] == '\r' && src [1] == '\n') || (src [0] == '\n' && src [1] == '\r'))
+		{	*dest++ = '\r' ;
+			*dest++ = '\n' ;
+			src += 2 ;
+			continue ;
+			} ;
+
+		if (src [0] == '\r')
+		{	*dest++ = '\r' ;
+			*dest++ = '\n' ;
+			src += 1 ;
+			continue ;
+			} ;
+
+		if (src [0] == '\n')
+		{	*dest++ = '\r' ;
+			*dest++ = '\n' ;
+			src += 1 ;
+			continue ;
+			} ;
+
+		*dest++ = *src++ ;
+		} ;
+
+	/* Make sure dest is terminated. */
+	*end = 0 ;
+} /* strncpy_crlf */

@@ -195,6 +195,16 @@
 	<TD>Determine if raw data needs endswapping</TD>
 </TR>
 
+<TR>
+	<TD><A HREF="#SFC_GET_BROADCAST_INFO">SFC_GET_BROADCAST_INFO</A></TD>
+	<TD>Retrieve the Broadcast Chunk info</TD>
+</TR>
+
+<TR>
+	<TD><A HREF="#SFC_SET_BROADCAST_INFO">SFC_SET_BROADCAST_INFO</A></TD>
+	<TD>Set the Broadcast Chunk info</TD>
+</TR>
+
 <!--
 <TR>
 	<TD><A HREF="#add-dither">add dither</A></TD>
@@ -1190,7 +1200,7 @@ Parameters:
         datasize : sizeof (SF_EMBED_FILE_INFO)
 </PRE>
 <P>
-The SF_FORMAT_INFO struct is defined in &lt;sndfile.h&gt; as:
+The SF_EMBED_FILE_INFO struct is defined in &lt;sndfile.h&gt; as:
 </P>
 <PRE>
         typedef struct
@@ -1314,13 +1324,74 @@ Parameters:
         datasize : 0
 </PRE>
 
-<P>
-</P>
 <DL>
 <DT>Return value: </DT>
 	<DD>SF_TRUE or SF_FALSE
 </DL>
 
+
+<!-- ========================================================================= -->
+<A NAME="SFC_GET_BROADCAST_INFO"></A>
+<H2><BR><B>SFC_GET_BROADCAST_INFO</B></H2>
+<P>
+Retrieve the Broadcast Extention Chunk from WAV (and related) files.
+</P>
+<p>
+Parameters:
+</p>
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_GET_BROADCAST_INFO
+        data     : a pointer to an SF_BROADCAST_INFO struct
+        datasize : sizeof (SF_BROADCAST_INFO)
+</PRE>
+<P>
+The SF_BROADCAST_INFO struct is defined in &lt;sndfile.h&gt; as:
+</P>
+<PRE>
+    typedef struct
+    {   char            description [256] ;
+        char            originator [32] ;
+        char            originator_reference [32] ;
+        char            origination_date [10] ;
+        char            origination_time [8] ;
+        unsigned int    time_reference_low ;
+        unsigned int    time_reference_high ;
+        short           version ;
+        char            umid [64] ;
+        char            reserved [190] ;
+        unsigned int    coding_history_size ;
+        char            coding_history [256] ;
+    } SF_BROADCAST_INFO ;
+</PRE>
+
+<DL>
+<DT>Return value: </DT>
+	<DD>SF_TRUE if the file contained a Broadcast Extention chunk or SF_FALSE
+	otherwise.
+</DL>
+
+<!-- ========================================================================= -->
+<A NAME="SFC_SET_BROADCAST_INFO"></A>
+<H2><BR><B>SFC_SET_BROADCAST_INFO</B></H2>
+<P>
+Set the Broadcast Extention Chunk for WAV (and related) files.
+</P>
+<p>
+Parameters:
+</p>
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_SET_BROADCAST_INFO
+        data     : a pointer to an SF_BROADCAST_INFO struct
+        datasize : sizeof (SF_BROADCAST_INFO)
+</PRE>
+
+<DL>
+<DT>Return value: </DT>
+	<DD>SF_TRUE if setting the Broadcast Extention chunk was successful and SF_FALSE
+	otherwise.
+</DL>
 <!-- ========================================================================= -->
 
 

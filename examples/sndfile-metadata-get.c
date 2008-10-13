@@ -42,8 +42,6 @@
 
 #include <sndfile.h>
 
-#include "copy_data.h"
-
 #define	BUFFER_LEN		(1 << 16)
 
 
@@ -65,7 +63,7 @@ main (int argc, char *argv [])
 	progname = progname ? progname + 1 : argv [0] ;
 
 	/* Check if we've been asked for help. */
-	if (argc < 2 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)
+	if (argc <= 2 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)
 		usage_exit (progname, 0) ;
 
 	if (argv [argc - 1][0] != '-')
@@ -102,8 +100,28 @@ main (int argc, char *argv [])
 
 static void
 usage_exit (const char *progname, int exit_code)
-{	printf ("Usage :\n  %s <file> ...\n", progname) ;
-	printf ("    Fill in more later.\n\n") ;
+{	printf ("\nUsage :\n  %s [options] <file>\n\nOptions:\n", progname) ;
+
+	puts (
+		"    --bext-description    Print the 'bext' description.\n"
+		"    --bext-originator     Print the 'bext; originator info.\n"
+		"    --bext-orig-ref       Print the 'bext' origination reference.\n"
+		"    --bext-umid           Print the 'bext' UMID.\n"
+		"    --bext-orig-date      Print the 'bext' origination date.\n"
+		"    --bext-orig-time      Print the 'bext' origination time.\n"
+		"    --bext-coding-hist    Print the 'bext' coding history.\n"
+		) ;
+
+	puts (
+		"    --str-title           Print the title metadata.\n"
+		"    --str-copyright       Print the copyright metadata.\n"
+		"    --str-artist          Print the artist metadata.\n"
+		"    --str-comment         Print the comment metadata.\n"
+		"    --str-date            Print the creation date metadata.\n"
+		"    --str-album           Print the album metadata.\n"
+		"    --str-license         Print the license metadata.\n"
+		) ;
+
 	exit (exit_code) ;
 } /* usage_exit */
 
@@ -138,9 +156,13 @@ process_args (SNDFILE * file, const SF_BROADCAST_INFO * binfo, int argc, char * 
 		HANDLE_BEXT_ARG ("--bext-orig-time", "Origination time", origination_time) ;
 		HANDLE_BEXT_ARG ("--bext-coding-hist", "Coding history", coding_history) ;
 
-		HANDLE_STR_ARG ("--str-name", "Name", SF_STR_TITLE) ;
+		HANDLE_STR_ARG ("--str-title", "Name", SF_STR_TITLE) ;
+		HANDLE_STR_ARG ("--str-copyright", "Copyright", SF_STR_COPYRIGHT) ;
 		HANDLE_STR_ARG ("--str-artist", "Artist", SF_STR_ARTIST) ;
-		HANDLE_STR_ARG ("--str-create-date", "Create date", SF_STR_DATE) ;
+		HANDLE_STR_ARG ("--str-comment", "Comment", SF_STR_COMMENT) ;
+		HANDLE_STR_ARG ("--str-date", "Create date", SF_STR_DATE) ;
+		HANDLE_STR_ARG ("--str-album", "Album", SF_STR_ALBUM) ;
+		HANDLE_STR_ARG ("--str-license", "License", SF_STR_LICENSE) ;
 
 		if (! do_all)
 			printf ("Error : Don't know what to do with command line arg '%s'.\n\n", argv [k]) ;

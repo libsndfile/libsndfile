@@ -60,7 +60,7 @@ test_float_convert (void)
 			exit (1) ;
 			} ;
 
-		} ;	
+		} ;
 
 	puts ("ok") ;
 } /* test_float_convert */
@@ -97,7 +97,7 @@ test_double_convert (void)
 			exit (1) ;
 			} ;
 
-		} ;	
+		} ;
 
 	puts ("ok") ;
 } /* test_double_convert */

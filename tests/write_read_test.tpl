@@ -370,7 +370,7 @@ main (int argc, char **argv)
 			}
 		else
 			puts ("    No FLAC tests because FLAC support was not compiled in.") ;
-		test_count++ ;	
+		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "rf64"))

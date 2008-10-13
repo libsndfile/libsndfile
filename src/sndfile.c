@@ -82,13 +82,12 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_UNKNOWN_FORMAT		, "File contains data in an unknown format." },
 	{	SFE_NOT_READMODE		, "Read attempted on file currently open for write." },
 	{	SFE_NOT_WRITEMODE		, "Write attempted on file currently open for read." },
-	{	SFE_BAD_MODE_RW			, "This file format does not support read/write mode." },
+	{	SFE_BAD_MODE_RW			, "Error : This file format does not support read/write mode." },
 	{	SFE_BAD_SF_INFO			, "Internal error : SF_INFO struct incomplete." },
 	{	SFE_BAD_OFFSET			, "Error : supplied offset beyond end of file." },
 	{	SFE_NO_EMBED_SUPPORT	, "Error : embedding not supported for this file format." },
 	{	SFE_NO_EMBEDDED_RDWR	, "Error : cannot open embedded file read/write." },
 	{	SFE_NO_PIPE_WRITE		, "Error : this file format does not support pipe write." },
-	{	SFE_BAD_RDWR_FORMAT		, "Error : File format cannot be opened for RDWR." },
 	{	SFE_BAD_VIRTUAL_IO		, "Error : bad pointer on SF_VIRTUAL_IO struct." },
 
 	{	SFE_INTERLEAVE_MODE		, "Attempt to write to file with non-interleaved data." },
@@ -96,7 +95,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_INTERLEAVE_READ		, "Bad karma in read during interleave read operation." },
 
 	{	SFE_INTERNAL			, "Unspecified internal error." },
-	{	SFE_BAD_CONTROL_CMD		, "Bad command passed to function sf_command()." },
+	{	SFE_BAD_COMMAND_PARAM	, "Bad parameter passed to function sf_command." },
 	{	SFE_BAD_ENDIAN			, "Bad endian-ness. Try default endian-ness" },
 	{	SFE_CHANNEL_COUNT_ZERO	, "Channel count is zero." },
 	{	SFE_CHANNEL_COUNT		, "Too many channels specified." },
@@ -111,7 +110,8 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_OPEN_PIPE_RDWR		, "Error : attempt toopen a pipe in read/write mode." },
 	{	SFE_RDWR_POSITION		, "Error on RDWR position (cryptic)." },
 	{	SFE_RDWR_BAD_HEADER		, "Error : Cannot open file in read/write mode due to string data in header." },
-
+	{	SFE_CMD_HAS_DATA		, "Error : Command fails because file already has audio data." },
+	
 	{	SFE_STR_NO_SUPPORT		, "Error : File type does not support string data." },
 	{	SFE_STR_NOT_WRITE		, "Error : Trying to set a string when file is not in write mode." },
 	{	SFE_STR_MAX_DATA		, "Error : Maximum string data storage reached." },
@@ -827,7 +827,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 	switch (command)
 	{	case SFC_GET_LIB_VERSION :
 			if (data == NULL)
-				return (psf->error = SFE_BAD_CONTROL_CMD) ;
+				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 			if (ENABLE_EXPERIMENTAL_CODE)
 				LSF_SNPRINTF (data, datasize, "%s-%s-exp", PACKAGE_NAME, PACKAGE_VERSION) ;
 			else
@@ -836,46 +836,46 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_GET_SIMPLE_FORMAT_COUNT :
 			if (data == NULL || datasize != SIGNED_SIZEOF (int))
-				return (sf_errno = SFE_BAD_CONTROL_CMD) ;
+				return (sf_errno = SFE_BAD_COMMAND_PARAM) ;
 			*((int*) data) = psf_get_format_simple_count () ;
 			return 0 ;
 
 		case SFC_GET_SIMPLE_FORMAT :
 			if (data == NULL || datasize != SIGNED_SIZEOF (SF_FORMAT_INFO))
-				return (sf_errno = SFE_BAD_CONTROL_CMD) ;
+				return (sf_errno = SFE_BAD_COMMAND_PARAM) ;
 			return psf_get_format_simple (data) ;
 
 		case SFC_GET_FORMAT_MAJOR_COUNT :
 			if (data == NULL || datasize != SIGNED_SIZEOF (int))
-				return (sf_errno = SFE_BAD_CONTROL_CMD) ;
+				return (sf_errno = SFE_BAD_COMMAND_PARAM) ;
 			*((int*) data) = psf_get_format_major_count () ;
 			return 0 ;
 
 		case SFC_GET_FORMAT_MAJOR :
 			if (data == NULL || datasize != SIGNED_SIZEOF (SF_FORMAT_INFO))
-				return (sf_errno = SFE_BAD_CONTROL_CMD) ;
+				return (sf_errno = SFE_BAD_COMMAND_PARAM) ;
 			return psf_get_format_major (data) ;
 
 		case SFC_GET_FORMAT_SUBTYPE_COUNT :
 			if (data == NULL || datasize != SIGNED_SIZEOF (int))
-				return (sf_errno = SFE_BAD_CONTROL_CMD) ;
+				return (sf_errno = SFE_BAD_COMMAND_PARAM) ;
 			*((int*) data) = psf_get_format_subtype_count () ;
 			return 0 ;
 
 		case SFC_GET_FORMAT_SUBTYPE :
 			if (data == NULL || datasize != SIGNED_SIZEOF (SF_FORMAT_INFO))
-				return (sf_errno = SFE_BAD_CONTROL_CMD) ;
+				return (sf_errno = SFE_BAD_COMMAND_PARAM) ;
 			return psf_get_format_subtype (data) ;
 
 		case SFC_GET_FORMAT_INFO :
 			if (data == NULL || datasize != SIGNED_SIZEOF (SF_FORMAT_INFO))
-				return (sf_errno = SFE_BAD_CONTROL_CMD) ;
+				return (sf_errno = SFE_BAD_COMMAND_PARAM) ;
 			return psf_get_format_info (data) ;
 		} ;
 
 	if (sndfile == NULL && command == SFC_GET_LOG_INFO)
 	{	if (data == NULL)
-			return (psf->error = SFE_BAD_CONTROL_CMD) ;
+			return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 		LSF_SNPRINTF (data, datasize, "%s", sf_logbuffer) ;
 		return strlen (data) ;
 		} ;
@@ -890,7 +890,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_GET_CURRENT_SF_INFO :
 			if (data == NULL || datasize != SIGNED_SIZEOF (SF_INFO))
-				return (sf_errno = SFE_BAD_CONTROL_CMD) ;
+				return (sf_errno = SFE_BAD_COMMAND_PARAM) ;
 			memcpy (data, &psf->sf, sizeof (SF_INFO)) ;
 			break ;
 
@@ -937,7 +937,9 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				return SF_FALSE ;
 			/* If data has already been written this must fail. */
 			if (psf->have_written)
+			{	psf->error = SFE_CMD_HAS_DATA ;
 				return SF_FALSE ;
+				} ;
 			/* Everything seems OK, so set psf->has_peak and re-write header. */
 			if (datasize == SF_FALSE && psf->peak_info != NULL)
 			{	free (psf->peak_info) ;
@@ -958,42 +960,42 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_GET_LOG_INFO :
 			if (data == NULL)
-				return SFE_BAD_CONTROL_CMD ;
+				return SFE_BAD_COMMAND_PARAM ;
 			LSF_SNPRINTF (data, datasize, "%s", psf->logbuffer) ;
 			break ;
 
 		case SFC_CALC_SIGNAL_MAX :
 			if (data == NULL || datasize != sizeof (double))
-				return (psf->error = SFE_BAD_CONTROL_CMD) ;
+				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 			*((double*) data) = psf_calc_signal_max (psf, SF_FALSE) ;
 			break ;
 
 		case SFC_CALC_NORM_SIGNAL_MAX :
 			if (data == NULL || datasize != sizeof (double))
-				return (psf->error = SFE_BAD_CONTROL_CMD) ;
+				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 			*((double*) data) = psf_calc_signal_max (psf, SF_TRUE) ;
 			break ;
 
 		case SFC_CALC_MAX_ALL_CHANNELS :
 			if (data == NULL || datasize != SIGNED_SIZEOF (double) * psf->sf.channels)
-				return (psf->error = SFE_BAD_CONTROL_CMD) ;
+				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 			return psf_calc_max_all_channels (psf, (double*) data, SF_FALSE) ;
 
 		case SFC_CALC_NORM_MAX_ALL_CHANNELS :
 			if (data == NULL || datasize != SIGNED_SIZEOF (double) * psf->sf.channels)
-				return (psf->error = SFE_BAD_CONTROL_CMD) ;
+				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 			return psf_calc_max_all_channels (psf, (double*) data, SF_TRUE) ;
 
 		case SFC_GET_SIGNAL_MAX :
 			if (data == NULL || datasize != sizeof (double))
-			{	psf->error = SFE_BAD_CONTROL_CMD ;
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
 				} ;
 			return psf_get_signal_max (psf, (double *) data) ;
 
 		case SFC_GET_MAX_ALL_CHANNELS :
 			if (data == NULL || datasize != SIGNED_SIZEOF (double) * psf->sf.channels)
-			{	psf->error = SFE_BAD_CONTROL_CMD ;
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
 				} ;
 			return psf_get_max_all_channels (psf, (double*) data) ;
@@ -1019,7 +1021,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_SET_DITHER_ON_WRITE :
 			if (data == NULL || datasize != SIGNED_SIZEOF (SF_DITHER_INFO))
-				return (psf->error = SFE_BAD_CONTROL_CMD) ;
+				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 			memcpy (&psf->write_dither, data, sizeof (psf->write_dither)) ;
 			if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 				dither_init (psf, SFM_WRITE) ;
@@ -1027,7 +1029,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_SET_DITHER_ON_READ :
 			if (data == NULL || datasize != SIGNED_SIZEOF (SF_DITHER_INFO))
-				return (psf->error = SFE_BAD_CONTROL_CMD) ;
+				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 			memcpy (&psf->read_dither, data, sizeof (psf->read_dither)) ;
 			if (psf->mode == SFM_READ || psf->mode == SFM_RDWR)
 				dither_init (psf, SFM_READ) ;
@@ -1055,9 +1057,10 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_SET_RAW_START_OFFSET :
 			if (data == NULL || datasize != sizeof (sf_count_t))
-				return (psf->error = SFE_BAD_CONTROL_CMD) ;
+				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
+
 			if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_RAW)
-				return (psf->error = SFE_BAD_CONTROL_CMD) ;
+				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 
 			psf->dataoffset = *((sf_count_t*) data) ;
 			sf_seek (sndfile, 0, SEEK_CUR) ;
@@ -1065,7 +1068,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_GET_EMBED_FILE_INFO :
 			if (data == NULL || datasize != sizeof (SF_EMBED_FILE_INFO))
-				return (psf->error = SFE_BAD_CONTROL_CMD) ;
+				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 
 			((SF_EMBED_FILE_INFO*) data)->offset = psf->fileoffset ;
 			((SF_EMBED_FILE_INFO*) data)->length = psf->filelength ;
@@ -1079,7 +1082,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			else if ((SF_CODEC (psf->sf.format)) == SF_FORMAT_DOUBLE)
 				double64_init (psf) ;
 			else
-				return (psf->error = SFE_BAD_CONTROL_CMD) ;
+				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 			break ;
 		/* Lite remove end */
 
@@ -1092,7 +1095,9 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_GET_LOOP_INFO :
 			if (datasize != sizeof (SF_LOOP_INFO) || data == NULL)
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
+				} ;
 			if (psf->loop_info == NULL)
 				return SF_FALSE ;
 			memcpy (data, psf->loop_info, sizeof (SF_LOOP_INFO)) ;
@@ -1111,7 +1116,9 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				return SF_FALSE ;
 			/* If data has already been written this must fail. */
 			if (psf->broadcast_info == NULL && psf->have_written)
+			{	psf->error = SFE_CMD_HAS_DATA ;
 				return SF_FALSE ;
+				} ;
 
 			if (psf->broadcast_info == NULL)
 				psf->broadcast_info = broadcast_info_alloc () ;
@@ -1125,14 +1132,18 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_GET_BROADCAST_INFO :
 			if (datasize != sizeof (SF_BROADCAST_INFO) || data == NULL)
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
+				} ;
 			if (psf->broadcast_info == NULL)
 				return SF_FALSE ;
 			return broadcast_info_copy (data, psf->broadcast_info) ;
 
 		case SFC_GET_INSTRUMENT :
 			if (datasize != sizeof (SF_INSTRUMENT) || data == NULL)
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
+				} ;
 			if (psf->instrument == NULL)
 				return SF_FALSE ;
 			memcpy (data, psf->instrument, sizeof (SF_INSTRUMENT)) ;
@@ -1141,9 +1152,14 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 		case SFC_SET_INSTRUMENT :
 			/* If data has already been written this must fail. */
 			if (psf->have_written)
+			{	psf->error = SFE_CMD_HAS_DATA ;
 				return SF_FALSE ;
+				} ;
 			if (datasize != sizeof (SF_INSTRUMENT) || data == NULL)
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
+				} ;
+
 			if (psf->instrument == NULL && (psf->instrument = psf_instrument_alloc ()) == NULL)
 			{	psf->error = SFE_MALLOC_FAILED ;
 				return SF_FALSE ;
@@ -1160,7 +1176,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				return psf->command (psf, command, data, datasize) ;
 
 			psf_log_printf (psf, "*** sf_command : cmd = 0x%X\n", command) ;
-			return (psf->error = SFE_BAD_CONTROL_CMD) ;
+			return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 		} ;
 
 	return 0 ;
@@ -2269,7 +2285,7 @@ guess_file_type (SF_PRIVATE *psf)
 	if ((buffer [0] & MAKE_MARKER (0xFF, 0xFF, 0x80, 0xFF)) == MAKE_MARKER (0xF0, 0x7E, 0, 0x01))
 		return SF_FORMAT_SDS ;
 
-	if ((buffer [0] & 0xFFFF) == MAKE_MARKER (1, 4, 0, 0))
+	if ((buffer [0] & MAKE_MARKER (0xFF, 0xFF, 0, 0)) == MAKE_MARKER (1, 4, 0, 0))
 		return SF_FORMAT_MPC2K ;
 
 	if (buffer [0] == MAKE_MARKER ('C', 'A', 'T', ' ') && buffer [2] == MAKE_MARKER ('R', 'E', 'X', '2'))
@@ -2720,7 +2736,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		psf_log_printf (psf, "Embedded file length : %D\n", psf->filelength) ;
 
 	if (mode == SFM_RDWR && sf_format_check (&(psf->sf)) == 0)
-	{	error = SFE_BAD_RDWR_FORMAT ;
+	{	error = SFE_BAD_MODE_RW ;
 		goto error_exit ;
 		} ;
 

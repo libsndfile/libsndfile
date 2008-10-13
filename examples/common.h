@@ -32,6 +32,31 @@
 
 #include <sndfile.h>
 
+typedef struct
+{	const char * title ;
+	const char * copyright ;
+	const char * artist ;
+	const char * comment ;
+	const char * date ;
+	const char * album ;
+	const char * license ;
+
+
+	/* Stuff to go in the 'bext' chunk of WAV files. */
+	int has_bext_fields ;
+	int coding_hist_append ;
+
+	const char * description ;
+	const char * originator ;
+	const char * originator_reference ;
+	const char * origination_date ;
+	const char * origination_time ;
+	const char * umid ;
+	const char * coding_history ;
+} METADATA_INFO ;
+
+void sfe_apply_metadata_changes (const char * filenames [2], const METADATA_INFO * info) ;
+
 void sfe_copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels) ;
 
 void sfe_copy_data_int (SNDFILE *outfile, SNDFILE *infile, int channels) ;

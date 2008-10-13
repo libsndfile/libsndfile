@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.57)
 
-AC_INIT([libsndfile],[1.0.18pre23],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.18pre24],[erikd@mega-nerd.com])
 
 # Put config stuff in Cfg.
 AC_CONFIG_AUX_DIR(Cfg)
@@ -479,6 +479,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 
 	AC_ADD_CFLAGS([-Wdeclaration-after-statement])
 	AC_ADD_CFLAGS([-Wpointer-arith])
+	AC_ADD_CFLAGS([-funsigned-char])
 
 	if test x$enable_gcc_werror = "xyes" ; then
 		CFLAGS="-Werror $CFLAGS"
