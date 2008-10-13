@@ -261,7 +261,6 @@ rf64-tests: write_read_test misc_test
 	./write_read_test rf64
 	./header_test rf64
 	./misc_test rf64
-	./string_test rf64
 	@echo "----------------------------------------------------------------------"
 	@echo "  `./sfversion` passed tests on RF64 files."
 	@echo "----------------------------------------------------------------------"
