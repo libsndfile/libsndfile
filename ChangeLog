@@ -11,6 +11,9 @@
     Set psf->error to SFE_CMD_HAS_DATA when adding metadata via sf_command()
     fails due to psf->have_written being true.
 
+    * doc/command.html
+    Document the SFC_GET/SET_BROADCAST_INFO comamnds.
+
 2008-10-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/command_test.c
