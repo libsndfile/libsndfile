@@ -200,5 +200,5 @@ strncpy_crlf (char *dest, const char *src, size_t max)
 		} ;
 
 	/* Make sure dest is terminated. */
-	*end = 0 ;
+	*dest = 0 ;
 } /* strncpy_crlf */
