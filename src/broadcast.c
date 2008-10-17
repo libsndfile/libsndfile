@@ -42,6 +42,9 @@ int
 broadcast_info_copy (SF_BROADCAST_INFO* dst, const SF_BROADCAST_INFO* src)
 {	memcpy (dst, src, sizeof (SF_BROADCAST_INFO)) ;
 
+	/* In case the src has the wrong line endings. */
+	strncpy_crlf (dst->coding_history, src->coding_history, sizeof (dst->coding_history)) ;
+
 	/* Currently writing this version. */
 	dst->version = 1 ;
 

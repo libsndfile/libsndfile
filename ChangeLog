@@ -2,6 +2,8 @@
 
     * src/broadcast.c
     Fix termination of desitination string in strncpy_crlf.
+    When copying BROADCAST_INFO chunk, make sure destination gets correct line
+    endings.
 
 2008-10-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
