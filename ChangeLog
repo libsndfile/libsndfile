@@ -5,6 +5,9 @@
     When copying BROADCAST_INFO chunk, make sure destination gets correct line
     endings.
 
+    * examples/common.c
+    Fix copying of BROADCAST_INFO coding_history field.
+
 2008-10-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/command_test.c

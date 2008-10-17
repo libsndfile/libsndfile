@@ -152,12 +152,14 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 			while (slen > 1 && isspace (binfo.coding_history [slen - 1]))
 				slen -- ;
 
-			binfo.coding_history [slen++] = '\n' ;
 			memcpy (binfo.coding_history + slen, info->coding_history, sizeof (binfo.coding_history) - slen) ;
 			}
 		else
-		{	memcpy (binfo.coding_history, info->coding_history, sizeof (binfo.coding_history)) ;
-			binfo.coding_history_size = sizeof (binfo.coding_history) ;
+		{	size_t slen = MIN (strlen (info->coding_history), sizeof (binfo.coding_history)) ;
+
+			memset (binfo.coding_history, 0, sizeof (binfo.coding_history)) ;
+			memcpy (binfo.coding_history, info->coding_history, slen) ;
+			binfo.coding_history_size = slen ;
 			} ;
 		} ;
 
