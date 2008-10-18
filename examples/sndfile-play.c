@@ -144,7 +144,7 @@ alsa_open (int channels, unsigned samplerate, int realtime)
 {	const char * device = "default" ;
 	snd_pcm_t *alsa_dev = NULL ;
 	snd_pcm_hw_params_t *hw_params ;
-	snd_pcm_uframes_t buffer_size, xfer_align, start_threshold ;
+	snd_pcm_uframes_t buffer_size ;
 	snd_pcm_uframes_t alsa_period_size, alsa_buffer_frames ;
 	snd_pcm_sw_params_t *sw_params ;
 
@@ -233,16 +233,8 @@ alsa_open (int channels, unsigned samplerate, int realtime)
 
 	/* note: set start threshold to delay start until the ring buffer is full */
 	snd_pcm_sw_params_current (alsa_dev, sw_params) ;
-	if ((err = snd_pcm_sw_params_get_xfer_align (sw_params, &xfer_align)) < 0)
-	{	fprintf (stderr, "cannot get xfer align (%s)\n", snd_strerror (err)) ;
-		goto catch_error ;
-		} ;
 
-	/* round up to closest transfer boundary */
-	start_threshold = (buffer_size / xfer_align) * xfer_align ;
-	if (start_threshold < 1)
-		start_threshold = 1 ;
-	if ((err = snd_pcm_sw_params_set_start_threshold (alsa_dev, sw_params, start_threshold)) < 0)
+	if ((err = snd_pcm_sw_params_set_start_threshold (alsa_dev, sw_params, buffer_size)) < 0)
 	{	fprintf (stderr, "cannot set start threshold (%s)\n", snd_strerror (err)) ;
 		goto catch_error ;
 		} ;
@@ -365,7 +357,7 @@ linux_play (int argc, char *argv [])
 {	static short buffer [BUFFER_LEN] ;
 	SNDFILE *sndfile ;
 	SF_INFO sfinfo ;
-	int		k, audio_device, readcount, subformat ;
+	int		k, audio_device, readcount, writecount, subformat ;
 
 	for (k = 1 ; k < argc ; k++)
 	{	memset (&sfinfo, 0, sizeof (sfinfo)) ;
@@ -399,12 +391,12 @@ linux_play (int argc, char *argv [])
 			while ((readcount = sf_read_float (sndfile, float_buffer, BUFFER_LEN)))
 			{	for (m = 0 ; m < readcount ; m++)
 					buffer [m] = scale * float_buffer [m] ;
-				write (audio_device, buffer, readcount * sizeof (short)) ;
+				writecount = write (audio_device, buffer, readcount * sizeof (short)) ;
 				} ;
 			}
 		else
 		{	while ((readcount = sf_read_short (sndfile, buffer, BUFFER_LEN)))
-				write (audio_device, buffer, readcount * sizeof (short)) ;
+				writecount = write (audio_device, buffer, readcount * sizeof (short)) ;
 			} ;
 
 		if (ioctl (audio_device, SNDCTL_DSP_POST, 0) == -1)
