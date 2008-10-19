@@ -26,6 +26,11 @@ Cfg/depcomp
 Cfg/install-sh
 Cfg/ltmain.sh
 Cfg/missing
+M4/libtool.m4
+M4/ltoptions.m4
+M4/ltsugar.m4
+M4/ltversion.m4
+M4/lt~obsolete.m4
 Makefile
 Makefile.in
 aclocal.m4

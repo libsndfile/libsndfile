@@ -74,7 +74,7 @@ main (void)
 {	int k ;
 
 	if (file_exists ("libsndfile.spec.in"))
-		chdir ("tests") ;
+		exit_if_true (chdir ("tests") != 0, "\n    Error : chdir ('tests') failed.\n") ;
 
 	for (k = 0 ; filetypes [k] ; k++)
 		stdio_test (filetypes [k]) ;

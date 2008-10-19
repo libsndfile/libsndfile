@@ -152,7 +152,7 @@ bad_wav_test (const char * filename)
 		exit (1) ;
 		} ;
 
-	fwrite (data, sizeof (data), 1, file) ;
+	exit_if_true (fwrite (data, sizeof (data), 1, file) != 1, "\n\nLine %d : fwrite failed.\n", __LINE__) ;
 	fclose (file) ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;

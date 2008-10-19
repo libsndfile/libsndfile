@@ -274,12 +274,12 @@ check_logged_peaks (char *buffer)
 			} ;
 		if (position == 0)
 		{	printf ("\n\nLine %d: peak position for channel %d should not be at offset 0.\n", __LINE__, chan) ;
-			printf (buffer) ;
+			printf ("%s", buffer) ;
 			exit (1) ;
 			} ;
 		if (chan != k || fabs ((position) * 0.01 - value) > 1e-6)
 		{	printf ("\n\nLine %d: Error : peak value incorrect!\n", __LINE__) ;
-			printf (buffer) ;
+			printf ("%s", buffer) ;
 			printf ("\n\nLine %d: %d %f %f\n", __LINE__, chan, position * 0.01, value) ;
 			exit (1) ;
 			} ;

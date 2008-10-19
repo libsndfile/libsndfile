@@ -100,7 +100,7 @@ show_fstat_error (void)
 	static char data [256] ;
 
 	STATBUF 	statbuf ;
-	int fd, mode, flags ;
+	int fd, mode, flags, ignored ;
 
 	if (sizeof (statbuf.st_size) != sizeof (INT64))
 	{	printf ("\n\nLine %d: Error, sizeof (statbuf.st_size) != 8.\n\n", __LINE__) ;
@@ -116,7 +116,7 @@ show_fstat_error (void)
 	{	printf ("\n\nLine %d: open() failed : %s\n\n", __LINE__, strerror (errno)) ;
 		return ;
 		} ;
-	write (fd, data, sizeof (data)) ;
+	ignored = write (fd, data, sizeof (data)) ;
 	close (fd) ;
 
 	printf ("1) Re-open file in read/write mode and write another %d bytes at the end.\n", SIGNED_SIZEOF (data)) ;
@@ -127,11 +127,11 @@ show_fstat_error (void)
 		return ;
 		} ;
 	LSEEK (fd, 0, SEEK_END) ;
-	write (fd, data, sizeof (data)) ;
+	ignored = write (fd, data, sizeof (data)) ;
 
 	printf ("2) Now use system (\"%s %s\") to show the file length.\n\n", dir_cmd, filename) ;
 	sprintf (data, "%s %s", dir_cmd, filename) ;
-	system (data) ;
+	ignored = system (data) ;
 	puts ("") ;
 
 	printf ("3) Now use fstat() to get the file length.\n") ;
@@ -159,7 +159,7 @@ show_lseek_error (void)
 	static char data [256] ;
 
 	INT64	retval ;
-	int fd, mode, flags ;
+	int fd, mode, flags, ignored ;
 
 	puts ("\n64 bit lseek() test.\n--------------------") ;
 
@@ -170,7 +170,7 @@ show_lseek_error (void)
 	{	printf ("\n\nLine %d: open() failed : %s\n\n", __LINE__, strerror (errno)) ;
 		return ;
 		} ;
-	write (fd, data, sizeof (data)) ;
+	ignored = write (fd, data, sizeof (data)) ;
 	close (fd) ;
 
 	printf ("1) Re-open file in read/write mode and write another %d bytes at the end.\n", SIGNED_SIZEOF (data)) ;
@@ -182,11 +182,11 @@ show_lseek_error (void)
 		} ;
 
 	LSEEK (fd, 0, SEEK_END) ;
-	write (fd, data, sizeof (data)) ;
+	ignored = write (fd, data, sizeof (data)) ;
 
 	printf ("2) Now use system (\"%s %s\") to show the file length.\n\n", dir_cmd, filename) ;
 	sprintf (data, "%s %s", dir_cmd, filename) ;
-	system (data) ;
+	ignored = system (data) ;
 	puts ("") ;
 
 	printf ("3) Now use lseek() to go to the end of the file.\n") ;
@@ -211,7 +211,7 @@ show_stat_fstat_error (void)
 	static char data [256] ;
 
 	int fd, mode, flags ;
-	int stat_size, fstat_size ;
+	int stat_size, fstat_size, ignored ;
 	struct stat buf ;
 
 	/* Known to fail on WinXP. */
@@ -226,7 +226,7 @@ show_stat_fstat_error (void)
 		return ;
 		} ;
 
-	write (fd, data, sizeof (data)) ;
+	ignored = write (fd, data, sizeof (data)) ;
 
 	printf ("1) Now call stat and fstat on the file and retreive the file lengths.\n") ;
 

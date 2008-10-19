@@ -144,7 +144,7 @@ multi_file_test (const char *filename, int *formats, int format_count)
 		exit (1) ;
 		} ;
 
-	write (fd, "1234", 4) ;
+	k = write (fd, "1234", 4) ;
 
 	for (k = 0 ; k < format_count ; k++)
 		write_file_at_end (fd, formats [k], 2, k) ;
