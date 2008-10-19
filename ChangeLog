@@ -4,6 +4,9 @@
     Remove call to deprecated function snd_pcm_sw_params_get_xfer_align.
     Fix gcc-4.3 compiler warnings.
 
+    * tests/command_test.c
+    Fix a valgrind warning.
+
 2008-10-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/broadcast.c

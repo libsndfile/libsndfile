@@ -941,7 +941,9 @@ broadcast_rdwr_test (const char *filename, int filetype)
 
 	create_short_sndfile (filename, filetype, 2) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	memset (&binfo, 0, sizeof (binfo)) ;
+
 	snprintf (binfo.description, sizeof (binfo.description), "Test description") ;
 	snprintf (binfo.originator, sizeof (binfo.originator), "Test originator") ;
 	snprintf (binfo.originator_reference, sizeof (binfo.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
