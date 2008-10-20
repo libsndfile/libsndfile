@@ -1,3 +1,8 @@
+2008-10-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/Makefile.am
+    Automake 1.10 MinGW cross compiling fixes.
+
 2008-10-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-play.c
