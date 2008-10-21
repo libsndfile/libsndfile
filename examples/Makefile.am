@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 bin_PROGRAMS = sndfile-info sndfile-play sndfile-convert sndfile-jackplay sndfile-cmp \
-				sndfile-metadata-set sndfile-metadata-get
+				sndfile-metadata-set sndfile-metadata-get sndfile-to-text
 
 noinst_PROGRAMS = make_sine sfprocess list_formats generate sndfilehandle
 
@@ -35,6 +35,9 @@ sndfile_metadata_set_LDADD = $(top_builddir)/src/libsndfile.la
 
 sndfile_metadata_get_SOURCES = sndfile-metadata-get.c
 sndfile_metadata_get_LDADD = $(top_builddir)/src/libsndfile.la
+
+sndfile_to_text_SOURCES = sndfile-to-text.c
+sndfile_to_text_LDADD = $(top_builddir)/src/libsndfile.la
 
 make_sine_SOURCES = make_sine.c
 make_sine_LDADD = $(top_builddir)/src/libsndfile.la
