@@ -272,10 +272,10 @@ AC_C99_FUNC_LRINTF
 
 dnl Octave maths environment http://www.octave.org/
 if test x$cross_compiling = xno ; then
-	if test x$enable_octave = xyes ; then
-		AC_OCTAVE_BUILD
-	else
+	if test x$enable_octave = xno ; then
 		AM_CONDITIONAL(BUILD_OCTAVE_MOD, false)
+	else
+		AC_OCTAVE_BUILD
 		fi
 else
 	AM_CONDITIONAL(BUILD_OCTAVE_MOD, false)
