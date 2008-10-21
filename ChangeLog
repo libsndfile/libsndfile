@@ -3,6 +3,11 @@
     * examples/sndfile-to-text.c examples/Makefile.am
     Add a new example program and hook it into the build.
 
+    * examples/ programs/
+    Add a new directory programs and move sndfile-info, sndfile-play and other
+    real programs to the new directory, leaving example programs where they
+    were.
+
 2008-10-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/Makefile.am
