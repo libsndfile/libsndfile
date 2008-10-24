@@ -1,3 +1,8 @@
+2008-10-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/sndfile-metadata-get.c programs/sndfile-info.c
+    Exit with non-zero on errors.
+
 2008-10-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-to-text.c examples/Makefile.am
