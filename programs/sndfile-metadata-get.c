@@ -165,7 +165,9 @@ process_args (SNDFILE * file, const SF_BROADCAST_INFO * binfo, int argc, char * 
 		HANDLE_STR_ARG ("--str-license", "License", SF_STR_LICENSE) ;
 
 		if (! do_all)
-			printf ("Error : Don't know what to do with command line arg '%s'.\n\n", argv [k]) ;
+		{	printf ("Error : Don't know what to do with command line arg '%s'.\n\n", argv [k]) ;
+			exit (1) ;
+			} ;
 		break ;
 		} ;
 
