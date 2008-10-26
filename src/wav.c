@@ -94,7 +94,8 @@
 #define OggS_MARKER (MAKE_MARKER ('O', 'g', 'g', 'S'))
 
 #define WAV_PEAK_CHUNK_SIZE(ch) 	(2 * sizeof (int) + ch * (sizeof (float) + sizeof (int)))
-#define WAV_BEXT_MIN_CHUNK_SIZE		602 /* offsetof (SF_BROADCAST_INFO, coding_history_size) */
+#define WAV_BEXT_MIN_CHUNK_SIZE		602
+#define WAV_BEXT_MAX_CHUNK_SIZE		(10 * 1024)
 
 enum
 {	HAVE_RIFF	= 0x01,
@@ -1618,6 +1619,12 @@ wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 
 	if (chunksize < WAV_BEXT_MIN_CHUNK_SIZE)
 	{	psf_log_printf (psf, "bext : %u (should be >= %d)\n", chunksize, WAV_BEXT_MIN_CHUNK_SIZE) ;
+		psf_binheader_readf (psf, "j", chunksize) ;
+		return 0 ;
+		} ;
+
+	if (chunksize > WAV_BEXT_MAX_CHUNK_SIZE)
+	{	psf_log_printf (psf, "bext : %u (should be < %d)\n", chunksize, WAV_BEXT_MAX_CHUNK_SIZE) ;
 		psf_binheader_readf (psf, "j", chunksize) ;
 		return 0 ;
 		} ;
