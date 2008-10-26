@@ -54,7 +54,7 @@ broadcast_var_alloc (size_t datasize)
 int
 broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datasize)
 {	char added_history [256] ;
-	int added_history_len, total_history_len ;
+	int added_history_len, len ;
 
 	if (info == NULL)
 		return SF_FALSE ;
@@ -82,7 +82,10 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 	memcpy (&(psf->broadcast_var->binfo), info, offsetof (SF_BROADCAST_INFO, coding_history)) ;
 
 	strncpy_crlf (psf->broadcast_var->binfo.coding_history, info->coding_history, bc_var_coding_hist_size (psf->broadcast_var), info->coding_history_size) ;
-	total_history_len = strlen (psf->broadcast_var->binfo.coding_history) + added_history_len ;
+	len = strlen (psf->broadcast_var->binfo.coding_history) ;
+
+	if (len > 0 && psf->broadcast_var->binfo.coding_history [len] != '\n')
+		strncat (psf->broadcast_var->binfo.coding_history, "\r\n", 2) ;
 
 	if (psf->mode == SFM_WRITE)
 		strncat (psf->broadcast_var->binfo.coding_history, added_history, strlen (added_history)) ;
