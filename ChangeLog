@@ -3,6 +3,9 @@
     * programs/common.c
     Return 1 if SFC_SET_BROADCAST_INFO fails.
 
+    * programs/test-sndfile-metadata-set.py
+    Update for new programs directory, exit on any error.
+
 2008-10-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-metadata-get.c programs/sndfile-info.c
