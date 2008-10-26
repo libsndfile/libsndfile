@@ -6,6 +6,9 @@
     * programs/test-sndfile-metadata-set.py
     Update for new programs directory, exit on any error.
 
+    * tests/error_test.c
+    Fix failure behaviour in error_number_test.
+
 2008-10-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-metadata-get.c programs/sndfile-info.c
