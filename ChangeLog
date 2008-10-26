@@ -1,3 +1,8 @@
+2008-10-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/command_test.c
+    Add broadcast_coding_history_size test.
+
 2008-10-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/common.c
