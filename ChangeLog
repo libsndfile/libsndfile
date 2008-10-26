@@ -3,6 +3,9 @@
     * tests/command_test.c
     Add broadcast_coding_history_size test.
 
+    * programs/*.[ch]
+    Use SF_BROADCAST_INFO_VAR to manipulate larger 'bext' chunks.
+
 2008-10-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/common.c

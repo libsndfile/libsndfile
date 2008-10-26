@@ -39,6 +39,8 @@
 
 #include	<sndfile.h>
 
+#include "common.h"
+
 #define	BUFFER_LEN		(1 << 16)
 
 #if (defined (WIN32) || defined (_WIN32))
@@ -334,7 +336,7 @@ static int
 broadcast_dump (const char *filename)
 {	SNDFILE	 *file ;
 	SF_INFO	 sfinfo ;
-	SF_BROADCAST_INFO bext ;
+	SF_BROADCAST_INFO_2K bext ;
 	double time_ref_sec ;
 	int got_bext ;
 
@@ -348,7 +350,7 @@ broadcast_dump (const char *filename)
 		return 1 ;
 		} ;
 
-	memset (&bext, 0, sizeof (SF_BROADCAST_INFO)) ;
+	memset (&bext, 0, sizeof (SF_BROADCAST_INFO_2K)) ;
 
 	got_bext = sf_command (file, SFC_GET_BROADCAST_INFO, &bext, sizeof (bext)) ;
 	sf_close (file) ;

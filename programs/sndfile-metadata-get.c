@@ -42,18 +42,18 @@
 
 #include <sndfile.h>
 
+#include "common.h"
+
 #define	BUFFER_LEN		(1 << 16)
 
-
-
 static void usage_exit (const char *progname, int exit_code) ;
-static void process_args (SNDFILE * file, const SF_BROADCAST_INFO * binfo, int argc, char * argv []) ;
+static void process_args (SNDFILE * file, const SF_BROADCAST_INFO_2K * binfo, int argc, char * argv []) ;
 
 int
 main (int argc, char *argv [])
 {	SNDFILE *file ;
 	SF_INFO sfinfo ;
-	SF_BROADCAST_INFO binfo ;
+	SF_BROADCAST_INFO_2K binfo ;
 	const char *progname ;
 	const char * filename = NULL ;
 	int	start ;
@@ -126,7 +126,7 @@ usage_exit (const char *progname, int exit_code)
 } /* usage_exit */
 
 static void
-process_args (SNDFILE * file, const SF_BROADCAST_INFO * binfo, int argc, char * argv [])
+process_args (SNDFILE * file, const SF_BROADCAST_INFO_2K * binfo, int argc, char * argv [])
 {	const char * str ;
 	int k, do_all = 0 ;
 
