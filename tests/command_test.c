@@ -43,11 +43,12 @@ static	void	calc_peak_test			(int filetype, const char *filename) ;
 static	void	truncate_test			(const char *filename, int filetype) ;
 static	void	instrument_test			(const char *filename, int filetype) ;
 static	void	channel_map_test		(const char *filename, int filetype) ;
+static	void	current_sf_info_test	(const char *filename) ;
+static	void	raw_needs_endswap_test	(const char *filename, int filetype) ;
+
 static	void	broadcast_test			(const char *filename, int filetype) ;
 static	void	broadcast_rdwr_test		(const char *filename, int filetype) ;
 static	void	broadcast_coding_history_test	(const char *filename) ;
-static	void	current_sf_info_test	(const char *filename) ;
-static	void	raw_needs_endswap_test	(const char *filename, int filetype) ;
 
 /* Force the start of this buffer to be double aligned. Sparc-solaris will
 ** choke if its not.
