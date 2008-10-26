@@ -9,6 +9,9 @@
     * tests/error_test.c
     Fix failure behaviour in error_number_test.
 
+    * src/common.h src/sndfile.c
+    Add error number SFE_BAD_BROADCAST_INFO_SIZE.
+
 2008-10-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-metadata-get.c programs/sndfile-info.c
