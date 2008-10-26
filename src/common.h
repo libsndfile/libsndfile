@@ -220,6 +220,12 @@ make_size_t (int x)
 **	contents.
 */
 
+
+typedef struct
+{	int size ;
+	SF_BROADCAST_INFO binfo ;
+} SF_BROADCAST_VAR ;
+
 typedef struct sf_private_tag
 {
 	/* Canary in a coal mine. */
@@ -318,6 +324,7 @@ typedef struct sf_private_tag
 
 	/* Broadcast (EBU) Info */
 	SF_BROADCAST_INFO *broadcast_info ;
+	SF_BROADCAST_VAR *broadcast_var ;
 
 	/* Channel map data (if present) : an array of ints. */
 	int				*channel_map ;
@@ -786,6 +793,12 @@ void	psf_get_date_str (char *str, int maxlen) ;
 SF_BROADCAST_INFO* broadcast_info_alloc (void) ;
 int		broadcast_info_copy (SF_BROADCAST_INFO* dst, const SF_BROADCAST_INFO* src) ;
 int		broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, unsigned int samplerate, int format) ;
+
+SF_BROADCAST_VAR* broadcast_var_alloc (size_t datasize) ;
+int		broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * data, size_t datasize) ;
+int		broadcast_var_get (SF_PRIVATE *psf, SF_BROADCAST_INFO * data, size_t datasize) ;
+void	broadcast_info_to_var (SF_PRIVATE *psf) ;
+
 
 typedef struct
 {	int channels ;

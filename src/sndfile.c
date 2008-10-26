@@ -1116,29 +1116,37 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			if ((psf->mode != SFM_WRITE) && (psf->mode != SFM_RDWR))
 				return SF_FALSE ;
 			/* If data has already been written this must fail. */
-			if (psf->broadcast_info == NULL && psf->have_written)
+			if (psf->broadcast_var == NULL && psf->have_written)
 			{	psf->error = SFE_CMD_HAS_DATA ;
 				return SF_FALSE ;
 				} ;
 
+#if 0
 			if (psf->broadcast_info == NULL)
 				psf->broadcast_info = broadcast_info_alloc () ;
 
 			broadcast_info_copy (psf->broadcast_info, data) ;
 			broadcast_add_coding_history (psf->broadcast_info, psf->sf.channels, psf->sf.samplerate, psf->sf.format) ;
+#else
+			broadcast_var_set (psf, data, datasize) ;
+#endif
 
 			if (psf->write_header)
 				psf->write_header (psf, SF_TRUE) ;
 			return SF_TRUE ;
 
 		case SFC_GET_BROADCAST_INFO :
-			if (datasize != sizeof (SF_BROADCAST_INFO) || data == NULL)
+			if (data == NULL)
 			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
 				} ;
+#if 0
 			if (psf->broadcast_info == NULL)
 				return SF_FALSE ;
 			return broadcast_info_copy (data, psf->broadcast_info) ;
+#else
+			return broadcast_var_get (psf, data, datasize) ;
+#endif
 
 		case SFC_GET_INSTRUMENT :
 			if (datasize != sizeof (SF_INSTRUMENT) || data == NULL)
@@ -2422,6 +2430,9 @@ psf_close (SF_PRIVATE *psf)
 
 	if (psf->broadcast_info)
 		free (psf->broadcast_info) ;
+
+	if (psf->broadcast_var)
+		free (psf->broadcast_var) ;
 
 	if (psf->loop_info)
 		free (psf->loop_info) ;

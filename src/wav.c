@@ -575,6 +575,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 					if ((error = wav_read_bext_chunk (psf, dword)))
 						return error ;
+					broadcast_info_to_var (psf) ;
 					break ;
 
 			case PAD_MARKER :
@@ -1073,7 +1074,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 			psf_binheader_writef (psf, "ft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 
-	if (psf->broadcast_info != NULL)
+	if (psf->broadcast_var != NULL)
 		wav_write_bext_chunk (psf) ;
 
 	if (psf->instrument != NULL)
@@ -1621,12 +1622,12 @@ wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 	SF_BROADCAST_INFO* b ;
 	unsigned int bytes = 0 ;
 
-	if ((psf->broadcast_info = calloc (1, sizeof (SF_BROADCAST_INFO))) == NULL)
+	if ((psf->broadcast_var = broadcast_var_alloc (chunksize + 128)) == NULL)
 	{	psf->error = SFE_MALLOC_FAILED ;
 		return psf->error ;
 		} ;
 
-	b = psf->broadcast_info ;
+	b = & psf->broadcast_var->binfo ;
 
 	bytes += psf_binheader_readf (psf, "b", b->description, sizeof (b->description)) ;
 	bytes += psf_binheader_readf (psf, "b", b->originator, sizeof (b->originator)) ;
@@ -1659,8 +1660,10 @@ static int
 wav_write_bext_chunk (SF_PRIVATE *psf)
 {	SF_BROADCAST_INFO *b ;
 
-	if ((b = psf->broadcast_info) == NULL)
+	if (psf->broadcast_var == NULL)
 		return -1 ;
+
+	b = & psf->broadcast_var->binfo ;
 
 	psf_binheader_writef (psf, "m4", bext_MARKER, WAV_BEXT_CHUNK_SIZE + b->coding_history_size) ;
 
