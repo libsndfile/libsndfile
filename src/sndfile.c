@@ -2428,9 +2428,6 @@ psf_close (SF_PRIVATE *psf)
 	if (psf->peak_info)
 		free (psf->peak_info) ;
 
-	if (psf->broadcast_info)
-		free (psf->broadcast_info) ;
-
 	if (psf->broadcast_var)
 		free (psf->broadcast_var) ;
 

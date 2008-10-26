@@ -575,7 +575,6 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 					if ((error = wav_read_bext_chunk (psf, dword)))
 						return error ;
-					broadcast_info_to_var (psf) ;
 					break ;
 
 			case PAD_MARKER :
