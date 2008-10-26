@@ -1,3 +1,8 @@
+2008-10-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/common.c
+    Return 1 if SFC_SET_BROADCAST_INFO fails.
+
 2008-10-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-metadata-get.c programs/sndfile-info.c

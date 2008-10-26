@@ -164,7 +164,9 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 		} ;
 
 	if (sf_command (outfile, SFC_SET_BROADCAST_INFO, &binfo, sizeof (binfo)) == 0)
-		printf ("Error : Setting of broadcast info chunks failed.\n\n") ;
+	{	printf ("Error : Setting of broadcast info chunks failed.\n\n") ;
+		return 1 ;
+		} ;
 
 	return 0 ;
 } /* merge_broadcast_info*/
