@@ -24,7 +24,7 @@
 #include "common.h"
 
 static void strncpy_crlf (char *dest, const char *src, size_t destmax, size_t srcmax) ;
-static int gen_coding_history (char * added_history, size_t added_history_max, const SF_INFO * psfinfo) ;
+static int gen_coding_history (char * added_history, int added_history_max, const SF_INFO * psfinfo) ;
 
 static inline size_t
 bc_min_size (const SF_BROADCAST_INFO* info)
@@ -152,7 +152,7 @@ strncpy_crlf (char *dest, const char *src, size_t destmax, size_t srcmax)
 } /* strncpy_crlf */
 
 static int
-gen_coding_history (char * added_history, size_t added_history_max, const SF_INFO * psfinfo)
+gen_coding_history (char * added_history, int added_history_max, const SF_INFO * psfinfo)
 {	char chnstr [16] ;
 	int count, width ;
 
@@ -224,7 +224,7 @@ gen_coding_history (char * added_history, size_t added_history_max, const SF_INF
 							"A=PCM,F=%u,W=%hu,M=%s,T=%s-%s\r\n",
 							psfinfo->samplerate, width, chnstr, PACKAGE, VERSION) ;
 
-	if (count >= SIGNED_SIZEOF (added_history))
+	if (count >= added_history_max)
 		return 0 ;
 
 	return count ;

@@ -15,6 +15,9 @@
     * src/*
     Reimplement handling of broadcast extentioon chunk in WAV/WAVEX files.
 
+    * src/broadcast.c
+    Fix generation of added coding history.
+
 2008-10-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-metadata-get.c programs/sndfile-info.c
