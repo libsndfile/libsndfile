@@ -16,13 +16,181 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include <string>
-#include <vector>
-#include <cctype>
+#include <octave/oct.h>
 
 #include "sndfile.h"
 
-#include "format.h"
+#define FOUR_GIG 		(0x100000000LL)
+#define	BUFFER_FRAMES	8192
+
+
+static int format_of_str (const std::string & fmt) ;
+static void string_of_format (std::string & fmt, int format) ;
+
+
+DEFUN_DLD (sfread, args, nargout ,
+"-*- texinfo -*-\n\
+@deftypefn {Loadable Function} {@var{I},@var{srate},@var{format} =} sfread (@var{filename})\n\
+@cindex Reading sound files\n\
+Read a sound file from disk using libsndfile.\n\
+\n\
+@seealso{wavread}\n\
+@end deftypefn")
+{	SNDFILE * file ;
+	SF_INFO sfinfo ;
+
+	octave_value_list retval ;
+
+	int nargin  = args.length () ;
+
+	/* Bail out if the input parameters are bad. */
+	if ((nargin != 1) || !args (0) .is_string () || nargout < 1 || nargout > 3)
+	{	print_usage () ;
+		return retval ;
+		} ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	std::string filename = args (0).string_value () ;
+
+	if ((file = sf_open (filename.c_str (), SFM_READ, &sfinfo)) == NULL)
+	{	error ("sfread: couldn't open file %s : %s", filename.c_str (), sf_strerror (NULL)) ;
+		return retval ;
+		} ;
+
+	if (sfinfo.frames > FOUR_GIG)
+		printf ("This is a really huge file (%lld frames).\nYou may run out of memory trying to load it.\n", (long long) sfinfo.frames) ;
+
+	dim_vector dim = dim_vector () ;
+	dim.resize (2) ;
+	dim (0) = sfinfo.frames ;
+	dim (1) = sfinfo.channels ;
+
+	/* Should I be using Matrix instead? */
+	NDArray out (dim, 0.0) ;
+
+	float buffer [BUFFER_FRAMES * sfinfo.channels] ;
+	int readcount ;
+	sf_count_t total = 0 ;
+
+	do
+	{	readcount = sf_readf_float (file, buffer, BUFFER_FRAMES) ;
+
+		/* Make sure we don't read more frames than we allocated. */
+		if (total + readcount > sfinfo.frames)
+			readcount = sfinfo.frames - total ;
+
+		for (int ch = 0 ; ch < sfinfo.channels ; ch++)
+		{	for (int k = 0 ; k < readcount ; k++)
+				out (total + k, ch) = buffer [k * sfinfo.channels + ch] ;
+			} ;
+
+		total += readcount ;
+	} while (readcount > 0 && total < sfinfo.frames) ;
+
+	retval.append (out.squeeze ()) ;
+
+	if (nargout >= 2)
+		retval.append ((octave_uint32) sfinfo.samplerate) ;
+
+	if (nargout >= 3)
+	{	std::string fmt ("") ;
+		string_of_format (fmt, sfinfo.format) ;
+		retval.append (fmt) ;
+		} ;
+
+	/* Clean up. */
+	sf_close (file) ;
+
+	return retval ;
+} /* sfread */
+
+DEFUN_DLD (sfwrite, args, nargout , "\
+-*- texinfo -*-\n\
+@deftypefn {Function File} sfwrite (@var{filename},@var{data},@var{srate},@var{format})\n\
+Write a sound file to disk using libsndfile.\n\
+\n\
+@seealso{wavwrite}\n\
+@end deftypefn\n\
+")
+{	SNDFILE * file ;
+	SF_INFO sfinfo ;
+
+    octave_value_list retval ;
+
+    int nargin  = args.length () ;
+
+    /* Bail out if the input parameters are bad. */
+    if (nargin != 4 || !args (0).is_string () || !args (1).is_real_matrix ()
+			|| !args (2).is_real_scalar () || !args (3).is_string ()
+			|| nargout != 0)
+	{	print_usage () ;
+		return retval ;
+    	} ;
+
+    std::string filename = args (0).string_value () ;
+    std::string format = args (3).string_value () ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	sfinfo.format = format_of_str (format) ;
+	if (sfinfo.format == 0)
+	{	error ("Bad format '%s'", format.c_str ()) ;
+		return retval ;
+		} ;
+
+	sfinfo.samplerate = lrint (args (2).scalar_value ()) ;
+	if (sfinfo.samplerate < 1)
+	{	error ("Bad sample rate : %d.\n", sfinfo.samplerate) ;
+		return retval ;
+		} ;
+
+	Matrix data = args (1).matrix_value () ;
+	long rows = args (1).rows () ;
+	long cols = args (1).columns () ;
+
+	if (cols > rows)
+	{	error ("Audio data should have one column per channel, but supplied data "
+				"has %ld rows and %ld columns.\n", rows, cols) ;
+		return retval ;
+		} ;
+
+	sfinfo.channels = cols ;
+
+    if ((file = sf_open (filename.c_str (), SFM_WRITE, &sfinfo)) == NULL)
+	{	error ("Couldn't open file %s : %s", filename.c_str (), sf_strerror (NULL)) ;
+		return retval ;
+    	} ;
+
+	float buffer [BUFFER_FRAMES * sfinfo.channels] ;
+	int writecount ;
+	long total = 0 ;
+
+	do
+	{
+		writecount = BUFFER_FRAMES ;
+
+		/* Make sure we don't read more frames than we allocated. */
+		if (total + writecount > rows)
+			writecount = rows - total ;
+
+		for (int ch = 0 ; ch < sfinfo.channels ; ch++)
+		{	for (int k = 0 ; k < writecount ; k++)
+				buffer [k * sfinfo.channels + ch] = data (total + k, ch) ;
+			} ;
+
+		if (writecount > 0)
+			sf_writef_float (file, buffer, writecount) ;
+
+		total += writecount ;
+	} while (writecount > 0 && total < rows) ;
+
+    /* Clean up. */
+    sf_close (file) ;
+
+    return retval ;
+} /* sfwrite */
+
 
 static void
 str_split (const std::string & str, const std::string & delim, std::vector <std::string> & output)
@@ -122,27 +290,6 @@ minor_format_of_hash (const std::string & str)
 } /* minor_format_of_hash */
 
 
-int
-format_of_str (const std::string & fmt)
-{
-	std::vector <std::string> split ;
-
-	str_split (fmt, "-", split) ;
-
-	if (split.size () != 2)
-		return 0 ;
-
-	int major_fmt = major_format_of_hash (split.at (0)) ;
-	if (major_fmt == 0)
-		return 0 ;
-
-	int minor_fmt = minor_format_of_hash (split.at (1)) ;
-	if (minor_fmt == 0)
-		return 0 ;
-
-	return major_fmt | minor_fmt ;
-} /* format_of_str */
-
 static const char *
 string_of_major_format (int format)
 {
@@ -201,7 +348,28 @@ string_of_minor_format (int format)
 	return "unknown" ;
 } /* string_of_minor_format */
 
-void
+static int
+format_of_str (const std::string & fmt)
+{
+	std::vector <std::string> split ;
+
+	str_split (fmt, "-", split) ;
+
+	if (split.size () != 2)
+		return 0 ;
+
+	int major_fmt = major_format_of_hash (split.at (0)) ;
+	if (major_fmt == 0)
+		return 0 ;
+
+	int minor_fmt = minor_format_of_hash (split.at (1)) ;
+	if (minor_fmt == 0)
+		return 0 ;
+
+	return major_fmt | minor_fmt ;
+} /* format_of_str */
+
+static void
 string_of_format (std::string & fmt, int format)
 {
 	char buffer [64] ;
