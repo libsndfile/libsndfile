@@ -6,6 +6,9 @@
     * programs/*.[ch]
     Use SF_BROADCAST_INFO_VAR to manipulate larger 'bext' chunks.
 
+    * src/rf64.c
+    Add code to prevent infinite loop on malformed file.
+
 2008-10-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/common.c

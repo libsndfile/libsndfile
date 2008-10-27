@@ -183,6 +183,8 @@ rf64_read_header (SF_PRIVATE *psf)
 						&& isprint ((marker >> 8) & 0xFF) && isprint (marker & 0xFF))
 					{	psf_binheader_readf (psf, "4", &size32) ;
 						psf_log_printf (psf, "*** %M : %d (unknown marker)\n", marker, size32) ;
+						if (size32 < 8)
+							done = SF_TRUE ;
 						psf_binheader_readf (psf, "j", size32) ;
 						break ;
 						} ;
