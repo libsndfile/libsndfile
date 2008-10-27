@@ -89,6 +89,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_NO_EMBEDDED_RDWR	, "Error : cannot open embedded file read/write." },
 	{	SFE_NO_PIPE_WRITE		, "Error : this file format does not support pipe write." },
 	{	SFE_BAD_VIRTUAL_IO		, "Error : bad pointer on SF_VIRTUAL_IO struct." },
+	{	SFE_BAD_BROADCAST_INFO_SIZE, "Error : badd SF_BROADCAST_INFO_SIZE." },
 
 	{	SFE_INTERLEAVE_MODE		, "Attempt to write to file with non-interleaved data." },
 	{	SFE_INTERLEAVE_SEEK		, "Bad karma in seek during interleave read operation." },
@@ -123,8 +124,9 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_WAV_NO_RIFF			, "Error in WAV file. No 'RIFF' chunk marker." },
 	{	SFE_WAV_NO_WAVE			, "Error in WAV file. No 'WAVE' chunk marker." },
-	{	SFE_WAV_NO_FMT			, "Error in WAV file. No 'fmt ' chunk marker." },
-	{	SFE_WAV_FMT_SHORT		, "Error in WAV file. Short 'fmt ' chunk." },
+	{	SFE_WAV_NO_FMT			, "Error in WAV/W64/RF64 file. No 'fmt ' chunk marker." },
+	{	SFE_WAV_BAD_FMT			, "Error in WAV/W64/RF64 file. Malformed 'fmt ' chunk." },
+	{	SFE_WAV_FMT_SHORT		, "Error in WAV/W64/RF64 file. Short 'fmt ' chunk." },
 
 	{	SFE_WAV_BAD_FACT		, "Error in WAV file. 'fact' chunk out of place." },
 	{	SFE_WAV_BAD_PEAK		, "Error in WAV file. Bad 'PEAK' chunk." },
@@ -195,15 +197,9 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_IRCAM_UNKNOWN_FORMAT, "Error in IRCAM file, unknow encoding format." },
 
 	{	SFE_W64_64_BIT			, "Error in W64 file, file contains 64 bit offset." },
-
 	{	SFE_W64_NO_RIFF			, "Error in W64 file. No 'riff' chunk marker." },
 	{	SFE_W64_NO_WAVE			, "Error in W64 file. No 'wave' chunk marker." },
-	{	SFE_W64_NO_FMT			, "Error in W64 file. No 'fmt ' chunk marker." },
 	{	SFE_W64_NO_DATA			, "Error in W64 file. No 'data' chunk marker." },
-
-	{	SFE_W64_FMT_SHORT		, "Error in W64 file. Short 'fmt ' chunk." },
-	{	SFE_W64_FMT_TOO_BIG		, "Error in W64 file. 'fmt ' chunk too large." },
-
 	{	SFE_W64_ADPCM_NOT4BIT	, "Error in ADPCM W64 file. Invalid bit width." },
 	{	SFE_W64_ADPCM_CHANNELS	, "Error in ADPCM W64 file. Invalid number of channels." },
 	{	SFE_W64_GSM610_FORMAT	, "Error in GSM610 W64 file. Invalid format chunk." },
@@ -1115,29 +1111,37 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			if ((psf->mode != SFM_WRITE) && (psf->mode != SFM_RDWR))
 				return SF_FALSE ;
 			/* If data has already been written this must fail. */
-			if (psf->broadcast_info == NULL && psf->have_written)
+			if (psf->broadcast_var == NULL && psf->have_written)
 			{	psf->error = SFE_CMD_HAS_DATA ;
 				return SF_FALSE ;
 				} ;
 
+#if 0
 			if (psf->broadcast_info == NULL)
 				psf->broadcast_info = broadcast_info_alloc () ;
 
 			broadcast_info_copy (psf->broadcast_info, data) ;
 			broadcast_add_coding_history (psf->broadcast_info, psf->sf.channels, psf->sf.samplerate, psf->sf.format) ;
+#else
+			broadcast_var_set (psf, data, datasize) ;
+#endif
 
 			if (psf->write_header)
 				psf->write_header (psf, SF_TRUE) ;
 			return SF_TRUE ;
 
 		case SFC_GET_BROADCAST_INFO :
-			if (datasize != sizeof (SF_BROADCAST_INFO) || data == NULL)
+			if (data == NULL)
 			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
 				} ;
+#if 0
 			if (psf->broadcast_info == NULL)
 				return SF_FALSE ;
 			return broadcast_info_copy (data, psf->broadcast_info) ;
+#else
+			return broadcast_var_get (psf, data, datasize) ;
+#endif
 
 		case SFC_GET_INSTRUMENT :
 			if (datasize != sizeof (SF_INSTRUMENT) || data == NULL)
@@ -2419,8 +2423,8 @@ psf_close (SF_PRIVATE *psf)
 	if (psf->peak_info)
 		free (psf->peak_info) ;
 
-	if (psf->broadcast_info)
-		free (psf->broadcast_info) ;
+	if (psf->broadcast_var)
+		free (psf->broadcast_var) ;
 
 	if (psf->loop_info)
 		free (psf->loop_info) ;

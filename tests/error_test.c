@@ -51,7 +51,9 @@ error_number_test (void)
 
 		/* Test for error. */
 		if (strstr (errstr, "This is a bug in libsndfile."))
+		{	printf ("\n\nError : error number %d : %s\n\n\n", k, errstr) ;
 			exit (1) ;
+			} ;
 		} ;
 
 

@@ -62,6 +62,7 @@ def test_empty_fail ():
 	status, output = commands.getstatusoutput (cmd)
 	if not status:
 		print "\n\nError : command '%s' should have failed." % cmd
+		sys.exit (1)
 	print "ok"
 
 def test_copy ():
@@ -70,6 +71,7 @@ def test_copy ():
 	status, output = commands.getstatusoutput (cmd)
 	if status:
 		print "\n\nError : command '%s' should not have failed." % cmd
+		sys.exit (1)
 	assert_info ("output.wav", "--bext-description", "First Try")
 	print "ok"
 
@@ -80,6 +82,7 @@ def test_update (tests):
 		status, output = commands.getstatusoutput (cmd)
 		if status:
 			print "\n\nError : command '%s' should not have failed." % cmd
+			sys.exit (1)
 		assert_info ("output.wav", arg, value)
 	print "ok"
 
@@ -95,6 +98,7 @@ def test_auto_date ():
 	status, output = commands.getstatusoutput (cmd)
 	if status:
 		print "\n\nError : command '%s' should not have failed." % cmd
+		sys.exit (1)
 	target = datetime.date.today ().__str__ ()
 	assert_info ("date-time.wav", "--bext-orig-date", target)
 	print "ok"
@@ -108,21 +112,25 @@ def test_coding_history ():
 	status, output = commands.getstatusoutput (cmd)
 	if status:
 		print "\n\nError : command '%s' should not have failed." % cmd
+		sys.exit (1)
 	cmd = "./sndfile-metadata-get --bext-coding-hist output.wav"
 	status, output = commands.getstatusoutput (cmd)
 	if status:
 		print "\n\nError : command '%s' should not have failed." % cmd
+		sys.exit (1)
 	print "ok"
 
 #===============================================================================
 
-if os.path.isdir ("examples"):
-	os.chdir ("examples")
+test_dir = "programs"
 
-for f in [ "sndfile-metadata-set", "sndfile-metadata-get", "make_sine" ]:
+if os.path.isdir (test_dir):
+	os.chdir (test_dir)
+
+for f in [ "sndfile-metadata-set", "sndfile-metadata-get", "../examples/make_sine" ]:
 	check_executable (f)
 
-os.system ("./make_sine")
+os.system ("../examples/make_sine")
 if not os.path.isfile ("sine.wav"):
 	print "\n\nError : Can't file file 'sine.wav'."
 	sys.exit (1)

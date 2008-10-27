@@ -55,6 +55,8 @@ typedef struct
 	const char * coding_history ;
 } METADATA_INFO ;
 
+typedef SF_BROADCAST_INFO_VAR (2048) SF_BROADCAST_INFO_2K ;
+
 void sfe_apply_metadata_changes (const char * filenames [2], const METADATA_INFO * info) ;
 
 void sfe_copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels) ;

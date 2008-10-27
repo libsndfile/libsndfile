@@ -345,12 +345,12 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 
 		default :
 				psf_log_printf (psf, "*** No 'fmt ' chunk dumper for this format!\n") ;
-				break ;
+				return SFE_WAV_BAD_FMT ;
 		} ;
 
 	if (bytesread > fmtsize)
 	{	psf_log_printf (psf, "*** wav_w64_read_fmt_chunk (bytesread > fmtsize)\n") ;
-		return SFE_W64_FMT_SHORT ;
+		return SFE_WAV_BAD_FMT ;
 		}
 	else
 		psf_binheader_readf (psf, "j", fmtsize - bytesread) ;

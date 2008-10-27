@@ -345,7 +345,7 @@ main (int argc, char * argv [])
 static void
 copy_metadata (SNDFILE *outfile, SNDFILE *infile)
 {	SF_INSTRUMENT inst ;
-	SF_BROADCAST_INFO binfo ;
+	SF_BROADCAST_INFO_2K binfo ;
 	const char *str ;
 	int k, err = 0 ;
 

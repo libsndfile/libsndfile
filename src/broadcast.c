@@ -18,44 +18,146 @@
 */
 
 #include <stdio.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "common.h"
 
-static void strncpy_crlf (char *dest, const char *src, size_t n) ;
+static void strncpy_crlf (char *dest, const char *src, size_t destmax, size_t srcmax) ;
+static int gen_coding_history (char * added_history, int added_history_max, const SF_INFO * psfinfo) ;
 
-/*
-** Allocate and initialize a broadcast info structure.
-*/
+static inline size_t
+bc_min_size (const SF_BROADCAST_INFO* info)
+{	if (info == NULL)
+		return 0 ;
 
-SF_BROADCAST_INFO*
-broadcast_info_alloc (void)
-{	SF_BROADCAST_INFO* bext ;
+	return offsetof (SF_BROADCAST_INFO, coding_history) + info->coding_history_size ;
+} /* broadcast_size */
 
-	if ((bext = calloc (1, sizeof (SF_BROADCAST_INFO))) == NULL)
-		return NULL ;
 
-	return bext ;
-} /* broadcast_info_alloc */
+static inline size_t
+bc_var_coding_hist_size (const SF_BROADCAST_VAR* var)
+{	return var->size - offsetof (SF_BROADCAST_VAR, binfo.coding_history) ;
+} /* broadcast_size */
+
+SF_BROADCAST_VAR*
+broadcast_var_alloc (size_t datasize)
+{	SF_BROADCAST_VAR * data ;
+
+	if ((data = calloc (1, datasize)) != NULL)
+		data->size = datasize ;
+
+	return data ;
+} /* broadcast_var_alloc */
+
 
 int
-broadcast_info_copy (SF_BROADCAST_INFO* dst, const SF_BROADCAST_INFO* src)
-{	memcpy (dst, src, sizeof (SF_BROADCAST_INFO)) ;
+broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datasize)
+{	char added_history [256] ;
+	int added_history_len, len ;
 
-	/* In case the src has the wrong line endings. */
-	strncpy_crlf (dst->coding_history, src->coding_history, sizeof (dst->coding_history)) ;
+	if (info == NULL)
+		return SF_FALSE ;
+
+	if (bc_min_size (info) > datasize)
+	{	psf->error = SFE_BAD_BROADCAST_INFO_SIZE ;
+		return SF_FALSE ;
+		} ;
+
+	added_history_len = gen_coding_history (added_history, sizeof (added_history), &(psf->sf)) ;
+
+	if (psf->broadcast_var != NULL
+		&& psf->broadcast_var->binfo.coding_history_size + added_history_len < datasize)
+	{	free (psf->broadcast_var) ;
+		psf->broadcast_var = NULL ;
+		} ;
+
+	if (psf->broadcast_var == NULL)
+	{	int size = datasize + added_history_len + 512 ;
+
+		psf->broadcast_var = calloc (1, size) ;
+		psf->broadcast_var->size = size ;
+		} ;
+
+	memcpy (&(psf->broadcast_var->binfo), info, offsetof (SF_BROADCAST_INFO, coding_history)) ;
+
+	strncpy_crlf (psf->broadcast_var->binfo.coding_history, info->coding_history, bc_var_coding_hist_size (psf->broadcast_var), info->coding_history_size) ;
+	len = strlen (psf->broadcast_var->binfo.coding_history) ;
+
+	if (len > 0 && psf->broadcast_var->binfo.coding_history [len] != '\n')
+		strncat (psf->broadcast_var->binfo.coding_history, "\r\n", 2) ;
+
+	if (psf->mode == SFM_WRITE)
+		strncat (psf->broadcast_var->binfo.coding_history, added_history, strlen (added_history)) ;
+
+	psf->broadcast_var->binfo.coding_history_size = strlen (psf->broadcast_var->binfo.coding_history) ;
+
+	/* Fore coding_history_size to be even. */
+	psf->broadcast_var->binfo.coding_history_size += (psf->broadcast_var->binfo.coding_history_size & 1) ? 1 : 0 ;
 
 	/* Currently writing this version. */
-	dst->version = 1 ;
+	psf->broadcast_var->binfo.version = 1 ;
 
 	return SF_TRUE ;
-} /* broadcast_info_copy */
+} /* broadcast_var_set */
+
 
 int
-broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, unsigned int samplerate, int format)
-{	const char *newline ;
-	char chnstr [16], history [2 * sizeof (bext->coding_history)] ;
-	int count, width, current_history_len ;
+broadcast_var_get (SF_PRIVATE *psf, SF_BROADCAST_INFO * data, size_t datasize)
+{	size_t size ;
+
+	if (psf->broadcast_var == NULL)
+		return SF_FALSE ;
+
+	size = SF_MIN (datasize, bc_min_size (&(psf->broadcast_var->binfo))) ;
+
+	memcpy (data, &(psf->broadcast_var->binfo), size) ;
+
+	return SF_TRUE ;
+} /* broadcast_var_set */
+
+/*------------------------------------------------------------------------------
+**	Strncpy which converts all line endings to CR/LF.
+*/
+
+static void
+strncpy_crlf (char *dest, const char *src, size_t destmax, size_t srcmax)
+{	char * destend = dest + destmax - 1 ;
+	const char * srcend = src + srcmax - 1 ;
+
+	while (dest < destend && src < srcend)
+	{	if ((src [0] == '\r' && src [1] == '\n') || (src [0] == '\n' && src [1] == '\r'))
+		{	*dest++ = '\r' ;
+			*dest++ = '\n' ;
+			src += 2 ;
+			continue ;
+			} ;
+
+		if (src [0] == '\r')
+		{	*dest++ = '\r' ;
+			*dest++ = '\n' ;
+			src += 1 ;
+			continue ;
+			} ;
+
+		if (src [0] == '\n')
+		{	*dest++ = '\r' ;
+			*dest++ = '\n' ;
+			src += 1 ;
+			continue ;
+			} ;
+
+		*dest++ = *src++ ;
+		} ;
+
+	/* Make sure dest is terminated. */
+	*dest = 0 ;
+} /* strncpy_crlf */
+
+static int
+gen_coding_history (char * added_history, int added_history_max, const SF_INFO * psfinfo)
+{	char chnstr [16] ;
+	int count, width ;
 
 	/*
 	**	From : http://www.sr.se/utveckling/tu/bwf/docs/codhist2.htm
@@ -75,7 +177,7 @@ broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, un
 	**	                     type; A/D type>
 	*/
 
-	switch (channels)
+	switch (psfinfo->channels)
 	{	case 0 :
 			return SF_FALSE ;
 
@@ -88,11 +190,11 @@ broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, un
 			break ;
 
 		default :
-			LSF_SNPRINTF (chnstr, sizeof (chnstr), "%uchn", channels) ;
+			LSF_SNPRINTF (chnstr, sizeof (chnstr), "%uchn", psfinfo->channels) ;
 			break ;
 		} ;
 
-	switch (SF_CODEC (format))
+	switch (SF_CODEC (psfinfo->format))
 	{	case SF_FORMAT_PCM_U8 :
 		case SF_FORMAT_PCM_S8 :
 			width = 8 ;
@@ -121,87 +223,13 @@ broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, un
 			break ;
 		} ;
 
-	/* Make sure its a terminated C string. */
-	bext->coding_history [sizeof (bext->coding_history) - 1] = 0 ;
+	count = LSF_SNPRINTF (added_history, added_history_max,
+							"A=PCM,F=%u,W=%hu,M=%s,T=%s-%s\r\n",
+							psfinfo->samplerate, width, chnstr, PACKAGE, VERSION) ;
 
-	/* Note newlines in Coding History should be '\r\n' as per the URL above. */
+	if (count >= added_history_max)
+		return 0 ;
 
-	if (bext->coding_history_size > 0)
-		strncpy_crlf (history, bext->coding_history, sizeof (history)) ;
-	else
-		history [0] = 0 ;
+	return count ;
+} /* gen_coding_history */
 
-	current_history_len = strlen (history) ;
-	newline = "" ;
-
-	if (current_history_len != 0 && history [current_history_len - 1] != '\n')
-		newline = "\r\n" ;
-
-	count = LSF_SNPRINTF (history + current_history_len, sizeof (history) - current_history_len,
-							"%sA=PCM,F=%u,W=%hu,M=%s,T=%s-%s\r\n",
-							newline, samplerate, width, chnstr, PACKAGE, VERSION) ;
-	count += current_history_len ;
-
-	while (count >= SIGNED_SIZEOF (bext->coding_history))
-	{	/* Coding history is too long, delete oldest part. */
-		const char *cptr ;
-
-		/* Entries should be delimited by a newline, so find first newline. */
-		if ((cptr = strchr (history, '\n')) == NULL)
-		{	/* Ooops, fail to safe and leave a message. */
-			count = snprintf (history, sizeof (bext->coding_history), "Something went wrong!\n") ;
-			break ;
-			} ;
-
-		cptr ++ ;
-		count -= cptr - history ;
-		memmove (history, cptr, count) ;
-		} ;
-
-	/* Zero out end of history chunk. */
-	memset (history + count, 0, sizeof (history) - count) ;
-
-	/* Now copy from temporary storage to bext->coding_history. */
-	memcpy (bext->coding_history, history, sizeof (bext->coding_history)) ;
-	count += count & 1 ;
-	bext->coding_history_size = count ;
-
-	return SF_TRUE ;
-} /* broadcast_add_coding_history */
-
-/*------------------------------------------------------------------------------
-**	Strncpy which converts all line endings to CR/LF.
-*/
-
-static void
-strncpy_crlf (char *dest, const char *src, size_t max)
-{	char * end = dest + max - 1 ;
-
-	while (dest < end && src [0])
-	{	if ((src [0] == '\r' && src [1] == '\n') || (src [0] == '\n' && src [1] == '\r'))
-		{	*dest++ = '\r' ;
-			*dest++ = '\n' ;
-			src += 2 ;
-			continue ;
-			} ;
-
-		if (src [0] == '\r')
-		{	*dest++ = '\r' ;
-			*dest++ = '\n' ;
-			src += 1 ;
-			continue ;
-			} ;
-
-		if (src [0] == '\n')
-		{	*dest++ = '\r' ;
-			*dest++ = '\n' ;
-			src += 1 ;
-			continue ;
-			} ;
-
-		*dest++ = *src++ ;
-		} ;
-
-	/* Make sure dest is terminated. */
-	*dest = 0 ;
-} /* strncpy_crlf */

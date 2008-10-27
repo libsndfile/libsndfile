@@ -220,6 +220,12 @@ make_size_t (int x)
 **	contents.
 */
 
+
+typedef struct
+{	int size ;
+	SF_BROADCAST_INFO binfo ;
+} SF_BROADCAST_VAR ;
+
 typedef struct sf_private_tag
 {
 	/* Canary in a coal mine. */
@@ -317,7 +323,7 @@ typedef struct sf_private_tag
 	SF_INSTRUMENT	*instrument ;
 
 	/* Broadcast (EBU) Info */
-	SF_BROADCAST_INFO *broadcast_info ;
+	SF_BROADCAST_VAR *broadcast_var ;
 
 	/* Channel map data (if present) : an array of ints. */
 	int				*channel_map ;
@@ -446,6 +452,7 @@ enum
 	SFE_RDWR_POSITION,
 	SFE_RDWR_BAD_HEADER,
 	SFE_CMD_HAS_DATA,
+	SFE_BAD_BROADCAST_INFO_SIZE,
 
 	SFE_STR_NO_SUPPORT,
 	SFE_STR_NOT_WRITE,
@@ -459,6 +466,7 @@ enum
 	SFE_WAV_NO_RIFF,
 	SFE_WAV_NO_WAVE,
 	SFE_WAV_NO_FMT,
+	SFE_WAV_BAD_FMT,
 	SFE_WAV_FMT_SHORT,
 	SFE_WAV_BAD_FACT,
 	SFE_WAV_BAD_PEAK,
@@ -527,10 +535,7 @@ enum
 	SFE_W64_64_BIT,
 	SFE_W64_NO_RIFF,
 	SFE_W64_NO_WAVE,
-	SFE_W64_NO_FMT,
 	SFE_W64_NO_DATA,
-	SFE_W64_FMT_SHORT,
-	SFE_W64_FMT_TOO_BIG,
 	SFE_W64_ADPCM_NOT4BIT,
 	SFE_W64_ADPCM_CHANNELS,
 	SFE_W64_GSM610_FORMAT,
@@ -782,9 +787,10 @@ void	psf_sanitize_string (char * cptr, int len) ;
 /* Generate the current date as a string. */
 void	psf_get_date_str (char *str, int maxlen) ;
 
-SF_BROADCAST_INFO* broadcast_info_alloc (void) ;
-int		broadcast_info_copy (SF_BROADCAST_INFO* dst, const SF_BROADCAST_INFO* src) ;
-int		broadcast_add_coding_history (SF_BROADCAST_INFO* bext, unsigned int channels, unsigned int samplerate, int format) ;
+SF_BROADCAST_VAR* broadcast_var_alloc (size_t datasize) ;
+int		broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * data, size_t datasize) ;
+int		broadcast_var_get (SF_PRIVATE *psf, SF_BROADCAST_INFO * data, size_t datasize) ;
+
 
 typedef struct
 {	int channels ;

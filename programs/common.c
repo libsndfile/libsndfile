@@ -95,7 +95,7 @@ sfe_copy_data_int (SNDFILE *outfile, SNDFILE *infile, int channels)
 
 static int
 merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const METADATA_INFO * info)
-{	SF_BROADCAST_INFO binfo ;
+{	SF_BROADCAST_INFO_2K binfo ;
 	int infileminor ;
 
 	memset (&binfo, 0, sizeof (binfo)) ;
@@ -164,7 +164,9 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 		} ;
 
 	if (sf_command (outfile, SFC_SET_BROADCAST_INFO, &binfo, sizeof (binfo)) == 0)
-		printf ("Error : Setting of broadcast info chunks failed.\n\n") ;
+	{	printf ("Error : Setting of broadcast info chunks failed.\n\n") ;
+		return 1 ;
+		} ;
 
 	return 0 ;
 } /* merge_broadcast_info*/

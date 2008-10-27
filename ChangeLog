@@ -1,3 +1,52 @@
+2008-10-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/command_test.c
+    Add broadcast_coding_history_size test.
+
+    * programs/*.[ch]
+    Use SF_BROADCAST_INFO_VAR to manipulate larger 'bext' chunks.
+
+    * src/rf64.c
+    Add code to prevent infinite loop on malformed file.
+
+    * src/common.h src/sndfile.c src/w64.c src/wav_w64.c
+    Rationalize and improve error handling when parsing 'fmt ' chunk.
+
+2008-10-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/common.c
+    Return 1 if SFC_SET_BROADCAST_INFO fails.
+
+    * programs/test-sndfile-metadata-set.py
+    Update for new programs directory, exit on any error.
+
+    * tests/error_test.c
+    Fix failure behaviour in error_number_test.
+
+    * src/common.h src/sndfile.c
+    Add error number SFE_BAD_BROADCAST_INFO_SIZE.
+
+    * src/*
+    Reimplement handling of broadcast extentioon chunk in WAV/WAVEX files.
+
+    * src/broadcast.c
+    Fix generation of added coding history.
+
+2008-10-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/sndfile-metadata-get.c programs/sndfile-info.c
+    Exit with non-zero on errors.
+
+2008-10-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * examples/sndfile-to-text.c examples/Makefile.am
+    Add a new example program and hook it into the build.
+
+    * examples/ programs/
+    Add a new directory programs and move sndfile-info, sndfile-play and other
+    real programs to the new directory, leaving example programs where they
+    were.
+
 2008-10-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/Makefile.am

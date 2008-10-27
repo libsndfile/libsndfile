@@ -39,6 +39,8 @@
 
 #include	<sndfile.h>
 
+#include "common.h"
+
 #define	BUFFER_LEN		(1 << 16)
 
 #if (defined (WIN32) || defined (_WIN32))
@@ -50,8 +52,8 @@ static void print_version (void) ;
 static void print_usage (const char *progname) ;
 
 static void info_dump (const char *filename) ;
-static void instrument_dump (const char *filename) ;
-static void broadcast_dump (const char *filename) ;
+static int	instrument_dump (const char *filename) ;
+static int	broadcast_dump (const char *filename) ;
 
 int
 main (int argc, char *argv [])
@@ -70,15 +72,19 @@ main (int argc, char *argv [])
 		} ;
 
 	if (strcmp (argv [1], "-i") == 0)
-	{	for (k = 2 ; k < argc ; k++)
-			instrument_dump (argv [k]) ;
-		return 0 ;
+	{	int error = 0 ;
+
+		for (k = 2 ; k < argc ; k++)
+			error += instrument_dump (argv [k]) ;
+		return error ;
 		} ;
 
 	if (strcmp (argv [1], "-b") == 0)
-	{	for (k = 2 ; k < argc ; k++)
-			broadcast_dump (argv [k]) ;
-		return 0 ;
+	{	int error = 0 ;
+
+		for (k = 2 ; k < argc ; k++)
+			error += broadcast_dump (argv [k]) ;
+		return error ;
 		} ;
 
 	for (k = 1 ; k < argc ; k++)
@@ -287,7 +293,7 @@ str_of_type (int mode)
 	return "????" ;
 } /* str_of_mode */
 
-static void
+static int
 instrument_dump (const char *filename)
 {	SNDFILE	 *file ;
 	SF_INFO	 sfinfo ;
@@ -301,7 +307,7 @@ instrument_dump (const char *filename)
 		fflush (stdout) ;
 		memset (data, 0, sizeof (data)) ;
 		puts (sf_strerror (NULL)) ;
-		return ;
+		return 1 ;
 		} ;
 
 	got_inst = sf_command (file, SFC_GET_INSTRUMENT, &inst, sizeof (inst)) ;
@@ -309,7 +315,7 @@ instrument_dump (const char *filename)
 
 	if (got_inst == SF_FALSE)
 	{	printf ("Error : File '%s' does not contain instrument data.\n\n", filename) ;
-		return ;
+		return 1 ;
 		} ;
 
 	printf ("Instrument : %s\n\n", filename) ;
@@ -323,13 +329,14 @@ instrument_dump (const char *filename)
 		printf ("  %-2d    Mode : %s    Start : %6d   End : %6d   Count : %6d\n", k, str_of_type (inst.loops [k].mode), inst.loops [k].start, inst.loops [k].end, inst.loops [k].count) ;
 
 	putchar ('\n') ;
+	return 0 ;
 } /* instrument_dump */
 
-static void
+static int
 broadcast_dump (const char *filename)
 {	SNDFILE	 *file ;
 	SF_INFO	 sfinfo ;
-	SF_BROADCAST_INFO bext ;
+	SF_BROADCAST_INFO_2K bext ;
 	double time_ref_sec ;
 	int got_bext ;
 
@@ -340,17 +347,17 @@ broadcast_dump (const char *filename)
 		fflush (stdout) ;
 		memset (data, 0, sizeof (data)) ;
 		puts (sf_strerror (NULL)) ;
-		return ;
+		return 1 ;
 		} ;
 
-	memset (&bext, 0, sizeof (SF_BROADCAST_INFO)) ;
+	memset (&bext, 0, sizeof (SF_BROADCAST_INFO_2K)) ;
 
 	got_bext = sf_command (file, SFC_GET_BROADCAST_INFO, &bext, sizeof (bext)) ;
 	sf_close (file) ;
 
 	if (got_bext == SF_FALSE)
 	{	printf ("Error : File '%s' does not contain broadcast information.\n\n", filename) ;
-		return ;
+		return 1 ;
 		} ;
 
 	/*
@@ -378,5 +385,6 @@ broadcast_dump (const char *filename)
 	printf ("UMID             : %.*s\n", (int) sizeof (bext.umid), bext.umid) ;
 	printf ("Coding history   : %.*s\n", bext.coding_history_size, bext.coding_history) ;
 
+	return 0 ;
 } /* broadcast_dump */
 

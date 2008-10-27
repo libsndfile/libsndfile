@@ -94,7 +94,8 @@
 #define OggS_MARKER (MAKE_MARKER ('O', 'g', 'g', 'S'))
 
 #define WAV_PEAK_CHUNK_SIZE(ch) 	(2 * sizeof (int) + ch * (sizeof (float) + sizeof (int)))
-#define WAV_BEXT_CHUNK_SIZE			602
+#define WAV_BEXT_MIN_CHUNK_SIZE		602
+#define WAV_BEXT_MAX_CHUNK_SIZE		(10 * 1024)
 
 enum
 {	HAVE_RIFF	= 0x01,
@@ -568,11 +569,6 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					parsestage |= HAVE_other ;
 					*/
 					psf_binheader_readf (psf, "4", &dword) ;
-					if (dword < WAV_BEXT_CHUNK_SIZE)
-						psf_log_printf (psf, "bext : %u (should be >= %d)\n", dword, WAV_BEXT_CHUNK_SIZE) ;
-					else
-						psf_log_printf (psf, "bext : %u\n", dword) ;
-
 					if ((error = wav_read_bext_chunk (psf, dword)))
 						return error ;
 					break ;
@@ -1073,7 +1069,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 			psf_binheader_writef (psf, "ft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 
-	if (psf->broadcast_info != NULL)
+	if (psf->broadcast_var != NULL)
 		wav_write_bext_chunk (psf) ;
 
 	if (psf->instrument != NULL)
@@ -1621,12 +1617,26 @@ wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 	SF_BROADCAST_INFO* b ;
 	unsigned int bytes = 0 ;
 
-	if ((psf->broadcast_info = calloc (1, sizeof (SF_BROADCAST_INFO))) == NULL)
+	if (chunksize < WAV_BEXT_MIN_CHUNK_SIZE)
+	{	psf_log_printf (psf, "bext : %u (should be >= %d)\n", chunksize, WAV_BEXT_MIN_CHUNK_SIZE) ;
+		psf_binheader_readf (psf, "j", chunksize) ;
+		return 0 ;
+		} ;
+
+	if (chunksize > WAV_BEXT_MAX_CHUNK_SIZE)
+	{	psf_log_printf (psf, "bext : %u (should be < %d)\n", chunksize, WAV_BEXT_MAX_CHUNK_SIZE) ;
+		psf_binheader_readf (psf, "j", chunksize) ;
+		return 0 ;
+		} ;
+
+	psf_log_printf (psf, "bext : %u\n", chunksize) ;
+
+	if ((psf->broadcast_var = broadcast_var_alloc (chunksize + 128)) == NULL)
 	{	psf->error = SFE_MALLOC_FAILED ;
 		return psf->error ;
 		} ;
 
-	b = psf->broadcast_info ;
+	b = & psf->broadcast_var->binfo ;
 
 	bytes += psf_binheader_readf (psf, "b", b->description, sizeof (b->description)) ;
 	bytes += psf_binheader_readf (psf, "b", b->originator, sizeof (b->originator)) ;
@@ -1636,17 +1646,13 @@ wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 	bytes += psf_binheader_readf (psf, "442", &b->time_reference_low, &b->time_reference_high, &b->version) ;
 	bytes += psf_binheader_readf (psf, "bj", &b->umid, sizeof (b->umid), 190) ;
 
-	if (chunksize > WAV_BEXT_CHUNK_SIZE)
+	if (chunksize > WAV_BEXT_MIN_CHUNK_SIZE)
 	{	/* File has coding history data. */
 
-		b->coding_history_size = chunksize - WAV_BEXT_CHUNK_SIZE ;
-
-		if (b->coding_history_size > SIGNED_SIZEOF (b->coding_history))
-			b->coding_history_size = SIGNED_SIZEOF (b->coding_history) ;
+		b->coding_history_size = chunksize - WAV_BEXT_MIN_CHUNK_SIZE ;
 
 		/* We do not parse the coding history */
 		bytes += psf_binheader_readf (psf, "b", b->coding_history, b->coding_history_size) ;
-		b->coding_history [sizeof (b->coding_history) - 1] = 0 ;
 		} ;
 
 	if (bytes < chunksize)
@@ -1659,10 +1665,12 @@ static int
 wav_write_bext_chunk (SF_PRIVATE *psf)
 {	SF_BROADCAST_INFO *b ;
 
-	if ((b = psf->broadcast_info) == NULL)
+	if (psf->broadcast_var == NULL)
 		return -1 ;
 
-	psf_binheader_writef (psf, "m4", bext_MARKER, WAV_BEXT_CHUNK_SIZE + b->coding_history_size) ;
+	b = & psf->broadcast_var->binfo ;
+
+	psf_binheader_writef (psf, "m4", bext_MARKER, WAV_BEXT_MIN_CHUNK_SIZE + b->coding_history_size) ;
 
 	/*
 	**	Note that it is very important the the field widths of the SF_BROADCAST_INFO

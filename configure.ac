@@ -586,7 +586,7 @@ AC_CONFIG_FILES([ \
 	src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
 	man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
 	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile \
-	doc/libsndfile.css \
+	programs/Makefile doc/libsndfile.css \
 	Makefile libsndfile.spec sndfile.pc \
 	])
 AC_OUTPUT
