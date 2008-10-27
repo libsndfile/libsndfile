@@ -196,10 +196,13 @@ rf64_read_header (SF_PRIVATE *psf)
 					psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D. Exiting parser.\n", marker, psf_ftell (psf) - 4) ;
 					done = SF_TRUE ;
 				break ;
+			} ;	/* switch (marker) */
+
+		if (psf_ftell (psf) >= psf->filelength - SIGNED_SIZEOF (marker))
+		{	psf_log_printf (psf, "End\n") ;
+			break ;
 			} ;
 		} ;
-
-	psf_log_printf (psf, "End\n") ;
 
 	return 0 ;
 } /* rf64_read_header */
