@@ -123,7 +123,7 @@ broadcast_var_get (SF_PRIVATE *psf, SF_BROADCAST_INFO * data, size_t datasize)
 static void
 strncpy_crlf (char *dest, const char *src, size_t destmax, size_t srcmax)
 {	char * destend = dest + destmax - 1 ;
-	const char * srcend = src + srcmax - 1 ;
+	const char * srcend = src + srcmax ;
 
 	while (dest < destend && src < srcend)
 	{	if ((src [0] == '\r' && src [1] == '\n') || (src [0] == '\n' && src [1] == '\r'))

@@ -3,6 +3,7 @@
 *.aiff
 *.au
 *.bin
+*.cm*
 *.exe
 *.flac
 *.la
@@ -26,6 +27,7 @@ Cfg/depcomp
 Cfg/install-sh
 Cfg/ltmain.sh
 Cfg/missing
+Hack/sndfile-fuzzbomb
 M4/libtool.m4
 M4/ltoptions.m4
 M4/ltsugar.m4
@@ -43,6 +45,7 @@ examples/generate
 examples/list_formats
 examples/make_sine
 examples/sfprocess
+examples/sndfile-to-text
 examples/sndfilehandle
 libsndfile-1.0.*
 libsndfile.spec

@@ -3,6 +3,9 @@
     * tests/command_test.c
     Add test to detect if coding history is truncated.
 
+    * src/broadcast.c
+    Fix truncation of coding history.
+
 2008-10-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/command_test.c
