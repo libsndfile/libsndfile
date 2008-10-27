@@ -29,19 +29,19 @@ else
 libsndfile_lib_location=`(cd $libsndfile_lib_location && pwd)`
 
 
-# Find sfread.oct and sfwrite.oct
-sfread_write_oct_location=""
+# Find sndfile.oct
+sndfile_oct_location=""
 
-if [ -f .libs/sfread.oct ]; then
-	sfread_write_oct_location=".libs"
-elif [ -f sfread.oct ]; then
-	sfread_write_oct_location="."
+if [ -f .libs/sndfile.oct ]; then
+	sndfile_oct_location=".libs"
+elif [ -f sndfile.oct ]; then
+	sndfile_oct_location="."
 else
-	echo "Not able to find the sfread.oct/sfwrite.oct binaries we've just built."
+	echo "Not able to find the sndfile.oct binaries we've just built."
 	exit 1
 	fi
 
-case `file -b $sfread_write_oct_location/sfread.oct` in
+case `file -b $sndfile_oct_location/sndfile.oct` in
 	ELF*)
 		;;
 	Mach*)
@@ -49,13 +49,13 @@ case `file -b $sfread_write_oct_location/sfread.oct` in
 		exit 0
 		;;
 	*)
-		echo "Not able to find the sfread.oct/sfwrite.oct binaries we've just built."
+		echo "Not able to find the sndfile.oct binaries we've just built."
 		exit 1
 		;;
 	esac
 
 # echo "libsndfile_lib_location : $libsndfile_lib_location"
-# echo "sfread_write_oct_location : $sfread_write_oct_location"
+# echo "sndfile_oct_location : $sndfile_oct_location"
 
 LD_LIBRARY_PATH="$libsndfile_lib_location:$LD_LIBRARY_PATH"
 
@@ -63,6 +63,6 @@ octave_src_dir=`(cd $octave_src_dir && pwd)`
 
 octave_script="$octave_src_dir/octave_test.m"
 
-(cd $sfread_write_oct_location && octave -qH $octave_script)
+(cd $sndfile_oct_location && octave -qH $octave_script)
 
 

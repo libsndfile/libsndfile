@@ -1,0 +1,2 @@
+autoload ("sfread", "sndfile.oct");
+autoload ("sfwrite", "sndfile.oct");

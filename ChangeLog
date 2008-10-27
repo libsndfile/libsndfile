@@ -12,6 +12,13 @@
     * src/common.h src/sndfile.c src/w64.c src/wav_w64.c
     Rationalize and improve error handling when parsing 'fmt ' chunk.
 
+    * M4/octave.m4
+    Simplify and remove cruft.
+    Check for correct Octave version.
+
+    * Octave/*
+    Reduce 3 C++ files to one, fix build for octave 3.0, fix build.
+
 2008-10-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/common.c

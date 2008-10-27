@@ -14,7 +14,7 @@ octconfigdir = $(exec_prefix)/share/octave/site/m
 octconfig_DATA = sndfile_load.m sndfile_save.m sndfile_play.m
 
 OCTAVE_DEST_MDIR = @OCTAVE_DEST_MDIR@
-OCTAVE_DEST_ODIR = @OCTAVE_DEST_ODIR@
+OCTAVE_DEST_ODIR = @OCTAVE_DEST_ODIR@/sndfile
 
 OCT_CXXFLAGS = @OCT_CXXFLAGS@
 OCT_LIB_DIR = @OCT_LIB_DIR@
@@ -23,13 +23,11 @@ OCT_LIBS = @OCT_LIBS@
 SNDFILEDIR = $(top_builddir)/src
 INCLUDES = -I$(SNDFILEDIR)
 
-oct_module_srcs = sfread.cc sfwrite.cc format.cc
-oct_modules = sfread.oct sfwrite.oct
+oct_module_srcs = sndfile.cc
+oct_modules = sndfile.oct PKG_ADD
 
 # Make these noinst so they can be installed manually.
 noinst_DATA = $(oct_modules)
-
-noinst_HEADERS = format.h
 
 
 # Need to jump through extra hoops here because we only these Octave
@@ -38,12 +36,8 @@ noinst_HEADERS = format.h
 #
 # Maybe should create both dynamic and static versions and install
 # the dynamic and test the static.
-sfread.oct : format.cc sfread.cc
-	$(CXXLINK) $(OCT_CXXFLAGS) $(INCLUDES) $+ $(OCT_LIB_DIR) $(OCT_LIBS) $(SNDFILEDIR)/libsndfile.la
-
-sfwrite.oct : format.cc sfwrite.cc
-	$(CXXLINK) $(OCT_CXXFLAGS) $(INCLUDES) $+ $(OCT_LIB_DIR) $(OCT_LIBS) $(SNDFILEDIR)/libsndfile.la
-
+sndfile.oct : sndfile.cc
+	$(MKOCTFILE) $(INCLUDES) $+ -L$(SNDFILEDIR)/.libs -lsndfile -o $@
 
 # Allow for the test being run in the build dir, but the test script
 # being located in the source dir.

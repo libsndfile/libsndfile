@@ -113,44 +113,29 @@ if test "x$prog_concat" = "xyesyesyes" ; then
 		AC_MSG_WARN([** Mismatch between versions of octave and octave-config. **])
 		AC_MSG_WARN([** Octave libsndfile modules will not be built.           **])
 	else
-		OCTAVE_DEST_ODIR=`$OCTAVE_CONFIG --oct-site-dir | sed 's%^/usr%${prefix}%'`
-		OCTAVE_DEST_MDIR=`$OCTAVE_CONFIG --m-site-dir | sed 's%^/usr%${prefix}%'`
+		case "$MKOCTFILE_VERSION" in
+			2.*)
+				AC_MSG_WARN([Octave version 2.X is not supported.])
+				;;
+			3.0.*)
+				OCTAVE_DEST_ODIR=`$OCTAVE_CONFIG --oct-site-dir | sed 's%^/usr%${prefix}%'`
+				OCTAVE_DEST_MDIR=`$OCTAVE_CONFIG --m-site-dir | sed 's%^/usr%${prefix}%'`
 
-		AC_MSG_RESULT([retrieving compile and link flags from $MKOCTFILE])
-
-		OCT_CXXFLAGS=`$MKOCTFILE -p ALL_CXXFLAGS`
-		OCT_CXXFLAGS="$OCT_CXXFLAGS `$MKOCTFILE -p FPICFLAG`"
-		OCT_LIB_DIR=`$MKOCTFILE -p LFLAGS`
-
-		dnl Pinched from mkoctfile.
-		dnl
-		dnl LINK_DEPS="$LFLAGS $OCTAVE_LIBS $LDFLAGS $BLAS_LIBS $FFTW_LIBS $LIBS $FLIBS"
-		dnl cmd="$DL_LD $DL_LDFLAGS $pass_on_options -o $octfile $objfiles $ldflags $LINK_DEPS"
-
-
-		OCT_LIBS=`$MKOCTFILE -p LFLAGS`
-		OCT_LIBS="$OCT_LIBS `$MKOCTFILE -p OCTAVE_LIBS`"
-		OCT_LIBS="$OCT_LIBS `$MKOCTFILE -p LDFLAGS`"
-		OCT_LIBS="$OCT_LIBS `$MKOCTFILE -p BLAS_LIBS`"
-		OCT_LIBS="$OCT_LIBS `$MKOCTFILE -p FFTW_LIBS`"
-		OCT_LIBS="$OCT_LIBS `$MKOCTFILE -p LIBS`"
-		OCT_LIBS="$OCT_LIBS `$MKOCTFILE -p FLIBS`"
-
-		OCT_LIBS="`$MKOCTFILE -p DL_LDFLAGS` $OCT_LIBS"
-
-		OCTAVE_BUILD=yes
+				OCTAVE_BUILD=yes
+				;;
+			*)
+				AC_MSG_WARN([Octave version $MKOCTFILE_VERSION is not supported.])
+				;;
+				esac
 		AC_MSG_RESULT([building octave libsndfile module... $OCTAVE_BUILD])
 		fi
 	fi
 
-
 AC_SUBST(OCTAVE_DEST_ODIR)
 AC_SUBST(OCTAVE_DEST_MDIR)
 
-AC_SUBST(OCT_CXXFLAGS)
-AC_SUBST(OCT_LIB_DIR)
-AC_SUBST(OCT_LIBS)
+AC_SUBST(MKOCTFILE)
 
-AM_CONDITIONAL(BUILD_OCTAVE_MOD, test -n "$OCT_CXXFLAGS")
+AM_CONDITIONAL(BUILD_OCTAVE_MOD, test -n "$MKOCTFILE")
 
 ])# AC_OCTAVE_BUILD

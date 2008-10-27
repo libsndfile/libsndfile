@@ -128,7 +128,7 @@ AC_ARG_ENABLE(external-libs,
 	AC_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis]))
 
 AC_ARG_ENABLE(octave,
-	AC_HELP_STRING([--disable-octave], [disable building of GNU Octave module]))
+	AC_HELP_STRING([--enable-octave], [disable building of GNU Octave module]))
 
 AC_ARG_ENABLE(test-coverage,
 	AC_HELP_STRING([--enable-test-coverage], [enable test coverage]))
@@ -272,10 +272,10 @@ AC_C99_FUNC_LRINTF
 
 dnl Octave maths environment http://www.octave.org/
 if test x$cross_compiling = xno ; then
-	if test x$enable_octave = xyes ; then
-		AC_OCTAVE_BUILD
-	else
+	if test x$enable_octave = xno ; then
 		AM_CONDITIONAL(BUILD_OCTAVE_MOD, false)
+	else
+		AC_OCTAVE_BUILD
 		fi
 else
 	AM_CONDITIONAL(BUILD_OCTAVE_MOD, false)
