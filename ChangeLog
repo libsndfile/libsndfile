@@ -19,6 +19,10 @@
     * Octave/*
     Reduce 3 C++ files to one, fix build for octave 3.0, fix build.
 
+    * Octave/sndfile.cc Octave/PKG_ADD
+    Add Octave function sfversion which returns the libsndfile version that the
+    module is linked against.
+
 2008-10-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/common.c

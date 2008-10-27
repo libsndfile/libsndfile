@@ -28,12 +28,35 @@ static int format_of_str (const std::string & fmt) ;
 static void string_of_format (std::string & fmt, int format) ;
 
 
+DEFUN_DLD (sfversion, args, nargout ,
+"-*- texinfo -*-\n\
+@deftypefn {Loadable Function} {@var{version} =} sfversion ()\n\
+@cindex Reading sound files\n\
+Return a string containing the libsndfile version.\n\
+@end deftypefn")
+{	char buffer [256] ;
+	octave_value_list retval ;
+
+	/* Bail out if the input parameters are bad. */
+	if (args.length () != 0 || nargout > 1)
+	{	print_usage () ;
+		return retval ;
+		} ;
+
+	sf_command (NULL, SFC_GET_LIB_VERSION, buffer, sizeof (buffer)) ;
+
+	std::string version (buffer) ;
+
+	retval.append (version) ;
+	return retval ;
+} /* sfversion */
+
+
 DEFUN_DLD (sfread, args, nargout ,
 "-*- texinfo -*-\n\
-@deftypefn {Loadable Function} {@var{I},@var{srate},@var{format} =} sfread (@var{filename})\n\
+@deftypefn {Loadable Function} {@var{data},@var{srate},@var{format} =} sfread (@var{filename})\n\
 @cindex Reading sound files\n\
 Read a sound file from disk using libsndfile.\n\
-\n\
 @seealso{wavread}\n\
 @end deftypefn")
 {	SNDFILE * file ;
@@ -105,11 +128,10 @@ Read a sound file from disk using libsndfile.\n\
 	return retval ;
 } /* sfread */
 
-DEFUN_DLD (sfwrite, args, nargout , "\
--*- texinfo -*-\n\
+DEFUN_DLD (sfwrite, args, nargout ,
+"-*- texinfo -*-\n\
 @deftypefn {Function File} sfwrite (@var{filename},@var{data},@var{srate},@var{format})\n\
 Write a sound file to disk using libsndfile.\n\
-\n\
 @seealso{wavwrite}\n\
 @end deftypefn\n\
 ")
