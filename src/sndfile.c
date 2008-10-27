@@ -124,8 +124,9 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_WAV_NO_RIFF			, "Error in WAV file. No 'RIFF' chunk marker." },
 	{	SFE_WAV_NO_WAVE			, "Error in WAV file. No 'WAVE' chunk marker." },
-	{	SFE_WAV_NO_FMT			, "Error in WAV file. No 'fmt ' chunk marker." },
-	{	SFE_WAV_FMT_SHORT		, "Error in WAV file. Short 'fmt ' chunk." },
+	{	SFE_WAV_NO_FMT			, "Error in WAV/W64/RF64 file. No 'fmt ' chunk marker." },
+	{	SFE_WAV_BAD_FMT			, "Error in WAV/W64/RF64 file. Malformed 'fmt ' chunk." },
+	{	SFE_WAV_FMT_SHORT		, "Error in WAV/W64/RF64 file. Short 'fmt ' chunk." },
 
 	{	SFE_WAV_BAD_FACT		, "Error in WAV file. 'fact' chunk out of place." },
 	{	SFE_WAV_BAD_PEAK		, "Error in WAV file. Bad 'PEAK' chunk." },
@@ -196,15 +197,9 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_IRCAM_UNKNOWN_FORMAT, "Error in IRCAM file, unknow encoding format." },
 
 	{	SFE_W64_64_BIT			, "Error in W64 file, file contains 64 bit offset." },
-
 	{	SFE_W64_NO_RIFF			, "Error in W64 file. No 'riff' chunk marker." },
 	{	SFE_W64_NO_WAVE			, "Error in W64 file. No 'wave' chunk marker." },
-	{	SFE_W64_NO_FMT			, "Error in W64 file. No 'fmt ' chunk marker." },
 	{	SFE_W64_NO_DATA			, "Error in W64 file. No 'data' chunk marker." },
-
-	{	SFE_W64_FMT_SHORT		, "Error in W64 file. Short 'fmt ' chunk." },
-	{	SFE_W64_FMT_TOO_BIG		, "Error in W64 file. 'fmt ' chunk too large." },
-
 	{	SFE_W64_ADPCM_NOT4BIT	, "Error in ADPCM W64 file. Invalid bit width." },
 	{	SFE_W64_ADPCM_CHANNELS	, "Error in ADPCM W64 file. Invalid number of channels." },
 	{	SFE_W64_GSM610_FORMAT	, "Error in GSM610 W64 file. Invalid format chunk." },

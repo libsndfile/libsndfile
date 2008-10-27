@@ -270,7 +270,7 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 			case fmt_HASH16 :
 					if ((parsestage & (HAVE_riff | HAVE_wave)) != (HAVE_riff | HAVE_wave))
-						return SFE_W64_NO_FMT ;
+						return SFE_WAV_NO_FMT ;
 
 					bytesread += psf_binheader_readf (psf, "e8", &chunk_size) ;
 					psf_log_printf (psf, " fmt : %D\n", chunk_size) ;

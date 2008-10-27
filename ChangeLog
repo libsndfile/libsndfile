@@ -9,6 +9,9 @@
     * src/rf64.c
     Add code to prevent infinite loop on malformed file.
 
+    * src/common.h src/sndfile.c src/w64.c src/wav_w64.c
+    Rationalize and improve error handling when parsing 'fmt ' chunk.
+
 2008-10-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/common.c
