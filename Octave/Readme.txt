@@ -1,7 +1,7 @@
 The libsndfile Modules for GNU Octave
 =====================================
 
-These modules are currently known to work with version 2.9 of GNU Octave on
+These modules are currently known to work with version 3.0 of GNU Octave on
 Linux. They have not been tested elsewhere.
 
 
