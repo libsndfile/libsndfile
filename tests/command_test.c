@@ -990,7 +990,7 @@ check_coding_history_newlines (const char *filename)
 	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
 	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
 	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
-	bc_write.coding_history_size = snprintf (bc_write.coding_history, sizeof (bc_write.coding_history), "This has\nUnix\nand\rMac OS9\rline endings.\n") ; ;
+	bc_write.coding_history_size = snprintf (bc_write.coding_history, sizeof (bc_write.coding_history), "This has\nUnix\nand\rMac OS9\rline endings.\nLast line") ; ;
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 	if (sf_command (file, SFC_SET_BROADCAST_INFO, &bc_write, sizeof (bc_write)) == SF_FALSE)
@@ -1013,6 +1013,11 @@ check_coding_history_newlines (const char *filename)
 
 	if (bc_read.coding_history_size == 0)
 	{	printf ("\n\nLine %d : missing coding history.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	if (strstr (bc_read.coding_history, "Last line") == NULL)
+	{	printf ("\n\nLine %d : coding history truncated.\n\n", __LINE__) ;
 		exit (1) ;
 		} ;
 
