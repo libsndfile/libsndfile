@@ -33,6 +33,7 @@ DEFUN_DLD (sfversion, args, nargout ,
 @deftypefn {Loadable Function} {@var{version} =} sfversion ()\n\
 @cindex Reading sound files\n\
 Return a string containing the libsndfile version.\n\
+@seealso{sfread, sfwrite}\n\
 @end deftypefn")
 {	char buffer [256] ;
 	octave_value_list retval ;
@@ -57,7 +58,7 @@ DEFUN_DLD (sfread, args, nargout ,
 @deftypefn {Loadable Function} {@var{data},@var{srate},@var{format} =} sfread (@var{filename})\n\
 @cindex Reading sound files\n\
 Read a sound file from disk using libsndfile.\n\
-@seealso{wavread}\n\
+@seealso{sfversion, sfwrite}\n\
 @end deftypefn")
 {	SNDFILE * file ;
 	SF_INFO sfinfo ;
@@ -132,7 +133,7 @@ DEFUN_DLD (sfwrite, args, nargout ,
 "-*- texinfo -*-\n\
 @deftypefn {Function File} sfwrite (@var{filename},@var{data},@var{srate},@var{format})\n\
 Write a sound file to disk using libsndfile.\n\
-@seealso{wavwrite}\n\
+@seealso{sfread, sfversion}\n\
 @end deftypefn\n\
 ")
 {	SNDFILE * file ;
