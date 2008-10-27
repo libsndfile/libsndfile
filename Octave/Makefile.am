@@ -8,7 +8,7 @@ CXXLINK = $(LIBTOOL) --tag=CXX --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 
 EXTRA_DIST = sndfile_load.m sndfile_save.m sndfile_play.m \
-	octave_test.m octave_test.sh $(oct_module_srcs)
+	octave_test.m octave_test.sh $(oct_module_srcs) PKG_ADD
 
 octconfigdir = $(exec_prefix)/share/octave/site/m
 octconfig_DATA = sndfile_load.m sndfile_save.m sndfile_play.m
@@ -24,20 +24,19 @@ SNDFILEDIR = $(top_builddir)/src
 INCLUDES = -I$(SNDFILEDIR)
 
 oct_module_srcs = sndfile.cc
-oct_modules = sndfile.oct PKG_ADD
+oct_module_files = sndfile.oct PKG_ADD
 
 # Make these noinst so they can be installed manually.
-noinst_DATA = $(oct_modules)
+noinst_DATA = $(oct_module_files)
 
 
-# Need to jump through extra hoops here because we only these Octave
-# modules must be dynamic. However, to make the tests pass, they need
-# to be statically linked to the libsndfile that has just been built.
-#
-# Maybe should create both dynamic and static versions and install
-# the dynamic and test the static.
-sndfile.oct : sndfile.cc
-	$(MKOCTFILE) $(INCLUDES) $+ -L$(SNDFILEDIR)/.libs -lsndfile -o $@
+# Use Octave's mkoctfile to do all the heavy lifting. Unfortunately, its
+# a little dumb so we need to guide it carefully.
+sndfile.oct : sndfile.o
+	$(MKOCTFILE) -v $(INCLUDES) $(builddir)/$+ -L$(SNDFILEDIR)/.libs -L$(SNDFILEDIR) -lsndfile -o $(builddir)/$@
+
+sndfile.o : sndfile.cc
+	$(MKOCTFILE) -v $(INCLUDES) -c $+ -o $(builddir)/$@
 
 # Allow for the test being run in the build dir, but the test script
 # being located in the source dir.
@@ -47,10 +46,10 @@ check :
 
 # Since the octave modules are installed in a special location, a custom install
 # and uninstall routine must be specified.
-install-exec-local : $(oct_modules)
+install-exec-local : $(oct_module_files)
 	@$(NORMAL_INSTALL)
 	test -z "$(OCTAVE_DEST_ODIR)" || $(mkdir_p) "$(DESTDIR)$(OCTAVE_DEST_ODIR)"
-	@list='$(oct_modules)'; for p in $$list; do \
+	@list='$(oct_module_files)'; for p in $$list; do \
 	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
 	  if test -f $$p \
 	     || test -f $$p1 \
@@ -63,11 +62,11 @@ install-exec-local : $(oct_modules)
 
 uninstall-local :
 	@$(NORMAL_UNINSTALL)
-	@list='$(oct_modules)'; for p in $$list; do \
+	@list='$(oct_module_files)'; for p in $$list; do \
 	  f=`echo "$$p" | sed 's,^.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
 	  echo " rm -f '$(DESTDIR)$(OCTAVE_DEST_ODIR)/$$f'"; \
 	  rm -f "$(DESTDIR)$(OCTAVE_DEST_ODIR)/$$f"; \
 	done
 
 clean-local :
-	rm -f $(oct_modules)
+	rm -f sndfile.o sndfile.oct
