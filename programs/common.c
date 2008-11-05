@@ -135,7 +135,9 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 
 #define REPLACE_IF_NEW(x) \
 		if (info->x != NULL) \
-			memcpy (binfo.x, info->x, MIN (strlen (info->x), sizeof (binfo.x))) ;
+		{	memset (binfo.x, 0, sizeof (binfo.x)) ; \
+			memcpy (binfo.x, info->x, MIN (strlen (info->x), sizeof (binfo.x))) ; \
+			} ;
 
 	REPLACE_IF_NEW (description) ;
 	REPLACE_IF_NEW (originator) ;
