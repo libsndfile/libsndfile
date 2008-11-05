@@ -66,10 +66,13 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 
 	added_history_len = gen_coding_history (added_history, sizeof (added_history), &(psf->sf)) ;
 
-	if (psf->broadcast_var != NULL
-		&& psf->broadcast_var->binfo.coding_history_size + added_history_len < datasize)
-	{	free (psf->broadcast_var) ;
-		psf->broadcast_var = NULL ;
+	if (psf->broadcast_var != NULL)
+	{	size_t coding_hist_offset = offsetof (SF_BROADCAST_INFO, coding_history) ;
+
+		if (psf->broadcast_var->binfo.coding_history_size + added_history_len < datasize - coding_hist_offset)
+		{	free (psf->broadcast_var) ;
+			psf->broadcast_var = NULL ;
+			} ;
 		} ;
 
 	if (psf->broadcast_var == NULL)

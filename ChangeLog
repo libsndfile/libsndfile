@@ -7,6 +7,9 @@
     * programs/test-sndfile-metadata-set.py
     Add test for the above.
 
+    * src/broadcast.c
+    Fix checking of required coding_history_size.
+
 2008-10-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/command_test.c
