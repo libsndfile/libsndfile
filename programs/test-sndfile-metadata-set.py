@@ -120,6 +120,30 @@ def test_coding_history ():
 		sys.exit (1)
 	print "ok"
 
+#-------------------------------------------------------------------------------
+
+def test_rewrite ():
+	print_test_name ("Rewrite test")
+	cmd = "./sndfile-metadata-set --bext-originator \"Really, really long string\" output.wav"
+	status, output = commands.getstatusoutput (cmd)
+	if status:
+		print "\n\nError : command '%s' should not have failed." % cmd
+		sys.exit (1)
+	cmd = "./sndfile-metadata-set --bext-originator \"Short\" output.wav"
+	status, output = commands.getstatusoutput (cmd)
+	if status:
+		print "\n\nError : command '%s' should not have failed." % cmd
+		sys.exit (1)
+	cmd = "./sndfile-metadata-get --bext-originator output.wav"
+	status, output = commands.getstatusoutput (cmd)
+	if status:
+		print "\n\nError : command '%s' should not have failed." % cmd
+		sys.exit (1)
+	if output.find ("really long") > 0:
+		print "\n\nError : output '%s' should not contain 'really long'." % output
+		sys.exit (1)
+	print "ok"
+
 #===============================================================================
 
 test_dir = "programs"
@@ -153,6 +177,9 @@ test_post_mod (tests)
 test_update ([ ("--str-artist", "Fox") ])
 
 test_coding_history ()
+
+test_rewrite ()
+
 
 print ""
 

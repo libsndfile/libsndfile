@@ -4,6 +4,9 @@
     When merging broadcast info, make sure to clear the destination field
     before copying in the new data.
 
+    * programs/test-sndfile-metadata-set.py
+    Add test for the above.
+
 2008-10-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/command_test.c
