@@ -13,9 +13,10 @@ noinst_LTLIBRARIES = libcommon.la
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 
+SYMBOL_FILES = Symbols.linux Symbols.darwin libsndfile-1.def Symbols.os2
+
 EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
-			Symbols.linux Symbols.darwin libsndfile.def cygsndfile.def \
-			create_symbols_file.py binheader_writef_check.py
+			$(SYMBOL_FILES) create_symbols_file.py binheader_writef_check.py
 
 noinst_HEADERS = common.h sfconfig.h sfendian.h wav_w64.h sf_unistd.h
 
@@ -47,7 +48,7 @@ test_main_LDADD = libcommon.la
 test_endswap.c: test_endswap.def test_endswap.tpl
 	autogen --writable test_endswap.def
 
-genfiles : test_endswap.c Symbols.linux Symbols.darwin libsndfile.def cygsndfile.def
+genfiles : test_endswap.c $(SYMBOL_FILES)
 
 # A single test programs.
 # It is not possible to place these in the tests/ directory because they
@@ -71,22 +72,19 @@ check: $(noinst_PROGRAMS)
 # end user to create these files.
 
 Symbols.linux: create_symbols_file.py
-	./create_symbols_file.py linux $(VERSION) > Symbols.linux
+	./create_symbols_file.py linux $(VERSION) > $@
 
 Symbols.darwin: create_symbols_file.py
-	./create_symbols_file.py darwin $(VERSION) > Symbols.darwin
+	./create_symbols_file.py darwin $(VERSION) > $@
 
-libsndfile.def: create_symbols_file.py
-	./create_symbols_file.py win32 $(VERSION) > libsndfile.def
-
-cygsndfile.def: create_symbols_file.py
-	./create_symbols_file.py cygwin $(VERSION) > cygsndfile.def
+libsndfile-1.def: create_symbols_file.py
+	./create_symbols_file.py win32 $(VERSION) > $@
 
 Symbols.os2: create_symbols_file.py
-	./create_symbols_file.py os2 $(VERSION) > Symbols.os2
+	./create_symbols_file.py os2 $(VERSION) > $@
 
 # Fake dependancy to force the creation of these files.
-sndfile.o : Symbols.linux Symbols.darwin libsndfile.def cygsndfile.def Symbols.os2
+sndfile.o : $(SYMBOL_FILES)
 
 #======================================================================
 # Disable autoheader.
