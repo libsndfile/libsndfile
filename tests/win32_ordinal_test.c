@@ -46,11 +46,6 @@
 #if TEST_WIN32
 #include <windows.h>
 
-#ifdef __CYGWIN__
-#define DLL_NAME	"cygsndfile"
-#else
-#define DLL_NAME	"libsndfile"
-#endif
 
 static const char * locations [] =
 {	"../src/", "src/", "../src/.libs/", "src/.libs/",
@@ -95,7 +90,7 @@ win32_ordinal_test (void)
 	int k, ordinal, errors = 0 ;
 
 	for (k = 0 ; locations [k] != NULL ; k++)
-	{	snprintf (buffer, sizeof (buffer), "%s/%s.def", locations [k], DLL_NAME) ;
+	{	snprintf (buffer, sizeof (buffer), "%s/libsndfile-1.def", locations [k]) ;
 		if ((file = fopen (buffer, "r")) != NULL)
 			break ;
 		} ;
@@ -106,7 +101,7 @@ win32_ordinal_test (void)
 		} ;
 
 	for (k = 0 ; locations [k] != NULL ; k++)
-	{	snprintf (buffer, sizeof (buffer), "%s/%s-1.dll", locations [k], DLL_NAME) ;
+	{	snprintf (buffer, sizeof (buffer), "%s/libsndfile-1.dll", locations [k]) ;
 		if ((hmod = (HMODULE) LoadLibrary (buffer)) != NULL)
 			break ;
 		} ;

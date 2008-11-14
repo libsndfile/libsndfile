@@ -3,6 +3,9 @@
     * configure.ac src/Makefile.am
     Tweaks to generation of Symbols files.
 
+    * tests/win32_ordinal_test.c
+    Update tests for above changes.
+
 2008-11-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/common.c
