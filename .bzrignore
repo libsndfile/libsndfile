@@ -60,13 +60,14 @@ programs/sndfile-metadata-set
 programs/sndfile-play
 regtest/sndfile-regtest
 sndfile.pc
-src/*sndfile.def
 src/Ext
 src/G72x/g72x_test
 src/Symbols.darwin
 src/Symbols.linux
+src/Symbols.os2
 src/config.h
 src/config.h.in
+src/libsndfile-1.def
 src/sndfile.h
 src/stamp-h1
 src/test_endswap.c

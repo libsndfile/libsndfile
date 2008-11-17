@@ -159,7 +159,7 @@ AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
 
 case "$host_os" in
 	mingw*)
-		TYPEOF_SF_COUNT_T="__int64"
+		TYPEOF_SF_COUNT_T="int64_t"
 		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 		SIZEOF_SF_COUNT_T=8
 		;;
@@ -376,10 +376,6 @@ case "$host_os" in
 	mingw*)
 		os_is_win32=1
 		use_windows_api=1
-		OS_SPECIFIC_LINKS="-lwinmm"
-		;;
-	cygwin*)
-		os_is_win32=1
 		OS_SPECIFIC_LINKS="-lwinmm"
 		;;
 	esac
