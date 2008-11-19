@@ -1,3 +1,9 @@
+2008-11-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/sndfile-info.c
+    Apply patch from Conrad Parker to calculate and display total duration when
+    more than one file is dumped.
+
 2008-11-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac src/Makefile.am

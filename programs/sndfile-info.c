@@ -54,6 +54,9 @@ static void print_usage (const char *progname) ;
 static void info_dump (const char *filename) ;
 static int	instrument_dump (const char *filename) ;
 static int	broadcast_dump (const char *filename) ;
+static void total_dump (void) ;
+
+static double total_seconds = 0.0 ;
 
 int
 main (int argc, char *argv [])
@@ -89,6 +92,9 @@ main (int argc, char *argv [])
 
 	for (k = 1 ; k < argc ; k++)
 		info_dump (argv [k]) ;
+
+	if (argc > 2)
+		total_dump () ;
 
 	return 0 ;
 } /* main */
@@ -195,12 +201,26 @@ calc_decibels (SF_INFO * sfinfo, double max)
 } /* calc_decibels */
 
 static const char *
-generate_duration_str (SF_INFO *sfinfo)
+format_duration_str (double seconds)
 {	static char str [128] ;
-
-	int seconds ;
+	int hrs, min ;
+	double sec ;
 
 	memset (str, 0, sizeof (str)) ;
+
+	hrs = (int) (seconds / 3600.0) ;
+	min = (int) ((seconds - (hrs * 3600.0)) / 60.0) ;
+	sec = seconds - (hrs * 3600.0) - (min * 60.0) ;
+
+	snprintf (str, sizeof (str) - 1, "%02d:%02d:%06.3f", hrs, min, sec) ;
+
+	return str ;
+} /* format_duration_str */
+
+static const char *
+generate_duration_str (SF_INFO *sfinfo)
+{
+	double seconds ;
 
 	if (sfinfo->samplerate < 1)
 		return NULL ;
@@ -208,20 +228,12 @@ generate_duration_str (SF_INFO *sfinfo)
 	if (sfinfo->frames / sfinfo->samplerate > 0x7FFFFFFF)
 		return "unknown" ;
 
-	seconds = sfinfo->frames / sfinfo->samplerate ;
+	seconds = (1.0 * sfinfo->frames) / sfinfo->samplerate ;
 
-	snprintf (str, sizeof (str) - 1, "%02d:", seconds / 60 / 60) ;
+	/* Accumulate the total of all known file durations */
+	total_seconds += seconds ;
 
-	seconds = seconds % (60 * 60) ;
-	snprintf (str + strlen (str), sizeof (str) - strlen (str) - 1, "%02d:", seconds / 60) ;
-
-	seconds = seconds % 60 ;
-	snprintf (str + strlen (str), sizeof (str) - strlen (str) - 1, "%02d.", seconds) ;
-
-	seconds = ((1000 * sfinfo->frames) / sfinfo->samplerate) % 1000 ;
-	snprintf (str + strlen (str), sizeof (str) - strlen (str) - 1, "%03d", seconds) ;
-
-	return str ;
+	return format_duration_str (seconds) ;
 } /* generate_duration_str */
 
 static void
@@ -388,3 +400,8 @@ broadcast_dump (const char *filename)
 	return 0 ;
 } /* broadcast_dump */
 
+static void
+total_dump (void)
+{	printf ("========================================\n") ;
+	printf ("Total Duration : %s\n", format_duration_str (total_seconds)) ;
+} /* total_dump */
