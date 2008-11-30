@@ -477,8 +477,14 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		AC_ADD_CFLAGS([-fgnu89-inline])
 		fi
 
-	CFLAGS="$CFLAGS -Wextra -Wall"
-	CXXFLAGS="$CXXFLAGS -Wextra -Wall"
+	CFLAGS="$CFLAGS -Wall"
+	CXXFLAGS="$CXXFLAGS -Wall"
+
+	AC_ADD_CFLAGS([-Wextra])
+
+	AC_LANG_PUSH([C++])
+	AC_ADD_CXXFLAGS([-Wextra])
+	AC_LANG_POP([C++])
 
 	AC_ADD_CFLAGS([-Wdeclaration-after-statement])
 	AC_ADD_CFLAGS([-Wpointer-arith])

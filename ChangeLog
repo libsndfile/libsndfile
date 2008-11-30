@@ -3,6 +3,9 @@
     * M4/add_cflags.m4
     Fix problem with quoting of '#include'.
 
+    * M4/add_cxxflags.m4 configure.ac
+    Add new file M4/add_cxxflags.m4 and use it in configure.ac.
+
 2008-11-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-info.c
