@@ -38,6 +38,7 @@ static void	string_start_test (const char *filename, int typemajor) ;
 static void	string_start_end_test (const char *filename, int typemajor) ;
 static void	string_multi_set_test (const char *filename, int typemajor) ;
 static void	string_rdwr_test (const char *filename, int typemajor) ;
+static void	string_short_rdwr_test (const char *filename, int typemajor) ;
 
 static int str_count (const char * haystack, const char * needle) ;
 
@@ -63,19 +64,27 @@ main (int argc, char *argv [])
 	{	string_start_end_test ("strings.wav", SF_FORMAT_WAV) ;
 		string_multi_set_test ("multi.wav", SF_FORMAT_WAV) ;
 		string_rdwr_test ("rdwr.wav", SF_FORMAT_WAV) ;
+		string_short_rdwr_test ("short_rdwr.wav", SF_FORMAT_WAV) ;
 
 		string_start_end_test ("strings.wavex", SF_FORMAT_WAVEX) ;
 		string_multi_set_test ("multi.wavex", SF_FORMAT_WAVEX) ;
 		string_rdwr_test ("rdwr.wavex", SF_FORMAT_WAVEX) ;
+		string_short_rdwr_test ("short_rdwr.wavex", SF_FORMAT_WAVEX) ;
 
 		string_start_end_test ("strings.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
 		string_multi_set_test ("multi.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
 		string_rdwr_test ("rdwr.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
+		string_short_rdwr_test ("short_rdwr.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "aiff"))
 	{	string_start_end_test ("strings.aiff", SF_FORMAT_AIFF) ;
+		/*
+		string_multi_set_test ("multi.aiff", SF_FORMAT_AIFF) ;
+		string_rdwr_test ("rdwr.aiff", SF_FORMAT_AIFF) ;
+		string_short_rdwr_test ("short_rdwr.aiff", SF_FORMAT_AIFF) ;
+		*/
 		test_count++ ;
 		} ;
 
@@ -101,6 +110,7 @@ main (int argc, char *argv [])
 		string_start_end_test ("strings.rf64", SF_FORMAT_RF64) ;
 		string_multi_set_test ("multi.rf64", SF_FORMAT_RF64) ;
 		string_rdwr_test ("rdwr.rf64", SF_FORMAT_RF64) ;
+		string_short_rdwr_test ("short_rdwr.rf64", SF_FORMAT_RF64) ;
 		*/
 		test_count++ ;
 		} ;
@@ -128,7 +138,10 @@ static const char
 	date		[]	= "2001/01/27",
 	album		[]	= "The Album",
 	license		[]	= "The license",
-	title		[]	= "This is the title" ;
+	title		[]	= "This is the title",
+	long_title	[]	= "This is a very long and very boring title for this file",
+	long_artist	[]	= "The artist who kept on changing its name" ;
+
 
 static	short	data_out [BUFFER_LEN] ;
 
@@ -522,6 +535,64 @@ string_rdwr_test (const char *filename, int typemajor)
 
 	puts ("ok") ;
 } /* string_rdwr_test */
+
+static void
+string_short_rdwr_test (const char *filename, int typemajor)
+{	SNDFILE *file ;
+	SF_INFO sfinfo ;
+	sf_count_t frames = BUFFER_LEN ;
+	const char * str ;
+
+	print_test_name (__func__, filename) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.format		= typemajor | SF_FORMAT_PCM_16 ;
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.channels		= 1 ;
+	sfinfo.frames		= 0 ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+
+	/* Write data to file. */
+	test_write_short_or_die (file, 0, data_out, BUFFER_LEN, __LINE__) ;
+
+	sf_set_string (file, SF_STR_TITLE, long_title) ;
+	sf_set_string (file, SF_STR_ARTIST, long_artist) ;
+	sf_close (file) ;
+
+	/* Open the file RDWR. */
+	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__) ;
+	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %lld should be %lld.\n", __LINE__, sfinfo.frames, frames) ;
+	str = sf_get_string (file, SF_STR_TITLE) ;
+	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_TITLE string is NULL.\n", __LINE__) ;
+	exit_if_true (strcmp (str, long_title) != 0, "\n\nLine %d : SF_STR_TITLE doesn't match what was written.\n", __LINE__) ;
+	str = sf_get_string (file, SF_STR_ARTIST) ;
+	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_TITLE string is NULL.\n", __LINE__) ;
+	exit_if_true (strcmp (str, long_artist) != 0, "\n\nLine %d : SF_STR_ARTIST doesn't match what was written.\n", __LINE__) ;
+
+	/* Change title and artist. */
+	sf_set_string (file, SF_STR_TITLE, title) ;
+	sf_set_string (file, SF_STR_ARTIST, artist) ;
+
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	str = sf_get_string (file, SF_STR_TITLE) ;
+	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_TITLE string is NULL.\n", __LINE__) ;
+	exit_if_true (strcmp (str, title) != 0, "\n\nLine %d : SF_STR_TITLE doesn't match what was written.\n", __LINE__) ;
+
+	str = sf_get_string (file, SF_STR_ARTIST) ;
+	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_ARTIST string is NULL.\n", __LINE__) ;
+	exit_if_true (strcmp (str, artist) != 0, "\n\nLine %d : SF_STR_ARTIST doesn't match what was written.\n", __LINE__) ;
+
+	sf_close (file) ;
+	unlink (filename) ;
+
+	puts ("ok") ;
+} /* string_short_rdwr_test */
 
 static int
 str_count (const char * haystack, const char * needle)

@@ -1,3 +1,9 @@
+2008-12-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/string_test.c
+    Add test for RDWR mode where the file ends up shorter than when it was
+    opened.
+
 2008-11-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * M4/add_cflags.m4
