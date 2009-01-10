@@ -1,3 +1,8 @@
+2009-01-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/index.html
+	Fix links to versions of the LGPL.
+
 2008-12-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/string_test.c
