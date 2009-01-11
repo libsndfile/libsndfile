@@ -80,11 +80,13 @@ main (int argc, char *argv [])
 		} ;
 
 	/* Get the time in case we need it later. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	if ((file = sf_open (filename, SFM_READ, &sfinfo)) == NULL)
 	{	printf ("Error : Open of file '%s' failed : %s\n\n", filename, sf_strerror (file)) ;
 		exit (1) ;
 		} ;
 
+	memset (&binfo, 0, sizeof (binfo)) ;
 	if (sf_command (file, SFC_GET_BROADCAST_INFO, &binfo, sizeof (binfo)) == 0)
 		memset (&binfo, 0, sizeof (binfo)) ;
 
