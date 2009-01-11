@@ -3,6 +3,7 @@
     * programs/sndfile-metadata-get.c
     Make valgrind clean.
     Clean up temp string array usage.
+    Error out if trying to update coding history in RDWR mode.
 
 2009-01-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

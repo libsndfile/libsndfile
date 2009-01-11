@@ -166,6 +166,17 @@ main (int argc, char *argv [])
 		exit (1) ;
 		} ;
 
+	if (info.coding_history != NULL && filenames [1] == NULL)
+	{	printf ("\n"
+			"Error : Trying to update coding history of an existing file which unfortunately\n"
+			"        is not supported. Instead, create a new file using :\n"
+			"\n"
+			"        %s --bext-coding-hist \"Coding history\" old_file.wav new_file.wav\n"
+			"\n",
+			progname) ;
+		exit (1) ;
+		} ;
+
 	sfe_apply_metadata_changes (filenames, &info) ;
 
 	return 0 ;
