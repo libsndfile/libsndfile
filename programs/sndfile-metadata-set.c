@@ -75,7 +75,9 @@ main (int argc, char *argv [])
 	read_localtime (&timedata) ;
 
 	for (k = 1 ; k < argc ; k++)
-	{	if (argv [k][0] != '-')
+	{	char tmp [20] ;
+
+		if (argv [k][0] != '-')
 		{	if (filenames [0] == NULL)
 				filenames [0] = argv [k] ;
 			else if (filenames [1] == NULL)
@@ -120,8 +122,7 @@ main (int argc, char *argv [])
 
 		/* Following options do not take an argument. */
 		if (strcmp (argv [k], "--bext-auto-time-date") == 0)
-		{	char tmp [20] ;
-			snprintf (tmp, sizeof (tmp), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
+		{	snprintf (tmp, sizeof (tmp), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
 			info.origination_time = strdup (tmp) ;
 
 			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
@@ -130,23 +131,19 @@ main (int argc, char *argv [])
 			} ;
 
 		if (strcmp (argv [k], "--bext-auto-time") == 0)
-		{	char tmp [20] ;
-			snprintf (tmp, sizeof (tmp), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
+		{	snprintf (tmp, sizeof (tmp), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
 			info.origination_time = strdup (tmp) ;
 			continue ;
 			} ;
 
 		if (strcmp (argv [k], "--bext-auto-date") == 0)
-		{	char tmp [20] ;
-			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
+		{	snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
 			info.origination_date = strdup (tmp) ;
 			continue ;
 			} ;
 
 		if (strcmp (argv [k], "--str-auto-date") == 0)
-		{	char tmp [20] ;
-
-			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
+		{	snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
 
 			info.date = strdup (tmp) ;
 			continue ;

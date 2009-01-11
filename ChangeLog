@@ -2,6 +2,7 @@
 
     * programs/sndfile-metadata-get.c
     Make valgrind clean.
+    Clean up temp string array usage.
 
 2009-01-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
