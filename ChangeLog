@@ -1,3 +1,8 @@
+2009-02-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/sndfile-convert.c
+    Add 'htk' to the list of convert formats.
+
 2009-01-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/index.html

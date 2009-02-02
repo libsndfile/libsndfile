@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2008 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -66,6 +66,7 @@ static OUTPUT_FORMAT_MAP format_map [] =
 	{	"fap",		0,	SF_ENDIAN_LITTLE | SF_FORMAT_PAF	},
 	{	"gsm",		0,	SF_FORMAT_RAW	},
 	{	"nist", 	0,	SF_FORMAT_NIST	},
+	{	"htk",		0,	SF_FORMAT_HTK	},
 	{	"ircam",	0,	SF_FORMAT_IRCAM	},
 	{	"sf",		0, 	SF_FORMAT_IRCAM	},
 	{	"voc",		0, 	SF_FORMAT_VOC	},
