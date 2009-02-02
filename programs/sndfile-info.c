@@ -145,22 +145,9 @@ static double	data [BUFFER_LEN] ;
 
 static double
 get_signal_max (SNDFILE *file)
-{	double	max, temp ;
-	int		readcount, k, save_state ;
+{	double	max ;
 
-	save_state = sf_command (file, SFC_GET_NORM_DOUBLE, NULL, 0) ;
-	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
-
-	max = 0.0 ;
-	while ((readcount = sf_read_double (file, data, BUFFER_LEN)))
-	{	for (k = 0 ; k < readcount ; k++)
-		{	temp = fabs (data [k]) ;
-			if (temp > max)
-				max = temp ;
-			} ;
-		} ;
-
-	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, save_state) ;
+	sf_command (file, SFC_CALC_SIGNAL_MAX, &max, sizeof (max)) ;
 
 	return max ;
 } /* get_signal_max */
@@ -275,7 +262,7 @@ info_dump (const char *filename)
 		printf ("Seekable    : %s\n", (sfinfo.seekable ? "TRUE" : "FALSE")) ;
 		printf ("Duration    : %s\n", generate_duration_str (&sfinfo)) ;
 
-		if (sfinfo.frames < 10 * 1024 * 1024)
+		if (sfinfo.frames < 100 * 1024 * 1024)
 		{	/* Do not use sf_signal_max because it doesn't work for non-seekable files . */
 			signal_max = get_signal_max (file) ;
 			decibels = calc_decibels (&sfinfo, signal_max) ;

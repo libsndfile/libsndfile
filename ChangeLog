@@ -3,6 +3,10 @@
     * programs/sndfile-convert.c
     Add 'htk' to the list of convert formats.
 
+    * programs/sndfile-info.c
+    Simplify get_signal_max using SFC_CALC_SIGNAL_MAX command.
+    Increase size of files for which signal max will be calculated.
+
 2009-01-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/index.html
