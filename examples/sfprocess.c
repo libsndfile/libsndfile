@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2005 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
