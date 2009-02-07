@@ -12,9 +12,3 @@ apart from code in the following directories:
    modifications were required to integrate these files into libsndfile. The
    changes are listed in src/G72x/ChangeLog.
 
- - src/FLAC : Written by Josh Coalson and others.
-
- - src/OGG : Written by Monty <monty@xiph.org> and the Xiph.Org Foundation.
-
- - src/VORBIS : Written by Monty <monty@xiph.org> and the Xiph.org Foundation.
-

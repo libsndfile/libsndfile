@@ -1,3 +1,9 @@
+Version 1.0.18 (2009-02-07)
+  * Add Ogg/Vorbis support (thanks to John ffitch).
+  * Remove captive FLAC library.
+  * Many new features and bug fixes.
+  * Generate Win32 and Win64 pre-compiled binaries.
+
 Version 1.0.17 (2006-08-31)
   * Add sndfile.hh C++ wrapper.
   * Update Win32 MinGW build instructions.
