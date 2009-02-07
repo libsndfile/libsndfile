@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.57)
 
-AC_INIT([libsndfile],[1.0.18],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.19pre1],[erikd@mega-nerd.com])
 
 # Put config stuff in Cfg.
 AC_CONFIG_AUX_DIR(Cfg)
@@ -37,7 +37,7 @@ AC_LANG([C])
 #  6. If any interfaces have been removed since the last public release, then set age
 #     to 0.
 
-SHARED_VERSION_INFO="1:18:0"
+SHARED_VERSION_INFO="1:19:0"
 
 AC_PROG_CC
 AM_PROG_CC_C_O
