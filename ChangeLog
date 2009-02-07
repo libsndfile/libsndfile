@@ -3,6 +3,9 @@
     * Octave/Makefile.am
     Use $(top_buildir) instead of $(builddir) which may not be defined.
 
+    * M4/octave.m4
+    Improve logic and status reporting.
+
 2009-02-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac  AUTHORS NEWS README doc/*.html

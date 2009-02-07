@@ -127,8 +127,8 @@ if test "x$prog_concat" = "xyesyesyes" ; then
 				AC_MSG_WARN([Octave version $MKOCTFILE_VERSION is not supported.])
 				;;
 				esac
-		AC_MSG_RESULT([building octave libsndfile module... $OCTAVE_BUILD])
 		fi
+	AC_MSG_RESULT([building octave libsndfile module... $OCTAVE_BUILD])
 	fi
 
 AC_SUBST(OCTAVE_DEST_ODIR)
@@ -136,6 +136,6 @@ AC_SUBST(OCTAVE_DEST_MDIR)
 
 AC_SUBST(MKOCTFILE)
 
-AM_CONDITIONAL(BUILD_OCTAVE_MOD, test -n "$MKOCTFILE")
+AM_CONDITIONAL(BUILD_OCTAVE_MOD, test "x$OCTAVE_BUILD" = xyes)
 
 ])# AC_OCTAVE_BUILD
