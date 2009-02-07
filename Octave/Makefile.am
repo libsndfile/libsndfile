@@ -33,10 +33,10 @@ noinst_DATA = $(oct_module_files)
 # Use Octave's mkoctfile to do all the heavy lifting. Unfortunately, its
 # a little dumb so we need to guide it carefully.
 sndfile.oct : sndfile.o
-	$(MKOCTFILE) -v $(INCLUDES) $(builddir)/$+ -L$(SNDFILEDIR)/.libs -L$(SNDFILEDIR) -lsndfile -o $(builddir)/$@
+	$(MKOCTFILE) -v $(INCLUDES) $(top_builddir)/Octave/$+ -L$(SNDFILEDIR)/.libs -L$(SNDFILEDIR) -lsndfile -o $(top_builddir)/Octave/$@
 
 sndfile.o : sndfile.cc
-	$(MKOCTFILE) -v $(INCLUDES) -c $+ -o $(builddir)/$@
+	$(MKOCTFILE) -v $(INCLUDES) -c $+ -o $(top_builddir)/Octave/$@
 
 # Allow for the test being run in the build dir, but the test script
 # being located in the source dir.

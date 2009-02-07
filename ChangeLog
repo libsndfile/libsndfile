@@ -1,3 +1,8 @@
+2009-02-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Octave/Makefile.am
+    Use $(top_buildir) instead of $(builddir) which may not be defined.
+
 2009-02-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac  AUTHORS NEWS README doc/*.html
