@@ -1,3 +1,8 @@
+2009-02-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/ogg.c
+    Record vorbis library version string.
+
 2009-02-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Octave/Makefile.am
