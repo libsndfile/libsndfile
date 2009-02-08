@@ -9,6 +9,9 @@
     * M4/endian.m4
     Fix bracketing of function for autoconf 2.63. Thanks to Richard Ash.
 
+    * M4/octave.m4 M4/mkoctfile_version.m4
+    Clean up AC_WITH_ARG usage using AC_HELP_STRING.
+
 2009-02-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Octave/Makefile.am

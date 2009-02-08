@@ -16,7 +16,8 @@ AC_DEFUN([AC_MKOCTFILE_VERSION],
 
 
 AC_ARG_WITH(mkoctfile,
-	[  --with-mkoctfile        choose the mkoctfile version], [ with_mkoctfile=$withval ])
+	AC_HELP_STRING([--with-mkoctfile], [choose the mkoctfile version]),
+	[ with_mkoctfile=$withval ])
 
 test -z "$with_mkoctfile" && with_mkoctfile=mkoctfile
 

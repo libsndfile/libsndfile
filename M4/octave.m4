@@ -29,7 +29,8 @@ AC_DEFUN([AC_OCTAVE_VERSION],
 [
 
 AC_ARG_WITH(octave,
-	[  --with-octave           choose the octave version], [ with_octave=$withval ])
+	AC_HELP_STRING([--with-octave], [choose the octave version]),
+	[ with_octave=$withval ])
 
 test -z "$with_octave" && with_octave=octave
 
@@ -62,7 +63,8 @@ AC_DEFUN([AC_OCTAVE_CONFIG_VERSION],
 [
 
 AC_ARG_WITH(octave-config,
-	[  --with-octave-config    choose the octave-config version], [ with_octave_config=$withval ])
+	AC_HELP_STRING([--with-octave-config], [choose the octave-config version]),
+	[ with_octave_config=$withval ])
 
 test -z "$with_octave_config" && with_octave_config=octave-config
 
