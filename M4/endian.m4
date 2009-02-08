@@ -135,7 +135,6 @@ if test $ac_cv_c_byte_order = unknown ; then
 	fi
 
 )
-]
 
 if test $ac_cv_c_byte_order = big ; then
 	ac_cv_c_big_endian=1
@@ -154,6 +153,7 @@ else
 	AC_MSG_WARN([[*****************************************************************]])
 	fi
 
+]
 )# AC_C_FIND_ENDIAN
 
 

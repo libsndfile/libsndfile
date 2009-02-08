@@ -6,6 +6,9 @@
     * configure.ac
     Require libvorbis >= 1.2.2.
 
+    * M4/endian.m4
+    Fix bracketing of function for autoconf 2.63. Thanks to Richard Ash.
+
 2009-02-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Octave/Makefile.am
