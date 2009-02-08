@@ -3,6 +3,9 @@
     * src/ogg.c
     Record vorbis library version string.
 
+    * configure.ac
+    Require libvorbis >= 1.2.2.
+
 2009-02-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Octave/Makefile.am

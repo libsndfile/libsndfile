@@ -297,10 +297,10 @@ else
 	PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
 	PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
-	# Yes we really do need vorbis >= 1.2.1 because earlier versions are
-	# not const correct at the API level.
-	PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.1, ac_cv_vorbis=yes, ac_cv_vorbis=no)
-	PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.1, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
+	# Yes we really do need vorbis >= 1.2.2 for vorbis_version_string and
+	# >= 1.21 because earlier versions are not const correct at the API level.
+	PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.2, ac_cv_vorbis=yes, ac_cv_vorbis=no)
+	PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.2, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
 	fi
 
 if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
