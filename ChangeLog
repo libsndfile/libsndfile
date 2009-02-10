@@ -1,3 +1,14 @@
+2009-02-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/test_wrapper.sh.in
+    New file to act as the template for the test wrapper script.
+
+    * configure.ac
+    Generate tests/test_wrapper.sh from the template.
+
+    * tests/Makefile.am
+    Replace all tests with a single invocation of the test wrapper script.
+
 2009-02-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ogg.c
