@@ -585,8 +585,12 @@ AC_CONFIG_FILES([ \
 	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile \
 	programs/Makefile doc/libsndfile.css \
 	Makefile libsndfile.spec sndfile.pc \
+	tests/test_wrapper.sh \
 	])
 AC_OUTPUT
+
+# Make it executable.
+chmod u+x tests/test_wrapper
 
 #====================================================================================
 
