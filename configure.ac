@@ -590,7 +590,7 @@ AC_CONFIG_FILES([ \
 AC_OUTPUT
 
 # Make it executable.
-chmod u+x tests/test_wrapper
+chmod u+x tests/test_wrapper.sh
 
 #====================================================================================
 
