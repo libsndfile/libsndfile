@@ -360,7 +360,7 @@ mat5_read_header (SF_PRIVATE *psf)
 				{	double	samplerate ;
 
 					psf_binheader_readf (psf, "d", &samplerate) ;
-					LSF_SNPRINTF (name, sizeof (name), "%f\n", samplerate) ;
+					snprintf (name, sizeof (name), "%f\n", samplerate) ;
 					psf_log_printf (psf, "    Val  : %s\n", name) ;
 
 					psf->sf.samplerate = lrint (samplerate) ;

@@ -264,7 +264,7 @@ caf_read_header (SF_PRIVATE *psf)
 
 	psf_binheader_readf (psf, "mE8b", &marker, &chunk_size, psf->u.ucbuf, 8) ;
 	srate = double64_be_read (psf->u.ucbuf) ;
-	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%5.3f", srate) ;
+	snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "%5.3f", srate) ;
 	psf_log_printf (psf, "%M : %D\n  Sample rate  : %s\n", marker, chunk_size, psf->u.cbuf) ;
 	if (marker != desc_MARKER)
 		return SFE_CAF_NO_DESC ;
@@ -315,7 +315,7 @@ caf_read_header (SF_PRIVATE *psf)
 					psf->peak_info->peaks [k].value = value ;
 					psf->peak_info->peaks [k].position = position ;
 
-					LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "    %2d   %-12ld   %g\n", k, (long) position, value) ;
+					snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "    %2d   %-12ld   %g\n", k, (long) position, value) ;
 					psf_log_printf (psf, psf->u.cbuf) ;
 					} ;
 

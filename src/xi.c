@@ -95,7 +95,7 @@ xi_open	(SF_PRIVATE *psf)
 		memcpy (pxi->software, PACKAGE "-" VERSION "               ", sizeof (pxi->software)) ;
 
 		memset (pxi->sample_name, 0, sizeof (pxi->sample_name)) ;
-		LSF_SNPRINTF (pxi->sample_name, sizeof (pxi->sample_name), "%s", "Sample #1") ;
+		snprintf (pxi->sample_name, sizeof (pxi->sample_name), "%s", "Sample #1") ;
 
 		pxi->sample_flags = (subformat == SF_FORMAT_DPCM_16) ? 16 : 0 ;
 

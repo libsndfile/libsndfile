@@ -123,7 +123,7 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 		return 0 ;
 
 	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
-	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s/rsrc", psf->filepath) ;
+	snprintf (psf->rsrcpath, sizeof (psf->rsrcpath), "%s/rsrc", psf->filepath) ;
 	psf->error = SFE_NO_ERROR ;
 	if ((psf->rsrcdes = psf_open_fd (psf->rsrcpath, open_mode)) >= 0)
 	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrcdes) ;
@@ -142,7 +142,7 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	** Now try for a resource fork stored as a separate file in the same
 	** directory, but preceded with a dot underscore.
 	*/
-	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s._%s", psf->directory, psf->filename) ;
+	snprintf (psf->rsrcpath, sizeof (psf->rsrcpath), "%s._%s", psf->directory, psf->filename) ;
 	psf->error = SFE_NO_ERROR ;
 	if ((psf->rsrcdes = psf_open_fd (psf->rsrcpath, open_mode)) >= 0)
 	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrcdes) ;
@@ -153,7 +153,7 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	** Now try for a resource fork stored in a separate file in the
 	** .AppleDouble/ directory.
 	*/
-	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s.AppleDouble/%s", psf->directory, psf->filename) ;
+	snprintf (psf->rsrcpath, sizeof (psf->rsrcpath), "%s.AppleDouble/%s", psf->directory, psf->filename) ;
 	psf->error = SFE_NO_ERROR ;
 	if ((psf->rsrcdes = psf_open_fd (psf->rsrcpath, open_mode)) >= 0)
 	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrcdes) ;
@@ -568,7 +568,7 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 	/* Only log an error if no error has been set yet. */
 	if (psf->error == 0)
 	{	psf->error = SFE_SYSTEM ;
-		LSF_SNPRINTF (psf->syserr, sizeof (psf->syserr), "System error : %s.", strerror (error)) ;
+		snprintf (psf->syserr, sizeof (psf->syserr), "System error : %s.", strerror (error)) ;
 		} ;
 
 	return ;
@@ -637,7 +637,7 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 		return 0 ;
 
 	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
-	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s/rsrc", psf->filepath) ;
+	snprintf (psf->rsrcpath, sizeof (psf->rsrcpath), "%s/rsrc", psf->filepath) ;
 	psf->error = SFE_NO_ERROR ;
 	if ((psf->hrsrc = psf_open_handle (psf->rsrcpath, open_mode)) != NULL)
 	{	psf->rsrclength = psf_get_filelen_handle (psf->hrsrc) ;
@@ -648,7 +648,7 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	** Now try for a resource fork stored as a separate file in the same
 	** directory, but preceded with a dot underscore.
 	*/
-	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s._%s", psf->directory, psf->filename) ;
+	snprintf (psf->rsrcpath, sizeof (psf->rsrcpath), "%s._%s", psf->directory, psf->filename) ;
 	psf->error = SFE_NO_ERROR ;
 	if ((psf->hrsrc = psf_open_handle (psf->rsrcpath, open_mode)) != NULL)
 	{	psf->rsrclength = psf_get_filelen_handle (psf->hrsrc) ;
@@ -659,7 +659,7 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	** Now try for a resource fork stored in a separate file in the
 	** .AppleDouble/ directory.
 	*/
-	LSF_SNPRINTF (psf->rsrcpath, sizeof (psf->rsrcpath), "%s.AppleDouble/%s", psf->directory, psf->filename) ;
+	snprintf (psf->rsrcpath, sizeof (psf->rsrcpath), "%s.AppleDouble/%s", psf->directory, psf->filename) ;
 	psf->error = SFE_NO_ERROR ;
 	if ((psf->hrsrc = psf_open_handle (psf->rsrcpath, open_mode)) != NULL)
 	{	psf->rsrclength = psf_get_filelen_handle (psf->hrsrc) ;
@@ -806,7 +806,7 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 			NULL
 			) ;
 
-		LSF_SNPRINTF (psf->syserr, sizeof (psf->syserr), "System error : %s", lpMsgBuf) ;
+		snprintf (psf->syserr, sizeof (psf->syserr), "System error : %s", lpMsgBuf) ;
 		LocalFree (lpMsgBuf) ;
 		} ;
 
@@ -1516,7 +1516,7 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 	/* Only log an error if no error has been set yet. */
 	if (psf->error == 0)
 	{	psf->error = SFE_SYSTEM ;
-		LSF_SNPRINTF (psf->syserr, sizeof (psf->syserr), "System error : %s", strerror (error)) ;
+		snprintf (psf->syserr, sizeof (psf->syserr), "System error : %s", strerror (error)) ;
 		} ;
 
 	return ;

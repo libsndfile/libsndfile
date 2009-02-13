@@ -193,7 +193,7 @@ gen_coding_history (char * added_history, int added_history_max, const SF_INFO *
 			break ;
 
 		default :
-			LSF_SNPRINTF (chnstr, sizeof (chnstr), "%uchn", psfinfo->channels) ;
+			snprintf (chnstr, sizeof (chnstr), "%uchn", psfinfo->channels) ;
 			break ;
 		} ;
 
@@ -226,7 +226,7 @@ gen_coding_history (char * added_history, int added_history_max, const SF_INFO *
 			break ;
 		} ;
 
-	count = LSF_SNPRINTF (added_history, added_history_max,
+	count = snprintf (added_history, added_history_max,
 							"A=PCM,F=%u,W=%hu,M=%s,T=%s-%s\r\n",
 							psfinfo->samplerate, width, chnstr, PACKAGE, VERSION) ;
 

@@ -357,19 +357,19 @@ sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user
 	/* Make sure we have a valid set ot virtual pointers. */
 	if (sfvirtual->get_filelen == NULL || sfvirtual->seek == NULL || sfvirtual->tell == NULL)
 	{	sf_errno = SFE_BAD_VIRTUAL_IO ;
-		LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "Bad vio_get_filelen / vio_seek / vio_tell in SF_VIRTUAL_IO struct.\n") ;
+		snprintf (sf_logbuffer, sizeof (sf_logbuffer), "Bad vio_get_filelen / vio_seek / vio_tell in SF_VIRTUAL_IO struct.\n") ;
 		return NULL ;
 		} ;
 
 	if ((mode == SFM_READ || mode == SFM_RDWR) && sfvirtual->read == NULL)
 	{	sf_errno = SFE_BAD_VIRTUAL_IO ;
-		LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "Bad vio_read in SF_VIRTUAL_IO struct.\n") ;
+		snprintf (sf_logbuffer, sizeof (sf_logbuffer), "Bad vio_read in SF_VIRTUAL_IO struct.\n") ;
 		return NULL ;
 		} ;
 
 	if ((mode == SFM_WRITE || mode == SFM_RDWR) && sfvirtual->write == NULL)
 	{	sf_errno = SFE_BAD_VIRTUAL_IO ;
-		LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "Bad vio_write in SF_VIRTUAL_IO struct.\n") ;
+		snprintf (sf_logbuffer, sizeof (sf_logbuffer), "Bad vio_write in SF_VIRTUAL_IO struct.\n") ;
 		return NULL ;
 		} ;
 
@@ -517,7 +517,7 @@ sf_error_str (SNDFILE *sndfile, char *str, size_t maxlen)
 		errnum = psf->error ;
 		} ;
 
-	LSF_SNPRINTF (str, maxlen, "%s", sf_error_number (errnum)) ;
+	snprintf (str, maxlen, "%s", sf_error_number (errnum)) ;
 
 	return SFE_NO_ERROR ;
 } /* sf_error_str */
@@ -825,9 +825,9 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			if (data == NULL)
 				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 			if (ENABLE_EXPERIMENTAL_CODE)
-				LSF_SNPRINTF (data, datasize, "%s-%s-exp", PACKAGE_NAME, PACKAGE_VERSION) ;
+				snprintf (data, datasize, "%s-%s-exp", PACKAGE_NAME, PACKAGE_VERSION) ;
 			else
-				LSF_SNPRINTF (data, datasize, "%s-%s", PACKAGE_NAME, PACKAGE_VERSION) ;
+				snprintf (data, datasize, "%s-%s", PACKAGE_NAME, PACKAGE_VERSION) ;
 			return strlen (data) ;
 
 		case SFC_GET_SIMPLE_FORMAT_COUNT :
@@ -872,7 +872,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 	if (sndfile == NULL && command == SFC_GET_LOG_INFO)
 	{	if (data == NULL)
 			return (psf->error = SFE_BAD_COMMAND_PARAM) ;
-		LSF_SNPRINTF (data, datasize, "%s", sf_logbuffer) ;
+		snprintf (data, datasize, "%s", sf_logbuffer) ;
 		return strlen (data) ;
 		} ;
 
@@ -957,7 +957,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 		case SFC_GET_LOG_INFO :
 			if (data == NULL)
 				return SFE_BAD_COMMAND_PARAM ;
-			LSF_SNPRINTF (data, datasize, "%s", psf->logbuffer) ;
+			snprintf (data, datasize, "%s", psf->logbuffer) ;
 			break ;
 
 		case SFC_CALC_SIGNAL_MAX :
@@ -2367,7 +2367,7 @@ validate_psf (SF_PRIVATE *psf)
 
 static void
 save_header_info (SF_PRIVATE *psf)
-{	LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
+{	snprintf (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
 } /* save_header_info */
 
 static void
@@ -2375,16 +2375,16 @@ copy_filename (SF_PRIVATE *psf, const char *path)
 {	const char *ccptr ;
 	char *cptr ;
 
-	LSF_SNPRINTF (psf->filepath, sizeof (psf->filepath), "%s", path) ;
+	snprintf (psf->filepath, sizeof (psf->filepath), "%s", path) ;
 	if ((ccptr = strrchr (path, '/')) || (ccptr = strrchr (path, '\\')))
 		ccptr ++ ;
 	else
 		ccptr = path ;
 
-	LSF_SNPRINTF (psf->filename, sizeof (psf->filename), "%s", ccptr) ;
+	snprintf (psf->filename, sizeof (psf->filename), "%s", ccptr) ;
 
 	/* Now grab the directory. */
-	LSF_SNPRINTF (psf->directory, sizeof (psf->directory), "%s", path) ;
+	snprintf (psf->directory, sizeof (psf->directory), "%s", path) ;
 	if ((cptr = strrchr (psf->directory, '/')) || (cptr = strrchr (psf->directory, '\\')))
 		cptr [1] = 0 ;
 	else
@@ -2774,8 +2774,8 @@ error_exit :
 	sf_errno = error ;
 
 	if (error == SFE_SYSTEM)
-		LSF_SNPRINTF (sf_syserr, sizeof (sf_syserr), "%s", psf->syserr) ;
-	LSF_SNPRINTF (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
+		snprintf (sf_syserr, sizeof (sf_syserr), "%s", psf->syserr) ;
+	snprintf (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
 
 	switch (error)
 	{	case SF_ERR_SYSTEM :

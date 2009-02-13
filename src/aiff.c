@@ -484,7 +484,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						psf->peak_info->peaks [dword].value = value ;
 						psf->peak_info->peaks [dword].position = position ;
 
-						LSF_SNPRINTF (cptr, sizeof (psf->u.scbuf), "    %2d   %-12ld   %g\n",
+						snprintf (cptr, sizeof (psf->u.scbuf), "    %2d   %-12ld   %g\n",
 								dword, (long) psf->peak_info->peaks [dword].position, psf->peak_info->peaks [dword].value) ;
 						cptr [sizeof (psf->u.scbuf) - 1] = 0 ;
 						psf_log_printf (psf, cptr) ;

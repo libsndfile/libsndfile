@@ -490,7 +490,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						psf->peak_info->peaks [dword].value = value ;
 						psf->peak_info->peaks [dword].position = position ;
 
-						LSF_SNPRINTF (cptr, sizeof (psf->u.cbuf), "    %2d   %-12ld   %g\n",
+						snprintf (cptr, sizeof (psf->u.cbuf), "    %2d   %-12ld   %g\n",
 								dword, (long) psf->peak_info->peaks [dword].position, psf->peak_info->peaks [dword].value) ;
 						cptr [sizeof (psf->u.cbuf) - 1] = 0 ;
 						psf_log_printf (psf, cptr) ;
@@ -1444,7 +1444,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 
 	bytesread += psf_binheader_readf (psf, "4", &dword) ;
 	if (dword != 0)
-	{	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%f",
+	{	snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "%f",
 				 (1.0 * 0x80000000) / ((unsigned int) dword)) ;
 		psf_log_printf (psf, "  Pitch Fract. : %s\n", psf->u.cbuf) ;
 		}
@@ -1455,7 +1455,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	psf_log_printf (psf, "  SMPTE Format : %u\n", dword) ;
 
 	bytesread += psf_binheader_readf (psf, "4", &dword) ;
-	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%02d:%02d:%02d %02d",
+	snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "%02d:%02d:%02d %02d",
 		 (dword >> 24) & 0x7F, (dword >> 16) & 0x7F, (dword >> 8) & 0x7F, dword & 0x7F) ;
 	psf_log_printf (psf, "  SMPTE Offset : %s\n", psf->u.cbuf) ;
 
@@ -1593,7 +1593,7 @@ wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 
 	bytesread += psf_binheader_readf (psf, "422f", &flags, &rootnote, &q1, &q2) ;
 
-	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%f", q2) ;
+	snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "%f", q2) ;
 
 	psf_log_printf (psf, "  Flags     : 0x%04x (%s,%s,%s,%s,%s)\n", flags,
 			(flags & 0x01) ? "OneShot" : "Loop",
@@ -1606,7 +1606,7 @@ wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 				rootnote, q1, psf->u.cbuf) ;
 
 	bytesread += psf_binheader_readf (psf, "422f", &beats, &meter_denom, &meter_numer, &tempo) ;
-	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), "%f", tempo) ;
+	snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "%f", tempo) ;
 	psf_log_printf (psf, "  Beats     : %d\n  Meter     : %d/%d\n  Tempo     : %s\n",
 				beats, meter_numer, meter_denom, psf->u.cbuf) ;
 

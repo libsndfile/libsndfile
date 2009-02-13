@@ -244,7 +244,7 @@ mat4_read_header (SF_PRIVATE *psf)
 
 	psf_binheader_readf (psf, "d", &value) ;
 
-	LSF_SNPRINTF (psf->u.cbuf, sizeof (psf->u.cbuf), " Value : %f\n", value) ;
+	snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), " Value : %f\n", value) ;
 	psf_log_printf (psf, psf->u.cbuf) ;
 
 	if ((rows != 1) || (cols != 1))
@@ -383,7 +383,7 @@ mat4_marker_to_str (int marker)
 
 	/* This is a little unsafe but is really only for debugging. */
 	str [sizeof (str) - 1] = 0 ;
-	LSF_SNPRINTF (str, sizeof (str) - 1, "%08X", marker) ;
+	snprintf (str, sizeof (str) - 1, "%08X", marker) ;
 	return str ;
 } /* mat4_marker_to_str */
 

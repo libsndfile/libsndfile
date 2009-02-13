@@ -112,7 +112,7 @@ pvf_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 	if (psf->is_pipe == SF_FALSE)
 		psf_fseek (psf, 0, SEEK_SET) ;
 
-	LSF_SNPRINTF ((char*) psf->header, sizeof (psf->header), "PVF1\n%d %d %d\n",
+	snprintf ((char*) psf->header, sizeof (psf->header), "PVF1\n%d %d %d\n",
 		psf->sf.channels, psf->sf.samplerate, psf->bytewidth * 8) ;
 
 	psf->headindex = strlen ((char*) psf->header) ;

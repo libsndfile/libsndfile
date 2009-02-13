@@ -812,29 +812,6 @@ const char * str_of_open_mode (int mode) ;
 const char * str_of_endianness (int end) ;
 
 /*------------------------------------------------------------------------------------
-** Here's how we fix systems which don't snprintf / vsnprintf.
-** Systems without these functions should use the
-*/
-
-#if USE_WINDOWS_API
-#define	LSF_SNPRINTF	_snprintf
-#elif		(HAVE_SNPRINTF && ! FORCE_MISSING_SNPRINTF)
-#define	LSF_SNPRINTF	snprintf
-#else
-int missing_snprintf (char *str, size_t n, char const *fmt, ...) ;
-#define	LSF_SNPRINTF	missing_snprintf
-#endif
-
-#if USE_WINDOWS_API
-#define	LSF_VSNPRINTF	_vsnprintf
-#elif		(HAVE_VSNPRINTF && ! FORCE_MISSING_SNPRINTF)
-#define	LSF_VSNPRINTF	vsnprintf
-#else
-int missing_vsnprintf (char *str, size_t n, const char *fmt, ...) ;
-#define	LSF_VSNPRINTF	missing_vsnprintf
-#endif
-
-/*------------------------------------------------------------------------------------
 ** Extra commands for sf_command(). Not for public use yet.
 */
 

@@ -336,7 +336,7 @@ psf_asciiheader_printf (SF_PRIVATE *psf, const char *format, ...)
 	maxlen	= sizeof (psf->header) - maxlen ;
 
 	va_start (argptr, format) ;
-	LSF_VSNPRINTF (start, maxlen, format, argptr) ;
+	vsnprintf (start, maxlen, format, argptr) ;
 	va_end (argptr) ;
 
 	/* Make sure the string is properly terminated. */
@@ -1231,11 +1231,11 @@ psf_get_date_str (char *str, int maxlen)
 #endif
 
 	if (tmptr)
-		LSF_SNPRINTF (str, maxlen, "%4d-%02d-%02d %02d:%02d:%02d UTC",
+		snprintf (str, maxlen, "%4d-%02d-%02d %02d:%02d:%02d UTC",
 			1900 + timedata.tm_year, timedata.tm_mon, timedata.tm_mday,
 			timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
 	else
-		LSF_SNPRINTF (str, maxlen, "Unknown date") ;
+		snprintf (str, maxlen, "Unknown date") ;
 
 	return ;
 } /* psf_get_date_str */

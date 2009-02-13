@@ -249,9 +249,9 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 	rsrc.rsrc_len = sizeof (psf->header) ;
 	memset (rsrc.rsrc_data, 0xea, rsrc.rsrc_len) ;
 
-	LSF_SNPRINTF (str_rsrc [0].value, sizeof (str_rsrc [0].value), "_%d", rsrc.sample_size) ;
-	LSF_SNPRINTF (str_rsrc [1].value, sizeof (str_rsrc [1].value), "_%d.000000", rsrc.sample_rate) ;
-	LSF_SNPRINTF (str_rsrc [2].value, sizeof (str_rsrc [2].value), "_%d", rsrc.channels) ;
+	snprintf (str_rsrc [0].value, sizeof (str_rsrc [0].value), "_%d", rsrc.sample_size) ;
+	snprintf (str_rsrc [1].value, sizeof (str_rsrc [1].value), "_%d.000000", rsrc.sample_rate) ;
+	snprintf (str_rsrc [2].value, sizeof (str_rsrc [2].value), "_%d", rsrc.channels) ;
 
 	for (k = 0 ; k < ARRAY_LEN (str_rsrc) ; k++)
 	{	if (str_rsrc [k].value_len == 0)
