@@ -1,3 +1,10 @@
+2009-02-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * M4/octave.m4
+    Clear the TERM environment before evaluating anything in Octave. This works
+    around problems that might occur if a users TERM settings are incorrect.
+    Thanks to Rob Til Freedmen for helping to debug this.
+
 2009-02-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/*.c
