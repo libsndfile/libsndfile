@@ -1,3 +1,8 @@
+2009-02-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/file_io.c
+    In windows code, cast LPVOID to 'char*' in printf.
+
 2009-02-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * M4/octave.m4

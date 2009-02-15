@@ -806,7 +806,7 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 			NULL
 			) ;
 
-		snprintf (psf->syserr, sizeof (psf->syserr), "System error : %s", lpMsgBuf) ;
+		snprintf (psf->syserr, sizeof (psf->syserr), "System error : %s", (char*) lpMsgBuf) ;
 		LocalFree (lpMsgBuf) ;
 		} ;
 
