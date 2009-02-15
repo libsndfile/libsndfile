@@ -5,6 +5,10 @@
     around problems that might occur if a users TERM settings are incorrect.
     Thanks to Rob Til Freedmen for helping to debug this.
 
+    * src/wav.c
+    Handle four zero bytes as a marker within a LIST or INFO chunk.
+    Thanks to Rogério Brito for supplying an example file.
+
 2009-02-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/*.c

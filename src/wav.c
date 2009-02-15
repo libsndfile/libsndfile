@@ -1380,6 +1380,17 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 					bytesread += exif_subchunk_parse (psf, length - bytesread) ;
 					break ;
 
+			case 0 :
+					/*
+					**	Four zero bytes where a marker was expected. Assume this means
+					**	the rest of the chunk is garbage.
+					*/
+					psf_log_printf (psf, "    *** Found weird-ass zero marker. Jumping to end of chunk.\n") ;
+					if (bytesread < length)
+						bytesread += psf_binheader_readf (psf, "j", length - bytesread + 4) ;
+					psf_log_printf (psf, "    *** Offset is now : 0x%X\n", psf_fseek (psf, 0, SEEK_CUR)) ;
+					return 0 ;
+
 			default :
 					psf_binheader_readf (psf, "4", &dword) ;
 					bytesread += sizeof (dword) ;
