@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.57)
 
-AC_INIT([libsndfile],[1.0.19pre1],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.19pre3],[erikd@mega-nerd.com])
 
 # Put config stuff in Cfg.
 AC_CONFIG_AUX_DIR(Cfg)
@@ -298,7 +298,7 @@ else
 	PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
 	# Yes we really do need vorbis >= 1.2.2 for vorbis_version_string and
-	# >= 1.21 because earlier versions are not const correct at the API level.
+	# >= 1.2.1 because earlier versions are not const correct at the API level.
 	PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.2, ac_cv_vorbis=yes, ac_cv_vorbis=no)
 	PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.2, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
 	fi
