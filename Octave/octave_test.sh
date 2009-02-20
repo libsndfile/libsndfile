@@ -54,10 +54,14 @@ case `file -b $sndfile_oct_location/sndfile.oct` in
 		;;
 	esac
 
+
+# Make sure the TERM environment variable doesn't contain anything wrong.
+unset TERM
+
 # echo "libsndfile_lib_location : $libsndfile_lib_location"
 # echo "sndfile_oct_location : $sndfile_oct_location"
 
-LD_LIBRARY_PATH="$libsndfile_lib_location:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$libsndfile_lib_location:$LD_LIBRARY_PATH"
 
 octave_src_dir=`(cd $octave_src_dir && pwd)`
 

@@ -1,3 +1,8 @@
+2009-02-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Octave/octave_test.sh
+    Unset TERM environment variable and export LD_LIBRARY_PATH.
+
 2009-02-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/file_io.c
