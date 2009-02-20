@@ -816,14 +816,17 @@ sf_format_check	(const SF_INFO *info)
 
 int
 sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
-{	SF_PRIVATE 	*psf = NULL ;
+{	SF_PRIVATE *psf = (SF_PRIVATE *) sndfile ;
 	int old_value ;
 
 	/* This set of commands do not need the sndfile parameter. */
 	switch (command)
 	{	case SFC_GET_LIB_VERSION :
 			if (data == NULL)
-				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
+			{   if (psf)
+					psf->error = SFE_BAD_COMMAND_PARAM ;
+				return SFE_BAD_COMMAND_PARAM ;
+				} ;
 			if (ENABLE_EXPERIMENTAL_CODE)
 				snprintf (data, datasize, "%s-%s-exp", PACKAGE_NAME, PACKAGE_VERSION) ;
 			else
