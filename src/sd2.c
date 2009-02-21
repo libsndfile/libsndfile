@@ -477,6 +477,12 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 		goto parse_rsrc_fork_cleanup ;
 		} ;
 
+	if (rsrc.map_offset + 26 >= rsrc.rsrc_len)
+	{	psf_log_printf (psf, "Bad map offset (%d + 26 > %d).\n", rsrc.map_offset, rsrc.rsrc_len) ;
+		error = SFE_SD2_BAD_RSRC ;
+		goto parse_rsrc_fork_cleanup ;
+		} ;
+
 	rsrc.string_offset = rsrc.map_offset + read_short (rsrc.rsrc_data, rsrc.map_offset + 26) ;
 	if (rsrc.string_offset > rsrc.rsrc_len)
 	{	psf_log_printf (psf, "Bad string offset (%d).\n", rsrc.string_offset) ;
