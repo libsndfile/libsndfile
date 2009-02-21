@@ -3,6 +3,11 @@
     * src/sd2.c
     Validate data before using.
 
+    * src/caf.c
+    Validate channels per frame value before using, fixing a possible integer
+    overflow bug, leading to a possible heap overflow. Found by Alin Rad Pop of
+    Secunia Research (CVE-2009-0186).
+
 2009-02-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * Octave/octave_test.sh
@@ -91,7 +96,7 @@
 2009-01-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/index.html
-	Fix links to versions of the LGPL.
+    Fix links to versions of the LGPL.
 
 2008-12-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
