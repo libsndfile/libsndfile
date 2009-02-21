@@ -112,7 +112,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_RDWR_POSITION		, "Error on RDWR position (cryptic)." },
 	{	SFE_RDWR_BAD_HEADER		, "Error : Cannot open file in read/write mode due to string data in header." },
 	{	SFE_CMD_HAS_DATA		, "Error : Command fails because file already has audio data." },
-	
+
 	{	SFE_STR_NO_SUPPORT		, "Error : File type does not support string data." },
 	{	SFE_STR_NOT_WRITE		, "Error : Trying to set a string when file is not in write mode." },
 	{	SFE_STR_MAX_DATA		, "Error : Maximum string data storage reached." },
@@ -823,7 +823,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 	switch (command)
 	{	case SFC_GET_LIB_VERSION :
 			if (data == NULL)
-			{   if (psf)
+			{	if (psf)
 					psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SFE_BAD_COMMAND_PARAM ;
 				} ;
