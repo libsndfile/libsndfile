@@ -23,6 +23,7 @@
 
     * src/aiff.c
     Fix potential memory leak in handling of 'MARK' chunk.
+	Remove un-needed test (unsigned > 0).
 
 2009-02-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

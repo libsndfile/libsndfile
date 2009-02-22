@@ -548,10 +548,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
-					if (dword > SIGNED_SIZEOF (psf->u.cbuf))
+					if (dword >= sizeof (psf->u.cbuf))
 						cptr [sizeof (psf->u.cbuf) - 1] = 0 ;
 					else
-						cptr [dword > 0 ? dword : 0] = 0 ;
+						cptr [dword] = 0 ;
 
 					psf_sanitize_string (cptr, dword) ;
 
