@@ -247,29 +247,21 @@ info_dump (const char *filename)
 	puts (strbuffer) ;
 	printf ("----------------------------------------\n") ;
 
-	if (file == NULL)
-	{	printf ("Error : Not able to open input file %s.\n", filename) ;
-		fflush (stdout) ;
-		memset (data, 0, sizeof (data)) ;
-		puts (sf_strerror (NULL)) ;
-		}
-	else
-	{	printf ("Sample Rate : %d\n", sfinfo.samplerate) ;
-		printf ("Frames      : %" PRId64 "\n", sfinfo.frames) ;
-		printf ("Channels    : %d\n", sfinfo.channels) ;
-		printf ("Format      : 0x%08X\n", sfinfo.format) ;
-		printf ("Sections    : %d\n", sfinfo.sections) ;
-		printf ("Seekable    : %s\n", (sfinfo.seekable ? "TRUE" : "FALSE")) ;
-		printf ("Duration    : %s\n", generate_duration_str (&sfinfo)) ;
+	printf ("Sample Rate : %d\n", sfinfo.samplerate) ;
+	printf ("Frames      : %" PRId64 "\n", sfinfo.frames) ;
+	printf ("Channels    : %d\n", sfinfo.channels) ;
+	printf ("Format      : 0x%08X\n", sfinfo.format) ;
+	printf ("Sections    : %d\n", sfinfo.sections) ;
+	printf ("Seekable    : %s\n", (sfinfo.seekable ? "TRUE" : "FALSE")) ;
+	printf ("Duration    : %s\n", generate_duration_str (&sfinfo)) ;
 
-		if (sfinfo.frames < 100 * 1024 * 1024)
-		{	/* Do not use sf_signal_max because it doesn't work for non-seekable files . */
-			signal_max = get_signal_max (file) ;
-			decibels = calc_decibels (&sfinfo, signal_max) ;
-			printf ("Signal Max  : %g (%4.2f dB)\n", signal_max, decibels) ;
-			} ;
-		putchar ('\n') ;
+	if (sfinfo.frames < 100 * 1024 * 1024)
+	{	/* Do not use sf_signal_max because it doesn't work for non-seekable files . */
+		signal_max = get_signal_max (file) ;
+		decibels = calc_decibels (&sfinfo, signal_max) ;
+		printf ("Signal Max  : %g (%4.2f dB)\n", signal_max, decibels) ;
 		} ;
+	putchar ('\n') ;
 
 	sf_close (file) ;
 
