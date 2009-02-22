@@ -93,6 +93,16 @@ static int aiff_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima) ;
 static int aiff_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima) ;
 
 
+static inline int
+clamp_ima_step_index (int indx)
+{	if (indx < 0)
+		return 0 ;
+	if (indx >= ARRAY_LEN (ima_step_size))
+		return ARRAY_LEN (ima_step_size) - 1 ;
+
+	return indx ;
+} /* clamp_ima_step_index */
+
 /*============================================================================================
 ** IMA ADPCM Reader initialisation function.
 */
@@ -269,15 +279,6 @@ count ++ ;
 		predictor = (blockdata [0] << 8) | (blockdata [1] & 0x80) ;
 		stepindx = blockdata [1] & 0x7F ;
 
-{
-if (count < 5)
-printf ("\nchan: %d    predictor: %d    stepindx: %d (%d)\n",
-	chan, predictor, stepindx, ima_step_size [stepindx]) ;
-}
-		/* FIXME : Do this a better way. */
-		if (stepindx < 0) stepindx = 0 ;
-		else if (stepindx > 88)	stepindx = 88 ;
-
 		/*
 		**	Pull apart the packed 4 bit samples and store them in their
 		**	correct sample positions.
@@ -290,7 +291,8 @@ printf ("\nchan: %d    predictor: %d    stepindx: %d (%d)\n",
 
 		/* Decode the encoded 4 bit samples. */
 		for (k = 0 ; k < pima->samplesperblock ; k ++)
-		{	step = ima_step_size [stepindx] ;
+		{	stepindx = clamp_ima_step_index (stepindx) ;
+			step = ima_step_size [stepindx] ;
 
 			bytecode = pima->samples [pima->channels * k + chan] ;
 
@@ -306,17 +308,9 @@ printf ("\nchan: %d    predictor: %d    stepindx: %d (%d)\n",
 			if (bytecode & 8)	diff = -diff ;
 
 			predictor += diff ;
-
 			pima->samples [pima->channels * k + chan] = predictor ;
 			} ;
 		} ;
-
-if (count < 5)
-{
-	for (k = 0 ; k < 10 ; k++)
-		printf ("% 7d,", pima->samples [k]) ;
-	puts ("") ;
-}
 
 	return 1 ;
 } /* aiff_ima_decode_block */
@@ -351,6 +345,7 @@ count ++ ;
 		diff = pima->samples [k] - pima->previous [chan] ;
 
 		bytecode = 0 ;
+		pima->stepindx [chan] = clamp_ima_step_index (pima->stepindx [chan]) ;
 		step = ima_step_size [pima->stepindx [chan]] ;
 		vpdiff = step >> 3 ;
 		if (diff < 0)
@@ -378,12 +373,8 @@ count ++ ;
 		else if (pima->previous [chan] < -32768)
 			pima->previous [chan] = -32768 ;
 
+		/* This gets clamped before use. */
 		pima->stepindx [chan] += ima_indx_adjust [bytecode] ;
-		if (pima->stepindx [chan] < 0)
-			pima->stepindx [chan] = 0 ;
-		else if (pima->stepindx [chan] > 88)
-			pima->stepindx [chan] = 88 ;
-
 		pima->samples [k] = bytecode ;
 		} ;
 
@@ -477,6 +468,7 @@ wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 
 		bytecode = pima->samples [k] & 0xF ;
 
+		stepindx [chan] = clamp_ima_step_index (stepindx [chan]) ;
 		step = ima_step_size [stepindx [chan]] ;
 		current = pima->samples [k - pima->channels] ;
 
@@ -497,13 +489,8 @@ wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 		else if (current < -32768)
 			current = -32768 ;
 
+		/* This get clamped before use. */
 		stepindx [chan] += ima_indx_adjust [bytecode] ;
-
-		if (stepindx [chan] < 0)
-			stepindx [chan] = 0 ;
-		else if (stepindx [chan] > 88)
-			stepindx [chan] = 88 ;
-
 		pima->samples [k] = current ;
 		} ;
 
@@ -534,6 +521,7 @@ wav_w64_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 		diff = pima->samples [k] - pima->previous [chan] ;
 
 		bytecode = 0 ;
+		pima->stepindx [chan] = clamp_ima_step_index (pima->stepindx [chan]) ;
 		step = ima_step_size [pima->stepindx [chan]] ;
 		vpdiff = step >> 3 ;
 		if (diff < 0)
@@ -562,11 +550,6 @@ wav_w64_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 			pima->previous [chan] = -32768 ;
 
 		pima->stepindx [chan] += ima_indx_adjust [bytecode] ;
-		if (pima->stepindx [chan] < 0)
-			pima->stepindx [chan] = 0 ;
-		else if (pima->stepindx [chan] > 88)
-			pima->stepindx [chan] = 88 ;
-
 		pima->samples [k] = bytecode ;
 		} ;
 
