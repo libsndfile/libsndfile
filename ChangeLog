@@ -3,7 +3,7 @@
     * src/ima_adpcm.c
     Clamp values to a valid range before indexing ima_step_size array.
 
-    * src/GSM610/*.c tests/*c programs/*.c
+    * src/GSM610/*.c tests/*c programs/*.c src/audio_detect.c
     Don't include un-needed headers.
 
     * programs/sndfile-info.c

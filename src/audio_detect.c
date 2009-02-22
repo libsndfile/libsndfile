@@ -30,7 +30,6 @@
 #include <errno.h>
 
 #include "common.h"
-#include "sfendian.h"
 
 typedef struct
 {	int le_float ;
