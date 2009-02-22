@@ -763,8 +763,14 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 						bytesread = psf_binheader_readf (psf, "E2", &n) ;
 						mark_count = n ;
-						markstr = calloc (mark_count, sizeof (MARK_ID_POS)) ;
 						psf_log_printf (psf, "  Count : %d\n", mark_count) ;
+						if (markstr != NULL)
+						{	psf_log_printf (psf, "*** Second MARK chunk found. Throwing away the first.\n") ;
+							free (markstr) ;
+							} ;
+						markstr = calloc (mark_count, sizeof (MARK_ID_POS)) ;
+						if (markstr == NULL)
+							return SFE_MALLOC_FAILED ;
 
 						for (n = 0 ; n < mark_count && bytesread < dword ; n++)
 						{	bytesread += psf_binheader_readf (psf, "E241", &mark_id, &position, &pstr_len) ;

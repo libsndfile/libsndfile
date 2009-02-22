@@ -18,6 +18,12 @@
     * tests/win32_test.c
     Add missing close on file descriptor.
 
+    * src/nist.c programs/sndfile-metadata-set.c
+    Fix 'unused variable' warnings.
+
+    * src/aiff.c
+    Fix potential memory leak in handling of 'MARK' chunk.
+
 2009-02-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sd2.c
