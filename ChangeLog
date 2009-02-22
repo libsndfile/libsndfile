@@ -12,6 +12,9 @@
     * tests/test_wrapper.sh.in
 	Add 'set -e' so the script exits on error.
 
+    * src/test_ima_oki_adpcm.c
+    Fix read beyond end of array.
+
 2009-02-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sd2.c
