@@ -28,7 +28,6 @@
 #include	<sndfile.h>
 
 #include	"utils.h"
-#include	"generate.h"
 #include	"dft_cmp.h"
 
 #define	SAMPLE_RATE		16000

@@ -28,7 +28,6 @@
 #include	<sndfile.h>
 
 #include	"utils.h"
-#include	"generate.h"
 
 #define	SAMPLE_RATE			44100
 #define	DATA_LENGTH			(SAMPLE_RATE / 8)
