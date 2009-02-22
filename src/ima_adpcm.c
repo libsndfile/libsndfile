@@ -277,7 +277,9 @@ count ++ ;
 		sampledata = pima->samples + chan ;
 
 		predictor = (blockdata [0] << 8) | (blockdata [1] & 0x80) ;
+
 		stepindx = blockdata [1] & 0x7F ;
+		stepindx = clamp_ima_step_index (stepindx) ;
 
 		/*
 		**	Pull apart the packed 4 bit samples and store them in their
@@ -291,15 +293,12 @@ count ++ ;
 
 		/* Decode the encoded 4 bit samples. */
 		for (k = 0 ; k < pima->samplesperblock ; k ++)
-		{	stepindx = clamp_ima_step_index (stepindx) ;
-			step = ima_step_size [stepindx] ;
+		{	step = ima_step_size [stepindx] ;
 
 			bytecode = pima->samples [pima->channels * k + chan] ;
 
 			stepindx += ima_indx_adjust [bytecode] ;
-
-			if (stepindx < 0) stepindx = 0 ;
-			else if (stepindx > 88) stepindx = 88 ;
+			stepindx = clamp_ima_step_index (stepindx) ;
 
 			diff = step >> 3 ;
 			if (bytecode & 1)	diff += step >> 2 ;
@@ -320,14 +319,6 @@ aiff_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 {	int		chan, k, step, diff, vpdiff, blockindx, indx ;
 	short	bytecode, mask ;
 
-static int count = 0 ;
-if (0 && count == 0)
-{	pima->samples [0] = 0 ;
-	printf ("blocksize : %d\n", pima->blocksize) ;
-	printf ("pima->stepindx [0] : %d\n", pima->stepindx [0]) ;
-	}
-count ++ ;
-
 	/* Encode the block header. */
 	for (chan = 0 ; chan < pima->channels ; chan ++)
 	{	blockindx = chan * pima->blocksize ;
@@ -345,7 +336,6 @@ count ++ ;
 		diff = pima->samples [k] - pima->previous [chan] ;
 
 		bytecode = 0 ;
-		pima->stepindx [chan] = clamp_ima_step_index (pima->stepindx [chan]) ;
 		step = ima_step_size [pima->stepindx [chan]] ;
 		vpdiff = step >> 3 ;
 		if (diff < 0)
@@ -373,8 +363,9 @@ count ++ ;
 		else if (pima->previous [chan] < -32768)
 			pima->previous [chan] = -32768 ;
 
-		/* This gets clamped before use. */
 		pima->stepindx [chan] += ima_indx_adjust [bytecode] ;
+
+		pima->stepindx [chan] = clamp_ima_step_index (pima->stepindx [chan]) ;
 		pima->samples [k] = bytecode ;
 		} ;
 
@@ -383,9 +374,6 @@ count ++ ;
 	for (chan = 0 ; chan < pima->channels ; chan ++)
 	{	for (indx = pima->channels ; indx < pima->channels * pima->samplesperblock ; indx += 2 * pima->channels)
 		{	blockindx = chan * pima->blocksize + 2 + indx / 2 ;
-
-if (0 && count ++ < 5)
-	printf ("chan: %d    blockindx: %3d    indx: %3d\n", chan, blockindx, indx) ;
 
 			pima->block [blockindx] = pima->samples [indx] & 0x0F ;
 			pima->block [blockindx] |= (pima->samples [indx + pima->channels] << 4) & 0xF0 ;
@@ -428,10 +416,8 @@ wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 			current -= 0x10000 ;
 
 		stepindx [chan] = pima->block [chan*4+2] ;
-		if (stepindx [chan] < 0)
-			stepindx [chan] = 0 ;
-		else if (stepindx [chan] > 88)
-			stepindx [chan] = 88 ;
+		stepindx [chan] = clamp_ima_step_index (stepindx [chan]) ;
+
 
 		if (pima->block [chan*4+3] != 0)
 			psf_log_printf (psf, "IMA ADPCM synchronisation error.\n") ;
@@ -468,7 +454,6 @@ wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 
 		bytecode = pima->samples [k] & 0xF ;
 
-		stepindx [chan] = clamp_ima_step_index (stepindx [chan]) ;
 		step = ima_step_size [stepindx [chan]] ;
 		current = pima->samples [k - pima->channels] ;
 
@@ -489,8 +474,9 @@ wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 		else if (current < -32768)
 			current = -32768 ;
 
-		/* This get clamped before use. */
 		stepindx [chan] += ima_indx_adjust [bytecode] ;
+		stepindx [chan] = clamp_ima_step_index (stepindx [chan]) ;
+
 		pima->samples [k] = current ;
 		} ;
 
@@ -521,7 +507,6 @@ wav_w64_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 		diff = pima->samples [k] - pima->previous [chan] ;
 
 		bytecode = 0 ;
-		pima->stepindx [chan] = clamp_ima_step_index (pima->stepindx [chan]) ;
 		step = ima_step_size [pima->stepindx [chan]] ;
 		vpdiff = step >> 3 ;
 		if (diff < 0)
@@ -550,6 +535,8 @@ wav_w64_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 			pima->previous [chan] = -32768 ;
 
 		pima->stepindx [chan] += ima_indx_adjust [bytecode] ;
+		pima->stepindx [chan] = clamp_ima_step_index (pima->stepindx [chan]) ;
+
 		pima->samples [k] = bytecode ;
 		} ;
 
