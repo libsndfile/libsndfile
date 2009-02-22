@@ -68,7 +68,7 @@ file_open_test (const char *filename)
 		exit (1) ;
 		} ;
 
-	strncpy (psf->filename, filename, sizeof (psf->filename)) ;
+	snprintf (psf->filename, sizeof (psf->filename), "%s", filename) ;
 
 	/* Test that open for read fails if the file doesn't exist. */
 	error = psf_fopen (psf, psf->filename, SFM_READ) ;
@@ -121,7 +121,7 @@ file_read_write_test (const char *filename)
 
 	memset (&sf_data, 0, sizeof (sf_data)) ;
 	psf = &sf_data ;
-	strncpy (psf->filename, filename, sizeof (psf->filename)) ;
+	snprintf (psf->filename, sizeof (psf->filename), "%s", filename) ;
 
 	/* Test file open in write mode. */
 	psf->mode = SFM_WRITE ;
@@ -277,7 +277,7 @@ file_truncate_test (const char *filename)
 	memset (buffer, 0xEE, sizeof (buffer)) ;
 
 	psf = &sf_data ;
-	strncpy (psf->filename, filename, sizeof (psf->filename)) ;
+	snprintf (psf->filename, sizeof (psf->filename), "%s", filename) ;
 
 	/*
 	** Open the file write mode, write 0xEE data and then extend the file
