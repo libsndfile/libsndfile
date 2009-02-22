@@ -10,7 +10,10 @@ if [ ! -f sfversion@EXEEXT@ ]; then
 	fi
 
 sfversion=`./sfversion@EXEEXT@`
-	
+
+# Force exit on errors.
+set -e
+
 # generic-tests
 uname -a
 ./error_test@EXEEXT@

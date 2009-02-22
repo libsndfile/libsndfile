@@ -9,6 +9,9 @@
     * programs/sndfile-info.c
 	Remove dead code.
 
+    * tests/test_wrapper.sh.in
+	Add 'set -e' so the script exits on error.
+
 2009-02-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sd2.c
