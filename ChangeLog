@@ -34,6 +34,9 @@
     * src/wav.c src/rf64.c
     Ifdef out dead code that will be resurected some time in the future.
 
+    * src/xi.c
+    Handle error return values from psf_ftell.
+
 2009-02-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sd2.c

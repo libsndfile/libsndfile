@@ -442,10 +442,14 @@ xi_read_header (SF_PRIVATE *psf)
 		return SFE_XI_EXCESS_SAMPLES ;
 		} ;
 
-	psf->dataoffset = psf_fseek (psf, 0, SEEK_CUR) ;
-	psf_log_printf (psf, "Data Offset : %D\n", psf->dataoffset) ;
-
 	psf->datalength = sample_sizes [0] ;
+
+	psf->dataoffset = psf_ftell (psf) ;
+	if (psf->dataoffset < 0)
+	{	psf_log_printf (psf, "*** Bad Data Offset : %D\n", psf->dataoffset) ;
+		return SFE_BAD_OFFSET ;
+		} ;
+	psf_log_printf (psf, "Data Offset : %D\n", psf->dataoffset) ;
 
 	if (psf->dataoffset + psf->datalength > psf->filelength)
 	{	psf_log_printf (psf, "*** File seems to be truncated. Should be at least %D bytes long.\n",
@@ -453,7 +457,7 @@ xi_read_header (SF_PRIVATE *psf)
 		psf->datalength = psf->filelength - psf->dataoffset ;
 		} ;
 
- 	if (psf_fseek (psf, psf->dataoffset, SEEK_SET) != psf->dataoffset)
+	if (psf_fseek (psf, psf->dataoffset, SEEK_SET) != psf->dataoffset)
 		return SFE_BAD_SEEK ;
 
 	psf->endian = SF_ENDIAN_LITTLE ;
