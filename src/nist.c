@@ -181,12 +181,12 @@ nist_read_header (SF_PRIVATE *psf)
 	if ((cptr = strstr (psf_header, "sample_rate -i ")))
 		sscanf (cptr, "sample_rate -i %d", &(psf->sf.samplerate)) ;
 
-	if ((cptr = strstr (psf_header, "sample_count -i ")))
+	if (strstr (psf_header, "sample_count -i ") != NULL)
 	{	sscanf (psf_header, "sample_count -i %ld", &samples) ;
 		psf->sf.frames = samples ;
 		} ;
 
-	if ((cptr = strstr (psf_header, "sample_n_bytes -i ")))
+	if (strstr (psf_header, "sample_n_bytes -i ") != NULL)
 		sscanf (cptr, "sample_n_bytes -i %d", &(psf->bytewidth)) ;
 
 	/* Default endian-ness (for 8 bit, u-law, A-law. */

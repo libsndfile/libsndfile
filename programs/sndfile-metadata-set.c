@@ -259,18 +259,20 @@ has_bext_fields_set (const METADATA_INFO * info)
 static void
 read_localtime (struct tm * timedata)
 {	time_t		current ;
-	struct tm	*tmptr ;
 
 	time (&current) ;
 	memset (timedata, 0, sizeof (struct tm)) ;
 
 #if defined (HAVE_LOCALTIME_R)
 	/* If the re-entrant version is available, use it. */
-	tmptr = localtime_r (&current, timedata) ;
+	localtime_r (&current, timedata) ;
 #elif defined (HAVE_LOCALTIME)
-	/* Otherwise use the standard one and copy the data to local storage. */
-	tmptr = localtime (&current) ;
-	memcpy (timedata, tmptr, sizeof (struct tm)) ;
+	{
+		struct tm	*tmptr ;
+		/* Otherwise use the standard one and copy the data to local storage. */
+		if ((tmptr = localtime (&current)) != NULL)
+			memcpy (timedata, tmptr, sizeof (struct tm)) ;
+	}
 #endif
 
 	return ;
