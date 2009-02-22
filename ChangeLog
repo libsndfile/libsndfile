@@ -28,6 +28,9 @@
     * src/sd2.c
     Improve handling of heap allocated buffer.
 
+    * src/sndfile.c
+    Remove un-needed test (always true).
+
 2009-02-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sd2.c

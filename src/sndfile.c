@@ -2158,9 +2158,6 @@ format_from_extension (SF_PRIVATE *psf)
 	char buffer [16] ;
 	int format = 0 ;
 
-	if (psf->filename == NULL)
-		return 0 ;
-
 	if ((cptr = strrchr (psf->filename, '.')) == NULL)
 		return 0 ;
 
