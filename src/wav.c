@@ -985,9 +985,11 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 
 		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists */
 			return SFE_UNIMPLEMENTED ;
+#if 0
 			wavex_write_guid (psf, &MSGUID_SUBTYPE_MS_ADPCM) ;
 			add_fact_chunk = SF_TRUE ;
 			break ;
+#endif
 
 		default : return SFE_UNIMPLEMENTED ;
 		} ;

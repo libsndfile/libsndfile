@@ -346,9 +346,11 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 			break ;
 
 		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists */
-			return SFE_UNIMPLEMENTED ;
+#if 0
 			wavex_write_guid (psf, &MSGUID_SUBTYPE_MS_ADPCM) ;
 			break ;
+#endif
+			return SFE_UNIMPLEMENTED ;
 
 		default : return SFE_UNIMPLEMENTED ;
 		} ;
