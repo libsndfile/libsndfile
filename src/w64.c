@@ -377,7 +377,7 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			break ;
 		} ; /* while (1) */
 
-	if (! psf->dataoffset)
+	if (psf->dataoffset <= 0)
 		return SFE_W64_NO_DATA ;
 
 	psf->endian = SF_ENDIAN_LITTLE ;		/* All W64 files are little endian. */

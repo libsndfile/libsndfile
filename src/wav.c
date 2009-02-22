@@ -400,28 +400,30 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					psf->datalength = dword ;
 					psf->dataoffset = psf_ftell (psf) ;
 
-					if (dword == 0 && RIFFsize == 8 && psf->filelength > 44)
-					{	psf_log_printf (psf, "*** Looks like a WAV file which wasn't closed properly. Fixing it.\n") ;
-						psf->datalength = psf->filelength - psf->dataoffset ;
+					if (psf->dataoffset > 0)
+					{	if (dword == 0 && RIFFsize == 8 && psf->filelength > 44)
+						{	psf_log_printf (psf, "*** Looks like a WAV file which wasn't closed properly. Fixing it.\n") ;
+							psf->datalength = psf->filelength - psf->dataoffset ;
+							} ;
+
+						if (psf->datalength > psf->filelength - psf->dataoffset)
+						{	psf_log_printf (psf, "data : %D (should be %D)\n", psf->datalength, psf->filelength - psf->dataoffset) ;
+							psf->datalength = psf->filelength - psf->dataoffset ;
+							}
+						else
+							psf_log_printf (psf, "data : %D\n", psf->datalength) ;
+
+						/* Only set dataend if there really is data at the end. */
+						if (psf->datalength + psf->dataoffset < psf->filelength)
+							psf->dataend = psf->datalength + psf->dataoffset ;
+
+						if (format == WAVE_FORMAT_MS_ADPCM && psf->datalength % 2)
+						{	psf->datalength ++ ;
+							psf_log_printf (psf, "*** Data length odd. Increasing it by 1.\n") ;
+							} ;
 						} ;
 
-					if (psf->datalength > psf->filelength - psf->dataoffset)
-					{	psf_log_printf (psf, "data : %D (should be %D)\n", psf->datalength, psf->filelength - psf->dataoffset) ;
-						psf->datalength = psf->filelength - psf->dataoffset ;
-						}
-					else
-						psf_log_printf (psf, "data : %D\n", psf->datalength) ;
-
-					/* Only set dataend if there really is data at the end. */
-					if (psf->datalength + psf->dataoffset < psf->filelength)
-						psf->dataend = psf->datalength + psf->dataoffset ;
-
-					if (format == WAVE_FORMAT_MS_ADPCM && psf->datalength % 2)
-					{	psf->datalength ++ ;
-						psf_log_printf (psf, "*** Data length odd. Increasing it by 1.\n") ;
-						} ;
-
-					if (! psf->sf.seekable)
+					if (! psf->sf.seekable || psf->dataoffset < 0)
 						break ;
 
 					/* Seek past data and continue reading header. */
@@ -630,7 +632,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			} ;
 		} ; /* while (1) */
 
-	if (! psf->dataoffset)
+	if (psf->dataoffset <= 0)
 		return SFE_WAV_NO_DATA ;
 
 	/* WAVs can be little or big endian */
@@ -1358,7 +1360,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 						cptr = psf->u.cbuf ;
 						psf_binheader_readf (psf, "b", cptr, dword) ;
 						bytesread += dword ;
-						if (dword > SIGNED_SIZEOF (psf->u.cbuf))
+						if (dword >= SIGNED_SIZEOF (psf->u.cbuf))
 							cptr [sizeof (psf->u.cbuf) - 1] = 0 ;
 						else
 							cptr [dword > 0 ? dword : 0] = 0 ;
