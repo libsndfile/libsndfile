@@ -244,6 +244,8 @@ show_stat_fstat_error (void)
 
 	printf ("3) Size returned by stat and fstat is %d and %d, ", stat_size, fstat_size) ;
 
+	close (fd) ;
+
 	if (stat_size == 0 || stat_size != fstat_size)
 		printf ("but thats just plain ***WRONG***.\n\n") ;
 	else

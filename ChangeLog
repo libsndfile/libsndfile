@@ -15,6 +15,9 @@
     * src/test_ima_oki_adpcm.c
     Fix read beyond end of array.
 
+    * tests/win32_test.c
+    Add missing close on file descriptor.
+
 2009-02-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sd2.c
