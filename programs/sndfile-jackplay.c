@@ -1,4 +1,5 @@
 /*
+** Copyright (c) 2007-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2007 Jonatan Liljedahl <lijon@kymatica.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -27,7 +28,6 @@
 #if HAVE_JACK
 
 #include <math.h>
-#include <float.h>
 #include <pthread.h>
 
 #include <jack/jack.h>

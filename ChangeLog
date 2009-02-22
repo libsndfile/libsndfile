@@ -3,8 +3,11 @@
     * src/ima_adpcm.c
     Clamp values to a valid range before indexing ima_step_size array.
 
-    * src/GSM610/*.c tests/*c
+    * src/GSM610/*.c tests/*c programs/*.c
     Don't include un-needed headers.
+
+    * programs/sndfile-info.c
+	Remove dead code.
 
 2009-02-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
