@@ -25,6 +25,9 @@
     Fix potential memory leak in handling of 'MARK' chunk.
 	Remove un-needed test (unsigned > 0).
 
+    * src/sd2.c
+    Improve handling of heap allocated buffer.
+
 2009-02-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sd2.c

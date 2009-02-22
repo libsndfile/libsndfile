@@ -58,6 +58,7 @@ enum
 typedef struct
 {	unsigned char * rsrc_data ;
 	int rsrc_len ;
+	int need_to_free_rsrc_data ;
 
 	int data_offset, data_length ;
 	int map_offset, map_length ;
@@ -420,7 +421,9 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 	psf_log_printf (psf, "Resource length : %d (0x%04X)\n", rsrc.rsrc_len, rsrc.rsrc_len) ;
 
 	if (rsrc.rsrc_len > SIGNED_SIZEOF (psf->header))
-		rsrc.rsrc_data = calloc (1, rsrc.rsrc_len) ;
+	{	rsrc.rsrc_data = calloc (1, rsrc.rsrc_len) ;
+		rsrc.need_to_free_rsrc_data = SF_TRUE ;
+		}
 	else
 		rsrc.rsrc_data = psf->header ;
 
@@ -525,7 +528,7 @@ parse_rsrc_fork_cleanup :
 
 	psf_use_rsrc (psf, SF_FALSE) ;
 
-	if ((void *) rsrc.rsrc_data < (void *) psf || (void *) rsrc.rsrc_data > (void *) (psf + 1))
+	if (rsrc.need_to_free_rsrc_data)
 		free (rsrc.rsrc_data) ;
 
 	return error ;
