@@ -222,9 +222,9 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				psf->bytewidth = 2 ;
 				psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->msadpcm.extrabytes) ;
 				psf_log_printf (psf, "  Samples/Block : %d\n", wav_fmt->msadpcm.samplesperblock) ;
-				if (wav_fmt->msadpcm.numcoeffs > SIGNED_SIZEOF (MS_ADPCM_WAV_FMT) / SIGNED_SIZEOF (int))
-				{	psf_log_printf (psf, "  No. of Coeffs : %d ****\n", wav_fmt->msadpcm.numcoeffs) ;
-					wav_fmt->msadpcm.numcoeffs = SIGNED_SIZEOF (MS_ADPCM_WAV_FMT) / SIGNED_SIZEOF (int) ;
+				if (wav_fmt->msadpcm.numcoeffs > ARRAY_LEN (wav_fmt->msadpcm.coeffs))
+				{	psf_log_printf (psf, "  No. of Coeffs : %d (should be <= %d)\n", wav_fmt->msadpcm.numcoeffs, ARRAY_LEN (wav_fmt->msadpcm.coeffs)) ;
+					wav_fmt->msadpcm.numcoeffs = ARRAY_LEN (wav_fmt->msadpcm.coeffs) ;
 					}
 				else
 					psf_log_printf (psf, "  No. of Coeffs : %d\n", wav_fmt->msadpcm.numcoeffs) ;
