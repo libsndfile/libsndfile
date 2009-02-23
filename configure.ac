@@ -579,7 +579,12 @@ dnl The following line causes the libtool distributed with the source
 dnl to be replaced if the build system has a more recent version.
 AC_SUBST(LIBTOOL_DEPS)
 
+# Shave make automake/libtool output much less verbose and much more
+# readable. See : git://git.lespiau.name/shave
+SHAVE_INIT
+
 AC_CONFIG_FILES([ \
+	shave shave-libtool \
 	src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
 	man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
 	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile \

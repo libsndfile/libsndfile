@@ -55,16 +55,8 @@ genfiles : test_endswap.c $(SYMBOL_FILES)
 # need access to the internals of the SF_PRIVATE struct.
 
 check: $(noinst_PROGRAMS)
-	@echo
-	@echo
-	@echo
-	@echo "============================================================"
 	@if [ -x /usr/bin/python2.5 ]; then $(srcdir)/binheader_writef_check.py $(srcdir)/*.c ; fi
 	./test_main$(EXEEXT)
-	@echo "============================================================"
-	@echo
-	@echo
-	@echo
 
 #======================================================================
 # Generate an OS specific Symbols files. This is done when the author

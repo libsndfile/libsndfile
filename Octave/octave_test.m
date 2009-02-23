@@ -16,9 +16,7 @@
 
 # These tests are nowhere near comprehensive.
 
-printf ("\n\n\n\n\n\n\n") ;
-
-printf ("    Running Octave tests : ") ;
+printf ("    Running Octave tests                     : ") ;
 fflush (stdout) ;
 
 filename = "whatever" ;
@@ -50,7 +48,5 @@ if (err > 1e-7)
 	endif
 
 printf ("ok") ;
-
-printf ("\n\n\n\n\n\n\n") ;
 
 unlink (filename) ;
