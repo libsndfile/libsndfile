@@ -130,7 +130,13 @@ show_fstat_error (void)
 	ignored = write (fd, data, sizeof (data)) ;
 
 	printf ("2) Now use system (\"%s %s\") to show the file length.\n\n", dir_cmd, filename) ;
-	sprintf (data, "%s %s", dir_cmd, filename) ;
+
+	/* Would use snprintf, but thats not really available on windows. */
+	memset (data, 0, sizeof (data)) ;
+	strncpy (data, dir_cmd, sizeof (data) - 1) ;
+	strncat (data, " ", sizeof (data) - 1 - strlen (data)) ;
+	strncat (data, filename, sizeof (data) - 1 - strlen (data)) ;
+
 	ignored = system (data) ;
 	puts ("") ;
 
@@ -185,7 +191,13 @@ show_lseek_error (void)
 	ignored = write (fd, data, sizeof (data)) ;
 
 	printf ("2) Now use system (\"%s %s\") to show the file length.\n\n", dir_cmd, filename) ;
-	sprintf (data, "%s %s", dir_cmd, filename) ;
+
+	/* Would use snprintf, but thats not really available on windows. */
+	memset (data, 0, sizeof (data)) ;
+	strncpy (data, dir_cmd, sizeof (data) - 1) ;
+	strncat (data, " ", sizeof (data) - 1 - strlen (data)) ;
+	strncat (data, filename, sizeof (data) - 1 - strlen (data)) ;
+
 	ignored = system (data) ;
 	puts ("") ;
 
