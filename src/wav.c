@@ -985,12 +985,13 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 			add_fact_chunk = SF_TRUE ;
 			break ;
 
-		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists */
-			return SFE_UNIMPLEMENTED ;
 #if 0
+		/* This is dead code due to return in previous switch statement. */
+		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists */
 			wavex_write_guid (psf, &MSGUID_SUBTYPE_MS_ADPCM) ;
 			add_fact_chunk = SF_TRUE ;
 			break ;
+			return SFE_UNIMPLEMENTED ;
 #endif
 
 		default : return SFE_UNIMPLEMENTED ;
@@ -1272,7 +1273,7 @@ static int
 wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 {	sf_count_t	current_pos ;
 	char		*cptr ;
-	int 		dword, bytesread, length ;
+	unsigned 	dword, bytesread, length ;
 
 	current_pos = psf_fseek (psf, 0, SEEK_CUR) ;
 
@@ -1329,7 +1330,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 			case ISRC_MARKER :
 					bytesread += psf_binheader_readf (psf, "4", &dword) ;
 					dword += (dword & 1) ;
-					if (dword < 0 || dword > SIGNED_SIZEOF (psf->u.cbuf))
+					if (dword > SIGNED_SIZEOF (psf->u.cbuf))
 					{	psf_log_printf (psf, "  *** %M : %d (too big)\n", chunk, dword) ;
 						psf_binheader_readf (psf, "j", dword) ;
 						break ;
@@ -1338,10 +1339,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword) ;
 					bytesread += dword ;
-					if (dword > SIGNED_SIZEOF (psf->u.cbuf))
-						cptr [sizeof (psf->u.cbuf) - 1] = 0 ;
-					else
-						cptr [dword > 0 ? dword : 0] = 0 ;
+					cptr [dword] = 0 ;
 					psf_log_printf (psf, "    %M : %s\n", chunk, cptr) ;
 					break ;
 
@@ -1351,7 +1349,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 						bytesread += psf_binheader_readf (psf, "44", &dword, &mark_id) ;
 						dword -= 4 ;
 						dword += (dword & 1) ;
-						if (dword < 1 || dword > SIGNED_SIZEOF (psf->u.cbuf))
+						if (dword < 1 || dword >= SIGNED_SIZEOF (psf->u.cbuf))
 						{	psf_log_printf (psf, "  *** %M : %d (too big)\n", chunk, dword) ;
 							psf_binheader_readf (psf, "j", dword) ;
 							break ;
@@ -1360,10 +1358,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 						cptr = psf->u.cbuf ;
 						psf_binheader_readf (psf, "b", cptr, dword) ;
 						bytesread += dword ;
-						if (dword >= SIGNED_SIZEOF (psf->u.cbuf))
-							cptr [sizeof (psf->u.cbuf) - 1] = 0 ;
-						else
-							cptr [dword > 0 ? dword : 0] = 0 ;
+						cptr [dword] = 0 ;
 						psf_log_printf (psf, "    %M : %d : %s\n", chunk, mark_id, cptr) ;
 						} ;
 					break ;
@@ -1745,8 +1740,7 @@ exif_fill_and_sink (SF_PRIVATE *psf, char* buf, size_t bufsz, size_t toread)
 */
 static int
 exif_subchunk_parse (SF_PRIVATE *psf, unsigned int length)
-{
-	unsigned marker, dword, vmajor = -1, vminor = -1, bytesread = 0 ;
+{	unsigned marker, dword, vmajor = -1, vminor = -1, bytesread = 0 ;
 	char buf [4096] ;
 
 	while (bytesread < length)
@@ -1774,6 +1768,11 @@ exif_subchunk_parse (SF_PRIVATE *psf, unsigned int length)
 				psf_binheader_readf (psf, "4", &dword) ;
 				bytesread += sizeof (dword) ;
 				dword += (dword & 1) ;
+
+				if (dword > sizeof (buf))
+				{	psf_log_printf (psf, "*** Marker '%M' is too big %u\n\n", marker, dword) ;
+					return bytesread ;
+					} ;
 
 				bytesread += exif_fill_and_sink (psf, buf, sizeof (buf), dword) ;
 

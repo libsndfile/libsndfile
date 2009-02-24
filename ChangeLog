@@ -3,6 +3,9 @@
     * tests/win32_test.c
     Don't use sprintf, even on windows.
 
+    * src/aiff.c src/rf64.c src/wav.c
+    Eliminate dead code, more validation of data read from file.
+
 2009-02-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ima_adpcm.c

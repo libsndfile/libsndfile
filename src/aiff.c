@@ -401,7 +401,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 		switch (marker)
 		{	case FORM_MARKER :
 					if (found_chunk)
+					{	if (markstr != NULL)
+							free (markstr) ;
 						return SFE_AIFF_NO_FORM ;
+						} ;
 
 					psf_binheader_readf (psf, "E4", &FORMsize) ;
 					pchk4_store (&(paiff->chunk4), marker, psf->headindex - 8, FORMsize) ;
@@ -541,17 +544,14 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					pchk4_store (&paiff->chunk4, marker, psf_ftell (psf) - 8, dword) ;
 					if (dword == 0)
 						break ;
-					if (dword > SIGNED_SIZEOF (psf->u.scbuf) - 1)
+					if (dword >= SIGNED_SIZEOF (psf->u.scbuf))
 					{	psf_log_printf (psf, " %M : %d (too big)\n", marker, dword) ;
 						return SFE_INTERNAL ;
 						} ;
 
 					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
-					if (dword >= sizeof (psf->u.cbuf))
-						cptr [sizeof (psf->u.cbuf) - 1] = 0 ;
-					else
-						cptr [dword] = 0 ;
+					cptr [dword] = 0 ;
 
 					psf_sanitize_string (cptr, dword) ;
 

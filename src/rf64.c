@@ -345,12 +345,13 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 			wavex_write_guid (psf, &MSGUID_SUBTYPE_ALAW) ;
 			break ;
 
-		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists */
 #if 0
+		/* This is dead code due to return in previous switch statement. */
+		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists */
 			wavex_write_guid (psf, &MSGUID_SUBTYPE_MS_ADPCM) ;
 			break ;
-#endif
 			return SFE_UNIMPLEMENTED ;
+#endif
 
 		default : return SFE_UNIMPLEMENTED ;
 		} ;
