@@ -1,3 +1,8 @@
+2009-03-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c src/sndfile.h.in src/create_symbols_file.py
+    Add function sf_version_string.
+
 2009-02-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ima_adpcm.c
