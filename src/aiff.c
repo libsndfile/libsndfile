@@ -186,6 +186,8 @@ typedef struct
 
 	sf_count_t	comm_offset ;
 	sf_count_t	ssnd_offset ;
+
+	MARK_ID_POS *markstr ;
 } AIFF_PRIVATE ;
 
 /*------------------------------------------------------------------------------
@@ -364,7 +366,6 @@ marker_to_position (const MARK_ID_POS *m, unsigned short n, int marksize)
 static int
 aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 {	SSND_CHUNK	ssnd_fmt ;
-	MARK_ID_POS *markstr = NULL ;
 	AIFF_PRIVATE *paiff ;
 	unsigned	marker, dword, FORMsize, SSNDsize, bytesread ;
 	int			k, found_chunk = 0, done = 0, error = 0 ;
@@ -401,10 +402,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 		switch (marker)
 		{	case FORM_MARKER :
 					if (found_chunk)
-					{	if (markstr != NULL)
-							free (markstr) ;
 						return SFE_AIFF_NO_FORM ;
-						} ;
 
 					psf_binheader_readf (psf, "E4", &FORMsize) ;
 					pchk4_store (&(paiff->chunk4), marker, psf->headindex - 8, FORMsize) ;
@@ -564,14 +562,14 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					pchk4_store (&paiff->chunk4, marker, psf_ftell (psf) - 8, dword) ;
 					if (dword == 0)
 						break ;
-					if (dword > SIGNED_SIZEOF (psf->u.scbuf) - 1)
+					if (dword >= SIGNED_SIZEOF (psf->u.scbuf) - 1)
 					{	psf_log_printf (psf, " %M : %d (too big)\n", marker, dword) ;
 						return SFE_INTERNAL ;
 						} ;
 
 					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
-					cptr [dword > 0 ? dword : 0] = 0 ;
+					cptr [dword] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
 					psf_store_string (psf, SF_STR_ARTIST, cptr) ;
 					break ;
@@ -629,7 +627,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "mb", &appl_marker, cptr, dword + (dword & 1) - 4) ;
-					cptr [dword > 0 ? dword : 0] = 0 ;
+					cptr [dword] = 0 ;
 
 					for (k = 0 ; k < (int) dword ; k++)
 						if (! isprint (cptr [k]))
@@ -647,14 +645,14 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					pchk4_store (&paiff->chunk4, marker, psf_ftell (psf) - 8, dword) ;
 					if (dword == 0)
 						break ;
-					if (dword > SIGNED_SIZEOF (psf->u.scbuf) - 2)
+					if (dword >= SIGNED_SIZEOF (psf->u.scbuf) - 2)
 					{	psf_log_printf (psf, " %M : %d (too big)\n", marker, dword) ;
 						return SFE_INTERNAL ;
 						} ;
 
 					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
-					cptr [dword > 0 ? dword : 0] = 0 ;
+					cptr [dword] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
 					psf_store_string (psf, SF_STR_TITLE, cptr) ;
 					break ;
@@ -664,14 +662,14 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					pchk4_store (&paiff->chunk4, marker, psf_ftell (psf) - 8, dword) ;
 					if (dword == 0)
 						break ;
-					if (dword > SIGNED_SIZEOF (psf->u.scbuf) - 2)
+					if (dword >= SIGNED_SIZEOF (psf->u.scbuf) - 2)
 					{	psf_log_printf (psf, " %M : %d (too big)\n", marker, dword) ;
 						return SFE_INTERNAL ;
 						} ;
 
 					cptr = psf->u.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
-					cptr [dword > 0 ? dword : 0] = 0 ;
+					cptr [dword] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
 					psf_store_string (psf, SF_STR_COMMENT, cptr) ;
 					break ;
@@ -764,12 +762,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						bytesread = psf_binheader_readf (psf, "E2", &n) ;
 						mark_count = n ;
 						psf_log_printf (psf, "  Count : %d\n", mark_count) ;
-						if (markstr != NULL)
+						if (paiff->markstr != NULL)
 						{	psf_log_printf (psf, "*** Second MARK chunk found. Throwing away the first.\n") ;
-							free (markstr) ;
+							free (paiff->markstr) ;
 							} ;
-						markstr = calloc (mark_count, sizeof (MARK_ID_POS)) ;
-						if (markstr == NULL)
+						paiff->markstr = calloc (mark_count, sizeof (MARK_ID_POS)) ;
+						if (paiff->markstr == NULL)
 							return SFE_MALLOC_FAILED ;
 
 						for (n = 0 ; n < mark_count && bytesread < dword ; n++)
@@ -782,8 +780,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 							psf->u.scbuf [pstr_len] = 0 ;
 							psf_log_printf (psf, "   Name     : %s\n", psf->u.scbuf) ;
 
-							markstr [n].markerID = mark_id ;
-							markstr [n].position = position ;
+							paiff->markstr [n].markerID = mark_id ;
+							paiff->markstr [n].position = position ;
 							/*
 							**	TODO if psf->u.scbuf is equal to
 							**	either Beg_loop, Beg loop or beg loop and spam
@@ -847,15 +845,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 		for (j = 0 ; j<psf->instrument->loop_count ; j ++)
 		{	if (j < ARRAY_LEN (psf->instrument->loops))
-			{	psf->instrument->loops [j].start = marker_to_position (markstr, psf->instrument->loops [j].start, mark_count) ;
-				psf->instrument->loops [j].end = marker_to_position (markstr, psf->instrument->loops [j].end, mark_count) ;
+			{	psf->instrument->loops [j].start = marker_to_position (paiff->markstr, psf->instrument->loops [j].start, mark_count) ;
+				psf->instrument->loops [j].end = marker_to_position (paiff->markstr, psf->instrument->loops [j].end, mark_count) ;
 				psf->instrument->loops [j].mode = SF_LOOP_FORWARD ;
 				} ;
   			} ;
 		} ;
-
-	if (markstr)
-		free (markstr) ;
 
 	if (! (found_chunk & HAVE_FORM))
 		return SFE_AIFF_NO_FORM ;
@@ -874,7 +869,13 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 static int
 aiff_close (SF_PRIVATE *psf)
-{
+{	AIFF_PRIVATE *paiff = psf->container_data ;
+
+	if (paiff != NULL && paiff->markstr != NULL)
+	{	free (paiff->markstr) ;
+		paiff->markstr = NULL ;
+		} ;
+
 	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
 	{	aiff_write_tailer (psf) ;
 		aiff_write_header (psf, SF_TRUE) ;
