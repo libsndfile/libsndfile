@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.57)
 
-AC_INIT([libsndfile],[1.0.19pre3],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.19],[erikd@mega-nerd.com])
 
 # Put config stuff in Cfg.
 AC_CONFIG_AUX_DIR(Cfg)
@@ -297,13 +297,17 @@ else
 	PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
 	PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
-	# Yes we really do need vorbis >= 1.2.2 for vorbis_version_string and
-	# >= 1.2.1 because earlier versions are not const correct at the API level.
-	PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.2, ac_cv_vorbis=yes, ac_cv_vorbis=no)
-	PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.2, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
+	# Vorbis versions 1.2.1 and earlier versions are not const correct at the API level.
+	# 
+	PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.0, ac_cv_vorbis=yes, ac_cv_vorbis=no)
+	PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.0, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
 	fi
 
+HAVE_VORBIS_VERSION_STRING=0
 if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
+
+	AC_CHECK_LIB(vorbis, vorbis_version_string, HAVE_VORBIS_VERSION_STRING=1)
+
 	HAVE_EXTERNAL_LIBS=1
 	enable_external_libs=yes
 
@@ -311,7 +315,8 @@ if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; 
 	EXTERNAL_LIBS="$FLAC_LIBS $VORBISENC_LIBS"
 	fi
 
-AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_LIBS],$HAVE_EXTERNAL_LIBS,[Will be set to 1 if flac, ogg and vorbis are available.])
+AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_LIBS], $HAVE_EXTERNAL_LIBS, [Will be set to 1 if flac, ogg and vorbis are available.])
+AC_DEFINE_UNQUOTED([HAVE_VORBIS_VERSION_STRING], $HAVE_VORBIS_VERSION_STRING, [Set to 1 if we have vorbis_version_string.])
 
 #====================================================================================
 # Check for libsqlite3 (only used in regtest).
