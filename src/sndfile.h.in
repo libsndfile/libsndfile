@@ -551,6 +551,10 @@ int sf_set_string (SNDFILE *sndfile, int str_type, const char* str) ;
 
 const char* sf_get_string (SNDFILE *sndfile, int str_type) ;
 
+/* Return the library version string. */
+
+const char * sf_version_string (void) ;
+
 /* Functions for reading/writing the waveform data of a sound file.
 */
 
