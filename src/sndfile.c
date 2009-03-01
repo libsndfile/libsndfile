@@ -317,9 +317,9 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 	copy_filename (psf, path) ;
 
 	if (strcmp (path, "-") == 0)
-		psf_set_stdio (psf, mode) ;
+		psf->error = psf_set_stdio (psf, mode) ;
 	else
-		psf_fopen (psf, path, mode) ;
+		psf->error = psf_fopen (psf, path, mode) ;
 
 	return psf_open_file (psf, mode, sfinfo) ;
 } /* sf_open */

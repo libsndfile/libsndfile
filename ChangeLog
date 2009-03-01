@@ -1,3 +1,17 @@
+2009-03-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c
+    Fix resource leak and potential read beyond end of buffer.
+
+    * src/nist.c
+    Fix reading of header value sample_n_bytes.
+
+    * src/sd2.c src/wav.c
+    Fix potential read beyond end of buffer.
+
+    * src/sndfile.c src/svx.c
+    Check return values of file_io functions.
+
 2009-02-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/win32_test.c
@@ -15,10 +29,10 @@
     Don't include un-needed headers.
 
     * programs/sndfile-info.c
-	Remove dead code.
+    Remove dead code.
 
     * tests/test_wrapper.sh.in
-	Add 'set -e' so the script exits on error.
+    Add 'set -e' so the script exits on error.
 
     * src/test_ima_oki_adpcm.c
     Fix read beyond end of array.
@@ -31,7 +45,7 @@
 
     * src/aiff.c
     Fix potential memory leak in handling of 'MARK' chunk.
-	Remove un-needed test (unsigned > 0).
+    Remove un-needed test (unsigned > 0).
 
     * src/sd2.c
     Improve handling of heap allocated buffer.

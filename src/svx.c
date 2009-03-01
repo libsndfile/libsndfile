@@ -226,6 +226,8 @@ svx_read_header	(SF_PRIVATE *psf)
 					psf->datalength = dword ;
 
 					psf->dataoffset = psf_ftell (psf) ;
+					if (psf->dataoffset < 0)
+						return SFE_SVX_NO_BODY ;
 
 					if (psf->datalength > psf->filelength - psf->dataoffset)
 					{	psf_log_printf (psf, " BODY : %D (should be %D)\n", psf->datalength, psf->filelength - psf->dataoffset) ;
