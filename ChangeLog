@@ -15,6 +15,12 @@
     * tests/win32_test.c
     Fix resource leak.
 
+    * configure.ac
+    Detect the presence/absence of vorbis_version_string() in libvorbis.
+
+    * src/ogg.c
+    Only call vorbis_version_string() from libvorbis if present.
+
 2009-02-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/win32_test.c

@@ -506,7 +506,9 @@ ogg_open (SF_PRIVATE *psf)
 	if (psf->mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
+#if HAVE_VORBIS_VERSION_STRING
 	psf_log_printf (psf, "Vorbis library version : %s\n", vorbis_version_string ()) ;
+#endif
 
 	if (psf->mode == SFM_READ)
 	{	/* Call this here so it only gets called once, so no memory is leaked. */
