@@ -480,8 +480,8 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 		goto parse_rsrc_fork_cleanup ;
 		} ;
 
-	if (rsrc.map_offset + 26 >= rsrc.rsrc_len)
-	{	psf_log_printf (psf, "Bad map offset (%d + 26 > %d).\n", rsrc.map_offset, rsrc.rsrc_len) ;
+	if (rsrc.map_offset + 28 >= rsrc.rsrc_len)
+	{	psf_log_printf (psf, "Bad map offset (%d + 28 > %d).\n", rsrc.map_offset, rsrc.rsrc_len) ;
 		error = SFE_SD2_BAD_RSRC ;
 		goto parse_rsrc_fork_cleanup ;
 		} ;

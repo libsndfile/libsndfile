@@ -1330,7 +1330,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 			case ISRC_MARKER :
 					bytesread += psf_binheader_readf (psf, "4", &dword) ;
 					dword += (dword & 1) ;
-					if (dword > SIGNED_SIZEOF (psf->u.cbuf))
+					if (dword >= SIGNED_SIZEOF (psf->u.cbuf))
 					{	psf_log_printf (psf, "  *** %M : %d (too big)\n", chunk, dword) ;
 						psf_binheader_readf (psf, "j", dword) ;
 						break ;
@@ -1769,7 +1769,7 @@ exif_subchunk_parse (SF_PRIVATE *psf, unsigned int length)
 				bytesread += sizeof (dword) ;
 				dword += (dword & 1) ;
 
-				if (dword > sizeof (buf))
+				if (dword >= sizeof (buf))
 				{	psf_log_printf (psf, "*** Marker '%M' is too big %u\n\n", marker, dword) ;
 					return bytesread ;
 					} ;
