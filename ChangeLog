@@ -1,3 +1,8 @@
+2009-03-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * NEWS README doc/*.html
+    Updates for 1.0.19 release.
+
 2009-03-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c
