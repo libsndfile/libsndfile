@@ -244,26 +244,28 @@ show_stat_fstat_error (void)
 
 	if (stat (filename, &buf) != 0)
 	{	printf ("\n\nLine %d: stat() failed : %s\n\n", __LINE__, strerror (errno)) ;
-		return ;
+		goto error_exit ;
 		} ;
 	stat_size = buf.st_size ;
 
 	if (fstat (fd, &buf) != 0)
 	{	printf ("\n\nLine %d: fstat() failed : %s\n\n", __LINE__, strerror (errno)) ;
-		return ;
+		goto error_exit ;
 		} ;
 	fstat_size = buf.st_size ;
 
 	printf ("3) Size returned by stat and fstat is %d and %d, ", stat_size, fstat_size) ;
 
-	close (fd) ;
 
 	if (stat_size == 0 || stat_size != fstat_size)
 		printf ("but thats just plain ***WRONG***.\n\n") ;
 	else
-	{	printf ("which is correct.\n\n") ;
-		unlink (filename) ;
-		} ;
+		printf ("which is correct.\n\n") ;
+
+error_exit :
+
+	close (fd) ;
+	unlink (filename) ;
 
 	return ;
 } /* show_stat_fstat_error */
