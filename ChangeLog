@@ -6,6 +6,9 @@
     * NEWS README doc/*.html
     Updates for 1.0.19 release.
 
+    * configure.ac
+    Fix --enable-external-libs logic.
+
 2009-03-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c

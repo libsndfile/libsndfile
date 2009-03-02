@@ -313,6 +313,8 @@ if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; 
 
 	EXTERNAL_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBISENC_CFLAGS"
 	EXTERNAL_LIBS="$FLAC_LIBS $VORBISENC_LIBS"
+else
+	enable_external_libs=no
 	fi
 
 AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_LIBS], $HAVE_EXTERNAL_LIBS, [Will be set to 1 if flac, ogg and vorbis are available.])
