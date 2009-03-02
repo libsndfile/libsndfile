@@ -1,5 +1,8 @@
 2009-03-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
+    * doc/index.html
+    Add a 'See Also' section with a link to sndfile-tools.
+
     * NEWS README doc/*.html
     Updates for 1.0.19 release.
 
