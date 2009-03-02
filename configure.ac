@@ -297,8 +297,8 @@ else
 	PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
 	PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
-	# Vorbis versions 1.2.1 and earlier versions are not const correct at the API level.
-	# 
+	# Vorbis versions earlier than 1.2.1 are not const correct at the API level.
+	# Vorbis 1.2.2 adds vorbis_version_string.
 	PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.0, ac_cv_vorbis=yes, ac_cv_vorbis=no)
 	PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.0, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
 	fi
