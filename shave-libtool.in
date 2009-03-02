@@ -8,7 +8,7 @@ fi
 
 lt_unmangle ()
 {
-   last_result=`echo $1 | $SED -e 's#.libs/##' -e 's#[0-9a-zA-Z_]\*_la-##'`
+   last_result=`echo $1 | $SED -e 's#.libs/##' -e 's#[0-9a-zA-Z_\-\.]*_la-##'`
 }
 
 # the real libtool to use

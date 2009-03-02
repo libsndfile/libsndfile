@@ -8,7 +8,7 @@ fi
 
 lt_unmangle ()
 {
-   last_result=`echo $1 | $SED -e 's#.libs/##' -e 's#[0-9a-zA-Z_]\*_la-##'`
+   last_result=`echo $1 | $SED -e 's#.libs/##' -e 's#[0-9a-zA-Z_\-\.]*_la-##'`
 }
 
 # the tool to wrap (cc, cxx, ar, ranlib, ..)
@@ -49,6 +49,12 @@ link,*)
     ;;
 *,cc)
     Q="  CC    "
+    ;;
+*,fc)
+    Q="  FC    "
+    ;;
+*,f77)
+    Q="  F77   "
     ;;
 *,*)
     # should not happen

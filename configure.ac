@@ -581,7 +581,7 @@ AC_SUBST(LIBTOOL_DEPS)
 
 # Shave make automake/libtool output much less verbose and much more
 # readable. See : git://git.lespiau.name/shave
-SHAVE_INIT
+SHAVE_INIT([],[enable])
 
 AC_CONFIG_FILES([ \
 	shave shave-libtool \
