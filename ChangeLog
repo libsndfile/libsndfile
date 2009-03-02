@@ -1,3 +1,8 @@
+2009-03-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Detect vorbis_version_string() correctly.
+
 2009-03-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/index.html

@@ -306,7 +306,10 @@ else
 HAVE_VORBIS_VERSION_STRING=0
 if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
 
+	save_LIBS="$LIBS"
+	LIBS="$VORBIS_LIBS $LIBS"
 	AC_CHECK_LIB(vorbis, vorbis_version_string, HAVE_VORBIS_VERSION_STRING=1)
+	LIBS="$save_LIBS"
 
 	HAVE_EXTERNAL_LIBS=1
 	enable_external_libs=yes
