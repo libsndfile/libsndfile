@@ -1,3 +1,8 @@
+2009-03-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/vorbis_test.c
+    Relax test slighly to allow test to pass on more CPUs etc.
+
 2009-03-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
