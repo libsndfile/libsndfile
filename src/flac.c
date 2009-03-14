@@ -35,8 +35,6 @@
 #include	<FLAC/stream_encoder.h>
 #include	<FLAC/metadata.h>
 
-#include	"sfendian.h"
-
 /*------------------------------------------------------------------------------
 ** Private static functions.
 */
