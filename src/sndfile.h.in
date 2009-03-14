@@ -301,7 +301,7 @@ typedef	struct SNDFILE_tag	SNDFILE ;
 ** header file to be compiler by both GCC and the microsoft compiler.
 */
 
-#ifdef _MSCVER
+#if (defined (_MSCVER) || defined (_MSC_VER))
 typedef __int64_t	sf_count_t ;
 #define SF_COUNT_MAX		0x7fffffffffffffffi64
 #else

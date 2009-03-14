@@ -3,6 +3,9 @@
     * src/common.h src/caf.c src/sndfile.c
     Add SF_MAX_CHANNELS (set to 256) and use it.
 
+    * src/sndfile.h.in
+    Check for either _MSCVER or _MSC_VER being defined.
+
 2009-03-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/vorbis_test.c
