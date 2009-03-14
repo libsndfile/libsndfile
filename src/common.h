@@ -104,6 +104,9 @@
 #define		SF_MIN(a,b)		((a) < (b) ? (a) : (b))
 #endif
 
+
+#define		SF_MAX_CHANNELS	256
+
 /*
 *	Macros for spliting the format file of SF_INFI into contrainer type,
 **	codec type and endian-ness.

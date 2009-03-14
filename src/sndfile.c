@@ -537,7 +537,7 @@ sf_format_check	(const SF_INFO *info)
 	** Return 0 on failure, 1 ons success.
 	*/
 
-	if (info->channels < 1 || info->channels > 256)
+	if (info->channels < 1 || info->channels > SF_MAX_CHANNELS)
 		return 0 ;
 
 	if (info->samplerate < 0)

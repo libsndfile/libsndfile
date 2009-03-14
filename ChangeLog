@@ -1,3 +1,8 @@
+2009-03-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/caf.c src/sndfile.c
+    Add SF_MAX_CHANNELS (set to 256) and use it.
+
 2009-03-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/vorbis_test.c

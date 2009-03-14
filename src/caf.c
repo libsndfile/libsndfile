@@ -282,7 +282,7 @@ caf_read_header (SF_PRIVATE *psf)
 			"  Frames / packet  : %u\n  Channels / frame : %u\n  Bits / channel   : %u\n",
 			desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.pkt_frames, desc.channels_per_frame, desc.bits_per_chan) ;
 
-	if (desc.channels_per_frame > 200)
+	if (desc.channels_per_frame > SF_MAX_CHANNELS)
 	{	psf_log_printf (psf, "**** Bad channels per frame value %u.\n", desc.channels_per_frame) ;
 		return SFE_MALFORMED_FILE ;
 		} ;
