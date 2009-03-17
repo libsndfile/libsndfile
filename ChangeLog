@@ -3,6 +3,10 @@
     * src/common.h
     Define SF_PLATFORM_S64 for non-gcc compilers with 'long long' type.
 
+    * configure.ac
+    Add documentation for --disable-external-libs and improve error handling
+    for that option.
+
 2009-03-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/caf.c src/sndfile.c

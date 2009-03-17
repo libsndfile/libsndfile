@@ -125,7 +125,7 @@ AC_ARG_ENABLE(alsa,
 	AC_HELP_STRING([--disable-alsa], [disable use of ALSA]))
 
 AC_ARG_ENABLE(external-libs,
-	AC_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis]))
+	AC_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis [[default=no]]]))
 
 AC_ARG_ENABLE(octave,
 	AC_HELP_STRING([--enable-octave], [disable building of GNU Octave module]))
@@ -294,13 +294,14 @@ PKG_PROG_PKG_CONFIG
 if test x$enable_external_libs = xno ; then
 	AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
 else
-	PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
+	PKG_CHECK_MOD_VERSION(FLAC, flac >= 2.2.1, ac_cv_flac=yes, ac_cv_flac=no)
 	PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
 	# Vorbis versions earlier than 1.2.1 are not const correct at the API level.
 	# Vorbis 1.2.2 adds vorbis_version_string.
 	PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.0, ac_cv_vorbis=yes, ac_cv_vorbis=no)
 	PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.0, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
+	enable_external_libs=yes
 	fi
 
 HAVE_VORBIS_VERSION_STRING=0
@@ -317,6 +318,16 @@ if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; 
 	EXTERNAL_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBISENC_CFLAGS"
 	EXTERNAL_LIBS="$FLAC_LIBS $VORBISENC_LIBS"
 else
+	AC_MSG_WARN([[
+	
+*** It looks like you enabled the use of external libraries
+*** (ie Flac, Ogg, Vorbis, etc), but one or more of those libs
+*** is either missing (possibly only the development headers)
+*** or is of an unsupported version.
+***
+*** Unfortunately, for ease of maintenance, the external libs
+*** are an all or nothing affair.
+]])
 	enable_external_libs=no
 	fi
 
@@ -613,7 +624,6 @@ AC_MSG_RESULT([
     Experimental code : ................... ${enable_experimental:-no}
     Using ALSA in example programs : ...... ${enable_alsa:-no}
     External FLAC/Ogg/Vorbis : ............ ${enable_external_libs:-no}
-
 ])
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
