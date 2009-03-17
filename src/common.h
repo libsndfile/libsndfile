@@ -39,6 +39,8 @@
 
 #if (SIZEOF_LONG == 8)
 #	define	SF_PLATFORM_S64(x)		x##l
+#elif (SIZEOF_LONG_LONG == 8)
+#	define	SF_PLATFORM_S64(x)		x##ll
 #elif COMPILER_IS_GCC
 #	define	SF_PLATFORM_S64(x)		x##ll
 #elif OS_IS_WIN32

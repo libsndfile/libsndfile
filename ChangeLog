@@ -1,3 +1,8 @@
+2009-03-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h
+    Define SF_PLATFORM_S64 for non-gcc compilers with 'long long' type.
+
 2009-03-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/caf.c src/sndfile.c
