@@ -69,6 +69,7 @@ ALL_SYMBOLS = (
 	(	"sf_strerror",		50	),
 	(	"sf_get_string",	60	),
 	(	"sf_set_string",	61	),
+	(	"sf_version_string",68	),
 	(	"sf_open_fd",		70	),
 	(	"sf_open_virtual",	80	),
 	(	"sf_write_sync",	90	)

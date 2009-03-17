@@ -814,6 +814,20 @@ sf_format_check	(const SF_INFO *info)
 /*------------------------------------------------------------------------------
 */
 
+const char *
+sf_version_string (void)
+{
+#if	ENABLE_EXPERIMENTAL_CODE
+	return PACKAGE_NAME "-" PACKAGE_VERSION "-exp" ;
+#else
+	return PACKAGE_NAME "-" PACKAGE_VERSION ;
+#endif
+}
+
+
+/*------------------------------------------------------------------------------
+*/
+
 int
 sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 {	SF_PRIVATE *psf = (SF_PRIVATE *) sndfile ;
@@ -827,10 +841,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 					psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SFE_BAD_COMMAND_PARAM ;
 				} ;
-			if (ENABLE_EXPERIMENTAL_CODE)
-				snprintf (data, datasize, "%s-%s-exp", PACKAGE_NAME, PACKAGE_VERSION) ;
-			else
-				snprintf (data, datasize, "%s-%s", PACKAGE_NAME, PACKAGE_VERSION) ;
+			snprintf (data, datasize, "%s", sf_version_string ()) ;
 			return strlen (data) ;
 
 		case SFC_GET_SIMPLE_FORMAT_COUNT :
