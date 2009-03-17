@@ -1,0 +1,69 @@
+#!/bin/sh
+
+# we need sed
+SED=@SED@
+if test -z "$SED" ; then
+SED=sed
+fi
+
+lt_unmangle ()
+{
+   last_result=`echo $1 | $SED -e 's#.libs/##' -e 's#[0-9a-zA-Z_\-\.]*_la-##'`
+}
+
+# the real libtool to use
+LIBTOOL="$1"
+shift
+
+# if 1, don't print anything, the underlaying wrapper will do it
+pass_though=0
+
+# scan the arguments, keep the right ones for libtool, and discover the mode
+preserved_args=
+while test "$#" -gt 0; do
+    opt="$1"
+    shift
+
+    case $opt in
+    --mode=*)
+        mode=`echo $opt | $SED -e 's/[-_a-zA-Z0-9]*=//'`
+        preserved_args="$preserved_args $opt"
+        ;;
+    -o)
+        lt_output="$1"
+        preserved_args="$preserved_args $opt"
+	;;
+    *)
+        preserved_args="$preserved_args $opt"
+        ;;
+      esac
+done
+
+case "$mode" in
+compile)
+    # shave will be called and print the actual CC/CXX/LINK line
+    preserved_args="$preserved_args --shave-mode=$mode"
+    pass_though=1
+    ;;
+link)
+    preserved_args="$preserved_args --shave-mode=$mode"
+    Q="  LINK  "
+    ;;
+*)
+    # let's u
+    # echo "*** libtool: Unimplemented mode: $mode, fill a bug report"
+    ;;
+esac
+
+lt_unmangle "$lt_output"
+output=$last_result
+
+if test -z $V; then
+    if test $pass_though -eq 0; then
+        echo "$Q$output"
+    fi
+    $LIBTOOL --silent $preserved_args
+else
+    echo $LIBTOOL $preserved_args
+    $LIBTOOL $preserved_args
+fi

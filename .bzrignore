@@ -40,6 +40,10 @@ autom4te.cache
 config.log
 config.status
 configure
+doc/AUTHORS
+doc/ChangeLog
+doc/NEWS
+doc/README
 doc/libsndfile.css
 examples/generate
 examples/list_formats
@@ -59,6 +63,8 @@ programs/sndfile-metadata-get
 programs/sndfile-metadata-set
 programs/sndfile-play
 regtest/sndfile-regtest
+shave
+shave-libtool
 sndfile.pc
 src/Ext
 src/G72x/g72x_test
@@ -83,11 +89,8 @@ tests/pcm_test.c
 tests/pipe_test.c
 tests/scale_clip_test.c
 tests/sfversion
+tests/test_wrapper.sh
+tests/test_wrapper.sh
 tests/utils.c
 tests/utils.h
 tests/write_read_test.c
-tests/test_wrapper.sh
-doc/AUTHORS
-doc/ChangeLog
-doc/NEWS
-doc/README

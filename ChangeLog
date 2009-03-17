@@ -13,6 +13,15 @@
     * tests/sfversion.c
     Test function sf_version_string.
 
+    * M4/shave.m4 shave-libtool.in shave.in
+    Add new files from 'git clone git://git.lespiau.name/shave'.
+
+    * configure.ac
+    Enable shave.
+
+    * src/Makefile.am src/binheader_writef_check.py Octave/*
+    Shave related tweaks.
+
 2009-03-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/caf.c src/sndfile.c
