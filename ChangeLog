@@ -10,6 +10,9 @@
     * src/sndfile.c src/sndfile.h.in src/create_symbols_file.py
     Add public function sf_version_string.
 
+    * tests/sfversion.c
+    Test function sf_version_string.
+
 2009-03-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/caf.c src/sndfile.c

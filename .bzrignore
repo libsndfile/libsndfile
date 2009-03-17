@@ -87,3 +87,7 @@ tests/utils.c
 tests/utils.h
 tests/write_read_test.c
 tests/test_wrapper.sh
+doc/AUTHORS
+doc/ChangeLog
+doc/NEWS
+doc/README

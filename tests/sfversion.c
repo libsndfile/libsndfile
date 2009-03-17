@@ -19,6 +19,7 @@
 #include "sfconfig.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #if HAVE_UNISTD_H
@@ -29,11 +30,19 @@
 
 #define	BUFFER_SIZE	(256)
 
-static	char	strbuffer [BUFFER_SIZE] ;
 
 int
 main (void)
-{	sf_command (NULL, SFC_GET_LIB_VERSION, strbuffer, sizeof (strbuffer)) ;
+{	static char	strbuffer [BUFFER_SIZE] ;
+	const char * ver ;
+
+	sf_command (NULL, SFC_GET_LIB_VERSION, strbuffer, sizeof (strbuffer)) ;
+	ver = sf_version_string () ;
+
+	if (strcmp (ver, strbuffer) != 0)
+	{	printf ("Version mismatch : '%s' != '%s'\n\n", ver, strbuffer) ;
+		exit (1) ;
+		} ;
 
 	printf ("%s", strbuffer) ;
 
