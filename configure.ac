@@ -294,7 +294,7 @@ PKG_PROG_PKG_CONFIG
 if test x$enable_external_libs = xno ; then
 	AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
 else
-	PKG_CHECK_MOD_VERSION(FLAC, flac >= 2.2.1, ac_cv_flac=yes, ac_cv_flac=no)
+	PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
 	PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
 	# Vorbis versions earlier than 1.2.1 are not const correct at the API level.
