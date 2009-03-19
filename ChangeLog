@@ -1,3 +1,8 @@
+2009-03-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/api.html
+    Add pointers to example programs in source code tarball.
+
 2009-03-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h
