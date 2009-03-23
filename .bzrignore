@@ -20,13 +20,7 @@
 *.wavex
 .deps
 .libs
-Cfg/compile
-Cfg/config.guess
-Cfg/config.sub
-Cfg/depcomp
-Cfg/install-sh
-Cfg/ltmain.sh
-Cfg/missing
+Cfg
 Hack/sndfile-fuzzbomb
 M4/libtool.m4
 M4/ltoptions.m4
