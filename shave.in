@@ -56,6 +56,9 @@ link,*)
 *,f77)
     Q="  F77   "
     ;;
+*,objc)
+    Q="  OBJC   "
+    ;;
 *,*)
     # should not happen
     Q="  CC    "

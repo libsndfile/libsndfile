@@ -1,3 +1,8 @@
+2009-03-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * M4/shave.m4 shave.in
+    Pulled update from upstream.
+
 2009-03-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/api.html
