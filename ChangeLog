@@ -3,6 +3,9 @@
     * src/float32.c
     In host_read_f2s call convert instead of f2s_array.
 
+    * src/ima_adpcm.c
+    Remove dead code.
+
 2009-03-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * M4/shave.m4 shave.in

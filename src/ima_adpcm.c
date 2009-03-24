@@ -238,7 +238,6 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 		default :
 				psf_log_printf (psf, "ima_reader_init: bad psf->sf.format\n") ;
 				return SFE_INTERNAL ;
-				break ;
 		} ;
 
 	pima->decode_block (psf, pima) ;	/* Read first block. */
@@ -796,7 +795,6 @@ ima_writer_init (SF_PRIVATE *psf, int blockalign)
 		default :
 				psf_log_printf (psf, "ima_reader_init: bad psf->sf.format\n") ;
 				return SFE_INTERNAL ;
-				break ;
 		} ;
 
 	psf->write_short	= ima_write_s ;
