@@ -155,10 +155,8 @@ multi_file_test (const char *filename, int *formats, int format_count)
 	embed_info.length = 0 ;
 
 
-	for (file_count = 0 ; embed_info.offset + embed_info.length < filelen ; )
+	for (file_count = 1 ; embed_info.offset + embed_info.length < filelen ; file_count ++)
 	{
-		file_count ++ ;
-
 		if (verbose)
 		{	puts ("\n------------------------------------") ;
 			printf ("This offset : %ld\n", SF_COUNT_TO_LONG (embed_info.offset + embed_info.length)) ;
@@ -185,6 +183,8 @@ multi_file_test (const char *filename, int *formats, int format_count)
 		if (verbose)
 			printf ("\nNext offset : %ld\nNext length : %ld\n", SF_COUNT_TO_LONG (embed_info.offset), SF_COUNT_TO_LONG (embed_info.length)) ;
 		} ;
+
+	file_count -- ;
 
 	if (file_count != format_count)
 	{	printf ("\n\nLine %d: file count (%d) not equal to %d.\n\n", __LINE__, file_count, format_count) ;

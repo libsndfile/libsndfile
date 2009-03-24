@@ -71,7 +71,7 @@ test_oki_adpcm (void)
 	print_test_name ("Testing ima/oki decoder") ;
 
 	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI) ;
-	for (i = 0 ; i < ARRAY_LEN (test_pcm) - 1 ; i += j)
+	for (i = 0 ; i < ARRAY_LEN (test_pcm) - 1 ; i += 2)
 	{	code = adpcm_encode (&adpcm, test_pcm [i]) ;
 		code = (code << 4) | adpcm_encode (&adpcm, test_pcm [i + 1]) ;
 		if (code != test_codes [i / 2])

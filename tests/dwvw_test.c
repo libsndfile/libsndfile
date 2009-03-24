@@ -73,7 +73,6 @@ dwvw_test (const char *filename, int format, int bit_width)
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 
 	/* Generate random.frames. */
-	k = 0 ;
 	for (k = 0 ; k < BUFFER_SIZE / 2 ; k++)
 	{	value = 0x7FFFFFFF * sin (123.0 / sfinfo.samplerate * 2 * k * M_PI) ;
 		write_buf [k] = bit_mask & lrint (value) ;

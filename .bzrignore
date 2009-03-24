@@ -19,8 +19,10 @@
 *.wav
 *.wavex
 .deps
+.git*
 .libs
 Cfg
+Hack
 Hack/sndfile-fuzzbomb
 M4/libtool.m4
 M4/ltoptions.m4
@@ -57,7 +59,7 @@ programs/sndfile-metadata-get
 programs/sndfile-metadata-set
 programs/sndfile-play
 regtest/sndfile-regtest
-shave
+save
 shave-libtool
 sndfile.pc
 src/Ext

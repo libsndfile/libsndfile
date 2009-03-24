@@ -6,6 +6,11 @@
     * src/ima_adpcm.c
     Remove dead code.
 
+    * src/test_ima_oki_adpcm.c examples/generate.c tests/dither_test.c
+        tests/dwvw_test.c tests/fix_this.c tests/generate.c
+        tests/multi_file_test.c
+    Minor fixes.
+
 2009-03-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * M4/shave.m4 shave.in
