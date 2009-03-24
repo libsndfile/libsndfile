@@ -523,7 +523,7 @@ host_read_f2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 		if (psf->data_endswap == SF_TRUE)
 			endswap_int_array (psf->u.ibuf, bufferlen) ;
 
-		f2s_array (psf->u.fbuf, readcount, ptr + total, scale) ;
+		convert (psf->u.fbuf, readcount, ptr + total, scale) ;
 		total += readcount ;
 		if (readcount < bufferlen)
 			break ;
