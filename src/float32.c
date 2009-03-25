@@ -444,7 +444,7 @@ f2s_clip_array (const float *src, int count, short *dest, float scale)
 
 		if (CPU_CLIPS_POSITIVE == 0 && tmp > 32767.0)
 			dest [count] = SHRT_MAX ;
-		else if (CPU_CLIPS_NEGATIVE == 0 && tmp < 32768.0)
+		else if (CPU_CLIPS_NEGATIVE == 0 && tmp < -32768.0)
 			dest [count] = SHRT_MIN ;
 		else
 			dest [count] = lrintf (tmp) ;

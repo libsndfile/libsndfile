@@ -1,3 +1,8 @@
+2009-03-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/float32.c
+    Fix f2s_clip_array.
+
 2009-03-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/float32.c
