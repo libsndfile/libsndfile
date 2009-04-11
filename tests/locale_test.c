@@ -84,7 +84,7 @@ locale_test (const char * locname, const char * filename, int width)
 	if (setlocale (LC_ALL, locname) == NULL)
 		return ;
 
-	printf ("    locale_test : %-6s   %s%*c : ", locname, filename, 28 - width, ' ') ;
+	printf ("    locale_test                    : %-6s  %s %*c ", locname, filename, 16 - width, ' ') ;
 	fflush (stdout) ;
 
 	sfinfo.format = SF_FORMAT_AU | SF_FORMAT_PCM_16 ;

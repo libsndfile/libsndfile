@@ -44,6 +44,8 @@ main (void)
 	const char	*filename ;
 	int			k ;
 
+	print_test_name ("alaw_test", "encoder") ;
+
 	filename = "test.raw" ;
 
 	sfinfo.format		= SF_FORMAT_RAW | SF_FORMAT_ALAW ;
@@ -94,8 +96,9 @@ main (void)
 
 	sf_close (file) ;
 
-	printf ("    alaw_test : encoder ... ok\n") ;
+	puts ("ok") ;
 
+	print_test_name ("alaw_test", "decoder") ;
 	/* Now generate a file containing all possible 8 bit encoded
 	** sample values and write it to disk as alaw encoded.frames.
 	*/
@@ -139,7 +142,7 @@ main (void)
 
 	sf_close (file) ;
 
-	printf ("    alaw_test : decoder ... ok\n") ;
+	puts ("ok") ;
 
 	unlink (filename) ;
 

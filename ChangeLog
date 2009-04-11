@@ -1,3 +1,8 @@
+2009-04-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/alaw_test.c tests/locale_test.c tests/ulaw_test.c
+    Cleanup output.
+
 2009-03-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/float32.c
