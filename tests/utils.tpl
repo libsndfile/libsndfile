@@ -470,7 +470,7 @@ test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allo
 
 	SNDFILE *file ;
 	const char *modestr, *func_name ;
-	int oflags = 0, omode = 0 ;
+	int oflags = 0, omode = 0, err ;
 
 	/*
 	** Need to test both sf_open() and sf_open_fd().
@@ -525,6 +525,13 @@ test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allo
 
 	if (file == NULL)
 	{	printf ("\n\nLine %d: %s (%s) failed : %s\n\n", line_num, func_name, modestr, sf_strerror (NULL)) ;
+		dump_log_buffer (file) ;
+		exit (1) ;
+		} ;
+
+	err = sf_error (file) ;
+	if (err != SF_ERR_NO_ERROR)
+	{	printf ("\n\nLine %d : sf_error : %s\n\n", line_num, sf_error_number (err)) ;
 		dump_log_buffer (file) ;
 		exit (1) ;
 		} ;
