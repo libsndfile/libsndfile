@@ -50,6 +50,7 @@ examples/sndfilehandle
 libsndfile-1.0.*
 libsndfile.spec
 libtool
+mntest.sh
 programs/sndfile-cmp
 programs/sndfile-convert
 programs/sndfile-data-trim
@@ -59,7 +60,9 @@ programs/sndfile-metadata-get
 programs/sndfile-metadata-set
 programs/sndfile-play
 regtest/sndfile-regtest
+rf64-test.sh
 save
+shave
 shave-libtool
 sndfile.pc
 src/Ext
