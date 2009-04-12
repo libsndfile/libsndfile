@@ -2153,9 +2153,12 @@ sf_writef_double	(SNDFILE *sndfile, const double *ptr, sf_count_t frames)
 
 static int
 try_resource_fork (SF_PRIVATE * psf, int mode)
-{
+{	int old_error = psf->error ;
+
 	if (psf_open_rsrc (psf, mode) != 0)
+	{	psf->error = old_error ;
 		return 0 ;
+		} ;
 
 	/* More checking here. */
 	psf_log_printf (psf, "Resource fork : %s\n", psf->rsrcpath) ;

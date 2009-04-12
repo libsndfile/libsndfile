@@ -9,6 +9,9 @@
     * tests/utils.tpl
     Add check of sf_error to test_open_file_or_die().
 
+    * src/sndfile.c
+    Clear error if opening resource fork fails.
+
 2009-04-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/alaw_test.c tests/locale_test.c tests/ulaw_test.c
