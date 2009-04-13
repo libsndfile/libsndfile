@@ -112,6 +112,11 @@ if test -z "$*"; then
         echo "to pass any to it, please specify them on the $0 command line."
 fi
 
+if test ! -d Cfg ; then
+	echo "Createing 'Cfg' directory."
+	mkdir Cfg
+fi
+
 echo "Generating configuration files for $package, please wait...."
 
 echo "  $ACLOCAL $ACLOCAL_FLAGS"
@@ -126,4 +131,4 @@ echo "  autoconf"
 autoconf || exit 1
 
 cd $olddir
-$srcdir/configure --enable-maintainer-mode --enable-gcc-werror "$@" && echo
+$srcdir/configure --enable-gcc-werror "$@" && echo
