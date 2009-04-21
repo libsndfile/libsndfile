@@ -756,7 +756,6 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					pchk4_store (&paiff->chunk4, marker, psf_ftell (psf) - 8, dword) ;
 					psf_log_printf (psf, " %M : %d\n", marker, dword) ;
 					{	unsigned short mark_id, n = 0 ;
-						unsigned char pstr_len ;
 						unsigned int position ;
 
 						bytesread = psf_binheader_readf (psf, "E2", &n) ;
@@ -771,13 +770,24 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 							return SFE_MALLOC_FAILED ;
 
 						for (n = 0 ; n < mark_count && bytesread < dword ; n++)
-						{	bytesread += psf_binheader_readf (psf, "E241", &mark_id, &position, &pstr_len) ;
+						{	unsigned int pstr_len ;
+							unsigned char ch ;
+
+							bytesread += psf_binheader_readf (psf, "E241", &mark_id, &position, &ch) ;
 							psf_log_printf (psf, "   Mark ID  : %u\n   Position : %u\n", mark_id, position) ;
 
-							pstr_len += (pstr_len & 1) ? 0 : 1 ;
+							pstr_len = (ch & 1) ? ch : ch + 1 ;
 
-							bytesread += psf_binheader_readf (psf, "b", psf->u.scbuf, pstr_len) ;
-							psf->u.scbuf [pstr_len] = 0 ;
+							if (pstr_len < sizeof (psf->u.scbuf) - 1)
+							{	bytesread += psf_binheader_readf (psf, "b", psf->u.scbuf, pstr_len) ;
+								psf->u.scbuf [pstr_len] = 0 ;
+								}
+							else
+							{	unsigned int read_len = pstr_len - (sizeof (psf->u.scbuf) - 1) ;
+								bytesread += psf_binheader_readf (psf, "bj", psf->u.scbuf, read_len, pstr_len - read_len) ;
+								psf->u.scbuf [sizeof (psf->u.scbuf) - 1] = 0 ;
+								}
+
 							psf_log_printf (psf, "   Name     : %s\n", psf->u.scbuf) ;
 
 							paiff->markstr [n].markerID = mark_id ;

@@ -5,6 +5,9 @@
     heap overflow. Thanks to Tobias Klein (http://www.trapkit.de) for reporting
     this issue.
 
+    * src/aiff.c
+    Fix potential (heap) buffer overflow when parsing 'MARK' chunk.
+
 2009-04-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/stdin_test.c
