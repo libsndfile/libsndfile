@@ -199,7 +199,7 @@ voc_read_header	(SF_PRIVATE *psf)
 	psf->endian = SF_ENDIAN_LITTLE ;
 
 	while (1)
-	{	int size ;
+	{	unsigned size ;
 		short count ;
 
 		block_type = 0 ;
@@ -211,9 +211,14 @@ voc_read_header	(SF_PRIVATE *psf)
 
 					psf_log_printf (psf, " ASCII : %d\n", size) ;
 
-					offset += psf_binheader_readf (psf, "b", psf->header, size) ;
-					psf->header [size] = 0 ;
-					psf_log_printf (psf, "  text : %s\n", psf->header) ;
+					if (size < sizeof (psf->header) - 1)
+					{	offset += psf_binheader_readf (psf, "b", psf->header, size) ;
+						psf->header [size] = 0 ;
+						psf_log_printf (psf, "  text : %s\n", psf->header) ;
+						continue ;
+						}
+
+					offset += psf_binheader_readf (psf, "j", size) ;
 					continue ;
 
 			case VOC_REPEAT :
