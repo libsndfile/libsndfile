@@ -25,12 +25,12 @@
 
 #if HAVE_STDINT_H
 #include <stdint.h>
+#elif HAVE_INTTYPES_H
+#include <inttypes.h>
 #endif
 
 #ifndef SNDFILE_H
 #include "sndfile.h"
-#elif HAVE_INTTYPES_H
-#include <inttypes.h>
 #endif
 
 #ifdef __cplusplus

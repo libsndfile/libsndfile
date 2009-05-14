@@ -1,3 +1,9 @@
+2009-05-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/test_conversions.c
+    Be more careful when including <stdint.h> so compiling on pre-C99 platforms
+    (hello Slowlaris) might actually work.
+
 2009-04-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/voc.c
