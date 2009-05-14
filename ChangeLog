@@ -4,6 +4,9 @@
     Be more careful when including <stdint.h> so compiling on pre-C99 platforms
     (hello Slowlaris) might actually work.
 
+    * NEWS README doc/*.html
+    Updates for 1.0.20.
+
 2009-04-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/voc.c

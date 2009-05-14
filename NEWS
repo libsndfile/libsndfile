@@ -1,3 +1,6 @@
+Version 1.0.20 (2009-03-14)
+  * Fix potential heap overflow in VOC file parser (Tobias Klein, http://www.trapkit.de/).
+
 Version 1.0.19 (2009-03-02)
   * Fix for CVE-2009-0186 (Alin Rad Pop, Secunia Research).
   * Huge number of minor bug fixes as a result of static analysis.
