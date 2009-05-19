@@ -60,7 +60,7 @@
 
 <!-- ========================================================================= -->
 <A NAME="Q001"></A>
-<H2><BR><B>Q1 : Do you plan to support XYZ codec in libsnfile?</B></H2>
+<H2><BR><B>Q1 : Do you plan to support XYZ codec in libsndfile?</B></H2>
 <P>
 If source code for XYZ codec is available under a suitable license (LGPL, BSD,
 MIT etc) then yes, I'd like to add it.
@@ -106,12 +106,12 @@ When you configure and compile libsndfile, it uses the /bin/sh shell for a numbe
 of tasks (ie configure script and libtool).
 Older versions of OSX (10.2?) shipped a a really crappy Bourne shell as /bin/sh
 which resulted in <b>really</b> slow compiles.
-New version of OSX ship GNU BASh as /bin/sh and this answer doesn't apply in that
+New version of OSX ship GNU Bash as /bin/sh and this answer doesn't apply in that
 case.
 </P>
 <P>
 To fix this I suggest that you install the GNU Bash shell, rename /bin/sh to
-/bin/sh.old and make a softlink from /bin/sh to the bash shell.
+/bin/sh.old and make a symlink from /bin/sh to the bash shell.
 Bash is designed to behave as a Bourne shell when is is called as /bin/sh.
 </P>
 <P>
@@ -128,7 +128,7 @@ It seems that the Solaris Bourne shell disagrees with GNU libtool.
 </P>
 <P>
 To fix this I suggest that you install the GNU Bash shell, rename /bin/sh to
-/bin/sh.old and make a softlink from /bin/sh to the bash shell.
+/bin/sh.old and make a symlink from /bin/sh to the bash shell.
 Bash is designed to behave as a Bourne shell when is is called as /bin/sh.
 </P>
 
@@ -766,16 +766,19 @@ released under, the GNU Lesser General Public License (LGPL):
 </B></H2>
 
 <p>
-Currently the precompiled windows binaries are tested in Windows XP.
+Currently the precompiled windows binaries are thoroughly tested on Windows XP.
 As such, they should also work on Win2k and Windows Vista.
 They may also work on earlier versions of windows.
 </p>
 
 <p>
-libsndfile does not yet work on 64 bit versions of windows.
-Support for 64 bit versions of WinXP and Vista is likely to be working some
-time late in 2008.
+Since version 0.1.18 I have also been releasing precompiled binaries for Win64,
+the 64 bit version of windows.
+These binaries have received much less testing than the  32 bit versions, but
+should work as expected.
+I'd be very interested in receiving feedback  on these binaries.
 </p>
+
 <!-- ========================================================================= -->
 <HR>
 <P>

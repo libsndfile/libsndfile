@@ -1,3 +1,8 @@
+2009-05-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/FAQ.html
+    Update the section about pre-compiled binaries for Win64.
+
 2009-05-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/test_conversions.c
