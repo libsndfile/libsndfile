@@ -1,3 +1,9 @@
+2009-05-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in src/common.h src/sndfile.c src/wav_w64.c
+    Apply a patch from Lennart Poettering (PulseAudio) to allow reading of
+    channel data in WAV and W64 files.
+
 2009-05-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/FAQ.html

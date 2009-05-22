@@ -72,6 +72,28 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_PVOCEX =
 } ;
 #endif
 
+/* This stores which bit in dwChannelMask maps to which channel */
+static const int channel_mask_bits[] = {
+	SF_CHANNEL_MAP_FRONT_LEFT,  /* WAVEFORMATEXTENSIBLE doesn't distuingish FRONT_LEFT from LEFT */
+	SF_CHANNEL_MAP_FRONT_RIGHT,
+	SF_CHANNEL_MAP_FRONT_CENTER,
+	SF_CHANNEL_MAP_LFE,
+	SF_CHANNEL_MAP_REAR_LEFT,
+	SF_CHANNEL_MAP_REAR_RIGHT,
+	SF_CHANNEL_MAP_FRONT_LEFT_OF_CENTER,
+	SF_CHANNEL_MAP_FRONT_RIGHT_OF_CENTER,
+	SF_CHANNEL_MAP_REAR_CENTER,
+	SF_CHANNEL_MAP_SIDE_LEFT,
+	SF_CHANNEL_MAP_SIDE_RIGHT,
+	SF_CHANNEL_MAP_TOP_CENTER,
+	SF_CHANNEL_MAP_TOP_FRONT_LEFT,
+	SF_CHANNEL_MAP_TOP_FRONT_CENTER,
+	SF_CHANNEL_MAP_TOP_FRONT_RIGHT,
+	SF_CHANNEL_MAP_TOP_REAR_LEFT,
+	SF_CHANNEL_MAP_TOP_REAR_CENTER,
+	SF_CHANNEL_MAP_TOP_REAR_RIGHT
+} ;
+
 /*------------------------------------------------------------------------------
  * Private static functions.
  */
@@ -272,9 +294,30 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				psf_log_printf (psf, "  Valid Bits    : %d\n", wav_fmt->ext.validbits) ;
 				psf_log_printf (psf, "  Channel Mask  : 0x%X\n", wav_fmt->ext.channelmask) ;
 
-				bytesread +=
-				psf_binheader_readf (psf, "422", &(wav_fmt->ext.esf.esf_field1), &(wav_fmt->ext.esf.esf_field2),
-						&(wav_fmt->ext.esf.esf_field3)) ;
+				if (wav_fmt->ext.channelmask)
+				{	unsigned bit ;
+
+					/* It's probably wise to ignore the channel mask if it is all zero */
+					free (psf->channel_map) ;
+
+					if ((psf->channel_map = malloc (psf->sf.channels * sizeof (psf->channel_map [0]))) == NULL)
+						return SFE_MALLOC_FAILED ;
+
+					for (bit = k = 0 ; bit < ARRAY_LEN (channel_mask_bits) ; bit++)
+					{
+						if (wav_fmt->ext.channelmask & (1 << bit))
+						{	if (k > psf->sf.channels)
+								return SFE_W64_BAD_CHANNEL_MAP ;
+
+							psf->channel_map [k++] = channel_mask_bits [bit] ;
+							} ;
+						} ;
+
+					if (k != psf->sf.channels)
+						return SFE_W64_BAD_CHANNEL_MAP ;
+					} ;
+
+				bytesread += psf_binheader_readf (psf, "422", &(wav_fmt->ext.esf.esf_field1), &(wav_fmt->ext.esf.esf_field2), &(wav_fmt->ext.esf.esf_field3)) ;
 
 				/* compare the esf_fields with each known GUID? and print? */
 				psf_log_printf (psf, "  Subformat\n") ;

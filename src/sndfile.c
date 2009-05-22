@@ -203,6 +203,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_W64_ADPCM_NOT4BIT	, "Error in ADPCM W64 file. Invalid bit width." },
 	{	SFE_W64_ADPCM_CHANNELS	, "Error in ADPCM W64 file. Invalid number of channels." },
 	{	SFE_W64_GSM610_FORMAT	, "Error in GSM610 W64 file. Invalid format chunk." },
+	{	SFE_W64_BAD_CHANNEL_MAP	, "Error in W64 file. Invalid channel map." },
 
 	{	SFE_MAT4_BAD_NAME		, "Error in MAT4 file. No variable name." },
 	{	SFE_MAT4_NO_SAMPLERATE	, "Error in MAT4 file. No sample rate." },
@@ -1187,6 +1188,43 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_RAW_DATA_NEEDS_ENDSWAP :
 			return psf->data_endswap ;
+
+		case SFC_GET_CHANNEL_MAP_INFO:
+			if (psf->channel_map == NULL)
+				return SF_FALSE ;
+
+			if (data == NULL || datasize != SIGNED_SIZEOF (psf->channel_map [0]) * psf->sf.channels)
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
+				return SF_FALSE ;
+				} ;
+
+			memcpy (data, psf->channel_map, datasize) ;
+			return SF_TRUE ;
+
+		case SFC_SET_CHANNEL_MAP_INFO:
+		{	int *iptr ;
+
+			if (data == NULL || datasize != SIGNED_SIZEOF (psf->channel_map [0]) * psf->sf.channels)
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
+				return SF_FALSE ;
+				} ;
+
+			for (iptr = data ; iptr < (int*) data + psf->sf.channels ; iptr++)
+			{	if (*iptr <= SF_CHANNEL_MAP_INVALID || *iptr >= SF_CHANNEL_MAP_MAX)
+				{	psf->error = SFE_BAD_COMMAND_PARAM ;
+					return SF_FALSE ;
+					}
+				} ;
+
+			free (psf->channel_map) ;
+			if ((psf->channel_map = malloc (datasize)) == NULL)
+			{	psf->error = SFE_MALLOC_FAILED ;
+				return SF_FALSE ;
+				} ;
+
+			memcpy (psf->channel_map, data, datasize) ;
+			return SF_TRUE ;
+			}
 
 		default :
 			/* Must be a file specific command. Pass it on. */
