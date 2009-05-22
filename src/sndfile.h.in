@@ -297,12 +297,12 @@ typedef	struct SNDFILE_tag	SNDFILE ;
 
 /* The following typedef is system specific and is defined when libsndfile is
 ** compiled. sf_count_t can be one of loff_t (Linux), off_t (*BSD), off64_t 
-** (Solaris), __int64_t (Win32) etc. On windows, we need to allow the same
+** (Solaris), __int64 (Win32) etc. On windows, we need to allow the same
 ** header file to be compiler by both GCC and the microsoft compiler.
 */
 
 #if (defined (_MSCVER) || defined (_MSC_VER))
-typedef __int64_t	sf_count_t ;
+typedef __int64	sf_count_t ;
 #define SF_COUNT_MAX		0x7fffffffffffffffi64
 #else
 typedef @TYPEOF_SF_COUNT_T@	sf_count_t ;
