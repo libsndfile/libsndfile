@@ -259,6 +259,7 @@ typedef struct
 typedef struct
 {	/* For ambisonic commands */
 	int	wavex_ambisonic ;
+	unsigned wavex_channelmask ;
 
 	/* Set to true when 'fmt ' chunk is ambiguous.*/
 	int fmt_is_broken ;
@@ -285,6 +286,7 @@ char const* wav_w64_format_str (int k) ;
 int		wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize) ;
 void	wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat) ;
 void	wav_w64_analyze (SF_PRIVATE *psf) ;
+int		wavex_gen_channel_mask (const int *chan_map, int channels) ;
 
 #endif
 

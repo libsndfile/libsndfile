@@ -1,3 +1,9 @@
+2009-05-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav_w64.[ch]
+    Add wavex_channelmask to WAV_PRIVATE struct and add a function to convert
+    an array of SF_CHANNEL_MASK_* values into a bit mask for use in WAV files.
+
 2009-05-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-info.c

@@ -73,8 +73,8 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_PVOCEX =
 #endif
 
 /* This stores which bit in dwChannelMask maps to which channel */
-static const int channel_mask_bits[] = {
-	SF_CHANNEL_MAP_FRONT_LEFT,  /* WAVEFORMATEXTENSIBLE doesn't distuingish FRONT_LEFT from LEFT */
+static const int channel_mask_bits [] =
+{	SF_CHANNEL_MAP_FRONT_LEFT,  /* WAVEFORMATEXTENSIBLE doesn't distuingish FRONT_LEFT from LEFT */
 	SF_CHANNEL_MAP_FRONT_RIGHT,
 	SF_CHANNEL_MAP_FRONT_CENTER,
 	SF_CHANNEL_MAP_LFE,
@@ -240,7 +240,6 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				else
 					psf_log_printf (psf, "  Bytes/sec     : %d (should be %d)\n", wav_fmt->min.bytespersec, bytespersec) ;
 
-
 				psf->bytewidth = 2 ;
 				psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->msadpcm.extrabytes) ;
 				psf_log_printf (psf, "  Samples/Block : %d\n", wav_fmt->msadpcm.samplesperblock) ;
@@ -296,6 +295,8 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 
 				if (wav_fmt->ext.channelmask)
 				{	unsigned bit ;
+
+					wpriv->wavex_channelmask = wav_fmt->ext.channelmask ;
 
 					/* It's probably wise to ignore the channel mask if it is all zero */
 					free (psf->channel_map) ;
@@ -412,6 +413,34 @@ wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat)
 					subformat->esf_field2, subformat->esf_field3,
 					subformat->esf_field4, make_size_t (8)) ;
 } /* wavex_write_guid */
+
+
+int
+wavex_gen_channel_mask (const int *chan_map, int channels)
+{	int chan, mask = 0, bit = -1, last_bit = -1 ;
+
+	if  (chan_map == NULL)
+		return 0 ;
+
+	for (chan = 0 ; chan < channels ; chan ++)
+	{	int k ;
+
+		for (k = bit + 1 ; k < ARRAY_LEN (channel_mask_bits) ; k++)
+			if (chan_map [chan] == channel_mask_bits [k])
+			{	bit = k ;
+				break ;
+				} ;
+
+		/* Check for bad sequence. */
+		if (bit <= last_bit)
+			return 0 ;
+
+		mask += 1 << bit ;
+		last_bit = bit ;
+		} ;
+
+	return mask ;
+} /* wavex_gen_channel_mask */
 
 void
 wav_w64_analyze (SF_PRIVATE *psf)
