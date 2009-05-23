@@ -3,6 +3,9 @@
     * programs/sndfile-info.c
     Add -c command line option to dump the channel map information.
 
+    * src/wav_w64.c
+    Don't bail from parser if channel map bitmask is faulty.
+
 2009-05-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in src/common.h src/sndfile.c src/wav_w64.c

@@ -300,21 +300,23 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 					/* It's probably wise to ignore the channel mask if it is all zero */
 					free (psf->channel_map) ;
 
-					if ((psf->channel_map = malloc (psf->sf.channels * sizeof (psf->channel_map [0]))) == NULL)
+					if ((psf->channel_map = calloc (psf->sf.channels, sizeof (psf->channel_map [0]))) == NULL)
 						return SFE_MALLOC_FAILED ;
 
 					for (bit = k = 0 ; bit < ARRAY_LEN (channel_mask_bits) ; bit++)
 					{
 						if (wav_fmt->ext.channelmask & (1 << bit))
 						{	if (k > psf->sf.channels)
-								return SFE_W64_BAD_CHANNEL_MAP ;
+							{	psf_log_printf (psf, "*** More channel map bits than there are channels.\n") ;
+								break ;
+								} ;
 
 							psf->channel_map [k++] = channel_mask_bits [bit] ;
 							} ;
 						} ;
 
 					if (k != psf->sf.channels)
-						return SFE_W64_BAD_CHANNEL_MAP ;
+						psf_log_printf (psf, "*** Less channel map bits than there are channels.\n") ;
 					} ;
 
 				bytesread += psf_binheader_readf (psf, "422", &(wav_fmt->ext.esf.esf_field1), &(wav_fmt->ext.esf.esf_field2), &(wav_fmt->ext.esf.esf_field3)) ;
