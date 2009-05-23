@@ -4,6 +4,9 @@
     Add wavex_channelmask to WAV_PRIVATE struct and add a function to convert
     an array of SF_CHANNEL_MASK_* values into a bit mask for use in WAV files.
 
+    * src/wav.c
+    Add ability to write the channel mask.
+
 2009-05-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-info.c
