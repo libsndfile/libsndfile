@@ -10,6 +10,9 @@
     * tests/command_test.c
     Update channel_map_test() function so WAV test passes.
 
+    * src/rf64.c
+    Add channel mapping and ambisonic support.
+
 2009-05-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-info.c
