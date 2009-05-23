@@ -1,3 +1,8 @@
+2009-05-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/sndfile-info.c
+    Add -c command line option to dump the channel map information.
+
 2009-05-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in src/common.h src/sndfile.c src/wav_w64.c
