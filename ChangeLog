@@ -6,6 +6,9 @@
     * src/wav_w64.c
     Don't bail from parser if channel map bitmask is faulty.
 
+    * src/common.h src/sndfile.c
+    Remove error code SFE_W64_BAD_CHANNEL_MAP which is not needed any more.
+
 2009-05-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in src/common.h src/sndfile.c src/wav_w64.c
