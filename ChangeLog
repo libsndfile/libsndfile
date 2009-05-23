@@ -9,6 +9,10 @@
     * src/common.h src/sndfile.c
     Remove error code SFE_W64_BAD_CHANNEL_MAP which is not needed any more.
 
+    * src/sndfile.c
+    On SFC_SET_CHANNEL_MAP_INFO pass the channel map command down to container's
+    command handler.
+
 2009-05-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in src/common.h src/sndfile.c src/wav_w64.c

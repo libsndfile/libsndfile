@@ -1188,7 +1188,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 		case SFC_RAW_DATA_NEEDS_ENDSWAP :
 			return psf->data_endswap ;
 
-		case SFC_GET_CHANNEL_MAP_INFO:
+		case SFC_GET_CHANNEL_MAP_INFO :
 			if (psf->channel_map == NULL)
 				return SF_FALSE ;
 
@@ -1200,19 +1200,20 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			memcpy (data, psf->channel_map, datasize) ;
 			return SF_TRUE ;
 
-		case SFC_SET_CHANNEL_MAP_INFO:
-		{	int *iptr ;
-
+		case SFC_SET_CHANNEL_MAP_INFO :
 			if (data == NULL || datasize != SIGNED_SIZEOF (psf->channel_map [0]) * psf->sf.channels)
 			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
 				} ;
 
-			for (iptr = data ; iptr < (int*) data + psf->sf.channels ; iptr++)
-			{	if (*iptr <= SF_CHANNEL_MAP_INVALID || *iptr >= SF_CHANNEL_MAP_MAX)
-				{	psf->error = SFE_BAD_COMMAND_PARAM ;
-					return SF_FALSE ;
-					}
+			{	int *iptr ;
+
+				for (iptr = data ; iptr < (int*) data + psf->sf.channels ; iptr++)
+				{	if (*iptr <= SF_CHANNEL_MAP_INVALID || *iptr >= SF_CHANNEL_MAP_MAX)
+					{	psf->error = SFE_BAD_COMMAND_PARAM ;
+						return SF_FALSE ;
+						} ;
+					} ;
 				} ;
 
 			free (psf->channel_map) ;
@@ -1222,8 +1223,12 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				} ;
 
 			memcpy (psf->channel_map, data, datasize) ;
-			return SF_TRUE ;
-			}
+
+			/*
+			**	Pass the command down to the container's command handler.
+			**	Don't pass user data, use validated psf->channel_map data instead.
+			*/
+			return psf->command (psf, command, NULL, 0) ;
 
 		default :
 			/* Must be a file specific command. Pass it on. */
