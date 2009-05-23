@@ -7,6 +7,9 @@
     * src/wav.c
     Add ability to write the channel mask.
 
+    * tests/command_test.c
+    Update channel_map_test() function so WAV test passes.
+
 2009-05-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-info.c

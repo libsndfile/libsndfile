@@ -151,8 +151,10 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || strcmp (argv [1], "chanmap") == 0)
-	{	channel_map_test ("chanmap.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
-		channel_map_test ("chanmap.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
+	{	channel_map_test ("chanmap.wavex", SF_FORMAT_WAVEX | SF_FORMAT_PCM_16) ;
+		channel_map_test ("chanmap.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
+		channel_map_test ("chanmap.caf" , SF_FORMAT_CAF | SF_FORMAT_PCM_16) ;
+		channel_map_test ("chanmap.aifc" , SF_FORMAT_AIFF | SF_FORMAT_PCM_16) ;
 		test_count ++ ;
 		} ;
 
@@ -1212,8 +1214,8 @@ channel_map_test (const char *filename, int filetype)
 {	SNDFILE	 *file ;
 	SF_INFO	 sfinfo ;
 	int channel_map_read [4], channel_map_write [4] =
-	{	SF_CHANNEL_MAP_FRONT_LEFT, SF_CHANNEL_MAP_FRONT_CENTER,
-		SF_CHANNEL_MAP_REAR_LEFT, SF_CHANNEL_MAP_REAR_RIGHT
+	{	SF_CHANNEL_MAP_SIDE_LEFT, SF_CHANNEL_MAP_SIDE_RIGHT,	
+		SF_CHANNEL_MAP_TOP_FRONT_LEFT, SF_CHANNEL_MAP_TOP_FRONT_RIGHT
 		} ;
 
 	print_test_name ("channel_map_test", filename) ;
@@ -1228,11 +1230,11 @@ channel_map_test (const char *filename, int filetype)
 	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
 	sf_close (file) ;
 
-	/* Read file making sure no channel map exists. */
+	/* Read file making default channel map exists. */
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 	exit_if_true (
-		sf_command (file, SFC_GET_CHANNEL_MAP_INFO, channel_map_read, sizeof (channel_map_read)) != SF_FALSE,
-		"\n\nLine %d : sf_command (SFC_GET_CHANNEL_MAP_INFO) should have failed.\n\n", __LINE__
+		sf_command (file, SFC_GET_CHANNEL_MAP_INFO, channel_map_read, sizeof (channel_map_read)) == SF_FALSE,
+		"\n\nLine %d : sf_command (SFC_GET_CHANNEL_MAP_INFO) should not have failed.\n\n", __LINE__
 		) ;
 	check_log_buffer_or_die (file, __LINE__) ;
 	sf_close (file) ;
