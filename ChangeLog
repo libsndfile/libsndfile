@@ -13,6 +13,10 @@
     * src/rf64.c
     Add channel mapping and ambisonic support.
 
+    * src/sndfile.h
+    Add comments showing correspondance between libsndfile channel map
+    defintiions and those used by Apple and MS.
+
 2009-05-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-info.c
