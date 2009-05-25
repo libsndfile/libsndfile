@@ -1,3 +1,8 @@
+2009-05-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac src/sndfile.h.in
+    Fix MSVC definition of sf_count_t.
+
 2009-05-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/FAQ.html

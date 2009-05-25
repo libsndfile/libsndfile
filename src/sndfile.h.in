@@ -302,7 +302,7 @@ typedef	struct SNDFILE_tag	SNDFILE ;
 */
 
 #if (defined (_MSCVER) || defined (_MSC_VER))
-typedef __int64	sf_count_t ;
+typedef __int64		sf_count_t ;
 #define SF_COUNT_MAX		0x7fffffffffffffffi64
 #else
 typedef @TYPEOF_SF_COUNT_T@	sf_count_t ;

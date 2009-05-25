@@ -159,7 +159,7 @@ AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
 
 case "$host_os" in
 	mingw*)
-		TYPEOF_SF_COUNT_T="int64_t"
+		TYPEOF_SF_COUNT_T="__int64"
 		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 		SIZEOF_SF_COUNT_T=8
 		;;
