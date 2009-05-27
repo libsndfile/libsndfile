@@ -4,6 +4,10 @@
     Disallow setting of channel map after audio data has been written.
     Only call psf->command if it is non-NULL.
 
+    * src/wav_w64.c
+    Use SF_CHANNL_MAP_LEFT/RIGHT/CENTER instead of SF_CHANNL_MAP_FRONT_LEFT/
+	RIGHT/CENTER.
+
 2009-05-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/chanmap.[ch]

@@ -74,9 +74,9 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_PVOCEX =
 
 /* This stores which bit in dwChannelMask maps to which channel */
 static const int channel_mask_bits [] =
-{	SF_CHANNEL_MAP_FRONT_LEFT,  /* WAVEFORMATEXTENSIBLE doesn't distuingish FRONT_LEFT from LEFT */
-	SF_CHANNEL_MAP_FRONT_RIGHT,
-	SF_CHANNEL_MAP_FRONT_CENTER,
+{	SF_CHANNEL_MAP_LEFT,  /* WAVEFORMATEXTENSIBLE doesn't distuingish FRONT_LEFT from LEFT */
+	SF_CHANNEL_MAP_RIGHT,
+	SF_CHANNEL_MAP_CENTER,
 	SF_CHANNEL_MAP_LFE,
 	SF_CHANNEL_MAP_REAR_LEFT,
 	SF_CHANNEL_MAP_REAR_RIGHT,
