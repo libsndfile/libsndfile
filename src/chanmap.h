@@ -29,4 +29,4 @@ typedef struct
 
 int aiff_caf_find_channel_layout_tag (const int *chan_map, int channels) ;
 
-const AIFF_CAF_CHANNEL_MAP  * aiff_caf_of_channel_layout_tag (int tag) ;
+const AIFF_CAF_CHANNEL_MAP * aiff_caf_of_channel_layout_tag (int tag) ;

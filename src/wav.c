@@ -919,7 +919,7 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 			if (wpriv->wavex_ambisonic != SF_AMBISONIC_NONE)
 				psf_binheader_writef (psf, "4", 0) ;
 			else if (wpriv->wavex_channelmask != 0)
-				psf_binheader_writef (psf, "4", wpriv->wavex_channelmask) ; 
+				psf_binheader_writef (psf, "4", wpriv->wavex_channelmask) ;
 			else
 			{	/*
 				** Ok some liberty is taken here to use the most commonly used channel masks

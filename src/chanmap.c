@@ -42,7 +42,7 @@ static const AIFF_CAF_CHANNEL_MAP zero_chan [] =
 static const int one_chan_mono [1] = {	SF_CHANNEL_MAP_MONO } ;
 
 static const AIFF_CAF_CHANNEL_MAP one_chan [] =
-{	{	(100 << 16) | 1,  one_chan_mono, "mono" }
+{	{	(100 << 16) | 1, one_chan_mono, "mono" }
 } ; /* one_chan */
 
 
@@ -74,7 +74,7 @@ static const AIFF_CAF_CHANNEL_MAP three_chan [] =
 {	{	(113 << 16) | 3, three_channel_mpeg_30a, "MPEG 3 0 A (L, R, C)" },
 	{	(114 << 16) | 3, three_channel_mpeg_30b, "MPEG 3 0 B (C, L, R)" },
 	{	(131 << 16) | 3, three_channel_itu_21, "ITU 2.1 (L, R, Cs)" },
-	{	(133 << 16) | 3, three_channel_dvd_4,  "DVD 4 (L, R, LFE)" }
+	{	(133 << 16) | 3, three_channel_dvd_4, "DVD 4 (L, R, LFE)" }
 } ; /* three_chan */
 
 
@@ -95,7 +95,7 @@ static const int four_channel_dvd_10 [4] =
 
 static const AIFF_CAF_CHANNEL_MAP four_chan [] =
 {	{	(107 << 16) | 4, four_channel_ambisonc_b, "ambisonic B (W,  X, Y, Z)" },
-	{	(108 << 16) | 4, four_channel_quad,  "quad (Lfront, Rfront, Lrear, Rrear)" },
+	{	(108 << 16) | 4, four_channel_quad, "quad (Lfront, Rfront, Lrear, Rrear)" },
 	{	(115 << 16) | 4, four_channel_mpeg_40a, "MPEG 4.0 A (L, R, C, Cs)" },
 	{	(116 << 16) | 4, four_channel_mpeg_40b, "MPEG 4.0 B (C, L, R, Cs)" },
 	{	(132 << 16) | 4, four_channel_itu_23, "ITU 2.3 (L, R, Ls, Rs)" },
@@ -196,17 +196,18 @@ static const AIFF_CAF_CHANNEL_MAP eight_chan [] =
 
 #if 0
 
-TMH_10_2_std   = (145 << 16) | 16,
-                        // L R C Vhc Lsd Rsd Ls Rs Vhl Vhr Lw Rw Csd Cs LFE1 LFE2
+TMH_10_2_std = (145 << 16) | 16,
+// L R C Vhc Lsd Rsd Ls Rs Vhl Vhr Lw Rw Csd Cs LFE1 LFE2
 
 TMH_10_2_full = (146 << 16) | 21,
-                                        // TMH_10_2_std plus: Lc Rc HI VI Haptic
+// TMH_10_2_std plus: Lc Rc HI VI Haptic
+
 #endif
 
 
 typedef struct
 {	const AIFF_CAF_CHANNEL_MAP * map ;
-	int len  ;
+	int len ;
 } MAP_MAP ;
 
 static const MAP_MAP map [] =
@@ -241,7 +242,7 @@ aiff_caf_find_channel_layout_tag (const int *chan_map, int channels)
 	return 0 ;
 } /* aiff_caf_find_channel_layout_tag */
 
-const AIFF_CAF_CHANNEL_MAP  *
+const AIFF_CAF_CHANNEL_MAP *
 aiff_caf_of_channel_layout_tag (int tag)
 {	const AIFF_CAF_CHANNEL_MAP * curr_map ;
 	unsigned k, len ;

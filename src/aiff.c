@@ -1311,7 +1311,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "mb", comm_encoding, comm_zero_bytes, sizeof (comm_zero_bytes)) ;
 
 	if (psf->channel_map && paiff->chanmap_tag)
-		psf_binheader_writef (psf, "Em4444", CHAN_MARKER, 12, paiff->chanmap_tag, 0,  0) ;
+		psf_binheader_writef (psf, "Em4444", CHAN_MARKER, 12, paiff->chanmap_tag, 0, 0) ;
 
 	if (psf->instrument != NULL)
 	{	MARK_ID_POS	m [4] ;
@@ -1682,7 +1682,7 @@ aiff_read_chanmap (SF_PRIVATE * psf, unsigned dword)
 	{	size_t chanmap_size = psf->sf.channels * sizeof (psf->channel_map [0]) ;
 
 		free (psf->channel_map) ;
-	
+
 		if ((psf->channel_map = malloc (chanmap_size)) == NULL)
 			return SFE_MALLOC_FAILED ;
 

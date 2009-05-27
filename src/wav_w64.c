@@ -419,7 +419,7 @@ int
 wavex_gen_channel_mask (const int *chan_map, int channels)
 {	int chan, mask = 0, bit = -1, last_bit = -1 ;
 
-	if  (chan_map == NULL)
+	if (chan_map == NULL)
 		return 0 ;
 
 	for (chan = 0 ; chan < channels ; chan ++)
