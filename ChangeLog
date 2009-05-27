@@ -6,7 +6,7 @@
 
     * src/wav_w64.c
     Use SF_CHANNL_MAP_LEFT/RIGHT/CENTER instead of SF_CHANNL_MAP_FRONT_LEFT/
-	RIGHT/CENTER.
+    RIGHT/CENTER.
 
     * src/aiff.c
     Add handling of reading/writing channel map info.
@@ -16,6 +16,9 @@
 
     * src/caf.c
     Add handling of reading/writing channel map info.
+
+    * tests/command_test.c tests/test_wrapper.sh.in
+    Update channel map tests.
 
 2009-05-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
