@@ -1201,6 +1201,10 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			return SF_TRUE ;
 
 		case SFC_SET_CHANNEL_MAP_INFO :
+			if (psf->have_written)
+			{	psf->error = SFE_CMD_HAS_DATA ;
+				return SF_FALSE ;
+				} ;
 			if (data == NULL || datasize != SIGNED_SIZEOF (psf->channel_map [0]) * psf->sf.channels)
 			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
@@ -1228,7 +1232,9 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			**	Pass the command down to the container's command handler.
 			**	Don't pass user data, use validated psf->channel_map data instead.
 			*/
-			return psf->command (psf, command, NULL, 0) ;
+			if (psf->command)
+				return psf->command (psf, command, NULL, 0) ;
+			return SF_FALSE ;
 
 		default :
 			/* Must be a file specific command. Pass it on. */

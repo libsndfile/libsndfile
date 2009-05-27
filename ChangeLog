@@ -1,3 +1,9 @@
+2009-05-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    Disallow setting of channel map after audio data has been written.
+    Only call psf->command if it is non-NULL.
+
 2009-05-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/chanmap.[ch]
