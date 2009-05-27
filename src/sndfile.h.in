@@ -273,10 +273,10 @@ enum
 	SF_CHANNEL_MAP_FRONT_LEFT,
 	SF_CHANNEL_MAP_FRONT_RIGHT,
 	SF_CHANNEL_MAP_FRONT_CENTER,
-	SF_CHANNEL_MAP_REAR_CENTER,				/* Apple calls this 'Center Surround', MS calls this 'Back Center' */
-	SF_CHANNEL_MAP_REAR_LEFT,				/* Apple calls this 'Left Surround', MS calls this 'Back Left' */
-	SF_CHANNEL_MAP_REAR_RIGHT,				/* Apple calls this 'Right Surround', MS calls this 'Back Right' */
-	SF_CHANNEL_MAP_LFE,						/* Apple calls this 'LFEScreen', MS calls this 'Low Frequency'  */
+	SF_CHANNEL_MAP_REAR_CENTER,				/* Apple calls this 'Center Surround', Msft calls this 'Back Center' */
+	SF_CHANNEL_MAP_REAR_LEFT,				/* Apple calls this 'Left Surround', Msft calls this 'Back Left' */
+	SF_CHANNEL_MAP_REAR_RIGHT,				/* Apple calls this 'Right Surround', Msft calls this 'Back Right' */
+	SF_CHANNEL_MAP_LFE,						/* Apple calls this 'LFEScreen', Msft calls this 'Low Frequency'  */
 	SF_CHANNEL_MAP_FRONT_LEFT_OF_CENTER,	/* Apple calls this 'Left Center' */
 	SF_CHANNEL_MAP_FRONT_RIGHT_OF_CENTER,	/* Apple calls this 'Right Center */
 	SF_CHANNEL_MAP_SIDE_LEFT,				/* Apple calls this 'Left Surround Direct' */
@@ -288,7 +288,13 @@ enum
 	SF_CHANNEL_MAP_TOP_REAR_LEFT,			/* Apple and MS call this 'Top Back Left' */
 	SF_CHANNEL_MAP_TOP_REAR_RIGHT,			/* Apple and MS call this 'Top Back Right' */
 	SF_CHANNEL_MAP_TOP_REAR_CENTER,			/* Apple and MS call this 'Top Back Center' */
-	SF_CHANNEL_MAP_MAX
+
+	SF_CHANNEL_MAP_AMBISONIC_B_W,
+	SF_CHANNEL_MAP_AMBISONIC_B_X,
+	SF_CHANNEL_MAP_AMBISONIC_B_Y,
+	SF_CHANNEL_MAP_AMBISONIC_B_Z,
+
+	SF_CHANNEL_MAP_MAX,
 } ;
 
 
