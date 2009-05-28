@@ -59,7 +59,7 @@ ulaw_init (SF_PRIVATE *psf)
 	else
 		psf->datalength = 0 ;
 
-	psf->sf.frames = psf->datalength / psf->blockwidth ;
+	psf->sf.frames = psf->blockwidth > 0 ? psf->datalength / psf->blockwidth : 1 ;
 
 	return 0 ;
 } /* ulaw_init */

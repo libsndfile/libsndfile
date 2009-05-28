@@ -1,3 +1,9 @@
+2009-05-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/alaw.c src/float32.c src/htk.c src/pcm.c src/sds.c src/ulaw.c
+    Fix bugs where invalid files can cause a divide by zero error (SIGFPE).
+    Thanks to Sami Liedes for reporting this a Debian bug #530831.
+
 2009-05-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac src/sndfile.h.in

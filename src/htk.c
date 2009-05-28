@@ -195,10 +195,17 @@ htk_read_header (SF_PRIVATE *psf)
 		return SFE_HTK_NOT_WAVEFORM ;
 
 	psf->sf.channels = 1 ;
-	psf->sf.samplerate = 10000000 / sample_period ;
 
-	psf_log_printf (psf, "HTK Waveform file\n  Sample Count  : %d\n  Sample Period : %d => %d Hz\n",
-				sample_count, sample_period, psf->sf.samplerate) ;
+	if (sample_period > 0)
+	{	psf->sf.samplerate = 10000000 / sample_period ;
+		psf_log_printf (psf, "HTK Waveform file\n  Sample Count  : %d\n  Sample Period : %d => %d Hz\n",
+					sample_count, sample_period, psf->sf.samplerate) ;
+		}
+	else
+	{	psf->sf.samplerate = 16000 ;
+		psf_log_printf (psf, "HTK Waveform file\n  Sample Count  : %d\n  Sample Period : %d (should be > 0) => Guessed sample rate %d Hz\n",
+					sample_count, sample_period, psf->sf.samplerate) ;
+		} ;
 
 	psf->sf.format = SF_FORMAT_HTK | SF_FORMAT_PCM_16 ;
 	psf->bytewidth = 2 ;
