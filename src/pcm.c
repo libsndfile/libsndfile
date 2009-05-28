@@ -271,7 +271,7 @@ pcm_init (SF_PRIVATE *psf)
 	else
 		psf->datalength = 0 ;
 
-	psf->sf.frames = psf->blockwidth > 0 ? psf->datalength / psf->blockwidth : 1 ;
+	psf->sf.frames = psf->blockwidth > 0 ? psf->datalength / psf->blockwidth : 0 ;
 
 	return 0 ;
 } /* pcm_init */
