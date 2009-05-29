@@ -51,12 +51,13 @@ typedef struct
 	int			format ;
 } OUTPUT_FORMAT_MAP ;
 
-static void copy_metadata (SNDFILE *outfile, SNDFILE *infile) ;
+static void copy_metadata (SNDFILE *outfile, SNDFILE *infile, int channels) ;
 
 static OUTPUT_FORMAT_MAP format_map [] =
 {
 	{	"aif",		3,	SF_FORMAT_AIFF	},
 	{	"wav", 		0,	SF_FORMAT_WAV	},
+	{	"wavex",	0,	SF_FORMAT_WAVEX	},
 	{	"au",		0,	SF_FORMAT_AU	},
 	{	"caf",		0,	SF_FORMAT_CAF	},
 	{	"flac",		0,	SF_FORMAT_FLAC	},
@@ -328,7 +329,7 @@ main (int argc, char * argv [])
 		} ;
 
 	/* Copy the metadata */
-	copy_metadata (outfile, infile) ;
+	copy_metadata (outfile, infile, sfinfo.channels) ;
 
 	if ((outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT)
 			|| (infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT)
@@ -344,11 +345,11 @@ main (int argc, char * argv [])
 } /* main */
 
 static void
-copy_metadata (SNDFILE *outfile, SNDFILE *infile)
+copy_metadata (SNDFILE *outfile, SNDFILE *infile, int channels)
 {	SF_INSTRUMENT inst ;
 	SF_BROADCAST_INFO_2K binfo ;
 	const char *str ;
-	int k, err = 0 ;
+	int k, err = 0, chanmap [256] ;
 
 	for (k = SF_STR_FIRST ; k <= SF_STR_LAST ; k++)
 	{	str = sf_get_string (infile, k) ;
@@ -358,6 +359,13 @@ copy_metadata (SNDFILE *outfile, SNDFILE *infile)
 
 	memset (&inst, 0, sizeof (inst)) ;
 	memset (&binfo, 0, sizeof (binfo)) ;
+
+	if (channels < ARRAY_LEN (chanmap))
+	{	size_t size = channels * sizeof (chanmap [0]) ;
+
+		if (sf_command (infile, SFC_GET_CHANNEL_MAP_INFO, chanmap, size) == SF_TRUE)
+			sf_command (outfile, SFC_SET_CHANNEL_MAP_INFO, chanmap, size) ;
+		} ;
 
 	if (sf_command (infile, SFC_GET_INSTRUMENT, &inst, sizeof (inst)) == SF_TRUE)
 		sf_command (outfile, SFC_SET_INSTRUMENT, &inst, sizeof (inst)) ;

@@ -32,6 +32,8 @@
 
 #include <sndfile.h>
 
+#define	ARRAY_LEN(x)	((int) (sizeof (x) / sizeof ((x) [0])))
+
 typedef struct
 {	const char * title ;
 	const char * copyright ;
