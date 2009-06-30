@@ -73,25 +73,29 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_PVOCEX =
 #endif
 
 /* This stores which bit in dwChannelMask maps to which channel */
-static const int channel_mask_bits [] =
-{	SF_CHANNEL_MAP_LEFT,  /* WAVEFORMATEXTENSIBLE doesn't distuingish FRONT_LEFT from LEFT */
-	SF_CHANNEL_MAP_RIGHT,
-	SF_CHANNEL_MAP_CENTER,
-	SF_CHANNEL_MAP_LFE,
-	SF_CHANNEL_MAP_REAR_LEFT,
-	SF_CHANNEL_MAP_REAR_RIGHT,
-	SF_CHANNEL_MAP_FRONT_LEFT_OF_CENTER,
-	SF_CHANNEL_MAP_FRONT_RIGHT_OF_CENTER,
-	SF_CHANNEL_MAP_REAR_CENTER,
-	SF_CHANNEL_MAP_SIDE_LEFT,
-	SF_CHANNEL_MAP_SIDE_RIGHT,
-	SF_CHANNEL_MAP_TOP_CENTER,
-	SF_CHANNEL_MAP_TOP_FRONT_LEFT,
-	SF_CHANNEL_MAP_TOP_FRONT_CENTER,
-	SF_CHANNEL_MAP_TOP_FRONT_RIGHT,
-	SF_CHANNEL_MAP_TOP_REAR_LEFT,
-	SF_CHANNEL_MAP_TOP_REAR_CENTER,
-	SF_CHANNEL_MAP_TOP_REAR_RIGHT
+static const struct chanmap_s
+{	int id ;
+	const char * name ;
+} channel_mask_bits [] =
+{	/* WAVEFORMATEXTENSIBLE doesn't distuingish FRONT_LEFT from LEFT */
+	{	SF_CHANNEL_MAP_LEFT, "L" },
+	{	SF_CHANNEL_MAP_RIGHT, "R" },
+	{	SF_CHANNEL_MAP_CENTER, "C" },
+	{	SF_CHANNEL_MAP_LFE, "LFE" },
+	{	SF_CHANNEL_MAP_REAR_LEFT, "Ls" },
+	{	SF_CHANNEL_MAP_REAR_RIGHT, "Rs" },
+	{	SF_CHANNEL_MAP_FRONT_LEFT_OF_CENTER, "Lc" },
+	{	SF_CHANNEL_MAP_FRONT_RIGHT_OF_CENTER, "Rc" },
+	{	SF_CHANNEL_MAP_REAR_CENTER, "Cs" },
+	{	SF_CHANNEL_MAP_SIDE_LEFT, "Sl" },
+	{	SF_CHANNEL_MAP_SIDE_RIGHT, "Sr" },
+	{	SF_CHANNEL_MAP_TOP_CENTER, "Tc" },
+	{	SF_CHANNEL_MAP_TOP_FRONT_LEFT, "Tfl" },
+	{	SF_CHANNEL_MAP_TOP_FRONT_CENTER, "Tfc" },
+	{	SF_CHANNEL_MAP_TOP_FRONT_RIGHT, "Tfr" },
+	{	SF_CHANNEL_MAP_TOP_REAR_LEFT, "Trl" },
+	{	SF_CHANNEL_MAP_TOP_REAR_CENTER, "Trc" },
+	{	SF_CHANNEL_MAP_TOP_REAR_RIGHT, "Trr" },
 } ;
 
 /*------------------------------------------------------------------------------
@@ -291,9 +295,10 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 						&(wav_fmt->ext.channelmask)) ;
 
 				psf_log_printf (psf, "  Valid Bits    : %d\n", wav_fmt->ext.validbits) ;
-				psf_log_printf (psf, "  Channel Mask  : 0x%X\n", wav_fmt->ext.channelmask) ;
 
-				if (wav_fmt->ext.channelmask)
+				if (wav_fmt->ext.channelmask == 0)
+					psf_log_printf (psf, "  Channel Mask  : 0x0 (should not be zero)\n") ;
+				else
 				{	unsigned bit ;
 
 					wpriv->wavex_channelmask = wav_fmt->ext.channelmask ;
@@ -304,6 +309,9 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 					if ((psf->channel_map = calloc (psf->sf.channels, sizeof (psf->channel_map [0]))) == NULL)
 						return SFE_MALLOC_FAILED ;
 
+					/* Terminate the buffer we're going to append_snprintf into. */
+					psf->u.cbuf [0] = 0 ;
+
 					for (bit = k = 0 ; bit < ARRAY_LEN (channel_mask_bits) ; bit++)
 					{
 						if (wav_fmt->ext.channelmask & (1 << bit))
@@ -312,12 +320,22 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 								break ;
 								} ;
 
-							psf->channel_map [k++] = channel_mask_bits [bit] ;
+							psf->channel_map [k++] = channel_mask_bits [bit].id ;
+							append_snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "%s, ", channel_mask_bits [bit].name) ;
 							} ;
 						} ;
 
+					/* Remove trailing ", ". */
+					bit = strlen (psf->u.cbuf) ;
+					psf->u.cbuf [--bit] = 0 ;
+					psf->u.cbuf [--bit] = 0 ;
+
 					if (k != psf->sf.channels)
+					{	psf_log_printf (psf, "  Channel Mask  : 0x%X\n", wav_fmt->ext.channelmask) ;
 						psf_log_printf (psf, "*** Less channel map bits than there are channels.\n") ;
+						}
+					else
+						psf_log_printf (psf, "  Channel Mask  : 0x%X (%s)\n", wav_fmt->ext.channelmask, psf->u.cbuf) ;
 					} ;
 
 				bytesread += psf_binheader_readf (psf, "422", &(wav_fmt->ext.esf.esf_field1), &(wav_fmt->ext.esf.esf_field2), &(wav_fmt->ext.esf.esf_field3)) ;
@@ -426,7 +444,7 @@ wavex_gen_channel_mask (const int *chan_map, int channels)
 	{	int k ;
 
 		for (k = bit + 1 ; k < ARRAY_LEN (channel_mask_bits) ; k++)
-			if (chan_map [chan] == channel_mask_bits [k])
+			if (chan_map [chan] == channel_mask_bits [k].id)
 			{	bit = k ;
 				break ;
 				} ;

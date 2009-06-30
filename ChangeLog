@@ -1,3 +1,11 @@
+2009-06-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.(c|h)
+    Add function append_snprintf().
+
+    * src/wav_w64.c
+    Decode channel map field of WAVEX into a string.
+
 2009-05-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
