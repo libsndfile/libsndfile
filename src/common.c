@@ -1132,7 +1132,7 @@ psf_hexdump (const void *ptr, int len)
 		printf ("%08X: ", k) ;
 		for (m = 0 ; m < 16 && k + m < len ; m++)
 		{	printf (m == 8 ? " %02X " : "%02X ", data [k + m] & 0xFF) ;
-			ascii [m] = isprint (data [k + m]) ? data [k + m] : '.' ;
+			ascii [m] = psf_isprint (data [k + m]) ? data [k + m] : '.' ;
 			} ;
 
 		if (m <= 8) printf (" ") ;
@@ -1207,7 +1207,7 @@ psf_sanitize_string (char * cptr, int len)
 	do
 	{
 		len -- ;
-		cptr [len] = isprint (cptr [len]) ? cptr [len] : '.' ;
+		cptr [len] = psf_isprint (cptr [len]) ? cptr [len] : '.' ;
 	}
 	while (len > 0) ;
 } /* psf_sanitize_string */

@@ -4,6 +4,9 @@
     Add function psf_isprint() a replacement for the standard C isprint()
     function which ignores any locale settings and treats all input as ASCII.
 
+    * src/(aiff|common|rf64|sd2|strings|svx|wav).c
+    Use psf_isprint() instead of isprint().
+
 2009-07-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/command.c

@@ -401,7 +401,7 @@ read_str (const unsigned char * data, int offset, char * buffer, int buffer_len)
 	memset (buffer, 0, buffer_len) ;
 
 	for (k = 0 ; k < buffer_len - 1 ; k++)
-	{	if (isprint (data [offset + k]) == 0)
+	{	if (psf_isprint (data [offset + k]) == 0)
 			return ;
 		buffer [k] = data [offset + k] ;
 		} ;

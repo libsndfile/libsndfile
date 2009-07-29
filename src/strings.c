@@ -208,7 +208,7 @@ hexdump (void *data, int len)
 			printf ("%02X ", ptr [k] & 0xFF) ;
 		printf ("   ") ;
 		for (k = 0 ; k < 16 ; k++)
-			printf ("%c", isprint (ptr [k]) ? ptr [k] : '.') ;
+			printf ("%c", psf_isprint (ptr [k]) ? ptr [k] : '.') ;
 		puts ("") ;
 		ptr += 16 ;
 		len -= 16 ;
