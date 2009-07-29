@@ -219,6 +219,15 @@ make_size_t (int x)
 {	return (size_t) x ;
 } /* size_t_of_int */
 
+/*
+**	This version of isprint specifically ignore any locale info. Its used for
+**	determining which characters can be printed in things like hexdumps.
+*/
+static inline int
+psf_isprint (int ch)
+{	return (ch >= ' ' && ch <= '~') ;
+} /* psf_isprint */
+
 /*=======================================================================================
 **	SF_PRIVATE stuct - a pointer to this struct is passed back to the caller of the
 **	sf_open_XXXX functions. The caller however has no knowledge of the struct's
