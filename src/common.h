@@ -220,7 +220,7 @@ make_size_t (int x)
 } /* size_t_of_int */
 
 /*
-**	This version of isprint specifically ignore any locale info. Its used for
+**	This version of isprint specifically ignores any locale info. Its used for
 **	determining which characters can be printed in things like hexdumps.
 */
 static inline int
