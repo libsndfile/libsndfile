@@ -1116,8 +1116,8 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 		case SFC_SET_BROADCAST_INFO :
 			{	int format = SF_CONTAINER (psf->sf.format) ;
 
-				/* Only WAV supports the BEXT (Broadcast) chunk. */
-				if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX)
+				/* Only WAV and RF64 supports the BEXT (Broadcast) chunk. */
+				if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX && format != SF_FORMAT_RF64)
 					return SF_FALSE ;
 				} ;
 

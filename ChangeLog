@@ -1,3 +1,9 @@
+2009-08-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/rf64.c src/sndfile.c src/wav.c src/wav_w64.h
+    Apply a patch (massaged slightly) from Uli Franke adding handling of the
+    BEXT chunk in RF64 files.
+
 2009-07-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h

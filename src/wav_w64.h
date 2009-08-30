@@ -286,5 +286,8 @@ int		wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize) ;
 void	wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat) ;
 void	wav_w64_analyze (SF_PRIVATE *psf) ;
 
+int		wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize) ;
+int		wav_write_bext_chunk (SF_PRIVATE *psf) ;
+
 #endif
 

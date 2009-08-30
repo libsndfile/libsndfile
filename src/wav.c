@@ -167,8 +167,6 @@ static int 	wav_subchunk_parse	 (SF_PRIVATE *psf, int chunk) ;
 static int 	exif_subchunk_parse	 (SF_PRIVATE *psf, unsigned int length) ;
 static int	wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
 static int	wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
-static int	wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
-static int	wav_write_bext_chunk (SF_PRIVATE *psf) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -430,7 +428,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					psf_fseek (psf, psf->datalength, SEEK_CUR) ;
 
 					if (psf_ftell (psf) != psf->datalength + psf->dataoffset)
-						psf_log_printf (psf, "*** psf_fseek past end error ***\n", dword, psf->dataoffset + psf->datalength) ;
+						psf_log_printf (psf, "*** psf_fseek past end error ***\n") ;
 					break ;
 
 			case fact_MARKER :
@@ -1635,7 +1633,7 @@ wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	return 0 ;
 } /* wav_read_acid_chunk */
 
-static int
+int
 wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 {
 	SF_BROADCAST_INFO* b ;
@@ -1685,7 +1683,7 @@ wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 	return 0 ;
 } /* wav_read_bext_chunk */
 
-static int
+int
 wav_write_bext_chunk (SF_PRIVATE *psf)
 {	SF_BROADCAST_INFO *b ;
 

@@ -1,5 +1,6 @@
 /*
 ** Copyright (C) 2008-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2009      Uli Franke <cls@nebadje.org>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -19,6 +20,9 @@
 /*
 **	This format documented at:
 **	http://www.sr.se/utveckling/tu/bwf/prog/RF_64v1_4.pdf
+**
+**	But this may be a better reference:
+**	http://www.ebu.ch/CMSimages/en/tec_doc_t3306-2007_tcm6-42570.pdf
 */
 
 #include	"sfconfig.h"
@@ -44,6 +48,10 @@
 #define	fact_MARKER		MAKE_MARKER ('f', 'a', 'c', 't')
 #define	data_MARKER		MAKE_MARKER ('d', 'a', 't', 'a')
 
+#define bext_MARKER		MAKE_MARKER ('b', 'e', 'x', 't')
+#define OggS_MARKER		MAKE_MARKER ('O', 'g', 'g', 'S')
+#define wvpk_MARKER 	MAKE_MARKER ('w', 'v', 'p', 'k')
+
 /*------------------------------------------------------------------------------
 ** Typedefs.
 */
@@ -52,7 +60,7 @@
 ** Private static functions.
 */
 
-static int	rf64_read_header (SF_PRIVATE *psf) ;
+static int	rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock) ;
 static int	rf64_write_header (SF_PRIVATE *psf, int calc_length) ;
 static int	rf64_close (SF_PRIVATE *psf) ;
 
@@ -64,6 +72,7 @@ int
 rf64_open (SF_PRIVATE *psf)
 {	WAV_PRIVATE *wpriv ;
 	int	subformat, error = 0 ;
+	int blockalign, framesperblock ;
 
 	if ((wpriv = calloc (1, sizeof (WAV_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
@@ -74,7 +83,7 @@ rf64_open (SF_PRIVATE *psf)
 
 
 	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
-	{	if ((error = rf64_read_header (psf)) != 0)
+	{	if ((error = rf64_read_header (psf, &blockalign, &framesperblock)) != 0)
 			return error ;
 		} ;
 
@@ -132,16 +141,26 @@ rf64_open (SF_PRIVATE *psf)
 
 /*------------------------------------------------------------------------------
 */
+enum
+{	HAVE_ds64	= 0x01,
+	HAVE_fmt	= 0x02,
+	HAVE_bext	= 0x04,
+	HAVE_data	= 0x08
+} ;
+
+#define HAVE_CHUNK(CHUNK)	((parsestage & CHUNK) != 0)
 
 static int
-rf64_read_header (SF_PRIVATE *psf)
-{	WAV_PRIVATE *wpriv ;
-	sf_count_t riff_size, data_size ;
-	unsigned int size32 ;
-	int marker, marks [2], error, done = 0 ;
+rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
+{	WAV_PRIVATE	*wpriv ;
+	WAV_FMT		*wav_fmt ;
+	sf_count_t riff_size = 0, sample_count = 0 ;
+	unsigned int size32, parsestage = 0 ;
+	int marker, marks [2], error, done = 0, format = 0 ;
 
 	if ((wpriv = psf->container_data) == NULL)
 		return SFE_INTERNAL ;
+	wav_fmt = &wpriv->wav_fmt ;
 
 	/* Set position to start of file to begin reading header. */
 	psf_binheader_readf (psf, "pmmm", 0, &marker, marks, marks + 1) ;
@@ -157,32 +176,82 @@ rf64_read_header (SF_PRIVATE *psf)
 		{	case ds64_MARKER :
 					psf_log_printf (psf, "%M : %u\n", marker, size32) ;
 
-					psf_binheader_readf (psf, "888", &riff_size, &data_size, &psf->sf.frames) ;
+					/* Read ds64 sizes (3 8-byte words). */
+					psf_binheader_readf (psf, "888", &riff_size, &psf->datalength, &sample_count) ;
 					psf_log_printf (psf, "  Riff size : %D\n  Data size : %D\n  Frames    : %D\n",
-											riff_size, data_size, psf->sf.frames) ;
+											riff_size, psf->datalength, sample_count) ;
 
+					/* Read table length. */
 					psf_binheader_readf (psf, "4", &size32) ;
-					psf_log_printf (psf, "  Table len : %u\n", size32) ;
+					psf_log_printf (psf, "  Table length : %u\n", size32) ;
 
-					psf_binheader_readf (psf, "jm4", size32 + 4, &marker, &size32) ;
+					/* Skip table for now. (this was "size32 + 4", why?) */
+					psf_binheader_readf (psf, "j", size32) ;
+					parsestage |= HAVE_ds64 ;
+					break ;
+
+			case fmt_MARKER:
 					psf_log_printf (psf, "%M : %u\n", marker, size32) ;
-
 					if ((error = wav_w64_read_fmt_chunk (psf, size32)) != 0)
 						return error ;
-					psf->sf.format = SF_FORMAT_RF64 | (psf->sf.format & SF_FORMAT_SUBMASK) ;
+					format = wav_fmt->format ;
+					parsestage |= HAVE_fmt ;
+					break ;
+
+			case bext_MARKER :
+					if ((error = wav_read_bext_chunk (psf, size32)) != 0)
+						return error ;
+					parsestage |= HAVE_bext ;
 					break ;
 
 			case data_MARKER :
-					psf_log_printf (psf, "%M : %x\n", marker, size32) ;
-					psf->dataoffset = psf->headindex ;
-					done = SF_TRUE ;
-					break ;
+				/* see wav for more sophisticated parsing -> implement state machine with parsestage */
+
+				psf_log_printf (psf, "%M : %x\n", marker, size32) ;
+
+				/* Fetch data length only from data chunk when data chunk size is not set to -1 */
+				if ( size32 != 0xFFFFFFFF )
+					psf->datalength = size32 ;
+				else if ( ! HAVE_CHUNK (HAVE_ds64))
+				{	/* Assuming the ds64 chunk comes always before the data chunk. */
+					psf_log_printf (psf, "  *** Data length not specified (-1 in data chunk and no ds64 chunk).") ;
+					} ;
+
+				psf->dataoffset = psf_ftell (psf) ;
+
+				if (psf->dataoffset > 0)
+				{	if (size32 == 0 && riff_size == 8 && psf->filelength > 44)
+					{	psf_log_printf (psf, "  *** Looks like a WAV file which wasn't closed properly. Fixing it.\n") ;
+						psf->datalength = psf->filelength - psf->dataoffset ;
+						} ;
+
+					if (psf->datalength > psf->filelength - psf->dataoffset)
+					{	psf_log_printf (psf, "  data : %D (should be %D)\n", psf->datalength, psf->filelength - psf->dataoffset) ;
+						psf->datalength = psf->filelength - psf->dataoffset ;
+						}
+					else
+						psf_log_printf (psf, "  data : %D\n", psf->datalength) ;
+
+					/* Only set dataend if there really is data at the end. */
+					if (psf->datalength + psf->dataoffset < psf->filelength)
+						psf->dataend = psf->datalength + psf->dataoffset ;
+
+					if (! psf->sf.seekable || psf->dataoffset < 0)
+						break ;
+
+					/* Seek past data and continue reading header. */
+					psf_fseek (psf, psf->datalength, SEEK_CUR) ;
+
+					if (psf_ftell (psf) != psf->datalength + psf->dataoffset)
+						psf_log_printf (psf, "  *** psf_fseek past end error ***\n") ;
+						break ;
+					} ;
+				break ;
 
 			default :
-					if (psf_isprint ((marker >> 24) & 0xFF) && psf_isprint ((marker >> 16) & 0xFF)
-						&& psf_isprint ((marker >> 8) & 0xFF) && psf_isprint (marker & 0xFF))
-					{	psf_binheader_readf (psf, "4", &size32) ;
-						psf_log_printf (psf, "*** %M : %d (unknown marker)\n", marker, size32) ;
+					if (isprint ((marker >> 24) & 0xFF) && isprint ((marker >> 16) & 0xFF)
+						&& isprint ((marker >> 8) & 0xFF) && isprint (marker & 0xFF))
+					{	psf_log_printf (psf, "*** %M : %d (unknown marker)\n", marker, size32) ;
 						if (size32 < 8)
 							done = SF_TRUE ;
 						psf_binheader_readf (psf, "j", size32) ;
@@ -203,6 +272,98 @@ rf64_read_header (SF_PRIVATE *psf)
 			break ;
 			} ;
 		} ;
+
+	if (psf->dataoffset <= 0)
+		return SFE_WAV_NO_DATA ;
+
+	/* WAVs can be little or big endian */
+	psf->endian = psf->rwf_endian ;
+
+	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
+
+	if (psf->is_pipe == 0)
+	{	/*
+		** Check for 'wvpk' at the start of the DATA section. Not able to
+		** handle this.
+		*/
+		psf_binheader_readf (psf, "4", &marker) ;
+		if (marker == wvpk_MARKER || marker == OggS_MARKER)
+			return SFE_WAV_WVPK_DATA ;
+		} ;
+
+	/* Seek to start of DATA section. */
+	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
+
+	if (psf->blockwidth)
+	{	if (psf->filelength - psf->dataoffset < psf->datalength)
+			psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;
+		else
+			psf->sf.frames = psf->datalength / psf->blockwidth ;
+		} ;
+
+	switch (format)
+	{
+		case WAVE_FORMAT_EXTENSIBLE :
+
+			/* with WAVE_FORMAT_EXTENSIBLE the psf->sf.format field is already set. We just have to set the major to rf64 */
+			psf->sf.format = (psf->sf.format & ~SF_FORMAT_TYPEMASK ) | SF_FORMAT_RF64 ;
+
+			if (psf->sf.format == (SF_FORMAT_WAVEX | SF_FORMAT_MS_ADPCM))
+			{	*blockalign = wav_fmt->msadpcm.blockalign ;
+				*framesperblock = wav_fmt->msadpcm.samplesperblock ;
+				} ;
+			break ;
+
+		case WAVE_FORMAT_PCM :
+					psf->sf.format = SF_FORMAT_RF64 | u_bitwidth_to_subformat (psf->bytewidth * 8) ;
+					break ;
+
+		case WAVE_FORMAT_MULAW :
+		case IBM_FORMAT_MULAW :
+					psf->sf.format = (SF_FORMAT_RF64 | SF_FORMAT_ULAW) ;
+					break ;
+
+		case WAVE_FORMAT_ALAW :
+		case IBM_FORMAT_ALAW :
+					psf->sf.format = (SF_FORMAT_RF64 | SF_FORMAT_ALAW) ;
+					break ;
+
+		case WAVE_FORMAT_MS_ADPCM :
+					psf->sf.format = (SF_FORMAT_RF64 | SF_FORMAT_MS_ADPCM) ;
+					*blockalign = wav_fmt->msadpcm.blockalign ;
+					*framesperblock = wav_fmt->msadpcm.samplesperblock ;
+					break ;
+
+		case WAVE_FORMAT_IMA_ADPCM :
+					psf->sf.format = (SF_FORMAT_RF64 | SF_FORMAT_IMA_ADPCM) ;
+					*blockalign = wav_fmt->ima.blockalign ;
+					*framesperblock = wav_fmt->ima.samplesperblock ;
+					break ;
+
+		case WAVE_FORMAT_GSM610 :
+					psf->sf.format = (SF_FORMAT_RF64 | SF_FORMAT_GSM610) ;
+					break ;
+
+		case WAVE_FORMAT_IEEE_FLOAT :
+					psf->sf.format = SF_FORMAT_RF64 ;
+					psf->sf.format |= (psf->bytewidth == 8) ? SF_FORMAT_DOUBLE : SF_FORMAT_FLOAT ;
+					break ;
+
+		case WAVE_FORMAT_G721_ADPCM :
+					psf->sf.format = SF_FORMAT_RF64 | SF_FORMAT_G721_32 ;
+					break ;
+
+		default : return SFE_UNIMPLEMENTED ;
+		} ;
+
+	psf_log_printf (psf, "  FORMAT : %x\n", psf->sf.format) ;
+
+	if (wpriv->fmt_is_broken)
+		wav_w64_analyze (psf) ;
+
+	/* Only set the format endian-ness if its non-standard big-endian. */
+	if (psf->endian == SF_ENDIAN_BIG)
+		psf->sf.format |= SF_ENDIAN_BIG ;
 
 	return 0 ;
 } /* rf64_read_header */
@@ -392,7 +553,8 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 
 	psf_binheader_writef (psf, "em4m", RF64_MARKER, 0xffffffff, WAVE_MARKER) ;
 
-	psf_binheader_writef (psf, "m488844", ds64_MARKER, 32, psf->filelength, psf->datalength, psf->sf.frames, 0, 0x005c0064) ;
+	/* Currently no table. */
+	psf_binheader_writef (psf, "m48884", ds64_MARKER, 32, psf->filelength, psf->datalength, psf->sf.frames, 0) ;
 
 	/* WAVE and 'fmt ' markers. */
 	psf_binheader_writef (psf, "m", fmt_MARKER) ;
@@ -414,6 +576,9 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 				return SFE_UNIMPLEMENTED ;
 		} ;
 
+	if (psf->broadcast_var != NULL)
+		wav_write_bext_chunk (psf) ;
+
 #if 0
 	/* The LIST/INFO chunk. */
 	if (psf->str_flags & SF_STR_LOCATE_START)
@@ -426,8 +591,8 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 			psf_binheader_writef (psf, "ft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 
-	if (psf->broadcast_info != NULL)
-		wav_write_bext_chunk (psf) ;
+//	if (psf->broadcast_info != NULL)
+//		wav_write_bext_chunk (psf) ;
 
 	if (psf->instrument != NULL)
 	{	int		tmp ;
