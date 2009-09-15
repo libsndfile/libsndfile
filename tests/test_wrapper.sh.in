@@ -1,10 +1,10 @@
 #!/bin/sh
 
-if [ -f tests/sfversion@EXEEXT@ ]; then
+if test -f tests/sfversion@EXEEXT@ ; then
 	cd tests
 	fi
 
-if [ ! -f sfversion@EXEEXT@ ]; then
+if test ! -f sfversion@EXEEXT@ ; then
 	echo "Not able to find test executables."
 	exit 1
 	fi
