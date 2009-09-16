@@ -92,13 +92,11 @@ if test $ac_cv_c_byte_order = unknown ; then
 		[
 		case "$target_cpu" in
 			alpha* | i?86* | mipsel* | ia64*)
-				ac_cv_c_big_endian=0
-				ac_cv_c_little_endian=1
+				ac_cv_c_byte_order=little
 				;;
 			
 			m68* | mips* | powerpc* | hppa* | sparc*)
-				ac_cv_c_big_endian=1
-				ac_cv_c_little_endian=0
+				ac_cv_c_byte_order=big
 				;;
 	
 			esac
@@ -116,7 +114,6 @@ if test $ac_cv_c_byte_order = unknown ; then
 			return (u.c [sizeof (long) - 1] == 1);
 			}
 			]], , ac_cv_c_byte_order=big, 
-			ac_cv_c_byte_order=unknown
 			)
 
 		AC_TRY_RUN(
@@ -129,7 +126,6 @@ if test $ac_cv_c_byte_order = unknown ; then
 			u.l = 1 ;
 			return (u.c [0] == 1);
 			}]], , ac_cv_c_byte_order=little, 
-			ac_cv_c_byte_order=unknown
 			)
 		fi	
 	fi

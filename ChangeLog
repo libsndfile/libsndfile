@@ -3,6 +3,10 @@
     * src/caf.c
     Use the correct C99 format specifier for int64_t.
 
+    * M4/endian.m4
+    Fix detection of CPU endian-ness when cross compiling. Thanks to Pierre
+    Ossman for the bug report.
+
 2009-09-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c src/wav.c
