@@ -47,7 +47,7 @@
 
 
 static const char * locations [] =
-{	"../src/", "src/", "../src/.libs/", "src/.libs/",
+{	".", "../src/", "src/", "../src/.libs/", "src/.libs/",
 	NULL
 } ; /* locations. */
 
