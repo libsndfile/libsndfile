@@ -27,6 +27,7 @@
 
 #include <string.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #include "common.h"
 
@@ -131,7 +132,7 @@ file_read_write_test (const char *filename)
 	test_write_or_die (psf, data_out, sizeof (data_out [0]), ARRAY_LEN (data_out), sizeof (data_out), __LINE__) ;
 
 	if ((retval = psf_get_filelen (psf)) != sizeof (data_out))
-	{	printf ("\n\nLine %d: file length after write is not correct (%ld should be %d).\n\n", __LINE__, (long) retval, (int) sizeof (data_out)) ;
+	{	printf ("\n\nLine %d: file length after write is not correct (%" PRId64 " should be %zd).\n\n", __LINE__, retval, sizeof (data_out)) ;
 		if (retval == 0)
 			printf ("An fsync() may be necessary before fstat() in psf_get_filelen().\n\n") ;
 		exit (1) ;
@@ -141,7 +142,7 @@ file_read_write_test (const char *filename)
 	test_write_or_die (psf, data_out, ARRAY_LEN (data_out), sizeof (data_out [0]), 2 * sizeof (data_out), __LINE__) ;
 
 	if ((retval = psf_get_filelen (psf)) != 2 * sizeof (data_out))
-	{	printf ("\n\nLine %d: file length after write is not correct. (%ld should be %d)\n\n", __LINE__, (long) retval, 2 * ((int) sizeof (data_out))) ;
+	{	printf ("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %zd)\n\n", __LINE__, retval, 2 * sizeof (data_out)) ;
 		exit (1) ;
 		} ;
 
@@ -223,7 +224,7 @@ file_read_write_test (const char *filename)
 	test_open_or_die (psf, __LINE__) ;
 
 	if ((retval = psf_get_filelen (psf)) != 3 * sizeof (data_out))
-	{	printf ("\n\nLine %d: file length after write is not correct. (%ld should be %d)\n\n", __LINE__, (long) retval, 3 * ((int) sizeof (data_out))) ;
+	{	printf ("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %zd)\n\n", __LINE__, retval, 3 * sizeof (data_out)) ;
 		exit (1) ;
 		} ;
 
@@ -239,7 +240,7 @@ file_read_write_test (const char *filename)
 	test_open_or_die (psf, __LINE__) ;
 
 	if ((retval = psf_get_filelen (psf)) != 3 * sizeof (data_out))
-	{	printf ("\n\nLine %d: file length after write is not correct. (%ld should be %d)\n\n", __LINE__, (long) retval, 3 * ((int) sizeof (data_out))) ;
+	{	printf ("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %zd)\n\n", __LINE__, retval, 3 * sizeof (data_out)) ;
 		exit (1) ;
 		} ;
 
@@ -356,12 +357,12 @@ test_write_or_die (SF_PRIVATE *psf, void *data, sf_count_t bytes, sf_count_t ite
 
 	retval = psf_fwrite (data, bytes, items, psf) ;
 	if (retval != items)
-	{	printf ("\n\nLine %d: psf_write() returned %ld (should be %ld)\n\n", linenum, (long) retval, (long) items) ;
+	{	printf ("\n\nLine %d: psf_write() returned %" PRId64 " (should be %" PRId64 ")\n\n", linenum, retval, items) ;
 		exit (1) ;
 		} ;
 
 	if ((retval = psf_ftell (psf)) != new_position)
-	{	printf ("\n\nLine %d: file length after write is not correct. (%ld should be %ld)\n\n", linenum, (long) retval, (long) new_position) ;
+	{	printf ("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %" PRId64 ")\n\n", linenum, retval, new_position) ;
 		exit (1) ;
 		} ;
 
@@ -374,12 +375,12 @@ test_read_or_die (SF_PRIVATE *psf, void *data, sf_count_t bytes, sf_count_t item
 
 	retval = psf_fread (data, bytes, items, psf) ;
 	if (retval != items)
-	{	printf ("\n\nLine %d: psf_write() returned %ld (should be %ld)\n\n", linenum, (long) retval, (long) items) ;
+	{	printf ("\n\nLine %d: psf_write() returned %" PRId64 " (should be %" PRId64 ")\n\n", linenum, retval, items) ;
 		exit (1) ;
 		} ;
 
 	if ((retval = psf_ftell (psf)) != new_position)
-	{	printf ("\n\nLine %d: file length after write is not correct. (%ld should be %ld)\n\n", linenum, (long) retval, (long) new_position) ;
+	{	printf ("\n\nLine %d: file length after write is not correct. (%" PRId64 " should be %" PRId64 ")\n\n", linenum, retval, new_position) ;
 		exit (1) ;
 		} ;
 
@@ -393,8 +394,8 @@ test_seek_or_die (SF_PRIVATE *psf, sf_count_t offset, int whence, sf_count_t new
 	retval = psf_fseek (psf, offset, whence) ;
 
 	if (retval != new_position)
-	{	printf ("\n\nLine %d: psf_fseek() failed. New position is %ld (should be %ld).\n\n",
-			linenum, (long) retval, (long) new_position) ;
+	{	printf ("\n\nLine %d: psf_fseek() failed. New position is %" PRId64 " (should be %" PRId64 ").\n\n",
+			linenum, retval, new_position) ;
 		exit (1) ;
 		} ;
 
