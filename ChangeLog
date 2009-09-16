@@ -1,3 +1,8 @@
+2009-09-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/caf.c
+    Use the correct C99 format specifier for int64_t.
+
 2009-09-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c src/wav.c

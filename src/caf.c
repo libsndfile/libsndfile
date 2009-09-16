@@ -23,6 +23,7 @@
 #include	<string.h>
 #include	<ctype.h>
 #include	<math.h>
+#include	<inttypes.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
@@ -320,7 +321,7 @@ caf_read_header (SF_PRIVATE *psf)
 					psf->peak_info->peaks [k].value = value ;
 					psf->peak_info->peaks [k].position = position ;
 
-					snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "    %2d   %-12ld   %g\n", k, (long) position, value) ;
+					snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "    %2d   %-12" PRId64 "   %g\n", k, position, value) ;
 					psf_log_printf (psf, psf->u.cbuf) ;
 					} ;
 
