@@ -7,6 +7,9 @@
     Fix detection of CPU endian-ness when cross compiling. Thanks to Pierre
     Ossman for the bug report.
 
+    * src/caf.c src/sndfile.c
+    Fix reading and writing of PEAK chunks in CAF files.
+
 2009-09-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c src/wav.c

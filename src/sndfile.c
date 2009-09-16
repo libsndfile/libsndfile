@@ -932,8 +932,16 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			{	int format = SF_CONTAINER (psf->sf.format) ;
 
 				/* Only WAV and AIFF support the PEAK chunk. */
-				if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX && format != SF_FORMAT_AIFF)
-					return SF_FALSE ;
+				switch (format)
+				{	case SF_FORMAT_AIFF :
+					case SF_FORMAT_CAF :
+					case SF_FORMAT_WAV :
+					case SF_FORMAT_WAVEX :
+						break ;
+
+					default :
+						return SF_FALSE ;
+					} ;
 
 				format = SF_CODEC (psf->sf.format) ;
 

@@ -312,7 +312,7 @@ caf_read_header (SF_PRIVATE *psf)
 				psf_binheader_readf (psf, "E4", & (psf->peak_info->edit_number)) ;
 				psf_log_printf (psf, "  edit count : %d\n", psf->peak_info->edit_number) ;
 
-				psf_log_printf (psf, "     Ch   Position      Value\n") ;
+				psf_log_printf (psf, "     Ch   Position       Value\n") ;
 				for (k = 0 ; k < psf->sf.channels ; k++)
 				{	sf_count_t position ;
 					float value ;
