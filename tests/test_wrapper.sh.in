@@ -78,6 +78,7 @@ echo "----------------------------------------------------------------------"
 ./lossy_comp_test@EXEEXT@ caf_ulaw
 ./lossy_comp_test@EXEEXT@ caf_alaw
 ./header_test@EXEEXT@ caf
+./peak_chunk_test@EXEEXT@ caf
 ./misc_test@EXEEXT@ caf
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on CAF files."

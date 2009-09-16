@@ -10,6 +10,9 @@
     * src/caf.c src/sndfile.c
     Fix reading and writing of PEAK chunks in CAF files.
 
+    * tests/peak_chunk_test.c tests/test_wrapper.sh.in
+    Run peak_chunk_test on CAF files.
+
 2009-09-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c src/wav.c
