@@ -641,7 +641,7 @@ ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *tran
 {
 	VORBIS_PRIVATE *vdata = psf->codec_data ;
 	OGG_PRIVATE *odata = psf->container_data ;
-	int len, samples, i = 0 ;
+	int result, len, samples, i = 0 ;
 	float **pcm ;
 
 	len = lens / psf->sf.channels ;
@@ -660,7 +660,7 @@ ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *tran
 	while (len > 0 && !odata->eos)
 	{
 		while (len > 0 && !odata->eos)
-		{	int result = ogg_sync_pageout (&odata->oy, &odata->og) ;
+		{	result = ogg_sync_pageout (&odata->oy, &odata->og) ;
 			if (result == 0) break ; /* need more data */
 			if (result < 0)
 			{	/* missing or corrupt data at this page position */
