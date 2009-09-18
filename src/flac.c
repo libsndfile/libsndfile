@@ -121,7 +121,7 @@ static FLAC__StreamEncoderTellStatus sf_flac_enc_tell_callback (const FLAC__Stre
 static FLAC__StreamEncoderWriteStatus sf_flac_enc_write_callback (const FLAC__StreamEncoder *encoder, const FLAC__byte buffer [], size_t bytes, unsigned samples, unsigned current_frame, void *client_data) ;
 
 static const int legal_sample_rates [] =
-{	8000, 16000, 22050, 24000, 32000, 44100, 48000, 96000
+{	8000, 16000, 22050, 24000, 32000, 44100, 48000, 88200, 96000
 } ;
 
 static void

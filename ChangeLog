@@ -3,6 +3,9 @@
     * src/sndfile.c
     Fix error message string.
 
+    * src/flac.c
+    Add 88200 to the list of supported sample rates.
+
 2009-09-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/caf.c
