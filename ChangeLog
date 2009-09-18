@@ -1,3 +1,8 @@
+2009-09-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    Fix error message string.
+
 2009-09-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/caf.c

@@ -57,7 +57,7 @@ ErrorStruct SndfileErrors [] =
 {
 	/* Public error values and their associated strings. */
 	{	SF_ERR_NO_ERROR				, "No Error." },
-	{	SF_ERR_UNRECOGNISED_FORMAT	, "File opened for read. Format not recognised." },
+	{	SF_ERR_UNRECOGNISED_FORMAT	, "Format not recognised." },
 	{	SF_ERR_SYSTEM				, "System error." /* Often replaced. */ 	},
 	{	SF_ERR_MALFORMED_FILE		, "Supported file format but file is malformed." },
 	{	SF_ERR_UNSUPPORTED_ENCODING	, "Supported file format but unsupported encoding." },
