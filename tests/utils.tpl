@@ -41,10 +41,6 @@ extern "C" {
 #define	PIPE_INDEX(x)	((x) + 500)
 #define	PIPE_TEST_LEN	12345
 
-#if (defined (WIN32) || defined (_WIN32) || defined (__OS2__))
-#define	snprintf	_snprintf
-#endif
-
 [+ FOR float_type
 +]void gen_windowed_sine_[+ (get "name") +] ([+ (get "name") +] *data, int len, double maximum) ;
 [+ ENDFOR float_type
