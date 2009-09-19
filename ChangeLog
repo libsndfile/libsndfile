@@ -12,6 +12,10 @@
     * programs/sndfile-info.c tests/utils.tpl
     Remove WIN32 snprintf #define.
 
+    * src/ima_adpcm.c
+    Fix minor bug in aiff_ima_encode_block. Thanks to Denis Fileev for finding
+    this.
+
 2009-09-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/caf.c

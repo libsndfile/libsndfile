@@ -375,7 +375,7 @@ aiff_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 		{	blockindx = chan * pima->blocksize + 2 + indx / 2 ;
 
 			pima->block [blockindx] = pima->samples [indx] & 0x0F ;
-			pima->block [blockindx] |= (pima->samples [indx + pima->channels] << 4) & 0xF0 ;
+			pima->block [blockindx] |= (pima->samples [indx + chan] << 4) & 0xF0 ;
 			} ;
 		} ;
 
