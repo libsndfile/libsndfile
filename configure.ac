@@ -12,9 +12,10 @@ AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
 AC_CONFIG_MACRO_DIR([M4])
+AC_CONFIG_HEADERS([src/config.h])
 
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
-AC_CONFIG_HEADERS([src/config.h])
+AM_CONFIG_HEADER 
 
 dnl Add parameters for aclocal
 AC_SUBST(ACLOCAL_AMFLAGS, "-I M4")
@@ -161,10 +162,11 @@ unset ac_cv_sizeof_off_t
 AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
 
 case "$host_os" in
-	mingw*)
+	mingw32msvc | mingw32)
 		TYPEOF_SF_COUNT_T="__int64"
 		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 		SIZEOF_SF_COUNT_T=8
+		AC_DEFINE([__USE_MINGW_ANSI_STDIO],1,[Set to 1 to use C99 printf/snprintf in MinGW.])
 		;;
 	*)
 		if test "x$ac_cv_sizeof_off_t" = "x8" ; then
@@ -593,15 +595,9 @@ AC_SUBST(SHARED_VERSION_INFO)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(ALSA_LIBS)
-AC_SUBST(ENABLE_EXPERIMENTAL_CODE)
 
 AC_SUBST(EXTERNAL_CFLAGS)
 AC_SUBST(EXTERNAL_LIBS)
-
-AC_SUBST(COMPILER_IS_GCC)
-AC_SUBST(GCC_MAJOR_VERSION)
-
-AC_SUBST(HAVE_JACK)
 
 dnl The following line causes the libtool distributed with the source
 dnl to be replaced if the build system has a more recent version.
@@ -632,7 +628,12 @@ AC_MSG_RESULT([
 
   Configuration summary :
 
-    Version : ............................. ${VERSION}
+    libsndfile cersion : .................. ${VERSION}
+
+    Host CPU : ............................ ${host_cpu}
+    Host Vendor : ......................... ${host_vendor}
+    Host OS : ............................. ${host_os}
+
     Experimental code : ................... ${enable_experimental:-no}
     Using ALSA in example programs : ...... ${enable_alsa:-no}
     External FLAC/Ogg/Vorbis : ............ ${enable_external_libs:-no}
