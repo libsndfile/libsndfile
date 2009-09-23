@@ -19,6 +19,8 @@
 
 /* ADPCM: IMA, OKI <==> 16-bit PCM. */
 
+#include "sfconfig.h"
+
 #include <string.h>
 
 /* Set up for libsndfile environment: */

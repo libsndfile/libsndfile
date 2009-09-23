@@ -3,6 +3,9 @@
     * src/aiff.c src/voc.c
     When a byte is needed, use unsigned char.
 
+    * src/ima_oki_adpcm.c src/broadcast.c src/test_ima_oki_adpcm.c
+    Include sfconfig.h to prevent compile errors with MinGW compilers.
+
 2009-09-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
