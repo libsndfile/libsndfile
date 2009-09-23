@@ -532,7 +532,7 @@ voc_close	(SF_PRIVATE *psf)
 	{	/*  Now we know for certain the length of the file we can re-write
 		**	correct values for the FORM, 8SVX and BODY chunks.
 		*/
-		unsigned byte = VOC_TERMINATOR ;
+		unsigned char byte = VOC_TERMINATOR ;
 
 
 		psf_fseek (psf, 0, SEEK_END) ;

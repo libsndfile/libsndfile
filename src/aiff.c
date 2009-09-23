@@ -370,7 +370,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	AIFF_PRIVATE *paiff ;
 	unsigned	marker, dword, FORMsize, SSNDsize, bytesread ;
 	int			k, found_chunk = 0, done = 0, error = 0 ;
-	char		*cptr, byte ;
+	char		*cptr ;
 	int			instr_found = 0, mark_found = 0, mark_count = 0 ;
 
 	if (psf->filelength > SF_PLATFORM_S64 (0xffffffff))
@@ -819,9 +819,11 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 			case NONE_MARKER :
 					/* Fix for broken AIFC files with incorrect COMM chunk length. */
-					psf_binheader_readf (psf, "1", &byte) ;
-					dword = byte ;
-					psf_binheader_readf (psf, "j", dword) ;
+					{	unsigned char byte ;
+						psf_binheader_readf (psf, "1", &byte) ;
+						dword = byte ;
+						psf_binheader_readf (psf, "j", dword) ;
+					}
 					break ;
 
 			default :
