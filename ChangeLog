@@ -6,6 +6,12 @@
     * src/ima_oki_adpcm.c src/broadcast.c src/test_ima_oki_adpcm.c
     Include sfconfig.h to prevent compile errors with MinGW compilers.
 
+    * configure.ac
+    Remove AM_CONFIG_HEADER due to warnings from autoconf 2.64.
+
+    * tests/locale_test.c
+    Update to work with xx_XX.UTF-8 style locales. Refactoring.
+
 2009-09-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac

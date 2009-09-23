@@ -17,7 +17,6 @@
 */
 
 #include "sfconfig.h"
-#include "sndfile.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,41 +30,51 @@
 #include <locale.h>
 #endif
 
+#include "sndfile.h"
 #include "utils.h"
 
 typedef struct
 {	const char *locale ;
+	int utf8 ;
 	const char *filename ;
 	int	width ;
 } LOCALE_DATA ;
 
-static void locale_test (const char * locname, const char * filename, int width) ;
+static void utf8_test (void) ;
+static void locale_test (const LOCALE_DATA * locdata) ;
 
 int
 main (void)
-{	LOCALE_DATA ldata [] =
-	{	{	"de_DE", "F\303\274\303\237e.au", 7 },
-		{	"en_AU", "kangaroo.au", 11 },
-		{	"POSIX", "posix.au", 8 },
-		{	"pt_PT", "concei\303\247\303\243o.au", 12 },
-
-#if OS_IS_WIN32 == 0
-		{	"ja_JP", "\343\201\212\343\201\257\343\202\210\343\201\206\343\201\224\343\201\226\343\201\204\343\201\276\343\201\231.au", 21 },
-		{	"vi_VN", "qu\341\273\221c ng\341\273\257.au", 11 },
-#endif
-
-		{	NULL, NULL, 0 }
-		} ;
-	int k ;
-
-	for (k = 0 ; ldata [k].locale != NULL ; k++)
-		locale_test (ldata [k].locale, ldata [k].filename, ldata [k].width) ;
+{
+	utf8_test () ;
 
 	return 0 ;
 } /* main */
 
 static void
-locale_test (const char * locname, const char * filename, int width)
+utf8_test (void)
+{	LOCALE_DATA ldata [] =
+	{	{	"de_DE", 1, "F\303\274\303\237e.au", 7 },
+		{	"en_AU", 1, "kangaroo.au", 11 },
+		{	"POSIX", 0, "posix.au", 8 },
+		{	"pt_PT", 1, "concei\303\247\303\243o.au", 12 },
+
+#if OS_IS_WIN32 == 0
+		{	"ja_JP", 1, "\343\201\212\343\201\257\343\202\210\343\201\206\343\201\224\343\201\226\343\201\204\343\201\276\343\201\231.au", 21 },
+		{	"vi_VN", 1, "qu\341\273\221c ng\341\273\257.au", 11 },
+#endif
+
+		{	NULL, 0, NULL, 0 }
+		} ;
+	int k ;
+
+	for (k = 0 ; ldata [k].locale != NULL ; k++)
+		locale_test (ldata + k) ;
+} /* utf8_test */
+
+
+static void
+locale_test (const LOCALE_DATA * ldata)
 {
 #if (HAVE_LOCALE_H == 0 || HAVE_SETLOCALE == 0)
 	locname = filename = NULL ;
@@ -75,34 +84,35 @@ locale_test (const char * locname, const char * filename, int width)
 	const short wdata [] = { 1, 2, 3, 4, 5, 6, 7, 8 } ;
 	short rdata [ARRAY_LEN (wdata)] ;
 	const char *old_locale ;
+	char utf8_locname [32] ;
 	SNDFILE *file ;
 	SF_INFO sfinfo ;
 
-	/* Grab the old locale. */
-	old_locale = setlocale (LC_ALL, NULL) ;
+	snprintf (utf8_locname, sizeof (utf8_locname), "%s%s", ldata->locale, ldata->utf8 ? ".UTF-8" : "") ;
 
-	if (setlocale (LC_ALL, locname) == NULL)
+	/* Change the locale saving the old one. */
+	if ((old_locale = setlocale (LC_CTYPE, utf8_locname)) == NULL)
 		return ;
 
-	printf ("    locale_test                    : %-6s  %s %*c ", locname, filename, 16 - width, ' ') ;
+	printf ("    locale_test           %-8s : %s %*c ", ldata->locale, ldata->filename, 24 - ldata->width, ' ') ;
 	fflush (stdout) ;
 
 	sfinfo.format = SF_FORMAT_AU | SF_FORMAT_PCM_16 ;
 	sfinfo.channels = 1 ;
 	sfinfo.samplerate = 44100 ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, 0, __LINE__) ;
+	file = test_open_file_or_die (ldata->filename, SFM_WRITE, &sfinfo, 0, __LINE__) ;
 	test_write_short_or_die (file, 0, wdata, ARRAY_LEN (wdata), __LINE__) ;
 	sf_close (file) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, 0, __LINE__) ;
+	file = test_open_file_or_die (ldata->filename, SFM_READ, &sfinfo, 0, __LINE__) ;
 	test_read_short_or_die (file, 0, rdata, ARRAY_LEN (rdata), __LINE__) ;
 	sf_close (file) ;
 
 	/* Restore old locale. */
-	setlocale (LC_ALL, old_locale) ;
+	setlocale (LC_CTYPE, old_locale) ;
 
-	unlink (filename) ;
+	unlink (ldata->filename) ;
 	puts ("ok") ;
 #endif
 } /* locale_test */
