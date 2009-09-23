@@ -312,7 +312,7 @@ typedef @TYPEOF_SF_COUNT_T@	sf_count_t ;
 
 /* A pointer to a SF_INFO structure is passed to sf_open_read () and filled in.
 ** On write, the SF_INFO structure is filled in by the user and passed into
-** sf_open_write ().
+** sf_open ().
 */
 
 struct SF_INFO
