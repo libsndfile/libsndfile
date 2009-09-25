@@ -140,6 +140,7 @@ AM_CONDITIONAL([ENABLE_TEST_COVERAGE], [test "$enable_test_coverage" = yes])
 #====================================================================================
 # Check types and their sizes.
 
+AC_CHECK_SIZEOF(wchar_t,4)
 AC_CHECK_SIZEOF(short,2)
 AC_CHECK_SIZEOF(int,4)
 AC_CHECK_SIZEOF(long,4)
