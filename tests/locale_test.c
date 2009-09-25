@@ -109,10 +109,11 @@ locale_test (const LOCALE_DATA * ldata)
 	test_read_short_or_die (file, 0, rdata, ARRAY_LEN (rdata), __LINE__) ;
 	sf_close (file) ;
 
+	unlink (ldata->filename) ;
+
 	/* Restore old locale. */
 	setlocale (LC_CTYPE, old_locale) ;
 
-	unlink (ldata->filename) ;
 	puts ("ok") ;
 #endif
 } /* locale_test */
