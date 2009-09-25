@@ -111,7 +111,7 @@ sds_open	(SF_PRIVATE *psf)
 		return SFE_MALLOC_FAILED ;
 	psf->codec_data = psds ;
 
-	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
+	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = sds_read_header (psf, psds)))
 			return error ;
 		} ;
@@ -119,7 +119,7 @@ sds_open	(SF_PRIVATE *psf)
 	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_SDS)
 		return	SFE_BAD_OPEN_FORMAT ;
 
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	if (sds_write_header (psf, SF_FALSE))
 			return psf->error ;
 
@@ -145,7 +145,7 @@ sds_open	(SF_PRIVATE *psf)
 static int
 sds_close	(SF_PRIVATE *psf)
 {
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	SDS_PRIVATE *psds ;
 
 		if ((psds = (SDS_PRIVATE *) psf->codec_data) == NULL)
@@ -186,7 +186,7 @@ sds_init (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 		psds->samplesperblock = SDS_AUDIO_BYTES_PER_BLOCK / 4 ;
 		} ;
 
-	if (psf->mode == SFM_READ || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_READ || psf->file.mode == SFM_RDWR)
 	{	psf->read_short		= sds_read_s ;
 		psf->read_int		= sds_read_i ;
 		psf->read_float		= sds_read_f ;
@@ -196,7 +196,7 @@ sds_init (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 		psds->reader (psf, psds) ;
 		} ;
 
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	psf->write_short	= sds_write_s ;
 		psf->write_int		= sds_write_i ;
 		psf->write_float	= sds_write_f ;

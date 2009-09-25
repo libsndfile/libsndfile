@@ -234,26 +234,26 @@ aiff_open (SF_PRIVATE *psf)
 	if ((psf->container_data = calloc (1, sizeof (AIFF_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 
-	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
+	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = aiff_read_header (psf, &comm_fmt)))
 			return error ;
 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 		} ;
 
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	if (psf->is_pipe)
 			return SFE_NO_PIPE_WRITE ;
 
 		if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_AIFF)
 			return SFE_BAD_OPEN_FORMAT ;
 
-		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
+		if (psf->file.mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
 		{	if ((psf->peak_info = peak_info_calloc (psf->sf.channels)) == NULL)
 				return SFE_MALLOC_FAILED ;
 			psf->peak_info->peak_loc = SF_PEAK_START ;
 			} ;
 
-		if (psf->mode != SFM_RDWR || psf->filelength < 40)
+		if (psf->file.mode != SFM_RDWR || psf->filelength < 40)
 		{	psf->filelength = 0 ;
 			psf->datalength = 0 ;
 			psf->dataoffset = 0 ;
@@ -316,7 +316,7 @@ aiff_open (SF_PRIVATE *psf)
 				break ;
 
 		case SF_FORMAT_DWVW_N :
-				if (psf->mode != SFM_READ)
+				if (psf->file.mode != SFM_READ)
 				{	error = SFE_DWVW_BAD_BITWIDTH ;
 					break ;
 					} ;
@@ -397,7 +397,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	while (! done)
 	{	psf_binheader_readf (psf, "m", &marker) ;
 
-		if (psf->mode == SFM_RDWR && (found_chunk & HAVE_SSND))
+		if (psf->file.mode == SFM_RDWR && (found_chunk & HAVE_SSND))
 			return SFE_AIFF_RW_SSND_NOT_LAST ;
 
 		switch (marker)
@@ -889,7 +889,7 @@ aiff_close (SF_PRIVATE *psf)
 		paiff->markstr = NULL ;
 		} ;
 
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	aiff_write_tailer (psf) ;
 		aiff_write_header (psf, SF_TRUE) ;
 		} ;
@@ -1132,7 +1132,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
 		} ;
 
-	if (psf->mode == SFM_RDWR && psf->dataoffset > 0 && paiff->chunk4.count > 0)
+	if (psf->file.mode == SFM_RDWR && psf->dataoffset > 0 && paiff->chunk4.count > 0)
 	{	int err = aiff_rewrite_header (psf, paiff) ;
 		if (current > 0)
 			psf_fseek (psf, current, SEEK_SET) ;

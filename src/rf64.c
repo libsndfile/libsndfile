@@ -82,7 +82,7 @@ rf64_open (SF_PRIVATE *psf)
 	psf->endian = SF_ENDIAN_LITTLE ;
 
 
-	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
+	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = rf64_read_header (psf, &blockalign, &framesperblock)) != 0)
 			return error ;
 		} ;
@@ -92,7 +92,7 @@ rf64_open (SF_PRIVATE *psf)
 
 	subformat = psf->sf.format & SF_FORMAT_SUBMASK ;
 
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	if (psf->is_pipe)
 			return SFE_NO_PIPE_WRITE ;
 
@@ -651,7 +651,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 static int
 rf64_close (SF_PRIVATE *psf)
 {
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	// rf64_write_tailer (psf) ;
 
 		psf->write_header (psf, SF_TRUE) ;

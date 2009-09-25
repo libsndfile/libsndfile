@@ -238,12 +238,39 @@ psf_isprint (int ch)
 typedef struct
 {	int size ;
 	SF_BROADCAST_INFO binfo ;
-} SF_BROADCAST_VAR ;
+} PSF_BROADCAST_VAR ;
+
+
+typedef struct
+{	char			path	[SF_FILENAME_LEN] ;
+	char			dir		[SF_FILENAME_LEN] ;
+	char			name	[SF_FILENAME_LEN / 4] ;
+
+	int				do_not_close_descriptor ;
+	int				mode ;			/* Open mode : SFM_READ, SFM_WRITE or SFM_RDWR. */
+
+#if USE_WINDOWS_API
+	/*
+	**	These fields can only be used in src/file_io.c.
+	**	They are basically the same as a windows file HANDLE.
+	*/
+	void 			*handle, *hsaved ;
+#else
+	/* These fields can only be used in src/file_io.c. */
+	int 			filedes, savedes ;
+#endif
+
+} PSF_FILE ;
+
 
 typedef struct sf_private_tag
 {
 	/* Canary in a coal mine. */
-	char canary [64] ;
+	union
+	{	/* Place a double here to encourage double alignment. */
+		double d [2] ;
+		char c [16] ;
+		} canary ;
 
 	/* Force the compiler to double align the start of buffer. */
 	union
@@ -261,10 +288,8 @@ typedef struct sf_private_tag
 		unsigned char	ucbuf	[SF_BUFFER_LEN / sizeof (signed char)] ;
 		} u ;
 
-	char			filepath	[SF_FILENAME_LEN] ;
-	char			rsrcpath	[SF_FILENAME_LEN] ;
-	char			directory	[SF_FILENAME_LEN] ;
-	char			filename	[SF_FILENAME_LEN / 4] ;
+
+	PSF_FILE		file, rsrc ;
 
 	char			syserr		[SF_SYSERR_LEN] ;
 
@@ -292,22 +317,9 @@ typedef struct sf_private_tag
 	int				logindex ;
 	int				headindex, headend ;
 	int				has_text ;
-	int				do_not_close_descriptor ;
-
-#if USE_WINDOWS_API
-	/*
-	**	These fields can only be used in src/file_io.c.
-	**	They are basically the same as a windows file HANDLE.
-	*/
-	void 			*hfile, *hrsrc, *hsaved ;
-#else
-	/* These fields can only be used in src/file_io.c. */
-	int 			filedes, rsrcdes, savedes ;
-#endif
 
 	int				error ;
 
-	int				mode ;			/* Open mode : SFM_READ, SFM_WRITE or SFM_RDWR. */
 	int				endian ;		/* File endianness : SF_ENDIAN_LITTLE or SF_ENDIAN_BIG. */
 	int				data_endswap ;	/* Need to endswap data? */
 
@@ -337,7 +349,7 @@ typedef struct sf_private_tag
 	SF_INSTRUMENT	*instrument ;
 
 	/* Broadcast (EBU) Info */
-	SF_BROADCAST_VAR *broadcast_var ;
+	PSF_BROADCAST_VAR *broadcast_var ;
 
 	/* Channel map data (if present) : an array of ints. */
 	int				*channel_map ;
@@ -801,7 +813,7 @@ void	psf_sanitize_string (char * cptr, int len) ;
 /* Generate the current date as a string. */
 void	psf_get_date_str (char *str, int maxlen) ;
 
-SF_BROADCAST_VAR* broadcast_var_alloc (size_t datasize) ;
+PSF_BROADCAST_VAR* broadcast_var_alloc (size_t datasize) ;
 int		broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * data, size_t datasize) ;
 int		broadcast_var_get (SF_PRIVATE *psf, SF_BROADCAST_INFO * data, size_t datasize) ;
 

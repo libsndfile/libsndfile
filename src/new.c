@@ -60,7 +60,7 @@ int
 new_open (SF_PRIVATE *psf)
 {	int	subformat, error = 0 ;
 
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 		return SFE_UNIMPLEMENTED ;
 
 	if ((error = new_read_header (psf)))

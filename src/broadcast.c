@@ -38,13 +38,13 @@ bc_min_size (const SF_BROADCAST_INFO* info)
 
 
 static inline size_t
-bc_var_coding_hist_size (const SF_BROADCAST_VAR* var)
-{	return var->size - offsetof (SF_BROADCAST_VAR, binfo.coding_history) ;
+bc_var_coding_hist_size (const PSF_BROADCAST_VAR* var)
+{	return var->size - offsetof (PSF_BROADCAST_VAR, binfo.coding_history) ;
 } /* broadcast_size */
 
-SF_BROADCAST_VAR*
+PSF_BROADCAST_VAR*
 broadcast_var_alloc (size_t datasize)
-{	SF_BROADCAST_VAR * data ;
+{	PSF_BROADCAST_VAR * data ;
 
 	if ((data = calloc (1, datasize)) != NULL)
 		data->size = datasize ;
@@ -92,7 +92,7 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 	if (len > 0 && psf->broadcast_var->binfo.coding_history [len] != '\n')
 		strncat (psf->broadcast_var->binfo.coding_history, "\r\n", 2) ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 		strncat (psf->broadcast_var->binfo.coding_history, added_history, strlen (added_history)) ;
 
 	psf->broadcast_var->binfo.coding_history_size = strlen (psf->broadcast_var->binfo.coding_history) ;

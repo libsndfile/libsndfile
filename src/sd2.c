@@ -104,12 +104,12 @@ sd2_open (SF_PRIVATE *psf)
 	/* SD2 is always big endian. */
 	psf->endian = SF_ENDIAN_BIG ;
 
-	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->rsrclength > 0))
+	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->rsrclength > 0))
 	{	psf_use_rsrc (psf, SF_TRUE) ;
 		valid = psf_file_valid (psf) ;
 		psf_use_rsrc (psf, SF_FALSE) ;
 		if (! valid)
-		{	psf_log_printf (psf, "sd2_open : psf->rsrcdes < 0\n") ;
+		{	psf_log_printf (psf, "sd2_open : psf->rsrc.filedes < 0\n") ;
 			return SFE_SD2_BAD_RSRC ;
 			} ;
 
@@ -128,8 +128,8 @@ sd2_open (SF_PRIVATE *psf)
 	psf->dataoffset = 0 ;
 
 	/* Only open and write the resource in RDWR mode is its current length is zero. */
-	if (psf->mode == SFM_WRITE || (psf->mode == SFM_RDWR && psf->rsrclength == 0))
-	{	psf_open_rsrc (psf, psf->mode) ;
+	if (psf->file.mode == SFM_WRITE || (psf->file.mode == SFM_RDWR && psf->rsrclength == 0))
+	{	psf_open_rsrc (psf, psf->file.mode) ;
 
 		error = sd2_write_rsrc_fork (psf, SF_FALSE) ;
 
@@ -172,7 +172,7 @@ error_cleanup:
 static int
 sd2_close	(SF_PRIVATE *psf)
 {
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	/*  Now we know for certain the audio_length of the file we can re-write
 		**	correct values for the FORM, 8SVX and BODY chunks.
 		*/
@@ -222,7 +222,7 @@ write_marker (unsigned char * data, int offset, int value)
 } /* write_marker */
 
 static void
-write_str (unsigned char * data, int offset, char * buffer, int buffer_len)
+write_str (unsigned char * data, int offset, const char * buffer, int buffer_len)
 {	memcpy (data + offset, buffer, buffer_len) ;
 } /* write_str */
 
@@ -281,8 +281,8 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 	write_int (rsrc.rsrc_data, 4, rsrc.map_offset) ;
 	write_int (rsrc.rsrc_data, 8, rsrc.data_length) ;
 
-	write_char (rsrc.rsrc_data, 0x30, strlen (psf->filename)) ;
-	write_str (rsrc.rsrc_data, 0x31, psf->filename, strlen (psf->filename)) ;
+	write_char (rsrc.rsrc_data, 0x30, strlen (psf->file.name)) ;
+	write_str (rsrc.rsrc_data, 0x31, psf->file.name, strlen (psf->file.name)) ;
 
 	write_short (rsrc.rsrc_data, 0x50, 0) ;
 	write_marker (rsrc.rsrc_data, 0x52, Sd2f_MARKER) ;

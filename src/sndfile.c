@@ -339,13 +339,14 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 		} ;
 
 	psf_init_files (psf) ;
+	copy_filename (psf, "") ;
 
 	psf_set_file (psf, fd) ;
 	psf->is_pipe = psf_is_pipe (psf) ;
 	psf->fileoffset = psf_ftell (psf) ;
 
 	if (! close_desc)
-		psf->do_not_close_descriptor = SF_TRUE ;
+		psf->file.do_not_close_descriptor = SF_TRUE ;
 
 	return psf_open_file (psf, mode, sfinfo) ;
 } /* sf_open_fd */
@@ -384,7 +385,7 @@ sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user
 	psf->vio = *sfvirtual ;
 	psf->vio_user_data = user_data ;
 
-	psf->mode = mode ;
+	psf->file.mode = mode ;
 
 	return psf_open_file (psf, mode, sfinfo) ;
 } /* sf_open_virtual */
@@ -951,7 +952,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 				} ;
 			/* Can only do this is in SFM_WRITE mode. */
-			if (psf->mode != SFM_WRITE && psf->mode != SFM_RDWR)
+			if (psf->file.mode != SFM_WRITE && psf->file.mode != SFM_RDWR)
 				return SF_FALSE ;
 			/* If data has already been written this must fail. */
 			if (psf->have_written)
@@ -1041,7 +1042,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			if (data == NULL || datasize != SIGNED_SIZEOF (SF_DITHER_INFO))
 				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 			memcpy (&psf->write_dither, data, sizeof (psf->write_dither)) ;
-			if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+			if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 				dither_init (psf, SFM_WRITE) ;
 			break ;
 
@@ -1049,12 +1050,12 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			if (data == NULL || datasize != SIGNED_SIZEOF (SF_DITHER_INFO))
 				return (psf->error = SFE_BAD_COMMAND_PARAM) ;
 			memcpy (&psf->read_dither, data, sizeof (psf->read_dither)) ;
-			if (psf->mode == SFM_READ || psf->mode == SFM_RDWR)
+			if (psf->file.mode == SFM_READ || psf->file.mode == SFM_RDWR)
 				dither_init (psf, SFM_READ) ;
 			break ;
 
 		case SFC_FILE_TRUNCATE :
-			if (psf->mode != SFM_WRITE && psf->mode != SFM_RDWR)
+			if (psf->file.mode != SFM_WRITE && psf->file.mode != SFM_RDWR)
 				return SF_TRUE ;
 			if (datasize != sizeof (sf_count_t))
 				return SF_TRUE ;
@@ -1130,7 +1131,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				} ;
 
 			/* Only makes sense in SFM_WRITE or SFM_RDWR mode. */
-			if ((psf->mode != SFM_WRITE) && (psf->mode != SFM_RDWR))
+			if ((psf->file.mode != SFM_WRITE) && (psf->file.mode != SFM_RDWR))
 				return SF_FALSE ;
 			/* If data has already been written this must fail. */
 			if (psf->broadcast_var == NULL && psf->have_written)
@@ -1226,8 +1227,8 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 	/* If the whence parameter has a mode ORed in, check to see that
 	** it makes sense.
 	*/
-	if (((whence & SFM_MASK) == SFM_WRITE && psf->mode == SFM_READ) ||
-			((whence & SFM_MASK) == SFM_READ && psf->mode == SFM_WRITE))
+	if (((whence & SFM_MASK) == SFM_WRITE && psf->file.mode == SFM_READ) ||
+			((whence & SFM_MASK) == SFM_READ && psf->file.mode == SFM_WRITE))
 	{	psf->error = SFE_WRONG_SEEK ;
 		return PSF_SEEK_ERROR ;
 		} ;
@@ -1247,14 +1248,14 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 		/* The SEEK_CUR is a little more tricky. */
 		case SEEK_CUR :
 				if (offset == 0)
-				{	if (psf->mode == SFM_READ)
+				{	if (psf->file.mode == SFM_READ)
 						return psf->read_current ;
-					if (psf->mode == SFM_WRITE)
+					if (psf->file.mode == SFM_WRITE)
 						return psf->write_current ;
 					} ;
-				if (psf->mode == SFM_READ)
+				if (psf->file.mode == SFM_READ)
 					seek_from_start = psf->read_current + offset ;
-				else if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+				else if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 					seek_from_start = psf->write_current + offset ;
 				else
 					psf->error = SFE_AMBIGUOUS_SEEK ;
@@ -1287,7 +1288,7 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 	if (psf->error)
 		return PSF_SEEK_ERROR ;
 
-	if (psf->mode == SFM_RDWR || psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_RDWR || psf->file.mode == SFM_WRITE)
 	{	if (seek_from_start < 0)
 		{	psf->error = SFE_BAD_SEEK ;
 			return PSF_SEEK_ERROR ;
@@ -1299,7 +1300,7 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 		} ;
 
 	if (psf->seek)
-	{	int new_mode = (whence & SFM_MASK) ? (whence & SFM_MASK) : psf->mode ;
+	{	int new_mode = (whence & SFM_MASK) ? (whence & SFM_MASK) : psf->file.mode ;
 
 		retval = psf->seek (psf, new_mode, seek_from_start) ;
 
@@ -1364,7 +1365,7 @@ sf_read_raw		(SNDFILE *sndfile, void *ptr, sf_count_t bytes)
 	bytewidth = (psf->bytewidth > 0) ? psf->bytewidth : 1 ;
 	blockwidth = (psf->blockwidth > 0) ? psf->blockwidth : 1 ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	psf->error = SFE_NOT_READMODE ;
 		return	0 ;
 		} ;
@@ -1405,7 +1406,7 @@ sf_read_short	(SNDFILE *sndfile, short *ptr, sf_count_t len)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	psf->error = SFE_NOT_READMODE ;
 		return 0 ;
 		} ;
@@ -1452,7 +1453,7 @@ sf_readf_short		(SNDFILE *sndfile, short *ptr, sf_count_t frames)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	psf->error = SFE_NOT_READMODE ;
 		return 0 ;
 		} ;
@@ -1497,7 +1498,7 @@ sf_read_int		(SNDFILE *sndfile, int *ptr, sf_count_t len)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	psf->error = SFE_NOT_READMODE ;
 		return 0 ;
 		} ;
@@ -1544,7 +1545,7 @@ sf_readf_int	(SNDFILE *sndfile, int *ptr, sf_count_t frames)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	psf->error = SFE_NOT_READMODE ;
 		return 0 ;
 		} ;
@@ -1589,7 +1590,7 @@ sf_read_float	(SNDFILE *sndfile, float *ptr, sf_count_t len)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	psf->error = SFE_NOT_READMODE ;
 		return 0 ;
 		} ;
@@ -1636,7 +1637,7 @@ sf_readf_float	(SNDFILE *sndfile, float *ptr, sf_count_t frames)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	psf->error = SFE_NOT_READMODE ;
 		return 0 ;
 		} ;
@@ -1681,7 +1682,7 @@ sf_read_double	(SNDFILE *sndfile, double *ptr, sf_count_t len)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	psf->error = SFE_NOT_READMODE ;
 		return 0 ;
 		} ;
@@ -1728,7 +1729,7 @@ sf_readf_double	(SNDFILE *sndfile, double *ptr, sf_count_t frames)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	psf->error = SFE_NOT_READMODE ;
 		return 0 ;
 		} ;
@@ -1777,7 +1778,7 @@ sf_write_raw	(SNDFILE *sndfile, const void *ptr, sf_count_t len)
 	bytewidth = (psf->bytewidth > 0) ? psf->bytewidth : 1 ;
 	blockwidth = (psf->blockwidth > 0) ? psf->blockwidth : 1 ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	psf->error = SFE_NOT_WRITEMODE ;
 		return 0 ;
 		} ;
@@ -1813,7 +1814,7 @@ sf_write_short	(SNDFILE *sndfile, const short *ptr, sf_count_t len)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	psf->error = SFE_NOT_WRITEMODE ;
 		return 0 ;
 		} ;
@@ -1858,7 +1859,7 @@ sf_writef_short	(SNDFILE *sndfile, const short *ptr, sf_count_t frames)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	psf->error = SFE_NOT_WRITEMODE ;
 		return 0 ;
 		} ;
@@ -1901,7 +1902,7 @@ sf_write_int	(SNDFILE *sndfile, const int *ptr, sf_count_t len)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	psf->error = SFE_NOT_WRITEMODE ;
 		return 0 ;
 		} ;
@@ -1946,7 +1947,7 @@ sf_writef_int	(SNDFILE *sndfile, const int *ptr, sf_count_t frames)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	psf->error = SFE_NOT_WRITEMODE ;
 		return 0 ;
 		} ;
@@ -1989,7 +1990,7 @@ sf_write_float	(SNDFILE *sndfile, const float *ptr, sf_count_t len)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	psf->error = SFE_NOT_WRITEMODE ;
 		return 0 ;
 		} ;
@@ -2034,7 +2035,7 @@ sf_writef_float	(SNDFILE *sndfile, const float *ptr, sf_count_t frames)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	psf->error = SFE_NOT_WRITEMODE ;
 		return 0 ;
 		} ;
@@ -2077,7 +2078,7 @@ sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t len)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	psf->error = SFE_NOT_WRITEMODE ;
 		return 0 ;
 		} ;
@@ -2122,7 +2123,7 @@ sf_writef_double	(SNDFILE *sndfile, const double *ptr, sf_count_t frames)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	psf->error = SFE_NOT_WRITEMODE ;
 		return 0 ;
 		} ;
@@ -2169,7 +2170,7 @@ try_resource_fork (SF_PRIVATE * psf, int mode)
 		} ;
 
 	/* More checking here. */
-	psf_log_printf (psf, "Resource fork : %s\n", psf->rsrcpath) ;
+	psf_log_printf (psf, "Resource fork : %s\n", psf->rsrc.path) ;
 
 	return SF_FORMAT_SD2 ;
 } /* try_resource_fork */
@@ -2180,7 +2181,7 @@ format_from_extension (SF_PRIVATE *psf)
 	char buffer [16] ;
 	int format = 0 ;
 
-	if ((cptr = strrchr (psf->filename, '.')) == NULL)
+	if ((cptr = strrchr (psf->file.name, '.')) == NULL)
 		return 0 ;
 
 	cptr ++ ;
@@ -2397,20 +2398,20 @@ copy_filename (SF_PRIVATE *psf, const char *path)
 {	const char *ccptr ;
 	char *cptr ;
 
-	snprintf (psf->filepath, sizeof (psf->filepath), "%s", path) ;
+	snprintf (psf->file.path, sizeof (psf->file.path), "%s", path) ;
 	if ((ccptr = strrchr (path, '/')) || (ccptr = strrchr (path, '\\')))
 		ccptr ++ ;
 	else
 		ccptr = path ;
 
-	snprintf (psf->filename, sizeof (psf->filename), "%s", ccptr) ;
+	snprintf (psf->file.name, sizeof (psf->file.name), "%s", ccptr) ;
 
 	/* Now grab the directory. */
-	snprintf (psf->directory, sizeof (psf->directory), "%s", path) ;
-	if ((cptr = strrchr (psf->directory, '/')) || (cptr = strrchr (psf->directory, '\\')))
+	snprintf (psf->file.dir, sizeof (psf->file.dir), "%s", path) ;
+	if ((cptr = strrchr (psf->file.dir, '/')) || (cptr = strrchr (psf->file.dir, '\\')))
 		cptr [1] = 0 ;
 	else
-		psf->directory [0] = 0 ;
+		psf->file.dir [0] = 0 ;
 
 	return ;
 } /* copy_filename */
@@ -2511,7 +2512,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	psf->Magick 		= SNDFILE_MAGICK ;
 	psf->norm_float 	= SF_TRUE ;
 	psf->norm_double	= SF_TRUE ;
-	psf->mode 			= mode ;
+	psf->file.mode 			= mode ;
 	psf->dataoffset		= -1 ;
 	psf->datalength		= -1 ;
 	psf->read_current	= -1 ;
@@ -2541,7 +2542,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		} ;
 
 	if (psf->fileoffset > 0)
-	{	switch (psf->mode)
+	{	switch (psf->file.mode)
 		{	case SFM_READ :
 				if (psf->filelength < 44)
 				{	psf_log_printf (psf, "Short filelength: %D (fileoffset: %D)\n", psf->filelength, psf->fileoffset) ;
@@ -2596,7 +2597,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		} ;
 
 	/* Prevent unnecessary seeks */
-	psf->last_op = psf->mode ;
+	psf->last_op = psf->file.mode ;
 
 	/* Set bytewidth if known. */
 	switch (SF_CODEC (psf->sf.format))
@@ -2781,7 +2782,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 
 	psf->read_current = 0 ;
 	psf->write_current = 0 ;
-	if (psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_RDWR)
 	{	psf->write_current = psf->sf.frames ;
 		psf->have_written = psf->sf.frames > 0 ? SF_TRUE : SF_FALSE ;
 		} ;
@@ -2809,7 +2810,7 @@ error_exit :
 			break ;
 
 		default :
-			if (psf->mode == SFM_READ)
+			if (psf->file.mode == SFM_READ)
 			{	psf_log_printf (psf, "Parse error : %s\n", sf_error_number (error)) ;
 				error = SF_ERR_MALFORMED_FILE ;
 				} ;

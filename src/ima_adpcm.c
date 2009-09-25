@@ -116,14 +116,14 @@ wav_w64_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 		return SFE_INTERNAL ;
 		} ;
 
-	if (psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 		if ((error = ima_reader_init (psf, blockalign, samplesperblock)))
 			return error ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 		if ((error = ima_writer_init (psf, blockalign)))
 			return error ;
 
@@ -137,14 +137,14 @@ int
 aiff_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 {	int error ;
 
-	if (psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 		if ((error = ima_reader_init (psf, blockalign, samplesperblock)))
 			return error ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 		if ((error = ima_writer_init (psf, blockalign)))
 			return error ;
 
@@ -159,7 +159,7 @@ ima_close	(SF_PRIVATE *psf)
 
 	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	/*	If a block has been partially assembled, write it out
 		**	as the final block.
 		*/
@@ -181,7 +181,7 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 {	IMA_ADPCM_PRIVATE	*pima ;
 	int		pimasize, count ;
 
-	if (psf->mode != SFM_READ)
+	if (psf->file.mode != SFM_READ)
 		return SFE_BAD_MODE_RW ;
 
 	pimasize = sizeof (IMA_ADPCM_PRIVATE) + blockalign * psf->sf.channels + 3 * psf->sf.channels * samplesperblock ;
@@ -761,7 +761,7 @@ ima_writer_init (SF_PRIVATE *psf, int blockalign)
 	int					samplesperblock ;
 	unsigned int 		pimasize ;
 
-	if (psf->mode != SFM_WRITE)
+	if (psf->file.mode != SFM_WRITE)
 		return SFE_BAD_MODE_RW ;
 
 	samplesperblock = 2 * (blockalign - 4 * psf->sf.channels) / psf->sf.channels + 1 ;

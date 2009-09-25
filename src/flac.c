@@ -618,17 +618,17 @@ flac_open	(SF_PRIVATE *psf)
 	FLAC_PRIVATE* pflac = calloc (1, sizeof (FLAC_PRIVATE)) ;
 	psf->codec_data = pflac ;
 
-	if (psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	if ((error = flac_read_header (psf)))
 			return error ;
 		} ;
 
 	subformat = SF_CODEC (psf->sf.format) ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_FLAC)
 			return	SFE_BAD_OPEN_FORMAT ;
 
@@ -681,7 +681,7 @@ flac_close	(SF_PRIVATE *psf)
 	if (pflac->metadata != NULL)
 		FLAC__metadata_object_delete (pflac->metadata) ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	FLAC__stream_encoder_finish (pflac->fse) ;
 		FLAC__stream_encoder_delete (pflac->fse) ;
 
@@ -689,7 +689,7 @@ flac_close	(SF_PRIVATE *psf)
 			free (pflac->encbuffer) ;
 		} ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	FLAC__stream_decoder_finish (pflac->fsd) ;
 		FLAC__stream_decoder_delete (pflac->fsd) ;
 		} ;
@@ -794,17 +794,17 @@ flac_command (SF_PRIVATE * UNUSED (psf), int UNUSED (command), void * UNUSED (da
 int
 flac_init (SF_PRIVATE *psf)
 {
-	if (psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	psf->read_short		= flac_read_flac2s ;
 		psf->read_int		= flac_read_flac2i ;
 		psf->read_float		= flac_read_flac2f ;
 		psf->read_double	= flac_read_flac2d ;
 		} ;
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{	psf->write_short	= flac_write_s2flac ;
 		psf->write_int		= flac_write_i2flac ;
 		psf->write_float	= flac_write_f2flac ;
@@ -1286,7 +1286,7 @@ flac_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 
 	pflac->frame = NULL ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	FLAC__uint64 position ;
 		if (FLAC__stream_decoder_seek_absolute (pflac->fsd, offset))
 		{	FLAC__stream_decoder_get_decode_position (pflac->fsd, &position) ;
