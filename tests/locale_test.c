@@ -30,8 +30,64 @@
 #include <locale.h>
 #endif
 
+#if OS_IS_WIN32
+#include <windows.h>
+#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES
+#endif
+
 #include "sndfile.h"
 #include "utils.h"
+
+static void utf8_test (void) ;
+static void wchar_test (void) ;
+
+int
+main (void)
+{
+	utf8_test () ;
+	wchar_test () ;
+
+	return 0 ;
+} /* main */
+
+/*==============================================================================
+*/
+
+static void
+wchar_test (void)
+{
+#if OS_IS_WIN32
+	SNDFILE * file ;
+	SF_INFO info ;
+	LPCWSTR filename = L"test.wav" ;
+
+	print_test_name (__func__, "test.wav") ;
+
+	info.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
+	info.channels = 1 ;
+	info.samplerate = 44100 ;
+
+	file = sf_wchar_open (filename, SFM_WRITE, &info) ;
+	exit_if_true (file == NULL, "\n\nLine %d : sf_wchar_open failed : %s\n\n", __LINE__, sf_strerror (NULL)) ;
+	sf_close (file) ;
+
+	/*	This should check that the file did in fact get created with a
+	**	wchar_t * filename.
+	*/
+	exit_if_true (
+		GetFileAttributesW (filename) == INVALID_FILE_ATTRIBUTES,
+		"\n\nLine %d : GetFileAttributes failed.\n\n", __LINE__
+		) ;
+
+	/* Use this because the file was created with CreateFileW. */
+	DeleteFileW (filename) ;
+
+	puts ("ok") ;
+#endif
+} /* wchar_test */
+
+/*==============================================================================
+*/
 
 typedef struct
 {	const char *locale ;
@@ -40,16 +96,7 @@ typedef struct
 	int	width ;
 } LOCALE_DATA ;
 
-static void utf8_test (void) ;
 static void locale_test (const LOCALE_DATA * locdata) ;
-
-int
-main (void)
-{
-	utf8_test () ;
-
-	return 0 ;
-} /* main */
 
 static void
 utf8_test (void)
@@ -61,9 +108,9 @@ utf8_test (void)
 
 #if OS_IS_WIN32 == 0
 		{	"ja_JP", 1, "\343\201\212\343\201\257\343\202\210\343\201\206\343\201\224\343\201\226\343\201\204\343\201\276\343\201\231.au", 21 },
-		{	"vi_VN", 1, "qu\341\273\221c ng\341\273\257.au", 11 },
 #endif
 
+		{	"vi_VN", 1, "qu\341\273\221c ng\341\273\257.au", 11 },
 		{	NULL, 0, NULL, 0 }
 		} ;
 	int k ;

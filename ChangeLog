@@ -13,6 +13,9 @@
 
     * src/create_symbols_file.py
     Add sf_wchar_open() to the list of public symbols (windows only).
+
+    * tests/locale_test.c
+    Add a wchar_test() to test sf_wchar_open().
  
 2009-09-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
