@@ -4,6 +4,16 @@
     Modify SF_FILE struct to allow it to carry either 8-bit or 16-bit strings
     for the file path, directory and name. Fixes for this change throughout.
 
+    * src/windows.c src/Makefile.am
+    New file defining new windows only public function sf_wchar_open() which
+    takes a 'const wchar_t *' string (LPCWSTR) for the file name parameter.
+
+    * src/sndfile.h.in
+    Add windows only defintion for sf_wchar_open().
+
+    * src/create_symbols_file.py
+    Add sf_wchar_open() to the list of public symbols (windows only).
+ 
 2009-09-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/*.c
