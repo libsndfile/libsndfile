@@ -129,7 +129,8 @@ sd2_open (SF_PRIVATE *psf)
 
 	/* Only open and write the resource in RDWR mode is its current length is zero. */
 	if (psf->file.mode == SFM_WRITE || (psf->file.mode == SFM_RDWR && psf->rsrclength == 0))
-	{	psf_open_rsrc (psf, psf->file.mode) ;
+	{	psf->rsrc.mode = psf->file.mode ;
+		psf_open_rsrc (psf) ;
 
 		error = sd2_write_rsrc_fork (psf, SF_FALSE) ;
 
@@ -281,8 +282,8 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 	write_int (rsrc.rsrc_data, 4, rsrc.map_offset) ;
 	write_int (rsrc.rsrc_data, 8, rsrc.data_length) ;
 
-	write_char (rsrc.rsrc_data, 0x30, strlen (psf->file.name)) ;
-	write_str (rsrc.rsrc_data, 0x31, psf->file.name, strlen (psf->file.name)) ;
+	write_char (rsrc.rsrc_data, 0x30, strlen (psf->file.name.c)) ;
+	write_str (rsrc.rsrc_data, 0x31, psf->file.name.c, strlen (psf->file.name.c)) ;
 
 	write_short (rsrc.rsrc_data, 0x50, 0) ;
 	write_marker (rsrc.rsrc_data, 0x52, Sd2f_MARKER) ;

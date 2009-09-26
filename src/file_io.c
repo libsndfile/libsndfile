@@ -73,14 +73,14 @@ static void psf_log_syserr (SF_PRIVATE *psf, int error) ;
 */
 
 static int psf_close_fd (int fd) ;
-static int psf_open_fd (const char * path, int mode) ;
+static int psf_open_fd (PSF_FILE * pfile) ;
 static sf_count_t psf_get_filelen_fd (int fd) ;
 
 int
-psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
+psf_fopen (SF_PRIVATE *psf)
 {
 	psf->error = 0 ;
-	psf->file.filedes = psf_open_fd (pathname, open_mode) ;
+	psf->file.filedes = psf_open_fd (&psf->file) ;
 
 	if (psf->file.filedes == - SFE_BAD_OPEN_MODE)
 	{	psf->error = SFE_BAD_OPEN_MODE ;
@@ -90,8 +90,6 @@ psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
 
 	if (psf->file.filedes == -1)
 		psf_log_syserr (psf, errno) ;
-
-	psf->file.mode = open_mode ;
 
 	return psf->error ;
 } /* psf_fopen */
@@ -117,17 +115,17 @@ psf_fclose (SF_PRIVATE *psf)
 } /* psf_fclose */
 
 int
-psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
+psf_open_rsrc (SF_PRIVATE *psf)
 {
 	if (psf->rsrc.filedes > 0)
 		return 0 ;
 
 	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
-	snprintf (psf->rsrc.path, sizeof (psf->rsrc.path), "%s/rsrc", psf->file.path) ;
+	snprintf (psf->rsrc.path.c, sizeof (psf->rsrc.path.c), "%s/rsrc", psf->file.path.c) ;
 	psf->error = SFE_NO_ERROR ;
-	if ((psf->rsrc.filedes = psf_open_fd (psf->rsrc.path, open_mode)) >= 0)
+	if ((psf->rsrc.filedes = psf_open_fd (&psf->rsrc)) >= 0)
 	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrc.filedes) ;
-		if (psf->rsrclength > 0 || (open_mode & SFM_WRITE))
+		if (psf->rsrclength > 0 || (psf->rsrc.mode & SFM_WRITE))
 			return SFE_NO_ERROR ;
 		psf_close_fd (psf->rsrc.filedes) ;
 		psf->rsrc.filedes = -1 ;
@@ -142,9 +140,9 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	** Now try for a resource fork stored as a separate file in the same
 	** directory, but preceded with a dot underscore.
 	*/
-	snprintf (psf->rsrc.path, sizeof (psf->rsrc.path), "%s._%s", psf->file.dir, psf->file.name) ;
+	snprintf (psf->rsrc.path.c, sizeof (psf->rsrc.path.c), "%s._%s", psf->file.dir.c, psf->file.name.c) ;
 	psf->error = SFE_NO_ERROR ;
-	if ((psf->rsrc.filedes = psf_open_fd (psf->rsrc.path, open_mode)) >= 0)
+	if ((psf->rsrc.filedes = psf_open_fd (&psf->rsrc)) >= 0)
 	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrc.filedes) ;
 		return SFE_NO_ERROR ;
 		} ;
@@ -153,9 +151,9 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	** Now try for a resource fork stored in a separate file in the
 	** .AppleDouble/ directory.
 	*/
-	snprintf (psf->rsrc.path, sizeof (psf->rsrc.path), "%s.AppleDouble/%s", psf->file.dir, psf->file.name) ;
+	snprintf (psf->rsrc.path.c, sizeof (psf->rsrc.path.c), "%s.AppleDouble/%s", psf->file.dir.c, psf->file.name.c) ;
 	psf->error = SFE_NO_ERROR ;
-	if ((psf->rsrc.filedes = psf_open_fd (psf->rsrc.path, open_mode)) >= 0)
+	if ((psf->rsrc.filedes = psf_open_fd (&psf->rsrc)) >= 0)
 	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrc.filedes) ;
 		return SFE_NO_ERROR ;
 		} ;
@@ -224,10 +222,10 @@ psf_close_rsrc (SF_PRIVATE *psf)
 } /* psf_close_rsrc */
 
 int
-psf_set_stdio (SF_PRIVATE *psf, int mode)
+psf_set_stdio (SF_PRIVATE *psf)
 {	int	error = 0 ;
 
-	switch (mode)
+	switch (psf->file.mode)
 	{	case SFM_RDWR :
 				error = SFE_OPEN_PIPE_RDWR ;
 				break ;
@@ -531,7 +529,7 @@ psf_use_rsrc (SF_PRIVATE *psf, int on_off)
 } /* psf_use_rsrc */
 
 static int
-psf_open_fd (const char * pathname, int open_mode)
+psf_open_fd (PSF_FILE * pfile)
 {	int fd, oflag, mode ;
 
 	/*
@@ -545,7 +543,7 @@ psf_open_fd (const char * pathname, int open_mode)
 		exit (1) ;
 		} ;
 
-	switch (open_mode)
+	switch (pfile->mode)
 	{	case SFM_READ :
 				oflag = O_RDONLY | O_BINARY ;
 				mode = 0 ;
@@ -566,10 +564,10 @@ psf_open_fd (const char * pathname, int open_mode)
 				break ;
 		} ;
 
-	if (mode == 0)
-		fd = open (pathname, oflag) ;
+	if (pfile->mode == 0)
+		fd = open (pfile->path.c, oflag) ;
 	else
-		fd = open (pathname, oflag, mode) ;
+		fd = open (pfile->path.c, oflag, mode) ;
 
 	return fd ;
 } /* psf_open_fd */
@@ -605,19 +603,17 @@ psf_fsync (SF_PRIVATE *psf)
 #include <io.h>
 
 static int psf_close_handle (HANDLE handle) ;
-static HANDLE psf_open_handle (const char * path, int mode) ;
+static HANDLE psf_open_handle (PSF_FILE * pfile) ;
 static sf_count_t psf_get_filelen_handle (HANDLE handle) ;
 
 /* USE_WINDOWS_API */ int
-psf_fopen (SF_PRIVATE *psf, const char *pathname, int open_mode)
+psf_fopen (SF_PRIVATE *psf)
 {
 	psf->error = 0 ;
-	psf->file.handle = psf_open_handle (pathname, open_mode) ;
+	psf->file.handle = psf_open_handle (&psf->file) ;
 
 	if (psf->file.handle == NULL)
 		psf_log_syserr (psf, GetLastError ()) ;
-
-	psf->file.mode = open_mode ;
 
 	return psf->error ;
 } /* psf_fopen */
@@ -643,15 +639,15 @@ psf_fclose (SF_PRIVATE *psf)
 } /* psf_fclose */
 
 /* USE_WINDOWS_API */ int
-psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
+psf_open_rsrc (SF_PRIVATE *psf)
 {
 	if (psf->rsrc.handle != NULL)
 		return 0 ;
 
 	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
-	snprintf (psf->rsrc.path, sizeof (psf->rsrc.path), "%s/rsrc", psf->file.path) ;
+	snprintf (psf->rsrc.path.c, sizeof (psf->rsrc.path.c), "%s/rsrc", psf->file.path.c) ;
 	psf->error = SFE_NO_ERROR ;
-	if ((psf->rsrc.handle = psf_open_handle (psf->rsrc.path, open_mode)) != NULL)
+	if ((psf->rsrc.handle = psf_open_handle (&psf->rsrc)) != NULL)
 	{	psf->rsrclength = psf_get_filelen_handle (psf->rsrc.handle) ;
 		return SFE_NO_ERROR ;
 		} ;
@@ -660,9 +656,9 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	** Now try for a resource fork stored as a separate file in the same
 	** directory, but preceded with a dot underscore.
 	*/
-	snprintf (psf->rsrc.path, sizeof (psf->rsrc.path), "%s._%s", psf->file.dir, psf->file.name) ;
+	snprintf (psf->rsrc.path.c, sizeof (psf->rsrc.path.c), "%s._%s", psf->file.dir.c, psf->file.name.c) ;
 	psf->error = SFE_NO_ERROR ;
-	if ((psf->rsrc.handle = psf_open_handle (psf->rsrc.path, open_mode)) != NULL)
+	if ((psf->rsrc.handle = psf_open_handle (&psf->rsrc)) != NULL)
 	{	psf->rsrclength = psf_get_filelen_handle (psf->rsrc.handle) ;
 		return SFE_NO_ERROR ;
 		} ;
@@ -671,11 +667,11 @@ psf_open_rsrc (SF_PRIVATE *psf, int open_mode)
 	** Now try for a resource fork stored in a separate file in the
 	** .AppleDouble/ directory.
 	*/
-	snprintf (psf->rsrc.path, sizeof (psf->rsrc.path), "%s.AppleDouble/%s", psf->file.dir, psf->file.name) ;
+	snprintf (psf->rsrc.path.c, sizeof (psf->rsrc.path.c), "%s.AppleDouble/%s", psf->file.dir.c, psf->file.name.c) ;
 	psf->error = SFE_NO_ERROR ;
-	if ((psf->rsrc.handle = psf_open_handle (psf->rsrc.path, open_mode)) != NULL)
+	if ((psf->rsrc.handle = psf_open_handle (&psf->rsrc)) != NULL)
 	{	psf->rsrclength = psf_get_filelen_handle (psf->rsrc.handle) ;
-		return SFE_NO_ERROR ;
+      		return SFE_NO_ERROR ;
 		} ;
 
 	/* No resource file found. */
@@ -755,13 +751,13 @@ psf_use_rsrc (SF_PRIVATE *psf, int on_off)
 } /* psf_use_rsrc */
 
 /* USE_WINDOWS_API */ static HANDLE
-psf_open_handle (const char * pathname, int open_mode)
+psf_open_handle (PSF_FILE * pfile)
 {	DWORD dwDesiredAccess ;
 	DWORD dwShareMode ;
 	DWORD dwCreationDistribution ;
 	HANDLE handle ;
 
-	switch (open_mode)
+	switch (pfile->mode)
 	{	case SFM_READ :
 				dwDesiredAccess = GENERIC_READ ;
 				dwShareMode = FILE_SHARE_READ | FILE_SHARE_WRITE ;
@@ -784,15 +780,26 @@ psf_open_handle (const char * pathname, int open_mode)
 				return NULL ;
 		} ;
 
-	handle = CreateFile (
-			pathname,					/* pointer to name of the file */
-			dwDesiredAccess,			/* access (read-write) mode */
-			dwShareMode,				/* share mode */
-			0,							/* pointer to security attributes */
-			dwCreationDistribution,		/* how to create */
-			FILE_ATTRIBUTE_NORMAL,		/* file attributes (could use FILE_FLAG_SEQUENTIAL_SCAN) */
-			NULL						/* handle to file with attributes to copy */
-			) ;
+	if (pfile->use_wchar)
+		handle = CreateFileW (
+					pfile->path.wc,				/* pointer to name of the file */
+					dwDesiredAccess,			/* access (read-write) mode */
+					dwShareMode,				/* share mode */
+					0,							/* pointer to security attributes */
+					dwCreationDistribution,		/* how to create */
+					FILE_ATTRIBUTE_NORMAL,		/* file attributes (could use FILE_FLAG_SEQUENTIAL_SCAN) */
+					NULL						/* handle to file with attributes to copy */
+					) ;
+	else
+		handle = CreateFile (
+					pfile->path.c,				/* pointer to name of the file */
+					dwDesiredAccess,			/* access (read-write) mode */
+					dwShareMode,				/* share mode */
+					0,							/* pointer to security attributes */
+					dwCreationDistribution,		/* how to create */
+					FILE_ATTRIBUTE_NORMAL,		/* file attributes (could use FILE_FLAG_SEQUENTIAL_SCAN) */
+					NULL						/* handle to file with attributes to copy */
+					) ;
 
 	if (handle == INVALID_HANDLE_VALUE)
 		return NULL ;
@@ -837,11 +844,11 @@ psf_close_rsrc (SF_PRIVATE *psf)
 
 
 /* USE_WINDOWS_API */ int
-psf_set_stdio (SF_PRIVATE *psf, int mode)
+psf_set_stdio (SF_PRIVATE *psf)
 {	HANDLE	handle = NULL ;
 	int	error = 0 ;
 
-	switch (mode)
+	switch (psf->file.mode)
 	{	case SFM_RDWR :
 				error = SFE_OPEN_PIPE_RDWR ;
 				break ;

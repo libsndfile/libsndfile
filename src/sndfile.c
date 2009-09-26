@@ -263,15 +263,14 @@ static int	validate_psf (SF_PRIVATE *psf) ;
 static void	save_header_info (SF_PRIVATE *psf) ;
 static void	copy_filename (SF_PRIVATE *psf, const char *path) ;
 static int	psf_close (SF_PRIVATE *psf) ;
-static SNDFILE * psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo) ;
 
-static int	try_resource_fork (SF_PRIVATE * psf, int mode) ;
+static int	try_resource_fork (SF_PRIVATE * psf) ;
 
 /*------------------------------------------------------------------------------
 ** Private (static) variables.
 */
 
-static int	sf_errno = 0 ;
+int	sf_errno = 0 ;
 static char	sf_logbuffer [SF_BUFFER_LEN] = { 0 } ;
 static char	sf_syserr [SF_SYSERR_LEN] = { 0 } ;
 
@@ -316,12 +315,13 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 
 	copy_filename (psf, path) ;
 
+	psf->file.mode = mode ;
 	if (strcmp (path, "-") == 0)
-		psf->error = psf_set_stdio (psf, mode) ;
+		psf->error = psf_set_stdio (psf) ;
 	else
-		psf->error = psf_fopen (psf, path, mode) ;
+		psf->error = psf_fopen (psf) ;
 
-	return psf_open_file (psf, mode, sfinfo) ;
+	return psf_open_file (psf, sfinfo) ;
 } /* sf_open */
 
 SNDFILE*
@@ -341,6 +341,7 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 	psf_init_files (psf) ;
 	copy_filename (psf, "") ;
 
+	psf->file.mode = mode ;
 	psf_set_file (psf, fd) ;
 	psf->is_pipe = psf_is_pipe (psf) ;
 	psf->fileoffset = psf_ftell (psf) ;
@@ -348,7 +349,7 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 	if (! close_desc)
 		psf->file.do_not_close_descriptor = SF_TRUE ;
 
-	return psf_open_file (psf, mode, sfinfo) ;
+	return psf_open_file (psf, sfinfo) ;
 } /* sf_open_fd */
 
 SNDFILE*
@@ -387,7 +388,7 @@ sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user
 
 	psf->file.mode = mode ;
 
-	return psf_open_file (psf, mode, sfinfo) ;
+	return psf_open_file (psf, sfinfo) ;
 } /* sf_open_virtual */
 
 int
@@ -2161,16 +2162,18 @@ sf_writef_double	(SNDFILE *sndfile, const double *ptr, sf_count_t frames)
 */
 
 static int
-try_resource_fork (SF_PRIVATE * psf, int mode)
+try_resource_fork (SF_PRIVATE * psf)
 {	int old_error = psf->error ;
 
-	if (psf_open_rsrc (psf, mode) != 0)
+	/* Set READ mode now, to see if resource fork exists. */
+	psf->rsrc.mode = SFM_READ ;
+	if (psf_open_rsrc (psf) != 0)
 	{	psf->error = old_error ;
 		return 0 ;
 		} ;
 
 	/* More checking here. */
-	psf_log_printf (psf, "Resource fork : %s\n", psf->rsrc.path) ;
+	psf_log_printf (psf, "Resource fork : %s\n", psf->rsrc.path.c) ;
 
 	return SF_FORMAT_SD2 ;
 } /* try_resource_fork */
@@ -2181,7 +2184,7 @@ format_from_extension (SF_PRIVATE *psf)
 	char buffer [16] ;
 	int format = 0 ;
 
-	if ((cptr = strrchr (psf->file.name, '.')) == NULL)
+	if ((cptr = strrchr (psf->file.name.c, '.')) == NULL)
 		return 0 ;
 
 	cptr ++ ;
@@ -2345,7 +2348,7 @@ guess_file_type (SF_PRIVATE *psf)
 		return SF_FORMAT_RF64 ;
 
 	/* This must be the second last one. */
-	if (psf->filelength > 0 && (format = try_resource_fork (psf, SFM_READ)) != 0)
+	if (psf->filelength > 0 && (format = try_resource_fork (psf)) != 0)
 		return format ;
 
 	return 0 ;
@@ -2398,20 +2401,20 @@ copy_filename (SF_PRIVATE *psf, const char *path)
 {	const char *ccptr ;
 	char *cptr ;
 
-	snprintf (psf->file.path, sizeof (psf->file.path), "%s", path) ;
+	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", path) ;
 	if ((ccptr = strrchr (path, '/')) || (ccptr = strrchr (path, '\\')))
 		ccptr ++ ;
 	else
 		ccptr = path ;
 
-	snprintf (psf->file.name, sizeof (psf->file.name), "%s", ccptr) ;
+	snprintf (psf->file.name.c, sizeof (psf->file.name.c), "%s", ccptr) ;
 
 	/* Now grab the directory. */
-	snprintf (psf->file.dir, sizeof (psf->file.dir), "%s", path) ;
-	if ((cptr = strrchr (psf->file.dir, '/')) || (cptr = strrchr (psf->file.dir, '\\')))
+	snprintf (psf->file.dir.c, sizeof (psf->file.dir.c), "%s", path) ;
+	if ((cptr = strrchr (psf->file.dir.c, '/')) || (cptr = strrchr (psf->file.dir.c, '\\')))
 		cptr [1] = 0 ;
 	else
-		psf->file.dir [0] = 0 ;
+		psf->file.dir.c [0] = 0 ;
 
 	return ;
 } /* copy_filename */
@@ -2469,8 +2472,8 @@ psf_close (SF_PRIVATE *psf)
 	return error ;
 } /* psf_close */
 
-static SNDFILE *
-psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
+SNDFILE *
+psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 {	int		error, format ;
 
 	sf_errno = error = 0 ;
@@ -2481,7 +2484,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 		goto error_exit ;
 		} ;
 
-	if (mode != SFM_READ && mode != SFM_WRITE && mode != SFM_RDWR)
+	if (psf->file.mode != SFM_READ && psf->file.mode != SFM_WRITE && psf->file.mode != SFM_RDWR)
 	{	error = SFE_BAD_OPEN_MODE ;
 		goto error_exit ;
 		} ;
@@ -2496,7 +2499,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	sfinfo->sections = 0 ;
 	sfinfo->seekable = 0 ;
 
-	if (mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	if ((SF_CONTAINER (sfinfo->format)) == SF_FORMAT_RAW)
 		{	if (sf_format_check (sfinfo) == 0)
 			{	error = SFE_RAW_BAD_FORMAT ;
@@ -2512,7 +2515,6 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	psf->Magick 		= SNDFILE_MAGICK ;
 	psf->norm_float 	= SF_TRUE ;
 	psf->norm_double	= SF_TRUE ;
-	psf->file.mode 			= mode ;
 	psf->dataoffset		= -1 ;
 	psf->datalength		= -1 ;
 	psf->read_current	= -1 ;
@@ -2570,7 +2572,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	else
 		psf_log_printf (psf, "Length : %D\n", psf->filelength) ;
 
-	if (mode == SFM_WRITE || (mode == SFM_RDWR && psf->filelength == 0))
+	if (psf->file.mode == SFM_WRITE || (psf->file.mode == SFM_RDWR && psf->filelength == 0))
 	{	/* If the file is being opened for write or RDWR and the file is currently
 		** empty, then the SF_INFO struct must contain valid data.
 		*/
@@ -2762,7 +2764,7 @@ psf_open_file (SF_PRIVATE *psf, int mode, SF_INFO *sfinfo)
 	if (psf->fileoffset > 0)
 		psf_log_printf (psf, "Embedded file length : %D\n", psf->filelength) ;
 
-	if (mode == SFM_RDWR && sf_format_check (&(psf->sf)) == 0)
+	if (psf->file.mode == SFM_RDWR && sf_format_check (&(psf->sf)) == 0)
 	{	error = SFE_BAD_MODE_RW ;
 		goto error_exit ;
 		} ;

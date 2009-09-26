@@ -240,14 +240,29 @@ typedef struct
 	SF_BROADCAST_INFO binfo ;
 } PSF_BROADCAST_VAR ;
 
+#if SIZEOF_WCHAR_T == 2
+typedef wchar_t	sfwchar_t ;
+#else
+typedef int16_t sfwchar_t ;
+#endif
+
 
 typedef struct
-{	char			path	[SF_FILENAME_LEN] ;
-	char			dir		[SF_FILENAME_LEN] ;
-	char			name	[SF_FILENAME_LEN / 4] ;
+{
+	union
+	{	char		c [SF_FILENAME_LEN] ;
+		sfwchar_t	wc [SF_FILENAME_LEN] ;
+	} path ;
 
-	int				do_not_close_descriptor ;
-	int				mode ;			/* Open mode : SFM_READ, SFM_WRITE or SFM_RDWR. */
+	union
+	{	char		c [SF_FILENAME_LEN] ;
+		sfwchar_t	wc [SF_FILENAME_LEN] ;
+	} dir ;
+
+	union
+	{	char		c [SF_FILENAME_LEN / 4] ;
+		sfwchar_t	wc [SF_FILENAME_LEN / 4] ;
+	} name ;
 
 #if USE_WINDOWS_API
 	/*
@@ -255,11 +270,15 @@ typedef struct
 	**	They are basically the same as a windows file HANDLE.
 	*/
 	void 			*handle, *hsaved ;
+
+	int				use_wchar ;
 #else
 	/* These fields can only be used in src/file_io.c. */
 	int 			filedes, savedes ;
 #endif
 
+	int				do_not_close_descriptor ;
+	int				mode ;			/* Open mode : SFM_READ, SFM_WRITE or SFM_RDWR. */
 } PSF_FILE ;
 
 
@@ -691,12 +710,14 @@ int macos_guess_file_type (SF_PRIVATE *psf, const char *filename) ;
 **	some 32 bit OSes. Implementation in file_io.c.
 */
 
-int psf_fopen (SF_PRIVATE *psf, const char *pathname, int flags) ;
-int psf_set_stdio (SF_PRIVATE *psf, int mode) ;
+int psf_fopen (SF_PRIVATE *psf) ;
+int psf_set_stdio (SF_PRIVATE *psf) ;
 int psf_file_valid (SF_PRIVATE *psf) ;
 void psf_set_file (SF_PRIVATE *psf, int fd) ;
 void psf_init_files (SF_PRIVATE *psf) ;
 void psf_use_rsrc (SF_PRIVATE *psf, int on_off) ;
+
+SNDFILE * psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo) ;
 
 sf_count_t psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence) ;
 sf_count_t psf_fread (void *ptr, sf_count_t bytes, sf_count_t count, SF_PRIVATE *psf) ;
@@ -713,7 +734,7 @@ int psf_ftruncate (SF_PRIVATE *psf, sf_count_t len) ;
 int psf_fclose (SF_PRIVATE *psf) ;
 
 /* Open and close the resource fork of a file. */
-int psf_open_rsrc (SF_PRIVATE *psf, int mode) ;
+int psf_open_rsrc (SF_PRIVATE *psf) ;
 int psf_close_rsrc (SF_PRIVATE *psf) ;
 
 /*

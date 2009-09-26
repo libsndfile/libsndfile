@@ -69,10 +69,11 @@ file_open_test (const char *filename)
 		exit (1) ;
 		} ;
 
-	snprintf (psf->file.path, sizeof (psf->file.path), "%s", filename) ;
+	psf->file.mode = SFM_READ ;
+	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", filename) ;
 
 	/* Test that open for read fails if the file doesn't exist. */
-	error = psf_fopen (psf, psf->file.path, SFM_READ) ;
+	error = psf_fopen (psf) ;
 	if (error == 0)
 	{	printf ("\n\nLine %d: psf_fopen() should have failed.\n\n", __LINE__) ;
 		exit (1) ;
@@ -87,7 +88,7 @@ file_open_test (const char *filename)
 
 	test_close_or_die (psf, __LINE__) ;
 
-	unlink (psf->file.path) ;
+	unlink (psf->file.path.c) ;
 
 	/* Test file open in read/write mode for a non-existant file. */
 	psf->file.mode = SFM_RDWR ;
@@ -101,7 +102,7 @@ file_open_test (const char *filename)
 
 	test_close_or_die (psf, __LINE__) ;
 
-	unlink (psf->file.path) ;
+	unlink (psf->file.path.c) ;
 	puts ("ok") ;
 } /* file_open_test */
 
@@ -122,7 +123,7 @@ file_read_write_test (const char *filename)
 
 	memset (&sf_data, 0, sizeof (sf_data)) ;
 	psf = &sf_data ;
-	snprintf (psf->file.path, sizeof (psf->file.path), "%s", filename) ;
+	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", filename) ;
 
 	/* Test file open in write mode. */
 	psf->file.mode = SFM_WRITE ;
@@ -278,7 +279,7 @@ file_truncate_test (const char *filename)
 	memset (buffer, 0xEE, sizeof (buffer)) ;
 
 	psf = &sf_data ;
-	snprintf (psf->file.path, sizeof (psf->file.path), "%s", filename) ;
+	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", filename) ;
 
 	/*
 	** Open the file write mode, write 0xEE data and then extend the file
@@ -332,7 +333,7 @@ test_open_or_die (SF_PRIVATE *psf, int linenum)
 {	int		error ;
 
 	/* Test that open for read fails if the file doesn't exist. */
-	error = psf_fopen (psf, psf->file.path, psf->file.mode) ;
+	error = psf_fopen (psf) ;
 	if (error)
 	{	printf ("\n\nLine %d: psf_fopen() failed : %s\n\n", linenum, strerror (errno)) ;
 		exit (1) ;

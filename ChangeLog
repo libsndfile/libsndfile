@@ -1,3 +1,9 @@
+2009-09-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/*.c
+    Modify SF_FILE struct to allow it to carry either 8-bit or 16-bit strings
+    for the file path, directory and name. Fixes for this change throughout.
+
 2009-09-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/*.c

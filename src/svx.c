@@ -252,12 +252,12 @@ svx_read_header	(SF_PRIVATE *psf)
 
 					psf_log_printf (psf, " %M : %d\n", marker, dword) ;
 
-					if (strlen (psf->file.name) != dword)
-					{	if (dword > sizeof (psf->file.name) - 1)
+					if (strlen (psf->file.name.c) != dword)
+					{	if (dword > sizeof (psf->file.name.c) - 1)
 							return SFE_SVX_BAD_NAME_LENGTH ;
 
-						psf_binheader_readf (psf, "b", psf->file.name, dword) ;
-						psf->file.name [dword] = 0 ;
+						psf_binheader_readf (psf, "b", psf->file.name.c, dword) ;
+						psf->file.name.c [dword] = 0 ;
 						}
 					else
 						psf_binheader_readf (psf, "j", dword) ;
@@ -386,7 +386,7 @@ svx_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_binheader_writef (psf, "E4", (psf->bytewidth == 1) ? 0xFF : 0xFFFF) ;
 
 	/* Filename and annotation strings. */
-	psf_binheader_writef (psf, "Emsms", NAME_MARKER, psf->file.name, ANNO_MARKER, annotation) ;
+	psf_binheader_writef (psf, "Emsms", NAME_MARKER, psf->file.name.c, ANNO_MARKER, annotation) ;
 
 	/* BODY marker and size. */
 	psf_binheader_writef (psf, "Etm8", BODY_MARKER, (psf->datalength < 0) ?
