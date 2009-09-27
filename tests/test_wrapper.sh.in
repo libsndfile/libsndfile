@@ -1,5 +1,8 @@
 #!/bin/sh
 
+PACKAGE_VERSION=@PACKAGE_VERSION@
+LIB_VERSION=`echo $PACKAGE_VERSION | sed "s/[a-z].*//"`
+
 if test -f tests/sfversion@EXEEXT@ ; then
 	cd tests
 	fi
@@ -9,13 +12,35 @@ if test ! -f sfversion@EXEEXT@ ; then
 	exit 1
 	fi
 
+if test -f libsndfile.so.$LIB_VERSION ; then
+	export LD_LIBRARY_PATH=`pwd`
+	if test ! -f libsndfile.so.1 ; then
+		ln -s libsndfile.so.$LIB_VERSION libsndfile.so.1
+		fi
+	fi
+
 sfversion=`./sfversion@EXEEXT@`
+
+if test $sfversion != libsndfile-$PACKAGE_VERSION ; then
+	echo "Error : sfversion ($sfversion) and PACKAGE_VERSION ($PACKAGE_VERSION) don't match."
+	exit 1
+	fi
 
 # Force exit on errors.
 set -e
 
-# generic-tests
+# Generic-tests
 uname -a
+
+# Need this for when we're running from files collected into the
+# libsndfile-testsuite-@PACKAGE_VERSION@ tarball.
+if test -x test_main@EXEEXT@ ; then
+	echo "Running unit tests from src/ directory of source code tree."
+	./test_main@EXEEXT@
+	echo
+	echo "Running end-to-end tests from tests/ directory."
+	fi
+
 ./error_test@EXEEXT@
 ./pcm_test@EXEEXT@
 ./ulaw_test@EXEEXT@

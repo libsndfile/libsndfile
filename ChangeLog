@@ -1,3 +1,9 @@
+2009-09-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/test_wrapper.sh.in
+    Update to allow all tests to be gathered up into a testsuite tarball and
+    then be run using this script.
+
 2009-09-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/*.c
