@@ -33,6 +33,7 @@ Makefile
 Makefile.in
 aclocal.m4
 autom4te.cache
+build-test-tarball.mk
 config.log
 config.status
 configure
@@ -48,6 +49,7 @@ examples/sfprocess
 examples/sndfile-to-text
 examples/sndfilehandle
 libsndfile-1.0.*
+libsndfile-testsuite-*
 libsndfile.spec
 libtool
 mntest.sh

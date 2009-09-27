@@ -4,6 +4,12 @@
     Update to allow all tests to be gathered up into a testsuite tarball and
     then be run using this script.
 
+    * build-test-tarball.mk.in
+    Add a Make script to build a tarball of all the test binaries and the test
+    wrapper script. This is useful for cross compiling; you can build the
+    binaries, build test test tarball and transfer the test tarball to the
+    target machine for testing.
+
 2009-09-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/*.c

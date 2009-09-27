@@ -584,7 +584,11 @@ if test x"$CFLAGS" = x ; then
 	exit
 	fi
 
+HOST_TRIPLET="${host_cpu}-${host_vendor}-${host_os}"
+
 #-------------------------------------------------------------------------------
+
+AC_SUBST(HOST_TRIPLET)
 
 AC_SUBST(htmldocdir)
 AC_SUBST(HTML_BGCOLOUR)
@@ -614,12 +618,12 @@ AC_CONFIG_FILES([ \
 	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile \
 	programs/Makefile doc/libsndfile.css \
 	Makefile libsndfile.spec sndfile.pc \
-	tests/test_wrapper.sh \
+	tests/test_wrapper.sh build-test-tarball.mk \
 	])
 AC_OUTPUT
 
-# Make it executable.
-chmod u+x tests/test_wrapper.sh
+# Make sure these are executable.
+chmod u+x tests/test_wrapper.sh build-test-tarball.mk
 
 #====================================================================================
 
@@ -638,6 +642,7 @@ AC_MSG_RESULT([
     Using ALSA in example programs : ...... ${enable_alsa:-no}
     External FLAC/Ogg/Vorbis : ............ ${enable_external_libs:-no}
 ])
+
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
 	echo -e "  Tools :\n"
