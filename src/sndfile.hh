@@ -338,5 +338,31 @@ SndfileHandle::writeRaw (const void *ptr, sf_count_t bytes)
 {	return sf_write_raw (p->sf, ptr, bytes) ; }
 
 
+#ifdef ENABLE_SNDFILE_WINDOWS_PROTOTYPES
+
+inline
+SndfileHandle::SndfileHandle (LPCWSTR wpath, int mode, int fmt, int chans, int srate)
+: p (NULL)
+{
+	p = new (std::nothrow) SNDFILE_ref () ;
+
+	if (p != NULL)
+	{	p->ref = 1 ;
+
+		p->sfinfo.frames = 0 ;
+		p->sfinfo.channels = chans ;
+		p->sfinfo.format = fmt ;
+		p->sfinfo.samplerate = srate ;
+		p->sfinfo.sections = 0 ;
+		p->sfinfo.seekable = 0 ;
+
+		p->sf = sf_wchar_open (wpath, mode, &p->sfinfo) ;
+		} ;
+
+	return ;
+} /* SndfileHandle const wchar_t * constructor */
+
+#endif
+
 #endif	/* SNDFILE_HH */
 
