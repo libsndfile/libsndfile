@@ -631,7 +631,7 @@ void	sf_write_sync	(SNDFILE *sndfile) ;
 
 
 
-/* Windows Only!
+/* The function sf_wchar_open() is Windows Only!
 ** Open a file passing in a Windows Unicode filename. Otherwise, this is
 ** the same as sf_open().
 **
