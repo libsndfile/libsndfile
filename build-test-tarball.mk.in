@@ -39,6 +39,10 @@ check : $(TESTNAME)/test_wrapper.sh
 
 $(TARBALL) : $(TESTNAME)/test_wrapper.sh
 	tar zcf $@ $(TESTNAME)
+	rm -rf $(TESTNAME)
+	@echo
+	@echo "Created : $(TARBALL)"
+	@echo
 
 $(TESTNAME)/test_wrapper.sh : tests/test_wrapper.sh
 	rm -rf $(TESTNAME)
