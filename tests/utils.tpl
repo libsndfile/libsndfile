@@ -497,17 +497,20 @@ test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allo
 		} ;
 
 	if (OS_IS_WIN32)
-	{	/* Windows doesn't support Unix file permissions so set it to zero. */
-		omode = 0 ;
+	{	/* Windows does not understand and ignores the S_IRGRP flag, but Wine
+		** gives a run time warning message, so just clear it.
+		*/
+		omode &= ~S_IRGRP ;
 		} ;
 
 	if (allow_fd && ((++count) & 1) == 1)
 	{	int fd ;
 
-		fd = open (filename, oflags, omode) ;
+		/* Only use the three argument open() function if omode != 0. */
+		fd = (omode == 0) ? open (filename, oflags) : open (filename, oflags, omode) ;
 
 		if (fd < 0)
-		{	perror ("open") ;
+		{	printf ("\n\n%s : open failed : %s\n", __func__, strerror (errno)) ;
 			exit (1) ;
 			} ;
 
@@ -708,7 +711,7 @@ static int allowed_open_files = -1 ;
 void
 count_open_files (void)
 {
-#if (defined (WIN32) || defined (_WIN32))
+#if OS_IS_WIN32
 	return ;
 #else
 	int k, count = 0 ;
@@ -733,7 +736,7 @@ increment_open_file_count (void)
 void
 check_open_file_count_or_die (int lineno)
 {
-#if (defined (WIN32) || defined (_WIN32))
+#if OS_IS_WIN32
 	lineno = 0 ;
 	return ;
 #else

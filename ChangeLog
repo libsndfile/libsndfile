@@ -1,3 +1,11 @@
+2009-09-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/utils.tpl
+    On windows, make sure the open() function doesn't get called with a third
+    parameter of 0 which fails for no good reason. Also make sure this third
+    parameter doesn't get called with S_IRGRP when compiling for windows because
+    Wine complains.
+
 2009-09-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/test_wrapper.sh.in
