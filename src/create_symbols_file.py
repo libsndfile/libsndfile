@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (C) 2003-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+# Copyright (C) 2003-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
 #
 # All rights reserved.
 #
@@ -125,6 +125,10 @@ def os2_symbols (progname, version, name):
 	print
 	return
 
+def plain_symbols (progname, version, name):
+	for name, ordinal in ALL_SYMBOLS:
+		print name
+
 def no_symbols (os_name):
 	print
 	print "No known way of restricting exported symbols on '%s'." % os_name
@@ -146,6 +150,7 @@ if len (sys.argv) != 3:
 	print "          win32      (ie wintendo)"
 	print "          cygwin     (Cygwin on wintendo)"
 	print "          os2        (OS/2)"
+	print "          plain      (plain list of symbols)"
 	print
 	sys.exit (1)
 
@@ -162,6 +167,8 @@ elif os_name == "cygwin":
 	win32_symbols (progname, version, "cygsndfile")
 elif os_name == "os2":
 	os2_symbols (progname, version, "sndfile")
+elif os_name == "static":
+	plain_symbols (progname, version, "")
 else:
 	no_symbols (os_name)
 

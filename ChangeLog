@@ -7,12 +7,15 @@
     Wine complains.
 
     * src/sndfile.hh
-    Add an SndfileHandle constructor for windows that takes a 'const wchar_t *'
+    Add a SndfileHandle constructor for windows that takes a 'const wchar_t *'
     string.
 
     * doc/FAQ.html
     Add Q/A : I'm cross compiling libsndfile for another platform. How can I
     run the test suite?
+
+    * src/create_symbols_file.py src/Makefile.am
+    Add Symbols.static target, a list of symbols, one per line.
 
 2009-09-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

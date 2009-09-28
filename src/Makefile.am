@@ -13,7 +13,7 @@ noinst_LTLIBRARIES = libcommon.la
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 
-SYMBOL_FILES = Symbols.linux Symbols.darwin libsndfile-1.def Symbols.os2
+SYMBOL_FILES = Symbols.linux Symbols.darwin libsndfile-1.def Symbols.os2 Symbols.static
 
 EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 			$(SYMBOL_FILES) create_symbols_file.py binheader_writef_check.py
@@ -75,6 +75,9 @@ libsndfile-1.def: create_symbols_file.py
 
 Symbols.os2: create_symbols_file.py
 	./create_symbols_file.py os2 $(VERSION) > $@
+
+Symbols.static: create_symbols_file.py
+	./create_symbols_file.py static $(VERSION) > $@
 
 # Fake dependancy to force the creation of these files.
 sndfile.o : $(SYMBOL_FILES)
