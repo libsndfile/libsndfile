@@ -56,6 +56,9 @@
 	</A><BR>
 <A HREF="#Q022">Q22 : What versions of windows does libsndfile work on?
 	</A><BR>
+<A HREF="#Q023">Q23 : I'm cross compiling libsndfile for another platform. How can I
+	run the test suite?
+	</A><BR>
 <HR>
 
 <!-- ========================================================================= -->
@@ -777,6 +780,32 @@ the 64 bit version of windows.
 These binaries have received much less testing than the  32 bit versions, but
 should work as expected.
 I'd be very interested in receiving feedback  on these binaries.
+</p>
+
+<!-- ========================================================================= -->
+<A NAME="Q023"></A>
+<H2><BR><B>Q23 : I'm cross compiling libsndfile for another platform. How can I
+	run the test suite?
+</B></H2>
+
+<p>
+</p>
+
+<p>
+Since version 1.0.21 the top level Makefile has an extra make target,
+'test-tarball'.
+Building this target creates a tarball called called:
+</p>
+
+<center><tt>
+libsndfile-testsuite-${host_triplet}-${version}.tar.gz
+</tt></center>
+
+<p>
+in the top level directory.
+This tarball can then be copied to the target platform.
+Once untarred and test script <tt>test_wrapper.sh</tt> can be run from
+the top level of the extracted tarball.
 </p>
 
 <!-- ========================================================================= -->
