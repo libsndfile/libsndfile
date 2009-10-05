@@ -118,6 +118,18 @@ fi
 	DIE=1
 }
 
+echo -n "checking for pkg-config ... "
+result="yes"
+(pkg-config --version) < /dev/null > /dev/null 2>&1 || {
+        echo
+        echo "You must have pkg-config installed to compile $package."
+        echo "Download the appropriate package for your distribution."
+		result="no"
+        DIE=1
+}
+echo $result
+
+
 if test "$DIE" -eq 1; then
         exit 1
 fi
