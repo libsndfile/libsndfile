@@ -1,5 +1,6 @@
 #!/bin/sh
 
+HOST_TRIPLET=@HOST_TRIPLET@
 PACKAGE_VERSION=@PACKAGE_VERSION@
 LIB_VERSION=`echo $PACKAGE_VERSION | sed "s/[a-z].*//"`
 
@@ -13,6 +14,8 @@ if test ! -f sfversion@EXEEXT@ ; then
 	fi
 
 if test -f libsndfile.so.$LIB_VERSION ; then
+	# This will work on Linux, but not on Mac.
+	# Windows is already sorted out.
 	export LD_LIBRARY_PATH=`pwd`
 	if test ! -f libsndfile.so.1 ; then
 		ln -s libsndfile.so.$LIB_VERSION libsndfile.so.1
@@ -62,7 +65,13 @@ if test -x test_main@EXEEXT@ ; then
 ./locale_test@EXEEXT@
 ./win32_ordinal_test@EXEEXT@
 ./external_libs_test@EXEEXT@
-./cpp_test@EXEEXT@
+
+# The win64 G++ compiler requires an extra runtime DLL which
+# we don't have, so skip the following test on win64.
+if test "$HOST_TRIPLET" != "x86_64-w64-mingw32" ; then
+	./cpp_test@EXEEXT@
+	fi
+
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed common tests."
 echo "----------------------------------------------------------------------"
