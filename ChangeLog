@@ -1,3 +1,8 @@
+2009-10-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * man/sndfile-convert.1
+    Fix warning from Debian's lintian checks.
+
 2009-10-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/test_wrapper.sh.in
