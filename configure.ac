@@ -302,21 +302,15 @@ else
 	PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
 	PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
-	# Vorbis versions earlier than 1.2.1 are not const correct at the API level.
-	# Vorbis 1.2.2 adds vorbis_version_string.
-	PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.0, ac_cv_vorbis=yes, ac_cv_vorbis=no)
-	PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.0, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
+	# Vorbis versions earlier than 1.2.3 have bugs that cause the libsndfile
+	# test suite to fail on MIPS, PowerPC and others.
+	# See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
+	PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.3, ac_cv_vorbis=yes, ac_cv_vorbis=no)
+	PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.3, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
 	enable_external_libs=yes
 	fi
 
-HAVE_VORBIS_VERSION_STRING=0
 if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
-
-	save_LIBS="$LIBS"
-	LIBS="$VORBIS_LIBS $LIBS"
-	AC_CHECK_LIB(vorbis, vorbis_version_string, HAVE_VORBIS_VERSION_STRING=1)
-	LIBS="$save_LIBS"
-
 	HAVE_EXTERNAL_LIBS=1
 	enable_external_libs=yes
 
@@ -325,10 +319,9 @@ if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; 
 else
 	AC_MSG_WARN([[
 	
-*** It looks like you enabled the use of external libraries
-*** (ie Flac, Ogg, Vorbis, etc), but one or more of those libs
-*** is either missing (possibly only the development headers)
-*** or is of an unsupported version.
+*** One or more of the external libraries (ie Flac, Ogg, Vorbis,
+*** etc), but one or more of those libs is either missing (possibly
+*** only the development headers) or is of an unsupported version.
 ***
 *** Unfortunately, for ease of maintenance, the external libs
 *** are an all or nothing affair.
@@ -337,7 +330,6 @@ else
 	fi
 
 AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_LIBS], $HAVE_EXTERNAL_LIBS, [Will be set to 1 if flac, ogg and vorbis are available.])
-AC_DEFINE_UNQUOTED([HAVE_VORBIS_VERSION_STRING], $HAVE_VORBIS_VERSION_STRING, [Set to 1 if we have vorbis_version_string.])
 
 #====================================================================================
 # Check for libsqlite3 (only used in regtest).

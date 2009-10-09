@@ -3,6 +3,11 @@
     * src/nist.c
     Fix parsing of odd ulaw encoded file provided by Jan Silovsky.
 
+    * configure.ac
+    Insist on libvorbis >= 1.2.3. Earlier verions have bugs that cause the
+    libsndfile test suite to fail on MIPS, PowerPC and others.
+    See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
+
 2009-10-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * man/sndfile-convert.1
