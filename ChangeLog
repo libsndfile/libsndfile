@@ -1,3 +1,8 @@
+2009-10-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/nist.c
+    Fix parsing of odd ulaw encoded file provided by Jan Silovsky.
+
 2009-10-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * man/sndfile-convert.1
