@@ -120,10 +120,6 @@ static FLAC__StreamEncoderSeekStatus sf_flac_enc_seek_callback (const FLAC__Stre
 static FLAC__StreamEncoderTellStatus sf_flac_enc_tell_callback (const FLAC__StreamEncoder *encoder, FLAC__uint64 *absolute_byte_offset, void *client_data) ;
 static FLAC__StreamEncoderWriteStatus sf_flac_enc_write_callback (const FLAC__StreamEncoder *encoder, const FLAC__byte buffer [], size_t bytes, unsigned samples, unsigned current_frame, void *client_data) ;
 
-static const int legal_sample_rates [] =
-{	8000, 16000, 22050, 24000, 32000, 44100, 48000, 88200, 96000
-} ;
-
 static void
 s2flac8_array (const short *src, FLAC__int32 *dest, int count)
 {	while (--count >= 0)
@@ -707,17 +703,16 @@ static int
 flac_enc_init (SF_PRIVATE *psf)
 {	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->codec_data ;
 	unsigned bps ;
-	int k, found ;
 
-	found = 0 ;
-	for (k = 0 ; k < ARRAY_LEN (legal_sample_rates) ; k++)
-		if (psf->sf.samplerate == legal_sample_rates [k])
-		{	found = 1 ;
-			break ;
-			} ;
-
-	if (found == 0)
+	/* To cite the flac FAQ at
+	** http://flac.sourceforge.net/faq.html#general__samples
+	**     "FLAC supports linear sample rates from 1Hz - 655350Hz in 1Hz
+	**     increments."
+	*/
+	if ( psf->sf.samplerate < 1 || psf->sf.samplerate > 655350 )
+	{	psf_log_printf (psf, "flac sample rate out of range.\n", psf->sf.samplerate) ;
 		return SFE_FLAC_BAD_SAMPLE_RATE ;
+		} ;
 
 	psf_fseek (psf, 0, SEEK_SET) ;
 

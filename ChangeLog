@@ -1,3 +1,9 @@
+2009-10-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/flac.c
+    Apply patch from Uli Franke allowing FLAC files to be encoded at any sample
+    rate.
+
 2009-10-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/nist.c
