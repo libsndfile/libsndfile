@@ -141,6 +141,9 @@ main (int argc, char *argv [])
 
 		broadcast_test ("broadcast.wavex", SF_FORMAT_WAVEX | SF_FORMAT_PCM_16) ;
 		broadcast_rdwr_test	("broadcast.wavex", SF_FORMAT_WAVEX | SF_FORMAT_PCM_16) ;
+
+		broadcast_test ("broadcast.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
+		broadcast_rdwr_test	("broadcast.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
 		test_count ++ ;
 		} ;
 

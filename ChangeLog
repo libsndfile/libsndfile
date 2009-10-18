@@ -1,46 +1,159 @@
-2009-06-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2009-10-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
-    * src/common.(c|h)
-    Add function append_snprintf().
+    * src/wav.c
+    When writing loop lengths, adjust the end position by one to make up for
+    Microsoft's screwed up spec. Thanks to Olivier Tristan for the patch.
 
-    * src/wav_w64.c
-    Decode channel map field of WAVEX into a string.
+2009-10-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
-2009-05-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+    * src/flac.c
+    Apply patch from Uli Franke allowing FLAC files to be encoded at any sample
+    rate.
 
-    * src/sndfile.c
-    Disallow setting of channel map after audio data has been written.
-    Only call psf->command if it is non-NULL.
+2009-10-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
-    * src/wav_w64.c
-    Use SF_CHANNL_MAP_LEFT/RIGHT/CENTER instead of SF_CHANNL_MAP_FRONT_LEFT/
-    RIGHT/CENTER.
+    * src/nist.c
+    Fix parsing of odd ulaw encoded file provided by Jan Silovsky.
 
-    * src/aiff.c
-    Add handling of reading/writing channel map info.
+    * configure.ac
+    Insist on libvorbis >= 1.2.3. Earlier verions have bugs that cause the
+    libsndfile test suite to fail on MIPS, PowerPC and others.
+    See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
+
+2009-10-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * man/sndfile-convert.1
+    Fix warning from Debian's lintian checks.
+
+    * man/sndfile-cmp.1 man/sndfile-jackplay.1 man/sndfile-metadata-get.1
+        man/Makefile.am
+    Add three new minimal manpages and hook into build.
+
+2009-10-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/test_wrapper.sh.in
+    Don't run cpp_test on x86_64-w64-mingw32.
+
+2009-09-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/utils.tpl
+    On windows, make sure the open() function doesn't get called with a third
+    parameter of 0 which fails for no good reason. Also make sure this third
+    parameter doesn't get called with S_IRGRP when compiling for windows because
+    Wine complains.
+
+    * src/sndfile.hh
+    Add a SndfileHandle constructor for windows that takes a 'const wchar_t *'
+    string.
+
+    * doc/FAQ.html
+    Add Q/A : I'm cross compiling libsndfile for another platform. How can I
+    run the test suite?
+
+    * src/create_symbols_file.py src/Makefile.am
+    Add Symbols.static target, a list of symbols, one per line.
+
+2009-09-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/test_wrapper.sh.in
+    Update to allow all tests to be gathered up into a testsuite tarball and
+    then be run using this script.
+
+    * build-test-tarball.mk.in
+    Add a Make script to build a tarball of all the test binaries and the test
+    wrapper script. This is useful for cross compiling; you can build the
+    binaries, build test test tarball and transfer the test tarball to the
+    target machine for testing.
+
+2009-09-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/*.c
+    Modify SF_FILE struct to allow it to carry either 8-bit or 16-bit strings
+    for the file path, directory and name. Fixes for this change throughout.
+
+    * src/windows.c src/Makefile.am
+    New file defining new windows only public function sf_wchar_open() which
+    takes a 'const wchar_t *' string (LPCWSTR) for the file name parameter.
 
     * src/sndfile.h.in
     Add SF_CHANNEL_MAP_ABISONIC_* entries.
+    Add windows only defintion for sf_wchar_open().
+
+    * src/create_symbols_file.py
+    Add sf_wchar_open() to the list of public symbols (windows only).
+
+    * tests/locale_test.c
+    Add a wchar_test() to test sf_wchar_open().
+ 
+2009-09-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/*.c
+    Split file stuff into PSF_FILE struct within the SF_PRIVATE struct.
+
+2009-09-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c src/voc.c
+    When a byte is needed, use unsigned char.
+
+    * src/ima_oki_adpcm.c src/broadcast.c src/test_ima_oki_adpcm.c
+    Include sfconfig.h to prevent compile errors with MinGW compilers.
+
+    * configure.ac
+    Remove AM_CONFIG_HEADER due to warnings from autoconf 2.64.
+
+    * tests/locale_test.c
+    Update to work with xx_XX.UTF-8 style locales. Refactoring.
+
+2009-09-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Set __USE_MINGW_ANSI_STDIO to 1 when compiling using MinGW compilers.
+    Remove unneeded AC_SUBST.
+    Report Host CPU/OS/vendor.
+
+2009-09-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    Fix error message string.
+
+    * src/flac.c
+    Add 88200 to the list of supported sample rates.
+
+    * src/ogg.c
+    Fix compiler warning when using gcc-4.5.0.
+
+    * programs/sndfile-info.c tests/utils.tpl
+    Remove WIN32 snprintf #define.
+
+    * src/ima_adpcm.c
+    Fix minor bug in aiff_ima_encode_block. Thanks to Denis Fileev for finding
+    this.
+
+2009-09-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/caf.c
-    Add handling of reading/writing channel map info.
+    Use the correct C99 format specifier for int64_t.
 
-    * tests/command_test.c tests/test_wrapper.sh.in
-    Update channel map tests.
+    * M4/endian.m4
+    Fix detection of CPU endian-ness when cross compiling. Thanks to Pierre
+    Ossman for the bug report.
 
-2009-05-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+    * src/caf.c src/sndfile.c
+    Fix reading and writing of PEAK chunks in CAF files.
 
-    * src/chanmap.[ch]
-    New files for channel map decoding/encoding.
+    * tests/peak_chunk_test.c tests/test_wrapper.sh.in
+    Run peak_chunk_test on CAF files.
 
-2009-05-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2009-09-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
-    * src/wav_w64.[ch]
-    Add wavex_channelmask to WAV_PRIVATE struct and add a function to convert
-    an array of SF_CHANNEL_MASK_* values into a bit mask for use in WAV files.
+    * src/aiff.c src/wav.c
+    Use the correct C99 format specifier for int64_t.
 
-    * src/wav.c
-    Add ability to write the channel mask.
+2009-08-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/rf64.c src/sndfile.c src/wav.c src/wav_w64.h
+    Apply a patch (massaged slightly) from Uli Franke adding handling of the
+    BEXT chunk in RF64 files.
 
     * tests/command_test.c
     Update channel_map_test() function so WAV test passes.
@@ -51,6 +164,60 @@
     * src/sndfile.h
     Add comments showing correspondance between libsndfile channel map
     defintiions and those used by Apple and MS.
+
+    Add handling of reading/writing channel map info.
+
+    * tests/command_test.c tests/test_wrapper.sh.in
+    Update channel map tests.
+
+2009-07-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h
+    Add function psf_isprint() a replacement for the standard C isprint()
+    function which ignores any locale settings and treats all input as ASCII.
+
+    * src/(aiff|common|rf64|sd2|strings|svx|wav).c
+    Use psf_isprint() instead of isprint().
+
+2009-07-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/command.c
+    Add string descriptions for SF_FORMAT_RF64 and SF_FORMAT_MPC2K.
+
+2009-06-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/sndfile-play.c
+    Allow use of Open Sound System audio output under FreeBSD.
+
+2009-06-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Add patch from Conrad Parker to add --disable-jack.
+
+2009-05-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/alaw.c src/float32.c src/htk.c src/pcm.c src/sds.c src/ulaw.c
+    Fix bugs where invalid files can cause a divide by zero error (SIGFPE).
+    Thanks to Sami Liedes for reporting this a Debian bug #530831.
+
+2009-05-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/chanmap.[ch]
+    New files for channel map decoding/encoding.
+
+2009-05-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac src/sndfile.h.in
+    Fix MSVC definition of sf_count_t.
+
+2009-05-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav_w64.[ch]
+    Add wavex_channelmask to WAV_PRIVATE struct and add a function to convert
+    an array of SF_CHANNEL_MASK_* values into a bit mask for use in WAV files.
+
+    * src/wav.c
+    Add ability to write the channel mask.
 
 2009-05-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
@@ -72,6 +239,7 @@
     * src/sndfile.h.in src/common.h src/sndfile.c src/wav_w64.c
     Apply a patch from Lennart Poettering (PulseAudio) to allow reading of
     channel data in WAV and W64 files.
+    Add a test for the above.
 
 2009-05-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

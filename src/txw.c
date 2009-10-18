@@ -100,7 +100,7 @@ int
 txw_open	(SF_PRIVATE *psf)
 {	int error ;
 
-	if (psf->mode != SFM_READ)
+	if (psf->file.mode != SFM_READ)
 		return SFE_UNIMPLEMENTED ;
 
 	if ((error = txw_read_header (psf)))

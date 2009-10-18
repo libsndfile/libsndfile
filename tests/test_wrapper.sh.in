@@ -1,21 +1,49 @@
 #!/bin/sh
 
-if [ -f tests/sfversion@EXEEXT@ ]; then
+HOST_TRIPLET=@HOST_TRIPLET@
+PACKAGE_VERSION=@PACKAGE_VERSION@
+LIB_VERSION=`echo $PACKAGE_VERSION | sed "s/[a-z].*//"`
+
+if test -f tests/sfversion@EXEEXT@ ; then
 	cd tests
 	fi
 
-if [ ! -f sfversion@EXEEXT@ ]; then
+if test ! -f sfversion@EXEEXT@ ; then
 	echo "Not able to find test executables."
 	exit 1
 	fi
 
+if test -f libsndfile.so.$LIB_VERSION ; then
+	# This will work on Linux, but not on Mac.
+	# Windows is already sorted out.
+	export LD_LIBRARY_PATH=`pwd`
+	if test ! -f libsndfile.so.1 ; then
+		ln -s libsndfile.so.$LIB_VERSION libsndfile.so.1
+		fi
+	fi
+
 sfversion=`./sfversion@EXEEXT@`
+
+if test $sfversion != libsndfile-$PACKAGE_VERSION ; then
+	echo "Error : sfversion ($sfversion) and PACKAGE_VERSION ($PACKAGE_VERSION) don't match."
+	exit 1
+	fi
 
 # Force exit on errors.
 set -e
 
-# generic-tests
+# Generic-tests
 uname -a
+
+# Need this for when we're running from files collected into the
+# libsndfile-testsuite-@PACKAGE_VERSION@ tarball.
+if test -x test_main@EXEEXT@ ; then
+	echo "Running unit tests from src/ directory of source code tree."
+	./test_main@EXEEXT@
+	echo
+	echo "Running end-to-end tests from tests/ directory."
+	fi
+
 ./error_test@EXEEXT@
 ./pcm_test@EXEEXT@
 ./ulaw_test@EXEEXT@
@@ -38,7 +66,13 @@ uname -a
 ./locale_test@EXEEXT@
 ./win32_ordinal_test@EXEEXT@
 ./external_libs_test@EXEEXT@
-./cpp_test@EXEEXT@
+
+# The win64 G++ compiler requires an extra runtime DLL which
+# we don't have, so skip the following test on win64.
+if test "$HOST_TRIPLET" != "x86_64-w64-mingw32" ; then
+	./cpp_test@EXEEXT@
+	fi
+
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed common tests."
 echo "----------------------------------------------------------------------"
@@ -79,6 +113,7 @@ echo "----------------------------------------------------------------------"
 ./lossy_comp_test@EXEEXT@ caf_ulaw
 ./lossy_comp_test@EXEEXT@ caf_alaw
 ./header_test@EXEEXT@ caf
+./peak_chunk_test@EXEEXT@ caf
 ./misc_test@EXEEXT@ caf
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on CAF files."

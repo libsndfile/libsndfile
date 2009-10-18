@@ -111,7 +111,7 @@ sds_open	(SF_PRIVATE *psf)
 		return SFE_MALLOC_FAILED ;
 	psf->codec_data = psds ;
 
-	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
+	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = sds_read_header (psf, psds)))
 			return error ;
 		} ;
@@ -119,7 +119,7 @@ sds_open	(SF_PRIVATE *psf)
 	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_SDS)
 		return	SFE_BAD_OPEN_FORMAT ;
 
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	if (sds_write_header (psf, SF_FALSE))
 			return psf->error ;
 
@@ -145,7 +145,7 @@ sds_open	(SF_PRIVATE *psf)
 static int
 sds_close	(SF_PRIVATE *psf)
 {
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	SDS_PRIVATE *psds ;
 
 		if ((psds = (SDS_PRIVATE *) psf->codec_data) == NULL)
@@ -186,7 +186,7 @@ sds_init (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 		psds->samplesperblock = SDS_AUDIO_BYTES_PER_BLOCK / 4 ;
 		} ;
 
-	if (psf->mode == SFM_READ || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_READ || psf->file.mode == SFM_RDWR)
 	{	psf->read_short		= sds_read_s ;
 		psf->read_int		= sds_read_i ;
 		psf->read_float		= sds_read_f ;
@@ -196,7 +196,7 @@ sds_init (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 		psds->reader (psf, psds) ;
 		} ;
 
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	psf->write_short	= sds_write_s ;
 		psf->write_int		= sds_write_i ;
 		psf->write_float	= sds_write_f ;
@@ -219,21 +219,40 @@ sds_read_header (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 	if (marker != 0xF07E || byte != 0x01)
 		return SFE_SDS_NOT_SDS ;
 
-	psf_log_printf (psf, "Midi Sample Dump Standard (.sds)\nF07E\n Midi Channel  : %d\n", channel) ;
-
-	bytesread += psf_binheader_readf (psf, "e213", &sample_no, &bitwidth, &samp_period) ;
-
+	bytesread += psf_binheader_readf (psf, "e2", &sample_no) ;
 	sample_no = SDS_3BYTE_TO_INT_DECODE (sample_no) ;
+
+	psf_log_printf (psf, "Midi Sample Dump Standard (.sds)\nF07E\n"
+						" Midi Channel  : %d\n Sample Number : %d\n",
+						channel, sample_no) ;
+
+	bytesread += psf_binheader_readf (psf, "e13", &bitwidth, &samp_period) ;
+
 	samp_period = SDS_3BYTE_TO_INT_DECODE (samp_period) ;
 
 	psds->bitwidth = bitwidth ;
 
-	psf->sf.samplerate = 1000000000 / samp_period ;
+	if (psds->bitwidth > 1)
+		psf_log_printf (psf, " Bit Width     : %d\n", psds->bitwidth) ;
+	else
+	{	psf_log_printf (psf, " Bit Width     : %d (should be > 1)\n", psds->bitwidth) ;
+		return SFE_SDS_BAD_BIT_WIDTH ;
+		} ;
 
-	psf_log_printf (psf, 	" Sample Number : %d\n"
-							" Bit Width     : %d\n"
+	if (samp_period > 0)
+	{	psf->sf.samplerate = 1000000000 / samp_period ;
+
+		psf_log_printf (psf, " Sample Period : %d\n"
 							" Sample Rate   : %d\n",
-			sample_no, psds->bitwidth, psf->sf.samplerate) ;
+							samp_period, psf->sf.samplerate) ;
+		}
+	else
+	{	psf->sf.samplerate = 16000 ;
+
+		psf_log_printf (psf, " Sample Period : %d (should be > 0)\n"
+							" Sample Rate   : %d (guessed)\n",
+							samp_period, psf->sf.samplerate) ;
+		} ;
 
 	bytesread += psf_binheader_readf (psf, "e3331", &data_length, &sustain_loop_start, &sustain_loop_end, &loop_type) ;
 

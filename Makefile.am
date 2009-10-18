@@ -25,3 +25,11 @@ genfiles :
 	(cd tests ; make genfiles)
 
 
+testprogs :
+	(cd src ; make testprogs)
+	(cd tests ; make testprogs)
+
+
+test-tarball : build-test-tarball.mk
+	make all
+	make -f build-test-tarball.mk

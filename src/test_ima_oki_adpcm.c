@@ -17,6 +17,8 @@
 ** Fifth Floor, 51 Franklin Street, Boston, MA 02111-1301, USA.
 */
 
+#include "sfconfig.h"
+
 #include <stdio.h>
 
 #include "test_main.h"

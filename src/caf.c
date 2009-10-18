@@ -23,6 +23,7 @@
 #include	<string.h>
 #include	<ctype.h>
 #include	<math.h>
+#include	<inttypes.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
@@ -105,7 +106,7 @@ int
 caf_open (SF_PRIVATE *psf)
 {	int	subformat, format, error = 0 ;
 
-	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
+	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = caf_read_header (psf)))
 			return error ;
 		} ;
@@ -115,7 +116,7 @@ caf_open (SF_PRIVATE *psf)
 	if ((psf->container_data = calloc (1, sizeof (CAF_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	if (psf->is_pipe)
 			return SFE_NO_PIPE_WRITE ;
 
@@ -125,7 +126,7 @@ caf_open (SF_PRIVATE *psf)
 
 		psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
-		if (psf->mode != SFM_RDWR || psf->filelength < 44)
+		if (psf->file.mode != SFM_RDWR || psf->filelength < 44)
 		{	psf->filelength = 0 ;
 			psf->datalength = 0 ;
 			psf->dataoffset = 0 ;
@@ -138,7 +139,7 @@ caf_open (SF_PRIVATE *psf)
 		**	By default, add the peak chunk to floating point files. Default behaviour
 		**	can be switched off using sf_command (SFC_SET_PEAK_CHUNK, SF_FALSE).
 		*/
-		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
+		if (psf->file.mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
 		{	if ((psf->peak_info = peak_info_calloc (psf->sf.channels)) == NULL)
 				return SFE_MALLOC_FAILED ;
 			psf->peak_info->peak_loc = SF_PEAK_START ;
@@ -189,7 +190,7 @@ caf_open (SF_PRIVATE *psf)
 static int
 caf_close (SF_PRIVATE *psf)
 {
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 		caf_write_header (psf, SF_TRUE) ;
 
 	return 0 ;
@@ -340,7 +341,7 @@ caf_read_header (SF_PRIVATE *psf)
 				psf_binheader_readf (psf, "E4", & (psf->peak_info->edit_number)) ;
 				psf_log_printf (psf, "  edit count : %d\n", psf->peak_info->edit_number) ;
 
-				psf_log_printf (psf, "     Ch   Position      Value\n") ;
+				psf_log_printf (psf, "     Ch   Position       Value\n") ;
 				for (k = 0 ; k < psf->sf.channels ; k++)
 				{	sf_count_t position ;
 					float value ;
@@ -349,7 +350,7 @@ caf_read_header (SF_PRIVATE *psf)
 					psf->peak_info->peaks [k].value = value ;
 					psf->peak_info->peaks [k].position = position ;
 
-					snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "    %2d   %-12ld   %g\n", k, (long) position, value) ;
+					snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "    %2d   %-12" PRId64 "   %g\n", k, position, value) ;
 					psf_log_printf (psf, psf->u.cbuf) ;
 					} ;
 

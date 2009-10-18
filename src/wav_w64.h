@@ -288,5 +288,8 @@ void	wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat) ;
 void	wav_w64_analyze (SF_PRIVATE *psf) ;
 int		wavex_gen_channel_mask (const int *chan_map, int channels) ;
 
+int		wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize) ;
+int		wav_write_bext_chunk (SF_PRIVATE *psf) ;
+
 #endif
 

@@ -129,10 +129,10 @@ print_usage (char *progname)
 	printf ("\nUsage : %s [options] [encoding] <input file> <output file>\n", progname) ;
 	puts ("\n"
 		"    where [option] may be:\n\n"
-		"        -override-sample-rate=X  : force sample rate of input to X\n\n"
+		"        -override-sample-rate=X  : force sample rate of input to X\n"
 		) ;
 
-	puts ("\n"
+	puts (
 		"    where [encoding] may be one of the following:\n\n"
 		"        -pcms8     : force the output to signed 8 bit pcm\n"
 		"        -pcmu8     : force the output to unsigned 8 bit pcm\n"
@@ -161,7 +161,7 @@ print_usage (char *progname)
 	for (k = 0 ; k < (int) (sizeof (format_map) / sizeof (format_map [0])) ; k++)
 	{	info.format = format_map [k].format ;
 		sf_command (NULL, SFC_GET_FORMAT_INFO, &info, sizeof (info)) ;
-		printf ("        %-10s : %s\n", format_map [k].ext, info.name) ;
+		printf ("        %-10s : %s\n", format_map [k].ext, info.name == NULL ? "????" : info.name) ;
 		} ;
 
 	puts ("") ;

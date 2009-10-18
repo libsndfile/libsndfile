@@ -129,7 +129,7 @@ w64_open	(SF_PRIVATE *psf)
 		return SFE_MALLOC_FAILED ;
 	psf->container_data = wpriv ;
 
-	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR &&psf->filelength > 0))
+	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR &&psf->filelength > 0))
 	{	if ((error = w64_read_header (psf, &blockalign, &framesperblock)))
 			return error ;
 		} ;
@@ -139,7 +139,7 @@ w64_open	(SF_PRIVATE *psf)
 
 	subformat = SF_CODEC (psf->sf.format) ;
 
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	if (psf->is_pipe)
 			return SFE_NO_PIPE_WRITE ;
 
@@ -631,7 +631,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 static int
 w64_close (SF_PRIVATE *psf)
 {
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 		w64_write_header (psf, SF_TRUE) ;
 
 	return 0 ;

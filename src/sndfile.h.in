@@ -309,7 +309,7 @@ typedef	struct SNDFILE_tag	SNDFILE ;
 */
 
 #if (defined (_MSCVER) || defined (_MSC_VER))
-typedef __int64	sf_count_t ;
+typedef __int64		sf_count_t ;
 #define SF_COUNT_MAX		0x7fffffffffffffffi64
 #else
 typedef @TYPEOF_SF_COUNT_T@	sf_count_t ;
@@ -319,7 +319,7 @@ typedef @TYPEOF_SF_COUNT_T@	sf_count_t ;
 
 /* A pointer to a SF_INFO structure is passed to sf_open_read () and filled in.
 ** On write, the SF_INFO structure is filled in by the user and passed into
-** sf_open_write ().
+** sf_open ().
 */
 
 struct SF_INFO
@@ -472,6 +472,7 @@ struct SF_VIRTUAL_IO
 
 typedef	struct SF_VIRTUAL_IO SF_VIRTUAL_IO ;
 
+
 /* Open the specified file for read, write or both. On error, this will
 ** return a NULL pointer. To find the error number, pass a NULL SNDFILE
 ** to sf_strerror ().
@@ -479,6 +480,7 @@ typedef	struct SF_VIRTUAL_IO SF_VIRTUAL_IO ;
 */
 
 SNDFILE* 	sf_open		(const char *path, int mode, SF_INFO *sfinfo) ;
+
 
 /* Use the existing file descriptor to create a SNDFILE object. If close_desc
 ** is TRUE, the file descriptor will be closed when sf_close() is called. If
@@ -496,11 +498,13 @@ SNDFILE* 	sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc) ;
 
 SNDFILE* 	sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data) ;
 
+
 /* sf_error () returns a error number which can be translated to a text
 ** string using sf_error_number().
 */
 
 int		sf_error		(SNDFILE *sndfile) ;
+
 
 /* sf_strerror () returns to the caller a pointer to the current error message for
 ** the given SNDFILE.
@@ -508,12 +512,14 @@ int		sf_error		(SNDFILE *sndfile) ;
 
 const char* sf_strerror (SNDFILE *sndfile) ;
 
+
 /* sf_error_number () allows the retrieval of the error string for each internal
 ** error number.
 **
 */
 
 const char*	sf_error_number	(int errnum) ;
+
 
 /* The following two error functions are deprecated but they will remain in the
 ** library for the forseeable future. The function sf_strerror() should be used
@@ -528,9 +534,11 @@ int		sf_error_str	(SNDFILE *sndfile, char* str, size_t len) ;
 
 int		sf_command	(SNDFILE *sndfile, int command, void *data, int datasize) ;
 
+
 /* Return TRUE if fields of the SF_INFO struct are a valid combination of values. */
 
 int		sf_format_check	(const SF_INFO *info) ;
+
 
 /* Seek within the waveform data chunk of the SNDFILE. sf_seek () uses
 ** the same values for whence (SEEK_SET, SEEK_CUR and SEEK_END) as
@@ -546,6 +554,7 @@ int		sf_format_check	(const SF_INFO *info) ;
 
 sf_count_t	sf_seek 		(SNDFILE *sndfile, sf_count_t frames, int whence) ;
 
+
 /* Functions for retrieving and setting string data within sound files.
 ** Not all file types support this features; AIFF and WAV do. For both
 ** functions, the str_type parameter must be one of the SF_STR_* values
@@ -558,15 +567,18 @@ int sf_set_string (SNDFILE *sndfile, int str_type, const char* str) ;
 
 const char* sf_get_string (SNDFILE *sndfile, int str_type) ;
 
+
 /* Return the library version string. */
 
 const char * sf_version_string (void) ;
+
 
 /* Functions for reading/writing the waveform data of a sound file.
 */
 
 sf_count_t	sf_read_raw		(SNDFILE *sndfile, void *ptr, sf_count_t bytes) ;
 sf_count_t	sf_write_raw 	(SNDFILE *sndfile, const void *ptr, sf_count_t bytes) ;
+
 
 /* Functions for reading and writing the data chunk in terms of frames.
 ** The number of items actually read/written = frames * number of channels.
@@ -590,6 +602,7 @@ sf_count_t	sf_writef_float	(SNDFILE *sndfile, const float *ptr, sf_count_t frame
 sf_count_t	sf_readf_double		(SNDFILE *sndfile, double *ptr, sf_count_t frames) ;
 sf_count_t	sf_writef_double	(SNDFILE *sndfile, const double *ptr, sf_count_t frames) ;
 
+
 /* Functions for reading and writing the data chunk in terms of items.
 ** Otherwise similar to above.
 ** All of these read/write function return number of items read/written.
@@ -607,12 +620,14 @@ sf_count_t	sf_write_float	(SNDFILE *sndfile, const float *ptr, sf_count_t items)
 sf_count_t	sf_read_double	(SNDFILE *sndfile, double *ptr, sf_count_t items) ;
 sf_count_t	sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t items) ;
 
+
 /* Close the SNDFILE and clean up all memory allocations associated with this
 ** file.
 ** Returns 0 on success, or an error number.
 */
 
 int		sf_close		(SNDFILE *sndfile) ;
+
 
 /* If the file is opened SFM_WRITE or SFM_RDWR, call fsync() on the file
 ** to force the writing of data to disk. If the file is opened SFM_READ
@@ -621,8 +636,28 @@ int		sf_close		(SNDFILE *sndfile) ;
 
 void	sf_write_sync	(SNDFILE *sndfile) ;
 
+
+
+/* The function sf_wchar_open() is Windows Only!
+** Open a file passing in a Windows Unicode filename. Otherwise, this is
+** the same as sf_open().
+**
+** In order for this to work, you need to do the following:
+**
+**		#include <windows.h>
+**		#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES
+**		#including <sndfile.h>
+*/
+
+#ifdef ENABLE_SNDFILE_WINDOWS_PROTOTYPES
+SNDFILE* sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo) ;
+#endif
+
+
+
 #ifdef __cplusplus
 }		/* extern "C" */
 #endif	/* __cplusplus */
 
 #endif	/* SNDFILE_H */
+

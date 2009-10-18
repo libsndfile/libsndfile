@@ -12,9 +12,9 @@ AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
 
 AC_CONFIG_MACRO_DIR([M4])
+AC_CONFIG_HEADERS([src/config.h])
 
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
-AC_CONFIG_HEADERS([src/config.h])
 
 dnl Add parameters for aclocal
 AC_SUBST(ACLOCAL_AMFLAGS, "-I M4")
@@ -121,6 +121,9 @@ AC_ARG_ENABLE(bow-docs,
 AC_ARG_ENABLE(sqlite,
 	AC_HELP_STRING([--disable-sqlite], [disable use of sqlite]))
 
+AC_ARG_ENABLE(jack,
+	AC_HELP_STRING([--disable-jack], [disable use of JACK]))
+
 AC_ARG_ENABLE(alsa,
 	AC_HELP_STRING([--disable-alsa], [disable use of ALSA]))
 
@@ -137,6 +140,7 @@ AM_CONDITIONAL([ENABLE_TEST_COVERAGE], [test "$enable_test_coverage" = yes])
 #====================================================================================
 # Check types and their sizes.
 
+AC_CHECK_SIZEOF(wchar_t,4)
 AC_CHECK_SIZEOF(short,2)
 AC_CHECK_SIZEOF(int,4)
 AC_CHECK_SIZEOF(long,4)
@@ -158,10 +162,11 @@ unset ac_cv_sizeof_off_t
 AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
 
 case "$host_os" in
-	mingw*)
-		TYPEOF_SF_COUNT_T="int64_t"
+	mingw32msvc | mingw32)
+		TYPEOF_SF_COUNT_T="__int64"
 		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 		SIZEOF_SF_COUNT_T=8
+		AC_DEFINE([__USE_MINGW_ANSI_STDIO],1,[Set to 1 to use C99 printf/snprintf in MinGW.])
 		;;
 	*)
 		if test "x$ac_cv_sizeof_off_t" = "x8" ; then
@@ -297,21 +302,15 @@ else
 	PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
 	PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
-	# Vorbis versions earlier than 1.2.1 are not const correct at the API level.
-	# Vorbis 1.2.2 adds vorbis_version_string.
-	PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.0, ac_cv_vorbis=yes, ac_cv_vorbis=no)
-	PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.0, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
+	# Vorbis versions earlier than 1.2.3 have bugs that cause the libsndfile
+	# test suite to fail on MIPS, PowerPC and others.
+	# See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
+	PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.3, ac_cv_vorbis=yes, ac_cv_vorbis=no)
+	PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.3, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
 	enable_external_libs=yes
 	fi
 
-HAVE_VORBIS_VERSION_STRING=0
 if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
-
-	save_LIBS="$LIBS"
-	LIBS="$VORBIS_LIBS $LIBS"
-	AC_CHECK_LIB(vorbis, vorbis_version_string, HAVE_VORBIS_VERSION_STRING=1)
-	LIBS="$save_LIBS"
-
 	HAVE_EXTERNAL_LIBS=1
 	enable_external_libs=yes
 
@@ -320,10 +319,9 @@ if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; 
 else
 	AC_MSG_WARN([[
 	
-*** It looks like you enabled the use of external libraries
-*** (ie Flac, Ogg, Vorbis, etc), but one or more of those libs
-*** is either missing (possibly only the development headers)
-*** or is of an unsupported version.
+*** One or more of the external libraries (ie Flac, Ogg, Vorbis,
+*** etc), but one or more of those libs is either missing (possibly
+*** only the development headers) or is of an unsupported version.
 ***
 *** Unfortunately, for ease of maintenance, the external libs
 *** are an all or nothing affair.
@@ -332,7 +330,6 @@ else
 	fi
 
 AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_LIBS], $HAVE_EXTERNAL_LIBS, [Will be set to 1 if flac, ogg and vorbis are available.])
-AC_DEFINE_UNQUOTED([HAVE_VORBIS_VERSION_STRING], $HAVE_VORBIS_VERSION_STRING, [Set to 1 if we have vorbis_version_string.])
 
 #====================================================================================
 # Check for libsqlite3 (only used in regtest).
@@ -353,7 +350,11 @@ AC_DEFINE_UNQUOTED([HAVE_SQLITE3],$HAVE_SQLITE3,[Set to 1 if you have libsqlite3
 #====================================================================================
 # Check for JACK (only used for examples/sndfile-jackplay).
 
-PKG_CHECK_MOD_VERSION(JACK, jack >= 0.100, ac_cv_jack=yes, ac_cv_jack=no)
+ac_cv_jack=no
+if test x$enable_jack != xno ; then
+	PKG_CHECK_MOD_VERSION(JACK, jack >= 0.100, ac_cv_jack=yes, ac_cv_jack=no)
+	fi
+
 
 if test x$ac_cv_jack = "xyes" ; then
 	HAVE_JACK=1
@@ -575,7 +576,11 @@ if test x"$CFLAGS" = x ; then
 	exit
 	fi
 
+HOST_TRIPLET="${host_cpu}-${host_vendor}-${host_os}"
+
 #-------------------------------------------------------------------------------
+
+AC_SUBST(HOST_TRIPLET)
 
 AC_SUBST(htmldocdir)
 AC_SUBST(HTML_BGCOLOUR)
@@ -586,15 +591,9 @@ AC_SUBST(SHARED_VERSION_INFO)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(ALSA_LIBS)
-AC_SUBST(ENABLE_EXPERIMENTAL_CODE)
 
 AC_SUBST(EXTERNAL_CFLAGS)
 AC_SUBST(EXTERNAL_LIBS)
-
-AC_SUBST(COMPILER_IS_GCC)
-AC_SUBST(GCC_MAJOR_VERSION)
-
-AC_SUBST(HAVE_JACK)
 
 dnl The following line causes the libtool distributed with the source
 dnl to be replaced if the build system has a more recent version.
@@ -611,12 +610,12 @@ AC_CONFIG_FILES([ \
 	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile \
 	programs/Makefile doc/libsndfile.css \
 	Makefile libsndfile.spec sndfile.pc \
-	tests/test_wrapper.sh \
+	tests/test_wrapper.sh build-test-tarball.mk \
 	])
 AC_OUTPUT
 
-# Make it executable.
-chmod u+x tests/test_wrapper.sh
+# Make sure these are executable.
+chmod u+x tests/test_wrapper.sh build-test-tarball.mk
 
 #====================================================================================
 
@@ -625,11 +624,17 @@ AC_MSG_RESULT([
 
   Configuration summary :
 
-    Version : ............................. ${VERSION}
+    libsndfile cersion : .................. ${VERSION}
+
+    Host CPU : ............................ ${host_cpu}
+    Host Vendor : ......................... ${host_vendor}
+    Host OS : ............................. ${host_os}
+
     Experimental code : ................... ${enable_experimental:-no}
     Using ALSA in example programs : ...... ${enable_alsa:-no}
     External FLAC/Ogg/Vorbis : ............ ${enable_external_libs:-no}
 ])
+
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
 	echo -e "  Tools :\n"

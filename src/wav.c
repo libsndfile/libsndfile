@@ -24,6 +24,7 @@
 #include	<string.h>
 #include	<ctype.h>
 #include	<time.h>
+#include	<inttypes.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
@@ -167,8 +168,6 @@ static int 	wav_subchunk_parse	 (SF_PRIVATE *psf, int chunk) ;
 static int 	exif_subchunk_parse	 (SF_PRIVATE *psf, unsigned int length) ;
 static int	wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
 static int	wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
-static int	wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
-static int	wav_write_bext_chunk (SF_PRIVATE *psf) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -186,14 +185,14 @@ wav_open	 (SF_PRIVATE *psf)
 	wpriv->wavex_ambisonic = SF_AMBISONIC_NONE ;
 	psf->str_flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END ;
 
-	if (psf->mode == SFM_READ || (psf->mode == SFM_RDWR && psf->filelength > 0))
+	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = wav_read_header (psf, &blockalign, &framesperblock)))
 			return error ;
 		} ;
 
 	subformat = SF_CODEC (psf->sf.format) ;
 
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	if (psf->is_pipe)
 			return SFE_NO_PIPE_WRITE ;
 
@@ -212,7 +211,7 @@ wav_open	 (SF_PRIVATE *psf)
 		else if (psf->endian != SF_ENDIAN_BIG)
 			psf->endian = SF_ENDIAN_LITTLE ;
 
-		if (psf->mode != SFM_RDWR || psf->filelength < 44)
+		if (psf->file.mode != SFM_RDWR || psf->filelength < 44)
 		{	psf->filelength = 0 ;
 			psf->datalength = 0 ;
 			psf->dataoffset = 0 ;
@@ -227,7 +226,7 @@ wav_open	 (SF_PRIVATE *psf)
 		/* By default, add the peak chunk to floating point files. Default behaviour
 		** can be switched off using sf_command (SFC_SET_PEAK_CHUNK, SF_FALSE).
 		*/
-		if (psf->mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
+		if (psf->file.mode == SFM_WRITE && (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE))
 		{	if ((psf->peak_info = peak_info_calloc (psf->sf.channels)) == NULL)
 				return SFE_MALLOC_FAILED ;
 			psf->peak_info->peak_loc = SF_PEAK_START ;
@@ -284,7 +283,7 @@ wav_open	 (SF_PRIVATE *psf)
 		default : 	return SFE_UNIMPLEMENTED ;
 		} ;
 
-	if (psf->mode == SFM_WRITE || (psf->mode == SFM_RDWR && psf->filelength == 0))
+	if (psf->file.mode == SFM_WRITE || (psf->file.mode == SFM_RDWR && psf->filelength == 0))
 		return psf->write_header (psf, SF_FALSE) ;
 
 	return error ;
@@ -390,7 +389,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if ((parsestage & (HAVE_RIFF | HAVE_WAVE | HAVE_fmt)) != (HAVE_RIFF | HAVE_WAVE | HAVE_fmt))
 						return SFE_WAV_NO_DATA ;
 
-					if (psf->mode == SFM_RDWR && (parsestage & HAVE_other) != 0)
+					if (psf->file.mode == SFM_RDWR && (parsestage & HAVE_other) != 0)
 						return SFE_RDWR_BAD_HEADER ;
 
 					parsestage |= HAVE_data ;
@@ -430,7 +429,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					psf_fseek (psf, psf->datalength, SEEK_CUR) ;
 
 					if (psf_ftell (psf) != psf->datalength + psf->dataoffset)
-						psf_log_printf (psf, "*** psf_fseek past end error ***\n", dword, psf->dataoffset + psf->datalength) ;
+						psf_log_printf (psf, "*** psf_fseek past end error ***\n") ;
 					break ;
 
 			case fact_MARKER :
@@ -488,14 +487,15 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					for (dword = 0 ; dword < (unsigned) psf->sf.channels ; dword++)
 					{	float value ;
 						unsigned int position ;
+
 						psf_binheader_readf (psf, "f4", &value, &position) ;
 						psf->peak_info->peaks [dword].value = value ;
 						psf->peak_info->peaks [dword].position = position ;
 
-						snprintf (cptr, sizeof (psf->u.cbuf), "    %2d   %-12ld   %g\n",
-								dword, (long) psf->peak_info->peaks [dword].position, psf->peak_info->peaks [dword].value) ;
+						snprintf (cptr, sizeof (psf->u.cbuf), "    %2d   %-12" PRId64 "   %g\n",
+								dword, psf->peak_info->peaks [dword].position, psf->peak_info->peaks [dword].value) ;
 						cptr [sizeof (psf->u.cbuf) - 1] = 0 ;
-						psf_log_printf (psf, cptr) ;
+						psf_log_printf (psf, "%s", cptr) ;
 						} ;
 
 					psf->peak_info->peak_loc = ((parsestage & HAVE_data) == 0) ? SF_PEAK_START : SF_PEAK_END ;
@@ -606,8 +606,8 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 			default :
 					parsestage |= HAVE_other ;
-					if (isprint ((marker >> 24) & 0xFF) && isprint ((marker >> 16) & 0xFF)
-						&& isprint ((marker >> 8) & 0xFF) && isprint (marker & 0xFF))
+					if (psf_isprint ((marker >> 24) & 0xFF) && psf_isprint ((marker >> 16) & 0xFF)
+						&& psf_isprint ((marker >> 8) & 0xFF) && psf_isprint (marker & 0xFF))
 					{	psf_binheader_readf (psf, "4", &dword) ;
 						psf_log_printf (psf, "*** %M : %d (unknown marker)\n", marker, dword) ;
 						psf_binheader_readf (psf, "j", dword) ;
@@ -1099,7 +1099,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 			type = (type == SF_LOOP_FORWARD ? 0 : type==SF_LOOP_BACKWARD ? 2 : type == SF_LOOP_ALTERNATING ? 1 : 32) ;
 
 			psf_binheader_writef (psf, "44", tmp, type) ;
-			psf_binheader_writef (psf, "44", psf->instrument->loops [tmp].start, psf->instrument->loops [tmp].end) ;
+			psf_binheader_writef (psf, "44", psf->instrument->loops [tmp].start, psf->instrument->loops [tmp].end - 1) ;
 			psf_binheader_writef (psf, "44", 0, psf->instrument->loops [tmp].count) ;
 			} ;
 		} ;
@@ -1219,10 +1219,10 @@ wav_write_strings (SF_PRIVATE *psf, int location)
 static int
 wav_close (SF_PRIVATE *psf)
 {
-	if (psf->mode == SFM_WRITE || psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	wav_write_tailer (psf) ;
 
-		if (psf->mode == SFM_RDWR)
+		if (psf->file.mode == SFM_RDWR)
 		{	sf_count_t current = psf_ftell (psf) ;
 
 			/*
@@ -1509,7 +1509,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 
 		if (j < ARRAY_LEN (psf->instrument->loops))
 		{	psf->instrument->loops [j].start = start ;
-			psf->instrument->loops [j].end = end ;
+			psf->instrument->loops [j].end = end + 1 ;
 			psf->instrument->loops [j].count = count ;
 
 			switch (type)
@@ -1641,7 +1641,7 @@ wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	return 0 ;
 } /* wav_read_acid_chunk */
 
-static int
+int
 wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 {
 	SF_BROADCAST_INFO* b ;
@@ -1691,7 +1691,7 @@ wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 	return 0 ;
 } /* wav_read_bext_chunk */
 
-static int
+int
 wav_write_bext_chunk (SF_PRIVATE *psf)
 {	SF_BROADCAST_INFO *b ;
 

@@ -45,7 +45,6 @@
 
 #if (defined (WIN32) || defined (_WIN32))
 #include <windows.h>
-#define	snprintf	_snprintf
 #endif
 
 static void print_version (void) ;

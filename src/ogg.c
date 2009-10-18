@@ -445,7 +445,7 @@ ogg_close (SF_PRIVATE *psf)
 	/*	Clean up this logical bitstream ; before exit we shuld see if we're
 	**	followed by another [chained]. */
 
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{
 		if (psf->write_current <= 0)
 			ogg_write_header (psf, 0) ;
@@ -503,14 +503,14 @@ ogg_open (SF_PRIVATE *psf)
 	psf->container_data = odata ;
 	psf->codec_data = vdata ;
 
-	if (psf->mode == SFM_RDWR)
+	if (psf->file.mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
 #if HAVE_VORBIS_VERSION_STRING
 	psf_log_printf (psf, "Vorbis library version : %s\n", vorbis_version_string ()) ;
 #endif
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	/* Call this here so it only gets called once, so no memory is leaked. */
 		ogg_sync_init (&odata->oy) ;
 
@@ -525,7 +525,7 @@ ogg_open (SF_PRIVATE *psf)
 		} ;
 
 	psf->container_close = ogg_close ;
-	if (psf->mode == SFM_WRITE)
+	if (psf->file.mode == SFM_WRITE)
 	{
 		/* Set the default vorbis quality here. */
 		vdata->quality = 0.4 ;
@@ -641,7 +641,7 @@ ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *tran
 {
 	VORBIS_PRIVATE *vdata = psf->codec_data ;
 	OGG_PRIVATE *odata = psf->container_data ;
-	int len, samples, i = 0 ;
+	int result, len, samples, i = 0 ;
 	float **pcm ;
 
 	len = lens / psf->sf.channels ;
@@ -660,7 +660,7 @@ ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *tran
 	while (len > 0 && !odata->eos)
 	{
 		while (len > 0 && !odata->eos)
-		{	int result = ogg_sync_pageout (&odata->oy, &odata->og) ;
+		{	result = ogg_sync_pageout (&odata->oy, &odata->og) ;
 			if (result == 0) break ; /* need more data */
 			if (result < 0)
 			{	/* missing or corrupt data at this page position */
@@ -858,7 +858,7 @@ ogg_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 		return ((sf_count_t) -1) ;
 		} ;
 
-	if (psf->mode == SFM_READ)
+	if (psf->file.mode == SFM_READ)
 	{	sf_count_t target = offset - vdata->loc ;
 
 		if (target < 0)

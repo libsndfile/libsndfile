@@ -48,7 +48,7 @@
 	#include <sys/time.h>
 #endif
 
-#if defined (__linux__)
+#if defined (__linux__) || defined (__FreeBSD_kernel__) || defined (__FreeBSD__)
 	#include 	<fcntl.h>
 	#include 	<sys/ioctl.h>
 	#include 	<sys/soundcard.h>
@@ -348,12 +348,12 @@ alsa_write_float (snd_pcm_t *alsa_dev, float *data, int frames, int channels)
 **	Linux/OSS functions for playing a sound.
 */
 
-#if defined (__linux__)
+#if defined (__linux__) || defined (__FreeBSD_kernel__) || defined (__FreeBSD__)
 
-static	int	linux_open_dsp_device (int channels, int srate) ;
+static	int	opensoundsys_open_device (int channels, int srate) ;
 
 static void
-linux_play (int argc, char *argv [])
+opensoundsys_play (int argc, char *argv [])
 {	static short buffer [BUFFER_LEN] ;
 	SNDFILE *sndfile ;
 	SF_INFO sfinfo ;
@@ -373,7 +373,7 @@ linux_play (int argc, char *argv [])
 			continue ;
 			} ;
 
-		audio_device = linux_open_dsp_device (sfinfo.channels, sfinfo.samplerate) ;
+		audio_device = opensoundsys_open_device (sfinfo.channels, sfinfo.samplerate) ;
 
 		subformat = sfinfo.format & SF_FORMAT_SUBMASK ;
 
@@ -411,53 +411,53 @@ linux_play (int argc, char *argv [])
 		} ;
 
 	return ;
-} /* linux_play */
+} /* opensoundsys_play */
 
 static int
-linux_open_dsp_device (int channels, int srate)
+opensoundsys_open_device (int channels, int srate)
 {	int fd, stereo, fmt ;
 
 	if ((fd = open ("/dev/dsp", O_WRONLY, 0)) == -1 &&
 		(fd = open ("/dev/sound/dsp", O_WRONLY, 0)) == -1)
-	{	perror ("linux_open_dsp_device : open ") ;
+	{	perror ("opensoundsys_open_device : open ") ;
 		exit (1) ;
 		} ;
 
 	stereo = 0 ;
 	if (ioctl (fd, SNDCTL_DSP_STEREO, &stereo) == -1)
 	{ 	/* Fatal error */
-		perror ("linux_open_dsp_device : stereo ") ;
+		perror ("opensoundsys_open_device : stereo ") ;
 		exit (1) ;
 		} ;
 
 	if (ioctl (fd, SNDCTL_DSP_RESET, 0))
-	{	perror ("linux_open_dsp_device : reset ") ;
+	{	perror ("opensoundsys_open_device : reset ") ;
 		exit (1) ;
 		} ;
 
 	fmt = CPU_IS_BIG_ENDIAN ? AFMT_S16_BE : AFMT_S16_LE ;
 	if (ioctl (fd, SNDCTL_DSP_SETFMT, &fmt) != 0)
-	{	perror ("linux_open_dsp_device : set format ") ;
+	{	perror ("opensoundsys_open_device : set format ") ;
 		exit (1) ;
   		} ;
 
 	if (ioctl (fd, SNDCTL_DSP_CHANNELS, &channels) != 0)
-	{	perror ("linux_open_dsp_device : channels ") ;
+	{	perror ("opensoundsys_open_device : channels ") ;
 		exit (1) ;
 		} ;
 
 	if (ioctl (fd, SNDCTL_DSP_SPEED, &srate) != 0)
-	{	perror ("linux_open_dsp_device : sample rate ") ;
+	{	perror ("opensoundsys_open_device : sample rate ") ;
 		exit (1) ;
 		} ;
 
 	if (ioctl (fd, SNDCTL_DSP_SYNC, 0) != 0)
-	{	perror ("linux_open_dsp_device : sync ") ;
+	{	perror ("opensoundsys_open_device : sync ") ;
 		exit (1) ;
 		} ;
 
 	return 	fd ;
-} /* linux_open_dsp_device */
+} /* opensoundsys_open_device */
 
 #endif /* __linux__ */
 
@@ -936,7 +936,9 @@ main (int argc, char *argv [])
 			alsa_play (argc, argv) ;
 		else
 	#endif
-		linux_play (argc, argv) ;
+		opensoundsys_play (argc, argv) ;
+#elif defined (__FreeBSD_kernel__) || defined (__FreeBSD__)
+	opensoundsys_play (argc, argv) ;
 #elif (defined (__MACH__) && defined (__APPLE__))
 	macosx_play (argc, argv) ;
 #elif (defined (sun) && defined (unix))
