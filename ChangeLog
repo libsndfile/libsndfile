@@ -1,3 +1,9 @@
+2009-10-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav.c
+    When writing loop lengths, adjust the end position by one to make up for
+    Microsoft's screwed up spec. Thanks to Olivier Tristan for the patch.
+
 2009-10-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/flac.c

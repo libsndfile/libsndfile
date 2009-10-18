@@ -1097,7 +1097,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 			type = (type == SF_LOOP_FORWARD ? 0 : type==SF_LOOP_BACKWARD ? 2 : type == SF_LOOP_ALTERNATING ? 1 : 32) ;
 
 			psf_binheader_writef (psf, "44", tmp, type) ;
-			psf_binheader_writef (psf, "44", psf->instrument->loops [tmp].start, psf->instrument->loops [tmp].end) ;
+			psf_binheader_writef (psf, "44", psf->instrument->loops [tmp].start, psf->instrument->loops [tmp].end - 1) ;
 			psf_binheader_writef (psf, "44", 0, psf->instrument->loops [tmp].count) ;
 			} ;
 		} ;
@@ -1503,7 +1503,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 
 		if (j < ARRAY_LEN (psf->instrument->loops))
 		{	psf->instrument->loops [j].start = start ;
-			psf->instrument->loops [j].end = end ;
+			psf->instrument->loops [j].end = end + 1 ;
 			psf->instrument->loops [j].count = count ;
 
 			switch (type)
