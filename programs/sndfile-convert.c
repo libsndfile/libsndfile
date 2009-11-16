@@ -191,7 +191,7 @@ main (int argc, char * argv [])
 		return 1 ;
 		} ;
 
-	if (infilename [0] == '-')
+	if (strlen (infilename) > 1 && infilename [0] == '-')
 	{	printf ("Error : Input filename (%s) looks like an option.\n\n", infilename) ;
 		print_usage (progname) ;
 		return 1 ;
