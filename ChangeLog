@@ -7,6 +7,10 @@
     * src/sndfile.h.in
     Hash define ENABLE_SNDFILE_WINDOWS_PROTOTYPES to 1 for greater safety.
 
+    * tests/virtual_io_test.c
+    Add a PAF/PCM_24 test and verify the file length is not negative
+    immediately after openning the file for write.
+
 2009-10-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c
