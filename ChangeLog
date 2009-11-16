@@ -1,8 +1,11 @@
 2009-11-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-convert.c
-    Allow the program to read from stdin by specifying '-' on the command  line
+    Allow the program to read from stdin by specifying '-' on the command line
     as the input file.
+
+    * src/sndfile.h.in
+    Hash define ENABLE_SNDFILE_WINDOWS_PROTOTYPES to 1 for greater safety.
 
 2009-10-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

@@ -310,7 +310,7 @@ typedef @TYPEOF_SF_COUNT_T@	sf_count_t ;
 #endif
 
 
-/* A pointer to a SF_INFO structure is passed to sf_open_read () and filled in.
+/* A pointer to a SF_INFO structure is passed to sf_open () and filled in.
 ** On write, the SF_INFO structure is filled in by the user and passed into
 ** sf_open ().
 */
@@ -638,11 +638,11 @@ void	sf_write_sync	(SNDFILE *sndfile) ;
 ** In order for this to work, you need to do the following:
 **
 **		#include <windows.h>
-**		#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES
+**		#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES 1
 **		#including <sndfile.h>
 */
 
-#ifdef ENABLE_SNDFILE_WINDOWS_PROTOTYPES
+#if ENABLE_SNDFILE_WINDOWS_PROTOTYPES
 SNDFILE* sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo) ;
 #endif
 
