@@ -1,3 +1,8 @@
+2009-11-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/windows.c
+    Correct usage of ENABLE_SNDFILE_WINDOWS_PROTOTYPES.
+
 2009-11-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-convert.c
