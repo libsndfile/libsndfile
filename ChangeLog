@@ -1,5 +1,10 @@
 2009-11-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
  
+    * sndfile.pc.in
+    Add a Libs.private entry to assist with static linking.
+
+2009-11-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+ 
     * src/make-static-lib-hidden-privates.sh src/Makefile.am
     Add a script to hide all non-public symbols in the libsndfile.a static
     library.
