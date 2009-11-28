@@ -1,3 +1,9 @@
+2009-11-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+ 
+    * src/make-static-lib-hidden-privates.sh src/Makefile.am
+    Add a script to hide all non-public symbols in the libsndfile.a static
+    library.
+
 2009-11-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
  
     * tests/locale_test.c

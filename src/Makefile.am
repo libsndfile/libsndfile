@@ -16,7 +16,8 @@ OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 SYMBOL_FILES = Symbols.linux Symbols.darwin libsndfile-1.def Symbols.os2 Symbols.static
 
 EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
-			$(SYMBOL_FILES) create_symbols_file.py binheader_writef_check.py
+			$(SYMBOL_FILES) create_symbols_file.py binheader_writef_check.py \
+			make-static-lib-hidden-privates.sh
 
 noinst_HEADERS = common.h sfconfig.h sfendian.h wav_w64.h sf_unistd.h
 
