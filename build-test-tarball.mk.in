@@ -19,7 +19,7 @@ TARBALL = $(TESTNAME).tar.gz
 # Find the test programs by grepping the script for the programs it executes.
 testprogs := $(shell grep '^\./' tests/test_wrapper.sh | sed -e "s|./||" -e "s/ .*//" | sort | uniq)
 # Also add the programs not found by the above.
-testprogs += sfversion@EXEEXT@ stdin_test@EXEEXT@ stdout_test@EXEEXT@
+testprogs += sfversion@EXEEXT@ stdin_test@EXEEXT@ stdout_test@EXEEXT@ cpp_test@EXEEXT@
 
 # Find the single test program in src/ .
 srcprogs := $(shell if test -x src/.libs/test_main$(EXEEXT) ; then echo "src/.libs/test_main$(EXEEXT)" ; else echo "src/test_main$(EXEEXT)" ; fi)
