@@ -4,6 +4,9 @@
     Add a print stylesheet and update all HTML documents to reference it.
     Thanks to Aditya Bhargava for suggesting this.
 
+    * doc/index.html
+    Minor corrections.
+
 2009-11-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
  
     * sndfile.pc.in
