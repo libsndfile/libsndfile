@@ -1,3 +1,8 @@
+2009-12-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/create_symbols_file.py tests/stdio_test.c tests/win32_test.c
+    Minor OS/2 tweaks as suggested by David Yeo.
+
 2009-11-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/print.css doc/*.html

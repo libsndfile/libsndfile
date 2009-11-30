@@ -38,7 +38,8 @@
 
 #define SIGNED_SIZEOF(x)	((int) sizeof (x))
 
-#if defined (__CYGWIN__)
+/* EMX is OS/2. */
+#if defined (__CYGWIN__) || defined (__EMX__)
 
 	#define		LSEEK	lseek
 	#define		FSTAT	fstat
