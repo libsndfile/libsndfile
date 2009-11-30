@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
 # This script takes a static library and removes all non-public symbols.
-# Ie, it makes a static lib whose symbols are far less like;y to clash with
+# Ie, it makes a static lib whose symbols are far less likely to clash with
 # the symbols of another shared or static library.
 
 grep sf_ Symbols.linux | sed -e "s/[ ;]//g" > Symbols.static
