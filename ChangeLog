@@ -9,6 +9,9 @@
     * src/sf_unistd.h
     Set all group and other file create permssions to zero.
 
+    * tests/win32_test.c
+    Add a new test.
+
 2009-11-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/print.css doc/*.html

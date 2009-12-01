@@ -75,6 +75,7 @@
 static void show_fstat_error (void) ;
 static void show_lseek_error (void) ;
 static void show_stat_fstat_error (void) ;
+static void write_to_closed_file (void) ;
 
 int
 main (void)
@@ -89,6 +90,7 @@ main (void)
 	show_fstat_error () ;
 	show_lseek_error () ;
 	show_stat_fstat_error () ;
+	write_to_closed_file () ;
 
 	puts ("\n\n") ;
 
@@ -255,7 +257,7 @@ show_stat_fstat_error (void)
 		} ;
 	fstat_size = buf.st_size ;
 
-	printf ("3) Size returned by stat and fstat is %d and %d, ", stat_size, fstat_size) ;
+	printf ("2) Size returned by stat and fstat is %d and %d, ", stat_size, fstat_size) ;
 
 
 	if (stat_size == 0 || stat_size != fstat_size)
@@ -272,3 +274,44 @@ error_exit :
 } /* show_stat_fstat_error */
 
 
+static void
+write_to_closed_file (void)
+{	const char * filename = "closed_write_test.txt" ;
+	struct stat buf ;
+	FILE * file ;
+	int		fd, ignored ;
+
+	puts ("\nWrite to closed file test.\n--------------------------") ;
+
+	printf ("0) First we open file for write using fopen().\n") ;
+	if ((file = fopen (filename, "w")) == NULL)
+	{	printf ("\n\nLine %d: fopen() failed : %s\n\n", __LINE__, strerror (errno)) ;
+		return ;
+		} ;
+
+	printf ("1) Now we grab the file descriptor fileno().\n") ;
+	fd = fileno (file) ;
+
+	printf ("2) Write some text via the file descriptor.\n") ;
+	ignored = write (fd, "a\n", 2) ;
+
+	printf ("3) Now we close the file using fclose().\n") ;
+	fclose (file) ;
+
+	stat (filename, &buf);
+	printf ("   File size is %d bytes.\n", (int) buf.st_size) ;
+
+	printf ("4) Now write more data to the file descriptor which should fail.\n") ;
+	if (write (fd, "b\n", 2) < 0)
+		printf ("5) Good, write returned an error code as it should have.\n") ;
+	else
+	{	printf ("5) Attempting to write to a closed file should have failed but didn't! *** WRONG ***\n") ;
+
+		stat (filename, &buf);
+		printf ("   File size is %d bytes.\n", (int) buf.st_size) ;
+		} ;
+
+	unlink (filename) ;
+
+	return ;
+} /* write_to_closed_file */
