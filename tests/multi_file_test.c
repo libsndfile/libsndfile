@@ -131,15 +131,13 @@ multi_file_test (const char *filename, int *formats, int format_count)
 	SF_INFO				sfinfo ;
 	SF_EMBED_FILE_INFO	embed_info ;
 	sf_count_t			filelen ;
-	int					fd, k, file_count = 0, open_perm ;
+	int					fd, k, file_count = 0 ;
 
 	print_test_name ("multi_file_test", filename) ;
 
 	unlink (filename) ;
 
-	open_perm = OS_IS_WIN32 ? 0 : S_IRUSR | S_IWUSR | S_IRGRP ;
-
-	if ((fd = open (filename, O_RDWR | O_CREAT, open_perm)) < 0)
+	if ((fd = open (filename, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR)) < 0)
 	{	printf ("\n\nLine %d: open failed : %s\n", __LINE__, strerror (errno)) ;
 		exit (1) ;
 		} ;
