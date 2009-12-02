@@ -6,6 +6,12 @@
     * programs/sndfile-convert.c programs/common.[ch]
     Move some code from convert to common for reuse.
 
+    * programs/sndfile-interleave.c programs/sndfile-interleave.c
+    Add new programs sndfile-interleave and sndfile-deinterleave.
+
+    * programs/Makefile.am
+    Hook new programs into build.
+
 2009-12-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/create_symbols_file.py tests/stdio_test.c tests/win32_test.c

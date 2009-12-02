@@ -1,7 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
 bin_PROGRAMS = sndfile-info sndfile-play sndfile-convert sndfile-jackplay sndfile-cmp \
-				sndfile-metadata-set sndfile-metadata-get
+				sndfile-metadata-set sndfile-metadata-get sndfile-interleave \
+				sndfile-deinterleave
 
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
@@ -33,4 +34,10 @@ sndfile_metadata_set_LDADD = $(top_builddir)/src/libsndfile.la
 
 sndfile_metadata_get_SOURCES = sndfile-metadata-get.c
 sndfile_metadata_get_LDADD = $(top_builddir)/src/libsndfile.la
+
+sndfile_interleave_SOURCES = sndfile-interleave.c common.c common.h
+sndfile_interleave_LDADD = $(top_builddir)/src/libsndfile.la
+
+sndfile_deinterleave_SOURCES = sndfile-deinterleave.c
+sndfile_deinterleave_LDADD = $(top_builddir)/src/libsndfile.la
 
