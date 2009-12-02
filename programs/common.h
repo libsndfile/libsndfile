@@ -30,7 +30,9 @@
 ** ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <sndfile.h>
+
+#define	ARRAY_LEN(x)	((int) (sizeof (x) / sizeof (x [0])))
+#define	MAX(a,b)		((a) > (b) ? (a) : (b))
 
 typedef struct
 {	const char * title ;
@@ -62,3 +64,7 @@ void sfe_apply_metadata_changes (const char * filenames [2], const METADATA_INFO
 void sfe_copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels) ;
 
 void sfe_copy_data_int (SNDFILE *outfile, SNDFILE *infile, int channels) ;
+
+int sfe_file_type_of_ext (const char *filename, int format) ;
+
+void sfe_dump_format_map (void) ;
