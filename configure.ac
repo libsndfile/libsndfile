@@ -319,9 +319,9 @@ if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; 
 else
 	AC_MSG_WARN([[
 	
-*** One or more of the external libraries (ie Flac, Ogg, Vorbis,
-*** etc), but one or more of those libs is either missing (possibly
-*** only the development headers) or is of an unsupported version.
+*** One or more of the external libraries (ie libflac, libogg and
+*** libvorbis) is either missing (possibly only the development
+*** headers) or is of an unsupported version.
 ***
 *** Unfortunately, for ease of maintenance, the external libs
 *** are an all or nothing affair.
