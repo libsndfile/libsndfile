@@ -76,7 +76,7 @@ AM_CONDITIONAL([LINUX_MINGW_CROSS_TEST],
 #====================================================================================
 # Check for support of the struct hack.
 
-AC_C99_FLEXIBLE_ARRAY
+MN_C99_FLEXIBLE_ARRAY
 
 if test x$ac_cv_c99_flexible_array = xyes ; then
 	AC_DEFINE([HAVE_FLEXIBLE_ARRAY],1, [Set to 1 if the compile supports the struct hack.])
@@ -246,7 +246,7 @@ AC_CHECK_SIZEOF(ssize_t,4)
 #====================================================================================
 # Determine endian-ness of target processor.
 
-AC_C_FIND_ENDIAN
+MN_C_FIND_ENDIAN
 
 AC_DEFINE_UNQUOTED(CPU_IS_BIG_ENDIAN, ${ac_cv_c_big_endian},
 	[Target processor is big endian.])
@@ -269,8 +269,8 @@ AC_CHECK_FUNCS(setlocale)
 AC_CHECK_LIB([m],floor)
 AC_CHECK_FUNCS(floor ceil fmod)
 
-AC_C99_FUNC_LRINT
-AC_C99_FUNC_LRINTF
+MN_C99_FUNC_LRINT
+MN_C99_FUNC_LRINTF
 
 #====================================================================================
 # Check for requirements for building plugins for other languages/enviroments.
@@ -368,7 +368,7 @@ AC_DEFINE_UNQUOTED([HAVE_JACK],$HAVE_JACK,[Set to 1 if you have JACK.])
 # Determine if the processor can do clipping on float to int conversions.
 
 if test x$enable_cpu_clip != "xno" ; then
-	AC_C_CLIP_MODE
+	MN_C_CLIP_MODE
 else
 	echo "checking processor clipping capabilities... disabled"
 	ac_cv_c_clip_positive=0
@@ -485,9 +485,9 @@ win32_target_dll=0
 COMPILER_IS_GCC=0
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
-	AC_ADD_CFLAGS(-std=gnu99)
+	MN_ADD_CFLAGS(-std=gnu99)
 
-	AC_GCC_VERSION
+	MN_GCC_VERSION
 
 	if test "x$GCC_MAJOR_VERSION$GCC_MINOR_VERSION" = "x42" ; then
 		AC_MSG_WARN([****************************************************************])
@@ -496,21 +496,21 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		AC_MSG_WARN([** See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=33995      **])
 		AC_MSG_WARN([** Using -fgnu-inline to avoid this stupidity.                **])
 		AC_MSG_WARN([****************************************************************])
-		AC_ADD_CFLAGS([-fgnu89-inline])
+		MN_ADD_CFLAGS([-fgnu89-inline])
 		fi
 
 	CFLAGS="$CFLAGS -Wall"
 	CXXFLAGS="$CXXFLAGS -Wall"
 
-	AC_ADD_CFLAGS([-Wextra])
+	MN_ADD_CFLAGS([-Wextra])
 
 	AC_LANG_PUSH([C++])
-	AC_ADD_CXXFLAGS([-Wextra])
+	MN_ADD_CXXFLAGS([-Wextra])
 	AC_LANG_POP([C++])
 
-	AC_ADD_CFLAGS([-Wdeclaration-after-statement])
-	AC_ADD_CFLAGS([-Wpointer-arith])
-	AC_ADD_CFLAGS([-funsigned-char])
+	MN_ADD_CFLAGS([-Wdeclaration-after-statement])
+	MN_ADD_CFLAGS([-Wpointer-arith])
+	MN_ADD_CFLAGS([-funsigned-char])
 
 	if test x$enable_gcc_werror = "xyes" ; then
 		CFLAGS="-Werror $CFLAGS"
@@ -518,8 +518,8 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		fi
 
 	if test x$enable_test_coverage = "xyes" ; then
-		# AC_ADD_CFLAGS([-ftest-coverage])
-		AC_ADD_CFLAGS([-coverage])
+		# MN_ADD_CFLAGS([-ftest-coverage])
+		MN_ADD_CFLAGS([-coverage])
 		fi
 
 	CFLAGS="$CFLAGS -Wstrict-prototypes -Wmissing-prototypes -Waggregate-return -Wcast-align -Wcast-qual -Wnested-externs -Wshadow -Wbad-function-cast -Wwrite-strings "

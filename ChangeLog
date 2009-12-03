@@ -1,3 +1,8 @@
+2009-12-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac M4/*.m4
+    Rename all custom macros from AC_* to MN_*.
+
 2009-12-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/*.html configure.ac
