@@ -71,13 +71,13 @@ main (int argc, char **argv)
 	SF_INFO sfinfo ;
 	int k, double_merge = 0 ;
 
-	if (strcmp (argv [argc - 2], "-o") != 0)
-	{	puts ("\nError : second last command line parameter should be '-o'.\n") ;
+	if (argc < 5)
+	{	puts ("\nError : need at least 2 input files.") ;
 		usage_exit () ;
 		} ;
 
-	if (argc < 5)
-	{	puts ("\nError : need at least 2 input files.\n") ;
+	if (strcmp (argv [argc - 2], "-o") != 0)
+	{	puts ("\nError : second last command line parameter should be '-o'.\n") ;
 		usage_exit () ;
 		} ;
 
@@ -91,7 +91,7 @@ main (int argc, char **argv)
 
 	for (k = 1 ; k < argc - 2 ; k++)
 	{
-		if ((state.infile [k] = sf_open (argv [k], SFM_READ, &sfinfo)) == NULL)
+		if ((state.infile [k - 1] = sf_open (argv [k], SFM_READ, &sfinfo)) == NULL)
 		{	printf ("\nError : Not able to open input file '%s'\n%s\n", argv [k], sf_strerror (NULL)) ;
 			exit (1) ;
 			} ;

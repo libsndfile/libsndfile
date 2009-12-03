@@ -3,6 +3,9 @@
     * configure.ac M4/*.m4
     Rename all custom macros from AC_* to MN_*.
 
+    * programs/sndfile-interleave.c
+    Make it actually work.
+
 2009-12-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/*.html configure.ac
