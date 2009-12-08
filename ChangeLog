@@ -1,3 +1,10 @@
+2009-12-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/error_test.c
+    Don't terminate when sf_close() returns zero in error_close_test().
+    It seems that Windows 7 behaves differently from earlier versions of
+    Windows.
+
 2009-12-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac M4/*.m4
