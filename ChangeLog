@@ -1,3 +1,8 @@
+2009-12-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/sndfile-jackplay.c man/sndfile-jackplay.1
+    Remove these which will now be in found in the sndfile-tools package.
+
 2009-12-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/error_test.c
