@@ -121,9 +121,6 @@ AC_ARG_ENABLE(bow-docs,
 AC_ARG_ENABLE(sqlite,
 	AC_HELP_STRING([--disable-sqlite], [disable use of sqlite]))
 
-AC_ARG_ENABLE(jack,
-	AC_HELP_STRING([--disable-jack], [disable use of JACK]))
-
 AC_ARG_ENABLE(alsa,
 	AC_HELP_STRING([--disable-alsa], [disable use of ALSA]))
 
@@ -346,23 +343,6 @@ else
 	fi
 
 AC_DEFINE_UNQUOTED([HAVE_SQLITE3],$HAVE_SQLITE3,[Set to 1 if you have libsqlite3.])
-
-#====================================================================================
-# Check for JACK (only used for examples/sndfile-jackplay).
-
-ac_cv_jack=no
-if test x$enable_jack != xno ; then
-	PKG_CHECK_MOD_VERSION(JACK, jack >= 0.100, ac_cv_jack=yes, ac_cv_jack=no)
-	fi
-
-
-if test x$ac_cv_jack = "xyes" ; then
-	HAVE_JACK=1
-else
-	HAVE_JACK=0
-	fi
-
-AC_DEFINE_UNQUOTED([HAVE_JACK],$HAVE_JACK,[Set to 1 if you have JACK.])
 
 #====================================================================================
 # Determine if the processor can do clipping on float to int conversions.
