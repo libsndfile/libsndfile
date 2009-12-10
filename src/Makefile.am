@@ -19,14 +19,14 @@ EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 			$(SYMBOL_FILES) create_symbols_file.py binheader_writef_check.py \
 			make-static-lib-hidden-privates.sh
 
-noinst_HEADERS = common.h sfconfig.h sfendian.h wav_w64.h sf_unistd.h
+noinst_HEADERS = common.h sfconfig.h sfendian.h wav_w64.h sf_unistd.h chanmap.h
 
 noinst_PROGRAMS = test_main
 
 COMMON = common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
 		interleave.c strings.c dither.c broadcast.c audio_detect.c \
- 		ima_oki_adpcm.c ima_oki_adpcm.h chunk.c \
+ 		ima_oki_adpcm.c ima_oki_adpcm.h chunk.c chanmap.c \
 		windows.c
 
 FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c \

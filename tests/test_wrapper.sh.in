@@ -58,6 +58,7 @@ if test -x test_main@EXEEXT@ ; then
 ./command_test@EXEEXT@ current_sf_info
 ./command_test@EXEEXT@ bext
 ./command_test@EXEEXT@ bextch
+./command_test@EXEEXT@ chanmap
 ./floating_point_test@EXEEXT@
 ./checksum_test@EXEEXT@
 ./scale_clip_test@EXEEXT@

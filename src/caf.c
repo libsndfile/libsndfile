@@ -28,6 +28,7 @@
 #include	"sndfile.h"
 #include	"sfendian.h"
 #include	"common.h"
+#include	"chanmap.h"
 
 /*------------------------------------------------------------------------------
 ** Macros to handle big/little endian issues.
@@ -83,6 +84,10 @@ typedef struct
 	unsigned int bits_per_chan ;
 } DESC_CHUNK ;
 
+typedef struct
+{	int chanmap_tag ;
+} CAF_PRIVATE ;
+
 /*------------------------------------------------------------------------------
 ** Private static functions.
 */
@@ -90,6 +95,8 @@ typedef struct
 static int	caf_close (SF_PRIVATE *psf) ;
 static int	caf_read_header (SF_PRIVATE *psf) ;
 static int	caf_write_header (SF_PRIVATE *psf, int calc_length) ;
+static int	caf_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
+static int	caf_read_chanmap (SF_PRIVATE * psf, sf_count_t chunk_size) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -105,6 +112,9 @@ caf_open (SF_PRIVATE *psf)
 		} ;
 
 	subformat = SF_CODEC (psf->sf.format) ;
+
+	if ((psf->container_data = calloc (1, sizeof (CAF_PRIVATE))) == NULL)
+		return SFE_MALLOC_FAILED ;
 
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	if (psf->is_pipe)
@@ -142,7 +152,7 @@ caf_open (SF_PRIVATE *psf)
 		} ;
 
 	psf->container_close = caf_close ;
-	/*psf->command = caf_command ;*/
+	psf->command = caf_command ;
 
 	switch (subformat)
 	{	case SF_FORMAT_PCM_S8 :
@@ -185,6 +195,25 @@ caf_close (SF_PRIVATE *psf)
 
 	return 0 ;
 } /* caf_close */
+
+static int
+caf_command (SF_PRIVATE * psf, int command, void * UNUSED (data), int UNUSED (datasize))
+{	CAF_PRIVATE	*pcaf ;
+
+	if ((pcaf = psf->container_data) == NULL)
+		return SFE_INTERNAL ;
+
+	switch (command)
+	{	case SFC_SET_CHANNEL_MAP_INFO :
+			pcaf->chanmap_tag = aiff_caf_find_channel_layout_tag (psf->channel_map, psf->sf.channels) ;
+			return (pcaf->chanmap_tag != 0) ;
+
+		default :
+			break ;
+	} ;
+
+	return 0 ;
+} /* caf_command */
 
 /*------------------------------------------------------------------------------
 */
@@ -253,7 +282,7 @@ caf_read_header (SF_PRIVATE *psf)
 	sf_count_t chunk_size ;
 	double srate ;
 	short version, flags ;
-	int marker, k, have_data = 0 ;
+	int marker, k, have_data = 0, error ;
 
 	memset (&desc, 0, sizeof (desc)) ;
 
@@ -328,6 +357,19 @@ caf_read_header (SF_PRIVATE *psf)
 				psf->peak_info->peak_loc = SF_PEAK_START ;
 				break ;
 
+			case chan_MARKER :
+				if (chunk_size < 12)
+				{	psf_log_printf (psf, "%M : %D (should be >= 12)\n", marker, chunk_size) ;
+					psf_binheader_readf (psf, "j", (int) chunk_size) ;
+					break ;
+					}
+
+				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+
+				if ((error = caf_read_chanmap (psf, chunk_size)))
+					return error ;
+				break ;
+
 			case free_MARKER :
 				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
 				psf_binheader_readf (psf, "j", (int) chunk_size) ;
@@ -372,9 +414,13 @@ caf_read_header (SF_PRIVATE *psf)
 
 static int
 caf_write_header (SF_PRIVATE *psf, int calc_length)
-{	DESC_CHUNK desc ;
+{	CAF_PRIVATE	*pcaf ;
+	DESC_CHUNK desc ;
 	sf_count_t current, free_len ;
 	int subformat ;
+
+	if ((pcaf = psf->container_data) == NULL)
+		return SFE_INTERNAL ;
 
 	memset (&desc, 0, sizeof (desc)) ;
 
@@ -514,6 +560,9 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 			psf_binheader_writef (psf, "Ef8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 
+	if (psf->channel_map && pcaf->chanmap_tag)
+		psf_binheader_writef (psf, "Em8444", chan_MARKER, (sf_count_t) 12, pcaf->chanmap_tag, 0, 0) ;
+
 	/* Add free chunk so that the actual audio data starts at a multiple 0x1000. */
 	free_len = 0x1000 - psf->headindex - 16 - 12 ;
 	while (free_len < 0)
@@ -534,4 +583,35 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 
 	return psf->error ;
 } /* caf_write_header */
+
+static int
+caf_read_chanmap (SF_PRIVATE * psf, sf_count_t chunk_size)
+{	const AIFF_CAF_CHANNEL_MAP * map_info ;
+	unsigned channel_bitmap, channel_decriptions, bytesread ;
+	int layout_tag ;
+
+	bytesread = psf_binheader_readf (psf, "E444", &layout_tag, &channel_bitmap, &channel_decriptions) ;
+
+	map_info = aiff_caf_of_channel_layout_tag (layout_tag) ;
+
+	psf_log_printf (psf, "  Tag    : %x\n", layout_tag) ;
+	if (map_info)
+		psf_log_printf (psf, "  Layout : %s\n", map_info->name) ;
+
+	if (bytesread < chunk_size)
+		psf_binheader_readf (psf, "j", chunk_size - bytesread) ;
+
+	if (map_info->channel_map != NULL)
+	{	size_t chanmap_size = psf->sf.channels * sizeof (psf->channel_map [0]) ;
+
+		free (psf->channel_map) ;
+
+		if ((psf->channel_map = malloc (chanmap_size)) == NULL)
+			return SFE_MALLOC_FAILED ;
+
+		memcpy (psf->channel_map, map_info->channel_map, chanmap_size) ;
+		} ;
+
+	return 0 ;
+} /* caf_read_chanmap */
 

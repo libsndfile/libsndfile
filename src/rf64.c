@@ -63,6 +63,7 @@
 static int	rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock) ;
 static int	rf64_write_header (SF_PRIVATE *psf, int calc_length) ;
 static int	rf64_close (SF_PRIVATE *psf) ;
+static int	rf64_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -77,6 +78,7 @@ rf64_open (SF_PRIVATE *psf)
 	if ((wpriv = calloc (1, sizeof (WAV_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 	psf->container_data = wpriv ;
+	wpriv->wavex_ambisonic = SF_AMBISONIC_NONE ;
 
 	/* All RF64 files are little endian. */
 	psf->endian = SF_ENDIAN_LITTLE ;
@@ -105,6 +107,7 @@ rf64_open (SF_PRIVATE *psf)
 		} ;
 
 	psf->container_close = rf64_close ;
+	psf->command = rf64_command ;
 
 	switch (subformat)
 	{	case SF_FORMAT_PCM_U8 :
@@ -442,6 +445,8 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 			*/
 			if (wpriv->wavex_ambisonic != SF_AMBISONIC_NONE)
 				psf_binheader_writef (psf, "4", 0) ;
+			else if (wpriv->wavex_channelmask != 0)
+				psf_binheader_writef (psf, "4", wpriv->wavex_channelmask) ;
 			else
 			{	/*
 				** Ok some liberty is taken here to use the most commonly used channel masks
@@ -659,3 +664,37 @@ rf64_close (SF_PRIVATE *psf)
 
 	return 0 ;
 } /* rf64_close */
+
+static int
+rf64_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
+{	WAV_PRIVATE	*wpriv ;
+
+	if ((wpriv = psf->container_data) == NULL)
+		return SFE_INTERNAL ;
+
+	switch (command)
+	{	case SFC_WAVEX_SET_AMBISONIC :
+			if ((SF_CONTAINER (psf->sf.format)) == SF_FORMAT_WAVEX)
+			{	if (datasize == SF_AMBISONIC_NONE)
+					wpriv->wavex_ambisonic = SF_AMBISONIC_NONE ;
+				else if (datasize == SF_AMBISONIC_B_FORMAT)
+					wpriv->wavex_ambisonic = SF_AMBISONIC_B_FORMAT ;
+				else
+					return 0 ;
+				} ;
+			return wpriv->wavex_ambisonic ;
+
+		case SFC_WAVEX_GET_AMBISONIC :
+			return wpriv->wavex_ambisonic ;
+
+		case SFC_SET_CHANNEL_MAP_INFO :
+			wpriv->wavex_channelmask = wavex_gen_channel_mask (psf->channel_map, psf->sf.channels) ;
+			return (wpriv->wavex_channelmask != 0) ;
+
+		default :
+			break ;
+	} ;
+
+	return 0 ;
+} /* rf64_command */
+

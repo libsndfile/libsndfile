@@ -53,6 +53,7 @@ static void print_usage (const char *progname) ;
 static void info_dump (const char *filename) ;
 static int	instrument_dump (const char *filename) ;
 static int	broadcast_dump (const char *filename) ;
+static int	chanmap_dump (const char *filename) ;
 static void total_dump (void) ;
 
 static double total_seconds = 0.0 ;
@@ -86,6 +87,14 @@ main (int argc, char *argv [])
 
 		for (k = 2 ; k < argc ; k++)
 			error += broadcast_dump (argv [k]) ;
+		return error ;
+		} ;
+
+	if (strcmp (argv [1], "-c") == 0)
+	{	int error = 0 ;
+
+		for (k = 2 ; k < argc ; k++)
+			error += chanmap_dump (argv [k]) ;
 		return error ;
 		} ;
 
@@ -377,6 +386,82 @@ broadcast_dump (const char *filename)
 
 	return 0 ;
 } /* broadcast_dump */
+
+static int
+chanmap_dump (const char *filename)
+{	SNDFILE	 *file ;
+	SF_INFO	 sfinfo ;
+	int * channel_map ;
+	int got_chanmap, k ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	if ((file = sf_open (filename, SFM_READ, &sfinfo)) == NULL)
+	{	printf ("Error : Not able to open input file %s.\n", filename) ;
+		fflush (stdout) ;
+		memset (data, 0, sizeof (data)) ;
+		puts (sf_strerror (NULL)) ;
+		return 1 ;
+		} ;
+
+	if ((channel_map = calloc (sfinfo.channels, sizeof (int))) == NULL)
+	{	printf ("Error : malloc failed.\n\n") ;
+		return 1 ;
+		} ;
+
+	got_chanmap = sf_command (file, SFC_GET_CHANNEL_MAP_INFO, channel_map, sfinfo.channels * sizeof (int)) ;
+	sf_close (file) ;
+
+	if (got_chanmap == SF_FALSE)
+	{	printf ("Error : File '%s' does not contain channel map information.\n\n", filename) ;
+		free (channel_map) ;
+		return 1 ;
+		} ;
+
+	printf ("File : %s\n\n", filename) ;
+
+	puts ("    Chan    Position") ;
+	for (k = 0 ; k < sfinfo.channels ; k ++)
+	{	const char * name ;
+
+#define CASE_NAME(x)	case x : name = #x ; break ;
+		switch (channel_map [k])
+		{	CASE_NAME (SF_CHANNEL_MAP_INVALID) ;
+			CASE_NAME (SF_CHANNEL_MAP_MONO) ;
+			CASE_NAME (SF_CHANNEL_MAP_LEFT) ;
+			CASE_NAME (SF_CHANNEL_MAP_RIGHT) ;
+			CASE_NAME (SF_CHANNEL_MAP_CENTER) ;
+			CASE_NAME (SF_CHANNEL_MAP_FRONT_LEFT) ;
+			CASE_NAME (SF_CHANNEL_MAP_FRONT_RIGHT) ;
+			CASE_NAME (SF_CHANNEL_MAP_FRONT_CENTER) ;
+			CASE_NAME (SF_CHANNEL_MAP_REAR_CENTER) ;
+			CASE_NAME (SF_CHANNEL_MAP_REAR_LEFT) ;
+			CASE_NAME (SF_CHANNEL_MAP_REAR_RIGHT) ;
+			CASE_NAME (SF_CHANNEL_MAP_LFE) ;
+			CASE_NAME (SF_CHANNEL_MAP_FRONT_LEFT_OF_CENTER) ;
+			CASE_NAME (SF_CHANNEL_MAP_FRONT_RIGHT_OF_CENTER) ;
+			CASE_NAME (SF_CHANNEL_MAP_SIDE_LEFT) ;
+			CASE_NAME (SF_CHANNEL_MAP_SIDE_RIGHT) ;
+			CASE_NAME (SF_CHANNEL_MAP_TOP_CENTER) ;
+			CASE_NAME (SF_CHANNEL_MAP_TOP_FRONT_LEFT) ;
+			CASE_NAME (SF_CHANNEL_MAP_TOP_FRONT_RIGHT) ;
+			CASE_NAME (SF_CHANNEL_MAP_TOP_FRONT_CENTER) ;
+			CASE_NAME (SF_CHANNEL_MAP_TOP_REAR_LEFT) ;
+			CASE_NAME (SF_CHANNEL_MAP_TOP_REAR_RIGHT) ;
+			CASE_NAME (SF_CHANNEL_MAP_TOP_REAR_CENTER) ;
+			CASE_NAME (SF_CHANNEL_MAP_MAX) ;
+			default : name = "default" ;
+				break ;
+			} ;
+
+		printf ("    %3d     %s\n", k, name) ;
+		} ;
+
+	putchar ('\n') ;
+	free (channel_map) ;
+
+	return 0 ;
+} /* chanmap_dump */
 
 static void
 total_dump (void)
