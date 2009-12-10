@@ -9,6 +9,9 @@
     * configure.ac
     Remove detection of JACK Audio Connect Kit.
 
+    * programs/sndfile-concat.c man/sndfile-concat.1
+    Add new program with man page.
+
 2009-12-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/error_test.c
