@@ -98,3 +98,4 @@ tests/test_wrapper.sh
 tests/utils.c
 tests/utils.h
 tests/write_read_test.c
+programs/sndfile-concat

@@ -12,6 +12,9 @@
     * programs/sndfile-concat.c man/sndfile-concat.1
     Add new program with man page.
 
+    * man/Makefile.am programs/Makefile.am
+    Hook sndfile-concat into build system.
+
 2009-12-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/error_test.c
