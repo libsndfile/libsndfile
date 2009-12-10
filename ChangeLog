@@ -1,3 +1,106 @@
+2009-12-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/sndfile-jackplay.c man/sndfile-jackplay.1
+    Remove these which will now be in found in the sndfile-tools package.
+
+    * programs/Makefile.am man/Makefile.am
+    Remove build rules for sndfile-jackplay.
+
+    * configure.ac
+    Remove detection of JACK Audio Connect Kit.
+
+    * programs/sndfile-concat.c man/sndfile-concat.1
+    Add new program with man page.
+
+    * man/Makefile.am programs/Makefile.am
+    Hook sndfile-concat into build system.
+
+2009-12-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/error_test.c
+    Don't terminate when sf_close() returns zero in error_close_test().
+    It seems that Windows 7 behaves differently from earlier versions of
+    Windows.
+
+2009-12-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac M4/*.m4
+    Rename all custom macros from AC_* to MN_*.
+
+    * programs/sndfile-interleave.c
+    Make it actually work.
+
+2009-12-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/*.html configure.ac
+    Corrections and clarifications courtesy of Robin Forder.
+
+    * programs/sndfile-convert.c programs/common.[ch]
+    Move some code from convert to common for reuse.
+
+    * programs/sndfile-interleave.c programs/sndfile-interleave.c
+    Add new programs sndfile-interleave and sndfile-deinterleave.
+
+    * programs/Makefile.am
+    Hook new programs into build.
+
+2009-12-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/create_symbols_file.py tests/stdio_test.c tests/win32_test.c
+    Minor OS/2 tweaks as suggested by David Yeo.
+
+    * tests/multi_file_test.c
+    Fix file creation flags on windows. Thanks to Bruce Sharpe.
+
+    * src/sf_unistd.h
+    Set all group and other file create permssions to zero.
+
+    * tests/win32_test.c
+    Add a new test.
+
+2009-11-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/print.css doc/*.html
+    Add a print stylesheet and update all HTML documents to reference it.
+    Thanks to Aditya Bhargava for suggesting this.
+
+    * doc/index.html
+    Minor corrections.
+
+2009-11-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+ 
+    * sndfile.pc.in
+    Add a Libs.private entry to assist with static linking.
+
+2009-11-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+ 
+    * src/make-static-lib-hidden-privates.sh src/Makefile.am
+    Add a script to hide all non-public symbols in the libsndfile.a static
+    library.
+
+2009-11-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+ 
+    * tests/locale_test.c
+    Correct usage of ENABLE_SNDFILE_WINDOWS_PROTOTYPES.
+
+2009-11-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/windows.c
+    Correct usage of ENABLE_SNDFILE_WINDOWS_PROTOTYPES.
+
+2009-11-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/sndfile-convert.c
+    Allow the program to read from stdin by specifying '-' on the command line
+    as the input file.
+
+    * src/sndfile.h.in
+    Hash define ENABLE_SNDFILE_WINDOWS_PROTOTYPES to 1 for greater safety.
+
+    * tests/virtual_io_test.c
+    Add a PAF/PCM_24 test and verify the file length is not negative
+    immediately after openning the file for write.
+
 2009-10-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c

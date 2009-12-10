@@ -45,87 +45,11 @@ typedef	struct
 	SF_INFO	infileinfo, outfileinfo ;
 } OptionData ;
 
-typedef struct
-{	const char	*ext ;
-	int			len ;
-	int			format ;
-} OUTPUT_FORMAT_MAP ;
-
 static void copy_metadata (SNDFILE *outfile, SNDFILE *infile, int channels) ;
-
-static OUTPUT_FORMAT_MAP format_map [] =
-{
-	{	"aif",		3,	SF_FORMAT_AIFF	},
-	{	"wav", 		0,	SF_FORMAT_WAV	},
-	{	"wavex",	0,	SF_FORMAT_WAVEX	},
-	{	"au",		0,	SF_FORMAT_AU	},
-	{	"caf",		0,	SF_FORMAT_CAF	},
-	{	"flac",		0,	SF_FORMAT_FLAC	},
-	{	"snd",		0,	SF_FORMAT_AU	},
-	{	"svx",		0,	SF_FORMAT_SVX	},
-	{	"paf",		0,	SF_ENDIAN_BIG | SF_FORMAT_PAF	},
-	{	"fap",		0,	SF_ENDIAN_LITTLE | SF_FORMAT_PAF	},
-	{	"gsm",		0,	SF_FORMAT_RAW	},
-	{	"nist", 	0,	SF_FORMAT_NIST	},
-	{	"htk",		0,	SF_FORMAT_HTK	},
-	{	"ircam",	0,	SF_FORMAT_IRCAM	},
-	{	"sf",		0, 	SF_FORMAT_IRCAM	},
-	{	"voc",		0, 	SF_FORMAT_VOC	},
-	{	"w64", 		0, 	SF_FORMAT_W64	},
-	{	"raw",		0,	SF_FORMAT_RAW	},
-	{	"mat4", 	0,	SF_FORMAT_MAT4	},
-	{	"mat5", 	0, 	SF_FORMAT_MAT5 	},
-	{	"mat",		0, 	SF_FORMAT_MAT4 	},
-	{	"pvf",		0, 	SF_FORMAT_PVF 	},
-	{	"sds",		0, 	SF_FORMAT_SDS 	},
-	{	"sd2",		0, 	SF_FORMAT_SD2 	},
-	{	"vox",		0, 	SF_FORMAT_RAW 	},
-	{	"xi",		0, 	SF_FORMAT_XI 	},
-	{	"wve",		0,	SF_FORMAT_WVE	},
-	{	"oga",		0,	SF_FORMAT_OGG	},
-	{	"mpc",		0,	SF_FORMAT_MPC2K	},
-	{	"rf64",		0,	SF_FORMAT_RF64	},
-} ; /* format_map */
-
-static int
-guess_output_file_type (char *str, int format)
-{	char	buffer [16], *cptr ;
-	int		k ;
-
-	format &= SF_FORMAT_SUBMASK ;
-
-	if ((cptr = strrchr (str, '.')) == NULL)
-		return 0 ;
-
-	strncpy (buffer, cptr + 1, 15) ;
-	buffer [15] = 0 ;
-
-	for (k = 0 ; buffer [k] ; k++)
-		buffer [k] = tolower ((buffer [k])) ;
-
-	if (strcmp (buffer, "gsm") == 0)
-		return SF_FORMAT_RAW | SF_FORMAT_GSM610 ;
-
-	if (strcmp (buffer, "vox") == 0)
-		return SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM ;
-
-	for (k = 0 ; k < (int) (sizeof (format_map) / sizeof (format_map [0])) ; k++)
-	{	if (format_map [k].len > 0 && strncmp (buffer, format_map [k].ext, format_map [k].len) == 0)
-			return format_map [k].format | format ;
-		else if (strcmp (buffer, format_map [k].ext) == 0)
-			return format_map [k].format | format ;
-		} ;
-
-	return	0 ;
-} /* guess_output_file_type */
-
 
 static void
 print_usage (char *progname)
-{	SF_FORMAT_INFO	info ;
-
-	int k ;
-
+{
 	printf ("\nUsage : %s [options] [encoding] <input file> <output file>\n", progname) ;
 	puts ("\n"
 		"    where [option] may be:\n\n"
@@ -158,11 +82,7 @@ print_usage (char *progname)
 		"    output file name. The following extensions are currently understood:\n"
 		) ;
 
-	for (k = 0 ; k < (int) (sizeof (format_map) / sizeof (format_map [0])) ; k++)
-	{	info.format = format_map [k].format ;
-		sf_command (NULL, SFC_GET_FORMAT_INFO, &info, sizeof (info)) ;
-		printf ("        %-10s : %s\n", format_map [k].ext, info.name == NULL ? "????" : info.name) ;
-		} ;
+	sfe_dump_format_map () ;
 
 	puts ("") ;
 } /* print_usage */
@@ -192,7 +112,7 @@ main (int argc, char * argv [])
 		return 1 ;
 		} ;
 
-	if (infilename [0] == '-')
+	if (strlen (infilename) > 1 && infilename [0] == '-')
 	{	printf ("Error : Input filename (%s) looks like an option.\n\n", infilename) ;
 		print_usage (progname) ;
 		return 1 ;
@@ -290,7 +210,7 @@ main (int argc, char * argv [])
 
 	infileminor = sfinfo.format & SF_FORMAT_SUBMASK ;
 
-	if ((sfinfo.format = guess_output_file_type (outfilename, sfinfo.format)) == 0)
+	if ((sfinfo.format = sfe_file_type_of_ext (outfilename, sfinfo.format)) == 0)
 	{	printf ("Error : Not able to determine output file type for %s.\n", outfilename) ;
 		return 1 ;
 		} ;

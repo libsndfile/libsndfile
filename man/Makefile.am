@@ -1,10 +1,10 @@
 ## Process this file with automake to produce Makefile.in
 
 man_MANS = sndfile-info.1 sndfile-play.1 sndfile-convert.1 sndfile-cmp.1 \
-			sndfile-jackplay.1 sndfile-metadata-get.1 sndfile-metadata-set.1
+			sndfile-metadata-get.1 sndfile-metadata-set.1 sndfile-concat.1
 
 EXTRA_DIST = sndfile-info.1 sndfile-play.1 sndfile-convert.1 sndfile-cmp.1 \
-			sndfile-jackplay.1 sndfile-metadata-get.1
+			sndfile-metadata-get.1 sndfile-concat.1
 
 # Same manpage for both programs.
 sndfile-metadata-set.1 : sndfile-metadata-get.1

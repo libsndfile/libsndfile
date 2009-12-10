@@ -1,7 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_PROGRAMS = sndfile-info sndfile-play sndfile-convert sndfile-jackplay sndfile-cmp \
-				sndfile-metadata-set sndfile-metadata-get
+bin_PROGRAMS = sndfile-info sndfile-play sndfile-convert sndfile-cmp \
+				sndfile-metadata-set sndfile-metadata-get sndfile-interleave \
+				sndfile-deinterleave sndfile-concat
 
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
@@ -18,10 +19,6 @@ sndfile_info_LDADD = $(top_builddir)/src/libsndfile.la
 sndfile_play_SOURCES = sndfile-play.c
 sndfile_play_LDADD = $(top_builddir)/src/libsndfile.la $(OS_SPECIFIC_LINKS) $(ALSA_LIBS)
 
-sndfile_jackplay_SOURCES = sndfile-jackplay.c
-sndfile_jackplay_CFLAGS = $(JACK_CFLAGS)
-sndfile_jackplay_LDADD = $(top_builddir)/src/libsndfile.la $(JACK_LIBS)
-
 sndfile_convert_SOURCES = sndfile-convert.c common.c common.h
 sndfile_convert_LDADD = $(top_builddir)/src/libsndfile.la
 
@@ -33,4 +30,13 @@ sndfile_metadata_set_LDADD = $(top_builddir)/src/libsndfile.la
 
 sndfile_metadata_get_SOURCES = sndfile-metadata-get.c
 sndfile_metadata_get_LDADD = $(top_builddir)/src/libsndfile.la
+
+sndfile_interleave_SOURCES = sndfile-interleave.c common.c common.h
+sndfile_interleave_LDADD = $(top_builddir)/src/libsndfile.la
+
+sndfile_deinterleave_SOURCES = sndfile-deinterleave.c
+sndfile_deinterleave_LDADD = $(top_builddir)/src/libsndfile.la
+
+sndfile_concat_SOURCES = sndfile-concat.c
+sndfile_concat_LDADD = $(top_builddir)/src/libsndfile.la
 

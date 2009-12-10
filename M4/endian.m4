@@ -1,4 +1,4 @@
-dnl @synopsis AC_C_FIND_ENDIAN
+dnl @synopsis MN_C_FIND_ENDIAN
 dnl
 dnl Determine endian-ness of target processor.
 dnl @version 1.1	Mar 03 2002
@@ -20,7 +20,7 @@ dnl    2) If 1) fails, look in <sys/types.h> and <sys/param.h>.
 dnl    3) If 1) and 2) fails and not cross compiling run a test program.
 dnl    4) If 1) and 2) fails and cross compiling then guess based on target.
 
-AC_DEFUN([AC_C_FIND_ENDIAN],
+AC_DEFUN([MN_C_FIND_ENDIAN],
 [AC_CACHE_CHECK(processor byte ordering, 
 	ac_cv_c_byte_order,
 
@@ -150,6 +150,6 @@ else
 	fi
 
 ]
-)# AC_C_FIND_ENDIAN
+)# MN_C_FIND_ENDIAN
 
 

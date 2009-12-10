@@ -3,12 +3,13 @@
 
 <HEAD>
 	<TITLE>
-	The libsndfile API.
+	The libsndfile API
 	</TITLE>
 	<META NAME="Author"      CONTENT="Erik de Castro Lopo (erikd AT mega-nerd DOT com)">
 	<META NAME="Description" CONTENT="The libsndfile API.">
 	<META NAME="Keywords"    CONTENT="WAV AIFF AU libsndfile sound audio dsp Linux">
-	<LINK REL=StyleSheet HREF="libsndfile.css" TYPE="text/css" MEDIA="all">
+	<LINK REL="stylesheet" HREF="libsndfile.css" TYPE="text/css" MEDIA="all">
+	<LINK REL="stylesheet" HREF="print.css" TYPE="text/css" MEDIA="print">
 </HEAD>
 
 <BODY>
@@ -34,7 +35,7 @@
 	unambiguous.
 	However, since maintaining the documentation is the least fun part of working
 	on libsndfile, these docs can and do fall behind the behaviour of library.
-	If any errors omissions or ambiguities are found, please notify
+	If any errors, omissions or ambiguities are found, please notify
 		<A HREF="m&#97;ilt&#111;:&#101;rikd&#64;z&#105;p.&#99;om.au">
 	Erik de Castro Lopo</a>.
 </P>
@@ -53,7 +54,7 @@
 	</B>
 </P>
 
-<H2><B>SYNOPSIS</B></H2>
+<H2><B>Synopsis</B></H2>
 <P>
 The functions of libsndfile are defined as follows:
 </P>
@@ -245,7 +246,7 @@ memory allocated during the call to sf_open().
 </P>
 <!-- pepper -->
 <P>
-On success, the sf_open function returns a non NULL pointer which should be
+On success, the sf_open function returns a non-NULL pointer which should be
 passed as the first parameter to all subsequent libsndfile calls dealing with
 that audio file.
 On fail, the sf_open function returns a NULL pointer.
@@ -287,7 +288,7 @@ parameter was TRUE when the sf_open_fd() function was called.
 </P>
 
 <P>
-On success, the sf_open_fd function returns a non NULL pointer which should be
+On success, the sf_open_fd function returns a non-NULL pointer which should be
 passed as the first parameter to all subsequent libsndfile calls dealing with
 that audio file.
 On fail, the sf_open_fd function returns a NULL pointer.
@@ -598,7 +599,7 @@ The <B>str_type</B> parameter can be any one of the following string types:
 </PRE>
 
 <P>
-The sf_get_string() function returns the specificed string if it exists and a
+The sf_get_string() function returns the specified string if it exists and a
 NULL pointer otherwise.
 In addition to the string ids above, SF_STR_FIRST (== SF_STR_TITLE) and
 SF_STR_LAST (always the same as the highest numbers string id) are also
@@ -655,7 +656,7 @@ would mean that all sample values read from the file will be zero.
 In order to read these files correctly using integer read methods, it is recommended
 that you use the
      <A HREF="command.html">sf_command</A>
-interface a command of
+interface, a command of
      <A HREF="command.html#SFC_SET_SCALE_FLOAT_INT_READ">SFC_SET_SCALE_FLOAT_INT_READ</A>
 and a parameter of SF_TRUE to force correct scaling.
 </P>

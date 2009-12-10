@@ -1,8 +1,8 @@
-dnl @synopsis AC_ADD_CXXFLAGS
+dnl @synopsis MN_ADD_CXXFLAGS
 dnl
 dnl Add the given option to CXXFLAGS, if it doesn't break the compiler
 
-AC_DEFUN([AC_ADD_CXXFLAGS],
+AC_DEFUN([MN_ADD_CXXFLAGS],
 [AC_MSG_CHECKING([if $CXX accepts $1])
 	ac_add_cxxflags__old_cxxflags="$CXXFLAGS"
 	CXXFLAGS="$CXXFLAGS $1"
@@ -14,4 +14,4 @@ AC_DEFUN([AC_ADD_CXXFLAGS],
 		AC_MSG_RESULT([no])
 		CXXFLAGS="$ac_add_cxxflags__old_cxxflags"
 		)
-])# AC_ADD_CXXFLAGS
+])# MN_ADD_CXXFLAGS

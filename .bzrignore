@@ -57,7 +57,9 @@ mntest.sh
 programs/sndfile-cmp
 programs/sndfile-convert
 programs/sndfile-data-trim
+programs/sndfile-deinterleave
 programs/sndfile-info
+programs/sndfile-interleave
 programs/sndfile-jackplay
 programs/sndfile-metadata-get
 programs/sndfile-metadata-set
@@ -96,3 +98,4 @@ tests/test_wrapper.sh
 tests/utils.c
 tests/utils.h
 tests/write_read_test.c
+programs/sndfile-concat
