@@ -1,9 +1,9 @@
-# Copyright (C) 1999-2008 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
+# Copyright (C) 1999-2009 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
 
 dnl Require autoconf version
 AC_PREREQ(2.57)
 
-AC_INIT([libsndfile],[1.0.21pre4],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.21],[erikd@mega-nerd.com])
 
 # Put config stuff in Cfg.
 AC_CONFIG_AUX_DIR(Cfg)
