@@ -4,6 +4,9 @@
     When decoding to short or int, clip the decoded signal to [-1.0, 1.0] if
     its too hot. Thanks to Dmitry Baikov for suggesting this.
 
+    * NEWS README doc/*.html
+    Updates for 1.0.21.
+
 2009-12-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-jackplay.c man/sndfile-jackplay.1
