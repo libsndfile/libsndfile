@@ -597,7 +597,20 @@ ogg_rshort (int samples, void *vptr, int off, int channels, float **pcm)
 	int i = 0, j, n ;
 	for (j = 0 ; j < samples ; j++)
 		for (n = 0 ; n < channels ; n++)
-			ptr [i++] = lrintf (pcm [n][j] * 32767.0f) ;
+		{	float value = pcm [n][j] ;
+
+			if (CPU_CLIPS_POSITIVE == 0 && value >= 1.0)
+			{	ptr [i++] = 0x7fff ;
+				continue ;
+				} ;
+			if (CPU_CLIPS_NEGATIVE == 0 && value <= -1.0)
+			{	ptr [i++] = 0x8000 ;
+				continue ;
+				} ;
+
+			ptr [i++] = lrintf (value * 32767.0f) ;
+			} ;
+
 	return i ;
 } /* ogg_rshort */
 
@@ -609,7 +622,20 @@ ogg_rint (int samples, void *vptr, int off, int channels, float **pcm)
 
 	for (j = 0 ; j < samples ; j++)
 		for (n = 0 ; n < channels ; n++)
-			ptr [i++] = lrintf (pcm [n][j] * 2147483647.0f) ;
+		{	float value = pcm [n][j] ;
+
+			if (CPU_CLIPS_POSITIVE == 0 && value >= 1.0)
+			{	ptr [i++] = 0x7fffffff ;
+				continue ;
+				} ;
+			if (CPU_CLIPS_NEGATIVE == 0 && value <= -1.0)
+			{	ptr [i++] = 0x80000000 ;
+				continue ;
+				} ;
+
+			ptr [i++] = lrintf (value * 2147483647.0f) ;
+			} ;
+
 	return i ;
 } /* ogg_rint */
 
