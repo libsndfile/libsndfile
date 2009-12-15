@@ -237,7 +237,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_FLAC_INIT_DECODER	, "Error : problem while initialization of the flac decoder." },
 	{	SFE_FLAC_LOST_SYNC		, "Error : flac decoder lost sync." },
 	{	SFE_FLAC_BAD_SAMPLE_RATE, "Error : flac does not support this sample rate." },
-	{	SFE_FLAC_UNKOWN_ERROR	, "Error : unkown error in flac decoder." },
+	{	SFE_FLAC_UNKOWN_ERROR	, "Error : unknown error in flac decoder." },
 
 	{	SFE_WVE_NOT_WVE			, "Error : not a WVE file." },
 	{	SFE_WVE_NO_PIPE			, "Error : not able to operate on WVE files over a pipe." },
