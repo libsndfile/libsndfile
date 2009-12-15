@@ -3,6 +3,9 @@
     * man/sndfile-metadata-get.1
     Fix typo.
 
+    * man/sndfile-interleave.1 man/Makefile.am
+    New man page.
+
 2009-12-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ogg.c
