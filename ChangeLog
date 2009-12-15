@@ -1,3 +1,8 @@
+2009-12-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * man/sndfile-metadata-get.1
+    Fix typo.
+
 2009-12-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ogg.c
