@@ -521,8 +521,8 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 			CFLAGS=$temp_CFLAGS
 			SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,\$(srcdir)/Symbols.darwin"
 			;;
-		linux*)
-			SHLIB_VERSION_ARG="-Wl,--version-script=\$(srcdir)/Symbols.linux"
+		linux*|kfreebsd*-gnu*|gnu*)
+			SHLIB_VERSION_ARG="-Wl,--version-script=\$(srcdir)/Symbols.gnu-binutils"
 			;;
 		mingw*)
 			# Linker flag '-Wl,--out-implib' does not work with mingw cross compiler

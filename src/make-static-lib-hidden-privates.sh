@@ -4,7 +4,7 @@
 # Ie, it makes a static lib whose symbols are far less likely to clash with
 # the symbols of another shared or static library.
 
-grep sf_ Symbols.linux | sed -e "s/[ ;]//g" > Symbols.static
+grep sf_ Symbols.gnu-binutils | sed -e "s/[ ;]//g" > Symbols.static
 
 ld -r --whole-archive .libs/libsndfile.a -o libsndfile_a.o
 

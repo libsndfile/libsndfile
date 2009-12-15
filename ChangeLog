@@ -1,3 +1,11 @@
+2009-12-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac src/Makefile.am src/create_symbols_file.py
+        src/make-static-lib-hidden-privates.sh
+    Change name of generated file src/Symbols.linux to Symbols.gnu-binutils and
+    and use the same symbols file for other systems which use GNU binutils like
+    Debian's kfreebsd.
+
 2009-12-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * man/sndfile-metadata-get.1

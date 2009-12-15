@@ -13,7 +13,7 @@ noinst_LTLIBRARIES = libcommon.la
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 
-SYMBOL_FILES = Symbols.linux Symbols.darwin libsndfile-1.def Symbols.os2 Symbols.static
+SYMBOL_FILES = Symbols.gnu-binutils Symbols.darwin libsndfile-1.def Symbols.os2 Symbols.static
 
 EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 			$(SYMBOL_FILES) create_symbols_file.py binheader_writef_check.py \
@@ -65,7 +65,7 @@ check: $(noinst_PROGRAMS)
 # builds the distribution tarball. There should be not need for the
 # end user to create these files.
 
-Symbols.linux: create_symbols_file.py
+Symbols.gnu-binutils: create_symbols_file.py
 	./create_symbols_file.py linux $(VERSION) > $@
 
 Symbols.darwin: create_symbols_file.py

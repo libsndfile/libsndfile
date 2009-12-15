@@ -73,7 +73,7 @@ sndfile.pc
 src/Ext
 src/G72x/g72x_test
 src/Symbols.darwin
-src/Symbols.linux
+src/Symbols.gnu-binutils
 src/Symbols.os2
 src/Symbols.static
 src/config.h
@@ -99,3 +99,4 @@ tests/utils.c
 tests/utils.h
 tests/write_read_test.c
 programs/sndfile-concat
+man/sndfile-deinterleave.1
