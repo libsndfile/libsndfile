@@ -6,6 +6,9 @@
     and use the same symbols file for other systems which use GNU binutils like
     Debian's kfreebsd.
 
+    * M4/shave.m4 shave.in
+    Update shave files from upstream.
+
 2009-12-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * man/sndfile-metadata-get.1
