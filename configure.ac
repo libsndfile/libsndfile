@@ -3,7 +3,8 @@
 dnl Require autoconf version
 AC_PREREQ(2.57)
 
-AC_INIT([libsndfile],[1.0.22pre1],[erikd@mega-nerd.com])
+AC_INIT([libsndfile],[1.0.22pre1],[sndfile@mega-nerd.com],
+		[libsndfile],[http://www.mega-nerd.com/libsndfile/])
 
 # Put config stuff in Cfg.
 AC_CONFIG_AUX_DIR(Cfg)
