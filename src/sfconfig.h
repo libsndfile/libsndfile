@@ -97,5 +97,13 @@
 #define HAVE_UNISTD_H 0
 #endif
 
+#ifndef HAVE_PIPE
+#define HAVE_PIPE 0
+#endif
+
+#ifndef HAVE_WAITPID
+#define	HAVE_WAITPID 0
+#endif
+
 #endif
 

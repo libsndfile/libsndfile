@@ -27,12 +27,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if (OS_IS_WIN32)
+#if (OS_IS_WIN32 || HAVE_PIPE == 0 || HAVE_WAITPID == 0)
 
 int
 main (void)
 {
-	puts ("    pipe_test  : this test doesn't work on win32.") ;
+	puts ("    pipe_test  : this test doesn't work on this OS.") ;
 	return 0 ;
 } /* main */
 

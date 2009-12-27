@@ -3,6 +3,9 @@
     * configure.ac
     Test for Unix pipe() and waitpid() functions.
 
+    * src/sfconfig.h tests/pipe_test.tpl
+    Disable pipe_test if pipe() and waitpid() aren't available.
+
 2009-12-16  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac src/Makefile.am src/create_symbols_file.py
