@@ -263,6 +263,7 @@ AC_CHECK_FUNCS(snprintf vsnprintf)
 AC_CHECK_FUNCS(gmtime gmtime_r localtime localtime_r gettimeofday)
 AC_CHECK_FUNCS(mmap getpagesize)
 AC_CHECK_FUNCS(setlocale)
+AC_CHECK_FUNCS(pipe waitpid)
 
 AC_CHECK_LIB([m],floor)
 AC_CHECK_FUNCS(floor ceil fmod)
