@@ -550,6 +550,12 @@ same as the frames parameter).
 </PRE>
 
 <P>
+<b>Note:</b> Unless you are writing an external decoder/encode that uses
+libsndfile to handle the file headers, you should not be using these
+functions.
+</P>
+
+<P>
 The raw read and write functions read raw audio data from the audio file (not to be
 confused with reading RAW header-less PCM files). The number of bytes read or written
 must always be an integer multiple of the number of channels multiplied by the number
