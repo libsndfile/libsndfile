@@ -180,22 +180,22 @@ update_strings (SNDFILE * outfile, const METADATA_INFO * info)
 		sf_set_string (outfile, SF_STR_TITLE, info->title) ;
 
 	if (info->copyright != NULL)
-		sf_set_string (outfile, SF_STR_TITLE, info->copyright) ;
+		sf_set_string (outfile, SF_STR_COPYRIGHT, info->copyright) ;
 
 	if (info->artist != NULL)
 		sf_set_string (outfile, SF_STR_ARTIST, info->artist) ;
 
 	if (info->comment != NULL)
-		sf_set_string (outfile, SF_STR_TITLE, info->comment) ;
+		sf_set_string (outfile, SF_STR_COMMENT, info->comment) ;
 
 	if (info->date != NULL)
 		sf_set_string (outfile, SF_STR_DATE, info->date) ;
 
 	if (info->album != NULL)
-		sf_set_string (outfile, SF_STR_TITLE, info->album) ;
+		sf_set_string (outfile, SF_STR_ALBUM, info->album) ;
 
 	if (info->license != NULL)
-		sf_set_string (outfile, SF_STR_TITLE, info->license) ;
+		sf_set_string (outfile, SF_STR_LICENSE, info->license) ;
 
 } /* update_strings */
 

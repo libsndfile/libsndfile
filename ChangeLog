@@ -1,3 +1,9 @@
+2010-01-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/common.c
+    Fix update_strings() copyright, comment, album and license are correctly
+    written. Thanks to Todd Allen for reporting this.
+
 2010-01-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/api.html
