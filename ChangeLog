@@ -8,6 +8,10 @@
     Change GNU makeism to something more widely supported. Thanks to Christian
     Weisgerber for reporting this.
 
+    * configure.ac programs/Makefile.am programs/sndfile-play.c
+    Apply patch from Christian Weisgerber and Jacob Meuserto add support for
+    OpenBSD's sndio.
+
 2010-01-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/api.html

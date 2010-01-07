@@ -402,6 +402,15 @@ if test x$enable_alsa != xno ; then
 	fi
 
 #====================================================================================
+# Check for OpenBSD's sndio.
+
+SNDIO_LIBS=""
+AC_CHECK_HEADERS(sndio.h)
+if test x$ac_cv_header_sndio_h = xyes ; then
+	SNDIO_LIBS="-lsndio"
+	fi
+
+#====================================================================================
 # Test for sanity when cross-compiling.
 
 if test x$cross_compiling = xyes ; then
@@ -573,6 +582,7 @@ AC_SUBST(SHARED_VERSION_INFO)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(ALSA_LIBS)
+AC_SUBST(SNDIO_LIBS)
 
 AC_SUBST(EXTERNAL_CFLAGS)
 AC_SUBST(EXTERNAL_LIBS)

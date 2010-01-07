@@ -57,6 +57,9 @@
 	#include <Carbon.h>
 	#include <CoreAudio/AudioHardware.h>
 
+#elif defined (HAVE_SNDIO_H)
+	#include <sndio.h>
+
 #elif (defined (sun) && defined (unix))
 	#include <fcntl.h>
 	#include <sys/ioctl.h>
@@ -820,6 +823,66 @@ win32_play (int argc, char *argv [])
 #endif /* Win32 */
 
 /*------------------------------------------------------------------------------
+**	OpenBDS's sndio.
+*/
+
+#if defined (HAVE_SNDIO_H)
+
+static void
+sndio_play (int argc, char *argv [])
+{	struct sio_hdl	*hdl ;
+	struct sio_par	par ;
+	short	 	buffer [BUFFER_LEN] ;
+	SNDFILE	*sndfile ;
+	SF_INFO	sfinfo ;
+	int		k, readcount ;
+
+	for (k = 1 ; k < argc ; k++)
+	{	printf ("Playing %s\n", argv [k]) ;
+		if (! (sndfile = sf_open (argv [k], SFM_READ, &sfinfo)))
+		{	puts (sf_strerror (NULL)) ;
+			continue ;
+			} ;
+
+		if (sfinfo.channels < 1 || sfinfo.channels > 2)
+		{	printf ("Error : channels = %d.\n", sfinfo.channels) ;
+			continue ;
+			} ;
+
+		if ((hdl = sio_open (NULL, SIO_PLAY, 0)) == NULL)
+		{	fprintf (stderr, "open sndio device failed") ;
+			return ;
+			} ;
+
+		sio_initpar (&par) ;
+		par.rate = sfinfo.samplerate ;
+		par.pchan = sfinfo.channels ;
+		par.bits = 16 ;
+		par.sig = 1 ;
+		par.le = SIO_LE_NATIVE ;
+
+		if (! sio_setpar (hdl, &par) || ! sio_getpar (hdl, &par))
+		{	fprintf (stderr, "set sndio params failed") ;
+			return ;
+			} ;
+
+		if (! sio_start (hdl))
+		{	fprintf (stderr, "sndio start failed") ;
+			return ;
+			} ;
+
+		while ((readcount = sf_read_short (sndfile, buffer, BUFFER_LEN)))
+			sio_write (hdl, buffer, readcount * sizeof (short)) ;
+
+		sio_close (hdl) ;
+		} ;
+
+	return ;
+} /* sndio_play */
+
+#endif /* sndio */
+
+/*------------------------------------------------------------------------------
 **	Solaris.
 */
 
@@ -941,6 +1004,8 @@ main (int argc, char *argv [])
 	opensoundsys_play (argc, argv) ;
 #elif (defined (__MACH__) && defined (__APPLE__))
 	macosx_play (argc, argv) ;
+#elif defined HAVE_SNDIO_H
+	sndio_play (argc, argv) ;
 #elif (defined (sun) && defined (unix))
 	solaris_play (argc, argv) ;
 #elif (OS_IS_WIN32 == 1)
