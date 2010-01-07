@@ -4,6 +4,10 @@
     Fix update_strings() copyright, comment, album and license are correctly
     written. Thanks to Todd Allen for reporting this.
 
+    * man/Makefile.am
+    Change GNU makeism to something more widely supported. Thanks to Christian
+    Weisgerber for reporting this.
+
 2010-01-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/api.html
