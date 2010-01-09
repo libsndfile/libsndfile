@@ -3,6 +3,9 @@
     * src/id3.c src/Makefile.am
     Add new file src/id3.c and hook into build.
 
+    * src/sndfile.c src/common.h
+    Detect and skip and ID3 header at the start of the file.
+
 2010-01-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/common.c

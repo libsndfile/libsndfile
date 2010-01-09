@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -2379,23 +2379,31 @@ guess_file_type (SF_PRIVATE *psf)
 	if (buffer [0] == MAKE_MARKER ('f', 'L', 'a', 'C'))
 		return SF_FORMAT_FLAC ;
 
-	/* Turtle Beach SMP 16-bit */
-	if (buffer [0] == MAKE_MARKER ('S', 'O', 'U', 'N') && buffer [1] == MAKE_MARKER ('D', ' ', 'S', 'A'))
-		return 0 ;
-
-	if (buffer [0] == MAKE_MARKER ('S', 'Y', '8', '0') || buffer [0] == MAKE_MARKER ('S', 'Y', '8', '5'))
-		return 0 ;
-
-	if (buffer [0] == MAKE_MARKER ('a', 'j', 'k', 'g'))
-		return 0 /*-SF_FORMAT_SHN-*/ ;
-
 	if (buffer [0] == MAKE_MARKER ('2', 'B', 'I', 'T'))
 		return SF_FORMAT_AVR ;
 
 	if (buffer [0] == MAKE_MARKER ('R', 'F', '6', '4') && buffer [2] == MAKE_MARKER ('W', 'A', 'V', 'E'))
 		return SF_FORMAT_RF64 ;
 
-	/* This must be the second last one. */
+	if (buffer [0] == MAKE_MARKER ('I', 'D', '3', 3))
+	{	psf_log_printf (psf, "Found 'ID3' marker.\n") ;
+		if (id3_skip (psf))
+			return guess_file_type (psf) ;
+		return 0 ;
+		} ;
+
+	/* Turtle Beach SMP 16-bit */
+	if (buffer [0] == MAKE_MARKER ('S', 'O', 'U', 'N') && buffer [1] == MAKE_MARKER ('D', ' ', 'S', 'A'))
+		return 0 ;
+
+	/* Yamaha sampler format. */
+	if (buffer [0] == MAKE_MARKER ('S', 'Y', '8', '0') || buffer [0] == MAKE_MARKER ('S', 'Y', '8', '5'))
+		return 0 ;
+
+	if (buffer [0] == MAKE_MARKER ('a', 'j', 'k', 'g'))
+		return 0 /*-SF_FORMAT_SHN-*/ ;
+
+	/* This must be the last one. */
 	if (psf->filelength > 0 && (format = try_resource_fork (psf)) != 0)
 		return format ;
 
@@ -2801,12 +2809,23 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 
 	/* For now, check whether embedding is supported. */
 	format = SF_CONTAINER (psf->sf.format) ;
-	if (psf->fileoffset > 0 &&
-			(format != SF_FORMAT_WAV) && (format != SF_FORMAT_WAVEX) &&
-			(format != SF_FORMAT_AIFF) && (format != SF_FORMAT_AU)
-			)
-	{	error = SFE_NO_EMBED_SUPPORT ;
-		goto error_exit ;
+	if (psf->fileoffset > 0)
+	{	switch (format)
+		{	case SF_FORMAT_WAV :
+			case SF_FORMAT_WAVEX :
+			case SF_FORMAT_AIFF :
+			case SF_FORMAT_AU :
+				/* Actual embedded files. */
+				break ;
+
+			case SF_FORMAT_FLAC :
+				/* Flac with an ID3v2 header? */
+				break ;
+
+			default :
+				error = SFE_NO_EMBED_SUPPORT ;
+				goto error_exit ;
+			} ;
 		} ;
 
 	if (psf->fileoffset > 0)

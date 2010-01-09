@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -847,7 +847,7 @@ typedef struct
 } AUDIO_DETECT ;
 
 int audio_detect (SF_PRIVATE * psf, AUDIO_DETECT *ad, const unsigned char * data, int datalen) ;
-
+int id3_skip (SF_PRIVATE * psf) ;
 
 /*------------------------------------------------------------------------------------
 ** Helper/debug functions.
