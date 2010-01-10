@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2009-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -71,7 +71,8 @@ main (int argc, char **argv)
 	int ch, double_split ;
 
 	if (argc != 2)
-	{	puts ("\nError : need a single input file.\n") ;
+	{	if (argc != 1)
+			puts ("\nError : need a single input file.\n") ;
 		usage_exit () ;
 		} ;
 
@@ -146,7 +147,12 @@ main (int argc, char **argv)
 static void
 usage_exit (void)
 {	puts ("\nUsage : sndfile-deinterleave <filename>\n") ;
-	puts ("Split a mutli channel file into a set of mon files.\n") ;
+	puts (
+		"Split a mutli-channel file into a set of mono files.\n"
+		"\n"
+		"If the input file is named 'a.wav', the output files will be named\n"
+		"a_00.wav, a_01.wav and so on.\n"
+		) ;
 	exit (0) ;
 } /* usage_exit */
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2009-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -72,7 +72,8 @@ main (int argc, char **argv)
 	int k, double_merge = 0 ;
 
 	if (argc < 5)
-	{	puts ("\nError : need at least 2 input files.") ;
+	{	if (argc > 1)
+			puts ("\nError : need at least 2 input files.") ;
 		usage_exit () ;
 		} ;
 
@@ -143,7 +144,7 @@ main (int argc, char **argv)
 static void
 usage_exit (void)
 {	puts ("\nUsage : sndfile-interleave <input 1> <input 2> ... -o <output file>\n") ;
-	puts ("Merge two mono files to one stereo file\n") ;
+	puts ("Merge two or more mono files into a single multi-channel file.\n") ;
 	exit (0) ;
 } /* usage_exit */
 

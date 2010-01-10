@@ -1,3 +1,8 @@
+2010-01-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/sndfile-deinterleave.c programs/sndfile-interleave.c
+    Improve usage messages.
+
 2010-01-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/id3.c src/Makefile.am
