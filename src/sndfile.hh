@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2005-2007 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2005-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -76,6 +76,8 @@ class SndfileHandle
 			SndfileHandle (const char *path, int mode = SFM_READ,
 							int format = 0, int channels = 0, int samplerate = 0) ;
 			SndfileHandle (std::string const & path, int mode = SFM_READ,
+							int format = 0, int channels = 0, int samplerate = 0) ;
+			SndfileHandle (int fd, bool close_desc, int mode = SFM_READ,
 							int format = 0, int channels = 0, int samplerate = 0) ;
 			~SndfileHandle (void) ;
 
@@ -191,6 +193,30 @@ SndfileHandle::SndfileHandle (std::string const & path, int mode, int fmt, int c
 	return ;
 } /* SndfileHandle std::string constructor */
 
+SndfileHandle::SndfileHandle (int fd, bool close_desc, int mode, int fmt, int chans, int srate)
+: p (NULL)
+{
+	if (fd < 0)
+		return ;
+
+	p = new (std::nothrow) SNDFILE_ref () ;
+
+	if (p != NULL)
+	{	p->ref = 1 ;
+
+		p->sfinfo.frames = 0 ;
+		p->sfinfo.channels = chans ;
+		p->sfinfo.format = fmt ;
+		p->sfinfo.samplerate = srate ;
+		p->sfinfo.sections = 0 ;
+		p->sfinfo.seekable = 0 ;
+
+		p->sf = sf_open_fd (fd, mode, &p->sfinfo, close_desc) ;
+		} ;
+
+	return ;
+} /* SndfileHandle fd constructor */
+
 inline
 SndfileHandle::~SndfileHandle (void)
 {	if (p != NULL && --p->ref == 0)
@@ -249,7 +275,7 @@ SndfileHandle::getString (int str_type) const
 {	return sf_get_string (p->sf, str_type) ; }
 
 inline int
-SndfileHandle::formatCheck(int fmt, int chans, int srate)
+SndfileHandle::formatCheck (int fmt, int chans, int srate)
 {
 	SF_INFO sfinfo ;
 
