@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -253,8 +253,8 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 static int
 aiff_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 {	unsigned char *blockdata ;
-	int		chan, k, diff, bytecode ;
-	short	step, stepindx, predictor, *sampledata ;
+	int		chan, k, diff, bytecode, predictor ;
+	short	step, stepindx, *sampledata ;
 
 static int count = 0 ;
 count ++ ;
@@ -306,6 +306,11 @@ count ++ ;
 			if (bytecode & 8)	diff = -diff ;
 
 			predictor += diff ;
+			if (predictor < -32768)
+				predictor = -32768 ;
+			else if (predictor > 32767)
+				predictor = 32767 ;
+
 			pima->samples [pima->channels * k + chan] = predictor ;
 			} ;
 		} ;
@@ -393,7 +398,7 @@ aiff_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 
 static int
 wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
-{	int		chan, k, current, blockindx, indx, indxstart, diff ;
+{	int		chan, k, predictor, blockindx, indx, indxstart, diff ;
 	short	step, bytecode, stepindx [2] ;
 
 	pima->blockcount ++ ;
@@ -410,9 +415,9 @@ wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 	/* Read and check the block header. */
 
 	for (chan = 0 ; chan < pima->channels ; chan++)
-	{	current = pima->block [chan*4] | (pima->block [chan*4+1] << 8) ;
-		if (current & 0x8000)
-			current -= 0x10000 ;
+	{	predictor = pima->block [chan*4] | (pima->block [chan*4+1] << 8) ;
+		if (predictor & 0x8000)
+			predictor -= 0x10000 ;
 
 		stepindx [chan] = pima->block [chan*4+2] ;
 		stepindx [chan] = clamp_ima_step_index (stepindx [chan]) ;
@@ -421,7 +426,7 @@ wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 		if (pima->block [chan*4+3] != 0)
 			psf_log_printf (psf, "IMA ADPCM synchronisation error.\n") ;
 
-		pima->samples [chan] = current ;
+		pima->samples [chan] = predictor ;
 		} ;
 
 	/*
@@ -454,7 +459,7 @@ wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 		bytecode = pima->samples [k] & 0xF ;
 
 		step = ima_step_size [stepindx [chan]] ;
-		current = pima->samples [k - pima->channels] ;
+		predictor = pima->samples [k - pima->channels] ;
 
 		diff = step >> 3 ;
 		if (bytecode & 1)
@@ -466,17 +471,17 @@ wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 		if (bytecode & 8)
 			diff = -diff ;
 
-		current += diff ;
+		predictor += diff ;
 
-		if (current > 32767)
-			current = 32767 ;
-		else if (current < -32768)
-			current = -32768 ;
+		if (predictor > 32767)
+			predictor = 32767 ;
+		else if (predictor < -32768)
+			predictor = -32768 ;
 
 		stepindx [chan] += ima_indx_adjust [bytecode] ;
 		stepindx [chan] = clamp_ima_step_index (stepindx [chan]) ;
 
-		pima->samples [k] = current ;
+		pima->samples [k] = predictor ;
 		} ;
 
 	return 1 ;
