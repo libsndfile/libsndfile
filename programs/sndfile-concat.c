@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -37,7 +37,7 @@
 
 #include	<sndfile.h>
 
-#define	 BUFFER_LEN      (1<<16)
+#define		BUFFER_LEN	(1<<16)
 
 
 static void concat_data_fp (SNDFILE *wfile, SNDFILE *rofile, int channels) ;
@@ -68,7 +68,7 @@ usage_exit (const char *argv0)
 
 int
 main (int argc, char *argv [])
-{	const char  *argv0, *outfilename ;
+{	const char	*argv0, *outfilename ;
 	SNDFILE	 	*outfile, **infiles ;
 	SF_INFO	 	sfinfo_out, sfinfo_in ;
 	void 		(*func) (SNDFILE*, SNDFILE*, int) ;
@@ -98,7 +98,7 @@ main (int argc, char *argv [])
 		} ;
 
 	sfinfo_out = sfinfo_in ;
-	
+
 	for (k = 1 ; k < argc ; k++)
 	{	if ((infiles [k] = sf_open (argv [k], SFM_READ, &sfinfo_in)) == NULL)
 		{	printf ("\nError : failed to open file '%s'.\n\n", argv [k]) ;
@@ -117,7 +117,7 @@ main (int argc, char *argv [])
 		exit (1) ;
 		} ;
 
-	if ((sfinfo_out.format & SF_FORMAT_SUBMASK) == SF_FORMAT_DOUBLE || 
+	if ((sfinfo_out.format & SF_FORMAT_SUBMASK) == SF_FORMAT_DOUBLE ||
 			(sfinfo_out.format & SF_FORMAT_SUBMASK) == SF_FORMAT_FLOAT)
 		func = concat_data_fp ;
 	else
@@ -140,7 +140,7 @@ concat_data_fp (SNDFILE *wfile, SNDFILE *rofile, int channels)
 
 	frames = BUFFER_LEN / channels ;
 	readcount = frames ;
-	
+
 	sf_seek (wfile, 0, SEEK_END) ;
 
 	while (readcount > 0)
