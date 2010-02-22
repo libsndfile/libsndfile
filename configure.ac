@@ -374,7 +374,7 @@ use_windows_api=0
 case "$host_os" in
 	darwin* | rhapsody*)
 		os_is_macosx=1
-		OS_SPECIFIC_CFLAGS="-fpascal-strings -I/Developer/Headers/FlatCarbon"
+		OS_SPECIFIC_CFLAGS="-I/Developer/Headers/FlatCarbon"
 		OS_SPECIFIC_LINKS="-framework CoreAudio"
 		;;
 	mingw*)
