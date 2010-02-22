@@ -3,6 +3,10 @@
     * configure.ac
     Remove -fpascal-strings from OSX's OS_SPECIFIC_CFLAGS.
 
+    * programs/common.[ch] programs/sndfile-metadata-set.c
+    Apply a patch from Robin Gareus allowing the setting of the time reference
+    field of the BEXT chunk.
+
 2010-02-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ima_adpcm.c

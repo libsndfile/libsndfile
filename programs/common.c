@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008 George Blood Audio
 **
 ** All rights reserved.
@@ -35,6 +35,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdint.h>
 
 #include <sndfile.h>
 
@@ -145,6 +146,14 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 	REPLACE_IF_NEW (origination_date) ;
 	REPLACE_IF_NEW (origination_time) ;
 	REPLACE_IF_NEW (umid) ;
+
+	/* Special case for Time Ref. */
+	if (info->time_ref != NULL)
+	{	uint64_t ts = atoll (info->time_ref) ;
+
+		binfo.time_reference_high = (ts >> 32) ;
+		binfo.time_reference_low = (ts & 0xffffffff) ;
+		} ;
 
 	/* Special case for coding_history because we may want to append. */
 	if (info->coding_history != NULL)

@@ -103,6 +103,7 @@ main (int argc, char *argv [])
 		HANDLE_BEXT_ARG ("--bext-orig-date", origination_date) ;
 		HANDLE_BEXT_ARG ("--bext-orig-time", origination_time) ;
 		HANDLE_BEXT_ARG ("--bext-coding-hist", coding_history) ;
+		HANDLE_BEXT_ARG ("--bext-time-ref", time_ref) ;
 
 #define HANDLE_STR_ARG(cmd,field) \
 	if (strcmp (argv [k], cmd) == 0) \
@@ -206,7 +207,8 @@ usage_exit (const char *progname, int exit_code)
 		"    --bext-umid              Set the 'bext' UMID.\n"
 		"    --bext-orig-date         Set the 'bext' origination date.\n"
 		"    --bext-orig-time         Set the 'bext' origination time.\n"
-		"    --bext-coding-hist       Set the 'bext' coding history\n"
+		"    --bext-coding-hist       Set the 'bext' coding history.\n"
+		"    --bext-time-raf          Set the 'bext' Time ref.\n"
 		"\n"
 		"    --str-title              Set the metadata title.\n"
 		"    --str-copyright          Set the metadata copyright.\n"
@@ -250,7 +252,7 @@ has_bext_fields_set (const METADATA_INFO * info)
 	if (info->description || info->originator || info->originator_reference)
 		return 1 ;
 
-	if (info->origination_date || info->origination_time || info->umid || info->coding_history)
+	if (info->origination_date || info->origination_time || info->umid || info->coding_history || info->time_ref)
 		return 1 ;
 
 	return 0 ;

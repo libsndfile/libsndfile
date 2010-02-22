@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -55,6 +55,7 @@ typedef struct
 	const char * origination_time ;
 	const char * umid ;
 	const char * coding_history ;
+	const char * time_ref ;
 } METADATA_INFO ;
 
 typedef SF_BROADCAST_INFO_VAR (2048) SF_BROADCAST_INFO_2K ;
