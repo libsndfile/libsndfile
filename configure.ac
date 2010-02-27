@@ -616,7 +616,7 @@ AC_MSG_RESULT([
 
   Configuration summary :
 
-    libsndfile cersion : .................. ${VERSION}
+    libsndfile version : .................. ${VERSION}
 
     Host CPU : ............................ ${host_cpu}
     Host Vendor : ......................... ${host_vendor}
@@ -629,11 +629,13 @@ AC_MSG_RESULT([
 
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
-	echo -e "  Tools :\n"
+	echo "  Tools :"
+	echo
 	echo "    Compiler is GCC : ..................... ${ac_cv_c_compiler_gnu}"
 	echo "    GCC version : ......................... ${GCC_VERSION}"
 	if test $GCC_MAJOR_VERSION -lt 3 ; then
-		echo -e "\n    ** This compiler version allows applications to write"
+		echo
+		echo "\n    ** This compiler version allows applications to write"
 		echo "    ** to static strings within the library."
 		echo "    ** Compile with GCC version 3.X or above to avoid this problem."
 		fi
@@ -658,8 +660,9 @@ AC_MSG_RESULT([[
 
 if test x$prefix != "x/usr" ; then
 	echo "Compiling some other packages against libsndfile may require"
-	echo -e "the addition of \"$libdir/pkgconfig\" to the"
-	echo -e "PKG_CONFIG_PATH environment variable.\n"
+	echo "the addition of '$libdir/pkgconfig' to the"
+	echo "PKG_CONFIG_PATH environment variable."
+	echo
 	fi
 
 (cd src && make genfiles)
