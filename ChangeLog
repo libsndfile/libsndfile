@@ -12,6 +12,9 @@
     * src/sndfile.c
     Fix minor issues with sf_read/write_raw(). Bug reported by Milan Křápek.
 
+    * tests/test_wrapper.sh.in
+    Add rdwr_test to the test wrapper script.
+
 2010-02-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac

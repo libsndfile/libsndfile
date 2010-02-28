@@ -63,6 +63,7 @@ if test -x test_main@EXEEXT@ ; then
 ./checksum_test@EXEEXT@
 ./scale_clip_test@EXEEXT@
 ./headerless_test@EXEEXT@
+./rdwr_test@EXEEXT@
 ./locale_test@EXEEXT@
 ./win32_ordinal_test@EXEEXT@
 ./external_libs_test@EXEEXT@
