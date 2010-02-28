@@ -9,6 +9,9 @@
     * tests/rdwr_test.(def|tpl) tests/Makefile.am
     Add new test program and hook into build.
 
+    * src/sndfile.c
+    Fix minor issues with sf_read/write_raw(). Bug reported by Milan Křápek.
+
 2010-02-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
@@ -676,7 +679,7 @@
 
     * src/wav.c
     Handle four zero bytes as a marker within a LIST or INFO chunk.
-    Thanks to Rog�rio Brito for supplying an example file.
+    Thanks to Rogério Brito for supplying an example file.
 
 2009-02-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
@@ -1237,7 +1240,7 @@
 2008-06-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c
-    Apply a fix from Axel Roebel where if the second loop in the instrument
+    Apply a fix from Axel Röbel where if the second loop in the instrument
     chunk is none, the loop mode is written into the first loop.
 
 2008-05-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
@@ -1351,7 +1354,7 @@
 2008-04-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c
-    Fix up handling of 'APPL' chunk. Thanks to Axel Roebel for bringing up
+    Fix up handling of 'APPL' chunk. Thanks to Axel Röbel for bringing up
     this issue.
 
 2008-04-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
@@ -1502,10 +1505,10 @@
     Allow use of either LGPL v2.1 or LGPL v3.
 
     * tests/header_test.tpl
-    Add header_shrink_test from Axel Roebel.
+    Add header_shrink_test from Axel Röbel.
 
     * src/wav.c
-    Add fix from Axel Roebel for writing files with float data but no peak
+    Add fix from Axel Röbel for writing files with float data but no peak
     chunk (ie peak chunk gets removed after the file is opened).
 
     * src/aiff.c tests/header_test.tpl
@@ -1962,7 +1965,7 @@
 2007-04-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/GSM610/long_term.c src/macbinary3.c tests/cpp_test.cc
-    Add patch from Andr� Pang to clean up compiles on OSX.
+    Add patch from André Pang to clean up compiles on OSX.
 
     * src/wve.c src/common.h src/sndfile.c src/sndfile.h.in
         examples/sndfile-convert.c
@@ -1975,7 +1978,7 @@
 
     * src/sndfile.hh
     Add a static SndfileHandle::formatCheck method as suggested by Jorge
-    Jim�nez.
+    Jiménez.
 
 2007-04-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
@@ -2480,7 +2483,7 @@
 
     * configure.ac
     Fix handling of --enable and --disable configure args. Thanks to Diego
-    'Flameeyes' Petten� who sent the patch.
+    'Flameeyes' Pettenò who sent the patch.
 
 2006-03-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
@@ -2651,11 +2654,11 @@
 2006-01-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * examples/sndfile-play.c
-    Fix calculation of samples remaining in win32 code. Thanks Axel Roebel.
+    Fix calculation of samples remaining in win32 code. Thanks Axel Röbel.
 
     * src/common.h
     Make sure length of header buffer can hold header plus strings. Thanks Axel
-    Roebel.
+    Röbel.
 
 2006-01-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
@@ -2869,7 +2872,7 @@
 
     * tests/locale_test.c
     Modify the way the unicode strings were encoded so that older compilers
-    do not complain. Thanks Axel Roebel.
+    do not complain. Thanks Axel Röbel.
 
     * configure.ac
     Bump the version to 1.0.12 for release.
@@ -3098,7 +3101,7 @@
     style strings (no terminating character).
 
     * src/aiff.c
-    Move to new (correct) AIFF string style. Thanks to Axel Roebel for being
+    Move to new (correct) AIFF string style. Thanks to Axel Röbel for being
     so persistent on this issue.
 
 2005-07-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
@@ -3257,7 +3260,7 @@
 2005-05-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ircam.c
-    Fix writing of IRCAM files on big endian systems (thanks to Axel Roebel).
+    Fix writing of IRCAM files on big endian systems (thanks to Axel Röbel).
 
     * src/wav.c
     Add workaround for files created by the Peak audio editor on Mac which can
@@ -3856,7 +3859,7 @@
 2004-04-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
-    Improve printout configuration summary (as suggested by Axel R�bel).
+    Improve printout configuration summary (as suggested by Axel Röbel).
 
     * doc/index.html
     Add link to pre-release location.
@@ -4130,7 +4133,7 @@
 2003-12-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/file_io.c
-    Axel Roebel pointed out that on Mac OSX a pipe is not considered a fifo
+    Axel Röbel pointed out that on Mac OSX a pipe is not considered a fifo
     (S_ISFIFO (st.st_mode) is false) but a socket (S_ISSOCK (st.st_mode) is
     true). The test has therefore been changed to is S_ISREG and anything
     which which does not return true for S_ISREG is considered a pipe.
@@ -4334,11 +4337,11 @@
 
     * src/aiff.c
     Fixed a bug where opening a file with a non-trival header in SFM_RDWR mode
-    would over-write part of the header. Thanks to Axel Roebel for pointing
+    would over-write part of the header. Thanks to Axel Röbel for pointing
     this out. Axel also provided a patch to fix this but I came up with a
     neater and more general solution.
     Return error when openning an AIFF file with data after the SSND chunk
-    (Thanks Axel Roebel).
+    (Thanks Axel Röbel).
 
     * tests/aiff_rw_test.c
     Improvements to test program which will later allow it to be generalised to
@@ -4622,28 +4625,28 @@
 
     * src/common.c src/common.h src/file_io.h
     Added is_pipe field to SF_PRIVATE and declaration of psf_is_pipe()
-    function. (Axel Roebel)
+    function. (Axel Röbel)
 
     * src/sndfile.c
-    Fixed determination of whether the file is a pipe. (Axel Roebel)
+    Fixed determination of whether the file is a pipe. (Axel Röbel)
 
     * src/paf.c
-    Force paf24 to start with undefined mode. (Axel Roebel)
+    Force paf24 to start with undefined mode. (Axel Röbel)
 
     * tests/pipe_test.c
     Mods to make this test work and actually do the test on RAW files. (Axel
-    Roebel).
+    Röbel).
 
 2003-05-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
     Fixed a potential bug where psf->sf.seekable was being set to FALSE when
     operating on stdin or stdout but then the default initialiser was reseting
-    it to TRUE. Thanks to Axel Roebel.
+    it to TRUE. Thanks to Axel Röbel.
 
     * src/aiff.c
     Fixed a bug in the header parser where it was not handling an odd length
-    COMM chunk correctly. Thanks to Axel Roebel.
+    COMM chunk correctly. Thanks to Axel Röbel.
 
     * src/test_file_io.c
     Add more tests.
@@ -7567,7 +7570,7 @@ This is the boundary between version 1 of the library above and version 0 below.
 
     * src/paf.c src/wav_gsm610.c
     Removed two printf()s which had escaped notice for some time (thanks
-    Sigbj�rn Skj�ret).
+    Sigbjørn Skjæret).
 
 2001-07-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
@@ -7887,7 +7890,7 @@ This is the boundary between version 1 of the library above and version 0 below.
 
     * src/sndfile.h
     Removed prototype of unimplemented function sf_get_info(). Added prototype
-    for sf_error_number() Thanks to Sigbj�rn Skj�ret for spotting these.
+    for sf_error_number() Thanks to Sigbjørn Skjæret for spotting these.
 
 2000-08-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
@@ -7897,8 +7900,8 @@ This is the boundary between version 1 of the library above and version 0 below.
 2000-08-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
-    Fixed a leak of FILE* pointers in sf_open_write(). Thanks to Sigbj�rn
-    Skj�ret for spotting this one.
+    Fixed a leak of FILE* pointers in sf_open_write(). Thanks to Sigbjørn
+    Skjæret for spotting this one.
 
 2000-08-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
@@ -7992,7 +7995,7 @@ This is the boundary between version 1 of the library above and version 0 below.
 
     * src/wav.c
     Fixed bug in GSM 6.10 handling for big-endian machines. Thanks
-    to Sigbj�rn Skj�ret for reporting this.
+    to Sigbjørn Skjæret for reporting this.
 
 2000-04-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
@@ -8174,7 +8177,7 @@ This is the boundary between version 1 of the library above and version 0 below.
 
     * src/aiff.c
     Fixed calculation of datalength when reading SSND chunk. Thanks to
-    Sigbj�rn Skj�ret for pointing out this error.
+    Sigbjørn Skjæret for pointing out this error.
 
 1999-07-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

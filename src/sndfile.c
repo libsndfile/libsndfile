@@ -1419,7 +1419,7 @@ sf_read_raw		(SNDFILE *sndfile, void *ptr, sf_count_t bytes)
 		return	0 ;
 		} ;
 
-	if (bytes < 0 || psf->read_current >= psf->datalength)
+	if (bytes < 0 || psf->read_current >= psf->sf.frames)
 	{	psf_memset (ptr, 0, bytes) ;
 		return 0 ;
 		} ;
@@ -1428,6 +1428,10 @@ sf_read_raw		(SNDFILE *sndfile, void *ptr, sf_count_t bytes)
 	{	psf->error = SFE_BAD_READ_ALIGN ;
 		return 0 ;
 		} ;
+
+	if (psf->last_op != SFM_READ)
+		if (psf->seek (psf, SFM_READ, psf->read_current) < 0)
+			return 0 ;
 
 	count = psf_fread (ptr, 1, bytes, psf) ;
 
@@ -1837,6 +1841,10 @@ sf_write_raw	(SNDFILE *sndfile, const void *ptr, sf_count_t len)
 		return 0 ;
 		} ;
 
+	if (psf->last_op != SFM_WRITE)
+		if (psf->seek (psf, SFM_WRITE, psf->write_current) < 0)
+			return 0 ;
+
 	if (psf->have_written == SF_FALSE && psf->write_header != NULL)
 		psf->write_header (psf, SF_FALSE) ;
 	psf->have_written = SF_TRUE ;
@@ -1845,10 +1853,13 @@ sf_write_raw	(SNDFILE *sndfile, const void *ptr, sf_count_t len)
 
 	psf->write_current += count / blockwidth ;
 
+	psf->last_op = SFM_WRITE ;
+
+	if (psf->auto_header && psf->write_header != NULL)
+		psf->write_header (psf, SF_TRUE) ;
+
 	if (psf->write_current > psf->sf.frames)
 		psf->sf.frames = psf->write_current ;
-
-	psf->last_op = SFM_WRITE ;
 
 	return count ;
 } /* sf_write_raw */
