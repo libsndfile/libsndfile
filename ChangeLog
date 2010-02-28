@@ -1,6 +1,10 @@
 2010-02-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
-    * Clean up configure report.
+    * configure.ac
+    Clean up configure report.
+
+    * tests/utils.tpl
+    Add functions test_read_raw_or_die and test_write_raw_or_die.
 
 2010-02-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
