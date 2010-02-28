@@ -15,7 +15,7 @@ noinst_PROGRAMS = sfversion floating_point_test write_read_test \
 	raw_test string_test multi_file_test dither_test \
 	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
 	locale_test largefile_test win32_ordinal_test ogg_test vorbis_test \
-	checksum_test external_libs_test $(CPP_TEST)
+	checksum_test external_libs_test rdwr_test $(CPP_TEST)
 
 noinst_HEADERS = dft_cmp.h utils.h generate.h
 
@@ -25,6 +25,7 @@ autogen_sources = write_read_test.tpl write_read_test.def	\
 					utils.tpl utils.def						\
 					scale_clip_test.tpl scale_clip_test.def	\
 					pipe_test.tpl pipe_test.def				\
+					rdwr_test.tpl rdwr_test.def				\
 					floating_point_test.tpl floating_point_test.def	\
 					benchmark.tpl benchmark.def
 
@@ -113,6 +114,9 @@ ogg_test_LDADD = $(top_builddir)/src/libsndfile.la
 vorbis_test_SOURCES = vorbis_test.c utils.c
 vorbis_test_LDADD = $(top_builddir)/src/libsndfile.la
 
+rdwr_test_SOURCES = rdwr_test.c utils.c
+rdwr_test_LDADD = $(top_builddir)/src/libsndfile.la
+
 win32_test_SOURCES = win32_test.c
 win32_test_LDADD =
 
@@ -162,6 +166,9 @@ scale_clip_test.c: scale_clip_test.def scale_clip_test.tpl
 pipe_test.c: pipe_test.def pipe_test.tpl
 	autogen --writable pipe_test.def
 
+rdwr_test.c: rdwr_test.def rdwr_test.tpl
+	autogen --writable rdwr_test.def
+
 floating_point_test.c: floating_point_test.def floating_point_test.tpl
 	autogen --writable floating_point_test.def
 
@@ -169,7 +176,8 @@ benchmark.c: benchmark.def benchmark.tpl
 	autogen --writable benchmark.def
 
 genfiles : write_read_test.c pcm_test.c header_test.c utils.c \
-		scale_clip_test.c pipe_test.c floating_point_test.c benchmark.c
+		scale_clip_test.c pipe_test.c floating_point_test.c rdwr_test.c \
+		benchmark.c
 
 #===============================================================================
 # If we're cross compiling from Linux to Windows and running the test suite

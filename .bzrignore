@@ -52,9 +52,11 @@ libsndfile-1.0.*
 libsndfile-testsuite-*
 libsndfile.spec
 libtool
+man/sndfile-deinterleave.1
 man/sndfile-metadata-set.1
 mntest.sh
 programs/sndfile-cmp
+programs/sndfile-concat
 programs/sndfile-convert
 programs/sndfile-data-trim
 programs/sndfile-deinterleave
@@ -92,11 +94,10 @@ tests/header_test.c
 tests/libsndfile-1.dll
 tests/pcm_test.c
 tests/pipe_test.c
+tests/rdwr_test.c
 tests/scale_clip_test.c
 tests/sfversion
 tests/test_wrapper.sh
 tests/utils.c
 tests/utils.h
 tests/write_read_test.c
-programs/sndfile-concat
-man/sndfile-deinterleave.1

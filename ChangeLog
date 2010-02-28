@@ -6,6 +6,9 @@
     * tests/utils.tpl
     Add functions test_read_raw_or_die and test_write_raw_or_die.
 
+    * tests/rdwr_test.(def|tpl) tests/Makefile.am
+    Add new test program and hook into build.
+
 2010-02-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
