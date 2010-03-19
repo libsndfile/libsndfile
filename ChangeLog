@@ -1,3 +1,9 @@
+2010-03-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c
+    Don't use the 'twos' marker for 24 and 32 bit PCM, use 'in24' and 'in32'
+    instead. Thanks to Paul Davis (Ardour) for this suggestion.
+
 2010-02-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -1169,34 +1169,72 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	bit_width = psf->bytewidth * 8 ;
 	comm_frames = (psf->sf.frames > 0xFFFFFFFF) ? 0xFFFFFFFF : psf->sf.frames ;
 
-	switch (SF_CODEC (psf->sf.format))
-	{	case SF_FORMAT_PCM_S8 :
+	switch (SF_CODEC (psf->sf.format) | endian)
+	{	case SF_FORMAT_PCM_S8 | SF_ENDIAN_BIG :
+			psf->endian = SF_ENDIAN_BIG ;
+			comm_type = AIFC_MARKER ;
+			comm_size = SIZEOF_AIFC_COMM ;
+			comm_encoding = twos_MARKER ;
+			break ;
+
+		case SF_FORMAT_PCM_S8 | SF_ENDIAN_LITTLE :
+			psf->endian = SF_ENDIAN_LITTLE ;
+			comm_type = AIFC_MARKER ;
+			comm_size = SIZEOF_AIFC_COMM ;
+			comm_encoding = sowt_MARKER ;
+			break ;
+
+		case SF_FORMAT_PCM_16 | SF_ENDIAN_BIG :
+			psf->endian = SF_ENDIAN_BIG ;
+			comm_type = AIFC_MARKER ;
+			comm_size = SIZEOF_AIFC_COMM ;
+			comm_encoding = twos_MARKER ;
+			break ;
+
+		case SF_FORMAT_PCM_16 | SF_ENDIAN_LITTLE :
+			psf->endian = SF_ENDIAN_LITTLE ;
+			comm_type = AIFC_MARKER ;
+			comm_size = SIZEOF_AIFC_COMM ;
+			comm_encoding = sowt_MARKER ;
+			break ;
+
+		case SF_FORMAT_PCM_24 | SF_ENDIAN_BIG :
+			psf->endian = SF_ENDIAN_BIG ;
+			comm_type = AIFC_MARKER ;
+			comm_size = SIZEOF_AIFC_COMM ;
+			comm_encoding = in24_MARKER ;
+			break ;
+
+		case SF_FORMAT_PCM_24 | SF_ENDIAN_LITTLE :
+			psf->endian = SF_ENDIAN_LITTLE ;
+			comm_type = AIFC_MARKER ;
+			comm_size = SIZEOF_AIFC_COMM ;
+			comm_encoding = ni24_MARKER ;
+			break ;
+
+		case SF_FORMAT_PCM_32 | SF_ENDIAN_BIG :
+			psf->endian = SF_ENDIAN_BIG ;
+			comm_type = AIFC_MARKER ;
+			comm_size = SIZEOF_AIFC_COMM ;
+			comm_encoding = in32_MARKER ;
+			break ;
+
+		case SF_FORMAT_PCM_32 | SF_ENDIAN_LITTLE :
+			psf->endian = SF_ENDIAN_LITTLE ;
+			comm_type = AIFC_MARKER ;
+			comm_size = SIZEOF_AIFC_COMM ;
+			comm_encoding = ni32_MARKER ;
+			break ;
+
+		case SF_FORMAT_PCM_S8 :			/* SF_ENDIAN_FILE */
 		case SF_FORMAT_PCM_16 :
 		case SF_FORMAT_PCM_24 :
 		case SF_FORMAT_PCM_32 :
-				switch (endian)
-				{	case SF_ENDIAN_BIG :
-							psf->endian = SF_ENDIAN_BIG ;
-							comm_type = AIFC_MARKER ;
-							comm_size = SIZEOF_AIFC_COMM ;
-							comm_encoding = twos_MARKER ;
-							break ;
-
-					case SF_ENDIAN_LITTLE :
-							psf->endian = SF_ENDIAN_LITTLE ;
-							comm_type = AIFC_MARKER ;
-							comm_size = SIZEOF_AIFC_COMM ;
-							comm_encoding = sowt_MARKER ;
-							break ;
-
-					default : /* SF_ENDIAN_FILE */
-							psf->endian = SF_ENDIAN_BIG ;
-							comm_type = AIFF_MARKER ;
-							comm_size = SIZEOF_AIFF_COMM ;
-							comm_encoding = 0 ;
-							break ;
-					} ;
-				break ;
+			psf->endian = SF_ENDIAN_BIG ;
+			comm_type = AIFF_MARKER ;
+			comm_size = SIZEOF_AIFF_COMM ;
+			comm_encoding = 0 ;
+			break ;
 
 		case SF_FORMAT_FLOAT :					/* Big endian floating point. */
 				psf->endian = SF_ENDIAN_BIG ;
