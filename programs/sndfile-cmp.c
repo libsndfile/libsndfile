@@ -1,5 +1,6 @@
 /*
-** Copyright (C) 2008-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008 Conrad Parker <conrad@metadecks.org>
+** Copyright (C) 2008-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -30,27 +31,28 @@
 ** ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* sndfile-cmp.c
- * Conrad Parker 2008
- */
-
-
 #include "sfconfig.h"
 
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include <sndfile.h>
 
 /* Length of comparison data buffers in units of items */
 #define BUFLEN 65536
 
-static char * progname ;
-static char * filename1, * filename2 ;
+static char * progname = NULL ;
+static char * filename1 = NULL, * filename2 = NULL ;
 
 static int
-comparison_error (const char * what)
-{	printf ("%s: %s of files %s and %s differ\n", progname, what, filename1, filename2) ;
+comparison_error (const char * what, sf_count_t frame_offset)
+{	char buffer [128] = "" ;
+
+	if (frame_offset >= 0)
+		snprintf (buffer, sizeof (buffer), " (at frame offset %" PRId64 ")", frame_offset) ;
+
+	printf ("%s: %s of files %s and %s differ%s.\n", progname, what, filename1, filename2, buffer) ;
 	return 1 ;
 } /* comparison_error */
 
@@ -60,7 +62,7 @@ compare (void)
 	double buf1 [BUFLEN], buf2 [BUFLEN] ;
 	SF_INFO sfinfo1, sfinfo2 ;
 	SNDFILE * sf1 = NULL, * sf2 = NULL ;
-	sf_count_t len, i, nread1, nread2 ;
+	sf_count_t items, i, nread1, nread2, offset = 0 ;
 	int retval = 0 ;
 
 	memset (&sfinfo1, 0, sizeof (SF_INFO)) ;
@@ -80,34 +82,35 @@ compare (void)
 		} ;
 
 	if (sfinfo1.samplerate != sfinfo2.samplerate)
-	{	retval = comparison_error ("Samplerates") ;
+	{	retval = comparison_error ("Samplerates", -1) ;
 		goto out ;
 		} ;
 
 	if (sfinfo1.channels != sfinfo2.channels)
-	{	retval = comparison_error ("Number of channels") ;
+	{	retval = comparison_error ("Number of channels", -1) ;
 		goto out ;
 		} ;
 
 	/* Calculate the framecount that will fit in our data buffers */
-	len = BUFLEN / sfinfo1.channels ;
+	items = BUFLEN / sfinfo1.channels ;
 
-	while ( (nread1 = sf_readf_double (sf1, buf1, len)) > 0)
+	while ( (nread1 = sf_readf_double (sf1, buf1, items)) > 0)
 	{	nread2 = sf_readf_double (sf2, buf2, nread1) ;
 		if (nread2 != nread1)
-		{	retval = comparison_error ("PCM data lengths") ;
+		{	retval = comparison_error ("PCM data lengths", -1) ;
 			goto out ;
 			} ;
-		for (i = 0 ; i < nread1 ; i++)
+		for (i = 0 ; i < nread1 * sfinfo1.channels ; i++)
 		{	if (buf1 [i] != buf2 [i])
-			{	retval = comparison_error ("PCM data") ;
+			{	retval = comparison_error ("PCM data", offset + i / sfinfo1.channels) ;
 				goto out ;
 				} ;
 			} ;
+		offset += nread1 ;
 		} ;
 
 	if ( (nread2 = sf_readf_double (sf2, buf2, nread1)) != 0)
-	{	retval = comparison_error ("PCM data lengths") ;
+	{	retval = comparison_error ("PCM data lengths", -1) ;
 		goto out ;
 		} ;
 
