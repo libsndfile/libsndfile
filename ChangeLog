@@ -1,6 +1,11 @@
+2010-04-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/sndfile-convert.c
+    Fix valgrind warning.
+
 2010-04-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
-    * programs/sndfile.c
+    * programs/sndfile-cmp.c
     When files differ in the PCM data, also print the difference offset.
     Minor cleanup.
 

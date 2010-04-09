@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -197,6 +197,8 @@ main (int argc, char * argv [])
 		printf ("Error : Not able to decode argunment '%s'.\n", argv [k]) ;
 		exit (1) ;
 		} ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	if ((infile = sf_open (infilename, SFM_READ, &sfinfo)) == NULL)
 	{	printf ("Not able to open input file %s.\n", infilename) ;
