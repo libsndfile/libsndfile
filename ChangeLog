@@ -1,3 +1,9 @@
+2010-04-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/sndfile-salvage.c programs/Makefile.am
+    New program to salvage the audio data from WAV/WAVEX/AIFF files which are
+    greater than 4Gig in size.
+
 2010-04-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-convert.c

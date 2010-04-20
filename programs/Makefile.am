@@ -2,7 +2,7 @@
 
 bin_PROGRAMS = sndfile-info sndfile-play sndfile-convert sndfile-cmp \
 				sndfile-metadata-set sndfile-metadata-get sndfile-interleave \
-				sndfile-deinterleave sndfile-concat
+				sndfile-deinterleave sndfile-concat sndfile-salvage
 
 OS_SPECIFIC_CFLAGS = @OS_SPECIFIC_CFLAGS@
 OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
@@ -39,4 +39,7 @@ sndfile_deinterleave_LDADD = $(top_builddir)/src/libsndfile.la
 
 sndfile_concat_SOURCES = sndfile-concat.c
 sndfile_concat_LDADD = $(top_builddir)/src/libsndfile.la
+
+sndfile_salvage_SOURCES = sndfile-salvage.c
+sndfile_salvage_LDADD = $(top_builddir)/src/libsndfile.la
 

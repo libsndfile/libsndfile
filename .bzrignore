@@ -66,6 +66,7 @@ programs/sndfile-jackplay
 programs/sndfile-metadata-get
 programs/sndfile-metadata-set
 programs/sndfile-play
+programs/sndfile-salvage
 regtest/sndfile-regtest
 rf64-test.sh
 save
