@@ -602,7 +602,8 @@ AC_CONFIG_FILES([ \
 	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile \
 	programs/Makefile doc/libsndfile.css \
 	Makefile libsndfile.spec sndfile.pc \
-	tests/test_wrapper.sh build-test-tarball.mk \
+	tests/test_wrapper.sh tests/pedantic-header-test.sh \
+	build-test-tarball.mk \
 	])
 AC_OUTPUT
 

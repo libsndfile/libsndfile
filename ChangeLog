@@ -4,6 +4,9 @@
     New file to test whether sndfile.h can be compiled with gcc's -pedantic
     flag.
 
+    * configure.ac tests/test_wrapper.sh.in
+    Hook pedantic-header-test into test suite.
+
 2010-04-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-salvage.c programs/Makefile.am

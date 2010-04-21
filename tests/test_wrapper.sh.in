@@ -35,6 +35,9 @@ set -e
 # Generic-tests
 uname -a
 
+# Check the header file.
+sh pedantic-header-test.sh
+
 # Need this for when we're running from files collected into the
 # libsndfile-testsuite-@PACKAGE_VERSION@ tarball.
 if test -x test_main@EXEEXT@ ; then
