@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,15 +16,9 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include "sfconfig.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#if HAVE_UNISTD_H
-#include <unistd.h>
-#endif
 
 #include <sndfile.h>
 
