@@ -1,0 +1,22 @@
+#!/bin/bash
+
+echo -n "    Pedantic header test                     : "
+
+# Only do this if the compiler is GCC.
+if test -n "@GCC_MAJOR_VERSION@" ; then
+
+	# Compile with -Werror and -pedantic.
+	@ac_ct_CC@ -Werror -pedantic -I@top_srcdir@/src -c sfversion.c -o /dev/null
+
+	# Check compiler return status.
+	if test $? -ne 0 ; then
+		echo
+		exit 1
+		fi
+
+	echo "ok"
+else
+	echo "n/a"
+	fi
+
+exit 0

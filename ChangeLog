@@ -1,3 +1,9 @@
+2010-04-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/pedantic-header-test.sh.in
+    New file to test whether sndfile.h can be compiled with gcc's -pedantic
+    flag.
+
 2010-04-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-salvage.c programs/Makefile.am
