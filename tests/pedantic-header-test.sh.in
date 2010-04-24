@@ -36,8 +36,9 @@ echo -n "    Pedantic header test                     : "
 # Only do this if the compiler is GCC.
 if test -n "@GCC_MAJOR_VERSION@" ; then
 
+	CC=`echo "@CC@" | sed "s/.* //"`
 	# Compile with -Werror and -pedantic.
-	@CC@ -std=c99 -Werror -pedantic -I@top_srcdir@/src -c @top_srcdir@/tests/sfversion.c -o /dev/null
+	$CC -std=c99 -Werror -pedantic -I@top_builddir@/src -c @top_srcdir@/tests/sfversion.c -o /dev/null
 
 	# Check compiler return status.
 	if test $? -ne 0 ; then
