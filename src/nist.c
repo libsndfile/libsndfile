@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -201,7 +201,14 @@ nist_read_header (SF_PRIVATE *psf)
 			psf_log_printf (psf, "Weird sample_byte_format : strlen '%s' != %d\n", str, bytes) ;
 
 		if (bytes > 1)
-		{	if (strcmp (str, "01") == 0)
+		{	if (psf->bytewidth == 0)
+				psf->bytewidth = bytes ;
+			else if (psf->bytewidth - bytes != 0)
+			{	psf_log_printf (psf, "psf->bytewidth (%d) != bytes (%d)\n", psf->bytewidth, bytes) ;
+				return SFE_NIST_BAD_ENCODING ;
+				} ;
+
+			if (strcmp (str, "01") == 0)
 				psf->endian = SF_ENDIAN_LITTLE ;
 			else if (strcmp (str, "10") == 0)
 				psf->endian = SF_ENDIAN_BIG ;
