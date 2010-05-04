@@ -259,6 +259,11 @@ On fail, the sf_open function returns a NULL pointer.
 </PRE>
 
 <P>
+<b>Note:</b> On Microsoft Windows, this function does not work if the
+application and the libsndfile DLL are linked to different versions of the
+Microsoft C runtime DLL.
+</P>
+<P>
 The second open function takes a file descriptor of a file that has already been
 opened.
 Care should be taken to ensure that the mode of the file represented by the

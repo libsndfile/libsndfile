@@ -3,6 +3,11 @@
     * src/nist.c
     Fix a regression reported by Hugh Secker-Walker.
 
+    * src/api.html
+    Add comment about sf_open_fd() not working on Windows if the application
+    and the libsndfile DLL are linked to different versions of the Microsoft
+    C runtime DLL.
+
 2010-04-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/pedantic-header-test.sh.in
