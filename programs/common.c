@@ -247,8 +247,6 @@ sfe_apply_metadata_changes (const char * filenames [2], const METADATA_INFO * in
 		goto cleanup_exit ;
 		} ;
 
-	update_strings (outfile, info) ;
-
 	if (infile != outfile)
 	{	int infileminor = SF_FORMAT_SUBMASK & sfinfo.format ;
 
@@ -258,6 +256,8 @@ sfe_apply_metadata_changes (const char * filenames [2], const METADATA_INFO * in
 		else
 			sfe_copy_data_int (outfile, infile, sfinfo.channels) ;
 		} ;
+
+	update_strings (outfile, info) ;
 
 cleanup_exit :
 

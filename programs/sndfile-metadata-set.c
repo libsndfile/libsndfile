@@ -113,6 +113,7 @@ main (int argc, char *argv [])
 		continue ; \
 		} ;
 
+		HANDLE_STR_ARG ("--str-comment", comment) ;
 		HANDLE_STR_ARG ("--str-title", title) ;
 		HANDLE_STR_ARG ("--str-copyright", copyright) ;
 		HANDLE_STR_ARG ("--str-artist", artist) ;
@@ -210,6 +211,7 @@ usage_exit (const char *progname, int exit_code)
 		"    --bext-coding-hist       Set the 'bext' coding history.\n"
 		"    --bext-time-raf          Set the 'bext' Time ref.\n"
 		"\n"
+		"    --str-comment            Set the metadata comment.\n"
 		"    --str-title              Set the metadata title.\n"
 		"    --str-copyright          Set the metadata copyright.\n"
 		"    --str-artist             Set the metadata artist.\n"
