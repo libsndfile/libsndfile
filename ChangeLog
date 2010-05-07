@@ -1,3 +1,8 @@
+2010-05-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    When compiling with x86_64-w64-mingw32-gcc link with -static-libgcc flags.
+
 2010-05-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/nist.c

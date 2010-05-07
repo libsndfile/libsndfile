@@ -569,6 +569,10 @@ if test x"$CFLAGS" = x ; then
 
 HOST_TRIPLET="${host_cpu}-${host_vendor}-${host_os}"
 
+if test "$HOST_TRIPLET" = "x86_64-w64-mingw32" ; then
+	OS_SPECIFIC_LINKS=" -static-libgcc $OS_SPECIFIC_LINKS"
+	fi
+
 #-------------------------------------------------------------------------------
 
 AC_SUBST(HOST_TRIPLET)
