@@ -303,6 +303,9 @@ SNDFILE*
 sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 {	SF_PRIVATE 	*psf ;
 
+	/* Ultimate sanity check. */
+	SF_ASSERT (sizeof (sf_count_t) == 8) ;
+
 	if ((psf = calloc (1, sizeof (SF_PRIVATE))) == NULL)
 	{	sf_errno = SFE_MALLOC_FAILED ;
 		return	NULL ;
