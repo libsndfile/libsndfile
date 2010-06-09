@@ -6,6 +6,9 @@
     * src/sndfile.c
     Use SF_ASSERT to ensure sizeof (sf_count_t) == 8.
 
+    * src/svx.c
+    Add support for reading and writing stereo SVX files.
+
 2010-05-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac

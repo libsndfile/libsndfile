@@ -644,16 +644,14 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_SVX :
-				/* SVX currently does not support more than one channel for write.
-				** Read will allow more than one channel but only allow one here.
-				*/
-				if (info->channels != 1)
+				/* SVX only supports mono and stereo. */
+				if (info->channels > 2)
 					return 0 ;
 				/* Always big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
 					return 0 ;
 
-				if ((subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16) && info->channels == 1)
+				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
 					return 1 ;
 				break ;
 

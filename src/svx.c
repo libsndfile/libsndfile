@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -140,7 +140,7 @@ svx_read_header	(SF_PRIVATE *psf)
 	memset (&vhdr, 0, sizeof (vhdr)) ;
 	psf_binheader_readf (psf, "p", 0) ;
 
-	/* Set default number of channels. Currently can't handle stereo SVX files. */
+	/* Set default number of channels. Modify later if necessary */
 	psf->sf.channels = 1 ;
 
 	psf->sf.format = SF_FORMAT_SVX ;
@@ -283,9 +283,15 @@ svx_read_header	(SF_PRIVATE *psf)
 					psf_log_printf (psf, " %M : %d\n", marker, dword) ;
 
 					bytecount += psf_binheader_readf (psf, "E4", &channels) ;
-					psf->sf.channels = channels ;
 
-					psf_log_printf (psf, "  Channels : %d\n", channels) ;
+					if (channels == 2 || channels == 4)
+						psf_log_printf (psf, "  Channels : %d => mono\n", channels) ;
+					else if (channels == 6)
+					{	psf->sf.channels = 2 ;
+						psf_log_printf (psf, "  Channels : %d => stereo\n", channels) ;
+						}
+					else
+						psf_log_printf (psf, "  Channels : %d *** assuming mono\n", channels) ;
 
 					psf_binheader_readf (psf, "j", dword - bytecount) ;
 					break ;
@@ -384,6 +390,9 @@ svx_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_binheader_writef (psf, "E211", psf->sf.samplerate, 1, 0) ;
 	/* VHDR : volume */
 	psf_binheader_writef (psf, "E4", (psf->bytewidth == 1) ? 0xFF : 0xFFFF) ;
+
+	if (psf->sf.channels == 2)
+		psf_binheader_writef (psf, "Em44", CHAN_MARKER, 4, 6) ;
 
 	/* Filename and annotation strings. */
 	psf_binheader_writef (psf, "Emsms", NAME_MARKER, psf->file.name.c, ANNO_MARKER, annotation) ;
