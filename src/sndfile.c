@@ -644,8 +644,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_SVX :
-				/* SVX only supports mono and stereo. */
-				if (info->channels > 2)
+				/* SVX only supports writing mono SVX files. */
+				if (info->channels > 1)
 					return 0 ;
 				/* Always big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
