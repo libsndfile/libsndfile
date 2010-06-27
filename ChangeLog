@@ -1,3 +1,14 @@
+2010-06-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    Only support writing mono SVX files. Multichannel SVX files are not
+    interleaved and there is no support infrastructure to cache and write
+	multiple channels to create a non-interleaved file.
+
+    * src/file_io.c
+    Don't call close() on a file descriptor of -1. Thanks to Jeremy Friesner
+    for the bug report.
+
 2010-06-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h

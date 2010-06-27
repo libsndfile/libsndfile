@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2003 Ross Bencina <rbencina@iprimus.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -214,9 +214,7 @@ psf_get_filelen (SF_PRIVATE *psf)
 
 int
 psf_close_rsrc (SF_PRIVATE *psf)
-{
-	if (psf->rsrc.filedes >= 0)
-		psf_close_fd (psf->rsrc.filedes) ;
+{	psf_close_fd (psf->rsrc.filedes) ;
 	psf->rsrc.filedes = -1 ;
 	return 0 ;
 } /* psf_close_rsrc */
@@ -419,6 +417,9 @@ psf_ftell (SF_PRIVATE *psf)
 static int
 psf_close_fd (int fd)
 {	int retval ;
+
+	if (fd < 0)
+		return 0 ;
 
 	while ((retval = close (fd)) == -1 && errno == EINTR)
 		/* Do nothing. */ ;
@@ -835,9 +836,7 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 
 /* USE_WINDOWS_API */ int
 psf_close_rsrc (SF_PRIVATE *psf)
-{
-	if (psf->rsrc.handle != NULL)
-		psf_close_handle (psf->rsrc.handle) ;
+{	psf_close_handle (psf->rsrc.handle) ;
 	psf->rsrc.handle = NULL ;
 	return 0 ;
 } /* psf_close_rsrc */
@@ -1051,7 +1050,10 @@ psf_ftell (SF_PRIVATE *psf)
 
 /* USE_WINDOWS_API */ static int
 psf_close_handle (HANDLE handle)
-{	if (CloseHandle (handle) == 0)
+{	if (handle == NULL)
+		return 0 ;
+
+	if (CloseHandle (handle) == 0)
 		return -1 ;
 
 	return 0 ;
