@@ -1,3 +1,9 @@
+2010-08-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/flac.c
+    When the file meta data says the file has zero frames set psf->sf.frames
+    to SF_COUNT_MAX. Fixes Debian bug #590752.
+
 2010-06-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
@@ -255,18 +261,18 @@
     Minor corrections.
 
 2009-11-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
- 
+
     * sndfile.pc.in
     Add a Libs.private entry to assist with static linking.
 
 2009-11-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
- 
+
     * src/make-static-lib-hidden-privates.sh src/Makefile.am
     Add a script to hide all non-public symbols in the libsndfile.a static
     library.
 
 2009-11-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
- 
+
     * tests/locale_test.c
     Correct usage of ENABLE_SNDFILE_WINDOWS_PROTOTYPES.
 
@@ -374,7 +380,7 @@
 
     * tests/locale_test.c
     Add a wchar_test() to test sf_wchar_open().
- 
+
 2009-09-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/*.c

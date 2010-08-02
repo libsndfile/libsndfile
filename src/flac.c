@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Tobias Gehrig <tgehrig@ira.uka.de>
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -405,7 +405,14 @@ sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC_
 			psf->sf.samplerate = metadata->data.stream_info.sample_rate ;
 			psf->sf.frames = metadata->data.stream_info.total_samples ;
 
-			psf_log_printf (psf, "FLAC Stream Metadata\n  Channels    : %d\n  Sample rate : %d\n  Frames      : %D\n", psf->sf.channels, psf->sf.samplerate, psf->sf.frames) ;
+			psf_log_printf (psf, "FLAC Stream Metadata\n  Channels    : %d\n  Sample rate : %d\n", psf->sf.channels, psf->sf.samplerate) ;
+
+			if (psf->sf.frames == 0)
+			{	psf_log_printf (psf, "  Frames      : 0 (bumping to SF_COUNT_MAX)\n") ;
+				psf->sf.frames = SF_COUNT_MAX ;
+				}
+			else
+				psf_log_printf (psf, "  Frames      : %D\n", psf->sf.frames) ;
 
 			switch (metadata->data.stream_info.bits_per_sample)
 			{	case 8 :
