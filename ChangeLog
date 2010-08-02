@@ -4,6 +4,9 @@
     When the file meta data says the file has zero frames set psf->sf.frames
     to SF_COUNT_MAX. Fixes Debian bug #590752.
 
+    * programs/sndfile-info.c
+    Print 'unknown' if frame count == SF_COUNT_MAX.
+
 2010-06-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c

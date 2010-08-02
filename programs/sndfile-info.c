@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -256,7 +256,12 @@ info_dump (const char *filename)
 	printf ("----------------------------------------\n") ;
 
 	printf ("Sample Rate : %d\n", sfinfo.samplerate) ;
-	printf ("Frames      : %" PRId64 "\n", sfinfo.frames) ;
+
+	if (sfinfo.frames == SF_COUNT_MAX)
+		printf ("Frames      : unknown\n") ;
+	else
+		printf ("Frames      : %" PRId64 "\n", sfinfo.frames) ;
+
 	printf ("Channels    : %d\n", sfinfo.channels) ;
 	printf ("Format      : 0x%08X\n", sfinfo.format) ;
 	printf ("Sections    : %d\n", sfinfo.sections) ;
