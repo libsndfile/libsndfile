@@ -1,3 +1,8 @@
+2010-08-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h
+    Move code around to make comments make sense.
+
 2010-08-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/flac.c

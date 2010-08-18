@@ -226,6 +226,17 @@ make_size_t (int x)
 {	return (size_t) x ;
 } /* size_t_of_int */
 
+typedef struct
+{	int size ;
+	SF_BROADCAST_INFO binfo ;
+} PSF_BROADCAST_VAR ;
+
+#if SIZEOF_WCHAR_T == 2
+typedef wchar_t	sfwchar_t ;
+#else
+typedef int16_t sfwchar_t ;
+#endif
+
 /*
 **	This version of isprint specifically ignores any locale info. Its used for
 **	determining which characters can be printed in things like hexdumps.
@@ -240,19 +251,6 @@ psf_isprint (int ch)
 **	sf_open_XXXX functions. The caller however has no knowledge of the struct's
 **	contents.
 */
-
-
-typedef struct
-{	int size ;
-	SF_BROADCAST_INFO binfo ;
-} PSF_BROADCAST_VAR ;
-
-#if SIZEOF_WCHAR_T == 2
-typedef wchar_t	sfwchar_t ;
-#else
-typedef int16_t sfwchar_t ;
-#endif
-
 
 typedef struct
 {
