@@ -1,6 +1,6 @@
 /*
 ** Copyright (C) 2006 Paul Davis <paul@linuxaudiosystems.com>
-** Copyright (C) 2006-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2006-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -53,10 +53,23 @@ broadcast_var_alloc (size_t datasize)
 } /* broadcast_var_alloc */
 
 
+#define	DEBUG_CHS	0
+
+static size_t
+var_coding_history_size (const PSF_BROADCAST_VAR *pvar)
+{
+#if DEBUG_CHS
+	printf ("size %d   offsetof (binfo) %zu     offsetof(coding_history) %zu\n",
+			pvar->size, offsetof (PSF_BROADCAST_VAR, binfo), offsetof (SF_BROADCAST_INFO, coding_history)) ;
+#endif
+	return pvar->size - offsetof (PSF_BROADCAST_VAR, binfo) - offsetof (SF_BROADCAST_INFO, coding_history) ;
+} /* var_coding_history_size */
+
+
 int
 broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datasize)
 {	char added_history [256] ;
-	int added_history_len, len ;
+	size_t added_history_len, len ;
 
 	if (info == NULL)
 		return SF_FALSE ;
@@ -78,16 +91,24 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 		} ;
 
 	if (psf->broadcast_var == NULL)
-	{	int size = datasize + added_history_len + 512 ;
+	{	size_t size = datasize + added_history_len + 512 ;
 
 		psf->broadcast_var = calloc (1, size) ;
 		psf->broadcast_var->size = size ;
 		} ;
 
+	if (DEBUG_CHS)
+		printf ("sizeof (coding_history) %zu   realsize %zu\n", sizeof (psf->broadcast_var->binfo.coding_history), var_coding_history_size (psf->broadcast_var)) ;
+
 	memcpy (&(psf->broadcast_var->binfo), info, offsetof (SF_BROADCAST_INFO, coding_history)) ;
 
 	strncpy_crlf (psf->broadcast_var->binfo.coding_history, info->coding_history, bc_var_coding_hist_size (psf->broadcast_var), info->coding_history_size) ;
 	len = strlen (psf->broadcast_var->binfo.coding_history) ;
+
+	if (DEBUG_CHS)
+	{	printf ("len %zu    sizeof %zu\n", len, sizeof (psf->broadcast_var->binfo.coding_history)) ;
+		SF_ASSERT (len < var_coding_history_size (psf->broadcast_var)) ;
+		} ;
 
 	if (len > 0 && psf->broadcast_var->binfo.coding_history [len] != '\n')
 		strncat (psf->broadcast_var->binfo.coding_history, "\r\n", 2) ;
@@ -97,7 +118,7 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 
 	psf->broadcast_var->binfo.coding_history_size = strlen (psf->broadcast_var->binfo.coding_history) ;
 
-	/* Fore coding_history_size to be even. */
+	/* Force coding_history_size to be even. */
 	psf->broadcast_var->binfo.coding_history_size += (psf->broadcast_var->binfo.coding_history_size & 1) ? 1 : 0 ;
 
 	/* Currently writing this version. */
@@ -119,7 +140,7 @@ broadcast_var_get (SF_PRIVATE *psf, SF_BROADCAST_INFO * data, size_t datasize)
 	memcpy (data, &(psf->broadcast_var->binfo), size) ;
 
 	return SF_TRUE ;
-} /* broadcast_var_set */
+} /* broadcast_var_get */
 
 /*------------------------------------------------------------------------------
 **	Strncpy which converts all line endings to CR/LF.
