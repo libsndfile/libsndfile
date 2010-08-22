@@ -663,6 +663,7 @@ void	psf_log_SF_INFO 	(SF_PRIVATE *psf) ;
 int32_t	psf_rand_int32 (void) ;
 
 void append_snprintf (char * dest, size_t maxlen, const char * fmt, ...) ;
+void psf_strncpy_crlf (char *dest, const char *src, size_t destmax, size_t srcmax) ;
 
 /* Functions used when writing file headers. */
 

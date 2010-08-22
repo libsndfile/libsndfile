@@ -1,3 +1,9 @@
+2010-08-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/broadcast.c src/common.(c|h)
+    Move function strncpy_crlf() to src/common.c so the function can be tested
+    in isolation.
+
 2010-08-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h

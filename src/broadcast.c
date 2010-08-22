@@ -25,7 +25,10 @@
 
 #include "common.h"
 
-static void strncpy_crlf (char *dest, const char *src, size_t destmax, size_t srcmax) ;
+#define CODE_HIST_OFFSET	offsetof (SF_BROADCAST_INFO, coding_history)
+
+#define	DEBUG_CHS	0
+
 static int gen_coding_history (char * added_history, int added_history_max, const SF_INFO * psfinfo) ;
 
 static inline size_t
@@ -34,7 +37,7 @@ bc_min_size (const SF_BROADCAST_INFO* info)
 		return 0 ;
 
 	return offsetof (SF_BROADCAST_INFO, coding_history) + info->coding_history_size ;
-} /* broadcast_size */
+} /* bc_min_size */
 
 
 static inline size_t
@@ -52,8 +55,6 @@ broadcast_var_alloc (size_t datasize)
 	return data ;
 } /* broadcast_var_alloc */
 
-
-#define	DEBUG_CHS	0
 
 static size_t
 var_coding_history_size (const PSF_BROADCAST_VAR *pvar)
@@ -79,15 +80,14 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 		return SF_FALSE ;
 		} ;
 
+	if (DEBUG_CHS) puts ("\n") ;
+
 	added_history_len = gen_coding_history (added_history, sizeof (added_history), &(psf->sf)) ;
 
-	if (psf->broadcast_var != NULL)
-	{	size_t coding_hist_offset = offsetof (SF_BROADCAST_INFO, coding_history) ;
-
-		if (psf->broadcast_var->binfo.coding_history_size + added_history_len < datasize - coding_hist_offset)
-		{	free (psf->broadcast_var) ;
-			psf->broadcast_var = NULL ;
-			} ;
+	if (psf->broadcast_var != NULL
+		&& psf->broadcast_var->binfo.coding_history_size + added_history_len < datasize - CODE_HIST_OFFSET)
+	{	free (psf->broadcast_var) ;
+		psf->broadcast_var = NULL ;
 		} ;
 
 	if (psf->broadcast_var == NULL)
@@ -102,7 +102,7 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 
 	memcpy (&(psf->broadcast_var->binfo), info, offsetof (SF_BROADCAST_INFO, coding_history)) ;
 
-	strncpy_crlf (psf->broadcast_var->binfo.coding_history, info->coding_history, bc_var_coding_hist_size (psf->broadcast_var), info->coding_history_size) ;
+	psf_strncpy_crlf (psf->broadcast_var->binfo.coding_history, info->coding_history, bc_var_coding_hist_size (psf->broadcast_var), info->coding_history_size) ;
 	len = strlen (psf->broadcast_var->binfo.coding_history) ;
 
 	if (DEBUG_CHS)
@@ -143,42 +143,7 @@ broadcast_var_get (SF_PRIVATE *psf, SF_BROADCAST_INFO * data, size_t datasize)
 } /* broadcast_var_get */
 
 /*------------------------------------------------------------------------------
-**	Strncpy which converts all line endings to CR/LF.
 */
-
-static void
-strncpy_crlf (char *dest, const char *src, size_t destmax, size_t srcmax)
-{	char * destend = dest + destmax - 1 ;
-	const char * srcend = src + srcmax ;
-
-	while (dest < destend && src < srcend)
-	{	if ((src [0] == '\r' && src [1] == '\n') || (src [0] == '\n' && src [1] == '\r'))
-		{	*dest++ = '\r' ;
-			*dest++ = '\n' ;
-			src += 2 ;
-			continue ;
-			} ;
-
-		if (src [0] == '\r')
-		{	*dest++ = '\r' ;
-			*dest++ = '\n' ;
-			src += 1 ;
-			continue ;
-			} ;
-
-		if (src [0] == '\n')
-		{	*dest++ = '\r' ;
-			*dest++ = '\n' ;
-			src += 1 ;
-			continue ;
-			} ;
-
-		*dest++ = *src++ ;
-		} ;
-
-	/* Make sure dest is terminated. */
-	*dest = 0 ;
-} /* strncpy_crlf */
 
 static int
 gen_coding_history (char * added_history, int added_history_max, const SF_INFO * psfinfo)

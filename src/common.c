@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -1328,6 +1328,42 @@ append_snprintf (char * dest, size_t maxlen, const char * fmt, ...)
 
 	return ;
 } /* append_snprintf */
+
+
+void
+psf_strncpy_crlf (char *dest, const char *src, size_t destmax, size_t srcmax)
+{	/* Must be minus 2 so it can still expand a single trailing '\n' or '\r'. */
+	char * destend = dest + destmax - 2 ;
+	const char * srcend = src + srcmax ;
+
+	while (dest < destend && src < srcend)
+	{	if ((src [0] == '\r' && src [1] == '\n') || (src [0] == '\n' && src [1] == '\r'))
+		{	*dest++ = '\r' ;
+			*dest++ = '\n' ;
+			src += 2 ;
+			continue ;
+			} ;
+
+		if (src [0] == '\r')
+		{	*dest++ = '\r' ;
+			*dest++ = '\n' ;
+			src += 1 ;
+			continue ;
+			} ;
+
+		if (src [0] == '\n')
+		{	*dest++ = '\r' ;
+			*dest++ = '\n' ;
+			src += 1 ;
+			continue ;
+			} ;
+
+		*dest++ = *src++ ;
+		} ;
+
+	/* Make sure dest is terminated. */
+	*dest = 0 ;
+} /* psf_strncpy_crlf */
 
 /*==============================================================================
 */
