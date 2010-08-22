@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,24 +16,36 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-static inline void
-print_test_name (const char * name)
-{	printf ("    %-40s : ", name) ;
-	fflush (stdout) ;
-} /* print_test_name */
+#include "sfconfig.h"
 
+#include <stdio.h>
+#include <stdlib.h>
 
+#include "common.h"
 
-void test_conversions (void) ;
-void test_endswap (void) ;
-void test_log_printf (void) ;
-void test_file_io (void) ;
+#include "test_main.h"
 
-void test_float_convert (void) ;
-void test_double_convert (void) ;
+void
+test_strncpy_crlf (void)
+{	const char *src = "a\nb\nc\n" ;
+	char *dest ;
+	int dest_len ;
 
-void test_audio_detect (void) ;
-void test_ima_oki_adpcm (void) ;
+	print_test_name ("Testing psf_strncpy_crlf") ;
 
-void test_strncpy_crlf (void) ;
+	for (dest_len = 3 ; dest_len < 30 ; dest_len++)
+	{	dest = calloc (1, dest_len + 1) ;
+		dest [dest_len] = 0xea ;
 
+		psf_strncpy_crlf (dest, src, dest_len, sizeof (src)) ;
+
+		if (dest [dest_len] != 0xea)
+		{	printf ("\n\nLine %d: buffer overrun for dest_len == %d\n\t", __LINE__, dest_len) ;
+			exit (1) ;
+			} ;
+
+		free (dest) ;
+		} ;
+
+	puts ("ok") ;
+} /* test_strncpy_crlf */
