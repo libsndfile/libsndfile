@@ -1,3 +1,11 @@
+2010-08-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/test_broadcast_var.c
+    New file containing tests for broadcast_set_var().
+
+    * src/Makefile.am src/test_main.[ch]
+    Hook test_broadcast_var.c into tests.
+
 2010-08-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/broadcast.c src/common.(c|h)

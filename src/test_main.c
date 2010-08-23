@@ -41,6 +41,7 @@ main (void)
 	test_ima_oki_adpcm () ;
 
 	test_strncpy_crlf () ;
+	test_broadcast_var () ;
 
 	return 0 ;
 } /* main */

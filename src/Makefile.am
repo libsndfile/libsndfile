@@ -44,7 +44,7 @@ libcommon_la_SOURCES = $(COMMON)
 
 test_main_SOURCES = test_main.c test_main.h test_conversions.c test_float.c test_endswap.c \
 					test_audio_detect.c test_log_printf.c test_file_io.c test_ima_oki_adpcm.c \
-					test_strncpy_crlf.c
+					test_strncpy_crlf.c test_broadcast_var.c
 test_main_LDADD = libcommon.la
 
 
