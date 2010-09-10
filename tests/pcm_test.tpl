@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -317,7 +317,6 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 		if (fabs (float_out [k] - float_in [k]) > 1e-10)
 		{	printf ("\n\nLine %d: float : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, (double) float_out [k], (double) float_in [k]) ;
 			exit (1) ;
-			break ;
 			} ;
 
 	sf_close (file) ;

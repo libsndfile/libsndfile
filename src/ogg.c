@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2007 John ffitch
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -265,7 +265,7 @@ ogg_read_header (SF_PRIVATE *psf, int log_data)
 			buffer = ogg_sync_buffer (&odata->oy, 4096) ;
 			bytes = psf_fread (buffer, 1, 4096, psf) ;
 
-			if (bytes == 0 && i < 2)
+			if (bytes == 0)
 			{	psf_log_printf (psf, "End of file before finding all Vorbis headers!\n") ;
 				return SFE_MALFORMED_FILE ;
 				} ;
@@ -499,6 +499,9 @@ ogg_open (SF_PRIVATE *psf)
 {	OGG_PRIVATE* odata = calloc (1, sizeof (OGG_PRIVATE)) ;
 	VORBIS_PRIVATE* vdata = calloc (1, sizeof (VORBIS_PRIVATE)) ;
 	int	error = 0 ;
+
+	if (vdata == NULL || odata == NULL)
+		return SFE_MALLOC_FAILED ;
 
 	psf->container_data = odata ;
 	psf->codec_data = vdata ;
@@ -948,9 +951,11 @@ static stream_set *
 create_stream_set (void)
 {	stream_set *set = calloc (1, sizeof (stream_set)) ;
 
-	set->streams = calloc (5, sizeof (stream_processor)) ;
-	set->allocated = 5 ;
-	set->used = 0 ;
+	if (set)
+	{	set->streams = calloc (5, sizeof (stream_processor)) ;
+		set->allocated = 5 ;
+		set->used = 0 ;
+		} ;
 
 	return set ;
 } /* create_stream_set */

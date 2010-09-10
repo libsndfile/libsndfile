@@ -1710,7 +1710,8 @@ aiff_read_chanmap (SF_PRIVATE * psf, unsigned dword)
 
 	bytesread = psf_binheader_readf (psf, "444", &layout_tag, &channel_bitmap, &channel_decriptions) ;
 
-	map_info = aiff_caf_of_channel_layout_tag (layout_tag) ;
+	if ((map_info = aiff_caf_of_channel_layout_tag (layout_tag)) == NULL)
+		return 0 ;
 
 	psf_log_printf (psf, "  Tag    : %x\n", layout_tag) ;
 	if (map_info)

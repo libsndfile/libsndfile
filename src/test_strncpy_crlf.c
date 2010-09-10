@@ -35,12 +35,17 @@ test_strncpy_crlf (void)
 
 	for (dest_len = 3 ; dest_len < 30 ; dest_len++)
 	{	dest = calloc (1, dest_len + 1) ;
+		if (dest == NULL)
+		{	printf ("\n\nLine %d: calloc failed!\n\n", __LINE__) ;
+			exit (1) ;
+			} ;
+
 		dest [dest_len] = 0xea ;
 
 		psf_strncpy_crlf (dest, src, dest_len, sizeof (src)) ;
 
 		if (dest [dest_len] != 0xea)
-		{	printf ("\n\nLine %d: buffer overrun for dest_len == %d\n\t", __LINE__, dest_len) ;
+		{	printf ("\n\nLine %d: buffer overrun for dest_len == %d\n\n", __LINE__, dest_len) ;
 			exit (1) ;
 			} ;
 

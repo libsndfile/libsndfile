@@ -888,7 +888,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 	if (sndfile == NULL && command == SFC_GET_LOG_INFO)
 	{	if (data == NULL)
-			return (psf->error = SFE_BAD_COMMAND_PARAM) ;
+			return (sf_errno = SFE_BAD_COMMAND_PARAM) ;
 		snprintf (data, datasize, "%s", sf_logbuffer) ;
 		return strlen (data) ;
 		} ;
@@ -1061,6 +1061,11 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				return SF_TRUE ;
 			if (datasize != sizeof (sf_count_t))
 				return SF_TRUE ;
+			if (data == NULL || datasize != sizeof (sf_count_t))
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
+				return SF_FALSE ;
+				}
+			else
 			{	sf_count_t position ;
 
 				position = *((sf_count_t*) data) ;
@@ -2648,7 +2653,7 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 		{	error = SFE_ZERO_MAJOR_FORMAT ;
 			goto error_exit ;
 			} ;
-		if ((SF_CONTAINER (psf->sf.format)) == 0)
+		if ((SF_CODEC (psf->sf.format)) == 0)
 		{	error = SFE_ZERO_MINOR_FORMAT ;
 			goto error_exit ;
 			} ;

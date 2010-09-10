@@ -565,7 +565,7 @@ psf_open_fd (PSF_FILE * pfile)
 				break ;
 		} ;
 
-	if (pfile->mode == 0)
+	if (mode == 0)
 		fd = open (pfile->path.c, oflag) ;
 	else
 		fd = open (pfile->path.c, oflag, mode) ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2009      Uli Franke <cls@nebadje.org>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -408,7 +408,7 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT =
 static int
 wavex_write_fmt_chunk (SF_PRIVATE *psf)
 {	WAV_PRIVATE	*wpriv ;
-	int subformat, fmt_size, add_fact_chunk = 0 ;
+	int subformat, fmt_size ;
 
 	if ((wpriv = psf->container_data) == NULL)
 		return SFE_INTERNAL ;
@@ -511,19 +511,8 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 			wavex_write_guid (psf, &MSGUID_SUBTYPE_ALAW) ;
 			break ;
 
-#if 0
-		/* This is dead code due to return in previous switch statement. */
-		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists */
-			wavex_write_guid (psf, &MSGUID_SUBTYPE_MS_ADPCM) ;
-			break ;
-			return SFE_UNIMPLEMENTED ;
-#endif
-
 		default : return SFE_UNIMPLEMENTED ;
 		} ;
-
-	if (add_fact_chunk)
-		psf_binheader_writef (psf, "tm48", fact_MARKER, 4, psf->sf.frames) ;
 
 	return 0 ;
 } /* wavex_write_fmt_chunk */

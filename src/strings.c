@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -34,7 +34,7 @@ int
 psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 {	static char lsf_name [] = PACKAGE "-" VERSION ;
 	static char bracket_name [] = " (" PACKAGE "-" VERSION ")" ;
-	int		k, str_len, len_remaining, str_flags, str_type_replace = 0 ;
+	int		k, str_len, len_remaining, str_flags ;
 
 	if (str == NULL)
 		return SFE_STR_BAD_STRING ;
@@ -64,7 +64,7 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 
 	/* Determine flags */
 	str_flags = SF_STR_LOCATE_START ;
-	if (psf->file.mode == SFM_RDWR || psf->have_written || str_type_replace)
+	if (psf->file.mode == SFM_RDWR || psf->have_written)
 	{	if ((psf->str_flags & SF_STR_ALLOW_END) == 0)
 			return SFE_STR_NO_ADD_END ;
 		str_flags = SF_STR_LOCATE_END ;
