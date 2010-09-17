@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -448,7 +448,7 @@ sds_2byte_read (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 	{	printf ("Error 1 : %02X\n", checksum & 0xFF) ;
 		}
 
-	for (k = 2 ; k < SDS_BLOCK_SIZE - 3 ; k ++)
+	for (k = 2 ; k <= SDS_BLOCK_SIZE - 3 ; k ++)
 		checksum ^= psds->read_data [k] ;
 
 	checksum &= 0x7F ;
@@ -492,7 +492,7 @@ sds_3byte_read (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 	{	printf ("Error 1 : %02X\n", checksum & 0xFF) ;
 		}
 
-	for (k = 2 ; k < SDS_BLOCK_SIZE - 3 ; k ++)
+	for (k = 2 ; k <= SDS_BLOCK_SIZE - 3 ; k ++)
 		checksum ^= psds->read_data [k] ;
 
 	checksum &= 0x7F ;
@@ -536,7 +536,7 @@ sds_4byte_read (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 	{	printf ("Error 1 : %02X\n", checksum & 0xFF) ;
 		}
 
-	for (k = 2 ; k < SDS_BLOCK_SIZE - 3 ; k ++)
+	for (k = 2 ; k <= SDS_BLOCK_SIZE - 3 ; k ++)
 		checksum ^= psds->read_data [k] ;
 
 	checksum &= 0x7F ;
@@ -768,7 +768,8 @@ sds_2byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 	psds->write_data [0] = 0xF0 ;
 	psds->write_data [1] = 0x7E ;
 	psds->write_data [2] = 0 ;							/* Channel number */
-	psds->write_data [3] = psds->write_block & 0x7F ;	/* Packet number */
+	psds->write_data [3] = 2 ;
+	psds->write_data [4] = psds->write_block & 0x7F ;	/* Packet number */
 
 	ucptr = psds->write_data + 5 ;
 	for (k = 0 ; k < 120 ; k += 2)
@@ -779,7 +780,7 @@ sds_2byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 		} ;
 
 	checksum = psds->write_data [1] ;
-	for (k = 2 ; k < SDS_BLOCK_SIZE - 3 ; k ++)
+	for (k = 2 ; k <= SDS_BLOCK_SIZE - 3 ; k ++)
 		checksum ^= psds->write_data [k] ;
 	checksum &= 0x7F ;
 
@@ -808,7 +809,8 @@ sds_3byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 	psds->write_data [0] = 0xF0 ;
 	psds->write_data [1] = 0x7E ;
 	psds->write_data [2] = 0 ;							/* Channel number */
-	psds->write_data [3] = psds->write_block & 0x7F ;	/* Packet number */
+	psds->write_data [3] = 2 ;
+	psds->write_data [4] = psds->write_block & 0x7F ;	/* Packet number */
 
 	ucptr = psds->write_data + 5 ;
 	for (k = 0 ; k < 120 ; k += 3)
@@ -820,7 +822,7 @@ sds_3byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 		} ;
 
 	checksum = psds->write_data [1] ;
-	for (k = 2 ; k < SDS_BLOCK_SIZE - 3 ; k ++)
+	for (k = 2 ; k <= SDS_BLOCK_SIZE - 3 ; k ++)
 		checksum ^= psds->write_data [k] ;
 	checksum &= 0x7F ;
 
@@ -849,7 +851,8 @@ sds_4byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 	psds->write_data [0] = 0xF0 ;
 	psds->write_data [1] = 0x7E ;
 	psds->write_data [2] = 0 ;							/* Channel number */
-	psds->write_data [3] = psds->write_block & 0x7F ;	/* Packet number */
+	psds->write_data [3] = 2 ;
+	psds->write_data [4] = psds->write_block & 0x7F ;	/* Packet number */
 
 	ucptr = psds->write_data + 5 ;
 	for (k = 0 ; k < 120 ; k += 4)
@@ -862,7 +865,7 @@ sds_4byte_write (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 		} ;
 
 	checksum = psds->write_data [1] ;
-	for (k = 2 ; k < SDS_BLOCK_SIZE - 3 ; k ++)
+	for (k = 2 ; k <= SDS_BLOCK_SIZE - 3 ; k ++)
 		checksum ^= psds->write_data [k] ;
 	checksum &= 0x7F ;
 
