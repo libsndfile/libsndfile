@@ -412,7 +412,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						return SFE_AIFF_NO_FORM ;
 
 					psf_binheader_readf (psf, "E4", &FORMsize) ;
-					pchk4_store (&(paiff->chunk4), marker, psf->headindex - 8, FORMsize) ;
+					pchk4_store (&paiff->chunk4, marker, psf->headindex - 8, FORMsize) ;
 
 					if (psf->fileoffset > 0 && psf->filelength > FORMsize + 8)
 					{	/* Set file length. */
