@@ -273,13 +273,6 @@ sds_read_header (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 	psf->dataoffset = SDS_DATA_OFFSET ;
 	psf->datalength = psf->filelength - psf->dataoffset ;
 
-	if (data_length != psf->filelength - psf->dataoffset)
-	{	psf_log_printf (psf, " Datalength     : %d (truncated data??? %d)\n", data_length, psf->filelength - psf->dataoffset) ;
-		data_length = psf->filelength - psf->dataoffset ;
-		}
-	else
-		psf_log_printf (psf, " Datalength     : %d\n", data_length) ;
-
 	bytesread += psf_binheader_readf (psf, "1", &byte) ;
 	if (byte != 0xF7)
 		psf_log_printf (psf, "bad end : %X\n", byte & 0xFF) ;
