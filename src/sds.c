@@ -56,6 +56,7 @@ typedef struct tag_SDS_PRIVATE
 	int	read_samples [SDS_BLOCK_SIZE / 2] ; /* Maximum samples per block */
 
 	int write_block, write_count ;
+	int total_written ;
 	unsigned char write_data [SDS_BLOCK_SIZE] ;
 	int	write_samples [SDS_BLOCK_SIZE / 2] ; /* Maximum samples per block */
 } SDS_PRIVATE ;
@@ -258,6 +259,8 @@ sds_read_header (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 
 	data_length = SDS_3BYTE_TO_INT_DECODE (data_length) ;
 
+	psf->sf.frames = psds->frames = data_length ;
+
 	sustain_loop_start = SDS_3BYTE_TO_INT_DECODE (sustain_loop_start) ;
 	sustain_loop_end = SDS_3BYTE_TO_INT_DECODE (sustain_loop_end) ;
 
@@ -299,9 +302,6 @@ sds_read_header (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 	psf_log_printf (psf, "Samples/Block  : %d\n", psds->samplesperblock) ;
 
 	psf_log_printf (psf, "Frames         : %d\n", blockcount * psds->samplesperblock) ;
-
-	psf->sf.frames = blockcount * psds->samplesperblock ;
-	psds->frames = blockcount * psds->samplesperblock ;
 
 	/* Always Mono */
 	psf->sf.channels = 1 ;
@@ -356,7 +356,7 @@ sds_write_header (SF_PRIVATE *psf, int calc_length)
 	current = psf_ftell (psf) ;
 
 	if (calc_length)
-		psf->sf.frames = psds->total_blocks * psds->samplesperblock + psds->write_count ;
+		psf->sf.frames = psds->total_written ;
 
 	if (psds->write_count > 0)
 	{	int current_count = psds->write_count ;
@@ -397,9 +397,9 @@ sds_write_header (SF_PRIVATE *psf, int calc_length)
 
 	psf_binheader_writef (psf, "e213", 0, psds->bitwidth, samp_period) ;
 
-	data_length			= SDS_INT_TO_3BYTE_ENCODE (psds->total_blocks * SDS_BLOCK_SIZE) ;
+	data_length			= SDS_INT_TO_3BYTE_ENCODE (psds->total_written) ;
 	sustain_loop_start	= SDS_INT_TO_3BYTE_ENCODE (0) ;
-	sustain_loop_end	= SDS_INT_TO_3BYTE_ENCODE (psf->sf.frames) ;
+	sustain_loop_end	= SDS_INT_TO_3BYTE_ENCODE (psds->total_written) ;
 
 	psf_binheader_writef (psf, "e33311", data_length, sustain_loop_start, sustain_loop_end, loop_type, 0xF7) ;
 
@@ -895,6 +895,7 @@ sds_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	if (psf->codec_data == NULL)
 		return 0 ;
 	psds = (SDS_PRIVATE*) psf->codec_data ;
+	psds->total_written += len ;
 
 	iptr = psf->u.ibuf ;
 	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
@@ -918,6 +919,7 @@ sds_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	if (psf->codec_data == NULL)
 		return 0 ;
 	psds = (SDS_PRIVATE*) psf->codec_data ;
+	psds->total_written += len ;
 
 	total = sds_write (psf, psds, ptr, len) ;
 
@@ -935,6 +937,7 @@ sds_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	if (psf->codec_data == NULL)
 		return 0 ;
 	psds = (SDS_PRIVATE*) psf->codec_data ;
+	psds->total_written += len ;
 
 	if (psf->norm_float == SF_TRUE)
 		normfact = 1.0 * 0x80000000 ;
@@ -966,6 +969,7 @@ sds_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	if (psf->codec_data == NULL)
 		return 0 ;
 	psds = (SDS_PRIVATE*) psf->codec_data ;
+	psds->total_written += len ;
 
 	if (psf->norm_double == SF_TRUE)
 		normfact = 1.0 * 0x80000000 ;
