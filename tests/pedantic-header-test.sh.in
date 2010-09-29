@@ -31,7 +31,11 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-echo -n "    Pedantic header test                     : "
+if test ! -f @top_srcdir@/tests/sfversion.c ; then
+	exit 0
+	fi
+
+echo -n "    Pedantic header test           : "
 
 # Only do this if the compiler is GCC.
 if test -n "@GCC_MAJOR_VERSION@" ; then
