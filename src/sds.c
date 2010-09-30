@@ -392,7 +392,7 @@ sds_write_header (SF_PRIVATE *psf, int calc_length)
 
 	data_length			= SDS_INT_TO_3BYTE_ENCODE (psds->total_written) ;
 	sustain_loop_start	= SDS_INT_TO_3BYTE_ENCODE (0) ;
-	sustain_loop_end	= SDS_INT_TO_3BYTE_ENCODE (psds->total_written) ;
+	sustain_loop_end	= SDS_INT_TO_3BYTE_ENCODE (0) ;
 
 	psf_binheader_writef (psf, "e33311", data_length, sustain_loop_start, sustain_loop_end, loop_type, 0xF7) ;
 
