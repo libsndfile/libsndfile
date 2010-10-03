@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1098,7 +1098,9 @@ broadcast_coding_history_test (const char *filename)
 		} ;
 
 	if (bc_read.coding_history_size < strlen (default_history) || memcmp (bc_read.coding_history, default_history, strlen (default_history)) != 0)
-	{	printf ("\n\nLine %d : unexpected coding history '%.*s'.\n\n", __LINE__, bc_read.coding_history_size, bc_read.coding_history) ;
+	{	printf ("\n\n"
+				"Line %d : unexpected coding history '%.*s',\n"
+				"            should be '%s'\n\n", __LINE__, bc_read.coding_history_size, bc_read.coding_history, default_history) ;
 		exit (1) ;
 		} ;
 

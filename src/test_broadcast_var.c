@@ -80,8 +80,8 @@ test_broadcast_var (void)
 		broadcast_var_set (psf, (SF_BROADCAST_INFO*) &bi, sizeof (bi)) ;
 		} ;
 
-	if (psf->broadcast_var != NULL)
-		free (psf->broadcast_var) ;
+	if (psf->broadcast_16k != NULL)
+		free (psf->broadcast_16k) ;
 
 	puts ("ok") ;
 } /* test_broadcast_var */

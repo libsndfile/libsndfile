@@ -3,6 +3,9 @@
     * src/common.h src/broadcast.c src/rf64.c src/sndfile.c src/wav.c
     Rewrite of SF_BROADCAST_INFO handling.
 
+    * src/test_broadcast_var.c tests/command_test.c
+    Tweak SF_BROADCAST_INFO tests.
+
 2010-09-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sds.c
