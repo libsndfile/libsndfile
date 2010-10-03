@@ -89,7 +89,10 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_NO_EMBEDDED_RDWR	, "Error : cannot open embedded file read/write." },
 	{	SFE_NO_PIPE_WRITE		, "Error : this file format does not support pipe write." },
 	{	SFE_BAD_VIRTUAL_IO		, "Error : bad pointer on SF_VIRTUAL_IO struct." },
-	{	SFE_BAD_BROADCAST_INFO_SIZE, "Error : badd SF_BROADCAST_INFO_SIZE." },
+	{	SFE_BAD_BROADCAST_INFO_SIZE
+								, "Error : bad size in SF_BROADCAST_INFO struct." },
+	{	SFE_BAD_BROADCAST_INFO_TOO_BIG
+								, "Error : SF_BROADCAST_INFO struct too large." },
 
 	{	SFE_INTERLEAVE_MODE		, "Attempt to write to file with non-interleaved data." },
 	{	SFE_INTERLEAVE_SEEK		, "Bad karma in seek during interleave read operation." },
@@ -1141,7 +1144,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			if ((psf->file.mode != SFM_WRITE) && (psf->file.mode != SFM_RDWR))
 				return SF_FALSE ;
 			/* If data has already been written this must fail. */
-			if (psf->broadcast_var == NULL && psf->have_written)
+			if (psf->broadcast_16k == NULL && psf->have_written)
 			{	psf->error = SFE_CMD_HAS_DATA ;
 				return SF_FALSE ;
 				} ;
@@ -2522,8 +2525,8 @@ psf_close (SF_PRIVATE *psf)
 	if (psf->peak_info)
 		free (psf->peak_info) ;
 
-	if (psf->broadcast_var)
-		free (psf->broadcast_var) ;
+	if (psf->broadcast_16k)
+		free (psf->broadcast_16k) ;
 
 	if (psf->loop_info)
 		free (psf->loop_info) ;

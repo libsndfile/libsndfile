@@ -226,10 +226,7 @@ make_size_t (int x)
 {	return (size_t) x ;
 } /* size_t_of_int */
 
-typedef struct
-{	int size ;
-	SF_BROADCAST_INFO binfo ;
-} PSF_BROADCAST_VAR ;
+typedef SF_BROADCAST_INFO_VAR (16 * 1024) SF_BROADCAST_INFO_16K ;
 
 #if SIZEOF_WCHAR_T == 2
 typedef wchar_t	sfwchar_t ;
@@ -373,7 +370,7 @@ typedef struct sf_private_tag
 	SF_INSTRUMENT	*instrument ;
 
 	/* Broadcast (EBU) Info */
-	PSF_BROADCAST_VAR *broadcast_var ;
+	SF_BROADCAST_INFO_16K *broadcast_16k ;
 
 	/* Channel map data (if present) : an array of ints. */
 	int				*channel_map ;
@@ -503,6 +500,7 @@ enum
 	SFE_RDWR_BAD_HEADER,
 	SFE_CMD_HAS_DATA,
 	SFE_BAD_BROADCAST_INFO_SIZE,
+	SFE_BAD_BROADCAST_INFO_TOO_BIG,
 
 	SFE_STR_NO_SUPPORT,
 	SFE_STR_NOT_WRITE,
@@ -842,7 +840,7 @@ void	psf_sanitize_string (char * cptr, int len) ;
 /* Generate the current date as a string. */
 void	psf_get_date_str (char *str, int maxlen) ;
 
-PSF_BROADCAST_VAR* broadcast_var_alloc (size_t datasize) ;
+SF_BROADCAST_INFO_16K * broadcast_var_alloc (void) ;
 int		broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * data, size_t datasize) ;
 int		broadcast_var_get (SF_PRIVATE *psf, SF_BROADCAST_INFO * data, size_t datasize) ;
 

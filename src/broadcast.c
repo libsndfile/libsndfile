@@ -25,9 +25,6 @@
 
 #include "common.h"
 
-#define CODE_HIST_OFFSET	offsetof (SF_BROADCAST_INFO, coding_history)
-
-#define	DEBUG_CHS	0
 
 static int gen_coding_history (char * added_history, int added_history_max, const SF_INFO * psfinfo) ;
 
@@ -39,38 +36,14 @@ bc_min_size (const SF_BROADCAST_INFO* info)
 	return offsetof (SF_BROADCAST_INFO, coding_history) + info->coding_history_size ;
 } /* bc_min_size */
 
-
-static inline size_t
-bc_var_coding_hist_size (const PSF_BROADCAST_VAR* var)
-{	return var->size - offsetof (PSF_BROADCAST_VAR, binfo.coding_history) ;
-} /* broadcast_size */
-
-PSF_BROADCAST_VAR*
-broadcast_var_alloc (size_t datasize)
-{	PSF_BROADCAST_VAR * data ;
-
-	if ((data = calloc (1, datasize)) != NULL)
-		data->size = datasize ;
-
-	return data ;
+SF_BROADCAST_INFO_16K*
+broadcast_var_alloc (void)
+{	return calloc (1, sizeof (SF_BROADCAST_INFO_16K)) ;
 } /* broadcast_var_alloc */
-
-
-static size_t
-var_coding_history_size (const PSF_BROADCAST_VAR *pvar)
-{
-#if DEBUG_CHS
-	printf ("size %d   offsetof (binfo) %zu     offsetof(coding_history) %zu\n",
-			pvar->size, offsetof (PSF_BROADCAST_VAR, binfo), offsetof (SF_BROADCAST_INFO, coding_history)) ;
-#endif
-	return pvar->size - offsetof (PSF_BROADCAST_VAR, binfo) - offsetof (SF_BROADCAST_INFO, coding_history) ;
-} /* var_coding_history_size */
-
 
 int
 broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datasize)
-{	char added_history [256] ;
-	size_t added_history_len, len ;
+{	size_t len ;
 
 	if (info == NULL)
 		return SF_FALSE ;
@@ -80,49 +53,42 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 		return SF_FALSE ;
 		} ;
 
-	if (DEBUG_CHS) puts ("\n") ;
-
-	added_history_len = gen_coding_history (added_history, sizeof (added_history), &(psf->sf)) ;
-
-	if (psf->broadcast_var != NULL
-		&& psf->broadcast_var->binfo.coding_history_size + added_history_len < datasize - CODE_HIST_OFFSET)
-	{	free (psf->broadcast_var) ;
-		psf->broadcast_var = NULL ;
+	if (datasize >= sizeof (SF_BROADCAST_INFO_16K))
+	{	psf->error = SFE_BAD_BROADCAST_INFO_TOO_BIG ;
+		return SF_FALSE ;
 		} ;
 
-	if (psf->broadcast_var == NULL)
-	{	size_t size = datasize + added_history_len + 512 ;
-
-		psf->broadcast_var = calloc (1, size) ;
-		psf->broadcast_var->size = size ;
+	if (psf->broadcast_16k == NULL)
+	{	if ((psf->broadcast_16k = broadcast_var_alloc ()) == NULL)
+		{	psf->error = SFE_MALLOC_FAILED	 ;
+			return SF_FALSE ;
+			} ;
 		} ;
 
-	if (DEBUG_CHS)
-		printf ("sizeof (coding_history) %zu   realsize %zu\n", sizeof (psf->broadcast_var->binfo.coding_history), var_coding_history_size (psf->broadcast_var)) ;
+	memcpy (psf->broadcast_16k, info, offsetof (SF_BROADCAST_INFO, coding_history)) ;
 
-	memcpy (&(psf->broadcast_var->binfo), info, offsetof (SF_BROADCAST_INFO, coding_history)) ;
+	psf_strncpy_crlf (psf->broadcast_16k->coding_history, info->coding_history, sizeof (psf->broadcast_16k->coding_history), datasize - offsetof (SF_BROADCAST_INFO, coding_history)) ;
+	len = strlen (psf->broadcast_16k->coding_history) ;
 
-	psf_strncpy_crlf (psf->broadcast_var->binfo.coding_history, info->coding_history, bc_var_coding_hist_size (psf->broadcast_var), info->coding_history_size) ;
-	len = strlen (psf->broadcast_var->binfo.coding_history) ;
-
-	if (DEBUG_CHS)
-	{	printf ("len %zu    sizeof %zu\n", len, sizeof (psf->broadcast_var->binfo.coding_history)) ;
-		SF_ASSERT (len < var_coding_history_size (psf->broadcast_var)) ;
-		} ;
-
-	if (len > 0 && psf->broadcast_var->binfo.coding_history [len] != '\n')
-		strncat (psf->broadcast_var->binfo.coding_history, "\r\n", 2) ;
+	if (len > 0 && psf->broadcast_16k->coding_history [len - 1] != '\n')
+		strncat (psf->broadcast_16k->coding_history, "\r\n", sizeof (psf->broadcast_16k->coding_history)) ;
 
 	if (psf->file.mode == SFM_WRITE)
-		strncat (psf->broadcast_var->binfo.coding_history, added_history, strlen (added_history)) ;
+	{	char added_history [256] ;
+		size_t added_history_len ;
 
-	psf->broadcast_var->binfo.coding_history_size = strlen (psf->broadcast_var->binfo.coding_history) ;
+		added_history_len = gen_coding_history (added_history, sizeof (added_history), &(psf->sf)) ;
+		strncat (psf->broadcast_16k->coding_history, added_history, sizeof (psf->broadcast_16k->coding_history)) ;
+		psf->broadcast_16k->coding_history [sizeof (psf->broadcast_16k->coding_history) - 1] = 0 ;
+		} ;
 
 	/* Force coding_history_size to be even. */
-	psf->broadcast_var->binfo.coding_history_size += (psf->broadcast_var->binfo.coding_history_size & 1) ? 1 : 0 ;
+	len = strlen (psf->broadcast_16k->coding_history) ;
+	len += (len & 1) ? 1 : 2 ;
+	psf->broadcast_16k->coding_history_size = len ;
 
 	/* Currently writing this version. */
-	psf->broadcast_var->binfo.version = 1 ;
+	psf->broadcast_16k->version = 1 ;
 
 	return SF_TRUE ;
 } /* broadcast_var_set */
@@ -132,12 +98,12 @@ int
 broadcast_var_get (SF_PRIVATE *psf, SF_BROADCAST_INFO * data, size_t datasize)
 {	size_t size ;
 
-	if (psf->broadcast_var == NULL)
+	if (psf->broadcast_16k == NULL)
 		return SF_FALSE ;
 
-	size = SF_MIN (datasize, bc_min_size (&(psf->broadcast_var->binfo))) ;
+	size = SF_MIN (datasize, bc_min_size ((const SF_BROADCAST_INFO *) psf->broadcast_16k)) ;
 
-	memcpy (data, &(psf->broadcast_var->binfo), size) ;
+	memcpy (data, psf->broadcast_16k, size) ;
 
 	return SF_TRUE ;
 } /* broadcast_var_get */

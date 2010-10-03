@@ -1076,7 +1076,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 			psf_binheader_writef (psf, "ft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 
-	if (psf->broadcast_var != NULL)
+	if (psf->broadcast_16k != NULL)
 		wav_write_bext_chunk (psf) ;
 
 	if (psf->instrument != NULL)
@@ -1644,7 +1644,7 @@ wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 int
 wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 {
-	SF_BROADCAST_INFO* b ;
+	SF_BROADCAST_INFO_16K * b ;
 	unsigned int bytes = 0 ;
 
 	if (chunksize < WAV_BEXT_MIN_CHUNK_SIZE)
@@ -1659,14 +1659,20 @@ wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 		return 0 ;
 		} ;
 
+	if (chunksize >= sizeof (SF_BROADCAST_INFO_16K))
+	{	psf_log_printf (psf, "bext : %u too big to be handled\n", chunksize) ;
+		psf_binheader_readf (psf, "j", chunksize) ;
+		return 0 ;
+		} ;
+
 	psf_log_printf (psf, "bext : %u\n", chunksize) ;
 
-	if ((psf->broadcast_var = broadcast_var_alloc (chunksize + 128)) == NULL)
+	if ((psf->broadcast_16k = broadcast_var_alloc ()) == NULL)
 	{	psf->error = SFE_MALLOC_FAILED ;
 		return psf->error ;
 		} ;
 
-	b = & psf->broadcast_var->binfo ;
+	b = psf->broadcast_16k ;
 
 	bytes += psf_binheader_readf (psf, "b", b->description, sizeof (b->description)) ;
 	bytes += psf_binheader_readf (psf, "b", b->originator, sizeof (b->originator)) ;
@@ -1693,12 +1699,12 @@ wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
 
 int
 wav_write_bext_chunk (SF_PRIVATE *psf)
-{	SF_BROADCAST_INFO *b ;
+{	SF_BROADCAST_INFO_16K *b ;
 
-	if (psf->broadcast_var == NULL)
+	if (psf->broadcast_16k == NULL)
 		return -1 ;
 
-	b = & psf->broadcast_var->binfo ;
+	b = psf->broadcast_16k ;
 
 	psf_binheader_writef (psf, "m4", bext_MARKER, WAV_BEXT_MIN_CHUNK_SIZE + b->coding_history_size) ;
 

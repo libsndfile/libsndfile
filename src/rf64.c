@@ -570,7 +570,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 				return SFE_UNIMPLEMENTED ;
 		} ;
 
-	if (psf->broadcast_var != NULL)
+	if (psf->broadcast_16k != NULL)
 		wav_write_bext_chunk (psf) ;
 
 #if 0
