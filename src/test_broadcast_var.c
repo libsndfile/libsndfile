@@ -28,7 +28,7 @@
 
 #define	BCAST_MAX	512
 
-typedef SF_BROADCAST_INFO_VAR (512) SF_BROADCAST_INFO_512 ;
+typedef SF_BROADCAST_INFO_VAR (BCAST_MAX) SF_BROADCAST_INFO_512 ;
 
 static void
 fill_coding_history (SF_BROADCAST_INFO_512 * bi)
@@ -67,7 +67,7 @@ test_broadcast_var (void)
 
 	print_test_name ("Testing broadcast_var_set ") ;
 
-	for (k = 64 ; k < BCAST_MAX + 20 ; k++)
+	for (k = 64 ; k < BCAST_MAX ; k++)
 	{
 		SF_BROADCAST_INFO_512 bi ;
 
