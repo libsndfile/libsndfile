@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -298,7 +298,7 @@ write_to_closed_file (void)
 	printf ("3) Now we close the file using fclose().\n") ;
 	fclose (file) ;
 
-	stat (filename, &buf);
+	stat (filename, &buf) ;
 	printf ("   File size is %d bytes.\n", (int) buf.st_size) ;
 
 	printf ("4) Now write more data to the file descriptor which should fail.\n") ;
@@ -307,7 +307,7 @@ write_to_closed_file (void)
 	else
 	{	printf ("5) Attempting to write to a closed file should have failed but didn't! *** WRONG ***\n") ;
 
-		stat (filename, &buf);
+		stat (filename, &buf) ;
 		printf ("   File size is %d bytes.\n", (int) buf.st_size) ;
 		} ;
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -188,7 +188,7 @@ lcomp_test_int (const char *str, const char *filename, int filetype, double marg
 		} ;
 
 	for (m = 0 ; m < 3 ; m++)
-	{	int n  ;
+	{	int n ;
 
 		if ((k = sf_readf_int (file, data, 11)) != 11)
 		{	printf ("Line %d: Incorrect read length (11 => %d).\n", __LINE__, k) ;
