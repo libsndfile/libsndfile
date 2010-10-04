@@ -4,6 +4,9 @@
     Add ability to read/write tracknumber and genre to flac/ogg/wav files.
     Thanks to Matti Nykyri for the patch.
 
+    * src/common.h src/broadcast.c src/strings.c
+    Add function psf_safe_strncpy() and use where appropriate.
+
 2010-10-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * NEWS README configure.ac doc/*.html

@@ -22,6 +22,7 @@
 #include "sfconfig.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #if HAVE_STDINT_H
 #include <stdint.h>
@@ -830,6 +831,13 @@ int pchk4_find (PRIV_CHUNK4 * pchk, int marker) ;
 /*------------------------------------------------------------------------------------
 ** Other helper functions.
 */
+
+static inline void
+psf_safe_strncat (char *dest, const char *src, size_t n)
+{	strncat (dest, src, n) ;
+	dest [n - 1] = 0 ;
+} /* psf_safe_strncat */
+
 
 void	*psf_memset (void *s, int c, sf_count_t n) ;
 

@@ -71,15 +71,14 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 	len = strlen (psf->broadcast_16k->coding_history) ;
 
 	if (len > 0 && psf->broadcast_16k->coding_history [len - 1] != '\n')
-		strncat (psf->broadcast_16k->coding_history, "\r\n", sizeof (psf->broadcast_16k->coding_history)) ;
+		psf_safe_strncat (psf->broadcast_16k->coding_history, "\r\n", sizeof (psf->broadcast_16k->coding_history)) ;
 
 	if (psf->file.mode == SFM_WRITE)
 	{	char added_history [256] ;
 		size_t added_history_len ;
 
 		added_history_len = gen_coding_history (added_history, sizeof (added_history), &(psf->sf)) ;
-		strncat (psf->broadcast_16k->coding_history, added_history, sizeof (psf->broadcast_16k->coding_history)) ;
-		psf->broadcast_16k->coding_history [sizeof (psf->broadcast_16k->coding_history) - 1] = 0 ;
+		psf_safe_strncat (psf->broadcast_16k->coding_history, added_history, sizeof (psf->broadcast_16k->coding_history)) ;
 		} ;
 
 	/* Force coding_history_size to be even. */

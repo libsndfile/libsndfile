@@ -110,9 +110,9 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 					*/
 					if (strstr (str, PACKAGE) == NULL && len_remaining > (int) (strlen (bracket_name) + str_len + 2))
 					{	if (strlen (str) == 0)
-							strncat (psf->str_end, lsf_name, len_remaining) ;
+							psf_safe_strncat (psf->str_end, lsf_name, len_remaining) ;
 						else
-							strncat (psf->str_end, bracket_name, len_remaining) ;
+							psf_safe_strncat (psf->str_end, bracket_name, len_remaining) ;
 						psf->str_end += strlen (psf->str_end) ;
 						} ;
 
