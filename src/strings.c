@@ -130,6 +130,8 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 		case SF_STR_DATE :
 		case SF_STR_ALBUM :
 		case SF_STR_LICENSE :
+		case SF_STR_TRACKNUMBER :
+		case SF_STR_GENRE :
 				psf->strings [k].type = str_type ;
 				psf->strings [k].str = psf->str_end ;
 				psf->strings [k].flags = str_flags ;

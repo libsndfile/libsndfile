@@ -84,6 +84,7 @@
 #define INAM_MARKER	 (MAKE_MARKER ('I', 'N', 'A', 'M'))
 #define IENG_MARKER	 (MAKE_MARKER ('I', 'E', 'N', 'G'))
 #define IART_MARKER	 (MAKE_MARKER ('I', 'A', 'R', 'T'))
+#define IGNR_MARKER	 (MAKE_MARKER ('I', 'G', 'N', 'R'))
 #define ICOP_MARKER	 (MAKE_MARKER ('I', 'C', 'O', 'P'))
 #define IPRD_MARKER	 (MAKE_MARKER ('I', 'P', 'R', 'D'))
 #define ISRC_MARKER	 (MAKE_MARKER ('I', 'S', 'R', 'C'))
@@ -1204,6 +1205,10 @@ wav_write_strings (SF_PRIVATE *psf, int location)
 				psf_binheader_writef (psf, "ms", ICRD_MARKER, psf->strings [k].str) ;
 				break ;
 
+			case SF_STR_GENRE :
+				psf_binheader_writef (psf, "ms", IGNR_MARKER, psf->strings [k].str) ;
+				break ;
+
 			default :
 				break ;
 			} ;
@@ -1329,7 +1334,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 			case ICMT_MARKER :
 			case ICRD_MARKER :
 			case IENG_MARKER :
-
+			case IGNR_MARKER :
 			case INAM_MARKER :
 			case IPRD_MARKER :
 			case ISBJ_MARKER :
@@ -1426,6 +1431,9 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk)
 					break ;
 			case ICRD_MARKER :
 					psf_store_string (psf, SF_STR_DATE, psf->u.cbuf) ;
+					break ;
+			case IGNR_MARKER :
+					psf_store_string (psf, SF_STR_GENRE, psf->u.cbuf) ;
 					break ;
 			} ;
 		} ;
