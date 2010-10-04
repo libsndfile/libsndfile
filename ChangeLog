@@ -1,3 +1,8 @@
+2010-10-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * NEWS README configure.ac doc/*.html
+    Updates for 1.0.22 release.
+
 2010-10-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/broadcast.c src/rf64.c src/sndfile.c src/wav.c

@@ -1,3 +1,10 @@
+Version 1.0.22 (2009-10-04)
+  * Couple of fixes for SDS file writer.
+  * Fixes arising from static analysis.
+  * Handle FLAC files with ID3 meta data at start of file.
+  * Handle FLAC files which report zero length.
+  * Other minor bug fixes and improvements.
+
 Version 1.0.21 (2009-12-13)
   * Add a couple of new binary programs to programs/ dir.
   * Remove sndfile-jackplay (now in sndfile-tools package).

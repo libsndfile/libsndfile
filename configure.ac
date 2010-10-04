@@ -1,9 +1,9 @@
-# Copyright (C) 1999-2009 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
+# Copyright (C) 1999-2010 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
 
 dnl Require autoconf version
 AC_PREREQ(2.57)
 
-AC_INIT([libsndfile],[1.0.22pre4],[sndfile@mega-nerd.com],
+AC_INIT([libsndfile],[1.0.22],[sndfile@mega-nerd.com],
 		[libsndfile],[http://www.mega-nerd.com/libsndfile/])
 
 # Put config stuff in Cfg.
@@ -317,7 +317,7 @@ if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; 
 	EXTERNAL_LIBS="$FLAC_LIBS $VORBISENC_LIBS"
 else
 	AC_MSG_WARN([[
-	
+
 *** One or more of the external libraries (ie libflac, libogg and
 *** libvorbis) is either missing (possibly only the development
 *** headers) or is of an unsupported version.
@@ -595,7 +595,7 @@ dnl The following line causes the libtool distributed with the source
 dnl to be replaced if the build system has a more recent version.
 AC_SUBST(LIBTOOL_DEPS)
 
-# Shave make automake/libtool output much less verbose and much more
+# Shave makes automake/libtool output much less verbose and much more
 # readable. See : git://git.lespiau.name/shave
 SHAVE_INIT([],[enable])
 
