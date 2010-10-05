@@ -1,3 +1,9 @@
+2010-10-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    Fix a typo in the error string for SFE_OPEN_PIPE_RDWR. Thanks to Charles
+    Van Winkle for the report.
+
 2010-10-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/flac.c src/ogg.c src/sndfile.h.in src/strings.c src/wav.c

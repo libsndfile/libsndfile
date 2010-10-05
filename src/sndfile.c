@@ -111,7 +111,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_SEEK_FAILED			, "Error : parameters OK, but psf_seek() failed." },
 
 	{	SFE_BAD_OPEN_MODE		, "Error : bad mode parameter for file open." },
-	{	SFE_OPEN_PIPE_RDWR		, "Error : attempt toopen a pipe in read/write mode." },
+	{	SFE_OPEN_PIPE_RDWR		, "Error : attempt to open a pipe in read/write mode." },
 	{	SFE_RDWR_POSITION		, "Error on RDWR position (cryptic)." },
 	{	SFE_RDWR_BAD_HEADER		, "Error : Cannot open file in read/write mode due to string data in header." },
 	{	SFE_CMD_HAS_DATA		, "Error : Command fails because file already has audio data." },
