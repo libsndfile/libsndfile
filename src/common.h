@@ -90,6 +90,8 @@
 
 #define		ARRAY_LEN(x)	((int) (sizeof (x) / sizeof ((x) [0])))
 
+#define		NOT(x)			(! (x))
+
 #if (COMPILER_IS_GCC == 1)
 #define		SF_MAX(x,y)		({ \
 								typeof (x) sf_max_x1 = (x) ; \
