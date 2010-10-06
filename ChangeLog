@@ -6,6 +6,9 @@
     * src/rf64.c
     Minor tweaks.
 
+    * Makefile.am */Makefile.am
+    Add *~ to CLEANFILES.
+
 2010-10-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c

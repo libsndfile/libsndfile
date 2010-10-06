@@ -9,6 +9,8 @@ OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 
 INCLUDES = -I$(top_srcdir)/src $(OS_SPECIFIC_CFLAGS)
 
+CLEANFILES = *~
+
 # This is the BeOS version of sndfile-play. It needs to be compiled with the C++
 # compiler.
 EXTRA_DIST = sndfile-play-beos.cpp test-sndfile-metadata-set.py

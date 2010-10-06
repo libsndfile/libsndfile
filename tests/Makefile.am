@@ -31,6 +31,8 @@ autogen_sources = write_read_test.tpl write_read_test.def	\
 
 EXTRA_DIST = $(autogen_sources)
 
+CLEANFILES = *~
+
 #===============================================================================
 
 sfversion_SOURCES = sfversion.c
@@ -200,4 +202,4 @@ endif
 check: $(noinst_PROGRAMS) test_wrapper.sh
 	sh test_wrapper.sh
 
-	
+
