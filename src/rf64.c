@@ -172,7 +172,7 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 	psf_log_printf (psf, "%M\n  %M\n", RF64_MARKER, WAVE_MARKER) ;
 
-	while (! done)
+	while (NOT (done))
 	{	psf_binheader_readf (psf, "em4", &marker, &size32) ;
 
 		switch (marker)
@@ -181,8 +181,11 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 					/* Read ds64 sizes (3 8-byte words). */
 					psf_binheader_readf (psf, "888", &riff_size, &psf->datalength, &sample_count) ;
-					psf_log_printf (psf, "  Riff size : %D\n  Data size : %D\n  Frames    : %D\n",
-											riff_size, psf->datalength, sample_count) ;
+					if (psf->filelength != riff_size + 8)
+						psf_log_printf (psf, "  Riff size : %D (should be %D)\n  Data size : %D\n", riff_size, psf->filelength - 8, psf->datalength) ;
+					else
+						psf_log_printf (psf, "  Riff size : %D\n  Data size : %D\n", riff_size, psf->datalength) ;
+					psf_log_printf (psf, "  Frames    : %D\n", sample_count) ;
 
 					/* Read table length. */
 					psf_binheader_readf (psf, "4", &size32) ;
@@ -213,9 +216,9 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 				psf_log_printf (psf, "%M : %x\n", marker, size32) ;
 
 				/* Fetch data length only from data chunk when data chunk size is not set to -1 */
-				if ( size32 != 0xFFFFFFFF )
+				if (size32 != 0xFFFFFFFF)
 					psf->datalength = size32 ;
-				else if ( ! HAVE_CHUNK (HAVE_ds64))
+				else if (NOT (HAVE_CHUNK (HAVE_ds64)))
 				{	/* Assuming the ds64 chunk comes always before the data chunk. */
 					psf_log_printf (psf, "  *** Data length not specified (-1 in data chunk and no ds64 chunk).") ;
 					} ;
@@ -239,7 +242,7 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if (psf->datalength + psf->dataoffset < psf->filelength)
 						psf->dataend = psf->datalength + psf->dataoffset ;
 
-					if (! psf->sf.seekable || psf->dataoffset < 0)
+					if (NOT (psf->sf.seekable) || psf->dataoffset < 0)
 						break ;
 
 					/* Seek past data and continue reading header. */
@@ -261,11 +264,11 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						break ;
 						} ;
 					if (psf_ftell (psf) & 0x03)
-					{	psf_log_printf (psf, "  Unknown chunk marker at position %d. Resynching.\n", size32 - 4) ;
+					{	psf_log_printf (psf, "  Unknown chunk marker at position 0x%x. Resynching.\n", size32 - 4) ;
 						psf_binheader_readf (psf, "j", -3) ;
 						break ;
 						} ;
-					psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D. Exiting parser.\n", marker, psf_ftell (psf) - 4) ;
+					psf_log_printf (psf, "*** Unknown chunk marker (0x%X) at position 0x%X. Exiting parser.\n", marker, psf_ftell (psf) - 4) ;
 					done = SF_TRUE ;
 				break ;
 			} ;	/* switch (marker) */
@@ -548,7 +551,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_binheader_writef (psf, "em4m", RF64_MARKER, 0xffffffff, WAVE_MARKER) ;
 
 	/* Currently no table. */
-	psf_binheader_writef (psf, "m48884", ds64_MARKER, 32, psf->filelength, psf->datalength, psf->sf.frames, 0) ;
+	psf_binheader_writef (psf, "m48884", ds64_MARKER, 32, psf->filelength - 8, psf->datalength, psf->sf.frames, 0) ;
 
 	/* WAVE and 'fmt ' markers. */
 	psf_binheader_writef (psf, "m", fmt_MARKER) ;
@@ -634,7 +637,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 
 	psf->dataoffset = psf->headindex ;
 
-	if (! has_data)
+	if (NOT (has_data))
 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 	else if (current > 0)
 		psf_fseek (psf, current, SEEK_SET) ;
