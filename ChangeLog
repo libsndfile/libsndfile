@@ -6,6 +6,9 @@
     * src/rf64.c
     Minor tweaks and additional sanity checking.
 
+    * src/Makefile.am src/binheader_writef_check.py
+    Use python 2.6.
+
 2010-10-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.hh

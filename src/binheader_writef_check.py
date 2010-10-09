@@ -1,6 +1,6 @@
-#!/usr/bin/python2.5
+#!/usr/bin/python2.6
 
-# Copyright (C) 2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+# Copyright (C) 2006-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 #
 # All rights reserved.
 #
@@ -97,7 +97,7 @@ def handle_file (fname):
 				print "    %s" % item
 				errors += 1
 			param_index += 2
-			
+
 	return errors
 
 #===============================================================================
