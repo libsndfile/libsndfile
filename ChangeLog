@@ -1,3 +1,8 @@
+2010-10-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/pedantic-header-test.sh.in
+    Handle unusual values of CC environment variable.
+
 2010-10-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.hh
