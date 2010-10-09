@@ -157,7 +157,7 @@ static int
 rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 {	WAV_PRIVATE	*wpriv ;
 	WAV_FMT		*wav_fmt ;
-	sf_count_t riff_size = 0, sample_count = 0 ;
+	sf_count_t riff_size = 0, frame_count = 0 ;
 	unsigned int size32, parsestage = 0 ;
 	int marker, marks [2], error, done = 0, format = 0 ;
 
@@ -180,12 +180,12 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					psf_log_printf (psf, "%M : %u\n", marker, size32) ;
 
 					/* Read ds64 sizes (3 8-byte words). */
-					psf_binheader_readf (psf, "888", &riff_size, &psf->datalength, &sample_count) ;
+					psf_binheader_readf (psf, "888", &riff_size, &psf->datalength, &frame_count) ;
 					if (psf->filelength != riff_size + 8)
 						psf_log_printf (psf, "  Riff size : %D (should be %D)\n  Data size : %D\n", riff_size, psf->filelength - 8, psf->datalength) ;
 					else
 						psf_log_printf (psf, "  Riff size : %D\n  Data size : %D\n", riff_size, psf->datalength) ;
-					psf_log_printf (psf, "  Frames    : %D\n", sample_count) ;
+					psf_log_printf (psf, "  Frames    : %D\n", frame_count) ;
 
 					/* Read table length. */
 					psf_binheader_readf (psf, "4", &size32) ;
@@ -306,6 +306,9 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		else
 			psf->sf.frames = psf->datalength / psf->blockwidth ;
 		} ;
+
+	if (frame_count != psf->sf.frames)
+		psf_log_printf (psf, "*** Calculated frame count %d does not match value from 'ds64' chunk %d\n", psf->sf.frames, frame_count) ;
 
 	switch (format)
 	{
