@@ -1,4 +1,10 @@
 Version 1.0.22 (2009-10-04)
+  * Add version metadata to Windows DLL.
+  * Add a missing 'inline' to sndfile.hh.
+  * Update docs.
+  * Minor bug fixes and improvements.
+
+Version 1.0.22 (2009-10-04)
   * Couple of fixes for SDS file writer.
   * Fixes arising from static analysis.
   * Handle FLAC files with ID3 meta data at start of file.

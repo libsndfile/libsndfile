@@ -6,6 +6,9 @@
     * doc/api.html
     Update to add missing SF_FORMAT_* values. Closed Debian bug #545257.
 
+    * NEWS README configure.ac doc/*.html
+    Updates for 1.0.23 release.
+
 2010-10-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/pedantic-header-test.sh.in
