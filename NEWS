@@ -1,4 +1,4 @@
-Version 1.0.22 (2009-10-04)
+Version 1.0.23 (2009-10-10)
   * Add version metadata to Windows DLL.
   * Add a missing 'inline' to sndfile.hh.
   * Update docs.
