@@ -38,7 +38,10 @@ AC_LANG([C])
 #  6. If any interfaces have been removed since the last public release, then set age
 #     to 0.
 
-SHARED_VERSION_INFO="1:21:0"
+CLEAN_VERSION=`echo $PACKAGE_VERSION | sed "s/p.*//"`
+VERSION_MINOR=`echo $CLEAN_VERSION | sed "s/.*\.//"`
+
+SHARED_VERSION_INFO="1:$VERSION_MINOR:0"
 
 AC_PROG_CC
 AM_PROG_CC_C_O
@@ -48,6 +51,7 @@ AC_PROG_CXX
 define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
 
 AM_PROG_LIBTOOL
+LT_PROG_RC
 
 AC_CHECK_PROG(HAVE_AUTOGEN, autogen, yes, no)
 AC_CHECK_PROG(HAVE_WINE, wine, yes, no)
@@ -388,6 +392,8 @@ AC_DEFINE_UNQUOTED(OS_IS_WIN32, ${os_is_win32}, [Set to 1 if compiling for Win32
 AC_DEFINE_UNQUOTED(OS_IS_MACOSX, ${os_is_macosx}, [Set to 1 if compiling for MacOSX])
 AC_DEFINE_UNQUOTED(USE_WINDOWS_API, ${use_windows_api}, [Set to 1 to use the native windows API])
 
+AM_CONDITIONAL(USE_WIN_VERSION_FILE, test ${use_windows_api} -eq 1)
+
 #====================================================================================
 # Check for ALSA.
 
@@ -573,6 +579,8 @@ if test "$HOST_TRIPLET" = "x86_64-w64-mingw32" ; then
 	OS_SPECIFIC_LINKS=" -static-libgcc $OS_SPECIFIC_LINKS"
 	fi
 
+WIN_RC_VERSION=`echo $PACKAGE_VERSION | sed -re "s/p.*//" -e "s/\./,/g"`
+
 #-------------------------------------------------------------------------------
 
 AC_SUBST(HOST_TRIPLET)
@@ -583,6 +591,9 @@ AC_SUBST(HTML_FGCOLOUR)
 
 AC_SUBST(SHLIB_VERSION_ARG)
 AC_SUBST(SHARED_VERSION_INFO)
+AC_SUBST(CLEAN_VERSION)
+AC_SUBST(WIN_RC_VERSION)
+
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(ALSA_LIBS)
@@ -602,6 +613,7 @@ SHAVE_INIT([],[enable])
 AC_CONFIG_FILES([ \
 	shave shave-libtool \
 	src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
+	src/version-metadata.rc \
 	man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
 	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile \
 	programs/Makefile doc/libsndfile.css \

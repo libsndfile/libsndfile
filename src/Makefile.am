@@ -27,13 +27,19 @@ COMMON = common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
 		interleave.c strings.c dither.c broadcast.c audio_detect.c \
  		ima_oki_adpcm.c ima_oki_adpcm.h chunk.c chanmap.c \
-		windows.c id3.c
+		windows.c id3.c $(WIN_VERSION_FILE)
 
 FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c \
 		macbinary3.c macos.c mat4.c mat5.c nist.c ogg.c paf.c pvf.c raw.c rx2.c sd2.c \
 		sds.c svx.c txw.c voc.c wve.c w64.c wav_w64.c wav.c xi.c mpc2k.c rf64.c
 
 CLEANFILES = *~
+
+if USE_WIN_VERSION_FILE
+WIN_VERSION_FILE = version-metadata.rc
+else
+WIN_VERSION_FILE =
+endif
 
 #===============================================================================
 # MinGW requires -no-undefined if a DLL is to be built.
@@ -86,6 +92,12 @@ Symbols.static: create_symbols_file.py
 
 # Fake dependancy to force the creation of these files.
 sndfile.o : $(SYMBOL_FILES)
+
+#======================================================================
+# Building windows resource files (if needed).
+
+.rc.lo:
+	$(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --tag=RC --mode=compile $(RC) $(RCFLAGS) $< -o $@
 
 #======================================================================
 # Disable autoheader.
