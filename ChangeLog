@@ -3,6 +3,9 @@
     * configure.ac src/version-metadata.rc.in src/Makefile.am
     Add version string resources to the windows DLL.
 
+    * doc/api.html
+    Update to add missing SF_FORMAT_* values. Closed Debian bug #545257.
+
 2010-10-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/pedantic-header-test.sh.in
