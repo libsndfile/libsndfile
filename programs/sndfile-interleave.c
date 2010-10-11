@@ -145,6 +145,7 @@ static void
 usage_exit (void)
 {	puts ("\nUsage : sndfile-interleave <input 1> <input 2> ... -o <output file>\n") ;
 	puts ("Merge two or more mono files into a single multi-channel file.\n") ;
+	printf ("Using %s.\n\n", sf_version_string ()) ;
 	exit (0) ;
 } /* usage_exit */
 

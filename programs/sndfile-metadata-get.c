@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008 George Blood Audio
+** Copyright (C) 2008-2010 George Blood Audio
 ** Written by Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
@@ -123,6 +123,7 @@ usage_exit (const char *progname, int exit_code)
 		"    --str-license         Print the license metadata.\n"
 		) ;
 
+	printf ("Using %s.\n\n", sf_version_string ()) ;
 	exit (exit_code) ;
 } /* usage_exit */
 

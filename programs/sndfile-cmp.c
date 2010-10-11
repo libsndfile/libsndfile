@@ -34,6 +34,7 @@
 #include "sfconfig.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
 
@@ -130,13 +131,14 @@ print_version (void)
 } /* print_version */
 
 static void
-print_usage (void)
+usage_exit (void)
 {
 	print_version () ;
 
 	printf ("Usage : %s <filename> <filename>\n", progname) ;
 	printf ("	Compare the PCM data of two sound files.\n\n") ;
-} /* print_usage */
+	exit (0) ;
+} /* usage_exit */
 
 int
 main (int argc, char *argv [])
@@ -145,7 +147,7 @@ main (int argc, char *argv [])
 	progname = progname ? progname + 1 : argv [0] ;
 
 	if (argc != 3)
-	{	print_usage () ;
+	{	usage_exit () ;
 		return 1 ;
 		} ;
 
@@ -154,7 +156,7 @@ main (int argc, char *argv [])
 
 	if (strcmp (filename1, filename2) == 0)
 	{	printf ("Error : Input filenames are the same.\n\n") ;
-		print_usage () ;
+		usage_exit () ;
 		return 1 ;
 		} ;
 

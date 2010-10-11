@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2009 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -978,6 +978,7 @@ main (int argc, char *argv [])
 	if (argc < 2)
 	{
 		printf ("\nUsage : %s <input sound file>\n\n", argv [0]) ;
+		printf ("  Using %s.\n\n", sf_version_string ()) ;
 #if (OS_IS_WIN32 == 1)
 		printf ("This is a Unix style command line application which\n"
 				"should be run in a MSDOS box or Command Shell window.\n\n") ;

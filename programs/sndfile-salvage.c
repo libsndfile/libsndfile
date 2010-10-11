@@ -49,7 +49,7 @@
 #define	NOT(x)			(! (x))
 
 
-static void print_usage (const char *progname) ;
+static void usage_exit (const char *progname) ;
 static void salvage_file (const char * broken_wav, const char * fixed_w64) ;
 
 int
@@ -61,8 +61,7 @@ main (int argc, char *argv [])
 		progname = strrchr (argv [0], '/') ;
 		progname = progname ? progname + 1 : argv [0] ;
 
-		print_usage (progname) ;
-		exit (1) ;
+		usage_exit (progname) ;
 		} ;
 
 	salvage_file (argv [1], argv [2]) ;
@@ -80,10 +79,12 @@ static void copy_data (int fd, SNDFILE * sndfile, int readsize) ;
 
 
 static void
-print_usage (const char *progname)
+usage_exit (const char *progname)
 {	printf ("Usage :\n\n  %s <broken wav file> <fixed w64 file>\n\n", progname) ;
-	puts ("    Salvages the audio data from WAV files which are more than 4G in length.\n") ;
-} /* print_usage */
+	puts ("Salvages the audio data from WAV files which are more than 4G in length.\n") ;
+	printf ("Using %s.\n\n", sf_version_string ()) ;
+	exit (0) ;
+} /* usage_exit */
 
 static void
 salvage_file (const char * broken_wav, const char * fixed_w64)

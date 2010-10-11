@@ -153,6 +153,7 @@ usage_exit (void)
 		"If the input file is named 'a.wav', the output files will be named\n"
 		"a_00.wav, a_01.wav and so on.\n"
 		) ;
+	printf ("Using %s.\n\n", sf_version_string ()) ;
 	exit (0) ;
 } /* usage_exit */
 

@@ -48,7 +48,7 @@ typedef	struct
 static void copy_metadata (SNDFILE *outfile, SNDFILE *infile, int channels) ;
 
 static void
-print_usage (char *progname)
+usage_exit (char *progname)
 {
 	printf ("\nUsage : %s [options] [encoding] <input file> <output file>\n", progname) ;
 	puts ("\n"
@@ -85,7 +85,8 @@ print_usage (char *progname)
 	sfe_dump_format_map () ;
 
 	puts ("") ;
-} /* print_usage */
+	exit (0) ;
+} /* usage_exit */
 
 int
 main (int argc, char * argv [])
@@ -99,7 +100,7 @@ main (int argc, char * argv [])
 	progname = progname ? progname + 1 : argv [0] ;
 
 	if (argc < 3 || argc > 5)
-	{	print_usage (progname) ;
+	{	usage_exit (progname) ;
 		return 1 ;
 		} ;
 
@@ -108,19 +109,19 @@ main (int argc, char * argv [])
 
 	if (strcmp (infilename, outfilename) == 0)
 	{	printf ("Error : Input and output filenames are the same.\n\n") ;
-		print_usage (progname) ;
+		usage_exit (progname) ;
 		return 1 ;
 		} ;
 
 	if (strlen (infilename) > 1 && infilename [0] == '-')
 	{	printf ("Error : Input filename (%s) looks like an option.\n\n", infilename) ;
-		print_usage (progname) ;
+		usage_exit (progname) ;
 		return 1 ;
 		} ;
 
 	if (outfilename [0] == '-')
 	{	printf ("Error : Output filename (%s) looks like an option.\n\n", outfilename) ;
-		print_usage (progname) ;
+		usage_exit (progname) ;
 		return 1 ;
 		} ;
 

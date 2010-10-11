@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2010Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -48,7 +48,7 @@
 #endif
 
 static void print_version (void) ;
-static void print_usage (const char *progname) ;
+static void usage_exit (const char *progname) ;
 
 static void info_dump (const char *filename) ;
 static int	instrument_dump (const char *filename) ;
@@ -70,7 +70,7 @@ main (int argc, char *argv [])
 		progname = strrchr (argv [0], '/') ;
 		progname = progname ? progname + 1 : argv [0] ;
 
-		print_usage (progname) ;
+		usage_exit (progname) ;
 		return 1 ;
 		} ;
 
@@ -123,7 +123,7 @@ print_version (void)
 
 
 static void
-print_usage (const char *progname)
+usage_exit (const char *progname)
 {	printf ("Usage :\n  %s <file> ...\n", progname) ;
 	printf ("    Prints out information about one or more sound files.\n\n") ;
 	printf ("  %s -i <file>\n", progname) ;
@@ -143,7 +143,9 @@ print_usage (const char *progname)
 		*/
 		Sleep (5 * 1000) ;
 #endif
-} /* print_usage */
+	printf ("Using %s.\n\n", sf_version_string ()) ;
+	exit (0) ;
+} /* usage_exit */
 
 /*==============================================================================
 **	Dumping of sndfile info.

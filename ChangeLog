@@ -1,5 +1,10 @@
 2010-10-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
+    * programs/*.c
+    Add the libsndfile version to the usage message of all programs.
+
+2010-10-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
     * configure.ac src/version-metadata.rc.in src/Makefile.am
     Add version string resources to the windows DLL.
 
