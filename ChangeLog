@@ -7,6 +7,9 @@
         src/test_main.h src/test_strncpy_crlf.c
     Use functions psf_strlcpy() and psf_strlcat() as appropriate.
 
+    * tests/string_test.c
+    Add tests for SF_STR_GENRE and SF_STR_TRACKNUMBER.
+
 2010-10-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/*.c
