@@ -177,24 +177,31 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 		switch (marker)
 		{	case ds64_MARKER :
-					psf_log_printf (psf, "%M : %u\n", marker, size32) ;
+				{	unsigned int table_len, bytesread ;
 
 					/* Read ds64 sizes (3 8-byte words). */
-					psf_binheader_readf (psf, "888", &riff_size, &psf->datalength, &frame_count) ;
+					bytesread = psf_binheader_readf (psf, "888", &riff_size, &psf->datalength, &frame_count) ;
+
+					/* Read table length. */
+					bytesread += psf_binheader_readf (psf, "4", &table_len) ;
+					/* Skip table for now. (this was "table_len + 4", why?) */
+					bytesread += psf_binheader_readf (psf, "j", table_len) ;
+
+					if (size32 == bytesread)
+						psf_log_printf (psf, "%M : %u\n", marker, size32) ;
+					else
+						psf_log_printf (psf, "%M : %u (should be %u)\n", marker, size32, bytesread) ;
+
 					if (psf->filelength != riff_size + 8)
 						psf_log_printf (psf, "  Riff size : %D (should be %D)\n  Data size : %D\n", riff_size, psf->filelength - 8, psf->datalength) ;
 					else
 						psf_log_printf (psf, "  Riff size : %D\n  Data size : %D\n", riff_size, psf->datalength) ;
 					psf_log_printf (psf, "  Frames    : %D\n", frame_count) ;
+					psf_log_printf (psf, "  Table length : %u\n", table_len) ;
 
-					/* Read table length. */
-					psf_binheader_readf (psf, "4", &size32) ;
-					psf_log_printf (psf, "  Table length : %u\n", size32) ;
-
-					/* Skip table for now. (this was "size32 + 4", why?) */
-					psf_binheader_readf (psf, "j", size32) ;
-					parsestage |= HAVE_ds64 ;
-					break ;
+					} ;
+				parsestage |= HAVE_ds64 ;
+				break ;
 
 			case fmt_MARKER:
 					psf_log_printf (psf, "%M : %u\n", marker, size32) ;
@@ -412,7 +419,7 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT =
 
 
 static int
-wavex_write_fmt_chunk (SF_PRIVATE *psf)
+rf64_write_fmt_chunk (SF_PRIVATE *psf)
 {	WAV_PRIVATE	*wpriv ;
 	int subformat, fmt_size ;
 
@@ -521,7 +528,7 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 		} ;
 
 	return 0 ;
-} /* wavex_write_fmt_chunk */
+} /* rf64_write_fmt_chunk */
 
 
 static int
@@ -554,7 +561,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_binheader_writef (psf, "em4m", RF64_MARKER, 0xffffffff, WAVE_MARKER) ;
 
 	/* Currently no table. */
-	psf_binheader_writef (psf, "m48884", ds64_MARKER, 32, psf->filelength - 8, psf->datalength, psf->sf.frames, 0) ;
+	psf_binheader_writef (psf, "m48884", ds64_MARKER, 28, psf->filelength - 8, psf->datalength, psf->sf.frames, 0) ;
 
 	/* WAVE and 'fmt ' markers. */
 	psf_binheader_writef (psf, "m", fmt_MARKER) ;
@@ -568,7 +575,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 
 		case SF_FORMAT_WAVEX :
 		case SF_FORMAT_RF64 :
-				if ((error = wavex_write_fmt_chunk (psf)) != 0)
+				if ((error = rf64_write_fmt_chunk (psf)) != 0)
 					return error ;
 				break ;
 
