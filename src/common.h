@@ -831,15 +831,32 @@ void pchk4_store (PRIV_CHUNK4 * pchk, int marker, sf_count_t offset, sf_count_t 
 int pchk4_find (PRIV_CHUNK4 * pchk, int marker) ;
 
 /*------------------------------------------------------------------------------------
-** Other helper functions.
+** Functions that work like OpenBSD's strlcpy/strlcat to replace strncpy/strncat.
+**
+** See : http://www.gratisoft.us/todd/papers/strlcpy.html
+**
+** These functions are available on *BSD, but are not avaialble everywhere so we
+** implement them here.
+**
+** The argument order has been changed to that of strncpy/strncat to cause
+** compiler errors if code is carelessly converted from one to the other.
 */
 
 static inline void
-psf_safe_strncat (char *dest, const char *src, size_t n)
-{	strncat (dest, src, n) ;
+psf_strlcat (char *dest, size_t n, const char *src)
+{	strncat (dest, src, n - strlen (dest) - 1) ;
 	dest [n - 1] = 0 ;
-} /* psf_safe_strncat */
+} /* psf_strlcat */
 
+static inline void
+psf_strlcpy (char *dest, size_t n, const char *src)
+{	strncpy (dest, src, n - 1) ;
+	dest [n - 1] = 0 ;
+} /* psf_strlcpy */
+
+/*------------------------------------------------------------------------------------
+** Other helper functions.
+*/
 
 void	*psf_memset (void *s, int c, sf_count_t n) ;
 
