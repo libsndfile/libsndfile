@@ -3,6 +3,10 @@
     * src/common.h
     Add functions psf_strlcpy() and psf_strlcat().
 
+    * src/broadcast.c src/sndfile.c src/strings.c src/test_main.c
+        src/test_main.h src/test_strncpy_crlf.c
+    Use functions psf_strlcpy() and psf_strlcat() as appropriate.
+
 2010-10-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/*.c

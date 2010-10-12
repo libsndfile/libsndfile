@@ -2259,7 +2259,7 @@ format_from_extension (SF_PRIVATE *psf)
 	if (strlen (cptr) > sizeof (buffer) - 1)
 		return 0 ;
 
-	strncpy (buffer, cptr, sizeof (buffer)) ;
+	psf_strlcpy (buffer, sizeof (buffer), cptr) ;
 	buffer [sizeof (buffer) - 1] = 0 ;
 
 	/* Convert everything in the buffer to lower case. */

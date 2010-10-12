@@ -26,12 +26,12 @@
 #include "test_main.h"
 
 void
-test_strncpy_crlf (void)
+test_psf_strlcpy_crlf (void)
 {	const char *src = "a\nb\nc\n" ;
 	char *dest ;
 	int dest_len ;
 
-	print_test_name ("Testing psf_strncpy_crlf") ;
+	print_test_name ("Testing psf_strlcpy_crlf") ;
 
 	for (dest_len = 3 ; dest_len < 30 ; dest_len++)
 	{	dest = calloc (1, dest_len + 1) ;
@@ -42,7 +42,7 @@ test_strncpy_crlf (void)
 
 		dest [dest_len] = 0xea ;
 
-		psf_strncpy_crlf (dest, src, dest_len, sizeof (src)) ;
+		psf_strlcpy_crlf (dest, src, dest_len, sizeof (src)) ;
 
 		if (dest [dest_len] != 0xea)
 		{	printf ("\n\nLine %d: buffer overrun for dest_len == %d\n\n", __LINE__, dest_len) ;
@@ -53,4 +53,4 @@ test_strncpy_crlf (void)
 		} ;
 
 	puts ("ok") ;
-} /* test_strncpy_crlf */
+} /* test_psf_strlcpy_crlf */

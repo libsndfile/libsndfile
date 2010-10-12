@@ -35,5 +35,5 @@ void test_double_convert (void) ;
 void test_audio_detect (void) ;
 void test_ima_oki_adpcm (void) ;
 
-void test_strncpy_crlf (void) ;
+void test_psf_strlcpy_crlf (void) ;
 void test_broadcast_var (void) ;

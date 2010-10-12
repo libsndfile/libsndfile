@@ -40,7 +40,7 @@ main (void)
 	test_audio_detect () ;
 	test_ima_oki_adpcm () ;
 
-	test_strncpy_crlf () ;
+	test_psf_strlcpy_crlf () ;
 	test_broadcast_var () ;
 
 	return 0 ;

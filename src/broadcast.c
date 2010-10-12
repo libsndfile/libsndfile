@@ -67,18 +67,18 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 
 	memcpy (psf->broadcast_16k, info, offsetof (SF_BROADCAST_INFO, coding_history)) ;
 
-	psf_strncpy_crlf (psf->broadcast_16k->coding_history, info->coding_history, sizeof (psf->broadcast_16k->coding_history), datasize - offsetof (SF_BROADCAST_INFO, coding_history)) ;
+	psf_strlcpy_crlf (psf->broadcast_16k->coding_history, info->coding_history, sizeof (psf->broadcast_16k->coding_history), datasize - offsetof (SF_BROADCAST_INFO, coding_history)) ;
 	len = strlen (psf->broadcast_16k->coding_history) ;
 
 	if (len > 0 && psf->broadcast_16k->coding_history [len - 1] != '\n')
-		psf_safe_strncat (psf->broadcast_16k->coding_history, "\r\n", sizeof (psf->broadcast_16k->coding_history)) ;
+		psf_strlcat (psf->broadcast_16k->coding_history, sizeof (psf->broadcast_16k->coding_history), "\r\n") ;
 
 	if (psf->file.mode == SFM_WRITE)
 	{	char added_history [256] ;
 		size_t added_history_len ;
 
 		added_history_len = gen_coding_history (added_history, sizeof (added_history), &(psf->sf)) ;
-		psf_safe_strncat (psf->broadcast_16k->coding_history, added_history, sizeof (psf->broadcast_16k->coding_history)) ;
+		psf_strlcat (psf->broadcast_16k->coding_history, sizeof (psf->broadcast_16k->coding_history), added_history) ;
 		} ;
 
 	/* Force coding_history_size to be even. */
@@ -138,11 +138,11 @@ gen_coding_history (char * added_history, int added_history_max, const SF_INFO *
 			return SF_FALSE ;
 
 		case 1 :
-			strncpy (chnstr, "mono", sizeof (chnstr)) ;
+			psf_strlcpy (chnstr, sizeof (chnstr), "mono") ;
 			break ;
 
 		case 2 :
-			strncpy (chnstr, "stereo", sizeof (chnstr)) ;
+			psf_strlcpy (chnstr, sizeof (chnstr), "stereo") ;
 			break ;
 
 		default :

@@ -1331,7 +1331,7 @@ append_snprintf (char * dest, size_t maxlen, const char * fmt, ...)
 
 
 void
-psf_strncpy_crlf (char *dest, const char *src, size_t destmax, size_t srcmax)
+psf_strlcpy_crlf (char *dest, const char *src, size_t destmax, size_t srcmax)
 {	/* Must be minus 2 so it can still expand a single trailing '\n' or '\r'. */
 	char * destend = dest + destmax - 2 ;
 	const char * srcend = src + srcmax ;
@@ -1363,7 +1363,7 @@ psf_strncpy_crlf (char *dest, const char *src, size_t destmax, size_t srcmax)
 
 	/* Make sure dest is terminated. */
 	*dest = 0 ;
-} /* psf_strncpy_crlf */
+} /* psf_strlcpy_crlf */
 
 /*==============================================================================
 */
