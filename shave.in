@@ -105,8 +105,8 @@ if test -z $V; then
     if test $pass_through -eq 0; then
         echo "$Q$output"
     fi
-    $REEL_TOOL $preserved_args
+    eval $REEL_TOOL $preserved_args
 else
     echo $REEL_TOOL $preserved_args
-    $REEL_TOOL $preserved_args
+    eval $REEL_TOOL $preserved_args
 fi
