@@ -16,6 +16,7 @@ AC_CONFIG_MACRO_DIR([M4])
 AC_CONFIG_HEADERS([src/config.h])
 
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
+AM_SILENT_RULES([yes])
 
 dnl Add parameters for aclocal
 AC_SUBST(ACLOCAL_AMFLAGS, "-I M4")
@@ -606,12 +607,7 @@ dnl The following line causes the libtool distributed with the source
 dnl to be replaced if the build system has a more recent version.
 AC_SUBST(LIBTOOL_DEPS)
 
-# Shave makes automake/libtool output much less verbose and much more
-# readable. See : git://git.lespiau.name/shave
-SHAVE_INIT([],[enable])
-
 AC_CONFIG_FILES([ \
-	shave shave-libtool \
 	src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
 	src/version-metadata.rc \
 	man/Makefile examples/Makefile tests/Makefile regtest/Makefile \

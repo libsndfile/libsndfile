@@ -4,6 +4,9 @@
     Fix shave invocation of windres compiler. Thanks Damien Lespiau (upstream
     shave author).
 
+    * configure.ac M4/shave.m4 shave-libtool.in shave.in
+    Switch from shave to automake-1.11's AM_SILENT_RULES.
+
 2010-10-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * shave-libtool.in shave.in
