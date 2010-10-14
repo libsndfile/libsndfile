@@ -1,3 +1,9 @@
+2010-10-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * shave.in M4/shave.m4
+    Fix shave invocation of windres compiler. Thanks Damien Lespiau (upstream
+    shave author).
+
 2010-10-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * shave-libtool.in shave.in

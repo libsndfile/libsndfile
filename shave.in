@@ -92,6 +92,9 @@ link,*)
 *,mcs)
     Q="  MCS   "
     ;;
+*,rc)
+    Q="  RC    "
+    ;;
 *,*)
     # should not happen
     Q="  CC    "
