@@ -580,7 +580,7 @@ if test "$HOST_TRIPLET" = "x86_64-w64-mingw32" ; then
 	OS_SPECIFIC_LINKS=" -static-libgcc $OS_SPECIFIC_LINKS"
 	fi
 
-WIN_RC_VERSION=`echo $PACKAGE_VERSION | sed -re "s/p.*//" -e "s/\./,/g"`
+WIN_RC_VERSION=`echo $PACKAGE_VERSION | $SED -re "s/p.*//" -e "s/\./,/g"`
 
 #-------------------------------------------------------------------------------
 

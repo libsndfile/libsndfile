@@ -1,3 +1,8 @@
+2010-10-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Sed fix for FreeBSD. Thanks Tony Theodore.
+
 2010-10-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * shave.in M4/shave.m4
