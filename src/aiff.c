@@ -527,8 +527,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						psf->datalength -= ssnd_fmt.offset ;
 						}
 					else
-					{	psf_log_printf (psf, "  Offset     : %u (Should be zero)\n", ssnd_fmt.offset) ;
+					{	psf_log_printf (psf, "  Offset     : %u\n", ssnd_fmt.offset) ;
 						psf_log_printf (psf, "  Block Size : %u ???\n", ssnd_fmt.blocksize) ;
+						psf->dataoffset += ssnd_fmt.offset ;
+						psf->datalength -= ssnd_fmt.offset ;
 						} ;
 
 					/* Only set dataend if there really is data at the end. */

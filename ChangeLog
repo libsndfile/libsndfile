@@ -1,3 +1,8 @@
+2010-10-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c
+    Handle non-zero offset field in SSND chunk. Thanks to Michael Chinen.
+
 2010-10-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
