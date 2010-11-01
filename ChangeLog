@@ -1,3 +1,9 @@
+2010-11-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Make TYPEOF_SF_COUNT_T int64_t where possible. This may fix problems where
+    people are compiling on a 64 bit system with the GCC -m32 flag.
+
 2010-10-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c

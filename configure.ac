@@ -174,7 +174,7 @@ case "$host_os" in
 	*)
 		if test "x$ac_cv_sizeof_off_t" = "x8" ; then
 			# If sizeof (off_t) is 8, no further checking is needed.
-			TYPEOF_SF_COUNT_T="off_t"
+			TYPEOF_SF_COUNT_T="int64_t"
 			SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 			SIZEOF_SF_COUNT_T=8
 		else
@@ -184,10 +184,10 @@ case "$host_os" in
 
 			TYPEOF_SF_COUNT_T="unknown"
 			if test "x$ac_cv_sizeof_loff_t" = "x8" ; then
-				TYPEOF_SF_COUNT_T="loff_t"
+				TYPEOF_SF_COUNT_T="int64_t"
 				SIZEOF_SF_COUNT_T=8
 			elif test "x$ac_cv_sizeof_off64_t" = "x8" ; then
-				TYPEOF_SF_COUNT_T="off64_t"
+				TYPEOF_SF_COUNT_T="int64_t"
 				SIZEOF_SF_COUNT_T=8
 				fi
 
