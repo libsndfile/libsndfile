@@ -255,6 +255,8 @@ On success, the sf_open function returns a non-NULL pointer which should be
 passed as the first parameter to all subsequent libsndfile calls dealing with
 that audio file.
 On fail, the sf_open function returns a NULL pointer.
+An explanation of the error can obtained by passing NULL to
+	<A HREF="#error">sf_strerror</A>.
 </P>
 
 <A NAME="open_fd"></A>
