@@ -4,6 +4,9 @@
     Add methods rawHandle() and takeOwnership(). Thanks to Tim Blechmann for
     the patch.
 
+    * tests/cpp_test.cc
+    Add tests for above two methods. Also supplied by Tim Blechmann.
+
 2010-11-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/api.html

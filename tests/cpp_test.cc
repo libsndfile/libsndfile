@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2006 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2006-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -207,6 +207,65 @@ ceeplusplus_extra_test (void)
 	puts ("ok") ;
 } /* ceeplusplus_extra_test */
 
+
+static void
+ceeplusplus_rawhandle_test (const char *filename)
+{
+	SNDFILE* handle ;
+	{
+		SndfileHandle file (filename) ;
+		handle = file.rawHandle () ;
+		sf_read_float (handle, fbuffer, ARRAY_LEN (fbuffer)) ;
+	}
+
+	if (sf_read_float (handle, fbuffer, ARRAY_LEN (fbuffer)) > 0)
+	{	printf ("\n\n%s %d : cannot read closed file.\n\n", __func__, __LINE__) ;
+		exit (1) ;
+		}
+}
+
+static void
+ceeplusplus_takeOwnership_test (const char *filename)
+{
+	SNDFILE* handle ;
+	{
+		SndfileHandle file (filename) ;
+		handle = file.takeOwnership () ;
+	}
+
+	if (sf_read_float (handle, fbuffer, ARRAY_LEN (fbuffer)) <= 0)
+	{	printf ("\n\n%s %d : error when taking ownership of handle.\n\n", __func__, __LINE__) ;
+		exit (1) ;
+		}
+
+	if (sf_close (handle) != 0)
+	{	printf ("\n\n%s %d : cannot close file.\n\n", __func__, __LINE__) ;
+		exit (1) ;
+		}
+
+	SndfileHandle file (filename) ;
+	SndfileHandle file2 (file) ;
+
+	if (file2.takeOwnership ())
+	{	printf ("\n\n%s %d : taking ownership of shared handle is not allowed.\n\n", __func__, __LINE__) ;
+		exit (1) ;
+		}
+}
+
+static void
+ceeplusplus_handle_test (const char *filename, int format)
+{
+	print_test_name ("ceeplusplus_handle_test", filename) ;
+
+	create_file (filename, format) ;
+
+	ceeplusplus_rawhandle_test (filename) ;
+	ceeplusplus_takeOwnership_test (filename) ;
+
+	remove (filename) ;
+	puts ("ok") ;
+} /* ceeplusplus_test */
+
 int
 main (void)
 {
@@ -215,6 +274,7 @@ main (void)
 	ceeplusplus_test ("cpp_test.au", SF_FORMAT_AU | SF_FORMAT_FLOAT) ;
 
 	ceeplusplus_extra_test () ;
+	ceeplusplus_handle_test ("cpp_test.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 
 	return 0 ;
 } /* main */
