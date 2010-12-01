@@ -134,6 +134,11 @@ class SndfileHandle
 		sf_count_t	readRaw		(void *ptr, sf_count_t bytes) ;
 		sf_count_t	writeRaw	(const void *ptr, sf_count_t bytes) ;
 
+		/**< Raw access to the handle. SndfileHandle keeps ownership. */
+		SNDFILE * rawHandle (void) ;
+
+		/**< Take ownership of handle, iff reference count is 1. */
+		SNDFILE * takeOwnership (void) ;
 } ;
 
 /*==============================================================================
@@ -364,6 +369,22 @@ inline sf_count_t
 SndfileHandle::writeRaw (const void *ptr, sf_count_t bytes)
 {	return sf_write_raw (p->sf, ptr, bytes) ; }
 
+inline SNDFILE *
+SndfileHandle::rawHandle (void)
+{	return (p ? p->sf : NULL) ; }
+
+inline SNDFILE *
+SndfileHandle::takeOwnership (void)
+{
+	if (p == NULL || (p->ref != 1))
+		return NULL ;
+
+	SNDFILE * sf = p->sf ;
+	p->sf = NULL ;
+	delete p ;
+	p = NULL ;
+	return sf ;
+}
 
 #ifdef ENABLE_SNDFILE_WINDOWS_PROTOTYPES
 
