@@ -640,6 +640,14 @@ AC_MSG_RESULT([
     External FLAC/Ogg/Vorbis : ............ ${enable_external_libs:-no}
 ])
 
+if test -z "$PKG_CONFIG" ; then
+	echo "    ***************************************************************"
+	echo "    ***          The pkg-config program is missing.             ***"
+	echo "    *** External FLAC/Ogg/Vorbis libs will not work without it. ***"
+	echo "    ***       http://pkg-config.freedesktop.org/wiki/           ***"
+	echo "    ***************************************************************"
+	echo
+	fi
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
 	echo "  Tools :"
