@@ -1,6 +1,6 @@
 /*
+** Copyright (C) 2008-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008 Conrad Parker <conrad@metadecks.org>
-** Copyright (C) 2008-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **

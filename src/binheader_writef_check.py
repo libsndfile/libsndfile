@@ -1,6 +1,6 @@
-#!/usr/bin/python2.6
+#!/usr/bin/python
 
-# Copyright (C) 2006-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
+# Copyright (C) 2006-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
 #
 # All rights reserved.
 #

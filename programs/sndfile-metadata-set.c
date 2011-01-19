@@ -1,6 +1,6 @@
 /*
+** Copyright (C) 2008-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008-2010 George Blood Audio
-** Written by Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **

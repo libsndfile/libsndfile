@@ -67,7 +67,7 @@ genfiles : test_endswap.c $(SYMBOL_FILES)
 # need access to the internals of the SF_PRIVATE struct.
 
 check: $(noinst_PROGRAMS)
-	@if [ -x /usr/bin/python2.6 ]; then $(srcdir)/binheader_writef_check.py $(srcdir)/*.c ; fi
+	@if [ -x /usr/bin/python ]; then $(srcdir)/binheader_writef_check.py $(srcdir)/*.c ; fi
 	./test_main$(EXEEXT)
 
 #======================================================================
