@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2010 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -984,11 +984,6 @@ main (int argc, char *argv [])
 				"should be run in a MSDOS box or Command Shell window.\n\n") ;
 		printf ("Sleeping for 5 seconds before exiting.\n\n") ;
 
-		/* This is the officially blessed by microsoft way but I can't get
-		** it to link.
-		**     Sleep (15) ;
-		** Instead, use this:
-		*/
 		Sleep (5 * 1000) ;
 #endif
 		return 1 ;
