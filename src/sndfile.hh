@@ -79,6 +79,12 @@ class SndfileHandle
 							int format = 0, int channels = 0, int samplerate = 0) ;
 			SndfileHandle (int fd, bool close_desc, int mode = SFM_READ,
 							int format = 0, int channels = 0, int samplerate = 0) ;
+
+#ifdef ENABLE_SNDFILE_WINDOWS_PROTOTYPES
+			SndfileHandle (LPCWSTR wpath, int mode = SFM_READ,
+							int format = 0, int channels = 0, int samplerate = 0) ;
+#endif
+
 			~SndfileHandle (void) ;
 
 			SndfileHandle (const SndfileHandle &orig) ;
