@@ -30,6 +30,41 @@ static float	fbuffer [100] ;
 static double	dbuffer [100] ;
 
 static void
+ceeplusplus_wchar_test (void)
+{
+#if 0
+	LPCWSTR filename = L"wchar_test.wav" ;
+
+	print_test_name (__func__, "ceeplusplus_wchar_test.wav") ;
+
+	/* Use this scope to make sure the created file is closed. */
+	{
+		SndfileHandle file (filename, SFM_WRITE, SF_FORMAT_WAV | SF_FORMAT_PCM_16, 2, 44100) ;
+
+		if (file.refCount () != 1)
+		{	printf ("\n\n%s %d : Error : Reference count (%d) should be 1.\n\n", __func__, __LINE__, file.refCount ()) ;
+			exit (1) ;
+			} ;
+
+		/*	This should check that the file did in fact get created with a
+		**	wchar_t * filename.
+		*/
+		exit_if_true (
+			GetFileAttributesW (filename) == INVALID_FILE_ATTRIBUTES,
+			"\n\nLine %d : GetFileAttributes failed.\n\n", __LINE__
+			) ;
+	}
+
+	/* Use this because the file was created with CreateFileW. */
+	DeleteFileW (filename) ;
+
+	puts ("ok") ;
+#endif
+} /* ceeplusplus_wchar_test */
+
+
+
+static void
 create_file (const char * filename, int format)
 {	SndfileHandle file ;
 
@@ -275,6 +310,8 @@ main (void)
 
 	ceeplusplus_extra_test () ;
 	ceeplusplus_handle_test ("cpp_test.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+
+	ceeplusplus_wchar_test () ;
 
 	return 0 ;
 } /* main */

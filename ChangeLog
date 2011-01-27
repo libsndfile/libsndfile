@@ -2,7 +2,10 @@
 
     * src/sndfile.hh
     Add an LPCWSTR version of the SndfileHandle constructor to the SndfileHandle
-    class definition.Thanks to Eric Eizenman for pointing out this was missing.
+    class definition. Thanks to Eric Eizenman for pointing out this was missing.
+
+    * tests/cpp_test.cc
+    Add test for LPCWSTR version of the SndfileHandle constructor.
 
 2011-01-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
