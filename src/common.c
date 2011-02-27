@@ -1034,14 +1034,14 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 			case 'b' :
 					charptr = va_arg (argptr, char*) ;
-					count = va_arg (argptr, int) ;
+					count = va_arg (argptr, size_t) ;
 					if (count > 0)
 						byte_count += header_read (psf, charptr, count) ;
 					break ;
 
 			case 'G' :
 					charptr = va_arg (argptr, char*) ;
-					count = va_arg (argptr, int) ;
+					count = va_arg (argptr, size_t) ;
 					if (count > 0)
 						byte_count += header_gets (psf, charptr, count) ;
 					break ;
@@ -1060,14 +1060,14 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 
 			case 'p' :
 					/* Get the seek position first. */
-					count = va_arg (argptr, int) ;
+					count = va_arg (argptr, size_t) ;
 					header_seek (psf, count, SEEK_SET) ;
 					byte_count = count ;
 					break ;
 
 			case 'j' :
 					/* Get the seek position first. */
-					count = va_arg (argptr, int) ;
+					count = va_arg (argptr, size_t) ;
 					header_seek (psf, count, SEEK_CUR) ;
 					byte_count += count ;
 					break ;
