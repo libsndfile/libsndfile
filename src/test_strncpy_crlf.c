@@ -40,11 +40,11 @@ test_psf_strlcpy_crlf (void)
 			exit (1) ;
 			} ;
 
-		dest [dest_len] = 0xea ;
+		dest [dest_len] = '\xea' ;
 
 		psf_strlcpy_crlf (dest, src, dest_len, sizeof (src)) ;
 
-		if (dest [dest_len] != 0xea)
+		if (dest [dest_len] != '\xea')
 		{	printf ("\n\nLine %d: buffer overrun for dest_len == %d\n\n", __LINE__, dest_len) ;
 			exit (1) ;
 			} ;
