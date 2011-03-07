@@ -300,37 +300,38 @@ EXTERNAL_LIBS=""
 # Check for pkg-config outside the if statement.
 PKG_PROG_PKG_CONFIG
 
-if test x$enable_external_libs = xno ; then
-	AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
-else
-	PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
-	PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
+if test -n "$ac_cv_path_PKG_CONFIG" ; then
+	if test x$enable_external_libs = xno ; then
+		AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
+	else
+		PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
+		PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
 	# Vorbis versions earlier than 1.2.3 have bugs that cause the libsndfile
-	# test suite to fail on MIPS, PowerPC and others.
-	# See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
-	PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.3, ac_cv_vorbis=yes, ac_cv_vorbis=no)
-	PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.3, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
-	enable_external_libs=yes
-	fi
+		# test suite to fail on MIPS, PowerPC and others.
+		# See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
+		PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.3, ac_cv_vorbis=yes, ac_cv_vorbis=no)
+		PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.3, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
+		enable_external_libs=yes
+		fi
 
 if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
-	HAVE_EXTERNAL_LIBS=1
-	enable_external_libs=yes
+		HAVE_EXTERNAL_LIBS=1
+		enable_external_libs=yes
 
 	EXTERNAL_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBISENC_CFLAGS"
-	EXTERNAL_LIBS="$FLAC_LIBS $VORBISENC_LIBS"
-else
-	AC_MSG_WARN([[
-
-*** One or more of the external libraries (ie libflac, libogg and
-*** libvorbis) is either missing (possibly only the development
-*** headers) or is of an unsupported version.
-***
-*** Unfortunately, for ease of maintenance, the external libs
-*** are an all or nothing affair.
-]])
-	enable_external_libs=no
+		EXTERNAL_LIBS="$FLAC_LIBS $VORBISENC_LIBS"
+	else
+		echo
+		AC_MSG_WARN([[*** One or more of the external libraries (ie libflac, libogg and]])
+		AC_MSG_WARN([[*** libvorbis) is either missing (possibly only the development]])
+		AC_MSG_WARN([[*** headers) or is of an unsupported version.]])
+		AC_MSG_WARN([[***]])
+		AC_MSG_WARN([[*** Unfortunately, for ease of maintenance, the external libs]])
+		AC_MSG_WARN([[*** are an all or nothing affair.]])
+		echo
+		enable_external_libs=no
+		fi
 	fi
 
 AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_LIBS], $HAVE_EXTERNAL_LIBS, [Will be set to 1 if flac, ogg and vorbis are available.])
@@ -641,11 +642,11 @@ AC_MSG_RESULT([
 ])
 
 if test -z "$PKG_CONFIG" ; then
-	echo "    ***************************************************************"
-	echo "    ***          The pkg-config program is missing.             ***"
-	echo "    *** External FLAC/Ogg/Vorbis libs will not work without it. ***"
-	echo "    ***       http://pkg-config.freedesktop.org/wiki/           ***"
-	echo "    ***************************************************************"
+	echo "    *****************************************************************"
+	echo "    ***          The pkg-config program is missing.               ***"
+	echo "    *** External FLAC/Ogg/Vorbis libs cannot be found without it. ***"
+	echo "    ***       http://pkg-config.freedesktop.org/wiki/             ***"
+	echo "    *****************************************************************"
 	echo
 	fi
 
