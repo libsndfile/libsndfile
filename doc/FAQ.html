@@ -389,16 +389,18 @@ is the risk of breaking something that currently works.
 </B></H2>
 
 <P>
-For a sound file with only one channel, a frame is the same as a item (ie a
-single sample).
+An <tt>item</tt>tt> is a single sample of the data type you are reading; ie a
+single <tt>short</tt> value for <tt>sf_read_short</tt> or a single <tt>float</tt>
+for <tt>sf_read_float</tt>.
 </P>
-<P>
-For multi channel sound files, a single frame contains a single item for
-each channel.
+
+For a sound file with only one channel, a frame is the same as a item (ie a
+single sample) while for multi channel sound files, a single frame contains a
+single item for each channel.
 </P>
 
 <P>
-Here is are two simple, correct examples, both of which are assumed to be working
+Here are two simple, correct examples, both of which are assumed to be working
 on a stereo file, first using items:
 </P>
 
