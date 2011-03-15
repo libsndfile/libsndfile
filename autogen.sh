@@ -158,4 +158,3 @@ echo "  autoconf"
 autoconf || exit 1
 
 cd $olddir
-$srcdir/configure --enable-gcc-werror "$@" && echo
