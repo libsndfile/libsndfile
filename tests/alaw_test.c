@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -48,10 +49,7 @@ main (void)
 
 	filename = "test.raw" ;
 
-	sfinfo.format		= SF_FORMAT_RAW | SF_FORMAT_ALAW ;
-	sfinfo.samplerate	= 44100 ;
-	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
-	sfinfo.channels		= 1 ;
+	sf_info_setup (&sfinfo, SF_FORMAT_RAW | SF_FORMAT_ALAW, 44100, 1) ;
 
 	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
 	{	printf ("sf_open_write failed with error : ") ;

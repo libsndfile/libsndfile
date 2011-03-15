@@ -3,14 +3,17 @@
     * doc/FAQ.html
     Add examples for question 12.
 
-    * tests/util.tpl
-    Add static inline functions sf_info_clear() and sf_info_setup().
-
     * doc/libsndfile.css.in
     Add tweaks for h4 element.
 
     * doc/api.html
     Add documentation for virtual I/O functionality. Thanks to Uli Franke.
+
+    * tests/util.tpl
+    Add static inline functions sf_info_clear() and sf_info_setup().
+
+    * tests/(alaw|dwvw|ulaw)_test.c
+    Use functions sf_info_clear() and sf_info_setup().
 
 2011-03-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
