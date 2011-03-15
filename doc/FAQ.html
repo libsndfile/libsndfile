@@ -389,12 +389,32 @@ is the risk of breaking something that currently works.
 </B></H2>
 
 <P>
-For a sound file with only one channel, a frame is the same as a item.
+For a sound file with only one channel, a frame is the same as a item, a single
+sample.
 </P>
 <P>
 For multi channel sound files, a single frame contains a single item for
 each channel.
 </P>
+
+<P>
+Here is a simple, correct example using items:
+</P>
+
+<PRE>
+        short data [100] ;
+        sf_count items_read = sf_read_short (file, data, 100) ;
+        assert (items_read == 100) ;
+</PRE>
+
+and one using frames and assuming a stereo file (two channels):
+
+<PRE>
+        #define CHANNELS 2
+        short data [CHANNELS * 100] ;
+        sf_count frames_read = sf_readf_short (file, data, 100) ;
+        assert (frames_read == 100) ;
+</PRE>
 
 <!-- ========================================================================= -->
 
