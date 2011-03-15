@@ -83,7 +83,6 @@
 #define IART_MARKER	 (MAKE_MARKER ('I', 'A', 'R', 'T'))
 #define INAM_MARKER	 (MAKE_MARKER ('I', 'N', 'A', 'M'))
 #define IENG_MARKER	 (MAKE_MARKER ('I', 'E', 'N', 'G'))
-#define IART_MARKER	 (MAKE_MARKER ('I', 'A', 'R', 'T'))
 #define IGNR_MARKER	 (MAKE_MARKER ('I', 'G', 'N', 'R'))
 #define ICOP_MARKER	 (MAKE_MARKER ('I', 'C', 'O', 'P'))
 #define IPRD_MARKER	 (MAKE_MARKER ('I', 'P', 'R', 'D'))
