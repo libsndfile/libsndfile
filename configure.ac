@@ -656,8 +656,8 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	echo "    Compiler is GCC : ..................... ${ac_cv_c_compiler_gnu}"
 	echo "    GCC version : ......................... ${GCC_VERSION}"
 	if test $GCC_MAJOR_VERSION -lt 3 ; then
-		echo
-		echo "\n    ** This compiler version allows applications to write"
+		echo "\n"
+		echo "    ** This compiler version allows applications to write"
 		echo "    ** to static strings within the library."
 		echo "    ** Compile with GCC version 3.X or above to avoid this problem."
 		fi
