@@ -41,6 +41,22 @@ extern "C" {
 #define	PIPE_INDEX(x)	((x) + 500)
 #define	PIPE_TEST_LEN	12345
 
+
+static inline void
+sf_info_clear (SF_INFO * info)
+{	memset (info, 0, sizeof (SF_INFO)) ;
+} /* sf_info_clear */
+
+static inline void
+sf_info_setup (SF_INFO * info, int format, int samplerate, int channels)
+{	sf_info_clear (info) ;
+
+	info->format = format ;
+	info->samplerate = samplerate ;
+	info->channels = channels ;
+} /* sf_info_setup */
+
+
 [+ FOR float_type
 +]void gen_windowed_sine_[+ (get "name") +] ([+ (get "name") +] *data, int len, double maximum) ;
 [+ ENDFOR float_type
