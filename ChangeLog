@@ -9,6 +9,9 @@
     * doc/libsndfile.css.in
     Add tweaks for h4 element.
 
+    * doc/api.html
+    Add documentation for virtual I/O functionality. Thanks to Uli Franke.
+
 2011-03-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac

@@ -64,7 +64,7 @@ The functions of libsndfile are defined as follows:
 
       SNDFILE*    <A HREF="#open">sf_open</A>          (const char *path, int mode, SF_INFO *sfinfo) ;
       SNDFILE*    <A HREF="#open_fd">sf_open_fd</A>       (int fd, int mode, SF_INFO *sfinfo, int close_desc) ;
-
+      SNDFILE* 	  <A HREF="#open_virtual">sf_open_virtual</A>  (SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data) ;
       int         <A HREF="#check">sf_format_check</A>  (const SF_INFO *info) ;
 
       sf_count_t  <A HREF="#seek">sf_seek</A>          (SNDFILE *sndfile, sf_count_t frames, int whence) ;
@@ -305,6 +305,86 @@ passed as the first parameter to all subsequent libsndfile calls dealing with
 that audio file.
 On fail, the sf_open_fd function returns a NULL pointer.
 </P>
+
+<A NAME="open_virtual"></A>
+<h3><b>Virtual File Open Function</b></h3>
+<pre>
+      SNDFILE* 	sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data) ;
+</pre>
+<p>
+	Opens a soundfile from a virtual file I/O context which is provided
+	by the caller. This is usually used to interface libsndfile to a stream or buffer
+	based system. Apart from the sfvirtual and the user_data parameters this function behaves
+	like <a href="#open">sf_open</a>.
+</p>
+
+<pre>
+      typedef struct
+      {    sf_vio_get_filelen  get_filelen ;
+           sf_vio_seek         seek ;
+           sf_vio_read         read ;
+           sf_vio_write        write ;
+           sf_vio_tell         tell ;
+      } SF_VIRTUAL_IO ;
+</pre>
+<p>
+Libsndfile calls the callbacks provided by the SF_VIRTUAL_IO structure when opening, reading
+and writing to the virtual file context. The user_data pointer is a user defined context which
+will be available in the callbacks.
+</p>
+<pre>
+      typedef sf_count_t  (*sf_vio_get_filelen) (void *user_data) ;
+      typedef sf_count_t  (*sf_vio_seek)        (sf_count_t offset, int whence, void *user_data) ;
+      typedef sf_count_t  (*sf_vio_read)        (void *ptr, sf_count_t count, void *user_data) ;
+      typedef sf_count_t  (*sf_vio_write)       (const void *ptr, sf_count_t count, void *user_data) ;
+      typedef sf_count_t  (*sf_vio_tell)        (void *user_data) ;
+</pre>
+<h4>sf_vio_get_filelen</h4>
+<pre>
+      typedef sf_count_t  (*sf_vio_get_filelen) (void *user_data) ;
+</pre>
+<p>
+The virtual file contex must return the length of the virtual file in bytes.<br>
+</p>
+<h4>sf_vio_seek</h4>
+<pre>
+      typedef sf_count_t  (*sf_vio_seek)        (sf_count_t offset, int whence, void *user_data) ;
+</pre>
+<p>
+The virtual file context must seek to offset using the seek mode provided by whence which is one of<br>
+</p>
+<pre>
+      SEEK_CUR
+      SEEK_SET
+      SEEK_END
+</pre>
+<p>
+The return value must contain the new offset in the file.
+</p>
+<h4>sf_vio_read</h4>
+<pre>
+      typedef sf_count_t  (*sf_vio_read)        (void *ptr, sf_count_t count, void *user_data) ;
+</pre>
+<p>
+The virtual file context must copy ("read") "count" bytes into the
+buffer provided by ptr and return the count of actually copied bytes.
+</p>
+<h4>sf_vio_write</h4>
+<pre>
+      typedef sf_count_t  (*sf_vio_write)       (const void *ptr, sf_count_t count, void *user_data) ;
+</pre>
+<p>
+The virtual file context must process "count" bytes stored in the
+buffer passed with ptr and return the count of actually processed bytes.<br>
+</p>
+<h4>sf_vio_tell</h4>
+<pre>
+      typedef sf_count_t  (*sf_vio_tell)        (void *user_data) ;
+</pre>
+<p>
+Return the current position of the virtual file context.<br>
+</p>
+
 
 <A NAME="check"></A>
 <BR><H2><B>Format Check Function</B></H2>

@@ -11,13 +11,16 @@
 *.loT
 *.oct
 *.oga
+*.ogg
 *.paf
 *.rifx
 *.sd2
 *.sds
 *.svx
+*.w64
 *.wav
 *.wavex
+*.8svx
 .deps
 .git*
 .libs
