@@ -300,14 +300,14 @@ EXTERNAL_LIBS=""
 # Check for pkg-config outside the if statement.
 PKG_PROG_PKG_CONFIG
 
-if test -n "$ac_cv_path_PKG_CONFIG" ; then
+if test -n "$PKG_CONFIG" ; then
 	if test x$enable_external_libs = xno ; then
 		AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
 	else
 		PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
 		PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
-	# Vorbis versions earlier than 1.2.3 have bugs that cause the libsndfile
+		# Vorbis versions earlier than 1.2.3 have bugs that cause the libsndfile
 		# test suite to fail on MIPS, PowerPC and others.
 		# See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
 		PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.3, ac_cv_vorbis=yes, ac_cv_vorbis=no)
