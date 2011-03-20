@@ -102,11 +102,17 @@ if test -x test_main@EXEEXT@ ; then
 ./win32_ordinal_test@EXEEXT@
 ./external_libs_test@EXEEXT@
 
-# The win64 G++ compiler requires an extra runtime DLL which
-# we don't have, so skip the following test on win64.
-if test "$HOST_TRIPLET" != "x86_64-w64-mingw32" ; then
-	./cpp_test@EXEEXT@
-	fi
+# The w64 G++ compiler requires an extra runtime DLL which we don't have,
+# so skip this test.
+case "$HOST_TRIPLET" in
+	x86_64-w64-mingw32)
+		;;
+	i686-w64-mingw32)
+		;;
+	*)
+		./cpp_test@EXEEXT@
+		;;
+	esac
 
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed common tests."
