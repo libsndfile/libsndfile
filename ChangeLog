@@ -1,3 +1,10 @@
+2011-03-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/wav.c
+    For u-law and A-law files, write an 18 byte 'fmt ' chunk instead of a 16
+    byte one. Win98 accepts files with a 16 but not 18 byte 'fmt' chunk. Later
+    version accept 18 byte but not 16 byte.
+
 2011-03-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html

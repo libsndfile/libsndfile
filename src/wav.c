@@ -756,27 +756,27 @@ wav_write_fmt_chunk (SF_PRIVATE *psf)
 					break ;
 
 		case SF_FORMAT_ULAW :
-					fmt_size = 2 + 2 + 4 + 4 + 2 + 2 ;
+					fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 ;
 
 					/* fmt : format, channels, samplerate */
 					psf_binheader_writef (psf, "4224", fmt_size, WAVE_FORMAT_MULAW, psf->sf.channels, psf->sf.samplerate) ;
 					/*  fmt : bytespersec */
 					psf_binheader_writef (psf, "4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
-					/*  fmt : blockalign, bitwidth */
-					psf_binheader_writef (psf, "22", psf->bytewidth * psf->sf.channels, 8) ;
+					/*  fmt : blockalign, bitwidth, extrabytes */
+					psf_binheader_writef (psf, "222", psf->bytewidth * psf->sf.channels, 8, 0) ;
 
 					add_fact_chunk = SF_TRUE ;
 					break ;
 
 		case SF_FORMAT_ALAW :
-					fmt_size = 2 + 2 + 4 + 4 + 2 + 2 ;
+					fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 ;
 
 					/* fmt : format, channels, samplerate */
 					psf_binheader_writef (psf, "4224", fmt_size, WAVE_FORMAT_ALAW, psf->sf.channels, psf->sf.samplerate) ;
 					/*  fmt : bytespersec */
 					psf_binheader_writef (psf, "4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
-					/*  fmt : blockalign, bitwidth */
-					psf_binheader_writef (psf, "22", psf->bytewidth * psf->sf.channels, 8) ;
+					/*  fmt : blockalign, bitwidth, extrabytes */
+					psf_binheader_writef (psf, "222", psf->bytewidth * psf->sf.channels, 8, 0) ;
 
 					add_fact_chunk = SF_TRUE ;
 					break ;
