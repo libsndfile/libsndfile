@@ -715,11 +715,12 @@ ogg_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *tran
 					{	/* we have a packet.	Decode it */
 						if (vorbis_synthesis (&vdata->vb, &odata->op) == 0) /* test for success! */
 							vorbis_synthesis_blockin (&vdata->vd, &vdata->vb) ;
-		  /*
-		  **pcm is a multichannel float vector.	 In stereo, for
-		  example, pcm [0] is left, and pcm [1] is right.	 samples is
-		  the size of each channel.	 Convert the float values
-		  (-1.<=range<=1.) to whatever PCM format and write it out */
+						/*
+						** The **pcm variable is a multichannel float vector.	 In stereo, for
+						** example, pcm [0] is left, and pcm [1] is right.	 samples is
+						** the size of each channel.	 Convert the float values
+						** (-1.<=range<=1.) to whatever PCM format and write it out.
+						*/
 
 						while ((samples = vorbis_synthesis_pcmout (&vdata->vd, &pcm)) > 0)
 						{	if (samples>len) samples = len ;
