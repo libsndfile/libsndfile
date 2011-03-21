@@ -69,3 +69,5 @@ void sfe_copy_data_int (SNDFILE *outfile, SNDFILE *infile, int channels) ;
 int sfe_file_type_of_ext (const char *filename, int format) ;
 
 void sfe_dump_format_map (void) ;
+
+const char * program_name (const char * argv0) ;

@@ -1,3 +1,9 @@
+2011-03-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/common.[ch]
+    Add function program_name() which returns the program name minus the path
+    from argv [0].
+
 2011-03-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c

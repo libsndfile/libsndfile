@@ -360,3 +360,20 @@ sfe_dump_format_map (void)
 		} ;
 
 } /* sfe_dump_format_map */
+
+const char *
+program_name (const char * argv0)
+{	const char * tmp ;
+
+	tmp = strrchr (argv0, '/') ;
+	argv0 = tmp ? tmp + 1 : argv0 ;
+
+	tmp = strrchr (argv0, '/') ;
+	argv0 = tmp ? tmp + 1 : argv0 ;
+
+	/* Remove leading libtool name mangling. */
+	if (strstr (argv0, "lt-") == argv0)
+		return argv0 + 3 ;
+
+	return argv0 ;
+} /* program_name */
