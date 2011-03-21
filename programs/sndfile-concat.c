@@ -37,6 +37,8 @@
 
 #include	<sndfile.h>
 
+#include	"common.h"
+
 #define		BUFFER_LEN	(1<<16)
 
 
@@ -44,12 +46,8 @@ static void concat_data_fp (SNDFILE *wfile, SNDFILE *rofile, int channels) ;
 static void concat_data_int (SNDFILE *wfile, SNDFILE *rofile, int channels) ;
 
 static void
-usage_exit (const char *argv0)
-{	const char *progname ;
-
-	progname = strrchr (argv0, '/') ;
-	progname = progname ? progname + 1 : argv0 ;
-
+usage_exit (const char *progname)
+{
 	printf ("\nUsage : %s <infile1> <infile2>  ... <outfile>\n\n", progname) ;
 	puts (
 		"    Create a new output file <outfile> containing the concatenated\n"
@@ -68,16 +66,16 @@ usage_exit (const char *argv0)
 
 int
 main (int argc, char *argv [])
-{	const char	*argv0, *outfilename ;
+{	const char	*progname, *outfilename ;
 	SNDFILE	 	*outfile, **infiles ;
 	SF_INFO	 	sfinfo_out, sfinfo_in ;
 	void 		(*func) (SNDFILE*, SNDFILE*, int) ;
 	int			k ;
 
-	argv0 = argv [0] ;
+	progname = program_name (argv [0]) ;
 
 	if (argc < 4)
-		usage_exit (argv0) ;
+		usage_exit (progname) ;
 
 	argv ++ ;
 	argc -- ;

@@ -58,8 +58,7 @@ main (int argc, char *argv [])
 	int	start ;
 
 	/* Store the program name. */
-	progname = strrchr (argv [0], '/') ;
-	progname = progname ? progname + 1 : argv [0] ;
+	progname = program_name (argv [0]) ;
 
 	/* Check if we've been asked for help. */
 	if (argc <= 2 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)

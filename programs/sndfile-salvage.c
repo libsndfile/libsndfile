@@ -44,6 +44,8 @@
 
 #include	<sndfile.h>
 
+#include	"common.h"
+
 #define	BUFFER_LEN		(1 << 16)
 
 #define	NOT(x)			(! (x))
@@ -56,13 +58,7 @@ int
 main (int argc, char *argv [])
 {
 	if (argc != 3)
-	{	char *progname ;
-
-		progname = strrchr (argv [0], '/') ;
-		progname = progname ? progname + 1 : argv [0] ;
-
-		usage_exit (progname) ;
-		} ;
+		usage_exit (program_name (argv [0])) ;
 
 	salvage_file (argv [1], argv [2]) ;
 

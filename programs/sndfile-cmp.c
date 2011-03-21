@@ -40,10 +40,12 @@
 
 #include <sndfile.h>
 
+#include "common.h"
+
 /* Length of comparison data buffers in units of items */
 #define BUFLEN 65536
 
-static char * progname = NULL ;
+static const char * progname = NULL ;
 static char * filename1 = NULL, * filename2 = NULL ;
 
 static int
@@ -143,8 +145,7 @@ usage_exit (void)
 int
 main (int argc, char *argv [])
 {
-	progname = strrchr (argv [0], '/') ;
-	progname = progname ? progname + 1 : argv [0] ;
+	progname = program_name (argv [0]) ;
 
 	if (argc != 3)
 	{	usage_exit () ;

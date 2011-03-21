@@ -65,12 +65,7 @@ main (int argc, char *argv [])
 	print_version () ;
 
 	if (argc < 2 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)
-	{	char *progname ;
-
-		progname = strrchr (argv [0], '/') ;
-		progname = progname ? progname + 1 : argv [0] ;
-
-		usage_exit (progname) ;
+	{	usage_exit (program_name (argv [0])) ;
 		return 1 ;
 		} ;
 

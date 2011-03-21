@@ -48,7 +48,7 @@ typedef	struct
 static void copy_metadata (SNDFILE *outfile, SNDFILE *infile, int channels) ;
 
 static void
-usage_exit (char *progname)
+usage_exit (const char *progname)
 {
 	printf ("\nUsage : %s [options] [encoding] <input file> <output file>\n", progname) ;
 	puts ("\n"
@@ -90,14 +90,13 @@ usage_exit (char *progname)
 
 int
 main (int argc, char * argv [])
-{	char 		*progname, *infilename, *outfilename ;
+{	const char	*progname, *infilename, *outfilename ;
 	SNDFILE	 	*infile = NULL, *outfile = NULL ;
 	SF_INFO	 	sfinfo ;
 	int			k, outfilemajor, outfileminor = 0, infileminor ;
 	int			override_sample_rate = 0 ; /* assume no sample rate override. */
 
-	progname = strrchr (argv [0], '/') ;
-	progname = progname ? progname + 1 : argv [0] ;
+	progname = program_name (argv [0]) ;
 
 	if (argc < 3 || argc > 5)
 	{	usage_exit (progname) ;

@@ -4,6 +4,9 @@
     Add function program_name() which returns the program name minus the path
     from argv [0].
 
+    * programs/*.c programs/Makefile.am
+    Use program_name() where appropriate. Fix build.
+
 2011-03-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c
