@@ -120,7 +120,8 @@ rdwr_test_SOURCES = rdwr_test.c utils.c
 rdwr_test_LDADD = $(top_builddir)/src/libsndfile.la
 
 win32_test_SOURCES = win32_test.c
-win32_test_LDADD =
+# Link lib here so that generating the testsuite tarball works correctly.
+win32_test_LDADD = $(top_builddir)/src/libsndfile.la
 
 win32_ordinal_test_SOURCES = win32_ordinal_test.c utils.c
 win32_ordinal_test_LDADD = $(top_builddir)/src/libsndfile.la
