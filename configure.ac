@@ -23,6 +23,23 @@ AC_SUBST(ACLOCAL_AMFLAGS, "-I M4")
 
 AC_LANG([C])
 
+AC_PROG_CC
+AM_PROG_CC_C_O
+AC_PROG_CXX
+AC_PROG_SED
+
+# Do not check for F77.
+define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
+
+AM_PROG_LIBTOOL
+LT_PROG_RC
+
+AC_CHECK_PROG(HAVE_AUTOGEN, autogen, yes, no)
+AC_CHECK_PROG(HAVE_WINE, wine, yes, no)
+
+AC_PROG_INSTALL
+AC_PROG_LN_S
+
 #------------------------------------------------------------------------------------
 # Rules for library version information:
 #
@@ -39,26 +56,12 @@ AC_LANG([C])
 #  6. If any interfaces have been removed since the last public release, then set age
 #     to 0.
 
-CLEAN_VERSION=`echo $PACKAGE_VERSION | sed "s/p.*//"`
-VERSION_MINOR=`echo $CLEAN_VERSION | sed "s/.*\.//"`
+CLEAN_VERSION=`echo $PACKAGE_VERSION | $SED "s/p.*//"`
+VERSION_MINOR=`echo $CLEAN_VERSION | $SED "s/.*\.//"`
 
 SHARED_VERSION_INFO="1:$VERSION_MINOR:0"
 
-AC_PROG_CC
-AM_PROG_CC_C_O
-AC_PROG_CXX
-
-# Do not check for F77.
-define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
-
-AM_PROG_LIBTOOL
-LT_PROG_RC
-
-AC_CHECK_PROG(HAVE_AUTOGEN, autogen, yes, no)
-AC_CHECK_PROG(HAVE_WINE, wine, yes, no)
-
-AC_PROG_INSTALL
-AC_PROG_LN_S
+#------------------------------------------------------------------------------------
 
 AC_HEADER_STDC
 
@@ -526,7 +529,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	CXXFLAGS="$CXXFLAGS -Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo "
 
 	if test "x$enable_gcc_opt" = "xno" ; then
-		temp_CFLAGS=`echo $CFLAGS | sed "s/O2/O0/"`
+		temp_CFLAGS=`echo $CFLAGS | $SED "s/O2/O0/"`
 		CFLAGS=$temp_CFLAGS
 		AC_MSG_WARN([[*** Compiler optimisations switched off. ***]])
 		fi
@@ -536,7 +539,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		darwin* | rhapsody*)
 			# Disable -Wall, -pedantic and -Wshadow for Apple Darwin/Rhapsody.
 			# System headers on these systems are broken.
-			temp_CFLAGS=`echo $CFLAGS | sed "s/-Wall -pedantic//" | sed "s/-Wshadow//" | sed "s/-Waggregate-return//"`
+			temp_CFLAGS=`echo $CFLAGS | $SED "s/-Wall -pedantic//" | $SED "s/-Wshadow//" | $SED "s/-Waggregate-return//"`
 			CFLAGS=$temp_CFLAGS
 			SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,\$(srcdir)/Symbols.darwin"
 			;;
@@ -581,7 +584,7 @@ if test "$HOST_TRIPLET" = "x86_64-w64-mingw32" ; then
 	OS_SPECIFIC_LINKS=" -static-libgcc $OS_SPECIFIC_LINKS"
 	fi
 
-WIN_RC_VERSION=`echo $PACKAGE_VERSION | $SED -re "s/p.*//" -e "s/\./,/g"`
+WIN_RC_VERSION=`echo $PACKAGE_VERSION | $SED -e "s/p.*//" -e "s/\./,/g"`
 
 #-------------------------------------------------------------------------------
 
