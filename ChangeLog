@@ -3,6 +3,9 @@
     * configure.ac
     Fix up usage of sed (should not assume GNU sed).
 
+    * M4/add_(c|cxx)flags.m4
+    Test flags in isolation.
+
 2011-03-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/common.[ch]
