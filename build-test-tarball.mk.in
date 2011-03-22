@@ -44,11 +44,12 @@ $(TARBALL) : $(TESTNAME)/test_wrapper.sh
 	@echo "Created : $(TARBALL)"
 	@echo
 
-$(TESTNAME)/test_wrapper.sh : tests/test_wrapper.sh
+$(TESTNAME)/test_wrapper.sh : $(files) tests/test_wrapper.sh tests/pedantic-header-test.sh
 	rm -rf $(TESTNAME)
 	mkdir -p $(TESTNAME)/tests/
 	cp $(files) $(TESTNAME)/tests/
-	cp $+ $(TESTNAME)/
+	cp tests/test_wrapper.sh $(TESTNAME)/
+	cp tests/pedantic-header-test.sh $(TESTNAME)/tests/
 	chmod u+x $@
 
 tests/test_wrapper.sh : tests/test_wrapper.sh.in
