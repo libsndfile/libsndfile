@@ -1,10 +1,18 @@
-2011-03-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2011-03-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * NEWS README docs/*.html
+    Updates for 1.0.24 release.
+
+2011-03-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
     Fix up usage of sed (should not assume GNU sed).
 
     * M4/add_(c|cxx)flags.m4
     Test flags in isolation.
+
+    * tests/cpp_test.cc
+    Fix a broken test (test segfaults). Report by Dave Flogeras.
 
 2011-03-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

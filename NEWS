@@ -1,3 +1,10 @@
+Version 1.0.24 (2011-03-23)
+  * WAV files now have an 18 byte u-law and A-law fmt chunk.
+  * Document virtual I/O functionality.
+  * Two new methods rawHandle() and takeOwnership() in sndfile.hh.
+  * AIFF fix for non-zero offset value in SSND chunk.
+  * Minor bug fixes and improvements.
+
 Version 1.0.23 (2010-10-10)
   * Add version metadata to Windows DLL.
   * Add a missing 'inline' to sndfile.hh.
