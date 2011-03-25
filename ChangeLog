@@ -3,6 +3,11 @@
     * tests/util.tpl
     Add NOT macro to util.h.
 
+    * src/strings.c
+    Fix handling of SF_STR_SOFTWARE that resulted in a segfault due to calling
+    strlen() on an unterminated string. Thanks to Francois Thibaud for reporting
+    this problem.
+
 2011-03-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * NEWS README docs/*.html
