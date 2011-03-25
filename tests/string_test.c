@@ -40,6 +40,8 @@ static void	string_multi_set_test (const char *filename, int typemajor) ;
 static void	string_rdwr_test (const char *filename, int typemajor) ;
 static void	string_short_rdwr_test (const char *filename, int typemajor) ;
 
+static void	software_string_test (const char *filename) ;
+
 static int str_count (const char * haystack, const char * needle) ;
 
 int
@@ -75,6 +77,8 @@ main (int argc, char *argv [])
 		string_multi_set_test ("multi.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
 		string_rdwr_test ("rdwr.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
 		string_short_rdwr_test ("short_rdwr.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
+
+		software_string_test ("software_string.wav") ;
 		test_count++ ;
 		} ;
 
@@ -623,3 +627,41 @@ str_count (const char * haystack, const char * needle)
 	return count ;
 } /* str_count */
 
+#define MIN(a,b)  ((a) < (b) ? (a) : (b))
+
+
+static void
+software_string_test (const char *filename)
+{	size_t k ;
+
+	print_test_name (__func__, filename) ;
+
+	for (k = 0 ; k < 50 ; k++)
+	{	const char *result ;
+		char sfname [64] ;
+		SNDFILE *file ;
+		SF_INFO info ;
+
+		sf_info_setup (&info, SF_FORMAT_WAV | SF_FORMAT_PCM_16, 44100, 1) ;
+		file = test_open_file_or_die (filename, SFM_WRITE, &info, SF_TRUE, __LINE__) ;
+
+		snprintf (sfname, MIN (k, sizeof (sfname)), "%s", "abcdefghijklmnopqrestvwxyz0123456789abcdefghijklmnopqrestvwxyz") ;
+
+		exit_if_true (sf_set_string (file, SF_STR_SOFTWARE, sfname),
+			"\n\nLine %d : sf_set_string (f, SF_STR_SOFTWARE, '%s') failed : %s\n", __LINE__, sfname, sf_strerror (file)) ;
+
+		sf_close (file) ;
+
+		file = test_open_file_or_die (filename, SFM_READ, &info, SF_TRUE, __LINE__) ;
+		result = sf_get_string (file, SF_STR_SOFTWARE) ;
+
+		exit_if_true (result == NULL, "\n\nLine %d : sf_get_string (file, SF_STR_SOFTWARE) returned NULL.\n\n", __LINE__) ;
+
+		exit_if_true (strstr (result, sfname) != result,
+			"\n\nLine %d : String '%s''%s' -> '%s'\n\n", sfname, result) ;
+		sf_close (file) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* new_test_test */

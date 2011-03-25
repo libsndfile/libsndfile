@@ -8,6 +8,9 @@
     strlen() on an unterminated string. Thanks to Francois Thibaud for reporting
     this problem.
 
+    * tests/string_test.c
+    Add test for SF_STR_SOFTWARE segfault bug.
+
 2011-03-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * NEWS README docs/*.html
