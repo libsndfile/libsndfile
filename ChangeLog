@@ -18,6 +18,9 @@
     solution is strip the 'FLAC' part off the end and include all FLAC headers
     as <FLAC/header.h>.
 
+    * configure.ac src/Makefile.am
+    Use non-recursive make in src/ directory.
+
 2011-03-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * NEWS README docs/*.html

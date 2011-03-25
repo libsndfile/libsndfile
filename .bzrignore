@@ -22,6 +22,7 @@
 *.wavex
 *.8svx
 .deps
+.dirstamp
 .git*
 .libs
 Cfg
