@@ -11,6 +11,13 @@
     * tests/string_test.c
     Add test for SF_STR_SOFTWARE segfault bug.
 
+    * configure.ac
+    Sanitize FLAC_CFLAGS value supplied by pkg-config which returns a value of
+    '-I${includedir}/FLAC'. However FLAC also provides an include file
+    <assert.h> which clashes with the Standard C header of the same name. The
+    solution is strip the 'FLAC' part off the end and include all FLAC headers
+    as <FLAC/header.h>.
+
 2011-03-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * NEWS README docs/*.html

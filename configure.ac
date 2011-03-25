@@ -308,6 +308,10 @@ if test -n "$PKG_CONFIG" ; then
 		AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
 	else
 		PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
+
+		# Make sure the FLAC_CFLAGS value is sane.
+		FLAC_CFLAGS=`echo $FLAC_CLFAGS | $SED "s/FLAC$//"`
+
 		PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
 		# Vorbis versions earlier than 1.2.3 have bugs that cause the libsndfile
@@ -322,7 +326,7 @@ if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; 
 		HAVE_EXTERNAL_LIBS=1
 		enable_external_libs=yes
 
-	EXTERNAL_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBISENC_CFLAGS"
+		EXTERNAL_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBISENC_CFLAGS"
 		EXTERNAL_LIBS="$FLAC_LIBS $VORBISENC_LIBS"
 	else
 		echo
