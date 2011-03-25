@@ -37,6 +37,7 @@ extern "C" {
 #define SF_COUNT_TO_LONG(x)	((long) (x))
 #define	ARRAY_LEN(x)		((int) (sizeof (x)) / (sizeof ((x) [0])))
 #define SIGNED_SIZEOF(x)	((int64_t) (sizeof (x)))
+#define	NOT(x)				(! (x))
 
 #define	PIPE_INDEX(x)	((x) + 500)
 #define	PIPE_TEST_LEN	12345
