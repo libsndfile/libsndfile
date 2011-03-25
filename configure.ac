@@ -612,14 +612,12 @@ dnl to be replaced if the build system has a more recent version.
 AC_SUBST(LIBTOOL_DEPS)
 
 AC_CONFIG_FILES([ \
-	src/sndfile.h src/Makefile src/GSM610/Makefile src/G72x/Makefile \
-	src/version-metadata.rc \
-	man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
-	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile \
-	programs/Makefile doc/libsndfile.css \
-	Makefile libsndfile.spec sndfile.pc \
-	tests/test_wrapper.sh tests/pedantic-header-test.sh \
-	build-test-tarball.mk \
+	src/Makefile src/GSM610/Makefile src/G72x/Makefile man/Makefile \
+	examples/Makefile tests/Makefile regtest/Makefile M4/Makefile \
+	doc/Makefile Win32/Makefile Octave/Makefile programs/Makefile Makefile \
+	src/version-metadata.rc tests/test_wrapper.sh tests/pedantic-header-test.sh \
+	doc/libsndfile.css build-test-tarball.mk libsndfile.spec sndfile.pc \
+	src/sndfile.h \
 	])
 AC_OUTPUT
 
