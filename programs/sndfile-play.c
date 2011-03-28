@@ -357,7 +357,7 @@ alsa_write_float (snd_pcm_t *alsa_dev, float *data, int frames, int channels)
 
 static	int	opensoundsys_open_device (int channels, int srate) ;
 
-static void
+static int
 opensoundsys_play (int argc, char *argv [])
 {	static short buffer [BUFFER_LEN] ;
 	SNDFILE *sndfile ;
@@ -415,7 +415,7 @@ opensoundsys_play (int argc, char *argv [])
 		sf_close (sndfile) ;
 		} ;
 
-	return ;
+	return writecount ;
 } /* opensoundsys_play */
 
 static int

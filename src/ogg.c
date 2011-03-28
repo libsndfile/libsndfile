@@ -999,7 +999,7 @@ streams_open (stream_set *set)
 static stream_processor *
 find_stream_processor (stream_set *set, ogg_page *page)
 {	uint32_t serial = ogg_page_serialno (page) ;
-	int i, found = 0 ;
+	int i ;
 	int invalid = 0 ;
 
 	stream_processor *stream ;
@@ -1008,7 +1008,6 @@ find_stream_processor (stream_set *set, ogg_page *page)
 	{
 		if (serial == set->streams [i].serial)
 		{	/* We have a match! */
-			found = 1 ;
 			stream = & (set->streams [i]) ;
 
 			set->in_headers = 0 ;
@@ -1102,7 +1101,6 @@ ogg_length_aux (SF_PRIVATE * psf)
 {
 	ogg_sync_state osync ;
 	ogg_page page ;
-	int gotpage = 0 ;
 	sf_count_t len = 0 ;
 	stream_set *processors ;
 
@@ -1115,7 +1113,6 @@ ogg_length_aux (SF_PRIVATE * psf)
 	while (ogg_length_get_next_page (psf, &osync, &page))
 	{
 		stream_processor *p = find_stream_processor (processors, &page) ;
-		gotpage = 1 ;
 
 		if (!p)
 		{	len = 0 ;

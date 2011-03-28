@@ -63,8 +63,7 @@ static int		mpc2k_read_header (SF_PRIVATE *psf) ;
 
 int
 mpc2k_open	(SF_PRIVATE *psf)
-{	int		subformat ;
-	int		error = 0 ;
+{	int		error = 0 ;
 
 	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = mpc2k_read_header (psf)))
@@ -73,8 +72,6 @@ mpc2k_open	(SF_PRIVATE *psf)
 
 	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_MPC2K)
 		return	SFE_BAD_OPEN_FORMAT ;
-
-	subformat = SF_CODEC (psf->sf.format) ;
 
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	if (mpc2k_write_header (psf, SF_FALSE))

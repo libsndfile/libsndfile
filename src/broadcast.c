@@ -75,9 +75,8 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 
 	if (psf->file.mode == SFM_WRITE)
 	{	char added_history [256] ;
-		size_t added_history_len ;
 
-		added_history_len = gen_coding_history (added_history, sizeof (added_history), &(psf->sf)) ;
+		gen_coding_history (added_history, sizeof (added_history), &(psf->sf)) ;
 		psf_strlcat (psf->broadcast_16k->coding_history, sizeof (psf->broadcast_16k->coding_history), added_history) ;
 		} ;
 

@@ -271,12 +271,12 @@ copy_metadata (SNDFILE *outfile, SNDFILE *infile, int channels)
 {	SF_INSTRUMENT inst ;
 	SF_BROADCAST_INFO_2K binfo ;
 	const char *str ;
-	int k, err = 0, chanmap [256] ;
+	int k, chanmap [256] ;
 
 	for (k = SF_STR_FIRST ; k <= SF_STR_LAST ; k++)
 	{	str = sf_get_string (infile, k) ;
 		if (str != NULL)
-			err = sf_set_string (outfile, k, str) ;
+			sf_set_string (outfile, k, str) ;
 		} ;
 
 	memset (&inst, 0, sizeof (inst)) ;

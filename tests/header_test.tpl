@@ -244,14 +244,12 @@ static void
 update_header_sub (const char *filename, int typemajor, int write_mode)
 {	SNDFILE		*outfile, *infile ;
 	SF_INFO		sfinfo ;
-	int			k, frames ;
+	int			k ;
 
 	sfinfo.samplerate = 44100 ;
 	sfinfo.format = (typemajor | SF_FORMAT_PCM_16) ;
 	sfinfo.channels = 1 ;
 	sfinfo.frames = 0 ;
-
-	frames = BUFFER_LEN / sfinfo.channels ;
 
 	outfile = test_open_file_or_die (filename, write_mode, &sfinfo, SF_TRUE, __LINE__) ;
 

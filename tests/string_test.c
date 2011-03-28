@@ -156,7 +156,7 @@ string_start_end_test (const char *filename, int typemajor)
 {	const char	*cptr ;
 	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
-	int			frames, errors = 0 ;
+	int			errors = 0 ;
 
 	typemajor = typemajor ;
 
@@ -166,8 +166,6 @@ string_start_end_test (const char *filename, int typemajor)
 	sfinfo.channels		= 1 ;
 	sfinfo.frames		= 0 ;
 	sfinfo.format		= typemajor | SF_FORMAT_PCM_16 ;
-
-	frames = BUFFER_LEN / sfinfo.channels ;
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 
@@ -305,7 +303,7 @@ string_start_test (const char *filename, int typemajor)
 {	const char	*cptr ;
 	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
-	int			frames, errors = 0 ;
+	int			errors = 0 ;
 
 	print_test_name ("string_start_test", filename) ;
 
@@ -322,8 +320,6 @@ string_start_test (const char *filename, int typemajor)
 			sfinfo.format = typemajor | SF_FORMAT_PCM_16 ;
 			break ;
 		} ;
-
-	frames = BUFFER_LEN / sfinfo.channels ;
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 

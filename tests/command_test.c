@@ -805,7 +805,6 @@ static	void
 current_sf_info_test	(const char *filename)
 {	SNDFILE *outfile, *infile ;
 	SF_INFO outinfo, ininfo ;
-	sf_count_t last_count ;
 
 	print_test_name ("current_sf_info_test", filename) ;
 
@@ -832,8 +831,6 @@ current_sf_info_test	(const char *filename)
 	/* Read file making sure no channel map exists. */
 	memset (&ininfo, 0, sizeof (ininfo)) ;
 	infile = test_open_file_or_die (filename, SFM_READ, &ininfo, SF_TRUE, __LINE__) ;
-
-	last_count = ininfo.frames ;
 
 	test_write_double_or_die (outfile, 0, double_data, BUFFER_LEN, __LINE__) ;
 

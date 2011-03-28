@@ -468,12 +468,11 @@ hexdump_file (const char * filename, sf_count_t offset, sf_count_t length)
 void
 dump_log_buffer (SNDFILE *file)
 {	static char	buffer [LOG_BUFFER_SIZE] ;
-	int			count ;
 
 	memset (buffer, 0, LOG_BUFFER_SIZE) ;
 
 	/* Get the log buffer data. */
-	count = sf_command	(file, SFC_GET_LOG_INFO, buffer, LOG_BUFFER_SIZE) ;
+	sf_command	(file, SFC_GET_LOG_INFO, buffer, LOG_BUFFER_SIZE) ;
 
 	if (strlen (buffer) < 1)
 		puts ("Log buffer empty.\n") ;
