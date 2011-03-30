@@ -83,7 +83,7 @@ genfiles : test_endswap.c $(SYMBOL_FILES)
 
 check : $(noinst_PROGRAMS)
 	@if [ -x /usr/bin/python ]; then $(srcdir)/binheader_writef_check.py $(srcdir)/*.c ; fi
-	G72x/g72x_test all
+	G72x/g72x_test$(EXEEXT) all
 	./test_main$(EXEEXT)
 
 #======================================================================
