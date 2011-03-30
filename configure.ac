@@ -322,7 +322,7 @@ if test -n "$PKG_CONFIG" ; then
 		enable_external_libs=yes
 		fi
 
-if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
+	if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
 		HAVE_EXTERNAL_LIBS=1
 		enable_external_libs=yes
 
