@@ -1,3 +1,9 @@
+2011-04-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/caf.c
+    Add validation to size of 'data' chunk and fix size of written 'data'
+    chunk. Thanks to Michael Pruett for reporting this.
+
 2011-03-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/* tests/* programs/*

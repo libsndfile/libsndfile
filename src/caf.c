@@ -376,7 +376,10 @@ caf_read_header (SF_PRIVATE *psf)
 				break ;
 
 			case data_MARKER :
-				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+				if (psf->filelength > 0 && chunk_size + psf->headindex != psf->filelength)
+					psf_log_printf (psf, "%M : %D (should be %D)\n", marker, chunk_size, chunk_size + 4) ;
+				else
+					psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
 				psf_binheader_readf (psf, "E4", &k) ;
 				psf_log_printf (psf, "  edit : %u\n", k) ;
 				have_data = 1 ;
@@ -569,7 +572,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 		free_len += 0x1000 ;
 	psf_binheader_writef (psf, "Em8z", free_MARKER, free_len, (int) free_len) ;
 
-	psf_binheader_writef (psf, "Em84", data_MARKER, psf->datalength, 0) ;
+	psf_binheader_writef (psf, "Em84", data_MARKER, psf->datalength + 4, 0) ;
 
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 	if (psf->error)
