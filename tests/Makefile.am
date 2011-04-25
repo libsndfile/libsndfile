@@ -15,7 +15,7 @@ noinst_PROGRAMS = sfversion floating_point_test write_read_test \
 	raw_test string_test multi_file_test dither_test \
 	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
 	locale_test largefile_test win32_ordinal_test ogg_test vorbis_test \
-	checksum_test external_libs_test rdwr_test $(CPP_TEST)
+	checksum_test external_libs_test rdwr_test format_check_test $(CPP_TEST)
 
 noinst_HEADERS = dft_cmp.h utils.h generate.h
 
@@ -128,6 +128,9 @@ win32_ordinal_test_LDADD = $(top_builddir)/src/libsndfile.la
 
 external_libs_test_SOURCES = external_libs_test.c utils.c
 external_libs_test_LDADD = $(top_builddir)/src/libsndfile.la
+
+format_check_test_SOURCES = format_check_test.c utils.c
+format_check_test_LDADD = $(top_builddir)/src/libsndfile.la
 
 cpp_test_SOURCES = cpp_test.cc utils.c
 cpp_test_LDADD = $(top_builddir)/src/libsndfile.la
