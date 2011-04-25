@@ -553,7 +553,6 @@ sf_format_check	(const SF_INFO *info)
 
 	switch (SF_CONTAINER (info->format))
 	{	case SF_FORMAT_WAV :
-		case SF_FORMAT_WAVEX :
 				/* WAV now allows both endian, RIFF or RIFX (little or big respectively) */
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16)
 					return 1 ;
@@ -564,6 +563,19 @@ sf_format_check	(const SF_INFO *info)
 				if (subformat == SF_FORMAT_GSM610 && info->channels == 1)
 					return 1 ;
 				if (subformat == SF_FORMAT_G721_32 && info->channels == 1)
+					return 1 ;
+				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
+					return 1 ;
+				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
+					return 1 ;
+				break ;
+
+		case SF_FORMAT_WAVEX :
+				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
+					return 0 ;
+				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16)
+					return 1 ;
+				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
 					return 1 ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
 					return 1 ;
@@ -640,9 +652,7 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_PAF :
-				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
-					return 1 ;
-				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
+				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24)
 					return 1 ;
 				break ;
 
@@ -668,7 +678,7 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_IRCAM :
-				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
+				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_32)
 					return 1 ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW || subformat == SF_FORMAT_FLOAT)
 					return 1 ;

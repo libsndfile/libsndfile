@@ -7,6 +7,10 @@
     * tests/Makefile.am tests/test_wrapper.sh.in
     Hook into build and test runner.
 
+    * src/sndfile.c
+    Fix some sf_format_check() problems. Thanks to Charles Van Winkle for the
+    notification.
+
 2011-04-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/caf.c
