@@ -68,7 +68,7 @@ format_check_test (void)
 
 			memset (&subtype_fmt_info, 0, sizeof (subtype_fmt_info)) ;
 			subtype_fmt_info.format = codec ;
-			subtype_is_valid == sf_command (NULL, SFC_GET_FORMAT_SUBTYPE, &subtype_fmt_info, sizeof (subtype_fmt_info)) == 0 ;
+			subtype_is_valid = sf_command (NULL, SFC_GET_FORMAT_SUBTYPE, &subtype_fmt_info, sizeof (subtype_fmt_info)) == 0 ;
 
 			sf_info_setup (&info, major_fmt_info.format | subtype_fmt_info.format, 22050, 1) ;
 
