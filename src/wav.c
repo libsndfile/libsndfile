@@ -596,8 +596,6 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case plst_MARKER :
 			case DISP_MARKER :
 			case MEXT_MARKER :
-					parsestage |= HAVE_other ;
-
 					psf_binheader_readf (psf, "4", &dword) ;
 					psf_log_printf (psf, "%M : %u\n", marker, dword) ;
 					dword += (dword & 1) ;
@@ -605,7 +603,6 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					break ;
 
 			default :
-					parsestage |= HAVE_other ;
 					if (psf_isprint ((marker >> 24) & 0xFF) && psf_isprint ((marker >> 16) & 0xFF)
 						&& psf_isprint ((marker >> 8) & 0xFF) && psf_isprint (marker & 0xFF))
 					{	psf_binheader_readf (psf, "4", &dword) ;
@@ -616,6 +613,8 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if (psf_ftell (psf) & 0x03)
 					{	psf_log_printf (psf, "  Unknown chunk marker at position %d. Resynching.\n", dword - 4) ;
 						psf_binheader_readf (psf, "j", -3) ;
+						/* File is too messed up so we prevent editing in RDWR mode here. */
+						parsestage |= HAVE_other ;
 						break ;
 						} ;
 					psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D. Exiting parser.\n", marker, psf_ftell (psf) - 4) ;
