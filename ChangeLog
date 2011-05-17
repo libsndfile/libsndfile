@@ -3,6 +3,9 @@
     * configure.ac
     Use int64_t instead of off_t when they are the same size.
 
+    * src/Makefile.am tests/Makefile.am
+    Use check_PROGRAMS instead of noinst_PROGRAMS where appropriate.
+
 2011-05-08  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c

@@ -8,7 +8,7 @@ endif
 
 INCLUDES = -I$(top_srcdir)/src
 
-noinst_PROGRAMS = sfversion floating_point_test write_read_test \
+check_PROGRAMS = sfversion floating_point_test write_read_test \
 	lossy_comp_test error_test ulaw_test alaw_test dwvw_test \
 	peak_chunk_test command_test stdin_test stdout_test stdio_test \
 	pcm_test headerless_test pipe_test benchmark header_test misc_test \
@@ -191,7 +191,7 @@ genfiles : write_read_test.c pcm_test.c header_test.c utils.c \
 
 if LINUX_MINGW_CROSS_TEST
 
-$(noinst_PROGRAMS) : libsndfile-1.dll
+$(check_PROGRAMS) : libsndfile-1.dll
 
 libsndfile-1.dll :
 	ln -s $(top_builddir)/src/.libs/$@ $@
@@ -203,7 +203,7 @@ endif
 
 #===============================================================================
 
-check: $(noinst_PROGRAMS) test_wrapper.sh
+check: test_wrapper.sh
 	sh test_wrapper.sh
 
 

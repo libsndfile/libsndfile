@@ -23,7 +23,7 @@ EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 
 noinst_HEADERS = common.h sfconfig.h sfendian.h wav_w64.h sf_unistd.h chanmap.h
 
-noinst_PROGRAMS = test_main G72x/g72x_test
+check_PROGRAMS = test_main$(EXEEXT) G72x/g72x_test$(EXEEXT)
 
 COMMON = common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
@@ -81,7 +81,7 @@ test_endswap.c: test_endswap.def test_endswap.tpl
 
 genfiles : test_endswap.c $(SYMBOL_FILES)
 
-check : $(noinst_PROGRAMS)
+check :
 	@if [ -x /usr/bin/python ]; then $(srcdir)/binheader_writef_check.py $(srcdir)/*.c ; fi
 	G72x/g72x_test$(EXEEXT) all
 	./test_main$(EXEEXT)
