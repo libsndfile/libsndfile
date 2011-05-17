@@ -215,6 +215,7 @@ case "$host_os" in
 			AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
 
 			if test "x$ac_cv_sizeof_off_t" = "x8" ; then
+				TYPEOF_SF_COUNT_T="int64_t"
 				SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 			elif test "x$ac_cv_sizeof_off_t" = "x$pre_largefile_sizeof_off_t" ; then
 				AC_MSG_WARN([[This machine does not seem to support 64 bit file offsets.]])
