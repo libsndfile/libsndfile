@@ -3,6 +3,9 @@
     * src/sndfile.h.in
     Fix -Wundef warning due to ENABLE_SNDFILE_WINDOWS_PROTOTYPES.
 
+    * configure.ac
+    Add -Wundef to CFLAGS.
+
 2011-05-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
