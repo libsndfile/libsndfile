@@ -6,6 +6,9 @@
     * configure.ac
     Add -Wundef to CFLAGS.
 
+    * src/ogg.c
+    Fix -Wunder warning.
+
 2011-05-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac
