@@ -3,6 +3,10 @@
     * programs/sndfile-interleave.c
     Fix handling of argc. Thanks to Marius Hennecke.
 
+    * src/wav_w64.c
+    Accept broken WAV files with blockalign == 0. Thanks to Olivier Tristan for
+    providing example files.
+
 2011-06-14  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in

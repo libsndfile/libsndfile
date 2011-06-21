@@ -135,12 +135,13 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 	psf_log_printf (psf, "  Format        : 0x%X => %s\n", wav_fmt->format, wav_w64_format_str (wav_fmt->format)) ;
 	psf_log_printf (psf, "  Channels      : %d\n", wav_fmt->min.channels) ;
 	psf_log_printf (psf, "  Sample Rate   : %d\n", wav_fmt->min.samplerate) ;
-	psf_log_printf (psf, "  Block Align   : %d\n", wav_fmt->min.blockalign) ;
 
-	if (wav_fmt->min.blockalign == 0)
-	{	psf_log_printf (psf, "*** Error : wav_fmt->min.blockalign should not be zero.\n") ;
-		return SFE_INTERNAL ;
-		} ;
+	if (wav_fmt->format == WAVE_FORMAT_PCM && wav_fmt->min.blockalign == 0 && wav_fmt->min.bitwidth > 0)
+	{	wav_fmt->min.blockalign = wav_fmt->min.bitwidth / 8 + (wav_fmt->min.bitwidth % 8 > 0 ? 1 : 0) ;
+		psf_log_printf (psf, "  Block Align   : 0 (should be %d)\n", wav_fmt->min.blockalign) ;
+		}
+	else
+		psf_log_printf (psf, "  Block Align   : %d\n", wav_fmt->min.blockalign) ;
 
 	if (wav_fmt->format == WAVE_FORMAT_PCM && wav_fmt->min.bitwidth == 24 &&
 			wav_fmt->min.blockalign == 4 * wav_fmt->min.channels)
