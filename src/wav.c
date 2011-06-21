@@ -66,6 +66,7 @@
 #define clm_MARKER	 (MAKE_MARKER ('c', 'l', 'm', ' '))
 #define elmo_MARKER	 (MAKE_MARKER ('e', 'l', 'm', 'o'))
 #define cart_MARKER	 (MAKE_MARKER ('c', 'a', 'r', 't'))
+#define FLLR_MARKER	 (MAKE_MARKER ('F', 'L', 'L', 'R'))
 
 #define exif_MARKER	 (MAKE_MARKER ('e', 'x', 'i', 'f'))
 #define ever_MARKER	 (MAKE_MARKER ('e', 'v', 'e', 'r'))
@@ -596,6 +597,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case plst_MARKER :
 			case DISP_MARKER :
 			case MEXT_MARKER :
+			case FLLR_MARKER :
 					psf_binheader_readf (psf, "4", &dword) ;
 					psf_log_printf (psf, "%M : %u\n", marker, dword) ;
 					dword += (dword & 1) ;
