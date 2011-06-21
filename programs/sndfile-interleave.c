@@ -82,7 +82,7 @@ main (int argc, char **argv)
 		usage_exit () ;
 		} ;
 
-	if (argc - 2 > MAX_INPUTS)
+	if (argc - 3 > MAX_INPUTS)
 	{	printf ("\nError : Cannot handle more than %d input channels.\n\n", MAX_INPUTS) ;
 		exit (1) ;
 		} ;
