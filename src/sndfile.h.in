@@ -232,7 +232,7 @@ enum
 */
 
 #define	SF_STR_FIRST	SF_STR_TITLE
-#define	SF_STR_LAST		SF_STR_LICENSE
+#define	SF_STR_LAST		SF_STR_GENRE
 
 enum
 {	/* True and false */

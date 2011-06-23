@@ -1,3 +1,9 @@
+2011-06-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.h.in doc/api.html
+    Fix definition of SF_STR_LAST and update SF_STR_* related docs. Thanks to
+    Tim van der Molen for the patch.
+
 2011-06-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-interleave.c
