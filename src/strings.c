@@ -32,7 +32,8 @@ static void hexdump (void *data, int len) ;
 
 int
 psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
-{	size_t	len_remaining, str_len ;
+{	char	new_str [128] ;
+	size_t	len_remaining, str_len ;
 	int		k, str_flags ;
 
 	if (str == NULL)
@@ -87,18 +88,11 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	if (k == 0)
 		psf->str_end = psf->str_storage ;
 
-	len_remaining = SIGNED_SIZEOF (psf->str_storage) - (psf->str_end - psf->str_storage) ;
-
-	if (len_remaining < str_len + 2)
-		return SFE_STR_MAX_DATA ;
-
 	switch (str_type)
 	{	case SF_STR_SOFTWARE :
 				/* In write mode, want to append libsndfile-version to string. */
 				if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
-				{	char new_str [128] ;
-
-					if (strstr (str, PACKAGE) == NULL)
+				{	if (strstr (str, PACKAGE) == NULL)
 					{	/*
 						** If the supplied string does not already contain a
 						** libsndfile-X.Y.Z component, then add it.
@@ -112,19 +106,8 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 						snprintf (new_str, sizeof (new_str), "%s", str) ;
 
 					str = new_str ;
-					str_len = strlen (str) ;
-
-					psf->strings [k].type = str_type ;
-					psf->strings [k].str = psf->str_end ;
-					psf->strings [k].flags = str_flags ;
-
-					memcpy (psf->str_end, str, str_len + 1) ;
-					/* Plus one to catch string terminator. */
-					psf->str_end += str_len + 1 ;
-					break ;
 					} ;
-
-				/* Fall though if not write mode. */
+				break ;
 
 		case SF_STR_TITLE :
 		case SF_STR_COPYRIGHT :
@@ -135,19 +118,27 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 		case SF_STR_LICENSE :
 		case SF_STR_TRACKNUMBER :
 		case SF_STR_GENRE :
-				psf->strings [k].type = str_type ;
-				psf->strings [k].str = psf->str_end ;
-				psf->strings [k].flags = str_flags ;
-
-				/* Plus one to catch string terminator. */
-				memcpy (psf->str_end, str, str_len + 1) ;
-				psf->str_end += str_len + 1 ;
 				break ;
 
 		default :
 			psf_log_printf (psf, "%s : SFE_STR_BAD_TYPE\n", __func__) ;
 			return SFE_STR_BAD_TYPE ;
 		} ;
+
+	str_len = strlen (str) ;
+
+	len_remaining = SIGNED_SIZEOF (psf->str_storage) - (psf->str_end - psf->str_storage) ;
+
+	if (len_remaining < str_len + 2)
+		return SFE_STR_MAX_DATA ;
+
+	psf->strings [k].type = str_type ;
+	psf->strings [k].str = psf->str_end ;
+	psf->strings [k].flags = str_flags ;
+
+	memcpy (psf->str_end, str, str_len + 1) ;
+	/* Plus one to catch string terminator. */
+	psf->str_end += str_len + 1 ;
 
 	psf->str_flags |= str_flags ;
 
