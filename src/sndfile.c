@@ -64,7 +64,7 @@ ErrorStruct SndfileErrors [] =
 
 	/* Private error values and their associated strings. */
 	{	SFE_ZERO_MAJOR_FORMAT	, "Error : major format is 0." },
-	{	SFE_ZERO_MINOR_FORMAT	, "Error : major format is 0." },
+	{	SFE_ZERO_MINOR_FORMAT	, "Error : minor format is 0." },
 	{	SFE_BAD_FILE			, "File does not exist or is not a regular file (possibly a pipe?)." },
 	{	SFE_BAD_FILE_READ		, "File exists but no data could be read." },
 	{	SFE_OPEN_FAILED			, "Could not open file." },
