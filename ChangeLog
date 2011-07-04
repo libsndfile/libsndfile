@@ -3,6 +3,9 @@
     * src/sndfile.c
     Fix error message for erro code SFE_ZERO_MINOR_FORMAT.
 
+    * tests/format_check_test.c
+    Add a test to for SF_FINFO format field validation.
+
 2011-06-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/strings.c

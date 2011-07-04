@@ -29,12 +29,14 @@
 #include "sndfile.h"
 #include "utils.h"
 
-static void format_check_test (void) ;
+static void format_error_test (void) ;
+static void format_combo_test (void) ;
 
 int
 main (void)
 {
-	format_check_test () ;
+	format_error_test () ;
+	format_combo_test () ;
 
 	return 0 ;
 } /* main */
@@ -43,7 +45,40 @@ main (void)
 */
 
 static void
-format_check_test (void)
+format_error_test (void)
+{	const char *filename = "format-error.wav" ;
+	SNDFILE *file ;
+	SF_INFO info ;
+
+	print_test_name (__func__, NULL) ;
+
+	memset (&info, 0, sizeof (info)) ;
+	info.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
+	info.channels = 1 ;
+	info.samplerate = 44100 ;
+
+	info.format = SF_FORMAT_WAV ;
+	file = sf_open (filename, SFM_WRITE, &info) ;
+	exit_if_true (file != NULL, "\n\nLine %d : Format should not be valid.\n\n", __LINE__) ;
+	exit_if_true (
+		strstr (sf_strerror (NULL), "minor format") == NULL,
+		"\n\nLine %d : Error string should reference bad 'minor format'.\n\n", __LINE__
+		) ;
+
+	info.format = SF_FORMAT_PCM_16 ;
+	file = sf_open (filename, SFM_WRITE, &info) ;
+	exit_if_true (file != NULL, "\n\nLine %d : Format should not be valid.\n\n", __LINE__) ;
+	exit_if_true (
+		strstr (sf_strerror (NULL), "major format") == NULL,
+		"\n\nLine %d : Error string should reference bad 'major format'.\n\n", __LINE__
+		) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* format_error_test */
+
+static void
+format_combo_test (void)
 {	int container_max, codec_max, cont, codec ;
 
 	print_test_name (__func__, NULL) ;
@@ -105,5 +140,5 @@ format_check_test (void)
 		} ;
 
 	puts ("ok") ;
-} /* format_check_test */
+} /* format_combo_test */
 
