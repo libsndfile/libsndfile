@@ -315,6 +315,13 @@ if test -n "$PKG_CONFIG" ; then
 
 		PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
+		if test x$enable_experimental = xyes ; then
+			PKG_CHECK_MOD_VERSION(SPEEX, speex >= 1.2, ac_cv_speex=yes, ac_cv_speex=no)
+		else
+			SPEEX_CFLAGS=""
+			SPEEX_LIBS=""
+			fi
+
 		# Vorbis versions earlier than 1.2.3 have bugs that cause the libsndfile
 		# test suite to fail on MIPS, PowerPC and others.
 		# See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
@@ -327,8 +334,8 @@ if test -n "$PKG_CONFIG" ; then
 		HAVE_EXTERNAL_LIBS=1
 		enable_external_libs=yes
 
-		EXTERNAL_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBISENC_CFLAGS"
-		EXTERNAL_LIBS="$FLAC_LIBS $VORBISENC_LIBS"
+		EXTERNAL_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBISENC_CFLAGS $SPEEX_CFLAGS"
+		EXTERNAL_LIBS="$FLAC_LIBS $VORBISENC_LIBS $SPEEX_LIBS"
 	else
 		echo
 		AC_MSG_WARN([[*** One or more of the external libraries (ie libflac, libogg and]])
