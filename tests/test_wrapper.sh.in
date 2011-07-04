@@ -53,7 +53,7 @@ if test -f libsndfile.so.$LIB_VERSION ; then
 		fi
 	fi
 
-sfversion=`./sfversion@EXEEXT@`
+sfversion=`./sfversion@EXEEXT@ | sed "s/-exp$//"`
 
 if test $sfversion != libsndfile-$PACKAGE_VERSION ; then
 	echo "Error : sfversion ($sfversion) and PACKAGE_VERSION ($PACKAGE_VERSION) don't match."
