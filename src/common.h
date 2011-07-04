@@ -158,6 +158,8 @@ enum
 
 enum
 {	/* Work in progress. */
+	SF_FORMAT_SPEEX			= 0x5000000,
+	SF_FORMAT_OGGFLAC		= 0x5000001,
 
 	/* Formats supported read only. */
 	SF_FORMAT_TXW			= 0x4030000,		/* Yamaha TX16 sampler file */
@@ -779,6 +781,11 @@ int		mpc2k_open	(SF_PRIVATE *psf) ;
 int		rf64_open	(SF_PRIVATE *psf) ;
 
 /* In progress. Do not currently work. */
+
+int		ogg_vorbis_open	(SF_PRIVATE *psf) ;
+int		ogg_speex_open	(SF_PRIVATE *psf) ;
+int		ogg_pcm_open	(SF_PRIVATE *psf) ;
+
 
 int		mpeg_open	(SF_PRIVATE *psf) ;
 int		ogg_open	(SF_PRIVATE *psf) ;

@@ -6,6 +6,12 @@
     * tests/format_check_test.c
     Add a test to for SF_FINFO format field validation.
 
+    * src/ogg.c src/ogg_vorbis.c src/ogg.h src/ogg_pcm.c src/ogg_speex.c
+        src/common.h src/Makefile.am
+    Move vorbis specific code to ogg_vorbis.c, add new files for handling PCM
+    and Speex codecs in an Ogg container. The later two are only enabled with
+    ENABLE_EXPERIMENTAL_CODE config variable.
+
 2011-06-28  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/strings.c
