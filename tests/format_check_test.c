@@ -88,11 +88,10 @@ format_combo_test (void)
 
 	for (cont = 0 ; cont < container_max + 10 ; cont ++)
 	{	SF_FORMAT_INFO major_fmt_info ;
-		int major_is_valid ;
 
 		memset (&major_fmt_info, 0, sizeof (major_fmt_info)) ;
 		major_fmt_info.format = cont ;
-		major_is_valid = sf_command (NULL, SFC_GET_FORMAT_MAJOR, &major_fmt_info, sizeof (major_fmt_info)) == 0 ;
+		(void) sf_command (NULL, SFC_GET_FORMAT_MAJOR, &major_fmt_info, sizeof (major_fmt_info)) ;
 
 		for (codec = 0 ; codec < codec_max + 10 ; codec ++)
 		{	SF_FORMAT_INFO subtype_fmt_info ;
@@ -108,6 +107,12 @@ format_combo_test (void)
 			sf_info_setup (&info, major_fmt_info.format | subtype_fmt_info.format, 22050, 1) ;
 
 			check_is_valid = sf_format_check (&info) ;
+
+			exit_if_true (
+				NOT (subtype_is_valid) && check_is_valid,
+				"\n\nLine %d : Subtype is not valid but checks ok.\n",
+				__LINE__
+				) ;
 
 			snprintf (filename, sizeof (filename), "format-check.%s", major_fmt_info.extension) ;
 

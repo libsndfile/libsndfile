@@ -3,6 +3,9 @@
     * src/ogg.c
     Fix log message.
 
+    * tests/format_check_test.c
+    Fix compiler warnings.
+
 2011-07-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
