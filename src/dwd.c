@@ -69,7 +69,7 @@ static int	dwd_close		(SF_PRIVATE *psf) ;
 
 int
 dwd_open (SF_PRIVATE *psf)
-{	int	subformat, error = 0 ;
+{	int	error = 0 ;
 
 	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = dwd_read_header (psf)))
@@ -78,8 +78,6 @@ dwd_open (SF_PRIVATE *psf)
 
 	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_DWD)
 		return	SFE_BAD_OPEN_FORMAT ;
-
-	subformat = SF_CODEC (psf->sf.format) ;
 
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{
