@@ -190,8 +190,8 @@ ogg_stream_classify (SF_PRIVATE *psf, OGG_PRIVATE* odata)
 			break ;
 		} ;
 
-	psf_log_printf (psf, "This Ogg bitstream does not contain Vorbis audio data.\n") ;
-	return SFE_MALFORMED_FILE ;
+	psf_log_printf (psf, "This Ogg bitstream contains some uknown data type.\n") ;
+	return SFE_UNIMPLEMENTED ;
 } /* ogg_stream_classify */
 
 /*==============================================================================
