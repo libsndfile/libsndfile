@@ -174,6 +174,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_PAF_VERSION			, "Error in PAF file, bad version." },
 	{	SFE_PAF_UNKNOWN_FORMAT	, "Error in PAF file, unknown format." },
 	{	SFE_PAF_SHORT_HEADER	, "Error in PAF file. File shorter than minimal header." },
+	{	SFE_PAF_BAD_CHANNELS	, "Error in PAF file. Bad channel count." },
 
 	{	SFE_SVX_NO_FORM			, "Error in 8SVX / 16SV file, no 'FORM' marker." },
 	{	SFE_SVX_NO_BODY			, "Error in 8SVX / 16SV file, no 'BODY' marker." },

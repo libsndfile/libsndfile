@@ -3,6 +3,10 @@
     * src/common.h src/sndfile.c
     Purge SF_ASSERT macro. Use standard C assert instead.
 
+    * src/paf.c src/common.h src/sndfile.c
+    Fix for Secunia Advisory SA45125, heap overflow (heap gets overwritten with
+    byte value of 0) due to integer overflow if PAF file handler.
+
 2011-07-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ogg.c

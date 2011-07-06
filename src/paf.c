@@ -163,6 +163,9 @@ paf_read_header	(SF_PRIVATE *psf)
 {	PAF_FMT		paf_fmt ;
 	int			marker ;
 
+	if (psf->filelength < PAF_HEADER_LENGTH)
+		return SFE_PAF_SHORT_HEADER ;
+
 	memset (&paf_fmt, 0, sizeof (paf_fmt)) ;
 	psf_binheader_readf (psf, "pm", 0, &marker) ;
 
@@ -199,8 +202,8 @@ paf_read_header	(SF_PRIVATE *psf)
 		psf->endian = SF_ENDIAN_BIG ;
 		} ;
 
-	if (psf->filelength < PAF_HEADER_LENGTH)
-		return SFE_PAF_SHORT_HEADER ;
+	if (paf_fmt.channels > SF_MAX_CHANNELS)
+		return SFE_PAF_BAD_CHANNELS ;
 
 	psf->datalength = psf->filelength - psf->dataoffset ;
 
