@@ -359,11 +359,10 @@ paf24_init (SF_PRIVATE *psf)
 	*/
 	psf->last_op = 0 ;
 
-	if (! (psf->codec_data = malloc (paf24size)))
+	if (! (psf->codec_data = calloc (1, paf24size)))
 		return SFE_MALLOC_FAILED ;
 
 	ppaf24 = (PAF24_PRIVATE*) psf->codec_data ;
-	memset (ppaf24, 0, paf24size) ;
 
 	ppaf24->channels	= psf->sf.channels ;
 	ppaf24->samples		= ppaf24->data ;

@@ -7,6 +7,9 @@
     Fix for Secunia Advisory SA45125, heap overflow (heap gets overwritten with
     byte value of 0) due to integer overflow if PAF file handler.
 
+    * src/ima_adpcm.c src/ms_adpcm.c src/paf.c
+    Use calloc instead of malloc followed by memset.
+
 2011-07-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ogg.c

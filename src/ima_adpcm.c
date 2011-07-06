@@ -186,12 +186,10 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 
 	pimasize = sizeof (IMA_ADPCM_PRIVATE) + blockalign * psf->sf.channels + 3 * psf->sf.channels * samplesperblock ;
 
-	if (! (pima = malloc (pimasize)))
+	if (! (pima = calloc (1, pimasize)))
 		return SFE_MALLOC_FAILED ;
 
 	psf->codec_data = (void*) pima ;
-
-	memset (pima, 0, pimasize) ;
 
 	pima->samples	= pima->data ;
 	pima->block		= (unsigned char*) (pima->data + samplesperblock * psf->sf.channels) ;
