@@ -1,5 +1,10 @@
 2011-07-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
+    * src/common.h src/sndfile.c
+    Purge SF_ASSERT macro. Use standard C assert instead.
+
+2011-07-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
     * src/ogg.c
     Fix log message.
 

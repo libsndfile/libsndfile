@@ -113,13 +113,6 @@
 #define		SF_MAX_CHANNELS	256
 
 
-#define	SF_ASSERT(expr) \
-			{	if (! (expr)) \
-				{	printf ("%s %d : assert '" #expr "' failed!\n", __FILE__, __LINE__) ;\
-					exit (1) ; \
-					} ;\
-			}
-
 /*
 *	Macros for spliting the format file of SF_INFI into contrainer type,
 **	codec type and endian-ness.
