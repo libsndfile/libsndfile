@@ -360,7 +360,7 @@ check_log_buffer_or_die (SNDFILE *file, int line_num)
 {	static char	buffer [LOG_BUFFER_SIZE] ;
 	int			count ;
 
-	memset (buffer, 0, LOG_BUFFER_SIZE) ;
+	memset (buffer, 0, sizeof (buffer)) ;
 
 	/* Get the log buffer data. */
 	count = sf_command	(file, SFC_GET_LOG_INFO, buffer, LOG_BUFFER_SIZE) ;
@@ -399,7 +399,7 @@ string_in_log_buffer (SNDFILE *file, const char *s)
 {	static char	buffer [LOG_BUFFER_SIZE] ;
 	int			count ;
 
-	memset (buffer, 0, LOG_BUFFER_SIZE) ;
+	memset (buffer, 0, sizeof (buffer)) ;
 
 	/* Get the log buffer data. */
 	count = sf_command	(file, SFC_GET_LOG_INFO, buffer, LOG_BUFFER_SIZE) ;
@@ -469,7 +469,7 @@ void
 dump_log_buffer (SNDFILE *file)
 {	static char	buffer [LOG_BUFFER_SIZE] ;
 
-	memset (buffer, 0, LOG_BUFFER_SIZE) ;
+	memset (buffer, 0, sizeof (buffer)) ;
 
 	/* Get the log buffer data. */
 	sf_command	(file, SFC_GET_LOG_INFO, buffer, LOG_BUFFER_SIZE) ;
