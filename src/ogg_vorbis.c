@@ -114,13 +114,13 @@ typedef struct
 {	/* Count current location */
 	sf_count_t loc ;
 	/* Struct that stores all the static vorbis bitstream settings */
-	vorbis_info	vi ;
+	vorbis_info	vinfo ;
 	/* Struct that stores all the bitstream user comments */
-	vorbis_comment vc ;
+	vorbis_comment vcomment ;
 	/* Ventral working state for the packet->PCM decoder */
-	vorbis_dsp_state vd ;
+	vorbis_dsp_state vdsp ;
 	/* Local working space for packet->PCM decode */
-	vorbis_block vb ;
+	vorbis_block vblock ;
 
 	/* Encoding quality in range [0.0, 1.0]. */
 	double quality ;
@@ -195,10 +195,10 @@ vorbis_read_header (SF_PRIVATE *psf, int log_data)
 	**	and vorbis structs have to be cleared every time we pass through to
 	**	prevent memory leaks.
 	*/
-	vorbis_block_clear (&vdata->vb) ;
-	vorbis_dsp_clear (&vdata->vd) ;
-	vorbis_comment_clear (&vdata->vc) ;
-	vorbis_info_clear (&vdata->vi) ;
+	vorbis_block_clear (&vdata->vblock) ;
+	vorbis_dsp_clear (&vdata->vdsp) ;
+	vorbis_comment_clear (&vdata->vcomment) ;
+	vorbis_info_clear (&vdata->vinfo) ;
 
 	/*
 	**	Extract the initial header from the first page and verify that the
@@ -209,10 +209,10 @@ vorbis_read_header (SF_PRIVATE *psf, int log_data)
 	**	header is an easy way to identify a Vorbis bitstream and it's
 	**	useful to see that functionality seperated out.
 	*/
-	vorbis_info_init (&vdata->vi) ;
-	vorbis_comment_init (&vdata->vc) ;
+	vorbis_info_init (&vdata->vinfo) ;
+	vorbis_comment_init (&vdata->vcomment) ;
 
-	if (vorbis_synthesis_headerin (&vdata->vi, &vdata->vc, &odata->opacket) < 0)
+	if (vorbis_synthesis_headerin (&vdata->vinfo, &vdata->vcomment, &odata->opacket) < 0)
 	{	/* Error case ; not a vorbis header. */
 		psf_log_printf (psf, "Found Vorbis in stream header, but vorbis_synthesis_headerin failed.\n") ;
 		return SFE_MALFORMED_FILE ;
@@ -230,7 +230,7 @@ vorbis_read_header (SF_PRIVATE *psf, int log_data)
 		for (k = 0 ; k < ARRAY_LEN (vorbis_metatypes) ; k++)
 		{	char *dd ;
 
-			dd = vorbis_comment_query (&vdata->vc, vorbis_metatypes [k].name, 0) ;
+			dd = vorbis_comment_query (&vdata->vcomment, vorbis_metatypes [k].name, 0) ;
 			if (dd == NULL)
 				continue ;
 			psf_store_string (psf, vorbis_metatypes [k].id, dd) ;
@@ -283,7 +283,7 @@ vorbis_read_header (SF_PRIVATE *psf, int log_data)
 					return SFE_MALFORMED_FILE ;
 					} ;
 
-				vorbis_synthesis_headerin (&vdata->vi, &vdata->vc, &odata->opacket) ;
+				vorbis_synthesis_headerin (&vdata->vinfo, &vdata->vcomment, &odata->opacket) ;
 				i++ ;
 				} ;
 			} ;
@@ -293,14 +293,14 @@ vorbis_read_header (SF_PRIVATE *psf, int log_data)
 	{	int printed_metadata_msg = 0 ;
 		int k ;
 
-		psf_log_printf (psf, "Bitstream is %d channel, %D Hz\n", vdata->vi.channels, vdata->vi.rate) ;
-		psf_log_printf (psf, "Encoded by : %s\n", vdata->vc.vendor) ;
+		psf_log_printf (psf, "Bitstream is %d channel, %D Hz\n", vdata->vinfo.channels, vdata->vinfo.rate) ;
+		psf_log_printf (psf, "Encoded by : %s\n", vdata->vcomment.vendor) ;
 
 		/* Throw the comments plus a few lines about the bitstream we're decoding. */
 		for (k = 0 ; k < ARRAY_LEN (vorbis_metatypes) ; k++)
 		{	char *dd ;
 
-			dd = vorbis_comment_query (&vdata->vc, vorbis_metatypes [k].name, 0) ;
+			dd = vorbis_comment_query (&vdata->vcomment, vorbis_metatypes [k].name, 0) ;
 			if (dd == NULL)
 				continue ;
 
@@ -316,19 +316,19 @@ vorbis_read_header (SF_PRIVATE *psf, int log_data)
 		psf_log_printf (psf, "End\n") ;
 		} ;
 
-	psf->sf.samplerate	= vdata->vi.rate ;
-	psf->sf.channels	= vdata->vi.channels ;
+	psf->sf.samplerate	= vdata->vinfo.rate ;
+	psf->sf.channels	= vdata->vinfo.channels ;
 	psf->sf.format		= SF_FORMAT_OGG | SF_FORMAT_VORBIS ;
 
 	/*	OK, got and parsed all three headers. Initialize the Vorbis
 	**	packet->PCM decoder.
 	**	Central decode state. */
-	vorbis_synthesis_init (&vdata->vd, &vdata->vi) ;
+	vorbis_synthesis_init (&vdata->vdsp, &vdata->vinfo) ;
 
 	/*	Local state for most of the decode so multiple block decodes can
 	**	proceed in parallel. We could init multiple vorbis_block structures
 	**	for vd here. */
-	vorbis_block_init (&vdata->vd, &vdata->vb) ;
+	vorbis_block_init (&vdata->vdsp, &vdata->vblock) ;
 
 	vdata->loc = 0 ;
 
@@ -342,17 +342,17 @@ vorbis_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 	int k, ret ;
 
-	vorbis_info_init (&vdata->vi) ;
+	vorbis_info_init (&vdata->vinfo) ;
 
 	/* The style of encoding should be selectable here, VBR quality mode. */
-	ret = vorbis_encode_init_vbr (&vdata->vi, psf->sf.channels, psf->sf.samplerate, vdata->quality) ;
+	ret = vorbis_encode_init_vbr (&vdata->vinfo, psf->sf.channels, psf->sf.samplerate, vdata->quality) ;
 
 #if 0
-	ret = vorbis_encode_init (&vdata->vi, psf->sf.channels, psf->sf.samplerate, -1, 128000, -1) ; /* average bitrate mode */
-	ret = ( vorbis_encode_setup_managed (&vdata->vi, psf->sf.channels,
+	ret = vorbis_encode_init (&vdata->vinfo, psf->sf.channels, psf->sf.samplerate, -1, 128000, -1) ; /* average bitrate mode */
+	ret = ( vorbis_encode_setup_managed (&vdata->vinfo, psf->sf.channels,
 						 psf->sf.samplerate, -1, 128000, -1) ||
-		vorbis_encode_ctl (&vdata->vi, OV_ECTL_RATEMANAGE_AVG, NULL) ||
-		vorbis_encode_setup_init (&vdata->vi)) ;
+		vorbis_encode_ctl (&vdata->vinfo, OV_ECTL_RATEMANAGE_AVG, NULL) ||
+		vorbis_encode_setup_init (&vdata->vinfo)) ;
 #endif
 	if (ret)
 		return SFE_BAD_OPEN_FORMAT ;
@@ -360,9 +360,9 @@ vorbis_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 	vdata->loc = 0 ;
 
 	/* add a comment */
-	vorbis_comment_init (&vdata->vc) ;
+	vorbis_comment_init (&vdata->vcomment) ;
 
-	vorbis_comment_add_tag (&vdata->vc, "ENCODER", "libsndfile") ;
+	vorbis_comment_add_tag (&vdata->vcomment, "ENCODER", "libsndfile") ;
 	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
 	{	const char * name ;
 
@@ -381,12 +381,12 @@ vorbis_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 			default : continue ;
 			} ;
 
-		vorbis_comment_add_tag (&vdata->vc, name, psf->strings [k].str) ;
+		vorbis_comment_add_tag (&vdata->vcomment, name, psf->strings [k].str) ;
 		} ;
 
 	/* set up the analysis state and auxiliary encoding storage */
-	vorbis_analysis_init (&vdata->vd, &vdata->vi) ;
-	vorbis_block_init (&vdata->vd, &vdata->vb) ;
+	vorbis_analysis_init (&vdata->vdsp, &vdata->vinfo) ;
+	vorbis_block_init (&vdata->vdsp, &vdata->vblock) ;
 
 	/*
 	**	Set up our packet->stream encoder.
@@ -408,7 +408,7 @@ vorbis_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		ogg_packet header_code ;
 		int result ;
 
-		vorbis_analysis_headerout (&vdata->vd, &vdata->vc, &header, &header_comm, &header_code) ;
+		vorbis_analysis_headerout (&vdata->vdsp, &vdata->vcomment, &header, &header_comm, &header_code) ;
 		ogg_stream_packetin (&odata->ostream, &header) ; /* automatically placed in its own page */
 		ogg_stream_packetin (&odata->ostream, &header_comm) ;
 		ogg_stream_packetin (&odata->ostream, &header_code) ;
@@ -441,15 +441,15 @@ vorbis_close (SF_PRIVATE *psf)
 		if (psf->write_current <= 0)
 			vorbis_write_header (psf, 0) ;
 
-		vorbis_analysis_wrote (&vdata->vd, 0) ;
-		while (vorbis_analysis_blockout (&vdata->vd, &vdata->vb) == 1)
+		vorbis_analysis_wrote (&vdata->vdsp, 0) ;
+		while (vorbis_analysis_blockout (&vdata->vdsp, &vdata->vblock) == 1)
 		{
 
 		/* analysis, assume we want to use bitrate management */
-			vorbis_analysis (&vdata->vb, NULL) ;
-			vorbis_bitrate_addblock (&vdata->vb) ;
+			vorbis_analysis (&vdata->vblock, NULL) ;
+			vorbis_bitrate_addblock (&vdata->vblock) ;
 
-			while (vorbis_bitrate_flushpacket (&vdata->vd, &odata->opacket))
+			while (vorbis_bitrate_flushpacket (&vdata->vdsp, &odata->opacket))
 			{	/* weld the packet into the bitstream */
 				ogg_stream_packetin (&odata->ostream, &odata->opacket) ;
 
@@ -472,10 +472,10 @@ vorbis_close (SF_PRIVATE *psf)
 	/* ogg_page and ogg_packet structs always point to storage in
 	   libvorbis.  They are never freed or manipulated directly */
 
-	vorbis_block_clear (&vdata->vb) ;
-	vorbis_dsp_clear (&vdata->vd) ;
-	vorbis_comment_clear (&vdata->vc) ;
-	vorbis_info_clear (&vdata->vi) ;
+	vorbis_block_clear (&vdata->vblock) ;
+	vorbis_dsp_clear (&vdata->vdsp) ;
+	vorbis_comment_clear (&vdata->vcomment) ;
+	vorbis_info_clear (&vdata->vinfo) ;
 
 	return 0 ;
 } /* vorbis_close */
@@ -634,12 +634,12 @@ vorbis_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *t
 
 	len = lens / psf->sf.channels ;
 
-	while ((samples = vorbis_synthesis_pcmout (&vdata->vd, &pcm)) > 0)
+	while ((samples = vorbis_synthesis_pcmout (&vdata->vdsp, &pcm)) > 0)
 	{	if (samples > len) samples = len ;
 		i += transfn (samples, ptr, i, psf->sf.channels, pcm) ;
 		len -= samples ;
 		/* tell libvorbis how many samples we actually consumed */
-		vorbis_synthesis_read (&vdata->vd, samples) ;
+		vorbis_synthesis_read (&vdata->vdsp, samples) ;
 		vdata->loc += samples ;
 		if (len == 0)
 			return i ; /* Is this necessary */
@@ -668,20 +668,20 @@ vorbis_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *t
 						}
 					else
 					{	/* we have a packet.	Decode it */
-						if (vorbis_synthesis (&vdata->vb, &odata->opacket) == 0) /* test for success! */
-							vorbis_synthesis_blockin (&vdata->vd, &vdata->vb) ;
+						if (vorbis_synthesis (&vdata->vblock, &odata->opacket) == 0) /* test for success! */
+							vorbis_synthesis_blockin (&vdata->vdsp, &vdata->vblock) ;
 		  /*
 		  **pcm is a multichannel float vector.	 In stereo, for
 		  example, pcm [0] is left, and pcm [1] is right.	 samples is
 		  the size of each channel.	 Convert the float values
 		  (-1.<=range<=1.) to whatever PCM format and write it out */
 
-						while ((samples = vorbis_synthesis_pcmout (&vdata->vd, &pcm)) > 0)
+						while ((samples = vorbis_synthesis_pcmout (&vdata->vdsp, &pcm)) > 0)
 						{	if (samples>len) samples = len ;
 							i += transfn (samples, ptr, i, psf->sf.channels, pcm) ;
 							len -= samples ;
 							/* tell libvorbis how many samples we actually consumed */
-							vorbis_synthesis_read (&vdata->vd, samples) ;
+							vorbis_synthesis_read (&vdata->vdsp, samples) ;
 							vdata->loc += samples ;
 							if (len == 0)
 								return i ; /* Is this necessary */
@@ -729,20 +729,20 @@ vorbis_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t lens)
 static void
 vorbis_write_samples (SF_PRIVATE *psf, OGG_PRIVATE *odata, VORBIS_PRIVATE *vdata, int in_frames)
 {
-	vorbis_analysis_wrote (&vdata->vd, in_frames) ;
+	vorbis_analysis_wrote (&vdata->vdsp, in_frames) ;
 
 	/*
 	**	Vorbis does some data preanalysis, then divvies up blocks for
 	**	more involved (potentially parallel) processing. Get a single
 	**	block for encoding now.
 	*/
-	while (vorbis_analysis_blockout (&vdata->vd, &vdata->vb) == 1)
+	while (vorbis_analysis_blockout (&vdata->vdsp, &vdata->vblock) == 1)
 	{
 		/* analysis, assume we want to use bitrate management */
-		vorbis_analysis (&vdata->vb, NULL) ;
-		vorbis_bitrate_addblock (&vdata->vb) ;
+		vorbis_analysis (&vdata->vblock, NULL) ;
+		vorbis_bitrate_addblock (&vdata->vblock) ;
 
-		while (vorbis_bitrate_flushpacket (&vdata->vd, &odata->opacket))
+		while (vorbis_bitrate_flushpacket (&vdata->vdsp, &odata->opacket))
 		{
 			/* weld the packet into the bitstream */
 			ogg_stream_packetin (&odata->ostream, &odata->opacket) ;
@@ -774,7 +774,7 @@ vorbis_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t lens)
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 	int in_frames = lens / psf->sf.channels ;
-	float **buffer = vorbis_analysis_buffer (&vdata->vd, in_frames) ;
+	float **buffer = vorbis_analysis_buffer (&vdata->vdsp, in_frames) ;
 	for (i = 0 ; i < in_frames ; i++)
 		for (m = 0 ; m < psf->sf.channels ; m++)
 			buffer [m][i] = (float) (ptr [j++]) / 32767.0f ;
@@ -790,7 +790,7 @@ vorbis_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t lens)
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 	int in_frames = lens / psf->sf.channels ;
-	float **buffer = vorbis_analysis_buffer (&vdata->vd, in_frames) ;
+	float **buffer = vorbis_analysis_buffer (&vdata->vdsp, in_frames) ;
 	for (i = 0 ; i < in_frames ; i++)
 		for (m = 0 ; m < psf->sf.channels ; m++)
 			buffer [m][i] = (float) (ptr [j++]) / 2147483647.0f ;
@@ -806,7 +806,7 @@ vorbis_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t lens)
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 	int in_frames = lens / psf->sf.channels ;
-	float **buffer = vorbis_analysis_buffer (&vdata->vd, in_frames) ;
+	float **buffer = vorbis_analysis_buffer (&vdata->vdsp, in_frames) ;
 	for (i = 0 ; i < in_frames ; i++)
 		for (m = 0 ; m < psf->sf.channels ; m++)
 			buffer [m][i] = ptr [j++] ;
@@ -822,7 +822,7 @@ vorbis_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 	int in_frames = lens / psf->sf.channels ;
-	float **buffer = vorbis_analysis_buffer (&vdata->vd, in_frames) ;
+	float **buffer = vorbis_analysis_buffer (&vdata->vdsp, in_frames) ;
 	for (i = 0 ; i < in_frames ; i++)
 		for (m = 0 ; m < psf->sf.channels ; m++)
 			buffer [m][i] = (float) ptr [j++] ;
@@ -892,8 +892,8 @@ typedef struct
 	uint32_t serial ; /* must be 32 bit unsigned */
 	ogg_stream_state ostream ;
 
-	vorbis_info vi ;
-	vorbis_comment vc ;
+	vorbis_info vinfo ;
+	vorbis_comment vcomment ;
 	sf_count_t lastgranulepos ;
 	int doneheaders ;
 } stream_processor ;
@@ -920,8 +920,8 @@ create_stream_set (void)
 static void
 vorbis_end (stream_processor *stream, sf_count_t * len)
 {	*len += stream->lastgranulepos ;
-	vorbis_comment_clear (&stream->vc) ;
-	vorbis_info_clear (&stream->vi) ;
+	vorbis_comment_clear (&stream->vcomment) ;
+	vorbis_info_clear (&stream->vinfo) ;
 } /* vorbis_end */
 
 static void
@@ -1011,8 +1011,8 @@ find_stream_processor (stream_set *set, ogg_page *page)
 		else if (packet.bytes >= 7 && memcmp (packet.packet, "\x01vorbis", 7) == 0)
 		{
 			stream->lastgranulepos = 0 ;
-			vorbis_comment_init (&stream->vc) ;
-			vorbis_info_init (&stream->vi) ;
+			vorbis_comment_init (&stream->vcomment) ;
+			vorbis_info_init (&stream->vinfo) ;
 			} ;
 
 		res = ogg_stream_packetout (&stream->ostream, &packet) ;
@@ -1090,7 +1090,7 @@ vorbis_length_aux (SF_PRIVATE * psf)
 			while (ogg_stream_packetout (&p->ostream, &packet) > 0)
 			{
 				if (p->doneheaders < 3)
-				{	if (vorbis_synthesis_headerin (&p->vi, &p->vc, &packet) < 0)
+				{	if (vorbis_synthesis_headerin (&p->vinfo, &p->vcomment, &packet) < 0)
 						continue ;
 					p->doneheaders ++ ;
 					} ;
