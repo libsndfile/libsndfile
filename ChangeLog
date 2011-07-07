@@ -1,3 +1,8 @@
+2011-07-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sfconfig.h
+    Add handling for HAVE_SYS_WAIT_H.
+
 2011-07-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/sndfile.c

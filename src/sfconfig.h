@@ -93,6 +93,10 @@
 #define HAVE_STDINT_H 0
 #endif
 
+#ifndef HAVE_SYS_WAIT_H
+#define HAVE_SYS_WAIT_H 0
+#endif
+
 #ifndef HAVE_UNISTD_H
 #define HAVE_UNISTD_H 0
 #endif
