@@ -23,7 +23,7 @@ EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 
 noinst_HEADERS = common.h sfconfig.h sfendian.h wav_w64.h sf_unistd.h ogg.h chanmap.h
 
-check_PROGRAMS = test_main$(EXEEXT) G72x/g72x_test$(EXEEXT)
+check_PROGRAMS = test_main G72x/g72x_test
 
 COMMON = common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
@@ -87,6 +87,9 @@ check :
 	G72x/g72x_test$(EXEEXT) all
 	./test_main$(EXEEXT)
 
+# Need this target to force building of test programs.
+checkprograms : $(check_PROGRAMS)
+
 #======================================================================
 # Generate an OS specific Symbols files. This is done when the author
 # builds the distribution tarball. There should be not need for the
@@ -120,6 +123,5 @@ sndfile.o : $(SYMBOL_FILES)
 # Disable autoheader.
 AUTOHEADER=echo
 
-# Dependancies.
 
 

@@ -27,6 +27,9 @@ genfiles :
 	(cd src ; make genfiles)
 	(cd tests ; make genfiles)
 
+checkprograms :
+	(cd src ; make libsndfile.la checkprograms)
+	(cd tests ; make checkprograms)
 
 testprogs :
 	(cd src ; make testprogs)

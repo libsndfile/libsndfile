@@ -34,6 +34,30 @@ EXTRA_DIST = $(autogen_sources)
 CLEANFILES = *~
 
 #===============================================================================
+# If we're cross compiling from Linux to Windows and running the test suite
+# under Wine, we need a symbolic link to the generated libsndfile DLL.
+
+if LINUX_MINGW_CROSS_TEST
+
+$(check_PROGRAMS) : libsndfile-1.dll
+
+libsndfile-1.dll :
+	ln -s $(top_builddir)/src/.libs/$@ $@
+
+clean-local :
+	-rm -f libsndfile-1.dll
+
+endif
+
+#===============================================================================
+
+check: test_wrapper.sh
+	sh test_wrapper.sh
+
+# Need this target to force building of test programs.
+checkprograms : $(check_PROGRAMS)
+
+#===============================================================================
 
 sfversion_SOURCES = sfversion.c
 sfversion_LDADD = $(top_builddir)/src/libsndfile.la
@@ -184,26 +208,4 @@ benchmark.c: benchmark.def benchmark.tpl
 genfiles : write_read_test.c pcm_test.c header_test.c utils.c \
 		scale_clip_test.c pipe_test.c floating_point_test.c rdwr_test.c \
 		benchmark.c
-
-#===============================================================================
-# If we're cross compiling from Linux to Windows and running the test suite
-# under Wine, we need a symbolic link to the generated libsndfile DLL.
-
-if LINUX_MINGW_CROSS_TEST
-
-$(check_PROGRAMS) : libsndfile-1.dll
-
-libsndfile-1.dll :
-	ln -s $(top_builddir)/src/.libs/$@ $@
-
-clean-local :
-	-rm -f libsndfile-1.dll
-
-endif
-
-#===============================================================================
-
-check: test_wrapper.sh
-	sh test_wrapper.sh
-
 
