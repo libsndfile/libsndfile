@@ -146,7 +146,7 @@ db_file_exists (REG_DB * db_handle, const char * filename)
 
 	db->count = 0 ;
 	err = sqlite3_exec (db->sql, db->cmdbuf, (sqlite3_callback) count_callback, db, &errmsg) ;
-	if (db->count == 1)
+	if (err == 0 && db->count == 1)
 		return 1 ;
 
 	return 0 ;
