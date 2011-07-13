@@ -1,3 +1,8 @@
+2011-07-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/ogg_vorbis.c
+    Fix return value of SFC_SET_VBR_ENCODING_QUALITY command.
+
 2011-07-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sfconfig.h

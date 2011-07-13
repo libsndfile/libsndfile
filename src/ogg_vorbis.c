@@ -552,10 +552,10 @@ vorbis_command (SF_PRIVATE *psf, int command, void * data, int datasize)
 	switch (command)
 	{	case SFC_SET_VBR_ENCODING_QUALITY :
 			if (data == NULL || datasize != sizeof (double))
-				return 1 ;
+				return SF_FALSE ;
 
 			if (psf->have_written)
-				return 1 ;
+				return SF_FALSE ;
 
 			vdata->quality = *((double *) data) ;
 
@@ -563,13 +563,13 @@ vorbis_command (SF_PRIVATE *psf, int command, void * data, int datasize)
 			vdata->quality = SF_MAX (0.0, SF_MIN (1.0, vdata->quality)) ;
 
 			psf_log_printf (psf, "%s : Setting SFC_SET_VBR_ENCODING_QUALITY to %f.\n", __func__, vdata->quality) ;
-			break ;
+			return SF_TRUE ;
 
 		default :
-			return 0 ;
+			return SF_FALSE ;
 		} ;
 
-	return 0 ;
+	return SF_FALSE ;
 } /* vorbis_command */
 
 static int
