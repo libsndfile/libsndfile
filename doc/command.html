@@ -206,6 +206,28 @@
 	<TD>Set the Broadcast Chunk info</TD>
 </TR>
 
+<TR>
+	<TD><A HREF="#SFC_GET_LOOP_INFO">SFC_GET_LOOP_INFO</A></TD>
+	<TD>Get loop info</TD>
+</TR>
+
+<TR>
+	<TD><A HREF="#SFC_GET_INSTRUMENT">SFC_GET_INSTRUMENT</A></TD>
+	<TD>Get instrument info</TD>
+</TR>
+
+<TR>
+	<TD><A HREF="#SFC_SET_INSTRUMENT">SFC_SET_INSTRUMENT</A></TD>
+	<TD>Set instrument info</TD>
+</TR>
+
+<TR>
+	<TD><A HREF="#SFC_SET_VBR_ENCODING_QUALITY">SFC_SET_VBR_ENCODING_QUALITY</A></TD>
+	<TD>Set variable bit rate encoding quality</TD>
+</TR>
+
+
+
 <!--
 <TR>
 	<TD><A HREF="#add-dither">add dither</A></TD>
@@ -1243,7 +1265,7 @@ Parameters:
 </P>
 <DL>
 <DT>Return value: </DT>
-	<DD>SF_AMBISONIC_NONE or SF_AMBISONIC_B_FORMAT or zero if the file format 
+	<DD>SF_AMBISONIC_NONE or SF_AMBISONIC_B_FORMAT or zero if the file format
 		does not support ambisonic formats.
 </DL>
 
@@ -1395,6 +1417,180 @@ Parameters:
 </DL>
 <!-- ========================================================================= -->
 
+<A NAME="SFC_GET_LOOP_INFO"></A>
+<H2><BR><B>SFC_GET_LOOP_INFO</B></H2>
+<P>
+Retrieve loop information for file including time signature, length in
+beats and original MIDI base note
+</P>
+<p>
+Parameters:
+</p>
+<PRE>
+         sndfile  : A valid SNDFILE* pointer
+         cmd      : SFC_GET_LOOP_INFO
+         data     : a pointer to an SF_LOOP_INFO struct
+         datasize : sizeof (SF_LOOP_INFO)
+</PRE>
+<P>
+The SF_BROADCAST_INFO struct is defined in &lt;sndfile.h&gt; as:
+</P>
+<PRE>
+        typedef struct
+        {   short    time_sig_num ;   /* any positive integer    > 0  */
+            short    time_sig_den ;   /* any positive power of 2 > 0  */
+            int        loop_mode ;    /* see SF_LOOP enum             */
+
+            int        num_beats ;    /* this is NOT the amount of quarter notes !!!*/
+                                      /* a full bar of 4/4 is 4 beats */
+                                      /* a full bar of 7/8 is 7 beats */
+
+            float    bpm ;            /* suggestion, as it can be calculated using other fields:*/
+                                      /* file's lenght, file's sampleRate and our time_sig_den*/
+                                      /* -> bpms are always the amount of _quarter notes_ per minute */
+
+            int    root_key ;         /* MIDI note, or -1 for None */
+            int future [6] ;
+        } SF_LOOP_INFO ;
+</PRE>
+<P>
+Example:
+</P>
+<PRE>
+         SF_LOOP_INFO loop;
+         sf_command (sndfile, SFC_GET_LOOP_INFO, &amp;loop, sizeof (loop)) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<DD>SF_TRUE if the file header contains loop information for the file.
+    SF_FALSE otherwise.
+</DL>
+
+<!-- ========================================================================= -->
+
+
+<A NAME="SFC_GET_INSTRUMENT"></A>
+<H2><BR><B>SFC_GET_INSTRUMENT</B></H2>
+<P>
+Retrieve instrument information from file including MIDI base note,
+keyboard mapping and looping informations(start/stop and mode).
+</P>
+<p>
+Parameters:
+</p>
+<PRE>
+         sndfile  : A valid SNDFILE* pointer
+         cmd      : SFC_GET_INSTRUMENT
+         data     : a pointer to an SF_INSTRUMENT struct
+         datasize : sizeof (SF_INSTRUMENT)
+</PRE>
+
+<P>
+The SF_INSTRUMENT struct is defined in &lt;sndfile.h&gt; as:
+</P>
+<PRE>
+        enum
+        {    /*
+            **    The loop mode field in SF_INSTRUMENT will be one of the following.
+            */
+            SF_LOOP_NONE = 800,
+            SF_LOOP_FORWARD,
+            SF_LOOP_BACKWARD,
+            SF_LOOP_ALTERNATING
+        } ;
+
+        typedef struct
+        {   int gain ;
+            char basenote, detune ;
+            char velocity_lo, velocity_hi ;
+            char key_lo, key_hi ;
+            int loop_count ;
+
+            struct
+            {   int mode ;
+                unsigned int start ;
+                unsigned int end ;
+                unsigned int count ;
+            } loops [16] ; /* make variable in a sensible way */
+        } SF_INSTRUMENT ;
+</PRE>
+
+<P>
+Example:
+</P>
+<PRE>
+         SF_INSTRUMENT inst ;
+         sf_command (sndfile, SFC_GET_INSTRUMENT, &amp;inst, sizeof (inst)) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<dd>SF_TRUE if the file header contains instrument information for the
+    file. SF_FALSE otherwise.
+</DL>
+
+<!-- ========================================================================= -->
+
+
+<A NAME="SFC_SET_INSTRUMENT"></A>
+<H2><BR><B>SFC_SET_INSTRUMENT</B></H2>
+<P>
+Set the instrument information for the file.
+</P>
+<p>
+Parameters:
+</p>
+<PRE>
+         sndfile  : A valid SNDFILE* pointer
+         cmd      : SFC_GET_INSTRUMENT
+         data     : a pointer to an SF_INSTRUMENT struct
+         datasize : sizeof (SF_INSTRUMENT)
+</PRE>
+<P>
+Example:
+</P>
+<PRE>
+         SF_INSTRUMENT inst ;
+         sf_command (sndfile, SFC_SET_INSTRUMENT, &amp;inst, sizeof (inst)) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<dd>SF_TRUE if the file header contains instrument information for the
+    file. SF_FALSE otherwise.
+</DL>
+
+<!-- ========================================================================= -->
+
+
+<A NAME="SFC_SET_VBR_ENCODING_QUALITY"></A>
+<H2><BR><B>SFC_SET_VBR_ENCODING_QUALITY</B></H2>
+<P>
+Set the Variable Bite Rate encoding quality.
+Currenly only implemented fro Ogg/Vorbis files.
+</P>
+<p>
+Parameters:
+</p>
+<PRE>
+         sndfile  : A valid SNDFILE* pointer
+         cmd      : SFC_SET_VBR_ENCODING_QUALITY
+         data     : a pointer to double specifing VBR quality
+         datasize : sizeof (double)
+</PRE>
+<P>
+Example:
+</P>
+<PRE>
+         double quality = 0.5 ;
+         sf_command (sndfile, SFC_SET_VBR_ENCODING_QUALITY, &amp;quality, sizeof (double)) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<dd>SF_TRUE if VBR encoding quality was set.
+    SF_FALSE otherwise.
+</DL>
+
+<!-- ========================================================================= -->
+
 
 <HR>
 <P>
@@ -1402,7 +1598,7 @@ Parameters:
 		<A HREF="http://www.mega-nerd.com/libsndfile/">
 			http://www.mega-nerd.com/libsndfile/</A>.
 <BR>
-Version : 1.0.24
+Version : 1.0.25
 </P>
 
 </BODY>
