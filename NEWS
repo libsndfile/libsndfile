@@ -1,3 +1,8 @@
+Version 1.0.25 (2011-07-13)
+  * Fix for Secunia Advisory SA45125, heap overflow in PAF file handler.
+  * Accept broken WAV files with blockalign == 0.
+  * Minor bug fixes and improvements.
+
 Version 1.0.24 (2011-03-23)
   * WAV files now have an 18 byte u-law and A-law fmt chunk.
   * Document virtual I/O functionality.

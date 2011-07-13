@@ -3,6 +3,13 @@
     * src/ogg_vorbis.c
     Fix return value of SFC_SET_VBR_ENCODING_QUALITY command.
 
+    * doc/command.html
+    Document SFC_SET_VBR_ENCODING_QUALITY, SFC_GET/SET_LOOP_INFO and
+    SFC_GET_INSTRUMENT.
+
+    * NEWS README configure.ac doc/*.html
+    Updates for 1.0.25.
+
 2011-07-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sfconfig.h
