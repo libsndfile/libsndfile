@@ -3,6 +3,9 @@
     * doc/command.html
     Merge two separate blocks of SFC_SET_VBR_ENCODING_QUALITY documentation.
 
+    * src/paf.c
+    Replace ppaf24->samplesperblock with a compile time constant.
+
 2011-07-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ogg_vorbis.c

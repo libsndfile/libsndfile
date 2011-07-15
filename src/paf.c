@@ -59,7 +59,7 @@ typedef	struct
 } PAF_FMT ;
 
 typedef struct
-{	int				max_blocks, channels, samplesperblock, blocksize ;
+{	int				max_blocks, channels, blocksize ;
 	int				read_block, write_block, read_count, write_count ;
 	sf_count_t		sample_count ;
 	int				*samples ;
@@ -369,7 +369,6 @@ paf24_init (SF_PRIVATE *psf)
 	ppaf24->block		= (unsigned char*) (ppaf24->data + PAF24_SAMPLES_PER_BLOCK * ppaf24->channels) ;
 
 	ppaf24->blocksize = PAF24_BLOCK_SIZE * ppaf24->channels ;
-	ppaf24->samplesperblock = PAF24_SAMPLES_PER_BLOCK ;
 
 	if (psf->file.mode == SFM_READ || psf->file.mode == SFM_RDWR)
 	{	paf24_read_block (psf, ppaf24) ;	/* Read first block. */
@@ -407,7 +406,7 @@ paf24_init (SF_PRIVATE *psf)
 	else
 		ppaf24->write_block = 0 ;
 
-	psf->sf.frames = ppaf24->samplesperblock * ppaf24->max_blocks ;
+	psf->sf.frames = PAF24_SAMPLES_PER_BLOCK * ppaf24->max_blocks ;
 	ppaf24->sample_count = psf->sf.frames ;
 
 	return 0 ;
@@ -428,8 +427,8 @@ paf24_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 	if (mode == SFM_READ && ppaf24->write_count > 0)
 		paf24_write_block (psf, ppaf24) ;
 
-	newblock	= offset / ppaf24->samplesperblock ;
-	newsample	= offset % ppaf24->samplesperblock ;
+	newblock	= offset / PAF24_SAMPLES_PER_BLOCK ;
+	newsample	= offset % PAF24_SAMPLES_PER_BLOCK ;
 
 	switch (mode)
 	{	case SFM_READ :
@@ -462,7 +461,7 @@ paf24_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 				return PSF_SEEK_ERROR ;
 		} ;
 
-	return newblock * ppaf24->samplesperblock + newsample ;
+	return newblock * PAF24_SAMPLES_PER_BLOCK + newsample ;
 } /* paf24_seek */
 
 static int
@@ -492,8 +491,8 @@ paf24_read_block (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
 	ppaf24->read_block ++ ;
 	ppaf24->read_count = 0 ;
 
-	if (ppaf24->read_block * ppaf24->samplesperblock > ppaf24->sample_count)
-	{	memset (ppaf24->samples, 0, ppaf24->samplesperblock * ppaf24->channels) ;
+	if (ppaf24->read_block * PAF24_SAMPLES_PER_BLOCK > ppaf24->sample_count)
+	{	memset (ppaf24->samples, 0, PAF24_SAMPLES_PER_BLOCK * ppaf24->channels) ;
 		return 1 ;
 		} ;
 
@@ -535,15 +534,15 @@ paf24_read (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, int *ptr, int len)
 {	int	count, total = 0 ;
 
 	while (total < len)
-	{	if (ppaf24->read_block * ppaf24->samplesperblock >= ppaf24->sample_count)
+	{	if (ppaf24->read_block * PAF24_SAMPLES_PER_BLOCK >= ppaf24->sample_count)
 		{	memset (&(ptr [total]), 0, (len - total) * sizeof (int)) ;
 			return total ;
 			} ;
 
-		if (ppaf24->read_count >= ppaf24->samplesperblock)
+		if (ppaf24->read_count >= PAF24_SAMPLES_PER_BLOCK)
 			paf24_read_block (psf, ppaf24) ;
 
-		count = (ppaf24->samplesperblock - ppaf24->read_count) * ppaf24->channels ;
+		count = (PAF24_SAMPLES_PER_BLOCK - ppaf24->read_count) * ppaf24->channels ;
 		count = (len - total > count) ? count : len - total ;
 
 		memcpy (&(ptr [total]), &(ppaf24->samples [ppaf24->read_count * ppaf24->channels]), count * sizeof (int)) ;
@@ -688,10 +687,10 @@ paf24_write_block (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
 	if ((k = psf_fwrite (ppaf24->block, 1, ppaf24->blocksize, psf)) != ppaf24->blocksize)
 		psf_log_printf (psf, "*** Warning : short write (%d != %d).\n", k, ppaf24->blocksize) ;
 
-	if (ppaf24->sample_count < ppaf24->write_block * ppaf24->samplesperblock + ppaf24->write_count)
-		ppaf24->sample_count = ppaf24->write_block * ppaf24->samplesperblock + ppaf24->write_count ;
+	if (ppaf24->sample_count < ppaf24->write_block * PAF24_SAMPLES_PER_BLOCK + ppaf24->write_count)
+		ppaf24->sample_count = ppaf24->write_block * PAF24_SAMPLES_PER_BLOCK + ppaf24->write_count ;
 
-	if (ppaf24->write_count == ppaf24->samplesperblock)
+	if (ppaf24->write_count == PAF24_SAMPLES_PER_BLOCK)
 	{	ppaf24->write_block ++ ;
 		ppaf24->write_count = 0 ;
 		} ;
@@ -704,7 +703,7 @@ paf24_write (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, const int *ptr, int len)
 {	int		count, total = 0 ;
 
 	while (total < len)
-	{	count = (ppaf24->samplesperblock - ppaf24->write_count) * ppaf24->channels ;
+	{	count = (PAF24_SAMPLES_PER_BLOCK - ppaf24->write_count) * ppaf24->channels ;
 
 		if (count > len - total)
 			count = len - total ;
@@ -713,7 +712,7 @@ paf24_write (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24, const int *ptr, int len)
 		total += count ;
 		ppaf24->write_count += count / ppaf24->channels ;
 
-		if (ppaf24->write_count >= ppaf24->samplesperblock)
+		if (ppaf24->write_count >= PAF24_SAMPLES_PER_BLOCK)
 			paf24_write_block (psf, ppaf24) ;
 		} ;
 
