@@ -221,11 +221,6 @@
 	<TD>Set instrument info</TD>
 </TR>
 
-<TR>
-	<TD><A HREF="#SFC_SET_VBR_ENCODING_QUALITY">SFC_SET_VBR_ENCODING_QUALITY</A></TD>
-	<TD>Set variable bit rate encoding quality</TD>
-</TR>
-
 
 
 <!--
@@ -1305,6 +1300,7 @@ This command is currently only supported for files with SF_FORMAT_WAVEX format.
 Set the the Variable Bit Rate encoding quality.
 The encoding quality value should be between 0.0 (lowest quality) and 1.0
 (highest quality).
+Currenly this command is only implemented for Ogg/Vorbis files.
 </P>
 <P>
 Parameters:
@@ -1320,8 +1316,9 @@ The command must be sent before any audio data is written to the file.
 <P>
 </P>
 <DL>
-<DT>Return value: </DT>
-	<DD>Zero on success, non-zero otherwise.
+<DT>Return value:</DT>
+	<dd>SF_TRUE if VBR encoding quality was set.
+    SF_FALSE otherwise.
 </DL>
 
 <!-- ========================================================================= -->
@@ -1556,37 +1553,6 @@ Example:
 <DT>Return value:</DT>
 	<dd>SF_TRUE if the file header contains instrument information for the
     file. SF_FALSE otherwise.
-</DL>
-
-<!-- ========================================================================= -->
-
-
-<A NAME="SFC_SET_VBR_ENCODING_QUALITY"></A>
-<H2><BR><B>SFC_SET_VBR_ENCODING_QUALITY</B></H2>
-<P>
-Set the Variable Bite Rate encoding quality.
-Currenly only implemented fro Ogg/Vorbis files.
-</P>
-<p>
-Parameters:
-</p>
-<PRE>
-         sndfile  : A valid SNDFILE* pointer
-         cmd      : SFC_SET_VBR_ENCODING_QUALITY
-         data     : a pointer to double specifing VBR quality
-         datasize : sizeof (double)
-</PRE>
-<P>
-Example:
-</P>
-<PRE>
-         double quality = 0.5 ;
-         sf_command (sndfile, SFC_SET_VBR_ENCODING_QUALITY, &amp;quality, sizeof (double)) ;
-</PRE>
-<DL>
-<DT>Return value:</DT>
-	<dd>SF_TRUE if VBR encoding quality was set.
-    SF_FALSE otherwise.
 </DL>
 
 <!-- ========================================================================= -->
