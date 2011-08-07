@@ -18,9 +18,6 @@ AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE($PACKAGE_NAME,$PACKAGE_VERSION)
 AM_SILENT_RULES([yes])
 
-dnl Add parameters for aclocal
-AC_SUBST(ACLOCAL_AMFLAGS, "-I M4")
-
 AC_LANG([C])
 
 AC_PROG_CC

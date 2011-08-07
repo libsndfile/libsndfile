@@ -1,3 +1,8 @@
+2011-08-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac Makefile.am
+    Move ACLOCAL_AMFLAGS setup to Makefile.am.
+
 2011-07-15  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/command.html
