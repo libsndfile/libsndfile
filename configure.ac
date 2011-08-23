@@ -197,7 +197,7 @@ case "$host_os" in
 			pre_largefile_sizeof_off_t=$ac_cv_sizeof_off_t
 			unset ac_cv_sizeof_off_t
 
-			AC_SYS_EXTRA_LARGEFILE
+			AC_SYS_LARGEFILE
 
 			if test "x$ac_cv_sys_largefile_CFLAGS" = "xno" ; then
 				ac_cv_sys_largefile_CFLAGS=""

@@ -1,3 +1,9 @@
+2011-08-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Use AC_SYS_LARGEFILE instead of AC_SYS_EXTRA_LARGEFILE as suggested by
+    Jan Willies.
+
 2011-08-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac Makefile.am
