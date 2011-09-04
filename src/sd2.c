@@ -149,6 +149,7 @@ sd2_open (SF_PRIVATE *psf)
 	{	case SF_FORMAT_PCM_S8 :	/* 8-bit linear PCM. */
 		case SF_FORMAT_PCM_16 :	/* 16-bit linear PCM. */
 		case SF_FORMAT_PCM_24 :	/* 24-bit linear PCM */
+		case SF_FORMAT_PCM_32 :	/* 32-bit linear PCM */
 				error = pcm_init (psf) ;
 				break ;
 
@@ -618,6 +619,10 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 
 		case 3 :
 			psf->sf.format = SF_FORMAT_SD2 | SF_FORMAT_PCM_24 ;
+			break ;
+
+		case 4 :
+			psf->sf.format = SF_FORMAT_SD2 | SF_FORMAT_PCM_32 ;
 			break ;
 
 		default :
