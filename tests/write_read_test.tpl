@@ -29,11 +29,6 @@
 
 #include	<math.h>
 
-#if (defined (WIN32) || defined (_WIN32))
-#include	<fcntl.h>
-static int truncate (const char *filename, int ignored) ;
-#endif
-
 #include	<sndfile.h>
 
 #include	"utils.h"
@@ -1029,28 +1024,6 @@ create_short_file (const char *filename)
 	fclose (file) ;
 } /* create_short_file */
 
-#if (defined (WIN32) || defined (__WIN32))
-
-/* Win32 does not have truncate (nor does it have the POSIX function ftruncate).
-** Hack somethng up here to over come this. This function can only truncate to a
-** length of zero.
-*/
-
-static int
-truncate (const char *filename, int ignored)
-{	int fd ;
-
-	ignored = 0 ;
-
-	if ((fd = open (filename, O_RDWR | O_TRUNC | O_BINARY)) < 0)
-		return 0 ;
-
-	close (fd) ;
-
-	return 0 ;
-} /* truncate */
-
-#endif
 
 static void
 multi_seek_test (const char * filename, int format)
