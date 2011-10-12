@@ -76,6 +76,7 @@
 #define emnt_MARKER	 (MAKE_MARKER ('e', 'm', 'n', 't'))
 #define erel_MARKER	 (MAKE_MARKER ('e', 'r', 'e', 'l'))
 #define eucm_MARKER	 (MAKE_MARKER ('e', 'u', 'c', 'm'))
+#define olym_MARKER	 (MAKE_MARKER ('o', 'l', 'y', 'm'))
 
 #define ISFT_MARKER	 (MAKE_MARKER ('I', 'S', 'F', 'T'))
 #define ICRD_MARKER	 (MAKE_MARKER ('I', 'C', 'R', 'D'))
@@ -1777,6 +1778,13 @@ exif_subchunk_parse (SF_PRIVATE *psf, unsigned int length)
 				vmajor = 10 * (((dword >> 24) & 0xff) - '0') + (((dword >> 16) & 0xff) - '0') ;
 				vminor = 10 * (((dword >> 8) & 0xff) - '0') + ((dword & 0xff) - '0') ;
 				psf_log_printf (psf, "    EXIF Version : %u.%02u\n", vmajor, vminor) ;
+				break ;
+
+			case olym_MARKER :
+				psf_binheader_readf (psf, "4", &dword) ;
+				psf_log_printf (psf, "%M : %u\n", marker, dword) ;
+				dword += (dword & 1) ;
+				psf_binheader_readf (psf, "j", dword) ;
 				break ;
 
 			case emnt_MARKER : /* design information: null-terminated string */
