@@ -121,7 +121,7 @@ psf_open_rsrc (SF_PRIVATE *psf)
 		return 0 ;
 
 	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
-	snprintf (psf->rsrc.path.c, sizeof (psf->rsrc.path.c), "%s/rsrc", psf->file.path.c) ;
+	snprintf (psf->rsrc.path.c, sizeof (psf->rsrc.path.c), "%s/..namedfork/rsrc", psf->file.path.c) ;
 	psf->error = SFE_NO_ERROR ;
 	if ((psf->rsrc.filedes = psf_open_fd (&psf->rsrc)) >= 0)
 	{	psf->rsrclength = psf_get_filelen_fd (psf->rsrc.filedes) ;
