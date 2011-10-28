@@ -701,8 +701,9 @@ win32_audio_out_callback (HWAVEOUT hwave, UINT msg, DWORD_PTR data, DWORD param1
 {	Win32_Audio_Data	*audio_data ;
 
 	/* Prevent compiler warnings. */
-	hwave = hwave ;
-	param1 = param2 ;
+	(void) hwave ;
+	(void) param1 ;
+	(void) param2 ;
 
 	if (data == 0)
 		return ;

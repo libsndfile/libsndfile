@@ -796,7 +796,7 @@ void
 check_open_file_count_or_die (int lineno)
 {
 #if OS_IS_WIN32
-	lineno = 0 ;
+	(void) lineno ;
 	return ;
 #else
 	int k, count = 0 ;
