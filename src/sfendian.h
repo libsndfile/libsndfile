@@ -232,12 +232,12 @@ endswap_int64_t_copy (int64_t *dest, const int64_t *src, int len)
 
 static inline void
 endswap_float_array (float *ptr, int len)
-{	endswap_int_array ((void *) ptr, len) ;
+{	endswap_int_array ((int *) ptr, len) ;
 } /* endswap_float_array */
 
 static inline void
 endswap_double_array (double *ptr, int len)
-{	endswap_int64_t_array ((void *) ptr, len) ;
+{	endswap_int64_t_array ((int64_t *) ptr, len) ;
 } /* endswap_double_array */
 
 static inline void
