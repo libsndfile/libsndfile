@@ -642,13 +642,13 @@ int u_bitwidth_to_subformat (int bits) ;
 /*  Functions for reading and writing floats and doubles on processors
 **	with non-IEEE floats/doubles.
 */
-float	float32_be_read		(unsigned char *cptr) ;
-float	float32_le_read		(unsigned char *cptr) ;
+float	float32_be_read		(const unsigned char *cptr) ;
+float	float32_le_read		(const unsigned char *cptr) ;
 void	float32_be_write	(float in, unsigned char *out) ;
 void	float32_le_write	(float in, unsigned char *out) ;
 
-double	double64_be_read	(unsigned char *cptr) ;
-double	double64_le_read	(unsigned char *cptr) ;
+double	double64_be_read	(const unsigned char *cptr) ;
+double	double64_le_read	(const unsigned char *cptr) ;
 void	double64_be_write	(double in, unsigned char *out) ;
 void	double64_le_write	(double in, unsigned char *out) ;
 

@@ -276,7 +276,7 @@ double64_init	(SF_PRIVATE *psf)
 */
 
 double
-double64_be_read (unsigned char *cptr)
+double64_be_read (const unsigned char *cptr)
 {	int		exponent, negative, upper, lower ;
 	double	dvalue ;
 
@@ -309,7 +309,7 @@ double64_be_read (unsigned char *cptr)
 } /* double64_be_read */
 
 double
-double64_le_read (unsigned char *cptr)
+double64_le_read (const unsigned char *cptr)
 {	int		exponent, negative, upper, lower ;
 	double	dvalue ;
 

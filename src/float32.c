@@ -247,7 +247,7 @@ float32_init	(SF_PRIVATE *psf)
 } /* float32_init */
 
 float
-float32_be_read (unsigned char *cptr)
+float32_be_read (const unsigned char *cptr)
 {	int		exponent, mantissa, negative ;
 	float	fvalue ;
 
@@ -275,7 +275,7 @@ float32_be_read (unsigned char *cptr)
 } /* float32_be_read */
 
 float
-float32_le_read (unsigned char *cptr)
+float32_le_read (const unsigned char *cptr)
 {	int		exponent, mantissa, negative ;
 	float	fvalue ;
 
