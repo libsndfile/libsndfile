@@ -149,15 +149,6 @@ usage_exit (const char *progname)
 static double	data [BUFFER_LEN] ;
 
 static double
-get_signal_max (SNDFILE *file)
-{	double	max ;
-
-	sf_command (file, SFC_CALC_SIGNAL_MAX, &max, sizeof (max)) ;
-
-	return max ;
-} /* get_signal_max */
-
-static double
 calc_decibels (SF_INFO * sfinfo, double max)
 {	double decibels ;
 
@@ -267,7 +258,7 @@ info_dump (const char *filename)
 
 	if (sfinfo.frames < 100 * 1024 * 1024)
 	{	/* Do not use sf_signal_max because it doesn't work for non-seekable files . */
-		signal_max = get_signal_max (file) ;
+		sf_command (file, SFC_CALC_SIGNAL_MAX, &signal_max, sizeof (signal_max)) ;
 		decibels = calc_decibels (&sfinfo, signal_max) ;
 		printf ("Signal Max  : %g (%4.2f dB)\n", signal_max, decibels) ;
 		} ;
