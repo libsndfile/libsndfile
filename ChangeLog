@@ -1,3 +1,8 @@
+2011-11-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * libsndfile.spec.in
+    Change field name 'URL' to 'Url'.
+
 2011-11-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/id3.c
