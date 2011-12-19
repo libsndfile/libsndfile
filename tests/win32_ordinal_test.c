@@ -17,7 +17,6 @@
 */
 
 #include "sfconfig.h"
-#include "sndfile.h"
 
 #include <stdio.h>
 #include <stdlib.h>

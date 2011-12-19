@@ -111,9 +111,9 @@ main (int argc, char *argv [])
 		} ;
 
 	if (test_count == 0)
-	{	fprintf (stderr, "************************************\n") ;
-		fprintf (stderr, "*  No '%s' test defined.\n", argv [1]) ;
-		fprintf (stderr, "************************************\n") ;
+	{	fprintf (stderr, "\n******************************************\n") ;
+		fprintf (stderr, "*  stdout_test : No '%s' test defined.\n", argv [1]) ;
+		fprintf (stderr, "******************************************\n") ;
 		return 1 ;
 		} ;
 
