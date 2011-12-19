@@ -3,6 +3,9 @@
     * libsndfile.spec.in
     Change field name 'URL' to 'Url'.
 
+    * src/sndfile.h.in
+    Add SF_SEEK_SET/CUR/END.
+
 2011-11-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/id3.c

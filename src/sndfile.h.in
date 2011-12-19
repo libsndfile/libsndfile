@@ -555,6 +555,12 @@ int		sf_format_check	(const SF_INFO *info) ;
 ** On error all of these functions return -1.
 */
 
+enum
+{	SF_SEEK_SET = SEEK_SET,
+	SF_SEEK_CUR = SEEK_CUR,
+	SF_SEEK_END = SEEK_END
+} ;
+
 sf_count_t	sf_seek 		(SNDFILE *sndfile, sf_count_t frames, int whence) ;
 
 
