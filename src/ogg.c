@@ -220,7 +220,7 @@ ogg_page_classify (SF_PRIVATE * psf, const ogg_page * og)
 
 		if (memcmp (og->body, codec_lookup [k].str, codec_lookup [k].len) == 0)
 		{	psf_log_printf (psf, "Ogg stream data : %s\n", codec_lookup [k].name) ;
-			psf_log_printf (psf, "Stream serialno : %010D\n", (int64_t) ogg_page_serialno (og)) ;
+			psf_log_printf (psf, "Stream serialno : %u\n", (uint32_t) ogg_page_serialno (og)) ;
 			return codec_lookup [k].codec ;
 			} ;
 		} ;
