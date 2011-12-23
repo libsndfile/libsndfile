@@ -1,3 +1,8 @@
+2011-11-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/binheader_writef_check.py src/create_symbols_file.py
+    Make it work for Python 2 and 3. Thanks Michael.
+
 2011-11-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * libsndfile.spec.in

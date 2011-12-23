@@ -48,19 +48,19 @@ def find_binheader_writefs (data):
 def find_format_string (s):
 	fmt = re.search ('"([^"]+)"', s)
 	if not fmt:
-		print "Bad format in :\n\n\t%s\n\n" % s
+		print ("Bad format in :\n\n\t%s\n\n" % s)
 		sys.exit (1)
 	fmt = fmt.groups ()
 	if len (fmt) != 1:
-		print "Bad format in :\n\n\t%s\n\n" % s
+		print ("Bad format in :\n\n\t%s\n\n" % s)
 		sys.exit (1)
 	return _whitespace_re.sub ("", fmt [0])
 
 def get_param_list (data):
 	dlist = re.search ("\((.+)\)\s*;", data)
 	dlist = dlist.groups ()[0]
-	dlist = string.split (dlist, ",")
-	dlist = [string.strip (x) for x in dlist]
+	dlist = dlist.split(",")
+	dlist = [x.strip() for x in dlist]
 	return dlist [2:]
 
 def handle_file (fname):
@@ -88,13 +88,14 @@ def handle_file (fname):
 			# print item
 			# print "    param [%d] %c : %s <-> %s" % (param_index, ch, params [param_index], params [param_index + 1])
 
-			if string.find (params [param_index + 1], "sizeof") < 0 \
-						and string.find (params [param_index + 1], "make_size_t") < 0 \
-						and string.find (params [param_index + 1], "strlen") < 0:
-				if errors == 0: print
-				print "\n%s :" % fname
-				print "    param [%d] %c : %s <-> %s" % (param_index, ch, params [param_index], params [param_index + 1])
-				print "    %s" % item
+			print (params [param_index + 1])
+			if params [param_index + 1].find ("sizeof") < 0 \
+						and params [param_index + 1].find ("make_size_t") < 0 \
+						and params [param_index + 1].find ("strlen") < 0:
+				if errors == 0: sys.stdout.write ("\n")
+				print ("\n%s :" % fname)
+				print ("    param [%d] %c : %s <-> %s" % (param_index, ch, params [param_index], params [param_index + 1]))
+				print ("    %s" % item)
 				errors += 1
 			param_index += 2
 
@@ -103,14 +104,14 @@ def handle_file (fname):
 #===============================================================================
 
 if len (sys.argv) > 1:
-	print "\n    binheader_writef_check                   :",
+	sys.stdout.write ("\n    binheader_writef_check                   :")
 	sys.stdout.flush ()
 	errors = 0
 	for fname in sys.argv [1:]:
 		errors += handle_file (fname)
 	if errors > 0:
-		print "\nErrors : %d\n" % errors
+		print ("\nErrors : %d\n" % errors)
 		sys.exit (1)
 
-print "ok\n"
+print ("ok\n")
 
