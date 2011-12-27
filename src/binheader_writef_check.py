@@ -88,7 +88,7 @@ def handle_file (fname):
 			# print item
 			# print "    param [%d] %c : %s <-> %s" % (param_index, ch, params [param_index], params [param_index + 1])
 
-			print (params [param_index + 1])
+			# print (params [param_index + 1])
 			if params [param_index + 1].find ("sizeof") < 0 \
 						and params [param_index + 1].find ("make_size_t") < 0 \
 						and params [param_index + 1].find ("strlen") < 0:
