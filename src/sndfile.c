@@ -2524,37 +2524,17 @@ psf_close (SF_PRIVATE *psf)
 	error = psf_fclose (psf) ;
 	psf_close_rsrc (psf) ;
 
-	if (psf->container_data)
-		free (psf->container_data) ;
-
-	if (psf->codec_data)
-		free (psf->codec_data) ;
-
-	if (psf->interleave)
-		free (psf->interleave) ;
-
-	if (psf->dither)
-		free (psf->dither) ;
-
-	if (psf->peak_info)
-		free (psf->peak_info) ;
-
-	if (psf->broadcast_16k)
-		free (psf->broadcast_16k) ;
-
-	if (psf->loop_info)
-		free (psf->loop_info) ;
-
-	if (psf->instrument)
-		free (psf->instrument) ;
-
-	if (psf->channel_map)
-		free (psf->channel_map) ;
-
-	if (psf->format_desc)
-	{	psf->format_desc [0] = 0 ;
-		free (psf->format_desc) ;
-		} ;
+	/* For an ISO C compliant implementation it is ok to free a NULL pointer. */
+	free (psf->container_data) ;
+	free (psf->codec_data) ;
+	free (psf->interleave) ;
+	free (psf->dither) ;
+	free (psf->peak_info) ;
+	free (psf->broadcast_16k) ;
+	free (psf->loop_info) ;
+	free (psf->instrument) ;
+	free (psf->channel_map) ;
+	free (psf->format_desc) ;
 
 	memset (psf, 0, sizeof (SF_PRIVATE)) ;
 	free (psf) ;
