@@ -27,10 +27,23 @@
 
 
 void
-psf_chunk_store (PRIV_CHUNK_LOG * pchk, int marker, sf_count_t offset, sf_count_t len)
+psf_chunk_store (PRIV_CHUNK_LOG * pchk, int64_t marker, sf_count_t offset, sf_count_t len)
 {
-	if (pchk->used >= pchk->count)
-		return ;
+	if (pchk->count == 0)
+	{	pchk->used = 0 ;
+		pchk->count = 20 ;
+		pchk->chunks = calloc (pchk->count, sizeof (CHUNK_LOG)) ;
+		}
+	else if (pchk->used >= pchk->count)
+	{	CHUNK_LOG * old_ptr = pchk->chunks ;
+		int new_count = 3 * (pchk->count + 1) / 2 ;
+
+		pchk->chunks = realloc (old_ptr, new_count * sizeof (CHUNK_LOG)) ;
+		if (pchk->chunks == NULL)
+		{	pchk->chunks = old_ptr ;
+			return ;
+			} ;
+		} ;
 
 	pchk->chunks [pchk->used].marker = marker ;
 	pchk->chunks [pchk->used].offset = offset ;
@@ -42,7 +55,7 @@ psf_chunk_store (PRIV_CHUNK_LOG * pchk, int marker, sf_count_t offset, sf_count_
 } /* psf_chunk_store */
 
 int
-psf_chunk_find (PRIV_CHUNK_LOG * pchk, int marker)
+psf_chunk_find (PRIV_CHUNK_LOG * pchk, int64_t marker)
 {	int k ;
 
 	for (k = 0 ; k < pchk->used ; k++)

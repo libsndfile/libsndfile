@@ -386,10 +386,6 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	paiff->comm_offset = 0 ;
 	paiff->ssnd_offset = 0 ;
 
-	psf->chunk_log.used = 0 ;
-	psf->chunk_log.count = 20 ;
-	psf->chunk_log.chunks = calloc (psf->chunk_log.count, sizeof (CHUNK_LOG)) ;
-
 	/* Set position to start of file to begin reading header. */
 	psf_binheader_readf (psf, "p", 0) ;
 

@@ -650,6 +650,7 @@ enum
 
 	SFE_RF64_NOT_RF64,
 	SFE_BAD_CHUNK_INFO_PTR,
+	SFE_UNKNOWN_CHUNK,
 
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
@@ -837,9 +838,8 @@ int		interleave_init (SF_PRIVATE *psf) ;
 ** Chunk logging functions.
 */
 
-
-void psf_chunk_store (PRIV_CHUNK_LOG * pchk, int marker, sf_count_t offset, sf_count_t len) ;
-int psf_chunk_find (PRIV_CHUNK_LOG * pchk, int marker) ;
+void	psf_chunk_store (PRIV_CHUNK_LOG * pchk, int64_t marker, sf_count_t offset, sf_count_t len) ;
+int		psf_chunk_find (PRIV_CHUNK_LOG * pchk, int64_t marker) ;
 
 /*------------------------------------------------------------------------------------
 ** Functions that work like OpenBSD's strlcpy/strlcat to replace strncpy/strncat.

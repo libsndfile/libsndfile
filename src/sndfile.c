@@ -255,6 +255,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_RF64_NOT_RF64		, "Error : Not an RF64 file." },
 
 	{	SFE_BAD_CHUNK_INFO_PTR	, "Error : Bad SF_CHUNK_INFO pointer." },
+	{	SFE_UNKNOWN_CHUNK		, "Error : Uknown chunk marker." },
 
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
