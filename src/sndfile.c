@@ -2535,6 +2535,7 @@ psf_close (SF_PRIVATE *psf)
 	free (psf->instrument) ;
 	free (psf->channel_map) ;
 	free (psf->format_desc) ;
+	free (psf->chunk_log.chunks) ;
 
 	memset (psf, 0, sizeof (SF_PRIVATE)) ;
 	free (psf) ;

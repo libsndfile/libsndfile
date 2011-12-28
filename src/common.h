@@ -219,6 +219,18 @@ typedef struct
 	char 	*str ;
 } STR_DATA ;
 
+typedef struct
+{	int64_t		marker ;
+	sf_count_t	offset ;
+	sf_count_t	len ;
+} CHUNK_LOG ;
+
+typedef struct
+{	int count ;
+	int used ;
+	CHUNK_LOG * chunks ;
+} PRIV_CHUNK_LOG ;
+
 static inline size_t
 make_size_t (int x)
 {	return (size_t) x ;
@@ -440,6 +452,7 @@ typedef struct sf_private_tag
 	void				*vio_user_data ;
 
 	/* Chunk get/set. */
+	PRIV_CHUNK_LOG	chunk_log ;
 	int				(*set_chunk)		(struct sf_private_tag*, const SF_CHUNK_INFO * chunk_info) ;
 	int				(*get_chunk_size)	(struct sf_private_tag*, SF_CHUNK_INFO * chunk_info) ;
 	int				(*get_chunk_data)	(struct sf_private_tag*, SF_CHUNK_INFO * chunk_info) ;
@@ -824,18 +837,9 @@ int		interleave_init (SF_PRIVATE *psf) ;
 ** Chunk logging functions.
 */
 
-typedef struct
-{	struct
-	{	int chunk ;
-		sf_count_t offset ;
-		sf_count_t len ;
-	} l [100] ;
 
-	int count ;
-} PRIV_CHUNK4 ;
-
-void pchk4_store (PRIV_CHUNK4 * pchk, int marker, sf_count_t offset, sf_count_t len) ;
-int pchk4_find (PRIV_CHUNK4 * pchk, int marker) ;
+void psf_chunk_store (PRIV_CHUNK_LOG * pchk, int marker, sf_count_t offset, sf_count_t len) ;
+int psf_chunk_find (PRIV_CHUNK_LOG * pchk, int marker) ;
 
 /*------------------------------------------------------------------------------------
 ** Functions that work like OpenBSD's strlcpy/strlcat to replace strncpy/strncat.

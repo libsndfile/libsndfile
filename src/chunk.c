@@ -27,28 +27,28 @@
 
 
 void
-pchk4_store (PRIV_CHUNK4 * pchk, int marker, sf_count_t offset, sf_count_t len)
+psf_chunk_store (PRIV_CHUNK_LOG * pchk, int marker, sf_count_t offset, sf_count_t len)
 {
-	if (pchk->count >= ARRAY_LEN (pchk->l))
+	if (pchk->used >= pchk->count)
 		return ;
 
-	pchk->l [pchk->count].chunk = marker ;
-	pchk->l [pchk->count].offset = offset ;
-	pchk->l [pchk->count].len = len ;
+	pchk->chunks [pchk->used].marker = marker ;
+	pchk->chunks [pchk->used].offset = offset ;
+	pchk->chunks [pchk->used].len = len ;
 
-	pchk->count ++ ;
+	pchk->used ++ ;
 
 	return ;
-} /* pchk4_store */
+} /* psf_chunk_store */
 
 int
-pchk4_find (PRIV_CHUNK4 * pchk, int marker)
+psf_chunk_find (PRIV_CHUNK_LOG * pchk, int marker)
 {	int k ;
 
-	for (k = 0 ; k < pchk->count ; k++)
-		if (pchk->l [k].chunk == marker)
+	for (k = 0 ; k < pchk->used ; k++)
+		if (pchk->chunks [k].marker == marker)
 			return k ;
 
 	return -1 ;
-} /* pchk4_find */
+} /* psf_chunk_find */
 
