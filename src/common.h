@@ -438,6 +438,11 @@ typedef struct sf_private_tag
 	int					virtual_io ;
 	SF_VIRTUAL_IO		vio ;
 	void				*vio_user_data ;
+
+	/* Chunk get/set. */
+	int				(*set_chunk)		(struct sf_private_tag*, const SF_CHUNK_INFO * chunk_info) ;
+	int				(*get_chunk_size)	(struct sf_private_tag*, SF_CHUNK_INFO * chunk_info) ;
+	int				(*get_chunk_data)	(struct sf_private_tag*, SF_CHUNK_INFO * chunk_info) ;
 } SF_PRIVATE ;
 
 
@@ -631,6 +636,7 @@ enum
 	SFE_VORBIS_ENCODER_BUG,
 
 	SFE_RF64_NOT_RF64,
+	SFE_BAD_CHUNK_INFO_PTR,
 
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;

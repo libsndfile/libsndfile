@@ -254,6 +254,8 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_RF64_NOT_RF64		, "Error : Not an RF64 file." },
 
+	{	SFE_BAD_CHUNK_INFO_PTR	, "Error : Bad SF_CHUNK_INFO pointer." },
+
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
 } ;
@@ -2921,3 +2923,52 @@ error_exit :
 	return NULL ;
 } /* psf_open_file */
 
+/*==============================================================================
+** Chunk getting and setting.
+*/
+
+int
+sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
+{	SF_PRIVATE 	*psf ;
+
+	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
+
+	if (chunk_info == NULL)
+		return SFE_BAD_CHUNK_INFO_PTR ;
+
+	if (psf->set_chunk)
+		return psf->set_chunk (psf, chunk_info) ;
+
+	return SFE_UNIMPLEMENTED ;
+} /* sf_set_chunk */
+
+
+int
+sf_get_chunk_size (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info)
+{	SF_PRIVATE 	*psf ;
+
+	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
+
+	if (chunk_info == NULL)
+		return SFE_BAD_CHUNK_INFO_PTR ;
+
+	if (psf->get_chunk_size)
+		return psf->get_chunk_size (psf, chunk_info) ;
+
+	return SFE_UNIMPLEMENTED ;
+} /* sf_get_chunk_size */
+
+int
+sf_get_chunk_data (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info)
+{	SF_PRIVATE 	*psf ;
+
+	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
+
+	if (chunk_info == NULL)
+		return SFE_BAD_CHUNK_INFO_PTR ;
+
+	if (psf->get_chunk_data)
+		return psf->get_chunk_data (psf, chunk_info) ;
+
+	return SFE_UNIMPLEMENTED ;
+} /* sf_get_chunk_data */
