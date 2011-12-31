@@ -1,3 +1,11 @@
+2011-12-31  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/chunk_test.c tests/Makefile.am
+    New test for custom chunks.
+
+    * src/aiff.c src/chunk.c src/common.h src/sndfile.c
+    Make custom chunks work on AIFF files.
+
 2011-11-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.h.in src/common.h src/sndfile.c

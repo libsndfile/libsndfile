@@ -222,14 +222,26 @@ typedef struct
 typedef struct
 {	int64_t		marker ;
 	sf_count_t	offset ;
-	sf_count_t	len ;
-} CHUNK_LOG ;
+	uint32_t	len ;
+} READ_CHUNK ;
 
 typedef struct
-{	int count ;
-	int used ;
-	CHUNK_LOG * chunks ;
-} PRIV_CHUNK_LOG ;
+{	int64_t		marker ;
+	uint32_t	len ;
+	void		*data ;
+} WRITE_CHUNK ;
+
+typedef struct
+{	uint32_t	count ;
+	uint32_t	used ;
+	READ_CHUNK	*chunks ;
+} READ_CHUNKS ;
+
+typedef struct
+{	uint32_t	count ;
+	uint32_t	used ;
+	WRITE_CHUNK	*chunks ;
+} WRITE_CHUNKS ;
 
 static inline size_t
 make_size_t (int x)
@@ -243,6 +255,13 @@ typedef wchar_t	sfwchar_t ;
 #else
 typedef int16_t sfwchar_t ;
 #endif
+
+
+static inline void *
+psf_memdup (const void *src, size_t n)
+{	void * mem = calloc (1, n & 3 ? n + 4 - (n & 3) : n) ;
+	return memcpy (mem, src, n) ;
+} /* psf_memdup */
 
 /*
 **	This version of isprint specifically ignores any locale info. Its used for
@@ -452,7 +471,8 @@ typedef struct sf_private_tag
 	void				*vio_user_data ;
 
 	/* Chunk get/set. */
-	PRIV_CHUNK_LOG	chunk_log ;
+	READ_CHUNKS		rchunks ;
+	WRITE_CHUNKS	wchunks ;
 	int				(*set_chunk)		(struct sf_private_tag*, const SF_CHUNK_INFO * chunk_info) ;
 	int				(*get_chunk_size)	(struct sf_private_tag*, SF_CHUNK_INFO * chunk_info) ;
 	int				(*get_chunk_data)	(struct sf_private_tag*, SF_CHUNK_INFO * chunk_info) ;
@@ -649,8 +669,11 @@ enum
 	SFE_VORBIS_ENCODER_BUG,
 
 	SFE_RF64_NOT_RF64,
-	SFE_BAD_CHUNK_INFO_PTR,
+	SFE_BAD_READ_CHUNK_PTR,
 	SFE_UNKNOWN_CHUNK,
+	SFE_BAD_CHUNK_FORMAT,
+	SFE_BAD_CHUNK_MARKER,
+	SFE_BAD_CHUNK_DATA_PTR,
 
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
@@ -838,8 +861,10 @@ int		interleave_init (SF_PRIVATE *psf) ;
 ** Chunk logging functions.
 */
 
-void	psf_chunk_store (PRIV_CHUNK_LOG * pchk, int64_t marker, sf_count_t offset, sf_count_t len) ;
-int		psf_chunk_find (PRIV_CHUNK_LOG * pchk, int64_t marker) ;
+int		psf_store_read_chunk (READ_CHUNKS * pchk, int64_t marker, sf_count_t offset, uint32_t len) ;
+int		psf_save_write_chunk (WRITE_CHUNKS * pchk, int64_t marker, const SF_CHUNK_INFO * chunk_info) ;
+int		psf_find_read_chunk (READ_CHUNKS * pchk, int64_t marker) ;
+int		psf_find_write_chunk (WRITE_CHUNKS * pchk, int64_t marker) ;
 
 /*------------------------------------------------------------------------------------
 ** Functions that work like OpenBSD's strlcpy/strlcat to replace strncpy/strncat.

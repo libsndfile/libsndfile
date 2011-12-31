@@ -254,8 +254,11 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_RF64_NOT_RF64		, "Error : Not an RF64 file." },
 
-	{	SFE_BAD_CHUNK_INFO_PTR	, "Error : Bad SF_CHUNK_INFO pointer." },
+	{	SFE_BAD_READ_CHUNK_PTR	, "Error : Bad SF_CHUNK_INFO pointer." },
 	{	SFE_UNKNOWN_CHUNK		, "Error : Uknown chunk marker." },
+	{	SFE_BAD_CHUNK_FORMAT	, "Error : Reading/writing chunks from this file format is not supported." },
+	{	SFE_BAD_CHUNK_MARKER	, "Error : Bad chunk marker." },
+	{	SFE_BAD_CHUNK_DATA_PTR	, "Error : Bad data pointer in SF_CHUNK_INFO struct." },
 
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
@@ -2515,7 +2518,8 @@ copy_filename (SF_PRIVATE *psf, const char *path)
 
 static int
 psf_close (SF_PRIVATE *psf)
-{	int	error = 0 ;
+{	uint32_t k ;
+	int	error = 0 ;
 
 	if (psf->codec_close)
 		error = psf->codec_close (psf) ;
@@ -2536,7 +2540,12 @@ psf_close (SF_PRIVATE *psf)
 	free (psf->instrument) ;
 	free (psf->channel_map) ;
 	free (psf->format_desc) ;
-	free (psf->chunk_log.chunks) ;
+
+	if (psf->wchunks.chunks)
+		for (k = 0 ; k < psf->wchunks.used ; k++)
+			free (psf->wchunks.chunks [k].data) ;
+	free (psf->rchunks.chunks) ;
+	free (psf->wchunks.chunks) ;
 
 	memset (psf, 0, sizeof (SF_PRIVATE)) ;
 	free (psf) ;
@@ -2916,12 +2925,12 @@ sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
 	if (chunk_info == NULL)
-		return SFE_BAD_CHUNK_INFO_PTR ;
+		return SFE_BAD_READ_CHUNK_PTR ;
 
 	if (psf->set_chunk)
 		return psf->set_chunk (psf, chunk_info) ;
 
-	return SFE_UNIMPLEMENTED ;
+	return SFE_BAD_CHUNK_FORMAT ;
 } /* sf_set_chunk */
 
 
@@ -2932,12 +2941,12 @@ sf_get_chunk_size (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info)
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
 	if (chunk_info == NULL)
-		return SFE_BAD_CHUNK_INFO_PTR ;
+		return SFE_BAD_READ_CHUNK_PTR ;
 
 	if (psf->get_chunk_size)
 		return psf->get_chunk_size (psf, chunk_info) ;
 
-	return SFE_UNIMPLEMENTED ;
+	return SFE_BAD_CHUNK_FORMAT ;
 } /* sf_get_chunk_size */
 
 int
@@ -2947,10 +2956,10 @@ sf_get_chunk_data (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info)
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
 	if (chunk_info == NULL)
-		return SFE_BAD_CHUNK_INFO_PTR ;
+		return SFE_BAD_READ_CHUNK_PTR ;
 
 	if (psf->get_chunk_data)
 		return psf->get_chunk_data (psf, chunk_info) ;
 
-	return SFE_UNIMPLEMENTED ;
+	return SFE_BAD_CHUNK_FORMAT ;
 } /* sf_get_chunk_data */

@@ -26,22 +26,22 @@
 #include	"common.h"
 
 
-void
-psf_chunk_store (PRIV_CHUNK_LOG * pchk, int64_t marker, sf_count_t offset, sf_count_t len)
+int
+psf_store_read_chunk (READ_CHUNKS * pchk, int64_t marker, sf_count_t offset, uint32_t len)
 {
 	if (pchk->count == 0)
 	{	pchk->used = 0 ;
 		pchk->count = 20 ;
-		pchk->chunks = calloc (pchk->count, sizeof (CHUNK_LOG)) ;
+		pchk->chunks = calloc (pchk->count, sizeof (READ_CHUNK)) ;
 		}
 	else if (pchk->used >= pchk->count)
-	{	CHUNK_LOG * old_ptr = pchk->chunks ;
+	{	READ_CHUNK * old_ptr = pchk->chunks ;
 		int new_count = 3 * (pchk->count + 1) / 2 ;
 
-		pchk->chunks = realloc (old_ptr, new_count * sizeof (CHUNK_LOG)) ;
+		pchk->chunks = realloc (old_ptr, new_count * sizeof (READ_CHUNK)) ;
 		if (pchk->chunks == NULL)
 		{	pchk->chunks = old_ptr ;
-			return ;
+			return SFE_MALLOC_FAILED ;
 			} ;
 		} ;
 
@@ -51,17 +51,48 @@ psf_chunk_store (PRIV_CHUNK_LOG * pchk, int64_t marker, sf_count_t offset, sf_co
 
 	pchk->used ++ ;
 
-	return ;
-} /* psf_chunk_store */
+	return SFE_NO_ERROR ;
+} /* psf_store_read_chunk */
 
 int
-psf_chunk_find (PRIV_CHUNK_LOG * pchk, int64_t marker)
-{	int k ;
+psf_save_write_chunk (WRITE_CHUNKS * pchk, int64_t marker, const SF_CHUNK_INFO * chunk_info)
+{	uint32_t len ;
+
+	if (pchk->count == 0)
+	{	pchk->used = 0 ;
+		pchk->count = 20 ;
+		pchk->chunks = calloc (pchk->count, sizeof (WRITE_CHUNK)) ;
+		}
+	else if (pchk->used >= pchk->count)
+	{	WRITE_CHUNK * old_ptr = pchk->chunks ;
+		int new_count = 3 * (pchk->count + 1) / 2 ;
+
+		pchk->chunks = realloc (old_ptr, new_count * sizeof (WRITE_CHUNK)) ;
+		if (pchk->chunks == NULL)
+		{	pchk->chunks = old_ptr ;
+			return SFE_MALLOC_FAILED ;
+			} ;
+		} ;
+
+	len = chunk_info->datalen ;
+	while (len & 3) len ++ ;
+
+	pchk->chunks [pchk->used].marker = marker ;
+	pchk->chunks [pchk->used].len = len ;
+	pchk->chunks [pchk->used].data = psf_memdup (chunk_info->data, chunk_info->datalen) ;
+
+	pchk->used ++ ;
+
+	return SFE_NO_ERROR ;
+} /* psf_store_read_chunk */
+
+int
+psf_find_read_chunk (READ_CHUNKS * pchk, int64_t marker)
+{	uint32_t k ;
 
 	for (k = 0 ; k < pchk->used ; k++)
 		if (pchk->chunks [k].marker == marker)
 			return k ;
 
 	return -1 ;
-} /* psf_chunk_find */
-
+} /* psf_find_read_chunk */
