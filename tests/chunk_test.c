@@ -54,6 +54,8 @@ main (int argc, char *argv [])
 
 	if (do_all || ! strcmp (argv [1], "wav"))
 	{	chunk_test ("chunks.wav", SF_FORMAT_WAV) ;
+		chunk_test ("chunks.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
+		chunk_test ("chunks.wavex", SF_FORMAT_WAVEX) ;
 		test_count++ ;
 		} ;
 
