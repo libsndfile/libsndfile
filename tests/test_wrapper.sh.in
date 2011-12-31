@@ -133,6 +133,7 @@ echo "=========================="
 ./string_test@EXEEXT@ aiff
 ./multi_file_test@EXEEXT@ aiff
 ./aiff_rw_test@EXEEXT@
+./chunk_test@EXEEXT@ aiff
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on AIFF files."
 echo "----------------------------------------------------------------------"
@@ -175,6 +176,7 @@ echo "----------------------------------------------------------------------"
 ./misc_test@EXEEXT@ wav
 ./string_test@EXEEXT@ wav
 ./multi_file_test@EXEEXT@ wav
+./chunk_test@EXEEXT@ wav
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on WAV files."
 echo "----------------------------------------------------------------------"
