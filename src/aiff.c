@@ -277,8 +277,7 @@ aiff_open (SF_PRIVATE *psf)
 		if ((error = aiff_write_header (psf, SF_FALSE)))
 			return error ;
 
-		psf->write_header = aiff_write_header ;
-
+		psf->write_header	= aiff_write_header ;
 		psf->set_chunk		= aiff_set_chunk ;
 		} ;
 

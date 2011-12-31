@@ -7,7 +7,7 @@
     Make custom chunks work on AIFF files.
 
     * src/wav.c
-    Change the way the 'WAVE' chunk is parsed.
+    Make custom chunks work on WAV files (includes refactoring).
 
 2011-11-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
