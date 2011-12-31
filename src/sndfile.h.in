@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -662,6 +662,53 @@ void	sf_write_sync	(SNDFILE *sndfile) ;
 SNDFILE* sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo) ;
 #endif
 
+
+
+
+/* Getting and setting of chunks from within a sound file.
+**
+** These functions allow the getting and setting of chunks within a sound file
+** (for those formats which allow it).
+**
+** These functions fail safely. Specfically, they will not allow you to overwrite
+** existing chunks or add extra versions of format specific reserved chunks but
+** should allow you to retrieve any and all chunks (may not be implemented for
+** all chunks or all file formats).
+*/
+
+struct SF_CHUNK_INFO
+{	char		id [64] ;	/* The chunk identifier. */
+	unsigned	id_size ;	/* The size of the chunk identifier. */
+	unsigned	datalen ;	/* The size of that data. */
+	void		*data ;		/* Pointer to the data. */
+} ;
+
+typedef struct SF_CHUNK_INFO SF_CHUNK_INFO ;
+
+/* Set the specified chunk info (must be done before any audio data is written
+** to the file). This will fail for format specific reserved chunks.
+** The chunk_info->data pointer must be valid until the file is closed.
+** Returns SF_ERR_NO_ERROR on success or non-zero on failure.
+*/
+int sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info) ;
+
+
+/* Get the size of the specified chunk.
+** If the specified chunk exists, the size will be returned in the datalen field
+** of the SF_CHUNK_INFO struct. If it doesn't exist datalen will be zero.
+** The function will return SF_ERR_NO_ERROR on success or non-zero on failure.
+*/
+int sf_get_chunk_size (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info) ;
+
+/* Get the specified chunk data.
+** If the specified chunk exists, up to chunk_info->datalen bytes of the chunk
+** data will be copied into the chunk_info->data buffer (allocated by the caller)
+** and the chunk_info->datalen field updated to reflect the size of the data
+** copied.
+** If the chunk doesn't exist chunk_info->datalen will be zero.
+** The function will return SF_ERR_NO_ERROR on success or non-zero on failure.
+*/
+int sf_get_chunk_data (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info) ;
 
 
 #ifdef __cplusplus

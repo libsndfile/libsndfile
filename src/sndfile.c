@@ -254,6 +254,12 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_RF64_NOT_RF64		, "Error : Not an RF64 file." },
 
+	{	SFE_BAD_READ_CHUNK_PTR	, "Error : Bad SF_CHUNK_INFO pointer." },
+	{	SFE_UNKNOWN_CHUNK		, "Error : Uknown chunk marker." },
+	{	SFE_BAD_CHUNK_FORMAT	, "Error : Reading/writing chunks from this file format is not supported." },
+	{	SFE_BAD_CHUNK_MARKER	, "Error : Bad chunk marker." },
+	{	SFE_BAD_CHUNK_DATA_PTR	, "Error : Bad data pointer in SF_CHUNK_INFO struct." },
+
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
 } ;
@@ -2512,7 +2518,8 @@ copy_filename (SF_PRIVATE *psf, const char *path)
 
 static int
 psf_close (SF_PRIVATE *psf)
-{	int	error = 0 ;
+{	uint32_t k ;
+	int	error = 0 ;
 
 	if (psf->codec_close)
 		error = psf->codec_close (psf) ;
@@ -2522,37 +2529,23 @@ psf_close (SF_PRIVATE *psf)
 	error = psf_fclose (psf) ;
 	psf_close_rsrc (psf) ;
 
-	if (psf->container_data)
-		free (psf->container_data) ;
+	/* For an ISO C compliant implementation it is ok to free a NULL pointer. */
+	free (psf->container_data) ;
+	free (psf->codec_data) ;
+	free (psf->interleave) ;
+	free (psf->dither) ;
+	free (psf->peak_info) ;
+	free (psf->broadcast_16k) ;
+	free (psf->loop_info) ;
+	free (psf->instrument) ;
+	free (psf->channel_map) ;
+	free (psf->format_desc) ;
 
-	if (psf->codec_data)
-		free (psf->codec_data) ;
-
-	if (psf->interleave)
-		free (psf->interleave) ;
-
-	if (psf->dither)
-		free (psf->dither) ;
-
-	if (psf->peak_info)
-		free (psf->peak_info) ;
-
-	if (psf->broadcast_16k)
-		free (psf->broadcast_16k) ;
-
-	if (psf->loop_info)
-		free (psf->loop_info) ;
-
-	if (psf->instrument)
-		free (psf->instrument) ;
-
-	if (psf->channel_map)
-		free (psf->channel_map) ;
-
-	if (psf->format_desc)
-	{	psf->format_desc [0] = 0 ;
-		free (psf->format_desc) ;
-		} ;
+	if (psf->wchunks.chunks)
+		for (k = 0 ; k < psf->wchunks.used ; k++)
+			free (psf->wchunks.chunks [k].data) ;
+	free (psf->rchunks.chunks) ;
+	free (psf->wchunks.chunks) ;
 
 	memset (psf, 0, sizeof (SF_PRIVATE)) ;
 	free (psf) ;
@@ -2921,3 +2914,52 @@ error_exit :
 	return NULL ;
 } /* psf_open_file */
 
+/*==============================================================================
+** Chunk getting and setting.
+*/
+
+int
+sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
+{	SF_PRIVATE 	*psf ;
+
+	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
+
+	if (chunk_info == NULL)
+		return SFE_BAD_READ_CHUNK_PTR ;
+
+	if (psf->set_chunk)
+		return psf->set_chunk (psf, chunk_info) ;
+
+	return SFE_BAD_CHUNK_FORMAT ;
+} /* sf_set_chunk */
+
+
+int
+sf_get_chunk_size (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info)
+{	SF_PRIVATE 	*psf ;
+
+	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
+
+	if (chunk_info == NULL)
+		return SFE_BAD_READ_CHUNK_PTR ;
+
+	if (psf->get_chunk_size)
+		return psf->get_chunk_size (psf, chunk_info) ;
+
+	return SFE_BAD_CHUNK_FORMAT ;
+} /* sf_get_chunk_size */
+
+int
+sf_get_chunk_data (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info)
+{	SF_PRIVATE 	*psf ;
+
+	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
+
+	if (chunk_info == NULL)
+		return SFE_BAD_READ_CHUNK_PTR ;
+
+	if (psf->get_chunk_data)
+		return psf->get_chunk_data (psf, chunk_info) ;
+
+	return SFE_BAD_CHUNK_FORMAT ;
+} /* sf_get_chunk_data */

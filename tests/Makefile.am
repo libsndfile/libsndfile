@@ -12,7 +12,7 @@ check_PROGRAMS = sfversion floating_point_test write_read_test \
 	lossy_comp_test error_test ulaw_test alaw_test dwvw_test \
 	peak_chunk_test command_test stdin_test stdout_test stdio_test \
 	pcm_test headerless_test pipe_test benchmark header_test misc_test \
-	raw_test string_test multi_file_test dither_test \
+	raw_test string_test multi_file_test dither_test chunk_test \
 	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
 	locale_test largefile_test win32_ordinal_test ogg_test vorbis_test \
 	checksum_test external_libs_test rdwr_test format_check_test $(CPP_TEST)
@@ -127,6 +127,9 @@ string_test_LDADD = $(top_builddir)/src/libsndfile.la
 
 dither_test_SOURCES = dither_test.c utils.c
 dither_test_LDADD = $(top_builddir)/src/libsndfile.la
+
+chunk_test_SOURCES = chunk_test.c utils.c
+chunk_test_LDADD = $(top_builddir)/src/libsndfile.la
 
 multi_file_test_SOURCES = multi_file_test.c utils.c
 multi_file_test_LDADD = $(top_builddir)/src/libsndfile.la
