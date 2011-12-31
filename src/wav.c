@@ -350,7 +350,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						else
 							psf_log_printf (psf, "RIFX : %u (should be %D)\n", RIFFsize, psf->filelength - 2 * SIGNED_SIZEOF (dword)) ;
 
-						RIFFsize = dword ;
+						RIFFsize = psf->filelength - 2 * SIGNED_SIZEOF (dword) ;
 						}
 					else
 					{	if (marker == RIFF_MARKER)
@@ -358,13 +358,11 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						else
 							psf_log_printf (psf, "RIFX : %u\n", RIFFsize) ;
 					} ;
-					break ;
 
-			case WAVE_MARKER :
-					if ((parsestage & HAVE_RIFF) != HAVE_RIFF)
+					psf_binheader_readf (psf, "m", &marker) ;
+					if (marker != WAVE_MARKER)
 						return SFE_WAV_NO_WAVE ;
 					parsestage |= HAVE_WAVE ;
-
 					psf_log_printf (psf, "WAVE\n") ;
 					break ;
 
