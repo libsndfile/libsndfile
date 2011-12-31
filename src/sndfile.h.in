@@ -680,13 +680,14 @@ struct SF_CHUNK_INFO
 {	char		id [64] ;	/* The chunk identifier. */
 	unsigned	id_size ;	/* The size of the chunk identifier. */
 	unsigned	datalen ;	/* The size of that data. */
-	char		*data ;		/* Pointer to the data. */
+	void		*data ;		/* Pointer to the data. */
 } ;
 
 typedef struct SF_CHUNK_INFO SF_CHUNK_INFO ;
 
 /* Set the specified chunk info (must be done before any audio data is written
 ** to the file). This will fail for format specific reserved chunks.
+** The chunk_info->data pointer must be valid until the file is closed.
 ** Returns SF_ERR_NO_ERROR on success or non-zero on failure.
 */
 int sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info) ;
