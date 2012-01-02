@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (C) 2003-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+# Copyright (C) 2003-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 #
 # All rights reserved.
 #
@@ -73,7 +73,10 @@ ALL_SYMBOLS = (
 	(	"sf_open_fd",		70	),
 	(	"sf_wchar_open",	71  ),
 	(	"sf_open_virtual",	80	),
-	(	"sf_write_sync",	90	)
+	(	"sf_write_sync",	90	),
+	(	"sf_set_chunk",		100	),
+	(	"sf_get_chunk_size",101 ),
+	(	"sf_get_chunk_data",102 )
 	)
 
 #-------------------------------------------------------------------------------
