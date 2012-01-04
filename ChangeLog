@@ -1,3 +1,8 @@
+2012-01-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * programs/sndfile-cmp.c
+    Catch the case where the second file has more frames than the first.
+
 2012-01-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/create_symbols_file.py

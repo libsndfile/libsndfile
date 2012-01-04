@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008 Conrad Parker <conrad@metadecks.org>
 **
 ** All rights reserved.
@@ -97,7 +97,7 @@ compare (void)
 	/* Calculate the framecount that will fit in our data buffers */
 	items = BUFLEN / sfinfo1.channels ;
 
-	while ( (nread1 = sf_readf_double (sf1, buf1, items)) > 0)
+	while ((nread1 = sf_readf_double (sf1, buf1, items)) > 0)
 	{	nread2 = sf_readf_double (sf2, buf2, nread1) ;
 		if (nread2 != nread1)
 		{	retval = comparison_error ("PCM data lengths", -1) ;
@@ -112,7 +112,7 @@ compare (void)
 		offset += nread1 ;
 		} ;
 
-	if ( (nread2 = sf_readf_double (sf2, buf2, nread1)) != 0)
+	if ((nread2 = sf_readf_double (sf2, buf2, items)) != 0)
 	{	retval = comparison_error ("PCM data lengths", -1) ;
 		goto out ;
 		} ;
