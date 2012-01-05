@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -1751,19 +1751,8 @@ aiff_read_chanmap (SF_PRIVATE * psf, unsigned dword)
 */
 
 static int
-aiff_id_to_marker (const SF_CHUNK_INFO * chunk_info)
-{	const unsigned char * cptr ;
-
-	if (chunk_info->id_size != 4)
-		return 0 ;
-
-	cptr = (const unsigned char *) chunk_info->id ;
-	return (cptr [3] << 24) + (cptr [2] << 16) + (cptr [1] << 8) + cptr [0] ;
-} /* aiff_id_to_marker */
-
-static int
 aiff_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info)
-{	int marker = aiff_id_to_marker (chunk_info) ;
+{	int marker = fourcc_to_marker (chunk_info) ;
 
 	return psf_save_write_chunk (&psf->wchunks, marker, chunk_info) ;
 } /* aiff_set_chunk */
@@ -1771,7 +1760,7 @@ aiff_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info)
 
 static int
 aiff_get_chunk_size (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
-{	int indx, marker = aiff_id_to_marker (chunk_info) ;
+{	int indx, marker = fourcc_to_marker (chunk_info) ;
 
 	if ((indx = psf_find_read_chunk (&psf->rchunks, marker)) < 0)
 		return SFE_UNKNOWN_CHUNK ;
@@ -1783,7 +1772,7 @@ aiff_get_chunk_size (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
 
 static int
 aiff_get_chunk_data (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
-{	int indx, marker = aiff_id_to_marker (chunk_info) ;
+{	int indx, marker = fourcc_to_marker (chunk_info) ;
 	sf_count_t pos ;
 
 	if ((indx = psf_find_read_chunk (&psf->rchunks, marker)) < 0)

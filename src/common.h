@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -865,6 +865,17 @@ int		psf_store_read_chunk (READ_CHUNKS * pchk, int64_t marker, sf_count_t offset
 int		psf_save_write_chunk (WRITE_CHUNKS * pchk, int64_t marker, const SF_CHUNK_INFO * chunk_info) ;
 int		psf_find_read_chunk (READ_CHUNKS * pchk, int64_t marker) ;
 int		psf_find_write_chunk (WRITE_CHUNKS * pchk, int64_t marker) ;
+
+static inline int
+fourcc_to_marker (const SF_CHUNK_INFO * chunk_info)
+{	const unsigned char * cptr ;
+
+	if (chunk_info->id_size != 4)
+		return 0 ;
+
+	cptr = (const unsigned char *) chunk_info->id ;
+	return (cptr [3] << 24) + (cptr [2] << 16) + (cptr [1] << 8) + cptr [0] ;
+} /* fourcc_to_marker */
 
 /*------------------------------------------------------------------------------------
 ** Functions that work like OpenBSD's strlcpy/strlcat to replace strncpy/strncat.
