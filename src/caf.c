@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2005-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2005-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -98,6 +98,10 @@ static int	caf_write_header (SF_PRIVATE *psf, int calc_length) ;
 static int	caf_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 static int	caf_read_chanmap (SF_PRIVATE * psf, sf_count_t chunk_size) ;
 
+static int caf_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info) ;
+static int caf_get_chunk_size (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info) ;
+static int caf_get_chunk_data (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info) ;
+
 /*------------------------------------------------------------------------------
 ** Public function.
 */
@@ -109,6 +113,9 @@ caf_open (SF_PRIVATE *psf)
 	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = caf_read_header (psf)))
 			return error ;
+
+		psf->get_chunk_size = caf_get_chunk_size ;
+		psf->get_chunk_data = caf_get_chunk_data ;
 		} ;
 
 	subformat = SF_CODEC (psf->sf.format) ;
@@ -148,7 +155,8 @@ caf_open (SF_PRIVATE *psf)
 		if ((error = caf_write_header (psf, SF_FALSE)) != 0)
 			return error ;
 
-		psf->write_header = caf_write_header ;
+		psf->write_header	= caf_write_header ;
+		psf->set_chunk		= caf_set_chunk ;
 		} ;
 
 	psf->container_close = caf_close ;
@@ -325,6 +333,8 @@ caf_read_header (SF_PRIVATE *psf)
 	while (have_data == 0 && psf_ftell (psf) < psf->filelength - SIGNED_SIZEOF (marker))
 	{	psf_binheader_readf (psf, "mE8", &marker, &chunk_size) ;
 
+		psf_store_read_chunk (&psf->rchunks, marker, psf->headindex, chunk_size) ;
+
 		switch (marker)
 		{	case peak_MARKER :
 				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
@@ -386,7 +396,7 @@ caf_read_header (SF_PRIVATE *psf)
 				break ;
 
 			default :
-				psf_log_printf (psf, " %M : %D (skipped)\n", marker, chunk_size) ;
+				psf_log_printf (psf, "%M : %D (skipped)\n", marker, chunk_size) ;
 				psf_binheader_readf (psf, "j", (int) chunk_size) ;
 				break ;
 			} ;
@@ -420,6 +430,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 {	CAF_PRIVATE	*pcaf ;
 	DESC_CHUNK desc ;
 	sf_count_t current, free_len ;
+	uint32_t uk ;
 	int subformat ;
 
 	if ((pcaf = psf->container_data) == NULL)
@@ -566,6 +577,10 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->channel_map && pcaf->chanmap_tag)
 		psf_binheader_writef (psf, "Em8444", chan_MARKER, (sf_count_t) 12, pcaf->chanmap_tag, 0, 0) ;
 
+	/* Write custom headers. */
+	for (uk = 0 ; uk < psf->wchunks.used ; uk++)
+		psf_binheader_writef (psf, "m44b", (int) psf->wchunks.chunks [uk].marker, 0, psf->wchunks.chunks [uk].len, psf->wchunks.chunks [uk].data, make_size_t (psf->wchunks.chunks [uk].len)) ;
+
 	/* Add free chunk so that the actual audio data starts at a multiple 0x1000. */
 	free_len = 0x1000 - psf->headindex - 16 - 12 ;
 	while (free_len < 0)
@@ -618,3 +633,44 @@ caf_read_chanmap (SF_PRIVATE * psf, sf_count_t chunk_size)
 	return 0 ;
 } /* caf_read_chanmap */
 
+/*==============================================================================
+*/
+
+static int
+caf_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info)
+{	int marker = fourcc_to_marker (chunk_info) ;
+
+	return psf_save_write_chunk (&psf->wchunks, marker, chunk_info) ;
+} /* caf_set_chunk */
+
+
+static int
+caf_get_chunk_size (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
+{	int indx, marker = fourcc_to_marker (chunk_info) ;
+
+	if ((indx = psf_find_read_chunk (&psf->rchunks, marker)) < 0)
+		return SFE_UNKNOWN_CHUNK ;
+
+	chunk_info->datalen = psf->rchunks.chunks [indx].len ;
+
+	return SFE_NO_ERROR ;
+} /* caf_get_chunk_size */
+
+static int
+caf_get_chunk_data (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
+{	int indx, marker = fourcc_to_marker (chunk_info) ;
+	sf_count_t pos ;
+
+	if ((indx = psf_find_read_chunk (&psf->rchunks, marker)) < 0)
+		return SFE_UNKNOWN_CHUNK ;
+
+	if (chunk_info->data == NULL)
+		return SFE_BAD_CHUNK_DATA_PTR ;
+
+	pos = psf_ftell (psf) ;
+	psf_fseek (psf, psf->rchunks.chunks [indx].offset, SEEK_SET) ;
+	psf_fread (chunk_info->data, SF_MIN (chunk_info->datalen, psf->rchunks.chunks [indx].len), 1, psf) ;
+	psf_fseek (psf, pos, SEEK_SET) ;
+
+	return SFE_NO_ERROR ;
+} /* caf_get_chunk_data */

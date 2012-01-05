@@ -3,6 +3,9 @@
     * src/aiff.c src/wav.c src/common.h
     Refactor common code into src/common.h.
 
+    * src/caf.c
+    Make custom chunks work for CAF files.
+
 2012-01-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-cmp.c
