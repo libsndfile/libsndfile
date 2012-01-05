@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -61,6 +61,11 @@ main (int argc, char *argv [])
 
 	if (do_all || ! strcmp (argv [1], "aiff"))
 	{	chunk_test ("chunks.aiff", SF_FORMAT_AIFF) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "caf"))
+	{	chunk_test ("chunks.caf", SF_FORMAT_CAF) ;
 		test_count++ ;
 		} ;
 

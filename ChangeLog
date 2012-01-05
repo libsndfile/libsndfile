@@ -6,6 +6,9 @@
     * src/caf.c
     Make custom chunks work for CAF files.
 
+    * tests/chunk_test.c tests/test_wrapper.sh.in
+    Test CAF files with custom chunks.
+
 2012-01-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-cmp.c
