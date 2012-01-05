@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -2522,7 +2522,11 @@ psf_close (SF_PRIVATE *psf)
 	int	error = 0 ;
 
 	if (psf->codec_close)
-		error = psf->codec_close (psf) ;
+	{	error = psf->codec_close (psf) ;
+		/* To prevent it being called in psf->container_close(). */
+		psf->codec_close = NULL ;
+		} ;
+
 	if (psf->container_close)
 		error = psf->container_close (psf) ;
 

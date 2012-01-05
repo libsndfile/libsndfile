@@ -9,6 +9,9 @@
     * tests/chunk_test.c tests/test_wrapper.sh.in
     Test CAF files with custom chunks.
 
+    * src/sndfile.c
+    Prevent psf->codec_close() being called more than once.
+
 2012-01-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/sndfile-cmp.c
