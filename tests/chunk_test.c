@@ -145,7 +145,7 @@ chunk_test (const char *filename, int typemajor)
 
 	exit_if_true (
 		length_before > chunk_info.datalen || chunk_info.datalen - length_before > 4,
-		"\n\nLine %d : Bad chunk length %u (previous length %u)\n", __LINE__, chunk_info.datalen - length_before
+		"\n\nLine %d : Bad chunk length %u (previous length %u)\n", __LINE__, chunk_info.datalen, length_before
 		) ;
 
 	chunk_info.data = malloc (chunk_info.datalen) ;
