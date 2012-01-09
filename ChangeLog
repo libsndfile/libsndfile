@@ -3,6 +3,9 @@
     * src/aiff.c
     Refactor reading of chunk size and use of psf_store_read_chunk().
 
+    * src/(caf|wav).c
+    Correct storing of chunk offset.
+
 2012-01-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c src/wav.c src/common.h

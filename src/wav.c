@@ -332,7 +332,7 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	while (! done)
 	{	psf_binheader_readf (psf, "m4", &marker, &chunk_size) ;
 
-		psf_store_read_chunk (&psf->rchunks, marker, psf->headindex, chunk_size) ;
+		psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf), chunk_size) ;
 
 		switch (marker)
 		{	case RIFF_MARKER :

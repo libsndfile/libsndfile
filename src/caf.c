@@ -333,7 +333,7 @@ caf_read_header (SF_PRIVATE *psf)
 	while (have_data == 0 && psf_ftell (psf) < psf->filelength - SIGNED_SIZEOF (marker))
 	{	psf_binheader_readf (psf, "mE8", &marker, &chunk_size) ;
 
-		psf_store_read_chunk (&psf->rchunks, marker, psf->headindex, chunk_size) ;
+		psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf), chunk_size) ;
 
 		switch (marker)
 		{	case peak_MARKER :
