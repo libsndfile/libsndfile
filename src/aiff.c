@@ -381,7 +381,7 @@ static int
 aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 {	SSND_CHUNK	ssnd_fmt ;
 	AIFF_PRIVATE *paiff ;
-	unsigned	marker, dword, FORMsize, SSNDsize, bytesread ;
+	unsigned	marker, chunk_size, dword, FORMsize, SSNDsize, bytesread ;
 	int			k, found_chunk = 0, done = 0, error = 0 ;
 	char		*cptr ;
 	int			instr_found = 0, mark_found = 0, mark_count = 0 ;
@@ -408,18 +408,19 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	**	one and then check for the mandatory chunks at the end.
 	*/
 	while (! done)
-	{	psf_binheader_readf (psf, "m", &marker) ;
+	{	psf_binheader_readf (psf, "Em4", &marker, &chunk_size) ;
 
 		if (psf->file.mode == SFM_RDWR && (found_chunk & HAVE_SSND))
 			return SFE_AIFF_RW_SSND_NOT_LAST ;
+
+		psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf), chunk_size) ;
 
 		switch (marker)
 		{	case FORM_MARKER :
 					if (found_chunk)
 						return SFE_AIFF_NO_FORM ;
 
-					psf_binheader_readf (psf, "E4", &FORMsize) ;
-					psf_store_read_chunk (&psf->rchunks, marker, psf->headindex - 8, FORMsize) ;
+					FORMsize = chunk_size ;
 
 					if (psf->fileoffset > 0 && psf->filelength > FORMsize + 8)
 					{	/* Set file length. */
@@ -434,20 +435,22 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					else
 						psf_log_printf (psf, "FORM : %u\n", FORMsize) ;
 					found_chunk |= HAVE_FORM ;
+					psf_binheader_readf (psf, "m", &marker) ;
+					switch (marker)
+					{	case AIFC_MARKER :
+						case AIFF_MARKER :
+							found_chunk |= (marker == AIFC_MARKER) ? (HAVE_AIFC | HAVE_AIFF) : HAVE_AIFF ;
+							break ;
+						default :
+							break ;
+						} ;
 					break ;
 
-			case AIFC_MARKER :
-			case AIFF_MARKER :
-					if ((found_chunk & HAVE_FORM) == 0)
-						return SFE_AIFF_AIFF_NO_FORM ;
-					psf_log_printf (psf, " %M\n", marker) ;
-					found_chunk |= (marker == AIFC_MARKER) ? (HAVE_AIFC | HAVE_AIFF) : HAVE_AIFF ;
-					break ;
 
 			case COMM_MARKER :
-					paiff->comm_offset = psf_ftell (psf) - 4 ;
+					paiff->comm_offset = psf_ftell (psf) - 8 ;
+					comm_fmt->size = chunk_size ;
 					error = aiff_read_comm_chunk (psf, comm_fmt) ;
-					psf_store_read_chunk (&psf->rchunks, marker, paiff->comm_offset, comm_fmt->size) ;
 
 					psf->sf.samplerate = tenbytefloat2int (comm_fmt->sampleRate) ;
 					psf->sf.frames = comm_fmt->numSampleFrames ;
@@ -465,12 +468,9 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					if ((found_chunk & (HAVE_FORM | HAVE_AIFF | HAVE_COMM)) != (HAVE_FORM | HAVE_AIFF | HAVE_COMM))
 						return SFE_AIFF_PEAK_B4_COMM ;
 
-					psf_binheader_readf (psf, "E4", &dword) ;
-					psf_store_read_chunk (&psf->rchunks, marker, psf->headindex - 8, dword) ;
-
-					psf_log_printf (psf, "%M : %d\n", marker, dword) ;
-					if (dword != AIFF_PEAK_CHUNK_SIZE (psf->sf.channels))
-					{	psf_binheader_readf (psf, "j", dword) ;
+					psf_log_printf (psf, "%M : %d\n", marker, chunk_size) ;
+					if (chunk_size != AIFF_PEAK_CHUNK_SIZE (psf->sf.channels))
+					{	psf_binheader_readf (psf, "j", chunk_size) ;
 						psf_log_printf (psf, "*** File PEAK chunk too big.\n") ;
 						return SFE_WAV_BAD_PEAK ;
 						} ;
@@ -511,9 +511,9 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					if ((found_chunk & HAVE_AIFC) && (found_chunk & HAVE_FVER) == 0)
 						psf_log_printf (psf, "*** Valid AIFC files should have an FVER chunk.\n") ;
 
-					paiff->ssnd_offset = psf_ftell (psf) - 4 ;
-					psf_binheader_readf (psf, "E444", &SSNDsize, &(ssnd_fmt.offset), &(ssnd_fmt.blocksize)) ;
-					psf_store_read_chunk (&psf->rchunks, marker, paiff->ssnd_offset, SSNDsize) ;
+					paiff->ssnd_offset = psf_ftell (psf) - 8 ;
+					SSNDsize = chunk_size ;
+					psf_binheader_readf (psf, "E44", &(ssnd_fmt.offset), &(ssnd_fmt.blocksize)) ;
 
 					psf->datalength = SSNDsize - sizeof (ssnd_fmt) ;
 					psf->dataoffset = psf_ftell (psf) ;
@@ -553,8 +553,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case c_MARKER :
-					psf_binheader_readf (psf, "E4", &dword) ;
-					psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf) - 8, dword) ;
+					dword = chunk_size ;
 					if (dword == 0)
 						break ;
 					if (dword >= SIGNED_SIZEOF (psf->u.scbuf))
@@ -573,8 +572,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case AUTH_MARKER :
-					psf_binheader_readf (psf, "E4", &dword) ;
-					psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf) - 8, dword) ;
+					dword = chunk_size ;
 					if (dword == 0)
 						break ;
 					if (dword >= SIGNED_SIZEOF (psf->u.scbuf) - 1)
@@ -593,8 +591,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 				{	unsigned short count, id, len ;
 					unsigned int timestamp ;
 
-					psf_binheader_readf (psf, "E42", &dword, &count) ;
-					psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf) - 8, dword) ;
+					dword = chunk_size ;
+					psf_binheader_readf (psf, "E2", &count) ;
 					psf_log_printf (psf, " %M : %d\n  count  : %d\n", marker, dword, count) ;
 					dword += (dword & 1) ;
 					if (dword == 0)
@@ -624,8 +622,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 			case APPL_MARKER :
 				{	unsigned appl_marker ;
 
-					psf_binheader_readf (psf, "E4", &dword) ;
-					psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf) - 8, dword) ;
+					dword = chunk_size ;
 					if (dword == 0)
 						break ;
 					if (dword >= SIGNED_SIZEOF (psf->u.scbuf) - 1)
@@ -656,8 +653,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case NAME_MARKER :
-					psf_binheader_readf (psf, "E4", &dword) ;
-					psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf) - 8, dword) ;
+					dword = chunk_size ;
 					if (dword == 0)
 						break ;
 					if (dword >= SIGNED_SIZEOF (psf->u.scbuf) - 2)
@@ -673,8 +669,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case ANNO_MARKER :
-					psf_binheader_readf (psf, "E4", &dword) ;
-					psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf) - 8, dword) ;
+					dword = chunk_size ;
 					if (dword == 0)
 						break ;
 					if (dword >= SIGNED_SIZEOF (psf->u.scbuf) - 2)
@@ -690,8 +685,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case INST_MARKER :
-					psf_binheader_readf (psf, "E4", &dword) ;
-					psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf) - 8, dword) ;
+					dword = chunk_size ;
 					if (dword != SIZEOF_INST_CHUNK)
 					{	psf_log_printf (psf, " %M : %d (should be %d)\n", marker, dword, SIZEOF_INST_CHUNK) ;
 						psf_binheader_readf (psf, "j", dword) ;
@@ -758,8 +752,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case basc_MARKER :
-					psf_binheader_readf (psf, "E4", &dword) ;
-					psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf) - 8, dword) ;
+					dword = chunk_size ;
 					psf_log_printf (psf, " basc : %u\n", dword) ;
 
 					if ((error = aiff_read_basc_chunk (psf, dword)))
@@ -767,8 +760,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case MARK_MARKER :
-					psf_binheader_readf (psf, "E4", &dword) ;
-					psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf) - 8, dword) ;
+					dword = chunk_size ;
 					psf_log_printf (psf, " %M : %d\n", marker, dword) ;
 					{	unsigned short mark_id, n = 0 ;
 						unsigned int position ;
@@ -824,8 +816,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					/* Fall through to next case. */
 
 			case SFX_MARKER :
-					psf_binheader_readf (psf, "E4", &dword) ;
-					psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf) - 8, dword) ;
+					dword = chunk_size ;
 					psf_log_printf (psf, " %M : %d\n", marker, dword) ;
 
 					psf_binheader_readf (psf, "j", dword) ;
@@ -841,8 +832,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case CHAN_MARKER :
-					psf_binheader_readf (psf, "E4", &dword) ;
-					psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf) - 8, dword) ;
+					dword = chunk_size ;
 
 					if (dword < 12)
 					{	psf_log_printf (psf, " %M : %d (should be >= 12)\n", marker, dword) ;
@@ -859,9 +849,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 			default :
 					if (psf_isprint ((marker >> 24) & 0xFF) && psf_isprint ((marker >> 16) & 0xFF)
 						&& psf_isprint ((marker >> 8) & 0xFF) && psf_isprint (marker & 0xFF))
-					{	psf_binheader_readf (psf, "E4", &dword) ;
+					{	dword = chunk_size ;
 						psf_log_printf (psf, " %M : %d (unknown marker)\n", marker, dword) ;
-						psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf), dword) ;
 
 						psf_binheader_readf (psf, "j", dword) ;
 						break ;
@@ -930,11 +919,9 @@ aiff_close (SF_PRIVATE *psf)
 
 static int
 aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
-{	int error = 0, bytesread, subformat ;
+{	int error = 0, subformat ;
 
 	psf->u.scbuf [0] = 0 ;
-
-	bytesread = psf_binheader_readf (psf, "E4", &(comm_fmt->size)) ;
 
 	/* The COMM chunk has an int aligned to an odd word boundary. Some
 	** procesors are not able to deal with this (ie bus fault) so we have
@@ -942,9 +929,8 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	*/
 	comm_fmt->size += comm_fmt->size & 1 ;
 
-	bytesread +=
 	psf_binheader_readf (psf, "E242b", &(comm_fmt->numChannels), &(comm_fmt->numSampleFrames),
-			&(comm_fmt->sampleSize), &(comm_fmt->sampleRate), SIGNED_SIZEOF (comm_fmt->sampleRate)) ;
+				&(comm_fmt->sampleSize), &(comm_fmt->sampleRate), SIGNED_SIZEOF (comm_fmt->sampleRate)) ;
 
 	if (comm_fmt->size > 0x10000 && (comm_fmt->size & 0xffff) == 0)
 	{	psf_log_printf (psf, " COMM : %d (0x%x) *** should be ", comm_fmt->size, comm_fmt->size) ;
@@ -957,17 +943,17 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	if (comm_fmt->size == SIZEOF_AIFF_COMM)
 		comm_fmt->encoding = NONE_MARKER ;
 	else if (comm_fmt->size == SIZEOF_AIFC_COMM_MIN)
-		bytesread += psf_binheader_readf (psf, "Em", &(comm_fmt->encoding)) ;
+		psf_binheader_readf (psf, "Em", &(comm_fmt->encoding)) ;
 	else if (comm_fmt->size >= SIZEOF_AIFC_COMM)
 	{	unsigned char encoding_len ;
 		unsigned read_len ;
 
-		bytesread += psf_binheader_readf (psf, "Em1", &(comm_fmt->encoding), &encoding_len) ;
+		psf_binheader_readf (psf, "Em1", &(comm_fmt->encoding), &encoding_len) ;
 
 		comm_fmt->size = SF_MIN (sizeof (psf->u.scbuf), make_size_t (comm_fmt->size)) ;
 		memset (psf->u.scbuf, 0, comm_fmt->size) ;
 		read_len = comm_fmt->size - SIZEOF_AIFC_COMM + 1 ;
-		bytesread += psf_binheader_readf (psf, "b", psf->u.scbuf, read_len) ;
+		psf_binheader_readf (psf, "b", psf->u.scbuf, read_len) ;
 		psf->u.scbuf [read_len + 1] = 0 ;
 		} ;
 
@@ -1103,19 +1089,19 @@ aiff_rewrite_header (SF_PRIVATE *psf)
 				break ;
 
 			case COMM_MARKER :
-				psf->headindex = psf->rchunks.chunks [k].offset ;
+				psf->headindex = psf->rchunks.chunks [k].offset - 8 ;
 				comm_frames = psf->sf.frames ;
 				comm_size = psf->rchunks.chunks [k].len ;
 				psf_binheader_writef (psf, "Em42t4", COMM_MARKER, comm_size, psf->sf.channels, comm_frames) ;
 				break ;
 
 			case SSND_MARKER :
-				psf->headindex = psf->rchunks.chunks [k].offset ;
+				psf->headindex = psf->rchunks.chunks [k].offset - 8 ;
 				psf_binheader_writef (psf, "Etm8", SSND_MARKER, psf->datalength + SIZEOF_SSND_CHUNK) ;
 				break ;
 
 			case PEAK_MARKER :
-				psf->headindex = psf->rchunks.chunks [k].offset ;
+				psf->headindex = psf->rchunks.chunks [k].offset - 8 ;
 				psf_binheader_writef (psf, "Em4", PEAK_MARKER, AIFF_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
 				psf_binheader_writef (psf, "E44", 1, time (NULL)) ;
 				for (ch = 0 ; ch < psf->sf.channels ; ch++)
