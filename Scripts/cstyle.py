@@ -4,6 +4,9 @@
 #
 # Released under the 2 clause BSD license.
 
+# This program checks C code for compliance to coding standards used in
+# libsndfile and other projects I run.
+
 import re, string, sys
 
 # Take a line and split it ont the double quoted strings so we can test the
