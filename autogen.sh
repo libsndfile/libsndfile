@@ -158,3 +158,15 @@ echo "  autoconf"
 autoconf || exit 1
 
 cd $olddir
+
+fprecommit=.git/hooks/pre-commit
+if test ! -f $fprecommit ; then
+	echo
+	echo "Installing git pre-commit hook for this project."
+	cat > $fprecommit << 'foobar'
+#!/bin/sh
+exec Scripts/git-pre-commit-hook
+foobar
+	chmod u+x $fprecommit
+	echo
+	fi
