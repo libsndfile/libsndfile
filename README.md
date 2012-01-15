@@ -18,7 +18,7 @@ and other Free and Open Source Software tools including:
 * [Autoconf][autoconf]
 * [Autogen][autogen]
 * [Automake][automake]
-* [Libtool][libtool],
+* [Libtool][libtool]
 * [Pkgconfig][pkgconfig]
 * [Python][python]
 
@@ -53,7 +53,13 @@ Finally libsndfile can be built and tested:
 
 ## Submitting Patches.
 
-Patches should always be submitted via the Github issue tracker.
+* Patches should always be submitted via the Github issue tracker.
+* Patches for new features should include tests and documentation.
+* Patches to fix bugs should either pass all tests, or modify the tests in some
+  sane way.
+
+
+
 
 
 
