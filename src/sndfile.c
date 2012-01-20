@@ -1882,11 +1882,13 @@ sf_write_raw	(SNDFILE *sndfile, const void *ptr, sf_count_t len)
 
 	psf->last_op = SFM_WRITE ;
 
+	if (psf->write_current > psf->sf.frames)
+	{	psf->sf.frames = psf->write_current ;
+		psf->dataend = 0 ;
+		} ;
+
 	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
-
-	if (psf->write_current > psf->sf.frames)
-		psf->sf.frames = psf->write_current ;
 
 	return count ;
 } /* sf_write_raw */
@@ -1930,11 +1932,13 @@ sf_write_short	(SNDFILE *sndfile, const short *ptr, sf_count_t len)
 
 	psf->last_op = SFM_WRITE ;
 
+	if (psf->write_current > psf->sf.frames)
+	{	psf->sf.frames = psf->write_current ;
+		psf->dataend = 0 ;
+		} ;
+
 	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
-
-	if (psf->write_current > psf->sf.frames)
-		psf->sf.frames = psf->write_current ;
 
 	return count ;
 } /* sf_write_short */
@@ -1970,11 +1974,13 @@ sf_writef_short	(SNDFILE *sndfile, const short *ptr, sf_count_t frames)
 
 	psf->last_op = SFM_WRITE ;
 
+	if (psf->write_current > psf->sf.frames)
+	{	psf->sf.frames = psf->write_current ;
+		psf->dataend = 0 ;
+		} ;
+
 	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
-
-	if (psf->write_current > psf->sf.frames)
-		psf->sf.frames = psf->write_current ;
 
 	return count / psf->sf.channels ;
 } /* sf_writef_short */
@@ -2018,11 +2024,13 @@ sf_write_int	(SNDFILE *sndfile, const int *ptr, sf_count_t len)
 
 	psf->last_op = SFM_WRITE ;
 
+	if (psf->write_current > psf->sf.frames)
+	{	psf->sf.frames = psf->write_current ;
+		psf->dataend = 0 ;
+		} ;
+
 	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
-
-	if (psf->write_current > psf->sf.frames)
-		psf->sf.frames = psf->write_current ;
 
 	return count ;
 } /* sf_write_int */
@@ -2058,11 +2066,13 @@ sf_writef_int	(SNDFILE *sndfile, const int *ptr, sf_count_t frames)
 
 	psf->last_op = SFM_WRITE ;
 
+	if (psf->write_current > psf->sf.frames)
+	{	psf->sf.frames = psf->write_current ;
+		psf->dataend = 0 ;
+		} ;
+
 	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
-
-	if (psf->write_current > psf->sf.frames)
-		psf->sf.frames = psf->write_current ;
 
 	return count / psf->sf.channels ;
 } /* sf_writef_int */
@@ -2106,11 +2116,13 @@ sf_write_float	(SNDFILE *sndfile, const float *ptr, sf_count_t len)
 
 	psf->last_op = SFM_WRITE ;
 
+	if (psf->write_current > psf->sf.frames)
+	{	psf->sf.frames = psf->write_current ;
+		psf->dataend = 0 ;
+		} ;
+
 	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
-
-	if (psf->write_current > psf->sf.frames)
-		psf->sf.frames = psf->write_current ;
 
 	return count ;
 } /* sf_write_float */
@@ -2146,11 +2158,13 @@ sf_writef_float	(SNDFILE *sndfile, const float *ptr, sf_count_t frames)
 
 	psf->last_op = SFM_WRITE ;
 
+	if (psf->write_current > psf->sf.frames)
+	{	psf->sf.frames = psf->write_current ;
+		psf->dataend = 0 ;
+		} ;
+
 	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
-
-	if (psf->write_current > psf->sf.frames)
-		psf->sf.frames = psf->write_current ;
 
 	return count / psf->sf.channels ;
 } /* sf_writef_float */
@@ -2194,11 +2208,13 @@ sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t len)
 
 	psf->last_op = SFM_WRITE ;
 
+	if (psf->write_current > psf->sf.frames)
+	{	psf->sf.frames = psf->write_current ;
+		psf->dataend = 0 ;
+		} ;
+
 	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
-
-	if (psf->write_current > psf->sf.frames)
-		psf->sf.frames = psf->write_current ;
 
 	return count ;
 } /* sf_write_double */
@@ -2234,11 +2250,13 @@ sf_writef_double	(SNDFILE *sndfile, const double *ptr, sf_count_t frames)
 
 	psf->last_op = SFM_WRITE ;
 
+	if (psf->write_current > psf->sf.frames)
+	{	psf->sf.frames = psf->write_current ;
+		psf->dataend = 0 ;
+		} ;
+
 	if (psf->auto_header && psf->write_header != NULL)
 		psf->write_header (psf, SF_TRUE) ;
-
-	if (psf->write_current > psf->sf.frames)
-		psf->sf.frames = psf->write_current ;
 
 	return count / psf->sf.channels ;
 } /* sf_writef_double */

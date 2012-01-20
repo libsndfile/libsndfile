@@ -1021,9 +1021,8 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 
 		if (psf->dataend)
 			psf->datalength -= psf->filelength - psf->dataend ;
-
-		if (psf->bytewidth > 0)
-			psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
+		else if (psf->bytewidth > 0 && psf->sf.seekable == SF_TRUE)
+			psf->datalength = psf->sf.frames * psf->bytewidth * psf->sf.channels ;
 		} ;
 
 	/* Reset the current header length to zero. */
@@ -1094,7 +1093,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 		{	int type ;
 
 			type = psf->instrument->loops [tmp].mode ;
-			type = (type == SF_LOOP_FORWARD ? 0 : type==SF_LOOP_BACKWARD ? 2 : type == SF_LOOP_ALTERNATING ? 1 : 32) ;
+			type = (type == SF_LOOP_FORWARD ? 0 : type == SF_LOOP_BACKWARD ? 2 : type == SF_LOOP_ALTERNATING ? 1 : 32) ;
 
 			psf_binheader_writef (psf, "44", tmp, type) ;
 			psf_binheader_writef (psf, "44", psf->instrument->loops [tmp].start, psf->instrument->loops [tmp].end - 1) ;
@@ -1140,6 +1139,11 @@ wav_write_tailer (SF_PRIVATE *psf)
 	/* Reset the current header buffer length to zero. */
 	psf->header [0] = 0 ;
 	psf->headindex = 0 ;
+
+	if (psf->bytewidth > 0 && psf->sf.seekable == SF_TRUE)
+	{	psf->datalength = psf->sf.frames * psf->bytewidth * psf->sf.channels ;
+		psf->dataend = psf->dataoffset + psf->datalength ;
+		} ;
 
 	if (psf->dataend > 0)
 		psf_fseek (psf, psf->dataend, SEEK_SET) ;
