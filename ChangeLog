@@ -4,6 +4,9 @@
     Allow files opened in RDWR mode with string data in the tailer to be
     extended. Thanks to Bodo for the patch.
 
+    * tests/string_test.c
+    Add tests for the above changes (patch from Bodo).
+
 2012-01-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c
@@ -571,7 +574,7 @@
     * src/sndfile.c
     Only support writing mono SVX files. Multichannel SVX files are not
     interleaved and there is no support infrastructure to cache and write
-	multiple channels to create a non-interleaved file.
+    multiple channels to create a non-interleaved file.
 
     * src/file_io.c
     Don't call close() on a file descriptor of -1. Thanks to Jeremy Friesner
