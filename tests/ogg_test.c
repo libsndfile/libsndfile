@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2007-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2007-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -266,7 +266,7 @@ ogg_stereo_seek_test (const char * filename, int format)
 	gen_windowed_sine_float (data, ARRAY_LEN (data), 0.95) ;
 	for (k = 0 ; k < ARRAY_LEN (data) ; k++)
 	{	stereo_out [2 * k] = data [k] ;
-   		stereo_out [2 * k + 1] = data [ARRAY_LEN (data) - k - 1] ;
+		stereo_out [2 * k + 1] = data [ARRAY_LEN (data) - k - 1] ;
 		} ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;

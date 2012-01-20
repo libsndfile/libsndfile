@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2009      Uli Franke <cls@nebadje.org>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -632,7 +632,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 		{	int type ;
 
 			type = psf->instrument->loops [tmp].mode ;
-			type = (type == SF_LOOP_FORWARD ? 0 : type==SF_LOOP_BACKWARD ? 2 : type == SF_LOOP_ALTERNATING ? 1 : 32) ;
+			type = (type == SF_LOOP_FORWARD ? 0 : type == SF_LOOP_BACKWARD ? 2 : type == SF_LOOP_ALTERNATING ? 1 : 32) ;
 
 			psf_binheader_writef (psf, "44", tmp, type) ;
 			psf_binheader_writef (psf, "44", psf->instrument->loops [tmp].start, psf->instrument->loops [tmp].end) ;

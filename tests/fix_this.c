@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 
 #include	"utils.h"
 
-#define		BUFFER_SIZE		(1<<14) /* Should be (1<<14) */
+#define		BUFFER_SIZE		(1 << 14)
 #define		SAMPLE_RATE		(11025)
 
 #ifndef		M_PI

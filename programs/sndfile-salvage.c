@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2010-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2010-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -240,7 +240,7 @@ find_data_offset (int fd, int format)
 
 	cptr = memchr (buffer, target [0], rlen - slen) ;
 	if (cptr && memcmp (cptr, target, slen) == 0)
-		offset = cptr - buffer  ;
+		offset = cptr - buffer ;
 	else
 	{	printf ("Error : Could not find data offset.\n") ;
 		exit (1) ;

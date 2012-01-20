@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@
 #include	"generate.h"
 
 #define	SAMPLE_RATE			11025
-#define	DATA_LENGTH			(1<<12)
+#define	DATA_LENGTH			(1 << 12)
 
 #define	SILLY_WRITE_COUNT	(234)
 

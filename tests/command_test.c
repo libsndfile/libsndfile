@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 
 #include "utils.h"
 
-#define	BUFFER_LEN		(1<<10)
+#define	BUFFER_LEN		(1 << 10)
 #define LOG_BUFFER_SIZE	1024
 
 static	void	float_norm_test			(const char *filename) ;

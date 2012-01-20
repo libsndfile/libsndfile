@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Tobias Gehrig <tgehrig@ira.uka.de>
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -147,8 +147,8 @@ i2flac8_array (const int *src, FLAC__int32 *dest, int count)
 static void
 i2flac16_array (const int *src, FLAC__int32 *dest, int count)
 {
-  while (--count >= 0)
-    dest [count] = src [count] >> 16 ;
+	while (--count >= 0)
+		dest [count] = src [count] >> 16 ;
 } /* i2flac16_array */
 
 static void
@@ -300,7 +300,7 @@ sf_flac_read_callback (const FLAC__StreamDecoder * UNUSED (decoder), FLAC__byte 
 	if (*bytes > 0 && psf->error == 0)
 		return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE ;
 
-    return FLAC__STREAM_DECODER_READ_STATUS_ABORT ;
+	return FLAC__STREAM_DECODER_READ_STATUS_ABORT ;
 } /* sf_flac_read_callback */
 
 static FLAC__StreamDecoderSeekStatus
@@ -342,7 +342,7 @@ sf_flac_eof_callback (const FLAC__StreamDecoder *UNUSED (decoder), void *client_
 	if (psf_ftell (psf) == psf->filelength)
 		return SF_TRUE ;
 
-    return SF_FALSE ;
+	return SF_FALSE ;
 } /* sf_flac_eof_callback */
 
 static FLAC__StreamDecoderWriteStatus
@@ -504,7 +504,7 @@ sf_flac_enc_seek_callback (const FLAC__StreamEncoder * UNUSED (encoder), FLAC__u
 	if (psf->error)
 		return FLAC__STREAM_ENCODER_SEEK_STATUS_ERROR ;
 
-    return FLAC__STREAM_ENCODER_SEEK_STATUS_OK ;
+	return FLAC__STREAM_ENCODER_SEEK_STATUS_OK ;
 } /* sf_flac_enc_seek_callback */
 
 static FLAC__StreamEncoderTellStatus
@@ -962,7 +962,7 @@ flac_write_s2flac (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		convert (ptr + total, buffer, writecount) ;
-		if (FLAC__stream_encoder_process_interleaved (pflac->fse, buffer, writecount/psf->sf.channels))
+		if (FLAC__stream_encoder_process_interleaved (pflac->fse, buffer, writecount / psf->sf.channels))
 			thiswrite = writecount ;
 		else
 			break ;
@@ -1004,7 +1004,7 @@ flac_write_i2flac (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		convert (ptr + total, buffer, writecount) ;
-		if (FLAC__stream_encoder_process_interleaved (pflac->fse, buffer, writecount/psf->sf.channels))
+		if (FLAC__stream_encoder_process_interleaved (pflac->fse, buffer, writecount / psf->sf.channels))
 			thiswrite = writecount ;
 		else
 			break ;
@@ -1046,7 +1046,7 @@ flac_write_f2flac (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		convert (ptr + total, buffer, writecount, psf->norm_float) ;
-		if (FLAC__stream_encoder_process_interleaved (pflac->fse, buffer, writecount/psf->sf.channels))
+		if (FLAC__stream_encoder_process_interleaved (pflac->fse, buffer, writecount / psf->sf.channels))
 			thiswrite = writecount ;
 		else
 			break ;
@@ -1084,23 +1084,22 @@ f2flac8_clip_array (const float *src, FLAC__int32 *dest, int count, int normaliz
 
 static void
 f2flac16_clip_array (const float *src, FLAC__int32 *dest, int count, int normalize)
-{
-  float normfact, scaled_value ;
+{	float normfact, scaled_value ;
 
-  normfact = normalize ? (8.0 * 0x1000) : 1.0 ;
+	normfact = normalize ? (8.0 * 0x1000) : 1.0 ;
 
-  while (--count >= 0) {
-    scaled_value = src [count] * normfact ;
-    if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFF)) {
-      dest [count] = 0x7FFF ;
-      continue ;
-    }
-    if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x1000)) {
-      dest [count] = 0x8000 ;
-      continue ;
-    }
-    dest [count] = lrintf (scaled_value) ;
-  }
+	while (--count >= 0)
+	{	scaled_value = src [count] * normfact ;
+		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFF))
+		{	dest [count] = 0x7FFF ;
+			continue ;
+			} ;
+		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x1000))
+		{	dest [count] = 0x8000 ;
+			continue ;
+			} ;
+		dest [count] = lrintf (scaled_value) ;
+		} ;
 } /* f2flac16_clip_array */
 
 static void
@@ -1178,7 +1177,7 @@ flac_write_d2flac (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		convert (ptr + total, buffer, writecount, psf->norm_double) ;
-		if (FLAC__stream_encoder_process_interleaved (pflac->fse, buffer, writecount/psf->sf.channels))
+		if (FLAC__stream_encoder_process_interleaved (pflac->fse, buffer, writecount / psf->sf.channels))
 			thiswrite = writecount ;
 		else
 			break ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -50,9 +50,9 @@ typedef struct IMA_ADPCM_PRIVATE_tag
 
 static int ima_indx_adjust [16] =
 {	-1, -1, -1, -1,		/* +0 - +3, decrease the step size */
-     2,  4,  6,  8,     /* +4 - +7, increase the step size */
-    -1, -1, -1, -1,		/* -0 - -3, decrease the step size */
-     2,  4,  6,  8,		/* -4 - -7, increase the step size */
+	+2, +4, +6, +8,		/* +4 - +7, increase the step size */
+	-1, -1, -1, -1,		/* -0 - -3, decrease the step size */
+	+2, +4, +6, +8,		/* -4 - -7, increase the step size */
 } ;
 
 static int ima_step_size [89] =
@@ -202,7 +202,7 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 	psf->datalength = (psf->dataend) ? psf->dataend - psf->dataoffset :
 							psf->filelength - psf->dataoffset ;
 
-    if (pima->blocksize == 0)
+	if (pima->blocksize == 0)
 	{	psf_log_printf (psf, "*** Error : pima->blocksize should not be zero.\n") ;
 		return SFE_INTERNAL ;
 		} ;

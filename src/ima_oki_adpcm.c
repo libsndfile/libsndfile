@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2007-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2007-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (c) 2007 <robs@users.sourceforge.net>
 **
 ** This library is free software; you can redistribute it and/or modify it
@@ -77,7 +77,7 @@ adpcm_decode (IMA_OKI_ADPCM * state, int code)
 	s = ((state->steps [state->step_index] * s) >> 3) & state->mask ;
 
 	if (code & 8)
-    	s = -s ;
+		s = -s ;
 	s += state->last_output ;
 
 	if (s < MIN_SAMPLE || s > MAX_SAMPLE)

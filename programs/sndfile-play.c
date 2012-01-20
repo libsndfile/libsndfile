@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -444,7 +444,7 @@ opensoundsys_open_device (int channels, int srate)
 	if (ioctl (fd, SNDCTL_DSP_SETFMT, &fmt) != 0)
 	{	perror ("opensoundsys_open_device : set format ") ;
 		exit (1) ;
-  		} ;
+		} ;
 
 	if (ioctl (fd, SNDCTL_DSP_CHANNELS, &channels) != 0)
 	{	perror ("opensoundsys_open_device : channels ") ;
@@ -645,7 +645,7 @@ macosx_play (int argc, char *argv [])
 
 #if (OS_IS_WIN32 == 1)
 
-#define	WIN32_BUFFER_LEN	(1<<15)
+#define	WIN32_BUFFER_LEN	(1 << 15)
 
 typedef struct
 {	HWAVEOUT	hwave ;

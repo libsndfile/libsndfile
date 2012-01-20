@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@
 
 #include	"utils.h"
 
-#define	BUFFER_LEN		(1<<10)
+#define	BUFFER_LEN		(1 << 10)
 #define LOG_BUFFER_SIZE	1024
 
 static void	zero_data_test (const char *filename, int format) ;
@@ -65,7 +65,7 @@ main (int argc, char *argv [])
 		exit (1) ;
 		} ;
 
-	do_all=!strcmp (argv [1], "all") ;
+	do_all =! strcmp (argv [1], "all") ;
 
 	if (do_all || ! strcmp (argv [1], "wav"))
 	{	zero_data_test ("zerolen.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;

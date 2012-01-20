@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
 
 #include "utils.h"
 
-#define	BUFFER_SIZE		(1<<15)
+#define	BUFFER_SIZE		(1 << 15)
 #define	SHORT_BUFFER	(256)
 
 static void

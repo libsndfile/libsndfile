@@ -1,6 +1,6 @@
 [+ AutoGen5 template h c +]
 /*
-** Copyright (C) 2002-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -725,7 +725,7 @@ compare_[+ (get "io_element") +]_or_die (const [+ (get "io_element") +] *left, c
 {
 	unsigned k ;
 
-	for (k = 0 ; k < count ;k++)
+	for (k = 0 ; k < count ; k++)
 		if (left [k] != right [k])
 		{	printf ("\n\nLine %d : Error at index %d, " [+ (get "format_str") +] " should be " [+ (get "format_str") +] ".\n\n", line_num, k, left [k], right [k]) ;
 			exit (1) ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -39,7 +39,7 @@
 
 #include	"common.h"
 
-#define		BUFFER_LEN	(1<<16)
+#define		BUFFER_LEN	(1 << 16)
 
 
 static void concat_data_fp (SNDFILE *wfile, SNDFILE *rofile, int channels) ;

@@ -371,10 +371,10 @@ static unsigned int
 marker_to_position (const MARK_ID_POS *m, unsigned short n, int marksize)
 {	int i ;
 
-    for (i = 0 ; i < marksize ; i++)
+	for (i = 0 ; i < marksize ; i++)
 		if (m [i].markerID == n)
 			return m [i].position ;
-    return 0 ;
+	return 0 ;
 } /* marker_to_position */
 
 static int
@@ -876,13 +876,13 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	if (instr_found && mark_found)
 	{	int j ;
 
-		for (j = 0 ; j<psf->instrument->loop_count ; j ++)
+		for (j = 0 ; j < psf->instrument->loop_count ; j ++)
 		{	if (j < ARRAY_LEN (psf->instrument->loops))
 			{	psf->instrument->loops [j].start = marker_to_position (paiff->markstr, psf->instrument->loops [j].start, mark_count) ;
 				psf->instrument->loops [j].end = marker_to_position (paiff->markstr, psf->instrument->loops [j].end, mark_count) ;
 				psf->instrument->loops [j].mode = SF_LOOP_FORWARD ;
 				} ;
-  			} ;
+			} ;
 		} ;
 
 	if (! (found_chunk & HAVE_FORM))

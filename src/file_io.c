@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2003 Ross Bencina <rbencina@iprimus.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -589,10 +589,10 @@ void
 psf_fsync (SF_PRIVATE *psf)
 {
 #if HAVE_FSYNC
-    if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
-        fsync (psf->file.filedes) ;
+	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+		fsync (psf->file.filedes) ;
 #else
-    psf = NULL ;
+	psf = NULL ;
 #endif
 } /* psf_fsync */
 
@@ -672,7 +672,7 @@ psf_open_rsrc (SF_PRIVATE *psf)
 	psf->error = SFE_NO_ERROR ;
 	if ((psf->rsrc.handle = psf_open_handle (&psf->rsrc)) != NULL)
 	{	psf->rsrclength = psf_get_filelen_handle (psf->rsrc.handle) ;
-      		return SFE_NO_ERROR ;
+		return SFE_NO_ERROR ;
 		} ;
 
 	/* No resource file found. */

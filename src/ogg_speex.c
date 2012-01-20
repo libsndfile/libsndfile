@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -310,7 +310,7 @@ spx_header_read (SF_PRIVATE * psf, ogg_packet *op, spx_int32_t enh_enabled, int 
 	if (!psf->sf.samplerate)
 		psf->sf.samplerate = spx->header.rate ;
 	/* Adjust rate if --force-* options are used */
-	if (force_mode!=-1)
+	if (force_mode != -1)
 	{	if (spx->header.mode < force_mode)
 		{	psf->sf.samplerate <<= (force_mode - spx->header.mode) ;
 			spx->granule_frame_size >>= (force_mode - spx->header.mode) ;
@@ -360,7 +360,7 @@ spx_print_comments (const char *c, int length)
 	int len, i, nb_fields ;
 
 printf ("%s %d\n", __func__, __LINE__) ;
-	if (length<8)
+	if (length < 8)
 	{	fprintf (stderr, "Invalid/corrupted comments\n") ;
 		return ;
 		}
@@ -381,7 +381,7 @@ printf ("%s %d\n", __func__, __LINE__) ;
 	nb_fields = readint (c, 0) ;
 	c += 4 ;
 	for (i = 0 ; i < nb_fields ; i++)
-	{	if (c+4>end)
+	{	if (c + 4 > end)
 		{	fprintf (stderr, "Invalid/corrupted comments\n") ;
 			return ;
 			} ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 
 #include	"utils.h"
 
-#define	BUFFER_LEN		(1<<16)
+#define	BUFFER_LEN		(1 << 16)
 #define LOG_BUFFER_SIZE	1024
 
 static void	dither_test (const char *filename, int filetype) ;
@@ -52,7 +52,7 @@ main (int argc, char *argv [])
 		exit (1) ;
 		} ;
 
-	do_all=!strcmp (argv [1], "all") ;
+	do_all =! strcmp (argv [1], "all") ;
 
 	if (do_all || ! strcmp (argv [1], "wav"))
 	{	dither_test ("dither.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_U8) ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -28,7 +28,7 @@
 
 enum
 {
-  /* keep sorted for wav_w64_format_str() */
+	/* keep sorted for wav_w64_format_str() */
 	WAVE_FORMAT_UNKNOWN					= 0x0000,		/* Microsoft Corporation */
 	WAVE_FORMAT_PCM	 					= 0x0001, 		/* Microsoft PCM format */
 	WAVE_FORMAT_MS_ADPCM				= 0x0002,		/* Microsoft ADPCM */

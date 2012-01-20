@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 
 #include "utils.h"
 
-#define	BUFFER_SIZE		(1<<12)
+#define	BUFFER_SIZE		(1 << 12)
 
 static void	lrintf_test (void) ;
 
@@ -403,7 +403,7 @@ pcm_test_float (const char *filename, int filetype, uint64_t hash, int replace_f
 	int				sign ;
 	double			*data, error ;
 
-	print_test_name (replace_float ?  "pcm_test_float (replace)" : "pcm_test_float", filename) ;
+	print_test_name (replace_float ? "pcm_test_float (replace)" : "pcm_test_float", filename) ;
 
 	items = BUFFER_SIZE ;
 
@@ -659,7 +659,7 @@ pcm_test_double (const char *filename, int	filetype, uint64_t hash, int replace_
 
 	/* This is the best test routine. Other should be brought up to this standard. */
 
-	print_test_name (replace_float ?  "pcm_test_double (replace)" : "pcm_test_double", filename) ;
+	print_test_name (replace_float ? "pcm_test_double (replace)" : "pcm_test_double", filename) ;
 
 	items = BUFFER_SIZE ;
 

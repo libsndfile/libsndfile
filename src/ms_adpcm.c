@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -206,9 +206,9 @@ msadpcm_decode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 {	int		chan, k, blockindx, sampleindx ;
 	short	bytecode, bpred [2], chan_idelta [2] ;
 
-    int predict ;
-    int current ;
-    int idelta ;
+	int predict ;
+	int current ;
+	int idelta ;
 
 	pms->blockcount ++ ;
 	pms->samplecount = 0 ;
@@ -277,7 +277,7 @@ msadpcm_decode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 	sampleindx = 2 * pms->channels ;
 	while (blockindx < pms->blocksize)
 	{	bytecode = pms->block [blockindx++] ;
-  		pms->samples [sampleindx++] = (bytecode >> 4) & 0x0F ;
+		pms->samples [sampleindx++] = (bytecode >> 4) & 0x0F ;
 		pms->samples [sampleindx++] = bytecode & 0x0F ;
 		} ;
 
@@ -296,7 +296,7 @@ msadpcm_decode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 		if (bytecode & 0x8)
 			bytecode -= 0x10 ;
 
-    	predict = ((pms->samples [k - pms->channels] * AdaptCoeff1 [bpred [chan]])
+		predict = ((pms->samples [k - pms->channels] * AdaptCoeff1 [bpred [chan]])
 					+ (pms->samples [k - 2 * pms->channels] * AdaptCoeff2 [bpred [chan]])) >> 8 ; /* => / 256 => FIXED_POINT_COEFF_BASE == 256 */
 		current = (bytecode * idelta) + predict ;
 
