@@ -65,6 +65,9 @@ ogg_open (SF_PRIVATE *psf)
 	ogg_stream_clear (&odata->ostream) ;
 	psf_fseek (psf, pos, SEEK_SET) ;
 
+	if (SF_ENDIAN (psf->sf.format) != 0)
+		return SFE_BAD_ENDIAN ;
+
 	switch (psf->sf.format)
 	{	case SF_FORMAT_OGG | SF_FORMAT_VORBIS :
 			return ogg_vorbis_open (psf) ;
@@ -88,7 +91,7 @@ ogg_open (SF_PRIVATE *psf)
 			break ;
 		} ;
 
-	psf_log_printf (psf, "%s : mode should be SFM_READ or SFM_WRITE.\n", __func__) ;
+	psf_log_printf (psf, "%s : bad psf->sf.format 0x%x.\n", __func__, psf->sf.format) ;
 	return SFE_INTERNAL ;
 } /* ogg_open */
 

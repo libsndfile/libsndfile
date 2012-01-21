@@ -779,6 +779,8 @@ sf_format_check	(const SF_INFO *info)
 				/* FLAC can't do more than 8 channels. */
 				if (info->channels > 8)
 					return 0 ;
+				if (endian != SF_ENDIAN_FILE)
+					return 0 ;
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24)
 					return 1 ;
 				break ;
@@ -802,6 +804,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_OGG :
+				if (endian != SF_ENDIAN_FILE)
+					return 0 ;
 				if (subformat == SF_FORMAT_VORBIS)
 					return 1 ;
 				break ;
