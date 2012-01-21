@@ -114,7 +114,7 @@
 
 
 /*
-*	Macros for spliting the format file of SF_INFI into contrainer type,
+*	Macros for spliting the format file of SF_INFO into container type,
 **	codec type and endian-ness.
 */
 #define SF_CONTAINER(x)		((x) & SF_FORMAT_TYPEMASK)
