@@ -62,7 +62,7 @@ main (int argc, char *argv [])
 		exit (1) ;
 		} ;
 
-	do_all =! strcmp (argv [1], "all") ;
+	do_all = ! strcmp (argv [1], "all") ;
 
 	if (do_all || ! strcmp (argv [1], "wav"))
 	{	string_start_end_test ("strings.wav", SF_FORMAT_WAV) ;
@@ -631,7 +631,7 @@ str_count (const char * haystack, const char * needle)
 	return count ;
 } /* str_count */
 
-#define MIN(a,b)	((a) < (b) ? (a) : (b))
+#define MIN(a, b)	((a) < (b) ? (a) : (b))
 
 static void
 software_string_test (const char *filename)

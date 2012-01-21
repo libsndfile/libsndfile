@@ -67,8 +67,8 @@ usage_exit (const char *progname)
 int
 main (int argc, char *argv [])
 {	const char	*progname, *outfilename ;
-	SNDFILE	 	*outfile, **infiles ;
-	SF_INFO	 	sfinfo_out, sfinfo_in ;
+	SNDFILE		*outfile, **infiles ;
+	SF_INFO		sfinfo_out, sfinfo_in ;
 	void 		(*func) (SNDFILE*, SNDFILE*, int) ;
 	int			k ;
 

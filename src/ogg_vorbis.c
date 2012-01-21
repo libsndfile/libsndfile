@@ -132,7 +132,7 @@ vorbis_read_header (SF_PRIVATE *psf, int log_data)
 	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 	char *buffer ;
-	int	 bytes ;
+	int	bytes ;
 	int i, nn ;
 
 	odata->eos = 0 ;
@@ -249,7 +249,7 @@ vorbis_read_header (SF_PRIVATE *psf, int log_data)
 	**	header page is the only place where missing data is fatal.
 	*/
 
-	i = 0 ;			 /* Count of number of packets read */
+	i = 0 ;			/* Count of number of packets read */
 	while (i < 2)
 	{	int result = ogg_sync_pageout (&odata->osync, &odata->opage) ;
 		if (result == 0)
@@ -349,10 +349,10 @@ vorbis_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 
 #if 0
 	ret = vorbis_encode_init (&vdata->vinfo, psf->sf.channels, psf->sf.samplerate, -1, 128000, -1) ; /* average bitrate mode */
-	ret = ( vorbis_encode_setup_managed (&vdata->vinfo, psf->sf.channels,
-						 psf->sf.samplerate, -1, 128000, -1) ||
-		vorbis_encode_ctl (&vdata->vinfo, OV_ECTL_RATEMANAGE_AVG, NULL) ||
-		vorbis_encode_setup_init (&vdata->vinfo)) ;
+	ret = (	vorbis_encode_setup_managed (&vdata->vinfo, psf->sf.channels, psf->sf.samplerate, -1, 128000, -1)
+			|| vorbis_encode_ctl (&vdata->vinfo, OV_ECTL_RATEMANAGE_AVG, NULL)
+			|| vorbis_encode_setup_init (&vdata->vinfo)
+			) ;
 #endif
 	if (ret)
 		return SFE_BAD_OPEN_FORMAT ;
@@ -644,7 +644,7 @@ vorbis_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *t
 		if (len == 0)
 			return i ; /* Is this necessary */
 	}
-	goto start0 ;		 /* Jump into the nasty nest */
+	goto start0 ;		/* Jump into the nasty nest */
 	while (len > 0 && !odata->eos)
 	{
 		while (len > 0 && !odata->eos)

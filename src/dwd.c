@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -150,9 +150,9 @@ dwd_read_header (SF_PRIVATE *psf)
 	else
 		psf_log_printf (psf, "None\n") ;
 
-	psf_log_printf (psf, "  Sample Rate   : %d\n  Channels      : %d\n"
-						 "  Bit Width     : %d\n",
-						 dwdh.srate, dwdh.channels, dwdh.bitwidth) ;
+	psf_log_printf (psf,	"  Sample Rate   : %d\n  Channels      : %d\n"
+							"  Bit Width     : %d\n",
+						dwdh.srate, dwdh.channels, dwdh.bitwidth) ;
 
 	switch (dwdh.bitwidth)
 	{	case 8 :

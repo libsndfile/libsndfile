@@ -52,7 +52,7 @@ main (int argc, char *argv [])
 		exit (1) ;
 		} ;
 
-	do_all =! strcmp (argv [1], "all") ;
+	do_all = ! strcmp (argv [1], "all") ;
 
 	if (do_all || ! strcmp (argv [1], "wav"))
 	{	dither_test ("dither.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_U8) ;

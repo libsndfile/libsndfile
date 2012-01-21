@@ -81,7 +81,7 @@ main (int argc, char *argv [])
 		exit (1) ;
 		} ;
 
-	do_all =! strcmp (argv [1], "all") ;
+	do_all = ! strcmp (argv [1], "all") ;
 
 	if (do_all || strcmp (argv [1], "ver") == 0)
 	{	char buffer [128] ;
@@ -699,8 +699,8 @@ instrument_test (const char *filename, int filetype)
 		}
 	} ;
 	SF_INSTRUMENT read_inst ;
-	SNDFILE	 *file ;
-	SF_INFO	 sfinfo ;
+	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
 
 	print_test_name ("instrument_test", filename) ;
 
@@ -851,8 +851,8 @@ current_sf_info_test	(const char *filename)
 static void
 broadcast_test (const char *filename, int filetype)
 {	static SF_BROADCAST_INFO bc_write, bc_read ;
-	SNDFILE	 *file ;
-	SF_INFO	 sfinfo ;
+	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
 	int errors = 0 ;
 
 	print_test_name ("broadcast_test", filename) ;
@@ -976,8 +976,8 @@ broadcast_rdwr_test (const char *filename, int filetype)
 static void
 check_coding_history_newlines (const char *filename)
 {	static SF_BROADCAST_INFO bc_write, bc_read ;
-	SNDFILE	 *file ;
-	SF_INFO	 sfinfo ;
+	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
 	unsigned k ;
 
 	sfinfo.samplerate	= 22050 ;
@@ -1046,8 +1046,8 @@ check_coding_history_newlines (const char *filename)
 static void
 broadcast_coding_history_test (const char *filename)
 {	static SF_BROADCAST_INFO bc_write, bc_read ;
-	SNDFILE	 *file ;
-	SF_INFO	 sfinfo ;
+	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
 	const char *default_history = "A=PCM,F=22050,W=16,M=mono" ;
 	const char *supplied_history =
 					"A=PCM,F=44100,W=24,M=mono,T=other\r\n"
@@ -1150,8 +1150,8 @@ broadcast_coding_history_size (const char *filename)
 {	/* SF_BROADCAST_INFO struct with coding_history field of 1024 bytes. */
 	static SF_BROADCAST_INFO_VAR (1024) bc_write ;
 	static SF_BROADCAST_INFO_VAR (1024) bc_read ;
-	SNDFILE	 *file ;
-	SF_INFO	 sfinfo ;
+	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
 	int k ;
 
 	print_test_name (__func__, filename) ;
@@ -1213,8 +1213,8 @@ broadcast_coding_history_size (const char *filename)
 
 static	void
 channel_map_test (const char *filename, int filetype)
-{	SNDFILE	 *file ;
-	SF_INFO	 sfinfo ;
+{	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
 	int channel_map_read [4], channel_map_write [4] =
 	{	SF_CHANNEL_MAP_LEFT, SF_CHANNEL_MAP_RIGHT, SF_CHANNEL_MAP_LFE,
 		SF_CHANNEL_MAP_REAR_CENTER
@@ -1283,8 +1283,8 @@ raw_needs_endswap_test (const char *filename, int filetype)
 	{	SF_FORMAT_FLOAT, SF_FORMAT_DOUBLE,
 		SF_FORMAT_PCM_16, SF_FORMAT_PCM_24, SF_FORMAT_PCM_32
 		} ;
-	SNDFILE	 *file ;
-	SF_INFO	 sfinfo ;
+	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
 	unsigned k ;
 	int needs_endswap ;
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008-2010 George Blood Audio
 **
 ** All rights reserved.
@@ -87,7 +87,7 @@ main (int argc, char *argv [])
 			continue ;
 			} ;
 
-#define HANDLE_BEXT_ARG(cmd,field) \
+#define HANDLE_BEXT_ARG(cmd, field) \
 		if (strcmp (argv [k], cmd) == 0) \
 		{	k ++ ; \
 			if (k == argc) missing_param (argv [k - 1]) ; \
@@ -104,7 +104,7 @@ main (int argc, char *argv [])
 		HANDLE_BEXT_ARG ("--bext-coding-hist", coding_history) ;
 		HANDLE_BEXT_ARG ("--bext-time-ref", time_ref) ;
 
-#define HANDLE_STR_ARG(cmd,field) \
+#define HANDLE_STR_ARG(cmd, field) \
 	if (strcmp (argv [k], cmd) == 0) \
 	{	k ++ ; \
 		if (k == argc) missing_param (argv [k - 1]) ; \

@@ -835,7 +835,7 @@ static void
 sndio_play (int argc, char *argv [])
 {	struct sio_hdl	*hdl ;
 	struct sio_par	par ;
-	short	 	buffer [BUFFER_LEN] ;
+	short buffer [BUFFER_LEN] ;
 	SNDFILE	*sndfile ;
 	SF_INFO	sfinfo ;
 	int		k, readcount ;

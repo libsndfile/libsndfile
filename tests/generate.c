@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2007-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2007-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #include "utils.h"
 #include "generate.h"
 
-#define	SF_MAX(x,y)		((x) > (y) ? (x) : (y))
+#define	SF_MAX(x, y)		((x) > (y) ? (x) : (y))
 
 static float crappy_snare (float *output, int len, int offset, float gain, float maxabs) ;
 

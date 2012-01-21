@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -461,9 +461,9 @@ dump_bits (DWVW_PRIVATE *pdwvw)
 } /* dump_bits */
 #endif
 
-#define HIGHEST_BIT(x,count)		\
+#define HIGHEST_BIT(x, count)		\
 			{	int y = x ;			\
-				(count) = 0 ;	 	\
+				(count) = 0 ;		\
 				while (y)			\
 				{	(count) ++ ;	\
 					y >>= 1 ;		\

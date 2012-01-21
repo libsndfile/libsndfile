@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -95,7 +95,7 @@ ircam_open	(SF_PRIVATE *psf)
 		if (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU)
 			psf->endian = (CPU_IS_BIG_ENDIAN) ? SF_ENDIAN_BIG : SF_ENDIAN_LITTLE ;
 
-	 	psf->dataoffset = IRCAM_DATA_OFFSET ;
+		psf->dataoffset = IRCAM_DATA_OFFSET ;
 
 		if ((error = ircam_write_header (psf, SF_FALSE)))
 			return error ;
@@ -163,9 +163,10 @@ ircam_read_header	(SF_PRIVATE *psf)
 
 	psf->sf.samplerate = (int) samplerate ;
 
-	psf_log_printf (psf, "  Sample Rate : %d\n"
-						 "  Channels    : %d\n"
-						 "  Encoding    : %X => %s\n", psf->sf.samplerate, psf->sf.channels, encoding, get_encoding_str (encoding)) ;
+	psf_log_printf (psf,	"  Sample Rate : %d\n"
+							"  Channels    : %d\n"
+							"  Encoding    : %X => %s\n",
+						psf->sf.samplerate, psf->sf.channels, encoding, get_encoding_str (encoding)) ;
 
 	switch (encoding)
 	{	case IRCAM_PCM_16 :

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -776,17 +776,17 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 								((ptr) [1] << 8)	| ((ptr) [0]) )
 
 #define	GET_BE_INT(ptr)		( 	((ptr) [0] << 24)	| ((ptr) [1] << 16) |	\
-							 	((ptr) [2] << 8)	| ((ptr) [3]) )
+								((ptr) [2] << 8)	| ((ptr) [3]) )
 
 #define	GET_LE_8BYTE(ptr)	( 	(((sf_count_t) (ptr) [7]) << 56) | (((sf_count_t) (ptr) [6]) << 48) |	\
-							 	(((sf_count_t) (ptr) [5]) << 40) | (((sf_count_t) (ptr) [4]) << 32) |	\
-							 	(((sf_count_t) (ptr) [3]) << 24) | (((sf_count_t) (ptr) [2]) << 16) |	\
-							 	(((sf_count_t) (ptr) [1]) << 8 ) | ((ptr) [0]))
+								(((sf_count_t) (ptr) [5]) << 40) | (((sf_count_t) (ptr) [4]) << 32) |	\
+								(((sf_count_t) (ptr) [3]) << 24) | (((sf_count_t) (ptr) [2]) << 16) |	\
+								(((sf_count_t) (ptr) [1]) << 8 ) | ((ptr) [0]))
 
 #define	GET_BE_8BYTE(ptr)	( 	(((sf_count_t) (ptr) [0]) << 56) | (((sf_count_t) (ptr) [1]) << 48) |	\
-							 	(((sf_count_t) (ptr) [2]) << 40) | (((sf_count_t) (ptr) [3]) << 32) |	\
-							 	(((sf_count_t) (ptr) [4]) << 24) | (((sf_count_t) (ptr) [5]) << 16) |	\
-							 	(((sf_count_t) (ptr) [6]) << 8 ) | ((ptr) [7]))
+								(((sf_count_t) (ptr) [2]) << 40) | (((sf_count_t) (ptr) [3]) << 32) |	\
+								(((sf_count_t) (ptr) [4]) << 24) | (((sf_count_t) (ptr) [5]) << 16) |	\
+								(((sf_count_t) (ptr) [6]) << 8 ) | ((ptr) [7]))
 
 
 

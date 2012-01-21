@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -134,7 +134,7 @@ g72x_init (SF_PRIVATE * psf)
 		psf->read_float		= g72x_read_f ;
 		psf->read_double	= g72x_read_d ;
 
-	 	psf->seek = g72x_seek ;
+		psf->seek = g72x_seek ;
 
 		if (psf->datalength % pg72x->blocksize)
 		{	psf_log_printf (psf, "*** Odd psf->datalength (%D) should be a multiple of %d\n", psf->datalength, pg72x->blocksize) ;

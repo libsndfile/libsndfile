@@ -159,7 +159,7 @@ wav_w64_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 		} ;
 
 	if (psf->file.mode == SFM_READ)
-	{	pms->dataremaining	 = psf->datalength ;
+	{	pms->dataremaining = psf->datalength ;
 
 		if (psf->datalength % pms->blocksize)
 			pms->blocks = psf->datalength / pms->blocksize + 1 ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -222,8 +222,8 @@ generate_duration_str (SF_INFO *sfinfo)
 static void
 info_dump (const char *filename)
 {	static	char	strbuffer [BUFFER_LEN] ;
-	SNDFILE	 	*file ;
-	SF_INFO	 	sfinfo ;
+	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
 	double		signal_max, decibels ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
@@ -287,8 +287,8 @@ str_of_type (int mode)
 
 static int
 instrument_dump (const char *filename)
-{	SNDFILE	 *file ;
-	SF_INFO	 sfinfo ;
+{	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
 	SF_INSTRUMENT inst ;
 	int got_inst, k ;
 
@@ -326,8 +326,8 @@ instrument_dump (const char *filename)
 
 static int
 broadcast_dump (const char *filename)
-{	SNDFILE	 *file ;
-	SF_INFO	 sfinfo ;
+{	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
 	SF_BROADCAST_INFO_2K bext ;
 	double time_ref_sec ;
 	int got_bext ;
@@ -382,8 +382,8 @@ broadcast_dump (const char *filename)
 
 static int
 chanmap_dump (const char *filename)
-{	SNDFILE	 *file ;
-	SF_INFO	 sfinfo ;
+{	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
 	int * channel_map ;
 	int got_chanmap, k ;
 

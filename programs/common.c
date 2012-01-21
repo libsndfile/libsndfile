@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008 George Blood Audio
 **
 ** All rights reserved.
@@ -41,9 +41,9 @@
 
 #include "common.h"
 
-#define	 BUFFER_LEN	4096
+#define	BUFFER_LEN	4096
 
-#define	MIN(x,y)	((x) < (y) ? (x) : (y))
+#define	MIN(x, y)	((x) < (y) ? (x) : (y))
 
 void
 sfe_copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels)

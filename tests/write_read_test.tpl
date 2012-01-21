@@ -405,12 +405,12 @@ main (int argc, char **argv)
 
 static void	create_short_file (const char *filename) ;
 
-#define	CHAR_ERROR(x,y)		(abs ((x) - (y)) > 255)
-#define	INT_ERROR(x,y)		(((x) - (y)) != 0)
-#define	TRIBYTE_ERROR(x,y)	(abs ((x) - (y)) > 255)
-#define	FLOAT_ERROR(x,y)	(fabs ((x) - (y)) > 1e-5)
+#define	CHAR_ERROR(x, y)		(abs ((x) - (y)) > 255)
+#define	INT_ERROR(x, y)			(((x) - (y)) != 0)
+#define	TRIBYTE_ERROR(x, y)		(abs ((x) - (y)) > 255)
+#define	FLOAT_ERROR(x, y)		(fabs ((x) - (y)) > 1e-5)
 
-#define CONVERT_DATA(k,len,new,orig)					\
+#define CONVERT_DATA(k, len, new, orig)					\
 			{	for ((k) = 0 ; (k) < (len) ; (k) ++)	\
 					(new) [k] = (orig) [k] ;			\
 				}

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -51,8 +51,8 @@ txw_open	(SF_PRIVATE *psf)
 
 #define TXW_DATA_OFFSET		32
 
-#define	TXW_LOOPED		 	0x49
-#define	TXW_NO_LOOP		 	0xC9
+#define	TXW_LOOPED			0x49
+#define	TXW_NO_LOOP			0xC9
 
 /*------------------------------------------------------------------------------
 ** Private static functions.

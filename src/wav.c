@@ -35,62 +35,62 @@
  * Macros to handle big/little endian issues.
  */
 
-#define RIFF_MARKER	 (MAKE_MARKER ('R', 'I', 'F', 'F'))
-#define RIFX_MARKER	 (MAKE_MARKER ('R', 'I', 'F', 'X'))
-#define WAVE_MARKER	 (MAKE_MARKER ('W', 'A', 'V', 'E'))
-#define fmt_MARKER	 (MAKE_MARKER ('f', 'm', 't', ' '))
-#define data_MARKER	 (MAKE_MARKER ('d', 'a', 't', 'a'))
-#define fact_MARKER	 (MAKE_MARKER ('f', 'a', 'c', 't'))
-#define PEAK_MARKER	 (MAKE_MARKER ('P', 'E', 'A', 'K'))
+#define RIFF_MARKER		(MAKE_MARKER ('R', 'I', 'F', 'F'))
+#define RIFX_MARKER		(MAKE_MARKER ('R', 'I', 'F', 'X'))
+#define WAVE_MARKER		(MAKE_MARKER ('W', 'A', 'V', 'E'))
+#define fmt_MARKER		(MAKE_MARKER ('f', 'm', 't', ' '))
+#define data_MARKER		(MAKE_MARKER ('d', 'a', 't', 'a'))
+#define fact_MARKER		(MAKE_MARKER ('f', 'a', 'c', 't'))
+#define PEAK_MARKER		(MAKE_MARKER ('P', 'E', 'A', 'K'))
 
-#define cue_MARKER	 (MAKE_MARKER ('c', 'u', 'e', ' '))
-#define LIST_MARKER	 (MAKE_MARKER ('L', 'I', 'S', 'T'))
-#define slnt_MARKER	 (MAKE_MARKER ('s', 'l', 'n', 't'))
-#define wavl_MARKER	 (MAKE_MARKER ('w', 'a', 'v', 'l'))
-#define INFO_MARKER	 (MAKE_MARKER ('I', 'N', 'F', 'O'))
-#define plst_MARKER	 (MAKE_MARKER ('p', 'l', 's', 't'))
-#define adtl_MARKER	 (MAKE_MARKER ('a', 'd', 't', 'l'))
-#define labl_MARKER	 (MAKE_MARKER ('l', 'a', 'b', 'l'))
-#define ltxt_MARKER	 (MAKE_MARKER ('l', 't', 'x', 't'))
-#define note_MARKER	 (MAKE_MARKER ('n', 'o', 't', 'e'))
-#define smpl_MARKER	 (MAKE_MARKER ('s', 'm', 'p', 'l'))
-#define bext_MARKER	 (MAKE_MARKER ('b', 'e', 'x', 't'))
-#define iXML_MARKER	 (MAKE_MARKER ('i', 'X', 'M', 'L'))
-#define levl_MARKER	 (MAKE_MARKER ('l', 'e', 'v', 'l'))
-#define MEXT_MARKER	 (MAKE_MARKER ('M', 'E', 'X', 'T'))
-#define DISP_MARKER	 (MAKE_MARKER ('D', 'I', 'S', 'P'))
-#define acid_MARKER	 (MAKE_MARKER ('a', 'c', 'i', 'd'))
-#define strc_MARKER	 (MAKE_MARKER ('s', 't', 'r', 'c'))
-#define PAD_MARKER	 (MAKE_MARKER ('P', 'A', 'D', ' '))
-#define afsp_MARKER	 (MAKE_MARKER ('a', 'f', 's', 'p'))
-#define clm_MARKER	 (MAKE_MARKER ('c', 'l', 'm', ' '))
-#define elmo_MARKER	 (MAKE_MARKER ('e', 'l', 'm', 'o'))
-#define cart_MARKER	 (MAKE_MARKER ('c', 'a', 'r', 't'))
-#define FLLR_MARKER	 (MAKE_MARKER ('F', 'L', 'L', 'R'))
+#define cue_MARKER		(MAKE_MARKER ('c', 'u', 'e', ' '))
+#define LIST_MARKER		(MAKE_MARKER ('L', 'I', 'S', 'T'))
+#define slnt_MARKER		(MAKE_MARKER ('s', 'l', 'n', 't'))
+#define wavl_MARKER		(MAKE_MARKER ('w', 'a', 'v', 'l'))
+#define INFO_MARKER		(MAKE_MARKER ('I', 'N', 'F', 'O'))
+#define plst_MARKER		(MAKE_MARKER ('p', 'l', 's', 't'))
+#define adtl_MARKER		(MAKE_MARKER ('a', 'd', 't', 'l'))
+#define labl_MARKER		(MAKE_MARKER ('l', 'a', 'b', 'l'))
+#define ltxt_MARKER		(MAKE_MARKER ('l', 't', 'x', 't'))
+#define note_MARKER		(MAKE_MARKER ('n', 'o', 't', 'e'))
+#define smpl_MARKER		(MAKE_MARKER ('s', 'm', 'p', 'l'))
+#define bext_MARKER		(MAKE_MARKER ('b', 'e', 'x', 't'))
+#define iXML_MARKER		(MAKE_MARKER ('i', 'X', 'M', 'L'))
+#define levl_MARKER		(MAKE_MARKER ('l', 'e', 'v', 'l'))
+#define MEXT_MARKER		(MAKE_MARKER ('M', 'E', 'X', 'T'))
+#define DISP_MARKER		(MAKE_MARKER ('D', 'I', 'S', 'P'))
+#define acid_MARKER		(MAKE_MARKER ('a', 'c', 'i', 'd'))
+#define strc_MARKER		(MAKE_MARKER ('s', 't', 'r', 'c'))
+#define PAD_MARKER		(MAKE_MARKER ('P', 'A', 'D', ' '))
+#define afsp_MARKER		(MAKE_MARKER ('a', 'f', 's', 'p'))
+#define clm_MARKER		(MAKE_MARKER ('c', 'l', 'm', ' '))
+#define elmo_MARKER		(MAKE_MARKER ('e', 'l', 'm', 'o'))
+#define cart_MARKER		(MAKE_MARKER ('c', 'a', 'r', 't'))
+#define FLLR_MARKER		(MAKE_MARKER ('F', 'L', 'L', 'R'))
 
-#define exif_MARKER	 (MAKE_MARKER ('e', 'x', 'i', 'f'))
-#define ever_MARKER	 (MAKE_MARKER ('e', 'v', 'e', 'r'))
-#define etim_MARKER	 (MAKE_MARKER ('e', 't', 'i', 'm'))
-#define ecor_MARKER	 (MAKE_MARKER ('e', 'c', 'o', 'r'))
-#define emdl_MARKER	 (MAKE_MARKER ('e', 'm', 'd', 'l'))
-#define emnt_MARKER	 (MAKE_MARKER ('e', 'm', 'n', 't'))
-#define erel_MARKER	 (MAKE_MARKER ('e', 'r', 'e', 'l'))
-#define eucm_MARKER	 (MAKE_MARKER ('e', 'u', 'c', 'm'))
-#define olym_MARKER	 (MAKE_MARKER ('o', 'l', 'y', 'm'))
+#define exif_MARKER		(MAKE_MARKER ('e', 'x', 'i', 'f'))
+#define ever_MARKER		(MAKE_MARKER ('e', 'v', 'e', 'r'))
+#define etim_MARKER		(MAKE_MARKER ('e', 't', 'i', 'm'))
+#define ecor_MARKER		(MAKE_MARKER ('e', 'c', 'o', 'r'))
+#define emdl_MARKER		(MAKE_MARKER ('e', 'm', 'd', 'l'))
+#define emnt_MARKER		(MAKE_MARKER ('e', 'm', 'n', 't'))
+#define erel_MARKER		(MAKE_MARKER ('e', 'r', 'e', 'l'))
+#define eucm_MARKER		(MAKE_MARKER ('e', 'u', 'c', 'm'))
+#define olym_MARKER		(MAKE_MARKER ('o', 'l', 'y', 'm'))
 
-#define ISFT_MARKER	 (MAKE_MARKER ('I', 'S', 'F', 'T'))
-#define ICRD_MARKER	 (MAKE_MARKER ('I', 'C', 'R', 'D'))
-#define ICOP_MARKER	 (MAKE_MARKER ('I', 'C', 'O', 'P'))
-#define IARL_MARKER	 (MAKE_MARKER ('I', 'A', 'R', 'L'))
-#define IART_MARKER	 (MAKE_MARKER ('I', 'A', 'R', 'T'))
-#define INAM_MARKER	 (MAKE_MARKER ('I', 'N', 'A', 'M'))
-#define IENG_MARKER	 (MAKE_MARKER ('I', 'E', 'N', 'G'))
-#define IGNR_MARKER	 (MAKE_MARKER ('I', 'G', 'N', 'R'))
-#define ICOP_MARKER	 (MAKE_MARKER ('I', 'C', 'O', 'P'))
-#define IPRD_MARKER	 (MAKE_MARKER ('I', 'P', 'R', 'D'))
-#define ISRC_MARKER	 (MAKE_MARKER ('I', 'S', 'R', 'C'))
-#define ISBJ_MARKER	 (MAKE_MARKER ('I', 'S', 'B', 'J'))
-#define ICMT_MARKER	 (MAKE_MARKER ('I', 'C', 'M', 'T'))
+#define ISFT_MARKER		(MAKE_MARKER ('I', 'S', 'F', 'T'))
+#define ICRD_MARKER		(MAKE_MARKER ('I', 'C', 'R', 'D'))
+#define ICOP_MARKER		(MAKE_MARKER ('I', 'C', 'O', 'P'))
+#define IARL_MARKER		(MAKE_MARKER ('I', 'A', 'R', 'L'))
+#define IART_MARKER		(MAKE_MARKER ('I', 'A', 'R', 'T'))
+#define INAM_MARKER		(MAKE_MARKER ('I', 'N', 'A', 'M'))
+#define IENG_MARKER		(MAKE_MARKER ('I', 'E', 'N', 'G'))
+#define IGNR_MARKER		(MAKE_MARKER ('I', 'G', 'N', 'R'))
+#define ICOP_MARKER		(MAKE_MARKER ('I', 'C', 'O', 'P'))
+#define IPRD_MARKER		(MAKE_MARKER ('I', 'P', 'R', 'D'))
+#define ISRC_MARKER		(MAKE_MARKER ('I', 'S', 'R', 'C'))
+#define ISBJ_MARKER		(MAKE_MARKER ('I', 'S', 'B', 'J'))
+#define ICMT_MARKER		(MAKE_MARKER ('I', 'C', 'M', 'T'))
 
 /* Weird WAVPACK marker which can show up at the start of the DATA section. */
 #define wvpk_MARKER (MAKE_MARKER ('w', 'v', 'p', 'k'))
@@ -158,16 +158,16 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_PVOCEX =
 ** Private static functions.
 */
 
-static int	wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock) ;
-static int	wav_write_header (SF_PRIVATE *psf, int calc_length) ;
+static int	wav_read_header		(SF_PRIVATE *psf, int *blockalign, int *framesperblock) ;
+static int	wav_write_header	(SF_PRIVATE *psf, int calc_length) ;
 
 static int	wav_write_tailer (SF_PRIVATE *psf) ;
 static void wav_write_strings (SF_PRIVATE *psf, int location) ;
 static int	wav_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 static int	wav_close (SF_PRIVATE *psf) ;
 
-static int 	wav_subchunk_parse	 (SF_PRIVATE *psf, int chunk, unsigned length) ;
-static int 	exif_subchunk_parse	 (SF_PRIVATE *psf, unsigned int length) ;
+static int 	wav_subchunk_parse	(SF_PRIVATE *psf, int chunk, unsigned length) ;
+static int 	exif_subchunk_parse	(SF_PRIVATE *psf, unsigned int length) ;
 static int	wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
 static int	wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
 
@@ -180,7 +180,7 @@ static int wav_get_chunk_data (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info) ;
 */
 
 int
-wav_open	 (SF_PRIVATE *psf)
+wav_open	(SF_PRIVATE *psf)
 {	WAV_PRIVATE * wpriv ;
 	int	format, subformat, error, blockalign = 0, framesperblock = 0 ;
 
@@ -304,7 +304,7 @@ wav_open	 (SF_PRIVATE *psf)
 */
 
 static int
-wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
+wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 {	WAV_PRIVATE	*wpriv ;
 	WAV_FMT		*wav_fmt ;
 	FACT_CHUNK	fact_chunk ;
@@ -525,10 +525,10 @@ wav_read_header	 (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						while (cue_count)
 						{	bytesread += psf_binheader_readf (psf, "444444", &id, &position,
 									&chunk_id, &chunk_start, &block_start, &offset) ;
-							psf_log_printf (psf, "   Cue ID : %2d"
-												 "  Pos : %5u  Chunk : %M"
-												 "  Chk Start : %d  Blk Start : %d"
-												 "  Offset : %5d\n",
+							psf_log_printf (psf,	"   Cue ID : %2d"
+													"  Pos : %5u  Chunk : %M"
+													"  Chk Start : %d  Blk Start : %d"
+													"  Offset : %5d\n",
 									id, position, chunk_id, chunk_start, block_start, offset) ;
 							cue_count -- ;
 							} ;
@@ -1474,7 +1474,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	bytesread += psf_binheader_readf (psf, "4", &dword) ;
 	if (dword != 0)
 	{	snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "%f",
-				 (1.0 * 0x80000000) / ((unsigned int) dword)) ;
+					(1.0 * 0x80000000) / ((unsigned int) dword)) ;
 		psf_log_printf (psf, "  Pitch Fract. : %s\n", psf->u.cbuf) ;
 		}
 	else
@@ -1485,7 +1485,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 
 	bytesread += psf_binheader_readf (psf, "4", &dword) ;
 	snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "%02d:%02d:%02d %02d",
-		 (dword >> 24) & 0x7F, (dword >> 16) & 0x7F, (dword >> 8) & 0x7F, dword & 0x7F) ;
+				(dword >> 24) & 0x7F, (dword >> 16) & 0x7F, (dword >> 8) & 0x7F, dword & 0x7F) ;
 	psf_log_printf (psf, "  SMPTE Offset : %s\n", psf->u.cbuf) ;
 
 	bytesread += psf_binheader_readf (psf, "4", &loop_count) ;

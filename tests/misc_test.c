@@ -65,7 +65,7 @@ main (int argc, char *argv [])
 		exit (1) ;
 		} ;
 
-	do_all =! strcmp (argv [1], "all") ;
+	do_all = ! strcmp (argv [1], "all") ;
 
 	if (do_all || ! strcmp (argv [1], "wav"))
 	{	zero_data_test ("zerolen.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -61,9 +61,9 @@ typedef __int64 int64_t ;
 */
 
 #if (CPU_IS_LITTLE_ENDIAN == 1)
-	#define	MAKE_MARKER(a,b,c,d)	((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
+	#define	MAKE_MARKER(a, b, c, d)		((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
 #elif (CPU_IS_BIG_ENDIAN == 1)
-	#define	MAKE_MARKER(a,b,c,d)	(((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
+	#define	MAKE_MARKER(a, b, c, d)		(((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
 #else
 	#error "Target CPU endian-ness unknown. May need to hand edit src/sfconfig.h"
 #endif

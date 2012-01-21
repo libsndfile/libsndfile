@@ -165,8 +165,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_AU_EMBED_BAD_LEN	, "Embedded AU file with unknown length." },
 
 	{	SFE_RAW_READ_BAD_SPEC	, "Error while opening RAW file for read. Must specify format and channels.\n"
-									"Possibly trying to open unsupported format."
-									 },
+									"Possibly trying to open unsupported format." },
 	{	SFE_RAW_BAD_BITWIDTH	, "Error. RAW file bitwidth must be a multiple of 8." },
 	{	SFE_RAW_BAD_FORMAT		, "Error. Bad format field in SF_INFO struct when openning a RAW file for read." },
 
@@ -288,7 +287,7 @@ static char	sf_syserr [SF_SYSERR_LEN] = { 0 } ;
 /*------------------------------------------------------------------------------
 */
 
-#define	VALIDATE_SNDFILE_AND_ASSIGN_PSF(a,b,c)		\
+#define	VALIDATE_SNDFILE_AND_ASSIGN_PSF(a, b, c)	\
 		{	if ((a) == NULL)						\
 			{	sf_errno = SFE_BAD_SNDFILE_PTR ;	\
 				return 0 ;							\

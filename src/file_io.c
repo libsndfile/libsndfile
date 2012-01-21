@@ -980,7 +980,7 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 /* USE_WINDOWS_API */ sf_count_t
 psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 {	sf_count_t total = 0 ;
-	ssize_t	 count ;
+	ssize_t	count ;
 	DWORD dwNumberOfBytesWritten ;
 
 	if (psf->virtual_io)
@@ -1276,7 +1276,7 @@ psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence)
 /* Win32 */ sf_count_t
 psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 {	sf_count_t total = 0 ;
-	ssize_t	 count ;
+	ssize_t	count ;
 
 	if (psf->virtual_io)
 		return psf->vio.read (ptr, bytes*items, psf->vio_user_data) / bytes ;
@@ -1314,7 +1314,7 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 /* Win32 */ sf_count_t
 psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 {	sf_count_t total = 0 ;
-	ssize_t	 count ;
+	ssize_t	count ;
 
 	if (psf->virtual_io)
 		return psf->vio.write (ptr, bytes*items, psf->vio_user_data) / bytes ;

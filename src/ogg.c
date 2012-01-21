@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2007 John ffitch
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -106,7 +106,7 @@ ogg_close (SF_PRIVATE *psf)
 static int
 ogg_stream_classify (SF_PRIVATE *psf, OGG_PRIVATE* odata)
 {	char *buffer ;
-	int	 bytes, nn ;
+	int	bytes, nn ;
 
 	/* Call this here so it only gets called once, so no memory is leaked. */
 	ogg_sync_init (&odata->osync) ;

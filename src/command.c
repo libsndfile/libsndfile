@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -115,10 +115,10 @@ static SF_FORMAT_INFO const major_formats [] =
 {
 	{	SF_FORMAT_AIFF,		"AIFF (Apple/SGI)",						"aiff" 	},
 	{	SF_FORMAT_AU,		"AU (Sun/NeXT)", 						"au"	},
-	{	SF_FORMAT_AVR,		"AVR (Audio Visual Research)",	 		"avr"	},
-	{	SF_FORMAT_CAF,		"CAF (Apple Core Audio File)",	 		"caf"	},
+	{	SF_FORMAT_AVR,		"AVR (Audio Visual Research)",			"avr"	},
+	{	SF_FORMAT_CAF,		"CAF (Apple Core Audio File)",			"caf"	},
 #if HAVE_EXTERNAL_LIBS
-	{	SF_FORMAT_FLAC,		"FLAC (FLAC Lossless Audio Codec)",	 	"flac"	},
+	{	SF_FORMAT_FLAC,		"FLAC (FLAC Lossless Audio Codec)",		"flac"	},
 #endif
 	{	SF_FORMAT_HTK,		"HTK (HMM Tool Kit)",					"htk"	},
 	{	SF_FORMAT_SVX,		"IFF (Amiga IFF/SVX8/SV16)",			"iff"	},
@@ -126,11 +126,11 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_MAT5,		"MAT5 (GNU Octave 2.1 / Matlab 5.0)",	"mat"	},
 	{	SF_FORMAT_MPC2K,	"MPC (Akai MPC 2k)",					"mpc"	},
 #if HAVE_EXTERNAL_LIBS
-	{	SF_FORMAT_OGG,		"OGG (OGG Container format)",		 	"oga"	},
+	{	SF_FORMAT_OGG,		"OGG (OGG Container format)",			"oga"	},
 #endif
 	{	SF_FORMAT_PAF,		"PAF (Ensoniq PARIS)", 					"paf"	},
 	{	SF_FORMAT_PVF,		"PVF (Portable Voice Format)",			"pvf"	},
-	{	SF_FORMAT_RAW,		"RAW (header-less)",				 	"raw"	},
+	{	SF_FORMAT_RAW,		"RAW (header-less)",					"raw"	},
 	{	SF_FORMAT_RF64,		"RF64 (RIFF 64)",						"rf64"	},
 	{	SF_FORMAT_SD2,		"SD2 (Sound Designer II)", 				"sd2"	},
 	{	SF_FORMAT_SDS,		"SDS (Midi Sample Dump Standard)", 		"sds"	},
@@ -138,7 +138,7 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_VOC,		"VOC (Creative Labs)",					"voc"	},
 	{	SF_FORMAT_W64,		"W64 (SoundFoundry WAVE 64)",			"w64"	},
 	{	SF_FORMAT_WAV,		"WAV (Microsoft)",						"wav"	},
-	{	SF_FORMAT_NIST,		"WAV (NIST Sphere)",	 				"wav"	},
+	{	SF_FORMAT_NIST,		"WAV (NIST Sphere)",					"wav"	},
 	{	SF_FORMAT_WAVEX,	"WAVEX (Microsoft)",					"wav"	},
 	{	SF_FORMAT_WVE,		"WVE (Psion Series 3)",					"wve"	},
 	{	SF_FORMAT_XI,		"XI (FastTracker 2)",					"xi"	},

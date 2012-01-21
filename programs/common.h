@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -32,7 +32,7 @@
 
 
 #define	ARRAY_LEN(x)	((int) (sizeof (x) / sizeof (x [0])))
-#define	MAX(a,b)		((a) > (b) ? (a) : (b))
+#define	MAX(a, b)		((a) > (b) ? (a) : (b))
 
 typedef struct
 {	const char * title ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -91,8 +91,8 @@ usage_exit (const char *progname)
 int
 main (int argc, char * argv [])
 {	const char	*progname, *infilename, *outfilename ;
-	SNDFILE	 	*infile = NULL, *outfile = NULL ;
-	SF_INFO	 	sfinfo ;
+	SNDFILE		*infile = NULL, *outfile = NULL ;
+	SF_INFO		sfinfo ;
 	int			k, outfilemajor, outfileminor = 0, infileminor ;
 	int			override_sample_rate = 0 ; /* assume no sample rate override. */
 
