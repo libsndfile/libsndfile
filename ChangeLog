@@ -1,3 +1,8 @@
+2012-01-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Fix typo, FLAC_CLFAGS -> FLAC_CFLAGS. Thanks to Jeremy Friesner.
+
 2012-01-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c src/ogg.c

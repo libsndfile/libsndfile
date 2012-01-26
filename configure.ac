@@ -1,4 +1,4 @@
-# Copyright (C) 1999-2011 Erik de Castro Lopo (erikd AT mega-nerd DOT com).
+# Copyright (C) 1999-2012  Erik de Castro Lopo <erikd@mega-nerd.com>.
 
 dnl Require autoconf version
 AC_PREREQ(2.57)
@@ -308,7 +308,7 @@ if test -n "$PKG_CONFIG" ; then
 		PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
 
 		# Make sure the FLAC_CFLAGS value is sane.
-		FLAC_CFLAGS=`echo $FLAC_CLFAGS | $SED "s/FLAC$//"`
+		FLAC_CFLAGS=`echo $FLAC_CFLAGS | $SED "s/FLAC$//"`
 
 		PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
