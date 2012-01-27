@@ -2616,7 +2616,7 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 			memset (sfinfo, 0, sizeof (SF_INFO)) ;
 		} ;
 
-	memcpy (&(psf->sf), sfinfo, sizeof (SF_INFO)) ;
+	memcpy (&psf->sf, sfinfo, sizeof (SF_INFO)) ;
 
 	psf->Magick 		= SNDFILE_MAGICK ;
 	psf->norm_float 	= SF_TRUE ;
@@ -2691,7 +2691,7 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 			goto error_exit ;
 			} ;
 
-		if (sf_format_check (&(psf->sf)) == 0)
+		if (sf_format_check (&psf->sf) == 0)
 		{	error = SFE_BAD_OPEN_FORMAT ;
 			goto error_exit ;
 			} ;
@@ -2881,12 +2881,12 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 	if (psf->fileoffset > 0)
 		psf_log_printf (psf, "Embedded file length : %D\n", psf->filelength) ;
 
-	if (psf->file.mode == SFM_RDWR && sf_format_check (&(psf->sf)) == 0)
+	if (psf->file.mode == SFM_RDWR && sf_format_check (&psf->sf) == 0)
 	{	error = SFE_BAD_MODE_RW ;
 		goto error_exit ;
 		} ;
 
-	if (validate_sfinfo (&(psf->sf)) == 0)
+	if (validate_sfinfo (&psf->sf) == 0)
 	{	psf_log_SF_INFO (psf) ;
 		save_header_info (psf) ;
 		error = SFE_BAD_SF_INFO ;
@@ -2906,9 +2906,7 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 		psf->have_written = psf->sf.frames > 0 ? SF_TRUE : SF_FALSE ;
 		} ;
 
-	memcpy (sfinfo, &(psf->sf), sizeof (SF_INFO)) ;
-
-	memcpy (sfinfo, &(psf->sf), sizeof (SF_INFO)) ;
+	memcpy (sfinfo, &psf->sf, sizeof (SF_INFO)) ;
 
 	return (SNDFILE *) psf ;
 
