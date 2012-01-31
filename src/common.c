@@ -40,9 +40,9 @@
 
 static inline void
 log_putchar (SF_PRIVATE *psf, char ch)
-{	if (psf->logindex < SIGNED_SIZEOF (psf->parselog) - 1)
-	{	psf->parselog [psf->logindex++] = ch ;
-		psf->parselog [psf->logindex] = 0 ;
+{	if (psf->parselog.indx < SIGNED_SIZEOF (psf->parselog.buf) - 1)
+	{	psf->parselog.buf [psf->parselog.indx++] = ch ;
+		psf->parselog.buf [psf->parselog.indx] = 0 ;
 		} ;
 	return ;
 } /* log_putchar */

@@ -344,10 +344,14 @@ typedef struct sf_private_tag
 
 	char			syserr		[SF_SYSERR_LEN] ;
 
-	/* parselog and logindex should only be changed within the logging functions
+	/* parselog and indx should only be changed within the logging functions
 	** of common.c
 	*/
-	char			parselog	[SF_PARSELOG_LEN] ;
+	struct
+	{	char			buf	[SF_PARSELOG_LEN] ;
+		int				indx ;
+	} parselog ;
+
 	unsigned char	header		[SF_HEADER_LEN] ; /* Must be unsigned */
 	int				rwf_endian ;	/* Header endian-ness flag. */
 
@@ -365,7 +369,6 @@ typedef struct sf_private_tag
 	unsigned		unique_id ;
 
 	/* Index variables for maintaining parselog and header above. */
-	int				logindex ;
 	int				headindex, headend ;
 	int				has_text ;
 

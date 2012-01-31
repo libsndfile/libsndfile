@@ -1006,7 +1006,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 		case SFC_GET_LOG_INFO :
 			if (data == NULL)
 				return SFE_BAD_COMMAND_PARAM ;
-			snprintf (data, datasize, "%s", psf->parselog) ;
+			snprintf (data, datasize, "%s", psf->parselog.buf) ;
 			break ;
 
 		case SFC_CALC_SIGNAL_MAX :
@@ -2508,7 +2508,7 @@ validate_psf (SF_PRIVATE *psf)
 
 static void
 save_header_info (SF_PRIVATE *psf)
-{	snprintf (sf_parselog, sizeof (sf_parselog), "%s", psf->parselog) ;
+{	snprintf (sf_parselog, sizeof (sf_parselog), "%s", psf->parselog.buf) ;
 } /* save_header_info */
 
 static void
@@ -2915,7 +2915,7 @@ error_exit :
 
 	if (error == SFE_SYSTEM)
 		snprintf (sf_syserr, sizeof (sf_syserr), "%s", psf->syserr) ;
-	snprintf (sf_parselog, sizeof (sf_parselog), "%s", psf->parselog) ;
+	snprintf (sf_parselog, sizeof (sf_parselog), "%s", psf->parselog.buf) ;
 
 	switch (error)
 	{	case SF_ERR_SYSTEM :

@@ -29,38 +29,38 @@
 #include "test_main.h"
 
 #define	CMP_0_ARGS(line, err, fmt)	\
-	{	psf->logindex = 0 ;			\
+	{	psf->parselog.indx = 0 ;			\
 		snprintf (buffer, sizeof (buffer), (fmt)) ;	\
 		psf_log_printf (psf, (fmt)) ;				\
-		err += compare_strings_or_die (line, fmt, buffer, psf->parselog) ;	\
+		err += compare_strings_or_die (line, fmt, buffer, psf->parselog.buf) ;	\
 		}
 
 #define	CMP_2_ARGS(line, err, fmt, a)	\
-	{	psf->logindex = 0 ;				\
+	{	psf->parselog.indx = 0 ;				\
 		snprintf (buffer, sizeof (buffer), (fmt), (a), (a)) ;	\
 		psf_log_printf (psf, (fmt), (a), (a)) ;					\
-		err += compare_strings_or_die (line, fmt, buffer, psf->parselog) ;	\
+		err += compare_strings_or_die (line, fmt, buffer, psf->parselog.buf) ;	\
 		}
 
 #define	CMP_4_ARGS(line, err, fmt, a)	\
-	{	psf->logindex = 0 ;				\
+	{	psf->parselog.indx = 0 ;				\
 		snprintf (buffer, sizeof (buffer), (fmt), (a), (a), (a), (a)) ;	\
 		psf_log_printf (psf, (fmt), (a), (a), (a), (a)) ;				\
-		err += compare_strings_or_die (line, fmt, buffer, psf->parselog) ;	\
+		err += compare_strings_or_die (line, fmt, buffer, psf->parselog.buf) ;	\
 		}
 
 #define	CMP_5_ARGS(line, err, fmt, a)	\
-	{	psf->logindex = 0 ;				\
+	{	psf->parselog.indx = 0 ;				\
 		snprintf (buffer, sizeof (buffer), (fmt), (a), (a), (a), (a), (a)) ;	\
 		psf_log_printf (psf, (fmt), (a), (a), (a), (a), (a)) ;					\
-		err += compare_strings_or_die (line, fmt, buffer, psf->parselog) ;		\
+		err += compare_strings_or_die (line, fmt, buffer, psf->parselog.buf) ;		\
 		}
 
 #define	CMP_6_ARGS(line, err, fmt, a)	\
-	{	psf->logindex = 0 ;				\
+	{	psf->parselog.indx = 0 ;				\
 		snprintf (buffer, sizeof (buffer), (fmt), (a), (a), (a), (a), (a), (a)) ;	\
 		psf_log_printf (psf, (fmt), (a), (a), (a), (a), (a), (a)) ;					\
-		err += compare_strings_or_die (line, fmt, buffer, psf->parselog) ;			\
+		err += compare_strings_or_die (line, fmt, buffer, psf->parselog.buf) ;			\
 		}
 
 static int

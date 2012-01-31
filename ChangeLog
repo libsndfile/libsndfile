@@ -2,6 +2,7 @@
 
     * src/common.h src*.c
     Rename logbuffer field of SF_PRIVATE to parselog and reduce its size.
+    Put the parselog buffer and the index inside a struct within SF_PRIVATE.
 
 2012-01-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
