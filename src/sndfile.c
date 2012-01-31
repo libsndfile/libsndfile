@@ -281,7 +281,7 @@ static int	try_resource_fork (SF_PRIVATE * psf) ;
 */
 
 int	sf_errno = 0 ;
-static char	sf_logbuffer [SF_BUFFER_LEN] = { 0 } ;
+static char	sf_parselog [SF_BUFFER_LEN] = { 0 } ;
 static char	sf_syserr [SF_SYSERR_LEN] = { 0 } ;
 
 /*------------------------------------------------------------------------------
@@ -372,19 +372,19 @@ sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user
 	/* Make sure we have a valid set ot virtual pointers. */
 	if (sfvirtual->get_filelen == NULL || sfvirtual->seek == NULL || sfvirtual->tell == NULL)
 	{	sf_errno = SFE_BAD_VIRTUAL_IO ;
-		snprintf (sf_logbuffer, sizeof (sf_logbuffer), "Bad vio_get_filelen / vio_seek / vio_tell in SF_VIRTUAL_IO struct.\n") ;
+		snprintf (sf_parselog, sizeof (sf_parselog), "Bad vio_get_filelen / vio_seek / vio_tell in SF_VIRTUAL_IO struct.\n") ;
 		return NULL ;
 		} ;
 
 	if ((mode == SFM_READ || mode == SFM_RDWR) && sfvirtual->read == NULL)
 	{	sf_errno = SFE_BAD_VIRTUAL_IO ;
-		snprintf (sf_logbuffer, sizeof (sf_logbuffer), "Bad vio_read in SF_VIRTUAL_IO struct.\n") ;
+		snprintf (sf_parselog, sizeof (sf_parselog), "Bad vio_read in SF_VIRTUAL_IO struct.\n") ;
 		return NULL ;
 		} ;
 
 	if ((mode == SFM_WRITE || mode == SFM_RDWR) && sfvirtual->write == NULL)
 	{	sf_errno = SFE_BAD_VIRTUAL_IO ;
-		snprintf (sf_logbuffer, sizeof (sf_logbuffer), "Bad vio_write in SF_VIRTUAL_IO struct.\n") ;
+		snprintf (sf_parselog, sizeof (sf_parselog), "Bad vio_write in SF_VIRTUAL_IO struct.\n") ;
 		return NULL ;
 		} ;
 
@@ -913,7 +913,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 	if (sndfile == NULL && command == SFC_GET_LOG_INFO)
 	{	if (data == NULL)
 			return (sf_errno = SFE_BAD_COMMAND_PARAM) ;
-		snprintf (data, datasize, "%s", sf_logbuffer) ;
+		snprintf (data, datasize, "%s", sf_parselog) ;
 		return strlen (data) ;
 		} ;
 
@@ -1006,7 +1006,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 		case SFC_GET_LOG_INFO :
 			if (data == NULL)
 				return SFE_BAD_COMMAND_PARAM ;
-			snprintf (data, datasize, "%s", psf->logbuffer) ;
+			snprintf (data, datasize, "%s", psf->parselog) ;
 			break ;
 
 		case SFC_CALC_SIGNAL_MAX :
@@ -2508,7 +2508,7 @@ validate_psf (SF_PRIVATE *psf)
 
 static void
 save_header_info (SF_PRIVATE *psf)
-{	snprintf (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
+{	snprintf (sf_parselog, sizeof (sf_parselog), "%s", psf->parselog) ;
 } /* save_header_info */
 
 static void
@@ -2583,7 +2583,7 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 {	int		error, format ;
 
 	sf_errno = error = 0 ;
-	sf_logbuffer [0] = 0 ;
+	sf_parselog [0] = 0 ;
 
 	if (psf->error)
 	{	error = psf->error ;
@@ -2915,7 +2915,7 @@ error_exit :
 
 	if (error == SFE_SYSTEM)
 		snprintf (sf_syserr, sizeof (sf_syserr), "%s", psf->syserr) ;
-	snprintf (sf_logbuffer, sizeof (sf_logbuffer), "%s", psf->logbuffer) ;
+	snprintf (sf_parselog, sizeof (sf_parselog), "%s", psf->parselog) ;
 
 	switch (error)
 	{	case SF_ERR_SYSTEM :

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -253,7 +253,7 @@ rx2_open	(SF_PRIVATE *psf)
 			break ;
 		} ;
 
-	puts (psf->logbuffer) ;
+	puts (psf->parselog) ;
 	puts ("-----------------------------------") ;
 
 	printf ("SDAT length  : %d\n", sdat_length) ;
@@ -270,7 +270,7 @@ rx2_open	(SF_PRIVATE *psf)
 
 	puts (" ") ;
 
-	psf->logbuffer [0] = 0 ;
+	psf->parselog [0] = 0 ;
 
 	/* OK, have the header although not too sure what it all means. */
 

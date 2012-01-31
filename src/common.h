@@ -76,6 +76,7 @@
 #define SF_MAX_STRINGS			(32)
 #define SF_STR_BUFFER_LEN		(8192)
 #define	SF_HEADER_LEN			(4100 + SF_STR_BUFFER_LEN)
+#define	SF_PARSELOG_LEN			(2048)
 
 #define	PSF_SEEK_ERROR			((sf_count_t) -1)
 
@@ -343,10 +344,10 @@ typedef struct sf_private_tag
 
 	char			syserr		[SF_SYSERR_LEN] ;
 
-	/* logbuffer and logindex should only be changed within the logging functions
+	/* parselog and logindex should only be changed within the logging functions
 	** of common.c
 	*/
-	char			logbuffer	[SF_BUFFER_LEN] ;
+	char			parselog	[SF_PARSELOG_LEN] ;
 	unsigned char	header		[SF_HEADER_LEN] ; /* Must be unsigned */
 	int				rwf_endian ;	/* Header endian-ness flag. */
 
@@ -363,7 +364,7 @@ typedef struct sf_private_tag
 
 	unsigned		unique_id ;
 
-	/* Index variables for maintaining logbuffer and header above. */
+	/* Index variables for maintaining parselog and header above. */
 	int				logindex ;
 	int				headindex, headend ;
 	int				has_text ;

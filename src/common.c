@@ -30,19 +30,19 @@
 #include	"common.h"
 
 /*-----------------------------------------------------------------------------------------------
-** psf_log_printf allows libsndfile internal functions to print to an internal logbuffer which
+** psf_log_printf allows libsndfile internal functions to print to an internal parselog which
 ** can later be displayed.
 ** The format specifiers are as for printf but without the field width and other modifiers.
-** Printing is performed to the logbuffer char array of the SF_PRIVATE struct.
+** Printing is performed to the parselog char array of the SF_PRIVATE struct.
 ** Printing is done in such a way as to guarantee that the log never overflows the end of the
-** logbuffer array.
+** parselog array.
 */
 
 static inline void
 log_putchar (SF_PRIVATE *psf, char ch)
-{	if (psf->logindex < SIGNED_SIZEOF (psf->logbuffer) - 1)
-	{	psf->logbuffer [psf->logindex++] = ch ;
-		psf->logbuffer [psf->logindex] = 0 ;
+{	if (psf->logindex < SIGNED_SIZEOF (psf->parselog) - 1)
+	{	psf->parselog [psf->logindex++] = ch ;
+		psf->parselog [psf->logindex] = 0 ;
 		} ;
 	return ;
 } /* log_putchar */
