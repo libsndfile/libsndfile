@@ -70,7 +70,7 @@
 #	define WARN_UNUSED
 #endif
 
-#define	SF_BUFFER_LEN			(8192*2)
+#define	SF_BUFFER_LEN			(8192)
 #define	SF_FILENAME_LEN			(512)
 #define SF_SYSERR_LEN			(256)
 #define SF_MAX_STRINGS			(32)
@@ -314,6 +314,24 @@ typedef struct
 } PSF_FILE ;
 
 
+
+typedef union
+{	double			dbuf	[SF_BUFFER_LEN / sizeof (double)] ;
+#if (defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
+	int64_t			lbuf	[SF_BUFFER_LEN / sizeof (int64_t)] ;
+#else
+	long			lbuf	[SF_BUFFER_LEN / sizeof (double)] ;
+#endif
+	float			fbuf	[SF_BUFFER_LEN / sizeof (float)] ;
+	int				ibuf	[SF_BUFFER_LEN / sizeof (int)] ;
+	short			sbuf	[SF_BUFFER_LEN / sizeof (short)] ;
+	char			cbuf	[SF_BUFFER_LEN / sizeof (char)] ;
+	signed char		scbuf	[SF_BUFFER_LEN / sizeof (signed char)] ;
+	unsigned char	ucbuf	[SF_BUFFER_LEN / sizeof (signed char)] ;
+} BUF_UNION ;
+
+
+
 typedef struct sf_private_tag
 {
 	/* Canary in a coal mine. */
@@ -323,22 +341,7 @@ typedef struct sf_private_tag
 		char c [16] ;
 		} canary ;
 
-	/* Force the compiler to double align the start of buffer. */
-	union
-	{	double			dbuf	[SF_BUFFER_LEN / sizeof (double)] ;
-#if (defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
-		int64_t			lbuf	[SF_BUFFER_LEN / sizeof (int64_t)] ;
-#else
-		long			lbuf	[SF_BUFFER_LEN / sizeof (double)] ;
-#endif
-		float			fbuf	[SF_BUFFER_LEN / sizeof (float)] ;
-		int				ibuf	[SF_BUFFER_LEN / sizeof (int)] ;
-		short			sbuf	[SF_BUFFER_LEN / sizeof (short)] ;
-		char			cbuf	[SF_BUFFER_LEN / sizeof (char)] ;
-		signed char		scbuf	[SF_BUFFER_LEN / sizeof (signed char)] ;
-		unsigned char	ucbuf	[SF_BUFFER_LEN / sizeof (signed char)] ;
-		} u ;
-
+//	BUF_UNION	u ;
 
 	PSF_FILE		file, rsrc ;
 

@@ -181,6 +181,7 @@ dwvw_seek	(SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 static sf_count_t
 dwvw_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 {	DWVW_PRIVATE *pdwvw ;
+	BUF_UNION	ubuf ;
 	int		*iptr ;
 	int		k, bufferlen, readcount = 0, count ;
 	sf_count_t	total = 0 ;
@@ -189,8 +190,8 @@ dwvw_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 		return 0 ;
 	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = ubuf.ibuf ;
+	bufferlen = ARRAY_LEN (ubuf.ibuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
@@ -234,8 +235,9 @@ dwvw_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 static sf_count_t
 dwvw_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 {	DWVW_PRIVATE *pdwvw ;
-	int		*iptr ;
-	int		k, bufferlen, readcount = 0, count ;
+	BUF_UNION	ubuf ;
+	int			*iptr ;
+	int			k, bufferlen, readcount = 0, count ;
 	sf_count_t	total = 0 ;
 	float	normfact ;
 
@@ -245,8 +247,8 @@ dwvw_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x80000000) : 1.0 ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = ubuf.ibuf ;
+	bufferlen = ARRAY_LEN (ubuf.ibuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
@@ -265,8 +267,9 @@ dwvw_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 static sf_count_t
 dwvw_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 {	DWVW_PRIVATE *pdwvw ;
-	int		*iptr ;
-	int		k, bufferlen, readcount = 0, count ;
+	BUF_UNION	ubuf ;
+	int			*iptr ;
+	int			k, bufferlen, readcount = 0, count ;
 	sf_count_t	total = 0 ;
 	double 	normfact ;
 
@@ -276,8 +279,8 @@ dwvw_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x80000000) : 1.0 ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = ubuf.ibuf ;
+	bufferlen = ARRAY_LEN (ubuf.ibuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
@@ -548,6 +551,7 @@ dwvw_encode_data (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, const int *ptr, int len)
 static sf_count_t
 dwvw_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 {	DWVW_PRIVATE *pdwvw ;
+	BUF_UNION	ubuf ;
 	int		*iptr ;
 	int		k, bufferlen, writecount = 0, count ;
 	sf_count_t	total = 0 ;
@@ -556,8 +560,8 @@ dwvw_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 		return 0 ;
 	pdwvw = (DWVW_PRIVATE*) psf->codec_data ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = ubuf.ibuf ;
+	bufferlen = ARRAY_LEN (ubuf.ibuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -601,6 +605,7 @@ dwvw_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 static sf_count_t
 dwvw_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	DWVW_PRIVATE *pdwvw ;
+	BUF_UNION	ubuf ;
 	int			*iptr ;
 	int			k, bufferlen, writecount = 0, count ;
 	sf_count_t	total = 0 ;
@@ -612,8 +617,8 @@ dwvw_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 
 	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = ubuf.ibuf ;
+	bufferlen = ARRAY_LEN (ubuf.ibuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -632,6 +637,7 @@ dwvw_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 static sf_count_t
 dwvw_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	DWVW_PRIVATE *pdwvw ;
+	BUF_UNION	ubuf ;
 	int			*iptr ;
 	int			k, bufferlen, writecount = 0, count ;
 	sf_count_t	total = 0 ;
@@ -643,8 +649,8 @@ dwvw_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 	normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFFFFFF) : 1.0 ;
 
-	iptr = psf->u.ibuf ;
-	bufferlen = ARRAY_LEN (psf->u.ibuf) ;
+	iptr = ubuf.ibuf ;
+	bufferlen = ARRAY_LEN (ubuf.ibuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)

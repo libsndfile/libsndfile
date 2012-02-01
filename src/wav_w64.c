@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004-2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -259,10 +259,12 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 
 				psf_log_printf (psf, "    Index   Coeffs1   Coeffs2\n") ;
 				for (k = 0 ; k < wav_fmt->msadpcm.numcoeffs ; k++)
-				{	bytesread +=
-					psf_binheader_readf (psf, "22", &(wav_fmt->msadpcm.coeffs [k].coeff1), &(wav_fmt->msadpcm.coeffs [k].coeff2)) ;
-					snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "     %2d     %7d   %7d\n", k, wav_fmt->msadpcm.coeffs [k].coeff1, wav_fmt->msadpcm.coeffs [k].coeff2) ;
-					psf_log_printf (psf, psf->u.cbuf) ;
+				{	char buffer [128] ;
+
+					bytesread +=
+						psf_binheader_readf (psf, "22", &(wav_fmt->msadpcm.coeffs [k].coeff1), &(wav_fmt->msadpcm.coeffs [k].coeff2)) ;
+					snprintf (buffer, sizeof (buffer), "     %2d     %7d   %7d\n", k, wav_fmt->msadpcm.coeffs [k].coeff1, wav_fmt->msadpcm.coeffs [k].coeff2) ;
+					psf_log_printf (psf, buffer) ;
 					} ;
 				break ;
 
@@ -302,7 +304,8 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				if (wav_fmt->ext.channelmask == 0)
 					psf_log_printf (psf, "  Channel Mask  : 0x0 (should not be zero)\n") ;
 				else
-				{	unsigned bit ;
+				{	char buffer [512] ;
+					unsigned bit ;
 
 					wpriv->wavex_channelmask = wav_fmt->ext.channelmask ;
 
@@ -313,7 +316,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 						return SFE_MALLOC_FAILED ;
 
 					/* Terminate the buffer we're going to append_snprintf into. */
-					psf->u.cbuf [0] = 0 ;
+					buffer [0] = 0 ;
 
 					for (bit = k = 0 ; bit < ARRAY_LEN (channel_mask_bits) ; bit++)
 					{
@@ -324,21 +327,21 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 								} ;
 
 							psf->channel_map [k++] = channel_mask_bits [bit].id ;
-							append_snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "%s, ", channel_mask_bits [bit].name) ;
+							append_snprintf (buffer, sizeof (buffer), "%s, ", channel_mask_bits [bit].name) ;
 							} ;
 						} ;
 
 					/* Remove trailing ", ". */
-					bit = strlen (psf->u.cbuf) ;
-					psf->u.cbuf [--bit] = 0 ;
-					psf->u.cbuf [--bit] = 0 ;
+					bit = strlen (buffer) ;
+					buffer [--bit] = 0 ;
+					buffer [--bit] = 0 ;
 
 					if (k != psf->sf.channels)
 					{	psf_log_printf (psf, "  Channel Mask  : 0x%X\n", wav_fmt->ext.channelmask) ;
 						psf_log_printf (psf, "*** Less channel map bits than there are channels.\n") ;
 						}
 					else
-						psf_log_printf (psf, "  Channel Mask  : 0x%X (%s)\n", wav_fmt->ext.channelmask, psf->u.cbuf) ;
+						psf_log_printf (psf, "  Channel Mask  : 0x%X (%s)\n", wav_fmt->ext.channelmask, buffer) ;
 					} ;
 
 				bytesread += psf_binheader_readf (psf, "422", &(wav_fmt->ext.esf.esf_field1), &(wav_fmt->ext.esf.esf_field2), &(wav_fmt->ext.esf.esf_field3)) ;
@@ -465,7 +468,8 @@ wavex_gen_channel_mask (const int *chan_map, int channels)
 
 void
 wav_w64_analyze (SF_PRIVATE *psf)
-{	AUDIO_DETECT ad ;
+{	unsigned char buffer [4096] ;
+	AUDIO_DETECT ad ;
 	int format = 0 ;
 
 	if (psf->is_pipe)
@@ -482,8 +486,8 @@ wav_w64_analyze (SF_PRIVATE *psf)
 
 	psf_fseek (psf, 3 * 4 * 50, SEEK_SET) ;
 
-	while (psf_fread (psf->u.ucbuf, 1, 4096, psf) == 4096)
-	{	format = audio_detect (psf, &ad, psf->u.ucbuf, 4096) ;
+	while (psf_fread (buffer, 1, sizeof (buffer), psf) == sizeof (buffer))
+	{	format = audio_detect (psf, &ad, buffer, sizeof (buffer)) ;
 		if (format != 0)
 			break ;
 		} ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -118,13 +118,11 @@ static char bad_header [] =
 
 	static int
 nist_read_header (SF_PRIVATE *psf)
-{	char	*psf_header ;
+{	char	psf_header [NIST_HEADER_LENGTH + 2] ;
 	int		bitwidth = 0, count, encoding ;
 	unsigned bytes = 0 ;
 	char 	str [64], *cptr ;
 	long	samples ;
-
-	psf_header = psf->u.cbuf ;
 
 	if (sizeof (psf->header) <= NIST_HEADER_LENGTH)
 		return SFE_INTERNAL ;

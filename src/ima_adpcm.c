@@ -625,6 +625,7 @@ ima_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 static sf_count_t
 ima_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 {	IMA_ADPCM_PRIVATE *pima ;
+	BUF_UNION	ubuf ;
 	short		*sptr ;
 	int			k, bufferlen, readcount, count ;
 	sf_count_t	total = 0 ;
@@ -633,8 +634,8 @@ ima_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		return 0 ;
 	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
 
-	sptr = psf->u.sbuf ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	sptr = ubuf.sbuf ;
+	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = ima_read_block (psf, pima, sptr, readcount) ;
@@ -652,6 +653,7 @@ ima_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 static sf_count_t
 ima_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 {	IMA_ADPCM_PRIVATE *pima ;
+	BUF_UNION	ubuf ;
 	short		*sptr ;
 	int			k, bufferlen, readcount, count ;
 	sf_count_t	total = 0 ;
@@ -663,8 +665,8 @@ ima_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x8000) : 1.0 ;
 
-	sptr = psf->u.sbuf ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	sptr = ubuf.sbuf ;
+	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = ima_read_block (psf, pima, sptr, readcount) ;
@@ -682,6 +684,7 @@ ima_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 static sf_count_t
 ima_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 {	IMA_ADPCM_PRIVATE *pima ;
+	BUF_UNION	ubuf ;
 	short		*sptr ;
 	int			k, bufferlen, readcount, count ;
 	sf_count_t	total = 0 ;
@@ -693,8 +696,8 @@ ima_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x8000) : 1.0 ;
 
-	sptr = psf->u.sbuf ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	sptr = ubuf.sbuf ;
+	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = ima_read_block (psf, pima, sptr, readcount) ;
@@ -860,6 +863,7 @@ ima_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 static sf_count_t
 ima_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	IMA_ADPCM_PRIVATE *pima ;
+	BUF_UNION	ubuf ;
 	short		*sptr ;
 	int			k, bufferlen, writecount, count ;
 	sf_count_t	total = 0 ;
@@ -868,8 +872,8 @@ ima_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 		return 0 ;
 	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
 
-	sptr = psf->u.sbuf ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	sptr = ubuf.sbuf ;
+	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -887,6 +891,7 @@ ima_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 static sf_count_t
 ima_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	IMA_ADPCM_PRIVATE *pima ;
+	BUF_UNION	ubuf ;
 	short		*sptr ;
 	int			k, bufferlen, writecount, count ;
 	sf_count_t	total = 0 ;
@@ -898,8 +903,8 @@ ima_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 
 	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
 
-	sptr = psf->u.sbuf ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	sptr = ubuf.sbuf ;
+	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -917,6 +922,7 @@ ima_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 static sf_count_t
 ima_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	IMA_ADPCM_PRIVATE *pima ;
+	BUF_UNION	ubuf ;
 	short		*sptr ;
 	int			k, bufferlen, writecount, count ;
 	sf_count_t	total = 0 ;
@@ -928,8 +934,8 @@ ima_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 	normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
 
-	sptr = psf->u.sbuf ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	sptr = ubuf.sbuf ;
+	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)

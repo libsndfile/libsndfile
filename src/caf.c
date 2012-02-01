@@ -286,7 +286,8 @@ decode_desc_chunk (SF_PRIVATE *psf, const DESC_CHUNK *desc)
 
 static int
 caf_read_header (SF_PRIVATE *psf)
-{	DESC_CHUNK desc ;
+{	BUF_UNION	ubuf ;
+	DESC_CHUNK desc ;
 	sf_count_t chunk_size ;
 	double srate ;
 	short version, flags ;
@@ -300,10 +301,10 @@ caf_read_header (SF_PRIVATE *psf)
 	if (marker != caff_MARKER)
 		return SFE_CAF_NOT_CAF ;
 
-	psf_binheader_readf (psf, "mE8b", &marker, &chunk_size, psf->u.ucbuf, 8) ;
-	srate = double64_be_read (psf->u.ucbuf) ;
-	snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "%5.3f", srate) ;
-	psf_log_printf (psf, "%M : %D\n  Sample rate  : %s\n", marker, chunk_size, psf->u.cbuf) ;
+	psf_binheader_readf (psf, "mE8b", &marker, &chunk_size, ubuf.ucbuf, 8) ;
+	srate = double64_be_read (ubuf.ucbuf) ;
+	snprintf (ubuf.cbuf, sizeof (ubuf.cbuf), "%5.3f", srate) ;
+	psf_log_printf (psf, "%M : %D\n  Sample rate  : %s\n", marker, chunk_size, ubuf.cbuf) ;
 	if (marker != desc_MARKER)
 		return SFE_CAF_NO_DESC ;
 
@@ -360,8 +361,8 @@ caf_read_header (SF_PRIVATE *psf)
 					psf->peak_info->peaks [k].value = value ;
 					psf->peak_info->peaks [k].position = position ;
 
-					snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), "    %2d   %-12" PRId64 "   %g\n", k, position, value) ;
-					psf_log_printf (psf, psf->u.cbuf) ;
+					snprintf (ubuf.cbuf, sizeof (ubuf.cbuf), "    %2d   %-12" PRId64 "   %g\n", k, position, value) ;
+					psf_log_printf (psf, ubuf.cbuf) ;
 					} ;
 
 				psf->peak_info->peak_loc = SF_PEAK_START ;
@@ -427,7 +428,8 @@ caf_read_header (SF_PRIVATE *psf)
 
 static int
 caf_write_header (SF_PRIVATE *psf, int calc_length)
-{	CAF_PRIVATE	*pcaf ;
+{	BUF_UNION	ubuf ;
+	CAF_PRIVATE	*pcaf ;
 	DESC_CHUNK desc ;
 	sf_count_t current, free_len ;
 	uint32_t uk ;
@@ -463,8 +465,8 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 	/* 'desc' marker and chunk size. */
 	psf_binheader_writef (psf, "Em8", desc_MARKER, (sf_count_t) (sizeof (DESC_CHUNK))) ;
 
- 	double64_be_write (1.0 * psf->sf.samplerate, psf->u.ucbuf) ;
-	psf_binheader_writef (psf, "b", psf->u.ucbuf, make_size_t (8)) ;
+ 	double64_be_write (1.0 * psf->sf.samplerate, ubuf.ucbuf) ;
+	psf_binheader_writef (psf, "b", ubuf.ucbuf, make_size_t (8)) ;
 
 	subformat = SF_CODEC (psf->sf.format) ;
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -206,7 +206,8 @@ mat4_write_header (SF_PRIVATE *psf, int calc_length)
 
 static int
 mat4_read_header (SF_PRIVATE *psf)
-{	int		marker, rows, cols, imag ;
+{	char	buffer [256] ;
+	int		marker, rows, cols, imag ;
 	unsigned namesize ;
 	double	value ;
 	const char *marker_str ;
@@ -244,8 +245,8 @@ mat4_read_header (SF_PRIVATE *psf)
 
 	psf_binheader_readf (psf, "d", &value) ;
 
-	snprintf (psf->u.cbuf, sizeof (psf->u.cbuf), " Value : %f\n", value) ;
-	psf_log_printf (psf, psf->u.cbuf) ;
+	snprintf (buffer, sizeof (buffer), " Value : %f\n", value) ;
+	psf_log_printf (psf, buffer) ;
 
 	if ((rows != 1) || (cols != 1))
 		return SFE_MAT4_NO_SAMPLERATE ;

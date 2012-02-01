@@ -290,6 +290,7 @@ gsm610_read_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 static sf_count_t
 gsm610_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 {	GSM610_PRIVATE *pgsm610 ;
+	BUF_UNION	ubuf ;
 	short		*sptr ;
 	int			k, bufferlen, readcount = 0, count ;
 	sf_count_t	total = 0 ;
@@ -298,8 +299,8 @@ gsm610_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		return 0 ;
 	pgsm610 = (GSM610_PRIVATE*) psf->codec_data ;
 
-	sptr = psf->u.sbuf ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	sptr = ubuf.sbuf ;
+	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = gsm610_read_block (psf, pgsm610, sptr, readcount) ;
@@ -315,6 +316,7 @@ gsm610_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 static sf_count_t
 gsm610_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 {	GSM610_PRIVATE *pgsm610 ;
+	BUF_UNION	ubuf ;
 	short		*sptr ;
 	int			k, bufferlen, readcount = 0, count ;
 	sf_count_t	total = 0 ;
@@ -326,8 +328,8 @@ gsm610_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x8000) : 1.0 ;
 
-	sptr = psf->u.sbuf ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	sptr = ubuf.sbuf ;
+	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = gsm610_read_block (psf, pgsm610, sptr, readcount) ;
@@ -343,6 +345,7 @@ gsm610_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 static sf_count_t
 gsm610_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 {	GSM610_PRIVATE *pgsm610 ;
+	BUF_UNION	ubuf ;
 	short		*sptr ;
 	int			k, bufferlen, readcount = 0, count ;
 	sf_count_t	total = 0 ;
@@ -354,8 +357,8 @@ gsm610_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 		return 0 ;
 	pgsm610 = (GSM610_PRIVATE*) psf->codec_data ;
 
-	sptr = psf->u.sbuf ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	sptr = ubuf.sbuf ;
+	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = gsm610_read_block (psf, pgsm610, sptr, readcount) ;
@@ -517,6 +520,7 @@ gsm610_write_s	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 static sf_count_t
 gsm610_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 {	GSM610_PRIVATE *pgsm610 ;
+	BUF_UNION	ubuf ;
 	short		*sptr ;
 	int			k, bufferlen, writecount = 0, count ;
 	sf_count_t	total = 0 ;
@@ -525,8 +529,8 @@ gsm610_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 		return 0 ;
 	pgsm610 = (GSM610_PRIVATE*) psf->codec_data ;
 
-	sptr = psf->u.sbuf ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	sptr = ubuf.sbuf ;
+	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -542,6 +546,7 @@ gsm610_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 static sf_count_t
 gsm610_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	GSM610_PRIVATE *pgsm610 ;
+	BUF_UNION	ubuf ;
 	short		*sptr ;
 	int			k, bufferlen, writecount = 0, count ;
 	sf_count_t	total = 0 ;
@@ -553,8 +558,8 @@ gsm610_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 
 	normfact = (psf->norm_float == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
 
-	sptr = psf->u.sbuf ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	sptr = ubuf.sbuf ;
+	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
@@ -570,6 +575,7 @@ gsm610_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 static sf_count_t
 gsm610_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	GSM610_PRIVATE *pgsm610 ;
+	BUF_UNION	ubuf ;
 	short		*sptr ;
 	int			k, bufferlen, writecount = 0, count ;
 	sf_count_t	total = 0 ;
@@ -581,8 +587,8 @@ gsm610_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 	normfact = (psf->norm_double == SF_TRUE) ? (1.0 * 0x7FFF) : 1.0 ;
 
-	sptr = psf->u.sbuf ;
-	bufferlen = ARRAY_LEN (psf->u.sbuf) ;
+	sptr = ubuf.sbuf ;
+	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)

@@ -258,7 +258,8 @@ psf_get_format_info (SF_FORMAT_INFO *data)
 
 double
 psf_calc_signal_max (SF_PRIVATE *psf, int normalize)
-{	sf_count_t	position ;
+{	BUF_UNION	ubuf ;
+	sf_count_t	position ;
 	double 		max_val, temp, *data ;
 	int			k, len, readcount, save_state ;
 
@@ -282,8 +283,8 @@ psf_calc_signal_max (SF_PRIVATE *psf, int normalize)
 	/* Go to start of file. */
 	sf_seek ((SNDFILE*) psf, 0, SEEK_SET) ;
 
-	data = psf->u.dbuf ;
-	len = ARRAY_LEN (psf->u.dbuf) ;
+	data = ubuf.dbuf ;
+	len = ARRAY_LEN (ubuf.dbuf) ;
 
 	for (readcount = 1, max_val = 0.0 ; readcount > 0 ; /* nothing */)
 	{	readcount = sf_read_double ((SNDFILE*) psf, data, len) ;
@@ -302,7 +303,8 @@ psf_calc_signal_max (SF_PRIVATE *psf, int normalize)
 
 int
 psf_calc_max_all_channels (SF_PRIVATE *psf, double *peaks, int normalize)
-{	sf_count_t	position ;
+{	BUF_UNION	ubuf ;
+	sf_count_t	position ;
 	double 		temp, *data ;
 	int			k, len, readcount, save_state ;
 	int			chan ;
@@ -323,9 +325,9 @@ psf_calc_max_all_channels (SF_PRIVATE *psf, double *peaks, int normalize)
 	position = sf_seek ((SNDFILE*) psf, 0, SEEK_CUR) ; /* Get current position in file */
 	sf_seek ((SNDFILE*) psf, 0, SEEK_SET) ;			/* Go to start of file. */
 
-	len = ARRAY_LEN (psf->u.dbuf) ;
+	len = ARRAY_LEN (ubuf.dbuf) ;
 
-	data = psf->u.dbuf ;
+	data = ubuf.dbuf ;
 
 	chan = 0 ;
 	readcount = len ;

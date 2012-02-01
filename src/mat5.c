@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -157,6 +157,7 @@ mat5_write_header (SF_PRIVATE *psf, int calc_length)
 {	static const char	*filename = "MATLAB 5.0 MAT-file, written by " PACKAGE "-" VERSION ", " ;
 	static const char	*sr_name = "samplerate\0\0\0\0\0\0\0\0\0\0\0" ;
 	static const char	*wd_name = "wavedata\0" ;
+	char		buffer [256] ;
 	sf_count_t	current, datasize ;
 	int			encoding ;
 
@@ -204,11 +205,11 @@ mat5_write_header (SF_PRIVATE *psf, int calc_length)
 	psf->headindex = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
-	psf_get_date_str (psf->u.cbuf, sizeof (psf->u.scbuf)) ;
-	psf_binheader_writef (psf, "bb", filename, strlen (filename), psf->u.cbuf, strlen (psf->u.cbuf) + 1) ;
+	psf_get_date_str (buffer, sizeof (buffer)) ;
+	psf_binheader_writef (psf, "bb", filename, strlen (filename), buffer, strlen (buffer) + 1) ;
 
-	memset (psf->u.scbuf, ' ', 124 - psf->headindex) ;
-	psf_binheader_writef (psf, "b", psf->u.scbuf, make_size_t (124 - psf->headindex)) ;
+	memset (buffer, ' ', 124 - psf->headindex) ;
+	psf_binheader_writef (psf, "b", buffer, make_size_t (124 - psf->headindex)) ;
 
 	psf->rwf_endian = psf->endian ;
 
@@ -257,20 +258,20 @@ mat5_write_header (SF_PRIVATE *psf, int calc_length)
 
 static int
 mat5_read_header (SF_PRIVATE *psf)
-{	char	name [32] ;
+{	char	buffer [256], name [32] ;
 	short	version, endian ;
 	int		type, flags1, flags2, rows, cols ;
 	unsigned size ;
 
-	psf_binheader_readf (psf, "pb", 0, psf->u.cbuf, 124) ;
+	psf_binheader_readf (psf, "pb", 0, buffer, 124) ;
 
-	psf->u.scbuf [125] = 0 ;
+	buffer [125] = 0 ;
 
-	if (strlen (psf->u.cbuf) >= 124)
+	if (strlen (buffer) >= 124)
 		return SFE_UNIMPLEMENTED ;
 
-	if (strstr (psf->u.cbuf, "MATLAB 5.0 MAT-file") == psf->u.cbuf)
-		psf_log_printf (psf, "%s\n", psf->u.scbuf) ;
+	if (strstr (buffer, "MATLAB 5.0 MAT-file") == buffer)
+		psf_log_printf (psf, "%s\n", buffer) ;
 
 
 	psf_binheader_readf (psf, "E22", &version, &endian) ;

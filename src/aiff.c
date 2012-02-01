@@ -381,6 +381,7 @@ static int
 aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 {	SSND_CHUNK	ssnd_fmt ;
 	AIFF_PRIVATE *paiff ;
+	BUF_UNION	ubuf ;
 	unsigned	marker, chunk_size, dword, FORMsize, SSNDsize, bytesread ;
 	int			k, found_chunk = 0, done = 0, error = 0 ;
 	char		*cptr ;
@@ -489,7 +490,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					psf_log_printf (psf, "  time stamp : %d\n", psf->peak_info->timestamp) ;
 					psf_log_printf (psf, "    Ch   Position       Value\n") ;
 
-					cptr = psf->u.cbuf ;
+					cptr = ubuf.cbuf ;
 					for (dword = 0 ; dword < (unsigned) psf->sf.channels ; dword++)
 					{	float value ;
 						unsigned int position ;
@@ -498,9 +499,9 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						psf->peak_info->peaks [dword].value = value ;
 						psf->peak_info->peaks [dword].position = position ;
 
-						snprintf (cptr, sizeof (psf->u.scbuf), "    %2d   %-12" PRId64 "   %g\n",
+						snprintf (cptr, sizeof (ubuf.scbuf), "    %2d   %-12" PRId64 "   %g\n",
 								dword, psf->peak_info->peaks [dword].position, psf->peak_info->peaks [dword].value) ;
-						cptr [sizeof (psf->u.scbuf) - 1] = 0 ;
+						cptr [sizeof (ubuf.scbuf) - 1] = 0 ;
 						psf_log_printf (psf, "%s", cptr) ;
 						} ;
 
@@ -556,12 +557,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					dword = chunk_size ;
 					if (dword == 0)
 						break ;
-					if (dword >= SIGNED_SIZEOF (psf->u.scbuf))
+					if (dword >= SIGNED_SIZEOF (ubuf.scbuf))
 					{	psf_log_printf (psf, " %M : %d (too big)\n", marker, dword) ;
 						return SFE_INTERNAL ;
 						} ;
 
-					cptr = psf->u.cbuf ;
+					cptr = ubuf.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
 					cptr [dword] = 0 ;
 
@@ -575,12 +576,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					dword = chunk_size ;
 					if (dword == 0)
 						break ;
-					if (dword >= SIGNED_SIZEOF (psf->u.scbuf) - 1)
+					if (dword >= SIGNED_SIZEOF (ubuf.scbuf) - 1)
 					{	psf_log_printf (psf, " %M : %d (too big)\n", marker, dword) ;
 						return SFE_INTERNAL ;
 						} ;
 
-					cptr = psf->u.cbuf ;
+					cptr = ubuf.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
 					cptr [dword] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
@@ -603,12 +604,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					{	dword -= psf_binheader_readf (psf, "E422", &timestamp, &id, &len) ;
 						psf_log_printf (psf, "   time   : 0x%x\n   marker : %x\n   length : %d\n", timestamp, id, len) ;
 
-						if (len + 1 > SIGNED_SIZEOF (psf->u.scbuf))
+						if (len + 1 > SIGNED_SIZEOF (ubuf.scbuf))
 						{	psf_log_printf (psf, "\nError : string length (%d) too big.\n", len) ;
 							return SFE_INTERNAL ;
 							} ;
 
-						cptr = psf->u.cbuf ;
+						cptr = ubuf.cbuf ;
 						dword -= psf_binheader_readf (psf, "b", cptr, len) ;
 						cptr [len] = 0 ;
 						psf_log_printf (psf, "   string : %s\n", cptr) ;
@@ -625,7 +626,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					dword = chunk_size ;
 					if (dword == 0)
 						break ;
-					if (dword >= SIGNED_SIZEOF (psf->u.scbuf) - 1)
+					if (dword >= SIGNED_SIZEOF (ubuf.scbuf) - 1)
 					{	psf_log_printf (psf, " %M : %d (too big, skipping)\n", marker, dword) ;
 						psf_binheader_readf (psf, "j", dword + (dword & 1)) ;
 						break ;
@@ -637,7 +638,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						break ;
 						} ;
 
-					cptr = psf->u.cbuf ;
+					cptr = ubuf.cbuf ;
 					psf_binheader_readf (psf, "mb", &appl_marker, cptr, dword + (dword & 1) - 4) ;
 					cptr [dword] = 0 ;
 
@@ -656,12 +657,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					dword = chunk_size ;
 					if (dword == 0)
 						break ;
-					if (dword >= SIGNED_SIZEOF (psf->u.scbuf) - 2)
+					if (dword >= SIGNED_SIZEOF (ubuf.scbuf) - 2)
 					{	psf_log_printf (psf, " %M : %d (too big)\n", marker, dword) ;
 						return SFE_INTERNAL ;
 						} ;
 
-					cptr = psf->u.cbuf ;
+					cptr = ubuf.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
 					cptr [dword] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
@@ -672,12 +673,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					dword = chunk_size ;
 					if (dword == 0)
 						break ;
-					if (dword >= SIGNED_SIZEOF (psf->u.scbuf) - 2)
+					if (dword >= SIGNED_SIZEOF (ubuf.scbuf) - 2)
 					{	psf_log_printf (psf, " %M : %d (too big)\n", marker, dword) ;
 						return SFE_INTERNAL ;
 						} ;
 
-					cptr = psf->u.cbuf ;
+					cptr = ubuf.cbuf ;
 					psf_binheader_readf (psf, "b", cptr, dword + (dword & 1)) ;
 					cptr [dword] = 0 ;
 					psf_log_printf (psf, " %M : %s\n", marker, cptr) ;
@@ -785,22 +786,22 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 							pstr_len = (ch & 1) ? ch : ch + 1 ;
 
-							if (pstr_len < sizeof (psf->u.scbuf) - 1)
-							{	bytesread += psf_binheader_readf (psf, "b", psf->u.scbuf, pstr_len) ;
-								psf->u.scbuf [pstr_len] = 0 ;
+							if (pstr_len < sizeof (ubuf.scbuf) - 1)
+							{	bytesread += psf_binheader_readf (psf, "b", ubuf.scbuf, pstr_len) ;
+								ubuf.scbuf [pstr_len] = 0 ;
 								}
 							else
-							{	unsigned int read_len = pstr_len - (sizeof (psf->u.scbuf) - 1) ;
-								bytesread += psf_binheader_readf (psf, "bj", psf->u.scbuf, read_len, pstr_len - read_len) ;
-								psf->u.scbuf [sizeof (psf->u.scbuf) - 1] = 0 ;
+							{	unsigned int read_len = pstr_len - (sizeof (ubuf.scbuf) - 1) ;
+								bytesread += psf_binheader_readf (psf, "bj", ubuf.scbuf, read_len, pstr_len - read_len) ;
+								ubuf.scbuf [sizeof (ubuf.scbuf) - 1] = 0 ;
 								}
 
-							psf_log_printf (psf, "   Name     : %s\n", psf->u.scbuf) ;
+							psf_log_printf (psf, "   Name     : %s\n", ubuf.scbuf) ;
 
 							paiff->markstr [n].markerID = mark_id ;
 							paiff->markstr [n].position = position ;
 							/*
-							**	TODO if psf->u.scbuf is equal to
+							**	TODO if ubuf.scbuf is equal to
 							**	either Beg_loop, Beg loop or beg loop and spam
 							**	if (psf->instrument == NULL && (psf->instrument = psf_instrument_alloc ()) == NULL)
 							**		return SFE_MALLOC_FAILED ;
@@ -919,9 +920,10 @@ aiff_close (SF_PRIVATE *psf)
 
 static int
 aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
-{	int error = 0, subformat ;
+{	BUF_UNION	ubuf ;
+	int error = 0, subformat ;
 
-	psf->u.scbuf [0] = 0 ;
+	ubuf.scbuf [0] = 0 ;
 
 	/* The COMM chunk has an int aligned to an odd word boundary. Some
 	** procesors are not able to deal with this (ie bus fault) so we have
@@ -950,11 +952,11 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 		psf_binheader_readf (psf, "Em1", &(comm_fmt->encoding), &encoding_len) ;
 
-		comm_fmt->size = SF_MIN (sizeof (psf->u.scbuf), make_size_t (comm_fmt->size)) ;
-		memset (psf->u.scbuf, 0, comm_fmt->size) ;
+		comm_fmt->size = SF_MIN (sizeof (ubuf.scbuf), make_size_t (comm_fmt->size)) ;
+		memset (ubuf.scbuf, 0, comm_fmt->size) ;
 		read_len = comm_fmt->size - SIZEOF_AIFC_COMM + 1 ;
-		psf_binheader_readf (psf, "b", psf->u.scbuf, read_len) ;
-		psf->u.scbuf [read_len + 1] = 0 ;
+		psf_binheader_readf (psf, "b", ubuf.scbuf, read_len) ;
+		ubuf.scbuf [read_len + 1] = 0 ;
 		} ;
 
 	psf_log_printf (psf, "  Sample Rate : %d\n", tenbytefloat2int (comm_fmt->sampleRate)) ;
@@ -1054,10 +1056,10 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 			error = SFE_UNIMPLEMENTED ;
 		} ;
 
-	if (! psf->u.scbuf [0])
+	if (! ubuf.scbuf [0])
 		psf_log_printf (psf, "  Encoding    : %M\n", comm_fmt->encoding) ;
 	else
-		psf_log_printf (psf, "  Encoding    : %M => %s\n", comm_fmt->encoding, psf->u.scbuf) ;
+		psf_log_printf (psf, "  Encoding    : %M => %s\n", comm_fmt->encoding, ubuf.scbuf) ;
 
 	return error ;
 } /* aiff_read_comm_chunk */
