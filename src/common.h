@@ -361,10 +361,12 @@ typedef struct sf_private_tag
 	/* Storage and housekeeping data for adding/reading strings from
 	** sound files.
 	*/
-	STR_DATA		strings [SF_MAX_STRINGS] ;
-	char			str_storage [SF_STR_BUFFER_LEN] ;
-	char			*str_end ;
-	int				str_flags ;
+	struct
+	{	STR_DATA	data [SF_MAX_STRINGS] ;
+		char		storage [SF_STR_BUFFER_LEN] ;
+		char		*str_end ;
+		int			flags ;
+	} strings ;
 
 	/* Guard value. If this changes the buffers above have overflowed. */
 	int				Magick ;

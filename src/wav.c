@@ -189,7 +189,7 @@ wav_open	(SF_PRIVATE *psf)
 	psf->container_data = wpriv ;
 
 	wpriv->wavex_ambisonic = SF_AMBISONIC_NONE ;
-	psf->str_flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END ;
+	psf->strings.flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END ;
 
 	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = wav_read_header (psf, &blockalign, &framesperblock)))
@@ -1062,7 +1062,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	/* The LIST/INFO chunk. */
-	if (psf->str_flags & SF_STR_LOCATE_START)
+	if (psf->strings.flags & SF_STR_LOCATE_START)
 		wav_write_strings (psf, SF_STR_LOCATE_START) ;
 
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
@@ -1157,7 +1157,7 @@ wav_write_tailer (SF_PRIVATE *psf)
 			psf_binheader_writef (psf, "f4", psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 
-	if (psf->str_flags & SF_STR_LOCATE_END)
+	if (psf->strings.flags & SF_STR_LOCATE_END)
 		wav_write_strings (psf, SF_STR_LOCATE_END) ;
 
 	/* Write the tailer. */
@@ -1179,38 +1179,38 @@ wav_write_strings (SF_PRIVATE *psf, int location)
 	psf_binheader_writef (psf, "m4m", LIST_MARKER, 0xBADBAD, INFO_MARKER) ;
 
 	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
-	{	if (psf->strings [k].type == 0)
+	{	if (psf->strings.data [k].type == 0)
 			break ;
-		if (psf->strings [k].type < 0 || psf->strings [k].flags != location)
+		if (psf->strings.data [k].type < 0 || psf->strings.data [k].flags != location)
 			continue ;
 
-		switch (psf->strings [k].type)
+		switch (psf->strings.data [k].type)
 		{	case SF_STR_SOFTWARE :
-				psf_binheader_writef (psf, "ms", ISFT_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "ms", ISFT_MARKER, psf->strings.data [k].str) ;
 				break ;
 
 			case SF_STR_TITLE :
-				psf_binheader_writef (psf, "ms", INAM_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "ms", INAM_MARKER, psf->strings.data [k].str) ;
 				break ;
 
 			case SF_STR_COPYRIGHT :
-				psf_binheader_writef (psf, "ms", ICOP_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "ms", ICOP_MARKER, psf->strings.data [k].str) ;
 				break ;
 
 			case SF_STR_ARTIST :
-				psf_binheader_writef (psf, "ms", IART_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "ms", IART_MARKER, psf->strings.data [k].str) ;
 				break ;
 
 			case SF_STR_COMMENT :
-				psf_binheader_writef (psf, "ms", ICMT_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "ms", ICMT_MARKER, psf->strings.data [k].str) ;
 				break ;
 
 			case SF_STR_DATE :
-				psf_binheader_writef (psf, "ms", ICRD_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "ms", ICRD_MARKER, psf->strings.data [k].str) ;
 				break ;
 
 			case SF_STR_GENRE :
-				psf_binheader_writef (psf, "ms", IGNR_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "ms", IGNR_MARKER, psf->strings.data [k].str) ;
 				break ;
 
 			default :

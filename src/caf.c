@@ -140,7 +140,7 @@ caf_open (SF_PRIVATE *psf)
 			psf->sf.frames = 0 ;
 			} ;
 
-		psf->str_flags = SF_STR_ALLOW_START ;
+		psf->strings.flags = SF_STR_ALLOW_START ;
 
 		/*
 		**	By default, add the peak chunk to floating point files. Default behaviour
@@ -565,7 +565,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_binheader_writef (psf, "mE44444", desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.pkt_frames, desc.channels_per_frame, desc.bits_per_chan) ;
 
 #if 0
-	if (psf->str_flags & SF_STR_LOCATE_START)
+	if (psf->strings.flags & SF_STR_LOCATE_START)
 		caf_write_strings (psf, SF_STR_LOCATE_START) ;
 #endif
 

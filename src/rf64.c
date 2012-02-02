@@ -602,7 +602,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 
 #if 0
 	/* The LIST/INFO chunk. */
-	if (psf->str_flags & SF_STR_LOCATE_START)
+	if (psf->strings.flags & SF_STR_LOCATE_START)
 		wav_write_strings (psf, SF_STR_LOCATE_START) ;
 
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)

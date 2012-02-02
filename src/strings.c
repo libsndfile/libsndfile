@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -43,9 +43,9 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 
 	/* A few extra checks for write mode. */
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
-	{	if ((psf->str_flags & SF_STR_ALLOW_START) == 0)
+	{	if ((psf->strings.flags & SF_STR_ALLOW_START) == 0)
 			return SFE_STR_NO_SUPPORT ;
-		if (psf->have_written && (psf->str_flags & SF_STR_ALLOW_END) == 0)
+		if (psf->have_written && (psf->strings.flags & SF_STR_ALLOW_END) == 0)
 			return SFE_STR_NO_SUPPORT ;
 		/* Only allow zero length strings for software. */
 		if (str_type != SF_STR_SOFTWARE && str_len == 0)
@@ -55,17 +55,17 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	/* Find the next free slot in table. */
 	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
 	{	/* If we find a matching entry clear it. */
-		if (psf->strings [k].type == str_type)
-			psf->strings [k].type = -1 ;
+		if (psf->strings.data [k].type == str_type)
+			psf->strings.data [k].type = -1 ;
 
-		if (psf->strings [k].type == 0)
+		if (psf->strings.data [k].type == 0)
 			break ;
 		} ;
 
 	/* Determine flags */
 	str_flags = SF_STR_LOCATE_START ;
 	if (psf->file.mode == SFM_RDWR || psf->have_written)
-	{	if ((psf->str_flags & SF_STR_ALLOW_END) == 0)
+	{	if ((psf->strings.flags & SF_STR_ALLOW_END) == 0)
 			return SFE_STR_NO_ADD_END ;
 		str_flags = SF_STR_LOCATE_END ;
 		} ;
@@ -74,19 +74,19 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	if (k >= SF_MAX_STRINGS)
 		return SFE_STR_MAX_COUNT ;
 
-	if (k == 0 && psf->str_end != NULL)
-	{	psf_log_printf (psf, "SFE_STR_WEIRD : k == 0 && psf->str_end != NULL\n") ;
+	if (k == 0 && psf->strings.str_end != NULL)
+	{	psf_log_printf (psf, "SFE_STR_WEIRD : k == 0 && psf->strings.str_end != NULL\n") ;
 		return SFE_STR_WEIRD ;
 		} ;
 
-	if (k != 0 && psf->str_end == NULL)
-	{	psf_log_printf (psf, "SFE_STR_WEIRD : k != 0 && psf->str_end == NULL\n") ;
+	if (k != 0 && psf->strings.str_end == NULL)
+	{	psf_log_printf (psf, "SFE_STR_WEIRD : k != 0 && psf->strings.str_end == NULL\n") ;
 		return SFE_STR_WEIRD ;
 		} ;
 
 	/* Special case for the first string. */
 	if (k == 0)
-		psf->str_end = psf->str_storage ;
+		psf->strings.str_end = psf->strings.storage ;
 
 	switch (str_type)
 	{	case SF_STR_SOFTWARE :
@@ -127,29 +127,29 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 
 	str_len = strlen (str) ;
 
-	len_remaining = SIGNED_SIZEOF (psf->str_storage) - (psf->str_end - psf->str_storage) ;
+	len_remaining = SIGNED_SIZEOF (psf->strings.storage) - (psf->strings.str_end - psf->strings.storage) ;
 
 	if (len_remaining < str_len + 2)
 		return SFE_STR_MAX_DATA ;
 
-	psf->strings [k].type = str_type ;
-	psf->strings [k].str = psf->str_end ;
-	psf->strings [k].flags = str_flags ;
+	psf->strings.data [k].type = str_type ;
+	psf->strings.data [k].str = psf->strings.str_end ;
+	psf->strings.data [k].flags = str_flags ;
 
-	memcpy (psf->str_end, str, str_len + 1) ;
+	memcpy (psf->strings.str_end, str, str_len + 1) ;
 	/* Plus one to catch string terminator. */
-	psf->str_end += str_len + 1 ;
+	psf->strings.str_end += str_len + 1 ;
 
-	psf->str_flags |= str_flags ;
+	psf->strings.flags |= str_flags ;
 
 #if STRINGS_DEBUG
-	psf_log_printf (psf, "str_storage          : %X\n", (int) psf->str_storage) ;
-	psf_log_printf (psf, "str_end              : %X\n", (int) psf->str_end) ;
-	psf_log_printf (psf, "sizeof (str_storage) : %d\n", SIGNED_SIZEOF (psf->str_storage)) ;
-	psf_log_printf (psf, "used                 : %d\n", (int ) (psf->str_end - psf->str_storage)) ;
-	psf_log_printf (psf, "remaining            : %d\n", SIGNED_SIZEOF (psf->str_storage) - (psf->str_end - psf->str_storage)) ;
+	psf_log_printf (psf, "str_storage          : %X\n", (int) psf->strings.storage) ;
+	psf_log_printf (psf, "str_end              : %X\n", (int) psf->strings.str_end) ;
+	psf_log_printf (psf, "sizeof (str_storage) : %d\n", SIGNED_SIZEOF (psf->strings.storage)) ;
+	psf_log_printf (psf, "used                 : %d\n", (int ) (psf->strings.str_end - psf->strings.storage)) ;
+	psf_log_printf (psf, "remaining            : %d\n", SIGNED_SIZEOF (psf->strings.storage) - (psf->strings.str_end - psf->strings.storage)) ;
 
-	hexdump (psf->str_storage, 300) ;
+	hexdump (psf->strings.storage, 300) ;
 #endif
 
 	return 0 ;
@@ -168,8 +168,8 @@ psf_get_string (SF_PRIVATE *psf, int str_type)
 {	int k ;
 
 	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
-		if (str_type == psf->strings [k].type)
-			return psf->strings [k].str ;
+		if (str_type == psf->strings.data [k].type)
+			return psf->strings.data [k].str ;
 
 	return NULL ;
 } /* psf_get_string */
@@ -179,7 +179,7 @@ psf_location_string_count (const SF_PRIVATE * psf, int location)
 {	int k, count = 0 ;
 
 	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
-		if (psf->strings [k].type > 0 && psf->strings [k].flags & location)
+		if (psf->strings.data [k].type > 0 && psf->strings.data [k].flags & location)
 			count ++ ;
 
 	return count ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -100,7 +100,7 @@ ogg_pcm_open (SF_PRIVATE *psf)
 #endif
 
 		psf->sf.frames = SF_COUNT_MAX ; /* Unknown really */
-		psf->str_flags = SF_STR_ALLOW_START ;
+		psf->strings.flags = SF_STR_ALLOW_START ;
 		} ;
 
 	psf->bytewidth = 1 ;

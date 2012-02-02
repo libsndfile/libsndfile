@@ -116,7 +116,7 @@ ogg_speex_open (SF_PRIVATE *psf)
 #endif
 
 		psf->sf.frames = SF_COUNT_MAX ; /* Unknown really */
-		psf->str_flags = SF_STR_ALLOW_START ;
+		psf->strings.flags = SF_STR_ALLOW_START ;
 		} ;
 
 	psf->bytewidth = 1 ;

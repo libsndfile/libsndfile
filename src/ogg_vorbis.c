@@ -366,10 +366,10 @@ vorbis_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
 	{	const char * name ;
 
-		if (psf->strings [k].type == 0)
+		if (psf->strings.data [k].type == 0)
 			break ;
 
-		switch (psf->strings [k].type)
+		switch (psf->strings.data [k].type)
 		{	case SF_STR_TITLE :		name = "TITLE" ; break ;
 			case SF_STR_COPYRIGHT : name = "COPYRIGHT" ; break ;
 			case SF_STR_SOFTWARE :	name = "SOFTWARE" ; break ;
@@ -381,7 +381,7 @@ vorbis_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 			default : continue ;
 			} ;
 
-		vorbis_comment_add_tag (&vdata->vcomment, name, psf->strings [k].str) ;
+		vorbis_comment_add_tag (&vdata->vcomment, name, psf->strings.data [k].str) ;
 		} ;
 
 	/* set up the analysis state and auxiliary encoding storage */
@@ -525,7 +525,7 @@ ogg_vorbis_open (SF_PRIVATE *psf)
 		psf->write_double	= vorbis_write_d ;
 
 		psf->sf.frames = SF_COUNT_MAX ; /* Unknown really */
-		psf->str_flags = SF_STR_ALLOW_START ;
+		psf->strings.flags = SF_STR_ALLOW_START ;
 		} ;
 
 	psf->bytewidth = 1 ;

@@ -534,7 +534,7 @@ flac_write_strings (SF_PRIVATE *psf, FLAC_PRIVATE* pflac)
 	int	k, string_count = 0 ;
 
 	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
-	{	if (psf->strings [k].type != 0)
+	{	if (psf->strings.data [k].type != 0)
 			string_count ++ ;
 		} ;
 
@@ -546,10 +546,10 @@ flac_write_strings (SF_PRIVATE *psf, FLAC_PRIVATE* pflac)
 		return ;
 		} ;
 
-	for (k = 0 ; k < SF_MAX_STRINGS && psf->strings [k].type != 0 ; k++)
+	for (k = 0 ; k < SF_MAX_STRINGS && psf->strings.data [k].type != 0 ; k++)
 	{	const char * key, * value ;
 
-		switch (psf->strings [k].type)
+		switch (psf->strings.data [k].type)
 		{	case SF_STR_SOFTWARE :
 				key = "software" ;
 				break ;
@@ -584,7 +584,7 @@ flac_write_strings (SF_PRIVATE *psf, FLAC_PRIVATE* pflac)
 				continue ;
 			} ;
 
-		value = psf->strings [k].str ;
+		value = psf->strings.data [k].str ;
 
 		FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair (&entry, key, value) ;
 		FLAC__metadata_object_vorbiscomment_append_comment (pflac->metadata, entry, /* copy */ SF_FALSE) ;
@@ -646,7 +646,7 @@ flac_open	(SF_PRIVATE *psf)
 		psf->endian = SF_ENDIAN_BIG ;
 		psf->sf.seekable = 0 ;
 
-		psf->str_flags = SF_STR_ALLOW_START ;
+		psf->strings.flags = SF_STR_ALLOW_START ;
 
 		if ((error = flac_enc_init (psf)))
 			return error ;

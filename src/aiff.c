@@ -272,7 +272,7 @@ aiff_open (SF_PRIVATE *psf)
 			psf->sf.frames = 0 ;
 			} ;
 
-		psf->str_flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END ;
+		psf->strings.flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END ;
 
 		if ((error = aiff_write_header (psf, SF_FALSE)))
 			return error ;
@@ -1410,7 +1410,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 					m [3].markerID, m [3].position, 8, "end loop", make_size_t (9)) ;
 		} ;
 
-	if (psf->str_flags & SF_STR_LOCATE_START)
+	if (psf->strings.flags & SF_STR_LOCATE_START)
 		aiff_write_strings (psf, SF_STR_LOCATE_START) ;
 
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
@@ -1470,7 +1470,7 @@ aiff_write_tailer (SF_PRIVATE *psf)
 			psf_binheader_writef (psf, "Eft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
 
-	if (psf->str_flags & SF_STR_LOCATE_END)
+	if (psf->strings.flags & SF_STR_LOCATE_END)
 		aiff_write_strings (psf, SF_STR_LOCATE_END) ;
 
 	/* Write the tailer. */
@@ -1485,37 +1485,37 @@ aiff_write_strings (SF_PRIVATE *psf, int location)
 {	int	k, slen ;
 
 	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
-	{	if (psf->strings [k].type == 0)
+	{	if (psf->strings.data [k].type == 0)
 			break ;
 
-		if (psf->strings [k].flags != location)
+		if (psf->strings.data [k].flags != location)
 			continue ;
 
-		switch (psf->strings [k].type)
+		switch (psf->strings.data [k].type)
 		{	case SF_STR_SOFTWARE :
-				slen = strlen (psf->strings [k].str) ;
-				psf_binheader_writef (psf, "Em4mb", APPL_MARKER, slen + 4, m3ga_MARKER, psf->strings [k].str, make_size_t (slen + (slen & 1))) ;
+				slen = strlen (psf->strings.data [k].str) ;
+				psf_binheader_writef (psf, "Em4mb", APPL_MARKER, slen + 4, m3ga_MARKER, psf->strings.data [k].str, make_size_t (slen + (slen & 1))) ;
 				break ;
 
 			case SF_STR_TITLE :
-				psf_binheader_writef (psf, "EmS", NAME_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "EmS", NAME_MARKER, psf->strings.data [k].str) ;
 				break ;
 
 			case SF_STR_COPYRIGHT :
-				psf_binheader_writef (psf, "EmS", c_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "EmS", c_MARKER, psf->strings.data [k].str) ;
 				break ;
 
 			case SF_STR_ARTIST :
-				psf_binheader_writef (psf, "EmS", AUTH_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "EmS", AUTH_MARKER, psf->strings.data [k].str) ;
 				break ;
 
 			case SF_STR_COMMENT :
-				psf_binheader_writef (psf, "EmS", ANNO_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "EmS", ANNO_MARKER, psf->strings.data [k].str) ;
 				break ;
 
 			/*
 			case SF_STR_DATE :
-				psf_binheader_writef (psf, "Ems", ICRD_MARKER, psf->strings [k].str) ;
+				psf_binheader_writef (psf, "Ems", ICRD_MARKER, psf->strings.data [k].str) ;
 				break ;
 			*/
 			} ;
