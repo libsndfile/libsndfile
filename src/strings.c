@@ -74,19 +74,19 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	if (k >= SF_MAX_STRINGS)
 		return SFE_STR_MAX_COUNT ;
 
-	if (k == 0 && psf->strings.str_end != NULL)
-	{	psf_log_printf (psf, "SFE_STR_WEIRD : k == 0 && psf->strings.str_end != NULL\n") ;
+	if (k == 0 && psf->strings.str_last != 0)
+	{	psf_log_printf (psf, "SFE_STR_WEIRD : k == 0 && psf->strings.str_last != 0\n") ;
 		return SFE_STR_WEIRD ;
 		} ;
 
-	if (k != 0 && psf->strings.str_end == NULL)
-	{	psf_log_printf (psf, "SFE_STR_WEIRD : k != 0 && psf->strings.str_end == NULL\n") ;
+	if (k != 0 && psf->strings.str_last == 0)
+	{	psf_log_printf (psf, "SFE_STR_WEIRD : k != 0 && psf->strings.str_last == 0\n") ;
 		return SFE_STR_WEIRD ;
 		} ;
 
 	/* Special case for the first string. */
 	if (k == 0)
-		psf->strings.str_end = psf->strings.storage ;
+		psf->strings.str_last = 0 ;
 
 	switch (str_type)
 	{	case SF_STR_SOFTWARE :
@@ -127,27 +127,27 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 
 	str_len = strlen (str) ;
 
-	len_remaining = SIGNED_SIZEOF (psf->strings.storage) - (psf->strings.str_end - psf->strings.storage) ;
+	len_remaining = SIGNED_SIZEOF (psf->strings.storage) - psf->strings.str_last ;
 
 	if (len_remaining < str_len + 2)
 		return SFE_STR_MAX_DATA ;
 
 	psf->strings.data [k].type = str_type ;
-	psf->strings.data [k].str = psf->strings.str_end ;
+	psf->strings.data [k].str = psf->strings.storage + psf->strings.str_last ;
 	psf->strings.data [k].flags = str_flags ;
 
-	memcpy (psf->strings.str_end, str, str_len + 1) ;
+	memcpy (psf->strings.storage + psf->strings.str_last, str, str_len + 1) ;
 	/* Plus one to catch string terminator. */
-	psf->strings.str_end += str_len + 1 ;
+	psf->strings.str_last += str_len + 1 ;
 
 	psf->strings.flags |= str_flags ;
 
 #if STRINGS_DEBUG
 	psf_log_printf (psf, "str_storage          : %X\n", (int) psf->strings.storage) ;
-	psf_log_printf (psf, "str_end              : %X\n", (int) psf->strings.str_end) ;
+	psf_log_printf (psf, "str_last             : %d\n", (int) psf->strings.str_last) ;
 	psf_log_printf (psf, "sizeof (str_storage) : %d\n", SIGNED_SIZEOF (psf->strings.storage)) ;
-	psf_log_printf (psf, "used                 : %d\n", (int ) (psf->strings.str_end - psf->strings.storage)) ;
-	psf_log_printf (psf, "remaining            : %d\n", SIGNED_SIZEOF (psf->strings.storage) - (psf->strings.str_end - psf->strings.storage)) ;
+	psf_log_printf (psf, "used                 : %d\n", psf->strings.str_last) ;
+	psf_log_printf (psf, "remaining            : %d\n", SIGNED_SIZEOF (psf->strings.storage) - psf->strings.str_last) ;
 
 	hexdump (psf->strings.storage, 300) ;
 #endif

@@ -1,3 +1,9 @@
+2012-02-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/strings.c
+    Change way strings are stored in SF_PRIVATE in preparation for dynamically
+    allocating the storage.
+
 2012-02-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src*.c

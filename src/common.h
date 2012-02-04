@@ -364,8 +364,8 @@ typedef struct sf_private_tag
 	struct
 	{	STR_DATA	data [SF_MAX_STRINGS] ;
 		char		storage [SF_STR_BUFFER_LEN] ;
-		char		*str_end ;
-		int			flags ;
+		uint32_t	str_last ;
+		uint32_t	flags ;
 	} strings ;
 
 	/* Guard value. If this changes the buffers above have overflowed. */
