@@ -77,6 +77,15 @@
 #define erel_MARKER		(MAKE_MARKER ('e', 'r', 'e', 'l'))
 #define eucm_MARKER		(MAKE_MARKER ('e', 'u', 'c', 'm'))
 #define olym_MARKER		(MAKE_MARKER ('o', 'l', 'y', 'm'))
+#define minf_MARKER		(MAKE_MARKER ('m', 'i', 'n', 'f'))
+#define elm1_MARKER		(MAKE_MARKER ('e', 'l', 'm', '1'))
+#define regn_MARKER		(MAKE_MARKER ('r', 'e', 'g', 'n'))
+#define ovwf_MARKER		(MAKE_MARKER ('o', 'v', 'w', 'f'))
+#define umid_MARKER		(MAKE_MARKER ('u', 'm', 'i', 'd'))
+#define SyLp_MARKER		(MAKE_MARKER ('S', 'y', 'L', 'p'))
+#define Cr8r_MARKER		(MAKE_MARKER ('C', 'r', '8', 'r'))
+#define JUNQ_MARKER		(MAKE_MARKER ('J', 'U', 'N', 'Q'))
+#define PMX_MARKER		(MAKE_MARKER ('_', 'P', 'M', 'X'))
 
 #define ISFT_MARKER		(MAKE_MARKER ('I', 'S', 'F', 'T'))
 #define ICRD_MARKER		(MAKE_MARKER ('I', 'C', 'R', 'D'))
@@ -592,6 +601,15 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case cart_MARKER :
 			case levl_MARKER :
 			case plst_MARKER :
+			case minf_MARKER :
+			case elm1_MARKER :
+			case regn_MARKER :
+			case ovwf_MARKER :
+			case umid_MARKER :
+			case SyLp_MARKER :
+			case Cr8r_MARKER :
+			case JUNQ_MARKER :
+			case PMX_MARKER :
 			case DISP_MARKER :
 			case MEXT_MARKER :
 			case FLLR_MARKER :
