@@ -86,6 +86,9 @@
 #define Cr8r_MARKER		(MAKE_MARKER ('C', 'r', '8', 'r'))
 #define JUNQ_MARKER		(MAKE_MARKER ('J', 'U', 'N', 'Q'))
 #define PMX_MARKER		(MAKE_MARKER ('_', 'P', 'M', 'X'))
+#define inst_MARKER		(MAKE_MARKER ('i', 'n', 's', 't'))
+#define AFAn_MARKER		(MAKE_MARKER ('A', 'F', 'A', 'n'))
+
 
 #define ISFT_MARKER		(MAKE_MARKER ('I', 'S', 'F', 'T'))
 #define ICRD_MARKER		(MAKE_MARKER ('I', 'C', 'R', 'D'))
@@ -605,6 +608,8 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case elm1_MARKER :
 			case regn_MARKER :
 			case ovwf_MARKER :
+			case inst_MARKER :
+			case AFAn_MARKER :
 			case umid_MARKER :
 			case SyLp_MARKER :
 			case Cr8r_MARKER :
@@ -622,11 +627,12 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if (psf_isprint ((marker >> 24) & 0xFF) && psf_isprint ((marker >> 16) & 0xFF)
 						&& psf_isprint ((marker >> 8) & 0xFF) && psf_isprint (marker & 0xFF))
 					{	psf_log_printf (psf, "*** %M : %d (unknown marker)\n", marker, chunk_size) ;
+						chunk_size += (chunk_size & 1) ;
 						psf_binheader_readf (psf, "j", chunk_size) ;
 						break ;
 						} ;
 					if (psf_ftell (psf) & 0x03)
-					{	psf_log_printf (psf, "  Unknown chunk marker at position %d. Resynching.\n", chunk_size - 4) ;
+					{	psf_log_printf (psf, "  Unknown chunk marker at position %D. Resynching.\n", psf_ftell (psf) - 4) ;
 						psf_binheader_readf (psf, "j", -3) ;
 						/* File is too messed up so we prevent editing in RDWR mode here. */
 						parsestage |= HAVE_other ;
