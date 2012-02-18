@@ -14,6 +14,9 @@
     Remove un-needed OSX include <Carbon.h>. Thanks jamesfmilne for github
     issue #3.
 
+    * tests/chunk_test.c
+    Extend custom chunk test.
+
 2012-02-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c

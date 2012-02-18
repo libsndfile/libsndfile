@@ -85,15 +85,12 @@ main (int argc, char *argv [])
 */
 
 static void
-chunk_test (const char *filename, int typemajor)
-{	const char*		testdata = "There can be only one." ;
-	SNDFILE			*file ;
+chunk_test_helper (const char *filename, int typemajor, const char * testdata)
+{	SNDFILE			*file ;
 	SF_INFO			sfinfo ;
 	SF_CHUNK_INFO	chunk_info ;
 	uint32_t		length_before ;
 	int				err ;
-
-	print_test_name ("chunk_test", filename) ;
 
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 1 ;
@@ -123,7 +120,7 @@ chunk_test (const char *filename, int typemajor)
 	err = sf_set_chunk (file, &chunk_info) ;
 	exit_if_true (
 		err != SF_ERR_NO_ERROR,
-		"\n\nLine %d : sf_set_chunk returned : %s\n", __LINE__, sf_error_number (err)
+		"\n\nLine %d : sf_set_chunk returned for testdata '%s' : %s\n", __LINE__, testdata, sf_error_number (err)
 		) ;
 
 	memset (chunk_info.data, 0, chunk_info.datalen) ;
@@ -140,19 +137,19 @@ chunk_test (const char *filename, int typemajor)
 	err = sf_get_chunk_size (file, &chunk_info) ;
 	exit_if_true (
 		err != SF_ERR_NO_ERROR,
-		"\n\nLine %d : sf_get_chunk_size returned : %s\n", __LINE__, sf_error_number (err)
+		"\n\nLine %d : sf_get_chunk_size returned for testdata '%s' : %s", __LINE__, testdata, sf_error_number (err)
 		) ;
 
 	exit_if_true (
 		length_before > chunk_info.datalen || chunk_info.datalen - length_before > 4,
-		"\n\nLine %d : Bad chunk length %u (previous length %u)\n", __LINE__, chunk_info.datalen, length_before
+		"\n\nLine %d : testdata '%s' : Bad chunk length %u (previous length %u)\n", __LINE__, testdata, chunk_info.datalen, length_before
 		) ;
 
 	chunk_info.data = malloc (chunk_info.datalen) ;
 	err = sf_get_chunk_data (file, &chunk_info) ;
 	exit_if_true (
 		err != SF_ERR_NO_ERROR,
-		"\n\nLine %d : sf_get_chunk_data returned : %s\n", __LINE__, sf_error_number (err)
+		"\n\nLine %d : sf_get_chunk_size returned for testdata '%s' : %s", __LINE__, testdata, sf_error_number (err)
 		) ;
 
 	exit_if_true (
@@ -164,6 +161,18 @@ chunk_test (const char *filename, int typemajor)
 
 	sf_close (file) ;
 	unlink (filename) ;
+} /* chunk_test_helper */
+
+static void
+chunk_test (const char *filename, int typemajor)
+{	const char*		testdata [] =
+	{	"There can be only one.", "", "A", "AB", "ABC", "ABCD", "ABCDE" } ;
+	uint32_t k ;
+
+	print_test_name (__func__, filename) ;
+
+	for (k = 0 ; k < ARRAY_LEN (testdata) ; k++)
+		chunk_test_helper (filename, typemajor, testdata [k]) ;
 
 	puts ("ok") ;
 } /* chunk_test */
