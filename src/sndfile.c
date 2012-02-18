@@ -253,7 +253,7 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_RF64_NOT_RF64		, "Error : Not an RF64 file." },
 
-	{	SFE_BAD_READ_CHUNK_PTR	, "Error : Bad SF_CHUNK_INFO pointer." },
+	{	SFE_BAD_CHUNK_PTR		, "Error : Bad SF_CHUNK_INFO pointer." },
 	{	SFE_UNKNOWN_CHUNK		, "Error : Uknown chunk marker." },
 	{	SFE_BAD_CHUNK_FORMAT	, "Error : Reading/writing chunks from this file format is not supported." },
 	{	SFE_BAD_CHUNK_MARKER	, "Error : Bad chunk marker." },
@@ -2948,7 +2948,7 @@ sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
 	if (chunk_info == NULL)
-		return SFE_BAD_READ_CHUNK_PTR ;
+		return SFE_BAD_CHUNK_PTR ;
 
 	if (psf->set_chunk)
 		return psf->set_chunk (psf, chunk_info) ;
@@ -2964,7 +2964,7 @@ sf_get_chunk_size (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info)
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
 	if (chunk_info == NULL)
-		return SFE_BAD_READ_CHUNK_PTR ;
+		return SFE_BAD_CHUNK_PTR ;
 
 	if (psf->get_chunk_size)
 		return psf->get_chunk_size (psf, chunk_info) ;
@@ -2979,7 +2979,7 @@ sf_get_chunk_data (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info)
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
 	if (chunk_info == NULL)
-		return SFE_BAD_READ_CHUNK_PTR ;
+		return SFE_BAD_CHUNK_PTR ;
 
 	if (psf->get_chunk_data)
 		return psf->get_chunk_data (psf, chunk_info) ;

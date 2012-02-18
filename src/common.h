@@ -75,7 +75,7 @@
 #define SF_SYSERR_LEN			(256)
 #define SF_MAX_STRINGS			(32)
 #define SF_STR_BUFFER_LEN		(8192)
-#define	SF_HEADER_LEN			(4100 + SF_STR_BUFFER_LEN)
+#define	SF_HEADER_LEN			(8192)
 #define	SF_PARSELOG_LEN			(2048)
 
 #define	PSF_SEEK_ERROR			((sf_count_t) -1)
@@ -109,6 +109,9 @@
 #define		SF_MAX(a, b)	((a) > (b) ? (a) : (b))
 #define		SF_MIN(a, b)	((a) < (b) ? (a) : (b))
 #endif
+
+
+#define		COMPILE_TIME_ASSERT(e)	(sizeof (struct { int : - !! (e) ; }))
 
 
 #define		SF_MAX_CHANNELS	256
@@ -678,7 +681,7 @@ enum
 	SFE_VORBIS_ENCODER_BUG,
 
 	SFE_RF64_NOT_RF64,
-	SFE_BAD_READ_CHUNK_PTR,
+	SFE_BAD_CHUNK_PTR,
 	SFE_UNKNOWN_CHUNK,
 	SFE_BAD_CHUNK_FORMAT,
 	SFE_BAD_CHUNK_MARKER,
