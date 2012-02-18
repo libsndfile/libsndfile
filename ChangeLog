@@ -7,6 +7,13 @@
     * src/utils.tpl
     Add GCC specific testing for format string parameters for exit_if_true().
 
+    * tests/*.c tests/*.tpl
+    Fix all printf format warnings.
+
+    * programs/sndfile-play.c
+    Remove un-needed OSX include <Carbon.h>. Thanks jamesfmilne for github
+    issue #3.
+
 2012-02-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c
