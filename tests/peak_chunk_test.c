@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <inttypes.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -347,7 +348,7 @@ read_write_peak_test (const char *filename, int filetype)
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
 
 	exit_if_true (sfinfo.channels * sfinfo.frames != 2 * ARRAY_LEN (small_data),
-			"Line %d : frame count is %ld, should be %d\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), 2 * ARRAY_LEN (small_data)) ;
+			"Line %d : frame count is %" PRId64 ", should be %zd\n", __LINE__, sfinfo.frames, 2 * ARRAY_LEN (small_data)) ;
 
 	sf_command (file, SFC_GET_SIGNAL_MAX, &max_peak, sizeof (double)) ;
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2006-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2006-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -159,7 +159,7 @@ read_file (const char * filename, int format)
 
 	if (file.frames () != ARRAY_LEN (sbuffer) * 4)
 	{	printf ("\n\n%s %d : Error : frames %ld should be %lu.\n\n", __func__, __LINE__,
-				SF_COUNT_TO_LONG (file.frames ()), (long unsigned int) ARRAY_LEN (sbuffer) * 4 / 2) ;
+				(long) file.frames (), (long) ARRAY_LEN (sbuffer) * 4 / 2) ;
 		exit (1) ;
 		} ;
 
@@ -187,14 +187,14 @@ read_file (const char * filename, int format)
 	count = file.seek (file.frames () - 10, SEEK_SET) ;
 	if (count != file.frames () - 10)
 	{	printf ("\n\n%s %d : Error : offset (%ld) should be %ld\n\n", __func__, __LINE__,
-				SF_COUNT_TO_LONG (count), SF_COUNT_TO_LONG (file.frames () - 10)) ;
+				(long) count, (long) (file.frames () - 10)) ;
 		exit (1) ;
 		} ;
 
 	count = file.read (sbuffer, ARRAY_LEN (sbuffer)) ;
 	if (count != 10 * file.channels ())
 	{	printf ("\n\n%s %d : Error : count (%ld) should be %ld\n\n", __func__, __LINE__,
-				SF_COUNT_TO_LONG (count), SF_COUNT_TO_LONG (10 * file.channels ())) ;
+				(long) count, (long) (10 * file.channels ())) ;
 		exit (1) ;
 		} ;
 

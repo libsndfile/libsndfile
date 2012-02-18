@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <inttypes.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -174,7 +175,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 		} ;
 
 	if (sfinfo.frames != items)
-	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %ld)\n", __LINE__, items, SF_COUNT_TO_LONG (sfinfo.frames)) ;
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
@@ -236,7 +237,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 		} ;
 
 	if (sfinfo.frames != items)
-	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %ld)\n", __LINE__, items, SF_COUNT_TO_LONG (sfinfo.frames)) ;
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
@@ -298,7 +299,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 		} ;
 
 	if (sfinfo.frames != items)
-	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %ld)\n", __LINE__, items, SF_COUNT_TO_LONG (sfinfo.frames)) ;
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
@@ -361,7 +362,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 		} ;
 
 	if (sfinfo.frames != items)
-	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %ld)\n", __LINE__, items, SF_COUNT_TO_LONG (sfinfo.frames)) ;
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
@@ -451,7 +452,7 @@ pcm_test_float (const char *filename, int filetype, uint64_t hash, int replace_f
 		} ;
 
 	if (sfinfo.frames != items)
-	{	printf ("\n\nError (%s:%d) Mono : Incorrect number of frames in file. (%d => %ld)\n", __FILE__, __LINE__, items, SF_COUNT_TO_LONG (sfinfo.frames)) ;
+	{	printf ("\n\nError (%s:%d) Mono : Incorrect number of frames in file. (%d => %" PRId64 ")\n", __FILE__, __LINE__, items, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
@@ -575,7 +576,7 @@ pcm_test_float (const char *filename, int filetype, uint64_t hash, int replace_f
 		} ;
 
 	if (sfinfo.frames != frames)
-	{	printf ("\n\nError (%s:%d) Stereo : Incorrect number of frames in file. (%d => %ld)\n", __FILE__, __LINE__, frames, SF_COUNT_TO_LONG (sfinfo.frames)) ;
+	{	printf ("\n\nError (%s:%d) Stereo : Incorrect number of frames in file. (%d => %" PRId64 ")\n", __FILE__, __LINE__, frames, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
@@ -714,7 +715,7 @@ pcm_test_double (const char *filename, int	filetype, uint64_t hash, int replace_
 		} ;
 
 	if (sfinfo.frames != items)
-	{	printf ("\n\nError (%s:%d) Mono : Incorrect number of frames in file. (%d => %ld)\n", __FILE__, __LINE__, items, SF_COUNT_TO_LONG (sfinfo.frames)) ;
+	{	printf ("\n\nError (%s:%d) Mono : Incorrect number of frames in file. (%d => %" PRId64 ")\n", __FILE__, __LINE__, items, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
@@ -848,7 +849,7 @@ pcm_test_double (const char *filename, int	filetype, uint64_t hash, int replace_
 		} ;
 
 	if (sfinfo.frames != frames)
-	{	printf ("\n\nError (%s:%d) Stereo : Incorrect number of frames in file. (%d => %ld)\n", __FILE__, __LINE__, frames, SF_COUNT_TO_LONG (sfinfo.frames)) ;
+	{	printf ("\n\nError (%s:%d) Stereo : Incorrect number of frames in file. (%d => %" PRId64 ")\n", __FILE__, __LINE__, frames, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 

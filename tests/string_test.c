@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <inttypes.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -526,7 +527,7 @@ string_rdwr_test (const char *filename, int typemajor)
 	sf_close (file) ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
-	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %lld should be %lld.\n", __LINE__, sfinfo.frames, frames) ;
+	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %" PRId64 " should be %" PRId64 ".\n", __LINE__, sfinfo.frames, frames) ;
 	str = sf_get_string (file, SF_STR_TITLE) ;
 	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_TITLE string is NULL.\n", __LINE__) ;
 	exit_if_true (strcmp (str, title) != 0, "\n\nLine %d : SF_STR_TITLE doesn't match what was written.\n", __LINE__) ;
@@ -553,7 +554,7 @@ string_rdwr_test (const char *filename, int typemajor)
 	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_TITLE string is NULL.\n", __LINE__) ;
 	exit_if_true (strcmp (str, title) != 0, "\n\nLine %d : SF_STR_TITLE doesn't match what was written.\n", __LINE__) ;
 
-	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %lld should be %lld.\n", __LINE__, sfinfo.frames, frames) ;
+	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %" PRId64 " should be %" PRId64 ".\n", __LINE__, sfinfo.frames, frames) ;
 
 	sf_close (file) ;
 	unlink (filename) ;
@@ -587,7 +588,7 @@ string_short_rdwr_test (const char *filename, int typemajor)
 
 	/* Open the file RDWR. */
 	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__) ;
-	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %lld should be %lld.\n", __LINE__, sfinfo.frames, frames) ;
+	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %" PRId64 " should be %" PRId64 ".\n", __LINE__, sfinfo.frames, frames) ;
 	str = sf_get_string (file, SF_STR_TITLE) ;
 	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_TITLE string is NULL.\n", __LINE__) ;
 	exit_if_true (strcmp (str, long_title) != 0, "\n\nLine %d : SF_STR_TITLE doesn't match what was written.\n", __LINE__) ;
@@ -661,7 +662,7 @@ software_string_test (const char *filename)
 		exit_if_true (result == NULL, "\n\nLine %d : sf_get_string (file, SF_STR_SOFTWARE) returned NULL.\n\n", __LINE__) ;
 
 		exit_if_true (strstr (result, sfname) != result,
-			"\n\nLine %d : String '%s''%s' -> '%s'\n\n", sfname, result) ;
+			"\n\nLine %d : Can't fine string '%s' in '%s'\n\n", __LINE__, sfname, result) ;
 		sf_close (file) ;
 		} ;
 
@@ -709,7 +710,7 @@ string_rdwr_grow_test (const char *filename, int typemajor)
 	/* Now open file again. It should now contain two BUFFER_LEN's worth of frames and the strings. */
 	frames = 2 * BUFFER_LEN / sfinfo.channels ;
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
-	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %lld should be %lld.\n", __LINE__, sfinfo.frames, frames) ;
+	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %" PRId64 " should be %" PRId64 ".\n", __LINE__, sfinfo.frames, frames) ;
 
 	/* Check the strings */
 	str = sf_get_string (file, SF_STR_TITLE) ;
@@ -761,7 +762,7 @@ string_header_update (const char *filename, int typemajor)
 	file1 = test_open_file_or_die (filename, SFM_READ, &sfinfo1, SF_TRUE, __LINE__) ;
 
 	frames = (BUFFER_LEN + GROW_BUFFER_AMOUNT) / sfinfo.channels ;
-	exit_if_true (frames != sfinfo1.frames, "\n\nLine %d : Frame count %lld should be %lld.\n", __LINE__, sfinfo1.frames, frames) ;
+	exit_if_true (frames != sfinfo1.frames, "\n\nLine %d : Frame count %" PRId64 " should be %" PRId64 ".\n", __LINE__, sfinfo1.frames, frames) ;
 
 	/* The strings are probably not readable by the second soundfile handle because write_tailer has not yet been called.
 		It's a design decision whether SFC_UPDATE_HEADER_NOW should write the tailer. I think it's fine that it doesn't.  */
@@ -780,7 +781,7 @@ string_header_update (const char *filename, int typemajor)
 	/* Open file again and verify data and string. */
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 	frames = (BUFFER_LEN + 2*GROW_BUFFER_AMOUNT) / sfinfo.channels ;
-	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %lld should be %lld.\n", __LINE__, sfinfo.frames, frames) ;
+	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %" PRId64 " should be %" PRId64 ".\n", __LINE__, sfinfo.frames, frames) ;
 	str = sf_get_string (file, SF_STR_TITLE) ;
 	exit_if_true (str == NULL, "\n\nLine %d : SF_STR_TITLE string is NULL.\n", __LINE__) ;
 	exit_if_true (strcmp (str, long_title) != 0, "\n\nLine %d : SF_STR_TITLE doesn't match what was written.\n", __LINE__) ;

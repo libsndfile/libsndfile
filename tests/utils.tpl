@@ -34,7 +34,6 @@ extern "C" {
 #include <stdint.h>
 #include <stdarg.h>
 
-#define SF_COUNT_TO_LONG(x)	((long) (x))
 #define	ARRAY_LEN(x)		((int) (sizeof (x)) / (sizeof ((x) [0])))
 #define SIGNED_SIZEOF(x)	((int64_t) (sizeof (x)))
 #define	NOT(x)				(! (x))
@@ -427,7 +426,7 @@ hexdump_file (const char * filename, sf_count_t offset, sf_count_t length)
 	int k, m, ch, readcount ;
 
 	if (length > 1000000)
-	{	printf ("\n\nError : length (%ld) too long.\n\n", SF_COUNT_TO_LONG (offset)) ;
+	{	printf ("\n\nError : length (%" PRId64 ") too long.\n\n", offset) ;
 		exit (1) ;
 		} ;
 
@@ -437,7 +436,7 @@ hexdump_file (const char * filename, sf_count_t offset, sf_count_t length)
 		} ;
 
 	if (fseek (file, offset, SEEK_SET) != 0)
-	{	printf ("\n\nError : fseek(file, %ld, SEEK_SET) failed : %s\n\n", SF_COUNT_TO_LONG (offset), strerror (errno)) ;
+	{	printf ("\n\nError : fseek(file, %" PRId64 ", SEEK_SET) failed : %s\n\n", offset, strerror (errno)) ;
 		exit (1) ;
 		} ;
 
@@ -446,7 +445,7 @@ hexdump_file (const char * filename, sf_count_t offset, sf_count_t length)
 	for (k = 0 ; k < length ; k+= sizeof (buffer))
 	{	readcount = fread (buffer, 1, sizeof (buffer), file) ;
 
-		printf ("%08lx : ", SF_COUNT_TO_LONG (offset + k)) ;
+		printf ("%08" PRIx64 " : ", offset + k) ;
 
 		for (m = 0 ; m < readcount ; m++)
 			printf ("%02x ", buffer [m] & 0xFF) ;
@@ -575,7 +574,7 @@ test_read_write_position_or_die (SNDFILE *file, int line_num, int pass, sf_count
 	{	printf ("\n\nLine %d ", line_num) ;
 		if (pass > 0)
 			printf ("(pass %d): ", pass) ;
-		printf ("Read position (%ld) should be %ld.\n", SF_COUNT_TO_LONG (pos), SF_COUNT_TO_LONG (read_pos)) ;
+		printf ("Read position (%" PRId64 ") should be %" PRId64 ".\n", pos, read_pos) ;
 		exit (1) ;
 		} ;
 
@@ -584,8 +583,7 @@ test_read_write_position_or_die (SNDFILE *file, int line_num, int pass, sf_count
 	{	printf ("\n\nLine %d", line_num) ;
 		if (pass > 0)
 			printf (" (pass %d)", pass) ;
-		printf (" : Write position (%ld) should be %ld.\n",
-						SF_COUNT_TO_LONG (pos), SF_COUNT_TO_LONG (write_pos)) ;
+		printf (" : Write position (%" PRId64 ") should be %" PRId64 ".\n", pos, write_pos) ;
 		exit (1) ;
 		} ;
 
@@ -638,9 +636,8 @@ test_seek_or_die (SNDFILE *file, sf_count_t offset, int whence, sf_count_t new_p
 	channel_name = (channels == 1) ? "Mono" : "Stereo" ;
 
 	if ((position = sf_seek (file, offset, whence)) != new_pos)
-	{	printf ("\n\nLine %d : %s : sf_seek (file, %ld, %s) returned %ld (should be %ld).\n\n",
-					line_num, channel_name, SF_COUNT_TO_LONG (offset), whence_name,
-					SF_COUNT_TO_LONG (position), SF_COUNT_TO_LONG (new_pos)) ;
+	{	printf ("\n\nLine %d : %s : sf_seek (file, %" PRId64 ", %s) returned %" PRId64 " (should be %" PRId64 ").\n\n",
+					line_num, channel_name, offset, whence_name, position, new_pos) ;
 		exit (1) ;
 		} ;
 
@@ -656,8 +653,8 @@ test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die (SNDFILE *file, in
 	{	printf ("\n\nLine %d", line_num) ;
 		if (pass > 0)
 			printf (" (pass %d)", pass) ;
-		printf (" : sf_[+ (get "op_element") +]_[+ (get "io_element") +] failed with short [+ (get "op_element") +] (%ld => %ld).\n",
-						SF_COUNT_TO_LONG ([+ (get "count_name") +]), SF_COUNT_TO_LONG (count)) ;
+		printf (" : sf_[+ (get "op_element") +]_[+ (get "io_element") +] failed with short [+ (get "op_element") +] (%" PRId64 " => %" PRId64 ").\n",
+						[+ (get "count_name") +], count) ;
 		fflush (stdout) ;
 		puts (sf_strerror (file)) ;
 		exit (1) ;
@@ -675,8 +672,7 @@ test_read_raw_or_die (SNDFILE *file, int pass, void *test, sf_count_t items, int
 	{	printf ("\n\nLine %d", line_num) ;
 		if (pass > 0)
 			printf (" (pass %d)", pass) ;
-		printf (" : sf_read_raw failed with short read (%ld => %ld).\n",
-						SF_COUNT_TO_LONG (items), SF_COUNT_TO_LONG (count)) ;
+		printf (" : sf_read_raw failed with short read (%" PRId64 " => %" PRId64 ").\n", items, count) ;
 		fflush (stdout) ;
 		puts (sf_strerror (file)) ;
 		exit (1) ;
@@ -695,8 +691,8 @@ test_[+ (get "op_element") +]_[+ (get "io_element") +]_or_die (SNDFILE *file, in
 	{	printf ("\n\nLine %d", line_num) ;
 		if (pass > 0)
 			printf (" (pass %d)", pass) ;
-		printf (" : sf_[+ (get "op_element") +]_[+ (get "io_element") +] failed with short [+ (get "op_element") +] (%ld => %ld).\n",
-						SF_COUNT_TO_LONG ([+ (get "count_name") +]), SF_COUNT_TO_LONG (count)) ;
+		printf (" : sf_[+ (get "op_element") +]_[+ (get "io_element") +] failed with short [+ (get "op_element") +] (%" PRId64 " => %" PRId64 ").\n",
+						[+ (get "count_name") +], count) ;
 		fflush (stdout) ;
 		puts (sf_strerror (file)) ;
 		exit (1) ;
@@ -714,8 +710,7 @@ test_write_raw_or_die (SNDFILE *file, int pass, const void *test, sf_count_t ite
 	{	printf ("\n\nLine %d", line_num) ;
 		if (pass > 0)
 			printf (" (pass %d)", pass) ;
-		printf (" : sf_write_raw failed with short write (%ld => %ld).\n",
-						SF_COUNT_TO_LONG (items), SF_COUNT_TO_LONG (count)) ;
+		printf (" : sf_write_raw failed with short write (%" PRId64 " => %" PRId64 ").\n", items, count) ;
 		fflush (stdout) ;
 		puts (sf_strerror (file)) ;
 		exit (1) ;

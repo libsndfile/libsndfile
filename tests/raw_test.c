@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <inttypes.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -84,7 +85,7 @@ raw_offset_test (const char *filename, int typeminor)
 	check_log_buffer_or_die (sndfile, __LINE__) ;
 
 	if (abs (BUFFER_LEN - sfinfo.frames) > 1)
-	{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), BUFFER_LEN) ;
+	{	printf ("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, BUFFER_LEN) ;
 		dump_log_buffer (sndfile) ;
 		exit (1) ;
 		} ;

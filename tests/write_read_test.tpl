@@ -22,17 +22,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+#include <inttypes.h>
+
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
-#include	<math.h>
+#include <sndfile.h>
 
-#include	<sndfile.h>
-
-#include	"utils.h"
-#include	"generate.h"
+#include "utils.h"
+#include "generate.h"
 
 #define	SAMPLE_RATE			11025
 #define	DATA_LENGTH			(1 << 12)
@@ -533,12 +534,12 @@ mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_fi
 		} ;
 
 	if (sfinfo.frames < 2 * items)
-	{	printf ("\n\nLine %d : Mono : Incorrect number of frames in file (too short). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), items) ;
+	{	printf ("\n\nLine %d : Mono : Incorrect number of frames in file (too short). (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, items) ;
 		exit (1) ;
 		} ;
 
 	if (! long_file_ok && sfinfo.frames > 2 * items)
-	{	printf ("\n\nLine %d : Mono : Incorrect number of frames in file (too long). (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), items) ;
+	{	printf ("\n\nLine %d : Mono : Incorrect number of frames in file (too long). (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, items) ;
 		exit (1) ;
 		} ;
 
@@ -621,7 +622,7 @@ mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_fi
 
 	/* Check that we haven't read beyond EOF. */
 	if (count > sfinfo.frames)
-	{	printf ("\n\nLines %d : read past end of file (%ld should be %ld)\n", __LINE__, (long) count, (long) sfinfo.frames) ;
+	{	printf ("\n\nLines %d : read past end of file (%" PRId64 " should be %" PRId64 ")\n", __LINE__, count, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
@@ -681,14 +682,14 @@ stereo_[+ (get "type_name") +]_test (const char *filename, int format, int long_
 		} ;
 
 	if (sfinfo.frames < frames)
-	{	printf ("\n\nLine %d : Stereo : Incorrect number of frames in file (too short). (%ld should be %d)\n",
-				__LINE__, SF_COUNT_TO_LONG (sfinfo.frames), frames) ;
+	{	printf ("\n\nLine %d : Stereo : Incorrect number of frames in file (too short). (%" PRId64 " should be %d)\n",
+				__LINE__, sfinfo.frames, frames) ;
 		exit (1) ;
 		} ;
 
 	if (! long_file_ok && sfinfo.frames > frames)
-	{	printf ("\n\nLine %d : Stereo : Incorrect number of frames in file (too long). (%ld should be %d)\n",
-				__LINE__, SF_COUNT_TO_LONG (sfinfo.frames), frames) ;
+	{	printf ("\n\nLine %d : Stereo : Incorrect number of frames in file (too long). (%" PRId64 " should be %d)\n",
+				__LINE__, sfinfo.frames, frames) ;
 		exit (1) ;
 		} ;
 
@@ -852,12 +853,12 @@ mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int lo
 		} ;
 
 	if (sfinfo.frames < 3 * DATA_LENGTH)
-	{	printf ("\n\nLine %d : Not enough frames in file. (%ld < %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), 3 * DATA_LENGTH ) ;
+	{	printf ("\n\nLine %d : Not enough frames in file. (%" PRId64 " < %d)\n", __LINE__, sfinfo.frames, 3 * DATA_LENGTH ) ;
 		exit (1) ;
 		}
 
 	if (! long_file_ok && sfinfo.frames != 3 * DATA_LENGTH)
-	{	printf ("\n\nLine %d : Incorrect number of frames in file. (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), 3 * DATA_LENGTH ) ;
+	{	printf ("\n\nLine %d : Incorrect number of frames in file. (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, 3 * DATA_LENGTH ) ;
 		exit (1) ;
 		} ;
 
@@ -919,7 +920,7 @@ new_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int all
 
 	rwfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, allow_fd, __LINE__) ;
 	if (sfinfo.frames != 2 * frames)
-	{	printf ("\n\nLine %d : incorrect number of frames in file (%ld should be %d)\n\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), 2 * frames) ;
+	{	printf ("\n\nLine %d : incorrect number of frames in file (%" PRId64 " should be %d)\n\n", __LINE__, sfinfo.frames, 2 * frames) ;
 		exit (1) ;
 		} ;
 
@@ -969,8 +970,8 @@ empty_file_test (const char *filename, int format)
 	/* Open for read and check the length. */
 	file = test_open_file_or_die (filename, SFM_READ, &info, allow_fd, __LINE__) ;
 
-	if (SF_COUNT_TO_LONG (info.frames) != 0)
-	{	printf ("\n\nError : frame count (%ld) should be zero.\n", SF_COUNT_TO_LONG (info.frames)) ;
+	if (info.frames != 0)
+	{	printf ("\n\nError : frame count (%" PRId64 ") should be zero.\n", info.frames) ;
 			exit (1) ;
 			} ;
 
@@ -979,8 +980,8 @@ empty_file_test (const char *filename, int format)
 	/* Open for read/write and check the length. */
 	file = test_open_file_or_die (filename, SFM_RDWR, &info, allow_fd, __LINE__) ;
 
-	if (SF_COUNT_TO_LONG (info.frames) != 0)
-	{	printf ("\n\nError : frame count (%ld) should be zero.\n", SF_COUNT_TO_LONG (info.frames)) ;
+	if (info.frames != 0)
+	{	printf ("\n\nError : frame count (%" PRId64 ") should be zero.\n", info.frames) ;
 		exit (1) ;
 		} ;
 
@@ -989,8 +990,8 @@ empty_file_test (const char *filename, int format)
 	/* Open for read and check the length. */
 	file = test_open_file_or_die (filename, SFM_READ, &info, allow_fd, __LINE__) ;
 
-	if (SF_COUNT_TO_LONG (info.frames) != 0)
-	{	printf ("\n\nError : frame count (%ld) should be zero.\n", SF_COUNT_TO_LONG (info.frames)) ;
+	if (info.frames != 0)
+	{	printf ("\n\nError : frame count (%" PRId64 ") should be zero.\n", info.frames) ;
 		exit (1) ;
 		} ;
 

@@ -273,7 +273,7 @@ update_header_sub (const char *filename, int typemajor, int write_mode)
 	check_log_buffer_or_die (infile, __LINE__) ;
 
 	if (sfinfo.frames < BUFFER_LEN || sfinfo.frames > BUFFER_LEN + 50)
-	{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), BUFFER_LEN) ;
+	{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %d)\n", __LINE__, sfinfo.frames, BUFFER_LEN) ;
 		dump_log_buffer (infile) ;
 		exit (1) ;
 		} ;
@@ -298,7 +298,7 @@ update_header_sub (const char *filename, int typemajor, int write_mode)
 	check_log_buffer_or_die (infile, __LINE__) ;
 
 	if (sfinfo.frames < 2 * BUFFER_LEN || sfinfo.frames > 2 * BUFFER_LEN + 50)
-	{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %d)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), 2 * BUFFER_LEN) ;
+	{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %d)\n", __LINE__, sfinfo.frames, 2 * BUFFER_LEN) ;
 		dump_log_buffer (infile) ;
 		exit (1) ;
 		} ;
@@ -375,7 +375,7 @@ update_seek_[+ (get "name") +]_test	(const char *filename, int filetype)
 		sf_close (infile) ;
 
 		if (sfinfo.frames != k * frames)
-		{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %ld)\n", __LINE__, SF_COUNT_TO_LONG (sfinfo.frames), SF_COUNT_TO_LONG (k + frames)) ;
+		{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %ld)\n", __LINE__, sfinfo.frames, k + frames) ;
 			dump_log_buffer (infile) ;
 			exit (1) ;
 			} ;
@@ -520,7 +520,7 @@ extra_header_test (const char *filename, int filetype)
 			} ;
 
 		if (sfinfo.frames != k * frames)
-		{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %ld)\n", [+ (tpl-file-line "%2$d") +], SF_COUNT_TO_LONG (sfinfo.frames), SF_COUNT_TO_LONG (k + frames)) ;
+		{	printf ("\n\nLine %d : Incorrect sample count (%ld should be %ld)\n", [+ (tpl-file-line "%2$d") +], sfinfo.frames, k + frames) ;
 			dump_log_buffer (infile) ;
 			exit (1) ;
 			} ;

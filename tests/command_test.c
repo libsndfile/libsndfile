@@ -20,6 +20,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <inttypes.h>
 #include <string.h>
 #include <time.h>
 
@@ -241,7 +243,7 @@ float_norm_test (const char *filename)
 		} ;
 
 	if (sfinfo.frames != BUFFER_LEN)
-	{	printf ("\n\nLine %d: Incorrect number of.frames in file. (%d => %ld)\n", __LINE__, BUFFER_LEN, SF_COUNT_TO_LONG (sfinfo.frames)) ;
+	{	printf ("\n\nLine %d: Incorrect number of.frames in file. (%d => %" PRId64 ")\n", __LINE__, BUFFER_LEN, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
@@ -357,7 +359,7 @@ double_norm_test (const char *filename)
 		} ;
 
 	if (sfinfo.frames != BUFFER_LEN)
-	{	printf ("\n\nLine %d: Incorrect number of.frames in file. (%d => %ld)\n", __LINE__, BUFFER_LEN, SF_COUNT_TO_LONG (sfinfo.frames)) ;
+	{	printf ("\n\nLine %d: Incorrect number of.frames in file. (%d => %" PRId64 ")\n", __LINE__, BUFFER_LEN, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
@@ -546,7 +548,7 @@ calc_peak_test (int filetype, const char *filename)
 		} ;
 
 	if (sfinfo.frames != BUFFER_LEN)
-	{	printf ("\n\nLine %d: Incorrect number of.frames in file. (%d => %ld)\n", __LINE__, BUFFER_LEN, SF_COUNT_TO_LONG (sfinfo.frames)) ;
+	{	printf ("\n\nLine %d: Incorrect number of.frames in file. (%d => %" PRId64 ")\n", __LINE__, BUFFER_LEN, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
@@ -593,7 +595,7 @@ calc_peak_test (int filetype, const char *filename)
 		} ;
 
 	if (sfinfo.frames != BUFFER_LEN)
-	{	printf ("\n\nLine %d: Incorrect number of.frames in file. (%d => %ld)\n", __LINE__, BUFFER_LEN, SF_COUNT_TO_LONG (sfinfo.frames)) ;
+	{	printf ("\n\nLine %d: Incorrect number of.frames in file. (%d => %" PRId64 ")\n", __LINE__, BUFFER_LEN, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
@@ -824,8 +826,8 @@ current_sf_info_test	(const char *filename)
 	sf_command (outfile, SFC_GET_CURRENT_SF_INFO, &outinfo, sizeof (outinfo)) ;
 
 	exit_if_true (outinfo.frames != BUFFER_LEN,
-		"\n\nLine %d : Initial sfinfo.frames (%ld) should be %d.\n\n", __LINE__,
-		SF_COUNT_TO_LONG (outinfo.frames), BUFFER_LEN
+		"\n\nLine %d : Initial sfinfo.frames (%" PRId64 ") should be %d.\n\n", __LINE__,
+		outinfo.frames, BUFFER_LEN
 		) ;
 
 	/* Read file making sure no channel map exists. */
@@ -837,8 +839,8 @@ current_sf_info_test	(const char *filename)
 	sf_command (infile, SFC_GET_CURRENT_SF_INFO, &ininfo, sizeof (ininfo)) ;
 
 	exit_if_true (ininfo.frames != BUFFER_LEN,
-		"\n\nLine %d : Initial sfinfo.frames (%ld) should be %d.\n\n", __LINE__,
-		SF_COUNT_TO_LONG (ininfo.frames), BUFFER_LEN
+		"\n\nLine %d : Initial sfinfo.frames (%" PRId64 ") should be %d.\n\n", __LINE__,
+		ininfo.frames, BUFFER_LEN
 		) ;
 
 	sf_close (outfile) ;
@@ -967,7 +969,7 @@ broadcast_rdwr_test (const char *filename, int filetype)
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 	sf_close (file) ;
-	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %lld should be %lld.\n", __LINE__, sfinfo.frames, frames) ;
+	exit_if_true (frames != sfinfo.frames, "\n\nLine %d : Frame count %" PRId64 " should be %" PRId64 ".\n", __LINE__, sfinfo.frames, frames) ;
 
 	unlink (filename) ;
 	puts ("ok") ;

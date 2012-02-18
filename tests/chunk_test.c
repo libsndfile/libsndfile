@@ -157,7 +157,7 @@ chunk_test (const char *filename, int typemajor)
 
 	exit_if_true (
 		memcmp (testdata, chunk_info.data, length_before),
-		"\n\nLine %d : Data compare failed.\n    %s\n    %s\n\n", __LINE__, testdata, chunk_info.data
+		"\n\nLine %d : Data compare failed.\n    %s\n    %s\n\n", __LINE__, testdata, (char*) chunk_info.data
 		) ;
 
 	free (chunk_info.data) ;
