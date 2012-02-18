@@ -4,6 +4,9 @@
     Improve handlling unknown chunk types. Thanks to Olivier Tristan for sending
     example files.
 
+    * src/utils.tpl
+    Add GCC specific testing for format string parameters for exit_if_true().
+
 2012-02-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c

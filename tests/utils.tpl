@@ -58,6 +58,12 @@ void	dump_data_to_file (const char *filename, const void *data, unsigned int dat
 
 void	write_mono_file (const char * filename, int format, int srate, float * output, int len) ;
 
+#ifdef __GNUC__
+static inline void
+exit_if_true (int test, const char *format, ...)
+	__attribute__ ((format (printf, 2, 3))) ;
+#endif
+
 static inline void
 exit_if_true (int test, const char *format, ...)
 {	if (test)
