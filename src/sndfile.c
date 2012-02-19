@@ -2565,6 +2565,7 @@ psf_close (SF_PRIVATE *psf)
 	free (psf->instrument) ;
 	free (psf->channel_map) ;
 	free (psf->format_desc) ;
+	free (psf->strings.storage) ;
 
 	if (psf->wchunks.chunks)
 		for (k = 0 ; k < psf->wchunks.used ; k++)

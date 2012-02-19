@@ -33,13 +33,18 @@ static void hexdump (void *data, int len) ;
 int
 psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 {	char	new_str [128] ;
-	size_t	len_remaining, str_len ;
+	size_t	str_len ;
 	int		k, str_flags ;
 
 	if (str == NULL)
 		return SFE_STR_BAD_STRING ;
 
 	str_len = strlen (str) ;
+
+	if (psf->strings.storage == NULL)
+	{	psf->strings.storage_len = 2 * str_len ;
+		psf->strings.storage = malloc (psf->strings.storage_len) ;
+		} ;
 
 	/* A few extra checks for write mode. */
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
@@ -127,10 +132,17 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 
 	str_len = strlen (str) ;
 
-	len_remaining = SIGNED_SIZEOF (psf->strings.storage) - psf->strings.str_last ;
+	if (psf->strings.str_last + str_len + 2 > psf->strings.storage_len)
+	{	char * temp = psf->strings.storage ;
+		size_t newlen = 2 * psf->strings.storage_len + str_len ;
 
-	if (len_remaining < str_len + 2)
-		return SFE_STR_MAX_DATA ;
+		if ((psf->strings.storage = realloc (temp, newlen)) == NULL)
+		{	psf->strings.storage = temp ;
+			return SFE_MALLOC_FAILED ;
+			} ;
+
+		psf->strings.storage_len = newlen ;
+		} ;
 
 	psf->strings.data [k].type = str_type ;
 	psf->strings.data [k].str = psf->strings.storage + psf->strings.str_last ;
@@ -143,11 +155,10 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	psf->strings.flags |= str_flags ;
 
 #if STRINGS_DEBUG
-	psf_log_printf (psf, "str_storage          : %X\n", (int) psf->strings.storage) ;
-	psf_log_printf (psf, "str_last             : %d\n", (int) psf->strings.str_last) ;
-	psf_log_printf (psf, "sizeof (str_storage) : %d\n", SIGNED_SIZEOF (psf->strings.storage)) ;
+	psf_log_printf (psf, "str_storage          : %p\n", psf->strings.storage) ;
+	psf_log_printf (psf, "str_last             : %u\n", psf->strings.str_last) ;
 	psf_log_printf (psf, "used                 : %d\n", psf->strings.str_last) ;
-	psf_log_printf (psf, "remaining            : %d\n", SIGNED_SIZEOF (psf->strings.storage) - psf->strings.str_last) ;
+	psf_log_printf (psf, "remaining            : %d\n", psf->strings.storage_len - psf->strings.str_last ;
 
 	hexdump (psf->strings.storage, 300) ;
 #endif
