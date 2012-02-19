@@ -171,6 +171,7 @@ string_start_end_test (const char *filename, int typemajor)
 
 	print_test_name ("string_start_end_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 1 ;
 	sfinfo.frames		= 0 ;
@@ -316,6 +317,7 @@ string_start_test (const char *filename, int typemajor)
 
 	print_test_name ("string_start_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 1 ;
 	sfinfo.frames		= 0 ;
@@ -451,6 +453,7 @@ string_multi_set_test (const char *filename, int typemajor)
 
 	print_test_name (__func__, filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.format		= typemajor | SF_FORMAT_PCM_16 ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 1 ;
@@ -685,6 +688,7 @@ string_rdwr_grow_test (const char *filename, int typemajor)
 		 been added to the file, and that the strings are still there. */
 
 	/* Create a short file that contains a string. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 2 ;
 	sfinfo.frames		= 0 ;
@@ -738,6 +742,7 @@ string_header_update (const char *filename, int typemajor)
 	print_test_name (__func__, filename) ;
 
 	/* Create a short file. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 2 ;
 	sfinfo.frames		= 0 ;
@@ -759,6 +764,7 @@ string_header_update (const char *filename, int typemajor)
 
 	/* The file should now contain BUFFER_LEN + GROW_BUFFER_AMOUNT frames.
 		Open a second handle to the file and check the reported length. */
+	memset (&sfinfo1, 0, sizeof (sfinfo1)) ;
 	file1 = test_open_file_or_die (filename, SFM_READ, &sfinfo1, SF_TRUE, __LINE__) ;
 
 	frames = (BUFFER_LEN + GROW_BUFFER_AMOUNT) / sfinfo.channels ;
