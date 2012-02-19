@@ -2948,7 +2948,7 @@ sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (chunk_info == NULL)
+	if (chunk_info == NULL || chunk_info->data == NULL)
 		return SFE_BAD_CHUNK_PTR ;
 
 	if (psf->set_chunk)
@@ -2979,7 +2979,7 @@ sf_get_chunk_data (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info)
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (chunk_info == NULL)
+	if (chunk_info == NULL || chunk_info->data == NULL)
 		return SFE_BAD_CHUNK_PTR ;
 
 	if (psf->get_chunk_data)

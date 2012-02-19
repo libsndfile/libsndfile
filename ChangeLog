@@ -6,6 +6,9 @@
     * src/common.h src/sndfile.c src/strings.c
     Make string storage dynamically allocated.
 
+    * src/sndfile.c
+    Add extra validation for custom chunk handling.
+
 2012-02-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c
