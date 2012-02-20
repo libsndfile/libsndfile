@@ -224,7 +224,6 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				else
 					psf_log_printf (psf, "  Bytes/sec     : %d\n", wav_fmt->ima.bytespersec) ;
 
-				psf->bytewidth = 2 ;
 				psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->ima.extrabytes) ;
 				psf_log_printf (psf, "  Samples/Block : %d\n", wav_fmt->ima.samplesperblock) ;
 				break ;
@@ -247,7 +246,6 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				else
 					psf_log_printf (psf, "  Bytes/sec     : %d (should be %d)\n", wav_fmt->min.bytespersec, bytespersec) ;
 
-				psf->bytewidth = 2 ;
 				psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->msadpcm.extrabytes) ;
 				psf_log_printf (psf, "  Samples/Block : %d\n", wav_fmt->msadpcm.samplesperblock) ;
 				if (wav_fmt->msadpcm.numcoeffs > ARRAY_LEN (wav_fmt->msadpcm.coeffs))
@@ -284,7 +282,6 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				else
 					psf_log_printf (psf, "  Bytes/sec     : %d\n", wav_fmt->gsm610.bytespersec) ;
 
-				psf->bytewidth = 2 ;
 				psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->gsm610.extrabytes) ;
 				psf_log_printf (psf, "  Samples/Block : %d\n", wav_fmt->gsm610.samplesperblock) ;
 				break ;

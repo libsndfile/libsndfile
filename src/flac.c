@@ -656,14 +656,10 @@ flac_open	(SF_PRIVATE *psf)
 
 	psf->datalength = psf->filelength ;
 	psf->dataoffset = 0 ;
-	psf->blockwidth = 0 ;
-	psf->bytewidth = 1 ;
 
 	psf->container_close = flac_close ;
 	psf->seek = flac_seek ;
 	psf->command = flac_command ;
-
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
 	switch (subformat)
 	{	case SF_FORMAT_PCM_S8 :	/* 8-bit FLAC.  */
@@ -820,9 +816,6 @@ flac_init (SF_PRIVATE *psf)
 		psf->write_float	= flac_write_f2flac ;
 		psf->write_double	= flac_write_d2flac ;
 		} ;
-
-	psf->bytewidth = 1 ;
-	psf->blockwidth = psf->sf.channels ;
 
 	if (psf->filelength > psf->dataoffset)
 		psf->datalength = (psf->dataend) ? psf->dataend - psf->dataoffset : psf->filelength - psf->dataoffset ;

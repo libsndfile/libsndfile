@@ -211,8 +211,6 @@ au_write_header (SF_PRIVATE *psf, int calc_length)
 		psf->datalength = psf->filelength - psf->dataoffset ;
 		if (psf->dataend)
 			psf->datalength -= psf->filelength - psf->dataend ;
-
-		psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
 		} ;
 
 	encoding = au_format_to_encoding (SF_CODEC (psf->sf.format)) ;
