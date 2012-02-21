@@ -91,7 +91,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_NO_PIPE_WRITE		, "Error : this file format does not support pipe write." },
 	{	SFE_BAD_VIRTUAL_IO		, "Error : bad pointer on SF_VIRTUAL_IO struct." },
 	{	SFE_BAD_BROADCAST_INFO_SIZE
-								, "Error : bad size in SF_BROADCAST_INFO struct." },
+								, "Error : bad coding_history_size in SF_BROADCAST_INFO struct." },
 	{	SFE_BAD_BROADCAST_INFO_TOO_BIG
 								, "Error : SF_BROADCAST_INFO struct too large." },
 
@@ -1170,15 +1170,8 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				return SF_FALSE ;
 				} ;
 
-#if 0
-			if (psf->broadcast_info == NULL)
-				psf->broadcast_info = broadcast_info_alloc () ;
-
-			broadcast_info_copy (psf->broadcast_info, data) ;
-			broadcast_add_coding_history (psf->broadcast_info, psf->sf.channels, psf->sf.samplerate, psf->sf.format) ;
-#else
-			broadcast_var_set (psf, data, datasize) ;
-#endif
+			if (NOT (broadcast_var_set (psf, data, datasize)))
+				return SF_FALSE ;
 
 			if (psf->write_header)
 				psf->write_header (psf, SF_TRUE) ;
@@ -1189,13 +1182,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
 				} ;
-#if 0
-			if (psf->broadcast_info == NULL)
-				return SF_FALSE ;
-			return broadcast_info_copy (data, psf->broadcast_info) ;
-#else
 			return broadcast_var_get (psf, data, datasize) ;
-#endif
 
 		case SFC_GET_INSTRUMENT :
 			if (datasize != sizeof (SF_INSTRUMENT) || data == NULL)
