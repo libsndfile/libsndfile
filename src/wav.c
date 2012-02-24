@@ -522,7 +522,6 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						int id, position, chunk_id, chunk_start, block_start, offset ;
 
 						bytesread = psf_binheader_readf (psf, "4", &cue_count) ;
-						bytesread -= 4 ; /* Remove bytes for first dword. */
 						psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
 
 						if (cue_count > 10)
