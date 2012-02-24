@@ -716,6 +716,8 @@ int32_t	psf_rand_int32 (void) ;
 void append_snprintf (char * dest, size_t maxlen, const char * fmt, ...) ;
 void psf_strlcpy_crlf (char *dest, const char *src, size_t destmax, size_t srcmax) ;
 
+sf_count_t psf_decode_frame_count (SF_PRIVATE *psf) ;
+
 /* Functions used when writing file headers. */
 
 int		psf_binheader_writef	(SF_PRIVATE *psf, const char *format, ...) ;
