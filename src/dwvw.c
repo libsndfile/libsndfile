@@ -38,7 +38,7 @@
 #include	"common.h"
 
 typedef struct
-{	int		dwm_maxsize, bit_width, max_delta, span ;
+{	int		bit_width, dwm_maxsize, max_delta, span ;
 	int		samplecount ;
 	int		bit_count, bits, last_delta_width, last_sample ;
 	struct
@@ -93,12 +93,7 @@ dwvw_init (SF_PRIVATE *psf, int bitwidth)
 		return SFE_MALLOC_FAILED ;
 
 	psf->codec_data = (void*) pdwvw ;
-
 	pdwvw->bit_width 	= bitwidth ;
-	pdwvw->dwm_maxsize	= bitwidth / 2 ;
-	pdwvw->max_delta	= 1 << (bitwidth - 1) ;
-	pdwvw->span			= 1 << bitwidth ;
-
 	dwvw_read_reset (pdwvw) ;
 
 	if (psf->file.mode == SFM_READ)
@@ -118,10 +113,10 @@ dwvw_init (SF_PRIVATE *psf, int bitwidth)
 	psf->codec_close = dwvw_close ;
 	psf->seek = dwvw_seek ;
 
-	/* FIXME : This is bogus. */
-	psf->sf.frames = SF_COUNT_MAX ;
-	psf->datalength = psf->sf.frames ;
-	/* EMXIF : This is bogus. */
+	if (psf->file.mode == SFM_READ)
+	{	psf->sf.frames = psf_decode_frame_count (psf) ;
+		dwvw_read_reset (pdwvw) ;
+		} ;
 
 	return 0 ;
 } /* dwvw_init */
@@ -310,7 +305,7 @@ dwvw_decode_data (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int *ptr, int len)
 		delta_width_modifier = dwvw_decode_load_bits (psf, pdwvw, -1) ;
 
 		/* Check for end of input bit stream. Break loop if end. */
-		if (delta_width_modifier < 0)
+		if (delta_width_modifier < 0 || (pdwvw->b.end == 0 && count == 0))
 			break ;
 
 		if (delta_width_modifier && dwvw_decode_load_bits (psf, pdwvw, 1))
@@ -409,13 +404,14 @@ dwvw_decode_load_bits (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int bit_count)
 
 static void
 dwvw_read_reset (DWVW_PRIVATE *pdwvw)
-{	pdwvw->samplecount		= 0 ;
-	pdwvw->b.index			= 0 ;
-	pdwvw->b.end			= 0 ;
-	pdwvw->bit_count		= 0 ;
-	pdwvw->bits				= 0 ;
-	pdwvw->last_delta_width = 0 ;
-	pdwvw->last_sample		= 0 ;
+{	int bitwidth = pdwvw->bit_width ;
+
+	memset (pdwvw, 0, sizeof (DWVW_PRIVATE)) ;
+
+	pdwvw->bit_width	= bitwidth ;
+	pdwvw->dwm_maxsize	= bitwidth / 2 ;
+	pdwvw->max_delta	= 1 << (bitwidth - 1) ;
+	pdwvw->span			= 1 << bitwidth ;
 } /* dwvw_read_reset */
 
 static void

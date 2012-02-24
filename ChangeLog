@@ -3,6 +3,9 @@
     * src/common.[ch]
     Add function psf_decode_frame_count().
 
+    * src/dwvw.c
+    Fix a termnation bug that caused the decoder to go into an infinite loop.
+
 2012-02-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/wav.c
