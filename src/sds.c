@@ -83,6 +83,7 @@ static sf_count_t sds_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len
 static sf_count_t sds_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static sf_count_t sds_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
+static int sds_byterate (SF_PRIVATE * psf) ;
 
 static int sds_2byte_read (SF_PRIVATE *psf, SDS_PRIVATE *psds) ;
 static int sds_3byte_read (SF_PRIVATE *psf, SDS_PRIVATE *psds) ;
@@ -132,8 +133,9 @@ sds_open	(SF_PRIVATE *psf)
 	if ((error = sds_init (psf, psds)) != 0)
 		return error ;
 
-	psf->seek = sds_seek ;
 	psf->container_close = sds_close ;
+	psf->seek = sds_seek ;
+	psf->byterate = sds_byterate ;
 
 	psf->blockwidth = 0 ;
 
@@ -751,6 +753,15 @@ sds_seek (SF_PRIVATE *psf, int mode, sf_count_t seek_from_start)
 
 	return seek_from_start ;
 } /* sds_seek */
+
+static int
+sds_byterate (SF_PRIVATE * psf)
+{
+	if (psf->file.mode == SFM_READ)
+		return (psf->datalength * psf->sf.samplerate) / psf->sf.frames ;
+
+	return -1 ;
+} /* sds_byterate */
 
 /*==============================================================================
 */

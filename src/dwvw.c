@@ -61,7 +61,8 @@ static sf_count_t dwvw_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t le
 static sf_count_t dwvw_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static sf_count_t	dwvw_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
-static int	dwvw_close	(SF_PRIVATE *psf) ;
+static int	dwvw_close		(SF_PRIVATE *psf) ;
+static int	dwvw_byterate	(SF_PRIVATE *psf) ;
 
 static int	dwvw_decode_data (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int *ptr, int len) ;
 static int	dwvw_decode_load_bits (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int bit_count) ;
@@ -112,6 +113,7 @@ dwvw_init (SF_PRIVATE *psf, int bitwidth)
 
 	psf->codec_close = dwvw_close ;
 	psf->seek = dwvw_seek ;
+	psf->byterate = dwvw_byterate ;
 
 	if (psf->file.mode == SFM_READ)
 	{	psf->sf.frames = psf_decode_frame_count (psf) ;
@@ -169,6 +171,14 @@ dwvw_seek	(SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 	return	PSF_SEEK_ERROR ;
 } /* dwvw_seek */
 
+static int
+dwvw_byterate	(SF_PRIVATE *psf)
+{
+	if (psf->file.mode == SFM_READ)
+		return (psf->datalength * psf->sf.samplerate) / psf->sf.frames ;
+
+	return -1 ;
+} /* dwvw_byterate */
 
 /*==============================================================================
 */

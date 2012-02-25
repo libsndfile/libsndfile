@@ -82,6 +82,7 @@ static int	vorbis_read_header (SF_PRIVATE *psf, int log_data) ;
 static int	vorbis_write_header (SF_PRIVATE *psf, int calc_length) ;
 static int	vorbis_close (SF_PRIVATE *psf) ;
 static int	vorbis_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
+static int	vorbis_byterate (SF_PRIVATE *psf) ;
 static sf_count_t	vorbis_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 static sf_count_t	vorbis_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
 static sf_count_t	vorbis_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
@@ -530,6 +531,7 @@ ogg_vorbis_open (SF_PRIVATE *psf)
 
 	psf->seek = vorbis_seek ;
 	psf->command = vorbis_command ;
+	psf->byterate = vorbis_byterate ;
 
 	/* FIXME, FIXME, FIXME : Hack these here for now and correct later. */
 	psf->sf.format = SF_FORMAT_OGG | SF_FORMAT_VORBIS ;
@@ -872,6 +874,16 @@ vorbis_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 
 	return 0 ;
 } /* vorbis_seek */
+
+
+static int
+vorbis_byterate (SF_PRIVATE *psf)
+{
+	if (psf->file.mode == SFM_READ)
+		return (psf->datalength * psf->sf.samplerate) / psf->sf.frames ;
+
+	return -1 ;
+} /* vorbis_byterate */
 
 /*==============================================================================
 **	Most of the following code was snipped from Mike Smith's ogginfo utility

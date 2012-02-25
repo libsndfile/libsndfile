@@ -75,6 +75,7 @@ typedef struct
 } FLAC_TAG ;
 
 static sf_count_t	flac_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
+static int			flac_byterate (SF_PRIVATE *psf) ;
 static int			flac_close (SF_PRIVATE *psf) ;
 
 static int			flac_enc_init (SF_PRIVATE *psf) ;
@@ -659,6 +660,8 @@ flac_open	(SF_PRIVATE *psf)
 
 	psf->container_close = flac_close ;
 	psf->seek = flac_seek ;
+	psf->byterate = flac_byterate ;
+
 	psf->command = flac_command ;
 
 	switch (subformat)
@@ -1303,6 +1306,16 @@ flac_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 
 	return ((sf_count_t) -1) ;
 } /* flac_seek */
+
+static int
+flac_byterate (SF_PRIVATE *psf)
+{
+	if (psf->file.mode == SFM_READ)
+		return (psf->datalength * psf->sf.samplerate) / psf->sf.frames ;
+
+	return -1 ;
+} /* flac_byterate */
+
 
 #else /* HAVE_EXTERNAL_LIBS */
 
