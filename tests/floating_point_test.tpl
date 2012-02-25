@@ -188,6 +188,7 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	double		snr ;
+	int			byterate ;
 
 	print_test_name ("float_scaled_test", filename) ;
 
@@ -218,6 +219,9 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 
 	test_read_float_or_die (file, 0, float_test, DFT_DATA_LENGTH, __LINE__) ;
 
+	byterate = sf_current_byterate (file) ;
+	exit_if_true (byterate <= 0, "\n\nLine %d: byterate is zero.\n", __LINE__) ;
+
 	sf_close (file) ;
 
 	snr = dft_cmp_float (__LINE__, float_data, float_test, DFT_DATA_LENGTH, target_snr, allow_exit) ;
@@ -236,6 +240,7 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	double		snr ;
+	int			byterate ;
 
 	print_test_name ("double_scaled_test", filename) ;
 
@@ -265,6 +270,9 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 	check_log_buffer_or_die (file, __LINE__) ;
 
 	test_read_double_or_die (file, 0, double_test, DFT_DATA_LENGTH, __LINE__) ;
+
+	byterate = sf_current_byterate (file) ;
+	exit_if_true (byterate <= 0, "\n\nLine %d: byterate is zero.\n", __LINE__) ;
 
 	sf_close (file) ;
 
