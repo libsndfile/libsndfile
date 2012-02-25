@@ -466,6 +466,7 @@ typedef struct sf_private_tag
 	sf_count_t		(*seek) 		(struct sf_private_tag*, int mode, sf_count_t samples_from_start) ;
 	int				(*write_header)	(struct sf_private_tag*, int calc_length) ;
 	int				(*command)		(struct sf_private_tag*, int command, void *data, int datasize) ;
+	int				(*byterate)		(struct sf_private_tag*) ;
 
 	/*
 	**	Separate close functions for the codec and the container.

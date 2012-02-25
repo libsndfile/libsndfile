@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -581,6 +581,18 @@ const char* sf_get_string (SNDFILE *sndfile, int str_type) ;
 
 const char * sf_version_string (void) ;
 
+/* Return the current byterate at this point in the file. The byte rate in this
+** case is the number of bytes per second of audio data. For instance, for a
+** stereo, 18 bit PCM encoded file with an 16kHz sample rate, the byte rate
+** would be 2 (stereo) * 2 (two bytes per sample) * 16000 => 64000 bytes/sec.
+** For some file formats the returned value will be accurate and exact, for some
+** it will be a close approximation, for some it will be the average bitrate for
+** the whole file and for some it will be a time varying value that was accurate
+** when the file was most recently read or written.
+** To get the bitrate, multiple this value by 8.
+** Returns -1 for unknown.
+*/
+int sf_current_byterate (SNDFILE *sndfile) ;
 
 /* Functions for reading/writing the waveform data of a sound file.
 */
