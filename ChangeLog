@@ -1,3 +1,13 @@
+2012-02-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * M4/extra_pkg.m4
+    Update PKG_CHECK_MOD_VERSION macro to add an AC_TRY_LINK step. This fix
+    allows the configure process to catch attempts to link incompatible
+    libraries. For example, linking 32 bit version of eg libFLAC to a 64 bit
+    version of libsndfile will now fail. Similarly, when cross compiling
+    libsndfile from Linux to Windows linking the Linux versions of a library
+    to the Windows version of libsndfile will now also fail.
+
 2012-02-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.[ch]
