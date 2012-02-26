@@ -1,3 +1,8 @@
+2012-02-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/util.tpl
+    Used gnu_printf format checking with mingw-w64 compiler.
+
 2012-02-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * M4/extra_pkg.m4
