@@ -1,3 +1,10 @@
+2012-02-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/chunk.c
+    Fix buffer overrun introduced in recently added chunk logging. This chunk
+    logging has not yet made it to a libsndfile release version. Thanks to
+    Olivier Tristan for providing an example file.
+
 2012-02-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/util.tpl
