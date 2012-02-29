@@ -320,7 +320,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 {	WAV_PRIVATE	*wpriv ;
 	WAV_FMT		*wav_fmt ;
 	FACT_CHUNK	fact_chunk ;
-	unsigned	marker, chunk_size, RIFFsize = 0, done = 0, uk ;
+	unsigned	marker, chunk_size = 0, RIFFsize = 0, done = 0, uk ;
 	int			parsestage = 0, error, format = 0 ;
 	char		buffer [256] ;
 
@@ -342,7 +342,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	psf->rwf_endian = (marker == RIFF_MARKER) ? SF_ENDIAN_LITTLE : SF_ENDIAN_BIG ;
 
 	while (! done)
-	{	psf_binheader_readf (psf, "m4", &marker, &chunk_size) ;
+	{	psf_binheader_readf (psf, "jm4", chunk_size & 1 ? 1 : 0, &marker, &chunk_size) ;
 
 		psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf), chunk_size) ;
 
@@ -591,7 +591,6 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					parsestage |= HAVE_other ;
 					*/
 					psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
-					chunk_size += (chunk_size & 1) ;
 					psf_binheader_readf (psf, "j", chunk_size) ;
 					break ;
 
@@ -618,7 +617,6 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case MEXT_MARKER :
 			case FLLR_MARKER :
 					psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
-					chunk_size += (chunk_size & 1) ;
 					psf_binheader_readf (psf, "j", chunk_size) ;
 					break ;
 
@@ -626,7 +624,6 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if (psf_isprint ((marker >> 24) & 0xFF) && psf_isprint ((marker >> 16) & 0xFF)
 						&& psf_isprint ((marker >> 8) & 0xFF) && psf_isprint (marker & 0xFF))
 					{	psf_log_printf (psf, "*** %M : %d (unknown marker)\n", marker, chunk_size) ;
-						chunk_size += (chunk_size & 1) ;
 						psf_binheader_readf (psf, "j", chunk_size) ;
 						break ;
 						} ;

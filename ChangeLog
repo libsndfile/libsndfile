@@ -5,6 +5,10 @@
     logging has not yet made it to a libsndfile release version. Thanks to
     Olivier Tristan for providing an example file.
 
+    * src/wav.c
+    Fix handling of odd sized chunks which was causing the parser to lose some
+    chunks. Thanks to Olivier Tristan for providing an example file.
+
 2012-02-26  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/util.tpl
