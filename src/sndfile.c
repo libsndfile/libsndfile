@@ -321,7 +321,6 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 		return	NULL ;
 		} ;
 
-	memset (psf, 0, sizeof (SF_PRIVATE)) ;
 	psf_init_files (psf) ;
 
 	psf_log_printf (psf, "File : %s\n", path) ;
