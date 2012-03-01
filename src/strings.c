@@ -41,11 +41,6 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 
 	str_len = strlen (str) ;
 
-	if (psf->strings.storage == NULL)
-	{	psf->strings.storage_len = 2 * str_len ;
-		psf->strings.storage = malloc (psf->strings.storage_len) ;
-		} ;
-
 	/* A few extra checks for write mode. */
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	if ((psf->strings.flags & SF_STR_ALLOW_START) == 0)
@@ -135,6 +130,8 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	if (psf->strings.str_last + str_len + 2 > psf->strings.storage_len)
 	{	char * temp = psf->strings.storage ;
 		size_t newlen = 2 * psf->strings.storage_len + str_len ;
+
+		newlen = newlen < 256 ? 256 : newlen ;
 
 		if ((psf->strings.storage = realloc (temp, newlen)) == NULL)
 		{	psf->strings.storage = temp ;
