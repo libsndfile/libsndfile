@@ -84,7 +84,7 @@
 #define umid_MARKER		(MAKE_MARKER ('u', 'm', 'i', 'd'))
 #define SyLp_MARKER		(MAKE_MARKER ('S', 'y', 'L', 'p'))
 #define Cr8r_MARKER		(MAKE_MARKER ('C', 'r', '8', 'r'))
-#define JUNQ_MARKER		(MAKE_MARKER ('J', 'U', 'N', 'Q'))
+#define JUNK_MARKER		(MAKE_MARKER ('J', 'U', 'N', 'K'))
 #define PMX_MARKER		(MAKE_MARKER ('_', 'P', 'M', 'X'))
 #define inst_MARKER		(MAKE_MARKER ('i', 'n', 's', 't'))
 #define AFAn_MARKER		(MAKE_MARKER ('A', 'F', 'A', 'n'))
@@ -103,6 +103,7 @@
 #define ISRC_MARKER		(MAKE_MARKER ('I', 'S', 'R', 'C'))
 #define ISBJ_MARKER		(MAKE_MARKER ('I', 'S', 'B', 'J'))
 #define ICMT_MARKER		(MAKE_MARKER ('I', 'C', 'M', 'T'))
+#define IAUT_MARKER		(MAKE_MARKER ('I', 'A', 'U', 'T'))
 
 /* Weird WAVPACK marker which can show up at the start of the DATA section. */
 #define wvpk_MARKER (MAKE_MARKER ('w', 'v', 'p', 'k'))
@@ -342,7 +343,10 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	psf->rwf_endian = (marker == RIFF_MARKER) ? SF_ENDIAN_LITTLE : SF_ENDIAN_BIG ;
 
 	while (! done)
-	{	psf_binheader_readf (psf, "jm4", chunk_size & 1 ? 1 : 0, &marker, &chunk_size) ;
+	{	size_t jump = chunk_size & 1 ;
+
+		marker = chunk_size = 0 ;
+		psf_binheader_readf (psf, "jm4", jump, &marker, &chunk_size) ;
 
 		psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf), chunk_size) ;
 
@@ -384,6 +388,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						return SFE_WAV_NO_WAVE ;
 					parsestage |= HAVE_WAVE ;
 					psf_log_printf (psf, "WAVE\n") ;
+					chunk_size = 0 ;
 					break ;
 
 			case fmt_MARKER :
@@ -433,10 +438,8 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						if (psf->datalength + psf->dataoffset < psf->filelength)
 							psf->dataend = psf->datalength + psf->dataoffset ;
 
-						if (format == WAVE_FORMAT_MS_ADPCM && psf->datalength % 2)
-						{	psf->datalength ++ ;
-							psf_log_printf (psf, "*** Data length odd. Increasing it by 1.\n") ;
-							} ;
+						psf->datalength += chunk_size & 1 ;
+						chunk_size = 0 ;
 						} ;
 
 					if (! psf->sf.seekable || psf->dataoffset < 0)
@@ -611,7 +614,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case umid_MARKER :
 			case SyLp_MARKER :
 			case Cr8r_MARKER :
-			case JUNQ_MARKER :
+			case JUNK_MARKER :
 			case PMX_MARKER :
 			case DISP_MARKER :
 			case MEXT_MARKER :
@@ -628,13 +631,13 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						break ;
 						} ;
 					if (psf_ftell (psf) & 0x03)
-					{	psf_log_printf (psf, "  Unknown chunk marker at position %D. Resynching.\n", psf_ftell (psf) - 4) ;
+					{	psf_log_printf (psf, "  Unknown chunk marker at position %D. Resynching.\n", psf_ftell (psf) - 8) ;
 						psf_binheader_readf (psf, "j", -3) ;
 						/* File is too messed up so we prevent editing in RDWR mode here. */
 						parsestage |= HAVE_other ;
 						break ;
 						} ;
-					psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D. Exiting parser.\n", marker, psf_ftell (psf) - 4) ;
+					psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D. Exiting parser.\n", marker, psf_ftell (psf) - 8) ;
 					done = SF_TRUE ;
 					break ;
 			} ;	/* switch (marker) */
@@ -1363,6 +1366,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk, unsigned length)
 			case IPRD_MARKER :
 			case ISBJ_MARKER :
 			case ISRC_MARKER :
+			case IAUT_MARKER :
 					bytesread += psf_binheader_readf (psf, "4", &dword) ;
 					dword += (dword & 1) ;
 					if (dword >= SIGNED_SIZEOF (buffer))
@@ -1371,8 +1375,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk, unsigned length)
 						break ;
 						} ;
 
-					psf_binheader_readf (psf, "b", buffer, dword) ;
-					bytesread += dword ;
+					bytesread += psf_binheader_readf (psf, "b", buffer, dword) ;
 					buffer [dword] = 0 ;
 					psf_log_printf (psf, "    %M : %s\n", chunk, buffer) ;
 					break ;

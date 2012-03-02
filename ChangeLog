@@ -1,7 +1,12 @@
+2012-02-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c src/wav.c
+    Fix a couple of regressions from version 1.0.25.
+
 2012-02-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/strings.c
-    Small refactoring. Make sure that the memory allocation size if always > 0
+    Minor refactoring. Make sure that the memory allocation size if always > 0
     to avoid undefined behaviour.
 
 2012-02-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
