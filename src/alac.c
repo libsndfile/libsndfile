@@ -256,8 +256,8 @@ alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 			break ;
 
 		default :
-			printf ("%-20s (%3d) : info->bits_per_sample %u\n", __func__, __LINE__, info->bits_per_sample) ;
-			exit (1) ;
+			printf ("%s : info->bits_per_sample %u\n", __func__, info->bits_per_sample) ;
+			return SFE_UNSUPPORTED_ENCODING ;
 		} ;
 
 	psf->codec_close	= alac_close ;
@@ -389,7 +389,7 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
 	packet_size = alac_reader_next_packet_size (plac->pakt_info) ;
 	if (packet_size == 0)
-	{	psf_log_printf (psf, "%20s : packet_size is 0\n", __func__) ;
+	{	psf_log_printf (psf, "packet_size is 0 (%d of %d)\n", plac->pakt_info->current, plac->pakt_info->count) ;
 		return 0 ;
 		} ;
 
