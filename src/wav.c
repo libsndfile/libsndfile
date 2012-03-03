@@ -179,10 +179,10 @@ static void wav_write_strings (SF_PRIVATE *psf, int location) ;
 static int	wav_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 static int	wav_close (SF_PRIVATE *psf) ;
 
-static int 	wav_subchunk_parse	(SF_PRIVATE *psf, int chunk, unsigned length) ;
-static int 	exif_subchunk_parse	(SF_PRIVATE *psf, unsigned int length) ;
-static int	wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
-static int	wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen) ;
+static int 	wav_subchunk_parse	(SF_PRIVATE *psf, int chunk, uint32_t length) ;
+static int 	exif_subchunk_parse	(SF_PRIVATE *psf, uint32_t length) ;
+static int	wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen) ;
+static int	wav_read_acid_chunk (SF_PRIVATE *psf, uint32_t chunklen) ;
 
 static int wav_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info) ;
 static int wav_get_chunk_size (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info) ;
@@ -321,7 +321,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 {	WAV_PRIVATE	*wpriv ;
 	WAV_FMT		*wav_fmt ;
 	FACT_CHUNK	fact_chunk ;
-	unsigned	marker, chunk_size = 0, RIFFsize = 0, done = 0, uk ;
+	uint32_t	marker, chunk_size = 0, RIFFsize = 0, done = 0, uk ;
 	int			parsestage = 0, error, format = 0 ;
 	char		buffer [256] ;
 
@@ -501,9 +501,9 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					psf_log_printf (psf, "  time stamp : %d\n", psf->peak_info->timestamp) ;
 					psf_log_printf (psf, "    Ch   Position       Value\n") ;
 
-					for (uk = 0 ; uk < (unsigned) psf->sf.channels ; uk++)
+					for (uk = 0 ; uk < (uint32_t) psf->sf.channels ; uk++)
 					{	float value ;
-						unsigned int position ;
+						uint32_t position ;
 
 						psf_binheader_readf (psf, "f4", &value, &position) ;
 						psf->peak_info->peaks [uk].value = value ;
@@ -521,7 +521,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case cue_MARKER :
 					parsestage |= HAVE_other ;
 
-					{	unsigned bytesread, cue_count ;
+					{	uint32_t bytesread, cue_count ;
 						int id, position, chunk_id, chunk_start, block_start, offset ;
 
 						bytesread = psf_binheader_readf (psf, "4", &cue_count) ;
@@ -1106,7 +1106,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "44", 0, 0) ; /* Manufacturer zero is everyone */
 		tmp = (int) (1.0e9 / psf->sf.samplerate) ; /* Sample period in nano seconds */
 		psf_binheader_writef (psf, "44", tmp, psf->instrument->basenote) ;
-		tmp = (unsigned int) (psf->instrument->detune * dtune + 0.5) ;
+		tmp = (uint32_t) (psf->instrument->detune * dtune + 0.5) ;
 		psf_binheader_writef (psf, "4", tmp) ;
 		psf_binheader_writef (psf, "44", 0, 0) ; /* SMTPE format */
 		psf_binheader_writef (psf, "44", psf->instrument->loop_count, 0) ;
@@ -1308,10 +1308,10 @@ wav_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
 } /* wav_command */
 
 static int
-wav_subchunk_parse (SF_PRIVATE *psf, int chunk, unsigned length)
+wav_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t length)
 {	sf_count_t	current_pos ;
 	char		buffer [512] ;
-	unsigned 	dword, bytesread ;
+	uint32_t 	dword, bytesread ;
 
 	current_pos = psf_fseek (psf, 0, SEEK_CUR) - 4 ;
 
@@ -1472,10 +1472,10 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk, unsigned length)
 } /* wav_subchunk_parse */
 
 static int
-wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
+wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 {	char buffer [512] ;
-	unsigned int bytesread = 0, dword, sampler_data, loop_count ;
-	unsigned int note, start, end, type = -1, count ;
+	uint32_t bytesread = 0, dword, sampler_data, loop_count ;
+	uint32_t note, start, end, type = -1, count ;
 	int j, k ;
 
 	chunklen += (chunklen & 1) ;
@@ -1495,7 +1495,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 	bytesread += psf_binheader_readf (psf, "4", &dword) ;
 	if (dword != 0)
 	{	snprintf (buffer, sizeof (buffer), "%f",
-					(1.0 * 0x80000000) / ((unsigned int) dword)) ;
+					(1.0 * 0x80000000) / ((uint32_t) dword)) ;
 		psf_log_printf (psf, "  Pitch Fract. : %s\n", buffer) ;
 		}
 	else
@@ -1633,9 +1633,9 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 */
 
 static int
-wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
+wav_read_acid_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 {	char buffer [512] ;
-	unsigned int bytesread = 0 ;
+	uint32_t bytesread = 0 ;
 	int	beats, flags ;
 	short rootnote, q1, meter_denom, meter_numer ;
 	float q2, tempo ;
@@ -1677,10 +1677,10 @@ wav_read_acid_chunk (SF_PRIVATE *psf, unsigned int chunklen)
 } /* wav_read_acid_chunk */
 
 int
-wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize)
+wav_read_bext_chunk (SF_PRIVATE *psf, uint32_t chunksize)
 {
 	SF_BROADCAST_INFO_16K * b ;
-	unsigned int bytes = 0 ;
+	uint32_t bytes = 0 ;
 
 	if (chunksize < WAV_BEXT_MIN_CHUNK_SIZE)
 	{	psf_log_printf (psf, "bext : %u (should be >= %d)\n", chunksize, WAV_BEXT_MIN_CHUNK_SIZE) ;
@@ -1786,8 +1786,8 @@ exif_fill_and_sink (SF_PRIVATE *psf, char* buf, size_t bufsz, size_t toread)
 ** (Exif Audio File Specification) http://www.exif.org/Exif2-2.PDF
 */
 static int
-exif_subchunk_parse (SF_PRIVATE *psf, unsigned int length)
-{	unsigned marker, dword, vmajor = -1, vminor = -1, bytesread = 0 ;
+exif_subchunk_parse (SF_PRIVATE *psf, uint32_t length)
+{	uint32_t marker, dword, vmajor = -1, vminor = -1, bytesread = 0 ;
 	char buf [4096] ;
 
 	while (bytesread < length)
@@ -1807,10 +1807,10 @@ exif_subchunk_parse (SF_PRIVATE *psf, unsigned int length)
 				break ;
 
 			case olym_MARKER :
-				psf_binheader_readf (psf, "4", &dword) ;
+				bytesread += psf_binheader_readf (psf, "4", &dword) ;
 				psf_log_printf (psf, "%M : %u\n", marker, dword) ;
 				dword += (dword & 1) ;
-				psf_binheader_readf (psf, "j", dword) ;
+				bytesread += psf_binheader_readf (psf, "j", dword) ;
 				break ;
 
 			case emnt_MARKER : /* design information: null-terminated string */
@@ -1819,7 +1819,7 @@ exif_subchunk_parse (SF_PRIVATE *psf, unsigned int length)
 			case etim_MARKER : /* creation time: null-terminated string in the format "hour:minute:second.subsecond" */
 			case erel_MARKER : /* relation info: null-terminated string (filename) */
 			case eucm_MARKER : /* user comment: 4-byte size follows, then possibly unicode data */
-				psf_binheader_readf (psf, "4", &dword) ;
+				bytesread += psf_binheader_readf (psf, "4", &dword) ;
 				bytesread += sizeof (dword) ;
 				dword += (dword & 1) ;
 
