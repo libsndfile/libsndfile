@@ -578,8 +578,6 @@ alac_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	if (psf->datalength < 0 || psf->dataoffset < 0)
 	{	psf->error = SFE_BAD_SEEK ;
-printf ("%-20s (%3d) : seek error\n", __func__, __LINE__) ;
-exit (1) ;
 		return PSF_SEEK_ERROR ;
 		} ;
 
@@ -857,7 +855,6 @@ alac_pakt_encode (const PAKT_INFO *info, uint32_t * pakt_size_out)
 			continue ;
 			} ;
 
-printf ("%s %d : Bad value size.\n", __func__, __LINE__) ;
 		*pakt_size_out = 0 ;
 		free (data) ;
 		return NULL ;
