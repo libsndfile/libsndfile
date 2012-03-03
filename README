@@ -20,6 +20,9 @@ Bormann. Their original code can be found at :
 The src/G72x directory contains code written and released by Sun Microsystems
 under a suitably free license.
 
+The src/ALAC directory contains code written and released by Apple Inc and
+released under the Apache license.
+
 
 LINUX
 -----
