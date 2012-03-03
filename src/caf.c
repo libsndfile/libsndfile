@@ -75,17 +75,19 @@
 */
 
 typedef struct
-{	unsigned char srate [8] ;
-	unsigned int fmt_id ;
-	unsigned int fmt_flags ;
-	unsigned int pkt_bytes ;
-	unsigned int pkt_frames ;
-	unsigned int channels_per_frame ;
-	unsigned int bits_per_chan ;
+{	uint8_t		srate [8] ;
+	uint32_t	fmt_id ;
+	uint32_t	fmt_flags ;
+	uint32_t	pkt_bytes ;
+	uint32_t	frames_per_packet ;
+	uint32_t	channels_per_frame ;
+	uint32_t	bits_per_chan ;
 } DESC_CHUNK ;
 
 typedef struct
-{	int chanmap_tag ;
+{	int			chanmap_tag ;
+
+	ALAC_DECODER_INFO	alac ;
 } CAF_PRIVATE ;
 
 /*------------------------------------------------------------------------------
@@ -108,7 +110,13 @@ static int caf_get_chunk_data (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info) ;
 
 int
 caf_open (SF_PRIVATE *psf)
-{	int	subformat, format, error = 0 ;
+{	CAF_PRIVATE * pcaf ;
+	int	subformat, format, error = 0 ;
+
+	if ((psf->container_data = calloc (1, sizeof (CAF_PRIVATE))) == NULL)
+		return SFE_MALLOC_FAILED ;
+
+	pcaf = psf->container_data ;
 
 	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = caf_read_header (psf)))
@@ -119,9 +127,6 @@ caf_open (SF_PRIVATE *psf)
 		} ;
 
 	subformat = SF_CODEC (psf->sf.format) ;
-
-	if ((psf->container_data = calloc (1, sizeof (CAF_PRIVATE))) == NULL)
-		return SFE_MALLOC_FAILED ;
 
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 	{	if (psf->is_pipe)
@@ -186,6 +191,18 @@ caf_open (SF_PRIVATE *psf)
 		case SF_FORMAT_DOUBLE :
 					error = double64_init (psf) ;
 					break ;
+
+		case SF_FORMAT_ALAC_16 :
+		case SF_FORMAT_ALAC_20 :
+		case SF_FORMAT_ALAC_24 :
+		case SF_FORMAT_ALAC_32 :
+					if (psf->file.mode == SFM_READ)
+						/* Only pass the ALAC_DECODER_INFO in read mode. */
+						error = alac_init (psf, &pcaf->alac) ;
+					else
+						error = alac_init (psf, NULL) ;
+					break ;
+
 		/* Lite remove end */
 
 		default :
@@ -228,11 +245,42 @@ caf_command (SF_PRIVATE * psf, int command, void * UNUSED (data), int UNUSED (da
 
 static int
 decode_desc_chunk (SF_PRIVATE *psf, const DESC_CHUNK *desc)
-{	int format ;
+{	int format = SF_FORMAT_CAF ;
 
 	psf->sf.channels = desc->channels_per_frame ;
 
-	format = SF_FORMAT_CAF | (psf->endian == SF_ENDIAN_LITTLE ? SF_ENDIAN_LITTLE : 0) ;
+	if (desc->fmt_id == alac_MARKER)
+	{	CAF_PRIVATE	*pcaf ;
+
+		if ((pcaf = psf->container_data) != NULL)
+		{	switch (desc->fmt_flags)
+			{	case 1 :
+					pcaf->alac.bits_per_sample = 16 ;
+					format |= SF_FORMAT_ALAC_16 ;
+					break ;
+				case 2 :
+					pcaf->alac.bits_per_sample = 20 ;
+					format |= SF_FORMAT_ALAC_20 ;
+					break ;
+				case 3 :
+					pcaf->alac.bits_per_sample = 24 ;
+					format |= SF_FORMAT_ALAC_24 ;
+					break ;
+				case 4 :
+					pcaf->alac.bits_per_sample = 32 ;
+					format |= SF_FORMAT_ALAC_32 ;
+					break ;
+				default :
+					psf_log_printf (psf, "Bad ALAC format flag value of %d\n", desc->fmt_flags) ;
+				} ;
+
+			pcaf->alac.frames_per_packet = desc->frames_per_packet ;
+			} ;
+
+		return format ;
+		} ;
+
+	format |= psf->endian == SF_ENDIAN_LITTLE ? SF_ENDIAN_LITTLE : 0 ;
 
 	if (desc->fmt_id == lpcm_MARKER && desc->fmt_flags & 1)
 	{	/* Floating point data. */
@@ -246,12 +294,7 @@ decode_desc_chunk (SF_PRIVATE *psf, const DESC_CHUNK *desc)
 			} ;
 		} ;
 
-	if ((desc->fmt_flags & 1) != 0)
-	{	psf_log_printf (psf, "**** Ooops, 'desc' chunk suggests float data, but other info invalid.\n") ;
-		return 0 ;
-		} ;
-
-	if (desc->fmt_id == lpcm_MARKER)
+	if (desc->fmt_id == lpcm_MARKER && (desc->fmt_flags & 1) == 0)
 	{	/* Integer data. */
 		if (desc->bits_per_chan == 32 && desc->pkt_bytes == 4 * desc->channels_per_frame)
 		{	psf->bytewidth = 4 ;
@@ -281,17 +324,23 @@ decode_desc_chunk (SF_PRIVATE *psf, const DESC_CHUNK *desc)
 		return format | SF_FORMAT_ULAW ;
 		} ;
 
+	psf_log_printf (psf, "**** Unknown format identifier.\n") ;
+
 	return 0 ;
 } /* decode_desc_chunk */
 
 static int
 caf_read_header (SF_PRIVATE *psf)
-{	BUF_UNION	ubuf ;
+{	CAF_PRIVATE	*pcaf ;
+	BUF_UNION	ubuf ;
 	DESC_CHUNK desc ;
 	sf_count_t chunk_size ;
 	double srate ;
 	short version, flags ;
 	int marker, k, have_data = 0, error ;
+
+	if ((pcaf = psf->container_data) == NULL)
+		return SFE_INTERNAL ;
 
 	memset (&desc, 0, sizeof (desc)) ;
 
@@ -315,11 +364,11 @@ caf_read_header (SF_PRIVATE *psf)
 
 	psf->sf.samplerate = lrint (srate) ;
 
-	psf_binheader_readf (psf, "mE44444", &desc.fmt_id, &desc.fmt_flags, &desc.pkt_bytes, &desc.pkt_frames,
+	psf_binheader_readf (psf, "mE44444", &desc.fmt_id, &desc.fmt_flags, &desc.pkt_bytes, &desc.frames_per_packet,
 			&desc.channels_per_frame, &desc.bits_per_chan) ;
 	psf_log_printf (psf, "  Format id    : %M\n  Format flags : %x\n  Bytes / packet   : %u\n"
 			"  Frames / packet  : %u\n  Channels / frame : %u\n  Bits / channel   : %u\n",
-			desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.pkt_frames, desc.channels_per_frame, desc.bits_per_chan) ;
+			desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.frames_per_packet, desc.channels_per_frame, desc.bits_per_chan) ;
 
 	if (desc.channels_per_frame > SF_MAX_CHANNELS)
 	{	psf_log_printf (psf, "**** Bad channels per frame value %u.\n", desc.channels_per_frame) ;
@@ -396,6 +445,18 @@ caf_read_header (SF_PRIVATE *psf)
 				have_data = 1 ;
 				break ;
 
+			case kuki_MARKER :
+				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+				pcaf->alac.kuki_offset = psf_ftell (psf) - 12 ;
+				psf_binheader_readf (psf, "j", (int) chunk_size) ;
+				break ;
+
+			case pakt_MARKER :
+				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+				pcaf->alac.pakt_offset = psf_ftell (psf) - 12 ;
+				psf_binheader_readf (psf, "j", (int) chunk_size) ;
+				break ;
+
 			default :
 				psf_log_printf (psf, "%M : %D (skipped)\n", marker, chunk_size) ;
 				psf_binheader_readf (psf, "j", (int) chunk_size) ;
@@ -433,7 +494,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 	DESC_CHUNK desc ;
 	sf_count_t current, free_len ;
 	uint32_t uk ;
-	int subformat ;
+	int subformat, append_free_block = SF_TRUE ;
 
 	if ((pcaf = psf->container_data) == NULL)
 		return SFE_INTERNAL ;
@@ -488,7 +549,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 			desc.fmt_id = lpcm_MARKER ;
 			psf->bytewidth = 1 ;
 			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
-			desc.pkt_frames = 1 ;
+			desc.frames_per_packet = 1 ;
 			desc.channels_per_frame = psf->sf.channels ;
 			desc.bits_per_chan = 8 ;
 			break ;
@@ -497,7 +558,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 			desc.fmt_id = lpcm_MARKER ;
 			psf->bytewidth = 2 ;
 			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
-			desc.pkt_frames = 1 ;
+			desc.frames_per_packet = 1 ;
 			desc.channels_per_frame = psf->sf.channels ;
 			desc.bits_per_chan = 16 ;
 			break ;
@@ -505,7 +566,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 		case SF_FORMAT_PCM_24 :
 			psf->bytewidth = 3 ;
 			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
-			desc.pkt_frames = 1 ;
+			desc.frames_per_packet = 1 ;
 			desc.channels_per_frame = psf->sf.channels ;
 			desc.bits_per_chan = 24 ;
 			desc.fmt_id = lpcm_MARKER ;
@@ -515,7 +576,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 			desc.fmt_id = lpcm_MARKER ;
 			psf->bytewidth = 4 ;
 			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
-			desc.pkt_frames = 1 ;
+			desc.frames_per_packet = 1 ;
 			desc.channels_per_frame = psf->sf.channels ;
 			desc.bits_per_chan = 32 ;
 			break ;
@@ -525,7 +586,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 			desc.fmt_flags |= 1 ;
 			psf->bytewidth = 4 ;
 			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
-			desc.pkt_frames = 1 ;
+			desc.frames_per_packet = 1 ;
 			desc.channels_per_frame = psf->sf.channels ;
 			desc.bits_per_chan = 32 ;
 			break ;
@@ -535,7 +596,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 			desc.fmt_flags |= 1 ;
 			psf->bytewidth = 8 ;
 			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
-			desc.pkt_frames = 1 ;
+			desc.frames_per_packet = 1 ;
 			desc.channels_per_frame = psf->sf.channels ;
 			desc.bits_per_chan = 64 ;
 			break ;
@@ -544,7 +605,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 			desc.fmt_id = alaw_MARKER ;
 			psf->bytewidth = 1 ;
 			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
-			desc.pkt_frames = 1 ;
+			desc.frames_per_packet = 1 ;
 			desc.channels_per_frame = psf->sf.channels ;
 			desc.bits_per_chan = 8 ;
 			break ;
@@ -553,16 +614,27 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 			desc.fmt_id = ulaw_MARKER ;
 			psf->bytewidth = 1 ;
 			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
-			desc.pkt_frames = 1 ;
+			desc.frames_per_packet = 1 ;
 			desc.channels_per_frame = psf->sf.channels ;
 			desc.bits_per_chan = 8 ;
+			break ;
+
+		case SF_FORMAT_ALAC_16 :
+		case SF_FORMAT_ALAC_20 :
+		case SF_FORMAT_ALAC_24 :
+		case SF_FORMAT_ALAC_32 :
+			desc.fmt_id = alac_MARKER ;
+			desc.pkt_bytes = psf->bytewidth * psf->sf.channels ;
+			desc.channels_per_frame = psf->sf.channels ;
+			alac_get_desc_chunk_items (subformat, &desc.fmt_flags, &desc.frames_per_packet) ;
+			append_free_block = SF_FALSE ;
 			break ;
 
 		default :
 			return SFE_UNIMPLEMENTED ;
 		} ;
 
-	psf_binheader_writef (psf, "mE44444", desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.pkt_frames, desc.channels_per_frame, desc.bits_per_chan) ;
+	psf_binheader_writef (psf, "mE44444", desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.frames_per_packet, desc.channels_per_frame, desc.bits_per_chan) ;
 
 #if 0
 	if (psf->strings.flags & SF_STR_LOCATE_START)
@@ -583,11 +655,13 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 	for (uk = 0 ; uk < psf->wchunks.used ; uk++)
 		psf_binheader_writef (psf, "m44b", (int) psf->wchunks.chunks [uk].marker, 0, psf->wchunks.chunks [uk].len, psf->wchunks.chunks [uk].data, make_size_t (psf->wchunks.chunks [uk].len)) ;
 
-	/* Add free chunk so that the actual audio data starts at a multiple 0x1000. */
-	free_len = 0x1000 - psf->headindex - 16 - 12 ;
-	while (free_len < 0)
-		free_len += 0x1000 ;
-	psf_binheader_writef (psf, "Em8z", free_MARKER, free_len, (int) free_len) ;
+	if (append_free_block)
+	{	/* Add free chunk so that the actual audio data starts at a multiple 0x1000. */
+		free_len = 0x1000 - psf->headindex - 16 - 12 ;
+		while (free_len < 0)
+			free_len += 0x1000 ;
+		psf_binheader_writef (psf, "Em8z", free_MARKER, free_len, (int) free_len) ;
+		} ;
 
 	psf_binheader_writef (psf, "Em84", data_MARKER, psf->datalength + 4, 0) ;
 

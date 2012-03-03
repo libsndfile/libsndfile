@@ -75,6 +75,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_BAD_FILE_PTR		, "Bad FILE pointer." },
 	{	SFE_BAD_INT_PTR			, "Internal error, Bad pointer." },
 	{	SFE_BAD_STAT_SIZE		, "Error : software was misconfigured at compile time (sizeof statbuf.st_size)." },
+	{	SFE_NO_TEMP_DIR			, "Error : Could not file temp dir." },
 
 	{	SFE_MALLOC_FAILED		, "Internal malloc () failed." },
 	{	SFE_UNIMPLEMENTED		, "File contains data in an unimplemented format." },
@@ -252,6 +253,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_VORBIS_ENCODER_BUG	, "Error : Sample rate chosen is known to trigger a Vorbis encoder bug on this CPU." },
 
 	{	SFE_RF64_NOT_RF64		, "Error : Not an RF64 file." },
+	{	SFE_ALAC_FAIL_TMPFILE	, "Error : Failed to open tmp file for ALAC encoding." },
 
 	{	SFE_BAD_CHUNK_PTR		, "Error : Bad SF_CHUNK_INFO pointer." },
 	{	SFE_UNKNOWN_CHUNK		, "Error : Uknown chunk marker." },
@@ -634,6 +636,10 @@ sf_format_check	(const SF_INFO *info)
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
 					return 1 ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
+					return 1 ;
+				if (subformat == SF_FORMAT_ALAC_16 || subformat == SF_FORMAT_ALAC_20)
+					return 1 ;
+				if (subformat == SF_FORMAT_ALAC_24 || subformat == SF_FORMAT_ALAC_32)
 					return 1 ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
 					return 1 ;

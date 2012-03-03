@@ -175,6 +175,17 @@ enum
 } ;
 
 /*---------------------------------------------------------------------------------------
+*/
+
+typedef struct
+{	unsigned	kuki_offset ;
+	unsigned	pakt_offset ;
+
+	unsigned	bits_per_sample ;
+	unsigned	frames_per_packet ;
+} ALAC_DECODER_INFO ;
+
+/*---------------------------------------------------------------------------------------
 **	PEAK_CHUNK - This chunk type is common to both AIFF and WAVE files although their
 **	endian encodings are different.
 */
@@ -510,6 +521,7 @@ enum
 	SFE_BAD_FILE_PTR,
 	SFE_BAD_INT_PTR,
 	SFE_BAD_STAT_SIZE,
+	SFE_NO_TEMP_DIR,
 	SFE_MALLOC_FAILED,
 	SFE_UNIMPLEMENTED,
 	SFE_BAD_READ_ALIGN,
@@ -687,6 +699,8 @@ enum
 	SFE_BAD_CHUNK_MARKER,
 	SFE_BAD_CHUNK_DATA_PTR,
 
+	SFE_ALAC_FAIL_TMPFILE,
+
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
 
@@ -861,6 +875,7 @@ int		gsm610_init		(SF_PRIVATE *psf) ;
 int		vox_adpcm_init	(SF_PRIVATE *psf) ;
 int		flac_init		(SF_PRIVATE *psf) ;
 int		g72x_init 		(SF_PRIVATE * psf) ;
+int		alac_init		(SF_PRIVATE *psf, const ALAC_DECODER_INFO * info) ;
 
 int 	dither_init		(SF_PRIVATE *psf, int mode) ;
 
@@ -941,6 +956,8 @@ typedef struct
 int audio_detect (SF_PRIVATE * psf, AUDIO_DETECT *ad, const unsigned char * data, int datalen) ;
 int id3_skip (SF_PRIVATE * psf) ;
 
+void	alac_get_desc_chunk_items (int subformat, uint32_t *fmt_flags, uint32_t *frames_per_packet) ;
+
 /*------------------------------------------------------------------------------------
 ** Helper/debug functions.
 */
@@ -974,6 +991,18 @@ int sf_dither_int		(const SF_DITHER_INFO *dither, const int *in, int *out, int c
 int sf_dither_float		(const SF_DITHER_INFO *dither, const float *in, float *out, int count) ;
 int sf_dither_double	(const SF_DITHER_INFO *dither, const double *in, double *out, int count) ;
 #endif
+
+/*------------------------------------------------------------------------------------
+** Data conversion functions.
+*/
+
+static inline short
+psf_short_of_int (int x)
+{	return (x >> 16) ;
+}
+
+void psf_f2s_array (const float *src, short *dest, int count, int normalize) ;
+void psf_f2s_clip_array (const float *src, short *dest, int count, int normalize) ;
 
 #endif /* SNDFILE_COMMON_H */
 

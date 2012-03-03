@@ -105,6 +105,11 @@ enum
 
 	SF_FORMAT_VORBIS		= 0x0060,		/* Xiph Vorbis encoding. */
 
+	SF_FORMAT_ALAC_16		= 0x0070,		/* Apple Lossless Audio Codec (16 bit). */
+	SF_FORMAT_ALAC_20		= 0x0071,		/* Apple Lossless Audio Codec (20 bit). */
+	SF_FORMAT_ALAC_24		= 0x0072,		/* Apple Lossless Audio Codec (24 bit). */
+	SF_FORMAT_ALAC_32		= 0x0073,		/* Apple Lossless Audio Codec (32 bit). */
+
 	/* Endian-ness options. */
 
 	SF_ENDIAN_FILE			= 0x00000000,	/* Default file endian-ness. */

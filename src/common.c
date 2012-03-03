@@ -1488,3 +1488,41 @@ str_of_endianness (int end)
 	/* Zero length string for SF_ENDIAN_FILE. */
 	return "" ;
 } /* str_of_endianness */
+
+/*==============================================================================
+*/
+
+void
+psf_f2s_array (const float *src, short *dest, int count, int normalize)
+{	float 			normfact ;
+
+	normfact = normalize ? (1.0 * 0x7FFF) : 1.0 ;
+	while (--count >= 0)
+		dest [count] = lrintf (src [count] * normfact) ;
+
+	return ;
+} /* f2s_array */
+
+void
+psf_f2s_clip_array (const float *src, short *dest, int count, int normalize)
+{	float			normfact, scaled_value ;
+
+	normfact = normalize ? (8.0 * 0x1000) : 1.0 ;
+
+	while (--count >= 0)
+	{	scaled_value = src [count] * normfact ;
+		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFF))
+		{	dest [count] = 0x7FFF ;
+			continue ;
+			} ;
+		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x1000))
+		{	dest [count] = 0x8000 ;
+			continue ;
+			} ;
+
+		dest [count] = lrintf (scaled_value) ;
+		} ;
+
+	return ;
+} /* f2s_clip_array */
+

@@ -7,6 +7,10 @@
     but unfortunately the history of those changes were lost because they were
     developed in a Bzr tree and during that time libsndfile moved to Git.
 
+    * src/alac.c src/caf.c src/common.[ch] src/Makefile.am src/sndfile.h.in
+        src/sndfile.c
+    Hook new ALAC codec in.
+
 2012-02-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c src/wav.c
