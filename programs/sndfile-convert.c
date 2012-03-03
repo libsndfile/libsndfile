@@ -68,6 +68,10 @@ usage_exit (const char *progname)
 	puts (
 		"        -ulaw      : force the output ULAW\n"
 		"        -alaw      : force the output ALAW\n"
+		"        -alac16    : force the output 16 bit ALAC (CAF only)\n"
+		"        -alac20    : force the output 20 bit ALAC (CAF only)\n"
+		"        -alac24    : force the output 24 bit ALAC (CAF only)\n"
+		"        -alac32    : force the output 32 bit ALAC (CAF only)\n"
 		"        -ima-adpcm : force the output to IMA ADPCM (WAV only)\n"
 		"        -ms-adpcm  : force the output to MS ADPCM (WAV only)\n"
 		"        -gsm610    : force the GSM6.10 (WAV only)\n"
@@ -155,6 +159,22 @@ main (int argc, char * argv [])
 			} ;
 		if (! strcmp (argv [k], "-alaw"))
 		{	outfileminor = SF_FORMAT_ALAW ;
+			continue ;
+			} ;
+		if (! strcmp (argv [k], "-alac16"))
+		{	outfileminor = SF_FORMAT_ALAC_16 ;
+			continue ;
+			} ;
+		if (! strcmp (argv [k], "-alac20"))
+		{	outfileminor = SF_FORMAT_ALAC_20 ;
+			continue ;
+			} ;
+		if (! strcmp (argv [k], "-alac24"))
+		{	outfileminor = SF_FORMAT_ALAC_24 ;
+			continue ;
+			} ;
+		if (! strcmp (argv [k], "-alac32"))
+		{	outfileminor = SF_FORMAT_ALAC_32 ;
 			continue ;
 			} ;
 		if (! strcmp (argv [k], "-ima-adpcm"))

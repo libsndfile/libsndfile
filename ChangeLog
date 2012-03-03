@@ -11,6 +11,9 @@
         src/sndfile.c
     Hook new ALAC codec in.
 
+    * programs/sndfile-convert.c
+    Add support for alac codec.
+
 2012-02-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c src/wav.c
