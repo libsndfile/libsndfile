@@ -187,6 +187,9 @@ main (int argc, char **argv)
 		/* Lite remove start */
 		pcm_test_float	("float_le.caf"	, SF_ENDIAN_LITTLE | SF_FORMAT_CAF | SF_FORMAT_FLOAT , SF_FALSE) ;
 		pcm_test_double	("double_le.caf", SF_ENDIAN_LITTLE | SF_FORMAT_CAF | SF_FORMAT_DOUBLE, SF_FALSE) ;
+
+		pcm_test_short	("alac16.caf"	, SF_FORMAT_CAF | SF_FORMAT_ALAC_16, SF_FALSE) ;
+
 		/* Lite remove end */
 		test_count++ ;
 		} ;
@@ -463,7 +466,12 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 		return ;
 		} ;
 
-	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_FLAC)
+	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_FLAC
+		&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_16
+		&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20
+		&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24
+		&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32
+		)
 		mono_rdwr_[+ (get "type_name") +]_test (filename, format, long_file_ok, allow_fd) ;
 
 	/* If the format doesn't support stereo we're done. */
@@ -478,9 +486,14 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 
 	/* New read/write test. Not sure if this is needed yet. */
 
-	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_PAF &&
-			(format & SF_FORMAT_TYPEMASK) != SF_FORMAT_VOC &&
-			(format & SF_FORMAT_TYPEMASK) != SF_FORMAT_FLAC)
+	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_PAF
+			&& (format & SF_FORMAT_TYPEMASK) != SF_FORMAT_VOC
+			&& (format & SF_FORMAT_TYPEMASK) != SF_FORMAT_FLAC
+			&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_16
+			&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20
+			&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24
+			&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_32
+			)
 		new_rdwr_[+ (get "type_name") +]_test (filename, format, allow_fd) ;
 
 	delete_file (format, filename) ;
@@ -495,7 +508,7 @@ mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_fi
 	SF_INFO		sfinfo ;
 	[+ (get "data_type") +]		*orig, *test ;
 	sf_count_t	count ;
-	int			k, items ;
+	int			k, items, total ;
 
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= SILLY_WRITE_COUNT ; /* Wrong length. Library should correct this on sf_close. */
@@ -558,6 +571,23 @@ mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_fi
 			exit (1) ;
 			} ;
 
+	/* Test multiple short reads. */
+	test_seek_or_die (file, 0, SEEK_SET, 0, sfinfo.channels, __LINE__) ;
+
+	total = 0 ;
+	for (k = 1 ; k <= 32 ; k++)
+	{	int ik ;
+
+		test_read_[+ (get "data_type") +]_or_die (file, 0, test + total, k, __LINE__) ;
+		total += k ;
+
+		for (ik = 0 ; ik < total ; ik++)
+			if ([+ (get "error_func") +] (orig [ik], test [ik]))
+			{	printf ("\n\nLine %d : Mono : Incorrect sample A (#%d : [+ (get "format_char") +] => [+ (get "format_char") +]).\n", __LINE__, ik, orig [ik], test [ik]) ;
+				exit (1) ;
+				} ;
+		} ;
+
 	/* Seek to start of file. */
 	test_seek_or_die (file, 0, SEEK_SET, 0, sfinfo.channels, __LINE__) ;
 
@@ -568,6 +598,7 @@ mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_fi
 			exit (1) ;
 			} ;
 
+	/* For some codecs we can't go past here. */
 	if ((format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_16 ||
 			(format & SF_FORMAT_SUBMASK) == SF_FORMAT_DWVW_24)
 	{	sf_close (file) ;
@@ -774,6 +805,18 @@ mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int lo
 	SF_INFO		sfinfo ;
 	[+ (get "data_type") +]		*orig, *test ;
 	int			k, pass ;
+
+	switch (format & SF_FORMAT_SUBMASK)
+	{	case SF_FORMAT_ALAC_16 :
+		case SF_FORMAT_ALAC_20 :
+		case SF_FORMAT_ALAC_24 :
+		case SF_FORMAT_ALAC_32 :
+			allow_fd = 0 ;
+			break ;
+
+		default :
+			break ;
+		} ;
 
 	orig = orig_data.[+ (get "data_field") +] ;
 	test = test_data.[+ (get "data_field") +] ;
@@ -1063,13 +1106,25 @@ write_seek_extend_test (const char * filename, int format)
 	short	*orig, *test ;
 	unsigned items, k ;
 
-	/* This test doesn't work on the following. */
+	/* This test doesn't work on the following container formats. */
 	switch (format & SF_FORMAT_TYPEMASK)
 	{	case SF_FORMAT_FLAC :
 		case SF_FORMAT_HTK :
 		case SF_FORMAT_PAF :
 		case SF_FORMAT_SDS :
 		case SF_FORMAT_SVX :
+			return ;
+
+		default :
+			break ;
+		} ;
+
+	/* This test doesn't work on the following codec formats. */
+	switch (format & SF_FORMAT_SUBMASK)
+	{	case SF_FORMAT_ALAC_16 :
+		case SF_FORMAT_ALAC_20 :
+		case SF_FORMAT_ALAC_24 :
+		case SF_FORMAT_ALAC_32 :
 			return ;
 
 		default :
