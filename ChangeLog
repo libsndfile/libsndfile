@@ -9,9 +9,9 @@
 2012-02-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ALAC/*
-    Big code dump of code for Apple's ALAC file format. This copyyright to this
-    code is owned by Apple who have released it under an Apache style license.
-    A few modifications were made to allow this to be integrated into libsndfile
+    Big dump of code for Apple's ALAC file format. The copyyright to this code
+    is owned by Apple who have released it under an Apache style license. A few
+    small modifications were made to allow this to be integrated into libsndfile
     but unfortunately the history of those changes were lost because they were
     developed in a Bzr tree and during that time libsndfile moved to Git.
 
