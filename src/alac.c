@@ -775,12 +775,14 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 
 	if ((bcount = psf->get_chunk_data (psf, &chunk_info)) != SF_ERR_NO_ERROR)
 	{	printf ("%s %d : %s\n\n", __func__, __LINE__, sf_error_number (bcount)) ;
-		exit (1) ;
+		free (chunk_info.data) ;
+		chunk_info.data = NULL ;
+		return NULL ;
 		} ;
 
 	info = alac_pakt_alloc (pakt_size / 4) ;
 
-	/* Start at 24 bytes in. The chunks has some unknown leading cruft. */
+	/* Start at 24 bytes in. The chunks have some unknown leading cruft. */
 	for (bcount = 24 ; bcount < pakt_size && value != 0 ; )
 	{	uint8_t byte ;
 		int32_t count = 0 ;
