@@ -3,6 +3,9 @@
     * src/
 	Refactor chunk storage so it work on big as well as little endian CPUs.
 
+    * tests/chunk_test.c
+    Clean up error messages.
+
 2012-02-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ALAC/*

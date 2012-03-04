@@ -120,7 +120,7 @@ chunk_test_helper (const char *filename, int typemajor, const char * testdata)
 	err = sf_set_chunk (file, &chunk_info) ;
 	exit_if_true (
 		err != SF_ERR_NO_ERROR,
-		"\n\nLine %d : sf_set_chunk returned for testdata '%s' : %s\n", __LINE__, testdata, sf_error_number (err)
+		"\n\nLine %d : sf_set_chunk returned for testdata '%s' : %s\n\n", __LINE__, testdata, sf_error_number (err)
 		) ;
 
 	memset (chunk_info.data, 0, chunk_info.datalen) ;
@@ -137,19 +137,19 @@ chunk_test_helper (const char *filename, int typemajor, const char * testdata)
 	err = sf_get_chunk_size (file, &chunk_info) ;
 	exit_if_true (
 		err != SF_ERR_NO_ERROR,
-		"\n\nLine %d : sf_get_chunk_size returned for testdata '%s' : %s", __LINE__, testdata, sf_error_number (err)
+		"\n\nLine %d : sf_get_chunk_size returned for testdata '%s' : %s\n\n", __LINE__, testdata, sf_error_number (err)
 		) ;
 
 	exit_if_true (
 		length_before > chunk_info.datalen || chunk_info.datalen - length_before > 4,
-		"\n\nLine %d : testdata '%s' : Bad chunk length %u (previous length %u)\n", __LINE__, testdata, chunk_info.datalen, length_before
+		"\n\nLine %d : testdata '%s' : Bad chunk length %u (previous length %u)\n\n", __LINE__, testdata, chunk_info.datalen, length_before
 		) ;
 
 	chunk_info.data = malloc (chunk_info.datalen) ;
 	err = sf_get_chunk_data (file, &chunk_info) ;
 	exit_if_true (
 		err != SF_ERR_NO_ERROR,
-		"\n\nLine %d : sf_get_chunk_size returned for testdata '%s' : %s", __LINE__, testdata, sf_error_number (err)
+		"\n\nLine %d : sf_get_chunk_size returned for testdata '%s' : %s\n\n", __LINE__, testdata, sf_error_number (err)
 		) ;
 
 	exit_if_true (
@@ -176,4 +176,3 @@ chunk_test (const char *filename, int typemajor)
 
 	puts ("ok") ;
 } /* chunk_test */
-
