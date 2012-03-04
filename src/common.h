@@ -233,13 +233,15 @@ typedef struct
 } STR_DATA ;
 
 typedef struct
-{	int64_t		marker ;
+{	int64_t		hash ;
+	uint32_t	mark32 ;
 	sf_count_t	offset ;
 	uint32_t	len ;
 } READ_CHUNK ;
 
 typedef struct
-{	int64_t		marker ;
+{	int64_t		hash ;
+	uint32_t	mark32 ;
 	uint32_t	len ;
 	void		*data ;
 } WRITE_CHUNK ;
@@ -890,10 +892,13 @@ int		interleave_init (SF_PRIVATE *psf) ;
 ** Chunk logging functions.
 */
 
-int		psf_store_read_chunk (READ_CHUNKS * pchk, int64_t marker, sf_count_t offset, uint32_t len) ;
-int		psf_save_write_chunk (WRITE_CHUNKS * pchk, int64_t marker, const SF_CHUNK_INFO * chunk_info) ;
-int		psf_find_read_chunk (READ_CHUNKS * pchk, int64_t marker) ;
-int		psf_find_write_chunk (WRITE_CHUNKS * pchk, int64_t marker) ;
+int		psf_store_read_chunk_u32 (READ_CHUNKS * pchk, uint32_t marker, sf_count_t offset, uint32_t len) ;
+int		psf_store_read_chunk_str (READ_CHUNKS * pchk, const char * marker, sf_count_t offset, uint32_t len) ;
+int		psf_save_write_chunk (WRITE_CHUNKS * pchk, const SF_CHUNK_INFO * chunk_info) ;
+int		psf_find_read_chunk_str (READ_CHUNKS * pchk, const char * marker) ;
+int		psf_find_read_chunk_m32 (READ_CHUNKS * pchk, uint32_t marker) ;
+
+int		psf_find_write_chunk (WRITE_CHUNKS * pchk, const char * marker) ;
 
 static inline int
 fourcc_to_marker (const SF_CHUNK_INFO * chunk_info)

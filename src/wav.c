@@ -348,7 +348,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		marker = chunk_size = 0 ;
 		psf_binheader_readf (psf, "jm4", jump, &marker, &chunk_size) ;
 
-		psf_store_read_chunk (&psf->rchunks, marker, psf_ftell (psf), chunk_size) ;
+		psf_store_read_chunk_u32 (&psf->rchunks, marker, psf_ftell (psf), chunk_size) ;
 
 		switch (marker)
 		{	case RIFF_MARKER :
@@ -1125,7 +1125,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 
 	/* Write custom headers. */
 	for (uk = 0 ; uk < psf->wchunks.used ; uk++)
-		psf_binheader_writef (psf, "m4b", (int) psf->wchunks.chunks [uk].marker, psf->wchunks.chunks [uk].len, psf->wchunks.chunks [uk].data, make_size_t (psf->wchunks.chunks [uk].len)) ;
+		psf_binheader_writef (psf, "m4b", (int) psf->wchunks.chunks [uk].mark32, psf->wchunks.chunks [uk].len, psf->wchunks.chunks [uk].data, make_size_t (psf->wchunks.chunks [uk].len)) ;
 
 	if (psf->headindex + 16 < psf->dataoffset)
 	{	/* Add PAD data if necessary. */
@@ -1857,17 +1857,16 @@ exif_subchunk_parse (SF_PRIVATE *psf, uint32_t length)
 
 static int
 wav_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info)
-{	int marker = fourcc_to_marker (chunk_info) ;
-
-	return psf_save_write_chunk (&psf->wchunks, marker, chunk_info) ;
+{	return psf_save_write_chunk (&psf->wchunks, chunk_info) ;
 } /* wav_set_chunk */
 
 
 static int
 wav_get_chunk_size (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
-{	int indx, marker = fourcc_to_marker (chunk_info) ;
+{	int indx ;
 
-	if ((indx = psf_find_read_chunk (&psf->rchunks, marker)) < 0)
+	chunk_info->id [sizeof (chunk_info->id) - 1] = 0 ;
+	if ((indx = psf_find_read_chunk_str (&psf->rchunks, chunk_info->id)) < 0)
 		return SFE_UNKNOWN_CHUNK ;
 
 	chunk_info->datalen = psf->rchunks.chunks [indx].len ;
@@ -1877,10 +1876,11 @@ wav_get_chunk_size (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
 
 static int
 wav_get_chunk_data (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
-{	int indx, marker = fourcc_to_marker (chunk_info) ;
+{	int indx ;
 	sf_count_t pos ;
 
-	if ((indx = psf_find_read_chunk (&psf->rchunks, marker)) < 0)
+	chunk_info->id [sizeof (chunk_info->id) - 1] = 0 ;
+	if ((indx = psf_find_read_chunk_str (&psf->rchunks, chunk_info->id)) < 0)
 		return SFE_UNKNOWN_CHUNK ;
 
 	if (chunk_info->data == NULL)

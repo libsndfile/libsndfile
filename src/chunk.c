@@ -25,9 +25,19 @@
 #include	"sfendian.h"
 #include	"common.h"
 
+static int64_t
+hash_of_str (const char * str)
+{	int64_t marker = 0 ;
+	int k ;
 
-int
-psf_store_read_chunk (READ_CHUNKS * pchk, int64_t marker, sf_count_t offset, uint32_t len)
+	for (k = 0 ; str [k] ; k++)
+		marker = marker * 0x7f + ((const uint8_t *) str) [k] ;
+
+	return marker ;
+} /* hash_of_str */
+
+static int
+psf_store_read_chunk (READ_CHUNKS * pchk, const READ_CHUNK * rchunk)
 {
 	if (pchk->count == 0)
 	{	pchk->used = 0 ;
@@ -48,9 +58,7 @@ psf_store_read_chunk (READ_CHUNKS * pchk, int64_t marker, sf_count_t offset, uin
 		pchk->count = new_count ;
 		} ;
 
-	pchk->chunks [pchk->used].marker = marker ;
-	pchk->chunks [pchk->used].offset = offset ;
-	pchk->chunks [pchk->used].len = len ;
+	pchk->chunks [pchk->used] = *rchunk ;
 
 	pchk->used ++ ;
 
@@ -58,8 +66,76 @@ psf_store_read_chunk (READ_CHUNKS * pchk, int64_t marker, sf_count_t offset, uin
 } /* psf_store_read_chunk */
 
 int
-psf_save_write_chunk (WRITE_CHUNKS * pchk, int64_t marker, const SF_CHUNK_INFO * chunk_info)
-{	uint32_t len ;
+psf_store_read_chunk_u32 (READ_CHUNKS * pchk, uint32_t marker, sf_count_t offset, uint32_t len)
+{	READ_CHUNK rchunk ;
+
+	memset (&rchunk, 0, sizeof (rchunk)) ;
+
+	rchunk.hash = marker ;
+	rchunk.mark32 = marker ;
+	rchunk.offset = offset ;
+	rchunk.len = len ;
+
+	return psf_store_read_chunk (pchk, &rchunk) ;
+} /* psf_store_read_chunk_u32 */
+
+int
+psf_find_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str)
+{	int64_t hash ;
+	uint32_t k ;
+	union
+	{	uint32_t marker ;
+		char str [5] ;
+	} u ;
+
+	snprintf (u.str, sizeof (u.str), "%s", marker_str) ;
+
+	hash = strlen (marker_str) > 4 ? hash_of_str (marker_str) : u.marker ;
+
+	for (k = 0 ; k < pchk->used ; k++)
+		if (pchk->chunks [k].hash == hash)
+			return k ;
+
+	return -1 ;
+} /* psf_find_read_chunk_str */
+
+int
+psf_find_read_chunk_m32 (READ_CHUNKS * pchk, uint32_t marker)
+{	uint32_t k ;
+
+	for (k = 0 ; k < pchk->used ; k++)
+		if (pchk->chunks [k].mark32 == marker)
+			return k ;
+
+	return -1 ;
+} /* psf_find_read_chunk_str */
+
+int
+psf_store_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str, sf_count_t offset, uint32_t len)
+{	READ_CHUNK rchunk ;
+	union
+	{	uint32_t marker ;
+		char str [5] ;
+	} u ;
+
+	memset (&rchunk, 0, sizeof (rchunk)) ;
+	snprintf (u.str, sizeof (u.str), "%s", marker_str) ;
+
+	rchunk.hash = strlen (marker_str) > 4 ? hash_of_str (marker_str) : u.marker ;
+	rchunk.mark32 = u.marker ;
+	rchunk.offset = offset ;
+	rchunk.len = len ;
+
+	return psf_store_read_chunk (pchk, &rchunk) ;
+} /* psf_store_read_chunk_str */
+
+int
+psf_save_write_chunk (WRITE_CHUNKS * pchk, const SF_CHUNK_INFO * chunk_info)
+{	union
+	{	uint32_t marker ;
+		char str [5] ;
+	} u ;
+	uint32_t len ;
 
 	if (pchk->count == 0)
 	{	pchk->used = 0 ;
@@ -80,22 +156,15 @@ psf_save_write_chunk (WRITE_CHUNKS * pchk, int64_t marker, const SF_CHUNK_INFO *
 	len = chunk_info->datalen ;
 	while (len & 3) len ++ ;
 
-	pchk->chunks [pchk->used].marker = marker ;
+	snprintf (u.str, sizeof (u.str), "%s", chunk_info->id) ;
+
+	pchk->chunks [pchk->used].hash = strlen (chunk_info->id) > 4 ? hash_of_str (chunk_info->id) : u.marker ;
+	pchk->chunks [pchk->used].mark32 = u.marker ;
 	pchk->chunks [pchk->used].len = len ;
 	pchk->chunks [pchk->used].data = psf_memdup (chunk_info->data, chunk_info->datalen) ;
 
 	pchk->used ++ ;
 
 	return SFE_NO_ERROR ;
-} /* psf_store_read_chunk */
+} /* psf_save_write_chunk */
 
-int
-psf_find_read_chunk (READ_CHUNKS * pchk, int64_t marker)
-{	uint32_t k ;
-
-	for (k = 0 ; k < pchk->used ; k++)
-		if (pchk->chunks [k].marker == marker)
-			return k ;
-
-	return -1 ;
-} /* psf_find_read_chunk */

@@ -182,16 +182,16 @@ alac_close	(SF_PRIVATE *psf)
 		alac_get_magic_cookie (penc, kuki_data, &plac->kuki_size) ;
 
 		memset (&chunk_info, 0, sizeof (chunk_info)) ;
-		chunk_info.id_size = 4 ;
+		chunk_info.id_size = snprintf (chunk_info.id, sizeof (chunk_info.id), "kuki") ;
 		chunk_info.data = kuki_data ;
 		chunk_info.datalen = plac->kuki_size ;
-		psf_save_write_chunk (&psf->wchunks, kuki_MARKER, &chunk_info) ;
+		psf_save_write_chunk (&psf->wchunks, &chunk_info) ;
 
 		memset (&chunk_info, 0, sizeof (chunk_info)) ;
-		chunk_info.id_size = 4 ;
+		chunk_info.id_size = snprintf (chunk_info.id, sizeof (chunk_info.id), "pakt") ;
 		chunk_info.data = alac_pakt_encode (plac->pakt_info, &pakt_size) ;
 		chunk_info.datalen = pakt_size ;
-		psf_save_write_chunk (&psf->wchunks, pakt_MARKER, &chunk_info) ;
+		psf_save_write_chunk (&psf->wchunks, &chunk_info) ;
 
 		psf->write_header (psf, 1) ;
 
