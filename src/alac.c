@@ -388,7 +388,7 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 	BitBufferInit (&bit_buffer, byte_buffer, ALAC_MAX_FRAME_SIZE) ;
 
 	packet_size = alac_reader_next_packet_size (plac->pakt_info) ;
-	if (packet_size == 0)
+	if (packet_size == 0 && plac->pakt_info->current < plac->pakt_info->count)
 	{	psf_log_printf (psf, "packet_size is 0 (%d of %d)\n", plac->pakt_info->current, plac->pakt_info->count) ;
 		return 0 ;
 		} ;
