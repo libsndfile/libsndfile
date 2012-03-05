@@ -21,31 +21,24 @@
 
 #include "sfconfig.h"
 
-#if HAVE_STDINT_H
 #include <stdint.h>
-#elif HAVE_INTTYPES_H
 #include <inttypes.h>
-#endif
 
-#if (defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
-/* Good, we have int64_t. */
-#elif (defined (SIZEOF_LONG_LONG) && (SIZEOF_LONG_LONG == 8))
-typedef long long int64_t ;
-#elif (defined (SIZEOF_LONG) && (SIZEOF_LONG == 8))
-typedef long int64_t ;
-#elif (defined (WIN32) || defined (_WIN32))
-typedef __int64 int64_t ;
-#else
-#error "No 64 bit integer type."
-#endif
 
-#if HAVE_BYTESWAP_H
-
+#if HAVE_BYTESWAP_H			/* Linux, all CPUs */
 #include <byteswap.h>
 
 #define	ENDSWAP_16(x)		(bswap_16 (x))
 #define	ENDSWAP_32(x)		(bswap_32 (x))
 #define	ENDSWAP_64(x)		(bswap_64 (x))
+
+#elif HAVE_X86INTRIN_H		/* x86 and x86_64 with GCC */
+
+#include <x86intrin.h>
+
+#define	ENDSWAP_16(x)		((((x) >> 8) & 0xFF) + (((x) & 0xFF) << 8))
+#define	ENDSWAP_32(x)		(__bswapd (x))
+#define	ENDSWAP_64(x)		(_bswap64 (x))
 
 #else
 
@@ -151,15 +144,13 @@ endswap_int_copy (int *dest, const int *src, int len)
 /*========================================================================================
 */
 
-#if	(HAVE_BYTESWAP_H && defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
-
 static inline void
 endswap_int64_t_array (int64_t *ptr, int len)
 {	int64_t value ;
 
 	while (--len >= 0)
 	{	value = ptr [len] ;
-		ptr [len] = bswap_64 (value) ;
+		ptr [len] = ENDSWAP_64 (value) ;
 		} ;
 } /* endswap_int64_t_array */
 
@@ -169,67 +160,9 @@ endswap_int64_t_copy (int64_t *dest, const int64_t *src, int len)
 
 	while (--len >= 0)
 	{	value = src [len] ;
-		dest [len] = bswap_64 (value) ;
+		dest [len] = ENDSWAP_64 (value) ;
 		} ;
 } /* endswap_int64_t_copy */
-
-#else
-
-static inline void
-endswap_int64_t_array (int64_t *ptr, int len)
-{	unsigned char *ucptr, temp ;
-
-	ucptr = (unsigned char *) ptr ;
-	ucptr += 8 * len ;
-	while (--len >= 0)
-	{	ucptr -= 8 ;
-
-		temp = ucptr [0] ;
-		ucptr [0] = ucptr [7] ;
-		ucptr [7] = temp ;
-
-		temp = ucptr [1] ;
-		ucptr [1] = ucptr [6] ;
-		ucptr [6] = temp ;
-
-		temp = ucptr [2] ;
-		ucptr [2] = ucptr [5] ;
-		ucptr [5] = temp ;
-
-		temp = ucptr [3] ;
-		ucptr [3] = ucptr [4] ;
-		ucptr [4] = temp ;
-		} ;
-} /* endswap_int64_t_array */
-
-static inline void
-endswap_int64_t_copy (int64_t *dest, const int64_t *src, int len)
-{	const unsigned char *psrc ;
-	unsigned char *pdest ;
-
-	if (dest == src)
-	{	endswap_int64_t_array (dest, len) ;
-		return ;
-		} ;
-
-	psrc = ((const unsigned char *) src) + 8 * len ;
-	pdest = ((unsigned char *) dest) + 8 * len ;
-	while (--len >= 0)
-	{	psrc -= 8 ;
-		pdest -= 8 ;
-
-		pdest [0] = psrc [7] ;
-		pdest [2] = psrc [5] ;
-		pdest [4] = psrc [3] ;
-		pdest [6] = psrc [1] ;
-		pdest [7] = psrc [0] ;
-		pdest [1] = psrc [6] ;
-		pdest [3] = psrc [4] ;
-		pdest [5] = psrc [2] ;
-		} ;
-} /* endswap_int64_t_copy */
-
-#endif
 
 /* A couple of wrapper functions. */
 

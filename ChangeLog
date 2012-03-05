@@ -12,6 +12,10 @@
     * configure.ac
     Detect presence of <x86intrin.h> header file.
 
+    * src/sfendian.h
+    Use <x86intrin.h> intrinsics (ie for MinGW) when <byteswap.h> is not
+    present.
+
 2012-02-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ALAC/*
