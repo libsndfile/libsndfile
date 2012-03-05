@@ -19,6 +19,9 @@
     * src/ALAC/EndianPortable.c
     Add support for __powerpc__.
 
+    * src/sfconfig.h
+    Make sure HAVE_X86INTRIN_H is either 1 or 0.
+
 2012-02-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ALAC/*
