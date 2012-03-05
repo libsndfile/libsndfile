@@ -43,13 +43,14 @@ typedef __int64 int64_t ;
 
 #include <byteswap.h>
 
-#define	ENDSWAP_SHORT(x)	((short) bswap_16 (x))
-#define	ENDSWAP_INT(x)		((int) bswap_32 (x))
+#define	ENDSWAP_16(x)		(bswap_16 (x))
+#define	ENDSWAP_32(x)		(bswap_32 (x))
+#define	ENDSWAP_64(x)		(bswap_64 (x))
 
 #else
 
-#define	ENDSWAP_SHORT(x)	((((x) >> 8) & 0xFF) + (((x) & 0xFF) << 8))
-#define	ENDSWAP_INT(x)		((((x) >> 24) & 0xFF) + (((x) >> 8) & 0xFF00) + (((x) & 0xFF00) << 8) + (((x) & 0xFF) << 24))
+#define	ENDSWAP_16(x)		((((x) >> 8) & 0xFF) + (((x) & 0xFF) << 8))
+#define	ENDSWAP_32(x)		((((x) >> 24) & 0xFF) + (((x) >> 8) & 0xFF00) + (((x) & 0xFF00) << 8) + (((x) & 0xFF) << 24))
 
 #endif
 
@@ -76,34 +77,36 @@ typedef __int64 int64_t ;
 */
 
 #if (CPU_IS_LITTLE_ENDIAN == 1)
-	#define LES2H_SHORT(x)			(x)
-	#define LEI2H_INT(x)			(x)
+	#define LE2H_16(x)			(x)
+	#define LE2H_32(x)			(x)
 
-	#define BES2H_SHORT(x)			ENDSWAP_SHORT (x)
-	#define BEI2H_INT(x)			ENDSWAP_INT (x)
+	#define BE2H_16(x)			ENDSWAP_16 (x)
+	#define BE2H_32(x)			ENDSWAP_32 (x)
+	#define BE2H_64(x)			ENDSWAP_64 (x)
 
-	#define H2BE_SHORT(x)			ENDSWAP_SHORT (x)
-	#define H2BE_INT(x)				ENDSWAP_INT (x)
+	#define H2BE_16(x)			ENDSWAP_16 (x)
+	#define H2BE_32(x)			ENDSWAP_32 (x)
 
 #elif (CPU_IS_BIG_ENDIAN == 1)
-	#define LES2H_SHORT(x)			ENDSWAP_SHORT (x)
-	#define LEI2H_INT(x)			ENDSWAP_INT (x)
+	#define LE2H_16(x)			ENDSWAP_16 (x)
+	#define LE2H_32(x)			ENDSWAP_32 (x)
 
-	#define BES2H_SHORT(x)			(x)
-	#define BEI2H_INT(x)			(x)
+	#define BE2H_16(x)			(x)
+	#define BE2H_32(x)			(x)
+	#define	BE2H_64(x)			(x)
 
-	#define H2LE_SHORT(x)			ENDSWAP_SHORT (x)
-	#define H2LE_INT(x)				ENDSWAP_INT (x)
+	#define H2LE_16(x)			ENDSWAP_16 (x)
+	#define H2LE_32(x)			ENDSWAP_32 (x)
 
 #else
 	#error "Target CPU endian-ness unknown. May need to hand edit src/sfconfig.h"
 #endif
 
-#define LET2H_SHORT_PTR(x)		((x) [1] + ((x) [2] << 8))
-#define LET2H_INT_PTR(x)		(((x) [0] << 8) + ((x) [1] << 16) + ((x) [2] << 24))
+#define LET2H_16_PTR(x)			((x) [1] + ((x) [2] << 8))
+#define LET2H_32_PTR(x)			(((x) [0] << 8) + ((x) [1] << 16) + ((x) [2] << 24))
 
-#define BET2H_SHORT_PTR(x)		(((x) [0] << 8) + (x) [1])
-#define BET2H_INT_PTR(x)		(((x) [0] << 24) + ((x) [1] << 16) + ((x) [2] << 8))
+#define BET2H_16_PTR(x)			(((x) [0] << 8) + (x) [1])
+#define BET2H_32_PTR(x)			(((x) [0] << 24) + ((x) [1] << 16) + ((x) [2] << 8))
 
 /*-----------------------------------------------------------------------------------------------
 ** Generic functions for performing endian swapping on integer arrays.
@@ -115,7 +118,7 @@ endswap_short_array (short *ptr, int len)
 
 	while (--len >= 0)
 	{	temp = ptr [len] ;
-		ptr [len] = ENDSWAP_SHORT (temp) ;
+		ptr [len] = ENDSWAP_16 (temp) ;
 		} ;
 } /* endswap_short_array */
 
@@ -123,7 +126,7 @@ static inline void
 endswap_short_copy (short *dest, const short *src, int len)
 {
 	while (--len >= 0)
-	{	dest [len] = ENDSWAP_SHORT (src [len]) ;
+	{	dest [len] = ENDSWAP_16 (src [len]) ;
 		} ;
 } /* endswap_short_copy */
 
@@ -133,7 +136,7 @@ endswap_int_array (int *ptr, int len)
 
 	while (--len >= 0)
 	{	temp = ptr [len] ;
-		ptr [len] = ENDSWAP_INT (temp) ;
+		ptr [len] = ENDSWAP_32 (temp) ;
 		} ;
 } /* endswap_int_array */
 
@@ -141,7 +144,7 @@ static inline void
 endswap_int_copy (int *dest, const int *src, int len)
 {
 	while (--len >= 0)
-	{	dest [len] = ENDSWAP_INT (src [len]) ;
+	{	dest [len] = ENDSWAP_32 (src [len]) ;
 		} ;
 } /* endswap_int_copy */
 

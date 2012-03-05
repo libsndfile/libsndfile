@@ -924,7 +924,7 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 	if (comm_fmt->size > 0x10000 && (comm_fmt->size & 0xffff) == 0)
 	{	psf_log_printf (psf, " COMM : %d (0x%x) *** should be ", comm_fmt->size, comm_fmt->size) ;
-		comm_fmt->size = ENDSWAP_INT (comm_fmt->size) ;
+		comm_fmt->size = ENDSWAP_32 (comm_fmt->size) ;
 		psf_log_printf (psf, "%d (0x%x)\n", comm_fmt->size, comm_fmt->size) ;
 		}
 	else

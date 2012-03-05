@@ -890,7 +890,7 @@ alac_kuki_read (SF_PRIVATE * psf, uint32_t kuki_offset, uint8_t * kuki, size_t k
 		return 0 ;
 
 	psf_fread (&kuki_size, 1, sizeof (kuki_size), psf) ;
-	kuki_size = bswap_64 (kuki_size) ;
+	kuki_size = BE2H_64 (kuki_size) ;
 
 	if (kuki_size == 0 || kuki_size > kuki_maxlen)
 	{	psf_log_printf (psf, "%s : Bad size (%D) of 'kuki' chunk.\n", __func__, kuki_size) ;

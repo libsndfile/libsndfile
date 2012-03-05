@@ -1091,7 +1091,7 @@ dles2s_array (XI_PRIVATE *pxi, short *src, int count, short *dest)
 	last_val = pxi->last_16 ;
 
 	for (k = 0 ; k < count ; k++)
-	{	last_val += LES2H_SHORT (src [k]) ;
+	{	last_val += LE2H_16 (src [k]) ;
 		dest [k] = last_val ;
 		} ;
 
@@ -1106,7 +1106,7 @@ dles2i_array (XI_PRIVATE *pxi, short *src, int count, int *dest)
 	last_val = pxi->last_16 ;
 
 	for (k = 0 ; k < count ; k++)
-	{	last_val += LES2H_SHORT (src [k]) ;
+	{	last_val += LE2H_16 (src [k]) ;
 		dest [k] = last_val << 16 ;
 		} ;
 
@@ -1121,7 +1121,7 @@ dles2f_array (XI_PRIVATE *pxi, short *src, int count, float *dest, float normfac
 	last_val = pxi->last_16 ;
 
 	for (k = 0 ; k < count ; k++)
-	{	last_val += LES2H_SHORT (src [k]) ;
+	{	last_val += LE2H_16 (src [k]) ;
 		dest [k] = last_val * normfact ;
 		} ;
 
@@ -1136,7 +1136,7 @@ dles2d_array (XI_PRIVATE *pxi, short *src, int count, double *dest, double normf
 	last_val = pxi->last_16 ;
 
 	for (k = 0 ; k < count ; k++)
-	{	last_val += LES2H_SHORT (src [k]) ;
+	{	last_val += LE2H_16 (src [k]) ;
 		dest [k] = last_val * normfact ;
 		} ;
 
@@ -1155,7 +1155,7 @@ s2dles_array (XI_PRIVATE *pxi, const short *src, short *dest, int count)
 
 	for (k = 0 ; k < count ; k++)
 	{	diff = src [k] - last_val ;
-		dest [k] = LES2H_SHORT (diff) ;
+		dest [k] = LE2H_16 (diff) ;
 		last_val = src [k] ;
 		} ;
 
@@ -1171,7 +1171,7 @@ i2dles_array (XI_PRIVATE *pxi, const int *src, short *dest, int count)
 
 	for (k = 0 ; k < count ; k++)
 	{	diff = (src [k] >> 16) - last_val ;
-		dest [k] = LES2H_SHORT (diff) ;
+		dest [k] = LE2H_16 (diff) ;
 		last_val = src [k] >> 16 ;
 		} ;
 
@@ -1188,7 +1188,7 @@ f2dles_array (XI_PRIVATE *pxi, const float *src, short *dest, int count, float n
 	for (k = 0 ; k < count ; k++)
 	{	current = lrintf (src [k] * normfact) ;
 		diff = current - last_val ;
-		dest [k] = LES2H_SHORT (diff) ;
+		dest [k] = LE2H_16 (diff) ;
 		last_val = current ;
 		} ;
 
@@ -1205,7 +1205,7 @@ d2dles_array (XI_PRIVATE *pxi, const double *src, short *dest, int count, double
 	for (k = 0 ; k < count ; k++)
 	{	current = lrint (src [k] * normfact) ;
 		diff = current - last_val ;
-		dest [k] = LES2H_SHORT (diff) ;
+		dest [k] = LE2H_16 (diff) ;
 		last_val = current ;
 		} ;
 

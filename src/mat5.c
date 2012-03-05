@@ -278,18 +278,18 @@ mat5_read_header (SF_PRIVATE *psf)
 
 	if (endian == MI_MARKER)
 	{	psf->endian = psf->rwf_endian = SF_ENDIAN_BIG ;
-		if (CPU_IS_LITTLE_ENDIAN) version = ENDSWAP_SHORT (version) ;
+		if (CPU_IS_LITTLE_ENDIAN) version = ENDSWAP_16 (version) ;
 		}
 	else if (endian == IM_MARKER)
 	{	psf->endian = psf->rwf_endian = SF_ENDIAN_LITTLE ;
-		if (CPU_IS_BIG_ENDIAN) version = ENDSWAP_SHORT (version) ;
+		if (CPU_IS_BIG_ENDIAN) version = ENDSWAP_16 (version) ;
 		}
 	else
 		return SFE_MAT5_BAD_ENDIAN ;
 
 	if ((CPU_IS_LITTLE_ENDIAN && endian == IM_MARKER) ||
 			(CPU_IS_BIG_ENDIAN && endian == MI_MARKER))
-		version = ENDSWAP_SHORT (version) ;
+		version = ENDSWAP_16 (version) ;
 
 	psf_log_printf (psf, "Version : 0x%04X\n", version) ;
 	psf_log_printf (psf, "Endian  : 0x%04X => %s\n", endian,

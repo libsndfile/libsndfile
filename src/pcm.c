@@ -300,7 +300,7 @@ let2s_array (tribyte *src, int count, short *dest)
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
 	{	ucptr -= 3 ;
-		dest [count] = LET2H_SHORT_PTR (ucptr) ;
+		dest [count] = LET2H_16_PTR (ucptr) ;
 		} ;
 } /* let2s_array */
 
@@ -311,7 +311,7 @@ bet2s_array (tribyte *src, int count, short *dest)
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
 	{	ucptr -= 3 ;
-		dest [count] = BET2H_SHORT_PTR (ucptr) ;
+		dest [count] = BET2H_16_PTR (ucptr) ;
 			} ;
 } /* bet2s_array */
 
@@ -320,7 +320,7 @@ lei2s_array (int *src, int count, short *dest)
 {	int value ;
 
 	while (--count >= 0)
-	{	value = LEI2H_INT (src [count]) ;
+	{	value = LE2H_32 (src [count]) ;
 		dest [count] = value >> 16 ;
 		} ;
 } /* lei2s_array */
@@ -330,7 +330,7 @@ bei2s_array (int *src, int count, short *dest)
 {	int value ;
 
 	while (--count >= 0)
-	{	value = BEI2H_INT (src [count]) ;
+	{	value = BE2H_32 (src [count]) ;
 		dest [count] = value >> 16 ;
 		} ;
 } /* bei2s_array */
@@ -357,7 +357,7 @@ bes2i_array (short *src, int count, int *dest)
 {	short value ;
 
 	while (--count >= 0)
-	{	value = BES2H_SHORT (src [count]) ;
+	{	value = BE2H_16 (src [count]) ;
 		dest [count] = value << 16 ;
 		} ;
 } /* bes2i_array */
@@ -367,7 +367,7 @@ les2i_array (short *src, int count, int *dest)
 {	short value ;
 
 	while (--count >= 0)
-	{	value = LES2H_SHORT (src [count]) ;
+	{	value = LE2H_16 (src [count]) ;
 		dest [count] = value << 16 ;
 		} ;
 } /* les2i_array */
@@ -379,7 +379,7 @@ bet2i_array (tribyte *src, int count, int *dest)
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
 	{	ucptr -= 3 ;
-		dest [count] = BET2H_INT_PTR (ucptr) ;
+		dest [count] = BET2H_32_PTR (ucptr) ;
 			} ;
 } /* bet2i_array */
 
@@ -390,7 +390,7 @@ let2i_array (tribyte *src, int count, int *dest)
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
 	{	ucptr -= 3 ;
-		dest [count] = LET2H_INT_PTR (ucptr) ;
+		dest [count] = LET2H_32_PTR (ucptr) ;
 		} ;
 } /* let2i_array */
 
@@ -415,7 +415,7 @@ les2f_array (short *src, int count, float *dest, float normfact)
 
 	while (--count >= 0)
 	{	value = src [count] ;
-		value = LES2H_SHORT (value) ;
+		value = LE2H_16 (value) ;
 		dest [count] = ((float) value) * normfact ;
 		} ;
 } /* les2f_array */
@@ -426,7 +426,7 @@ bes2f_array (short *src, int count, float *dest, float normfact)
 
 	while (--count >= 0)
 	{	value = src [count] ;
-		value = BES2H_SHORT (value) ;
+		value = BE2H_16 (value) ;
 		dest [count] = ((float) value) * normfact ;
 		} ;
 } /* bes2f_array */
@@ -439,7 +439,7 @@ let2f_array (tribyte *src, int count, float *dest, float normfact)
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
 	{	ucptr -= 3 ;
-		value = LET2H_INT_PTR (ucptr) ;
+		value = LET2H_32_PTR (ucptr) ;
 		dest [count] = ((float) value) * normfact ;
 		} ;
 } /* let2f_array */
@@ -452,7 +452,7 @@ bet2f_array (tribyte *src, int count, float *dest, float normfact)
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
 	{	ucptr -= 3 ;
-		value = BET2H_INT_PTR (ucptr) ;
+		value = BET2H_32_PTR (ucptr) ;
 		dest [count] = ((float) value) * normfact ;
 			} ;
 } /* bet2f_array */
@@ -463,7 +463,7 @@ lei2f_array (int *src, int count, float *dest, float normfact)
 
 	while (--count >= 0)
 	{	value = src [count] ;
-		value = LEI2H_INT (value) ;
+		value = LE2H_32 (value) ;
 		dest [count] = ((float) value) * normfact ;
 		} ;
 } /* lei2f_array */
@@ -474,7 +474,7 @@ bei2f_array (int *src, int count, float *dest, float normfact)
 
 	while (--count >= 0)
 	{	value = src [count] ;
-		value = BEI2H_INT (value) ;
+		value = BE2H_32 (value) ;
 		dest [count] = ((float) value) * normfact ;
 		} ;
 } /* bei2f_array */
@@ -500,7 +500,7 @@ les2d_array (short *src, int count, double *dest, double normfact)
 
 	while (--count >= 0)
 	{	value = src [count] ;
-		value = LES2H_SHORT (value) ;
+		value = LE2H_16 (value) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
 } /* les2d_array */
@@ -511,7 +511,7 @@ bes2d_array (short *src, int count, double *dest, double normfact)
 
 	while (--count >= 0)
 	{	value = src [count] ;
-		value = BES2H_SHORT (value) ;
+		value = BE2H_16 (value) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
 } /* bes2d_array */
@@ -524,7 +524,7 @@ let2d_array (tribyte *src, int count, double *dest, double normfact)
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
 	{	ucptr -= 3 ;
-		value = LET2H_INT_PTR (ucptr) ;
+		value = LET2H_32_PTR (ucptr) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
 } /* let2d_array */
@@ -548,7 +548,7 @@ lei2d_array (int *src, int count, double *dest, double normfact)
 
 	while (--count >= 0)
 	{	value = src [count] ;
-		value = LEI2H_INT (value) ;
+		value = LE2H_32 (value) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
 } /* lei2d_array */
@@ -559,7 +559,7 @@ bei2d_array (int *src, int count, double *dest, double normfact)
 
 	while (--count >= 0)
 	{	value = src [count] ;
-		value = BEI2H_INT (value) ;
+		value = BE2H_32 (value) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
 } /* bei2d_array */

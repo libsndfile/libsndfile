@@ -1025,7 +1025,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 					strptr = va_arg (argptr, char *) ;
 					size   = strlen (strptr) + 1 ;
 					size  += (size & 1) ;
-					longdata = H2LE_INT (size) ;
+					longdata = H2LE_32 (size) ;
 					get_int (psf, longdata) ;
 					memcpy (&(psf->header [psf->headindex]), strptr, size) ;
 					psf->headindex += size ;

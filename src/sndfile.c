@@ -2468,7 +2468,7 @@ guess_file_type (SF_PRIVATE *psf)
 		return 0 /*-SF_FORMAT_WMA-*/ ;
 
 	/* HMM (Hidden Markov Model) Tool Kit. */
-	if (2 * BEI2H_INT (buffer [0]) + 12 == psf->filelength && buffer [2] == MAKE_MARKER (0, 2, 0, 0))
+	if (2 * BE2H_32 (buffer [0]) + 12 == psf->filelength && buffer [2] == MAKE_MARKER (0, 2, 0, 0))
 		return SF_FORMAT_HTK ;
 
 	if (buffer [0] == MAKE_MARKER ('f', 'L', 'a', 'C'))
