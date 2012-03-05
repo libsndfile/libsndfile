@@ -38,13 +38,31 @@
 
 #define	ENDSWAP_16(x)		((((x) >> 8) & 0xFF) + (((x) & 0xFF) << 8))
 #define	ENDSWAP_32(x)		(__bswapd (x))
-#define	ENDSWAP_64(x)		(_bswap64 (x))
-
+#if defined (__x86_64__)
+#define	ENDSWAP_64(x)		(__bswapq (x))
+#endif
 #else
 
 #define	ENDSWAP_16(x)		((((x) >> 8) & 0xFF) + (((x) & 0xFF) << 8))
 #define	ENDSWAP_32(x)		((((x) >> 24) & 0xFF) + (((x) >> 8) & 0xFF00) + (((x) & 0xFF00) << 8) + (((x) & 0xFF) << 24))
 
+#endif
+
+#ifndef ENDSWAP_64
+static inline uint64_t
+ENDSWAP_64 (uint64_t x)
+{	union
+	{	uint32_t parts [2] ;
+		uint64_t whole ;
+	} u ;
+	uint32_t temp ;
+
+	u.whole = x ;
+	temp = u.parts [0] ;
+	u.parts [0] = ENDSWAP_32 (u.parts [1]) ;
+	u.parts [1] = ENDSWAP_32 (temp) ;
+	return u.whole ;
+}
 #endif
 
 /*

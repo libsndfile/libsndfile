@@ -1,7 +1,7 @@
 2012-02-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/
-	Refactor chunk storage so it work on big as well as little endian CPUs.
+    Refactor chunk storage so it work on big as well as little endian CPUs.
 
     * tests/chunk_test.c
     Clean up error messages.
@@ -15,6 +15,7 @@
     * src/sfendian.h
     Use <x86intrin.h> intrinsics (ie for MinGW) when <byteswap.h> is not
     present.
+    Make ENDSWAP_64() work with i686-w64-mingw32 compiler.
 
     * src/ALAC/EndianPortable.c
     Add support for __powerpc__.
