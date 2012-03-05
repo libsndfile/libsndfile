@@ -64,6 +64,7 @@ AC_HEADER_STDC
 
 AC_CHECK_HEADERS(endian.h)
 AC_CHECK_HEADERS(byteswap.h)
+AC_CHECK_HEADERS(x86intrin.h)
 AC_CHECK_HEADERS(locale.h)
 AC_CHECK_HEADERS(sys/time.h)
 
