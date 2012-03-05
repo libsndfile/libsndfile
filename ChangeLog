@@ -1,3 +1,8 @@
+2012-02-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/alac.c
+    Make sure temp file gets opened in binary mode.
+
 2012-02-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/

@@ -336,7 +336,7 @@ alac_writer_init (SF_PRIVATE *psf)
 		return SFE_NO_TEMP_DIR ;
 
 	snprintf (plac->enctmpname, sizeof (plac->enctmpname), "%s/%x%x.alac", tmpdir, psf_rand_int32 (), psf_rand_int32 ()) ;
-	if ((plac->enctmp = fopen (plac->enctmpname, "w+")) == NULL)
+	if ((plac->enctmp = fopen (plac->enctmpname, "wb+")) == NULL)
 		return SFE_ALAC_FAIL_TMPFILE ;
 
 	alac_encoder_init (&plac->encoder, psf->sf.samplerate, psf->sf.channels, alac_format_flags, ALAC_FRAME_LENGTH) ;
