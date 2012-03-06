@@ -3,6 +3,9 @@
     * src/alac.c
     Make sure temp file gets opened in binary mode.
 
+    * src/alac.c src/common.c src/common.h
+    Fix function alac_write16_d().
+
 2012-02-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/

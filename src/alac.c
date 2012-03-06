@@ -90,7 +90,8 @@ static sf_count_t alac_write16_d (SF_PRIVATE *psf, const double *ptr, sf_count_t
 
 static sf_count_t	alac_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 
-static int	alac_close	(SF_PRIVATE *psf) ;
+static int	alac_close		(SF_PRIVATE *psf) ;
+static int	alac_byterate	(SF_PRIVATE *psf) ;
 
 static int alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac) ;
 static int alac_encode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac) ;
@@ -134,6 +135,7 @@ alac_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 		} ;
 
 	psf->codec_close = alac_close ;
+	psf->byterate = alac_byterate ;
 
 	return 0 ;
 } /* aiff_alac_init */
@@ -209,6 +211,14 @@ alac_close	(SF_PRIVATE *psf)
 	return 0 ;
 } /* alac_close */
 
+static int
+alac_byterate	(SF_PRIVATE *psf)
+{
+	if (psf->file.mode == SFM_READ)
+		return (psf->datalength * psf->sf.samplerate) / psf->sf.frames ;
+
+	return -1 ;
+} /* alac_byterate */
 
 /*============================================================================================
 ** ALAC initialisation Functions.
@@ -712,12 +722,33 @@ alac_write16_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 
 static sf_count_t
 alac_write16_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
-{	sf_count_t	total = 0 ;
-	(void) psf ;
-	(void) ptr ;
-	(void) len ;
-	printf ("%s %d : Exit\n", __func__, __LINE__) ;
-	exit (1) ;
+{	ALAC_PRIVATE *plac ;
+	void		(*convert) (const double *, short *t, int, int) ;
+	short		*sptr ;
+	int			writecount ;
+	sf_count_t	total = 0 ;
+
+	if ((plac = (ALAC_PRIVATE*) psf->codec_data) == NULL)
+		return 0 ;
+
+	convert = (psf->add_clipping) ? psf_d2s_clip_array : psf_d2s_array ;
+
+	while (len > 0)
+	{	writecount = (plac->frames_per_block - plac->partial_block_frames) * plac->channels ;
+		writecount = (writecount == 0 || writecount > len) ? len : writecount ;
+
+		sptr = plac->sbuf + plac->partial_block_frames * plac->channels ;
+
+		convert (ptr, sptr, writecount, psf->norm_float) ;
+
+		plac->partial_block_frames += writecount / plac->channels ;
+		total += writecount ;
+		len -= writecount ;
+
+		if (plac->partial_block_frames >= plac->frames_per_block)
+			alac_encode_block (psf, plac) ;
+		} ;
+
 	return total ;
 } /* alac_write16_d */
 
