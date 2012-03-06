@@ -1012,5 +1012,11 @@ void psf_f2s_clip_array (const float *src, short *dest, int count, int normalize
 void psf_d2s_array (const double *src, short *dest, int count, int normalize) ;
 void psf_d2s_clip_array (const double *src, short *dest, int count, int normalize) ;
 
+void psf_f2i_array (const float *src, int *dest, int count, int normalize) ;
+void psf_f2i_clip_array (const float *src, int *dest, int count, int normalize) ;
+
+void psf_d2i_array (const double *src, int *dest, int count, int normalize) ;
+void psf_d2i_clip_array (const double *src, int *dest, int count, int normalize) ;
+
 #endif /* SNDFILE_COMMON_H */
 

@@ -83,10 +83,20 @@ static sf_count_t alac_read16_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t alac_read16_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
 static sf_count_t alac_read16_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
 
+static sf_count_t alac_read32_s (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
+static sf_count_t alac_read32_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
+static sf_count_t alac_read32_f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
+static sf_count_t alac_read32_d (SF_PRIVATE *psf, double *ptr, sf_count_t len) ;
+
 static sf_count_t alac_write16_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
 static sf_count_t alac_write16_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
 static sf_count_t alac_write16_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
 static sf_count_t alac_write16_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
+
+static sf_count_t alac_write32_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
+static sf_count_t alac_write32_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
+static sf_count_t alac_write32_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
+static sf_count_t alac_write32_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static sf_count_t	alac_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 
@@ -258,11 +268,18 @@ alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 	alac_decoder_init (&plac->decoder, kuki, kuki_size) ;
 
 	switch (info->bits_per_sample)
-	{	case 16:
+	{	case 16 :
 			psf->read_short		= alac_read16_s ;
 			psf->read_int		= alac_read16_i ;
 			psf->read_float		= alac_read16_f ;
 			psf->read_double	= alac_read16_d ;
+			break ;
+
+		case 32 :
+			psf->read_short		= alac_read32_s ;
+			psf->read_int		= alac_read32_i ;
+			psf->read_float		= alac_read32_f ;
+			psf->read_double	= alac_read32_d ;
 			break ;
 
 		default :
@@ -321,6 +338,11 @@ alac_writer_init (SF_PRIVATE *psf)
 			break ;
 
 		case SF_FORMAT_ALAC_32 :
+			psf->write_short	= alac_write32_s ;
+			psf->write_int		= alac_write32_i ;
+			psf->write_float	= alac_write32_f ;
+			psf->write_double	= alac_write32_d ;
+
 			alac_format_flags	= 4 ;
 			plac->bits_per_sample = 32 ;
 			plac->bytes_per_packet = plac->channels * (plac->bits_per_sample >> 3) ;
@@ -574,6 +596,133 @@ alac_read16_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	return total ;
 } /* alac_read16_d */
 
+
+static sf_count_t
+alac_read32_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
+{	ALAC_PRIVATE *plac ;
+	int			*iptr ;
+	int			k, readcount ;
+	sf_count_t	total = 0 ;
+
+	if ((plac = (ALAC_PRIVATE*) psf->codec_data) == NULL)
+		return 0 ;
+
+	while (len > 0)
+	{	if (plac->partial_block_frames >= plac->frames_this_block && alac_decode_block (psf, plac) == 0)
+			break ;
+
+		readcount = (plac->frames_this_block - plac->partial_block_frames) * plac->channels ;
+		readcount = readcount > len ? len : readcount ;
+
+		iptr = plac->ibuf + plac->partial_block_frames * plac->channels ;
+
+		for (k = 0 ; k < readcount ; k++)
+			ptr [total + k] = iptr [k] >> 16 ;
+
+		plac->partial_block_frames += readcount / plac->channels ;
+		total += readcount ;
+		len -= readcount ;
+		} ;
+
+	return total ;
+} /* alac_read32_s */
+
+static sf_count_t
+alac_read32_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
+{	ALAC_PRIVATE *plac ;
+	int			*iptr ;
+	int			k, readcount ;
+	sf_count_t	total = 0 ;
+
+	if ((plac = (ALAC_PRIVATE*) psf->codec_data) == NULL)
+		return 0 ;
+
+	while (len > 0)
+	{	if (plac->partial_block_frames >= plac->frames_this_block && alac_decode_block (psf, plac) == 0)
+			break ;
+
+		readcount = (plac->frames_this_block - plac->partial_block_frames) * plac->channels ;
+		readcount = readcount > len ? len : readcount ;
+
+		iptr = plac->ibuf + plac->partial_block_frames * plac->channels ;
+
+		for (k = 0 ; k < readcount ; k++)
+			ptr [total + k] = iptr [k] ;
+
+		plac->partial_block_frames += readcount / plac->channels ;
+		total += readcount ;
+		len -= readcount ;
+		} ;
+
+	return total ;
+} /* alac_read32_i */
+
+static sf_count_t
+alac_read32_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
+{	ALAC_PRIVATE *plac ;
+	int			*iptr ;
+	int			k, readcount ;
+	sf_count_t	total = 0 ;
+	float		normfact ;
+
+	if ((plac = (ALAC_PRIVATE*) psf->codec_data) == NULL)
+		return 0 ;
+
+	normfact = (psf->norm_float == SF_TRUE) ? 1.0 / ((float) 0x80000000) : 1.0 ;
+
+	while (len > 0)
+	{	if (plac->partial_block_frames >= plac->frames_this_block && alac_decode_block (psf, plac) == 0)
+			break ;
+
+		readcount = (plac->frames_this_block - plac->partial_block_frames) * plac->channels ;
+		readcount = readcount > len ? len : readcount ;
+
+		iptr = plac->ibuf + plac->partial_block_frames * plac->channels ;
+
+		for (k = 0 ; k < readcount ; k++)
+			ptr [total + k] = normfact * iptr [k] ;
+
+		plac->partial_block_frames += readcount / plac->channels ;
+		total += readcount ;
+		len -= readcount ;
+		} ;
+
+	return total ;
+} /* alac_read32_f */
+
+static sf_count_t
+alac_read32_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
+{	ALAC_PRIVATE *plac ;
+	int			*iptr ;
+	int			k, readcount ;
+	sf_count_t	total = 0 ;
+	double		normfact ;
+
+	if ((plac = (ALAC_PRIVATE*) psf->codec_data) == NULL)
+		return 0 ;
+
+	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((float) 0x80000000) : 1.0 ;
+
+	while (len > 0)
+	{	if (plac->partial_block_frames >= plac->frames_this_block && alac_decode_block (psf, plac) == 0)
+			break ;
+
+		readcount = (plac->frames_this_block - plac->partial_block_frames) * plac->channels ;
+		readcount = readcount > len ? len : readcount ;
+
+		iptr = plac->ibuf + plac->partial_block_frames * plac->channels ;
+
+		for (k = 0 ; k < readcount ; k++)
+			ptr [total + k] = normfact * iptr [k] ;
+
+		plac->partial_block_frames += readcount / plac->channels ;
+		total += readcount ;
+		len -= readcount ;
+		} ;
+
+	return total ;
+} /* alac_read32_d */
+
 /*============================================================================================
 */
 
@@ -751,6 +900,131 @@ alac_write16_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 	return total ;
 } /* alac_write16_d */
+
+
+static sf_count_t
+alac_write32_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
+{	ALAC_PRIVATE *plac ;
+	int			*iptr ;
+	int			k, writecount ;
+	sf_count_t	total = 0 ;
+
+	if ((plac = (ALAC_PRIVATE*) psf->codec_data) == NULL)
+		return 0 ;
+
+	while (len > 0)
+	{	writecount = (plac->frames_per_block - plac->partial_block_frames) * plac->channels ;
+		writecount = (writecount == 0 || writecount > len) ? len : writecount ;
+
+		iptr = plac->ibuf + plac->partial_block_frames * plac->channels ;
+
+		for (k = 0 ; k < writecount ; k++)
+			iptr [k] = ptr [total + k] << 16 ;
+
+		plac->partial_block_frames += writecount / plac->channels ;
+		total += writecount ;
+		len -= writecount ;
+
+		if (plac->partial_block_frames >= plac->frames_per_block)
+			alac_encode_block (psf, plac) ;
+		} ;
+
+	return total ;
+} /* alac_write32_s */
+
+static sf_count_t
+alac_write32_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
+{	ALAC_PRIVATE *plac ;
+	int			*iptr ;
+	int			k, writecount ;
+	sf_count_t	total = 0 ;
+
+	if ((plac = (ALAC_PRIVATE*) psf->codec_data) == NULL)
+		return 0 ;
+
+	while (len > 0)
+	{	writecount = (plac->frames_per_block - plac->partial_block_frames) * plac->channels ;
+		writecount = (writecount == 0 || writecount > len) ? len : writecount ;
+
+		iptr = plac->ibuf + plac->partial_block_frames * plac->channels ;
+
+		for (k = 0 ; k < writecount ; k++)
+			iptr [k] = ptr [total + k] ;
+
+		plac->partial_block_frames += writecount / plac->channels ;
+		total += writecount ;
+		len -= writecount ;
+
+		if (plac->partial_block_frames >= plac->frames_per_block)
+			alac_encode_block (psf, plac) ;
+		} ;
+
+	return total ;
+} /* alac_write32_i */
+
+static sf_count_t
+alac_write32_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
+{	ALAC_PRIVATE *plac ;
+	void		(*convert) (const float *, int *t, int, int) ;
+	int			*iptr ;
+	int			writecount ;
+	sf_count_t	total = 0 ;
+
+	if ((plac = (ALAC_PRIVATE*) psf->codec_data) == NULL)
+		return 0 ;
+
+	convert = (psf->add_clipping) ? psf_f2i_clip_array : psf_f2i_array ;
+
+	while (len > 0)
+	{	writecount = (plac->frames_per_block - plac->partial_block_frames) * plac->channels ;
+		writecount = (writecount == 0 || writecount > len) ? len : writecount ;
+
+		iptr = plac->ibuf + plac->partial_block_frames * plac->channels ;
+
+		convert (ptr, iptr, writecount, psf->norm_float) ;
+
+		plac->partial_block_frames += writecount / plac->channels ;
+		total += writecount ;
+		len -= writecount ;
+
+		if (plac->partial_block_frames >= plac->frames_per_block)
+			alac_encode_block (psf, plac) ;
+		} ;
+
+	return total ;
+} /* alac_write32_f */
+
+static sf_count_t
+alac_write32_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
+{	ALAC_PRIVATE *plac ;
+	void		(*convert) (const double *, int *t, int, int) ;
+	int			*iptr ;
+	int			writecount ;
+	sf_count_t	total = 0 ;
+
+	if ((plac = (ALAC_PRIVATE*) psf->codec_data) == NULL)
+		return 0 ;
+
+	convert = (psf->add_clipping) ? psf_d2i_clip_array : psf_d2i_array ;
+
+	while (len > 0)
+	{	writecount = (plac->frames_per_block - plac->partial_block_frames) * plac->channels ;
+		writecount = (writecount == 0 || writecount > len) ? len : writecount ;
+
+		iptr = plac->ibuf + plac->partial_block_frames * plac->channels ;
+
+		convert (ptr, iptr, writecount, psf->norm_float) ;
+
+		plac->partial_block_frames += writecount / plac->channels ;
+		total += writecount ;
+		len -= writecount ;
+
+		if (plac->partial_block_frames >= plac->frames_per_block)
+			alac_encode_block (psf, plac) ;
+		} ;
+
+	return total ;
+} /* alac_write32_d */
 
 /*==============================================================================
 ** PAKT_INFO handling.
