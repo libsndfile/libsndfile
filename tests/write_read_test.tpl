@@ -189,6 +189,8 @@ main (int argc, char **argv)
 		pcm_test_double	("double_le.caf", SF_ENDIAN_LITTLE | SF_FORMAT_CAF | SF_FORMAT_DOUBLE, SF_FALSE) ;
 
 		pcm_test_short	("alac16.caf"	, SF_FORMAT_CAF | SF_FORMAT_ALAC_16, SF_FALSE) ;
+		pcm_test_short	("alac32.caf"	, SF_FORMAT_CAF | SF_FORMAT_ALAC_32, SF_FALSE) ;
+		pcm_test_int	("alac32.caf"	, SF_FORMAT_CAF | SF_FORMAT_ALAC_32, SF_FALSE) ;
 
 		/* Lite remove end */
 		test_count++ ;
