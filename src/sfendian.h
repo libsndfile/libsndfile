@@ -25,22 +25,42 @@
 #include <inttypes.h>
 
 
-#if HAVE_BYTESWAP_H			/* Linux, all CPUs */
+#if COMPILER_IS_GCC && (__i486__ || __i586__ || __i686__ || __x86_64__)
+
+static inline int16_t
+ENDSWAP_16 (int16_t x)
+{	int16_t y ;
+	__asm__ ("rorw $8, %w0" : "=r" (y) : "0" (x) : "cc") ;
+	return y ;
+} /* ENDSWAP_16 */
+
+static inline int32_t
+ENDSWAP_32 (int32_t x)
+{	int32_t y ;
+	__asm__ ("bswap %0" : "=r" (y) : "0" (x)) ;
+	return y ;
+} /* ENDSWAP_32 */
+
+#if __x86_64__
+
+static inline int64_t
+ENDSWAP_64X (int64_t x)
+{	int64_t y ;
+	__asm__ ("bswap %q0" : "=r" (y) : "0" (x)) ;
+	return y ;
+} /* ENDSWAP_64X */
+
+#define ENDSWAP_64 ENDSWAP_64X
+
+#endif
+
+#elif HAVE_BYTESWAP_H			/* Linux, any CPU */
 #include <byteswap.h>
 
 #define	ENDSWAP_16(x)		(bswap_16 (x))
 #define	ENDSWAP_32(x)		(bswap_32 (x))
 #define	ENDSWAP_64(x)		(bswap_64 (x))
 
-#elif HAVE_X86INTRIN_H		/* x86 and x86_64 with GCC */
-
-#include <x86intrin.h>
-
-#define	ENDSWAP_16(x)		((((x) >> 8) & 0xFF) + (((x) & 0xFF) << 8))
-#define	ENDSWAP_32(x)		(__bswapd (x))
-#if defined (__x86_64__)
-#define	ENDSWAP_64(x)		(__bswapq (x))
-#endif
 #else
 
 #define	ENDSWAP_16(x)		((((x) >> 8) & 0xFF) + (((x) & 0xFF) << 8))
