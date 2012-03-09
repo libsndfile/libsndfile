@@ -43,7 +43,9 @@ if test -n "$missing_copyright_year" ; then
 
 cfiles=""
 for f in $files ; do
-	if test `echo $f | grep -c "\.[ch]$"` -gt 0 ; then
+	if test `dirname $f` = "src/ALAC" ; then
+		echo "Skipping cstyle checking on $f"
+	elif test `echo $f | grep -c "\.[ch]$"` -gt 0 ; then
 		cfiles="$cfiles $f"
 		fi
 	done
