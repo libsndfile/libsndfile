@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
+ * Copyright (C) 2012 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
@@ -86,11 +87,11 @@ typedef struct alac_encoder_s
 int32_t	alac_decoder_init (ALAC_DECODER *p, void * inMagicCookie, uint32_t inMagicCookieSize) ;
 int32_t alac_encoder_init (ALAC_ENCODER *p, uint32_t samplerate, uint32_t channels, uint32_t format_flags, uint32_t frameSize) ;
 
-int32_t	alac_decode (ALAC_DECODER *, struct BitBuffer * bits, uint8_t * sampleBuffer,
+int32_t	alac_decode (ALAC_DECODER *, struct BitBuffer * bits, int32_t * sampleBuffer,
 					uint32_t numSamples, uint32_t numChannels, uint32_t * outNumSamples) ;
 
-int32_t	alac_encode (ALAC_ENCODER *p, uint32_t numChannels, uint32_t bytesPerPacket,
-					unsigned char * theReadBuffer, unsigned char * theWriteBuffer,
+int32_t	alac_encode (ALAC_ENCODER *p, uint32_t numChannels, uint32_t numSamples,
+					int32_t * theReadBuffer, unsigned char * theWriteBuffer,
 					int32_t * ioNumBytes) ;
 
 void alac_set_fastmode(ALAC_ENCODER * p, int32_t fast) ;

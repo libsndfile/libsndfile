@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
+ * Copyright (C) 2012 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
@@ -29,17 +30,6 @@
 #include "matrixlib.h"
 #include "ALACAudioTypes.h"
 
-// up to 24-bit "offset" macros for the individual bytes of a 20/24-bit word
-#if TARGET_RT_BIG_ENDIAN
-	#define LBYTE	2
-	#define MBYTE	1
-	#define HBYTE	0
-#else
-	#define LBYTE	0
-	#define MBYTE	1
-	#define HBYTE	2
-#endif
-
 /*
     There is no plain middle-side option; instead there are various mixing
     modes including middle-side, each lossless, as embodied in the mix()
@@ -57,10 +47,9 @@
 
 // 16-bit routines
 
-void mix16( int16_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples, int32_t mixbits, int32_t mixres )
+void mix16( int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples, int32_t mixbits, int32_t mixres )
 {
-	int16_t	*	ip = in;
-	int32_t			j;
+	int32_t		j;
 
 	if ( mixres != 0 )
 	{
@@ -73,9 +62,9 @@ void mix16( int16_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 		{
 			int32_t		l, r;
 
-			l = (int32_t) ip[0];
-			r = (int32_t) ip[1];
-			ip += stride;
+			l = in[0] >> 16;
+			r = in[1] >> 16;
+			in += stride;
 			u[j] = (mixres * l + m2 * r) >> mixbits;
 			v[j] = l - r;
 		}
@@ -85,9 +74,9 @@ void mix16( int16_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 		/* Conventional separated stereo. */
 		for ( j = 0; j < numSamples; j++ )
 		{
-			u[j] = (int32_t) ip[0];
-			v[j] = (int32_t) ip[1];
-			ip += stride;
+			u[j] = in[0] >> 16;
+			v[j] = in[1] >> 16;
+			in += stride;
 		}
 	}
 }
@@ -95,11 +84,10 @@ void mix16( int16_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 // 20-bit routines
 // - the 20 bits of data are left-justified in 3 bytes of storage but right-aligned for input/output predictor buffers
 
-void mix20( uint8_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples, int32_t mixbits, int32_t mixres )
+void mix20( int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples, int32_t mixbits, int32_t mixres )
 {
 	int32_t		l, r;
-	uint8_t *	ip = in;
-	int32_t			j;
+	int32_t		j;
 
 	if ( mixres != 0 )
 	{
@@ -109,13 +97,9 @@ void mix20( uint8_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 
 		for ( j = 0; j < numSamples; j++ )
 		{
-			l = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-			l = (l << 8) >> 12;
-			ip += 3;
-
-			r = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-			r = (r << 8) >> 12;
-			ip += (stride - 1) * 3;
+			l = in[0] >> 12;
+			r = in[1] >> 12;
+			in += stride;
 
 			u[j] = (mixres * l + m2 * r) >> mixbits;
 			v[j] = l - r;
@@ -126,13 +110,9 @@ void mix20( uint8_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 		/* Conventional separated stereo. */
 		for ( j = 0; j < numSamples; j++ )
 		{
-			l = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-			u[j] = (l << 8) >> 12;
-			ip += 3;
-
-			r = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-			v[j] = (r << 8) >> 12;
-			ip += (stride - 1) * 3;
+			u[j] = in[0] >> 12;
+			v[j] = in[1] >> 12;
+			in += stride;
 		}
 	}
 }
@@ -140,14 +120,13 @@ void mix20( uint8_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 // 24-bit routines
 // - the 24 bits of data are right-justified in the input/output predictor buffers
 
-void mix24( uint8_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples,
+void mix24( int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples,
 			int32_t mixbits, int32_t mixres, uint16_t * shiftUV, int32_t bytesShifted )
 {
 	int32_t		l, r;
-	uint8_t *	ip = in;
-	int32_t			shift = bytesShifted * 8;
+	int32_t		shift = bytesShifted * 8;
 	uint32_t	mask  = (1ul << shift) - 1;
-	int32_t			j, k;
+	int32_t		j, k;
 
 	if ( mixres != 0 )
 	{
@@ -159,13 +138,9 @@ void mix24( uint8_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 		{
 			for ( j = 0, k = 0; j < numSamples; j++, k += 2 )
 			{
-				l = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-				l = (l << 8) >> 8;
-				ip += 3;
-
-				r = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-				r = (r << 8) >> 8;
-				ip += (stride - 1) * 3;
+				l = in[0] >> 8;
+				r = in[1] >> 8;
+				in += stride;
 
 				shiftUV[k + 0] = (uint16_t)(l & mask);
 				shiftUV[k + 1] = (uint16_t)(r & mask);
@@ -181,13 +156,9 @@ void mix24( uint8_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 		{
 			for ( j = 0; j < numSamples; j++ )
 			{
-				l = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-				l = (l << 8) >> 8;
-				ip += 3;
-
-				r = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-				r = (r << 8) >> 8;
-				ip += (stride - 1) * 3;
+				l = in[0] >> 8;
+				r = in[1] >> 8;
+				in += stride;
 
 				u[j] = (mixres * l + m2 * r) >> mixbits;
 				v[j] = l - r;
@@ -201,13 +172,9 @@ void mix24( uint8_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 		{
 			for ( j = 0, k = 0; j < numSamples; j++, k += 2 )
 			{
-				l = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-				l = (l << 8) >> 8;
-				ip += 3;
-
-				r = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-				r = (r << 8) >> 8;
-				ip += (stride - 1) * 3;
+				l = in[0] >> 8;
+				r = in[1] >> 8;
+				in += stride;
 
 				shiftUV[k + 0] = (uint16_t)(l & mask);
 				shiftUV[k + 1] = (uint16_t)(r & mask);
@@ -223,13 +190,9 @@ void mix24( uint8_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 		{
 			for ( j = 0; j < numSamples; j++ )
 			{
-				l = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-				u[j] = (l << 8) >> 8;
-				ip += 3;
-
-				r = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-				v[j] = (r << 8) >> 8;
-				ip += (stride - 1) * 3;
+				l = in[0] >> 8;
+				r = in[1] >> 8;
+				in += stride;
 			}
 		}
 	}
@@ -243,11 +206,10 @@ void mix24( uint8_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 void mix32( int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples,
 			int32_t mixbits, int32_t mixres, uint16_t * shiftUV, int32_t bytesShifted )
 {
-	int32_t	*	ip = in;
-	int32_t			shift = bytesShifted * 8;
+	int32_t		shift = bytesShifted * 8;
 	uint32_t	mask  = (1ul << shift) - 1;
 	int32_t		l, r;
-	int32_t			j, k;
+	int32_t		j, k;
 
 	if ( mixres != 0 )
 	{
@@ -260,9 +222,9 @@ void mix32( int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 		m2 = mod - mixres;
 		for ( j = 0, k = 0; j < numSamples; j++, k += 2 )
 		{
-			l = ip[0];
-			r = ip[1];
-			ip += stride;
+			l = in[0];
+			r = in[1];
+			in += stride;
 
 			shiftUV[k + 0] = (uint16_t)(l & mask);
 			shiftUV[k + 1] = (uint16_t)(r & mask);
@@ -281,9 +243,9 @@ void mix32( int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 			/* de-interleaving w/o shift */
 			for ( j = 0; j < numSamples; j++ )
 			{
-				u[j] = ip[0];
-				v[j] = ip[1];
-				ip += stride;
+				u[j] = in[0];
+				v[j] = in[1];
+				in += stride;
 			}
 		}
 		else
@@ -291,9 +253,9 @@ void mix32( int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 			/* de-interleaving with shift */
 			for ( j = 0, k = 0; j < numSamples; j++, k += 2 )
 			{
-				l = ip[0];
-				r = ip[1];
-				ip += stride;
+				l = in[0];
+				r = in[1];
+				in += stride;
 
 				shiftUV[k + 0] = (uint16_t)(l & mask);
 				shiftUV[k + 1] = (uint16_t)(r & mask);
@@ -308,35 +270,3 @@ void mix32( int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 	}
 }
 
-// 20/24-bit <-> 32-bit helper routines (not really matrixing but convenient to put here)
-
-void copy20ToPredictor( uint8_t * in, uint32_t stride, int32_t * out, int32_t numSamples )
-{
-	uint8_t *	ip = in;
-	int32_t			j;
-
-	for ( j = 0; j < numSamples; j++ )
-	{
-		int32_t			val;
-
-		// 20-bit values are left-aligned in the 24-bit input buffer but right-aligned in the 32-bit output buffer
-		val = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-		out[j] = (val << 8) >> 12;
-		ip += stride * 3;
-	}
-}
-
-void copy24ToPredictor( uint8_t * in, uint32_t stride, int32_t * out, int32_t numSamples )
-{
-	uint8_t *	ip = in;
-	int32_t			j;
-
-	for ( j = 0; j < numSamples; j++ )
-	{
-		int32_t			val;
-
-		val = (int32_t)( ((uint32_t)ip[HBYTE] << 16) | ((uint32_t)ip[MBYTE] << 8) | (uint32_t)ip[LBYTE] );
-		out[j] = (val << 8) >> 8;
-		ip += stride * 3;
-	}
-}

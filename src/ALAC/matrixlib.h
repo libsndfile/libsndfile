@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
+ * Copyright (C) 2012 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
@@ -38,19 +39,19 @@ extern "C" {
 #endif
 
 // 16-bit routines
-void	mix16( int16_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples, int32_t mixbits, int32_t mixres );
-void	unmix16( int32_t * u, int32_t * v, int16_t * out, uint32_t stride, int32_t numSamples, int32_t mixbits, int32_t mixres );
+void	mix16( int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples, int32_t mixbits, int32_t mixres );
+void	unmix16( int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t numSamples, int32_t mixbits, int32_t mixres );
 
 // 20-bit routines
-void	mix20( uint8_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples, int32_t mixbits, int32_t mixres );
-void	unmix20( int32_t * u, int32_t * v, uint8_t * out, uint32_t stride, int32_t numSamples, int32_t mixbits, int32_t mixres );
+void	mix20( int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples, int32_t mixbits, int32_t mixres );
+void	unmix20( int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t numSamples, int32_t mixbits, int32_t mixres );
 
 // 24-bit routines
 // - 24-bit data sometimes compresses better by shifting off the bottom byte so these routines deal with
 //	 the specified "unused lower bytes" in the combined "shift" buffer
-void	mix24( uint8_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples,
+void	mix24( int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples,
 				int32_t mixbits, int32_t mixres, uint16_t * shiftUV, int32_t bytesShifted );
-void	unmix24( int32_t * u, int32_t * v, uint8_t * out, uint32_t stride, int32_t numSamples,
+void	unmix24( int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t numSamples,
 				 int32_t mixbits, int32_t mixres, uint16_t * shiftUV, int32_t bytesShifted );
 
 // 32-bit routines
@@ -63,12 +64,12 @@ void	unmix32( int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t 
 				 int32_t mixbits, int32_t mixres, uint16_t * shiftUV, int32_t bytesShifted );
 
 // 20/24/32-bit <-> 32-bit helper routines (not really matrixing but convenient to put here)
-void	copy20ToPredictor( uint8_t * in, uint32_t stride, int32_t * out, int32_t numSamples );
-void	copy24ToPredictor( uint8_t * in, uint32_t stride, int32_t * out, int32_t numSamples );
+void	copy20ToPredictor( int32_t * in, uint32_t stride, int32_t * out, int32_t numSamples );
+void	copy24ToPredictor( int32_t * in, uint32_t stride, int32_t * out, int32_t numSamples );
 
-void	copyPredictorTo24( int32_t * in, uint8_t * out, uint32_t stride, int32_t numSamples );
-void	copyPredictorTo24Shift( int32_t * in, uint16_t * shift, uint8_t * out, uint32_t stride, int32_t numSamples, int32_t bytesShifted );
-void	copyPredictorTo20( int32_t * in, uint8_t * out, uint32_t stride, int32_t numSamples );
+void	copyPredictorTo24( int32_t * in, int32_t * out, uint32_t stride, int32_t numSamples );
+void	copyPredictorTo24Shift( int32_t * in, uint16_t * shift, int32_t * out, uint32_t stride, int32_t numSamples, int32_t bytesShifted );
+void	copyPredictorTo20( int32_t * in, int32_t * out, uint32_t stride, int32_t numSamples );
 
 void	copyPredictorTo32( int32_t * in, int32_t * out, uint32_t stride, int32_t numSamples );
 void	copyPredictorTo32Shift( int32_t * in, uint16_t * shift, int32_t * out, uint32_t stride, int32_t numSamples, int32_t bytesShifted );

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
+ * Copyright (C) 2012 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
@@ -47,8 +48,6 @@ const uint32_t kMaxBitDepth = 32;			// max allowed bit depth is 32
 static int32_t	alac_fill_element (struct BitBuffer * bits) ;
 static int32_t	alac_data_stream_element (struct BitBuffer * bits) ;
 
-static void Zero16( int16_t * buffer, uint32_t numItems, uint32_t stride );
-static void Zero24( uint8_t * buffer, uint32_t numItems, uint32_t stride );
 static void Zero32( int32_t * buffer, uint32_t numItems, uint32_t stride );
 
 
@@ -131,7 +130,7 @@ Exit:
 	  the bitstream
 */
 int32_t
-alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, uint8_t * sampleBuffer, uint32_t numSamples, uint32_t numChannels, uint32_t * outNumSamples)
+alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, uint32_t numSamples, uint32_t numChannels, uint32_t * outNumSamples)
 {
 	BitBuffer			shiftBits;
 	uint32_t            bits1, bits2;
@@ -153,9 +152,6 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, uint8_t * sampleBuffer, u
 	uint32_t			denShiftU, denShiftV;
 	uint16_t			pbFactorU, pbFactorV;
 	uint16_t			pb;
-	int16_t *			out16;
-	uint8_t *			out20;
-	uint8_t *			out24;
 	int32_t *			out32;
 	uint8_t				headerByte;
 	uint8_t				partialFrame;
@@ -304,23 +300,23 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, uint8_t * sampleBuffer, u
 				switch ( p->mConfig.bitDepth )
 				{
 					case 16:
-						out16 = &((int16_t *)sampleBuffer)[channelIndex];
+						out32 = sampleBuffer + channelIndex;
 						for ( i = 0, j = 0; i < numSamples; i++, j += numChannels )
-							out16[j] = (int16_t) p->mMixBufferU[i];
+							out32[j] = p->mMixBufferU[i] << 16;
 						break;
 					case 20:
-						out20 = (uint8_t *)sampleBuffer + (channelIndex * 3);
-						copyPredictorTo20( p->mMixBufferU, out20, numChannels, numSamples );
+						out32 = sampleBuffer + channelIndex;
+						copyPredictorTo20( p->mMixBufferU, out32, numChannels, numSamples );
 						break;
 					case 24:
-						out24 = (uint8_t *)sampleBuffer + (channelIndex * 3);
+						out32 = sampleBuffer + channelIndex;
 						if ( bytesShifted != 0 )
-							copyPredictorTo24Shift( p->mMixBufferU, p->mShiftBuffer, out24, numChannels, numSamples, bytesShifted );
+							copyPredictorTo24Shift( p->mMixBufferU, p->mShiftBuffer, out32, numChannels, numSamples, bytesShifted );
 						else
-							copyPredictorTo24( p->mMixBufferU, out24, numChannels, numSamples );
+							copyPredictorTo24( p->mMixBufferU, out32, numChannels, numSamples );
 						break;
 					case 32:
-						out32 = &((int32_t *)sampleBuffer)[channelIndex];
+						out32 = sampleBuffer + channelIndex;
 						if ( bytesShifted != 0 )
 							copyPredictorTo32Shift( p->mMixBufferU, p->mShiftBuffer, out32, numChannels, numSamples, bytesShifted );
 						else
@@ -493,20 +489,20 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, uint8_t * sampleBuffer, u
 				switch ( p->mConfig.bitDepth )
 				{
 					case 16:
-						out16 = &((int16_t *)sampleBuffer)[channelIndex];
-						unmix16( p->mMixBufferU, p->mMixBufferV, out16, numChannels, numSamples, mixBits, mixRes );
+						out32 = sampleBuffer + channelIndex;
+						unmix16( p->mMixBufferU, p->mMixBufferV, out32, numChannels, numSamples, mixBits, mixRes );
 						break;
 					case 20:
-						out20 = (uint8_t *)sampleBuffer + (channelIndex * 3);
-						unmix20( p->mMixBufferU, p->mMixBufferV, out20, numChannels, numSamples, mixBits, mixRes );
+						out32 = sampleBuffer + channelIndex;
+						unmix20( p->mMixBufferU, p->mMixBufferV, out32, numChannels, numSamples, mixBits, mixRes );
 						break;
 					case 24:
-						out24 = (uint8_t *)sampleBuffer + (channelIndex * 3);
-						unmix24( p->mMixBufferU, p->mMixBufferV, out24, numChannels, numSamples,
+						out32 = sampleBuffer + channelIndex;
+						unmix24( p->mMixBufferU, p->mMixBufferV, out32, numChannels, numSamples,
 									mixBits, mixRes, p->mShiftBuffer, bytesShifted );
 						break;
 					case 32:
-						out32 = &((int32_t *)sampleBuffer)[channelIndex];
+						out32 = sampleBuffer + channelIndex;
 						unmix32( p->mMixBufferU, p->mMixBufferV, out32, numChannels, numSamples,
 									mixBits, mixRes, p->mShiftBuffer, bytesShifted );
 						break;
@@ -562,27 +558,8 @@ NoMoreChannels:
 	// if we get here and haven't decoded all of the requested channels, fill the remaining channels with zeros
 	for ( ; channelIndex < numChannels; channelIndex++ )
 	{
-		switch ( p->mConfig.bitDepth )
-		{
-			case 16:
-			{
-				int16_t *	fill16 = &((int16_t *)sampleBuffer)[channelIndex];
-				Zero16( fill16, numSamples, numChannels );
-				break;
-			}
-			case 24:
-			{
-				uint8_t *	fill24 = (uint8_t *)sampleBuffer + (channelIndex * 3);
-				Zero24( fill24, numSamples, numChannels );
-				break;
-			}
-			case 32:
-			{
-				int32_t *	fill32 = &((int32_t *)sampleBuffer)[channelIndex];
-				Zero32( fill32, numSamples, numChannels );
-				break;
-			}
-		}
+		int32_t *	fill32 = sampleBuffer + channelIndex;
+		Zero32( fill32, numSamples, numChannels );
 	}
 
 Exit:
@@ -652,36 +629,6 @@ alac_data_stream_element (struct BitBuffer * bits)
 	ZeroN()
 	- helper routines to clear out output channel buffers when decoding fewer channels than requested
 */
-static void Zero16( int16_t * buffer, uint32_t numItems, uint32_t stride )
-{
-	if ( stride == 1 )
-	{
-		memset( buffer, 0, numItems * sizeof(int16_t) );
-	}
-	else
-	{
-		for ( uint32_t indx = 0; indx < (numItems * stride); indx += stride )
-			buffer[indx] = 0;
-	}
-}
-
-static void Zero24( uint8_t * buffer, uint32_t numItems, uint32_t stride )
-{
-	if ( stride == 1 )
-	{
-		memset( buffer, 0, numItems * 3 );
-	}
-	else
-	{
-		for ( uint32_t indx = 0; indx < (numItems * stride * 3); indx += (stride * 3) )
-		{
-			buffer[indx + 0] = 0;
-			buffer[indx + 1] = 0;
-			buffer[indx + 2] = 0;
-		}
-	}
-}
-
 static void Zero32( int32_t * buffer, uint32_t numItems, uint32_t stride )
 {
 	if ( stride == 1 )

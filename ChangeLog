@@ -1,3 +1,13 @@
+2012-02-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/ALAC/ src/alac.c
+    Unify the interface between libsndfile and Apple ALAC codec. Regardless of
+    file bit width samples are now passed between the two as int32_t that are
+    justified towards the most significant bit. Without this modification, 16
+    conversion functions would have been needed between the libsndfile (short,
+    int, float, double) types and the ALAC types (16, 20, 24 and 32 bit). With
+    this mod, only 4 are needed.
+
 2012-02-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac src/sfconfig.h src/sfendian.h
