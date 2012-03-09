@@ -1507,7 +1507,7 @@ void
 psf_f2s_clip_array (const float *src, short *dest, int count, int normalize)
 {	float			normfact, scaled_value ;
 
-	normfact = normalize ? (8.0 * 0x1000) : 1.0 ;
+	normfact = normalize ? (1.0 * 0x8000) : 1.0 ;
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
@@ -1541,7 +1541,7 @@ void
 psf_d2s_clip_array (const double *src, short *dest, int count, int normalize)
 {	double			normfact, scaled_value ;
 
-	normfact = normalize ? (8.0 * 0x1000) : 1.0 ;
+	normfact = normalize ? (1.0 * 0x8000) : 1.0 ;
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
