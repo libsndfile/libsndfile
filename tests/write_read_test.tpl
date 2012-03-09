@@ -189,7 +189,8 @@ main (int argc, char **argv)
 		pcm_test_double	("double_le.caf", SF_ENDIAN_LITTLE | SF_FORMAT_CAF | SF_FORMAT_DOUBLE, SF_FALSE) ;
 
 		pcm_test_short	("alac16.caf"	, SF_FORMAT_CAF | SF_FORMAT_ALAC_16, SF_FALSE) ;
-		pcm_test_short	("alac32.caf"	, SF_FORMAT_CAF | SF_FORMAT_ALAC_32, SF_FALSE) ;
+		pcm_test_20bit	("alac20.caf"	, SF_FORMAT_CAF | SF_FORMAT_ALAC_20, SF_FALSE) ;
+		pcm_test_24bit	("alac24.caf"	, SF_FORMAT_CAF | SF_FORMAT_ALAC_24, SF_FALSE) ;
 		pcm_test_int	("alac32.caf"	, SF_FORMAT_CAF | SF_FORMAT_ALAC_32, SF_FALSE) ;
 
 		/* Lite remove end */
@@ -413,6 +414,7 @@ static void	create_short_file (const char *filename) ;
 
 #define	CHAR_ERROR(x, y)		(abs ((x) - (y)) > 255)
 #define	INT_ERROR(x, y)			(((x) - (y)) != 0)
+#define	BIT_20_ERROR(x, y)		(abs ((x) - (y)) > 4095)
 #define	TRIBYTE_ERROR(x, y)		(abs ((x) - (y)) > 255)
 #define	FLOAT_ERROR(x, y)		(fabs ((x) - (y)) > 1e-5)
 

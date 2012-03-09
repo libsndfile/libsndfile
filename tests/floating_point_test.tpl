@@ -109,6 +109,8 @@ main (int argc, char *argv [])
 
 	float_scaled_test	("alac_16.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_16, -90.0) ;
 	float_scaled_test	("alac_32.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_32, -186.0) ;
+	float_scaled_test	("alac_24.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_24, -160.0) ;
+	float_scaled_test	("alac_20.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_20, -134.0) ;
 
 #if HAVE_EXTERNAL_LIBS
 	float_scaled_test	("flac_8.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_S8, -39.0) ;
@@ -163,6 +165,8 @@ main (int argc, char *argv [])
 	double_scaled_test	("pcm_24.sds", allow_exit, SF_FALSE, SF_FORMAT_SDS | SF_FORMAT_PCM_24, -180.0) ;
 
 	double_scaled_test	("alac_16.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_16, -90.0) ;
+	double_scaled_test	("alac_20.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_20, -134.0) ;
+	double_scaled_test	("alac_24.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_24, -158.0) ;
 	double_scaled_test	("alac_32.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_32, -186.0) ;
 
 #if HAVE_EXTERNAL_LIBS
