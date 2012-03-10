@@ -20,14 +20,16 @@ user=`git config --global user.email`
 year=`date +"%Y"`
 
 missing_copyright_year=""
-for f in $files ; do
-	if test `head -5 $f | grep -c -i copyright` -gt 0 ; then
-		user_copyright=`grep -i copyright $f | grep $user | grep -c $year`
-		if test $user_copyright -lt 1 ; then
-			missing_copyright_year="$missing_copyright_year $f"
+if test $user = "erikd@mega-nerd.com" ; then
+	for f in $files ; do
+		if test `head -5 $f | grep -c -i copyright` -gt 0 ; then
+			user_copyright=`grep -i copyright $f | grep $user | grep -c $year`
+			if test $user_copyright -lt 1 ; then
+				missing_copyright_year="$missing_copyright_year $f"
+				fi
 			fi
-		fi
-	done
+		done
+	fi
 
 if test -n "$missing_copyright_year" ; then
 	echo "Missing current year in the copyright notice of the following files:"
