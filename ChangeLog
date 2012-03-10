@@ -17,6 +17,9 @@
     * configure.ac
     Only use automake AM_SLIENT_RULES where supported. Thanks Dave Yeo.
 
+    * tests/pipe_test.tpl
+    Disable tests on OS/2. Thanks Dave Yeo.
+
 2012-02-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac src/sfconfig.h src/sfendian.h

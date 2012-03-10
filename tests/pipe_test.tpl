@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 2001-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if (OS_IS_WIN32 || HAVE_PIPE == 0 || HAVE_WAITPID == 0)
+#if (OS_IS_WIN32 || defined __OS2__ || HAVE_PIPE == 0 || HAVE_WAITPID == 0)
 
 int
 main (void)
