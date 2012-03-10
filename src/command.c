@@ -47,6 +47,10 @@ static SF_FORMAT_INFO const simple_formats [] =
 		"AU (Sun/Next 8-bit u-law)", "au"
 		},
 
+	{	SF_FORMAT_CAF | SF_FORMAT_ALAC_16,
+		"CAF (Apple 16 bit ALAC)", "caf"
+		},
+
 	{	SF_FORMAT_CAF | SF_FORMAT_PCM_16,
 		"CAF (Apple 16 bit PCM)", "caf"
 		},
@@ -200,6 +204,11 @@ static SF_FORMAT_INFO subtype_formats [] =
 #if HAVE_EXTERNAL_LIBS
 	{	SF_FORMAT_VORBIS,		"Vorbis",				NULL 	},
 #endif
+
+	{	SF_FORMAT_ALAC_16,		"16 bit ALAC",			NULL	},
+	{	SF_FORMAT_ALAC_20,		"20 bit ALAC",			NULL	},
+	{	SF_FORMAT_ALAC_24,		"24 bit ALAC",			NULL	},
+	{	SF_FORMAT_ALAC_32,		"32 bit ALAC",			NULL	},
 } ; /* subtype_formats */
 
 int
@@ -212,7 +221,9 @@ psf_get_format_subtype (SF_FORMAT_INFO *data)
 {	int indx ;
 
 	if (data->format < 0 || data->format >= (SIGNED_SIZEOF (subtype_formats) / SIGNED_SIZEOF (SF_FORMAT_INFO)))
+	{	data->format = 0 ;
 		return SFE_BAD_COMMAND_PARAM ;
+		} ;
 
 	indx = data->format ;
 	memcpy (data, &(subtype_formats [indx]), sizeof (SF_FORMAT_INFO)) ;

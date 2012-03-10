@@ -11,6 +11,9 @@
     * tests/floating_point_test.tpl tests/write_read_test.(def|tpl)
     Add tests for 20 and 24 bit ALAC/CAF files.
 
+    * src/command.c
+    Add ALAC/CAF to the SFC_GET_FORMAT_* commands. Fixes github issue #5.
+
 2012-02-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac src/sfconfig.h src/sfendian.h
