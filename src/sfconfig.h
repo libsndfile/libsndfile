@@ -113,31 +113,8 @@
 #define HAVE_X86INTRIN_H 0
 #endif
 
-/*
-**  These are are defined by GNU GCC to 1 for the relevant processors and left
-** undefined for other processors. We want to default them to zero when they
-** aren't defined.
-*/
-
-#ifndef __i386__
-#define __i386__ 0
-#endif
-
-#ifndef __i486__
-#define __i486__ 0
-#endif
-
-#ifndef __i586__
-#define __i586__ 0
-#endif
-
-#ifndef __i686__
-#define __i686__ 0
-#endif
-
-#ifndef __x86_64__
-#define __x86_64__ 0
-#endif
+#define CPU_IS_X86		(defined __i486__ || defined __i586__ || defined __i686__ || defined __x86_64__)
+#define CPU_IS_X86_64	(defined __x86_64__)
 
 #endif
 

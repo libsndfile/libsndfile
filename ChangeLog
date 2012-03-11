@@ -4,6 +4,10 @@
     Fix decoding of last block so that the decode length is not a multiple of
     the block length. Fixes github issue #4 reported by Charles Van Winkle.
 
+    * src/sfconfig.h src/sfendian.h
+    Fix for MinGW cross compiling. Use '#if (defined __*66__)' instead of
+    '#if __*86__' because the MinGW header use '#ifdef __x86_64__'.
+
 2012-02-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ALAC/ src/alac.c

@@ -25,7 +25,7 @@
 #include <inttypes.h>
 
 
-#if COMPILER_IS_GCC && (__i486__ || __i586__ || __i686__ || __x86_64__)
+#if COMPILER_IS_GCC && CPU_IS_X86
 
 static inline int16_t
 ENDSWAP_16 (int16_t x)
@@ -41,7 +41,7 @@ ENDSWAP_32 (int32_t x)
 	return y ;
 } /* ENDSWAP_32 */
 
-#if __x86_64__
+#if CPU_IS_X86_64
 
 static inline int64_t
 ENDSWAP_64X (int64_t x)
