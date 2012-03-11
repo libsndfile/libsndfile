@@ -364,16 +364,17 @@ alac_reader_next_packet_size (PAKT_INFO * info)
 static sf_count_t
 alac_reader_calc_frames (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 {	sf_count_t	frames = 0 ;
-	uint32_t	current_pos = 1 ;
+	uint32_t	current_pos = 1, blocks = 0 ;
 
 	plac->pakt_info->current = 0 ;
 
 	while (current_pos < psf->filelength && current_pos > 0)
 	{	current_pos = alac_reader_next_packet_size (plac->pakt_info) ;
-		frames = current_pos > 0 ? frames + plac->frames_per_block : frames ;
+		blocks = current_pos > 0 ? blocks + 1 : blocks ;
 		} ;
 
-	frames = frames > plac->frames_per_block ? frames - plac->frames_per_block : 0 ;
+	/* Only count full blocks. */
+	frames = plac->frames_per_block * (blocks - 1) ;
 
 	alac_seek (psf, SFM_READ, frames) ;
 	alac_decode_block (psf, plac) ;
@@ -391,16 +392,14 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 	uint32_t	packet_size ;
 	BitBuffer	bit_buffer ;
 
-	BitBufferInit (&bit_buffer, byte_buffer, ALAC_MAX_FRAME_SIZE) ;
-
 	packet_size = alac_reader_next_packet_size (plac->pakt_info) ;
-	if (packet_size == 0 && plac->pakt_info->current < plac->pakt_info->count)
-	{	psf_log_printf (psf, "packet_size is 0 (%d of %d)\n", plac->pakt_info->current, plac->pakt_info->count) ;
+	if (packet_size == 0)
+	{	if (plac->pakt_info->current < plac->pakt_info->count)
+			psf_log_printf (psf, "packet_size is 0 (%d of %d)\n", plac->pakt_info->current, plac->pakt_info->count) ;
 		return 0 ;
 		} ;
 
 	psf_fseek (psf, plac->input_data_pos, SEEK_SET) ;
-	plac->input_data_pos += packet_size ;
 
 	if (packet_size > SIGNED_SIZEOF (byte_buffer))
 	{	psf_log_printf (psf, "%s : bad packet_size (%zd)\n", __func__, packet_size) ;
@@ -410,9 +409,11 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 	if ((packet_size != psf_fread (byte_buffer, 1, packet_size, psf)))
 		return 0 ;
 
-	alac_decode (pdec, &bit_buffer, plac->buffer, plac->frames_per_block, psf->sf.channels, &plac->frames_this_block) ;
+	BitBufferInit (&bit_buffer, byte_buffer, packet_size) ;
 
-	BitBufferReset (&bit_buffer) ;
+	plac->input_data_pos += packet_size ;
+	plac->frames_this_block = 0 ;
+	alac_decode (pdec, &bit_buffer, plac->buffer, plac->frames_per_block, psf->sf.channels, &plac->frames_this_block) ;
 
 	plac->partial_block_frames = 0 ;
 

@@ -1,5 +1,11 @@
 2012-02-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
+    * src/alac.c
+    Fix decoding of last block so that the decode length is not a multiple of
+    the block length. Fixes github issue #4 reported by Charles Van Winkle.
+
+2012-02-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
     * src/ALAC/ src/alac.c
     Unify the interface between libsndfile and Apple ALAC codec. Regardless of
     file bit width samples are now passed between the two as int32_t that are
