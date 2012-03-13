@@ -70,8 +70,9 @@ static void
 lcomp_test_int (const char *str, const char *filename, int filetype, double margin)
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
-	int			k, m, *orig, *data, sum_abs ;
+	int			k, m, *orig, *data ;
 	sf_count_t	datalen, seekpos ;
+	int64_t		sum_abs ;
 	double		scale ;
 
 	printf ("\nThis is program is not part of the libsndfile test suite.\n\n") ;
@@ -153,7 +154,7 @@ lcomp_test_int (const char *str, const char *filename, int filetype, double marg
 			oct_save_int (orig, data, datalen) ;
 			exit (1) ;
 			} ;
-		sum_abs = abs (sum_abs + abs (data [k])) ;
+		sum_abs += abs (data [k]) ;
 		} ;
 
 	if (sum_abs < 1.0)
