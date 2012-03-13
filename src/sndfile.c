@@ -256,7 +256,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_ALAC_FAIL_TMPFILE	, "Error : Failed to open tmp file for ALAC encoding." },
 
 	{	SFE_BAD_CHUNK_PTR		, "Error : Bad SF_CHUNK_INFO pointer." },
-	{	SFE_UNKNOWN_CHUNK		, "Error : Uknown chunk marker." },
+	{	SFE_UNKNOWN_CHUNK		, "Error : Unknown chunk marker." },
 	{	SFE_BAD_CHUNK_FORMAT	, "Error : Reading/writing chunks from this file format is not supported." },
 	{	SFE_BAD_CHUNK_MARKER	, "Error : Bad chunk marker." },
 	{	SFE_BAD_CHUNK_DATA_PTR	, "Error : Bad data pointer in SF_CHUNK_INFO struct." },
