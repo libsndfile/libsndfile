@@ -382,7 +382,7 @@ vorbis_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 			default : continue ;
 			} ;
 
-		vorbis_comment_add_tag (&vdata->vcomment, name, psf->strings.data [k].str) ;
+		vorbis_comment_add_tag (&vdata->vcomment, name, psf->strings.storage + psf->strings.data [k].offset) ;
 		} ;
 
 	/* set up the analysis state and auxiliary encoding storage */

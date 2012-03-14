@@ -1209,31 +1209,31 @@ wav_write_strings (SF_PRIVATE *psf, int location)
 
 		switch (psf->strings.data [k].type)
 		{	case SF_STR_SOFTWARE :
-				psf_binheader_writef (psf, "ms", ISFT_MARKER, psf->strings.data [k].str) ;
+				psf_binheader_writef (psf, "ms", ISFT_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
 				break ;
 
 			case SF_STR_TITLE :
-				psf_binheader_writef (psf, "ms", INAM_MARKER, psf->strings.data [k].str) ;
+				psf_binheader_writef (psf, "ms", INAM_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
 				break ;
 
 			case SF_STR_COPYRIGHT :
-				psf_binheader_writef (psf, "ms", ICOP_MARKER, psf->strings.data [k].str) ;
+				psf_binheader_writef (psf, "ms", ICOP_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
 				break ;
 
 			case SF_STR_ARTIST :
-				psf_binheader_writef (psf, "ms", IART_MARKER, psf->strings.data [k].str) ;
+				psf_binheader_writef (psf, "ms", IART_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
 				break ;
 
 			case SF_STR_COMMENT :
-				psf_binheader_writef (psf, "ms", ICMT_MARKER, psf->strings.data [k].str) ;
+				psf_binheader_writef (psf, "ms", ICMT_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
 				break ;
 
 			case SF_STR_DATE :
-				psf_binheader_writef (psf, "ms", ICRD_MARKER, psf->strings.data [k].str) ;
+				psf_binheader_writef (psf, "ms", ICRD_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
 				break ;
 
 			case SF_STR_GENRE :
-				psf_binheader_writef (psf, "ms", IGNR_MARKER, psf->strings.data [k].str) ;
+				psf_binheader_writef (psf, "ms", IGNR_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
 				break ;
 
 			default :

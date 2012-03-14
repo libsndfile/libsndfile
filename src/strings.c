@@ -74,19 +74,19 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	if (k >= SF_MAX_STRINGS)
 		return SFE_STR_MAX_COUNT ;
 
-	if (k == 0 && psf->strings.str_last != 0)
-	{	psf_log_printf (psf, "SFE_STR_WEIRD : k == 0 && psf->strings.str_last != 0\n") ;
+	if (k == 0 && psf->strings.storage_used != 0)
+	{	psf_log_printf (psf, "SFE_STR_WEIRD : k == 0 && psf->strings.storage_used != 0\n") ;
 		return SFE_STR_WEIRD ;
 		} ;
 
-	if (k != 0 && psf->strings.str_last == 0)
-	{	psf_log_printf (psf, "SFE_STR_WEIRD : k != 0 && psf->strings.str_last == 0\n") ;
+	if (k != 0 && psf->strings.storage_used == 0)
+	{	psf_log_printf (psf, "SFE_STR_WEIRD : k != 0 && psf->strings.storage_used == 0\n") ;
 		return SFE_STR_WEIRD ;
 		} ;
 
 	/* Special case for the first string. */
 	if (k == 0)
-		psf->strings.str_last = 0 ;
+		psf->strings.storage_used = 0 ;
 
 	switch (str_type)
 	{	case SF_STR_SOFTWARE :
@@ -125,9 +125,10 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 			return SFE_STR_BAD_TYPE ;
 		} ;
 
-	str_len = strlen (str) ;
+	/* Plus one to catch string terminator. */
+	str_len = strlen (str) + 1 ;
 
-	if (psf->strings.str_last + str_len + 2 > psf->strings.storage_len)
+	if (psf->strings.storage_used + str_len + 1 > psf->strings.storage_len)
 	{	char * temp = psf->strings.storage ;
 		size_t newlen = 2 * psf->strings.storage_len + str_len ;
 
@@ -142,20 +143,19 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 		} ;
 
 	psf->strings.data [k].type = str_type ;
-	psf->strings.data [k].str = psf->strings.storage + psf->strings.str_last ;
+	psf->strings.data [k].offset = psf->strings.storage_used ;
 	psf->strings.data [k].flags = str_flags ;
 
-	memcpy (psf->strings.storage + psf->strings.str_last, str, str_len + 1) ;
-	/* Plus one to catch string terminator. */
-	psf->strings.str_last += str_len + 1 ;
+	memcpy (psf->strings.storage + psf->strings.storage_used, str, str_len) ;
+	psf->strings.storage_used += str_len ;
 
 	psf->strings.flags |= str_flags ;
 
 #if STRINGS_DEBUG
 	psf_log_printf (psf, "str_storage          : %p\n", psf->strings.storage) ;
-	psf_log_printf (psf, "str_last             : %u\n", psf->strings.str_last) ;
-	psf_log_printf (psf, "used                 : %d\n", psf->strings.str_last) ;
-	psf_log_printf (psf, "remaining            : %d\n", psf->strings.storage_len - psf->strings.str_last ;
+	psf_log_printf (psf, "storage_used             : %u\n", psf->strings.storage_used) ;
+	psf_log_printf (psf, "used                 : %d\n", psf->strings.storage_used) ;
+	psf_log_printf (psf, "remaining            : %d\n", psf->strings.storage_len - psf->strings.storage_used ;
 
 	hexdump (psf->strings.storage, 300) ;
 #endif
@@ -177,7 +177,7 @@ psf_get_string (SF_PRIVATE *psf, int str_type)
 
 	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
 		if (str_type == psf->strings.data [k].type)
-			return psf->strings.data [k].str ;
+			return psf->strings.storage + psf->strings.data [k].offset ;
 
 	return NULL ;
 } /* psf_get_string */

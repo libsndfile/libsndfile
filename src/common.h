@@ -229,7 +229,7 @@ peak_info_calloc (int channels)
 typedef struct
 {	int		type ;
 	int		flags ;
-	char 	*str ;
+	size_t 	offset ;
 } STR_DATA ;
 
 typedef struct
@@ -379,7 +379,7 @@ typedef struct sf_private_tag
 	{	STR_DATA	data [SF_MAX_STRINGS] ;
 		char		*storage ;
 		size_t		storage_len ;
-		uint32_t	str_last ;
+		size_t		storage_used ;
 		uint32_t	flags ;
 	} strings ;
 

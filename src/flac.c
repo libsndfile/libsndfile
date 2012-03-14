@@ -585,7 +585,7 @@ flac_write_strings (SF_PRIVATE *psf, FLAC_PRIVATE* pflac)
 				continue ;
 			} ;
 
-		value = psf->strings.data [k].str ;
+		value = psf->strings.storage + psf->strings.data [k].offset ;
 
 		FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair (&entry, key, value) ;
 		FLAC__metadata_object_vorbiscomment_append_comment (pflac->metadata, entry, /* copy */ SF_FALSE) ;
