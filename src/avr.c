@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -89,8 +89,7 @@ avr_open	(SF_PRIVATE *psf)
 		return	SFE_BAD_OPEN_FORMAT ;
 
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
-	{	psf->endian = SF_ENDIAN (psf->sf.format) ;
-		psf->endian = SF_ENDIAN_BIG ;
+	{	psf->endian = SF_ENDIAN_BIG ;
 
 		if (avr_write_header (psf, SF_FALSE))
 			return psf->error ;
