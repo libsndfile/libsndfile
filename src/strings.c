@@ -130,7 +130,7 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 
 	if (psf->strings.storage_used + str_len + 1 > psf->strings.storage_len)
 	{	char * temp = psf->strings.storage ;
-		size_t newlen = 2 * psf->strings.storage_len + str_len ;
+		size_t newlen = 2 * psf->strings.storage_len + str_len + 1 ;
 
 		newlen = newlen < 256 ? 256 : newlen ;
 
