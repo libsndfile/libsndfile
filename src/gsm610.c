@@ -194,7 +194,7 @@ gsm610_wav_decode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
 	pgsm610->samplecount = 0 ;
 
 	if (pgsm610->blockcount > pgsm610->blocks)
-	{	memset (pgsm610->samples, 0, WAV_W64_GSM610_SAMPLES * sizeof (short)) ;
+	{	memset (pgsm610->samples, 0, sizeof (pgsm610->samples)) ;
 		return 1 ;
 		} ;
 
@@ -222,7 +222,7 @@ gsm610_decode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
 	pgsm610->samplecount = 0 ;
 
 	if (pgsm610->blockcount > pgsm610->blocks)
-	{	memset (pgsm610->samples, 0, GSM610_SAMPLES * sizeof (short)) ;
+	{	memset (pgsm610->samples, 0, sizeof (pgsm610->samples)) ;
 		return 1 ;
 		} ;
 
@@ -243,7 +243,7 @@ gsm610_read_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610, short *ptr, int len
 
 	while (indx < len)
 	{	if (pgsm610->blockcount >= pgsm610->blocks && pgsm610->samplecount >= pgsm610->samplesperblock)
-		{	memset (&(ptr [indx]), 0, (len - indx) * sizeof (short)) ;
+		{	memset (ptr + indx, 0, (len - indx) * sizeof (short)) ;
 			return total ;
 			} ;
 
@@ -444,7 +444,7 @@ gsm610_encode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
 	pgsm610->blockcount ++ ;
 
 	/* Set samples to zero for next block. */
-	memset (pgsm610->samples, 0, WAV_W64_GSM610_SAMPLES * sizeof (short)) ;
+	memset (pgsm610->samples, 0, sizeof (pgsm610->samples)) ;
 
 	return 1 ;
 } /* gsm610_encode_block */
@@ -465,7 +465,7 @@ gsm610_wav_encode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
 	pgsm610->blockcount ++ ;
 
 	/* Set samples to zero for next block. */
-	memset (pgsm610->samples, 0, WAV_W64_GSM610_SAMPLES * sizeof (short)) ;
+	memset (pgsm610->samples, 0, sizeof (pgsm610->samples)) ;
 
 	return 1 ;
 } /* gsm610_wav_encode_block */
