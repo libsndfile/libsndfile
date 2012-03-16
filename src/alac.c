@@ -323,7 +323,7 @@ alac_writer_init (SF_PRIVATE *psf)
 			break ;
 
 		default :
-			psf_log_printf (psf, "%s : Can;t figure out bits per sample.\n", __func__) ;
+			psf_log_printf (psf, "%s : Can't figure out bits per sample.\n", __func__) ;
 			return SFE_UNIMPLEMENTED ;
 		} ;
 
