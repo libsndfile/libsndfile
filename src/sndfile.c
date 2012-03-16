@@ -2993,36 +2993,16 @@ sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
 	return SFE_BAD_CHUNK_FORMAT ;
 } /* sf_set_chunk */
 
-
-int
-sf_get_chunk_size (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info)
 {	SF_PRIVATE 	*psf ;
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (chunk_info == NULL)
-		return SFE_BAD_CHUNK_PTR ;
 
-	if (psf->get_chunk_size)
-		return psf->get_chunk_size (psf, chunk_info) ;
 
-	return SFE_BAD_CHUNK_FORMAT ;
-} /* sf_get_chunk_size */
-
-int
-sf_get_chunk_data (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info)
 {	SF_PRIVATE 	*psf ;
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (chunk_info == NULL || chunk_info->data == NULL)
-		return SFE_BAD_CHUNK_PTR ;
-
-	if (psf->get_chunk_data)
-		return psf->get_chunk_data (psf, chunk_info) ;
-
-	return SFE_BAD_CHUNK_FORMAT ;
-} /* sf_get_chunk_data */
 
 SF_CHUNK_ITERATOR *
 sf_get_chunk_iterator (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
@@ -3037,20 +3017,33 @@ sf_get_chunk_iterator_next (SF_CHUNK_ITERATOR * iterator)
 	return NULL ;
 } /* sf_get_chunk_iterator_next */
 int
-sf_get_chunk_iterator_size (const SF_CHUNK_ITERATOR * it, SF_CHUNK_INFO * chunk_info)
+sf_get_chunk_size (const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info)
 {	SF_PRIVATE 	*psf ;
-	SNDFILE	*sndfile = it ? it->sndfile : NULL ;
+	SNDFILE	*sndfile = iterator ? iterator->sndfile : NULL ;
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
+	if (chunk_info == NULL)
+		return SFE_BAD_CHUNK_PTR ;
+
+	if (psf->get_chunk_size)
+		return psf->get_chunk_size (psf, iterator, chunk_info) ;
+
+	return SFE_BAD_CHUNK_FORMAT ;
 	return 0 ;
-} /* sf_get_chunk_iterator_size */
+} /* sf_get_chunk_size */
 int
-sf_get_chunk_iterator_data (const SF_CHUNK_ITERATOR * it, SF_CHUNK_INFO * chunk_info)
+sf_get_chunk_data (const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info)
 {	SF_PRIVATE	*psf ;
-	SNDFILE	*sndfile = it ? it->sndfile : NULL ;
+	SNDFILE	*sndfile = iterator ? iterator->sndfile : NULL ;
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	return 0 ;
-} /* sf_get_chunk_iterator_data */
+	if (chunk_info == NULL || chunk_info->data == NULL)
+		return SFE_BAD_CHUNK_PTR ;
+
+	if (psf->get_chunk_data)
+		return psf->get_chunk_data (psf, iterator, chunk_info) ;
+
+	return SFE_BAD_CHUNK_FORMAT ;
+} /* sf_get_chunk_data */
