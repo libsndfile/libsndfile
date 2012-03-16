@@ -71,6 +71,9 @@ psf_create_chunk_iterator (const READ_CHUNKS * pchk, const char * marker_str)
 		iterator->id_size = marker_len ;
 		iterator->hash = hash ;
 		}
+
+	iterator->current = idx ;
+
 	return iterator ;
 } /* psf_create_chunk_iterator */
 SF_CHUNK_ITERATOR *
