@@ -77,6 +77,8 @@ ALL_SYMBOLS = (
 	(	"sf_set_chunk",			100	),
 	(	"sf_get_chunk_size",	101 ),
 	(	"sf_get_chunk_data",	102 ),
+	(	"sf_create_chunk_iterator",	103 ),
+	(	"sf_next_chunk_iterator",	104 ),
 	(	"sf_current_byterate",	110 )
 	)
 
