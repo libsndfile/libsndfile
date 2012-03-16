@@ -101,8 +101,10 @@ static int	caf_command (SF_PRIVATE *psf, int command, void *data, int datasize) 
 static int	caf_read_chanmap (SF_PRIVATE * psf, sf_count_t chunk_size) ;
 
 static int caf_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info) ;
-static int caf_get_chunk_size (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info) ;
-static int caf_get_chunk_data (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info) ;
+static SF_CHUNK_ITERATOR * caf_create_chunk_iterator (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info) ;
+static SF_CHUNK_ITERATOR * caf_next_chunk_iterator (SF_PRIVATE *psf, SF_CHUNK_ITERATOR * iterator) ;
+static int caf_get_chunk_size (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
+static int caf_get_chunk_data (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -122,6 +124,8 @@ caf_open (SF_PRIVATE *psf)
 	{	if ((error = caf_read_header (psf)))
 			return error ;
 
+		psf->create_chunk_iterator = caf_create_chunk_iterator ;
+		psf->next_chunk_iterator = caf_next_chunk_iterator ;
 		psf->get_chunk_size = caf_get_chunk_size ;
 		psf->get_chunk_data = caf_get_chunk_data ;
 		} ;
@@ -720,12 +724,24 @@ caf_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info)
 } /* caf_set_chunk */
 
 
+static SF_CHUNK_ITERATOR *
+caf_create_chunk_iterator (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info)
+{	if (chunk_info)
+		return psf_create_chunk_iterator ( &psf->rchunks, chunk_info->id) ;
+	else
+		return psf_create_chunk_iterator ( &psf->rchunks, NULL) ;
+} /* caf_create_chunk_iterator */
+
+static SF_CHUNK_ITERATOR *
+caf_next_chunk_iterator (SF_PRIVATE *psf, SF_CHUNK_ITERATOR * iterator)
+{	return psf_next_chunk_iterator ( &psf->rchunks, iterator) ;
+} /* caf_next_chunk_iterator */
+
 static int
-caf_get_chunk_size (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
+caf_get_chunk_size (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info)
 {	int indx ;
 
-	chunk_info->id [sizeof (chunk_info->id) - 1] = 0 ;
-	if ((indx = psf_find_read_chunk_str (&psf->rchunks, chunk_info->id)) < 0)
+	if ((indx = psf_find_read_chunk_iterator (&psf->rchunks, iterator)) < 0)
 		return SFE_UNKNOWN_CHUNK ;
 
 	chunk_info->datalen = psf->rchunks.chunks [indx].len ;
@@ -734,12 +750,11 @@ caf_get_chunk_size (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
 } /* caf_get_chunk_size */
 
 static int
-caf_get_chunk_data (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
+caf_get_chunk_data (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info)
 {	int indx ;
 	sf_count_t pos ;
 
-	chunk_info->id [sizeof (chunk_info->id) - 1] = 0 ;
-	if ((indx = psf_find_read_chunk_str (&psf->rchunks, chunk_info->id)) < 0)
+	if ((indx = psf_find_read_chunk_iterator (&psf->rchunks, iterator)) < 0)
 		return SFE_UNKNOWN_CHUNK ;
 
 	if (chunk_info->data == NULL)
