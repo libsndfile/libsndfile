@@ -223,9 +223,10 @@ static int aiff_read_chanmap (SF_PRIVATE * psf, unsigned dword) ;
 static unsigned int marker_to_position (const MARK_ID_POS *m, unsigned short n, int marksize) ;
 
 static int aiff_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info) ;
-static int aiff_get_chunk_size (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info) ;
-static int aiff_get_chunk_data (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info) ;
-
+static SF_CHUNK_ITERATOR * aiff_create_chunk_iterator (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info) ;
+static SF_CHUNK_ITERATOR * aiff_next_chunk_iterator (SF_PRIVATE *psf, SF_CHUNK_ITERATOR * iterator) ;
+static int aiff_get_chunk_size (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
+static int aiff_get_chunk_data (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
 /*------------------------------------------------------------------------------
 ** Public function.
 */
@@ -246,6 +247,8 @@ aiff_open (SF_PRIVATE *psf)
 	{	if ((error = aiff_read_header (psf, &comm_fmt)))
 			return error ;
 
+		psf->create_chunk_iterator = aiff_create_chunk_iterator ;
+		psf->next_chunk_iterator = aiff_next_chunk_iterator ;
 		psf->get_chunk_size = aiff_get_chunk_size ;
 		psf->get_chunk_data = aiff_get_chunk_data ;
 
@@ -1731,12 +1734,24 @@ aiff_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info)
 } /* aiff_set_chunk */
 
 
+static SF_CHUNK_ITERATOR *
+aiff_create_chunk_iterator (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info)
+{	if (chunk_info)
+		return psf_create_chunk_iterator ( &psf->rchunks, chunk_info->id) ;
+	else
+		return psf_create_chunk_iterator ( &psf->rchunks, NULL) ;
+} /* aiff_create_chunk_iterator */
+
+static SF_CHUNK_ITERATOR *
+aiff_next_chunk_iterator (SF_PRIVATE *psf, SF_CHUNK_ITERATOR * iterator)
+{	return psf_next_chunk_iterator ( &psf->rchunks, iterator) ;
+} /* aiff_next_chunk_iterator */
+
 static int
-aiff_get_chunk_size (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
+aiff_get_chunk_size (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info)
 {	int indx ;
 
-	chunk_info->id [sizeof (chunk_info->id) - 1] = 0 ;
-	if ((indx = psf_find_read_chunk_str (&psf->rchunks, chunk_info->id)) < 0)
+	if ((indx = psf_find_read_chunk_iterator (&psf->rchunks, iterator)) < 0)
 		return SFE_UNKNOWN_CHUNK ;
 
 	chunk_info->datalen = psf->rchunks.chunks [indx].len ;
@@ -1745,12 +1760,11 @@ aiff_get_chunk_size (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
 } /* aiff_get_chunk_size */
 
 static int
-aiff_get_chunk_data (SF_PRIVATE *psf, SF_CHUNK_INFO * chunk_info)
+aiff_get_chunk_data (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info)
 {	sf_count_t pos ;
 	int indx ;
 
-	chunk_info->id [sizeof (chunk_info->id) - 1] = 0 ;
-	if ((indx = psf_find_read_chunk_str (&psf->rchunks, chunk_info->id)) < 0)
+	if ((indx = psf_find_read_chunk_iterator (&psf->rchunks, iterator)) < 0)
 		return SFE_UNKNOWN_CHUNK ;
 
 	if (chunk_info->data == NULL)
