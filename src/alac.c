@@ -791,22 +791,37 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 	PAKT_INFO * info = NULL ;
 	uint8_t *pakt_data = NULL ;
 	uint32_t bcount, value = 1, pakt_size ;
+	SF_CHUNK_ITERATOR * chunk_iterator ;
 
 
 	memset (&chunk_info, 0, sizeof (chunk_info)) ;
 	snprintf (chunk_info.id, sizeof (chunk_info.id), "pakt") ;
 	chunk_info.id_size = 4 ;
-	psf->get_chunk_size (psf, &chunk_info) ;
 
-	pakt_size = chunk_info.datalen ;
-	chunk_info.data = pakt_data = malloc (pakt_size + 5) ;
-
-	if ((bcount = psf->get_chunk_data (psf, &chunk_info)) != SF_ERR_NO_ERROR)
-	{	printf ("%s %d : %s\n\n", __func__, __LINE__, sf_error_number (bcount)) ;
+	chunk_iterator = psf->create_chunk_iterator (psf, &chunk_info) ;
+	if ((chunk_iterator = psf->create_chunk_iterator (psf, &chunk_info)) == NULL)
+	{	printf ("%s %d : no chunk iterator found\n\n", __func__, __LINE__) ;
 		free (chunk_info.data) ;
 		chunk_info.data = NULL ;
 		return NULL ;
 		} ;
+
+	psf->get_chunk_size (psf, chunk_iterator, &chunk_info) ;
+
+	pakt_size = chunk_info.datalen ;
+	chunk_info.data = pakt_data = malloc (pakt_size + 5) ;
+
+	if ((bcount = psf->get_chunk_data (psf, chunk_iterator, &chunk_info)) != SF_ERR_NO_ERROR)
+	{	printf ("%s %d : %s\n\n", __func__, __LINE__, sf_error_number (bcount)) ;
+		while (chunk_iterator)
+			chunk_iterator = psf->next_chunk_iterator (psf, chunk_iterator) ;
+		free (chunk_info.data) ;
+		chunk_info.data = NULL ;
+		return NULL ;
+		} ;
+
+	while (chunk_iterator)
+		chunk_iterator = psf->next_chunk_iterator (psf, chunk_iterator) ;
 
 	info = alac_pakt_alloc (pakt_size / 4) ;
 
