@@ -234,6 +234,8 @@ typedef struct
 
 typedef struct
 {	int64_t		hash ;
+	char	id [64] ;
+	unsigned	id_size ;
 	uint32_t	mark32 ;
 	sf_count_t	offset ;
 	uint32_t	len ;
@@ -257,6 +259,14 @@ typedef struct
 	uint32_t	used ;
 	WRITE_CHUNK	*chunks ;
 } WRITE_CHUNKS ;
+
+typedef struct SF_CHUNK_ITERATOR
+{	uint32_t	current ;
+	int64_t		hash ;
+	char	id [64] ;
+	unsigned	id_size ;
+	SNDFILE	*sndfile ;
+} SF_CHUNK_ITERATOR ;
 
 static inline size_t
 make_size_t (int x)
@@ -499,8 +509,10 @@ typedef struct sf_private_tag
 	READ_CHUNKS		rchunks ;
 	WRITE_CHUNKS	wchunks ;
 	int				(*set_chunk)		(struct sf_private_tag*, const SF_CHUNK_INFO * chunk_info) ;
-	int				(*get_chunk_size)	(struct sf_private_tag*, SF_CHUNK_INFO * chunk_info) ;
-	int				(*get_chunk_data)	(struct sf_private_tag*, SF_CHUNK_INFO * chunk_info) ;
+	SF_CHUNK_ITERATOR *	(*create_chunk_iterator)	(struct sf_private_tag*, const SF_CHUNK_INFO * chunk_info) ;
+	SF_CHUNK_ITERATOR *	(*next_chunk_iterator)	(struct sf_private_tag*, SF_CHUNK_ITERATOR * iterator) ;
+	int				(*get_chunk_size)	(struct sf_private_tag*, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
+	int				(*get_chunk_data)	(struct sf_private_tag*, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
 } SF_PRIVATE ;
 
 
@@ -892,11 +904,14 @@ int		interleave_init (SF_PRIVATE *psf) ;
 ** Chunk logging functions.
 */
 
+SF_CHUNK_ITERATOR * psf_create_chunk_iterator (const READ_CHUNKS * pchk, const char * marker_str) ;
+SF_CHUNK_ITERATOR * psf_next_chunk_iterator (const READ_CHUNKS * pchk , SF_CHUNK_ITERATOR *iterator) ;
 int		psf_store_read_chunk_u32 (READ_CHUNKS * pchk, uint32_t marker, sf_count_t offset, uint32_t len) ;
 int		psf_store_read_chunk_str (READ_CHUNKS * pchk, const char * marker, sf_count_t offset, uint32_t len) ;
 int		psf_save_write_chunk (WRITE_CHUNKS * pchk, const SF_CHUNK_INFO * chunk_info) ;
-int		psf_find_read_chunk_str (READ_CHUNKS * pchk, const char * marker) ;
-int		psf_find_read_chunk_m32 (READ_CHUNKS * pchk, uint32_t marker) ;
+int		psf_find_read_chunk_str (const READ_CHUNKS * pchk, const char * marker) ;
+int		psf_find_read_chunk_m32 (const READ_CHUNKS * pchk, uint32_t marker) ;
+int		psf_find_read_chunk_iterator (const READ_CHUNKS * pchk, const SF_CHUNK_ITERATOR * marker) ;
 
 int		psf_find_write_chunk (WRITE_CHUNKS * pchk, const char * marker) ;
 
