@@ -80,7 +80,7 @@ psf_store_read_chunk_u32 (READ_CHUNKS * pchk, uint32_t marker, sf_count_t offset
 } /* psf_store_read_chunk_u32 */
 
 int
-psf_find_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str)
+psf_find_read_chunk_str (const READ_CHUNKS * pchk, const char * marker_str)
 {	int64_t hash ;
 	uint32_t k ;
 	union
@@ -100,7 +100,7 @@ psf_find_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str)
 } /* psf_find_read_chunk_str */
 
 int
-psf_find_read_chunk_m32 (READ_CHUNKS * pchk, uint32_t marker)
+psf_find_read_chunk_m32 (const READ_CHUNKS * pchk, uint32_t marker)
 {	uint32_t k ;
 
 	for (k = 0 ; k < pchk->used ; k++)
