@@ -78,6 +78,8 @@ psf_next_chunk_iterator (const READ_CHUNKS * pchk , SF_CHUNK_ITERATOR * iterator
 {	int64_t hash = iterator->hash ;
 	uint32_t k ;
 
+	iterator->current++ ;
+
 	if (hash)
 	{	for (k = iterator->current ; k < pchk->used ; k++)
 			if (pchk->chunks [k].hash == hash)
@@ -85,10 +87,8 @@ psf_next_chunk_iterator (const READ_CHUNKS * pchk , SF_CHUNK_ITERATOR * iterator
 				return iterator ;
 				}
 		}
-	else if (iterator->current + 1 < pchk->used )
-	{	iterator->current++ ;
+	else if (iterator->current < pchk->used )
 		return iterator ;
-		}
 
 	/* no match, destroy iterator and return NULL */
 	memset (iterator, 0, sizeof (*iterator)) ;
