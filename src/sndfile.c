@@ -3023,3 +3023,34 @@ sf_get_chunk_data (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info)
 
 	return SFE_BAD_CHUNK_FORMAT ;
 } /* sf_get_chunk_data */
+
+SF_CHUNK_ITERATOR *
+sf_get_chunk_iterator (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
+{	SF_PRIVATE 	*psf ;
+
+	return NULL ;
+} /* sf_get_chunk_iterator */
+SF_CHUNK_ITERATOR *
+sf_get_chunk_iterator_next (SF_CHUNK_ITERATOR * iterator)
+{	SF_PRIVATE 	*psf ;
+
+	return NULL ;
+} /* sf_get_chunk_iterator_next */
+int
+sf_get_chunk_iterator_size (const SF_CHUNK_ITERATOR * it, SF_CHUNK_INFO * chunk_info)
+{	SF_PRIVATE 	*psf ;
+	SNDFILE	*sndfile = it ? it->sndfile : NULL ;
+
+	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
+
+	return 0 ;
+} /* sf_get_chunk_iterator_size */
+int
+sf_get_chunk_iterator_data (const SF_CHUNK_ITERATOR * it, SF_CHUNK_INFO * chunk_info)
+{	SF_PRIVATE	*psf ;
+	SNDFILE	*sndfile = it ? it->sndfile : NULL ;
+
+	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
+
+	return 0 ;
+} /* sf_get_chunk_iterator_data */
