@@ -138,6 +138,9 @@ psf_store_read_chunk_u32 (READ_CHUNKS * pchk, uint32_t marker, sf_count_t offset
 	rchunk.offset = offset ;
 	rchunk.len = len ;
 
+	rchunk.id_size = 4 ;
+	memcpy (rchunk.id, &marker, rchunk.id_size) ;
+
 	return psf_store_read_chunk (pchk, &rchunk) ;
 } /* psf_store_read_chunk_u32 */
 
