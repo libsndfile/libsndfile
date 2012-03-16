@@ -234,6 +234,8 @@ typedef struct
 
 typedef struct
 {	int64_t		hash ;
+	char	id [64] ;
+	unsigned	id_size ;
 	uint32_t	mark32 ;
 	sf_count_t	offset ;
 	uint32_t	len ;

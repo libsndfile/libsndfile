@@ -117,14 +117,20 @@ psf_store_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str, sf_count_
 	{	uint32_t marker ;
 		char str [5] ;
 	} u ;
+	size_t marker_len ;
 
 	memset (&rchunk, 0, sizeof (rchunk)) ;
 	snprintf (u.str, sizeof (u.str), "%s", marker_str) ;
 
-	rchunk.hash = strlen (marker_str) > 4 ? hash_of_str (marker_str) : u.marker ;
+	marker_len = strlen (marker_str) ;
+
+	rchunk.hash = marker_len > 4 ? hash_of_str (marker_str) : u.marker ;
 	rchunk.mark32 = u.marker ;
 	rchunk.offset = offset ;
 	rchunk.len = len ;
+
+	rchunk.id_size = marker_len > 64 ? 64 : marker_len ;
+	memcpy (rchunk.id, marker_str, rchunk.id_size) ;
 
 	return psf_store_read_chunk (pchk, &rchunk) ;
 } /* psf_store_read_chunk_str */
