@@ -509,6 +509,8 @@ typedef struct sf_private_tag
 	READ_CHUNKS		rchunks ;
 	WRITE_CHUNKS	wchunks ;
 	int				(*set_chunk)		(struct sf_private_tag*, const SF_CHUNK_INFO * chunk_info) ;
+	SF_CHUNK_ITERATOR *	(*create_chunk_iterator)	(struct sf_private_tag*, const SF_CHUNK_INFO * chunk_info) ;
+	SF_CHUNK_ITERATOR *	(*next_chunk_iterator)	(struct sf_private_tag*, SF_CHUNK_ITERATOR * iterator) ;
 	int				(*get_chunk_size)	(struct sf_private_tag*, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
 	int				(*get_chunk_data)	(struct sf_private_tag*, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
 } SF_PRIVATE ;

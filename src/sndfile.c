@@ -2993,26 +2993,30 @@ sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
 	return SFE_BAD_CHUNK_FORMAT ;
 } /* sf_set_chunk */
 
+SF_CHUNK_ITERATOR *
+sf_create_chunk_iterator (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
 {	SF_PRIVATE 	*psf ;
+	SF_CHUNK_ITERATOR 	*iterator = NULL ;
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
+	if (psf->create_chunk_iterator)
+		iterator = psf->create_chunk_iterator (psf, chunk_info) ;
 
+	if (iterator)
+		iterator->sndfile = sndfile ;
 
+	return iterator ;
+} /* sf_create_chunk_iterator */
+SF_CHUNK_ITERATOR *
+sf_next_chunk_iterator (SF_CHUNK_ITERATOR * iterator)
 {	SF_PRIVATE 	*psf ;
+	SNDFILE	*sndfile = iterator ? iterator->sndfile : NULL ;
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-
-SF_CHUNK_ITERATOR *
-sf_get_chunk_iterator (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
-{	SF_PRIVATE 	*psf ;
-
-	return NULL ;
-} /* sf_get_chunk_iterator */
-SF_CHUNK_ITERATOR *
-sf_get_chunk_iterator_next (SF_CHUNK_ITERATOR * iterator)
-{	SF_PRIVATE 	*psf ;
+	if (psf->next_chunk_iterator)
+		return psf->next_chunk_iterator (psf, iterator) ;
 
 	return NULL ;
 } /* sf_get_chunk_iterator_next */
