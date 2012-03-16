@@ -97,8 +97,7 @@ psf_next_chunk_iterator (const READ_CHUNKS * pchk , SF_CHUNK_ITERATOR * iterator
 } /* psf_next_chunk_iterator */
 static int
 psf_store_read_chunk (READ_CHUNKS * pchk, const READ_CHUNK * rchunk)
-{
-	if (pchk->count == 0)
+{	if (pchk->count == 0)
 	{	pchk->used = 0 ;
 		pchk->count = 20 ;
 		pchk->chunks = calloc (pchk->count, sizeof (READ_CHUNK)) ;
@@ -167,7 +166,7 @@ psf_find_read_chunk_m32 (const READ_CHUNKS * pchk, uint32_t marker)
 			return k ;
 
 	return -1 ;
-} /* psf_find_read_chunk_str */
+} /* psf_find_read_chunk_m32 */
 int
 psf_find_read_chunk_iterator (const READ_CHUNKS * pchk, const SF_CHUNK_ITERATOR * marker)
 {	if (marker->current < pchk->used)
