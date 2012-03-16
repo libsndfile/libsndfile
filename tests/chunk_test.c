@@ -89,6 +89,7 @@ chunk_test_helper (const char *filename, int typemajor, const char * testdata)
 {	SNDFILE			*file ;
 	SF_INFO			sfinfo ;
 	SF_CHUNK_INFO	chunk_info ;
+	SF_CHUNK_ITERATOR * iterator ;
 	uint32_t		length_before ;
 	int				err ;
 
@@ -134,7 +135,8 @@ chunk_test_helper (const char *filename, int typemajor, const char * testdata)
 	snprintf (chunk_info.id, sizeof (chunk_info.id), "Test") ;
 	chunk_info.id_size = 4 ;
 
-	err = sf_get_chunk_size (file, &chunk_info) ;
+	iterator = sf_create_chunk_iterator (file, &chunk_info) ;
+	err = sf_get_chunk_size (iterator, &chunk_info) ;
 	exit_if_true (
 		err != SF_ERR_NO_ERROR,
 		"\n\nLine %d : sf_get_chunk_size returned for testdata '%s' : %s\n\n", __LINE__, testdata, sf_error_number (err)
@@ -146,7 +148,7 @@ chunk_test_helper (const char *filename, int typemajor, const char * testdata)
 		) ;
 
 	chunk_info.data = malloc (chunk_info.datalen) ;
-	err = sf_get_chunk_data (file, &chunk_info) ;
+	err = sf_get_chunk_data (iterator, &chunk_info) ;
 	exit_if_true (
 		err != SF_ERR_NO_ERROR,
 		"\n\nLine %d : sf_get_chunk_size returned for testdata '%s' : %s\n\n", __LINE__, testdata, sf_error_number (err)
