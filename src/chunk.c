@@ -36,6 +36,65 @@ hash_of_str (const char * str)
 	return marker ;
 } /* hash_of_str */
 
+SF_CHUNK_ITERATOR *
+psf_create_chunk_iterator (const READ_CHUNKS * pchk, const char * marker_str)
+{	int idx ;
+	SF_CHUNK_ITERATOR * iterator ;
+
+	if (marker_str)
+		idx = psf_find_read_chunk_str (pchk, marker_str) ;
+	else
+		idx = pchk->used > 0 ? 0 : -1 ;
+
+	if (idx < 0)
+		return NULL ;
+
+	iterator = calloc (1, sizeof (SF_CHUNK_ITERATOR)) ;
+	if (marker_str)
+	{	int64_t hash ;
+		size_t marker_len ;
+		union
+		{	uint32_t marker ;
+			char str [5] ;
+		} u ;
+
+		snprintf (u.str, sizeof (u.str), "%s", marker_str) ;
+
+		marker_len = strlen (marker_str) ;
+		if (marker_len > 64)
+			marker_len = 64 ;
+
+		hash = marker_len > 4 ? hash_of_str (marker_str) : u.marker ;
+
+		memcpy (iterator->id, marker_str, marker_len) ;
+		iterator->id_size = marker_len ;
+		iterator->hash = hash ;
+		}
+	return iterator ;
+} /* psf_create_chunk_iterator */
+SF_CHUNK_ITERATOR *
+psf_next_chunk_iterator (const READ_CHUNKS * pchk , SF_CHUNK_ITERATOR * iterator)
+{	int64_t hash = iterator->hash ;
+	uint32_t k ;
+
+	if (hash)
+	{	for (k = iterator->current ; k < pchk->used ; k++)
+			if (pchk->chunks [k].hash == hash)
+			{	iterator->current = k ;
+				return iterator ;
+				}
+		}
+	else if (iterator->current + 1 < pchk->used )
+	{	iterator->current++ ;
+		return iterator ;
+		}
+
+	/* no match, destroy iterator and return NULL */
+	memset (iterator, 0, sizeof (*iterator)) ;
+	free (iterator) ;
+
+	return NULL ;
+} /* psf_next_chunk_iterator */
 static int
 psf_store_read_chunk (READ_CHUNKS * pchk, const READ_CHUNK * rchunk)
 {
@@ -109,7 +168,13 @@ psf_find_read_chunk_m32 (const READ_CHUNKS * pchk, uint32_t marker)
 
 	return -1 ;
 } /* psf_find_read_chunk_str */
+int
+psf_find_read_chunk_iterator (const READ_CHUNKS * pchk, const SF_CHUNK_ITERATOR * marker)
+{	if (marker->current < pchk->used)
+		return marker->current ;
 
+	return -1 ;
+} /* psf_find_read_chunk_iterator */
 int
 psf_store_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str, sf_count_t offset, uint32_t len)
 {	READ_CHUNK rchunk ;
