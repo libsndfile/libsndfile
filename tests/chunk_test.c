@@ -225,7 +225,8 @@ multichunk_test_helper (const char *filename, int typemajor, const char * testda
 
 	i = 0 ;
 	while (iterator)
-	{	err = sf_get_chunk_size (iterator, &chunk_info) ;
+	{	memset (&chunk_info, 0, sizeof (chunk_info)) ;
+		err = sf_get_chunk_size (iterator, &chunk_info) ;
 		exit_if_true (
 			i > testdata_len,
 			"\n\nLine %d : iterated to chunk #%d, but only %d chunks have been written\n\n", __LINE__, (int) i, (int) testdata_len
@@ -246,6 +247,15 @@ multichunk_test_helper (const char *filename, int typemajor, const char * testda
 		exit_if_true (
 			err != SF_ERR_NO_ERROR,
 			"\n\nLine %d : sf_get_chunk_size returned for testdata[%d] '%s' : %s\n\n", __LINE__, (int) i, testdata [i], sf_error_number (err)
+			) ;
+
+		exit_if_true (
+			4 != chunk_info.id_size,
+			"\n\nLine %d : testdata[%d] : Bad ID length %u (previous length %u)\n\n", __LINE__, (int) i, chunk_info.id_size, 4
+			) ;
+		exit_if_true (
+			memcmp ("Test", chunk_info.id, 4),
+			"\n\nLine %d : ID compare failed at %d.\n    %s\n    %s\n\n", __LINE__, (int) i, "Test", (char*) chunk_info.id
 			) ;
 
 		exit_if_true (
