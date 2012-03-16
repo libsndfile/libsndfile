@@ -1,5 +1,6 @@
 /*
 ** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2012 IOhannes m zmoelnig, IEM <zmoelnig@iem.at>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
