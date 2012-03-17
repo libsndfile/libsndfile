@@ -52,8 +52,7 @@ psf_create_chunk_iterator (const READ_CHUNKS * pchk, const char * marker_str)
 
 	iterator = calloc (1, sizeof (SF_CHUNK_ITERATOR)) ;
 	if (marker_str)
-	{	int64_t hash ;
-		size_t marker_len ;
+	{	size_t marker_len ;
 		union
 		{	uint32_t marker ;
 			char str [5] ;
@@ -65,11 +64,7 @@ psf_create_chunk_iterator (const READ_CHUNKS * pchk, const char * marker_str)
 		if (marker_len > 64)
 			marker_len = 64 ;
 
-		hash = marker_len > 4 ? hash_of_str (marker_str) : u.marker ;
-
-		memcpy (iterator->id, marker_str, marker_len) ;
-		iterator->id_size = marker_len ;
-		iterator->hash = hash ;
+		iterator->hash = marker_len > 4 ? hash_of_str (marker_str) : u.marker ;
 		}
 
 	iterator->current = idx ;

@@ -263,8 +263,6 @@ typedef struct
 typedef struct SF_CHUNK_ITERATOR
 {	uint32_t	current ;
 	int64_t		hash ;
-	char		id [64] ;
-	unsigned	id_size ;
 	SNDFILE		*sndfile ;
 } SF_CHUNK_ITERATOR ;
 
