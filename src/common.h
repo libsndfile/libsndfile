@@ -266,6 +266,11 @@ typedef struct SF_CHUNK_ITERATOR
 	SNDFILE		*sndfile ;
 } SF_CHUNK_ITERATOR ;
 
+typedef struct
+{	uint32_t	count ;
+	SF_CHUNK_ITERATOR	**iterators ;
+} READ_ITERATORS ;
+
 static inline size_t
 make_size_t (int x)
 {	return (size_t) x ;
@@ -506,6 +511,8 @@ typedef struct sf_private_tag
 	/* Chunk get/set. */
 	READ_CHUNKS		rchunks ;
 	WRITE_CHUNKS	wchunks ;
+
+	READ_ITERATORS		riterators ;
 	int				(*set_chunk)		(struct sf_private_tag*, const SF_CHUNK_INFO * chunk_info) ;
 	SF_CHUNK_ITERATOR *	(*create_chunk_iterator)	(struct sf_private_tag*, const SF_CHUNK_INFO * chunk_info) ;
 	SF_CHUNK_ITERATOR *	(*next_chunk_iterator)	(struct sf_private_tag*, SF_CHUNK_ITERATOR * iterator) ;

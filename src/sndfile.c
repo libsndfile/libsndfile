@@ -2606,6 +2606,10 @@ psf_close (SF_PRIVATE *psf)
 	if (psf->wchunks.chunks)
 		for (k = 0 ; k < psf->wchunks.used ; k++)
 			free (psf->wchunks.chunks [k].data) ;
+
+	for (k = 0 ; k < psf->riterators.count ; k++)
+		free (psf->riterators.iterators [k]) ;
+
 	free (psf->rchunks.chunks) ;
 	free (psf->wchunks.chunks) ;
 
