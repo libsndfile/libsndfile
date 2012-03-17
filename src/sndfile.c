@@ -2608,7 +2608,10 @@ psf_close (SF_PRIVATE *psf)
 			free (psf->wchunks.chunks [k].data) ;
 
 	for (k = 0 ; k < psf->riterators.count ; k++)
+	{	if (NULL != psf->riterators.iterators [k])
+			memset (psf->riterators.iterators [k], 0, sizeof (SF_CHUNK_ITERATOR)) ;
 		free (psf->riterators.iterators [k]) ;
+		}
 	free (psf->riterators.iterators) ;
 
 	free (psf->rchunks.chunks) ;
