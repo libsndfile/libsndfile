@@ -1,5 +1,6 @@
 /*
 ** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2012 IOhannes m zmoelnig, IEM <zmoelnig@iem.at>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -36,10 +37,71 @@ hash_of_str (const char * str)
 	return marker ;
 } /* hash_of_str */
 
+SF_CHUNK_ITERATOR *
+psf_create_chunk_iterator (const READ_CHUNKS * pchk, const char * marker_str)
+{	int idx ;
+	SF_CHUNK_ITERATOR * iterator ;
+
+	if (marker_str)
+		idx = psf_find_read_chunk_str (pchk, marker_str) ;
+	else
+		idx = pchk->used > 0 ? 0 : -1 ;
+
+	if (idx < 0)
+		return NULL ;
+
+	iterator = calloc (1, sizeof (SF_CHUNK_ITERATOR)) ;
+	if (marker_str)
+	{	int64_t hash ;
+		size_t marker_len ;
+		union
+		{	uint32_t marker ;
+			char str [5] ;
+		} u ;
+
+		snprintf (u.str, sizeof (u.str), "%s", marker_str) ;
+
+		marker_len = strlen (marker_str) ;
+		if (marker_len > 64)
+			marker_len = 64 ;
+
+		hash = marker_len > 4 ? hash_of_str (marker_str) : u.marker ;
+
+		memcpy (iterator->id, marker_str, marker_len) ;
+		iterator->id_size = marker_len ;
+		iterator->hash = hash ;
+		}
+
+	iterator->current = idx ;
+
+	return iterator ;
+} /* psf_create_chunk_iterator */
+SF_CHUNK_ITERATOR *
+psf_next_chunk_iterator (const READ_CHUNKS * pchk , SF_CHUNK_ITERATOR * iterator)
+{	int64_t hash = iterator->hash ;
+	uint32_t k ;
+
+	iterator->current++ ;
+
+	if (hash)
+	{	for (k = iterator->current ; k < pchk->used ; k++)
+			if (pchk->chunks [k].hash == hash)
+			{	iterator->current = k ;
+				return iterator ;
+				}
+		}
+	else if (iterator->current < pchk->used )
+		return iterator ;
+
+	/* no match, destroy iterator and return NULL */
+	memset (iterator, 0, sizeof (*iterator)) ;
+	free (iterator) ;
+
+	return NULL ;
+} /* psf_next_chunk_iterator */
 static int
 psf_store_read_chunk (READ_CHUNKS * pchk, const READ_CHUNK * rchunk)
-{
-	if (pchk->count == 0)
+{	if (pchk->count == 0)
 	{	pchk->used = 0 ;
 		pchk->count = 20 ;
 		pchk->chunks = calloc (pchk->count, sizeof (READ_CHUNK)) ;
@@ -76,11 +138,14 @@ psf_store_read_chunk_u32 (READ_CHUNKS * pchk, uint32_t marker, sf_count_t offset
 	rchunk.offset = offset ;
 	rchunk.len = len ;
 
+	rchunk.id_size = 4 ;
+	memcpy (rchunk.id, &marker, rchunk.id_size) ;
+
 	return psf_store_read_chunk (pchk, &rchunk) ;
 } /* psf_store_read_chunk_u32 */
 
 int
-psf_find_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str)
+psf_find_read_chunk_str (const READ_CHUNKS * pchk, const char * marker_str)
 {	int64_t hash ;
 	uint32_t k ;
 	union
@@ -100,7 +165,7 @@ psf_find_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str)
 } /* psf_find_read_chunk_str */
 
 int
-psf_find_read_chunk_m32 (READ_CHUNKS * pchk, uint32_t marker)
+psf_find_read_chunk_m32 (const READ_CHUNKS * pchk, uint32_t marker)
 {	uint32_t k ;
 
 	for (k = 0 ; k < pchk->used ; k++)
@@ -108,8 +173,14 @@ psf_find_read_chunk_m32 (READ_CHUNKS * pchk, uint32_t marker)
 			return k ;
 
 	return -1 ;
-} /* psf_find_read_chunk_str */
+} /* psf_find_read_chunk_m32 */
+int
+psf_find_read_chunk_iterator (const READ_CHUNKS * pchk, const SF_CHUNK_ITERATOR * marker)
+{	if (marker->current < pchk->used)
+		return marker->current ;
 
+	return -1 ;
+} /* psf_find_read_chunk_iterator */
 int
 psf_store_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str, sf_count_t offset, uint32_t len)
 {	READ_CHUNK rchunk ;
@@ -117,14 +188,20 @@ psf_store_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str, sf_count_
 	{	uint32_t marker ;
 		char str [5] ;
 	} u ;
+	size_t marker_len ;
 
 	memset (&rchunk, 0, sizeof (rchunk)) ;
 	snprintf (u.str, sizeof (u.str), "%s", marker_str) ;
 
-	rchunk.hash = strlen (marker_str) > 4 ? hash_of_str (marker_str) : u.marker ;
+	marker_len = strlen (marker_str) ;
+
+	rchunk.hash = marker_len > 4 ? hash_of_str (marker_str) : u.marker ;
 	rchunk.mark32 = u.marker ;
 	rchunk.offset = offset ;
 	rchunk.len = len ;
+
+	rchunk.id_size = marker_len > 64 ? 64 : marker_len ;
+	memcpy (rchunk.id, marker_str, rchunk.id_size) ;
 
 	return psf_store_read_chunk (pchk, &rchunk) ;
 } /* psf_store_read_chunk_str */

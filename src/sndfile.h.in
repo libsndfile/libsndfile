@@ -709,23 +709,65 @@ typedef struct SF_CHUNK_INFO SF_CHUNK_INFO ;
 */
 int sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info) ;
 
+/*
+** An opaque structure to an iterator over the all chunks of a given id
+*/
+typedef	struct SF_CHUNK_ITERATOR SF_CHUNK_ITERATOR ;
 
+/* Get an iterator for all chunks matching chunk_info.
+** The iterator will point to the first chunk matching chunk_info.
+** Chunks are matching, if (chunk_info->id) matches the first
+**     (chunk_info->id_size) bytes of a chunk found in the sndfile.
+** If chunk_info is NULL, an iterator to all chunks in the sndfile
+**     is returned.
+** The values of chunk_info->datalen and chunk_info->data are ignored.
+** If no matching chunks are found in the sndfile, NULL is returned.
+** The returned iterator will stay valid until either the sndfile is
+**     closed or any new chunk is added using sf_set_chunk().
+*/
+SF_CHUNK_ITERATOR *
+sf_create_chunk_iterator (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info) ;
+/* Iterate through chunks by incrementing the iterator.
+** Increments the iterator and returns a handle to the new one.
+** After this call, iterator will no longer be valid, and you must use the
+**      newly returned handle from now on.
+** The returned handle can be used to access the next chunk matching 
+**      the criteria as defined in sf_get_chunk_iterator().
+** If iterator points to the last chunk, this will free all ressources 
+**      associated with iterator and return NULL.
+** The returned iterator will stay valid until sf_get_chunk_iterator_next 
+**      is called again, the sndfile is closed or a new chunk us added.
+*/
+SF_CHUNK_ITERATOR *
+sf_next_chunk_iterator (SF_CHUNK_ITERATOR * iterator) ;
 /* Get the size of the specified chunk.
-** If the specified chunk exists, the size will be returned in the datalen field
-** of the SF_CHUNK_INFO struct. If it doesn't exist datalen will be zero.
-** The function will return SF_ERR_NO_ERROR on success or non-zero on failure.
+** If the specified chunk exists, the size will be returned in the
+**      datalen field of the SF_CHUNK_INFO struct.
+**      Additionally, the id of the chunk will be copied to the id
+**      field of the SF_CHUNK_INFO struct and it's id_size field will
+**      be updated accordingly.
+** If the chunk doesn't exist chunk_info->datalen will be zero, and the
+**      id and id_size fields will be undefined.
+** The function will return SF_ERR_NO_ERROR on success or non-zero on
+** failure.
 */
-int sf_get_chunk_size (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info) ;
-
+int
+sf_get_chunk_size (const SF_CHUNK_ITERATOR * it, SF_CHUNK_INFO * chunk_info) ;
 /* Get the specified chunk data.
-** If the specified chunk exists, up to chunk_info->datalen bytes of the chunk
-** data will be copied into the chunk_info->data buffer (allocated by the caller)
-** and the chunk_info->datalen field updated to reflect the size of the data
-** copied.
-** If the chunk doesn't exist chunk_info->datalen will be zero.
-** The function will return SF_ERR_NO_ERROR on success or non-zero on failure.
+** If the specified chunk exists, up to chunk_info->datalen bytes of
+**      the chunk data will be copied into the chunk_info->data buffer
+**      (allocated by the caller) and the chunk_info->datalen field
+**      updated to reflect the size of the data. The id and id_size
+**      field will be updated according to the retrieved chunk
+** If the chunk doesn't exist chunk_info->datalen will be zero, and the
+**      id and id_size fields will be undefined.
+** The function will return SF_ERR_NO_ERROR on success or non-zero on
+** failure.
 */
-int sf_get_chunk_data (SNDFILE * sndfile, SF_CHUNK_INFO * chunk_info) ;
+int
+sf_get_chunk_data (const SF_CHUNK_ITERATOR * it, SF_CHUNK_INFO * chunk_info) ;
+
+
 
 
 #ifdef __cplusplus
