@@ -38,7 +38,7 @@ hash_of_str (const char * str)
 } /* hash_of_str */
 
 SF_CHUNK_ITERATOR *
-psf_create_chunk_iterator (const READ_CHUNKS * pchk, const char * marker_str)
+psf_create_chunk_iterator (SF_PRIVATE *psf, const READ_CHUNKS * pchk, const char * marker_str)
 {	int idx ;
 	SF_CHUNK_ITERATOR * iterator ;
 
@@ -68,6 +68,7 @@ psf_create_chunk_iterator (const READ_CHUNKS * pchk, const char * marker_str)
 		}
 
 	iterator->current = idx ;
+	iterator->sndfile = psf;
 
 	return iterator ;
 } /* psf_create_chunk_iterator */
