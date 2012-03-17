@@ -263,10 +263,13 @@ typedef struct
 typedef struct SF_CHUNK_ITERATOR
 {	uint32_t	current ;
 	int64_t		hash ;
-	char		id [64] ;
-	unsigned	id_size ;
-	SNDFILE		*sndfile ;
+	struct sf_private_tag		*sndfile ;
 } SF_CHUNK_ITERATOR ;
+
+typedef struct
+{	uint32_t	count ;
+	SF_CHUNK_ITERATOR	**iterators ;
+} READ_ITERATORS ;
 
 static inline size_t
 make_size_t (int x)
@@ -508,6 +511,8 @@ typedef struct sf_private_tag
 	/* Chunk get/set. */
 	READ_CHUNKS		rchunks ;
 	WRITE_CHUNKS	wchunks ;
+
+	READ_ITERATORS		riterators ;
 	int				(*set_chunk)		(struct sf_private_tag*, const SF_CHUNK_INFO * chunk_info) ;
 	SF_CHUNK_ITERATOR *	(*create_chunk_iterator)	(struct sf_private_tag*, const SF_CHUNK_INFO * chunk_info) ;
 	SF_CHUNK_ITERATOR *	(*next_chunk_iterator)	(struct sf_private_tag*, SF_CHUNK_ITERATOR * iterator) ;
@@ -904,7 +909,7 @@ int		interleave_init (SF_PRIVATE *psf) ;
 ** Chunk logging functions.
 */
 
-SF_CHUNK_ITERATOR * psf_create_chunk_iterator (const READ_CHUNKS * pchk, const char * marker_str) ;
+SF_CHUNK_ITERATOR * psf_create_chunk_iterator (SF_PRIVATE *psf, const READ_CHUNKS * pchk, const char * marker_str) ;
 SF_CHUNK_ITERATOR * psf_next_chunk_iterator (const READ_CHUNKS * pchk , SF_CHUNK_ITERATOR *iterator) ;
 int		psf_store_read_chunk_u32 (READ_CHUNKS * pchk, uint32_t marker, sf_count_t offset, uint32_t len) ;
 int		psf_store_read_chunk_str (READ_CHUNKS * pchk, const char * marker, sf_count_t offset, uint32_t len) ;

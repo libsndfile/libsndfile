@@ -727,9 +727,9 @@ caf_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info)
 static SF_CHUNK_ITERATOR *
 caf_create_chunk_iterator (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info)
 {	if (chunk_info)
-		return psf_create_chunk_iterator ( &psf->rchunks, chunk_info->id) ;
+		return psf_create_chunk_iterator ( psf, &psf->rchunks, chunk_info->id) ;
 	else
-		return psf_create_chunk_iterator ( &psf->rchunks, NULL) ;
+		return psf_create_chunk_iterator ( psf, &psf->rchunks, NULL) ;
 } /* caf_create_chunk_iterator */
 
 static SF_CHUNK_ITERATOR *

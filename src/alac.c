@@ -801,7 +801,6 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 	snprintf (chunk_info.id, sizeof (chunk_info.id), "pakt") ;
 	chunk_info.id_size = 4 ;
 
-	chunk_iterator = psf->create_chunk_iterator (psf, &chunk_info) ;
 	if ((chunk_iterator = psf->create_chunk_iterator (psf, &chunk_info)) == NULL)
 	{	printf ("%s %d : no chunk iterator found\n\n", __func__, __LINE__) ;
 		free (chunk_info.data) ;
