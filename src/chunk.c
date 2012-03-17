@@ -68,7 +68,37 @@ psf_create_chunk_iterator (SF_PRIVATE *psf, const READ_CHUNKS * pchk, const char
 		}
 
 	iterator->current = idx ;
-	iterator->sndfile = psf;
+	iterator->sndfile = psf ;
+
+	/* register marker with sndfile */
+	do
+	{	uint32_t k ;
+		uint32_t new_count = 3 * (psf->riterators.count + 1) / 2 ;
+		SF_CHUNK_ITERATOR ** iterators = psf->riterators.iterators ;
+
+		if (NULL == psf->riterators.iterators)
+		{	new_count = 3 ;
+			psf->riterators.iterators = calloc (new_count, sizeof (SF_CHUNK_ITERATOR *)) ;
+			psf->riterators.count = new_count ;
+			}
+
+		for (k = 0 ; k < psf->riterators.count ; k++)
+			if (NULL == psf->riterators.iterators [k])
+			{	psf->riterators.iterators [k] = iterator ;
+				return iterator ;
+				}
+
+		/* allocate space for new iterators */
+		psf->riterators.iterators = realloc (iterators, new_count * sizeof (SF_CHUNK_ITERATOR *)) ;
+		for (k = psf->riterators.count ; k < new_count ; k++)
+			psf->riterators.iterators [k] = NULL ;
+
+		for (k = 0 ; k < psf->riterators.count ; k++)
+			if (NULL == psf->riterators.iterators [k])
+			{	psf->riterators.iterators [k] = iterator ;
+				return iterator ;
+				}
+		} while (0) ;
 
 	return iterator ;
 } /* psf_create_chunk_iterator */
@@ -91,8 +121,16 @@ psf_next_chunk_iterator (const READ_CHUNKS * pchk , SF_CHUNK_ITERATOR * iterator
 		return iterator ;
 
 	/* no match, destroy iterator and return NULL */
-	memset (iterator, 0, sizeof (*iterator)) ;
-	free (iterator) ;
+	do
+	{	SF_PRIVATE*psf = iterator->sndfile ;
+
+		for (k = 0 ; k < psf->riterators.count ; k++)
+			if (iterator == psf->riterators.iterators [k])
+				psf->riterators.iterators [k] = NULL ;
+
+		memset (iterator, 0, sizeof (*iterator)) ;
+		free (iterator) ;
+		} while (0) ;
 
 	return NULL ;
 } /* psf_next_chunk_iterator */
