@@ -373,6 +373,9 @@ alac_reader_calc_frames (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 		blocks = current_pos > 0 ? blocks + 1 : blocks ;
 		} ;
 
+	if (blocks == 0)
+		return 0 ;
+
 	/* Only count full blocks. */
 	frames = plac->frames_per_block * (blocks - 1) ;
 
