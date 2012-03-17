@@ -159,9 +159,6 @@ chunk_test_helper (const char *filename, int typemajor, const char * testdata)
 		"\n\nLine %d : Data compare failed.\n    %s\n    %s\n\n", __LINE__, testdata, (char*) chunk_info.data
 		) ;
 
-	while (iterator)
-		iterator = sf_next_chunk_iterator (iterator) ;
-
 	free (chunk_info.data) ;
 
 	sf_close (file) ;
