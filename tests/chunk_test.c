@@ -164,6 +164,7 @@ chunk_test_helper (const char *filename, int typemajor, const char * testdata)
 	sf_close (file) ;
 	unlink (filename) ;
 } /* chunk_test_helper */
+
 static void
 multichunk_test_helper (const char *filename, int typemajor, const char * testdata [], size_t testdata_len)
 {	SNDFILE			*file ;

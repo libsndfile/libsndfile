@@ -76,6 +76,7 @@ psf_create_chunk_iterator (const READ_CHUNKS * pchk, const char * marker_str)
 
 	return iterator ;
 } /* psf_create_chunk_iterator */
+
 SF_CHUNK_ITERATOR *
 psf_next_chunk_iterator (const READ_CHUNKS * pchk , SF_CHUNK_ITERATOR * iterator)
 {	int64_t hash = iterator->hash ;
@@ -99,6 +100,7 @@ psf_next_chunk_iterator (const READ_CHUNKS * pchk , SF_CHUNK_ITERATOR * iterator
 
 	return NULL ;
 } /* psf_next_chunk_iterator */
+
 static int
 psf_store_read_chunk (READ_CHUNKS * pchk, const READ_CHUNK * rchunk)
 {	if (pchk->count == 0)
@@ -181,6 +183,7 @@ psf_find_read_chunk_iterator (const READ_CHUNKS * pchk, const SF_CHUNK_ITERATOR 
 
 	return -1 ;
 } /* psf_find_read_chunk_iterator */
+
 int
 psf_store_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str, sf_count_t offset, uint32_t len)
 {	READ_CHUNK rchunk ;

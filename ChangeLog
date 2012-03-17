@@ -1,3 +1,9 @@
+2012-02-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/*.c tests/chunk_test.c
+    Add improved handling of custom chunk getting and settings. Set of patches
+    from IOhannes m zmoelnig submitted via github pull request #6.
+
 2012-02-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/avr.c

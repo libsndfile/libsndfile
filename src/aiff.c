@@ -227,6 +227,7 @@ static SF_CHUNK_ITERATOR * aiff_create_chunk_iterator (SF_PRIVATE *psf, const SF
 static SF_CHUNK_ITERATOR * aiff_next_chunk_iterator (SF_PRIVATE *psf, SF_CHUNK_ITERATOR * iterator) ;
 static int aiff_get_chunk_size (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
 static int aiff_get_chunk_data (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
+
 /*------------------------------------------------------------------------------
 ** Public function.
 */

@@ -234,7 +234,7 @@ typedef struct
 
 typedef struct
 {	int64_t		hash ;
-	char	id [64] ;
+	char		id [64] ;
 	unsigned	id_size ;
 	uint32_t	mark32 ;
 	sf_count_t	offset ;
@@ -263,9 +263,9 @@ typedef struct
 typedef struct SF_CHUNK_ITERATOR
 {	uint32_t	current ;
 	int64_t		hash ;
-	char	id [64] ;
+	char		id [64] ;
 	unsigned	id_size ;
-	SNDFILE	*sndfile ;
+	SNDFILE		*sndfile ;
 } SF_CHUNK_ITERATOR ;
 
 static inline size_t
