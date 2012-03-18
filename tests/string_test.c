@@ -645,7 +645,7 @@ software_string_test (const char *filename)
 
 	for (k = 0 ; k < 50 ; k++)
 	{	const char *result ;
-		char sfname [64] ;
+		char sfname [64] = "" ;
 		SNDFILE *file ;
 		SF_INFO info ;
 
