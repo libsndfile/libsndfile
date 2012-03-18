@@ -126,14 +126,21 @@ class CStyleChecker:
 			, ( re.compile ("[^\s\(\[\*&']\("),				"missing space before open parenthesis" )
 			, ( re.compile ("\)(-[^>]|[^,'\s\n\)\]-])"),	"missing space after close parenthesis" )
 			, ( re.compile ("\s(do|for|if|when)\s.*{$"),	"trailing open parenthesis at end of line" )
+			, ( re.compile ("\( [^;]"),						"space after open parenthesis" )
+			, ( re.compile ("[^;] \)"),						"space before close parenthesis" )
 
 			# Open and close square brace.
 			, ( re.compile ("[^\s\(\]]\["),			"missing space before open square brace" )
 			, ( re.compile ("\][^,\)\]\[\s\.-]"),	"missing space after close square brace" )
+			, ( re.compile ("\[ "),					"space after open square brace" )
+			, ( re.compile (" \]"),					"space before close square brace" )
 
 			# Space around operators.
 			, ( re.compile ("[^\s][\*/%+-][=][^\s]"),		"missing space around opassign" )
 			, ( re.compile ("[^\s][<>!=^/][=]{1,2}[^\s]"),	"missing space around comparison" )
+
+			# Parens around single argument to return.
+			, ( re.compile ("\s+return\s+\([a-zA-Z0-9_]+\)\s+;"),	"parens around return value" )
 			]
 
 	def get_error_count (self):
