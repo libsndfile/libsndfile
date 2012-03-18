@@ -112,6 +112,8 @@ alac_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 	if ((psf->codec_data = calloc (1, sizeof (ALAC_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 
+	psf->codec_close = alac_close ;
+
 	switch (psf->file.mode)
 	{	case SFM_RDWR :
 			return SFE_BAD_MODE_RW ;
@@ -131,7 +133,6 @@ alac_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 			return SFE_INTERNAL ;
 		} ;
 
-	psf->codec_close = alac_close ;
 	psf->byterate = alac_byterate ;
 
 	return 0 ;
@@ -191,6 +192,9 @@ alac_close	(SF_PRIVATE *psf)
 		chunk_info.data = alac_pakt_encode (plac->pakt_info, &pakt_size) ;
 		chunk_info.datalen = pakt_size ;
 		psf_save_write_chunk (&psf->wchunks, &chunk_info) ;
+
+		free (chunk_info.data) ;
+		chunk_info.data = NULL ;
 
 		psf->write_header (psf, 1) ;
 
@@ -285,13 +289,10 @@ alac_writer_init (SF_PRIVATE *psf)
 	ALAC_PRIVATE	*plac ;
 	uint32_t		alac_format_flags = 0 ;
 
+	plac = psf->codec_data ;
+
 	if (psf->file.mode != SFM_WRITE)
 		return SFE_BAD_MODE_RW ;
-
-	if ((plac = calloc (1, sizeof (ALAC_PRIVATE))) == NULL)
-		return SFE_MALLOC_FAILED ;
-
-	psf->codec_data = plac ;
 
 	plac->channels	= psf->sf.channels ;
 	plac->kuki_size = alac_get_magic_cookie_size (psf->sf.channels) ;
@@ -801,8 +802,7 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 	snprintf (chunk_info.id, sizeof (chunk_info.id), "pakt") ;
 	chunk_info.id_size = 4 ;
 
-	chunk_iterator = psf->create_chunk_iterator (psf, &chunk_info) ;
-	if ((chunk_iterator = psf->create_chunk_iterator (psf, &chunk_info)) == NULL)
+	if ((chunk_iterator = psf_get_chunk_iterator (psf, chunk_info.id)) == NULL)
 	{	printf ("%s %d : no chunk iterator found\n\n", __func__, __LINE__) ;
 		free (chunk_info.data) ;
 		chunk_info.data = NULL ;

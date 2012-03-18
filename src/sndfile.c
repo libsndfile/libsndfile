@@ -2608,6 +2608,7 @@ psf_close (SF_PRIVATE *psf)
 			free (psf->wchunks.chunks [k].data) ;
 	free (psf->rchunks.chunks) ;
 	free (psf->wchunks.chunks) ;
+	free (psf->iterator) ;
 
 	memset (psf, 0, sizeof (SF_PRIVATE)) ;
 	free (psf) ;
@@ -2994,20 +2995,16 @@ sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
 } /* sf_set_chunk */
 
 SF_CHUNK_ITERATOR *
-sf_create_chunk_iterator (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
+sf_get_chunk_iterator (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
 {	SF_PRIVATE 	*psf ;
-	SF_CHUNK_ITERATOR 	*iterator = NULL ;
 
 	VALIDATE_SNDFILE_AND_ASSIGN_PSF (sndfile, psf, 1) ;
 
-	if (psf->create_chunk_iterator)
-		iterator = psf->create_chunk_iterator (psf, chunk_info) ;
+	if (chunk_info)
+		return psf_get_chunk_iterator (psf, chunk_info->id) ;
 
-	if (iterator)
-		iterator->sndfile = sndfile ;
-
-	return iterator ;
-} /* sf_create_chunk_iterator */
+	return psf_get_chunk_iterator (psf, NULL) ;
+} /* sf_get_chunk_iterator */
 
 SF_CHUNK_ITERATOR *
 sf_next_chunk_iterator (SF_CHUNK_ITERATOR * iterator)

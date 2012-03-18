@@ -717,16 +717,21 @@ typedef	struct SF_CHUNK_ITERATOR SF_CHUNK_ITERATOR ;
 /* Get an iterator for all chunks matching chunk_info.
 ** The iterator will point to the first chunk matching chunk_info.
 ** Chunks are matching, if (chunk_info->id) matches the first
-**     (chunk_info->id_size) bytes of a chunk found in the sndfile.
-** If chunk_info is NULL, an iterator to all chunks in the sndfile
+**     (chunk_info->id_size) bytes of a chunk found in the SNDFILE* handle.
+** If chunk_info is NULL, an iterator to all chunks in the SNDFILE* handle
 **     is returned.
 ** The values of chunk_info->datalen and chunk_info->data are ignored.
 ** If no matching chunks are found in the sndfile, NULL is returned.
-** The returned iterator will stay valid until either the sndfile is
-**     closed or any new chunk is added using sf_set_chunk().
+** The returned iterator will stay valid until one of the following occurs:
+**     a) The sndfile is closed.
+**     b) A new chunk is added using sf_set_chunk().
+**     c) Another chunk iterator function is called on the same SNDFILE* handle
+**        that causes the iterator to be modified.
+** The memory for the iterator belongs to the SNDFILE* handle and is freed when
+** sf_close() is called.
 */
 SF_CHUNK_ITERATOR *
-sf_create_chunk_iterator (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info) ;
+sf_get_chunk_iterator (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info) ;
 
 /* Iterate through chunks by incrementing the iterator.
 ** Increments the iterator and returns a handle to the new one.

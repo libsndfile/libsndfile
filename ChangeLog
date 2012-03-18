@@ -1,3 +1,12 @@
+2012-02-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/*.c tests/chunk_test.c
+    Reworking of custom chunk handling code.
+    - Memory for the iterator is now attached to the SF_PRIVATE struct and
+      freed one sf_close().
+    - Rename sf_create_chunk_iterator() ->  sf_get_chunk_iterator().
+    - Each SNDFILE handle never has more than one SF_CHUNK_ITERATOR handle.
+
 2012-02-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/*.c tests/chunk_test.c

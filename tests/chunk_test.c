@@ -34,7 +34,10 @@
 #define	BUFFER_LEN			(1 << 10)
 #define LOG_BUFFER_SIZE		1024
 
-static void	chunk_test (const char *filename, int typemajor) ;
+static void	chunk_test (const char *filename, int format) ;
+
+static void
+chunk_test_helper (const char *filename, int format, const char * testdata) ;
 
 int
 main (int argc, char *argv [])
@@ -53,19 +56,20 @@ main (int argc, char *argv [])
 	do_all = ! strcmp (argv [1], "all") ;
 
 	if (do_all || ! strcmp (argv [1], "wav"))
-	{	chunk_test ("chunks.wav", SF_FORMAT_WAV) ;
-		chunk_test ("chunks.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
-		chunk_test ("chunks.wavex", SF_FORMAT_WAVEX) ;
+	{	chunk_test ("chunks_pcm16.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+		chunk_test ("chunks_pcm16.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+		chunk_test ("chunks_pcm16.wavex", SF_FORMAT_WAVEX | SF_FORMAT_PCM_16) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "aiff"))
-	{	chunk_test ("chunks.aiff", SF_FORMAT_AIFF) ;
+	{	chunk_test ("chunks_pcm16.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_16) ;
 		test_count++ ;
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "caf"))
-	{	chunk_test ("chunks.caf", SF_FORMAT_CAF) ;
+	{	chunk_test ("chunks_pcm16.caf", SF_FORMAT_CAF | SF_FORMAT_PCM_16) ;
+		chunk_test ("chunks_alac.caf", SF_FORMAT_CAF | SF_FORMAT_ALAC_16) ;
 		test_count++ ;
 		} ;
 
@@ -85,29 +89,29 @@ main (int argc, char *argv [])
 */
 
 static void
-chunk_test_helper (const char *filename, int typemajor, const char * testdata)
+chunk_test_helper (const char *filename, int format, const char * testdata)
 {	SNDFILE			*file ;
 	SF_INFO			sfinfo ;
 	SF_CHUNK_INFO	chunk_info ;
 	SF_CHUNK_ITERATOR * iterator ;
 	uint32_t		length_before ;
-	int				err ;
+	int				err, allow_fd ;
+
+	switch (format & SF_FORMAT_SUBMASK)
+	{	case SF_FORMAT_ALAC_16 :
+			allow_fd = SF_FALSE ;
+			break ;
+		default :
+			allow_fd = SF_TRUE ;
+			break ;
+		} ;
 
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 1 ;
 	sfinfo.frames		= 0 ;
+	sfinfo.format		= format ;
 
-	switch (typemajor)
-	{	case SF_FORMAT_OGG :
-			sfinfo.format = typemajor | SF_FORMAT_VORBIS ;
-			break ;
-
-		default :
-			sfinfo.format = typemajor | SF_FORMAT_PCM_16 ;
-			break ;
-		} ;
-
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__) ;
 
 	/* Set up the chunk to write. */
 	memset (&chunk_info, 0, sizeof (chunk_info)) ;
@@ -129,13 +133,13 @@ chunk_test_helper (const char *filename, int typemajor, const char * testdata)
 
 	sf_close (file) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, allow_fd, __LINE__) ;
 
 	memset (&chunk_info, 0, sizeof (chunk_info)) ;
 	snprintf (chunk_info.id, sizeof (chunk_info.id), "Test") ;
 	chunk_info.id_size = 4 ;
 
-	iterator = sf_create_chunk_iterator (file, &chunk_info) ;
+	iterator = sf_get_chunk_iterator (file, &chunk_info) ;
 	err = sf_get_chunk_size (iterator, &chunk_info) ;
 	exit_if_true (
 		err != SF_ERR_NO_ERROR,
@@ -166,32 +170,30 @@ chunk_test_helper (const char *filename, int typemajor, const char * testdata)
 } /* chunk_test_helper */
 
 static void
-multichunk_test_helper (const char *filename, int typemajor, const char * testdata [], size_t testdata_len)
+multichunk_test_helper (const char *filename, int format, const char * testdata [], size_t testdata_len)
 {	SNDFILE			*file ;
 	SF_INFO			sfinfo ;
 	SF_CHUNK_INFO	chunk_info ;
 	SF_CHUNK_ITERATOR * iterator ;
-	uint32_t		* length_before ;
-	int				err ;
-	size_t		i ;
-
-	length_before = calloc (testdata_len, sizeof (*length_before)) ;
+	uint32_t		length_before [testdata_len] ;
+	int				err, allow_fd ;
+	size_t			i ;
 
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 1 ;
 	sfinfo.frames		= 0 ;
+	sfinfo.format		= format ;
 
-	switch (typemajor)
-	{	case SF_FORMAT_OGG :
-			sfinfo.format = typemajor | SF_FORMAT_VORBIS ;
+	switch (format & SF_FORMAT_SUBMASK)
+	{	case SF_FORMAT_ALAC_16 :
+			allow_fd = SF_FALSE ;
 			break ;
-
 		default :
-			sfinfo.format = typemajor | SF_FORMAT_PCM_16 ;
+			allow_fd = SF_TRUE ;
 			break ;
 		} ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__) ;
 
 	/* Set up the chunk to write. */
 	for (i = 0 ; i < testdata_len ; i++)
@@ -216,13 +218,13 @@ multichunk_test_helper (const char *filename, int typemajor, const char * testda
 
 	sf_close (file) ;
 
-	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, allow_fd, __LINE__) ;
 
 	memset (&chunk_info, 0, sizeof (chunk_info)) ;
 	snprintf (chunk_info.id, sizeof (chunk_info.id), "Test") ;
 	chunk_info.id_size = 4 ;
 
-	iterator = sf_create_chunk_iterator (file, &chunk_info) ;
+	iterator = sf_get_chunk_iterator (file, &chunk_info) ;
 
 	i = 0 ;
 	while (iterator)
@@ -270,13 +272,12 @@ multichunk_test_helper (const char *filename, int typemajor, const char * testda
 	}
 
 	sf_close (file) ;
-	free (length_before) ;
 	unlink (filename) ;
 } /* multichunk_test_helper */
 
 
 static void
-chunk_test (const char *filename, int typemajor)
+chunk_test (const char *filename, int format)
 {	const char*		testdata [] =
 	{	"There can be only one.", "", "A", "AB", "ABC", "ABCD", "ABCDE" } ;
 	uint32_t k ;
@@ -284,9 +285,9 @@ chunk_test (const char *filename, int typemajor)
 	print_test_name (__func__, filename) ;
 
 	for (k = 0 ; k < ARRAY_LEN (testdata) ; k++)
-		chunk_test_helper (filename, typemajor, testdata [k]) ;
+		chunk_test_helper (filename, format, testdata [k]) ;
 
-	multichunk_test_helper (filename, typemajor, testdata, ARRAY_LEN (testdata)) ;
+	multichunk_test_helper (filename, format, testdata, ARRAY_LEN (testdata)) ;
 
 	puts ("ok") ;
 } /* chunk_test */
