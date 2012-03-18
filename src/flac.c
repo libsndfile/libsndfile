@@ -723,7 +723,7 @@ flac_enc_init (SF_PRIVATE *psf)
 	**     "FLAC supports linear sample rates from 1Hz - 655350Hz in 1Hz
 	**     increments."
 	*/
-	if ( psf->sf.samplerate < 1 || psf->sf.samplerate > 655350 )
+	if (psf->sf.samplerate < 1 || psf->sf.samplerate > 655350)
 	{	psf_log_printf (psf, "flac sample rate out of range.\n", psf->sf.samplerate) ;
 		return SFE_FLAC_BAD_SAMPLE_RATE ;
 		} ;

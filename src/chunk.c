@@ -98,7 +98,7 @@ psf_next_chunk_iterator (const READ_CHUNKS * pchk , SF_CHUNK_ITERATOR * iterator
 				return iterator ;
 				}
 		}
-	else if (iterator->current < pchk->used )
+	else if (iterator->current < pchk->used)
 		return iterator ;
 
 	/* No match, clear iterator and return NULL */

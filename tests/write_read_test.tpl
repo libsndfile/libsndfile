@@ -900,12 +900,12 @@ mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int lo
 		} ;
 
 	if (sfinfo.frames < 3 * DATA_LENGTH)
-	{	printf ("\n\nLine %d : Not enough frames in file. (%" PRId64 " < %d)\n", __LINE__, sfinfo.frames, 3 * DATA_LENGTH ) ;
+	{	printf ("\n\nLine %d : Not enough frames in file. (%" PRId64 " < %d)\n", __LINE__, sfinfo.frames, 3 * DATA_LENGTH) ;
 		exit (1) ;
 		}
 
 	if (! long_file_ok && sfinfo.frames != 3 * DATA_LENGTH)
-	{	printf ("\n\nLine %d : Incorrect number of frames in file. (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, 3 * DATA_LENGTH ) ;
+	{	printf ("\n\nLine %d : Incorrect number of frames in file. (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, 3 * DATA_LENGTH) ;
 		exit (1) ;
 		} ;
 

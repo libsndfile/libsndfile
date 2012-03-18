@@ -699,7 +699,7 @@ string_rdwr_grow_test (const char *filename, int typemajor)
 	test_write_short_or_die (file, 0, data_out, BUFFER_LEN, __LINE__) ;
 
 	/* Write some strings at end of file. */
-	sf_set_string (file, SF_STR_TITLE , title ) ;
+	sf_set_string (file, SF_STR_TITLE , title) ;
 	sf_set_string (file, SF_STR_COMMENT, comment) ;
 	sf_close (file) ;
 
@@ -750,7 +750,7 @@ string_header_update (const char *filename, int typemajor)
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 	test_write_short_or_die (file, 0, data_out, BUFFER_LEN, __LINE__) ;
-	sf_set_string ( file, SF_STR_TITLE, long_title ) ;
+	sf_set_string (file, SF_STR_TITLE, long_title) ;
 	sf_close (file) ;
 
 

@@ -339,7 +339,7 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		case WAVE_FORMAT_EXTENSIBLE :
 
 			/* with WAVE_FORMAT_EXTENSIBLE the psf->sf.format field is already set. We just have to set the major to rf64 */
-			psf->sf.format = (psf->sf.format & ~SF_FORMAT_TYPEMASK ) | SF_FORMAT_RF64 ;
+			psf->sf.format = (psf->sf.format & ~SF_FORMAT_TYPEMASK) | SF_FORMAT_RF64 ;
 
 			if (psf->sf.format == (SF_FORMAT_WAVEX | SF_FORMAT_MS_ADPCM))
 			{	*blockalign = wav_fmt->msadpcm.blockalign ;

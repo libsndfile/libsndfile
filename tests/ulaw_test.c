@@ -208,16 +208,16 @@ unsigned char ulaw_encode (int sample)
 
 	/* Get the sample into sign-magnitude. */
 	sign = (sample >> 8) & 0x80 ;					/* set aside the sign */
-	if ( sign != 0 )
+	if (sign != 0)
 		sample = -sample ;							/* get magnitude */
-	if ( sample > uCLIP )
+	if (sample > uCLIP)
 		sample = uCLIP ;							/* clip the magnitude */
 
 	/* Convert from 16 bit linear to ulaw. */
 	sample = sample + uBIAS ;
-	exponent = exp_lut [( sample >> 7 ) & 0xFF] ;
-	mantissa = (sample >> ( exponent + 3 ) ) & 0x0F ;
-	ulawbyte = ~ (sign | ( exponent << 4 ) | mantissa) ;
+	exponent = exp_lut [(sample >> 7) & 0xFF] ;
+	mantissa = (sample >> (exponent + 3)) & 0x0F ;
+	ulawbyte = ~ (sign | (exponent << 4) | mantissa) ;
 
 	return ulawbyte ;
 } /* ulaw_encode */

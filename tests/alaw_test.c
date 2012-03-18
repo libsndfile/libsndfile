@@ -202,7 +202,7 @@ unsigned char alaw_encode (int sample)
 	/* Convert from 16 bit linear to ulaw. */
 	if (sample >= 256)
 	{	exponent = exp_lut [(sample >> 8) & 0x7F] ;
-		mantissa = ( sample >> ( exponent + 3 ) ) & 0x0F ;
+		mantissa = (sample >> (exponent + 3)) & 0x0F ;
 		Alawbyte = ((exponent << 4) | mantissa) ;
 		}
 	else
@@ -222,9 +222,9 @@ int alaw_decode (unsigned int Alawbyte)
 	sign = (Alawbyte & 0x80) ;
 	Alawbyte &= 0x7f ;			/* get magnitude */
 	if (Alawbyte >= 16)
-	{	exponent = (Alawbyte >> 4 ) & 0x07 ;
+	{	exponent = (Alawbyte >> 4) & 0x07 ;
 		mantissa = Alawbyte & 0x0F ;
-		sample = exp_lut [exponent] + (mantissa << ( exponent + 3 )) ;
+		sample = exp_lut [exponent] + (mantissa << (exponent + 3)) ;
 		}
 	else
 		sample = (Alawbyte << 4) + 8 ;
