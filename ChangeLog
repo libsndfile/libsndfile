@@ -1,4 +1,4 @@
-2012-02-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2012-03-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/*.c tests/chunk_test.c
     Reworking of custom chunk handling code.
@@ -10,7 +10,7 @@
     * tests/string_test.c
     Fix un-initialised char buffer.
 
-2012-02-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2012-03-17  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/*.c tests/chunk_test.c
     Add improved handling of custom chunk getting and settings. Set of patches
@@ -19,7 +19,7 @@
     * src/alac.c
     Fix calculated frame count for files with zero block length.
 
-2012-02-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2012-03-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/avr.c
     Remove double assignment to psf->endian. Thanks Kao Dome.
@@ -36,7 +36,7 @@
     * src/common.h src/*.c
     Fix a bunch of valgrind errors.
 
-2012-02-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2012-03-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
     Fix typo in error string 'Uknown' -> 'Unknown'.
@@ -44,7 +44,7 @@
     * tests/fix_this.c
     Fix potential int overflow.
 
-2012-02-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2012-03-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/alac.c
     Fix decoding of last block so that the decode length is not a multiple of
@@ -54,7 +54,7 @@
     Fix for MinGW cross compiling. Use '#if (defined __*66__)' instead of
     '#if __*86__' because the MinGW header use '#ifdef __x86_64__'.
 
-2012-02-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2012-03-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ALAC/ src/alac.c
     Unify the interface between libsndfile and Apple ALAC codec. Regardless of
@@ -76,13 +76,13 @@
     * tests/pipe_test.tpl
     Disable tests on OS/2. Thanks Dave Yeo.
 
-2012-02-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2012-03-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac src/sfconfig.h src/sfendian.h
     For GCC, use inline assembler for endian swapping. This should work with
     older versions of GCC like the one currently used in OS/2.
 
-2012-02-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2012-03-06  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/alac.c
     Make sure temp file gets opened in binary mode.
@@ -99,7 +99,7 @@
     * tests/floating_point_test.tpl tests/write_read_test.tpl
     Add tests for 32 bit ALAC/CAF files.
 
-2012-02-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2012-03-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/
     Refactor chunk storage so it work on big as well as little endian CPUs.
@@ -124,7 +124,7 @@
     * src/sfconfig.h
     Make sure HAVE_X86INTRIN_H is either 1 or 0.
 
-2012-02-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2012-03-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ALAC/*
     Big dump of code for Apple's ALAC file format. The copyyright to this code
@@ -143,12 +143,12 @@
     * tests/write_read_test.tpl
     Expand tests to cover ALAC.
 
-2012-02-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2012-03-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c src/wav.c
     Fix a couple of regressions from version 1.0.25.
 
-2012-02-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+2012-03-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/strings.c
     Minor refactoring. Make sure that the memory allocation size if always > 0
