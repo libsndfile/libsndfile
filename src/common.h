@@ -260,13 +260,13 @@ typedef struct
 	WRITE_CHUNK	*chunks ;
 } WRITE_CHUNKS ;
 
-typedef struct SF_CHUNK_ITERATOR
+struct SF_CHUNK_ITERATOR
 {	uint32_t	current ;
 	int64_t		hash ;
 	char		id [64] ;
 	unsigned	id_size ;
 	SNDFILE		*sndfile ;
-} SF_CHUNK_ITERATOR ;
+} ;
 
 static inline size_t
 make_size_t (int x)
