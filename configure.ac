@@ -475,7 +475,7 @@ if test x"$ac_cv_prog_HAVE_AUTOGEN" = "xno" ; then
 
 htmldocdir=$prefix/share/doc/libsndfile1-dev/html
 
-if test $prefix = "NONE" ; then
+if test x$prefix = "xNONE" ; then
 	htmldocdir=/usr/local/share/doc/libsndfile1-dev/html
 else
 	htmldocdir=$prefix/share/doc/libsndfile1-dev/html
