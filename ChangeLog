@@ -1,5 +1,11 @@
 2012-03-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
+    * src/alac.c
+    Fix segfault when decoding CAF/ALAC file with more than 4 channels.
+    Fixes github issue #8 reported by Charles Van Winkle.
+
+2012-03-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
     * src/common.h
     Change 'typedef SF_CHUNK_ITERATOR { ... } SF_CHUNK_ITERATOR' into 'struct
     SF_CHUNK_ITERATOR { ... }' to prevent older compilers from complaining of

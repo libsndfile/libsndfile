@@ -29,9 +29,8 @@
 #include	"ALAC/alac_codec.h"
 #include	"ALAC/ALACBitUtilities.h"
 
-#define		ALAC_MAX_FRAME_SIZE		32800
-
-#define		ALAC_PACKET_MARKER		0xa1acc0d3
+#define		ALAC_MAX_FRAME_SIZE		8192
+#define		ALAC_BYTE_BUFFER_SIZE	32768
 
 #define		kuki_MARKER				MAKE_MARKER ('k', 'u', 'k', 'i')
 #define		pakt_MARKER				MAKE_MARKER ('p', 'a', 'k', 't')
@@ -41,15 +40,15 @@ typedef struct
 	uint32_t	packet_size [] ;
 } PAKT_INFO ;
 
-typedef struct ALAC_PRIVATE_tag
-{	PAKT_INFO	* pakt_info ;
+typedef struct
+{	sf_count_t	input_data_pos ;
 
-	sf_count_t	input_data_pos ;
+	PAKT_INFO	* pakt_info ;
 
 	int			channels, final_write_block ;
 
-	uint32_t	frames_this_block, partial_block_frames, frames_per_block, kuki_size ;
-	uint32_t	bits_per_sample, decode_bytes_per_frame_is_this_needed ;
+	uint32_t	frames_this_block, partial_block_frames, frames_per_block ;
+	uint32_t	bits_per_sample, kuki_size ;
 
 
 	/* Can't have a decoder and an encoder at the same time so stick
@@ -60,10 +59,10 @@ typedef struct ALAC_PRIVATE_tag
 		ALAC_ENCODER encoder ;
 	} ;
 
-	char enctmpname [256] ;
+	char enctmpname [512] ;
 	FILE *enctmp ;
 
-	int	buffer	[ALAC_MAX_FRAME_SIZE / 4] ;
+	int	buffer	[] ;
 
 } ALAC_PRIVATE ;
 
@@ -109,7 +108,7 @@ int
 alac_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 {	int error ;
 
-	if ((psf->codec_data = calloc (1, sizeof (ALAC_PRIVATE))) == NULL)
+	if ((psf->codec_data = calloc (1, sizeof (ALAC_PRIVATE) + psf->sf.channels * sizeof (int) * ALAC_MAX_FRAME_SIZE)) == NULL)
 		return SFE_MALLOC_FAILED ;
 
 	psf->codec_close = alac_close ;
@@ -241,7 +240,6 @@ alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 	plac->channels			= psf->sf.channels ;
 	plac->frames_per_block	= info->frames_per_packet ;
 	plac->bits_per_sample	= info->bits_per_sample ;
-	plac->decode_bytes_per_frame_is_this_needed = info->bits_per_sample / 8 * psf->sf.channels ;
 
 	if (plac->pakt_info != NULL)
 		free (plac->pakt_info) ;
@@ -392,7 +390,7 @@ alac_reader_calc_frames (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 static int
 alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 {	ALAC_DECODER *pdec = &plac->decoder ;
-	uint8_t		byte_buffer [ALAC_MAX_FRAME_SIZE] ;
+	uint8_t		byte_buffer [ALAC_BYTE_BUFFER_SIZE] ;
 	uint32_t	packet_size ;
 	BitBuffer	bit_buffer ;
 
@@ -406,7 +404,7 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 	psf_fseek (psf, plac->input_data_pos, SEEK_SET) ;
 
 	if (packet_size > SIGNED_SIZEOF (byte_buffer))
-	{	psf_log_printf (psf, "%s : bad packet_size (%zd)\n", __func__, packet_size) ;
+	{	psf_log_printf (psf, "%s : bad packet_size (%u)\n", __func__, packet_size) ;
 		return 0 ;
 		} ;
 
@@ -428,7 +426,7 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 static int
 alac_encode_block (SF_PRIVATE * UNUSED (psf), ALAC_PRIVATE *plac)
 {	ALAC_ENCODER *penc = &plac->encoder ;
-	uint8_t	byte_buffer [ALAC_MAX_FRAME_SIZE] ;
+	uint8_t	byte_buffer [ALAC_BYTE_BUFFER_SIZE] ;
 	int32_t num_bytes = 0 ;
 
 // printf ("%s : raw_bytes %d -> ", __func__, plac->partial_block_frames * plac->bits_per_sample / 8) ;
