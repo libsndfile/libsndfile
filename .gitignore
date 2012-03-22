@@ -1,3 +1,4 @@
+*.8svx
 *.aif
 *.aifc
 *.aiff
@@ -9,6 +10,7 @@
 *.la
 *.lo
 *.loT
+*.o
 *.oct
 *.oga
 *.ogg
@@ -20,7 +22,7 @@
 *.w64
 *.wav
 *.wavex
-*.8svx
+.DS_Store
 .deps
 .dirstamp
 .git*
