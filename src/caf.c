@@ -382,18 +382,23 @@ caf_read_header (SF_PRIVATE *psf)
 
 	psf->sf.channels = desc.channels_per_frame ;
 
-	while (have_data == 0 && psf_ftell (psf) < psf->filelength - SIGNED_SIZEOF (marker))
+	while (have_data == 0 && psf_ftell (psf) < psf->filelength)
 	{	marker = 0 ;
 		chunk_size = 0 ;
 
 		psf_binheader_readf (psf, "mE8", &marker, &chunk_size) ;
+		if (marker == 0)
+		{	psf_log_printf (psf, "Have 0 marker.\n") ;
+			break ;
+			} ;
+
 		psf_store_read_chunk_u32 (&psf->rchunks, marker, psf_ftell (psf), chunk_size) ;
 
 		switch (marker)
 		{	case peak_MARKER :
 				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
 				if (chunk_size != CAF_PEAK_CHUNK_SIZE (psf->sf.channels))
-				{	psf_binheader_readf (psf, "j", (int) chunk_size) ;
+				{	psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
 					psf_log_printf (psf, "*** File PEAK chunk %D should be %d.\n", chunk_size, CAF_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
 					return SFE_CAF_BAD_PEAK ;
 					} ;
@@ -424,7 +429,7 @@ caf_read_header (SF_PRIVATE *psf)
 			case chan_MARKER :
 				if (chunk_size < 12)
 				{	psf_log_printf (psf, "%M : %D (should be >= 12)\n", marker, chunk_size) ;
-					psf_binheader_readf (psf, "j", (int) chunk_size) ;
+					psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
 					break ;
 					}
 
@@ -436,7 +441,7 @@ caf_read_header (SF_PRIVATE *psf)
 
 			case free_MARKER :
 				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
-				psf_binheader_readf (psf, "j", (int) chunk_size) ;
+				psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
 				break ;
 
 			case data_MARKER :
@@ -452,18 +457,18 @@ caf_read_header (SF_PRIVATE *psf)
 			case kuki_MARKER :
 				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
 				pcaf->alac.kuki_offset = psf_ftell (psf) - 12 ;
-				psf_binheader_readf (psf, "j", (int) chunk_size) ;
+				psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
 				break ;
 
 			case pakt_MARKER :
 				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
 				pcaf->alac.pakt_offset = psf_ftell (psf) - 12 ;
-				psf_binheader_readf (psf, "j", (int) chunk_size) ;
+				psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
 				break ;
 
 			default :
 				psf_log_printf (psf, "%M : %D (skipped)\n", marker, chunk_size) ;
-				psf_binheader_readf (psf, "j", (int) chunk_size) ;
+				psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
 				break ;
 			} ;
 		} ;
