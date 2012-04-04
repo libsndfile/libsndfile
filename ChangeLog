@@ -1,8 +1,13 @@
+2012-04-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/FAQ.html
+    Fix text. Thanks to Richard Collins.
+
 2012-03-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/caf.c
-    Exit parse loop if the make is zero. Pass jump offsets as size_t instead of
-    int.
+    Exit parse loop if the marker is zero. Pass jump offsets as size_t instead
+    of int.
 
 2012-03-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
