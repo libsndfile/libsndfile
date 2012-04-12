@@ -416,6 +416,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 		marker = chunk_size = 0 ;
 		psf_binheader_readf (psf, "Ejm4", jump, &marker, &chunk_size) ;
+		if (marker == 0)
+		{	psf_log_printf (psf, "Have 0 marker.\n") ;
+			break ;
+			} ;
 
 		if (psf->file.mode == SFM_RDWR && (found_chunk & HAVE_SSND))
 			return SFE_AIFF_RW_SSND_NOT_LAST ;

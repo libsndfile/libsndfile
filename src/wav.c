@@ -349,6 +349,10 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 		marker = chunk_size = 0 ;
 		psf_binheader_readf (psf, "jm4", jump, &marker, &chunk_size) ;
+		if (marker == 0)
+		{	psf_log_printf (psf, "Have 0 marker.\n") ;
+			break ;
+			} ;
 
 		psf_store_read_chunk_u32 (&psf->rchunks, marker, psf_ftell (psf), chunk_size) ;
 

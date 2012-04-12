@@ -4,6 +4,9 @@
     Fix regression in handling of odd length SSND chunks.
     Thanks Olivier Tristan for the example file.
 
+    * src/aiff.c src/wav.c
+    Exit parser loop when marker == 0.
+
 2012-04-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html
