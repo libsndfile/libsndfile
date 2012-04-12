@@ -1,6 +1,12 @@
+2012-04-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/aiff.c
+    Fix regression in handling of odd length SSND chunks.
+    Thanks Olivier Tristan for the example file.
+
 2012-04-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
-    * src/FAQ.html
+    * doc/FAQ.html
     Fix text. Thanks to Richard Collins.
 
 2012-03-24  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
