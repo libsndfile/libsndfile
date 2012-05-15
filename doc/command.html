@@ -202,8 +202,13 @@
 </TR>
 
 <TR>
-	<TD><A HREF="#SFC_SET_BROADCAST_INFO">SFC_SET_BROADCAST_INFO</A></TD>
-	<TD>Set the Broadcast Chunk info</TD>
+	<TD><A HREF="#SFC_SET_CART_INFO">SFC_SET_CART_INFO</A></TD>
+	<TD>Set the Cart Chunk info</TD>
+</TR>
+
+<TR>
+	<TD><A HREF="#SFC_GET_CART_INFO">SFC_GET_CART_INFO</A></TD>
+	<TD>Retrieve the Cart Chunk info</TD>
 </TR>
 
 <TR>
@@ -1411,7 +1416,81 @@ Parameters:
 <DT>Return value: </DT>
 	<DD>SF_TRUE if setting the Broadcast Extension chunk was successful and SF_FALSE
 	otherwise.
+
 </DL>
+
+<!-- ========================================================================= -->
+<A NAME="SFC_GET_CART_INFO"></A>
+<H2><BR><B>SFC_GET_CART_INFO</B></H2>
+<P>Retrieve the Cart Chunk from WAV (and related) files.  Based on AES46 standard for CartChunk (see <a href="http://www.cartchunk.org/">CartChunk.org</a> for more information. 
+</P>
+<p>
+Parameters:
+</p>
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_GET_CART_INFO
+        data     : a pointer to an SF_CART_INFO struct
+        datasize : sizeof (SF_CART_INFO)
+</PRE>
+<P>
+The SF_CART_INFO struct is defined in &lt;sndfile.h&gt; as:
+</P>
+<PRE>
+#define SF_CART_INFO_VAR(p_tag_text_size) \
+                        struct 
+                        {       char            version [4] ; 
+                                char            title [64] ; 
+                                char            artist [64] ; 
+                                char            cut_id [64] ; 
+                                char            client_id [64] ; 
+                                char            category [64] ; 
+                                char            classification [64] ; 
+                                char            out_cue [64] ; 
+                                char            start_date [10] ; 
+                                char            start_time [8] ; 
+                                char            end_date [10] ; 
+                                char            end_time [8] ; 
+                                char            producer_app_id [64] ; 
+                                char            producer_app_version [64] ; 
+                                char            user_def [64] ; 
+                                long    level_reference ; 
+                                SF_CART_TIMER   post_timers [8] ; 
+                                char            reserved [276] ; 
+                                char            url [1024] ; 
+                                unsigned int    tag_text_size ; 
+                                char            tag_text[p_tag_text_size] ; 
+                        }
+</PRE>
+
+<DL>
+<DT>Return value: </DT>
+	<DD>SF_TRUE if the file contained a Cart chunk or SF_FALSE
+	otherwise.
+</DL>
+
+<!-- ========================================================================= -->
+<A NAME="SFC_SET_CART_INFO"></A>
+<H2><BR><B>SFC_SET_CART_INFO</B></H2>
+<P>
+Set the Cart Chunk for WAV (and related) files.
+</P>
+<p>
+Parameters:
+</p>
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_SET_CART_INFO
+        data     : a pointer to an SF_CART_INFO struct
+        datasize : sizeof (SF_CART_INFO)
+</PRE>
+
+<DL>
+<DT>Return value: </DT>
+	<DD>SF_TRUE if setting the Cart chunk was successful and SF_FALSE
+	otherwise.
+</DL>
+<
 <!-- ========================================================================= -->
 
 <A NAME="SFC_GET_LOOP_INFO"></A>

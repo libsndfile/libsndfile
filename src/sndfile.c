@@ -95,7 +95,8 @@ ErrorStruct SndfileErrors [] =
 								, "Error : bad coding_history_size in SF_BROADCAST_INFO struct." },
 	{	SFE_BAD_BROADCAST_INFO_TOO_BIG
 								, "Error : SF_BROADCAST_INFO struct too large." },
-
+	{	SFE_BAD_CART_INFO_SIZE				, "Error: SF_CART_INFO struct too large." },
+	{	SFE_BAD_CART_INFO_TOO_BIG			, "Error: bag tag_text_size in SF_CART_INFO struct." },
 	{	SFE_INTERLEAVE_MODE		, "Attempt to write to file with non-interleaved data." },
 	{	SFE_INTERLEAVE_SEEK		, "Bad karma in seek during interleave read operation." },
 	{	SFE_INTERLEAVE_READ		, "Bad karma in read during interleave read operation." },
@@ -1188,6 +1189,34 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				return SF_FALSE ;
 				} ;
 			return broadcast_var_get (psf, data, datasize) ;
+
+		case SFC_SET_CART_INFO :
+			{	int format = SF_CONTAINER (psf->sf.format) ;
+				/* Only WAV and RF64 support cart chunk format */
+				if (format != SF_FORMAT_WAV && format != SF_FORMAT_RF64)
+					return SF_FALSE ;
+				} ;
+
+			/* Only makes sense in SFM_WRITE or SFM_RDWR mode */
+			if ((psf->file.mode != SFM_WRITE) && (psf->file.mode != SFM_RDWR))
+				return SF_FALSE ;
+			/* If data has already been written this must fail. */
+			if (psf->cart_16k == NULL && psf->have_written)
+			{	psf->error = SFE_CMD_HAS_DATA ;
+				return SF_FALSE ;
+				} ;
+			if (NOT (cart_var_set (psf, data, datasize)))
+				return SF_FALSE ;
+			if (psf->write_header)
+				psf->write_header (psf, SF_TRUE) ;
+			return SF_TRUE ;
+
+		case SFC_GET_CART_INFO :
+			if (data == NULL)
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
+				return SF_FALSE ;
+				} ;
+			return cart_var_get (psf, data, datasize) ;
 
 		case SFC_GET_INSTRUMENT :
 			if (datasize != sizeof (SF_INSTRUMENT) || data == NULL)

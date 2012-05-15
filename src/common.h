@@ -253,7 +253,6 @@ typedef struct
 	uint32_t	used ;
 	READ_CHUNK	*chunks ;
 } READ_CHUNKS ;
-
 typedef struct
 {	uint32_t	count ;
 	uint32_t	used ;
@@ -274,6 +273,8 @@ make_size_t (int x)
 } /* size_t_of_int */
 
 typedef SF_BROADCAST_INFO_VAR (16 * 1024) SF_BROADCAST_INFO_16K ;
+
+typedef SF_CART_INFO_VAR (16 * 1024) SF_CART_INFO_16K ;
 
 #if SIZEOF_WCHAR_T == 2
 typedef wchar_t	sfwchar_t ;
@@ -435,6 +436,9 @@ typedef struct sf_private_tag
 	/* Broadcast (EBU) Info */
 	SF_BROADCAST_INFO_16K *broadcast_16k ;
 
+	/* Cart (AES46) Info */
+	SF_CART_INFO_16K *cart_16k ;
+
 	/* Channel map data (if present) : an array of ints. */
 	int				*channel_map ;
 
@@ -577,6 +581,8 @@ enum
 	SFE_CMD_HAS_DATA,
 	SFE_BAD_BROADCAST_INFO_SIZE,
 	SFE_BAD_BROADCAST_INFO_TOO_BIG,
+	SFE_BAD_CART_INFO_SIZE,
+	SFE_BAD_CART_INFO_TOO_BIG,
 
 	SFE_STR_NO_SUPPORT,
 	SFE_STR_NOT_WRITE,
@@ -969,6 +975,10 @@ SF_BROADCAST_INFO_16K * broadcast_var_alloc (void) ;
 int		broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * data, size_t datasize) ;
 int		broadcast_var_get (SF_PRIVATE *psf, SF_BROADCAST_INFO * data, size_t datasize) ;
 
+
+SF_CART_INFO_16K * cart_var_alloc (void) ;
+int 		cart_var_set (SF_PRIVATE *psf, const SF_CART_INFO * date, size_t datasize) ;
+int		cart_var_get (SF_PRIVATE *psf, SF_CART_INFO * data, size_t datasize) ;
 
 typedef struct
 {	int channels ;
