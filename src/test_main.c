@@ -42,6 +42,7 @@ main (void)
 
 	test_psf_strlcpy_crlf () ;
 	test_broadcast_var () ;
+	test_cart_var () ;
 
 	return 0 ;
 } /* main */

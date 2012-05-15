@@ -49,6 +49,7 @@
 #define	data_MARKER		MAKE_MARKER ('d', 'a', 't', 'a')
 
 #define bext_MARKER		MAKE_MARKER ('b', 'e', 'x', 't')
+#define cart_MARKER		MAKE_MARKER ('c', 'a', 'r', 't')
 #define OggS_MARKER		MAKE_MARKER ('O', 'g', 'g', 'S')
 #define wvpk_MARKER 	MAKE_MARKER ('w', 'v', 'p', 'k')
 
@@ -148,7 +149,8 @@ enum
 {	HAVE_ds64	= 0x01,
 	HAVE_fmt	= 0x02,
 	HAVE_bext	= 0x04,
-	HAVE_data	= 0x08
+	HAVE_data	= 0x08,
+	HAVE_cart	= 0x10
 } ;
 
 #define HAVE_CHUNK(CHUNK)	((parsestage & CHUNK) != 0)
@@ -231,6 +233,12 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if ((error = wav_read_bext_chunk (psf, size32)) != 0)
 						return error ;
 					parsestage |= HAVE_bext ;
+					break ;
+
+			case cart_MARKER :
+					if ((error = wav_read_cart_chunk (psf, size32)) != 0)
+						return error ;
+					parsestage |= HAVE_cart ;
 					break ;
 
 			case data_MARKER :
@@ -600,6 +608,8 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->broadcast_16k != NULL)
 		wav_write_bext_chunk (psf) ;
 
+	if (psf->cart_16k != NULL)
+		wav_write_cart_chunk (psf) ;
 #if 0
 	/* The LIST/INFO chunk. */
 	if (psf->strings.flags & SF_STR_LOCATE_START)
