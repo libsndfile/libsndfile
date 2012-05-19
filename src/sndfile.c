@@ -595,8 +595,8 @@ sf_format_check	(const SF_INFO *info)
 				/* AIFF does allow both endian-nesses for PCM data.*/
 				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
 					return 1 ;
-				/* Other encodings. Check for endian-ness. */
-				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
+				/* For other encodings reject any endian-ness setting. */
+				if (endian != 0)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8)
 					return 1 ;

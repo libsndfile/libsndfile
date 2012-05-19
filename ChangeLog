@@ -1,3 +1,9 @@
+2012-05-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.c
+    sf_format_check: For SF_FORMAT_AIFF, reject endian-ness setttings for
+    non-PCM formats.
+
 2012-04-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/aiff.c
