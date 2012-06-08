@@ -272,7 +272,7 @@ AC_CHECK_FUNCS(setlocale)
 AC_CHECK_FUNCS(pipe waitpid)
 
 AC_CHECK_LIB([m],floor)
-AC_CHECK_FUNCS(floor ceil fmod)
+AC_CHECK_FUNCS(floor ceil fmod lround)
 
 MN_C99_FUNC_LRINT
 MN_C99_FUNC_LRINTF
