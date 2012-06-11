@@ -204,7 +204,7 @@ enum
 	/*
 	** SFC_SET_ADD_* values are deprecated and will disappear at some
 	** time in the future. They are guaranteed to be here up to and
-	** including version 1.0.8 to avoid breakage of existng software.
+	** including version 1.0.8 to avoid breakage of existing software.
 	** They currently do nothing and will continue to do nothing.
 	*/
 	SFC_SET_ADD_DITHER_ON_WRITE		= 0x1070,
@@ -431,7 +431,7 @@ typedef struct
 							/* a full bar of 7/8 is 7 beats */
 
 	float	bpm ;			/* suggestion, as it can be calculated using other fields:*/
-							/* file's lenght, file's sampleRate and our time_sig_den*/
+							/* file's length, file's sampleRate and our time_sig_den*/
 							/* -> bpms are always the amount of _quarter notes_ per minute */
 
 	int	root_key ;			/* MIDI note, or -1 for None */
@@ -492,7 +492,7 @@ SNDFILE* 	sf_open		(const char *path, int mode, SF_INFO *sfinfo) ;
 
 /* Use the existing file descriptor to create a SNDFILE object. If close_desc
 ** is TRUE, the file descriptor will be closed when sf_close() is called. If
-** it is FALSE, the descritor will not be closed.
+** it is FALSE, the descriptor will not be closed.
 ** When passed a descriptor like this, the library will assume that the start
 ** of file header is at the current file offset. This allows sound files within
 ** larger container files to be read and/or written.
@@ -530,7 +530,7 @@ const char*	sf_error_number	(int errnum) ;
 
 
 /* The following two error functions are deprecated but they will remain in the
-** library for the forseeable future. The function sf_strerror() should be used
+** library for the foreseeable future. The function sf_strerror() should be used
 ** in their place.
 */
 
@@ -687,7 +687,7 @@ SNDFILE* sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo) ;
 ** These functions allow the getting and setting of chunks within a sound file
 ** (for those formats which allow it).
 **
-** These functions fail safely. Specfically, they will not allow you to overwrite
+** These functions fail safely. Specifically, they will not allow you to overwrite
 ** existing chunks or add extra versions of format specific reserved chunks but
 ** should allow you to retrieve any and all chunks (may not be implemented for
 ** all chunks or all file formats).
@@ -739,7 +739,7 @@ sf_get_chunk_iterator (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info) ;
 **      newly returned handle from now on.
 ** The returned handle can be used to access the next chunk matching
 **      the criteria as defined in sf_get_chunk_iterator().
-** If iterator points to the last chunk, this will free all ressources
+** If iterator points to the last chunk, this will free all resources
 **      associated with iterator and return NULL.
 ** The returned iterator will stay valid until sf_get_chunk_iterator_next
 **      is called again, the sndfile is closed or a new chunk us added.
