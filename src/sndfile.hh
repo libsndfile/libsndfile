@@ -143,7 +143,7 @@ class SndfileHandle
 		/**< Raw access to the handle. SndfileHandle keeps ownership. */
 		SNDFILE * rawHandle (void) ;
 
-		/**< Take ownership of handle, iff reference count is 1. */
+		/**< Take ownership of handle, if reference count is 1. */
 		SNDFILE * takeOwnership (void) ;
 } ;
 
