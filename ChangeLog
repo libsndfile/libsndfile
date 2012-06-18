@@ -5,6 +5,9 @@
     history field would get corrupted when the file was closed.
     Reported by Paul Davis of the Ardour project.
 
+    * src/test_broadcast_var.c
+    Add a test for the above.
+
 2012-05-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
