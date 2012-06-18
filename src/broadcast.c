@@ -65,6 +65,7 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 			} ;
 		} ;
 
+	/* Only copy the first part of the struct. */
 	memcpy (psf->broadcast_16k, info, offsetof (SF_BROADCAST_INFO, coding_history)) ;
 
 	psf_strlcpy_crlf (psf->broadcast_16k->coding_history, info->coding_history, sizeof (psf->broadcast_16k->coding_history), datasize - offsetof (SF_BROADCAST_INFO, coding_history)) ;
@@ -82,7 +83,7 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 
 	/* Force coding_history_size to be even. */
 	len = strlen (psf->broadcast_16k->coding_history) ;
-	len += (len & 1) ? 1 : 2 ;
+	len += (len & 1) ? 1 : 0 ;
 	psf->broadcast_16k->coding_history_size = len ;
 
 	/* Currently writing this version. */

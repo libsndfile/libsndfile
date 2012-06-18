@@ -1,3 +1,10 @@
+2012-06-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/broadcast.c
+    Fix a bug where a file with a 'bext' chunk with a zero length coding
+    history field would get corrupted when the file was closed.
+    Reported by Paul Davis of the Ardour project.
+
 2012-05-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.c
