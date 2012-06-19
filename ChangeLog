@@ -1,3 +1,9 @@
+2012-06-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/
+    Rename vorbis_test.c -> compression_size_test.c so it can be extended to
+    test FLAC as well.
+
 2012-06-18  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/broadcast.c

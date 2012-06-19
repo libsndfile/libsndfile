@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2007-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2007-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,13 +106,14 @@ vorbis_test (void)
 } /* vorbis_test */
 
 static void
-vorbis_quality_test (void)
+compression_size_test (int format, const char * filename)
 {	/*
 	**	Encode two files, one at quality 0.3 and one at quality 0.5 and then
 	**	make sure that the quality 0.3 files is the smaller of the two.
 	*/
-	const char * q3_fname = "q3_vorbis.oga" ;
-	const char * q5_fname = "q5_vorbis.oga" ;
+	char q3_fname [64] ;
+	char q5_fname [64] ;
+	char test_name [64] ;
 
 	SNDFILE *q3_file, *q5_file ;
 	SF_INFO sfinfo ;
@@ -120,12 +121,16 @@ vorbis_quality_test (void)
 	double quality ;
 	int k ;
 
-	print_test_name (__func__, "q[35]_vorbis.oga") ;
+	snprintf (q3_fname, sizeof (q3_fname), "q3_%s", filename) ;
+	snprintf (q5_fname, sizeof (q5_fname), "q5_%s", filename) ;
+
+	snprintf (test_name, sizeof (test_name), "q[35]_%s", filename) ;
+	print_test_name (__func__, test_name) ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	/* Set up output file type. */
-	sfinfo.format = SF_FORMAT_OGG | SF_FORMAT_VORBIS ;
+	sfinfo.format = format ;
 	sfinfo.channels = 1 ;
 	sfinfo.samplerate = SAMPLE_RATE ;
 
@@ -158,19 +163,20 @@ vorbis_quality_test (void)
 	puts ("ok") ;
 	unlink (q3_fname) ;
 	unlink (q5_fname) ;
-} /* vorbis_quality_test */
+} /* compression_size_test */
 
 
 
 int
 main (void)
 {
-	if (HAVE_EXTERNAL_LIBS)
-	{	vorbis_test () ;
-		vorbis_quality_test () ;
-		}
-	else
-		puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
+	if (! HAVE_EXTERNAL_LIBS)
+	{	puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
+		return 0 ;
+	} ;
+
+	vorbis_test () ;
+	compression_size_test (SF_FORMAT_OGG | SF_FORMAT_VORBIS, "vorbis.oga") ;
 
 	return 0 ;
 } /* main */

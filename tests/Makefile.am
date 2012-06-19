@@ -14,7 +14,7 @@ check_PROGRAMS = sfversion floating_point_test write_read_test \
 	pcm_test headerless_test pipe_test benchmark header_test misc_test \
 	raw_test string_test multi_file_test dither_test chunk_test \
 	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
-	locale_test largefile_test win32_ordinal_test ogg_test vorbis_test \
+	locale_test largefile_test win32_ordinal_test ogg_test compression_size_test \
 	checksum_test external_libs_test rdwr_test format_check_test $(CPP_TEST)
 
 noinst_HEADERS = dft_cmp.h utils.h generate.h
@@ -140,8 +140,8 @@ virtual_io_test_LDADD = $(top_builddir)/src/libsndfile.la
 ogg_test_SOURCES = ogg_test.c utils.c
 ogg_test_LDADD = $(top_builddir)/src/libsndfile.la
 
-vorbis_test_SOURCES = vorbis_test.c utils.c
-vorbis_test_LDADD = $(top_builddir)/src/libsndfile.la
+compression_size_test_SOURCES = compression_size_test.c utils.c
+compression_size_test_LDADD = $(top_builddir)/src/libsndfile.la
 
 rdwr_test_SOURCES = rdwr_test.c utils.c
 rdwr_test_LDADD = $(top_builddir)/src/libsndfile.la
