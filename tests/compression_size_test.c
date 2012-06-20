@@ -31,7 +31,7 @@
 #include	"dft_cmp.h"
 
 #define	SAMPLE_RATE		16000
-#define	DATA_LENGTH		(SAMPLE_RATE / 8)
+#define	DATA_LENGTH		(SAMPLE_RATE)
 
 static float data_out [DATA_LENGTH] ;
 
@@ -112,19 +112,19 @@ compression_size_test (int format, const char * filename)
 	**	make sure that the quality 0.3 files is the smaller of the two.
 	*/
 	char q3_fname [64] ;
-	char q5_fname [64] ;
+	char q6_fname [64] ;
 	char test_name [64] ;
 
-	SNDFILE *q3_file, *q5_file ;
+	SNDFILE *q3_file, *q6_file ;
 	SF_INFO sfinfo ;
-	int q3_size, q5_size ;
+	int q3_size, q6_size ;
 	double quality ;
 	int k ;
 
 	snprintf (q3_fname, sizeof (q3_fname), "q3_%s", filename) ;
-	snprintf (q5_fname, sizeof (q5_fname), "q5_%s", filename) ;
+	snprintf (q6_fname, sizeof (q6_fname), "q6_%s", filename) ;
 
-	snprintf (test_name, sizeof (test_name), "q[35]_%s", filename) ;
+	snprintf (test_name, sizeof (test_name), "q[36]_%s", filename) ;
 	print_test_name (__func__, test_name) ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
@@ -136,47 +136,70 @@ compression_size_test (int format, const char * filename)
 
 	/* Write the output file. */
 	q3_file = test_open_file_or_die (q3_fname, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
-	q5_file = test_open_file_or_die (q5_fname, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	q6_file = test_open_file_or_die (q6_fname, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
 
 	quality = 0.3 ;
 	sf_command (q3_file, SFC_SET_VBR_ENCODING_QUALITY, &quality, sizeof (quality)) ;
-	quality = 0.5 ;
-	sf_command (q5_file, SFC_SET_VBR_ENCODING_QUALITY, &quality, sizeof (quality)) ;
+	quality = 0.6 ;
+	sf_command (q6_file, SFC_SET_VBR_ENCODING_QUALITY, &quality, sizeof (quality)) ;
 
 	for (k = 0 ; k < 5 ; k++)
-	{	gen_lowpass_noise_float (data_out, ARRAY_LEN (data_out)) ;
+	{	gen_lowpass_signal_float (data_out, ARRAY_LEN (data_out)) ;
 		test_write_float_or_die (q3_file, 0, data_out, ARRAY_LEN (data_out), __LINE__) ;
-		test_write_float_or_die (q5_file, 0, data_out, ARRAY_LEN (data_out), __LINE__) ;
+		test_write_float_or_die (q6_file, 0, data_out, ARRAY_LEN (data_out), __LINE__) ;
 		} ;
 
 	sf_close (q3_file) ;
-	sf_close (q5_file) ;
+	sf_close (q6_file) ;
 
 	q3_size = file_length (q3_fname) ;
-	q5_size = file_length (q5_fname) ;
+	q6_size = file_length (q6_fname) ;
 
-	if (q3_size >= q5_size)
-	{	printf ("\n\nLine %d : q3 size (%d) >= q5 size (%d)\n\n", __LINE__, q3_size, q5_size) ;
+	if (q3_size >= q6_size)
+	{	printf ("\n\nLine %d : q3 size (%d) >= q5 size (%d)\n\n", __LINE__, q3_size, q6_size) ;
 		exit (1) ;
 		} ;
 
 	puts ("ok") ;
 	unlink (q3_fname) ;
-	unlink (q5_fname) ;
+	unlink (q6_fname) ;
 } /* compression_size_test */
 
 
 
 int
-main (void)
-{
+main (int argc, char *argv [])
+{	int all_tests = 0, tests = 0 ;
+
+	if (argc != 2)
+	{	printf (
+			"Usage : %s <test>\n"
+			"    Where <test> is one of:\n"
+			"        vorbis - test Ogg/Vorbis\n"
+			"        flac   - test FLAC\n"
+			"        all    - perform all tests\n",
+			argv [0]) ;
+		exit (0) ;
+		} ;
+
 	if (! HAVE_EXTERNAL_LIBS)
 	{	puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
 		return 0 ;
 	} ;
 
-	vorbis_test () ;
-	compression_size_test (SF_FORMAT_OGG | SF_FORMAT_VORBIS, "vorbis.oga") ;
+	if (strcmp (argv [1], "all") == 0)
+		all_tests = 1 ;
+
+	if (all_tests || strcmp (argv [1], "vorbis") == 0)
+	{	vorbis_test () ;
+		compression_size_test (SF_FORMAT_OGG | SF_FORMAT_VORBIS, "vorbis.oga") ;
+		tests ++ ;
+		} ;
+
+	if (all_tests || strcmp (argv [1], "flac") == 0)
+	{	compression_size_test (SF_FORMAT_FLAC | SF_FORMAT_PCM_16, "pcm16.flac") ;
+		tests ++ ;
+		} ;
 
 	return 0 ;
 } /* main */

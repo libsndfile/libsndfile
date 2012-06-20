@@ -336,6 +336,7 @@ echo "----------------------------------------------------------------------"
 
 # flac-tests
 ./write_read_test@EXEEXT@ flac
+./compression_size_test@EXEEXT@ flac
 ./string_test@EXEEXT@ flac
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on FLAC files."
@@ -343,7 +344,7 @@ echo "----------------------------------------------------------------------"
 
 # vorbis-tests
 ./ogg_test@EXEEXT@
-./vorbis_test@EXEEXT@
+./compression_size_test@EXEEXT@ vorbis
 ./lossy_comp_test@EXEEXT@ ogg_vorbis
 ./string_test@EXEEXT@ ogg
 ./misc_test@EXEEXT@ ogg

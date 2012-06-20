@@ -15,6 +15,9 @@
     * src/ogg_vorbis.c src/flac.c
     Implement SFC_SET_COMPRESSION_LEVEL command.
 
+    * tests/test_wrapper.sh.in tests/compression_size_test.c
+    Use the compression_size_test on FLAC as well.
+
 2012-06-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/
