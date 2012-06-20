@@ -188,7 +188,12 @@
 
 <TR>
 	<TD><A HREF="#SFC_SET_VBR_ENCODING_QUALITY">SFC_SET_VBR_ENCODING_QUALITY</A></TD>
-	<TD>Set the the Variable Bit Rate encoding quality</TD>
+	<TD>Set the Variable Bit Rate encoding quality</TD>
+</TR>
+
+<TR>
+	<TD><A HREF="#SFC_SET_COMPRESSION_LEVEL">SFC_SET_COMPRESSION_LEVEL</A></TD>
+	<TD>Set the compression level.</TD>
 </TR>
 
 <TR>
@@ -1297,10 +1302,10 @@ This command is currently only supported for files with SF_FORMAT_WAVEX format.
 <A NAME="SFC_SET_VBR_ENCODING_QUALITY"></A>
 <H2><BR><B>SFC_SET_VBR_ENCODING_QUALITY</B></H2>
 <P>
-Set the the Variable Bit Rate encoding quality.
+Set the Variable Bit Rate encoding quality.
 The encoding quality value should be between 0.0 (lowest quality) and 1.0
 (highest quality).
-Currenly this command is only implemented for Ogg/Vorbis files.
+Currenly this command is only implemented for FLAC and Ogg/Vorbis files.
 </P>
 <P>
 Parameters:
@@ -1318,6 +1323,34 @@ The command must be sent before any audio data is written to the file.
 <DL>
 <DT>Return value:</DT>
 	<dd>SF_TRUE if VBR encoding quality was set.
+    SF_FALSE otherwise.
+</DL>
+
+<!-- ========================================================================= -->
+<A NAME="SFC_SET_COMPRESSION_LEVEL"></A>
+<H2><BR><B>SFC_SET_COMPRESSION_LEVEL</B></H2>
+<P>
+Set the compression level.
+The compression level should be between 0.0 (minimum compression level) and 1.0
+(highest compression level).
+Currenly this command is only implemented for FLAC and Ogg/Vorbis files.
+</P>
+<P>
+Parameters:
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_SET_COMPRESSION_LEVEL
+        data     : A pointer to a double value
+        datasize : sizeof (double)
+</PRE>
+<P>
+The command must be sent before any audio data is written to the file.
+</P>
+<P>
+</P>
+<DL>
+<DT>Return value:</DT>
+	<dd>SF_TRUE if compression level was set.
     SF_FALSE otherwise.
 </DL>
 

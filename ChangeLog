@@ -5,6 +5,9 @@
     sine wave component so that different FLAC compression levels can be
     tested.
 
+    * src/sndfile.h.in doc/command.html
+    Add SFC_SET_COMPRESSION_LEVEL and document it.
+
 2012-06-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/
