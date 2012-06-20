@@ -549,14 +549,14 @@ vorbis_command (SF_PRIVATE *psf, int command, void * data, int datasize)
 {	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 
 	switch (command)
-	{	case SFC_SET_VBR_ENCODING_QUALITY :
+	{	case SFC_SET_COMPRESSION_LEVEL :
 			if (data == NULL || datasize != sizeof (double))
 				return SF_FALSE ;
 
 			if (psf->have_written)
 				return SF_FALSE ;
 
-			vdata->quality = *((double *) data) ;
+			vdata->quality = 1.0 - *((double *) data) ;
 
 			/* Clip range. */
 			vdata->quality = SF_MAX (0.0, SF_MIN (1.0, vdata->quality)) ;

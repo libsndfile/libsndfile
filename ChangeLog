@@ -8,6 +8,13 @@
     * src/sndfile.h.in doc/command.html
     Add SFC_SET_COMPRESSION_LEVEL and document it.
 
+    * src/sndfile.c
+    Catch SFC_SET_VBR_ENCODING_QUALITY command and implement it as the inverse
+    of SFC_SET_COMPRESSION_LEVEL.
+
+    * src/ogg_vorbis.c src/flac.c
+    Implement SFC_SET_COMPRESSION_LEVEL command.
+
 2012-06-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/

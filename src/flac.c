@@ -39,6 +39,8 @@
 ** Private static functions.
 */
 
+#define	FLAC_DEFAULT_COMPRESSION_LEVEL	5
+
 #define ENC_BUFFER_SIZE 8192
 
 typedef enum
@@ -67,6 +69,8 @@ typedef struct
 
 	const FLAC__Frame *frame ;
 	FLAC__bool bufferbackup ;
+
+	unsigned compression ;
 } FLAC_PRIVATE ;
 
 typedef struct
@@ -630,6 +634,10 @@ flac_open	(SF_PRIVATE *psf)
 	FLAC_PRIVATE* pflac = calloc (1, sizeof (FLAC_PRIVATE)) ;
 	psf->codec_data = pflac ;
 
+	/* Set the default value here. Over-ridden later if necessary. */
+	pflac->compression = FLAC_DEFAULT_COMPRESSION_LEVEL ;
+
+
 	if (psf->file.mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
@@ -764,6 +772,11 @@ flac_enc_init (SF_PRIVATE *psf)
 		return SFE_FLAC_INIT_DECODER ;
 		} ;
 
+	if (! FLAC__stream_encoder_set_compression_level (pflac->fse, pflac->compression))
+	{	psf_log_printf (psf, "FLAC__stream_encoder_set_compression_level (%d) return false.\n", pflac->compression) ;
+		return SFE_FLAC_INIT_DECODER ;
+		} ;
+
 	return 0 ;
 } /* flac_enc_init */
 
@@ -795,9 +808,37 @@ flac_read_header (SF_PRIVATE *psf)
 } /* flac_read_header */
 
 static int
-flac_command (SF_PRIVATE * UNUSED (psf), int UNUSED (command), void * UNUSED (data), int UNUSED (datasize))
-{
-	return 0 ;
+flac_command (SF_PRIVATE * psf, int command, void * data, int datasize)
+{	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->codec_data ;
+	double quality ;
+
+	switch (command)
+	{	case SFC_SET_COMPRESSION_LEVEL :
+			if (data == NULL || datasize != sizeof (double))
+				return SF_FALSE ;
+
+			if (psf->have_written)
+				return SF_FALSE ;
+
+			/* FLAC compression level is in the range [0, 8] while libsndfile takes
+			** values in the range [0.0, 1.0]. Massage the libsndfile value here.
+			*/
+			quality = (*((double *) data)) * 8.0 ;
+			/* Clip range. */
+			pflac->compression = lrint (SF_MAX (0.0, SF_MIN (8.0, quality))) ;
+
+			psf_log_printf (psf, "%s : Setting SFC_SET_COMPRESSION_LEVEL to %u.\n", __func__, pflac->compression) ;
+
+			if (flac_enc_init (psf))
+				return SF_FALSE ;
+
+			return SF_TRUE ;
+
+		default :
+			return SF_FALSE ;
+		} ;
+
+	return SF_FALSE ;
 } /* flac_command */
 
 int
