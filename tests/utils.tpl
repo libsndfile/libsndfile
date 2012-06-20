@@ -149,7 +149,7 @@ test_write_raw_or_die (SNDFILE *file, int pass, const void *test, sf_count_t ite
 [+ ENDFOR io_type +]
 
 
-void	gen_lowpass_noise_float (float *data, int len) ;
+void	gen_lowpass_signal_float (float *data, int len) ;
 
 sf_count_t		file_length (const char * fname) ;
 sf_count_t		file_length_fd (int fd) ;
@@ -843,7 +843,7 @@ write_mono_file (const char * filename, int format, int srate, float * output, i
 } /* write_mono_file */
 
 void
-gen_lowpass_noise_float (float *data, int len)
+gen_lowpass_signal_float (float *data, int len)
 {	int32_t value = 0x1243456 ;
 	double sample, last_val = 0.0 ;
 	int k ;
@@ -857,10 +857,12 @@ gen_lowpass_noise_float (float *data, int len)
 		sample = value / (0x7fffffff * 1.000001) ;
 		sample = 0.2 * sample - 0.9 * last_val ;
 
-		data [k] = last_val = sample ;
+		last_val = sample ;
+
+		data [k] = 0.5 * (sample + sin (2.0 * k * M_PI * 1.0 / 32.0)) ;
 		} ;
 
-} /* gen_lowpass_noise_float */
+} /* gen_lowpass_signal_float */
 
 
 /*
