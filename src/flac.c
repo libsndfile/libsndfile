@@ -754,6 +754,8 @@ flac_enc_init (SF_PRIVATE *psf)
 			break ;
 		} ;
 
+	if (pflac->fse)
+		FLAC__stream_encoder_delete (pflac->fse) ;
 	if ((pflac->fse = FLAC__stream_encoder_new ()) == NULL)
 		return SFE_FLAC_NEW_DECODER ;
 
@@ -785,6 +787,8 @@ flac_read_header (SF_PRIVATE *psf)
 {	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->codec_data ;
 
 	psf_fseek (psf, 0, SEEK_SET) ;
+	if (pflac->fsd)
+		FLAC__stream_decoder_delete (pflac->fsd) ;
 	if ((pflac->fsd = FLAC__stream_decoder_new ()) == NULL)
 		return SFE_FLAC_NEW_DECODER ;
 

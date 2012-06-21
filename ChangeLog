@@ -1,3 +1,9 @@
+2012-06-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/flac.c
+    Make sure any previously allocated FLAC stream encoder and stream decoder
+    objects are deleted before a new one is allocated.
+
 2012-06-20  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/utils.tpl
