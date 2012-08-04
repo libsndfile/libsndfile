@@ -58,7 +58,17 @@
 	#include 	<sys/soundcard.h>
 
 #elif (defined (__MACH__) && defined (__APPLE__))
-	#include <CoreAudio/AudioHardware.h>
+	#include <AvailabilityMacros.h>
+	#include <Availability.h>
+
+	#if defined (__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED > 1060
+		#include <AudioToolbox/AudioToolbox.h>
+		#define USE_MAC_OS_X_AUDIO_QUEUES 1
+	#else
+		#include <Carbon.h>
+		#include <CoreAudio/AudioHardware.h>
+		#define USE_MAC_OS_X_AUDIO_QUEUES 0
+	#endif
 
 #elif defined (HAVE_SNDIO_H)
 	#include <sndio.h>
@@ -471,6 +481,170 @@ opensoundsys_open_device (int channels, int srate)
 
 #if (defined (__MACH__) && defined (__APPLE__)) /* MacOSX */
 
+#if USE_MAC_OS_X_AUDIO_QUEUES	/* MacOSX 10.7 or later, use AudioQueue API */
+
+#define kBytesPerAudioBuffer	(1024 * 8)
+#define kNumberOfAudioBuffers	4
+
+typedef struct
+{	AudioStreamBasicDescription		format ;
+
+	AudioQueueRef		queue ;
+	AudioQueueBufferRef	queueBuffer [kNumberOfAudioBuffers] ;
+
+	UInt32 			buf_size ;
+
+	SNDFILE 		*sndfile ;
+	SF_INFO 		sfinfo ;
+
+	int				done_playing ;
+} MacOSXAudioData ;
+
+
+static void
+macosx_fill_buffer (MacOSXAudioData *audio_data, AudioQueueBufferRef audio_buffer)
+{	int		size, sample_count, read_count ;
+	short	*buffer ;
+
+	size = audio_buffer->mAudioDataBytesCapacity ;
+	sample_count = size / sizeof (short) ;
+
+	buffer = (short*) audio_buffer->mAudioData ;
+
+	read_count = sf_read_short (audio_data->sndfile, buffer, sample_count) ;
+
+	if (read_count > 0)
+	{	audio_buffer->mAudioDataByteSize = read_count * sizeof (short) ;
+		AudioQueueEnqueueBuffer (audio_data->queue, audio_buffer, 0, NULL) ;
+		}
+	else
+		AudioQueueStop (audio_data->queue, false) ;
+
+} /* macosx_fill_buffer */
+
+
+static void
+macosx_audio_out_callback (void *user_data, AudioQueueRef audio_queue, AudioQueueBufferRef audio_buffer)
+{	MacOSXAudioData *audio_data = (MacOSXAudioData *) user_data ;
+
+	if (audio_data->queue == audio_queue)
+		macosx_fill_buffer (audio_data, audio_buffer) ;
+
+} /* macosx_audio_out_callback */
+
+
+static void
+macosx_audio_out_property_callback (void *user_data, AudioQueueRef audio_queue, AudioQueuePropertyID prop)
+{	MacOSXAudioData *audio_data = (MacOSXAudioData *) user_data ;
+
+	if (prop == kAudioQueueProperty_IsRunning)
+	{	UInt32 is_running = 0 ;
+		UInt32 is_running_size = sizeof (is_running) ;
+
+		AudioQueueGetProperty (audio_queue, kAudioQueueProperty_IsRunning, &is_running, &is_running_size) ;
+
+		if (!is_running)
+		{	audio_data->done_playing = SF_TRUE ;
+			CFRunLoopStop (CFRunLoopGetCurrent ()) ;
+			} ;
+		} ;
+} /* macosx_audio_out_property_callback */
+
+
+
+static void
+macosx_play (int argc, char *argv [])
+{	MacOSXAudioData 	audio_data ;
+	OSStatus	err ;
+	int 		i ;
+	int 		k ;
+
+	memset (&audio_data, 0x55, sizeof (audio_data)) ;
+
+	for (k = 1 ; k < argc ; k++)
+	{	memset (&(audio_data.sfinfo), 0, sizeof (audio_data.sfinfo)) ;
+
+		printf ("Playing %s\n", argv [k]) ;
+		if (! (audio_data.sndfile = sf_open (argv [k], SFM_READ, &(audio_data.sfinfo))))
+		{	puts (sf_strerror (NULL)) ;
+			continue ;
+			} ;
+
+		if (audio_data.sfinfo.channels < 1 || audio_data.sfinfo.channels > 2)
+		{	printf ("Error : channels = %d.\n", audio_data.sfinfo.channels) ;
+			continue ;
+			} ;
+
+		/*  fill ASBD */
+		audio_data.format.mSampleRate = audio_data.sfinfo.samplerate ;
+		audio_data.format.mChannelsPerFrame	= audio_data.sfinfo.channels ;
+		audio_data.format.mFormatID			= kAudioFormatLinearPCM ;
+		audio_data.format.mFormatFlags		= kAudioFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked ;
+		audio_data.format.mBytesPerPacket	= audio_data.format.mChannelsPerFrame * 2 ;
+		audio_data.format.mFramesPerPacket	= 1 ;
+		audio_data.format.mBytesPerFrame	= audio_data.format.mBytesPerPacket ;
+		audio_data.format.mBitsPerChannel	= 16 ;
+		audio_data.format.mReserved			= 0 ;
+
+		/* create the queue */
+		if ((err = AudioQueueNewOutput (&(audio_data.format), macosx_audio_out_callback, &audio_data,
+					CFRunLoopGetCurrent (), kCFRunLoopCommonModes, 0, &(audio_data.queue))) != noErr)
+		{	printf ("AudioQueueNewOutput failed\n") ;
+			return ;
+			} ;
+
+		/*  add property listener */
+		if ((err = AudioQueueAddPropertyListener (audio_data.queue, kAudioQueueProperty_IsRunning, macosx_audio_out_property_callback, &audio_data)) != noErr)
+		{	printf ("AudioQueueAddPropertyListener failed\n") ;
+			return ;
+			} ;
+
+		/*  create the buffers */
+		for (i = 0 ; i < kNumberOfAudioBuffers ; i++)
+		{	if ((err = AudioQueueAllocateBuffer (audio_data.queue, kBytesPerAudioBuffer, &audio_data.queueBuffer [i])) != noErr)
+			{	printf ("AudioQueueAllocateBuffer failed\n") ;
+				return ;
+				} ;
+
+			macosx_fill_buffer (&audio_data, audio_data.queueBuffer [i]) ;
+			} ;
+
+		audio_data.done_playing = SF_FALSE ;
+
+		/* start queue */
+		if ((err = AudioQueueStart (audio_data.queue, NULL)) != noErr)
+		{	printf ("AudioQueueStart failed\n") ;
+			return ;
+		} ;
+
+		while (audio_data.done_playing == SF_FALSE)
+			CFRunLoopRun () ;
+
+		/*  free the buffers */
+		for (i = 0 ; i < kNumberOfAudioBuffers ; i++)
+		{	if ((err = AudioQueueFreeBuffer (audio_data.queue, audio_data.queueBuffer [i])) != noErr)
+			{	printf ("AudioQueueFreeBuffer failed\n") ;
+				return ;
+				} ;
+			} ;
+
+		/*  free the queue */
+		if ((err = AudioQueueDispose (audio_data.queue, true)) != noErr)
+		{	printf ("AudioQueueDispose failed\n") ;
+			return ;
+			} ;
+
+		sf_close (audio_data.sndfile) ;
+		} ;
+
+	return ;
+} /* macosx_play, AudioQueue implementation */
+
+
+#else /* MacOSX 10.6 or earlier, use Carbon and AudioHardware API */
+
+#error HERE
+
 typedef struct
 {	AudioStreamBasicDescription		format ;
 
@@ -568,7 +742,9 @@ macosx_play (int argc, char *argv [])
 
 	/* Base setup completed. Now play files. */
 	for (k = 1 ; k < argc ; k++)
-	{	printf ("Playing %s\n", argv [k]) ;
+	{	memset (&(audio_data.sfinfo), 0, sizeof (audio_data.sfinfo)) ;
+
+		printf ("Playing %s\n", argv [k]) ;
 		if (! (audio_data.sndfile = sf_open (argv [k], SFM_READ, &(audio_data.sfinfo))))
 		{	puts (sf_strerror (NULL)) ;
 			continue ;
@@ -629,8 +805,9 @@ macosx_play (int argc, char *argv [])
 		} ;
 
 	return ;
-} /* macosx_play */
+} /* macosx_play, AudioHardware implementation */
 
+#endif /* USE_MAC_OS_X_AUDIO_QUEUES */
 #endif /* MacOSX */
 
 

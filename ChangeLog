@@ -1,3 +1,8 @@
+2012-08-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac programs/sndfile-play.c
+    Patch from Ricci Adams to use OSX's AudioQueues on OSX 10.7 and greater.
+
 2012-07-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * programs/common.c

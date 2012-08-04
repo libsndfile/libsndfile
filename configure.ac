@@ -31,11 +31,12 @@ define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
 AM_PROG_LIBTOOL
 LT_PROG_RC
 
-AC_CHECK_PROG(HAVE_AUTOGEN, autogen, yes, no)
-AC_CHECK_PROG(HAVE_WINE, wine, yes, no)
-
 AC_PROG_INSTALL
 AC_PROG_LN_S
+
+AC_CHECK_PROG(HAVE_AUTOGEN, autogen, yes, no)
+AC_CHECK_PROG(HAVE_WINE, wine, yes, no)
+AC_CHECK_PROG(HAVE_XCODE_SELECT, xcode-select, yes, no)
 
 #------------------------------------------------------------------------------------
 # Rules for library version information:
@@ -392,8 +393,13 @@ use_windows_api=0
 case "$host_os" in
 	darwin* | rhapsody*)
 		os_is_macosx=1
-		OS_SPECIFIC_CFLAGS="-I/Developer/Headers/FlatCarbon"
-		OS_SPECIFIC_LINKS="-framework CoreAudio"
+		if test x$HAVE_XCODE_SELECT = xyes ; then
+			developer_path=`xcode-select --print-path`
+		else
+			developer_path="/Developer"
+			fi
+		OS_SPECIFIC_CFLAGS="-I${developer_path}/Headers/FlatCarbon"
+		OS_SPECIFIC_LINKS="-framework CoreAudio -framework AudioToolbox -framework CoreFoundation"
 		;;
 	mingw*)
 		os_is_win32=1
