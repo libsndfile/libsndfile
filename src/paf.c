@@ -202,7 +202,7 @@ paf_read_header	(SF_PRIVATE *psf)
 		psf->endian = SF_ENDIAN_BIG ;
 		} ;
 
-	if (paf_fmt.channels > SF_MAX_CHANNELS)
+	if (paf_fmt.channels < 1 || paf_fmt.channels > SF_MAX_CHANNELS)
 		return SFE_PAF_BAD_CHANNELS ;
 
 	psf->datalength = psf->filelength - psf->dataoffset ;

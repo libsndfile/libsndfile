@@ -1,3 +1,10 @@
+2012-08-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/paf.c
+    Error out if channel count is zero. Bug report from William ELla via
+    launchpad:
+    https://bugs.launchpad.net/ubuntu/+source/libsndfile/+bug/1036831
+
 2012-08-04  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac programs/sndfile-play.c
