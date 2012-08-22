@@ -233,6 +233,12 @@ mat4_read_header (SF_PRIVATE *psf)
 
 	psf_log_printf (psf, " Rows  : %d\n Cols  : %d\n Imag  : %s\n", rows, cols, imag ? "True" : "False") ;
 
+	if ((rows != 1) || (cols != 1))
+	{	if (0 == psf->sf.samplerate)
+			psf->sf.samplerate = 44100 ;
+		goto skip_samplerate ;
+		}
+
 	psf_binheader_readf (psf, "4", &namesize) ;
 
 	if (namesize >= SIGNED_SIZEOF (name))
@@ -248,9 +254,6 @@ mat4_read_header (SF_PRIVATE *psf)
 	snprintf (buffer, sizeof (buffer), " Value : %f\n", value) ;
 	psf_log_printf (psf, buffer) ;
 
-	if ((rows != 1) || (cols != 1))
-		return SFE_MAT4_NO_SAMPLERATE ;
-
 	psf->sf.samplerate = lrint (value) ;
 
 	/* Now write out the audio data. */
@@ -263,6 +266,7 @@ mat4_read_header (SF_PRIVATE *psf)
 
 	psf_log_printf (psf, " Rows  : %d\n Cols  : %d\n Imag  : %s\n", rows, cols, imag ? "True" : "False") ;
 
+skip_samplerate :
 	psf_binheader_readf (psf, "4", &namesize) ;
 
 	if (namesize >= SIGNED_SIZEOF (name))

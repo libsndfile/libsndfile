@@ -2508,6 +2508,30 @@ guess_file_type (SF_PRIVATE *psf)
 	if (buffer [0] == MAKE_MARKER ('a', 'j', 'k', 'g'))
 		return 0 /*-SF_FORMAT_SHN-*/ ;
 
+	/* More checks for MAT4:
+	 * at the end, since MAT4 doesn't have a real header but instead
+	 * provides data right away; luckily the 1st four bytes can only
+	 * have a smallish set of values */
+	if ((buffer [0] == MAKE_MARKER (0x00, 0x00, 0x03, 0xE8) || /* BIG & double */
+		buffer [0] == MAKE_MARKER (0x00, 0x00, 0x03, 0xF2) || /* BIG & single */
+		buffer [0] == MAKE_MARKER (0x00, 0x00, 0x03, 0xFC) || /* BIG & int32 */
+		buffer [0] == MAKE_MARKER (0x00, 0x00, 0x04, 0x06) || /* BIG & int16 */
+		buffer [0] == MAKE_MARKER (0x00, 0x00, 0x04, 0x10) || /* BIG & uint16 */
+		buffer [0] == MAKE_MARKER (0x00, 0x00, 0x04, 0x1A)) && /* BIG & uint8 */
+		buffer [1] != MAKE_MARKER (0x00, 0x00, 0x00, 0x00) &&
+		buffer [2] != MAKE_MARKER (0x00, 0x00, 0x00, 0x00))
+		return SF_FORMAT_MAT4 ;
+
+	if ((buffer [0] == MAKE_MARKER (0x00, 0x00, 0x00, 0x00) || /* LITTLE & double */
+		buffer [0] == MAKE_MARKER (0x00, 0x00, 0x00, 0x0A) || /* LITTLE & single */
+		buffer [0] == MAKE_MARKER (0x00, 0x00, 0x00, 0x14) || /* LITTLE & int32 */
+		buffer [0] == MAKE_MARKER (0x00, 0x00, 0x00, 0x1E) || /* LITTLE & int16 */
+		buffer [0] == MAKE_MARKER (0x00, 0x00, 0x00, 0x28) || /* LITTLE & uint16 */
+		buffer [0] == MAKE_MARKER (0x00, 0x00, 0x00, 0x32)) && /* LITTLE & uint8 */
+		buffer [1] != MAKE_MARKER (0x00, 0x00, 0x00, 0x00) &&
+		buffer [2] != MAKE_MARKER (0x00, 0x00, 0x00, 0x00))
+		return SF_FORMAT_MAT4 ;
+
 	/* This must be the last one. */
 	if (psf->filelength > 0 && (format = try_resource_fork (psf)) != 0)
 		return format ;
