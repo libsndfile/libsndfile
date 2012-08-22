@@ -262,6 +262,7 @@ mat5_read_header (SF_PRIVATE *psf)
 	short	version, endian ;
 	int		type, flags1, flags2, rows, cols ;
 	unsigned size ;
+	int		have_samplerate = 1 ;
 
 	psf_binheader_readf (psf, "pb", 0, buffer, 124) ;
 
@@ -321,8 +322,10 @@ mat5_read_header (SF_PRIVATE *psf)
 	psf_log_printf (psf, "    Rows : %X    Cols : %d\n", rows, cols) ;
 
 	if (rows != 1 || cols != 1)
-		return SFE_MAT5_SAMPLE_RATE ;
-
+	{	if (0 == psf->sf.samplerate)
+			psf->sf.samplerate = 44100 ;
+		have_samplerate = 0 ;
+		}
 	psf_binheader_readf (psf, "4", &type) ;
 
 	if (type == MAT5_TYPE_SCHAR)
@@ -355,6 +358,9 @@ mat5_read_header (SF_PRIVATE *psf)
 	/*-----------------------------------------*/
 
 	psf_binheader_readf (psf, "44", &type, &size) ;
+
+	if (!have_samplerate)
+		goto skip_samplerate ;
 
 	switch (type)
 	{	case MAT5_TYPE_DOUBLE :
@@ -446,6 +452,7 @@ mat5_read_header (SF_PRIVATE *psf)
 	psf_binheader_readf (psf, "44", &type, &size) ;
 	psf_log_printf (psf, "    Type : %X    Size : %d\n", type, size) ;
 
+skip_samplerate :
 	/*++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 	if (rows == 0 && cols == 0)
