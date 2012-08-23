@@ -319,10 +319,10 @@ mat5_read_header (SF_PRIVATE *psf)
 		return SFE_MAT5_NO_BLOCK ;
 
 	psf_binheader_readf (psf, "44", &rows, &cols) ;
-	psf_log_printf (psf, "    Rows : %X    Cols : %d\n", rows, cols) ;
+	psf_log_printf (psf, "    Rows : %d    Cols : %d\n", rows, cols) ;
 
 	if (rows != 1 || cols != 1)
-	{	if (0 == psf->sf.samplerate)
+	{	if (psf->sf.samplerate == 0)
 			psf->sf.samplerate = 44100 ;
 		have_samplerate = 0 ;
 		}

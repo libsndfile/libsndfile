@@ -3,6 +3,10 @@
     * doc/octave.html
     Fix link to octave.sourceforge.net. Thanks to IOhannes m zmoelnig.
 
+    * src/mat5.c
+    Allow reading of mat5 files without a specified sample rate (default to
+    44.1kHz). Thanks to IOhannes m zmoelnig.
+
 2012-08-19  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/paf.c
