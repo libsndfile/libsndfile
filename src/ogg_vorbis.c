@@ -572,7 +572,7 @@ vorbis_command (SF_PRIVATE *psf, int command, void * data, int datasize)
 } /* vorbis_command */
 
 static int
-vorbis_rnull (SF_PRIVATE *psf, int samples, void *UNUSED (vptr), int UNUSED (off) , int channels, float **UNUSED (pcm))
+vorbis_rnull (SF_PRIVATE *UNUSED (psf), int samples, void *UNUSED (vptr), int UNUSED (off) , int channels, float **UNUSED (pcm))
 {
 	return samples * channels ;
 } /* vorbis_rnull */
@@ -621,7 +621,7 @@ vorbis_rint (SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, fl
 } /* vorbis_rint */
 
 static int
-vorbis_rfloat (SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, float **pcm)
+vorbis_rfloat (SF_PRIVATE *UNUSED (psf), int samples, void *vptr, int off, int channels, float **pcm)
 {
 	float *ptr = (float*) vptr + off ;
 	int i = 0, j, n ;
@@ -632,7 +632,7 @@ vorbis_rfloat (SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, 
 } /* vorbis_rfloat */
 
 static int
-vorbis_rdouble (SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, float **pcm)
+vorbis_rdouble (SF_PRIVATE *UNUSED (psf), int samples, void *vptr, int off, int channels, float **pcm)
 {
 	double *ptr = (double*) vptr + off ;
 	int i = 0, j, n ;
