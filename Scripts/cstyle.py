@@ -9,7 +9,9 @@ This program checks C code for compliance to coding standards used in
 libsndfile and other projects I run.
 """
 
-import re, sys
+import re
+import sys
+
 
 class Preprocessor:
 	"""
@@ -114,8 +116,8 @@ class CStyleChecker:
 			[ ( re.compile ("  "),		"multiple space instead of tab" )
 			, ( re.compile ("\t "), 	"space after tab" )
 			, ( re.compile ("[^ ];"),	"missing space before semi-colon" )
-			, ( re.compile ("{[^\s]"),	"missing space after open brace" )
-			, ( re.compile ("[^\s]}"),	"missing space before close brace" )
+			, ( re.compile ("{[^\s}]"),	"missing space after open brace" )
+			, ( re.compile ("[^{\s]}"),	"missing space before close brace" )
 			, ( re.compile ("[ \t]+$"),	"contains trailing whitespace" )
 
 			, ( re.compile (",[^\s\n]"),		"missing space after comma" )
@@ -197,7 +199,7 @@ class CStyleChecker:
 		indent = len (self.indent_re.search (line).group ())
 		if re.search ("^\s+}", line):
 			if not self.last_line_indent_curly and indent != self.last_line_indent:
-				None # self.error ("bad indent on close curly brace")
+				None	# self.error ("bad indent on close curly brace")
 			self.last_line_indent_curly = True
 		else:
 			self.last_line_indent_curly = False
@@ -242,4 +244,3 @@ if cstyle.get_error_count ():
 	sys.exit (1)
 
 sys.exit (0)
-
