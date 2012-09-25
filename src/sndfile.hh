@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2005-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2005-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -78,6 +78,8 @@ class SndfileHandle
 			SndfileHandle (std::string const & path, int mode = SFM_READ,
 							int format = 0, int channels = 0, int samplerate = 0) ;
 			SndfileHandle (int fd, bool close_desc, int mode = SFM_READ,
+							int format = 0, int channels = 0, int samplerate = 0) ;
+			SndfileHandle (SF_VIRTUAL_IO &sfvirtual, void *user_data, int mode = SFM_READ,
 							int format = 0, int channels = 0, int samplerate = 0) ;
 
 #ifdef ENABLE_SNDFILE_WINDOWS_PROTOTYPES
@@ -228,6 +230,28 @@ SndfileHandle::SndfileHandle (int fd, bool close_desc, int mode, int fmt, int ch
 
 	return ;
 } /* SndfileHandle fd constructor */
+
+inline
+SndfileHandle::SndfileHandle (SF_VIRTUAL_IO &sfvirtual, void *user_data, int mode, int fmt, int chans, int srate)
+: p (NULL)
+{
+	p = new (std::nothrow) SNDFILE_ref () ;
+
+	if (p != NULL)
+	{	p->ref = 1 ;
+
+		p->sfinfo.frames = 0 ;
+		p->sfinfo.channels = chans ;
+		p->sfinfo.format = fmt ;
+		p->sfinfo.samplerate = srate ;
+		p->sfinfo.sections = 0 ;
+		p->sfinfo.seekable = 0 ;
+
+		p->sf = sf_open_virtual (&sfvirtual, mode, &p->sfinfo, user_data) ;
+		} ;
+
+	return ;
+} /* SndfileHandle std::string constructor */
 
 inline
 SndfileHandle::~SndfileHandle (void)

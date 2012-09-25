@@ -1,3 +1,9 @@
+2012-09-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/sndfile.hh
+    Added a constructor to allow the use of SF_VIRTUAL_IO. Patch from
+    DannyDaemonic : https://github.com/erikd/libsndfile/pull/20
+
 2012-08-23  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/octave.html
