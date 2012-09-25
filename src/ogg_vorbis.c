@@ -76,7 +76,7 @@
 
 #include "ogg.h"
 
-typedef int convert_func (int, void *, int, int, float **) ;
+typedef int convert_func (SF_PRIVATE *psf, int, void *, int, int, float **) ;
 
 static int	vorbis_read_header (SF_PRIVATE *psf, int log_data) ;
 static int	vorbis_write_header (SF_PRIVATE *psf, int calc_length) ;
@@ -572,36 +572,56 @@ vorbis_command (SF_PRIVATE *psf, int command, void * data, int datasize)
 } /* vorbis_command */
 
 static int
-vorbis_rnull (int samples, void *UNUSED (vptr), int UNUSED (off) , int channels, float **UNUSED (pcm))
+vorbis_rnull (SF_PRIVATE *psf, int samples, void *UNUSED (vptr), int UNUSED (off) , int channels, float **UNUSED (pcm))
 {
 	return samples * channels ;
 } /* vorbis_rnull */
 
 static int
-vorbis_rshort (int samples, void *vptr, int off, int channels, float **pcm)
+vorbis_rshort (SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, float **pcm)
 {
 	short *ptr = (short*) vptr + off ;
 	int i = 0, j, n ;
-	for (j = 0 ; j < samples ; j++)
-		for (n = 0 ; n < channels ; n++)
-			ptr [i++] = lrintf (pcm [n][j] * 32767.0f) ;
+	if (psf->float_int_mult)
+	{
+		float inverse = 1.0 / psf->float_max ;
+		for (j = 0 ; j < samples ; j++)
+			for (n = 0 ; n < channels ; n++)
+				ptr [i++] = lrintf ((pcm [n][j] * inverse) * 32767.0f) ;
+	}
+	else
+	{
+		for (j = 0 ; j < samples ; j++)
+			for (n = 0 ; n < channels ; n++)
+				ptr [i++] = lrintf (pcm [n][j] * 32767.0f) ;
+	}
 	return i ;
 } /* vorbis_rshort */
 
 static int
-vorbis_rint (int samples, void *vptr, int off, int channels, float **pcm)
+vorbis_rint (SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, float **pcm)
 {
 	int *ptr = (int*) vptr + off ;
 	int i = 0, j, n ;
 
-	for (j = 0 ; j < samples ; j++)
-		for (n = 0 ; n < channels ; n++)
-			ptr [i++] = lrintf (pcm [n][j] * 2147483647.0f) ;
+	if (psf->float_int_mult)
+	{
+		float inverse = 1.0 / psf->float_max ;
+		for (j = 0 ; j < samples ; j++)
+			for (n = 0 ; n < channels ; n++)
+				ptr [i++] = lrintf ((pcm [n][j] * inverse) * 2147483647.0f) ;
+	}
+	else
+	{
+		for (j = 0 ; j < samples ; j++)
+			for (n = 0 ; n < channels ; n++)
+				ptr [i++] = lrintf (pcm [n][j] * 2147483647.0f) ;
+	}
 	return i ;
 } /* vorbis_rint */
 
 static int
-vorbis_rfloat (int samples, void *vptr, int off, int channels, float **pcm)
+vorbis_rfloat (SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, float **pcm)
 {
 	float *ptr = (float*) vptr + off ;
 	int i = 0, j, n ;
@@ -612,7 +632,7 @@ vorbis_rfloat (int samples, void *vptr, int off, int channels, float **pcm)
 } /* vorbis_rfloat */
 
 static int
-vorbis_rdouble (int samples, void *vptr, int off, int channels, float **pcm)
+vorbis_rdouble (SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, float **pcm)
 {
 	double *ptr = (double*) vptr + off ;
 	int i = 0, j, n ;
@@ -635,7 +655,7 @@ vorbis_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *t
 
 	while ((samples = vorbis_synthesis_pcmout (&vdata->vdsp, &pcm)) > 0)
 	{	if (samples > len) samples = len ;
-		i += transfn (samples, ptr, i, psf->sf.channels, pcm) ;
+		i += transfn (psf, samples, ptr, i, psf->sf.channels, pcm) ;
 		len -= samples ;
 		/* tell libvorbis how many samples we actually consumed */
 		vorbis_synthesis_read (&vdata->vdsp, samples) ;
@@ -678,7 +698,7 @@ vorbis_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *t
 
 						while ((samples = vorbis_synthesis_pcmout (&vdata->vdsp, &pcm)) > 0)
 						{	if (samples > len) samples = len ;
-							i += transfn (samples, ptr, i, psf->sf.channels, pcm) ;
+							i += transfn (psf, samples, ptr, i, psf->sf.channels, pcm) ;
 							len -= samples ;
 							/* tell libvorbis how many samples we actually consumed */
 							vorbis_synthesis_read (&vdata->vdsp, samples) ;
