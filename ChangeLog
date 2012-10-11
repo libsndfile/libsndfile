@@ -11,6 +11,9 @@
     Calculation of the signal max was failing because it was trying to read
     a sample count that was not an integer multiple of the channel count.
 
+    * tests/channel_test.c tests/Makefile.am tests/test_wrapper.sh.in
+    Add test for the above.
+
 2012-09-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.hh

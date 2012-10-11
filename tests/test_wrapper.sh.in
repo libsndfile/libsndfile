@@ -102,6 +102,7 @@ if test -x test_main@EXEEXT@ ; then
 ./win32_ordinal_test@EXEEXT@
 ./external_libs_test@EXEEXT@
 ./format_check_test@EXEEXT@
+./channel_test@EXEEXT@
 
 # The w64 G++ compiler requires an extra runtime DLL which we don't have,
 # so skip this test.
