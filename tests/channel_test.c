@@ -63,7 +63,7 @@ channel_test (void)
 
 	for (ch = 1 ; ch <= 8 ; ch++)
 	{	SNDFILE	*file ;
-		SF_INFO	wsfinfo = { 0, }, rsfinfo = { 0, } ;
+		SF_INFO	wsfinfo, rsfinfo ;
 		sf_count_t wframes = ARRAY_LEN (float_data) / ch ;
 		double	maxdiff ;
 		char	filename [256] ;
@@ -71,10 +71,8 @@ channel_test (void)
 		snprintf (filename, sizeof (filename), "chan_%d.wav", ch) ;
 		print_test_name (__func__, filename) ;
 
-		wsfinfo.samplerate	= 48000 ;
-		wsfinfo.format		= SF_FORMAT_WAV | SF_FORMAT_FLOAT ;
-		wsfinfo.channels	= ch ;
-		wsfinfo.frames		= wframes ;
+		sf_info_setup (&wsfinfo, SF_FORMAT_WAV | SF_FORMAT_FLOAT, 48000, ch) ;
+		sf_info_clear (&rsfinfo) ;
 
 		/* Write the test file. */
 		file = test_open_file_or_die (filename, SFM_WRITE, &wsfinfo, SF_FALSE, __LINE__) ;
@@ -84,9 +82,9 @@ channel_test (void)
 		/* Read it as float and test. */
 		file = test_open_file_or_die (filename, SFM_READ, &rsfinfo, SF_FALSE, __LINE__) ;
 		exit_if_true (rsfinfo.frames == 0,
-				"\n\nLine %d : Frames in file %ld.\n\n", __LINE__, rsfinfo.frames) ;
+				"\n\nLine %d : Frames in file %" PRId64 ".\n\n", __LINE__, rsfinfo.frames) ;
 		exit_if_true (wframes != rsfinfo.frames,
-				"\n\nLine %d : Wrote %ld, read %ld frames.\n\n", __LINE__, wframes, rsfinfo.frames) ;
+				"\n\nLine %d : Wrote %" PRId64 ", read %" PRId64 " frames.\n\n", __LINE__, wframes, rsfinfo.frames) ;
 
 		sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
 
