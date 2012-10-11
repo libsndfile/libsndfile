@@ -145,7 +145,7 @@ void
 test_write_raw_or_die (SNDFILE *file, int pass, const void *test, sf_count_t items, int line_num) ;
 
 [+ FOR io_type
-+]void compare_[+ (get "io_element") +]_or_die (const [+ (get "io_element") +] *left, const [+ (get "io_element") +] *right, unsigned count, int line_num) ;
++]void compare_[+ (get "io_element") +]_or_die (const [+ (get "io_element") +] *expected, const [+ (get "io_element") +] *actual, unsigned count, int line_num) ;
 [+ ENDFOR io_type +]
 
 
@@ -726,13 +726,13 @@ test_write_raw_or_die (SNDFILE *file, int pass, const void *test, sf_count_t ite
 
 [+ FOR io_type
 +]void
-compare_[+ (get "io_element") +]_or_die (const [+ (get "io_element") +] *left, const [+ (get "io_element") +] *right, unsigned count, int line_num)
+compare_[+ (get "io_element") +]_or_die (const [+ (get "io_element") +] *expected, const [+ (get "io_element") +] *actual, unsigned count, int line_num)
 {
 	unsigned k ;
 
 	for (k = 0 ; k < count ; k++)
-		if (left [k] != right [k])
-		{	printf ("\n\nLine %d : Error at index %d, " [+ (get "format_str") +] " should be " [+ (get "format_str") +] ".\n\n", line_num, k, left [k], right [k]) ;
+		if (expected [k] != actual [k])
+		{	printf ("\n\nLine %d : Error at index %d, got " [+ (get "format_str") +] ", should be " [+ (get "format_str") +] ".\n\n", line_num, k, actual [k], expected [k]) ;
 			exit (1) ;
 			} ;
 
