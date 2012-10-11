@@ -3,6 +3,14 @@
     * tests/utils.tpl
     Improve compare_*_or_die() functions.
 
+    * src/command.c
+    Fix bug reported by Keiler Florian. When reading short or int data from a
+    file containing float data, and setting SFC_SET_SCALE_FLOAT_INT_READ to
+    SF_TRUE would fail 3, 5, 7 and other channels counts. Problem was that
+    psf_calc_signal_max() was not calculating the signal max correctly.
+    Calculation of the signal max was failing because it was trying to read
+    a sample count that was not an integer multiple of the channel count.
+
 2012-09-25  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/sndfile.hh

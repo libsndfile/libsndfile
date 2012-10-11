@@ -295,7 +295,8 @@ psf_calc_signal_max (SF_PRIVATE *psf, int normalize)
 	sf_seek ((SNDFILE*) psf, 0, SEEK_SET) ;
 
 	data = ubuf.dbuf ;
-	len = ARRAY_LEN (ubuf.dbuf) ;
+	/* Make sure len is an integer multiple of the channel count. */
+	len = ARRAY_LEN (ubuf.dbuf) - (ARRAY_LEN (ubuf.dbuf) % psf->sf.channels) ;
 
 	for (readcount = 1, max_val = 0.0 ; readcount > 0 ; /* nothing */)
 	{	readcount = sf_read_double ((SNDFILE*) psf, data, len) ;
