@@ -1,3 +1,8 @@
+2012-10-13  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * M4/octave.m4
+    Relax constraints on Octave version.
+
 2012-10-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/utils.tpl
