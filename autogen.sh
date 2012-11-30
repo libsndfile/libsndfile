@@ -146,11 +146,6 @@ if test "$DIE" -eq 1; then
         exit 1
 fi
 
-if test -z "$*"; then
-        echo "I am going to run ./configure with no arguments - if you wish "
-        echo "to pass any to it, please specify them on the $0 command line."
-fi
-
 if test ! -d Cfg ; then
 	echo "Createing 'Cfg' directory."
 	mkdir Cfg
