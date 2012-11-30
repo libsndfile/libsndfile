@@ -76,3 +76,4 @@ uninstall-local :
 
 clean-local :
 	rm -f sndfile.o sndfile.oct
+	@if test $(abs_builddir) != $(abs_srcdir) ; then rm -f PKG_ADD ; fi
