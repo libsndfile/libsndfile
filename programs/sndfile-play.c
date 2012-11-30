@@ -61,13 +61,11 @@
 	#include <AvailabilityMacros.h>
 	#include <Availability.h>
 
-	#if defined (__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED > 1060
+	#if (OSX_DARWIN_VERSION == 11)
 		#include <AudioToolbox/AudioToolbox.h>
-		#define USE_MAC_OS_X_AUDIO_QUEUES 1
-	#else
+	#elif (OSX_DARWIN_VERSION > 0 && OSX_DARWIN_VERSION <= 10)
 		#include <Carbon.h>
 		#include <CoreAudio/AudioHardware.h>
-		#define USE_MAC_OS_X_AUDIO_QUEUES 0
 	#endif
 
 #elif defined (HAVE_SNDIO_H)
@@ -479,9 +477,8 @@ opensoundsys_open_device (int channels, int srate)
 **	Mac OS X functions for playing a sound.
 */
 
-#if (defined (__MACH__) && defined (__APPLE__)) /* MacOSX */
-
-#if USE_MAC_OS_X_AUDIO_QUEUES	/* MacOSX 10.7 or later, use AudioQueue API */
+#if (OSX_DARWIN_VERSION == 11)
+/* MacOSX 10.7 or later, use AudioQueue API */
 
 #define kBytesPerAudioBuffer	(1024 * 8)
 #define kNumberOfAudioBuffers	4
@@ -640,10 +637,10 @@ macosx_play (int argc, char *argv [])
 	return ;
 } /* macosx_play, AudioQueue implementation */
 
+#endif /* OSX_DARWIN_VERSION == 11 */
 
-#else /* MacOSX 10.6 or earlier, use Carbon and AudioHardware API */
-
-#error HERE
+#if (OSX_DARWIN_VERSION > 0 && OSX_DARWIN_VERSION <= 10)
+/* MacOSX 10.6 or earlier, use Carbon and AudioHardware API */
 
 typedef struct
 {	AudioStreamBasicDescription		format ;
@@ -807,9 +804,7 @@ macosx_play (int argc, char *argv [])
 	return ;
 } /* macosx_play, AudioHardware implementation */
 
-#endif /* USE_MAC_OS_X_AUDIO_QUEUES */
-#endif /* MacOSX */
-
+#endif /* OSX_DARWIN_VERSION > 0 && OSX_DARWIN_VERSION <= 10 */
 
 /*------------------------------------------------------------------------------
 **	Win32 functions for playing a sound.
@@ -1177,7 +1172,7 @@ main (int argc, char *argv [])
 		opensoundsys_play (argc, argv) ;
 #elif defined (__FreeBSD_kernel__) || defined (__FreeBSD__)
 	opensoundsys_play (argc, argv) ;
-#elif (defined (__MACH__) && defined (__APPLE__))
+#elif (defined (__MACH__) && defined (__APPLE__) && OSX_DARWIN_VERSION <= 11)
 	macosx_play (argc, argv) ;
 #elif defined HAVE_SNDIO_H
 	sndio_play (argc, argv) ;
