@@ -61,7 +61,9 @@
 	#include <AvailabilityMacros.h>
 	#include <Availability.h>
 
-	#if (OSX_DARWIN_VERSION == 11)
+	#if (OSX_DARWIN_VERSION > 11)
+		/* Includes go here. */
+	#elif (OSX_DARWIN_VERSION == 11)
 		#include <AudioToolbox/AudioToolbox.h>
 	#elif (OSX_DARWIN_VERSION > 0 && OSX_DARWIN_VERSION <= 10)
 		#include <Carbon.h>
@@ -477,8 +479,12 @@ opensoundsys_open_device (int channels, int srate)
 **	Mac OS X functions for playing a sound.
 */
 
+#if (OSX_DARWIN_VERSION > 11)
+/* MacOSX 10.8 use a new Audio API. Someone needs to write some code for it. */
+#endif /* OSX_DARWIN_VERSION > 11 */
+
 #if (OSX_DARWIN_VERSION == 11)
-/* MacOSX 10.7 or later, use AudioQueue API */
+/* MacOSX 10.7 use AudioQueue API */
 
 #define kBytesPerAudioBuffer	(1024 * 8)
 #define kNumberOfAudioBuffers	4
@@ -1180,6 +1186,10 @@ main (int argc, char *argv [])
 	solaris_play (argc, argv) ;
 #elif (OS_IS_WIN32 == 1)
 	win32_play (argc, argv) ;
+#elif (defined (__MACH__) && defined (__APPLE__) && OSX_DARWIN_VERSION > 11)
+	printf ("OS X 10.8 and later have a new Audio API.\n") ;
+	printf ("Someone needs to write code to use that API.\n") ;
+	return 1 ;
 #elif defined (__BEOS__)
 	printf ("This program cannot be compiled on BeOS.\n") ;
 	printf ("Instead, compile the file sfplay_beos.cpp.\n") ;
