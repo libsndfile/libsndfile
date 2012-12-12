@@ -122,16 +122,17 @@ typedef struct
 
 static int
 dwd_read_header (SF_PRIVATE *psf)
-{	DWD_HEADER	dwdh ;
+{	BUF_UNION	ubuf ;
+	DWD_HEADER	dwdh ;
 
-	memset (psf->u.cbuf, 0, sizeof (psf->u.cbuf)) ;
+	memset (ubuf.cbuf, 0, sizeof (ubuf.cbuf)) ;
 	/* Set position to start of file to begin reading header. */
-	psf_binheader_readf (psf, "pb", 0, psf->u.cbuf, DWD_IDENTIFIER_LEN) ;
+	psf_binheader_readf (psf, "pb", 0, ubuf.cbuf, DWD_IDENTIFIER_LEN) ;
 
-	if (memcmp (psf->u.cbuf, DWD_IDENTIFIER, DWD_IDENTIFIER_LEN) != 0)
+	if (memcmp (ubuf.cbuf, DWD_IDENTIFIER, DWD_IDENTIFIER_LEN) != 0)
 		return SFE_DWD_NO_DWD ;
 
-	psf_log_printf (psf, "Read only : DiamondWare Digitized (.dwd)\n", psf->u.cbuf) ;
+	psf_log_printf (psf, "Read only : DiamondWare Digitized (.dwd)\n", ubuf.cbuf) ;
 
 	psf_binheader_readf (psf, "11", &dwdh.major, &dwdh.minor) ;
 	psf_binheader_readf (psf, "e4j1", &dwdh.id, 1, &dwdh.compression) ;

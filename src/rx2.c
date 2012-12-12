@@ -80,10 +80,9 @@ rx2_open	(SF_PRIVATE *psf)
 		"Additional/PencilTool", "Disabled"
 		} ;
 
+	BUF_UNION	ubuf ;
 	int error, marker, length, glob_offset, slce_count, frames ;
-
 	int sdat_length = 0, slce_total = 0 ;
-
 	int n_channels ;
 
 
@@ -119,14 +118,14 @@ rx2_open	(SF_PRIVATE *psf)
 	/* Get name length */
 	length = 0 ;
 	psf_binheader_readf (psf, "1", &length) ;
-	if (length >= SIGNED_SIZEOF (psf->u.cbuf))
+	if (length >= SIGNED_SIZEOF (ubuf.cbuf))
 	{	psf_log_printf (psf, "  Text : %d *** Error : Too sf_count_t!\n") ;
 		return -1001 ;
 		}
 
-	memset (psf->u.cbuf, 0, sizeof (psf->u.cbuf)) ;
-	psf_binheader_readf (psf, "b", psf->u.cbuf, length) ;
-	psf_log_printf (psf, " Text : \"%s\"\n", psf->u.cbuf) ;
+	memset (ubuf.cbuf, 0, sizeof (ubuf.cbuf)) ;
+	psf_binheader_readf (psf, "b", ubuf.cbuf, length) ;
+	psf_log_printf (psf, " Text : \"%s\"\n", ubuf.cbuf) ;
 
 	/* Jump to GLOB offset position. */
 	if (glob_offset & 1)
@@ -253,7 +252,7 @@ rx2_open	(SF_PRIVATE *psf)
 			break ;
 		} ;
 
-	puts (psf->parselog) ;
+	puts (psf->parselog.buf) ;
 	puts ("-----------------------------------") ;
 
 	printf ("SDAT length  : %d\n", sdat_length) ;
@@ -270,7 +269,7 @@ rx2_open	(SF_PRIVATE *psf)
 
 	puts (" ") ;
 
-	psf->parselog [0] = 0 ;
+	psf->parselog.buf [0] = 0 ;
 
 	/* OK, have the header although not too sure what it all means. */
 

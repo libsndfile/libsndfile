@@ -1,3 +1,9 @@
+2012-12-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/dwd.c src/rx2.c src/txw.c
+    Fix for compiling when configured with --enable-experimental. Thanks to
+    Eric Wong for reporting this.
+
 2012-12-01  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * configure.ac programs/sndfile-play.c
