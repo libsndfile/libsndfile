@@ -365,8 +365,6 @@ typedef struct sf_private_tag
 		char c [16] ;
 		} canary ;
 
-//	BUF_UNION	u ;
-
 	PSF_FILE		file, rsrc ;
 
 	char			syserr		[SF_SYSERR_LEN] ;
