@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -862,6 +862,7 @@ int		rf64_open	(SF_PRIVATE *psf) ;
 int		ogg_vorbis_open	(SF_PRIVATE *psf) ;
 int		ogg_speex_open	(SF_PRIVATE *psf) ;
 int		ogg_pcm_open	(SF_PRIVATE *psf) ;
+int		ogg_opus_open	(SF_PRIVATE *psf) ;
 int		ogg_open	(SF_PRIVATE *psf) ;
 
 
