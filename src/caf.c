@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2005-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2005-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -462,8 +462,25 @@ caf_read_header (SF_PRIVATE *psf)
 
 			case pakt_MARKER :
 				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+
+				psf_binheader_readf (psf, "E8844", &pcaf->alac.packets, &pcaf->alac.valid_frames,
+									&pcaf->alac.priming_frames, &pcaf->alac.remainder_frames) ;
+
+				psf_log_printf (psf,
+						"  Packets          : %D\n"
+						"  Valid frames     : %D\n"
+						"  Priming frames   : %d\n"
+						"  Remainder frames : %d\n",
+						pcaf->alac.packets, pcaf->alac.valid_frames, pcaf->alac.priming_frames,
+						pcaf->alac.remainder_frames
+						) ;
+
+				if (pcaf->alac.packets == 0 && pcaf->alac.valid_frames == 0
+							&& pcaf->alac.priming_frames == 0 && pcaf->alac.remainder_frames == 0)
+					psf_log_printf (psf, "*** 'pakt' chunk header is all zero.\n") ;
+
 				pcaf->alac.pakt_offset = psf_ftell (psf) - 12 ;
-				psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
+				psf_binheader_readf (psf, "j", make_size_t (chunk_size) - 24) ;
 				break ;
 
 			default :

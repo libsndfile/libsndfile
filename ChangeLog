@@ -1,3 +1,8 @@
+2013-02-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h src/caf.c
+    Read the ALAC 'pakt' header and stash the values.
+
 2013-02-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html
