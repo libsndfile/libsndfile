@@ -1,3 +1,8 @@
+2013-02-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * doc/FAQ.html
+    Add missing opening <P> tag.
+
 2013-01-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html
