@@ -3,6 +3,9 @@
     * doc/FAQ.html
     Add missing opening <P> tag.
 
+    * src/alac.c
+    Increase ALAC_BYTE_BUFFER_SIZE to 82000.
+
 2013-01-27  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html

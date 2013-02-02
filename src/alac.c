@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2011-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2011-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -30,7 +30,7 @@
 #include	"ALAC/ALACBitUtilities.h"
 
 #define		ALAC_MAX_FRAME_SIZE		8192
-#define		ALAC_BYTE_BUFFER_SIZE	32768
+#define		ALAC_BYTE_BUFFER_SIZE	82000
 
 #define		kuki_MARKER				MAKE_MARKER ('k', 'u', 'k', 'i')
 #define		pakt_MARKER				MAKE_MARKER ('p', 'a', 'k', 't')
