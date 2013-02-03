@@ -32,8 +32,6 @@
 #define		ALAC_MAX_FRAME_SIZE		8192
 #define		ALAC_BYTE_BUFFER_SIZE	82000
 
-#define		kuki_MARKER				MAKE_MARKER ('k', 'u', 'k', 'i')
-#define		pakt_MARKER				MAKE_MARKER ('p', 'a', 'k', 't')
 
 typedef struct
 {	uint32_t	current, count, allocated ;
@@ -97,7 +95,7 @@ static uint32_t alac_kuki_read (SF_PRIVATE * psf, uint32_t kuki_offset, uint8_t 
 static PAKT_INFO * alac_pakt_alloc (uint32_t initial_count) ;
 static PAKT_INFO * alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t pakt_offset) ;
 static PAKT_INFO * alac_pakt_append (PAKT_INFO * info, uint32_t value) ;
-static uint8_t * alac_pakt_encode (const PAKT_INFO *info, uint32_t * pakt_size) ;
+static uint8_t * alac_pakt_encode (const SF_PRIVATE *psf, uint32_t * pakt_size) ;
 static sf_count_t alac_pakt_block_offset (const PAKT_INFO *info, uint32_t block) ;
 
 /*============================================================================================
@@ -170,7 +168,7 @@ alac_close	(SF_PRIVATE *psf)
 		SF_CHUNK_INFO chunk_info ;
 		sf_count_t readcount ;
 		uint8_t *kuki_data [plac->kuki_size] ;
-		uint32_t pakt_size ;
+		uint32_t pakt_size = 0 ;
 
 		plac->final_write_block = 1 ;
 
@@ -188,7 +186,7 @@ alac_close	(SF_PRIVATE *psf)
 
 		memset (&chunk_info, 0, sizeof (chunk_info)) ;
 		chunk_info.id_size = snprintf (chunk_info.id, sizeof (chunk_info.id), "pakt") ;
-		chunk_info.data = alac_pakt_encode (plac->pakt_info, &pakt_size) ;
+		chunk_info.data = alac_pakt_encode (psf, &pakt_size) ;
 		chunk_info.datalen = pakt_size ;
 		psf_save_write_chunk (&psf->wchunks, &chunk_info) ;
 
@@ -826,7 +824,7 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 
 	info = alac_pakt_alloc (pakt_size / 4) ;
 
-	/* Start at 24 bytes in. The chunks have some unknown leading cruft. */
+	/* Start at 24 bytes in, skipping over the 'pakt' chunks header. */
 	for (bcount = 24 ; bcount < pakt_size && value != 0 ; )
 	{	uint8_t byte ;
 		int32_t count = 0 ;
@@ -862,14 +860,24 @@ FreeExit :
 } /* alac_pakt_read_decode */
 
 static uint8_t *
-alac_pakt_encode (const PAKT_INFO *info, uint32_t * pakt_size_out)
-{	uint8_t	*data ;
+alac_pakt_encode (const SF_PRIVATE *psf, uint32_t * pakt_size_out)
+{	const ALAC_PRIVATE *plac ;
+	const PAKT_INFO *info ;
+	uint8_t	*data ;
 	uint32_t k, allocated, pakt_size ;
 
-	allocated = 100 + 2 * info->count ;
-	data = calloc (1, allocated) ;
+	plac = psf->codec_data ;
+	info = plac->pakt_info ;
 
-	/* 24 bytes of unknown data at start of 'pakt'. */
+	allocated = 100 + 2 * info->count ;
+	if ((data = calloc (1, allocated)) == NULL)
+		return NULL ;
+
+	psf_put_be64 (data, 0, info->count) ;
+	psf_put_be64 (data, 8, psf->sf.frames) ;
+	psf_put_be32 (data, 20, plac->partial_block_frames) ;
+
+	/* Real 'pakt' data starts after 24 byte header. */
 	pakt_size = 24 ;
 
 	for (k = 0 ; k < info->count ; k++)

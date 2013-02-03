@@ -6,6 +6,9 @@
     * src/sfendian.h
     Add functions psf_put_be64() and psf_put_be32().
 
+    * src/alac.c
+    Start work on filling on the 'pakt' chunk header.
+
 2013-02-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html
