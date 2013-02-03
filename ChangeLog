@@ -3,6 +3,9 @@
     * src/common.h src/caf.c
     Read the ALAC 'pakt' header and stash the values.
 
+    * src/sfendian.h
+    Add functions psf_put_be64() and psf_put_be32().
+
 2013-02-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/FAQ.html

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -138,6 +138,28 @@ ENDSWAP_64 (uint64_t x)
 
 #define BET2H_16_PTR(x)			(((x) [0] << 8) + (x) [1])
 #define BET2H_32_PTR(x)			(((x) [0] << 24) + ((x) [1] << 16) + ((x) [2] << 8))
+
+static inline void
+psf_put_be64 (uint8_t *ptr, int offset, int64_t value)
+{
+	ptr [offset] = value >> 56 ;
+	ptr [offset + 1] = value >> 48 ;
+	ptr [offset + 2] = value >> 40 ;
+	ptr [offset + 3] = value >> 32 ;
+	ptr [offset + 4] = value >> 24 ;
+	ptr [offset + 5] = value >> 16 ;
+	ptr [offset + 6] = value >> 8 ;
+	ptr [offset + 7] = value ;
+} /* psf_put_be64 */
+
+static inline void
+psf_put_be32 (uint8_t *ptr, int offset, int32_t value)
+{
+	ptr [offset] = value >> 24 ;
+	ptr [offset + 1] = value >> 16 ;
+	ptr [offset + 2] = value >> 8 ;
+	ptr [offset + 3] = value ;
+} /* psf_put_be32 */
 
 /*-----------------------------------------------------------------------------------------------
 ** Generic functions for performing endian swapping on integer arrays.
