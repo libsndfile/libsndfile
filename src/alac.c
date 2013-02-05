@@ -168,13 +168,16 @@ alac_close	(SF_PRIVATE *psf)
 		SF_CHUNK_INFO chunk_info ;
 		sf_count_t readcount ;
 		uint8_t *kuki_data [plac->kuki_size] ;
-		uint32_t pakt_size = 0 ;
+		uint32_t pakt_size = 0, saved_partial_block_frames ;
 
 		plac->final_write_block = 1 ;
+		saved_partial_block_frames = plac->partial_block_frames ;
 
 		/*	If a block has been partially assembled, write it out as the final block. */
 		if (plac->partial_block_frames && plac->partial_block_frames < plac->frames_per_block)
 			alac_encode_block (psf, plac) ;
+
+		plac->partial_block_frames = saved_partial_block_frames ;
 
 		alac_get_magic_cookie (penc, kuki_data, &plac->kuki_size) ;
 
@@ -875,7 +878,7 @@ alac_pakt_encode (const SF_PRIVATE *psf, uint32_t * pakt_size_out)
 
 	psf_put_be64 (data, 0, info->count) ;
 	psf_put_be64 (data, 8, psf->sf.frames) ;
-	psf_put_be32 (data, 20, plac->partial_block_frames) ;
+	psf_put_be32 (data, 20, kALACDefaultFramesPerPacket - plac->partial_block_frames) ;
 
 	/* Real 'pakt' data starts after 24 byte header. */
 	pakt_size = 24 ;

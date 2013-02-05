@@ -1,3 +1,9 @@
+2013-02-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/alac.c
+    The 'pakt' chunk header should now be written correctly.
+    Closes: https://github.com/erikd/libsndfile/issues/24
+
 2013-02-03  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h src/caf.c
