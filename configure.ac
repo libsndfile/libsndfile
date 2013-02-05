@@ -1,4 +1,4 @@
-# Copyright (C) 1999-2012  Erik de Castro Lopo <erikd@mega-nerd.com>.
+# Copyright (C) 1999-2013  Erik de Castro Lopo <erikd@mega-nerd.com>.
 
 dnl Require autoconf version
 AC_PREREQ(2.57)
@@ -301,6 +301,7 @@ EXTERNAL_LIBS=""
 
 # Check for pkg-config outside the if statement.
 PKG_PROG_PKG_CONFIG
+m4_ifdef([PKG_INSTALLDIR], [PKG_INSTALLDIR], AC_SUBST([pkgconfigdir], ${libdir}/pkgconfig))
 
 if test -n "$PKG_CONFIG" ; then
 	if test x$enable_external_libs = xno ; then
