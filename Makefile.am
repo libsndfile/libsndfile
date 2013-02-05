@@ -15,7 +15,6 @@ EXTRA_DIST = libsndfile.spec.in sndfile.pc.in
 
 CLEANFILES = *~
 
-pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = sndfile.pc
 
 m4datadir = $(datadir)/aclocal

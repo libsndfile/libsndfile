@@ -301,6 +301,7 @@ EXTERNAL_LIBS=""
 
 # Check for pkg-config outside the if statement.
 PKG_PROG_PKG_CONFIG
+PKG_INSTALLDIR
 
 if test -n "$PKG_CONFIG" ; then
 	if test x$enable_external_libs = xno ; then
