@@ -4,6 +4,10 @@
     Drop tests for and #ifdef hackery for C99 struct flexible array feature.
     libsndfile assumes the compiler supports most of the ISO C99 standard.
 
+    * src/alac.c
+    Fix valgrind invalid realloc. Reported by nu774.
+    Closes: https://github.com/erikd/libsndfile/issues/31
+
 2013-02-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/alac.c
