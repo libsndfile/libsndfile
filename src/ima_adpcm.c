@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -37,11 +37,7 @@ typedef struct IMA_ADPCM_PRIVATE_tag
 	int				stepindx [2] ;
 	unsigned char	*block ;
 	short			*samples ;
-#if HAVE_FLEXIBLE_ARRAY
 	short			data	[] ; /* ISO C99 struct flexible array. */
-#else
-	short			data	[0] ; /* This is a hack and might not work. */
-#endif
 } IMA_ADPCM_PRIVATE ;
 
 /*============================================================================================

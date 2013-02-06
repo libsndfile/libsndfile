@@ -211,19 +211,8 @@ typedef struct
 	/* CAF */
 	unsigned int	edit_number ;
 
-#if HAVE_FLEXIBLE_ARRAY
 	/* the per channel peak info */
 	PEAK_POS		peaks [] ;
-#else
-	/*
-	** This is not ISO compliant C. It works on some compilers which
-	** don't support the ISO standard flexible struct array which is
-	** used above. If your compiler doesn't like this I suggest you find
-	** youself a 1999 ISO C standards compilant compiler. GCC-3.X is
-	** highly recommended.
-	*/
-	PEAK_POS		peaks [0] ;
-#endif
 } PEAK_INFO ;
 
 static inline PEAK_INFO *

@@ -81,19 +81,6 @@ AM_CONDITIONAL([LINUX_MINGW_CROSS_TEST],
 	[test "$build_os:$target_os:$host_os:$HAVE_WINE" = "linux-gnu:mingw32msvc:mingw32msvc:yes"])
 
 #====================================================================================
-# Check for support of the struct hack.
-
-MN_C99_FLEXIBLE_ARRAY
-
-if test x$ac_cv_c99_flexible_array = xyes ; then
-	AC_DEFINE([HAVE_FLEXIBLE_ARRAY],1, [Set to 1 if the compile supports the struct hack.])
-else
-	AC_MSG_WARN([[*** This compiler does not support the 1999 ISO C Standard ***]])
-	AC_MSG_WARN([[*** feature known as the flexible array struct member.     ***]])
-	AC_DEFINE([HAVE_FLEXIBLE_ARRAY],0)
-	fi
-
-#====================================================================================
 # Couple of initializations here. Fill in real values later.
 
 SHLIB_VERSION_ARG=""

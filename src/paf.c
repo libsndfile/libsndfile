@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -64,11 +64,7 @@ typedef struct
 	sf_count_t		sample_count ;
 	int				*samples ;
 	unsigned char	*block ;
-#if HAVE_FLEXIBLE_ARRAY
 	int				data [] ; /* ISO C99 struct flexible array. */
-#else
-	int				data [1] ; /* This is a hack and may not work. */
-#endif
 } PAF24_PRIVATE ;
 
 /*------------------------------------------------------------------------------
