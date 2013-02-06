@@ -60,7 +60,7 @@ main (void)
 	*/
 	SNDFILE	*infile, *outfile ;
 
-	/* A pointer to an SF_INFO stutct is passed to sf_open.
+	/* A pointer to an SF_INFO struct is passed to sf_open.
 	** On read, the library fills this struct with information about the file.
 	** On write, the struct must be filled in before calling sf_open.
 	*/
@@ -68,6 +68,10 @@ main (void)
 	int			readcount ;
 	const char	*infilename = "input.wav" ;
 	const char	*outfilename = "output.wav" ;
+
+	/* The SF_INFO struct must be initialized before using it.
+	*/
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	/* Here's where we open the input file. We pass sf_open the file name and
 	** a pointer to an SF_INFO struct.
