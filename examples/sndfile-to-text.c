@@ -101,6 +101,8 @@ main (int argc, char * argv [])
 		return 1 ;
 		} ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
 	if ((infile = sf_open (infilename, SFM_READ, &sfinfo)) == NULL)
 	{	printf ("Not able to open input file %s.\n", infilename) ;
 		puts (sf_strerror (NULL)) ;
