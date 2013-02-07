@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -31,6 +31,7 @@
 */
 
 #include	<stdio.h>
+#include	<string.h>
 
 /* Include this header file to use functions from libsndfile. */
 #include	<sndfile.h>
