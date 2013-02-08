@@ -42,6 +42,14 @@
 #define TARGET_RT_LITTLE_ENDIAN 0
 #elif defined (TARGET_OS_WIN32)
 #define TARGET_RT_LITTLE_ENDIAN 1
+#elif defined (__BYTE_ORDER__)
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define TARGET_RT_LITTLE_ENDIAN 1
+#else
+#define TARGET_RT_LITTLE_ENDIAN 0
+#endif
+
 #endif
 
 uint16_t Swap16NtoB(uint16_t inUInt16)
