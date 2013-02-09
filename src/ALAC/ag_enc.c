@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
+ * Copyright (C) 2013 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
@@ -179,6 +180,7 @@ codeasescape:
 
 static inline void ALWAYS_INLINE dyn_jam_noDeref(unsigned char *out, uint32_t bitPos, uint32_t numBits, uint32_t value)
 {
+	/* FIXME: Cast-align warning when compiling on armhf. */
 	uint32_t	*i = (uint32_t *)(out + (bitPos >> 3));
 	uint32_t	mask;
 	uint32_t	curr;
@@ -203,6 +205,7 @@ static inline void ALWAYS_INLINE dyn_jam_noDeref(unsigned char *out, uint32_t bi
 
 static inline void ALWAYS_INLINE dyn_jam_noDeref_large(unsigned char *out, uint32_t bitPos, uint32_t numBits, uint32_t value)
 {
+	/* FIXME: Cast-align warning when compiling on armhf. */
 	uint32_t *	i = (uint32_t *)(out + (bitPos>>3));
 	uint32_t	w;
 	uint32_t	curr;

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
- * Copyright (C) 2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+ * Copyright (C) 2012-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
@@ -86,6 +86,7 @@ alac_decoder_init (ALAC_DECODER *p, void * inMagicCookie, uint32_t inMagicCookie
     // read the ALACSpecificConfig
     if (theCookieBytesRemaining >= sizeof(ALACSpecificConfig))
     {
+        /* FIXME: Cast-align warning when compiling on armhf. */
         theConfig.frameLength = Swap32BtoN(((ALACSpecificConfig *)theActualCookie)->frameLength);
 
 		if (theConfig.frameLength > ALAC_FRAME_LENGTH)
