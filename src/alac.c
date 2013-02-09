@@ -425,9 +425,9 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
 
 static int
-alac_encode_block (SF_PRIVATE * UNUSED (psf), ALAC_PRIVATE *plac)
+alac_encode_block (SF_PRIVATE * psf, ALAC_PRIVATE *plac)
 {	ALAC_ENCODER *penc = &plac->encoder ;
-	uint8_t	byte_buffer [ALAC_BYTE_BUFFER_SIZE] ;
+	uint8_t	byte_buffer [psf->sf.channels * ALAC_BYTE_BUFFER_SIZE] ;
 	int32_t num_bytes = 0 ;
 
 	alac_encode (penc, plac->channels, plac->partial_block_frames, plac->buffer, byte_buffer, &num_bytes) ;
