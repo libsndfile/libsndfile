@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -30,6 +30,7 @@
 #define	SNDFILE_1
 
 #include <stdio.h>
+#include <stdint.h>
 #include <sys/types.h>
 
 #ifdef __cplusplus
@@ -412,9 +413,9 @@ typedef struct
 
 	struct
 	{	int mode ;
-		unsigned int start ;
-		unsigned int end ;
-		unsigned int count ;
+		uint32_t start ;
+		uint32_t end ;
+		uint32_t count ;
 	} loops [16] ; /* make variable in a sensible way */
 } SF_INSTRUMENT ;
 
@@ -445,18 +446,18 @@ typedef struct
 */
 #define	SF_BROADCAST_INFO_VAR(coding_hist_size) \
 			struct \
-			{	char			description [256] ; \
-				char			originator [32] ; \
-				char			originator_reference [32] ; \
-				char			origination_date [10] ; \
-				char			origination_time [8] ; \
-				unsigned int	time_reference_low ; \
-				unsigned int	time_reference_high ; \
-				short			version ; \
-				char			umid [64] ; \
-				char			reserved [190] ; \
-				unsigned int	coding_history_size ; \
-				char			coding_history [coding_hist_size] ; \
+			{	char		description [256] ; \
+				char		originator [32] ; \
+				char		originator_reference [32] ; \
+				char		origination_date [10] ; \
+				char		origination_time [8] ; \
+				uint32_t	time_reference_low ; \
+				uint32_t	time_reference_high ; \
+				short		version ; \
+				char		umid [64] ; \
+				char		reserved [190] ; \
+				uint32_t	coding_history_size ; \
+				char		coding_history [coding_hist_size] ; \
 			}
 
 /* SF_BROADCAST_INFO is the above struct with coding_history field of 256 bytes. */
