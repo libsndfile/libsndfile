@@ -1,3 +1,9 @@
+2013-02-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/common.h
+    Bump SF_HEADER_LEN from 8192 to 12292, the value it was in the 1.0.25
+    release.
+
 2013-02-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/alac.c
