@@ -467,12 +467,12 @@ typedef struct
 /* SF_BROADCAST_INFO is the above struct with coding_history field of 256 bytes. */
 typedef SF_BROADCAST_INFO_VAR (256) SF_BROADCAST_INFO ;
 
-#define SF_CART_TIMER_I \
-			struct \
-			{	char		usage[4] ; \
-				long		value ; \
-			}
-typedef SF_CART_TIMER_I SF_CART_TIMER ;
+struct SF_CART_TIMER
+{	char		usage[4] ;
+	long		value ;
+} ;
+
+typedef struct SF_CART_TIMER SF_CART_TIMER ;
 
 #define	SF_CART_INFO_VAR(p_tag_text_size) \
 			struct \
