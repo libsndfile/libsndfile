@@ -229,7 +229,7 @@ static int
 alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 {	ALAC_PRIVATE	*plac ;
 	uint32_t		kuki_size ;
-	uint8_t			kuki [512] ;
+	union			{ uint8_t kuki [512] ; uint32_t alignment ; } u ;
 
 	if (info == NULL)
 	{	psf_log_printf (psf, "%s : ALAC_DECODER_INFO is NULL.\n", __func__) ;
@@ -253,9 +253,9 @@ alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 		} ;
 
 	/* Read in the ALAC cookie data and pass it to the init function. */
-	kuki_size = alac_kuki_read (psf, info->kuki_offset, kuki, sizeof (kuki)) ;
+	kuki_size = alac_kuki_read (psf, info->kuki_offset, u.kuki, sizeof (u.kuki)) ;
 
-	alac_decoder_init (&plac->decoder, kuki, kuki_size) ;
+	alac_decoder_init (&plac->decoder, u.kuki, kuki_size) ;
 
 	switch (info->bits_per_sample)
 	{	case 16 :
