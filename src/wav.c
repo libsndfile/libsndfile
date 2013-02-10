@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004-2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -601,11 +601,19 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case PAD_MARKER :
 					/*
 					We can eat into a 'PAD ' chunk if we need to.
-					e*/
+					parsestage |= HAVE_other ;
+					*/
+					psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
+					psf_binheader_readf (psf, "j", chunk_size) ;
+					break ;
+
 			case cart_MARKER:
 					if ((error = wav_read_cart_chunk (psf, chunk_size)))
 						return error ;
 					break ;
+
+			case iXML_MARKER : /* See http://en.wikipedia.org/wiki/IXML */
+			case strc_MARKER : /* Multiple of 32 bytes. */
 			case afsp_MARKER :
 			case clm_MARKER :
 			case elmo_MARKER :
