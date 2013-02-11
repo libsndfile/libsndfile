@@ -495,7 +495,7 @@ typedef struct SF_CART_TIMER SF_CART_TIMER ;
 				SF_CART_TIMER	post_timers [8] ; \
 				char		reserved [276] ; \
 				char		url [1024] ; \
-				int32_t		tag_text_size ; \
+				uint32_t	tag_text_size ; \
 				char		tag_text[p_tag_text_size] ; \
 			}
 
