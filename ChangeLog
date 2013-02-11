@@ -1,3 +1,8 @@
+2013-02-11  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/ALAC/
+    Replace Apple endswap routines with ones from libsndfile.
+
 2013-02-10  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/common.h

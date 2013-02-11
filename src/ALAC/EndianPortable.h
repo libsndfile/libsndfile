@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
+** Copyright (C) 2013 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
@@ -27,33 +28,12 @@
 #ifndef _EndianPortable_h
 #define _EndianPortable_h
 
-#include <stdint.h>
+#include <sfendian.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#define Swap16NtoB(x)	H2BE_16(x)
+#define Swap16BtoN(x)	BE2H_16(x)
 
-uint16_t Swap16NtoB(uint16_t inUInt16);
-uint16_t Swap16BtoN(uint16_t inUInt16);
-
-uint32_t Swap32NtoB(uint32_t inUInt32);
-uint32_t Swap32BtoN(uint32_t inUInt32);
-
-uint64_t Swap64BtoN(uint64_t inUInt64);
-uint64_t Swap64NtoB(uint64_t inUInt64);
-
-float SwapFloat32BtoN(float in);
-float SwapFloat32NtoB(float in);
-
-double SwapFloat64BtoN(double in);
-double SwapFloat64NtoB(double in);
-
-void Swap16(uint16_t * inUInt16);
-void Swap24(uint8_t * inUInt24);
-void Swap32(uint32_t * inUInt32);
-
-#ifdef __cplusplus
-}
-#endif
+#define Swap32NtoB(x)	H2BE_32(x)
+#define Swap32BtoN(x)	BE2H_32(x)
 
 #endif

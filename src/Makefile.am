@@ -69,7 +69,7 @@ G72x_libg72x_la_SOURCES = G72x/g72x.h G72x/g72x_priv.h \
 ALAC_libalac_la_SOURCES = ALAC/ALACAudioTypes.h ALAC/ALACBitUtilities.h \
 		ALAC/EndianPortable.h ALAC/aglib.h ALAC/dplib.h ALAC/matrixlib.h \
 		ALAC/alac_codec.h \
-		ALAC/ALACBitUtilities.c ALAC/EndianPortable.c ALAC/ag_dec.c \
+		ALAC/ALACBitUtilities.c ALAC/ag_dec.c \
 		ALAC/ag_enc.c ALAC/dp_dec.c ALAC/dp_enc.c ALAC/matrix_dec.c \
 		ALAC/matrix_enc.c ALAC/alac_decoder.c ALAC/alac_encoder.c
 
