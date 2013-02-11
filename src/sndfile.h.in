@@ -201,8 +201,8 @@ enum
 	SFC_SET_COMPRESSION_LEVEL		= 0x1301,
 
 	/* Cart Chunk support */
-	SFC_SET_CART_INFO		= 0x1400,
-	SFC_GET_CART_INFO		= 0x1401,
+	SFC_SET_CART_INFO				= 0x1400,
+	SFC_GET_CART_INFO				= 0x1401,
 
 	/* Following commands for testing only. */
 	SFC_TEST_IEEE_FLOAT_REPLACE		= 0x6001,
@@ -468,8 +468,8 @@ typedef struct
 typedef SF_BROADCAST_INFO_VAR (256) SF_BROADCAST_INFO ;
 
 struct SF_CART_TIMER
-{	char		usage[4] ;
-	long		value ;
+{	char	usage[4] ;
+	int32_t	value ;
 } ;
 
 typedef struct SF_CART_TIMER SF_CART_TIMER ;
@@ -491,11 +491,11 @@ typedef struct SF_CART_TIMER SF_CART_TIMER ;
 				char		producer_app_id [64] ; \
 				char		producer_app_version [64] ; \
 				char		user_def [64] ; \
-				long	level_reference ; \
+				int32_t		level_reference ; \
 				SF_CART_TIMER	post_timers [8] ; \
 				char		reserved [276] ; \
 				char		url [1024] ; \
-				unsigned int	tag_text_size ; \
+				int32_t		tag_text_size ; \
 				char		tag_text[p_tag_text_size] ; \
 			}
 

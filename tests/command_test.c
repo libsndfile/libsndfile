@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1354,18 +1354,13 @@ cart_test (const char *filename, int filetype)
 
 
 	if (ca_write.level_reference != ca_read.level_reference)
-	{	printf ("\n\nLine %d : level_reference mismatch :\n\twrite : '%ld'\n\tread  : '%ld'\n\n", __LINE__, ca_write.level_reference, ca_read.level_reference) ;
+	{	printf ("\n\nLine %d : level_reference mismatch :\n\twrite : '%d'\n\tread  : '%d'\n\n", __LINE__, ca_write.level_reference, ca_read.level_reference) ;
 		errors ++ ;
 		} ;
 
 	// TODO: make this more helpful
 	if (memcmp (ca_write.post_timers, ca_read.post_timers, sizeof (ca_write.post_timers)) != 0)
 	{	printf ("\n\nLine %d : post_timers mismatch :\n'\n\n", __LINE__) ;
-		errors ++ ;
-		} ;
-
-	if (memcmp (ca_write.reserved, ca_read.reserved, sizeof (ca_write.reserved)) != 0)
-	{	printf ("\n\nLine %d : reserved mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, ca_write.reserved, ca_read.reserved) ;
 		errors ++ ;
 		} ;
 
