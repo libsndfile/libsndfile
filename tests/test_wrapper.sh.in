@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+# Copyright (C) 2008-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 #
 # All rights reserved.
 #
@@ -93,6 +93,7 @@ if test -x test_main@EXEEXT@ ; then
 ./command_test@EXEEXT@ bext
 ./command_test@EXEEXT@ bextch
 ./command_test@EXEEXT@ chanmap
+./command_test@EXEEXT@ cart
 ./floating_point_test@EXEEXT@
 ./checksum_test@EXEEXT@
 ./scale_clip_test@EXEEXT@
