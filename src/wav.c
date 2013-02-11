@@ -1784,7 +1784,7 @@ int
 wav_read_cart_chunk (SF_PRIVATE *psf, uint32_t chunksize)
 {	SF_CART_INFO_16K *c ;
 	uint32_t bytes = 0 ;
-	SF_CART_TIMER *timer ;
+	int k ;
 
 	if (chunksize < WAV_CART_MIN_CHUNK_SIZE)
 	{	psf_log_printf (psf, "cart : %u (should be >= %d)\n", chunksize, WAV_CART_MIN_CHUNK_SIZE) ;
@@ -1826,15 +1826,12 @@ wav_read_cart_chunk (SF_PRIVATE *psf, uint32_t chunksize)
 	bytes += psf_binheader_readf (psf, "b", c->producer_app_id, sizeof (c->producer_app_id)) ;
 	bytes += psf_binheader_readf (psf, "b", c->producer_app_version, sizeof (c->producer_app_version)) ;
 	bytes += psf_binheader_readf (psf, "b", c->user_def, sizeof (c->user_def)) ;
-	bytes += psf_binheader_readf (psf, "4", &c->level_reference, sizeof (c->level_reference)) ;
-	timer = c->post_timers ; //  point at the first timer
-	for (int f = 0 ; f < 8 ; f++) //TODO: make this less magic - 8 is the maximum number of timers, should make this a constant
-	{
-		bytes += psf_binheader_readf (psf, "b", &timer->usage, make_size_t (4)) ;
-		bytes += psf_binheader_readf (psf, "4", &timer->value) ;
-		timer++ ;
-	}
-	bytes += psf_binheader_readf (psf, "j", sizeof (c->reserved)) ; // discard the reserved data ... ?
+	bytes += psf_binheader_readf (psf, "e4", &c->level_reference, sizeof (c->level_reference)) ;
+
+	for (k = 0 ; k < ARRAY_LEN (c->post_timers) ; k++)
+		bytes += psf_binheader_readf (psf, "b4", &c->post_timers [k].usage, make_size_t (4), &c->post_timers [k].value) ;
+
+	bytes += psf_binheader_readf (psf, "b", c->reserved, sizeof (c->reserved)) ;
 	bytes += psf_binheader_readf (psf, "b", c->url, sizeof (c->url)) ;
 
 	if (chunksize > WAV_CART_MIN_CHUNK_SIZE)
@@ -1842,14 +1839,15 @@ wav_read_cart_chunk (SF_PRIVATE *psf, uint32_t chunksize)
 		c->tag_text_size = chunksize - WAV_CART_MIN_CHUNK_SIZE ;
 		bytes += psf_binheader_readf (psf, "b", c->tag_text, make_size_t (c->tag_text_size)) ;
 		} ;
-	return 0 ;
 
+	return 0 ;
 } /* wav_read_cart_chunk */
 
 int
 wav_write_cart_chunk (SF_PRIVATE *psf)
 {	SF_CART_INFO_16K *c ;
-	SF_CART_TIMER *timer ;
+	int k ;
+
 	if (psf->cart_16k == NULL)
 		return -1 ;
 
@@ -1875,18 +1873,16 @@ wav_write_cart_chunk (SF_PRIVATE *psf)
 	psf_binheader_writef (psf, "b", c->producer_app_version, sizeof (c->producer_app_version)) ;
 	psf_binheader_writef (psf, "b", c->user_def, sizeof (c->user_def)) ;
 	psf_binheader_writef (psf, "4", c->level_reference, sizeof (c->level_reference)) ;
-	// TODO : sort out them pesky timers
-	timer = (SF_CART_TIMER *) c->post_timers ;
-	for (int f = 0 ; f < 8 ; f++) //TODO: make this less magic - 8 is the maximum number of timers, should make this a constant
-	{
-		psf_binheader_writef (psf, "b", (c->post_timers + f)->usage, make_size_t (4)) ;
-		psf_binheader_writef (psf, "4", (c->post_timers + f)->value) ;
-		timer++ ;
-	}
+
+	for (k = 0 ; k < ARRAY_LEN (c->post_timers) ; k++)
+		psf_binheader_writef (psf, "b4", c->post_timers [k].usage, make_size_t (4), c->post_timers [k].value) ;
+
 	psf_binheader_writef (psf, "z", sizeof (c->reserved)) ;	// just write zeros, we don't have any other use for it
 	psf_binheader_writef (psf, "b", c->url, sizeof (c->url)) ;
+
 	if (c->tag_text_size > 0)
 		psf_binheader_writef (psf, "b", c->tag_text, make_size_t (c->tag_text_size)) ;
+
 	return 0 ;
 } /* wav_write_cart_chunk */
 
