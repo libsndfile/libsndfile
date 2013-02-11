@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -2648,6 +2648,7 @@ psf_close (SF_PRIVATE *psf)
 	free (psf->rchunks.chunks) ;
 	free (psf->wchunks.chunks) ;
 	free (psf->iterator) ;
+	free (psf->cart_16k) ;
 
 	memset (psf, 0, sizeof (SF_PRIVATE)) ;
 	free (psf) ;
