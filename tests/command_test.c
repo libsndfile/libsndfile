@@ -157,6 +157,8 @@ main (int argc, char *argv [])
 	if (do_all || strcmp (argv [1], "cart") == 0)
 	{	cart_test ("cart.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		cart_rdwr_test ("cart.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+		cart_test ("cart.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
+		cart_rdwr_test ("cart.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
 		test_count ++ ;
 		} ;
 
