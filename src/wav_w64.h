@@ -291,5 +291,8 @@ int		wavex_gen_channel_mask (const int *chan_map, int channels) ;
 int		wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize) ;
 int		wav_write_bext_chunk (SF_PRIVATE *psf) ;
 
+int		wav_read_cart_chunk (SF_PRIVATE *psf, unsigned int chunksize) ;
+int		wav_write_cart_chunk (SF_PRIVATE *psf) ;
+
 #endif
 

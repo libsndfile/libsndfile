@@ -113,6 +113,10 @@
 #define WAV_BEXT_MIN_CHUNK_SIZE		602
 #define WAV_BEXT_MAX_CHUNK_SIZE		(10 * 1024)
 
+#define WAV_CART_MIN_CHUNK_SIZE		2048
+#define WAV_CART_MAX_CHUNK_SIZE		0xffffffff
+
+
 enum
 {	HAVE_RIFF	= 0x01,
 	HAVE_WAVE	= 0x02,
@@ -597,18 +601,14 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case PAD_MARKER :
 					/*
 					We can eat into a 'PAD ' chunk if we need to.
-					parsestage |= HAVE_other ;
-					*/
-					psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
-					psf_binheader_readf (psf, "j", chunk_size) ;
+					e*/
+			case cart_MARKER:
+					if ((error = wav_read_cart_chunk (psf, chunk_size)))
+						return error ;
 					break ;
-
-			case iXML_MARKER : /* See http://en.wikipedia.org/wiki/IXML */
-			case strc_MARKER : /* Multiple of 32 bytes. */
 			case afsp_MARKER :
 			case clm_MARKER :
 			case elmo_MARKER :
-			case cart_MARKER :
 			case levl_MARKER :
 			case plst_MARKER :
 			case minf_MARKER :
@@ -1103,6 +1103,9 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 
 	if (psf->broadcast_16k != NULL)
 		wav_write_bext_chunk (psf) ;
+
+	if (psf->cart_16k != NULL)
+		wav_write_cart_chunk (psf) ;
 
 	if (psf->instrument != NULL)
 	{	int		tmp ;
@@ -1768,6 +1771,116 @@ wav_write_bext_chunk (SF_PRIVATE *psf)
 
 	return 0 ;
 } /* wav_write_bext_chunk */
+
+int
+wav_read_cart_chunk (SF_PRIVATE *psf, uint32_t chunksize)
+{	SF_CART_INFO_16K *c ;
+	uint32_t bytes = 0 ;
+	SF_CART_TIMER *timer ;
+
+	if (chunksize < WAV_CART_MIN_CHUNK_SIZE)
+	{	psf_log_printf (psf, "cart : %u (should be >= %d)\n", chunksize, WAV_CART_MIN_CHUNK_SIZE) ;
+		psf_binheader_readf (psf, "j", chunksize) ;
+		return 0 ;
+		} ;
+	if (chunksize > WAV_CART_MAX_CHUNK_SIZE)
+	{	psf_log_printf (psf, "cart : %u (should be < %d)\n", chunksize, WAV_CART_MAX_CHUNK_SIZE) ;
+		psf_binheader_readf (psf, "j", chunksize) ;
+		return 0 ;
+		} ;
+
+	if (chunksize >= sizeof (SF_CART_INFO_16K))
+	{	psf_log_printf (psf, "cart : %u too big to be handled\n", chunksize) ;
+		psf_binheader_readf (psf, "j", chunksize) ;
+		return 0 ;
+		} ;
+
+	psf_log_printf (psf, "cart : %u\n", chunksize) ;
+
+	if ((psf->cart_16k = cart_var_alloc ()) == NULL)
+	{	psf->error = SFE_MALLOC_FAILED ;
+		return psf->error ;
+		} ;
+
+	c = psf->cart_16k ;
+	bytes += psf_binheader_readf (psf, "b", c->version, sizeof (c->version)) ;
+	bytes += psf_binheader_readf (psf, "b", c->title, sizeof (c->title)) ;
+	bytes += psf_binheader_readf (psf, "b", c->artist, sizeof (c->artist)) ;
+	bytes += psf_binheader_readf (psf, "b", c->cut_id, sizeof (c->cut_id)) ;
+	bytes += psf_binheader_readf (psf, "b", c->client_id, sizeof (c->client_id)) ;
+	bytes += psf_binheader_readf (psf, "b", c->category, sizeof (c->category)) ;
+	bytes += psf_binheader_readf (psf, "b", c->classification, sizeof (c->classification)) ;
+	bytes += psf_binheader_readf (psf, "b", c->out_cue, sizeof (c->out_cue)) ;
+	bytes += psf_binheader_readf (psf, "b", c->start_date, sizeof (c->start_date)) ;
+	bytes += psf_binheader_readf (psf, "b", c->start_time, sizeof (c->start_time)) ;
+	bytes += psf_binheader_readf (psf, "b", c->end_date, sizeof (c->end_date)) ;
+	bytes += psf_binheader_readf (psf, "b", c->end_time, sizeof (c->end_time)) ;
+	bytes += psf_binheader_readf (psf, "b", c->producer_app_id, sizeof (c->producer_app_id)) ;
+	bytes += psf_binheader_readf (psf, "b", c->producer_app_version, sizeof (c->producer_app_version)) ;
+	bytes += psf_binheader_readf (psf, "b", c->user_def, sizeof (c->user_def)) ;
+	bytes += psf_binheader_readf (psf, "4", &c->level_reference, sizeof (c->level_reference)) ;
+	timer = c->post_timers ; //  point at the first timer
+	for (int f = 0 ; f < 8 ; f++) //TODO: make this less magic - 8 is the maximum number of timers, should make this a constant
+	{
+		bytes += psf_binheader_readf (psf, "b", &timer->usage, make_size_t (4)) ;
+		bytes += psf_binheader_readf (psf, "4", &timer->value) ;
+		timer++ ;
+	}
+	bytes += psf_binheader_readf (psf, "j", sizeof (c->reserved)) ; // discard the reserved data ... ?
+	bytes += psf_binheader_readf (psf, "b", c->url, sizeof (c->url)) ;
+
+	if (chunksize > WAV_CART_MIN_CHUNK_SIZE)
+	{	/* File has tag text. */
+		c->tag_text_size = chunksize - WAV_CART_MIN_CHUNK_SIZE ;
+		bytes += psf_binheader_readf (psf, "b", c->tag_text, make_size_t (c->tag_text_size)) ;
+		} ;
+	return 0 ;
+
+} /* wav_read_cart_chunk */
+
+int
+wav_write_cart_chunk (SF_PRIVATE *psf)
+{	SF_CART_INFO_16K *c ;
+	SF_CART_TIMER *timer ;
+	if (psf->cart_16k == NULL)
+		return -1 ;
+
+	c = psf->cart_16k ;
+	psf_binheader_writef (psf, "m4", cart_MARKER, WAV_CART_MIN_CHUNK_SIZE + c->tag_text_size) ;
+	/*
+	**	Note that it is very important the the field widths of the SF_CART_INFO
+	**	struct match those for the cart chunk fields.
+	*/
+	psf_binheader_writef (psf, "b", c->version, sizeof (c->version)) ;
+	psf_binheader_writef (psf, "b", c->title, sizeof (c->title)) ;
+	psf_binheader_writef (psf, "b", c->artist, sizeof (c->artist)) ;
+	psf_binheader_writef (psf, "b", c->cut_id, sizeof (c->cut_id)) ;
+	psf_binheader_writef (psf, "b", c->client_id, sizeof (c->client_id)) ;
+	psf_binheader_writef (psf, "b", c->category, sizeof (c->category)) ;
+	psf_binheader_writef (psf, "b", c->classification, sizeof (c->classification)) ;
+	psf_binheader_writef (psf, "b", c->out_cue, sizeof (c->out_cue)) ;
+	psf_binheader_writef (psf, "b", c->start_date, sizeof (c->start_date)) ;
+	psf_binheader_writef (psf, "b", c->start_time, sizeof (c->start_time)) ;
+	psf_binheader_writef (psf, "b", c->end_date, sizeof (c->end_date)) ;
+	psf_binheader_writef (psf, "b", c->end_time, sizeof (c->end_time)) ;
+	psf_binheader_writef (psf, "b", c->producer_app_id, sizeof (c->producer_app_id)) ;
+	psf_binheader_writef (psf, "b", c->producer_app_version, sizeof (c->producer_app_version)) ;
+	psf_binheader_writef (psf, "b", c->user_def, sizeof (c->user_def)) ;
+	psf_binheader_writef (psf, "4", c->level_reference, sizeof (c->level_reference)) ;
+	// TODO : sort out them pesky timers
+	timer = (SF_CART_TIMER *) c->post_timers ;
+	for (int f = 0 ; f < 8 ; f++) //TODO: make this less magic - 8 is the maximum number of timers, should make this a constant
+	{
+		psf_binheader_writef (psf, "b", (c->post_timers + f)->usage, make_size_t (4)) ;
+		psf_binheader_writef (psf, "4", (c->post_timers + f)->value) ;
+		timer++ ;
+	}
+	psf_binheader_writef (psf, "z", sizeof (c->reserved)) ;	// just write zeros, we don't have any other use for it
+	psf_binheader_writef (psf, "b", c->url, sizeof (c->url)) ;
+	if (c->tag_text_size > 0)
+		psf_binheader_writef (psf, "b", c->tag_text, make_size_t (c->tag_text_size)) ;
+	return 0 ;
+} /* wav_write_cart_chunk */
 
 static int
 exif_fill_and_sink (SF_PRIVATE *psf, char* buf, size_t bufsz, size_t toread)
