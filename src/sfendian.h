@@ -126,6 +126,9 @@ ENDSWAP_64 (uint64_t x)
 	#define BE2H_32(x)			(x)
 	#define	BE2H_64(x)			(x)
 
+	#define H2BE_16(x)			(x)
+	#define H2BE_32(x)			(x)
+
 	#define H2LE_16(x)			ENDSWAP_16 (x)
 	#define H2LE_32(x)			ENDSWAP_32 (x)
 
