@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2010-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2010-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -55,7 +55,7 @@ fill_tag_text (SF_CART_INFO_512 * ci)
 		append_snprintf (ci->tag_text, ci->tag_text_size, "%s\n", lines [k % ARRAY_LEN (lines)]) ;
 
 	return ;
-} /* fill_coding_listory */
+} /* fill_tag_text */
 
 void
 test_cart_var (void)
@@ -75,7 +75,7 @@ test_cart_var (void)
 		memset (&ci, 0, sizeof (ci)) ;
 
 		memset (&timer, 0, sizeof (timer)) ;
-		memcpy ((void * restrict) ci.post_timers, (void *restrict) &timer, sizeof (timer)) ;
+		memcpy (ci.post_timers, &timer, sizeof (timer)) ;
 
 		ci.tag_text_size = k ;
 		fill_tag_text (&ci) ;
@@ -88,4 +88,4 @@ test_cart_var (void)
 		free (psf->cart_16k) ;
 
 	puts ("ok") ;
-} /* t void * restrictest_cart_var */
+} /* test_cart_var */
