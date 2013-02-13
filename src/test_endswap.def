@@ -18,3 +18,16 @@ int_type = {
 	format		= FMT_INT64 ;
 	} ;
 
+int_size = {
+	name		= 32 ;
+	typename	= int32_t ;
+	value		= 0x30313233 ;
+	strval		= "0123" ;
+	} ;
+
+int_size = {
+	name		= 64 ;
+	typename	= int64_t ;
+	value		= 0x3031323334353637 ;
+	strval		= "01234567" ;
+	} ;
