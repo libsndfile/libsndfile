@@ -4,8 +4,11 @@
     Add tests for psf_put_be32() and psf_put_be64().
 
     * src/sfendian.h src/test_endswap.(def|tpl)
-    Add functions psf_get_be32() and psf_gett_be64() with tests.
+    Add functions psf_get_be(16|32|64) with tests.
     These are needed for platforms where un-aligned accesses cause bus faults.
+
+    * src/ALAC/ag_enc.c src/ALAC/alac_decoder.c
+    Replace all un-aligned accesses with safe alternatives.
 
 2013-02-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 

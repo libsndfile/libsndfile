@@ -24,6 +24,7 @@
 */
 
 #include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "alac_codec.h"
@@ -87,21 +88,21 @@ alac_decoder_init (ALAC_DECODER *p, void * inMagicCookie, uint32_t inMagicCookie
     if (theCookieBytesRemaining >= sizeof(ALACSpecificConfig))
     {
         /* FIXME: Cast-align warning when compiling on armhf. */
-        theConfig.frameLength = Swap32BtoN(((ALACSpecificConfig *)theActualCookie)->frameLength);
+        theConfig.frameLength = psf_get_be32 (theActualCookie, offsetof (ALACSpecificConfig, frameLength)) ;
 
 		if (theConfig.frameLength > ALAC_FRAME_LENGTH)
 			return fALAC_FrameLengthError ;
 
-        theConfig.compatibleVersion = ((ALACSpecificConfig *)theActualCookie)->compatibleVersion;
-        theConfig.bitDepth = ((ALACSpecificConfig *)theActualCookie)->bitDepth;
-        theConfig.pb = ((ALACSpecificConfig *)theActualCookie)->pb;
-        theConfig.mb = ((ALACSpecificConfig *)theActualCookie)->mb;
-        theConfig.kb = ((ALACSpecificConfig *)theActualCookie)->kb;
-        theConfig.numChannels = ((ALACSpecificConfig *)theActualCookie)->numChannels;
-        theConfig.maxRun = Swap16BtoN(((ALACSpecificConfig *)theActualCookie)->maxRun);
-        theConfig.maxFrameBytes = Swap32BtoN(((ALACSpecificConfig *)theActualCookie)->maxFrameBytes);
-        theConfig.avgBitRate = Swap32BtoN(((ALACSpecificConfig *)theActualCookie)->avgBitRate);
-        theConfig.sampleRate = Swap32BtoN(((ALACSpecificConfig *)theActualCookie)->sampleRate);
+        theConfig.compatibleVersion = theActualCookie [offsetof (ALACSpecificConfig, compatibleVersion)] ;
+        theConfig.bitDepth = theActualCookie [offsetof (ALACSpecificConfig, bitDepth)] ;
+        theConfig.pb = theActualCookie [offsetof (ALACSpecificConfig, pb)] ;
+        theConfig.mb = theActualCookie [offsetof (ALACSpecificConfig, mb)] ;
+        theConfig.kb = theActualCookie [offsetof (ALACSpecificConfig, kb)] ;
+        theConfig.numChannels = theActualCookie [offsetof (ALACSpecificConfig, numChannels)] ;
+        theConfig.maxRun = psf_get_be16 (theActualCookie, offsetof (ALACSpecificConfig, maxRun)) ;
+        theConfig.maxFrameBytes = psf_get_be32 (theActualCookie, offsetof (ALACSpecificConfig, maxFrameBytes)) ;
+        theConfig.avgBitRate = psf_get_be32 (theActualCookie, offsetof (ALACSpecificConfig, avgBitRate)) ;
+        theConfig.sampleRate = psf_get_be32 (theActualCookie, offsetof (ALACSpecificConfig, sampleRate)) ;
 
         p->mConfig = theConfig;
 

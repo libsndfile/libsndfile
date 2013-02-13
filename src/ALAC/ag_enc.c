@@ -180,16 +180,13 @@ codeasescape:
 
 static inline void ALWAYS_INLINE dyn_jam_noDeref(unsigned char *out, uint32_t bitPos, uint32_t numBits, uint32_t value)
 {
-	/* FIXME: Cast-align warning when compiling on armhf. */
-	uint32_t	*i = (uint32_t *)(out + (bitPos >> 3));
 	uint32_t	mask;
 	uint32_t	curr;
 	uint32_t	shift;
 
 	//Assert( numBits <= 32 );
 
-	curr = *i;
-	curr = Swap32NtoB( curr );
+	curr = psf_get_be32 (out, bitPos >> 3);
 
 	shift = 32 - (bitPos & 7) - numBits;
 
@@ -199,23 +196,20 @@ static inline void ALWAYS_INLINE dyn_jam_noDeref(unsigned char *out, uint32_t bi
 	value  = (value << shift) & mask;
 	value |= curr & ~mask;
 
-	*i = Swap32BtoN( value );
+	psf_put_be32 (out, bitPos >> 3, value) ;
 }
 
 
 static inline void ALWAYS_INLINE dyn_jam_noDeref_large(unsigned char *out, uint32_t bitPos, uint32_t numBits, uint32_t value)
 {
-	/* FIXME: Cast-align warning when compiling on armhf. */
-	uint32_t *	i = (uint32_t *)(out + (bitPos>>3));
 	uint32_t	w;
 	uint32_t	curr;
 	uint32_t	mask;
-	int32_t			shiftvalue = (32 - (bitPos&7) - numBits);
+	int32_t		shiftvalue = (32 - (bitPos&7) - numBits);
 
 	//Assert(numBits <= 32);
 
-	curr = *i;
-	curr = Swap32NtoB( curr );
+	curr = psf_get_be32 (out, bitPos >> 3);
 
 	if (shiftvalue < 0)
 	{
@@ -226,7 +220,7 @@ static inline void ALWAYS_INLINE dyn_jam_noDeref_large(unsigned char *out, uint3
 		mask = ~0u >> -shiftvalue;
 		w |= (curr & ~mask);
 
-		tailptr = ((uint8_t *)i) + 4;
+		tailptr = out + (bitPos>>3) + 4;
 		tailbyte = (value << ((8+shiftvalue))) & 0xff;
 		*tailptr = (uint8_t)tailbyte;
 	}
@@ -239,7 +233,7 @@ static inline void ALWAYS_INLINE dyn_jam_noDeref_large(unsigned char *out, uint3
 		w |= curr & ~mask;
 	}
 
-	*i = Swap32BtoN( w );
+	psf_put_be32 (out, bitPos >> 3, w) ;
 }
 
 
