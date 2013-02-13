@@ -19,6 +19,13 @@ int_type = {
 	} ;
 
 int_size = {
+	name		= 16 ;
+	typename	= int16_t ;
+	value		= 0x4142 ;
+	strval		= "AB" ;
+	} ;
+
+int_size = {
 	name		= 32 ;
 	typename	= int32_t ;
 	value		= 0x30313233 ;

@@ -109,18 +109,22 @@ test_endswap_[+ (get "name") +] (void)
 static void
 test_psf_put_be[+ (get "name") +] (void)
 {	const char *test = "[+ (get "strval") +]" ;
-	uint8_t array [20] ;
+	uint8_t array [32] ;
 	int k ;
 
 	printf ("    %-40s : ", __func__) ;
 	fflush (stdout) ;
 
-	for (k = 0 ; k < 6 ; k++)
+	for (k = 0 ; k < 10 ; k++)
 	{	memset (array, 0, sizeof (array)) ;
 
 		psf_put_be[+ (get "name") +] (array, k, [+ (get "value") +]) ;
 		if (memcmp (array + k, test, sizeof ([+ (get "typename") +])) != 0)
-		{	printf ("Failed at %d\n", k) ;
+		{	printf ("\n\nLine %d : Put failed at index %d.\n", __LINE__, k) ;
+			exit (1) ;
+			} ;
+		if (psf_get_be[+ (get "name") +] (array, k) != [+ (get "value") +])
+		{	printf ("\n\nLine %d : Get failed at index %d.\n", __LINE__, k) ;
 			exit (1) ;
 			} ;
 		} ;

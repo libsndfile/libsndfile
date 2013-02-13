@@ -164,6 +164,47 @@ psf_put_be32 (uint8_t *ptr, int offset, int32_t value)
 	ptr [offset + 3] = value ;
 } /* psf_put_be32 */
 
+static inline void
+psf_put_be16 (uint8_t *ptr, int offset, int16_t value)
+{
+	ptr [offset] = value >> 8 ;
+	ptr [offset + 1] = value ;
+} /* psf_put_be16 */
+
+static inline int64_t
+psf_get_be64 (uint8_t *ptr, int offset)
+{	int64_t value ;
+
+	value = ptr [offset] << 24 ;
+	value += ptr [offset + 1] << 16 ;
+	value += ptr [offset + 2] << 8 ;
+	value += ptr [offset + 3] ;
+
+	value <<= 32 ;
+
+	value += ptr [offset + 4] << 24 ;
+	value += ptr [offset + 5] << 16 ;
+	value += ptr [offset + 6] << 8 ;
+	value += ptr [offset + 7] ;
+	return value ;
+} /* psf_get_be64 */
+
+static inline int32_t
+psf_get_be32 (uint8_t *ptr, int offset)
+{	int32_t value ;
+
+	value = ptr [offset] << 24 ;
+	value += ptr [offset + 1] << 16 ;
+	value += ptr [offset + 2] << 8 ;
+	value += ptr [offset + 3] ;
+	return value ;
+} /* psf_get_be32 */
+
+static inline int16_t
+psf_get_be16 (uint8_t *ptr, int offset)
+{	return (ptr [offset] << 8) + ptr [offset + 1] ;
+} /* psf_get_be16 */
+
 /*-----------------------------------------------------------------------------------------------
 ** Generic functions for performing endian swapping on integer arrays.
 */
