@@ -9,6 +9,7 @@
 
     * src/ALAC/ag_enc.c src/ALAC/alac_decoder.c
     Replace all un-aligned accesses with safe alternatives.
+    Closes: https://github.com/erikd/libsndfile/issues/19
 
 2013-02-12  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
