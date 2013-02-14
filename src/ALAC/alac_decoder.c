@@ -87,7 +87,6 @@ alac_decoder_init (ALAC_DECODER *p, void * inMagicCookie, uint32_t inMagicCookie
     // read the ALACSpecificConfig
     if (theCookieBytesRemaining >= sizeof(ALACSpecificConfig))
     {
-        /* FIXME: Cast-align warning when compiling on armhf. */
         theConfig.frameLength = psf_get_be32 (theActualCookie, offsetof (ALACSpecificConfig, frameLength)) ;
 
 		if (theConfig.frameLength > ALAC_FRAME_LENGTH)
