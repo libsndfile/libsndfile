@@ -297,7 +297,7 @@ if test -n "$PKG_CONFIG" ; then
 		PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
 
 		# Make sure the FLAC_CFLAGS value is sane.
-		FLAC_CFLAGS=`echo $FLAC_CFLAGS | $SED "s/FLAC$//"`
+		FLAC_CFLAGS=`echo $FLAC_CFLAGS | $SED "s|include/FLAC||"`
 
 		PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 

@@ -1,3 +1,8 @@
+2013-02-22  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * configure.ac
+    Improve sanitization of FLAC_CFLAGS value.
+
 2013-02-21  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/Makefile.am
