@@ -103,19 +103,19 @@ checkprograms : $(check_PROGRAMS)
 # end user to create these files.
 
 Symbols.gnu-binutils: create_symbols_file.py
-	./create_symbols_file.py linux $(VERSION) > $@
+	python create_symbols_file.py linux $(VERSION) > $@
 
 Symbols.darwin: create_symbols_file.py
-	./create_symbols_file.py darwin $(VERSION) > $@
+	python create_symbols_file.py darwin $(VERSION) > $@
 
 libsndfile-1.def: create_symbols_file.py
-	./create_symbols_file.py win32 $(VERSION) > $@
+	python create_symbols_file.py win32 $(VERSION) > $@
 
 Symbols.os2: create_symbols_file.py
-	./create_symbols_file.py os2 $(VERSION) > $@
+	python create_symbols_file.py os2 $(VERSION) > $@
 
 Symbols.static: create_symbols_file.py
-	./create_symbols_file.py static $(VERSION) > $@
+	python create_symbols_file.py static $(VERSION) > $@
 
 # Fake dependancy to force the creation of these files.
 sndfile.o : $(SYMBOL_FILES)
