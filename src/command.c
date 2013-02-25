@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -122,7 +122,7 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_AVR,		"AVR (Audio Visual Research)",			"avr"	},
 	{	SF_FORMAT_CAF,		"CAF (Apple Core Audio File)",			"caf"	},
 #if HAVE_EXTERNAL_LIBS
-	{	SF_FORMAT_FLAC,		"FLAC (FLAC Lossless Audio Codec)",		"flac"	},
+	{	SF_FORMAT_FLAC,		"FLAC (Free Lossless Audio Codec)",		"flac"	},
 #endif
 	{	SF_FORMAT_HTK,		"HTK (HMM Tool Kit)",					"htk"	},
 	{	SF_FORMAT_SVX,		"IFF (Amiga IFF/SVX8/SV16)",			"iff"	},
