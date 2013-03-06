@@ -1,3 +1,9 @@
+2013-03-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * src/ALAC/alac_encoder.c
+    Patch from Michael Pruett (author of libaudiofile) to add correct byte
+    swapping for the mChannelLayoutTag field.
+
 2013-03-02  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * doc/bugs.html

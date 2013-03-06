@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
- * Copyright (C) 2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+ * Copyright (C) 2012-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
@@ -1151,7 +1151,7 @@ alac_get_magic_cookie(ALAC_ENCODER *p, void * outCookie, uint32_t * ioSize )
     GetConfig(p, &theConfig);
     if (theConfig.numChannels > 2)
     {
-        theChannelLayout.mChannelLayoutTag = ALACChannelLayoutTags[theConfig.numChannels - 1];
+        theChannelLayout.mChannelLayoutTag = Swap32NtoB(ALACChannelLayoutTags[theConfig.numChannels - 1]);
         theCookieSize += (sizeof(ALACAudioChannelLayout) + kChannelAtomSize);
     }
      if (*ioSize >= theCookieSize)
