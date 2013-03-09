@@ -1,3 +1,8 @@
+2013-03-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * M4/gcc_version.m4
+    Fix to work with OpenBSD's sed.
+
 2013-03-07  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * src/ALAC/alac_encoder.c
