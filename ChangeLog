@@ -1,3 +1,10 @@
+2013-03-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * tests/dft_cmp.c
+    Fix a buffer overflow detected using GCC 4.8's -fsantiize=address runtime
+    error checking functionality. This was a buffer overflow in libsndfile's
+    test suite, not in the actual library code.
+
 2013-03-09  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * M4/gcc_version.m4
