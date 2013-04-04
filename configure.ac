@@ -516,6 +516,9 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	MN_ADD_CFLAGS([-Wpointer-arith])
 	MN_ADD_CFLAGS([-funsigned-char])
 
+	MN_ADD_CFLAGS([-D_FORTIFY_SOURCE=2])
+	MN_ADD_CFLAGS([-fstack-protector --param ssp-buffer-size=4])
+
 	if test x$enable_gcc_werror = "xyes" ; then
 		CFLAGS="-Werror $CFLAGS"
 		CXXFLAGS="-Werror $CXXFLAGS"
