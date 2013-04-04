@@ -466,14 +466,6 @@ if test x"$ac_cv_prog_HAVE_AUTOGEN" = "xno" ; then
 #====================================================================================
 # Settings for the HTML documentation.
 
-htmldocdir=$prefix/share/doc/libsndfile1-dev/html
-
-if test x$prefix = "xNONE" ; then
-	htmldocdir=/usr/local/share/doc/libsndfile1-dev/html
-else
-	htmldocdir=$prefix/share/doc/libsndfile1-dev/html
-	fi
-
 if test x$enable_bow_docs = "xyes" ; then
 	HTML_BGCOLOUR="white"
 	HTML_FGCOLOUR="black"
@@ -595,7 +587,6 @@ WIN_RC_VERSION=`echo $PACKAGE_VERSION | $SED -e "s/p.*//" -e "s/\./,/g"`
 
 AC_SUBST(HOST_TRIPLET)
 
-AC_SUBST(htmldocdir)
 AC_SUBST(HTML_BGCOLOUR)
 AC_SUBST(HTML_FGCOLOUR)
 
