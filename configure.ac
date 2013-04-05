@@ -660,6 +660,22 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		fi
 	fi
 
+if test $libdir = "\${exec_prefix}/lib" ; then
+	libdir="$prefix/lib"
+	fi
+
+if test $bindir = "\${exec_prefix}/bin" ; then
+	bindir="$prefix/bin"
+	fi
+
+AC_MSG_RESULT([[
+  Installation directories :
+
+    Library directory : ................... $libdir
+    Program directory : ................... $bindir
+    Pkgconfig directory : ................. $libdir/pkgconfig
+]])
+
 if test x$prefix != "x/usr" ; then
 	echo "Compiling some other packages against libsndfile may require"
 	echo "the addition of '$libdir/pkgconfig' to the"
