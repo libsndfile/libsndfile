@@ -21,7 +21,7 @@ OCT_LIB_DIR = @OCT_LIB_DIR@
 OCT_LIBS = @OCT_LIBS@
 
 SNDFILEDIR = $(top_builddir)/src
-INCLUDES = -I$(SNDFILEDIR)
+AM_CPPFLAGS = -I$(SNDFILEDIR)
 
 oct_module_srcs = sndfile.cc
 oct_module_files = sndfile.oct PKG_ADD
