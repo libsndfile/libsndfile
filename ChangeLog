@@ -1,3 +1,9 @@
+2013-04-05  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
+
+    * Makefile.am
+    Make sure checkprograms are built as part of 'make test-tarball'.
+    Closes: https://github.com/erikd/libsndfile/issues/37
+
 2013-03-29  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
 
     * tests/dft_cmp.c

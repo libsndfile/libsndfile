@@ -38,5 +38,6 @@ testprogs :
 
 
 test-tarball : build-test-tarball.mk
-	make all
+	(cd src ; make all libsndfile.la checkprograms)
+	(cd tests ; make all checkprograms)
 	make -f build-test-tarball.mk
