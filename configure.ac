@@ -614,11 +614,12 @@ AC_CONFIG_FILES([ \
 	src/version-metadata.rc tests/test_wrapper.sh tests/pedantic-header-test.sh \
 	doc/libsndfile.css build-test-tarball.mk libsndfile.spec sndfile.pc \
 	src/sndfile.h \
+	echo-install-dirs
 	])
 AC_OUTPUT
 
 # Make sure these are executable.
-chmod u+x tests/test_wrapper.sh build-test-tarball.mk
+chmod u+x tests/test_wrapper.sh build-test-tarball.mk echo-install-dirs
 
 #====================================================================================
 
@@ -660,29 +661,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		fi
 	fi
 
-if test $libdir = "\${exec_prefix}/lib" ; then
-	libdir="$prefix/lib"
-	fi
-
-if test $bindir = "\${exec_prefix}/bin" ; then
-	bindir="$prefix/bin"
-	fi
-
-AC_MSG_RESULT([[
-  Installation directories :
-
-    Library directory : ................... $libdir
-    Program directory : ................... $bindir
-    Pkgconfig directory : ................. $libdir/pkgconfig
-    HTML docs directory : ................. $htmldocdir
-]])
-
-if test x$prefix != "x/usr" ; then
-	echo "Compiling some other packages against libsndfile may require"
-	echo "the addition of '$libdir/pkgconfig' to the"
-	echo "PKG_CONFIG_PATH environment variable."
-	echo
-	fi
+(./echo-install-dirs)
 
 (cd src && make genfiles)
 (cd tests && make genfiles)
