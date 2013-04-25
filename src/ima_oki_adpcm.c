@@ -1,6 +1,7 @@
 /*
 ** Copyright (C) 2007-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (c) 2007 <robs@users.sourceforge.net>
+** Copyright (c) 2013 Chris Rienzo <chris.rienzo@grasshopper.com>
 **
 ** This library is free software; you can redistribute it and/or modify it
 ** under the terms of the GNU Lesser General Public License as published by
@@ -28,8 +29,10 @@
 
 #include "ima_oki_adpcm.h"
 
-#define MIN_SAMPLE	-0x8000
-#define MAX_SAMPLE	0x7fff
+#define IMA_MIN_SAMPLE	-0x8000
+#define IMA_MAX_SAMPLE	0x7fff
+#define OKI_MIN_SAMPLE	-0x800
+#define OKI_MAX_SAMPLE	0x7ff
 
 static int const ima_steps [] =	/* ~16-bit precision */
 {	7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45,
@@ -41,11 +44,11 @@ static int const ima_steps [] =	/* ~16-bit precision */
 	32767
 } ;
 
-static int const oki_steps [] =	/* ~12-bit precision */
-{	256, 272, 304, 336, 368, 400, 448, 496, 544, 592, 656, 720, 800, 880, 960,
-	1056, 1168, 1280, 1408, 1552, 1712, 1888, 2080, 2288, 2512, 2768, 3040, 3344,
-	3680, 4048, 4464, 4912, 5392, 5936, 6528, 7184, 7904, 8704, 9568, 10528,
-	11584, 12736, 14016, 15408, 16960, 18656, 20512, 22576, 24832
+static int const oki_steps [] = /* ~12-bit precision */
+{	16, 17, 19, 21, 23, 25, 28, 31, 34, 37, 41, 45, 50, 55, 60,
+	66, 73, 80, 88, 97, 107, 118, 130, 143, 157, 173, 190, 209,
+	230, 253, 279, 307, 337, 371, 408, 449, 494, 544, 598, 658,
+	724, 796, 876, 963, 1060, 1166, 1282, 1411, 1552
 } ;
 
 static int const step_changes [] = { -1, -1, -1, -1, 2, 4, 6, 8 } ;
@@ -58,12 +61,16 @@ ima_oki_adpcm_init (IMA_OKI_ADPCM * state, IMA_OKI_ADPCM_TYPE type)
 	if (type == IMA_OKI_ADPCM_TYPE_IMA)
 	{	state->max_step_index = ARRAY_LEN (ima_steps) - 1 ;
 		state->steps = ima_steps ;
-		state->mask = (~0) ;
+		state->min_sample = IMA_MIN_SAMPLE ;
+		state->max_sample = IMA_MAX_SAMPLE ;
+		state->shift = 0 ;
 		}
 	else
 	{	state->max_step_index = ARRAY_LEN (oki_steps) - 1 ;
 		state->steps = oki_steps ;
-		state->mask = (~0) << 4 ;
+		state->min_sample = OKI_MIN_SAMPLE ;
+		state->max_sample = OKI_MAX_SAMPLE ;
+		state->shift = 4 ;
 		} ;
 
 } /* ima_oki_adpcm_init */
@@ -71,46 +78,61 @@ ima_oki_adpcm_init (IMA_OKI_ADPCM * state, IMA_OKI_ADPCM_TYPE type)
 
 int
 adpcm_decode (IMA_OKI_ADPCM * state, int code)
-{	int s ;
+{	int sample ;
+	int ss ;
+	int d ;
 
-	s = ((code & 7) << 1) | 1 ;
-	s = ((state->steps [state->step_index] * s) >> 3) & state->mask ;
-
+	ss = state->steps [state->step_index] ;
+	d = ss >> 3 ;
+	if (code & 1)
+		d += ss >> 2 ;
+	if (code & 2)
+		d += ss >> 1 ;
+	if (code & 4)
+		d += ss ;
 	if (code & 8)
-		s = -s ;
-	s += state->last_output ;
+ 	d = -d ;
+	sample = d + state->last_output ;
 
-	if (s < MIN_SAMPLE || s > MAX_SAMPLE)
-	{	int grace ;
-
-		grace = (state->steps [state->step_index] >> 3) & state->mask ;
-
-		if (s < MIN_SAMPLE - grace || s > MAX_SAMPLE + grace)
+	if (sample < state->min_sample || sample > state->max_sample)
+	{
+		if (sample < state->min_sample - d || sample > state->max_sample + d)
 			state->errors ++ ;
 
-		s = s < MIN_SAMPLE ? MIN_SAMPLE : MAX_SAMPLE ;
+		sample = sample < state->min_sample ? state->min_sample : state->max_sample ;
 		} ;
 
 	state->step_index += step_changes [code & 7] ;
 	state->step_index = SF_MIN (SF_MAX (state->step_index, 0), state->max_step_index) ;
-	state->last_output = s ;
+	state->last_output = sample ;
 
-	return s ;
+	return sample << state->shift ;
 } /* adpcm_decode */
 
 int
 adpcm_encode (IMA_OKI_ADPCM * state, int sample)
-{	int delta, sign = 0, code ;
+{	int code ;
+	int d ;
+	int ss ;
 
-	delta = sample - state->last_output ;
-
-	if (delta < 0)
-	{	sign = 8 ;
-		delta = -delta ;
+	ss = state->steps [state->step_index] ;
+	d = (sample >> state->shift) - state->last_output ;
+	code = 0 ;
+	if (d < 0)
+	{	code = 8 ;
+		d = -d ;
 		} ;
+	if (d >= ss)
+	{	code |= 4 ;
+		d -= ss ;
+		} ;
+	if (d >= ss >> 1)
+	{	code |= 2 ;
+		d -= ss >> 1 ;
+		} ;
+	if (d >= ss >> 2)
+		code |= 1 ;
 
-	code = 4 * delta / state->steps [state->step_index] ;
-	code = sign | SF_MIN (code, 7) ;
 	adpcm_decode (state, code) ; /* Update encoder state */
 
 	return code ;
@@ -168,19 +190,19 @@ static const unsigned char test_codes [] =
 } ;
 
 static const short test_pcm [] =
-{	32, 0, 32, 0, 32, 320, 880, -336, 2304, 4192, -992, 10128, 5360, -16352,
-	30208, 2272, -31872, 14688, -7040, -32432, 14128, -1392, -15488, 22960,
-	1232, -1584, 21488, -240, 2576, -15360, 960, -1152, -30032, 10320, 1008,
-	-30032, 16528, 1008, -30032, 16528, -5200, -30592, 15968, 448, -30592,
-	15968, 448, -2368, 30960, 3024, -80, 8384, 704, -1616, -29168, -1232, 1872,
-	-32768, 13792, -1728, -32768, 13792, 4480, -32192, 14368, -7360, -32752,
-	13808, -1712, -21456, 16992, 1472, -1344, 26848, -1088, 2016, -17728, 208,
-	-2112, -32768, 1376, -1728, -32768, 13792, -1728, -32768, 13792, -1728,
-	-32768, 13792, -1728, -32768, 13792, -1728, -4544, 32767, -1377, 1727,
-	15823, -2113, 207, -27345, 591, -2513, -32768, 13792, -1728, -32768, 13792,
-	10688, -31632, 14928, -6800, -32192, 14368, -1152, -20896, 17552, 2032,
-	-784, 22288, 560, -2256, -4816, 2176, 64, -21120, 9920, 6816, -24224, 16128,
-	608, -13488, 9584, 272, -2544, 16, -2304, -192, 1728, -16, 1568, 128, -1184,
+{	32, 0, 32, 0, 32, 320, 864, -352, 2288, 4176, -992, 10112, 5344, -16368,
+	30192, 2256, -31888, 14672, -7056, -32448, 14112, -1408, -15504, 22944,
+	1216, -1600, 21472, -256, 2560, -15376, 928, -1184, -30048, 10304, 992,
+	-30032, 16528, 1008, -30016, 16544, -5184, -30576, 15984, 464, -30560,
+	16000, 480, -2336, 30992, 3056, -48, 8400, 720, -1600, -29152, -1216, 1888,
+	-32768, 13792, -1728, -32752, 13808, 4496, -32176, 14384, -7344, -32736,
+	13824, -1696, -21424, 17024, 1504, -1312, 26880, -1056, 2048, -17680, 256,
+	-2064, -32768, 1376, -1728, -32752, 13808, -1712, -32736, 13824, -1696,
+	-32720, 13840, -1680, -32704, 13856, -1664, -4480, 32752, -1392, 1712,
+	15808, -2128, 192, -27360, 576, -2528, -32768, 13792, -1728, -32752, 13808,
+	10704, -31600, 14960, -6768, -32160, 14400, -1120, -20848, 17600, 2080,
+	-736, 22336, 608, -2208, -4768, 2208, 96, -21072, 9952, 6848, -24176, 16176,
+	656, -13440, 9632, 320, -2496, 64, -2256, -144, 1776, 32, 1616, 176, -1136,
 } ;
 
 
@@ -191,7 +213,7 @@ test_oki_adpcm (void)
 	unsigned char code ;
 	int i, j ;
 
-	printf ("    Testing encoder          : ") ;
+	printf ("    Testing decoder          : ") ;
 	fflush (stdout) ;
 
 	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI) ;
@@ -204,7 +226,7 @@ test_oki_adpcm (void)
 
 	puts ("ok") ;
 
-	printf ("    Testing decoder          : ") ;
+	printf ("    Testing encoder          : ") ;
 	fflush (stdout) ;
 
 	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI) ;
