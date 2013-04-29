@@ -152,6 +152,14 @@ unset ac_cv_sizeof_off_t
 
 AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
 
+if test "$enable_largefile:$ac_cv_sizeof_off_t" = "no:8" ; then
+	echo
+	echo "Error : Cannot disable large file support because sizeof (off_t) == 8."
+	echo
+	exit 1
+	fi
+
+
 case "$host_os" in
 	mingw32msvc | mingw32)
 		TYPEOF_SF_COUNT_T="__int64"
