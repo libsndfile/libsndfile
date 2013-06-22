@@ -100,6 +100,9 @@ AC_DEFINE_UNQUOTED([ENABLE_EXPERIMENTAL_CODE],${EXPERIMENTAL_CODE}, [Set to 1 to
 AC_ARG_ENABLE(gcc-werror,
 	AC_HELP_STRING([--enable-gcc-werror], [enable -Werror in all Makefiles]))
 
+AC_ARG_ENABLE(stack-smash-protection,
+       AC_HELP_STRING([--enable-stack-smash-protection], [Enable GNU GCC stack smash protection]))
+
 AC_ARG_ENABLE(gcc-pipe,
 	AC_HELP_STRING([--disable-gcc-pipe], [disable gcc -pipe option]))
 
@@ -517,7 +520,11 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	MN_ADD_CFLAGS([-funsigned-char])
 
 	MN_ADD_CFLAGS([-D_FORTIFY_SOURCE=2])
-	MN_ADD_CFLAGS([-fstack-protector --param ssp-buffer-size=4])
+
+	if test x$enable_stack_smash_protection = "xyes" ; then
+		XIPH_GCC_STACK_PROTECTOR
+		XIPH_GXX_STACK_PROTECTOR
+		fi
 
 	if test x$enable_gcc_werror = "xyes" ; then
 		CFLAGS="-Werror $CFLAGS"
