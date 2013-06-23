@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Tobias Gehrig <tgehrig@ira.uka.de>
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -1338,11 +1338,22 @@ flac_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 
 	if (psf->file.mode == SFM_READ)
 	{	FLAC__uint64 position ;
+
 		if (FLAC__stream_decoder_seek_absolute (pflac->fsd, offset))
 		{	FLAC__stream_decoder_get_decode_position (pflac->fsd, &position) ;
 			return offset ;
 			} ;
 
+		if (offset == psf->sf.frames)
+		{	/*
+			** If we've been asked to seek to the very end of the file, libFLAC
+			** will return an error. However, we know the length of the file so
+			** instead of returning an error, we can return the offset.
+			*/
+			return offset ;
+			} ;
+
+		psf->error = SFE_BAD_SEEK ;
 		return ((sf_count_t) -1) ;
 		} ;
 
