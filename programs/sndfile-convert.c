@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -54,6 +54,9 @@ usage_exit (const char *progname)
 	puts ("\n"
 		"    where [option] may be:\n\n"
 		"        -override-sample-rate=X  : force sample rate of input to X\n"
+		"        -endian=little           : force output file to little endian data\n"
+		"        -endian=big              : force output file to big endian data\n"
+		"        -endian=cpu              : force output file same endian-ness as the CPU\n"
 		) ;
 
 	puts (
@@ -99,6 +102,7 @@ main (int argc, char * argv [])
 	SF_INFO		sfinfo ;
 	int			k, outfilemajor, outfileminor = 0, infileminor ;
 	int			override_sample_rate = 0 ; /* assume no sample rate override. */
+	int			endian = SF_ENDIAN_FILE ;
 
 	progname = program_name (argv [0]) ;
 
@@ -214,6 +218,22 @@ main (int argc, char * argv [])
 			continue ;
 			} ;
 
+		if (! strcmp (argv [k], "-endian=little"))
+		{	endian = SF_ENDIAN_LITTLE ;
+			continue ;
+			} ;
+
+		if (! strcmp (argv [k], "-endian=big"))
+		{	endian = SF_ENDIAN_BIG ;
+			continue ;
+			} ;
+
+		if (! strcmp (argv [k], "-endian=cpu"))
+		{	endian = SF_ENDIAN_CPU ;
+			continue ;
+			} ;
+
+
 		printf ("Error : Not able to decode argunment '%s'.\n", argv [k]) ;
 		exit (1) ;
 		} ;
@@ -246,6 +266,8 @@ main (int argc, char * argv [])
 		sfinfo.format = outfilemajor | outfileminor ;
 	else
 		sfinfo.format = outfilemajor | (sfinfo.format & SF_FORMAT_SUBMASK) ;
+
+	sfinfo.format |= endian ;
 
 	if ((sfinfo.format & SF_FORMAT_TYPEMASK) == SF_FORMAT_XI)
 		switch (sfinfo.format & SF_FORMAT_SUBMASK)
