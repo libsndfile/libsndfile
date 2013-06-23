@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -472,6 +472,9 @@ pcm_test_float (const char *filename, int filetype, uint64_t hash, int replace_f
 			exit (1) ;
 			} ;
 		} ;
+
+	/* Seek to end of file. */
+	test_seek_or_die (file, 0, SEEK_END, sfinfo.frames, sfinfo.channels, __LINE__) ;
 
 	/* Seek to start of file. */
 	test_seek_or_die (file, 0, SEEK_SET, 0, sfinfo.channels, __LINE__) ;
