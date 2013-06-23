@@ -22,3 +22,4 @@ generate_LDADD = $(top_builddir)/src/libsndfile.la
 sndfilehandle_SOURCES = sndfilehandle.cc
 sndfilehandle_LDADD = $(top_builddir)/src/libsndfile.la
 
+CLEANFILES = *~ *.exe

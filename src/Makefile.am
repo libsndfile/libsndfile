@@ -36,7 +36,7 @@ FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam
 		sds.c svx.c txw.c voc.c wve.c w64.c wav_w64.c wav.c xi.c mpc2k.c rf64.c \
 		ogg_vorbis.c ogg_speex.c ogg_pcm.c ogg_opus.c
 
-CLEANFILES = *~
+CLEANFILES = *~ *.exe G72x/*.exe
 
 if USE_WIN_VERSION_FILE
 WIN_VERSION_FILE = version-metadata.rc

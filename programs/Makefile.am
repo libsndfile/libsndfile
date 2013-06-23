@@ -9,7 +9,7 @@ OS_SPECIFIC_LINKS = @OS_SPECIFIC_LINKS@
 
 AM_CPPFLAGS = -I$(top_srcdir)/src $(OS_SPECIFIC_CFLAGS)
 
-CLEANFILES = *~
+CLEANFILES = *~ sndfile-*.exe
 
 # This is the BeOS version of sndfile-play. It needs to be compiled with the C++
 # compiler.

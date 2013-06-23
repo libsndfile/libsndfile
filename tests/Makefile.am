@@ -32,7 +32,7 @@ autogen_sources = write_read_test.tpl write_read_test.def	\
 
 EXTRA_DIST = $(autogen_sources)
 
-CLEANFILES = *~
+CLEANFILES = *~ *.exe
 
 #===============================================================================
 # If we're cross compiling from Linux to Windows and running the test suite
