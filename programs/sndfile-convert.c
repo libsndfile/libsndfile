@@ -85,6 +85,13 @@ usage_exit (const char *progname)
 		) ;
 
 	puts (
+		"    If no encoding is specified, the program will try to use the encoding\n"
+		"    of the input file in the output file. This will not always work as\n"
+		"    most container formats (eg WAV, AIFF etc) only support a small subset\n"
+		"    of codec formats (eg 16 bit PCM, a-law, Vorbis etc).\n"
+		) ;
+
+	puts (
 		"    The format of the output file is determined by the file extension of the\n"
 		"    output file name. The following extensions are currently understood:\n"
 		) ;
@@ -94,6 +101,26 @@ usage_exit (const char *progname)
 	puts ("") ;
 	exit (0) ;
 } /* usage_exit */
+
+static void
+report_format_error_exit (const char * argv0, SF_INFO * sfinfo)
+{	int old_format = sfinfo->format ;
+	int endian = sfinfo->format & SF_FORMAT_ENDMASK ;
+
+	sfinfo->format = old_format & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK) ;
+
+	if (endian && sf_format_check (sfinfo))
+	{	printf ("Error : output file format does not support %s endian-ness.\n", sfe_endian_name (endian)) ;
+		exit (1) ;
+		} ;
+
+	printf ("\n"
+			"Error : output file format is invalid.\n"
+			"The '%s' container does not support '%s' codec data.\n"
+			"Run '%s --help' for clues.\n\n",
+			sfe_container_name (sfinfo->format), sfe_codec_name (sfinfo->format), program_name (argv0)) ;
+	exit (1) ;
+} /* report_format_error_exit */
 
 int
 main (int argc, char * argv [])
@@ -233,6 +260,10 @@ main (int argc, char * argv [])
 			continue ;
 			} ;
 
+		if (! strcmp (argv [k], "-endian=file"))
+		{	endian = SF_ENDIAN_FILE ;
+			continue ;
+			} ;
 
 		printf ("Error : Not able to decode argunment '%s'.\n", argv [k]) ;
 		exit (1) ;
@@ -282,9 +313,7 @@ main (int argc, char * argv [])
 			} ;
 
 	if (sf_format_check (&sfinfo) == 0)
-	{	printf ("Error : output file format is invalid (0x%08X).\n", sfinfo.format) ;
-		return 1 ;
-		} ;
+		report_format_error_exit (argv [0], &sfinfo) ;
 
 	/* Open the output file. */
 	if ((outfile = sf_open (outfilename, SFM_WRITE, &sfinfo)) == NULL)
