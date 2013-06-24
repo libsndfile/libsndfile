@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -71,3 +71,8 @@ int sfe_file_type_of_ext (const char *filename, int format) ;
 void sfe_dump_format_map (void) ;
 
 const char * program_name (const char * argv0) ;
+
+const char * sfe_endian_name (int format) ;
+const char * sfe_container_name (int format) ;
+const char * sfe_codec_name (int format) ;
+

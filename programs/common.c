@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008 George Blood Audio
 **
 ** All rights reserved.
@@ -378,3 +378,89 @@ program_name (const char * argv0)
 
 	return argv0 ;
 } /* program_name */
+
+const char *
+sfe_endian_name (int format)
+{
+	switch (format & SF_FORMAT_ENDMASK)
+	{	case SF_ENDIAN_FILE : return "file" ;
+		case SF_ENDIAN_LITTLE : return "little" ;
+		case SF_ENDIAN_BIG : return "big" ;
+		case SF_ENDIAN_CPU : return "cpu" ;
+		default : break ;
+		} ;
+
+	return "unknown" ;
+} /* sfe_endian_name */
+
+const char *
+sfe_container_name (int format)
+{
+	switch (format & SF_FORMAT_TYPEMASK)
+	{	case SF_FORMAT_WAV : return "WAV" ;
+		case SF_FORMAT_AIFF : return "AIFF" ;
+		case SF_FORMAT_AU : return "AU" ;
+		case SF_FORMAT_RAW : return "RAW" ;
+		case SF_FORMAT_PAF : return "PAF" ;
+		case SF_FORMAT_SVX : return "SVX" ;
+		case SF_FORMAT_NIST : return "NIST" ;
+		case SF_FORMAT_VOC : return "VOC" ;
+		case SF_FORMAT_IRCAM : return "IRCAM" ;
+		case SF_FORMAT_W64 : return "W64" ;
+		case SF_FORMAT_MAT4 : return "MAT4" ;
+		case SF_FORMAT_MAT5 : return "MAT5" ;
+		case SF_FORMAT_PVF : return "PVF" ;
+		case SF_FORMAT_XI : return "XI" ;
+		case SF_FORMAT_HTK : return "HTK" ;
+		case SF_FORMAT_SDS : return "SDS" ;
+		case SF_FORMAT_AVR : return "AVR" ;
+		case SF_FORMAT_WAVEX : return "WAVEX" ;
+		case SF_FORMAT_SD2 : return "SD2" ;
+		case SF_FORMAT_FLAC : return "FLAC" ;
+		case SF_FORMAT_CAF : return "CAF" ;
+		case SF_FORMAT_WVE : return "WVE" ;
+		case SF_FORMAT_OGG : return "OGG" ;
+		case SF_FORMAT_MPC2K : return "MPC2K" ;
+		case SF_FORMAT_RF64 : return "RF64" ;
+		default : break ;
+		} ;
+
+	return "unknown" ;
+} /* sfe_container_name */
+
+const char *
+sfe_codec_name (int format)
+{
+	switch (format & SF_FORMAT_SUBMASK)
+	{	case SF_FORMAT_PCM_S8 : return "signed 8 bit PCM" ;
+		case SF_FORMAT_PCM_16 : return "16 bit PCM" ;
+		case SF_FORMAT_PCM_24 : return "24 bit PCM" ;
+		case SF_FORMAT_PCM_32 : return "32 bit PCM" ;
+		case SF_FORMAT_PCM_U8 : return "unsigned 8 bit PCM" ;
+		case SF_FORMAT_FLOAT : return "32 bit float" ;
+		case SF_FORMAT_DOUBLE : return "64 bit double" ;
+		case SF_FORMAT_ULAW : return "u-law" ;
+		case SF_FORMAT_ALAW : return "a-law" ;
+		case SF_FORMAT_IMA_ADPCM : return "IMA ADPCM" ;
+		case SF_FORMAT_MS_ADPCM : return "MS ADPCM" ;
+		case SF_FORMAT_GSM610 : return "gsm610" ;
+		case SF_FORMAT_VOX_ADPCM : return "Vox ADPCM" ;
+		case SF_FORMAT_G721_32 : return "g721 32kbps" ;
+		case SF_FORMAT_G723_24 : return "g723 24kbps" ;
+		case SF_FORMAT_G723_40 : return "g723 40kbps" ;
+		case SF_FORMAT_DWVW_12 : return "12 bit DWVW" ;
+		case SF_FORMAT_DWVW_16 : return "16 bit DWVW" ;
+		case SF_FORMAT_DWVW_24 : return "14 bit DWVW" ;
+		case SF_FORMAT_DWVW_N : return "DWVW" ;
+		case SF_FORMAT_DPCM_8 : return "8 bit DPCM" ;
+		case SF_FORMAT_DPCM_16 : return "16 bit DPCM" ;
+		case SF_FORMAT_VORBIS : return "Vorbis" ;
+		case SF_FORMAT_ALAC_16 : return "16 bit ALAC" ;
+		case SF_FORMAT_ALAC_20 : return "20 bit ALAC" ;
+		case SF_FORMAT_ALAC_24 : return "24 bit ALAC" ;
+		case SF_FORMAT_ALAC_32 : return "32 bit ALAC" ;
+		default : break ;
+		} ;
+	return "unknown" ;
+} /* sfe_codec_name */
+
