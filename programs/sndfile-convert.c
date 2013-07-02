@@ -57,6 +57,7 @@ usage_exit (const char *progname)
 		"        -endian=little           : force output file to little endian data\n"
 		"        -endian=big              : force output file to big endian data\n"
 		"        -endian=cpu              : force output file same endian-ness as the CPU\n"
+		"        -normalize               : normalize the data in the output file\n"
 		) ;
 
 	puts (
@@ -129,7 +130,7 @@ main (int argc, char * argv [])
 	SF_INFO		sfinfo ;
 	int			k, outfilemajor, outfileminor = 0, infileminor ;
 	int			override_sample_rate = 0 ; /* assume no sample rate override. */
-	int			endian = SF_ENDIAN_FILE ;
+	int			endian = SF_ENDIAN_FILE, normalize = SF_FALSE ;
 
 	progname = program_name (argv [0]) ;
 
@@ -265,6 +266,11 @@ main (int argc, char * argv [])
 			continue ;
 			} ;
 
+		if (! strcmp (argv [k], "-normalize"))
+		{	normalize = SF_TRUE ;
+			continue ;
+			} ;
+
 		printf ("Error : Not able to decode argunment '%s'.\n", argv [k]) ;
 		exit (1) ;
 		} ;
@@ -324,10 +330,11 @@ main (int argc, char * argv [])
 	/* Copy the metadata */
 	copy_metadata (outfile, infile, sfinfo.channels) ;
 
-	if ((outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT)
+	if (normalize
+			|| (outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT)
 			|| (infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT)
 			|| (infileminor == SF_FORMAT_VORBIS) || (outfileminor == SF_FORMAT_VORBIS))
-		sfe_copy_data_fp (outfile, infile, sfinfo.channels) ;
+		sfe_copy_data_fp (outfile, infile, sfinfo.channels, normalize) ;
 	else
 		sfe_copy_data_int (outfile, infile, sfinfo.channels) ;
 
