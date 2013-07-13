@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,8 +134,6 @@ dither_test (const char *filename, int filetype)
 {	SNDFILE			*file ;
 	SF_INFO			sfinfo ;
 	SF_DITHER_INFO	dither ;
-
-	filetype = filetype ;
 
 	print_test_name ("dither_test", filename) ;
 

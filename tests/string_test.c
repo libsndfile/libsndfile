@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -166,8 +166,6 @@ string_start_end_test (const char *filename, int typemajor)
 	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	int			errors = 0 ;
-
-	typemajor = typemajor ;
 
 	print_test_name ("string_start_end_test", filename) ;
 
