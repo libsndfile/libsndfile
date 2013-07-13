@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2009      Uli Franke <cls@nebadje.org>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -160,8 +160,8 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 {	WAV_PRIVATE	*wpriv ;
 	WAV_FMT		*wav_fmt ;
 	sf_count_t riff_size = 0, frame_count = 0, ds64_datalength = 0 ;
-	unsigned int size32, parsestage = 0 ;
-	int marker, marks [2], error, done = 0, format = 0 ;
+	uint32_t marks [2], size32, parsestage = 0 ;
+	int marker, error, done = 0, format = 0 ;
 
 	if ((wpriv = psf->container_data) == NULL)
 		return SFE_INTERNAL ;

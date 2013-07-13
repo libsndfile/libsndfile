@@ -93,9 +93,9 @@ ENDSWAP_64 (uint64_t x)
 */
 
 #if (CPU_IS_LITTLE_ENDIAN == 1)
-	#define	MAKE_MARKER(a, b, c, d)		((a) | ((b) << 8) | ((c) << 16) | ((d) << 24))
+	#define	MAKE_MARKER(a, b, c, d)		((uint32_t) ((a) | ((b) << 8) | ((c) << 16) | (((uint32_t) (d)) << 24)))
 #elif (CPU_IS_BIG_ENDIAN == 1)
-	#define	MAKE_MARKER(a, b, c, d)		(((a) << 24) | ((b) << 16) | ((c) << 8) | (d))
+	#define	MAKE_MARKER(a, b, c, d)		((uint32_t) ((((uint32_t) (a)) << 24) | ((b) << 16) | ((c) << 8) | (d)))
 #else
 	#error "Target CPU endian-ness unknown. May need to hand edit src/sfconfig.h"
 #endif

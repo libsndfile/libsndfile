@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -207,8 +207,8 @@ mat4_write_header (SF_PRIVATE *psf, int calc_length)
 static int
 mat4_read_header (SF_PRIVATE *psf)
 {	char	buffer [256] ;
-	int		marker, rows, cols, imag ;
-	unsigned namesize ;
+	uint32_t marker, namesize ;
+	int		rows, cols, imag ;
 	double	value ;
 	const char *marker_str ;
 	char	name [64] ;

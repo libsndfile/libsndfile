@@ -2421,7 +2421,7 @@ format_from_extension (SF_PRIVATE *psf)
 
 static int
 guess_file_type (SF_PRIVATE *psf)
-{	int buffer [3], format ;
+{	uint32_t buffer [3], format ;
 
 	if (psf_binheader_readf (psf, "b", &buffer, SIGNED_SIZEOF (buffer)) != SIGNED_SIZEOF (buffer))
 	{	psf->error = SFE_BAD_FILE_READ ;
