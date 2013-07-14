@@ -175,30 +175,79 @@ static inline int64_t
 psf_get_be64 (uint8_t *ptr, int offset)
 {	int64_t value ;
 
-	value = ptr [offset] << 24 ;
+	value = ((uint32_t) ptr [offset]) << 24 ;
 	value += ptr [offset + 1] << 16 ;
 	value += ptr [offset + 2] << 8 ;
 	value += ptr [offset + 3] ;
 
-	value <<= 32 ;
+	value = ((uint64_t) value) << 32 ;
 
-	value += ptr [offset + 4] << 24 ;
+	value += ((uint32_t) ptr [offset + 4]) << 24 ;
 	value += ptr [offset + 5] << 16 ;
 	value += ptr [offset + 6] << 8 ;
 	value += ptr [offset + 7] ;
 	return value ;
 } /* psf_get_be64 */
 
+static inline int64_t
+psf_get_le64 (uint8_t *ptr, int offset)
+{	int64_t value ;
+
+	value = ((uint32_t) ptr [offset + 7]) << 24 ;
+	value += ptr [offset + 6] << 16 ;
+	value += ptr [offset + 5] << 8 ;
+	value += ptr [offset + 4] ;
+
+	value = ((uint64_t) value) << 32 ;
+
+	value += ((uint32_t) ptr [offset + 3]) << 24 ;
+	value += ptr [offset + 2] << 16 ;
+	value += ptr [offset + 1] << 8 ;
+	value += ptr [offset] ;
+	return value ;
+} /* psf_get_le64 */
+
 static inline int32_t
 psf_get_be32 (uint8_t *ptr, int offset)
 {	int32_t value ;
 
-	value = ptr [offset] << 24 ;
+	value = ((uint32_t) ptr [offset]) << 24 ;
 	value += ptr [offset + 1] << 16 ;
 	value += ptr [offset + 2] << 8 ;
 	value += ptr [offset + 3] ;
 	return value ;
 } /* psf_get_be32 */
+
+static inline int32_t
+psf_get_le32 (uint8_t *ptr, int offset)
+{	int32_t value ;
+
+	value = ((uint32_t) ptr [offset + 3]) << 24 ;
+	value += ptr [offset + 2] << 16 ;
+	value += ptr [offset + 1] << 8 ;
+	value += ptr [offset] ;
+	return value ;
+} /* psf_get_le32 */
+
+static inline int32_t
+psf_get_be24 (uint8_t *ptr, int offset)
+{	int32_t value ;
+
+	value = ((uint32_t) ptr [offset]) << 24 ;
+	value += ptr [offset + 1] << 16 ;
+	value += ptr [offset + 2] << 8 ;
+	return value ;
+} /* psf_get_be24 */
+
+static inline int32_t
+psf_get_le24 (uint8_t *ptr, int offset)
+{	int32_t value ;
+
+	value = ((uint32_t) ptr [offset + 2]) << 24 ;
+	value += ptr [offset + 1] << 16 ;
+	value += ptr [offset] << 8 ;
+	return value ;
+} /* psf_get_le24 */
 
 static inline int16_t
 psf_get_be16 (uint8_t *ptr, int offset)

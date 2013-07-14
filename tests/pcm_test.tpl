@@ -62,30 +62,30 @@ main (void)
 {
 	lrintf_test () ;
 
-	pcm_test_bits_8	("pcm-s8.raw", SF_FORMAT_RAW | SF_FORMAT_PCM_S8, 0x1cda335091249dbfLL) ;
-	pcm_test_bits_8	("pcm-u8.raw", SF_FORMAT_RAW | SF_FORMAT_PCM_U8, 0x7f748c433d695f3fLL) ;
+	pcm_test_bits_8	("pcm-s8.raw", SF_FORMAT_RAW | SF_FORMAT_PCM_S8, 0xa335091249dbfLL) ;
+	pcm_test_bits_8	("pcm-u8.raw", SF_FORMAT_RAW | SF_FORMAT_PCM_U8, 0x48c433d695f3fLL) ;
 
-	pcm_test_bits_16 ("le-pcm16.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_PCM_16, 0x3a2b956c881ebf08LL) ;
-	pcm_test_bits_16 ("be-pcm16.raw", SF_ENDIAN_BIG		| SF_FORMAT_RAW | SF_FORMAT_PCM_16, 0xd9e2f840c55750f8LL) ;
+	pcm_test_bits_16 ("le-pcm16.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_PCM_16, 0xb956c881ebf08LL) ;
+	pcm_test_bits_16 ("be-pcm16.raw", SF_ENDIAN_BIG		| SF_FORMAT_RAW | SF_FORMAT_PCM_16, 0x2f840c55750f8LL) ;
 
-	pcm_test_bits_24 ("le-pcm24.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_PCM_24, 0x933b6a759ab496f8LL) ;
-	pcm_test_bits_24 ("be-pcm24.raw", SF_ENDIAN_BIG		| SF_FORMAT_RAW | SF_FORMAT_PCM_24, 0xbb1f3eaf9c30b6f8LL) ;
+	pcm_test_bits_24 ("le-pcm24.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_PCM_24, 0xb6a759ab496f8LL) ;
+	pcm_test_bits_24 ("be-pcm24.raw", SF_ENDIAN_BIG		| SF_FORMAT_RAW | SF_FORMAT_PCM_24, 0xf3eaf9c30b6f8LL) ;
 
-	pcm_test_bits_32 ("le-pcm32.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_PCM_32, 0xa77aece1c1c17f08LL) ;
-	pcm_test_bits_32 ("be-pcm32.raw", SF_ENDIAN_BIG		| SF_FORMAT_RAW | SF_FORMAT_PCM_32, 0x3099ddf142d0b0f8LL) ;
+	pcm_test_bits_32 ("le-pcm32.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_PCM_32, 0xaece1c1c17f08LL) ;
+	pcm_test_bits_32 ("be-pcm32.raw", SF_ENDIAN_BIG		| SF_FORMAT_RAW | SF_FORMAT_PCM_32, 0x9ddf142d0b0f8LL) ;
 
 	/* Lite remove start */
-	pcm_test_float	("le-float.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_FLOAT, 0x3c2ad04f7554267aLL, SF_FALSE) ;
-	pcm_test_float	("be-float.raw", SF_ENDIAN_BIG		| SF_FORMAT_RAW | SF_FORMAT_FLOAT, 0x074de3e248fa9186LL, SF_FALSE) ;
+	pcm_test_float	("le-float.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_FLOAT, 0xad04f7554267aLL, SF_FALSE) ;
+	pcm_test_float	("be-float.raw", SF_ENDIAN_BIG		| SF_FORMAT_RAW | SF_FORMAT_FLOAT, 0xde3e248fa9186LL, SF_FALSE) ;
 
-	pcm_test_double	("le-double.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_DOUBLE, 0xc682726f958f669cLL, SF_FALSE) ;
-	pcm_test_double	("be-double.raw", SF_ENDIAN_BIG	| SF_FORMAT_RAW | SF_FORMAT_DOUBLE, 0xd9a3583f8ee51164LL, SF_FALSE) ;
+	pcm_test_double	("le-double.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_DOUBLE, 0x2726f958f669cLL, SF_FALSE) ;
+	pcm_test_double	("be-double.raw", SF_ENDIAN_BIG	| SF_FORMAT_RAW | SF_FORMAT_DOUBLE, 0x3583f8ee51164LL, SF_FALSE) ;
 
-	pcm_test_float	("le-float.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_FLOAT, 0x3c2ad04f7554267aLL, SF_TRUE) ;
-	pcm_test_float	("be-float.raw", SF_ENDIAN_BIG		| SF_FORMAT_RAW | SF_FORMAT_FLOAT, 0x074de3e248fa9186LL, SF_TRUE) ;
+	pcm_test_float	("le-float.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_FLOAT, 0xad04f7554267aLL, SF_TRUE) ;
+	pcm_test_float	("be-float.raw", SF_ENDIAN_BIG		| SF_FORMAT_RAW | SF_FORMAT_FLOAT, 0xde3e248fa9186LL, SF_TRUE) ;
 
-	pcm_test_double	("le-double.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_DOUBLE, 0xc682726f958f669cLL, SF_TRUE) ;
-	pcm_test_double	("be-double.raw", SF_ENDIAN_BIG	| SF_FORMAT_RAW | SF_FORMAT_DOUBLE, 0xd9a3583f8ee51164LL, SF_TRUE) ;
+	pcm_test_double	("le-double.raw", SF_ENDIAN_LITTLE	| SF_FORMAT_RAW | SF_FORMAT_DOUBLE, 0x2726f958f669cLL, SF_TRUE) ;
+	pcm_test_double	("be-double.raw", SF_ENDIAN_BIG	| SF_FORMAT_RAW | SF_FORMAT_DOUBLE, 0x3583f8ee51164LL, SF_TRUE) ;
 	/* Lite remove end */
 
 	return 0 ;

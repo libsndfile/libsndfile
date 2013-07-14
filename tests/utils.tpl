@@ -1,6 +1,6 @@
 [+ AutoGen5 template h c +]
 /*
-** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -266,7 +266,7 @@ check_file_hash_or_die (const char *filename, uint64_t target_hash, int line_num
 
 	while ((read_count = fread (buf, 1, sizeof (buf), file)))
 		for (k = 0 ; k < read_count ; k++)
-			cksum = cksum * 511 + buf [k] ;
+			cksum = (cksum * 511 + buf [k]) & 0xfffffffffffff ;
 
 	fclose (file) ;
 
@@ -844,15 +844,15 @@ write_mono_file (const char * filename, int format, int srate, float * output, i
 
 void
 gen_lowpass_signal_float (float *data, int len)
-{	int32_t value = 0x1243456 ;
+{	int64_t value = 0x1243456 ;
 	double sample, last_val = 0.0 ;
 	int k ;
 
 	for (k = 0 ; k < len ; k++)
 	{	/* Not a crypto quality RNG. */
-		value = 11117 * value + 211231 ;
-		value = 11117 * value + 211231 ;
-		value = 11117 * value + 211231 ;
+		value = (11117 * value + 211231) & 0xffffffff ;
+		value = (11117 * value + 211231) & 0xffffffff ;
+		value = (11117 * value + 211231) & 0xffffffff ;
 
 		sample = value / (0x7fffffff * 1.000001) ;
 		sample = 0.2 * sample - 0.9 * last_val ;

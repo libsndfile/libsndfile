@@ -53,10 +53,10 @@ log_putchar (SF_PRIVATE *psf, char ch)
 
 void
 psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
-{	va_list			ap ;
-	unsigned int	u ;
-	int				d, tens, shift, width, width_specifier, left_align ;
-	char			c, *strptr, istr [5], lead_char, sign_char ;
+{	va_list		ap ;
+	uint32_t	u ;
+	int			d, tens, shift, width, width_specifier, left_align, slen ;
+	char		c, *strptr, istr [5], lead_char, sign_char ;
 
 	va_start (ap, format) ;
 
@@ -113,7 +113,8 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					strptr = va_arg (ap, char *) ;
 					if (strptr == NULL)
 						break ;
-					width_specifier -= strlen (strptr) ;
+					slen = strlen (strptr) ;
+					width_specifier = width_specifier >= slen ? width_specifier - slen : 0 ;
 					if (left_align == SF_FALSE)
 						while (width_specifier -- > 0)
 							log_putchar (psf, ' ') ;
@@ -270,7 +271,7 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 						} ;
 					shift = 28 ;
 					width = (width_specifier < 8) ? 8 : width_specifier ;
-					while (! ((0xF << shift) & d))
+					while (! ((((uint32_t) 0xF) << shift) & d))
 					{	shift -= 4 ;
 						width -- ;
 						} ;
@@ -759,12 +760,12 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 */
 
 #if (CPU_IS_BIG_ENDIAN == 1)
-#define	GET_MARKER(ptr)	(	((ptr) [0] << 24)	| ((ptr) [1] << 16) |	\
+#define	GET_MARKER(ptr)	(	(((uint32_t) (ptr) [0]) << 24)	| ((ptr) [1] << 16) |	\
 							((ptr) [2] << 8)	| ((ptr) [3]))
 
 #elif (CPU_IS_LITTLE_ENDIAN == 1)
 #define	GET_MARKER(ptr)	(	((ptr) [0])			| ((ptr) [1] << 8) |	\
-							((ptr) [2] << 16)	| ((ptr) [3] << 24))
+							((ptr) [2] << 16)	| (((uint32_t) (ptr) [3]) << 24))
 
 #else
 #	error "Cannot determine endian-ness of processor."
@@ -987,9 +988,9 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 					ucptr = (unsigned char*) intptr ;
 					byte_count += header_read (psf, ucptr, sizeof (int)) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
-						*intptr = GET_BE_INT (ucptr) ;
+						*intptr = psf_get_be32 (ucptr, 0) ;
 					else
-						*intptr = GET_LE_INT (ucptr) ;
+						*intptr = psf_get_le32 (ucptr, 0) ;
 					break ;
 
 			case '8' :
@@ -997,9 +998,9 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 					*countptr = 0 ;
 					byte_count += header_read (psf, sixteen_bytes, 8) ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
-						countdata = GET_BE_8BYTE (sixteen_bytes) ;
+						countdata = psf_get_be64 (sixteen_bytes, 0) ;
 					else
-						countdata = GET_LE_8BYTE (sixteen_bytes) ;
+						countdata = psf_get_le64 (sixteen_bytes, 0) ;
 					*countptr = countdata ;
 					break ;
 
@@ -1300,10 +1301,10 @@ u_bitwidth_to_subformat (int bits)
 
 int32_t
 psf_rand_int32 (void)
-{	static int32_t value = -1 ;
+{	static uint64_t value = 0 ;
 	int k, count ;
 
-	if (value == -1)
+	if (value == 0)
 	{
 #if HAVE_GETTIMEOFDAY
 		struct timeval tv ;
@@ -1316,9 +1317,9 @@ psf_rand_int32 (void)
 
 	count = 4 + (value & 7) ;
 	for (k = 0 ; k < count ; k++)
-		value = 11117 * value + 211231 ;
+		value = (11117 * value + 211231) & 0x7fffffff ;
 
-	return value ;
+	return (int32_t) value ;
 } /* psf_rand_int32 */
 
 void
