@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -52,7 +52,9 @@
 	#include <sys/time.h>
 #endif
 
-#if defined (__linux__) || defined (__FreeBSD_kernel__) || defined (__FreeBSD__)
+#if defined (__ANDROID__)
+
+#elif defined (__linux__) || defined (__FreeBSD_kernel__) || defined (__FreeBSD__)
 	#include 	<fcntl.h>
 	#include 	<sys/ioctl.h>
 	#include 	<sys/soundcard.h>
@@ -362,7 +364,7 @@ alsa_write_float (snd_pcm_t *alsa_dev, float *data, int frames, int channels)
 **	Linux/OSS functions for playing a sound.
 */
 
-#if defined (__linux__) || defined (__FreeBSD_kernel__) || defined (__FreeBSD__)
+#if !defined (__ANDROID__) && (defined (__linux__) || defined (__FreeBSD_kernel__) || defined (__FreeBSD__))
 
 static	int	opensoundsys_open_device (int channels, int srate) ;
 
@@ -1169,7 +1171,11 @@ main (int argc, char *argv [])
 		return 1 ;
 		} ;
 
-#if defined (__linux__)
+#if defined (__ANDROID__)
+	puts ("*** Playing sound not yet supported on Android.") ;
+	puts ("*** Please feel free to submit a patch.") ;
+	return 1 ;
+#elif defined (__linux__)
 	#if HAVE_ALSA_ASOUNDLIB_H
 		if (access ("/proc/asound/cards", R_OK) == 0)
 			alsa_play (argc, argv) ;
