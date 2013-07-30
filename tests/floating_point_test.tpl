@@ -61,7 +61,7 @@ main (int argc, char *argv [])
 	if (argc == 2 && ! strstr (argv [1], "no-exit"))
 		allow_exit = 0 ;
 
-#if ((HAVE_LRINTF == 0) && (HAVE_LRINT_REPLACEMENT == 0))
+#if (HAVE_LRINTF == 0)
 	puts ("*** Cannot run this test on this platform because it lacks lrintf().") ;
 	exit (0) ;
 #endif
