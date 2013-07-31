@@ -256,7 +256,7 @@ AC_DEFINE_UNQUOTED(WORDS_BIGENDIAN, ${ac_cv_c_big_endian},
 
 AC_CHECK_FUNCS(malloc calloc realloc free)
 AC_CHECK_FUNCS(open read write lseek lseek64)
-AC_CHECK_FUNCS(fstat ftruncate fsync)
+AC_CHECK_FUNCS(fstat fstat64 ftruncate fsync)
 AC_CHECK_FUNCS(snprintf vsnprintf)
 AC_CHECK_FUNCS(gmtime gmtime_r localtime localtime_r gettimeofday)
 AC_CHECK_FUNCS(mmap getpagesize)

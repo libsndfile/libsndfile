@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2003 Ross Bencina <rbencina@iprimus.com.au>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -473,19 +473,22 @@ psf_is_pipe (SF_PRIVATE *psf)
 
 static sf_count_t
 psf_get_filelen_fd (int fd)
-{	struct stat statbuf ;
+{
+#if (SIZEOF_OFF_T == 4 && SIZEOF_SF_COUNT_T == 8 && HAVE_FSTAT64)
+	struct stat64 statbuf ;
 
-	/*
-	** Sanity check.
-	** If everything is OK, this will be optimised out.
-	*/
-	if (sizeof (statbuf.st_size) == 4 && sizeof (sf_count_t) == 8)
-		return (sf_count_t) -SFE_BAD_STAT_SIZE ;
+	if (fstat64 (fd, &statbuf) == -1)
+		return (sf_count_t) -1 ;
+
+	return statbuf.st_size ;
+#else
+	struct stat statbuf ;
 
 	if (fstat (fd, &statbuf) == -1)
 		return (sf_count_t) -1 ;
 
 	return statbuf.st_size ;
+#endif
 } /* psf_get_filelen_fd */
 
 int
@@ -538,8 +541,8 @@ psf_open_fd (PSF_FILE * pfile)
 	** be optimised out. This is meant to catch the problems caused by
 	** "sfconfig.h" being included after <stdio.h>.
 	*/
-	if (sizeof (off_t) != sizeof (sf_count_t))
-	{	puts ("\n\n*** Fatal error : sizeof (off_t) != sizeof (sf_count_t)") ;
+	if (sizeof (sf_count_t) != 8)
+	{	puts ("\n\n*** Fatal error : sizeof (sf_count_t) != 8") ;
 		puts ("*** This means that libsndfile was not configured correctly.\n") ;
 		exit (1) ;
 		} ;
