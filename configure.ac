@@ -152,9 +152,10 @@ AC_CHECK_SIZEOF(long long,8)
 # Unfortunately there is more than one way of ensuring this so need to do some
 # pretty rigourous testing here.
 
-unset ac_cv_sizeof_off_t
-
-AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
+# Check for common 64 bit file offset types.
+AC_CHECK_SIZEOF(off_t,1)
+AC_CHECK_SIZEOF(loff_t,1)
+AC_CHECK_SIZEOF(off64_t,1)
 
 if test "$enable_largefile:$ac_cv_sizeof_off_t" = "no:8" ; then
 	echo
@@ -172,28 +173,23 @@ case "$host_os" in
 		AC_DEFINE([__USE_MINGW_ANSI_STDIO],1,[Set to 1 to use C99 printf/snprintf in MinGW.])
 		;;
 	*)
+		SIZEOF_SF_COUNT_T=0
 		if test "x$ac_cv_sizeof_off_t" = "x8" ; then
 			# If sizeof (off_t) is 8, no further checking is needed.
 			TYPEOF_SF_COUNT_T="int64_t"
 			SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 			SIZEOF_SF_COUNT_T=8
+		elif test "x$ac_cv_sizeof_loff_t" = "x8" ; then
+			TYPEOF_SF_COUNT_T="int64_t"
+			SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
+			SIZEOF_SF_COUNT_T=8
+		elif test "x$ac_cv_sizeof_off64_t" = "x8" ; then
+			TYPEOF_SF_COUNT_T="int64_t"
+			SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
+			SIZEOF_SF_COUNT_T=8
 		else
-			# Check for common 64 bit file offset types.
-			AC_CHECK_SIZEOF(loff_t,1)	# Fake default value.
-			AC_CHECK_SIZEOF(off64_t,1)	# Fake default value.
-
-			TYPEOF_SF_COUNT_T="unknown"
-			if test "x$ac_cv_sizeof_loff_t" = "x8" ; then
-				TYPEOF_SF_COUNT_T="int64_t"
-				SIZEOF_SF_COUNT_T=8
-			elif test "x$ac_cv_sizeof_off64_t" = "x8" ; then
-				TYPEOF_SF_COUNT_T="int64_t"
-				SIZEOF_SF_COUNT_T=8
-				fi
-
 			# Save the old sizeof (off_t) value  and then unset it to see if it
 			# changes when Large File Support is enabled.
-
 			pre_largefile_sizeof_off_t=$ac_cv_sizeof_off_t
 			unset ac_cv_sizeof_off_t
 
@@ -209,15 +205,11 @@ case "$host_os" in
 				ac_cv_sys_largefile_LIBS=""
 				fi
 
-			AC_CHECK_SIZEOF(off_t,1)	# Fake default value.
+			AC_CHECK_SIZEOF(off_t,1)
 
 			if test "x$ac_cv_sizeof_off_t" = "x8" ; then
 				TYPEOF_SF_COUNT_T="int64_t"
 				SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
-			elif test "x$ac_cv_sizeof_off_t" = "x$pre_largefile_sizeof_off_t" ; then
-				AC_MSG_WARN([[This machine does not seem to support 64 bit file offsets.]])
-				TYPEOF_SF_COUNT_T="off_t"
-				SIZEOF_SF_COUNT_T=$ac_cv_sizeof_off_t
 			elif test "x$TYPEOF_SF_COUNT_T" = "xunknown" ; then
 				echo
 				echo "*** The configure process has determined that this system is capable"
@@ -263,7 +255,7 @@ AC_DEFINE_UNQUOTED(WORDS_BIGENDIAN, ${ac_cv_c_big_endian},
 # Check for functions.
 
 AC_CHECK_FUNCS(malloc calloc realloc free)
-AC_CHECK_FUNCS(open read write lseek pread pwrite)
+AC_CHECK_FUNCS(open read write lseek lseek64)
 AC_CHECK_FUNCS(fstat ftruncate fsync)
 AC_CHECK_FUNCS(snprintf vsnprintf)
 AC_CHECK_FUNCS(gmtime gmtime_r localtime localtime_r gettimeofday)
@@ -437,14 +429,6 @@ if test x$ac_cv_header_sndio_h = xyes ; then
 
 #====================================================================================
 # Test for sanity when cross-compiling.
-
-if test x$cross_compiling = xyes ; then
-	AC_MSG_WARN([[******************************************************************]])
-	AC_MSG_WARN([[*** We are cross-compiling, so have to assume sizeof (short) == 2 ]])
-	AC_MSG_WARN([[*** and sizeof (int) == 4. If this is not the case there is no    ]])
-	AC_MSG_WARN([[*** chance of this working. Please contact the mantainer.         ]])
-	AC_MSG_WARN([[******************************************************************]])
-	fi
 
 if test $ac_cv_sizeof_short != 2 ; then
 	AC_MSG_WARN([[******************************************************************]])
