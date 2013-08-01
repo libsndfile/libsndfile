@@ -76,9 +76,6 @@ export CXX=${CROSS_PREFIX}-g++
 export LD=${CROSS_PREFIX}-ld
 export RANLIB=${CROSS_PREFIX}-ranlib
 
-# This is just an empty directory where I want the built objects to be installed
-export PREFIX=${DEV_PREFIX}/android/prefix
-
 # Don't mix up .pc files from your host and build target
 export PKG_CONFIG_PATH=${PREFIX}/lib/pkgconfig
 
@@ -91,4 +88,4 @@ export CXXFLAGS="${CXXFLAGS} -fno-exceptions --sysroot=${SYSROOT} -I${SYSROOT}/u
 export CPPFLAGS="${CFLAGS}"
 export LDFLAGS="${LDFLAGS} -L${SYSROOT}/usr/lib -L${ANDROID_PREFIX}/lib"
 
-./configure --host=${CROSS_COMPILE} --with-sysroot=${SYSROOT} --prefix=${PREFIX} "$@"
+./configure --host=${CROSS_COMPILE} --with-sysroot=${SYSROOT} "$@"
