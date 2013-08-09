@@ -577,6 +577,8 @@ if test x"$CFLAGS" = x ; then
 
 HOST_TRIPLET="${host_cpu}-${host_vendor}-${host_os}"
 
+AC_DEFINE_UNQUOTED([HOST_TRIPLET], "${HOST_TRIPLET}", [The host triplet of the compiled binary.])
+
 if test "$HOST_TRIPLET" = "x86_64-w64-mingw32" ; then
 	OS_SPECIFIC_LINKS=" -static-libgcc $OS_SPECIFIC_LINKS"
 	fi
