@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
- * Copyright (C) 2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+ * Copyright (C) 2012-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
@@ -92,7 +92,7 @@ int32_t	alac_decode (ALAC_DECODER *, struct BitBuffer * bits, int32_t * sampleBu
 
 int32_t	alac_encode (ALAC_ENCODER *p, uint32_t numChannels, uint32_t numSamples,
 					int32_t * theReadBuffer, unsigned char * theWriteBuffer,
-					int32_t * ioNumBytes) ;
+					uint32_t * ioNumBytes) ;
 
 void alac_set_fastmode(ALAC_ENCODER * p, int32_t fast) ;
 

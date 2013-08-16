@@ -965,7 +965,7 @@ Exit:
 */
 int32_t
 alac_encode(ALAC_ENCODER *p, uint32_t numChannels, uint32_t		numSamples,
-								   int32_t * theReadBuffer, unsigned char * theWriteBuffer, int32_t * ioNumBytes)
+								   int32_t * theReadBuffer, unsigned char * theWriteBuffer, uint32_t * ioNumBytes)
 {
 	uint32_t		outputSize;
 	BitBuffer		bitstream;

@@ -428,11 +428,12 @@ static int
 alac_encode_block (SF_PRIVATE * psf, ALAC_PRIVATE *plac)
 {	ALAC_ENCODER *penc = &plac->encoder ;
 	uint8_t	byte_buffer [psf->sf.channels * ALAC_BYTE_BUFFER_SIZE] ;
-	int32_t num_bytes = 0 ;
+	uint32_t num_bytes = 0 ;
 
 	alac_encode (penc, plac->channels, plac->partial_block_frames, plac->buffer, byte_buffer, &num_bytes) ;
 
-	fwrite (byte_buffer, 1, num_bytes, plac->enctmp) ;
+	if (fwrite (byte_buffer, 1, num_bytes, plac->enctmp) != num_bytes)
+		return 0 ;
 	if ((plac->pakt_info = alac_pakt_append (plac->pakt_info, num_bytes)) == NULL)
 		return 0 ;
 
@@ -440,8 +441,6 @@ alac_encode_block (SF_PRIVATE * psf, ALAC_PRIVATE *plac)
 
 	return 1 ;
 } /* alac_encode_block */
-
-
 
 /*============================================================================================
 ** ALAC read functions.
