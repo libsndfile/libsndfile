@@ -10,6 +10,11 @@ PACKAGE_VERSION = @PACKAGE_VERSION@
 
 HOST_TRIPLET = @HOST_TRIPLET@
 
+SRC_BINDIR = @SRC_BINDIR@
+TEST_BINDIR = @TEST_BINDIR@
+
+LIBRARY := $(SRC_BINDIR)libsndfile.so.$(LIB_VERSION)
+
 LIB_VERSION := $(shell echo $(PACKAGE_VERSION) | sed -e 's/[a-z].*//')
 
 TESTNAME = libsndfile-testsuite-$(HOST_TRIPLET)-$(PACKAGE_VERSION)
@@ -24,9 +29,9 @@ testprogs += sfversion@EXEEXT@ stdin_test@EXEEXT@ stdout_test@EXEEXT@ cpp_test@E
 # Find the single test program in src/ .
 srcprogs := $(shell if test -x src/.libs/test_main$(EXEEXT) ; then echo "src/.libs/test_main$(EXEEXT)" ; else echo "src/test_main$(EXEEXT)" ; fi)
 
-libfiles := $(shell if test ! -z $(EXEEXT) ; then echo "src/libsndfile-1.def src/.libs/libsndfile-1.dll" ; else echo "src/.libs/libsndfile.so.$(LIB_VERSION)" ; fi)
+libfiles := $(shell if test ! -z $(EXEEXT) ; then echo "src/libsndfile-1.def src/.libs/libsndfile-1.dll" ; elif test -f $(LIBRARY) ; then echo $(LIBRARY) ; fi  ; fi)
 
-files := $(addprefix tests/.libs/,$(subst @EXEEXT@,$(EXEEXT),$(testprogs))) $(libfiles) $(srcprogs)
+testbins := $(addprefix $(TEST_BINDIR),$(subst @EXEEXT@,$(EXEEXT),$(testprogs))) $(libfiles) $(srcprogs)
 
 
 all : $(TARBALL)
@@ -44,10 +49,10 @@ $(TARBALL) : $(TESTNAME)/test_wrapper.sh
 	@echo "Created : $(TARBALL)"
 	@echo
 
-$(TESTNAME)/test_wrapper.sh : $(files) tests/test_wrapper.sh tests/pedantic-header-test.sh
+$(TESTNAME)/test_wrapper.sh : $(testbins) tests/test_wrapper.sh tests/pedantic-header-test.sh
 	rm -rf $(TESTNAME)
 	mkdir -p $(TESTNAME)/tests/
-	cp $(files) $(TESTNAME)/tests/
+	cp $(testbins) $(TESTNAME)/tests/
 	cp tests/test_wrapper.sh $(TESTNAME)/
 	cp tests/pedantic-header-test.sh $(TESTNAME)/tests/
 	chmod u+x $@

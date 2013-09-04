@@ -585,6 +585,15 @@ if test "$HOST_TRIPLET" = "x86_64-w64-mingw32" ; then
 
 WIN_RC_VERSION=`echo $PACKAGE_VERSION | $SED -e "s/p.*//" -e "s/\./,/g"`
 
+
+if test "$enable_static" = no ; then
+	SRC_BINDIR=src/.libs/
+	TEST_BINDIR=tests/.libs/
+else
+	SRC_BINDIR=src/
+	TEST_BINDIR=tests/
+	fi
+
 #-------------------------------------------------------------------------------
 
 AC_SUBST(HOST_TRIPLET)
@@ -604,6 +613,8 @@ AC_SUBST(SNDIO_LIBS)
 
 AC_SUBST(EXTERNAL_CFLAGS)
 AC_SUBST(EXTERNAL_LIBS)
+AC_SUBST(SRC_BINDIR)
+AC_SUBST(TEST_BINDIR)
 
 dnl The following line causes the libtool distributed with the source
 dnl to be replaced if the build system has a more recent version.
