@@ -22,6 +22,7 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<math.h>
+#include	<errno.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
@@ -198,11 +199,14 @@ alac_close	(SF_PRIVATE *psf)
 
 		psf->write_header (psf, 1) ;
 
-		fseek (plac->enctmp, 0, SEEK_SET) ;
-		while ((readcount = fread (ubuf.ucbuf, 1, sizeof (ubuf.ucbuf), plac->enctmp)) > 0)
-			psf_fwrite (ubuf.ucbuf, 1, readcount, psf) ;
-		fclose (plac->enctmp) ;
-		remove (plac->enctmpname) ;
+		if (plac->enctmp != NULL)
+		{	fseek (plac->enctmp, 0, SEEK_SET) ;
+
+			while ((readcount = fread (ubuf.ucbuf, 1, sizeof (ubuf.ucbuf), plac->enctmp)) > 0)
+				psf_fwrite (ubuf.ucbuf, 1, readcount, psf) ;
+			fclose (plac->enctmp) ;
+			remove (plac->enctmpname) ;
+			} ;
 		} ;
 
 	if (plac->pakt_info)
@@ -284,8 +288,7 @@ alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 
 static int
 alac_writer_init (SF_PRIVATE *psf)
-{	const char		*tmpdir = NULL ;
-	ALAC_PRIVATE	*plac ;
+{	ALAC_PRIVATE	*plac ;
 	uint32_t		alac_format_flags = 0 ;
 
 	plac = psf->codec_data ;
@@ -331,19 +334,10 @@ alac_writer_init (SF_PRIVATE *psf)
 
 	plac->pakt_info = alac_pakt_alloc (2000) ;
 
-	if (OS_IS_WIN32)
-		tmpdir = getenv ("TEMP") ;
-	else
-	{	tmpdir = getenv ("TMPDIR") ;
-		tmpdir = tmpdir == NULL ? "/tmp" : tmpdir ;
-		} ;
-
-	if (tmpdir == NULL)
-		return SFE_NO_TEMP_DIR ;
-
-	snprintf (plac->enctmpname, sizeof (plac->enctmpname), "%s/%x%x.alac", tmpdir, psf_rand_int32 (), psf_rand_int32 ()) ;
-	if ((plac->enctmp = fopen (plac->enctmpname, "wb+")) == NULL)
+	if ((plac->enctmp = psf_open_tmpfile (plac->enctmpname, sizeof (plac->enctmpname))) == NULL)
+	{	psf_log_printf (psf, "Error : Failed to open temp file '%s' : \n", plac->enctmpname, strerror (errno)) ;
 		return SFE_ALAC_FAIL_TMPFILE ;
+		} ;
 
 	alac_encoder_init (&plac->encoder, psf->sf.samplerate, psf->sf.channels, alac_format_flags, ALAC_FRAME_LENGTH) ;
 
