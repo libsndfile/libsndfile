@@ -676,5 +676,8 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 
 ./echo-install-dirs
 
+# Remove symlink created by Scripts/android-configure.sh.
+test -h gdbclient && rm -f gdbclient
+
 (cd src && make genfiles)
 (cd tests && make genfiles)

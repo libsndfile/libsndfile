@@ -79,13 +79,14 @@ export RANLIB=${CROSS_PREFIX}-ranlib
 # Don't mix up .pc files from your host and build target
 export PKG_CONFIG_PATH=${PREFIX}/lib/pkgconfig
 
-# You can clone the full Android sources to get bionic if you want.. I didn't
-# want to so I just got linker.h from here: http://gitorious.org/0xdroid/bionic
-# Note that this was only required to build boehm-gc with dynamic linking support.
-export CFLAGS="${CFLAGS} --sysroot=${SYSROOT} -I${SYSROOT}/usr/include -I${ANDROID_PREFIX}/include -I${DEV_PREFIX}/android/bionic"
-export CXXFLAGS="${CXXFLAGS} -fno-exceptions --sysroot=${SYSROOT} -I${SYSROOT}/usr/include -I${ANDROID_PREFIX}/include -I${DEV_PREFIX}/android/bionic -I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/${ANDROID_GCC_VER}/include/ -I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/${ANDROID_GCC_VER}/libs/armeabi/include"
+# Set up the needed FLAGS.
+export CFLAGS="${CFLAGS} -gstabs --sysroot=${SYSROOT} -I${SYSROOT}/usr/include -I${ANDROID_PREFIX}/include"
+export CXXFLAGS="${CXXFLAGS} -gstabs -fno-exceptions --sysroot=${SYSROOT} -I${SYSROOT}/usr/include -I${ANDROID_PREFIX}/include -I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/${ANDROID_GCC_VER}/include/ -I${ANDROID_NDK}/sources/cxx-stl/gnu-libstdc++/${ANDROID_GCC_VER}/libs/armeabi/include"
 
 export CPPFLAGS="${CFLAGS}"
 export LDFLAGS="${LDFLAGS} -L${SYSROOT}/usr/lib -L${ANDROID_PREFIX}/lib"
+
+# Create a symlink to the gdbclient.
+test -h gdbclient || ln -s ${ANDROID_PREFIX}/bin/arm-linux-androideabi-gdb gdbclient
 
 ./configure --host=${CROSS_COMPILE} --with-sysroot=${SYSROOT} "$@"
