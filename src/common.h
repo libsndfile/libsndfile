@@ -983,6 +983,8 @@ int id3_skip (SF_PRIVATE * psf) ;
 
 void	alac_get_desc_chunk_items (int subformat, uint32_t *fmt_flags, uint32_t *frames_per_packet) ;
 
+FILE *	psf_open_tmpfile (char * fname, size_t fnamelen) ;
+
 /*------------------------------------------------------------------------------------
 ** Helper/debug functions.
 */
