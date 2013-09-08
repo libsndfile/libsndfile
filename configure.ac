@@ -625,7 +625,7 @@ AC_CONFIG_FILES([ \
 	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile programs/Makefile \
 	Makefile \
 	src/version-metadata.rc tests/test_wrapper.sh tests/pedantic-header-test.sh \
-	doc/libsndfile.css build-test-tarball.mk libsndfile.spec sndfile.pc \
+	doc/libsndfile.css Scripts/build-test-tarball.mk libsndfile.spec sndfile.pc \
 	src/sndfile.h \
 	echo-install-dirs
 	])
