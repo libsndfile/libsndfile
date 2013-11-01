@@ -24,6 +24,10 @@ AC_PROG_CC_STDC
 AC_USE_SYSTEM_EXTENSIONS
 AM_PROG_CC_C_O
 AC_PROG_CXX
+
+MN_C_COMPILER_IS_CLANG
+MN_GCC_REALLY_IS_GCC
+
 AC_PROG_SED
 
 # Do not check for F77.
@@ -661,10 +665,11 @@ if test -z "$PKG_CONFIG" ; then
 	echo
 	fi
 
+echo "  Tools :"
+echo
+echo "    Compiler is GCC : ..................... ${ac_cv_c_compiler_gnu}"
+
 if test x$ac_cv_c_compiler_gnu = xyes ; then
-	echo "  Tools :"
-	echo
-	echo "    Compiler is GCC : ..................... ${ac_cv_c_compiler_gnu}"
 	echo "    GCC version : ......................... ${GCC_VERSION}"
 	if test $GCC_MAJOR_VERSION -lt 3 ; then
 		echo "\n"
