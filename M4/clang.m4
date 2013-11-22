@@ -24,8 +24,8 @@ AC_DEFUN([MN_C_COMPILER_IS_CLANG],
 				This is not clang!
 			#endif
 			],
-		AC_MSG_RESULT([yes]),
-		AC_MSG_RESULT([no])
+		mn_cv_c_compiler_clang=yes,
+		mn_cv_c_compiler_clang=no
 		])
 	)
 ])
