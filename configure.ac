@@ -671,6 +671,7 @@ if test -z "$PKG_CONFIG" ; then
 
 echo "  Tools :"
 echo
+echo "    Compiler is Clang : ................... ${mn_cv_c_compiler_clang}"
 echo "    Compiler is GCC : ..................... ${ac_cv_c_compiler_gnu}"
 
 if test x$ac_cv_c_compiler_gnu = xyes ; then
