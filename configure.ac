@@ -102,8 +102,8 @@ if test x$enable_experimental = xyes ; then
 	fi
 AC_DEFINE_UNQUOTED([ENABLE_EXPERIMENTAL_CODE],${EXPERIMENTAL_CODE}, [Set to 1 to enable experimental code.])
 
-AC_ARG_ENABLE(gcc-werror,
-	AC_HELP_STRING([--enable-gcc-werror], [enable -Werror in all Makefiles]))
+AC_ARG_ENABLE(werror,
+	AC_HELP_STRING([--enable-werror], [enable -Werror in all Makefiles]))
 
 AC_ARG_ENABLE(stack-smash-protection,
        AC_HELP_STRING([--enable-stack-smash-protection], [Enable GNU GCC stack smash protection]))
@@ -515,11 +515,6 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		XIPH_GXX_STACK_PROTECTOR
 		fi
 
-	if test x$enable_gcc_werror = "xyes" ; then
-		CFLAGS="-Werror $CFLAGS"
-		CXXFLAGS="-Werror $CXXFLAGS"
-		fi
-
 	if test x$enable_test_coverage = "xyes" ; then
 		# MN_ADD_CFLAGS([-ftest-coverage])
 		MN_ADD_CFLAGS([-coverage])
@@ -568,6 +563,15 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 
 	COMPILER_IS_GCC=1
 	fi
+
+if test x$enable_werror = "xyes" ; then
+	MN_ADD_CFLAGS([-Werror])
+
+	AC_LANG_PUSH([C++])
+	MN_ADD_CXXFLAGS([-Werror])
+	AC_LANG_POP([C++])
+	fi
+
 
 AC_DEFINE_UNQUOTED([WIN32_TARGET_DLL], ${win32_target_dll}, [Set to 1 if windows DLL is being built.])
 AC_DEFINE_UNQUOTED([COMPILER_IS_GCC], ${COMPILER_IS_GCC}, [Set to 1 if the compile is GNU GCC.])
