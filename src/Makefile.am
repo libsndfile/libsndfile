@@ -85,9 +85,9 @@ G72x_g72x_test_SOURCES = G72x/g72x_test.c
 G72x_g72x_test_LDADD = G72x/libg72x.la
 
 test_endswap.c: test_endswap.def test_endswap.tpl
-	autogen --writable test_endswap.def
+	cd $(srcdir) && autogen --writable test_endswap.def && cd $(abs_builddir)
 
-genfiles : test_endswap.c $(SYMBOL_FILES)
+genfiles : $(SYMBOL_FILES) test_endswap.c
 
 check :
 	@if [ -x /usr/bin/python ]; then $(srcdir)/binheader_writef_check.py $(srcdir)/*.c ; fi
@@ -103,19 +103,19 @@ checkprograms : $(check_PROGRAMS)
 # end user to create these files.
 
 Symbols.gnu-binutils: create_symbols_file.py
-	python create_symbols_file.py linux $(VERSION) > $@
+	python $(srcdir)/create_symbols_file.py linux $(VERSION) > $@
 
 Symbols.darwin: create_symbols_file.py
-	python create_symbols_file.py darwin $(VERSION) > $@
+	python $(srcdir)/create_symbols_file.py darwin $(VERSION) > $@
 
 libsndfile-1.def: create_symbols_file.py
-	python create_symbols_file.py win32 $(VERSION) > $@
+	python $(srcdir)/create_symbols_file.py win32 $(VERSION) > $@
 
 Symbols.os2: create_symbols_file.py
-	python create_symbols_file.py os2 $(VERSION) > $@
+	python $(srcdir)/create_symbols_file.py os2 $(VERSION) > $@
 
 Symbols.static: create_symbols_file.py
-	python create_symbols_file.py static $(VERSION) > $@
+	python $(srcdir)/create_symbols_file.py static $(VERSION) > $@
 
 # Fake dependancy to force the creation of these files.
 sndfile.o : $(SYMBOL_FILES)
