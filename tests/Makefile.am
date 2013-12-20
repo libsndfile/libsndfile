@@ -186,31 +186,31 @@ scale_clip_test_LDADD = $(top_builddir)/src/libsndfile.la
 #===============================================================================
 
 write_read_test.c: write_read_test.def write_read_test.tpl
-	autogen --writable write_read_test.def
+	cd $(srcdir) && autogen --writable write_read_test.def && cd $(abs_builddir)
 
 pcm_test.c: pcm_test.def pcm_test.tpl
-	autogen --writable pcm_test.def
+	cd $(srcdir) && autogen --writable pcm_test.def && cd $(abs_builddir)
 
 header_test.c: header_test.def header_test.tpl
-	autogen --writable header_test.def
+	cd $(srcdir) && autogen --writable header_test.def && cd $(abs_builddir)
 
 utils.c utils.h : utils.def utils.tpl
-	autogen --writable utils.def
+	cd $(srcdir) && autogen --writable utils.def && cd $(abs_builddir)
 
 scale_clip_test.c: scale_clip_test.def scale_clip_test.tpl
-	autogen --writable scale_clip_test.def
+	cd $(srcdir) && autogen --writable scale_clip_test.def && cd $(abs_builddir)
 
 pipe_test.c: pipe_test.def pipe_test.tpl
-	autogen --writable pipe_test.def
+	cd $(srcdir) && autogen --writable pipe_test.def && cd $(abs_builddir)
 
 rdwr_test.c: rdwr_test.def rdwr_test.tpl
-	autogen --writable rdwr_test.def
+	cd $(srcdir) && autogen --writable rdwr_test.def && cd $(abs_builddir)
 
 floating_point_test.c: floating_point_test.def floating_point_test.tpl
-	autogen --writable floating_point_test.def
+	cd $(srcdir) && autogen --writable floating_point_test.def && cd $(abs_builddir)
 
 benchmark.c: benchmark.def benchmark.tpl
-	autogen --writable benchmark.def
+	cd $(srcdir) && autogen --writable benchmark.def && cd $(abs_builddir)
 
 genfiles : write_read_test.c pcm_test.c header_test.c utils.c \
 		scale_clip_test.c pipe_test.c floating_point_test.c rdwr_test.c \
