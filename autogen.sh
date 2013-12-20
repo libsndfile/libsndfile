@@ -136,7 +136,7 @@ result="yes"
         echo
         echo "You must have Python installed to compile $package."
         echo "Download the appropriate package for your distribution,"
-        echo "or get the source tarball at ftp://ftp.gnu.org/pub/gnu/"
+        echo "or get the source tarball at http://python.org/"
 		result="no"
         DIE=1
 }
