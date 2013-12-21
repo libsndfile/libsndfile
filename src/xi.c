@@ -352,11 +352,21 @@ xi_read_header (SF_PRIVATE *psf)
 		return SFE_XI_BAD_HEADER ;
 
 	buffer [22] = 0 ;
+	k = 21;
+	while (buffer[k] == ' ') {
+	  buffer [k--] = 0 ;
+	}
 	psf_log_printf (psf, "Extended Instrument : %s\n", buffer) ;
+	psf_store_string (psf, SF_STR_TITLE, buffer) ;
 
 	psf_binheader_readf (psf, "be2", buffer, 20, &version) ;
 	buffer [19] = 0 ;
-	psf_log_printf (psf, "Software : %s\nVersion  : %d.%02d\n", buffer, version / 256, version % 256) ;
+	k = 18;
+	while (buffer[k] == ' ') {
+	  buffer [k--] = 0 ;
+	}
+	psf_log_printf (psf, "Software : %s\nVersion  : %d.%02d\n", buffer, version / 256, version % 256) ;	
+	psf_store_string (psf, SF_STR_SOFTWARE, buffer) ;
 
 	/* Jump note numbers (96), volume envelope (48), pan envelope (48),
 	** volume points (1), pan points (1)
