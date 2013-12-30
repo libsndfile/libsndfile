@@ -396,6 +396,7 @@ xi_read_header (SF_PRIVATE *psf)
 	if (psf->instrument == NULL && (psf->instrument = psf_instrument_alloc ()) == NULL)
 		return SFE_MALLOC_FAILED ;
 
+	psf->instrument->basenote = 0 ;
 	/* Log all data for each sample. */
 	for (k = 0 ; k < sample_count ; k++)
 	{	psf_binheader_readf (psf, "e444", &(sample_sizes [k]), &loop_begin, &loop_end) ;
@@ -425,6 +426,15 @@ xi_read_header (SF_PRIVATE *psf)
 
 		psf_log_printf (psf, "  pan     : %u\n  note    : %d\n  namelen : %d\n",
 					buffer [3] & 0xFF, buffer [4], buffer [5]) ;
+
+		psf->instrument->basenote = buffer[4];
+		if (buffer [2] & 1) 
+		{
+		  psf->instrument->loop_count = 1;
+		  psf->instrument->loops[0].mode = (buffer [2] & 2) ? SF_LOOP_ALTERNATING : SF_LOOP_FORWARD;
+		  psf->instrument->loops[0].start = loop_begin;
+		  psf->instrument->loops[0].end = loop_end;
+		  }
 
 		if (k != 0)
 			continue ;
@@ -478,7 +488,6 @@ xi_read_header (SF_PRIVATE *psf)
 	if (! psf->sf.frames && psf->blockwidth)
 		psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;
 
-	psf->instrument->basenote = 0 ;
 	psf->instrument->gain = 1 ;
 	psf->instrument->velocity_lo = psf->instrument->key_lo = 0 ;
 	psf->instrument->velocity_hi = psf->instrument->key_hi = 127 ;
