@@ -336,16 +336,14 @@ typedef @TYPEOF_SF_COUNT_T@	sf_count_t ;
 ** sf_open ().
 */
 
-struct SF_INFO
+typedef struct
 {	sf_count_t	frames ;		/* Used to be called samples.  Changed to avoid confusion. */
 	int			samplerate ;
 	int			channels ;
 	int			format ;
 	int			sections ;
 	int			seekable ;
-} ;
-
-typedef	struct SF_INFO SF_INFO ;
+} SF_INFO ;
 
 /* The SF_FORMAT_INFO struct is used to retrieve information about the sound
 ** file formats libsndfile supports using the sf_command () interface.
@@ -370,17 +368,17 @@ typedef struct
 ** and SFC_SET_DITHER_ON_READ.
 */
 
-enum
+typedef enum
 {	SFD_DEFAULT_LEVEL	= 0,
 	SFD_CUSTOM_LEVEL	= 0x40000000,
 
 	SFD_NO_DITHER		= 500,
 	SFD_WHITE			= 501,
 	SFD_TRIANGULAR_PDF	= 502
-} ;
+} SF_DITHER ;
 
 typedef struct
-{	int			type ;
+{	int			type ;	/* see SF_DITHER enum */
 	double		level ;
 	const char	*name ;
 } SF_DITHER_INFO ;
@@ -398,15 +396,16 @@ typedef struct
 **	Structs used to retrieve music sample information from a file.
 */
 
-enum
+typedef enum
 {	/*
-	**	The loop mode field in SF_INSTRUMENT will be one of the following.
+	**	The loop mode field in SF_INSTRUMENT / SF_LOOP_INFO will be one of the
+	**  following.
 	*/
 	SF_LOOP_NONE = 800,
 	SF_LOOP_FORWARD,
 	SF_LOOP_BACKWARD,
 	SF_LOOP_ALTERNATING
-} ;
+} SF_LOOP ;
 
 typedef struct
 {	int gain ;
@@ -416,7 +415,7 @@ typedef struct
 	int loop_count ;
 
 	struct
-	{	int mode ;
+	{	int mode ;	/* see SF_LOOP enum */
 		uint32_t start ;
 		uint32_t end ;
 		uint32_t count ;
@@ -468,7 +467,7 @@ typedef struct
 typedef SF_BROADCAST_INFO_VAR (256) SF_BROADCAST_INFO ;
 
 struct SF_CART_TIMER
-{	char	usage[4] ;
+{	char	usage [4] ;
 	int32_t	value ;
 } ;
 
@@ -496,7 +495,7 @@ typedef struct SF_CART_TIMER SF_CART_TIMER ;
 				char		reserved [276] ; \
 				char		url [1024] ; \
 				uint32_t	tag_text_size ; \
-				char		tag_text[p_tag_text_size] ; \
+				char		tag_text [p_tag_text_size] ; \
 			}
 
 typedef SF_CART_INFO_VAR (256) SF_CART_INFO ;
