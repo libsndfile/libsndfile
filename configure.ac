@@ -1,4 +1,4 @@
-# Copyright (C) 1999-2013  Erik de Castro Lopo <erikd@mega-nerd.com>.
+# Copyright (C) 1999-2014  Erik de Castro Lopo <erikd@mega-nerd.com>.
 
 dnl Require autoconf version
 AC_PREREQ(2.57)
@@ -8,6 +8,7 @@ AC_INIT([libsndfile],[1.0.26pre5],[sndfile@mega-nerd.com],
 
 # Put config stuff in Cfg.
 AC_CONFIG_AUX_DIR(Cfg)
+AC_CONFIG_MACRO_DIR([M4])
 
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
