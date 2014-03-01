@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -337,7 +337,7 @@ psf_calc_max_all_channels (SF_PRIVATE *psf, double *peaks, int normalize)
 	position = sf_seek ((SNDFILE*) psf, 0, SEEK_CUR) ; /* Get current position in file */
 	sf_seek ((SNDFILE*) psf, 0, SEEK_SET) ;			/* Go to start of file. */
 
-	len = ARRAY_LEN (ubuf.dbuf) ;
+	len = ARRAY_LEN (ubuf.dbuf) - (ARRAY_LEN (ubuf.dbuf) % psf->sf.channels) ;
 
 	data = ubuf.dbuf ;
 
