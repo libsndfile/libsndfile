@@ -137,6 +137,9 @@ AC_ARG_ENABLE(test-coverage,
 	AC_HELP_STRING([--enable-test-coverage], [enable test coverage]))
 AM_CONDITIONAL([ENABLE_TEST_COVERAGE], [test "$enable_test_coverage" = yes])
 
+AC_ARG_ENABLE(sanitizer,
+	AC_HELP_STRING([--sanitizer], [enable ggc/clang code sanitizier runtime checks]))
+
 #====================================================================================
 # Check types and their sizes.
 
@@ -563,6 +566,17 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	 	fi
 
 	COMPILER_IS_GCC=1
+	fi
+
+if test x$enable_sanitizer = "xyes" ; then
+	MN_ADD_CFLAGS([-fsanitize=address])
+	MN_ADD_CFLAGS([-fsanitize=integer])
+
+	# If we enable it for the C compiler we have to do it for the C++ compiler as well.
+	AC_LANG_PUSH([C++])
+	MN_ADD_CXXFLAGS([-fsanitize=address])
+	MN_ADD_CXXFLAGS([-fsanitize=integer])
+	AC_LANG_POP([C++])
 	fi
 
 if test x$enable_werror = "xyes" ; then
