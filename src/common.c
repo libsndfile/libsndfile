@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,19 +16,22 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	<config.h>
+#include <config.h>
 
-#include	<stdarg.h>
-#include	<string.h>
-#include	<unistd.h>
-#include	<ctype.h>
-#include	<math.h>
-#include	<time.h>
-#include	<sys/time.h>
-
-#include	"sndfile.h"
-#include	"sfendian.h"
-#include	"common.h"
+#include <stdarg.h>
+#include <string.h>
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#include <ctype.h>
+#include <math.h>
+#include <time.h>
+#if HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+#include "sndfile.h"
+#include "sfendian.h"
+#include "common.h"
 
 /*-----------------------------------------------------------------------------------------------
 ** psf_log_printf allows libsndfile internal functions to print to an internal parselog which
