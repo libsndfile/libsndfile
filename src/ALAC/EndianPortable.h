@@ -1,10 +1,10 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
-** Copyright (C) 2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2013-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License") ;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -30,10 +30,10 @@
 
 #include <sfendian.h>
 
-#define Swap16NtoB(x)	H2BE_16(x)
-#define Swap16BtoN(x)	BE2H_16(x)
+#define Swap16NtoB(x)	H2BE_16 (x)
+#define Swap16BtoN(x)	BE2H_16 (x)
 
-#define Swap32NtoB(x)	H2BE_32(x)
-#define Swap32BtoN(x)	BE2H_32(x)
+#define Swap32NtoB(x)	H2BE_32 (x)
+#define Swap32BtoN(x)	BE2H_32 (x)
 
 #endif
