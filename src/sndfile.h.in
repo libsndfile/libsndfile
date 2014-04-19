@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -468,7 +468,7 @@ typedef struct
 typedef SF_BROADCAST_INFO_VAR (256) SF_BROADCAST_INFO ;
 
 struct SF_CART_TIMER
-{	char	usage[4] ;
+{	char	usage [4] ;
 	int32_t	value ;
 } ;
 
@@ -496,7 +496,7 @@ typedef struct SF_CART_TIMER SF_CART_TIMER ;
 				char		reserved [276] ; \
 				char		url [1024] ; \
 				uint32_t	tag_text_size ; \
-				char		tag_text[p_tag_text_size] ; \
+				char		tag_text [p_tag_text_size] ; \
 			}
 
 typedef SF_CART_INFO_VAR (256) SF_CART_INFO ;
