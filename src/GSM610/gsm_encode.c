@@ -9,7 +9,7 @@
 
 void gsm_encode (gsm s, gsm_signal * source, gsm_byte * c)
 {
-	word		LARc [8], Nc [4], Mc [4], bc [4], xmaxc [4], xmc [13 * 4] ;
+	int16_t		LARc [8], Nc [4], Mc [4], bc [4], xmaxc [4], xmc [13 * 4] ;
 
 	Gsm_Coder (s, source, LARc, Nc, bc, Mc, xmaxc, xmc) ;
 
@@ -105,7 +105,7 @@ void gsm_encode (gsm s, gsm_signal * source, gsm_byte * c)
 	if (s->wav_fmt)
 	{	s->frame_index = !s->frame_index ;
 		if (s->frame_index)
-		{	uword sr ;
+		{	uint16_t sr ;
 
 			sr = 0 ;
 			sr = sr >> 6 | LARc [0] << 10 ;
@@ -221,7 +221,7 @@ void gsm_encode (gsm s, gsm_signal * source, gsm_byte * c)
 			s->frame_chain = *c ;
 		}
 		else {
-			uword sr ;
+			uint16_t sr ;
 
 			sr = 0 ;
 			sr = sr >> 4 | s->frame_chain << 12 ;

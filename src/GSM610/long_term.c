@@ -45,21 +45,21 @@ static void Cut_Calculation_of_the_LTP_parameters (
 
 	struct gsm_state * st,
 
-	register word	* d,		/* [0..39]	IN	*/
-	register word	* dp,		/* [-120..-1]	IN	*/
-	word		* bc_out,	/* 		OUT	*/
-	word		* Nc_out	/* 		OUT	*/)
+	register int16_t	* d,		/* [0..39]	IN	*/
+	register int16_t	* dp,		/* [-120..-1]	IN	*/
+	int16_t		* bc_out,	/* 		OUT	*/
+	int16_t		* Nc_out	/* 		OUT	*/)
 {
 	register int	k, lambda ;
-	word		Nc, bc ;
-	word		wt [40] ;
+	int16_t		Nc, bc ;
+	int16_t		wt [40] ;
 
-	longword	L_result ;
-	longword	L_max, L_power ;
-	word		R, S, dmax, scal, best_k ;
-	word		ltp_cut ;
+	int32_t	L_result ;
+	int32_t	L_max, L_power ;
+	int16_t		R, S, dmax, scal, best_k ;
+	int16_t		ltp_cut ;
 
-	register word	temp, wt_k ;
+	register int16_t	temp, wt_k ;
 
 	/*  Search of the optimum scaling of d [0..39]. */
 	dmax = 0 ;
@@ -76,7 +76,7 @@ static void Cut_Calculation_of_the_LTP_parameters (
 		scal = 0 ;
 	else
 	{	assert (dmax > 0) ;
-		temp = gsm_norm ((longword) dmax << 16) ;
+		temp = gsm_norm ((int32_t) dmax << 16) ;
 		}
 	if (temp > 6) scal = 0 ;
 	else scal = 6 - temp ;
@@ -89,7 +89,7 @@ static void Cut_Calculation_of_the_LTP_parameters (
 	wt_k = SASR_W (d [best_k], scal) ;
 
 	for (lambda = 40 ; lambda <= 120 ; lambda++)
-	{	L_result = (longword) wt_k * dp [best_k - lambda] ;
+	{	L_result = (int32_t) wt_k * dp [best_k - lambda] ;
 		if (L_result > L_max)
 		{	Nc = lambda ;
 			L_max = L_result ;
@@ -110,7 +110,7 @@ static void Cut_Calculation_of_the_LTP_parameters (
 	 */
 	L_power = 0 ;
 	for (k = 0 ; k <= 39 ; k++)
-	{	register longword L_temp ;
+	{	register int32_t L_temp ;
 
 		L_temp = SASR_W (dp [k - Nc], 3) ;
 		L_power += L_temp * L_temp ;
@@ -146,18 +146,18 @@ static void Cut_Calculation_of_the_LTP_parameters (
 #endif 	/* LTP_CUT */
 
 static void Calculation_of_the_LTP_parameters (
-	register word	* d,		/* [0..39]	IN	*/
-	register word	* dp,		/* [-120..-1]	IN	*/
-	word		* bc_out,	/* 		OUT	*/
-	word		* Nc_out	/* 		OUT	*/)
+	register int16_t	* d,		/* [0..39]	IN	*/
+	register int16_t	* dp,		/* [-120..-1]	IN	*/
+	int16_t		* bc_out,	/* 		OUT	*/
+	int16_t		* Nc_out	/* 		OUT	*/)
 {
 	register int	k, lambda ;
-	word		Nc, bc ;
-	word		wt [40] ;
+	int16_t		Nc, bc ;
+	int16_t		wt [40] ;
 
-	longword	L_max, L_power ;
-	word		R, S, dmax, scal ;
-	register word	temp ;
+	int32_t	L_max, L_power ;
+	int16_t		R, S, dmax, scal ;
+	register int16_t	temp ;
 
 	/*  Search of the optimum scaling of d [0..39].
 	 */
@@ -174,7 +174,7 @@ static void Calculation_of_the_LTP_parameters (
 		scal = 0 ;
 	else
 	{	assert (dmax > 0) ;
-		temp = gsm_norm ((longword) dmax << 16) ;
+		temp = gsm_norm ((int32_t) dmax << 16) ;
 		}
 
 	if (temp > 6) scal = 0 ;
@@ -195,9 +195,9 @@ static void Calculation_of_the_LTP_parameters (
 	{
 
 # undef STEP
-#		define STEP(k) 	(longword) wt [k] * dp [k - lambda]
+#		define STEP(k) 	(int32_t) wt [k] * dp [k - lambda]
 
-		register longword L_result ;
+		register int32_t L_result ;
 
 		L_result = STEP (0) ; L_result += STEP (1) ;
 		L_result += STEP (2) ; L_result += STEP (3) ;
@@ -242,7 +242,7 @@ static void Calculation_of_the_LTP_parameters (
 	 */
 	L_power = 0 ;
 	for (k = 0 ; k <= 39 ; k++)
-	{	register longword L_temp ;
+	{	register int32_t L_temp ;
 
 		L_temp = SASR_W (dp [k - Nc], 3) ;
 		L_power += L_temp * L_temp ;
@@ -282,21 +282,21 @@ static void Calculation_of_the_LTP_parameters (
 
 static void Cut_Calculation_of_the_LTP_parameters (
 	struct gsm_state * st,		/*              IN 	*/
-	register word	* d,		/* [0..39]	IN	*/
-	register word	* dp,		/* [-120..-1]	IN	*/
-	word		* bc_out,	/* 		OUT	*/
-	word		* Nc_out	/* 		OUT	*/)
+	register int16_t	* d,		/* [0..39]	IN	*/
+	register int16_t	* dp,		/* [-120..-1]	IN	*/
+	int16_t		* bc_out,	/* 		OUT	*/
+	int16_t		* Nc_out	/* 		OUT	*/)
 {
 	register int	k, lambda ;
-	word		Nc, bc ;
-	word		ltp_cut ;
+	int16_t		Nc, bc ;
+	int16_t		ltp_cut ;
 
 	float		wt_float [40] ;
 	float		dp_float_base [120], * dp_float = dp_float_base + 120 ;
 
-	longword	L_max, L_power ;
-	word		R, S, dmax, scal ;
-	register word	temp ;
+	int32_t	L_max, L_power ;
+	int16_t		R, S, dmax, scal ;
+	register int16_t	temp ;
 
 	/*  Search of the optimum scaling of d [0..39].
 	 */
@@ -312,19 +312,19 @@ static void Cut_Calculation_of_the_LTP_parameters (
 	if (dmax == 0) scal = 0 ;
 	else
 	{	assert (dmax > 0) ;
-		temp = gsm_norm ((longword) dmax << 16) ;
+		temp = gsm_norm ((int32_t) dmax << 16) ;
 		}
 
 	if (temp > 6) scal = 0 ;
 	else scal = 6 - temp ;
 
 	assert (scal >= 0) ;
-	ltp_cut = (longword) SASR_W (dmax, scal) * st->ltp_cut / 100 ;
+	ltp_cut = (int32_t) SASR_W (dmax, scal) * st->ltp_cut / 100 ;
 
 	/*  Initialization of a working array wt */
 
 	for (k = 0 ; k < 40 ; k++)
-	{	register word w = SASR_W (d [k], scal) ;
+	{	register int16_t w = SASR_W (d [k], scal) ;
 		if (w < 0 ? w > -ltp_cut : w < ltp_cut)
 			wt_float [k] = 0.0 ;
 		else
@@ -423,7 +423,7 @@ static void Cut_Calculation_of_the_LTP_parameters (
 	 */
 	L_power = 0 ;
 	for (k = 0 ; k <= 39 ; k++)
-	{	register longword L_temp ;
+	{	register int32_t L_temp ;
 
 		L_temp = SASR_W (dp [k - Nc], 3) ;
 		L_power += L_temp * L_temp ;
@@ -460,20 +460,20 @@ static void Cut_Calculation_of_the_LTP_parameters (
 #endif /* LTP_CUT */
 
 static void Calculation_of_the_LTP_parameters (
-	register word	* din,		/* [0..39]	IN	*/
-	register word	* dp,		/* [-120..-1]	IN	*/
-	word		* bc_out,	/* 		OUT	*/
-	word		* Nc_out	/* 		OUT	*/)
+	register int16_t	* din,		/* [0..39]	IN	*/
+	register int16_t	* dp,		/* [-120..-1]	IN	*/
+	int16_t		* bc_out,	/* 		OUT	*/
+	int16_t		* Nc_out	/* 		OUT	*/)
 {
 	register int	k, lambda ;
-	word	Nc, bc ;
+	int16_t	Nc, bc ;
 
 	float	wt_float [40] ;
 	float	dp_float_base [120], * dp_float = dp_float_base + 120 ;
 
-	longword	L_max, L_power ;
-	word		R, S, dmax, scal ;
-	register word	temp ;
+	int32_t	L_max, L_power ;
+	int16_t		R, S, dmax, scal ;
+	register int16_t	temp ;
 
 	/*  Search of the optimum scaling of d [0..39].
 	 */
@@ -489,7 +489,7 @@ static void Calculation_of_the_LTP_parameters (
 	if (dmax == 0) scal = 0 ;
 	else
 	{	assert (dmax > 0) ;
-		temp = gsm_norm ((longword) dmax << 16) ;
+		temp = gsm_norm ((int32_t) dmax << 16) ;
 		}
 
 	if (temp > 6) scal = 0 ;
@@ -592,7 +592,7 @@ static void Calculation_of_the_LTP_parameters (
 	 */
 	L_power = 0 ;
 	for (k = 0 ; k <= 39 ; k++)
-	{	register longword L_temp ;
+	{	register int32_t L_temp ;
 
 		L_temp = SASR_W (dp [k - Nc], 3) ;
 		L_power += L_temp * L_temp ;
@@ -631,15 +631,15 @@ static void Calculation_of_the_LTP_parameters (
 
 static void Cut_Fast_Calculation_of_the_LTP_parameters (
 	struct gsm_state * st,		/*              IN	*/
-	register word	* d,		/* [0..39]	IN	*/
-	register word	* dp,		/* [-120..-1]	IN	*/
-	word		* bc_out,	/* 		OUT	*/
-	word		* Nc_out	/* 		OUT	*/)
+	register int16_t	* d,		/* [0..39]	IN	*/
+	register int16_t	* dp,		/* [-120..-1]	IN	*/
+	int16_t		* bc_out,	/* 		OUT	*/
+	int16_t		* Nc_out	/* 		OUT	*/)
 {
 	register int	k, lambda ;
 	register float	wt_float ;
-	word	Nc, bc ;
-	word	wt_max, best_k, ltp_cut ;
+	int16_t	Nc, bc ;
+	int16_t	wt_max, best_k, ltp_cut ;
 
 	float		dp_float_base [120], * dp_float = dp_float_base + 120 ;
 
@@ -702,13 +702,13 @@ static void Cut_Fast_Calculation_of_the_LTP_parameters (
 #endif /* LTP_CUT */
 
 static void Fast_Calculation_of_the_LTP_parameters (
-	register word	* din,		/* [0..39]	IN	*/
-	register word	* dp,		/* [-120..-1]	IN	*/
-	word		* bc_out,	/* 		OUT	*/
-	word		* Nc_out	/* 		OUT	*/)
+	register int16_t	* din,		/* [0..39]	IN	*/
+	register int16_t	* dp,		/* [-120..-1]	IN	*/
+	int16_t		* bc_out,	/* 		OUT	*/
+	int16_t		* Nc_out	/* 		OUT	*/)
 {
 	register int	k, lambda ;
-	word			Nc, bc ;
+	int16_t			Nc, bc ;
 
 	float		wt_float [40] ;
 	float		dp_float_base [120], * dp_float = dp_float_base + 120 ;
@@ -820,12 +820,12 @@ static void Fast_Calculation_of_the_LTP_parameters (
 /* 4.2.12 */
 
 static void Long_term_analysis_filtering (
-	word		bc,	/* 					IN  */
-	word		Nc,	/* 					IN  */
-	register word	* dp,	/* previous d	[-120..-1]		IN  */
-	register word	* d,	/* d		[0..39]			IN  */
-	register word	* dpp,	/* estimate	[0..39]			OUT */
-	register word	* e	/* long term res. signal [0..39]	OUT */)
+	int16_t		bc,	/* 					IN  */
+	int16_t		Nc,	/* 					IN  */
+	register int16_t	* dp,	/* previous d	[-120..-1]		IN  */
+	register int16_t	* d,	/* d		[0..39]			IN  */
+	register int16_t	* dpp,	/* estimate	[0..39]			OUT */
+	register int16_t	* e	/* long term res. signal [0..39]	OUT */)
 /*
  *  In this part, we have to decode the bc parameter to compute
  *  the samples of the estimate dpp [0..39].  The decoding of bc needs the
@@ -854,13 +854,13 @@ void Gsm_Long_Term_Predictor (	/* 4x for 160 samples */
 
 	struct gsm_state	* S,
 
-	word	* d,	/* [0..39]   residual signal	IN	*/
-	word	* dp,	/* [-120..-1] d'		IN	*/
+	int16_t	* d,	/* [0..39]   residual signal	IN	*/
+	int16_t	* dp,	/* [-120..-1] d'		IN	*/
 
-	word	* e,	/* [0..39] 			OUT	*/
-	word	* dpp,	/* [0..39] 			OUT	*/
-	word	* Nc,	/* correlation lag		OUT	*/
-	word	* bc	/* gain factor			OUT	*/)
+	int16_t	* e,	/* [0..39] 			OUT	*/
+	int16_t	* dpp,	/* [0..39] 			OUT	*/
+	int16_t	* Nc,	/* correlation lag		OUT	*/
+	int16_t	* bc	/* gain factor			OUT	*/)
 {
 	assert (d) ; assert (dp) ; assert (e) ;
 	assert (dpp) ; assert (Nc) ; assert (bc) ;
@@ -890,10 +890,10 @@ void Gsm_Long_Term_Predictor (	/* 4x for 160 samples */
 void Gsm_Long_Term_Synthesis_Filtering (
 	struct gsm_state	* S,
 
-	word			Ncr,
-	word			bcr,
-	register word	* erp,	/* [0..39]		  	 IN */
-	register word	* drp	/* [-120..-1] IN, [-120..40] OUT */)
+	int16_t			Ncr,
+	int16_t			bcr,
+	register int16_t	* erp,	/* [0..39]		  	 IN */
+	register int16_t	* drp	/* [-120..-1] IN, [-120..40] OUT */)
 /*
  *  This procedure uses the bcr and Ncr parameter to realize the
  *  long term synthesis filtering.  The decoding of bcr needs
@@ -901,7 +901,7 @@ void Gsm_Long_Term_Synthesis_Filtering (
  */
 {
 	register int 		k ;
-	word			brp, drpp, Nr ;
+	int16_t			brp, drpp, Nr ;
 
 	/*  Check the limits of Nr.
 	 */

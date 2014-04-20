@@ -15,8 +15,8 @@
 /* 4.2.13 */
 
 static void Weighting_filter (
-	register word	* e,		/* signal [-5..0.39.44]	IN  */
-	word		* x		/* signal [0..39]	OUT */
+	register int16_t	* e,		/* signal [-5..0.39.44]	IN  */
+	int16_t		* x		/* signal [0..39]	OUT */
 )
 /*
  *  The coefficients of the weighting filter are stored in a table
@@ -25,9 +25,9 @@ static void Weighting_filter (
  *	H[0..10] = integer(real_H [0..10] * 8192) ;
  */
 {
-	/* word			wt [50] ; */
+	/* int16_t			wt [50] ; */
 
-	register longword	L_result ;
+	register int32_t	L_result ;
 	register int		k /* , i */ ;
 
 	/*  Initialization of a temporary working array wt[0...49]
@@ -54,7 +54,7 @@ static void Weighting_filter (
 		 */
 
 #undef	STEP
-#define	STEP(i, H)	(e [k + i] * (longword) H)
+#define	STEP(i, H)	(e [k + i] * (int32_t) H)
 
 		/*  Every one of these multiplications is done twice --
 		 *  but I don't see an elegant way to optimize this.
@@ -106,9 +106,9 @@ static void Weighting_filter (
 /* 4.2.14 */
 
 static void RPE_grid_selection (
-	word		* x,		/* [0..39]		IN  */
-	word		* xM,		/* [0..12]		OUT */
-	word		* Mc_out	/*			OUT */
+	int16_t		* x,		/* [0..39]		IN  */
+	int16_t		* xM,		/* [0..12]		OUT */
+	int16_t		* Mc_out	/*			OUT */
 )
 /*
  *  The signal x[0..39] is used to select the RPE grid which is
@@ -116,11 +116,11 @@ static void RPE_grid_selection (
  */
 {
 	register int		i ;
-	register longword	L_result, L_temp ;
-	longword		EM ;	/* xxx should be L_EM? */
-	word			Mc ;
+	register int32_t	L_result, L_temp ;
+	int32_t		EM ;	/* xxx should be L_EM? */
+	int16_t			Mc ;
 
-	longword		L_common_0_3 ;
+	int32_t		L_common_0_3 ;
 
 	EM = 0 ;
 	Mc = 0 ;
@@ -210,11 +210,11 @@ static void RPE_grid_selection (
 /* 4.12.15 */
 
 static void APCM_quantization_xmaxc_to_exp_mant (
-	word		xmaxc,		/* IN 	*/
-	word		* expon_out,	/* OUT	*/
-	word		* mant_out)	/* OUT  */
+	int16_t		xmaxc,		/* IN 	*/
+	int16_t		* expon_out,	/* OUT	*/
+	int16_t		* mant_out)	/* OUT  */
 {
-	word	expon, mant ;
+	int16_t	expon, mant ;
 
 	/* Compute expononent and mantissa of the decoded version of xmaxc
 	 */
@@ -243,17 +243,17 @@ static void APCM_quantization_xmaxc_to_exp_mant (
 }
 
 static void APCM_quantization (
-	word		* xM,		/* [0..12]		IN	*/
-	word		* xMc,		/* [0..12]		OUT	*/
-	word		* mant_out,	/* 			OUT	*/
-	word		* expon_out,	/*			OUT	*/
-	word		* xmaxc_out	/*			OUT	*/
+	int16_t		* xM,		/* [0..12]		IN	*/
+	int16_t		* xMc,		/* [0..12]		OUT	*/
+	int16_t		* mant_out,	/* 			OUT	*/
+	int16_t		* expon_out,	/*			OUT	*/
+	int16_t		* xmaxc_out	/*			OUT	*/
 )
 {
 	int	i, itest ;
 
-	word	xmax, xmaxc, temp, temp1, temp2 ;
-	word	expon, mant ;
+	int16_t	xmax, xmaxc, temp, temp1, temp2 ;
+	int16_t	expon, mant ;
 
 
 	/*  Find the maximum absolute value xmax of xM [0..12].
@@ -285,7 +285,7 @@ static void APCM_quantization (
 	temp = expon + 5 ;
 
 	assert (temp <= 11 && temp >= 0) ;
-	xmaxc = gsm_add (SASR_W (xmax, temp), (word) (expon << 3)) ;
+	xmaxc = gsm_add (SASR_W (xmax, temp), (int16_t) (expon << 3)) ;
 
 	/*   Quantizing and coding of the xM [0..12] RPE sequence
 	 *   to get the xMc [0..12]
@@ -333,10 +333,10 @@ static void APCM_quantization (
 /* 4.2.16 */
 
 static void APCM_inverse_quantization (
-	register word	* xMc,	/* [0..12]			IN 	*/
-	word		mant,
-	word		expon,
-	register word	* xMp)	/* [0..12]			OUT 	*/
+	register int16_t	* xMc,	/* [0..12]			IN 	*/
+	int16_t		mant,
+	int16_t		expon,
+	register int16_t	* xMp)	/* [0..12]			OUT 	*/
 /*
  *  This part is for decoding the RPE sequence of coded xMc [0..12]
  *  samples to obtain the xMp[0..12] array.  Table 4.6 is used to get
@@ -344,7 +344,7 @@ static void APCM_inverse_quantization (
  */
 {
 	int	i ;
-	word	temp, temp1, temp2, temp3 ;
+	int16_t	temp, temp1, temp2, temp3 ;
 
 	assert (mant >= 0 && mant <= 7) ;
 
@@ -369,9 +369,9 @@ static void APCM_inverse_quantization (
 /* 4.2.17 */
 
 static void RPE_grid_positioning (
-	word		Mc,		/* grid position	IN	*/
-	register word	* xMp,		/* [0..12]		IN	*/
-	register word	* ep		/* [0..39]		OUT	*/
+	int16_t		Mc,		/* grid position	IN	*/
+	register int16_t	* xMp,		/* [0..12]		IN	*/
+	register int16_t	* ep		/* [0..39]		OUT	*/
 )
 /*
  *  This procedure computes the reconstructed long term residual signal
@@ -407,9 +407,9 @@ static void RPE_grid_positioning (
 
 #if 0	/* Has been inlined in code.c */
 void Gsm_Update_of_reconstructed_short_time_residual_signal (
-	word	* dpp,		/* [0...39]	IN	*/
-	word	* ep,		/* [0...39]	IN	*/
-	word	* dp)		/* [-120...-1]  IN/OUT 	*/
+	int16_t	* dpp,		/* [0...39]	IN	*/
+	int16_t	* ep,		/* [0...39]	IN	*/
+	int16_t	* dp)		/* [-120...-1]  IN/OUT 	*/
 {
 	int 		k ;
 
@@ -422,14 +422,14 @@ void Gsm_Update_of_reconstructed_short_time_residual_signal (
 #endif	/* Has been inlined in code.c */
 
 void Gsm_RPE_Encoding (
-	word	* e,		/* -5..-1][0..39][40..44	IN/OUT  */
-	word	* xmaxc,	/* 				OUT */
-	word	* Mc,		/* 			  	OUT */
-	word	* xMc)		/* [0..12]			OUT */
+	int16_t	* e,		/* -5..-1][0..39][40..44	IN/OUT  */
+	int16_t	* xmaxc,	/* 				OUT */
+	int16_t	* Mc,		/* 			  	OUT */
+	int16_t	* xMc)		/* [0..12]			OUT */
 {
-	word	x [40] ;
-	word	xM [13], xMp [13] ;
-	word	mant, expon ;
+	int16_t	x [40] ;
+	int16_t	xM [13], xMp [13] ;
+	int16_t	mant, expon ;
 
 	Weighting_filter (e, x) ;
 	RPE_grid_selection (x, xM, Mc) ;
@@ -442,14 +442,14 @@ void Gsm_RPE_Encoding (
 }
 
 void Gsm_RPE_Decoding (
-	word 		xmaxcr,
-	word		Mcr,
-	word		* xMcr,	/* [0..12], 3 bits 		IN	*/
-	word		* erp	/* [0..39]			OUT 	*/
+	int16_t 		xmaxcr,
+	int16_t		Mcr,
+	int16_t		* xMcr,	/* [0..12], 3 bits 		IN	*/
+	int16_t		* erp	/* [0..39]			OUT 	*/
 )
 {
-	word	expon, mant ;
-	word	xMp [13] ;
+	int16_t	expon, mant ;
+	int16_t	xMp [13] ;
 
 	APCM_quantization_xmaxc_to_exp_mant (xmaxcr, &expon, &mant) ;
 	APCM_inverse_quantization (xMcr, mant, expon, xMp) ;

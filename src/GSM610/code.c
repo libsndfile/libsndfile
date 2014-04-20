@@ -18,7 +18,7 @@ void Gsm_Coder (
 
 	struct gsm_state	* State,
 
-	word	* s,	/* [0..159] samples		  	IN	*/
+	int16_t	* s,	/* [0..159] samples		  	IN	*/
 
 /*
  * The RPE-LTD coder works on a frame by frame basis.  The length of
@@ -30,7 +30,7 @@ void Gsm_Coder (
  * the output of the coder:
  */
 
-	word	* LARc,	/* [0..7] LAR coefficients		OUT	*/
+	int16_t	* LARc,	/* [0..7] LAR coefficients		OUT	*/
 
 /*
  * Procedure 4.2.11 to 4.2.18 are to be executed four times per
@@ -38,18 +38,18 @@ void Gsm_Coder (
  * 40 samples.  These parts produce at the output of the coder:
  */
 
-	word	*Nc,	/* [0..3] LTP lag			OUT 	*/
-	word	*bc,	/* [0..3] coded LTP gain		OUT 	*/
-	word	*Mc,	/* [0..3] RPE grid selection		OUT     */
-	word	*xmaxc,	/* [0..3] Coded maximum amplitude	OUT	*/
-	word	*xMc	/* [13*4] normalized RPE samples	OUT	*/
+	int16_t	*Nc,	/* [0..3] LTP lag			OUT 	*/
+	int16_t	*bc,	/* [0..3] coded LTP gain		OUT 	*/
+	int16_t	*Mc,	/* [0..3] RPE grid selection		OUT     */
+	int16_t	*xmaxc,	/* [0..3] Coded maximum amplitude	OUT	*/
+	int16_t	*xMc	/* [13*4] normalized RPE samples	OUT	*/
 )
 {
 	int	k ;
-	word	*dp = State->dp0 + 120 ;	/* [-120...-1] */
-	word	*dpp = dp ;					/* [0...39]	 */
+	int16_t	*dp = State->dp0 + 120 ;	/* [-120...-1] */
+	int16_t	*dpp = dp ;					/* [0...39]	 */
 
-	word	so [160] ;
+	int16_t	so [160] ;
 
 	Gsm_Preprocess (State, s, so) ;
 	Gsm_LPC_Analysis (State, so, LARc) ;

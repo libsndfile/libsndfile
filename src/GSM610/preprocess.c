@@ -28,21 +28,21 @@
 
 void Gsm_Preprocess (
 	struct gsm_state * S,
-	word		* s,
-	word		* so)		/* [0..159] 	IN/OUT	*/
+	int16_t		* s,
+	int16_t		* so)		/* [0..159] 	IN/OUT	*/
 {
 
-	word		z1 = S->z1 ;
-	longword 	L_z2 = S->L_z2 ;
-	word		mp = S->mp ;
+	int16_t		z1 = S->z1 ;
+	int32_t 	L_z2 = S->L_z2 ;
+	int16_t		mp = S->mp ;
 
-	word		s1 ;
-	longword	L_s2 ;
+	int16_t		s1 ;
+	int32_t	L_s2 ;
 
-	longword	L_temp ;
+	int32_t	L_temp ;
 
-	word		msp, lsp ;
-	word		SO ;
+	int16_t		msp, lsp ;
+	int16_t		SO ;
 
 	register int		k = 160 ;
 
@@ -79,10 +79,10 @@ void Gsm_Preprocess (
 		/*   Execution of a 31 bv 16 bits multiplication */
 
 		msp = SASR_L (L_z2, 15) ;
-		lsp = L_z2 - ((longword) msp << 15) ; /* gsm_L_sub (L_z2,(msp<<15)) ; */
+		lsp = L_z2 - ((int32_t) msp << 15) ; /* gsm_L_sub (L_z2,(msp<<15)) ; */
 
 		L_s2 += GSM_MULT_R (lsp, 32735) ;
-		L_temp = (longword) msp * 32735 ; /* GSM_L_MULT (msp,32735) >> 1 ;*/
+		L_temp = (int32_t) msp * 32735 ; /* GSM_L_MULT (msp,32735) >> 1 ;*/
 		L_z2 = GSM_L_ADD (L_temp, L_s2) ;
 
 		/*    Compute sof[k] with rounding */
