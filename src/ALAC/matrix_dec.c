@@ -29,6 +29,7 @@
 
 #include "matrixlib.h"
 #include "ALACAudioTypes.h"
+#include "shift.h"
 
 // up to 24-bit "offset" macros for the individual bytes of a 20/24-bit word
 #if TARGET_RT_BIG_ENDIAN
@@ -72,8 +73,8 @@ void unmix16 (int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t 
 			l = u [j] + v [j] - ((mixres * v [j]) >> mixbits) ;
 			r = l - v [j] ;
 
-			out [0] = l << 16 ;
-			out [1] = r << 16 ;
+			out [0] = arith_shift_left (l, 16) ;
+			out [1] = arith_shift_left (r, 16) ;
 			out += stride ;
 		}
 	}
@@ -106,8 +107,8 @@ void unmix20 (int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t 
 			l = u [j] + v [j] - ((mixres * v [j]) >> mixbits) ;
 			r = l - v [j] ;
 
-			out [0] = l << 12 ;
-			out [1] = r << 12 ;
+			out [0] = arith_shift_left (l, 12) ;
+			out [1] = arith_shift_left (r, 12) ;
 			out += stride ;
 		}
 	}
@@ -116,8 +117,8 @@ void unmix20 (int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t 
 		/* Conventional separated stereo. */
 		for (j = 0 ; j < numSamples ; j++)
 		{
-			out [0] = u [j] << 12 ;
-			out [1] = v [j] << 12 ;
+			out [0] = arith_shift_left (u [j], 12) ;
+			out [1] = arith_shift_left (v [j], 12) ;
 			out += stride ;
 		}
 	}
@@ -143,11 +144,11 @@ void unmix24 (int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t 
 				l = u [j] + v [j] - ((mixres * v [j]) >> mixbits) ;
 				r = l - v [j] ;
 
-				l = (l << shift) | (uint32_t) shiftUV [k + 0] ;
-				r = (r << shift) | (uint32_t) shiftUV [k + 1] ;
+				l = arith_shift_left (l, shift) | (uint32_t) shiftUV [k + 0] ;
+				r = arith_shift_left (r, shift) | (uint32_t) shiftUV [k + 1] ;
 
-				out [0] = l << 8 ;
-				out [1] = r << 8 ;
+				out [0] = arith_shift_left (l, 8) ;
+				out [1] = arith_shift_left (r, 8) ;
 				out += stride ;
 			}
 		}
@@ -221,8 +222,8 @@ void unmix32 (int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t 
 			l = lt + rt - ((mixres * rt) >> mixbits) ;
 			r = l - rt ;
 
-			out [0] = (l << shift) | (uint32_t) shiftUV [k + 0] ;
-			out [1] = (r << shift) | (uint32_t) shiftUV [k + 1] ;
+			out [0] = arith_shift_left (l, shift) | (uint32_t) shiftUV [k + 0] ;
+			out [1] = arith_shift_left (r, shift) | (uint32_t) shiftUV [k + 1] ;
 			out += stride ;
 		}
 	}
@@ -275,8 +276,8 @@ void copyPredictorTo24Shift (int32_t * in, uint16_t * shift, int32_t * out, uint
 	{
 		int32_t		val = in [j] ;
 
-		val = (val << shiftVal) | (uint32_t) shift [j] ;
-		out [0] = val << 8 ;
+		val = arith_shift_left (val, shiftVal) | (uint32_t) shift [j] ;
+		out [0] = arith_shift_left (val, 8) ;
 		out += stride ;
 	}
 }
@@ -289,7 +290,7 @@ void copyPredictorTo20 (int32_t * in, int32_t * out, uint32_t stride, int32_t nu
 	// in the 24-bit output buffer
 	for (j = 0 ; j < numSamples ; j++)
 	{
-		out [0] = in [j] << 12 ;
+		out [0] = arith_shift_left (in [j], 12) ;
 		out += stride ;
 	}
 }
@@ -300,7 +301,7 @@ void copyPredictorTo32 (int32_t * in, int32_t * out, uint32_t stride, int32_t nu
 
 	// this is only a subroutine to abstract the "iPod can only output 16-bit data" problem
 	for (i = 0, j = 0 ; i < numSamples ; i++, j += stride)
-		out [j] = in [i] << 8 ;
+		out [j] = arith_shift_left (in [i], 8) ;
 }
 
 void copyPredictorTo32Shift (int32_t * in, uint16_t * shift, int32_t * out, uint32_t stride, int32_t numSamples, int32_t bytesShifted)
@@ -314,7 +315,7 @@ void copyPredictorTo32Shift (int32_t * in, uint16_t * shift, int32_t * out, uint
 	// this is only a subroutine to abstract the "iPod can only output 16-bit data" problem
 	for (j = 0 ; j < numSamples ; j++)
 	{
-		op [0] = (in [j] << shiftVal) | (uint32_t) shift [j] ;
+		op [0] = arith_shift_left (in [j], shiftVal) | (uint32_t) shift [j] ;
 		op += stride ;
 	}
 }

@@ -26,8 +26,10 @@
 	Copyright:	(c) 2001-2011 Apple, Inc.
 */
 
-#include "dplib.h"
 #include <string.h>
+
+#include "dplib.h"
+#include "shift.h"
 
 #if __GNUC__
 #define ALWAYS_INLINE		__attribute__ ((always_inline))
@@ -100,7 +102,7 @@ void pc_block (int32_t * in, int32_t * pc1, int32_t num, int16_t * coefs, int32_
 	for (j = 1 ; j <= numactive ; j++)
 	{
 		del = in [j] - in [j-1] ;
-		pc1 [j] = (del << chanshift) >> chanshift ;
+		pc1 [j] = arith_shift_left (del, chanshift) >> chanshift ;
 	}
 
 	lim = numactive + 1 ;
@@ -128,7 +130,7 @@ void pc_block (int32_t * in, int32_t * pc1, int32_t num, int16_t * coefs, int32_
 			sum1 = (denhalf - a0 * b0 - a1 * b1 - a2 * b2 - a3 * b3) >> denshift ;
 
 			del = in [j] - top - sum1 ;
-			del = (del << chanshift) >> chanshift ;
+			del = arith_shift_left (del, chanshift) >> chanshift ;
 			pc1 [j] = del ;
 			del0 = del ;
 
@@ -221,7 +223,7 @@ void pc_block (int32_t * in, int32_t * pc1, int32_t num, int16_t * coefs, int32_
 					- a4 * b4 - a5 * b5 - a6 * b6 - a7 * b7) >> denshift ;
 
 			del = in [j] - top - sum1 ;
-			del = (del << chanshift) >> chanshift ;
+			del = arith_shift_left (del, chanshift) >> chanshift ;
 			pc1 [j] = del ;
 			del0 = del ;
 

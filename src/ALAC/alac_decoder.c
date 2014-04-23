@@ -32,6 +32,7 @@
 #include "dplib.h"
 #include "aglib.h"
 #include "matrixlib.h"
+#include "shift.h"
 
 #include "ALACBitUtilities.h"
 #include "EndianPortable.h"
@@ -277,7 +278,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 						for (i = 0 ; i < numSamples ; i++)
 						{
 							val = (int32_t) BitBufferRead (bits, 16) ;
-							val = (val << 16) >> shift ;
+							val = arith_shift_left (val, 16) >> shift ;
 							p->mMixBufferU [i] = val | BitBufferRead (bits, (uint8_t) extraBits) ;
 						}
 					}
@@ -303,7 +304,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 					case 16:
 						out32 = sampleBuffer + channelIndex ;
 						for (i = 0, j = 0 ; i < numSamples ; i++, j += numChannels)
-							out32 [j] = p->mMixBufferU [i] << 16 ;
+							out32 [j] = arith_shift_left (p->mMixBufferU [i], 16) ;
 						break ;
 					case 20:
 						out32 = sampleBuffer + channelIndex ;
