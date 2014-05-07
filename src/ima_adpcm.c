@@ -269,7 +269,8 @@ count ++ ;
 	{	blockdata = pima->block + chan * 34 ;
 		sampledata = pima->samples + chan ;
 
-		predictor = (blockdata [0] << 8) | (blockdata [1] & 0x80) ;
+		/* Sign-extend from 16 bits to 32. */
+		predictor = (int) (short) ((blockdata [0] << 8) | (blockdata [1] & 0x80)) ;
 
 		stepindx = blockdata [1] & 0x7F ;
 		stepindx = clamp_ima_step_index (stepindx) ;
