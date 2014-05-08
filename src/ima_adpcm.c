@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -270,7 +270,7 @@ count ++ ;
 		sampledata = pima->samples + chan ;
 
 		/* Sign-extend from 16 bits to 32. */
-		predictor = (int) (short) ((blockdata [0] << 8) | (blockdata [1] & 0x80)) ;
+		predictor = (int) ((short) ((blockdata [0] << 8) | (blockdata [1] & 0x80))) ;
 
 		stepindx = blockdata [1] & 0x7F ;
 		stepindx = clamp_ima_step_index (stepindx) ;
