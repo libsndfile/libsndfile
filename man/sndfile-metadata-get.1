@@ -1,26 +1,36 @@
-.TH SNDFILE-METADATA-GET 1 "October 6, 2009"
-.SH NAME
-sndfile-metadata-get \- retrieve metadata from a sound file
-.br
-sndfile-metadata-set \- set metadata in a sound file
-.SH SYNOPSIS
-.B sndfile-metadata-get
-.RI "[options] file"
-.br
-.B sndfile-metadata-set
-.RI "[options] file"
-.br
-.B sndfile-metadata-set
-.RI "[options] input-file output-file"
-
-.SH DESCRIPTION
-sndfile-metadata-get and sndfile-metadata-set use libsndfile
-(http://www.mega-nerd.com/libsndfile/) to retrieve metadata from or set metadata
-in a sound file.
-
-Run "sndfile\-metadata\-get \-\-help" or "sndfile\-metadata\-set \-\-help" for
-more information
-
-.SH AUTHOR
-This manual page was written by Erik de Castro Lopo <erikd@mega-nerd.com>.
-
+.Dd "June 19, 2014"
+.Dt SNDFILE-METADATA-GET 1
+.Os
+.Sh NAME
+.Nm sndfile-metadata-get
+.Nd get or set metadata in a sound file
+.Sh SYNOPSIS
+.Nm sndfile-metadata-get
+.Op Ar options
+.\"FIXME add the details here
+.Ar file
+.Nm sndfile-metadata-set
+.Op Ar options
+.\"FIXME add the details here
+.Ar file
+.Nm sndfile-metadata-set
+.Op Ar options
+.\"FIXME add the details here
+.Ar input-file
+.Ar output-file
+.Sh DESCRIPTION
+.Nm sndfile-metadata-get
+and
+.Nm sndfile-metadata-set
+use libsndfile
+.Pq Lk http://www.mega-nerd.com/libsndfile/
+to retrieve metadata from or set metadata in a sound file.
+.Pp
+Run
+.Dq sndfile-metadata-get --help
+or
+.Dq sndfile-metadata-set --help
+for more information.
+.Sh AUTHORS
+This manual page was written by
+.An Erik de Castro Lopo Aq Mt erikd@mega-nerd.com .

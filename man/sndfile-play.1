@@ -1,36 +1,37 @@
-.de EX
-.ne 5
-.if n .sp 1
-.if t .sp .5
-.nf
-.in +.5i
-..
-.de EE
-.fi
-.in -.5i
-.if n .sp 1
-.if t .sp .5
-..
-.TH SNDFILE-PLAY 1 "July 28, 2002"
-.SH NAME
-sndfile-play \- play a sound file
-.SH SYNOPSIS
-.B sndfile-play
-.RI file
-.SH DESCRIPTION
-sndfile-play plays the specified sound file using :
-.EX
-ALSA on Linux
-/dev/dsp on systems supporting OSS (including Linux)
-/dev/audio on Sun Solaris
-CoreAudio on Apple MacOSX
-waveOut on Microsoft Win32
-.EE
-sndfile-play uses libsndfile (http://www.mega-nerd.com/libsndfile/)
+.Dd "June 19, 2014"
+.Dt SNDFILE-PLAY 1
+.Os
+.Sh NAME
+.Nm sndfile-play
+.Nd play a sound file
+.Sh SYNOPSIS
+.Nm sndfile-play
+.Ar file
+.Sh DESCRIPTION
+.Nm
+plays the specified sound file using:
+.Pp
+.Bl -tag -width /dev/audio -compact
+.It ALSA
+on Linux
+.It /dev/dsp
+on systems supporting OSS (including Linux)
+.It /dev/audio
+on Sun Solaris
+.It CoreAudio
+on Apple MacOSX
+.It waveOut
+on Microsoft Win32
+.\" FIXME Add details here about the various OSes and their APIs
+.El
+.Pp
+.Nm
+uses libsndfile
+.Pq Lk http://www.mega-nerd.com/libsndfile/
 to read the file.
-.SH AUTHOR
-This manual page was originally written by Joshua Haberman 
-<joshua@debian.org>, for the Debian GNU/Linux system (but may be used by 
-others). Further additions have been made by Erik de Castro Lopo 
-<erikd@mega-nerd.com>.
-
+.Sh AUTHORS
+This manual page was originally written by
+.An Joshua Haberman Aq Mt joshua@debian.org
+for the Debian GNU/Linux system (but may be used by others).
+Further additions have been made by
+.An Erik de Castro Lopo Aq Mt erikd@mega-nerd.com .

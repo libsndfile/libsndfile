@@ -1,16 +1,22 @@
-.TH SNDFILE-CONCAT 1 "December 9, 2009"
-.SH NAME
-sndfile-concat \- concatenates two or more audio files
-.SH SYNOPSIS
-.B sndfile-concat
-.RI "infile1 infile2 .... outfile"
-.SH DESCRIPTION
-sndfile-concat generates a new output file by concatenating two or more input
-files. The format of the output file is the same as the format of the input
-file.
-
+.Dd "December 9, 2009"
+.Dt SNDFILE-CONCAT 1
+.Os
+.Sh NAME
+.Nm sndfile-concat
+.Nd concatenates two or more audio files
+.Sh SYNOPSIS
+.Nm sndfile-concat
+.Ar infile1
+.Ar infile2
+.Ar ...
+.Ar outfile
+.Sh DESCRIPTION
+.Nm
+generates a new output file by concatenating two or more input files.
+The format of the output file is the same as the format of the input file.
+.Pp
 sndfile-concat does its work using libsndfile
-(http://www.mega-nerd.com/libsndfile/).
-.SH AUTHOR
-This manual page was written by Erik de Castro Lopo <erikd@mega-nerd.com>.
-
+.Lk http://www.mega-nerd.com/libsndfile/
+.Sh AUTHORS
+This manual page was written by
+.An Erik de Castro Lopo Aq Mt erikd@mega-nerd.com
