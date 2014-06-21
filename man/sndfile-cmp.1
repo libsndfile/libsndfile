@@ -3,7 +3,7 @@
 .Os
 .Sh NAME
 .Nm sndfile-cmp
-.Nd compares two audio files
+.Nd compare two audio files
 .Sh SYNOPSIS
 .Nm sndfile-cmp
 .Ar file1
@@ -11,11 +11,19 @@
 .Sh DESCRIPTION
 .Nm
 compares the audio data of two sound files.
-In particular most differences in the audio file header,
-particularly metadata like string info, are completely ignored.
-.Pp
-sndfile-cmp does its work using libsndfile
+For two files to compare as being the same, their channel counts, sample rate,
+audio data lengths and actual audio data must match.
+Other differences such as string metadata like song title, artist etc and their
+presence or absence are ignored.
+.Sh EXIT STATUS
+.Bl -tag -width 0 -compact
+.It 0
+The audio data is the same
+.It 1
+The audio data differs
+.El
+.Sh SEE ALSO
 .Lk http://www.mega-nerd.com/libsndfile
 .Sh AUTHORS
-This manual page was written by
-.An Erik de Castro Lopo Aq Mt erikd@mega-nerd.com .
+.An Conrad Parker Aq Mt conrad@metadecks.org
+.An Erik de Castro Lopo Aq Mt erikd@mega-nerd.com
