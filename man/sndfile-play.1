@@ -6,32 +6,31 @@
 .Nd play a sound file
 .Sh SYNOPSIS
 .Nm sndfile-play
-.Ar file
+.Ar file1
+.Op Ar file2 ...
 .Sh DESCRIPTION
 .Nm
-plays the specified sound file using:
+plays one or more sound files on various operating systems using standard audio
+output APIs. The following table summarizes which audio API is used where:
 .Pp
-.Bl -tag -width /dev/audio -compact
-.It ALSA
-on Linux
-.It /dev/dsp
-on systems supporting OSS (including Linux)
-.It /dev/audio
-on Sun Solaris
-.It CoreAudio
-on Apple MacOSX
-.It waveOut
-on Microsoft Win32
-.\" FIXME Add details here about the various OSes and their APIs
+.Bl -tag -width MacOSX10XXX -compact
+.It Linux
+ALSA or OSS
+.It OpenBSD
+sndio
+.It FreeBSD
+/dev/dsp (OSS)
+.It Solaris
+/dev/audio
+.It MacOSX 10.6
+Carbon and CoreAudio
+.It MacOSX 10.7
+AudioToolbox
+.It Win32
+waveOut
 .El
-.Pp
-.Nm
-uses libsndfile
-.Pq Lk http://www.mega-nerd.com/libsndfile/
-to read the file.
+.Sh SEE ALSO
+.Lk http://www.mega-nerd.com/libsndfile/
+.\" FIXME: links to ALSA, OSS, sndio, Sun audio, MacOSX audio
 .Sh AUTHORS
-This manual page was originally written by
-.An Joshua Haberman Aq Mt joshua@debian.org
-for the Debian GNU/Linux system (but may be used by others).
-Further additions have been made by
-.An Erik de Castro Lopo Aq Mt erikd@mega-nerd.com .
+.An Erik de Castro Lopo Aq Mt erikd@mega-nerd.com
