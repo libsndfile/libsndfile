@@ -1,21 +1,31 @@
-.Dd "June 14, 2014"
+.Dd "June 19, 2014"
 .Dt SNDFILE-INFO 1
 .Os
 .Sh NAME
 .Nm sndfile-info
-.Nd display information about a sound file
+.Nd display information about sound files
 .Sh SYNOPSIS
 .Nm sndfile-info
-.Ar file
+.Op Ar options
+.Ar
 .Sh DESCRIPTION
 .Nm
-will display basic information about a sound file such as
-its format, its sample rate, and the number of channels.
-This information is obtained using libsndfile
-.Pq Lk http://www.mega-nerd.com/libsndfile/ .
+displays basic information about sound files
+such as format, number of channels, samplerate, and length.
+The following options are recognized:
+.Pp
+.Bl -tag -compact -width channelmapXXXX
+.It Fl -instrument
+Display instrument info:
+a base note, gain, velocity, key, and loop points.
+.It Fl -broadcast
+Display broadcast (BWF) info.
+.It Fl -channel-map
+Display channel map.
+.It Fl -cart
+Display the cart chunk of a WAV (or related) file.
+.El
+.Sh SEE ALSO
+.Lk http://www.mega-nerd.com/libsndfile/
 .Sh AUTHORS
-This manual page was originally written by
-.An Joshua Haberman Aq Mt joshua@debian.org
-for the Debian GNU/Linux system (but may be used by others).
-Further additions have been made by
 .An Erik de Castro Lopo Aq Mt erikd@mega-nerd.com .
