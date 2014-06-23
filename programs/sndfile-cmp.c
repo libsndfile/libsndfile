@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008 Conrad Parker <conrad@metadecks.org>
 **
 ** All rights reserved.
@@ -125,20 +125,11 @@ out :
 } /* compare */
 
 static void
-print_version (void)
-{	char buffer [256] ;
-
-	sf_command (NULL, SFC_GET_LIB_VERSION, buffer, sizeof (buffer)) ;
-	printf ("\nVersion : %s\n\n", buffer) ;
-} /* print_version */
-
-static void
 usage_exit (void)
 {
-	print_version () ;
-
 	printf ("Usage : %s <filename> <filename>\n", progname) ;
 	printf ("	Compare the PCM data of two sound files.\n\n") ;
+	printf ("Using %s.\n\n", sf_version_string ()) ;
 	exit (0) ;
 } /* usage_exit */
 
