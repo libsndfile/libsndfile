@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008-2010 George Blood Audio
 **
 ** All rights reserved.
@@ -66,7 +66,7 @@ main (int argc, char *argv [])
 	if (argc < 3 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)
 		usage_exit (progname, 0) ;
 
-	/* Clear set all fields of the struct to zero bytes. */
+	/* Set all fields of the struct to zero bytes. */
 	memset (&info, 0, sizeof (info)) ;
 
 	/* Get the time in case we need it later. */
@@ -208,7 +208,7 @@ usage_exit (const char *progname, int exit_code)
 		"    --bext-orig-date         Set the 'bext' origination date.\n"
 		"    --bext-orig-time         Set the 'bext' origination time.\n"
 		"    --bext-coding-hist       Set the 'bext' coding history.\n"
-		"    --bext-time-raf          Set the 'bext' Time ref.\n"
+		"    --bext-time-ref          Set the 'bext' Time ref.\n"
 		"\n"
 		"    --str-comment            Set the metadata comment.\n"
 		"    --str-title              Set the metadata title.\n"

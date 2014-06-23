@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008-2010 George Blood Audio
 **
 ** All rights reserved.
@@ -77,7 +77,6 @@ main (int argc, char *argv [])
 		exit (1) ;
 		} ;
 
-	/* Get the time in case we need it later. */
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	if ((file = sf_open (filename, SFM_READ, &sfinfo)) == NULL)
 	{	printf ("Error : Open of file '%s' failed : %s\n\n", filename, sf_strerror (file)) ;
@@ -103,8 +102,12 @@ usage_exit (const char *progname, int exit_code)
 {	printf ("\nUsage :\n  %s [options] <file>\n\nOptions:\n", progname) ;
 
 	puts (
+		"    --all                 Print all metadata.\n"
+		) ;
+
+	puts (
 		"    --bext-description    Print the 'bext' description.\n"
-		"    --bext-originator     Print the 'bext; originator info.\n"
+		"    --bext-originator     Print the 'bext' originator info.\n"
 		"    --bext-orig-ref       Print the 'bext' origination reference.\n"
 		"    --bext-umid           Print the 'bext' UMID.\n"
 		"    --bext-orig-date      Print the 'bext' origination date.\n"
