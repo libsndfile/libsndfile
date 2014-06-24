@@ -130,7 +130,7 @@ usage_exit (void)
 	printf ("Usage : %s <filename> <filename>\n", progname) ;
 	printf ("	Compare the PCM data of two sound files.\n\n") ;
 	printf ("Using %s.\n\n", sf_version_string ()) ;
-	exit (0) ;
+	exit (1) ;
 } /* usage_exit */
 
 int
@@ -139,9 +139,7 @@ main (int argc, char *argv [])
 	progname = program_name (argv [0]) ;
 
 	if (argc != 3)
-	{	usage_exit () ;
-		return 1 ;
-		} ;
+		usage_exit () ;
 
 	filename1 = argv [argc - 2] ;
 	filename2 = argv [argc - 1] ;
@@ -149,7 +147,6 @@ main (int argc, char *argv [])
 	if (strcmp (filename1, filename2) == 0)
 	{	printf ("Error : Input filenames are the same.\n\n") ;
 		usage_exit () ;
-		return 1 ;
 		} ;
 
 	return compare () ;
