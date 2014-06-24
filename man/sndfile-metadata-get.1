@@ -58,6 +58,7 @@ sets bext and string metadata in an audio file if the format supports it.
 If the file does not contain a BEXT chunk to be modified,
 the second synopsis must be used, where another output file
 capable of storing the metadata is created.
+This file is overwritten if it already exists.
 The following options take an argument specifying the metadata:
 .Pp
 .Bl -tag -width bext-coding-histXXXXXXX -compact
@@ -104,6 +105,13 @@ Set the BEXT time to current.
 Set the BEXT date to current.
 .It Fl -str-auto-date
 Set the string date to current.
+.El
+.Sh EXIT STATUS
+.Bl -tag -width 0 -compact
+.It 0
+The metadata was written or retrieved successfully.
+.It 1
+An error occurred.
 .El
 .Sh SEE ALSO
 .Lk http://www.mega-nerd.com/libsndfile/

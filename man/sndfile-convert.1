@@ -13,6 +13,7 @@
 .Sh DESCRIPTION
 .Nm
 converts sound files from one audio format to another.
+The output file is overwritten it it already exists.
 .Ss Formats
 The format of the output file is determined by the filename extension.
 The following file formats are currently supported:
@@ -138,6 +139,13 @@ will try to use the encoding of the input file.
 This will not always work as most container formats
 (e.g. WAV, AIFF etc) only support a small subset of encodings
 (eg 16 bit PCM, a-law, Vorbis etc).
+.Sh EXIT STATUS
+.Bl -tag -width 0 -compact
+.It 0
+The conversion was successful.
+.It 1
+An error occured.
+.El
 .Sh SEE ALSO
 .Lk http://www.mega-nerd.com/libsndfile/
 .Sh AUTHORS
