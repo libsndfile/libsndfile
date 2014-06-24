@@ -63,9 +63,7 @@ main (int argc, char *argv [])
 {	int	k ;
 
 	if (argc < 2 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)
-	{	usage_exit (program_name (argv [0])) ;
-		return 1 ;
-		} ;
+		usage_exit (program_name (argv [0])) ;
 
 	if (strcmp (argv [1], "--instrument") == 0)
 	{	int error = 0 ;
@@ -134,14 +132,9 @@ usage_exit (const char *progname)
 		printf ("Sleeping for 5 seconds before exiting.\n\n") ;
 		fflush (stdout) ;
 
-		/* This is the officially blessed by microsoft way but I can't get
-		** it to link.
-		**     Sleep (15) ;
-		** Instead, use this:
-		*/
 		Sleep (5 * 1000) ;
 #endif
-	exit (0) ;
+	exit (1) ;
 } /* usage_exit */
 
 /*==============================================================================

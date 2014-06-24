@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -61,7 +61,7 @@ usage_exit (const char *progname)
 		"    number of channels.\n"
 		) ;
 
-	exit (0) ;
+	exit (1) ;
 } /* usage_exit */
 
 int

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2009-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2009-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -154,7 +154,7 @@ usage_exit (void)
 		"a_00.wav, a_01.wav and so on.\n"
 		) ;
 	printf ("Using %s.\n\n", sf_version_string ()) ;
-	exit (0) ;
+	exit (1) ;
 } /* usage_exit */
 
 static void

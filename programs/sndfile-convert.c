@@ -98,7 +98,7 @@ usage_exit (const char *progname)
 	sfe_dump_format_map () ;
 
 	puts ("") ;
-	exit (0) ;
+	exit (1) ;
 } /* usage_exit */
 
 static void
@@ -133,9 +133,7 @@ main (int argc, char * argv [])
 	progname = program_name (argv [0]) ;
 
 	if (argc < 3 || argc > 5)
-	{	usage_exit (progname) ;
-		return 1 ;
-		} ;
+		usage_exit (progname) ;
 
 	infilename = argv [argc-2] ;
 	outfilename = argv [argc-1] ;
@@ -143,19 +141,16 @@ main (int argc, char * argv [])
 	if (strcmp (infilename, outfilename) == 0)
 	{	printf ("Error : Input and output filenames are the same.\n\n") ;
 		usage_exit (progname) ;
-		return 1 ;
 		} ;
 
 	if (strlen (infilename) > 1 && infilename [0] == '-')
 	{	printf ("Error : Input filename (%s) looks like an option.\n\n", infilename) ;
 		usage_exit (progname) ;
-		return 1 ;
 		} ;
 
 	if (outfilename [0] == '-')
 	{	printf ("Error : Output filename (%s) looks like an option.\n\n", outfilename) ;
 		usage_exit (progname) ;
-		return 1 ;
 		} ;
 
 	for (k = 1 ; k < argc - 2 ; k++)
