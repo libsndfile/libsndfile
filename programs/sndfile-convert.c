@@ -314,6 +314,14 @@ main (int argc, char * argv [])
 	if (sf_format_check (&sfinfo) == 0)
 		report_format_error_exit (argv [0], &sfinfo) ;
 
+	if ((sfinfo.format & SF_FORMAT_SUBMASK) == SF_FORMAT_GSM610 && sfinfo.samplerate != 8000)
+	{	printf (
+			"WARNING: GSM 6.10 data format only supports 8kHz sample rate. The converted\n"
+			"ouput file will contain the input data converted to the GSM 6.10 data format\n"
+			"but not re-sampled.\n"
+			) ;
+		} ;
+
 	/* Open the output file. */
 	if ((outfile = sf_open (outfilename, SFM_WRITE, &sfinfo)) == NULL)
 	{	printf ("Not able to open output file %s : %s\n", outfilename, sf_strerror (NULL)) ;
