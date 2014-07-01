@@ -34,7 +34,7 @@
 	Every effort is made to keep these documents up-to-date, error free and
 	unambiguous.
 	However, since maintaining the documentation is the least fun part of working
-	on libsndfile, these docs can and do fall behind the behaviour of library.
+	on libsndfile, these docs can and do fall behind the behaviour of the library.
 	If any errors, omissions or ambiguities are found, please notify me (erikd)
 	at mega-nerd dot com.
 </P>
@@ -725,8 +725,9 @@ The error code can be converted to a string using sf_error_number().
 <H2><BR><B>Note 1</B></H2>
 <!-- pepper -->
 <P>
-When converting between integer PCM formats of differing size (ie using sf_read_int()
-to read a 16 bit PCM encoded WAV file) libsndfile obeys one simple rule:
+When converting between integer PCM formats of differing size
+(e.g. using sf_read_int() to read a 16 bit PCM encoded WAV file)
+libsndfile obeys one simple rule:
 </P>
 
 <P CLASS=indent_block>
