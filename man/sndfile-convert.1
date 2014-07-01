@@ -1,4 +1,4 @@
-.Dd "June 19, 2014"
+.Dd "June 30, 2014"
 .Dt SNDFILE-CONVERT 1
 .Os
 .Sh NAME
@@ -16,61 +16,71 @@ converts sound files from one audio format to another.
 The output file is overwritten it it already exists.
 .Ss Formats
 The format of the output file is determined by the filename extension.
-The following file formats are currently supported:
+The following file formats are currently recognized:
 .Pp
 .Bl -tag -compact -width ircam
-.It aif
-AIFF (Apple/SGI)
 .It wav
 WAV (Microsoft)
+.It aif
+AIFF (Apple/SGI)
 .It au
 AU (Sun/NeXT)
-.It caf
-CAF (Apple Core Audio File)
-.It flac
-FLAC (FLAC Lossless Audio Codec)
 .It snd
 AU (Sun/NeXT)
-.It svx
-IFF (Amiga IFF/SVX8/SV16)
-.It paf
-PAF (Ensoniq PARIS)
-.It fap
-PAF (Ensoniq PARIS)
+.It raw
+RAW (header-less)
 .It gsm
 RAW (header-less)
+.It vox
+RAW (header-less)
+.It paf
+PAF (Ensoniq PARIS, big-endian)
+.It fap
+PAF (Ensoniq PARIS, little-endian)
+.It svx
+IFF (Amiga IFF/SVX8/SV16)
 .It nist
-WAV (NIST Sphere)
-.It htk
-HTK (HMM Tool Kit)
+SPHERE (NIST SPeech HEader Resources)
+.It sph
+SPHERE (NIST SPeech HEader Resources)
+.It voc
+VOC (Creative Labs)
 .It ircam
 SF (Berkeley/IRCAM/CARL)
 .It sf
 SF (Berkeley/IRCAM/CARL)
-.It voc
-VOC (Creative Labs)
 .It w64
 W64 (SoundFoundry WAVE 64)
-.It raw
-RAW (header-less)
+.It mat
+MAT4 (GNU Octave 2.0 / Matlab 4.2)
 .It mat4
 MAT4 (GNU Octave 2.0 / Matlab 4.2)
 .It mat5
 MAT5 (GNU Octave 2.1 / Matlab 5.0)
-.It mat
-MAT4 (GNU Octave 2.0 / Matlab 4.2)
 .It pvf
 PVF (Portable Voice Format)
-.It sds
-SDS (Midi Sample Dump Standard)
-.It sd2
-SD2 (Sound Designer II)
-.It vox
-RAW (header-less)
 .It xi
 XI (FastTracker 2)
+.It htk
+HTK (HMM Tool Kit)
+.It sds
+SDS (Midi Sample Dump Standard)
+.It avr
+AVR (Audio Visual Research)
+.It wavex
+WAVEX (MS WAVE with WAVEFORMATEX)
+.It sd2
+SD2 (Sound Designer II)
+.It flac
+FLAC (FLAC Lossless Audio Codec)
+.It caf
+CAF (Apple Core Audio File)
 .It wve
 WVE (Psion Series 3)
+.It prc
+WVE (Psion Series 3)
+.It ogg
+OGG (OGG Container format)
 .It oga
 OGG (OGG Container format)
 .It mpc

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008 George Blood Audio
 **
 ** All rights reserved.
@@ -284,34 +284,38 @@ typedef struct
 
 static OUTPUT_FORMAT_MAP format_map [] =
 {
-	{	"aif",		3,	SF_FORMAT_AIFF	},
 	{	"wav", 		0,	SF_FORMAT_WAV	},
+	{	"aif",		3,	SF_FORMAT_AIFF	},
 	{	"au",		0,	SF_FORMAT_AU	},
-	{	"caf",		0,	SF_FORMAT_CAF	},
-	{	"flac",		0,	SF_FORMAT_FLAC	},
 	{	"snd",		0,	SF_FORMAT_AU	},
-	{	"svx",		0,	SF_FORMAT_SVX	},
-	{	"paf",		0,	SF_ENDIAN_BIG | SF_FORMAT_PAF	},
-	{	"fap",		0,	SF_ENDIAN_LITTLE | SF_FORMAT_PAF	},
+	{	"raw",		0,	SF_FORMAT_RAW	},
 	{	"gsm",		0,	SF_FORMAT_RAW	},
+	{	"vox",		0, 	SF_FORMAT_RAW 	},
+	{	"paf",		0,	SF_FORMAT_PAF | SF_ENDIAN_BIG },
+	{	"fap",		0,	SF_FORMAT_PAF | SF_ENDIAN_LITTLE },
+	{	"svx",		0,	SF_FORMAT_SVX	},
 	{	"nist", 	0,	SF_FORMAT_NIST	},
-	{	"htk",		0,	SF_FORMAT_HTK	},
+	{	"sph",		0,	SF_FORMAT_NIST	},
+	{	"voc",		0, 	SF_FORMAT_VOC	},
 	{	"ircam",	0,	SF_FORMAT_IRCAM	},
 	{	"sf",		0, 	SF_FORMAT_IRCAM	},
-	{	"voc",		0, 	SF_FORMAT_VOC	},
 	{	"w64", 		0, 	SF_FORMAT_W64	},
-	{	"raw",		0,	SF_FORMAT_RAW	},
+	{	"mat",		0, 	SF_FORMAT_MAT4 	},
 	{	"mat4", 	0,	SF_FORMAT_MAT4	},
 	{	"mat5", 	0, 	SF_FORMAT_MAT5 	},
-	{	"mat",		0, 	SF_FORMAT_MAT4 	},
 	{	"pvf",		0, 	SF_FORMAT_PVF 	},
-	{	"sds",		0, 	SF_FORMAT_SDS 	},
-	{	"sd2",		0, 	SF_FORMAT_SD2 	},
-	{	"vox",		0, 	SF_FORMAT_RAW 	},
 	{	"xi",		0, 	SF_FORMAT_XI 	},
+	{	"htk",		0,	SF_FORMAT_HTK	},
+	{	"sds",		0, 	SF_FORMAT_SDS 	},
+	{	"avr",		0, 	SF_FORMAT_AVR 	},
+	{	"wavex",	0, 	SF_FORMAT_WAVEX },
+	{	"sd2",		0, 	SF_FORMAT_SD2 	},
+	{	"flac",		0,	SF_FORMAT_FLAC	},
+	{	"caf",		0,	SF_FORMAT_CAF	},
 	{	"wve",		0,	SF_FORMAT_WVE	},
-	{	"oga",		0,	SF_FORMAT_OGG	},
+	{	"prc",		0,	SF_FORMAT_WVE	},
 	{	"ogg",		0,	SF_FORMAT_OGG	},
+	{	"oga",		0,	SF_FORMAT_OGG	},
 	{	"mpc",		0,	SF_FORMAT_MPC2K	},
 	{	"rf64",		0,	SF_FORMAT_RF64	},
 } ; /* format_map */
