@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -658,7 +658,7 @@ sf_format_check	(const SF_INFO *info)
 				if ((subformat == SF_FORMAT_DWVW_12 || subformat == SF_FORMAT_DWVW_16 ||
 							subformat == SF_FORMAT_DWVW_24) && info-> channels == 1)
 					return 1 ;
-				if (subformat == SF_FORMAT_GSM610 && info->channels == 1)
+				if (subformat == SF_FORMAT_GSM610 && info->channels == 1 && info->samplerate == 8000)
 					return 1 ;
 				if (subformat == SF_FORMAT_VOX_ADPCM && info->channels == 1)
 					return 1 ;
