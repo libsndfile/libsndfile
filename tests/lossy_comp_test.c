@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1346,7 +1346,7 @@ channels = 1 ;
 	for (k = 0 ; k < datalen ; k++)
 		orig [k] = lrint (orig_buffer.d [k]) ;
 
-	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.samplerate	= (filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_GSM610 ? 8000 : SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= channels ;
 	sfinfo.format		= filetype ;
@@ -1554,7 +1554,7 @@ channels = 1 ;
 	for (k = 0 ; k < datalen ; k++)
 		orig [k] = lrint (orig_buffer.d [k]) ;
 
-	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.samplerate	= (filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_GSM610 ? 8000 : SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= channels ;
 	sfinfo.format		= filetype ;
@@ -1767,7 +1767,7 @@ printf ("** fix this ** ") ;
 	for (k = 0 ; k < datalen ; k++)
 		orig [k] = lrint (orig_buffer.d [k]) ;
 
-	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.samplerate	= (filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_GSM610 ? 8000 : SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= channels ;
 	sfinfo.format		= filetype ;
@@ -1958,7 +1958,7 @@ channels = 1 ;
 
 	gen_signal_double (orig_buffer.d, 32000.0, channels, datalen) ;
 
-	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.samplerate	= (filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_GSM610 ? 8000 : SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= channels ;
 	sfinfo.format		= filetype ;
