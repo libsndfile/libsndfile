@@ -204,7 +204,7 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 
 	gen_windowed_sine_float (float_data, DFT_DATA_LENGTH, 1.0) ;
 
-	sfinfo.samplerate	= (filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_GSM610 ? 8000 : SAMPLE_RATE ;
+	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= DFT_DATA_LENGTH ;
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;
@@ -256,7 +256,7 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 
 	gen_windowed_sine_double (double_data, DFT_DATA_LENGTH, 0.95) ;
 
-	sfinfo.samplerate	= (filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_GSM610 ? 8000 : SAMPLE_RATE ;
+	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= DFT_DATA_LENGTH ;
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= filetype ;

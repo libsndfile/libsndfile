@@ -113,21 +113,11 @@ report_format_error_exit (const char * argv0, SF_INFO * sfinfo)
 		exit (1) ;
 		} ;
 
-	if ((sfinfo->format & SF_FORMAT_SUBMASK) == SF_FORMAT_GSM610)
-		printf ("\n"
+	printf ("\n"
 			"Error : output file format is invalid.\n"
-			"The '%s' container does not support '%s' data at %d Hz.\n"
+			"The '%s' container does not support '%s' codec data.\n"
 			"Run '%s --help' for clues.\n\n",
-				sfe_container_name (sfinfo->format), sfe_codec_name (sfinfo->format),
-				sfinfo->samplerate, program_name (argv0)) ;
-	else
-		printf ("\n"
-			"Error : output file format is invalid.\n"
-			"The '%s' container does not support '%s' data.\n"
-			"Run '%s --help' for clues.\n\n",
-				sfe_container_name (sfinfo->format), sfe_codec_name (sfinfo->format),
-				program_name (argv0)) ;
-
+			sfe_container_name (sfinfo->format), sfe_codec_name (sfinfo->format), program_name (argv0)) ;
 	exit (1) ;
 } /* report_format_error_exit */
 
