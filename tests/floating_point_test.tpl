@@ -67,7 +67,8 @@ main (int argc, char *argv [])
 #endif
 
 	/* Float tests. */
-	float_scaled_test	("float.raw", allow_exit, SF_FALSE, SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_FLOAT, -163.0) ;
+	float_scaled_test	("float.raw", allow_exit, SF_FALSE, SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_FLOAT,
+									OS_IS_OPENBSD ? -98.0 : -163.0) ;
 
 	/* Test both signed and unsigned 8 bit files. */
 	float_scaled_test	("pcm_s8.raw", allow_exit, SF_FALSE, SF_FORMAT_RAW | SF_FORMAT_PCM_S8, -39.0) ;
@@ -126,7 +127,7 @@ main (int argc, char *argv [])
 	** Double tests.
 	*/
 
-	double_scaled_test	("double.raw", allow_exit, SF_FALSE, SF_FORMAT_RAW | SF_FORMAT_DOUBLE, -204.0) ;
+	double_scaled_test	("double.raw", allow_exit, SF_FALSE, SF_FORMAT_RAW | SF_FORMAT_DOUBLE, -201.0) ;
 
 	/* Test both signed (AIFF) and unsigned (WAV) 8 bit files. */
 	double_scaled_test	("pcm_s8.raw", allow_exit, SF_FALSE, SF_FORMAT_RAW | SF_FORMAT_PCM_S8, -39.0) ;
@@ -177,7 +178,7 @@ main (int argc, char *argv [])
 	double_scaled_test	("vorbis.oga", allow_exit, SF_FALSE, SF_FORMAT_OGG | SF_FORMAT_VORBIS, -29.0) ;
 #endif
 
-	double_scaled_test	("replace_double.raw", allow_exit, SF_TRUE, SF_FORMAT_RAW | SF_FORMAT_DOUBLE, -204.0) ;
+	double_scaled_test	("replace_double.raw", allow_exit, SF_TRUE, SF_FORMAT_RAW | SF_FORMAT_DOUBLE, -201.0) ;
 
 	putchar ('\n') ;
 	/* Float int tests. */
