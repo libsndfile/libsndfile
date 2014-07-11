@@ -430,6 +430,9 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					parsestage |= HAVE_data ;
 
 					psf->datalength = chunk_size ;
+					if (psf->datalength & 1)
+						psf_log_printf (psf, "*** 'data' chunk should be an even number of bytes in length.\n") ;
+
 					psf->dataoffset = psf_ftell (psf) ;
 
 					if (psf->dataoffset > 0)
@@ -1187,6 +1190,9 @@ wav_write_tailer (SF_PRIVATE *psf)
 		psf_fseek (psf, psf->dataend, SEEK_SET) ;
 	else
 		psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
+
+	if (psf->dataend & 1)
+		psf_binheader_writef (psf, "z", 1) ;
 
 	/* Add a PEAK chunk if requested. */
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_END)
