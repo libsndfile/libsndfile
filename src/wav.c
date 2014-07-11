@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004-2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -669,6 +669,9 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	if (psf->dataoffset <= 0)
 		return SFE_WAV_NO_DATA ;
 
+	if (format != WAVE_FORMAT_PCM && (parsestage & HAVE_fact) == 0)
+		psf_log_printf (psf, "**** All non-PCM format files should have a 'fact' chunk.\n") ;
+
 	/* WAVs can be little or big endian */
 	psf->endian = psf->rwf_endian ;
 
@@ -915,7 +918,7 @@ wav_write_fmt_chunk (SF_PRIVATE *psf)
 static int
 wavex_write_fmt_chunk (SF_PRIVATE *psf)
 {	WAV_PRIVATE	*wpriv ;
-	int subformat, fmt_size, add_fact_chunk = 0 ;
+	int subformat, fmt_size ;
 
 	if ((wpriv = psf->container_data) == NULL)
 		return SFE_INTERNAL ;
@@ -1008,24 +1011,20 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 		case SF_FORMAT_DOUBLE :
 			wavex_write_guid (psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE ?
 						&MSGUID_SUBTYPE_IEEE_FLOAT : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT) ;
-			add_fact_chunk = SF_TRUE ;
 			break ;
 
 		case SF_FORMAT_ULAW :
 			wavex_write_guid (psf, &MSGUID_SUBTYPE_MULAW) ;
-			add_fact_chunk = SF_TRUE ;
 			break ;
 
 		case SF_FORMAT_ALAW :
 			wavex_write_guid (psf, &MSGUID_SUBTYPE_ALAW) ;
-			add_fact_chunk = SF_TRUE ;
 			break ;
 
 #if 0
 		/* This is dead code due to return in previous switch statement. */
 		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists */
 			wavex_write_guid (psf, &MSGUID_SUBTYPE_MS_ADPCM) ;
-			add_fact_chunk = SF_TRUE ;
 			break ;
 			return SFE_UNIMPLEMENTED ;
 #endif
@@ -1033,8 +1032,7 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 		default : return SFE_UNIMPLEMENTED ;
 		} ;
 
-	if (add_fact_chunk)
-		psf_binheader_writef (psf, "tm48", fact_MARKER, 4, psf->sf.frames) ;
+	psf_binheader_writef (psf, "tm48", fact_MARKER, 4, psf->sf.frames) ;
 
 	return 0 ;
 } /* wavex_write_fmt_chunk */
