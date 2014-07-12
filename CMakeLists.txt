@@ -1,6 +1,12 @@
 # cmakelists.txt for libsndfile
 cmake_minimum_required (VERSION 2.8.12)
 
+set (BASEPATH "${CMAKE_SOURCE_DIR}")
+
+project (libsndfile C)
+
+include (CMake/libsndfile.cmake)
+
 if (MSVC)
 	set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996")
 	add_definitions ("/wd4244 /wd4996")
@@ -18,7 +24,7 @@ else (MSVC)
 	set (HAVE_INTTYPES_H 1)
 	set (HAVE_STDINT_H 1)
 	set (SIZEOF_LONG 4)
-	set (COMPILER_IS_GCC 1)
+	set (COMPILER_IS_GCC ${COMPILER_IS_GCC})
 	set (OS_IS_WIN32 0)
 	set (USE_WINDOWS_API 0)
 	set (SIZEOF_INT64_T 8)
@@ -42,7 +48,6 @@ else (MSVC)
 	set (OSX_DARWIN_VERSION 0)
 endif (MSVC)
 
-include (TestBigEndian)
 TEST_BIG_ENDIAN (BIGENDIAN)
 if (${BIGENDIAN})
 	set (WORDS_BIGENDIAN 1)
@@ -56,7 +61,6 @@ endif (${BIGENDIAN})
 
 #-------------------------------------------------------------------------------
 # Project definitions follow.
-project (libsndfile C)
 
 configure_file (src/sndfile.h.in src/sndfile.h)
 configure_file (CMake/config.h.in src/config.h)
