@@ -1,15 +1,69 @@
 # cmakelists.txt for libsndfile
-cmake_minimum_required (VERSION 2.8.4)
+cmake_minimum_required (VERSION 2.8.12)
 
-set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996")
+if (MSVC)
+	set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996")
+	add_definitions ("/wd4244 /wd4996")
 
-CONFIGURE_FILE( src/sndfile.h.in src/sndfile.h )
-add_definitions( "/wd4244 /wd4996" )
+	set (HAVE_BYTESWAP_H 0)
+	set (HAVE_INTTYPES_H 1)
+	set (HAVE_STDINT_H 0)
+	set (SIZEOF_LONG 4)
+	set (COMPILER_IS_GCC 0)
+	set (OS_IS_WIN32 1)
+	set (USE_WINDOWS_API 1)
+else (MSVC)
+	# Assume this is Linux or some other POSIX-like system (including OS X).
+	set (HAVE_BYTESWAP_H 1)
+	set (HAVE_INTTYPES_H 1)
+	set (HAVE_STDINT_H 1)
+	set (SIZEOF_LONG 4)
+	set (COMPILER_IS_GCC 1)
+	set (OS_IS_WIN32 0)
+	set (USE_WINDOWS_API 0)
+	set (SIZEOF_INT64_T 8)
+	set (SIZEOF_WCHAR_T 2)
+	set (SIZEOF_LONG_LONG 8)
+	set (SIZEOF_OFF_T 8)
+	set (HAVE_UNISTD_H 1)
+	set (HAVE_EXTERNAL_LIBS 0)
+	set (CPU_CLIPS_NEGATIVE 0)
+	set (CPU_CLIPS_POSITIVE 0)
+	set (HAVE_GETTIMEOFDAY 1)
+	set (SIZEOF_SF_COUNT_T ${SIZEOF_INT64_T})
+	set (HAVE_SYS_TIME_H 1)
+	set (_POSIX_SOURCE 1)
+	set (TYPEOF_SF_COUNT_T int64_t)
+	set (SF_COUNT_MAX 0x7fffffffffffffffll)
+	set (ENABLE_EXPERIMENTAL_CODE 0)
+	set (HAVE_DECL_S_IRGRP 1)
+	set (HAVE_FSTAT64 1)
+	set (HAVE_FSYNC 1)
+	set (OSX_DARWIN_VERSION 0)
+endif (MSVC)
 
+include (TestBigEndian)
+TEST_BIG_ENDIAN (BIGENDIAN)
+if (${BIGENDIAN})
+	set (WORDS_BIGENDIAN 1)
+	set (CPU_IS_BIG_ENDIAN 1)
+	set (CPU_IS_LITTLE_ENDIAN 0)
+else (${BIGENDIAN})
+	set (WORDS_BIGENDIAN 0)
+	set (CPU_IS_LITTLE_ENDIAN 1)
+	set (CPU_IS_BIG_ENDIAN 0)
+endif (${BIGENDIAN})
+
+#-------------------------------------------------------------------------------
+# Project definitions follow.
 project (libsndfile C)
 
-include_directories( include )
-file( GLOB libsndfile_srcs 
+configure_file (src/sndfile.h.in src/sndfile.h)
+configure_file (CMake/config.h.in src/config.h)
+
+include_directories (src)
+
+file (GLOB libsndfile_sources
 	src/aiff.c
 	src/alaw.c
 	src/au.c
@@ -70,13 +124,13 @@ file( GLOB libsndfile_srcs
 	src/windows.c
 	src/wve.c
 	src/xi.c
-	
+
 	src/G72x/g721.c
 	src/G72x/g72x.c
 	src/G72x/g723_16.c
 	src/G72x/g723_24.c
 	src/G72x/g723_40.c
-	
+
 	src/GSM610/add.c
 	src/GSM610/code.c
 	src/GSM610/decode.c
@@ -90,10 +144,10 @@ file( GLOB libsndfile_srcs
 	src/GSM610/preprocess.c
 	src/GSM610/rpe.c
 	src/GSM610/short_term.c
-	src/GSM610/table.c	
-)
+	src/GSM610/table.c
+	)
 
-file( GLOB libsndfile_test_srcs
+file (GLOB src_tests_sources
 	src/test_audio_detect.c
 	src/test_broadcast_var.c
 	src/test_cart_var.c
@@ -104,13 +158,13 @@ file( GLOB libsndfile_test_srcs
 	src/test_log_printf.c
 	src/test_main.c
 	src/test_strncpy_crlf.c
-	
 	src/GSM610/g72x_test.c
 	)
 
-add_library( libsndfile
-	${libsndfile_srcs} 
-)
+add_library (libsndfile
+	${libsndfile_sources}
+	)
+target_link_libraries (libsndfile m)
 
-add_executable( sndfile-info programs/sndfile-info.c )
-target_link_libraries( sndfile-info libsndfile )
+add_executable (sndfile-info programs/sndfile-info.c)
+target_link_libraries (sndfile-info libsndfile)
