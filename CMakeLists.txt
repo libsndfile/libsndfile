@@ -38,6 +38,11 @@ else (MSVC)
 	set (OSX_DARWIN_VERSION 0)
 endif (MSVC)
 
+if (${COMPILER_IS_GCC})
+	set(CMAKE_C_FLAGS "${CMAKE_C__FLAGS} -O3 -Wall -std=gnu99" CACHE STRING "" FORCE)
+	# set (CMAKE_CXX__FLAGS
+endif ()
+
 #-------------------------------------------------------------------------------
 # Project definitions follow.
 
@@ -47,12 +52,46 @@ configure_file (CMake/config.h.in src/config.h)
 include_directories (src)
 
 file (GLOB libsndfile_sources
+	src/ALAC/ALACBitUtilities.c
+	src/ALAC/ag_dec.c
+	src/ALAC/ag_enc.c
+	src/ALAC/alac_decoder.c
+	src/ALAC/alac_encoder.c
+	src/ALAC/dp_dec.c
+	src/ALAC/dp_enc.c
+	src/ALAC/matrix_dec.c
+	src/ALAC/matrix_enc.c
+
+	src/G72x/g721.c
+	src/G72x/g723_16.c
+	src/G72x/g723_24.c
+	src/G72x/g723_40.c
+	src/G72x/g72x.c
+	src/G72x/g72x_test.c
+
+	src/GSM610/add.c
+	src/GSM610/code.c
+	src/GSM610/decode.c
+	src/GSM610/gsm_create.c
+	src/GSM610/gsm_decode.c
+	src/GSM610/gsm_destroy.c
+	src/GSM610/gsm_encode.c
+	src/GSM610/gsm_option.c
+	src/GSM610/long_term.c
+	src/GSM610/lpc.c
+	src/GSM610/preprocess.c
+	src/GSM610/rpe.c
+	src/GSM610/short_term.c
+	src/GSM610/table.c
+
 	src/aiff.c
+	src/alac.c
 	src/alaw.c
 	src/au.c
 	src/audio_detect.c
 	src/avr.c
 	src/broadcast.c
+	src/caf.c
 	src/cart.c
 	src/chanmap.c
 	src/chunk.c
@@ -107,27 +146,6 @@ file (GLOB libsndfile_sources
 	src/windows.c
 	src/wve.c
 	src/xi.c
-
-	src/G72x/g721.c
-	src/G72x/g72x.c
-	src/G72x/g723_16.c
-	src/G72x/g723_24.c
-	src/G72x/g723_40.c
-
-	src/GSM610/add.c
-	src/GSM610/code.c
-	src/GSM610/decode.c
-	src/GSM610/gsm_create.c
-	src/GSM610/gsm_decode.c
-	src/GSM610/gsm_destroy.c
-	src/GSM610/gsm_encode.c
-	src/GSM610/gsm_option.c
-	src/GSM610/long_term.c
-	src/GSM610/lpc.c
-	src/GSM610/preprocess.c
-	src/GSM610/rpe.c
-	src/GSM610/short_term.c
-	src/GSM610/table.c
 	)
 
 file (GLOB src_tests_sources
@@ -144,10 +162,13 @@ file (GLOB src_tests_sources
 	src/GSM610/g72x_test.c
 	)
 
-add_library (libsndfile
+add_library (sndfile
 	${libsndfile_sources}
 	)
-target_link_libraries (libsndfile m)
+target_link_libraries (sndfile m)
 
-add_executable (sndfile-info programs/sndfile-info.c)
-target_link_libraries (sndfile-info libsndfile)
+add_executable (sndfile-info
+	programs/common.c
+	programs/sndfile-info.c
+	)
+target_link_libraries (sndfile-info sndfile)
