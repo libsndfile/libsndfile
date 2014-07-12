@@ -27,6 +27,8 @@
 .dirstamp
 .git*
 .libs
+CMakeFiles
+CMakeCache.txt
 Cfg
 Hack
 Hack/sndfile-fuzzbomb
