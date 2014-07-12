@@ -164,6 +164,17 @@ $AUTOMAKE --add-missing $AUTOMAKE_FLAGS || exit 1
 echo "  autoconf"
 autoconf || exit 1
 
+# Generate the src/cmake-config.h.in from src/config.h.in.
+# CMake process src/cmake-config.h to create src/config.h.
+rm -f src/config.h src/cmake-config.h
+
+version=$(grep ^AC_INIT configure.ac | sed 's/.*libsndfile[^0-9]*//;s/\].*//')
+
+sed -E 's/undef(\s+)([a-zA-Z0-8_]+)/define\1\2\1@\2@/' src/config.h.in \
+	| sed 's/.*_FILE_OFFSET_BITS.*//' \
+	| sed 's/@PACKAGE@/"libsndfile"/' \
+	| sed "s/@VERSION@/\"$version\"/" > CMake/config.h.in
+
 cd $olddir
 
 fprecommit=.git/hooks/pre-commit
