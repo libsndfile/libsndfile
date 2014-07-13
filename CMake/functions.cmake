@@ -1,4 +1,6 @@
+include (CheckFunctionExists)
 include (CheckIncludeFile)
+include (CheckLibraryExists)
 include (CheckTypeSize)
 include (TestBigEndian)
 
@@ -41,7 +43,49 @@ function (mn_check_type_size TYPE_NAME RESULT_SIZE)
 		set (${RESULT_SIZE} 0 PARENT_SCOPE)
 		endif (SIZE_${TYPE_NAME})
 
-	set (TMP1)
+	set (TMP1) # Clear temp variables.
 	set (TMP2)
 	set (SIZE_${TMP2})
+	endfunction ()
+
+function (mn_check_function_exists FUNC_NAME RESULT_NAME)
+	check_function_exists (${FUNC_NAME} FUNC_${RESULT_NAME})
+
+    if (FUNC_${RESULT_NAME})
+		set (${RESULT_NAME} 1 PARENT_SCOPE)
+	else (FUNC_${RESULT_NAME})
+		set (${RESULT_NAME} 0 PARENT_SCOPE)
+		endif (FUNC_${RESULT_NAME})
+
+	set (FUNC_${RESULT_NAME}) # Clear the variable.
+	endfunction ()
+
+# Unix does not link libm by default while windows does. We therefore have
+# a special function for testing math functions.
+function (mn_check_math_function_exists FUNC_NAME RESULT_NAME)
+	if (${UNIX})
+		check_library_exists (m ${FUNC_NAME} "" FUNC_${RESULT_NAME})
+	else (${UNIX})
+		check_function_exists (${FUNC_NAME} FUNC_${RESULT_NAME})
+		endif (${UNIX})
+
+    if (FUNC_${RESULT_NAME})
+		set (${RESULT_NAME} 1 PARENT_SCOPE)
+	else (FUNC_${RESULT_NAME})
+		set (${RESULT_NAME} 0 PARENT_SCOPE)
+		endif (FUNC_${RESULT_NAME})
+
+	set (FUNC_${RESULT_NAME}) # Clear the variable.
+	endfunction ()
+
+function (mn_check_library_exists LIB_NAME LIB_FUNC LOCATION RESULT_NAME)
+	check_library_exists (${LIB_NAME} ${LIB_FUNC} "${LOCATION}" LIB_${RESULT_NAME})
+
+    if (LIB_${RESULT_NAME})
+		set (${RESULT_NAME} 1 PARENT_SCOPE)
+	else (LIB_${RESULT_NAME})
+		set (${RESULT_NAME} 0 PARENT_SCOPE)
+		endif (LIB_${RESULT_NAME})
+
+	set (LIB_${RESULT_NAME}) # Clear the variable.
 	endfunction ()
