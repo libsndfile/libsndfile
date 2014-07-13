@@ -1,6 +1,11 @@
 # cmakelists.txt for libsndfile
 cmake_minimum_required (VERSION 2.8.12)
 
+set (LIB_VERSION_MAJOR 1)
+set (LIB_VERSION_MINOR 0)
+set (LIB_VERSION_PATCH 26)
+set (LIB_VERSION_STRING ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH})
+
 set (BASEPATH "${CMAKE_SOURCE_DIR}")
 
 project (libsndfile C)
@@ -162,10 +167,12 @@ file (GLOB src_tests_sources
 	src/GSM610/g72x_test.c
 	)
 
-add_library (sndfile
+add_library (sndfile SHARED
 	${libsndfile_sources}
 	)
 target_link_libraries (sndfile m)
+set_target_properties(sndfile PROPERTIES VERSION ${LIB_VERSION_STRING} SOVERSION ${LIB_VERSION_MAJOR})
+
 
 add_executable (sndfile-info
 	programs/common.c
