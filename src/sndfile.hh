@@ -155,7 +155,7 @@ class SndfileHandle
 
 inline
 SndfileHandle::SNDFILE_ref::SNDFILE_ref (void)
-: ref (1)
+: sf (NULL), sfinfo (), ref (1)
 {}
 
 inline
