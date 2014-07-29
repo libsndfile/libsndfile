@@ -1,16 +1,36 @@
 # cmakelists.txt for libsndfile
 cmake_minimum_required (VERSION 2.8.12)
 
+if (DEFINED ENV{CC})
+	set (CMAKE_C_COMPILER $ENV{CC})
+	endif()
+
+if (DEFINED ENV{CXX})
+	set (CMAKE_CXX_COMPILER $ENV{CXX})
+	endif()
+
+
+project (libsndfile)
+
+message (STATUS "Using C compiler   : " ${CMAKE_C_COMPILER})
+message (STATUS "Using C++ compiler : " ${CMAKE_CXX_COMPILER})
+
+#-------------------------------------------------------------------------------
+
 set (LIB_VERSION_MAJOR 1)
 set (LIB_VERSION_MINOR 0)
 set (LIB_VERSION_PATCH 26)
-set (LIB_VERSION_STRING ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH})
+
+set (PACKAGE_NAME \"libsndfile\")
+set (PACKAGE_VERSION \"1.0.26pre6\")
 
 set (BASEPATH "${CMAKE_SOURCE_DIR}")
 
-project (libsndfile C)
+
+set (LIB_VERSION_STRING ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH})
 
 include (CMake/libsndfile.cmake)
+include (CMake/build.cmake)
 
 if (MSVC)
 	set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996")
@@ -21,11 +41,13 @@ if (MSVC)
 	set (OS_IS_WIN32 1)
 	set (OSX_DARWIN_VERSION 0)
 	set (USE_WINDOWS_API 1)
+	set (WIN32_TARGET_DLL 1)
 else (MSVC)
 	# Assume this is Linux or some other POSIX-like system (including OS X).
 	set (HAVE_EXTERNAL_LIBS 0)
 	set (OSX_DARWIN_VERSION 0)
 	set (USE_WINDOWS_API 0)
+	set (__USE_MINGW_ANSI_STDIO 0)
 
 	set (CPU_CLIPS_NEGATIVE 0)
 	set (CPU_CLIPS_POSITIVE 0)
@@ -34,12 +56,32 @@ else (MSVC)
 	set (SF_COUNT_MAX 0x7fffffffffffffffll)
 	set (ENABLE_EXPERIMENTAL_CODE 0)
 	set (OSX_DARWIN_VERSION 0)
-endif (MSVC)
+	set (OS_IS_OPENBSD 0)
+	set (WIN32_TARGET_DLL 0)
+	endif (MSVC)
 
 if (${COMPILER_IS_GCC})
-	set(CMAKE_C_FLAGS "${CMAKE_C__FLAGS} -O3 -Wall -std=gnu99" CACHE STRING "" FORCE)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=gnu99 -Wall -Wextra" CACHE STRING "" FORCE)
 	# set (CMAKE_CXX__FLAGS
-endif ()
+	endif (${COMPILER_IS_GCC})
+
+if (${Werror} MATCHES "on")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror" CACHE STRING "" FORCE)
+	endif ()
+
+message (STATUS "CMAKE_C_FLAGS :" ${CMAKE_C_FLAGS})
+
+add_custom_target (check
+	COMMAND src/test_main && tests/test_wrapper.sh
+	DEPENDS src/test_main tests/test_wrapper.sh
+	)
+
+# add_test (TestName tests/test_wrapper.sh)
+# add_custom_target (check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS tests/test_wrapper.sh)
+
+# add_executable(<testprog> EXCLUDE_FROM_ALL ...)
+# add_test (tests/test_wrapper.sh tests/test_wrapper.sh)
+# add_dependencies (check tests/test_wrapper.sh)
 
 #-------------------------------------------------------------------------------
 # Project definitions follow.
@@ -49,7 +91,7 @@ configure_file (CMake/config.h.in src/config.h)
 
 include_directories (src)
 
-file (GLOB libsndfile_sources
+set (libsndfile_sources
 	src/ALAC/ALACBitUtilities.c
 	src/ALAC/ag_dec.c
 	src/ALAC/ag_enc.c
@@ -146,29 +188,98 @@ file (GLOB libsndfile_sources
 	src/xi.c
 	)
 
-file (GLOB src_tests_sources
+add_library (sndfile SHARED
+	${libsndfile_sources}
+	)
+
+target_link_libraries (sndfile m)
+
+set_target_properties(sndfile
+	PROPERTIES
+	VERSION ${LIB_VERSION_STRING} SOVERSION ${LIB_VERSION_MAJOR}
+	LIBRARY_OUTPUT_DIRECTORY src
+	)
+
+#-------------------------------------------------------------------------------
+# Tests from the src/ directory.
+
+set (src_test_sources
+	src/audio_detect.c
+	src/broadcast.c
+	src/cart.c
+	src/common.c
+	src/double64.c
+	src/file_io.c
+	src/float32.c
 	src/test_audio_detect.c
 	src/test_broadcast_var.c
 	src/test_cart_var.c
 	src/test_conversions.c
+	src/test_endswap.c
 	src/test_file_io.c
 	src/test_float.c
 	src/test_ima_oki_adpcm.c
 	src/test_log_printf.c
-	src/test_main.c
 	src/test_strncpy_crlf.c
-	src/GSM610/g72x_test.c
 	)
 
-add_library (sndfile SHARED
-	${libsndfile_sources}
-	)
-target_link_libraries (sndfile m)
-set_target_properties(sndfile PROPERTIES VERSION ${LIB_VERSION_STRING} SOVERSION ${LIB_VERSION_MAJOR})
+lsf_build_src_test_c (test_main "${src_test_sources}")
 
+#-------------------------------------------------------------------------------
+# Programs.
 
-add_executable (sndfile-info
-	programs/common.c
-	programs/sndfile-info.c
-	)
-target_link_libraries (sndfile-info sndfile)
+lsf_build_program (sndfile-cmp "")
+lsf_build_program (sndfile-concat "")
+lsf_build_program (sndfile-convert "")
+lsf_build_program (sndfile-deinterleave "")
+lsf_build_program (sndfile-info "")
+lsf_build_program (sndfile-interleave "")
+lsf_build_program (sndfile-metadata-get "")
+lsf_build_program (sndfile-metadata-set "")
+lsf_build_program (sndfile-play asound)
+lsf_build_program (sndfile-salvage "")
+
+#-------------------------------------------------------------------------------
+# Tests.
+
+lsf_build_test_c (aiff_rw_test "")
+lsf_build_test_c (alaw_test "")
+lsf_build_test_c (benchmark "")
+lsf_build_test_c (channel_test "")
+lsf_build_test_c (checksum_test "")
+lsf_build_test_c (chunk_test "")
+lsf_build_test_c (command_test "")
+lsf_build_test_c (compression_size_test "")
+lsf_build_test_cc (cpp_test "")
+lsf_build_test_c (dither_test "")
+lsf_build_test_c (dwvw_test "")
+lsf_build_test_c (error_test "")
+lsf_build_test_c (external_libs_test "")
+lsf_build_test_c (fix_this "")
+lsf_build_test_c (floating_point_test "tests/dft_cmp.c")
+lsf_build_test_c (format_check_test "")
+lsf_build_test_c (headerless_test "")
+lsf_build_test_c (header_test "")
+lsf_build_test_c (largefile_test "")
+lsf_build_test_c (locale_test "")
+lsf_build_test_c (lossy_comp_test "")
+lsf_build_test_c (misc_test "")
+lsf_build_test_c (multi_file_test "")
+lsf_build_test_c (ogg_test "")
+lsf_build_test_c (pcm_test "")
+lsf_build_test_c (peak_chunk_test "")
+lsf_build_test_c (pipe_test "")
+lsf_build_test_c (raw_test "")
+lsf_build_test_c (rdwr_test "")
+lsf_build_test_c (scale_clip_test "")
+lsf_build_test_c (sfversion "")
+lsf_build_test_c (stdin_test "")
+lsf_build_test_c (stdio_test "")
+lsf_build_test_c (stdout_test "")
+lsf_build_test_c (string_test "")
+lsf_build_test_c (ulaw_test "")
+lsf_build_test_c (virtual_io_test "")
+lsf_build_test_c (win32_ordinal_test "")
+lsf_build_test_c (win32_test "")
+lsf_build_test_c (write_read_test "tests/generate.c")
+
