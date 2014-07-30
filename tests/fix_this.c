@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -172,7 +172,7 @@ lcomp_test_int (const char *str, const char *filename, int filetype, double marg
 	*/
 	if ((sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_MS_ADPCM)
 		for (k = 0 ; k < sfinfo.frames - datalen ; k++)
-			if (abs (data [k] / scale) > decay_response (k))
+			if (ABS (data [k] / scale) > decay_response (k))
 			{	printf ("Line %d : Incorrect sample B (#%d : abs (%d) should be < %d).\n", __LINE__, k, data [k], decay_response (k)) ;
 				exit (1) ;
 				} ;

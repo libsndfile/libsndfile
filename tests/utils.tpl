@@ -1,6 +1,6 @@
 [+ AutoGen5 template h c +]
 /*
-** Copyright (C) 2002-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ extern "C" {
 #define	ARRAY_LEN(x)		((int) (sizeof (x)) / (sizeof ((x) [0])))
 #define SIGNED_SIZEOF(x)	((int64_t) (sizeof (x)))
 #define	NOT(x)				(! (x))
+#define	ABS(x)				((x) >= 0 ? (x) : -(x))
 
 #define	PIPE_INDEX(x)	((x) + 500)
 #define	PIPE_TEST_LEN	12345
@@ -60,7 +61,7 @@ void	write_mono_file (const char * filename, int format, int srate, float * outp
 #ifdef __GNUC__
 static inline void
 exit_if_true (int test, const char *format, ...)
-#ifdef __USE_MINGW_ANSI_STDIO
+#if (defined (__USE_MINGW_ANSI_STDIO) && __USE_MINGW_ANSI_STDIO)
 	__attribute__ ((format (gnu_printf, 2, 3))) ;
 #else
 	__attribute__ ((format (printf, 2, 3))) ;
