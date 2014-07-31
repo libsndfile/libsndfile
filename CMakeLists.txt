@@ -1,4 +1,5 @@
-# cmakelists.txt for libsndfile
+# CMakeLists.txt for libsndfile
+
 cmake_minimum_required (VERSION 2.8.12)
 
 if (DEFINED ENV{CC})
@@ -8,7 +9,6 @@ if (DEFINED ENV{CC})
 if (DEFINED ENV{CXX})
 	set (CMAKE_CXX_COMPILER $ENV{CXX})
 	endif()
-
 
 project (libsndfile)
 
@@ -69,19 +69,10 @@ if (${Werror} MATCHES "on")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror" CACHE STRING "" FORCE)
 	endif ()
 
-message (STATUS "CMAKE_C_FLAGS :" ${CMAKE_C_FLAGS})
-
 add_custom_target (check
 	COMMAND src/test_main && tests/test_wrapper.sh
 	DEPENDS src/test_main tests/test_wrapper.sh
 	)
-
-# add_test (TestName tests/test_wrapper.sh)
-# add_custom_target (check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS tests/test_wrapper.sh)
-
-# add_executable(<testprog> EXCLUDE_FROM_ALL ...)
-# add_test (tests/test_wrapper.sh tests/test_wrapper.sh)
-# add_dependencies (check tests/test_wrapper.sh)
 
 #-------------------------------------------------------------------------------
 # Project definitions follow.
@@ -201,8 +192,25 @@ set_target_properties(sndfile
 	)
 
 #-------------------------------------------------------------------------------
-# Tests from the src/ directory.
+# Programs.
 
+lsf_build_program (sndfile-cmp "")
+lsf_build_program (sndfile-concat "")
+lsf_build_program (sndfile-convert "")
+lsf_build_program (sndfile-deinterleave "")
+lsf_build_program (sndfile-info "")
+lsf_build_program (sndfile-interleave "")
+lsf_build_program (sndfile-metadata-get "")
+lsf_build_program (sndfile-metadata-set "")
+lsf_build_program (sndfile-play asound)
+lsf_build_program (sndfile-salvage "")
+
+#-------------------------------------------------------------------------------
+# Tests.
+
+configure_file (tests/test_wrapper.sh.in tests/test_wrapper.sh)
+
+# Tests from the src/ directory.
 set (src_test_sources
 	src/audio_detect.c
 	src/broadcast.c
@@ -225,22 +233,7 @@ set (src_test_sources
 
 lsf_build_src_test_c (test_main "${src_test_sources}")
 
-#-------------------------------------------------------------------------------
-# Programs.
-
-lsf_build_program (sndfile-cmp "")
-lsf_build_program (sndfile-concat "")
-lsf_build_program (sndfile-convert "")
-lsf_build_program (sndfile-deinterleave "")
-lsf_build_program (sndfile-info "")
-lsf_build_program (sndfile-interleave "")
-lsf_build_program (sndfile-metadata-get "")
-lsf_build_program (sndfile-metadata-set "")
-lsf_build_program (sndfile-play asound)
-lsf_build_program (sndfile-salvage "")
-
-#-------------------------------------------------------------------------------
-# Tests.
+# Tests from the tests/ directory.
 
 lsf_build_test_c (aiff_rw_test "")
 lsf_build_test_c (alaw_test "")
@@ -282,4 +275,3 @@ lsf_build_test_c (virtual_io_test "")
 lsf_build_test_c (win32_ordinal_test "")
 lsf_build_test_c (win32_test "")
 lsf_build_test_c (write_read_test "tests/generate.c")
-
