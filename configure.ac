@@ -665,7 +665,7 @@ AC_CONFIG_FILES([ \
 AC_OUTPUT
 
 # Make sure these are executable.
-chmod u+x tests/test_wrapper.sh build-test-tarball.mk echo-install-dirs
+chmod u+x tests/test_wrapper.sh Scripts/build-test-tarball.mk echo-install-dirs
 
 #====================================================================================
 
