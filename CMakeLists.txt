@@ -70,7 +70,7 @@ if (${Werror} MATCHES "on")
 	endif ()
 
 add_custom_target (check
-	COMMAND src/test_main && tests/test_wrapper.sh
+	COMMAND src/test_main && bash tests/test_wrapper.sh
 	DEPENDS src/test_main tests/test_wrapper.sh
 	)
 
