@@ -174,7 +174,7 @@ if test "$enable_largefile:$ac_cv_sizeof_off_t" = "no:8" ; then
 
 
 case "$host_os" in
-	mingw32msvc | mingw32)
+	mingw32*)
 		TYPEOF_SF_COUNT_T="__int64"
 		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 		SIZEOF_SF_COUNT_T=8
