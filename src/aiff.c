@@ -189,8 +189,6 @@ typedef struct
 	sf_count_t	ssnd_offset ;
 
 	int chanmap_tag ;
-
-	MARK_ID_POS *markstr ;
 } AIFF_PRIVATE ;
 
 /*------------------------------------------------------------------------------
@@ -220,7 +218,7 @@ static int aiff_read_basc_chunk (SF_PRIVATE * psf, int) ;
 
 static int aiff_read_chanmap (SF_PRIVATE * psf, unsigned dword) ;
 
-static unsigned int marker_to_position (const MARK_ID_POS *m, unsigned short n, int marksize) ;
+static unsigned int marker_to_position (const SF_CUE_INFO *m, unsigned short n) ;
 
 static int aiff_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info) ;
 static SF_CHUNK_ITERATOR * aiff_next_chunk_iterator (SF_PRIVATE *psf, SF_CHUNK_ITERATOR * iterator) ;
@@ -370,12 +368,14 @@ aiff_open (SF_PRIVATE *psf)
 
 /* This function ought to check size */
 static unsigned int
-marker_to_position (const MARK_ID_POS *m, unsigned short n, int marksize)
-{	int i ;
+marker_to_position (const SF_CUE_INFO *m, unsigned short n)
+{
+      int i ;
+  
+      for (i = 0 ; i < m->num ; i++)
+	  if (m->cue [i].markerID == n)
+	      return m->cue [i].position ;
 
-	for (i = 0 ; i < marksize ; i++)
-		if (m [i].markerID == n)
-			return m [i].position ;
 	return 0 ;
 } /* marker_to_position */
 
@@ -771,12 +771,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						bytesread = psf_binheader_readf (psf, "E2", &n) ;
 						mark_count = n ;
 						psf_log_printf (psf, "  Count : %d\n", mark_count) ;
-						if (paiff->markstr != NULL)
+						if (psf->cue_info != NULL)
 						{	psf_log_printf (psf, "*** Second MARK chunk found. Throwing away the first.\n") ;
-							free (paiff->markstr) ;
+						    psf_cueinfo_free (psf->cue_info);
 							} ;
-						paiff->markstr = calloc (mark_count, sizeof (MARK_ID_POS)) ;
-						if (paiff->markstr == NULL)
+						psf->cue_info = psf_cueinfo_alloc(mark_count);
+						if (psf->cue_info == NULL)
 							return SFE_MALLOC_FAILED ;
 
 						for (n = 0 ; n < mark_count && bytesread < chunk_size ; n++)
@@ -790,6 +790,16 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 							if (pstr_len < sizeof (ubuf.scbuf) - 1)
 							{	bytesread += psf_binheader_readf (psf, "b", ubuf.scbuf, pstr_len) ;
+							    //DS
+ 		    /* remove trailing spaces (HACK!?) */
+ 		    if (ubuf.scbuf[pstr_len - 1] == ' '  ||
+ 			ubuf.scbuf[pstr_len - 1] == 0)
+ 		    {
+ 			ubuf.scbuf[pstr_len - 1] = 0;
+ 			if (ubuf.scbuf[pstr_len - 2] == ' ')
+ 			    ubuf.scbuf[pstr_len - 2] = 0;
+ 		    }
+
 								ubuf.scbuf [pstr_len] = 0 ;
 								}
 							else
@@ -800,8 +810,11 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 							psf_log_printf (psf, "   Name     : %s\n", ubuf.scbuf) ;
 
-							paiff->markstr [n].markerID = mark_id ;
-							paiff->markstr [n].position = position ;
+//DS
+ 		    psf->cue_info->cue [n].markerID = mark_id ;
+ 		    psf->cue_info->cue [n].position = position ;
+ 		    psf->cue_info->cue [n].label    = strdup(ubuf.scbuf);
+
 							/*
 							**	TODO if ubuf.scbuf is equal to
 							**	either Beg_loop, Beg loop or beg loop and spam
@@ -874,8 +887,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 		for (j = 0 ; j < psf->instrument->loop_count ; j ++)
 		{	if (j < ARRAY_LEN (psf->instrument->loops))
-			{	psf->instrument->loops [j].start = marker_to_position (paiff->markstr, psf->instrument->loops [j].start, mark_count) ;
-				psf->instrument->loops [j].end = marker_to_position (paiff->markstr, psf->instrument->loops [j].end, mark_count) ;
+			{	psf->instrument->loops [j].start = marker_to_position (psf->cue_info, psf->instrument->loops [j].start) ;
+				psf->instrument->loops [j].end = marker_to_position (psf->cue_info, psf->instrument->loops [j].end) ;
 				psf->instrument->loops [j].mode = SF_LOOP_FORWARD ;
 				} ;
 			} ;
@@ -900,9 +913,9 @@ static int
 aiff_close (SF_PRIVATE *psf)
 {	AIFF_PRIVATE *paiff = psf->container_data ;
 
-	if (paiff != NULL && paiff->markstr != NULL)
-	{	free (paiff->markstr) ;
-		paiff->markstr = NULL ;
+	if (paiff != NULL && psf->cue_info != NULL)
+	{	psf_cueinfo_free (psf->cue_info) ;
+		psf->cue_info = NULL ;
 		} ;
 
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)

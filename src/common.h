@@ -420,6 +420,7 @@ typedef struct sf_private_tag
 
 	int				have_written ;	/* Has a single write been done to the file? */
 	PEAK_INFO		*peak_info ;
+	SF_CUE_INFO	*cue_info ;
 
 	/* Loop Info */
 	SF_LOOP_INFO	*loop_info ;
@@ -717,6 +718,10 @@ enum
 
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
+
+#define		PSF_CUEINFO_SIZE(num)	(sizeof (SF_CUE_INFO) + (num) * sizeof (SF_CUE))
+SF_CUE_INFO   * psf_cueinfo_alloc (int num);
+void		psf_cueinfo_free (SF_CUE_INFO *cueinfo);
 
 int subformat_to_bytewidth (int format) ;
 int s_bitwidth_to_subformat (int bits) ;

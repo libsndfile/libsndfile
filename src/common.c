@@ -1186,6 +1186,34 @@ psf_memset (void *s, int c, sf_count_t len)
 	return s ;
 } /* psf_memset */
 
+
+SF_CUE_INFO  *
+psf_cueinfo_alloc (int num)
+{
+    SF_CUE_INFO *cueinfo;
+
+    cueinfo = calloc (PSF_CUEINFO_SIZE(num), 1) ;
+    cueinfo->num = num;
+
+    return cueinfo;
+}
+
+void
+psf_cueinfo_free (SF_CUE_INFO *cueinfo)
+{
+    int i;
+
+    for (i = 0; i < cueinfo->num; i++)
+	if (cueinfo->cue[i].label)
+	    free(cueinfo->cue[i].label);
+
+    free(cueinfo);
+}
+
+
+
+
+
 SF_INSTRUMENT *
 psf_instrument_alloc (void)
 {	SF_INSTRUMENT *instr ;

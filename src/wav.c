@@ -532,29 +532,31 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case cue_MARKER :
 					parsestage |= HAVE_other ;
 
-					{	uint32_t bytesread, cue_count ;
+					{	uint32_t bytesread, cue_count, i ;
 						int id, position, chunk_id, chunk_start, block_start, offset ;
 
 						bytesread = psf_binheader_readf (psf, "4", &cue_count) ;
 						psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
-
-						if (cue_count > 10)
-						{	psf_log_printf (psf, "  Count : %d (skipping)\n", cue_count) ;
-							psf_binheader_readf (psf, "j", cue_count * 24) ;
-							break ;
-							} ;
-
 						psf_log_printf (psf, "  Count : %d\n", cue_count) ;
 
-						while (cue_count)
+//DS
+		if (psf->cue_info == NULL && (psf->cue_info = psf_cueinfo_alloc(cue_count)) == NULL)
+		    return SFE_MALLOC_FAILED ;
+		
+		for (i = 0; i < cue_count; i++)
 						{	bytesread += psf_binheader_readf (psf, "444444", &id, &position,
 									&chunk_id, &chunk_start, &block_start, &offset) ;
+		    psf->cue_info->cue [i].markerID = id ;
+		    psf->cue_info->cue [i].position = position ;
+
+		    if (cue_count <= 10)
 							psf_log_printf (psf,	"   Cue ID : %2d"
 													"  Pos : %5u  Chunk : %M"
 													"  Chk Start : %d  Blk Start : %d"
 													"  Offset : %5d\n",
 									id, position, chunk_id, chunk_start, block_start, offset) ;
-							cue_count -- ;
+		    else if (cue_count == 11)
+			psf_log_printf (psf, "  (truncating remaining cues)\n") ;
 							} ;
 
 						if (bytesread != chunk_size)
@@ -1423,6 +1425,17 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t length)
 						bytesread += dword ;
 						buffer [dword] = 0 ;
 						psf_log_printf (psf, "    %M : %d : %s\n", chunk, mark_id, buffer) ;
+
+						if (psf->cue_info)
+ 						{   /* find id to store label */
+ 						    int i = 0;
+ 						    
+ 						    while (i < psf->cue_info->num  &&  psf->cue_info->cue[i].markerID != mark_id)
+ 							i++;
+ 						    
+ 						    if (i < psf->cue_info->num)
+ 							psf->cue_info->cue [i].label = strdup(buffer);
+ 						}
 						} ;
 					break ;
 

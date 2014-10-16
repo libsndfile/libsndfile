@@ -1150,6 +1150,24 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 		case SFC_GET_CLIPPING :
 			return psf->add_clipping ;
 
+		case SFC_GET_CUE_SIZE :
+			if (psf->cue_info == NULL)
+			    return SF_FALSE ;
+			if (datasize != sizeof (int) || data == NULL)
+			    return SF_FALSE ;
+			*(int *) data = PSF_CUEINFO_SIZE(psf->cue_info->num);
+			return SF_TRUE ;
+
+		case SFC_GET_CUE_INFO :
+			if (psf->cue_info == NULL)
+			    return SF_FALSE ;
+			if (datasize != PSF_CUEINFO_SIZE(psf->cue_info->num) || data == NULL)
+				return SF_FALSE ;
+
+			memcpy (data, psf->cue_info, PSF_CUEINFO_SIZE(psf->cue_info->num)) ;
+			return SF_TRUE ;
+
+
 		case SFC_GET_LOOP_INFO :
 			if (datasize != sizeof (SF_LOOP_INFO) || data == NULL)
 			{	psf->error = SFE_BAD_COMMAND_PARAM ;
@@ -2659,6 +2677,12 @@ psf_close (SF_PRIVATE *psf)
 SNDFILE *
 psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 {	int		error, format ;
+
+	if (psf->cue_info)
+		psf_cueinfo_free (psf->cue_info) ;
+
+	if (psf->cue_info)
+		psf_cueinfo_free (psf->cue_info) ;
 
 	sf_errno = error = 0 ;
 	sf_parselog [0] = 0 ;
