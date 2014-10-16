@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -77,7 +77,8 @@ static sf_count_t ima_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len) 
 static sf_count_t ima_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
 static sf_count_t ima_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
-static sf_count_t	ima_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
+static sf_count_t aiff_ima_seek		(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
+static sf_count_t wav_w64_ima_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 
 static int	ima_close	(SF_PRIVATE *psf) ;
 
@@ -124,7 +125,7 @@ wav_w64_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 			return error ;
 
 	psf->codec_close = ima_close ;
-	psf->seek = ima_seek ;
+	psf->seek = wav_w64_ima_seek ;
 
 	return 0 ;
 } /* wav_w64_ima_init */
@@ -145,6 +146,7 @@ aiff_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 			return error ;
 
 	psf->codec_close = ima_close ;
+	psf->seek = aiff_ima_seek ;
 
 	return 0 ;
 } /* aiff_ima_init */
@@ -269,7 +271,8 @@ count ++ ;
 	{	blockdata = pima->block + chan * 34 ;
 		sampledata = pima->samples + chan ;
 
-		predictor = (blockdata [0] << 8) | (blockdata [1] & 0x80) ;
+		/* Sign-extend from 16 bits to 32. */
+		predictor = (int) ((short) ((blockdata [0] << 8) | (blockdata [1] & 0x80))) ;
 
 		stepindx = blockdata [1] & 0x7F ;
 		stepindx = clamp_ima_step_index (stepindx) ;
@@ -709,7 +712,53 @@ ima_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 } /* ima_read_d */
 
 static sf_count_t
-ima_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
+aiff_ima_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
+{	IMA_ADPCM_PRIVATE *pima ;
+	int			newblock, newsample, newblockaiff ;
+
+	if (! psf->codec_data)
+		return 0 ;
+	pima = (IMA_ADPCM_PRIVATE*) psf->codec_data ;
+
+	if (psf->datalength < 0 || psf->dataoffset < 0)
+	{	psf->error = SFE_BAD_SEEK ;
+		return PSF_SEEK_ERROR ;
+		} ;
+
+	if (offset == 0)
+	{	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
+		pima->blockcount = 0 ;
+		pima->decode_block (psf, pima) ;
+		pima->samplecount = 0 ;
+		return 0 ;
+		} ;
+
+	if (offset < 0 || offset > pima->blocks * pima->samplesperblock)
+	{	psf->error = SFE_BAD_SEEK ;
+		return	PSF_SEEK_ERROR ;
+		} ;
+
+	newblock		= offset / pima->samplesperblock ;
+	newsample		= offset % pima->samplesperblock ;
+	newblockaiff	= newblock * psf->sf.channels ;
+
+	if (mode == SFM_READ)
+	{	psf_fseek (psf, psf->dataoffset + newblockaiff * pima->blocksize, SEEK_SET) ;
+		pima->blockcount = newblockaiff ;
+		pima->decode_block (psf, pima) ;
+		pima->samplecount = newsample ;
+		}
+	else
+	{	/* What to do about write??? */
+		psf->error = SFE_BAD_SEEK ;
+		return	PSF_SEEK_ERROR ;
+		} ;
+
+	return newblock * pima->samplesperblock + newsample ;
+} /* aiff_ima_seek */
+
+static sf_count_t
+wav_w64_ima_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 {	IMA_ADPCM_PRIVATE *pima ;
 	int			newblock, newsample ;
 
@@ -751,7 +800,7 @@ ima_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 		} ;
 
 	return newblock * pima->samplesperblock + newsample ;
-} /* ima_seek */
+} /* wav_w64_ima_seek */
 
 /*==========================================================================================
 ** IMA ADPCM Write Functions.

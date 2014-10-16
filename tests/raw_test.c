@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ raw_offset_test (const char *filename, int typeminor)
 	sndfile = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 	check_log_buffer_or_die (sndfile, __LINE__) ;
 
-	if (abs (BUFFER_LEN - sfinfo.frames) > 1)
+	if (ABS (BUFFER_LEN - sfinfo.frames) > 1)
 	{	printf ("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, BUFFER_LEN) ;
 		dump_log_buffer (sndfile) ;
 		exit (1) ;

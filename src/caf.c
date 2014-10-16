@@ -382,7 +382,7 @@ caf_read_header (SF_PRIVATE *psf)
 
 	psf->sf.channels = desc.channels_per_frame ;
 
-	while (have_data == 0 && psf_ftell (psf) < psf->filelength)
+	while (psf_ftell (psf) < psf->filelength)
 	{	marker = 0 ;
 		chunk_size = 0 ;
 
@@ -445,12 +445,25 @@ caf_read_header (SF_PRIVATE *psf)
 				break ;
 
 			case data_MARKER :
-				if (psf->filelength > 0 && chunk_size + psf->headindex != psf->filelength)
-					psf_log_printf (psf, "%M : %D (should be %D)\n", marker, chunk_size, chunk_size + 4) ;
-				else
-					psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
 				psf_binheader_readf (psf, "E4", &k) ;
 				psf_log_printf (psf, "  edit : %u\n", k) ;
+
+				if (chunk_size == -1)
+				{	psf_log_printf (psf, "%M : -1\n") ;
+					chunk_size = psf->filelength - psf->headindex ;
+					}
+				else if (psf->filelength > 0 && psf->filelength < psf->headindex + chunk_size - 16)
+					psf_log_printf (psf, "%M : %D (should be %D)\n", marker, chunk_size, psf->filelength - psf->headindex - 8) ;
+				else
+					psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+
+
+				psf->dataoffset = psf->headindex ;
+
+				/* Subtract the 4 bytes of the 'edit' field above. */
+				psf->datalength = chunk_size - 4 ;
+
+				psf_binheader_readf (psf, "j", psf->datalength) ;
 				have_data = 1 ;
 				break ;
 
@@ -488,6 +501,14 @@ caf_read_header (SF_PRIVATE *psf)
 				psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
 				break ;
 			} ;
+
+		if (! psf->sf.seekable && have_data)
+			break ;
+
+		if (psf_ftell (psf) >= psf->filelength - SIGNED_SIZEOF (chunk_size))
+		{	psf_log_printf (psf, "End\n") ;
+			break ;
+			} ;
 		} ;
 
 	if (have_data == 0)
@@ -495,11 +516,9 @@ caf_read_header (SF_PRIVATE *psf)
 		return SFE_MALFORMED_FILE ;
 		} ;
 
-	psf_log_printf (psf, "End\n") ;
-
-	psf->dataoffset = psf_ftell (psf) ;
-	psf->datalength = psf->filelength - psf->dataoffset ;
 	psf->endian = (desc.fmt_flags & 2) ? SF_ENDIAN_LITTLE : SF_ENDIAN_BIG ;
+
+	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 
 	if ((psf->sf.format = decode_desc_chunk (psf, &desc)) == 0)
 		return SFE_UNSUPPORTED_ENCODING ;

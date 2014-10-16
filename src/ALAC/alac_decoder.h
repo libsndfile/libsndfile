@@ -3,7 +3,7 @@
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License") ;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -35,20 +35,20 @@ typedef enum
 	ALAC_TRUE = 1
 } bool ;
 
-struct BitBuffer;
+struct BitBuffer ;
 
 typedef struct alac_decoder
 {
 		// decoding parameters (public for use in the analyzer)
-		ALACSpecificConfig		mConfig;
+		ALACSpecificConfig		mConfig ;
 
-		uint16_t					mActiveElements;
+		uint16_t					mActiveElements ;
 
 		// decoding buffers
-		int32_t *				mMixBufferU;
-		int32_t *				mMixBufferV;
-		int32_t *				mPredictor;
-		uint16_t *				mShiftBuffer;	// note: this points to mPredictor's memory but different
+		int32_t *				mMixBufferU ;
+		int32_t *				mMixBufferV ;
+		int32_t *				mPredictor ;
+		uint16_t *				mShiftBuffer ;	// note: this points to mPredictor's memory but different
 												//		 variable for clarity and type difference
 } alac_decoder ;
 

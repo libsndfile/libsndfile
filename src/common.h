@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -91,7 +91,7 @@
 
 #define		NOT(x)			(! (x))
 
-#if (COMPILER_IS_GCC == 1)
+#if COMPILER_IS_GCC
 #define		SF_MAX(x, y)	({ \
 								typeof (x) sf_max_x1 = (x) ; \
 								typeof (y) sf_max_y1 = (y) ; \
@@ -112,7 +112,7 @@
 #define		COMPILE_TIME_ASSERT(e)	(sizeof (struct { int : - !! (e) ; }))
 
 
-#define		SF_MAX_CHANNELS	256
+#define		SF_MAX_CHANNELS		1024
 
 
 /*

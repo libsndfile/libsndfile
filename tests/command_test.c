@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@
 static	void	float_norm_test			(const char *filename) ;
 static	void	double_norm_test		(const char *filename) ;
 static	void	format_tests			(void) ;
-static	void	calc_peak_test			(int filetype, const char *filename) ;
+static	void	calc_peak_test			(int filetype, const char *filename, int channels) ;
 static	void	truncate_test			(const char *filename, int filetype) ;
 static	void	instrument_test			(const char *filename, int filetype) ;
 static	void	channel_map_test		(const char *filename, int filetype) ;
@@ -114,8 +114,10 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || strcmp (argv [1], "peak") == 0)
-	{	calc_peak_test (SF_ENDIAN_BIG		| SF_FORMAT_RAW, "be-peak.raw") ;
-		calc_peak_test (SF_ENDIAN_LITTLE	| SF_FORMAT_RAW, "le-peak.raw") ;
+	{	calc_peak_test (SF_ENDIAN_BIG		| SF_FORMAT_RAW, "be-peak.raw", 1) ;
+		calc_peak_test (SF_ENDIAN_LITTLE	| SF_FORMAT_RAW, "le-peak.raw", 1) ;
+		calc_peak_test (SF_ENDIAN_BIG		| SF_FORMAT_RAW, "be-peak.raw", 7) ;
+		calc_peak_test (SF_ENDIAN_LITTLE	| SF_FORMAT_RAW, "le-peak.raw", 7) ;
 		test_count ++ ;
 		} ;
 
@@ -528,28 +530,34 @@ format_tests	(void)
 } /* format_tests */
 
 static	void
-calc_peak_test (int filetype, const char *filename)
+calc_peak_test (int filetype, const char *filename, int channels)
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
+	char		label [128] ;
 	int			k, format ;
+	sf_count_t	buffer_len, frame_count ;
 	double		peak ;
 
-	print_test_name ("calc_peak_test", filename) ;
+	snprintf (label, sizeof (label), "calc_peak_test (%d channels)", channels) ;
+	print_test_name (label, filename) ;
 
-	format = (filetype | SF_FORMAT_PCM_16) ;
+	format = filetype | SF_FORMAT_PCM_16 ;
+
+	buffer_len = BUFFER_LEN - (BUFFER_LEN % channels) ;
+	frame_count = buffer_len / channels ;
 
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.format		= format ;
-	sfinfo.channels		= 1 ;
-	sfinfo.frames		= BUFFER_LEN ;
+	sfinfo.channels		= channels ;
+	sfinfo.frames		= frame_count ;
 
 	/* Create double_data with max value of 0.5. */
-	for (k = 0 ; k < BUFFER_LEN ; k++)
-		double_data [k] = (k + 1) / (2.0 * BUFFER_LEN) ;
+	for (k = 0 ; k < buffer_len ; k++)
+		double_data [k] = (k + 1) / (2.0 * buffer_len) ;
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 
-	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	test_writef_double_or_die (file, 0, double_data, frame_count, __LINE__) ;
 
 	sf_close (file) ;
 
@@ -560,12 +568,12 @@ calc_peak_test (int filetype, const char *filename)
 		exit (1) ;
 		} ;
 
-	if (sfinfo.frames != BUFFER_LEN)
-	{	printf ("\n\nLine %d: Incorrect number of.frames in file. (%d => %" PRId64 ")\n", __LINE__, BUFFER_LEN, sfinfo.frames) ;
+	if (sfinfo.frames != frame_count)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%" PRId64 " => %" PRId64 ")\n", __LINE__, frame_count, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
-	if (sfinfo.channels != 1)
+	if (sfinfo.channels != channels)
 	{	printf ("Line %d: Incorrect number of channels in file.\n", __LINE__) ;
 		exit (1) ;
 		} ;
@@ -587,16 +595,16 @@ calc_peak_test (int filetype, const char *filename)
 	format = (filetype | SF_FORMAT_FLOAT) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.format		= format ;
-	sfinfo.channels		= 1 ;
-	sfinfo.frames		= BUFFER_LEN ;
+	sfinfo.channels		= channels ;
+	sfinfo.frames		= frame_count ;
 
 	/* Create double_data with max value of 0.5. */
-	for (k = 0 ; k < BUFFER_LEN ; k++)
-		double_data [k] = (k + 1) / (2.0 * BUFFER_LEN) ;
+	for (k = 0 ; k < buffer_len ; k++)
+		double_data [k] = (k + 1) / (2.0 * buffer_len) ;
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 
-	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	test_writef_double_or_die (file, 0, double_data, frame_count, __LINE__) ;
 
 	sf_close (file) ;
 
@@ -607,12 +615,12 @@ calc_peak_test (int filetype, const char *filename)
 		exit (1) ;
 		} ;
 
-	if (sfinfo.frames != BUFFER_LEN)
-	{	printf ("\n\nLine %d: Incorrect number of.frames in file. (%d => %" PRId64 ")\n", __LINE__, BUFFER_LEN, sfinfo.frames) ;
+	if (sfinfo.frames != frame_count)
+	{	printf ("\n\nLine %d: Incorrect number of.frames in file. (%" PRId64 " => %" PRId64 ")\n", __LINE__, frame_count, sfinfo.frames) ;
 		exit (1) ;
 		} ;
 
-	if (sfinfo.channels != 1)
+	if (sfinfo.channels != channels)
 	{	printf ("Line %d: Incorrect number of channels in file.\n", __LINE__) ;
 		exit (1) ;
 		} ;

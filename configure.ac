@@ -1,4 +1,4 @@
-# Copyright (C) 1999-2013  Erik de Castro Lopo <erikd@mega-nerd.com>.
+# Copyright (C) 1999-2014  Erik de Castro Lopo <erikd@mega-nerd.com>.
 
 dnl Require autoconf version
 AC_PREREQ(2.57)
@@ -8,6 +8,7 @@ AC_INIT([libsndfile],[1.0.26pre5],[sndfile@mega-nerd.com],
 
 # Put config stuff in Cfg.
 AC_CONFIG_AUX_DIR(Cfg)
+AC_CONFIG_MACRO_DIR([M4])
 
 AC_CONFIG_SRCDIR([src/sndfile.c])
 AC_CANONICAL_TARGET([])
@@ -24,6 +25,10 @@ AC_PROG_CC_STDC
 AC_USE_SYSTEM_EXTENSIONS
 AM_PROG_CC_C_O
 AC_PROG_CXX
+
+MN_C_COMPILER_IS_CLANG
+MN_GCC_REALLY_IS_GCC
+
 AC_PROG_SED
 
 # Do not check for F77.
@@ -98,8 +103,8 @@ if test x$enable_experimental = xyes ; then
 	fi
 AC_DEFINE_UNQUOTED([ENABLE_EXPERIMENTAL_CODE],${EXPERIMENTAL_CODE}, [Set to 1 to enable experimental code.])
 
-AC_ARG_ENABLE(gcc-werror,
-	AC_HELP_STRING([--enable-gcc-werror], [enable -Werror in all Makefiles]))
+AC_ARG_ENABLE(werror,
+	AC_HELP_STRING([--enable-werror], [enable -Werror in all Makefiles]))
 
 AC_ARG_ENABLE(stack-smash-protection,
        AC_HELP_STRING([--enable-stack-smash-protection], [Enable GNU GCC stack smash protection]))
@@ -131,6 +136,9 @@ AC_ARG_ENABLE(octave,
 AC_ARG_ENABLE(test-coverage,
 	AC_HELP_STRING([--enable-test-coverage], [enable test coverage]))
 AM_CONDITIONAL([ENABLE_TEST_COVERAGE], [test "$enable_test_coverage" = yes])
+
+AC_ARG_ENABLE(sanitizer,
+	AC_HELP_STRING([--sanitizer], [enable ggc/clang code sanitizier runtime checks]))
 
 #====================================================================================
 # Check types and their sizes.
@@ -166,7 +174,7 @@ if test "$enable_largefile:$ac_cv_sizeof_off_t" = "no:8" ; then
 
 
 case "$host_os" in
-	mingw32msvc | mingw32)
+	mingw32*)
 		TYPEOF_SF_COUNT_T="__int64"
 		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 		SIZEOF_SF_COUNT_T=8
@@ -379,6 +387,7 @@ AC_DEFINE_UNQUOTED(CPU_CLIPS_NEGATIVE, ${ac_cv_c_clip_negative},
 OS_SPECIFIC_CFLAGS=""
 OS_SPECIFIC_LINKS=""
 os_is_win32=0
+os_is_openbsd=0
 use_windows_api=0
 osx_darwin_version=0
 
@@ -398,9 +407,13 @@ case "$host_os" in
 		use_windows_api=1
 		OS_SPECIFIC_LINKS="-lwinmm"
 		;;
+	openbsd*)
+		os_is_openbsd=1
+		;;
 	esac
 
 AC_DEFINE_UNQUOTED(OS_IS_WIN32, ${os_is_win32}, [Set to 1 if compiling for Win32])
+AC_DEFINE_UNQUOTED(OS_IS_OPENBSD, ${os_is_openbsd}, [Set to 1 if compiling for OpenBSD])
 AC_DEFINE_UNQUOTED(USE_WINDOWS_API, ${use_windows_api}, [Set to 1 to use the native windows API])
 AC_DEFINE_UNQUOTED(OSX_DARWIN_VERSION, ${osx_darwin_version}, [The darwin version, no-zero is valid])
 AM_CONDITIONAL(USE_WIN_VERSION_FILE, test ${use_windows_api} -eq 1)
@@ -422,10 +435,13 @@ if test x$enable_alsa != xno ; then
 # Check for OpenBSD's sndio.
 
 SNDIO_LIBS=""
+HAVE_SNDIO_H=0
 AC_CHECK_HEADERS(sndio.h)
 if test x$ac_cv_header_sndio_h = xyes ; then
 	SNDIO_LIBS="-lsndio"
+	HAVE_SNDIO_H=1
 	fi
+AC_DEFINE_UNQUOTED([HAVE_SNDIO_H],${HAVE_SNDIO_H},[Set to 1 if <sndio.h> is available.])
 
 #====================================================================================
 # Test for sanity when cross-compiling.
@@ -495,25 +511,22 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	CXXFLAGS="$CXXFLAGS -Wall"
 
 	MN_ADD_CFLAGS([-Wextra])
-
-	AC_LANG_PUSH([C++])
-	MN_ADD_CXXFLAGS([-Wextra])
-	AC_LANG_POP([C++])
-
 	MN_ADD_CFLAGS([-Wdeclaration-after-statement])
 	MN_ADD_CFLAGS([-Wpointer-arith])
 	MN_ADD_CFLAGS([-funsigned-char])
+
+	AC_LANG_PUSH([C++])
+	MN_ADD_CXXFLAGS([-Wextra])
+	MN_ADD_CXXFLAGS([-Wpointer-arith])
+	MN_ADD_CXXFLAGS([-funsigned-char])
+	AC_LANG_POP([C++])
+
 
 	MN_ADD_CFLAGS([-D_FORTIFY_SOURCE=2])
 
 	if test x$enable_stack_smash_protection = "xyes" ; then
 		XIPH_GCC_STACK_PROTECTOR
 		XIPH_GXX_STACK_PROTECTOR
-		fi
-
-	if test x$enable_gcc_werror = "xyes" ; then
-		CFLAGS="-Werror $CFLAGS"
-		CXXFLAGS="-Werror $CXXFLAGS"
 		fi
 
 	if test x$enable_test_coverage = "xyes" ; then
@@ -564,6 +577,26 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 
 	COMPILER_IS_GCC=1
 	fi
+
+if test x$enable_sanitizer = "xyes" ; then
+	MN_ADD_CFLAGS([-fsanitize=address])
+	MN_ADD_CFLAGS([-fsanitize=integer])
+
+	# If we enable it for the C compiler we have to do it for the C++ compiler as well.
+	AC_LANG_PUSH([C++])
+	MN_ADD_CXXFLAGS([-fsanitize=address])
+	MN_ADD_CXXFLAGS([-fsanitize=integer])
+	AC_LANG_POP([C++])
+	fi
+
+if test x$enable_werror = "xyes" ; then
+	MN_ADD_CFLAGS([-Werror])
+
+	AC_LANG_PUSH([C++])
+	MN_ADD_CXXFLAGS([-Werror])
+	AC_LANG_POP([C++])
+	fi
+
 
 AC_DEFINE_UNQUOTED([WIN32_TARGET_DLL], ${win32_target_dll}, [Set to 1 if windows DLL is being built.])
 AC_DEFINE_UNQUOTED([COMPILER_IS_GCC], ${COMPILER_IS_GCC}, [Set to 1 if the compile is GNU GCC.])
@@ -632,7 +665,7 @@ AC_CONFIG_FILES([ \
 AC_OUTPUT
 
 # Make sure these are executable.
-chmod u+x tests/test_wrapper.sh build-test-tarball.mk echo-install-dirs
+chmod u+x tests/test_wrapper.sh Scripts/build-test-tarball.mk echo-install-dirs
 
 #====================================================================================
 
@@ -661,10 +694,12 @@ if test -z "$PKG_CONFIG" ; then
 	echo
 	fi
 
+echo "  Tools :"
+echo
+echo "    Compiler is Clang : ................... ${mn_cv_c_compiler_clang}"
+echo "    Compiler is GCC : ..................... ${ac_cv_c_compiler_gnu}"
+
 if test x$ac_cv_c_compiler_gnu = xyes ; then
-	echo "  Tools :"
-	echo
-	echo "    Compiler is GCC : ..................... ${ac_cv_c_compiler_gnu}"
 	echo "    GCC version : ......................... ${GCC_VERSION}"
 	if test $GCC_MAJOR_VERSION -lt 3 ; then
 		echo "\n"

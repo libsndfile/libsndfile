@@ -1,6 +1,6 @@
 [+ AutoGen5 template h c +]
 /*
-** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ extern "C" {
 #define	ARRAY_LEN(x)		((int) (sizeof (x)) / (sizeof ((x) [0])))
 #define SIGNED_SIZEOF(x)	((int64_t) (sizeof (x)))
 #define	NOT(x)				(! (x))
+#define	ABS(x)				((x) >= 0 ? (x) : -(x))
 
 #define	PIPE_INDEX(x)	((x) + 500)
 #define	PIPE_TEST_LEN	12345
@@ -60,7 +61,7 @@ void	write_mono_file (const char * filename, int format, int srate, float * outp
 #ifdef __GNUC__
 static inline void
 exit_if_true (int test, const char *format, ...)
-#ifdef __USE_MINGW_ANSI_STDIO
+#if (defined (__USE_MINGW_ANSI_STDIO) && __USE_MINGW_ANSI_STDIO)
 	__attribute__ ((format (gnu_printf, 2, 3))) ;
 #else
 	__attribute__ ((format (printf, 2, 3))) ;
@@ -266,7 +267,7 @@ check_file_hash_or_die (const char *filename, uint64_t target_hash, int line_num
 
 	while ((read_count = fread (buf, 1, sizeof (buf), file)))
 		for (k = 0 ; k < read_count ; k++)
-			cksum = cksum * 511 + buf [k] ;
+			cksum = (cksum * 511 + buf [k]) & 0xfffffffffffff ;
 
 	fclose (file) ;
 
@@ -844,15 +845,15 @@ write_mono_file (const char * filename, int format, int srate, float * output, i
 
 void
 gen_lowpass_signal_float (float *data, int len)
-{	int32_t value = 0x1243456 ;
+{	int64_t value = 0x1243456 ;
 	double sample, last_val = 0.0 ;
 	int k ;
 
 	for (k = 0 ; k < len ; k++)
 	{	/* Not a crypto quality RNG. */
-		value = 11117 * value + 211231 ;
-		value = 11117 * value + 211231 ;
-		value = 11117 * value + 211231 ;
+		value = (11117 * value + 211231) & 0xffffffff ;
+		value = (11117 * value + 211231) & 0xffffffff ;
+		value = (11117 * value + 211231) & 0xffffffff ;
 
 		sample = value / (0x7fffffff * 1.000001) ;
 		sample = 0.2 * sample - 0.9 * last_val ;

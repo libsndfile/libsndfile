@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -147,11 +147,11 @@ ircam_read_header	(SF_PRIVATE *psf)
 
 	psf->endian = SF_ENDIAN_LITTLE ;
 
-	if (psf->sf.channels > 256)
+	if (psf->sf.channels > SF_MAX_CHANNELS)
 	{	psf_binheader_readf (psf, "Epmf44", 0, &marker, &samplerate, &(psf->sf.channels), &encoding) ;
 
 		/* Sanity checking for endian-ness detection. */
-		if (psf->sf.channels > 256)
+		if (psf->sf.channels > SF_MAX_CHANNELS)
 		{	psf_log_printf (psf, "marker: 0x%X\n", marker) ;
 			return SFE_IRCAM_BAD_CHANNELS ;
 			} ;

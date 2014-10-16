@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -47,7 +47,6 @@
 #include <windows.h>
 #endif
 
-static void print_version (void) ;
 static void usage_exit (const char *progname) ;
 
 static void info_dump (const char *filename) ;
@@ -63,12 +62,8 @@ int
 main (int argc, char *argv [])
 {	int	k ;
 
-	print_version () ;
-
 	if (argc < 2 || strcmp (argv [1], "--help") == 0 || strcmp (argv [1], "-h") == 0)
-	{	usage_exit (program_name (argv [0])) ;
-		return 1 ;
-		} ;
+		usage_exit (program_name (argv [0])) ;
 
 	if (strcmp (argv [1], "--instrument") == 0)
 	{	int error = 0 ;
@@ -118,15 +113,6 @@ main (int argc, char *argv [])
 static double	data [BUFFER_LEN] ;
 
 static void
-print_version (void)
-{	char buffer [256] ;
-
-	sf_command (NULL, SFC_GET_LIB_VERSION, buffer, sizeof (buffer)) ;
-	printf ("\nVersion : %s\n\n", buffer) ;
-} /* print_version */
-
-
-static void
 usage_exit (const char *progname)
 {	printf ("Usage :\n  %s <file> ...\n", progname) ;
 	printf ("    Prints out information about one or more sound files.\n\n") ;
@@ -138,20 +124,17 @@ usage_exit (const char *progname)
 	printf ("    Prints out the channel map for the given file.\n\n") ;
 	printf ("  %s --cart <file>\n", progname) ;
 	printf ("    Prints out the cart chunk WAV info for the given file.\n\n") ;
+
+	printf ("Using %s.\n\n", sf_version_string ()) ;
 #if (defined (_WIN32) || defined (WIN32))
 		printf ("This is a Unix style command line application which\n"
 				"should be run in a MSDOS box or Command Shell window.\n\n") ;
 		printf ("Sleeping for 5 seconds before exiting.\n\n") ;
 		fflush (stdout) ;
 
-		/* This is the officially blessed by microsoft way but I can't get
-		** it to link.
-		**     Sleep (15) ;
-		** Instead, use this:
-		*/
 		Sleep (5 * 1000) ;
 #endif
-	exit (0) ;
+	exit (1) ;
 } /* usage_exit */
 
 /*==============================================================================

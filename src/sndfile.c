@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -691,6 +691,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_IRCAM :
+				if (info->channels > 256)
+					return 0 ;
 				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_32)
 					return 1 ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW || subformat == SF_FORMAT_FLOAT)
@@ -698,6 +700,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_VOC :
+				if (info->channels > 2)
+					return 0 ;
 				/* VOC is strictly little endian. */
 				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
 					return 0 ;
@@ -752,30 +756,30 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_HTK :
+				if (info->channels != 1)
+					return 0 ;
 				/* HTK is strictly big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
-					return 0 ;
-				if (info->channels != 1)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_16)
 					return 1 ;
 				break ;
 
 		case SF_FORMAT_SDS :
+				if (info->channels != 1)
+					return 0 ;
 				/* SDS is strictly big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
-					return 0 ;
-				if (info->channels != 1)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24)
 					return 1 ;
 				break ;
 
 		case SF_FORMAT_AVR :
+				if (info->channels > 2)
+					return 0 ;
 				/* SDS is strictly big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
-					return 0 ;
-				if (info->channels > 2)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
 					return 1 ;
@@ -800,10 +804,10 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_WVE :
+				if (info->channels > 1)
+					return 0 ;
 				/* WVE is strictly big endian. */
 				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
-					return 0 ;
-				if (info->channels > 1)
 					return 0 ;
 				if (subformat == SF_FORMAT_ALAW)
 					return 1 ;
@@ -817,10 +821,10 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_MPC2K :
+				if (info->channels > 2)
+					return 0 ;
 				/* MPC2000 is strictly little endian. */
 				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
-					return 0 ;
-				if (info->channels > 2)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_16)
 					return 1 ;
@@ -2525,7 +2529,7 @@ guess_file_type (SF_PRIVATE *psf)
 		return 0 /*-SF_FORMAT_WMA-*/ ;
 
 	/* HMM (Hidden Markov Model) Tool Kit. */
-	if (2 * BE2H_32 (buffer [0]) + 12 == psf->filelength && buffer [2] == MAKE_MARKER (0, 2, 0, 0))
+	if (buffer [2] == MAKE_MARKER (0, 2, 0, 0) && 2 * ((int64_t) BE2H_32 (buffer [0])) + 12 == psf->filelength)
 		return SF_FORMAT_HTK ;
 
 	if (buffer [0] == MAKE_MARKER ('f', 'L', 'a', 'C'))

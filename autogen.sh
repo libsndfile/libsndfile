@@ -13,7 +13,7 @@ test -z "$srcdir" && srcdir=.
 cd "$srcdir"
 DIE=0
 
-echo -n "checking for autogen ... "
+printf "checking for autogen ... "
 result="yes"
 (autogen --version) < /dev/null > /dev/null 2>&1 || {
         echo
@@ -25,7 +25,7 @@ result="yes"
 }
 echo $result
 
-echo -n "checking for autoconf ... "
+printf "checking for autoconf ... "
 result="yes"
 (autoconf --version) < /dev/null > /dev/null 2>&1 || {
         echo
@@ -49,7 +49,7 @@ if test -r Makefile.am; then
     AM_NEEDED=""
   fi
   if test -z $AM_NEEDED; then
-    echo -n "checking for automake ... "
+    printf "checking for automake ... "
     AUTOMAKE=automake
     ACLOCAL=aclocal
     if ($AUTOMAKE --version < /dev/null > /dev/null 2>&1); then
@@ -59,7 +59,7 @@ if test -r Makefile.am; then
       AUTOMAKE=
     fi
   else
-    echo -n "checking for automake $AM_NEEDED or later ... "
+    printf "checking for automake $AM_NEEDED or later ... "
     majneeded=`echo $AM_NEEDED | $VERSIONMKMAJ`
     minneeded=`echo $AM_NEEDED | $VERSIONMKMIN`
     for am in automake-$AM_NEEDED automake$AM_NEEDED \
@@ -75,7 +75,7 @@ if test -r Makefile.am; then
       fi
     done
     test -z $AUTOMAKE &&  echo "no"
-    echo -n "checking for aclocal $AM_NEEDED or later ... "
+    printf "checking for aclocal $AM_NEEDED or later ... "
     for ac in aclocal-$AM_NEEDED aclocal$AM_NEEDED \
 	aclocal aclocal-1.7 aclocal-1.8 aclocal-1.9 aclocal-1.10; do
       ($ac --version < /dev/null > /dev/null 2>&1) || continue
@@ -99,7 +99,7 @@ if test -r Makefile.am; then
   }
 fi
 
-echo -n "checking for libtool ... "
+printf "checking for libtool ... "
 for LIBTOOLIZE in libtoolize glibtoolize nope; do
   ($LIBTOOLIZE --version) < /dev/null > /dev/null 2>&1 && break
 done
@@ -118,7 +118,7 @@ fi
 	DIE=1
 }
 
-echo -n "checking for pkg-config ... "
+printf "checking for pkg-config ... "
 result="yes"
 (pkg-config --version) < /dev/null > /dev/null 2>&1 || {
         echo
@@ -130,13 +130,13 @@ result="yes"
 echo $result
 
 
-echo -n "checking for python ... "
+printf "checking for python ... "
 result="yes"
 (python --version) < /dev/null > /dev/null 2>&1 || {
         echo
         echo "You must have Python installed to compile $package."
         echo "Download the appropriate package for your distribution,"
-        echo "or get the source tarball at ftp://ftp.gnu.org/pub/gnu/"
+        echo "or get the source tarball at http://python.org/"
 		result="no"
         DIE=1
 }
@@ -147,7 +147,7 @@ if test "$DIE" -eq 1; then
 fi
 
 if test ! -d Cfg ; then
-	echo "Createing 'Cfg' directory."
+	echo "Creating 'Cfg' directory."
 	mkdir Cfg
 fi
 
@@ -163,6 +163,17 @@ echo "  $AUTOMAKE --add-missing $AUTOMAKE_FLAGS"
 $AUTOMAKE --add-missing $AUTOMAKE_FLAGS || exit 1
 echo "  autoconf"
 autoconf || exit 1
+
+# Generate the src/cmake-config.h.in from src/config.h.in.
+# CMake process src/cmake-config.h to create src/config.h.
+rm -f src/config.h src/cmake-config.h
+
+version=$(grep ^AC_INIT configure.ac | sed 's/.*libsndfile[^0-9]*//;s/\].*//')
+
+sed -E 's/undef(\s+)([a-zA-Z0-8_]+)/define\1\2\1@\2@/' src/config.h.in \
+	| sed 's/.*_FILE_OFFSET_BITS.*//' \
+	| sed 's/@PACKAGE@/"libsndfile"/' \
+	| sed "s/@VERSION@/\"$version\"/" > CMake/config.h.in
 
 cd $olddir
 

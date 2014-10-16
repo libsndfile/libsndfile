@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008 Conrad Parker <conrad@metadecks.org>
 **
 ** All rights reserved.
@@ -125,21 +125,12 @@ out :
 } /* compare */
 
 static void
-print_version (void)
-{	char buffer [256] ;
-
-	sf_command (NULL, SFC_GET_LIB_VERSION, buffer, sizeof (buffer)) ;
-	printf ("\nVersion : %s\n\n", buffer) ;
-} /* print_version */
-
-static void
 usage_exit (void)
 {
-	print_version () ;
-
 	printf ("Usage : %s <filename> <filename>\n", progname) ;
 	printf ("	Compare the PCM data of two sound files.\n\n") ;
-	exit (0) ;
+	printf ("Using %s.\n\n", sf_version_string ()) ;
+	exit (1) ;
 } /* usage_exit */
 
 int
@@ -148,9 +139,7 @@ main (int argc, char *argv [])
 	progname = program_name (argv [0]) ;
 
 	if (argc != 3)
-	{	usage_exit () ;
-		return 1 ;
-		} ;
+		usage_exit () ;
 
 	filename1 = argv [argc - 2] ;
 	filename2 = argv [argc - 1] ;
@@ -158,7 +147,6 @@ main (int argc, char *argv [])
 	if (strcmp (filename1, filename2) == 0)
 	{	printf ("Error : Input filenames are the same.\n\n") ;
 		usage_exit () ;
-		return 1 ;
 		} ;
 
 	return compare () ;

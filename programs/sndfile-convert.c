@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -62,27 +62,25 @@ usage_exit (const char *progname)
 
 	puts (
 		"    where [encoding] may be one of the following:\n\n"
-		"        -pcms8     : force the output to signed 8 bit pcm\n"
-		"        -pcmu8     : force the output to unsigned 8 bit pcm\n"
-		"        -pcm16     : force the output to 16 bit pcm\n"
-		"        -pcm24     : force the output to 24 bit pcm\n"
-		"        -pcm32     : force the output to 32 bit pcm\n"
-		"        -float32   : force the output to 32 bit floating point"
-		) ;
-	puts (
-		"        -ulaw      : force the output ULAW\n"
-		"        -alaw      : force the output ALAW\n"
-		"        -alac16    : force the output 16 bit ALAC (CAF only)\n"
-		"        -alac20    : force the output 20 bit ALAC (CAF only)\n"
-		"        -alac24    : force the output 24 bit ALAC (CAF only)\n"
-		"        -alac32    : force the output 32 bit ALAC (CAF only)\n"
-		"        -ima-adpcm : force the output to IMA ADPCM (WAV only)\n"
-		"        -ms-adpcm  : force the output to MS ADPCM (WAV only)\n"
-		"        -gsm610    : force the GSM6.10 (WAV only)\n"
-		"        -dwvw12    : force the output to 12 bit DWVW (AIFF only)\n"
-		"        -dwvw16    : force the output to 16 bit DWVW (AIFF only)\n"
-		"        -dwvw24    : force the output to 24 bit DWVW (AIFF only)\n"
-		"        -vorbis    : force the output to Vorbis (OGG only)\n"
+		"        -pcms8     : signed 8 bit pcm\n"
+		"        -pcmu8     : unsigned 8 bit pcm\n"
+		"        -pcm16     : 16 bit pcm\n"
+		"        -pcm24     : 24 bit pcm\n"
+		"        -pcm32     : 32 bit pcm\n"
+		"        -float32   : 32 bit floating point\n"
+		"        -ulaw      : ULAW\n"
+		"        -alaw      : ALAW\n"
+		"        -alac16    : 16 bit ALAC (CAF only)\n"
+		"        -alac20    : 20 bit ALAC (CAF only)\n"
+		"        -alac24    : 24 bit ALAC (CAF only)\n"
+		"        -alac32    : 32 bit ALAC (CAF only)\n"
+		"        -ima-adpcm : IMA ADPCM (WAV only)\n"
+		"        -ms-adpcm  : MS ADPCM (WAV only)\n"
+		"        -gsm610    : GSM6.10 (WAV only)\n"
+		"        -dwvw12    : 12 bit DWVW (AIFF only)\n"
+		"        -dwvw16    : 16 bit DWVW (AIFF only)\n"
+		"        -dwvw24    : 24 bit DWVW (AIFF only)\n"
+		"        -vorbis    : Vorbis (OGG only)\n"
 		) ;
 
 	puts (
@@ -100,7 +98,7 @@ usage_exit (const char *progname)
 	sfe_dump_format_map () ;
 
 	puts ("") ;
-	exit (0) ;
+	exit (1) ;
 } /* usage_exit */
 
 static void
@@ -135,9 +133,7 @@ main (int argc, char * argv [])
 	progname = program_name (argv [0]) ;
 
 	if (argc < 3 || argc > 5)
-	{	usage_exit (progname) ;
-		return 1 ;
-		} ;
+		usage_exit (progname) ;
 
 	infilename = argv [argc-2] ;
 	outfilename = argv [argc-1] ;
@@ -145,19 +141,16 @@ main (int argc, char * argv [])
 	if (strcmp (infilename, outfilename) == 0)
 	{	printf ("Error : Input and output filenames are the same.\n\n") ;
 		usage_exit (progname) ;
-		return 1 ;
 		} ;
 
 	if (strlen (infilename) > 1 && infilename [0] == '-')
 	{	printf ("Error : Input filename (%s) looks like an option.\n\n", infilename) ;
 		usage_exit (progname) ;
-		return 1 ;
 		} ;
 
 	if (outfilename [0] == '-')
 	{	printf ("Error : Output filename (%s) looks like an option.\n\n", outfilename) ;
 		usage_exit (progname) ;
-		return 1 ;
 		} ;
 
 	for (k = 1 ; k < argc - 2 ; k++)
@@ -320,6 +313,14 @@ main (int argc, char * argv [])
 
 	if (sf_format_check (&sfinfo) == 0)
 		report_format_error_exit (argv [0], &sfinfo) ;
+
+	if ((sfinfo.format & SF_FORMAT_SUBMASK) == SF_FORMAT_GSM610 && sfinfo.samplerate != 8000)
+	{	printf (
+			"WARNING: GSM 6.10 data format only supports 8kHz sample rate. The converted\n"
+			"ouput file will contain the input data converted to the GSM 6.10 data format\n"
+			"but not re-sampled.\n"
+			) ;
+		} ;
 
 	/* Open the output file. */
 	if ((outfile = sf_open (outfilename, SFM_WRITE, &sfinfo)) == NULL)

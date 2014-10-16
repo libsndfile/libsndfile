@@ -27,6 +27,8 @@
 .dirstamp
 .git*
 .libs
+CMakeFiles
+CMakeCache.txt
 Cfg
 Hack
 Hack/sndfile-fuzzbomb
@@ -88,6 +90,7 @@ src/Symbols.os2
 src/Symbols.static
 src/config.h
 src/config.h.in
+src/libsndfile.so*
 src/libsndfile-1.def
 src/sndfile.h
 src/stamp-h1

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -282,14 +282,14 @@ pcm_init (SF_PRIVATE *psf)
 static inline void
 sc2s_array	(signed char *src, int count, short *dest)
 {	while (--count >= 0)
-	{	dest [count] = src [count] << 8 ;
+	{	dest [count] = ((uint16_t) src [count]) << 8 ;
 		} ;
 } /* sc2s_array */
 
 static inline void
 uc2s_array	(unsigned char *src, int count, short *dest)
 {	while (--count >= 0)
-	{	dest [count] = (((short) src [count]) - 0x80) << 8 ;
+	{	dest [count] = (((uint32_t) src [count]) - 0x80) << 8 ;
 		} ;
 } /* uc2s_array */
 
@@ -312,7 +312,7 @@ bet2s_array (tribyte *src, int count, short *dest)
 	while (--count >= 0)
 	{	ucptr -= 3 ;
 		dest [count] = BET2H_16_PTR (ucptr) ;
-			} ;
+		} ;
 } /* bet2s_array */
 
 static inline void
@@ -379,8 +379,8 @@ bet2i_array (tribyte *src, int count, int *dest)
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
 	{	ucptr -= 3 ;
-		dest [count] = BET2H_32_PTR (ucptr) ;
-			} ;
+		dest [count] = psf_get_be24 (ucptr, 0) ;
+		} ;
 } /* bet2i_array */
 
 static inline void
@@ -390,7 +390,7 @@ let2i_array (tribyte *src, int count, int *dest)
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
 	{	ucptr -= 3 ;
-		dest [count] = LET2H_32_PTR (ucptr) ;
+		dest [count] = psf_get_le24 (ucptr, 0) ;
 		} ;
 } /* let2i_array */
 
@@ -439,7 +439,7 @@ let2f_array (tribyte *src, int count, float *dest, float normfact)
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
 	{	ucptr -= 3 ;
-		value = LET2H_32_PTR (ucptr) ;
+		value = psf_get_le24 (ucptr, 0) ;
 		dest [count] = ((float) value) * normfact ;
 		} ;
 } /* let2f_array */
@@ -452,9 +452,9 @@ bet2f_array (tribyte *src, int count, float *dest, float normfact)
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
 	{	ucptr -= 3 ;
-		value = BET2H_32_PTR (ucptr) ;
+		value = psf_get_be24 (ucptr, 0) ;
 		dest [count] = ((float) value) * normfact ;
-			} ;
+		} ;
 } /* bet2f_array */
 
 static inline void
@@ -524,7 +524,7 @@ let2d_array (tribyte *src, int count, double *dest, double normfact)
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
 	{	ucptr -= 3 ;
-		value = LET2H_32_PTR (ucptr) ;
+		value = psf_get_le24 (ucptr, 0) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
 } /* let2d_array */
@@ -537,7 +537,7 @@ bet2d_array (tribyte *src, int count, double *dest, double normfact)
 	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
 	{	ucptr -= 3 ;
-		value = (ucptr [0] << 24) | (ucptr [1] << 16) | (ucptr [2] << 8) ;
+		value = psf_get_be24 (ucptr, 0) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
 } /* bet2d_array */

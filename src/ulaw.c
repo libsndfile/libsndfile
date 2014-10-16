@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -799,7 +799,7 @@ ulaw2s_array (unsigned char *buffer, int count, short *ptr)
 static inline void
 ulaw2i_array (unsigned char *buffer, int count, int *ptr)
 {	while (--count >= 0)
-		ptr [count] = ulaw_decode [buffer [count]] << 16 ;
+		ptr [count] = ((uint32_t) ulaw_decode [buffer [count]]) << 16 ;
 } /* ulaw2i_array */
 
 static inline void

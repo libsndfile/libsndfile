@@ -225,7 +225,7 @@ ceeplusplus_extra_test (void)
 
 	error = file.error () ;
 	if (error == 0)
-	{	printf ("\n\n%s %d : error should be zero.\n\n", __func__, __LINE__) ;
+	{	printf ("\n\n%s %d : error should not be zero.\n\n", __func__, __LINE__) ;
 		exit (1) ;
 		} ;
 

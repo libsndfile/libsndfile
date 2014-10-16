@@ -3,7 +3,7 @@
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License") ;
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -37,7 +37,7 @@ extern "C" {
 
 // defines
 
-#define DENSHIFT_MAX  15
+#define DENSHIFT_MAX	15
 #define DENSHIFT_DEFAULT 9
 #define AINIT 38
 #define BINIT (-29)
@@ -46,13 +46,13 @@ extern "C" {
 
 // prototypes
 
-void init_coefs( int16_t * coefs, uint32_t denshift, int32_t numPairs );
-void copy_coefs( int16_t * srcCoefs, int16_t * dstCoefs, int32_t numPairs );
+void init_coefs (int16_t * coefs, uint32_t denshift, int32_t numPairs) ;
+void copy_coefs (int16_t * srcCoefs, int16_t * dstCoefs, int32_t numPairs) ;
 
 // NOTE: these routines read at least "numactive" samples so the i/o buffers must be at least that big
 
-void pc_block( int32_t * in, int32_t * pc, int32_t num, int16_t * coefs, int32_t numactive, uint32_t chanbits, uint32_t denshift );
-void unpc_block( int32_t * pc, int32_t * out, int32_t num, int16_t * coefs, int32_t numactive, uint32_t chanbits, uint32_t denshift );
+void pc_block (int32_t * in, int32_t * pc, int32_t num, int16_t * coefs, int32_t numactive, uint32_t chanbits, uint32_t denshift) ;
+void unpc_block (int32_t * pc, int32_t * out, int32_t num, int16_t * coefs, int32_t numactive, uint32_t chanbits, uint32_t denshift) ;
 
 #ifdef __cplusplus
 }

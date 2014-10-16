@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@
 #define	SILLY_WRITE_COUNT	(234)
 
 [+ FOR data_type
-+]static void	pcm_test_[+ (get "type_name") +] (const char *str, int format, int long_file_okz) ;
++]static void	pcm_test_[+ (get "type_name") +] (const char *str, int format, int long_file_ok) ;
 [+ ENDFOR data_type
 +]
 static void empty_file_test (const char *filename, int format) ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -72,7 +72,7 @@
 		#include <CoreAudio/AudioHardware.h>
 	#endif
 
-#elif defined (HAVE_SNDIO_H)
+#elif HAVE_SNDIO_H
 	#include <sndio.h>
 
 #elif (defined (sun) && defined (unix))
@@ -1008,7 +1008,7 @@ win32_play (int argc, char *argv [])
 **	OpenBDS's sndio.
 */
 
-#if defined (HAVE_SNDIO_H)
+#if HAVE_SNDIO_H
 
 static void
 sndio_play (int argc, char *argv [])
@@ -1186,7 +1186,7 @@ main (int argc, char *argv [])
 	opensoundsys_play (argc, argv) ;
 #elif (defined (__MACH__) && defined (__APPLE__) && OSX_DARWIN_VERSION <= 11)
 	macosx_play (argc, argv) ;
-#elif defined HAVE_SNDIO_H
+#elif HAVE_SNDIO_H
 	sndio_play (argc, argv) ;
 #elif (defined (sun) && defined (unix))
 	solaris_play (argc, argv) ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -838,7 +838,7 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 	*/
 	if ((sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_MS_ADPCM)
 		for (k = 0 ; k < sfinfo.frames - datalen ; k++)
-			if (abs (data [channels * k] / scale) > decay_response (channels * k))
+			if (ABS (data [channels * k] / scale) > decay_response (channels * k))
 			{	printf ("\n\nLine %d : Incorrect sample B (#%d : abs (%d) should be < %d).\n", __LINE__, channels * k, data [channels * k], decay_response (channels * k)) ;
 				exit (1) ;
 				} ;
@@ -1032,7 +1032,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 	*/
 	if ((sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_MS_ADPCM)
 		for (k = 0 ; k < sfinfo.frames - datalen ; k++)
-			if (abs (data [channels * k]) > decay_response (channels * k))
+			if (ABS (data [channels * k]) > decay_response (channels * k))
 			{	printf ("\n\nLine %d : Incorrect sample B (#%d : abs (%f) should be < %d).\n", __LINE__, channels * k, data [channels * k], decay_response (channels * k)) ;
 				exit (1) ;
 				} ;
@@ -1207,7 +1207,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 			oct_save_double (orig, data, datalen) ;
 			exit (1) ;
 			} ;
-		half_max_abs = LCT_MAX (half_max_abs, abs (0.5 * data [k])) ;
+		half_max_abs = LCT_MAX (half_max_abs, ABS (0.5 * data [k])) ;
 		} ;
 
 	if (half_max_abs < 1.0)
@@ -1226,7 +1226,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 	*/
 	if ((sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_MS_ADPCM)
 		for (k = 0 ; k < sfinfo.frames - datalen ; k++)
-			if (abs (data [channels * k]) > decay_response (channels * k))
+			if (ABS (data [channels * k]) > decay_response (channels * k))
 			{	printf ("\n\nLine %d : Incorrect sample B (#%d : abs (%f) should be < %d).\n", __LINE__, channels * k, data [channels * k], decay_response (channels * k)) ;
 				exit (1) ;
 				} ;
@@ -1421,7 +1421,7 @@ channels = 1 ;
 			oct_save_short (orig, smooth, datalen) ;
 			exit (1) ;
 			} ;
-		half_max_abs = LCT_MAX (half_max_abs, abs (0.5 * data [k])) ;
+		half_max_abs = LCT_MAX (half_max_abs, ABS (0.5 * data [k])) ;
 		} ;
 
 	if (half_max_abs < 1)
@@ -1437,7 +1437,7 @@ channels = 1 ;
 	if ((sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_MS_ADPCM &&
 		(sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_GSM610)
 		for (k = 0 ; k < sfinfo.frames - datalen ; k++)
-			if (abs (data [k]) > decay_response (k))
+			if (ABS (data [k]) > decay_response (k))
 			{	printf ("\n\nLine %d: Incorrect sample (#%" PRId64 " : abs (%d) should be < %d).\n", __LINE__, datalen + k, data [k], decay_response (k)) ;
 				exit (1) ;
 				} ;
@@ -1824,7 +1824,7 @@ printf ("** fix this ** ") ;
 			oct_save_float (orig, smooth, datalen) ;
 			exit (1) ;
 			} ;
-		half_max_abs = LCT_MAX (half_max_abs, abs (0.5 * data [k])) ;
+		half_max_abs = LCT_MAX (half_max_abs, ABS (0.5 * data [k])) ;
 		} ;
 
 	if (half_max_abs <= 0.0)
@@ -1841,7 +1841,7 @@ printf ("** fix this ** ") ;
 	if ((sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_MS_ADPCM &&
 		(sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_GSM610)
 		for (k = 0 ; k < sfinfo.frames - datalen ; k++)
-			if (abs (data [k]) > decay_response (k))
+			if (ABS (data [k]) > decay_response (k))
 			{	printf ("\n\nLine %d: Incorrect sample (#%" PRId64 " : abs (%d) should be < %d).\n", __LINE__, datalen + k, (int) data [k], (int) decay_response (k)) ;
 				exit (1) ;
 				} ;
@@ -2033,7 +2033,7 @@ channels = 1 ;
 	if ((sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_MS_ADPCM &&
 		(sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_GSM610)
 		for (k = 0 ; k < sfinfo.frames - datalen ; k++)
-			if (abs (data [k]) > decay_response (k))
+			if (ABS (data [k]) > decay_response (k))
 			{	printf ("\n\nLine %d: Incorrect sample (#%" PRId64 " : abs (%d) should be < %d).\n", __LINE__, datalen + k, (int) data [k], (int) decay_response (k)) ;
 				exit (1) ;
 				} ;

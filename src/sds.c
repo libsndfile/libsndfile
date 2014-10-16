@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -498,7 +498,7 @@ sds_3byte_read (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 
 	ucptr = psds->read_data + 5 ;
 	for (k = 0 ; k < 120 ; k += 3)
-	{	sample = (ucptr [k] << 25) + (ucptr [k + 1] << 18) + (ucptr [k + 2] << 11) ;
+	{	sample = (((uint32_t) ucptr [k]) << 25) + (ucptr [k + 1] << 18) + (ucptr [k + 2] << 11) ;
 		psds->read_samples [k / 3] = (int) (sample - 0x80000000) ;
 		} ;
 
@@ -508,7 +508,7 @@ sds_3byte_read (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 static int
 sds_4byte_read (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 {	unsigned char *ucptr, checksum ;
-	unsigned int sample ;
+	uint32_t sample ;
 	int 	k ;
 
 	psds->read_block ++ ;
@@ -542,7 +542,7 @@ sds_4byte_read (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 
 	ucptr = psds->read_data + 5 ;
 	for (k = 0 ; k < 120 ; k += 4)
-	{	sample = (ucptr [k] << 25) + (ucptr [k + 1] << 18) + (ucptr [k + 2] << 11) + (ucptr [k + 3] << 4) ;
+	{	sample = (((uint32_t) ucptr [k]) << 25) + (ucptr [k + 1] << 18) + (ucptr [k + 2] << 11) + (ucptr [k + 3] << 4) ;
 		psds->read_samples [k / 4] = (int) (sample - 0x80000000) ;
 		} ;
 
