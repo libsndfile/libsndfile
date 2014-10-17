@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,8 +138,14 @@ stdout_test	(int typemajor, int count)
 		data [k] = PIPE_INDEX (k) ;
 
 	if ((file = sf_open ("-", SFM_WRITE, &sfinfo)) == NULL)
-	{	fprintf (stderr, "sf_open_write failed with error : ") ;
-		fprintf (stderr, "%s\n", sf_strerror (NULL)) ;
+	{	fprintf (stderr, "%s % d: sf_open_write failed with error : %s\n",
+									__func__, __LINE__, sf_strerror (NULL)) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != 0)
+	{	fprintf (stderr, "%s % d: Frames is %d (should be 0).\n",
+									__func__, __LINE__, (int) sfinfo.frames) ;
 		exit (1) ;
 		} ;
 

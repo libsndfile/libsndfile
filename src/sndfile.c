@@ -2682,11 +2682,6 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 		goto error_exit ;
 		} ;
 
-	/* Zero out these fields. */
-	sfinfo->frames = 0 ;
-	sfinfo->sections = 0 ;
-	sfinfo->seekable = 0 ;
-
 	if (psf->file.mode == SFM_READ)
 	{	if ((SF_CONTAINER (sfinfo->format)) == SF_FORMAT_RAW)
 		{	if (sf_format_check (sfinfo) == 0)
@@ -2989,6 +2984,14 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 		} ;
 
 	memcpy (sfinfo, &psf->sf, sizeof (SF_INFO)) ;
+
+	if (psf->file.mode == SFM_WRITE)
+	{	/* Zero out these fields. */
+		sfinfo->frames = 0 ;
+		} ;
+
+	sfinfo->sections = 0 ;
+	sfinfo->seekable = 0 ;
 
 	return (SNDFILE *) psf ;
 
