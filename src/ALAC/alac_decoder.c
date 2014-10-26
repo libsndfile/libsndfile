@@ -232,7 +232,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 					for (i = 0 ; i < numU ; i++)
 						coefsU [i] = (int16_t) BitBufferRead (bits, 16) ;
 
-					// if shift active, skip the the shift buffer but remember where it starts
+					// if shift active, skip the shift buffer but remember where it starts
 					if (bytesShifted != 0)
 					{
 						shiftBits = *bits ;

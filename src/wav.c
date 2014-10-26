@@ -1788,8 +1788,8 @@ wav_write_bext_chunk (SF_PRIVATE *psf)
 	psf_binheader_writef (psf, "m4", bext_MARKER, WAV_BEXT_MIN_CHUNK_SIZE + b->coding_history_size) ;
 
 	/*
-	**	Note that it is very important the the field widths of the SF_BROADCAST_INFO
-	**	struct match those for the bext chunk fields.
+	**	Note that it is very important that the field widths of the SF_BROADCAST_INFO
+	**	struct match those of the bext chunk fields.
 	*/
 
 	psf_binheader_writef (psf, "b", b->description, sizeof (b->description)) ;
@@ -1881,8 +1881,8 @@ wav_write_cart_chunk (SF_PRIVATE *psf)
 	c = psf->cart_16k ;
 	psf_binheader_writef (psf, "m4", cart_MARKER, WAV_CART_MIN_CHUNK_SIZE + c->tag_text_size) ;
 	/*
-	**	Note that it is very important the the field widths of the SF_CART_INFO
-	**	struct match those for the cart chunk fields.
+	**	Note that it is very important that the field widths of the SF_CART_INFO
+	**	struct match those of the cart chunk fields.
 	*/
 	psf_binheader_writef (psf, "b", c->version, sizeof (c->version)) ;
 	psf_binheader_writef (psf, "b", c->title, sizeof (c->title)) ;

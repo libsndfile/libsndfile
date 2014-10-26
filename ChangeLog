@@ -3642,7 +3642,7 @@
     Add channel map tests.
 
     * src/common.h src/sndfile.c
-    Add a pointer the the SF_PRIVATE struct and make sure it gets freed in
+    Add a pointer to the SF_PRIVATE struct and make sure it gets freed in
     sf_close().
 
 2006-04-30  Erik de Castro Lopo  <erikd AT mega-nerd DOT com>
@@ -5978,7 +5978,7 @@
 
     * src/strings.c
     Found and fixed a bug which was causing psf_store_string() to fail on
-    Motorola 68k processors. Many thanks fo Joshua Haberman (Debian maintainer
+    Motorola 68k processors. Many thanks to Joshua Haberman (Debian maintainer
     of libsndfile) for compiling and running debug code to help me debug the
     problem.
 
@@ -6809,7 +6809,7 @@
     Document SFC_SET_RAW_START_OFFSET.
 
     * tests/raw_test.c tests/Makefile.am
-    Add new file for for testing SF_FORMAT_RAW specific functionality.
+    Add new file for testing SF_FORMAT_RAW specific functionality.
 
     * tests/dwvw_test.c
     Updates.

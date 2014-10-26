@@ -818,7 +818,7 @@ macosx_play (int argc, char *argv [])
 **	Win32 functions for playing a sound.
 **
 **	This API sucks. Its needlessly complicated and is *WAY* too loose with
-**	passing pointers arounf in integers and and using char* pointers to
+**	passing pointers around in integers and using char* pointers to
 **  point to data instead of short*. It plain sucks!
 */
 
