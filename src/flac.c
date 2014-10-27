@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Tobias Gehrig <tgehrig@ira.uka.de>
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -1337,12 +1337,8 @@ flac_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 	pflac->frame = NULL ;
 
 	if (psf->file.mode == SFM_READ)
-	{	FLAC__uint64 position ;
-
-		if (FLAC__stream_decoder_seek_absolute (pflac->fsd, offset))
-		{	FLAC__stream_decoder_get_decode_position (pflac->fsd, &position) ;
+	{	if (FLAC__stream_decoder_seek_absolute (pflac->fsd, offset))
 			return offset ;
-			} ;
 
 		if (offset == psf->sf.frames)
 		{	/*
