@@ -396,6 +396,23 @@ typedef struct
 	sf_count_t	length ;
 } SF_EMBED_FILE_INFO ;
 
+
+/* Struct describing one cue/marker */
+typedef struct
+{
+    int markerID;	/* id, need not be consecutive */
+    int position;	/* position in sample frames */
+    char *label;	/* optional label */
+} SF_CUE ;
+
+/* Struct used to retrieve cue/marker information from a file.*/
+typedef struct
+{
+    int	   num;		/* number of cues/markers */
+    SF_CUE cue[1];	/* num allocated structs (variable size) */
+} SF_CUE_INFO ;
+
+
 /*
 **	Structs used to retrieve music sample information from a file.
 */

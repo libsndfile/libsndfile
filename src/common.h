@@ -719,7 +719,7 @@ enum
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
 
-#define		PSF_CUEINFO_SIZE(num)	(sizeof (SF_CUE_INFO) + (num) * sizeof (SF_CUE))
+#define		PSF_CUEINFO_SIZE(num)	(sizeof (SF_CUE_INFO) + (num - 1) * sizeof (SF_CUE)) /* num - 1 because SF_CUE_INFO contains 1 instance of SF_CUE because zero-size array breaks ISO C test */
 SF_CUE_INFO   * psf_cueinfo_alloc (int num);
 void		psf_cueinfo_free (SF_CUE_INFO *cueinfo);
 
