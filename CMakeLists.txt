@@ -2,6 +2,11 @@
 
 cmake_minimum_required (VERSION 2.8.12)
 
+
+if (NOT (EXISTS "${CMAKE_SOURCE_DIR}/CMake/config.h.in"))
+	message (FATAL_ERROR "\nError : Need to run \"./autogen.sh cmake\" first.")
+	endif ()
+
 if (DEFINED ENV{CC})
 	set (CMAKE_C_COMPILER $ENV{CC})
 	endif()
