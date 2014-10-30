@@ -71,7 +71,7 @@
 #endif
 
 #define	SF_BUFFER_LEN			(8192)
-#define	SF_FILENAME_LEN			(512)
+#define	SF_FILENAME_LEN			(1024)
 #define SF_SYSERR_LEN			(256)
 #define SF_MAX_STRINGS			(32)
 #define	SF_HEADER_LEN			(12292)
