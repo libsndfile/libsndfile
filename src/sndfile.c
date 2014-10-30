@@ -261,6 +261,8 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_BAD_CHUNK_FORMAT	, "Error : Reading/writing chunks from this file format is not supported." },
 	{	SFE_BAD_CHUNK_MARKER	, "Error : Bad chunk marker." },
 	{	SFE_BAD_CHUNK_DATA_PTR	, "Error : Bad data pointer in SF_CHUNK_INFO struct." },
+	{	SFE_FILENAME_TOO_LONG	, "Error : Supplied filename too long." },
+
 
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
@@ -274,7 +276,7 @@ static int	guess_file_type (SF_PRIVATE *psf) ;
 static int	validate_sfinfo (SF_INFO *sfinfo) ;
 static int	validate_psf (SF_PRIVATE *psf) ;
 static void	save_header_info (SF_PRIVATE *psf) ;
-static void	copy_filename (SF_PRIVATE *psf, const char *path) ;
+static int	copy_filename (SF_PRIVATE *psf, const char *path) ;
 static int	psf_close (SF_PRIVATE *psf) ;
 
 static int	try_resource_fork (SF_PRIVATE * psf) ;
@@ -328,7 +330,10 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 
 	psf_log_printf (psf, "File : %s\n", path) ;
 
-	copy_filename (psf, path) ;
+	if (copy_filename (psf, path) != 0)
+	{	sf_errno = psf->error ;
+		return	NULL ;
+		} ;
 
 	psf->file.mode = mode ;
 	if (strcmp (path, "-") == 0)
@@ -2590,10 +2595,15 @@ save_header_info (SF_PRIVATE *psf)
 {	snprintf (sf_parselog, sizeof (sf_parselog), "%s", psf->parselog.buf) ;
 } /* save_header_info */
 
-static void
+static int
 copy_filename (SF_PRIVATE *psf, const char *path)
 {	const char *ccptr ;
 	char *cptr ;
+
+	if (strlen (path) > 1 && strlen (path) - 1 >= sizeof (psf->file.path.c))
+	{	psf->error = SFE_FILENAME_TOO_LONG ;
+		return psf->error ;
+		} ;
 
 	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", path) ;
 	if ((ccptr = strrchr (path, '/')) || (ccptr = strrchr (path, '\\')))
@@ -2610,7 +2620,7 @@ copy_filename (SF_PRIVATE *psf, const char *path)
 	else
 		psf->file.dir.c [0] = 0 ;
 
-	return ;
+	return 0 ;
 } /* copy_filename */
 
 /*==============================================================================
