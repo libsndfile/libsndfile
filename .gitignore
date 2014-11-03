@@ -4,6 +4,7 @@
 *.aiff
 *.au
 *.bin
+*.caf
 *.cm*
 *.exe
 *.flac
@@ -15,6 +16,7 @@
 *.oga
 *.ogg
 *.paf
+*.raw
 *.rifx
 *.sd2
 *.sds
@@ -27,6 +29,8 @@
 .dirstamp
 .git*
 .libs
+Build/
+CMake/config.h.in
 CMakeFiles
 CMakeCache.txt
 Cfg
