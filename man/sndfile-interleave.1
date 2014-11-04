@@ -1,8 +1,9 @@
-.Dd "June 19, 2014"
+.Dd November 2, 2014
 .Dt SNDFILE-INTERLEAVE 1
 .Os
 .Sh NAME
-.Nm sndfile-interleave
+.Nm sndfile-interleave ,
+.Nm sndfile-deinterleave
 .Nd convert mono files into a multi-channel file and vice versa
 .Sh SYNOPSIS
 .Nm sndfile-interleave
@@ -38,12 +39,7 @@ Apart from the number of channels,
 the audio format of the resulting mono files
 is the same as that of the original file.
 .Sh EXIT STATUS
-.Bl -tag -width 0 -compact
-.It 0
-The conversion was successfull.
-.It 1
-An error occurred.
-.El
+.Ex -std
 .Sh EXAMPLES
 Merge a mono OGG file and a mono FLAC file into a stereo WAV file:
 .Bd -literal -offset indent

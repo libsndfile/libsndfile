@@ -1,4 +1,4 @@
-.Dd "June 30, 2014"
+.Dd November 2, 2014
 .Dt SNDFILE-CONVERT 1
 .Os
 .Sh NAME
@@ -6,7 +6,9 @@
 .Nd convert sound files from one format to another
 .Sh SYNOPSIS
 .Nm sndfile-convert
-.Op Ar options
+.Op Fl override-sample-rate Ns = Ns Ar rate
+.Op Fl endian Ns = Ns Cm little | big | cpu
+.Op Fl normalize
 .Op Ar encoding
 .Ar input
 .Ar output
@@ -91,10 +93,11 @@ RF64 (RIFF 64)
 .Ss Options
 The following options are recoginzed:
 .Pp
-.Bl -tag -compact -width "override-sample-rate=XXXX"
-.It Fl override-sample-rate Ns = Ns Ar X
-Make the input use sample rate
-.Ar X .
+.Bl -tag -compact -width "override-sample-rate=XXXXX"
+.It Fl override-sample-rate Ns = Ns Ar rate
+Make the input use sample rate of
+.Ar rate
+Hz.
 .It Fl endian Ns = Ns Cm little
 Make the output file use little endian data.
 .It Fl endian Ns = Ns Cm big
@@ -150,12 +153,7 @@ This will not always work as most container formats
 (e.g. WAV, AIFF etc) only support a small subset of encodings
 (e.g. 16 bit PCM, a-law, Vorbis etc).
 .Sh EXIT STATUS
-.Bl -tag -width 0 -compact
-.It 0
-The conversion was successful.
-.It 1
-An error occured.
-.El
+.Ex -std
 .Sh SEE ALSO
 .Lk http://www.mega-nerd.com/libsndfile/
 .Sh AUTHORS
