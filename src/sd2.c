@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Paavo Jumppanen
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -447,7 +447,7 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 	{
 		rsrc.rsrc_data = psf->header ;
 		rsrc.need_to_free_rsrc_data = SF_FALSE ;
-	}
+		} ;
 
 	/* Read in the whole lot. */
 	psf_fread (rsrc.rsrc_data, rsrc.rsrc_len, 1, psf) ;
