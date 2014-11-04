@@ -740,7 +740,7 @@ caf_read_chanmap (SF_PRIVATE * psf, sf_count_t chunk_size)
 	if (bytesread < chunk_size)
 		psf_binheader_readf (psf, "j", chunk_size - bytesread) ;
 
-	if (map_info->channel_map != NULL)
+	if (map_info && map_info->channel_map != NULL)
 	{	size_t chanmap_size = psf->sf.channels * sizeof (psf->channel_map [0]) ;
 
 		free (psf->channel_map) ;
