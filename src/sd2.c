@@ -444,7 +444,10 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 		rsrc.need_to_free_rsrc_data = SF_TRUE ;
 		}
 	else
+	{
 		rsrc.rsrc_data = psf->header ;
+		rsrc.need_to_free_rsrc_data = SF_FALSE ;
+	}
 
 	/* Read in the whole lot. */
 	psf_fread (rsrc.rsrc_data, rsrc.rsrc_len, 1, psf) ;
