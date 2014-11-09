@@ -138,7 +138,7 @@ AC_ARG_ENABLE(test-coverage,
 AM_CONDITIONAL([ENABLE_TEST_COVERAGE], [test "$enable_test_coverage" = yes])
 
 AC_ARG_ENABLE(sanitizer,
-	AC_HELP_STRING([--sanitizer], [enable ggc/clang code sanitizier runtime checks]))
+	AC_HELP_STRING([--enable-sanitizer], [enable ggc/clang code sanitizier runtime checks]))
 
 #====================================================================================
 # Check types and their sizes.
@@ -579,11 +579,13 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 if test x$enable_sanitizer = "xyes" ; then
 	MN_ADD_CFLAGS([-fsanitize=address])
 	MN_ADD_CFLAGS([-fsanitize=integer])
+	MN_ADD_CFLAGS([-fsanitize=undefined])
 
 	# If we enable it for the C compiler we have to do it for the C++ compiler as well.
 	AC_LANG_PUSH([C++])
 	MN_ADD_CXXFLAGS([-fsanitize=address])
 	MN_ADD_CXXFLAGS([-fsanitize=integer])
+	MN_ADD_CXXFLAGS([-fsanitize=undefined])
 	AC_LANG_POP([C++])
 	fi
 
@@ -707,6 +709,8 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		echo "    ** Compile with GCC version 3.X or above to avoid this problem."
 		fi
 	fi
+echo "    Sanitizer enabled : ................... ${enable_sanitizer:-no}"
+echo "    Stack smash protection : .............. ${enable_stack_smash_protection:-no}"
 
 ./echo-install-dirs
 
