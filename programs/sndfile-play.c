@@ -1160,7 +1160,7 @@ main (int argc, char *argv [])
 	if (argc < 2)
 	{
 		printf ("\nUsage : %s <input sound file>\n\n", program_name (argv [0])) ;
-		printf ("  Using %s.\n\n", sf_version_string ()) ;
+		printf ("Using %s.\n\n", sf_version_string ()) ;
 #if (OS_IS_WIN32 == 1)
 		printf ("This is a Unix style command line application which\n"
 				"should be run in a MSDOS box or Command Shell window.\n\n") ;
