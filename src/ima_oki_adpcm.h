@@ -31,6 +31,10 @@ typedef struct
 	int step_index ;
 	int max_step_index ;
 	int const * steps ;
+	int last_output1 ;
+	int last_input ;
+	int variant ;
+	double a, b ;
 
 	/* public: */
 	int errors ;
@@ -45,7 +49,7 @@ typedef enum
 	IMA_OKI_ADPCM_TYPE_OKI
 } IMA_OKI_ADPCM_TYPE ;
 
-void ima_oki_adpcm_init		(IMA_OKI_ADPCM * state, IMA_OKI_ADPCM_TYPE type) ;
+void ima_oki_adpcm_init		(IMA_OKI_ADPCM * state, IMA_OKI_ADPCM_TYPE type, int /* 0..1 */ variant, double rate) ;
 
 int	adpcm_decode	(IMA_OKI_ADPCM * state, int /* 0..15 */ code) ;
 int	adpcm_encode	(IMA_OKI_ADPCM * state, int /* -32768..32767 */ sample) ;
