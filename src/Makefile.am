@@ -46,7 +46,7 @@ endif
 
 #===============================================================================
 # MinGW requires -no-undefined if a DLL is to be built.
-libsndfile_la_LDFLAGS = -no-undefined -version-info @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@
+libsndfile_la_LDFLAGS = -no-undefined @SHARED_VERSION_INFO@ @SHLIB_VERSION_ARG@
 libsndfile_la_SOURCES = $(FILESPECIFIC) $(noinst_HEADERS)
 nodist_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
 libsndfile_la_LIBADD = GSM610/libgsm.la G72x/libg72x.la ALAC/libalac.la \

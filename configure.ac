@@ -63,7 +63,7 @@ AC_CHECK_PROG(HAVE_XCODE_SELECT, xcode-select, yes, no)
 CLEAN_VERSION=`echo $PACKAGE_VERSION | $SED "s/p.*//"`
 VERSION_MINOR=`echo $CLEAN_VERSION | $SED "s/.*\.//"`
 
-SHARED_VERSION_INFO="1:$VERSION_MINOR:0"
+SHARED_VERSION_INFO="-version-info 1:$VERSION_MINOR:0"
 
 #------------------------------------------------------------------------------------
 
@@ -409,6 +409,11 @@ case "$host_os" in
 		;;
 	openbsd*)
 		os_is_openbsd=1
+		;;
+	linux-android*)
+		# Disable versioned libraries for Android.
+		# See: https://github.com/erikd/libsndfile/issues/51
+		SHARED_VERSION_INFO=""
 		;;
 	esac
 
