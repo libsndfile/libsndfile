@@ -1,6 +1,7 @@
 /*
 ** Copyright (C) 2007-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (c) 2007 <robs@users.sourceforge.net>
+** Copyright (c) 2013 Chris Rienzo <chris.rienzo@grasshopper.com>
 **
 ** This library is free software; you can redistribute it and/or modify it
 ** under the terms of the GNU Lesser General Public License as published by
@@ -26,10 +27,12 @@
 typedef struct
 {
 	/* private: */
-	int mask ;
+	int shift ;
 	int last_output ;
 	int step_index ;
 	int max_step_index ;
+	int min_sample ;
+	int max_sample ;
 	int const * steps ;
 
 	/* public: */
