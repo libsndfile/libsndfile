@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2008-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+# Copyright (C) 2008-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 #
 # All rights reserved.
 #
@@ -33,7 +33,7 @@
 
 HOST_TRIPLET=@HOST_TRIPLET@
 PACKAGE_VERSION=@PACKAGE_VERSION@
-LIB_VERSION=`echo $PACKAGE_VERSION | sed "s/[a-z].*//"`
+LIB_VERSION=$(echo $PACKAGE_VERSION | sed "s/[a-z].*//")
 
 if test -f tests/sfversion@EXEEXT@ ; then
 	cd tests
@@ -53,9 +53,9 @@ if test -f libsndfile.so.$LIB_VERSION ; then
 		fi
 	fi
 
-sfversion=`./sfversion@EXEEXT@ | sed "s/-exp$//"`
+sfversion=$(./sfversion@EXEEXT@ | sed "s/-exp$//")
 
-if test $sfversion != libsndfile-$PACKAGE_VERSION ; then
+if test "$sfversion" != libsndfile-$PACKAGE_VERSION ; then
 	echo "Error : sfversion ($sfversion) and PACKAGE_VERSION ($PACKAGE_VERSION) don't match."
 	exit 1
 	fi
