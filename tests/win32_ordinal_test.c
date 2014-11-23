@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2006-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2006-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ win32_ordinal_test (void)
 		} ;
 
 	if (hmod == NULL)
-	{	puts ("\n\nError : cannot load DLL.\n") ;
+	{	printf ("\n\nError : cannot load DLL (cwd is %s).\n", getcwd (buffer, sizeof (buffer))) ;
 		exit (1) ;
 		} ;
 
