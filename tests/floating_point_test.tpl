@@ -110,7 +110,7 @@ main (int argc, char *argv [])
 
 	float_scaled_test	("alac_16.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_16, -90.0) ;
 	float_scaled_test	("alac_32.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_32, -76.0) ;
-	float_scaled_test	("alac_24.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_24, -160.0) ;
+	float_scaled_test	("alac_24.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_24, -158.0) ;
 	float_scaled_test	("alac_20.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_20, -134.0) ;
 
 #if HAVE_EXTERNAL_LIBS
