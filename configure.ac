@@ -557,9 +557,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 			SHLIB_VERSION_ARG="-Wl,--version-script=\$(srcdir)/Symbols.gnu-binutils"
 			;;
 		mingw*)
-			# Linker flag '-Wl,--out-implib' does not work with mingw cross compiler
-			# so we don't use it here.
-			SHLIB_VERSION_ARG="-Wl,\$(srcdir)/libsndfile-1.def"
+			SHLIB_VERSION_ARG="-Wc,-static-libgcc -Wl,\$(srcdir)/libsndfile-1.def"
 			win32_target_dll=1
 			if test x"$enable_shared" = xno ; then
 				win32_target_dll=0
