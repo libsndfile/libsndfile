@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004-2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -324,7 +324,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 					/* Terminate the buffer we're going to append_snprintf into. */
 					buffer [0] = 0 ;
 
-					for (bit = k = 0 ; bit < ARRAY_LEN (channel_mask_bits) ; bit++)
+					for (bit = k = 0 ; bit < ARRAY_LEN (channel_mask_bits) && k < psf->sf.channels ; bit++)
 					{
 						if (wav_fmt->ext.channelmask & (1 << bit))
 						{	if (k > psf->sf.channels)
@@ -339,8 +339,10 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 
 					/* Remove trailing ", ". */
 					bit = strlen (buffer) ;
-					buffer [--bit] = 0 ;
-					buffer [--bit] = 0 ;
+					if (bit >= 2)
+					{	buffer [--bit] = 0 ;
+						buffer [--bit] = 0 ;
+						} ;
 
 					if (k != psf->sf.channels)
 					{	psf_log_printf (psf, "  Channel Mask  : 0x%X\n", wav_fmt->ext.channelmask) ;
