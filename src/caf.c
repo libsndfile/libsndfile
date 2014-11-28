@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2005-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2005-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -502,6 +502,9 @@ caf_read_header (SF_PRIVATE *psf)
 				break ;
 			} ;
 
+		if (marker != data_MARKER && chunk_size >= 0xffffff00)
+			break ;
+
 		if (! psf->sf.seekable && have_data)
 			break ;
 
@@ -741,7 +744,7 @@ caf_read_chanmap (SF_PRIVATE * psf, sf_count_t chunk_size)
 		psf_binheader_readf (psf, "j", chunk_size - bytesread) ;
 
 	if (map_info && map_info->channel_map != NULL)
-	{	size_t chanmap_size = psf->sf.channels * sizeof (psf->channel_map [0]) ;
+	{	size_t chanmap_size = SF_MIN (psf->sf.channels, layout_tag & 0xff) * sizeof (psf->channel_map [0]) ;
 
 		free (psf->channel_map) ;
 

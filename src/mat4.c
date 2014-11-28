@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -122,9 +122,6 @@ mat4_open	(SF_PRIVATE *psf)
 
 		default : break ;
 		} ;
-
-	if (error)
-		return error ;
 
 	return error ;
 } /* mat4_open */
@@ -275,9 +272,13 @@ mat4_read_header (SF_PRIVATE *psf)
 
 	psf->dataoffset = psf_ftell (psf) ;
 
-	if (rows == 0 && cols == 0)
+	if (rows == 0)
 	{	psf_log_printf (psf, "*** Error : zero channel count.\n") ;
 		return SFE_CHANNEL_COUNT_ZERO ;
+		}
+	else if (rows > SF_MAX_CHANNELS)
+	{	psf_log_printf (psf, "*** Error : channel count %d > SF_MAX_CHANNELS.\n", rows) ;
+		return SFE_CHANNEL_COUNT ;
 		} ;
 
 	psf->sf.channels	= rows ;

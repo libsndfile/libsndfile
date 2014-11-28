@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -631,7 +631,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					if (chunk_size == 0)
 						break ;
 					if (chunk_size >= SIGNED_SIZEOF (ubuf.scbuf) - 1)
-					{	psf_log_printf (psf, " %M : %d (too big, skipping)\n", marker, chunk_size) ;
+					{	psf_log_printf (psf, " %M : %u (too big, skipping)\n", marker, chunk_size) ;
 						psf_binheader_readf (psf, "j", chunk_size + (chunk_size & 1)) ;
 						break ;
 						} ;
@@ -858,9 +858,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						break ;
 						} ;
 					psf_log_printf (psf, "*** Unknown chunk marker %X at position %D. Exiting parser.\n", marker, psf_ftell (psf)) ;
-					done = 1 ;
+					done = SF_TRUE ;
 					break ;
 			} ;	/* switch (marker) */
+
+		if (marker != SSND_MARKER && chunk_size >= 0xffffff00)
+			break ;
 
 		if ((! psf->sf.seekable) && (found_chunk & HAVE_SSND))
 			break ;

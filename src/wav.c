@@ -535,23 +535,26 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case cue_MARKER :
 					parsestage |= HAVE_other ;
 
-					{	uint32_t bytesread, cue_count ;
+					{	uint32_t thisread, bytesread, cue_count ;
 						int id, position, chunk_id, chunk_start, block_start, offset ;
 
 						bytesread = psf_binheader_readf (psf, "4", &cue_count) ;
 						psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
 
 						if (cue_count > 10)
-						{	psf_log_printf (psf, "  Count : %d (skipping)\n", cue_count) ;
-							psf_binheader_readf (psf, "j", cue_count * 24) ;
+						{	psf_log_printf (psf, "  Count : %u (skipping)\n", cue_count) ;
+							psf_binheader_readf (psf, "j", (cue_count > 20 ? 20 : cue_count) * 24) ;
 							break ;
 							} ;
 
 						psf_log_printf (psf, "  Count : %d\n", cue_count) ;
 
 						while (cue_count)
-						{	bytesread += psf_binheader_readf (psf, "444444", &id, &position,
-									&chunk_id, &chunk_start, &block_start, &offset) ;
+						{
+							if ((thisread = psf_binheader_readf (psf, "444444", &id, &position, &chunk_id, &chunk_start, &block_start, &offset)) == 0)
+								break ;
+							bytesread += thisread ;
+
 							psf_log_printf (psf,	"   Cue ID : %2d"
 													"  Pos : %5u  Chunk : %M"
 													"  Chk Start : %d  Blk Start : %d"
@@ -642,6 +645,9 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					break ;
 
 			default :
+					if (chunk_size >= 0xffff0000)
+						done = SF_TRUE ;
+
 					if (psf_isprint ((marker >> 24) & 0xFF) && psf_isprint ((marker >> 16) & 0xFF)
 						&& psf_isprint ((marker >> 8) & 0xFF) && psf_isprint (marker & 0xFF))
 					{	psf_log_printf (psf, "*** %M : %d (unknown marker)\n", marker, chunk_size) ;
@@ -659,6 +665,9 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					done = SF_TRUE ;
 					break ;
 			} ;	/* switch (marker) */
+
+		if (marker != data_MARKER && chunk_size >= 0xffffff00)
+			break ;
 
 		if (! psf->sf.seekable && (parsestage & HAVE_data))
 			break ;
@@ -1369,7 +1378,11 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 		psf_log_printf (psf, "%M : %d\n", chunk, chunk_length) ;
 
 	while (bytesread < chunk_length)
-	{	bytesread += psf_binheader_readf (psf, "m", &chunk) ;
+	{	int thisread ;
+
+		if ((thisread = psf_binheader_readf (psf, "m", &chunk)) == 0)
+			break ;
+		bytesread += thisread ;
 
 		switch (chunk)
 		{	case adtl_MARKER :
@@ -1422,7 +1435,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 					bytesread += psf_binheader_readf (psf, "4", &dword) ;
 					dword += (dword & 1) ;
 					if (dword >= SIGNED_SIZEOF (buffer))
-					{	psf_log_printf (psf, "  *** %M : %d (too big)\n", chunk, dword) ;
+					{	psf_log_printf (psf, "  *** %M : %u (too big)\n", chunk, dword) ;
 						psf_binheader_readf (psf, "j", dword) ;
 						break ;
 						} ;
@@ -1518,7 +1531,7 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 static int
 wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 {	char buffer [512] ;
-	uint32_t bytesread = 0, dword, sampler_data, loop_count ;
+	uint32_t thisread, bytesread = 0, dword, sampler_data, loop_count ;
 	uint32_t note, start, end, type = -1, count ;
 	int j, k ;
 
@@ -1567,7 +1580,9 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 	psf->instrument->loop_count = loop_count ;
 
 	for (j = 0 ; loop_count > 0 && chunklen - bytesread >= 24 ; j ++)
-	{	bytesread += psf_binheader_readf (psf, "4", &dword) ;
+	{	if ((thisread = psf_binheader_readf (psf, "4", &dword)) == 0)
+			break ;
+		bytesread += thisread ;
 		psf_log_printf (psf, "    Cue ID : %2u", dword) ;
 
 		bytesread += psf_binheader_readf (psf, "4", &type) ;
@@ -1630,7 +1645,9 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 			if (k > 0 && (k % 20) == 0)
 				psf_log_printf (psf, "\n      ") ;
 
-			bytesread += psf_binheader_readf (psf, "1", &ch) ;
+			if ((thisread = psf_binheader_readf (psf, "1", &ch)) == 0)
+				break ;
+			bytesread += thisread ;
 			psf_log_printf (psf, "%02X ", ch & 0xFF) ;
 			} ;
 
@@ -1939,10 +1956,13 @@ static int
 exif_subchunk_parse (SF_PRIVATE *psf, uint32_t length)
 {	uint32_t marker, dword, vmajor = -1, vminor = -1, bytesread = 0 ;
 	char buf [4096] ;
+	int thisread ;
 
 	while (bytesread < length)
 	{
-		bytesread += psf_binheader_readf (psf, "m", &marker) ;
+		if ((thisread = psf_binheader_readf (psf, "m", &marker)) == 0)
+			break ;
+		bytesread += thisread ;
 
 		switch (marker)
 		{
