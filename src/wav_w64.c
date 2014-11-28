@@ -197,7 +197,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 
 		case WAVE_FORMAT_ALAW :
 		case WAVE_FORMAT_MULAW :
-				if (wav_fmt->min.bytespersec / wav_fmt->min.blockalign != wav_fmt->min.samplerate)
+				if (wav_fmt->min.bytespersec != wav_fmt->min.samplerate * wav_fmt->min.blockalign)
 					psf_log_printf (psf, "  Bytes/sec     : %d (should be %d)\n", wav_fmt->min.bytespersec, wav_fmt->min.samplerate * wav_fmt->min.blockalign) ;
 				else
 					psf_log_printf (psf, "  Bytes/sec     : %d\n", wav_fmt->min.bytespersec) ;
@@ -215,8 +215,14 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				if (wav_fmt->min.channels < 1 || wav_fmt->min.channels > 2)
 					return SFE_WAV_ADPCM_CHANNELS ;
 
-				bytesread +=
-				psf_binheader_readf (psf, "22", &(wav_fmt->ima.extrabytes), &(wav_fmt->ima.samplesperblock)) ;
+				bytesread += psf_binheader_readf (psf, "22", &(wav_fmt->ima.extrabytes), &(wav_fmt->ima.samplesperblock)) ;
+				psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->ima.extrabytes) ;
+				if (wav_fmt->ima.samplesperblock < 1)
+				{	psf_log_printf (psf, "  Samples/Block : %d (should be > 0)\n", wav_fmt->ima.samplesperblock) ;
+					return SFE_WAV_ADPCM_SAMPLES ;
+					}
+				else
+					psf_log_printf (psf, "  Samples/Block : %d\n", wav_fmt->ima.samplesperblock) ;
 
 				bytespersec = (wav_fmt->ima.samplerate * wav_fmt->ima.blockalign) / wav_fmt->ima.samplesperblock ;
 				if (wav_fmt->ima.bytespersec != (unsigned) bytespersec)
@@ -224,8 +230,6 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				else
 					psf_log_printf (psf, "  Bytes/sec     : %d\n", wav_fmt->ima.bytespersec) ;
 
-				psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->ima.extrabytes) ;
-				psf_log_printf (psf, "  Samples/Block : %d\n", wav_fmt->ima.samplesperblock) ;
 				break ;
 
 		case WAVE_FORMAT_MS_ADPCM :
@@ -234,9 +238,16 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				if (wav_fmt->msadpcm.channels < 1 || wav_fmt->msadpcm.channels > 2)
 					return SFE_WAV_ADPCM_CHANNELS ;
 
-				bytesread +=
-				psf_binheader_readf (psf, "222", &(wav_fmt->msadpcm.extrabytes),
-						&(wav_fmt->msadpcm.samplesperblock), &(wav_fmt->msadpcm.numcoeffs)) ;
+				bytesread += psf_binheader_readf (psf, "222", &(wav_fmt->msadpcm.extrabytes),
+								&(wav_fmt->msadpcm.samplesperblock), &(wav_fmt->msadpcm.numcoeffs)) ;
+
+				psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->msadpcm.extrabytes) ;
+				if (wav_fmt->ima.samplesperblock < 1)
+				{	psf_log_printf (psf, "  Samples/Block : %d (should be > 0)\n", wav_fmt->ima.samplesperblock) ;
+					return SFE_WAV_ADPCM_SAMPLES ;
+					}
+				else
+					psf_log_printf (psf, "  Samples/Block : %d\n", wav_fmt->ima.samplesperblock) ;
 
 				bytespersec = (wav_fmt->min.samplerate * wav_fmt->min.blockalign) / wav_fmt->msadpcm.samplesperblock ;
 				if (wav_fmt->min.bytespersec == (unsigned) bytespersec)
@@ -246,8 +257,6 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				else
 					psf_log_printf (psf, "  Bytes/sec     : %d (should be %d)\n", wav_fmt->min.bytespersec, bytespersec) ;
 
-				psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->msadpcm.extrabytes) ;
-				psf_log_printf (psf, "  Samples/Block : %d\n", wav_fmt->msadpcm.samplesperblock) ;
 				if (wav_fmt->msadpcm.numcoeffs > ARRAY_LEN (wav_fmt->msadpcm.coeffs))
 				{	psf_log_printf (psf, "  No. of Coeffs : %d (should be <= %d)\n", wav_fmt->msadpcm.numcoeffs, ARRAY_LEN (wav_fmt->msadpcm.coeffs)) ;
 					wav_fmt->msadpcm.numcoeffs = ARRAY_LEN (wav_fmt->msadpcm.coeffs) ;
@@ -287,7 +296,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 				break ;
 
 		case WAVE_FORMAT_EXTENSIBLE :
-				if (wav_fmt->ext.bytespersec / wav_fmt->ext.blockalign != wav_fmt->ext.samplerate)
+				if (wav_fmt->ext.bytespersec != wav_fmt->ext.samplerate * wav_fmt->ext.blockalign)
 					psf_log_printf (psf, "  Bytes/sec     : %d (should be %d)\n", wav_fmt->ext.bytespersec, wav_fmt->ext.samplerate * wav_fmt->ext.blockalign) ;
 				else
 					psf_log_printf (psf, "  Bytes/sec     : %d\n", wav_fmt->ext.bytespersec) ;
