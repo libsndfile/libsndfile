@@ -35,6 +35,10 @@ help :
 	@echo "It requires all the normal build tools require to build libsndfile plus wget."
 	@echo
 
+configure : Build/Stamp/configure
+
+build : Build/Stamp/build
+
 clean :
 	rm -rf Build/flac-* Build/libogg-* Build/libvorbis-*
 	rm -rf Build/bin Build/include Build/lib Build/share
@@ -71,15 +75,18 @@ Build/Stamp/extract : Build/Stamp/md5sum
 	(cd Build && tar xf Tarballs/$(vorbis_tarball))
 	touch $@
 
-Build/Stamp/install : Build/Stamp/extract
+Build/Stamp/install-libs : Build/Stamp/extract
 	(cd Build/$(ogg_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
 	(cd Build/$(vorbis_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
 	(cd Build/$(flac_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
 	touch $@
 
-Build/Stamp/build : Build/Stamp/install
+Build/Stamp/configure : Build/Stamp/install-libs
 	PKG_CONFIG_LIBDIR=Build/lib/pkgconfig ./configure
 	sed -i 's#^EXTERNAL_CFLAGS.*#EXTERNAL_CFLAGS = -I/home/erikd/Git/libsndfile/Build/include#' src/Makefile
 	sed -i 's#^EXTERNAL_LIBS.*#EXTERNAL_LIBS = -static /home/erikd/Git/libsndfile/Build/lib/libFLAC.la /home/erikd/Git/libsndfile/Build/lib/libogg.la /home/erikd/Git/libsndfile/Build/lib/libvorbis.la /home/erikd/Git/libsndfile/Build/lib/libvorbisenc.la -dynamic #' src/Makefile
+	touch $@
+
+Build/Stamp/build : Build/Stamp/configure
 	make clean all check
 
