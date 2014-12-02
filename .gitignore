@@ -67,7 +67,6 @@ libsndfile.spec
 libtool
 man/sndfile-deinterleave.1
 man/sndfile-metadata-set.1
-mntest.sh
 programs/sndfile-cmp
 programs/sndfile-concat
 programs/sndfile-convert
@@ -81,10 +80,6 @@ programs/sndfile-metadata-set
 programs/sndfile-play
 programs/sndfile-salvage
 regtest/sndfile-regtest
-rf64-test.sh
-save
-shave
-shave-libtool
 sndfile.pc
 src/Ext
 src/G72x/g72x_test
