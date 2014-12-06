@@ -39,7 +39,8 @@
 
 #define LOOP_ALIGN
 
-void init_coefs (int16_t * coefs, uint32_t denshift, int32_t numPairs)
+void
+init_coefs (int16_t * coefs, uint32_t denshift, int32_t numPairs)
 {
 	int32_t		k ;
 	int32_t		den = 1 << denshift ;
@@ -51,7 +52,8 @@ void init_coefs (int16_t * coefs, uint32_t denshift, int32_t numPairs)
 		coefs [k] = 0 ;
 }
 
-void copy_coefs (int16_t * srcCoefs, int16_t * dstCoefs, int32_t numPairs)
+void
+copy_coefs (const int16_t * srcCoefs, int16_t * dstCoefs, int32_t numPairs)
 {
 	int32_t k ;
 
@@ -67,7 +69,8 @@ static inline int32_t ALWAYS_INLINE sign_of_int (int32_t i)
 	return negishift | (i >> 31) ;
 }
 
-void pc_block (int32_t * in, int32_t * pc1, int32_t num, int16_t * coefs, int32_t numactive, uint32_t chanbits, uint32_t denshift)
+void
+pc_block (int32_t * in, int32_t * pc1, int32_t num, int16_t * coefs, int32_t numactive, uint32_t chanbits, uint32_t denshift)
 {
 	register int16_t	a0, a1, a2, a3 ;
 	register int32_t	b0, b1, b2, b3 ;

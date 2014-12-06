@@ -59,7 +59,8 @@
 
 // 16-bit routines
 
-void unmix16 (int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t numSamples, int32_t mixbits, int32_t mixres)
+void
+unmix16 (const int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t numSamples, int32_t mixbits, int32_t mixres)
 {
 	int32_t 	j ;
 
@@ -93,7 +94,8 @@ void unmix16 (int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t 
 // 20-bit routines
 // - the 20 bits of data are left-justified in 3 bytes of storage but right-aligned for input/output predictor buffers
 
-void unmix20 (int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t numSamples, int32_t mixbits, int32_t mixres)
+void
+unmix20 (const int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t numSamples, int32_t mixbits, int32_t mixres)
 {
 	int32_t 	j ;
 
@@ -127,7 +129,8 @@ void unmix20 (int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t 
 // 24-bit routines
 // - the 24 bits of data are right-justified in the input/output predictor buffers
 
-void unmix24 (int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t numSamples,
+void
+unmix24 (const int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t numSamples,
 				int32_t mixbits, int32_t mixres, uint16_t * shiftUV, int32_t bytesShifted)
 {
 	int32_t		shift = bytesShifted * 8 ;
@@ -200,7 +203,8 @@ void unmix24 (int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t 
 // - otherwise, the calculations might overflow into the 33rd bit and be lost
 // - therefore, these routines deal with the specified "unused lower" bytes in the "shift" buffers
 
-void unmix32 (int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t numSamples,
+void
+unmix32 (const int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t numSamples,
 				int32_t mixbits, int32_t mixres, uint16_t * shiftUV, int32_t bytesShifted)
 {
 	int32_t		shift = bytesShifted * 8 ;
@@ -254,7 +258,8 @@ void unmix32 (int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t 
 
 // 20/24-bit <-> 32-bit helper routines (not really matrixing but convenient to put here)
 
-void copyPredictorTo24 (int32_t * in, int32_t * out, uint32_t stride, int32_t numSamples)
+void
+copyPredictorTo24 (const int32_t * in, int32_t * out, uint32_t stride, int32_t numSamples)
 {
 	int32_t		j ;
 
@@ -265,7 +270,8 @@ void copyPredictorTo24 (int32_t * in, int32_t * out, uint32_t stride, int32_t nu
 	}
 }
 
-void copyPredictorTo24Shift (int32_t * in, uint16_t * shift, int32_t * out, uint32_t stride, int32_t numSamples, int32_t bytesShifted)
+void
+copyPredictorTo24Shift (const int32_t * in, uint16_t * shift, int32_t * out, uint32_t stride, int32_t numSamples, int32_t bytesShifted)
 {
 	int32_t		shiftVal = bytesShifted * 8 ;
 	int32_t		j ;
@@ -282,7 +288,8 @@ void copyPredictorTo24Shift (int32_t * in, uint16_t * shift, int32_t * out, uint
 	}
 }
 
-void copyPredictorTo20 (int32_t * in, int32_t * out, uint32_t stride, int32_t numSamples)
+void
+copyPredictorTo20 (const int32_t * in, int32_t * out, uint32_t stride, int32_t numSamples)
 {
 	int32_t		j ;
 
@@ -295,7 +302,8 @@ void copyPredictorTo20 (int32_t * in, int32_t * out, uint32_t stride, int32_t nu
 	}
 }
 
-void copyPredictorTo32 (int32_t * in, int32_t * out, uint32_t stride, int32_t numSamples)
+void
+copyPredictorTo32 (const int32_t * in, int32_t * out, uint32_t stride, int32_t numSamples)
 {
 	int32_t			i, j ;
 
@@ -304,7 +312,8 @@ void copyPredictorTo32 (int32_t * in, int32_t * out, uint32_t stride, int32_t nu
 		out [j] = arith_shift_left (in [i], 8) ;
 }
 
-void copyPredictorTo32Shift (int32_t * in, uint16_t * shift, int32_t * out, uint32_t stride, int32_t numSamples, int32_t bytesShifted)
+void
+copyPredictorTo32Shift (const int32_t * in, uint16_t * shift, int32_t * out, uint32_t stride, int32_t numSamples, int32_t bytesShifted)
 {
 	int32_t *		op = out ;
 	uint32_t		shiftVal = bytesShifted * 8 ;

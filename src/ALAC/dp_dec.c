@@ -40,7 +40,8 @@
 
 #define LOOP_ALIGN
 
-static inline int32_t ALWAYS_INLINE sign_of_int (int32_t i)
+static inline int32_t ALWAYS_INLINE
+sign_of_int (int32_t i)
 {
 	int32_t negishift ;
 
@@ -48,7 +49,8 @@ static inline int32_t ALWAYS_INLINE sign_of_int (int32_t i)
 	return negishift | (i >> 31) ;
 }
 
-void unpc_block (int32_t * pc1, int32_t * out, int32_t num, int16_t * coefs, int32_t numactive, uint32_t chanbits, uint32_t denshift)
+void
+unpc_block (const int32_t * pc1, int32_t * out, int32_t num, int16_t * coefs, int32_t numactive, uint32_t chanbits, uint32_t denshift)
 {
 	register int16_t	a0, a1, a2, a3 ;
 	register int32_t	b0, b1, b2, b3 ;

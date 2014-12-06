@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2011-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2011-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -410,7 +410,7 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
 	plac->input_data_pos += packet_size ;
 	plac->frames_this_block = 0 ;
-	alac_decode (pdec, &bit_buffer, plac->buffer, plac->frames_per_block, psf->sf.channels, &plac->frames_this_block) ;
+	alac_decode (pdec, &bit_buffer, plac->buffer, plac->frames_per_block, &plac->frames_this_block) ;
 
 	plac->partial_block_frames = 0 ;
 
@@ -424,7 +424,7 @@ alac_encode_block (SF_PRIVATE * psf, ALAC_PRIVATE *plac)
 	uint8_t	byte_buffer [psf->sf.channels * ALAC_BYTE_BUFFER_SIZE] ;
 	uint32_t num_bytes = 0 ;
 
-	alac_encode (penc, plac->channels, plac->partial_block_frames, plac->buffer, byte_buffer, &num_bytes) ;
+	alac_encode (penc, plac->partial_block_frames, plac->buffer, byte_buffer, &num_bytes) ;
 
 	if (fwrite (byte_buffer, 1, num_bytes, plac->enctmp) != num_bytes)
 		return 0 ;

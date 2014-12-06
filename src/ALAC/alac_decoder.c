@@ -23,6 +23,7 @@
 	File:		ALACDecoder.cpp
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -105,6 +106,7 @@ alac_decoder_init (ALAC_DECODER *p, void * inMagicCookie, uint32_t inMagicCookie
 		theConfig.sampleRate = psf_get_be32 (theActualCookie, offsetof (ALACSpecificConfig, sampleRate)) ;
 
 		p->mConfig = theConfig ;
+		p->mNumChannels = theConfig.numChannels ;
 
 		RequireAction (p->mConfig.compatibleVersion <= kALACVersion, return kALAC_ParamError ;) ;
 
@@ -132,7 +134,7 @@ Exit:
 	  the bitstream
 */
 int32_t
-alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, uint32_t numSamples, uint32_t numChannels, uint32_t * outNumSamples)
+alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, uint32_t numSamples, uint32_t * outNumSamples)
 {
 	BitBuffer		shiftBits ;
 	uint32_t		bits1, bits2 ;
@@ -161,9 +163,10 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 	int32_t			val ;
 	uint32_t		i, j ;
 	int32_t			status ;
+	uint32_t		numChannels = p->mNumChannels ;
 
 	RequireAction ((bits != NULL) && (sampleBuffer != NULL) && (outNumSamples != NULL), return kALAC_ParamError ;) ;
-	RequireAction (numChannels > 0, return kALAC_ParamError ;) ;
+	RequireAction (p->mNumChannels > 0, return kALAC_ParamError ;) ;
 
 	p->mActiveElements = 0 ;
 	channelIndex	= 0 ;

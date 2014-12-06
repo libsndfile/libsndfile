@@ -52,10 +52,10 @@ typedef enum
 
 static void	GetConfig (ALAC_ENCODER *p, ALACSpecificConfig * config) ;
 
-static int32_t	EncodeStereo (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * input, uint32_t stride, uint32_t channelIndex, uint32_t numSamples) ;
-static int32_t	EncodeStereoFast (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * input, uint32_t stride, uint32_t channelIndex, uint32_t numSamples) ;
-static int32_t	EncodeStereoEscape (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * input, uint32_t stride, uint32_t numSamples) ;
-static int32_t	EncodeMono (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * input, uint32_t stride, uint32_t channelIndex, uint32_t numSamples) ;
+static int32_t	EncodeStereo (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * input, uint32_t stride, uint32_t channelIndex, uint32_t numSamples) ;
+static int32_t	EncodeStereoFast (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * input, uint32_t stride, uint32_t channelIndex, uint32_t numSamples) ;
+static int32_t	EncodeStereoEscape (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * input, uint32_t stride, uint32_t numSamples) ;
+static int32_t	EncodeMono (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * input, uint32_t stride, uint32_t channelIndex, uint32_t numSamples) ;
 
 
 
@@ -225,7 +225,7 @@ alac_set_fastmode (ALAC_ENCODER * p, int32_t fast)
 	- encode a channel pair
 */
 static int32_t
-EncodeStereo (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * inputBuffer, uint32_t stride, uint32_t channelIndex, uint32_t numSamples)
+EncodeStereo (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * inputBuffer, uint32_t stride, uint32_t channelIndex, uint32_t numSamples)
 {
 	BitBuffer		workBits ;
 	BitBuffer		startBits = *bitstream ;			// squirrel away copy of current state in case we need to go back and do an escape packet
@@ -507,7 +507,7 @@ Exit:
 	- encode a channel pair without the search loop for maximum possible speed
 */
 static int32_t
-EncodeStereoFast (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * inputBuffer, uint32_t stride, uint32_t channelIndex, uint32_t numSamples)
+EncodeStereoFast (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * inputBuffer, uint32_t stride, uint32_t channelIndex, uint32_t numSamples)
 {
 	BitBuffer		startBits = *bitstream ;			// squirrel away current bit position in case we decide to use escape hatch
 	AGParamRec		agParams ;
@@ -689,7 +689,7 @@ Exit:
 	- encode stereo escape frame
 */
 static int32_t
-EncodeStereoEscape (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * inputBuffer, uint32_t stride, uint32_t numSamples)
+EncodeStereoEscape (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * inputBuffer, uint32_t stride, uint32_t numSamples)
 {
 	uint8_t			partialFrame ;
 	uint32_t		indx ;
@@ -746,7 +746,7 @@ EncodeStereoEscape (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * inp
 	- encode a mono input buffer
 */
 static int32_t
-EncodeMono (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * inputBuffer, uint32_t stride, uint32_t channelIndex, uint32_t numSamples)
+EncodeMono (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * inputBuffer, uint32_t stride, uint32_t channelIndex, uint32_t numSamples)
 {
 	BitBuffer		startBits = *bitstream ;			// squirrel away copy of current state in case we need to go back and do an escape packet
 	AGParamRec		agParams ;
@@ -964,12 +964,13 @@ Exit:
 	- encode the next block of samples
 */
 int32_t
-alac_encode (ALAC_ENCODER *p, uint32_t numChannels, uint32_t numSamples,
-			int32_t * theReadBuffer, unsigned char * theWriteBuffer, uint32_t * ioNumBytes)
+alac_encode (ALAC_ENCODER *p, uint32_t numSamples,
+			const int32_t * theReadBuffer, unsigned char * theWriteBuffer, uint32_t * ioNumBytes)
 {
 	uint32_t		outputSize ;
 	BitBuffer		bitstream ;
 	int32_t			status ;
+	uint32_t 		numChannels = p->mNumChannels ;
 
 	// create a bit buffer structure pointing to our output buffer
 	BitBufferInit (&bitstream, theWriteBuffer, p->mMaxOutputBytes) ;
@@ -999,7 +1000,7 @@ alac_encode (ALAC_ENCODER *p, uint32_t numChannels, uint32_t numSamples,
 	}
 	else
 	{
-		int32_t *			inputBuffer ;
+		const int32_t *		inputBuffer ;
 		uint32_t			tag ;
 		uint32_t			channelIndex ;
 		uint32_t			inputIncrement ;
