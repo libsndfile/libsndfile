@@ -306,7 +306,7 @@ if test -n "$PKG_CONFIG" ; then
 	if test x$enable_external_libs = xno ; then
 		AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
 	else
-		PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.2.1, ac_cv_flac=yes, ac_cv_flac=no)
+		PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.3.1, ac_cv_flac=yes, ac_cv_flac=no)
 
 		# Make sure the FLAC_CFLAGS value is sane.
 		FLAC_CFLAGS=`echo $FLAC_CFLAGS | $SED "s|include/FLAC|include|"`
@@ -637,6 +637,7 @@ AC_SUBST(SHARED_VERSION_INFO)
 AC_SUBST(CLEAN_VERSION)
 AC_SUBST(WIN_RC_VERSION)
 
+AC_SUBST(HAVE_EXTERNAL_LIBS)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(ALSA_LIBS)
