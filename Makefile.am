@@ -2,7 +2,7 @@
 
 ACLOCAL_AMFLAGS = -I M4
 
-DISTCHECK_CONFIGURE_FLAGS = --enable-gcc-werror
+DISTCHECK_CONFIGURE_FLAGS = --enable-werror
 
 if BUILD_OCTAVE_MOD
 octave_dir = Octave
