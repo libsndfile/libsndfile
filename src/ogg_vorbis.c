@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2002-2005 Michael Smith <msmith@xiph.org>
 ** Copyright (C) 2007 John ffitch
 **
@@ -109,6 +109,8 @@ static STR_PAIRS vorbis_metatypes [] =
 	{	SF_STR_DATE,		"Date" },
 	{	SF_STR_ALBUM,		"Album" },
 	{	SF_STR_LICENSE,		"License" },
+	{	SF_STR_TRACKNUMBER,	"Tracknumber" },
+	{	SF_STR_GENRE, 		"Genre" },
 } ;
 
 typedef struct
@@ -371,14 +373,17 @@ vorbis_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 			break ;
 
 		switch (psf->strings.data [k].type)
-		{	case SF_STR_TITLE :		name = "TITLE" ; break ;
-			case SF_STR_COPYRIGHT : name = "COPYRIGHT" ; break ;
-			case SF_STR_SOFTWARE :	name = "SOFTWARE" ; break ;
-			case SF_STR_ARTIST :	name = "ARTIST" ; break ;
-			case SF_STR_COMMENT :	name = "COMMENT" ; break ;
-			case SF_STR_DATE :		name = "DATE" ; break ;
-			case SF_STR_ALBUM :		name = "ALBUM" ; break ;
-			case SF_STR_LICENSE :	name = "LICENSE" ; break ;
+		{	case SF_STR_TITLE :			name = "TITLE" ; break ;
+			case SF_STR_COPYRIGHT : 	name = "COPYRIGHT" ; break ;
+			case SF_STR_SOFTWARE :		name = "SOFTWARE" ; break ;
+			case SF_STR_ARTIST :		name = "ARTIST" ; break ;
+			case SF_STR_COMMENT :		name = "COMMENT" ; break ;
+			case SF_STR_DATE :			name = "DATE" ; break ;
+			case SF_STR_ALBUM :			name = "ALBUM" ; break ;
+			case SF_STR_LICENSE :		name = "LICENSE" ; break ;
+			case SF_STR_TRACKNUMBER : 	name = "Tracknumber" ; break ;
+			case SF_STR_GENRE : 		name = "Genre" ; break ;
+
 			default : continue ;
 			} ;
 
