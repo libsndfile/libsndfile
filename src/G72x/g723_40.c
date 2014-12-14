@@ -148,6 +148,6 @@ int	g723_40_decoder	(int i, G72x_STATE *state_ptr)
 
 	update (5, y, _witab [i], _fitab [i], dq, sr, dqsez, state_ptr) ;
 
-	return (sr << 2) ;	/* sr was of 14-bit dynamic range */
+	return arith_shift_left (sr, 2) ;	/* sr was of 14-bit dynamic range */
 }
 

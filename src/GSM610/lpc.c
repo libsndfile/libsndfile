@@ -125,14 +125,16 @@ static void Autocorrelation (
 		STEP (5) ; STEP (6) ; STEP (7) ; STEP (8) ;
 		}
 
-	for (k = 9 ; k-- ; L_ACF [k] <<= 1) ;
+	for (k = 9 ; k-- ; )
+		L_ACF [k] = SASL_L (L_ACF [k], 1) ;
 
 	}
 	/*   Rescaling of the array s [0..159]
 	 */
 	if (scalauto > 0)
 	{	assert (scalauto <= 4) ;
-		for (k = 160 ; k-- ; *s++ <<= scalauto) ;
+		for (k = 160 ; k-- ; s++)
+			*s = SASL_W (*s, scalauto) ;
 		}
 }
 
@@ -190,7 +192,7 @@ static void Reflection_coefficients (
 	assert (temp >= 0 && temp < 32) ;
 
 	/* ? overflow ? */
-	for (i = 0 ; i <= 8 ; i++) ACF [i] = SASR_L (L_ACF [i] << temp, 16) ;
+	for (i = 0 ; i <= 8 ; i++) ACF [i] = SASR_L (SASL_L (L_ACF [i], temp), 16) ;
 
 	/*   Initialize array P [..] and K [..] for the recursion.
 	 */

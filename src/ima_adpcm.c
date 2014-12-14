@@ -639,7 +639,7 @@ ima_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = ima_read_block (psf, pima, sptr, readcount) ;
 		for (k = 0 ; k < readcount ; k++)
-			ptr [total + k] = ((int) sptr [k]) << 16 ;
+			ptr [total + k] = arith_shift_left (sptr [k], 16) ;
 		total += count ;
 		len -= readcount ;
 		if (count != readcount)

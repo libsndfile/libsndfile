@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -341,14 +341,14 @@ bei2s_array (int *src, int count, short *dest)
 static inline void
 sc2i_array	(signed char *src, int count, int *dest)
 {	while (--count >= 0)
-	{	dest [count] = ((int) src [count]) << 24 ;
+	{	dest [count] = arith_shift_left ((int) src [count], 24) ;
 		} ;
 } /* sc2i_array */
 
 static inline void
 uc2i_array	(unsigned char *src, int count, int *dest)
 {	while (--count >= 0)
-	{	dest [count] = (((int) src [count]) - 128) << 24 ;
+	{	dest [count] = arith_shift_left (((int) src [count]) - 128, 24) ;
 		} ;
 } /* uc2i_array */
 
@@ -358,7 +358,7 @@ bes2i_array (short *src, int count, int *dest)
 
 	while (--count >= 0)
 	{	value = BE2H_16 (src [count]) ;
-		dest [count] = value << 16 ;
+		dest [count] = arith_shift_left (value, 16) ;
 		} ;
 } /* bes2i_array */
 
@@ -368,7 +368,7 @@ les2i_array (short *src, int count, int *dest)
 
 	while (--count >= 0)
 	{	value = LE2H_16 (src [count]) ;
-		dest [count] = value << 16 ;
+		dest [count] = arith_shift_left (value, 16) ;
 		} ;
 } /* les2i_array */
 

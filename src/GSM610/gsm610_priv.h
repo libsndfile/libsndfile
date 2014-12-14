@@ -63,13 +63,32 @@ typedef struct gsm_state GSM_STATE ;
 /* Signed arithmetic shift right. */
 static inline int16_t
 SASR_W (int16_t x, int16_t by)
-{	return (x >> by) ;
-} /* SASR */
+{	if (x >= 0)
+		return x >> by ;
+	return ~ ((~x) >> by) ;
+} /* SASR_W */
 
 static inline int32_t
 SASR_L (int32_t x, int16_t by)
-{	return (x >> by) ;
-} /* SASR */
+{	if (x >= 0)
+		return x >> by ;
+	return ~ ((~x) >> by) ;
+} /* SASR_L */
+
+/* Signed arithmetic shift left. */
+static inline int16_t
+SASL_W (int16_t x, int16_t by)
+{	if (x >= 0)
+		return x << by ;
+	return - ((-x) << by) ;
+} /* SASR_W */
+
+static inline int32_t
+SASL_L (int32_t x, int16_t by)
+{	if (x >= 0)
+		return x << by ;
+	return - ((-x) << by) ;
+} /* SASR_L */
 
 /*
  *	Prototypes from add.c
@@ -277,6 +296,27 @@ extern int16_t gsm_NRFAC [8] ;
 extern int16_t gsm_FAC [8] ;
 
 #endif	/* GSM_TABLE_C */
+
+
+#if __GNUC__
+#define ALWAYS_INLINE		__attribute__ ((always_inline))
+#else
+#define ALWAYS_INLINE
+#endif
+
+
+static inline int32_t ALWAYS_INLINE
+arith_shift_left (int32_t x, int shift)
+{	return (int32_t) (((uint32_t) x) << shift) ;
+} /* arith_shift_left */
+
+static inline int32_t ALWAYS_INLINE
+arith_shift_right (int32_t x, int shift)
+{	if (x >= 0)
+		return x << shift ;
+	return ~ ((~x) << shift) ;
+} /* arith_shift_right */
+
 
 /*
  *  Debugging

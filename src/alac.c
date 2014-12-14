@@ -637,7 +637,7 @@ alac_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
 		for (k = 0 ; k < writecount ; k++)
-			iptr [k] = ptr [total + k] << 16 ;
+			iptr [k] = arith_shift_left (ptr [total + k], 16) ;
 
 		plac->partial_block_frames += writecount / plac->channels ;
 		total += writecount ;

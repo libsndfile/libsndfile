@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -151,12 +151,14 @@ w64_open	(SF_PRIVATE *psf)
 		{	blockalign = wav_w64_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
 			framesperblock = -1 ;
 
-			/* FIXME : This block must go */
-			psf->filelength = SF_COUNT_MAX ;
+			/*
+			** At this point we don't know the file length so set it stupidly high, but not
+			** so high that it triggers undefined behaviour whan something is added to it.
+			*/
+			psf->filelength = SF_COUNT_MAX - 10000 ;
 			psf->datalength = psf->filelength ;
 			if (psf->sf.frames <= 0)
 				psf->sf.frames = (psf->blockwidth) ? psf->filelength / psf->blockwidth : psf->filelength ;
-			/* EMXIF : This block must go */
 			} ;
 
 		if ((error = w64_write_header (psf, SF_FALSE)))

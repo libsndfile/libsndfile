@@ -106,4 +106,22 @@ int g723_40_decoder	(int code, G72x_STATE *state_ptr) ;
 
 void private_init_state (G72x_STATE *state_ptr) ;
 
+#if __GNUC__
+#define ALWAYS_INLINE		__attribute__ ((always_inline))
+#else
+#define ALWAYS_INLINE
+#endif
+
+static inline int ALWAYS_INLINE
+arith_shift_left (int x, int shift)
+{	return (int) (((unsigned int) x) << shift) ;
+} /* arith_shift_left */
+
+static inline int ALWAYS_INLINE
+arith_shift_right (int x, int shift)
+{	if (x >= 0)
+		return x << shift ;
+	return ~ ((~x) << shift) ;
+} /* arith_shift_right */
+
 #endif /* G72X_PRIVATE_H */

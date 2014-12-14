@@ -1024,11 +1024,6 @@ int sf_dither_double	(const SF_DITHER_INFO *dither, const double *in, double *ou
 ** Data conversion functions.
 */
 
-static inline short
-psf_short_of_int (int x)
-{	return (x >> 16) ;
-}
-
 void psf_f2s_array (const float *src, short *dest, int count, int normalize) ;
 void psf_f2s_clip_array (const float *src, short *dest, int count, int normalize) ;
 
@@ -1041,5 +1036,29 @@ void psf_f2i_clip_array (const float *src, int *dest, int count, int normalize) 
 void psf_d2i_array (const double *src, int *dest, int count, int normalize) ;
 void psf_d2i_clip_array (const double *src, int *dest, int count, int normalize) ;
 
-#endif /* SNDFILE_COMMON_H */
 
+/*------------------------------------------------------------------------------------
+** Left and right shift on int. According to the C standard, the left and right
+** shift operations applied to a negative integer results in undefined behavior.
+** These twp functions work around that.
+*/
+
+#if __GNUC__
+#define ALWAYS_INLINE		__attribute__ ((always_inline))
+#else
+#define ALWAYS_INLINE
+#endif
+
+static inline int32_t ALWAYS_INLINE
+arith_shift_left (int32_t x, int shift)
+{	return (int32_t) (((uint32_t) x) << shift) ;
+} /* arith_shift_left */
+
+static inline int32_t ALWAYS_INLINE
+arith_shift_right (int32_t x, int shift)
+{	if (x >= 0)
+		return x >> shift ;
+	return ~ ((~x) >> shift) ;
+} /* arith_shift_right */
+
+#endif /* SNDFILE_COMMON_H */
