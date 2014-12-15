@@ -79,6 +79,11 @@ exit_if_true (int test, const char *format, ...)
 		} ;
 } /* exit_if_true */
 
+static inline int32_t
+arith_shift_left (int32_t x, int shift)
+{	return (int32_t) (((uint32_t) x) << shift) ;
+} /* arith_shift_left */
+
 /*
 **	Functions for saving two vectors of data in an ascii text file which
 **	can then be loaded into GNU octave for comparison.

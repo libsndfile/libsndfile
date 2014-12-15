@@ -85,8 +85,8 @@ main (int argc, char *argv [])
 	float_scaled_test	("ms_adpcm.wav" , allow_exit, SF_FALSE, SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM, -40.0) ;
 	float_scaled_test	("gsm610.raw"	, allow_exit, SF_FALSE, SF_FORMAT_RAW | SF_FORMAT_GSM610, -33.0) ;
 
-	float_scaled_test	("g721_32.au", allow_exit, SF_FALSE, SF_FORMAT_AU | SF_FORMAT_G721_32, -34.0) ;
-	float_scaled_test	("g723_24.au", allow_exit, SF_FALSE, SF_FORMAT_AU | SF_FORMAT_G723_24, -34.0) ;
+	float_scaled_test	("g721_32.au", allow_exit, SF_FALSE, SF_FORMAT_AU | SF_FORMAT_G721_32, -32.3) ;
+	float_scaled_test	("g723_24.au", allow_exit, SF_FALSE, SF_FORMAT_AU | SF_FORMAT_G723_24, -32.3) ;
 	float_scaled_test	("g723_40.au", allow_exit, SF_FALSE, SF_FORMAT_AU | SF_FORMAT_G723_40, -40.0) ;
 
 	/*	PAF files do not use the same encoding method for 24 bit PCM data as other file
@@ -144,8 +144,8 @@ main (int argc, char *argv [])
 	double_scaled_test	("ms_adpcm.wav"	, allow_exit, SF_FALSE, SF_FORMAT_WAV | SF_FORMAT_MS_ADPCM, -40.0) ;
 	double_scaled_test	("gsm610.raw"	, allow_exit, SF_FALSE, SF_FORMAT_RAW | SF_FORMAT_GSM610, -33.0) ;
 
-	double_scaled_test	("g721_32.au", allow_exit, SF_FALSE, SF_FORMAT_AU | SF_FORMAT_G721_32, -34.0) ;
-	double_scaled_test	("g723_24.au", allow_exit, SF_FALSE, SF_FORMAT_AU | SF_FORMAT_G723_24, -34.0) ;
+	double_scaled_test	("g721_32.au", allow_exit, SF_FALSE, SF_FORMAT_AU | SF_FORMAT_G721_32, -32.3) ;
+	double_scaled_test	("g723_24.au", allow_exit, SF_FALSE, SF_FORMAT_AU | SF_FORMAT_G723_24, -32.3) ;
 	double_scaled_test	("g723_40.au", allow_exit, SF_FALSE, SF_FORMAT_AU | SF_FORMAT_G723_40, -40.0) ;
 
 	/*	24 bit PCM PAF files tested here. */
@@ -159,7 +159,7 @@ main (int argc, char *argv [])
 	double_scaled_test	("adpcm.vox" , allow_exit, SF_FALSE, SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM, -40.0) ;
 
 	double_scaled_test	("dpcm_16.xi", allow_exit, SF_FALSE, SF_FORMAT_XI | SF_FORMAT_DPCM_16, -90.0) ;
-	double_scaled_test	("dpcm_8.xi" , allow_exit, SF_FALSE, SF_FORMAT_XI | SF_FORMAT_DPCM_8 , -42.0) ;
+	double_scaled_test	("dpcm_8.xi" , allow_exit, SF_FALSE, SF_FORMAT_XI | SF_FORMAT_DPCM_8 , -41.0) ;
 
 	double_scaled_test	("pcm_s8.sds", allow_exit, SF_FALSE, SF_FORMAT_SDS | SF_FORMAT_PCM_S8, -90.0) ;
 	double_scaled_test	("pcm_16.sds", allow_exit, SF_FALSE, SF_FORMAT_SDS | SF_FORMAT_PCM_16, -140.0) ;
@@ -203,7 +203,7 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 
 	print_test_name ("float_scaled_test", filename) ;
 
-	gen_windowed_sine_float (float_data, DFT_DATA_LENGTH, 1.0) ;
+	gen_windowed_sine_float (float_data, DFT_DATA_LENGTH, 0.9999) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= DFT_DATA_LENGTH ;
@@ -255,7 +255,7 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 
 	print_test_name ("double_scaled_test", filename) ;
 
-	gen_windowed_sine_double (double_data, DFT_DATA_LENGTH, 0.95) ;
+	gen_windowed_sine_double (double_data, DFT_DATA_LENGTH, 0.9999) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= DFT_DATA_LENGTH ;
@@ -311,7 +311,7 @@ static void
 
 	print_test_name ("[+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test", filename) ;
 
-	gen_windowed_sine_[+ (get "float_name") +] ([+ (get "float_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), 0.98) ;
+	gen_windowed_sine_[+ (get "float_name") +] ([+ (get "float_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), 0.9999) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= ARRAY_LEN ([+ (get "int_name") +]_data) ;
