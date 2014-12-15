@@ -1575,6 +1575,9 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 	bytesread += psf_binheader_readf (psf, "4", &loop_count) ;
 	psf_log_printf (psf, "  Loop Count   : %u\n", loop_count) ;
 
+	if (loop_count == 0 && chunklen == bytesread)
+		return 0 ;
+
 	/* Sampler Data holds the number of data bytes after the CUE chunks which
 	** is not actually CUE data. Display value after CUE data.
 	*/
