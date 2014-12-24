@@ -1616,7 +1616,7 @@ uint2tenbytefloat (unsigned int num, unsigned char *bytes)
 		return ;
 		} ;
 
-	for (count = 0 ; count <= 32 ; count ++)
+	for (count = 0 ; count < 32 ; count ++)
 	{	if (num & mask)
 			break ;
 		mask >>= 1 ;
