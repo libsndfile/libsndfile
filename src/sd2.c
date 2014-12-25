@@ -517,6 +517,11 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 
 	rsrc.type_offset = rsrc.map_offset + 30 ;
 
+	if (rsrc.map_offset + 28 > rsrc.rsrc_len)
+	{	psf_log_printf (psf, "Bad map offset.\n") ;
+		goto parse_rsrc_fork_cleanup ;
+		} ;
+
 	rsrc.type_count = read_rsrc_short (&rsrc, rsrc.map_offset + 28) + 1 ;
 	if (rsrc.type_count < 1)
 	{	psf_log_printf (psf, "Bad type count.\n") ;
@@ -533,7 +538,12 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 
 	rsrc.str_index = -1 ;
 	for (k = 0 ; k < rsrc.type_count ; k ++)
-	{	marker = read_rsrc_marker (&rsrc, rsrc.type_offset + k * 8) ;
+	{	if (rsrc.type_offset + k * 8 > rsrc.rsrc_len)
+		{	psf_log_printf (psf, "Bad rsrc marker.\n") ;
+			goto parse_rsrc_fork_cleanup ;
+			} ;
+
+		marker = read_rsrc_marker (&rsrc, rsrc.type_offset + k * 8) ;
 
 		if (marker == STR_MARKER)
 		{	rsrc.str_index = k ;
