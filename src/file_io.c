@@ -558,12 +558,12 @@ psf_open_fd (PSF_FILE * pfile)
 
 		case SFM_WRITE :
 				oflag = O_WRONLY | O_CREAT | O_TRUNC | O_BINARY ;
-				mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+				mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH ;
 				break ;
 
 		case SFM_RDWR :
 				oflag = O_RDWR | O_CREAT | O_BINARY ;
-				mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
+				mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH ;
 				break ;
 
 		default :
