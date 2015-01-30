@@ -26,6 +26,8 @@ stamp_dir = Build/Stamp
 build_dir = $(shell pwd)/Build
 config_options = --prefix=$(build_dir) --disable-shared
 
+pwd = $(shell pwd)
+
 help :
 	@echo
 	@echo "This script will build libsndfile as a dynamic/shared library but statically linked"
@@ -81,10 +83,13 @@ Build/Stamp/install-libs : Build/Stamp/extract
 	(cd Build/$(flac_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
 	touch $@
 
-Build/Stamp/configure : Build/Stamp/install-libs
+configure : configure.ac
+	./autogen.sh
+
+Build/Stamp/configure : Build/Stamp/install-libs configure
 	PKG_CONFIG_LIBDIR=Build/lib/pkgconfig ./configure
-	sed -i 's#^EXTERNAL_CFLAGS.*#EXTERNAL_CFLAGS = -I/home/erikd/Git/libsndfile/Build/include#' src/Makefile
-	sed -i 's#^EXTERNAL_LIBS.*#EXTERNAL_LIBS = -static /home/erikd/Git/libsndfile/Build/lib/libFLAC.la /home/erikd/Git/libsndfile/Build/lib/libogg.la /home/erikd/Git/libsndfile/Build/lib/libvorbis.la /home/erikd/Git/libsndfile/Build/lib/libvorbisenc.la -dynamic #' src/Makefile
+	sed -i 's#^EXTERNAL_CFLAGS.*#EXTERNAL_CFLAGS = -I$(pwd)/Build/include#' src/Makefile
+	sed -i 's#^EXTERNAL_LIBS.*#EXTERNAL_LIBS = -static $(pwd)/Build/lib/libFLAC.la $(pwd)/Build/lib/libogg.la $(pwd)/Build/lib/libvorbis.la $(pwd)/Build/lib/libvorbisenc.la -dynamic #' src/Makefile
 	touch $@
 
 Build/Stamp/build : Build/Stamp/configure
