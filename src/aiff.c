@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -844,16 +844,19 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			default :
+					if (chunk_size >= 0xffff0000)
+						done = SF_TRUE ;
+
 					if (psf_isprint ((marker >> 24) & 0xFF) && psf_isprint ((marker >> 16) & 0xFF)
 						&& psf_isprint ((marker >> 8) & 0xFF) && psf_isprint (marker & 0xFF))
-					{	psf_log_printf (psf, " %M : %d (unknown marker)\n", marker, chunk_size) ;
+					{	psf_log_printf (psf, " %M : %u (unknown marker)\n", marker, chunk_size) ;
 
 						psf_binheader_readf (psf, "j", chunk_size) ;
 						break ;
 						} ;
-					if ((chunk_size = psf_ftell (psf)) & 0x03)
-					{	psf_log_printf (psf, "  Unknown chunk marker %X at position %d. Resyncing.\n", marker, chunk_size - 4) ;
 
+					if (psf_ftell (psf) & 0x03)
+					{	psf_log_printf (psf, "  Unknown chunk marker at position %D. Resynching.\n", psf_ftell (psf) - 8) ;
 						psf_binheader_readf (psf, "j", -3) ;
 						break ;
 						} ;
