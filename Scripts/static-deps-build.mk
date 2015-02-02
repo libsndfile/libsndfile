@@ -37,7 +37,7 @@ help :
 	@echo "It requires all the normal build tools require to build libsndfile plus wget."
 	@echo
 
-configure : Build/Stamp/configure
+config : Build/Stamp/configure
 
 build : Build/Stamp/build
 
@@ -90,8 +90,10 @@ Build/Stamp/configure : Build/Stamp/install-libs configure
 	PKG_CONFIG_LIBDIR=Build/lib/pkgconfig ./configure
 	sed -i 's#^EXTERNAL_CFLAGS.*#EXTERNAL_CFLAGS = -I$(pwd)/Build/include#' src/Makefile
 	sed -i 's#^EXTERNAL_LIBS.*#EXTERNAL_LIBS = -static $(pwd)/Build/lib/libFLAC.la $(pwd)/Build/lib/libogg.la $(pwd)/Build/lib/libvorbis.la $(pwd)/Build/lib/libvorbisenc.la -dynamic #' src/Makefile
+	make clean
 	touch $@
 
 Build/Stamp/build : Build/Stamp/configure
-	make clean all check
+	make all check
+	touch $@
 
