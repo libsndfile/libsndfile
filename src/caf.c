@@ -392,6 +392,10 @@ caf_read_header (SF_PRIVATE *psf)
 			psf_log_printf (psf, "Have 0 marker at position %D (0x%x).\n", pos, pos) ;
 			break ;
 			} ;
+		if (chunk_size < 0)
+		{	psf_log_printf (psf, "%M : %D *** Should be >= 0 ***\n", marker, chunk_size) ;
+			break ;
+			} ;
 
 		psf_store_read_chunk_u32 (&psf->rchunks, marker, psf_ftell (psf), chunk_size) ;
 
