@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004-2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -355,7 +355,8 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		marker = chunk_size = 0 ;
 		psf_binheader_readf (psf, "jm4", jump, &marker, &chunk_size) ;
 		if (marker == 0)
-		{	psf_log_printf (psf, "Have 0 marker.\n") ;
+		{	sf_count_t pos = psf_ftell (psf) ;
+			psf_log_printf (psf, "Have 0 marker at position %D (0x%x).\n", pos, pos) ;
 			break ;
 			} ;
 

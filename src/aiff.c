@@ -417,7 +417,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 		marker = chunk_size = 0 ;
 		psf_binheader_readf (psf, "Ejm4", jump, &marker, &chunk_size) ;
 		if (marker == 0)
-		{	psf_log_printf (psf, "Have 0 marker.\n") ;
+		{	sf_count_t pos = psf_ftell (psf) ;
+			psf_log_printf (psf, "Have 0 marker at position %D (0x%x).\n", pos, pos) ;
 			break ;
 			} ;
 
