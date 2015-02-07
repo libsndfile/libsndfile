@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -800,21 +800,16 @@ header_read (SF_PRIVATE *psf, void *ptr, int bytes)
 {	int count = 0 ;
 
 	if (psf->headindex >= SIGNED_SIZEOF (psf->header))
-	{	memset (ptr, 0, SIGNED_SIZEOF (psf->header) - psf->headindex) ;
-
-		/* This is the best that we can do. */
-		psf_fseek (psf, bytes, SEEK_CUR) ;
-		return bytes ;
-		} ;
+		return psf_fread (ptr, 1, bytes, psf) ;
 
 	if (psf->headindex + bytes > SIGNED_SIZEOF (psf->header))
 	{	int most ;
 
 		most = SIGNED_SIZEOF (psf->header) - psf->headindex ;
 		psf_fread (psf->header + psf->headend, 1, most, psf) ;
-		memset ((char *) ptr + most, 0, bytes - most) ;
-
-		psf_fseek (psf, bytes - most, SEEK_CUR) ;
+		memcpy (ptr, psf->header + psf->headend, most) ;
+		psf->headend = psf->headindex += most ;
+		psf_fread ((char *) ptr + most, bytes - most, 1, psf) ;
 		return bytes ;
 		} ;
 
@@ -822,7 +817,7 @@ header_read (SF_PRIVATE *psf, void *ptr, int bytes)
 	{	count = psf_fread (psf->header + psf->headend, 1, bytes - (psf->headend - psf->headindex), psf) ;
 		if (count != bytes - (int) (psf->headend - psf->headindex))
 		{	psf_log_printf (psf, "Error : psf_fread returned short count.\n") ;
-			return 0 ;
+			return count ;
 			} ;
 		psf->headend += count ;
 		} ;
@@ -836,7 +831,6 @@ header_read (SF_PRIVATE *psf, void *ptr, int bytes)
 static void
 header_seek (SF_PRIVATE *psf, sf_count_t position, int whence)
 {
-
 	switch (whence)
 	{	case SEEK_SET :
 			if (position > SIGNED_SIZEOF (psf->header))
@@ -885,8 +879,7 @@ header_seek (SF_PRIVATE *psf, sf_count_t position, int whence)
 
 static int
 header_gets (SF_PRIVATE *psf, char *ptr, int bufsize)
-{
-	int		k ;
+{	int		k ;
 
 	for (k = 0 ; k < bufsize - 1 ; k++)
 	{	if (psf->headindex < psf->headend)
@@ -1073,8 +1066,10 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 			case 'j' :
 					/* Get the seek position first. */
 					count = va_arg (argptr, size_t) ;
-					header_seek (psf, count, SEEK_CUR) ;
-					byte_count += count ;
+					if (count)
+					{	header_seek (psf, count, SEEK_CUR) ;
+						byte_count += count ;
+						} ;
 					break ;
 
 			default :
