@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2011-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2011-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -31,7 +31,7 @@
 #include	"ALAC/ALACBitUtilities.h"
 
 #define		ALAC_MAX_FRAME_SIZE		8192
-#define		ALAC_BYTE_BUFFER_SIZE	82000
+#define		ALAC_BYTE_BUFFER_SIZE	0x20000
 
 
 typedef struct
@@ -240,6 +240,11 @@ alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 		return SFE_INTERNAL ;
 		} ;
 
+	if (info->frames_per_packet > ALAC_MAX_FRAME_SIZE)
+	{	psf_log_printf (psf, "*** Error : frames_per_packet (%u) is too big. ***\n", info->frames_per_packet) ;
+		return SFE_INTERNAL ;
+		} ;
+
 	plac = psf->codec_data ;
 
 	plac->channels			= psf->sf.channels ;
@@ -260,6 +265,11 @@ alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 	kuki_size = alac_kuki_read (psf, info->kuki_offset, u.kuki, sizeof (u.kuki)) ;
 
 	alac_decoder_init (&plac->decoder, u.kuki, kuki_size) ;
+
+	if (plac->decoder.mNumChannels != (unsigned) psf->sf.channels)
+	{	psf_log_printf (psf, "*** Initialized decoder has %u channels, but it should be %d. ***\n", plac->decoder.mNumChannels, psf->sf.channels) ;
+		return SFE_INTERNAL ;
+		} ;
 
 	switch (info->bits_per_sample)
 	{	case 16 :

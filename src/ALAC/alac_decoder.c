@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
- * Copyright (C) 2012-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+ * Copyright (C) 2012-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
@@ -216,6 +216,8 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 				{
 					numSamples = BitBufferRead (bits, 16) << 16 ;
 					numSamples |= BitBufferRead (bits, 16) ;
+
+					RequireAction (numSamples < kALACDefaultFramesPerPacket, return kALAC_ParamError ;) ;
 				}
 
 				if (escapeFlag == 0)
@@ -367,6 +369,8 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 				{
 					numSamples = BitBufferRead (bits, 16) << 16 ;
 					numSamples |= BitBufferRead (bits, 16) ;
+
+					RequireAction (numSamples < kALACDefaultFramesPerPacket, return kALAC_ParamError ;) ;
 				}
 
 				if (escapeFlag == 0)
@@ -461,11 +465,11 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 						for (i = 0 ; i < numSamples ; i++)
 						{
 							val = (int32_t) BitBufferRead (bits, 16) ;
-							val = (val << 16) >> shift ;
+							val = (((uint32_t) val) << 16) >> shift ;
 							p->mMixBufferU [i] = val | BitBufferRead (bits, (uint8_t) extraBits) ;
 
 							val = (int32_t) BitBufferRead (bits, 16) ;
-							val = (val << 16) >> shift ;
+							val = ((uint32_t) val) >> shift ;
 							p->mMixBufferV [i] = val | BitBufferRead (bits, (uint8_t) extraBits) ;
 						}
 					}
