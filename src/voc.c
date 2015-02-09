@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -199,7 +199,8 @@ voc_read_header	(SF_PRIVATE *psf)
 	psf->endian = SF_ENDIAN_LITTLE ;
 
 	while (1)
-	{	unsigned size ;
+	{	char header [256] ;
+		unsigned size ;
 		short count ;
 
 		block_type = 0 ;
@@ -211,10 +212,10 @@ voc_read_header	(SF_PRIVATE *psf)
 
 					psf_log_printf (psf, " ASCII : %d\n", size) ;
 
-					if (size < sizeof (psf->header) - 1)
-					{	offset += psf_binheader_readf (psf, "b", psf->header, size) ;
-						psf->header [size] = 0 ;
-						psf_log_printf (psf, "  text : %s\n", psf->header) ;
+					if (size < sizeof (header) - 1)
+					{	offset += psf_binheader_readf (psf, "b", header, size) ;
+						header [size] = 0 ;
+						psf_log_printf (psf, "  text : %s\n", header) ;
 						continue ;
 						}
 
