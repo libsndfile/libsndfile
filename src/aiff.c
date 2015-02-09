@@ -846,7 +846,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 			default :
 					if (chunk_size >= 0xffff0000)
-						done = SF_TRUE ;
+					{	done = SF_TRUE ;
+						psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D with length %u. Exiting parser.\n", marker, psf_ftell (psf) - 8, chunk_size) ;
+						break ;
+						} ;
 
 					if (psf_isprint ((marker >> 24) & 0xFF) && psf_isprint ((marker >> 16) & 0xFF)
 						&& psf_isprint ((marker >> 8) & 0xFF) && psf_isprint (marker & 0xFF))
