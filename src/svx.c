@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -130,7 +130,7 @@ svx_open	(SF_PRIVATE *psf)
 static int
 svx_read_header	(SF_PRIVATE *psf)
 {	VHDR_CHUNK		vhdr ;
-	unsigned int	FORMsize, vhdrsize, dword, marker ;
+	uint32_t		chunk_size, marker ;
 	int				filetype = 0, parsestage = 0, done = 0 ;
 	int 			bytecount = 0, channels ;
 
@@ -146,28 +146,21 @@ svx_read_header	(SF_PRIVATE *psf)
 	psf->sf.format = SF_FORMAT_SVX ;
 
 	while (! done)
-	{	psf_binheader_readf (psf, "m", &marker) ;
+	{	psf_binheader_readf (psf, "Em4", &marker, &chunk_size) ;
+
 		switch (marker)
 		{	case FORM_MARKER :
 					if (parsestage)
 						return SFE_SVX_NO_FORM ;
 
-					psf_binheader_readf (psf, "E4", &FORMsize) ;
-
-					if (FORMsize != psf->filelength - 2 * sizeof (dword))
-					{	dword = psf->filelength - 2 * sizeof (dword) ;
-						psf_log_printf (psf, "FORM : %d (should be %d)\n", FORMsize, dword) ;
-						FORMsize = dword ;
-						}
+					if (chunk_size != psf->filelength - 2 * sizeof (chunk_size))
+						psf_log_printf (psf, "FORM : %u (should be %u)\n", chunk_size, (uint32_t) psf->filelength - 2 * sizeof (chunk_size)) ;
 					else
-						psf_log_printf (psf, "FORM : %d\n", FORMsize) ;
+						psf_log_printf (psf, "FORM : %u\n", chunk_size) ;
 					parsestage |= HAVE_FORM ;
-					break ;
 
-			case SVX8_MARKER :
-			case SV16_MARKER :
-					if (! (parsestage & HAVE_FORM))
-						return SFE_SVX_NO_FORM ;
+					psf_binheader_readf (psf, "m", &marker) ;
+
 					filetype = marker ;
 					psf_log_printf (psf, " %M\n", marker) ;
 					parsestage |= HAVE_SVX ;
@@ -177,9 +170,7 @@ svx_read_header	(SF_PRIVATE *psf)
 					if (! (parsestage & (HAVE_FORM | HAVE_SVX)))
 						return SFE_SVX_NO_FORM ;
 
-					psf_binheader_readf (psf, "E4", &vhdrsize) ;
-
-					psf_log_printf (psf, " VHDR : %d\n", vhdrsize) ;
+					psf_log_printf (psf, " VHDR : %d\n", chunk_size) ;
 
 					psf_binheader_readf (psf, "E4442114", &(vhdr.oneShotHiSamples), &(vhdr.repeatHiSamples),
 						&(vhdr.samplesPerHiCycle), &(vhdr.samplesPerSec), &(vhdr.octave), &(vhdr.compression),
@@ -222,8 +213,7 @@ svx_read_header	(SF_PRIVATE *psf)
 					if (! (parsestage & HAVE_VHDR))
 						return SFE_SVX_NO_BODY ;
 
-					psf_binheader_readf (psf, "E4", &dword) ;
-					psf->datalength = dword ;
+					psf->datalength = chunk_size ;
 
 					psf->dataoffset = psf_ftell (psf) ;
 					if (psf->dataoffset < 0)
@@ -248,39 +238,33 @@ svx_read_header	(SF_PRIVATE *psf)
 					if (! (parsestage & HAVE_SVX))
 						return SFE_SVX_NO_FORM ;
 
-					psf_binheader_readf (psf, "E4", &dword) ;
+					psf_log_printf (psf, " %M : %u\n", marker, chunk_size) ;
 
-					psf_log_printf (psf, " %M : %d\n", marker, dword) ;
-
-					if (strlen (psf->file.name.c) != dword)
-					{	if (dword > sizeof (psf->file.name.c) - 1)
+					if (strlen (psf->file.name.c) != chunk_size)
+					{	if (chunk_size > sizeof (psf->file.name.c) - 1)
 							return SFE_SVX_BAD_NAME_LENGTH ;
 
-						psf_binheader_readf (psf, "b", psf->file.name.c, dword) ;
-						psf->file.name.c [dword] = 0 ;
+						psf_binheader_readf (psf, "b", psf->file.name.c, chunk_size) ;
+						psf->file.name.c [chunk_size] = 0 ;
 						}
 					else
-						psf_binheader_readf (psf, "j", dword) ;
+						psf_binheader_readf (psf, "j", chunk_size) ;
 					break ;
 
 			case ANNO_MARKER :
 					if (! (parsestage & HAVE_SVX))
 						return SFE_SVX_NO_FORM ;
 
-					psf_binheader_readf (psf, "E4", &dword) ;
+					psf_log_printf (psf, " %M : %u\n", marker, chunk_size) ;
 
-					psf_log_printf (psf, " %M : %d\n", marker, dword) ;
-
-					psf_binheader_readf (psf, "j", dword) ;
+					psf_binheader_readf (psf, "j", chunk_size) ;
 					break ;
 
 			case CHAN_MARKER :
 					if (! (parsestage & HAVE_SVX))
 						return SFE_SVX_NO_FORM ;
 
-					psf_binheader_readf (psf, "E4", &dword) ;
-
-					psf_log_printf (psf, " %M : %d\n", marker, dword) ;
+					psf_log_printf (psf, " %M : %u\n", marker, chunk_size) ;
 
 					bytecount += psf_binheader_readf (psf, "E4", &channels) ;
 
@@ -293,7 +277,7 @@ svx_read_header	(SF_PRIVATE *psf)
 					else
 						psf_log_printf (psf, "  Channels : %d *** assuming mono\n", channels) ;
 
-					psf_binheader_readf (psf, "j", dword - bytecount) ;
+					psf_binheader_readf (psf, "j", chunk_size - bytecount) ;
 					break ;
 
 
@@ -302,37 +286,38 @@ svx_read_header	(SF_PRIVATE *psf)
 					if (! (parsestage & HAVE_SVX))
 						return SFE_SVX_NO_FORM ;
 
-					psf_binheader_readf (psf, "E4", &dword) ;
+					psf_log_printf (psf, " %M : %u\n", marker, chunk_size) ;
 
-					psf_log_printf (psf, " %M : %d\n", marker, dword) ;
-
-					psf_binheader_readf (psf, "j", dword) ;
+					psf_binheader_readf (psf, "j", chunk_size) ;
 					break ;
 
 			default :
-					if (psf_isprint ((marker >> 24) & 0xFF) && psf_isprint ((marker >> 16) & 0xFF)
-						&& psf_isprint ((marker >> 8) & 0xFF) && psf_isprint (marker & 0xFF))
-					{	psf_binheader_readf (psf, "E4", &dword) ;
-
-						psf_log_printf (psf, "%M : %d (unknown marker)\n", marker, dword) ;
-
-						psf_binheader_readf (psf, "j", dword) ;
+					if (chunk_size >= 0xffff0000)
+					{	done = SF_TRUE ;
+						psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D with length %u. Exiting parser.\n", marker, psf_ftell (psf) - 8, chunk_size) ;
 						break ;
 						} ;
-					if ((dword = psf_ftell (psf)) & 0x03)
-					{	psf_log_printf (psf, "  Unknown chunk marker at position %d. Resynching.\n", dword - 4) ;
+
+					if (psf_isprint ((marker >> 24) & 0xFF) && psf_isprint ((marker >> 16) & 0xFF)
+						&& psf_isprint ((marker >> 8) & 0xFF) && psf_isprint (marker & 0xFF))
+					{	psf_log_printf (psf, "%M : %u (unknown marker)\n", marker, chunk_size) ;
+						psf_binheader_readf (psf, "j", chunk_size) ;
+						break ;
+						} ;
+					if ((chunk_size = psf_ftell (psf)) & 0x03)
+					{	psf_log_printf (psf, "  Unknown chunk marker at position %d. Resynching.\n", chunk_size - 4) ;
 
 						psf_binheader_readf (psf, "j", -3) ;
 						break ;
 						} ;
-					psf_log_printf (psf, "*** Unknown chunk marker : %X. Exiting parser.\n", marker) ;
-					done = 1 ;
+					psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D. Exiting parser.\n", marker, psf_ftell (psf) - 8) ;
+					done = SF_TRUE ;
 			} ;	/* switch (marker) */
 
 		if (! psf->sf.seekable && (parsestage & HAVE_BODY))
 			break ;
 
-		if (psf_ftell (psf) >= psf->filelength - SIGNED_SIZEOF (dword))
+		if (psf_ftell (psf) >= psf->filelength - SIGNED_SIZEOF (chunk_size))
 			break ;
 		} ; /* while (1) */
 
