@@ -99,6 +99,8 @@ static PAKT_INFO * alac_pakt_append (PAKT_INFO * info, uint32_t value) ;
 static uint8_t * alac_pakt_encode (const SF_PRIVATE *psf, uint32_t * pakt_size) ;
 static sf_count_t alac_pakt_block_offset (const PAKT_INFO *info, uint32_t block) ;
 
+static const char * alac_error_string (int error) ;
+
 /*============================================================================================
 ** ALAC Reader initialisation function.
 */
@@ -233,6 +235,7 @@ static int
 alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 {	ALAC_PRIVATE	*plac ;
 	uint32_t		kuki_size ;
+	int				error ;
 	union			{ uint8_t kuki [512] ; uint32_t alignment ; } u ;
 
 	if (info == NULL)
@@ -264,7 +267,11 @@ alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 	/* Read in the ALAC cookie data and pass it to the init function. */
 	kuki_size = alac_kuki_read (psf, info->kuki_offset, u.kuki, sizeof (u.kuki)) ;
 
-	alac_decoder_init (&plac->decoder, u.kuki, kuki_size) ;
+	if ((error = alac_decoder_init (&plac->decoder, u.kuki, kuki_size)) != ALAC_noErr)
+	{	psf_log_printf (psf, "*** alac_decoder_init() returned %s. ***\n", alac_error_string (error)) ;
+		return SFE_INTERNAL ;
+		} ;
+
 
 	if (plac->decoder.mNumChannels != (unsigned) psf->sf.channels)
 	{	psf_log_printf (psf, "*** Initialized decoder has %u channels, but it should be %d. ***\n", plac->decoder.mNumChannels, psf->sf.channels) ;
@@ -395,7 +402,7 @@ alac_reader_calc_frames (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 static int
 alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 {	ALAC_DECODER *pdec = &plac->decoder ;
-	uint8_t		byte_buffer [ALAC_BYTE_BUFFER_SIZE] ;
+	uint8_t		byte_buffer [psf->sf.channels * ALAC_BYTE_BUFFER_SIZE] ;
 	uint32_t	packet_size ;
 	BitBuffer	bit_buffer ;
 
@@ -408,7 +415,7 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
 	psf_fseek (psf, plac->input_data_pos, SEEK_SET) ;
 
-	if (packet_size > SIGNED_SIZEOF (byte_buffer))
+	if (packet_size > sizeof (byte_buffer))
 	{	psf_log_printf (psf, "%s : bad packet_size (%u)\n", __func__, packet_size) ;
 		return 0 ;
 		} ;
@@ -958,3 +965,31 @@ alac_kuki_read (SF_PRIVATE * psf, uint32_t kuki_offset, uint8_t * kuki, size_t k
 
 	return kuki_size ;
 } /* alac_kuki_read */
+
+#define CASE_NAME(x)	case x : return #x ; break ;
+
+static const char *
+alac_error_string (int error)
+{	static char errstr [128] ;
+	switch (error)
+	{	CASE_NAME (kALAC_UnimplementedError) ;
+		CASE_NAME (kALAC_FileNotFoundError) ;
+		CASE_NAME (kALAC_ParamError) ;
+		CASE_NAME (kALAC_MemFullError) ;
+		CASE_NAME (fALAC_FrameLengthError) ;
+
+		/* Added for libsndfile */
+		CASE_NAME (kALAC_BadBitWidth) ;
+		CASE_NAME (kALAC_IncompatibleVersion) ;
+		CASE_NAME (kALAC_BadSpecificConfigSize) ;
+		CASE_NAME (kALAC_ZeroChannelCount) ;
+		CASE_NAME (kALAC_NumSamplesTooBig) ;
+		CASE_NAME (kALAC_UnsupportedElement) ;
+		default :
+			break ;
+		} ;
+
+	snprintf (errstr, sizeof (errstr), "Unknown error %d", error) ;
+	return errstr ;
+} /* alac_error_string */
+

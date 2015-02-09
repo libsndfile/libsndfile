@@ -108,14 +108,14 @@ alac_decoder_init (ALAC_DECODER *p, void * inMagicCookie, uint32_t inMagicCookie
 		p->mConfig = theConfig ;
 		p->mNumChannels = theConfig.numChannels ;
 
-		RequireAction (p->mConfig.compatibleVersion <= kALACVersion, return kALAC_ParamError ;) ;
-
+		RequireAction (p->mConfig.compatibleVersion <= kALACVersion, return kALAC_IncompatibleVersion ;) ;
+		RequireAction ((p->mConfig.bitDepth >= 8 && p->mConfig.bitDepth <= 32), return kALAC_BadBitWidth ;) ;
 		RequireAction ((p->mMixBufferU != NULL) && (p->mMixBufferV != NULL) && (p->mPredictor != NULL),
 						status = kALAC_MemFullError ; goto Exit ;) ;
 	}
 	else
 	{
-		status = kALAC_ParamError ;
+		status = kALAC_BadSpecificConfigSize ;
 	}
 
 	// skip to Channel Layout Info
@@ -166,7 +166,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 	uint32_t		numChannels = p->mNumChannels ;
 
 	RequireAction ((bits != NULL) && (sampleBuffer != NULL) && (outNumSamples != NULL), return kALAC_ParamError ;) ;
-	RequireAction (p->mNumChannels > 0, return kALAC_ParamError ;) ;
+	RequireAction (p->mNumChannels > 0, return kALAC_ZeroChannelCount ;) ;
 
 	p->mActiveElements = 0 ;
 	channelIndex	= 0 ;
@@ -217,7 +217,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 					numSamples = BitBufferRead (bits, 16) << 16 ;
 					numSamples |= BitBufferRead (bits, 16) ;
 
-					RequireAction (numSamples < kALACDefaultFramesPerPacket, return kALAC_ParamError ;) ;
+					RequireAction (numSamples < kALACDefaultFramesPerPacket, return kALAC_NumSamplesTooBig ;) ;
 				}
 
 				if (escapeFlag == 0)
@@ -370,7 +370,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 					numSamples = BitBufferRead (bits, 16) << 16 ;
 					numSamples |= BitBufferRead (bits, 16) ;
 
-					RequireAction (numSamples < kALACDefaultFramesPerPacket, return kALAC_ParamError ;) ;
+					RequireAction (numSamples < kALACDefaultFramesPerPacket, return kALAC_NumSamplesTooBig ;) ;
 				}
 
 				if (escapeFlag == 0)
@@ -527,7 +527,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 			{
 				// unsupported element, bail
 				//AssertNoErr (tag) ;
-				status = kALAC_ParamError ;
+				status = kALAC_UnsupportedElement ;
 				break ;
 			}
 
