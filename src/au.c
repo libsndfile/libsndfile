@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -437,8 +437,12 @@ au_read_header (SF_PRIVATE *psf)
 	{	psf_log_printf (psf, "  Channels    : %d  **** should be >= 1\n", au_fmt.channels) ;
 		return SFE_CHANNEL_COUNT_ZERO ;
 		}
-	else
-		psf_log_printf (psf, "  Channels    : %d\n", au_fmt.channels) ;
+	else if (au_fmt.channels > SF_MAX_CHANNELS)
+	{	psf_log_printf (psf, "  Channels    : %d  **** should be <= %d\n", au_fmt.channels, SF_MAX_CHANNELS) ;
+		return SFE_CHANNEL_COUNT ;
+		} ;
+
+	psf_log_printf (psf, "  Channels    : %d\n", au_fmt.channels) ;
 
 	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
 
