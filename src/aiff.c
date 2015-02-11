@@ -891,6 +891,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 			} ;
 		} ;
 
+	if (psf->sf.channels < 1)
+		return SFE_CHANNEL_COUNT_ZERO ;
+
+	if (psf->sf.channels >= SF_MAX_CHANNELS)
+		return SFE_CHANNEL_COUNT ;
+
 	if (! (found_chunk & HAVE_FORM))
 		return SFE_AIFF_NO_FORM ;
 
