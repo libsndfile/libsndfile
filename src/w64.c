@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -307,8 +307,7 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					psf_binheader_readf (psf, "e8", &chunk_size) ;
 
 					psf->dataoffset = psf_ftell (psf) ;
-
-					psf->datalength = chunk_size - 24 ;
+					psf->datalength = SF_MIN (chunk_size - 24, psf->filelength - psf->dataoffset) ;
 
 					if (chunk_size % 8)
 						chunk_size += 8 - (chunk_size % 8) ;
