@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -41,6 +41,7 @@
 typedef struct
 {	int				channels, blocksize, samplesperblock, blocks, dataremaining ;
 	int				blockcount ;
+	int				sync_error ;
 	sf_count_t		samplecount ;
 	short			*samples ;
 	unsigned char	*block ;
@@ -142,6 +143,7 @@ wav_w64_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 		return SFE_MALLOC_FAILED ;
 	pms = (MSADPCM_PRIVATE*) psf->codec_data ;
 
+	pms->sync_error = 0 ;
 	pms->samples	= pms->dummydata ;
 	pms->block		= (unsigned char*) (pms->dummydata + psf->sf.channels * samplesperblock) ;
 
@@ -197,6 +199,20 @@ wav_w64_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 	return 0 ;
 } /* wav_w64_msadpcm_init */
 
+
+static inline short
+msadpcm_get_bpred (SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, unsigned char value)
+{	if (value >= MSADPCM_ADAPT_COEFF_COUNT)
+	{	if (pms->sync_error == 0)
+		{	pms->sync_error = 1 ;
+			psf_log_printf (psf, "MS ADPCM synchronisation error (%u should be < %u).\n", value, MSADPCM_ADAPT_COEFF_COUNT) ;
+			} ;
+		return 0 ;
+		} ;
+	return value ;
+} /* msadpcm_get_bpred */
+
+
 static int
 msadpcm_decode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 {	int		chan, k, blockindx, sampleindx ;
@@ -220,10 +236,7 @@ msadpcm_decode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 	/* Read and check the block header. */
 
 	if (pms->channels == 1)
-	{	bpred [0] = pms->block [0] ;
-
-		if (bpred [0] >= 7)
-			psf_log_printf (psf, "MS ADPCM synchronisation error (%d).\n", bpred [0]) ;
+	{	bpred [0] = msadpcm_get_bpred (psf, pms, pms->block [0]) ;
 
 		chan_idelta [0] = pms->block [1] | (pms->block [2] << 8) ;
 		chan_idelta [1] = 0 ;
@@ -235,11 +248,8 @@ msadpcm_decode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 		blockindx = 7 ;
 		}
 	else
-	{	bpred [0] = pms->block [0] ;
-		bpred [1] = pms->block [1] ;
-
-		if (bpred [0] >= 7 || bpred [1] >= 7)
-			psf_log_printf (psf, "MS ADPCM synchronisation error (%d %d).\n", bpred [0], bpred [1]) ;
+	{	bpred [0] = msadpcm_get_bpred (psf, pms, pms->block [0]) ;
+		bpred [1] = msadpcm_get_bpred (psf, pms, pms->block [1]) ;
 
 		chan_idelta [0] = pms->block [2] | (pms->block [3] << 8) ;
 		chan_idelta [1] = pms->block [4] | (pms->block [5] << 8) ;
