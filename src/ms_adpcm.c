@@ -172,8 +172,6 @@ wav_w64_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 
 		psf->sf.frames = (psf->datalength / pms->blocksize) * pms->samplesperblock ;
 
-		psf_log_printf (psf, " bpred   idelta\n") ;
-
 		msadpcm_decode_block (psf, pms) ;
 
 		psf->read_short		= msadpcm_read_s ;
@@ -231,7 +229,10 @@ msadpcm_decode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 		} ;
 
 	if ((k = psf_fread (pms->block, 1, pms->blocksize, psf)) != pms->blocksize)
-		psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, pms->blocksize) ;
+	{	psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, pms->blocksize) ;
+		if (k <= 0)
+			return 1 ;
+		} ;
 
 	/* Read and check the block header. */
 
@@ -240,8 +241,6 @@ msadpcm_decode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 
 		chan_idelta [0] = pms->block [1] | (pms->block [2] << 8) ;
 		chan_idelta [1] = 0 ;
-
-		psf_log_printf (psf, "(%d) (%d)\n", bpred [0], chan_idelta [0]) ;
 
 		pms->samples [1] = pms->block [3] | (pms->block [4] << 8) ;
 		pms->samples [0] = pms->block [5] | (pms->block [6] << 8) ;
@@ -253,8 +252,6 @@ msadpcm_decode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 
 		chan_idelta [0] = pms->block [2] | (pms->block [3] << 8) ;
 		chan_idelta [1] = pms->block [4] | (pms->block [5] << 8) ;
-
-		psf_log_printf (psf, "(%d, %d) (%d, %d)\n", bpred [0], bpred [1], chan_idelta [0], chan_idelta [1]) ;
 
 		pms->samples [2] = pms->block [6] | (pms->block [7] << 8) ;
 		pms->samples [3] = pms->block [8] | (pms->block [9] << 8) ;
@@ -314,7 +311,7 @@ msadpcm_decode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 		pms->samples [k] = current ;
 		} ;
 
-	return 1 ;
+	return 0 ;
 } /* msadpcm_decode_block */
 
 static sf_count_t
@@ -328,7 +325,8 @@ msadpcm_read_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, short *ptr, int len)
 			} ;
 
 		if (pms->samplecount >= pms->samplesperblock)
-			msadpcm_decode_block (psf, pms) ;
+			if (msadpcm_decode_block (psf, pms) != 0)
+				return total ;
 
 		count = (pms->samplesperblock - pms->samplecount) * pms->channels ;
 		count = (len - indx > count) ? count : len - indx ;
@@ -355,7 +353,8 @@ msadpcm_read_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	while (len > 0)
 	{	readcount = (len > 0x10000000) ? 0x10000000 : (int) len ;
 
-		count = msadpcm_read_block (psf, pms, ptr, readcount) ;
+		if ((count = msadpcm_read_block (psf, pms, ptr, readcount)) <= 0)
+			return -1 ;
 
 		total += count ;
 		len -= count ;
@@ -382,7 +381,10 @@ msadpcm_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
-		count = msadpcm_read_block (psf, pms, sptr, readcount) ;
+
+		if ((count = msadpcm_read_block (psf, pms, sptr, readcount)) <= 0)
+			return -1 ;
+
 		for (k = 0 ; k < readcount ; k++)
 			ptr [total + k] = arith_shift_left (sptr [k], 16) ;
 		total += count ;
@@ -411,7 +413,10 @@ msadpcm_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
-		count = msadpcm_read_block (psf, pms, sptr, readcount) ;
+
+		if ((count = msadpcm_read_block (psf, pms, sptr, readcount)) <= 0)
+			return -1 ;
+
 		for (k = 0 ; k < readcount ; k++)
 			ptr [total + k] = normfact * (float) (sptr [k]) ;
 		total += count ;
@@ -431,17 +436,19 @@ msadpcm_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	sf_count_t	total = 0 ;
 	double 		normfact ;
 
-	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x8000) : 1.0 ;
-
 	if (! psf->codec_data)
 		return 0 ;
 	pms = (MSADPCM_PRIVATE*) psf->codec_data ;
 
+	normfact = (psf->norm_double == SF_TRUE) ? 1.0 / ((double) 0x8000) : 1.0 ;
 	sptr = ubuf.sbuf ;
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
-		count = msadpcm_read_block (psf, pms, sptr, readcount) ;
+
+		if ((count = msadpcm_read_block (psf, pms, sptr, readcount)) <= 0)
+			return -1 ;
+
 		for (k = 0 ; k < readcount ; k++)
 			ptr [total + k] = normfact * (double) (sptr [k]) ;
 		total += count ;
@@ -449,6 +456,7 @@ msadpcm_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 		if (count != readcount)
 			break ;
 		} ;
+
 	return total ;
 } /* msadpcm_read_d */
 
