@@ -451,8 +451,6 @@ caf_read_header (SF_PRIVATE *psf)
 
 			case data_MARKER :
 				psf_binheader_readf (psf, "E4", &k) ;
-				psf_log_printf (psf, "  edit : %u\n", k) ;
-
 				if (chunk_size == -1)
 				{	psf_log_printf (psf, "%M : -1\n") ;
 					chunk_size = psf->filelength - psf->headindex ;
@@ -462,13 +460,14 @@ caf_read_header (SF_PRIVATE *psf)
 				else
 					psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
 
+				psf_log_printf (psf, "  edit : %u\n", k) ;
 
 				psf->dataoffset = psf->headindex ;
 
 				/* Subtract the 4 bytes of the 'edit' field above. */
 				psf->datalength = chunk_size - 4 ;
 
-				psf_binheader_readf (psf, "j", psf->datalength) ;
+				psf_binheader_readf (psf, "j", make_size_t (psf->datalength)) ;
 				have_data = 1 ;
 				break ;
 
