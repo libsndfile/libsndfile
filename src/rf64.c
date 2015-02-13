@@ -328,6 +328,12 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	if (psf->dataoffset <= 0)
 		return SFE_WAV_NO_DATA ;
 
+	if (psf->sf.channels < 1)
+		return SFE_CHANNEL_COUNT_ZERO ;
+
+	if (psf->sf.channels >= SF_MAX_CHANNELS)
+		return SFE_CHANNEL_COUNT ;
+
 	/* WAVs can be little or big endian */
 	psf->endian = psf->rwf_endian ;
 

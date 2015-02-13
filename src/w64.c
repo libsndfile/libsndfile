@@ -375,6 +375,12 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	if (psf->dataoffset <= 0)
 		return SFE_W64_NO_DATA ;
 
+	if (psf->sf.channels < 1)
+		return SFE_CHANNEL_COUNT_ZERO ;
+
+	if (psf->sf.channels >= SF_MAX_CHANNELS)
+		return SFE_CHANNEL_COUNT ;
+
 	psf->endian = SF_ENDIAN_LITTLE ;		/* All W64 files are little endian. */
 
 	if (psf_ftell (psf) != psf->dataoffset)
