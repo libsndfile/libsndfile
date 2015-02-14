@@ -296,8 +296,8 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 			default :
 					if (chunk_size >= 0xffff0000)
-					{	done = SF_TRUE ;
-						psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D with length %u. Exiting parser.\n", marker, psf_ftell (psf) - 8, chunk_size) ;
+					{	psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D with length %u. Exiting parser.\n", marker, psf_ftell (psf) - 8, chunk_size) ;
+						done = SF_TRUE ;
 						break ;
 						} ;
 
@@ -316,8 +316,16 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						} ;
 					psf_log_printf (psf, "*** Unknown chunk marker (0x%X) at position 0x%X. Exiting parser.\n", marker, psf_ftell (psf) - 4) ;
 					done = SF_TRUE ;
-				break ;
+					break ;
 			} ;	/* switch (marker) */
+
+		/* The 'data' chunk, a chunk size of 0xffffffff means that the 'data' chunk size
+		** is actually given by the ds64_datalength field.
+		*/
+		if (marker != data_MARKER && chunk_size >= psf->filelength)
+		{	psf_log_printf (psf, "*** Chunk size %u > file length %D. Exiting parser.\n", chunk_size, psf->filelength) ;
+			break ;
+			} ;
 
 		if (psf_ftell (psf) >= psf->filelength - SIGNED_SIZEOF (marker))
 		{	psf_log_printf (psf, "End\n") ;

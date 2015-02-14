@@ -869,8 +869,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 			} ;	/* switch (marker) */
 
-		if (marker != SSND_MARKER && chunk_size >= 0xffffff00)
+		if (chunk_size >= psf->filelength)
+		{	psf_log_printf (psf, "*** Chunk size %u > file length %D. Exiting parser.\n", chunk_size, psf->filelength) ;
 			break ;
+			} ;
 
 		if ((! psf->sf.seekable) && (found_chunk & HAVE_SSND))
 			break ;

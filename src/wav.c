@@ -670,8 +670,10 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					break ;
 			} ;	/* switch (marker) */
 
-		if (marker != data_MARKER && chunk_size >= 0xffffff00)
+		if (chunk_size >= psf->filelength)
+		{	psf_log_printf (psf, "*** Chunk size %u > file length %D. Exiting parser.\n", chunk_size, psf->filelength) ;
 			break ;
+			} ;
 
 		if (! psf->sf.seekable && (parsestage & HAVE_data))
 			break ;

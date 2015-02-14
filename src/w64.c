@@ -360,6 +360,11 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					break ;
 			} ;	/* switch (dword) */
 
+		if (chunk_size >= psf->filelength)
+		{	psf_log_printf (psf, "*** Chunk size %u > file length %D. Exiting parser.\n", chunk_size, psf->filelength) ;
+			break ;
+			} ;
+
 		if (psf->sf.seekable == 0 && (parsestage & HAVE_data))
 			break ;
 
