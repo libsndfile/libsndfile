@@ -190,6 +190,11 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 		switch (marker)
 		{	case ds64_MARKER :
+				if (parsestage & HAVE_ds64)
+				{	psf_log_printf (psf, "*** Second 'ds64' chunk?\n") ;
+					break ;
+					} ;
+
 				{	unsigned int table_len, bytesread ;
 
 					/* Read ds64 sizes (3 8-byte words). */
