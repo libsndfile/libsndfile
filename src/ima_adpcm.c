@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -200,8 +200,13 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 	psf->datalength = (psf->dataend) ? psf->dataend - psf->dataoffset :
 							psf->filelength - psf->dataoffset ;
 
-	if (pima->blocksize == 0)
-	{	psf_log_printf (psf, "*** Error : pima->blocksize should not be zero.\n") ;
+	if (pima->blocksize <= 0)
+	{	psf_log_printf (psf, "*** Error : pima->blocksize should be > 0.\n") ;
+		return SFE_INTERNAL ;
+		} ;
+
+	if (pima->samplesperblock <= 0)
+	{	psf_log_printf (psf, "*** Error : pima->samplesperblock should be > 0.\n") ;
 		return SFE_INTERNAL ;
 		} ;
 

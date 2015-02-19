@@ -137,6 +137,11 @@ wav_w64_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 	if (psf->file.mode == SFM_WRITE)
 		samplesperblock = 2 + 2 * (blockalign - 7 * psf->sf.channels) / psf->sf.channels ;
 
+	if (blockalign < 7 * psf->sf.channels)
+	{	psf_log_printf (psf, "*** Error blockalign (%d) should be > %d.\n", blockalign, 7 * psf->sf.channels) ;
+		return SFE_INTERNAL ;
+		} ;
+
 	pmssize = sizeof (MSADPCM_PRIVATE) + blockalign + 3 * psf->sf.channels * samplesperblock ;
 
 	if (! (psf->codec_data = calloc (1, pmssize)))
@@ -151,8 +156,8 @@ wav_w64_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 	pms->blocksize	= blockalign ;
 	pms->samplesperblock = samplesperblock ;
 
-	if (pms->blocksize == 0)
-	{	psf_log_printf (psf, "*** Error : pms->blocksize should not be zero.\n") ;
+	if (pms->blocksize <= 0)
+	{	psf_log_printf (psf, "*** Error : pms->blocksize should be > 0.\n") ;
 		return SFE_INTERNAL ;
 		} ;
 
