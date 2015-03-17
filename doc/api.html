@@ -63,6 +63,7 @@ The functions of libsndfile are defined as follows:
       #include &lt;sndfile.h&gt;
 
       SNDFILE*    <A HREF="#open">sf_open</A>          (const char *path, int mode, SF_INFO *sfinfo) ;
+      SNDFILE*    <A HREF="#open">sf_wchar_open</A>    (LPCWSTR wpath, int mode, SF_INFO *sfinfo) ;
       SNDFILE*    <A HREF="#open_fd">sf_open_fd</A>       (int fd, int mode, SF_INFO *sfinfo, int close_desc) ;
       SNDFILE* 	  <A HREF="#open_virtual">sf_open_virtual</A>  (SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data) ;
       int         <A HREF="#check">sf_format_check</A>  (const SF_INFO *info) ;
@@ -119,6 +120,18 @@ SNDFILE* is an anonymous pointer to data which is private to the library.
 
 <PRE>
       SNDFILE*  sf_open    (const char *path, int mode, SF_INFO *sfinfo) ;
+</PRE>
+
+<P>
+The sf_open() function opens the sound file at the specified path.
+The filename is byte encoded, but may be utf-8 on Linux, while on Mac OS X it
+will use the filesystem character set.
+On Windows, there is also a Windows specific sf_wchar_open() that takes a
+UTF16_BE encoded filename.
+</P>
+
+<PRE>
+      SNDFILE*  sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo) ;
 </PRE>
 
 <P>
@@ -714,9 +727,20 @@ It returns zero on success and non-zero on error.
 The error code can be converted to a string using sf_error_number().
 </P>
 
+<P>
+Strings passed to and retrieved from these two functions are assumed to be
+utf-8.
+However, while formats like Ogg/Vorbis and FLAC fully support utf-8, others
+like WAV and AIFF officially only support ASCII.
+Writing utf-8 strings to WAV and AIF files with libsndfile will work when read
+back with libsndfile, but may not work with other programs.
+</P>
 
 <P>
-
+The suggested method of dealing with tags retrived using sf_get_string() is to
+assume they are utf-8.
+Similarly if you have a string in some exotic format like utf-16, it should be
+encoded to utf-8 before being written using libsndfile.
 </P>
 
 <HR>
