@@ -105,6 +105,8 @@
 #define ICMT_MARKER		(MAKE_MARKER ('I', 'C', 'M', 'T'))
 #define IAUT_MARKER		(MAKE_MARKER ('I', 'A', 'U', 'T'))
 #define ITRK_MARKER		(MAKE_MARKER ('I', 'T', 'R', 'K'))
+#define ISRF_MARKER		(MAKE_MARKER ('I', 'S', 'R', 'F'))
+#define IMED_MARKER		(MAKE_MARKER ('I', 'M', 'E', 'D'))
 
 /* Weird WAVPACK marker which can show up at the start of the DATA section. */
 #define wvpk_MARKER (MAKE_MARKER ('w', 'v', 'p', 'k'))
@@ -1287,6 +1289,14 @@ wav_write_strings (SF_PRIVATE *psf, int location)
 				psf_binheader_writef (psf, "ms", ITRK_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
 				break ;
 
+			case SF_STR_INTROMS :
+				psf_binheader_writef (psf, "ms", ISRF_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				break ;
+
+			case SF_STR_SEGUEMS :
+				psf_binheader_writef (psf, "ms", IMED_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				break ;
+
 			default :
 				break ;
 			} ;
@@ -1534,6 +1544,12 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 					break ;
 			case ITRK_MARKER :
 					psf_store_string (psf, SF_STR_TRACKNUMBER, buffer) ;
+					break ;
+			case ISRF_MARKER :
+					psf_store_string (psf, SF_STR_INTROMS, buffer) ;
+					break ;
+			case IMED_MARKER :
+					psf_store_string (psf, SF_STR_SEGUEMS, buffer) ;
 					break ;
 			} ;
 		} ;

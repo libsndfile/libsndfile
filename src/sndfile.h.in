@@ -214,7 +214,12 @@ enum
 	** They currently do nothing and will continue to do nothing.
 	*/
 	SFC_SET_ADD_DITHER_ON_WRITE		= 0x1070,
-	SFC_SET_ADD_DITHER_ON_READ		= 0x1071
+	SFC_SET_ADD_DITHER_ON_READ		= 0x1071,
+	
+	/* Allow setting & reading INFO Chunk Strings */
+	
+	SFC_GET_LIST_STRING				= 0x1501,
+	SFC_SET_LIST_STRING				= 0x1502
 } ;
 
 
@@ -234,7 +239,9 @@ enum
 	SF_STR_ALBUM					= 0x07,
 	SF_STR_LICENSE					= 0x08,
 	SF_STR_TRACKNUMBER				= 0x09,
-	SF_STR_GENRE					= 0x10
+	SF_STR_GENRE					= 0x10,
+	SF_STR_INTROMS					= 0x0a,
+	SF_STR_SEGUEMS					= 0x0b
 } ;
 
 /*
@@ -243,7 +250,7 @@ enum
 */
 
 #define	SF_STR_FIRST	SF_STR_TITLE
-#define	SF_STR_LAST		SF_STR_GENRE
+#define	SF_STR_LAST		SF_STR_SEGUEMS
 
 enum
 {	/* True and false */
@@ -500,6 +507,14 @@ typedef struct SF_CART_TIMER SF_CART_TIMER ;
 			}
 
 typedef SF_CART_INFO_VAR (256) SF_CART_INFO ;
+
+#define	SF_LIST_STRING_VAR(p_string_size) \
+			struct \
+			{	int			list_enum ; \
+				char		value[p_string_size] ; \
+			}
+
+typedef SF_LIST_STRING_VAR (2048) SF_LIST_STRING ;
 
 /*	Virtual I/O functionality. */
 

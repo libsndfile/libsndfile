@@ -1316,6 +1316,44 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			quality = 1.0 - SF_MAX (0.0, SF_MIN (1.0, quality)) ;
 			return sf_command (sndfile, SFC_SET_COMPRESSION_LEVEL, &quality, sizeof (quality)) ;
 
+		case SFC_GET_LIST_STRING :
+			if (data == NULL || datasize < 10)
+			{
+				return SF_FALSE ;
+			} else
+			{
+				SF_LIST_STRING* liststr = (SF_LIST_STRING*) data ;
+				const char* str = psf_get_string (psf, liststr->list_enum) ;
+				int ssize = datasize - sizeof (int) ;
+				if (liststr->list_enum < SF_STR_FIRST)
+					return SF_FALSE ;
+
+				if (!str)
+					return SF_FALSE ;
+				strncpy (liststr->value, str, ssize-1) ;
+				liststr->value [ssize-1] = 0 ;
+			}
+			return SF_TRUE ;
+
+		case SFC_SET_LIST_STRING :
+			if (data == NULL || datasize < 10)
+			{
+				return SF_FALSE ;
+			} else
+			{
+				SF_LIST_STRING* liststr = (SF_LIST_STRING*) data ;
+				int ret = psf_store_string (psf, liststr->list_enum, liststr->value) ;
+				if (ret != 0)
+				{
+					return SF_FALSE ;
+				}
+				if (psf->strings.flags | SF_STR_LOCATE_START || psf->strings.flags | SF_STR_LOCATE_END)
+				{
+					return SF_TRUE ;
+				}
+				psf->strings.flags |= SF_STR_LOCATE_END ;
+			}
+			return SF_TRUE ;
 
 		default :
 			/* Must be a file specific command. Pass it on. */

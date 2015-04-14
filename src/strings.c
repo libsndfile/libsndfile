@@ -118,6 +118,8 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 		case SF_STR_LICENSE :
 		case SF_STR_TRACKNUMBER :
 		case SF_STR_GENRE :
+		case SF_STR_INTROMS:
+		case SF_STR_SEGUEMS:
 				break ;
 
 		default :
