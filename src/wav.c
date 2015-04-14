@@ -1454,6 +1454,8 @@ wav_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 			case ISRC_MARKER :
 			case IAUT_MARKER :
 			case ITRK_MARKER :
+			case ISRF_MARKER :
+			case IMED_MARKER :
 					bytesread += psf_binheader_readf (psf, "4", &chunk_size) ;
 					chunk_size += (chunk_size & 1) ;
 					if (chunk_size >= SIGNED_SIZEOF (buffer) || chunk_size >= chunk_length)
