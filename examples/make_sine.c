@@ -68,6 +68,7 @@ main (void)
 
 	if (! (file = sf_open ("sine.wav", SFM_WRITE, &sfinfo)))
 	{	printf ("Error : Not able to open output file.\n") ;
+		free (buffer) ;
 		return 1 ;
 		} ;
 
@@ -91,6 +92,7 @@ main (void)
 		puts (sf_strerror (file)) ;
 
 	sf_close (file) ;
+	free (buffer) ;
 	return 0 ;
 } /* main */
 
