@@ -10,8 +10,13 @@ export CC = afl-gcc
 export CXX = afl-g++
 
 fuzz : programs/sndfile-info
-	mkdir -p afl/out
-	afl-fuzz -t 400 -m -1 -i afl/in -o afl/out -- programs/sndfile-info @@
+	mkdir -p fuzzing/out
+	afl-fuzz -t 400 -m -1 -i fuzzing/in -o fuzzing/out -- programs/sndfile-info @@
+
+clean :
+	rm -rf fuzzing/out/*
+	make clean
+	touch configure.ac
 
 configure : configure.ac
 	./autogen.sh
