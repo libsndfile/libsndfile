@@ -1,5 +1,7 @@
 # libsndfile
 
+[![Build Status](https://secure.travis-ci.org/erikd/libsndfile.png?branch=master)](http://travis-ci.org/erikd/libsndfile)
+
 libsndfile is a C library for reading and writing files containing sampled audio
 data.
 

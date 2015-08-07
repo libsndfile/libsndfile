@@ -1,0 +1,11 @@
+language: c
+
+sudo: required
+
+before_install:
+  - sudo apt-get install -y libogg-dev libflac-dev libvorbis-dev
+
+script:
+  - ./autogen.sh
+  - ./configure
+  - make distcheck
