@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
- * Copyright (C) 2012-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+ * Copyright (C) 2012-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
@@ -972,6 +972,9 @@ alac_encode (ALAC_ENCODER *p, uint32_t numSamples,
 	int32_t			status ;
 	uint32_t 		numChannels = p->mNumChannels ;
 
+	// make sure we handle this bit-depth before we get going
+	RequireAction ((p->mBitDepth == 16) || (p->mBitDepth == 20) || (p->mBitDepth == 24) || (p->mBitDepth == 32), return kALAC_ParamError ;) ;
+
 	// create a bit buffer structure pointing to our output buffer
 	BitBufferInit (&bitstream, theWriteBuffer, p->mMaxOutputBytes) ;
 
@@ -1003,13 +1006,11 @@ alac_encode (ALAC_ENCODER *p, uint32_t numSamples,
 		const int32_t *		inputBuffer ;
 		uint32_t			tag ;
 		uint32_t			channelIndex ;
-		uint32_t			inputIncrement ;
 		uint8_t				stereoElementTag ;
 		uint8_t				monoElementTag ;
 		uint8_t				lfeElementTag ;
 
 		inputBuffer		= theReadBuffer ;
-		inputIncrement	= ((p->mBitDepth + 7) / 8) ;
 
 		stereoElementTag	= 0 ;
 		monoElementTag		= 0 ;
@@ -1028,7 +1029,7 @@ alac_encode (ALAC_ENCODER *p, uint32_t numSamples,
 
 					status = EncodeMono (p, &bitstream, inputBuffer, numChannels, channelIndex, numSamples) ;
 
-					inputBuffer += inputIncrement ;
+					inputBuffer += 1 ;
 					channelIndex++ ;
 					monoElementTag++ ;
 					break ;
@@ -1039,7 +1040,7 @@ alac_encode (ALAC_ENCODER *p, uint32_t numSamples,
 
 					status = EncodeStereo (p, &bitstream, inputBuffer, numChannels, channelIndex, numSamples) ;
 
-					inputBuffer += (inputIncrement * 2) ;
+					inputBuffer += 2 ;
 					channelIndex += 2 ;
 					stereoElementTag++ ;
 					break ;
@@ -1050,7 +1051,7 @@ alac_encode (ALAC_ENCODER *p, uint32_t numSamples,
 
 					status = EncodeMono (p, &bitstream, inputBuffer, numChannels, channelIndex, numSamples) ;
 
-					inputBuffer += inputIncrement ;
+					inputBuffer += 1 ;
 					channelIndex++ ;
 					lfeElementTag++ ;
 					break ;
