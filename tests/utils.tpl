@@ -1,6 +1,6 @@
 [+ AutoGen5 template h c +]
 /*
-** Copyright (C) 2002-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -214,13 +214,8 @@ gen_windowed_sine_[+ (get "name") +] ([+ (get "name") +] *data, int len, double 
 {	int k ;
 
 	memset (data, 0, len * sizeof ([+ (get "name") +])) ;
-	/*
-	**	Choose a frequency of 1/32 so that it aligns perfectly with a DFT
-	**	bucket to minimise spreading of energy over more than one bucket.
-	**	Also do not want to make the frequency too high as some of the
-	**	codecs (ie gsm610) have a quite severe high frequency roll off.
-	*/
-	len /= 2 ;
+
+	len = (5 * len) / 6 ;
 
 	for (k = 0 ; k < len ; k++)
 	{	data [k] = sin (2.0 * k * M_PI * 1.0 / 32.0 + 0.4) ;
