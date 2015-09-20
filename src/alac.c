@@ -654,11 +654,12 @@ alac_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
 		for (k = 0 ; k < writecount ; k++)
-			iptr [k] = arith_shift_left (ptr [total + k], 16) ;
+			iptr [k] = arith_shift_left (ptr [k], 16) ;
 
 		plac->partial_block_frames += writecount / plac->channels ;
 		total += writecount ;
 		len -= writecount ;
+		ptr += writecount ;
 
 		if (plac->partial_block_frames >= plac->frames_per_block)
 			alac_encode_block (psf, plac) ;
@@ -684,11 +685,12 @@ alac_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
 		for (k = 0 ; k < writecount ; k++)
-			iptr [k] = ptr [total + k] ;
+			iptr [k] = ptr [k] ;
 
 		plac->partial_block_frames += writecount / plac->channels ;
 		total += writecount ;
 		len -= writecount ;
+		ptr += writecount ;
 
 		if (plac->partial_block_frames >= plac->frames_per_block)
 			alac_encode_block (psf, plac) ;
@@ -721,6 +723,7 @@ alac_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 		plac->partial_block_frames += writecount / plac->channels ;
 		total += writecount ;
 		len -= writecount ;
+		ptr += writecount ;
 
 		if (plac->partial_block_frames >= plac->frames_per_block)
 			alac_encode_block (psf, plac) ;
@@ -753,6 +756,7 @@ alac_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 		plac->partial_block_frames += writecount / plac->channels ;
 		total += writecount ;
 		len -= writecount ;
+		ptr += writecount ;
 
 		if (plac->partial_block_frames >= plac->frames_per_block)
 			alac_encode_block (psf, plac) ;
