@@ -272,12 +272,12 @@ check_file_hash_or_die (const char *filename, uint64_t target_hash, int line_num
 	fclose (file) ;
 
 	if (target_hash == 0)
-	{	printf (" 0x%016" PRIx64 "\n", cksum) ;
+	{	printf (" 0x%" PRIx64 "\n", cksum) ;
 		return ;
 		} ;
 
 	if (cksum != target_hash)
-	{	printf ("\n\nLine %d: incorrect hash value 0x%016" PRIx64 " should be 0x%016" PRIx64 ".\n\n", line_num, cksum, target_hash) ;
+	{	printf ("\n\nLine %d: incorrect hash value 0x%" PRIx64 " should be 0x%" PRIx64 ".\n\n", line_num, cksum, target_hash) ;
 		exit (1) ;
 		} ;
 
