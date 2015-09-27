@@ -2000,6 +2000,8 @@ exif_subchunk_parse (SF_PRIVATE *psf, uint32_t length)
 			case olym_MARKER :
 				bytesread += psf_binheader_readf (psf, "4", &dword) ;
 				psf_log_printf (psf, "%M : %u\n", marker, dword) ;
+				if (bytesread + dword > length)
+					break ;
 				dword += (dword & 1) ;
 				bytesread += psf_binheader_readf (psf, "j", dword) ;
 				break ;
