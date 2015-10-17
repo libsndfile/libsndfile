@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2007-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2007-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,10 +96,8 @@ vorbis_test (void)
 	for (k = 0 ; k < ARRAY_LEN (float_data) ; k ++)
 		max_abs = max_float (max_abs, fabs (float_data [k])) ;
 
-	if (max_abs > 1.021)
-	{	printf ("\n\n    Error : max_abs %f should be < 1.021.\n\n", max_abs) ;
-		exit (1) ;
-		} ;
+	exit_if_true (max_abs > 1.023,
+		"\n\nLine %d : max_abs %f should be < 1.023.\n\n", __LINE__, max_abs) ;
 
 	puts ("ok") ;
 	unlink (filename) ;
@@ -155,10 +153,8 @@ compression_size_test (int format, const char * filename)
 	q3_size = file_length (q3_fname) ;
 	q6_size = file_length (q6_fname) ;
 
-	if (q3_size >= q6_size)
-	{	printf ("\n\nLine %d : q3 size (%d) >= q5 size (%d)\n\n", __LINE__, q3_size, q6_size) ;
-		exit (1) ;
-		} ;
+	exit_if_true (q3_size >= q6_size,
+		"\n\nLine %d : q3 size (%d) >= q6 size (%d)\n\n", __LINE__, q3_size, q6_size) ;
 
 	puts ("ok") ;
 	unlink (q3_fname) ;
