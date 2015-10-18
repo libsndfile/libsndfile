@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2008-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+# Copyright (C) 2008-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 #
 # All rights reserved.
 #
@@ -161,6 +161,7 @@ echo "----------------------------------------------------------------------"
 ./peak_chunk_test@EXEEXT@ caf
 ./misc_test@EXEEXT@ caf
 ./chunk_test@EXEEXT@ caf
+./long_read_write_test alac
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on CAF files."
 echo "----------------------------------------------------------------------"
