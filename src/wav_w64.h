@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -264,6 +264,12 @@ typedef struct
 	/* Set to true when 'fmt ' chunk is ambiguous.*/
 	int fmt_is_broken ;
 	WAV_FMT wav_fmt ;
+
+	/*
+	** Set to true when RF64 should be converted back to RIFF when writing the
+	** header.
+	*/
+	int rf64_downgrade ;
 } WAV_PRIVATE ;
 
 #define		WAV_W64_GSM610_BLOCKSIZE	65

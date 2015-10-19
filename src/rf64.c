@@ -41,6 +41,8 @@
 ** Macros to handle big/little endian issues.
 */
 #define	RF64_MARKER		MAKE_MARKER ('R', 'F', '6', '4')
+#define	RIFF_MARKER		MAKE_MARKER ('R', 'I', 'F', 'F')
+#define	JUNK_MARKER		MAKE_MARKER ('J', 'U', 'N', 'K')
 #define	FFFF_MARKER		MAKE_MARKER (0xff, 0xff, 0xff, 0xff)
 #define	WAVE_MARKER		MAKE_MARKER ('W', 'A', 'V', 'E')
 #define	ds64_MARKER		MAKE_MARKER ('d', 's', '6', '4')
@@ -52,6 +54,13 @@
 #define cart_MARKER		MAKE_MARKER ('c', 'a', 'r', 't')
 #define OggS_MARKER		MAKE_MARKER ('O', 'g', 'g', 'S')
 #define wvpk_MARKER 	MAKE_MARKER ('w', 'v', 'p', 'k')
+
+/*
+** The file size limit in bytes below which we can, if requested, write this
+** file as a RIFF/WAVE file.
+*/
+
+#define RIFF_DOWNGRADE_BYTES	((sf_count_t) 0xffffffff)
 
 /*------------------------------------------------------------------------------
 ** Typedefs.
@@ -590,7 +599,11 @@ rf64_write_fmt_chunk (SF_PRIVATE *psf)
 static int
 rf64_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t	current ;
-	int 		error = 0, has_data = SF_FALSE ;
+	int 		error = 0, has_data = SF_FALSE, add_fact_chunk = 0 ;
+	WAV_PRIVATE	*wpriv ;
+
+	if ((wpriv = psf->container_data) == NULL)
+		return SFE_INTERNAL ;
 
 	current = psf_ftell (psf) ;
 
@@ -613,10 +626,16 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 	psf->headindex = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
-	psf_binheader_writef (psf, "em4m", RF64_MARKER, 0xffffffff, WAVE_MARKER) ;
-
-	/* Currently no table. */
-	psf_binheader_writef (psf, "m48884", ds64_MARKER, 28, psf->filelength - 8, psf->datalength, psf->sf.frames, 0) ;
+	if (wpriv->rf64_downgrade && psf->filelength < RIFF_DOWNGRADE_BYTES)
+	{	psf_binheader_writef (psf, "etm8m", RIFF_MARKER, (psf->filelength < 8) ? 8 : psf->filelength - 8, WAVE_MARKER) ;
+		psf_binheader_writef (psf, "m4884", JUNK_MARKER, 20, 0, 0, 0, 0) ;
+		add_fact_chunk = 1 ;
+		}
+	else
+	{	psf_binheader_writef (psf, "em4m", RF64_MARKER, 0xffffffff, WAVE_MARKER) ;
+		/* Currently no table. */
+		psf_binheader_writef (psf, "m48884", ds64_MARKER, 28, psf->filelength - 8, psf->datalength, psf->sf.frames, 0) ;
+		} ;
 
 	/* WAVE and 'fmt ' markers. */
 	psf_binheader_writef (psf, "m", fmt_MARKER) ;
@@ -632,6 +651,8 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 		case SF_FORMAT_RF64 :
 				if ((error = rf64_write_fmt_chunk (psf)) != 0)
 					return error ;
+				if (add_fact_chunk)
+					psf_binheader_writef (psf, "tm48", fact_MARKER, 4, psf->sf.frames) ;
 				break ;
 
 		default :
@@ -691,7 +712,10 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 
 #endif
 
-	psf_binheader_writef (psf, "m4", data_MARKER, 0xffffffff) ;
+	if (wpriv->rf64_downgrade && (psf->filelength < RIFF_DOWNGRADE_BYTES))
+		psf_binheader_writef (psf, "tm8", data_MARKER, psf->datalength) ;
+	else
+		psf_binheader_writef (psf, "m4", data_MARKER, 0xffffffff) ;
 
 	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
 	if (psf->error)
@@ -749,6 +773,11 @@ rf64_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
 		case SFC_SET_CHANNEL_MAP_INFO :
 			wpriv->wavex_channelmask = wavex_gen_channel_mask (psf->channel_map, psf->sf.channels) ;
 			return (wpriv->wavex_channelmask != 0) ;
+
+		case SFC_RF64_AUTO_DOWNGRADE :
+			if (psf->have_written == 0)
+				wpriv->rf64_downgrade = datasize ? SF_TRUE : SF_FALSE ;
+			return wpriv->rf64_downgrade ;
 
 		default :
 			break ;

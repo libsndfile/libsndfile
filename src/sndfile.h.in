@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -196,6 +196,13 @@ enum
 	/* Support for Wavex Ambisonics Format */
 	SFC_WAVEX_SET_AMBISONIC			= 0x1200,
 	SFC_WAVEX_GET_AMBISONIC			= 0x1201,
+
+	/*
+	** RF64 files can be set so that on-close, writable files that have less
+	** than 4GB of data in them are converted to RIFF/WAV, as per EBU
+	** recommendations.
+	*/
+	SFC_RF64_AUTO_DOWNGRADE			= 0x1210,
 
 	SFC_SET_VBR_ENCODING_QUALITY	= 0x1300,
 	SFC_SET_COMPRESSION_LEVEL		= 0x1301,
