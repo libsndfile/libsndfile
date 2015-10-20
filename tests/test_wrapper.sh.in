@@ -161,7 +161,7 @@ echo "----------------------------------------------------------------------"
 ./peak_chunk_test@EXEEXT@ caf
 ./misc_test@EXEEXT@ caf
 ./chunk_test@EXEEXT@ caf
-./long_read_write_test alac
+./long_read_write_test@EXEEXT@ alac
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on CAF files."
 echo "----------------------------------------------------------------------"
