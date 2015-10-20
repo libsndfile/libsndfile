@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #include <sys/stat.h>
 #include <math.h>
@@ -50,6 +51,7 @@ static void	zero_data_test (const char *filename, int format) ;
 static void	filesystem_full_test (int format) ;
 static void	permission_test (const char *filename, int typemajor) ;
 static void	wavex_amb_test (const char *filename) ;
+static void rf64_downgrade_test (const char *filename) ;
 
 int
 main (int argc, char *argv [])
@@ -139,9 +141,10 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "rf64"))
-	{	zero_data_test ("zerolen.rf64", SF_FORMAT_W64 | SF_FORMAT_PCM_16) ;
-		filesystem_full_test (SF_FORMAT_W64 | SF_FORMAT_PCM_16) ;
-		permission_test ("readonly.rf64", SF_FORMAT_W64) ;
+	{	zero_data_test ("zerolen.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
+		filesystem_full_test (SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
+		permission_test ("readonly.rf64", SF_FORMAT_RF64) ;
+		rf64_downgrade_test ("downgrade.wav") ;
 		test_count++ ;
 		} ;
 
@@ -413,3 +416,58 @@ wavex_amb_test (const char *filename)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* wavex_amb_test */
+
+static void
+rf64_downgrade_test (const char *filename)
+{	static short	output	[BUFFER_LEN] ;
+	static short	input	[BUFFER_LEN] ;
+
+	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	unsigned	k ;
+
+	print_test_name (__func__, filename) ;
+
+	sf_info_clear (&sfinfo) ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= ARRAY_LEN (output) ;
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= SF_FORMAT_RF64 | SF_FORMAT_PCM_16 ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	exit_if_true (sf_command (file, SFC_RF64_AUTO_DOWNGRADE, NULL, SF_FALSE) != SF_FALSE, "\n\nLine %d: sf_command failed.\n", __LINE__) ;
+	exit_if_true (sf_command (file, SFC_RF64_AUTO_DOWNGRADE, NULL, SF_TRUE) != SF_TRUE, "\n\nLine %d: sf_command failed.\n", __LINE__) ;
+
+	test_write_short_or_die (file, 0, output, ARRAY_LEN (output), __LINE__) ;
+
+	exit_if_true (sf_command (file, SFC_RF64_AUTO_DOWNGRADE, NULL, SF_FALSE) != SF_TRUE, "\n\nLine %d: sf_command failed.\n", __LINE__) ;
+	exit_if_true (sf_command (file, SFC_RF64_AUTO_DOWNGRADE, NULL, SF_TRUE) != SF_TRUE, "\n\nLine %d: sf_command failed.\n", __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (input, 0, sizeof (input)) ;
+	sf_info_clear (&sfinfo) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	exit_if_true (sfinfo.format != (SF_FORMAT_WAVEX | SF_FORMAT_PCM_16), "\n\nLine %d: RF64 to WAV downgrade failed.\n", __LINE__) ;
+	exit_if_true (sfinfo.frames != ARRAY_LEN (output), "\n\nLine %d: Incorrect number of frames in file (too short). (%d should be %d)\n", __LINE__, (int) sfinfo.frames, (int) ARRAY_LEN (output)) ;
+	exit_if_true (sfinfo.channels != 1, "\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	test_read_short_or_die (file, 0, input, ARRAY_LEN (input), __LINE__) ;
+
+	sf_close (file) ;
+
+	for (k = 0 ; k < ARRAY_LEN (input) ; k++)
+		exit_if_true (input [k] != output [k],
+			"\n\nLine: %d: Error on input %d, expected %d, got %d\n", __LINE__, k, output [k], input [k]) ;
+
+	puts ("ok") ;
+	unlink (filename) ;
+
+	return ;
+} /* rf64_downgrade_test */
