@@ -236,7 +236,10 @@
 	<TD>Set instrument info</TD>
 </TR>
 
-
+<TR>
+	<TD><A HREF="#SFC_RF64_AUTO_DOWNGRADE">SFC_RF64_AUTO_DOWNGRADE</A></TD>
+	<TD>Enable auto downgrade from RF64 to WAV</TD>
+</TR>
 
 <!--
 <TR>
@@ -1672,6 +1675,53 @@ Example:
 	<dd>SF_TRUE if the file header contains instrument information for the
     file. SF_FALSE otherwise.
 </DL>
+
+
+<!-- ========================================================================= -->
+
+
+<A NAME="SFC_RF64_AUTO_DOWNGRADE"></A>
+<H2><BR><B>SFC_RF64_AUTO_DOWNGRADE</B></H2>
+<P>
+Enable auto downgrade from RF64 to WAV.
+</P>
+<P>
+The EBU recomendation is that when writing RF64 files and the resulting file is
+less than 4Gig in size, it should be downgraded to a WAV file (WAV files have a
+maximum size of 4Gig).
+libsndfile doesn't follow the EBU recommendations exactly, , mainly because the
+test suite needs to be able test reading/writing RF64 files without having to
+generate files larger than 4 gigabytes.
+</P>
+<p>
+Note: This command should be issued before the first bit of audio data has been
+written to the file.
+Calling this command after audio data has been written will return the current
+value of this setting, but will not allow it to be changed.
+</p>
+<p>
+Parameters:
+</p>
+<PRE>
+         sndfile  : A valid SNDFILE* pointer
+         cmd      : SFC_RF64_AUTO_DOWNGRADE
+         data     : NULL
+         datasize : SF_TRUE or SF_FALSE
+</PRE>
+<P>
+Example:
+</P>
+<PRE>
+         /* Enable auto downgrade on file close. */
+         sf_command (sndfile, SFC_RF64_AUTO_DOWNGRADE, NULL, SF_TRUE) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<dd>Returns SF_TRUE if SFC_RF64_AUTO_DOWNGRADE is set and SF_FALSE
+	otherwise.
+</DL>
+
+
 
 <!-- ========================================================================= -->
 
