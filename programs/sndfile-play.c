@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -1005,7 +1005,7 @@ win32_play (int argc, char *argv [])
 #endif /* Win32 */
 
 /*------------------------------------------------------------------------------
-**	OpenBDS's sndio.
+**	OpenBSD's sndio.
 */
 
 #if HAVE_SNDIO_H
