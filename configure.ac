@@ -433,11 +433,18 @@ if test x$enable_alsa != xno ; then
 
 SNDIO_LIBS=""
 HAVE_SNDIO_H=0
-AC_CHECK_HEADERS(sndio.h)
-if test x$ac_cv_header_sndio_h = xyes ; then
-	SNDIO_LIBS="-lsndio"
-	HAVE_SNDIO_H=1
-	fi
+case "$host_os" in
+	openbsd*)
+		AC_CHECK_HEADERS(sndio.h)
+		if test x$ac_cv_header_sndio_h = xyes ; then
+			SNDIO_LIBS="-lsndio"
+			HAVE_SNDIO_H=1
+			fi
+		;;
+	*)
+		;;
+	esac
+
 AC_DEFINE_UNQUOTED([HAVE_SNDIO_H],${HAVE_SNDIO_H},[Set to 1 if <sndio.h> is available.])
 
 #====================================================================================
