@@ -805,7 +805,7 @@ header_read (SF_PRIVATE *psf, void *ptr, int bytes)
 	if (psf->headindex + bytes > SIGNED_SIZEOF (psf->header))
 	{	int most ;
 
-		most = SIGNED_SIZEOF (psf->header) - psf->headindex ;
+		most = SIGNED_SIZEOF (psf->header) - psf->headend ;
 		psf_fread (psf->header + psf->headend, 1, most, psf) ;
 		memcpy (ptr, psf->header + psf->headend, most) ;
 		psf->headend = psf->headindex += most ;
