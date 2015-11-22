@@ -341,7 +341,7 @@ static void
 
 	max = 0 ;
 	for (k = 0 ; k < ARRAY_LEN ([+ (get "int_name") +]_data) ; k++)
-		if ((unsigned) abs ([+ (get "int_name") +]_data [k]) > max)
+		if (abs ([+ (get "int_name") +]_data [k]) > max)
 			max = abs ([+ (get "int_name") +]_data [k]) ;
 
 	if (1.0 * abs (max - [+ (get "int_max") +]) / [+ (get "int_max") +] > 0.01)
