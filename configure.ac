@@ -396,7 +396,6 @@ case "$host_os" in
 		else
 			developer_path="/Developer"
 			fi
-		OS_SPECIFIC_CFLAGS="-I${developer_path}/Headers/FlatCarbon"
 		OS_SPECIFIC_LINKS="-framework CoreAudio -framework AudioToolbox -framework CoreFoundation"
 		;;
 	mingw*)

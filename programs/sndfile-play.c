@@ -68,7 +68,6 @@
 	#elif (OSX_DARWIN_VERSION == 11)
 		#include <AudioToolbox/AudioToolbox.h>
 	#elif (OSX_DARWIN_VERSION > 0 && OSX_DARWIN_VERSION <= 10)
-		#include <Carbon.h>
 		#include <CoreAudio/AudioHardware.h>
 	#endif
 
@@ -648,7 +647,7 @@ macosx_play (int argc, char *argv [])
 #endif /* OSX_DARWIN_VERSION == 11 */
 
 #if (OSX_DARWIN_VERSION > 0 && OSX_DARWIN_VERSION <= 10)
-/* MacOSX 10.6 or earlier, use Carbon and AudioHardware API */
+/* MacOSX 10.6 or earlier, use AudioHardware API */
 
 typedef struct
 {	AudioStreamBasicDescription		format ;
