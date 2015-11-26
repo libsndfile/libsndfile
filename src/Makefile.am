@@ -29,7 +29,7 @@ COMMON = common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
 		windows.c id3.c $(WIN_VERSION_FILE)
 
 FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c \
-		macbinary3.c macos.c mat4.c mat5.c nist.c paf.c pvf.c raw.c rx2.c sd2.c \
+		macos.c mat4.c mat5.c nist.c paf.c pvf.c raw.c rx2.c sd2.c \
 		sds.c svx.c txw.c voc.c wve.c w64.c wav_w64.c wav.c xi.c mpc2k.c rf64.c \
 		ogg_vorbis.c ogg_speex.c ogg_pcm.c ogg_opus.c
 

@@ -875,8 +875,6 @@ int		txw_open	(SF_PRIVATE *psf) ;
 int		wve_open	(SF_PRIVATE *psf) ;
 int		dwd_open	(SF_PRIVATE *psf) ;
 
-int		macbinary3_open (SF_PRIVATE *psf) ;
-
 /*------------------------------------------------------------------------------------
 **	Init functions for a number of common data encodings.
 */
