@@ -565,6 +565,11 @@ mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_fi
 		exit (1) ;
 		} ;
 
+	if (sfinfo.seekable != 1)
+	{	printf ("\n\nLine %d : File should be seekable.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
 	check_log_buffer_or_die (file, __LINE__) ;
 
 	test_read_[+ (get "data_type") +]_or_die (file, 0, test, items, __LINE__) ;

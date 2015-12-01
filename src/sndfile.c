@@ -3003,7 +3003,6 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 		} ;
 
 	sfinfo->sections = 0 ;
-	sfinfo->seekable = 0 ;
 
 	return (SNDFILE *) psf ;
 
