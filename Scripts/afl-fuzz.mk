@@ -11,7 +11,7 @@ export CXX = afl-g++
 
 fuzz : programs/sndfile-info
 	mkdir -p fuzzing/out
-	afl-fuzz -t 400 -m -1 -i fuzzing/in -o fuzzing/out -- programs/sndfile-info @@
+	afl-fuzz -t 400 -m none -i fuzzing/in -o fuzzing/out -- programs/sndfile-info @@
 
 clean :
 	rm -rf fuzzing/out/*
