@@ -3000,9 +3000,9 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 	if (psf->file.mode == SFM_WRITE)
 	{	/* Zero out these fields. */
 		sfinfo->frames = 0 ;
+		sfinfo->sections = 0 ;
+		sfinfo->seekable = 0 ;
 		} ;
-
-	sfinfo->sections = 0 ;
 
 	return (SNDFILE *) psf ;
 

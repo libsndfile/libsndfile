@@ -526,6 +526,11 @@ mono_[+ (get "type_name") +]_test (const char *filename, int format, int long_fi
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__) ;
 
+	if (sfinfo.frames || sfinfo.sections || sfinfo.seekable)
+	{	printf ("\n\nLine %d : Weird SF_INFO fields.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
 	sf_set_string (file, SF_STR_ARTIST, "Your name here") ;
 
 	test_write_[+ (get "data_type") +]_or_die (file, 0, orig, items, __LINE__) ;
