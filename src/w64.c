@@ -475,7 +475,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		case	SF_FORMAT_PCM_24 :
 		case	SF_FORMAT_PCM_32 :
 					fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 ;
-					fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+					fmt_pad = (size_t) ((fmt_size & 0x7) ? 8 - (fmt_size & 0x7) : 0) ;
 					fmt_size += fmt_pad ;
 
 					/* fmt : format, channels, samplerate */
@@ -489,7 +489,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		case SF_FORMAT_FLOAT :
 		case SF_FORMAT_DOUBLE :
 					fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 ;
-					fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+					fmt_pad = (size_t) ((fmt_size & 0x7) ? 8 - (fmt_size & 0x7) : 0) ;
 					fmt_size += fmt_pad ;
 
 					/* fmt : format, channels, samplerate */
@@ -504,7 +504,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 
 		case SF_FORMAT_ULAW :
 					fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 ;
-					fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+					fmt_pad = (size_t) ((fmt_size & 0x7) ? 8 - (fmt_size & 0x7) : 0) ;
 					fmt_size += fmt_pad ;
 
 					/* fmt : format, channels, samplerate */
@@ -519,7 +519,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 
 		case SF_FORMAT_ALAW :
 					fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 ;
-					fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+					fmt_pad = (size_t) ((fmt_size & 0x7) ? 8 - (fmt_size & 0x7) : 0) ;
 					fmt_size += fmt_pad ;
 
 					/* fmt : format, channels, samplerate */
@@ -542,7 +542,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 
 						/* fmt chunk. */
 						fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 ;
-						fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+						fmt_pad = (size_t) ((fmt_size & 0x7) ? 8 - (fmt_size & 0x7) : 0) ;
 						fmt_size += fmt_pad ;
 
 						/* fmt : size, WAV format type, channels. */
@@ -568,7 +568,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 						/* fmt chunk. */
 						extrabytes	= 2 + 2 + MSADPCM_ADAPT_COEFF_COUNT * (2 + 2) ;
 						fmt_size	= 24 + 2 + 2 + 4 + 4 + 2 + 2 + 2 + extrabytes ;
-						fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+						fmt_pad = (size_t) ((fmt_size & 0x7) ? 8 - (fmt_size & 0x7) : 0) ;
 						fmt_size += fmt_pad ;
 
 						/* fmt : size, W64 format type, channels. */
@@ -594,7 +594,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 
 						/* fmt chunk. */
 						fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 ;
-						fmt_pad = (size_t) (8 - (fmt_size & 0x7)) ;
+						fmt_pad = (size_t) ((fmt_size & 0x7) ? 8 - (fmt_size & 0x7) : 0) ;
 						fmt_size += fmt_pad ;
 
 						/* fmt : size, WAV format type, channels. */
