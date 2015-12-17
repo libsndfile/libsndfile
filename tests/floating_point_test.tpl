@@ -307,7 +307,8 @@ static void
 [+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test (const char * filename)
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
-	unsigned	k, max ;
+	int			max ;
+	unsigned	k ;
 
 	print_test_name ("[+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test", filename) ;
 
