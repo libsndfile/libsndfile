@@ -975,6 +975,12 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 	psf_log_printf (psf, "  Sample Rate : %d\n", samplerate) ;
 	psf_log_printf (psf, "  Frames      : %u%s\n", comm_fmt->numSampleFrames, (comm_fmt->numSampleFrames == 0 && psf->filelength > 104) ? " (Should not be 0)" : "") ;
+
+	if (comm_fmt->numChannels < 1 || comm_fmt->numChannels >= SF_MAX_CHANNELS)
+	{	psf_log_printf (psf, "  Channels    : %d (should be >= 1 and < %d)\n", comm_fmt->numChannels, SF_MAX_CHANNELS) ;
+		return SFE_CHANNEL_COUNT_BAD ;
+		} ;
+
 	psf_log_printf (psf, "  Channels    : %d\n", comm_fmt->numChannels) ;
 
 	/* Found some broken 'fl32' files with comm.samplesize == 16. Fix it here. */

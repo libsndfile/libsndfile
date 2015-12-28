@@ -106,6 +106,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_BAD_ENDIAN			, "Bad endian-ness. Try default endian-ness" },
 	{	SFE_CHANNEL_COUNT_ZERO	, "Channel count is zero." },
 	{	SFE_CHANNEL_COUNT		, "Too many channels specified." },
+	{	SFE_CHANNEL_COUNT_BAD	, "Bad channel count." },
 
 	{	SFE_BAD_SEEK			, "Internal psf_fseek() failed." },
 	{	SFE_NOT_SEEKABLE		, "Seek attempted on unseekable file type." },
