@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2005-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2005-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -456,16 +456,18 @@ caf_read_header (SF_PRIVATE *psf)
 					chunk_size = psf->filelength - psf->headindex ;
 					}
 				else if (psf->filelength > 0 && psf->filelength < psf->headindex + chunk_size - 16)
-					psf_log_printf (psf, "%M : %D (should be %D)\n", marker, chunk_size, psf->filelength - psf->headindex - 8) ;
+				{	psf_log_printf (psf, "%M : %D (should be %D)\n", marker, chunk_size, psf->filelength - psf->headindex - 8) ;
+					psf->datalength = psf->filelength - psf->headindex - 8 ;
+					}
 				else
-					psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+				{	psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+					/* Subtract the 4 bytes of the 'edit' field above. */
+					psf->datalength = chunk_size - 4 ;
+					} ;
 
 				psf_log_printf (psf, "  edit : %u\n", k) ;
 
 				psf->dataoffset = psf->headindex ;
-
-				/* Subtract the 4 bytes of the 'edit' field above. */
-				psf->datalength = chunk_size - 4 ;
 
 				psf_binheader_readf (psf, "j", make_size_t (psf->datalength)) ;
 				have_data = 1 ;
