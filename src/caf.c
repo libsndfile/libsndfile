@@ -480,7 +480,16 @@ caf_read_header (SF_PRIVATE *psf)
 				break ;
 
 			case pakt_MARKER :
-				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+				if (chunk_size < 24)
+				{	psf_log_printf (psf, "%M : %D (should be > 24)\n", marker, chunk_size) ;
+					return SFE_MALFORMED_FILE ;
+					}
+				else if (chunk_size > psf->filelength - psf->headindex)
+				{	psf_log_printf (psf, "%M : %D (should be < %D)\n", marker, chunk_size, psf->filelength - psf->headindex) ;
+					return SFE_MALFORMED_FILE ;
+					}
+				else
+					psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
 
 				psf_binheader_readf (psf, "E8844", &pcaf->alac.packets, &pcaf->alac.valid_frames,
 									&pcaf->alac.priming_frames, &pcaf->alac.remainder_frames) ;

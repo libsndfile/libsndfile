@@ -261,7 +261,7 @@ alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 
 	if (plac->pakt_info == NULL)
 	{	psf_log_printf (psf, "%s : alac_pkt_read() returns NULL.\n", __func__) ;
-		return SFE_MALLOC_FAILED ;
+		return SFE_INTERNAL ;
 		} ;
 
 	/* Read in the ALAC cookie data and pass it to the init function. */
@@ -815,7 +815,7 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 	chunk_info.id_size = 4 ;
 
 	if ((chunk_iterator = psf_get_chunk_iterator (psf, chunk_info.id)) == NULL)
-	{	printf ("%s %d : no chunk iterator found\n\n", __func__, __LINE__) ;
+	{	psf_log_printf (psf, "%s : no chunk iterator found\n", __func__) ;
 		free (chunk_info.data) ;
 		chunk_info.data = NULL ;
 		return NULL ;
@@ -827,8 +827,7 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 	chunk_info.data = pakt_data = malloc (pakt_size + 5) ;
 
 	if ((bcount = psf->get_chunk_data (psf, chunk_iterator, &chunk_info)) != SF_ERR_NO_ERROR)
-	{	printf ("%s %d : %s\n\n", __func__, __LINE__, sf_error_number (bcount)) ;
-		while (chunk_iterator)
+	{	while (chunk_iterator)
 			chunk_iterator = psf->next_chunk_iterator (psf, chunk_iterator) ;
 		free (chunk_info.data) ;
 		chunk_info.data = NULL ;
