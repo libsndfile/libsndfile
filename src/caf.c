@@ -455,7 +455,7 @@ caf_read_header (SF_PRIVATE *psf)
 				{	psf_log_printf (psf, "%M : -1\n") ;
 					chunk_size = psf->filelength - psf->headindex ;
 					}
-				else if (psf->filelength > 0 && psf->filelength < psf->headindex + chunk_size - 16)
+				else if (psf->filelength > 0 && chunk_size > psf->filelength - psf->headindex + 10)
 				{	psf_log_printf (psf, "%M : %D (should be %D)\n", marker, chunk_size, psf->filelength - psf->headindex - 8) ;
 					psf->datalength = psf->filelength - psf->headindex - 8 ;
 					}
