@@ -929,7 +929,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 					psf->rwf_endian = SF_ENDIAN_BIG ;
 					break ;
 
-			case 'm' :
+			case 'm' : /* 4 byte marker value eg 'RIFF' */
 					intptr = va_arg (argptr, unsigned int*) ;
 					ucptr = (unsigned char*) intptr ;
 					byte_count += header_read (psf, ucptr, sizeof (int)) ;
@@ -954,7 +954,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 					byte_count += header_read (psf, charptr, sizeof (char)) ;
 					break ;
 
-			case '2' :
+			case '2' : /* 2 byte value with the current endian-ness */
 					shortptr = va_arg (argptr, unsigned short*) ;
 					*shortptr = 0 ;
 					ucptr = (unsigned char*) shortptr ;
@@ -965,7 +965,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 						*shortptr = GET_LE_SHORT (ucptr) ;
 					break ;
 
-			case '3' :
+			case '3' : /* 3 byte value with the current endian-ness */
 					intptr = va_arg (argptr, unsigned int*) ;
 					*intptr = 0 ;
 					byte_count += header_read (psf, sixteen_bytes, 3) ;
@@ -975,7 +975,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 						*intptr = GET_LE_3BYTE (sixteen_bytes) ;
 					break ;
 
-			case '4' :
+			case '4' : /* 4 byte value with the current endian-ness */
 					intptr = va_arg (argptr, unsigned int*) ;
 					*intptr = 0 ;
 					ucptr = (unsigned char*) intptr ;
@@ -986,7 +986,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 						*intptr = psf_get_le32 (ucptr, 0) ;
 					break ;
 
-			case '8' :
+			case '8' : /* 8 byte value with the current endian-ness */
 					countptr = va_arg (argptr, sf_count_t *) ;
 					*countptr = 0 ;
 					byte_count += header_read (psf, sixteen_bytes, 8) ;
@@ -1030,7 +1030,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 					*/
 					break ;
 
-			case 'b' :
+			case 'b' : /* Raw bytes */
 					charptr = va_arg (argptr, char*) ;
 					count = va_arg (argptr, size_t) ;
 					if (count > 0)
