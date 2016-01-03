@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -295,7 +295,7 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					{	sf_count_t frames ;
 
 						psf_binheader_readf (psf, "e8", &frames) ;
-						psf_log_printf (psf, "   fact : %D\n     frames : %D\n",
+						psf_log_printf (psf, "fact : %D\n  frames : %D\n",
 										chunk_size, frames) ;
 						} ;
 					chunk_size = 0 ;

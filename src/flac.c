@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Tobias Gehrig <tgehrig@ira.uka.de>
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -394,7 +394,7 @@ sf_flac_meta_get_vorbiscomments (SF_PRIVATE *psf, const FLAC__StreamMetadata *me
 		if ((cptr = strchr (value, '=')) != NULL)
 			value = cptr + 1 ;
 
-		psf_log_printf (psf, "  %-10s : %s\n", tags [k].tag, value) ;
+		psf_log_printf (psf, "  %-12s : %s\n", tags [k].tag, value) ;
 		psf_store_string (psf, tags [k].type, value) ;
 		} ;
 
