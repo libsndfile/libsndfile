@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -116,6 +116,24 @@ main (int argc, char *argv [])
 			puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
 		test_count++ ;
 		} ;
+
+
+	if (do_all || ! strcmp (argv [1], "caf"))
+	{
+		string_start_test ("strings.caf", SF_FORMAT_CAF) ;
+		string_start_end_test ("strings.caf", SF_FORMAT_CAF) ;
+		string_multi_set_test ("multi.caf", SF_FORMAT_CAF) ;
+		/*
+		TODO : Fix src/caf.c so these tests pass.
+		string_rdwr_test ("rdwr.caf", SF_FORMAT_CAF) ;
+		string_short_rdwr_test ("short_rdwr.caf", SF_FORMAT_CAF) ;
+		*/
+		test_count++ ;
+		} ;
+
+
+
+
 
 	if (do_all || ! strcmp (argv [1], "rf64"))
 	{	puts ("\n\n     **** String test not working yet for RF64 format. ****\n") ;
@@ -275,18 +293,18 @@ string_start_end_test (const char *filename, int typemajor)
 			if (cptr == NULL || strcmp (album, cptr) != 0)
 			{	if (errors++ == 0)
 					puts ("\n") ;
-				printf ("    Bad album   : %s\n", cptr) ;
+				printf ("    Bad album     : %s\n", cptr) ;
 				} ;
 
 			cptr = sf_get_string (file, SF_STR_LICENSE) ;
 			if (cptr == NULL || strcmp (license, cptr) != 0)
 			{	if (errors++ == 0)
 					puts ("\n") ;
-				printf ("    Bad license : %s\n", cptr) ;
+				printf ("    Bad license   : %s\n", cptr) ;
 				} ;
 
 			cptr = sf_get_string (file, SF_STR_TRACKNUMBER) ;
-			if (cptr == NULL || strcmp (genre, cptr) != 0)
+			if (cptr == NULL || strcmp (trackno, cptr) != 0)
 			{	if (errors++ == 0)
 					puts ("\n") ;
 				printf ("    Bad track no. : %s\n", cptr) ;
@@ -377,7 +395,7 @@ string_start_test (const char *filename, int typemajor)
 		printf ("    Bad software  : %s\n", cptr) ;
 		} ;
 
-	if (str_count (cptr, "libsndfile") != 1)
+	if (cptr && str_count (cptr, "libsndfile") != 1)
 	{	if (errors++ == 0)
 			puts ("\n") ;
 		printf ("    Bad software  : %s\n", cptr) ;
