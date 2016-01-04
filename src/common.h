@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -264,7 +264,12 @@ struct SF_CHUNK_ITERATOR
 static inline size_t
 make_size_t (int x)
 {	return (size_t) x ;
-} /* size_t_of_int */
+} /* make_size_t */
+
+static inline uint64_t
+make_size_8 (int x)
+{	return (uint64_t) x ;
+} /* make_size_8 */
 
 typedef SF_BROADCAST_INFO_VAR (16 * 1024) SF_BROADCAST_INFO_16K ;
 

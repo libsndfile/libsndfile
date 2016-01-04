@@ -974,7 +974,7 @@ caf_write_strings (SF_PRIVATE * psf, int location)
 	if (string_count == 0 || buf.index == 0)
 		return ;
 
-	psf_binheader_writef (psf, "Em84b", info_MARKER, buf.index + 4, string_count, buf.s, make_size_t (buf.index)) ;
+	psf_binheader_writef (psf, "Em84b", info_MARKER, make_size_8 (buf.index + 4), string_count, buf.s, make_size_t (buf.index)) ;
 } /* caf_write_strings */
 
 /*==============================================================================
