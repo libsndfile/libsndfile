@@ -88,7 +88,8 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "aiff"))
-	{	string_start_end_test ("strings.aiff", SF_FORMAT_AIFF) ;
+	{	string_start_test ("strings.aiff", SF_FORMAT_AIFF) ;
+		string_start_end_test ("strings.aiff", SF_FORMAT_AIFF) ;
 		/*
 		TODO : Fix src/aiff.c so these tests pass.
 		string_multi_set_test ("multi.aiff", SF_FORMAT_AIFF) ;
@@ -117,31 +118,41 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
-
 	if (do_all || ! strcmp (argv [1], "caf"))
-	{
-		string_start_test ("strings.caf", SF_FORMAT_CAF) ;
+	{	string_start_test ("strings.caf", SF_FORMAT_CAF) ;
 		string_start_end_test ("strings.caf", SF_FORMAT_CAF) ;
 		string_multi_set_test ("multi.caf", SF_FORMAT_CAF) ;
 		/*
 		TODO : Fix src/caf.c so these tests pass.
 		string_rdwr_test ("rdwr.caf", SF_FORMAT_CAF) ;
 		string_short_rdwr_test ("short_rdwr.caf", SF_FORMAT_CAF) ;
+		string_header_update ("header_update.caf", SF_FORMAT_CAF) ;
 		*/
 		test_count++ ;
 		} ;
 
-
-
-
-
 	if (do_all || ! strcmp (argv [1], "rf64"))
-	{	puts ("\n\n     **** String test not working yet for RF64 format. ****\n") ;
-		/*
+	{	string_start_test ("strings.rf64", SF_FORMAT_RF64) ;
 		string_start_end_test ("strings.rf64", SF_FORMAT_RF64) ;
 		string_multi_set_test ("multi.rf64", SF_FORMAT_RF64) ;
+		/*
+		TODO : Fix src/rf64.c so these tests pass.
 		string_rdwr_test ("rdwr.rf64", SF_FORMAT_RF64) ;
 		string_short_rdwr_test ("short_rdwr.rf64", SF_FORMAT_RF64) ;
+		string_header_update ("header_update.rf64", SF_FORMAT_RF64) ;
+		*/
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "w64"))
+	{	puts ("\n\n     **** String test not working yet for W64 format. ****\n") ;
+		/*
+		string_start_test ("strings.w64", SF_FORMAT_W64) ;
+		string_start_end_test ("strings.w64", SF_FORMAT_W64) ;
+		string_multi_set_test ("multi.w64", SF_FORMAT_W64) ;
+		string_rdwr_test ("rdwr.w64", SF_FORMAT_W64) ;
+		string_short_rdwr_test ("short_rdwr.w64", SF_FORMAT_W64) ;
+		string_header_update ("header_update.w64", SF_FORMAT_W64) ;
 		*/
 		test_count++ ;
 		} ;
@@ -286,6 +297,8 @@ string_start_end_test (const char *filename, int typemajor)
 		case SF_FORMAT_WAV :
 		case SF_FORMAT_WAVEX :
 		case SF_ENDIAN_BIG | SF_FORMAT_WAV :
+		case SF_FORMAT_RF64 :
+			/* These formats do not support the following. */
 			break ;
 
 		default :
@@ -433,7 +446,7 @@ string_start_test (const char *filename, int typemajor)
 			} ;
 		} ;
 
-	if (typemajor != SF_FORMAT_WAV && typemajor != SF_FORMAT_AIFF)
+	if (typemajor != SF_FORMAT_WAV && typemajor != SF_FORMAT_AIFF && typemajor != SF_FORMAT_RF64)
 	{	cptr = sf_get_string (file, SF_STR_LICENSE) ;
 		if (cptr == NULL || strcmp (license, cptr) != 0)
 		{	if (errors++ == 0)

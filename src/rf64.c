@@ -53,7 +53,8 @@
 #define bext_MARKER		MAKE_MARKER ('b', 'e', 'x', 't')
 #define cart_MARKER		MAKE_MARKER ('c', 'a', 'r', 't')
 #define OggS_MARKER		MAKE_MARKER ('O', 'g', 'g', 'S')
-#define wvpk_MARKER 	MAKE_MARKER ('w', 'v', 'p', 'k')
+#define wvpk_MARKER		MAKE_MARKER ('w', 'v', 'p', 'k')
+#define LIST_MARKER		MAKE_MARKER ('L', 'I', 'S', 'T')
 
 /*
 ** The file size limit in bytes below which we can, if requested, write this
@@ -72,6 +73,7 @@
 
 static int	rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock) ;
 static int	rf64_write_header (SF_PRIVATE *psf, int calc_length) ;
+static int	rf64_write_tailer (SF_PRIVATE *psf) ;
 static int	rf64_close (SF_PRIVATE *psf) ;
 static int	rf64_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize) ;
 
@@ -93,6 +95,7 @@ rf64_open (SF_PRIVATE *psf)
 	/* All RF64 files are little endian. */
 	psf->endian = SF_ENDIAN_LITTLE ;
 
+	psf->strings.flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END ;
 
 	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = rf64_read_header (psf, &blockalign, &framesperblock)) != 0)
@@ -159,7 +162,8 @@ enum
 	HAVE_fmt	= 0x02,
 	HAVE_bext	= 0x04,
 	HAVE_data	= 0x08,
-	HAVE_cart	= 0x10
+	HAVE_cart	= 0x10,
+	HAVE_other	= 0x20
 } ;
 
 #define HAVE_CHUNK(CHUNK)	((parsestage & CHUNK) != 0)
@@ -261,6 +265,13 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if ((error = wavlike_read_cart_chunk (psf, chunk_size)) != 0)
 						return error ;
 					parsestage |= HAVE_cart ;
+					break ;
+
+			case INFO_MARKER :
+			case LIST_MARKER :
+					if ((error = wavlike_subchunk_parse (psf, marker, chunk_size)) != 0)
+						return error ;
+					parsestage |= HAVE_other ;
 					break ;
 
 			case data_MARKER :
@@ -664,20 +675,18 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 
 	if (psf->cart_16k != NULL)
 		wavlike_write_cart_chunk (psf) ;
-#if 0
+
 	/* The LIST/INFO chunk. */
 	if (psf->strings.flags & SF_STR_LOCATE_START)
-		wav_write_strings (psf, SF_STR_LOCATE_START) ;
+		wavlike_write_strings (psf, SF_STR_LOCATE_START) ;
 
+#if 0
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
 	{	psf_binheader_writef (psf, "m4", PEAK_MARKER, WAV_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
 		psf_binheader_writef (psf, "44", 1, time (NULL)) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
 			psf_binheader_writef (psf, "ft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
 		} ;
-
-//	if (psf->broadcast_info != NULL)
-//		wavlike_write_bext_chunk (psf) ;
 
 	if (psf->instrument != NULL)
 	{	int		tmp ;
@@ -704,13 +713,13 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 			} ;
 		} ;
 
+#endif
+
 	if (psf->headindex + 8 < psf->dataoffset)
 	{	/* Add PAD data if necessary. */
-		k = psf->dataoffset - 16 - psf->headindex ;
+		int k = psf->dataoffset - 16 - psf->headindex ;
 		psf_binheader_writef (psf, "m4z", PAD_MARKER, k, make_size_t (k)) ;
 		} ;
-
-#endif
 
 	if (wpriv->rf64_downgrade && (psf->filelength < RIFF_DOWNGRADE_BYTES))
 		psf_binheader_writef (psf, "tm8", data_MARKER, psf->datalength) ;
@@ -737,12 +746,41 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 } /* rf64_write_header */
 
 static int
+rf64_write_tailer (SF_PRIVATE *psf)
+{
+	/* Reset the current header buffer length to zero. */
+	psf->header [0] = 0 ;
+	psf->headindex = 0 ;
+
+	if (psf->bytewidth > 0 && psf->sf.seekable == SF_TRUE)
+	{	psf->datalength = psf->sf.frames * psf->bytewidth * psf->sf.channels ;
+		psf->dataend = psf->dataoffset + psf->datalength ;
+		} ;
+
+	if (psf->dataend > 0)
+		psf_fseek (psf, psf->dataend, SEEK_SET) ;
+	else
+		psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
+
+	if (psf->dataend & 1)
+		psf_binheader_writef (psf, "z", 1) ;
+
+	if (psf->strings.flags & SF_STR_LOCATE_END)
+		wavlike_write_strings (psf, SF_STR_LOCATE_END) ;
+
+	/* Write the tailer. */
+	if (psf->headindex > 0)
+		psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+
+	return 0 ;
+} /* rf64_write_tailer */
+
+static int
 rf64_close (SF_PRIVATE *psf)
 {
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
-	{	// rf64_write_tailer (psf) ;
-
-		psf->write_header (psf, SF_TRUE) ;
+	{	rf64_write_tailer (psf) ;
+		rf64_write_header (psf, SF_TRUE) ;
 		} ;
 
 	return 0 ;
@@ -785,4 +823,3 @@ rf64_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
 
 	return 0 ;
 } /* rf64_command */
-
