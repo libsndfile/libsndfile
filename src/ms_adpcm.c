@@ -28,15 +28,6 @@
 #include	"common.h"
 #include	"wavlike.h"
 
-/* These required here because we write the header in this file. */
-
-#define RIFF_MARKER	(MAKE_MARKER ('R', 'I', 'F', 'F'))
-#define WAVE_MARKER	(MAKE_MARKER ('W', 'A', 'V', 'E'))
-#define fmt_MARKER	(MAKE_MARKER ('f', 'm', 't', ' '))
-#define fact_MARKER	(MAKE_MARKER ('f', 'a', 'c', 't'))
-#define data_MARKER	(MAKE_MARKER ('d', 'a', 't', 'a'))
-
-#define WAVE_FORMAT_MS_ADPCM	0x0002
 
 typedef struct
 {	int				channels, blocksize, samplesperblock, blocks, dataremaining ;
