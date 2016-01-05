@@ -39,44 +39,24 @@
 #define RIFX_MARKER		(MAKE_MARKER ('R', 'I', 'F', 'X'))
 #define WAVE_MARKER		(MAKE_MARKER ('W', 'A', 'V', 'E'))
 #define fmt_MARKER		(MAKE_MARKER ('f', 'm', 't', ' '))
-#define data_MARKER		(MAKE_MARKER ('d', 'a', 't', 'a'))
 #define fact_MARKER		(MAKE_MARKER ('f', 'a', 'c', 't'))
 #define PEAK_MARKER		(MAKE_MARKER ('P', 'E', 'A', 'K'))
 
 #define cue_MARKER		(MAKE_MARKER ('c', 'u', 'e', ' '))
-#define LIST_MARKER		(MAKE_MARKER ('L', 'I', 'S', 'T'))
 #define slnt_MARKER		(MAKE_MARKER ('s', 'l', 'n', 't'))
 #define wavl_MARKER		(MAKE_MARKER ('w', 'a', 'v', 'l'))
-#define INFO_MARKER		(MAKE_MARKER ('I', 'N', 'F', 'O'))
 #define plst_MARKER		(MAKE_MARKER ('p', 'l', 's', 't'))
-#define adtl_MARKER		(MAKE_MARKER ('a', 'd', 't', 'l'))
-#define labl_MARKER		(MAKE_MARKER ('l', 'a', 'b', 'l'))
-#define ltxt_MARKER		(MAKE_MARKER ('l', 't', 'x', 't'))
-#define note_MARKER		(MAKE_MARKER ('n', 'o', 't', 'e'))
 #define smpl_MARKER		(MAKE_MARKER ('s', 'm', 'p', 'l'))
-#define bext_MARKER		(MAKE_MARKER ('b', 'e', 'x', 't'))
 #define iXML_MARKER		(MAKE_MARKER ('i', 'X', 'M', 'L'))
 #define levl_MARKER		(MAKE_MARKER ('l', 'e', 'v', 'l'))
 #define MEXT_MARKER		(MAKE_MARKER ('M', 'E', 'X', 'T'))
-#define DISP_MARKER		(MAKE_MARKER ('D', 'I', 'S', 'P'))
 #define acid_MARKER		(MAKE_MARKER ('a', 'c', 'i', 'd'))
 #define strc_MARKER		(MAKE_MARKER ('s', 't', 'r', 'c'))
-#define PAD_MARKER		(MAKE_MARKER ('P', 'A', 'D', ' '))
 #define afsp_MARKER		(MAKE_MARKER ('a', 'f', 's', 'p'))
 #define clm_MARKER		(MAKE_MARKER ('c', 'l', 'm', ' '))
 #define elmo_MARKER		(MAKE_MARKER ('e', 'l', 'm', 'o'))
-#define cart_MARKER		(MAKE_MARKER ('c', 'a', 'r', 't'))
 #define FLLR_MARKER		(MAKE_MARKER ('F', 'L', 'L', 'R'))
 
-#define exif_MARKER		(MAKE_MARKER ('e', 'x', 'i', 'f'))
-#define ever_MARKER		(MAKE_MARKER ('e', 'v', 'e', 'r'))
-#define etim_MARKER		(MAKE_MARKER ('e', 't', 'i', 'm'))
-#define ecor_MARKER		(MAKE_MARKER ('e', 'c', 'o', 'r'))
-#define emdl_MARKER		(MAKE_MARKER ('e', 'm', 'd', 'l'))
-#define emnt_MARKER		(MAKE_MARKER ('e', 'm', 'n', 't'))
-#define erel_MARKER		(MAKE_MARKER ('e', 'r', 'e', 'l'))
-#define eucm_MARKER		(MAKE_MARKER ('e', 'u', 'c', 'm'))
-#define olym_MARKER		(MAKE_MARKER ('o', 'l', 'y', 'm'))
 #define minf_MARKER		(MAKE_MARKER ('m', 'i', 'n', 'f'))
 #define elm1_MARKER		(MAKE_MARKER ('e', 'l', 'm', '1'))
 #define regn_MARKER		(MAKE_MARKER ('r', 'e', 'g', 'n'))
@@ -90,32 +70,11 @@
 #define AFAn_MARKER		(MAKE_MARKER ('A', 'F', 'A', 'n'))
 
 
-#define ISFT_MARKER		(MAKE_MARKER ('I', 'S', 'F', 'T'))
-#define ICRD_MARKER		(MAKE_MARKER ('I', 'C', 'R', 'D'))
-#define ICOP_MARKER		(MAKE_MARKER ('I', 'C', 'O', 'P'))
-#define IARL_MARKER		(MAKE_MARKER ('I', 'A', 'R', 'L'))
-#define IART_MARKER		(MAKE_MARKER ('I', 'A', 'R', 'T'))
-#define INAM_MARKER		(MAKE_MARKER ('I', 'N', 'A', 'M'))
-#define IENG_MARKER		(MAKE_MARKER ('I', 'E', 'N', 'G'))
-#define IGNR_MARKER		(MAKE_MARKER ('I', 'G', 'N', 'R'))
-#define ICOP_MARKER		(MAKE_MARKER ('I', 'C', 'O', 'P'))
-#define IPRD_MARKER		(MAKE_MARKER ('I', 'P', 'R', 'D'))
-#define ISRC_MARKER		(MAKE_MARKER ('I', 'S', 'R', 'C'))
-#define ISBJ_MARKER		(MAKE_MARKER ('I', 'S', 'B', 'J'))
-#define ICMT_MARKER		(MAKE_MARKER ('I', 'C', 'M', 'T'))
-#define IAUT_MARKER		(MAKE_MARKER ('I', 'A', 'U', 'T'))
-#define ITRK_MARKER		(MAKE_MARKER ('I', 'T', 'R', 'K'))
-
 /* Weird WAVPACK marker which can show up at the start of the DATA section. */
 #define wvpk_MARKER (MAKE_MARKER ('w', 'v', 'p', 'k'))
 #define OggS_MARKER (MAKE_MARKER ('O', 'g', 'g', 'S'))
 
 #define WAV_PEAK_CHUNK_SIZE(ch) 	(2 * sizeof (int) + ch * (sizeof (float) + sizeof (int)))
-#define WAV_BEXT_MIN_CHUNK_SIZE		602
-#define WAV_BEXT_MAX_CHUNK_SIZE		(10 * 1024)
-
-#define WAV_CART_MIN_CHUNK_SIZE		2048
-#define WAV_CART_MAX_CHUNK_SIZE		0xffffffff
 
 
 enum
@@ -180,12 +139,9 @@ static int	wav_read_header		(SF_PRIVATE *psf, int *blockalign, int *framesperblo
 static int	wav_write_header	(SF_PRIVATE *psf, int calc_length) ;
 
 static int	wav_write_tailer (SF_PRIVATE *psf) ;
-static void wav_write_strings (SF_PRIVATE *psf, int location) ;
 static int	wav_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 static int	wav_close (SF_PRIVATE *psf) ;
 
-static int 	wav_subchunk_parse	(SF_PRIVATE *psf, int chunk, uint32_t length) ;
-static int 	exif_subchunk_parse	(SF_PRIVATE *psf, uint32_t length) ;
 static int	wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen) ;
 static int	wav_read_acid_chunk (SF_PRIVATE *psf, uint32_t chunklen) ;
 
@@ -593,7 +549,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			case LIST_MARKER :
 					parsestage |= HAVE_other ;
 
-					if ((error = wav_subchunk_parse (psf, marker, chunk_size)) != 0)
+					if ((error = wavlike_subchunk_parse (psf, marker, chunk_size)) != 0)
 						return error ;
 					break ;
 
@@ -1123,7 +1079,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 
 	/* The LIST/INFO chunk. */
 	if (psf->strings.flags & SF_STR_LOCATE_START)
-		wav_write_strings (psf, SF_STR_LOCATE_START) ;
+		wavlike_write_strings (psf, SF_STR_LOCATE_START) ;
 
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
 	{	psf_binheader_writef (psf, "m4", PEAK_MARKER, WAV_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
@@ -1224,7 +1180,7 @@ wav_write_tailer (SF_PRIVATE *psf)
 		} ;
 
 	if (psf->strings.flags & SF_STR_LOCATE_END)
-		wav_write_strings (psf, SF_STR_LOCATE_END) ;
+		wavlike_write_strings (psf, SF_STR_LOCATE_END) ;
 
 	/* Write the tailer. */
 	if (psf->headindex > 0)
@@ -1232,72 +1188,6 @@ wav_write_tailer (SF_PRIVATE *psf)
 
 	return 0 ;
 } /* wav_write_tailer */
-
-static void
-wav_write_strings (SF_PRIVATE *psf, int location)
-{	int	k, prev_head_index, saved_head_index ;
-
-	if (psf_location_string_count (psf, location) == 0)
-		return ;
-
-	prev_head_index = psf->headindex + 4 ;
-
-	psf_binheader_writef (psf, "m4m", LIST_MARKER, 0xBADBAD, INFO_MARKER) ;
-
-	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
-	{	if (psf->strings.data [k].type == 0)
-			break ;
-		if (psf->strings.data [k].type < 0 || psf->strings.data [k].flags != location)
-			continue ;
-
-		switch (psf->strings.data [k].type)
-		{	case SF_STR_SOFTWARE :
-				psf_binheader_writef (psf, "ms", ISFT_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
-				break ;
-
-			case SF_STR_TITLE :
-				psf_binheader_writef (psf, "ms", INAM_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
-				break ;
-
-			case SF_STR_COPYRIGHT :
-				psf_binheader_writef (psf, "ms", ICOP_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
-				break ;
-
-			case SF_STR_ARTIST :
-				psf_binheader_writef (psf, "ms", IART_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
-				break ;
-
-			case SF_STR_COMMENT :
-				psf_binheader_writef (psf, "ms", ICMT_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
-				break ;
-
-			case SF_STR_DATE :
-				psf_binheader_writef (psf, "ms", ICRD_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
-				break ;
-
-			case SF_STR_GENRE :
-				psf_binheader_writef (psf, "ms", IGNR_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
-				break ;
-
-			case SF_STR_ALBUM :
-				psf_binheader_writef (psf, "ms", IPRD_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
-				break ;
-
-			case SF_STR_TRACKNUMBER :
-				psf_binheader_writef (psf, "ms", ITRK_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
-				break ;
-
-			default :
-				break ;
-			} ;
-		} ;
-
-	saved_head_index = psf->headindex ;
-	psf->headindex = prev_head_index ;
-	psf_binheader_writef (psf, "4", saved_head_index - prev_head_index - 4) ;
-	psf->headindex = saved_head_index ;
-
-} /* wav_write_strings */
 
 static int
 wav_close (SF_PRIVATE *psf)
@@ -1357,194 +1247,6 @@ wav_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
 
 	return 0 ;
 } /* wav_command */
-
-static int
-wav_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
-{	sf_count_t	current_pos ;
-	char		buffer [512] ;
-	uint32_t 	chunk_size, bytesread ;
-
-	current_pos = psf_fseek (psf, 0, SEEK_CUR) - 4 ;
-
-	bytesread = sizeof (chunk_length) ;
-
-	if (chunk_length <= 8)
-	{	/* This case is for broken files generated by PEAK. */
-		psf_log_printf (psf, "%M : %u (weird length)\n", chunk, chunk_length) ;
-		psf_binheader_readf (psf, "mj", &chunk, chunk_length - 4) ;
-		psf_log_printf (psf, "  %M\n", chunk) ;
-		return 0 ;
-		} ;
-
-	if (psf->headindex + chunk_length > SIGNED_SIZEOF (psf->header))
-	{	psf_log_printf (psf, "%M : %u (too long)\n", chunk, chunk_length) ;
-		psf_binheader_readf (psf, "j", chunk_length) ;
-		return 0 ;
-		} ;
-
-	if (current_pos + chunk_length > psf->filelength)
-	{	psf_log_printf (psf, "%M : %u (should be %d)\n", chunk, chunk_length, (int) (psf->filelength - current_pos)) ;
-		chunk_length = psf->filelength - current_pos ;
-		}
-	else
-		psf_log_printf (psf, "%M : %u\n", chunk, chunk_length) ;
-
-	while (bytesread < chunk_length)
-	{	uint32_t thisread ;
-
-		if ((thisread = psf_binheader_readf (psf, "m", &chunk)) == 0)
-			break ;
-		bytesread += thisread ;
-
-		switch (chunk)
-		{	case adtl_MARKER :
-			case INFO_MARKER :
-					/* These markers don't contain anything, not even a chunk lebgth. */
-					psf_log_printf (psf, "  %M\n", chunk) ;
-					continue ;
-
-			case exif_MARKER :
-					psf_log_printf (psf, "  %M\n", chunk) ;
-					bytesread += exif_subchunk_parse (psf, chunk_length - bytesread) ;
-					continue ;
-
-			case data_MARKER :
-					psf_log_printf (psf, "  %M inside a LIST block??? Backing out.\n", chunk) ;
-					/* Jump back four bytes and return to caller. */
-					psf_binheader_readf (psf, "j", -4) ;
-					return 0 ;
-
-			case 0 :
-					/*
-					**	Four zero bytes where a marker was expected. Assume this means
-					**	the rest of the chunk is garbage.
-					*/
-					psf_log_printf (psf, "    *** Found weird-ass zero marker. Jumping to end of chunk.\n") ;
-					if (bytesread < chunk_length)
-						bytesread += psf_binheader_readf (psf, "j", chunk_length - bytesread + 4) ;
-					psf_log_printf (psf, "    *** Offset is now : 0x%X\n", psf_fseek (psf, 0, SEEK_CUR)) ;
-					return 0 ;
-
-			default :
-					break ;
-			} ;
-
-		switch (chunk)
-		{	case ISFT_MARKER :
-			case ICOP_MARKER :
-			case IARL_MARKER :
-			case IART_MARKER :
-			case ICMT_MARKER :
-			case ICRD_MARKER :
-			case IENG_MARKER :
-			case IGNR_MARKER :
-			case INAM_MARKER :
-			case IPRD_MARKER :
-			case ISBJ_MARKER :
-			case ISRC_MARKER :
-			case IAUT_MARKER :
-			case ITRK_MARKER :
-					bytesread += psf_binheader_readf (psf, "4", &chunk_size) ;
-					chunk_size += (chunk_size & 1) ;
-					if (chunk_size >= SIGNED_SIZEOF (buffer) || chunk_size >= chunk_length)
-					{	psf_log_printf (psf, "  *** %M : %u (too big)\n", chunk, chunk_size) ;
-						psf_binheader_readf (psf, "j", chunk_length) ;
-						return 0 ;
-						} ;
-
-					bytesread += psf_binheader_readf (psf, "b", buffer, chunk_size) ;
-					buffer [chunk_size] = 0 ;
-					psf_log_printf (psf, "    %M : %s\n", chunk, buffer) ;
-					break ;
-
-			case labl_MARKER :
-					{	int mark_id ;
-
-						bytesread += psf_binheader_readf (psf, "44", &chunk_size, &mark_id) ;
-						chunk_size -= 4 ;
-						chunk_size += (chunk_size & 1) ;
-						if (chunk_size < 1 || chunk_size >= SIGNED_SIZEOF (buffer) || chunk_size >= chunk_length)
-						{	psf_log_printf (psf, "  *** %M : %u (too big)\n", chunk, chunk_size) ;
-							psf_binheader_readf (psf, "j", chunk_length) ;
-							break ;
-							} ;
-
-						bytesread += psf_binheader_readf (psf, "b", buffer, chunk_size) ;
-						buffer [chunk_size] = 0 ;
-						psf_log_printf (psf, "    %M : %u : %s\n", chunk, mark_id, buffer) ;
-						} ;
-					break ;
-
-
-			case DISP_MARKER :
-			case ltxt_MARKER :
-			case note_MARKER :
-					bytesread += psf_binheader_readf (psf, "4", &chunk_size) ;
-					chunk_size += (chunk_size & 1) ;
-					if (chunk_size >= SIGNED_SIZEOF (buffer) || chunk_size >= chunk_length)
-					{	psf_log_printf (psf, "  *** %M : %u (too big)\n", chunk, chunk_size) ;
-						psf_binheader_readf (psf, "j", chunk_length) ;
-						return 0 ;
-						} ;
-
-					bytesread += psf_binheader_readf (psf, "j", chunk_size) ;
-					psf_log_printf (psf, "    %M : %u\n", chunk, chunk_size) ;
-					break ;
-
-			default :
-					bytesread += psf_binheader_readf (psf, "4", &chunk_size) ;
-					chunk_size += (chunk_size & 1) ;
-					psf_log_printf (psf, "    *** %M : %u\n", chunk, chunk_size) ;
-					if (bytesread + chunk_size > chunk_length)
-					{	bytesread += psf_binheader_readf (psf, "j", chunk_length - bytesread + 4) ;
-						continue ;
-						}
-					else
-						bytesread += psf_binheader_readf (psf, "j", chunk_size) ;
-
-					if (chunk_size >= chunk_length)
-						return 0 ;
-					break ;
-			} ;
-
-		switch (chunk)
-		{	case ISFT_MARKER :
-					psf_store_string (psf, SF_STR_SOFTWARE, buffer) ;
-					break ;
-			case ICOP_MARKER :
-					psf_store_string (psf, SF_STR_COPYRIGHT, buffer) ;
-					break ;
-			case INAM_MARKER :
-					psf_store_string (psf, SF_STR_TITLE, buffer) ;
-					break ;
-			case IART_MARKER :
-					psf_store_string (psf, SF_STR_ARTIST, buffer) ;
-					break ;
-			case ICMT_MARKER :
-					psf_store_string (psf, SF_STR_COMMENT, buffer) ;
-					break ;
-			case ICRD_MARKER :
-					psf_store_string (psf, SF_STR_DATE, buffer) ;
-					break ;
-			case IGNR_MARKER :
-					psf_store_string (psf, SF_STR_GENRE, buffer) ;
-					break ;
-			case IPRD_MARKER :
-					psf_store_string (psf, SF_STR_ALBUM, buffer) ;
-					break ;
-			case ITRK_MARKER :
-					psf_store_string (psf, SF_STR_TRACKNUMBER, buffer) ;
-					break ;
-			} ;
-		} ;
-
-	current_pos = psf_fseek (psf, 0, SEEK_CUR) - current_pos ;
-
-	if (current_pos - 4 != chunk_length)
-		psf_log_printf (psf, "**** Bad chunk length %d sbould be %D\n", chunk_length, current_pos - 4) ;
-
-	return 0 ;
-} /* wav_subchunk_parse */
 
 static int
 wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
@@ -1757,293 +1459,6 @@ wav_read_acid_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 
 	return 0 ;
 } /* wav_read_acid_chunk */
-
-int
-wavlike_read_bext_chunk (SF_PRIVATE *psf, uint32_t chunksize)
-{
-	SF_BROADCAST_INFO_16K * b ;
-	uint32_t bytes = 0 ;
-
-	if (chunksize < WAV_BEXT_MIN_CHUNK_SIZE)
-	{	psf_log_printf (psf, "bext : %u (should be >= %d)\n", chunksize, WAV_BEXT_MIN_CHUNK_SIZE) ;
-		psf_binheader_readf (psf, "j", chunksize) ;
-		return 0 ;
-		} ;
-
-	if (chunksize > WAV_BEXT_MAX_CHUNK_SIZE)
-	{	psf_log_printf (psf, "bext : %u (should be < %d)\n", chunksize, WAV_BEXT_MAX_CHUNK_SIZE) ;
-		psf_binheader_readf (psf, "j", chunksize) ;
-		return 0 ;
-		} ;
-
-	if (chunksize >= sizeof (SF_BROADCAST_INFO_16K))
-	{	psf_log_printf (psf, "bext : %u too big to be handled\n", chunksize) ;
-		psf_binheader_readf (psf, "j", chunksize) ;
-		return 0 ;
-		} ;
-
-	psf_log_printf (psf, "bext : %u\n", chunksize) ;
-
-	if ((psf->broadcast_16k = broadcast_var_alloc ()) == NULL)
-	{	psf->error = SFE_MALLOC_FAILED ;
-		return psf->error ;
-		} ;
-
-	b = psf->broadcast_16k ;
-
-	bytes += psf_binheader_readf (psf, "b", b->description, sizeof (b->description)) ;
-	bytes += psf_binheader_readf (psf, "b", b->originator, sizeof (b->originator)) ;
-	bytes += psf_binheader_readf (psf, "b", b->originator_reference, sizeof (b->originator_reference)) ;
-	bytes += psf_binheader_readf (psf, "b", b->origination_date, sizeof (b->origination_date)) ;
-	bytes += psf_binheader_readf (psf, "b", b->origination_time, sizeof (b->origination_time)) ;
-	bytes += psf_binheader_readf (psf, "442", &b->time_reference_low, &b->time_reference_high, &b->version) ;
-	bytes += psf_binheader_readf (psf, "bj", &b->umid, sizeof (b->umid), 190) ;
-
-	if (chunksize > WAV_BEXT_MIN_CHUNK_SIZE)
-	{	/* File has coding history data. */
-
-		b->coding_history_size = chunksize - WAV_BEXT_MIN_CHUNK_SIZE ;
-
-		/* We do not parse the coding history */
-		bytes += psf_binheader_readf (psf, "b", b->coding_history, b->coding_history_size) ;
-		} ;
-
-	if (bytes < chunksize)
-		psf_binheader_readf (psf, "j", chunksize - bytes) ;
-
-	return 0 ;
-} /* wavlike_read_bext_chunk */
-
-int
-wavlike_write_bext_chunk (SF_PRIVATE *psf)
-{	SF_BROADCAST_INFO_16K *b ;
-
-	if (psf->broadcast_16k == NULL)
-		return -1 ;
-
-	b = psf->broadcast_16k ;
-
-	psf_binheader_writef (psf, "m4", bext_MARKER, WAV_BEXT_MIN_CHUNK_SIZE + b->coding_history_size) ;
-
-	/*
-	**	Note that it is very important that the field widths of the SF_BROADCAST_INFO
-	**	struct match those of the bext chunk fields.
-	*/
-
-	psf_binheader_writef (psf, "b", b->description, sizeof (b->description)) ;
-	psf_binheader_writef (psf, "b", b->originator, sizeof (b->originator)) ;
-	psf_binheader_writef (psf, "b", b->originator_reference, sizeof (b->originator_reference)) ;
-	psf_binheader_writef (psf, "b", b->origination_date, sizeof (b->origination_date)) ;
-	psf_binheader_writef (psf, "b", b->origination_time, sizeof (b->origination_time)) ;
-	psf_binheader_writef (psf, "442", b->time_reference_low, b->time_reference_high, b->version) ;
-	psf_binheader_writef (psf, "b", b->umid, sizeof (b->umid)) ;
-	psf_binheader_writef (psf, "z", make_size_t (190)) ;
-
-	if (b->coding_history_size > 0)
-		psf_binheader_writef (psf, "b", b->coding_history, make_size_t (b->coding_history_size)) ;
-
-	return 0 ;
-} /* wavlike_write_bext_chunk */
-
-int
-wavlike_read_cart_chunk (SF_PRIVATE *psf, uint32_t chunksize)
-{	SF_CART_INFO_16K *c ;
-	uint32_t bytes = 0 ;
-	int k ;
-
-	if (chunksize < WAV_CART_MIN_CHUNK_SIZE)
-	{	psf_log_printf (psf, "cart : %u (should be >= %d)\n", chunksize, WAV_CART_MIN_CHUNK_SIZE) ;
-		psf_binheader_readf (psf, "j", chunksize) ;
-		return 0 ;
-		} ;
-	if (chunksize > WAV_CART_MAX_CHUNK_SIZE)
-	{	psf_log_printf (psf, "cart : %u (should be < %d)\n", chunksize, WAV_CART_MAX_CHUNK_SIZE) ;
-		psf_binheader_readf (psf, "j", chunksize) ;
-		return 0 ;
-		} ;
-
-	if (chunksize >= sizeof (SF_CART_INFO_16K))
-	{	psf_log_printf (psf, "cart : %u too big to be handled\n", chunksize) ;
-		psf_binheader_readf (psf, "j", chunksize) ;
-		return 0 ;
-		} ;
-
-	psf_log_printf (psf, "cart : %u\n", chunksize) ;
-
-	if ((psf->cart_16k = cart_var_alloc ()) == NULL)
-	{	psf->error = SFE_MALLOC_FAILED ;
-		return psf->error ;
-		} ;
-
-	c = psf->cart_16k ;
-	bytes += psf_binheader_readf (psf, "b", c->version, sizeof (c->version)) ;
-	bytes += psf_binheader_readf (psf, "b", c->title, sizeof (c->title)) ;
-	bytes += psf_binheader_readf (psf, "b", c->artist, sizeof (c->artist)) ;
-	bytes += psf_binheader_readf (psf, "b", c->cut_id, sizeof (c->cut_id)) ;
-	bytes += psf_binheader_readf (psf, "b", c->client_id, sizeof (c->client_id)) ;
-	bytes += psf_binheader_readf (psf, "b", c->category, sizeof (c->category)) ;
-	bytes += psf_binheader_readf (psf, "b", c->classification, sizeof (c->classification)) ;
-	bytes += psf_binheader_readf (psf, "b", c->out_cue, sizeof (c->out_cue)) ;
-	bytes += psf_binheader_readf (psf, "b", c->start_date, sizeof (c->start_date)) ;
-	bytes += psf_binheader_readf (psf, "b", c->start_time, sizeof (c->start_time)) ;
-	bytes += psf_binheader_readf (psf, "b", c->end_date, sizeof (c->end_date)) ;
-	bytes += psf_binheader_readf (psf, "b", c->end_time, sizeof (c->end_time)) ;
-	bytes += psf_binheader_readf (psf, "b", c->producer_app_id, sizeof (c->producer_app_id)) ;
-	bytes += psf_binheader_readf (psf, "b", c->producer_app_version, sizeof (c->producer_app_version)) ;
-	bytes += psf_binheader_readf (psf, "b", c->user_def, sizeof (c->user_def)) ;
-	bytes += psf_binheader_readf (psf, "e4", &c->level_reference, sizeof (c->level_reference)) ;
-
-	for (k = 0 ; k < ARRAY_LEN (c->post_timers) ; k++)
-		bytes += psf_binheader_readf (psf, "b4", &c->post_timers [k].usage, make_size_t (4), &c->post_timers [k].value) ;
-
-	bytes += psf_binheader_readf (psf, "b", c->reserved, sizeof (c->reserved)) ;
-	bytes += psf_binheader_readf (psf, "b", c->url, sizeof (c->url)) ;
-
-	if (chunksize > WAV_CART_MIN_CHUNK_SIZE)
-	{	/* File has tag text. */
-		c->tag_text_size = chunksize - WAV_CART_MIN_CHUNK_SIZE ;
-		bytes += psf_binheader_readf (psf, "b", c->tag_text, make_size_t (c->tag_text_size)) ;
-		} ;
-
-	return 0 ;
-} /* wavlike_read_cart_chunk */
-
-int
-wavlike_write_cart_chunk (SF_PRIVATE *psf)
-{	SF_CART_INFO_16K *c ;
-	int k ;
-
-	if (psf->cart_16k == NULL)
-		return -1 ;
-
-	c = psf->cart_16k ;
-	psf_binheader_writef (psf, "m4", cart_MARKER, WAV_CART_MIN_CHUNK_SIZE + c->tag_text_size) ;
-	/*
-	**	Note that it is very important that the field widths of the SF_CART_INFO
-	**	struct match those of the cart chunk fields.
-	*/
-	psf_binheader_writef (psf, "b", c->version, sizeof (c->version)) ;
-	psf_binheader_writef (psf, "b", c->title, sizeof (c->title)) ;
-	psf_binheader_writef (psf, "b", c->artist, sizeof (c->artist)) ;
-	psf_binheader_writef (psf, "b", c->cut_id, sizeof (c->cut_id)) ;
-	psf_binheader_writef (psf, "b", c->client_id, sizeof (c->client_id)) ;
-	psf_binheader_writef (psf, "b", c->category, sizeof (c->category)) ;
-	psf_binheader_writef (psf, "b", c->classification, sizeof (c->classification)) ;
-	psf_binheader_writef (psf, "b", c->out_cue, sizeof (c->out_cue)) ;
-	psf_binheader_writef (psf, "b", c->start_date, sizeof (c->start_date)) ;
-	psf_binheader_writef (psf, "b", c->start_time, sizeof (c->start_time)) ;
-	psf_binheader_writef (psf, "b", c->end_date, sizeof (c->end_date)) ;
-	psf_binheader_writef (psf, "b", c->end_time, sizeof (c->end_time)) ;
-	psf_binheader_writef (psf, "b", c->producer_app_id, sizeof (c->producer_app_id)) ;
-	psf_binheader_writef (psf, "b", c->producer_app_version, sizeof (c->producer_app_version)) ;
-	psf_binheader_writef (psf, "b", c->user_def, sizeof (c->user_def)) ;
-	psf_binheader_writef (psf, "4", c->level_reference, sizeof (c->level_reference)) ;
-
-	for (k = 0 ; k < ARRAY_LEN (c->post_timers) ; k++)
-		psf_binheader_writef (psf, "b4", c->post_timers [k].usage, make_size_t (4), c->post_timers [k].value) ;
-
-	psf_binheader_writef (psf, "z", sizeof (c->reserved)) ;	// just write zeros, we don't have any other use for it
-	psf_binheader_writef (psf, "b", c->url, sizeof (c->url)) ;
-
-	if (c->tag_text_size > 0)
-		psf_binheader_writef (psf, "b", c->tag_text, make_size_t (c->tag_text_size)) ;
-
-	return 0 ;
-} /* wavlike_write_cart_chunk */
-
-static int
-exif_fill_and_sink (SF_PRIVATE *psf, char* buf, size_t bufsz, size_t toread)
-{
-	size_t bytesread = 0 ;
-
-	buf [0] = 0 ;
-	bufsz -= 1 ;
-	if (toread < bufsz)
-		bufsz = toread ;
-	bytesread = psf_binheader_readf (psf, "b", buf, bufsz) ;
-	buf [bufsz] = 0 ;
-
-	if (bytesread == bufsz && toread > bufsz)
-		bytesread += psf_binheader_readf (psf, "j", toread - bufsz) ;
-
-	return bytesread ;
-} /* exif_fill_and_sink */
-
-/*
-** Exif specification for audio files, at JEITA CP-3451 Exif 2.2 section 5
-** (Exif Audio File Specification) http://www.exif.org/Exif2-2.PDF
-*/
-static int
-exif_subchunk_parse (SF_PRIVATE *psf, uint32_t length)
-{	uint32_t marker, dword, vmajor = -1, vminor = -1, bytesread = 0 ;
-	char buf [4096] ;
-	int thisread ;
-
-	while (bytesread < length)
-	{
-		if ((thisread = psf_binheader_readf (psf, "m", &marker)) == 0)
-			break ;
-		bytesread += thisread ;
-
-		switch (marker)
-		{
-			case 0 : /* camera padding? */
-				break ;
-
-			case ever_MARKER :
-				bytesread += psf_binheader_readf (psf, "j4", 4, &dword) ;
-				vmajor = 10 * (((dword >> 24) & 0xff) - '0') + (((dword >> 16) & 0xff) - '0') ;
-				vminor = 10 * (((dword >> 8) & 0xff) - '0') + ((dword & 0xff) - '0') ;
-				psf_log_printf (psf, "    EXIF Version : %u.%02u\n", vmajor, vminor) ;
-				break ;
-
-			case olym_MARKER :
-				bytesread += psf_binheader_readf (psf, "4", &dword) ;
-				psf_log_printf (psf, "%M : %u\n", marker, dword) ;
-				if (dword > length || bytesread + dword > length)
-					break ;
-				dword += (dword & 1) ;
-				bytesread += psf_binheader_readf (psf, "j", dword) ;
-				break ;
-
-			case emnt_MARKER : /* design information: null-terminated string */
-			case emdl_MARKER : /* model name ; null-terminated string */
-			case ecor_MARKER : /* manufacturer: null-terminated string */
-			case etim_MARKER : /* creation time: null-terminated string in the format "hour:minute:second.subsecond" */
-			case erel_MARKER : /* relation info: null-terminated string (filename) */
-			case eucm_MARKER : /* user comment: 4-byte size follows, then possibly unicode data */
-				bytesread += psf_binheader_readf (psf, "4", &dword) ;
-				bytesread += sizeof (dword) ;
-				dword += (dword & 1) ;
-
-				if (dword >= sizeof (buf))
-				{	psf_log_printf (psf, "*** Marker '%M' is too big %u\n\n", marker, dword) ;
-					return bytesread ;
-					} ;
-
-				bytesread += exif_fill_and_sink (psf, buf, sizeof (buf), dword) ;
-
-				/* BAD - don't know what's going on here -- maybe a bug in the camera */
-				/* field should be NULL-terminated but there's no room for it with the reported number */
-				/*  example output:     emdl : 8 (EX-Z1050) */
-				if (marker == emdl_MARKER && dword == strlen (buf) /* should be >= strlen+1*/)
-				{	psf_log_printf (psf, "    *** field size too small for string (sinking 2 bytes)\n") ;
-					bytesread += psf_binheader_readf (psf, "j", 2) ;
-					} ;
-
-				psf_log_printf (psf, "    %M : %u (%s)\n", marker, dword, buf) ;
-				if (dword > length)
-					return bytesread ;
-				break ;
-
-			default :
-				psf_log_printf (psf, "    *** %M (%u): -- ignored --\n", marker, marker) ;
-				break ;
-			} ;
-		} ;
-
-	return bytesread ;
-} /* exif_subchunk_parse */
 
 /*==============================================================================
 */

@@ -23,6 +23,48 @@
 #define WAVLIKE_H_INCLUDED
 
 /*------------------------------------------------------------------------------
+** Chunk markers.
+*/
+
+#define adtl_MARKER		MAKE_MARKER ('a', 'd', 't', 'l')
+#define bext_MARKER		MAKE_MARKER ('b', 'e', 'x', 't')
+#define cart_MARKER		MAKE_MARKER ('c', 'a', 'r', 't')
+#define data_MARKER		MAKE_MARKER ('d', 'a', 't', 'a')
+#define labl_MARKER		MAKE_MARKER ('l', 'a', 'b', 'l')
+#define ltxt_MARKER		MAKE_MARKER ('l', 't', 'x', 't')
+#define note_MARKER		MAKE_MARKER ('n', 'o', 't', 'e')
+#define DISP_MARKER		MAKE_MARKER ('D', 'I', 'S', 'P')
+#define INFO_MARKER		MAKE_MARKER ('I', 'N', 'F', 'O')
+#define LIST_MARKER		MAKE_MARKER ('L', 'I', 'S', 'T')
+#define PAD_MARKER		MAKE_MARKER ('P', 'A', 'D', ' ')
+
+#define ISFT_MARKER		MAKE_MARKER ('I', 'S', 'F', 'T')
+#define ICRD_MARKER		MAKE_MARKER ('I', 'C', 'R', 'D')
+#define ICOP_MARKER		MAKE_MARKER ('I', 'C', 'O', 'P')
+#define IARL_MARKER		MAKE_MARKER ('I', 'A', 'R', 'L')
+#define IART_MARKER		MAKE_MARKER ('I', 'A', 'R', 'T')
+#define INAM_MARKER		MAKE_MARKER ('I', 'N', 'A', 'M')
+#define IENG_MARKER		MAKE_MARKER ('I', 'E', 'N', 'G')
+#define IGNR_MARKER		MAKE_MARKER ('I', 'G', 'N', 'R')
+#define ICOP_MARKER		MAKE_MARKER ('I', 'C', 'O', 'P')
+#define IPRD_MARKER		MAKE_MARKER ('I', 'P', 'R', 'D')
+#define ISRC_MARKER		MAKE_MARKER ('I', 'S', 'R', 'C')
+#define ISBJ_MARKER		MAKE_MARKER ('I', 'S', 'B', 'J')
+#define ICMT_MARKER		MAKE_MARKER ('I', 'C', 'M', 'T')
+#define IAUT_MARKER		MAKE_MARKER ('I', 'A', 'U', 'T')
+#define ITRK_MARKER		MAKE_MARKER ('I', 'T', 'R', 'K')
+
+#define exif_MARKER		MAKE_MARKER ('e', 'x', 'i', 'f')
+#define ever_MARKER		MAKE_MARKER ('e', 'v', 'e', 'r')
+#define etim_MARKER		MAKE_MARKER ('e', 't', 'i', 'm')
+#define ecor_MARKER		MAKE_MARKER ('e', 'c', 'o', 'r')
+#define emdl_MARKER		MAKE_MARKER ('e', 'm', 'd', 'l')
+#define emnt_MARKER		MAKE_MARKER ('e', 'm', 'n', 't')
+#define erel_MARKER		MAKE_MARKER ('e', 'r', 'e', 'l')
+#define eucm_MARKER		MAKE_MARKER ('e', 'u', 'c', 'm')
+#define olym_MARKER		MAKE_MARKER ('o', 'l', 'y', 'm')
+
+/*------------------------------------------------------------------------------
 ** List of known WAV format tags
 */
 
@@ -289,7 +331,7 @@ void	wavlike_msadpcm_write_adapt_coeffs (SF_PRIVATE *psf) ;
 
 char const* wavlike_format_str (int k) ;
 
-int 	wavlike_srate2blocksize (int srate_chan_product) ;
+int		wavlike_srate2blocksize (int srate_chan_product) ;
 int		wavlike_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize) ;
 void	wavlike_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat) ;
 void	wavlike_analyze (SF_PRIVATE *psf) ;
@@ -300,6 +342,9 @@ int		wavlike_write_bext_chunk (SF_PRIVATE *psf) ;
 
 int		wavlike_read_cart_chunk (SF_PRIVATE *psf, unsigned int chunksize) ;
 int		wavlike_write_cart_chunk (SF_PRIVATE *psf) ;
+
+int		wavlike_subchunk_parse	(SF_PRIVATE *psf, int chunk, uint32_t length) ;
+void	wavlike_write_strings (SF_PRIVATE *psf, int location) ;
 
 #endif
 
