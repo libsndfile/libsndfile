@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2009      Uli Franke <cls@nebadje.org>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@
 #include	"sndfile.h"
 #include	"sfendian.h"
 #include	"common.h"
-#include	"wav_w64.h"
+#include	"wavlike.h"
 
 /*------------------------------------------------------------------------------
 ** Macros to handle big/little endian issues.
@@ -81,11 +81,11 @@ static int	rf64_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int
 
 int
 rf64_open (SF_PRIVATE *psf)
-{	WAV_PRIVATE *wpriv ;
+{	WAVLIKE_PRIVATE *wpriv ;
 	int	subformat, error = 0 ;
 	int blockalign, framesperblock ;
 
-	if ((wpriv = calloc (1, sizeof (WAV_PRIVATE))) == NULL)
+	if ((wpriv = calloc (1, sizeof (WAVLIKE_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 	psf->container_data = wpriv ;
 	wpriv->wavex_ambisonic = SF_AMBISONIC_NONE ;
@@ -166,7 +166,7 @@ enum
 
 static int
 rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
-{	WAV_PRIVATE	*wpriv ;
+{	WAVLIKE_PRIVATE	*wpriv ;
 	WAV_FMT		*wav_fmt ;
 	sf_count_t riff_size = 0, frame_count = 0, ds64_datalength = 0 ;
 	uint32_t marks [2], chunk_size, parsestage = 0 ;
@@ -245,20 +245,20 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 			case fmt_MARKER:
 					psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
-					if ((error = wav_w64_read_fmt_chunk (psf, chunk_size)) != 0)
+					if ((error = wavlike_read_fmt_chunk (psf, chunk_size)) != 0)
 						return error ;
 					format = wav_fmt->format ;
 					parsestage |= HAVE_fmt ;
 					break ;
 
 			case bext_MARKER :
-					if ((error = wav_read_bext_chunk (psf, chunk_size)) != 0)
+					if ((error = wavlike_read_bext_chunk (psf, chunk_size)) != 0)
 						return error ;
 					parsestage |= HAVE_bext ;
 					break ;
 
 			case cart_MARKER :
-					if ((error = wav_read_cart_chunk (psf, chunk_size)) != 0)
+					if ((error = wavlike_read_cart_chunk (psf, chunk_size)) != 0)
 						return error ;
 					parsestage |= HAVE_cart ;
 					break ;
@@ -440,7 +440,7 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		} ;
 
 	if (wpriv->fmt_is_broken)
-		wav_w64_analyze (psf) ;
+		wavlike_analyze (psf) ;
 
 	/* Only set the format endian-ness if its non-standard big-endian. */
 	if (psf->endian == SF_ENDIAN_BIG)
@@ -485,7 +485,7 @@ static const EXT_SUBFORMAT MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT =
 
 static int
 rf64_write_fmt_chunk (SF_PRIVATE *psf)
-{	WAV_PRIVATE	*wpriv ;
+{	WAVLIKE_PRIVATE	*wpriv ;
 	int subformat, fmt_size ;
 
 	if ((wpriv = psf->container_data) == NULL)
@@ -571,22 +571,22 @@ rf64_write_fmt_chunk (SF_PRIVATE *psf)
 		case SF_FORMAT_PCM_16 :
 		case SF_FORMAT_PCM_24 :
 		case SF_FORMAT_PCM_32 :
-			wavex_write_guid (psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE ?
+			wavlike_write_guid (psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE ?
 						&MSGUID_SUBTYPE_PCM : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM) ;
 			break ;
 
 		case SF_FORMAT_FLOAT :
 		case SF_FORMAT_DOUBLE :
-			wavex_write_guid (psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE ?
+			wavlike_write_guid (psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE ?
 						&MSGUID_SUBTYPE_IEEE_FLOAT : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT) ;
 			break ;
 
 		case SF_FORMAT_ULAW :
-			wavex_write_guid (psf, &MSGUID_SUBTYPE_MULAW) ;
+			wavlike_write_guid (psf, &MSGUID_SUBTYPE_MULAW) ;
 			break ;
 
 		case SF_FORMAT_ALAW :
-			wavex_write_guid (psf, &MSGUID_SUBTYPE_ALAW) ;
+			wavlike_write_guid (psf, &MSGUID_SUBTYPE_ALAW) ;
 			break ;
 
 		default : return SFE_UNIMPLEMENTED ;
@@ -600,7 +600,7 @@ static int
 rf64_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t	current ;
 	int 		error = 0, has_data = SF_FALSE, add_fact_chunk = 0 ;
-	WAV_PRIVATE	*wpriv ;
+	WAVLIKE_PRIVATE	*wpriv ;
 
 	if ((wpriv = psf->container_data) == NULL)
 		return SFE_INTERNAL ;
@@ -660,10 +660,10 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	if (psf->broadcast_16k != NULL)
-		wav_write_bext_chunk (psf) ;
+		wavlike_write_bext_chunk (psf) ;
 
 	if (psf->cart_16k != NULL)
-		wav_write_cart_chunk (psf) ;
+		wavlike_write_cart_chunk (psf) ;
 #if 0
 	/* The LIST/INFO chunk. */
 	if (psf->strings.flags & SF_STR_LOCATE_START)
@@ -677,7 +677,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 //	if (psf->broadcast_info != NULL)
-//		wav_write_bext_chunk (psf) ;
+//		wavlike_write_bext_chunk (psf) ;
 
 	if (psf->instrument != NULL)
 	{	int		tmp ;
@@ -750,7 +750,7 @@ rf64_close (SF_PRIVATE *psf)
 
 static int
 rf64_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
-{	WAV_PRIVATE	*wpriv ;
+{	WAVLIKE_PRIVATE	*wpriv ;
 
 	if ((wpriv = psf->container_data) == NULL)
 		return SFE_INTERNAL ;
@@ -771,7 +771,7 @@ rf64_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
 			return wpriv->wavex_ambisonic ;
 
 		case SFC_SET_CHANNEL_MAP_INFO :
-			wpriv->wavex_channelmask = wavex_gen_channel_mask (psf->channel_map, psf->sf.channels) ;
+			wpriv->wavex_channelmask = wavlike_gen_channel_mask (psf->channel_map, psf->sf.channels) ;
 			return (wpriv->wavex_channelmask != 0) ;
 
 		case SFC_RF64_AUTO_DOWNGRADE :

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -26,7 +26,7 @@
 #include	"sndfile.h"
 #include	"sfendian.h"
 #include	"common.h"
-#include	"wav_w64.h"
+#include	"wavlike.h"
 
 /* These required here because we write the header in this file. */
 
@@ -61,11 +61,11 @@ static int AdaptationTable [] =
    appear in the actual WAVE file.  They should be read in
    in case a sound program added extras to the list. */
 
-static int AdaptCoeff1 [MSADPCM_ADAPT_COEFF_COUNT] =
+static int AdaptCoeff1 [WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT] =
 {	256, 512, 0, 192, 240, 460, 392
 } ;
 
-static int AdaptCoeff2 [MSADPCM_ADAPT_COEFF_COUNT] =
+static int AdaptCoeff2 [WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT] =
 {	0, -256, 0, 64, 0, -208, -232
 } ;
 
@@ -124,7 +124,7 @@ static	void	choose_predictor (unsigned int channels, short *data, int *bpred, in
 */
 
 int
-wav_w64_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
+wavlike_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 {	MSADPCM_PRIVATE	*pms ;
 	unsigned int	pmssize ;
 	int				count ;
@@ -200,15 +200,15 @@ wav_w64_msadpcm_init	(SF_PRIVATE *psf, int blockalign, int samplesperblock)
 	psf->seek = msadpcm_seek ;
 
 	return 0 ;
-} /* wav_w64_msadpcm_init */
+} /* wavlike_msadpcm_init */
 
 
 static inline short
 msadpcm_get_bpred (SF_PRIVATE *psf, MSADPCM_PRIVATE *pms, unsigned char value)
-{	if (value >= MSADPCM_ADAPT_COEFF_COUNT)
+{	if (value >= WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT)
 	{	if (pms->sync_error == 0)
 		{	pms->sync_error = 1 ;
-			psf_log_printf (psf, "MS ADPCM synchronisation error (%u should be < %u).\n", value, MSADPCM_ADAPT_COEFF_COUNT) ;
+			psf_log_printf (psf, "MS ADPCM synchronisation error (%u should be < %u).\n", value, WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT) ;
 			} ;
 		return 0 ;
 		} ;
@@ -515,12 +515,12 @@ msadpcm_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset)
 */
 
 void
-msadpcm_write_adapt_coeffs	(SF_PRIVATE *psf)
+wavlike_msadpcm_write_adapt_coeffs	(SF_PRIVATE *psf)
 {	int k ;
 
-	for (k = 0 ; k < MSADPCM_ADAPT_COEFF_COUNT ; k++)
+	for (k = 0 ; k < WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT ; k++)
 		psf_binheader_writef (psf, "22", AdaptCoeff1 [k], AdaptCoeff2 [k]) ;
-} /* msadpcm_write_adapt_coeffs */
+} /* wavlike_msadpcm_write_adapt_coeffs */
 
 /*==========================================================================================
 */

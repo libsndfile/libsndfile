@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -78,12 +78,12 @@ static sf_count_t ima_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len
 static sf_count_t ima_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static sf_count_t aiff_ima_seek		(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
-static sf_count_t wav_w64_ima_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
+static sf_count_t wavlike_ima_seek	(SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 
 static int	ima_close	(SF_PRIVATE *psf) ;
 
-static int wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima) ;
-static int wav_w64_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima) ;
+static int wavlike_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima) ;
+static int wavlike_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima) ;
 
 /*-static int aiff_ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;-*/
 static int aiff_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima) ;
@@ -105,7 +105,7 @@ clamp_ima_step_index (int indx)
 */
 
 int
-wav_w64_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
+wavlike_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 {	int error ;
 
 	if (psf->codec_data != NULL)
@@ -125,10 +125,10 @@ wav_w64_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 			return error ;
 
 	psf->codec_close = ima_close ;
-	psf->seek = wav_w64_ima_seek ;
+	psf->seek = wavlike_ima_seek ;
 
 	return 0 ;
-} /* wav_w64_ima_init */
+} /* wavlike_ima_init */
 
 int
 aiff_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
@@ -225,7 +225,7 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 					return SFE_INTERNAL ;
 					} ;
 
-				pima->decode_block = wav_w64_ima_decode_block ;
+				pima->decode_block = wavlike_ima_decode_block ;
 
 				psf->sf.frames = pima->samplesperblock * pima->blocks ;
 				break ;
@@ -399,7 +399,7 @@ aiff_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 } /* aiff_ima_encode_block */
 
 static int
-wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
+wavlike_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 {	int		chan, k, predictor, blockindx, indx, indxstart, diff ;
 	short	step, bytecode, stepindx [2] ;
 
@@ -487,10 +487,10 @@ wav_w64_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 		} ;
 
 	return 1 ;
-} /* wav_w64_ima_decode_block */
+} /* wavlike_ima_decode_block */
 
 static int
-wav_w64_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
+wavlike_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 {	int		chan, k, step, diff, vpdiff, blockindx, indx, indxstart ;
 	short	bytecode, mask ;
 
@@ -575,7 +575,7 @@ wav_w64_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 	pima->blockcount ++ ;
 
 	return 1 ;
-} /* wav_w64_ima_encode_block */
+} /* wavlike_ima_encode_block */
 
 static int
 ima_read_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima, short *ptr, int len)
@@ -763,7 +763,7 @@ aiff_ima_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 } /* aiff_ima_seek */
 
 static sf_count_t
-wav_w64_ima_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
+wavlike_ima_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 {	IMA_ADPCM_PRIVATE *pima ;
 	int			newblock, newsample ;
 
@@ -805,7 +805,7 @@ wav_w64_ima_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 		} ;
 
 	return newblock * pima->samplesperblock + newsample ;
-} /* wav_w64_ima_seek */
+} /* wavlike_ima_seek */
 
 /*==========================================================================================
 ** IMA ADPCM Write Functions.
@@ -841,7 +841,7 @@ ima_writer_init (SF_PRIVATE *psf, int blockalign)
 	switch (SF_CONTAINER (psf->sf.format))
 	{	case SF_FORMAT_WAV :
 		case SF_FORMAT_W64 :
-				pima->encode_block = wav_w64_ima_encode_block ;
+				pima->encode_block = wavlike_ima_encode_block ;
 				break ;
 
 		case SF_FORMAT_AIFF :

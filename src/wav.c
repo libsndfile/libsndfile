@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004-2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -29,7 +29,7 @@
 #include	"sndfile.h"
 #include	"sfendian.h"
 #include	"common.h"
-#include	"wav_w64.h"
+#include	"wavlike.h"
 
 /*------------------------------------------------------------------------------
  * Macros to handle big/little endian issues.
@@ -200,10 +200,10 @@ static int wav_get_chunk_data (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterat
 
 int
 wav_open	(SF_PRIVATE *psf)
-{	WAV_PRIVATE * wpriv ;
+{	WAVLIKE_PRIVATE * wpriv ;
 	int	format, subformat, error, blockalign = 0, framesperblock = 0 ;
 
-	if ((wpriv = calloc (1, sizeof (WAV_PRIVATE))) == NULL)
+	if ((wpriv = calloc (1, sizeof (WAVLIKE_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 	psf->container_data = wpriv ;
 
@@ -248,7 +248,7 @@ wav_open	(SF_PRIVATE *psf)
 			} ;
 
 		if (subformat == SF_FORMAT_IMA_ADPCM || subformat == SF_FORMAT_MS_ADPCM)
-		{	blockalign = wav_w64_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
+		{	blockalign = wavlike_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
 			framesperblock = -1 ; /* Corrected later. */
 			} ;
 
@@ -294,11 +294,11 @@ wav_open	(SF_PRIVATE *psf)
 					break ;
 
 		case SF_FORMAT_IMA_ADPCM :
-					error = wav_w64_ima_init (psf, blockalign, framesperblock) ;
+					error = wavlike_ima_init (psf, blockalign, framesperblock) ;
 					break ;
 
 		case SF_FORMAT_MS_ADPCM :
-					error = wav_w64_msadpcm_init (psf, blockalign, framesperblock) ;
+					error = wavlike_msadpcm_init (psf, blockalign, framesperblock) ;
 					break ;
 
 		case SF_FORMAT_G721_32 :
@@ -325,7 +325,7 @@ wav_open	(SF_PRIVATE *psf)
 
 static int
 wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
-{	WAV_PRIVATE	*wpriv ;
+{	WAVLIKE_PRIVATE	*wpriv ;
 	WAV_FMT		*wav_fmt ;
 	FACT_CHUNK	fact_chunk ;
 	uint32_t	marker, chunk_size = 0, RIFFsize = 0, done = 0, uk ;
@@ -415,7 +415,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 					psf_log_printf (psf, "fmt  : %d\n", chunk_size) ;
 
-					if ((error = wav_w64_read_fmt_chunk (psf, chunk_size)))
+					if ((error = wavlike_read_fmt_chunk (psf, chunk_size)))
 						return error ;
 
 					format = wav_fmt->format ;
@@ -602,7 +602,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					The 'bext' chunk can actually be updated, so don't need to set this.
 					parsestage |= HAVE_other ;
 					*/
-					if ((error = wav_read_bext_chunk (psf, chunk_size)))
+					if ((error = wavlike_read_bext_chunk (psf, chunk_size)))
 						return error ;
 					break ;
 
@@ -616,7 +616,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					break ;
 
 			case cart_MARKER:
-					if ((error = wav_read_cart_chunk (psf, chunk_size)))
+					if ((error = wavlike_read_cart_chunk (psf, chunk_size)))
 						return error ;
 					break ;
 
@@ -772,7 +772,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		} ;
 
 	if (wpriv->fmt_is_broken)
-		wav_w64_analyze (psf) ;
+		wavlike_analyze (psf) ;
 
 	/* Only set the format endian-ness if its non-standard big-endian. */
 	if (psf->endian == SF_ENDIAN_BIG)
@@ -846,7 +846,7 @@ wav_write_fmt_chunk (SF_PRIVATE *psf)
 		case SF_FORMAT_IMA_ADPCM :
 					{	int blockalign, framesperblock, bytespersec ;
 
-						blockalign		= wav_w64_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
+						blockalign		= wavlike_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
 						framesperblock	= 2 * (blockalign - 4 * psf->sf.channels) / psf->sf.channels + 1 ;
 						bytespersec		= (psf->sf.samplerate * blockalign) / framesperblock ;
 
@@ -867,12 +867,12 @@ wav_write_fmt_chunk (SF_PRIVATE *psf)
 		case SF_FORMAT_MS_ADPCM :
 					{	int	blockalign, framesperblock, bytespersec, extrabytes ;
 
-						blockalign		= wav_w64_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
+						blockalign		= wavlike_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
 						framesperblock	= 2 + 2 * (blockalign - 7 * psf->sf.channels) / psf->sf.channels ;
 						bytespersec		= (psf->sf.samplerate * blockalign) / framesperblock ;
 
 						/* fmt chunk. */
-						extrabytes	= 2 + 2 + MSADPCM_ADAPT_COEFF_COUNT * (2 + 2) ;
+						extrabytes	= 2 + 2 + WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT * (2 + 2) ;
 						fmt_size	= 2 + 2 + 4 + 4 + 2 + 2 + 2 + extrabytes ;
 
 						/* fmt : size, WAV format type, channels. */
@@ -884,7 +884,7 @@ wav_write_fmt_chunk (SF_PRIVATE *psf)
 						/* fmt : blockalign, bitwidth, extrabytes, framesperblock. */
 						psf_binheader_writef (psf, "22222", blockalign, 4, extrabytes, framesperblock, 7) ;
 
-						msadpcm_write_adapt_coeffs (psf) ;
+						wavlike_msadpcm_write_adapt_coeffs (psf) ;
 						} ;
 
 					add_fact_chunk = SF_TRUE ;
@@ -910,8 +910,8 @@ wav_write_fmt_chunk (SF_PRIVATE *psf)
 		case SF_FORMAT_GSM610 :
 					{	int	blockalign, framesperblock, bytespersec ;
 
-						blockalign		= WAV_W64_GSM610_BLOCKSIZE ;
-						framesperblock	= WAV_W64_GSM610_SAMPLES ;
+						blockalign		= WAVLIKE_GSM610_BLOCKSIZE ;
+						framesperblock	= WAVLIKE_GSM610_SAMPLES ;
 						bytespersec		= (psf->sf.samplerate * blockalign) / framesperblock ;
 
 						/* fmt chunk. */
@@ -941,7 +941,7 @@ wav_write_fmt_chunk (SF_PRIVATE *psf)
 
 static int
 wavex_write_fmt_chunk (SF_PRIVATE *psf)
-{	WAV_PRIVATE	*wpriv ;
+{	WAVLIKE_PRIVATE	*wpriv ;
 	int subformat, fmt_size ;
 
 	if ((wpriv = psf->container_data) == NULL)
@@ -1027,28 +1027,28 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 		case SF_FORMAT_PCM_16 :
 		case SF_FORMAT_PCM_24 :
 		case SF_FORMAT_PCM_32 :
-			wavex_write_guid (psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE ?
+			wavlike_write_guid (psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE ?
 						&MSGUID_SUBTYPE_PCM : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_PCM) ;
 			break ;
 
 		case SF_FORMAT_FLOAT :
 		case SF_FORMAT_DOUBLE :
-			wavex_write_guid (psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE ?
+			wavlike_write_guid (psf, wpriv->wavex_ambisonic == SF_AMBISONIC_NONE ?
 						&MSGUID_SUBTYPE_IEEE_FLOAT : &MSGUID_SUBTYPE_AMBISONIC_B_FORMAT_IEEE_FLOAT) ;
 			break ;
 
 		case SF_FORMAT_ULAW :
-			wavex_write_guid (psf, &MSGUID_SUBTYPE_MULAW) ;
+			wavlike_write_guid (psf, &MSGUID_SUBTYPE_MULAW) ;
 			break ;
 
 		case SF_FORMAT_ALAW :
-			wavex_write_guid (psf, &MSGUID_SUBTYPE_ALAW) ;
+			wavlike_write_guid (psf, &MSGUID_SUBTYPE_ALAW) ;
 			break ;
 
 #if 0
 		/* This is dead code due to return in previous switch statement. */
 		case SF_FORMAT_MS_ADPCM : /* todo, GUID exists */
-			wavex_write_guid (psf, &MSGUID_SUBTYPE_MS_ADPCM) ;
+			wavlike_write_guid (psf, &MSGUID_SUBTYPE_MS_ADPCM) ;
 			break ;
 			return SFE_UNIMPLEMENTED ;
 #endif
@@ -1133,10 +1133,10 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	if (psf->broadcast_16k != NULL)
-		wav_write_bext_chunk (psf) ;
+		wavlike_write_bext_chunk (psf) ;
 
 	if (psf->cart_16k != NULL)
-		wav_write_cart_chunk (psf) ;
+		wavlike_write_cart_chunk (psf) ;
 
 	if (psf->instrument != NULL)
 	{	int		tmp ;
@@ -1327,7 +1327,7 @@ wav_close (SF_PRIVATE *psf)
 
 static int
 wav_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
-{	WAV_PRIVATE	*wpriv ;
+{	WAVLIKE_PRIVATE	*wpriv ;
 
 	if ((wpriv = psf->container_data) == NULL)
 		return SFE_INTERNAL ;
@@ -1348,7 +1348,7 @@ wav_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
 			return wpriv->wavex_ambisonic ;
 
 		case SFC_SET_CHANNEL_MAP_INFO :
-			wpriv->wavex_channelmask = wavex_gen_channel_mask (psf->channel_map, psf->sf.channels) ;
+			wpriv->wavex_channelmask = wavlike_gen_channel_mask (psf->channel_map, psf->sf.channels) ;
 			return (wpriv->wavex_channelmask != 0) ;
 
 		default :
@@ -1759,7 +1759,7 @@ wav_read_acid_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 } /* wav_read_acid_chunk */
 
 int
-wav_read_bext_chunk (SF_PRIVATE *psf, uint32_t chunksize)
+wavlike_read_bext_chunk (SF_PRIVATE *psf, uint32_t chunksize)
 {
 	SF_BROADCAST_INFO_16K * b ;
 	uint32_t bytes = 0 ;
@@ -1812,10 +1812,10 @@ wav_read_bext_chunk (SF_PRIVATE *psf, uint32_t chunksize)
 		psf_binheader_readf (psf, "j", chunksize - bytes) ;
 
 	return 0 ;
-} /* wav_read_bext_chunk */
+} /* wavlike_read_bext_chunk */
 
 int
-wav_write_bext_chunk (SF_PRIVATE *psf)
+wavlike_write_bext_chunk (SF_PRIVATE *psf)
 {	SF_BROADCAST_INFO_16K *b ;
 
 	if (psf->broadcast_16k == NULL)
@@ -1843,10 +1843,10 @@ wav_write_bext_chunk (SF_PRIVATE *psf)
 		psf_binheader_writef (psf, "b", b->coding_history, make_size_t (b->coding_history_size)) ;
 
 	return 0 ;
-} /* wav_write_bext_chunk */
+} /* wavlike_write_bext_chunk */
 
 int
-wav_read_cart_chunk (SF_PRIVATE *psf, uint32_t chunksize)
+wavlike_read_cart_chunk (SF_PRIVATE *psf, uint32_t chunksize)
 {	SF_CART_INFO_16K *c ;
 	uint32_t bytes = 0 ;
 	int k ;
@@ -1906,10 +1906,10 @@ wav_read_cart_chunk (SF_PRIVATE *psf, uint32_t chunksize)
 		} ;
 
 	return 0 ;
-} /* wav_read_cart_chunk */
+} /* wavlike_read_cart_chunk */
 
 int
-wav_write_cart_chunk (SF_PRIVATE *psf)
+wavlike_write_cart_chunk (SF_PRIVATE *psf)
 {	SF_CART_INFO_16K *c ;
 	int k ;
 
@@ -1949,7 +1949,7 @@ wav_write_cart_chunk (SF_PRIVATE *psf)
 		psf_binheader_writef (psf, "b", c->tag_text, make_size_t (c->tag_text_size)) ;
 
 	return 0 ;
-} /* wav_write_cart_chunk */
+} /* wavlike_write_cart_chunk */
 
 static int
 exif_fill_and_sink (SF_PRIVATE *psf, char* buf, size_t bufsz, size_t toread)

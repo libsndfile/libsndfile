@@ -26,7 +26,7 @@
 #include	"sndfile.h"
 #include	"sfendian.h"
 #include	"common.h"
-#include	"wav_w64.h"
+#include	"wavlike.h"
 
 /*------------------------------------------------------------------------------
 ** W64 files use 16 byte markers as opposed to the four byte marker of
@@ -122,10 +122,10 @@ static int	w64_close (SF_PRIVATE *psf) ;
 
 int
 w64_open	(SF_PRIVATE *psf)
-{	WAV_PRIVATE * wpriv ;
+{	WAVLIKE_PRIVATE * wpriv ;
 	int	subformat, error, blockalign = 0, framesperblock = 0 ;
 
-	if ((wpriv = calloc (1, sizeof (WAV_PRIVATE))) == NULL)
+	if ((wpriv = calloc (1, sizeof (WAVLIKE_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 	psf->container_data = wpriv ;
 
@@ -148,7 +148,7 @@ w64_open	(SF_PRIVATE *psf)
 		psf->blockwidth = psf->bytewidth * psf->sf.channels ;
 
 		if (subformat == SF_FORMAT_IMA_ADPCM || subformat == SF_FORMAT_MS_ADPCM)
-		{	blockalign = wav_w64_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
+		{	blockalign = wavlike_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
 			framesperblock = -1 ;
 
 			/*
@@ -198,11 +198,11 @@ w64_open	(SF_PRIVATE *psf)
 					break ;
 
 		case SF_FORMAT_IMA_ADPCM :
-					error = wav_w64_ima_init (psf, blockalign, framesperblock) ;
+					error = wavlike_ima_init (psf, blockalign, framesperblock) ;
 					break ;
 
 		case SF_FORMAT_MS_ADPCM :
-					error = wav_w64_msadpcm_init (psf, blockalign, framesperblock) ;
+					error = wavlike_msadpcm_init (psf, blockalign, framesperblock) ;
 					break ;
 		/* Lite remove end */
 
@@ -222,7 +222,7 @@ w64_open	(SF_PRIVATE *psf)
 
 static int
 w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
-{	WAV_PRIVATE *wpriv ;
+{	WAVLIKE_PRIVATE *wpriv ;
 	WAV_FMT 	*wav_fmt ;
 	int			dword = 0, marker, format = 0 ;
 	sf_count_t	chunk_size, bytesread = 0 ;
@@ -280,7 +280,7 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					/* size of 16 byte marker and 8 byte chunk_size value. */
 					chunk_size -= 24 ;
 
-					if ((error = wav_w64_read_fmt_chunk (psf, (int) chunk_size)))
+					if ((error = wavlike_read_fmt_chunk (psf, (int) chunk_size)))
 						return error ;
 
 					if (chunk_size % 8)
@@ -536,7 +536,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		case SF_FORMAT_IMA_ADPCM :
 					{	int		blockalign, framesperblock, bytespersec ;
 
-						blockalign		= wav_w64_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
+						blockalign		= wavlike_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
 						framesperblock	= 2 * (blockalign - 4 * psf->sf.channels) / psf->sf.channels + 1 ;
 						bytespersec		= (psf->sf.samplerate * blockalign) / framesperblock ;
 
@@ -561,12 +561,12 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		case SF_FORMAT_MS_ADPCM :
 					{	int blockalign, framesperblock, bytespersec, extrabytes ;
 
-						blockalign		= wav_w64_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
+						blockalign		= wavlike_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
 						framesperblock	= 2 + 2 * (blockalign - 7 * psf->sf.channels) / psf->sf.channels ;
 						bytespersec		= (psf->sf.samplerate * blockalign) / framesperblock ;
 
 						/* fmt chunk. */
-						extrabytes	= 2 + 2 + MSADPCM_ADAPT_COEFF_COUNT * (2 + 2) ;
+						extrabytes	= 2 + 2 + WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT * (2 + 2) ;
 						fmt_size	= 24 + 2 + 2 + 4 + 4 + 2 + 2 + 2 + extrabytes ;
 						fmt_pad = (size_t) ((fmt_size & 0x7) ? 8 - (fmt_size & 0x7) : 0) ;
 						fmt_size += fmt_pad ;
@@ -580,7 +580,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 						/* fmt : blockalign, bitwidth, extrabytes, framesperblock. */
 						psf_binheader_writef (psf, "e22222", blockalign, 4, extrabytes, framesperblock, 7) ;
 
-						msadpcm_write_adapt_coeffs (psf) ;
+						wavlike_msadpcm_write_adapt_coeffs (psf) ;
 						} ;
 
 					add_fact_chunk = SF_TRUE ;
@@ -590,7 +590,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		case SF_FORMAT_GSM610 :
 					{	int bytespersec ;
 
-						bytespersec = (psf->sf.samplerate * WAV_W64_GSM610_BLOCKSIZE) / WAV_W64_GSM610_SAMPLES ;
+						bytespersec = (psf->sf.samplerate * WAVLIKE_GSM610_BLOCKSIZE) / WAVLIKE_GSM610_SAMPLES ;
 
 						/* fmt chunk. */
 						fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 ;
@@ -604,7 +604,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 						psf_binheader_writef (psf, "e44", psf->sf.samplerate, bytespersec) ;
 
 						/* fmt : blockalign, bitwidth, extrabytes, framesperblock. */
-						psf_binheader_writef (psf, "e2222", WAV_W64_GSM610_BLOCKSIZE, 0, 2, WAV_W64_GSM610_SAMPLES) ;
+						psf_binheader_writef (psf, "e2222", WAVLIKE_GSM610_BLOCKSIZE, 0, 2, WAVLIKE_GSM610_SAMPLES) ;
 						} ;
 
 					add_fact_chunk = SF_TRUE ;

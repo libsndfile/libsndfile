@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004-2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -27,7 +27,7 @@
 #include	"sndfile.h"
 #include	"sfendian.h"
 #include	"common.h"
-#include	"wav_w64.h"
+#include	"wavlike.h"
 
 /*  Known WAVEFORMATEXTENSIBLE GUIDS.  */
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_PCM =
@@ -110,8 +110,8 @@ wavex_guid_equal (const EXT_SUBFORMAT * first, const EXT_SUBFORMAT * second)
 
 
 int
-wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
-{	WAV_PRIVATE * wpriv ;
+wavlike_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
+{	WAVLIKE_PRIVATE * wpriv ;
 	WAV_FMT *wav_fmt ;
 	int	bytesread, k, bytespersec = 0 ;
 
@@ -132,7 +132,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 					&(wav_fmt->min.samplerate), &(wav_fmt->min.bytespersec),
 					&(wav_fmt->min.blockalign), &(wav_fmt->min.bitwidth)) ;
 
-	psf_log_printf (psf, "  Format        : 0x%X => %s\n", wav_fmt->format, wav_w64_format_str (wav_fmt->format)) ;
+	psf_log_printf (psf, "  Format        : 0x%X => %s\n", wav_fmt->format, wavlike_format_str (wav_fmt->format)) ;
 	psf_log_printf (psf, "  Channels      : %d\n", wav_fmt->min.channels) ;
 	psf_log_printf (psf, "  Sample Rate   : %d\n", wav_fmt->min.samplerate) ;
 
@@ -427,7 +427,7 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 		} ;
 
 	if (bytesread > fmtsize)
-	{	psf_log_printf (psf, "*** wav_w64_read_fmt_chunk (bytesread > fmtsize)\n") ;
+	{	psf_log_printf (psf, "*** wavlike_read_fmt_chunk (bytesread > fmtsize)\n") ;
 		return SFE_WAV_BAD_FMT ;
 		}
 	else
@@ -436,19 +436,19 @@ wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 	psf->blockwidth = wav_fmt->min.channels * psf->bytewidth ;
 
 	return 0 ;
-} /* wav_w64_read_fmt_chunk */
+} /* wavlike_read_fmt_chunk */
 
 void
-wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat)
+wavlike_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat)
 {
 	psf_binheader_writef (psf, "422b", subformat->esf_field1,
 					subformat->esf_field2, subformat->esf_field3,
 					subformat->esf_field4, make_size_t (8)) ;
-} /* wavex_write_guid */
+} /* wavlike_write_guid */
 
 
 int
-wavex_gen_channel_mask (const int *chan_map, int channels)
+wavlike_gen_channel_mask (const int *chan_map, int channels)
 {	int chan, mask = 0, bit = -1, last_bit = -1 ;
 
 	if (chan_map == NULL)
@@ -472,10 +472,10 @@ wavex_gen_channel_mask (const int *chan_map, int channels)
 		} ;
 
 	return mask ;
-} /* wavex_gen_channel_mask */
+} /* wavlike_gen_channel_mask */
 
 void
-wav_w64_analyze (SF_PRIVATE *psf)
+wavlike_analyze (SF_PRIVATE *psf)
 {	unsigned char buffer [4096] ;
 	AUDIO_DETECT ad ;
 	int format = 0 ;
@@ -504,33 +504,33 @@ wav_w64_analyze (SF_PRIVATE *psf)
 	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 
 	if (format == 0)
-	{	psf_log_printf (psf, "wav_w64_analyze : detection failed.\n") ;
+	{	psf_log_printf (psf, "wavlike_analyze : detection failed.\n") ;
 		return ;
 		} ;
 
 	switch (format)
 	{	case SF_FORMAT_PCM_32 :
 		case SF_FORMAT_FLOAT :
-			psf_log_printf (psf, "wav_w64_analyze : found format : 0x%X\n", format) ;
+			psf_log_printf (psf, "wavlike_analyze : found format : 0x%X\n", format) ;
 			psf->sf.format = (psf->sf.format & ~SF_FORMAT_SUBMASK) + format ;
 			psf->bytewidth = 4 ;
 			psf->blockwidth = psf->sf.channels * psf->bytewidth ;
 			break ;
 
 		case SF_FORMAT_PCM_24 :
-			psf_log_printf (psf, "wav_w64_analyze : found format : 0x%X\n", format) ;
+			psf_log_printf (psf, "wavlike_analyze : found format : 0x%X\n", format) ;
 			psf->sf.format = (psf->sf.format & ~SF_FORMAT_SUBMASK) + format ;
 			psf->bytewidth = 3 ;
 			psf->blockwidth = psf->sf.channels * psf->bytewidth ;
 			break ;
 
 		default :
-			psf_log_printf (psf, "wav_w64_analyze : unhandled format : 0x%X\n", format) ;
+			psf_log_printf (psf, "wavlike_analyze : unhandled format : 0x%X\n", format) ;
 			break ;
 		} ;
 
 	return ;
-} /* wav_w64_analyze */
+} /* wavlike_analyze */
 
 /*==============================================================================
 */
@@ -653,7 +653,7 @@ static WAV_FORMAT_DESC wave_descs [] =
 } ;
 
 char const*
-wav_w64_format_str (int k)
+wavlike_format_str (int k)
 {	int lower, upper, mid ;
 
 	lower = -1 ;
@@ -675,10 +675,10 @@ wav_w64_format_str (int k)
 		} ;
 
 	return "Unknown format" ;
-} /* wav_w64_format_str */
+} /* wavlike_format_str */
 
 int
-wav_w64_srate2blocksize (int srate_chan_product)
+wavlike_srate2blocksize (int srate_chan_product)
 {	if (srate_chan_product < 12000)
 		return 256 ;
 	if (srate_chan_product < 23000)

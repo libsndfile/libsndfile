@@ -899,8 +899,8 @@ int		alac_init		(SF_PRIVATE *psf, const ALAC_DECODER_INFO * info) ;
 
 int 	dither_init		(SF_PRIVATE *psf, int mode) ;
 
-int		wav_w64_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;
-int		wav_w64_msadpcm_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;
+int		wavlike_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;
+int		wavlike_msadpcm_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;
 
 int		aiff_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;
 
