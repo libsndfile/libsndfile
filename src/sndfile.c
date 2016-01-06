@@ -256,6 +256,9 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_VORBIS_ENCODER_BUG	, "Error : Sample rate chosen is known to trigger a Vorbis encoder bug on this CPU." },
 
 	{	SFE_RF64_NOT_RF64		, "Error : Not an RF64 file." },
+	{	SFE_RF64_PEAK_B4_FMT	, "Error in RF64 file. 'PEAK' chunk found before 'fmt ' chunk." },
+	{	SFE_RF64_NO_DATA		, "Error in RF64 file. No 'data' chunk marker." },
+
 	{	SFE_ALAC_FAIL_TMPFILE	, "Error : Failed to open tmp file for ALAC encoding." },
 
 	{	SFE_BAD_CHUNK_PTR		, "Error : Bad SF_CHUNK_INFO pointer." },

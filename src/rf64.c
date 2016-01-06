@@ -273,7 +273,7 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 			case PEAK_MARKER :
 					if ((parsestage & (HAVE_ds64 | HAVE_fmt)) != (HAVE_ds64 | HAVE_fmt))
-						return SFE_WAV_PEAK_B4_FMT ;
+						return SFE_RF64_PEAK_B4_FMT ;
 
 					parsestage |= HAVE_PEAK ;
 
@@ -368,7 +368,7 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		} ;
 
 	if (psf->dataoffset <= 0)
-		return SFE_WAV_NO_DATA ;
+		return SFE_RF64_NO_DATA ;
 
 	if (psf->sf.channels < 1)
 		return SFE_CHANNEL_COUNT_ZERO ;
