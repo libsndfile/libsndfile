@@ -204,6 +204,7 @@ echo "----------------------------------------------------------------------"
 ./header_test@EXEEXT@ rf64
 ./misc_test@EXEEXT@ rf64
 ./string_test@EXEEXT@ rf64
+./peak_chunk_test@EXEEXT@ rf64
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on RF64 files."
 echo "----------------------------------------------------------------------"

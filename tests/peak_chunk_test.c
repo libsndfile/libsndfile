@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,6 +85,13 @@ main (int argc, char *argv [])
 	{	test_float_peak	("peak_float.caf", SF_FORMAT_CAF | SF_FORMAT_FLOAT) ;
 
 		read_write_peak_test ("rw_peak.caf", SF_FORMAT_CAF | SF_FORMAT_FLOAT) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "rf64"))
+	{	test_float_peak	("peak_float.rf64", SF_FORMAT_RF64 | SF_FORMAT_FLOAT) ;
+
+		read_write_peak_test ("rw_peak.rf64", SF_FORMAT_RF64 | SF_FORMAT_FLOAT) ;
 		test_count++ ;
 		} ;
 

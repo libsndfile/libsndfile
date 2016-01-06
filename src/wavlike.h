@@ -37,6 +37,7 @@
 #define INFO_MARKER		MAKE_MARKER ('I', 'N', 'F', 'O')
 #define LIST_MARKER		MAKE_MARKER ('L', 'I', 'S', 'T')
 #define PAD_MARKER		MAKE_MARKER ('P', 'A', 'D', ' ')
+#define PEAK_MARKER		MAKE_MARKER ('P', 'E', 'A', 'K')
 
 #define ISFT_MARKER		MAKE_MARKER ('I', 'S', 'F', 'T')
 #define ICRD_MARKER		MAKE_MARKER ('I', 'C', 'R', 'D')
@@ -317,6 +318,8 @@ typedef struct
 #define		WAVLIKE_GSM610_BLOCKSIZE	65
 #define		WAVLIKE_GSM610_SAMPLES		320
 
+#define		WAVLIKE_PEAK_CHUNK_SIZE(ch) (2 * sizeof (int) + ch * (sizeof (float) + sizeof (int)))
+
 /*------------------------------------------------------------------------------------
 **	Functions defined in wav_ms_adpcm.c
 */
@@ -345,6 +348,9 @@ int		wavlike_write_cart_chunk (SF_PRIVATE *psf) ;
 
 int		wavlike_subchunk_parse	(SF_PRIVATE *psf, int chunk, uint32_t length) ;
 void	wavlike_write_strings (SF_PRIVATE *psf, int location) ;
+
+int		wavlike_read_peak_chunk (SF_PRIVATE * psf, size_t chunk_size) ;
+void	wavlike_write_peak_chunk (SF_PRIVATE * psf) ;
 
 #endif
 

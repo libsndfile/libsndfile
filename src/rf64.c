@@ -64,10 +64,6 @@
 #define RIFF_DOWNGRADE_BYTES	((sf_count_t) 0xffffffff)
 
 /*------------------------------------------------------------------------------
-** Typedefs.
-*/
-
-/*------------------------------------------------------------------------------
 ** Private static functions.
 */
 
@@ -163,7 +159,8 @@ enum
 	HAVE_bext	= 0x04,
 	HAVE_data	= 0x08,
 	HAVE_cart	= 0x10,
-	HAVE_other	= 0x20
+	HAVE_PEAK	= 0x20,
+	HAVE_other	= 0x40
 } ;
 
 #define HAVE_CHUNK(CHUNK)	((parsestage & CHUNK) != 0)
@@ -272,6 +269,18 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if ((error = wavlike_subchunk_parse (psf, marker, chunk_size)) != 0)
 						return error ;
 					parsestage |= HAVE_other ;
+					break ;
+
+			case PEAK_MARKER :
+					if ((parsestage & (HAVE_ds64 | HAVE_fmt)) != (HAVE_ds64 | HAVE_fmt))
+						return SFE_WAV_PEAK_B4_FMT ;
+
+					parsestage |= HAVE_PEAK ;
+
+					psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
+					if ((error = wavlike_read_peak_chunk (psf, chunk_size)) != 0)
+						return error ;
+					psf->peak_info->peak_loc = ((parsestage & HAVE_data) == 0) ? SF_PEAK_START : SF_PEAK_END ;
 					break ;
 
 			case data_MARKER :
@@ -680,14 +689,10 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->strings.flags & SF_STR_LOCATE_START)
 		wavlike_write_strings (psf, SF_STR_LOCATE_START) ;
 
-#if 0
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
-	{	psf_binheader_writef (psf, "m4", PEAK_MARKER, WAV_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
-		psf_binheader_writef (psf, "44", 1, time (NULL)) ;
-		for (k = 0 ; k < psf->sf.channels ; k++)
-			psf_binheader_writef (psf, "ft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
-		} ;
+		wavlike_write_peak_chunk (psf) ;
 
+#if 0
 	if (psf->instrument != NULL)
 	{	int		tmp ;
 		double	dtune = (double) (0x40000000) / 25.0 ;

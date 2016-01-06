@@ -1146,6 +1146,61 @@ wavlike_write_strings (SF_PRIVATE *psf, int location)
 
 } /* wavlike_write_strings */
 
+int
+wavlike_read_peak_chunk (SF_PRIVATE * psf, size_t chunk_size)
+{	char		buffer [256] ;
+	uint32_t uk ;
+
+	if (chunk_size != WAVLIKE_PEAK_CHUNK_SIZE (psf->sf.channels))
+	{	psf_binheader_readf (psf, "j", chunk_size) ;
+		psf_log_printf (psf, "*** File PEAK chunk size doesn't fit with number of channels (%d).\n", psf->sf.channels) ;
+		return SFE_WAV_BAD_PEAK ;
+		} ;
+
+	if ((psf->peak_info = peak_info_calloc (psf->sf.channels)) == NULL)
+		return SFE_MALLOC_FAILED ;
+
+	/* read in rest of PEAK chunk. */
+	psf_binheader_readf (psf, "44", & (psf->peak_info->version), & (psf->peak_info->timestamp)) ;
+
+	if (psf->peak_info->version != 1)
+		psf_log_printf (psf, "  version    : %d *** (should be version 1)\n", psf->peak_info->version) ;
+	else
+		psf_log_printf (psf, "  version    : %d\n", psf->peak_info->version) ;
+
+	psf_log_printf (psf, "  time stamp : %d\n", psf->peak_info->timestamp) ;
+	psf_log_printf (psf, "    Ch   Position       Value\n") ;
+
+	for (uk = 0 ; uk < (uint32_t) psf->sf.channels ; uk++)
+	{	float value ;
+		uint32_t position ;
+
+		psf_binheader_readf (psf, "f4", &value, &position) ;
+		psf->peak_info->peaks [uk].value = value ;
+		psf->peak_info->peaks [uk].position = position ;
+
+		snprintf (buffer, sizeof (buffer), "    %2d   %-12" PRId64 "   %g\n",
+				uk, psf->peak_info->peaks [uk].position, psf->peak_info->peaks [uk].value) ;
+		buffer [sizeof (buffer) - 1] = 0 ;
+		psf_log_printf (psf, "%s", buffer) ;
+		} ;
+
+	return 0 ;
+} /* wavlike_read_peak_chunk */
+
+void
+wavlike_write_peak_chunk (SF_PRIVATE * psf)
+{	int k ;
+
+	if (psf->peak_info == NULL)
+		return ;
+
+	psf_binheader_writef (psf, "m4", PEAK_MARKER, WAVLIKE_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
+	psf_binheader_writef (psf, "44", 1, time (NULL)) ;
+	for (k = 0 ; k < psf->sf.channels ; k++)
+		psf_binheader_writef (psf, "ft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
+} /* wavlike_write_peak_chunk */
+
 /*==============================================================================
 */
 
