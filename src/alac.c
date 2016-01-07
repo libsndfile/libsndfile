@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2011-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2011-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -243,7 +243,7 @@ alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 		return SFE_INTERNAL ;
 		} ;
 
-	if (info->frames_per_packet > ALAC_MAX_FRAME_SIZE)
+	if (info->frames_per_packet > ALAC_FRAME_LENGTH)
 	{	psf_log_printf (psf, "*** Error : frames_per_packet (%u) is too big. ***\n", info->frames_per_packet) ;
 		return SFE_INTERNAL ;
 		} ;
