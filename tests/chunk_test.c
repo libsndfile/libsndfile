@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,6 +49,8 @@ main (int argc, char *argv [])
 		printf ("    Where <test> is one of the following:\n") ;
 		printf ("           wav  - test adding chunks to WAV files\n") ;
 		printf ("           aiff - test adding chunks to AIFF files\n") ;
+		printf ("           caf  - test adding chunks to CAF files\n") ;
+		printf ("           rf64 - test adding chunks to RF64 files\n") ;
 		printf ("           all  - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -70,6 +72,11 @@ main (int argc, char *argv [])
 	if (do_all || ! strcmp (argv [1], "caf"))
 	{	chunk_test ("chunks_pcm16.caf", SF_FORMAT_CAF | SF_FORMAT_PCM_16) ;
 		chunk_test ("chunks_alac.caf", SF_FORMAT_CAF | SF_FORMAT_ALAC_16) ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "rf64"))
+	{	chunk_test ("chunks_pcm16.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
 		test_count++ ;
 		} ;
 

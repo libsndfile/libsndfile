@@ -73,6 +73,11 @@ static int	rf64_write_tailer (SF_PRIVATE *psf) ;
 static int	rf64_close (SF_PRIVATE *psf) ;
 static int	rf64_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize) ;
 
+static int rf64_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info) ;
+static SF_CHUNK_ITERATOR * rf64_next_chunk_iterator (SF_PRIVATE *psf, SF_CHUNK_ITERATOR * iterator) ;
+static int rf64_get_chunk_size (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
+static int rf64_get_chunk_data (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
+
 /*------------------------------------------------------------------------------
 ** Public function.
 */
@@ -96,6 +101,10 @@ rf64_open (SF_PRIVATE *psf)
 	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = rf64_read_header (psf, &blockalign, &framesperblock)) != 0)
 			return error ;
+
+		psf->next_chunk_iterator = rf64_next_chunk_iterator ;
+		psf->get_chunk_size = rf64_get_chunk_size ;
+		psf->get_chunk_data = rf64_get_chunk_data ;
 		} ;
 
 	if ((psf->sf.format & SF_FORMAT_TYPEMASK) != SF_FORMAT_RF64)
@@ -113,6 +122,7 @@ rf64_open (SF_PRIVATE *psf)
 			return error ;
 
 		psf->write_header = rf64_write_header ;
+		psf->set_chunk = rf64_set_chunk ;
 		} ;
 
 	psf->container_close = rf64_close ;
@@ -170,8 +180,8 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 {	WAVLIKE_PRIVATE	*wpriv ;
 	WAV_FMT		*wav_fmt ;
 	sf_count_t riff_size = 0, frame_count = 0, ds64_datalength = 0 ;
-	uint32_t marks [2], chunk_size, parsestage = 0 ;
-	int marker, error, done = 0, format = 0 ;
+	uint32_t marks [2], marker, chunk_size, parsestage = 0 ;
+	int error, done = 0, format = 0 ;
 
 	if ((wpriv = psf->container_data) == NULL)
 		return SFE_INTERNAL ;
@@ -197,6 +207,8 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			psf_log_printf (psf, "Have 0 marker at position %D (0x%x).\n", pos, pos) ;
 			break ;
 			} ;
+
+		psf_store_read_chunk_u32 (&psf->rchunks, marker, psf_ftell (psf), chunk_size) ;
 
 		switch (marker)
 		{	case ds64_MARKER :
@@ -338,8 +350,6 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if (isprint ((marker >> 24) & 0xFF) && isprint ((marker >> 16) & 0xFF)
 						&& isprint ((marker >> 8) & 0xFF) && isprint (marker & 0xFF))
 					{	psf_log_printf (psf, "*** %M : %d (unknown marker)\n", marker, chunk_size) ;
-						if (chunk_size < 8)
-							done = SF_TRUE ;
 						psf_binheader_readf (psf, "j", chunk_size) ;
 						break ;
 						} ;
@@ -692,6 +702,10 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
 		wavlike_write_peak_chunk (psf) ;
 
+	/* Write custom headers. */
+	if (psf->wchunks.used > 0)
+		wavlike_write_custom_chunks (psf) ;
+
 #if 0
 	if (psf->instrument != NULL)
 	{	int		tmp ;
@@ -828,3 +842,47 @@ rf64_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
 
 	return 0 ;
 } /* rf64_command */
+
+static int
+rf64_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info)
+{	return psf_save_write_chunk (&psf->wchunks, chunk_info) ;
+} /* rf64_set_chunk */
+
+static SF_CHUNK_ITERATOR *
+rf64_next_chunk_iterator (SF_PRIVATE *psf, SF_CHUNK_ITERATOR * iterator)
+{	return psf_next_chunk_iterator (&psf->rchunks, iterator) ;
+} /* rf64_next_chunk_iterator */
+
+static int
+rf64_get_chunk_size (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info)
+{	int indx ;
+
+	if ((indx = psf_find_read_chunk_iterator (&psf->rchunks, iterator)) < 0)
+		return SFE_UNKNOWN_CHUNK ;
+
+	chunk_info->datalen = psf->rchunks.chunks [indx].len ;
+
+	return SFE_NO_ERROR ;
+} /* rf64_get_chunk_size */
+
+static int
+rf64_get_chunk_data (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info)
+{	int indx ;
+	sf_count_t pos ;
+
+	if ((indx = psf_find_read_chunk_iterator (&psf->rchunks, iterator)) < 0)
+		return SFE_UNKNOWN_CHUNK ;
+
+	if (chunk_info->data == NULL)
+		return SFE_BAD_CHUNK_DATA_PTR ;
+
+	chunk_info->id_size = psf->rchunks.chunks [indx].id_size ;
+	memcpy (chunk_info->id, psf->rchunks.chunks [indx].id, sizeof (chunk_info->id) / sizeof (*chunk_info->id)) ;
+
+	pos = psf_ftell (psf) ;
+	psf_fseek (psf, psf->rchunks.chunks [indx].offset, SEEK_SET) ;
+	psf_fread (chunk_info->data, SF_MIN (chunk_info->datalen, psf->rchunks.chunks [indx].len), 1, psf) ;
+	psf_fseek (psf, pos, SEEK_SET) ;
+
+	return SFE_NO_ERROR ;
+} /* rf64_get_chunk_data */
