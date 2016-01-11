@@ -987,7 +987,6 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 static int
 wav_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t	current ;
-	uint32_t	uk ;
 	int 		k, error, has_data = SF_FALSE ;
 
 	current = psf_ftell (psf) ;
@@ -1082,8 +1081,8 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	/* Write custom headers. */
-	for (uk = 0 ; uk < psf->wchunks.used ; uk++)
-		psf_binheader_writef (psf, "m4b", (int) psf->wchunks.chunks [uk].mark32, psf->wchunks.chunks [uk].len, psf->wchunks.chunks [uk].data, make_size_t (psf->wchunks.chunks [uk].len)) ;
+	if (psf->wchunks.used > 0)
+		wavlike_write_custom_chunks (psf) ;
 
 	if (psf->headindex + 16 < psf->dataoffset)
 	{	/* Add PAD data if necessary. */

@@ -1297,3 +1297,12 @@ exif_subchunk_parse (SF_PRIVATE *psf, uint32_t length)
 
 	return bytesread ;
 } /* exif_subchunk_parse */
+
+void
+wavlike_write_custom_chunks (SF_PRIVATE * psf)
+{	uint32_t k ;
+
+	for (k = 0 ; k < psf->wchunks.used ; k++)
+		psf_binheader_writef (psf, "m4b", (int) psf->wchunks.chunks [k].mark32, psf->wchunks.chunks [k].len, psf->wchunks.chunks [k].data, make_size_t (psf->wchunks.chunks [k].len)) ;
+
+} /* wavlike_write_custom_chunks */

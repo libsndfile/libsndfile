@@ -352,5 +352,7 @@ void	wavlike_write_strings (SF_PRIVATE *psf, int location) ;
 int		wavlike_read_peak_chunk (SF_PRIVATE * psf, size_t chunk_size) ;
 void	wavlike_write_peak_chunk (SF_PRIVATE * psf) ;
 
+void	wavlike_write_custom_chunks (SF_PRIVATE * psf) ;
+
 #endif
 
