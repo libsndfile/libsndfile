@@ -227,7 +227,7 @@ typedef struct
 } STR_DATA ;
 
 typedef struct
-{	int64_t		hash ;
+{	uint64_t	hash ;
 	char		id [64] ;
 	unsigned	id_size ;
 	uint32_t	mark32 ;
@@ -236,7 +236,7 @@ typedef struct
 } READ_CHUNK ;
 
 typedef struct
-{	int64_t		hash ;
+{	uint64_t	hash ;
 	uint32_t	mark32 ;
 	uint32_t	len ;
 	void		*data ;

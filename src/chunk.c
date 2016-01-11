@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2012 IOhannes m zmoelnig, IEM <zmoelnig@iem.at>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -86,7 +86,7 @@ psf_get_chunk_iterator (SF_PRIVATE * psf, const char * marker_str)
 
 SF_CHUNK_ITERATOR *
 psf_next_chunk_iterator (const READ_CHUNKS * pchk , SF_CHUNK_ITERATOR * iterator)
-{	int64_t hash = iterator->hash ;
+{	uint64_t hash = iterator->hash ;
 	uint32_t k ;
 
 	iterator->current++ ;
@@ -153,7 +153,7 @@ psf_store_read_chunk_u32 (READ_CHUNKS * pchk, uint32_t marker, sf_count_t offset
 
 int
 psf_find_read_chunk_str (const READ_CHUNKS * pchk, const char * marker_str)
-{	int64_t hash ;
+{	uint64_t hash ;
 	uint32_t k ;
 	union
 	{	uint32_t marker ;
