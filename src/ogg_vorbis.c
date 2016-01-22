@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2002-2005 Michael Smith <msmith@xiph.org>
 ** Copyright (C) 2007 John ffitch
 **
@@ -489,7 +489,7 @@ vorbis_close (SF_PRIVATE *psf)
 int
 ogg_vorbis_open (SF_PRIVATE *psf)
 {	OGG_PRIVATE* odata = psf->container_data ;
-	VORBIS_PRIVATE* vdata = calloc (1, sizeof (VORBIS_PRIVATE)) ;
+	VORBIS_PRIVATE* vdata ;
 	int	error = 0 ;
 
 	if (odata == NULL)
@@ -497,6 +497,7 @@ ogg_vorbis_open (SF_PRIVATE *psf)
 		return SFE_INTERNAL ;
 		} ;
 
+	vdata = calloc (1, sizeof (VORBIS_PRIVATE)) ;
 	psf->codec_data = vdata ;
 
 	if (psf->file.mode == SFM_RDWR)
