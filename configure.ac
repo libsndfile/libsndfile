@@ -1,4 +1,4 @@
-# Copyright (C) 1999-2015  Erik de Castro Lopo <erikd@mega-nerd.com>.
+# Copyright (C) 1999-2016  Erik de Castro Lopo <erikd@mega-nerd.com>.
 
 dnl Require autoconf version
 AC_PREREQ(2.57)
@@ -536,9 +536,11 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 		MN_ADD_CFLAGS([-coverage])
 		fi
 
-	CFLAGS="$CFLAGS     -Wcast-align -Wcast-qual -Wshadow -Wbad-function-cast -Wwrite-strings -Wundef -Wuninitialized -Winit-self -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return"
-	# -Winline -Wconversion  -Wunreachable-code"
-	CXXFLAGS="$CXXFLAGS -Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo -Wundef -Wuninitialized -Winit-self"
+	common_flags="-Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wundef -Wuninitialized -Winit-self"
+
+	# -Winline -Wconversion "
+	CFLAGS="$CFLAGS     $common_flags -Wbad-function-cast -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return"
+	CXXFLAGS="$CXXFLAGS $common_flags -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo"
 
 	if test "x$enable_gcc_opt" = "xno" ; then
 		temp_CFLAGS=`echo $CFLAGS | $SED "s/O2/O0/"`
