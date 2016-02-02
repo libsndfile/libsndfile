@@ -59,6 +59,7 @@ examples/generate
 examples/list_formats
 examples/make_sine
 examples/sfprocess
+examples/sndfile-loopify
 examples/sndfile-to-text
 examples/sndfilehandle
 libsndfile-1.0.*
