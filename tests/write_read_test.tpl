@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1011,6 +1011,7 @@ empty_file_test (const char *filename, int format)
 	info.samplerate = 48000 ;
 	info.channels = 2 ;
 	info.format = format ;
+	info.frames = 0 ;
 
 	if (sf_format_check (&info) == SF_FALSE)
 	{	info.channels = 1 ;
