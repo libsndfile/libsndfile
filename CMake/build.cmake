@@ -1,5 +1,17 @@
 # Build recipe for building programs in the programs/ directory.
-function (lsf_build_program prog_name extra_libs)
+function (lsf_build_program prog_name)
+	add_executable (${prog_name}
+		programs/common.c
+		programs/${prog_name}.c
+		)
+	target_link_libraries (${prog_name} sndfile)
+	set_target_properties (${prog_name}
+		PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY programs
+		)
+	endfunction ()
+
+function (lsf_build_program_extra prog_name extra_libs)
 	add_executable (${prog_name}
 		programs/common.c
 		programs/${prog_name}.c
@@ -10,7 +22,6 @@ function (lsf_build_program prog_name extra_libs)
 		RUNTIME_OUTPUT_DIRECTORY programs
 		)
 	endfunction ()
-
 
 # Build recipe for building C tests in the src/ directory.
 function (lsf_build_src_test_c test_name extra_files)

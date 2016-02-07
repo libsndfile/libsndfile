@@ -2,6 +2,7 @@
 
 cmake_minimum_required (VERSION 2.8.12)
 
+project (libsndfile)
 
 if (NOT (EXISTS "${CMAKE_SOURCE_DIR}/CMake/config.h.in"))
 	message (FATAL_ERROR "\nError : Need to run \"./autogen.sh cmake\" first.")
@@ -15,8 +16,6 @@ if (DEFINED ENV{CXX})
 	set (CMAKE_CXX_COMPILER $ENV{CXX})
 	endif()
 
-project (libsndfile)
-
 message (STATUS "Using C compiler   : " ${CMAKE_C_COMPILER})
 message (STATUS "Using C++ compiler : " ${CMAKE_CXX_COMPILER})
 
@@ -24,10 +23,10 @@ message (STATUS "Using C++ compiler : " ${CMAKE_CXX_COMPILER})
 
 set (LIB_VERSION_MAJOR 1)
 set (LIB_VERSION_MINOR 0)
-set (LIB_VERSION_PATCH 26)
+set (LIB_VERSION_PATCH 27)
 
 set (PACKAGE_NAME \"libsndfile\")
-set (PACKAGE_VERSION \"1.0.26pre6\")
+set (PACKAGE_VERSION \"${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH}pre1\")
 
 set (BASEPATH "${CMAKE_SOURCE_DIR}")
 
@@ -82,8 +81,8 @@ add_custom_target (check
 #-------------------------------------------------------------------------------
 # Project definitions follow.
 
-configure_file (src/sndfile.h.in src/sndfile.h)
-configure_file (CMake/config.h.in src/config.h)
+configure_file (${CMAKE_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_SOURCE_DIR}/src/sndfile.h)
+configure_file (${CMAKE_SOURCE_DIR}/CMake/config.h.in ${CMAKE_SOURCE_DIR}/src/config.h)
 
 include_directories (src)
 
@@ -148,7 +147,6 @@ set (libsndfile_sources
 	src/ima_oki_adpcm.c
 	src/interleave.c
 	src/ircam.c
-	src/macbinary3.c
 	src/macos.c
 	src/mat4.c
 	src/mat5.c
@@ -178,7 +176,7 @@ set (libsndfile_sources
 	src/vox_adpcm.c
 	src/w64.c
 	src/wav.c
-	src/wav_w64.c
+	src/wavlike.c
 	src/windows.c
 	src/wve.c
 	src/xi.c
@@ -193,22 +191,22 @@ target_link_libraries (sndfile m)
 set_target_properties(sndfile
 	PROPERTIES
 	VERSION ${LIB_VERSION_STRING} SOVERSION ${LIB_VERSION_MAJOR}
-	LIBRARY_OUTPUT_DIRECTORY src
+	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/src
 	)
 
 #-------------------------------------------------------------------------------
 # Programs.
 
-lsf_build_program (sndfile-cmp "")
-lsf_build_program (sndfile-concat "")
-lsf_build_program (sndfile-convert "")
-lsf_build_program (sndfile-deinterleave "")
-lsf_build_program (sndfile-info "")
-lsf_build_program (sndfile-interleave "")
-lsf_build_program (sndfile-metadata-get "")
-lsf_build_program (sndfile-metadata-set "")
-lsf_build_program (sndfile-play asound)
-lsf_build_program (sndfile-salvage "")
+lsf_build_program (sndfile-cmp)
+lsf_build_program (sndfile-concat)
+lsf_build_program (sndfile-convert)
+lsf_build_program (sndfile-deinterleave)
+lsf_build_program (sndfile-info)
+lsf_build_program (sndfile-interleave)
+lsf_build_program (sndfile-metadata-get)
+lsf_build_program (sndfile-metadata-set)
+lsf_build_program (sndfile-salvage)
+lsf_build_program_extra (sndfile-play asound)
 
 #-------------------------------------------------------------------------------
 # Tests.
