@@ -89,15 +89,15 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	{	case SF_STR_SOFTWARE :
 				/* In write mode, want to append libsndfile-version to string. */
 				if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
-				{	if (strstr (str, PACKAGE) == NULL)
+				{	if (strstr (str, PACKAGE_NAME) == NULL)
 					{	/*
 						** If the supplied string does not already contain a
 						** libsndfile-X.Y.Z component, then add it.
 						*/
 						if (strlen (str) == 0)
-							snprintf (new_str, sizeof (new_str), "%s-%s", PACKAGE, VERSION) ;
+							snprintf (new_str, sizeof (new_str), "%s-%s", PACKAGE_NAME, PACKAGE_VERSION) ;
 						else
-							snprintf (new_str, sizeof (new_str), "%s (%s-%s)", str, PACKAGE, VERSION) ;
+							snprintf (new_str, sizeof (new_str), "%s (%s-%s)", str, PACKAGE_NAME, PACKAGE_VERSION) ;
 						}
 					else
 						snprintf (new_str, sizeof (new_str), "%s", str) ;

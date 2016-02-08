@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -154,7 +154,7 @@ mat5_close	(SF_PRIVATE *psf)
 
 static int
 mat5_write_header (SF_PRIVATE *psf, int calc_length)
-{	static const char	*filename = "MATLAB 5.0 MAT-file, written by " PACKAGE "-" VERSION ", " ;
+{	static const char	*filename = "MATLAB 5.0 MAT-file, written by " PACKAGE_NAME "-" PACKAGE_VERSION ", " ;
 	static const char	*sr_name = "samplerate\0\0\0\0\0\0\0\0\0\0\0" ;
 	static const char	*wd_name = "wavedata\0" ;
 	char		buffer [256] ;

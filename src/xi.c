@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -92,7 +92,7 @@ xi_open	(SF_PRIVATE *psf)
 
 		/* Set up default instrument and software name. */
 		memcpy (pxi->filename, "Default Name            ", sizeof (pxi->filename)) ;
-		memcpy (pxi->software, PACKAGE "-" VERSION "               ", sizeof (pxi->software)) ;
+		memcpy (pxi->software, PACKAGE_NAME "-" PACKAGE_VERSION "               ", sizeof (pxi->software)) ;
 
 		memset (pxi->sample_name, 0, sizeof (pxi->sample_name)) ;
 		snprintf (pxi->sample_name, sizeof (pxi->sample_name), "%s", "Sample #1") ;
