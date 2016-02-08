@@ -82,7 +82,7 @@ G72x_g72x_test_SOURCES = G72x/g72x_test.c
 G72x_g72x_test_LDADD = G72x/libg72x.la
 
 test_endswap.c: test_endswap.def test_endswap.tpl
-	cd $(srcdir) && autogen --writable test_endswap.def && cd $(abs_builddir)
+	(cd $(srcdir) && autogen --writable test_endswap.def)
 
 genfiles : $(SYMBOL_FILES) test_endswap.c
 
