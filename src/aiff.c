@@ -123,34 +123,34 @@ enum
 } ;
 
 typedef struct
-{	unsigned int	size ;
-	short			numChannels ;
-	unsigned int	numSampleFrames ;
-	short			sampleSize ;
-	unsigned char	sampleRate [10] ;
-	unsigned int	encoding ;
+{	uint32_t	size ;
+	int16_t		numChannels ;
+	uint32_t	numSampleFrames ;
+	int16_t		sampleSize ;
+	uint8_t		sampleRate [10] ;
+	uint32_t	encoding ;
 	char			zero_bytes [2] ;
 } COMM_CHUNK ;
 
 typedef struct
-{	unsigned int	offset ;
-	unsigned int	blocksize ;
+{	uint32_t	offset ;
+	uint32_t	blocksize ;
 } SSND_CHUNK ;
 
 typedef struct
-{	short			playMode ;
-	unsigned short	beginLoop ;
-	unsigned short	endLoop ;
+{	int16_t		playMode ;
+	uint16_t	beginLoop ;
+	uint16_t	endLoop ;
 } INST_LOOP ;
 
 typedef struct
-{	char		baseNote ;		/* all notes are MIDI note numbers */
-	char		detune ;		/* cents off, only -50 to +50 are significant */
-	char		lowNote ;
-	char		highNote ;
-	char		lowVelocity ;	/* 1 to 127 */
-	char		highVelocity ;	/* 1 to 127 */
-	short		gain ;			/* in dB, 0 is normal */
+{	int8_t		baseNote ;		/* all notes are MIDI note numbers */
+	int8_t		detune ;		/* cents off, only -50 to +50 are significant */
+	int8_t		lowNote ;
+	int8_t		highNote ;
+	int8_t		lowVelocity ;	/* 1 to 127 */
+	int8_t		highVelocity ;	/* 1 to 127 */
+	int16_t		gain ;			/* in dB, 0 is normal */
 	INST_LOOP	sustain_loop ;
 	INST_LOOP	release_loop ;
 } INST_CHUNK ;
@@ -170,25 +170,25 @@ enum
 
 
 typedef struct
-{	unsigned int	version ;
-	unsigned int	numBeats ;
-	unsigned short	rootNote ;
-	unsigned short	scaleType ;
-	unsigned short	sigNumerator ;
-	unsigned short	sigDenominator ;
-	unsigned short	loopType ;
+{	uint32_t	version ;
+	uint32_t	numBeats ;
+	uint16_t	rootNote ;
+	uint16_t	scaleType ;
+	uint16_t	sigNumerator ;
+	uint16_t	sigDenominator ;
+	uint16_t	loopType ;
 } basc_CHUNK ;
 
 typedef struct
-{	unsigned short	markerID ;
-	unsigned int	position ;
+{	uint16_t	markerID ;
+	uint32_t	position ;
 } MARK_ID_POS ;
 
 typedef struct
 {	sf_count_t	comm_offset ;
 	sf_count_t	ssnd_offset ;
 
-	int chanmap_tag ;
+	int32_t		chanmap_tag ;
 
 	MARK_ID_POS *markstr ;
 } AIFF_PRIVATE ;
@@ -199,8 +199,8 @@ typedef struct
 
 static int	aiff_close (SF_PRIVATE *psf) ;
 
-static int	tenbytefloat2int (unsigned char *bytes) ;
-static void uint2tenbytefloat (unsigned int num, unsigned char *bytes) ;
+static int	tenbytefloat2int (uint8_t *bytes) ;
+static void uint2tenbytefloat (uint32_t num, uint8_t *bytes) ;
 
 static int	aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt) ;
 
@@ -212,15 +212,15 @@ static void	aiff_write_strings (SF_PRIVATE *psf, int location) ;
 
 static int	aiff_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 
-static const char *get_loop_mode_str (short mode) ;
+static const char *get_loop_mode_str (int16_t mode) ;
 
-static short get_loop_mode (short mode) ;
+static int16_t get_loop_mode (int16_t mode) ;
 
 static int aiff_read_basc_chunk (SF_PRIVATE * psf, int) ;
 
 static int aiff_read_chanmap (SF_PRIVATE * psf, unsigned dword) ;
 
-static unsigned int marker_to_position (const MARK_ID_POS *m, unsigned short n, int marksize) ;
+static uint32_t marker_to_position (const MARK_ID_POS *m, uint16_t n, int marksize) ;
 
 static int aiff_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info) ;
 static SF_CHUNK_ITERATOR * aiff_next_chunk_iterator (SF_PRIVATE *psf, SF_CHUNK_ITERATOR * iterator) ;
@@ -369,8 +369,8 @@ aiff_open (SF_PRIVATE *psf)
 */
 
 /* This function ought to check size */
-static unsigned int
-marker_to_position (const MARK_ID_POS *m, unsigned short n, int marksize)
+static uint32_t
+marker_to_position (const MARK_ID_POS *m, uint16_t n, int marksize)
 {	int i ;
 
 	for (i = 0 ; i < marksize ; i++)
@@ -501,7 +501,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					cptr = ubuf.cbuf ;
 					for (k = 0 ; k < psf->sf.channels ; k++)
 					{	float value ;
-						unsigned int position ;
+						uint32_t position ;
 
 						psf_binheader_readf (psf, "Ef4", &value, &position) ;
 						psf->peak_info->peaks [k].value = value ;
@@ -597,8 +597,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case COMT_MARKER :
-				{	unsigned short count, id, len ;
-					unsigned int timestamp, bytes ;
+				{	uint16_t count, id, len ;
+					uint32_t timestamp, bytes ;
 
 					if (chunk_size == 0)
 						break ;
@@ -698,8 +698,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						break ;
 						} ;
 					psf_log_printf (psf, " %M : %d\n", marker, chunk_size) ;
-					{	unsigned char bytes [6] ;
-						short gain ;
+					{	uint8_t bytes [6] ;
+						int16_t gain ;
 
 						if (psf->instrument == NULL && (psf->instrument = psf_instrument_alloc ()) == NULL)
 							return SFE_MALLOC_FAILED ;
@@ -719,9 +719,9 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						psf->instrument->gain = gain ;
 						psf_log_printf (psf, "  Gain (dB) : %d\n", gain) ;
 						} ;
-					{	short	mode ; /* 0 - no loop, 1 - forward looping, 2 - backward looping */
+					{	int16_t	mode ; /* 0 - no loop, 1 - forward looping, 2 - backward looping */
 						const char	*loop_mode ;
-						unsigned short begin, end ;
+						uint16_t begin, end ;
 
 						psf_binheader_readf (psf, "E222", &mode, &begin, &end) ;
 						loop_mode = get_loop_mode_str (mode) ;
@@ -766,8 +766,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 			case MARK_MARKER :
 					psf_log_printf (psf, " %M : %d\n", marker, chunk_size) ;
-					{	unsigned short mark_id, n = 0 ;
-						unsigned int position ;
+					{	uint16_t mark_id, n = 0 ;
+						uint32_t position ;
 
 						bytesread = psf_binheader_readf (psf, "E2", &n) ;
 						mark_count = n ;
@@ -781,8 +781,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 							return SFE_MALLOC_FAILED ;
 
 						for (n = 0 ; n < mark_count && bytesread < chunk_size ; n++)
-						{	unsigned int pstr_len ;
-							unsigned char ch ;
+						{	uint32_t pstr_len ;
+							uint8_t ch ;
 
 							bytesread += psf_binheader_readf (psf, "E241", &mark_id, &position, &ch) ;
 							psf_log_printf (psf, "   Mark ID  : %u\n   Position : %u\n", mark_id, position) ;
@@ -794,7 +794,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 								ubuf.scbuf [pstr_len] = 0 ;
 								}
 							else
-							{	unsigned int read_len = pstr_len - (sizeof (ubuf.scbuf) - 1) ;
+							{	uint32_t read_len = pstr_len - (sizeof (ubuf.scbuf) - 1) ;
 								bytesread += psf_binheader_readf (psf, "bj", ubuf.scbuf, read_len, pstr_len - read_len) ;
 								ubuf.scbuf [sizeof (ubuf.scbuf) - 1] = 0 ;
 								}
@@ -959,7 +959,7 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	else if (comm_fmt->size == SIZEOF_AIFC_COMM_MIN)
 		psf_binheader_readf (psf, "Em", &(comm_fmt->encoding)) ;
 	else if (comm_fmt->size >= SIZEOF_AIFC_COMM)
-	{	unsigned char encoding_len ;
+	{	uint8_t encoding_len ;
 		unsigned read_len ;
 
 		psf_binheader_readf (psf, "Em1", &(comm_fmt->encoding), &encoding_len) ;
@@ -1146,10 +1146,10 @@ static int
 aiff_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t		current ;
 	AIFF_PRIVATE	*paiff ;
-	unsigned char	comm_sample_rate [10], comm_zero_bytes [2] = { 0, 0 } ;
-	unsigned int	comm_type, comm_size, comm_encoding, comm_frames = 0, uk ;
+	uint8_t	comm_sample_rate [10], comm_zero_bytes [2] = { 0, 0 } ;
+	uint32_t	comm_type, comm_size, comm_encoding, comm_frames = 0, uk ;
 	int				k, endian, has_data = SF_FALSE ;
-	short			bit_width ;
+	int16_t			bit_width ;
 
 	if ((paiff = psf->container_data) == NULL)
 		return SFE_INTERNAL ;
@@ -1373,7 +1373,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->instrument != NULL)
 	{	MARK_ID_POS	m [4] ;
 		INST_CHUNK ch ;
-		unsigned short ct = 0 ;
+		uint16_t ct = 0 ;
 
 		memset (m, 0, sizeof (m)) ;
 		memset (&ch, 0, sizeof (ch)) ;
@@ -1563,7 +1563,7 @@ aiff_command (SF_PRIVATE * psf, int command, void * UNUSED (data), int UNUSED (d
 } /* aiff_command */
 
 static const char*
-get_loop_mode_str (short mode)
+get_loop_mode_str (int16_t mode)
 {	switch (mode)
 	{	case 0 : return "none" ;
 		case 1 : return "forward" ;
@@ -1573,8 +1573,8 @@ get_loop_mode_str (short mode)
 	return "*** unknown" ;
 } /* get_loop_mode_str */
 
-static short
-get_loop_mode (short mode)
+static int16_t
+get_loop_mode (int16_t mode)
 {	switch (mode)
 	{	case 0 : return SF_LOOP_NONE ;
 		case 1 : return SF_LOOP_FORWARD ;
@@ -1594,7 +1594,7 @@ get_loop_mode (short mode)
 */
 
 static int
-tenbytefloat2int (unsigned char *bytes)
+tenbytefloat2int (uint8_t *bytes)
 {	int val = 3 ;
 
 	if (bytes [0] & 0x80)	/* Negative number. */
@@ -1619,8 +1619,8 @@ tenbytefloat2int (unsigned char *bytes)
 } /* tenbytefloat2int */
 
 static void
-uint2tenbytefloat (unsigned int num, unsigned char *bytes)
-{	unsigned int mask = 0x40000000 ;
+uint2tenbytefloat (uint32_t num, uint8_t *bytes)
+{	uint32_t mask = 0x40000000 ;
 	int	count ;
 
 	if (num <= 1)
