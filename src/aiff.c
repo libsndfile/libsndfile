@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -319,15 +319,20 @@ aiff_open (SF_PRIVATE *psf)
 				break ;
 
 		case SF_FORMAT_DWVW_12 :
-				error = dwvw_init (psf, 12) ;
+				if (psf->sf.frames > comm_fmt.numSampleFrames)
+					psf->sf.frames = comm_fmt.numSampleFrames ;
 				break ;
 
 		case SF_FORMAT_DWVW_16 :
 				error = dwvw_init (psf, 16) ;
+				if (psf->sf.frames > comm_fmt.numSampleFrames)
+					psf->sf.frames = comm_fmt.numSampleFrames ;
 				break ;
 
 		case SF_FORMAT_DWVW_24 :
 				error = dwvw_init (psf, 24) ;
+				if (psf->sf.frames > comm_fmt.numSampleFrames)
+					psf->sf.frames = comm_fmt.numSampleFrames ;
 				break ;
 
 		case SF_FORMAT_DWVW_N :
@@ -337,7 +342,8 @@ aiff_open (SF_PRIVATE *psf)
 					} ;
 				if (comm_fmt.sampleSize >= 8 && comm_fmt.sampleSize < 24)
 				{	error = dwvw_init (psf, comm_fmt.sampleSize) ;
-					psf->sf.frames = comm_fmt.numSampleFrames ;
+					if (psf->sf.frames > comm_fmt.numSampleFrames)
+						psf->sf.frames = comm_fmt.numSampleFrames ;
 					break ;
 					} ;
 				psf_log_printf (psf, "AIFC/DWVW : Bad bitwidth %d\n", comm_fmt.sampleSize) ;
@@ -355,11 +361,19 @@ aiff_open (SF_PRIVATE *psf)
 
 		case SF_FORMAT_GSM610 :
 				error = gsm610_init (psf) ;
+				if (psf->sf.frames > comm_fmt.numSampleFrames)
+					psf->sf.frames = comm_fmt.numSampleFrames ;
 				break ;
 
 		default : return SFE_UNIMPLEMENTED ;
 		} ;
 
+	if (psf->file.mode != SFM_WRITE && psf->sf.frames - comm_fmt.numSampleFrames != 0)
+	{	psf_log_printf (psf,
+			"*** Frame count read from 'COMM' chunk (%u) not equal to frame count\n"
+			"*** calculated from length of 'SSND' chunk (%u).\n",
+			comm_fmt.numSampleFrames, (uint32_t) psf->sf.frames) ;
+		} ;
 
 	return error ;
 } /* aiff_open */
