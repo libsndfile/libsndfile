@@ -28,7 +28,7 @@ function (lsf_check_include_file header_name result_name)
 		set (${result_name} 0 PARENT_SCOPE)
 		endif (header_${result_name})
 
-	set (header_${result_name}) # Clear the variable.
+	unset (header_${result_name})
 	endfunction ()
 
 function (lsf_check_type_size type_name result_size)
@@ -43,9 +43,9 @@ function (lsf_check_type_size type_name result_size)
 		set (${result_size} 0 PARENT_SCOPE)
 		endif (size_${type_name})
 
-	set (tmp1) # Clear temp variables.
-	set (tmp2)
-	set (size_${tmp2})
+	unset (tmp1)
+	unset (tmp2)
+	unset (size_${tmp2})
 	endfunction ()
 
 function (lsf_check_function_exists func_name result_name)
@@ -57,7 +57,7 @@ function (lsf_check_function_exists func_name result_name)
 		set (${result_name} 0 PARENT_SCOPE)
 		endif (func_${result_name})
 
-	set (func_${result_name}) # Clear the variable.
+	unset (func_${result_name})
 	endfunction ()
 
 # Unix does not link libm by default while windows does. We therefore have
@@ -75,7 +75,7 @@ function (lsf_check_math_function_exists func_name result_name)
 		set (${result_name} 0 PARENT_SCOPE)
 		endif (func_${result_name})
 
-	set (func_${result_name}) # Clear the variable.
+	unset (func_${result_name})
 	endfunction ()
 
 function (lsf_check_library_exists lib_name lib_func location result_name)
@@ -87,6 +87,6 @@ function (lsf_check_library_exists lib_name lib_func location result_name)
 		set (${result_name} 0 PARENT_SCOPE)
 		endif (lib_${result_name})
 
-	set (lib_${result_name}) # Clear the variable.
+	unset (lib_${result_name})
 	endfunction ()
 
