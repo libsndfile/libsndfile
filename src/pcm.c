@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -258,7 +258,7 @@ pcm_init (SF_PRIVATE *psf)
 					break ;
 
 			default :
-				psf_log_printf (psf, "pcm.c returning SFE_UNIMPLEMENTED\nbytewidth %s    endian %d\n", psf->bytewidth, psf->endian) ;
+				psf_log_printf (psf, "pcm.c returning SFE_UNIMPLEMENTED\nbytewidth %d    endian %d\n", psf->bytewidth, psf->endian) ;
 				return SFE_UNIMPLEMENTED ;
 			} ;
 
