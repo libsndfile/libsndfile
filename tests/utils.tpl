@@ -1,6 +1,6 @@
 [+ AutoGen5 template h c +]
 /*
-** Copyright (C) 2002-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -122,6 +122,7 @@ void 	check_log_buffer_or_die (SNDFILE *file, int line_num) ;
 int 	string_in_log_buffer (SNDFILE *file, const char *s) ;
 void	hexdump_file (const char * filename, sf_count_t offset, sf_count_t length) ;
 
+void	test_sf_format_or_die	(const SF_INFO *info, int line_num) ;
 
 SNDFILE *test_open_file_or_die
 			(const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num) ;
@@ -491,6 +492,18 @@ dump_log_buffer (SNDFILE *file)
 
 	return ;
 } /* dump_log_buffer */
+
+void
+test_sf_format_or_die (const SF_INFO *info, int line_num)
+{	int res ;
+
+	if ((res = sf_format_check (info)) != 1)
+	{	printf ("\n\nLine %d : sf_format_check returned error (%d)\n\n", line_num,res) ;
+		exit (1) ;
+		} ;
+
+	return ;
+} /* test_sf_format_or_die */
 
 SNDFILE *
 test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num)

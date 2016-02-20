@@ -451,6 +451,8 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 	sfinfo.channels		= 1 ;
 	sfinfo.format		= format ;
 
+	test_sf_format_or_die (&sfinfo, __LINE__) ;
+
 	gen_windowed_sine_double (orig_data.d, DATA_LENGTH, [+ (get "max_val") +]) ;
 
 	orig = orig_data.[+ (get "data_field") +] ;
