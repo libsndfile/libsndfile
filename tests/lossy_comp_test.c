@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -376,7 +376,7 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || strcmp (argv [1], "ogg_vorbis") == 0)
-	{	if (HAVE_EXTERNAL_LIBS)
+	{	if (HAVE_EXTERNAL_XIPH_LIBS)
 		{	/* Don't do lcomp_test_XXX as the errors are too big. */
 			sdlcomp_test_short	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
 			sdlcomp_test_int	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;

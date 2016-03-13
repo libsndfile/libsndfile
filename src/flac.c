@@ -29,7 +29,7 @@
 #include	"sndfile.h"
 #include	"common.h"
 
-#if HAVE_EXTERNAL_LIBS
+#if HAVE_EXTERNAL_XIPH_LIBS
 
 #include	<FLAC/stream_decoder.h>
 #include	<FLAC/stream_encoder.h>
@@ -1369,7 +1369,7 @@ flac_byterate (SF_PRIVATE *psf)
 } /* flac_byterate */
 
 
-#else /* HAVE_EXTERNAL_LIBS */
+#else /* HAVE_EXTERNAL_XIPH_LIBS */
 
 int
 flac_open	(SF_PRIVATE *psf)

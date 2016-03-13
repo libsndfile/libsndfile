@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ major_format_test (void)
 		have_ogg = info.format == SF_FORMAT_OGG ? 1 : have_ogg ;
 		} ;
 
-	if (HAVE_EXTERNAL_LIBS)
+	if (HAVE_EXTERNAL_XIPH_LIBS)
 	{	exit_if_true (have_flac == 0, "\n\nLine %d : FLAC should be available.\n\n", __LINE__) ;
 		exit_if_true (have_ogg == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;
 		}
@@ -88,7 +88,7 @@ subtype_format_test (void)
 		have_vorbis = info.format == SF_FORMAT_VORBIS ? 1 : have_vorbis ;
 		} ;
 
-	if (HAVE_EXTERNAL_LIBS)
+	if (HAVE_EXTERNAL_XIPH_LIBS)
 		exit_if_true (have_vorbis == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;
 	else
 		exit_if_true (have_vorbis, "\n\nLine %d : Ogg/Vorbis should not be available.\n\n", __LINE__) ;
@@ -134,7 +134,7 @@ simple_format_test (void)
 
 		} ;
 
-	if (HAVE_EXTERNAL_LIBS)
+	if (HAVE_EXTERNAL_XIPH_LIBS)
 	{	exit_if_true (have_flac == 0, "\n\nLine %d : FLAC should be available.\n\n", __LINE__) ;
 		exit_if_true (have_ogg == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;
 		exit_if_true (have_vorbis == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;

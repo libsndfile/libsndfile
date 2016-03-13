@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2007-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2007-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -328,7 +328,7 @@ ogg_stereo_seek_test (const char * filename, int format)
 int
 main (void)
 {
-	if (HAVE_EXTERNAL_LIBS)
+	if (HAVE_EXTERNAL_XIPH_LIBS)
 	{	ogg_short_test () ;
 		ogg_int_test () ;
 		ogg_float_test () ;

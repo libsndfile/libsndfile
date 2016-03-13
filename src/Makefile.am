@@ -2,7 +2,7 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-AM_CPPFLAGS = $(EXTERNAL_CFLAGS)
+AM_CPPFLAGS = $(EXTERNAL_XIPH_CFLAGS)
 
 lib_LTLIBRARIES = libsndfile.la
 include_HEADERS = sndfile.hh
@@ -47,7 +47,7 @@ libsndfile_la_LDFLAGS = -no-undefined -version-info  $(SHARED_VERSION_INFO) $(SH
 libsndfile_la_SOURCES = $(FILESPECIFIC) $(noinst_HEADERS)
 nodist_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
 libsndfile_la_LIBADD = GSM610/libgsm.la G72x/libg72x.la ALAC/libalac.la \
-		libcommon.la $(EXTERNAL_LIBS) -lm
+		libcommon.la $(EXTERNAL_XIPH_LIBS) -lm
 
 libcommon_la_SOURCES = $(COMMON)
 

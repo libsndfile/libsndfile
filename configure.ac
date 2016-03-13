@@ -290,9 +290,9 @@ else
 #====================================================================================
 # Check for Ogg, Vorbis and FLAC.
 
-HAVE_EXTERNAL_LIBS=0
-EXTERNAL_CFLAGS=""
-EXTERNAL_LIBS=""
+HAVE_EXTERNAL_XIPH_LIBS=0
+EXTERNAL_XIPH_CFLAGS=""
+EXTERNAL_XIPH_LIBS=""
 
 # Check for pkg-config outside the if statement.
 PKG_PROG_PKG_CONFIG
@@ -325,11 +325,11 @@ if test -n "$PKG_CONFIG" ; then
 		fi
 
 	if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
-		HAVE_EXTERNAL_LIBS=1
+		HAVE_EXTERNAL_XIPH_LIBS=1
 		enable_external_libs=yes
 
-		EXTERNAL_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBIS_CFLAGS $VORBISENC_CFLAGS $SPEEX_CFLAGS"
-		EXTERNAL_LIBS="$FLAC_LIBS $OGG_LIBS $VORBIS_LIBS $VORBISENC_LIBS $SPEEX_LIBS "
+		EXTERNAL_XIPH_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBIS_CFLAGS $VORBISENC_CFLAGS $SPEEX_CFLAGS"
+		EXTERNAL_XIPH_LIBS="$FLAC_LIBS $OGG_LIBS $VORBIS_LIBS $VORBISENC_LIBS $SPEEX_LIBS "
 	else
 		echo
 		AC_MSG_WARN([[*** One or more of the external libraries (ie libflac, libogg and]])
@@ -343,7 +343,7 @@ if test -n "$PKG_CONFIG" ; then
 		fi
 	fi
 
-AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_LIBS], $HAVE_EXTERNAL_LIBS, [Will be set to 1 if flac, ogg and vorbis are available.])
+AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_XIPH_LIBS], $HAVE_EXTERNAL_XIPH_LIBS, [Will be set to 1 if flac, ogg and vorbis are available.])
 
 #====================================================================================
 # Check for libsqlite3 (only used in regtest).
@@ -630,14 +630,14 @@ AC_SUBST(SHARED_VERSION_INFO)
 AC_SUBST(CLEAN_VERSION)
 AC_SUBST(WIN_RC_VERSION)
 
-AC_SUBST(HAVE_EXTERNAL_LIBS)
+AC_SUBST(HAVE_EXTERNAL_XIPH_LIBS)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(ALSA_LIBS)
 AC_SUBST(SNDIO_LIBS)
 
-AC_SUBST(EXTERNAL_CFLAGS)
-AC_SUBST(EXTERNAL_LIBS)
+AC_SUBST(EXTERNAL_XIPH_CFLAGS)
+AC_SUBST(EXTERNAL_XIPH_LIBS)
 AC_SUBST(SRC_BINDIR)
 AC_SUBST(TEST_BINDIR)
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2007-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2007-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -178,7 +178,7 @@ main (int argc, char *argv [])
 		exit (0) ;
 		} ;
 
-	if (! HAVE_EXTERNAL_LIBS)
+	if (! HAVE_EXTERNAL_XIPH_LIBS)
 	{	puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
 		return 0 ;
 	} ;

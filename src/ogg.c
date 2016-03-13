@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2007 John ffitch
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -34,7 +34,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if HAVE_EXTERNAL_LIBS
+#if HAVE_EXTERNAL_XIPH_LIBS
 
 #include <ogg/ogg.h>
 
@@ -241,7 +241,7 @@ ogg_page_classify (SF_PRIVATE * psf, const ogg_page * og)
 	return 0 ;
 } /* ogg_page_classify */
 
-#else /* HAVE_EXTERNAL_LIBS */
+#else /* HAVE_EXTERNAL_XIPH_LIBS */
 
 int
 ogg_open	(SF_PRIVATE *psf)

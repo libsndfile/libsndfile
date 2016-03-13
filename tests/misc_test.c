@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -226,7 +226,7 @@ zero_data_test (const char *filename, int format)
 
 	switch (format & SF_FORMAT_TYPEMASK)
 	{	case SF_FORMAT_OGG :
-			if (HAVE_EXTERNAL_LIBS == 0)
+			if (HAVE_EXTERNAL_XIPH_LIBS == 0)
 				return ;
 			break ;
 		default :
