@@ -34,7 +34,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if (ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_LIBS)
+#if (ENABLE_EXPERIMENTAL_CODE && HAVE_LIBOGG)
 
 #include <ogg/ogg.h>
 
@@ -152,7 +152,7 @@ duration = audio_samples / rate
          = 3.947
 */
 
-#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_LIBS */
+#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_LIBOGG */
 
 int
 ogg_pcm_open (SF_PRIVATE *psf)

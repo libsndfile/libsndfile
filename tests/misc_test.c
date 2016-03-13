@@ -226,7 +226,7 @@ zero_data_test (const char *filename, int format)
 
 	switch (format & SF_FORMAT_TYPEMASK)
 	{	case SF_FORMAT_OGG :
-			if (HAVE_EXTERNAL_LIBS == 0)
+			if (!HAVE_LIBOGG || !HAVE_LIBVORBIS)
 				return ;
 			break ;
 		default :

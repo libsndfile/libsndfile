@@ -126,8 +126,19 @@ AC_ARG_ENABLE(sqlite,
 AC_ARG_ENABLE(alsa,
 	AC_HELP_STRING([--disable-alsa], [disable use of ALSA]))
 
+AC_ARG_ENABLE(libflac,
+	AC_HELP_STRING([--disable-libflac], [disable use of external FLAC library]))
+
+AC_ARG_ENABLE(libogg,
+	AC_HELP_STRING([--disable-libogg], [disable use of external Ogg library]))
+
+AC_ARG_ENABLE(libvorbis,
+	AC_HELP_STRING([--disable-libvorbis], [disable use of external Vorbis library]))
+
+# Once, you could only have all or none of FLAC, Ogg and Vorbis via this option.
+# We keep it to avoid breaking OpenWRT, OpenEmbedded and others' build scripts.
 AC_ARG_ENABLE(external-libs,
-	AC_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis [[default=no]]]))
+	AC_HELP_STRING([--disable-external-libs], [disable all external libraries]))
 
 AC_ARG_ENABLE(octave,
 	AC_HELP_STRING([--enable-octave], [disable building of GNU Octave module]))
@@ -290,60 +301,67 @@ else
 #====================================================================================
 # Check for Ogg, Vorbis and FLAC.
 
-HAVE_EXTERNAL_LIBS=0
+HAVE_LIBFLAC=0
+HAVE_LIBOGG=0
+HAVE_LIBVORBIS=0
 EXTERNAL_CFLAGS=""
 EXTERNAL_LIBS=""
+
+if test x$enable_external_libs = xno ; then
+	AC_MSG_WARN([[*** External libraries disabled. ***]])
+	enable_libflac=no
+	enable_libogg=no
+	enable_libvorbis=no
+	fi
 
 # Check for pkg-config outside the if statement.
 PKG_PROG_PKG_CONFIG
 m4_ifdef([PKG_INSTALLDIR], [PKG_INSTALLDIR], AC_SUBST([pkgconfigdir], ${libdir}/pkgconfig))
 
 if test -n "$PKG_CONFIG" ; then
-	if test x$enable_external_libs = xno ; then
-		AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
-	else
-		PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.3.1, ac_cv_flac=yes, ac_cv_flac=no)
+	if test x$enable_libflac != xno ; then
+		PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.3.0, ac_cv_flac=yes, ac_cv_flac=no)
 
 		# Make sure the FLAC_CFLAGS value is sane.
 		FLAC_CFLAGS=`echo $FLAC_CFLAGS | $SED "s|include/FLAC|include|"`
+		fi
 
+	if test x$enable_libogg != xno ; then
 		PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
+		fi
 
-		if test x$enable_experimental = xyes ; then
-			PKG_CHECK_MOD_VERSION(SPEEX, speex >= 1.2, ac_cv_speex=yes, ac_cv_speex=no)
-		else
-			SPEEX_CFLAGS=""
-			SPEEX_LIBS=""
-			fi
+	if test x$enable_experimental = xyes ; then
+		PKG_CHECK_MOD_VERSION(SPEEX, speex >= 1.2, ac_cv_speex=yes, ac_cv_speex=no)
+	else
+		SPEEX_CFLAGS=""
+		SPEEX_LIBS=""
+		fi
 
+	if test x$enable_libvorbis != xno ; then
 		# Vorbis versions earlier than 1.2.3 have bugs that cause the libsndfile
 		# test suite to fail on MIPS, PowerPC and others.
 		# See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
 		PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.3, ac_cv_vorbis=yes, ac_cv_vorbis=no)
 		PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.3, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
-		enable_external_libs=yes
 		fi
 
-	if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
-		HAVE_EXTERNAL_LIBS=1
-		enable_external_libs=yes
-
-		EXTERNAL_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBIS_CFLAGS $VORBISENC_CFLAGS $SPEEX_CFLAGS"
-		EXTERNAL_LIBS="$FLAC_LIBS $OGG_LIBS $VORBIS_LIBS $VORBISENC_LIBS $SPEEX_LIBS "
-	else
-		echo
-		AC_MSG_WARN([[*** One or more of the external libraries (ie libflac, libogg and]])
-		AC_MSG_WARN([[*** libvorbis) is either missing (possibly only the development]])
-		AC_MSG_WARN([[*** headers) or is of an unsupported version.]])
-		AC_MSG_WARN([[***]])
-		AC_MSG_WARN([[*** Unfortunately, for ease of maintenance, the external libs]])
-		AC_MSG_WARN([[*** are an all or nothing affair.]])
-		echo
-		enable_external_libs=no
+	if test x$ac_cv_flac = xyes ; then
+		HAVE_LIBFLAC=1
 		fi
+	if test x$ac_cv_ogg = xyes ; then
+		HAVE_LIBOGG=1
+		fi
+	if test x$ac_cv_vorbis = xyes ; then
+		HAVE_LIBVORBIS=1
+		fi
+
+	EXTERNAL_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBIS_CFLAGS $VORBISENC_CFLAGS $SPEEX_CFLAGS"
+	EXTERNAL_LIBS="$FLAC_LIBS $OGG_LIBS $VORBIS_LIBS $VORBISENC_LIBS $SPEEX_LIBS "
 	fi
 
-AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_LIBS], $HAVE_EXTERNAL_LIBS, [Will be set to 1 if flac, ogg and vorbis are available.])
+AC_DEFINE_UNQUOTED([HAVE_LIBFLAC], $HAVE_LIBFLAC, [Will be set to 1 if libflac is available.])
+AC_DEFINE_UNQUOTED([HAVE_LIBOGG], $HAVE_LIBOGG, [Will be set to 1 if libogg is available.])
+AC_DEFINE_UNQUOTED([HAVE_LIBVORBIS], $HAVE_LIBVORBIS, [Will be set to 1 if libvorbis is available.])
 
 #====================================================================================
 # Check for libsqlite3 (only used in regtest).
@@ -630,7 +648,9 @@ AC_SUBST(SHARED_VERSION_INFO)
 AC_SUBST(CLEAN_VERSION)
 AC_SUBST(WIN_RC_VERSION)
 
-AC_SUBST(HAVE_EXTERNAL_LIBS)
+AC_SUBST(HAVE_LIBFLAC)
+AC_SUBST(HAVE_LIBOGG)
+AC_SUBST(HAVE_LIBVORBIS)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(ALSA_LIBS)
@@ -674,7 +694,9 @@ AC_MSG_RESULT([
 
     Experimental code : ................... ${enable_experimental:-no}
     Using ALSA in example programs : ...... ${enable_alsa:-no}
-    External FLAC/Ogg/Vorbis : ............ ${enable_external_libs:-no}
+    External FLAC library : ............... ${enable_libflac:-yes}
+    External Ogg library : ................ ${enable_libogg:-yes}
+    External Vorbis library : ............. ${enable_libvorbis:-yes}
 ])
 
 if test -z "$PKG_CONFIG" ; then
