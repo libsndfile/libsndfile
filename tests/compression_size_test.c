@@ -178,21 +178,24 @@ main (int argc, char *argv [])
 		exit (0) ;
 		} ;
 
-	if (! HAVE_EXTERNAL_LIBS)
-	{	puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
-		return 0 ;
-	} ;
-
 	if (strcmp (argv [1], "all") == 0)
 		all_tests = 1 ;
 
-	if (all_tests || strcmp (argv [1], "vorbis") == 0)
+	if (! HAVE_LIBOGG || ! HAVE_LIBVORBIS)
+	{	puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
+		return 0 ;
+		}
+	else if (all_tests || strcmp (argv [1], "vorbis") == 0)
 	{	vorbis_test () ;
 		compression_size_test (SF_FORMAT_OGG | SF_FORMAT_VORBIS, "vorbis.oga") ;
 		tests ++ ;
 		} ;
 
-	if (all_tests || strcmp (argv [1], "flac") == 0)
+	if (! HAVE_LIBFLAC)
+	{	puts ("    No FLAC tests because FLAC support was not compiled in.") ;
+		return 0 ;
+		}
+	else if (all_tests || strcmp (argv [1], "flac") == 0)
 	{	compression_size_test (SF_FORMAT_FLAC | SF_FORMAT_PCM_16, "pcm16.flac") ;
 		tests ++ ;
 		} ;

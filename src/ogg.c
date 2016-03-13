@@ -34,7 +34,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if HAVE_EXTERNAL_LIBS
+#if HAVE_LIBOGG
 
 #include <ogg/ogg.h>
 
@@ -241,7 +241,7 @@ ogg_page_classify (SF_PRIVATE * psf, const ogg_page * og)
 	return 0 ;
 } /* ogg_page_classify */
 
-#else /* HAVE_EXTERNAL_LIBS */
+#else /* HAVE_LIBOGG */
 
 int
 ogg_open	(SF_PRIVATE *psf)
