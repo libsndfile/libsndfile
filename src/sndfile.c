@@ -3040,6 +3040,8 @@ error_exit :
 
 /*==============================================================================
 ** Chunk getting and setting.
+** This works for AIFF, CAF, RF64 and WAV.
+** It doesn't work for W64 because W64 uses weird GUID style chunk markers.
 */
 
 int
