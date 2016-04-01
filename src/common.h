@@ -426,6 +426,9 @@ typedef struct sf_private_tag
 	int				have_written ;	/* Has a single write been done to the file? */
 	PEAK_INFO		*peak_info ;
 
+	/* Cue Marker Info */
+	SF_CUES		*cues ;
+
 	/* Loop Info */
 	SF_LOOP_INFO	*loop_info ;
 	SF_INSTRUMENT	*instrument ;
@@ -964,6 +967,8 @@ psf_strlcpy (char *dest, size_t n, const char *src)
 */
 
 void	*psf_memset (void *s, int c, sf_count_t n) ;
+
+SF_CUES * psf_cues_alloc (void) ;
 
 SF_INSTRUMENT * psf_instrument_alloc (void) ;
 
