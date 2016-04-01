@@ -917,20 +917,21 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 		} ; /* while (1) */
 
 	if (instr_found && mark_found)
-	{	int j, str_index ;
+	{	int ji, str_index ;
 		/* Next loop will convert markers to loop positions for internal handling */
-		for (j = 0 ; j < psf->instrument->loop_count ; j ++)
-		{	if (j < ARRAY_LEN (psf->instrument->loops))
-			{	psf->instrument->loops [j].start = marker_to_position (paiff->markstr, psf->instrument->loops [j].start, mark_count) ;
-				psf->instrument->loops [j].end = marker_to_position (paiff->markstr, psf->instrument->loops [j].end, mark_count) ;
-				psf->instrument->loops [j].mode = SF_LOOP_FORWARD ;
+		for (ji = 0 ; ji < psf->instrument->loop_count ; ji ++)
+		{	if (ji < ARRAY_LEN (psf->instrument->loops))
+			{	psf->instrument->loops [ji].start = marker_to_position (paiff->markstr, psf->instrument->loops [ji].start, mark_count) ;
+				psf->instrument->loops [ji].end = marker_to_position (paiff->markstr, psf->instrument->loops [ji].end, mark_count) ;
+				psf->instrument->loops [ji].mode = SF_LOOP_FORWARD ;
 				} ;
 			} ;
 
 		/* The markers that correspond to loop positions can now be removed from cues struct */
-		if (psf->cues->cue_count > psf->instrument->loop_count * 2)
-		{
-			for (j = 0 ; j < psf->cues->cue_count - (psf->instrument->loop_count * 2) ; j ++)
+		if (psf->cues->cue_count > (uint32_t) (psf->instrument->loop_count * 2))
+		{	uint32_t j ;
+
+			for (j = 0 ; j < psf->cues->cue_count - (uint32_t) (psf->instrument->loop_count * 2) ; j ++)
 			{	/* This simply copies the information in cues above loop positions and writes it at current count instead */
 				psf->cues->cue_points [j].indx = psf->cues->cue_points [j + psf->instrument->loop_count * 2].indx ;
 				psf->cues->cue_points [j].position = psf->cues->cue_points [j + psf->instrument->loop_count * 2].position ;
@@ -1445,8 +1446,8 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->instrument != NULL && psf->cues != NULL)
 	{	/* Both loops and cues exist */
 		uint16_t sustainLoopMode, releaseLoopMode ;
-		uint32_t sLoopStart = 0, sLoopEnd = 0, rLoopStart = 0, rLoopEnd = 0 ;
-		int totalStringLength = 0, idx, ps, stringLength ;
+		uint32_t idx, sLoopStart = 0, sLoopEnd = 0, rLoopStart = 0, rLoopEnd = 0 ;
+		int totalStringLength = 0, ps, stringLength ;
 
 		/* Here we count how many bytes will the pascal strings need */
 		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
@@ -1622,7 +1623,8 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		}
 	else if (psf->instrument == NULL && psf->cues != NULL)
 	{	/* There are cues but no loops */
-		int totalStringLength = 0, idx, ps, stringLength ;
+		uint32_t idx ;
+		int totalStringLength = 0, ps, stringLength ;
 
 		/* Here we count how many bytes will the pascal strings need */
 		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)

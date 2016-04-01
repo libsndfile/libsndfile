@@ -1001,7 +1001,7 @@ wavex_write_fmt_chunk (SF_PRIVATE *psf)
 static int
 wav_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t	current ;
-	int 		k, error, has_data = SF_FALSE ;
+	int 		error, has_data = SF_FALSE ;
 
 	current = psf_ftell (psf) ;
 
@@ -1070,7 +1070,9 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 		wavlike_write_cart_chunk (psf) ;
 
 	if (psf->cues != NULL)
-	{	psf_binheader_writef (psf, "m4", cue_MARKER, 4 + psf->cues->cue_count * 6 * 4) ;
+	{	uint32_t k ;
+
+		psf_binheader_writef (psf, "m4", cue_MARKER, 4 + psf->cues->cue_count * 6 * 4) ;
 		psf_binheader_writef (psf, "4", psf->cues->cue_count) ;
 
 		for (k = 0 ; k < psf->cues->cue_count ; k++)
@@ -1108,8 +1110,8 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 
 	if (psf->headindex + 16 < psf->dataoffset)
 	{	/* Add PAD data if necessary. */
-		k = psf->dataoffset - (psf->headindex + 16) ;
-		psf_binheader_writef (psf, "m4z", PAD_MARKER, k, make_size_t (k)) ;
+		size_t k = psf->dataoffset - (psf->headindex + 16) ;
+		psf_binheader_writef (psf, "m4z", PAD_MARKER, k, k) ;
 		} ;
 
 	psf_binheader_writef (psf, "tm8", data_MARKER, psf->datalength) ;

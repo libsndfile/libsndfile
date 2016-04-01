@@ -409,7 +409,7 @@ typedef struct
 */
 
 typedef struct
-{	int cue_count ;
+{	uint32_t cue_count ;
 
 	struct
 	{	int32_t 	indx ;
