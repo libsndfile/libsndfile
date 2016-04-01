@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -1187,22 +1187,7 @@ psf_memset (void *s, int c, sf_count_t len)
 
 SF_CUES *
 psf_cues_alloc (void)
-{	SF_CUES *cue ;
-	int i, j ;
-
-	cue = calloc (1, sizeof (SF_CUES)) ;
-
-	if (cue == NULL)
-		return NULL ;
-
-	/* Initialize name string with zeros */
-	for (i = 0 ; i < 100 ; i++)
-	{
-		for (j = 0 ; j < 256 ; j++)
-			cue->cue_points [i].name [j] = 0 ;
-	}
-
-	return cue ;
+{	return calloc (1, sizeof (SF_CUES)) ;
 } /* psf_cues_alloc */
 
 SF_INSTRUMENT *
