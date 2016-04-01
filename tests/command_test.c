@@ -864,15 +864,27 @@ cue_rw_test (const char *filename)
 
 static void
 cue_test (const char *filename, int filetype)
-{	static SF_CUES write_cue =
-	{	2,		/* cue_count */
-		{	{	1, 0, 1635017060, 0, 0, 1, "" },
-			{	2, 0, 1635017060, 0, 0, 2, "" },
-		}
-	} ;
+{	SF_CUES write_cue ;
 	SF_CUES read_cue ;
 	SNDFILE	*file ;
 	SF_INFO	sfinfo ;
+
+	if (filetype == (SF_FORMAT_WAV | SF_FORMAT_PCM_16))
+	{	write_cue = (SF_CUES)
+		{	2,		/* cue_count */
+			{	{	1, 0, 1635017060, 0, 0, 1, "" },
+				{	2, 0, 1635017060, 0, 0, 2, "" },
+			}
+		} ;
+	}
+	else
+	{	write_cue = (SF_CUES)
+		{	2,		/* cue_count */
+			{	{	1, 0, 1635017060, 0, 0, 1, "Cue1" },
+				{	2, 0, 1635017060, 0, 0, 2, "Cue2" },
+			}
+		} ;
+	}
 
 	print_test_name ("cue_test", filename) ;
 

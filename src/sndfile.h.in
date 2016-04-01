@@ -413,11 +413,11 @@ typedef struct
 
 	struct 
 	{	int dwName;
-		unsigned int dwPosition;
+		uint32_t dwPosition;
 		int fccChunk;
 		int dwChunkStart;
 		int dwBlockStart;
-		unsigned int dwSampleOffset;
+		uint32_t dwSampleOffset;
 		char name[256];
 	} cue_points[100];
 } SF_CUES ;
