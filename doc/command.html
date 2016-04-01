@@ -237,6 +237,16 @@
 </TR>
 
 <TR>
+	<TD><A HREF="#SFC_GET_CUE">SFC_GET_CUE</A></TD>
+	<TD>Get cue marker info</TD>
+</TR>
+
+<TR>
+	<TD><A HREF="#SFC_SET_CUE">SFC_SET_CUE</A></TD>
+	<TD>Set cue marker info</TD>
+</TR>
+
+<TR>
 	<TD><A HREF="#SFC_RF64_AUTO_DOWNGRADE">SFC_RF64_AUTO_DOWNGRADE</A></TD>
 	<TD>Enable auto downgrade from RF64 to WAV</TD>
 </TR>
@@ -1659,7 +1669,7 @@ Parameters:
 </p>
 <PRE>
          sndfile  : A valid SNDFILE* pointer
-         cmd      : SFC_GET_INSTRUMENT
+         cmd      : SFC_SET_INSTRUMENT
          data     : a pointer to an SF_INSTRUMENT struct
          datasize : sizeof (SF_INSTRUMENT)
 </PRE>
@@ -1674,6 +1684,88 @@ Example:
 <DT>Return value:</DT>
 	<dd>SF_TRUE if the file header contains instrument information for the
     file. SF_FALSE otherwise.
+</DL>
+
+
+<!-- ========================================================================= -->
+
+ 
+<A NAME="SFC_GET_CUE"></A>
+<H2><BR><B>SFC_GET_CUE</B></H2>
+<P>
+Retrieve cue marker information from file.
+</P>
+<P>
+Parameters:
+</P>
+<PRE>
+         sndfile  : A valid SNDFILE* pointer
+         cmd      : SFC_GET_CUE
+         data     : a pointer to an SF_CUES struct
+         datasize : sizeof (SF_CUES)
+</PRE>
+
+<P>
+The SF_CUES struct is defined in &lt;sndfile.h&gt; as:
+</P>
+<PRE>
+	typedef struct
+	{	int cue_count;
+
+		struct 
+		{	int dwName;
+			unsigned int dwPosition;
+			int fccChunk;
+			int dwChunkStart;
+			int dwBlockStart;
+			unsigned int dwSampleOffset;
+			char name[256];
+		} cue_points[100];
+	} SF_CUES ;
+</PRE>
+
+<P>
+Example:
+</P>
+<PRE>
+         SF_CUES cues ;
+         sf_command (sndfile, SFC_GET_CUE, &amp;cues, sizeof (cues)) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<dd>SF_TRUE if the file header contains cue marker information for the
+    file. SF_FALSE otherwise.
+</DL>
+
+
+<!-- ========================================================================= -->
+
+
+<A NAME="SFC_SET_CUE"></A>
+<H2><BR><B>SFC_SET_CUE</B></H2>
+<P>
+Set the cue marker information for the file.
+</P>
+<P>
+Parameters:
+</P>
+<PRE>
+         sndfile  : A valid SNDFILE* pointer
+         cmd      : SFC_SET_CUE
+         data     : a pointer to an SF_CUES struct
+         datasize : sizeof (SF_CUES)
+</PRE>
+<P>
+Example:
+</P>
+<PRE>
+         SF_CUES cues ;
+         sf_command (sndfile, SFC_SET_CUE, &amp;cues, sizeof (cues)) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<dd>SF_TRUE if the file header contains cue marker information for the
+	file. SF_FALSE otherwise.
 </DL>
 
 
