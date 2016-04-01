@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (C) 2008-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+# Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 #
 # All rights reserved.
 #
@@ -148,6 +148,8 @@ def test_rewrite ():
 
 test_dir = "programs"
 
+print "\nTesting WAV metadata manipulation:"
+
 if os.path.isdir (test_dir):
 	os.chdir (test_dir)
 
@@ -158,8 +160,6 @@ os.system ("../examples/make_sine")
 if not os.path.isfile ("sine.wav"):
 	print "\n\nError : Can't file file 'sine.wav'."
 	sys.exit (1)
-
-print ""
 
 test_empty_fail ()
 test_copy ()
