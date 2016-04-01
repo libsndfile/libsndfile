@@ -44,6 +44,7 @@ static	void	format_tests			(void) ;
 static	void	calc_peak_test			(int filetype, const char *filename, int channels) ;
 static	void	truncate_test			(const char *filename, int filetype) ;
 static	void	instrument_test			(const char *filename, int filetype) ;
+static	void	cue_test			(const char *filename, int filetype) ;
 static	void	channel_map_test		(const char *filename, int filetype) ;
 static	void	current_sf_info_test	(const char *filename) ;
 static	void	raw_needs_endswap_test	(const char *filename, int filetype) ;
@@ -79,6 +80,7 @@ main (int argc, char *argv [])
 		printf ("           peak    - test peak calculation\n") ;
 		printf ("           trunc   - test file truncation\n") ;
 		printf ("           inst    - test set/get of SF_INSTRUMENT.\n") ;
+		printf ("           cue     - test set/get of SF_CUES.\n") ;
 		printf ("           chanmap - test set/get of channel map data..\n") ;
 		printf ("           bext    - test set/get of SF_BROADCAST_INFO.\n") ;
 		printf ("           bextch  - test set/get of SF_BROADCAST_INFO coding_history.\n") ;
@@ -136,6 +138,12 @@ main (int argc, char *argv [])
 	{	instrument_test ("instrument.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		instrument_test ("instrument.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
 		/*-instrument_test ("instrument.xi", SF_FORMAT_XI | SF_FORMAT_DPCM_16) ;-*/
+		test_count ++ ;
+		} ;
+
+	if (do_all || strcmp (argv [1], "cue") == 0)
+	{	cue_test ("cue.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+		cue_test ("cue.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
 		test_count ++ ;
 		} ;
 
@@ -823,6 +831,145 @@ instrument_test (const char *filename, int filetype)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* instrument_test */
+
+static void
+cue_rw_test (const char *filename)
+{	SNDFILE *sndfile ;
+	SF_INFO sfinfo ;
+	SF_CUES cues ;
+	memset (&sfinfo, 0, sizeof (SF_INFO)) ;
+
+	sndfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__) ;
+
+	if (sf_command (sndfile, SFC_GET_CUE, &cues, sizeof (cues)) == SF_TRUE)
+	{	cues.cue_points [1].dwSampleOffset = 3 ;
+
+		if (sf_command (sndfile, SFC_SET_CUE, &cues, sizeof (cues)) == SF_TRUE)
+			printf ("Sucess: [%s] updated\n", filename) ;
+		else
+			printf ("Error: SFC_SET_CUE on [%s] [%s]\n", filename, sf_strerror (sndfile)) ;
+		}
+	else
+		printf ("Error: SFC_GET_CUE on [%s] [%s]\n", filename, sf_strerror (sndfile)) ;
+
+
+	if (sf_command (sndfile, SFC_UPDATE_HEADER_NOW, NULL, 0) != 0)
+		printf ("Error: SFC_UPDATE_HEADER_NOW on [%s] [%s]\n", filename, sf_strerror (sndfile)) ;
+
+	sf_write_sync (sndfile) ;
+	sf_close (sndfile) ;
+
+	return ;
+} /* cue_rw_test */
+
+static void
+cue_test (const char *filename, int filetype)
+{	static SF_CUES write_cue =
+	{	2,		/* cue_count */
+		{	{	1, 0, 1635017060, 0, 0, 1, "" },
+			{	2, 0, 1635017060, 0, 0, 2, "" },
+		}
+	} ;
+	SF_CUES read_cue ;
+	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
+
+	print_test_name ("cue_test", filename) ;
+
+	sfinfo.samplerate	= 11025 ;
+	sfinfo.format		= filetype ;
+	sfinfo.channels		= 1 ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_SET_CUE, &write_cue, sizeof (write_cue)) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_CUE) failed.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	memset (&read_cue, 0, sizeof (read_cue)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_GET_CUE, &read_cue, sizeof (read_cue)) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_GET_CUE) failed.\n\n", __LINE__) ;
+		exit (1) ;
+		return ;
+		} ;
+	check_log_buffer_or_die (file, __LINE__) ;
+	sf_close (file) ;
+
+	if (memcmp (&write_cue, &read_cue, sizeof (write_cue)) != 0)
+	{	printf ("\n\nLine %d : cue comparison failed.\n\n", __LINE__) ;
+		printf ("W  Cue count      : %d\n"
+			"   dwName         : %d\n"
+			"   dwPosition     : %u\n"
+			"   fccChunk       : %d\n"
+			"   dwChunkStart   : %d\n"
+			"   dwBlockStart   : %d\n"
+			"   dwSampleOffset : %u\n"
+			"   name           : %s\n"
+			"   dwName         : %d\n"
+			"   dwPosition     : %u\n"
+			"   fccChunk       : %d\n"
+			"   dwChunkStart   : %d\n"
+			"   dwBlockStart   : %d\n"
+			"   dwSampleOffset : %u\n"
+			"   name           : %s\n",
+			write_cue.cue_count,
+			write_cue.cue_points [0].dwName,
+			write_cue.cue_points [0].dwPosition,
+			write_cue.cue_points [0].fccChunk,
+			write_cue.cue_points [0].dwChunkStart,
+			write_cue.cue_points [0].dwBlockStart,
+			write_cue.cue_points [0].dwSampleOffset,
+			write_cue.cue_points [0].name,
+			write_cue.cue_points [1].dwName,
+			write_cue.cue_points [1].dwPosition,
+			write_cue.cue_points [1].fccChunk,
+			write_cue.cue_points [1].dwChunkStart,
+			write_cue.cue_points [1].dwBlockStart,
+			write_cue.cue_points [1].dwSampleOffset,
+			write_cue.cue_points [1].name) ;
+		printf ("R  Cue count      : %d\n"
+			"   dwName         : %d\n"
+			"   dwPosition     : %u\n"
+			"   fccChunk       : %d\n"
+			"   dwChunkStart   : %d\n"
+			"   dwBlockStart   : %d\n"
+			"   dwSampleOffset : %u\n"
+			"   name           : %s\n"
+			"   dwName         : %d\n"
+			"   dwPosition     : %u\n"
+			"   fccChunk       : %d\n"
+			"   dwChunkStart   : %d\n"
+			"   dwBlockStart   : %d\n"
+			"   dwSampleOffset : %u\n"
+			"   name           : %s\n",
+			read_cue.cue_count,
+			read_cue.cue_points [0].dwName,
+			read_cue.cue_points [0].dwPosition,
+			read_cue.cue_points [0].fccChunk,
+			read_cue.cue_points [0].dwChunkStart,
+			read_cue.cue_points [0].dwBlockStart,
+			read_cue.cue_points [0].dwSampleOffset,
+			read_cue.cue_points [0].name,
+			read_cue.cue_points [1].dwName,
+			read_cue.cue_points [1].dwPosition,
+			read_cue.cue_points [1].fccChunk,
+			read_cue.cue_points [1].dwChunkStart,
+			read_cue.cue_points [1].dwBlockStart,
+			read_cue.cue_points [1].dwSampleOffset,
+			read_cue.cue_points [1].name) ;
+
+			exit (1) ;
+		} ;
+
+	if (0) cue_rw_test (filename) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* cue_test */
 
 static	void
 current_sf_info_test	(const char *filename)
