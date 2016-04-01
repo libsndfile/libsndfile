@@ -1689,7 +1689,7 @@ Example:
 
 <!-- ========================================================================= -->
 
- 
+
 <A NAME="SFC_GET_CUE"></A>
 <H2><BR><B>SFC_GET_CUE</B></H2>
 <P>
@@ -1709,19 +1709,19 @@ Parameters:
 The SF_CUES struct is defined in &lt;sndfile.h&gt; as:
 </P>
 <PRE>
-	typedef struct
-	{	int cue_count;
+        typedef struct
+        {   int cue_count ;
 
-		struct 
-		{	int dwName;
-			unsigned int dwPosition;
-			int fccChunk;
-			int dwChunkStart;
-			int dwBlockStart;
-			unsigned int dwSampleOffset;
-			char name[256];
-		} cue_points[100];
-	} SF_CUES ;
+            struct
+            {   int dwName ;
+                unsigned int dwPosition ;
+                int fccChunk ;
+                int dwChunkStart ;
+                int dwBlockStart ;
+                unsigned int dwSampleOffset ;
+                char name [256] ;
+            } cue_points [100] ;
+        } SF_CUES ;
 </PRE>
 
 <P>
