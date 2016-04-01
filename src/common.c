@@ -1185,6 +1185,18 @@ psf_memset (void *s, int c, sf_count_t len)
 	return s ;
 } /* psf_memset */
 
+SF_CUES *
+psf_cues_alloc (void)
+{	SF_CUES *cue ;
+
+	cue = calloc (1, sizeof (SF_CUES)) ;
+
+	if (cue == NULL)
+		return NULL ;
+
+	return cue ;
+} /* psf_cues_alloc */
+
 SF_INSTRUMENT *
 psf_instrument_alloc (void)
 {	SF_INSTRUMENT *instr ;
