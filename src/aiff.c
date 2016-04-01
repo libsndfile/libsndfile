@@ -812,12 +812,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 							bytesread += psf_binheader_readf (psf, "E241", &mark_id, &position, &ch) ;
 							psf_log_printf (psf, "   Mark ID  : %u\n   Position : %u\n", mark_id, position) ;
 
-							psf->cues->cue_points [n].dwName = mark_id ;
-							psf->cues->cue_points [n].dwPosition = 0 ;
-							psf->cues->cue_points [n].fccChunk = 1635017060 ; /* always data */
-							psf->cues->cue_points [n].dwChunkStart = 0 ;
-							psf->cues->cue_points [n].dwBlockStart = 0 ;
-							psf->cues->cue_points [n].dwSampleOffset = position ;
+							psf->cues->cue_points [n].indx = mark_id ;
+							psf->cues->cue_points [n].position = 0 ;
+							psf->cues->cue_points [n].fcc_chunk = 1635017060 ; /* always data */
+							psf->cues->cue_points [n].chunk_start = 0 ;
+							psf->cues->cue_points [n].block_start = 0 ;
+							psf->cues->cue_points [n].sample_offset = position ;
 
 							pstr_len = (ch & 1) ? ch : ch + 1 ;
 
@@ -932,12 +932,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 		{
 			for (j = 0 ; j < psf->cues->cue_count - (psf->instrument->loop_count * 2) ; j ++)
 			{	/* This simply copies the information in cues above loop positions and writes it at current count instead */
-				psf->cues->cue_points [j].dwName = psf->cues->cue_points [j + psf->instrument->loop_count * 2].dwName ;
-				psf->cues->cue_points [j].dwPosition = psf->cues->cue_points [j + psf->instrument->loop_count * 2].dwPosition ;
-				psf->cues->cue_points [j].fccChunk = psf->cues->cue_points [j + psf->instrument->loop_count * 2].fccChunk ;
-				psf->cues->cue_points [j].dwChunkStart = psf->cues->cue_points [j + psf->instrument->loop_count * 2].dwChunkStart ;
-				psf->cues->cue_points [j].dwBlockStart = psf->cues->cue_points [j + psf->instrument->loop_count * 2].dwBlockStart ;
-				psf->cues->cue_points [j].dwSampleOffset = psf->cues->cue_points [j + psf->instrument->loop_count * 2].dwSampleOffset ;
+				psf->cues->cue_points [j].indx = psf->cues->cue_points [j + psf->instrument->loop_count * 2].indx ;
+				psf->cues->cue_points [j].position = psf->cues->cue_points [j + psf->instrument->loop_count * 2].position ;
+				psf->cues->cue_points [j].fcc_chunk = psf->cues->cue_points [j + psf->instrument->loop_count * 2].fcc_chunk ;
+				psf->cues->cue_points [j].chunk_start = psf->cues->cue_points [j + psf->instrument->loop_count * 2].chunk_start ;
+				psf->cues->cue_points [j].block_start = psf->cues->cue_points [j + psf->instrument->loop_count * 2].block_start ;
+				psf->cues->cue_points [j].sample_offset = psf->cues->cue_points [j + psf->instrument->loop_count * 2].sample_offset ;
 				for (str_index = 0 ; str_index < 256 ; str_index++)
 					psf->cues->cue_points [j].name [str_index] = psf->cues->cue_points [j + psf->instrument->loop_count * 2].name [str_index] ;
 				} ;
@@ -1454,7 +1454,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 					4, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
 			/* Now comes true markers from cues struct */
 			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-			{	psf_binheader_writef (psf, "E24", 5 + idx, psf->cues->cue_points [idx].dwSampleOffset) ;
+			{	psf_binheader_writef (psf, "E24", 5 + idx, psf->cues->cue_points [idx].sample_offset) ;
 				stringLength = strlen (psf->cues->cue_points [idx].name) ;
 				if ((stringLength + 1) % 2 == 0)
 				{	/* the pascal string will have an even count so we'll not use the null terminator */
@@ -1481,7 +1481,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17)) ;
 			/* Now comes true markers from cues struct */
 			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-			{	psf_binheader_writef (psf, "E24", 3 + idx, psf->cues->cue_points [idx].dwSampleOffset) ;
+			{	psf_binheader_writef (psf, "E24", 3 + idx, psf->cues->cue_points [idx].sample_offset) ;
 				stringLength = strlen (psf->cues->cue_points [idx].name) ;
 				if ((stringLength + 1) % 2 == 0)
 				{	/* the pascal string will have an even count so we'll not use the null terminator */
@@ -1509,7 +1509,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 					2, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
 			/* Now comes true markers from cues struct */
 			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-			{	psf_binheader_writef (psf, "E24", 3 + idx, psf->cues->cue_points [idx].dwSampleOffset) ;
+			{	psf_binheader_writef (psf, "E24", 3 + idx, psf->cues->cue_points [idx].sample_offset) ;
 				stringLength = strlen (psf->cues->cue_points [idx].name) ;
 				if ((stringLength + 1) % 2 == 0)
 				{	/* the pascal string will have an even count so we'll not use the null terminator */
@@ -1651,7 +1651,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			MARK_MARKER, 2 + psf->cues->cue_count * (2 + 4) + totalStringLength, psf->cues->cue_count) ;
 
 		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-		{	psf_binheader_writef (psf, "E24", psf->cues->cue_points [idx].dwName, psf->cues->cue_points [idx].dwSampleOffset) ;
+		{	psf_binheader_writef (psf, "E24", psf->cues->cue_points [idx].indx, psf->cues->cue_points [idx].sample_offset) ;
 			stringLength = strlen (psf->cues->cue_points [idx].name) ;
 			if ((stringLength + 1) % 2 == 0)
 			{	/* the pascal string will have an even count so we'll not use the null terminator */

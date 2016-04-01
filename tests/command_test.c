@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -842,7 +842,7 @@ cue_rw_test (const char *filename)
 	sndfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__) ;
 
 	if (sf_command (sndfile, SFC_GET_CUE, &cues, sizeof (cues)) == SF_TRUE)
-	{	cues.cue_points [1].dwSampleOffset = 3 ;
+	{	cues.cue_points [1].sample_offset = 3 ;
 
 		if (sf_command (sndfile, SFC_SET_CUE, &cues, sizeof (cues)) == SF_TRUE)
 			printf ("Sucess: [%s] updated\n", filename) ;
@@ -914,64 +914,64 @@ cue_test (const char *filename, int filetype)
 	if (memcmp (&write_cue, &read_cue, sizeof (write_cue)) != 0)
 	{	printf ("\n\nLine %d : cue comparison failed.\n\n", __LINE__) ;
 		printf ("W  Cue count      : %d\n"
-			"   dwName         : %d\n"
-			"   dwPosition     : %u\n"
-			"   fccChunk       : %d\n"
-			"   dwChunkStart   : %d\n"
-			"   dwBlockStart   : %d\n"
-			"   dwSampleOffset : %u\n"
+			"   indx         : %d\n"
+			"   position     : %u\n"
+			"   fcc_chunk       : %d\n"
+			"   chunk_start   : %d\n"
+			"   block_start   : %d\n"
+			"   sample_offset : %u\n"
 			"   name           : %s\n"
-			"   dwName         : %d\n"
-			"   dwPosition     : %u\n"
-			"   fccChunk       : %d\n"
-			"   dwChunkStart   : %d\n"
-			"   dwBlockStart   : %d\n"
-			"   dwSampleOffset : %u\n"
+			"   indx         : %d\n"
+			"   position     : %u\n"
+			"   fcc_chunk       : %d\n"
+			"   chunk_start   : %d\n"
+			"   block_start   : %d\n"
+			"   sample_offset : %u\n"
 			"   name           : %s\n",
 			write_cue.cue_count,
-			write_cue.cue_points [0].dwName,
-			write_cue.cue_points [0].dwPosition,
-			write_cue.cue_points [0].fccChunk,
-			write_cue.cue_points [0].dwChunkStart,
-			write_cue.cue_points [0].dwBlockStart,
-			write_cue.cue_points [0].dwSampleOffset,
+			write_cue.cue_points [0].indx,
+			write_cue.cue_points [0].position,
+			write_cue.cue_points [0].fcc_chunk,
+			write_cue.cue_points [0].chunk_start,
+			write_cue.cue_points [0].block_start,
+			write_cue.cue_points [0].sample_offset,
 			write_cue.cue_points [0].name,
-			write_cue.cue_points [1].dwName,
-			write_cue.cue_points [1].dwPosition,
-			write_cue.cue_points [1].fccChunk,
-			write_cue.cue_points [1].dwChunkStart,
-			write_cue.cue_points [1].dwBlockStart,
-			write_cue.cue_points [1].dwSampleOffset,
+			write_cue.cue_points [1].indx,
+			write_cue.cue_points [1].position,
+			write_cue.cue_points [1].fcc_chunk,
+			write_cue.cue_points [1].chunk_start,
+			write_cue.cue_points [1].block_start,
+			write_cue.cue_points [1].sample_offset,
 			write_cue.cue_points [1].name) ;
 		printf ("R  Cue count      : %d\n"
-			"   dwName         : %d\n"
-			"   dwPosition     : %u\n"
-			"   fccChunk       : %d\n"
-			"   dwChunkStart   : %d\n"
-			"   dwBlockStart   : %d\n"
-			"   dwSampleOffset : %u\n"
+			"   indx         : %d\n"
+			"   position     : %u\n"
+			"   fcc_chunk       : %d\n"
+			"   chunk_start   : %d\n"
+			"   block_start   : %d\n"
+			"   sample_offset : %u\n"
 			"   name           : %s\n"
-			"   dwName         : %d\n"
-			"   dwPosition     : %u\n"
-			"   fccChunk       : %d\n"
-			"   dwChunkStart   : %d\n"
-			"   dwBlockStart   : %d\n"
-			"   dwSampleOffset : %u\n"
+			"   indx         : %d\n"
+			"   position     : %u\n"
+			"   fcc_chunk       : %d\n"
+			"   chunk_start   : %d\n"
+			"   block_start   : %d\n"
+			"   sample_offset : %u\n"
 			"   name           : %s\n",
 			read_cue.cue_count,
-			read_cue.cue_points [0].dwName,
-			read_cue.cue_points [0].dwPosition,
-			read_cue.cue_points [0].fccChunk,
-			read_cue.cue_points [0].dwChunkStart,
-			read_cue.cue_points [0].dwBlockStart,
-			read_cue.cue_points [0].dwSampleOffset,
+			read_cue.cue_points [0].indx,
+			read_cue.cue_points [0].position,
+			read_cue.cue_points [0].fcc_chunk,
+			read_cue.cue_points [0].chunk_start,
+			read_cue.cue_points [0].block_start,
+			read_cue.cue_points [0].sample_offset,
 			read_cue.cue_points [0].name,
-			read_cue.cue_points [1].dwName,
-			read_cue.cue_points [1].dwPosition,
-			read_cue.cue_points [1].fccChunk,
-			read_cue.cue_points [1].dwChunkStart,
-			read_cue.cue_points [1].dwBlockStart,
-			read_cue.cue_points [1].dwSampleOffset,
+			read_cue.cue_points [1].indx,
+			read_cue.cue_points [1].position,
+			read_cue.cue_points [1].fcc_chunk,
+			read_cue.cue_points [1].chunk_start,
+			read_cue.cue_points [1].block_start,
+			read_cue.cue_points [1].sample_offset,
 			read_cue.cue_points [1].name) ;
 
 			exit (1) ;

@@ -1709,19 +1709,19 @@ Parameters:
 The SF_CUES struct is defined in &lt;sndfile.h&gt; as:
 </P>
 <PRE>
-        typedef struct
-        {   int cue_count ;
+    typedef struct
+    {	int cue_count ;
 
-            struct
-            {   int dwName ;
-                unsigned int dwPosition ;
-                int fccChunk ;
-                int dwChunkStart ;
-                int dwBlockStart ;
-                unsigned int dwSampleOffset ;
-                char name [256] ;
-            } cue_points [100] ;
-        } SF_CUES ;
+    	struct
+    	{	int32_t   indx ;
+    		uint32_t  position ;
+    		int32_t   fcc_chunk ;
+    		int32_t   chunk_start ;
+    		int32_t   block_start ;
+    		uint32_t  sample_offset ;
+    		char name [256] ;
+    	} cue_points [100] ;
+    } SF_CUES ;
 </PRE>
 
 <P>
