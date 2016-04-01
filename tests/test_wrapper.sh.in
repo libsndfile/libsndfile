@@ -89,6 +89,7 @@ if test -x test_main@EXEEXT@ ; then
 ./command_test@EXEEXT@ peak
 ./command_test@EXEEXT@ trunc
 ./command_test@EXEEXT@ inst
+./command_test@EXEEXT@ cue
 ./command_test@EXEEXT@ current_sf_info
 ./command_test@EXEEXT@ bext
 ./command_test@EXEEXT@ bextch
