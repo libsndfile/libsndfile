@@ -1198,6 +1198,21 @@ aiff_rewrite_header (SF_PRIVATE *psf)
 	return ;
 } /* aiff_rewrite_header */
 
+static uint16_t
+convert_loop_mode (int type_mode)
+{	switch (type_mode)
+	{	case SF_LOOP_NONE:
+			return 0 ;
+		case SF_LOOP_FORWARD :
+			return 1 ;
+		case SF_LOOP_ALTERNATING :
+			return 2 ;
+		default : break ;
+		} ;
+
+	return 0 ;
+} /* convert_loop_mode */
+
 static int
 aiff_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t		current ;
@@ -1429,7 +1444,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	/* Check if there's a INST chunk to write */
 	if (psf->instrument != NULL && psf->cues != NULL)
 	{	/* Both loops and cues exist */
-		uint16_t typeMode, sustainLoopMode, releaseLoopMode ;
+		uint16_t sustainLoopMode, releaseLoopMode ;
 		uint32_t sLoopStart = 0, sLoopEnd = 0, rLoopStart = 0, rLoopEnd = 0 ;
 		int totalStringLength = 0, idx, ps, stringLength ;
 
@@ -1440,7 +1455,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 				totalStringLength += stringLength ;
 			else
 				totalStringLength += (stringLength + 1) ; /* The pascal string must have an even count */
-		}
+			}
 
 		/* First we check which loops are active and create the necessary MARK chunk for markers */
 		/* The first written markers will be references from loop points then comes the real markers */
@@ -1459,21 +1474,23 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 				if ((stringLength + 1) % 2 == 0)
 				{	/* the pascal string will have an even count so we'll not use the null terminator */
 					psf_binheader_writef (psf, "E1b", stringLength, psf->cues->cue_points [idx].name, make_size_t (stringLength)) ;
-				} else
+					}
+				else
 				{	/* the pascal string would have an uneven count so we include a null terminator as pad */
 					char textString [stringLength + 1] ;
 					for (ps = 0 ; ps < stringLength ; ps++)
 						textString [ps] = psf->cues->cue_points [idx].name [ps] ;
 					textString [stringLength] = '\0' ;
 					psf_binheader_writef (psf, "E1b", stringLength, textString, sizeof (textString)) ;
-				}
-			}
+					} ;
+				} ;
 			/* Change the loops to be references to the markers */
 			sLoopStart = 1 ;
 			sLoopEnd = 2 ;
 			rLoopStart = 3 ;
 			rLoopEnd = 4 ;
-		} else if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode == SF_LOOP_NONE)
+			}
+		else if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode == SF_LOOP_NONE)
 		{	/* There's a sustain loop but no release loop */
 			psf_binheader_writef (psf, "Em42241b241b",
 					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17) + psf->cues->cue_count * (2 + 4) + totalStringLength, 2 + psf->cues->cue_count,
@@ -1486,22 +1503,24 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 				if ((stringLength + 1) % 2 == 0)
 				{	/* the pascal string will have an even count so we'll not use the null terminator */
 					psf_binheader_writef (psf, "E1b", stringLength, psf->cues->cue_points [idx].name, make_size_t (stringLength)) ;
-				} else
+					}
+				else
 				{	/* the pascal string would have an uneven count so we include a null terminator as pad */
 					char textString [stringLength + 1] ;
 					for (ps = 0 ; ps < stringLength ; ps++)
 						textString [ps] = psf->cues->cue_points [idx].name [ps] ;
 					textString [stringLength] = '\0' ;
 					psf_binheader_writef (psf, "E1b", stringLength, textString, sizeof (textString)) ;
-				}
-			}
+					} ;
+				} ;
 
 			/* Change the loops to be references to the markers */
 			sLoopStart = 1 ;
 			sLoopEnd = 2 ;
 			rLoopStart = 0 ;
 			rLoopEnd = 0 ;
-		} else if (psf->instrument->loops [0].mode == SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
+			}
+		else if (psf->instrument->loops [0].mode == SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
 		{	/* There's a release loop but no sustain loop! Strange indeed! */
 			psf_binheader_writef (psf, "Em42241b241b",
 					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17) + psf->cues->cue_count * (2 + 4) + totalStringLength, 2 + psf->cues->cue_count,
@@ -1514,45 +1533,27 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 				if ((stringLength + 1) % 2 == 0)
 				{	/* the pascal string will have an even count so we'll not use the null terminator */
 					psf_binheader_writef (psf, "E1b", stringLength, psf->cues->cue_points [idx].name, make_size_t (stringLength)) ;
-				} else
+					}
+				else
 				{	/* the pascal string would have an uneven count so we include a null terminator as pad */
 					char textString [stringLength + 1] ;
 					for (ps = 0 ; ps < stringLength ; ps++)
 						textString [ps] = psf->cues->cue_points [idx].name [ps] ;
 					textString [stringLength] = '\0' ;
 					psf_binheader_writef (psf, "E1b", stringLength, textString, sizeof (textString)) ;
-				}
-			}
+					} ;
+				} ;
 
 			/* Change the loops to be references to the markers */
 			sLoopStart = 0 ;
 			sLoopEnd = 0 ;
 			rLoopStart = 1 ;
 			rLoopEnd = 2 ;
-		}
+			} ;
 
 		/* First convert loop modes to aiff standard */
-		typeMode = psf->instrument->loops [0].mode ;
-		if (typeMode == SF_LOOP_NONE)
-		{	sustainLoopMode = 0 ;
-		} else if (typeMode == SF_LOOP_FORWARD)
-		{	sustainLoopMode = 1 ;
-		} else if (typeMode == SF_LOOP_ALTERNATING)
-		{	sustainLoopMode = 2 ;
-		} else {
-			sustainLoopMode = 0 ;
-		}
-
-		typeMode = psf->instrument->loops [1].mode ;
-		if (typeMode == SF_LOOP_NONE)
-		{	releaseLoopMode = 0 ;
-		} else if (typeMode == SF_LOOP_FORWARD)
-		{	releaseLoopMode = 1 ;
-		} else if (typeMode == SF_LOOP_ALTERNATING)
-		{	releaseLoopMode = 2 ;
-		} else {
-			releaseLoopMode = 0 ;
-		}
+		sustainLoopMode = convert_loop_mode (psf->instrument->loops [0].mode) ;
+		releaseLoopMode = convert_loop_mode (psf->instrument->loops [1].mode) ;
 
 		/* Now we finally write the actual INST chunk */
 		psf_binheader_writef (psf, "Em4111111", INST_MARKER, SIZEOF_INST_CHUNK, psf->instrument->basenote, psf->instrument->detune,
@@ -1561,9 +1562,10 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			sustainLoopMode, sLoopStart, sLoopEnd,
 			releaseLoopMode, rLoopStart, rLoopEnd) ;
 
-	} else if (psf->instrument != NULL && psf->cues == NULL)
+		}
+	else if (psf->instrument != NULL && psf->cues == NULL)
 	{	/* There are loops but no cues */
-		uint16_t typeMode, sustainLoopMode, releaseLoopMode ;
+		uint16_t sustainLoopMode, releaseLoopMode ;
 		uint32_t sLoopStart = 0, sLoopEnd = 0, rLoopStart = 0, rLoopEnd = 0 ;
 
 		/* First we check which loops are active and create the necessary MARK chunk for markers */
@@ -1580,7 +1582,8 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			sLoopEnd = 2 ;
 			rLoopStart = 3 ;
 			rLoopEnd = 4 ;
-		} else if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode == SF_LOOP_NONE)
+			}
+		else if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode == SF_LOOP_NONE)
 		{	/* There's a sustain loop but no release loop */
 			psf_binheader_writef (psf, "Em42241b241b",
 					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17), 2,
@@ -1591,7 +1594,8 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			sLoopEnd = 2 ;
 			rLoopStart = 0 ;
 			rLoopEnd = 0 ;
-		} else if (psf->instrument->loops [0].mode == SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
+			}
+		else if (psf->instrument->loops [0].mode == SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
 		{	/* There's a release loop but no sustain loop! Strange indeed! */
 			psf_binheader_writef (psf, "Em42241b241b",
 					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17), 2,
@@ -1602,30 +1606,11 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			sLoopEnd = 0 ;
 			rLoopStart = 1 ;
 			rLoopEnd = 2 ;
-		}
+			} ;
 
 		/* First convert loop modes to aiff standard */
-		typeMode = psf->instrument->loops [0].mode ;
-		if (typeMode == SF_LOOP_NONE)
-		{	sustainLoopMode = 0 ;
-		} else if (typeMode == SF_LOOP_FORWARD)
-		{	sustainLoopMode = 1 ;
-		} else if (typeMode == SF_LOOP_ALTERNATING)
-		{	sustainLoopMode = 2 ;
-		} else {
-			sustainLoopMode = 0 ;
-		}
-
-		typeMode = psf->instrument->loops [1].mode ;
-		if (typeMode == SF_LOOP_NONE)
-		{	releaseLoopMode = 0 ;
-		} else if (typeMode == SF_LOOP_FORWARD)
-		{	releaseLoopMode = 1 ;
-		} else if (typeMode == SF_LOOP_ALTERNATING)
-		{	releaseLoopMode = 2 ;
-		} else {
-			releaseLoopMode = 0 ;
-		}
+		sustainLoopMode = convert_loop_mode (psf->instrument->loops [0].mode) ;
+		releaseLoopMode = convert_loop_mode (psf->instrument->loops [1].mode) ;
 
 		/* Now we finally write the actual INST chunk */
 		psf_binheader_writef (psf, "Em4111111", INST_MARKER, SIZEOF_INST_CHUNK, psf->instrument->basenote, psf->instrument->detune,
@@ -1634,7 +1619,8 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			sustainLoopMode, sLoopStart, sLoopEnd,
 			releaseLoopMode, rLoopStart, rLoopEnd) ;
 
-	} else if (psf->instrument == NULL && psf->cues != NULL)
+		}
+	else if (psf->instrument == NULL && psf->cues != NULL)
 	{	/* There are cues but no loops */
 		int totalStringLength = 0, idx, ps, stringLength ;
 
@@ -1645,7 +1631,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 				totalStringLength += stringLength ;
 			else
 				totalStringLength += (stringLength + 1) ; /* The pascal string must have an even count */
-		}
+			} ;
 
 		psf_binheader_writef (psf, "Em42",
 			MARK_MARKER, 2 + psf->cues->cue_count * (2 + 4) + totalStringLength, psf->cues->cue_count) ;
@@ -1656,16 +1642,17 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			if ((stringLength + 1) % 2 == 0)
 			{	/* the pascal string will have an even count so we'll not use the null terminator */
 				psf_binheader_writef (psf, "E1b", stringLength, psf->cues->cue_points [idx].name, make_size_t (stringLength)) ;
-			} else
+				}
+			else
 			{	/* the pascal string would have an uneven count so we include a null terminator as pad */
 				char textString [stringLength + 1] ;
 				for (ps = 0 ; ps < stringLength ; ps++)
 					textString [ps] = psf->cues->cue_points [idx].name [ps] ;
 				textString [stringLength] = '\0' ;
 				psf_binheader_writef (psf, "E1b", stringLength, textString, sizeof (textString)) ;
-			}
-		}
-	} ;
+				} ;
+			} ;
+		} ;
 
 	if (psf->strings.flags & SF_STR_LOCATE_START)
 		aiff_write_strings (psf, SF_STR_LOCATE_START) ;
