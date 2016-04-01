@@ -814,7 +814,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 							psf->cues->cue_points [n].indx = mark_id ;
 							psf->cues->cue_points [n].position = 0 ;
-							psf->cues->cue_points [n].fcc_chunk = 1635017060 ; /* always data */
+							psf->cues->cue_points [n].fcc_chunk = MAKE_MARKER ('d', 'a', 't', 'a') ; /* always data */
 							psf->cues->cue_points [n].chunk_start = 0 ;
 							psf->cues->cue_points [n].block_start = 0 ;
 							psf->cues->cue_points [n].sample_offset = position ;
