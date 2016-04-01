@@ -833,7 +833,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 							psf_log_printf (psf, "   Name     : %s\n", ubuf.scbuf) ;
 
-							for (pstringIdx = 0 ; pstringIdx < sizeof (ubuf.scbuf) ; pstringIdx++)
+							for (pstringIdx = 0 ; pstringIdx < pstr_len ; pstringIdx++)
 								psf->cues->cue_points [n].name [pstringIdx] = ubuf.scbuf [pstringIdx] ;
 
 							paiff->markstr [n].markerID = mark_id ;

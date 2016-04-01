@@ -1188,11 +1188,19 @@ psf_memset (void *s, int c, sf_count_t len)
 SF_CUES *
 psf_cues_alloc (void)
 {	SF_CUES *cue ;
+	int i, j ;
 
 	cue = calloc (1, sizeof (SF_CUES)) ;
 
 	if (cue == NULL)
 		return NULL ;
+
+	/* Initialize name string with zeros */
+	for (i = 0 ; i < 100 ; i++)
+	{
+		for (j = 0 ; j < 256 ; j++)
+			cue->cue_points [i].name [j] = 0 ;
+	}
 
 	return cue ;
 } /* psf_cues_alloc */
