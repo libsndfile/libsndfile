@@ -180,6 +180,9 @@ enum
 	SFC_SET_CLIPPING				= 0x10C0,
 	SFC_GET_CLIPPING				= 0x10C1,
 
+	SFC_GET_CUE				= 0x10CE,
+	SFC_SET_CUE				= 0x10CF,
+
 	SFC_GET_INSTRUMENT				= 0x10D0,
 	SFC_SET_INSTRUMENT				= 0x10D1,
 
@@ -400,6 +403,24 @@ typedef struct
 {	sf_count_t	offset ;
 	sf_count_t	length ;
 } SF_EMBED_FILE_INFO ;
+
+/*
+**	Struct used to retrieve cue marker information from a file
+*/
+
+typedef struct
+{	int cue_count;
+
+	struct 
+	{	int dwName;
+		unsigned int dwPosition;
+		int fccChunk;
+		int dwChunkStart;
+		int dwBlockStart;
+		unsigned int dwSampleOffset;
+		char name[256];
+	} cue_points[100];
+} SF_CUES ;
 
 /*
 **	Structs used to retrieve music sample information from a file.
