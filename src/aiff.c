@@ -780,7 +780,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 			case MARK_MARKER :
 					psf_log_printf (psf, " %M : %d\n", marker, chunk_size) ;
-					{	uint16_t mark_id, n = 0 ;
+					{	uint16_t mark_id, n = 0, pstringIdx ;
 						uint32_t position ;
 
 						bytesread = psf_binheader_readf (psf, "E2", &n) ;
@@ -794,12 +794,30 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						if (paiff->markstr == NULL)
 							return SFE_MALLOC_FAILED ;
 
+						if (mark_count > 100)
+						{	psf_log_printf (psf, "  More than 100 markers, skipping!\n") ;
+							psf_binheader_readf (psf, "j", chunk_size - bytesread) ;
+							break ;
+						} ;
+
+						if ((psf->cues = psf_cues_alloc ()) == NULL)
+							return SFE_MALLOC_FAILED ;
+
+						psf->cues->cue_count = mark_count ;
+
 						for (n = 0 ; n < mark_count && bytesread < chunk_size ; n++)
 						{	uint32_t pstr_len ;
 							uint8_t ch ;
 
 							bytesread += psf_binheader_readf (psf, "E241", &mark_id, &position, &ch) ;
 							psf_log_printf (psf, "   Mark ID  : %u\n   Position : %u\n", mark_id, position) ;
+
+							psf->cues->cue_points [n].dwName = mark_id ;
+							psf->cues->cue_points [n].dwPosition = 0 ;
+							psf->cues->cue_points [n].fccChunk = 1635017060 ; /* always data */
+							psf->cues->cue_points [n].dwChunkStart = 0 ;
+							psf->cues->cue_points [n].dwBlockStart = 0 ;
+							psf->cues->cue_points [n].dwSampleOffset = position ;
 
 							pstr_len = (ch & 1) ? ch : ch + 1 ;
 
@@ -814,6 +832,9 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 								}
 
 							psf_log_printf (psf, "   Name     : %s\n", ubuf.scbuf) ;
+
+							for (pstringIdx = 0 ; pstringIdx < sizeof (ubuf.scbuf) ; pstringIdx++)
+								psf->cues->cue_points [n].name [pstringIdx] = ubuf.scbuf [pstringIdx] ;
 
 							paiff->markstr [n].markerID = mark_id ;
 							paiff->markstr [n].position = position ;
@@ -896,8 +917,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 		} ; /* while (1) */
 
 	if (instr_found && mark_found)
-	{	int j ;
-
+	{	int j, str_index ;
+		/* Next loop will convert markers to loop positions for internal handling */
 		for (j = 0 ; j < psf->instrument->loop_count ; j ++)
 		{	if (j < ARRAY_LEN (psf->instrument->loops))
 			{	psf->instrument->loops [j].start = marker_to_position (paiff->markstr, psf->instrument->loops [j].start, mark_count) ;
@@ -905,6 +926,27 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 				psf->instrument->loops [j].mode = SF_LOOP_FORWARD ;
 				} ;
 			} ;
+
+		/* The markers that correspond to loop positions can now be removed from cues struct */
+		if (psf->cues->cue_count > psf->instrument->loop_count * 2)
+		{
+			for (j = 0 ; j < psf->cues->cue_count - (psf->instrument->loop_count * 2) ; j ++)
+			{	/* This simply copies the information in cues above loop positions and writes it at current count instead */
+				psf->cues->cue_points [j].dwName = psf->cues->cue_points [j + psf->instrument->loop_count * 2].dwName ;
+				psf->cues->cue_points [j].dwPosition = psf->cues->cue_points [j + psf->instrument->loop_count * 2].dwPosition ;
+				psf->cues->cue_points [j].fccChunk = psf->cues->cue_points [j + psf->instrument->loop_count * 2].fccChunk ;
+				psf->cues->cue_points [j].dwChunkStart = psf->cues->cue_points [j + psf->instrument->loop_count * 2].dwChunkStart ;
+				psf->cues->cue_points [j].dwBlockStart = psf->cues->cue_points [j + psf->instrument->loop_count * 2].dwBlockStart ;
+				psf->cues->cue_points [j].dwSampleOffset = psf->cues->cue_points [j + psf->instrument->loop_count * 2].dwSampleOffset ;
+				for (str_index = 0 ; str_index < 256 ; str_index++)
+					psf->cues->cue_points [j].name [str_index] = psf->cues->cue_points [j + psf->instrument->loop_count * 2].name [str_index] ;
+				} ;
+			psf->cues->cue_count -= psf->instrument->loop_count * 2 ;
+			} else
+			{	/* All the cues were in fact loop positions so we can actually remove the cues altogether */
+				free (psf->cues) ;
+				psf->cues = NULL ;
+				}
 		} ;
 
 	if (psf->sf.channels < 1)
@@ -1384,64 +1426,246 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->channel_map && paiff->chanmap_tag)
 		psf_binheader_writef (psf, "Em4444", CHAN_MARKER, 12, paiff->chanmap_tag, 0, 0) ;
 
-	if (psf->instrument != NULL)
-	{	MARK_ID_POS	m [4] ;
-		INST_CHUNK ch ;
-		uint16_t ct = 0 ;
+	/* Check if there's a INST chunk to write */
+	if (psf->instrument != NULL && psf->cues != NULL)
+	{	/* Both loops and cues exist */
+		uint16_t typeMode, sustainLoopMode, releaseLoopMode ;
+		uint32_t sLoopStart = 0, sLoopEnd = 0, rLoopStart = 0, rLoopEnd = 0 ;
+		int totalStringLength = 0, idx, ps, stringLength ;
 
-		memset (m, 0, sizeof (m)) ;
-		memset (&ch, 0, sizeof (ch)) ;
+		/* Here we count how many bytes will the pascal strings need */
+		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
+		{	stringLength = strlen (psf->cues->cue_points [idx].name) + 1 ; /* We'll count the first byte also of every pascal string */
+			if (stringLength % 2 == 0)
+				totalStringLength += stringLength ;
+			else
+				totalStringLength += (stringLength + 1) ; /* The pascal string must have an even count */
+		}
 
-		ch.baseNote = psf->instrument->basenote ;
-		ch.detune = psf->instrument->detune ;
-		ch.lowNote = psf->instrument->key_lo ;
-		ch.highNote = psf->instrument->key_hi ;
-		ch.lowVelocity = psf->instrument->velocity_lo ;
-		ch.highVelocity = psf->instrument->velocity_hi ;
-		ch.gain = psf->instrument->gain ;
-		if (psf->instrument->loops [0].mode != SF_LOOP_NONE)
-		{	ch.sustain_loop.playMode = 1 ;
-			ch.sustain_loop.beginLoop = ct ;
-			m [0].markerID = ct++ ;
-			m [0].position = psf->instrument->loops [0].start ;
-			ch.sustain_loop.endLoop = ct ;
-			m [1].markerID = ct++ ;
-			m [1].position = psf->instrument->loops [0].end ;
-			} ;
-		if (psf->instrument->loops [1].mode != SF_LOOP_NONE)
-		{	ch.release_loop.playMode = 1 ;
-			ch.release_loop.beginLoop = ct ;
-			m [2].markerID = ct++ ;
-			m [2].position = psf->instrument->loops [1].start ;
-			ch.release_loop.endLoop = ct ;
-			m [3].markerID = ct++ ;
-			m [3].position = psf->instrument->loops [1].end ;
-			}
-		else
-		{	ch.release_loop.playMode = 0 ;
-			ch.release_loop.beginLoop = 0 ;
-			ch.release_loop.endLoop = 0 ;
-			} ;
-
-		psf_binheader_writef (psf, "Em4111111", INST_MARKER, SIZEOF_INST_CHUNK, ch.baseNote, ch.detune,
-						ch.lowNote, ch.highNote, ch.lowVelocity, ch.highVelocity) ;
-		psf_binheader_writef (psf, "2222222", ch.gain, ch.sustain_loop.playMode,
-						ch.sustain_loop.beginLoop, ch.sustain_loop.endLoop, ch.release_loop.playMode,
-						ch.release_loop.beginLoop, ch.release_loop.endLoop) ;
-
-		if (ct == 2)
-			psf_binheader_writef (psf, "Em42241b241b",
-					MARK_MARKER, 2 + 2 * (2 + 4 + 1 + 9), 2,
-					m [0].markerID, m [0].position, 8, "beg loop", make_size_t (9),
-					m [1].markerID, m [1].position, 8, "end loop", make_size_t (9)) ;
-		else if (ct == 4)
+		/* First we check which loops are active and create the necessary MARK chunk for markers */
+		/* The first written markers will be references from loop points then comes the real markers */
+		if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
+		{	/* There's both a sustain loop and a release loop */
 			psf_binheader_writef (psf, "Em42 241b 241b 241b 241b",
-					MARK_MARKER, 2 + 4 * (2 + 4 + 1 + 9), 4,
-					m [0].markerID, m [0].position, 8, "beg loop", make_size_t (9),
-					m [1].markerID, m [1].position, 8, "end loop", make_size_t (9),
-					m [2].markerID, m [2].position, 8, "beg loop", make_size_t (9),
-					m [3].markerID, m [3].position, 8, "end loop", make_size_t (9)) ;
-		} ;
+					MARK_MARKER, 2 + 2 * (2 + 4 + 1 + 19) + 2 * (2 + 4 + 1 + 17) + psf->cues->cue_count * (2 + 4) + totalStringLength, 4 + psf->cues->cue_count,
+					1, psf->instrument->loops [0].start, 18, "sustain loop start", make_size_t (19),
+					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17),
+					3, psf->instrument->loops [1].start, 18, "release loop start", make_size_t (19),
+					4, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
+			/* Now comes true markers from cues struct */
+			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
+			{	psf_binheader_writef (psf, "E24", 5 + idx, psf->cues->cue_points [idx].dwSampleOffset) ;
+				stringLength = strlen (psf->cues->cue_points [idx].name) ;
+				if ((stringLength + 1) % 2 == 0)
+				{	/* the pascal string will have an even count so we'll not use the null terminator */
+					psf_binheader_writef (psf, "E1b", stringLength, psf->cues->cue_points [idx].name, make_size_t (stringLength)) ;
+				} else
+				{	/* the pascal string would have an uneven count so we include a null terminator as pad */
+					char textString [stringLength + 1] ;
+					for (ps = 0 ; ps < stringLength ; ps++)
+						textString [ps] = psf->cues->cue_points [idx].name [ps] ;
+					textString [stringLength] = '\0' ;
+					psf_binheader_writef (psf, "E1b", stringLength, textString, sizeof (textString)) ;
+				}
+			}
+			/* Change the loops to be references to the markers */
+			sLoopStart = 1 ;
+			sLoopEnd = 2 ;
+			rLoopStart = 3 ;
+			rLoopEnd = 4 ;
+		} else if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode == SF_LOOP_NONE)
+		{	/* There's a sustain loop but no release loop */
+			psf_binheader_writef (psf, "Em42241b241b",
+					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17) + psf->cues->cue_count * (2 + 4) + totalStringLength, 2 + psf->cues->cue_count,
+					1, psf->instrument->loops [0].start, 18, "sustain loop start", make_size_t (19),
+					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17)) ;
+			/* Now comes true markers from cues struct */
+			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
+			{	psf_binheader_writef (psf, "E24", 3 + idx, psf->cues->cue_points [idx].dwSampleOffset) ;
+				stringLength = strlen (psf->cues->cue_points [idx].name) ;
+				if ((stringLength + 1) % 2 == 0)
+				{	/* the pascal string will have an even count so we'll not use the null terminator */
+					psf_binheader_writef (psf, "E1b", stringLength, psf->cues->cue_points [idx].name, make_size_t (stringLength)) ;
+				} else
+				{	/* the pascal string would have an uneven count so we include a null terminator as pad */
+					char textString [stringLength + 1] ;
+					for (ps = 0 ; ps < stringLength ; ps++)
+						textString [ps] = psf->cues->cue_points [idx].name [ps] ;
+					textString [stringLength] = '\0' ;
+					psf_binheader_writef (psf, "E1b", stringLength, textString, sizeof (textString)) ;
+				}
+			}
+
+			/* Change the loops to be references to the markers */
+			sLoopStart = 1 ;
+			sLoopEnd = 2 ;
+			rLoopStart = 0 ;
+			rLoopEnd = 0 ;
+		} else if (psf->instrument->loops [0].mode == SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
+		{	/* There's a release loop but no sustain loop! Strange indeed! */
+			psf_binheader_writef (psf, "Em42241b241b",
+					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17) + psf->cues->cue_count * (2 + 4) + totalStringLength, 2 + psf->cues->cue_count,
+					1, psf->instrument->loops [1].start, 18, "release loop start", make_size_t (19),
+					2, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
+			/* Now comes true markers from cues struct */
+			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
+			{	psf_binheader_writef (psf, "E24", 3 + idx, psf->cues->cue_points [idx].dwSampleOffset) ;
+				stringLength = strlen (psf->cues->cue_points [idx].name) ;
+				if ((stringLength + 1) % 2 == 0)
+				{	/* the pascal string will have an even count so we'll not use the null terminator */
+					psf_binheader_writef (psf, "E1b", stringLength, psf->cues->cue_points [idx].name, make_size_t (stringLength)) ;
+				} else
+				{	/* the pascal string would have an uneven count so we include a null terminator as pad */
+					char textString [stringLength + 1] ;
+					for (ps = 0 ; ps < stringLength ; ps++)
+						textString [ps] = psf->cues->cue_points [idx].name [ps] ;
+					textString [stringLength] = '\0' ;
+					psf_binheader_writef (psf, "E1b", stringLength, textString, sizeof (textString)) ;
+				}
+			}
+
+			/* Change the loops to be references to the markers */
+			sLoopStart = 0 ;
+			sLoopEnd = 0 ;
+			rLoopStart = 1 ;
+			rLoopEnd = 2 ;
+		}
+
+		/* First convert loop modes to aiff standard */
+		typeMode = psf->instrument->loops [0].mode ;
+		if (typeMode == SF_LOOP_NONE)
+		{	sustainLoopMode = 0 ;
+		} else if (typeMode == SF_LOOP_FORWARD)
+		{	sustainLoopMode = 1 ;
+		} else if (typeMode == SF_LOOP_ALTERNATING)
+		{	sustainLoopMode = 2 ;
+		} else {
+			sustainLoopMode = 0 ;
+		}
+
+		typeMode = psf->instrument->loops [1].mode ;
+		if (typeMode == SF_LOOP_NONE)
+		{	releaseLoopMode = 0 ;
+		} else if (typeMode == SF_LOOP_FORWARD)
+		{	releaseLoopMode = 1 ;
+		} else if (typeMode == SF_LOOP_ALTERNATING)
+		{	releaseLoopMode = 2 ;
+		} else {
+			releaseLoopMode = 0 ;
+		}
+
+		/* Now we finally write the actual INST chunk */
+		psf_binheader_writef (psf, "Em4111111", INST_MARKER, SIZEOF_INST_CHUNK, psf->instrument->basenote, psf->instrument->detune,
+			psf->instrument->key_lo, psf->instrument->key_hi, psf->instrument->velocity_lo, psf->instrument->velocity_hi) ;
+		psf_binheader_writef (psf, "E2222222", (short) psf->instrument->gain,
+			sustainLoopMode, sLoopStart, sLoopEnd,
+			releaseLoopMode, rLoopStart, rLoopEnd) ;
+
+	} else if (psf->instrument != NULL && psf->cues == NULL)
+	{	/* There are loops but no cues */
+		uint16_t typeMode, sustainLoopMode, releaseLoopMode ;
+		uint32_t sLoopStart = 0, sLoopEnd = 0, rLoopStart = 0, rLoopEnd = 0 ;
+
+		/* First we check which loops are active and create the necessary MARK chunk for markers */
+		if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
+		{	/* There's both a sustain loop and a release loop */
+			psf_binheader_writef (psf, "Em42 241b 241b 241b 241b",
+					MARK_MARKER, 2 + 2 * (2 + 4 + 1 + 19) + 2 * (2 + 4 + 1 + 17), 4,
+					1, psf->instrument->loops [0].start, 18, "sustain loop start", make_size_t (19),
+					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17),
+					3, psf->instrument->loops [1].start, 18, "release loop start", make_size_t (19),
+					4, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
+			/* Change the loops to be references to the markers */
+			sLoopStart = 1 ;
+			sLoopEnd = 2 ;
+			rLoopStart = 3 ;
+			rLoopEnd = 4 ;
+		} else if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode == SF_LOOP_NONE)
+		{	/* There's a sustain loop but no release loop */
+			psf_binheader_writef (psf, "Em42241b241b",
+					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17), 2,
+					1, psf->instrument->loops [0].start, 18, "sustain loop start", make_size_t (19),
+					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17)) ;
+			/* Change the loops to be references to the markers */
+			sLoopStart = 1 ;
+			sLoopEnd = 2 ;
+			rLoopStart = 0 ;
+			rLoopEnd = 0 ;
+		} else if (psf->instrument->loops [0].mode == SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
+		{	/* There's a release loop but no sustain loop! Strange indeed! */
+			psf_binheader_writef (psf, "Em42241b241b",
+					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17), 2,
+					1, psf->instrument->loops [1].start, 18, "release loop start", make_size_t (19),
+					2, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
+			/* Change the loops to be references to the markers */
+			sLoopStart = 0 ;
+			sLoopEnd = 0 ;
+			rLoopStart = 1 ;
+			rLoopEnd = 2 ;
+		}
+
+		/* First convert loop modes to aiff standard */
+		typeMode = psf->instrument->loops [0].mode ;
+		if (typeMode == SF_LOOP_NONE)
+		{	sustainLoopMode = 0 ;
+		} else if (typeMode == SF_LOOP_FORWARD)
+		{	sustainLoopMode = 1 ;
+		} else if (typeMode == SF_LOOP_ALTERNATING)
+		{	sustainLoopMode = 2 ;
+		} else {
+			sustainLoopMode = 0 ;
+		}
+
+		typeMode = psf->instrument->loops [1].mode ;
+		if (typeMode == SF_LOOP_NONE)
+		{	releaseLoopMode = 0 ;
+		} else if (typeMode == SF_LOOP_FORWARD)
+		{	releaseLoopMode = 1 ;
+		} else if (typeMode == SF_LOOP_ALTERNATING)
+		{	releaseLoopMode = 2 ;
+		} else {
+			releaseLoopMode = 0 ;
+		}
+
+		/* Now we finally write the actual INST chunk */
+		psf_binheader_writef (psf, "Em4111111", INST_MARKER, SIZEOF_INST_CHUNK, psf->instrument->basenote, psf->instrument->detune,
+			psf->instrument->key_lo, psf->instrument->key_hi, psf->instrument->velocity_lo, psf->instrument->velocity_hi) ;
+		psf_binheader_writef (psf, "E2222222", (short) psf->instrument->gain,
+			sustainLoopMode, sLoopStart, sLoopEnd,
+			releaseLoopMode, rLoopStart, rLoopEnd) ;
+
+	} else if (psf->instrument == NULL && psf->cues != NULL)
+	{	/* There are cues but no loops */
+		int totalStringLength = 0, idx, ps, stringLength ;
+
+		/* Here we count how many bytes will the pascal strings need */
+		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
+		{	stringLength = strlen (psf->cues->cue_points [idx].name) + 1 ; /* We'll count the first byte also of every pascal string */
+			if (stringLength % 2 == 0)
+				totalStringLength += stringLength ;
+			else
+				totalStringLength += (stringLength + 1) ; /* The pascal string must have an even count */
+		}
+
+		psf_binheader_writef (psf, "Em42",
+			MARK_MARKER, 2 + psf->cues->cue_count * (2 + 4) + totalStringLength, psf->cues->cue_count) ;
+
+		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
+		{	psf_binheader_writef (psf, "E24", psf->cues->cue_points [idx].dwName, psf->cues->cue_points [idx].dwSampleOffset) ;
+			stringLength = strlen (psf->cues->cue_points [idx].name) ;
+			if ((stringLength + 1) % 2 == 0)
+			{	/* the pascal string will have an even count so we'll not use the null terminator */
+				psf_binheader_writef (psf, "E1b", stringLength, psf->cues->cue_points [idx].name, make_size_t (stringLength)) ;
+			} else
+			{	/* the pascal string would have an uneven count so we include a null terminator as pad */
+				char textString [stringLength + 1] ;
+				for (ps = 0 ; ps < stringLength ; ps++)
+					textString [ps] = psf->cues->cue_points [idx].name [ps] ;
+				textString [stringLength] = '\0' ;
+				psf_binheader_writef (psf, "E1b", stringLength, textString, sizeof (textString)) ;
+			}
+		}
+	} ;
 
 	if (psf->strings.flags & SF_STR_LOCATE_START)
 		aiff_write_strings (psf, SF_STR_LOCATE_START) ;
