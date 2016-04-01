@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -409,17 +409,17 @@ typedef struct
 */
 
 typedef struct
-{	int cue_count;
+{	int cue_count ;
 
-	struct 
-	{	int dwName;
-		uint32_t dwPosition;
-		int fccChunk;
-		int dwChunkStart;
-		int dwBlockStart;
-		uint32_t dwSampleOffset;
-		char name[256];
-	} cue_points[100];
+	struct
+	{	int dwName ;
+		unsigned int dwPosition ;
+		int fccChunk ;
+		int dwChunkStart ;
+		int dwBlockStart ;
+		unsigned int dwSampleOffset ;
+		char name [256] ;
+	} cue_points [100] ;
 } SF_CUES ;
 
 /*
