@@ -46,4 +46,4 @@ sndfile_salvage_SOURCES = sndfile-salvage.c common.c common.h
 sndfile_salvage_LDADD = $(top_builddir)/src/libsndfile.la
 
 check :
-	@if [ -x /usr/bin/python ]; then $(top_srcdir)/programs/test-sndfile-metadata-set.py ; fi
+	@if [ -x /usr/bin/python ]; then $(top_srcdir)/programs/test-sndfile-metadata-set.py @HOST_TRIPLET@ ; fi
