@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 2002-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -56,7 +56,7 @@ dump_[+ (get "name") +]_array (const char * name, [+ (get "name") +] * data, int
 static void
 test_endswap_[+ (get "name") +] (void)
 {	[+ (get "name") +] orig [4], first [4], second [4] ;
-	int k ;
+	int64_t k ;
 
 	printf ("    %-40s : ", "test_endswap_[+ (get "name") +]") ;
 	fflush (stdout) ;
