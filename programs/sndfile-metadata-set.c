@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008-2010 George Blood Audio
 **
 ** All rights reserved.
@@ -57,6 +57,7 @@ main (int argc, char *argv [])
 	struct tm timedata ;
 	const char *progname ;
 	const char * filenames [2] = { NULL, NULL } ;
+	char date [128], time [128] ;
 	int	k ;
 
 	/* Store the program name. */
@@ -73,9 +74,7 @@ main (int argc, char *argv [])
 	read_localtime (&timedata) ;
 
 	for (k = 1 ; k < argc ; k++)
-	{	char tmp [20] ;
-
-		if (argv [k][0] != '-')
+	{	if (argv [k][0] != '-')
 		{	if (filenames [0] == NULL)
 				filenames [0] = argv [k] ;
 			else if (filenames [1] == NULL)
@@ -122,30 +121,30 @@ main (int argc, char *argv [])
 
 		/* Following options do not take an argument. */
 		if (strcmp (argv [k], "--bext-auto-time-date") == 0)
-		{	snprintf (tmp, sizeof (tmp), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
-			info.origination_time = strdup (tmp) ;
+		{	snprintf (time, sizeof (time), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
+			info.origination_time = time ;
 
-			snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
-			info.origination_date = strdup (tmp) ;
+			snprintf (date, sizeof (date), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
+			info.origination_date = date ;
 			continue ;
 			} ;
 
 		if (strcmp (argv [k], "--bext-auto-time") == 0)
-		{	snprintf (tmp, sizeof (tmp), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
-			info.origination_time = strdup (tmp) ;
+		{	snprintf (time, sizeof (time), "%02d:%02d:%02d", timedata.tm_hour, timedata.tm_min, timedata.tm_sec) ;
+			info.origination_time = time ;
 			continue ;
 			} ;
 
 		if (strcmp (argv [k], "--bext-auto-date") == 0)
-		{	snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
-			info.origination_date = strdup (tmp) ;
+		{	snprintf (date, sizeof (date), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
+			info.origination_date = strdup (date) ;
 			continue ;
 			} ;
 
 		if (strcmp (argv [k], "--str-auto-date") == 0)
-		{	snprintf (tmp, sizeof (tmp), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
+		{	snprintf (date, sizeof (date), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
 
-			info.date = strdup (tmp) ;
+			info.date = strdup (date) ;
 			continue ;
 			} ;
 
