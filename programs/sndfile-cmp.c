@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008 Conrad Parker <conrad@metadecks.org>
 **
 ** All rights reserved.
@@ -50,10 +50,12 @@ static char * filename1 = NULL, * filename2 = NULL ;
 
 static int
 comparison_error (const char * what, sf_count_t frame_offset)
-{	char buffer [128] = "" ;
+{	char buffer [128] ;
 
 	if (frame_offset >= 0)
 		snprintf (buffer, sizeof (buffer), " (at frame offset %" PRId64 ")", frame_offset) ;
+	else
+		buffer [0] = 0 ;
 
 	printf ("%s: %s of files %s and %s differ%s.\n", progname, what, filename1, filename2, buffer) ;
 	return 1 ;
