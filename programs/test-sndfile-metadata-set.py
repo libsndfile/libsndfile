@@ -49,9 +49,13 @@ class Programs:
         status, output = commands.getstatusoutput (cmd)
         if should_fail and not status:
             print "\n\nError : command '%s' should have failed." % cmd
+            print output
+            print ""
             sys.exit (1)
         if not should_fail and status:
             print "\n\nError : command '%s' should not have failed." % cmd
+            print output
+            print ""
             sys.exit (1)
         return output
 
