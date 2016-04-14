@@ -1235,6 +1235,33 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				} ;
 			return cart_var_get (psf, data, datasize) ;
 
+		case SFC_GET_CUE :
+			if (datasize != sizeof (SF_CUES) || data == NULL)
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
+				return SF_FALSE ;
+				} ;
+			if (psf->cues == NULL)
+				return SF_FALSE ;
+			memcpy (data, psf->cues, sizeof (SF_CUES)) ;
+			return SF_TRUE ;
+
+		case SFC_SET_CUE :
+			if (psf->have_written)
+			{	psf->error = SFE_CMD_HAS_DATA ;
+				return SF_FALSE ;
+				} ;
+			if (datasize != sizeof (SF_CUES) || data == NULL)
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
+				return SF_FALSE ;
+				} ;
+
+			if (psf->cues == NULL && (psf->cues = psf_cues_alloc ()) == NULL)
+			{	psf->error = SFE_MALLOC_FAILED ;
+				return SF_FALSE ;
+				} ;
+			memcpy (psf->cues, data, sizeof (SF_CUES)) ;
+			return SF_TRUE ;
+
 		case SFC_GET_INSTRUMENT :
 			if (datasize != sizeof (SF_INSTRUMENT) || data == NULL)
 			{	psf->error = SFE_BAD_COMMAND_PARAM ;
@@ -2659,6 +2686,7 @@ psf_close (SF_PRIVATE *psf)
 	free (psf->broadcast_16k) ;
 	free (psf->loop_info) ;
 	free (psf->instrument) ;
+	free (psf->cues) ;
 	free (psf->channel_map) ;
 	free (psf->format_desc) ;
 	free (psf->strings.storage) ;
