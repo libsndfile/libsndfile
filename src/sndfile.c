@@ -1235,13 +1235,24 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				} ;
 			return cart_var_get (psf, data, datasize) ;
 
-		case SFC_GET_CUE :
-			if (psf->cues == NULL)
+		case SFC_GET_CUE_COUNT :
+			if (datasize != sizeof (uint32_t) || data == NULL)
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
+				} ;
+			if (psf->cues != NULL)
+			{	*((uint32_t *) data) = psf->cues->cue_count ;
+				return SF_TRUE ;
+				} ;
+			return SF_FALSE ;
+
+		case SFC_GET_CUE :
 			if (datasize != sizeof (SF_CUES) || data == NULL)
 			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
 				} ;
+			if (psf->cues == NULL)
+				return SF_FALSE ;
 			psf_get_cues (psf, data, datasize) ;
 			return SF_TRUE ;
 

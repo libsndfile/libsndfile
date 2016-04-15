@@ -841,6 +841,16 @@ cue_rw_test (const char *filename)
 
 	sndfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_FALSE, __LINE__) ;
 
+	exit_if_true (
+		sf_command (sndfile, SFC_GET_CUE_COUNT, &cues.cue_count, sizeof (cues.cue_count)) != SF_TRUE,
+		"\nLine %d: SFC_GET_CUE_COUNT command failed.\n\n", __LINE__
+		) ;
+
+	exit_if_true (
+		cues.cue_count != 3,
+		"\nLine %d: Expected cue_count (%u) to be 3.\n\n", __LINE__, cues.cue_count
+		) ;
+
 	if (sf_command (sndfile, SFC_GET_CUE, &cues, sizeof (cues)) == SF_TRUE)
 	{	cues.cue_points [1].sample_offset = 3 ;
 

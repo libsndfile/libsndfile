@@ -237,6 +237,11 @@
 </TR>
 
 <TR>
+	<TD><A HREF="#SFC_GET_CUE_COUNT">SFC_GET_CUE_COUNT</A></TD>
+	<TD>Get the cue marker count</TD>
+</TR>
+
+<TR>
 	<TD><A HREF="#SFC_GET_CUE">SFC_GET_CUE</A></TD>
 	<TD>Get cue marker info</TD>
 </TR>
@@ -1689,6 +1694,37 @@ Example:
 
 <!-- ========================================================================= -->
 
+<A NAME="SFC_GET_CUE"></A>
+<H2><BR><B>SFC_GET_CUE_COUNT</B></H2>
+<P>
+Retrieve the number of cue markers available for retrieval using the
+SFC_GET_CUE command.
+</P>
+<P>
+Parameters:
+</P>
+<PRE>
+         sndfile  : A valid SNDFILE* pointer
+         cmd      : SFC_GET_CUE
+         data     : a pointer to a uint32_t
+         datasize : sizeof (uint32_t)
+</PRE>
+
+
+<P>
+Example:
+</P>
+<PRE>
+         uint32_t cue_count ;
+         sf_command (sndfile, SFC_GET_CUE_COUNT, &amp;cue_count, sizeof (cue_count)) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<dd>SF_TRUE if the file header contains cue marker information for the
+    file. SF_FALSE otherwise.
+</DL>
+
+<!-- ========================================================================= -->
 
 <A NAME="SFC_GET_CUE"></A>
 <H2><BR><B>SFC_GET_CUE</B></H2>
@@ -1723,6 +1759,11 @@ The SF_CUES struct is defined in &lt;sndfile.h&gt; as:
     	} cue_points [100] ;
     } SF_CUES ;
 </PRE>
+
+<P>
+There is also an SF_CUES_VAR #define that allows reading/writing more than 100
+cue markers.
+</P>
 
 <P>
 Example:
