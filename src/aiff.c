@@ -398,10 +398,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 {	SSND_CHUNK	ssnd_fmt ;
 	AIFF_PRIVATE *paiff ;
 	BUF_UNION	ubuf ;
-	unsigned	chunk_size = 0, FORMsize, SSNDsize, bytesread ;
+	uint32_t	chunk_size = 0, FORMsize, SSNDsize, bytesread, mark_count = 0 ;
 	int			k, found_chunk = 0, done = 0, error = 0 ;
 	char		*cptr ;
-	int			instr_found = 0, mark_found = 0, mark_count = 0 ;
+	int			instr_found = 0, mark_found = 0 ;
 
 	if (psf->filelength > SF_PLATFORM_S64 (0xffffffff))
 		psf_log_printf (psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n") ;
@@ -785,7 +785,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 						bytesread = psf_binheader_readf (psf, "E2", &n) ;
 						mark_count = n ;
-						psf_log_printf (psf, "  Count : %d\n", mark_count) ;
+						psf_log_printf (psf, "  Count : %u\n", mark_count) ;
 						if (paiff->markstr != NULL)
 						{	psf_log_printf (psf, "*** Second MARK chunk found. Throwing away the first.\n") ;
 							free (paiff->markstr) ;
@@ -794,16 +794,14 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						if (paiff->markstr == NULL)
 							return SFE_MALLOC_FAILED ;
 
-						if (mark_count > 100)
-						{	psf_log_printf (psf, "  More than 100 markers, skipping!\n") ;
+						if (mark_count > 1000)
+						{	psf_log_printf (psf, "  More than 1000 markers, skipping!\n") ;
 							psf_binheader_readf (psf, "j", chunk_size - bytesread) ;
 							break ;
 						} ;
 
-						if ((psf->cues = psf_cues_alloc ()) == NULL)
+						if ((psf->cues = psf_cues_alloc (mark_count)) == NULL)
 							return SFE_MALLOC_FAILED ;
-
-						psf->cues->cue_count = mark_count ;
 
 						for (n = 0 ; n < mark_count && bytesread < chunk_size ; n++)
 						{	uint32_t pstr_len ;

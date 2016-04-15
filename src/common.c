@@ -1186,9 +1186,36 @@ psf_memset (void *s, int c, sf_count_t len)
 } /* psf_memset */
 
 SF_CUES *
-psf_cues_alloc (void)
-{	return calloc (1, sizeof (SF_CUES)) ;
+psf_cues_alloc (uint32_t cue_count)
+{	SF_CUES *pcues = calloc (1, sizeof (SF_CUES_VAR (cue_count))) ;
+
+	pcues->cue_count = cue_count ;
+	return pcues ;
 } /* psf_cues_alloc */
+
+SF_CUES *
+psf_cues_dup (const void * ptr)
+{	const SF_CUES *pcues = ptr ;
+	SF_CUES *pnew = psf_cues_alloc (pcues->cue_count) ;
+
+	memcpy (pnew, pcues, sizeof (SF_CUES_VAR (pcues->cue_count))) ;
+	return pnew ;
+} /* psf_cues_dup */
+
+void
+psf_get_cues (SF_PRIVATE * psf, void * data, size_t datasize)
+{
+	if (psf->cues)
+	{	uint32_t cue_count = (datasize - sizeof (uint32_t)) / sizeof (SF_CUE_POINT) ;
+
+		cue_count = SF_MIN (cue_count, psf->cues->cue_count) ;
+		memcpy (data, psf->cues, sizeof (SF_CUES_VAR (cue_count))) ;
+		((SF_CUES*) data)->cue_count = cue_count ;
+		} ;
+
+	return ;
+} /* psf_get_cues */
+
 
 SF_INSTRUMENT *
 psf_instrument_alloc (void)

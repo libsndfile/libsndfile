@@ -464,7 +464,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						bytesread = psf_binheader_readf (psf, "4", &cue_count) ;
 						psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
 
-						if (cue_count > 100)
+						if (cue_count > 1000)
 						{	psf_log_printf (psf, "  Count : %u (skipping)\n", cue_count) ;
 							psf_binheader_readf (psf, "j", (cue_count > 20 ? 20 : cue_count) * 24) ;
 							break ;
@@ -472,10 +472,9 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 						psf_log_printf (psf, "  Count : %d\n", cue_count) ;
 
-						if ((psf->cues = psf_cues_alloc ()) == NULL)
+						if ((psf->cues = psf_cues_alloc (cue_count)) == NULL)
 							return SFE_MALLOC_FAILED ;
 
-						psf->cues->cue_count = cue_count ;
 						cue_index = 0 ;
 
 						while (cue_count)

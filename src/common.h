@@ -968,7 +968,9 @@ psf_strlcpy (char *dest, size_t n, const char *src)
 
 void	*psf_memset (void *s, int c, sf_count_t n) ;
 
-SF_CUES * psf_cues_alloc (void) ;
+SF_CUES * psf_cues_dup (const void * ptr) ;
+SF_CUES * psf_cues_alloc (uint32_t cue_count) ;
+void psf_get_cues (SF_PRIVATE * psf, void * data, size_t datasize) ;
 
 SF_INSTRUMENT * psf_instrument_alloc (void) ;
 

@@ -409,18 +409,22 @@ typedef struct
 */
 
 typedef struct
-{	uint32_t cue_count ;
+{	int32_t 	indx ;
+	uint32_t 	position ;
+	int32_t 	fcc_chunk ;
+	int32_t 	chunk_start ;
+	int32_t		block_start ;
+	uint32_t 	sample_offset ;
+	char name [256] ;
+} SF_CUE_POINT ;
 
-	struct
-	{	int32_t 	indx ;
-		uint32_t 	position ;
-		int32_t 	fcc_chunk ;
-		int32_t 	chunk_start ;
-		int32_t		block_start ;
-		uint32_t 	sample_offset ;
-		char name [256] ;
-	} cue_points [100] ;
-} SF_CUES ;
+#define	SF_CUES_VAR(count) \
+	struct \
+	{	uint32_t cue_count ; \
+		SF_CUE_POINT cue_points [count] ; \
+	}
+
+typedef SF_CUES_VAR (100) SF_CUES ;
 
 /*
 **	Structs used to retrieve music sample information from a file.

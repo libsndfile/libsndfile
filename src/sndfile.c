@@ -1236,13 +1236,13 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			return cart_var_get (psf, data, datasize) ;
 
 		case SFC_GET_CUE :
+			if (psf->cues == NULL)
+				return SF_FALSE ;
 			if (datasize != sizeof (SF_CUES) || data == NULL)
 			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
 				} ;
-			if (psf->cues == NULL)
-				return SF_FALSE ;
-			memcpy (data, psf->cues, sizeof (SF_CUES)) ;
+			psf_get_cues (psf, data, datasize) ;
 			return SF_TRUE ;
 
 		case SFC_SET_CUE :
@@ -1255,11 +1255,10 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				return SF_FALSE ;
 				} ;
 
-			if (psf->cues == NULL && (psf->cues = psf_cues_alloc ()) == NULL)
+			if (psf->cues == NULL && (psf->cues = psf_cues_dup (data)) == NULL)
 			{	psf->error = SFE_MALLOC_FAILED ;
 				return SF_FALSE ;
 				} ;
-			memcpy (psf->cues, data, sizeof (SF_CUES)) ;
 			return SF_TRUE ;
 
 		case SFC_GET_INSTRUMENT :
