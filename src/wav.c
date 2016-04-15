@@ -479,7 +479,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 						while (cue_count)
 						{
-							if ((thisread = psf_binheader_readf (psf, "444444", &id, &position, &chunk_id, &chunk_start, &block_start, &offset)) == 0)
+							if ((thisread = psf_binheader_readf (psf, "e44m444", &id, &position, &chunk_id, &chunk_start, &block_start, &offset)) == 0)
 								break ;
 							bytesread += thisread ;
 
@@ -1071,11 +1071,12 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->cues != NULL)
 	{	uint32_t k ;
 
-		psf_binheader_writef (psf, "m4", cue_MARKER, 4 + psf->cues->cue_count * 6 * 4) ;
-		psf_binheader_writef (psf, "4", psf->cues->cue_count) ;
+		psf_binheader_writef (psf, "em44", cue_MARKER, 4 + psf->cues->cue_count * 6 * 4, psf->cues->cue_count) ;
 
 		for (k = 0 ; k < psf->cues->cue_count ; k++)
-			psf_binheader_writef (psf, "44m444", psf->cues->cue_points [k].indx, psf->cues->cue_points [k].position, psf->cues->cue_points [k].fcc_chunk, psf->cues->cue_points [k].chunk_start, psf->cues->cue_points [k].block_start, psf->cues->cue_points [k].sample_offset) ;
+			psf_binheader_writef (psf, "e44m444", psf->cues->cue_points [k].indx, psf->cues->cue_points [k].position,
+						psf->cues->cue_points [k].fcc_chunk, psf->cues->cue_points [k].chunk_start,
+						psf->cues->cue_points [k].block_start, psf->cues->cue_points [k].sample_offset) ;
 		} ;
 
 	if (psf->instrument != NULL)

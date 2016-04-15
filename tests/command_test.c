@@ -33,10 +33,12 @@
 
 #include <sndfile.h>
 
+#include "sfendian.h"
 #include "utils.h"
 
 #define	BUFFER_LEN		(1 << 10)
 #define LOG_BUFFER_SIZE	1024
+#define data_MARKER		MAKE_MARKER ('d', 'a', 't', 'a')
 
 static	void	float_norm_test			(const char *filename) ;
 static	void	double_norm_test		(const char *filename) ;
@@ -882,16 +884,16 @@ cue_test (const char *filename, int filetype)
 	if (filetype == (SF_FORMAT_WAV | SF_FORMAT_PCM_16))
 	{	write_cue = (SF_CUES)
 		{	2,		/* cue_count */
-			{	{	1, 0, 1635017060, 0, 0, 1, "" },
-				{	2, 0, 1635017060, 0, 0, 2, "" },
+			{	{	1, 0, data_MARKER, 0, 0, 1, "" },
+				{	2, 0, data_MARKER, 0, 0, 2, "" },
 			}
 		} ;
 	}
 	else
 	{	write_cue = (SF_CUES)
 		{	2,		/* cue_count */
-			{	{	1, 0, 1635017060, 0, 0, 1, "Cue1" },
-				{	2, 0, 1635017060, 0, 0, 2, "Cue2" },
+			{	{	1, 0, data_MARKER, 0, 0, 1, "Cue1" },
+				{	2, 0, data_MARKER, 0, 0, 2, "Cue2" },
 			}
 		} ;
 	}
@@ -924,16 +926,16 @@ cue_test (const char *filename, int filetype)
 	if (memcmp (&write_cue, &read_cue, sizeof (write_cue)) != 0)
 	{	printf ("\n\nLine %d : cue comparison failed.\n\n", __LINE__) ;
 		printf ("W  Cue count      : %d\n"
-			"   indx         : %d\n"
-			"   position     : %u\n"
-			"   fcc_chunk       : %d\n"
+			"   indx          : %d\n"
+			"   position      : %u\n"
+			"   fcc_chunk     : %x\n"
 			"   chunk_start   : %d\n"
 			"   block_start   : %d\n"
 			"   sample_offset : %u\n"
-			"   name           : %s\n"
-			"   indx         : %d\n"
-			"   position     : %u\n"
-			"   fcc_chunk       : %d\n"
+			"   name          : %s\n"
+			"   indx          : %d\n"
+			"   position      : %u\n"
+			"   fcc_chunk     : %x\n"
 			"   chunk_start   : %d\n"
 			"   block_start   : %d\n"
 			"   sample_offset : %u\n"
@@ -954,20 +956,20 @@ cue_test (const char *filename, int filetype)
 			write_cue.cue_points [1].sample_offset,
 			write_cue.cue_points [1].name) ;
 		printf ("R  Cue count      : %d\n"
-			"   indx         : %d\n"
-			"   position     : %u\n"
-			"   fcc_chunk       : %d\n"
+			"   indx          : %d\n"
+			"   position      : %u\n"
+			"   fcc_chunk     : %x\n"
 			"   chunk_start   : %d\n"
 			"   block_start   : %d\n"
 			"   sample_offset : %u\n"
-			"   name           : %s\n"
-			"   indx         : %d\n"
-			"   position     : %u\n"
-			"   fcc_chunk       : %d\n"
+			"   name          : %s\n"
+			"   indx          : %d\n"
+			"   position      : %u\n"
+			"   fcc_chunk     : %x\n"
 			"   chunk_start   : %d\n"
 			"   block_start   : %d\n"
 			"   sample_offset : %u\n"
-			"   name           : %s\n",
+			"   name          : %s\n",
 			read_cue.cue_count,
 			read_cue.cue_points [0].indx,
 			read_cue.cue_points [0].position,
