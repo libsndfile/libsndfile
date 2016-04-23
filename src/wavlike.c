@@ -939,7 +939,8 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 
 			case exif_MARKER :
 					psf_log_printf (psf, "  %M\n", chunk) ;
-					bytesread += exif_subchunk_parse (psf, chunk_length - bytesread) ;
+					if (chunk_length > bytesread)
+						bytesread += exif_subchunk_parse (psf, chunk_length - bytesread) ;
 					continue ;
 
 			case data_MARKER :
