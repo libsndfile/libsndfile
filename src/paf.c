@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -496,10 +496,9 @@ paf24_read_block (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
 	if ((k = psf_fread (ppaf24->block, 1, ppaf24->blocksize, psf)) != ppaf24->blocksize)
 		psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, ppaf24->blocksize) ;
 
-
 	/* Do endian swapping if necessary. */
-	if (psf->endian == SF_ENDIAN_BIG)
-		endswap_int_array 	(ppaf24->data, 8 * ppaf24->channels) ;
+	if ((CPU_IS_BIG_ENDIAN && psf->endian == SF_ENDIAN_LITTLE) || (CPU_IS_LITTLE_ENDIAN && psf->endian == SF_ENDIAN_BIG))
+		endswap_int_array ((int*) ppaf24->block, 8 * ppaf24->channels) ;
 
 	/* Unpack block. */
 	for (k = 0 ; k < PAF24_SAMPLES_PER_BLOCK * ppaf24->channels ; k++)
@@ -652,7 +651,7 @@ paf24_write_block (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
 
 		/* Do endian swapping if necessary. */
 		if (psf->endian == SF_ENDIAN_BIG)
-			endswap_int_array (ppaf24->data, 8 * ppaf24->channels) ;
+			endswap_int_array ((int*) ppaf24->block, 8 * ppaf24->channels) ;
 		}
 	else if (CPU_IS_BIG_ENDIAN)
 	{	/* This is correct. */
@@ -664,8 +663,8 @@ paf24_write_block (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
 			cptr [1] = nextsample >> 8 ;
 			cptr [2] = nextsample >> 16 ;
 			} ;
-		if (psf->endian == SF_ENDIAN_BIG)
-			endswap_int_array (ppaf24->data, 8 * ppaf24->channels) ;
+		if (psf->endian == SF_ENDIAN_LITTLE)
+			endswap_int_array ((int*) ppaf24->block, 8 * ppaf24->channels) ;
 		} ;
 
 	/* Write block to disk. */
