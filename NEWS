@@ -1,3 +1,11 @@
+Version 1.0.27 (2016-06-19)
+  * Fix an SF_INFO seekable flag regression introduced in 1.0.26.
+  * Fix potential infinite loops on malformed input files.
+  * Add string metadata read/write for CAF and RF64.
+  * Add handling of CUE chunks.
+  * Fix enaian-ness issues in PAF files.
+  * Minor bug fixes and improvements.
+
 Version 1.0.26 (2015-11-22)
   * Fix for CVE-2014-9496, SD2 buffer read overflow.
   * Fix for CVE-2014-9756, file_io.c divide by zero.

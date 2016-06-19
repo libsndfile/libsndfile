@@ -6,7 +6,7 @@
 	libsndfile
 	</TITLE>
 	<META NAME="Author"      CONTENT="Erik de Castro Lopo (erikd AT mega-nerd DOT com)">
-    <META NAME="Version"     CONTENT="libsndfile-1.0.26">
+    <META NAME="Version"     CONTENT="libsndfile-1.0.27">
 	<META NAME="Description" CONTENT="The libsndfile Home Page">
 	<META NAME="Keywords"    CONTENT="WAV AIFF AU SVX PAF NIST W64 libsndfile sound audio dsp Linux">
 	<META NAME="ROBOTS" 	 CONTENT="NOFOLLOW">
@@ -370,6 +370,8 @@ and
 				improvements.
 	<LI>Version 1.0.26 (November 22 2015) Fix for CVE-2014-9496, CVE-2014-9756 and CVE-2015-7805.
 				Add ALAC/CAF support. Minor bug fixes and improvements.
+	<LI>Version 1.0.27 (June 19 2016) Fix a seek regression in 1.0.26. Add metadata read/write
+				for CAF and RF64. FIx PAF endian-ness issue.
 	</UL>
 
 <A NAME="Similar"></A>
@@ -431,16 +433,14 @@ and
 </P>
 	<UL>
 	<LI>Source code as a .tar.gz :
-			<A HREF="files/libsndfile-1.0.26.tar.gz">libsndfile-1.0.26.tar.gz</A>
-			and
-			<A HREF="files/libsndfile-1.0.26.tar.gz.asc">(GPG signature)</A>.
+			<A HREF="files/libsndfile-1.0.27.tar.gz">libsndfile-1.0.27.tar.gz</A>.
 	<LI>Win32 installer:
-			<A HREF="files/libsndfile-1.0.26-w32-setup.exe">
-			libsndfile-1.0.26-w32-setup.exe</A> (thoroughly tested under
+			<A HREF="files/libsndfile-1.0.27-w32-setup.exe">
+			libsndfile-1.0.27-w32-setup.exe</A> (thoroughly tested under
 			<a href="http://www.winehq.com/">Wine</a> and Windows XP).
 	<LI>Win64 installer:
-			<A HREF="files/libsndfile-1.0.26-w64-setup.exe">
-			libsndfile-1.0.26-w64-setup.exe</A>
+			<A HREF="files/libsndfile-1.0.27-w64-setup.exe">
+			libsndfile-1.0.27-w64-setup.exe</A>
 			(thoroughly tested on 64 bit Windows 7).
 	</UL>
 
