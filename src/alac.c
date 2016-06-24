@@ -170,7 +170,7 @@ alac_close	(SF_PRIVATE *psf)
 	{	ALAC_ENCODER *penc = &plac->encoder ;
 		SF_CHUNK_INFO chunk_info ;
 		sf_count_t readcount ;
-		uint8_t *kuki_data [plac->kuki_size] ;
+		uint8_t kuki_data [plac->kuki_size] ;
 		uint32_t pakt_size = 0, saved_partial_block_frames ;
 
 		plac->final_write_block = 1 ;
