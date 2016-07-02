@@ -15,6 +15,7 @@ function (file_line_count filename variable)
 
 	execute_process (
 		COMMAND ${WC} -l ${filename}
+		COMMAND ${SED} "s/^[ ]*//"    # wc output on Mac has leading whitespace.
 		COMMAND ${SED} "s/ .*//"
 		OUTPUT_VARIABLE line_count
 		)
