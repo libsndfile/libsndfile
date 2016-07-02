@@ -67,7 +67,7 @@ as:
 
     $ Scripts/cmake-build.sh
 
-Will happily accpept patches to make the CMake build system more portable.
+Will happily accept patches to make the CMake build system more portable.
 
 
 ## Submitting Patches.
