@@ -1,6 +1,6 @@
 # CMakeLists.txt for libsndfile
 
-cmake_minimum_required (VERSION 2.8.12)
+cmake_minimum_required (VERSION 3.0.0)
 
 project (libsndfile)
 
@@ -40,15 +40,23 @@ if (NOT (EXISTS "${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in"))
 
 	message (STATUS "Post processing src/config.h.in")
 	execute_process (
-		COMMAND ${SED} -E "s/undef(\\s+)([a-zA-Z0-8_]+)/define\\1\\2\\1@\\2@/" src/config.h.in
+		COMMAND ${SED} -E "s/undef([ \\t]+)([a-zA-Z0-8_]+)/define\\1\\2\\1@\\2@/" src/config.h.in
 		COMMAND ${SED} "s/.*_FILE_OFFSET_BITS.*//"
 		OUTPUT_FILE ${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in
 		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 		)
+
+	execute_process (
+		COMMAND ${GREP} -c undef ${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in
+		OUTPUT_VARIABLE undef_count
+		)
+
+	if (${undef_count} GREATER 0)
+		message (FATAL_ERROR "CMake processing of CMakeFIles/config.h.in has failed.")
+		endif ()
 	endif ()
 
 assert_line_count_non_zero ("${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in")
-
 
 # Use autogen to generate files if they don't already exist.
 include (CMake/autogen.cmake)
@@ -71,8 +79,10 @@ if (DEFINED ENV{CXX})
 	set (CMAKE_CXX_COMPILER $ENV{CXX})
 	endif()
 
-message (STATUS "Using C compiler   : " ${CMAKE_C_COMPILER})
-message (STATUS "Using C++ compiler : " ${CMAKE_CXX_COMPILER})
+message (STATUS "System       : ${CMAKE_SYSTEM_NAME}")
+message (STATUS "Processor    : ${CMAKE_SYSTEM_PROCESSOR}")
+message (STATUS "C compiler   : ${CMAKE_C_COMPILER_ID}")
+message (STATUS "C++ compiler : ${CMAKE_CXX_COMPILER_ID}")
 
 #-------------------------------------------------------------------------------
 
@@ -87,41 +97,31 @@ include (CMake/build.cmake)
 include (CMake/external_libs.cmake)
 include (CMake/libsndfile.cmake)
 
-if (MSVC)
-	set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996")
-	add_definitions ("/wd4244 /wd4996")
+if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
+	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=gnu99 -Wall -Wextra" CACHE STRING "" FORCE)
+	set (CMAKE_CXX__FLAGS "${CMAKE_C_FLAGS} -O3 -std=gnu99 -Wall -Wextra" CACHE STRING "" FORCE)
 
-	set (COMPILER_IS_GCC 0)
-	set (HAVE_EXTERNAL_XIPH_LIBS 0)
-	set (OS_IS_WIN32 1)
-	set (OSX_DARWIN_VERSION 0)
-	set (USE_WINDOWS_API 1)
-	set (WIN32_TARGET_DLL 1)
-else (MSVC)
-	# Assume this is Linux or some other POSIX-like system (including OS X).
-	set (OSX_DARWIN_VERSION 0)
-	set (USE_WINDOWS_API 0)
-	set (__USE_MINGW_ANSI_STDIO 0)
-
-	set (CPU_CLIPS_NEGATIVE 0)
-	set (CPU_CLIPS_POSITIVE 0)
+	set (COMPILER_IS_GCC 1)
 	set (_POSIX_SOURCE 1)
 
-	set (SF_COUNT_MAX 0x7fffffffffffffffll)
-	set (ENABLE_EXPERIMENTAL_CODE 0)
-	set (OSX_DARWIN_VERSION 0)
-	set (OS_IS_OPENBSD 0)
-	set (WIN32_TARGET_DLL 0)
-	endif (MSVC)
-
-if (${COMPILER_IS_GCC})
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=gnu99 -Wall -Wextra" CACHE STRING "" FORCE)
-	# set (CMAKE_CXX__FLAGS
-	endif (${COMPILER_IS_GCC})
-
-if (${Werror} MATCHES "on")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror" CACHE STRING "" FORCE)
+	if (${Werror} MATCHES "on")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror" CACHE STRING "" FORCE)
+		endif ()
 	endif ()
+
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+	# Untested. Probably does not work. Patches accepted.
+
+	set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996" CACHE STRING "" FORCE)
+	add_definitions ("/wd4244 /wd4996")
+	endif ()
+
+
+# Need to actually detect this.
+set (CPU_CLIPS_POSITIVE 0)
+set (CPU_CLIPS_NEGATIVE 0)
+
+set (ENABLE_EXPERIMENTAL_CODE 0)
 
 find_external_xiph_libs (HAVE_EXTERNAL_XIPH_LIBS EXTERNAL_XIPH_CFLAGS EXTERNAL_XIPH_LIBS)
 
