@@ -2,7 +2,7 @@
 
 rm -rf CMakeCache.txt CMakeFiles/
 
-cmake -DWerror=on .
+cmake -DWerror=on -Werror=dev -Werror=deprecated .
 
 make clean
 make

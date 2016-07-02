@@ -14,8 +14,9 @@ DIST_SUBDIRS = M4 man doc Win32 src Octave examples regtest tests programs
 EXTRA_DIST = libsndfile.spec.in sndfile.pc.in Scripts/android-configure.sh \
 	Scripts/linux-to-win-cross-configure.sh Scripts/build-test-tarball.mk.in \
     CMakeLists.txt CMake/autogen.cmake CMake/build.cmake CMake/check.cmake \
-	CMake/compiler_is_gcc.c CMake/file.cmake CMake/have_decl_s_irgrp.c \
-	CMake/libsndfile.cmake
+	CMake/compiler_is_gcc.c CMake/external_libs.cmake CMake/file.cmake \
+	CMake/have_decl_s_irgrp.c CMake/libsndfile.cmake
+
 
 CLEANFILES = *~
 

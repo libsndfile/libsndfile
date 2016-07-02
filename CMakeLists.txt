@@ -15,6 +15,7 @@ include (CMake/file.cmake)
 
 # Duplicate the autoconf/autoheader functionality.
 
+# Get the version number from configure.ac.
 execute_process (
 	COMMAND ${GREP} ^AC_INIT configure.ac
 	COMMAND ${SED} "s/.*libsndfile[^0-9]*//;s/\\].*//"
@@ -26,6 +27,7 @@ string (REGEX REPLACE "\\..*" "" LIB_VERSION_MAJOR ${LIB_VERSION})
 
 message (STATUS "libsndfile version : ${LIB_VERSION}")
 
+# Generate config.h.in if it does not already exist.
 if (NOT (EXISTS "${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in"))
 	if (NOT AUTOHEADER)
 		message (FATAL_ERROR "Need autoheader (part of GNU autoconf) to proceed.")
@@ -82,6 +84,7 @@ set (PACKAGE_VERSION \"${LIB_VERSION}\")
 set (BASEPATH "${CMAKE_SOURCE_DIR}")
 
 include (CMake/build.cmake)
+include (CMake/external_libs.cmake)
 include (CMake/libsndfile.cmake)
 
 if (MSVC)
@@ -96,7 +99,6 @@ if (MSVC)
 	set (WIN32_TARGET_DLL 1)
 else (MSVC)
 	# Assume this is Linux or some other POSIX-like system (including OS X).
-	set (HAVE_EXTERNAL_XIPH_LIBS 0)
 	set (OSX_DARWIN_VERSION 0)
 	set (USE_WINDOWS_API 0)
 	set (__USE_MINGW_ANSI_STDIO 0)
@@ -121,10 +123,7 @@ if (${Werror} MATCHES "on")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror" CACHE STRING "" FORCE)
 	endif ()
 
-add_custom_target (check
-	COMMAND src/test_main && bash tests/test_wrapper.sh
-	DEPENDS src/test_main tests/test_wrapper.sh
-	)
+find_external_xiph_libs (HAVE_EXTERNAL_XIPH_LIBS EXTERNAL_XIPH_CFLAGS EXTERNAL_XIPH_LIBS)
 
 #-------------------------------------------------------------------------------
 # Project definitions follow.
@@ -233,11 +232,12 @@ add_library (sndfile SHARED
 	${libsndfile_sources}
 	)
 
-target_link_libraries (sndfile m)
+target_link_libraries (sndfile LINK_PRIVATE ${EXTERNAL_XIPH_LIBS} LINK_PUBLIC m)
 
-set_target_properties(sndfile
+set_target_properties (sndfile
 	PROPERTIES
-	VERSION ${LIB_VERSION} SOVERSION ${LIB_VERSION_MAJOR}
+	VERSION ${LIB_VERSION}
+	SOVERSION ${LIB_VERSION_MAJOR}
 	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/src
 	)
 
@@ -260,6 +260,11 @@ lsf_build_program_extra (sndfile-play asound)
 
 configure_file (${CMAKE_SOURCE_DIR}/tests/test_wrapper.sh.in ${CMAKE_SOURCE_DIR}/tests/test_wrapper.sh)
 configure_file (${CMAKE_SOURCE_DIR}/tests/pedantic-header-test.sh.in ${CMAKE_SOURCE_DIR}/tests/pedantic-header-test.sh)
+
+add_custom_target (check
+	COMMAND src/test_main && bash tests/test_wrapper.sh
+	DEPENDS src/test_main tests/test_wrapper.sh
+	)
 
 # Tests from the src/ directory.
 set (src_test_sources
