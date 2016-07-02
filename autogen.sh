@@ -4,16 +4,6 @@
 
 package="libsndfile"
 
-if test "x$1" = "xcmake" ; then
-	version=$(grep ^AC_INIT configure.ac | sed 's/.*libsndfile[^0-9]*//;s/\].*//')
-
-	sed -E 's/undef(\s+)([a-zA-Z0-8_]+)/define\1\2\1@\2@/' src/config.h.in \
-		| sed 's/.*_FILE_OFFSET_BITS.*//' \
-		| sed 's/@PACKAGE@/"libsndfile"/' \
-		| sed "s/@VERSION@/\"$version\"/" > CMake/config.h.in
-	exit 0
-	fi
-
 ACLOCAL_FLAGS="-I M4"
 
 olddir=`pwd`

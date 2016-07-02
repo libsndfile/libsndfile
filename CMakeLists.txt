@@ -4,9 +4,62 @@ cmake_minimum_required (VERSION 2.8.12)
 
 project (libsndfile)
 
-if (NOT (EXISTS "${CMAKE_SOURCE_DIR}/CMake/config.h.in"))
-	message (FATAL_ERROR "\nError : Need to run \"./autogen.sh cmake\" first.")
+# We may need these programs so detect them now.
+find_program (AUTOGEN autogen)
+find_program (AUTOHEADER autoheader)
+find_program (GREP grep)
+find_program (SED sed)
+find_program (WC wc)
+
+include (CMake/file.cmake)
+
+# Duplicate the autoconf/autoheader functionality.
+
+execute_process (
+	COMMAND ${GREP} ^AC_INIT configure.ac
+	COMMAND ${SED} "s/.*libsndfile[^0-9]*//;s/\\].*//"
+	OUTPUT_VARIABLE LIB_VERSION
+	)
+
+string (STRIP ${LIB_VERSION} LIB_VERSION)
+string (REGEX REPLACE "\\..*" "" LIB_VERSION_MAJOR ${LIB_VERSION})
+
+message (STATUS "libsndfile version : ${LIB_VERSION}")
+
+if (NOT (EXISTS "${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in"))
+	if (NOT AUTOHEADER)
+		message (FATAL_ERROR "Need autoheader (part of GNU autoconf) to proceed.")
+		endif ()
+
+	message (STATUS "Running autoheader to create src/config.h.in")
+	execute_process (COMMAND ${AUTOHEADER} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+	assert_line_count_non_zero ("${CMAKE_SOURCE_DIR}/src/config.h.in")
+
+	message (STATUS "Post processing src/config.h.in")
+	execute_process (
+		COMMAND ${SED} -E "s/undef(\\s+)([a-zA-Z0-8_]+)/define\\1\\2\\1@\\2@/" src/config.h.in
+		COMMAND ${SED} "s/.*_FILE_OFFSET_BITS.*//"
+		OUTPUT_FILE ${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		)
 	endif ()
+
+assert_line_count_non_zero ("${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in")
+
+
+# Use autogen to generate files if they don't already exist.
+include (CMake/autogen.cmake)
+lsf_autogen (src test_endswap)
+lsf_autogen (tests pcm_test)
+lsf_autogen (tests utils)
+lsf_autogen (tests floating_point_test)
+lsf_autogen (tests header_test)
+lsf_autogen (tests pipe_test)
+lsf_autogen (tests write_read_test)
+lsf_autogen (tests scale_clip_test)
+lsf_autogen (tests rdwr_test)
+lsf_autogen (tests benchmark)
 
 if (DEFINED ENV{CC})
 	set (CMAKE_C_COMPILER $ENV{CC})
@@ -21,20 +74,15 @@ message (STATUS "Using C++ compiler : " ${CMAKE_CXX_COMPILER})
 
 #-------------------------------------------------------------------------------
 
-set (LIB_VERSION_MAJOR 1)
-set (LIB_VERSION_MINOR 0)
-set (LIB_VERSION_PATCH 27)
-
+set (PACKAGE \"libsndfile\")
 set (PACKAGE_NAME \"libsndfile\")
-set (PACKAGE_VERSION \"${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH}pre1\")
+set (VERSION \"${LIB_VERSION}\")
+set (PACKAGE_VERSION \"${LIB_VERSION}\")
 
 set (BASEPATH "${CMAKE_SOURCE_DIR}")
 
-
-set (LIB_VERSION_STRING ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH})
-
-include (CMake/libsndfile.cmake)
 include (CMake/build.cmake)
+include (CMake/libsndfile.cmake)
 
 if (MSVC)
 	set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996")
@@ -82,7 +130,7 @@ add_custom_target (check
 # Project definitions follow.
 
 configure_file (${CMAKE_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_SOURCE_DIR}/src/sndfile.h)
-configure_file (${CMAKE_SOURCE_DIR}/CMake/config.h.in ${CMAKE_SOURCE_DIR}/src/config.h)
+configure_file (${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in ${CMAKE_SOURCE_DIR}/src/config.h)
 
 include_directories (src)
 
@@ -152,7 +200,6 @@ set (libsndfile_sources
 	src/mat5.c
 	src/mpc2k.c
 	src/ms_adpcm.c
-	src/new.c
 	src/nist.c
 	src/ogg.c
 	src/ogg_opus.c
@@ -190,7 +237,7 @@ target_link_libraries (sndfile m)
 
 set_target_properties(sndfile
 	PROPERTIES
-	VERSION ${LIB_VERSION_STRING} SOVERSION ${LIB_VERSION_MAJOR}
+	VERSION ${LIB_VERSION} SOVERSION ${LIB_VERSION_MAJOR}
 	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/src
 	)
 
@@ -211,7 +258,8 @@ lsf_build_program_extra (sndfile-play asound)
 #-------------------------------------------------------------------------------
 # Tests.
 
-configure_file (tests/test_wrapper.sh.in tests/test_wrapper.sh)
+configure_file (${CMAKE_SOURCE_DIR}/tests/test_wrapper.sh.in ${CMAKE_SOURCE_DIR}/tests/test_wrapper.sh)
+configure_file (${CMAKE_SOURCE_DIR}/tests/pedantic-header-test.sh.in ${CMAKE_SOURCE_DIR}/tests/pedantic-header-test.sh)
 
 # Tests from the src/ directory.
 set (src_test_sources
@@ -259,6 +307,7 @@ lsf_build_test_c (header_test "")
 lsf_build_test_c (largefile_test "")
 lsf_build_test_c (locale_test "")
 lsf_build_test_c (lossy_comp_test "")
+lsf_build_test_c (long_read_write_test "")
 lsf_build_test_c (misc_test "")
 lsf_build_test_c (multi_file_test "")
 lsf_build_test_c (ogg_test "")
