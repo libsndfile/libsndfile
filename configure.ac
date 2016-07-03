@@ -174,7 +174,6 @@ case "$host_os" in
 		TYPEOF_SF_COUNT_T="__int64"
 		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 		SIZEOF_SF_COUNT_T=8
-		AC_DEFINE([__USE_MINGW_ANSI_STDIO],1,[Set to 1 to use C99 printf/snprintf in MinGW.])
 		;;
 	*)
 		SIZEOF_SF_COUNT_T=0
