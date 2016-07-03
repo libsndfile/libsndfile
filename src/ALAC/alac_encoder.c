@@ -110,12 +110,6 @@ static const uint32_t	sChannelMaps [kALACMaxChannels] =
 	(ID_SCE << 21) | (ID_CPE << 15) | (ID_CPE << 9) | (ID_CPE << 3) | (ID_SCE)
 } ;
 
-static const uint32_t sSupportediPodSampleRates [] =
-{
-	8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000
-} ;
-
-
 #if PRAGMA_MARK
 #pragma mark -
 #endif

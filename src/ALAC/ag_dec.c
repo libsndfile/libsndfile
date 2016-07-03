@@ -34,7 +34,6 @@
 #include "aglib.h"
 #include "ALACBitUtilities.h"
 #include "ALACAudioTypes.h"
-#include "shift.h"
 
 #define CODE_TO_LONG_MAXBITS	32
 #define N_MAX_MEAN_CLAMP		0xffff
