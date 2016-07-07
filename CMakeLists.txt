@@ -5,39 +5,53 @@
 # lowest version supporting portable endianness check
 cmake_minimum_required (VERSION 3.0.0)
 
-# Options
-option (ENABLE_TESTING "Enable testing" OFF)
+set(PROJECT_NAME libsndfile)
+project(${PROJECT_NAME})
 
-# Set software information
-project(libsndfile VERSION 1.0.28)
-SET(LIB_VERSION_PATCH pre1)
-set(LIB_VERSION ${PROJECT_VERSION}pre1)
-
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/library-build)
 
-#
-# Setup definitions
-#
-include(${CMAKE_MODULE_PATH}/check.cmake)
+set(CMAKE_C_FLAGS "-std=gnu11 -O3")
 
 #
-#  Find external libs
+# Setup libsndfile definitions
 #
 
-include(${CMAKE_MODULE_PATH}/external_libs.cmake)
-add_definitions(-DHAVE_EXTERNAL_XIPH_LIBS=0)
+set(TYPEOF_SF_COUNT_T int64_t)
+set(SF_COUNT_MAX 0x7fffffffffffffffll)
 
-#
-# Setup configuration
-#
+include (TestBigEndian)
+TEST_BIG_ENDIAN (BIG_ENDIAN)
+if (${BIG_ENDIAN})
+	add_definitions(-DWORDS_BIGENDIAN=1)
+	add_definitions(-DCPU_IS_BIG_ENDIAN=1)
+	add_definitions(-DCPU_IS_LITTLE_ENDIAN=0)
+else (${LITTLE_ENDIAN})
+	add_definitions(-DWORDS_BIGENDIAN=0)
+	add_definitions(-DCPU_IS_LITTLE_ENDIAN=1)
+	add_definitions(-DCPU_IS_BIG_ENDIAN=0)
+endif ()
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+	add_definitions(-DOS_IS_WIN32=1)
+	add_definitions(-DUSE_WINDOWS_API=1)
+	add_definitions(-DWIN32_TARGET_DLL=1)
+else (${WINDOWS})
+	add_definitions(-DOS_IS_WIN32=0)
+	add_definitions(-DUSE_WINDOWS_API=0)
+	add_definitions(-DWIN32_TARGET_DLL=0)
+endif ()
 
-configure_file(src/config.h.cmake src/config.h)
+if (CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
+	add_definitions(-DOS_IS_OPENBSD=1)
+else ()
+	add_definitions(-DOS_IS_OPENBSD=0)
+endif ()
+
+add_definitions(-DCOMPILER_IS_GCC=1)
+
+
 configure_file(${CMAKE_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_SOURCE_DIR}/src/sndfile.h)
-
-#
-# Final project settings
-#
+#configure_file(${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in ${CMAKE_SOURCE_DIR}/src/config.h)
 
 add_subdirectory(src)
 
@@ -48,25 +62,3 @@ add_library(sndfile SHARED
 	$<TARGET_OBJECTS:GSM610>
 	)
 
-add_library(sndfile_static STATIC
-	$<TARGET_OBJECTS:source> 
-	$<TARGET_OBJECTS:ALAC>
-	$<TARGET_OBJECTS:G72x>
-	$<TARGET_OBJECTS:GSM610>
-	)
-
-target_link_libraries (sndfile LINK_PRIVATE ${EXTERNAL_XIPH_LIBS} LINK_PUBLIC m)
-target_link_libraries (sndfile_static LINK_PRIVATE ${EXTERNAL_XIPH_LIBS} LINK_PUBLIC m)
-
-set_target_properties (sndfile sndfile_static
-			PROPERTIES
-			VERSION ${PROJECT_VERSION}
-			POSITION_INDEPENDENT_CODE TRUE)
-
-add_subdirectory(programs)
-if (ENABLE_TESTING)
-enable_testing()
-add_subdirectory(tests)
-else ()
-add_subdirectory(tests EXCLUDE_FROM_ALL)
-endif ()
