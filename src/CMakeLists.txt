@@ -1,5 +1,3 @@
-include(CheckIncludeFiles)
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(ALAC)
@@ -9,15 +7,6 @@ include_directories(GSM610)
 add_subdirectory(ALAC)
 add_subdirectory(G72x)
 add_subdirectory(GSM610)
-
-add_definitions(-DPACKAGE_NAME="libsndfile")
-add_definitions(-DPACKAGE_VERSION="1.0.28pre1")
-
-add_definitions(-DWITH_OPENCV2)
-add_definitions(-DCPU_CLIPS_POSITIVE=0)
-add_definitions(-DCPU_CLIPS_NEGATIVE=0)
-add_definitions(-DSIZEOF_SF_COUNT_T=8) #need to calculate
-check_include_files(unistd.h HAVE_UNISTD_H)
 
 set (LIBSNDFILE_SOURCE_FILES
 	aiff.c
