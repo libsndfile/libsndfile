@@ -13,6 +13,8 @@ set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/library-build)
 
 set(CMAKE_C_FLAGS "-std=gnu11 -O3")
 
+include(CheckIncludeFiles)
+
 #
 # Setup libsndfile definitions
 #
@@ -48,6 +50,11 @@ else ()
 endif ()
 
 add_definitions(-DCOMPILER_IS_GCC=1)
+
+check_include_files(unistd.h HAVE_UNISTD_H)cd ../
+if(HAVE_UNISTD_H)
+	add_definitions(-DHAVE_UNISTD_H)
+endif()
 
 
 configure_file(${CMAKE_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_SOURCE_DIR}/src/sndfile.h)
