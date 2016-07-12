@@ -1,3 +1,5 @@
+include(CheckIncludeFiles)
+
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(ALAC)
@@ -17,7 +19,7 @@ add_definitions(-DWITH_OPENCV2)
 add_definitions(-DCPU_CLIPS_POSITIVE=0)
 add_definitions(-DCPU_CLIPS_NEGATIVE=0)
 add_definitions(-DSIZEOF_SF_COUNT_T=8) #need to calculate
-add_definitions(-DHAVE_UNISTD_H)
+check_include_files(unistd.h HAVE_UNISTD_H)
 
 >>>>>>> Reworked CMake build system
 set (LIBSNDFILE_SOURCE_FILES
