@@ -49,10 +49,12 @@ else ()
 	add_definitions(-DOS_IS_OPENBSD=0)
 endif ()
 
-add_definitions(-DCOMPILER_IS_GCC=1)
+if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_C_COMPILER_ID MATCHES "Clang")
+	add_definitions(-DCOMPILER_IS_GCC=1)
+endif ()
 
-check_include_files(unistd.h HAVE_UNISTD_H)cd ../
-if(HAVE_UNISTD_H)
+check_include_files(unistd.h HAVE_UNISTD_H)
+if (HAVE_UNISTD_H)
 	add_definitions(-DHAVE_UNISTD_H)
 endif()
 
