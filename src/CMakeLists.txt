@@ -1,5 +1,3 @@
-include(CheckIncludeFiles)
-
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(ALAC)
@@ -10,18 +8,6 @@ add_subdirectory(ALAC)
 add_subdirectory(G72x)
 add_subdirectory(GSM610)
 
-<<<<<<< 0ed77b697139da995110dbba9095a1f48ee4a013
-=======
-add_definitions(-DPACKAGE_NAME="libsndfile")
-add_definitions(-DPACKAGE_VERSION="1.0.28pre1")
-
-add_definitions(-DWITH_OPENCV2)
-add_definitions(-DCPU_CLIPS_POSITIVE=0)
-add_definitions(-DCPU_CLIPS_NEGATIVE=0)
-add_definitions(-DSIZEOF_SF_COUNT_T=8) #need to calculate
-check_include_files(unistd.h HAVE_UNISTD_H)
-
->>>>>>> Reworked CMake build system
 set (LIBSNDFILE_SOURCE_FILES
 	aiff.c
 	alac.c
@@ -83,13 +69,6 @@ set (LIBSNDFILE_SOURCE_FILES
 	windows.c
 	wve.c
 	xi.c
-<<<<<<< 0ed77b697139da995110dbba9095a1f48ee4a013
-	)
-
-add_library(source OBJECT ${LIBSNDFILE_SOURCE_FILES})
-set_property(TARGET source PROPERTY POSITION_INDEPENDENT_CODE TRUE)
-=======
 )
 
 add_library(source OBJECT ${LIBSNDFILE_SOURCE_FILES})
->>>>>>> Reworked CMake build system
