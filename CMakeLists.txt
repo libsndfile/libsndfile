@@ -13,14 +13,20 @@ set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/library-build)
 
 set(CMAKE_C_FLAGS "-std=gnu11 -O3")
 
-include(CheckIncludeFiles)
-
 #
 # Setup libsndfile definitions
 #
 
+include(CheckIncludeFiles)
+include(CheckTypeSize)
+
 set(TYPEOF_SF_COUNT_T int64_t)
 set(SF_COUNT_MAX 0x7fffffffffffffffll)
+add_definitions(-DPACKAGE_NAME="libsndfile")
+add_definitions(-DPACKAGE_VERSION="1.0.28pre1")
+add_definitions(-DWITH_OPENCV2)
+add_definitions(-DCPU_CLIPS_POSITIVE=0)
+add_definitions(-DCPU_CLIPS_NEGATIVE=0)
 
 include (TestBigEndian)
 TEST_BIG_ENDIAN (BIG_ENDIAN)
@@ -56,11 +62,18 @@ endif ()
 check_include_files(unistd.h HAVE_UNISTD_H)
 if (HAVE_UNISTD_H)
 	add_definitions(-DHAVE_UNISTD_H)
-endif()
+endif ()
 
+check_type_size(int64_t SIZEOF_SF_COUNT_T)
+if (SIZEOF_SF_COUNT_T)
+	add_definitions(-DSIZEOF_SF_COUNT_T=${SIZEOF_SF_COUNT_T})
+endif ()
+
+#
+# Final project settings
+#
 
 configure_file(${CMAKE_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_SOURCE_DIR}/src/sndfile.h)
-#configure_file(${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in ${CMAKE_SOURCE_DIR}/src/config.h)
 
 add_subdirectory(src)
 
