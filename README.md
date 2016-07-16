@@ -14,6 +14,8 @@ You can grab the source code using:
 
     $ git clone git://github.com/erikd/libsndfile.git
 
+For building for Android see [BuildingForAndroid][BuildingForAndroid].
+
 There are currently two build systems; the official GNU autotool based one and
 a more limited and experimental CMake based build system. Use of the CMake build
 system is documented below.
@@ -96,3 +98,4 @@ Will happily accept patches to make the CMake build system more portable.
 [libvorbis]: http://www.vorbis.com/
 [pkgconfig]: http://www.freedesktop.org/wiki/Software/pkg-config
 [python]: http://www.python.org/
+[BuildingForAndroid]: https://github.com/erikd/libsndfile/blob/master/Building-for-Android.md
