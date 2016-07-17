@@ -1,99 +1,57 @@
+find_package(Vorbis)
+if (${VORBIS_FOUND})
+    INCLUDE_DIRECTORIES(${VORBIS_INCLUDE_DIR})
+elseif ($(ENABLE_EXTERNAL_LIBS))
+    ExternalProject_Add(
+        Vorbis
+        GIT_REPOSITORY      "https://github.com/xiph/vorbis"
+        SOURCE_DIR          ${CMAKE_CURRENT_SOURCE_DIR}/lib/vorbis
+        UPDATE_COMMAND      ""
+        INSTALL_COMMAND     ""
+        LOG_DOWNLOAD        ON
+        LOG_UPDATE          ON
+        LOG_CONFIGURE       ON
+        LOG_BUILD           ON
+        LOG_TEST            ON
+        LOG_INSTALL         ON
+        ExternalProject_Get_Property(FLAC SOURCE_DIR)
+        ExternalProject_Get_Property(FLAC BINARY_DIR)
 
-find_package (PkgConfig)
-include (FindPackageHandleStandardArgs)
+        SET(VORBIS_SOURCE_DIR ${SOURCE_DIR})
+        SET(VORBIS_BINARY_DIR ${BINARY_DIR})
+        SET(VORBIS_LIBRARIES ${FLAC_BINARY_DIR}/lib/.libs/libFLAC.dylib)
+        SET(DEPENDENCIES ${DEPENDENCIES} FLAC)
+    )
+endif ()
+set(EXTERNAL_XIPH_LIBS ${EXTERNAL_XIPH_LIBS} ${VORBIS_LIBRARIES})
 
-function (find_libogg return_name)
-	pkg_check_modules (PC_LIBOGG QUIET libogg)
-	set (LIBOGG_DEFINITIONS ${PC_LIBOGG_CFLAGS_OTHER})
+find_package(FLAC)
+if (${FLAC_FOUND})
+    INCLUDE_DIRECTORIES(${FLAC_INCLUDE_DIR})
+elseif ($(ENABLE_EXTERNAL_LIBS))
+    ExternalProject_Add(
+        FLAC
+        DEPENDS             Vorbis
+        GIT_REPOSITORY      "https://github.com/xiph/flac"
+        SOURCE_DIR          ${CMAKE_CURRENT_SOURCE_DIR}/lib/flac
+        PATCH_COMMAND       ${CMAKE_CURRENT_SOURCE_DIR}/lib/flac/autogen.sh
+        CONFIGURE_COMMAND   ${CMAKE_CURRENT_SOURCE_DIR}/lib/flac/configure --prefix=<INSTALL_DIR>
+        BUILD_COMMAND       ${MAKE}
+        UPDATE_COMMAND      ""
+        INSTALL_COMMAND     ""
+        LOG_DOWNLOAD        ON
+        LOG_UPDATE          ON
+        LOG_CONFIGURE       ON
+        LOG_BUILD           ON
+        LOG_TEST            ON
+        LOG_INSTALL         ON
+        ExternalProject_Get_Property(FLAC SOURCE_DIR)
+        ExternalProject_Get_Property(FLAC BINARY_DIR)
 
-	find_path (LIBOGG_INCLUDE_DIR ogg/ogg.h
-				HINTS ${PC_LIBOGG_INCLUDEDIR} ${PC_LIBOGG_INCLUDE_DIRS}
-				PATH_SUFFIXES libogg)
-
-	find_library (LIBOGG_LIBRARY NAMES ogg libogg
-					HINTS ${PC_LIBOGG_LIBDIR} ${PC_LIBOGG_LIBRARY_DIRS})
-
-	find_package_handle_standard_args (LibOgg  DEFAULT_MSG
-										LIBOGG_LIBRARY LIBOGG_INCLUDE_DIR)
-
-	mark_as_advanced (LIBOGG_INCLUDE_DIR LIBOGG_LIBRARY)
-
-	set (LIBOGG_LIBRARIES ${LIBOGG_LIBRARY} PARENT_SCOPE)
-	set (LIBOGG_INCLUDE_DIRS ${LIBOGG_INCLUDE_DIR} PARENT_SCOPE)
-	set (${return_name} ${LIBOGG_FOUND} PARENT_SCOPE)
-	endfunction (find_libogg)
-
-
-function (find_libvorbis return_name)
-	pkg_check_modules (PC_LIBVORBIS QUIET libvorbis)
-	set (LIBVORBIS_DEFINITIONS ${PC_LIBVORBIS_CFLAGS_OTHER})
-
-	find_path (LIBVORBIS_INCLUDE_DIR vorbis/codec.h
-				HINTS ${PC_LIBVORBIS_INCLUDEDIR} ${PC_LIBVORBIS_INCLUDE_DIRS}
-				PATH_SUFFIXES libvorbis)
-
-	find_library (LIBVORBIS_LIBRARY NAMES vorbis libvorbis
-					HINTS ${PC_LIBVORBIS_LIBDIR} ${PC_LIBVORBIS_LIBRARY_DIRS})
-
-	find_package_handle_standard_args (LibVorbis  DEFAULT_MSG
-										LIBVORBIS_LIBRARY LIBVORBIS_INCLUDE_DIR)
-
-	mark_as_advanced (LIBVORBIS_INCLUDE_DIR LIBVORBIS_LIBRARY)
-
-	set (LIBVORBIS_LIBRARIES ${LIBVORBIS_LIBRARY} PARENT_SCOPE)
-	set (LIBVORBIS_INCLUDE_DIRS ${LIBVORBIS_INCLUDE_DIR} PARENT_SCOPE)
-	set (${return_name} ${LIBVORBIS_FOUND} PARENT_SCOPE)
-	endfunction (find_libvorbis)
-
-
-function (find_libflac return_name)
-	pkg_check_modules (PC_LIBFLAC QUIET libFLAC)
-	set (LIBFLAC_DEFINITIONS ${PC_LIBFLAC_CFLAGS_OTHER})
-
-	find_path (LIBFLAC_INCLUDE_DIR FLAC/all.h
-				HINTS ${PC_LIBFLAC_INCLUDEDIR} ${PC_LIBFLAC_INCLUDE_DIRS}
-				PATH_SUFFIXES libFLAC)
-
-	find_library (LIBFLAC_LIBRARY NAMES FLAC libFLAC
-					HINTS ${PC_LIBFLAC_LIBDIR} ${PC_LIBFLAC_LIBRARY_DIRS})
-
-	find_package_handle_standard_args (LibFlac  DEFAULT_MSG
-										LIBFLAC_LIBRARY LIBFLAC_INCLUDE_DIR)
-
-	mark_as_advanced (LIBFLAC_INCLUDE_DIR LIBFLAC_LIBRARY)
-
-	set (LIBFLAC_LIBRARIES ${LIBFLAC_LIBRARY} PARENT_SCOPE)
-	set (LIBFLAC_INCLUDE_DIRS ${LIBFLAC_INCLUDE_DIR} PARENT_SCOPE)
-	set (${return_name} ${LIBFLAC_FOUND} PARENT_SCOPE)
-	endfunction (find_libflac)
-
-
-function (find_external_xiph_libs return_name include_dirs external_libs)
-	find_libogg (LIBOGG_FOUND)
-	find_libvorbis (LIBVORBIS_FOUND)
-	find_libflac (LIBFLAC_FOUND)
-
-	set (name 1)
-	set (includes "")
-	set (libs "")
-
-	if (LIBOGG_FOUND AND LIBVORBIS_FOUND AND LIBFLAC_FOUND)
-		set (${name} 1)
-
-		if (NOT (LIBOGG_INCLUDE_DIR STREQUAL "/usr/include"))
-			set (${includes} "${includes} ${LIBOGG_INCLUDE_DIR}")
-			endif ()
-		if (NOT (LIBVORBIS_INCLUDE_DIR STREQUAL "/usr/include"))
-			set (${includes} "${includes} ${LIBVORBIS_INCLUDE_DIR}")
-			endif ()
-		if (NOT (LIBFLAC_INCLUDE_DIR STREQUAL "/usr/include"))
-			set (${includes} "${includes} ${LIBFLAC_INCLUDE_DIR}")
-			endif ()
-
-		set (libs "FLAC;vorbis;vorbisenc;ogg")
-		endif ()
-
-	set (${return_name} ${name} PARENT_SCOPE)
-	set (${include_dirs} "${includes}" PARENT_SCOPE)
-	set (${external_libs} "${libs}" PARENT_SCOPE)
-	endfunction (find_external_xiph_libs)
+        SET(FLAC_SOURCE_DIR ${SOURCE_DIR})
+        SET(FLAC_BINARY_DIR ${BINARY_DIR})
+        SET(FLAC_LIBRARIES ${FLAC_BINARY_DIR}/lib/.libs/libFLAC.dylib)
+        SET(DEPENDENCIES ${DEPENDENCIES} FLAC)
+    )
+endif ()
+set(EXTERNAL_XIPH_LIBS ${EXTERNAL_XIPH_LIBS} ${FLAC_LIBRARIES})
