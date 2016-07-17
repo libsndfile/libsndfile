@@ -5,14 +5,17 @@
 # lowest version supporting portable endianness check
 cmake_minimum_required (VERSION 3.0.0)
 
+# Set software information
 set(PROJECT_NAME libsndfile)
+SET(LIB_VERSION_MAJOR 1)
+SET(LIB_VERSION_MINOR 0)
+SET(LIB_VERSION_PATCH 28pre1)
+SET(LIB_VERSION ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH})
 set(LIB_VERSION 1.0.28pre1)
 project(${PROJECT_NAME})
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/library-build)
-
-set(CMAKE_C_FLAGS "-std=gnu11 -O3")
 
 #
 # Setup definitions
@@ -40,6 +43,8 @@ endif ()
 #  Find external libs
 #
 
+include(${CMAKE_MODULE_PATH}/external_libs.cmake)
+
 #
 # Setup configuration
 #
@@ -58,3 +63,12 @@ add_library(sndfile SHARED
 	$<TARGET_OBJECTS:G72x>
 	$<TARGET_OBJECTS:GSM610>
 	)
+
+target_link_libraries (sndfile LINK_PRIVATE ${EXTERNAL_XIPH_LIBS} LINK_PUBLIC m)
+
+set_target_properties (sndfile
+			PROPERTIES
+			VERSION ${LIB_VERSION}
+			SOVERSION ${LIB_VERSION_MAJOR}
+			LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+			)
