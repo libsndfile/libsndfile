@@ -69,6 +69,31 @@ set (LIBSNDFILE_SOURCE_FILES
 	windows.c
 	wve.c
 	xi.c
-)
+	)
 
 add_library(source OBJECT ${LIBSNDFILE_SOURCE_FILES})
+
+# programs
+
+set(PROGRAMS 	sndfile-cmp 
+	     	sndfile-concat
+		sndfile-convert
+		sndfile-deinterleave
+		sndfile-interleave
+		sndfile-metadata-get
+		sndfile-metadata-set
+		sndfile-salvage
+		#sndfile-play
+		)
+
+foreach (program ${PROGRAMS})
+	add_executable(${program} 
+			${CMAKE_SOURCE_DIR}/programs/common.c 
+			${CMAKE_SOURCE_DIR}/programs/${program}.c
+			)
+	target_link_libraries(${program} sndfile)
+	set_target_properties (${program} 	
+				PROPERTIES
+				RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+				)
+endforeach ()
