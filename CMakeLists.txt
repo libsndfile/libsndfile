@@ -20,7 +20,7 @@ set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/library-build)
 #
 # Setup definitions
 #
-include(${CMAKE_MODULE_PATH}/check.cmake)
+include(${CMAKE_MODULE_PATH}/check.txt)
 
 add_definitions(-DPACKAGE_NAME="PROJECT_NAME")
 add_definitions(-DPACKAGE_VERSION="${LIB_VERSION}")
@@ -43,7 +43,7 @@ endif ()
 #  Find external libs
 #
 
-include(${CMAKE_MODULE_PATH}/external_libs.cmake)
+include(${CMAKE_MODULE_PATH}/external_libs.txt)
 
 #
 # Setup configuration
