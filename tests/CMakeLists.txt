@@ -46,9 +46,9 @@ set(TESTS	aiff_rw_test
 		write_read_test
 	)
 
-if (NOT WIN32)
-	list (REMOVE_ITEM TESTS win32_ordinal_test win32_test)
-endif ()
+enable_testing()
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTS})
+set(CMAKE_CTEST_COMMAND ctest -V)
 
 foreach (test ${TESTS})
 	add_executable(${test} 
@@ -58,9 +58,12 @@ foreach (test ${TESTS})
 			${CMAKE_SOURCE_DIR}/tests/dft_cmp.c
 			)
 	target_link_libraries(${test} sndfile)
-	# bit jenky, should be an easier way to exclude
-	if (NOT (${test} MATCHES stdin_test OR ${test} MATCHES "stdout_test"))
-		add_test(NAME ${test} 
-		 	 COMMAND ${test} all)
-	endif()
+	set_target_properties(${test}
+				PROPERTIES
+				RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+				)
+	add_test(NAME ${test} 
+		 COMMAND ${test}
+		 WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+	add_dependencies(check ${test})
 endforeach ()
