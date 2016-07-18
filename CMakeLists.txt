@@ -20,7 +20,7 @@ set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/library-build)
 #
 # Setup definitions
 #
-include(${CMAKE_MODULE_PATH}/check.txt)
+include(${CMAKE_MODULE_PATH}/check.cmake)
 
 add_definitions(-DPACKAGE_NAME="PROJECT_NAME")
 add_definitions(-DPACKAGE_VERSION="${LIB_VERSION}")
@@ -43,7 +43,8 @@ endif ()
 #  Find external libs
 #
 
-include(${CMAKE_MODULE_PATH}/external_libs.txt)
+include(${CMAKE_MODULE_PATH}/external_libs.cmake)
+add_definitions(-DHAVE_EXTERNAL_XIPH_LIBS=0)
 
 #
 # Setup configuration
@@ -72,3 +73,6 @@ set_target_properties (sndfile
 			SOVERSION ${LIB_VERSION_MAJOR}
 			LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 			)
+
+add_subdirectory(programs)
+add_subdirectory(tests EXCLUDE_FROM_ALL)
