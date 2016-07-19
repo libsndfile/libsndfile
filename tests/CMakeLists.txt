@@ -16,7 +16,7 @@ set(TESTS	aiff_rw_test
 		dwvw_test 
 		error_test 
 		external_libs_test 
-		#fix_this 
+		fix_this 
 		floating_point_test
 		format_check_test 
 		headerless_test 
