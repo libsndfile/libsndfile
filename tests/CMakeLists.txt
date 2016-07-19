@@ -16,7 +16,7 @@ set(TESTS	aiff_rw_test
 		dwvw_test 
 		error_test 
 		external_libs_test 
-		fix_this 
+		#fix_this 
 		floating_point_test
 		format_check_test 
 		headerless_test 
@@ -62,8 +62,11 @@ foreach (test ${TESTS})
 				PROPERTIES
 				RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 				)
-	add_test(NAME ${test} 
-		 COMMAND ${test}
-		 WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+	# bit jenky, should be an easier way to exclude
+	if (NOT (${test} MATCHES stdin_test OR ${test} MATCHES "stdout_test"))
+		add_test(NAME ${test} 
+		 	 COMMAND ${test} all
+		 	 WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+	endif()
 	add_dependencies(check ${test})
 endforeach ()
