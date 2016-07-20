@@ -171,7 +171,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_RAW_READ_BAD_SPEC	, "Error while opening RAW file for read. Must specify format and channels.\n"
 									"Possibly trying to open unsupported format." },
 	{	SFE_RAW_BAD_BITWIDTH	, "Error. RAW file bitwidth must be a multiple of 8." },
-	{	SFE_RAW_BAD_FORMAT		, "Error. Bad format field in SF_INFO struct when openning a RAW file for read." },
+	{	SFE_RAW_BAD_FORMAT		, "Error. Bad format field in SF_INFO struct when opening a RAW file for read." },
 
 	{	SFE_PAF_NO_MARKER		, "Error in PAF file, no marker." },
 	{	SFE_PAF_VERSION			, "Error in PAF file, bad version." },
@@ -202,7 +202,7 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_IRCAM_NO_MARKER		, "Error in IRCAM file, bad IRCAM marker." },
 	{	SFE_IRCAM_BAD_CHANNELS	, "Error in IRCAM file, bad channel count." },
-	{	SFE_IRCAM_UNKNOWN_FORMAT, "Error in IRCAM file, unknow encoding format." },
+	{	SFE_IRCAM_UNKNOWN_FORMAT, "Error in IRCAM file, unknown encoding format." },
 
 	{	SFE_W64_64_BIT			, "Error in W64 file, file contains 64 bit offset." },
 	{	SFE_W64_NO_RIFF			, "Error in W64 file. No 'riff' chunk marker." },
