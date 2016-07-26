@@ -30,6 +30,8 @@
 ** ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include	"sfconfig.h"
+
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	<string.h>
@@ -37,7 +39,11 @@
 #include	<ctype.h>
 #include	<math.h>
 #include	<errno.h>
+#if HAVE_UNISTD_H
 #include	<unistd.h>
+#else
+#include	"sf_unistd.h"
+#endif
 #include	<fcntl.h>
 #include	<sys/stat.h>
 #include	<sys/types.h>

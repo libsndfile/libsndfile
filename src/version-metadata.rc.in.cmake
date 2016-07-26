@@ -1,0 +1,32 @@
+#include <windows.h>
+
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
+1 VERSIONINFO
+	FILEVERSION		@PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+	PRODUCTVERSION	@PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
+	FILEOS			VOS__WINDOWS32
+	FILETYPE		VFT_DLL
+	FILESUBTYPE		VFT2_UNKNOWN
+	FILEFLAGSMASK	0x00000000
+	FILEFLAGS		0x00000000
+{
+	BLOCK "StringFileInfo"
+	{
+		BLOCK "040904e4"
+		{
+			VALUE "FileDescription", "A library for reading and writing audio files."
+			VALUE "FileVersion", "@PROJECT_VERSION@\0"
+			VALUE "Full Version", "@PROJECT_VERSION@"
+			VALUE "InternalName", "@PROJECT_NAME@"
+			VALUE "LegalCopyright", "Copyright (C) 1999-2012, Licensed LGPL"
+			VALUE "OriginalFilename", "@PROJECT_NAME@-@PROJECT_VERSION_MAJOR@.dll"
+			VALUE "ProductName", "@PROJECT_NAME@-@PROJECT_VERSION_MAJOR@ DLL"
+			VALUE "ProductVersion", "@PROJECT_VERSION@.0\0"
+			VALUE "Language", "Language Neutral"
+		}
+	}
+	BLOCK "VarFileInfo"
+	{
+		VALUE "Translation", 0x0409, 0x04E4
+	}
+}

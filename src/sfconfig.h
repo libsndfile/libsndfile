@@ -116,4 +116,12 @@
 #define CPU_IS_X86		(defined __i486__ || defined __i586__ || defined __i686__ || defined __x86_64__)
 #define CPU_IS_X86_64	(defined __x86_64__)
 
+#ifndef HAVE_SSIZE_T
+#define HAVE_SSIZE_T 0
+#endif
+
+#if (HAVE_SSIZE_T == 0)
+#define ssize_t intptr_t
+#endif
+
 #endif
