@@ -16,7 +16,8 @@ EXTRA_DIST = sndfile.h.in config.h.in test_endswap.c test_endswap.tpl test_endsw
 			$(SYMBOL_FILES) create_symbols_file.py binheader_writef_check.py \
 			GSM610/README GSM610/COPYRIGHT GSM610/ChangeLog \
 			G72x/README G72x/README.original G72x/ChangeLog \
-			make-static-lib-hidden-privates.sh
+			make-static-lib-hidden-privates.sh \
+			config.h.cmake libsndfile.def.in.cmake version-metadata.rc.in.cmake
 
 noinst_HEADERS = common.h sfconfig.h sfendian.h wavlike.h sf_unistd.h ogg.h chanmap.h
 

@@ -22,6 +22,8 @@
 #include <string.h>
 #if HAVE_UNISTD_H
 #include <unistd.h>
+#else
+#include "sf_unistd.h"
 #endif
 #include <ctype.h>
 #include <math.h>

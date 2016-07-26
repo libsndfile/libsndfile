@@ -1,13 +1,43 @@
+sudo: false
 language: c
 
-sudo: required
-dist: trusty
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      compiler: clang
+      addons:
+        apt:
+          packages:
+            - libogg-dev
+            - libvorbis-dev
+            - libflac-dev
+            - libasound2-dev
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      addons:
+        apt:
+          packages:
+            - libogg-dev
+            - libvorbis-dev
+            - libflac-dev
+            - libasound2-dev
+ 
+    - os: osx
+      compiler: clang
 
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install -y libogg-dev libflac-dev libvorbis-dev
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      brew install autogen flac libogg libvorbis
+    fi
+
+install:
+  - true
 
 script:
-  - ./autogen.sh
-  - ./configure
-  - make distcheck
+  - mkdir cmake-build && (cd cmake-build && cmake .. -DCMAKE_BUILD_TYPE=Release && make VERBOSE=1 && ctest -V)
+  - pwd
+  - ./autogen.sh  
+  - ./configure --enable-werror && make clean all check
