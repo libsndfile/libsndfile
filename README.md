@@ -20,43 +20,23 @@ There are currently two build systems; the official GNU autotool based one and
 a more limited and experimental CMake based build system. Use of the CMake build
 system is documented below.
 
-To build libsndfile on Linux, OSX and Windows (Using GNU GCC) from a git clone
-using the autotools based build system will require a number of GNU and other
-Free and Open Source Software tools including:
+Setting up a build environment for libsndfile on Debian or Ubuntu is as simple as:
+```
+sudo apt install autoconf autogen automake build-essentials libflac-dev \
+    libogg-dev libtool libvorbis-dev pkg-config
+````
+For other Linux distributions or any of the *BSDs, the setup should be similar
+although the package install tools and package names may be slightly different.
 
-* [Autoconf][autoconf]
-* [Autogen][autogen]
-* [Automake][automake]
-* [Libtool][libtool]
-* [Pkgconfig][pkgconfig]
-* [Python][python]
-
-If you are on Linux, its probably best to install these via your Linux
-distribution's package manager.
-
-If you want to compile libsndfile with support for formats like FLAC and
-Ogg/Vorbis you will also need to install the following optional libraries:
-
-* [FLAC][flac]
-* [libogg][libogg]
-* [libvorbis][libvorbis]
-
-Support for these extra libraries is an all or nothing affair. Unless all of
-them are installed none of them will be supported.
+Similarly on Mac OS X, assuming [brew] is already installed:
+```
+brew install autoconf autogen automake flac libogg libtool libvorbis pkg-config
+```
+Once the build environment has been set up, building and testing libsndfile is
+as simple as:
 
     $ ./autogen.sh
-
-Running `autogen.sh` also installs a git pre-commit hook. The pre-commit hook
-is run each time a user tries to commit and checks code about to be committed
-against coding guidelines.
-
-Nest step is to run configure, with the following configure options being
-recommended for anyone contemplating sending libsndfile patches:
-
-    $ ./configure --enable-gcc-werror
-
-Finally libsndfile can be built and tested:
-
+    $ ./configure --enable-werror
     $ make
     $ make check
 
@@ -69,7 +49,7 @@ as:
 
     $ Scripts/cmake-build.sh
 
-Will happily accept patches to make the CMake build system more portable.
+I would be happy to accept patches to make the CMake build system more portable.
 
 
 ## Submitting Patches.
@@ -88,14 +68,6 @@ Will happily accept patches to make the CMake build system more portable.
 
 
 
-[autoconf]: http://www.gnu.org/s/autoconf/
-[autogen]: http://www.gnu.org/s/autogen/
-[automake]: http://www.gnu.org/software/automake/
-[flac]: http://flac.sourceforge.net/
+[brew]: http://brew.sh/
 [github]: https://github.com/erikd/libsndfile/
-[libogg]: http://xiph.org/ogg/
-[libtool]: http://www.gnu.org/software/libtool/
-[libvorbis]: http://www.vorbis.com/
-[pkgconfig]: http://www.freedesktop.org/wiki/Software/pkg-config
-[python]: http://www.python.org/
 [BuildingForAndroid]: https://github.com/erikd/libsndfile/blob/master/Building-for-Android.md
