@@ -22,8 +22,8 @@ system is documented below.
 
 Setting up a build environment for libsndfile on Debian or Ubuntu is as simple as:
 ```
-sudo apt install autoconf autogen automake build-essentials libflac-dev \
-    libogg-dev libtool libvorbis-dev pkg-config
+sudo apt install autoconf autogen automake build-essential libflac-dev \
+    libogg-dev libtool libvorbis-dev pkg-config python
 ````
 For other Linux distributions or any of the *BSDs, the setup should be similar
 although the package install tools and package names may be slightly different.
