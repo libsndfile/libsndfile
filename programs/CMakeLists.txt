@@ -4,15 +4,15 @@ include_directories(${CMAKE_SOURCE_DIR}/src/G72x)
 include_directories(${CMAKE_SOURCE_DIR}/src/GSM610)
 
 set(PROGRAMS 	sndfile-cmp 
-	     	sndfile-concat
-		sndfile-convert
-		sndfile-deinterleave
-		sndfile-interleave
-		sndfile-metadata-get
-		sndfile-metadata-set
-		sndfile-salvage
-		sndfile-play
-		)
+				sndfile-concat
+				sndfile-convert
+				sndfile-deinterleave
+				sndfile-interleave
+				sndfile-metadata-get
+				sndfile-metadata-set
+				sndfile-salvage
+				sndfile-play
+	)
 
 foreach (program ${PROGRAMS})
 	add_executable(${program} 
@@ -25,3 +25,7 @@ foreach (program ${PROGRAMS})
 				RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 				)
 endforeach ()
+
+if (WIN32)
+	target_link_libraries(sndfile-play Winmm.lib)
+endif ()
