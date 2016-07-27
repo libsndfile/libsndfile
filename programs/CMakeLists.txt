@@ -15,7 +15,7 @@ set(PROGRAMS 	sndfile-cmp
 	)
 
 foreach (program ${PROGRAMS})
-	add_executable(${program} 
+	add_executable(${program}
 			${CMAKE_SOURCE_DIR}/programs/common.c 
 			${CMAKE_SOURCE_DIR}/programs/${program}.c
 			)

@@ -65,9 +65,17 @@ add_library(sndfile SHARED
 	$<TARGET_OBJECTS:GSM610>
 	)
 
-target_link_libraries (sndfile LINK_PRIVATE ${EXTERNAL_XIPH_LIBS} LINK_PUBLIC m)
+add_library(sndfile_static STATIC
+	$<TARGET_OBJECTS:source> 
+	$<TARGET_OBJECTS:ALAC>
+	$<TARGET_OBJECTS:G72x>
+	$<TARGET_OBJECTS:GSM610>
+	)
 
-set_target_properties (sndfile
+target_link_libraries (sndfile LINK_PRIVATE ${EXTERNAL_XIPH_LIBS} LINK_PUBLIC m)
+target_link_libraries (sndfile_static LINK_PRIVATE ${EXTERNAL_XIPH_LIBS} LINK_PUBLIC m)
+
+set_target_properties (sndfile sndfile_static
 			PROPERTIES
 			VERSION ${LIB_VERSION}
 			SOVERSION ${LIB_VERSION_MAJOR}
