@@ -30,3 +30,11 @@ if (WIN32)
 	target_link_libraries(sndfile-play Winmm.lib)
 endif ()
 
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+	# Should probably check if libasound is available instead of just blindly
+	# linking it.
+	target_link_libraries(sndfile-play asound)
+endif ()
+
+# TODO : What about the *BSD sndio libs?
+
