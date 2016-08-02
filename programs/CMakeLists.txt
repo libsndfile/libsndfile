@@ -4,14 +4,14 @@ include_directories(${CMAKE_SOURCE_DIR}/src/G72x)
 include_directories(${CMAKE_SOURCE_DIR}/src/GSM610)
 
 set(PROGRAMS 	sndfile-cmp 
-				sndfile-concat
-				sndfile-convert
-				sndfile-deinterleave
-				sndfile-interleave
-				sndfile-metadata-get
-				sndfile-metadata-set
-				sndfile-salvage
-				sndfile-play
+		sndfile-concat
+		sndfile-convert
+		sndfile-deinterleave
+		sndfile-interleave
+		sndfile-metadata-get
+		sndfile-metadata-set
+		sndfile-salvage
+		sndfile-play
 	)
 
 foreach (program ${PROGRAMS})
@@ -31,9 +31,11 @@ if (WIN32)
 endif ()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-	# Should probably check if libasound is available instead of just blindly
-	# linking it.
-	target_link_libraries(sndfile-play asound)
+	FIND_PACKAGE(asound)
+	if (${ASOUND_FOUND})
+		include_directories(${ASOUND_INCLUDE_DIRS})
+		target_link_libraries(sndfile-play ${ASOUND_LIBRARIES})
+	endif ()
 endif ()
 
 # TODO : What about the *BSD sndio libs?
