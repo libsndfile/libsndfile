@@ -183,7 +183,7 @@ static void Reflection_coefficients (
 	 */
 
 	if (L_ACF [0] == 0)
-	{	memset (r, 0, 8) ;
+	{	memset (r, 0, 8 * sizeof (r [0])) ;
 		return ;
 		}
 
