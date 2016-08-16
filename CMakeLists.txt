@@ -6,13 +6,9 @@
 cmake_minimum_required (VERSION 3.0.0)
 
 # Set software information
-set(PROJECT_NAME libsndfile)
-SET(LIB_VERSION_MAJOR 1)
-SET(LIB_VERSION_MINOR 0)
-SET(LIB_VERSION_PATCH 28pre1)
-SET(LIB_VERSION ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH})
-set(LIB_VERSION 1.0.28pre1)
-project(${PROJECT_NAME})
+project(libsndfile VERSION 1.0.28)
+SET(LIB_VERSION_PATCH pre1)
+set(LIB_VERSION ${PROJECT_VERSION}pre1)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/library-build)
@@ -77,8 +73,7 @@ target_link_libraries (sndfile_static LINK_PRIVATE ${EXTERNAL_XIPH_LIBS} LINK_PU
 
 set_target_properties (sndfile sndfile_static
 			PROPERTIES
-			VERSION ${LIB_VERSION}
-			SOVERSION ${LIB_VERSION_MAJOR}
+			VERSION ${PROJECT_VERSION}
 			LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
 			POSITION_INDEPENDENT_CODE TRUE
 			)
