@@ -1,4 +1,5 @@
 *.8svx
+/*.a
 *.aif
 *.aifc
 *.aiff
@@ -6,9 +7,11 @@
 *.bin
 *.caf
 *.cm*
+*.dll
 *.exe
 *.flac
 *.la
+*.lib
 *.lo
 *.loT
 *.o
@@ -21,6 +24,7 @@
 *.sd2
 *.sds
 *.svx
+/*.so*
 *.w64
 *.wav
 *.wavex
