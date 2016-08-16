@@ -1,6 +1,7 @@
 include (CheckFunctionExists)
 include (CheckIncludeFile)
 include (CheckLibraryExists)
+include (CheckSymbolExists)
 include (CheckTypeSize)
 include (TestBigEndian)
 
@@ -86,6 +87,8 @@ check_function_exists(fmod          	HAVE_FMOD)
 check_function_exists(lrint         	HAVE_LRINT)
 check_function_exists(lrintf        	HAVE_LRINTF)
 check_function_exists(lround        	HAVE_LROUND)
+
+check_symbol_exists (S_IRGRP sys/stat.h HAVE_DECL_S_IRGRP)
 
 test_big_endian(WORDS_BIGENDIAN)
 if (WORDS_BIGENDIAN)
