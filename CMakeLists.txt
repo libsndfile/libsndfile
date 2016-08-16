@@ -77,9 +77,7 @@ target_link_libraries (sndfile_static LINK_PRIVATE ${EXTERNAL_XIPH_LIBS} LINK_PU
 set_target_properties (sndfile sndfile_static
 			PROPERTIES
 			VERSION ${PROJECT_VERSION}
-			LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/src/.libs
-			POSITION_INDEPENDENT_CODE TRUE
-			)
+			POSITION_INDEPENDENT_CODE TRUE)
 
 add_subdirectory(programs)
 if (ENABLE_TESTING)
