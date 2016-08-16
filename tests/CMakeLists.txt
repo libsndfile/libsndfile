@@ -46,9 +46,9 @@ set(TESTS	aiff_rw_test
 		write_read_test
 	)
 
-enable_testing()
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTS})
-set(CMAKE_CTEST_COMMAND ctest -V)
+if (NOT WIN32)
+	list (REMOVE_ITEM TESTS win32_ordinal_test win32_test)
+endif ()
 
 foreach (test ${TESTS})
 	add_executable(${test} 
@@ -63,5 +63,4 @@ foreach (test ${TESTS})
 		add_test(NAME ${test} 
 		 	 COMMAND ${test} all)
 	endif()
-	add_dependencies(check ${test})
 endforeach ()
