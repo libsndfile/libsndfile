@@ -30,6 +30,10 @@ if (${ALSA_FOUND})
 	target_include_directories(sndfile-play PRIVATE ${ALSA_INCLUDE_DIRS})
 	target_link_libraries(sndfile-play PRIVATE ${ALSA_LIBRARIES})
 endif ()
+if (${SNDIO_FOUND})
+	target_include_directories(sndfile-play PRIVATE ${SNDIO_INCLUDE_DIRS})
+	target_link_libraries(sndfile-play PRIVATE ${SNDIO_LIBRARIES})
+endif ()
 
 
 # TODO : What about the *BSD sndio libs?
