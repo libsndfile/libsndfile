@@ -58,15 +58,10 @@ foreach (test ${TESTS})
 			${CMAKE_SOURCE_DIR}/tests/dft_cmp.c
 			)
 	target_link_libraries(${test} sndfile)
-	set_target_properties(${test}
-				PROPERTIES
-				RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-				)
 	# bit jenky, should be an easier way to exclude
 	if (NOT (${test} MATCHES stdin_test OR ${test} MATCHES "stdout_test"))
 		add_test(NAME ${test} 
-		 	 COMMAND ${test} all
-		 	 WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+		 	 COMMAND ${test} all)
 	endif()
 	add_dependencies(check ${test})
 endforeach ()
