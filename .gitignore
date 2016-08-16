@@ -6,14 +6,7 @@
 *.au
 *.bin
 *.caf
-/*.cmake
-/src/*.cmake
-/src/ALAC/*.cmake
-/src/G72x/*.cmake
-/src/GSM610/*.cmake
-/tests/*.cmake
-/programs/*.cmake
-!src/config.h.cmake
+*.cm*
 *.dll
 *.exe
 *.flac
