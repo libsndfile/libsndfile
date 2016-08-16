@@ -20,10 +20,6 @@ foreach (program ${PROGRAMS})
 			${CMAKE_SOURCE_DIR}/programs/${program}.c
 			)
 	target_link_libraries(${program} sndfile)
-	set_target_properties (${program} 	
-				PROPERTIES
-				RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-				)
 endforeach ()
 
 if (WIN32)
