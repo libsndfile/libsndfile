@@ -5,6 +5,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 #include "gsm610_priv.h"
@@ -182,7 +183,7 @@ static void Reflection_coefficients (
 	 */
 
 	if (L_ACF [0] == 0)
-	{	for (i = 8 ; i-- ; *r++ = 0) ;
+	{	memset (r, 0, 8 * sizeof (r [0])) ;
 		return ;
 		}
 

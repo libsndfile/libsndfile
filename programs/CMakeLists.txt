@@ -19,24 +19,22 @@ foreach (program ${PROGRAMS})
 			${CMAKE_SOURCE_DIR}/programs/common.c 
 			${CMAKE_SOURCE_DIR}/programs/${program}.c
 			)
-	target_link_libraries(${program} sndfile)
-	set_target_properties (${program} 	
-				PROPERTIES
-				RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
-				)
+	target_link_libraries(${program} PRIVATE sndfile)
 endforeach ()
 
 if (WIN32)
-	target_link_libraries(sndfile-play Winmm.lib)
+	target_link_libraries(sndfile-play PRIVATE Winmm.lib)
 endif ()
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-	FIND_PACKAGE(asound)
-	if (${ASOUND_FOUND})
-		include_directories(${ASOUND_INCLUDE_DIRS})
-		target_link_libraries(sndfile-play ${ASOUND_LIBRARIES})
-	endif ()
+if (${ALSA_FOUND})
+	target_include_directories(sndfile-play PRIVATE ${ALSA_INCLUDE_DIRS})
+	target_link_libraries(sndfile-play PRIVATE ${ALSA_LIBRARIES})
 endif ()
+if (${SNDIO_FOUND})
+	target_include_directories(sndfile-play PRIVATE ${SNDIO_INCLUDE_DIRS})
+	target_link_libraries(sndfile-play PRIVATE ${SNDIO_LIBRARIES})
+endif ()
+
 
 # TODO : What about the *BSD sndio libs?
 
