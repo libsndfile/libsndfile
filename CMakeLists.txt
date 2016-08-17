@@ -59,6 +59,10 @@ set_target_properties (sndfile sndfile_static
 			PROPERTIES
 			VERSION ${PROJECT_VERSION}
 			POSITION_INDEPENDENT_CODE TRUE)
+target_include_directories (sndfile PUBLIC
+		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories (sndfile_static PUBLIC
+		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_subdirectory(programs)
 add_subdirectory(tests EXCLUDE_FROM_ALL)
