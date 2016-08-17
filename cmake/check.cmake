@@ -119,7 +119,7 @@ endif ()
 
 if (CMAKE_COMPILER_IS_GNUCC OR (CMAKE_C_COMPILER_ID MATCHES "Clang"))
 	set (COMPILER_IS_GCC 1)
-	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=gnu99 -Wall -Wextra" CACHE STRING "" FORCE)
-	set (CMAKE_CXX__FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=gnu99 -Wall -Wextra" CACHE STRING "" FORCE)
+	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -Wall -Wextra" CACHE STRING "" FORCE)
+	set (CMAKE_CXX__FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra" CACHE STRING "" FORCE)
 endif ()
 
