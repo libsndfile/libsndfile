@@ -5,9 +5,6 @@
 # lowest version supporting portable endianness check
 cmake_minimum_required (VERSION 3.0.0)
 
-# Options
-option (ENABLE_TESTING "Enable testing" OFF)
-
 # Set software information
 project(libsndfile VERSION 1.0.28)
 SET(LIB_VERSION_PATCH pre1)
@@ -64,9 +61,4 @@ set_target_properties (sndfile sndfile_static
 			POSITION_INDEPENDENT_CODE TRUE)
 
 add_subdirectory(programs)
-if (ENABLE_TESTING)
-    enable_testing()
-    add_subdirectory(tests)
-else ()
-    add_subdirectory(tests EXCLUDE_FROM_ALL)
-endif ()
+add_subdirectory(tests EXCLUDE_FROM_ALL)
