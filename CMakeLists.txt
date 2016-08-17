@@ -3,7 +3,7 @@
 #
 
 # lowest version supporting portable endianness check
-cmake_minimum_required (VERSION 3.0.0)
+cmake_minimum_required (VERSION 3.1.3)
 
 # Options
 option (ENABLE_TESTING "Enable testing" OFF)
