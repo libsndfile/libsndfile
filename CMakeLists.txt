@@ -2,7 +2,7 @@
 # Initial CMake and project setup
 #
 
-# lowest version supporting portable endianness check
+# lowest version supporting C_STANDARD property
 cmake_minimum_required (VERSION 3.1.3)
 
 # Set software information
