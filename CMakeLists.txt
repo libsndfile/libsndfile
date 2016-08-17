@@ -32,7 +32,7 @@ add_definitions(-DHAVE_EXTERNAL_XIPH_LIBS=0)
 # Setup configuration
 #
 
-configure_file(src/config.h.cmake src/config.h)
+configure_file(${CMAKE_SOURCE_DIR}/src/config.h.cmake ${CMAKE_SOURCE_DIR}/src/config.h)
 configure_file(${CMAKE_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_SOURCE_DIR}/src/sndfile.h)
 
 #
@@ -65,8 +65,8 @@ set_target_properties (sndfile sndfile_static
 
 add_subdirectory(programs)
 if (ENABLE_TESTING)
-enable_testing()
-add_subdirectory(tests)
+    enable_testing()
+    add_subdirectory(tests)
 else ()
-add_subdirectory(tests EXCLUDE_FROM_ALL)
+    add_subdirectory(tests EXCLUDE_FROM_ALL)
 endif ()
