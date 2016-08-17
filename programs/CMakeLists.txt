@@ -1,8 +1,3 @@
-include_directories(${CMAKE_SOURCE_DIR}/src)
-include_directories(${CMAKE_SOURCE_DIR}/src/ALAC)
-include_directories(${CMAKE_SOURCE_DIR}/src/G72x)
-include_directories(${CMAKE_SOURCE_DIR}/src/GSM610)
-
 set(PROGRAMS 	sndfile-cmp 
 		sndfile-concat
 		sndfile-convert
