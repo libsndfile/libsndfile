@@ -422,7 +422,7 @@ wavlike_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 						psf_log_printf (psf, "  Extra Bytes   : %d (should be 2)\n", wav_fmt->g72x.extrabytes) ;
 					else
 						psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->g72x.extrabytes) ;
-						psf_log_printf (psf, "  Aux Blk Size  : %d\n", wav_fmt->g72x.auxblocksize) ;
+					psf_log_printf (psf, "  Aux Blk Size  : %d\n", wav_fmt->g72x.auxblocksize) ;
 					}
 				else if (fmtsize == 18)
 				{	bytesread += psf_binheader_readf (psf, "2", &(wav_fmt->g72x.extrabytes)) ;

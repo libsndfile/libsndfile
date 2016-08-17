@@ -32,7 +32,7 @@ add_definitions(-DHAVE_EXTERNAL_XIPH_LIBS=0)
 # Setup configuration
 #
 
-configure_file(src/config.h.cmake src/config.h)
+configure_file(${CMAKE_SOURCE_DIR}/src/config.h.cmake ${CMAKE_SOURCE_DIR}/src/config.h)
 configure_file(${CMAKE_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_SOURCE_DIR}/src/sndfile.h)
 
 #

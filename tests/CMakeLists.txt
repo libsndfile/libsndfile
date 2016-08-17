@@ -50,6 +50,10 @@ if (NOT WIN32)
 	list (REMOVE_ITEM TESTS win32_ordinal_test win32_test)
 endif ()
 
+enable_testing()
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} DEPENDS ${TESTS})
+set(CMAKE_CTEST_COMMAND ctest -V)
+
 foreach (test ${TESTS})
 	add_executable(${test} 
 			${CMAKE_SOURCE_DIR}/tests/${test}
@@ -60,7 +64,7 @@ foreach (test ${TESTS})
 	target_link_libraries(${test} sndfile)
 	# bit jenky, should be an easier way to exclude
 	if (NOT (${test} MATCHES stdin_test OR ${test} MATCHES "stdout_test"))
-		add_test(NAME ${test} 
-		 	 COMMAND ${test} all)
+		add_test(NAME ${test}  COMMAND ${test} all)
 	endif()
+    add_dependencies(check ${test})
 endforeach ()
