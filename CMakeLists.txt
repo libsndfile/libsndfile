@@ -23,7 +23,9 @@ include(${CMAKE_MODULE_PATH}/check.cmake)
 #
 
 include(${CMAKE_MODULE_PATH}/external_libs.cmake)
-add_definitions(-DHAVE_EXTERNAL_XIPH_LIBS=0)
+if (OGG_FOUND AND VORBIS_FOUND AND FLAC_FOUND)
+set (HAVE_EXTERNAL_XIPH_LIBS 1)
+endif ()
 
 #
 # Setup configuration
@@ -52,8 +54,10 @@ add_library(sndfile_static STATIC
 	$<TARGET_OBJECTS:GSM610>
 	)
 
-target_link_libraries (sndfile LINK_PRIVATE ${EXTERNAL_XIPH_LIBS} LINK_PUBLIC m)
-target_link_libraries (sndfile_static LINK_PRIVATE ${EXTERNAL_XIPH_LIBS} LINK_PUBLIC m)
+message ("VORBIS_INCLUDE_DIR: ${VORBIS_INCLUDE_DIR}")
+message ("EXTERNAL_XIPH_LIBS: ${EXTERNAL_XIPH_LIBS}")
+target_link_libraries (sndfile PUBLIC ${EXTERNAL_XIPH_LIBS} m)
+target_link_libraries (sndfile_static PUBLIC ${EXTERNAL_XIPH_LIBS} m)
 
 set_target_properties (sndfile sndfile_static
 			PROPERTIES
