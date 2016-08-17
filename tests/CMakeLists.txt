@@ -1,8 +1,3 @@
-include_directories(${CMAKE_SOURCE_DIR}/src)
-include_directories(${CMAKE_SOURCE_DIR}/src/ALAC)
-include_directories(${CMAKE_SOURCE_DIR}/src/G72x)
-include_directories(${CMAKE_SOURCE_DIR}/src/GSM610)
-
 set(TESTS	aiff_rw_test
 		alaw_test 
 		benchmark 
