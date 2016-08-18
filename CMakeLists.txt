@@ -23,9 +23,6 @@ include(${CMAKE_MODULE_PATH}/check.cmake)
 #
 
 include(${CMAKE_MODULE_PATH}/external_libs.cmake)
-if (OGG_FOUND AND VORBIS_FOUND AND FLAC_FOUND)
-set (HAVE_EXTERNAL_XIPH_LIBS 1)
-endif ()
 
 #
 # Setup configuration
