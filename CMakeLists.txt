@@ -51,8 +51,6 @@ add_library(sndfile_static STATIC
 	$<TARGET_OBJECTS:GSM610>
 	)
 
-message ("VORBIS_INCLUDE_DIR: ${VORBIS_INCLUDE_DIR}")
-message ("EXTERNAL_XIPH_LIBS: ${EXTERNAL_XIPH_LIBS}")
 target_link_libraries (sndfile PUBLIC ${EXTERNAL_XIPH_LIBS} m)
 target_link_libraries (sndfile_static PUBLIC ${EXTERNAL_XIPH_LIBS} m)
 
