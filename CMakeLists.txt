@@ -56,8 +56,9 @@ target_link_libraries (sndfile_static PUBLIC ${EXTERNAL_XIPH_LIBS} m)
 
 set_target_properties (sndfile sndfile_static
 			PROPERTIES
-			VERSION ${PROJECT_VERSION})
-
+			SOVERSION ${PROJECT_VERSION_MAJOR}
+			VERSION ${PROJECT_VERSION}
+			POSITION_INDEPENDENT_CODE TRUE)
 target_include_directories (sndfile PUBLIC
 		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_include_directories (sndfile_static PUBLIC
