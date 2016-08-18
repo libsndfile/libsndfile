@@ -68,8 +68,8 @@ target_include_directories (sndfile_static PUBLIC
 
 add_subdirectory(programs)
 if (ENABLE_TESTING)
-enable_testing()
-add_subdirectory(tests)
+    enable_testing()
+    add_subdirectory(tests)
 else ()
-add_subdirectory(tests EXCLUDE_FROM_ALL)
+    add_subdirectory(tests EXCLUDE_FROM_ALL)
 endif ()
