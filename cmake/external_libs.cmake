@@ -1,3 +1,4 @@
+# will also check for Ogg libraries
 find_package(Vorbis)
 if (${VORBIS_FOUND})
     INCLUDE_DIRECTORIES(${VORBIS_INCLUDE_DIR})
@@ -55,3 +56,7 @@ elseif ($(ENABLE_EXTERNAL_LIBS))
     )
 endif ()
 set(EXTERNAL_XIPH_LIBS ${EXTERNAL_XIPH_LIBS} ${FLAC_LIBRARIES})
+
+if (OGG_FOUND AND VORBIS_FOUND AND FLAC_FOUND)
+    set(HAVE_EXTERNAL_XIPH_LIBS 1)
+endif ()
