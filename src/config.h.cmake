@@ -67,11 +67,11 @@
 /* Define to 1 if you have the `gettimeofday' function. */
 #cmakedefine01 HAVE_GETTIMEOFDAY
 
-/* Define to 1 if you have the `gmtime' function. */
-#cmakedefine01 HAVE_GMTIME
+/* Define if you have the `gmtime' function. */
+#cmakedefine HAVE_GMTIME
 
-/* Define to 1 if you have the `gmtime_r' function. */
-#cmakedefine01 HAVE_GMTIME_R
+/* Define if you have the `gmtime_r' function. */
+#cmakedefine HAVE_GMTIME_R
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #cmakedefine01 HAVE_INTTYPES_H
