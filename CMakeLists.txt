@@ -5,6 +5,10 @@
 # lowest version supporting C_STANDARD property
 cmake_minimum_required (VERSION 3.1.3)
 
+# Options
+option (BUILD_SHARED_LIBS "Build shared libraries" OFF)
+option (ENABLE_TESTING "Enable testing" OFF)
+
 # Set software information
 project(libsndfile VERSION 1.0.28)
 SET(LIB_VERSION_PATCH pre1)
@@ -37,32 +41,20 @@ configure_file(${CMAKE_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_SOURCE_DIR}/src/sndf
 
 add_subdirectory(src)
 
-add_library(sndfile SHARED
+add_library(sndfile
 	$<TARGET_OBJECTS:source> 
 	$<TARGET_OBJECTS:ALAC>
 	$<TARGET_OBJECTS:G72x>
 	$<TARGET_OBJECTS:GSM610>
 	)
 
-add_library(sndfile_static STATIC
-	$<TARGET_OBJECTS:source> 
-	$<TARGET_OBJECTS:ALAC>
-	$<TARGET_OBJECTS:G72x>
-	$<TARGET_OBJECTS:GSM610>
-	)
+target_link_libraries (sndfile PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE m)
 
-target_link_libraries (sndfile PUBLIC ${EXTERNAL_XIPH_LIBS} m)
-target_link_libraries (sndfile_static PUBLIC ${EXTERNAL_XIPH_LIBS} m)
-
-set_target_properties (sndfile sndfile_static
+set_target_properties (sndfile
 			PROPERTIES
-			SOVERSION ${PROJECT_VERSION_MAJOR}
-			VERSION ${PROJECT_VERSION}
-			POSITION_INDEPENDENT_CODE TRUE)
-target_include_directories (sndfile PUBLIC
-		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_include_directories (sndfile_static PUBLIC
-		PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+			VERSION ${PROJECT_VERSION})
+
+target_include_directories (sndfile PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_subdirectory(programs)
 if (ENABLE_TESTING)
