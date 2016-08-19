@@ -82,11 +82,11 @@
 /* Define to 1 if you have the <locale.h> header file. */
 #cmakedefine01 HAVE_LOCALE_H
 
-/* Define to 1 if you have the `localtime' function. */
-#cmakedefine01 HAVE_LOCALTIME
+/* Define if you have the `localtime' function. */
+#cmakedefine HAVE_LOCALTIME
 
-/* Define to 1 if you have the `localtime_r' function. */
-#cmakedefine01 HAVE_LOCALTIME_R
+/* Define if you have the `localtime_r' function. */
+#cmakedefine HAVE_LOCALTIME_R
 
 /* Define if you have C99's lrint function. */
 #cmakedefine01 HAVE_LRINT
