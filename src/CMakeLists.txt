@@ -1,3 +1,7 @@
+# Public libsndfile headers
+set (include_HEADERS sndfile.hh)
+set (nodist_include_HEADERS sndfile.h)
+
 # Private libsndfile headers
 set (noinst_HEADERS common.h sfconfig.h sfendian.h wavlike.h sf_unistd.h ogg.h chanmap.h)
 
@@ -42,15 +46,18 @@ source_group ("ALAC" FILES ${libalac_SOURCES})
 
 # TODO: Private symbols
 
-set (libsndfile_SOURCES ${COMMON} ${FILESPECIFIC} ${noinst_HEADERS} ${libgsm_SOURCES} ${libg72x_SOURCES} ${libalac_SOURCES})
+# Headers to be installed on target machine
+set (libsndfile_PUBLIC_HEADERS ${include_HEADERS} ${nodist_include_HEADERS})
+set (libsndfile_SOURCES ${COMMON} ${FILESPECIFIC} ${noinst_HEADERS} ${libgsm_SOURCES} ${libg72x_SOURCES} ${libalac_SOURCES} ${libsndfile_PUBLIC_HEADERS})
 
 add_library(sndfile	${libsndfile_SOURCES})
 
 target_link_libraries (sndfile PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE m)
-
+set_property(TARGET sndfile PROPERTY C_STANDARD 99)
 set_target_properties (sndfile
 			PROPERTIES
 			SOVERSION ${PROJECT_VERSION_MAJOR}
-			VERSION ${PROJECT_VERSION})
+			VERSION ${PROJECT_VERSION}
+			PUBLIC_HEADER "${libsndfile_PUBLIC_HEADERS}")
 target_include_directories (sndfile PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
