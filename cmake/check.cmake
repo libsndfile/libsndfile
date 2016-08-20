@@ -35,7 +35,6 @@ check_include_file(sys/time.h		HAVE_SYS_TIME_H)
 check_include_file(sys/types.h      HAVE_SYS_TYPES_H)
 check_include_file(sys/wait.h       HAVE_SYS_WAIT_H)
 check_include_file(unistd.h         HAVE_UNISTD_H)
-
 check_type_size(int64_t                 SIZEOF_INT64_T)
 check_type_size(double                  SIZEOF_DOUBLE)
 check_type_size(float                   SIZEOF_FLOAT)
@@ -44,13 +43,37 @@ check_type_size(loff_t                  SIZEOF_LOFF_T)
 check_type_size(long                    SIZEOF_LONG)
 check_type_size(long\ long              SIZEOF_LONG_LONG)
 check_type_size(offt64_t                SIZEOF_OFF64_T)
-check_type_size(${TYPEOF_SF_COUNT_T}    SIZEOF_SF_COUNT_T)
 check_type_size(off_t                   SIZEOF_OFF_T)
 check_type_size(short                   SIZEOF_SHORT)
 check_type_size(size_t                  SIZEOF_SIZE_T)
 check_type_size(ssize_t                 SIZEOF_SSIZE_T)
 check_type_size(void*                   SIZEOF_VOIDP)
 check_type_size(wchar_t                 SIZEOF_WCHAR_T)
+
+if (WIN32)
+set (TYPEOF_SF_COUNT_T "__int64")
+set (SF_COUNT_MAX "0x7FFFFFFFFFFFFFFFLL")
+set (SIZEOF_SF_COUNT_T 8)
+else ()
+
+if ((SIZEOF_OFF_T EQUAL 8) OR (SIZEOF_LOFF_T EQUAL 8) OR (SIZEOF_OFF64_T EQUAL 8))
+set (TYPEOF_SF_COUNT_T "int64_t")
+set (SF_COUNT_MAX "0x7FFFFFFFFFFFFFFFLL")
+set (SIZEOF_SF_COUNT_T 8)
+else ()
+# TODO: Check 64-bit support
+endif ()
+
+# Fallback to long
+if (NOT TYPEOF_SF_COUNT_T)
+set (TYPEOF_SF_COUNT_T "long")
+set (SF_COUNT_MAX "0x7FFFFFFF")
+set (SIZEOF_SF_COUNT_T 4)
+endif ()
+
+check_type_size(${TYPEOF_SF_COUNT_T} SIZEOF_SF_COUNT_T)
+
+endif ()
 
 find_library (M_LIBRARY m)
 # M is found
