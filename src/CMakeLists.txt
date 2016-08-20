@@ -11,7 +11,10 @@ set (COMMON
 	double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c
 	interleave.c strings.c dither.c cart.c broadcast.c audio_detect.c
  	ima_oki_adpcm.c ima_oki_adpcm.h alac.c chunk.c ogg.c chanmap.c
-	windows.c id3.c)
+	id3.c)
+if (WIN32)
+list (APPEND COMMON windows.c)
+endif ()
 	
 # File specific libsndfile sources
 set (FILESPECIFIC sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c
