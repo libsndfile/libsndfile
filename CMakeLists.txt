@@ -52,8 +52,8 @@ target_link_libraries (sndfile PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE m)
 
 set_target_properties (sndfile
 			PROPERTIES
+			SOVERSION ${PROJECT_VERSION_MAJOR}
 			VERSION ${PROJECT_VERSION})
-
 target_include_directories (sndfile PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_subdirectory(programs)
