@@ -1,75 +1,56 @@
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# Private libsndfile headers
+set (noinst_HEADERS common.h sfconfig.h sfendian.h wavlike.h sf_unistd.h ogg.h chanmap.h)
 
-include_directories(ALAC)
-include_directories(G72x)
-include_directories(GSM610)
+# Common libsndfile sources
+set (COMMON 
+	common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c
+	double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c
+	interleave.c strings.c dither.c cart.c broadcast.c audio_detect.c
+ 	ima_oki_adpcm.c ima_oki_adpcm.h alac.c chunk.c ogg.c chanmap.c
+	windows.c id3.c)
+	
+# File specific libsndfile sources
+set (FILESPECIFIC sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c
+		macos.c mat4.c mat5.c nist.c paf.c pvf.c raw.c rx2.c sd2.c
+		sds.c svx.c txw.c voc.c wve.c w64.c wavlike.c wav.c xi.c mpc2k.c rf64.c
+		ogg_vorbis.c ogg_speex.c ogg_pcm.c ogg_opus.c)
+	
+# GSM610 sources	
+set (libgsm_SOURCES GSM610/config.h GSM610/gsm.h GSM610/gsm610_priv.h
+		GSM610/add.c GSM610/code.c GSM610/decode.c GSM610/gsm_create.c
+		GSM610/gsm_decode.c GSM610/gsm_destroy.c GSM610/gsm_encode.c
+		GSM610/gsm_option.c GSM610/long_term.c GSM610/lpc.c GSM610/preprocess.c
+		GSM610/rpe.c GSM610/short_term.c GSM610/table.c)
+source_group ("GSM610" FILES ${libgsm_SOURCES})
 
-add_subdirectory(ALAC)
-add_subdirectory(G72x)
-add_subdirectory(GSM610)
+# G72x sources
+set (libg72x_SOURCES G72x/g72x.h G72x/g72x_priv.h
+		G72x/g721.c G72x/g723_16.c G72x/g723_24.c G72x/g723_40.c G72x/g72x.c)
+source_group ("G72x" FILES ${libg72x_SOURCES})
 
-set (LIBSNDFILE_SOURCE_FILES
-	aiff.c
-	alac.c
-	alaw.c
-	au.c
-	audio_detect.c
-	avr.c
-	broadcast.c
-	caf.c
-	cart.c
-	chanmap.c
-	chunk.c
-	command.c
-	common.c
-	dither.c
-	double64.c
-	dwd.c
-	dwvw.c
-	file_io.c
-	flac.c
-	float32.c
-	g72x.c
-	gsm610.c
-	htk.c
-	id3.c
-	ima_adpcm.c
-	ima_oki_adpcm.c
-	interleave.c
-	ircam.c
-	macos.c
-	mat4.c
-	mat5.c
-	mpc2k.c
-	ms_adpcm.c
-	nist.c
-	ogg.c
-	ogg_opus.c
-	ogg_pcm.c
-	ogg_speex.c
-	ogg_vorbis.c
-	paf.c
-	pcm.c
-	pvf.c
-	raw.c
-	rf64.c
-	rx2.c
-	sd2.c
-	sds.c
-	sndfile.c
-	strings.c
-	svx.c
-	txw.c
-	ulaw.c
-	voc.c
-	vox_adpcm.c
-	w64.c
-	wav.c
-	wavlike.c
-	windows.c
-	wve.c
-	xi.c
-	)
+# ALAC sources
 
-add_library(source OBJECT ${LIBSNDFILE_SOURCE_FILES})
+set (libalac_SOURCES ALAC/ALACAudioTypes.h ALAC/ALACBitUtilities.h
+		ALAC/EndianPortable.h ALAC/aglib.h ALAC/dplib.h ALAC/matrixlib.h
+		ALAC/alac_codec.h ALAC/shift.h
+		ALAC/ALACBitUtilities.c ALAC/ag_dec.c
+		ALAC/ag_enc.c ALAC/dp_dec.c ALAC/dp_enc.c ALAC/matrix_dec.c
+		ALAC/matrix_enc.c ALAC/alac_decoder.c ALAC/alac_encoder.c)
+source_group ("ALAC" FILES ${libalac_SOURCES})
+		
+# TODO: Generate and add version-metadata.rc
+
+# TODO: Private symbols
+
+set (libsndfile_SOURCES ${COMMON} ${FILESPECIFIC} ${noinst_HEADERS} ${libgsm_SOURCES} ${libg72x_SOURCES} ${libalac_SOURCES})
+
+add_library(sndfile	${libsndfile_SOURCES})
+
+target_link_libraries (sndfile PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE m)
+
+set_target_properties (sndfile
+			PROPERTIES
+			SOVERSION ${PROJECT_VERSION_MAJOR}
+			VERSION ${PROJECT_VERSION})
+target_include_directories (sndfile PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
