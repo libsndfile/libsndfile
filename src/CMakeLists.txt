@@ -51,8 +51,7 @@ set (libsndfile_PUBLIC_HEADERS ${include_HEADERS} ${nodist_include_HEADERS})
 set (libsndfile_SOURCES ${COMMON} ${FILESPECIFIC} ${noinst_HEADERS} ${libgsm_SOURCES} ${libg72x_SOURCES} ${libalac_SOURCES} ${libsndfile_PUBLIC_HEADERS})
 
 add_library(sndfile	${libsndfile_SOURCES})
-
-target_link_libraries (sndfile PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE m)
+target_link_libraries (sndfile PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE ${M_LIBRARY})
 set_property(TARGET sndfile PROPERTY C_STANDARD 99)
 set_target_properties (sndfile
 			PROPERTIES
