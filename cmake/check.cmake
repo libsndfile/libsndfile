@@ -52,9 +52,17 @@ check_type_size(ssize_t                 SIZEOF_SSIZE_T)
 check_type_size(void*                   SIZEOF_VOIDP)
 check_type_size(wchar_t                 SIZEOF_WCHAR_T)
 
-check_library_exists (m floor "" HAVE_LIBM)
-if (HAVE_LIBM)
-list (APPEND CMAKE_REQUIRED_LIBRARIES m)
+find_library (M_LIBRARY m)
+# M is found
+if (M_LIBRARY)
+# Check if he need to link 'm' for math functions
+check_library_exists (m floor "" LIBM_REQUIRED)
+if (LIBM_REQUIRED)
+list (APPEND CMAKE_REQUIRED_LIBRARIES ${M_LIBRARY})
+# We don't to link 'm', clean up
+else ()
+unset (M_LIBRARY)
+endif ()
 endif ()
 
 check_library_exists (sqlite3 sqlite3_close "" HAVE_SQLITE3)
