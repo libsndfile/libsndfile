@@ -58,6 +58,7 @@ endif (WIN32)
 
 add_library(sndfile	${libsndfile_SOURCES})
 target_link_libraries (sndfile PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE ${M_LIBRARY})
+endif ()
 set_property(TARGET sndfile PROPERTY C_STANDARD 99)
 set_target_properties (sndfile
 			PROPERTIES
