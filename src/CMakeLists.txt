@@ -57,7 +57,7 @@ list (APPEND libsndfile_SOURCES ${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
 endif (WIN32)
 
 add_library(sndfile	${libsndfile_SOURCES})
-if (NOT DEFINED M_LIBRARY)
+if (M_LIBRARY)
 target_link_libraries (sndfile PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE ${M_LIBRARY})
 endif ()
 set_property(TARGET sndfile PROPERTY C_STANDARD 99)
