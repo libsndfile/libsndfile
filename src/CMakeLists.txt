@@ -62,3 +62,6 @@ set_target_properties (sndfile
 			VERSION ${PROJECT_VERSION}
 			PUBLIC_HEADER "${libsndfile_PUBLIC_HEADERS}")
 target_include_directories (sndfile PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+if (COMPILER_IS_GCC)
+	target_compile_options(sndfile PRIVATE -Wall -Wextra)
+endif ()
