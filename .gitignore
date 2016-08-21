@@ -14,6 +14,7 @@
 /tests/*.cmake
 /programs/*.cmake
 !src/config.h.cmake
+!*.in.cmake
 *.dll
 *.exe
 *.flac

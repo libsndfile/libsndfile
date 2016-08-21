@@ -34,6 +34,9 @@ include(${CMAKE_MODULE_PATH}/external_libs.cmake)
 
 configure_file(${CMAKE_SOURCE_DIR}/src/config.h.cmake ${CMAKE_SOURCE_DIR}/src/config.h)
 configure_file(${CMAKE_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_SOURCE_DIR}/src/sndfile.h)
+if (WIN32)
+configure_file(src/libsndfile.def.in.cmake src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
+endif ()
 
 #
 # Final project settings
