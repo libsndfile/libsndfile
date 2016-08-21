@@ -28,7 +28,7 @@
 
 #ifndef X_OK
 #ifdef WIN32
-#define   X_OK
+#define   X_OK		0
 #else
 #define   X_OK    1       /* execute permission - unsupported in windows*/
 #endif
