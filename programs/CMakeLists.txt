@@ -20,6 +20,16 @@ if (COMPILER_IS_GCC)
 endif ()
 endforeach ()
 
+# This is the BeOS version of sndfile-play. It needs to be compiled with the C++
+# compiler.
+if (BEOS OR HAIKU)
+	add_executable (sndfile-play-beos sndfile-play-beos.cpp)
+	target_link_libraries(sndfile-play-beos PRIVATE sndfile)
+if (COMPILER_IS_GCC)
+	target_compile_options(sndfile-play-beos PRIVATE -Wall -Wextra)
+endif (COMPILER_IS_GCC)
+endif (BEOS OR HAIKU)
+
 if (WIN32)
 	target_link_libraries(sndfile-play PRIVATE Winmm.lib)
 endif ()
