@@ -57,6 +57,9 @@ foreach (test ${TESTS})
 			${CMAKE_SOURCE_DIR}/tests/dft_cmp.c
 			)
 	target_link_libraries(${test} sndfile)
+if (COMPILER_IS_GCC)
+	target_compile_options(${test} PRIVATE -Wall -Wextra)
+endif ()
 	# bit jenky, should be an easier way to exclude
 	if (NOT (${test} MATCHES stdin_test OR ${test} MATCHES "stdout_test"))
 		add_test(NAME ${test}  COMMAND ${test} all)
