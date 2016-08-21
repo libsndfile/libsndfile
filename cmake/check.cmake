@@ -143,8 +143,6 @@ endif (WIN32)
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "OpenBSD")
 	set (OS_IS_OPENBSD 1)
-else ()
-	set (OS_IS_OPENBSD 0)
 endif ()
 
 
