@@ -52,6 +52,9 @@ source_group ("ALAC" FILES ${libalac_SOURCES})
 # Headers to be installed on target machine
 set (libsndfile_PUBLIC_HEADERS ${include_HEADERS} ${nodist_include_HEADERS})
 set (libsndfile_SOURCES ${COMMON} ${FILESPECIFIC} ${noinst_HEADERS} ${libgsm_SOURCES} ${libg72x_SOURCES} ${libalac_SOURCES} ${libsndfile_PUBLIC_HEADERS})
+if (WIN32)
+list (APPEND libsndfile_SOURCES ${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
+endif (WIN32)
 
 add_library(sndfile	${libsndfile_SOURCES})
 target_link_libraries (sndfile PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE ${M_LIBRARY})
