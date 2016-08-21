@@ -50,30 +50,37 @@ check_type_size(ssize_t                 SIZEOF_SSIZE_T)
 check_type_size(void*                   SIZEOF_VOIDP)
 check_type_size(wchar_t                 SIZEOF_WCHAR_T)
 
-if (WIN32)
-set (TYPEOF_SF_COUNT_T "__int64")
-set (SF_COUNT_MAX "0x7FFFFFFFFFFFFFFFLL")
-set (SIZEOF_SF_COUNT_T 8)
-else ()
-
 if ((SIZEOF_OFF_T EQUAL 8) OR (SIZEOF_LOFF_T EQUAL 8) OR (SIZEOF_OFF64_T EQUAL 8))
 set (TYPEOF_SF_COUNT_T "int64_t")
 set (SF_COUNT_MAX "0x7FFFFFFFFFFFFFFFLL")
 set (SIZEOF_SF_COUNT_T 8)
 else ()
-# TODO: Check 64-bit support
-endif ()
 
-# Fallback to long
-if (NOT TYPEOF_SF_COUNT_T)
-set (TYPEOF_SF_COUNT_T "long")
-set (SF_COUNT_MAX "0x7FFFFFFF")
-set (SIZEOF_SF_COUNT_T 4)
+if (WIN32)
+if (NOT MINGW)
+set (TYPEOF_SF_COUNT_T "__int64")
+set (SF_COUNT_MAX "0x7FFFFFFFFFFFFFFFLL")
+set (SIZEOF_SF_COUNT_T 8)
+else (MINGW)
+set (TYPEOF_SF_COUNT_T "__int64")
+set (SF_COUNT_MAX "0x7FFFFFFFFFFFFFFFLL")
+set (SIZEOF_SF_COUNT_T 8)
+endif (NOT MINGW)
+else (NOT WIN32)
+
+#TODO: More checks if platform have Large File Support (_LARGE_FILES, _FILE_OFFSET_BITS etc)
+message ("")
+message ("*** The configure process has determined that this system is capable")
+message ("*** of Large File Support but has not been able to find a type which")
+message ("*** is an unambiguous 64 bit file offset.")
+message ("*** Please contact the author to help resolve this problem.")
+message ("")
+message (FATAL_ERROR "Bad file offset type.")
+
+endif (WIN32)
 endif ()
 
 check_type_size(${TYPEOF_SF_COUNT_T} SIZEOF_SF_COUNT_T)
-
-endif ()
 
 find_library (M_LIBRARY m)
 # M is found
