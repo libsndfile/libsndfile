@@ -64,6 +64,14 @@ set_target_properties (sndfile
 			SOVERSION ${PROJECT_VERSION_MAJOR}
 			VERSION ${PROJECT_VERSION}
 			PUBLIC_HEADER "${libsndfile_PUBLIC_HEADERS}")
+if (WIN32)
+	set_target_properties(sndfile PROPERTIES PREFIX "")
+if (BUILD_SHARED_LIBS)
+	set_target_properties(sndfile PROPERTIES OUTPUT_NAME "${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}")
+else (NOT BUILD_SHARED_LIBS)
+	set_target_properties(sndfile PROPERTIES OUTPUT_NAME "${PROJECT_NAME}")
+endif ()
+endif (WIN32)
 target_include_directories (sndfile PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 if (COMPILER_IS_GCC)
 	target_compile_options(sndfile PRIVATE -Wall -Wextra)
