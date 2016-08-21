@@ -15,6 +15,9 @@ foreach (program ${PROGRAMS})
 			${CMAKE_SOURCE_DIR}/programs/${program}.c
 			)
 	target_link_libraries(${program} PRIVATE sndfile)
+if (COMPILER_IS_GCC)
+	target_compile_options(${program} PRIVATE -Wall -Wextra)
+endif ()
 endforeach ()
 
 if (WIN32)
