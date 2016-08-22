@@ -10,7 +10,7 @@ option (BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option (ENABLE_TESTING "Enable testing" OFF)
 
 # Set software information
-project(libsndfile VERSION 1.0.28)
+project(libsndfile VERSION 1.0.28.0)
 SET(LIB_VERSION_PATCH pre1)
 set(LIB_VERSION ${PROJECT_VERSION}pre1)
 
@@ -36,6 +36,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.cmake ${CMAKE_CURRENT_SO
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/sndfile.h)
 if (WIN32)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libsndfile.def.in.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
+if (BUILD_SHARED_LIBS)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/version-metadata.rc.in.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/version-metadata.rc)
+endif ()
 endif ()
 
 #
