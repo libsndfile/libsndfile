@@ -4,15 +4,6 @@ language: c
 matrix:
   include:
     - os: linux
-      compiler:
-        - gcc
-        - clang
-      addons:
-        apt:
-          packages:
-            - libogg-dev
-            - libvorbis-dev
-            - libflac-dev
       compiler: clang
       addons:
         apt:
@@ -22,6 +13,9 @@ matrix:
           packages:
             - clang-3.6
             - g++-5
+            - libogg-dev
+            - libvorbis-dev
+            - libflac-dev
     - os: linux
       compiler: gcc
       addons:
@@ -30,6 +24,9 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
+            - libogg-dev
+            - libvorbis-dev
+            - libflac-dev
     - os: osx
       compiler: clang
 
