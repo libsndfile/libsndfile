@@ -45,7 +45,7 @@ before_install:
       cd -
     else
       brew update && brew unlink cmake
-      brew install cmake libogg libvorbis libflac
+      brew install cmake libogg libvorbis flac
     fi
 
 install:
