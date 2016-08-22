@@ -232,6 +232,7 @@ set(PROGRAMS 	sndfile-cmp
 
 foreach (program ${PROGRAMS})
 	add_executable(${program}
+			programs/common.h
 			programs/common.c 
 			programs/${program}.c
 			)
