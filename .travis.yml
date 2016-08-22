@@ -4,6 +4,9 @@ language: c
 matrix:
   include:
     - os: linux
+      compiler:
+        - gcc
+        - clang
       addons:
         apt:
           packages:
