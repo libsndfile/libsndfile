@@ -5,6 +5,10 @@
 # lowest version supporting C_STANDARD property
 cmake_minimum_required (VERSION 3.1.3)
 
+## System-wide includes
+
+include (GNUInstallDirs)
+
 # Options
 option (BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option (ENABLE_TESTING "Enable testing" OFF)
@@ -265,6 +269,50 @@ if (${SNDIO_FOUND})
 	target_link_libraries(sndfile-play PRIVATE ${SNDIO_LIBRARIES})
 endif ()
 
+## Installation
+
+install (TARGETS sndfile ${PROGRAMS} 
+	RUNTIME DESTINATION			${CMAKE_INSTALL_BINDIR}
+	ARCHIVE DESTINATION			${CMAKE_INSTALL_LIBDIR}
+	PUBLIC_HEADER DESTINATION	${CMAKE_INSTALL_INCLUDEDIR})
+
+if (Unix)
+set (man_MANS
+	man/sndfile-info.1
+	man/sndfile-play.1
+	man/sndfile-convert.1
+	man/sndfile-cmp.1
+	man/sndfile-metadata-get.1
+#	man/sndfile-metadata-set.1
+	man/sndfile-concat.1
+	man/sndfile-interleave.1
+#	man/sndfile-deinterleave.1
+	man/sndfile-salvage.1)
+install (FILES ${man_MANS} DESTINATION ${CMAKE_INSTALL_MANDIR}/man1 PATTERN "*.1")
+endif ()
+
+#TODO: ENABLE_BOW_DOCS option
+set (HTML_BGCOLOUR "black")
+set (HTML_FGCOLOUR "white")
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/doc/libsndfile.css.in ${CMAKE_CURRENT_SOURCE_DIR}/doc/libsndfile.css)
+set (html_DATA 
+	doc/index.html
+	doc/libsndfile.jpg
+	doc/libsndfile.css
+	doc/api.html
+	doc/command.html
+	doc/bugs.html
+	doc/sndfile_info.html
+	doc/new_file_type.HOWTO
+	doc/win32.html
+	doc/FAQ.html
+	doc/lists.html
+	doc/embedded_files.html
+	doc/octave.html
+	doc/dither.html
+	doc/tutorial.html)
+install (FILES ${html_DATA} DESTINATION ${CMAKE_INSTALL_DOCDIR}/${PROJECT_NAME})
+	
 ## Testing
 
 if (ENABLE_TESTING)
