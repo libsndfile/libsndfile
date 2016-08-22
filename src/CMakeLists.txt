@@ -14,6 +14,9 @@ set (COMMON
 	id3.c)
 if (WIN32)
 list (APPEND COMMON windows.c)
+if (BUILD_SHARED_LIBS)
+list (APPEND COMMON version-metadata.rc)
+endif ()
 endif ()
 	
 # File specific libsndfile sources
