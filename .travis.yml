@@ -11,11 +11,11 @@ matrix:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise
           packages:
-			- clang-3.6
-			- g++-5
-			- libogg-dev
-			- libvorbis-dev
-			- libflac-dev
+            - clang-3.6
+            - g++-5
+            - libogg-dev
+            - libvorbis-dev
+            - libflac-dev
     - os: linux
       compiler: gcc
       addons:
