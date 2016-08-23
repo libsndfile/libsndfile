@@ -10,8 +10,16 @@ cmake_minimum_required (VERSION 3.1.3)
 include (GNUInstallDirs)
 
 # Options
+option (BUILD_STATIC_LIBS "Build shared libraries" ON)
 option (BUILD_SHARED_LIBS "Build shared libraries" OFF)
 option (ENABLE_TESTING "Enable testing" OFF)
+
+if ((NOT BUILD_STATIC_LIBS) AND (NOT BUILD_SHARED_LIBS))
+message (WARNING "
+Both options BUILD_STATIC_LIBS and BUILD_SHARED_LIBS are manually set to OFF. To prevent configuration error
+BUILD_STATIC_LIBS is now set to ON.\n")
+set (BUILD_STATIC_LIBS ON)
+endif ()
 
 # Set software information
 project(libsndfile VERSION 1.0.28.0)
@@ -39,8 +47,8 @@ include(${CMAKE_MODULE_PATH}/external_libs.cmake)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/sndfile.h)
 if (WIN32)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libsndfile.def.in.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
 if (BUILD_SHARED_LIBS)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/libsndfile.def.in.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/version-metadata.rc.in.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/version-metadata.rc)
 endif ()
 endif ()
@@ -194,34 +202,64 @@ source_group ("ALAC" FILES ${libalac_SOURCES})
 # Headers to be installed on target machine
 set (libsndfile_PUBLIC_HEADERS ${include_HEADERS} ${nodist_include_HEADERS})
 set (libsndfile_SOURCES ${COMMON} ${FILESPECIFIC} ${noinst_HEADERS} ${libgsm_SOURCES} ${libg72x_SOURCES} ${libalac_SOURCES} ${libsndfile_PUBLIC_HEADERS})
+
+# libsndfile static library
+
+if (BUILD_STATIC_LIBS)
+set (SNDFILE_STATIC_TARGET sndfile-static)
+add_library(${SNDFILE_STATIC_TARGET}	${libsndfile_SOURCES})
+if (M_LIBRARY)
+target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE ${M_LIBRARY})
+endif ()
+if (WIN32)
+	set_target_properties(${SNDFILE_STATIC_TARGET} PROPERTIES PREFIX "lib")
+endif ()
+# Remove "-static" from output name
+set_target_properties(${SNDFILE_STATIC_TARGET} PROPERTIES OUTPUT_NAME "sndfile")
+set_property(TARGET ${SNDFILE_STATIC_TARGET} PROPERTY C_STANDARD 99)
+target_include_directories (${SNDFILE_STATIC_TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+if (COMPILER_IS_GCC)
+	target_compile_options(${SNDFILE_STATIC_TARGET} PRIVATE -Wall -Wextra)
+endif ()
+endif ()
+
+if (BUILD_SHARED_LIBS)
+
+set (SNDFILE_SHARED_TARGET sndfile)
+
 if (WIN32)
 list (APPEND libsndfile_SOURCES src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
 endif (WIN32)
 
-add_library(sndfile	${libsndfile_SOURCES})
+add_library(${SNDFILE_SHARED_TARGET}	${libsndfile_SOURCES})
 if (M_LIBRARY)
-target_link_libraries (sndfile PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE ${M_LIBRARY})
+target_link_libraries (${SNDFILE_SHARED_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE ${M_LIBRARY})
 endif ()
-set_property(TARGET sndfile PROPERTY C_STANDARD 99)
-set_target_properties (sndfile
+set_property(TARGET ${SNDFILE_SHARED_TARGET} PROPERTY C_STANDARD 99)
+set_target_properties (${SNDFILE_SHARED_TARGET}
 			PROPERTIES
 			SOVERSION ${PROJECT_VERSION_MAJOR}
 			VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_TWEAK}"
 			PUBLIC_HEADER "${libsndfile_PUBLIC_HEADERS}")
 if (WIN32)
-	set_target_properties(sndfile PROPERTIES PREFIX "lib")
-if (BUILD_SHARED_LIBS)
-	set_target_properties(sndfile PROPERTIES OUTPUT_NAME "sndfile-${PROJECT_VERSION_MAJOR}")
-else (NOT BUILD_SHARED_LIBS)
-	set_target_properties(sndfile PROPERTIES OUTPUT_NAME "sndfile")
-endif ()
+	set_target_properties(${SNDFILE_SHARED_TARGET} PROPERTIES PREFIX "lib")
+	set_target_properties(${SNDFILE_SHARED_TARGET} PROPERTIES OUTPUT_NAME "sndfile-${PROJECT_VERSION_MAJOR}")
 endif (WIN32)
-target_include_directories (sndfile PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
+target_include_directories (${SNDFILE_SHARED_TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 if (COMPILER_IS_GCC)
-	target_compile_options(sndfile PRIVATE -Wall -Wextra)
+	target_compile_options(${SNDFILE_SHARED_TARGET} PRIVATE -Wall -Wextra)
 endif ()
 
+endif (BUILD_SHARED_LIBS)
+
 ## Programs
+
+# Select libsndfile version to link
+if (BUILD_SHARED_LIBS)
+set (SNDFILE_TARGET ${SNDFILE_SHARED_TARGET})
+else (NOT BUILD_SHARED_LIBS)
+set (SNDFILE_TARGET ${SNDFILE_STATIC_TARGET})
+endif (BUILD_SHARED_LIBS)
 
 set(PROGRAMS 	sndfile-cmp 
 		sndfile-concat
@@ -240,7 +278,7 @@ foreach (program ${PROGRAMS})
 			programs/common.c 
 			programs/${program}.c
 			)
-	target_link_libraries(${program} PRIVATE sndfile)
+	target_link_libraries(${program} PRIVATE ${SNDFILE_TARGET})
 if (COMPILER_IS_GCC)
 	target_compile_options(${program} PRIVATE -Wall -Wextra)
 endif ()
@@ -250,7 +288,7 @@ endforeach ()
 # compiler.
 if (BEOS OR HAIKU)
 	add_executable (sndfile-play-beos programs/sndfile-play-beos.cpp)
-	target_link_libraries(sndfile-play-beos PRIVATE sndfile)
+	target_link_libraries(sndfile-play-beos PRIVATE ${SNDFILE_TARGET})
 if (COMPILER_IS_GCC)
 	target_compile_options(sndfile-play-beos PRIVATE -Wall -Wextra)
 endif (COMPILER_IS_GCC)
@@ -271,7 +309,7 @@ endif ()
 
 ## Installation
 
-install (TARGETS sndfile ${PROGRAMS} 
+install (TARGETS ${SNDFILE_STATIC_TARGET} ${SNDFILE_SHARED_TARGET} ${PROGRAMS} 
 	RUNTIME DESTINATION			${CMAKE_INSTALL_BINDIR}
 	ARCHIVE DESTINATION			${CMAKE_INSTALL_LIBDIR}
 	LIBRARY DESTINATION			${CMAKE_INSTALL_LIBDIR}
