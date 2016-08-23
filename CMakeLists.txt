@@ -53,6 +53,16 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/version-metadata.rc.in.cmake ${CM
 endif ()
 endif ()
 
+set (PC_PREFIX ${CMAKE_INSTALL_PREFIX})
+set (PC_EXEC_PREFIX "\$\{prefix\}")
+set (PC_LIBDIR "\$\{prefix\}/${CMAKE_INSTALL_LIBDIR}")
+set (PC_INCLUDEDIR "\$\{prefix\}/${CMAKE_INSTALL_INCLUDEDIR}")
+set (PC_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}")
+if (EXTERNAL_XIPH_LIBS)
+set (PC_PRIVATE_LIBS "-lFLAC  -lvorbisenc")
+endif ()
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc.cmake.in ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc @ONLY)
+
 #
 # libsndfile
 #
@@ -209,7 +219,10 @@ if (BUILD_STATIC_LIBS)
 set (SNDFILE_STATIC_TARGET sndfile-static)
 add_library(${SNDFILE_STATIC_TARGET} STATIC ${libsndfile_SOURCES})
 if (M_LIBRARY)
-target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE ${M_LIBRARY})
+target_link_libraries (${SNDFILE_STATIC_TARGET} PRIVATE ${M_LIBRARY})
+endif ()
+if (EXTERNAL_XIPH_LIBS)
+target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS})
 endif ()
 if (WIN32)
 	set_target_properties(${SNDFILE_STATIC_TARGET} PROPERTIES PREFIX "lib")
@@ -233,7 +246,10 @@ endif (WIN32)
 
 add_library(${SNDFILE_SHARED_TARGET} SHARED ${libsndfile_SOURCES})
 if (M_LIBRARY)
-target_link_libraries (${SNDFILE_SHARED_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE ${M_LIBRARY})
+target_link_libraries (${SNDFILE_SHARED_TARGET} PRIVATE ${M_LIBRARY})
+endif ()
+if (EXTERNAL_XIPH_LIBS)
+target_link_libraries (${SNDFILE_SHARED_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS})
 endif ()
 set_property(TARGET ${SNDFILE_SHARED_TARGET} PROPERTY C_STANDARD 99)
 set_target_properties (${SNDFILE_SHARED_TARGET}
@@ -352,6 +368,8 @@ set (html_DATA
 	doc/dither.html
 	doc/tutorial.html)
 install (FILES ${html_DATA} DESTINATION ${CMAKE_INSTALL_DOCDIR}/${PROJECT_NAME})
+
+install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 	
 ## Testing
 
