@@ -51,4 +51,4 @@ before_install:
 install:
   - true
 
-script: mkdir build && cd build && cmake .. && make
+script: mkdir build && cd build && cmake .. -DBUILD_STATIC_LIBS:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=ON && make
