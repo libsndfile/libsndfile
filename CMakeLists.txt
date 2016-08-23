@@ -207,7 +207,7 @@ set (libsndfile_SOURCES ${COMMON} ${FILESPECIFIC} ${noinst_HEADERS} ${libgsm_SOU
 
 if (BUILD_STATIC_LIBS)
 set (SNDFILE_STATIC_TARGET sndfile-static)
-add_library(${SNDFILE_STATIC_TARGET}	${libsndfile_SOURCES})
+add_library(${SNDFILE_STATIC_TARGET} STATIC ${libsndfile_SOURCES})
 if (M_LIBRARY)
 target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE ${M_LIBRARY})
 endif ()
@@ -231,7 +231,7 @@ if (WIN32)
 list (APPEND libsndfile_SOURCES src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
 endif (WIN32)
 
-add_library(${SNDFILE_SHARED_TARGET}	${libsndfile_SOURCES})
+add_library(${SNDFILE_SHARED_TARGET} SHARED ${libsndfile_SOURCES})
 if (M_LIBRARY)
 target_link_libraries (${SNDFILE_SHARED_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS} PRIVATE ${M_LIBRARY})
 endif ()
