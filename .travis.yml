@@ -13,6 +13,9 @@ matrix:
           packages:
             - clang-3.6
             - g++-5
+            - libogg-dev
+            - libvorbis-dev
+            - libflac-dev
     - os: linux
       compiler: gcc
       addons:
@@ -21,6 +24,9 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
+            - libogg-dev
+            - libvorbis-dev
+            - libflac-dev
     - os: osx
       compiler: clang
 
@@ -39,10 +45,10 @@ before_install:
       cd -
     else
       brew update && brew unlink cmake
-      brew install cmake
+      brew install cmake libogg libvorbis flac
     fi
 
 install:
   - true
 
-script: mkdir build && cd build && cmake .. && make
+script: mkdir build && cd build && cmake .. -DBUILD_STATIC_LIBS:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=ON && make
