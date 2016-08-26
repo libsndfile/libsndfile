@@ -5,6 +5,9 @@
 # lowest version supporting C_STANDARD property
 cmake_minimum_required (VERSION 3.1.3)
 
+# Set software information
+project(libsndfile VERSION 1.0.28.0)
+
 ## System-wide includes
 
 include (GNUInstallDirs)
@@ -12,17 +15,14 @@ include (GNUInstallDirs)
 # Options
 option (BUILD_STATIC_LIBS "Build shared libraries" ON)
 option (BUILD_SHARED_LIBS "Build shared libraries" ON)
-option (ENABLE_TESTING "Enable testing" OFF)
-
 if ((NOT BUILD_STATIC_LIBS) AND (NOT BUILD_SHARED_LIBS))
 message (WARNING "
 Both options BUILD_STATIC_LIBS and BUILD_SHARED_LIBS are manually set to OFF. To prevent configuration error
 BUILD_STATIC_LIBS is now set to ON.\n")
 set (BUILD_STATIC_LIBS ON)
 endif ()
+option (ENABLE_TESTING "Enable testing" OFF)
 
-# Set software information
-project(libsndfile VERSION 1.0.28.0)
 SET(LIB_VERSION_PATCH pre1)
 set(LIB_VERSION ${PROJECT_VERSION}pre1)
 
