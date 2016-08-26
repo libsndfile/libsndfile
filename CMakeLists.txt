@@ -11,7 +11,7 @@ include (GNUInstallDirs)
 
 # Options
 option (BUILD_STATIC_LIBS "Build shared libraries" ON)
-option (BUILD_SHARED_LIBS "Build shared libraries" OFF)
+option (BUILD_SHARED_LIBS "Build shared libraries" ON)
 option (ENABLE_TESTING "Enable testing" OFF)
 
 if ((NOT BUILD_STATIC_LIBS) AND (NOT BUILD_SHARED_LIBS))
