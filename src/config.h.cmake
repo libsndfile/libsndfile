@@ -194,7 +194,7 @@
 #define PACKAGE_NAME "@PROJECT_NAME@"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "@@PROJECT_NAME@ @PROJECT_VERSION@"
+#define PACKAGE_STRING "@PROJECT_NAME@ @PACKAGE_VERSION@"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "PROJECT_NAME"
@@ -203,7 +203,7 @@
 #define PACKAGE_URL "@PACKAGE_URL@"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "@PROJECT_VERSION@"
+#define PACKAGE_VERSION "@PACKAGE_VERSION@"
 
 /* Set to maximum allowed value of sf_count_t type. */
 #define SF_COUNT_MAX @SF_COUNT_MAX@
