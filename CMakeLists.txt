@@ -8,9 +8,17 @@ cmake_minimum_required (VERSION 3.1.3)
 # Set software information
 project(libsndfile VERSION 1.0.28)
 
+# Variables
+
+set (CPACK_PACKAGE_VERSION_MAJOR ${${PROJECT_VERSION}_MAJOR})
+set (CPACK_PACKAGE_VERSION_MINOR ${${PROJECT_VERSION}_MINOR})
+set (CPACK_PACKAGE_VERSION_PATCH ${${PROJECT_VERSION}_PATCH})
+set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}pre1")
+
 ## System-wide includes
 
 include (GNUInstallDirs)
+include (CPack)
 
 # Options
 option (BUILD_STATIC_LIBS "Build shared libraries" ON)
@@ -22,8 +30,6 @@ BUILD_STATIC_LIBS is now set to ON.\n")
 set (BUILD_STATIC_LIBS ON)
 endif ()
 option (ENABLE_TESTING "Enable testing" OFF)
-
-set(PACKAGE_VERSION "${PROJECT_VERSION}pre1")
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/library-build)
