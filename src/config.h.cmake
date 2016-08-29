@@ -185,25 +185,25 @@
 #cmakedefine01 OS_IS_WIN32
 
 /* Name of package */
-#define PACKAGE "@PROJECT_NAME@"
+#define PACKAGE "@CPACK_PACKAGE_NAME@"
 
 /* Define to the address where bug reports for this package should be sent. */
 #define PACKAGE_BUGREPORT "@PACKAGE_BUGREPORT@"
 
 /* Define to the full name of this package. */
-#define PACKAGE_NAME "@PROJECT_NAME@"
+#define PACKAGE_NAME "@CPACK_PACKAGE_NAME@"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "@PROJECT_NAME@ @PACKAGE_VERSION@"
+#define PACKAGE_STRING "@CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION@"
 
 /* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "PROJECT_NAME"
+#define PACKAGE_TARNAME "@CPACK_PACKAGE_NAME@"
 
 /* Define to the home page for this package. */
 #define PACKAGE_URL "@PACKAGE_URL@"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "@PACKAGE_VERSION@"
+#define PACKAGE_VERSION "@CPACK_PACKAGE_VERSION@"
 
 /* Set to maximum allowed value of sf_count_t type. */
 #define SF_COUNT_MAX @SF_COUNT_MAX@
