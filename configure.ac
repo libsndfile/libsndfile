@@ -30,9 +30,6 @@ MN_GCC_REALLY_IS_GCC
 
 AC_PROG_SED
 
-# Do not check for F77.
-define([AC_LIBTOOL_LANG_F77_CONFIG], [:])dnl
-
 LT_INIT
 LT_PROG_RC
 
