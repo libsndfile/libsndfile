@@ -75,7 +75,8 @@ ALAC_libalac_la_SOURCES = ALAC/ALACAudioTypes.h ALAC/ALACBitUtilities.h \
 
 test_main_SOURCES = test_main.c test_main.h test_conversions.c test_float.c test_endswap.c \
 					test_audio_detect.c test_log_printf.c test_file_io.c test_ima_oki_adpcm.c \
-					test_strncpy_crlf.c test_broadcast_var.c test_cart_var.c
+					test_strncpy_crlf.c test_broadcast_var.c test_cart_var.c \
+					test_binheader_writef.c
 test_main_LDADD = libcommon.la
 
 G72x_g72x_test_SOURCES = G72x/g72x_test.c

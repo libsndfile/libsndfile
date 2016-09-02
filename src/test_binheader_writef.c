@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,27 +16,42 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-static inline void
-print_test_name (const char * name)
-{	printf ("    %-40s : ", name) ;
-	fflush (stdout) ;
-} /* print_test_name */
+#include "sfconfig.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+#include <errno.h>
 
+#include "common.h"
 
-void test_conversions (void) ;
-void test_endswap (void) ;
-void test_log_printf (void) ;
-void test_binheader_writef (void) ;
-void test_file_io (void) ;
+#include "test_main.h"
 
-void test_float_convert (void) ;
-void test_double_convert (void) ;
+void
+test_binheader_writef (void)
+{	char buffer [18] ;
+	SF_PRIVATE	sf_private, *psf ;
+	int			k, errors = 0 ;
 
-void test_audio_detect (void) ;
-void test_ima_oki_adpcm (void) ;
+	print_test_name ("Testing binheader_writef") ;
 
-void test_psf_strlcpy_crlf (void) ;
-void test_broadcast_var (void) ;
+	psf = &sf_private ;
+	for (k = 0 ; errors == 0 && k < 10 ; k++)
+	{	psf_strlcpy (buffer, sizeof (buffer), "abcdefghijklmnop") ;
+		buffer [k] = 0 ;
 
-void test_cart_var (void) ;
+		psf_binheader_writef (psf, "Ep", buffer) ;
+
+		if ((psf->headindex & 1) != 0)
+			errors = 1 ;
+		} ;
+
+	if (errors)
+	{	puts ("\nExiting due to errors.\n") ;
+		exit (1) ;
+		} ;
+
+	puts ("ok") ;
+} /* test_log_printf */
+

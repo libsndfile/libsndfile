@@ -372,6 +372,8 @@ psf_asciiheader_printf (SF_PRIVATE *psf, const char *format, ...)
 **
 **		s   - string preceded by a four byte length
 **		S   - string including null terminator
+**      p   - a Pascal string
+**
 **		f	- floating point data
 **		d	- double precision floating point data
 **		h	- 16 binary bytes value
@@ -704,6 +706,19 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					psf->headindex += size ;
 					psf->header [psf->headindex] = 0 ;
 					count += 4 + size ;
+					break ;
+
+			case 'p' :
+					/* Write a PASCAL string (as used by AIFF files).
+					*/
+					strptr = va_arg (argptr, char *) ;
+					size = strlen (strptr) ;
+					size = (size & 1) ? size : size + 1 ;
+					size = (size > 255) ? 255 : size ;
+					header_put_byte (psf, size) ;
+					memcpy (&(psf->header [psf->headindex]), strptr, size) ;
+					psf->headindex += size ;
+					count += 1 + size ;
 					break ;
 
 			case 'b' :
