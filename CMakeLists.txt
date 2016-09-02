@@ -21,7 +21,7 @@ include (GNUInstallDirs)
 include (CPack)
 
 # Options
-option (BUILD_STATIC_LIBS "Build shared libraries" ON)
+option (BUILD_STATIC_LIBS "Build static libraries" ON)
 option (BUILD_SHARED_LIBS "Build shared libraries" ON)
 if ((NOT BUILD_STATIC_LIBS) AND (NOT BUILD_SHARED_LIBS))
 message (WARNING "
