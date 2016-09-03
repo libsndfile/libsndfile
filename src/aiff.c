@@ -780,7 +780,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 			case MARK_MARKER :
 					psf_log_printf (psf, " %M : %d\n", marker, chunk_size) ;
-					{	uint16_t mark_id, n = 0, pstringIdx ;
+					{	uint16_t mark_id, n = 0 ;
 						uint32_t position ;
 
 						bytesread = psf_binheader_readf (psf, "E2", &n) ;
@@ -831,8 +831,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 							psf_log_printf (psf, "   Name     : %s\n", ubuf.scbuf) ;
 
-							for (pstringIdx = 0 ; pstringIdx < pstr_len ; pstringIdx++)
-								psf->cues->cue_points [n].name [pstringIdx] = ubuf.scbuf [pstringIdx] ;
+							psf_strlcpy (psf->cues->cue_points [n].name, sizeof (psf->cues->cue_points [n].name), ubuf.cbuf) ;
 
 							paiff->markstr [n].markerID = mark_id ;
 							paiff->markstr [n].position = position ;
@@ -1445,7 +1444,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	{	/* Both loops and cues exist */
 		uint16_t sustainLoopMode, releaseLoopMode ;
 		uint32_t idx, sLoopStart = 0, sLoopEnd = 0, rLoopStart = 0, rLoopEnd = 0 ;
-		int totalStringLength = 0, ps, stringLength ;
+		int totalStringLength = 0, stringLength ;
 
 		/* Here we count how many bytes will the pascal strings need */
 		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
@@ -1468,21 +1467,8 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 					4, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
 			/* Now comes true markers from cues struct */
 			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-			{	psf_binheader_writef (psf, "E24", 5 + idx, psf->cues->cue_points [idx].sample_offset) ;
-				stringLength = strlen (psf->cues->cue_points [idx].name) ;
-				if ((stringLength + 1) % 2 == 0)
-				{	/* the pascal string will have an even count so we'll not use the null terminator */
-					psf_binheader_writef (psf, "E1b", stringLength, psf->cues->cue_points [idx].name, make_size_t (stringLength)) ;
-					}
-				else
-				{	/* the pascal string would have an uneven count so we include a null terminator as pad */
-					char textString [stringLength + 1] ;
-					for (ps = 0 ; ps < stringLength ; ps++)
-						textString [ps] = psf->cues->cue_points [idx].name [ps] ;
-					textString [stringLength] = '\0' ;
-					psf_binheader_writef (psf, "E1b", stringLength, textString, sizeof (textString)) ;
-					} ;
-				} ;
+				psf_binheader_writef (psf, "E24p", 5 + idx, psf->cues->cue_points [idx].sample_offset, psf->cues->cue_points [idx].name) ;
+
 			/* Change the loops to be references to the markers */
 			sLoopStart = 1 ;
 			sLoopEnd = 2 ;
@@ -1497,21 +1483,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17)) ;
 			/* Now comes true markers from cues struct */
 			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-			{	psf_binheader_writef (psf, "E24", 3 + idx, psf->cues->cue_points [idx].sample_offset) ;
-				stringLength = strlen (psf->cues->cue_points [idx].name) ;
-				if ((stringLength + 1) % 2 == 0)
-				{	/* the pascal string will have an even count so we'll not use the null terminator */
-					psf_binheader_writef (psf, "E1b", stringLength, psf->cues->cue_points [idx].name, make_size_t (stringLength)) ;
-					}
-				else
-				{	/* the pascal string would have an uneven count so we include a null terminator as pad */
-					char textString [stringLength + 1] ;
-					for (ps = 0 ; ps < stringLength ; ps++)
-						textString [ps] = psf->cues->cue_points [idx].name [ps] ;
-					textString [stringLength] = '\0' ;
-					psf_binheader_writef (psf, "E1b", stringLength, textString, sizeof (textString)) ;
-					} ;
-				} ;
+				psf_binheader_writef (psf, "E24p", 3 + idx, psf->cues->cue_points [idx].sample_offset, psf->cues->cue_points [idx].name) ;
 
 			/* Change the loops to be references to the markers */
 			sLoopStart = 1 ;
@@ -1527,21 +1499,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 					2, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
 			/* Now comes true markers from cues struct */
 			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-			{	psf_binheader_writef (psf, "E24", 3 + idx, psf->cues->cue_points [idx].sample_offset) ;
-				stringLength = strlen (psf->cues->cue_points [idx].name) ;
-				if ((stringLength + 1) % 2 == 0)
-				{	/* the pascal string will have an even count so we'll not use the null terminator */
-					psf_binheader_writef (psf, "E1b", stringLength, psf->cues->cue_points [idx].name, make_size_t (stringLength)) ;
-					}
-				else
-				{	/* the pascal string would have an uneven count so we include a null terminator as pad */
-					char textString [stringLength + 1] ;
-					for (ps = 0 ; ps < stringLength ; ps++)
-						textString [ps] = psf->cues->cue_points [idx].name [ps] ;
-					textString [stringLength] = '\0' ;
-					psf_binheader_writef (psf, "E1b", stringLength, textString, sizeof (textString)) ;
-					} ;
-				} ;
+				psf_binheader_writef (psf, "E24p", 3 + idx, psf->cues->cue_points [idx].sample_offset, psf->cues->cue_points [idx].name) ;
 
 			/* Change the loops to be references to the markers */
 			sLoopStart = 0 ;
@@ -1622,36 +1580,19 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	else if (psf->instrument == NULL && psf->cues != NULL)
 	{	/* There are cues but no loops */
 		uint32_t idx ;
-		int totalStringLength = 0, ps, stringLength ;
+		int totalStringLength = 0, stringLength ;
 
 		/* Here we count how many bytes will the pascal strings need */
 		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
 		{	stringLength = strlen (psf->cues->cue_points [idx].name) + 1 ; /* We'll count the first byte also of every pascal string */
-			if (stringLength % 2 == 0)
-				totalStringLength += stringLength ;
-			else
-				totalStringLength += (stringLength + 1) ; /* The pascal string must have an even count */
+			totalStringLength += stringLength + (stringLength % 2 == 0 ? 0 : 1) ;
 			} ;
 
 		psf_binheader_writef (psf, "Em42",
 			MARK_MARKER, 2 + psf->cues->cue_count * (2 + 4) + totalStringLength, psf->cues->cue_count) ;
 
 		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-		{	psf_binheader_writef (psf, "E24", psf->cues->cue_points [idx].indx, psf->cues->cue_points [idx].sample_offset) ;
-			stringLength = strlen (psf->cues->cue_points [idx].name) ;
-			if ((stringLength + 1) % 2 == 0)
-			{	/* the pascal string will have an even count so we'll not use the null terminator */
-				psf_binheader_writef (psf, "E1b", stringLength, psf->cues->cue_points [idx].name, make_size_t (stringLength)) ;
-				}
-			else
-			{	/* the pascal string would have an uneven count so we include a null terminator as pad */
-				char textString [stringLength + 1] ;
-				for (ps = 0 ; ps < stringLength ; ps++)
-					textString [ps] = psf->cues->cue_points [idx].name [ps] ;
-				textString [stringLength] = '\0' ;
-				psf_binheader_writef (psf, "E1b", stringLength, textString, sizeof (textString)) ;
-				} ;
-			} ;
+			psf_binheader_writef (psf, "E24p", psf->cues->cue_points [idx].indx, psf->cues->cue_points [idx].sample_offset, psf->cues->cue_points [idx].name) ;
 		} ;
 
 	if (psf->strings.flags & SF_STR_LOCATE_START)
