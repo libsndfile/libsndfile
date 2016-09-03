@@ -84,7 +84,7 @@ AM_CONDITIONAL([LINUX_MINGW_CROSS_TEST],
 
 #====================================================================================
 # Couple of initializations here. Fill in real values later.
-
+      
 SHLIB_VERSION_ARG=""
 
 #====================================================================================
@@ -237,8 +237,7 @@ AC_SUBST(SIZEOF_SF_COUNT_T)
 AC_DEFINE_UNQUOTED([SF_COUNT_MAX],${SF_COUNT_MAX}, [Set to maximum allowed value of sf_count_t type.])
 AC_SUBST(SF_COUNT_MAX)
 
-AC_CHECK_TYPES(ssize_t)
-AC_CHECK_SIZEOF(ssize_t,4)
+AC_TYPE_SSIZE_T
 
 #====================================================================================
 # Determine endian-ness of target processor.
