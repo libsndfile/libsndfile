@@ -182,9 +182,16 @@ multichunk_test_helper (const char *filename, int format, const char * testdata 
 	SF_INFO			sfinfo ;
 	SF_CHUNK_INFO	chunk_info ;
 	SF_CHUNK_ITERATOR * iterator ;
-	uint32_t		length_before [testdata_len] ;
+	uint32_t		length_before [16] ;
 	int				err, allow_fd ;
 	size_t			i ;
+
+
+	exit_if_true (
+		ARRAY_LEN (length_before) < testdata_len,
+		"\n\nLine %d : Bad array length.\n\n", __LINE__
+		) ;
+
 
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 1 ;

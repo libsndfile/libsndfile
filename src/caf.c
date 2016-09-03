@@ -529,7 +529,8 @@ caf_read_header (SF_PRIVATE *psf)
 					return SFE_MALFORMED_FILE ;
 					} ;
 				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
-				caf_read_strings (psf, chunk_size) ;
+				if (chunk_size > 4)
+					caf_read_strings (psf, chunk_size - 4) ;
 				break ;
 
 			default :
@@ -835,19 +836,22 @@ string_hash32 (const char * str)
 
 static int
 caf_read_strings (SF_PRIVATE * psf, sf_count_t chunk_size)
-{	char buf [chunk_size - 4] ;
+{	char *buf ;
 	char *key, *value ;
 	uint32_t count, hash ;
 
-	psf_binheader_readf (psf, "E4b", &count, buf, make_size_t (chunk_size - 4)) ;
+	if ((buf = malloc (chunk_size + 1)) == NULL)
+		return (psf->error = SFE_MALLOC_FAILED) ;
+
+	psf_binheader_readf (psf, "E4b", &count, buf, make_size_t (chunk_size)) ;
 	psf_log_printf (psf, " count: %u\n", count) ;
 
 	/* Force terminate `buf` to make sure. */
-	buf [sizeof (buf) - 1] = 0 ;
+	buf [chunk_size] = 0 ;
 
-	for (key = buf ; key < buf + sizeof (buf) ; )
+	for (key = buf ; key < buf + chunk_size ; )
 	{	value = key + strlen (key) + 1 ;
-		if (value > buf + sizeof (buf))
+		if (value > buf + chunk_size)
 			break ;
 		psf_log_printf (psf, "   %-12s : %s\n", key, value) ;
 
@@ -891,6 +895,8 @@ caf_read_strings (SF_PRIVATE * psf, sf_count_t chunk_size)
 
 		key = value + strlen (value) + 1 ;
 		} ;
+
+	free (buf) ;
 
 	return 0 ;
 } /* caf_read_strings */

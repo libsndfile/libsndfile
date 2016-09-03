@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -37,7 +37,7 @@
 
 #include <sndfile.h>
 
-#define	BLOCK_SIZE 512
+#define	BLOCK_SIZE 4096
 
 static void
 print_usage (char *progname)
@@ -51,10 +51,13 @@ print_usage (char *progname)
 
 static void
 convert_to_text (SNDFILE * infile, FILE * outfile, int channels)
-{	float buf [channels * BLOCK_SIZE] ;
+{	float buf [BLOCK_SIZE] ;
+	sf_count_t frames ;
 	int k, m, readcount ;
 
-	while ((readcount = sf_readf_float (infile, buf, BLOCK_SIZE)) > 0)
+	frames = BLOCK_SIZE / channels ;
+
+	while ((readcount = sf_readf_float (infile, buf, frames)) > 0)
 	{	for (k = 0 ; k < readcount ; k++)
 		{	for (m = 0 ; m < channels ; m++)
 				fprintf (outfile, " % 12.10f", buf [k * channels + m]) ;

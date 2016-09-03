@@ -32,7 +32,7 @@
 
 #define		ALAC_MAX_FRAME_SIZE		8192
 #define		ALAC_BYTE_BUFFER_SIZE	0x20000
-
+#define		ALAC_MAX_CHANNEL_COUNT	8	// Same as kALACMaxChannels in /ALACAudioTypes.h
 
 typedef struct
 {	uint32_t	current, count, allocated ;
@@ -89,7 +89,7 @@ static int	alac_close		(SF_PRIVATE *psf) ;
 static int	alac_byterate	(SF_PRIVATE *psf) ;
 
 static int alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac) ;
-static int alac_encode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac) ;
+static int alac_encode_block (ALAC_PRIVATE *plac) ;
 
 static uint32_t alac_kuki_read (SF_PRIVATE * psf, uint32_t kuki_offset, uint8_t * kuki, size_t kuki_maxlen) ;
 
@@ -170,7 +170,7 @@ alac_close	(SF_PRIVATE *psf)
 	{	ALAC_ENCODER *penc = &plac->encoder ;
 		SF_CHUNK_INFO chunk_info ;
 		sf_count_t readcount ;
-		uint8_t kuki_data [plac->kuki_size] ;
+		uint8_t kuki_data [1024] ;
 		uint32_t pakt_size = 0, saved_partial_block_frames ;
 
 		plac->final_write_block = 1 ;
@@ -178,7 +178,7 @@ alac_close	(SF_PRIVATE *psf)
 
 		/*	If a block has been partially assembled, write it out as the final block. */
 		if (plac->partial_block_frames && plac->partial_block_frames < plac->frames_per_block)
-			alac_encode_block (psf, plac) ;
+			alac_encode_block (plac) ;
 
 		plac->partial_block_frames = saved_partial_block_frames ;
 
@@ -257,7 +257,6 @@ alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 	if (plac->pakt_info != NULL)
 		free (plac->pakt_info) ;
 	plac->pakt_info = alac_pakt_read_decode (psf, info->pakt_offset) ;
-
 
 	if (plac->pakt_info == NULL)
 	{	psf_log_printf (psf, "%s : alac_pkt_read() returns NULL.\n", __func__) ;
@@ -402,7 +401,7 @@ alac_reader_calc_frames (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 static int
 alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 {	ALAC_DECODER *pdec = &plac->decoder ;
-	uint8_t		byte_buffer [psf->sf.channels * ALAC_BYTE_BUFFER_SIZE] ;
+	uint8_t		byte_buffer [ALAC_MAX_CHANNEL_COUNT * ALAC_BYTE_BUFFER_SIZE] ;
 	uint32_t	packet_size ;
 	BitBuffer	bit_buffer ;
 
@@ -436,9 +435,9 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
 
 static int
-alac_encode_block (SF_PRIVATE * psf, ALAC_PRIVATE *plac)
+alac_encode_block (ALAC_PRIVATE *plac)
 {	ALAC_ENCODER *penc = &plac->encoder ;
-	uint8_t	byte_buffer [psf->sf.channels * ALAC_BYTE_BUFFER_SIZE] ;
+	uint8_t	byte_buffer [ALAC_MAX_CHANNEL_COUNT * ALAC_BYTE_BUFFER_SIZE] ;
 	uint32_t num_bytes = 0 ;
 
 	alac_encode (penc, plac->partial_block_frames, plac->buffer, byte_buffer, &num_bytes) ;
@@ -662,7 +661,7 @@ alac_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 		ptr += writecount ;
 
 		if (plac->partial_block_frames >= plac->frames_per_block)
-			alac_encode_block (psf, plac) ;
+			alac_encode_block (plac) ;
 		} ;
 
 	return total ;
@@ -693,7 +692,7 @@ alac_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 		ptr += writecount ;
 
 		if (plac->partial_block_frames >= plac->frames_per_block)
-			alac_encode_block (psf, plac) ;
+			alac_encode_block (plac) ;
 		} ;
 
 	return total ;
@@ -726,7 +725,7 @@ alac_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 		ptr += writecount ;
 
 		if (plac->partial_block_frames >= plac->frames_per_block)
-			alac_encode_block (psf, plac) ;
+			alac_encode_block (plac) ;
 		} ;
 
 	return total ;
@@ -759,7 +758,7 @@ alac_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 		ptr += writecount ;
 
 		if (plac->partial_block_frames >= plac->frames_per_block)
-			alac_encode_block (psf, plac) ;
+			alac_encode_block (plac) ;
 		} ;
 
 	return total ;

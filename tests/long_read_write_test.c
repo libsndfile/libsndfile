@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2015-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,9 +89,11 @@ short_lrw_test (const char *filename, int filetype, const short * output, int ou
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	int			k ;
-	short		input [out_len] ;
+	short		input [BUFFER_LENGTH] ;
 
 	print_test_name ("short_lrw_test", filename) ;
+
+	exit_if_true (BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n", __LINE__) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= out_len ;
@@ -133,9 +135,11 @@ int_lrw_test (const char *filename, int filetype, const int * output, int out_le
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	int			k ;
-	int			input [out_len] ;
+	int			input [BUFFER_LENGTH] ;
 
 	print_test_name ("int_lrw_test", filename) ;
+
+	exit_if_true (BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n", __LINE__) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= out_len ;
@@ -177,9 +181,11 @@ float_lrw_test (const char *filename, int filetype, const float * output, int ou
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	int			k ;
-	float		input [out_len] ;
+	float		input [BUFFER_LENGTH] ;
 
 	print_test_name ("float_lrw_test", filename) ;
+
+	exit_if_true (BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n", __LINE__) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= out_len ;
@@ -221,9 +227,11 @@ double_lrw_test (const char *filename, int filetype, const double * output, int 
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	int			k ;
-	double		input [out_len] ;
+	double		input [BUFFER_LENGTH] ;
 
 	print_test_name ("double_lrw_test", filename) ;
+
+	exit_if_true (BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n", __LINE__) ;
 
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= out_len ;
