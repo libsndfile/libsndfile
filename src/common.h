@@ -29,6 +29,9 @@
 #elif HAVE_INTTYPES_H
 #include <inttypes.h>
 #endif
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
 
 #ifndef SNDFILE_H
 #include "sndfile.h"
