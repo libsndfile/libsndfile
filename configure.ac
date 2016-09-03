@@ -532,7 +532,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	common_flags="-Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wundef -Wuninitialized -Winit-self"
 
 	# -Winline -Wconversion "
-	CFLAGS="$CFLAGS     $common_flags -Wbad-function-cast -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return"
+	CFLAGS="$CFLAGS     $common_flags -Wbad-function-cast -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return -Wvla"
 	CXXFLAGS="$CXXFLAGS $common_flags -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo"
 
 	if test "x$enable_gcc_opt" = "xno" ; then
