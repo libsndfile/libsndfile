@@ -2,7 +2,6 @@
 # Initial CMake and project setup
 #
 
-# lowest version supporting C_STANDARD property
 cmake_minimum_required (VERSION 3.1.3)
 
 # Set software information
@@ -234,7 +233,6 @@ if (WIN32)
 endif ()
 # Remove "-static" from output name
 set_target_properties(${SNDFILE_STATIC_TARGET} PROPERTIES OUTPUT_NAME "sndfile")
-set_property(TARGET ${SNDFILE_STATIC_TARGET} PROPERTY C_STANDARD 99)
 target_include_directories (${SNDFILE_STATIC_TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 if (COMPILER_IS_GCC)
 	target_compile_options(${SNDFILE_STATIC_TARGET} PRIVATE -Wall -Wextra)
@@ -256,7 +254,6 @@ endif ()
 if (EXTERNAL_XIPH_LIBS)
 target_link_libraries (${SNDFILE_SHARED_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS})
 endif ()
-set_property(TARGET ${SNDFILE_SHARED_TARGET} PROPERTY C_STANDARD 99)
 set_target_properties (${SNDFILE_SHARED_TARGET}
 			PROPERTIES
 			SOVERSION ${PROJECT_VERSION_MAJOR}
