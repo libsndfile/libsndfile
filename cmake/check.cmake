@@ -157,3 +157,7 @@ if (CMAKE_COMPILER_IS_GNUCC OR (CMAKE_C_COMPILER_ID MATCHES "Clang"))
 	set (COMPILER_IS_GCC 1)
 endif ()
 
+if (COMPILER_IS_GCC)
+	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
+endif ()
+
