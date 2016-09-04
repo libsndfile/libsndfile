@@ -234,9 +234,6 @@ endif ()
 # Remove "-static" from output name
 set_target_properties(${SNDFILE_STATIC_TARGET} PROPERTIES OUTPUT_NAME "sndfile")
 target_include_directories (${SNDFILE_STATIC_TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
-if (COMPILER_IS_GCC)
-	target_compile_options(${SNDFILE_STATIC_TARGET} PRIVATE -Wall -Wextra)
-endif ()
 endif ()
 
 if (BUILD_SHARED_LIBS)
@@ -264,9 +261,6 @@ if (WIN32)
 	set_target_properties(${SNDFILE_SHARED_TARGET} PROPERTIES OUTPUT_NAME "sndfile-${PROJECT_VERSION_MAJOR}")
 endif (WIN32)
 target_include_directories (${SNDFILE_SHARED_TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
-if (COMPILER_IS_GCC)
-	target_compile_options(${SNDFILE_SHARED_TARGET} PRIVATE -Wall -Wextra)
-endif ()
 
 endif (BUILD_SHARED_LIBS)
 
@@ -297,9 +291,6 @@ foreach (program ${PROGRAMS})
 			programs/${program}.c
 			)
 	target_link_libraries(${program} PRIVATE ${SNDFILE_TARGET})
-if (COMPILER_IS_GCC)
-	target_compile_options(${program} PRIVATE -Wall -Wextra)
-endif ()
 endforeach ()
 
 # This is the BeOS version of sndfile-play. It needs to be compiled with the C++
@@ -307,9 +298,6 @@ endforeach ()
 if (BEOS OR HAIKU)
 	add_executable (sndfile-play-beos programs/sndfile-play-beos.cpp)
 	target_link_libraries(sndfile-play-beos PRIVATE ${SNDFILE_TARGET})
-if (COMPILER_IS_GCC)
-	target_compile_options(sndfile-play-beos PRIVATE -Wall -Wextra)
-endif (COMPILER_IS_GCC)
 endif (BEOS OR HAIKU)
 
 if (WIN32)
