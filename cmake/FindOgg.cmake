@@ -13,10 +13,10 @@ endif(OGG_INCLUDE_DIR)
 find_package (PkgConfig)
 pkg_check_modules(PC_OGG QUIET ogg)
 
-find_path(OGG_INCLUDE_DIR ogg/ogg.h HINTS ${PC_OGG_INCLUDEDIR} ${PC_OGG_INCLUDE_DIRS})
+find_path(OGG_INCLUDE_DIR ogg/ogg.h HINTS ${PC_OGG_INCLUDEDIR} ${PC_OGG_INCLUDE_DIRS} ${OGG_ROOT} PATH_SUFFIXES include)
 # MSVC built ogg may be named ogg_static.
 # The provided project files name the library with the lib prefix.
-find_library(OGG_LIBRARY NAMES ogg ogg_static libogg libogg_static HINTS ${PC_OGG_LIBDIR} ${PC_OGG_LIBRARY_DIRS})
+find_library(OGG_LIBRARY NAMES ogg ogg_static libogg libogg_static HINTS ${PC_OGG_LIBDIR} ${PC_OGG_LIBRARY_DIRS} ${OGG_ROOT} PATH_SUFFIXES lib)
 # Handle the QUIETLY and REQUIRED arguments and set OGG_FOUND
 # to TRUE if all listed variables are TRUE.
 include(FindPackageHandleStandardArgs)
