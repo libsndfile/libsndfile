@@ -1,9 +1,9 @@
 # - Find ogg
 # Find the native ogg includes and libraries
 #
-#  OGG_INCLUDE_DIR - where to find ogg.h, etc.
-#  OGG_LIBRARIES   - List of libraries when using ogg.
-#  OGG_FOUND       - True if ogg found.
+#  OGG_INCLUDE_DIRS - where to find ogg.h, etc.
+#  OGG_LIBRARIES    - List of libraries when using ogg.
+#  OGG_FOUND        - True if ogg found.
 
 if(OGG_INCLUDE_DIR)
     # Already in cache, be silent
@@ -18,7 +18,7 @@ find_library(OGG_LIBRARY NAMES ogg ogg_static libogg libogg_static)
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(OGG DEFAULT_MSG OGG_INCLUDE_DIR OGG_LIBRARY)
 
-set(OGG_LIBRARIES ${OGG_LIBRARY})
+mark_as_advanced(OGG_INCLUDE_DIR OGG_LIBRARY)
 
-mark_as_advanced(OGG_INCLUDE_DIR)
-mark_as_advanced(OGG_LIBRARY)
+set (OGG_LIBRARIES ${OGG_LIBRARY})
+set (OGG_INCLUDE_DIRS ${OGG_INCLUDE_DIR})
