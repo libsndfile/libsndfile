@@ -9,10 +9,14 @@ if(OGG_INCLUDE_DIR)
     # Already in cache, be silent
     set(OGG_FIND_QUIETLY TRUE)
 endif(OGG_INCLUDE_DIR)
-find_path(OGG_INCLUDE_DIR ogg/ogg.h)
+
+find_package (PkgConfig)
+pkg_check_modules(PC_OGG QUIET ogg)
+
+find_path(OGG_INCLUDE_DIR ogg/ogg.h HINTS ${PC_OGG_INCLUDEDIR} ${PC_OGG_INCLUDE_DIRS})
 # MSVC built ogg may be named ogg_static.
 # The provided project files name the library with the lib prefix.
-find_library(OGG_LIBRARY NAMES ogg ogg_static libogg libogg_static)
+find_library(OGG_LIBRARY NAMES ogg ogg_static libogg libogg_static HINTS ${PC_OGG_LIBDIR} ${PC_OGG_LIBRARY_DIRS})
 # Handle the QUIETLY and REQUIRED arguments and set OGG_FOUND
 # to TRUE if all listed variables are TRUE.
 include(FindPackageHandleStandardArgs)
