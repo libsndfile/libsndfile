@@ -20,6 +20,8 @@ else ()
     set (HAVE_SNDIO_H ${SNDIO_FOUND})
 endif (ALSA_FOUND)
 
+find_package (Speex)
+
 check_include_file(byteswap.h       HAVE_BYTESWAP_H)
 check_include_file(dlfcn.h          HAVE_DLFCN_H)
 check_include_file(endian.h         HAVE_ENDIAN_H)
