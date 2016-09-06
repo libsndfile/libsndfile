@@ -3,7 +3,7 @@
 #
 #  VORBIS_INCLUDE_DIRS - where to find vorbis.h, etc.
 #  VORBIS_LIBRARIES    - List of libraries when using vorbis(file).
-#  VORBIS_FOUND        - True if vorbis found.
+#  Vorbis_FOUND        - True if vorbis found.
 
 if(VORBIS_INCLUDE_DIR)
 	# Already in cache, be silent
@@ -11,7 +11,7 @@ if(VORBIS_INCLUDE_DIR)
 endif(VORBIS_INCLUDE_DIR)
 
 find_package (Ogg)
-if (OGG_FOUND)
+if (Ogg_FOUND)
 	find_package (PkgConfig)
 	pkg_check_modules(PC_VORBIS QUIET vorbis)
 	pkg_check_modules(PC_VORBISFILE QUIET vorbisfile)
@@ -37,15 +37,15 @@ if (OGG_FOUND)
 	# Handle the QUIETLY and REQUIRED arguments and set VORBIS_FOUND
 	# to TRUE if all listed variables are TRUE.
 	include(FindPackageHandleStandardArgs)
-	find_package_handle_standard_args(VORBIS DEFAULT_MSG
+	find_package_handle_standard_args(Vorbis DEFAULT_MSG
 	    VORBIS_INCLUDE_DIR
 	    VORBIS_LIBRARY VORBISFILE_LIBRARY VORBISENC_LIBRARY)
-endif(OGG_FOUND)
+endif(Ogg_FOUND)
 
-if (VORBIS_FOUND)
+if (Vorbis_FOUND)
 	set (VORBIS_INCLUDE_DIRS ${VORBIS_INCLUDE_DIR} ${OGG_INCLUDE_DIRS})
 	set (VORBIS_LIBRARIES ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${VORBISENC_LIBRARY}
 		${OGG_LIBRARIES})
-endif(VORBIS_FOUND)
+endif(Vorbis_FOUND)
 
 mark_as_advanced(VORBIS_INCLUDE_DIR VORBIS_LIBRARY VORBISFILE_LIBRARY VORBISENC_LIBRARY)
