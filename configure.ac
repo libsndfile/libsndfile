@@ -507,12 +507,10 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	MN_ADD_CFLAGS([-Wextra])
 	MN_ADD_CFLAGS([-Wdeclaration-after-statement])
 	MN_ADD_CFLAGS([-Wpointer-arith])
-	MN_ADD_CFLAGS([-funsigned-char])
 
 	AC_LANG_PUSH([C++])
 	MN_ADD_CXXFLAGS([-Wextra])
 	MN_ADD_CXXFLAGS([-Wpointer-arith])
-	MN_ADD_CXXFLAGS([-funsigned-char])
 	AC_LANG_POP([C++])
 
 
