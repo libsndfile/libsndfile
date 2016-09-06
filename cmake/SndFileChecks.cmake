@@ -23,7 +23,7 @@ endif (ALSA_FOUND)
 find_package (Ogg)
 find_package (Vorbis)
 find_package (FLAC)
-if (OGG_FOUND AND VORBIS_FOUND AND FLAC_FOUND)
+if (Ogg_FOUND AND Vorbis_FOUND AND FLAC_FOUND)
     set (HAVE_EXTERNAL_XIPH_LIBS 1)
 	set (EXTERNAL_XIPH_LIBS
 		${OGG_LIBRARIES}

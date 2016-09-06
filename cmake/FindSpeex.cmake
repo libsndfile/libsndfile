@@ -9,7 +9,7 @@ find_path (SPEEX_INCLUDE_DIR speex/speex.h HINTS ${PC_SPEEX_INCLUDEDIR} ${PC_SPE
 find_library (SPEEX_LIBRARY NAMES speex HINTS ${PC_SPEEX_LIBDIR} ${PC_SPEEX_LIBRARY_DIRS} ${SPEEX_ROOT} PATH_SUFFIXES lib)
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(SPEEX DEFAULT_MSG SPEEX_INCLUDE_DIR SPEEX_LIBRARY)
+find_package_handle_standard_args(Speex DEFAULT_MSG SPEEX_INCLUDE_DIR SPEEX_LIBRARY)
 
 mark_as_advanced (SPEEX_INCLUDE_DIR SPEEX_LIBRARY)
 
