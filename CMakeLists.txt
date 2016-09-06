@@ -39,6 +39,10 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 #
 include(${CMAKE_MODULE_PATH}/SndFileChecks.cmake)
 
+add_feature_info(BUILD_STATIC_LIBS BUILD_STATIC_LIBS "build static libraries")
+add_feature_info(BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
+add_feature_info(ENABLE_TESTING ENABLE_TESTING "build tests")
+
 set_package_properties(Ogg PROPERTIES TYPE RECOMMENDED
 	PURPOSE "Required to enable Vorbis, Speex and Opus support")
 set_package_properties(Vorbis PROPERTIES TYPE RECOMMENDED
