@@ -13,7 +13,7 @@ endif (FLAC_INCLUDE_DIR)
 find_package (Ogg)
 
 if (Ogg_FOUND)
-	find_package (PkgConfig)
+	find_package (PkgConfig QUIET)
 	pkg_check_modules(PC_FLAC QUIET flac)
 
 	find_path (FLAC_INCLUDE_DIR FLAC/stream_decoder.h

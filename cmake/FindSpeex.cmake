@@ -9,7 +9,7 @@ if (SPEEX_INCLUDE_DIR)
 	set (SPEEX_FIND_QUIETLY TRUE)
 endif ()
 
-find_package (PkgConfig)
+find_package (PkgConfig QUIET)
 pkg_check_modules(PC_SPEEX QUIET speex)
 
 find_path (SPEEX_INCLUDE_DIR speex/speex.h HINTS ${PC_SPEEX_INCLUDEDIR} ${PC_SPEEX_INCLUDE_DIRS} ${SPEEX_ROOT} PATH_SUFFIXES include)
