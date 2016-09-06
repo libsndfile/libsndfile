@@ -35,7 +35,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 #
 # Setup definitions
 #
-include(${CMAKE_MODULE_PATH}/check.cmake)
+include(${CMAKE_MODULE_PATH}/SndFileChecks.cmake)
 
 #
 # Setup configuration
