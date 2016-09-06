@@ -63,8 +63,6 @@ set_package_properties(Speex PROPERTIES TYPE OPTIONAL
 	URL "www.speex.org/"
 	DESCRIPTION "an audio codec tuned for speech"
 	PURPOSE "Enables experemental Speex support")
-set_package_properties(PkgConfig PROPERTIES TYPE OPTIONAL
-	PURPOSE "Improves searching of external libraries")
 
 feature_summary (WHAT ALL)
 
