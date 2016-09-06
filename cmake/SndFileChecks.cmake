@@ -35,7 +35,9 @@ else ()
 endif ()
 endif ()
 
-find_package (Speex)
+if (ENABLE_EXPERIMENTAL)
+	find_package (Speex)
+endif ()
 
 check_include_file(byteswap.h       HAVE_BYTESWAP_H)
 check_include_file(dlfcn.h          HAVE_DLFCN_H)
