@@ -44,12 +44,20 @@ add_feature_info(BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
 add_feature_info(ENABLE_TESTING ENABLE_TESTING "build tests")
 
 set_package_properties(Ogg PROPERTIES TYPE RECOMMENDED
+	URL "www.xiph.org/ogg/"
+	DESCRIPTION "library for manipulating ogg bitstreams"
 	PURPOSE "Required to enable Vorbis, Speex and Opus support")
 set_package_properties(Vorbis PROPERTIES TYPE RECOMMENDED
+	URL "www.vorbis.com/"
+	DESCRIPTION "open source lossy audio codec"	
 	PURPOSE "Enables Vorbis support")
 set_package_properties(FLAC PROPERTIES TYPE RECOMMENDED
+	URL "www.xiph.org/flac/"
+	DESCRIPTION "Free Lossless Audio Codec Library"
 	PURPOSE "Enables FLAC support")
 set_package_properties(Speex PROPERTIES TYPE OPTIONAL
+	URL "www.speex.org/"
+	DESCRIPTION "an audio codec tuned for speech"
 	PURPOSE "Enables experemental Speex support")
 set_package_properties(PkgConfig PROPERTIES TYPE OPTIONAL
 	PURPOSE "Improves searching of external libraries")
