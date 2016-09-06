@@ -27,7 +27,6 @@
 .DS_Store
 .deps
 .dirstamp
-.git*
 .libs
 Build/
 CMake/config.h.in
