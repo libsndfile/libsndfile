@@ -12,7 +12,7 @@ endif (FLAC_INCLUDE_DIR)
 
 find_package (Ogg)
 
-if (OGG_FOUND)
+if (Ogg_FOUND)
 	find_package (PkgConfig)
 	pkg_check_modules(PC_FLAC QUIET flac)
 
@@ -31,7 +31,7 @@ if (OGG_FOUND)
 	include (FindPackageHandleStandardArgs)
 	find_package_handle_standard_args (FLAC DEFAULT_MSG
 		FLAC_INCLUDE_DIR FLAC_LIBRARY)
-endif (OGG_FOUND)
+endif (Ogg_FOUND)
 
 if (FLAC_FOUND)
 	set (FLAC_INCLUDE_DIRS ${FLAC_INCLUDE_DIR} ${OGG_INCLUDE_DIRS})
