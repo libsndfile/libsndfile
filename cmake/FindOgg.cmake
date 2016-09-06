@@ -3,7 +3,7 @@
 #
 #  OGG_INCLUDE_DIRS - where to find ogg.h, etc.
 #  OGG_LIBRARIES    - List of libraries when using ogg.
-#  OGG_FOUND        - True if ogg found.
+#  Ogg_FOUND        - True if ogg found.
 
 if(OGG_INCLUDE_DIR)
     # Already in cache, be silent
@@ -20,7 +20,7 @@ find_library(OGG_LIBRARY NAMES ogg ogg_static libogg libogg_static HINTS ${PC_OG
 # Handle the QUIETLY and REQUIRED arguments and set OGG_FOUND
 # to TRUE if all listed variables are TRUE.
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(OGG DEFAULT_MSG OGG_INCLUDE_DIR OGG_LIBRARY)
+find_package_handle_standard_args(Ogg DEFAULT_MSG OGG_INCLUDE_DIR OGG_LIBRARY)
 
 mark_as_advanced(OGG_INCLUDE_DIR OGG_LIBRARY)
 
