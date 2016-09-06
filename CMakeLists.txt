@@ -23,6 +23,7 @@ include (FeatureSummary)
 # Options
 option (BUILD_STATIC_LIBS "Build static libraries" ON)
 option (BUILD_SHARED_LIBS "Build shared libraries" ON)
+option (DISABLE_EXTERNAL_LIBS "Disable use of FLAC, Ogg and Vorbis" OFF)
 
 if ((NOT BUILD_STATIC_LIBS) AND (NOT BUILD_SHARED_LIBS))
 message (WARNING "
@@ -42,6 +43,7 @@ include(${CMAKE_MODULE_PATH}/SndFileChecks.cmake)
 add_feature_info(BUILD_STATIC_LIBS BUILD_STATIC_LIBS "build static libraries")
 add_feature_info(BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
 add_feature_info(ENABLE_TESTING ENABLE_TESTING "build tests")
+add_feature_info(DISABLE_EXTERNAL_LIBS DISABLE_EXTERNAL_LIBS "disable use of FLAC, Ogg and Vorbis")
 
 set_package_properties(Ogg PROPERTIES TYPE RECOMMENDED
 	URL "www.xiph.org/ogg/"
