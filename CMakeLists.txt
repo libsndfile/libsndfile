@@ -18,6 +18,7 @@ set (CPACK_PACKAGE_VERSION "${PROJECT_VERSION}pre1")
 
 include (GNUInstallDirs)
 include (CPack)
+include (CTest)
 include (FeatureSummary)
 
 # Options
@@ -46,6 +47,7 @@ add_feature_info(BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
 add_feature_info(ENABLE_TESTING ENABLE_TESTING "build tests")
 add_feature_info(DISABLE_EXTERNAL_LIBS DISABLE_EXTERNAL_LIBS "disable use of FLAC, Ogg and Vorbis")
 add_feature_info(ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental code")
+add_feature_info(BUILD_TESTING BUILD_TESTING "build tests")
 
 set_package_properties(Ogg PROPERTIES TYPE RECOMMENDED
 	URL "www.xiph.org/ogg/"
@@ -403,10 +405,6 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTAL
 	
 ## Testing
 
-if (ENABLE_TESTING)
-    enable_testing()
+if (BUILD_TESTING)
     add_subdirectory(tests)
-else ()
-    add_subdirectory(tests EXCLUDE_FROM_ALL)
 endif ()
-
