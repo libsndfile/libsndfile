@@ -476,5 +476,5 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTAL
 ## Testing
 
 if (BUILD_TESTING)
-    add_subdirectory(tests)
+
 endif ()
