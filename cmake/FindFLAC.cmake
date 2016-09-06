@@ -17,12 +17,14 @@ if (OGG_FOUND)
 	pkg_check_modules(PC_FLAC QUIET flac)
 
 	find_path (FLAC_INCLUDE_DIR FLAC/stream_decoder.h
-		HINTS ${PC_FLAC_INCLUDEDIR} ${PC_FLAC_INCLUDE_DIRS})
+		HINTS ${PC_FLAC_INCLUDEDIR} ${PC_FLAC_INCLUDE_DIRS} ${FLAC_ROOT}
+		PATH_SUFFIXES include)
 
 	# MSVC built libraries can name them *_static, which is good as it
 	# distinguishes import libraries from static libraries with the same extension.
 	find_library (FLAC_LIBRARY NAMES FLAC libFLAC libFLAC_dynamic libFLAC_static
-		HINTS ${PC_FLAC_LIBDIR} ${PC_FLAC_LIBRARY_DIRS})
+		HINTS ${PC_FLAC_LIBDIR} ${PC_FLAC_LIBRARY_DIRS} ${FLAC_ROOT}
+		PATH_SUFFIXES lib)
 
 	# Handle the QUIETLY and REQUIRED arguments and set FLAC_FOUND to TRUE if
 	# all listed variables are TRUE.
