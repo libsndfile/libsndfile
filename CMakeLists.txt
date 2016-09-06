@@ -253,6 +253,11 @@ if (EXTERNAL_XIPH_LIBS)
 		${OGG_INCLUDE_DIRS}
 		${VORBIS_INCLUDE_DIRS}
 		${FLAC_INCLUDE_DIRS})
+	if (ENABLE_EXPERIMENTAL)
+		target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${SPEEX_LIBRARIES})
+		target_include_directories (${SNDFILE_STATIC_TARGET} PRIVATE
+		${SPEEX_INCLUDE_DIRS})
+	endif ()
 endif ()
 if (WIN32)
 	set_target_properties(${SNDFILE_STATIC_TARGET} PROPERTIES PREFIX "lib")
@@ -280,6 +285,11 @@ if (EXTERNAL_XIPH_LIBS)
 		${OGG_INCLUDE_DIRS}
 		${VORBIS_INCLUDE_DIRS}
 		${FLAC_INCLUDE_DIRS})
+	if (ENABLE_EXPERIMENTAL)
+		target_link_libraries (${SNDFILE_SHARED_TARGET} PUBLIC ${SPEEX_LIBRARIES})
+		target_include_directories (${SNDFILE_SHARED_TARGET} PRIVATE
+		${SPEEX_INCLUDE_DIRS})
+	endif ()
 endif ()
 set_target_properties (${SNDFILE_SHARED_TARGET}
 			PROPERTIES
