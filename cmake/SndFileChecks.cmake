@@ -178,3 +178,6 @@ if (COMPILER_IS_GCC)
 	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
 endif ()
 
+if (ENABLE_EXPERIMENTAL)
+	set (ENABLE_EXPERIMENTAL_CODE 1)
+endif ()
