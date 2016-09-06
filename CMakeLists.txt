@@ -315,45 +315,115 @@ else (NOT BUILD_SHARED_LIBS)
 set (SNDFILE_TARGET ${SNDFILE_STATIC_TARGET})
 endif (BUILD_SHARED_LIBS)
 
-set(PROGRAMS 	sndfile-cmp 
-		sndfile-concat
-		sndfile-convert
-		sndfile-deinterleave
-		sndfile-interleave
-		sndfile-metadata-get
-		sndfile-metadata-set
-		sndfile-salvage
-		sndfile-play
-	)
+### sndfile-info
 
-foreach (program ${PROGRAMS})
-	add_executable(${program}
-			programs/common.h
-			programs/common.c 
-			programs/${program}.c
-			)
-	target_link_libraries(${program} PRIVATE ${SNDFILE_TARGET})
-endforeach ()
+set (sndfile_info_SOURCES 
+	programs/sndfile-info.c
+	programs/common.c
+	programs/common.h)
+add_executable (sndfile-info ${sndfile_info_SOURCES})
+target_link_libraries(sndfile-info PUBLIC ${SNDFILE_TARGET})
 
-# This is the BeOS version of sndfile-play. It needs to be compiled with the C++
-# compiler.
-if (BEOS OR HAIKU)
-	add_executable (sndfile-play-beos programs/sndfile-play-beos.cpp)
-	target_link_libraries(sndfile-play-beos PRIVATE ${SNDFILE_TARGET})
-endif (BEOS OR HAIKU)
+### sndfile-play
 
+set (sndfile_play_SOURCES 
+	programs/sndfile-play.c
+	programs/common.c
+	programs/common.h)
+add_executable (sndfile-play ${sndfile_play_SOURCES})
+target_link_libraries(sndfile-play PUBLIC
+	${SNDFILE_TARGET}
+	${ALSA_LIBRARIES}
+	${Sndio_LIBRARIES})
+target_include_directories (sndfile-play PRIVATE
+	${ALSA_INCLUDE_DIRS}
+	${Sndio_INCLUDE_DIRS})
 if (WIN32)
 	target_link_libraries(sndfile-play PRIVATE Winmm.lib)
 endif ()
 
-if (${ALSA_FOUND})
-	target_include_directories(sndfile-play PRIVATE ${ALSA_INCLUDE_DIRS})
-	target_link_libraries(sndfile-play PRIVATE ${ALSA_LIBRARIES})
-endif ()
-if (${Sndio_FOUND})
-	target_include_directories(sndfile-play PRIVATE ${SNDIO_INCLUDE_DIRS})
-	target_link_libraries(sndfile-play PRIVATE ${SNDIO_LIBRARIES})
-endif ()
+### sndfile-convert
+
+set (sndfile_convert_SOURCES 
+	programs/sndfile-convert.c
+	programs/common.c
+	programs/common.h)
+add_executable (sndfile-convert ${sndfile_convert_SOURCES})
+target_link_libraries(sndfile-convert PUBLIC ${SNDFILE_TARGET})
+
+### sndfile-cmp
+
+set (sndfile_cmp_SOURCES 
+	programs/sndfile-cmp.c
+	programs/common.c
+	programs/common.h)
+add_executable (sndfile-cmp ${sndfile_cmp_SOURCES})
+target_link_libraries(sndfile-cmp PUBLIC ${SNDFILE_TARGET})
+
+### sndfile-metadata-set
+
+set (sndfile_metadata_set_SOURCES
+	programs/sndfile-metadata-set.c
+	programs/common.c
+	programs/common.h)
+add_executable (sndfile-metadata-set ${sndfile_metadata_set_SOURCES})
+target_link_libraries(sndfile-metadata-set PUBLIC ${SNDFILE_TARGET})
+
+### sndfile-metadata-get
+
+set (sndfile_metadata_get_SOURCES
+	programs/sndfile-metadata-get.c
+	programs/common.c
+	programs/common.h)
+add_executable (sndfile-metadata-get ${sndfile_metadata_get_SOURCES})
+target_link_libraries(sndfile-metadata-get PUBLIC ${SNDFILE_TARGET})
+
+### sndfile-interleave
+
+set (sndfile_interleave_SOURCES
+	programs/sndfile-interleave.c
+	programs/common.c
+	programs/common.h)
+add_executable (sndfile-interleave ${sndfile_interleave_SOURCES})
+target_link_libraries(sndfile-interleave PUBLIC ${SNDFILE_TARGET})
+
+### sndfile-deinterleave
+
+set (sndfile_deinterleave_SOURCES
+	programs/sndfile-deinterleave.c
+	programs/common.c
+	programs/common.h)
+add_executable (sndfile-deinterleave ${sndfile_deinterleave_SOURCES})
+target_link_libraries(sndfile-deinterleave PUBLIC ${SNDFILE_TARGET})
+
+### sndfile-concat
+
+set (sndfile_concat_SOURCES
+	programs/sndfile-concat.c
+	programs/common.c
+	programs/common.h)
+add_executable (sndfile-concat ${sndfile_concat_SOURCES})
+target_link_libraries(sndfile-concat PUBLIC ${SNDFILE_TARGET})
+
+### sndfile-salvage
+
+set (sndfile_salvage_SOURCES
+	programs/sndfile-salvage.c
+	programs/common.c
+	programs/common.h)
+add_executable (sndfile-salvage ${sndfile_salvage_SOURCES})
+target_link_libraries(sndfile-salvage PUBLIC ${SNDFILE_TARGET})
+
+### sndfile-play-beos
+
+# This is the BeOS version of sndfile-play. It needs to be compiled with the C++
+# compiler.
+if (BEOS OR HAIKU)
+	set (sndfile_play_beos_SOURCES
+		programs/sndfile-play-beos.cpp)
+	add_executable (sndfile-play-beos ${sndfile_play_beos_SOURCES})
+	target_link_libraries(sndfile-play-beos PUBLIC ${SNDFILE_TARGET})
+endif (BEOS OR HAIKU)
 
 ## Installation
 
