@@ -18,18 +18,22 @@ if (OGG_FOUND)
 	pkg_check_modules(PC_VORBISENC QUIET vorbisenc)
 
 	find_path(VORBIS_INCLUDE_DIR vorbis/codec.h vorbis/vorbisfile.h vorbis/vorbisfile.h
-		HINTS ${PC_VORBIS_INCLUDEDIR} ${PC_VORBIS_INCLUDE_DIRS})
+		HINTS ${PC_VORBIS_INCLUDEDIR} ${PC_VORBIS_INCLUDE_DIRS} ${VORBIS_ROOT}
+		PATH_SUFFIXES include)
 	# MSVC built vorbis may be named vorbis_static
 	# The provided project files name the library with the lib prefix.
 	find_library(VORBIS_LIBRARY
 	    NAMES vorbis vorbis_static libvorbis libvorbis_static
-		HINTS ${PC_VORBIS_LIBDIR} ${PC_VORBIS_LIBRARY_DIRS})
+		HINTS ${PC_VORBIS_LIBDIR} ${PC_VORBIS_LIBRARY_DIRS} ${VORBIS_ROOT}
+		PATH_SUFFIXES lib)
 	find_library(VORBISFILE_LIBRARY
 	    NAMES vorbisfile vorbisfile_static libvorbisfile libvorbisfile_static
-		HINTS ${PC_VORBISFILE_LIBDIR} ${PC_VORBISFILE_LIBRARY_DIRS})
+		HINTS ${PC_VORBISFILE_LIBDIR} ${PC_VORBISFILE_LIBRARY_DIRS} ${VORBIS_ROOT}
+		PATH_SUFFIXES lib)
 	find_library(VORBISENC_LIBRARY
 	    NAMES vorbisenc vorbisenc_static libvorbisenc libvorbisenc_static
-		HINTS ${PC_VORBISENC_LIBDIR} ${PC_VORBISENC_LIBRARY_DIRS})
+		HINTS ${PC_VORBISENC_LIBDIR} ${PC_VORBISENC_LIBRARY_DIRS} ${VORBIS_ROOT}
+		PATH_SUFFIXES lib)
 	# Handle the QUIETLY and REQUIRED arguments and set VORBIS_FOUND
 	# to TRUE if all listed variables are TRUE.
 	include(FindPackageHandleStandardArgs)
