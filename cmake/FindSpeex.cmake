@@ -1,3 +1,10 @@
+# - Find Speex
+# Find the native Speex includes and libraries
+#
+#  SPEEX_INCLUDE_DIRS - where to find speex.h, etc.
+#  SPEEX_LIBRARIES    - List of libraries when using Speex.
+#  Speex_FOUND        - True if Speex found.
+
 if (SPEEX_INCLUDE_DIR)
 	set (SPEEX_FIND_QUIETLY TRUE)
 endif ()
