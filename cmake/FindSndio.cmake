@@ -1,6 +1,6 @@
 # - Find SoundIO (sndio) includes and libraries
 #
-#   SNDIO_FOUND        - True if SNDIO_INCLUDE_DIR & SNDIO_LIBRARY are
+#   Sndio_FOUND        - True if SNDIO_INCLUDE_DIR & SNDIO_LIBRARY are
 #                          found
 #   SNDIO_LIBRARIES    - Set when SNDIO_LIBRARY is found
 #   SNDIO_INCLUDE_DIRS - Set when SNDIO_INCLUDE_DIR is found
@@ -20,11 +20,11 @@ find_library(SNDIO_LIBRARY
 )
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(SNDIO
+find_package_handle_standard_args(Sndio
     REQUIRED_VARS SNDIO_LIBRARY SNDIO_INCLUDE_DIR
 )
 
-if(SNDIO_FOUND)
+if(Sndio_FOUND)
     set(SNDIO_LIBRARIES ${SNDIO_LIBRARY})
     set(SNDIO_INCLUDE_DIRS ${SNDIO_INCLUDE_DIR})
 endif()
