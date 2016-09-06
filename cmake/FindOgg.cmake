@@ -10,7 +10,7 @@ if(OGG_INCLUDE_DIR)
     set(OGG_FIND_QUIETLY TRUE)
 endif(OGG_INCLUDE_DIR)
 
-find_package (PkgConfig)
+find_package (PkgConfig QUIET)
 pkg_check_modules(PC_OGG QUIET ogg)
 
 find_path(OGG_INCLUDE_DIR ogg/ogg.h HINTS ${PC_OGG_INCLUDEDIR} ${PC_OGG_INCLUDE_DIRS} ${OGG_ROOT} PATH_SUFFIXES include)
