@@ -20,6 +20,7 @@ else ()
     set (HAVE_SNDIO_H ${SNDIO_FOUND})
 endif (ALSA_FOUND)
 
+if (NOT DISABLE_EXTERNAL_LIBS)
 find_package (Ogg)
 find_package (Vorbis)
 find_package (FLAC)
@@ -29,6 +30,9 @@ if (Ogg_FOUND AND Vorbis_FOUND AND FLAC_FOUND)
 		${OGG_LIBRARIES}
 		${VORBIS_LIBRARIES}
 		${FLAC_LIBRARIES})
+else ()
+    set (DISABLE_EXTERNAL_LIBS ON)
+endif ()
 endif ()
 
 find_package (Speex)
