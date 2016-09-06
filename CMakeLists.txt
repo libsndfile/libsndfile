@@ -31,18 +31,11 @@ endif ()
 option (ENABLE_TESTING "Enable testing" OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
-set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/library-build)
 
 #
 # Setup definitions
 #
 include(${CMAKE_MODULE_PATH}/check.cmake)
-
-#
-#  Find external libs
-#
-
-include(${CMAKE_MODULE_PATH}/external_libs.cmake)
 
 #
 # Setup configuration
@@ -226,7 +219,11 @@ if (M_LIBRARY)
 target_link_libraries (${SNDFILE_STATIC_TARGET} PRIVATE ${M_LIBRARY})
 endif ()
 if (EXTERNAL_XIPH_LIBS)
-target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS})
+	target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS})
+	target_include_directories (${SNDFILE_STATIC_TARGET} PRIVATE
+		${OGG_INCLUDE_DIRS}
+		${VORBIS_INCLUDE_DIRS}
+		${FLAC_INCLUDE_DIRS})
 endif ()
 if (WIN32)
 	set_target_properties(${SNDFILE_STATIC_TARGET} PROPERTIES PREFIX "lib")
@@ -249,7 +246,11 @@ if (M_LIBRARY)
 target_link_libraries (${SNDFILE_SHARED_TARGET} PRIVATE ${M_LIBRARY})
 endif ()
 if (EXTERNAL_XIPH_LIBS)
-target_link_libraries (${SNDFILE_SHARED_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS})
+	target_link_libraries (${SNDFILE_SHARED_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS})
+	target_include_directories (${SNDFILE_SHARED_TARGET} PRIVATE
+		${OGG_INCLUDE_DIRS}
+		${VORBIS_INCLUDE_DIRS}
+		${FLAC_INCLUDE_DIRS})
 endif ()
 set_target_properties (${SNDFILE_SHARED_TARGET}
 			PROPERTIES

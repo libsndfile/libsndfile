@@ -20,6 +20,17 @@ else ()
     set (HAVE_SNDIO_H ${SNDIO_FOUND})
 endif (ALSA_FOUND)
 
+find_package (Ogg)
+find_package (Vorbis)
+find_package (FLAC)
+if (OGG_FOUND AND VORBIS_FOUND AND FLAC_FOUND)
+    set (HAVE_EXTERNAL_XIPH_LIBS 1)
+	set (EXTERNAL_XIPH_LIBS
+		${OGG_LIBRARIES}
+		${VORBIS_LIBRARIES}
+		${FLAC_LIBRARIES})
+endif ()
+
 find_package (Speex)
 
 check_include_file(byteswap.h       HAVE_BYTESWAP_H)
