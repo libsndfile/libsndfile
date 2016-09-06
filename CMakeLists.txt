@@ -18,10 +18,12 @@ set (CPACK_PACKAGE_VERSION "${PROJECT_VERSION}pre1")
 
 include (GNUInstallDirs)
 include (CPack)
+include (FeatureSummary)
 
 # Options
 option (BUILD_STATIC_LIBS "Build static libraries" ON)
 option (BUILD_SHARED_LIBS "Build shared libraries" ON)
+
 if ((NOT BUILD_STATIC_LIBS) AND (NOT BUILD_SHARED_LIBS))
 message (WARNING "
 Both options BUILD_STATIC_LIBS and BUILD_SHARED_LIBS are manually set to OFF. To prevent configuration error
@@ -36,6 +38,19 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 # Setup definitions
 #
 include(${CMAKE_MODULE_PATH}/SndFileChecks.cmake)
+
+set_package_properties(Ogg PROPERTIES TYPE RECOMMENDED
+	PURPOSE "Required to enable Vorbis, Speex and Opus support")
+set_package_properties(Vorbis PROPERTIES TYPE RECOMMENDED
+	PURPOSE "Enables Vorbis support")
+set_package_properties(FLAC PROPERTIES TYPE RECOMMENDED
+	PURPOSE "Enables FLAC support")
+set_package_properties(Speex PROPERTIES TYPE OPTIONAL
+	PURPOSE "Enables experemental Speex support")
+set_package_properties(PkgConfig PROPERTIES TYPE OPTIONAL
+	PURPOSE "Improves searching of external libraries")
+
+feature_summary (WHAT ALL)
 
 #
 # Setup configuration
