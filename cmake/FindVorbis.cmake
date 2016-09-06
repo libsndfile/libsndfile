@@ -12,7 +12,7 @@ endif(VORBIS_INCLUDE_DIR)
 
 find_package (Ogg)
 if (Ogg_FOUND)
-	find_package (PkgConfig)
+	find_package (PkgConfig QUIET)
 	pkg_check_modules(PC_VORBIS QUIET vorbis)
 	pkg_check_modules(PC_VORBISFILE QUIET vorbisfile)
 	pkg_check_modules(PC_VORBISENC QUIET vorbisenc)
