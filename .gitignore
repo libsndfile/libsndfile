@@ -101,6 +101,7 @@ src/Symbols.os2
 src/Symbols.static
 src/config.h
 src/config.h.in
+src/config.h.in~
 src/libsndfile.so*
 src/libsndfile-1.def
 src/sndfile.h
