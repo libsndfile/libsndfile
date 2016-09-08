@@ -41,7 +41,9 @@
 #error "This code is not designed to be compiled with a C++ compiler."
 #endif
 
-#if (SIZEOF_LONG == 8)
+#ifdef INT64_C
+#	define	SF_PLATFORM_S64(x)		INT64_C(x)
+#elif (SIZEOF_LONG == 8)
 #	define	SF_PLATFORM_S64(x)		x##l
 #elif (SIZEOF_LONG_LONG == 8)
 #	define	SF_PLATFORM_S64(x)		x##ll
