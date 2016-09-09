@@ -847,7 +847,10 @@ mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int lo
 		|| (format & SF_FORMAT_TYPEMASK) == SF_FORMAT_SD2)
 		unlink (filename) ;
 	else
-	{	/* Create a short file. */
+	{
+		FILE *fp;
+
+		/* Create a short file. */
 		create_short_file (filename) ;
 
 		/* Opening a already existing short file (ie invalid header) RDWR is disallowed.
@@ -859,11 +862,13 @@ mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int lo
 			} ;
 
 		/* Truncate the file to zero bytes. */
-		if (truncate (filename, 0) < 0)
-		{	printf ("\n\nLine %d: truncate (%s) failed", __LINE__, filename) ;
+		fp = fopen (filename, "w");
+		if (!fp)
+		{	printf ("\n\nLine %d: fopen (%s) failed", __LINE__, filename) ;
 			perror (NULL) ;
 			exit (1) ;
 			} ;
+		fclose (fp);
 		} ;
 
 	/* Opening a zero length file RDWR is allowed, but the SF_INFO struct must contain
