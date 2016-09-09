@@ -859,8 +859,8 @@ mono_rdwr_[+ (get "type_name") +]_test (const char *filename, int format, int lo
 			} ;
 
 		/* Truncate the file to zero bytes. */
-		if (truncate (filename, 0) < 0)
-		{	printf ("\n\nLine %d: truncate (%s) failed", __LINE__, filename) ;
+		if (truncate_file_to_zero (filename) < 0)
+		{	printf ("\n\nLine %d: truncate_file_to_zero (%s) failed", __LINE__, filename) ;
 			perror (NULL) ;
 			exit (1) ;
 			} ;

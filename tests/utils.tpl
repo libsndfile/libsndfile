@@ -96,6 +96,8 @@ arith_shift_left (int32_t x, int shift)
 
 void	delete_file (int format, const char *filename) ;
 
+int		truncate_file_to_zero (const char *fname) ;
+
 void	count_open_files (void) ;
 void	increment_open_file_count (void) ;
 void	check_open_file_count_or_die (int lineno) ;
@@ -783,6 +785,17 @@ delete_file (int format, const char *filename)
 
 	unlink (rsrc_name) ;
 } /* delete_file */
+
+int
+truncate_file_to_zero (const char * fname)
+{	FILE * file ;
+
+	if ((file = fopen (fname, "w")) == NULL)
+		return errno ;
+	fclose (file) ;
+
+	return 0 ;
+} /* truncate_file_to_zero */
 
 static int allowed_open_files = -1 ;
 
