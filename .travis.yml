@@ -16,6 +16,7 @@ matrix:
             - libogg-dev
             - libvorbis-dev
             - libflac-dev
+            - libasound2-dev
     - os: linux
       compiler: gcc
       addons:
@@ -27,6 +28,7 @@ matrix:
             - libogg-dev
             - libvorbis-dev
             - libflac-dev
+            - libasound2-dev
     - os: osx
       compiler: clang
 
