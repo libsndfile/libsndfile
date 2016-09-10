@@ -16,6 +16,12 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+/* Microsoft declares some 'unistd.h' functions in 'io.h'. */
+
+#ifdef HAVE_IO_H
+#include <io.h>
+#endif
+
 /* Some defines that microsoft 'forgot' to implement. */
 
 #ifndef R_OK
