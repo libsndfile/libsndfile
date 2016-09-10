@@ -12,6 +12,7 @@ matrix:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise
           packages:
+            - autogen
             - clang-3.6
             - g++-5
             - libogg-dev
@@ -26,6 +27,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - autogen
             - g++-5
             - libogg-dev
             - libvorbis-dev
@@ -49,7 +51,7 @@ before_install:
       cd -
     else
       brew update && brew unlink cmake
-      brew install cmake libogg libvorbis flac
+      brew install autogen cmake flac libogg libvorbis
     fi
 
 install:
@@ -57,5 +59,7 @@ install:
 
 script:
   - ./autogen.sh
+  - ./configure
   - mkdir cmake-build && (cd cmake-build && cmake .. -DBUILD_STATIC_LIBS:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=ON && make)
+  - pwd
   - ./configure --enable-werror && make clean all check
