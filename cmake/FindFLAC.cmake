@@ -4,6 +4,7 @@
 #  FLAC_INCLUDE_DIRS - where to find FLAC headers.
 #  FLAC_LIBRARIES    - List of libraries when using libFLAC.
 #  FLAC_FOUND        - True if libFLAC found.
+#  FLAC_DEFINITIONS  - FLAC compile definitons 
 
 if (FLAC_INCLUDE_DIR)
     # Already in cache, be silent
@@ -38,6 +39,10 @@ if (FLAC_FOUND)
 	set (FLAC_LIBRARIES ${FLAC_LIBRARY} ${OGG_LIBRARIES})
 	if (WIN32)
 		set (FLAC_LIBRARIES ${FLAC_LIBRARIES} wsock32)
+		get_filename_component (FLAC_LIBRARY_FILENAME ${FLAC_LIBRARY} NAME_WE)
+		if (FLAC_LIBRARY_FILENAME MATCHES "libFLAC_static")
+			set (FLAC_DEFINITIONS -DFLAC__NO_DLL)
+		endif ()
 	endif (WIN32)
 endif (FLAC_FOUND)
 
