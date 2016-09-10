@@ -545,20 +545,20 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 			# System headers on these systems are broken.
 			temp_CFLAGS=`echo $CFLAGS | $SED "s/-Wall -pedantic//" | $SED "s/-Wshadow//" | $SED "s/-Waggregate-return//"`
 			CFLAGS=$temp_CFLAGS
-			SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,\$(top_builddir)/src/Symbols.darwin"
+			SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,\$(srcdir)/Symbols.darwin"
 			;;
 		linux*|kfreebsd*-gnu*|gnu*)
-			SHLIB_VERSION_ARG="-Wl,--version-script=\$(top_builddir)/src/Symbols.gnu-binutils"
+			SHLIB_VERSION_ARG="-Wl,--version-script=\$(srcdir)/Symbols.gnu-binutils"
 			;;
 		mingw*)
-			SHLIB_VERSION_ARG="-Wc,-static-libgcc -Wl,\$(top_builddir)/src/libsndfile-1.def"
+			SHLIB_VERSION_ARG="-Wc,-static-libgcc -Wl,\$(srcdir)/libsndfile-1.def"
 			win32_target_dll=1
 			if test x"$enable_shared" = xno ; then
 				win32_target_dll=0
 				fi
 			;;
 		os2*)
-			SHLIB_VERSION_ARG="-Wl,-export-symbols \$(top_builddir)/src/Symbols.os2"
+			SHLIB_VERSION_ARG="-Wl,-export-symbols \$(srcdir)/Symbols.os2"
 			;;
 		*)
 			;;
