@@ -49,7 +49,7 @@ before_install:
       cd -
     else
       brew update && brew unlink cmake
-      brew install cmake libogg libvorbis flac pkg-config
+      brew install cmake libogg libvorbis flac
     fi
 
 install:
