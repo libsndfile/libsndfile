@@ -76,6 +76,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #cmakedefine01 HAVE_INTTYPES_H
 
+/* Define to 1 if you have the <io.h> header file. */
+#cmakedefine HAVE_IO_H
+
 /* Define to 1 if you have the `m' library (-lm). */
 #cmakedefine01 HAVE_LIBM
 
