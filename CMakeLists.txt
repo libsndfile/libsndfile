@@ -249,7 +249,7 @@ add_library(${SNDFILE_STATIC_TARGET} STATIC ${libsndfile_SOURCES})
 if (M_LIBRARY)
 target_link_libraries (${SNDFILE_STATIC_TARGET} PRIVATE ${M_LIBRARY})
 endif ()
-if (EXTERNAL_XIPH_LIBS)
+if (NOT DISABLE_EXTERNAL_LIBS)
 	target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS})
 	target_include_directories (${SNDFILE_STATIC_TARGET} PRIVATE
 		${OGG_INCLUDE_DIRS}
@@ -281,7 +281,7 @@ add_library(${SNDFILE_SHARED_TARGET} SHARED ${libsndfile_SOURCES})
 if (M_LIBRARY)
 target_link_libraries (${SNDFILE_SHARED_TARGET} PRIVATE ${M_LIBRARY})
 endif ()
-if (EXTERNAL_XIPH_LIBS)
+if (NOT DISABLE_EXTERNAL_LIBS)
 	target_link_libraries (${SNDFILE_SHARED_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS})
 	target_include_directories (${SNDFILE_SHARED_TARGET} PRIVATE
 		${OGG_INCLUDE_DIRS}
