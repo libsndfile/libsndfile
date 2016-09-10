@@ -324,7 +324,7 @@ set (sndfile_info_SOURCES
 	programs/common.c
 	programs/common.h)
 add_executable (sndfile-info ${sndfile_info_SOURCES})
-target_link_libraries(sndfile-info PUBLIC ${SNDFILE_TARGET})
+target_link_libraries(sndfile-info PUBLIC ${SNDFILE_TARGET} m)
 
 ### sndfile-play
 
