@@ -4,6 +4,7 @@ language: c
 matrix:
   include:
     - os: linux
+      dist: trusty
       compiler: clang
       addons:
         apt:
@@ -18,6 +19,7 @@ matrix:
             - libflac-dev
             - libasound2-dev
     - os: linux
+      dist: trusty
       compiler: gcc
       addons:
         apt:
@@ -53,4 +55,7 @@ before_install:
 install:
   - true
 
-script: mkdir build && cd build && cmake .. -DBUILD_STATIC_LIBS:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=ON && make
+script:
+  - ./autogen.sh
+  - mkdir cmake-build && cd cmake-build && cmake .. -DBUILD_STATIC_LIBS:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=ON && make
+  - mkdir autotool-build && cd autotool-build && ../configure --enable-werror && make clean all check
