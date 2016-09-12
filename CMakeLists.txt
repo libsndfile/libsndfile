@@ -597,4 +597,11 @@ add_executable (external_libs_test ${external_libs_test_SOURCES})
 target_link_libraries (external_libs_test ${SNDFILE_TARGET})
 add_test (external_libs_test external_libs_test)
 
+### format_check_test
+
+set (format_check_test_SOURCES tests/format_check_test.c tests/utils.c)
+add_executable (format_check_test ${format_check_test_SOURCES})
+target_link_libraries (format_check_test ${SNDFILE_TARGET})
+add_test (format_check_test format_check_test)
+
 endif ()
