@@ -558,4 +558,11 @@ add_executable (checksum_test ${checksum_test_SOURCES})
 target_link_libraries (checksum_test ${SNDFILE_TARGET})
 add_test (checksum_test checksum_test)
 
+### scale_clip_test
+
+set (scale_clip_test_SOURCES tests/scale_clip_test.c tests/utils.c)
+add_executable (scale_clip_test ${scale_clip_test_SOURCES})
+target_link_libraries (scale_clip_test ${SNDFILE_TARGET})
+add_test (scale_clip_test scale_clip_test)
+
 endif ()
