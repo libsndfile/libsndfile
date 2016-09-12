@@ -565,4 +565,11 @@ add_executable (scale_clip_test ${scale_clip_test_SOURCES})
 target_link_libraries (scale_clip_test ${SNDFILE_TARGET})
 add_test (scale_clip_test scale_clip_test)
 
+### headerless_test
+
+set (headerless_test_SOURCES tests/utils.c tests/headerless_test.c)
+add_executable (headerless_test ${headerless_test_SOURCES})
+target_link_libraries (headerless_test ${SNDFILE_TARGET})
+add_test (headerless_test headerless_test)
+
 endif ()
