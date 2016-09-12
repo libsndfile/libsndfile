@@ -481,4 +481,25 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTAL
 
 if (BUILD_TESTING)
 
+### test_main
+
+set (test_main_SOURCES 
+	src/test_main.c
+	src/test_main.h
+	src/test_conversions.c
+	src/test_float.c
+	src/test_endswap.c
+	src/test_audio_detect.c
+	src/test_log_printf.c
+	src/test_file_io.c
+	src/test_ima_oki_adpcm.c
+	src/test_strncpy_crlf.c
+	src/test_broadcast_var.c
+	src/test_cart_var.c
+	src/test_binheader_writef.c)
+	
+add_executable (test_main ${test_main_SOURCES})
+target_link_libraries (test_main ${SNDFILE_STATIC_TARGET})
+add_test (test_main test_main)
+
 endif ()
