@@ -544,4 +544,11 @@ add_executable (command_test ${command_test_SOURCES})
 target_link_libraries (command_test ${SNDFILE_TARGET})
 add_test (command_test command_test all)
 
+### floating_point_test
+
+set (floating_point_test_SOURCES tests/utils.c tests/dft_cmp.c tests/floating_point_test.c)
+add_executable (floating_point_test ${floating_point_test_SOURCES})
+target_link_libraries (floating_point_test ${SNDFILE_TARGET})
+add_test (floating_point_test floating_point_test)
+
 endif ()
