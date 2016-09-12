@@ -312,3 +312,6 @@
 
 /* Set to 1 to use C99 printf/snprintf in MinGW. */
 #cmakedefine01 __USE_MINGW_ANSI_STDIO
+
+/* Define as `__inline' or '__inline__' if that's what the C compiler calls it, or to nothing if it is not supported. */
+@INLINE_CODE@
