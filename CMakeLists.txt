@@ -510,5 +510,12 @@ target_link_libraries (sfversion ${SNDFILE_TARGET})
 add_test (sfversion sfversion)
 set_tests_properties (sfversion PROPERTIES
 	PASS_REGULAR_EXPRESSION "libsndfile-${CPACK_PACKAGE_VERSION}")
+	
+### error_test
+
+set (error_test_SOURCES tests/error_test.c tests/utils.c)
+add_executable (error_test ${error_test_SOURCES})
+target_link_libraries (error_test ${SNDFILE_TARGET})
+add_test (error_test error_test)
 
 endif ()
