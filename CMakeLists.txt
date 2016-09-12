@@ -524,4 +524,10 @@ add_executable (ulaw_test ${ulaw_test_SOURCES})
 target_link_libraries (ulaw_test ${SNDFILE_TARGET})
 add_test (ulaw_test ulaw_test)
 
+### alaw_test
+set (alaw_test_SOURCES tests/utils.c tests/alaw_test.c)
+add_executable (alaw_test ${alaw_test_SOURCES})
+target_link_libraries (alaw_test ${SNDFILE_TARGET})
+add_test (alaw_test alaw_test)
+
 endif ()
