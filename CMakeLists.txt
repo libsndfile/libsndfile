@@ -502,4 +502,13 @@ add_executable (test_main ${test_main_SOURCES})
 target_link_libraries (test_main ${SNDFILE_STATIC_TARGET})
 add_test (test_main test_main)
 
+### sfversion_test
+
+set (sfversion_SOURCES tests/sfversion.c)
+add_executable (sfversion ${sfversion_SOURCES})
+target_link_libraries (sfversion ${SNDFILE_TARGET})
+add_test (sfversion sfversion)
+set_tests_properties (sfversion PROPERTIES
+	PASS_REGULAR_EXPRESSION "libsndfile-${CPACK_PACKAGE_VERSION}")
+
 endif ()
