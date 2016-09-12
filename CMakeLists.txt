@@ -586,4 +586,15 @@ add_executable (locale_test ${locale_test_SOURCES})
 target_link_libraries (locale_test ${SNDFILE_TARGET})
 add_test (locale_test locale_test)
 
+### win32_ordinal_test
+
+# TODO
+
+### external_libs_test
+
+set (external_libs_test_SOURCES tests/external_libs_test.c tests/utils.c)
+add_executable (external_libs_test ${external_libs_test_SOURCES})
+target_link_libraries (external_libs_test ${SNDFILE_TARGET})
+add_test (external_libs_test external_libs_test)
+
 endif ()
