@@ -1809,7 +1809,7 @@ uint2tenbytefloat (uint32_t num, uint8_t *bytes)
 		mask >>= 1 ;
 		} ;
 
-	num <<= count + 1 ;
+	num = count < 31 ? num << (count + 1) : 0 ;
 	bytes [1] = 29 - count ;
 	bytes [2] = (num >> 24) & 0xFF ;
 	bytes [3] = (num >> 16) & 0xFF ;
