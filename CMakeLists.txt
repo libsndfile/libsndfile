@@ -572,4 +572,11 @@ add_executable (headerless_test ${headerless_test_SOURCES})
 target_link_libraries (headerless_test ${SNDFILE_TARGET})
 add_test (headerless_test headerless_test)
 
+### rdwr_test
+
+set (rdwr_test_SOURCES tests/rdwr_test.c tests/utils.c)
+add_executable (rdwr_test ${rdwr_test_SOURCES})
+target_link_libraries (rdwr_test ${SNDFILE_TARGET})
+add_test (rdwr_test rdwr_test)
+
 endif ()
