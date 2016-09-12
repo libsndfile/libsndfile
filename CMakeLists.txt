@@ -537,4 +537,11 @@ add_executable (dwvw_test ${dwvw_test_SOURCES})
 target_link_libraries (dwvw_test ${SNDFILE_TARGET})
 add_test (dwvw_test dwvw_test)
 
+### command_test
+
+set (command_test_SOURCES tests/command_test.c tests/utils.c)
+add_executable (command_test ${command_test_SOURCES})
+target_link_libraries (command_test ${SNDFILE_TARGET})
+add_test (command_test command_test all)
+
 endif ()
