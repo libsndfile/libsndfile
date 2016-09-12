@@ -5,6 +5,8 @@ include (CheckSymbolExists)
 include (CheckTypeSize)
 include (TestBigEndian)
 
+include (TestInline)
+
 if (WIN32)
     set(TYPEOF_SF_COUNT_T __int64)
 else (UNIX)
@@ -184,3 +186,5 @@ endif ()
 if (ENABLE_EXPERIMENTAL)
 	set (ENABLE_EXPERIMENTAL_CODE 1)
 endif ()
+
+test_inline ()
