@@ -551,4 +551,11 @@ add_executable (floating_point_test ${floating_point_test_SOURCES})
 target_link_libraries (floating_point_test ${SNDFILE_TARGET})
 add_test (floating_point_test floating_point_test)
 
+### checksum_test
+
+set (checksum_test_SOURCES tests/checksum_test.c tests/utils.c)
+add_executable (checksum_test ${checksum_test_SOURCES})
+target_link_libraries (checksum_test ${SNDFILE_TARGET})
+add_test (checksum_test checksum_test)
+
 endif ()
