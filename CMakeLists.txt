@@ -604,4 +604,11 @@ add_executable (format_check_test ${format_check_test_SOURCES})
 target_link_libraries (format_check_test ${SNDFILE_TARGET})
 add_test (format_check_test format_check_test)
 
+### channel_test
+
+set (channel_test_SOURCES tests/channel_test.c tests/utils.c)
+add_executable (channel_test ${channel_test_SOURCES})
+target_link_libraries (channel_test ${SNDFILE_TARGET})
+add_test (channel_test channel_test)
+
 endif ()
