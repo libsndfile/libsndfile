@@ -579,4 +579,11 @@ add_executable (rdwr_test ${rdwr_test_SOURCES})
 target_link_libraries (rdwr_test ${SNDFILE_TARGET})
 add_test (rdwr_test rdwr_test)
 
+### locale_test
+
+set (locale_test_SOURCES tests/locale_test.c tests/utils.c)
+add_executable (locale_test ${locale_test_SOURCES})
+target_link_libraries (locale_test ${SNDFILE_TARGET})
+add_test (locale_test locale_test)
+
 endif ()
