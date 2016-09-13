@@ -401,26 +401,30 @@ alac_reader_calc_frames (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 static int
 alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 {	ALAC_DECODER *pdec = &plac->decoder ;
-	uint8_t		byte_buffer [ALAC_MAX_CHANNEL_COUNT * ALAC_BYTE_BUFFER_SIZE] ;
+	uint8_t		*byte_buffer = malloc(ALAC_MAX_CHANNEL_COUNT * ALAC_BYTE_BUFFER_SIZE);
 	uint32_t	packet_size ;
 	BitBuffer	bit_buffer ;
+	int			ret = 0;
+
+	if (!byte_buffer)
+		return 0 ;
 
 	packet_size = alac_reader_next_packet_size (plac->pakt_info) ;
 	if (packet_size == 0)
 	{	if (plac->pakt_info->current < plac->pakt_info->count)
 			psf_log_printf (psf, "packet_size is 0 (%d of %d)\n", plac->pakt_info->current, plac->pakt_info->count) ;
-		return 0 ;
+		goto cleanup ;
 		} ;
 
 	psf_fseek (psf, plac->input_data_pos, SEEK_SET) ;
 
-	if (packet_size > sizeof (byte_buffer))
+	if (packet_size > (ALAC_MAX_CHANNEL_COUNT * ALAC_BYTE_BUFFER_SIZE))
 	{	psf_log_printf (psf, "%s : bad packet_size (%u)\n", __func__, packet_size) ;
-		return 0 ;
+		goto cleanup ;
 		} ;
 
 	if ((packet_size != psf_fread (byte_buffer, 1, packet_size, psf)))
-		return 0 ;
+		goto cleanup ;
 
 	BitBufferInit (&bit_buffer, byte_buffer, packet_size) ;
 
@@ -430,26 +434,37 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
 	plac->partial_block_frames = 0 ;
 
-	return 1 ;
+	ret = 1 ;
+
+cleanup:
+	free (byte_buffer);
+
+	return ret ;
 } /* alac_decode_block */
 
 
 static int
 alac_encode_block (ALAC_PRIVATE *plac)
 {	ALAC_ENCODER *penc = &plac->encoder ;
-	uint8_t	byte_buffer [ALAC_MAX_CHANNEL_COUNT * ALAC_BYTE_BUFFER_SIZE] ;
+	uint8_t	*byte_buffer = malloc(ALAC_MAX_CHANNEL_COUNT * ALAC_BYTE_BUFFER_SIZE);
 	uint32_t num_bytes = 0 ;
+	int ret = 0 ;
+
+	if (!byte_buffer)
+		return 0;
 
 	alac_encode (penc, plac->partial_block_frames, plac->buffer, byte_buffer, &num_bytes) ;
 
-	if (fwrite (byte_buffer, 1, num_bytes, plac->enctmp) != num_bytes)
-		return 0 ;
-	if ((plac->pakt_info = alac_pakt_append (plac->pakt_info, num_bytes)) == NULL)
-		return 0 ;
+	if (fwrite (byte_buffer, 1, num_bytes, plac->enctmp) == num_bytes)
+		if ((plac->pakt_info = alac_pakt_append(plac->pakt_info, num_bytes)) != NULL)
+		{
+			plac->partial_block_frames = 0;
+			ret = 1;
+		}
 
-	plac->partial_block_frames = 0 ;
+	free(byte_buffer);
 
-	return 1 ;
+	return ret;
 } /* alac_encode_block */
 
 /*============================================================================================
