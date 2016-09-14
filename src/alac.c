@@ -61,6 +61,8 @@ typedef struct
 	char enctmpname [512] ;
 	FILE *enctmp ;
 
+	uint8_t	byte_buffer [ALAC_MAX_CHANNEL_COUNT * ALAC_BYTE_BUFFER_SIZE] ;
+
 	int	buffer	[] ;
 
 } ALAC_PRIVATE ;
@@ -401,7 +403,6 @@ alac_reader_calc_frames (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 static int
 alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 {	ALAC_DECODER *pdec = &plac->decoder ;
-	uint8_t		byte_buffer [ALAC_MAX_CHANNEL_COUNT * ALAC_BYTE_BUFFER_SIZE] ;
 	uint32_t	packet_size ;
 	BitBuffer	bit_buffer ;
 
@@ -414,15 +415,15 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
 	psf_fseek (psf, plac->input_data_pos, SEEK_SET) ;
 
-	if (packet_size > sizeof (byte_buffer))
+	if (packet_size > sizeof (plac->byte_buffer))
 	{	psf_log_printf (psf, "%s : bad packet_size (%u)\n", __func__, packet_size) ;
 		return 0 ;
 		} ;
 
-	if ((packet_size != psf_fread (byte_buffer, 1, packet_size, psf)))
+	if ((packet_size != psf_fread (plac->byte_buffer, 1, packet_size, psf)))
 		return 0 ;
 
-	BitBufferInit (&bit_buffer, byte_buffer, packet_size) ;
+	BitBufferInit (&bit_buffer, plac->byte_buffer, packet_size) ;
 
 	plac->input_data_pos += packet_size ;
 	plac->frames_this_block = 0 ;
@@ -437,12 +438,11 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 static int
 alac_encode_block (ALAC_PRIVATE *plac)
 {	ALAC_ENCODER *penc = &plac->encoder ;
-	uint8_t	byte_buffer [ALAC_MAX_CHANNEL_COUNT * ALAC_BYTE_BUFFER_SIZE] ;
 	uint32_t num_bytes = 0 ;
 
-	alac_encode (penc, plac->partial_block_frames, plac->buffer, byte_buffer, &num_bytes) ;
+	alac_encode (penc, plac->partial_block_frames, plac->buffer, plac->byte_buffer, &num_bytes) ;
 
-	if (fwrite (byte_buffer, 1, num_bytes, plac->enctmp) != num_bytes)
+	if (fwrite (plac->byte_buffer, 1, num_bytes, plac->enctmp) != num_bytes)
 		return 0 ;
 	if ((plac->pakt_info = alac_pakt_append (plac->pakt_info, num_bytes)) == NULL)
 		return 0 ;
