@@ -481,4 +481,134 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTAL
 
 if (BUILD_TESTING)
 
+### test_main
+
+set (test_main_SOURCES 
+	src/test_main.c
+	src/test_main.h
+	src/test_conversions.c
+	src/test_float.c
+	src/test_endswap.c
+	src/test_audio_detect.c
+	src/test_log_printf.c
+	src/test_file_io.c
+	src/test_ima_oki_adpcm.c
+	src/test_strncpy_crlf.c
+	src/test_broadcast_var.c
+	src/test_cart_var.c
+	src/test_binheader_writef.c)
+	
+add_executable (test_main ${test_main_SOURCES})
+target_link_libraries (test_main ${SNDFILE_STATIC_TARGET})
+add_test (test_main test_main)
+
+### sfversion_test
+
+set (sfversion_SOURCES tests/sfversion.c)
+add_executable (sfversion ${sfversion_SOURCES})
+target_link_libraries (sfversion ${SNDFILE_TARGET})
+add_test (sfversion sfversion)
+set_tests_properties (sfversion PROPERTIES
+	PASS_REGULAR_EXPRESSION "libsndfile-${CPACK_PACKAGE_VERSION}")
+	
+### error_test
+
+set (error_test_SOURCES tests/error_test.c tests/utils.c)
+add_executable (error_test ${error_test_SOURCES})
+target_link_libraries (error_test ${SNDFILE_TARGET})
+add_test (error_test error_test)
+
+### ulaw_test
+set (ulaw_test_SOURCES tests/utils.c tests/ulaw_test.c)
+add_executable (ulaw_test ${ulaw_test_SOURCES})
+target_link_libraries (ulaw_test ${SNDFILE_TARGET})
+add_test (ulaw_test ulaw_test)
+
+### alaw_test
+set (alaw_test_SOURCES tests/utils.c tests/alaw_test.c)
+add_executable (alaw_test ${alaw_test_SOURCES})
+target_link_libraries (alaw_test ${SNDFILE_TARGET})
+add_test (alaw_test alaw_test)
+
+### dwvw_test
+
+set (dwvw_test_SOURCES tests/utils.c tests/dwvw_test.c)
+add_executable (dwvw_test ${dwvw_test_SOURCES})
+target_link_libraries (dwvw_test ${SNDFILE_TARGET})
+add_test (dwvw_test dwvw_test)
+
+### command_test
+
+set (command_test_SOURCES tests/command_test.c tests/utils.c)
+add_executable (command_test ${command_test_SOURCES})
+target_link_libraries (command_test ${SNDFILE_TARGET})
+add_test (command_test command_test all)
+
+### floating_point_test
+
+set (floating_point_test_SOURCES tests/utils.c tests/dft_cmp.c tests/floating_point_test.c)
+add_executable (floating_point_test ${floating_point_test_SOURCES})
+target_link_libraries (floating_point_test ${SNDFILE_TARGET})
+add_test (floating_point_test floating_point_test)
+
+### checksum_test
+
+set (checksum_test_SOURCES tests/checksum_test.c tests/utils.c)
+add_executable (checksum_test ${checksum_test_SOURCES})
+target_link_libraries (checksum_test ${SNDFILE_TARGET})
+add_test (checksum_test checksum_test)
+
+### scale_clip_test
+
+set (scale_clip_test_SOURCES tests/scale_clip_test.c tests/utils.c)
+add_executable (scale_clip_test ${scale_clip_test_SOURCES})
+target_link_libraries (scale_clip_test ${SNDFILE_TARGET})
+add_test (scale_clip_test scale_clip_test)
+
+### headerless_test
+
+set (headerless_test_SOURCES tests/utils.c tests/headerless_test.c)
+add_executable (headerless_test ${headerless_test_SOURCES})
+target_link_libraries (headerless_test ${SNDFILE_TARGET})
+add_test (headerless_test headerless_test)
+
+### rdwr_test
+
+set (rdwr_test_SOURCES tests/rdwr_test.c tests/utils.c)
+add_executable (rdwr_test ${rdwr_test_SOURCES})
+target_link_libraries (rdwr_test ${SNDFILE_TARGET})
+add_test (rdwr_test rdwr_test)
+
+### locale_test
+
+set (locale_test_SOURCES tests/locale_test.c tests/utils.c)
+add_executable (locale_test ${locale_test_SOURCES})
+target_link_libraries (locale_test ${SNDFILE_TARGET})
+add_test (locale_test locale_test)
+
+### win32_ordinal_test
+
+# TODO
+
+### external_libs_test
+
+set (external_libs_test_SOURCES tests/external_libs_test.c tests/utils.c)
+add_executable (external_libs_test ${external_libs_test_SOURCES})
+target_link_libraries (external_libs_test ${SNDFILE_TARGET})
+add_test (external_libs_test external_libs_test)
+
+### format_check_test
+
+set (format_check_test_SOURCES tests/format_check_test.c tests/utils.c)
+add_executable (format_check_test ${format_check_test_SOURCES})
+target_link_libraries (format_check_test ${SNDFILE_TARGET})
+add_test (format_check_test format_check_test)
+
+### channel_test
+
+set (channel_test_SOURCES tests/channel_test.c tests/utils.c)
+add_executable (channel_test ${channel_test_SOURCES})
+target_link_libraries (channel_test ${SNDFILE_TARGET})
+add_test (channel_test channel_test)
+
 endif ()
