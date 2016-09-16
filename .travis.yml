@@ -60,6 +60,6 @@ install:
 script:
   - ./autogen.sh
   - ./configure
-  - mkdir cmake-build && (cd cmake-build && cmake .. -DBUILD_STATIC_LIBS:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=ON && make && ctest -V)
+  - mkdir cmake-build && (cd cmake-build && cmake .. && make && ctest -V)
   - pwd
   - ./configure --enable-werror && make clean all check
