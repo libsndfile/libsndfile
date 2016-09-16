@@ -60,6 +60,6 @@ install:
 script:
   - ./autogen.sh
   - ./configure
-  - mkdir cmake-build && (cd cmake-build && cmake .. && make && ctest -V)
+  - mkdir cmake-build && (cd cmake-build && cmake .. -DCMAKE_BUILD_TYPE=Release && make && ctest -V)
   - pwd
   - ./configure --enable-werror && make clean all check
