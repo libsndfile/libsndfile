@@ -69,6 +69,7 @@ AC_CHECK_HEADERS(endian.h)
 AC_CHECK_HEADERS(byteswap.h)
 AC_CHECK_HEADERS(locale.h)
 AC_CHECK_HEADERS(sys/time.h)
+AC_CHECK_HEADERS(malloc.h)
 
 AC_HEADER_SYS_WAIT
 

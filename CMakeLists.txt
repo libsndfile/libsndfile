@@ -185,7 +185,6 @@ set (FILESPECIFIC
 	
 # GSM610 sources	
 set (libgsm_SOURCES
-	src/GSM610/config.h
 	src/GSM610/gsm.h
 	src/GSM610/gsm610_priv.h
 	src/GSM610/add.c

@@ -4,13 +4,16 @@
  * details.  THERE IS ABSOLUTELY NO WARRANTY FOR THIS SOFTWARE.
  */
 
-#include "gsm.h"
+#if HAVE_CONFIG_H
 #include "config.h"
+#endif
 
-#ifdef	HAS_STDLIB_H
+#include "gsm.h"
+
+#ifdef	HAVE_STDLIB_H
 #	include	<stdlib.h>
 #else
-#	ifdef	HAS_MALLOC_H
+#	ifdef	HAVE_MALLOC_H
 #		include 	<malloc.h>
 #	else
 		extern void free () ;

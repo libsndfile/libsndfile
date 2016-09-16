@@ -8,6 +8,10 @@
  *  See private.h for the more commonly used macro versions.
  */
 
+#if HAVE_CONFIG_H
+#include    "config.h"
+#endif
+
 #include	<stdio.h>
 #include	<assert.h>
 

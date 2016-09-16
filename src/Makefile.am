@@ -55,7 +55,7 @@ libcommon_la_SOURCES = $(COMMON)
 #======================================================================
 # Subdir libraries.
 
-GSM610_libgsm_la_SOURCES = GSM610/config.h GSM610/gsm.h GSM610/gsm610_priv.h \
+GSM610_libgsm_la_SOURCES = GSM610/gsm.h GSM610/gsm610_priv.h \
 		GSM610/add.c GSM610/code.c GSM610/decode.c GSM610/gsm_create.c \
 		GSM610/gsm_decode.c GSM610/gsm_destroy.c GSM610/gsm_encode.c \
 		GSM610/gsm_option.c GSM610/long_term.c GSM610/lpc.c GSM610/preprocess.c \

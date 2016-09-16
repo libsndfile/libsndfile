@@ -13,6 +13,10 @@
  *	(Most of them inlined, so watch out.)
  */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #define	GSM_TABLE_C
 #include "gsm610_priv.h"
 
