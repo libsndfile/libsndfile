@@ -27,6 +27,10 @@
 	Copyright:	(c) 2004-2011 Apple, Inc.
 */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "matrixlib.h"
 #include "ALACAudioTypes.h"
 #include "shift.h"
