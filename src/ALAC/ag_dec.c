@@ -26,6 +26,10 @@
 	Copyright:	(c) 2001-2011 Apple, Inc.
 */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
