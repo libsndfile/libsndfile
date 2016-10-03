@@ -28,6 +28,7 @@ option (BUILD_STATIC_LIBS "Build static libraries" ON)
 option (BUILD_SHARED_LIBS "Build shared libraries" ON)
 option (DISABLE_EXTERNAL_LIBS "Disable use of FLAC, Ogg and Vorbis" OFF)
 option (ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
+option (DISABLE_CPU_CLIP "Disable tricky cpu specific clipper" OFF)
 
 if ((NOT BUILD_STATIC_LIBS) AND (NOT BUILD_SHARED_LIBS))
 message (WARNING "
@@ -50,6 +51,7 @@ add_feature_info(ENABLE_TESTING ENABLE_TESTING "build tests")
 add_feature_info(DISABLE_EXTERNAL_LIBS DISABLE_EXTERNAL_LIBS "disable use of FLAC, Ogg and Vorbis")
 add_feature_info(ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info(BUILD_TESTING BUILD_TESTING "build tests")
+add_feature_info(DISABLE_CPU_CLIP DISABLE_CPU_CLIP "Disable tricky cpu specific clipper")
 
 set_package_properties(Ogg PROPERTIES TYPE RECOMMENDED
 	URL "www.xiph.org/ogg/"
