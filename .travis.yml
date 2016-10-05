@@ -50,8 +50,7 @@ before_install:
       export PATH=~/cmake_tmp/bin:$PATH
       cd -
     else
-      brew update && brew unlink cmake
-      brew install autogen cmake flac libogg libvorbis
+      brew install autogen flac libogg libvorbis
     fi
 
 install:
