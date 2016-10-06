@@ -59,7 +59,7 @@ set_package_properties(Ogg PROPERTIES TYPE RECOMMENDED
 	PURPOSE "Required to enable Vorbis, Speex and Opus support")
 set_package_properties(Vorbis PROPERTIES TYPE RECOMMENDED
 	URL "www.vorbis.com/"
-	DESCRIPTION "open source lossy audio codec"	
+	DESCRIPTION "open source lossy audio codec"
 	PURPOSE "Enables Vorbis support")
 set_package_properties(FLAC PROPERTIES TYPE RECOMMENDED
 	URL "www.xiph.org/flac/"
@@ -114,7 +114,7 @@ set (noinst_HEADERS
 	src/chanmap.h)
 
 # Common libsndfile sources
-set (COMMON 
+set (COMMON
 	src/common.c
 	src/file_io.c
 	src/command.c
@@ -147,7 +147,7 @@ if (BUILD_SHARED_LIBS)
 	list (APPEND COMMON src/version-metadata.rc)
 endif (BUILD_SHARED_LIBS)
 endif (WIN32)
-	
+
 # File specific libsndfile sources
 set (FILESPECIFIC
 	src/sndfile.c
@@ -184,8 +184,8 @@ set (FILESPECIFIC
 	src/ogg_speex.c
 	src/ogg_pcm.c
 	src/ogg_opus.c)
-	
-# GSM610 sources	
+
+# GSM610 sources
 set (libgsm_SOURCES
 	src/GSM610/config.h
 	src/GSM610/gsm.h
@@ -238,7 +238,7 @@ set (libalac_SOURCES
 	src/ALAC/alac_decoder.c
 	src/ALAC/alac_encoder.c)
 source_group ("ALAC" FILES ${libalac_SOURCES})
-		
+
 # TODO: Private symbols (Win32 implemented)
 
 # Headers to be installed on target machine
@@ -292,7 +292,7 @@ if (NOT DISABLE_EXTERNAL_LIBS)
 		${OGG_INCLUDE_DIRS}
 		${VORBIS_INCLUDE_DIRS}
 		${FLAC_INCLUDE_DIRS})
-		target_compile_definitions (${SNDFILE_SHARED_TARGET} PRIVATE ${FLAC_DEFINITIONS})		
+		target_compile_definitions (${SNDFILE_SHARED_TARGET} PRIVATE ${FLAC_DEFINITIONS})
 	if (ENABLE_EXPERIMENTAL)
 		target_link_libraries (${SNDFILE_SHARED_TARGET} PRIVATE ${SPEEX_LIBRARIES})
 		target_include_directories (${SNDFILE_SHARED_TARGET} PRIVATE
@@ -323,7 +323,7 @@ endif (BUILD_SHARED_LIBS)
 
 ### sndfile-info
 
-set (sndfile_info_SOURCES 
+set (sndfile_info_SOURCES
 	programs/sndfile-info.c
 	programs/common.c
 	programs/common.h)
@@ -335,7 +335,7 @@ endif ()
 
 ### sndfile-play
 
-set (sndfile_play_SOURCES 
+set (sndfile_play_SOURCES
 	programs/sndfile-play.c
 	programs/common.c
 	programs/common.h)
@@ -353,7 +353,7 @@ endif ()
 
 ### sndfile-convert
 
-set (sndfile_convert_SOURCES 
+set (sndfile_convert_SOURCES
 	programs/sndfile-convert.c
 	programs/common.c
 	programs/common.h)
@@ -362,7 +362,7 @@ target_link_libraries(sndfile-convert PUBLIC ${SNDFILE_TARGET})
 
 ### sndfile-cmp
 
-set (sndfile_cmp_SOURCES 
+set (sndfile_cmp_SOURCES
 	programs/sndfile-cmp.c
 	programs/common.c
 	programs/common.h)
@@ -436,7 +436,7 @@ endif (BEOS OR HAIKU)
 
 ## Installation
 
-install (TARGETS ${SNDFILE_STATIC_TARGET} ${SNDFILE_SHARED_TARGET} ${PROGRAMS} 
+install (TARGETS ${SNDFILE_STATIC_TARGET} ${SNDFILE_SHARED_TARGET} ${PROGRAMS}
 	RUNTIME DESTINATION			${CMAKE_INSTALL_BINDIR}
 	LIBRARY DESTINATION			${CMAKE_INSTALL_LIBDIR}
 	ARCHIVE DESTINATION			${CMAKE_INSTALL_LIBDIR}
@@ -462,7 +462,7 @@ endif ()
 set (HTML_BGCOLOUR "black")
 set (HTML_FGCOLOUR "white")
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/doc/libsndfile.css.in ${CMAKE_CURRENT_SOURCE_DIR}/doc/libsndfile.css)
-set (html_DATA 
+set (html_DATA
 	doc/index.html
 	doc/libsndfile.jpg
 	doc/libsndfile.css
@@ -481,14 +481,14 @@ set (html_DATA
 install (FILES ${html_DATA} DESTINATION ${CMAKE_INSTALL_DOCDIR}/${PROJECT_NAME})
 
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-	
+
 ## Testing
 
 if (BUILD_TESTING)
 
 ### test_main
 
-set (test_main_SOURCES 
+set (test_main_SOURCES
 	src/test_main.c
 	src/test_main.h
 	src/test_conversions.c
@@ -502,7 +502,7 @@ set (test_main_SOURCES
 	src/test_broadcast_var.c
 	src/test_cart_var.c
 	src/test_binheader_writef.c)
-	
+
 add_executable (test_main ${test_main_SOURCES})
 target_link_libraries (test_main ${SNDFILE_STATIC_TARGET})
 add_test (test_main test_main)
@@ -515,7 +515,7 @@ target_link_libraries (sfversion ${SNDFILE_TARGET})
 add_test (sfversion sfversion)
 set_tests_properties (sfversion PROPERTIES
 	PASS_REGULAR_EXPRESSION "libsndfile-${CPACK_PACKAGE_VERSION}")
-	
+
 ### error_test
 
 set (error_test_SOURCES tests/error_test.c tests/utils.c)
@@ -590,7 +590,7 @@ set (scale_clip_test_SOURCES tests/scale_clip_test.c tests/utils.c)
 add_executable (scale_clip_test ${scale_clip_test_SOURCES})
 target_link_libraries (scale_clip_test PRIVATE ${SNDFILE_TARGET})
 if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
-	target_link_libraries(checksum_test PRIVATE ${M_LIBRARY})
+	target_link_libraries(scale_clip_test PRIVATE ${M_LIBRARY})
 endif ()
 add_test (scale_clip_test scale_clip_test)
 
