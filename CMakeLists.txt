@@ -659,3 +659,82 @@ endif ()
 add_test (channel_test channel_test)
 
 endif ()
+
+### common test executables
+
+set (write_read_test_SOURCES tests/utils.c tests/generate.c tests/write_read_test.c)
+add_executable (write_read_test ${write_read_test_SOURCES})
+target_link_libraries (write_read_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(write_read_test PRIVATE ${M_LIBRARY})
+endif ()
+
+set (lossy_comp_test_SOURCES tests/utils.c tests/lossy_comp_test.c)
+add_executable (lossy_comp_test ${lossy_comp_test_SOURCES})
+target_link_libraries (lossy_comp_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(lossy_comp_test PRIVATE ${M_LIBRARY})
+endif ()
+
+set (peak_chunk_test_SOURCES tests/peak_chunk_test.c tests/utils.c)
+add_executable (peak_chunk_test ${peak_chunk_test_SOURCES})
+target_link_libraries (peak_chunk_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(peak_chunk_test PRIVATE ${M_LIBRARY})
+endif ()
+
+set (header_test_SOURCES tests/header_test.c tests/utils.c)
+add_executable (header_test ${header_test_SOURCES})
+target_link_libraries (header_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(header_test PRIVATE ${M_LIBRARY})
+endif ()
+
+set (misc_test_SOURCES tests/misc_test.c tests/utils.c)
+add_executable (misc_test ${misc_test_SOURCES})
+target_link_libraries (misc_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(misc_test PRIVATE ${M_LIBRARY})
+endif ()
+
+set (string_test_SOURCES tests/string_test.c tests/utils.c)
+add_executable (string_test ${string_test_SOURCES})
+target_link_libraries (string_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(string_test PRIVATE ${M_LIBRARY})
+endif ()
+
+set (multi_file_test_SOURCES tests/multi_file_test.c tests/utils.c)
+add_executable (multi_file_test ${multi_file_test_SOURCES})
+target_link_libraries (multi_file_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(multi_file_test PRIVATE ${M_LIBRARY})
+endif ()
+
+set (aiff_rw_test_SOURCES tests/utils.c tests/aiff_rw_test.c)
+add_executable (aiff_rw_test ${aiff_rw_test_SOURCES})
+target_link_libraries (aiff_rw_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(aiff_rw_test PRIVATE ${M_LIBRARY})
+endif ()
+
+set (chunk_test_SOURCES tests/chunk_test.c tests/utils.c)
+add_executable (chunk_test ${chunk_test_SOURCES})
+target_link_libraries (chunk_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(chunk_test PRIVATE ${M_LIBRARY})
+endif ()
+
+### aiff-tests
+
+add_test (write_read_test_aiff write_read_test aiff)
+add_test (lossy_comp_test_aiff_ulaw lossy_comp_test aiff_ulaw)
+add_test (lossy_comp_test_aiff_alaw lossy_comp_test aiff_alaw)
+add_test (lossy_comp_test_aiff_gsm610 lossy_comp_test aiff_gsm610)
+add_test (peak_chunk_test_aiff peak_chunk_test aiff)
+add_test (header_test_aiff header_test aiff)
+add_test (misc_test_aiff misc_test aiff)
+add_test (string_test_aiff string_test aiff)
+add_test (multi_file_test_aiff multi_file_test aiff)
+add_test (aiff_rw_test aiff_rw_test)
+
