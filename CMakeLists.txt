@@ -769,3 +769,14 @@ add_test (chunk_test_caf chunk_test caf)
 add_test (string_test_caf string_test caf)
 add_test (long_read_write_test_alac long_read_write_test alac)
 
+### w64-tests
+
+add_test (write_read_test_w64 write_read_test w64)
+add_test (lossy_comp_test_w64_ima lossy_comp_test w64_ima)
+add_test (lossy_comp_test_w64_msadpcm lossy_comp_test w64_msadpcm)
+add_test (lossy_comp_test_w64_ulaw lossy_comp_test w64_ulaw)
+add_test (lossy_comp_test_w64_alaw lossy_comp_test w64_alaw)
+add_test (lossy_comp_test_w64_gsm610 lossy_comp_test w64_gsm610)
+add_test (header_test_w64 header_test w64)
+add_test (misc_test_w64 misc_test w64)
+
