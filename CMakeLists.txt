@@ -725,6 +725,14 @@ if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 	target_link_libraries(chunk_test PRIVATE ${M_LIBRARY})
 endif ()
 
+set (long_read_write_test_SOURCES tests/long_read_write_test.c tests/utils.c)
+add_executable (long_read_write_test ${long_read_write_test_SOURCES})
+target_link_libraries (long_read_write_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(long_read_write_test PRIVATE ${M_LIBRARY})
+endif ()
+
+
 ### aiff-tests
 
 add_test (write_read_test_aiff write_read_test aiff)
@@ -737,4 +745,16 @@ add_test (misc_test_aiff misc_test aiff)
 add_test (string_test_aiff string_test aiff)
 add_test (multi_file_test_aiff multi_file_test aiff)
 add_test (aiff_rw_test aiff_rw_test)
+
+### caf-tests
+
+add_test (write_read_test_caf write_read_test caf)
+add_test (lossy_comp_test_caf_ulaw lossy_comp_test caf_ulaw)
+add_test (lossy_comp_test_caf_alaw lossy_comp_test caf_alaw)
+add_test (header_test_caf header_test caf)
+add_test (peak_chunk_test_caf peak_chunk_test caf)
+add_test (misc_test_caf misc_test caf)
+add_test (chunk_test_caf chunk_test caf)
+add_test (string_test_caf string_test caf)
+add_test (long_read_write_test_alac long_read_write_test alac)
 
