@@ -746,6 +746,17 @@ add_test (string_test_aiff string_test aiff)
 add_test (multi_file_test_aiff multi_file_test aiff)
 add_test (aiff_rw_test aiff_rw_test)
 
+### au-tests
+
+add_test (write_read_test_au write_read_test au)
+add_test (lossy_comp_test_au_ulaw lossy_comp_test au_ulaw)
+add_test (lossy_comp_test_au_alaw lossy_comp_test au_alaw)
+add_test (lossy_comp_test_au_g721 lossy_comp_test au_g721)
+add_test (lossy_comp_test_au_g723 lossy_comp_test au_g723)
+add_test (header_test_au header_test au)
+add_test (misc_test_au misc_test au)
+add_test (multi_file_test_au multi_file_test au)
+
 ### caf-tests
 
 add_test (write_read_test_caf write_read_test caf)
