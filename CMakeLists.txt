@@ -769,6 +769,22 @@ add_test (chunk_test_caf chunk_test caf)
 add_test (string_test_caf string_test caf)
 add_test (long_read_write_test_alac long_read_write_test alac)
 
+# wav-tests
+add_test (write_read_test_wav write_read_test wav)
+add_test (lossy_comp_test_wav_pcm lossy_comp_test wav_pcm)
+add_test (lossy_comp_test_wav_ima lossy_comp_test wav_ima)
+add_test (lossy_comp_test_wav_msadpcm lossy_comp_test wav_msadpcm)
+add_test (lossy_comp_test_wav_ulaw lossy_comp_test wav_ulaw)
+add_test (lossy_comp_test_wav_alaw lossy_comp_test wav_alaw)
+add_test (lossy_comp_test_wav_gsm610 lossy_comp_test wav_gsm610)
+add_test (lossy_comp_test_wav_g721 lossy_comp_test wav_g721)
+add_test (peak_chunk_test_wav peak_chunk_test wav)
+add_test (header_test_wav header_test wav)
+add_test (misc_test_wav misc_test wav)
+add_test (string_test_wav string_test wav)
+add_test (multi_file_test_wav multi_file_test wav)
+add_test (chunk_test_wav chunk_test wav)
+
 ### w64-tests
 
 add_test (write_read_test_w64 write_read_test w64)
