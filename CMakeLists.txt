@@ -824,3 +824,8 @@ add_test (write_read_test_paf write_read_test paf)
 add_test (header_test_paf header_test paf)
 add_test (misc_test_paf misc_test paf)
 
+### svx-tests
+add_test (write_read_test_svx write_read_test svx)
+add_test (header_test_svx header_test svx)
+add_test (misc_test_svx misc_test svx)
+
