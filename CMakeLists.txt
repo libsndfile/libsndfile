@@ -860,3 +860,8 @@ add_test (write_read_test_mat5 write_read_test mat5)
 add_test (header_test_mat5 header_test mat5)
 add_test (misc_test_mat5 misc_test mat5)
 
+### pvf-tests
+add_test (write_read_test_pvf write_read_test pvf)
+add_test (header_test_pvf header_test pvf)
+add_test (misc_test_pvf misc_test pvf)
+
