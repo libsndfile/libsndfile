@@ -855,3 +855,8 @@ add_test (write_read_test_mat4 write_read_test mat4)
 add_test (header_test_mat4 header_test mat4)
 add_test (misc_test_mat4 misc_test mat4)
 
+### mat5-tests
+add_test (write_read_test_mat5 write_read_test mat5)
+add_test (header_test_mat5 header_test mat5)
+add_test (misc_test_mat5 misc_test mat5)
+
