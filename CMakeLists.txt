@@ -753,6 +753,41 @@ if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 	target_link_libraries(ogg_test PRIVATE ${M_LIBRARY})
 endif ()
 
+set (stdin_test_SOURCES tests/stdin_test.c tests/utils.c)
+add_executable (stdin_test ${stdin_test_SOURCES})
+target_link_libraries (stdin_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(stdin_test PRIVATE ${M_LIBRARY})
+endif ()
+
+set (stdout_test_SOURCES tests/stdout_test.c)
+add_executable (stdout_test ${stdout_test_SOURCES})
+target_link_libraries (stdout_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(stdout_test PRIVATE ${M_LIBRARY})
+endif ()
+
+set (stdio_test_SOURCES tests/stdio_test.c tests/utils.c)
+add_executable (stdio_test ${stdio_test_SOURCES})
+target_link_libraries (stdio_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(stdio_test PRIVATE ${M_LIBRARY})
+endif ()
+
+set (pipe_test_SOURCES tests/pipe_test.c tests/utils.c)
+add_executable (pipe_test ${pipe_test_SOURCES})
+target_link_libraries (pipe_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(pipe_test PRIVATE ${M_LIBRARY})
+endif ()
+
+set (virtual_io_test_SOURCES tests/virtual_io_test.c tests/utils.c)
+add_executable (virtual_io_test ${virtual_io_test_SOURCES})
+target_link_libraries (virtual_io_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(virtual_io_test PRIVATE ${M_LIBRARY})
+endif ()
+
 ### aiff-tests
 
 add_test (write_read_test_aiff write_read_test aiff)
@@ -919,4 +954,9 @@ add_test (compression_size_test_vorbis compression_size_test vorbis)
 add_test (lossy_comp_test_ogg_vorbis lossy_comp_test ogg_vorbis)
 add_test (string_test_ogg string_test ogg)
 add_test (misc_test_ogg misc_test ogg)
+
+### io-tests
+add_test (stdio_test stdio_test)
+add_test (pipe_test pipe_test)
+add_test (virtual_io_test virtual_io_test)
 
