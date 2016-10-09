@@ -873,3 +873,8 @@ add_test (write_read_test_htk write_read_test htk)
 add_test (header_test_htk header_test htk)
 add_test (misc_test_htk misc_test htk)
 
+### avr-tests
+add_test (write_read_test_avr write_read_test avr)
+add_test (header_test_avr header_test avr)
+add_test (misc_test_avr misc_test avr)
+
