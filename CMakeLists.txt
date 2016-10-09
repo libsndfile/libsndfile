@@ -798,6 +798,16 @@ if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 	target_link_libraries(virtual_io_test PRIVATE ${M_LIBRARY})
 endif ()
 
+### g72x_test
+
+set (g72x_test_SOURCES src/G72x/g72x_test.c ${libg72x_SOURCES})
+add_executable (g72x_test ${g72x_test_SOURCES})
+target_link_libraries (g72x_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(g72x_test PRIVATE ${M_LIBRARY})
+endif ()
+add_test (g72x_test g72x_test all)
+
 ### aiff-tests
 
 add_test (write_read_test_aiff write_read_test aiff)
