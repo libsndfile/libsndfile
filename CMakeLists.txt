@@ -843,3 +843,10 @@ add_test (lossy_comp_test_ircam_alaw lossy_comp_test ircam_alaw)
 add_test (header_test_ircam header_test ircam)
 add_test (misc_test_ircam misc_test ircam)
 
+### voc-tests
+add_test (write_read_test_voc write_read_test voc)
+add_test (lossy_comp_test_voc_ulaw lossy_comp_test voc_ulaw)
+add_test (lossy_comp_test_voc_alaw lossy_comp_test voc_alaw)
+add_test (header_test_voc header_test voc)
+add_test (misc_test_voc misc_test voc)
+
