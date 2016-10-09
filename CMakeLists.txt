@@ -878,3 +878,8 @@ add_test (write_read_test_avr write_read_test avr)
 add_test (header_test_avr header_test avr)
 add_test (misc_test_avr misc_test avr)
 
+### sds-tests
+add_test (write_read_test_sds write_read_test sds)
+add_test (header_test_sds header_test sds)
+add_test (misc_test_sds misc_test sds)
+
