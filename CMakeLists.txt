@@ -865,3 +865,6 @@ add_test (write_read_test_pvf write_read_test pvf)
 add_test (header_test_pvf header_test pvf)
 add_test (misc_test_pvf misc_test pvf)
 
+### xi-tests
+add_test (lossy_comp_test_xi_dpcm lossy_comp_test xi_dpcm)
+
