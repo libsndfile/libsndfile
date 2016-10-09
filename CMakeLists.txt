@@ -796,3 +796,12 @@ add_test (lossy_comp_test_w64_gsm610 lossy_comp_test w64_gsm610)
 add_test (header_test_w64 header_test w64)
 add_test (misc_test_w64 misc_test w64)
 
+### rf64-tests
+
+add_test (write_read_test_rf64 write_read_test rf64)
+add_test (header_test_rf64 header_test rf64)
+add_test (misc_test_rf64 misc_test rf64)
+add_test (string_test_rf64 string_test rf64)
+add_test (peak_chunk_test_rf64 peak_chunk_test rf64)
+add_test (chunk_test_rf64 chunk_test rf64)
+
