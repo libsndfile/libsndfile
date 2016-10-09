@@ -819,3 +819,8 @@ add_test (lossy_comp_test_raw_gsm610 lossy_comp_test raw_gsm610)
 add_test (lossy_comp_test_vox_adpcm lossy_comp_test vox_adpcm)
 add_test (raw_test raw_test)
 
+### paf-tests
+add_test (write_read_test_paf write_read_test paf)
+add_test (header_test_paf header_test paf)
+add_test (misc_test_paf misc_test paf)
+
