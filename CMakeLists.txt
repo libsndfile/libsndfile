@@ -868,3 +868,8 @@ add_test (misc_test_pvf misc_test pvf)
 ### xi-tests
 add_test (lossy_comp_test_xi_dpcm lossy_comp_test xi_dpcm)
 
+### htk-tests
+add_test (write_read_test_htk write_read_test htk)
+add_test (header_test_htk header_test htk)
+add_test (misc_test_htk misc_test htk)
+
