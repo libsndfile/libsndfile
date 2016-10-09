@@ -739,6 +739,13 @@ if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 	target_link_libraries(raw_test PRIVATE ${M_LIBRARY})
 endif ()
 
+set (compression_size_test_SOURCES tests/compression_size_test.c tests/utils.c)
+add_executable (compression_size_test ${compression_size_test_SOURCES})
+target_link_libraries (compression_size_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(compression_size_test PRIVATE ${M_LIBRARY})
+endif ()
+
 ### aiff-tests
 
 add_test (write_read_test_aiff write_read_test aiff)
@@ -893,4 +900,9 @@ add_test (lossy_comp_test_wve lossy_comp_test wve)
 add_test (write_read_test_mpc2k write_read_test mpc2k)
 add_test (header_test_mpc2k header_test mpc2k)
 add_test (misc_test_mpc2k misc_test mpc2k)
+
+### flac-tests
+add_test (write_read_test_flac write_read_test flac)
+add_test (compression_size_test_flac compression_size_test flac)
+add_test (string_test_flac string_test flac)
 
