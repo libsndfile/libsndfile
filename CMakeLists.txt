@@ -889,3 +889,8 @@ add_test (write_read_test_sd2 write_read_test sd2)
 ### wve-tests
 add_test (lossy_comp_test_wve lossy_comp_test wve)
 
+### mpc2k-tests
+add_test (write_read_test_mpc2k write_read_test mpc2k)
+add_test (header_test_mpc2k header_test mpc2k)
+add_test (misc_test_mpc2k misc_test mpc2k)
+
