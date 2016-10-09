@@ -732,6 +732,12 @@ if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 	target_link_libraries(long_read_write_test PRIVATE ${M_LIBRARY})
 endif ()
 
+set (raw_test_SOURCES tests/raw_test.c tests/utils.c)
+add_executable (raw_test ${raw_test_SOURCES})
+target_link_libraries (raw_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(raw_test PRIVATE ${M_LIBRARY})
+endif ()
 
 ### aiff-tests
 
@@ -804,4 +810,12 @@ add_test (misc_test_rf64 misc_test rf64)
 add_test (string_test_rf64 string_test rf64)
 add_test (peak_chunk_test_rf64 peak_chunk_test rf64)
 add_test (chunk_test_rf64 chunk_test rf64)
+
+### raw-tests
+add_test (write_read_test_raw write_read_test raw)
+add_test (lossy_comp_test_raw_ulaw lossy_comp_test raw_ulaw)
+add_test (lossy_comp_test_raw_alaw lossy_comp_test raw_alaw)
+add_test (lossy_comp_test_raw_gsm610 lossy_comp_test raw_gsm610)
+add_test (lossy_comp_test_vox_adpcm lossy_comp_test vox_adpcm)
+add_test (raw_test raw_test)
 
