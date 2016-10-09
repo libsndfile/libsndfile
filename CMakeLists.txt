@@ -829,3 +829,10 @@ add_test (write_read_test_svx write_read_test svx)
 add_test (header_test_svx header_test svx)
 add_test (misc_test_svx misc_test svx)
 
+### nist-tests
+add_test (write_read_test_nist write_read_test nist)
+add_test (lossy_comp_test_nist_ulaw lossy_comp_test nist_ulaw)
+add_test (lossy_comp_test_nist_alaw lossy_comp_test nist_alaw)
+add_test (header_test_nist header_test nist)
+add_test (misc_test_nist misc_test nist)
+
