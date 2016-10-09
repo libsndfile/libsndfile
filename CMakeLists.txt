@@ -836,3 +836,10 @@ add_test (lossy_comp_test_nist_alaw lossy_comp_test nist_alaw)
 add_test (header_test_nist header_test nist)
 add_test (misc_test_nist misc_test nist)
 
+### ircam-tests
+add_test (write_read_test_ircam write_read_test ircam)
+add_test (lossy_comp_test_ircam_ulaw lossy_comp_test ircam_ulaw)
+add_test (lossy_comp_test_ircam_alaw lossy_comp_test ircam_alaw)
+add_test (header_test_ircam header_test ircam)
+add_test (misc_test_ircam misc_test ircam)
+
