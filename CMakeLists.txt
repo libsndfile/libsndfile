@@ -628,6 +628,16 @@ add_test (locale_test locale_test)
 
 # TODO
 
+### cpp_test
+
+set (cpp_test_SOURCES tests/cpp_test.cc tests/utils.c)
+add_executable (cpp_test ${cpp_test_SOURCES})
+target_link_libraries (cpp_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(cpp_test PRIVATE ${M_LIBRARY})
+endif ()
+add_test (cpp_test cpp_test)
+
 ### external_libs_test
 
 set (external_libs_test_SOURCES tests/external_libs_test.c tests/utils.c)
