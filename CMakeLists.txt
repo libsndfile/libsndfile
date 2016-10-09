@@ -850,3 +850,8 @@ add_test (lossy_comp_test_voc_alaw lossy_comp_test voc_alaw)
 add_test (header_test_voc header_test voc)
 add_test (misc_test_voc misc_test voc)
 
+### mat4-tests
+add_test (write_read_test_mat4 write_read_test mat4)
+add_test (header_test_mat4 header_test mat4)
+add_test (misc_test_mat4 misc_test mat4)
+
