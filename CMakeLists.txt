@@ -746,6 +746,13 @@ if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 	target_link_libraries(compression_size_test PRIVATE ${M_LIBRARY})
 endif ()
 
+set (ogg_test_SOURCES tests/ogg_test.c tests/utils.c)
+add_executable (ogg_test ${ogg_test_SOURCES})
+target_link_libraries (ogg_test PRIVATE ${SNDFILE_TARGET})
+if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	target_link_libraries(ogg_test PRIVATE ${M_LIBRARY})
+endif ()
+
 ### aiff-tests
 
 add_test (write_read_test_aiff write_read_test aiff)
@@ -905,4 +912,11 @@ add_test (misc_test_mpc2k misc_test mpc2k)
 add_test (write_read_test_flac write_read_test flac)
 add_test (compression_size_test_flac compression_size_test flac)
 add_test (string_test_flac string_test flac)
+
+### vorbis-tests
+add_test (ogg_test ogg_test)
+add_test (compression_size_test_vorbis compression_size_test vorbis)
+add_test (lossy_comp_test_ogg_vorbis lossy_comp_test ogg_vorbis)
+add_test (string_test_ogg string_test ogg)
+add_test (misc_test_ogg misc_test ogg)
 
