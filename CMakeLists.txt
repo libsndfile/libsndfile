@@ -886,3 +886,6 @@ add_test (misc_test_sds misc_test sds)
 # sd2-tests
 add_test (write_read_test_sd2 write_read_test sd2)
 
+### wve-tests
+add_test (lossy_comp_test_wve lossy_comp_test wve)
+
