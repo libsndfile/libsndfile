@@ -883,3 +883,6 @@ add_test (write_read_test_sds write_read_test sds)
 add_test (header_test_sds header_test sds)
 add_test (misc_test_sds misc_test sds)
 
+# sd2-tests
+add_test (write_read_test_sd2 write_read_test sd2)
+
