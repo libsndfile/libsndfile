@@ -36,7 +36,6 @@ LT_PROG_RC
 AC_PROG_INSTALL
 AC_PROG_LN_S
 
-AC_CHECK_PROG(HAVE_AUTOGEN, autogen, yes, no)
 AC_CHECK_PROG(HAVE_WINE, wine, yes, no)
 AC_CHECK_PROG(HAVE_XCODE_SELECT, xcode-select, yes, no)
 
@@ -464,11 +463,6 @@ if test $ac_cv_sizeof_double != 8 ; then
 	AC_MSG_WARN([[******************************************************************]])
 	fi
 
-if test x"$ac_cv_prog_HAVE_AUTOGEN" = "xno" ; then
-	AC_MSG_WARN([[Touching files in directory tests/.]])
-	touch tests/*.c tests/*.h
-	fi
-
 #====================================================================================
 # Settings for the HTML documentation.
 
@@ -698,5 +692,4 @@ echo "    Stack smash protection : .............. ${enable_stack_smash_protectio
 # Remove symlink created by Scripts/android-configure.sh.
 test -h gdbclient && rm -f gdbclient
 
-(cd src && make genfiles)
-(cd tests && make genfiles)
+(cd src)

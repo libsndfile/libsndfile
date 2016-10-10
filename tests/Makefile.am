@@ -20,18 +20,6 @@ check_PROGRAMS = sfversion floating_point_test write_read_test \
 
 noinst_HEADERS = dft_cmp.h utils.h generate.h
 
-autogen_sources = write_read_test.tpl write_read_test.def	\
-					pcm_test.tpl pcm_test.def				\
-					header_test.tpl header_test.def			\
-					utils.tpl utils.def						\
-					scale_clip_test.tpl scale_clip_test.def	\
-					pipe_test.tpl pipe_test.def				\
-					rdwr_test.tpl rdwr_test.def				\
-					floating_point_test.tpl floating_point_test.def	\
-					benchmark.tpl benchmark.def
-
-EXTRA_DIST = $(autogen_sources)
-
 CLEANFILES = *~ *.exe
 
 #===============================================================================
@@ -187,35 +175,3 @@ scale_clip_test_LDADD = $(top_builddir)/src/libsndfile.la
 # Lite remove end
 
 #===============================================================================
-
-write_read_test.c: write_read_test.def write_read_test.tpl
-	(cd $(srcdir) && autogen --writable write_read_test.def)
-
-pcm_test.c: pcm_test.def pcm_test.tpl
-	(cd $(srcdir) && autogen --writable pcm_test.def)
-
-header_test.c: header_test.def header_test.tpl
-	(cd $(srcdir) && autogen --writable header_test.def)
-
-utils.c utils.h : utils.def utils.tpl
-	(cd $(srcdir) && autogen --writable utils.def)
-
-scale_clip_test.c: scale_clip_test.def scale_clip_test.tpl
-	(cd $(srcdir) && autogen --writable scale_clip_test.def)
-
-pipe_test.c: pipe_test.def pipe_test.tpl
-	(cd $(srcdir) && autogen --writable pipe_test.def)
-
-rdwr_test.c: rdwr_test.def rdwr_test.tpl
-	(cd $(srcdir) && autogen --writable rdwr_test.def)
-
-floating_point_test.c: floating_point_test.def floating_point_test.tpl
-	(cd $(srcdir) && autogen --writable floating_point_test.def)
-
-benchmark.c: benchmark.def benchmark.tpl
-	(cd $(srcdir) && autogen --writable benchmark.def)
-
-genfiles : write_read_test.c pcm_test.c header_test.c utils.c \
-		scale_clip_test.c pipe_test.c floating_point_test.c rdwr_test.c \
-		benchmark.c
-

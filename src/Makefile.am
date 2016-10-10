@@ -12,12 +12,11 @@ noinst_LTLIBRARIES =  GSM610/libgsm.la G72x/libg72x.la ALAC/libalac.la libcommon
 
 SYMBOL_FILES = Symbols.gnu-binutils Symbols.darwin libsndfile-1.def Symbols.os2 Symbols.static
 
-EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
-			$(SYMBOL_FILES) create_symbols_file.py binheader_writef_check.py \
-			GSM610/README GSM610/COPYRIGHT GSM610/ChangeLog \
-			G72x/README G72x/README.original G72x/ChangeLog \
-			make-static-lib-hidden-privates.sh \
-			config.h.cmake libsndfile.def.in.cmake version-metadata.rc.in.cmake
+EXTRA_DIST = sndfile.h.in config.h.in $(SYMBOL_FILES) \
+			binheader_writef_check.py GSM610/README GSM610/COPYRIGHT \
+			GSM610/ChangeLog G72x/README G72x/README.original G72x/ChangeLog \
+			make-static-lib-hidden-privates.sh config.h.cmake \
+			libsndfile.def.in.cmake version-metadata.rc.in.cmake
 
 noinst_HEADERS = common.h sfconfig.h sfendian.h wavlike.h sf_unistd.h ogg.h chanmap.h
 
@@ -83,11 +82,6 @@ test_main_LDADD = libcommon.la
 G72x_g72x_test_SOURCES = G72x/g72x_test.c
 G72x_g72x_test_LDADD = G72x/libg72x.la
 
-test_endswap.c: test_endswap.def test_endswap.tpl
-	(cd $(srcdir) && autogen --writable test_endswap.def)
-
-genfiles : $(SYMBOL_FILES) test_endswap.c
-
 check :
 	@if [ -x /usr/bin/python ]; then $(srcdir)/binheader_writef_check.py $(srcdir)/*.c ; fi
 	G72x/g72x_test$(EXEEXT) all
@@ -95,29 +89,6 @@ check :
 
 # Need this target to force building of test programs.
 checkprograms : $(check_PROGRAMS)
-
-#======================================================================
-# Generate an OS specific Symbols files. This is done when the author
-# builds the distribution tarball. There should be not need for the
-# end user to create these files.
-
-Symbols.gnu-binutils: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py linux $(VERSION) > $@
-
-Symbols.darwin: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py darwin $(VERSION) > $@
-
-libsndfile-1.def: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py win32 $(VERSION) > $@
-
-Symbols.os2: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py os2 $(VERSION) > $@
-
-Symbols.static: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py static $(VERSION) > $@
-
-# Fake dependancy to force the creation of these files.
-sndfile.o : $(SYMBOL_FILES)
 
 #======================================================================
 # Building windows resource files (if needed).
