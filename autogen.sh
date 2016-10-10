@@ -117,19 +117,6 @@ result="yes"
 }
 echo $result
 
-
-printf "checking for python ... "
-result="yes"
-(python --version) < /dev/null > /dev/null 2>&1 || {
-        echo
-        echo "You must have Python installed to compile $package."
-        echo "Download the appropriate package for your distribution,"
-        echo "or get the source tarball at http://python.org/"
-		result="no"
-        DIE=1
-}
-echo $result
-
 if test "$DIE" -eq 1; then
         exit 1
 fi
