@@ -12,7 +12,7 @@ noinst_LTLIBRARIES =  GSM610/libgsm.la G72x/libg72x.la ALAC/libalac.la libcommon
 
 SYMBOL_FILES = Symbols.gnu-binutils Symbols.darwin libsndfile-1.def Symbols.os2 Symbols.static
 
-EXTRA_DIST = sndfile.h.in config.h.in test_endswap.c test_endswap.tpl test_endswap.def \
+EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
 			$(SYMBOL_FILES) create_symbols_file binheader_writef_check.py \
 			GSM610/README GSM610/COPYRIGHT GSM610/ChangeLog \
 			G72x/README G72x/README.original G72x/ChangeLog \
@@ -105,19 +105,19 @@ checkprograms : $(check_PROGRAMS)
 # end user to create these files.
 
 Symbols.gnu-binutils: create_symbols_file
-	$(AM_V_GEN) ./create_symbols_file linux $(VERSION) $@
+	./create_symbols_file linux $(VERSION) > $@
 
 Symbols.darwin: create_symbols_file
-	$(AM_V_GEN) ./create_symbols_file darwin $(VERSION) $@
+	./create_symbols_file darwin $(VERSION) > $@
 
 libsndfile-1.def: create_symbols_file
-	$(AM_V_GEN) ./create_symbols_file win32 $(VERSION) $@
+	./create_symbols_file win32 $(VERSION) > $@
 
 Symbols.os2: create_symbols_file
-	$(AM_V_GEN) ./create_symbols_file os2 $(VERSION) $@
+	./create_symbols_file os2 $(VERSION) > $@
 
 Symbols.static: create_symbols_file
-	$(AM_V_GEN) ./create_symbols_file static $(VERSION) $@
+	./create_symbols_file static $(VERSION) > $@
 
 create_symbols_file_SOURCES = create_symbols_file.c
 
