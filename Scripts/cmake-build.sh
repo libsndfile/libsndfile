@@ -6,4 +6,4 @@ cmake -DWerror=on -Werror=dev -Werror=deprecated .
 
 make clean
 make
-make check
+make test
