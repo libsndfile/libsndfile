@@ -13,12 +13,14 @@ noinst_LTLIBRARIES =  GSM610/libgsm.la G72x/libg72x.la ALAC/libalac.la libcommon
 SYMBOL_FILES = Symbols.gnu-binutils Symbols.darwin libsndfile-1.def Symbols.os2 Symbols.static
 
 EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
-			$(SYMBOL_FILES) create_symbols_file.py binheader_writef_check.py \
+			$(SYMBOL_FILES) create_symbols_file binheader_writef_check.py \
 			GSM610/README GSM610/COPYRIGHT GSM610/ChangeLog \
 			G72x/README G72x/README.original G72x/ChangeLog \
 			make-static-lib-hidden-privates.sh
 
 noinst_HEADERS = common.h sfconfig.h sfendian.h wavlike.h sf_unistd.h ogg.h chanmap.h
+
+noinst_PROGRAMS = create_symbols_file
 
 check_PROGRAMS = test_main G72x/g72x_test
 
@@ -33,7 +35,7 @@ FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam
 		sds.c svx.c txw.c voc.c wve.c w64.c wavlike.c wav.c xi.c mpc2k.c rf64.c \
 		ogg_vorbis.c ogg_speex.c ogg_pcm.c ogg_opus.c
 
-CLEANFILES = *~ *.exe G72x/*.exe error.dat
+CLEANFILES = *~ *.exe G72x/*.exe error.dat $(SYMBOL_FILES)
 
 if USE_WIN_VERSION_FILE
 WIN_VERSION_FILE = version-metadata.rc
@@ -100,20 +102,22 @@ checkprograms : $(check_PROGRAMS)
 # builds the distribution tarball. There should be not need for the
 # end user to create these files.
 
-Symbols.gnu-binutils: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py linux $(VERSION) > $@
+Symbols.gnu-binutils: create_symbols_file
+	./create_symbols_file linux $(VERSION) > $@
 
-Symbols.darwin: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py darwin $(VERSION) > $@
+Symbols.darwin: create_symbols_file
+	./create_symbols_file darwin $(VERSION) > $@
 
-libsndfile-1.def: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py win32 $(VERSION) > $@
+libsndfile-1.def: create_symbols_file
+	./create_symbols_file win32 $(VERSION) > $@
 
-Symbols.os2: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py os2 $(VERSION) > $@
+Symbols.os2: create_symbols_file
+	./create_symbols_file os2 $(VERSION) > $@
 
-Symbols.static: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py static $(VERSION) > $@
+Symbols.static: create_symbols_file
+	./create_symbols_file static $(VERSION) > $@
+
+create_symbols_file_SOURCES = create_symbols_file.c
 
 # Fake dependancy to force the creation of these files.
 sndfile.o : $(SYMBOL_FILES)
