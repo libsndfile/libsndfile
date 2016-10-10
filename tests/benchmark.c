@@ -1,4 +1,3 @@
-[+ AutoGen5 template c +]
 /*
 ** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
@@ -73,10 +72,10 @@ static void	*data = NULL ;
 
 static void calc_raw_performance (PERF_STATS *stats) ;
 
-[+ FOR data_type
-+]static void	calc_[+ (get "type_name") +]_performance (int format, double read_rate, double write_rate) ;
-[+ ENDFOR data_type
-+]
+static void	calc_short_performance (int format, double read_rate, double write_rate) ;
+static void	calc_int_performance (int format, double read_rate, double write_rate) ;
+static void	calc_float_performance (int format, double read_rate, double write_rate) ;
+
 
 static int cpu_is_big_endian (void) ;
 
@@ -218,28 +217,27 @@ calc_raw_performance (PERF_STATS *stats)
 /*------------------------------------------------------------------------------
 */
 
-[+ FOR data_type
-+]static void
-calc_[+ (get "type_name") +]_performance (int format, double read_rate, double write_rate)
+static void
+calc_short_performance (int format, double read_rate, double write_rate)
 {	SNDFILE *file ;
 	SF_INFO	sfinfo ;
 	clock_t start_clock, clock_time ;
 	double	performance ;
 	int k, item_count, retval, op_count ;
 	const char* subtype ;
-	[+ (get "type_name") +] *[+ (get "type_name") +]_data ;
+	short *short_data ;
 	const char *filename ;
 
 	filename = "benchmark.dat" ;
 	subtype = get_subtype_str (format & SF_FORMAT_SUBMASK) ;
 
-	[+ (get "type_name") +]_data = data ;
+	short_data = data ;
 	item_count = BUFFER_SIZE ;
 	for (k = 0 ; k < item_count ; k++)
-		[+ (get "type_name") +]_data [k] = [+ (get "multiplier") +] * sin (2 * M_PI * k / 32000.0) ;
+		short_data [k] = 32700.0 * sin (2 * M_PI * k / 32000.0) ;
 
 	/* Collect write stats */
-	printf ("    Write %-5s   to  %s : ", "[+ (get "type_name") +]", subtype) ;
+	printf ("    Write %-5s   to  %s : ", "short", subtype) ;
 	fflush (stdout) ;
 
 	sfinfo.channels = 1 ;
@@ -262,7 +260,7 @@ calc_[+ (get "type_name") +]_performance (int format, double read_rate, double w
 		sf_command (file, SFC_SET_ADD_PEAK_CHUNK, NULL, SF_FALSE) ;
 
 		for (k = 0 ; k < BLOCK_COUNT ; k++)
-		{	if ((retval = sf_write_[+ (get "type_name") +] (file, [+ (get "type_name") +]_data, item_count)) != item_count)
+		{	if ((retval = sf_write_short (file, short_data, item_count)) != item_count)
 			{	printf ("Error : sf_write_short returned %d (should have been %d)\n", retval, item_count) ;
 				exit (1) ;
 				} ;
@@ -279,7 +277,7 @@ calc_[+ (get "type_name") +]_performance (int format, double read_rate, double w
 	printf ("%6.2f%% of raw write\n", 100.0 * performance / write_rate) ;
 
 	/* Collect read stats */
-	printf ("    Read  %-5s  from %s : ", "[+ (get "type_name") +]", subtype) ;
+	printf ("    Read  %-5s  from %s : ", "short", subtype) ;
 	fflush (stdout) ;
 
 	clock_time = 0 ;
@@ -294,7 +292,7 @@ calc_[+ (get "type_name") +]_performance (int format, double read_rate, double w
 			} ;
 
 		for (k = 0 ; k < BLOCK_COUNT ; k++)
-		{	if ((retval = sf_read_[+ (get "type_name") +] (file, [+ (get "type_name") +]_data, item_count)) != item_count)
+		{	if ((retval = sf_read_short (file, short_data, item_count)) != item_count)
 			{	printf ("Error : write returned %d (should have been %d)\n", retval, item_count) ;
 				exit (1) ;
 				} ;
@@ -312,9 +310,196 @@ calc_[+ (get "type_name") +]_performance (int format, double read_rate, double w
 
 	unlink (filename) ;
 
-} /* calc_[+ (get "type_name") +]_performance */
-[+ ENDFOR data_type
-+]
+} /* calc_short_performance */
+static void
+calc_int_performance (int format, double read_rate, double write_rate)
+{	SNDFILE *file ;
+	SF_INFO	sfinfo ;
+	clock_t start_clock, clock_time ;
+	double	performance ;
+	int k, item_count, retval, op_count ;
+	const char* subtype ;
+	int *int_data ;
+	const char *filename ;
+
+	filename = "benchmark.dat" ;
+	subtype = get_subtype_str (format & SF_FORMAT_SUBMASK) ;
+
+	int_data = data ;
+	item_count = BUFFER_SIZE ;
+	for (k = 0 ; k < item_count ; k++)
+		int_data [k] = 32700.0 * (1 << 16) * sin (2 * M_PI * k / 32000.0) ;
+
+	/* Collect write stats */
+	printf ("    Write %-5s   to  %s : ", "int", subtype) ;
+	fflush (stdout) ;
+
+	sfinfo.channels = 1 ;
+	sfinfo.format = format ;
+	sfinfo.frames = 1 ;
+	sfinfo.samplerate = 32000 ;
+
+	clock_time = 0 ;
+	op_count = 0 ;
+	start_clock = clock () ;
+
+	while (clock_time < (CLOCKS_PER_SEC * TEST_DURATION))
+	{	if (! (file = sf_open (filename, SFM_WRITE, &sfinfo)))
+		{	printf ("Error : not able to open file : %s\n", filename) ;
+			perror ("") ;
+			exit (1) ;
+			} ;
+
+		/* Turn off the addition of a PEAK chunk. */
+		sf_command (file, SFC_SET_ADD_PEAK_CHUNK, NULL, SF_FALSE) ;
+
+		for (k = 0 ; k < BLOCK_COUNT ; k++)
+		{	if ((retval = sf_write_int (file, int_data, item_count)) != item_count)
+			{	printf ("Error : sf_write_short returned %d (should have been %d)\n", retval, item_count) ;
+				exit (1) ;
+				} ;
+			} ;
+
+		sf_close (file) ;
+
+		clock_time = clock () - start_clock ;
+		op_count ++ ;
+		} ;
+
+	performance = (1.0 * BUFFER_SIZE) * BLOCK_COUNT * op_count ;
+	performance *= (1.0 * CLOCKS_PER_SEC) / clock_time ;
+	printf ("%6.2f%% of raw write\n", 100.0 * performance / write_rate) ;
+
+	/* Collect read stats */
+	printf ("    Read  %-5s  from %s : ", "int", subtype) ;
+	fflush (stdout) ;
+
+	clock_time = 0 ;
+	op_count = 0 ;
+	start_clock = clock () ;
+
+	while (clock_time < (CLOCKS_PER_SEC * TEST_DURATION))
+	{	if (! (file = sf_open (filename, SFM_READ, &sfinfo)))
+		{	printf ("Error : not able to open file : %s\n", filename) ;
+			perror ("") ;
+			exit (1) ;
+			} ;
+
+		for (k = 0 ; k < BLOCK_COUNT ; k++)
+		{	if ((retval = sf_read_int (file, int_data, item_count)) != item_count)
+			{	printf ("Error : write returned %d (should have been %d)\n", retval, item_count) ;
+				exit (1) ;
+				} ;
+			} ;
+
+		sf_close (file) ;
+
+		clock_time = clock () - start_clock ;
+		op_count ++ ;
+		} ;
+
+	performance = (1.0 * item_count) * BLOCK_COUNT * op_count ;
+	performance *= (1.0 * CLOCKS_PER_SEC) / clock_time ;
+	printf ("%6.2f%% of raw read\n", 100.0 * performance / read_rate) ;
+
+	unlink (filename) ;
+
+} /* calc_int_performance */
+static void
+calc_float_performance (int format, double read_rate, double write_rate)
+{	SNDFILE *file ;
+	SF_INFO	sfinfo ;
+	clock_t start_clock, clock_time ;
+	double	performance ;
+	int k, item_count, retval, op_count ;
+	const char* subtype ;
+	float *float_data ;
+	const char *filename ;
+
+	filename = "benchmark.dat" ;
+	subtype = get_subtype_str (format & SF_FORMAT_SUBMASK) ;
+
+	float_data = data ;
+	item_count = BUFFER_SIZE ;
+	for (k = 0 ; k < item_count ; k++)
+		float_data [k] = 1.0 * sin (2 * M_PI * k / 32000.0) ;
+
+	/* Collect write stats */
+	printf ("    Write %-5s   to  %s : ", "float", subtype) ;
+	fflush (stdout) ;
+
+	sfinfo.channels = 1 ;
+	sfinfo.format = format ;
+	sfinfo.frames = 1 ;
+	sfinfo.samplerate = 32000 ;
+
+	clock_time = 0 ;
+	op_count = 0 ;
+	start_clock = clock () ;
+
+	while (clock_time < (CLOCKS_PER_SEC * TEST_DURATION))
+	{	if (! (file = sf_open (filename, SFM_WRITE, &sfinfo)))
+		{	printf ("Error : not able to open file : %s\n", filename) ;
+			perror ("") ;
+			exit (1) ;
+			} ;
+
+		/* Turn off the addition of a PEAK chunk. */
+		sf_command (file, SFC_SET_ADD_PEAK_CHUNK, NULL, SF_FALSE) ;
+
+		for (k = 0 ; k < BLOCK_COUNT ; k++)
+		{	if ((retval = sf_write_float (file, float_data, item_count)) != item_count)
+			{	printf ("Error : sf_write_short returned %d (should have been %d)\n", retval, item_count) ;
+				exit (1) ;
+				} ;
+			} ;
+
+		sf_close (file) ;
+
+		clock_time = clock () - start_clock ;
+		op_count ++ ;
+		} ;
+
+	performance = (1.0 * BUFFER_SIZE) * BLOCK_COUNT * op_count ;
+	performance *= (1.0 * CLOCKS_PER_SEC) / clock_time ;
+	printf ("%6.2f%% of raw write\n", 100.0 * performance / write_rate) ;
+
+	/* Collect read stats */
+	printf ("    Read  %-5s  from %s : ", "float", subtype) ;
+	fflush (stdout) ;
+
+	clock_time = 0 ;
+	op_count = 0 ;
+	start_clock = clock () ;
+
+	while (clock_time < (CLOCKS_PER_SEC * TEST_DURATION))
+	{	if (! (file = sf_open (filename, SFM_READ, &sfinfo)))
+		{	printf ("Error : not able to open file : %s\n", filename) ;
+			perror ("") ;
+			exit (1) ;
+			} ;
+
+		for (k = 0 ; k < BLOCK_COUNT ; k++)
+		{	if ((retval = sf_read_float (file, float_data, item_count)) != item_count)
+			{	printf ("Error : write returned %d (should have been %d)\n", retval, item_count) ;
+				exit (1) ;
+				} ;
+			} ;
+
+		sf_close (file) ;
+
+		clock_time = clock () - start_clock ;
+		op_count ++ ;
+		} ;
+
+	performance = (1.0 * item_count) * BLOCK_COUNT * op_count ;
+	performance *= (1.0 * CLOCKS_PER_SEC) / clock_time ;
+	printf ("%6.2f%% of raw read\n", 100.0 * performance / read_rate) ;
+
+	unlink (filename) ;
+
+} /* calc_float_performance */
+
 
 /*==============================================================================
 */
