@@ -34,14 +34,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <float.h>
 
 #include <sndfile.h>
 
 #define	BLOCK_SIZE 4096
 
+#ifdef DBL_DECIMAL_DIG
+	#define OP_DBL_Digs (DBL_DECIMAL_DIG)
+#else
+	#ifdef DECIMAL_DIG
+		#define OP_DBL_Digs (DECIMAL_DIG)
+	#else
+		#define OP_DBL_Digs (DBL_DIG + 3)
+	#endif
+#endif
+
 static void
 print_usage (char *progname)
-{	printf ("\nUsage : %s <input file> <output file>\n", progname) ;
+{	printf ("\nUsage : %s [--full-precision] <input file> <output file>\n", progname) ;
 	puts ("\n"
 		"    Where the output file will contain a line for each frame\n"
 		"    and a column for each channel.\n"
@@ -50,7 +61,7 @@ print_usage (char *progname)
 } /* print_usage */
 
 static void
-convert_to_text (SNDFILE * infile, FILE * outfile, int channels)
+convert_to_text (SNDFILE * infile, FILE * outfile, int channels, int full_precision)
 {	float buf [BLOCK_SIZE] ;
 	sf_count_t frames ;
 	int k, m, readcount ;
@@ -60,7 +71,10 @@ convert_to_text (SNDFILE * infile, FILE * outfile, int channels)
 	while ((readcount = sf_readf_float (infile, buf, frames)) > 0)
 	{	for (k = 0 ; k < readcount ; k++)
 		{	for (m = 0 ; m < channels ; m++)
-				fprintf (outfile, " % 12.10f", buf [k * channels + m]) ;
+				if (full_precision)
+					fprintf (outfile, " %.*e", OP_DBL_Digs - 1, buf [k * channels + m]) ;
+				else
+					fprintf (outfile, " % 12.10f", buf [k * channels + m]) ;
 			fprintf (outfile, "\n") ;
 			} ;
 		} ;
@@ -74,13 +88,24 @@ main (int argc, char * argv [])
 	SNDFILE		*infile = NULL ;
 	FILE		*outfile = NULL ;
 	SF_INFO		sfinfo ;
+	int		full_precision = 0 ;
 
 	progname = strrchr (argv [0], '/') ;
 	progname = progname ? progname + 1 : argv [0] ;
 
-	if (argc != 3)
-	{	print_usage (progname) ;
-		return 1 ;
+	switch (argc)
+	{	case 4 :
+			if (!strcmp ("--full-precision", argv [3]))
+			{	print_usage (progname) ;
+				return 1 ;
+				} ;
+			full_precision = 1 ;
+			argv++ ;
+		case 3 :
+			break ;
+		default:
+			print_usage (progname) ;
+			return 1 ;
 		} ;
 
 	infilename = argv [1] ;
@@ -121,7 +146,7 @@ main (int argc, char * argv [])
 	fprintf (outfile, "# Converted from file %s.\n", infilename) ;
 	fprintf (outfile, "# Channels %d, Sample rate %d\n", sfinfo.channels, sfinfo.samplerate) ;
 
-	convert_to_text (infile, outfile, sfinfo.channels) ;
+	convert_to_text (infile, outfile, sfinfo.channels, full_precision) ;
 
 	sf_close (infile) ;
 	fclose (outfile) ;
