@@ -25,12 +25,6 @@ noinst_PROGRAMS = create_symbols_file
 
 check_PROGRAMS = test_main G72x/g72x_test
 
-COMMON = common.c file_io.c command.c pcm.c ulaw.c alaw.c float32.c \
-		double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
-		interleave.c strings.c dither.c cart.c broadcast.c audio_detect.c \
- 		ima_oki_adpcm.c ima_oki_adpcm.h alac.c chunk.c ogg.c chanmap.c \
-		windows.c id3.c $(WIN_VERSION_FILE)
-
 FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c \
 		macos.c mat4.c mat5.c nist.c paf.c pvf.c raw.c rx2.c sd2.c \
 		sds.c svx.c txw.c voc.c wve.c w64.c wavlike.c wav.c xi.c mpc2k.c rf64.c \
@@ -52,7 +46,14 @@ nodist_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
 libsndfile_la_LIBADD = GSM610/libgsm.la G72x/libg72x.la ALAC/libalac.la \
 		libcommon.la $(EXTERNAL_XIPH_LIBS) -lm
 
-libcommon_la_SOURCES = $(COMMON)
+EXTRA_libsndfile_la_DEPENDENCIES = $(SYMBOL_FILES)
+
+libcommon_la_SOURCES = common.c file_io.c command.c pcm.c ulaw.c alaw.c \
+		float32.c double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
+		interleave.c strings.c dither.c cart.c broadcast.c audio_detect.c \
+ 		ima_oki_adpcm.c ima_oki_adpcm.h alac.c chunk.c ogg.c chanmap.c \
+		windows.c id3.c $(WIN_VERSION_FILE)
+
 
 #======================================================================
 # Subdir libraries.
@@ -104,24 +105,21 @@ checkprograms : $(check_PROGRAMS)
 # end user to create these files.
 
 Symbols.gnu-binutils: create_symbols_file
-	./create_symbols_file linux $(VERSION) > $@
+	$(AM_V_GEN) ./create_symbols_file linux $(VERSION) > $@
 
 Symbols.darwin: create_symbols_file
-	./create_symbols_file darwin $(VERSION) > $@
+	$(AM_V_GEN) ./create_symbols_file darwin $(VERSION) > $@
 
 libsndfile-1.def: create_symbols_file
-	./create_symbols_file win32 $(VERSION) > $@
+	$(AM_V_GEN) ./create_symbols_file win32 $(VERSION) > $@
 
 Symbols.os2: create_symbols_file
-	./create_symbols_file os2 $(VERSION) > $@
+	$(AM_V_GEN) ./create_symbols_file os2 $(VERSION) > $@
 
 Symbols.static: create_symbols_file
-	./create_symbols_file static $(VERSION) > $@
+	$(AM_V_GEN) ./create_symbols_file static $(VERSION) > $@
 
 create_symbols_file_SOURCES = create_symbols_file.c
-
-# Fake dependancy to force the creation of these files.
-sndfile.o : $(SYMBOL_FILES)
 
 #======================================================================
 # Building windows resource files (if needed).
