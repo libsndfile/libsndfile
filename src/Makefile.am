@@ -104,19 +104,19 @@ checkprograms : $(check_PROGRAMS)
 # end user to create these files.
 
 Symbols.gnu-binutils: create_symbols_file
-	$(AM_V_GEN) ./create_symbols_file linux $(VERSION) > $@
+	$(AM_V_GEN) ./create_symbols_file linux $(VERSION) $@
 
 Symbols.darwin: create_symbols_file
-	$(AM_V_GEN) ./create_symbols_file darwin $(VERSION) > $@
+	$(AM_V_GEN) ./create_symbols_file darwin $(VERSION) $@
 
 libsndfile-1.def: create_symbols_file
-	$(AM_V_GEN) ./create_symbols_file win32 $(VERSION) > $@
+	$(AM_V_GEN) ./create_symbols_file win32 $(VERSION) $@
 
 Symbols.os2: create_symbols_file
-	$(AM_V_GEN) ./create_symbols_file os2 $(VERSION) > $@
+	$(AM_V_GEN) ./create_symbols_file os2 $(VERSION) $@
 
 Symbols.static: create_symbols_file
-	$(AM_V_GEN) ./create_symbols_file static $(VERSION) > $@
+	$(AM_V_GEN) ./create_symbols_file static $(VERSION) $@
 
 create_symbols_file_SOURCES = create_symbols_file.c
 
