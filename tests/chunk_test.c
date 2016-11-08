@@ -29,20 +29,20 @@
 
 #include	<sndfile.h>
 
+#include	"sfendian.h"
 #include	"utils.h"
 
 #define	BUFFER_LEN			(1 << 10)
 #define LOG_BUFFER_SIZE		1024
 
 static void	chunk_test (const char *filename, int format) ;
-
-static void
-chunk_test_helper (const char *filename, int format, const char * testdata) ;
+static void wav_subchunk_test (size_t chunk_size) ;
+static void chunk_test_helper (const char *filename, int format, const char * testdata) ;
 
 int
 main (int argc, char *argv [])
 {	int		do_all = 0 ;
-	int		test_count = 0 ;
+	int		test_count = 0, k ;
 
 	if (argc != 2)
 	{	printf ("Usage : %s <test>\n", argv [0]) ;
@@ -61,6 +61,10 @@ main (int argc, char *argv [])
 	{	chunk_test ("chunks_pcm16.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		chunk_test ("chunks_pcm16.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		chunk_test ("chunks_pcm16.wavex", SF_FORMAT_WAVEX | SF_FORMAT_PCM_16) ;
+
+		for (k = 100 ; k < 10000 ; k *= 4)
+			wav_subchunk_test (k) ;
+
 		test_count++ ;
 		} ;
 
@@ -305,3 +309,74 @@ chunk_test (const char *filename, int format)
 
 	puts ("ok") ;
 } /* chunk_test */
+
+
+static void
+wav_subchunk_test (size_t chunk_size)
+{	SNDFILE 		* file ;
+	SF_INFO			sfinfo ;
+	SF_CHUNK_INFO	chunk_info ;
+	char filename [256] ;
+	char chunk_data [10240] ;
+	short audio [16] ;
+	int	err, value ;
+
+	snprintf (filename, sizeof (filename), "subchunk_%04d.wav", (int) chunk_size) ;
+	print_test_name (__func__, filename) ;
+
+	exit_if_true (sizeof (chunk_data) < chunk_size, "\n\nLine %d : sizeof (data) < chunk_size\n\n", __LINE__) ;
+
+	memset (chunk_data, 53, sizeof (chunk_data)) ;
+	chunk_data [chunk_size] = 0 ;
+
+	/* Fill in the chunk data. */
+	value = MAKE_MARKER ('a', 'd', 't', 'l') ;
+	memcpy (chunk_data, &value, sizeof (value)) ;
+	value = MAKE_MARKER ('n', 'o', 't', 'e') ;
+	memcpy (chunk_data + 4, &value, sizeof (value)) ;
+	value = H2LE_32 (chunk_size - 12) ;
+	memcpy (chunk_data + 8, &value, sizeof (value)) ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.channels		= 1 ;
+	sfinfo.frames		= 0 ;
+	sfinfo.format		= SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	/* Set up the chunk to write. */
+	memset (&chunk_info, 0, sizeof (chunk_info)) ;
+	snprintf (chunk_info.id, sizeof (chunk_info.id), "LIST") ;
+	chunk_info.id_size = 4 ;
+	chunk_info.data = chunk_data ;
+	chunk_info.datalen = chunk_size ;
+
+	err = sf_set_chunk (file, &chunk_info) ;
+	exit_if_true (
+		err != SF_ERR_NO_ERROR,
+		"\n\nLine %d : sf_set_chunk returned for testdata : %s\n\n", __LINE__, sf_error_number (err)
+		) ;
+
+	memset (chunk_info.data, 0, chunk_info.datalen) ;
+
+	/* Add some audio data. */
+	memset (audio, 0, sizeof (audio)) ;
+	sf_write_short (file, audio, ARRAY_LEN (audio)) ;
+
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	exit_if_true (
+		sfinfo.frames != ARRAY_LEN (audio),
+		"\n\nLine %d : Incorrect sample count (%d should be %d)\n", __LINE__, (int) sfinfo.frames, (int) ARRAY_LEN (audio)
+		) ;
+
+	if (chunk_size < 512)
+		check_log_buffer_or_die (file, __LINE__) ;
+
+	sf_close (file) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* wav_subchunk_test */
