@@ -170,14 +170,14 @@ rm -f src/config.h src/cmake-config.h
 
 cd $olddir
 
-fprecommit=.git/hooks/pre-commit
-if test ! -f $fprecommit ; then
-	echo
-	echo "Installing git pre-commit hook for this project."
-	cat > $fprecommit << 'foobar'
-#!/bin/sh
-exec Scripts/git-pre-commit-hook
-foobar
-	chmod u+x $fprecommit
-	echo
+if test -d .git/ ; then
+	fprecommit=.git/hooks/pre-commit
+	if test ! -f $fprecommit ; then
+		echo
+		echo "Installing git pre-commit hook for this project."
+		printf "#/bin/sh\nexec Scripts/git-pre-commit-hook\n" > $fprecommit
+		chmod u+x $fprecommit
+		echo
+		fi
 	fi
+
