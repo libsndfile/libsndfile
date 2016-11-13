@@ -14,7 +14,8 @@ matrix:
           packages:
             - autogen
             - clang-3.6
-            - g++-5
+            - gcc
+            - g++
             - libogg-dev
             - libvorbis-dev
             - libflac-dev
@@ -37,8 +38,8 @@ matrix:
       compiler: clang
 
 before_install:
-  - if [ "$CC"  == "gcc"     ]; then export CC=gcc-5; fi
-  - if [ "$CXX" == "g++"     ]; then export CXX=g++-5; fi
+  - if [ "$CC"  == "gcc"     ]; then export CC=gcc; fi
+  - if [ "$CXX" == "g++"     ]; then export CXX=g++; fi
 #- if [ "$CC"  == "clang"   ]; then export CC=clang-3.6; fi
 #- if [ "$CXX" == "clang++" ]; then export CXX=clang++-3.6; fi
   - |
