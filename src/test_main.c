@@ -26,9 +26,23 @@
 
 #include "test_main.h"
 
+static void
+test_file_offsets_are_64_bit (void)
+{
+	print_test_name ("File offsets are 64 bit") ;
+
+	if (sizeof (off_t) != 8)
+	{	printf ("\n\nError : sizeof (off_t) is %zd (should be 8).\n\n", sizeof (off_t)) ;
+		exit (1) ;
+		} ;
+
+	puts ("ok") ;
+} /* test_file_offsets_are_64_bit */
+
 int
 main (void)
 {
+	test_file_offsets_are_64_bit () ;
 	test_conversions () ;
 	test_endswap () ;
 	test_float_convert () ;
