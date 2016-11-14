@@ -155,8 +155,6 @@ AC_CHECK_SIZEOF(long long,8)
 
 # Check for common 64 bit file offset types.
 AC_CHECK_SIZEOF(off_t,1)
-AC_CHECK_SIZEOF(loff_t,1)
-AC_CHECK_SIZEOF(off64_t,1)
 
 if test "$enable_largefile:$ac_cv_sizeof_off_t" = "no:8" ; then
 	echo
@@ -164,7 +162,6 @@ if test "$enable_largefile:$ac_cv_sizeof_off_t" = "no:8" ; then
 	echo
 	exit 1
 	fi
-
 
 case "$host_os" in
 	mingw32*)
@@ -180,14 +177,6 @@ case "$host_os" in
 			TYPEOF_SF_COUNT_T="int64_t"
 			SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 			SIZEOF_SF_COUNT_T=8
-		elif test "x$ac_cv_sizeof_loff_t" = "x8" ; then
-			TYPEOF_SF_COUNT_T="int64_t"
-			SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
-			SIZEOF_SF_COUNT_T=8
-		elif test "x$ac_cv_sizeof_off64_t" = "x8" ; then
-			TYPEOF_SF_COUNT_T="int64_t"
-			SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
-			SIZEOF_SF_COUNT_T=8
 		else
 			# Save the old sizeof (off_t) value  and then unset it to see if it
 			# changes when Large File Support is enabled.
@@ -195,7 +184,6 @@ case "$host_os" in
 			unset ac_cv_sizeof_off_t
 
 			AC_SYS_LARGEFILE
-
 			if test "x$ac_cv_sys_largefile_CFLAGS" = "xno" ; then
 				ac_cv_sys_largefile_CFLAGS=""
 				fi
@@ -211,6 +199,7 @@ case "$host_os" in
 			if test "x$ac_cv_sizeof_off_t" = "x8" ; then
 				TYPEOF_SF_COUNT_T="int64_t"
 				SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
+				SIZEOF_SF_COUNT_T=8
 			elif test "x$TYPEOF_SF_COUNT_T" = "xunknown" ; then
 				echo
 				echo "*** The configure process has determined that this system is capable"
