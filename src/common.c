@@ -714,7 +714,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					strptr = va_arg (argptr, char *) ;
 					size = strlen (strptr) ;
 					size = (size & 1) ? size : size + 1 ;
-					size = (size > 255) ? 255 : size ;
+					size = (size > 254) ? 254 : size ;
 					header_put_byte (psf, size) ;
 					memcpy (&(psf->header [psf->headindex]), strptr, size) ;
 					psf->headindex += size ;
@@ -724,9 +724,11 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 			case 'b' :
 					bindata	= va_arg (argptr, void *) ;
 					size	= va_arg (argptr, size_t) ;
-					memcpy (&(psf->header [psf->headindex]), bindata, size) ;
-					psf->headindex += size ;
-					count += size ;
+					if (psf->headindex + size < sizeof (psf->header))
+					{	memcpy (&(psf->header [psf->headindex]), bindata, size) ;
+						psf->headindex += size ;
+						count += size ;
+						} ;
 					break ;
 
 			case 'z' :
@@ -749,7 +751,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 			case 'j' :
 					size = va_arg (argptr, size_t) ;
 					psf->headindex += size ;
-					count = size ;
+					count += size ;
 					break ;
 
 			default :
