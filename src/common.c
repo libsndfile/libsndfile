@@ -748,10 +748,18 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					count += 16 ;
 					break ;
 
-			case 'j' :
+			case 'j' :	/* Jump forwards/backwards by specified amount. */
 					size = va_arg (argptr, size_t) ;
 					psf->headindex += size ;
 					count += size ;
+					break ;
+
+			case 'o' :	/* Jump to specified offset. */
+					size = va_arg (argptr, size_t) ;
+					if (size < sizeof (psf->header))
+					{	psf->headindex = size ;
+						count = 0 ;
+						} ;
 					break ;
 
 			default :
