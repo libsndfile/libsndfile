@@ -1158,16 +1158,16 @@ aiff_rewrite_header (SF_PRIVATE *psf)
 	int k, ch, comm_size, comm_frames ;
 
 	psf_fseek (psf, 0, SEEK_SET) ;
-	psf_fread (psf->header, psf->dataoffset, 1, psf) ;
+	psf_fread (psf->header.ptr, psf->dataoffset, 1, psf) ;
 
-	psf->headindex = 0 ;
+	psf->header.indx = 0 ;
 
 	/* FORM chunk. */
 	psf_binheader_writef (psf, "Etm8", FORM_MARKER, psf->filelength - 8) ;
 
 	/* COMM chunk. */
 	if ((k = psf_find_read_chunk_m32 (&psf->rchunks, COMM_MARKER)) >= 0)
-	{	psf->headindex = psf->rchunks.chunks [k].offset - 8 ;
+	{	psf->header.indx = psf->rchunks.chunks [k].offset - 8 ;
 		comm_frames = psf->sf.frames ;
 		comm_size = psf->rchunks.chunks [k].len ;
 		psf_binheader_writef (psf, "Em42t4", COMM_MARKER, comm_size, psf->sf.channels, comm_frames) ;
@@ -1175,7 +1175,7 @@ aiff_rewrite_header (SF_PRIVATE *psf)
 
 	/* PEAK chunk. */
 	if ((k = psf_find_read_chunk_m32 (&psf->rchunks, PEAK_MARKER)) >= 0)
-	{	psf->headindex = psf->rchunks.chunks [k].offset - 8 ;
+	{	psf->header.indx = psf->rchunks.chunks [k].offset - 8 ;
 		psf_binheader_writef (psf, "Em4", PEAK_MARKER, AIFF_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
 		psf_binheader_writef (psf, "E44", 1, time (NULL)) ;
 		for (ch = 0 ; ch < psf->sf.channels ; ch++)
@@ -1185,13 +1185,13 @@ aiff_rewrite_header (SF_PRIVATE *psf)
 
 	/* SSND chunk. */
 	if ((k = psf_find_read_chunk_m32 (&psf->rchunks, SSND_MARKER)) >= 0)
-	{	psf->headindex = psf->rchunks.chunks [k].offset - 8 ;
+	{	psf->header.indx = psf->rchunks.chunks [k].offset - 8 ;
 		psf_binheader_writef (psf, "Etm8", SSND_MARKER, psf->datalength + SIZEOF_SSND_CHUNK) ;
 		} ;
 
 	/* Header mangling complete so write it out. */
 	psf_fseek (psf, 0, SEEK_SET) ;
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	return ;
 } /* aiff_rewrite_header */
@@ -1411,8 +1411,8 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	psf_binheader_writef (psf, "Etm8", FORM_MARKER, psf->filelength - 8) ;
@@ -1424,7 +1424,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	else
 		psf_binheader_writef (psf, "Em", comm_type) ;
 
-	paiff->comm_offset = psf->headindex - 8 ;
+	paiff->comm_offset = psf->header.indx - 8 ;
 
 	memset (comm_sample_rate, 0, sizeof (comm_sample_rate)) ;
 	uint2tenbytefloat (psf->sf.samplerate, comm_sample_rate) ;
@@ -1610,19 +1610,19 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "Em4b", psf->wchunks.chunks [uk].mark32, psf->wchunks.chunks [uk].len, psf->wchunks.chunks [uk].data, make_size_t (psf->wchunks.chunks [uk].len)) ;
 
 	/* Write SSND chunk. */
-	paiff->ssnd_offset = psf->headindex ;
+	paiff->ssnd_offset = psf->header.indx ;
 	psf_binheader_writef (psf, "Etm844", SSND_MARKER, psf->datalength + SIZEOF_SSND_CHUNK, 0, 0) ;
 
 	/* Header construction complete so write it out. */
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	if (psf->error)
 		return psf->error ;
 
-	if (has_data && psf->dataoffset != psf->headindex)
+	if (has_data && psf->dataoffset != psf->header.indx)
 		return psf->error = SFE_INTERNAL ;
 
-	psf->dataoffset = psf->headindex ;
+	psf->dataoffset = psf->header.indx ;
 
 	if (! has_data)
 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
@@ -1637,14 +1637,14 @@ aiff_write_tailer (SF_PRIVATE *psf)
 {	int		k ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 
 	psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
 
 	/* Make sure tailer data starts at even byte offset. Pad if necessary. */
 	if (psf->dataend % 2 == 1)
-	{	psf_fwrite (psf->header, 1, 1, psf) ;
+	{	psf_fwrite (psf->header.ptr, 1, 1, psf) ;
 		psf->dataend ++ ;
 		} ;
 
@@ -1659,8 +1659,8 @@ aiff_write_tailer (SF_PRIVATE *psf)
 		aiff_write_strings (psf, SF_STR_LOCATE_END) ;
 
 	/* Write the tailer. */
-	if (psf->headindex > 0)
-		psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	if (psf->header.indx > 0)
+		psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	return 0 ;
 } /* aiff_write_tailer */

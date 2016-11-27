@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -201,8 +201,8 @@ avr_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 
 	/*
 	** Only attempt to seek if we are not writng to a pipe. If we are
@@ -222,12 +222,12 @@ avr_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_binheader_writef (psf, "E222zz", 0, 0, 0, make_size_t (20), make_size_t (64)) ;
 
 	/* Header construction complete so write it out. */
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	if (psf->error)
 		return psf->error ;
 
-	psf->dataoffset = psf->headindex ;
+	psf->dataoffset = psf->header.indx ;
 
 	if (current > 0)
 		psf_fseek (psf, current, SEEK_SET) ;

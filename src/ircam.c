@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -256,8 +256,8 @@ ircam_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		return SFE_BAD_OPEN_FORMAT ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 
 	if (psf->is_pipe == SF_FALSE)
 		psf_fseek (psf, 0, SEEK_SET) ;
@@ -278,10 +278,10 @@ ircam_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		default : return SFE_BAD_OPEN_FORMAT ;
 		} ;
 
-	psf_binheader_writef (psf, "z", (size_t) (IRCAM_DATA_OFFSET - psf->headindex)) ;
+	psf_binheader_writef (psf, "z", (size_t) (IRCAM_DATA_OFFSET - psf->header.indx)) ;
 
 	/* Header construction complete so write it out. */
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	if (psf->error)
 		return psf->error ;

@@ -402,6 +402,8 @@ caf_read_header (SF_PRIVATE *psf)
 		{	psf_log_printf (psf, "%M : %D *** Should be >= 0 ***\n", marker, chunk_size) ;
 			break ;
 			} ;
+		if (chunk_size > psf->filelength)
+			break ;
 
 		psf_store_read_chunk_u32 (&psf->rchunks, marker, psf_ftell (psf), chunk_size) ;
 
@@ -459,11 +461,11 @@ caf_read_header (SF_PRIVATE *psf)
 				psf_binheader_readf (psf, "E4", &k) ;
 				if (chunk_size == -1)
 				{	psf_log_printf (psf, "%M : -1\n") ;
-					chunk_size = psf->filelength - psf->headindex ;
+					chunk_size = psf->filelength - psf->header.indx ;
 					}
-				else if (psf->filelength > 0 && chunk_size > psf->filelength - psf->headindex + 10)
-				{	psf_log_printf (psf, "%M : %D (should be %D)\n", marker, chunk_size, psf->filelength - psf->headindex - 8) ;
-					psf->datalength = psf->filelength - psf->headindex - 8 ;
+				else if (psf->filelength > 0 && chunk_size > psf->filelength - psf->header.indx + 10)
+				{	psf_log_printf (psf, "%M : %D (should be %D)\n", marker, chunk_size, psf->filelength - psf->header.indx - 8) ;
+					psf->datalength = psf->filelength - psf->header.indx - 8 ;
 					}
 				else
 				{	psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
@@ -473,7 +475,7 @@ caf_read_header (SF_PRIVATE *psf)
 
 				psf_log_printf (psf, "  edit : %u\n", k) ;
 
-				psf->dataoffset = psf->headindex ;
+				psf->dataoffset = psf->header.indx ;
 				if (psf->datalength + psf->dataoffset < psf->filelength)
 					psf->dataend = psf->datalength + psf->dataoffset ;
 
@@ -492,8 +494,8 @@ caf_read_header (SF_PRIVATE *psf)
 				{	psf_log_printf (psf, "%M : %D (should be > 24)\n", marker, chunk_size) ;
 					return SFE_MALFORMED_FILE ;
 					}
-				else if (chunk_size > psf->filelength - psf->headindex)
-				{	psf_log_printf (psf, "%M : %D (should be < %D)\n", marker, chunk_size, psf->filelength - psf->headindex) ;
+				else if (chunk_size > psf->filelength - psf->header.indx)
+				{	psf_log_printf (psf, "%M : %D (should be < %D)\n", marker, chunk_size, psf->filelength - psf->header.indx) ;
 					return SFE_MALFORMED_FILE ;
 					}
 				else
@@ -524,8 +526,8 @@ caf_read_header (SF_PRIVATE *psf)
 				{	psf_log_printf (psf, "%M : %D (should be > 4)\n", marker, chunk_size) ;
 					return SFE_MALFORMED_FILE ;
 					}
-				else if (chunk_size > psf->filelength - psf->headindex)
-				{	psf_log_printf (psf, "%M : %D (should be < %D)\n", marker, chunk_size, psf->filelength - psf->headindex) ;
+				else if (chunk_size > psf->filelength - psf->header.indx)
+				{	psf_log_printf (psf, "%M : %D (should be < %D)\n", marker, chunk_size, psf->filelength - psf->header.indx) ;
 					return SFE_MALFORMED_FILE ;
 					} ;
 				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
@@ -535,6 +537,7 @@ caf_read_header (SF_PRIVATE *psf)
 
 			default :
 				psf_log_printf (psf, "%M : %D (skipped)\n", marker, chunk_size) ;
+psf_log_printf (psf, "position : %d\n", (int) psf_ftell (psf)) ;
 				psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
 				break ;
 			} ;
@@ -601,8 +604,8 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	/* 'caff' marker, version and flags. */
@@ -739,7 +742,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 
 	if (append_free_block)
 	{	/* Add free chunk so that the actual audio data starts at a multiple 0x1000. */
-		free_len = 0x1000 - psf->headindex - 16 - 12 ;
+		free_len = 0x1000 - psf->header.indx - 16 - 12 ;
 		while (free_len < 0)
 			free_len += 0x1000 ;
 		psf_binheader_writef (psf, "Em8z", free_MARKER, free_len, (int) free_len) ;
@@ -747,11 +750,11 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 
 	psf_binheader_writef (psf, "Em84", data_MARKER, psf->datalength + 4, 0) ;
 
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 	if (psf->error)
 		return psf->error ;
 
-	psf->dataoffset = psf->headindex ;
+	psf->dataoffset = psf->header.indx ;
 	if (current < psf->dataoffset)
 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 	else if (current > 0)
@@ -764,8 +767,8 @@ static int
 caf_write_tailer (SF_PRIVATE *psf)
 {
 	/* Reset the current header buffer length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 
 	if (psf->bytewidth > 0 && psf->sf.seekable == SF_TRUE)
 	{	psf->datalength = psf->sf.frames * psf->bytewidth * psf->sf.channels ;
@@ -784,8 +787,8 @@ caf_write_tailer (SF_PRIVATE *psf)
 		caf_write_strings (psf, SF_STR_LOCATE_END) ;
 
 	/* Write the tailer. */
-	if (psf->headindex > 0)
-		psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	if (psf->header.indx > 0)
+		psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	return 0 ;
 } /* caf_write_tailer */

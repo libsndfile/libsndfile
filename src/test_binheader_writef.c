@@ -43,9 +43,11 @@ test_binheader_writef (void)
 
 		psf_binheader_writef (psf, "Ep", buffer) ;
 
-		if ((psf->headindex & 1) != 0)
+		if ((psf->header.indx & 1) != 0)
 			errors = 1 ;
 		} ;
+
+	free (psf->header.ptr) ;
 
 	if (errors)
 	{	puts ("\nExiting due to errors.\n") ;

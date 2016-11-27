@@ -237,8 +237,8 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 	while (! done)
 	{	/* Each new chunk must start on an 8 byte boundary, so jump if needed. */
-		if (psf->headindex & 0x7)
-			psf_binheader_readf (psf, "j", 8 - (psf->headindex & 0x7)) ;
+		if (psf->header.indx & 0x7)
+			psf_binheader_readf (psf, "j", 8 - (psf->header.indx & 0x7)) ;
 
 		/* Generate hash of 16 byte marker. */
 		marker = chunk_size = 0 ;
@@ -460,8 +460,8 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	/* riff marker, length, wave and 'fmt ' markers. */
@@ -621,12 +621,12 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "eh88", fact_MARKER16, (sf_count_t) (16 + 8 + 8), psf->sf.frames) ;
 
 	psf_binheader_writef (psf, "eh8", data_MARKER16, psf->datalength + 24) ;
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	if (psf->error)
 		return psf->error ;
 
-	psf->dataoffset = psf->headindex ;
+	psf->dataoffset = psf->header.indx ;
 
 	if (current > 0)
 		psf_fseek (psf, current, SEEK_SET) ;

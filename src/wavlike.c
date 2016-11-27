@@ -908,12 +908,6 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 		return 0 ;
 		} ;
 
-	if (psf->headindex + chunk_length > SIGNED_SIZEOF (psf->header))
-	{	psf_log_printf (psf, "%M : %u (too long)\n", chunk, chunk_length) ;
-		psf_binheader_readf (psf, "j", chunk_length) ;
-		return 0 ;
-		} ;
-
 	if (current_pos + chunk_length > psf->filelength)
 	{	psf_log_printf (psf, "%M : %u (should be %d)\n", chunk, chunk_length, (int) (psf->filelength - current_pos)) ;
 		chunk_length = psf->filelength - current_pos ;
@@ -1082,7 +1076,7 @@ wavlike_write_strings (SF_PRIVATE *psf, int location)
 	if (psf_location_string_count (psf, location) == 0)
 		return ;
 
-	prev_head_index = psf->headindex + 4 ;
+	prev_head_index = psf->header.indx + 4 ;
 
 	psf_binheader_writef (psf, "m4m", LIST_MARKER, 0xBADBAD, INFO_MARKER) ;
 
@@ -1134,10 +1128,10 @@ wavlike_write_strings (SF_PRIVATE *psf, int location)
 			} ;
 		} ;
 
-	saved_head_index = psf->headindex ;
-	psf->headindex = prev_head_index ;
+	saved_head_index = psf->header.indx ;
+	psf->header.indx = prev_head_index ;
 	psf_binheader_writef (psf, "4", saved_head_index - prev_head_index - 4) ;
-	psf->headindex = saved_head_index ;
+	psf->header.indx = saved_head_index ;
 
 } /* wavlike_write_strings */
 

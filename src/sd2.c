@@ -207,8 +207,8 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 	rsrc.sample_size = psf->bytewidth ;
 	rsrc.channels = psf->sf.channels ;
 
-	rsrc.rsrc_data = psf->header ;
-	rsrc.rsrc_len = sizeof (psf->header) ;
+	rsrc.rsrc_data = psf->header.ptr ;
+	rsrc.rsrc_len = psf->header.len ;
 	memset (rsrc.rsrc_data, 0xea, rsrc.rsrc_len) ;
 
 	snprintf (str_rsrc [0].value, sizeof (str_rsrc [0].value), "_%d", rsrc.sample_size) ;
@@ -294,9 +294,9 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 	psf_binheader_writef (psf, "Eo4o4", make_size_t (12), rsrc.map_length,
 							make_size_t (rsrc.map_offset + 12), rsrc.map_length) ;
 
-	psf->headindex = rsrc.map_offset + rsrc.map_length ;
+	psf->header.indx = rsrc.map_offset + rsrc.map_length ;
 
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	psf_use_rsrc (psf, SF_FALSE) ;
 
@@ -378,13 +378,14 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 	rsrc.rsrc_len = psf_get_filelen (psf) ;
 	psf_log_printf (psf, "Resource length : %d (0x%04X)\n", rsrc.rsrc_len, rsrc.rsrc_len) ;
 
-	if (rsrc.rsrc_len > SIGNED_SIZEOF (psf->header))
+	if (rsrc.rsrc_len > psf->header.len)
 	{	rsrc.rsrc_data = calloc (1, rsrc.rsrc_len) ;
 		rsrc.need_to_free_rsrc_data = SF_TRUE ;
 		}
 	else
 	{
-		rsrc.rsrc_data = psf->header ;
+		rsrc.rsrc_data = psf->header.ptr ;
+		// rsrc.rsrc_len > psf->header.len ;
 		rsrc.need_to_free_rsrc_data = SF_FALSE ;
 		} ;
 
@@ -392,7 +393,7 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 	psf_fread (rsrc.rsrc_data, rsrc.rsrc_len, 1, psf) ;
 
 	/* Reset the header storage because we have changed to the rsrcdes. */
-	psf->headindex = psf->headend = rsrc.rsrc_len ;
+	psf->header.indx = psf->header.end = rsrc.rsrc_len ;
 
 	rsrc.data_offset = read_rsrc_int (&rsrc, 0) ;
 	rsrc.map_offset = read_rsrc_int (&rsrc, 4) ;

@@ -131,11 +131,11 @@ ogg_stream_classify (SF_PRIVATE *psf, OGG_PRIVATE* odata)
 	buffer = ogg_sync_buffer (&odata->osync, 4096L) ;
 
 	/* Grab the part of the header that has already been read. */
-	memcpy (buffer, psf->header, psf->headindex) ;
-	bytes = psf->headindex ;
+	memcpy (buffer, psf->header.ptr, psf->header.indx) ;
+	bytes = psf->header.indx ;
 
 	/* Submit a 4k block to libvorbis' Ogg layer */
-	bytes += psf_fread (buffer + psf->headindex, 1, 4096 - psf->headindex, psf) ;
+	bytes += psf_fread (buffer + psf->header.indx, 1, 4096 - psf->header.indx, psf) ;
 	ogg_sync_wrote (&odata->osync, bytes) ;
 
 	/* Get the first page. */

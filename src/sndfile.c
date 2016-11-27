@@ -267,7 +267,6 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_BAD_CHUNK_MARKER	, "Error : Bad chunk marker." },
 	{	SFE_BAD_CHUNK_DATA_PTR	, "Error : Bad data pointer in SF_CHUNK_INFO struct." },
 	{	SFE_FILENAME_TOO_LONG	, "Error : Supplied filename too long." },
-	{	SFE_BAD_HEADER_ALLOC 	, "Error : Required header allocation is too large." },
 
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
