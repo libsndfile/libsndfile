@@ -267,7 +267,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_BAD_CHUNK_MARKER	, "Error : Bad chunk marker." },
 	{	SFE_BAD_CHUNK_DATA_PTR	, "Error : Bad data pointer in SF_CHUNK_INFO struct." },
 	{	SFE_FILENAME_TOO_LONG	, "Error : Supplied filename too long." },
-
+	{	SFE_BAD_HEADER_ALLOC 	, "Error : Required header allocation is too large." },
 
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
@@ -326,7 +326,7 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 	/* Ultimate sanity check. */
 	assert (sizeof (sf_count_t) == 8) ;
 
-	if ((psf = calloc (1, sizeof (SF_PRIVATE))) == NULL)
+	if ((psf = psf_allocate ()) == NULL)
 	{	sf_errno = SFE_MALLOC_FAILED ;
 		return	NULL ;
 		} ;
@@ -358,7 +358,7 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 		return	NULL ;
 		} ;
 
-	if ((psf = calloc (1, sizeof (SF_PRIVATE))) == NULL)
+	if ((psf = psf_allocate ()) == NULL)
 	{	sf_errno = SFE_MALLOC_FAILED ;
 		return	NULL ;
 		} ;
@@ -400,7 +400,7 @@ sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user
 		return NULL ;
 		} ;
 
-	if ((psf = calloc (1, sizeof (SF_PRIVATE))) == NULL)
+	if ((psf = psf_allocate ()) == NULL)
 	{	sf_errno = SFE_MALLOC_FAILED ;
 		return	NULL ;
 		} ;
@@ -2688,6 +2688,7 @@ psf_close (SF_PRIVATE *psf)
 	psf_close_rsrc (psf) ;
 
 	/* For an ISO C compliant implementation it is ok to free a NULL pointer. */
+	free (psf->header.ptr) ;
 	free (psf->container_data) ;
 	free (psf->codec_data) ;
 	free (psf->interleave) ;

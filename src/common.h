@@ -79,7 +79,6 @@
 #define	SF_FILENAME_LEN			(1024)
 #define SF_SYSERR_LEN			(256)
 #define SF_MAX_STRINGS			(32)
-#define	SF_HEADER_LEN			(12292)
 #define	SF_PARSELOG_LEN			(2048)
 
 #define	PSF_SEEK_ERROR			((sf_count_t) -1)
@@ -382,7 +381,12 @@ typedef struct sf_private_tag
 		int				indx ;
 	} parselog ;
 
-	unsigned char	header		[SF_HEADER_LEN] ; /* Must be unsigned */
+
+	struct
+	{	unsigned char	* ptr ;
+		sf_count_t		indx, end, len ;
+	} header ;
+
 	int				rwf_endian ;	/* Header endian-ness flag. */
 
 	/* Storage and housekeeping data for adding/reading strings from
@@ -400,10 +404,6 @@ typedef struct sf_private_tag
 	int				Magick ;
 
 	unsigned		unique_id ;
-
-	/* Index variables for maintaining parselog and header above. */
-	int				headindex, headend ;
-	int				has_text ;
 
 	int				error ;
 
@@ -735,6 +735,9 @@ enum
 
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
+
+/* Allocate and initialize the SF_PRIVATE struct. */
+SF_PRIVATE * psf_allocate (void) ;
 
 int subformat_to_bytewidth (int format) ;
 int s_bitwidth_to_subformat (int bits) ;
