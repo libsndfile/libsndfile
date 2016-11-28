@@ -36,6 +36,8 @@ test_binheader_writef (void)
 
 	print_test_name ("Testing binheader_writef") ;
 
+	memset (&sf_private, 0, sizeof (sf_private)) ;
+
 	psf = &sf_private ;
 	for (k = 0 ; errors == 0 && k < 10 ; k++)
 	{	psf_strlcpy (buffer, sizeof (buffer), "abcdefghijklmnop") ;
