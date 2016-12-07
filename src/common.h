@@ -732,6 +732,7 @@ enum
 	SFE_BAD_CHUNK_DATA_PTR,
 	SFE_ALAC_FAIL_TMPFILE,
 	SFE_FILENAME_TOO_LONG,
+	SFE_NEGATIVE_RW_LEN,
 
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
