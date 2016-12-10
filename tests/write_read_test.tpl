@@ -1176,6 +1176,11 @@ write_seek_extend_test (const char * filename, int format)
 	test_read_short_or_die (file, 0, test, 3 * items, __LINE__) ;
 	sf_close (file) ;
 
+	if (info.frames < 3 * items)
+	{	printf ("\n\nLine %d : Incorrect number of frames in file (too short). (%" PRId64 " should be %d)\n", __LINE__, info.frames, 3 * items) ;
+		exit (1) ;
+		} ;
+
 	/* Can't do these formats due to scaling. */
 	switch (format & SF_FORMAT_SUBMASK)
 	{	case SF_FORMAT_PCM_S8 :
