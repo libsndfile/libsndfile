@@ -91,7 +91,7 @@ SHLIB_VERSION_ARG=""
 # Finished checking, handle options.
 
 AC_ARG_ENABLE(experimental,
-	AC_HELP_STRING([--enable-experimental], [enable experimental code]))
+	AS_HELP_STRING([--enable-experimental], [enable experimental code]))
 
 EXPERIMENTAL_CODE=0
 if test x$enable_experimental = xyes ; then
@@ -100,37 +100,37 @@ if test x$enable_experimental = xyes ; then
 AC_DEFINE_UNQUOTED([ENABLE_EXPERIMENTAL_CODE],${EXPERIMENTAL_CODE}, [Set to 1 to enable experimental code.])
 
 AC_ARG_ENABLE(werror,
-	AC_HELP_STRING([--enable-werror], [enable -Werror in all Makefiles]))
+	AS_HELP_STRING([--enable-werror], [enable -Werror in all Makefiles]))
 
 AC_ARG_ENABLE(stack-smash-protection,
-       AC_HELP_STRING([--enable-stack-smash-protection], [Enable GNU GCC stack smash protection]))
+	AS_HELP_STRING([--enable-stack-smash-protection], [Enable GNU GCC stack smash protection]))
 
 AC_ARG_ENABLE(gcc-pipe,
-	AC_HELP_STRING([--disable-gcc-pipe], [disable gcc -pipe option]))
+	AS_HELP_STRING([--disable-gcc-pipe], [disable gcc -pipe option]))
 
 AC_ARG_ENABLE(gcc-opt,
-	AC_HELP_STRING([--disable-gcc-opt], [disable gcc optimisations]))
+	AS_HELP_STRING([--disable-gcc-opt], [disable gcc optimisations]))
 
 AC_ARG_ENABLE(cpu-clip,
-	AC_HELP_STRING([--disable-cpu-clip], [disable tricky cpu specific clipper]))
+	AS_HELP_STRING([--disable-cpu-clip], [disable tricky cpu specific clipper]))
 
 AC_ARG_ENABLE(bow-docs,
-	AC_HELP_STRING([--enable-bow-docs], [enable black-on-white html docs]))
+	AS_HELP_STRING([--enable-bow-docs], [enable black-on-white html docs]))
 
 AC_ARG_ENABLE(sqlite,
-	AC_HELP_STRING([--disable-sqlite], [disable use of sqlite]))
+	AS_HELP_STRING([--disable-sqlite], [disable use of sqlite]))
 
 AC_ARG_ENABLE(alsa,
-	AC_HELP_STRING([--disable-alsa], [disable use of ALSA]))
+	AS_HELP_STRING([--disable-alsa], [disable use of ALSA]))
 
 AC_ARG_ENABLE(external-libs,
-	AC_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis [[default=no]]]))
+	AS_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis [[default=no]]]))
 
 AC_ARG_ENABLE(octave,
-	AC_HELP_STRING([--enable-octave], [disable building of GNU Octave module]))
+	AS_HELP_STRING([--enable-octave], [disable building of GNU Octave module]))
 
 AC_ARG_ENABLE(test-coverage,
-	AC_HELP_STRING([--enable-test-coverage], [enable test coverage]))
+	AS_HELP_STRING([--enable-test-coverage], [enable test coverage]))
 AM_CONDITIONAL([ENABLE_TEST_COVERAGE], [test "$enable_test_coverage" = yes])
 
 #====================================================================================
