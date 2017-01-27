@@ -691,6 +691,3 @@ echo "    Stack smash protection : .............. ${enable_stack_smash_protectio
 
 # Remove symlink created by Scripts/android-configure.sh.
 test -h gdbclient && rm -f gdbclient
-
-(cd src && make genfiles)
-(cd tests && make genfiles)

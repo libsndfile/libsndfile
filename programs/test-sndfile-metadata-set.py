@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 #

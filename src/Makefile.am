@@ -12,7 +12,7 @@ noinst_LTLIBRARIES =  GSM610/libgsm.la G72x/libg72x.la ALAC/libalac.la libcommon
 
 SYMBOL_FILES = Symbols.gnu-binutils Symbols.darwin libsndfile-1.def Symbols.os2 Symbols.static
 
-EXTRA_DIST = sndfile.h.in config.h.in test_endswap.tpl test_endswap.def \
+EXTRA_DIST = sndfile.h.in config.h.in test_endswap.c test_endswap.tpl test_endswap.def \
 			$(SYMBOL_FILES) create_symbols_file binheader_writef_check.py \
 			GSM610/README GSM610/COPYRIGHT GSM610/ChangeLog \
 			G72x/README G72x/README.original G72x/ChangeLog \
@@ -85,10 +85,10 @@ test_main_LDADD = libcommon.la
 G72x_g72x_test_SOURCES = G72x/g72x_test.c
 G72x_g72x_test_LDADD = G72x/libg72x.la
 
-test_endswap.c: test_endswap.def test_endswap.tpl
-	(cd $(srcdir) && autogen --writable test_endswap.def)
+SUFFIXES = .def .tpl
 
-genfiles : $(SYMBOL_FILES) test_endswap.c
+.def.c:
+	autogen --writable $<
 
 check :
 	@if [ -x /usr/bin/python ]; then $(srcdir)/binheader_writef_check.py $(srcdir)/*.c ; fi
