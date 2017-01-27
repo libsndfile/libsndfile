@@ -129,6 +129,10 @@ AC_ARG_ENABLE(external-libs,
 AC_ARG_ENABLE(octave,
 	AS_HELP_STRING([--enable-octave], [disable building of GNU Octave module]))
 
+AC_ARG_ENABLE([full-suite],
+	AS_HELP_STRING([--disable-full-suite], [disable building and installing programs, documentation, only build library [[default=no]]]))
+AM_CONDITIONAL([FULL_SUITE], [test "x$enable_full_suite" != "xno"])
+
 AC_ARG_ENABLE(test-coverage,
 	AS_HELP_STRING([--enable-test-coverage], [enable test coverage]))
 AM_CONDITIONAL([ENABLE_TEST_COVERAGE], [test "$enable_test_coverage" = yes])
