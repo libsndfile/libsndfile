@@ -1,6 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
+if HAVE_SQLITE3
 bin_PROGRAMS = sndfile-regtest
+endif
 
 noinst_HEADERS = regtest.h
 
