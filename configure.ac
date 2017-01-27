@@ -692,4 +692,4 @@ echo "    Stack smash protection : .............. ${enable_stack_smash_protectio
 ./echo-install-dirs
 
 # Remove symlink created by Scripts/android-configure.sh.
-test -h gdbclient && rm -f gdbclient
+rm -f gdbclient
