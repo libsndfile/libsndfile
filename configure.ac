@@ -345,6 +345,7 @@ else
 	fi
 
 AC_DEFINE_UNQUOTED([HAVE_SQLITE3],$HAVE_SQLITE3,[Set to 1 if you have libsqlite3.])
+AM_CONDITIONAL([HAVE_SQLITE3], [test "x$ac_cv_sqlite3" = "xyes"])
 
 #====================================================================================
 # Determine if the processor can do clipping on float to int conversions.
