@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Tobias Gehrig <tgehrig@ira.uka.de>
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -667,7 +667,6 @@ flac_open	(SF_PRIVATE *psf)
 	/* Set the default value here. Over-ridden later if necessary. */
 	pflac->compression = FLAC_DEFAULT_COMPRESSION_LEVEL ;
 
-
 	if (psf->file.mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
@@ -689,6 +688,10 @@ flac_open	(SF_PRIVATE *psf)
 
 		if ((error = flac_enc_init (psf)))
 			return error ;
+
+		/* In an ideal world we would write the header at this point. Unfortunately
+		** that would prevent string metadata being added so we have to hold off.
+		*/
 
 		psf->write_header = flac_write_header ;
 		} ;
@@ -732,9 +735,7 @@ flac_close	(SF_PRIVATE *psf)
 	if (psf->file.mode == SFM_WRITE)
 	{	FLAC__stream_encoder_finish (pflac->fse) ;
 		FLAC__stream_encoder_delete (pflac->fse) ;
-
-		if (pflac->encbuffer)
-			free (pflac->encbuffer) ;
+		free (pflac->encbuffer) ;
 		} ;
 
 	if (psf->file.mode == SFM_READ)
