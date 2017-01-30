@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -242,7 +242,7 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_FLAC_BAD_HEADER		, "Error : bad flac header." },
 	{	SFE_FLAC_NEW_DECODER	, "Error : problem while creating flac decoder." },
-	{	SFE_FLAC_INIT_DECODER	, "Error : problem while initialization of the flac decoder." },
+	{	SFE_FLAC_INIT_DECODER	, "Error : problem with initialization of the flac decoder." },
 	{	SFE_FLAC_LOST_SYNC		, "Error : flac decoder lost sync." },
 	{	SFE_FLAC_BAD_SAMPLE_RATE, "Error : flac does not support this sample rate." },
 	{	SFE_FLAC_UNKOWN_ERROR	, "Error : unknown error in flac decoder." },
@@ -2079,7 +2079,9 @@ sf_write_raw	(SNDFILE *sndfile, const void *ptr, sf_count_t len)
 			return 0 ;
 
 	if (psf->have_written == SF_FALSE && psf->write_header != NULL)
-		psf->write_header (psf, SF_FALSE) ;
+	{	if ((psf->error = psf->write_header (psf, SF_FALSE)))
+			return 0 ;
+		} ;
 	psf->have_written = SF_TRUE ;
 
 	count = psf_fwrite (ptr, 1, len, psf) ;
@@ -2137,7 +2139,9 @@ sf_write_short	(SNDFILE *sndfile, const short *ptr, sf_count_t len)
 			return 0 ;
 
 	if (psf->have_written == SF_FALSE && psf->write_header != NULL)
-		psf->write_header (psf, SF_FALSE) ;
+	{	if ((psf->error = psf->write_header (psf, SF_FALSE)))
+			return 0 ;
+		} ;
 	psf->have_written = SF_TRUE ;
 
 	count = psf->write_short (psf, ptr, len) ;
@@ -2187,7 +2191,9 @@ sf_writef_short	(SNDFILE *sndfile, const short *ptr, sf_count_t frames)
 			return 0 ;
 
 	if (psf->have_written == SF_FALSE && psf->write_header != NULL)
-		psf->write_header (psf, SF_FALSE) ;
+	{	if ((psf->error = psf->write_header (psf, SF_FALSE)))
+			return 0 ;
+		} ;
 	psf->have_written = SF_TRUE ;
 
 	count = psf->write_short (psf, ptr, frames * psf->sf.channels) ;
@@ -2245,7 +2251,9 @@ sf_write_int	(SNDFILE *sndfile, const int *ptr, sf_count_t len)
 			return 0 ;
 
 	if (psf->have_written == SF_FALSE && psf->write_header != NULL)
-		psf->write_header (psf, SF_FALSE) ;
+	{	if ((psf->error = psf->write_header (psf, SF_FALSE)))
+			return 0 ;
+		} ;
 	psf->have_written = SF_TRUE ;
 
 	count = psf->write_int (psf, ptr, len) ;
@@ -2295,7 +2303,9 @@ sf_writef_int	(SNDFILE *sndfile, const int *ptr, sf_count_t frames)
 			return 0 ;
 
 	if (psf->have_written == SF_FALSE && psf->write_header != NULL)
-		psf->write_header (psf, SF_FALSE) ;
+	{	if ((psf->error = psf->write_header (psf, SF_FALSE)))
+			return 0 ;
+		} ;
 	psf->have_written = SF_TRUE ;
 
 	count = psf->write_int (psf, ptr, frames * psf->sf.channels) ;
@@ -2353,7 +2363,9 @@ sf_write_float	(SNDFILE *sndfile, const float *ptr, sf_count_t len)
 			return 0 ;
 
 	if (psf->have_written == SF_FALSE && psf->write_header != NULL)
-		psf->write_header (psf, SF_FALSE) ;
+	{	if ((psf->error = psf->write_header (psf, SF_FALSE)))
+			return 0 ;
+		} ;
 	psf->have_written = SF_TRUE ;
 
 	count = psf->write_float (psf, ptr, len) ;
@@ -2403,7 +2415,9 @@ sf_writef_float	(SNDFILE *sndfile, const float *ptr, sf_count_t frames)
 			return 0 ;
 
 	if (psf->have_written == SF_FALSE && psf->write_header != NULL)
-		psf->write_header (psf, SF_FALSE) ;
+	{	if ((psf->error = psf->write_header (psf, SF_FALSE)))
+			return 0 ;
+		} ;
 	psf->have_written = SF_TRUE ;
 
 	count = psf->write_float (psf, ptr, frames * psf->sf.channels) ;
@@ -2461,7 +2475,9 @@ sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t len)
 			return 0 ;
 
 	if (psf->have_written == SF_FALSE && psf->write_header != NULL)
-		psf->write_header (psf, SF_FALSE) ;
+	{	if ((psf->error = psf->write_header (psf, SF_FALSE)))
+			return 0 ;
+		} ;
 	psf->have_written = SF_TRUE ;
 
 	count = psf->write_double (psf, ptr, len) ;
@@ -2511,7 +2527,9 @@ sf_writef_double	(SNDFILE *sndfile, const double *ptr, sf_count_t frames)
 			return 0 ;
 
 	if (psf->have_written == SF_FALSE && psf->write_header != NULL)
-		psf->write_header (psf, SF_FALSE) ;
+	{	if ((psf->error = psf->write_header (psf, SF_FALSE)))
+			return 0 ;
+		} ;
 	psf->have_written = SF_TRUE ;
 
 	count = psf->write_double (psf, ptr, frames * psf->sf.channels) ;
