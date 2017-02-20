@@ -2685,9 +2685,6 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 	if (psf->cue_info)
 		psf_cueinfo_free (psf->cue_info) ;
 
-	if (psf->cue_info)
-		psf_cueinfo_free (psf->cue_info) ;
-
 	sf_errno = error = 0 ;
 	sf_parselog [0] = 0 ;
 
