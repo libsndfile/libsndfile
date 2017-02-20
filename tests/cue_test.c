@@ -23,10 +23,15 @@ int test_cues (const char *filename)
 	return 0;
     }
 
+    printf("\n---- get cues of file '%s'\n", filename);
+
     if ((err = sf_command(file, SFC_GET_CUE_COUNT, &count, sizeof(uint32_t))) == SF_FALSE)
     {
-	printf("can't get cue info size for file '%s' (arg size %lu, err %d)\n", 
-	       filename, sizeof(uint32_t), err);
+	if (sf_error(file))
+	    printf("can't get cue info size for file '%s' (arg size %lu), err %s\n", 
+		   filename, sizeof(uint32_t), sf_strerror(file));
+	else
+	    printf("no cue info for file '%s'\n", filename);
 	return 0;
     }
 	
@@ -38,8 +43,8 @@ int test_cues (const char *filename)
 
     if (sf_command(file, SFC_GET_CUE, info, size) == SF_FALSE)
     {
-	printf("can't get cue info of size %d for file '%s'\n", 
-	       size, filename);
+	printf("can't get cue info of size %d for file '%s' error %s\n", 
+	       size, filename, sf_strerror(file));
 	return 0;
     }
 
@@ -49,10 +54,10 @@ int test_cues (const char *filename)
     {
 	int    pos = info->cue_points[i].position;
 	double t   = (double) pos / sfinfo.samplerate;
-	double expected = i < 10  ?  (double) i / 3.  :  11. / 3.;
+	double expected = i < 8  ?  (double) i / 3.  :  10. / 3.;
 
-	printf("cue %02d: markerID %02d  position %06d  (time %.3f  diff %f)  label '%s'\n",
-	       i, info->cue_points[i].indx, pos, t, (double) fabs(t - expected), info->cue_points[i].name);
+	printf("cue %02d: markerID %02d  position %06d  (time %.3f  expected %.3f  diff %f)  label '%s'\n",
+	       i, info->cue_points[i].indx, pos, t, expected, (double) fabs(t - expected), info->cue_points[i].name);
     }
     
     sf_close(file);
