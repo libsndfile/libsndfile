@@ -1239,7 +1239,7 @@ psf_memset (void *s, int c, sf_count_t len)
 typedef SF_CUES_VAR (1) SF_CUES_1 ;
 typedef SF_CUES_VAR (2) SF_CUES_2 ;
 
-#define SF_CUES_VAR_SIZE(count)	(sizeof (SF_CUES_1) + count * (sizeof (SF_CUES_2) - sizeof (SF_CUES_1)))
+#define SF_CUES_VAR_SIZE(count)	(sizeof (SF_CUES_1) + (count - 1) * (sizeof (SF_CUES_2) - sizeof (SF_CUES_1)))
 
 SF_CUES *
 psf_cues_alloc (uint32_t cue_count)
