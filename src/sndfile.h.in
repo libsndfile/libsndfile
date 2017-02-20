@@ -188,8 +188,6 @@ enum
 	SFC_SET_INSTRUMENT				= 0x10D1,
 
 	SFC_GET_LOOP_INFO				= 0x10E0,
-	SFC_GET_CUE_SIZE				= 0x10E8,
-	SFC_GET_CUE_INFO				= 0x10E9,
 
 	SFC_GET_BROADCAST_INFO			= 0x10F0,
 	SFC_SET_BROADCAST_INFO			= 0x10F1,
@@ -406,23 +404,6 @@ typedef struct
 {	sf_count_t	offset ;
 	sf_count_t	length ;
 } SF_EMBED_FILE_INFO ;
-
-
-/* Struct describing one cue/marker */
-typedef struct
-{
-    int markerID;	/* id, need not be consecutive */
-    int position;	/* position in sample frames */
-    char *label;	/* optional label */
-} SF_CUE ;
-
-/* Struct used to retrieve cue/marker information from a file.*/
-typedef struct
-{
-    int	   num;		/* number of cues/markers */
-    SF_CUE cue[1];	/* num allocated structs (variable size) */
-} SF_CUE_INFO ;
-
 
 /*
 **	Struct used to retrieve cue marker information from a file
