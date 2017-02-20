@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2005-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2005-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -97,8 +97,12 @@ typedef struct
 static int	caf_close (SF_PRIVATE *psf) ;
 static int	caf_read_header (SF_PRIVATE *psf) ;
 static int	caf_write_header (SF_PRIVATE *psf, int calc_length) ;
+static int	caf_write_tailer (SF_PRIVATE *psf) ;
 static int	caf_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 static int	caf_read_chanmap (SF_PRIVATE * psf, sf_count_t chunk_size) ;
+static int	caf_read_strings (SF_PRIVATE * psf, sf_count_t chunk_size) ;
+static void	caf_write_strings (SF_PRIVATE * psf, int location) ;
+
 
 static int caf_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info) ;
 static SF_CHUNK_ITERATOR * caf_next_chunk_iterator (SF_PRIVATE *psf, SF_CHUNK_ITERATOR * iterator) ;
@@ -147,7 +151,7 @@ caf_open (SF_PRIVATE *psf)
 			psf->sf.frames = 0 ;
 			} ;
 
-		psf->strings.flags = SF_STR_ALLOW_START ;
+		psf->strings.flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END ;
 
 		/*
 		**	By default, add the peak chunk to floating point files. Default behaviour
@@ -218,7 +222,9 @@ static int
 caf_close (SF_PRIVATE *psf)
 {
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
+	{	caf_write_tailer (psf) ;
 		caf_write_header (psf, SF_TRUE) ;
+		} ;
 
 	return 0 ;
 } /* caf_close */
@@ -382,15 +388,22 @@ caf_read_header (SF_PRIVATE *psf)
 
 	psf->sf.channels = desc.channels_per_frame ;
 
-	while (psf_ftell (psf) < psf->filelength)
+	while (1)
 	{	marker = 0 ;
 		chunk_size = 0 ;
 
 		psf_binheader_readf (psf, "mE8", &marker, &chunk_size) ;
 		if (marker == 0)
-		{	psf_log_printf (psf, "Have 0 marker.\n") ;
+		{	sf_count_t pos = psf_ftell (psf) ;
+			psf_log_printf (psf, "Have 0 marker at position %D (0x%x).\n", pos, pos) ;
 			break ;
 			} ;
+		if (chunk_size < 0)
+		{	psf_log_printf (psf, "%M : %D *** Should be >= 0 ***\n", marker, chunk_size) ;
+			break ;
+			} ;
+		if (chunk_size > psf->filelength)
+			break ;
 
 		psf_store_read_chunk_u32 (&psf->rchunks, marker, psf_ftell (psf), chunk_size) ;
 
@@ -446,24 +459,27 @@ caf_read_header (SF_PRIVATE *psf)
 
 			case data_MARKER :
 				psf_binheader_readf (psf, "E4", &k) ;
-				psf_log_printf (psf, "  edit : %u\n", k) ;
-
 				if (chunk_size == -1)
 				{	psf_log_printf (psf, "%M : -1\n") ;
-					chunk_size = psf->filelength - psf->headindex ;
+					chunk_size = psf->filelength - psf->header.indx ;
 					}
-				else if (psf->filelength > 0 && psf->filelength < psf->headindex + chunk_size - 16)
-					psf_log_printf (psf, "%M : %D (should be %D)\n", marker, chunk_size, psf->filelength - psf->headindex - 8) ;
+				else if (psf->filelength > 0 && chunk_size > psf->filelength - psf->header.indx + 10)
+				{	psf_log_printf (psf, "%M : %D (should be %D)\n", marker, chunk_size, psf->filelength - psf->header.indx - 8) ;
+					psf->datalength = psf->filelength - psf->header.indx - 8 ;
+					}
 				else
-					psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+				{	psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+					/* Subtract the 4 bytes of the 'edit' field above. */
+					psf->datalength = chunk_size - 4 ;
+					} ;
 
+				psf_log_printf (psf, "  edit : %u\n", k) ;
 
-				psf->dataoffset = psf->headindex ;
+				psf->dataoffset = psf->header.indx ;
+				if (psf->datalength + psf->dataoffset < psf->filelength)
+					psf->dataend = psf->datalength + psf->dataoffset ;
 
-				/* Subtract the 4 bytes of the 'edit' field above. */
-				psf->datalength = chunk_size - 4 ;
-
-				psf_binheader_readf (psf, "j", psf->datalength) ;
+				psf_binheader_readf (psf, "j", make_size_t (psf->datalength)) ;
 				have_data = 1 ;
 				break ;
 
@@ -474,7 +490,16 @@ caf_read_header (SF_PRIVATE *psf)
 				break ;
 
 			case pakt_MARKER :
-				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+				if (chunk_size < 24)
+				{	psf_log_printf (psf, "%M : %D (should be > 24)\n", marker, chunk_size) ;
+					return SFE_MALFORMED_FILE ;
+					}
+				else if (chunk_size > psf->filelength - psf->header.indx)
+				{	psf_log_printf (psf, "%M : %D (should be < %D)\n", marker, chunk_size, psf->filelength - psf->header.indx) ;
+					return SFE_MALFORMED_FILE ;
+					}
+				else
+					psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
 
 				psf_binheader_readf (psf, "E8844", &pcaf->alac.packets, &pcaf->alac.valid_frames,
 									&pcaf->alac.priming_frames, &pcaf->alac.remainder_frames) ;
@@ -496,11 +521,29 @@ caf_read_header (SF_PRIVATE *psf)
 				psf_binheader_readf (psf, "j", make_size_t (chunk_size) - 24) ;
 				break ;
 
+			case info_MARKER :
+				if (chunk_size < 4)
+				{	psf_log_printf (psf, "%M : %D (should be > 4)\n", marker, chunk_size) ;
+					return SFE_MALFORMED_FILE ;
+					}
+				else if (chunk_size > psf->filelength - psf->header.indx)
+				{	psf_log_printf (psf, "%M : %D (should be < %D)\n", marker, chunk_size, psf->filelength - psf->header.indx) ;
+					return SFE_MALFORMED_FILE ;
+					} ;
+				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
+				if (chunk_size > 4)
+					caf_read_strings (psf, chunk_size - 4) ;
+				break ;
+
 			default :
 				psf_log_printf (psf, "%M : %D (skipped)\n", marker, chunk_size) ;
+psf_log_printf (psf, "position : %d\n", (int) psf_ftell (psf)) ;
 				psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
 				break ;
 			} ;
+
+		if (marker != data_MARKER && chunk_size >= 0xffffff00)
+			break ;
 
 		if (! psf->sf.seekable && have_data)
 			break ;
@@ -561,8 +604,8 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	/* 'caff' marker, version and flags. */
@@ -681,10 +724,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 
 	psf_binheader_writef (psf, "mE44444", desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.frames_per_packet, desc.channels_per_frame, desc.bits_per_chan) ;
 
-#if 0
-	if (psf->strings.flags & SF_STR_LOCATE_START)
-		caf_write_strings (psf, SF_STR_LOCATE_START) ;
-#endif
+	caf_write_strings (psf, SF_STR_LOCATE_START) ;
 
 	if (psf->peak_info != NULL)
 	{	int k ;
@@ -702,7 +742,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 
 	if (append_free_block)
 	{	/* Add free chunk so that the actual audio data starts at a multiple 0x1000. */
-		free_len = 0x1000 - psf->headindex - 16 - 12 ;
+		free_len = 0x1000 - psf->header.indx - 16 - 12 ;
 		while (free_len < 0)
 			free_len += 0x1000 ;
 		psf_binheader_writef (psf, "Em8z", free_MARKER, free_len, (int) free_len) ;
@@ -710,11 +750,11 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 
 	psf_binheader_writef (psf, "Em84", data_MARKER, psf->datalength + 4, 0) ;
 
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 	if (psf->error)
 		return psf->error ;
 
-	psf->dataoffset = psf->headindex ;
+	psf->dataoffset = psf->header.indx ;
 	if (current < psf->dataoffset)
 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 	else if (current > 0)
@@ -722,6 +762,36 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 
 	return psf->error ;
 } /* caf_write_header */
+
+static int
+caf_write_tailer (SF_PRIVATE *psf)
+{
+	/* Reset the current header buffer length to zero. */
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
+
+	if (psf->bytewidth > 0 && psf->sf.seekable == SF_TRUE)
+	{	psf->datalength = psf->sf.frames * psf->bytewidth * psf->sf.channels ;
+		psf->dataend = psf->dataoffset + psf->datalength ;
+		} ;
+
+	if (psf->dataend > 0)
+		psf_fseek (psf, psf->dataend, SEEK_SET) ;
+	else
+		psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
+
+	if (psf->dataend & 1)
+		psf_binheader_writef (psf, "z", 1) ;
+
+	if (psf->strings.flags & SF_STR_LOCATE_END)
+		caf_write_strings (psf, SF_STR_LOCATE_END) ;
+
+	/* Write the tailer. */
+	if (psf->header.indx > 0)
+		psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
+
+	return 0 ;
+} /* caf_write_tailer */
 
 static int
 caf_read_chanmap (SF_PRIVATE * psf, sf_count_t chunk_size)
@@ -740,8 +810,8 @@ caf_read_chanmap (SF_PRIVATE * psf, sf_count_t chunk_size)
 	if (bytesread < chunk_size)
 		psf_binheader_readf (psf, "j", chunk_size - bytesread) ;
 
-	if (map_info->channel_map != NULL)
-	{	size_t chanmap_size = psf->sf.channels * sizeof (psf->channel_map [0]) ;
+	if (map_info && map_info->channel_map != NULL)
+	{	size_t chanmap_size = SF_MIN (psf->sf.channels, layout_tag & 0xff) * sizeof (psf->channel_map [0]) ;
 
 		free (psf->channel_map) ;
 
@@ -753,6 +823,168 @@ caf_read_chanmap (SF_PRIVATE * psf, sf_count_t chunk_size)
 
 	return 0 ;
 } /* caf_read_chanmap */
+
+
+static uint32_t
+string_hash32 (const char * str)
+{	uint32_t hash = 0x87654321 ;
+
+	while (str [0])
+	{	hash = hash * 333 + str [0] ;
+		str ++ ;
+		} ;
+
+	return hash ;
+} /* string_hash32 */
+
+static int
+caf_read_strings (SF_PRIVATE * psf, sf_count_t chunk_size)
+{	char *buf ;
+	char *key, *value ;
+	uint32_t count, hash ;
+
+	if ((buf = malloc (chunk_size + 1)) == NULL)
+		return (psf->error = SFE_MALLOC_FAILED) ;
+
+	psf_binheader_readf (psf, "E4b", &count, buf, make_size_t (chunk_size)) ;
+	psf_log_printf (psf, " count: %u\n", count) ;
+
+	/* Force terminate `buf` to make sure. */
+	buf [chunk_size] = 0 ;
+
+	for (key = buf ; key < buf + chunk_size ; )
+	{	value = key + strlen (key) + 1 ;
+		if (value > buf + chunk_size)
+			break ;
+		psf_log_printf (psf, "   %-12s : %s\n", key, value) ;
+
+		hash = string_hash32 (key) ;
+		switch (hash)
+		{	case 0xC4861943 : /* 'title' */
+				psf_store_string (psf, SF_STR_TITLE, value) ;
+				break ;
+			case 0xAD47A394 : /* 'software' */
+				psf_store_string (psf, SF_STR_SOFTWARE, value) ;
+				break ;
+			case 0x5D178E2A : /* 'copyright' */
+				psf_store_string (psf, SF_STR_COPYRIGHT, value) ;
+				break ;
+			case 0x60E4D0C8 : /* 'artist' */
+				psf_store_string (psf, SF_STR_ARTIST, value) ;
+				break ;
+			case 0x83B5D16A : /* 'genre' */
+				psf_store_string (psf, SF_STR_GENRE, value) ;
+				break ;
+			case 0x15E5FC88 : /* 'comment' */
+			case 0x7C297D5B : /* 'comments' */
+				psf_store_string (psf, SF_STR_COMMENT, value) ;
+				break ;
+			case 0x24A7C347 : /* 'tracknumber' */
+				psf_store_string (psf, SF_STR_TRACKNUMBER, value) ;
+				break ;
+			case 0x50A31EB7 : /* 'date' */
+				psf_store_string (psf, SF_STR_DATE, value) ;
+				break ;
+			case 0x6583545A : /* 'album' */
+				psf_store_string (psf, SF_STR_ALBUM, value) ;
+				break ;
+			case 0xE7C64B6C : /* 'license' */
+				psf_store_string (psf, SF_STR_LICENSE, value) ;
+				break ;
+			default :
+				psf_log_printf (psf, " Unhandled hash 0x%x : /* '%s' */\n", hash, key) ;
+				break ;
+			} ;
+
+		key = value + strlen (value) + 1 ;
+		} ;
+
+	free (buf) ;
+
+	return 0 ;
+} /* caf_read_strings */
+
+struct put_buffer
+{	uint32_t index ;
+	char s [16 * 1024] ;
+} ;
+
+static uint32_t
+put_key_value (struct put_buffer * buf, const char * key, const char * value)
+{	uint32_t written ;
+
+	if (buf->index + strlen (key) + strlen (value) + 2 > sizeof (buf->s))
+		return 0 ;
+
+	written = snprintf (buf->s + buf->index, sizeof (buf->s) - buf->index, "%s%c%s%c", key, 0, value, 0) ;
+
+	if (buf->index + written >= sizeof (buf->s))
+		return 0 ;
+
+	buf->index += written ;
+	return 1 ;
+} /* put_key_value */
+
+static void
+caf_write_strings (SF_PRIVATE * psf, int location)
+{	struct put_buffer buf ;
+ 	const char * cptr ;
+	uint32_t k, string_count = 0 ;
+
+	memset (&buf, 0, sizeof (buf)) ;
+
+	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
+	{	if (psf->strings.data [k].type == 0)
+			break ;
+
+		if (psf->strings.data [k].flags != location)
+			continue ;
+
+		if ((cptr = psf_get_string (psf, psf->strings.data [k].type)) == NULL)
+			continue ;
+
+		switch (psf->strings.data [k].type)
+		{	case SF_STR_TITLE :
+				string_count += put_key_value (&buf, "title", cptr) ;
+				break ;
+			case SF_STR_COPYRIGHT :
+				string_count += put_key_value (&buf, "copyright", cptr) ;
+				break ;
+			case SF_STR_SOFTWARE :
+				string_count += put_key_value (&buf, "software", cptr) ;
+				break ;
+			case SF_STR_ARTIST :
+				string_count += put_key_value (&buf, "artist", cptr) ;
+				break ;
+			case SF_STR_COMMENT :
+				string_count += put_key_value (&buf, "comment", cptr) ;
+				break ;
+			case SF_STR_DATE :
+				string_count += put_key_value (&buf, "date", cptr) ;
+				break ;
+			case SF_STR_ALBUM :
+				string_count += put_key_value (&buf, "album", cptr) ;
+				break ;
+			case SF_STR_LICENSE :
+				string_count += put_key_value (&buf, "license", cptr) ;
+				break ;
+			case SF_STR_TRACKNUMBER :
+				string_count += put_key_value (&buf, "tracknumber", cptr) ;
+				break ;
+			case SF_STR_GENRE :
+				string_count += put_key_value (&buf, "genre", cptr) ;
+				break ;
+
+			default :
+				break ;
+			} ;
+		} ;
+
+	if (string_count == 0 || buf.index == 0)
+		return ;
+
+	psf_binheader_writef (psf, "Em84b", info_MARKER, make_size_8 (buf.index + 4), string_count, buf.s, make_size_t (buf.index)) ;
+} /* caf_write_strings */
 
 /*==============================================================================
 */

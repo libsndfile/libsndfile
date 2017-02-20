@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -16,30 +16,14 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-#include	"sfconfig.h"
-
-#include	<stdlib.h>
-#include	<string.h>
-
-#include	"sndfile.h"
-#include	"sfendian.h"
-#include	"common.h"
-
-#if (OSX_DARWIN_VERSION >= 1)
-
-int
-macbinary3_open (SF_PRIVATE * UNUSED (psf))
-{
-	return 0 ;
-} /* macbinary3_open */
-
+#if __GNUC__
+#define ALWAYS_INLINE		__attribute__ ((always_inline))
 #else
+#define ALWAYS_INLINE
+#endif
 
-int
-macbinary3_open (SF_PRIVATE * UNUSED (psf))
-{
-	return 0 ;
-} /* macbinary3_open */
 
-#endif /* OSX_DARWIN_VERSION */
-
+static inline int32_t ALWAYS_INLINE
+arith_shift_left (int32_t x, int shift)
+{	return (int32_t) (((uint32_t) x) << shift) ;
+} /* arith_shift_left */

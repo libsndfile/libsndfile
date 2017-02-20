@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -123,34 +123,34 @@ enum
 } ;
 
 typedef struct
-{	unsigned int	size ;
-	short			numChannels ;
-	unsigned int	numSampleFrames ;
-	short			sampleSize ;
-	unsigned char	sampleRate [10] ;
-	unsigned int	encoding ;
+{	uint32_t	size ;
+	int16_t		numChannels ;
+	uint32_t	numSampleFrames ;
+	int16_t		sampleSize ;
+	uint8_t		sampleRate [10] ;
+	uint32_t	encoding ;
 	char			zero_bytes [2] ;
 } COMM_CHUNK ;
 
 typedef struct
-{	unsigned int	offset ;
-	unsigned int	blocksize ;
+{	uint32_t	offset ;
+	uint32_t	blocksize ;
 } SSND_CHUNK ;
 
 typedef struct
-{	short			playMode ;
-	unsigned short	beginLoop ;
-	unsigned short	endLoop ;
+{	int16_t		playMode ;
+	uint16_t	beginLoop ;
+	uint16_t	endLoop ;
 } INST_LOOP ;
 
 typedef struct
-{	char		baseNote ;		/* all notes are MIDI note numbers */
-	char		detune ;		/* cents off, only -50 to +50 are significant */
-	char		lowNote ;
-	char		highNote ;
-	char		lowVelocity ;	/* 1 to 127 */
-	char		highVelocity ;	/* 1 to 127 */
-	short		gain ;			/* in dB, 0 is normal */
+{	int8_t		baseNote ;		/* all notes are MIDI note numbers */
+	int8_t		detune ;		/* cents off, only -50 to +50 are significant */
+	int8_t		lowNote ;
+	int8_t		highNote ;
+	int8_t		lowVelocity ;	/* 1 to 127 */
+	int8_t		highVelocity ;	/* 1 to 127 */
+	int16_t		gain ;			/* in dB, 0 is normal */
 	INST_LOOP	sustain_loop ;
 	INST_LOOP	release_loop ;
 } INST_CHUNK ;
@@ -170,25 +170,27 @@ enum
 
 
 typedef struct
-{	unsigned int	version ;
-	unsigned int	numBeats ;
-	unsigned short	rootNote ;
-	unsigned short	scaleType ;
-	unsigned short	sigNumerator ;
-	unsigned short	sigDenominator ;
-	unsigned short	loopType ;
+{	uint32_t	version ;
+	uint32_t	numBeats ;
+	uint16_t	rootNote ;
+	uint16_t	scaleType ;
+	uint16_t	sigNumerator ;
+	uint16_t	sigDenominator ;
+	uint16_t	loopType ;
 } basc_CHUNK ;
 
 typedef struct
-{	unsigned short	markerID ;
-	unsigned int	position ;
+{	uint16_t	markerID ;
+	uint32_t	position ;
 } MARK_ID_POS ;
 
 typedef struct
 {	sf_count_t	comm_offset ;
 	sf_count_t	ssnd_offset ;
 
-	int chanmap_tag ;
+	int32_t		chanmap_tag ;
+
+	MARK_ID_POS *markstr ;
 } AIFF_PRIVATE ;
 
 /*------------------------------------------------------------------------------
@@ -197,8 +199,8 @@ typedef struct
 
 static int	aiff_close (SF_PRIVATE *psf) ;
 
-static int	tenbytefloat2int (unsigned char *bytes) ;
-static void uint2tenbytefloat (unsigned int num, unsigned char *bytes) ;
+static int	tenbytefloat2int (uint8_t *bytes) ;
+static void uint2tenbytefloat (uint32_t num, uint8_t *bytes) ;
 
 static int	aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt) ;
 
@@ -210,15 +212,15 @@ static void	aiff_write_strings (SF_PRIVATE *psf, int location) ;
 
 static int	aiff_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 
-static const char *get_loop_mode_str (short mode) ;
+static const char *get_loop_mode_str (int16_t mode) ;
 
-static short get_loop_mode (short mode) ;
+static int16_t get_loop_mode (int16_t mode) ;
 
 static int aiff_read_basc_chunk (SF_PRIVATE * psf, int) ;
 
 static int aiff_read_chanmap (SF_PRIVATE * psf, unsigned dword) ;
 
-static unsigned int marker_to_position (const SF_CUE_INFO *m, unsigned short n) ;
+static uint32_t marker_to_position (const MARK_ID_POS *m, uint16_t n, int marksize) ;
 
 static int aiff_set_chunk (SF_PRIVATE *psf, const SF_CHUNK_INFO * chunk_info) ;
 static SF_CHUNK_ITERATOR * aiff_next_chunk_iterator (SF_PRIVATE *psf, SF_CHUNK_ITERATOR * iterator) ;
@@ -317,15 +319,20 @@ aiff_open (SF_PRIVATE *psf)
 				break ;
 
 		case SF_FORMAT_DWVW_12 :
-				error = dwvw_init (psf, 12) ;
+				if (psf->sf.frames > comm_fmt.numSampleFrames)
+					psf->sf.frames = comm_fmt.numSampleFrames ;
 				break ;
 
 		case SF_FORMAT_DWVW_16 :
 				error = dwvw_init (psf, 16) ;
+				if (psf->sf.frames > comm_fmt.numSampleFrames)
+					psf->sf.frames = comm_fmt.numSampleFrames ;
 				break ;
 
 		case SF_FORMAT_DWVW_24 :
 				error = dwvw_init (psf, 24) ;
+				if (psf->sf.frames > comm_fmt.numSampleFrames)
+					psf->sf.frames = comm_fmt.numSampleFrames ;
 				break ;
 
 		case SF_FORMAT_DWVW_N :
@@ -335,7 +342,8 @@ aiff_open (SF_PRIVATE *psf)
 					} ;
 				if (comm_fmt.sampleSize >= 8 && comm_fmt.sampleSize < 24)
 				{	error = dwvw_init (psf, comm_fmt.sampleSize) ;
-					psf->sf.frames = comm_fmt.numSampleFrames ;
+					if (psf->sf.frames > comm_fmt.numSampleFrames)
+						psf->sf.frames = comm_fmt.numSampleFrames ;
 					break ;
 					} ;
 				psf_log_printf (psf, "AIFC/DWVW : Bad bitwidth %d\n", comm_fmt.sampleSize) ;
@@ -353,11 +361,19 @@ aiff_open (SF_PRIVATE *psf)
 
 		case SF_FORMAT_GSM610 :
 				error = gsm610_init (psf) ;
+				if (psf->sf.frames > comm_fmt.numSampleFrames)
+					psf->sf.frames = comm_fmt.numSampleFrames ;
 				break ;
 
 		default : return SFE_UNIMPLEMENTED ;
 		} ;
 
+	if (psf->file.mode != SFM_WRITE && psf->sf.frames - comm_fmt.numSampleFrames != 0)
+	{	psf_log_printf (psf,
+			"*** Frame count read from 'COMM' chunk (%u) not equal to frame count\n"
+			"*** calculated from length of 'SSND' chunk (%u).\n",
+			comm_fmt.numSampleFrames, (uint32_t) psf->sf.frames) ;
+		} ;
 
 	return error ;
 } /* aiff_open */
@@ -367,15 +383,13 @@ aiff_open (SF_PRIVATE *psf)
 */
 
 /* This function ought to check size */
-static unsigned int
-marker_to_position (const SF_CUE_INFO *m, unsigned short n)
-{
-      int i ;
-  
-      for (i = 0 ; i < m->num ; i++)
-	  if (m->cue [i].markerID == n)
-	      return m->cue [i].position ;
+static uint32_t
+marker_to_position (const MARK_ID_POS *m, uint16_t n, int marksize)
+{	int i ;
 
+	for (i = 0 ; i < marksize ; i++)
+		if (m [i].markerID == n)
+			return m [i].position ;
 	return 0 ;
 } /* marker_to_position */
 
@@ -384,10 +398,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 {	SSND_CHUNK	ssnd_fmt ;
 	AIFF_PRIVATE *paiff ;
 	BUF_UNION	ubuf ;
-	unsigned	chunk_size = 0, FORMsize, SSNDsize, bytesread ;
+	uint32_t	chunk_size = 0, FORMsize, SSNDsize, bytesread, mark_count = 0 ;
 	int			k, found_chunk = 0, done = 0, error = 0 ;
 	char		*cptr ;
-	int			instr_found = 0, mark_found = 0, mark_count = 0 ;
+	int			instr_found = 0, mark_found = 0 ;
 
 	if (psf->filelength > SF_PLATFORM_S64 (0xffffffff))
 		psf_log_printf (psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n") ;
@@ -417,7 +431,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 		marker = chunk_size = 0 ;
 		psf_binheader_readf (psf, "Ejm4", jump, &marker, &chunk_size) ;
 		if (marker == 0)
-		{	psf_log_printf (psf, "Have 0 marker.\n") ;
+		{	sf_count_t pos = psf_ftell (psf) ;
+			psf_log_printf (psf, "Have 0 marker at position %D (0x%x).\n", pos, pos) ;
 			break ;
 			} ;
 
@@ -500,7 +515,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					cptr = ubuf.cbuf ;
 					for (k = 0 ; k < psf->sf.channels ; k++)
 					{	float value ;
-						unsigned int position ;
+						uint32_t position ;
 
 						psf_binheader_readf (psf, "Ef4", &value, &position) ;
 						psf->peak_info->peaks [k].value = value ;
@@ -596,8 +611,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			case COMT_MARKER :
-				{	unsigned short count, id, len ;
-					unsigned int timestamp, bytes ;
+				{	uint16_t count, id, len ;
+					uint32_t timestamp, bytes ;
 
 					if (chunk_size == 0)
 						break ;
@@ -631,7 +646,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					if (chunk_size == 0)
 						break ;
 					if (chunk_size >= SIGNED_SIZEOF (ubuf.scbuf) - 1)
-					{	psf_log_printf (psf, " %M : %d (too big, skipping)\n", marker, chunk_size) ;
+					{	psf_log_printf (psf, " %M : %u (too big, skipping)\n", marker, chunk_size) ;
 						psf_binheader_readf (psf, "j", chunk_size + (chunk_size & 1)) ;
 						break ;
 						} ;
@@ -697,8 +712,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						break ;
 						} ;
 					psf_log_printf (psf, " %M : %d\n", marker, chunk_size) ;
-					{	unsigned char bytes [6] ;
-						short gain ;
+					{	uint8_t bytes [6] ;
+						int16_t gain ;
 
 						if (psf->instrument == NULL && (psf->instrument = psf_instrument_alloc ()) == NULL)
 							return SFE_MALLOC_FAILED ;
@@ -718,9 +733,9 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						psf->instrument->gain = gain ;
 						psf_log_printf (psf, "  Gain (dB) : %d\n", gain) ;
 						} ;
-					{	short	mode ; /* 0 - no loop, 1 - forward looping, 2 - backward looping */
+					{	int16_t	mode ; /* 0 - no loop, 1 - forward looping, 2 - backward looping */
 						const char	*loop_mode ;
-						unsigned short begin, end ;
+						uint16_t begin, end ;
 
 						psf_binheader_readf (psf, "E222", &mode, &begin, &end) ;
 						loop_mode = get_loop_mode_str (mode) ;
@@ -765,56 +780,61 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 			case MARK_MARKER :
 					psf_log_printf (psf, " %M : %d\n", marker, chunk_size) ;
-					{	unsigned short mark_id, n = 0 ;
-						unsigned int position ;
+					{	uint16_t mark_id, n = 0 ;
+						uint32_t position ;
 
 						bytesread = psf_binheader_readf (psf, "E2", &n) ;
 						mark_count = n ;
-						psf_log_printf (psf, "  Count : %d\n", mark_count) ;
-						if (psf->cue_info != NULL)
+						psf_log_printf (psf, "  Count : %u\n", mark_count) ;
+						if (paiff->markstr != NULL)
 						{	psf_log_printf (psf, "*** Second MARK chunk found. Throwing away the first.\n") ;
-						    psf_cueinfo_free (psf->cue_info);
+							free (paiff->markstr) ;
 							} ;
-						psf->cue_info = psf_cueinfo_alloc(mark_count);
-						if (psf->cue_info == NULL)
+						paiff->markstr = calloc (mark_count, sizeof (MARK_ID_POS)) ;
+						if (paiff->markstr == NULL)
+							return SFE_MALLOC_FAILED ;
+
+						if (mark_count > 1000)
+						{	psf_log_printf (psf, "  More than 1000 markers, skipping!\n") ;
+							psf_binheader_readf (psf, "j", chunk_size - bytesread) ;
+							break ;
+						} ;
+
+						if ((psf->cues = psf_cues_alloc (mark_count)) == NULL)
 							return SFE_MALLOC_FAILED ;
 
 						for (n = 0 ; n < mark_count && bytesread < chunk_size ; n++)
-						{	unsigned int pstr_len ;
-							unsigned char ch ;
+						{	uint32_t pstr_len ;
+							uint8_t ch ;
 
 							bytesread += psf_binheader_readf (psf, "E241", &mark_id, &position, &ch) ;
 							psf_log_printf (psf, "   Mark ID  : %u\n   Position : %u\n", mark_id, position) ;
+
+							psf->cues->cue_points [n].indx = mark_id ;
+							psf->cues->cue_points [n].position = 0 ;
+							psf->cues->cue_points [n].fcc_chunk = MAKE_MARKER ('d', 'a', 't', 'a') ; /* always data */
+							psf->cues->cue_points [n].chunk_start = 0 ;
+							psf->cues->cue_points [n].block_start = 0 ;
+							psf->cues->cue_points [n].sample_offset = position ;
 
 							pstr_len = (ch & 1) ? ch : ch + 1 ;
 
 							if (pstr_len < sizeof (ubuf.scbuf) - 1)
 							{	bytesread += psf_binheader_readf (psf, "b", ubuf.scbuf, pstr_len) ;
-							    //DS
- 		    /* remove trailing spaces (HACK!?) */
- 		    if (ubuf.scbuf[pstr_len - 1] == ' '  ||
- 			ubuf.scbuf[pstr_len - 1] == 0)
- 		    {
- 			ubuf.scbuf[pstr_len - 1] = 0;
- 			if (ubuf.scbuf[pstr_len - 2] == ' ')
- 			    ubuf.scbuf[pstr_len - 2] = 0;
- 		    }
-
 								ubuf.scbuf [pstr_len] = 0 ;
 								}
 							else
-							{	unsigned int read_len = pstr_len - (sizeof (ubuf.scbuf) - 1) ;
+							{	uint32_t read_len = pstr_len - (sizeof (ubuf.scbuf) - 1) ;
 								bytesread += psf_binheader_readf (psf, "bj", ubuf.scbuf, read_len, pstr_len - read_len) ;
 								ubuf.scbuf [sizeof (ubuf.scbuf) - 1] = 0 ;
 								}
 
 							psf_log_printf (psf, "   Name     : %s\n", ubuf.scbuf) ;
 
-//DS
- 		    psf->cue_info->cue [n].markerID = mark_id ;
- 		    psf->cue_info->cue [n].position = position ;
- 		    psf->cue_info->cue [n].label    = strdup(ubuf.scbuf);
+							psf_strlcpy (psf->cues->cue_points [n].name, sizeof (psf->cues->cue_points [n].name), ubuf.cbuf) ;
 
+							paiff->markstr [n].markerID = mark_id ;
+							paiff->markstr [n].position = position ;
 							/*
 							**	TODO if ubuf.scbuf is equal to
 							**	either Beg_loop, Beg loop or beg loop and spam
@@ -857,23 +877,34 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					break ;
 
 			default :
+					if (chunk_size >= 0xffff0000)
+					{	done = SF_TRUE ;
+						psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D with length %u. Exiting parser.\n", marker, psf_ftell (psf) - 8, chunk_size) ;
+						break ;
+						} ;
+
 					if (psf_isprint ((marker >> 24) & 0xFF) && psf_isprint ((marker >> 16) & 0xFF)
 						&& psf_isprint ((marker >> 8) & 0xFF) && psf_isprint (marker & 0xFF))
-					{	psf_log_printf (psf, " %M : %d (unknown marker)\n", marker, chunk_size) ;
+					{	psf_log_printf (psf, " %M : %u (unknown marker)\n", marker, chunk_size) ;
 
 						psf_binheader_readf (psf, "j", chunk_size) ;
 						break ;
 						} ;
-					if ((chunk_size = psf_ftell (psf)) & 0x03)
-					{	psf_log_printf (psf, "  Unknown chunk marker %X at position %d. Resyncing.\n", marker, chunk_size - 4) ;
 
+					if (psf_ftell (psf) & 0x03)
+					{	psf_log_printf (psf, "  Unknown chunk marker at position %D. Resynching.\n", psf_ftell (psf) - 8) ;
 						psf_binheader_readf (psf, "j", -3) ;
 						break ;
 						} ;
 					psf_log_printf (psf, "*** Unknown chunk marker %X at position %D. Exiting parser.\n", marker, psf_ftell (psf)) ;
-					done = 1 ;
+					done = SF_TRUE ;
 					break ;
 			} ;	/* switch (marker) */
+
+		if (chunk_size >= psf->filelength)
+		{	psf_log_printf (psf, "*** Chunk size %u > file length %D. Exiting parser.\n", chunk_size, psf->filelength) ;
+			break ;
+			} ;
 
 		if ((! psf->sf.seekable) && (found_chunk & HAVE_SSND))
 			break ;
@@ -883,16 +914,44 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 		} ; /* while (1) */
 
 	if (instr_found && mark_found)
-	{	int j ;
-
-		for (j = 0 ; j < psf->instrument->loop_count ; j ++)
-		{	if (j < ARRAY_LEN (psf->instrument->loops))
-			{	psf->instrument->loops [j].start = marker_to_position (psf->cue_info, psf->instrument->loops [j].start) ;
-				psf->instrument->loops [j].end = marker_to_position (psf->cue_info, psf->instrument->loops [j].end) ;
-				psf->instrument->loops [j].mode = SF_LOOP_FORWARD ;
+	{	int ji, str_index ;
+		/* Next loop will convert markers to loop positions for internal handling */
+		for (ji = 0 ; ji < psf->instrument->loop_count ; ji ++)
+		{	if (ji < ARRAY_LEN (psf->instrument->loops))
+			{	psf->instrument->loops [ji].start = marker_to_position (paiff->markstr, psf->instrument->loops [ji].start, mark_count) ;
+				psf->instrument->loops [ji].end = marker_to_position (paiff->markstr, psf->instrument->loops [ji].end, mark_count) ;
+				psf->instrument->loops [ji].mode = SF_LOOP_FORWARD ;
 				} ;
 			} ;
+
+		/* The markers that correspond to loop positions can now be removed from cues struct */
+		if (psf->cues->cue_count > (uint32_t) (psf->instrument->loop_count * 2))
+		{	uint32_t j ;
+
+			for (j = 0 ; j < psf->cues->cue_count - (uint32_t) (psf->instrument->loop_count * 2) ; j ++)
+			{	/* This simply copies the information in cues above loop positions and writes it at current count instead */
+				psf->cues->cue_points [j].indx = psf->cues->cue_points [j + psf->instrument->loop_count * 2].indx ;
+				psf->cues->cue_points [j].position = psf->cues->cue_points [j + psf->instrument->loop_count * 2].position ;
+				psf->cues->cue_points [j].fcc_chunk = psf->cues->cue_points [j + psf->instrument->loop_count * 2].fcc_chunk ;
+				psf->cues->cue_points [j].chunk_start = psf->cues->cue_points [j + psf->instrument->loop_count * 2].chunk_start ;
+				psf->cues->cue_points [j].block_start = psf->cues->cue_points [j + psf->instrument->loop_count * 2].block_start ;
+				psf->cues->cue_points [j].sample_offset = psf->cues->cue_points [j + psf->instrument->loop_count * 2].sample_offset ;
+				for (str_index = 0 ; str_index < 256 ; str_index++)
+					psf->cues->cue_points [j].name [str_index] = psf->cues->cue_points [j + psf->instrument->loop_count * 2].name [str_index] ;
+				} ;
+			psf->cues->cue_count -= psf->instrument->loop_count * 2 ;
+			} else
+			{	/* All the cues were in fact loop positions so we can actually remove the cues altogether */
+				free (psf->cues) ;
+				psf->cues = NULL ;
+				}
 		} ;
+
+	if (psf->sf.channels < 1)
+		return SFE_CHANNEL_COUNT_ZERO ;
+
+	if (psf->sf.channels >= SF_MAX_CHANNELS)
+		return SFE_CHANNEL_COUNT ;
 
 	if (! (found_chunk & HAVE_FORM))
 		return SFE_AIFF_NO_FORM ;
@@ -913,9 +972,9 @@ static int
 aiff_close (SF_PRIVATE *psf)
 {	AIFF_PRIVATE *paiff = psf->container_data ;
 
-	if (paiff != NULL && psf->cue_info != NULL)
-	{	psf_cueinfo_free (psf->cue_info) ;
-		psf->cue_info = NULL ;
+	if (paiff != NULL && paiff->markstr != NULL)
+	{	free (paiff->markstr) ;
+		paiff->markstr = NULL ;
 		} ;
 
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
@@ -954,7 +1013,7 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	else if (comm_fmt->size == SIZEOF_AIFC_COMM_MIN)
 		psf_binheader_readf (psf, "Em", &(comm_fmt->encoding)) ;
 	else if (comm_fmt->size >= SIZEOF_AIFC_COMM)
-	{	unsigned char encoding_len ;
+	{	uint8_t encoding_len ;
 		unsigned read_len ;
 
 		psf_binheader_readf (psf, "Em1", &(comm_fmt->encoding), &encoding_len) ;
@@ -970,6 +1029,12 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 	psf_log_printf (psf, "  Sample Rate : %d\n", samplerate) ;
 	psf_log_printf (psf, "  Frames      : %u%s\n", comm_fmt->numSampleFrames, (comm_fmt->numSampleFrames == 0 && psf->filelength > 104) ? " (Should not be 0)" : "") ;
+
+	if (comm_fmt->numChannels < 1 || comm_fmt->numChannels >= SF_MAX_CHANNELS)
+	{	psf_log_printf (psf, "  Channels    : %d (should be >= 1 and < %d)\n", comm_fmt->numChannels, SF_MAX_CHANNELS) ;
+		return SFE_CHANNEL_COUNT_BAD ;
+		} ;
+
 	psf_log_printf (psf, "  Channels    : %d\n", comm_fmt->numChannels) ;
 
 	/* Found some broken 'fl32' files with comm.samplesize == 16. Fix it here. */
@@ -1093,16 +1158,16 @@ aiff_rewrite_header (SF_PRIVATE *psf)
 	int k, ch, comm_size, comm_frames ;
 
 	psf_fseek (psf, 0, SEEK_SET) ;
-	psf_fread (psf->header, psf->dataoffset, 1, psf) ;
+	psf_fread (psf->header.ptr, psf->dataoffset, 1, psf) ;
 
-	psf->headindex = 0 ;
+	psf->header.indx = 0 ;
 
 	/* FORM chunk. */
 	psf_binheader_writef (psf, "Etm8", FORM_MARKER, psf->filelength - 8) ;
 
 	/* COMM chunk. */
 	if ((k = psf_find_read_chunk_m32 (&psf->rchunks, COMM_MARKER)) >= 0)
-	{	psf->headindex = psf->rchunks.chunks [k].offset - 8 ;
+	{	psf->header.indx = psf->rchunks.chunks [k].offset - 8 ;
 		comm_frames = psf->sf.frames ;
 		comm_size = psf->rchunks.chunks [k].len ;
 		psf_binheader_writef (psf, "Em42t4", COMM_MARKER, comm_size, psf->sf.channels, comm_frames) ;
@@ -1110,7 +1175,7 @@ aiff_rewrite_header (SF_PRIVATE *psf)
 
 	/* PEAK chunk. */
 	if ((k = psf_find_read_chunk_m32 (&psf->rchunks, PEAK_MARKER)) >= 0)
-	{	psf->headindex = psf->rchunks.chunks [k].offset - 8 ;
+	{	psf->header.indx = psf->rchunks.chunks [k].offset - 8 ;
 		psf_binheader_writef (psf, "Em4", PEAK_MARKER, AIFF_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
 		psf_binheader_writef (psf, "E44", 1, time (NULL)) ;
 		for (ch = 0 ; ch < psf->sf.channels ; ch++)
@@ -1120,25 +1185,40 @@ aiff_rewrite_header (SF_PRIVATE *psf)
 
 	/* SSND chunk. */
 	if ((k = psf_find_read_chunk_m32 (&psf->rchunks, SSND_MARKER)) >= 0)
-	{	psf->headindex = psf->rchunks.chunks [k].offset - 8 ;
+	{	psf->header.indx = psf->rchunks.chunks [k].offset - 8 ;
 		psf_binheader_writef (psf, "Etm8", SSND_MARKER, psf->datalength + SIZEOF_SSND_CHUNK) ;
 		} ;
 
 	/* Header mangling complete so write it out. */
 	psf_fseek (psf, 0, SEEK_SET) ;
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	return ;
 } /* aiff_rewrite_header */
+
+static uint16_t
+convert_loop_mode (int type_mode)
+{	switch (type_mode)
+	{	case SF_LOOP_NONE:
+			return 0 ;
+		case SF_LOOP_FORWARD :
+			return 1 ;
+		case SF_LOOP_ALTERNATING :
+			return 2 ;
+		default : break ;
+		} ;
+
+	return 0 ;
+} /* convert_loop_mode */
 
 static int
 aiff_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t		current ;
 	AIFF_PRIVATE	*paiff ;
-	unsigned char	comm_sample_rate [10], comm_zero_bytes [2] = { 0, 0 } ;
-	unsigned int	comm_type, comm_size, comm_encoding, comm_frames = 0, uk ;
+	uint8_t	comm_sample_rate [10], comm_zero_bytes [2] = { 0, 0 } ;
+	uint32_t	comm_type, comm_size, comm_encoding, comm_frames = 0, uk ;
 	int				k, endian, has_data = SF_FALSE ;
-	short			bit_width ;
+	int16_t			bit_width ;
 
 	if ((paiff = psf->container_data) == NULL)
 		return SFE_INTERNAL ;
@@ -1331,8 +1411,8 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	psf_binheader_writef (psf, "Etm8", FORM_MARKER, psf->filelength - 8) ;
@@ -1344,7 +1424,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	else
 		psf_binheader_writef (psf, "Em", comm_type) ;
 
-	paiff->comm_offset = psf->headindex - 8 ;
+	paiff->comm_offset = psf->header.indx - 8 ;
 
 	memset (comm_sample_rate, 0, sizeof (comm_sample_rate)) ;
 	uint2tenbytefloat (psf->sf.samplerate, comm_sample_rate) ;
@@ -1359,63 +1439,160 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->channel_map && paiff->chanmap_tag)
 		psf_binheader_writef (psf, "Em4444", CHAN_MARKER, 12, paiff->chanmap_tag, 0, 0) ;
 
-	if (psf->instrument != NULL)
-	{	MARK_ID_POS	m [4] ;
-		INST_CHUNK ch ;
-		unsigned short ct = 0 ;
+	/* Check if there's a INST chunk to write */
+	if (psf->instrument != NULL && psf->cues != NULL)
+	{	/* Both loops and cues exist */
+		uint16_t sustainLoopMode, releaseLoopMode ;
+		uint32_t idx, sLoopStart = 0, sLoopEnd = 0, rLoopStart = 0, rLoopEnd = 0 ;
+		int totalStringLength = 0, stringLength ;
 
-		memset (m, 0, sizeof (m)) ;
-		memset (&ch, 0, sizeof (ch)) ;
-
-		ch.baseNote = psf->instrument->basenote ;
-		ch.detune = psf->instrument->detune ;
-		ch.lowNote = psf->instrument->key_lo ;
-		ch.highNote = psf->instrument->key_hi ;
-		ch.lowVelocity = psf->instrument->velocity_lo ;
-		ch.highVelocity = psf->instrument->velocity_hi ;
-		ch.gain = psf->instrument->gain ;
-		if (psf->instrument->loops [0].mode != SF_LOOP_NONE)
-		{	ch.sustain_loop.playMode = 1 ;
-			ch.sustain_loop.beginLoop = ct ;
-			m [0].markerID = ct++ ;
-			m [0].position = psf->instrument->loops [0].start ;
-			ch.sustain_loop.endLoop = ct ;
-			m [1].markerID = ct++ ;
-			m [1].position = psf->instrument->loops [0].end ;
-			} ;
-		if (psf->instrument->loops [1].mode != SF_LOOP_NONE)
-		{	ch.release_loop.playMode = 1 ;
-			ch.release_loop.beginLoop = ct ;
-			m [2].markerID = ct++ ;
-			m [2].position = psf->instrument->loops [1].start ;
-			ch.release_loop.endLoop = ct ;
-			m [3].markerID = ct++ ;
-			m [3].position = psf->instrument->loops [1].end ;
+		/* Here we count how many bytes will the pascal strings need */
+		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
+		{	stringLength = strlen (psf->cues->cue_points [idx].name) + 1 ; /* We'll count the first byte also of every pascal string */
+			if (stringLength % 2 == 0)
+				totalStringLength += stringLength ;
+			else
+				totalStringLength += (stringLength + 1) ; /* The pascal string must have an even count */
 			}
-		else
-		{	ch.release_loop.playMode = 0 ;
-			ch.release_loop.beginLoop = 0 ;
-			ch.release_loop.endLoop = 0 ;
+
+		/* First we check which loops are active and create the necessary MARK chunk for markers */
+		/* The first written markers will be references from loop points then comes the real markers */
+		if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
+		{	/* There's both a sustain loop and a release loop */
+			psf_binheader_writef (psf, "Em42 241b 241b 241b 241b",
+					MARK_MARKER, 2 + 2 * (2 + 4 + 1 + 19) + 2 * (2 + 4 + 1 + 17) + psf->cues->cue_count * (2 + 4) + totalStringLength, 4 + psf->cues->cue_count,
+					1, psf->instrument->loops [0].start, 18, "sustain loop start", make_size_t (19),
+					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17),
+					3, psf->instrument->loops [1].start, 18, "release loop start", make_size_t (19),
+					4, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
+			/* Now comes true markers from cues struct */
+			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
+				psf_binheader_writef (psf, "E24p", 5 + idx, psf->cues->cue_points [idx].sample_offset, psf->cues->cue_points [idx].name) ;
+
+			/* Change the loops to be references to the markers */
+			sLoopStart = 1 ;
+			sLoopEnd = 2 ;
+			rLoopStart = 3 ;
+			rLoopEnd = 4 ;
+			}
+		else if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode == SF_LOOP_NONE)
+		{	/* There's a sustain loop but no release loop */
+			psf_binheader_writef (psf, "Em42241b241b",
+					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17) + psf->cues->cue_count * (2 + 4) + totalStringLength, 2 + psf->cues->cue_count,
+					1, psf->instrument->loops [0].start, 18, "sustain loop start", make_size_t (19),
+					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17)) ;
+			/* Now comes true markers from cues struct */
+			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
+				psf_binheader_writef (psf, "E24p", 3 + idx, psf->cues->cue_points [idx].sample_offset, psf->cues->cue_points [idx].name) ;
+
+			/* Change the loops to be references to the markers */
+			sLoopStart = 1 ;
+			sLoopEnd = 2 ;
+			rLoopStart = 0 ;
+			rLoopEnd = 0 ;
+			}
+		else if (psf->instrument->loops [0].mode == SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
+		{	/* There's a release loop but no sustain loop! Strange indeed! */
+			psf_binheader_writef (psf, "Em42241b241b",
+					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17) + psf->cues->cue_count * (2 + 4) + totalStringLength, 2 + psf->cues->cue_count,
+					1, psf->instrument->loops [1].start, 18, "release loop start", make_size_t (19),
+					2, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
+			/* Now comes true markers from cues struct */
+			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
+				psf_binheader_writef (psf, "E24p", 3 + idx, psf->cues->cue_points [idx].sample_offset, psf->cues->cue_points [idx].name) ;
+
+			/* Change the loops to be references to the markers */
+			sLoopStart = 0 ;
+			sLoopEnd = 0 ;
+			rLoopStart = 1 ;
+			rLoopEnd = 2 ;
 			} ;
 
-		psf_binheader_writef (psf, "Em4111111", INST_MARKER, SIZEOF_INST_CHUNK, ch.baseNote, ch.detune,
-						ch.lowNote, ch.highNote, ch.lowVelocity, ch.highVelocity) ;
-		psf_binheader_writef (psf, "2222222", ch.gain, ch.sustain_loop.playMode,
-						ch.sustain_loop.beginLoop, ch.sustain_loop.endLoop, ch.release_loop.playMode,
-						ch.release_loop.beginLoop, ch.release_loop.endLoop) ;
+		/* First convert loop modes to aiff standard */
+		sustainLoopMode = convert_loop_mode (psf->instrument->loops [0].mode) ;
+		releaseLoopMode = convert_loop_mode (psf->instrument->loops [1].mode) ;
 
-		if (ct == 2)
-			psf_binheader_writef (psf, "Em42241b241b",
-					MARK_MARKER, 2 + 2 * (2 + 4 + 1 + 9), 2,
-					m [0].markerID, m [0].position, 8, "beg loop", make_size_t (9),
-					m [1].markerID, m [1].position, 8, "end loop", make_size_t (9)) ;
-		else if (ct == 4)
+		/* Now we finally write the actual INST chunk */
+		psf_binheader_writef (psf, "Em4111111", INST_MARKER, SIZEOF_INST_CHUNK, psf->instrument->basenote, psf->instrument->detune,
+			psf->instrument->key_lo, psf->instrument->key_hi, psf->instrument->velocity_lo, psf->instrument->velocity_hi) ;
+		psf_binheader_writef (psf, "E2222222", (short) psf->instrument->gain,
+			sustainLoopMode, sLoopStart, sLoopEnd,
+			releaseLoopMode, rLoopStart, rLoopEnd) ;
+
+		}
+	else if (psf->instrument != NULL && psf->cues == NULL)
+	{	/* There are loops but no cues */
+		uint16_t sustainLoopMode, releaseLoopMode ;
+		uint32_t sLoopStart = 0, sLoopEnd = 0, rLoopStart = 0, rLoopEnd = 0 ;
+
+		/* First we check which loops are active and create the necessary MARK chunk for markers */
+		if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
+		{	/* There's both a sustain loop and a release loop */
 			psf_binheader_writef (psf, "Em42 241b 241b 241b 241b",
-					MARK_MARKER, 2 + 4 * (2 + 4 + 1 + 9), 4,
-					m [0].markerID, m [0].position, 8, "beg loop", make_size_t (9),
-					m [1].markerID, m [1].position, 8, "end loop", make_size_t (9),
-					m [2].markerID, m [2].position, 8, "beg loop", make_size_t (9),
-					m [3].markerID, m [3].position, 8, "end loop", make_size_t (9)) ;
+					MARK_MARKER, 2 + 2 * (2 + 4 + 1 + 19) + 2 * (2 + 4 + 1 + 17), 4,
+					1, psf->instrument->loops [0].start, 18, "sustain loop start", make_size_t (19),
+					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17),
+					3, psf->instrument->loops [1].start, 18, "release loop start", make_size_t (19),
+					4, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
+			/* Change the loops to be references to the markers */
+			sLoopStart = 1 ;
+			sLoopEnd = 2 ;
+			rLoopStart = 3 ;
+			rLoopEnd = 4 ;
+			}
+		else if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode == SF_LOOP_NONE)
+		{	/* There's a sustain loop but no release loop */
+			psf_binheader_writef (psf, "Em42241b241b",
+					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17), 2,
+					1, psf->instrument->loops [0].start, 18, "sustain loop start", make_size_t (19),
+					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17)) ;
+			/* Change the loops to be references to the markers */
+			sLoopStart = 1 ;
+			sLoopEnd = 2 ;
+			rLoopStart = 0 ;
+			rLoopEnd = 0 ;
+			}
+		else if (psf->instrument->loops [0].mode == SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
+		{	/* There's a release loop but no sustain loop! Strange indeed! */
+			psf_binheader_writef (psf, "Em42241b241b",
+					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17), 2,
+					1, psf->instrument->loops [1].start, 18, "release loop start", make_size_t (19),
+					2, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
+			/* Change the loops to be references to the markers */
+			sLoopStart = 0 ;
+			sLoopEnd = 0 ;
+			rLoopStart = 1 ;
+			rLoopEnd = 2 ;
+			} ;
+
+		/* First convert loop modes to aiff standard */
+		sustainLoopMode = convert_loop_mode (psf->instrument->loops [0].mode) ;
+		releaseLoopMode = convert_loop_mode (psf->instrument->loops [1].mode) ;
+
+		/* Now we finally write the actual INST chunk */
+		psf_binheader_writef (psf, "Em4111111", INST_MARKER, SIZEOF_INST_CHUNK, psf->instrument->basenote, psf->instrument->detune,
+			psf->instrument->key_lo, psf->instrument->key_hi, psf->instrument->velocity_lo, psf->instrument->velocity_hi) ;
+		psf_binheader_writef (psf, "E2222222", (short) psf->instrument->gain,
+			sustainLoopMode, sLoopStart, sLoopEnd,
+			releaseLoopMode, rLoopStart, rLoopEnd) ;
+
+		}
+	else if (psf->instrument == NULL && psf->cues != NULL)
+	{	/* There are cues but no loops */
+		uint32_t idx ;
+		int totalStringLength = 0, stringLength ;
+
+		/* Here we count how many bytes will the pascal strings need */
+		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
+		{	stringLength = strlen (psf->cues->cue_points [idx].name) + 1 ; /* We'll count the first byte also of every pascal string */
+			totalStringLength += stringLength + (stringLength % 2 == 0 ? 0 : 1) ;
+			} ;
+
+		psf_binheader_writef (psf, "Em42",
+			MARK_MARKER, 2 + psf->cues->cue_count * (2 + 4) + totalStringLength, psf->cues->cue_count) ;
+
+		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
+			psf_binheader_writef (psf, "E24p", psf->cues->cue_points [idx].indx, psf->cues->cue_points [idx].sample_offset, psf->cues->cue_points [idx].name) ;
 		} ;
 
 	if (psf->strings.flags & SF_STR_LOCATE_START)
@@ -1433,19 +1610,19 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "Em4b", psf->wchunks.chunks [uk].mark32, psf->wchunks.chunks [uk].len, psf->wchunks.chunks [uk].data, make_size_t (psf->wchunks.chunks [uk].len)) ;
 
 	/* Write SSND chunk. */
-	paiff->ssnd_offset = psf->headindex ;
+	paiff->ssnd_offset = psf->header.indx ;
 	psf_binheader_writef (psf, "Etm844", SSND_MARKER, psf->datalength + SIZEOF_SSND_CHUNK, 0, 0) ;
 
 	/* Header construction complete so write it out. */
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	if (psf->error)
 		return psf->error ;
 
-	if (has_data && psf->dataoffset != psf->headindex)
+	if (has_data && psf->dataoffset != psf->header.indx)
 		return psf->error = SFE_INTERNAL ;
 
-	psf->dataoffset = psf->headindex ;
+	psf->dataoffset = psf->header.indx ;
 
 	if (! has_data)
 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
@@ -1460,14 +1637,14 @@ aiff_write_tailer (SF_PRIVATE *psf)
 {	int		k ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 
 	psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
 
 	/* Make sure tailer data starts at even byte offset. Pad if necessary. */
 	if (psf->dataend % 2 == 1)
-	{	psf_fwrite (psf->header, 1, 1, psf) ;
+	{	psf_fwrite (psf->header.ptr, 1, 1, psf) ;
 		psf->dataend ++ ;
 		} ;
 
@@ -1482,8 +1659,8 @@ aiff_write_tailer (SF_PRIVATE *psf)
 		aiff_write_strings (psf, SF_STR_LOCATE_END) ;
 
 	/* Write the tailer. */
-	if (psf->headindex > 0)
-		psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	if (psf->header.indx > 0)
+		psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	return 0 ;
 } /* aiff_write_tailer */
@@ -1552,7 +1729,7 @@ aiff_command (SF_PRIVATE * psf, int command, void * UNUSED (data), int UNUSED (d
 } /* aiff_command */
 
 static const char*
-get_loop_mode_str (short mode)
+get_loop_mode_str (int16_t mode)
 {	switch (mode)
 	{	case 0 : return "none" ;
 		case 1 : return "forward" ;
@@ -1562,8 +1739,8 @@ get_loop_mode_str (short mode)
 	return "*** unknown" ;
 } /* get_loop_mode_str */
 
-static short
-get_loop_mode (short mode)
+static int16_t
+get_loop_mode (int16_t mode)
 {	switch (mode)
 	{	case 0 : return SF_LOOP_NONE ;
 		case 1 : return SF_LOOP_FORWARD ;
@@ -1583,7 +1760,7 @@ get_loop_mode (short mode)
 */
 
 static int
-tenbytefloat2int (unsigned char *bytes)
+tenbytefloat2int (uint8_t *bytes)
 {	int val = 3 ;
 
 	if (bytes [0] & 0x80)	/* Negative number. */
@@ -1608,8 +1785,8 @@ tenbytefloat2int (unsigned char *bytes)
 } /* tenbytefloat2int */
 
 static void
-uint2tenbytefloat (unsigned int num, unsigned char *bytes)
-{	unsigned int mask = 0x40000000 ;
+uint2tenbytefloat (uint32_t num, uint8_t *bytes)
+{	uint32_t mask = 0x40000000 ;
 	int	count ;
 
 	if (num <= 1)
@@ -1626,13 +1803,13 @@ uint2tenbytefloat (unsigned int num, unsigned char *bytes)
 		return ;
 		} ;
 
-	for (count = 0 ; count <= 32 ; count ++)
+	for (count = 0 ; count < 32 ; count ++)
 	{	if (num & mask)
 			break ;
 		mask >>= 1 ;
 		} ;
 
-	num <<= count + 1 ;
+	num = count < 31 ? num << (count + 1) : 0 ;
 	bytes [1] = 29 - count ;
 	bytes [2] = (num >> 24) & 0xFF ;
 	bytes [3] = (num >> 16) & 0xFF ;

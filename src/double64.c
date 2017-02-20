@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -90,6 +90,11 @@ static	void	bd2d_write (double *buffer, int count) ;
 int
 double64_init	(SF_PRIVATE *psf)
 {	static int double64_caps ;
+
+	if (psf->sf.channels < 1)
+	{	psf_log_printf (psf, "double64_init : internal error : channels = %d\n", psf->sf.channels) ;
+		return SFE_INTERNAL ;
+		} ;
 
 	double64_caps = double64_get_capability (psf) ;
 

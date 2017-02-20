@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -123,9 +123,6 @@ mat4_open	(SF_PRIVATE *psf)
 		default : break ;
 		} ;
 
-	if (error)
-		return error ;
-
 	return error ;
 } /* mat4_open */
 
@@ -168,8 +165,8 @@ mat4_write_header (SF_PRIVATE *psf, int calc_length)
 		return SFE_BAD_OPEN_FORMAT ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	/* Need sample rate as a double for writing to the header. */
@@ -191,12 +188,12 @@ mat4_write_header (SF_PRIVATE *psf, int calc_length)
 		return SFE_BAD_OPEN_FORMAT ;
 
 	/* Header construction complete so write it out. */
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	if (psf->error)
 		return psf->error ;
 
-	psf->dataoffset = psf->headindex ;
+	psf->dataoffset = psf->header.indx ;
 
 	if (current > 0)
 		psf_fseek (psf, current, SEEK_SET) ;
@@ -275,9 +272,13 @@ mat4_read_header (SF_PRIVATE *psf)
 
 	psf->dataoffset = psf_ftell (psf) ;
 
-	if (rows == 0 && cols == 0)
+	if (rows == 0)
 	{	psf_log_printf (psf, "*** Error : zero channel count.\n") ;
 		return SFE_CHANNEL_COUNT_ZERO ;
+		}
+	else if (rows > SF_MAX_CHANNELS)
+	{	psf_log_printf (psf, "*** Error : channel count %d > SF_MAX_CHANNELS.\n", rows) ;
+		return SFE_CHANNEL_COUNT ;
 		} ;
 
 	psf->sf.channels	= rows ;

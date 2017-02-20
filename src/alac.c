@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2011-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2011-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -31,8 +31,8 @@
 #include	"ALAC/ALACBitUtilities.h"
 
 #define		ALAC_MAX_FRAME_SIZE		8192
-#define		ALAC_BYTE_BUFFER_SIZE	82000
-
+#define		ALAC_BYTE_BUFFER_SIZE	0x20000
+#define		ALAC_MAX_CHANNEL_COUNT	8	// Same as kALACMaxChannels in /ALACAudioTypes.h
 
 typedef struct
 {	uint32_t	current, count, allocated ;
@@ -60,6 +60,8 @@ typedef struct
 
 	char enctmpname [512] ;
 	FILE *enctmp ;
+
+	uint8_t	byte_buffer [ALAC_MAX_CHANNEL_COUNT * ALAC_BYTE_BUFFER_SIZE] ;
 
 	int	buffer	[] ;
 
@@ -89,7 +91,7 @@ static int	alac_close		(SF_PRIVATE *psf) ;
 static int	alac_byterate	(SF_PRIVATE *psf) ;
 
 static int alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac) ;
-static int alac_encode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac) ;
+static int alac_encode_block (ALAC_PRIVATE *plac) ;
 
 static uint32_t alac_kuki_read (SF_PRIVATE * psf, uint32_t kuki_offset, uint8_t * kuki, size_t kuki_maxlen) ;
 
@@ -98,6 +100,8 @@ static PAKT_INFO * alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t pakt_offset
 static PAKT_INFO * alac_pakt_append (PAKT_INFO * info, uint32_t value) ;
 static uint8_t * alac_pakt_encode (const SF_PRIVATE *psf, uint32_t * pakt_size) ;
 static sf_count_t alac_pakt_block_offset (const PAKT_INFO *info, uint32_t block) ;
+
+static const char * alac_error_string (int error) ;
 
 /*============================================================================================
 ** ALAC Reader initialisation function.
@@ -168,7 +172,7 @@ alac_close	(SF_PRIVATE *psf)
 	{	ALAC_ENCODER *penc = &plac->encoder ;
 		SF_CHUNK_INFO chunk_info ;
 		sf_count_t readcount ;
-		uint8_t *kuki_data [plac->kuki_size] ;
+		uint8_t kuki_data [1024] ;
 		uint32_t pakt_size = 0, saved_partial_block_frames ;
 
 		plac->final_write_block = 1 ;
@@ -176,7 +180,7 @@ alac_close	(SF_PRIVATE *psf)
 
 		/*	If a block has been partially assembled, write it out as the final block. */
 		if (plac->partial_block_frames && plac->partial_block_frames < plac->frames_per_block)
-			alac_encode_block (psf, plac) ;
+			alac_encode_block (plac) ;
 
 		plac->partial_block_frames = saved_partial_block_frames ;
 
@@ -233,10 +237,16 @@ static int
 alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 {	ALAC_PRIVATE	*plac ;
 	uint32_t		kuki_size ;
+	int				error ;
 	union			{ uint8_t kuki [512] ; uint32_t alignment ; } u ;
 
 	if (info == NULL)
 	{	psf_log_printf (psf, "%s : ALAC_DECODER_INFO is NULL.\n", __func__) ;
+		return SFE_INTERNAL ;
+		} ;
+
+	if (info->frames_per_packet > ALAC_FRAME_LENGTH)
+	{	psf_log_printf (psf, "*** Error : frames_per_packet (%u) is too big. ***\n", info->frames_per_packet) ;
 		return SFE_INTERNAL ;
 		} ;
 
@@ -250,16 +260,24 @@ alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 		free (plac->pakt_info) ;
 	plac->pakt_info = alac_pakt_read_decode (psf, info->pakt_offset) ;
 
-
 	if (plac->pakt_info == NULL)
 	{	psf_log_printf (psf, "%s : alac_pkt_read() returns NULL.\n", __func__) ;
-		return SFE_MALLOC_FAILED ;
+		return SFE_INTERNAL ;
 		} ;
 
 	/* Read in the ALAC cookie data and pass it to the init function. */
 	kuki_size = alac_kuki_read (psf, info->kuki_offset, u.kuki, sizeof (u.kuki)) ;
 
-	alac_decoder_init (&plac->decoder, u.kuki, kuki_size) ;
+	if ((error = alac_decoder_init (&plac->decoder, u.kuki, kuki_size)) != ALAC_noErr)
+	{	psf_log_printf (psf, "*** alac_decoder_init() returned %s. ***\n", alac_error_string (error)) ;
+		return SFE_INTERNAL ;
+		} ;
+
+
+	if (plac->decoder.mNumChannels != (unsigned) psf->sf.channels)
+	{	psf_log_printf (psf, "*** Initialized decoder has %u channels, but it should be %d. ***\n", plac->decoder.mNumChannels, psf->sf.channels) ;
+		return SFE_INTERNAL ;
+		} ;
 
 	switch (info->bits_per_sample)
 	{	case 16 :
@@ -385,7 +403,6 @@ alac_reader_calc_frames (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 static int
 alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 {	ALAC_DECODER *pdec = &plac->decoder ;
-	uint8_t		byte_buffer [ALAC_BYTE_BUFFER_SIZE] ;
 	uint32_t	packet_size ;
 	BitBuffer	bit_buffer ;
 
@@ -398,19 +415,19 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
 	psf_fseek (psf, plac->input_data_pos, SEEK_SET) ;
 
-	if (packet_size > SIGNED_SIZEOF (byte_buffer))
+	if (packet_size > sizeof (plac->byte_buffer))
 	{	psf_log_printf (psf, "%s : bad packet_size (%u)\n", __func__, packet_size) ;
 		return 0 ;
 		} ;
 
-	if ((packet_size != psf_fread (byte_buffer, 1, packet_size, psf)))
+	if ((packet_size != psf_fread (plac->byte_buffer, 1, packet_size, psf)))
 		return 0 ;
 
-	BitBufferInit (&bit_buffer, byte_buffer, packet_size) ;
+	BitBufferInit (&bit_buffer, plac->byte_buffer, packet_size) ;
 
 	plac->input_data_pos += packet_size ;
 	plac->frames_this_block = 0 ;
-	alac_decode (pdec, &bit_buffer, plac->buffer, plac->frames_per_block, psf->sf.channels, &plac->frames_this_block) ;
+	alac_decode (pdec, &bit_buffer, plac->buffer, plac->frames_per_block, &plac->frames_this_block) ;
 
 	plac->partial_block_frames = 0 ;
 
@@ -419,14 +436,13 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
 
 static int
-alac_encode_block (SF_PRIVATE * psf, ALAC_PRIVATE *plac)
+alac_encode_block (ALAC_PRIVATE *plac)
 {	ALAC_ENCODER *penc = &plac->encoder ;
-	uint8_t	byte_buffer [psf->sf.channels * ALAC_BYTE_BUFFER_SIZE] ;
 	uint32_t num_bytes = 0 ;
 
-	alac_encode (penc, plac->channels, plac->partial_block_frames, plac->buffer, byte_buffer, &num_bytes) ;
+	alac_encode (penc, plac->partial_block_frames, plac->buffer, plac->byte_buffer, &num_bytes) ;
 
-	if (fwrite (byte_buffer, 1, num_bytes, plac->enctmp) != num_bytes)
+	if (fwrite (plac->byte_buffer, 1, num_bytes, plac->enctmp) != num_bytes)
 		return 0 ;
 	if ((plac->pakt_info = alac_pakt_append (plac->pakt_info, num_bytes)) == NULL)
 		return 0 ;
@@ -637,14 +653,15 @@ alac_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
 		for (k = 0 ; k < writecount ; k++)
-			iptr [k] = ptr [total + k] << 16 ;
+			iptr [k] = arith_shift_left (ptr [k], 16) ;
 
 		plac->partial_block_frames += writecount / plac->channels ;
 		total += writecount ;
 		len -= writecount ;
+		ptr += writecount ;
 
 		if (plac->partial_block_frames >= plac->frames_per_block)
-			alac_encode_block (psf, plac) ;
+			alac_encode_block (plac) ;
 		} ;
 
 	return total ;
@@ -667,14 +684,15 @@ alac_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
 		for (k = 0 ; k < writecount ; k++)
-			iptr [k] = ptr [total + k] ;
+			iptr [k] = ptr [k] ;
 
 		plac->partial_block_frames += writecount / plac->channels ;
 		total += writecount ;
 		len -= writecount ;
+		ptr += writecount ;
 
 		if (plac->partial_block_frames >= plac->frames_per_block)
-			alac_encode_block (psf, plac) ;
+			alac_encode_block (plac) ;
 		} ;
 
 	return total ;
@@ -704,9 +722,10 @@ alac_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 		plac->partial_block_frames += writecount / plac->channels ;
 		total += writecount ;
 		len -= writecount ;
+		ptr += writecount ;
 
 		if (plac->partial_block_frames >= plac->frames_per_block)
-			alac_encode_block (psf, plac) ;
+			alac_encode_block (plac) ;
 		} ;
 
 	return total ;
@@ -736,9 +755,10 @@ alac_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 		plac->partial_block_frames += writecount / plac->channels ;
 		total += writecount ;
 		len -= writecount ;
+		ptr += writecount ;
 
 		if (plac->partial_block_frames >= plac->frames_per_block)
-			alac_encode_block (psf, plac) ;
+			alac_encode_block (plac) ;
 		} ;
 
 	return total ;
@@ -794,7 +814,7 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 	chunk_info.id_size = 4 ;
 
 	if ((chunk_iterator = psf_get_chunk_iterator (psf, chunk_info.id)) == NULL)
-	{	printf ("%s %d : no chunk iterator found\n\n", __func__, __LINE__) ;
+	{	psf_log_printf (psf, "%s : no chunk iterator found\n", __func__) ;
 		free (chunk_info.data) ;
 		chunk_info.data = NULL ;
 		return NULL ;
@@ -806,8 +826,7 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 	chunk_info.data = pakt_data = malloc (pakt_size + 5) ;
 
 	if ((bcount = psf->get_chunk_data (psf, chunk_iterator, &chunk_info)) != SF_ERR_NO_ERROR)
-	{	printf ("%s %d : %s\n\n", __func__, __LINE__, sf_error_number (bcount)) ;
-		while (chunk_iterator)
+	{	while (chunk_iterator)
 			chunk_iterator = psf->next_chunk_iterator (psf, chunk_iterator) ;
 		free (chunk_info.data) ;
 		chunk_info.data = NULL ;
@@ -948,3 +967,31 @@ alac_kuki_read (SF_PRIVATE * psf, uint32_t kuki_offset, uint8_t * kuki, size_t k
 
 	return kuki_size ;
 } /* alac_kuki_read */
+
+#define CASE_NAME(x)	case x : return #x ; break ;
+
+static const char *
+alac_error_string (int error)
+{	static char errstr [128] ;
+	switch (error)
+	{	CASE_NAME (kALAC_UnimplementedError) ;
+		CASE_NAME (kALAC_FileNotFoundError) ;
+		CASE_NAME (kALAC_ParamError) ;
+		CASE_NAME (kALAC_MemFullError) ;
+		CASE_NAME (fALAC_FrameLengthError) ;
+
+		/* Added for libsndfile */
+		CASE_NAME (kALAC_BadBitWidth) ;
+		CASE_NAME (kALAC_IncompatibleVersion) ;
+		CASE_NAME (kALAC_BadSpecificConfigSize) ;
+		CASE_NAME (kALAC_ZeroChannelCount) ;
+		CASE_NAME (kALAC_NumSamplesTooBig) ;
+		CASE_NAME (kALAC_UnsupportedElement) ;
+		default :
+			break ;
+		} ;
+
+	snprintf (errstr, sizeof (errstr), "Unknown error %d", error) ;
+	return errstr ;
+} /* alac_error_string */
+

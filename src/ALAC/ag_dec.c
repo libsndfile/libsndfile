@@ -26,14 +26,14 @@
 	Copyright:	(c) 2001-2011 Apple, Inc.
 */
 
-#include "aglib.h"
-#include "ALACBitUtilities.h"
-#include "ALACAudioTypes.h"
-
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "aglib.h"
+#include "ALACBitUtilities.h"
+#include "ALACAudioTypes.h"
 
 #define CODE_TO_LONG_MAXBITS	32
 #define N_MAX_MEAN_CLAMP		0xffff
@@ -306,7 +306,7 @@ int32_t dyn_decomp (AGParamRecPtr params, BitBuffer * bitstream, int32_t * pc, i
 		// least significant bit is sign bit
 		{
 			uint32_t	ndecode = n + zmode ;
-			int32_t		multiplier = - (ndecode & 1) ;
+			int32_t		multiplier = - (int) (ndecode & 1) ;
 
 			multiplier |= 1 ;
 			del = ((ndecode+1) >> 1) * (multiplier) ;

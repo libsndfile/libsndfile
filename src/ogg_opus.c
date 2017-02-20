@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2013-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -34,7 +34,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if (ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_LIBS)
+#if (ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_XIPH_LIBS)
 
 #include <ogg/ogg.h>
 
@@ -137,7 +137,7 @@ ogg_opus_close (SF_PRIVATE * UNUSED (psf))
 } /* ogg_opus_close */
 
 
-#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_LIBS */
+#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_XIPH_LIBS */
 
 int
 ogg_opus_open (SF_PRIVATE *psf)

@@ -1,3 +1,19 @@
+Version 1.0.27 (2016-06-19)
+  * Fix an SF_INFO seekable flag regression introduced in 1.0.26.
+  * Fix potential infinite loops on malformed input files.
+  * Add string metadata read/write for CAF and RF64.
+  * Add handling of CUE chunks.
+  * Fix enaian-ness issues in PAF files.
+  * Minor bug fixes and improvements.
+
+Version 1.0.26 (2015-11-22)
+  * Fix for CVE-2014-9496, SD2 buffer read overflow.
+  * Fix for CVE-2014-9756, file_io.c divide by zero.
+  * Fix for CVE-2015-7805, AIFF heap write overflow.
+  * Add support for ALAC encoder in a CAF container.
+  * Add support for Cart chunks in WAV files.
+  * Minor bug fixes and improvements.
+
 Version 1.0.25 (2011-07-13)
   * Fix for Secunia Advisory SA45125, heap overflow in PAF file handler.
   * Accept broken WAV files with blockalign == 0.

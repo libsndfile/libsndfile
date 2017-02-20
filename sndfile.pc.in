@@ -8,5 +8,5 @@ Description: A library for reading and writing audio files
 Requires: 
 Version: @VERSION@
 Libs: -L${libdir} -lsndfile
-Libs.private: @EXTERNAL_LIBS@
+Libs.private: @EXTERNAL_XIPH_LIBS@
 Cflags: -I${includedir} 

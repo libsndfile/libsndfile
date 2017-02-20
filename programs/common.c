@@ -373,9 +373,6 @@ program_name (const char * argv0)
 	tmp = strrchr (argv0, '/') ;
 	argv0 = tmp ? tmp + 1 : argv0 ;
 
-	tmp = strrchr (argv0, '/') ;
-	argv0 = tmp ? tmp + 1 : argv0 ;
-
 	/* Remove leading libtool name mangling. */
 	if (strstr (argv0, "lt-") == argv0)
 		return argv0 + 3 ;

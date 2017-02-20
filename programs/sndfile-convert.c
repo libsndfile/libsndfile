@@ -348,6 +348,7 @@ main (int argc, char * argv [])
 static void
 copy_metadata (SNDFILE *outfile, SNDFILE *infile, int channels)
 {	SF_INSTRUMENT inst ;
+	SF_CUES cues ;
 	SF_BROADCAST_INFO_2K binfo ;
 	const char *str ;
 	int k, chanmap [256] ;
@@ -359,6 +360,7 @@ copy_metadata (SNDFILE *outfile, SNDFILE *infile, int channels)
 		} ;
 
 	memset (&inst, 0, sizeof (inst)) ;
+	memset (&cues, 0, sizeof (cues)) ;
 	memset (&binfo, 0, sizeof (binfo)) ;
 
 	if (channels < ARRAY_LEN (chanmap))
@@ -367,6 +369,9 @@ copy_metadata (SNDFILE *outfile, SNDFILE *infile, int channels)
 		if (sf_command (infile, SFC_GET_CHANNEL_MAP_INFO, chanmap, size) == SF_TRUE)
 			sf_command (outfile, SFC_SET_CHANNEL_MAP_INFO, chanmap, size) ;
 		} ;
+
+	if (sf_command (infile, SFC_GET_CUE, &cues, sizeof (cues)) == SF_TRUE)
+		sf_command (outfile, SFC_SET_CUE, &cues, sizeof (cues)) ;
 
 	if (sf_command (infile, SFC_GET_INSTRUMENT, &inst, sizeof (inst)) == SF_TRUE)
 		sf_command (outfile, SFC_SET_INSTRUMENT, &inst, sizeof (inst)) ;

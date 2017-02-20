@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -19,8 +19,51 @@
 /* This file contains definitions commong to WAV and W64 files. */
 
 
-#ifndef WAV_W64_H_INCLUDED
-#define WAV_W64_H_INCLUDED
+#ifndef WAVLIKE_H_INCLUDED
+#define WAVLIKE_H_INCLUDED
+
+/*------------------------------------------------------------------------------
+** Chunk markers.
+*/
+
+#define adtl_MARKER		MAKE_MARKER ('a', 'd', 't', 'l')
+#define bext_MARKER		MAKE_MARKER ('b', 'e', 'x', 't')
+#define cart_MARKER		MAKE_MARKER ('c', 'a', 'r', 't')
+#define data_MARKER		MAKE_MARKER ('d', 'a', 't', 'a')
+#define labl_MARKER		MAKE_MARKER ('l', 'a', 'b', 'l')
+#define ltxt_MARKER		MAKE_MARKER ('l', 't', 'x', 't')
+#define note_MARKER		MAKE_MARKER ('n', 'o', 't', 'e')
+#define DISP_MARKER		MAKE_MARKER ('D', 'I', 'S', 'P')
+#define INFO_MARKER		MAKE_MARKER ('I', 'N', 'F', 'O')
+#define LIST_MARKER		MAKE_MARKER ('L', 'I', 'S', 'T')
+#define PAD_MARKER		MAKE_MARKER ('P', 'A', 'D', ' ')
+#define PEAK_MARKER		MAKE_MARKER ('P', 'E', 'A', 'K')
+
+#define ISFT_MARKER		MAKE_MARKER ('I', 'S', 'F', 'T')
+#define ICRD_MARKER		MAKE_MARKER ('I', 'C', 'R', 'D')
+#define ICOP_MARKER		MAKE_MARKER ('I', 'C', 'O', 'P')
+#define IARL_MARKER		MAKE_MARKER ('I', 'A', 'R', 'L')
+#define IART_MARKER		MAKE_MARKER ('I', 'A', 'R', 'T')
+#define INAM_MARKER		MAKE_MARKER ('I', 'N', 'A', 'M')
+#define IENG_MARKER		MAKE_MARKER ('I', 'E', 'N', 'G')
+#define IGNR_MARKER		MAKE_MARKER ('I', 'G', 'N', 'R')
+#define ICOP_MARKER		MAKE_MARKER ('I', 'C', 'O', 'P')
+#define IPRD_MARKER		MAKE_MARKER ('I', 'P', 'R', 'D')
+#define ISRC_MARKER		MAKE_MARKER ('I', 'S', 'R', 'C')
+#define ISBJ_MARKER		MAKE_MARKER ('I', 'S', 'B', 'J')
+#define ICMT_MARKER		MAKE_MARKER ('I', 'C', 'M', 'T')
+#define IAUT_MARKER		MAKE_MARKER ('I', 'A', 'U', 'T')
+#define ITRK_MARKER		MAKE_MARKER ('I', 'T', 'R', 'K')
+
+#define exif_MARKER		MAKE_MARKER ('e', 'x', 'i', 'f')
+#define ever_MARKER		MAKE_MARKER ('e', 'v', 'e', 'r')
+#define etim_MARKER		MAKE_MARKER ('e', 't', 'i', 'm')
+#define ecor_MARKER		MAKE_MARKER ('e', 'c', 'o', 'r')
+#define emdl_MARKER		MAKE_MARKER ('e', 'm', 'd', 'l')
+#define emnt_MARKER		MAKE_MARKER ('e', 'm', 'n', 't')
+#define erel_MARKER		MAKE_MARKER ('e', 'r', 'e', 'l')
+#define eucm_MARKER		MAKE_MARKER ('e', 'u', 'c', 'm')
+#define olym_MARKER		MAKE_MARKER ('o', 'l', 'y', 'm')
 
 /*------------------------------------------------------------------------------
 ** List of known WAV format tags
@@ -28,7 +71,7 @@
 
 enum
 {
-	/* keep sorted for wav_w64_format_str() */
+	/* keep sorted for wavlike_format_str() */
 	WAVE_FORMAT_UNKNOWN					= 0x0000,		/* Microsoft Corporation */
 	WAVE_FORMAT_PCM						= 0x0001, 		/* Microsoft PCM format */
 	WAVE_FORMAT_MS_ADPCM				= 0x0002,		/* Microsoft ADPCM */
@@ -264,35 +307,52 @@ typedef struct
 	/* Set to true when 'fmt ' chunk is ambiguous.*/
 	int fmt_is_broken ;
 	WAV_FMT wav_fmt ;
-} WAV_PRIVATE ;
 
-#define		WAV_W64_GSM610_BLOCKSIZE	65
-#define		WAV_W64_GSM610_SAMPLES		320
+	/*
+	** Set to true when RF64 should be converted back to RIFF when writing the
+	** header.
+	*/
+	int rf64_downgrade ;
+} WAVLIKE_PRIVATE ;
+
+#define		WAVLIKE_GSM610_BLOCKSIZE	65
+#define		WAVLIKE_GSM610_SAMPLES		320
+
+#define		WAVLIKE_PEAK_CHUNK_SIZE(ch) (2 * sizeof (int) + ch * (sizeof (float) + sizeof (int)))
 
 /*------------------------------------------------------------------------------------
 **	Functions defined in wav_ms_adpcm.c
 */
 
-#define	MSADPCM_ADAPT_COEFF_COUNT	7
+#define	WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT	7
 
-void	msadpcm_write_adapt_coeffs (SF_PRIVATE *psf) ;
+void	wavlike_msadpcm_write_adapt_coeffs (SF_PRIVATE *psf) ;
 
 /*------------------------------------------------------------------------------------
-**	Functions defined in wav_w64.c
+**	Functions defined in wavlike.c
 */
 
-int 	wav_w64_srate2blocksize (int srate_chan_product) ;
-char const* wav_w64_format_str (int k) ;
-int		wav_w64_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize) ;
-void	wavex_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat) ;
-void	wav_w64_analyze (SF_PRIVATE *psf) ;
-int		wavex_gen_channel_mask (const int *chan_map, int channels) ;
+char const* wavlike_format_str (int k) ;
 
-int		wav_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize) ;
-int		wav_write_bext_chunk (SF_PRIVATE *psf) ;
+int		wavlike_srate2blocksize (int srate_chan_product) ;
+int		wavlike_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize) ;
+void	wavlike_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat) ;
+void	wavlike_analyze (SF_PRIVATE *psf) ;
+int		wavlike_gen_channel_mask (const int *chan_map, int channels) ;
 
-int		wav_read_cart_chunk (SF_PRIVATE *psf, unsigned int chunksize) ;
-int		wav_write_cart_chunk (SF_PRIVATE *psf) ;
+int		wavlike_read_bext_chunk (SF_PRIVATE *psf, unsigned int chunksize) ;
+int		wavlike_write_bext_chunk (SF_PRIVATE *psf) ;
+
+int		wavlike_read_cart_chunk (SF_PRIVATE *psf, unsigned int chunksize) ;
+int		wavlike_write_cart_chunk (SF_PRIVATE *psf) ;
+
+int		wavlike_subchunk_parse	(SF_PRIVATE *psf, int chunk, uint32_t length) ;
+void	wavlike_write_strings (SF_PRIVATE *psf, int location) ;
+
+int		wavlike_read_peak_chunk (SF_PRIVATE * psf, size_t chunk_size) ;
+void	wavlike_write_peak_chunk (SF_PRIVATE * psf) ;
+
+void	wavlike_write_custom_chunks (SF_PRIVATE * psf) ;
 
 #endif
 

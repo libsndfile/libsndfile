@@ -49,6 +49,7 @@ typedef struct alac_decoder_s
 		int32_t			mPredictor [ALAC_FRAME_LENGTH] ;
 		uint16_t		mShiftBuffer [ALAC_FRAME_LENGTH] ;
 	} ;
+	uint32_t			mNumChannels ;
 } ALAC_DECODER ;
 
 typedef struct alac_encoder_s
@@ -88,10 +89,10 @@ int32_t	alac_decoder_init (ALAC_DECODER *p, void * inMagicCookie, uint32_t inMag
 int32_t alac_encoder_init (ALAC_ENCODER *p, uint32_t samplerate, uint32_t channels, uint32_t format_flags, uint32_t frameSize) ;
 
 int32_t	alac_decode (ALAC_DECODER *, struct BitBuffer * bits, int32_t * sampleBuffer,
-					uint32_t numSamples, uint32_t numChannels, uint32_t * outNumSamples) ;
+					uint32_t numSamples, uint32_t * outNumSamples) ;
 
-int32_t	alac_encode (ALAC_ENCODER *p, uint32_t numChannels, uint32_t numSamples,
-					int32_t * theReadBuffer, unsigned char * theWriteBuffer,
+int32_t	alac_encode (ALAC_ENCODER *p, uint32_t numSamples,
+					const int32_t * theReadBuffer, unsigned char * theWriteBuffer,
 					uint32_t * ioNumBytes) ;
 
 void alac_set_fastmode (ALAC_ENCODER * p, int32_t fast) ;

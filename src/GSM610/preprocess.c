@@ -50,7 +50,7 @@ void Gsm_Preprocess (
 	{
 
 		/*  4.2.1   Downscaling of the input signal */
-		SO = SASR_W (*s, 3) << 2 ;
+		SO = arith_shift_left (SASR_W (*s, 3), 2) ;
 		s++ ;
 
 		assert (SO >= -0x4000) ;	/* downscaled by     */
@@ -74,12 +74,12 @@ void Gsm_Preprocess (
 
 		/*   Compute the recursive part */
 		L_s2 = s1 ;
-		L_s2 <<= 15 ;
+		L_s2 = arith_shift_left (L_s2, 15) ;
 
 		/*   Execution of a 31 bv 16 bits multiplication */
 
 		msp = SASR_L (L_z2, 15) ;
-		lsp = L_z2 - ((int32_t) msp << 15) ; /* gsm_L_sub (L_z2,(msp<<15)) ; */
+		lsp = L_z2 - arith_shift_left ((int32_t) msp, 15) ; /* gsm_L_sub (L_z2,(msp<<15)) ; */
 
 		L_s2 += GSM_MULT_R (lsp, 32735) ;
 		L_temp = (int32_t) msp * 32735 ; /* GSM_L_MULT (msp,32735) >> 1 ;*/

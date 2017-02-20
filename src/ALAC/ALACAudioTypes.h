@@ -60,6 +60,14 @@ enum
 	kALAC_ParamError			= -50,
 	kALAC_MemFullError			= -108,
 	fALAC_FrameLengthError		= -666,
+
+	/* Add for libsndfile */
+	kALAC_BadBitWidth			= -0x100000,
+	kALAC_IncompatibleVersion	= -0x100001,
+	kALAC_BadSpecificConfigSize	= -0x100002,
+	kALAC_ZeroChannelCount		= -0x100003,
+	kALAC_NumSamplesTooBig		= -0x100004,
+	kALAC_UnsupportedElement	= -0x100005,
 } ;
 
 enum

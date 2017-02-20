@@ -1,8 +1,9 @@
-.Dd "June 19, 2014"
+.Dd November 2, 2014
 .Dt SNDFILE-METADATA-GET 1
 .Os
 .Sh NAME
-.Nm sndfile-metadata-get
+.Nm sndfile-metadata-get ,
+.Nm sndfile-metadata-set
 .Nd get or set metadata in a sound file
 .Sh SYNOPSIS
 .Nm sndfile-metadata-get
@@ -107,12 +108,7 @@ Set the BEXT date to current.
 Set the string date to current.
 .El
 .Sh EXIT STATUS
-.Bl -tag -width 0 -compact
-.It 0
-The metadata was written or retrieved successfully.
-.It 1
-An error occurred.
-.El
+.Ex -std
 .Sh SEE ALSO
 .Lk http://www.mega-nerd.com/libsndfile/
 .Lk http://tech.ebu.ch/docs/tech/tech3285.pdf

@@ -1,6 +1,6 @@
 [+ AutoGen5 template h c +]
 /*
-** Copyright (C) 2002-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,6 +79,11 @@ exit_if_true (int test, const char *format, ...)
 		} ;
 } /* exit_if_true */
 
+static inline int32_t
+arith_shift_left (int32_t x, int shift)
+{	return (int32_t) (((uint32_t) x) << shift) ;
+} /* arith_shift_left */
+
 /*
 **	Functions for saving two vectors of data in an ascii text file which
 **	can then be loaded into GNU octave for comparison.
@@ -90,6 +95,8 @@ exit_if_true (int test, const char *format, ...)
 +]
 
 void	delete_file (int format, const char *filename) ;
+
+int		truncate_file_to_zero (const char *fname) ;
 
 void	count_open_files (void) ;
 void	increment_open_file_count (void) ;
@@ -117,6 +124,7 @@ void 	check_log_buffer_or_die (SNDFILE *file, int line_num) ;
 int 	string_in_log_buffer (SNDFILE *file, const char *s) ;
 void	hexdump_file (const char * filename, sf_count_t offset, sf_count_t length) ;
 
+void	test_sf_format_or_die	(const SF_INFO *info, int line_num) ;
 
 SNDFILE *test_open_file_or_die
 			(const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num) ;
@@ -209,13 +217,8 @@ gen_windowed_sine_[+ (get "name") +] ([+ (get "name") +] *data, int len, double 
 {	int k ;
 
 	memset (data, 0, len * sizeof ([+ (get "name") +])) ;
-	/*
-	**	Choose a frequency of 1/32 so that it aligns perfectly with a DFT
-	**	bucket to minimise spreading of energy over more than one bucket.
-	**	Also do not want to make the frequency too high as some of the
-	**	codecs (ie gsm610) have a quite severe high frequency roll off.
-	*/
-	len /= 2 ;
+
+	len = (5 * len) / 6 ;
 
 	for (k = 0 ; k < len ; k++)
 	{	data [k] = sin (2.0 * k * M_PI * 1.0 / 32.0 + 0.4) ;
@@ -272,12 +275,12 @@ check_file_hash_or_die (const char *filename, uint64_t target_hash, int line_num
 	fclose (file) ;
 
 	if (target_hash == 0)
-	{	printf (" 0x%016" PRIx64 "\n", cksum) ;
+	{	printf (" 0x%" PRIx64 "\n", cksum) ;
 		return ;
 		} ;
 
 	if (cksum != target_hash)
-	{	printf ("\n\nLine %d: incorrect hash value 0x%016" PRIx64 " should be 0x%016" PRIx64 ".\n\n", line_num, cksum, target_hash) ;
+	{	printf ("\n\nLine %d: incorrect hash value 0x%" PRIx64 " should be 0x%" PRIx64 ".\n\n", line_num, cksum, target_hash) ;
 		exit (1) ;
 		} ;
 
@@ -491,6 +494,18 @@ dump_log_buffer (SNDFILE *file)
 
 	return ;
 } /* dump_log_buffer */
+
+void
+test_sf_format_or_die (const SF_INFO *info, int line_num)
+{	int res ;
+
+	if ((res = sf_format_check (info)) != 1)
+	{	printf ("\n\nLine %d : sf_format_check returned error (%d)\n\n", line_num,res) ;
+		exit (1) ;
+		} ;
+
+	return ;
+} /* test_sf_format_or_die */
 
 SNDFILE *
 test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num)
@@ -770,6 +785,17 @@ delete_file (int format, const char *filename)
 
 	unlink (rsrc_name) ;
 } /* delete_file */
+
+int
+truncate_file_to_zero (const char * fname)
+{	FILE * file ;
+
+	if ((file = fopen (fname, "w")) == NULL)
+		return errno ;
+	fclose (file) ;
+
+	return 0 ;
+} /* truncate_file_to_zero */
 
 static int allowed_open_files = -1 ;
 

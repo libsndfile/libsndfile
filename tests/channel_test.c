@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@
 #define LOG_BUFFER_SIZE	1024
 
 static	void	channel_test			(void) ;
-static	double	max_diff		(const float *a, const float *b, int len) ;
+static	double	max_diff		(const float *a, const float *b, unsigned int len, unsigned int * position) ;
 
 int
 main (void) // int argc, char *argv [])
@@ -57,7 +57,7 @@ channel_test (void)
 	static float	read_float [1024] ;
 	static int		read_int [1024] ;
 	static short	read_short [1024] ;
-	unsigned int	ch, k ;
+	unsigned int	ch, k, position = 0 ;
 
 	gen_windowed_sine_float (float_data, ARRAY_LEN (float_data), 0.9) ;
 
@@ -98,8 +98,8 @@ channel_test (void)
 		for (k = 0 ; k < ARRAY_LEN (read_float) ; k++)
 			read_float [k] = read_short [k] * (0.9 / 0x8000) ;
 
-		maxdiff = max_diff (float_data, read_float, ch * rsfinfo.frames) ;
-		exit_if_true (maxdiff > 0.5, "\n\nLine %d : Max diff is %f\n\n", __LINE__, maxdiff) ;
+		maxdiff = max_diff (float_data, read_float, ch * rsfinfo.frames, &position) ;
+		exit_if_true (maxdiff > 0.5, "\n\nLine %d : Max diff is %f at index %u\n\n", __LINE__, maxdiff, position) ;
 
 		/* Read it as int and test. */
 		test_seek_or_die (file, 0, SEEK_SET, 0, ch, __LINE__) ;
@@ -108,8 +108,8 @@ channel_test (void)
 		for (k = 0 ; k < ARRAY_LEN (read_float) ; k++)
 			read_float [k] = read_int [k] * (0.9 / 0x80000000) ;
 
-		maxdiff = max_diff (float_data, read_float, ch * rsfinfo.frames) ;
-		exit_if_true (maxdiff > 0.5, "\n\nLine %d : Max diff is %f\n\n", __LINE__, maxdiff) ;
+		maxdiff = max_diff (float_data, read_float, ch * rsfinfo.frames, &position) ;
+		exit_if_true (maxdiff > 0.5, "\n\nLine %d : Max diff is %f at index %u\n\n", __LINE__, maxdiff, position) ;
 
 		sf_close (file) ;
 		unlink (filename) ;
@@ -120,14 +120,16 @@ channel_test (void)
 } /* channel_test */
 
 static double
-max_diff (const float *a, const float *b, int len)
+max_diff (const float *a, const float *b, unsigned int len, unsigned int * position)
 {	double mdiff = 0.0, diff ;
-	int k ;
+	unsigned int k ;
 
 	for (k = 0 ; k < len ; k++)
 	{	diff = fabs (a [k] - b [k]) ;
-		mdiff = diff > mdiff ? diff : mdiff ;
-		// printf ("%4d:     % f        % f          % f          % f\n", k, a [k], b [k], diff, mdiff) ;
+		if (diff > mdiff)
+		{ 	mdiff = diff ;
+			*position = k ;
+			} ;
 		} ;
 
 	return mdiff ;

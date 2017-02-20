@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2007 John ffitch
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -34,7 +34,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if HAVE_EXTERNAL_LIBS
+#if HAVE_EXTERNAL_XIPH_LIBS
 
 #include <ogg/ogg.h>
 
@@ -131,11 +131,11 @@ ogg_stream_classify (SF_PRIVATE *psf, OGG_PRIVATE* odata)
 	buffer = ogg_sync_buffer (&odata->osync, 4096L) ;
 
 	/* Grab the part of the header that has already been read. */
-	memcpy (buffer, psf->header, psf->headindex) ;
-	bytes = psf->headindex ;
+	memcpy (buffer, psf->header.ptr, psf->header.indx) ;
+	bytes = psf->header.indx ;
 
 	/* Submit a 4k block to libvorbis' Ogg layer */
-	bytes += psf_fread (buffer + psf->headindex, 1, 4096 - psf->headindex, psf) ;
+	bytes += psf_fread (buffer + psf->header.indx, 1, 4096 - psf->header.indx, psf) ;
 	ogg_sync_wrote (&odata->osync, bytes) ;
 
 	/* Get the first page. */
@@ -241,7 +241,7 @@ ogg_page_classify (SF_PRIVATE * psf, const ogg_page * og)
 	return 0 ;
 } /* ogg_page_classify */
 
-#else /* HAVE_EXTERNAL_LIBS */
+#else /* HAVE_EXTERNAL_XIPH_LIBS */
 
 int
 ogg_open	(SF_PRIVATE *psf)

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -26,7 +26,7 @@
 #include "sndfile.h"
 #include "sfendian.h"
 #include "common.h"
-#include "wav_w64.h"
+#include "wavlike.h"
 #include "GSM610/gsm.h"
 
 #define	GSM610_BLOCKSIZE		33
@@ -40,8 +40,8 @@ typedef struct gsm610_tag
 	int				(*decode_block)	(SF_PRIVATE *psf, struct gsm610_tag *pgsm610) ;
 	int				(*encode_block)	(SF_PRIVATE *psf, struct gsm610_tag *pgsm610) ;
 
-	short			samples [WAV_W64_GSM610_SAMPLES] ;
-	unsigned char	block [WAV_W64_GSM610_BLOCKSIZE] ;
+	short			samples [WAVLIKE_GSM610_SAMPLES] ;
+	unsigned char	block [WAVLIKE_GSM610_BLOCKSIZE] ;
 
 	/* Damn I hate typedef-ed pointers; yes, gsm is a pointer type. */
 	gsm				gsm_data ;
@@ -114,8 +114,8 @@ Need separate gsm_data structs for encode and decode.
 			pgsm610->encode_block = gsm610_wav_encode_block ;
 			pgsm610->decode_block = gsm610_wav_decode_block ;
 
-			pgsm610->samplesperblock = WAV_W64_GSM610_SAMPLES ;
-			pgsm610->blocksize = WAV_W64_GSM610_BLOCKSIZE ;
+			pgsm610->samplesperblock = WAVLIKE_GSM610_SAMPLES ;
+			pgsm610->blocksize = WAVLIKE_GSM610_BLOCKSIZE ;
 			break ;
 
 		case SF_FORMAT_AIFF :
@@ -198,15 +198,15 @@ gsm610_wav_decode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
 		return 1 ;
 		} ;
 
-	if ((k = psf_fread (pgsm610->block, 1, WAV_W64_GSM610_BLOCKSIZE, psf)) != WAV_W64_GSM610_BLOCKSIZE)
-		psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, WAV_W64_GSM610_BLOCKSIZE) ;
+	if ((k = psf_fread (pgsm610->block, 1, WAVLIKE_GSM610_BLOCKSIZE, psf)) != WAVLIKE_GSM610_BLOCKSIZE)
+		psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, WAVLIKE_GSM610_BLOCKSIZE) ;
 
 	if (gsm_decode (pgsm610->gsm_data, pgsm610->block, pgsm610->samples) < 0)
 	{	psf_log_printf (psf, "Error from WAV gsm_decode() on frame : %d\n", pgsm610->blockcount) ;
 		return 0 ;
 		} ;
 
-	if (gsm_decode (pgsm610->gsm_data, pgsm610->block + (WAV_W64_GSM610_BLOCKSIZE + 1) / 2, pgsm610->samples + WAV_W64_GSM610_SAMPLES / 2) < 0)
+	if (gsm_decode (pgsm610->gsm_data, pgsm610->block + (WAVLIKE_GSM610_BLOCKSIZE + 1) / 2, pgsm610->samples + WAVLIKE_GSM610_SAMPLES / 2) < 0)
 	{	psf_log_printf (psf, "Error from WAV gsm_decode() on frame : %d.5\n", pgsm610->blockcount) ;
 		return 0 ;
 		} ;
@@ -305,7 +305,7 @@ gsm610_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	{	readcount = (len >= bufferlen) ? bufferlen : len ;
 		count = gsm610_read_block (psf, pgsm610, sptr, readcount) ;
 		for (k = 0 ; k < readcount ; k++)
-			ptr [total + k] = sptr [k] << 16 ;
+			ptr [total + k] = arith_shift_left (sptr [k], 16) ;
 
 		total += count ;
 		len -= readcount ;
@@ -455,11 +455,11 @@ gsm610_wav_encode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
 
 	/* Encode the samples. */
 	gsm_encode (pgsm610->gsm_data, pgsm610->samples, pgsm610->block) ;
-	gsm_encode (pgsm610->gsm_data, pgsm610->samples+WAV_W64_GSM610_SAMPLES / 2, pgsm610->block+WAV_W64_GSM610_BLOCKSIZE / 2) ;
+	gsm_encode (pgsm610->gsm_data, pgsm610->samples+WAVLIKE_GSM610_SAMPLES / 2, pgsm610->block+WAVLIKE_GSM610_BLOCKSIZE / 2) ;
 
 	/* Write the block to disk. */
-	if ((k = psf_fwrite (pgsm610->block, 1, WAV_W64_GSM610_BLOCKSIZE, psf)) != WAV_W64_GSM610_BLOCKSIZE)
-		psf_log_printf (psf, "*** Warning : short write (%d != %d).\n", k, WAV_W64_GSM610_BLOCKSIZE) ;
+	if ((k = psf_fwrite (pgsm610->block, 1, WAVLIKE_GSM610_BLOCKSIZE, psf)) != WAVLIKE_GSM610_BLOCKSIZE)
+		psf_log_printf (psf, "*** Warning : short write (%d != %d).\n", k, WAVLIKE_GSM610_BLOCKSIZE) ;
 
 	pgsm610->samplecount = 0 ;
 	pgsm610->blockcount ++ ;

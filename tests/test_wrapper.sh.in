@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2008-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+# Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 #
 # All rights reserved.
 #
@@ -33,7 +33,7 @@
 
 HOST_TRIPLET=@HOST_TRIPLET@
 PACKAGE_VERSION=@PACKAGE_VERSION@
-LIB_VERSION=`echo $PACKAGE_VERSION | sed "s/[a-z].*//"`
+LIB_VERSION=$(echo $PACKAGE_VERSION | sed "s/[a-z].*//")
 
 if test -f tests/sfversion@EXEEXT@ ; then
 	cd tests
@@ -53,9 +53,9 @@ if test -f libsndfile.so.$LIB_VERSION ; then
 		fi
 	fi
 
-sfversion=`./sfversion@EXEEXT@ | sed "s/-exp$//"`
+sfversion=$(./sfversion@EXEEXT@ | grep libsndfile | sed "s/-exp$//")
 
-if test $sfversion != libsndfile-$PACKAGE_VERSION ; then
+if test "$sfversion" != libsndfile-$PACKAGE_VERSION ; then
 	echo "Error : sfversion ($sfversion) and PACKAGE_VERSION ($PACKAGE_VERSION) don't match."
 	exit 1
 	fi
@@ -89,6 +89,7 @@ if test -x test_main@EXEEXT@ ; then
 ./command_test@EXEEXT@ peak
 ./command_test@EXEEXT@ trunc
 ./command_test@EXEEXT@ inst
+./command_test@EXEEXT@ cue
 ./command_test@EXEEXT@ current_sf_info
 ./command_test@EXEEXT@ bext
 ./command_test@EXEEXT@ bextch
@@ -161,6 +162,8 @@ echo "----------------------------------------------------------------------"
 ./peak_chunk_test@EXEEXT@ caf
 ./misc_test@EXEEXT@ caf
 ./chunk_test@EXEEXT@ caf
+./string_test@EXEEXT@ caf
+./long_read_write_test@EXEEXT@ alac
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on CAF files."
 echo "----------------------------------------------------------------------"
@@ -201,6 +204,9 @@ echo "----------------------------------------------------------------------"
 ./write_read_test@EXEEXT@ rf64
 ./header_test@EXEEXT@ rf64
 ./misc_test@EXEEXT@ rf64
+./string_test@EXEEXT@ rf64
+./peak_chunk_test@EXEEXT@ rf64
+./chunk_test@EXEEXT@ rf64
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on RF64 files."
 echo "----------------------------------------------------------------------"

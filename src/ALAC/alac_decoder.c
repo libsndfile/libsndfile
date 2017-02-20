@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
- * Copyright (C) 2012-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+ * Copyright (C) 2012-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
@@ -23,6 +23,7 @@
 	File:		ALACDecoder.cpp
 */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
@@ -32,6 +33,7 @@
 #include "dplib.h"
 #include "aglib.h"
 #include "matrixlib.h"
+#include "shift.h"
 
 #include "ALACBitUtilities.h"
 #include "EndianPortable.h"
@@ -104,15 +106,16 @@ alac_decoder_init (ALAC_DECODER *p, void * inMagicCookie, uint32_t inMagicCookie
 		theConfig.sampleRate = psf_get_be32 (theActualCookie, offsetof (ALACSpecificConfig, sampleRate)) ;
 
 		p->mConfig = theConfig ;
+		p->mNumChannels = theConfig.numChannels ;
 
-		RequireAction (p->mConfig.compatibleVersion <= kALACVersion, return kALAC_ParamError ;) ;
-
+		RequireAction (p->mConfig.compatibleVersion <= kALACVersion, return kALAC_IncompatibleVersion ;) ;
+		RequireAction ((p->mConfig.bitDepth >= 8 && p->mConfig.bitDepth <= 32), return kALAC_BadBitWidth ;) ;
 		RequireAction ((p->mMixBufferU != NULL) && (p->mMixBufferV != NULL) && (p->mPredictor != NULL),
 						status = kALAC_MemFullError ; goto Exit ;) ;
 	}
 	else
 	{
-		status = kALAC_ParamError ;
+		status = kALAC_BadSpecificConfigSize ;
 	}
 
 	// skip to Channel Layout Info
@@ -131,7 +134,7 @@ Exit:
 	  the bitstream
 */
 int32_t
-alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, uint32_t numSamples, uint32_t numChannels, uint32_t * outNumSamples)
+alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, uint32_t numSamples, uint32_t * outNumSamples)
 {
 	BitBuffer		shiftBits ;
 	uint32_t		bits1, bits2 ;
@@ -160,9 +163,10 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 	int32_t			val ;
 	uint32_t		i, j ;
 	int32_t			status ;
+	uint32_t		numChannels = p->mNumChannels ;
 
 	RequireAction ((bits != NULL) && (sampleBuffer != NULL) && (outNumSamples != NULL), return kALAC_ParamError ;) ;
-	RequireAction (numChannels > 0, return kALAC_ParamError ;) ;
+	RequireAction (p->mNumChannels > 0, return kALAC_ZeroChannelCount ;) ;
 
 	p->mActiveElements = 0 ;
 	channelIndex	= 0 ;
@@ -212,6 +216,8 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 				{
 					numSamples = BitBufferRead (bits, 16) << 16 ;
 					numSamples |= BitBufferRead (bits, 16) ;
+
+					RequireAction (numSamples < kALACDefaultFramesPerPacket, return kALAC_NumSamplesTooBig ;) ;
 				}
 
 				if (escapeFlag == 0)
@@ -232,7 +238,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 					for (i = 0 ; i < numU ; i++)
 						coefsU [i] = (int16_t) BitBufferRead (bits, 16) ;
 
-					// if shift active, skip the the shift buffer but remember where it starts
+					// if shift active, skip the shift buffer but remember where it starts
 					if (bytesShifted != 0)
 					{
 						shiftBits = *bits ;
@@ -277,7 +283,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 						for (i = 0 ; i < numSamples ; i++)
 						{
 							val = (int32_t) BitBufferRead (bits, 16) ;
-							val = (val << 16) >> shift ;
+							val = arith_shift_left (val, 16) >> shift ;
 							p->mMixBufferU [i] = val | BitBufferRead (bits, (uint8_t) extraBits) ;
 						}
 					}
@@ -303,7 +309,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 					case 16:
 						out32 = sampleBuffer + channelIndex ;
 						for (i = 0, j = 0 ; i < numSamples ; i++, j += numChannels)
-							out32 [j] = p->mMixBufferU [i] << 16 ;
+							out32 [j] = arith_shift_left (p->mMixBufferU [i], 16) ;
 						break ;
 					case 20:
 						out32 = sampleBuffer + channelIndex ;
@@ -363,6 +369,8 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 				{
 					numSamples = BitBufferRead (bits, 16) << 16 ;
 					numSamples |= BitBufferRead (bits, 16) ;
+
+					RequireAction (numSamples < kALACDefaultFramesPerPacket, return kALAC_NumSamplesTooBig ;) ;
 				}
 
 				if (escapeFlag == 0)
@@ -457,11 +465,11 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 						for (i = 0 ; i < numSamples ; i++)
 						{
 							val = (int32_t) BitBufferRead (bits, 16) ;
-							val = (val << 16) >> shift ;
+							val = (((uint32_t) val) << 16) >> shift ;
 							p->mMixBufferU [i] = val | BitBufferRead (bits, (uint8_t) extraBits) ;
 
 							val = (int32_t) BitBufferRead (bits, 16) ;
-							val = (val << 16) >> shift ;
+							val = ((uint32_t) val) >> shift ;
 							p->mMixBufferV [i] = val | BitBufferRead (bits, (uint8_t) extraBits) ;
 						}
 					}
@@ -519,7 +527,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 			{
 				// unsupported element, bail
 				//AssertNoErr (tag) ;
-				status = kALAC_ParamError ;
+				status = kALAC_UnsupportedElement ;
 				break ;
 			}
 

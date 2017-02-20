@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -92,7 +92,7 @@ xi_open	(SF_PRIVATE *psf)
 
 		/* Set up default instrument and software name. */
 		memcpy (pxi->filename, "Default Name            ", sizeof (pxi->filename)) ;
-		memcpy (pxi->software, PACKAGE "-" VERSION "               ", sizeof (pxi->software)) ;
+		memcpy (pxi->software, PACKAGE_NAME "-" PACKAGE_VERSION "               ", sizeof (pxi->software)) ;
 
 		memset (pxi->sample_name, 0, sizeof (pxi->sample_name)) ;
 		snprintf (pxi->sample_name, sizeof (pxi->sample_name), "%s", "Sample #1") ;
@@ -280,8 +280,8 @@ xi_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 	current = psf_ftell (psf) ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	string = "Extended Instrument: " ;
@@ -317,12 +317,12 @@ xi_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 
 
 	/* Header construction complete so write it out. */
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	if (psf->error)
 		return psf->error ;
 
-	psf->dataoffset = psf->headindex ;
+	psf->dataoffset = psf->header.indx ;
 
 	if (current > 0)
 		psf_fseek (psf, current, SEEK_SET) ;
@@ -978,10 +978,10 @@ dsc2s_array (XI_PRIVATE *pxi, signed char *src, int count, short *dest)
 
 	for (k = 0 ; k < count ; k++)
 	{	last_val += src [k] ;
-		dest [k] = last_val << 8 ;
+		dest [k] = arith_shift_left (last_val, 8) ;
 		} ;
 
-	pxi->last_16 = last_val << 8 ;
+	pxi->last_16 = arith_shift_left (last_val, 8) ;
 } /* dsc2s_array */
 
 static void
@@ -993,10 +993,10 @@ dsc2i_array (XI_PRIVATE *pxi, signed char *src, int count, int *dest)
 
 	for (k = 0 ; k < count ; k++)
 	{	last_val += src [k] ;
-		dest [k] = last_val << 24 ;
+		dest [k] = arith_shift_left (last_val, 24) ;
 		} ;
 
-	pxi->last_16 = last_val << 8 ;
+	pxi->last_16 = arith_shift_left (last_val, 8) ;
 } /* dsc2i_array */
 
 static void
@@ -1011,7 +1011,7 @@ dsc2f_array (XI_PRIVATE *pxi, signed char *src, int count, float *dest, float no
 		dest [k] = last_val * normfact ;
 		} ;
 
-	pxi->last_16 = last_val << 8 ;
+	pxi->last_16 = arith_shift_left (last_val, 8) ;
 } /* dsc2f_array */
 
 static void
@@ -1026,7 +1026,7 @@ dsc2d_array (XI_PRIVATE *pxi, signed char *src, int count, double *dest, double 
 		dest [k] = last_val * normfact ;
 		} ;
 
-	pxi->last_16 = last_val << 8 ;
+	pxi->last_16 = arith_shift_left (last_val, 8) ;
 } /* dsc2d_array */
 
 /*------------------------------------------------------------------------------
@@ -1045,7 +1045,7 @@ s2dsc_array (XI_PRIVATE *pxi, const short *src, signed char *dest, int count)
 		last_val = current ;
 		} ;
 
-	pxi->last_16 = last_val << 8 ;
+	pxi->last_16 = arith_shift_left (last_val, 8) ;
 } /* s2dsc_array */
 
 static void
@@ -1061,7 +1061,7 @@ i2dsc_array (XI_PRIVATE *pxi, const int *src, signed char *dest, int count)
 		last_val = current ;
 		} ;
 
-	pxi->last_16 = last_val << 8 ;
+	pxi->last_16 = arith_shift_left (last_val, 8) ;
 } /* i2dsc_array */
 
 static void
@@ -1077,7 +1077,7 @@ f2dsc_array (XI_PRIVATE *pxi, const float *src, signed char *dest, int count, fl
 		last_val = current ;
 		} ;
 
-	pxi->last_16 = last_val << 8 ;
+	pxi->last_16 = arith_shift_left (last_val, 8) ;
 } /* f2dsc_array */
 
 static void
@@ -1093,7 +1093,7 @@ d2dsc_array (XI_PRIVATE *pxi, const double *src, signed char *dest, int count, d
 		last_val = current ;
 		} ;
 
-	pxi->last_16 = last_val << 8 ;
+	pxi->last_16 = arith_shift_left (last_val, 8) ;
 } /* d2dsc_array */
 
 /*==============================================================================
@@ -1123,7 +1123,7 @@ dles2i_array (XI_PRIVATE *pxi, short *src, int count, int *dest)
 
 	for (k = 0 ; k < count ; k++)
 	{	last_val += LE2H_16 (src [k]) ;
-		dest [k] = last_val << 16 ;
+		dest [k] = arith_shift_left (last_val, 16) ;
 		} ;
 
 	pxi->last_16 = last_val ;

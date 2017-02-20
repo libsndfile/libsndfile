@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -26,9 +26,6 @@
 #include	"common.h"
 
 #define STRINGS_DEBUG 0
-#if STRINGS_DEBUG
-static void hexdump (void *data, int len) ;
-#endif
 
 int
 psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
@@ -92,15 +89,15 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	{	case SF_STR_SOFTWARE :
 				/* In write mode, want to append libsndfile-version to string. */
 				if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
-				{	if (strstr (str, PACKAGE) == NULL)
+				{	if (strstr (str, PACKAGE_NAME) == NULL)
 					{	/*
 						** If the supplied string does not already contain a
 						** libsndfile-X.Y.Z component, then add it.
 						*/
 						if (strlen (str) == 0)
-							snprintf (new_str, sizeof (new_str), "%s-%s", PACKAGE, VERSION) ;
+							snprintf (new_str, sizeof (new_str), "%s-%s", PACKAGE_NAME, PACKAGE_VERSION) ;
 						else
-							snprintf (new_str, sizeof (new_str), "%s (%s-%s)", str, PACKAGE, VERSION) ;
+							snprintf (new_str, sizeof (new_str), "%s (%s-%s)", str, PACKAGE_NAME, PACKAGE_VERSION) ;
 						}
 					else
 						snprintf (new_str, sizeof (new_str), "%s", str) ;
@@ -152,12 +149,8 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 	psf->strings.flags |= str_flags ;
 
 #if STRINGS_DEBUG
-	psf_log_printf (psf, "str_storage          : %p\n", psf->strings.storage) ;
-	psf_log_printf (psf, "storage_used             : %u\n", psf->strings.storage_used) ;
-	psf_log_printf (psf, "used                 : %d\n", psf->strings.storage_used) ;
-	psf_log_printf (psf, "remaining            : %d\n", psf->strings.storage_len - psf->strings.storage_used ;
-
-	hexdump (psf->strings.storage, 300) ;
+	printf ("storage_used         : %zd / %zd\n", psf->strings.storage_used, psf->strings.storage_len) ;
+	psf_hexdump (psf->strings.storage, psf->strings.storage_used) ;
 #endif
 
 	return 0 ;
@@ -192,31 +185,3 @@ psf_location_string_count (const SF_PRIVATE * psf, int location)
 
 	return count ;
 } /* psf_location_string_count */
-
-/*==============================================================================
-*/
-
-#if STRINGS_DEBUG
-
-#include <ctype.h>
-static void
-hexdump (void *data, int len)
-{	unsigned char *ptr ;
-	int k ;
-
-	ptr = data ;
-
-	puts ("---------------------------------------------------------") ;
-	while (len >= 16)
-	{	for (k = 0 ; k < 16 ; k++)
-			printf ("%02X ", ptr [k] & 0xFF) ;
-		printf ("   ") ;
-		for (k = 0 ; k < 16 ; k++)
-			printf ("%c", psf_isprint (ptr [k]) ? ptr [k] : '.') ;
-		puts ("") ;
-		ptr += 16 ;
-		len -= 16 ;
-		} ;
-} /* hexdump */
-
-#endif

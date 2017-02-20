@@ -47,7 +47,8 @@
 
 // 16-bit routines
 
-void mix16 (int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples, int32_t mixbits, int32_t mixres)
+void
+mix16 (const int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples, int32_t mixbits, int32_t mixres)
 {
 	int32_t		j ;
 
@@ -84,7 +85,8 @@ void mix16 (int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 // 20-bit routines
 // - the 20 bits of data are left-justified in 3 bytes of storage but right-aligned for input/output predictor buffers
 
-void mix20 (int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples, int32_t mixbits, int32_t mixres)
+void
+mix20 (const int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples, int32_t mixbits, int32_t mixres)
 {
 	int32_t		l, r ;
 	int32_t		j ;
@@ -120,7 +122,8 @@ void mix20 (int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 // 24-bit routines
 // - the 24 bits of data are right-justified in the input/output predictor buffers
 
-void mix24 (int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples,
+void
+mix24 (const int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples,
 			int32_t mixbits, int32_t mixres, uint16_t * shiftUV, int32_t bytesShifted)
 {
 	int32_t		l, r ;
@@ -203,7 +206,8 @@ void mix24 (int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 // - otherwise, the calculations might overflow into the 33rd bit and be lost
 // - therefore, these routines deal with the specified "unused lower" bytes in the "shift" buffers
 
-void mix32 (int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples,
+void
+mix32 (const int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t numSamples,
 			int32_t mixbits, int32_t mixres, uint16_t * shiftUV, int32_t bytesShifted)
 {
 	int32_t		shift = bytesShifted * 8 ;
@@ -269,4 +273,3 @@ void mix32 (int32_t * in, uint32_t stride, int32_t * u, int32_t * v, int32_t num
 		}
 	}
 }
-

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2011 Apple Inc. All rights reserved.
- * Copyright (C) 2012-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+ * Copyright (C) 2012-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
  *
  * @APPLE_APACHE_LICENSE_HEADER_START@
  *
@@ -52,10 +52,10 @@ typedef enum
 
 static void	GetConfig (ALAC_ENCODER *p, ALACSpecificConfig * config) ;
 
-static int32_t	EncodeStereo (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * input, uint32_t stride, uint32_t channelIndex, uint32_t numSamples) ;
-static int32_t	EncodeStereoFast (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * input, uint32_t stride, uint32_t channelIndex, uint32_t numSamples) ;
-static int32_t	EncodeStereoEscape (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * input, uint32_t stride, uint32_t numSamples) ;
-static int32_t	EncodeMono (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * input, uint32_t stride, uint32_t channelIndex, uint32_t numSamples) ;
+static int32_t	EncodeStereo (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * input, uint32_t stride, uint32_t channelIndex, uint32_t numSamples) ;
+static int32_t	EncodeStereoFast (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * input, uint32_t stride, uint32_t channelIndex, uint32_t numSamples) ;
+static int32_t	EncodeStereoEscape (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * input, uint32_t stride, uint32_t numSamples) ;
+static int32_t	EncodeMono (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * input, uint32_t stride, uint32_t channelIndex, uint32_t numSamples) ;
 
 
 
@@ -109,12 +109,6 @@ static const uint32_t	sChannelMaps [kALACMaxChannels] =
 	(ID_SCE << 18) | (ID_SCE << 15) | (ID_CPE << 9) | (ID_CPE << 3) | (ID_SCE),
 	(ID_SCE << 21) | (ID_CPE << 15) | (ID_CPE << 9) | (ID_CPE << 3) | (ID_SCE)
 } ;
-
-static const uint32_t sSupportediPodSampleRates [] =
-{
-	8000, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000
-} ;
-
 
 #if PRAGMA_MARK
 #pragma mark -
@@ -225,7 +219,7 @@ alac_set_fastmode (ALAC_ENCODER * p, int32_t fast)
 	- encode a channel pair
 */
 static int32_t
-EncodeStereo (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * inputBuffer, uint32_t stride, uint32_t channelIndex, uint32_t numSamples)
+EncodeStereo (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * inputBuffer, uint32_t stride, uint32_t channelIndex, uint32_t numSamples)
 {
 	BitBuffer		workBits ;
 	BitBuffer		startBits = *bitstream ;			// squirrel away copy of current state in case we need to go back and do an escape packet
@@ -507,7 +501,7 @@ Exit:
 	- encode a channel pair without the search loop for maximum possible speed
 */
 static int32_t
-EncodeStereoFast (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * inputBuffer, uint32_t stride, uint32_t channelIndex, uint32_t numSamples)
+EncodeStereoFast (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * inputBuffer, uint32_t stride, uint32_t channelIndex, uint32_t numSamples)
 {
 	BitBuffer		startBits = *bitstream ;			// squirrel away current bit position in case we decide to use escape hatch
 	AGParamRec		agParams ;
@@ -689,7 +683,7 @@ Exit:
 	- encode stereo escape frame
 */
 static int32_t
-EncodeStereoEscape (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * inputBuffer, uint32_t stride, uint32_t numSamples)
+EncodeStereoEscape (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * inputBuffer, uint32_t stride, uint32_t numSamples)
 {
 	uint8_t			partialFrame ;
 	uint32_t		indx ;
@@ -746,7 +740,7 @@ EncodeStereoEscape (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * inp
 	- encode a mono input buffer
 */
 static int32_t
-EncodeMono (ALAC_ENCODER *p, struct BitBuffer * bitstream, int32_t * inputBuffer, uint32_t stride, uint32_t channelIndex, uint32_t numSamples)
+EncodeMono (ALAC_ENCODER *p, struct BitBuffer * bitstream, const int32_t * inputBuffer, uint32_t stride, uint32_t channelIndex, uint32_t numSamples)
 {
 	BitBuffer		startBits = *bitstream ;			// squirrel away copy of current state in case we need to go back and do an escape packet
 	AGParamRec		agParams ;
@@ -964,12 +958,16 @@ Exit:
 	- encode the next block of samples
 */
 int32_t
-alac_encode (ALAC_ENCODER *p, uint32_t numChannels, uint32_t numSamples,
-			int32_t * theReadBuffer, unsigned char * theWriteBuffer, uint32_t * ioNumBytes)
+alac_encode (ALAC_ENCODER *p, uint32_t numSamples,
+			const int32_t * theReadBuffer, unsigned char * theWriteBuffer, uint32_t * ioNumBytes)
 {
 	uint32_t		outputSize ;
 	BitBuffer		bitstream ;
 	int32_t			status ;
+	uint32_t 		numChannels = p->mNumChannels ;
+
+	// make sure we handle this bit-depth before we get going
+	RequireAction ((p->mBitDepth == 16) || (p->mBitDepth == 20) || (p->mBitDepth == 24) || (p->mBitDepth == 32), return kALAC_ParamError ;) ;
 
 	// create a bit buffer structure pointing to our output buffer
 	BitBufferInit (&bitstream, theWriteBuffer, p->mMaxOutputBytes) ;
@@ -999,16 +997,14 @@ alac_encode (ALAC_ENCODER *p, uint32_t numChannels, uint32_t numSamples,
 	}
 	else
 	{
-		int32_t *			inputBuffer ;
+		const int32_t *		inputBuffer ;
 		uint32_t			tag ;
 		uint32_t			channelIndex ;
-		uint32_t			inputIncrement ;
 		uint8_t				stereoElementTag ;
 		uint8_t				monoElementTag ;
 		uint8_t				lfeElementTag ;
 
 		inputBuffer		= theReadBuffer ;
-		inputIncrement	= ((p->mBitDepth + 7) / 8) ;
 
 		stereoElementTag	= 0 ;
 		monoElementTag		= 0 ;
@@ -1027,7 +1023,7 @@ alac_encode (ALAC_ENCODER *p, uint32_t numChannels, uint32_t numSamples,
 
 					status = EncodeMono (p, &bitstream, inputBuffer, numChannels, channelIndex, numSamples) ;
 
-					inputBuffer += inputIncrement ;
+					inputBuffer += 1 ;
 					channelIndex++ ;
 					monoElementTag++ ;
 					break ;
@@ -1038,7 +1034,7 @@ alac_encode (ALAC_ENCODER *p, uint32_t numChannels, uint32_t numSamples,
 
 					status = EncodeStereo (p, &bitstream, inputBuffer, numChannels, channelIndex, numSamples) ;
 
-					inputBuffer += (inputIncrement * 2) ;
+					inputBuffer += 2 ;
 					channelIndex += 2 ;
 					stereoElementTag++ ;
 					break ;
@@ -1049,7 +1045,7 @@ alac_encode (ALAC_ENCODER *p, uint32_t numChannels, uint32_t numSamples,
 
 					status = EncodeMono (p, &bitstream, inputBuffer, numChannels, channelIndex, numSamples) ;
 
-					inputBuffer += inputIncrement ;
+					inputBuffer += 1 ;
 					channelIndex++ ;
 					lfeElementTag++ ;
 					break ;

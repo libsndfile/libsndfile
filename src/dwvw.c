@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -344,7 +344,7 @@ dwvw_decode_data (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int *ptr, int len)
 			sample += pdwvw->span ;
 
 		/* Store the sample justifying to the most significant bit. */
-		ptr [count] = sample << (32 - pdwvw->bit_width) ;
+		ptr [count] = arith_shift_left (sample, 32 - pdwvw->bit_width) ;
 
 		if (pdwvw->b.end == 0 && pdwvw->bit_count == 0)
 			break ;
@@ -385,7 +385,7 @@ dwvw_decode_load_bits (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int bit_count)
 		if (bit_count < 8 && pdwvw->b.end == 0)
 			return -1 ;
 
-		pdwvw->bits = (pdwvw->bits << 8) ;
+		pdwvw->bits = arith_shift_left (pdwvw->bits, 8) ;
 
 		if (pdwvw->b.index < pdwvw->b.end)
 		{	pdwvw->bits |= pdwvw->b.buffer [pdwvw->b.index] ;
@@ -429,7 +429,7 @@ dwvw_encode_store_bits (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int data, int new_
 {	int 	byte ;
 
 	/* Shift the bits into the resevoir. */
-	pdwvw->bits = (pdwvw->bits << new_bits) | (data & ((1 << new_bits) - 1)) ;
+	pdwvw->bits = arith_shift_left (pdwvw->bits, new_bits) | (data & (arith_shift_left (1, new_bits) - 1)) ;
 	pdwvw->bit_count += new_bits ;
 
 	/* Transfer bit to buffer. */
@@ -571,7 +571,7 @@ dwvw_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
-			iptr [k] = ptr [total + k] << 16 ;
+			iptr [k] = arith_shift_left (ptr [total + k], 16) ;
 		count = dwvw_encode_data (psf, pdwvw, iptr, writecount) ;
 
 		total += count ;

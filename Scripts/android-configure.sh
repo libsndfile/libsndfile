@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-# Copyright (C) 2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+# Copyright (C) 2013-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 #
 # All rights reserved.
 #
@@ -26,14 +26,22 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Android NDK version number; eg r8e, r9 etc
-ANDROID_NDK_VER=r9
+# Android NDK version number; eg r10, r10b  etc
+ANDROID_NDK_VER=${ANDROID_NDK_VER:-r10}
 
-# Android NDK gcc version; eg 4.7, 4.9 etc.
-ANDROID_GCC_VER=4.8
+# Android NDK gcc version; eg 4.8, 4.9 etc.
+ANDROID_GCC_VER=${ANDROID_GCC_VER:-4.9}
 
-# Android API version; eg 9 (Android 2.3), 14 (Android 4.0) etc.
-ANDROID_API_VER=9
+# Android API version; eg 14 (Android 4.0), 21 (Android 5.0)  etc.
+ANDROID_API_VER=${ANDROID_API_VER:-14}
+
+ANDROID_TARGET=${ANDROID_TARGET:-arm-linux-androideabi}
+
+if test -z ${ANDROID_TOOLCHAIN_HOME} ; then
+	echo "Environment variable ANDROID_TOOLCHAIN_HOME not defined."
+	echo "This should point to the directory containing the Android NDK."
+    exit 1
+	fi
 
 #-------------------------------------------------------------------------------
 # No more user config beyond here.
@@ -45,14 +53,10 @@ function die_with {
 	exit 1
 }
 
-export CROSS_COMPILE=arm-linux-androideabi
-
-# I put all my dev stuff in here
-export DEV_PREFIX=$HOME/Android
-test -d ${DEV_PREFIX} || die_with "Error : DEV_PREFIX '$DEV_PREFIX' does not exist."
+export CROSS_COMPILE=${ANDROID_TARGET}
 
 # Don't forget to adjust this to your NDK path
-export ANDROID_NDK=${DEV_PREFIX}/android-ndk-${ANDROID_NDK_VER}
+export ANDROID_NDK=${ANDROID_TOOLCHAIN_HOME}/android-ndk-${ANDROID_NDK_VER}
 test -d ${ANDROID_NDK} || die_with "Error : ANDROID_NDK '$ANDROID_NDK' does not exist."
 
 export ANDROID_PREFIX=${ANDROID_NDK}/toolchains/arm-linux-androideabi-${ANDROID_GCC_VER}/prebuilt/${BUILD_MACHINE}

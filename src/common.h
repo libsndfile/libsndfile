@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -29,6 +29,9 @@
 #elif HAVE_INTTYPES_H
 #include <inttypes.h>
 #endif
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
 
 #ifndef SNDFILE_H
 #include "sndfile.h"
@@ -38,7 +41,9 @@
 #error "This code is not designed to be compiled with a C++ compiler."
 #endif
 
-#if (SIZEOF_LONG == 8)
+#ifdef INT64_C
+#	define	SF_PLATFORM_S64(x)		INT64_C(x)
+#elif (SIZEOF_LONG == 8)
 #	define	SF_PLATFORM_S64(x)		x##l
 #elif (SIZEOF_LONG_LONG == 8)
 #	define	SF_PLATFORM_S64(x)		x##ll
@@ -71,10 +76,9 @@
 #endif
 
 #define	SF_BUFFER_LEN			(8192)
-#define	SF_FILENAME_LEN			(512)
+#define	SF_FILENAME_LEN			(1024)
 #define SF_SYSERR_LEN			(256)
 #define SF_MAX_STRINGS			(32)
-#define	SF_HEADER_LEN			(12292)
 #define	SF_PARSELOG_LEN			(2048)
 
 #define	PSF_SEEK_ERROR			((sf_count_t) -1)
@@ -227,7 +231,7 @@ typedef struct
 } STR_DATA ;
 
 typedef struct
-{	int64_t		hash ;
+{	uint64_t	hash ;
 	char		id [64] ;
 	unsigned	id_size ;
 	uint32_t	mark32 ;
@@ -236,7 +240,7 @@ typedef struct
 } READ_CHUNK ;
 
 typedef struct
-{	int64_t		hash ;
+{	uint64_t	hash ;
 	uint32_t	mark32 ;
 	uint32_t	len ;
 	void		*data ;
@@ -264,7 +268,12 @@ struct SF_CHUNK_ITERATOR
 static inline size_t
 make_size_t (int x)
 {	return (size_t) x ;
-} /* size_t_of_int */
+} /* make_size_t */
+
+static inline uint64_t
+make_size_8 (int x)
+{	return (uint64_t) x ;
+} /* make_size_8 */
 
 typedef SF_BROADCAST_INFO_VAR (16 * 1024) SF_BROADCAST_INFO_16K ;
 
@@ -372,7 +381,12 @@ typedef struct sf_private_tag
 		int				indx ;
 	} parselog ;
 
-	unsigned char	header		[SF_HEADER_LEN] ; /* Must be unsigned */
+
+	struct
+	{	unsigned char	* ptr ;
+		sf_count_t		indx, end, len ;
+	} header ;
+
 	int				rwf_endian ;	/* Header endian-ness flag. */
 
 	/* Storage and housekeeping data for adding/reading strings from
@@ -390,10 +404,6 @@ typedef struct sf_private_tag
 	int				Magick ;
 
 	unsigned		unique_id ;
-
-	/* Index variables for maintaining parselog and header above. */
-	int				headindex, headend ;
-	int				has_text ;
 
 	int				error ;
 
@@ -420,7 +430,9 @@ typedef struct sf_private_tag
 
 	int				have_written ;	/* Has a single write been done to the file? */
 	PEAK_INFO		*peak_info ;
-	SF_CUE_INFO	*cue_info ;
+
+	/* Cue Marker Info */
+	SF_CUES		*cues ;
 
 	/* Loop Info */
 	SF_LOOP_INFO	*loop_info ;
@@ -554,6 +566,7 @@ enum
 	SFE_BAD_ENDIAN,
 	SFE_CHANNEL_COUNT_ZERO,
 	SFE_CHANNEL_COUNT,
+	SFE_CHANNEL_COUNT_BAD,
 
 	SFE_BAD_VIRTUAL_IO,
 
@@ -600,6 +613,7 @@ enum
 	SFE_WAV_BAD_LIST,
 	SFE_WAV_ADPCM_NOT4BIT,
 	SFE_WAV_ADPCM_CHANNELS,
+	SFE_WAV_ADPCM_SAMPLES,
 	SFE_WAV_GSM610_FORMAT,
 	SFE_WAV_UNKNOWN_CHUNK,
 	SFE_WAV_WVPK_DATA,
@@ -708,20 +722,23 @@ enum
 	SFE_VORBIS_ENCODER_BUG,
 
 	SFE_RF64_NOT_RF64,
+	SFE_RF64_PEAK_B4_FMT,
+	SFE_RF64_NO_DATA,
+
 	SFE_BAD_CHUNK_PTR,
 	SFE_UNKNOWN_CHUNK,
 	SFE_BAD_CHUNK_FORMAT,
 	SFE_BAD_CHUNK_MARKER,
 	SFE_BAD_CHUNK_DATA_PTR,
-
 	SFE_ALAC_FAIL_TMPFILE,
+	SFE_FILENAME_TOO_LONG,
+	SFE_NEGATIVE_RW_LEN,
 
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
 
-#define		PSF_CUEINFO_SIZE(num)	(sizeof (SF_CUE_INFO) + (num - 1) * sizeof (SF_CUE)) /* num - 1 because SF_CUE_INFO contains 1 instance of SF_CUE because zero-size array breaks ISO C test */
-SF_CUE_INFO   * psf_cueinfo_alloc (int num);
-void		psf_cueinfo_free (SF_CUE_INFO *cueinfo);
+/* Allocate and initialize the SF_PRIVATE struct. */
+SF_PRIVATE * psf_allocate (void) ;
 
 int subformat_to_bytewidth (int format) ;
 int s_bitwidth_to_subformat (int bits) ;
@@ -879,8 +896,6 @@ int		txw_open	(SF_PRIVATE *psf) ;
 int		wve_open	(SF_PRIVATE *psf) ;
 int		dwd_open	(SF_PRIVATE *psf) ;
 
-int		macbinary3_open (SF_PRIVATE *psf) ;
-
 /*------------------------------------------------------------------------------------
 **	Init functions for a number of common data encodings.
 */
@@ -899,8 +914,8 @@ int		alac_init		(SF_PRIVATE *psf, const ALAC_DECODER_INFO * info) ;
 
 int 	dither_init		(SF_PRIVATE *psf, int mode) ;
 
-int		wav_w64_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;
-int		wav_w64_msadpcm_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;
+int		wavlike_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;
+int		wavlike_msadpcm_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;
 
 int		aiff_ima_init (SF_PRIVATE *psf, int blockalign, int samplesperblock) ;
 
@@ -961,6 +976,10 @@ psf_strlcpy (char *dest, size_t n, const char *src)
 */
 
 void	*psf_memset (void *s, int c, sf_count_t n) ;
+
+SF_CUES * psf_cues_dup (const void * ptr) ;
+SF_CUES * psf_cues_alloc (uint32_t cue_count) ;
+void psf_get_cues (SF_PRIVATE * psf, void * data, size_t datasize) ;
 
 SF_INSTRUMENT * psf_instrument_alloc (void) ;
 
@@ -1028,11 +1047,6 @@ int sf_dither_double	(const SF_DITHER_INFO *dither, const double *in, double *ou
 ** Data conversion functions.
 */
 
-static inline short
-psf_short_of_int (int x)
-{	return (x >> 16) ;
-}
-
 void psf_f2s_array (const float *src, short *dest, int count, int normalize) ;
 void psf_f2s_clip_array (const float *src, short *dest, int count, int normalize) ;
 
@@ -1045,5 +1059,29 @@ void psf_f2i_clip_array (const float *src, int *dest, int count, int normalize) 
 void psf_d2i_array (const double *src, int *dest, int count, int normalize) ;
 void psf_d2i_clip_array (const double *src, int *dest, int count, int normalize) ;
 
-#endif /* SNDFILE_COMMON_H */
 
+/*------------------------------------------------------------------------------------
+** Left and right shift on int. According to the C standard, the left and right
+** shift operations applied to a negative integer results in undefined behavior.
+** These twp functions work around that.
+*/
+
+#if __GNUC__
+#define ALWAYS_INLINE		__attribute__ ((always_inline))
+#else
+#define ALWAYS_INLINE
+#endif
+
+static inline int32_t ALWAYS_INLINE
+arith_shift_left (int32_t x, int shift)
+{	return (int32_t) (((uint32_t) x) << shift) ;
+} /* arith_shift_left */
+
+static inline int32_t ALWAYS_INLINE
+arith_shift_right (int32_t x, int shift)
+{	if (x >= 0)
+		return x >> shift ;
+	return ~ ((~x) >> shift) ;
+} /* arith_shift_right */
+
+#endif /* SNDFILE_COMMON_H */

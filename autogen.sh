@@ -168,23 +168,16 @@ autoconf || exit 1
 # CMake process src/cmake-config.h to create src/config.h.
 rm -f src/config.h src/cmake-config.h
 
-version=$(grep ^AC_INIT configure.ac | sed 's/.*libsndfile[^0-9]*//;s/\].*//')
-
-sed -E 's/undef(\s+)([a-zA-Z0-8_]+)/define\1\2\1@\2@/' src/config.h.in \
-	| sed 's/.*_FILE_OFFSET_BITS.*//' \
-	| sed 's/@PACKAGE@/"libsndfile"/' \
-	| sed "s/@VERSION@/\"$version\"/" > CMake/config.h.in
-
 cd $olddir
 
-fprecommit=.git/hooks/pre-commit
-if test ! -f $fprecommit ; then
-	echo
-	echo "Installing git pre-commit hook for this project."
-	cat > $fprecommit << 'foobar'
-#!/bin/sh
-exec Scripts/git-pre-commit-hook
-foobar
-	chmod u+x $fprecommit
-	echo
+if test -d .git/ ; then
+	fprecommit=.git/hooks/pre-commit
+	if test ! -f $fprecommit ; then
+		echo
+		echo "Installing git pre-commit hook for this project."
+		printf "#/bin/sh\nexec Scripts/git-pre-commit-hook\n" > $fprecommit
+		chmod u+x $fprecommit
+		echo
+		fi
 	fi
+

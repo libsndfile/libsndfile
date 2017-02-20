@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -117,6 +117,9 @@ ENDSWAP_64 (uint64_t x)
 
 	#define H2BE_16(x)			ENDSWAP_16 (x)
 	#define H2BE_32(x)			ENDSWAP_32 (x)
+
+	#define H2LE_16(x)			(x)
+	#define H2LE_32(x)			(x)
 
 #elif (CPU_IS_BIG_ENDIAN == 1)
 	#define LE2H_16(x)			ENDSWAP_16 (x)

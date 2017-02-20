@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -87,6 +87,11 @@ static int		float32_get_capability	(SF_PRIVATE *psf) ;
 int
 float32_init	(SF_PRIVATE *psf)
 {	static int float_caps ;
+
+	if (psf->sf.channels < 1)
+	{	psf_log_printf (psf, "float32_init : internal error : channels = %d\n", psf->sf.channels) ;
+		return SFE_INTERNAL ;
+		} ;
 
 	float_caps = float32_get_capability (psf) ;
 

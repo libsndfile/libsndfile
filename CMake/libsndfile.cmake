@@ -37,6 +37,7 @@ lsf_check_type_size (wchar_t 		SIZEOF_WCHAR_T)
 
 set (SIZEOF_SF_COUNT_T ${SIZEOF_INT64_T})
 set (TYPEOF_SF_COUNT_T int64_t)
+set (SF_COUNT_MAX 0x7fffffffffffffffll)
 
 # Can't figure out how to make CMAKE_COMPILER_IS_GNUCC set something to either
 # 1 or 0 so we do this:
@@ -55,12 +56,25 @@ else (${BIGENDIAN})
 	set (CPU_IS_BIG_ENDIAN 0)
 	endif (${BIGENDIAN})
 
-if (${WINDOWS})
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 	set (OS_IS_WIN32 1)
+	set (USE_WINDOWS_API 1)
+	set (USE_WINDOWS_API 1)
+	set (WIN32_TARGET_DLL 1)
+	set (__USE_MINGW_ANSI_STDIO 1)
 else (${WINDOWS})
 	set (OS_IS_WIN32 0)
-	endif (${WINDOWS})
+	set (USE_WINDOWS_API 0)
+	set (USE_WINDOWS_API 0)
+	set (WIN32_TARGET_DLL 0)
+	set (__USE_MINGW_ANSI_STDIO 0)
+	endif ()
 
+if (CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
+	set (OS_IS_OPENBSD 1)
+else ()
+	set (OS_IS_OPENBSD 0)
+	endif ()
 
 lsf_check_library_exists (m floor "" HAVE_LIBM)
 lsf_check_library_exists (sqlite3 sqlite3_close "" HAVE_SQLITE3)

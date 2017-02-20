@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2006-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2006-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2006 Paul Davis <paul@linuxaudiosystems.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -181,7 +181,7 @@ gen_coding_history (char * added_history, int added_history_max, const SF_INFO *
 
 	count = snprintf (added_history, added_history_max,
 							"A=PCM,F=%u,W=%d,M=%s,T=%s-%s\r\n",
-							psfinfo->samplerate, width, chnstr, PACKAGE, VERSION) ;
+							psfinfo->samplerate, width, chnstr, PACKAGE_NAME, PACKAGE_VERSION) ;
 
 	if (count >= added_history_max)
 		return 0 ;

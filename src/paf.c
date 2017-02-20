@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -63,7 +63,7 @@ typedef struct
 	int				read_block, write_block, read_count, write_count ;
 	sf_count_t		sample_count ;
 	int				*samples ;
-	unsigned char	*block ;
+	int				*block ;
 	int				data [] ; /* ISO C99 struct flexible array. */
 } PAF24_PRIVATE ;
 
@@ -298,8 +298,8 @@ paf_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		} ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 
 	if (psf->endian == SF_ENDIAN_BIG)
 	{	/* Marker, version, endianness, samplerate */
@@ -315,9 +315,9 @@ paf_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		} ;
 
 	/* Zero fill to dataoffset. */
-	psf_binheader_writef (psf, "z", (size_t) (psf->dataoffset - psf->headindex)) ;
+	psf_binheader_writef (psf, "z", (size_t) (psf->dataoffset - psf->header.indx)) ;
 
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	return psf->error ;
 } /* paf_write_header */
@@ -362,7 +362,7 @@ paf24_init (SF_PRIVATE *psf)
 
 	ppaf24->channels	= psf->sf.channels ;
 	ppaf24->samples		= ppaf24->data ;
-	ppaf24->block		= (unsigned char*) (ppaf24->data + PAF24_SAMPLES_PER_BLOCK * ppaf24->channels) ;
+	ppaf24->block		= ppaf24->data + PAF24_SAMPLES_PER_BLOCK * ppaf24->channels ;
 
 	ppaf24->blocksize = PAF24_BLOCK_SIZE * ppaf24->channels ;
 
@@ -496,16 +496,15 @@ paf24_read_block (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
 	if ((k = psf_fread (ppaf24->block, 1, ppaf24->blocksize, psf)) != ppaf24->blocksize)
 		psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, ppaf24->blocksize) ;
 
-
 	/* Do endian swapping if necessary. */
-	if (psf->endian == SF_ENDIAN_BIG)
-		endswap_int_array 	(ppaf24->data, 8 * ppaf24->channels) ;
+	if ((CPU_IS_BIG_ENDIAN && psf->endian == SF_ENDIAN_LITTLE) || (CPU_IS_LITTLE_ENDIAN && psf->endian == SF_ENDIAN_BIG))
+		endswap_int_array (ppaf24->block, 8 * ppaf24->channels) ;
 
 	/* Unpack block. */
 	for (k = 0 ; k < PAF24_SAMPLES_PER_BLOCK * ppaf24->channels ; k++)
 	{	channel = k % ppaf24->channels ;
-		cptr = ppaf24->block + PAF24_BLOCK_SIZE * channel + 3 * (k / ppaf24->channels) ;
-		ppaf24->samples [k] = (cptr [0] << 8) | (cptr [1] << 16) | (cptr [2] << 24) ;
+		cptr = ((unsigned char *) ppaf24->block) + PAF24_BLOCK_SIZE * channel + 3 * (k / ppaf24->channels) ;
+		ppaf24->samples [k] = (cptr [0] << 8) | (cptr [1] << 16) | (((unsigned) cptr [2]) << 24) ;
 		} ;
 
 	return 1 ;
@@ -643,7 +642,7 @@ paf24_write_block (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
 	if (CPU_IS_LITTLE_ENDIAN)
 	{	for (k = 0 ; k < PAF24_SAMPLES_PER_BLOCK * ppaf24->channels ; k++)
 		{	channel = k % ppaf24->channels ;
-			cptr = ppaf24->block + PAF24_BLOCK_SIZE * channel + 3 * (k / ppaf24->channels) ;
+			cptr = ((unsigned char *) ppaf24->block) + PAF24_BLOCK_SIZE * channel + 3 * (k / ppaf24->channels) ;
 			nextsample = ppaf24->samples [k] >> 8 ;
 			cptr [0] = nextsample ;
 			cptr [1] = nextsample >> 8 ;
@@ -652,20 +651,20 @@ paf24_write_block (SF_PRIVATE *psf, PAF24_PRIVATE *ppaf24)
 
 		/* Do endian swapping if necessary. */
 		if (psf->endian == SF_ENDIAN_BIG)
-			endswap_int_array (ppaf24->data, 8 * ppaf24->channels) ;
+			endswap_int_array (ppaf24->block, 8 * ppaf24->channels) ;
 		}
 	else if (CPU_IS_BIG_ENDIAN)
 	{	/* This is correct. */
 		for (k = 0 ; k < PAF24_SAMPLES_PER_BLOCK * ppaf24->channels ; k++)
 		{	channel = k % ppaf24->channels ;
-			cptr = ppaf24->block + PAF24_BLOCK_SIZE * channel + 3 * (k / ppaf24->channels) ;
+			cptr = ((unsigned char *) ppaf24->block) + PAF24_BLOCK_SIZE * channel + 3 * (k / ppaf24->channels) ;
 			nextsample = ppaf24->samples [k] >> 8 ;
 			cptr [0] = nextsample ;
 			cptr [1] = nextsample >> 8 ;
 			cptr [2] = nextsample >> 16 ;
 			} ;
-		if (psf->endian == SF_ENDIAN_BIG)
-			endswap_int_array (ppaf24->data, 8 * ppaf24->channels) ;
+		if (psf->endian == SF_ENDIAN_LITTLE)
+			endswap_int_array (ppaf24->block, 8 * ppaf24->channels) ;
 		} ;
 
 	/* Write block to disk. */

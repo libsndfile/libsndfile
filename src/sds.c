@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -366,8 +366,8 @@ sds_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 
 	if (psf->is_pipe == SF_FALSE)
 		psf_fseek (psf, 0, SEEK_SET) ;
@@ -399,12 +399,12 @@ sds_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_binheader_writef (psf, "e33311", data_length, sustain_loop_start, sustain_loop_end, loop_type, 0xF7) ;
 
 	/* Header construction complete so write it out. */
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	if (psf->error)
 		return psf->error ;
 
-	psf->dataoffset = psf->headindex ;
+	psf->dataoffset = psf->header.indx ;
 	psf->datalength = psds->write_block * SDS_BLOCK_SIZE ;
 
 	if (current > 0)
@@ -454,7 +454,7 @@ sds_2byte_read (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 
 	ucptr = psds->read_data + 5 ;
 	for (k = 0 ; k < 120 ; k += 2)
-	{	sample = (ucptr [k] << 25) + (ucptr [k + 1] << 18) ;
+	{	sample = arith_shift_left (ucptr [k], 25) + arith_shift_left (ucptr [k + 1], 18) ;
 		psds->read_samples [k / 2] = (int) (sample - 0x80000000) ;
 		} ;
 
@@ -910,7 +910,7 @@ sds_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
-			iptr [k] = ptr [total + k] << 16 ;
+			iptr [k] = arith_shift_left (ptr [total + k], 16) ;
 		count = sds_write (psf, psds, iptr, writecount) ;
 		total += count ;
 		len -= writecount ;

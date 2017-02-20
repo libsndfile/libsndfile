@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -34,7 +34,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if (ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_LIBS)
+#if (ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_XIPH_LIBS)
 
 #include <ogg/ogg.h>
 
@@ -413,7 +413,7 @@ duration = audio_samples / rate
 		 = 3.947
 */
 
-#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_LIBS */
+#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_XIPH_LIBS */
 
 int
 ogg_speex_open (SF_PRIVATE *psf)

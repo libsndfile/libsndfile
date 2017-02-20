@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -154,7 +154,7 @@ mat5_close	(SF_PRIVATE *psf)
 
 static int
 mat5_write_header (SF_PRIVATE *psf, int calc_length)
-{	static const char	*filename = "MATLAB 5.0 MAT-file, written by " PACKAGE "-" VERSION ", " ;
+{	static const char	*filename = "MATLAB 5.0 MAT-file, written by " PACKAGE_NAME "-" PACKAGE_VERSION ", " ;
 	static const char	*sr_name = "samplerate\0\0\0\0\0\0\0\0\0\0\0" ;
 	static const char	*wd_name = "wavedata\0" ;
 	char		buffer [256] ;
@@ -201,15 +201,15 @@ mat5_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	/* Reset the current header length to zero. */
-	psf->header [0] = 0 ;
-	psf->headindex = 0 ;
+	psf->header.ptr [0] = 0 ;
+	psf->header.indx = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	psf_get_date_str (buffer, sizeof (buffer)) ;
 	psf_binheader_writef (psf, "bb", filename, strlen (filename), buffer, strlen (buffer) + 1) ;
 
-	memset (buffer, ' ', 124 - psf->headindex) ;
-	psf_binheader_writef (psf, "b", buffer, make_size_t (124 - psf->headindex)) ;
+	memset (buffer, ' ', 124 - psf->header.indx) ;
+	psf_binheader_writef (psf, "b", buffer, make_size_t (124 - psf->header.indx)) ;
 
 	psf->rwf_endian = psf->endian ;
 
@@ -243,12 +243,12 @@ mat5_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_binheader_writef (psf, "t48", encoding, datasize) ;
 
 	/* Header construction complete so write it out. */
-	psf_fwrite (psf->header, psf->headindex, 1, psf) ;
+	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	if (psf->error)
 		return psf->error ;
 
-	psf->dataoffset = psf->headindex ;
+	psf->dataoffset = psf->header.indx ;
 
 	if (current > 0)
 		psf_fseek (psf, current, SEEK_SET) ;

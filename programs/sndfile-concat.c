@@ -127,6 +127,7 @@ main (int argc, char *argv [])
 		} ;
 
 	sf_close (outfile) ;
+	free (infiles) ;
 
 	return 0 ;
 } /* main */

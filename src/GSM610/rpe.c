@@ -316,7 +316,7 @@ static void APCM_quantization (
 	for (i = 0 ; i <= 12 ; i++)
 	{	assert (temp1 >= 0 && temp1 < 16) ;
 
-		temp = xM [i] << temp1 ;
+		temp = arith_shift_left (xM [i], temp1) ;
 		temp = GSM_MULT (temp, temp2) ;
 		temp = SASR_W (temp, 12) ;
 		xMc [i] = temp + 4 ;		/* see note below */
@@ -359,7 +359,7 @@ static void APCM_inverse_quantization (
 		temp = (*xMc++ << 1) - 7 ;			/* restore sign   */
 		assert (temp <= 7 && temp >= -7) ;	/* 4 bit signed   */
 
-		temp <<= 12 ;				/* 16 bit signed  */
+		temp = arith_shift_left (temp, 12) ;	/* 16 bit signed  */
 		temp = GSM_MULT_R (temp1, temp) ;
 		temp = GSM_ADD (temp, temp3) ;
 		*xMp++ = gsm_asr (temp, temp2) ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 static void major_format_test (void) ;
 static void subtype_format_test (void) ;
 static void simple_format_test (void) ;
+static void flac_subset_test (void) ;
 
 int
 main (void)
@@ -37,6 +38,9 @@ main (void)
 	major_format_test () ;
 	subtype_format_test () ;
 	simple_format_test () ;
+
+	if (HAVE_EXTERNAL_XIPH_LIBS)
+		flac_subset_test () ;
 
 	return 0 ;
 } /* main */
@@ -59,7 +63,7 @@ major_format_test (void)
 		have_ogg = info.format == SF_FORMAT_OGG ? 1 : have_ogg ;
 		} ;
 
-	if (HAVE_EXTERNAL_LIBS)
+	if (HAVE_EXTERNAL_XIPH_LIBS)
 	{	exit_if_true (have_flac == 0, "\n\nLine %d : FLAC should be available.\n\n", __LINE__) ;
 		exit_if_true (have_ogg == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;
 		}
@@ -88,7 +92,7 @@ subtype_format_test (void)
 		have_vorbis = info.format == SF_FORMAT_VORBIS ? 1 : have_vorbis ;
 		} ;
 
-	if (HAVE_EXTERNAL_LIBS)
+	if (HAVE_EXTERNAL_XIPH_LIBS)
 		exit_if_true (have_vorbis == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;
 	else
 		exit_if_true (have_vorbis, "\n\nLine %d : Ogg/Vorbis should not be available.\n\n", __LINE__) ;
@@ -134,7 +138,7 @@ simple_format_test (void)
 
 		} ;
 
-	if (HAVE_EXTERNAL_LIBS)
+	if (HAVE_EXTERNAL_XIPH_LIBS)
 	{	exit_if_true (have_flac == 0, "\n\nLine %d : FLAC should be available.\n\n", __LINE__) ;
 		exit_if_true (have_ogg == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;
 		exit_if_true (have_vorbis == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;
@@ -147,3 +151,35 @@ simple_format_test (void)
 
 	puts ("ok") ;
 } /* simple_format_test */
+
+static void
+flac_subset_test (void)
+{	float whatever [256] ;
+	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
+	sf_count_t rc ;
+	int		samplerate ;
+
+	/* For some formats (like FLAC) the headers are written *just* before the
+	** first bit of audio data. This test makes sure errors in that process
+	** are caught.
+	*/
+
+	print_test_name (__func__, NULL) ;
+
+	for (samplerate = 65536 ; samplerate < 655350 ; samplerate *= 4)
+	{	sfinfo.samplerate	= samplerate ;
+		sfinfo.channels		= 1 ;
+		sfinfo.frames		= 0 ;
+		sfinfo.format = SF_FORMAT_FLAC | SF_FORMAT_PCM_16 ;
+
+		file = test_open_file_or_die ("/tmp/test.flac", SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+		rc = sf_write_float (file, whatever, ARRAY_LEN (whatever)) ;
+		exit_if_true (rc != 0, "\n\nLine %d : return code (%d) should be 0.\n\n", __LINE__, (int) rc) ;
+
+		sf_close (file) ;
+		} ;
+
+	puts ("ok") ;
+} /* flac_subset_test */
+

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,19 +44,19 @@ checksum_orig [] =
 {
 	{	SF_FORMAT_RAW | SF_FORMAT_ULAW,
 		"checksum.ulaw", "cksum_ulaw.pcm16",
-		0xefae029e0c888LL, 0xcd6e47edd0cffLL
+		0xbd99d34ccbe2fLL, 0xda82168ed82e9LL
 		},
 	{	SF_FORMAT_RAW | SF_FORMAT_ALAW,
 		"checksum.alaw", "cksum_alaw.pcm16",
-		0x798da3572d468LL, 0x7d74869af5bb6LL
+		0x0004afddc0fcf4bdLL, 0x2e7320230b88LL
 		},
 	{	SF_FORMAT_RAW | SF_FORMAT_GSM610,
 		"checksum.gsm", "cksum_gsm.pcm16",
-		0xf64ff2acf858fLL, 0x179dbadd4bce6LL
+		0xa06a3faaaf684LL, 0x2d7ff668efeb9LL
 		},
 	{	SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM,
 		"checksum.vox", "cksum_vox.pcm16",
-		0x47fb3a298f4dfLL, 0xc0cb8b12cb0abLL
+		0x7c9d7afdb96a1LL, 0xe540df74a4b14LL
 		},
 } ;
 

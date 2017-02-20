@@ -108,7 +108,7 @@ g721_encoder (
 
 	dqsez = sr + sez - se ;			/* pole prediction diff. */
 
-	update (4, y, _witab [i] << 5, _fitab [i], dq, sr, dqsez, state_ptr) ;
+	update (4, y, arith_shift_left (_witab [i], 5), _fitab [i], dq, sr, dqsez, state_ptr) ;
 
 	return i ;
 }
@@ -147,9 +147,9 @@ g721_decoder (
 
 	dqsez = sr - se + sez ;			/* pole prediction diff. */
 
-	update (4, y, _witab [i] << 5, _fitab [i], dq, sr, dqsez, state_ptr) ;
+	update (4, y, arith_shift_left (_witab [i], 5), _fitab [i], dq, sr, dqsez, state_ptr) ;
 
 	/* sr was 14-bit dynamic range */
-	return (sr << 2) ;
+	return arith_shift_left (sr, 2) ;
 }
 

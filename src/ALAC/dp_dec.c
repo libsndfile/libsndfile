@@ -27,8 +27,10 @@
 */
 
 
-#include "dplib.h"
 #include <string.h>
+
+#include "dplib.h"
+#include "shift.h"
 
 #if __GNUC__
 #define ALWAYS_INLINE		__attribute__ ((always_inline))
@@ -38,7 +40,8 @@
 
 #define LOOP_ALIGN
 
-static inline int32_t ALWAYS_INLINE sign_of_int (int32_t i)
+static inline int32_t ALWAYS_INLINE
+sign_of_int (int32_t i)
 {
 	int32_t negishift ;
 
@@ -46,7 +49,8 @@ static inline int32_t ALWAYS_INLINE sign_of_int (int32_t i)
 	return negishift | (i >> 31) ;
 }
 
-void unpc_block (int32_t * pc1, int32_t * out, int32_t num, int16_t * coefs, int32_t numactive, uint32_t chanbits, uint32_t denshift)
+void
+unpc_block (const int32_t * pc1, int32_t * out, int32_t num, int16_t * coefs, int32_t numactive, uint32_t chanbits, uint32_t denshift)
 {
 	register int16_t	a0, a1, a2, a3 ;
 	register int32_t	b0, b1, b2, b3 ;
@@ -91,7 +95,7 @@ void unpc_block (int32_t * pc1, int32_t * out, int32_t num, int16_t * coefs, int
 	for (j = 1 ; j <= numactive ; j++)
 	{
 		del = pc1 [j] + out [j-1] ;
-		out [j] = (del << chanshift) >> chanshift ;
+		out [j] = arith_shift_left (del, chanshift) >> chanshift ;
 	}
 
 	lim = numactive + 1 ;
@@ -126,7 +130,7 @@ void unpc_block (int32_t * pc1, int32_t * out, int32_t num, int16_t * coefs, int
 			sg = sign_of_int (del) ;
 			del += top + sum1 ;
 
-			out [j] = (del << chanshift) >> chanshift ;
+			out [j] = arith_shift_left (del, chanshift) >> chanshift ;
 
 			if (sg > 0)
 			{
@@ -220,7 +224,7 @@ void unpc_block (int32_t * pc1, int32_t * out, int32_t num, int16_t * coefs, int
 			sg = sign_of_int (del) ;
 			del += top + sum1 ;
 
-			out [j] = (del << chanshift) >> chanshift ;
+			out [j] = arith_shift_left (del, chanshift) >> chanshift ;
 
 			if (sg > 0)
 			{

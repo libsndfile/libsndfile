@@ -1,6 +1,75 @@
 # CMakeLists.txt for libsndfile
 
-cmake_minimum_required (VERSION 2.8.12)
+cmake_minimum_required (VERSION 3.0.0)
+
+project (libsndfile)
+
+# We may need these programs so detect them now.
+find_program (AUTOGEN autogen)
+find_program (AUTOHEADER autoheader)
+find_program (GREP grep)
+find_program (SED sed)
+find_program (WC wc)
+
+include (CMake/file.cmake)
+
+# Duplicate the autoconf/autoheader functionality.
+
+# Get the version number from configure.ac.
+execute_process (
+	COMMAND ${GREP} ^AC_INIT configure.ac
+	COMMAND ${SED} "s/.*libsndfile[^0-9]*//;s/\\].*//"
+	OUTPUT_VARIABLE LIB_VERSION
+	)
+
+string (STRIP ${LIB_VERSION} LIB_VERSION)
+string (REGEX REPLACE "\\..*" "" LIB_VERSION_MAJOR ${LIB_VERSION})
+
+message (STATUS "libsndfile version : ${LIB_VERSION}")
+
+# Generate config.h.in if it does not already exist.
+if (NOT (EXISTS "${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in"))
+	if (NOT AUTOHEADER)
+		message (FATAL_ERROR "Need autoheader (part of GNU autoconf) to proceed.")
+		endif ()
+
+	message (STATUS "Running autoheader to create src/config.h.in")
+	execute_process (COMMAND ${AUTOHEADER} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+	assert_line_count_non_zero ("${CMAKE_SOURCE_DIR}/src/config.h.in")
+
+	message (STATUS "Post processing src/config.h.in")
+	execute_process (
+		COMMAND ${SED} -E "s/undef([ \\t]+)([a-zA-Z0-8_]+)/define\\1\\2\\1@\\2@/" src/config.h.in
+		COMMAND ${SED} "s/.*_FILE_OFFSET_BITS.*//"
+		OUTPUT_FILE ${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in
+		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+		)
+
+	execute_process (
+		COMMAND ${GREP} -c undef ${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in
+		OUTPUT_VARIABLE undef_count
+		)
+
+	if (${undef_count} GREATER 0)
+		message (FATAL_ERROR "CMake processing of CMakeFIles/config.h.in has failed.")
+		endif ()
+	endif ()
+
+assert_line_count_non_zero ("${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in")
+
+# Use autogen to generate files if they don't already exist.
+include (CMake/autogen.cmake)
+lsf_autogen (src test_endswap)
+lsf_autogen (tests pcm_test)
+lsf_autogen (tests utils)
+lsf_autogen (tests floating_point_test)
+lsf_autogen (tests header_test)
+lsf_autogen (tests pipe_test)
+lsf_autogen (tests write_read_test)
+lsf_autogen (tests scale_clip_test)
+lsf_autogen (tests rdwr_test)
+lsf_autogen (tests benchmark)
 
 if (DEFINED ENV{CC})
 	set (CMAKE_C_COMPILER $ENV{CC})
@@ -10,75 +79,57 @@ if (DEFINED ENV{CXX})
 	set (CMAKE_CXX_COMPILER $ENV{CXX})
 	endif()
 
-project (libsndfile)
-
-message (STATUS "Using C compiler   : " ${CMAKE_C_COMPILER})
-message (STATUS "Using C++ compiler : " ${CMAKE_CXX_COMPILER})
+message (STATUS "System       : ${CMAKE_SYSTEM_NAME}")
+message (STATUS "Processor    : ${CMAKE_SYSTEM_PROCESSOR}")
+message (STATUS "C compiler   : ${CMAKE_C_COMPILER_ID}")
+message (STATUS "C++ compiler : ${CMAKE_CXX_COMPILER_ID}")
 
 #-------------------------------------------------------------------------------
 
-set (LIB_VERSION_MAJOR 1)
-set (LIB_VERSION_MINOR 0)
-set (LIB_VERSION_PATCH 26)
-
+set (PACKAGE \"libsndfile\")
 set (PACKAGE_NAME \"libsndfile\")
-set (PACKAGE_VERSION \"1.0.26pre6\")
+set (VERSION \"${LIB_VERSION}\")
+set (PACKAGE_VERSION \"${LIB_VERSION}\")
 
 set (BASEPATH "${CMAKE_SOURCE_DIR}")
 
-
-set (LIB_VERSION_STRING ${LIB_VERSION_MAJOR}.${LIB_VERSION_MINOR}.${LIB_VERSION_PATCH})
-
-include (CMake/libsndfile.cmake)
 include (CMake/build.cmake)
+include (CMake/external_libs.cmake)
+include (CMake/libsndfile.cmake)
 
-if (MSVC)
-	set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996")
-	add_definitions ("/wd4244 /wd4996")
+if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "AppleClang")
+	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=gnu99 -Wall -Wextra" CACHE STRING "" FORCE)
+	set (CMAKE_CXX__FLAGS "${CMAKE_C_FLAGS} -O3 -std=gnu99 -Wall -Wextra" CACHE STRING "" FORCE)
 
-	set (COMPILER_IS_GCC 0)
-	set (HAVE_EXTERNAL_LIBS 0)
-	set (OS_IS_WIN32 1)
-	set (OSX_DARWIN_VERSION 0)
-	set (USE_WINDOWS_API 1)
-	set (WIN32_TARGET_DLL 1)
-else (MSVC)
-	# Assume this is Linux or some other POSIX-like system (including OS X).
-	set (HAVE_EXTERNAL_LIBS 0)
-	set (OSX_DARWIN_VERSION 0)
-	set (USE_WINDOWS_API 0)
-	set (__USE_MINGW_ANSI_STDIO 0)
-
-	set (CPU_CLIPS_NEGATIVE 0)
-	set (CPU_CLIPS_POSITIVE 0)
+	set (COMPILER_IS_GCC 1)
 	set (_POSIX_SOURCE 1)
 
-	set (SF_COUNT_MAX 0x7fffffffffffffffll)
-	set (ENABLE_EXPERIMENTAL_CODE 0)
-	set (OSX_DARWIN_VERSION 0)
-	set (OS_IS_OPENBSD 0)
-	set (WIN32_TARGET_DLL 0)
-	endif (MSVC)
-
-if (${COMPILER_IS_GCC})
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -std=gnu99 -Wall -Wextra" CACHE STRING "" FORCE)
-	# set (CMAKE_CXX__FLAGS
-	endif (${COMPILER_IS_GCC})
-
-if (${Werror} MATCHES "on")
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror" CACHE STRING "" FORCE)
+	if (${Werror} MATCHES "on")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror" CACHE STRING "" FORCE)
+		endif ()
 	endif ()
 
-add_custom_target (check
-	COMMAND src/test_main && bash tests/test_wrapper.sh
-	DEPENDS src/test_main tests/test_wrapper.sh
-	)
+if (CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+	# Untested. Probably does not work. Patches accepted.
+
+	set (CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4996" CACHE STRING "" FORCE)
+	add_definitions ("/wd4244 /wd4996")
+	endif ()
+
+
+# Need to actually detect this.
+set (CPU_CLIPS_POSITIVE 0)
+set (CPU_CLIPS_NEGATIVE 0)
+
+set (ENABLE_EXPERIMENTAL_CODE 0)
+
+find_external_xiph_libs (HAVE_EXTERNAL_XIPH_LIBS EXTERNAL_XIPH_CFLAGS EXTERNAL_XIPH_LIBS)
 
 #-------------------------------------------------------------------------------
 # Project definitions follow.
 
-configure_file (src/sndfile.h.in src/sndfile.h)
-configure_file (CMake/config.h.in src/config.h)
+configure_file (${CMAKE_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_SOURCE_DIR}/src/sndfile.h)
+configure_file (${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in ${CMAKE_SOURCE_DIR}/src/config.h)
 
 include_directories (src)
 
@@ -143,13 +194,11 @@ set (libsndfile_sources
 	src/ima_oki_adpcm.c
 	src/interleave.c
 	src/ircam.c
-	src/macbinary3.c
 	src/macos.c
 	src/mat4.c
 	src/mat5.c
 	src/mpc2k.c
 	src/ms_adpcm.c
-	src/new.c
 	src/nist.c
 	src/ogg.c
 	src/ogg_opus.c
@@ -173,7 +222,7 @@ set (libsndfile_sources
 	src/vox_adpcm.c
 	src/w64.c
 	src/wav.c
-	src/wav_w64.c
+	src/wavlike.c
 	src/windows.c
 	src/wve.c
 	src/xi.c
@@ -183,32 +232,39 @@ add_library (sndfile SHARED
 	${libsndfile_sources}
 	)
 
-target_link_libraries (sndfile m)
+target_link_libraries (sndfile LINK_PRIVATE ${EXTERNAL_XIPH_LIBS} LINK_PUBLIC m)
 
-set_target_properties(sndfile
+set_target_properties (sndfile
 	PROPERTIES
-	VERSION ${LIB_VERSION_STRING} SOVERSION ${LIB_VERSION_MAJOR}
-	LIBRARY_OUTPUT_DIRECTORY src
+	VERSION ${LIB_VERSION}
+	SOVERSION ${LIB_VERSION_MAJOR}
+	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/src
 	)
 
 #-------------------------------------------------------------------------------
 # Programs.
 
-lsf_build_program (sndfile-cmp "")
-lsf_build_program (sndfile-concat "")
-lsf_build_program (sndfile-convert "")
-lsf_build_program (sndfile-deinterleave "")
-lsf_build_program (sndfile-info "")
-lsf_build_program (sndfile-interleave "")
-lsf_build_program (sndfile-metadata-get "")
-lsf_build_program (sndfile-metadata-set "")
-lsf_build_program (sndfile-play asound)
-lsf_build_program (sndfile-salvage "")
+lsf_build_program (sndfile-cmp)
+lsf_build_program (sndfile-concat)
+lsf_build_program (sndfile-convert)
+lsf_build_program (sndfile-deinterleave)
+lsf_build_program (sndfile-info)
+lsf_build_program (sndfile-interleave)
+lsf_build_program (sndfile-metadata-get)
+lsf_build_program (sndfile-metadata-set)
+lsf_build_program (sndfile-salvage)
+lsf_build_program_extra (sndfile-play asound)
 
 #-------------------------------------------------------------------------------
 # Tests.
 
-configure_file (tests/test_wrapper.sh.in tests/test_wrapper.sh)
+configure_file (${CMAKE_SOURCE_DIR}/tests/test_wrapper.sh.in ${CMAKE_SOURCE_DIR}/tests/test_wrapper.sh)
+configure_file (${CMAKE_SOURCE_DIR}/tests/pedantic-header-test.sh.in ${CMAKE_SOURCE_DIR}/tests/pedantic-header-test.sh)
+
+add_custom_target (check
+	COMMAND src/test_main && bash tests/test_wrapper.sh
+	DEPENDS src/test_main tests/test_wrapper.sh
+	)
 
 # Tests from the src/ directory.
 set (src_test_sources
@@ -256,6 +312,7 @@ lsf_build_test_c (header_test "")
 lsf_build_test_c (largefile_test "")
 lsf_build_test_c (locale_test "")
 lsf_build_test_c (lossy_comp_test "")
+lsf_build_test_c (long_read_write_test "")
 lsf_build_test_c (misc_test "")
 lsf_build_test_c (multi_file_test "")
 lsf_build_test_c (ogg_test "")

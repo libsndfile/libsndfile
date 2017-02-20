@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2002-2005 Michael Smith <msmith@xiph.org>
 ** Copyright (C) 2007 John ffitch
 **
@@ -68,7 +68,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if HAVE_EXTERNAL_LIBS
+#if HAVE_EXTERNAL_XIPH_LIBS
 
 #include <ogg/ogg.h>
 #include <vorbis/codec.h>
@@ -109,6 +109,8 @@ static STR_PAIRS vorbis_metatypes [] =
 	{	SF_STR_DATE,		"Date" },
 	{	SF_STR_ALBUM,		"Album" },
 	{	SF_STR_LICENSE,		"License" },
+	{	SF_STR_TRACKNUMBER,	"Tracknumber" },
+	{	SF_STR_GENRE, 		"Genre" },
 } ;
 
 typedef struct
@@ -153,11 +155,11 @@ vorbis_read_header (SF_PRIVATE *psf, int log_data)
 	buffer = ogg_sync_buffer (&odata->osync, 4096L) ;
 
 	/* Grab the part of the header that has already been read. */
-	memcpy (buffer, psf->header, psf->headindex) ;
-	bytes = psf->headindex ;
+	memcpy (buffer, psf->header.ptr, psf->header.indx) ;
+	bytes = psf->header.indx ;
 
 	/* Submit a 4k block to libvorbis' Ogg layer */
-	bytes += psf_fread (buffer + psf->headindex, 1, 4096 - psf->headindex, psf) ;
+	bytes += psf_fread (buffer + psf->header.indx, 1, 4096 - psf->header.indx, psf) ;
 	ogg_sync_wrote (&odata->osync, bytes) ;
 
 	/* Get the first page. */
@@ -371,14 +373,17 @@ vorbis_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 			break ;
 
 		switch (psf->strings.data [k].type)
-		{	case SF_STR_TITLE :		name = "TITLE" ; break ;
-			case SF_STR_COPYRIGHT : name = "COPYRIGHT" ; break ;
-			case SF_STR_SOFTWARE :	name = "SOFTWARE" ; break ;
-			case SF_STR_ARTIST :	name = "ARTIST" ; break ;
-			case SF_STR_COMMENT :	name = "COMMENT" ; break ;
-			case SF_STR_DATE :		name = "DATE" ; break ;
-			case SF_STR_ALBUM :		name = "ALBUM" ; break ;
-			case SF_STR_LICENSE :	name = "LICENSE" ; break ;
+		{	case SF_STR_TITLE :			name = "TITLE" ; break ;
+			case SF_STR_COPYRIGHT : 	name = "COPYRIGHT" ; break ;
+			case SF_STR_SOFTWARE :		name = "SOFTWARE" ; break ;
+			case SF_STR_ARTIST :		name = "ARTIST" ; break ;
+			case SF_STR_COMMENT :		name = "COMMENT" ; break ;
+			case SF_STR_DATE :			name = "DATE" ; break ;
+			case SF_STR_ALBUM :			name = "ALBUM" ; break ;
+			case SF_STR_LICENSE :		name = "LICENSE" ; break ;
+			case SF_STR_TRACKNUMBER : 	name = "Tracknumber" ; break ;
+			case SF_STR_GENRE : 		name = "Genre" ; break ;
+
 			default : continue ;
 			} ;
 
@@ -484,7 +489,7 @@ vorbis_close (SF_PRIVATE *psf)
 int
 ogg_vorbis_open (SF_PRIVATE *psf)
 {	OGG_PRIVATE* odata = psf->container_data ;
-	VORBIS_PRIVATE* vdata = calloc (1, sizeof (VORBIS_PRIVATE)) ;
+	VORBIS_PRIVATE* vdata ;
 	int	error = 0 ;
 
 	if (odata == NULL)
@@ -492,6 +497,7 @@ ogg_vorbis_open (SF_PRIVATE *psf)
 		return SFE_INTERNAL ;
 		} ;
 
+	vdata = calloc (1, sizeof (VORBIS_PRIVATE)) ;
 	psf->codec_data = vdata ;
 
 	if (psf->file.mode == SFM_RDWR)
@@ -1160,7 +1166,7 @@ vorbis_length (SF_PRIVATE *psf)
 	return length ;
 } /* vorbis_length */
 
-#else /* HAVE_EXTERNAL_LIBS */
+#else /* HAVE_EXTERNAL_XIPH_LIBS */
 
 int
 ogg_vorbis_open	(SF_PRIVATE *psf)

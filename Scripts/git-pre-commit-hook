@@ -8,7 +8,12 @@ else
 	against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
 	fi
 
-files=$(git diff-index --name-status --cached HEAD | grep -v ^D | sed -r "s/^[A-Z]+[A-Z0-9]*[ \t]+/ /")
+SED="sed -r "  # BSD sed
+if test $(sed --version | grep -c GNU) -gt 0 ; then
+	SED="sed -E "
+	fi
+
+files=$(git diff-index --name-status --cached HEAD | grep -v ^D | ${SED} "s/^[A-Z]+[A-Z0-9]*[ \t]+/ /")
 
 # Redirect output to stderr.
 exec 1>&2

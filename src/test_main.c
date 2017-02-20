@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -26,15 +26,31 @@
 
 #include "test_main.h"
 
+static void
+test_file_offsets_are_64_bit (void)
+{
+	print_test_name ("File offsets are 64 bit") ;
+
+	// The Windows specific code path uses the 64 bit file I/O APIs.
+	if (! USE_WINDOWS_API && sizeof (off_t) != 8)
+	{	printf ("\n\nError : sizeof (off_t) is %zd (should be 8).\n\n", sizeof (off_t)) ;
+		exit (1) ;
+		} ;
+
+	puts ("ok") ;
+} /* test_file_offsets_are_64_bit */
+
 int
 main (void)
 {
+	test_file_offsets_are_64_bit () ;
 	test_conversions () ;
 	test_endswap () ;
 	test_float_convert () ;
 	test_double_convert () ;
 
 	test_log_printf () ;
+	test_binheader_writef () ;
 	test_file_io () ;
 
 	test_audio_detect () ;
