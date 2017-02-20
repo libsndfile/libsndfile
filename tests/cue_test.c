@@ -17,14 +17,16 @@ int test_cues (const char *filename)
     SF_CUE_INFO *info;
     int err;
 
-    file = sf_open(filename, SFM_READ, &sfinfo);
+    if ((file = sf_open(filename, SFM_READ, &sfinfo)) == NULL)
+    {
+	printf("can't open file '%s'\n", filename);
+	return 0;
+    }
 
     if ((err = sf_command(file, SFC_GET_CUE_SIZE, &size, sizeof (int))) == SF_FALSE)
     {
-#if 1
 	printf("can't get cue info size for file '%s' (arg size %lu, err %d)\n", 
 	       filename, sizeof(int), err);
-#endif
 	return 0;
     }
 
@@ -58,4 +60,6 @@ int test_cues (const char *filename)
 int main (int argc, char **argv)
 {
     test_cues("clickpluck24.wav");
+    test_cues("clickpluck.wav");
+    test_cues("clickpluck.aiff");
 }
