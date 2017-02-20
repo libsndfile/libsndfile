@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,7 +48,8 @@ static	void	format_tests			(void) ;
 static	void	calc_peak_test			(int filetype, const char *filename, int channels) ;
 static	void	truncate_test			(const char *filename, int filetype) ;
 static	void	instrument_test			(const char *filename, int filetype) ;
-static	void	cue_test			(const char *filename, int filetype) ;
+static	void	cue_test				(const char *filename, int filetype) ;
+static	void	cue_test_var			(const char *filename, int filetype, int count) ;
 static	void	channel_map_test		(const char *filename, int filetype) ;
 static	void	current_sf_info_test	(const char *filename) ;
 static	void	raw_needs_endswap_test	(const char *filename, int filetype) ;
@@ -59,7 +60,7 @@ static	void	broadcast_coding_history_test	(const char *filename) ;
 static	void	broadcast_coding_history_size	(const char *filename) ;
 
 /* Cart Chunk tests */
-static void	cart_test			(const char *filename, int filetype) ;
+static void	cart_test				(const char *filename, int filetype) ;
 static void	cart_rdwr_test			(const char *filename, int filetype) ;
 
 /* Force the start of this buffer to be double aligned. Sparc-solaris will
@@ -146,8 +147,18 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || strcmp (argv [1], "cue") == 0)
-	{	cue_test ("cue.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+	{	/* 2500 is close to the largest number of cues possible because of block sizes (enforced in aiff.c, wav.c) */
+		int cuecounts [] = { -1, 0, 1, 10, 100, 101, 1000, 1001, 2500 } ;
+		unsigned int i ;
+
+		cue_test ("cue.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		cue_test ("cue.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
+
+		for (i = 0 ; i < ARRAY_LEN (cuecounts) ; i++)
+		{	cue_test_var ("cue.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16, cuecounts [i]) ;
+			cue_test_var ("cue.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_24, cuecounts [i]) ;
+			} ;
+
 		test_count ++ ;
 		} ;
 
@@ -836,6 +847,50 @@ instrument_test (const char *filename, int filetype)
 } /* instrument_test */
 
 static void
+print_cue (SF_CUES *cue, int i)
+{
+	printf ("   indx[%d]       : %d\n"
+		"   position      : %u\n"
+		"   fcc_chunk     : %x\n"
+		"   chunk_start   : %d\n"
+		"   block_start   : %d\n"
+		"   sample_offset : %u\n"
+		"   name          : %s\n",
+		i,
+		cue->cue_points [i].indx,
+		cue->cue_points [i].position,
+		cue->cue_points [i].fcc_chunk,
+		cue->cue_points [i].chunk_start,
+		cue->cue_points [i].block_start,
+		cue->cue_points [i].sample_offset,
+		cue->cue_points [i].name) ;
+}
+
+static int
+cue_compare (SF_CUES *write_cue, SF_CUES *read_cue, size_t cue_size, int line)
+{
+	if (memcmp (write_cue, read_cue, cue_size) != 0)
+	{
+		printf ("\n\nLine %d : cue comparison failed.\n\n", line) ;
+		printf ("W  Cue count     : %d\n", write_cue->cue_count) ;
+		if (write_cue->cue_count > 0)
+			print_cue (write_cue, 0) ;
+		if (write_cue->cue_count > 2)	/* print last if at least 2 */
+			print_cue (write_cue, write_cue->cue_count - 1) ;
+
+		printf ("R  Cue count     : %d\n", read_cue->cue_count) ;
+		if (read_cue->cue_count > 0)
+			print_cue (read_cue, 0) ;
+		if (read_cue->cue_count > 2)	/* print last if at least 2 */
+			print_cue (read_cue, read_cue->cue_count - 1) ;
+
+		return SF_FALSE ;
+		} ;
+
+	return SF_TRUE ;
+} /* cue_compare */
+
+static void
 cue_rw_test (const char *filename)
 {	SNDFILE *sndfile ;
 	SF_INFO sfinfo ;
@@ -924,77 +979,74 @@ cue_test (const char *filename, int filetype)
 	check_log_buffer_or_die (file, __LINE__) ;
 	sf_close (file) ;
 
-	if (memcmp (&write_cue, &read_cue, sizeof (write_cue)) != 0)
-	{	printf ("\n\nLine %d : cue comparison failed.\n\n", __LINE__) ;
-		printf ("W  Cue count      : %d\n"
-			"   indx          : %d\n"
-			"   position      : %u\n"
-			"   fcc_chunk     : %x\n"
-			"   chunk_start   : %d\n"
-			"   block_start   : %d\n"
-			"   sample_offset : %u\n"
-			"   name          : %s\n"
-			"   indx          : %d\n"
-			"   position      : %u\n"
-			"   fcc_chunk     : %x\n"
-			"   chunk_start   : %d\n"
-			"   block_start   : %d\n"
-			"   sample_offset : %u\n"
-			"   name           : %s\n",
-			write_cue.cue_count,
-			write_cue.cue_points [0].indx,
-			write_cue.cue_points [0].position,
-			write_cue.cue_points [0].fcc_chunk,
-			write_cue.cue_points [0].chunk_start,
-			write_cue.cue_points [0].block_start,
-			write_cue.cue_points [0].sample_offset,
-			write_cue.cue_points [0].name,
-			write_cue.cue_points [1].indx,
-			write_cue.cue_points [1].position,
-			write_cue.cue_points [1].fcc_chunk,
-			write_cue.cue_points [1].chunk_start,
-			write_cue.cue_points [1].block_start,
-			write_cue.cue_points [1].sample_offset,
-			write_cue.cue_points [1].name) ;
-		printf ("R  Cue count      : %d\n"
-			"   indx          : %d\n"
-			"   position      : %u\n"
-			"   fcc_chunk     : %x\n"
-			"   chunk_start   : %d\n"
-			"   block_start   : %d\n"
-			"   sample_offset : %u\n"
-			"   name          : %s\n"
-			"   indx          : %d\n"
-			"   position      : %u\n"
-			"   fcc_chunk     : %x\n"
-			"   chunk_start   : %d\n"
-			"   block_start   : %d\n"
-			"   sample_offset : %u\n"
-			"   name          : %s\n",
-			read_cue.cue_count,
-			read_cue.cue_points [0].indx,
-			read_cue.cue_points [0].position,
-			read_cue.cue_points [0].fcc_chunk,
-			read_cue.cue_points [0].chunk_start,
-			read_cue.cue_points [0].block_start,
-			read_cue.cue_points [0].sample_offset,
-			read_cue.cue_points [0].name,
-			read_cue.cue_points [1].indx,
-			read_cue.cue_points [1].position,
-			read_cue.cue_points [1].fcc_chunk,
-			read_cue.cue_points [1].chunk_start,
-			read_cue.cue_points [1].block_start,
-			read_cue.cue_points [1].sample_offset,
-			read_cue.cue_points [1].name) ;
-
+	if (cue_compare (&write_cue, &read_cue, sizeof (write_cue), __LINE__) == SF_FALSE)
 			exit (1) ;
-		} ;
 
 	if (0) cue_rw_test (filename) ;
 
 	unlink (filename) ;
 	puts ("ok") ;
 } /* cue_test */
+
+/* calculate size of SF_CUES struct given number of cues */
+#define SF_CUES_SIZE(count)	(sizeof (uint32_t) + sizeof (SF_CUE_POINT) * (count))
+
+static void
+cue_test_var (const char *filename, int filetype, int count)
+{	size_t cues_size = SF_CUES_SIZE (count) ;
+	SF_CUES *write_cue = calloc (1, cues_size) ;
+	SF_CUES *read_cue = calloc (1, cues_size) ;
+	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
+	char name [40] ;
+	int i ;
+
+	snprintf (name, sizeof (name), "cue_test_var %d", count) ;
+	print_test_name (name, filename) ;
+
+	if (write_cue == NULL || read_cue == NULL)
+	{	printf ("ok (can't alloc)\n") ;
+		return ;
+		} ;
+
+	write_cue->cue_count = count ;
+	for (i = 0 ; i < count ; i++)
+	{	write_cue->cue_points [i] = (SF_CUE_POINT) { i, 0, data_MARKER, 0, 0, i, "" } ;
+		if (filetype == (SF_FORMAT_AIFF | SF_FORMAT_PCM_24))
+			snprintf (write_cue->cue_points [i].name, sizeof (write_cue->cue_points [i].name), "Cue%03d", i) ;
+		} ;
+
+	sfinfo.samplerate	= 11025 ;
+	sfinfo.format		= filetype ;
+	sfinfo.channels		= 1 ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_SET_CUE, write_cue, cues_size) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_CUE) failed with %d cues, datasize %ld --> error: %s\n\n", __LINE__, count, cues_size, sf_strerror (file)) ;
+		exit (1) ;
+		} ;
+	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	memset (read_cue, 0, cues_size) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sf_command (file, SFC_GET_CUE, read_cue, cues_size) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_GET_CUE) failed with %d cues, datasize %ld --> error: %s\n\n", __LINE__, count, cues_size, sf_strerror (file)) ;
+		exit (1) ;
+		} ;
+	check_log_buffer_or_die (file, __LINE__) ;
+	sf_close (file) ;
+
+	if (cue_compare (write_cue, read_cue, cues_size, __LINE__) == SF_FALSE)
+	{	printf ("\n\nLine %d : cue_compare failed.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* cue_test_var */
 
 static	void
 current_sf_info_test	(const char *filename)
