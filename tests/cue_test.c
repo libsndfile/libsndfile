@@ -13,9 +13,9 @@ int test_cues (const char *filename)
     SNDFILE    *file;
     SF_INFO	sfinfo;
 
-    int size, i;	/* long is UInt32 is 32bit, int might be 64bit */
-    SF_CUE_INFO *info;
-    int err;
+    int i, err;
+    uint32_t count = 0;
+    SF_CUES_VAR(0) *info;
 
     if ((file = sf_open(filename, SFM_READ, &sfinfo)) == NULL)
     {
@@ -23,32 +23,36 @@ int test_cues (const char *filename)
 	return 0;
     }
 
-    if ((err = sf_command(file, SFC_GET_CUE_SIZE, &size, sizeof (int))) == SF_FALSE)
+    if ((err = sf_command(file, SFC_GET_CUE_COUNT, &count, sizeof(uint32_t))) == SF_FALSE)
     {
 	printf("can't get cue info size for file '%s' (arg size %lu, err %d)\n", 
-	       filename, sizeof(int), err);
+	       filename, sizeof(uint32_t), err);
 	return 0;
     }
+	
+    int size = sizeof(*info) + count * sizeof(SF_CUE_POINT);
+    printf("num. cues in file '%s': %d  info struct size %d\n", filename, count, size);
 
     if (!(info = malloc(size)))
 	return 0;
 
-    if (sf_command(file, SFC_GET_CUE_INFO, info, size) == SF_FALSE)
+    if (sf_command(file, SFC_GET_CUE, info, size) == SF_FALSE)
     {
 	printf("can't get cue info of size %d for file '%s'\n", 
 	       size, filename);
 	return 0;
     }
 
-    printf("number of cues %d  in file %s  sr %d\n", info->num, filename, sfinfo.samplerate);
+    printf("number of cues %d  in struct\n", info->cue_count);
 
-    for (i = 0; i < info->num; i++)
+    for (i = 0; i < info->cue_count; i++)
     {
-	int    pos = info->cue[i].position;
+	int    pos = info->cue_points[i].position;
 	double t   = (double) pos / sfinfo.samplerate;
 	double expected = i < 10  ?  (double) i / 3.  :  11. / 3.;
 
-	printf("cue %02d: markerID %02d  position %06d  (time %.3f  diff %f)  label '%s'\n", i, info->cue[i].markerID, pos, t, (double) abs(t - expected), info->cue[i].label);
+	printf("cue %02d: markerID %02d  position %06d  (time %.3f  diff %f)  label '%s'\n",
+	       i, info->cue_points[i].indx, pos, t, (double) fabs(t - expected), info->cue_points[i].name);
     }
     
     sf_close(file);
