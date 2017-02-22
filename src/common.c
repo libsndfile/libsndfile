@@ -1242,6 +1242,9 @@ typedef SF_CUES_VAR (2) SF_CUES_2 ;
 /* calculate size of SF_CUES struct given number of cues */
 #define SF_CUES_VAR_SIZE(count)	(sizeof (SF_CUES_1) + ((int) (count) - 1) * (sizeof (SF_CUES_2) - sizeof (SF_CUES_1)))
 
+/* calculate number of cues in SF_CUES struct given data size */
+#define SF_CUES_COUNT(datasize) (((datasize) - sizeof (uint32_t)) / sizeof (SF_CUE_POINT))
+
 SF_CUES *
 psf_cues_alloc (uint32_t cue_count)
 {	SF_CUES *pcues = calloc (1, SF_CUES_VAR_SIZE (cue_count)) ;
@@ -1251,11 +1254,16 @@ psf_cues_alloc (uint32_t cue_count)
 } /* psf_cues_alloc */
 
 SF_CUES *
-psf_cues_dup (const void * ptr)
+psf_cues_dup (const void * ptr, size_t datasize)
 {	const SF_CUES *pcues = ptr ;
-	SF_CUES *pnew = psf_cues_alloc (pcues->cue_count) ;
+	SF_CUES *pnew = NULL;
 
-	memcpy (pnew, pcues, SF_CUES_VAR_SIZE (pcues->cue_count)) ;
+	if (pcues->cue_count <= SF_CUES_COUNT(datasize))
+	{	/* check that passed-in datasize is consistent with cue_count in passed-in SF_CUES struct */
+		pnew = psf_cues_alloc (pcues->cue_count) ;
+		memcpy (pnew, pcues, SF_CUES_VAR_SIZE (pcues->cue_count)) ;
+	}
+	
 	return pnew ;
 } /* psf_cues_dup */
 
@@ -1263,7 +1271,7 @@ void
 psf_get_cues (SF_PRIVATE * psf, void * data, size_t datasize)
 {
 	if (psf->cues)
-	{	uint32_t cue_count = (datasize - sizeof (uint32_t)) / sizeof (SF_CUE_POINT) ;
+	{	uint32_t cue_count = SF_CUES_COUNT(datasize);
 
 		cue_count = SF_MIN (cue_count, psf->cues->cue_count) ;
 		memcpy (data, psf->cues, SF_CUES_VAR_SIZE (cue_count)) ;

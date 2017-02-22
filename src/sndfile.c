@@ -1261,12 +1261,11 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			{	psf->error = SFE_CMD_HAS_DATA ;
 				return SF_FALSE ;
 				} ;
-			if (datasize != sizeof (SF_CUES) || data == NULL)
+			if (datasize < (int) sizeof (uint32_t) || data == NULL)
 			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
 				} ;
-
-			if (psf->cues == NULL && (psf->cues = psf_cues_dup (data)) == NULL)
+			if (psf->cues == NULL && (psf->cues = psf_cues_dup (data, datasize)) == NULL)
 			{	psf->error = SFE_MALLOC_FAILED ;
 				return SF_FALSE ;
 				} ;
