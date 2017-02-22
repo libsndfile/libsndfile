@@ -13,7 +13,7 @@ int test_cues (const char *filename)
     SNDFILE    *file;
     SF_INFO	sfinfo;
 
-    int i, err;
+    unsigned int i, err, size;
     uint32_t count = 0;
     SF_CUES_VAR(0) *info;
 
@@ -35,7 +35,7 @@ int test_cues (const char *filename)
 	return 0;
     }
 	
-    int size = sizeof(*info) + count * sizeof(SF_CUE_POINT);
+    size = sizeof(*info) + count * sizeof(SF_CUE_POINT);
     printf("num. cues in file '%s': %d  info struct size %d\n", filename, count, size);
 
     if (!(info = malloc(size)))
@@ -66,7 +66,7 @@ int test_cues (const char *filename)
 }
 
 
-int main (int argc, char **argv)
+int main ()
 {
     test_cues("clickpluck24.wav");
     test_cues("clickpluck.wav");
