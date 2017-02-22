@@ -66,8 +66,9 @@ int test_cues (const char *filename)
 }
 
 
-int main ()
+int main (int argc, char **argv)
 {
+    printf("testing cues, args %d %s\n", argc, argc > 0 ? argv[0] : "");
     test_cues("clickpluck24.wav");
     test_cues("clickpluck.wav");
     test_cues("clickpluck.aiff");
