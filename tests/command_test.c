@@ -47,6 +47,7 @@ static	void	calc_peak_test			(int filetype, const char *filename, int channels) 
 static	void	truncate_test			(const char *filename, int filetype) ;
 static	void	instrument_test			(const char *filename, int filetype) ;
 static	void	cue_test			(const char *filename, int filetype) ;
+static	void	cue_test_var			(const char *filename, int filetype, int count) ;
 static	void	channel_map_test		(const char *filename, int filetype) ;
 static	void	current_sf_info_test	(const char *filename) ;
 static	void	raw_needs_endswap_test	(const char *filename, int filetype) ;
@@ -144,8 +145,16 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || strcmp (argv [1], "cue") == 0)
-	{	cue_test ("cue.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
+	{	int i, cuecounts[] = {-1, 0, 1, 100, 101, 255, 256, 1000};
+	    
+		cue_test ("cue.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		cue_test ("cue.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
+
+		for (i = 0; i < sizeof(cuecounts) / sizeof(int); i++)
+		{	cue_test_var ("cue.wav",  SF_FORMAT_WAV | SF_FORMAT_PCM_16,  cuecounts[i]) ;
+			cue_test_var ("cue.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_24, cuecounts[i]) ;
+			} ;
+
 		test_count ++ ;
 		} ;
 
@@ -834,6 +843,77 @@ instrument_test (const char *filename, int filetype)
 	puts ("ok") ;
 } /* instrument_test */
 
+static int
+cue_compare (SF_CUES *write_cue, SF_CUES *read_cue, size_t cue_size, int line)
+{
+	if (memcmp (write_cue, read_cue, cue_size) != 0)
+	{	printf ("\n\nLine %d : cue comparison failed.\n\n", line) ;
+		printf ("W  Cue count      : %d\n"
+			"   indx          : %d\n"
+			"   position      : %u\n"
+			"   fcc_chunk     : %x\n"
+			"   chunk_start   : %d\n"
+			"   block_start   : %d\n"
+			"   sample_offset : %u\n"
+			"   name          : %s\n"
+			"   indx          : %d\n"
+			"   position      : %u\n"
+			"   fcc_chunk     : %x\n"
+			"   chunk_start   : %d\n"
+			"   block_start   : %d\n"
+			"   sample_offset : %u\n"
+			"   name           : %s\n",
+			write_cue->cue_count,
+			write_cue->cue_points [0].indx,
+			write_cue->cue_points [0].position,
+			write_cue->cue_points [0].fcc_chunk,
+			write_cue->cue_points [0].chunk_start,
+			write_cue->cue_points [0].block_start,
+			write_cue->cue_points [0].sample_offset,
+			write_cue->cue_points [0].name,
+			write_cue->cue_points [1].indx,
+			write_cue->cue_points [1].position,
+			write_cue->cue_points [1].fcc_chunk,
+			write_cue->cue_points [1].chunk_start,
+			write_cue->cue_points [1].block_start,
+			write_cue->cue_points [1].sample_offset,
+			write_cue->cue_points [1].name) ;
+		printf ("R  Cue count      : %d\n"
+			"   indx          : %d\n"
+			"   position      : %u\n"
+			"   fcc_chunk     : %x\n"
+			"   chunk_start   : %d\n"
+			"   block_start   : %d\n"
+			"   sample_offset : %u\n"
+			"   name          : %s\n"
+			"   indx          : %d\n"
+			"   position      : %u\n"
+			"   fcc_chunk     : %x\n"
+			"   chunk_start   : %d\n"
+			"   block_start   : %d\n"
+			"   sample_offset : %u\n"
+			"   name          : %s\n",
+			read_cue->cue_count,
+			read_cue->cue_points [0].indx,
+			read_cue->cue_points [0].position,
+			read_cue->cue_points [0].fcc_chunk,
+			read_cue->cue_points [0].chunk_start,
+			read_cue->cue_points [0].block_start,
+			read_cue->cue_points [0].sample_offset,
+			read_cue->cue_points [0].name,
+			read_cue->cue_points [1].indx,
+			read_cue->cue_points [1].position,
+			read_cue->cue_points [1].fcc_chunk,
+			read_cue->cue_points [1].chunk_start,
+			read_cue->cue_points [1].block_start,
+			read_cue->cue_points [1].sample_offset,
+			read_cue->cue_points [1].name) ;
+		return SF_FALSE;
+		}
+	else
+		return SF_TRUE;
+} /* cue_compare */
+
 static void
 cue_rw_test (const char *filename)
 {	SNDFILE *sndfile ;
@@ -923,73 +1003,67 @@ cue_test (const char *filename, int filetype)
 	check_log_buffer_or_die (file, __LINE__) ;
 	sf_close (file) ;
 
-	if (memcmp (&write_cue, &read_cue, sizeof (write_cue)) != 0)
-	{	printf ("\n\nLine %d : cue comparison failed.\n\n", __LINE__) ;
-		printf ("W  Cue count      : %d\n"
-			"   indx          : %d\n"
-			"   position      : %u\n"
-			"   fcc_chunk     : %x\n"
-			"   chunk_start   : %d\n"
-			"   block_start   : %d\n"
-			"   sample_offset : %u\n"
-			"   name          : %s\n"
-			"   indx          : %d\n"
-			"   position      : %u\n"
-			"   fcc_chunk     : %x\n"
-			"   chunk_start   : %d\n"
-			"   block_start   : %d\n"
-			"   sample_offset : %u\n"
-			"   name           : %s\n",
-			write_cue.cue_count,
-			write_cue.cue_points [0].indx,
-			write_cue.cue_points [0].position,
-			write_cue.cue_points [0].fcc_chunk,
-			write_cue.cue_points [0].chunk_start,
-			write_cue.cue_points [0].block_start,
-			write_cue.cue_points [0].sample_offset,
-			write_cue.cue_points [0].name,
-			write_cue.cue_points [1].indx,
-			write_cue.cue_points [1].position,
-			write_cue.cue_points [1].fcc_chunk,
-			write_cue.cue_points [1].chunk_start,
-			write_cue.cue_points [1].block_start,
-			write_cue.cue_points [1].sample_offset,
-			write_cue.cue_points [1].name) ;
-		printf ("R  Cue count      : %d\n"
-			"   indx          : %d\n"
-			"   position      : %u\n"
-			"   fcc_chunk     : %x\n"
-			"   chunk_start   : %d\n"
-			"   block_start   : %d\n"
-			"   sample_offset : %u\n"
-			"   name          : %s\n"
-			"   indx          : %d\n"
-			"   position      : %u\n"
-			"   fcc_chunk     : %x\n"
-			"   chunk_start   : %d\n"
-			"   block_start   : %d\n"
-			"   sample_offset : %u\n"
-			"   name          : %s\n",
-			read_cue.cue_count,
-			read_cue.cue_points [0].indx,
-			read_cue.cue_points [0].position,
-			read_cue.cue_points [0].fcc_chunk,
-			read_cue.cue_points [0].chunk_start,
-			read_cue.cue_points [0].block_start,
-			read_cue.cue_points [0].sample_offset,
-			read_cue.cue_points [0].name,
-			read_cue.cue_points [1].indx,
-			read_cue.cue_points [1].position,
-			read_cue.cue_points [1].fcc_chunk,
-			read_cue.cue_points [1].chunk_start,
-			read_cue.cue_points [1].block_start,
-			read_cue.cue_points [1].sample_offset,
-			read_cue.cue_points [1].name) ;
-
+	if (cue_compare (&write_cue, &read_cue, sizeof (write_cue), __LINE__) == SF_FALSE)
 			exit (1) ;
-		} ;
 
 	if (0) cue_rw_test (filename) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* cue_test */
+
+/* calculate size of SF_CUES struct given number of cues */
+#define SF_CUES_SIZE(count)	(sizeof (uint32_t) + sizeof (SF_CUE_POINT) * (count))
+
+static void
+cue_test_var (const char *filename, int filetype, int count)
+{	size_t  cues_size = SF_CUES_SIZE (count);
+	SF_CUES *write_cue = calloc (1, cues_size);
+	SF_CUES *read_cue  = calloc (1, cues_size);
+	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
+	char name[40];
+	int i;
+
+	snprintf(name, 40, "cue_test_var %d", count);
+	print_test_name (name, filename) ;
+
+	if (write_cue == NULL || read_cue == NULL)
+	{	printf("ok (can't alloc)\n");
+		return;
+		};
+	
+	write_cue->cue_count = count;
+	for (i = 0; i < count; i++)
+	{	write_cue->cue_points[i] = (SF_CUE_POINT) {	i, 0, data_MARKER, 0, 0, i, "" };
+		if (filetype == (SF_FORMAT_AIFF | SF_FORMAT_PCM_24))
+		    sprintf(write_cue->cue_points[i].name, "Cue%03d", i);
+		} ;
+
+	sfinfo.samplerate	= 11025 ;
+	sfinfo.format		= filetype ;
+	sfinfo.channels		= 1 ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_SET_CUE, write_cue, cues_size) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_CUE) failed with %d cues, datasize %ld --> error: %s.\n\n", __LINE__, count, cues_size, sf_strerror(file)) ;
+		exit (1) ;
+		} ;
+	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	memset (read_cue, 0, cues_size) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	if (sf_command (file, SFC_GET_CUE, read_cue, cues_size) == SF_FALSE)
+	{	printf ("\n\nLine %d : sf_command (SFC_GET_CUE) failed with %d cues, datasize %ld --> error: %s.\n\n", __LINE__, count, cues_size, sf_strerror(file)) ;
+		exit (1) ;
+		} ;
+	check_log_buffer_or_die (file, __LINE__) ;
+	sf_close (file) ;
+
+	if (cue_compare (write_cue, read_cue, cues_size, __LINE__) == SF_FALSE)
+		exit (1) ;
 
 	unlink (filename) ;
 	puts ("ok") ;
