@@ -150,7 +150,7 @@ main (int argc, char *argv [])
 		cue_test ("cue.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		cue_test ("cue.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
 
-		for (i = 0; i < sizeof(cuecounts) / sizeof(int); i++)
+		for (i = 0; i < (int) sizeof(cuecounts) / sizeof(int); i++)
 		{	cue_test_var ("cue.wav",  SF_FORMAT_WAV | SF_FORMAT_PCM_16,  cuecounts[i]) ;
 			cue_test_var ("cue.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_24, cuecounts[i]) ;
 			} ;
