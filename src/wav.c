@@ -468,7 +468,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 						if (cue_count > 1000)
 						{	psf_log_printf (psf, "  Count : %u (skipping)\n", cue_count) ;
-							psf_binheader_readf (psf, "j", (cue_count > 20 ? 20 : cue_count) * 24) ;
+							psf_binheader_readf (psf, "j", chunk_size - bytesread) ;
 							break ;
 							} ;
 
