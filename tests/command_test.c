@@ -844,71 +844,44 @@ instrument_test (const char *filename, int filetype)
 	puts ("ok") ;
 } /* instrument_test */
 
-static int
-cue_compare (SF_CUES *write_cue, SF_CUES *read_cue, size_t cue_size, int line)
+static void
+print_cue (SF_CUES *cue, int i)
 {
-	if (memcmp (write_cue, read_cue, cue_size) != 0)
-	{	printf ("\n\nLine %d : cue comparison failed.\n\n", line) ;
-		printf ("W  Cue count      : %d\n"
-			"   indx          : %d\n"
-			"   position      : %u\n"
-			"   fcc_chunk     : %x\n"
-			"   chunk_start   : %d\n"
-			"   block_start   : %d\n"
-			"   sample_offset : %u\n"
-			"   name          : %s\n"
-			"   indx          : %d\n"
+	printf ("   indx[%d]       : %d\n"
 			"   position      : %u\n"
 			"   fcc_chunk     : %x\n"
 			"   chunk_start   : %d\n"
 			"   block_start   : %d\n"
 			"   sample_offset : %u\n"
 			"   name           : %s\n",
-			write_cue->cue_count,
-			write_cue->cue_points [0].indx,
-			write_cue->cue_points [0].position,
-			write_cue->cue_points [0].fcc_chunk,
-			write_cue->cue_points [0].chunk_start,
-			write_cue->cue_points [0].block_start,
-			write_cue->cue_points [0].sample_offset,
-			write_cue->cue_points [0].name,
-			write_cue->cue_points [1].indx,
-			write_cue->cue_points [1].position,
-			write_cue->cue_points [1].fcc_chunk,
-			write_cue->cue_points [1].chunk_start,
-			write_cue->cue_points [1].block_start,
-			write_cue->cue_points [1].sample_offset,
-			write_cue->cue_points [1].name) ;
-		printf ("R  Cue count      : %d\n"
-			"   indx          : %d\n"
-			"   position      : %u\n"
-			"   fcc_chunk     : %x\n"
-			"   chunk_start   : %d\n"
-			"   block_start   : %d\n"
-			"   sample_offset : %u\n"
-			"   name          : %s\n"
-			"   indx          : %d\n"
-			"   position      : %u\n"
-			"   fcc_chunk     : %x\n"
-			"   chunk_start   : %d\n"
-			"   block_start   : %d\n"
-			"   sample_offset : %u\n"
-			"   name          : %s\n",
-			read_cue->cue_count,
-			read_cue->cue_points [0].indx,
-			read_cue->cue_points [0].position,
-			read_cue->cue_points [0].fcc_chunk,
-			read_cue->cue_points [0].chunk_start,
-			read_cue->cue_points [0].block_start,
-			read_cue->cue_points [0].sample_offset,
-			read_cue->cue_points [0].name,
-			read_cue->cue_points [1].indx,
-			read_cue->cue_points [1].position,
-			read_cue->cue_points [1].fcc_chunk,
-			read_cue->cue_points [1].chunk_start,
-			read_cue->cue_points [1].block_start,
-			read_cue->cue_points [1].sample_offset,
-			read_cue->cue_points [1].name) ;
+		i,
+		cue->cue_points [i].indx,
+		cue->cue_points [i].position,
+		cue->cue_points [i].fcc_chunk,
+		cue->cue_points [i].chunk_start,
+		cue->cue_points [i].block_start,
+		cue->cue_points [i].sample_offset,
+		cue->cue_points [i].name) ;
+}
+
+static int
+cue_compare (SF_CUES *write_cue, SF_CUES *read_cue, size_t cue_size, int line)
+{
+	if (memcmp (write_cue, read_cue, cue_size) != 0)
+	{	int i;
+		printf ("\n\nLine %d : cue comparison failed.\n\n", line) ;
+		printf ("W  Cue count     : %d\n", write_cue->cue_count);
+		if (write_cue->cue_count > 0)
+		    print_cue(write_cue, 0);
+		if (write_cue->cue_count > 2)	/* print last if at least 2 */
+		    print_cue(write_cue, write_cue->cue_count - 1);
+
+		printf ("R  Cue count     : %d\n", read_cue->cue_count) ;
+		if (read_cue->cue_count > 0)
+		    print_cue(read_cue, 0);
+		if (read_cue->cue_count > 2)	/* print last if at least 2 */
+		    print_cue(read_cue, read_cue->cue_count - 1);
+
 		return SF_FALSE;
 		}
 	else

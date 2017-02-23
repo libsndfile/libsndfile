@@ -985,6 +985,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 
 			case labl_MARKER :
 					{	int mark_id ;
+						char buffer [256] ;
 
 						bytesread += psf_binheader_readf (psf, "44", &chunk_size, &mark_id) ;
 						chunk_size -= 4 ;
@@ -996,10 +997,24 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 
 						bytesread += psf_binheader_readf (psf, "b", buffer, chunk_size) ;
 						buffer [chunk_size] = 0 ;
-						psf_log_printf (psf, "    %M : %u : %s\n", chunk, mark_id, buffer) ;
+
+						if (mark_id < 10) /* avoid swamping log buffer with labels */
+							psf_log_printf (psf, "    %M : %u : %s\n", chunk, mark_id, buffer) ;
+						else if (mark_id == 10)
+							psf_log_printf (psf, "    (Skipping)\n") ;
+
+						if (psf->cues)
+ 						{	int i = 0 ;
+
+							/* find id to store label */
+							while (i < psf->cues->cue_count  &&  psf->cues->cue_points [i].indx != mark_id)
+								i++ ;
+
+							if (i < psf->cues->cue_count)
+								strncpy (psf->cues->cue_points [i].name, buffer, 256) ;
+							} ;
 						} ;
 					break ;
-
 
 			case DISP_MARKER :
 			case ltxt_MARKER :

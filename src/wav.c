@@ -485,11 +485,15 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 								break ;
 							bytesread += thisread ;
 
+							if (cue_index < 10) /* avoid swamping log buffer with cues */
 							psf_log_printf (psf,	"   Cue ID : %2d"
 													"  Pos : %5u  Chunk : %M"
 													"  Chk Start : %d  Blk Start : %d"
 													"  Offset : %5d\n",
 									id, position, chunk_id, chunk_start, block_start, offset) ;
+							else if (cue_index == 10)
+								psf_log_printf (psf,	"   (Skipping)\n") ;
+
 							psf->cues->cue_points [cue_index].indx = id ;
 							psf->cues->cue_points [cue_index].position = position ;
 							psf->cues->cue_points [cue_index].fcc_chunk = chunk_id ;
