@@ -39,7 +39,7 @@ get_cues (const char *filename, double *sr)
     }
 	
     size = sizeof(*info) + count * sizeof(SF_CUE_POINT);
-    printf("num. cues in file '%s': %d  info struct size %d\n", filename, count, size);
+    printf("number of cues %d  size %d\n", count, size);
 
     if (!(info = malloc(size)))
 	return NULL;
@@ -50,8 +50,6 @@ get_cues (const char *filename, double *sr)
 	       size, filename, sf_strerror(file));
 	exit(3);
     }
-
-    printf("number of cues %d  in struct\n", info->cue_count);
 
     *sr = sfinfo.samplerate;
     sf_close(file);
@@ -99,11 +97,20 @@ print_cues (const char *filename)
     
     for (i = 0; i < info->cue_count; i++)
     {
-	int    pos = info->cue_points[i].position;
+	int    pos    = info->cue_points[i].position;
+	int    indx   = info->cue_points[i].indx;
+	int    cstart = info->cue_points[i].chunk_start;
+	int    bstart = info->cue_points[i].block_start;
+	int    offset = info->cue_points[i].sample_offset;
+	const char *name = info->cue_points[i].name;
 	double t   = (double) pos / sr;
 
-	printf("cue %02d: markerID %02d  position %6d  offset %6d  time %7.3fs  label '%s'\n",
-	       i, info->cue_points[i].indx, pos, info->cue_points[i].sample_offset, t, info->cue_points[i].name);
+	if (cstart != 0  ||  bstart != 0)
+	    printf("cue %02d time %7.3f: markerID %02d  position %8d  chunk_start %d  block_start %d  offset %8d  label '%s'\n",
+		   i, t, indx, pos, offset, cstart, bstart, name);
+	else
+	    printf("cue %02d  time %7.3f: markerID %02d  position %8d  offset %8d  label '%s'\n",
+		   i, t, indx, pos, offset, name);
     }
 
     free(info);
