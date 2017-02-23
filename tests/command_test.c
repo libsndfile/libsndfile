@@ -147,7 +147,7 @@ main (int argc, char *argv [])
 	if (do_all || strcmp (argv [1], "cue") == 0)
 	{	int cuecounts[] = {-1, 0, 1, 100, 101, 1000, 1001, 2500, 2501} ; /* 2500 is close to the largest number of cues possible because of block sizes (enforced in aiff.c, wav.c) */
 		int expecterr[] = { 0, 0, 0,   0,   0,    0,    0,    0,    1} ;
-		int i ;
+		unsigned int i ;
 	    
 		cue_test ("cue.wav",   SF_FORMAT_WAV  | SF_FORMAT_PCM_16) ;
 		cue_test ("cue.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
@@ -869,7 +869,7 @@ static int
 cue_compare (SF_CUES *write_cue, SF_CUES *read_cue, size_t cue_size, int line)
 {
 	if (memcmp (write_cue, read_cue, cue_size) != 0)
-	{	int i;
+	{
 		printf ("\n\nLine %d : cue comparison failed.\n\n", line) ;
 		printf ("W  Cue count     : %d\n", write_cue->cue_count);
 		if (write_cue->cue_count > 0)
