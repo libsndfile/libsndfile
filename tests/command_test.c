@@ -146,12 +146,12 @@ main (int argc, char *argv [])
 
 	if (do_all || strcmp (argv [1], "cue") == 0)
 	{	int cuecounts[] = {-1, 0, 1, 100, 101, 1000}; /* 1000 is the largest number of cues possible */
-		int i, n = ARRAY_LEN(cuecounts);
+		int i;
 	    
 		cue_test ("cue.wav",   SF_FORMAT_WAV  | SF_FORMAT_PCM_16) ;
 		cue_test ("cue.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
 
-		for (i = 0; i < n; i++)
+		for (i = 0; i < ARRAY_LEN(cuecounts); i++)
 		{	cue_test_var ("cue.wav",  SF_FORMAT_WAV  | SF_FORMAT_PCM_16, cuecounts[i]) ;
 			cue_test_var ("cue.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_24, cuecounts[i]) ;
 			} ;
