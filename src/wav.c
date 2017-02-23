@@ -466,7 +466,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						bytesread = psf_binheader_readf (psf, "4", &cue_count) ;
 						psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
 
-						if (cue_count > 1000)
+						if (cue_count > 2500) /* 2500 is close to the largest number of cues possible because of block sizes */
 						{	psf_log_printf (psf, "  Count : %u (skipping)\n", cue_count) ;
 							psf_binheader_readf (psf, "j", chunk_size - bytesread) ;
 							break ;
@@ -486,11 +486,11 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 							bytesread += thisread ;
 
 							if (cue_index < 10) /* avoid swamping log buffer with cues */
-							psf_log_printf (psf,	"   Cue ID : %2d"
-													"  Pos : %5u  Chunk : %M"
-													"  Chk Start : %d  Blk Start : %d"
-													"  Offset : %5d\n",
-									id, position, chunk_id, chunk_start, block_start, offset) ;
+								psf_log_printf (psf,	"   Cue ID : %2d"
+											"  Pos : %5u  Chunk : %M"
+											"  Chk Start : %d  Blk Start : %d"
+											"  Offset : %5d\n",
+										id, position, chunk_id, chunk_start, block_start, offset) ;
 							else if (cue_index == 10)
 								psf_log_printf (psf,	"   (Skipping)\n") ;
 

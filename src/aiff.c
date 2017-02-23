@@ -794,8 +794,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						if (paiff->markstr == NULL)
 							return SFE_MALLOC_FAILED ;
 
-						if (mark_count > 1000)
-						{	psf_log_printf (psf, "  More than 1000 markers, skipping!\n") ;
+						if (mark_count > 2500) /* 2500 is close to the largest number of cues possible because of block sizes */
+						{	psf_log_printf (psf, "  More than 2500 markers, skipping!\n") ;
 							psf_binheader_readf (psf, "j", chunk_size - bytesread) ;
 							break ;
 						} ;

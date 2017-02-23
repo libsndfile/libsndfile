@@ -47,7 +47,7 @@ static	void	calc_peak_test			(int filetype, const char *filename, int channels) 
 static	void	truncate_test			(const char *filename, int filetype) ;
 static	void	instrument_test			(const char *filename, int filetype) ;
 static	void	cue_test			(const char *filename, int filetype) ;
-static	void	cue_test_var			(const char *filename, int filetype, int count) ;
+static	void	cue_test_var			(const char *filename, int filetype, int count, int experr) ;
 static	void	channel_map_test		(const char *filename, int filetype) ;
 static	void	current_sf_info_test	(const char *filename) ;
 static	void	raw_needs_endswap_test	(const char *filename, int filetype) ;
@@ -145,15 +145,16 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || strcmp (argv [1], "cue") == 0)
-	{	int cuecounts[] = {-1, 0, 1, 100, 101, 1000}; /* 1000 is the largest number of cues possible */
+	{	int cuecounts[] = {-1, 0, 1, 100, 101, 1000, 1001, 2500, 2501}; /* 2500 is close to the largest number of cues possible because of block sizes (enforced in aiff.c, wav.c) */
+	    	int expecterr[] = { 0, 0, 0,   0,   0,    0,    0,    0,    1};
 		int i;
 	    
 		cue_test ("cue.wav",   SF_FORMAT_WAV  | SF_FORMAT_PCM_16) ;
 		cue_test ("cue.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
 
 		for (i = 0; i < ARRAY_LEN(cuecounts); i++)
-		{	cue_test_var ("cue.wav",  SF_FORMAT_WAV  | SF_FORMAT_PCM_16, cuecounts[i]) ;
-			cue_test_var ("cue.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_24, cuecounts[i]) ;
+		{	cue_test_var ("cue.wav",  SF_FORMAT_WAV  | SF_FORMAT_PCM_16, cuecounts[i], expecterr[i]) ;
+			cue_test_var ("cue.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_24, cuecounts[i], expecterr[i]) ;
 			} ;
 
 		test_count ++ ;
@@ -848,12 +849,12 @@ static void
 print_cue (SF_CUES *cue, int i)
 {
 	printf ("   indx[%d]       : %d\n"
-			"   position      : %u\n"
-			"   fcc_chunk     : %x\n"
-			"   chunk_start   : %d\n"
-			"   block_start   : %d\n"
-			"   sample_offset : %u\n"
-			"   name           : %s\n",
+		"   position      : %u\n"
+		"   fcc_chunk     : %x\n"
+		"   chunk_start   : %d\n"
+		"   block_start   : %d\n"
+		"   sample_offset : %u\n"
+		"   name          : %s\n",
 		i,
 		cue->cue_points [i].indx,
 		cue->cue_points [i].position,
@@ -990,7 +991,7 @@ cue_test (const char *filename, int filetype)
 #define SF_CUES_SIZE(count)	(sizeof (uint32_t) + sizeof (SF_CUE_POINT) * (count))
 
 static void
-cue_test_var (const char *filename, int filetype, int count)
+cue_test_var (const char *filename, int filetype, int count, int expect_error)
 {	size_t  cues_size = SF_CUES_SIZE (count);
 	SF_CUES *write_cue = calloc (1, cues_size);
 	SF_CUES *read_cue  = calloc (1, cues_size);
@@ -1020,7 +1021,7 @@ cue_test_var (const char *filename, int filetype, int count)
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 	if (sf_command (file, SFC_SET_CUE, write_cue, cues_size) == SF_FALSE)
-	{	printf ("\n\nLine %d : sf_command (SFC_SET_CUE) failed with %d cues, datasize %ld --> error: %s.\n\n", __LINE__, count, cues_size, sf_strerror(file)) ;
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_CUE) failed with %d cues, datasize %ld --> error: %s\n\n", __LINE__, count, cues_size, sf_strerror(file)) ;
 		exit (1) ;
 		} ;
 	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
@@ -1030,18 +1031,21 @@ cue_test_var (const char *filename, int filetype, int count)
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 	if (sf_command (file, SFC_GET_CUE, read_cue, cues_size) == SF_FALSE)
-	{	printf ("\n\nLine %d : sf_command (SFC_GET_CUE) failed with %d cues, datasize %ld --> error: %s.\n\n", __LINE__, count, cues_size, sf_strerror(file)) ;
-		exit (1) ;
+	{	printf ("\n\nLine %d : sf_command (SFC_GET_CUE) failed with %d cues, datasize %ld --> error: %s\n\n", __LINE__, count, cues_size, sf_strerror(file)) ;
+		if (expect_error)
+			printf ("(expected error) ... ") ;
+		else
+			exit (1) ;
 		} ;
 	check_log_buffer_or_die (file, __LINE__) ;
 	sf_close (file) ;
 
-	if (cue_compare (write_cue, read_cue, cues_size, __LINE__) == SF_FALSE)
+	if (!expect_error  &&  cue_compare (write_cue, read_cue, cues_size, __LINE__) == SF_FALSE)
 		exit (1) ;
 
 	unlink (filename) ;
 	puts ("ok") ;
-} /* cue_test */
+} /* cue_test_var */
 
 static	void
 current_sf_info_test	(const char *filename)
