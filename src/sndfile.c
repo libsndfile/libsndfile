@@ -1247,7 +1247,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			return SF_FALSE ;
 
 		case SFC_GET_CUE :
-		    if (datasize < (int) sizeof (uint32_t) || data == NULL)
+			if (datasize < (int) sizeof (uint32_t) || data == NULL)
 			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
 				} ;

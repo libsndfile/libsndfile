@@ -145,14 +145,14 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || strcmp (argv [1], "cue") == 0)
-	{	int cuecounts[] = {-1, 0, 1, 100, 101, 1000, 1001, 2500, 2501}; /* 2500 is close to the largest number of cues possible because of block sizes (enforced in aiff.c, wav.c) */
-	    	int expecterr[] = { 0, 0, 0,   0,   0,    0,    0,    0,    1};
-		int i;
+	{	int cuecounts[] = {-1, 0, 1, 100, 101, 1000, 1001, 2500, 2501} ; /* 2500 is close to the largest number of cues possible because of block sizes (enforced in aiff.c, wav.c) */
+		int expecterr[] = { 0, 0, 0,   0,   0,    0,    0,    0,    1} ;
+		int i ;
 	    
 		cue_test ("cue.wav",   SF_FORMAT_WAV  | SF_FORMAT_PCM_16) ;
 		cue_test ("cue.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
 
-		for (i = 0; i < ARRAY_LEN(cuecounts); i++)
+		for (i = 0; i < ARRAY_LEN (cuecounts); i++)
 		{	cue_test_var ("cue.wav",  SF_FORMAT_WAV  | SF_FORMAT_PCM_16, cuecounts[i], expecterr[i]) ;
 			cue_test_var ("cue.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_24, cuecounts[i], expecterr[i]) ;
 			} ;
