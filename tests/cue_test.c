@@ -13,7 +13,7 @@ get_cues (const char *filename, double *sr)
     SNDFILE    *file;
     SF_INFO	sfinfo;
 
-    unsigned int i, err, size;
+    unsigned int err, size;
     uint32_t count = 0;
     SF_CUES_VAR(0) *info;
 
@@ -63,7 +63,7 @@ get_cues (const char *filename, double *sr)
 static void
 test_cues (const char *filename)
 {
-    int i;
+    unsigned int i;
     double sr;
     SF_CUES_VAR(0) *info = get_cues(filename, &sr);
 
@@ -90,7 +90,7 @@ test_cues (const char *filename)
 static void
 print_cues (const char *filename)
 {
-    int i;
+    unsigned int i;
     double sr;
     SF_CUES_VAR(0) *info = get_cues(filename, &sr);
 
