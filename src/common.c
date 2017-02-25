@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -1236,10 +1236,9 @@ psf_memset (void *s, int c, sf_count_t len)
 ** bodgy something up instead.
 */
 
-typedef SF_CUES_VAR (1) SF_CUES_1 ;
-typedef SF_CUES_VAR (2) SF_CUES_2 ;
+typedef SF_CUES_VAR (0) SF_CUES_0 ;
 
-#define SF_CUES_VAR_SIZE(count)	(sizeof (SF_CUES_1) + count * (sizeof (SF_CUES_2) - sizeof (SF_CUES_1)))
+#define SF_CUES_VAR_SIZE(count)	(sizeof (SF_CUES_0) + count * sizeof (SF_CUE_POINT))
 
 SF_CUES *
 psf_cues_alloc (uint32_t cue_count)
