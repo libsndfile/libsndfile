@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2009      Uli Franke <cls@nebadje.org>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -629,7 +629,7 @@ rf64_write_fmt_chunk (SF_PRIVATE *psf)
 
 static int
 rf64_write_header (SF_PRIVATE *psf, int calc_length)
-{	sf_count_t	current ;
+{	sf_count_t	current, pad_size ;
 	int 		error = 0, has_data = SF_FALSE, add_fact_chunk = 0 ;
 	WAVLIKE_PRIVATE	*wpriv ;
 
@@ -735,11 +735,9 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 
 #endif
 
-	if (psf->header.indx + 8 < psf->dataoffset)
-	{	/* Add PAD data if necessary. */
-		int k = psf->dataoffset - 16 - psf->header.indx ;
-		psf_binheader_writef (psf, "m4z", PAD_MARKER, k, make_size_t (k)) ;
-		} ;
+	pad_size = psf->dataoffset - 16 - psf->header.indx ;
+	if (pad_size >= 0)
+		psf_binheader_writef (psf, "m4z", PAD_MARKER, pad_size, make_size_t (pad_size)) ;
 
 	if (wpriv->rf64_downgrade && (psf->filelength < RIFF_DOWNGRADE_BYTES))
 		psf_binheader_writef (psf, "tm8", data_MARKER, psf->datalength) ;
