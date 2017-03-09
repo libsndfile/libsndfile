@@ -196,3 +196,10 @@ test_inline ()
 if (NOT DISABLE_CPU_CLIP)
 	clip_mode ()
 endif ()
+
+find_program (AUTOGEN_EXECUTABLE NAMES autogen)
+if (NOT AUTOGEN_EXECUTABLE)
+	message (WARNING "autogen tool not found: tests will not be build.")
+	SET (BUILD_TESTING OFF)
+endif ()
+
