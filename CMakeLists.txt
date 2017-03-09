@@ -7,6 +7,8 @@ cmake_minimum_required (VERSION 3.1.3)
 # Set software information
 project(libsndfile VERSION 1.0.28)
 
+message ("CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
+
 # Variables
 
 set (CPACK_PACKAGE_VERSION_MAJOR ${${PROJECT_VERSION}_MAJOR})
@@ -36,7 +38,6 @@ Both options BUILD_STATIC_LIBS and BUILD_SHARED_LIBS are manually set to OFF. To
 BUILD_STATIC_LIBS is now set to ON.\n")
 set (BUILD_STATIC_LIBS ON)
 endif ()
-option (ENABLE_TESTING "Enable testing" OFF)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
 
@@ -47,7 +48,6 @@ include(${CMAKE_MODULE_PATH}/SndFileChecks.cmake)
 
 add_feature_info(BUILD_STATIC_LIBS BUILD_STATIC_LIBS "build static libraries")
 add_feature_info(BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
-add_feature_info(ENABLE_TESTING ENABLE_TESTING "build tests")
 add_feature_info(DISABLE_EXTERNAL_LIBS DISABLE_EXTERNAL_LIBS "disable use of FLAC, Ogg and Vorbis")
 add_feature_info(ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info(BUILD_TESTING BUILD_TESTING "build tests")
@@ -486,6 +486,63 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTAL
 
 if (BUILD_TESTING)
 
+### Custom commands to generate tests sources form autogen templates
+
+add_custom_command (
+	OUTPUT ${CMAKE_SOURCE_DIR}/tests/benchmark.c
+	COMMAND ${AUTOGEN_EXECUTABLE} --writable benchmark.def
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_custom_command (
+	OUTPUT ${CMAKE_SOURCE_DIR}/tests/floating_point_test.c
+	COMMAND ${AUTOGEN_EXECUTABLE} --writable floating_point_test.def
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)	
+
+add_custom_command (
+	OUTPUT ${CMAKE_SOURCE_DIR}/tests/floating_point_test.c
+	COMMAND ${AUTOGEN_EXECUTABLE} --writable floating_point_test.def
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_custom_command (
+	OUTPUT ${CMAKE_SOURCE_DIR}/tests/header_test.c
+	COMMAND ${AUTOGEN_EXECUTABLE} --writable header_test.def
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_custom_command (
+	OUTPUT ${CMAKE_SOURCE_DIR}/tests/pcm_test.c
+	COMMAND ${AUTOGEN_EXECUTABLE} --writable pcm_test.def
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_custom_command (
+	OUTPUT ${CMAKE_SOURCE_DIR}/tests/pipe_test.c
+	COMMAND ${AUTOGEN_EXECUTABLE} --writable pipe_test.def
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_custom_command (
+	OUTPUT ${CMAKE_SOURCE_DIR}/tests/rdwr_test.c
+	COMMAND ${AUTOGEN_EXECUTABLE} --writable rdwr_test.def
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_custom_command (
+	OUTPUT ${CMAKE_SOURCE_DIR}/tests/scale_clip_test.c
+	COMMAND ${AUTOGEN_EXECUTABLE} --writable scale_clip_test.def
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_custom_command (
+	OUTPUT ${CMAKE_SOURCE_DIR}/tests/utils.c
+	COMMAND ${AUTOGEN_EXECUTABLE} --writable utils.def
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_custom_command (
+	OUTPUT ${CMAKE_SOURCE_DIR}/tests/write_read_test.c
+	COMMAND ${AUTOGEN_EXECUTABLE} --writable write_read_test.def
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+
+add_custom_command (
+	OUTPUT ${CMAKE_SOURCE_DIR}/src/test_endswap.c
+	COMMAND ${AUTOGEN_EXECUTABLE} --writable test_endswap.def
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src)
+
 ### test_main
 
 set (test_main_SOURCES
@@ -667,8 +724,6 @@ if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 	target_link_libraries(channel_test PRIVATE ${M_LIBRARY})
 endif ()
 add_test (channel_test channel_test)
-
-endif ()
 
 ### common test executables
 
@@ -980,3 +1035,4 @@ add_test (stdio_test stdio_test)
 add_test (pipe_test pipe_test)
 add_test (virtual_io_test virtual_io_test)
 
+endif (BUILD_TESTING)
