@@ -75,6 +75,17 @@
 #	define WARN_UNUSED
 #endif
 
+/*
+** Visibility control
+ */
+
+#if defined (SNDFILE_EXPORTS) && (!defined _WIN32)
+#	define SNDFILE_API	__attribute__ ((visibility ("default")))
+#else
+#	define SNDFILE_API
+#endif
+
+
 #define	SF_BUFFER_LEN			(8192)
 #define	SF_FILENAME_LEN			(1024)
 #define SF_SYSERR_LEN			(256)
