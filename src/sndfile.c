@@ -319,7 +319,7 @@ static char	sf_syserr [SF_SYSERR_LEN] = { 0 } ;
 **	Public functions.
 */
 
-SNDFILE*
+SNDFILE_API SNDFILE*
 sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 {	SF_PRIVATE 	*psf ;
 
@@ -349,7 +349,7 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 	return psf_open_file (psf, sfinfo) ;
 } /* sf_open */
 
-SNDFILE*
+SNDFILE_API SNDFILE*
 sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 {	SF_PRIVATE 	*psf ;
 
@@ -377,7 +377,7 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 	return psf_open_file (psf, sfinfo) ;
 } /* sf_open_fd */
 
-SNDFILE*
+SNDFILE_API SNDFILE*
 sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user_data)
 {	SF_PRIVATE 	*psf ;
 
@@ -416,7 +416,7 @@ sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user
 	return psf_open_file (psf, sfinfo) ;
 } /* sf_open_virtual */
 
-int
+SNDFILE_API int
 sf_close	(SNDFILE *sndfile)
 {	SF_PRIVATE	*psf ;
 
@@ -425,7 +425,7 @@ sf_close	(SNDFILE *sndfile)
 	return psf_close (psf) ;
 } /* sf_close */
 
-void
+SNDFILE_API void
 sf_write_sync	(SNDFILE *sndfile)
 {	SF_PRIVATE	*psf ;
 
@@ -440,7 +440,7 @@ sf_write_sync	(SNDFILE *sndfile)
 /*==============================================================================
 */
 
-const char*
+SNDFILE_API const char*
 sf_error_number	(int errnum)
 {	static const char *bad_errnum =
 		"No error defined for this error number. This is a bug in libsndfile." ;
@@ -462,7 +462,7 @@ sf_error_number	(int errnum)
 	return bad_errnum ;
 } /* sf_error_number */
 
-const char*
+SNDFILE_API const char*
 sf_strerror (SNDFILE *sndfile)
 {	SF_PRIVATE 	*psf = NULL ;
 	int errnum ;
@@ -490,7 +490,7 @@ sf_strerror (SNDFILE *sndfile)
 /*------------------------------------------------------------------------------
 */
 
-int
+SNDFILE_API int
 sf_error (SNDFILE *sndfile)
 {	SF_PRIVATE	*psf ;
 
@@ -508,7 +508,7 @@ sf_error (SNDFILE *sndfile)
 /*------------------------------------------------------------------------------
 */
 
-int
+SNDFILE_API int
 sf_perror (SNDFILE *sndfile)
 {	SF_PRIVATE 	*psf ;
 	int 		errnum ;
@@ -529,7 +529,7 @@ sf_perror (SNDFILE *sndfile)
 /*------------------------------------------------------------------------------
 */
 
-int
+SNDFILE_API int
 sf_error_str (SNDFILE *sndfile, char *str, size_t maxlen)
 {	SF_PRIVATE 	*psf ;
 	int 		errnum ;
@@ -552,7 +552,7 @@ sf_error_str (SNDFILE *sndfile, char *str, size_t maxlen)
 /*==============================================================================
 */
 
-int
+SNDFILE_API int
 sf_format_check	(const SF_INFO *info)
 {	int	subformat, endian ;
 
@@ -861,7 +861,7 @@ sf_format_check	(const SF_INFO *info)
 /*------------------------------------------------------------------------------
 */
 
-const char *
+SNDFILE_API const char *
 sf_version_string (void)
 {
 #if	ENABLE_EXPERIMENTAL_CODE
@@ -875,7 +875,7 @@ sf_version_string (void)
 /*------------------------------------------------------------------------------
 */
 
-int
+SNDFILE_API int
 sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 {	SF_PRIVATE *psf = (SF_PRIVATE *) sndfile ;
 	double quality ;
@@ -1375,7 +1375,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 /*------------------------------------------------------------------------------
 */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	seek_from_start = 0, retval ;
@@ -1493,7 +1493,7 @@ sf_seek	(SNDFILE *sndfile, sf_count_t offset, int whence)
 /*------------------------------------------------------------------------------
 */
 
-const char*
+SNDFILE_API const char*
 sf_get_string (SNDFILE *sndfile, int str_type)
 {	SF_PRIVATE 	*psf ;
 
@@ -1505,7 +1505,7 @@ sf_get_string (SNDFILE *sndfile, int str_type)
 	return psf_get_string (psf, str_type) ;
 } /* sf_get_string */
 
-int
+SNDFILE_API int
 sf_set_string (SNDFILE *sndfile, int str_type, const char* str)
 {	SF_PRIVATE 	*psf ;
 
@@ -1517,7 +1517,7 @@ sf_set_string (SNDFILE *sndfile, int str_type, const char* str)
 /*------------------------------------------------------------------------------
 */
 
-int
+SNDFILE_API int
 sf_current_byterate (SNDFILE *sndfile)
 {	SF_PRIVATE 	*psf ;
 
@@ -1561,7 +1561,7 @@ sf_current_byterate (SNDFILE *sndfile)
 /*==============================================================================
 */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_read_raw		(SNDFILE *sndfile, void *ptr, sf_count_t bytes)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count, extra ;
@@ -1613,7 +1613,7 @@ sf_read_raw		(SNDFILE *sndfile, void *ptr, sf_count_t bytes)
 /*------------------------------------------------------------------------------
 */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_read_short	(SNDFILE *sndfile, short *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count, extra ;
@@ -1668,7 +1668,7 @@ sf_read_short	(SNDFILE *sndfile, short *ptr, sf_count_t len)
 	return count ;
 } /* sf_read_short */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_readf_short		(SNDFILE *sndfile, short *ptr, sf_count_t frames)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count, extra ;
@@ -1721,7 +1721,7 @@ sf_readf_short		(SNDFILE *sndfile, short *ptr, sf_count_t frames)
 /*------------------------------------------------------------------------------
 */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_read_int		(SNDFILE *sndfile, int *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count, extra ;
@@ -1776,7 +1776,7 @@ sf_read_int		(SNDFILE *sndfile, int *ptr, sf_count_t len)
 	return count ;
 } /* sf_read_int */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_readf_int	(SNDFILE *sndfile, int *ptr, sf_count_t frames)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count, extra ;
@@ -1829,7 +1829,7 @@ sf_readf_int	(SNDFILE *sndfile, int *ptr, sf_count_t frames)
 /*------------------------------------------------------------------------------
 */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_read_float	(SNDFILE *sndfile, float *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count, extra ;
@@ -1884,7 +1884,7 @@ sf_read_float	(SNDFILE *sndfile, float *ptr, sf_count_t len)
 	return count ;
 } /* sf_read_float */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_readf_float	(SNDFILE *sndfile, float *ptr, sf_count_t frames)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count, extra ;
@@ -1937,7 +1937,7 @@ sf_readf_float	(SNDFILE *sndfile, float *ptr, sf_count_t frames)
 /*------------------------------------------------------------------------------
 */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_read_double	(SNDFILE *sndfile, double *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count, extra ;
@@ -1992,7 +1992,7 @@ sf_read_double	(SNDFILE *sndfile, double *ptr, sf_count_t len)
 	return count ;
 } /* sf_read_double */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_readf_double	(SNDFILE *sndfile, double *ptr, sf_count_t frames)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count, extra ;
@@ -2045,7 +2045,7 @@ sf_readf_double	(SNDFILE *sndfile, double *ptr, sf_count_t frames)
 /*------------------------------------------------------------------------------
 */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_write_raw	(SNDFILE *sndfile, const void *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
@@ -2104,7 +2104,7 @@ sf_write_raw	(SNDFILE *sndfile, const void *ptr, sf_count_t len)
 /*------------------------------------------------------------------------------
 */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_write_short	(SNDFILE *sndfile, const short *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
@@ -2161,7 +2161,7 @@ sf_write_short	(SNDFILE *sndfile, const short *ptr, sf_count_t len)
 	return count ;
 } /* sf_write_short */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_writef_short	(SNDFILE *sndfile, const short *ptr, sf_count_t frames)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
@@ -2216,7 +2216,7 @@ sf_writef_short	(SNDFILE *sndfile, const short *ptr, sf_count_t frames)
 /*------------------------------------------------------------------------------
 */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_write_int	(SNDFILE *sndfile, const int *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
@@ -2273,7 +2273,7 @@ sf_write_int	(SNDFILE *sndfile, const int *ptr, sf_count_t len)
 	return count ;
 } /* sf_write_int */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_writef_int	(SNDFILE *sndfile, const int *ptr, sf_count_t frames)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
@@ -2328,7 +2328,7 @@ sf_writef_int	(SNDFILE *sndfile, const int *ptr, sf_count_t frames)
 /*------------------------------------------------------------------------------
 */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_write_float	(SNDFILE *sndfile, const float *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
@@ -2385,7 +2385,7 @@ sf_write_float	(SNDFILE *sndfile, const float *ptr, sf_count_t len)
 	return count ;
 } /* sf_write_float */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_writef_float	(SNDFILE *sndfile, const float *ptr, sf_count_t frames)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
@@ -2440,7 +2440,7 @@ sf_writef_float	(SNDFILE *sndfile, const float *ptr, sf_count_t frames)
 /*------------------------------------------------------------------------------
 */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t len)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
@@ -2497,7 +2497,7 @@ sf_write_double	(SNDFILE *sndfile, const double *ptr, sf_count_t len)
 	return count ;
 } /* sf_write_double */
 
-sf_count_t
+SNDFILE_API sf_count_t
 sf_writef_double	(SNDFILE *sndfile, const double *ptr, sf_count_t frames)
 {	SF_PRIVATE 	*psf ;
 	sf_count_t	count ;
@@ -3240,7 +3240,7 @@ error_exit :
 ** It doesn't work for W64 because W64 uses weird GUID style chunk markers.
 */
 
-int
+SNDFILE_API int
 sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
 {	SF_PRIVATE 	*psf ;
 
@@ -3255,7 +3255,7 @@ sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
 	return SFE_BAD_CHUNK_FORMAT ;
 } /* sf_set_chunk */
 
-SF_CHUNK_ITERATOR *
+SNDFILE_API SF_CHUNK_ITERATOR *
 sf_get_chunk_iterator (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
 {	SF_PRIVATE 	*psf ;
 
@@ -3267,7 +3267,7 @@ sf_get_chunk_iterator (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info)
 	return psf_get_chunk_iterator (psf, NULL) ;
 } /* sf_get_chunk_iterator */
 
-SF_CHUNK_ITERATOR *
+SNDFILE_API SF_CHUNK_ITERATOR *
 sf_next_chunk_iterator (SF_CHUNK_ITERATOR * iterator)
 {	SF_PRIVATE 	*psf ;
 	SNDFILE	*sndfile = iterator ? iterator->sndfile : NULL ;
@@ -3280,7 +3280,7 @@ sf_next_chunk_iterator (SF_CHUNK_ITERATOR * iterator)
 	return NULL ;
 } /* sf_get_chunk_iterator_next */
 
-int
+SNDFILE_API int
 sf_get_chunk_size (const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info)
 {	SF_PRIVATE 	*psf ;
 	SNDFILE	*sndfile = iterator ? iterator->sndfile : NULL ;
@@ -3297,7 +3297,7 @@ sf_get_chunk_size (const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_inf
 	return 0 ;
 } /* sf_get_chunk_size */
 
-int
+SNDFILE_API int
 sf_get_chunk_data (const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info)
 {	SF_PRIVATE	*psf ;
 	SNDFILE	*sndfile = iterator ? iterator->sndfile : NULL ;
