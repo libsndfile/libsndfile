@@ -239,8 +239,6 @@ set (libalac_SOURCES
 	src/ALAC/alac_encoder.c)
 source_group ("ALAC" FILES ${libalac_SOURCES})
 
-# TODO: Private symbols (Win32 implemented)
-
 # Headers to be installed on target machine
 set (libsndfile_PUBLIC_HEADERS ${include_HEADERS} ${nodist_include_HEADERS})
 set (libsndfile_SOURCES ${COMMON} ${FILESPECIFIC} ${noinst_HEADERS} ${libgsm_SOURCES} ${libg72x_SOURCES} ${libalac_SOURCES} ${libsndfile_PUBLIC_HEADERS})
@@ -279,7 +277,17 @@ if (BUILD_SHARED_LIBS)
 set (SNDFILE_SHARED_TARGET sndfile)
 
 if (WIN32)
+
+add_executable (create_symbols_file src/create_symbols_file.c)
+
+add_custom_command (
+	OUTPUT ${CMAKE_SOURCE_DIR}/src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def
+	COMMENT "Generating ${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def file..."
+	COMMAND create_symbols_file win32 ${PROJECT_VERSION_MAJOR} > ${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src)
+
 list (APPEND libsndfile_SOURCES src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
+
 endif (WIN32)
 
 add_library(${SNDFILE_SHARED_TARGET} SHARED ${libsndfile_SOURCES})
@@ -299,15 +307,27 @@ if (NOT DISABLE_EXTERNAL_LIBS)
 		${SPEEX_INCLUDE_DIRS})
 	endif ()
 endif ()
+
+if (NOT WIN32)
+
 set_target_properties (${SNDFILE_SHARED_TARGET}
 			PROPERTIES
 			SOVERSION ${PROJECT_VERSION_MAJOR}
 			VERSION ${PROJECT_VERSION}
-			PUBLIC_HEADER "${libsndfile_PUBLIC_HEADERS}")
-if (WIN32)
-	set_target_properties(${SNDFILE_SHARED_TARGET} PROPERTIES PREFIX "lib")
-	set_target_properties(${SNDFILE_SHARED_TARGET} PROPERTIES OUTPUT_NAME "sndfile-${PROJECT_VERSION_MAJOR}")
-endif (WIN32)
+			PUBLIC_HEADER "${libsndfile_PUBLIC_HEADERS}"
+			C_VISIBILITY_PRESET hidden
+			CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
+target_compile_definitions (${SNDFILE_SHARED_TARGET}
+	PRIVATE SNDFILE_EXPORTS)
+
+else (WIN32)
+
+set_target_properties(${SNDFILE_SHARED_TARGET} PROPERTIES PREFIX "lib")
+set_target_properties(${SNDFILE_SHARED_TARGET} PROPERTIES OUTPUT_NAME "sndfile-${PROJECT_VERSION_MAJOR}")
+
+endif (NOT WIN32)
+
 target_include_directories (${SNDFILE_SHARED_TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 endif (BUILD_SHARED_LIBS)
