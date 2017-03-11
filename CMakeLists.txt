@@ -8,22 +8,12 @@ project (libsndfile)
 find_program (AUTOGEN autogen)
 find_program (AUTOHEADER autoheader)
 find_program (GREP grep)
-find_program (SED sed)
-find_program (WC wc)
 
 include (CMake/file.cmake)
 
 # Duplicate the autoconf/autoheader functionality.
 
-# Get the version number from configure.ac.
-execute_process (
-	COMMAND ${GREP} ^AC_INIT configure.ac
-	COMMAND ${SED} "s/.*libsndfile[^0-9]*//;s/\\].*//"
-	OUTPUT_VARIABLE LIB_VERSION
-	)
-
-string (STRIP ${LIB_VERSION} LIB_VERSION)
-string (REGEX REPLACE "\\..*" "" LIB_VERSION_MAJOR ${LIB_VERSION})
+lsf_version_majorversion(LIB_VERSION LIB_VERSION_MAJOR)
 
 message (STATUS "libsndfile version : ${LIB_VERSION}")
 
@@ -86,10 +76,10 @@ message (STATUS "C++ compiler : ${CMAKE_CXX_COMPILER_ID}")
 
 #-------------------------------------------------------------------------------
 
-set (PACKAGE \"libsndfile\")
-set (PACKAGE_NAME \"libsndfile\")
-set (VERSION \"${LIB_VERSION}\")
-set (PACKAGE_VERSION \"${LIB_VERSION}\")
+set (PACKAGE "libsndfile")
+set (PACKAGE_NAME "libsndfile")
+set (VERSION "${LIB_VERSION}")
+set (PACKAGE_VERSION "${LIB_VERSION}")
 
 set (BASEPATH "${CMAKE_SOURCE_DIR}")
 
