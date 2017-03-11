@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2009-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2009-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -35,6 +35,7 @@ extern int sf_errno ;
 
 static void copy_filename (SF_PRIVATE * psf, LPCWSTR wpath) ;
 
+SNDFILE_API
 SNDFILE*
 sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo)
 {	SF_PRIVATE 	*psf ;

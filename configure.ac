@@ -83,6 +83,8 @@ else
 AM_CONDITIONAL([LINUX_MINGW_CROSS_TEST],
 	[test "$build_os:$target_os:$host_os:$HAVE_WINE" = "linux-gnu:mingw32msvc:mingw32msvc:yes"])
 
+gl_VISIBILITY
+
 #====================================================================================
 # Couple of initializations here. Fill in real values later.
 

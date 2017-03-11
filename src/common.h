@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -74,6 +74,17 @@
 #else
 #	define WARN_UNUSED
 #endif
+
+/*
+** Visibility control
+*/
+
+#if defined (SNDFILE_EXPORTS) && !defined (_WIN32)
+#	define SNDFILE_API	__attribute__ ((visibility ("default")))
+#else
+#	define SNDFILE_API
+#endif
+
 
 #define	SF_BUFFER_LEN			(8192)
 #define	SF_FILENAME_LEN			(1024)
