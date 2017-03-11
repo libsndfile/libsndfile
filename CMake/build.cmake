@@ -30,6 +30,8 @@ function (lsf_build_src_test_c test_name extra_files)
 		${extra_files}
 		)
 	target_link_libraries (${test_name} m)
+	target_include_directories(${test_name} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/src")
+	target_include_directories(${test_name} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 	set_target_properties (${test_name}
 		PROPERTIES
 		EXCLUDE_FROM_DEFAULT_BUILD TRUE
@@ -42,11 +44,14 @@ function (lsf_build_src_test_c test_name extra_files)
 # Build recipe for building C tests in the tests/ directory.
 function (lsf_build_test_c test_name extra_files)
 	add_executable (${test_name}
-		tests/${test_name}.c
-		tests/utils.c
+		"tests/${test_name}.c"
+		"tests/utils.c"
+		"tests/utils.h"
 		${extra_files}
 		)
 	target_link_libraries (${test_name} sndfile)
+	target_include_directories(${test_name} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/tests")
+	target_include_directories(${test_name} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 	set_target_properties (${test_name}
 		PROPERTIES
 		EXCLUDE_FROM_DEFAULT_BUILD TRUE
@@ -59,10 +64,13 @@ function (lsf_build_test_c test_name extra_files)
 # Build recipe for building C++ tests in the tests/ directory.
 function (lsf_build_test_cc test_name)
 	add_executable (${test_name}
-		tests/utils.c
-		tests/${test_name}.cc
+		"tests/${test_name}.cc"
+		"tests/utils.c"
+		"tests/utils.h"
 		)
 	target_link_libraries (${test_name} sndfile)
+	target_include_directories(${test_name} PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/tests")
+	target_include_directories(${test_name} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 	set_target_properties (${test_name}
 		PROPERTIES
 		EXCLUDE_FROM_DEFAULT_BUILD TRUE
