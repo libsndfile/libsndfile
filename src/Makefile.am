@@ -37,6 +37,9 @@ else
 WIN_VERSION_FILE =
 endif
 
+libsndfile_la_CFLAGS = $(CFLAG_VISIBILITY)
+libsndfile_la_CPPFLAGS = -DSNDFILE_EXPORTS
+
 #===============================================================================
 # MinGW requires -no-undefined if a DLL is to be built.
 libsndfile_la_LDFLAGS = -no-undefined -version-info  $(SHARED_VERSION_INFO) $(SHLIB_VERSION_ARG)
