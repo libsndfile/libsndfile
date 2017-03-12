@@ -17,19 +17,8 @@ message (STATUS "libsndfile version : ${LIB_VERSION}")
 
 assert_line_count_non_zero ("${CMAKE_CURRENT_SOURCE_DIR}/CMake/config.h.cmake")
 
-# Use autogen to generate files if they don't already exist.
-include (CMake/autogen.cmake)
+option(BUILD_TESTS "Build the tests" 1)
 
-lsf_autogen (src test_endswap "c")
-lsf_autogen (tests pcm_test "c")
-lsf_autogen (tests utils "c;h")
-lsf_autogen (tests floating_point_test "c")
-lsf_autogen (tests header_test "c")
-lsf_autogen (tests pipe_test "c")
-lsf_autogen (tests write_read_test "c")
-lsf_autogen (tests scale_clip_test "c")
-lsf_autogen (tests rdwr_test "c")
-lsf_autogen (tests benchmark "c")
 if (DEFINED ENV{CC})
 	set (CMAKE_C_COMPILER $ENV{CC})
 	endif()
@@ -216,6 +205,22 @@ lsf_build_program_extra (sndfile-play asound)
 #-------------------------------------------------------------------------------
 # Tests.
 
+if(BUILD_TESTS)
+
+# Use autogen to generate files if they don't already exist.
+include (CMake/autogen.cmake)
+
+lsf_autogen (src test_endswap "c")
+lsf_autogen (tests pcm_test "c")
+lsf_autogen (tests utils "c;h")
+lsf_autogen (tests floating_point_test "c")
+lsf_autogen (tests header_test "c")
+lsf_autogen (tests pipe_test "c")
+lsf_autogen (tests write_read_test "c")
+lsf_autogen (tests scale_clip_test "c")
+lsf_autogen (tests rdwr_test "c")
+lsf_autogen (tests benchmark "c")
+
 configure_file (tests/test_wrapper.sh.in tests/test_wrapper.sh)
 configure_file (tests/pedantic-header-test.sh.in tests/pedantic-header-test.sh)
 
@@ -291,3 +296,5 @@ lsf_build_test_c (virtual_io_test "")
 lsf_build_test_c (win32_ordinal_test "")
 lsf_build_test_c (win32_test "")
 lsf_build_test_c (write_read_test "tests/generate.c")
+
+endif(BUILD_TESTS)
