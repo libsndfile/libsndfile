@@ -7,8 +7,6 @@ cmake_minimum_required (VERSION 3.1.3)
 # Set software information
 project(libsndfile VERSION 1.0.28)
 
-message ("CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
-
 # Variables
 
 set (CPACK_PACKAGE_VERSION_MAJOR ${${PROJECT_VERSION}_MAJOR})
