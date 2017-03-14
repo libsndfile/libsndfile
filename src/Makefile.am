@@ -13,7 +13,7 @@ noinst_LTLIBRARIES =  GSM610/libgsm.la G72x/libg72x.la ALAC/libalac.la libcommon
 SYMBOL_FILES = Symbols.gnu-binutils Symbols.darwin libsndfile-1.def Symbols.os2 Symbols.static
 
 EXTRA_DIST = sndfile.h.in config.h.in test_endswap.c test_endswap.tpl test_endswap.def \
-			$(SYMBOL_FILES) create_symbols_file binheader_writef_check.py \
+			$(SYMBOL_FILES) create_symbols_file.c binheader_writef_check.py \
 			GSM610/README GSM610/COPYRIGHT GSM610/ChangeLog \
 			G72x/README G72x/README.original G72x/ChangeLog \
 			make-static-lib-hidden-privates.sh
