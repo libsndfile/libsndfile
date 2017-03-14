@@ -18,6 +18,26 @@
 
 /* Some defines that microsoft 'forgot' to implement. */
 
+#ifndef R_OK
+#define R_OK    4       /* Test for read permission.  */
+#endif
+
+#ifndef W_OK
+#define W_OK    2       /* Test for write permission.  */
+#endif
+
+#ifndef X_OK
+#ifdef WIN32
+#define   X_OK		0
+#else
+#define   X_OK    1       /* execute permission - unsupported in windows*/
+#endif
+#endif
+
+#ifndef F_OK
+#define F_OK    0       /* Test for existence.  */
+#endif
+
 #ifndef S_IRWXU
 #define	S_IRWXU 	0000700	/* rwx, owner */
 #endif
