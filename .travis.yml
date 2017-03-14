@@ -1,13 +1,54 @@
+sudo: false
 language: c
 
-sudo: required
-dist: trusty
+matrix:
+  include:
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise
+          packages:
+            - clang-3.6
+            - g++-5
+            - libogg-dev
+            - libvorbis-dev
+            - libflac-dev
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+            - libogg-dev
+            - libvorbis-dev
+            - libflac-dev
+    - os: osx
+      compiler: clang
 
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install -y libogg-dev libflac-dev libvorbis-dev
+  - if [ "$CC"  == "gcc"     ]; then export CC=gcc-5; fi
+  - if [ "$CXX" == "g++"     ]; then export CXX=g++-5; fi
+#- if [ "$CC"  == "clang"   ]; then export CC=clang-3.6; fi
+#- if [ "$CXX" == "clang++" ]; then export CXX=clang++-3.6; fi
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      mkdir ~/cmake_tmp
+      cd ~/cmake_tmp
+      wget --no-check-certificate http://www.cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz -O cmake3.tar.gz
+      tar xf cmake3.tar.gz -C . --strip-components=1
+      export PATH=~/cmake_tmp/bin:$PATH
+      cd -
+    else
+      brew update && brew unlink cmake
+      brew install cmake libogg libvorbis flac
+    fi
 
-script:
-  - ./autogen.sh
-  - ./configure
-  - make distcheck
+install:
+  - true
+
+script: mkdir build && cd build && cmake .. -DBUILD_STATIC_LIBS:BOOL=ON -DBUILD_SHARED_LIBS:BOOL=ON && make
