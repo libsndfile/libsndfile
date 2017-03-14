@@ -35,7 +35,7 @@ extern int sf_errno ;
 
 static void copy_filename (SF_PRIVATE * psf, LPCWSTR wpath) ;
 
-SNDFILE*
+SNDFILE_API SNDFILE*
 sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo)
 {	SF_PRIVATE 	*psf ;
 	char utf8name [512] ;
