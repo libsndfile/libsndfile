@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2006-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2006-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -27,6 +27,10 @@
 
 #include "common.h"
 #include "test_main.h"
+
+#ifndef M_PI
+#define	M_PI 3.14159265358979323846264338
+#endif
 
 void
 test_float_convert (void)
