@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -82,6 +82,8 @@ error_value_test (void)
 	print_test_name ("error_value_test", filename) ;
 
 	dump_data_to_file (filename, aiff_data, sizeof (aiff_data)) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	file = sf_open (filename, SFM_READ, &sfinfo) ;
 	if (file != NULL)
