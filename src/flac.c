@@ -68,9 +68,9 @@ typedef struct
 	unsigned bufferpos ;
 
 	const FLAC__Frame *frame ;
-	FLAC__bool bufferbackup ;
 
 	unsigned compression ;
+
 } FLAC_PRIVATE ;
 
 typedef struct
@@ -187,10 +187,9 @@ flac_buffer_copy (SF_PRIVATE *psf)
 
 	if (pflac->ptr == NULL)
 	{	/*
-		**	Not sure why this code is here and not elsewhere.
-		**	Removing it causes valgrind errors.
+		** This pointer is reset to NULL each time the current frame has been
+		** decoded. Somehow its used during encoding and decoding.
 		*/
-		pflac->bufferbackup = SF_TRUE ;
 		for (i = 0 ; i < channels ; i++)
 		{
 			if (pflac->rbuffer [i] == NULL)
@@ -205,6 +204,11 @@ flac_buffer_copy (SF_PRIVATE *psf)
 
 
 	len = SF_MIN (pflac->len, frame->header.blocksize) ;
+
+	if (pflac->remain % channels != 0)
+	{	psf_log_printf (psf, "Error: pflac->remain %u    channels %u\n", pflac->remain, channels) ;
+		return 0 ;
+		} ;
 
 	switch (pflac->pcmtype)
 	{	case PFLAC_PCM_SHORT :
@@ -381,7 +385,6 @@ sf_flac_write_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC
 	pflac->frame = frame ;
 	pflac->bufferpos = 0 ;
 
-	pflac->bufferbackup = SF_FALSE ;
 	pflac->wbuffer = buffer ;
 
 	flac_buffer_copy (psf) ;
@@ -907,10 +910,18 @@ flac_init (SF_PRIVATE *psf)
 static unsigned
 flac_read_loop (SF_PRIVATE *psf, unsigned len)
 {	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->codec_data ;
+	FLAC__StreamDecoderState state ;
 
 	pflac->pos = 0 ;
 	pflac->len = len ;
 	pflac->remain = len ;
+
+	state = FLAC__stream_decoder_get_state (pflac->fsd) ;
+	if (state > FLAC__STREAM_DECODER_END_OF_STREAM)
+	{	psf_log_printf (psf, "FLAC__stream_decoder_get_state returned %s\n", FLAC__StreamDecoderStateString [state]) ;
+		/* Current frame is busted, so NULL the pointer. */
+		pflac->frame = NULL ;
+		} ;
 
 	/* First copy data that has already been decoded and buffered. */
 	if (pflac->frame != NULL && pflac->bufferpos < pflac->frame->header.blocksize)
@@ -920,8 +931,13 @@ flac_read_loop (SF_PRIVATE *psf, unsigned len)
 	while (pflac->pos < pflac->len)
 	{	if (FLAC__stream_decoder_process_single (pflac->fsd) == 0)
 			break ;
-		if (FLAC__stream_decoder_get_state (pflac->fsd) >= FLAC__STREAM_DECODER_END_OF_STREAM)
+		state = FLAC__stream_decoder_get_state (pflac->fsd) ;
+		if (state >= FLAC__STREAM_DECODER_END_OF_STREAM)
+		{	psf_log_printf (psf, "FLAC__stream_decoder_get_state returned %s\n", FLAC__StreamDecoderStateString [state]) ;
+			/* Current frame is busted, so NULL the pointer. */
+			pflac->frame = NULL ;
 			break ;
+			} ;
 		} ;
 
 	pflac->ptr = NULL ;
