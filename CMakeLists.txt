@@ -5,7 +5,6 @@ cmake_minimum_required (VERSION 3.0.0)
 project (libsndfile)
 
 # We may need these programs so detect them now.
-find_program (AUTOGEN autogen)
 
 include (CMake/file.cmake)
 
@@ -208,7 +207,16 @@ lsf_build_program_extra (sndfile-play asound)
 if(BUILD_TESTS)
 
 # Use autogen to generate files if they don't already exist.
-include (CMake/autogen.cmake)
+include(CMake/CMakeAutoGen.cmake)
+
+function(lsf_autogen DIR NAME_WE EXTS)
+    set(INPUT "${DIR}/${NAME_WE}.def")
+    set(OUTPUTS)
+    foreach(EXT ${EXTS})
+        list(APPEND OUTPUTS "${NAME_WE}.${EXT}")
+    endforeach()
+    add_autogen_target("${INPUT}" "${DIR}" ${OUTPUTS})
+endfunction()
 
 lsf_autogen (src test_endswap "c")
 lsf_autogen (tests pcm_test "c")
