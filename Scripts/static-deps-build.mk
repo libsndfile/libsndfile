@@ -6,11 +6,11 @@
 ogg_version = libogg-1.3.2
 ogg_md5sum = 5c3a34309d8b98640827e5d0991a4015
 
-vorbis_version = libvorbis-1.3.4
-vorbis_md5sum = 55f2288055e44754275a17c9a2497391
+vorbis_version = libvorbis-1.3.5
+vorbis_md5sum = 28cb28097c07a735d6af56e598e1c90f
 
-flac_version = flac-1.3.1
-flac_md5sum = b9922c9a0378c88d3e901b234f852698
+flac_version = flac-1.3.2
+flac_md5sum = 454f1bfa3f93cc708098d7890d0499bd
 
 #-------------------------------------------------------------------------------
 # Code follows.
