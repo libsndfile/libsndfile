@@ -140,9 +140,9 @@ AC_ARG_ENABLE(test-coverage,
 	AS_HELP_STRING([--enable-test-coverage], [enable test coverage]))
 AM_CONDITIONAL([ENABLE_TEST_COVERAGE], [test "$enable_test_coverage" = yes])
 
-#====================================================================================
-# Check types and their sizes.
+# Checks for typedefs, structures, and compiler characteristics.
 
+AC_C_INLINE
 AC_CHECK_SIZEOF(wchar_t,4)
 AC_CHECK_SIZEOF(short,2)
 AC_CHECK_SIZEOF(int,4)
@@ -637,7 +637,7 @@ AC_SUBST(LIBTOOL_DEPS)
 AC_CONFIG_FILES([ \
 	src/Makefile man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
 	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile programs/Makefile \
-	Makefile \
+	Makefile cmake/Makefile \
 	src/version-metadata.rc tests/test_wrapper.sh tests/pedantic-header-test.sh \
 	doc/libsndfile.css Scripts/build-test-tarball.mk libsndfile.spec sndfile.pc \
 	src/sndfile.h \

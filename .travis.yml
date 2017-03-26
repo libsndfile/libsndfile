@@ -1,13 +1,64 @@
+sudo: false
 language: c
 
-sudo: required
-dist: trusty
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise
+          packages:
+            - autogen
+            - clang-3.6
+            - gcc
+            - g++
+            - libogg-dev
+            - libvorbis-dev
+            - libflac-dev
+            - libasound2-dev
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - autogen
+            - g++-5
+            - libogg-dev
+            - libvorbis-dev
+            - libflac-dev
+            - libasound2-dev
+    - os: osx
+      compiler: clang
 
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install -y libogg-dev libflac-dev libvorbis-dev
+  - if [ "$CC"  == "gcc"     ]; then export CC=gcc; fi
+  - if [ "$CXX" == "g++"     ]; then export CXX=g++; fi
+#- if [ "$CC"  == "clang"   ]; then export CC=clang-3.6; fi
+#- if [ "$CXX" == "clang++" ]; then export CXX=clang++-3.6; fi
+  - |
+    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
+      mkdir ~/cmake_tmp
+      cd ~/cmake_tmp
+      wget --no-check-certificate http://www.cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz -O cmake3.tar.gz
+      tar xf cmake3.tar.gz -C . --strip-components=1
+      export PATH=~/cmake_tmp/bin:$PATH
+      cd -
+    else
+      brew install autogen flac libogg libvorbis
+    fi
+
+install:
+  - true
 
 script:
-  - ./autogen.sh
-  - ./configure
-  - make distcheck
+  - mkdir cmake-build && (cd cmake-build && cmake .. -DCMAKE_BUILD_TYPE=Release && make VERBOSE=1 && ctest -V)
+  - pwd
+  - ./autogen.sh  
+  - ./configure --enable-werror && make clean all check

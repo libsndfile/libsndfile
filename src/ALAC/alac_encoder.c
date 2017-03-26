@@ -23,6 +23,10 @@
 	File:		ALACEncoder.cpp
 */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 // build stuff
 #define VERBOSE_DEBUG		0
 #define DebugMsg			printf
