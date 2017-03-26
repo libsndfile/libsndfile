@@ -23,6 +23,10 @@
 #include <string.h>
 #include <errno.h>
 
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 #include <sndfile.h>
 
 #include "utils.h"
@@ -159,6 +163,7 @@ flac_subset_test (void)
 	SF_INFO	sfinfo ;
 	sf_count_t rc ;
 	int		samplerate ;
+	const char *filename = "subset_test.flac" ;
 
 	/* For some formats (like FLAC) the headers are written *just* before the
 	** first bit of audio data. This test makes sure errors in that process
@@ -173,8 +178,9 @@ flac_subset_test (void)
 		sfinfo.frames		= 0 ;
 		sfinfo.format = SF_FORMAT_FLAC | SF_FORMAT_PCM_16 ;
 
-		file = test_open_file_or_die ("/tmp/test.flac", SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+		file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 		rc = sf_write_float (file, whatever, ARRAY_LEN (whatever)) ;
+		unlink (filename) ;
 		exit_if_true (rc != 0, "\n\nLine %d : return code (%d) should be 0.\n\n", __LINE__, (int) rc) ;
 
 		sf_close (file) ;
