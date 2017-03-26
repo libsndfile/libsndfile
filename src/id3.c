@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2010-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2010-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -48,9 +48,11 @@ id3_skip (SF_PRIVATE * psf)
 
 		/* Calculate new file offset and position ourselves there. */
 		psf->fileoffset += offset + 10 ;
-		psf_binheader_readf (psf, "p", psf->fileoffset) ;
 
-		return 1 ;
+		if (psf->fileoffset < psf->filelength)
+		{	psf_binheader_readf (psf, "p", psf->fileoffset) ;
+			return 1 ;
+			} ;
 		} ;
 
 	return 0 ;
