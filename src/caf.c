@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2005-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2005-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -537,7 +537,6 @@ caf_read_header (SF_PRIVATE *psf)
 
 			default :
 				psf_log_printf (psf, "%M : %D (skipped)\n", marker, chunk_size) ;
-psf_log_printf (psf, "position : %d\n", (int) psf_ftell (psf)) ;
 				psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
 				break ;
 			} ;
@@ -580,7 +579,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 {	BUF_UNION	ubuf ;
 	CAF_PRIVATE	*pcaf ;
 	DESC_CHUNK desc ;
-	sf_count_t current, free_len ;
+	sf_count_t current ;
 	uint32_t uk ;
 	int subformat, append_free_block = SF_TRUE ;
 
@@ -742,10 +741,10 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 
 	if (append_free_block)
 	{	/* Add free chunk so that the actual audio data starts at a multiple 0x1000. */
-		free_len = 0x1000 - psf->header.indx - 16 - 12 ;
+		sf_count_t free_len = 0x1000 - psf->header.indx - 16 - 12 ;
 		while (free_len < 0)
 			free_len += 0x1000 ;
-		psf_binheader_writef (psf, "Em8z", free_MARKER, free_len, (int) free_len) ;
+		psf_binheader_writef (psf, "Em8z", free_MARKER, free_len, make_size_t (free_len)) ;
 		} ;
 
 	psf_binheader_writef (psf, "Em84", data_MARKER, psf->datalength + 4, 0) ;
