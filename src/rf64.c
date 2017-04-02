@@ -749,7 +749,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 		return psf->error ;
 
 	if (has_data && psf->dataoffset != psf->header.indx)
-	{	printf ("Oooops : has_data && psf->dataoffset != psf->header.indx\n") ;
+	{	psf_log_printf (psf, "Oooops : has_data && psf->dataoffset != psf->header.indx\n") ;
 		return psf->error = SFE_INTERNAL ;
 		} ;
 
