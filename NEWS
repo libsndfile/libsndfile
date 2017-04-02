@@ -1,9 +1,17 @@
+Version 1.0.28 (2017-04-02)
+  * Fix buffer overruns in FLAC and ID3 handling code.
+  * Move to variable length header storage.
+  * Fix detection of Large File Support for 32 bit systems.
+  * Remove large stack allocations in ALAC handling code.
+  * Remove all use of Variable Length Arrays.
+  * Minor bug fixes and improvements.
+
 Version 1.0.27 (2016-06-19)
   * Fix an SF_INFO seekable flag regression introduced in 1.0.26.
   * Fix potential infinite loops on malformed input files.
   * Add string metadata read/write for CAF and RF64.
   * Add handling of CUE chunks.
-  * Fix enaian-ness issues in PAF files.
+  * Fix endian-ness issues in PAF files.
   * Minor bug fixes and improvements.
 
 Version 1.0.26 (2015-11-22)

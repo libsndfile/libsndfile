@@ -6,7 +6,7 @@
 	libsndfile
 	</TITLE>
 	<META NAME="Author"      CONTENT="Erik de Castro Lopo (erikd AT mega-nerd DOT com)">
-    <META NAME="Version"     CONTENT="libsndfile-1.0.27">
+    <META NAME="Version"     CONTENT="libsndfile-1.0.28">
 	<META NAME="Description" CONTENT="The libsndfile Home Page">
 	<META NAME="Keywords"    CONTENT="WAV AIFF AU SVX PAF NIST W64 libsndfile sound audio dsp Linux">
 	<META NAME="ROBOTS" 	 CONTENT="NOFOLLOW">
@@ -372,6 +372,8 @@ and
 				Add ALAC/CAF support. Minor bug fixes and improvements.
 	<LI>Version 1.0.27 (June 19 2016) Fix a seek regression in 1.0.26. Add metadata read/write
 				for CAF and RF64. FIx PAF endian-ness issue.
+	<LI>Version 1.0.28 (April 2 2017) Fix buffer overruns in FLAC and ID3 handling code. Reduce default
+				header memory requirements. Fix detection of Large File Support for 32 bit systems.
 	</UL>
 
 <A NAME="Similar"></A>
@@ -433,17 +435,26 @@ and
 </P>
 	<UL>
 	<LI>Source code as a .tar.gz :
-			<A HREF="files/libsndfile-1.0.27.tar.gz">libsndfile-1.0.27.tar.gz</A>.
+			<A HREF="files/libsndfile-1.0.28.tar.gz">libsndfile-1.0.28.tar.gz</A>
+			and
+			<A HREF="files/libsndfile-1.0.28.tar.gz.asc">GPG signature</A>.
 	<LI>Win32 installer:
-			<A HREF="files/libsndfile-1.0.27-w32-setup.exe">
-			libsndfile-1.0.27-w32-setup.exe</A> (thoroughly tested under
-			<a href="http://www.winehq.com/">Wine</a> and Windows XP).
+			<A HREF="files/libsndfile-1.0.28-w32-setup.exe">
+			libsndfile-1.0.28-w32-setup.exe</A> (thoroughly tested under
+			<a href="http://www.winehq.com/">Wine</a>)
+			and
+			<A HREF="files/libsndfile-1.0.28-w32-setup.exe.asc">GPG signature</A>.
 	<LI>Win64 installer:
-			<A HREF="files/libsndfile-1.0.27-w64-setup.exe">
-			libsndfile-1.0.27-w64-setup.exe</A>
-			(thoroughly tested on 64 bit Windows 7).
+			<A HREF="files/libsndfile-1.0.28-w64-setup.exe">
+			libsndfile-1.0.28-w64-setup.exe</A> (thoroughly tested under
+			<a href="http://www.winehq.com/">Wine</a>)
+			and
+			<A HREF="files/libsndfile-1.0.28-w64-setup.exe.asc">GPG signature</A>.
 	</UL>
-
+<P>
+    The GPG signature can be validated at
+		<A HREF="https://keybase.io/erikd/">Keybase.IO</A>.
+</P>
 <P>
 The Win32 installer should work on Windows Vista or later.
 </p>
