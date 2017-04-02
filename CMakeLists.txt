@@ -5,71 +5,18 @@ cmake_minimum_required (VERSION 3.0.0)
 project (libsndfile)
 
 # We may need these programs so detect them now.
-find_program (AUTOGEN autogen)
-find_program (AUTOHEADER autoheader)
-find_program (GREP grep)
-find_program (SED sed)
-find_program (WC wc)
 
 include (CMake/file.cmake)
 
 # Duplicate the autoconf/autoheader functionality.
 
-# Get the version number from configure.ac.
-execute_process (
-	COMMAND ${GREP} ^AC_INIT configure.ac
-	COMMAND ${SED} "s/.*libsndfile[^0-9]*//;s/\\].*//"
-	OUTPUT_VARIABLE LIB_VERSION
-	)
-
-string (STRIP ${LIB_VERSION} LIB_VERSION)
-string (REGEX REPLACE "\\..*" "" LIB_VERSION_MAJOR ${LIB_VERSION})
+lsf_version_majorversion(LIB_VERSION LIB_VERSION_MAJOR)
 
 message (STATUS "libsndfile version : ${LIB_VERSION}")
 
-# Generate config.h.in if it does not already exist.
-if (NOT (EXISTS "${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in"))
-	if (NOT AUTOHEADER)
-		message (FATAL_ERROR "Need autoheader (part of GNU autoconf) to proceed.")
-		endif ()
+assert_line_count_non_zero ("${CMAKE_CURRENT_SOURCE_DIR}/CMake/config.h.cmake")
 
-	message (STATUS "Running autoheader to create src/config.h.in")
-	execute_process (COMMAND ${AUTOHEADER} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-
-	assert_line_count_non_zero ("${CMAKE_SOURCE_DIR}/src/config.h.in")
-
-	message (STATUS "Post processing src/config.h.in")
-	execute_process (
-		COMMAND ${SED} -E "s/undef([ \\t]+)([a-zA-Z0-8_]+)/define\\1\\2\\1@\\2@/" src/config.h.in
-		COMMAND ${SED} "s/.*_FILE_OFFSET_BITS.*//"
-		OUTPUT_FILE ${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-		)
-
-	execute_process (
-		COMMAND ${GREP} -c undef ${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in
-		OUTPUT_VARIABLE undef_count
-		)
-
-	if (${undef_count} GREATER 0)
-		message (FATAL_ERROR "CMake processing of CMakeFIles/config.h.in has failed.")
-		endif ()
-	endif ()
-
-assert_line_count_non_zero ("${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in")
-
-# Use autogen to generate files if they don't already exist.
-include (CMake/autogen.cmake)
-lsf_autogen (src test_endswap)
-lsf_autogen (tests pcm_test)
-lsf_autogen (tests utils)
-lsf_autogen (tests floating_point_test)
-lsf_autogen (tests header_test)
-lsf_autogen (tests pipe_test)
-lsf_autogen (tests write_read_test)
-lsf_autogen (tests scale_clip_test)
-lsf_autogen (tests rdwr_test)
-lsf_autogen (tests benchmark)
+option(BUILD_TESTS "Build the tests" 1)
 
 if (DEFINED ENV{CC})
 	set (CMAKE_C_COMPILER $ENV{CC})
@@ -86,12 +33,10 @@ message (STATUS "C++ compiler : ${CMAKE_CXX_COMPILER_ID}")
 
 #-------------------------------------------------------------------------------
 
-set (PACKAGE \"libsndfile\")
-set (PACKAGE_NAME \"libsndfile\")
-set (VERSION \"${LIB_VERSION}\")
-set (PACKAGE_VERSION \"${LIB_VERSION}\")
-
-set (BASEPATH "${CMAKE_SOURCE_DIR}")
+set (PACKAGE "libsndfile")
+set (PACKAGE_NAME "libsndfile")
+set (VERSION "${LIB_VERSION}")
+set (PACKAGE_VERSION "${LIB_VERSION}")
 
 include (CMake/build.cmake)
 include (CMake/external_libs.cmake)
@@ -128,8 +73,8 @@ find_external_xiph_libs (HAVE_EXTERNAL_XIPH_LIBS EXTERNAL_XIPH_CFLAGS EXTERNAL_X
 #-------------------------------------------------------------------------------
 # Project definitions follow.
 
-configure_file (${CMAKE_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_SOURCE_DIR}/src/sndfile.h)
-configure_file (${CMAKE_SOURCE_DIR}/CMakeFiles/config.h.in ${CMAKE_SOURCE_DIR}/src/config.h)
+configure_file (src/sndfile.h.in src/sndfile.h)
+configure_file (CMake/config.h.cmake src/config.h)
 
 include_directories (src)
 
@@ -232,13 +177,14 @@ add_library (sndfile SHARED
 	${libsndfile_sources}
 	)
 
+target_include_directories(sndfile PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/src")
 target_link_libraries (sndfile LINK_PRIVATE ${EXTERNAL_XIPH_LIBS} LINK_PUBLIC m)
 
 set_target_properties (sndfile
 	PROPERTIES
 	VERSION ${LIB_VERSION}
 	SOVERSION ${LIB_VERSION_MAJOR}
-	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/src
+	LIBRARY_OUTPUT_DIRECTORY src
 	)
 
 #-------------------------------------------------------------------------------
@@ -258,12 +204,37 @@ lsf_build_program_extra (sndfile-play asound)
 #-------------------------------------------------------------------------------
 # Tests.
 
-configure_file (${CMAKE_SOURCE_DIR}/tests/test_wrapper.sh.in ${CMAKE_SOURCE_DIR}/tests/test_wrapper.sh)
-configure_file (${CMAKE_SOURCE_DIR}/tests/pedantic-header-test.sh.in ${CMAKE_SOURCE_DIR}/tests/pedantic-header-test.sh)
+if(BUILD_TESTS)
+
+# Use autogen to generate files if they don't already exist.
+include(CMake/CMakeAutoGen.cmake)
+
+function(lsf_autogen DIR NAME_WE EXTS)
+    set(INPUT "${DIR}/${NAME_WE}.def")
+    set(OUTPUTS)
+    foreach(EXT ${EXTS})
+        list(APPEND OUTPUTS "${NAME_WE}.${EXT}")
+    endforeach()
+    add_autogen_target("${INPUT}" "${DIR}" ${OUTPUTS})
+endfunction()
+
+lsf_autogen (src test_endswap "c")
+lsf_autogen (tests pcm_test "c")
+lsf_autogen (tests utils "c;h")
+lsf_autogen (tests floating_point_test "c")
+lsf_autogen (tests header_test "c")
+lsf_autogen (tests pipe_test "c")
+lsf_autogen (tests write_read_test "c")
+lsf_autogen (tests scale_clip_test "c")
+lsf_autogen (tests rdwr_test "c")
+lsf_autogen (tests benchmark "c")
+
+configure_file (tests/test_wrapper.sh.in tests/test_wrapper.sh)
+configure_file (tests/pedantic-header-test.sh.in tests/pedantic-header-test.sh)
 
 add_custom_target (check
 	COMMAND src/test_main && bash tests/test_wrapper.sh
-	DEPENDS src/test_main tests/test_wrapper.sh
+	DEPENDS test_main "${CMAKE_CURRENT_BINARY_DIR}/tests/test_wrapper.sh"
 	)
 
 # Tests from the src/ directory.
@@ -276,6 +247,7 @@ set (src_test_sources
 	src/file_io.c
 	src/float32.c
 	src/test_audio_detect.c
+	src/test_binheader_writef.c
 	src/test_broadcast_var.c
 	src/test_cart_var.c
 	src/test_conversions.c
@@ -332,3 +304,5 @@ lsf_build_test_c (virtual_io_test "")
 lsf_build_test_c (win32_ordinal_test "")
 lsf_build_test_c (win32_test "")
 lsf_build_test_c (write_read_test "tests/generate.c")
+
+endif(BUILD_TESTS)
