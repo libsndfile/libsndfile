@@ -3,7 +3,7 @@
 dnl Require autoconf version
 AC_PREREQ(2.57)
 
-AC_INIT([libsndfile],[1.0.28],[sndfile@mega-nerd.com],
+AC_INIT([libsndfile],[1.0.29pre1],[sndfile@mega-nerd.com],
 		[libsndfile],[http://www.mega-nerd.com/libsndfile/])
 
 # Put config stuff in Cfg.
@@ -504,6 +504,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	MN_ADD_CFLAGS([-Wextra])
 	MN_ADD_CFLAGS([-Wdeclaration-after-statement])
 	MN_ADD_CFLAGS([-Wpointer-arith])
+	MN_ADD_CFLAGS([-Wvla])
 
 	AC_LANG_PUSH([C++])
 	MN_ADD_CXXFLAGS([-Wextra])
@@ -528,7 +529,7 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 	common_flags="-Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wundef -Wuninitialized -Winit-self"
 
 	# -Winline -Wconversion "
-	CFLAGS="$CFLAGS     $common_flags -Wbad-function-cast -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return -Wvla"
+	CFLAGS="$CFLAGS     $common_flags -Wbad-function-cast -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return"
 	CXXFLAGS="$CXXFLAGS $common_flags -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo"
 
 	if test "x$enable_gcc_opt" = "xno" ; then
