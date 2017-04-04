@@ -2,8 +2,6 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-AM_CPPFLAGS = $(EXTERNAL_XIPH_CFLAGS)
-
 lib_LTLIBRARIES = libsndfile.la
 include_HEADERS = sndfile.hh
 nodist_include_HEADERS = sndfile.h
@@ -35,7 +33,7 @@ else
 WIN_VERSION_FILE =
 endif
 
-libsndfile_la_CFLAGS = $(CFLAG_VISIBILITY)
+libsndfile_la_CFLAGS = $(CFLAG_VISIBILITY) $(EXTERNAL_XIPH_CFLAGS)
 libsndfile_la_CPPFLAGS = -DSNDFILE_EXPORTS
 
 #===============================================================================
