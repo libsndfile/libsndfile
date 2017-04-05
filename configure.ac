@@ -631,10 +631,6 @@ AC_SUBST(EXTERNAL_XIPH_LIBS)
 AC_SUBST(SRC_BINDIR)
 AC_SUBST(TEST_BINDIR)
 
-dnl The following line causes the libtool distributed with the source
-dnl to be replaced if the build system has a more recent version.
-AC_SUBST(LIBTOOL_DEPS)
-
 AC_CONFIG_FILES([ \
 	src/Makefile man/Makefile examples/Makefile tests/Makefile regtest/Makefile \
 	M4/Makefile doc/Makefile Win32/Makefile Octave/Makefile programs/Makefile \
