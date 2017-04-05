@@ -96,7 +96,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_BAD_BROADCAST_INFO_TOO_BIG
 								, "Error : SF_BROADCAST_INFO struct too large." },
 	{	SFE_BAD_CART_INFO_SIZE				, "Error: SF_CART_INFO struct too large." },
-	{	SFE_BAD_CART_INFO_TOO_BIG			, "Error: bag tag_text_size in SF_CART_INFO struct." },
+	{	SFE_BAD_CART_INFO_TOO_BIG			, "Error: bad tag_text_size in SF_CART_INFO struct." },
 	{	SFE_INTERLEAVE_MODE		, "Attempt to write to file with non-interleaved data." },
 	{	SFE_INTERLEAVE_SEEK		, "Bad karma in seek during interleave read operation." },
 	{	SFE_INTERLEAVE_READ		, "Bad karma in read during interleave read operation." },
