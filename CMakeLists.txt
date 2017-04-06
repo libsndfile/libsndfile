@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.1.3)
 
-project(libsndfile VERSION 1.0.28)
+project(libsndfile VERSION 1.0.29)
 
 #
 # Variables
