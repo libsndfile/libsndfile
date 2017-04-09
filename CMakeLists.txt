@@ -492,7 +492,7 @@ set (html_DATA
 	doc/embedded_files.html
 	doc/octave.html
 	doc/tutorial.html)
-install (FILES ${html_DATA} DESTINATION ${CMAKE_INSTALL_DOCDIR}/${PROJECT_NAME})
+install (FILES ${html_DATA} DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
