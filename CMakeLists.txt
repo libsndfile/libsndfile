@@ -441,13 +441,23 @@ set (sndfile_salvage_SOURCES
 add_executable (sndfile-salvage ${sndfile_salvage_SOURCES})
 target_link_libraries(sndfile-salvage PUBLIC ${SNDFILE_TARGET})
 
-# sndfile-play-beos
+set (sdnfile_PROGRAMS
+	sndfile-info
+	sndfile-play
+	sndfile-convert
+	sndfile-cmp
+	sndfile-metadata-set
+	sndfile-metadata-get
+	sndfile-interleave
+	sndfile-deinterleave
+	sndfile-concat
+	sndfile-salvage)
 
 #
 # Installation
 #
 
-install (TARGETS ${SNDFILE_STATIC_TARGET} ${SNDFILE_SHARED_TARGET} ${PROGRAMS}
+install (TARGETS ${SNDFILE_STATIC_TARGET} ${SNDFILE_SHARED_TARGET} ${sdnfile_PROGRAMS}
 	RUNTIME DESTINATION			${CMAKE_INSTALL_BINDIR}
 	LIBRARY DESTINATION			${CMAKE_INSTALL_LIBDIR}
 	ARCHIVE DESTINATION			${CMAKE_INSTALL_LIBDIR}
