@@ -28,6 +28,7 @@ include (FeatureSummary)
 
 option (BUILD_STATIC_LIBS "Build static libraries" ON)
 option (BUILD_SHARED_LIBS "Build shared libraries" ON)
+option (BUILD_PROGRAMS "Build programs" ON)
 option (DISABLE_EXTERNAL_LIBS "Disable use of FLAC, Ogg and Vorbis" OFF)
 option (ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
 option (DISABLE_CPU_CLIP "Disable tricky cpu specific clipper" OFF)
@@ -331,127 +332,131 @@ else (NOT BUILD_SHARED_LIBS)
 	set (SNDFILE_TARGET ${SNDFILE_STATIC_TARGET})
 endif (BUILD_SHARED_LIBS)
 
+if (BUILD_PROGRAMS)
+
 # sndfile-info
 
-set (sndfile_info_SOURCES
-	programs/sndfile-info.c
-	programs/common.c
-	programs/common.h)
-add_executable (sndfile-info ${sndfile_info_SOURCES})
-target_link_libraries(sndfile-info PUBLIC ${SNDFILE_TARGET})
-if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
-	target_link_libraries(sndfile-info PRIVATE ${M_LIBRARY})
-endif ()
+	set (sndfile_info_SOURCES
+		programs/sndfile-info.c
+		programs/common.c
+		programs/common.h)
+	add_executable (sndfile-info ${sndfile_info_SOURCES})
+	target_link_libraries(sndfile-info PUBLIC ${SNDFILE_TARGET})
+	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+		target_link_libraries(sndfile-info PRIVATE ${M_LIBRARY})
+	endif ()
 
 # sndfile-play
 
-if (NOT BEOS)
-	set (sndfile_play_SOURCES
-		programs/sndfile-play.c
-		programs/common.c
-		programs/common.h)
-else ()
-	set (sndfile_play_SOURCES
-		programs/sndfile-play-beos.cpp)
-endif ()
+	if (NOT BEOS)
+		set (sndfile_play_SOURCES
+			programs/sndfile-play.c
+			programs/common.c
+			programs/common.h)
+	else ()
+		set (sndfile_play_SOURCES
+			programs/sndfile-play-beos.cpp)
+	endif ()
 
-add_executable (sndfile-play ${sndfile_play_SOURCES})
-target_link_libraries(sndfile-play PUBLIC ${SNDFILE_TARGET})
-if (WIN32)
-	target_link_libraries(sndfile-play PRIVATE Winmm.lib)
-# Maybe ALSA & Sndio are present in BeOS. They are not required
-# so skip them anyway.
-elseif ((NOT BEOS) AND ALSA_FOUND)
-	target_include_directories (sndfile-play PRIVATE ${ALSA_INCLUDE_DIRS})
-	target_link_libraries(sndfile-play PRIVATE ${ALSA_LIBRARIES})
-elseif ((NOT BEOS) AND Sndio_FOUND)
-	target_include_directories (sndfile-play PRIVATE ${Sndio_INCLUDE_DIRS})
-	target_link_libraries(sndfile-play PRIVATE ${Sndio_LIBRARIES})
-endif ()
+	add_executable (sndfile-play ${sndfile_play_SOURCES})
+	target_link_libraries(sndfile-play PUBLIC ${SNDFILE_TARGET})
+	if (WIN32)
+		target_link_libraries(sndfile-play PRIVATE Winmm.lib)
+	# Maybe ALSA & Sndio are present in BeOS. They are not required
+	# so skip them anyway.
+	elseif ((NOT BEOS) AND ALSA_FOUND)
+		target_include_directories (sndfile-play PRIVATE ${ALSA_INCLUDE_DIRS})
+		target_link_libraries(sndfile-play PRIVATE ${ALSA_LIBRARIES})
+	elseif ((NOT BEOS) AND Sndio_FOUND)
+		target_include_directories (sndfile-play PRIVATE ${Sndio_INCLUDE_DIRS})
+		target_link_libraries(sndfile-play PRIVATE ${Sndio_LIBRARIES})
+	endif ()
 
 # sndfile-convert
 
-set (sndfile_convert_SOURCES
-	programs/sndfile-convert.c
-	programs/common.c
-	programs/common.h)
-add_executable (sndfile-convert ${sndfile_convert_SOURCES})
-target_link_libraries(sndfile-convert PUBLIC ${SNDFILE_TARGET})
+	set (sndfile_convert_SOURCES
+		programs/sndfile-convert.c
+		programs/common.c
+		programs/common.h)
+	add_executable (sndfile-convert ${sndfile_convert_SOURCES})
+	target_link_libraries(sndfile-convert PUBLIC ${SNDFILE_TARGET})
 
 # sndfile-cmp
 
-set (sndfile_cmp_SOURCES
-	programs/sndfile-cmp.c
-	programs/common.c
-	programs/common.h)
-add_executable (sndfile-cmp ${sndfile_cmp_SOURCES})
-target_link_libraries(sndfile-cmp PUBLIC ${SNDFILE_TARGET})
+	set (sndfile_cmp_SOURCES
+		programs/sndfile-cmp.c
+		programs/common.c
+		programs/common.h)
+	add_executable (sndfile-cmp ${sndfile_cmp_SOURCES})
+	target_link_libraries(sndfile-cmp PUBLIC ${SNDFILE_TARGET})
 
 # sndfile-metadata-set
 
-set (sndfile_metadata_set_SOURCES
-	programs/sndfile-metadata-set.c
-	programs/common.c
-	programs/common.h)
-add_executable (sndfile-metadata-set ${sndfile_metadata_set_SOURCES})
-target_link_libraries(sndfile-metadata-set PUBLIC ${SNDFILE_TARGET})
+	set (sndfile_metadata_set_SOURCES
+		programs/sndfile-metadata-set.c
+		programs/common.c
+		programs/common.h)
+	add_executable (sndfile-metadata-set ${sndfile_metadata_set_SOURCES})
+	target_link_libraries(sndfile-metadata-set PUBLIC ${SNDFILE_TARGET})
 
 # sndfile-metadata-get
 
-set (sndfile_metadata_get_SOURCES
-	programs/sndfile-metadata-get.c
-	programs/common.c
-	programs/common.h)
-add_executable (sndfile-metadata-get ${sndfile_metadata_get_SOURCES})
-target_link_libraries(sndfile-metadata-get PUBLIC ${SNDFILE_TARGET})
+	set (sndfile_metadata_get_SOURCES
+		programs/sndfile-metadata-get.c
+		programs/common.c
+		programs/common.h)
+	add_executable (sndfile-metadata-get ${sndfile_metadata_get_SOURCES})
+	target_link_libraries(sndfile-metadata-get PUBLIC ${SNDFILE_TARGET})
 
 # sndfile-interleave
 
-set (sndfile_interleave_SOURCES
-	programs/sndfile-interleave.c
-	programs/common.c
-	programs/common.h)
-add_executable (sndfile-interleave ${sndfile_interleave_SOURCES})
-target_link_libraries(sndfile-interleave PUBLIC ${SNDFILE_TARGET})
+	set (sndfile_interleave_SOURCES
+		programs/sndfile-interleave.c
+		programs/common.c
+		programs/common.h)
+	add_executable (sndfile-interleave ${sndfile_interleave_SOURCES})
+	target_link_libraries(sndfile-interleave PUBLIC ${SNDFILE_TARGET})
 
 # sndfile-deinterleave
 
-set (sndfile_deinterleave_SOURCES
-	programs/sndfile-deinterleave.c
-	programs/common.c
-	programs/common.h)
-add_executable (sndfile-deinterleave ${sndfile_deinterleave_SOURCES})
-target_link_libraries(sndfile-deinterleave PUBLIC ${SNDFILE_TARGET})
+	set (sndfile_deinterleave_SOURCES
+		programs/sndfile-deinterleave.c
+		programs/common.c
+		programs/common.h)
+	add_executable (sndfile-deinterleave ${sndfile_deinterleave_SOURCES})
+	target_link_libraries(sndfile-deinterleave PUBLIC ${SNDFILE_TARGET})
 
 # sndfile-concat
 
-set (sndfile_concat_SOURCES
-	programs/sndfile-concat.c
-	programs/common.c
-	programs/common.h)
-add_executable (sndfile-concat ${sndfile_concat_SOURCES})
-target_link_libraries(sndfile-concat PUBLIC ${SNDFILE_TARGET})
+	set (sndfile_concat_SOURCES
+		programs/sndfile-concat.c
+		programs/common.c
+		programs/common.h)
+	add_executable (sndfile-concat ${sndfile_concat_SOURCES})
+	target_link_libraries(sndfile-concat PUBLIC ${SNDFILE_TARGET})
 
 # sndfile-salvage
 
-set (sndfile_salvage_SOURCES
-	programs/sndfile-salvage.c
-	programs/common.c
-	programs/common.h)
-add_executable (sndfile-salvage ${sndfile_salvage_SOURCES})
-target_link_libraries(sndfile-salvage PUBLIC ${SNDFILE_TARGET})
+	set (sndfile_salvage_SOURCES
+		programs/sndfile-salvage.c
+		programs/common.c
+		programs/common.h)
+	add_executable (sndfile-salvage ${sndfile_salvage_SOURCES})
+	target_link_libraries(sndfile-salvage PUBLIC ${SNDFILE_TARGET})
 
-set (sdnfile_PROGRAMS
-	sndfile-info
-	sndfile-play
-	sndfile-convert
-	sndfile-cmp
-	sndfile-metadata-set
-	sndfile-metadata-get
-	sndfile-interleave
-	sndfile-deinterleave
-	sndfile-concat
-	sndfile-salvage)
+	set (sdnfile_PROGRAMS
+		sndfile-info
+		sndfile-play
+		sndfile-convert
+		sndfile-cmp
+		sndfile-metadata-set
+		sndfile-metadata-get
+		sndfile-interleave
+		sndfile-deinterleave
+		sndfile-concat
+		sndfile-salvage)
+
+endif (BUILD_PROGRAMS)
 
 #
 # Installation
