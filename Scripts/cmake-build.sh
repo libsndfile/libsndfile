@@ -1,9 +1,9 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 
-rm -rf CMakeCache.txt CMakeFiles/
+rm -rf CMakeCache.txt CMakeFiles/ _Build
 
-cmake -DWerror=on -Werror=dev -Werror=deprecated .
-
-make clean
-make
-make check
+mkdir _Build
+cd _Build
+cmake ..
+cmake --build .
+ctest -V
