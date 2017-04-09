@@ -40,7 +40,7 @@ if ((NOT BUILD_STATIC_LIBS) AND (NOT BUILD_SHARED_LIBS))
 	set (BUILD_STATIC_LIBS ON)
 endif ()
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 #
 # Setup definitions
@@ -78,8 +78,11 @@ feature_summary (WHAT ALL)
 # Setup configuration
 #
 
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h)
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/src/sndfile.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/sndfile.h)
+file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/config.h")
+configure_file (src/config.h.cmake src/config.h)
+
+file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/sndfile.h")
+configure_file (src/sndfile.h.in src/sndfile.h)
 
 set (PC_PREFIX ${CMAKE_INSTALL_PREFIX})
 set (PC_EXEC_PREFIX "\$\{prefix\}")
@@ -89,7 +92,10 @@ set (PC_VERSION ${PROJECT_VERSION})
 if (EXTERNAL_XIPH_LIBS)
 	set (PC_PRIVATE_LIBS "-lFLAC  -lvorbisenc")
 endif ()
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc.cmake.in ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc @ONLY)
+
+
+file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc")
+configure_file (sndfile.pc.cmake.in sndfile.pc @ONLY)
 
 #
 # libsndfile
@@ -97,7 +103,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc.cmake.in ${CMAKE_CURRENT_
 
 # Public libsndfile headers
 set (include_HEADERS src/sndfile.hh)
-set (nodist_include_HEADERS src/sndfile.h)
+set (nodist_include_HEADERS "${CMAKE_CURRENT_BINARY_DIR}/src/sndfile.h")
 
 # Private libsndfile headers
 set (noinst_HEADERS
@@ -247,6 +253,7 @@ set (libsndfile_SOURCES ${COMMON} ${FILESPECIFIC} ${noinst_HEADERS}
 if (BUILD_STATIC_LIBS)
 	set (SNDFILE_STATIC_TARGET sndfile-static)
 	add_library (${SNDFILE_STATIC_TARGET} STATIC ${libsndfile_SOURCES})
+	target_include_directories(${SNDFILE_STATIC_TARGET} PUBLIC ${CMAKE_BINARY_DIR}/src)
 	if (LIBM_REQUIRED)
 		target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${M_LIBRARY})
 	endif ()
@@ -276,14 +283,19 @@ if (BUILD_SHARED_LIBS)
 	set (SNDFILE_SHARED_TARGET sndfile)
 
 	if (WIN32)
-		configure_file(${CMAKE_SOURCE_DIR}/src/version-metadata.rc.in.cmake ${CMAKE_SOURCE_DIR}/src/version-metadata.rc)
-		configure_file (${CMAKE_SOURCE_DIR}/src/libsndfile.def.in.cmake ${CMAKE_SOURCE_DIR}/src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
+		file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/version-metadata.rc")
+		configure_file(src/version-metadata.rc.in.cmake src/version-metadata.rc)
+
+		file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def")
+		configure_file (src/libsndfile.def.in.cmake src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
+
 		list (APPEND libsndfile_SOURCES
 			src/version-metadata.rc
 			src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
 	endif (WIN32)
 
 	add_library(${SNDFILE_SHARED_TARGET} SHARED ${libsndfile_SOURCES})
+	target_include_directories(${SNDFILE_SHARED_TARGET} PUBLIC ${CMAKE_BINARY_DIR}/src)
 
 	if (LIBM_REQUIRED)
 		target_link_libraries (${SNDFILE_SHARED_TARGET} PRIVATE ${M_LIBRARY})
@@ -487,11 +499,12 @@ endif ()
 #TODO: ENABLE_BOW_DOCS option
 set (HTML_BGCOLOUR "black")
 set (HTML_FGCOLOUR "white")
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/doc/libsndfile.css.in ${CMAKE_CURRENT_SOURCE_DIR}/doc/libsndfile.css)
+file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/doc/libsndfile.css")
+configure_file (doc/libsndfile.css.in doc/libsndfile.css)
 set (html_DATA
 	doc/index.html
 	doc/libsndfile.jpg
-	doc/libsndfile.css
+	"${CMAKE_CURRENT_BINARY_DIR}/doc/libsndfile.css"
 	doc/print.css
 	doc/api.html
 	doc/command.html
@@ -506,7 +519,7 @@ set (html_DATA
 	doc/tutorial.html)
 install (FILES ${html_DATA} DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 #
 # Testing
@@ -514,62 +527,61 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTAL
 
 if (BUILD_TESTING)
 
-	# Custom commands to generate tests sources form autogen templates
+	# Create src and tests directory in CMAKE_BINARY_DIR to put generated sources in
+	file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/src")
+	file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/tests")
+
+	# Custom commands to generate tests sources from autogen templates
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/benchmark.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable benchmark.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		OUTPUT ${CMAKE_BINARY_DIR}/tests/benchmark.c
+		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/benchmark.def
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/floating_point_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable floating_point_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)	
+		OUTPUT ${CMAKE_BINARY_DIR}/tests/floating_point_test.c
+		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/floating_point_test.def
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/floating_point_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable floating_point_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		OUTPUT ${CMAKE_BINARY_DIR}/tests/header_test.c
+		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/header_test.def
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/header_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable header_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		OUTPUT ${CMAKE_BINARY_DIR}/tests/pcm_test.c
+		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/pcm_test.def
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/pcm_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable pcm_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		OUTPUT ${CMAKE_BINARY_DIR}/tests/pipe_test.c
+		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/pipe_test.def
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/pipe_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable pipe_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		OUTPUT ${CMAKE_BINARY_DIR}/tests/rdwr_test.c
+		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/rdwr_test.def
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/rdwr_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable rdwr_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		OUTPUT ${CMAKE_BINARY_DIR}/tests/scale_clip_test.c
+		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/scale_clip_test.def
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/scale_clip_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable scale_clip_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		OUTPUT ${CMAKE_BINARY_DIR}/tests/utils.c ${CMAKE_BINARY_DIR}/tests/utils.h
+		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/utils.def
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/utils.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable utils.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		OUTPUT ${CMAKE_BINARY_DIR}/tests/write_read_test.c
+		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/write_read_test.def
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/write_read_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable write_read_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
-
-	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/src/test_endswap.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable test_endswap.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src)
+		OUTPUT ${CMAKE_BINARY_DIR}/src/test_endswap.c
+		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/src/test_endswap.def
+		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/src)
 
 	### test_main
 
@@ -654,6 +666,7 @@ if (BUILD_TESTING)
 	set (floating_point_test_SOURCES tests/utils.c tests/dft_cmp.c tests/floating_point_test.c)
 	add_executable (floating_point_test ${floating_point_test_SOURCES})
 	target_link_libraries (floating_point_test PRIVATE ${SNDFILE_TARGET})
+	target_include_directories(floating_point_test PRIVATE tests)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(floating_point_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -758,6 +771,7 @@ if (BUILD_TESTING)
 	set (write_read_test_SOURCES tests/utils.c tests/generate.c tests/write_read_test.c)
 	add_executable (write_read_test ${write_read_test_SOURCES})
 	target_link_libraries (write_read_test PRIVATE ${SNDFILE_TARGET})
+	target_include_directories(write_read_test PRIVATE tests)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(write_read_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -867,7 +881,7 @@ if (BUILD_TESTING)
 		target_link_libraries(stdio_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (pipe_test_SOURCES tests/pipe_test.c tests/utils.c)
+	set (pipe_test_SOURCES tests/pipe_test.c tests/utils.c tests/utils.h)
 	add_executable (pipe_test ${pipe_test_SOURCES})
 	target_link_libraries (pipe_test PRIVATE ${SNDFILE_TARGET})
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
