@@ -345,22 +345,28 @@ endif ()
 
 # sndfile-play
 
-if (WIN32 OR (ALSA_FOUND OR Sndio_FOUND))
+if (NOT BEOS)
 	set (sndfile_play_SOURCES
 		programs/sndfile-play.c
 		programs/common.c
 		programs/common.h)
-	add_executable (sndfile-play ${sndfile_play_SOURCES})
-	target_link_libraries(sndfile-play PUBLIC ${SNDFILE_TARGET})
-	if (WIN32)
-		target_link_libraries(sndfile-play PRIVATE Winmm.lib)
-	elseif (ALSA_FOUND)
-		target_include_directories (sndfile-play PRIVATE ${ALSA_INCLUDE_DIRS})
-		target_link_libraries(sndfile-play PRIVATE ${ALSA_LIBRARIES})
-	elseif (Sndio_FOUND)
-		target_include_directories (sndfile-play PRIVATE ${Sndio_INCLUDE_DIRS})
-		target_link_libraries(sndfile-play PRIVATE ${Sndio_LIBRARIES})
-	endif ()
+else ()
+	set (sndfile_play_SOURCES
+		programs/sndfile-play-beos.cpp)
+endif ()
+
+add_executable (sndfile-play ${sndfile_play_SOURCES})
+target_link_libraries(sndfile-play PUBLIC ${SNDFILE_TARGET})
+if (WIN32)
+	target_link_libraries(sndfile-play PRIVATE Winmm.lib)
+# Maybe ALSA & Sndio are present in BeOS. They are not required
+# so skip them anyway.
+elseif ((NOT BEOS) AND ALSA_FOUND)
+	target_include_directories (sndfile-play PRIVATE ${ALSA_INCLUDE_DIRS})
+	target_link_libraries(sndfile-play PRIVATE ${ALSA_LIBRARIES})
+elseif ((NOT BEOS) AND Sndio_FOUND)
+	target_include_directories (sndfile-play PRIVATE ${Sndio_INCLUDE_DIRS})
+	target_link_libraries(sndfile-play PRIVATE ${Sndio_LIBRARIES})
 endif ()
 
 # sndfile-convert
@@ -436,15 +442,6 @@ add_executable (sndfile-salvage ${sndfile_salvage_SOURCES})
 target_link_libraries(sndfile-salvage PUBLIC ${SNDFILE_TARGET})
 
 # sndfile-play-beos
-
-# This is the BeOS version of sndfile-play. It needs to be compiled with the C++
-# compiler.
-if (BEOS OR HAIKU)
-	set (sndfile_play_beos_SOURCES
-		programs/sndfile-play-beos.cpp)
-	add_executable (sndfile-play-beos ${sndfile_play_beos_SOURCES})
-	target_link_libraries(sndfile-play-beos PUBLIC ${SNDFILE_TARGET})
-endif (BEOS OR HAIKU)
 
 #
 # Installation
