@@ -520,57 +520,25 @@ if (BUILD_TESTING)
 	file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/src")
 	file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/tests")
 
-	# Custom commands to generate tests sources from autogen templates
+	include(${CMAKE_MODULE_PATH}/CMakeAutoGen.cmake)
 
-	add_custom_command (
-		OUTPUT ${CMAKE_BINARY_DIR}/tests/benchmark.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/benchmark.def
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+	# generate tests sources from autogen templates
+	lsf_autogen(tests benchmark c)
+	lsf_autogen(tests floating_point_test c)
+	lsf_autogen(tests header_test c)
+	lsf_autogen(tests pcm_test c)
+	lsf_autogen(tests pipe_test c)
+	lsf_autogen(tests rdwr_test c)
+	lsf_autogen(tests scale_clip_test c)
+	lsf_autogen(tests utils c h)
+	lsf_autogen(tests write_read_test c)
 
-	add_custom_command (
-		OUTPUT ${CMAKE_BINARY_DIR}/tests/floating_point_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/floating_point_test.def
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
+	lsf_autogen(src test_endswap c)
 
-	add_custom_command (
-		OUTPUT ${CMAKE_BINARY_DIR}/tests/header_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/header_test.def
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-
-	add_custom_command (
-		OUTPUT ${CMAKE_BINARY_DIR}/tests/pcm_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/pcm_test.def
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-
-	add_custom_command (
-		OUTPUT ${CMAKE_BINARY_DIR}/tests/pipe_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/pipe_test.def
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-
-	add_custom_command (
-		OUTPUT ${CMAKE_BINARY_DIR}/tests/rdwr_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/rdwr_test.def
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-
-	add_custom_command (
-		OUTPUT ${CMAKE_BINARY_DIR}/tests/scale_clip_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/scale_clip_test.def
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-
-	add_custom_command (
-		OUTPUT ${CMAKE_BINARY_DIR}/tests/utils.c ${CMAKE_BINARY_DIR}/tests/utils.h
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/utils.def
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-
-	add_custom_command (
-		OUTPUT ${CMAKE_BINARY_DIR}/tests/write_read_test.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/tests ${CMAKE_SOURCE_DIR}/tests/write_read_test.def
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests)
-
-	add_custom_command (
-		OUTPUT ${CMAKE_BINARY_DIR}/src/test_endswap.c
-		COMMAND ${AUTOGEN_EXECUTABLE} --writable -L ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/src/test_endswap.def
-		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/src)
+	# utils static library
+	add_library(test_utils STATIC tests/utils.c)
+	target_link_libraries(test_utils PUBLIC ${SNDFILE_TARGET})
+	target_include_directories(test_utils PUBLIC "${CMAKE_BINARY_DIR}/tests")
 
 	### test_main
 
@@ -604,27 +572,27 @@ if (BUILD_TESTING)
 
 	### error_test
 
-	set (error_test_SOURCES tests/error_test.c tests/utils.c)
+	set (error_test_SOURCES tests/error_test.c)
 	add_executable (error_test ${error_test_SOURCES})
-	target_link_libraries (error_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (error_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(error_test PRIVATE ${M_LIBRARY})
 	endif ()
 	add_test (error_test error_test)
 
 	### ulaw_test
-	set (ulaw_test_SOURCES tests/utils.c tests/ulaw_test.c)
+	set (ulaw_test_SOURCES tests/ulaw_test.c)
 	add_executable (ulaw_test ${ulaw_test_SOURCES})
-	target_link_libraries (ulaw_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (ulaw_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(ulaw_test PRIVATE ${M_LIBRARY})
 	endif ()
 	add_test (ulaw_test ulaw_test)
 
 	### alaw_test
-	set (alaw_test_SOURCES tests/utils.c tests/alaw_test.c)
+	set (alaw_test_SOURCES tests/alaw_test.c)
 	add_executable (alaw_test ${alaw_test_SOURCES})
-	target_link_libraries (alaw_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (alaw_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(alaw_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -632,9 +600,9 @@ if (BUILD_TESTING)
 
 	### dwvw_test
 
-	set (dwvw_test_SOURCES tests/utils.c tests/dwvw_test.c)
+	set (dwvw_test_SOURCES tests/dwvw_test.c)
 	add_executable (dwvw_test ${dwvw_test_SOURCES})
-	target_link_libraries (dwvw_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (dwvw_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(dwvw_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -642,9 +610,9 @@ if (BUILD_TESTING)
 
 	### command_test
 
-	set (command_test_SOURCES tests/command_test.c tests/utils.c)
+	set (command_test_SOURCES tests/command_test.c)
 	add_executable (command_test ${command_test_SOURCES})
-	target_link_libraries (command_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (command_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(command_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -652,9 +620,9 @@ if (BUILD_TESTING)
 
 	### floating_point_test
 
-	set (floating_point_test_SOURCES tests/utils.c tests/dft_cmp.c tests/floating_point_test.c)
+	set (floating_point_test_SOURCES tests/dft_cmp.c tests/floating_point_test.c)
 	add_executable (floating_point_test ${floating_point_test_SOURCES})
-	target_link_libraries (floating_point_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (floating_point_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	target_include_directories(floating_point_test PRIVATE tests)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(floating_point_test PRIVATE ${M_LIBRARY})
@@ -663,9 +631,9 @@ if (BUILD_TESTING)
 
 	### checksum_test
 
-	set (checksum_test_SOURCES tests/checksum_test.c tests/utils.c)
+	set (checksum_test_SOURCES tests/checksum_test.c)
 	add_executable (checksum_test ${checksum_test_SOURCES})
-	target_link_libraries (checksum_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (checksum_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(checksum_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -673,9 +641,9 @@ if (BUILD_TESTING)
 
 	### scale_clip_test
 
-	set (scale_clip_test_SOURCES tests/scale_clip_test.c tests/utils.c)
+	set (scale_clip_test_SOURCES tests/scale_clip_test.c)
 	add_executable (scale_clip_test ${scale_clip_test_SOURCES})
-	target_link_libraries (scale_clip_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (scale_clip_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(scale_clip_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -683,9 +651,9 @@ if (BUILD_TESTING)
 
 	### headerless_test
 
-	set (headerless_test_SOURCES tests/utils.c tests/headerless_test.c)
+	set (headerless_test_SOURCES tests/headerless_test.c)
 	add_executable (headerless_test ${headerless_test_SOURCES})
-	target_link_libraries (headerless_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (headerless_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(headerless_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -693,9 +661,9 @@ if (BUILD_TESTING)
 
 	### rdwr_test
 
-	set (rdwr_test_SOURCES tests/rdwr_test.c tests/utils.c)
+	set (rdwr_test_SOURCES tests/rdwr_test.c)
 	add_executable (rdwr_test ${rdwr_test_SOURCES})
-	target_link_libraries (rdwr_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (rdwr_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(rdwr_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -703,9 +671,9 @@ if (BUILD_TESTING)
 
 	### locale_test
 
-	set (locale_test_SOURCES tests/locale_test.c tests/utils.c)
+	set (locale_test_SOURCES tests/locale_test.c)
 	add_executable (locale_test ${locale_test_SOURCES})
-	target_link_libraries (locale_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (locale_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(locale_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -717,9 +685,9 @@ if (BUILD_TESTING)
 
 	### cpp_test
 
-	set (cpp_test_SOURCES tests/cpp_test.cc tests/utils.c)
+	set (cpp_test_SOURCES tests/cpp_test.cc)
 	add_executable (cpp_test ${cpp_test_SOURCES})
-	target_link_libraries (cpp_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (cpp_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(cpp_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -727,9 +695,9 @@ if (BUILD_TESTING)
 
 	### external_libs_test
 
-	set (external_libs_test_SOURCES tests/external_libs_test.c tests/utils.c)
+	set (external_libs_test_SOURCES tests/external_libs_test.c)
 	add_executable (external_libs_test ${external_libs_test_SOURCES})
-	target_link_libraries (external_libs_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (external_libs_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(external_libs_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -737,9 +705,9 @@ if (BUILD_TESTING)
 
 	### format_check_test
 
-	set (format_check_test_SOURCES tests/format_check_test.c tests/utils.c)
+	set (format_check_test_SOURCES tests/format_check_test.c)
 	add_executable (format_check_test ${format_check_test_SOURCES})
-	target_link_libraries (format_check_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (format_check_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(format_check_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -747,9 +715,9 @@ if (BUILD_TESTING)
 
 	### channel_test
 
-	set (channel_test_SOURCES tests/channel_test.c tests/utils.c)
+	set (channel_test_SOURCES tests/channel_test.c)
 	add_executable (channel_test ${channel_test_SOURCES})
-	target_link_libraries (channel_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (channel_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(channel_test PRIVATE ${M_LIBRARY})
 	endif ()
@@ -757,129 +725,129 @@ if (BUILD_TESTING)
 
 	### common test executables
 
-	set (write_read_test_SOURCES tests/utils.c tests/generate.c tests/write_read_test.c)
+	set (write_read_test_SOURCES tests/generate.c tests/write_read_test.c)
 	add_executable (write_read_test ${write_read_test_SOURCES})
-	target_link_libraries (write_read_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (write_read_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	target_include_directories(write_read_test PRIVATE tests)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(write_read_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (lossy_comp_test_SOURCES tests/utils.c tests/lossy_comp_test.c)
+	set (lossy_comp_test_SOURCES tests/lossy_comp_test.c)
 	add_executable (lossy_comp_test ${lossy_comp_test_SOURCES})
-	target_link_libraries (lossy_comp_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (lossy_comp_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(lossy_comp_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (peak_chunk_test_SOURCES tests/peak_chunk_test.c tests/utils.c)
+	set (peak_chunk_test_SOURCES tests/peak_chunk_test.c)
 	add_executable (peak_chunk_test ${peak_chunk_test_SOURCES})
-	target_link_libraries (peak_chunk_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (peak_chunk_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(peak_chunk_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (header_test_SOURCES tests/header_test.c tests/utils.c)
+	set (header_test_SOURCES tests/header_test.c)
 	add_executable (header_test ${header_test_SOURCES})
-	target_link_libraries (header_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (header_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(header_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (misc_test_SOURCES tests/misc_test.c tests/utils.c)
+	set (misc_test_SOURCES tests/misc_test.c)
 	add_executable (misc_test ${misc_test_SOURCES})
-	target_link_libraries (misc_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (misc_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(misc_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (string_test_SOURCES tests/string_test.c tests/utils.c)
+	set (string_test_SOURCES tests/string_test.c)
 	add_executable (string_test ${string_test_SOURCES})
-	target_link_libraries (string_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (string_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(string_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (multi_file_test_SOURCES tests/multi_file_test.c tests/utils.c)
+	set (multi_file_test_SOURCES tests/multi_file_test.c)
 	add_executable (multi_file_test ${multi_file_test_SOURCES})
-	target_link_libraries (multi_file_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (multi_file_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(multi_file_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (aiff_rw_test_SOURCES tests/utils.c tests/aiff_rw_test.c)
+	set (aiff_rw_test_SOURCES tests/aiff_rw_test.c)
 	add_executable (aiff_rw_test ${aiff_rw_test_SOURCES})
-	target_link_libraries (aiff_rw_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (aiff_rw_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(aiff_rw_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (chunk_test_SOURCES tests/chunk_test.c tests/utils.c)
+	set (chunk_test_SOURCES tests/chunk_test.c)
 	add_executable (chunk_test ${chunk_test_SOURCES})
-	target_link_libraries (chunk_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (chunk_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(chunk_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (long_read_write_test_SOURCES tests/long_read_write_test.c tests/utils.c)
+	set (long_read_write_test_SOURCES tests/long_read_write_test.c)
 	add_executable (long_read_write_test ${long_read_write_test_SOURCES})
-	target_link_libraries (long_read_write_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (long_read_write_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(long_read_write_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (raw_test_SOURCES tests/raw_test.c tests/utils.c)
+	set (raw_test_SOURCES tests/raw_test.c)
 	add_executable (raw_test ${raw_test_SOURCES})
-	target_link_libraries (raw_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (raw_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(raw_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (compression_size_test_SOURCES tests/compression_size_test.c tests/utils.c)
+	set (compression_size_test_SOURCES tests/compression_size_test.c)
 	add_executable (compression_size_test ${compression_size_test_SOURCES})
-	target_link_libraries (compression_size_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (compression_size_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(compression_size_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (ogg_test_SOURCES tests/ogg_test.c tests/utils.c)
+	set (ogg_test_SOURCES tests/ogg_test.c)
 	add_executable (ogg_test ${ogg_test_SOURCES})
-	target_link_libraries (ogg_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (ogg_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(ogg_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (stdin_test_SOURCES tests/stdin_test.c tests/utils.c)
+	set (stdin_test_SOURCES tests/stdin_test.c)
 	add_executable (stdin_test ${stdin_test_SOURCES})
-	target_link_libraries (stdin_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (stdin_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(stdin_test PRIVATE ${M_LIBRARY})
 	endif ()
 
 	set (stdout_test_SOURCES tests/stdout_test.c)
 	add_executable (stdout_test ${stdout_test_SOURCES})
-	target_link_libraries (stdout_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (stdout_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(stdout_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (stdio_test_SOURCES tests/stdio_test.c tests/utils.c)
+	set (stdio_test_SOURCES tests/stdio_test.c)
 	add_executable (stdio_test ${stdio_test_SOURCES})
-	target_link_libraries (stdio_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (stdio_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(stdio_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (pipe_test_SOURCES tests/pipe_test.c tests/utils.c tests/utils.h)
+	set (pipe_test_SOURCES tests/pipe_test.c)
 	add_executable (pipe_test ${pipe_test_SOURCES})
-	target_link_libraries (pipe_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (pipe_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(pipe_test PRIVATE ${M_LIBRARY})
 	endif ()
 
-	set (virtual_io_test_SOURCES tests/virtual_io_test.c tests/utils.c)
+	set (virtual_io_test_SOURCES tests/virtual_io_test.c)
 	add_executable (virtual_io_test ${virtual_io_test_SOURCES})
-	target_link_libraries (virtual_io_test PRIVATE ${SNDFILE_TARGET})
+	target_link_libraries (virtual_io_test PRIVATE ${SNDFILE_TARGET} test_utils)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(virtual_io_test PRIVATE ${M_LIBRARY})
 	endif ()
