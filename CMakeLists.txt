@@ -19,7 +19,6 @@ set (CMAKE_C_STANDARD_REQUIRED TRUE)
 
 include (GNUInstallDirs)
 include (CPack)
-include (CTest)
 include (FeatureSummary)
 
 #
@@ -513,6 +512,8 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTAL
 #
 
 if (BUILD_TESTING)
+
+	include (CTest)
 
 	# Custom commands to generate tests sources form autogen templates
 
