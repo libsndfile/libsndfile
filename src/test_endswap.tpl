@@ -146,7 +146,7 @@ test_endswap (void)
 
 [+ FOR int_size
 +]	test_psf_put_be[+ (get "name") +] () ;
-[+ ENDFOR int_endsize
+[+ ENDFOR int_size
 +]
 
 } /* test_endswap */
