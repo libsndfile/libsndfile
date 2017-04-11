@@ -40,7 +40,7 @@ if ((NOT BUILD_STATIC_LIBS) AND (NOT BUILD_SHARED_LIBS))
 	set (BUILD_STATIC_LIBS ON)
 endif ()
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 #
 # Setup definitions
@@ -78,7 +78,10 @@ feature_summary (WHAT ALL)
 # Setup configuration
 #
 
+file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/config.h")
 configure_file (src/config.h.cmake src/config.h)
+
+file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/sndfile.h")
 configure_file (src/sndfile.h.in src/sndfile.h)
 
 set (PC_PREFIX ${CMAKE_INSTALL_PREFIX})
@@ -89,7 +92,10 @@ set (PC_VERSION ${PROJECT_VERSION})
 if (EXTERNAL_XIPH_LIBS)
 	set (PC_PRIVATE_LIBS "-lFLAC  -lvorbisenc")
 endif ()
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc.cmake.in ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc @ONLY)
+
+
+file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc")
+configure_file (sndfile.pc.cmake.in sndfile.pc @ONLY)
 
 #
 # libsndfile
@@ -97,7 +103,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc.cmake.in ${CMAKE_CURRENT_
 
 # Public libsndfile headers
 set (include_HEADERS src/sndfile.hh)
-set (nodist_include_HEADERS src/sndfile.h)
+set (nodist_include_HEADERS "${CMAKE_CURRENT_BINARY_DIR}/src/sndfile.h")
 
 # Private libsndfile headers
 set (noinst_HEADERS
@@ -277,8 +283,12 @@ if (BUILD_SHARED_LIBS)
 	set (SNDFILE_SHARED_TARGET sndfile)
 
 	if (WIN32)
+		file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/version-metadata.rc")
 		configure_file(src/version-metadata.rc.in.cmake src/version-metadata.rc)
+
+		file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def")
 		configure_file (src/libsndfile.def.in.cmake src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
+
 		list (APPEND libsndfile_SOURCES
 			src/version-metadata.rc
 			src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
@@ -489,11 +499,12 @@ endif ()
 #TODO: ENABLE_BOW_DOCS option
 set (HTML_BGCOLOUR "black")
 set (HTML_FGCOLOUR "white")
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/doc/libsndfile.css.in ${CMAKE_CURRENT_SOURCE_DIR}/doc/libsndfile.css)
+file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/doc/libsndfile.css")
+configure_file (doc/libsndfile.css.in doc/libsndfile.css)
 set (html_DATA
 	doc/index.html
 	doc/libsndfile.jpg
-	doc/libsndfile.css
+	"${CMAKE_CURRENT_BINARY_DIR}/doc/libsndfile.css"
 	doc/print.css
 	doc/api.html
 	doc/command.html
@@ -508,18 +519,13 @@ set (html_DATA
 	doc/tutorial.html)
 install (FILES ${html_DATA} DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 #
 # Testing
 #
 
 if (BUILD_TESTING)
-
-	# Create src and tests directory in CMAKE_BINARY_DIR to put generated sources in
-	file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/src")
-	file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/tests")
-
 	include(${CMAKE_MODULE_PATH}/CMakeAutoGen.cmake)
 
 	# generate tests sources from autogen templates
