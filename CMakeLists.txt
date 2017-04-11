@@ -723,6 +723,16 @@ if (BUILD_TESTING)
 	endif ()
 	add_test (channel_test channel_test)
 
+	### pcm_test
+
+	set (pcm_test_SOURCES tests/pcm_test.c)
+	add_executable (pcm_test ${pcm_test_SOURCES})
+	target_link_libraries (pcm_test PRIVATE ${SNDFILE_TARGET} test_utils)
+	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+		target_link_libraries(pcm_test PRIVATE ${M_LIBRARY})
+	endif ()
+	add_test (pcm_test pcm_test)
+
 	### common test executables
 
 	set (write_read_test_SOURCES tests/generate.c tests/write_read_test.c)
