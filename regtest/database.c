@@ -20,7 +20,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#if HAVE_UNISTD_H
 #include <unistd.h>
+#else
+#include "sf_unistd.h"
+#endif
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
