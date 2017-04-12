@@ -20,6 +20,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#if defined (HAVE_SYS_TYPES) && (HAVE_SYS_TYPES == 1)
+#include <sys/types.h>
+#endif
 #include <string.h>
 #include <stdarg.h>
 #include <errno.h>

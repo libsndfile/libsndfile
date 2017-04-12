@@ -265,7 +265,7 @@ filesystem_full_test (int format)
 #if (defined (WIN32) || defined (_WIN32))
 	/* Can't run this test on Win32 so return. */
 	return ;
-#endif
+#else
 
 	/* Make sure errno is zero before doing anything else. */
 	errno = 0 ;
@@ -300,6 +300,7 @@ filesystem_full_test (int format)
 		} ;
 
 	puts ("ok") ;
+#endif
 } /* filesystem_full_test */
 
 static void
