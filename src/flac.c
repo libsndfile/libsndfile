@@ -841,7 +841,9 @@ flac_read_header (SF_PRIVATE *psf)
 
 	psf_log_printf (psf, "End\n") ;
 
-	if (psf->error == 0)
+	if (psf->error != 0)
+		FLAC__stream_decoder_delete (pflac->fsd) ;
+	else
 	{	FLAC__uint64 position ;
 
 		FLAC__stream_decoder_get_decode_position (pflac->fsd, &position) ;
