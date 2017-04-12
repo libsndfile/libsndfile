@@ -430,8 +430,7 @@ sf_flac_meta_get_vorbiscomments (SF_PRIVATE *psf, const FLAC__StreamMetadata *me
 static void
 sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC__StreamMetadata *metadata, void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
-	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->codec_data ;
-	int bitwidth = 0, i ;
+	int bitwidth = 0 ;
 
 	switch (metadata->type)
 	{	case FLAC__METADATA_TYPE_STREAMINFO :
@@ -468,12 +467,6 @@ sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC_
 
 			if (bitwidth > 0)
 				psf_log_printf (psf, "  Bit width   : %d\n", bitwidth) ;
-
-
-			for (i = 0 ; i < psf->sf.channels ; i++)
-				pflac->rbuffer [i] = calloc (FLAC__MAX_BLOCK_SIZE, sizeof (int32_t)) ;
-
-			pflac->wbuffer = (const int32_t* const*) pflac->rbuffer ;
 			break ;
 
 		case FLAC__METADATA_TYPE_VORBIS_COMMENT :
