@@ -20,10 +20,13 @@ EXTRA_DIST = libsndfile.spec.in sndfile.pc.in Scripts/android-configure.sh \
 	Scripts/linux-to-win-cross-configure.sh Scripts/build-test-tarball.mk.in \
     CMakeLists.txt $(cmake_files) sndfile.pc.cmake.in
 
-cmake_files = cmake/ClipMode.cmake cmake/FindFLAC.cmake cmake/FindOgg.cmake \
-	cmake/FindSndio.cmake cmake/FindSpeex.cmake cmake/FindVorbis.cmake \
-	cmake/SndFileChecks.cmake cmake/TestInline.c.in cmake/TestInline.cmake \
-	cmake/TestLargeFiles.cmake
+cmake_files = cmake/ClipMode.cmake cmake/FindFLAC.cmake \
+	cmake/CMakeAutoGen.cmake cmake/CMakeAutoGenScript.cmake \
+	cmake/FindFLAC.cmake cmake/FindOgg.cmake cmake/FindSndio.cmake \
+	cmake/FindSpeex.cmake cmake/FindSQLite3.cmake cmake/FindVorbis.cmake \
+	cmake/SndFileChecks.cmake cmake/TestInline.cmake \
+	cmake/TestLargeFiles.cmake cmake/LibSndFileConfig.cmake.in \
+	cmake/TestInline.c.in
 
 CLEANFILES = *~
 

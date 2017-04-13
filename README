@@ -39,6 +39,9 @@ Since libsndfile optionally links against libFLAC, libogg and libvorbis, you
 will need to install appropriate versions of these libraries before running
 configure as above.
 
+You can use CMake now to build under Linux, also under Windows and MacOS, see
+README.md for details. CMake toolchain is usable, but still exterimental.
+
 
 UNIX
 ----
@@ -47,11 +50,13 @@ Compile as for Linux.
 
 Win32/Win64
 -----------
-The default Windows compilers are nowhere near compliant with the 1999 ISO
-C Standard and hence not able to compile libsndfile.
 
-Please use the libsndfile binaries available on the libsndfile web site.
+Official Windows binaries are compiled with Autotools and MinGW, but you can use
+CMake to generate solution for Visual Studio. Details are described in
+README.md.
 
+It is still recommended to use the libsndfile binaries available on the
+libsndfile web site.
 
 MacOSX
 ------
