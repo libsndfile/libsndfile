@@ -51,8 +51,14 @@ if (ENABLE_EXPERIMENTAL)
 	find_package (Speex)
 endif ()
 
+find_package (SQLite3)
+if (SQLITE3_FOUND)
+	set (HAVE_SQLITE3 1)
+endif ()
+
 check_include_file(byteswap.h       HAVE_BYTESWAP_H)
 check_include_file(dlfcn.h          HAVE_DLFCN_H)
+check_include_file(direct.h         HAVE_DIRECT_H)
 check_include_file(endian.h         HAVE_ENDIAN_H)
 check_include_file(inttypes.h       HAVE_INTTYPES_H)
 check_include_file(locale.h         HAVE_LOCALE_H)
@@ -113,6 +119,7 @@ if (M_LIBRARY)
 		unset (M_LIBRARY)
 	endif ()
 endif ()
+mark_as_advanced (M_LIBRARY)
 
 check_library_exists (sqlite3 sqlite3_close "" HAVE_SQLITE3)
 
@@ -190,3 +197,45 @@ test_inline ()
 if (NOT DISABLE_CPU_CLIP)
 	clip_mode ()
 endif ()
+
+if (MSVC)
+	add_definitions (-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE)
+endif (MSVC)
+
+if (ENABLE_STATIC_RUNTIME)
+	if (MSVC)
+		foreach(flag_var
+			CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+			CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
+			CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
+			CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO)
+			if(${flag_var} MATCHES "/MD")
+				string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+			endif(${flag_var} MATCHES "/MD")
+		endforeach(flag_var)
+	endif (MSVC)
+	if (MINGW)
+		set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc")
+		set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
+		set (CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_C_FLAGS} -static-libgcc -s")
+		set (CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS} -static-libgcc -static-libstdc++ -s")
+	endif (MINGW)
+elseif (NOT ENABLE_STATIC_RUNTIME)
+	if (MSVC)
+		foreach(flag_var
+			CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+			CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
+			CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
+			CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO)
+			if(${flag_var} MATCHES "/MT")
+				string(REGEX REPLACE "/MT" "/MD" ${flag_var} "${${flag_var}}")
+			endif(${flag_var} MATCHES "/MT")
+		endforeach(flag_var)
+	endif (MSVC)
+	if (MINGW)
+		set (CMAKE_C_FLAGS "")
+		set (CMAKE_CXX_FLAGS "")
+		set (CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
+		set (CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
+	endif (MINGW)
+endif (ENABLE_STATIC_RUNTIME)

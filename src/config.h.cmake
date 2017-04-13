@@ -34,6 +34,9 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #cmakedefine01 HAVE_DLFCN_H
 
+/* Define to 1 if you have the <direct.h> header file. */
+#cmakedefine HAVE_DIRECT_H
+
 /* Define to 1 if you have the <endian.h> header file. */
 #cmakedefine01 HAVE_ENDIAN_H
 
@@ -197,7 +200,7 @@
 #define PACKAGE_NAME "@CPACK_PACKAGE_NAME@"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "@CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION@"
+#define PACKAGE_STRING "@CPACK_PACKAGE_NAME@ @CPACK_PACKAGE_VERSION_FULL@"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "@CPACK_PACKAGE_NAME@"
@@ -206,7 +209,7 @@
 #define PACKAGE_URL "@PACKAGE_URL@"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "@CPACK_PACKAGE_VERSION@"
+#define PACKAGE_VERSION "@CPACK_PACKAGE_VERSION_FULL@"
 
 /* Set to maximum allowed value of sf_count_t type. */
 #define SF_COUNT_MAX @SF_COUNT_MAX@
