@@ -188,10 +188,7 @@ scale_clip_test_LDADD = $(top_builddir)/src/libsndfile.la
 # Lite remove end
 
 #===============================================================================
+# Autogen generated sources.
 
-SUFFIXES = .def .tpl
-
-.def.c:
-	autogen --writable $<
-.def.h:
+%.c %h : %.def %.tpl
 	autogen --writable $<
