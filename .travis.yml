@@ -23,7 +23,7 @@ matrix:
             - libvorbis-dev
             - libflac-dev
             - libasound2-dev
- 
+
     - os: osx
       compiler: clang
 
@@ -39,5 +39,5 @@ install:
 script:
   - mkdir cmake-build && (cd cmake-build && cmake .. -DCMAKE_BUILD_TYPE=Release && make VERBOSE=1 && ctest -V)
   - pwd
-  - ./autogen.sh  
-  - ./configure --enable-werror && make clean all check
+  - ./autogen.sh
+  - ./configure --enable-werror && make clean all check && make distcheck
