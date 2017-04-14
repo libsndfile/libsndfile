@@ -169,6 +169,14 @@ flac_buffer_copy (SF_PRIVATE *psf)
 	const int32_t* const *buffer = pflac->wbuffer ;
 	unsigned i = 0, j, offset, channels, len ;
 
+	if (psf->sf.channels != (int) frame->header.channels)
+	{	psf_log_printf (psf, "Error: FLAC frame changed from %d to %d channels\n"
+									"Nothing to do but to error out.\n" ,
+									psf->sf.channels, frame->header.channels) ;
+		psf->error = SFE_FLAC_CHANNEL_COUNT_CHANGED ;
+		return 0 ;
+		} ;
+
 	/*
 	**	frame->header.blocksize is variable and we're using a constant blocksize
 	**	of FLAC__MAX_BLOCK_SIZE.
@@ -201,7 +209,6 @@ flac_buffer_copy (SF_PRIVATE *psf)
 
 		return 0 ;
 		} ;
-
 
 	len = SF_MIN (pflac->len, frame->header.blocksize) ;
 
@@ -436,7 +443,7 @@ sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC_
 	{	case FLAC__METADATA_TYPE_STREAMINFO :
 			if (psf->sf.channels > 0 && psf->sf.channels != (int) metadata->data.stream_info.channels)
 			{	psf_log_printf (psf, "Error: FLAC stream changed from %d to %d channels\n"
-									"Nothing to be but to error out.\n" ,
+									"Nothing to do but to error out.\n" ,
 									psf->sf.channels, metadata->data.stream_info.channels) ;
 				psf->error = SFE_FLAC_CHANNEL_COUNT_CHANGED ;
 				return ;
