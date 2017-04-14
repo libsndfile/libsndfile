@@ -190,5 +190,8 @@ scale_clip_test_LDADD = $(top_builddir)/src/libsndfile.la
 #===============================================================================
 # Autogen generated sources.
 
-%.c %h : %.def %.tpl
+%.c : %.def %.tpl
+	autogen --writable $<
+
+%.h : %.def %.tpl
 	autogen --writable $<
