@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#if defined (HAVE_SYS_TYPES) && (HAVE_SYS_TYPES == 1)
+#if defined (HAVE_SYS_TYPES_H) && (HAVE_SYS_TYPES_H == 1)
 #include <sys/types.h>
 #endif
 #include <string.h>

@@ -31,7 +31,9 @@
 
 #include <string.h>
 #include <fcntl.h>
-#include <dirent.h>
+#ifdef HAVE_DIRECT_H
+#include <direct.h>
+#endif
 #include <sys/types.h>
 
 #include "utils.h"
