@@ -339,6 +339,11 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					} ;
 				break ;
 
+			case PAD_MARKER :
+				psf_log_printf (psf, "%M : %d\n", marker, chunk_size) ;
+				psf_binheader_readf (psf, "j", chunk_size) ;
+				break ;
+
 			default :
 					if (chunk_size >= 0xffff0000)
 					{	psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D with length %u. Exiting parser.\n", marker, psf_ftell (psf) - 8, chunk_size) ;
@@ -659,7 +664,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 
 	if (wpriv->rf64_downgrade && psf->filelength < RIFF_DOWNGRADE_BYTES)
 	{	psf_binheader_writef (psf, "etm8m", RIFF_MARKER, (psf->filelength < 8) ? 8 : psf->filelength - 8, WAVE_MARKER) ;
-		psf_binheader_writef (psf, "m4884", JUNK_MARKER, 20, 0, 0, 0, 0) ;
+		psf_binheader_writef (psf, "m4z", JUNK_MARKER, 24, 24) ;
 		add_fact_chunk = 1 ;
 		}
 	else
