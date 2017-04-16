@@ -742,7 +742,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 
 	pad_size = psf->dataoffset - 16 - psf->header.indx ;
 	if (pad_size >= 0)
-		psf_binheader_writef (psf, "m4z", PAD_MARKER, pad_size, make_size_t (pad_size)) ;
+		psf_binheader_writef (psf, "m4z", PAD_MARKER, (unsigned int) pad_size, make_size_t (pad_size)) ;
 
 	if (wpriv->rf64_downgrade && (psf->filelength < RIFF_DOWNGRADE_BYTES))
 		psf_binheader_writef (psf, "tm8", data_MARKER, psf->datalength) ;
