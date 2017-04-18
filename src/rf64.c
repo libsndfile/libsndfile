@@ -339,6 +339,7 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					} ;
 				break ;
 
+			case JUNK_MARKER :
 			case PAD_MARKER :
 				psf_log_printf (psf, "%M : %d\n", marker, chunk_size) ;
 				psf_binheader_readf (psf, "j", chunk_size) ;
@@ -740,6 +741,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 
 #endif
 
+	/* Padding may be needed if string data sizes change. */
 	pad_size = psf->dataoffset - 16 - psf->header.indx ;
 	if (pad_size >= 0)
 		psf_binheader_writef (psf, "m4z", PAD_MARKER, (unsigned int) pad_size, make_size_t (pad_size)) ;

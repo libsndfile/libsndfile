@@ -480,17 +480,18 @@ rf64_downgrade_test (const char *filename)
 static void
 rf64_long_file_downgrade_test (const char *filename)
 {	static int	output	[BUFFER_LEN] ;
+	static int	input	[1] = { 0 } ;
 
 	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
-	sf_count_t	k, output_frames = 0 ;
+	sf_count_t	output_frames = 0 ;
 
 	print_test_name (__func__, filename) ;
 
 	sf_info_clear (&sfinfo) ;
 
-	for (k = 0 ; k < BUFFER_LEN ; k++)
-		output [k] = 0x1020304 ;
+	memset (output, 0, sizeof (output)) ;
+	output [0] = 0x1020304 ;
 
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= ARRAY_LEN (output) ;
@@ -515,6 +516,10 @@ rf64_long_file_downgrade_test (const char *filename)
 	exit_if_true (sfinfo.format != (SF_FORMAT_RF64 | SF_FORMAT_PCM_32), "\n\nLine %d: RF64 to WAV downgrade should have failed.\n", __LINE__) ;
 	exit_if_true (sfinfo.channels != 1, "\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
 	exit_if_true (sfinfo.frames != output_frames, "\n\nLine %d: Incorrect number of frames in file (%d should be %d).\n", __LINE__, (int) sfinfo.frames, (int) output_frames) ;
+
+	/* Check that the first sample read is the same as the first written. */
+	test_read_int_or_die (file, 0, input, ARRAY_LEN (input), __LINE__) ;
+	exit_if_true (input [0] != output [0], "\n\nLine %d: Bad first sample (0x%08x).\n", __LINE__, input [0]) ;
 
 	check_log_buffer_or_die (file, __LINE__) ;
 
