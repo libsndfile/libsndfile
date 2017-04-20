@@ -19,7 +19,6 @@ set (CMAKE_C_STANDARD_REQUIRED TRUE)
 
 include (GNUInstallDirs)
 include (CPack)
-include (CTest)
 include (FeatureSummary)
 
 #
@@ -29,6 +28,7 @@ include (FeatureSummary)
 option (BUILD_STATIC_LIBS "Build static libraries" ON)
 option (BUILD_SHARED_LIBS "Build shared libraries" ON)
 option (BUILD_PROGRAMS "Build programs" ON)
+option (BUILD_TESTING "Build tests" ON)
 option (DISABLE_EXTERNAL_LIBS "Disable use of FLAC, Ogg and Vorbis" OFF)
 option (ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
 option (DISABLE_CPU_CLIP "Disable tricky cpu specific clipper" OFF)
@@ -513,6 +513,8 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTAL
 #
 
 if (BUILD_TESTING)
+
+	include (CTest)
 
 	# Custom commands to generate tests sources form autogen templates
 
