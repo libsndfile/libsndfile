@@ -2,7 +2,7 @@ macro (TEST_INLINE)
 	if (NOT DEFINED INLINE_CODE)
 		message (STATUS "Checking for inline...")
 		set (INLINE_KEYWORD "inline")
-		configure_file (${CMAKE_SOURCE_DIR}/cmake/TestInline.c.in ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/TestInline.c)
+		configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake/TestInline.c.in ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/TestInline.c)
 		try_compile (HAVE_INLINE "${CMAKE_CURRENT_BINARY_DIR}"
                     "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/TestInline.c")
 		if (HAVE_INLINE)
@@ -12,7 +12,7 @@ macro (TEST_INLINE)
 			
 			message (STATUS "Checking for __inline...")
 			set (INLINE_KEYWORD "__inline")
-			configure_file (${CMAKE_SOURCE_DIR}/cmake/TestInline.c.in ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/TestInline.c)
+			configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake/TestInline.c.in ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/TestInline.c)
 			try_compile (HAVE___INLINE "${CMAKE_CURRENT_BINARY_DIR}"
                     "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/TestInline.c")
 			if (HAVE___INLINE)
@@ -22,7 +22,7 @@ macro (TEST_INLINE)
 				
 				message (STATUS "Checking for __inline__...")
 				set (INLINE_KEYWORD "__inline__")
-				configure_file (${CMAKE_SOURCE_DIR}/cmake/TestInline.c.in ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/TestInline.c)
+				configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake/TestInline.c.in ${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/TestInline.c)
 				try_compile (HAVE___INLINE "${CMAKE_CURRENT_BINARY_DIR}"
 					"${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/TestInline.c")
 				if (HAVE___INLINE)
@@ -30,7 +30,7 @@ macro (TEST_INLINE)
 					
 					message (STATUS "Checking for __inline__...")
 					set (INLINE_KEYWORD "__inline__")
-					configure_file (${CMAKE_SOURCE_DIR}/cmake/TestInline.c.in ${CMAKE_SOURCE_DIR}/cmake/TestInline.c)
+					configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cmake/TestInline.c.in ${CMAKE_CURRENT_SOURCE_DIR}/cmake/TestInline.c)
 					try_compile (HAVE___INLINE__ "${CMAKE_CURRENT_BINARY_DIR}"
 						"${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/TestInline.c")
 				else ()

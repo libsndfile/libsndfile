@@ -40,7 +40,7 @@ if ((NOT BUILD_STATIC_LIBS) AND (NOT BUILD_SHARED_LIBS))
 	set (BUILD_STATIC_LIBS ON)
 endif ()
 
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/")
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 #
 # Setup definitions
@@ -276,8 +276,8 @@ if (BUILD_SHARED_LIBS)
 	set (SNDFILE_SHARED_TARGET sndfile)
 
 	if (WIN32)
-		configure_file(${CMAKE_SOURCE_DIR}/src/version-metadata.rc.in.cmake ${CMAKE_SOURCE_DIR}/src/version-metadata.rc)
-		configure_file (${CMAKE_SOURCE_DIR}/src/libsndfile.def.in.cmake ${CMAKE_SOURCE_DIR}/src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
+		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/version-metadata.rc.in.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/version-metadata.rc)
+		configure_file (${CMAKE_CURRENT_SOURCE_DIR}/src/libsndfile.def.in.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
 		list (APPEND libsndfile_SOURCES
 			src/version-metadata.rc
 			src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
@@ -517,59 +517,59 @@ if (BUILD_TESTING)
 	# Custom commands to generate tests sources form autogen templates
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/benchmark.c
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/tests/benchmark.c
 		COMMAND ${AUTOGEN_EXECUTABLE} --writable benchmark.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/floating_point_test.c
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/tests/floating_point_test.c
 		COMMAND ${AUTOGEN_EXECUTABLE} --writable floating_point_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)	
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)	
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/floating_point_test.c
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/tests/floating_point_test.c
 		COMMAND ${AUTOGEN_EXECUTABLE} --writable floating_point_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/header_test.c
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/tests/header_test.c
 		COMMAND ${AUTOGEN_EXECUTABLE} --writable header_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/pcm_test.c
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/tests/pcm_test.c
 		COMMAND ${AUTOGEN_EXECUTABLE} --writable pcm_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/pipe_test.c
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/tests/pipe_test.c
 		COMMAND ${AUTOGEN_EXECUTABLE} --writable pipe_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/rdwr_test.c
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/tests/rdwr_test.c
 		COMMAND ${AUTOGEN_EXECUTABLE} --writable rdwr_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/scale_clip_test.c
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/tests/scale_clip_test.c
 		COMMAND ${AUTOGEN_EXECUTABLE} --writable scale_clip_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/utils.c
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/tests/utils.c
 		COMMAND ${AUTOGEN_EXECUTABLE} --writable utils.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/tests/write_read_test.c
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/tests/write_read_test.c
 		COMMAND ${AUTOGEN_EXECUTABLE} --writable write_read_test.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 	add_custom_command (
-		OUTPUT ${CMAKE_SOURCE_DIR}/src/test_endswap.c
+		OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/test_endswap.c
 		COMMAND ${AUTOGEN_EXECUTABLE} --writable test_endswap.def
-		WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src)
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 	### test_main
 
