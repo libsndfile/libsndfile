@@ -300,9 +300,9 @@ if (BUILD_STATIC_LIBS)
 	add_library (${SNDFILE_STATIC_TARGET} STATIC ${libsndfile_SOURCES})
 	target_include_directories(${SNDFILE_STATIC_TARGET}
 		PUBLIC
-			$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
+			$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src>
 			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-			$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
+			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
 	if (LIBM_REQUIRED)
 		target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${M_LIBRARY})
 	endif ()
@@ -345,9 +345,9 @@ if (BUILD_SHARED_LIBS)
 	add_library(${SNDFILE_SHARED_TARGET} SHARED ${libsndfile_SOURCES})
 	target_include_directories(${SNDFILE_SHARED_TARGET}
 		PUBLIC
-			$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
+			$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src>
 			$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
-			$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>)
+			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
 
 	if (LIBM_REQUIRED)
 		target_link_libraries (${SNDFILE_SHARED_TARGET} PRIVATE ${M_LIBRARY})
@@ -626,14 +626,14 @@ if (ENABLE_PACKAGE_CONFIG)
 
 	write_basic_package_version_file (LibSndFileConfigVersion.cmake COMPATIBILITY SameMajorVersion)
 	configure_package_config_file (
-		${CMAKE_SOURCE_DIR}/cmake/LibSndFileConfig.cmake.in
+		cmake/LibSndFileConfig.cmake.in
 		LibSndFileConfig.cmake
 		INSTALL_DESTINATION ${CMAKE_INSTALL_PACKAGEDIR})
 
 	install(EXPORT LibSndFileTargets DESTINATION ${CMAKE_INSTALL_PACKAGEDIR})
 	install(FILES
-				${CMAKE_BINARY_DIR}/LibSndFileConfig.cmake
-				${CMAKE_BINARY_DIR}/LibSndFileConfigVersion.cmake
+				${CMAKE_CURRENT_BINARY_DIR}/LibSndFileConfig.cmake
+				${CMAKE_CURRENT_BINARY_DIR}/LibSndFileConfigVersion.cmake
 			DESTINATION
 				${CMAKE_INSTALL_PACKAGEDIR})
 
@@ -716,7 +716,7 @@ if (BUILD_TESTING)
 	# utils static library
 	add_library(test_utils STATIC tests/utils.c)
 	target_link_libraries(test_utils PUBLIC ${SNDFILE_STATIC_TARGET})
-	target_include_directories(test_utils PUBLIC "${CMAKE_BINARY_DIR}/tests")
+	target_include_directories(test_utils PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/tests")
 
 	### test_main
 
