@@ -331,15 +331,19 @@ if (BUILD_SHARED_LIBS)
 	set (SNDFILE_SHARED_TARGET sndfile-shared)
 
 	if (WIN32)
+		set (VERSION_MAJOR ${CPACK_PACKAGE_VERSION_MAJOR})
+		set (PACKAGE_NAME ${CPACK_PACKAGE_NAME})
+		set (GEN_TOOL cmake)
+
 		file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/version-metadata.rc")
 		configure_file(src/version-metadata.rc.in.cmake src/version-metadata.rc)
 
-		file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def")
-		configure_file (src/libsndfile.def.in.cmake src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
+		file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/${PACKAGE_NAME}.def")
+		configure_file (src/libsndfile.def.in src/${PACKAGE_NAME}.def @ONLY)
 
 		list (APPEND libsndfile_SOURCES
 			src/version-metadata.rc
-			src/${PROJECT_NAME}-${PROJECT_VERSION_MAJOR}.def)
+			src/${PACKAGE_NAME}-${VERSION_MAJOR}.def)
 	endif (WIN32)
 
 	add_library(${SNDFILE_SHARED_TARGET} SHARED ${libsndfile_SOURCES})
