@@ -91,7 +91,7 @@ win32_ordinal_test (void)
 	int k, ordinal, errors = 0 ;
 
 	for (k = 0 ; locations [k] != NULL ; k++)
-	{	snprintf (buffer, sizeof (buffer), "%s/libsndfile.def", locations [k]) ;
+	{	snprintf (buffer, sizeof (buffer), "%s/libsndfile-1.def", locations [k]) ;
 		if ((file = fopen (buffer, "r")) != NULL)
 			break ;
 		} ;
