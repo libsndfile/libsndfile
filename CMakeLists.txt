@@ -343,7 +343,7 @@ if (BUILD_SHARED_LIBS)
 
 		list (APPEND libsndfile_SOURCES
 			src/version-metadata.rc
-			src/${PACKAGE_NAME}-${VERSION_MAJOR}.def)
+			src/${PACKAGE_NAME}.def)
 	endif (WIN32)
 
 	add_library(${SNDFILE_SHARED_TARGET} SHARED ${libsndfile_SOURCES})
