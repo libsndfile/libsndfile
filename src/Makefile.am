@@ -15,7 +15,7 @@ EXTRA_DIST = sndfile.h.in config.h.in test_endswap.c test_endswap.tpl test_endsw
 			GSM610/README GSM610/COPYRIGHT GSM610/ChangeLog \
 			G72x/README G72x/README.original G72x/ChangeLog \
 			make-static-lib-hidden-privates.sh \
-			config.h.cmake version-metadata.rc.in.cmake
+			config.h.cmake
 
 noinst_HEADERS = common.h sfconfig.h sfendian.h wavlike.h sf_unistd.h ogg.h chanmap.h
 
