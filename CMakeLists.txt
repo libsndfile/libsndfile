@@ -324,6 +324,8 @@ if (BUILD_STATIC_LIBS)
 	endif ()
 	# Remove "-static" from output name
 	set_target_properties (${SNDFILE_STATIC_TARGET} PROPERTIES OUTPUT_NAME "sndfile")
+	set_target_properties (${SNDFILE_STATIC_TARGET} PROPERTIES
+		PUBLIC_HEADER "${libsndfile_PUBLIC_HEADERS}")
 endif ()
 
 if (BUILD_SHARED_LIBS)
@@ -334,16 +336,20 @@ if (BUILD_SHARED_LIBS)
 		set (VERSION_MAJOR ${CPACK_PACKAGE_VERSION_MAJOR})
 		set (PACKAGE_NAME ${CPACK_PACKAGE_NAME})
 		set (GEN_TOOL cmake)
+		
+		set (WIN_RC_VERSION "${CPACK_PACKAGE_VERSION_MAJOR},${CPACK_PACKAGE_VERSION_MINOR},${CPACK_PACKAGE_VERSION_PATCH}")
+		set (CLEAN_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+		set (PACKAGE_VERSION ${CPACK_PACKAGE_VERSION})
 
 		file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/version-metadata.rc")
-		configure_file(src/version-metadata.rc.in.cmake src/version-metadata.rc)
+		configure_file(src/version-metadata.rc.in src/version-metadata.rc @ONLY)
 
 		file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/${PACKAGE_NAME}.def")
 		configure_file (src/libsndfile.def.in src/${PACKAGE_NAME}.def @ONLY)
 
 		list (APPEND libsndfile_SOURCES
-			src/version-metadata.rc
-			src/${PACKAGE_NAME}.def)
+			${CMAKE_CURRENT_BINARY_DIR}/src/version-metadata.rc
+			${CMAKE_CURRENT_BINARY_DIR}/src/${PACKAGE_NAME}.def)
 	endif (WIN32)
 
 	add_library(${SNDFILE_SHARED_TARGET} SHARED ${libsndfile_SOURCES})
@@ -380,6 +386,7 @@ if (BUILD_SHARED_LIBS)
 
 	if (WIN32)
 		set_target_properties(${SNDFILE_SHARED_TARGET} PROPERTIES
+			ARCHIVE_OUTPUT_NAME "libsndfile-${PROJECT_VERSION_MAJOR}"
 			PREFIX "lib"
 			OUTPUT_NAME "sndfile-${PROJECT_VERSION_MAJOR}")
 	endif (WIN32)
