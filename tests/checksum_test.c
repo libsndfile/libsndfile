@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -87,6 +87,7 @@ checksum_test (const CHECKSUM * cksum)
 
 	print_test_name (__func__, cksum->enc_name) ;
 
+	memset (&info, 0, sizeof (info)) ;
 	info.format = cksum->enc_fmt ;
 	info.channels = 1 ;
 	info.samplerate	= SAMPLE_RATE ;

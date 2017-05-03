@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -247,10 +247,10 @@ update_header_sub (const char *filename, int typemajor, int write_mode)
 	SF_INFO		sfinfo ;
 	int			k ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate = 44100 ;
 	sfinfo.format = (typemajor | SF_FORMAT_PCM_16) ;
 	sfinfo.channels = 1 ;
-	sfinfo.frames = 0 ;
 
 	outfile = test_open_file_or_die (filename, write_mode, &sfinfo, SF_TRUE, __LINE__) ;
 
@@ -340,6 +340,7 @@ update_seek_[+ (get "name") +]_test	(const char *filename, int filetype)
 	memset (buffer, 0, sizeof (buffer)) ;
 
 	/* Create sound outfile with no data. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.format = filetype | [+ (get "format") +] ;
 	sfinfo.samplerate = 48000 ;
 	sfinfo.channels = 2 ;
@@ -450,6 +451,7 @@ extra_header_test (const char *filename, int filetype)
 
 	print_test_name ("extra_header_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate = 44100 ;
 	sfinfo.format = (filetype | SF_FORMAT_PCM_16) ;
 	sfinfo.channels = 1 ;
