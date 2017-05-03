@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 2001-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,6 +129,7 @@ pipe_read_test (int filetype, const char *ext)
 	snprintf (filename, sizeof (filename), "pipe_in.%s", ext) ;
 	print_test_name ("pipe_read_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.format = filetype | SF_FORMAT_PCM_16 ;
 	sfinfo.channels = 1 ;
 	sfinfo.samplerate = 44100 ;
@@ -331,6 +332,7 @@ pipe_test_others (FILETYPE* list1, FILETYPE* list2)
 			SF_INFO sfinfo ;
 			int retval ;
 
+			memset (&sfinfo, 0, sizeof (sfinfo)) ;
 			sfinfo.format = info.format | SF_FORMAT_PCM_16 ;
 			sfinfo.channels = 1 ;
 			sfinfo.samplerate = 44100 ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -527,7 +527,7 @@ host_read_f2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 
 /* Fix me : Need lef2s_array */
 		if (psf->data_endswap == SF_TRUE)
-			endswap_int_array (ubuf.ibuf, bufferlen) ;
+			endswap_int_array (ubuf.ibuf, readcount) ;
 
 		convert (ubuf.fbuf, readcount, ptr + total, scale) ;
 		total += readcount ;

@@ -1,6 +1,6 @@
 [+ AutoGen5 template c +]
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -207,6 +207,7 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 
 	gen_windowed_sine_float (float_data, DFT_DATA_LENGTH, 0.9999) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= DFT_DATA_LENGTH ;
 	sfinfo.channels		= 1 ;
@@ -259,6 +260,7 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 
 	gen_windowed_sine_double (double_data, DFT_DATA_LENGTH, 0.9999) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= DFT_DATA_LENGTH ;
 	sfinfo.channels		= 1 ;
@@ -316,6 +318,7 @@ static void
 
 	gen_windowed_sine_[+ (get "float_name") +] ([+ (get "float_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), 0.9999) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= ARRAY_LEN ([+ (get "int_name") +]_data) ;
 	sfinfo.channels		= 1 ;

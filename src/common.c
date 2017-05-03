@@ -73,6 +73,10 @@ psf_bump_header_allocation (SF_PRIVATE * psf, sf_count_t needed)
 		return 1 ;
 		} ;
 
+	/* Always zero-out new header memory to avoid un-initializer memory accesses. */
+	if (newlen > psf->header.len)
+		memset ((char *) ptr + psf->header.len, 0, newlen - psf->header.len) ;
+
 	psf->header.ptr = ptr ;
 	psf->header.len = newlen ;
 	return 0 ;

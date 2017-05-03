@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2011-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,6 +102,7 @@ format_combo_test (void)
 			char filename [128] ;
 			int subtype_is_valid, check_is_valid ;
 
+			memset (&info, 0, sizeof (info)) ;
 			memset (&subtype_fmt_info, 0, sizeof (subtype_fmt_info)) ;
 			subtype_fmt_info.format = codec ;
 			subtype_is_valid = sf_command (NULL, SFC_GET_FORMAT_SUBTYPE, &subtype_fmt_info, sizeof (subtype_fmt_info)) == 0 ;

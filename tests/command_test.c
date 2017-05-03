@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1053,6 +1053,7 @@ broadcast_test (const char *filename, int filetype)
 
 	print_test_name ("broadcast_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 11025 ;
 	sfinfo.format		= filetype ;
 	sfinfo.channels		= 1 ;
@@ -1415,6 +1416,7 @@ cart_test (const char *filename, int filetype)
 
 	print_test_name ("cart_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 11025 ;
 	sfinfo.format		= filetype ;
 	sfinfo.channels		= 1 ;
