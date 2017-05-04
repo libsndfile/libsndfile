@@ -47,6 +47,7 @@ libsndfile_la_LIBADD = GSM610/libgsm.la G72x/libg72x.la ALAC/libalac.la \
 
 EXTRA_libsndfile_la_DEPENDENCIES = $(SYMBOL_FILES)
 
+libcommon_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS)
 libcommon_la_SOURCES = common.c file_io.c command.c pcm.c ulaw.c alaw.c \
 		float32.c double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
 		interleave.c strings.c dither.c cart.c broadcast.c audio_detect.c \
