@@ -27,6 +27,9 @@
 #endif
 #include <string.h>
 #include <fcntl.h>
+#ifdef HAVE_DIRECT_H
+#include <direct.h>
+#endif
 #include <sys/stat.h>
 
 #include <sndfile.h>
