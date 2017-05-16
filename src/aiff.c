@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -1196,21 +1196,6 @@ aiff_rewrite_header (SF_PRIVATE *psf)
 	return ;
 } /* aiff_rewrite_header */
 
-static uint16_t
-convert_loop_mode (int type_mode)
-{	switch (type_mode)
-	{	case SF_LOOP_NONE:
-			return 0 ;
-		case SF_LOOP_FORWARD :
-			return 1 ;
-		case SF_LOOP_ALTERNATING :
-			return 2 ;
-		default : break ;
-		} ;
-
-	return 0 ;
-} /* convert_loop_mode */
-
 static int
 aiff_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t		current ;
@@ -1441,141 +1426,10 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 
 	/* Check if there's a INST chunk to write */
 	if (psf->instrument != NULL && psf->cues != NULL)
-	{	/* Both loops and cues exist */
-		uint16_t sustainLoopMode, releaseLoopMode ;
-		uint32_t idx, sLoopStart = 0, sLoopEnd = 0, rLoopStart = 0, rLoopEnd = 0 ;
-		int totalStringLength = 0, stringLength ;
-
-		/* Here we count how many bytes will the pascal strings need */
-		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-		{	stringLength = strlen (psf->cues->cue_points [idx].name) + 1 ; /* We'll count the first byte also of every pascal string */
-			if (stringLength % 2 == 0)
-				totalStringLength += stringLength ;
-			else
-				totalStringLength += (stringLength + 1) ; /* The pascal string must have an even count */
-			}
-
-		/* First we check which loops are active and create the necessary MARK chunk for markers */
-		/* The first written markers will be references from loop points then comes the real markers */
-		if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
-		{	/* There's both a sustain loop and a release loop */
-			psf_binheader_writef (psf, "Em42 241b 241b 241b 241b",
-					MARK_MARKER, 2 + 2 * (2 + 4 + 1 + 19) + 2 * (2 + 4 + 1 + 17) + psf->cues->cue_count * (2 + 4) + totalStringLength, 4 + psf->cues->cue_count,
-					1, psf->instrument->loops [0].start, 18, "sustain loop start", make_size_t (19),
-					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17),
-					3, psf->instrument->loops [1].start, 18, "release loop start", make_size_t (19),
-					4, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
-			/* Now comes true markers from cues struct */
-			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-				psf_binheader_writef (psf, "E24p", 5 + idx, psf->cues->cue_points [idx].sample_offset, psf->cues->cue_points [idx].name) ;
-
-			/* Change the loops to be references to the markers */
-			sLoopStart = 1 ;
-			sLoopEnd = 2 ;
-			rLoopStart = 3 ;
-			rLoopEnd = 4 ;
-			}
-		else if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode == SF_LOOP_NONE)
-		{	/* There's a sustain loop but no release loop */
-			psf_binheader_writef (psf, "Em42241b241b",
-					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17) + psf->cues->cue_count * (2 + 4) + totalStringLength, 2 + psf->cues->cue_count,
-					1, psf->instrument->loops [0].start, 18, "sustain loop start", make_size_t (19),
-					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17)) ;
-			/* Now comes true markers from cues struct */
-			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-				psf_binheader_writef (psf, "E24p", 3 + idx, psf->cues->cue_points [idx].sample_offset, psf->cues->cue_points [idx].name) ;
-
-			/* Change the loops to be references to the markers */
-			sLoopStart = 1 ;
-			sLoopEnd = 2 ;
-			rLoopStart = 0 ;
-			rLoopEnd = 0 ;
-			}
-		else if (psf->instrument->loops [0].mode == SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
-		{	/* There's a release loop but no sustain loop! Strange indeed! */
-			psf_binheader_writef (psf, "Em42241b241b",
-					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17) + psf->cues->cue_count * (2 + 4) + totalStringLength, 2 + psf->cues->cue_count,
-					1, psf->instrument->loops [1].start, 18, "release loop start", make_size_t (19),
-					2, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
-			/* Now comes true markers from cues struct */
-			for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-				psf_binheader_writef (psf, "E24p", 3 + idx, psf->cues->cue_points [idx].sample_offset, psf->cues->cue_points [idx].name) ;
-
-			/* Change the loops to be references to the markers */
-			sLoopStart = 0 ;
-			sLoopEnd = 0 ;
-			rLoopStart = 1 ;
-			rLoopEnd = 2 ;
-			} ;
-
-		/* First convert loop modes to aiff standard */
-		sustainLoopMode = convert_loop_mode (psf->instrument->loops [0].mode) ;
-		releaseLoopMode = convert_loop_mode (psf->instrument->loops [1].mode) ;
-
-		/* Now we finally write the actual INST chunk */
-		psf_binheader_writef (psf, "Em4111111", INST_MARKER, SIZEOF_INST_CHUNK, psf->instrument->basenote, psf->instrument->detune,
-			psf->instrument->key_lo, psf->instrument->key_hi, psf->instrument->velocity_lo, psf->instrument->velocity_hi) ;
-		psf_binheader_writef (psf, "E2222222", (short) psf->instrument->gain,
-			sustainLoopMode, sLoopStart, sLoopEnd,
-			releaseLoopMode, rLoopStart, rLoopEnd) ;
-
-		}
-	else if (psf->instrument != NULL && psf->cues == NULL)
-	{	/* There are loops but no cues */
-		uint16_t sustainLoopMode, releaseLoopMode ;
-		uint32_t sLoopStart = 0, sLoopEnd = 0, rLoopStart = 0, rLoopEnd = 0 ;
-
-		/* First we check which loops are active and create the necessary MARK chunk for markers */
-		if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
-		{	/* There's both a sustain loop and a release loop */
-			psf_binheader_writef (psf, "Em42 241b 241b 241b 241b",
-					MARK_MARKER, 2 + 2 * (2 + 4 + 1 + 19) + 2 * (2 + 4 + 1 + 17), 4,
-					1, psf->instrument->loops [0].start, 18, "sustain loop start", make_size_t (19),
-					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17),
-					3, psf->instrument->loops [1].start, 18, "release loop start", make_size_t (19),
-					4, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
-			/* Change the loops to be references to the markers */
-			sLoopStart = 1 ;
-			sLoopEnd = 2 ;
-			rLoopStart = 3 ;
-			rLoopEnd = 4 ;
-			}
-		else if (psf->instrument->loops [0].mode != SF_LOOP_NONE && psf->instrument->loops [1].mode == SF_LOOP_NONE)
-		{	/* There's a sustain loop but no release loop */
-			psf_binheader_writef (psf, "Em42241b241b",
-					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17), 2,
-					1, psf->instrument->loops [0].start, 18, "sustain loop start", make_size_t (19),
-					2, psf->instrument->loops [0].end, 16, "sustain loop end", make_size_t (17)) ;
-			/* Change the loops to be references to the markers */
-			sLoopStart = 1 ;
-			sLoopEnd = 2 ;
-			rLoopStart = 0 ;
-			rLoopEnd = 0 ;
-			}
-		else if (psf->instrument->loops [0].mode == SF_LOOP_NONE && psf->instrument->loops [1].mode != SF_LOOP_NONE)
-		{	/* There's a release loop but no sustain loop! Strange indeed! */
-			psf_binheader_writef (psf, "Em42241b241b",
-					MARK_MARKER, 2 + (2 + 4 + 1 + 19) + (2 + 4 + 1 + 17), 2,
-					1, psf->instrument->loops [1].start, 18, "release loop start", make_size_t (19),
-					2, psf->instrument->loops [1].end, 16, "release loop end", make_size_t (17)) ;
-			/* Change the loops to be references to the markers */
-			sLoopStart = 0 ;
-			sLoopEnd = 0 ;
-			rLoopStart = 1 ;
-			rLoopEnd = 2 ;
-			} ;
-
-		/* First convert loop modes to aiff standard */
-		sustainLoopMode = convert_loop_mode (psf->instrument->loops [0].mode) ;
-		releaseLoopMode = convert_loop_mode (psf->instrument->loops [1].mode) ;
-
-		/* Now we finally write the actual INST chunk */
-		psf_binheader_writef (psf, "Em4111111", INST_MARKER, SIZEOF_INST_CHUNK, psf->instrument->basenote, psf->instrument->detune,
-			psf->instrument->key_lo, psf->instrument->key_hi, psf->instrument->velocity_lo, psf->instrument->velocity_hi) ;
-		psf_binheader_writef (psf, "E2222222", (short) psf->instrument->gain,
-			sustainLoopMode, sLoopStart, sLoopEnd,
-			releaseLoopMode, rLoopStart, rLoopEnd) ;
-
+	{	/* Huge chunk of code removed here because it had egregious errors that were
+		** not detected by either the compiler or the tests. It was found when updating
+		** the way psf_binheader_writef works.
+		*/
 		}
 	else if (psf->instrument == NULL && psf->cues != NULL)
 	{	/* There are cues but no loops */
