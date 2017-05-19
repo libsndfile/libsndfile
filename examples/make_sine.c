@@ -55,8 +55,8 @@ main (void)
 	int	*buffer ;
 
 	if (! (buffer = malloc (2 * SAMPLE_COUNT * sizeof (int))))
-	{	printf ("Malloc failed.\n") ;
-		exit (0) ;
+	{	printf ("Error : Malloc failed.\n") ;
+		return 1 ;
 		} ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
@@ -83,8 +83,10 @@ main (void)
 			} ;
 		}
 	else
-	{	printf ("makesine can only generate mono or stereo files.\n") ;
-		exit (1) ;
+	{	printf ("Error : make_sine can only generate mono or stereo files.\n") ;
+		sf_close (file) ;
+		free (buffer) ;
+		return 1 ;
 		} ;
 
 	if (sf_write_int (file, buffer, sfinfo.channels * SAMPLE_COUNT) !=
