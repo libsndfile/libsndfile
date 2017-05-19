@@ -236,7 +236,8 @@ set (FILESPECIFIC
 	src/ogg_vorbis.c
 	src/ogg_speex.c
 	src/ogg_pcm.c
-	src/ogg_opus.c)
+	src/ogg_opus.c
+	src/nms_adpcm.c)
 
 # GSM610 sources
 set (libgsm_SOURCES
@@ -788,7 +789,8 @@ if (BUILD_TESTING)
 		src/test_strncpy_crlf.c
 		src/test_broadcast_var.c
 		src/test_cart_var.c
-		src/test_binheader_writef.c)
+		src/test_binheader_writef.c
+		src/test_nms_adpcm.c)
 
 	add_executable (test_main ${test_main_SOURCES})
 	target_link_libraries (test_main ${SNDFILE_STATIC_TARGET})

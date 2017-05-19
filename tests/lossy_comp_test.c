@@ -377,6 +377,42 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
+	/* Lite remove start */
+	if (do_all || strcmp (argv [1], "raw_nmsadpcm") == 0)
+	{	lcomp_test_short	("raw.vce16", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_16, 1, 0.37) ;
+		lcomp_test_int		("raw.vce16", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_16, 1, 0.31) ;
+		lcomp_test_float	("raw.vce16", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_16, 1, 0.34) ;
+		lcomp_test_double	("raw.vce16", SF_FORMAT_RAW	| SF_FORMAT_NMS_ADPCM_16, 1, 0.34) ;
+
+		lcomp_test_short	("raw.vce24", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_24, 1, 0.15) ;
+		lcomp_test_int		("raw.vce24", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_24, 1, 0.10) ;
+		lcomp_test_float	("raw.vce24", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_24, 1, 0.14) ;
+		lcomp_test_double	("raw.vce24", SF_FORMAT_RAW	| SF_FORMAT_NMS_ADPCM_24, 1, 0.14) ;
+
+		lcomp_test_short	("raw.vce32", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_32, 1, 0.036) ;
+		lcomp_test_int		("raw.vce32", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_32, 1, 0.045) ;
+		lcomp_test_float	("raw.vce32", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_32, 1, 0.035) ;
+		lcomp_test_double	("raw.vce32", SF_FORMAT_RAW	| SF_FORMAT_NMS_ADPCM_32, 1, 0.035) ;
+
+		sdlcomp_test_short	("raw.vce16", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_16, 1, 0.16) ;
+		sdlcomp_test_int	("raw.vce16", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_16, 1, 0.16) ;
+		sdlcomp_test_float	("raw.vce16", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_16, 1, 0.16) ;
+		sdlcomp_test_double	("raw.vce16", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_16, 1, 0.16) ;
+
+		sdlcomp_test_short	("raw.vce24", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_24, 1, 0.06) ;
+		sdlcomp_test_int	("raw.vce24", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_24, 1, 0.06) ;
+		sdlcomp_test_float	("raw.vce24", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_24, 1, 0.06) ;
+		sdlcomp_test_double	("raw.vce24", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_24, 1, 0.06) ;
+
+		sdlcomp_test_short	("raw.vce32", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_32, 1, 0.017) ;
+		sdlcomp_test_int	("raw.vce32", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_32, 1, 0.018) ;
+		sdlcomp_test_float	("raw.vce32", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_32, 1, 0.018) ;
+		sdlcomp_test_double	("raw.vce32", SF_FORMAT_RAW | SF_FORMAT_NMS_ADPCM_32, 1, 0.018) ;
+
+		test_count++ ;
+		} ;
+	/* Lite remove end */
+
 	if (do_all || strcmp (argv [1], "ogg_vorbis") == 0)
 	{	if (HAVE_EXTERNAL_XIPH_LIBS)
 		{	/* Don't do lcomp_test_XXX as the errors are too big. */
@@ -1644,7 +1680,10 @@ channels = 1 ;
 		(sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_MS_ADPCM &&
 		(sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_GSM610 &&
 		(sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_G721_32 &&
-		(sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_G723_24)
+		(sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_G723_24 &&
+		(sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_NMS_ADPCM_16 &&
+		(sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_NMS_ADPCM_24 &&
+		(sfinfo.format & SF_FORMAT_SUBMASK) != SF_FORMAT_NMS_ADPCM_32)
 		for (k = 0 ; k < sfinfo.frames - datalen ; k++)
 			if (abs (data [k]) > decay_response (k))
 			{	printf ("\n\nLine %d: Incorrect sample (#%" PRId64 " : abs (%d) should be < %d).\n", __LINE__, datalen + k, data [k], decay_response (k)) ;

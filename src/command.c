@@ -192,11 +192,16 @@ static SF_FORMAT_INFO subtype_formats [] =
 
 	{	SF_FORMAT_G721_32,		"32kbs G721 ADPCM",		NULL 	},
 	{	SF_FORMAT_G723_24,		"24kbs G723 ADPCM",		NULL 	},
+	{	SF_FORMAT_G723_40,		"40kbs G723 ADPCM",		NULL	},
 
 	{	SF_FORMAT_DWVW_12,		"12 bit DWVW",			NULL 	},
 	{	SF_FORMAT_DWVW_16,		"16 bit DWVW",			NULL 	},
 	{	SF_FORMAT_DWVW_24,		"24 bit DWVW",			NULL 	},
 	{	SF_FORMAT_VOX_ADPCM,	"VOX ADPCM",			"vox" 	},
+
+	{	SF_FORMAT_NMS_ADPCM_16,	"16kbs NMS ADPCM",		NULL	},
+	{	SF_FORMAT_NMS_ADPCM_24,	"24kbs NMS ADPCM",		NULL	},
+	{	SF_FORMAT_NMS_ADPCM_32,	"32kbs NMS ADPCM",		NULL	},
 
 	{	SF_FORMAT_DPCM_16,		"16 bit DPCM",			NULL 	},
 	{	SF_FORMAT_DPCM_8,		"8 bit DPCM",			NULL 	},
