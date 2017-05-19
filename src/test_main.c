@@ -63,6 +63,8 @@ main (void)
 	test_broadcast_var () ;
 	test_cart_var () ;
 
+	test_nms_adpcm () ;
+
 	return 0 ;
 } /* main */
 
