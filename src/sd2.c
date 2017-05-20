@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Paavo Jumppanen
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -244,7 +244,7 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 	psf_binheader_writef (psf, "Eo2mm", make_size_t (0x50), 0, Sd2f_MARKER, lsf1_MARKER) ;
 
 	/* Very start of resource map. */
-	psf_binheader_writef (psf, "E444", make_size_t (rsrc.map_offset), rsrc.data_offset, rsrc.map_offset, rsrc.data_length) ;
+	psf_binheader_writef (psf, "E4444", make_size_t (rsrc.map_offset), rsrc.data_offset, rsrc.map_offset, rsrc.data_length) ;
 
 	/* These I don't currently understand. */
 	if (1)
