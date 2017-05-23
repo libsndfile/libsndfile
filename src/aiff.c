@@ -1759,7 +1759,7 @@ aiff_read_chanmap (SF_PRIVATE * psf, unsigned dword)
 		psf_binheader_readf (psf, "j", dword - bytesread) ;
 
 	if (map_info->channel_map != NULL)
-	{	size_t chanmap_size = psf->sf.channels * sizeof (psf->channel_map [0]) ;
+	{	size_t chanmap_size = SF_MIN (psf->sf.channels, layout_tag & 0xffff) * sizeof (psf->channel_map [0]) ;
 
 		free (psf->channel_map) ;
 
