@@ -85,8 +85,6 @@ else
 AM_CONDITIONAL([LINUX_MINGW_CROSS_TEST],
 	[test "$build_os:$target_os:$host_os:$HAVE_WINE" = "linux-gnu:mingw32msvc:mingw32msvc:yes"])
 
-gl_VISIBILITY
-
 #====================================================================================
 # Couple of initializations here. Fill in real values later.
 
@@ -542,12 +540,25 @@ if test x$ac_cv_c_compiler_gnu = xyes ; then
 
 	# OS specific tweaks.
 	case "$host_os" in
+		darwin* | rhapsody*)
+			# Disable -Wall, -pedantic and -Wshadow for Apple Darwin/Rhapsody.
+			# System headers on these systems are broken.
+			temp_CFLAGS=`echo $CFLAGS | $SED "s/-Wall -pedantic//" | $SED "s/-Wshadow//" | $SED "s/-Waggregate-return//"`
+			CFLAGS=$temp_CFLAGS
+			SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,\$(srcdir)/Symbols.darwin"
+			;;
+		linux*|kfreebsd*-gnu*|gnu*)
+			SHLIB_VERSION_ARG="-Wl,--version-script=\$(srcdir)/Symbols.gnu-binutils"
+			;;
 		mingw*)
-			SHLIB_VERSION_ARG="-Wc,-static-libgcc -Wl,\$(srcdir)/libsndfile.def"
+			SHLIB_VERSION_ARG="-Wc,-static-libgcc -Wl,\$(srcdir)/libsndfile-1.def"
 			win32_target_dll=1
 			if test x"$enable_shared" = xno ; then
 				win32_target_dll=0
 				fi
+			;;
+		os2*)
+			SHLIB_VERSION_ARG="-Wl,-export-symbols \$(srcdir)/Symbols.os2"
 			;;
 		*)
 			;;

@@ -8,10 +8,10 @@ nodist_include_HEADERS = sndfile.h
 
 noinst_LTLIBRARIES =  GSM610/libgsm.la G72x/libg72x.la ALAC/libalac.la libcommon.la
 
-SYMBOL_FILES = libsndfile.def
+SYMBOL_FILES = Symbols.gnu-binutils Symbols.darwin libsndfile-1.def Symbols.os2 Symbols.static
 
 EXTRA_DIST = sndfile.h.in config.h.in test_endswap.c test_endswap.tpl test_endswap.def \
-			$(SYMBOL_FILES) binheader_writef_check.py \
+			$(SYMBOL_FILES) create_symbols_file.py binheader_writef_check.py \
 			GSM610/README GSM610/COPYRIGHT GSM610/ChangeLog \
 			G72x/README G72x/README.original G72x/ChangeLog \
 			make-static-lib-hidden-privates.sh \
@@ -34,8 +34,7 @@ else
 WIN_VERSION_FILE =
 endif
 
-libsndfile_la_CFLAGS = $(CFLAG_VISIBILITY) $(EXTERNAL_XIPH_CFLAGS)
-libsndfile_la_CPPFLAGS = -DSNDFILE_EXPORTS
+libsndfile_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS)
 
 #===============================================================================
 # MinGW requires -no-undefined if a DLL is to be built.
@@ -98,6 +97,26 @@ check :
 
 # Need this target to force building of test programs.
 checkprograms : $(check_PROGRAMS)
+
+#======================================================================
+# Generate an OS specific Symbols files. This is done when the author
+# builds the distribution tarball. There should be not need for the
+# end user to create these files.
+
+Symbols.gnu-binutils: create_symbols_file.py
+	python $(srcdir)/create_symbols_file.py linux $(VERSION) > $@
+
+Symbols.darwin: create_symbols_file.py
+	python $(srcdir)/create_symbols_file.py darwin $(VERSION) > $@
+
+libsndfile-1.def: create_symbols_file.py
+	python $(srcdir)/create_symbols_file.py win32 $(VERSION) > $@
+
+Symbols.os2: create_symbols_file.py
+	python $(srcdir)/create_symbols_file.py os2 $(VERSION) > $@
+
+Symbols.static: create_symbols_file.py
+	python $(srcdir)/create_symbols_file.py static $(VERSION) > $@
 
 #======================================================================
 # Building windows resource files (if needed).

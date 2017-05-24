@@ -239,3 +239,7 @@ elseif (NOT ENABLE_STATIC_RUNTIME)
 		set (CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 	endif (MINGW)
 endif (ENABLE_STATIC_RUNTIME)
+
+if (BUILD_SHARED_LIBS)
+	find_package(PythonInterp REQUIRED)
+endif()
