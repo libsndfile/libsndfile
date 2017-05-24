@@ -63,7 +63,7 @@ psf_bump_header_allocation (SF_PRIVATE * psf, sf_count_t needed)
 	newlen = (needed > psf->header.len) ? 2 * SF_MAX (needed, smallest) : 2 * psf->header.len ;
 
 	if (newlen > 100 * 1024)
-	{	psf_log_printf (psf, "Request for header allocation of %D denined.\n", newlen) ;
+	{	psf_log_printf (psf, "Request for header allocation of %D denied.\n", newlen) ;
 		return 1 ;
 		}
 
