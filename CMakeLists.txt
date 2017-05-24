@@ -116,6 +116,12 @@ set_package_properties(SQLite3 PROPERTIES TYPE OPTIONAL
 	URL "www.sqlite.org/"
 	DESCRIPTION "light weight SQL database engine."
 	PURPOSE "Enables regtest")
+if(BUILD_SHARED_LIBS)
+	set_package_properties(PythonInterp PROPERTIES TYPE REQUIRED
+		URL "www.python.org/"
+		DESCRIPTION "Python is a widely used high-level programming language."
+		PURPOSE "Required to build shared libraries")
+endif()
 
 feature_summary (WHAT ALL)
 
@@ -344,12 +350,8 @@ if (BUILD_SHARED_LIBS)
 		file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/version-metadata.rc")
 		configure_file(src/version-metadata.rc.in src/version-metadata.rc @ONLY)
 
-		file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/src/${PACKAGE_NAME}.def")
-		configure_file (src/libsndfile.def.in src/${PACKAGE_NAME}.def @ONLY)
-
 		list (APPEND libsndfile_SOURCES
-			${CMAKE_CURRENT_BINARY_DIR}/src/version-metadata.rc
-			${CMAKE_CURRENT_BINARY_DIR}/src/${PACKAGE_NAME}.def)
+			${CMAKE_CURRENT_BINARY_DIR}/src/version-metadata.rc)
 	endif (WIN32)
 
 	add_library(${SNDFILE_SHARED_TARGET} SHARED ${libsndfile_SOURCES})
@@ -378,18 +380,60 @@ if (BUILD_SHARED_LIBS)
 	endif (NOT DISABLE_EXTERNAL_LIBS)
 
 	set_target_properties (${SNDFILE_SHARED_TARGET} PROPERTIES
-		DEFINE_SYMBOL SNDFILE_EXPORTS
 		PUBLIC_HEADER "${libsndfile_PUBLIC_HEADERS}"
 		SOVERSION ${PROJECT_VERSION_MAJOR}
-		VERSION ${PROJECT_VERSION}
-		C_VISIBILITY_PRESET hidden)
+		VERSION ${PROJECT_VERSION})
 
 	if (WIN32)
 		set_target_properties(${SNDFILE_SHARED_TARGET} PROPERTIES
 			ARCHIVE_OUTPUT_NAME "libsndfile-${PROJECT_VERSION_MAJOR}"
 			PREFIX "lib"
 			OUTPUT_NAME "sndfile-${PROJECT_VERSION_MAJOR}")
+	else ()
+		set_target_properties(${SNDFILE_SHARED_TARGET} PROPERTIES
+			OUTPUT_NAME "sndfile")
 	endif (WIN32)
+
+	# Symbol files generation
+
+	if (WIN32)
+		set(SYMBOL_FILENAME "libsndfile-${PROJECT_VERSION_MAJOR}.def")
+		set(SYMBOL_OS "win32")
+	elseif((CMAKE_SYSTEM_NAME MATCHES "Darwin") OR (CMAKE_SYSTEM_NAME MATCHES "Rhapsody"))
+		set(SYMBOL_FILENAME "Symbols.darwin")
+		set(SYMBOL_OS "darwin")
+	elseif(CMAKE_SYSTEM_NAME MATCHES "OS2")
+		set(SYMBOL_FILENAME "Symbols.os2")
+		set(SYMBOL_OS "os2")
+	elseif(UNIX)
+		set(SYMBOL_FILENAME "Symbols.gnu-binutils")
+		set(SYMBOL_OS "linux")
+	endif()
+
+	if (DEFINED SYMBOL_OS)
+		add_custom_command(
+			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}
+			COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/src/create_symbols_file.py ${SYMBOL_OS} ${PROJECT_VERSION_MAJOR} > ${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}
+			COMMENT "Generating ${SYMBOL_FILENAME}...")
+
+		add_custom_target(GENFILES DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME})
+		if (SYMBOL_OS MATCHES "win32")
+			target_sources(${SNDFILE_SHARED_TARGET}
+				PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME})
+		elseif(SYMBOL_OS MATCHES "darwin")
+			add_dependencies(${SNDFILE_SHARED_TARGET} GENFILES)
+			set_property(TARGET ${SNDFILE_SHARED_TARGET} APPEND_STRING PROPERTY
+				LINK_FLAGS " -Wl,-exported_symbols_list -Wl,${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}")
+		elseif(SYMBOL_OS MATCHES "os")
+			add_dependencies(${SNDFILE_SHARED_TARGET} GENFILES)
+			set_property(TARGET ${SNDFILE_SHARED_TARGET} APPEND_STRING PROPERTY
+				LINK_FLAGS " -Wl,-export-symbols ${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}")
+		elseif(UNIX)
+			add_dependencies(${SNDFILE_SHARED_TARGET} GENFILES)
+			set_property(TARGET ${SNDFILE_SHARED_TARGET} APPEND_STRING PROPERTY
+				LINK_FLAGS " -Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}")
+		endif()
+	endif()
 
 endif (BUILD_SHARED_LIBS)
 
