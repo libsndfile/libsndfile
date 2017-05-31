@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2015 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -123,10 +123,10 @@ alsa_play (int argc, char *argv [])
 			int 	m ;
 
 			sf_command (sndfile, SFC_CALC_SIGNAL_MAX, &scale, sizeof (scale)) ;
-			if (scale < 1e-10)
-				scale = 1.0 ;
+			if (scale > 1.0)
+				scale = 1.0 / scale ;
 			else
-				scale = 32700.0 / scale ;
+				scale = 1.0 ;
 
 			while ((readcount = sf_read_float (sndfile, buffer, BUFFER_LEN)))
 			{	for (m = 0 ; m < readcount ; m++)
