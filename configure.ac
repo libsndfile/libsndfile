@@ -76,11 +76,11 @@ AC_CHECK_HEADERS(sys/time.h)
 AC_HEADER_SYS_WAIT
 
 AC_CHECK_DECLS(S_IRGRP)
-if test x$ac_cv_have_decl_S_IRGRP = xyes ; then
-	AC_DEFINE_UNQUOTED([HAVE_DECL_S_IRGRP],1,[Set to 1 if S_IRGRP is defined.])
-else
-	AC_DEFINE_UNQUOTED([HAVE_DECL_S_IRGRP],0)
-	fi
+AS_IF([test "x$ac_cv_have_decl_S_IRGRP" = "xyes"], [
+		AC_DEFINE_UNQUOTED([HAVE_DECL_S_IRGRP], [1], [Set to 1 if S_IRGRP is defined.])
+	], [
+		AC_DEFINE_UNQUOTED([HAVE_DECL_S_IRGRP], [0], [Set to 0 if S_IRGRP is not defined.])
+	])
 
 AM_CONDITIONAL([LINUX_MINGW_CROSS_TEST],
 	[test "$build_os:$target_os:$host_os:$HAVE_WINE" = "linux-gnu:mingw32msvc:mingw32msvc:yes"])
@@ -96,11 +96,12 @@ SHLIB_VERSION_ARG=""
 AC_ARG_ENABLE(experimental,
 	AS_HELP_STRING([--enable-experimental], [enable experimental code]))
 
-EXPERIMENTAL_CODE=0
-if test x$enable_experimental = xyes ; then
-	EXPERIMENTAL_CODE=1
-	fi
-AC_DEFINE_UNQUOTED([ENABLE_EXPERIMENTAL_CODE],${EXPERIMENTAL_CODE}, [Set to 1 to enable experimental code.])
+AS_IF([test "x$enable_experimental" = "xyes"], [
+		EXPERIMENTAL_CODE=1
+	], [
+		EXPERIMENTAL_CODE=0
+	])
+AC_DEFINE_UNQUOTED([ENABLE_EXPERIMENTAL_CODE], [${EXPERIMENTAL_CODE}], [Set to 1 to enable experimental code.])
 
 AC_ARG_ENABLE(werror,
 	AS_HELP_STRING([--enable-werror], [enable -Werror in all Makefiles]))
@@ -163,74 +164,69 @@ AC_CHECK_SIZEOF(long long,8)
 # Check for common 64 bit file offset types.
 AC_CHECK_SIZEOF(off_t,1)
 
-if test "$enable_largefile:$ac_cv_sizeof_off_t" = "no:8" ; then
-	echo
-	echo "Error : Cannot disable large file support because sizeof (off_t) == 8."
-	echo
-	exit 1
-	fi
+AS_IF([test "x$enable_largefile:$ac_cv_sizeof_off_t" = "xno:8"], [
+		AC_MSG_ERROR(["Error : Cannot disable large file support because sizeof (off_t) == 8."])
+	])
 
-case "$host_os" in
-	mingw32*)
+AS_CASE([$host_os],
+	[mingw32*], [
 		TYPEOF_SF_COUNT_T="__int64"
 		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 		SIZEOF_SF_COUNT_T=8
-		AC_DEFINE([__USE_MINGW_ANSI_STDIO],1,[Set to 1 to use C99 printf/snprintf in MinGW.])
-		;;
-	*)
+		AC_DEFINE([__USE_MINGW_ANSI_STDIO], [1], [Set to 1 to use C99 printf/snprintf in MinGW.])
+	], [
 		SIZEOF_SF_COUNT_T=0
-		if test "x$ac_cv_sizeof_off_t" = "x8" ; then
-			# If sizeof (off_t) is 8, no further checking is needed.
-			TYPEOF_SF_COUNT_T="int64_t"
-			SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
-			SIZEOF_SF_COUNT_T=8
-		else
-			# Save the old sizeof (off_t) value  and then unset it to see if it
-			# changes when Large File Support is enabled.
-			pre_largefile_sizeof_off_t=$ac_cv_sizeof_off_t
-			unset ac_cv_sizeof_off_t
-
-			AC_SYS_LARGEFILE
-			if test "x$ac_cv_sys_largefile_CFLAGS" = "xno" ; then
-				ac_cv_sys_largefile_CFLAGS=""
-				fi
-			if test "x$ac_cv_sys_largefile_LDFLAGS" = "xno" ; then
-				ac_cv_sys_largefile_LDFLAGS=""
-				fi
-			if test "x$ac_cv_sys_largefile_LIBS" = "xno" ; then
-				ac_cv_sys_largefile_LIBS=""
-				fi
-
-			AC_CHECK_SIZEOF(off_t,1)
-
-			if test "x$ac_cv_sizeof_off_t" = "x8" ; then
+		AS_IF([test "x$ac_cv_sizeof_off_t" = "x8"], [
+				# If sizeof (off_t) is 8, no further checking is needed.
 				TYPEOF_SF_COUNT_T="int64_t"
 				SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 				SIZEOF_SF_COUNT_T=8
-			elif test "x$TYPEOF_SF_COUNT_T" = "xunknown" ; then
-				echo
-				echo "*** The configure process has determined that this system is capable"
-				echo "*** of Large File Support but has not been able to find a type which"
-				echo "*** is an unambiguous 64 bit file offset."
-				echo "*** Please contact the author to help resolve this problem."
-				echo
-				AC_MSG_ERROR([[Bad file offset type.]])
-				fi
-			fi
-		;;
-	esac
+			], [
+				# Save the old sizeof (off_t) value  and then unset it to see if it
+				# changes when Large File Support is enabled.
+				pre_largefile_sizeof_off_t=$ac_cv_sizeof_off_t
+				unset ac_cv_sizeof_off_t
 
-if test $SIZEOF_SF_COUNT_T = 4 ; then
-	SF_COUNT_MAX="0x7FFFFFFF"
-	fi
+				AC_SYS_LARGEFILE
+				AS_IF([test "x$ac_cv_sys_largefile_CFLAGS" = "xno"], [
+						ac_cv_sys_largefile_CFLAGS=""
+					])
+				AS_IF([test "x$ac_cv_sys_largefile_LDFLAGS" = "xno"], [
+						ac_cv_sys_largefile_LDFLAGS=""
+					])
+				AS_IF([test "x$ac_cv_sys_largefile_LIBS" = "xno"], [
+						ac_cv_sys_largefile_LIBS=""
+					])
 
-AC_DEFINE_UNQUOTED([TYPEOF_SF_COUNT_T],${TYPEOF_SF_COUNT_T}, [Set to long if unknown.])
+				AC_CHECK_SIZEOF(off_t,1)
+
+				AS_IF([test "x$ac_cv_sizeof_off_t" = "x8"], [
+						TYPEOF_SF_COUNT_T="int64_t"
+						SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
+						SIZEOF_SF_COUNT_T=8
+					], [test "x$TYPEOF_SF_COUNT_T" = "xunknown"], [
+						AS_ECHO([""])
+						AS_ECHO(["*** The configure process has determined that this system is capable"])
+						AS_ECHO(["*** of Large File Support but has not been able to find a type which"])
+						AS_ECHO(["*** is an unambiguous 64 bit file offset."])
+						AS_ECHO(["*** Please contact the author to help resolve this problem."])
+						AS_ECHO([""])
+						AC_MSG_ERROR([[Bad file offset type.]])
+					])
+			])
+	])
+
+AS_IF([test "x$SIZEOF_SF_COUNT_T" = "x4"], [
+		SF_COUNT_MAX="0x7FFFFFFF"
+	])
+
+AC_DEFINE_UNQUOTED([TYPEOF_SF_COUNT_T], [${TYPEOF_SF_COUNT_T}], [Set to long if unknown.])
 AC_SUBST(TYPEOF_SF_COUNT_T)
 
-AC_DEFINE_UNQUOTED([SIZEOF_SF_COUNT_T],${SIZEOF_SF_COUNT_T}, [Set to sizeof (long) if unknown.])
+AC_DEFINE_UNQUOTED([SIZEOF_SF_COUNT_T], [${SIZEOF_SF_COUNT_T}], [Set to sizeof (long) if unknown.])
 AC_SUBST(SIZEOF_SF_COUNT_T)
 
-AC_DEFINE_UNQUOTED([SF_COUNT_MAX],${SF_COUNT_MAX}, [Set to maximum allowed value of sf_count_t type.])
+AC_DEFINE_UNQUOTED([SF_COUNT_MAX], [${SF_COUNT_MAX}], [Set to maximum allowed value of sf_count_t type.])
 AC_SUBST(SF_COUNT_MAX)
 
 AC_TYPE_SSIZE_T
@@ -240,11 +236,11 @@ AC_TYPE_SSIZE_T
 
 MN_C_FIND_ENDIAN
 
-AC_DEFINE_UNQUOTED(CPU_IS_BIG_ENDIAN, ${ac_cv_c_big_endian},
+AC_DEFINE_UNQUOTED([CPU_IS_BIG_ENDIAN], [${ac_cv_c_big_endian}],
 	[Target processor is big endian.])
-AC_DEFINE_UNQUOTED(CPU_IS_LITTLE_ENDIAN, ${ac_cv_c_little_endian},
+AC_DEFINE_UNQUOTED([CPU_IS_LITTLE_ENDIAN], [${ac_cv_c_little_endian}],
 	[Target processor is little endian.])
-AC_DEFINE_UNQUOTED(WORDS_BIGENDIAN, ${ac_cv_c_big_endian},
+AC_DEFINE_UNQUOTED([WORDS_BIGENDIAN], [${ac_cv_c_big_endian}],
 	[Target processor is big endian.])
 
 #====================================================================================
@@ -269,15 +265,15 @@ MN_C99_FUNC_LRINTF
 # Check for requirements for building plugins for other languages/enviroments.
 
 dnl Octave maths environment http://www.octave.org/
-if test x$cross_compiling = xno ; then
-	if test x$enable_octave = xno ; then
+AS_IF([test "x$cross_compiling" = "xno"], [
+		AS_IF([test "x$enable_octave" = "xno"], [
+				AM_CONDITIONAL(BUILD_OCTAVE_MOD, false)
+			], [
+				AC_OCTAVE_BUILD
+			])
+	], [
 		AM_CONDITIONAL(BUILD_OCTAVE_MOD, false)
-	else
-		AC_OCTAVE_BUILD
-		fi
-else
-	AM_CONDITIONAL(BUILD_OCTAVE_MOD, false)
-	fi
+	])
 
 #====================================================================================
 # Check for Ogg, Vorbis and FLAC.
@@ -290,84 +286,84 @@ EXTERNAL_XIPH_LIBS=""
 PKG_PROG_PKG_CONFIG
 m4_ifdef([PKG_INSTALLDIR], [PKG_INSTALLDIR], AC_SUBST([pkgconfigdir], ${libdir}/pkgconfig))
 
-if test -n "$PKG_CONFIG" ; then
-	if test x$enable_external_libs = xno ; then
-		AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
-	else
-		PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.3.1, ac_cv_flac=yes, ac_cv_flac=no)
+AS_IF([test -n "$PKG_CONFIG"], [
+		AS_IF([test "x$enable_external_libs" = "xno"], [
+				AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
+			], [
+				PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.3.1, ac_cv_flac=yes, ac_cv_flac=no)
 
-		# Make sure the FLAC_CFLAGS value is sane.
-		FLAC_CFLAGS=`echo $FLAC_CFLAGS | $SED "s|include/FLAC|include|"`
+				# Make sure the FLAC_CFLAGS value is sane.
+				FLAC_CFLAGS=`echo $FLAC_CFLAGS | $SED "s|include/FLAC|include|"`
 
-		PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
+				PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
 
-		if test x$enable_experimental = xyes ; then
-			PKG_CHECK_MOD_VERSION(SPEEX, speex >= 1.2, ac_cv_speex=yes, ac_cv_speex=no)
-		else
-			SPEEX_CFLAGS=""
-			SPEEX_LIBS=""
-			fi
+				AS_IF([test "x$enable_experimental" = "xyes"], [
+						PKG_CHECK_MOD_VERSION(SPEEX, speex >= 1.2, ac_cv_speex=yes, ac_cv_speex=no)
+					], [
+						SPEEX_CFLAGS=""
+						SPEEX_LIBS=""
+					])
 
-		# Vorbis versions earlier than 1.2.3 have bugs that cause the libsndfile
-		# test suite to fail on MIPS, PowerPC and others.
-		# See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
-		PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.3, ac_cv_vorbis=yes, ac_cv_vorbis=no)
-		PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.3, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
-		enable_external_libs=yes
-		fi
+				# Vorbis versions earlier than 1.2.3 have bugs that cause the libsndfile
+				# test suite to fail on MIPS, PowerPC and others.
+				# See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
+				PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.3, ac_cv_vorbis=yes, ac_cv_vorbis=no)
+				PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.3, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
+				enable_external_libs=yes
+			])
 
-	if test x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc = "xyesyesyesyes" ; then
-		HAVE_EXTERNAL_XIPH_LIBS=1
-		enable_external_libs=yes
+			AS_IF([test "x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc" = "xyesyesyesyes"], [
+					HAVE_EXTERNAL_XIPH_LIBS=1
+					enable_external_libs=yes
 
-		EXTERNAL_XIPH_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBIS_CFLAGS $VORBISENC_CFLAGS $SPEEX_CFLAGS"
-		EXTERNAL_XIPH_LIBS="$FLAC_LIBS $OGG_LIBS $VORBIS_LIBS $VORBISENC_LIBS $SPEEX_LIBS "
-	else
-		echo
-		AC_MSG_WARN([[*** One or more of the external libraries (ie libflac, libogg and]])
-		AC_MSG_WARN([[*** libvorbis) is either missing (possibly only the development]])
-		AC_MSG_WARN([[*** headers) or is of an unsupported version.]])
-		AC_MSG_WARN([[***]])
-		AC_MSG_WARN([[*** Unfortunately, for ease of maintenance, the external libs]])
-		AC_MSG_WARN([[*** are an all or nothing affair.]])
-		echo
-		enable_external_libs=no
-		fi
-	fi
+					EXTERNAL_XIPH_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBIS_CFLAGS $VORBISENC_CFLAGS $SPEEX_CFLAGS"
+					EXTERNAL_XIPH_LIBS="$FLAC_LIBS $OGG_LIBS $VORBIS_LIBS $VORBISENC_LIBS $SPEEX_LIBS "
+				], [
+					AS_ECHO([""])
+					AC_MSG_WARN([[*** One or more of the external libraries (ie libflac, libogg and]])
+					AC_MSG_WARN([[*** libvorbis) is either missing (possibly only the development]])
+					AC_MSG_WARN([[*** headers) or is of an unsupported version.]])
+					AC_MSG_WARN([[***]])
+					AC_MSG_WARN([[*** Unfortunately, for ease of maintenance, the external libs]])
+					AC_MSG_WARN([[*** are an all or nothing affair.]])
+					AS_ECHO([""])
+					enable_external_libs=no
+				])
+	])
 
-AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_XIPH_LIBS], $HAVE_EXTERNAL_XIPH_LIBS, [Will be set to 1 if flac, ogg and vorbis are available.])
+AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_XIPH_LIBS], [$HAVE_EXTERNAL_XIPH_LIBS], [Will be set to 1 if flac, ogg and vorbis are available.])
 
 #====================================================================================
 # Check for libsqlite3 (only used in regtest).
 
 ac_cv_sqlite3=no
-if test x$enable_sqlite != xno ; then
-	PKG_CHECK_MOD_VERSION(SQLITE3, sqlite3 >= 3.2, ac_cv_sqlite3=yes, ac_cv_sqlite3=no)
-	fi
+AS_IF([test "x$enable_sqlite" != "xno"], [
+		PKG_CHECK_MOD_VERSION(SQLITE3, sqlite3 >= 3.2, ac_cv_sqlite3=yes, ac_cv_sqlite3=no)
+	])
 
-if test x$ac_cv_sqlite3 = "xyes" ; then
-	HAVE_SQLITE3=1
-else
-	HAVE_SQLITE3=0
-	fi
+AS_IF([test "x$ac_cv_sqlite3" = "xyes"], [
+		HAVE_SQLITE3=1
+	], [
+		HAVE_SQLITE3=0
+	])
 
-AC_DEFINE_UNQUOTED([HAVE_SQLITE3],$HAVE_SQLITE3,[Set to 1 if you have libsqlite3.])
+AC_DEFINE_UNQUOTED([HAVE_SQLITE3], [$HAVE_SQLITE3], [Set to 1 if you have libsqlite3.])
 AM_CONDITIONAL([HAVE_SQLITE3], [test "x$ac_cv_sqlite3" = "xyes"])
 
 #====================================================================================
 # Determine if the processor can do clipping on float to int conversions.
 
-if test x$enable_cpu_clip != "xno" ; then
-	MN_C_CLIP_MODE
-else
-	echo "checking processor clipping capabilities... disabled"
-	ac_cv_c_clip_positive=0
-	ac_cv_c_clip_negative=0
-	fi
+AS_IF([test "x$enable_cpu_clip" != "xno"], [
+		MN_C_CLIP_MODE
+	], [
+		AS_ECHO(["checking processor clipping capabilities... disabled"])
+		ac_cv_c_clip_positive=0
+		ac_cv_c_clip_negative=0
+	])
 
-AC_DEFINE_UNQUOTED(CPU_CLIPS_POSITIVE, ${ac_cv_c_clip_positive},
+AC_DEFINE_UNQUOTED([CPU_CLIPS_POSITIVE], [${ac_cv_c_clip_positive}],
 	[Target processor clips on positive float to int conversion.])
-AC_DEFINE_UNQUOTED(CPU_CLIPS_NEGATIVE, ${ac_cv_c_clip_negative},
+AC_DEFINE_UNQUOTED([CPU_CLIPS_NEGATIVE], [${ac_cv_c_clip_negative}],
 	[Target processor clips on negative float to int conversion.])
 
 #====================================================================================
@@ -378,28 +374,25 @@ OS_SPECIFIC_LINKS=""
 os_is_win32=0
 os_is_openbsd=0
 use_windows_api=0
-case "$host_os" in
-	darwin* | rhapsody*)
-		if test x$HAVE_XCODE_SELECT = xyes ; then
-			developer_path=`xcode-select --print-path`
-		else
-			developer_path="/Developer"
-			fi
-		OS_SPECIFIC_LINKS="-framework CoreAudio -framework AudioToolbox -framework CoreFoundation"
-		;;
-	mingw*)
+AS_CASE([$host_os],
+	[darwin* | rhapsody*], [
+		AS_IF([test "x$HAVE_XCODE_SELECT" = "xyes"], [
+				developer_path=`xcode-select --print-path`
+			], [
+				developer_path="/Developer"
+			])
+		OS_SPECIFIC_LINKS="-framework CoreAudio -framework AudioToolbox -framework CoreFoundation"],
+	[mingw*], [
 		os_is_win32=1
 		use_windows_api=1
-		OS_SPECIFIC_LINKS="-lwinmm"
-		;;
-	openbsd*)
+		OS_SPECIFIC_LINKS="-lwinmm"],
+	[openbsd*], [
 		os_is_openbsd=1
-		;;
-	esac
+	])
 
-AC_DEFINE_UNQUOTED(OS_IS_WIN32, ${os_is_win32}, [Set to 1 if compiling for Win32])
-AC_DEFINE_UNQUOTED(OS_IS_OPENBSD, ${os_is_openbsd}, [Set to 1 if compiling for OpenBSD])
-AC_DEFINE_UNQUOTED(USE_WINDOWS_API, ${use_windows_api}, [Set to 1 to use the native windows API])
+AC_DEFINE_UNQUOTED([OS_IS_WIN32], [${os_is_win32}], [Set to 1 if compiling for Win32])
+AC_DEFINE_UNQUOTED([OS_IS_OPENBSD], [${os_is_openbsd}], [Set to 1 if compiling for OpenBSD])
+AC_DEFINE_UNQUOTED([USE_WINDOWS_API], [${use_windows_api}], [Set to 1 to use the native windows API])
 AM_CONDITIONAL(USE_WIN_VERSION_FILE, test ${use_windows_api} -eq 1)
 
 #====================================================================================
@@ -407,75 +400,72 @@ AM_CONDITIONAL(USE_WIN_VERSION_FILE, test ${use_windows_api} -eq 1)
 
 ALSA_LIBS=""
 
-if test x$enable_alsa != xno ; then
-	AC_CHECK_HEADERS(alsa/asoundlib.h)
-	if test x$ac_cv_header_alsa_asoundlib_h = xyes ; then
-		ALSA_LIBS="-lasound"
-		enable_alsa=yes
-		fi
-	fi
+AS_IF([test "x$enable_alsa" != "xno"], [
+		AC_CHECK_HEADERS(alsa/asoundlib.h)
+		AS_IF([test "x$ac_cv_header_alsa_asoundlib_h" = "xyes"], [
+				ALSA_LIBS="-lasound"
+				enable_alsa=yes
+			])
+	])
 
 #====================================================================================
 # Check for OpenBSD's sndio.
 
 SNDIO_LIBS=""
 HAVE_SNDIO_H=0
-case "$host_os" in
-	openbsd*)
+AS_CASE([$host_os],
+	[openbsd*], [
 		AC_CHECK_HEADERS(sndio.h)
-		if test x$ac_cv_header_sndio_h = xyes ; then
-			SNDIO_LIBS="-lsndio"
-			HAVE_SNDIO_H=1
-			fi
-		;;
-	*)
-		;;
-	esac
+		AS_IF([test "x$ac_cv_header_sndio_h" = "xyes"], [
+				SNDIO_LIBS="-lsndio"
+				HAVE_SNDIO_H=1
+			])
+	])
 
-AC_DEFINE_UNQUOTED([HAVE_SNDIO_H],${HAVE_SNDIO_H},[Set to 1 if <sndio.h> is available.])
+AC_DEFINE_UNQUOTED([HAVE_SNDIO_H], [${HAVE_SNDIO_H}], [Set to 1 if <sndio.h> is available.])
 
 #====================================================================================
 # Test for sanity when cross-compiling.
 
-if test $ac_cv_sizeof_short != 2 ; then
-	AC_MSG_WARN([[******************************************************************]])
-	AC_MSG_WARN([[*** sizeof (short) != 2.                                          ]])
-	AC_MSG_WARN([[******************************************************************]])
-	fi
+AS_IF([test "x$ac_cv_sizeof_short" != "x2"], [
+		AC_MSG_WARN([[******************************************************************]])
+		AC_MSG_WARN([[*** sizeof (short) != 2.                                          ]])
+		AC_MSG_WARN([[******************************************************************]])
+	])
 
-if test $ac_cv_sizeof_int != 4 ; then
-	AC_MSG_WARN([[******************************************************************]])
-	AC_MSG_WARN([[*** sizeof (int) != 4                                             ]])
-	AC_MSG_WARN([[******************************************************************]])
-	fi
+AS_IF([test "x$ac_cv_sizeof_int" != "x4"], [
+		AC_MSG_WARN([[******************************************************************]])
+		AC_MSG_WARN([[*** sizeof (int) != 4                                             ]])
+		AC_MSG_WARN([[******************************************************************]])
+	])
 
-if test $ac_cv_sizeof_float != 4 ; then
-	AC_MSG_WARN([[******************************************************************]])
-	AC_MSG_WARN([[*** sizeof (float) != 4.                                          ]])
-	AC_MSG_WARN([[******************************************************************]])
-	fi
+AS_IF([test "x$ac_cv_sizeof_float" != "x4"], [
+		AC_MSG_WARN([[******************************************************************]])
+		AC_MSG_WARN([[*** sizeof (float) != 4.                                          ]])
+		AC_MSG_WARN([[******************************************************************]])
+	])
 
-if test $ac_cv_sizeof_double != 8 ; then
-	AC_MSG_WARN([[******************************************************************]])
-	AC_MSG_WARN([[*** sizeof (double) != 8.                                         ]])
-	AC_MSG_WARN([[******************************************************************]])
-	fi
+AS_IF([test "x$ac_cv_sizeof_double" != "x8"], [
+		AC_MSG_WARN([[******************************************************************]])
+		AC_MSG_WARN([[*** sizeof (double) != 8.                                         ]])
+		AC_MSG_WARN([[******************************************************************]])
+	])
 
-if test x"$ac_cv_prog_HAVE_AUTOGEN" = "xno" ; then
-	AC_MSG_WARN([[Touching files in directory tests/.]])
-	touch tests/*.c tests/*.h
-	fi
+AS_IF([test "x$ac_cv_prog_HAVE_AUTOGEN" = "xno"], [
+		AC_MSG_WARN([[Touching files in directory tests/.]])
+		touch tests/*.c tests/*.h
+	])
 
 #====================================================================================
 # Settings for the HTML documentation.
 
-if test x$enable_bow_docs = "xyes" ; then
-	HTML_BGCOLOUR="white"
-	HTML_FGCOLOUR="black"
-else
-	HTML_BGCOLOUR="black"
-	HTML_FGCOLOUR="white"
-	fi
+AS_IF([test "x$enable_bow_docs" = "xyes"], [
+		HTML_BGCOLOUR="white"
+		HTML_FGCOLOUR="black"
+	], [
+		HTML_BGCOLOUR="black"
+		HTML_FGCOLOUR="white"
+	])
 
 #====================================================================================
 # Now use the information from the checking stage.
@@ -483,130 +473,123 @@ else
 win32_target_dll=0
 COMPILER_IS_GCC=0
 
-if test x$ac_cv_c_compiler_gnu = xyes ; then
-	MN_ADD_CFLAGS(-std=gnu99)
+AS_IF([test "x$ac_cv_c_compiler_gnu" = "xyes"], [
+		MN_ADD_CFLAGS(-std=gnu99)
 
-	MN_GCC_VERSION
+		MN_GCC_VERSION
 
-	if test "x$GCC_MAJOR_VERSION$GCC_MINOR_VERSION" = "x42" ; then
-		AC_MSG_WARN([****************************************************************])
-		AC_MSG_WARN([** GCC version 4.2 warns about the inline keyword for no good **])
-		AC_MSG_WARN([** reason but the maintainers do not see it as a bug.         **])
-		AC_MSG_WARN([** See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=33995      **])
-		AC_MSG_WARN([** Using -fgnu-inline to avoid this stupidity.                **])
-		AC_MSG_WARN([****************************************************************])
-		MN_ADD_CFLAGS([-fgnu89-inline])
-		fi
+		AS_IF([test "x$GCC_MAJOR_VERSION$GCC_MINOR_VERSION" = "x42"], [
+				AC_MSG_WARN([****************************************************************])
+				AC_MSG_WARN([** GCC version 4.2 warns about the inline keyword for no good **])
+				AC_MSG_WARN([** reason but the maintainers do not see it as a bug.         **])
+				AC_MSG_WARN([** See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=33995      **])
+				AC_MSG_WARN([** Using -fgnu-inline to avoid this stupidity.                **])
+				AC_MSG_WARN([****************************************************************])
+				MN_ADD_CFLAGS([-fgnu89-inline])
+			])
 
-	CFLAGS="$CFLAGS -Wall"
-	CXXFLAGS="$CXXFLAGS -Wall"
+		CFLAGS="$CFLAGS -Wall"
+		CXXFLAGS="$CXXFLAGS -Wall"
 
-	MN_ADD_CFLAGS([-Wextra])
-	MN_ADD_CFLAGS([-Wdeclaration-after-statement])
-	MN_ADD_CFLAGS([-Wpointer-arith])
-	MN_ADD_CFLAGS([-Wvla])
+		MN_ADD_CFLAGS([-Wextra])
+		MN_ADD_CFLAGS([-Wdeclaration-after-statement])
+		MN_ADD_CFLAGS([-Wpointer-arith])
+		MN_ADD_CFLAGS([-Wvla])
 
-	AC_LANG_PUSH([C++])
-	MN_ADD_CXXFLAGS([-Wextra])
-	MN_ADD_CXXFLAGS([-Wpointer-arith])
-	AC_LANG_POP([C++])
+		AC_LANG_PUSH([C++])
+		MN_ADD_CXXFLAGS([-Wextra])
+		MN_ADD_CXXFLAGS([-Wpointer-arith])
+		AC_LANG_POP([C++])
 
-	if test x$enable_stack_smash_protection = "xyes" ; then
-		XIPH_GCC_STACK_PROTECTOR
-		XIPH_GXX_STACK_PROTECTOR
-		fi
+		AS_IF([test "x$enable_stack_smash_protection" = "xyes"], [
+				XIPH_GCC_STACK_PROTECTOR
+				XIPH_GXX_STACK_PROTECTOR
+			])
 
-	if test x$enable_test_coverage = "xyes" ; then
-		# MN_ADD_CFLAGS([-ftest-coverage])
-		MN_ADD_CFLAGS([-coverage])
-		fi
+		AS_IF([test "x$enable_test_coverage" = "xyes"], [
+				# MN_ADD_CFLAGS([-ftest-coverage])
+				MN_ADD_CFLAGS([-coverage])
+			])
 
-	dnl some distributions (such as Gentoo) have _FORTIFY_SOURCE always
-	dnl enabled. We test for this situation in order to prevent polluting
-	dnl the console with messages of macro redefinitions.
-	AX_ADD_FORTIFY_SOURCE
+		dnl some distributions (such as Gentoo) have _FORTIFY_SOURCE always
+		dnl enabled. We test for this situation in order to prevent polluting
+		dnl the console with messages of macro redefinitions.
+		AX_ADD_FORTIFY_SOURCE
 
-	common_flags="-Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wundef -Wuninitialized -Winit-self"
+		common_flags="-Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wundef -Wuninitialized -Winit-self"
 
-	# -Winline -Wconversion "
-	CFLAGS="$CFLAGS     $common_flags -Wbad-function-cast -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return"
-	CXXFLAGS="$CXXFLAGS $common_flags -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo"
+		# -Winline -Wconversion "
+		CFLAGS="$CFLAGS     $common_flags -Wbad-function-cast -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return"
+		CXXFLAGS="$CXXFLAGS $common_flags -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo"
 
-	if test "x$enable_gcc_opt" = "xno" ; then
-		temp_CFLAGS=`echo $CFLAGS | $SED "s/O2/O0/"`
-		CFLAGS=$temp_CFLAGS
-		AC_MSG_WARN([[*** Compiler optimisations switched off. ***]])
-		fi
+		AS_IF([test "x$enable_gcc_opt" = "xno"], [
+				temp_CFLAGS=`echo $CFLAGS | $SED "s/O2/O0/"`
+				CFLAGS=$temp_CFLAGS
+				AC_MSG_WARN([[*** Compiler optimisations switched off. ***]])
+			])
 
-	# OS specific tweaks.
-	case "$host_os" in
-		darwin* | rhapsody*)
-			# Disable -Wall, -pedantic and -Wshadow for Apple Darwin/Rhapsody.
-			# System headers on these systems are broken.
-			temp_CFLAGS=`echo $CFLAGS | $SED "s/-Wall -pedantic//" | $SED "s/-Wshadow//" | $SED "s/-Waggregate-return//"`
-			CFLAGS=$temp_CFLAGS
-			SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,\$(srcdir)/Symbols.darwin"
-			;;
-		linux*|kfreebsd*-gnu*|gnu*)
-			SHLIB_VERSION_ARG="-Wl,--version-script=\$(srcdir)/Symbols.gnu-binutils"
-			;;
-		mingw*)
-			SHLIB_VERSION_ARG="-Wc,-static-libgcc -Wl,\$(srcdir)/libsndfile-1.def"
-			win32_target_dll=1
-			if test x"$enable_shared" = xno ; then
-				win32_target_dll=0
-				fi
-			;;
-		os2*)
-			SHLIB_VERSION_ARG="-Wl,-export-symbols \$(srcdir)/Symbols.os2"
-			;;
-		*)
-			;;
-		esac
-	if test x$enable_gcc_pipe != "xno" ; then
-	 	CFLAGS="$CFLAGS -pipe"
-	 	fi
+		# OS specific tweaks.
+		AS_CASE([$host_os],
+			[darwin* | rhapsody*], [
+				# Disable -Wall, -pedantic and -Wshadow for Apple Darwin/Rhapsody.
+				# System headers on these systems are broken.
+				temp_CFLAGS=`echo $CFLAGS | $SED "s/-Wall -pedantic//" | $SED "s/-Wshadow//" | $SED "s/-Waggregate-return//"`
+				CFLAGS=$temp_CFLAGS
+				SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,\$(srcdir)/Symbols.darwin"],
+			[linux*|kfreebsd*-gnu*|gnu*], [
+				SHLIB_VERSION_ARG="-Wl,--version-script=\$(srcdir)/Symbols.gnu-binutils"],
+			[mingw*], [
+				SHLIB_VERSION_ARG="-Wc,-static-libgcc -Wl,\$(srcdir)/libsndfile-1.def"
+				win32_target_dll=1
+				AS_IF([test "x$enable_shared" = "xno"], [
+						win32_target_dll=0
+					])],
+			[os2*], [
+				SHLIB_VERSION_ARG="-Wl,-export-symbols \$(srcdir)/Symbols.os2"
+			])
+		AS_IF([test "x$enable_gcc_pipe" != "xno"], [
+				CFLAGS="$CFLAGS -pipe"
+			])
 
-	COMPILER_IS_GCC=1
-	fi
+		COMPILER_IS_GCC=1
+	])
 
-if test x$enable_werror = "xyes" ; then
-	MN_ADD_CFLAGS([-Werror])
+AS_IF([test "x$enable_werror" = "xyes"], [
+		MN_ADD_CFLAGS([-Werror])
 
-	AC_LANG_PUSH([C++])
-	MN_ADD_CXXFLAGS([-Werror])
-	AC_LANG_POP([C++])
-	fi
+		AC_LANG_PUSH([C++])
+		MN_ADD_CXXFLAGS([-Werror])
+		AC_LANG_POP([C++])
+	])
 
 
-AC_DEFINE_UNQUOTED([WIN32_TARGET_DLL], ${win32_target_dll}, [Set to 1 if windows DLL is being built.])
-AC_DEFINE_UNQUOTED([COMPILER_IS_GCC], ${COMPILER_IS_GCC}, [Set to 1 if the compile is GNU GCC.])
+AC_DEFINE_UNQUOTED([WIN32_TARGET_DLL], [${win32_target_dll}], [Set to 1 if windows DLL is being built.])
+AC_DEFINE_UNQUOTED([COMPILER_IS_GCC], [${COMPILER_IS_GCC}], [Set to 1 if the compile is GNU GCC.])
 
 CFLAGS="$CFLAGS $OS_SPECIFIC_CFLAGS"
 
-if test x"$CFLAGS" = x ; then
-	echo "Error in configure script. CFLAGS has been screwed up."
-	exit
-	fi
+AS_IF([test "x$CFLAGS" = "x"], [
+		AC_MSG_ERROR(["Error in configure script. CFLAGS has been screwed up."])
+	])
 
 HOST_TRIPLET="${host_cpu}-${host_vendor}-${host_os}"
 
-AC_DEFINE_UNQUOTED([HOST_TRIPLET], "${HOST_TRIPLET}", [The host triplet of the compiled binary.])
+AC_DEFINE_UNQUOTED([HOST_TRIPLET], [${HOST_TRIPLET}], [The host triplet of the compiled binary.])
 
-if test "$HOST_TRIPLET" = "x86_64-w64-mingw32" ; then
-	OS_SPECIFIC_LINKS=" -static-libgcc $OS_SPECIFIC_LINKS"
-	fi
+AS_IF([test "$HOST_TRIPLET" = "x86_64-w64-mingw32"], [
+		OS_SPECIFIC_LINKS=" -static-libgcc $OS_SPECIFIC_LINKS"
+	])
 
 WIN_RC_VERSION=`echo $PACKAGE_VERSION | $SED -e "s/p.*//" -e "s/\./,/g"`
 
 
-if test "$enable_static" = no ; then
-	SRC_BINDIR=src/.libs/
-	TEST_BINDIR=tests/.libs/
-else
-	SRC_BINDIR=src/
-	TEST_BINDIR=tests/
-	fi
+AS_IF([test "x$enable_static" = "xno"], [
+		SRC_BINDIR=src/.libs/
+		TEST_BINDIR=tests/.libs/
+	], [
+		SRC_BINDIR=src/
+		TEST_BINDIR=tests/
+	])
 
 #-------------------------------------------------------------------------------
 
@@ -666,31 +649,30 @@ AC_MSG_RESULT([
     External FLAC/Ogg/Vorbis : ............ ${enable_external_libs:-no}
 ])
 
-if test -z "$PKG_CONFIG" ; then
-	echo "    *****************************************************************"
-	echo "    ***          The pkg-config program is missing.               ***"
-	echo "    *** External FLAC/Ogg/Vorbis libs cannot be found without it. ***"
-	echo "    ***       http://pkg-config.freedesktop.org/wiki/             ***"
-	echo "    *****************************************************************"
-	echo
-	fi
+AS_IF([test -z "$PKG_CONFIG"], [
+		AS_ECHO(["    *****************************************************************"])
+		AS_ECHO(["    ***          The pkg-config program is missing.               ***"])
+		AS_ECHO(["    *** External FLAC/Ogg/Vorbis libs cannot be found without it. ***"])
+		AS_ECHO(["    ***       http://pkg-config.freedesktop.org/wiki/             ***"])
+		AS_ECHO(["    *****************************************************************"])
+	])
 
-echo "  Tools :"
-echo
-echo "    Compiler is Clang : ................... ${mn_cv_c_compiler_clang}"
-echo "    Compiler is GCC : ..................... ${ac_cv_c_compiler_gnu}"
+AS_ECHO(["  Tools :"])
+AS_ECHO([""])
+AS_ECHO(["    Compiler is Clang : ................... ${mn_cv_c_compiler_clang}"])
+AS_ECHO(["    Compiler is GCC : ..................... ${ac_cv_c_compiler_gnu}"])
 
-if test x$ac_cv_c_compiler_gnu = xyes ; then
-	echo "    GCC version : ......................... ${GCC_VERSION}"
-	if test $GCC_MAJOR_VERSION -lt 3 ; then
-		echo "\n"
-		echo "    ** This compiler version allows applications to write"
-		echo "    ** to static strings within the library."
-		echo "    ** Compile with GCC version 3.X or above to avoid this problem."
-		fi
-	fi
-echo "    Sanitizer enabled : ................... ${enable_sanitizer:-no}"
-echo "    Stack smash protection : .............. ${enable_stack_smash_protection:-no}"
+AS_IF([test "x$ac_cv_c_compiler_gnu" = "xyes"] ,[
+		AS_ECHO(["    GCC version : ......................... ${GCC_VERSION}"])
+		AS_IF([test $GCC_MAJOR_VERSION -lt 3], [
+				AS_ECHO(["\n"])
+				AS_ECHO(["    ** This compiler version allows applications to write"])
+				AS_ECHO(["    ** to static strings within the library."])
+				AS_ECHO(["    ** Compile with GCC version 3.X or above to avoid this problem."])
+			])
+	])
+AS_ECHO(["    Sanitizer enabled : ................... ${enable_sanitizer:-no}"])
+AS_ECHO(["    Stack smash protection : .............. ${enable_stack_smash_protection:-no}"])
 
 ./echo-install-dirs
 
