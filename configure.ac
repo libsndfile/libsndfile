@@ -6,6 +6,21 @@ AC_PREREQ(2.57)
 AC_INIT([libsndfile],[1.0.29pre1],[sndfile@mega-nerd.com],
 		[libsndfile],[http://www.mega-nerd.com/libsndfile/])
 
+dnl Check whether we want to set defaults for CFLAGS, CXXFLAGS, CPPFLAGS and LDFLAGS
+AC_MSG_CHECKING([whether configure should try to set CFLAGS/CXXFLAGS/CPPFLAGS/LDFLAGS])
+AS_IF([test "x${CFLAGS+set}" = "xset" || test "x${CXXFLAGS+set}" = "xset" || test "x${CPPFLAGS+set}" = "xset" || test "x${LDFLAGS+set}" = "xset"], [
+		enable_flags_setting=no
+		: ${CFLAGS=""}
+		: ${CXXFLAGS=""}
+	], [
+		enable_flags_setting=yes
+		dnl Set to empty flags so AC_PROG_CC and
+		dnl AC_PROG_CXX do not add -g -O2
+		CFLAGS=""
+		CXXFLAGS=""
+	])
+AC_MSG_RESULT([${enable_flags_setting}])
+
 # Put config stuff in Cfg.
 AC_CONFIG_AUX_DIR(Cfg)
 AC_CONFIG_MACRO_DIR([M4])
@@ -18,15 +33,18 @@ AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
-AC_LANG([C])
-
-AC_PROG_CC_STDC
+AC_PROG_CC_C99
 AC_USE_SYSTEM_EXTENSIONS
-AM_PROG_CC_C_O
 AC_PROG_CXX
 
-MN_C_COMPILER_IS_CLANG
-MN_GCC_REALLY_IS_GCC
+AC_LANG([C])
+AX_COMPILER_VENDOR
+AX_COMPILER_VERSION
+
+AC_LANG_PUSH([C++])
+AX_COMPILER_VENDOR
+AX_COMPILER_VERSION
+AC_LANG_POP([C++])
 
 AC_PROG_SED
 m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
@@ -108,12 +126,6 @@ AC_ARG_ENABLE(werror,
 
 AC_ARG_ENABLE(stack-smash-protection,
 	AS_HELP_STRING([--enable-stack-smash-protection], [Enable GNU GCC stack smash protection]))
-
-AC_ARG_ENABLE(gcc-pipe,
-	AS_HELP_STRING([--disable-gcc-pipe], [disable gcc -pipe option]))
-
-AC_ARG_ENABLE(gcc-opt,
-	AS_HELP_STRING([--disable-gcc-opt], [disable gcc optimisations]))
 
 AC_ARG_ENABLE(cpu-clip,
 	AS_HELP_STRING([--disable-cpu-clip], [disable tricky cpu specific clipper]))
@@ -473,61 +485,44 @@ AS_IF([test "x$enable_bow_docs" = "xyes"], [
 win32_target_dll=0
 COMPILER_IS_GCC=0
 
-AS_IF([test "x$ac_cv_c_compiler_gnu" = "xyes"], [
-		MN_ADD_CFLAGS(-std=gnu99)
-
-		MN_GCC_VERSION
-
-		AS_IF([test "x$GCC_MAJOR_VERSION$GCC_MINOR_VERSION" = "x42"], [
-				AC_MSG_WARN([****************************************************************])
-				AC_MSG_WARN([** GCC version 4.2 warns about the inline keyword for no good **])
-				AC_MSG_WARN([** reason but the maintainers do not see it as a bug.         **])
-				AC_MSG_WARN([** See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=33995      **])
-				AC_MSG_WARN([** Using -fgnu-inline to avoid this stupidity.                **])
-				AC_MSG_WARN([****************************************************************])
-				MN_ADD_CFLAGS([-fgnu89-inline])
-			])
-
-		CFLAGS="$CFLAGS -Wall"
-		CXXFLAGS="$CXXFLAGS -Wall"
-
-		MN_ADD_CFLAGS([-Wextra])
-		MN_ADD_CFLAGS([-Wdeclaration-after-statement])
-		MN_ADD_CFLAGS([-Wpointer-arith])
-		MN_ADD_CFLAGS([-Wvla])
+AS_IF([test "x$enable_flags_setting" = "xyes"], [
+		AX_APPEND_COMPILE_FLAGS([-O2 -pipe], [CFLAGS])
 
 		AC_LANG_PUSH([C++])
-		MN_ADD_CXXFLAGS([-Wextra])
-		MN_ADD_CXXFLAGS([-Wpointer-arith])
+		AX_APPEND_COMPILE_FLAGS([-O2 -pipe], [CXXFLAGS])
 		AC_LANG_POP([C++])
+	])
 
-		AS_IF([test "x$enable_stack_smash_protection" = "xyes"], [
-				XIPH_GCC_STACK_PROTECTOR
-				XIPH_GXX_STACK_PROTECTOR
-			])
+AS_IF([test "x$enable_werror" = "xyes"], [
+		AX_APPEND_COMPILE_FLAGS([-Werror], [CFLAGS])
 
-		AS_IF([test "x$enable_test_coverage" = "xyes"], [
-				# MN_ADD_CFLAGS([-ftest-coverage])
-				MN_ADD_CFLAGS([-coverage])
-			])
+		AC_LANG_PUSH([C++])
+		AX_APPEND_COMPILE_FLAGS([-Werror], [CXXFLAGS])
+		AC_LANG_POP([C++])
+	])
 
-		dnl some distributions (such as Gentoo) have _FORTIFY_SOURCE always
-		dnl enabled. We test for this situation in order to prevent polluting
-		dnl the console with messages of macro redefinitions.
-		AX_ADD_FORTIFY_SOURCE
+common_flags="-Wall -Wextra -Wpointer-arith -Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wundef -Wuninitialized -Winit-self"
+AX_APPEND_COMPILE_FLAGS([${common_flags} -Wdeclaration-after-statement -Wvla -Wbad-function-cast -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return], [CFLAGS])
 
-		common_flags="-Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wundef -Wuninitialized -Winit-self"
+AC_LANG_PUSH([C++])
+AX_APPEND_COMPILE_FLAGS([${common_flags} -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo], [CXXFLAGS])
+AC_LANG_POP([C++])
 
-		# -Winline -Wconversion "
-		CFLAGS="$CFLAGS     $common_flags -Wbad-function-cast -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return"
-		CXXFLAGS="$CXXFLAGS $common_flags -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo"
+AS_IF([test "x$enable_stack_smash_protection" = "xyes"], [
+		XIPH_GCC_STACK_PROTECTOR
+		XIPH_GXX_STACK_PROTECTOR
+	])
 
-		AS_IF([test "x$enable_gcc_opt" = "xno"], [
-				temp_CFLAGS=`echo $CFLAGS | $SED "s/O2/O0/"`
-				CFLAGS=$temp_CFLAGS
-				AC_MSG_WARN([[*** Compiler optimisations switched off. ***]])
-			])
+AS_IF([test "x$enable_test_coverage" = "xyes"], [
+		AX_APPEND_COMPILE_FLAGS([-coverage], [CFLAGS])
+	])
 
+dnl some distributions (such as Gentoo) have _FORTIFY_SOURCE always
+dnl enabled. We test for this situation in order to prevent polluting
+dnl the console with messages of macro redefinitions.
+AX_ADD_FORTIFY_SOURCE
+
+AS_IF([test "x$ax_cv_c_compiler_vendor" = "xgnu"], [
 		# OS specific tweaks.
 		AS_CASE([$host_os],
 			[darwin* | rhapsody*], [
@@ -547,21 +542,9 @@ AS_IF([test "x$ac_cv_c_compiler_gnu" = "xyes"], [
 			[os2*], [
 				SHLIB_VERSION_ARG="-Wl,-export-symbols \$(srcdir)/Symbols.os2"
 			])
-		AS_IF([test "x$enable_gcc_pipe" != "xno"], [
-				CFLAGS="$CFLAGS -pipe"
-			])
 
 		COMPILER_IS_GCC=1
 	])
-
-AS_IF([test "x$enable_werror" = "xyes"], [
-		MN_ADD_CFLAGS([-Werror])
-
-		AC_LANG_PUSH([C++])
-		MN_ADD_CXXFLAGS([-Werror])
-		AC_LANG_POP([C++])
-	])
-
 
 AC_DEFINE_UNQUOTED([WIN32_TARGET_DLL], [${win32_target_dll}], [Set to 1 if windows DLL is being built.])
 AC_DEFINE_UNQUOTED([COMPILER_IS_GCC], [${COMPILER_IS_GCC}], [Set to 1 if the compile is GNU GCC.])
@@ -644,6 +627,11 @@ AC_MSG_RESULT([
     Host Vendor : ......................... ${host_vendor}
     Host OS : ............................. ${host_os}
 
+    CFLAGS : .............................. ${CFLAGS}
+    CXXFLAGS : ............................ ${CXXFLAGS}
+    CPPFLAGS : ............................ ${CPPFLAGS}
+    LDFLAGS : ............................. ${LDFLAGS}
+
     Experimental code : ................... ${enable_experimental:-no}
     Using ALSA in example programs : ...... ${enable_alsa:-no}
     External FLAC/Ogg/Vorbis : ............ ${enable_external_libs:-no}
@@ -659,18 +647,9 @@ AS_IF([test -z "$PKG_CONFIG"], [
 
 AS_ECHO(["  Tools :"])
 AS_ECHO([""])
-AS_ECHO(["    Compiler is Clang : ................... ${mn_cv_c_compiler_clang}"])
-AS_ECHO(["    Compiler is GCC : ..................... ${ac_cv_c_compiler_gnu}"])
+AS_ECHO(["    C Compiler Vendor is : ................ ${ax_cv_c_compiler_vendor} (${ax_cv_c_compiler_version})"])
+AS_ECHO(["    CXX Compiler Vendor is : .............. ${ax_cv_cxx_compiler_vendor} (${ax_cv_cxx_compiler_version})"])
 
-AS_IF([test "x$ac_cv_c_compiler_gnu" = "xyes"] ,[
-		AS_ECHO(["    GCC version : ......................... ${GCC_VERSION}"])
-		AS_IF([test $GCC_MAJOR_VERSION -lt 3], [
-				AS_ECHO(["\n"])
-				AS_ECHO(["    ** This compiler version allows applications to write"])
-				AS_ECHO(["    ** to static strings within the library."])
-				AS_ECHO(["    ** Compile with GCC version 3.X or above to avoid this problem."])
-			])
-	])
 AS_ECHO(["    Sanitizer enabled : ................... ${enable_sanitizer:-no}"])
 AS_ECHO(["    Stack smash protection : .............. ${enable_stack_smash_protection:-no}"])
 
