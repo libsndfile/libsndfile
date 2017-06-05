@@ -387,9 +387,12 @@ static void RPE_grid_positioning (
 
 	switch (Mc)
 	{	case 3: *ep++ = 0 ;
+				/* Falls through. */
 		case 2: do
 				{	*ep++ = 0 ;
+				/* Falls through. */
 		case 1:		*ep++ = 0 ;
+				/* Falls through. */
 		case 0:		*ep++ = *xMp++ ;
 					} while (--i) ;
 	}
