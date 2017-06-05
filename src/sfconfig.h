@@ -113,8 +113,16 @@
 #define HAVE_X86INTRIN_H 0
 #endif
 
-#define CPU_IS_X86		(defined __i486__ || defined __i586__ || defined __i686__ || defined __x86_64__)
-#define CPU_IS_X86_64	(defined __x86_64__)
+#if (defined (__i486__) || defined (__i586__) || defined (__i686__) || defined (__x86_64__))
+#define CPU_IS_X86 1
+#define CPU_IS_X86_64 0
+#elif defined __x86_64__
+#define CPU_IS_X86 0
+#define CPU_IS_X86_64 1
+#else
+#define CPU_IS_X86 0
+#define CPU_IS_X86_64 0
+#endif
 
 #ifndef HAVE_SSIZE_T
 #define HAVE_SSIZE_T 0
