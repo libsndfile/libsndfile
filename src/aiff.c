@@ -849,7 +849,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 			case FVER_MARKER :
 					found_chunk |= HAVE_FVER ;
-					/* Fall through to next case. */
+					/* Falls through. */
 
 			case SFX_MARKER :
 					psf_log_printf (psf, " %M : %d\n", marker, chunk_size) ;
