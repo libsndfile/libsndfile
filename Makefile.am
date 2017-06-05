@@ -8,13 +8,13 @@ if BUILD_OCTAVE_MOD
 octave_dir = Octave
 endif
 
-SUBDIRS = M4 Win32 src examples tests
+SUBDIRS = Win32 src examples tests
 
 if FULL_SUITE
 SUBDIRS += man doc $(octave_dir) regtest programs
 endif
 
-DIST_SUBDIRS = M4 man doc Win32 src Octave examples regtest tests programs
+DIST_SUBDIRS = man doc Win32 src Octave examples regtest tests programs
 
 EXTRA_DIST = libsndfile.spec.in sndfile.pc.in Scripts/android-configure.sh \
 	Scripts/linux-to-win-cross-configure.sh Scripts/build-test-tarball.mk.in \
