@@ -608,13 +608,12 @@ AC_CONFIG_FILES([ \
 	Makefile \
 	src/version-metadata.rc tests/test_wrapper.sh tests/pedantic-header-test.sh \
 	doc/libsndfile.css Scripts/build-test-tarball.mk libsndfile.spec sndfile.pc \
-	src/sndfile.h src/libsndfile.def \
-	echo-install-dirs
+	src/sndfile.h src/libsndfile.def
 	])
 AC_OUTPUT
 
 # Make sure these are executable.
-chmod u+x tests/test_wrapper.sh Scripts/build-test-tarball.mk echo-install-dirs
+chmod u+x tests/test_wrapper.sh Scripts/build-test-tarball.mk
 
 #====================================================================================
 
@@ -655,7 +654,22 @@ AS_ECHO(["    CXX Compiler Vendor is : .............. ${ax_cv_cxx_compiler_vendo
 AS_ECHO(["    Sanitizer enabled : ................... ${enable_sanitizer:-no}"])
 AS_ECHO(["    Stack smash protection : .............. ${enable_stack_smash_protection:-no}"])
 
-./echo-install-dirs
+AX_RECURSIVE_EVAL([$libdir], [full_absolute_libdir])
+AX_RECURSIVE_EVAL([$bindir], [full_absolute_bindir])
+AX_RECURSIVE_EVAL([$pkgconfigdir], [full_absolute_pkgconfigdir])
+AX_RECURSIVE_EVAL([$htmldir], [full_absolute_htmldir])
+AS_ECHO([""])
+AS_ECHO(["  Installation directories :"])
+AS_ECHO([""])
+AS_ECHO(["    Library directory : ................... $full_absolute_libdir"])
+AS_ECHO(["    Program directory : ................... $full_absolute_bindir"])
+AS_ECHO(["    Pkgconfig directory : ................. $full_absolute_pkgconfigdir"])
+AS_ECHO(["    HTML docs directory : ................. $full_absolute_htmldir"])
+AS_ECHO([""])
+AS_ECHO(["Compiling some other packages against libsndfile may require"])
+AS_ECHO(["the addition of '$full_absolute_pkgconfigdir' to the"])
+AS_ECHO(["PKG_CONFIG_PATH environment variable."])
+AS_ECHO([""])
 
 # Remove symlink created by Scripts/android-configure.sh.
 rm -f gdbclient
