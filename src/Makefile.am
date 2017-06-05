@@ -91,7 +91,7 @@ SUFFIXES = .def .tpl
 	autogen --writable $<
 
 check :
-	@if [ -x /usr/bin/python ]; then $(srcdir)/binheader_writef_check.py $(srcdir)/*.c ; fi
+	$(PYTHON) $(srcdir)/binheader_writef_check.py $(srcdir)/*.c
 	G72x/g72x_test$(EXEEXT) all
 	./test_main$(EXEEXT)
 
@@ -104,19 +104,19 @@ checkprograms : $(check_PROGRAMS)
 # end user to create these files.
 
 Symbols.gnu-binutils: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py linux $(VERSION) > $@
+	$(PYTHON) $(srcdir)/create_symbols_file.py linux $(VERSION) > $@
 
 Symbols.darwin: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py darwin $(VERSION) > $@
+	$(PYTHON) $(srcdir)/create_symbols_file.py darwin $(VERSION) > $@
 
 libsndfile-1.def: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py win32 $(VERSION) > $@
+	$(PYTHON) $(srcdir)/create_symbols_file.py win32 $(VERSION) > $@
 
 Symbols.os2: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py os2 $(VERSION) > $@
+	$(PYTHON) $(srcdir)/create_symbols_file.py os2 $(VERSION) > $@
 
 Symbols.static: create_symbols_file.py
-	python $(srcdir)/create_symbols_file.py static $(VERSION) > $@
+	$(PYTHON) $(srcdir)/create_symbols_file.py static $(VERSION) > $@
 
 #======================================================================
 # Building windows resource files (if needed).
