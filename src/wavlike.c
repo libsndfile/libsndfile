@@ -432,6 +432,21 @@ wavlike_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 					psf_log_printf (psf, "*** 'fmt ' chunk should be bigger than this!\n") ;
 				break ;
 
+		case WAVE_FORMAT_NMS_VBXADPCM :
+				if (wav_fmt->min.channels != 1 || wav_fmt->min.bitwidth < 2 || wav_fmt->min.bitwidth * 20 + 2 != wav_fmt->min.blockalign)
+					return SFE_WAV_NMS_FORMAT ;
+
+				bytespersec = (wav_fmt->min.samplerate * wav_fmt->min.blockalign) / 160 ;
+				if (wav_fmt->min.bytespersec == (unsigned) bytespersec)
+					psf_log_printf (psf, "  Bytes/sec     : %d\n", wav_fmt->min.bytespersec) ;
+				else
+					psf_log_printf (psf, "  Bytes/sec     : %d (should be %d)\n", wav_fmt->min.bytespersec, bytespersec) ;
+				if (fmtsize >= 18)
+				{	bytesread += psf_binheader_readf (psf, "2", &(wav_fmt->size20.extrabytes)) ;
+					psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->size20.extrabytes) ;
+					} ;
+				break ;
+
 		default :
 				psf_log_printf (psf, "*** No 'fmt ' chunk dumper for this format!\n") ;
 				return SFE_WAV_BAD_FMT ;

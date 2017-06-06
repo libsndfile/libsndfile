@@ -150,6 +150,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_WAV_ADPCM_CHANNELS	, "Error in ADPCM WAV file. Invalid number of channels." },
 	{	SFE_WAV_ADPCM_SAMPLES	, "Error in ADPCM WAV file. Invalid number of samples per block." },
 	{	SFE_WAV_GSM610_FORMAT	, "Error in GSM610 WAV file. Invalid format chunk." },
+	{	SFE_WAV_NMS_FORMAT		, "Error in NMS ADPCM WAV file. Invalid format chunk." },
 
 	{	SFE_AIFF_NO_FORM		, "Error in AIFF file, bad 'FORM' marker." },
 	{	SFE_AIFF_AIFF_NO_FORM	, "Error in AIFF file, 'AIFF' marker without 'FORM'." },
