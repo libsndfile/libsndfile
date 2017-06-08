@@ -107,7 +107,7 @@ AM_CONDITIONAL([LINUX_MINGW_CROSS_TEST],
 
 #====================================================================================
 # Couple of initializations here. Fill in real values later.
-
+      
 SHLIB_VERSION_ARG=""
 
 #====================================================================================
