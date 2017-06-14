@@ -681,16 +681,16 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					/* Write a C string (guaranteed to have a zero terminator). */
 					strptr = va_arg (argptr, char *) ;
 					size = strlen (strptr) + 1 ;
-					size += (size & 1) ;
 
-					if (psf->header.indx + (sf_count_t) size >= psf->header.len && psf_bump_header_allocation (psf, 16))
+					if (psf->header.indx + 4 + (sf_count_t) size + (sf_count_t) (size & 1) > psf->header.len && psf_bump_header_allocation (psf, 4 + size + (size & 1)))
 						return count ;
 
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
-						header_put_be_int (psf, size) ;
+						header_put_be_int (psf, size + (size & 1)) ;
 					else
-						header_put_le_int (psf, size) ;
+						header_put_le_int (psf, size + (size & 1)) ;
 					memcpy (&(psf->header.ptr [psf->header.indx]), strptr, size) ;
+					size += (size & 1) ;
 					psf->header.indx += size ;
 					psf->header.ptr [psf->header.indx - 1] = 0 ;
 					count += 4 + size ;
@@ -703,16 +703,15 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					*/
 					strptr = va_arg (argptr, char *) ;
 					size = strlen (strptr) ;
-					if (psf->header.indx + (sf_count_t) size > psf->header.len && psf_bump_header_allocation (psf, size))
+					if (psf->header.indx + 4 + (sf_count_t) size + (sf_count_t) (size & 1) > psf->header.len && psf_bump_header_allocation (psf, 4 + size + (size & 1)))
 						return count ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						header_put_be_int (psf, size) ;
 					else
 						header_put_le_int (psf, size) ;
-					memcpy (&(psf->header.ptr [psf->header.indx]), strptr, size + 1) ;
+					memcpy (&(psf->header.ptr [psf->header.indx]), strptr, size + (size & 1)) ;
 					size += (size & 1) ;
 					psf->header.indx += size ;
-					psf->header.ptr [psf->header.indx] = 0 ;
 					count += 4 + size ;
 					break ;
 
@@ -724,7 +723,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					size = (size & 1) ? size : size + 1 ;
 					size = (size > 254) ? 254 : size ;
 
-					if (psf->header.indx + (sf_count_t) size > psf->header.len && psf_bump_header_allocation (psf, size))
+					if (psf->header.indx + 1 + (sf_count_t) size > psf->header.len && psf_bump_header_allocation (psf, 1 + size))
 						return count ;
 
 					header_put_byte (psf, size) ;
