@@ -163,7 +163,7 @@ salvage_file (const char * broken_wav, const char * fixed_w64)
 	read_size *= sfinfo.channels ;
 
 	if ((sndfile = sf_open (fixed_w64, SFM_WRITE, &sfinfo)) == NULL)
-	{	printf ("sf_open ('%s') failed : %s\n", broken_wav, sf_strerror (NULL)) ;
+	{	printf ("sf_open ('%s') failed : %s\n", fixed_w64, sf_strerror (NULL)) ;
 		exit (1) ;
 		} ;
 
