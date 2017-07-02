@@ -188,7 +188,15 @@ AS_CASE([$host_os],
 		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
 		SIZEOF_SF_COUNT_T=8
 		AC_DEFINE([__USE_MINGW_ANSI_STDIO], [1], [Set to 1 to use C99 printf/snprintf in MinGW.])
-	], [
+		],
+
+	[linux-android*], [
+		TYPEOF_SF_COUNT_T="int64_t"
+		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
+		SIZEOF_SF_COUNT_T=8
+		],
+
+	[
 		SIZEOF_SF_COUNT_T=0
 		AS_IF([test "x$ac_cv_sizeof_off_t" = "x8"], [
 				# If sizeof (off_t) is 8, no further checking is needed.
