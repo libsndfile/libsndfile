@@ -1,4 +1,4 @@
-sudo: false
+sudo: required
 language: c
 
 matrix:
@@ -9,6 +9,7 @@ matrix:
       addons:
         apt:
           packages:
+            - autogen
             - libogg-dev
             - libvorbis-dev
             - libflac-dev
@@ -19,6 +20,7 @@ matrix:
       addons:
         apt:
           packages:
+            - autogen
             - libogg-dev
             - libvorbis-dev
             - libflac-dev
@@ -31,6 +33,11 @@ before_install:
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       brew install autogen flac libogg libvorbis
+    else
+      sudo add-apt-repository ppa:ondrej/autotools -y # automake 1.15
+      sudo add-apt-repository ppa:cz.nic-labs/knot-dns -y # pkg-config 0.29.2
+      sudo apt-get update
+      sudo apt-get install -y autoconf automake-1.15 pkg-config m4 libfftw3-dev libasound2-dev
     fi
 
 install:
