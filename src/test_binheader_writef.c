@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -43,7 +43,7 @@ test_binheader_writef (void)
 	{	psf_strlcpy (buffer, sizeof (buffer), "abcdefghijklmnop") ;
 		buffer [k] = 0 ;
 
-		psf_binheader_writef (psf, "Ep", buffer) ;
+		psf_binheader_writef (psf, "Ep", BHWp (buffer)) ;
 
 		if ((psf->header.indx & 1) != 0)
 			errors = 1 ;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004-2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -452,9 +452,9 @@ wavlike_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 void
 wavlike_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat)
 {
-	psf_binheader_writef (psf, "422b", subformat->esf_field1,
-					subformat->esf_field2, subformat->esf_field3,
-					subformat->esf_field4, make_size_t (8)) ;
+	psf_binheader_writef (psf, "422b", BHW4 (subformat->esf_field1),
+					BHW2 (subformat->esf_field2), BHW2 (subformat->esf_field3),
+					BHWv (subformat->esf_field4), BHWz (8)) ;
 } /* wavlike_write_guid */
 
 
@@ -746,11 +746,11 @@ wavlike_read_bext_chunk (SF_PRIVATE *psf, uint32_t chunksize)
 		b->coding_history_size = chunksize - WAV_BEXT_MIN_CHUNK_SIZE ;
 
 		/* We do not parse the coding history */
-		bytes += psf_binheader_readf (psf, "b", b->coding_history, b->coding_history_size) ;
+		bytes += psf_binheader_readf (psf, "b", BHWv (b->coding_history), BHWz (b->coding_history_size)) ;
 		} ;
 
 	if (bytes < chunksize)
-		psf_binheader_readf (psf, "j", chunksize - bytes) ;
+		psf_binheader_readf (psf, "j", BHWj (chunksize - bytes)) ;
 
 	return 0 ;
 } /* wavlike_read_bext_chunk */
@@ -764,24 +764,24 @@ wavlike_write_bext_chunk (SF_PRIVATE *psf)
 
 	b = psf->broadcast_16k ;
 
-	psf_binheader_writef (psf, "m4", bext_MARKER, WAV_BEXT_MIN_CHUNK_SIZE + b->coding_history_size) ;
+	psf_binheader_writef (psf, "m4", BHWm (bext_MARKER), BHW4 (WAV_BEXT_MIN_CHUNK_SIZE + b->coding_history_size)) ;
 
 	/*
 	**	Note that it is very important that the field widths of the SF_BROADCAST_INFO
 	**	struct match those of the bext chunk fields.
 	*/
 
-	psf_binheader_writef (psf, "b", b->description, sizeof (b->description)) ;
-	psf_binheader_writef (psf, "b", b->originator, sizeof (b->originator)) ;
-	psf_binheader_writef (psf, "b", b->originator_reference, sizeof (b->originator_reference)) ;
-	psf_binheader_writef (psf, "b", b->origination_date, sizeof (b->origination_date)) ;
-	psf_binheader_writef (psf, "b", b->origination_time, sizeof (b->origination_time)) ;
-	psf_binheader_writef (psf, "442", b->time_reference_low, b->time_reference_high, b->version) ;
-	psf_binheader_writef (psf, "b", b->umid, sizeof (b->umid)) ;
-	psf_binheader_writef (psf, "z", make_size_t (190)) ;
+	psf_binheader_writef (psf, "b", BHWv (b->description), BHWz (sizeof (b->description))) ;
+	psf_binheader_writef (psf, "b", BHWv (b->originator), BHWz (sizeof (b->originator))) ;
+	psf_binheader_writef (psf, "b", BHWv (b->originator_reference), BHWz (sizeof (b->originator_reference))) ;
+	psf_binheader_writef (psf, "b", BHWv (b->origination_date), BHWz (sizeof (b->origination_date))) ;
+	psf_binheader_writef (psf, "b", BHWv (b->origination_time), BHWz (sizeof (b->origination_time))) ;
+	psf_binheader_writef (psf, "442", BHW4 (b->time_reference_low), BHW4 (b->time_reference_high), BHW2 (b->version)) ;
+	psf_binheader_writef (psf, "b", BHWv (b->umid), BHWz (sizeof (b->umid))) ;
+	psf_binheader_writef (psf, "z", BHWz (190)) ;
 
 	if (b->coding_history_size > 0)
-		psf_binheader_writef (psf, "b", b->coding_history, make_size_t (b->coding_history_size)) ;
+		psf_binheader_writef (psf, "b", BHWv (b->coding_history), BHWz (b->coding_history_size)) ;
 
 	return 0 ;
 } /* wavlike_write_bext_chunk */
@@ -858,36 +858,36 @@ wavlike_write_cart_chunk (SF_PRIVATE *psf)
 		return -1 ;
 
 	c = psf->cart_16k ;
-	psf_binheader_writef (psf, "m4", cart_MARKER, WAV_CART_MIN_CHUNK_SIZE + c->tag_text_size) ;
+	psf_binheader_writef (psf, "m4", BHWm (cart_MARKER), BHW4 (WAV_CART_MIN_CHUNK_SIZE + c->tag_text_size)) ;
 	/*
 	**	Note that it is very important that the field widths of the SF_CART_INFO
 	**	struct match those of the cart chunk fields.
 	*/
-	psf_binheader_writef (psf, "b", c->version, sizeof (c->version)) ;
-	psf_binheader_writef (psf, "b", c->title, sizeof (c->title)) ;
-	psf_binheader_writef (psf, "b", c->artist, sizeof (c->artist)) ;
-	psf_binheader_writef (psf, "b", c->cut_id, sizeof (c->cut_id)) ;
-	psf_binheader_writef (psf, "b", c->client_id, sizeof (c->client_id)) ;
-	psf_binheader_writef (psf, "b", c->category, sizeof (c->category)) ;
-	psf_binheader_writef (psf, "b", c->classification, sizeof (c->classification)) ;
-	psf_binheader_writef (psf, "b", c->out_cue, sizeof (c->out_cue)) ;
-	psf_binheader_writef (psf, "b", c->start_date, sizeof (c->start_date)) ;
-	psf_binheader_writef (psf, "b", c->start_time, sizeof (c->start_time)) ;
-	psf_binheader_writef (psf, "b", c->end_date, sizeof (c->end_date)) ;
-	psf_binheader_writef (psf, "b", c->end_time, sizeof (c->end_time)) ;
-	psf_binheader_writef (psf, "b", c->producer_app_id, sizeof (c->producer_app_id)) ;
-	psf_binheader_writef (psf, "b", c->producer_app_version, sizeof (c->producer_app_version)) ;
-	psf_binheader_writef (psf, "b", c->user_def, sizeof (c->user_def)) ;
-	psf_binheader_writef (psf, "4", c->level_reference, sizeof (c->level_reference)) ;
+	psf_binheader_writef (psf, "b", BHWv (c->version), BHWz (sizeof (c->version))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->title), BHWz (sizeof (c->title))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->artist), BHWz (sizeof (c->artist))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->cut_id), BHWz (sizeof (c->cut_id))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->client_id), BHWz (sizeof (c->client_id))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->category), BHWz (sizeof (c->category))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->classification), BHWz (sizeof (c->classification))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->out_cue), BHWz (sizeof (c->out_cue))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->start_date), BHWz (sizeof (c->start_date))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->start_time), BHWz (sizeof (c->start_time))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->end_date), BHWz (sizeof (c->end_date))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->end_time), BHWz (sizeof (c->end_time))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->producer_app_id), BHWz (sizeof (c->producer_app_id))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->producer_app_version), BHWz (sizeof (c->producer_app_version))) ;
+	psf_binheader_writef (psf, "b", BHWv (c->user_def), BHWz (sizeof (c->user_def))) ;
+	psf_binheader_writef (psf, "e4", BHW4 (c->level_reference)) ;
 
 	for (k = 0 ; k < ARRAY_LEN (c->post_timers) ; k++)
-		psf_binheader_writef (psf, "b4", c->post_timers [k].usage, make_size_t (4), c->post_timers [k].value) ;
+		psf_binheader_writef (psf, "b4", BHWv (c->post_timers [k].usage), BHWz (4), BHW4 (c->post_timers [k].value)) ;
 
-	psf_binheader_writef (psf, "z", sizeof (c->reserved)) ;	// just write zeros, we don't have any other use for it
-	psf_binheader_writef (psf, "b", c->url, sizeof (c->url)) ;
+	psf_binheader_writef (psf, "z", BHWz (sizeof (c->reserved))) ;	// just write zeros, we don't have any other use for it
+	psf_binheader_writef (psf, "b", BHWv (c->url), BHWz (sizeof (c->url))) ;
 
 	if (c->tag_text_size > 0)
-		psf_binheader_writef (psf, "b", c->tag_text, make_size_t (c->tag_text_size)) ;
+		psf_binheader_writef (psf, "b", BHWv (c->tag_text), BHWz (c->tag_text_size)) ;
 
 	return 0 ;
 } /* wavlike_write_cart_chunk */
@@ -1078,7 +1078,7 @@ wavlike_write_strings (SF_PRIVATE *psf, int location)
 
 	prev_head_index = psf->header.indx + 4 ;
 
-	psf_binheader_writef (psf, "m4m", LIST_MARKER, 0xBADBAD, INFO_MARKER) ;
+	psf_binheader_writef (psf, "m4m", BHWm (LIST_MARKER), BHW4 (0xBADBAD), BHWm (INFO_MARKER)) ;
 
 	for (k = 0 ; k < SF_MAX_STRINGS ; k++)
 	{	if (psf->strings.data [k].type == 0)
@@ -1088,39 +1088,39 @@ wavlike_write_strings (SF_PRIVATE *psf, int location)
 
 		switch (psf->strings.data [k].type)
 		{	case SF_STR_SOFTWARE :
-				psf_binheader_writef (psf, "ms", ISFT_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				psf_binheader_writef (psf, "ms", BHWm (ISFT_MARKER), BHWs (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			case SF_STR_TITLE :
-				psf_binheader_writef (psf, "ms", INAM_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				psf_binheader_writef (psf, "ms", BHWm (INAM_MARKER), BHWs (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			case SF_STR_COPYRIGHT :
-				psf_binheader_writef (psf, "ms", ICOP_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				psf_binheader_writef (psf, "ms", BHWm (ICOP_MARKER), BHWs (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			case SF_STR_ARTIST :
-				psf_binheader_writef (psf, "ms", IART_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				psf_binheader_writef (psf, "ms", BHWm (IART_MARKER), BHWs (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			case SF_STR_COMMENT :
-				psf_binheader_writef (psf, "ms", ICMT_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				psf_binheader_writef (psf, "ms", BHWm (ICMT_MARKER), BHWs (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			case SF_STR_DATE :
-				psf_binheader_writef (psf, "ms", ICRD_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				psf_binheader_writef (psf, "ms", BHWm (ICRD_MARKER), BHWs (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			case SF_STR_GENRE :
-				psf_binheader_writef (psf, "ms", IGNR_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				psf_binheader_writef (psf, "ms", BHWm (IGNR_MARKER), BHWs (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			case SF_STR_ALBUM :
-				psf_binheader_writef (psf, "ms", IPRD_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				psf_binheader_writef (psf, "ms", BHWm (IPRD_MARKER), BHWs (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			case SF_STR_TRACKNUMBER :
-				psf_binheader_writef (psf, "ms", ITRK_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				psf_binheader_writef (psf, "ms", BHWm (ITRK_MARKER), BHWs (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			default :
@@ -1130,7 +1130,7 @@ wavlike_write_strings (SF_PRIVATE *psf, int location)
 
 	saved_head_index = psf->header.indx ;
 	psf->header.indx = prev_head_index ;
-	psf_binheader_writef (psf, "4", saved_head_index - prev_head_index - 4) ;
+	psf_binheader_writef (psf, "4", BHW4 (saved_head_index - prev_head_index - 4)) ;
 	psf->header.indx = saved_head_index ;
 
 } /* wavlike_write_strings */
@@ -1184,10 +1184,10 @@ wavlike_write_peak_chunk (SF_PRIVATE * psf)
 	if (psf->peak_info == NULL)
 		return ;
 
-	psf_binheader_writef (psf, "m4", PEAK_MARKER, WAVLIKE_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
-	psf_binheader_writef (psf, "44", 1, time (NULL)) ;
+	psf_binheader_writef (psf, "m4", BHWm (PEAK_MARKER), BHW4 (WAVLIKE_PEAK_CHUNK_SIZE (psf->sf.channels))) ;
+	psf_binheader_writef (psf, "44", BHW4 (1), BHW4 (time (NULL))) ;
 	for (k = 0 ; k < psf->sf.channels ; k++)
-		psf_binheader_writef (psf, "ft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
+		psf_binheader_writef (psf, "ft8", BHWf (psf->peak_info->peaks [k].value), BHW8 (psf->peak_info->peaks [k].position)) ;
 } /* wavlike_write_peak_chunk */
 
 /*==============================================================================
@@ -1292,6 +1292,7 @@ wavlike_write_custom_chunks (SF_PRIVATE * psf)
 {	uint32_t k ;
 
 	for (k = 0 ; k < psf->wchunks.used ; k++)
-		psf_binheader_writef (psf, "m4b", (int) psf->wchunks.chunks [k].mark32, psf->wchunks.chunks [k].len, psf->wchunks.chunks [k].data, make_size_t (psf->wchunks.chunks [k].len)) ;
+		psf_binheader_writef (psf, "m4b", BHWm (psf->wchunks.chunks [k].mark32), BHW4 (psf->wchunks.chunks [k].len),
+							BHWv (psf->wchunks.chunks [k].data), BHWz (psf->wchunks.chunks [k].len)) ;
 
 } /* wavlike_write_custom_chunks */

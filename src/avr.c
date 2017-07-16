@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2004-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2004-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -211,15 +211,15 @@ avr_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->is_pipe == SF_FALSE)
 		psf_fseek (psf, 0, SEEK_SET) ;
 
-	psf_binheader_writef (psf, "Emz22", TWOBIT_MARKER, make_size_t (8),
-			psf->sf.channels == 2 ? 0xFFFF : 0, psf->bytewidth * 8) ;
+	psf_binheader_writef (psf, "Emz22", BHWm (TWOBIT_MARKER), BHWz (8),
+			BHW2 (psf->sf.channels == 2 ? 0xFFFF : 0), BHW2 (psf->bytewidth * 8)) ;
 
 	sign = ((SF_CODEC (psf->sf.format)) == SF_FORMAT_PCM_U8) ? 0 : 0xFFFF ;
 
-	psf_binheader_writef (psf, "E222", sign, 0, 0xFFFF) ;
-	psf_binheader_writef (psf, "E4444", psf->sf.samplerate, psf->sf.frames, 0, 0) ;
+	psf_binheader_writef (psf, "E222", BHW2 (sign), BHW2 (0), BHW2 (0xFFFF)) ;
+	psf_binheader_writef (psf, "E4444", BHW4 (psf->sf.samplerate), BHW4 (psf->sf.frames), BHW4 (0), BHW4 (0)) ;
 
-	psf_binheader_writef (psf, "E222zz", 0, 0, 0, make_size_t (20), make_size_t (64)) ;
+	psf_binheader_writef (psf, "E222zz", BHW2 (0), BHW2 (0), BHW2 (0), BHWz (20), BHWz (64)) ;
 
 	/* Header construction complete so write it out. */
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;

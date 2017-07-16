@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -133,10 +133,10 @@ mpc2k_write_header (SF_PRIVATE *psf, int calc_length)
 
 	snprintf (sample_name, sizeof (sample_name), "%s                    ", psf->file.name.c) ;
 
-	psf_binheader_writef (psf, "e11b", 1, 4, sample_name, make_size_t (HEADER_NAME_LEN)) ;
-	psf_binheader_writef (psf, "e111", 100, 0, (psf->sf.channels - 1) & 1) ;
-	psf_binheader_writef (psf, "et4888", 0, psf->sf.frames, psf->sf.frames, psf->sf.frames) ;
-	psf_binheader_writef (psf, "e112", 0, 1, (uint16_t) psf->sf.samplerate) ;
+	psf_binheader_writef (psf, "e11b", BHW1 (1), BHW1 (4), BHWv (sample_name), BHWz (HEADER_NAME_LEN)) ;
+	psf_binheader_writef (psf, "e111", BHW1 (100), BHW1 (0), BHW1 ((psf->sf.channels - 1) & 1)) ;
+	psf_binheader_writef (psf, "et4888", BHW4 (0), BHW8 (psf->sf.frames), BHW8 (psf->sf.frames), BHW8 (psf->sf.frames)) ;
+	psf_binheader_writef (psf, "e112", BHW1 (0), BHW1 (1), BHW2 ((uint16_t) psf->sf.samplerate)) ;
 
 	/* Always 16 bit little endian data. */
 	psf->bytewidth = 2 ;

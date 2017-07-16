@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -303,19 +303,19 @@ paf_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 
 	if (psf->endian == SF_ENDIAN_BIG)
 	{	/* Marker, version, endianness, samplerate */
-		psf_binheader_writef (psf, "Em444", PAF_MARKER, 0, 0, psf->sf.samplerate) ;
+		psf_binheader_writef (psf, "Em444", BHWm (PAF_MARKER), BHW4 (0), BHW4 (0), BHW4 (psf->sf.samplerate)) ;
 		/* format, channels, source */
-		psf_binheader_writef (psf, "E444", paf_format, psf->sf.channels, 0) ;
+		psf_binheader_writef (psf, "E444", BHW4 (paf_format), BHW4 (psf->sf.channels), BHW4 (0)) ;
 		}
 	else if (psf->endian == SF_ENDIAN_LITTLE)
 	{	/* Marker, version, endianness, samplerate */
-		psf_binheader_writef (psf, "em444", FAP_MARKER, 0, 1, psf->sf.samplerate) ;
+		psf_binheader_writef (psf, "em444", BHWm (FAP_MARKER), BHW4 (0), BHW4 (1), BHW4 (psf->sf.samplerate)) ;
 		/* format, channels, source */
-		psf_binheader_writef (psf, "e444", paf_format, psf->sf.channels, 0) ;
+		psf_binheader_writef (psf, "e444", BHW4 (paf_format), BHW4 (psf->sf.channels), BHW4 (0)) ;
 		} ;
 
 	/* Zero fill to dataoffset. */
-	psf_binheader_writef (psf, "z", (size_t) (psf->dataoffset - psf->header.indx)) ;
+	psf_binheader_writef (psf, "z", BHWz ((size_t) (psf->dataoffset - psf->header.indx))) ;
 
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 

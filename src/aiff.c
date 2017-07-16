@@ -1163,30 +1163,30 @@ aiff_rewrite_header (SF_PRIVATE *psf)
 	psf->header.indx = 0 ;
 
 	/* FORM chunk. */
-	psf_binheader_writef (psf, "Etm8", FORM_MARKER, psf->filelength - 8) ;
+	psf_binheader_writef (psf, "Etm8", BHWm (FORM_MARKER), BHW8 (psf->filelength - 8)) ;
 
 	/* COMM chunk. */
 	if ((k = psf_find_read_chunk_m32 (&psf->rchunks, COMM_MARKER)) >= 0)
 	{	psf->header.indx = psf->rchunks.chunks [k].offset - 8 ;
 		comm_frames = psf->sf.frames ;
 		comm_size = psf->rchunks.chunks [k].len ;
-		psf_binheader_writef (psf, "Em42t4", COMM_MARKER, comm_size, psf->sf.channels, comm_frames) ;
+		psf_binheader_writef (psf, "Em42t4", BHWm (COMM_MARKER), BHW4 (comm_size), BHW2 (psf->sf.channels), BHW4 (comm_frames)) ;
 		} ;
 
 	/* PEAK chunk. */
 	if ((k = psf_find_read_chunk_m32 (&psf->rchunks, PEAK_MARKER)) >= 0)
 	{	psf->header.indx = psf->rchunks.chunks [k].offset - 8 ;
-		psf_binheader_writef (psf, "Em4", PEAK_MARKER, AIFF_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
-		psf_binheader_writef (psf, "E44", 1, time (NULL)) ;
+		psf_binheader_writef (psf, "Em4", BHWm (PEAK_MARKER), BHW4 (AIFF_PEAK_CHUNK_SIZE (psf->sf.channels))) ;
+		psf_binheader_writef (psf, "E44", BHW4 (1), BHW4 (time (NULL))) ;
 		for (ch = 0 ; ch < psf->sf.channels ; ch++)
-			psf_binheader_writef (psf, "Eft8", (float) psf->peak_info->peaks [ch].value, psf->peak_info->peaks [ch].position) ;
+			psf_binheader_writef (psf, "Eft8", BHWf ((float) psf->peak_info->peaks [ch].value), BHW8 (psf->peak_info->peaks [ch].position)) ;
 		} ;
 
 
 	/* SSND chunk. */
 	if ((k = psf_find_read_chunk_m32 (&psf->rchunks, SSND_MARKER)) >= 0)
 	{	psf->header.indx = psf->rchunks.chunks [k].offset - 8 ;
-		psf_binheader_writef (psf, "Etm8", SSND_MARKER, psf->datalength + SIZEOF_SSND_CHUNK) ;
+		psf_binheader_writef (psf, "Etm8", BHWm (SSND_MARKER), BHW8 (psf->datalength + SIZEOF_SSND_CHUNK)) ;
 		} ;
 
 	/* Header mangling complete so write it out. */
@@ -1400,29 +1400,29 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	psf->header.indx = 0 ;
 	psf_fseek (psf, 0, SEEK_SET) ;
 
-	psf_binheader_writef (psf, "Etm8", FORM_MARKER, psf->filelength - 8) ;
+	psf_binheader_writef (psf, "Etm8", BHWm (FORM_MARKER), BHW8 (psf->filelength - 8)) ;
 
 	/* Write AIFF/AIFC marker and COM chunk. */
 	if (comm_type == AIFC_MARKER)
 		/* AIFC must have an FVER chunk. */
-		psf_binheader_writef (psf, "Emm44", comm_type, FVER_MARKER, 4, 0xA2805140) ;
+		psf_binheader_writef (psf, "Emm44", BHWm (comm_type), BHWm (FVER_MARKER), BHW4 (4), BHW4 (0xA2805140)) ;
 	else
-		psf_binheader_writef (psf, "Em", comm_type) ;
+		psf_binheader_writef (psf, "Em", BHWm (comm_type)) ;
 
 	paiff->comm_offset = psf->header.indx - 8 ;
 
 	memset (comm_sample_rate, 0, sizeof (comm_sample_rate)) ;
 	uint2tenbytefloat (psf->sf.samplerate, comm_sample_rate) ;
 
-	psf_binheader_writef (psf, "Em42t42", COMM_MARKER, comm_size, psf->sf.channels, comm_frames, bit_width) ;
-	psf_binheader_writef (psf, "b", comm_sample_rate, sizeof (comm_sample_rate)) ;
+	psf_binheader_writef (psf, "Em42t42", BHWm (COMM_MARKER), BHW4 (comm_size), BHW2 (psf->sf.channels), BHW4 (comm_frames), BHW2 (bit_width)) ;
+	psf_binheader_writef (psf, "b", BHWv (comm_sample_rate), BHWz (sizeof (comm_sample_rate))) ;
 
 	/* AIFC chunks have some extra data. */
 	if (comm_type == AIFC_MARKER)
-		psf_binheader_writef (psf, "mb", comm_encoding, comm_zero_bytes, sizeof (comm_zero_bytes)) ;
+		psf_binheader_writef (psf, "mb", BHWm (comm_encoding), BHWv (comm_zero_bytes), BHWz (sizeof (comm_zero_bytes))) ;
 
 	if (psf->channel_map && paiff->chanmap_tag)
-		psf_binheader_writef (psf, "Em4444", CHAN_MARKER, 12, paiff->chanmap_tag, 0, 0) ;
+		psf_binheader_writef (psf, "Em4444", BHWm (CHAN_MARKER), BHW4 (12), BHW4 (paiff->chanmap_tag), BHW4 (0), BHW4 (0)) ;
 
 	/* Check if there's a INST chunk to write */
 	if (psf->instrument != NULL && psf->cues != NULL)
@@ -1443,29 +1443,29 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			} ;
 
 		psf_binheader_writef (psf, "Em42",
-			MARK_MARKER, 2 + psf->cues->cue_count * (2 + 4) + totalStringLength, psf->cues->cue_count) ;
+			BHWm (MARK_MARKER), BHW4 (2 + psf->cues->cue_count * (2 + 4) + totalStringLength), BHW2 (psf->cues->cue_count)) ;
 
 		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-			psf_binheader_writef (psf, "E24p", psf->cues->cue_points [idx].indx, psf->cues->cue_points [idx].sample_offset, psf->cues->cue_points [idx].name) ;
+			psf_binheader_writef (psf, "E24p", BHW2 (psf->cues->cue_points [idx].indx), BHW4 (psf->cues->cue_points [idx].sample_offset), BHWp (psf->cues->cue_points [idx].name)) ;
 		} ;
 
 	if (psf->strings.flags & SF_STR_LOCATE_START)
 		aiff_write_strings (psf, SF_STR_LOCATE_START) ;
 
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_START)
-	{	psf_binheader_writef (psf, "Em4", PEAK_MARKER, AIFF_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
-		psf_binheader_writef (psf, "E44", 1, time (NULL)) ;
+	{	psf_binheader_writef (psf, "Em4", BHWm (PEAK_MARKER), BHW4 (AIFF_PEAK_CHUNK_SIZE (psf->sf.channels))) ;
+		psf_binheader_writef (psf, "E44", BHW4 (1), BHW4 (time (NULL))) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
-			psf_binheader_writef (psf, "Eft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
+			psf_binheader_writef (psf, "Eft8", BHWf ((float) psf->peak_info->peaks [k].value), BHW8 (psf->peak_info->peaks [k].position)) ;
 		} ;
 
 	/* Write custom headers. */
 	for (uk = 0 ; uk < psf->wchunks.used ; uk++)
-		psf_binheader_writef (psf, "Em4b", psf->wchunks.chunks [uk].mark32, psf->wchunks.chunks [uk].len, psf->wchunks.chunks [uk].data, make_size_t (psf->wchunks.chunks [uk].len)) ;
+		psf_binheader_writef (psf, "Em4b", BHWm (psf->wchunks.chunks [uk].mark32), BHW4 (psf->wchunks.chunks [uk].len), BHWv (psf->wchunks.chunks [uk].data), BHWz (psf->wchunks.chunks [uk].len)) ;
 
 	/* Write SSND chunk. */
 	paiff->ssnd_offset = psf->header.indx ;
-	psf_binheader_writef (psf, "Etm844", SSND_MARKER, psf->datalength + SIZEOF_SSND_CHUNK, 0, 0) ;
+	psf_binheader_writef (psf, "Etm844", BHWm (SSND_MARKER), BHW8 (psf->datalength + SIZEOF_SSND_CHUNK), BHW4 (0), BHW4 (0)) ;
 
 	/* Header construction complete so write it out. */
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
@@ -1503,10 +1503,10 @@ aiff_write_tailer (SF_PRIVATE *psf)
 		} ;
 
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_END)
-	{	psf_binheader_writef (psf, "Em4", PEAK_MARKER, AIFF_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
-		psf_binheader_writef (psf, "E44", 1, time (NULL)) ;
+	{	psf_binheader_writef (psf, "Em4", BHWm (PEAK_MARKER), BHW4 (AIFF_PEAK_CHUNK_SIZE (psf->sf.channels))) ;
+		psf_binheader_writef (psf, "E44", BHW4 (1), BHW4 (time (NULL))) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
-			psf_binheader_writef (psf, "Eft8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
+			psf_binheader_writef (psf, "Eft8", BHWf ((float) psf->peak_info->peaks [k].value), BHW8 (psf->peak_info->peaks [k].position)) ;
 		} ;
 
 	if (psf->strings.flags & SF_STR_LOCATE_END)
@@ -1533,28 +1533,28 @@ aiff_write_strings (SF_PRIVATE *psf, int location)
 		switch (psf->strings.data [k].type)
 		{	case SF_STR_SOFTWARE :
 				slen = strlen (psf->strings.storage + psf->strings.data [k].offset) ;
-				psf_binheader_writef (psf, "Em4mb", APPL_MARKER, slen + 4, m3ga_MARKER, psf->strings.storage + psf->strings.data [k].offset, make_size_t (slen + (slen & 1))) ;
+				psf_binheader_writef (psf, "Em4mb", BHWm (APPL_MARKER), BHW4 (slen + 4), BHWm (m3ga_MARKER), BHWv (psf->strings.storage + psf->strings.data [k].offset), BHWz (slen + (slen & 1))) ;
 				break ;
 
 			case SF_STR_TITLE :
-				psf_binheader_writef (psf, "EmS", NAME_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				psf_binheader_writef (psf, "EmS", BHWm (NAME_MARKER), BHWS (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			case SF_STR_COPYRIGHT :
-				psf_binheader_writef (psf, "EmS", c_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				psf_binheader_writef (psf, "EmS", BHWm (c_MARKER), BHWS (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			case SF_STR_ARTIST :
-				psf_binheader_writef (psf, "EmS", AUTH_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				psf_binheader_writef (psf, "EmS", BHWm (AUTH_MARKER), BHWS (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			case SF_STR_COMMENT :
-				psf_binheader_writef (psf, "EmS", ANNO_MARKER, psf->strings.storage + psf->strings.data [k].offset) ;
+				psf_binheader_writef (psf, "EmS", BHWm (ANNO_MARKER), BHWS (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			/*
 			case SF_STR_DATE :
-				psf_binheader_writef (psf, "Ems", ICRD_MARKER, psf->strings.data [k].str) ;
+				psf_binheader_writef (psf, "Ems", BHWm (ICRD_MARKER), BHWs (psf->strings.data [k].str)) ;
 				break ;
 			*/
 			} ;

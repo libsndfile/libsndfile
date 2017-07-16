@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -123,7 +123,7 @@ htk_write_header (SF_PRIVATE *psf, int calc_length)
 
 	sample_period = 10000000 / psf->sf.samplerate ;
 
-	psf_binheader_writef (psf, "E444", sample_count, sample_period, 0x20000) ;
+	psf_binheader_writef (psf, "E444", BHW4 (sample_count), BHW4 (sample_period), BHW4 (0x20000)) ;
 
 	/* Header construction complete so write it out. */
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;

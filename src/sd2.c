@@ -238,61 +238,61 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 	rsrc.map_offset = rsrc.data_offset + rsrc.data_length ;
 
 	/* Very start of resource fork. */
-	psf_binheader_writef (psf, "E444", rsrc.data_offset, rsrc.map_offset, rsrc.data_length) ;
+	psf_binheader_writef (psf, "E444", BHW4 (rsrc.data_offset), BHW4 (rsrc.map_offset), BHW4 (rsrc.data_length)) ;
 
-	psf_binheader_writef (psf, "Eop", make_size_t (0x30), psf->file.name.c) ;
-	psf_binheader_writef (psf, "Eo2mm", make_size_t (0x50), 0, Sd2f_MARKER, lsf1_MARKER) ;
+	psf_binheader_writef (psf, "Eop", BHWo (0x30), BHWp (psf->file.name.c)) ;
+	psf_binheader_writef (psf, "Eo2mm", BHWo (0x50), BHW2 (0), BHWm (Sd2f_MARKER), BHWm (lsf1_MARKER)) ;
 
 	/* Very start of resource map. */
-	psf_binheader_writef (psf, "E4444", make_size_t (rsrc.map_offset), rsrc.data_offset, rsrc.map_offset, rsrc.data_length) ;
+	psf_binheader_writef (psf, "E4444", BHW4 (rsrc.map_offset), BHW4 (rsrc.data_offset), BHW4 (rsrc.map_offset), BHW4 (rsrc.data_length)) ;
 
 	/* These I don't currently understand. */
 	if (1)
-	{	psf_binheader_writef (psf, "Eo1422", make_size_t (rsrc.map_offset + 16), 1, 0x12345678, 0xabcd, 0) ;
+	{	psf_binheader_writef (psf, "Eo1422", BHWo (rsrc.map_offset + 16), BHW1 (1), BHW4 (0x12345678), BHW2 (0xabcd), BHW2 (0)) ;
 		} ;
 
 	/* Resource type offset. */
 	rsrc.type_offset = rsrc.map_offset + 30 ;
-	psf_binheader_writef (psf, "Eo2", make_size_t (rsrc.map_offset + 24), rsrc.type_offset - rsrc.map_offset - 2) ;
+	psf_binheader_writef (psf, "Eo2", BHWo (rsrc.map_offset + 24), BHW2 (rsrc.type_offset - rsrc.map_offset - 2)) ;
 
 	/* Type index max. */
 	rsrc.type_count = 2 ;
-	psf_binheader_writef (psf, "Eo2", make_size_t (rsrc.map_offset + 28), rsrc.type_count - 1) ;
+	psf_binheader_writef (psf, "Eo2", BHWo (rsrc.map_offset + 28), BHW2 (rsrc.type_count - 1)) ;
 
 	rsrc.item_offset = rsrc.type_offset + rsrc.type_count * 8 ;
 
 	rsrc.str_count = ARRAY_LEN (str_rsrc) ;
 	rsrc.string_offset = rsrc.item_offset + (rsrc.str_count + 1) * 12 - rsrc.map_offset ;
-	psf_binheader_writef (psf, "Eo2", make_size_t (rsrc.map_offset + 26), rsrc.string_offset) ;
+	psf_binheader_writef (psf, "Eo2", BHWo (rsrc.map_offset + 26), BHW2 (rsrc.string_offset)) ;
 
 	/* Write 'STR ' resource type. */
 	rsrc.str_count = 3 ;
-	psf_binheader_writef (psf, "Eom22", make_size_t (rsrc.type_offset), STR_MARKER, rsrc.str_count - 1, 0x12) ;
+	psf_binheader_writef (psf, "Eom22", BHWo (rsrc.type_offset), BHWm (STR_MARKER), BHW2 (rsrc.str_count - 1), BHW2 (0x12)) ;
 
 	/* Write 'sdML' resource type. */
-	psf_binheader_writef (psf, "Em22", sdML_MARKER, 0, 0x36) ;
+	psf_binheader_writef (psf, "Em22", BHWm (sdML_MARKER), BHW2 (0), BHW2 (0x36)) ;
 
 	str_offset = rsrc.map_offset + rsrc.string_offset ;
 	next_str = 0 ;
 	data_offset = rsrc.data_offset ;
 	for (k = 0 ; k < ARRAY_LEN (str_rsrc) ; k++)
-	{	psf_binheader_writef (psf, "Eop", make_size_t (str_offset), str_rsrc [k].name) ;
-		psf_binheader_writef (psf, "Eo22", make_size_t (rsrc.item_offset + k * 12), str_rsrc [k].id, next_str) ;
+	{	psf_binheader_writef (psf, "Eop", BHWo (str_offset), BHWp (str_rsrc [k].name)) ;
+		psf_binheader_writef (psf, "Eo22", BHWo (rsrc.item_offset + k * 12), BHW2 (str_rsrc [k].id), BHW2 (next_str)) ;
 
 		str_offset += strlen (str_rsrc [k].name) ;
 		next_str += strlen (str_rsrc [k].name) ;
 
-		psf_binheader_writef (psf, "Eo4", make_size_t (rsrc.item_offset + k * 12 + 4), data_offset - rsrc.data_offset) ;
-		psf_binheader_writef (psf, "Eo4", make_size_t (data_offset), str_rsrc [k].value_len) ;
+		psf_binheader_writef (psf, "Eo4", BHWo (rsrc.item_offset + k * 12 + 4), BHW4 (data_offset - rsrc.data_offset)) ;
+		psf_binheader_writef (psf, "Eo4", BHWo (data_offset), BHW4 (str_rsrc [k].value_len)) ;
 
-		psf_binheader_writef (psf, "Eob", make_size_t (data_offset + 4), str_rsrc [k].value, make_size_t (str_rsrc [k].value_len)) ;
+		psf_binheader_writef (psf, "Eob", BHWo (data_offset + 4), BHWv (str_rsrc [k].value), BHWz (str_rsrc [k].value_len)) ;
 		data_offset += 4 + str_rsrc [k].value_len ;
 		} ;
 
 	/* Finally, calculate and set map length. */
 	rsrc.map_length = str_offset - rsrc.map_offset ;
-	psf_binheader_writef (psf, "Eo4o4", make_size_t (12), rsrc.map_length,
-							make_size_t (rsrc.map_offset + 12), rsrc.map_length) ;
+	psf_binheader_writef (psf, "Eo4o4", BHWo (12), BHW4 (rsrc.map_length),
+							BHWo (rsrc.map_offset + 12), BHW4 (rsrc.map_length)) ;
 
 	psf->header.indx = rsrc.map_offset + rsrc.map_length ;
 

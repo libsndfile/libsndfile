@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -465,7 +465,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	/* riff marker, length, wave and 'fmt ' markers. */
-	psf_binheader_writef (psf, "eh8hh", riff_MARKER16, psf->filelength, wave_MARKER16, fmt_MARKER16) ;
+	psf_binheader_writef (psf, "eh8hh", BHWh (riff_MARKER16), BHW8 (psf->filelength), BHWh (wave_MARKER16), BHWh (fmt_MARKER16)) ;
 
 	subformat = SF_CODEC (psf->sf.format) ;
 
@@ -479,11 +479,11 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 					fmt_size += fmt_pad ;
 
 					/* fmt : format, channels, samplerate */
-					psf_binheader_writef (psf, "e8224", fmt_size, WAVE_FORMAT_PCM, psf->sf.channels, psf->sf.samplerate) ;
+					psf_binheader_writef (psf, "e8224", BHW8 (fmt_size), BHW2 (WAVE_FORMAT_PCM), BHW2 (psf->sf.channels), BHW4 (psf->sf.samplerate)) ;
 					/*  fmt : bytespersec */
-					psf_binheader_writef (psf, "e4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
+					psf_binheader_writef (psf, "e4", BHW4 (psf->sf.samplerate * psf->bytewidth * psf->sf.channels)) ;
 					/*  fmt : blockalign, bitwidth */
-					psf_binheader_writef (psf, "e22", psf->bytewidth * psf->sf.channels, psf->bytewidth * 8) ;
+					psf_binheader_writef (psf, "e22", BHW2 (psf->bytewidth * psf->sf.channels), BHW2 (psf->bytewidth * 8)) ;
 					break ;
 
 		case SF_FORMAT_FLOAT :
@@ -493,11 +493,11 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 					fmt_size += fmt_pad ;
 
 					/* fmt : format, channels, samplerate */
-					psf_binheader_writef (psf, "e8224", fmt_size, WAVE_FORMAT_IEEE_FLOAT, psf->sf.channels, psf->sf.samplerate) ;
+					psf_binheader_writef (psf, "e8224", BHW8 (fmt_size), BHW2 (WAVE_FORMAT_IEEE_FLOAT), BHW2 (psf->sf.channels), BHW4 (psf->sf.samplerate)) ;
 					/*  fmt : bytespersec */
-					psf_binheader_writef (psf, "e4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
+					psf_binheader_writef (psf, "e4", BHW4 (psf->sf.samplerate * psf->bytewidth * psf->sf.channels)) ;
 					/*  fmt : blockalign, bitwidth */
-					psf_binheader_writef (psf, "e22", psf->bytewidth * psf->sf.channels, psf->bytewidth * 8) ;
+					psf_binheader_writef (psf, "e22", BHW2 (psf->bytewidth * psf->sf.channels), BHW2 (psf->bytewidth * 8)) ;
 
 					add_fact_chunk = SF_TRUE ;
 					break ;
@@ -508,11 +508,11 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 					fmt_size += fmt_pad ;
 
 					/* fmt : format, channels, samplerate */
-					psf_binheader_writef (psf, "e8224", fmt_size, WAVE_FORMAT_MULAW, psf->sf.channels, psf->sf.samplerate) ;
+					psf_binheader_writef (psf, "e8224", BHW8 (fmt_size), BHW2 (WAVE_FORMAT_MULAW), BHW2 (psf->sf.channels), BHW4 (psf->sf.samplerate)) ;
 					/*  fmt : bytespersec */
-					psf_binheader_writef (psf, "e4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
+					psf_binheader_writef (psf, "e4", BHW4 (psf->sf.samplerate * psf->bytewidth * psf->sf.channels)) ;
 					/*  fmt : blockalign, bitwidth */
-					psf_binheader_writef (psf, "e22", psf->bytewidth * psf->sf.channels, 8) ;
+					psf_binheader_writef (psf, "e22", BHW2 (psf->bytewidth * psf->sf.channels), BHW2 (8)) ;
 
 					add_fact_chunk = SF_TRUE ;
 					break ;
@@ -523,11 +523,11 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 					fmt_size += fmt_pad ;
 
 					/* fmt : format, channels, samplerate */
-					psf_binheader_writef (psf, "e8224", fmt_size, WAVE_FORMAT_ALAW, psf->sf.channels, psf->sf.samplerate) ;
+					psf_binheader_writef (psf, "e8224", BHW8 (fmt_size), BHW2 (WAVE_FORMAT_ALAW), BHW2 (psf->sf.channels), BHW4 (psf->sf.samplerate)) ;
 					/*  fmt : bytespersec */
-					psf_binheader_writef (psf, "e4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
+					psf_binheader_writef (psf, "e4", BHW4 (psf->sf.samplerate * psf->bytewidth * psf->sf.channels)) ;
 					/*  fmt : blockalign, bitwidth */
-					psf_binheader_writef (psf, "e22", psf->bytewidth * psf->sf.channels, 8) ;
+					psf_binheader_writef (psf, "e22", BHW2 (psf->bytewidth * psf->sf.channels), BHW2 (8)) ;
 
 					add_fact_chunk = SF_TRUE ;
 					break ;
@@ -546,13 +546,13 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 						fmt_size += fmt_pad ;
 
 						/* fmt : size, WAV format type, channels. */
-						psf_binheader_writef (psf, "e822", fmt_size, WAVE_FORMAT_IMA_ADPCM, psf->sf.channels) ;
+						psf_binheader_writef (psf, "e822", BHW8 (fmt_size), BHW2 (WAVE_FORMAT_IMA_ADPCM), BHW2 (psf->sf.channels)) ;
 
 						/* fmt : samplerate, bytespersec. */
-						psf_binheader_writef (psf, "e44", psf->sf.samplerate, bytespersec) ;
+						psf_binheader_writef (psf, "e44", BHW4 (psf->sf.samplerate), BHW4 (bytespersec)) ;
 
 						/* fmt : blockalign, bitwidth, extrabytes, framesperblock. */
-						psf_binheader_writef (psf, "e2222", blockalign, 4, 2, framesperblock) ;
+						psf_binheader_writef (psf, "e2222", BHW2 (blockalign), BHW2 (4), BHW2 (2), BHW2 (framesperblock)) ;
 						} ;
 
 					add_fact_chunk = SF_TRUE ;
@@ -572,13 +572,13 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 						fmt_size += fmt_pad ;
 
 						/* fmt : size, W64 format type, channels. */
-						psf_binheader_writef (psf, "e822", fmt_size, WAVE_FORMAT_MS_ADPCM, psf->sf.channels) ;
+						psf_binheader_writef (psf, "e822", BHW8 (fmt_size), BHW2 (WAVE_FORMAT_MS_ADPCM), BHW2 (psf->sf.channels)) ;
 
 						/* fmt : samplerate, bytespersec. */
-						psf_binheader_writef (psf, "e44", psf->sf.samplerate, bytespersec) ;
+						psf_binheader_writef (psf, "e44", BHW4 (psf->sf.samplerate), BHW4 (bytespersec)) ;
 
 						/* fmt : blockalign, bitwidth, extrabytes, framesperblock. */
-						psf_binheader_writef (psf, "e22222", blockalign, 4, extrabytes, framesperblock, 7) ;
+						psf_binheader_writef (psf, "e22222", BHW2 (blockalign), BHW2 (4), BHW2 (extrabytes), BHW2 (framesperblock), BHW2 (7)) ;
 
 						wavlike_msadpcm_write_adapt_coeffs (psf) ;
 						} ;
@@ -598,13 +598,13 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 						fmt_size += fmt_pad ;
 
 						/* fmt : size, WAV format type, channels. */
-						psf_binheader_writef (psf, "e822", fmt_size, WAVE_FORMAT_GSM610, psf->sf.channels) ;
+						psf_binheader_writef (psf, "e822", BHW8 (fmt_size), BHW2 (WAVE_FORMAT_GSM610), BHW2 (psf->sf.channels)) ;
 
 						/* fmt : samplerate, bytespersec. */
-						psf_binheader_writef (psf, "e44", psf->sf.samplerate, bytespersec) ;
+						psf_binheader_writef (psf, "e44", BHW4 (psf->sf.samplerate), BHW4 (bytespersec)) ;
 
 						/* fmt : blockalign, bitwidth, extrabytes, framesperblock. */
-						psf_binheader_writef (psf, "e2222", WAVLIKE_GSM610_BLOCKSIZE, 0, 2, WAVLIKE_GSM610_SAMPLES) ;
+						psf_binheader_writef (psf, "e2222", BHW2 (WAVLIKE_GSM610_BLOCKSIZE), BHW2 (0), BHW2 (2), BHW2 (WAVLIKE_GSM610_SAMPLES)) ;
 						} ;
 
 					add_fact_chunk = SF_TRUE ;
@@ -615,12 +615,12 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 
 	/* Pad to 8 bytes with zeros. */
 	if (fmt_pad > 0)
-		psf_binheader_writef (psf, "z", fmt_pad) ;
+		psf_binheader_writef (psf, "z", BHWz (fmt_pad)) ;
 
 	if (add_fact_chunk)
-		psf_binheader_writef (psf, "eh88", fact_MARKER16, (sf_count_t) (16 + 8 + 8), psf->sf.frames) ;
+		psf_binheader_writef (psf, "eh88", BHWh (fact_MARKER16), BHW8 ((sf_count_t) (16 + 8 + 8)), BHW8 (psf->sf.frames)) ;
 
-	psf_binheader_writef (psf, "eh8", data_MARKER16, psf->datalength + 24) ;
+	psf_binheader_writef (psf, "eh8", BHWh (data_MARKER16), BHW8 (psf->datalength + 24)) ;
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
 	if (psf->error)

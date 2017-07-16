@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -372,7 +372,7 @@ sds_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->is_pipe == SF_FALSE)
 		psf_fseek (psf, 0, SEEK_SET) ;
 
-	psf_binheader_writef (psf, "E211", 0xF07E, 0, 1) ;
+	psf_binheader_writef (psf, "E211", BHW2 (0xF07E), BHW1 (0), BHW1 (1)) ;
 
 	switch (SF_CODEC (psf->sf.format))
 	{	case SF_FORMAT_PCM_S8 :
@@ -390,13 +390,13 @@ sds_write_header (SF_PRIVATE *psf, int calc_length)
 
 	samp_period = SDS_INT_TO_3BYTE_ENCODE (1000000000 / psf->sf.samplerate) ;
 
-	psf_binheader_writef (psf, "e213", 0, psds->bitwidth, samp_period) ;
+	psf_binheader_writef (psf, "e213", BHW2 (0), BHW1 (psds->bitwidth), BHW3 (samp_period)) ;
 
 	data_length			= SDS_INT_TO_3BYTE_ENCODE (psds->total_written) ;
 	sustain_loop_start	= SDS_INT_TO_3BYTE_ENCODE (0) ;
 	sustain_loop_end	= SDS_INT_TO_3BYTE_ENCODE (0) ;
 
-	psf_binheader_writef (psf, "e33311", data_length, sustain_loop_start, sustain_loop_end, loop_type, 0xF7) ;
+	psf_binheader_writef (psf, "e33311", BHW3 (data_length), BHW3 (sustain_loop_start), BHW3 (sustain_loop_end), BHW1 (loop_type), BHW1 (0xF7)) ;
 
 	/* Header construction complete so write it out. */
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;

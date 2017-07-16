@@ -42,7 +42,7 @@
 #endif
 
 #ifdef INT64_C
-#	define	SF_PLATFORM_S64(x)		INT64_C(x)
+#	define	SF_PLATFORM_S64(x)		INT64_C (x)
 #elif (SIZEOF_LONG == 8)
 #	define	SF_PLATFORM_S64(x)		x##l
 #elif (SIZEOF_LONG_LONG == 8)
@@ -126,6 +126,33 @@
 #define SF_CONTAINER(x)		((x) & SF_FORMAT_TYPEMASK)
 #define SF_CODEC(x)			((x) & SF_FORMAT_SUBMASK)
 #define SF_ENDIAN(x)		((x) & SF_FORMAT_ENDMASK)
+
+/*
+**	Binheader cast macros.
+*/
+
+#define BHW1(x) ((uint8_t) (x))
+#define BHW2(x) ((uint16_t) (x))
+#define BHW3(x) ((uint32_t) (x))
+#define BHW4(x) ((uint32_t) (x))
+#define BHW8(x) ((uint64_t) (x))
+
+#define BHWm(x) ((uint32_t) (x))
+#define BHWS(x) ((char *) (x))
+
+#define BHWf(x) ((double) (x))
+#define BHWd(x) ((double) (x))
+
+#define BHWh(x) ((void *) (x))
+#define BHWj(x) ((size_t) (x))
+#define BHWp(x) ((char *) (x))
+#define BHWo(x) ((size_t) (x))
+#define BHWs(x) ((char *) (x))
+#define BHWv(x) ((const void *) (x))
+#define BHWz(x) ((size_t) (x))
+
+/*------------------------------------------------------------------------------
+*/
 
 enum
 {	/* PEAK chunk location. */
@@ -269,11 +296,6 @@ static inline size_t
 make_size_t (int x)
 {	return (size_t) x ;
 } /* make_size_t */
-
-static inline uint64_t
-make_size_8 (int x)
-{	return (uint64_t) x ;
-} /* make_size_8 */
 
 typedef SF_BROADCAST_INFO_VAR (16 * 1024) SF_BROADCAST_INFO_16K ;
 

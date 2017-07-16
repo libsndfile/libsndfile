@@ -608,13 +608,13 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	/* 'caff' marker, version and flags. */
-	psf_binheader_writef (psf, "Em22", caff_MARKER, 1, 0) ;
+	psf_binheader_writef (psf, "Em22", BHWm (caff_MARKER), BHW2 (1), BHW2 (0)) ;
 
 	/* 'desc' marker and chunk size. */
-	psf_binheader_writef (psf, "Em8", desc_MARKER, (sf_count_t) (sizeof (DESC_CHUNK))) ;
+	psf_binheader_writef (psf, "Em8", BHWm (desc_MARKER), BHW8 ((sf_count_t) (sizeof (DESC_CHUNK)))) ;
 
  	double64_be_write (1.0 * psf->sf.samplerate, ubuf.ucbuf) ;
-	psf_binheader_writef (psf, "b", ubuf.ucbuf, make_size_t (8)) ;
+	psf_binheader_writef (psf, "b", BHWv (ubuf.ucbuf), BHWz (8)) ;
 
 	subformat = SF_CODEC (psf->sf.format) ;
 
@@ -721,33 +721,33 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 			return SFE_UNIMPLEMENTED ;
 		} ;
 
-	psf_binheader_writef (psf, "mE44444", desc.fmt_id, desc.fmt_flags, desc.pkt_bytes, desc.frames_per_packet, desc.channels_per_frame, desc.bits_per_chan) ;
+	psf_binheader_writef (psf, "mE44444", BHWm (desc.fmt_id), BHW4 (desc.fmt_flags), BHW4 (desc.pkt_bytes), BHW4 (desc.frames_per_packet), BHW4 (desc.channels_per_frame), BHW4 (desc.bits_per_chan)) ;
 
 	caf_write_strings (psf, SF_STR_LOCATE_START) ;
 
 	if (psf->peak_info != NULL)
 	{	int k ;
-		psf_binheader_writef (psf, "Em84", peak_MARKER, (sf_count_t) CAF_PEAK_CHUNK_SIZE (psf->sf.channels), psf->peak_info->edit_number) ;
+		psf_binheader_writef (psf, "Em84", BHWm (peak_MARKER), BHW8 ((sf_count_t) CAF_PEAK_CHUNK_SIZE (psf->sf.channels)), BHW4 (psf->peak_info->edit_number)) ;
 		for (k = 0 ; k < psf->sf.channels ; k++)
-			psf_binheader_writef (psf, "Ef8", (float) psf->peak_info->peaks [k].value, psf->peak_info->peaks [k].position) ;
+			psf_binheader_writef (psf, "Ef8", BHWf ((float) psf->peak_info->peaks [k].value), BHW8 (psf->peak_info->peaks [k].position)) ;
 		} ;
 
 	if (psf->channel_map && pcaf->chanmap_tag)
-		psf_binheader_writef (psf, "Em8444", chan_MARKER, (sf_count_t) 12, pcaf->chanmap_tag, 0, 0) ;
+		psf_binheader_writef (psf, "Em8444", BHWm (chan_MARKER), BHW8 ((sf_count_t) 12), BHW4 (pcaf->chanmap_tag), BHW4 (0), BHW4 (0)) ;
 
 	/* Write custom headers. */
 	for (uk = 0 ; uk < psf->wchunks.used ; uk++)
-		psf_binheader_writef (psf, "m44b", (int) psf->wchunks.chunks [uk].mark32, 0, psf->wchunks.chunks [uk].len, psf->wchunks.chunks [uk].data, make_size_t (psf->wchunks.chunks [uk].len)) ;
+		psf_binheader_writef (psf, "m44b", BHWm ((int) psf->wchunks.chunks [uk].mark32), BHW4 (0), BHW4 (psf->wchunks.chunks [uk].len), BHWv (psf->wchunks.chunks [uk].data), BHWz (psf->wchunks.chunks [uk].len)) ;
 
 	if (append_free_block)
 	{	/* Add free chunk so that the actual audio data starts at a multiple 0x1000. */
 		sf_count_t free_len = 0x1000 - psf->header.indx - 16 - 12 ;
 		while (free_len < 0)
 			free_len += 0x1000 ;
-		psf_binheader_writef (psf, "Em8z", free_MARKER, free_len, make_size_t (free_len)) ;
+		psf_binheader_writef (psf, "Em8z", BHWm (free_MARKER), BHW8 (free_len), BHWz (free_len)) ;
 		} ;
 
-	psf_binheader_writef (psf, "Em84", data_MARKER, psf->datalength + 4, 0) ;
+	psf_binheader_writef (psf, "Em84", BHWm (data_MARKER), BHW8 (psf->datalength + 4), BHW4 (0)) ;
 
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 	if (psf->error)
@@ -780,7 +780,7 @@ caf_write_tailer (SF_PRIVATE *psf)
 		psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
 
 	if (psf->dataend & 1)
-		psf_binheader_writef (psf, "z", 1) ;
+		psf_binheader_writef (psf, "z", BHWz (1)) ;
 
 	if (psf->strings.flags & SF_STR_LOCATE_END)
 		caf_write_strings (psf, SF_STR_LOCATE_END) ;
@@ -982,7 +982,7 @@ caf_write_strings (SF_PRIVATE * psf, int location)
 	if (string_count == 0 || buf.index == 0)
 		return ;
 
-	psf_binheader_writef (psf, "Em84b", info_MARKER, make_size_8 (buf.index + 4), string_count, buf.s, make_size_t (buf.index)) ;
+	psf_binheader_writef (psf, "Em84b", BHWm (info_MARKER), BHW8 (buf.index + 4), BHW4 (string_count), BHWv (buf.s), BHWz (buf.index)) ;
 } /* caf_write_strings */
 
 /*==============================================================================
