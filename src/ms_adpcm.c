@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -510,7 +510,7 @@ wavlike_msadpcm_write_adapt_coeffs	(SF_PRIVATE *psf)
 {	int k ;
 
 	for (k = 0 ; k < WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT ; k++)
-		psf_binheader_writef (psf, "22", AdaptCoeff1 [k], AdaptCoeff2 [k]) ;
+		psf_binheader_writef (psf, "22", BHW2 (AdaptCoeff1 [k]), BHW2 (AdaptCoeff2 [k])) ;
 } /* wavlike_msadpcm_write_adapt_coeffs */
 
 /*==========================================================================================

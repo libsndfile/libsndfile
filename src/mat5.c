@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -206,41 +206,41 @@ mat5_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	psf_get_date_str (buffer, sizeof (buffer)) ;
-	psf_binheader_writef (psf, "bb", filename, strlen (filename), buffer, strlen (buffer) + 1) ;
+	psf_binheader_writef (psf, "bb", BHWv (filename), BHWz (strlen (filename)), BHWv (buffer), BHWz (strlen (buffer) + 1)) ;
 
 	memset (buffer, ' ', 124 - psf->header.indx) ;
-	psf_binheader_writef (psf, "b", buffer, make_size_t (124 - psf->header.indx)) ;
+	psf_binheader_writef (psf, "b", BHWv (buffer), BHWz (124 - psf->header.indx)) ;
 
 	psf->rwf_endian = psf->endian ;
 
 	if (psf->rwf_endian == SF_ENDIAN_BIG)
-		psf_binheader_writef (psf, "2b", 0x0100, "MI", make_size_t (2)) ;
+		psf_binheader_writef (psf, "2b", BHW2 (0x0100), BHWv ("MI"), BHWz (2)) ;
 	else
-		psf_binheader_writef (psf, "2b", 0x0100, "IM", make_size_t (2)) ;
+		psf_binheader_writef (psf, "2b", BHW2 (0x0100), BHWv ("IM"), BHWz (2)) ;
 
-	psf_binheader_writef (psf, "444444", MAT5_TYPE_ARRAY, 64, MAT5_TYPE_UINT32, 8, 6, 0) ;
-	psf_binheader_writef (psf, "4444", MAT5_TYPE_INT32, 8, 1, 1) ;
-	psf_binheader_writef (psf, "44b", MAT5_TYPE_SCHAR, strlen (sr_name), sr_name, make_size_t (16)) ;
+	psf_binheader_writef (psf, "444444", BHW4 (MAT5_TYPE_ARRAY), BHW4 (64), BHW4 (MAT5_TYPE_UINT32), BHW4 (8), BHW4 (6), BHW4 (0)) ;
+	psf_binheader_writef (psf, "4444", BHW4 (MAT5_TYPE_INT32), BHW4 (8), BHW4 (1), BHW4 (1)) ;
+	psf_binheader_writef (psf, "44b", BHW4 (MAT5_TYPE_SCHAR), BHW4 (strlen (sr_name)), BHWv (sr_name), BHWz (16)) ;
 
 	if (psf->sf.samplerate > 0xFFFF)
-		psf_binheader_writef (psf, "44", MAT5_TYPE_COMP_UINT, psf->sf.samplerate) ;
+		psf_binheader_writef (psf, "44", BHW4 (MAT5_TYPE_COMP_UINT), BHW4 (psf->sf.samplerate)) ;
 	else
 	{	unsigned short samplerate = psf->sf.samplerate ;
 
-		psf_binheader_writef (psf, "422", MAT5_TYPE_COMP_USHORT, samplerate, 0) ;
+		psf_binheader_writef (psf, "422", BHW4 (MAT5_TYPE_COMP_USHORT), BHW2 (samplerate), BHW2 (0)) ;
 		} ;
 
 	datasize = psf->sf.frames * psf->sf.channels * psf->bytewidth ;
 
-	psf_binheader_writef (psf, "t484444", MAT5_TYPE_ARRAY, datasize + 64, MAT5_TYPE_UINT32, 8, 6, 0) ;
-	psf_binheader_writef (psf, "t4448", MAT5_TYPE_INT32, 8, psf->sf.channels, psf->sf.frames) ;
-	psf_binheader_writef (psf, "44b", MAT5_TYPE_SCHAR, strlen (wd_name), wd_name, strlen (wd_name)) ;
+	psf_binheader_writef (psf, "t484444", BHW4 (MAT5_TYPE_ARRAY), BHW8 (datasize + 64), BHW4 (MAT5_TYPE_UINT32), BHW4 (8), BHW4 (6), BHW4 (0)) ;
+	psf_binheader_writef (psf, "t4448", BHW4 (MAT5_TYPE_INT32), BHW4 (8), BHW4 (psf->sf.channels), BHW8 (psf->sf.frames)) ;
+	psf_binheader_writef (psf, "44b", BHW4 (MAT5_TYPE_SCHAR), BHW4 (strlen (wd_name)), BHWv (wd_name), BHWz (strlen (wd_name))) ;
 
 	datasize = psf->sf.frames * psf->sf.channels * psf->bytewidth ;
 	if (datasize > 0x7FFFFFFF)
 		datasize = 0x7FFFFFFF ;
 
-	psf_binheader_writef (psf, "t48", encoding, datasize) ;
+	psf_binheader_writef (psf, "t48", BHW4 (encoding), BHW8 (datasize)) ;
 
 	/* Header construction complete so write it out. */
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;

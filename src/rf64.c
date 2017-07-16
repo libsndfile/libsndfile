@@ -543,25 +543,25 @@ rf64_write_fmt_chunk (SF_PRIVATE *psf)
 			fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 + 4 + 4 + 2 + 2 + 8 ;
 
 			/* fmt : format, channels, samplerate */
-			psf_binheader_writef (psf, "4224", fmt_size, WAVE_FORMAT_EXTENSIBLE, psf->sf.channels, psf->sf.samplerate) ;
+			psf_binheader_writef (psf, "4224", BHW4 (fmt_size), BHW2 (WAVE_FORMAT_EXTENSIBLE), BHW2 (psf->sf.channels), BHW4 (psf->sf.samplerate)) ;
 			/*  fmt : bytespersec */
-			psf_binheader_writef (psf, "4", psf->sf.samplerate * psf->bytewidth * psf->sf.channels) ;
+			psf_binheader_writef (psf, "4", BHW4 (psf->sf.samplerate * psf->bytewidth * psf->sf.channels)) ;
 			/*  fmt : blockalign, bitwidth */
-			psf_binheader_writef (psf, "22", psf->bytewidth * psf->sf.channels, psf->bytewidth * 8) ;
+			psf_binheader_writef (psf, "22", BHW2 (psf->bytewidth * psf->sf.channels), BHW2 (psf->bytewidth * 8)) ;
 
 			/* cbSize 22 is sizeof (WAVEFORMATEXTENSIBLE) - sizeof (WAVEFORMATEX) */
-			psf_binheader_writef (psf, "2", 22) ;
+			psf_binheader_writef (psf, "2", BHW2 (22)) ;
 
 			/* wValidBitsPerSample, for our use same as bitwidth as we use it fully */
-			psf_binheader_writef (psf, "2", psf->bytewidth * 8) ;
+			psf_binheader_writef (psf, "2", BHW2 (psf->bytewidth * 8)) ;
 
 			/* For an Ambisonic file set the channel mask to zero.
 			** Otherwise use a default based on the channel count.
 			*/
 			if (wpriv->wavex_ambisonic != SF_AMBISONIC_NONE)
-				psf_binheader_writef (psf, "4", 0) ;
+				psf_binheader_writef (psf, "4", BHW4 (0)) ;
 			else if (wpriv->wavex_channelmask != 0)
-				psf_binheader_writef (psf, "4", wpriv->wavex_channelmask) ;
+				psf_binheader_writef (psf, "4", BHW4 (wpriv->wavex_channelmask)) ;
 			else
 			{	/*
 				** Ok some liberty is taken here to use the most commonly used channel masks
@@ -570,27 +570,27 @@ rf64_write_fmt_chunk (SF_PRIVATE *psf)
 				*/
 				switch (psf->sf.channels)
 				{	case 1 :	/* center channel mono */
-						psf_binheader_writef (psf, "4", 0x4) ;
+						psf_binheader_writef (psf, "4", BHW4 (0x4)) ;
 						break ;
 
 					case 2 :	/* front left and right */
-						psf_binheader_writef (psf, "4", 0x1 | 0x2) ;
+						psf_binheader_writef (psf, "4", BHW4 (0x1 | 0x2)) ;
 						break ;
 
 					case 4 :	/* Quad */
-						psf_binheader_writef (psf, "4", 0x1 | 0x2 | 0x10 | 0x20) ;
+						psf_binheader_writef (psf, "4", BHW4 (0x1 | 0x2 | 0x10 | 0x20)) ;
 						break ;
 
 					case 6 :	/* 5.1 */
-						psf_binheader_writef (psf, "4", 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20) ;
+						psf_binheader_writef (psf, "4", BHW4 (0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20)) ;
 						break ;
 
 					case 8 :	/* 7.1 */
-						psf_binheader_writef (psf, "4", 0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20 | 0x40 | 0x80) ;
+						psf_binheader_writef (psf, "4", BHW4 (0x1 | 0x2 | 0x4 | 0x8 | 0x10 | 0x20 | 0x40 | 0x80)) ;
 						break ;
 
 					default :	/* 0 when in doubt , use direct out, ie NO mapping*/
-						psf_binheader_writef (psf, "4", 0x0) ;
+						psf_binheader_writef (psf, "4", BHW4 (0x0)) ;
 						break ;
 					} ;
 				} ;
@@ -664,18 +664,18 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	if (wpriv->rf64_downgrade && psf->filelength < RIFF_DOWNGRADE_BYTES)
-	{	psf_binheader_writef (psf, "etm8m", RIFF_MARKER, (psf->filelength < 8) ? 8 : psf->filelength - 8, WAVE_MARKER) ;
-		psf_binheader_writef (psf, "m4z", JUNK_MARKER, 24, 24) ;
+	{	psf_binheader_writef (psf, "etm8m", BHWm (RIFF_MARKER), BHW8 ((psf->filelength < 8) ? 8 : psf->filelength - 8), BHWm (WAVE_MARKER)) ;
+		psf_binheader_writef (psf, "m4z", BHWm (JUNK_MARKER), BHW4 (24), BHWz (24)) ;
 		add_fact_chunk = 1 ;
 		}
 	else
-	{	psf_binheader_writef (psf, "em4m", RF64_MARKER, 0xffffffff, WAVE_MARKER) ;
+	{	psf_binheader_writef (psf, "em4m", BHWm (RF64_MARKER), BHW4 (0xffffffff), BHWm (WAVE_MARKER)) ;
 		/* Currently no table. */
-		psf_binheader_writef (psf, "m48884", ds64_MARKER, 28, psf->filelength - 8, psf->datalength, psf->sf.frames, 0) ;
+		psf_binheader_writef (psf, "m48884", BHWm (ds64_MARKER), BHW4 (28), BHW8 (psf->filelength - 8), BHW8 (psf->datalength), BHW8 (psf->sf.frames), BHW4 (0)) ;
 		} ;
 
 	/* WAVE and 'fmt ' markers. */
-	psf_binheader_writef (psf, "m", fmt_MARKER) ;
+	psf_binheader_writef (psf, "m", BHWm (fmt_MARKER)) ;
 
 	/* Write the 'fmt ' chunk. */
 	switch (psf->sf.format & SF_FORMAT_TYPEMASK)
@@ -689,7 +689,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 				if ((error = rf64_write_fmt_chunk (psf)) != 0)
 					return error ;
 				if (add_fact_chunk)
-					psf_binheader_writef (psf, "tm48", fact_MARKER, 4, psf->sf.frames) ;
+					psf_binheader_writef (psf, "tm48", BHWm (fact_MARKER), BHW4 (4), BHW8 (psf->sf.frames)) ;
 				break ;
 
 		default :
@@ -718,14 +718,14 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 	{	int		tmp ;
 		double	dtune = (double) (0x40000000) / 25.0 ;
 
-		psf_binheader_writef (psf, "m4", smpl_MARKER, 9 * 4 + psf->instrument->loop_count * 6 * 4) ;
-		psf_binheader_writef (psf, "44", 0, 0) ; /* Manufacturer zero is everyone */
+		psf_binheader_writef (psf, "m4", BHWm (smpl_MARKER), BHW4 (9 * 4 + psf->instrument->loop_count * 6 * 4)) ;
+		psf_binheader_writef (psf, "44", BHW4 (0), BHW4 (0)) ; /* Manufacturer zero is everyone */
 		tmp = (int) (1.0e9 / psf->sf.samplerate) ; /* Sample period in nano seconds */
-		psf_binheader_writef (psf, "44", tmp, psf->instrument->basenote) ;
+		psf_binheader_writef (psf, "44", BHW4 (tmp), BHW4 (psf->instrument->basenote)) ;
 		tmp = (unsigned int) (psf->instrument->detune * dtune + 0.5) ;
-		psf_binheader_writef (psf, "4", tmp) ;
-		psf_binheader_writef (psf, "44", 0, 0) ; /* SMTPE format */
-		psf_binheader_writef (psf, "44", psf->instrument->loop_count, 0) ;
+		psf_binheader_writef (psf, "4", BHW4 (tmp)) ;
+		psf_binheader_writef (psf, "44", BHW4 (0), BHW4 (0)) ; /* SMTPE format */
+		psf_binheader_writef (psf, "44", BHW4 (psf->instrument->loop_count), BHW4 (0)) ;
 
 		for (tmp = 0 ; tmp < psf->instrument->loop_count ; tmp++)
 		{	int type ;
@@ -733,9 +733,9 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 			type = psf->instrument->loops [tmp].mode ;
 			type = (type == SF_LOOP_FORWARD ? 0 : type == SF_LOOP_BACKWARD ? 2 : type == SF_LOOP_ALTERNATING ? 1 : 32) ;
 
-			psf_binheader_writef (psf, "44", tmp, type) ;
-			psf_binheader_writef (psf, "44", psf->instrument->loops [tmp].start, psf->instrument->loops [tmp].end) ;
-			psf_binheader_writef (psf, "44", 0, psf->instrument->loops [tmp].count) ;
+			psf_binheader_writef (psf, "44", BHW4 (tmp), BHW4 (type)) ;
+			psf_binheader_writef (psf, "44", BHW4 (psf->instrument->loops [tmp].start), BHW4 (psf->instrument->loops [tmp].end)) ;
+			psf_binheader_writef (psf, "44", BHW4 (0), BHW4 (psf->instrument->loops [tmp].count)) ;
 			} ;
 		} ;
 
@@ -744,12 +744,12 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 	/* Padding may be needed if string data sizes change. */
 	pad_size = psf->dataoffset - 16 - psf->header.indx ;
 	if (pad_size >= 0)
-		psf_binheader_writef (psf, "m4z", PAD_MARKER, (unsigned int) pad_size, make_size_t (pad_size)) ;
+		psf_binheader_writef (psf, "m4z", BHWm (PAD_MARKER), BHW4 ((unsigned int) pad_size), BHWz (pad_size)) ;
 
 	if (wpriv->rf64_downgrade && (psf->filelength < RIFF_DOWNGRADE_BYTES))
-		psf_binheader_writef (psf, "tm8", data_MARKER, psf->datalength) ;
+		psf_binheader_writef (psf, "tm8", BHWm (data_MARKER), BHW8 (psf->datalength)) ;
 	else
-		psf_binheader_writef (psf, "m4", data_MARKER, 0xffffffff) ;
+		psf_binheader_writef (psf, "m4", BHWm (data_MARKER), BHW4 (0xffffffff)) ;
 
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 	if (psf->error)
@@ -788,7 +788,7 @@ rf64_write_tailer (SF_PRIVATE *psf)
 		psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
 
 	if (psf->dataend & 1)
-		psf_binheader_writef (psf, "z", 1) ;
+		psf_binheader_writef (psf, "z", BHWz (1)) ;
 
 	if (psf->strings.flags & SF_STR_LOCATE_END)
 		wavlike_write_strings (psf, SF_STR_LOCATE_END) ;

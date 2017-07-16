@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -441,10 +441,10 @@ voc_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	/* VOC marker and 0x1A byte. */
-	psf_binheader_writef (psf, "eb1", "Creative Voice File", make_size_t (19), 0x1A) ;
+	psf_binheader_writef (psf, "eb1", BHWv ("Creative Voice File"), BHWz (19), BHW1 (0x1A)) ;
 
 	/* Data offset, version and other. */
-	psf_binheader_writef (psf, "e222", 26, 0x0114, 0x111F) ;
+	psf_binheader_writef (psf, "e222", BHW2 (26), BHW2 (0x0114), BHW2 (0x111F)) ;
 
 	/*	Use same logic as SOX.
 	**	If the file is mono 8 bit data, use VOC_SOUND_DATA.
@@ -457,7 +457,7 @@ voc_write_header (SF_PRIVATE *psf, int calc_length)
 		rate_const = 256 - 1000000 / psf->sf.samplerate ;
 
 		/* First type marker, length, rate_const and compression */
-		psf_binheader_writef (psf, "e1311", VOC_SOUND_DATA, (int) (psf->datalength + 1), rate_const, 0) ;
+		psf_binheader_writef (psf, "e1311", BHW1 (VOC_SOUND_DATA), BHW3 ((int) (psf->datalength + 1)), BHW1 (rate_const), BHW1 (0)) ;
 		}
 	else if (subformat == SF_FORMAT_PCM_U8 && psf->sf.channels == 2)
 	{	/* sample_rate = 128000000 / (65536 - rate_short) ; */
@@ -466,7 +466,7 @@ voc_write_header (SF_PRIVATE *psf, int calc_length)
 		/* First write the VOC_EXTENDED section
 		** 		marker, length, rate_const and compression
 		*/
-		psf_binheader_writef (psf, "e13211", VOC_EXTENDED, 4, rate_const, 0, 1) ;
+		psf_binheader_writef (psf, "e13211", BHW1 (VOC_EXTENDED), BHW3 (4), BHW2 (rate_const), BHW1 (0), BHW1 (1)) ;
 
 		/* samplerate = 1000000 / (256 - rate_const) ; */
 		rate_const = 256 - 1000000 / psf->sf.samplerate ;
@@ -474,7 +474,7 @@ voc_write_header (SF_PRIVATE *psf, int calc_length)
 		/*	Now write the VOC_SOUND_DATA section
 		** 		marker, length, rate_const and compression
 		*/
-		psf_binheader_writef (psf, "e1311", VOC_SOUND_DATA, (int) (psf->datalength + 1), rate_const, 0) ;
+		psf_binheader_writef (psf, "e1311", BHW1 (VOC_SOUND_DATA), BHW3 ((int) (psf->datalength + 1)), BHW1 (rate_const), BHW1 (0)) ;
 		}
 	else
 	{	int length ;
@@ -487,26 +487,26 @@ voc_write_header (SF_PRIVATE *psf, int calc_length)
 					psf->bytewidth = 1 ;
 					length = psf->sf.frames * psf->sf.channels * psf->bytewidth + 12 ;
 					/* Marker, length, sample rate, bitwidth, stereo flag, encoding and fourt zero bytes. */
-					psf_binheader_writef (psf, "e1341124", VOC_EXTENDED_II, length, psf->sf.samplerate, 16, psf->sf.channels, 4, 0) ;
+					psf_binheader_writef (psf, "e1341124", BHW1 (VOC_EXTENDED_II), BHW3 (length), BHW4 (psf->sf.samplerate), BHW1 (16), BHW1 (psf->sf.channels), BHW2 (4), BHW4 (0)) ;
 					break ;
 
 			case SF_FORMAT_PCM_16 :
 					psf->bytewidth = 2 ;
 					length = psf->sf.frames * psf->sf.channels * psf->bytewidth + 12 ;
 					/* Marker, length, sample rate, bitwidth, stereo flag, encoding and fourt zero bytes. */
-					psf_binheader_writef (psf, "e1341124", VOC_EXTENDED_II, length, psf->sf.samplerate, 16, psf->sf.channels, 4, 0) ;
+					psf_binheader_writef (psf, "e1341124", BHW1 (VOC_EXTENDED_II), BHW3 (length), BHW4 (psf->sf.samplerate), BHW1 (16), BHW1 (psf->sf.channels), BHW2 (4), BHW4 (0)) ;
 					break ;
 
 			case SF_FORMAT_ALAW :
 					psf->bytewidth = 1 ;
 					length = psf->sf.frames * psf->sf.channels * psf->bytewidth + 12 ;
-					psf_binheader_writef (psf, "e1341124", VOC_EXTENDED_II, length, psf->sf.samplerate, 8, psf->sf.channels, 6, 0) ;
+					psf_binheader_writef (psf, "e1341124", BHW1 (VOC_EXTENDED_II), BHW3 (length), BHW4 (psf->sf.samplerate), BHW1 (8), BHW1 (psf->sf.channels), BHW2 (6), BHW4 (0)) ;
 					break ;
 
 			case SF_FORMAT_ULAW :
 					psf->bytewidth = 1 ;
 					length = psf->sf.frames * psf->sf.channels * psf->bytewidth + 12 ;
-					psf_binheader_writef (psf, "e1341124", VOC_EXTENDED_II, length, psf->sf.samplerate, 8, psf->sf.channels, 7, 0) ;
+					psf_binheader_writef (psf, "e1341124", BHW1 (VOC_EXTENDED_II), BHW3 (length), BHW4 (psf->sf.samplerate), BHW1 (8), BHW1 (psf->sf.channels), BHW2 (7), BHW4 (0)) ;
 					break ;
 
 			default : return SFE_UNIMPLEMENTED ;

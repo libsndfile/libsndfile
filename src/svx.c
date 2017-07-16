@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -362,29 +362,29 @@ svx_write_header (SF_PRIVATE *psf, int calc_length)
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	/* FORM marker and FORM size. */
-	psf_binheader_writef (psf, "Etm8", FORM_MARKER, (psf->filelength < 8) ?
-			psf->filelength * 0 : psf->filelength - 8) ;
+	psf_binheader_writef (psf, "Etm8", BHWm (FORM_MARKER), BHW8 ((psf->filelength < 8) ?
+			psf->filelength * 0 : psf->filelength - 8)) ;
 
-	psf_binheader_writef (psf, "m", (psf->bytewidth == 1) ? SVX8_MARKER : SV16_MARKER) ;
+	psf_binheader_writef (psf, "m", BHWm ((psf->bytewidth == 1) ? SVX8_MARKER : SV16_MARKER)) ;
 
 	/* VHDR chunk. */
-	psf_binheader_writef (psf, "Em4", VHDR_MARKER, sizeof (VHDR_CHUNK)) ;
+	psf_binheader_writef (psf, "Em4", BHWm (VHDR_MARKER), BHW4 (sizeof (VHDR_CHUNK))) ;
 	/* VHDR : oneShotHiSamples, repeatHiSamples, samplesPerHiCycle */
-	psf_binheader_writef (psf, "E444", psf->sf.frames, 0, 0) ;
+	psf_binheader_writef (psf, "E444", BHW4 (psf->sf.frames), BHW4 (0), BHW4 (0)) ;
 	/* VHDR : samplesPerSec, octave, compression */
-	psf_binheader_writef (psf, "E211", psf->sf.samplerate, 1, 0) ;
+	psf_binheader_writef (psf, "E211", BHW2 (psf->sf.samplerate), BHW1 (1), BHW1 (0)) ;
 	/* VHDR : volume */
-	psf_binheader_writef (psf, "E4", (psf->bytewidth == 1) ? 0xFF : 0xFFFF) ;
+	psf_binheader_writef (psf, "E4", BHW4 ((psf->bytewidth == 1) ? 0xFF : 0xFFFF)) ;
 
 	if (psf->sf.channels == 2)
-		psf_binheader_writef (psf, "Em44", CHAN_MARKER, 4, 6) ;
+		psf_binheader_writef (psf, "Em44", BHWm (CHAN_MARKER), BHW4 (4), BHW4 (6)) ;
 
 	/* Filename and annotation strings. */
-	psf_binheader_writef (psf, "Emsms", NAME_MARKER, psf->file.name.c, ANNO_MARKER, annotation) ;
+	psf_binheader_writef (psf, "Emsms", BHWm (NAME_MARKER), BHWs (psf->file.name.c), BHWm (ANNO_MARKER), BHWs (annotation)) ;
 
 	/* BODY marker and size. */
-	psf_binheader_writef (psf, "Etm8", BODY_MARKER, (psf->datalength < 0) ?
-			psf->datalength * 0 : psf->datalength) ;
+	psf_binheader_writef (psf, "Etm8", BHWm (BODY_MARKER), BHW8 ((psf->datalength < 0) ?
+			psf->datalength * 0 : psf->datalength)) ;
 
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 

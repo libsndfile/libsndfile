@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2003-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2003-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -285,32 +285,32 @@ xi_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 	psf_fseek (psf, 0, SEEK_SET) ;
 
 	string = "Extended Instrument: " ;
-	psf_binheader_writef (psf, "b", string, strlen (string)) ;
-	psf_binheader_writef (psf, "b1", pxi->filename, sizeof (pxi->filename), 0x1A) ;
+	psf_binheader_writef (psf, "b", BHWv (string), BHWz (strlen (string))) ;
+	psf_binheader_writef (psf, "b1", BHWv (pxi->filename), BHWz (sizeof (pxi->filename)), BHW1 (0x1A)) ;
 
 	/* Write software version and two byte XI version. */
-	psf_binheader_writef (psf, "eb2", pxi->software, sizeof (pxi->software), (1 << 8) + 2) ;
+	psf_binheader_writef (psf, "eb2", BHWv (pxi->software), BHWz (sizeof (pxi->software)), BHW2 ((1 << 8) + 2)) ;
 
 	/*
 	** Jump note numbers (96), volume envelope (48), pan envelope (48),
 	** volume points (1), pan points (1)
 	*/
-	psf_binheader_writef (psf, "z", (size_t) (96 + 48 + 48 + 1 + 1)) ;
+	psf_binheader_writef (psf, "z", BHWz ((size_t) (96 + 48 + 48 + 1 + 1))) ;
 
 	/* Jump volume loop (3 bytes), pan loop (3), envelope flags (3), vibrato (3)
 	** fade out (2), 22 unknown bytes, and then write sample_count (2 bytes).
 	*/
-	psf_binheader_writef (psf, "ez2z2", (size_t) (4 * 3), 0x1234, make_size_t (22), 1) ;
+	psf_binheader_writef (psf, "ez2z2", BHWz ((size_t) (4 * 3)), BHW2 (0x1234), BHWz (22), BHW2 (1)) ;
 
 	pxi->loop_begin = 0 ;
 	pxi->loop_end = 0 ;
 
-	psf_binheader_writef (psf, "et844", psf->sf.frames, pxi->loop_begin, pxi->loop_end) ;
+	psf_binheader_writef (psf, "et844", BHW8 (psf->sf.frames), BHW4 (pxi->loop_begin), BHW4 (pxi->loop_end)) ;
 
 	/* volume, fine tune, flags, pan, note, namelen */
-	psf_binheader_writef (psf, "111111", 128, 0, pxi->sample_flags, 128, 0, strlen (pxi->sample_name)) ;
+	psf_binheader_writef (psf, "111111", BHW1 (128), BHW1 (0), BHW1 (pxi->sample_flags), BHW1 (128), BHW1 (0), BHW1 (strlen (pxi->sample_name))) ;
 
-	psf_binheader_writef (psf, "b", pxi->sample_name, sizeof (pxi->sample_name)) ;
+	psf_binheader_writef (psf, "b", BHWv (pxi->sample_name), BHWz (sizeof (pxi->sample_name))) ;
 
 
 

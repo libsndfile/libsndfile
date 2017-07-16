@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -239,12 +239,12 @@ au_write_header (SF_PRIVATE *psf, int calc_length)
 		datalength = (int) (psf->datalength & 0x7FFFFFFF) ;
 
 	if (psf->endian == SF_ENDIAN_BIG)
-	{	psf_binheader_writef (psf, "Em4", DOTSND_MARKER, AU_DATA_OFFSET) ;
-		psf_binheader_writef (psf, "E4444", datalength, encoding, psf->sf.samplerate, psf->sf.channels) ;
+	{	psf_binheader_writef (psf, "Em4", BHWm (DOTSND_MARKER), BHW4 (AU_DATA_OFFSET)) ;
+		psf_binheader_writef (psf, "E4444", BHW4 (datalength), BHW4 (encoding), BHW4 (psf->sf.samplerate), BHW4 (psf->sf.channels)) ;
 		}
 	else if (psf->endian == SF_ENDIAN_LITTLE)
-	{	psf_binheader_writef (psf, "em4", DNSDOT_MARKER, AU_DATA_OFFSET) ;
-		psf_binheader_writef (psf, "e4444", datalength, encoding, psf->sf.samplerate, psf->sf.channels) ;
+	{	psf_binheader_writef (psf, "em4", BHWm (DNSDOT_MARKER), BHW4 (AU_DATA_OFFSET)) ;
+		psf_binheader_writef (psf, "e4444", BHW4 (datalength), BHW4 (encoding), BHW4 (psf->sf.samplerate), BHW4 (psf->sf.channels)) ;
 		}
 	else
 		return (psf->error = SFE_BAD_OPEN_FORMAT) ;
