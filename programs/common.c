@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008 George Blood Audio
 **
 ** All rights reserved.
@@ -48,7 +48,7 @@
 void
 sfe_copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels, int normalize)
 {	static double	data [BUFFER_LEN], max ;
-	int		frames, readcount, k ;
+	sf_count_t		frames, readcount, k ;
 
 	frames = BUFFER_LEN / channels ;
 	readcount = frames ;
