@@ -2868,7 +2868,6 @@ psf_close (SF_PRIVATE *psf)
 	free (psf->iterator) ;
 	free (psf->cart_16k) ;
 
-	memset (psf, 0, sizeof (SF_PRIVATE)) ;
 	free (psf) ;
 
 	return error ;
