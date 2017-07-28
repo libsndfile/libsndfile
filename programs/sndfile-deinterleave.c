@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2009-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2009-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -92,7 +92,11 @@ main (int argc, char **argv)
 	state.channels = sfinfo.channels ;
 	sfinfo.channels = 1 ;
 
-	snprintf (pathname, sizeof (pathname), "%s", argv [1]) ;
+	if (snprintf (pathname, sizeof (pathname), "%s", argv [1]) > (int) sizeof (pathname))
+	{	printf ("\nError : Length of provided filename '%s' exceeds MAX_PATH (%d).\n", argv [1], (int) sizeof (pathname)) ;
+		exit (1) ;
+		} ;
+
 	if ((cptr = strrchr (pathname, '.')) == NULL)
 		ext [0] = 0 ;
 	else
