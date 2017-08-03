@@ -115,12 +115,13 @@
 
 #if (defined (__i486__) || defined (__i586__) || defined (__i686__) || defined (__x86_64__))
 #define CPU_IS_X86 1
-#define CPU_IS_X86_64 0
-#elif defined __x86_64__
-#define CPU_IS_X86 0
-#define CPU_IS_X86_64 1
 #else
 #define CPU_IS_X86 0
+#endif
+
+#if defined (__x86_64__)
+#define CPU_IS_X86_64 1
+#else
 #define CPU_IS_X86_64 0
 #endif
 
