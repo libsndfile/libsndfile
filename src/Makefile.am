@@ -24,7 +24,7 @@ check_PROGRAMS = test_main G72x/g72x_test
 FILESPECIFIC = sndfile.c aiff.c au.c avr.c caf.c dwd.c flac.c g72x.c htk.c ircam.c \
 		macos.c mat4.c mat5.c nist.c paf.c pvf.c raw.c rx2.c sd2.c \
 		sds.c svx.c txw.c voc.c wve.c w64.c wavlike.c wav.c xi.c mpc2k.c rf64.c \
-		ogg_vorbis.c ogg_speex.c ogg_pcm.c ogg_opus.c
+		ogg_vorbis.c ogg_speex.c ogg_pcm.c ogg_opus.c mp3.c
 
 CLEANFILES = *~ *.exe G72x/*.exe error.dat
 
