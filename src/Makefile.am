@@ -34,7 +34,7 @@ else
 WIN_VERSION_FILE =
 endif
 
-libsndfile_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS)
+libsndfile_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS) $(MP3_CFLAGS)
 
 #===============================================================================
 # MinGW requires -no-undefined if a DLL is to be built.
@@ -42,11 +42,11 @@ libsndfile_la_LDFLAGS = -no-undefined -version-info  $(SHARED_VERSION_INFO) $(SH
 libsndfile_la_SOURCES = $(FILESPECIFIC) $(noinst_HEADERS)
 nodist_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
 libsndfile_la_LIBADD = GSM610/libgsm.la G72x/libg72x.la ALAC/libalac.la \
-		libcommon.la $(EXTERNAL_XIPH_LIBS) -lm
+		libcommon.la $(EXTERNAL_XIPH_LIBS) $(MP3_LIBS) -lm
 
 EXTRA_libsndfile_la_DEPENDENCIES = $(SYMBOL_FILES)
 
-libcommon_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS)
+libcommon_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS) $(MP3_CFLAGS)
 libcommon_la_SOURCES = common.c file_io.c command.c pcm.c ulaw.c alaw.c \
 		float32.c double64.c ima_adpcm.c ms_adpcm.c gsm610.c dwvw.c vox_adpcm.c \
 		interleave.c strings.c dither.c cart.c broadcast.c audio_detect.c \

@@ -356,6 +356,13 @@ AS_IF([test -n "$PKG_CONFIG"], [
 AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_XIPH_LIBS], [$HAVE_EXTERNAL_XIPH_LIBS], [Will be set to 1 if flac, ogg and vorbis are available.])
 
 #====================================================================================
+# Check for mp3 encoder/decoder
+
+PKG_CHECK_MOD_VERSION(MPG123, libmpg123 >= 1.0.0, ac_cv_mpg123=yes, ac_cv_mpg123=no)
+MP3_LIBS="$MPG123_LIBS"
+MP3_CFLAGS="$MPG123_CFLAGS"
+
+#====================================================================================
 # Check for libsqlite3 (only used in regtest).
 
 ac_cv_sqlite3=no
@@ -607,6 +614,8 @@ AC_SUBST(SNDIO_LIBS)
 
 AC_SUBST(EXTERNAL_XIPH_CFLAGS)
 AC_SUBST(EXTERNAL_XIPH_LIBS)
+AC_SUBST(MP3_CFLAGS)
+AC_SUBST(MP3_LIBS)
 AC_SUBST(SRC_BINDIR)
 AC_SUBST(TEST_BINDIR)
 
