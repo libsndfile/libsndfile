@@ -3138,6 +3138,10 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 				error = mpc2k_open (psf) ;
 				break ;
 
+        case    SF_FORMAT_MP3:
+                error = mp3_open(psf) ;
+                break ;
+
 		/* Lite remove end */
 
 		default :
