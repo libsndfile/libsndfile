@@ -2748,6 +2748,10 @@ guess_file_type (SF_PRIVATE *psf)
 	if (buffer [0] == MAKE_MARKER ('a', 'j', 'k', 'g'))
 		return 0 /*-SF_FORMAT_SHN-*/ ;
 
+    /* MP3 format */
+    if (buffer [0] == MAKE_MARKER (377, 373, 220, 'd'))
+        return SF_FORMAT_MP3 ;
+
 	/* This must be the last one. */
 	if (psf->filelength > 0 && (format = try_resource_fork (psf)) != 0)
 		return format ;
