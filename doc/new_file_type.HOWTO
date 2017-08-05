@@ -97,7 +97,7 @@ type. Something like:
 				sf_errno = whacky_open (psf) ;
 				break ;
 
-Setp 6
+Step 6
 ------
 Add prototypes for new open read and open write functions.
 
