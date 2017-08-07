@@ -665,6 +665,9 @@ flac_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		psf->dataoffset = psf_ftell (psf) ;
 	pflac->encbuffer = calloc (ENC_BUFFER_SIZE, sizeof (int32_t)) ;
 
+	/* can only call init_stream once */
+	psf->write_header = NULL ;
+
 	return psf->error ;
 } /* flac_write_header */
 
