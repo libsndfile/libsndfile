@@ -48,6 +48,7 @@
 #define LOG_BUFFER_SIZE	1024
 
 static void	update_header_test (const char *filename, int typemajor) ;
+static void	update_header_before_write_test (const char *filename, int typemajor) ;
 
 [+ FOR data_type
 +]static void	update_seek_[+ (get "name") +]_test	(const char *filename, int filetype) ;
@@ -226,6 +227,11 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
+	if (do_all || ! strcmp (argv [1], "flac"))
+	{	update_header_before_write_test ("header.flac", SF_FORMAT_FLAC) ;
+		test_count++ ;
+		} ;
+
 	if (test_count == 0)
 	{	printf ("Mono : ************************************\n") ;
 		printf ("Mono : *  No '%s' test defined.\n", argv [1]) ;
@@ -322,6 +328,35 @@ update_header_test (const char *filename, int typemajor)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* update_header_test */
+
+static void
+update_header_before_write_test (const char *filename, int typemajor)
+{
+	SNDFILE		*outfile ;
+	SF_INFO		sfinfo ;
+	int			k ;
+
+	print_test_name ("update_header_before_write", filename);
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.samplerate = 44100 ;
+	sfinfo.format = (typemajor | SF_FORMAT_PCM_16) ;
+	sfinfo.channels = 1 ;
+
+	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	/* FLAC can only write the header once; if the first call to sf_write() will
+	** also attempt to write the header, it fails. FLAC-specific regression
+	*/
+	sf_command (outfile, SFC_UPDATE_HEADER_NOW, NULL, 0) ;
+
+	for (k = 0 ; k < BUFFER_LEN ; k++)
+		data_out [k] = k + 1 ;
+	test_write_int_or_die (outfile, 0, data_out, BUFFER_LEN, __LINE__) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* update_header_before_write_test */
 
 /*==============================================================================
 */
@@ -542,4 +577,3 @@ extra_header_test (const char *filename, int filetype)
 	return ;
 #endif
 } /* extra_header_test */
-
