@@ -228,7 +228,10 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "flac"))
-	{	update_header_before_write_test ("header.flac", SF_FORMAT_FLAC) ;
+	{	if (HAVE_EXTERNAL_XIPH_LIBS)
+			update_header_before_write_test ("header.flac", SF_FORMAT_FLAC) ;
+		else
+			puts ("    No FLAC tests because FLAC support was not compiled in.") ;
 		test_count++ ;
 		} ;
 
