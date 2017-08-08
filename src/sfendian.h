@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -25,7 +25,18 @@
 #include <inttypes.h>
 
 
-#if COMPILER_IS_GCC && CPU_IS_X86
+#if HAVE_BYTESWAP_H			/* Linux, any CPU */
+#include <byteswap.h>
+
+#define	ENDSWAP_16(x)		(bswap_16 (x))
+#define	ENDSWAP_32(x)		(bswap_32 (x))
+#define	ENDSWAP_64(x)		(bswap_64 (x))
+#endif
+
+
+#if (HAVE_BYTESWAP_H == 0) && COMPILER_IS_GCC
+
+#if CPU_IS_X86
 
 static inline int16_t
 ENDSWAP_16 (int16_t x)
@@ -41,6 +52,8 @@ ENDSWAP_32 (int32_t x)
 	return y ;
 } /* ENDSWAP_32 */
 
+#endif
+
 #if CPU_IS_X86_64
 
 static inline int64_t
@@ -53,15 +66,9 @@ ENDSWAP_64X (int64_t x)
 #define ENDSWAP_64 ENDSWAP_64X
 
 #endif
+#endif
 
-#elif HAVE_BYTESWAP_H			/* Linux, any CPU */
-#include <byteswap.h>
-
-#define	ENDSWAP_16(x)		(bswap_16 (x))
-#define	ENDSWAP_32(x)		(bswap_32 (x))
-#define	ENDSWAP_64(x)		(bswap_64 (x))
-
-#else
+#if (HAVE_BYTESWAP_H == 0) && (COMPILER_IS_GCC == 0)
 
 #define	ENDSWAP_16(x)		((((x) >> 8) & 0xFF) + (((x) & 0xFF) << 8))
 #define	ENDSWAP_32(x)		((((x) >> 24) & 0xFF) + (((x) >> 8) & 0xFF00) + (((x) & 0xFF00) << 8) + (((x) & 0xFF) << 24))
