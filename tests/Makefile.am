@@ -189,17 +189,10 @@ scale_clip_test_LDADD = $(top_builddir)/src/libsndfile.la
 
 #===============================================================================
 # Autogen generated sources.
+# These GNU style rules actually work. The old style suffix rules do not.
 
-SUFFIXES = .def .tpl
-
-.def.c:
+%.c : %.def %.tpl
 	autogen --writable $<
 
-.tpl.c:
-	autogen --writable $<
-
-.def.h:
-	autogen --writable $<
-
-.tpl.h:
+%.h : %.def %.tpl
 	autogen --writable $<
