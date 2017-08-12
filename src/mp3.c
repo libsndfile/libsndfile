@@ -119,9 +119,10 @@ mp3_close (SF_PRIVATE * psf)
 
 static int
 mp3_read_header (SF_PRIVATE * psf, mpg123_handle * decoder) {
-    int decoder_err;
+    int decoder_err, channels, encoding;
     size_t n_bytes_read;
     char buffer;
+    long sample_rate;
     do {
         // TODO: is reading a byte at a time required?
         n_bytes_read = psf_fread(&buffer, 1, 1, psf);
@@ -131,5 +132,14 @@ mp3_read_header (SF_PRIVATE * psf, mpg123_handle * decoder) {
         decoder_err = mpg123_decode(
             decoder, (unsigned char *) &buffer, 1, NULL, 0, &n_bytes_read);
     } while (decoder_err == MPG123_NEED_MORE);
+    if (decoder_err != MPG123_OK) {
+        return decoder_err;
+    }
+    decoder_err = mpg123_getformat(decoder, &sample_rate, &channels, &encoding);
+    if (decoder_err == MPG123_OK) {
+        // FIXME: encoding unused!
+        psf->sf.channels = channels;
+        psf->sf.samplerate = sample_rate;
+    }
     return decoder_err;
 }
