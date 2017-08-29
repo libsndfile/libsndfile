@@ -246,6 +246,13 @@ AS_CASE([$host_os],
 			])
 	])
 
+AS_CASE([$host_vendor],
+	[vita], [
+		TYPEOF_SF_COUNT_T="int64_t"
+		SF_COUNT_MAX="0x7FFFFFFFFFFFFFFFLL"
+		SIZEOF_SF_COUNT_T=8
+	])
+
 AS_IF([test "x$SIZEOF_SF_COUNT_T" = "x4"], [
 		SF_COUNT_MAX="0x7FFFFFFF"
 	])
