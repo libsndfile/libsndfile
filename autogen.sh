@@ -4,8 +4,6 @@
 
 package="libsndfile"
 
-ACLOCAL_FLAGS="-I M4"
-
 olddir=`pwd`
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
@@ -144,11 +142,6 @@ echo $result
 
 if test "$DIE" -eq 1; then
         exit 1
-fi
-
-if test ! -d Cfg ; then
-	echo "Creating 'Cfg' directory."
-	mkdir Cfg
 fi
 
 echo "Generating configuration files for $package, please wait ... "

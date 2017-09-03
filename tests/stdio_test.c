@@ -63,7 +63,6 @@ main (void)
 
 
 static size_t	file_length (const char *filename) ;
-static int		file_exists (const char *filename) ;
 static void		stdio_test (const char *filetype) ;
 
 static const char *filetypes [] =
@@ -75,9 +74,6 @@ static const char *filetypes [] =
 int
 main (void)
 {	int k ;
-
-	if (file_exists ("libsndfile.spec.in"))
-		exit_if_true (chdir ("tests") != 0, "\n    Error : chdir ('tests') failed.\n") ;
 
 	for (k = 0 ; filetypes [k] ; k++)
 		stdio_test (filetypes [k]) ;
@@ -94,7 +90,7 @@ stdio_test (const char *filetype)
 
 	print_test_name ("stdio_test", filetype) ;
 
-	snprintf (buffer, sizeof (buffer), "./stdout_test %s > stdio.%s", filetype, filetype) ;
+	snprintf (buffer, sizeof (buffer), "./tests/stdout_test %s > stdio.%s", filetype, filetype) ;
 	if ((retval = system (buffer)))
 	{	retval = WIFEXITED (retval) ? WEXITSTATUS (retval) : 1 ;
 		printf ("%s : %s", buffer, (strerror (retval))) ;
@@ -107,7 +103,7 @@ stdio_test (const char *filetype)
 		exit (1) ;
 		} ;
 
-	snprintf (buffer, sizeof (buffer), "./stdin_test %s < stdio.%s", filetype, filetype) ;
+	snprintf (buffer, sizeof (buffer), "./tests/stdin_test %s < stdio.%s", filetype, filetype) ;
 	if ((retval = system (buffer)))
 	{	retval = WIFEXITED (retval) ? WEXITSTATUS (retval) : 1 ;
 		printf ("%s : %s", buffer, (strerror (retval))) ;
@@ -140,16 +136,6 @@ file_length (const char *filename)
 
 	return buf.st_size ;
 } /* file_length */
-
-static int
-file_exists (const char *filename)
-{	struct stat buf ;
-
-	if (stat (filename, &buf))
-		return 0 ;
-
-	return 1 ;
-} /* file_exists */
 
 #endif
 
