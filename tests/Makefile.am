@@ -16,7 +16,7 @@ check_PROGRAMS = sfversion floating_point_test write_read_test \
 	scale_clip_test win32_test fix_this aiff_rw_test virtual_io_test \
 	locale_test largefile_test win32_ordinal_test ogg_test compression_size_test \
 	checksum_test external_libs_test rdwr_test format_check_test $(CPP_TEST) \
-	channel_test long_read_write_test
+	channel_test long_read_write_test mp3_test
 
 noinst_HEADERS = dft_cmp.h utils.h generate.h
 
@@ -186,6 +186,9 @@ peak_chunk_test_LDADD = $(top_builddir)/src/libsndfile.la
 scale_clip_test_SOURCES = scale_clip_test.c utils.c
 scale_clip_test_LDADD = $(top_builddir)/src/libsndfile.la
 # Lite remove end
+
+mp3_test_SOURCES = utils.c mp3_test.c
+mp3_test_LDADD = $(top_builddir)/src/libsndfile.la
 
 #===============================================================================
 # Autogen generated sources.

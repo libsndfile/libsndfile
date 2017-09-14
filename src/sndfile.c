@@ -2622,6 +2622,9 @@ format_from_extension (SF_PRIVATE *psf)
 		psf->sf.samplerate = 8000 ;
 		format = SF_FORMAT_RAW | SF_FORMAT_GSM610 ;
 		}
+	else if (strcmp (cptr, "mp3") == 0)
+	{	format = SF_FORMAT_MP3 ;
+		}
 
 	/* For RAW files, make sure the dataoffset if set correctly. */
 	if ((SF_CONTAINER (format)) == SF_FORMAT_RAW)
@@ -2747,10 +2750,6 @@ guess_file_type (SF_PRIVATE *psf)
 
 	if (buffer [0] == MAKE_MARKER ('a', 'j', 'k', 'g'))
 		return 0 /*-SF_FORMAT_SHN-*/ ;
-
-    /* MP3 format */
-    if (buffer [0] == MAKE_MARKER (377, 373, 220, 'd'))
-        return SF_FORMAT_MP3 ;
 
 	/* This must be the last one. */
 	if (psf->filelength > 0 && (format = try_resource_fork (psf)) != 0)
@@ -3142,9 +3141,9 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 				error = mpc2k_open (psf) ;
 				break ;
 
-        case    SF_FORMAT_MP3:
-                error = mp3_open(psf) ;
-                break ;
+		case	SF_FORMAT_MP3:
+				error = mp3_open (psf) ;
+				break ;
 
 		/* Lite remove end */
 
@@ -3167,7 +3166,8 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 				break ;
 
 			case SF_FORMAT_FLAC :
-				/* Flac with an ID3v2 header? */
+			case SF_FORMAT_MP3 :
+				/* ID3v2 header? */
 				break ;
 
 			default :
