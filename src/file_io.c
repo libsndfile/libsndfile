@@ -262,11 +262,11 @@ psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence)
 	if (psf->virtual_io)
 		return psf->vio.seek (offset, whence, psf->vio_user_data) ;
 
+	// NOTE: ftell takes the fileoffset into account
 	current_pos = psf_ftell (psf) ;
 
 	switch (whence)
 	{	case SEEK_SET :
-				offset += psf->fileoffset ;
 				break ;
 
 		case SEEK_END :
@@ -284,7 +284,7 @@ psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence)
 				** get the offset wrt the start of file.
 				*/
 				whence = SEEK_SET ;
-				offset = lseek (psf->file.filedes, 0, SEEK_END) + offset ;
+				offset = lseek (psf->file.filedes, 0, SEEK_END) + offset - psf->fileoffset ;
 				break ;
 
 		case SEEK_CUR :
@@ -300,14 +300,12 @@ psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence)
 		} ;
 
 	if (current_pos != offset)
-		new_position = lseek (psf->file.filedes, offset, whence) ;
+		new_position = lseek (psf->file.filedes, offset + psf->fileoffset, SEEK_SET) - psf->fileoffset ;
 	else
 		new_position = offset ;
 
 	if (new_position < 0)
 		psf_log_syserr (psf, errno) ;
-
-	new_position -= psf->fileoffset ;
 
 	return new_position ;
 } /* psf_fseek */
