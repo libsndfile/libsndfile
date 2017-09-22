@@ -14,6 +14,7 @@ matrix:
             - libvorbis-dev
             - libflac-dev
             - libasound2-dev
+            - libmpg123-dev
     - os: linux
       dist: trusty
       compiler: gcc
@@ -25,6 +26,7 @@ matrix:
             - libvorbis-dev
             - libflac-dev
             - libasound2-dev
+            - libmpg123-dev
 
     - os: osx
       compiler: clang
