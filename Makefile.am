@@ -24,9 +24,9 @@ cmake_files = cmake/ClipMode.cmake cmake/FindFLAC.cmake \
 	cmake/CMakeAutoGen.cmake cmake/CMakeAutoGenScript.cmake \
 	cmake/FindFLAC.cmake cmake/FindOgg.cmake cmake/FindSndio.cmake \
 	cmake/FindSpeex.cmake cmake/FindSQLite3.cmake cmake/FindVorbis.cmake \
-	cmake/SndFileChecks.cmake cmake/TestInline.cmake \
-	cmake/TestLargeFiles.cmake cmake/LibSndFileConfig.cmake.in \
-	cmake/TestInline.c.in
+	cmake/FindMpg123.cmake cmake/SndFileChecks.cmake \
+	cmake/TestInline.cmake cmake/TestLargeFiles.cmake \
+	cmake/LibSndFileConfig.cmake.in cmake/TestInline.c.in
 
 CLEANFILES = *~
 

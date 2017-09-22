@@ -112,6 +112,10 @@ set_package_properties(Speex PROPERTIES TYPE OPTIONAL
 	URL "www.speex.org/"
 	DESCRIPTION "an audio codec tuned for speech"
 	PURPOSE "Enables experemental Speex support")
+set_package_properties(Mpg123 PROPERTIES TYPE REQUIRED
+	URL "www.mpg123.de"
+	DESCRIPTION "mp3 decoder"
+	PURPOSE "Mp3 decoding support")
 set_package_properties(SQLite3 PROPERTIES TYPE OPTIONAL
 	URL "www.sqlite.org/"
 	DESCRIPTION "light weight SQL database engine."
@@ -236,7 +240,8 @@ set (FILESPECIFIC
 	src/ogg_vorbis.c
 	src/ogg_speex.c
 	src/ogg_pcm.c
-	src/ogg_opus.c)
+	src/ogg_opus.c
+	src/mp3.c)
 
 # GSM610 sources
 set (libgsm_SOURCES
@@ -309,6 +314,7 @@ if (BUILD_STATIC_LIBS)
 			$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src>
 			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
+	target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${MPG123_LIBRARY})
 	if (LIBM_REQUIRED)
 		target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${M_LIBRARY})
 	endif ()
@@ -361,6 +367,7 @@ if (BUILD_SHARED_LIBS)
 			$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
 			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
 
+	target_link_libraries (${SNDFILE_SHARED_TARGET} PUBLIC ${MPG123_LIBRARY})
 	if (LIBM_REQUIRED)
 		target_link_libraries (${SNDFILE_SHARED_TARGET} PRIVATE ${M_LIBRARY})
 	endif (LIBM_REQUIRED)
@@ -973,6 +980,16 @@ if (BUILD_TESTING)
 		target_link_libraries(pcm_test PRIVATE ${M_LIBRARY})
 	endif ()
 	add_test (pcm_test pcm_test)
+
+	### mp3_test
+
+	set (mp3_test_SOURCES tests/mp3_test.c)
+	add_executable (mp3_test ${mp3_test_SOURCES})
+	target_link_libraries (mp3_test PRIVATE ${SNDFILE_STATIC_TARGET} test_utils)
+	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+		target_link_libraries(mp3_test PRIVATE ${M_LIBRARY})
+	endif ()
+	add_test (mp3_test mp3_test)
 
 	### common test executables
 

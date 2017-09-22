@@ -46,6 +46,7 @@ else ()
     set (DISABLE_EXTERNAL_LIBS ON)
 endif ()
 endif ()
+find_package (Mpg123)
 
 if (ENABLE_EXPERIMENTAL)
 	find_package (Speex)
