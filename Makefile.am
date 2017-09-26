@@ -63,15 +63,15 @@ src_libsndfile_la_LDFLAGS = -no-undefined -version-info $(SHARED_VERSION_INFO) $
 src_libsndfile_la_SOURCES = src/sndfile.c src/aiff.c src/au.c src/avr.c src/caf.c src/dwd.c src/flac.c src/g72x.c src/htk.c src/ircam.c \
 	src/macos.c src/mat4.c src/mat5.c src/nist.c src/paf.c src/pvf.c src/raw.c src/rx2.c src/sd2.c \
 	src/sds.c src/svx.c src/txw.c src/voc.c src/wve.c src/w64.c src/wavlike.c src/wav.c src/xi.c src/mpc2k.c src/rf64.c \
-	src/ogg_vorbis.c src/ogg_speex.c src/ogg_pcm.c src/ogg_opus.c src/common.h src/sfconfig.h src/sfendian.h src/wavlike.h \
+	src/ogg_vorbis.c src/ogg_speex.c src/ogg_pcm.c src/ogg_opus.c src/mp3.c src/common.h src/sfconfig.h src/sfendian.h src/wavlike.h \
 	src/sf_unistd.h src/ogg.h src/chanmap.h
 nodist_src_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
 src_libsndfile_la_LIBADD = src/GSM610/libgsm.la src/G72x/libg72x.la src/ALAC/libalac.la \
-	src/libcommon.la $(EXTERNAL_XIPH_LIBS) -lm
+	src/libcommon.la $(EXTERNAL_XIPH_LIBS) $(MP3_LIBS) -lm
 EXTRA_src_libsndfile_la_DEPENDENCIES = $(SYMBOL_FILES)
 
 noinst_LTLIBRARIES = src/libcommon.la
-src_libcommon_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS)
+src_libcommon_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS) $(MP3_CFLAGS)
 src_libcommon_la_SOURCES = src/common.c src/file_io.c src/command.c src/pcm.c src/ulaw.c src/alaw.c \
 	src/float32.c src/double64.c src/ima_adpcm.c src/ms_adpcm.c src/gsm610.c src/dwvw.c src/vox_adpcm.c \
 	src/interleave.c src/strings.c src/dither.c src/cart.c src/broadcast.c src/audio_detect.c \
@@ -211,7 +211,7 @@ check_PROGRAMS += tests/sfversion tests/floating_point_test tests/write_read_tes
 	tests/scale_clip_test tests/win32_test tests/aiff_rw_test tests/virtual_io_test \
 	tests/locale_test tests/win32_ordinal_test tests/ogg_test tests/compression_size_test \
 	tests/checksum_test tests/external_libs_test tests/rdwr_test tests/format_check_test $(CPP_TEST) \
-	tests/channel_test tests/long_read_write_test tests/stdin_test tests/stdout_test \
+	tests/channel_test tests/long_read_write_test tests/mp3_test tests/stdin_test tests/stdout_test \
 	tests/dither_test tests/fix_this tests/largefile_test tests/benchmark
 
 EXTRA_DIST += \
@@ -366,6 +366,9 @@ tests_peak_chunk_test_LDADD = src/libsndfile.la
 
 tests_scale_clip_test_SOURCES = tests/scale_clip_test.c tests/utils.c tests/utils.h
 tests_scale_clip_test_LDADD = src/libsndfile.la
+
+tests_mp3_test_SOURCES = tests/mp3_test.c tests/utils.c tests/utils.h
+tests_mp3_test_LDADD = src/libsndfile.la
 # Lite remove end
 
 #===============================================================================
