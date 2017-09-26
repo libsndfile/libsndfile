@@ -35,7 +35,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#define	INITAL_HEADER_SIZE	256
+#define	INITIAL_HEADER_SIZE	256
 
 /* Allocate and initialize the SF_PRIVATE struct. */
 SF_PRIVATE *
@@ -45,11 +45,11 @@ psf_allocate (void)
 	if ((psf = calloc (1, sizeof (SF_PRIVATE))) == NULL)
 		return	NULL ;
 
-	if ((psf->header.ptr = calloc (1, INITAL_HEADER_SIZE)) == NULL)
+	if ((psf->header.ptr = calloc (1, INITIAL_HEADER_SIZE)) == NULL)
 	{	free (psf) ;
 		return	NULL ;
 		} ;
-	psf->header.len = INITAL_HEADER_SIZE ;
+	psf->header.len = INITIAL_HEADER_SIZE ;
 
 	return psf ;
 } /* psf_allocate */
@@ -57,7 +57,7 @@ psf_allocate (void)
 static int
 psf_bump_header_allocation (SF_PRIVATE * psf, sf_count_t needed)
 {
-	sf_count_t newlen, smallest = INITAL_HEADER_SIZE ;
+	sf_count_t newlen, smallest = INITIAL_HEADER_SIZE ;
 	void * ptr ;
 
 	newlen = (needed > psf->header.len) ? 2 * SF_MAX (needed, smallest) : 2 * psf->header.len ;

@@ -1091,6 +1091,9 @@ if (BUILD_TESTING)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(stdin_test PRIVATE ${M_LIBRARY})
 	endif ()
+	set_target_properties(stdin_test
+		PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY "tests")
 
 	set (stdout_test_SOURCES tests/stdout_test.c)
 	add_executable (stdout_test ${stdout_test_SOURCES})
@@ -1098,6 +1101,9 @@ if (BUILD_TESTING)
 	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
 		target_link_libraries(stdout_test PRIVATE ${M_LIBRARY})
 	endif ()
+	set_target_properties(stdout_test
+		PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY "tests")
 
 	set (stdio_test_SOURCES tests/stdio_test.c)
 	add_executable (stdio_test ${stdio_test_SOURCES})

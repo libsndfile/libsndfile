@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2005-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2005-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -113,15 +113,15 @@
 #define HAVE_X86INTRIN_H 0
 #endif
 
-#if (defined (__i486__) || defined (__i586__) || defined (__i686__) || defined (__x86_64__))
-#define CPU_IS_X86 1
-#define CPU_IS_X86_64 0
-#elif defined __x86_64__
-#define CPU_IS_X86 0
-#define CPU_IS_X86_64 1
+#if defined __x86_64__
+#define CPU_IS_X86_64	1	/* Define both for x86_64 */
+#define CPU_IS_X86		1
+#elif defined (__i486__) || defined (__i586__) || defined (__i686__)
+#define CPU_IS_X86 		1
+#define CPU_IS_X86_64 	0
 #else
-#define CPU_IS_X86 0
-#define CPU_IS_X86_64 0
+#define CPU_IS_X86		0
+#define CPU_IS_X86_64	0
 #endif
 
 #ifndef HAVE_SSIZE_T

@@ -665,6 +665,9 @@ flac_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		psf->dataoffset = psf_ftell (psf) ;
 	pflac->encbuffer = calloc (ENC_BUFFER_SIZE, sizeof (int32_t)) ;
 
+	/* can only call init_stream once */
+	psf->write_header = NULL ;
+
 	return psf->error ;
 } /* flac_write_header */
 
@@ -1180,7 +1183,7 @@ f2flac8_clip_array (const float *src, int32_t *dest, int count, int normalize)
 			continue ;
 			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10))
-		{	dest [count] = 0x80 ;
+		{	dest [count] = -0x80 ;
 			continue ;
 			} ;
 		dest [count] = lrintf (scaled_value) ;
@@ -1202,7 +1205,7 @@ f2flac16_clip_array (const float *src, int32_t *dest, int count, int normalize)
 			continue ;
 			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x1000))
-		{	dest [count] = 0x8000 ;
+		{	dest [count] = -0x8000 ;
 			continue ;
 			} ;
 		dest [count] = lrintf (scaled_value) ;
@@ -1223,7 +1226,7 @@ f2flac24_clip_array (const float *src, int32_t *dest, int count, int normalize)
 			} ;
 
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x100000))
-		{	dest [count] = 0x800000 ;
+		{	dest [count] = -0x800000 ;
 			continue ;
 			}
 		dest [count] = lrintf (scaled_value) ;
@@ -1311,7 +1314,7 @@ d2flac8_clip_array (const double *src, int32_t *dest, int count, int normalize)
 			continue ;
 			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10))
-		{	dest [count] = 0x80 ;
+		{	dest [count] = -0x80 ;
 			continue ;
 			} ;
 		dest [count] = lrint (scaled_value) ;
@@ -1333,7 +1336,7 @@ d2flac16_clip_array (const double *src, int32_t *dest, int count, int normalize)
 			continue ;
 			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x1000))
-		{	dest [count] = 0x8000 ;
+		{	dest [count] = -0x8000 ;
 			continue ;
 			} ;
 		dest [count] = lrint (scaled_value) ;
@@ -1355,7 +1358,7 @@ d2flac24_clip_array (const double *src, int32_t *dest, int count, int normalize)
 			continue ;
 			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x100000))
-		{	dest [count] = 0x800000 ;
+		{	dest [count] = -0x800000 ;
 			continue ;
 			} ;
 		dest [count] = lrint (scaled_value) ;
