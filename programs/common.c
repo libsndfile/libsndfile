@@ -46,7 +46,7 @@
 
 #define	MIN(x, y)	((x) < (y) ? (x) : (y))
 
-void
+int
 sfe_copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels, int normalize)
 {	static double	data [BUFFER_LEN], max ;
 	sf_count_t		frames, readcount, k ;
@@ -55,6 +55,8 @@ sfe_copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels, int normalize
 	readcount = frames ;
 
 	sf_command (infile, SFC_CALC_SIGNAL_MAX, &max, sizeof (max)) ;
+	if (!isnormal (max)) /* neither zero, subnormal, infinite, nor NaN */
+		return 1 ;
 
 	if (!normalize && max < 1.0)
 	{	while (readcount > 0)
@@ -68,12 +70,16 @@ sfe_copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels, int normalize
 		while (readcount > 0)
 		{	readcount = sf_readf_double (infile, data, frames) ;
 			for (k = 0 ; k < readcount * channels ; k++)
-				data [k] /= max ;
+			{	data [k] /= max ;
+
+				if (!isfinite (data [k])) /* infinite or NaN */
+					return 1;
+				}
 			sf_writef_double (outfile, data, readcount) ;
 			} ;
 		} ;
 
-	return ;
+	return 0 ;
 } /* sfe_copy_data_fp */
 
 void
@@ -265,7 +271,12 @@ sfe_apply_metadata_changes (const char * filenames [2], const METADATA_INFO * in
 
 		/* If the input file is not the same as the output file, copy the data. */
 		if ((infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT))
-			sfe_copy_data_fp (outfile, infile, sfinfo.channels, SF_FALSE) ;
+		{	if (sfe_copy_data_fp (outfile, infile, sfinfo.channels, SF_FALSE) != 0)
+			{	printf ("Error : Not able to decode input file '%s'\n", filenames [0]) ;
+				error_code = 1 ;
+				goto cleanup_exit ;
+				} ;
+			}
 		else
 			sfe_copy_data_int (outfile, infile, sfinfo.channels) ;
 		} ;
