@@ -37,6 +37,12 @@
 ** Typedefs.
 */
 
+typedef struct
+{
+	lame_global_flags * gfp ;
+	char * encbuffer ;
+} MP3_WRITE_PRIVATE ;
+
 /*------------------------------------------------------------------------------
 ** Private static functions.
 */
@@ -54,6 +60,7 @@ static	int		mp3_format_to_encoding	(int encoding) ;
 
 static	int		mp3_write_open		(SF_PRIVATE * psf) ;
 static	int		mp3_write_close		(SF_PRIVATE * psf) ;
+static	sf_count_t	mp3_write_2s		(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 
 // FIXME: This initialisation should have a better hook
 static int mpg123_initialised = 0 ;
@@ -217,6 +224,9 @@ mp3_read_2d	(SF_PRIVATE * psf, double * ptr, sf_count_t len)
 {	return mp3_read_as (psf, (unsigned char *) ptr, MPG123_ENC_FLOAT_64, sizeof (double), len) ;
 }
 
+#define MAX_SAMPLES_ENCODED 1024
+#define ENC_BUFFER_SIZE (1.25 * MAX_SAMPLES_ENCODED) + 7200
+
 static int
 mp3_write_open (SNDFILE_PRIVATE * psf)
 {	lame_global_flags * gfp ;
@@ -227,16 +237,42 @@ mp3_write_open (SNDFILE_PRIVATE * psf)
 		// FIXME: wrong return code
 		return SFE_UNIMPLEMENTED ;
 	psf->container_close = mp3_write_close ;
-	psf->codec_data = gfp ;
+	MP3_WRITE_PRIVATE * codec_data = malloc (sizeof (MP3_WRITE_PRIVATE) );
+	codec_data->gfp = gfp;
+	codec_data->encbuffer = malloc (ENC_BUFFER_SIZE) ;
+	psf->codec_data = codec_data ;
+
+	psf->write_short = mp3_write_2s ;
 	return SFE_UNIMPLEMENTED ;
 }
 
 static int
 mp3_write_close (SF_PRIVATE * psf)
-{	lame_global_flags * gfp = psf->codec_data ;
-	if (gfp != NULL)
-	{	lame_close (gfp) ;
+{	MP3_WRITE_PRIVATE * p = psf->codec_data ;
+	if (p != NULL)
+	{	lame_close (p->gfp) ;
+		free (p->encbuffer) ;
+		free (p) ;
 		psf->codec_data = NULL ;
 	}
 	return 0;
+}
+
+static sf_count_t
+mp3_write_2s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
+{	MP3_WRITE_PRIVATE * p = psf->codec_data ;
+	sf_count_t samples_written = 0 ;
+	sf_count_t written_to_file ;
+	int n_bytes_encoded ;
+	while (samples_written < len)
+	{	sf_count_t const encoded_this_loop =
+			(len > MAX_SAMPLES_ENCODED) ? MAX_SAMPLES_ENCODED : len ;
+		n_bytes_encoded = lame_encode_buffer_interleaved (
+			p->gfp, ptr, encoded_this_loop, p->encbuffer, ENC_BUFFER_SIZE) ;
+		written_to_file = psf_fwrite (p->encbuffer, 1, n_bytes_encoded, psf) ;
+		if (written_to_file != n_bytes_encoded)
+			return 0 ;  // FIXME: error better
+		samples_written += encoded_this_loop ;
+	}
+	return samples_written;
 }
