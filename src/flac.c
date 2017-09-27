@@ -1059,7 +1059,7 @@ flac_write_s2flac (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 		case SF_FORMAT_PCM_16 :
 			convert = s2flac16_array ;
 			break ;
-			case SF_FORMAT_PCM_24 :
+		case SF_FORMAT_PCM_24 :
 			convert = s2flac24_array ;
 			break ;
 		default :
