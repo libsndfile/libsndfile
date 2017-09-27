@@ -23,7 +23,7 @@
 #include	<string.h>
 #include	<ctype.h>
 #include	<mpg123.h>
-#include	<lame.h>
+#include	<lame/lame.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
@@ -40,7 +40,7 @@
 typedef struct
 {
 	lame_global_flags * gfp ;
-	char * encbuffer ;
+	unsigned char * encbuffer ;
 } MP3_WRITE_PRIVATE ;
 
 /*------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ static	int		mp3_format_to_encoding	(int encoding) ;
 
 static	int		mp3_write_open		(SF_PRIVATE * psf) ;
 static	int		mp3_write_close		(SF_PRIVATE * psf) ;
-static	sf_count_t	mp3_write_2s		(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
+static	sf_count_t	mp3_write_2s		(SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
 
 // FIXME: This initialisation should have a better hook
 static int mpg123_initialised = 0 ;
@@ -73,11 +73,11 @@ int
 mp3_open (SF_PRIVATE * psf)
 {	psf->codec_data = NULL ;
 	switch (psf->file.mode) {
-	case (SFM_READ):
+	case (SFM_READ) :
 		return mp3_read_open (psf) ;
-	case (SFM_WRITE):
+	case (SFM_WRITE) :
 		return mp3_write_open (psf) ;
-	case (SFM_RDWR):
+	default:
 		return SFE_UNIMPLEMENTED ;
 	}
 }
@@ -228,8 +228,9 @@ mp3_read_2d	(SF_PRIVATE * psf, double * ptr, sf_count_t len)
 #define ENC_BUFFER_SIZE (1.25 * MAX_SAMPLES_ENCODED) + 7200
 
 static int
-mp3_write_open (SNDFILE_PRIVATE * psf)
+mp3_write_open (SF_PRIVATE * psf)
 {	lame_global_flags * gfp ;
+	MP3_WRITE_PRIVATE * codec_data ;
 	int lame_err = 0 ;
 	gfp = lame_init () ;
 	lame_err = lame_init_params (gfp) ;
@@ -237,8 +238,8 @@ mp3_write_open (SNDFILE_PRIVATE * psf)
 		// FIXME: wrong return code
 		return SFE_UNIMPLEMENTED ;
 	psf->container_close = mp3_write_close ;
-	MP3_WRITE_PRIVATE * codec_data = malloc (sizeof (MP3_WRITE_PRIVATE) );
-	codec_data->gfp = gfp;
+	codec_data = malloc (sizeof (MP3_WRITE_PRIVATE)) ;
+	codec_data->gfp = gfp ;
 	codec_data->encbuffer = malloc (ENC_BUFFER_SIZE) ;
 	psf->codec_data = codec_data ;
 
@@ -255,7 +256,7 @@ mp3_write_close (SF_PRIVATE * psf)
 		free (p) ;
 		psf->codec_data = NULL ;
 	}
-	return 0;
+	return 0 ;
 }
 
 static sf_count_t
@@ -267,12 +268,16 @@ mp3_write_2s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	while (samples_written < len)
 	{	sf_count_t const encoded_this_loop =
 			(len > MAX_SAMPLES_ENCODED) ? MAX_SAMPLES_ENCODED : len ;
+		#pragma GCC diagnostic push
+		#pragma GCC diagnostic ignored "-Wcast-qual"
 		n_bytes_encoded = lame_encode_buffer_interleaved (
-			p->gfp, ptr, encoded_this_loop, p->encbuffer, ENC_BUFFER_SIZE) ;
+			p->gfp, (short *) ptr, encoded_this_loop, p->encbuffer, ENC_BUFFER_SIZE) ;
+		#pragma GCC diagnostic pop
 		written_to_file = psf_fwrite (p->encbuffer, 1, n_bytes_encoded, psf) ;
 		if (written_to_file != n_bytes_encoded)
-			return 0 ;  // FIXME: error better
+			// FIXME: error better
+			return 0 ;
 		samples_written += encoded_this_loop ;
 	}
-	return samples_written;
+	return samples_written ;
 }
