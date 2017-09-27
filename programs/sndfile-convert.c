@@ -335,7 +335,11 @@ main (int argc, char * argv [])
 			|| (outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT)
 			|| (infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT)
 			|| (infileminor == SF_FORMAT_VORBIS) || (outfileminor == SF_FORMAT_VORBIS))
-		sfe_copy_data_fp (outfile, infile, sfinfo.channels, normalize) ;
+	{	if (sfe_copy_data_fp (outfile, infile, sfinfo.channels, normalize) != 0)
+		{	printf ("Error : Not able to decode input file %s.\n", infilename) ;
+			return 1 ;
+			} ;
+		}
 	else
 		sfe_copy_data_int (outfile, infile, sfinfo.channels) ;
 
