@@ -39,16 +39,19 @@
 /*------------------------------------------------------------------------------
 ** Private static functions.
 */
-static	int		mp3_close		(SF_PRIVATE *psf) ;
+static	int		mp3_read_open		(SF_PRIVATE * psf) ;
+static	int		mp3_read_close		(SF_PRIVATE * psf) ;
 static	int		mp3_read_header		(SF_PRIVATE * psf, mpg123_handle * decoder) ;
 static	sf_count_t	mp3_read_2s		(SF_PRIVATE * psf, short * ptr, sf_count_t len) ;
 static	sf_count_t	mp3_read_2i		(SF_PRIVATE * psf, int * ptr, sf_count_t len) ;
 static	sf_count_t	mp3_read_2f		(SF_PRIVATE * psf, float * ptr, sf_count_t len) ;
 static	sf_count_t	mp3_read_2d		(SF_PRIVATE * psf, double * ptr, sf_count_t len) ;
-static	sf_count_t	mp3_seek		(SF_PRIVATE *psf, int whence, sf_count_t offset) ;
+static	sf_count_t	mp3_read_seek		(SF_PRIVATE *psf, int whence, sf_count_t offset) ;
 static	ssize_t		mp3_read_sf_handle	(void * handle, void * buffer, size_t bytes) ;
 static	off_t		mp3_seek_sf_handle	(void * handle, off_t offset, int whence) ;
 static	int		mp3_format_to_encoding	(int encoding) ;
+
+static	int		mp3_write_open		(SF_PRIVATE * psf) ;
 
 // FIXME: This initialisation should have a better hook
 static int mpg123_initialised = 0 ;
@@ -57,19 +60,28 @@ static int mpg123_initialised = 0 ;
 ** Public function.
 */
 
-// FIXME: use mpg123 error string reporting
 int
 mp3_open (SF_PRIVATE * psf)
-{	int error = 0 ;
+{	psf->codec_data = NULL ;
+	switch (psf->file.mode) {
+	case (SFM_READ):
+		return mp3_read_open (psf) ;
+	case (SFM_WRITE):
+		return mp3_write_open (psf) ;
+	case (SFM_RDWR):
+		return SFE_UNIMPLEMENTED ;
+	}
+}
+
+/*------------------------------------------------------------------------------
+*/
+
+// FIXME: use mpg123 error string reporting
+static int
+mp3_read_open (SF_PRIVATE * psf)
+{
 	int decoder_err = MPG123_OK ;
 	mpg123_handle * decoder ;
-
-	psf->codec_data = NULL ;
-
-	// TODO: writing!
-	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
-		return SFE_UNIMPLEMENTED ;
-
 	if (mpg123_initialised == 0)
 	{	int decoder_init_err = mpg123_init () ;
 		if (decoder_init_err != MPG123_OK)
@@ -100,22 +112,19 @@ mp3_open (SF_PRIVATE * psf)
 	psf->datalength = psf->filelength - psf->dataoffset ;
 	psf->codec_data = decoder ;
 
-	psf->container_close = mp3_close ;
-	psf->seek = mp3_seek ;
+	psf->container_close = mp3_read_close ;
+	psf->seek = mp3_read_seek ;
 
 	psf->read_short = mp3_read_2s ;
 	psf->read_int = mp3_read_2i ;
 	psf->read_float = mp3_read_2f ;
 	psf->read_double = mp3_read_2d ;
 
-	return error ;
+	return 0 ;
 }
 
-/*------------------------------------------------------------------------------
-*/
-
 static int
-mp3_close (SF_PRIVATE * psf)
+mp3_read_close (SF_PRIVATE * psf)
 {	mpg123_handle * decoder = psf->codec_data ;
 	if (decoder != NULL)
 	{	// mpg123_close(decoder); <- Not sure if we need this?
@@ -129,7 +138,7 @@ mp3_close (SF_PRIVATE * psf)
 }
 
 static sf_count_t
-mp3_seek (SF_PRIVATE *psf, int whence, sf_count_t offset)
+mp3_read_seek (SF_PRIVATE *psf, int whence, sf_count_t offset)
 {	mpg123_handle * decoder = psf->codec_data ;
 	return mpg123_seek (decoder, whence, offset) ;
 }
@@ -204,4 +213,9 @@ mp3_read_2f	(SF_PRIVATE * psf, float * ptr, sf_count_t len)
 static sf_count_t
 mp3_read_2d	(SF_PRIVATE * psf, double * ptr, sf_count_t len)
 {	return mp3_read_as (psf, (unsigned char *) ptr, MPG123_ENC_FLOAT_64, sizeof (double), len) ;
+}
+
+static int
+mp3_write_open (SNDFILE_PRIVATE * psf)
+{	return SFE_UNIMPLEMENTED ;
 }
