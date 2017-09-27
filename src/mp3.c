@@ -23,6 +23,7 @@
 #include	<string.h>
 #include	<ctype.h>
 #include	<mpg123.h>
+#include	<lame.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
@@ -52,6 +53,7 @@ static	off_t		mp3_seek_sf_handle	(void * handle, off_t offset, int whence) ;
 static	int		mp3_format_to_encoding	(int encoding) ;
 
 static	int		mp3_write_open		(SF_PRIVATE * psf) ;
+static	int		mp3_write_close		(SF_PRIVATE * psf) ;
 
 // FIXME: This initialisation should have a better hook
 static int mpg123_initialised = 0 ;
@@ -217,5 +219,24 @@ mp3_read_2d	(SF_PRIVATE * psf, double * ptr, sf_count_t len)
 
 static int
 mp3_write_open (SNDFILE_PRIVATE * psf)
-{	return SFE_UNIMPLEMENTED ;
+{	lame_global_flags * gfp ;
+	int lame_err = 0 ;
+	gfp = lame_init () ;
+	lame_err = lame_init_params (gfp) ;
+	if (lame_err)
+		// FIXME: wrong return code
+		return SFE_UNIMPLEMENTED ;
+	psf->container_close = mp3_write_close ;
+	psf->codec_data = gfp ;
+	return SFE_UNIMPLEMENTED ;
+}
+
+static int
+mp3_write_close (SF_PRIVATE * psf)
+{	lame_global_flags * gfp = psf->codec_data ;
+	if (gfp != NULL)
+	{	lame_close (gfp) ;
+		psf->codec_data = NULL ;
+	}
+	return 0;
 }
