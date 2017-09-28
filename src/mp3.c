@@ -21,6 +21,7 @@
 #include	<stdio.h>
 #include	<fcntl.h>
 #include	<string.h>
+#include	<dlfcn.h>
 #include	<ctype.h>
 #include	<mpg123.h>
 #include	<lame/lame.h>
@@ -43,6 +44,16 @@ typedef struct
 	unsigned char * encbuffer ;
 } MP3_WRITE_PRIVATE ;
 
+typedef struct
+{	unsigned		n_instances ;
+	void			*dlhandle ;
+	lame_global_flags *	(*init) (void) ;
+	void			(*close) (lame_global_flags *) ;
+	int			(*init_params) (lame_global_flags *) ;
+	int			(*encode_interleaved) (
+		lame_global_flags *, short *, int, unsigned char *, int) ;
+} LAME_LIB_HANDLE ;
+
 /*------------------------------------------------------------------------------
 ** Private static functions.
 */
@@ -57,6 +68,9 @@ static	sf_count_t	mp3_read_seek		(SF_PRIVATE *psf, int whence, sf_count_t offset
 static	ssize_t		mp3_read_sf_handle	(void * handle, void * buffer, size_t bytes) ;
 static	off_t		mp3_seek_sf_handle	(void * handle, off_t offset, int whence) ;
 static	int		mp3_format_to_encoding	(int encoding) ;
+
+static	char *		mp3_init_lame		(void) ;
+static	void		mp3_close_lame		(void) ;
 
 static	int		mp3_write_open		(SF_PRIVATE * psf) ;
 static	int		mp3_write_close		(SF_PRIVATE * psf) ;
@@ -227,16 +241,72 @@ mp3_read_2d	(SF_PRIVATE * psf, double * ptr, sf_count_t len)
 #define MAX_SAMPLES_ENCODED 1024
 #define ENC_BUFFER_SIZE (1.25 * MAX_SAMPLES_ENCODED) + 7200
 
+static LAME_LIB_HANDLE lame_handle = {} ;
+
+static char *
+mp3_init_lame ()
+{	int failed = 0 ;
+	char * err = NULL ;
+	while (lame_handle.dlhandle == NULL)
+	{	lame_handle.dlhandle = dlopen ("liblame.so", RTLD_LAZY) ;
+		if (lame_handle.dlhandle == NULL)
+			return dlerror () ;
+		lame_handle.init = dlsym (lame_handle.dlhandle, "lame_init") ;
+		if (lame_handle.init == NULL)
+		{	failed = 1 ;
+			break ;
+		}
+		lame_handle.close = dlsym (lame_handle.dlhandle, "lame_close") ;
+		if (lame_handle.close == NULL)
+		{	failed = 1 ;
+			break ;
+		}
+		lame_handle.init_params = dlsym (lame_handle.dlhandle, "init_params") ;
+		if (lame_handle.init_params == NULL)
+		{	failed = 1 ;
+			break ;
+		}
+		lame_handle.encode_interleaved = dlsym (
+			lame_handle.dlhandle, "lame_encode_buffer_interleaved") ;
+		if (lame_handle.encode_interleaved == NULL)
+		{	failed = 1 ;
+			break ;
+		}
+	}
+	if (failed)
+	{	err = dlerror () ;
+		dlclose (lame_handle.dlhandle) ;
+		lame_handle.dlhandle = NULL ;
+	} else
+		lame_handle.n_instances++ ;
+	return err ;
+}
+
+static void
+mp3_close_lame ()
+{	if (lame_handle.dlhandle != NULL && !--lame_handle.n_instances)
+	{	dlclose (lame_handle.dlhandle) ;
+		lame_handle.dlhandle = NULL ;
+	}
+}
+
 static int
 mp3_write_open (SF_PRIVATE * psf)
 {	lame_global_flags * gfp ;
 	MP3_WRITE_PRIVATE * codec_data ;
 	int lame_err = 0 ;
-	gfp = lame_init () ;
-	lame_err = lame_init_params (gfp) ;
+	char * err = mp3_init_lame () ;
+	if (err != NULL)
+	{	psf_log_printf (psf, err) ;
+		return SFE_UNIMPLEMENTED ; // FIXME: wrong return code
+	}
+	gfp = lame_handle.init () ;
+	lame_err = lame_handle.init_params (gfp) ;
 	if (lame_err)
+	{	lame_handle.close (gfp) ;
 		// FIXME: wrong return code
 		return SFE_UNIMPLEMENTED ;
+	}
 	psf->container_close = mp3_write_close ;
 	codec_data = malloc (sizeof (MP3_WRITE_PRIVATE)) ;
 	codec_data->gfp = gfp ;
@@ -251,11 +321,12 @@ static int
 mp3_write_close (SF_PRIVATE * psf)
 {	MP3_WRITE_PRIVATE * p = psf->codec_data ;
 	if (p != NULL)
-	{	lame_close (p->gfp) ;
+	{	lame_handle.close (p->gfp) ;
 		free (p->encbuffer) ;
 		free (p) ;
 		psf->codec_data = NULL ;
 	}
+	mp3_close_lame () ;
 	return 0 ;
 }
 
@@ -270,7 +341,7 @@ mp3_write_2s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 			(len > MAX_SAMPLES_ENCODED) ? MAX_SAMPLES_ENCODED : len ;
 		#pragma GCC diagnostic push
 		#pragma GCC diagnostic ignored "-Wcast-qual"
-		n_bytes_encoded = lame_encode_buffer_interleaved (
+		n_bytes_encoded = lame_handle.encode_interleaved (
 			p->gfp, (short *) ptr, encoded_this_loop, p->encbuffer, ENC_BUFFER_SIZE) ;
 		#pragma GCC diagnostic pop
 		written_to_file = psf_fwrite (p->encbuffer, 1, n_bytes_encoded, psf) ;

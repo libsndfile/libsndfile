@@ -371,7 +371,7 @@ dnl #===========================================================================
 dnl # Check for mp3 encoder/decoder
 
 PKG_CHECK_MOD_VERSION(MPG123, libmpg123 >= 1.0.0, ac_cv_mpg123=yes, ac_cv_mpg123=no)
-MP3_LIBS="$MPG123_LIBS"
+MP3_LIBS="$MPG123_LIBS -ldl"
 MP3_CFLAGS="$MPG123_CFLAGS"
 
 dnl ====================================================================================
