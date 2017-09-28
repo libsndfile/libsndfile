@@ -91,7 +91,7 @@ int
 double64_init	(SF_PRIVATE *psf)
 {	static int double64_caps ;
 
-	if (psf->sf.channels < 1)
+	if (psf->sf.channels < 1 || psf->sf.channels > SF_MAX_CHANNELS)
 	{	psf_log_printf (psf, "double64_init : internal error : channels = %d\n", psf->sf.channels) ;
 		return SFE_INTERNAL ;
 		} ;
