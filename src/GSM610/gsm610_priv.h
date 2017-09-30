@@ -7,6 +7,8 @@
 #ifndef	PRIVATE_H
 #define	PRIVATE_H
 
+#include <stdint.h>
+
 /* Added by Erik de Castro Lopo */
 #define	USE_FLOAT_MUL
 #define	FAST
@@ -16,14 +18,6 @@
 #error "This code is not designed to be compiled with a C++ compiler."
 #endif
 /* Added by Erik de Castro Lopo */
-
-
-
-typedef short				int16_t ;		/* 16 bit signed int	*/
-typedef int					int32_t ;	/* 32 bit signed int	*/
-
-typedef unsigned short		uint16_t ;		/* unsigned int16_t	*/
-typedef unsigned int		uint32_t ;	/* unsigned int32_t	*/
 
 struct gsm_state
 {	int16_t			dp0 [280] ;
