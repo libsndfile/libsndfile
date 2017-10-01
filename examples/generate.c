@@ -30,8 +30,6 @@
 ** ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "sfconfig.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
