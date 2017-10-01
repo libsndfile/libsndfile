@@ -39,7 +39,7 @@ extern "C" {
 #define	ARRAY_LEN(x)		((int) (sizeof (x)) / (sizeof ((x) [0])))
 #define SIGNED_SIZEOF(x)	((int64_t) (sizeof (x)))
 #define	NOT(x)				(! (x))
-#define	ABS(x)				((x) >= 0 ? (x) : -(x))
+#define	ABS(x)				((x) >= 0 ? (x) : - (x))
 
 #define	PIPE_INDEX(x)	((x) + 500)
 #define	PIPE_TEST_LEN	12345
@@ -503,7 +503,7 @@ test_sf_format_or_die (const SF_INFO *info, int line_num)
 {	int res ;
 
 	if ((res = sf_format_check (info)) != 1)
-	{	printf ("\n\nLine %d : sf_format_check returned error (%d)\n\n", line_num,res) ;
+	{	printf ("\n\nLine %d : sf_format_check returned error (%d)\n\n", line_num, res) ;
 		exit (1) ;
 		} ;
 

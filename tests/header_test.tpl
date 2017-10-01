@@ -339,7 +339,7 @@ update_header_before_write_test (const char *filename, int typemajor)
 	SF_INFO		sfinfo ;
 	int			k ;
 
-	print_test_name ("update_header_before_write", filename);
+	print_test_name ("update_header_before_write", filename) ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate = 44100 ;

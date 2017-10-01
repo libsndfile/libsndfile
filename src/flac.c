@@ -235,7 +235,7 @@ flac_buffer_copy (SF_PRIVATE *psf)
 						for (j = 0 ; j < channels ; j++)
 							retpcm [offset + j] = buffer [j][pflac->bufferpos] >> shift ;
 						pflac->remain -= channels ;
-						pflac->bufferpos++ ;
+						pflac->bufferpos ++ ;
 						}
 					}
 				else
@@ -252,7 +252,7 @@ flac_buffer_copy (SF_PRIVATE *psf)
 							retpcm [offset + j] = ((uint16_t) buffer [j][pflac->bufferpos]) << shift ;
 
 						pflac->remain -= channels ;
-						pflac->bufferpos++ ;
+						pflac->bufferpos ++ ;
 						} ;
 					} ;
 				} ;
