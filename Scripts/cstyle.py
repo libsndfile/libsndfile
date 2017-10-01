@@ -1,6 +1,6 @@
 #!/usr/bin/python -tt
 #
-# Copyright (C) 2005-2012 Erik de Castro Lopo <erikd@mega-nerd.com>
+# Copyright (C) 2005-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 #
 # Released under the 2 clause BSD license.
 
@@ -121,7 +121,7 @@ class CStyleChecker:
 			, ( re.compile ("[ \t]+$"),	"contains trailing whitespace" )
 
 			, ( re.compile (",[^\s\n]"),		"missing space after comma" )
-			, ( re.compile (";[a-zA-Z0-9]"), 	"missing space after semi-colon" )
+			, ( re.compile (";[^\s]"), 	"missing space after semi-colon" )
 			, ( re.compile ("=[^\s\"'=]"),		"missing space after assignment" )
 
 			# Open and close parenthesis.
@@ -143,6 +143,16 @@ class CStyleChecker:
 
 			# Parens around single argument to return.
 			, ( re.compile ("\s+return\s+\([a-zA-Z0-9_]+\)\s+;"),	"parens around return value" )
+
+			# Parens around single case argument.
+			, ( re.compile ("\s+case\s+\([a-zA-Z0-9_]+\)\s+:"),	"parens around single case argument" )
+
+			# Open curly at end of line.
+			, ( re.compile ("\)\s*{\s*$"),	"open curly brace at end of line" )
+
+			# Pre and post increment/decrment.
+			, ( re.compile ("[^\(\[][+-]{2}[a-zA-Z0-9_]"),       "space after pre increment/decrement" )
+			, ( re.compile ("[a-zA-Z0-9_][+-]{2}[^\)\,]]"),       "space before post increment/decrement" )
 			]
 
 	def get_error_count (self):
