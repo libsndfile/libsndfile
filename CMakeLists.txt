@@ -477,7 +477,7 @@ if (BUILD_PROGRAMS)
 	add_executable (sndfile-play ${sndfile_play_SOURCES})
 	target_link_libraries(sndfile-play PUBLIC ${SNDFILE_TARGET})
 	if (LIBM_REQUIRED)
-		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+		target_link_libraries(sndfile-play PRIVATE ${M_LIBRARY})
 	endif ()
 	if (WIN32)
 		target_link_libraries(sndfile-play PRIVATE Winmm.lib)
@@ -512,7 +512,7 @@ if (BUILD_PROGRAMS)
 	add_executable (sndfile-cmp ${sndfile_cmp_SOURCES})
 	target_link_libraries(sndfile-cmp PUBLIC ${SNDFILE_TARGET})
 	if (LIBM_REQUIRED)
-		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+		target_link_libraries(sndfile-cmp PRIVATE ${M_LIBRARY})
 	endif ()
 
 # sndfile-metadata-set
@@ -536,7 +536,7 @@ if (BUILD_PROGRAMS)
 	add_executable (sndfile-metadata-get ${sndfile_metadata_get_SOURCES})
 	target_link_libraries(sndfile-metadata-get PUBLIC ${SNDFILE_TARGET})
 	if (LIBM_REQUIRED)
-		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+		target_link_libraries(sndfile-metadata-get PRIVATE ${M_LIBRARY})
 	endif ()
 
 # sndfile-interleave
@@ -548,7 +548,7 @@ if (BUILD_PROGRAMS)
 	add_executable (sndfile-interleave ${sndfile_interleave_SOURCES})
 	target_link_libraries(sndfile-interleave PUBLIC ${SNDFILE_TARGET})
 	if (LIBM_REQUIRED)
-		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+		target_link_libraries(sndfile-interleave PRIVATE ${M_LIBRARY})
 	endif ()
 
 # sndfile-deinterleave
@@ -560,7 +560,7 @@ if (BUILD_PROGRAMS)
 	add_executable (sndfile-deinterleave ${sndfile_deinterleave_SOURCES})
 	target_link_libraries(sndfile-deinterleave PUBLIC ${SNDFILE_TARGET})
 	if (LIBM_REQUIRED)
-		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+		target_link_libraries(sndfile-deinterleave PRIVATE ${M_LIBRARY})
 	endif ()
 
 # sndfile-concat
@@ -572,7 +572,7 @@ if (BUILD_PROGRAMS)
 	add_executable (sndfile-concat ${sndfile_concat_SOURCES})
 	target_link_libraries(sndfile-concat PUBLIC ${SNDFILE_TARGET})
 	if (LIBM_REQUIRED)
-		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+		target_link_libraries(sndfile-concat PRIVATE ${M_LIBRARY})
 	endif ()
 
 # sndfile-salvage
@@ -584,7 +584,7 @@ if (BUILD_PROGRAMS)
 	add_executable (sndfile-salvage ${sndfile_salvage_SOURCES})
 	target_link_libraries(sndfile-salvage PUBLIC ${SNDFILE_TARGET})
 	if (LIBM_REQUIRED)
-		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+		target_link_libraries(sndfile-salvage PRIVATE ${M_LIBRARY})
 	endif ()
 
 	set (SNDFILE_PROGRAM_TARGETS
