@@ -458,7 +458,7 @@ if (BUILD_PROGRAMS)
 		programs/common.h)
 	add_executable (sndfile-info ${sndfile_info_SOURCES})
 	target_link_libraries(sndfile-info PUBLIC ${SNDFILE_TARGET})
-	if (BUILD_SHARED_LIBS AND LIBM_REQUIRED)
+	if (LIBM_REQUIRED)
 		target_link_libraries(sndfile-info PRIVATE ${M_LIBRARY})
 	endif ()
 
@@ -476,6 +476,9 @@ if (BUILD_PROGRAMS)
 
 	add_executable (sndfile-play ${sndfile_play_SOURCES})
 	target_link_libraries(sndfile-play PUBLIC ${SNDFILE_TARGET})
+	if (LIBM_REQUIRED)
+		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+	endif ()
 	if (WIN32)
 		target_link_libraries(sndfile-play PRIVATE Winmm.lib)
 	# Maybe ALSA & Sndio are present in BeOS. They are not required
@@ -508,6 +511,9 @@ if (BUILD_PROGRAMS)
 		programs/common.h)
 	add_executable (sndfile-cmp ${sndfile_cmp_SOURCES})
 	target_link_libraries(sndfile-cmp PUBLIC ${SNDFILE_TARGET})
+	if (LIBM_REQUIRED)
+		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+	endif ()
 
 # sndfile-metadata-set
 
@@ -529,6 +535,9 @@ if (BUILD_PROGRAMS)
 		programs/common.h)
 	add_executable (sndfile-metadata-get ${sndfile_metadata_get_SOURCES})
 	target_link_libraries(sndfile-metadata-get PUBLIC ${SNDFILE_TARGET})
+	if (LIBM_REQUIRED)
+		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+	endif ()
 
 # sndfile-interleave
 
@@ -538,6 +547,9 @@ if (BUILD_PROGRAMS)
 		programs/common.h)
 	add_executable (sndfile-interleave ${sndfile_interleave_SOURCES})
 	target_link_libraries(sndfile-interleave PUBLIC ${SNDFILE_TARGET})
+	if (LIBM_REQUIRED)
+		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+	endif ()
 
 # sndfile-deinterleave
 
@@ -547,6 +559,9 @@ if (BUILD_PROGRAMS)
 		programs/common.h)
 	add_executable (sndfile-deinterleave ${sndfile_deinterleave_SOURCES})
 	target_link_libraries(sndfile-deinterleave PUBLIC ${SNDFILE_TARGET})
+	if (LIBM_REQUIRED)
+		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+	endif ()
 
 # sndfile-concat
 
@@ -556,6 +571,9 @@ if (BUILD_PROGRAMS)
 		programs/common.h)
 	add_executable (sndfile-concat ${sndfile_concat_SOURCES})
 	target_link_libraries(sndfile-concat PUBLIC ${SNDFILE_TARGET})
+	if (LIBM_REQUIRED)
+		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+	endif ()
 
 # sndfile-salvage
 
@@ -565,6 +583,9 @@ if (BUILD_PROGRAMS)
 		programs/common.h)
 	add_executable (sndfile-salvage ${sndfile_salvage_SOURCES})
 	target_link_libraries(sndfile-salvage PUBLIC ${SNDFILE_TARGET})
+	if (LIBM_REQUIRED)
+		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+	endif ()
 
 	set (SNDFILE_PROGRAM_TARGETS
 		sndfile-info

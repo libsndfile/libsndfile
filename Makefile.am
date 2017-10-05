@@ -415,34 +415,34 @@ endif
 EXTRA_DIST += programs/sndfile-play-beos.cpp programs/test-sndfile-metadata-set.py
 
 programs_sndfile_info_SOURCES = programs/sndfile-info.c programs/common.c programs/common.h
-programs_sndfile_info_LDADD = src/libsndfile.la
+programs_sndfile_info_LDADD = src/libsndfile.la $(LIBM)
 
 programs_sndfile_play_SOURCES = programs/sndfile-play.c programs/common.c programs/common.h
-programs_sndfile_play_LDADD = src/libsndfile.la $(OS_SPECIFIC_LINKS) $(ALSA_LIBS) $(SNDIO_LIBS)
+programs_sndfile_play_LDADD = src/libsndfile.la $(OS_SPECIFIC_LINKS) $(ALSA_LIBS) $(SNDIO_LIBS) $(LIBM)
 
 programs_sndfile_convert_SOURCES = programs/sndfile-convert.c programs/common.c programs/common.h
 programs_sndfile_convert_LDADD = src/libsndfile.la $(LIBM)
 
 programs_sndfile_cmp_SOURCES = programs/sndfile-cmp.c programs/common.c programs/common.h
-programs_sndfile_cmp_LDADD = src/libsndfile.la
+programs_sndfile_cmp_LDADD = src/libsndfile.la $(LIBM)
 
 programs_sndfile_metadata_set_SOURCES = programs/sndfile-metadata-set.c programs/common.c programs/common.h
 programs_sndfile_metadata_set_LDADD = src/libsndfile.la $(LIBM)
 
 programs_sndfile_metadata_get_SOURCES = programs/sndfile-metadata-get.c programs/common.c programs/common.h
-programs_sndfile_metadata_get_LDADD = src/libsndfile.la
+programs_sndfile_metadata_get_LDADD = src/libsndfile.la $(LIBM)
 
 programs_sndfile_interleave_SOURCES = programs/sndfile-interleave.c programs/common.c programs/common.h
-programs_sndfile_interleave_LDADD = src/libsndfile.la
+programs_sndfile_interleave_LDADD = src/libsndfile.la $(LIBM)
 
 programs_sndfile_deinterleave_SOURCES = programs/sndfile-deinterleave.c programs/common.c programs/common.h
-programs_sndfile_deinterleave_LDADD = src/libsndfile.la
+programs_sndfile_deinterleave_LDADD = src/libsndfile.la $(LIBM)
 
 programs_sndfile_concat_SOURCES = programs/sndfile-concat.c programs/common.c programs/common.h
-programs_sndfile_concat_LDADD = src/libsndfile.la
+programs_sndfile_concat_LDADD = src/libsndfile.la $(LIBM)
 
 programs_sndfile_salvage_SOURCES = programs/sndfile-salvage.c programs/common.c programs/common.h
-programs_sndfile_salvage_LDADD = src/libsndfile.la
+programs_sndfile_salvage_LDADD = src/libsndfile.la $(LIBM)
 
 ############
 # regtest/ #
