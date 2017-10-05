@@ -496,6 +496,9 @@ if (BUILD_PROGRAMS)
 		programs/common.h)
 	add_executable (sndfile-convert ${sndfile_convert_SOURCES})
 	target_link_libraries(sndfile-convert PUBLIC ${SNDFILE_TARGET})
+	if (LIBM_REQUIRED)
+		target_link_libraries(sndfile-convert PRIVATE ${M_LIBRARY})
+	endif ()
 
 # sndfile-cmp
 
@@ -514,6 +517,9 @@ if (BUILD_PROGRAMS)
 		programs/common.h)
 	add_executable (sndfile-metadata-set ${sndfile_metadata_set_SOURCES})
 	target_link_libraries(sndfile-metadata-set PUBLIC ${SNDFILE_TARGET})
+	if (LIBM_REQUIRED)
+		target_link_libraries(sndfile-metadata-set PRIVATE ${M_LIBRARY})
+	endif ()
 
 # sndfile-metadata-get
 

@@ -67,7 +67,7 @@ src_libsndfile_la_SOURCES = src/sndfile.c src/aiff.c src/au.c src/avr.c src/caf.
 	src/sf_unistd.h src/ogg.h src/chanmap.h
 nodist_src_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
 src_libsndfile_la_LIBADD = src/GSM610/libgsm.la src/G72x/libg72x.la src/ALAC/libalac.la \
-	src/libcommon.la $(EXTERNAL_XIPH_LIBS) -lm
+	src/libcommon.la $(EXTERNAL_XIPH_LIBS) $(LIBM)
 EXTRA_src_libsndfile_la_DEPENDENCIES = $(SYMBOL_FILES)
 
 noinst_LTLIBRARIES = src/libcommon.la
@@ -421,13 +421,13 @@ programs_sndfile_play_SOURCES = programs/sndfile-play.c programs/common.c progra
 programs_sndfile_play_LDADD = src/libsndfile.la $(OS_SPECIFIC_LINKS) $(ALSA_LIBS) $(SNDIO_LIBS)
 
 programs_sndfile_convert_SOURCES = programs/sndfile-convert.c programs/common.c programs/common.h
-programs_sndfile_convert_LDADD = src/libsndfile.la
+programs_sndfile_convert_LDADD = src/libsndfile.la $(LIBM)
 
 programs_sndfile_cmp_SOURCES = programs/sndfile-cmp.c programs/common.c programs/common.h
 programs_sndfile_cmp_LDADD = src/libsndfile.la
 
 programs_sndfile_metadata_set_SOURCES = programs/sndfile-metadata-set.c programs/common.c programs/common.h
-programs_sndfile_metadata_set_LDADD = src/libsndfile.la
+programs_sndfile_metadata_set_LDADD = src/libsndfile.la $(LIBM)
 
 programs_sndfile_metadata_get_SOURCES = programs/sndfile-metadata-get.c programs/common.c programs/common.h
 programs_sndfile_metadata_get_LDADD = src/libsndfile.la

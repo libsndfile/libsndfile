@@ -289,6 +289,9 @@ AC_CHECK_FUNCS([mmap getpagesize])
 AC_CHECK_FUNCS([setlocale])
 AC_CHECK_FUNCS([pipe waitpid])
 
+AC_CHECK_LIBM
+AC_SUBST(LIBM)
+
 AC_SEARCH_LIBS([floor], [m], [], [
 		AC_MSG_ERROR([unable to find the floor() function!])
 	])
