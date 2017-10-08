@@ -34,7 +34,7 @@
 HOST_TRIPLET=@HOST_TRIPLET@
 PACKAGE_VERSION=@PACKAGE_VERSION@
 LIB_VERSION=$(echo $PACKAGE_VERSION | sed "s/[a-z].*//")
-TOP_SRCDIR=@top_srcdir@
+ABS_TOP_SRCDIR=@abs_top_srcdir@
 PYTHON=@PYTHON@
 
 sfversion=$(./tests/sfversion@EXEEXT@ | grep libsndfile | sed "s/-exp$//")
@@ -350,12 +350,12 @@ echo "----------------------------------------------------------------------"
 echo "  $sfversion passed stdio/pipe/vio tests."
 echo "----------------------------------------------------------------------"
 
-"${PYTHON}" "tests/${TOP_SRCDIR}/src/binheader_writef_check.py" "tests/${TOP_SRCDIR}/src"/*.c
+"${PYTHON}" "${ABS_TOP_SRCDIR}/src/binheader_writef_check.py" "${ABS_TOP_SRCDIR}/src"/*.c
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed binary header tests."
 echo "----------------------------------------------------------------------"
 
-"${PYTHON}" "tests/${TOP_SRCDIR}/programs/test-sndfile-metadata-set.py" "${HOST_TRIPLET}"
+"${PYTHON}" "${ABS_TOP_SRCDIR}/programs/test-sndfile-metadata-set.py" "${HOST_TRIPLET}"
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed sndfile metadata tests."
 echo "----------------------------------------------------------------------"

@@ -37,9 +37,11 @@ checkprograms: $(check_PROGRAMS)
 # src/ #
 ########
 
+BUILT_SOURCES = src/test_endswap.c
+
 SYMBOL_FILES = src/Symbols.gnu-binutils src/Symbols.darwin src/libsndfile-1.def src/Symbols.os2 src/Symbols.static
 
-EXTRA_DIST += src/sndfile.h.in src/config.h.in src/test_endswap.c src/test_endswap.tpl src/test_endswap.def \
+EXTRA_DIST += src/sndfile.h.in src/config.h.in src/test_endswap.tpl src/test_endswap.def \
 	$(SYMBOL_FILES) src/create_symbols_file.py src/binheader_writef_check.py \
 	src/GSM610/README src/GSM610/COPYRIGHT src/GSM610/ChangeLog \
 	src/G72x/README src/G72x/README.original src/G72x/ChangeLog \
@@ -126,19 +128,19 @@ src_ALAC_libalac_la_SOURCES = src/ALAC/ALACAudioTypes.h src/ALAC/ALACBitUtilitie
 # end user to create these files.
 
 src/Symbols.gnu-binutils: $(top_srcdir)/src/create_symbols_file.py
-	$(PYTHON) $< linux $(VERSION) > $@
+	$(PYTHON) $< linux $(VERSION) > $(top_srcdir)/$@
 
 src/Symbols.darwin: $(top_srcdir)/src/create_symbols_file.py
-	$(PYTHON) $< darwin $(VERSION) > $@
+	$(PYTHON) $< darwin $(VERSION) > $(top_srcdir)/$@
 
 src/libsndfile-1.def: $(top_srcdir)/src/create_symbols_file.py
-	$(PYTHON) $< win32 $(VERSION) > $@
+	$(PYTHON) $< win32 $(VERSION) > $(top_srcdir)/$@
 
 src/Symbols.os2: $(top_srcdir)/src/create_symbols_file.py
-	$(PYTHON) $< os2 $(VERSION) > $@
+	$(PYTHON) $< os2 $(VERSION) > $(top_srcdir)/$@
 
 src/Symbols.static: $(top_srcdir)/src/create_symbols_file.py
-	$(PYTHON) $< static $(VERSION) > $@
+	$(PYTHON) $< static $(VERSION) > $(top_srcdir)/$@
 
 #===============================================================================
 # Building windows resource files (if needed).
@@ -214,16 +216,27 @@ check_PROGRAMS += tests/sfversion tests/floating_point_test tests/write_read_tes
 	tests/channel_test tests/long_read_write_test tests/stdin_test tests/stdout_test \
 	tests/dither_test tests/fix_this tests/largefile_test tests/benchmark
 
-EXTRA_DIST += \
-	tests/write_read_test.c      tests/write_read_test.tpl     tests/write_read_test.def \
-	tests/pcm_test.c             tests/pcm_test.tpl            tests/pcm_test.def \
-	tests/header_test.c          tests/header_test.tpl         tests/header_test.def \
-	tests/utils.c                tests/utils.tpl               tests/utils.def \
-	tests/scale_clip_test.c      tests/scale_clip_test.tpl     tests/scale_clip_test.def \
-	tests/pipe_test.c            tests/pipe_test.tpl           tests/pipe_test.def \
-	tests/rdwr_test.c            tests/rdwr_test.tpl           tests/rdwr_test.def \
-	tests/floating_point_test.c  tests/floating_point_test.tpl tests/floating_point_test.def \
-	tests/benchmark.c            tests/benchmark.tpl           tests/benchmark.def
+BUILT_SOURCES += \
+	tests/write_read_test.c \
+	tests/pcm_test.c \
+	tests/header_test.c \
+	tests/utils.c \
+	tests/scale_clip_test.c \
+	tests/pipe_test.c \
+	tests/rdwr_test.c \
+	tests/floating_point_test.c \
+	tests/benchmark.c
+
+EXTRA_DIST += $(BUILT_SOURCES) \
+	tests/write_read_test.tpl     tests/write_read_test.def \
+	tests/pcm_test.tpl            tests/pcm_test.def \
+	tests/header_test.tpl         tests/header_test.def \
+	tests/utils.tpl               tests/utils.def \
+	tests/scale_clip_test.tpl     tests/scale_clip_test.def \
+	tests/pipe_test.tpl           tests/pipe_test.def \
+	tests/rdwr_test.tpl           tests/rdwr_test.def \
+	tests/floating_point_test.tpl tests/floating_point_test.def \
+	tests/benchmark.tpl           tests/benchmark.def
 
 # If we're cross compiling from Linux to Windows and running the test suite
 # under Wine, we need a symbolic link to the generated libsndfile DLL.
@@ -373,11 +386,11 @@ tests_scale_clip_test_LDADD = src/libsndfile.la
 # These GNU style rules actually work. The old style suffix rules do not.
 
 %.c : %.def %.tpl
-	cd $(@D) && autogen --writable $(<F)
+	cd $(top_srcdir)/$(@D) && autogen --writable $(<F)
 
 # recommended Automake way for multi-output targets:
 # https://www.gnu.org/software/automake/manual/html_node/Multiple-Outputs.html
-%.h : %.c
+%.h : %.c %.def %.tpl
 	@if test -f $@; then :; else \
 	  rm -f $<; \
 	  $(MAKE) $(AM_MAKEFLAGS) $<; \
@@ -395,11 +408,11 @@ dist_man_MANS = man/sndfile-info.1 man/sndfile-play.1 man/sndfile-convert.1 man/
 # Same manpage for both programs.
 man/sndfile-metadata-set.1: man/sndfile-metadata-get.1
 	-rm -f $@
-	cd $(@D) && $(LN_S) $(<F) $(@F)
+	cd $(top_srcdir)/$(@D) && $(LN_S) $(<F) $(@F)
 
 man/sndfile-deinterleave.1: man/sndfile-interleave.1
 	-rm -f $@
-	cd $(@D) && $(LN_S) $(<F) $(@F)
+	cd $(top_srcdir)/$(@D) && $(LN_S) $(<F) $(@F)
 
 #############
 # programs/ #
@@ -409,6 +422,9 @@ bin_PROGRAMS = programs/sndfile-info programs/sndfile-play programs/sndfile-conv
 	programs/sndfile-metadata-set programs/sndfile-metadata-get programs/sndfile-interleave \
 	programs/sndfile-deinterleave programs/sndfile-concat programs/sndfile-salvage
 endif
+
+# required by test-sndfile-metadata-set.py
+check_PROGRAMS += programs/sndfile-metadata-set programs/sndfile-metadata-get
 
 # This is the BeOS version of sndfile-play. It needs to be compiled with the C++
 # compiler.
