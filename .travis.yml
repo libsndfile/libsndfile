@@ -32,6 +32,7 @@ matrix:
 before_install:
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+      brew update
       brew install autogen flac libogg libvorbis
     else
       sudo add-apt-repository ppa:ondrej/autotools -y # automake 1.15
