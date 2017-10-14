@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -68,6 +68,7 @@ usage_exit (const char *progname)
 		"        -pcm24     : 24 bit pcm\n"
 		"        -pcm32     : 32 bit pcm\n"
 		"        -float32   : 32 bit floating point\n"
+		"        -float64   : 64 bit floating point\n"
 		"        -ulaw      : ULAW\n"
 		"        -alaw      : ALAW\n"
 		"        -alac16    : 16 bit ALAC (CAF only)\n"
@@ -176,6 +177,10 @@ main (int argc, char * argv [])
 			} ;
 		if (! strcmp (argv [k], "-float32"))
 		{	outfileminor = SF_FORMAT_FLOAT ;
+			continue ;
+			} ;
+		if (! strcmp (argv [k], "-float64"))
+		{	outfileminor = SF_FORMAT_DOUBLE ;
 			continue ;
 			} ;
 		if (! strcmp (argv [k], "-ulaw"))
