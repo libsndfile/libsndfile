@@ -264,11 +264,10 @@ psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence)
 
 	/* When decoding from pipes sometimes see seeks to the pipeoffset, which appears to mean do nothing. */
 	if (psf->is_pipe)
-	{
-		if (whence != SEEK_SET || offset != psf->pipeoffset)
+	{	if (whence != SEEK_SET || offset != psf->pipeoffset)
 			psf_log_printf (psf, "psf_fseek : pipe seek to value other than pipeoffset\n") ;
 		return offset ;
-	}
+		}
 
 	switch (whence)
 	{	case SEEK_SET :
