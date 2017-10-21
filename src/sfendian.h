@@ -68,7 +68,13 @@ ENDSWAP_64X (int64_t x)
 #endif
 #endif
 
-#if (HAVE_BYTESWAP_H == 0) && (COMPILER_IS_GCC == 0)
+#ifdef _MSC_VER
+#include <stdlib.h>
+
+#define	ENDSWAP_16(x)		(_byteswap_ushort (x))
+#define	ENDSWAP_32(x)		(_byteswap_ulong (x))
+#define	ENDSWAP_64(x)		(_byteswap_uint64 (x))
+#elif (HAVE_BYTESWAP_H == 0) && (COMPILER_IS_GCC == 0)
 
 #define	ENDSWAP_16(x)		((((x) >> 8) & 0xFF) + (((x) & 0xFF) << 8))
 #define	ENDSWAP_32(x)		((((x) >> 24) & 0xFF) + (((x) >> 8) & 0xFF00) + (((x) & 0xFF00) << 8) + (((x) & 0xFF) << 24))
