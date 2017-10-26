@@ -357,6 +357,7 @@ update_header_before_write_test (const char *filename, int typemajor)
 		data_out [k] = k + 1 ;
 	test_write_int_or_die (outfile, 0, data_out, BUFFER_LEN, __LINE__) ;
 
+	sf_close (outfile) ;
 	unlink (filename) ;
 	puts ("ok") ;
 } /* update_header_before_write_test */
