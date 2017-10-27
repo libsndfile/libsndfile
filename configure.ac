@@ -598,7 +598,9 @@ AS_IF([test "x$ax_cv_c_compiler_vendor" = "xgnu"], [
 				win32_target_dll=1
 				AS_IF([test "x$enable_shared" = "xno"], [
 						win32_target_dll=0
-					])],
+					])
+				AX_APPEND_COMPILE_FLAGS([-mstackrealign], [CFLAGS])
+				],
 			[os2*], [
 				SHLIB_VERSION_ARG="-Wl,-export-symbols \$(top_srcdir)/src/Symbols.os2"
 			])
