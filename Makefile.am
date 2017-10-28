@@ -471,3 +471,10 @@ endif
 regtest_sndfile_regtest_SOURCES = regtest/regtest.h regtest/sndfile-regtest.c regtest/database.c regtest/checksum.c
 regtest_sndfile_CPPFLAGS = -I$(top_srcdir)/src $(SQLITE3_CFLAGS) $(OS_SPECIFIC_CFLAGS)
 regtest_sndfile_regtest_LDADD = src/libsndfile.la $(SQLITE3_LIBS)
+
+################
+# test-tarball #
+################
+test-tarball : Scripts/build-test-tarball.mk
+	$(MAKE) $(bin_PROGRAMS) $(check_PROGRAMS)
+	$(MAKE) -f Scripts/build-test-tarball.mk
