@@ -24,15 +24,12 @@ TARBALL = $(TESTNAME).tar.gz
 # Find the test programs by grepping the script for the programs it executes.
 testprogs := $(shell grep '^\./' tests/test_wrapper.sh | sed -e "s|./||" -e "s/ .*//" | sort | uniq)
 # Also add the programs not found by the above.
-testprogs += sfversion@EXEEXT@ stdin_test@EXEEXT@ stdout_test@EXEEXT@ cpp_test@EXEEXT@ win32_test@EXEEXT@
-
-# Find the single test program in src/ .
-srcprogs := $(shell if test -x src/.libs/test_main$(EXEEXT) ; then echo "src/.libs/test_main$(EXEEXT)" ; else echo "src/test_main$(EXEEXT)" ; fi)
+testprogs += tests/sfversion$(EXEEXT) tests/stdin_test$(EXEEXT) tests/stdout_test$(EXEEXT) \
+				tests/cpp_test$(EXEEXT) tests/win32_test$(EXEEXT)
 
 libfiles := $(shell if test ! -z $(EXEEXT) ; then echo "src/libsndfile-1.def src/.libs/libsndfile-1.dll" ; elif test -f $(LIBRARY) ; then echo $(LIBRARY) ; fi  ; fi)
 
-testbins := $(addprefix $(TEST_BINDIR),$(subst @EXEEXT@,$(EXEEXT),$(testprogs))) $(libfiles) $(srcprogs)
-
+testbins := $(testprogs) $(libfiles)
 
 all : $(TARBALL)
 
@@ -49,13 +46,16 @@ $(TARBALL) : $(TESTNAME)/test_wrapper.sh
 	@echo "Created : $(TARBALL)"
 	@echo
 
-$(TESTNAME)/test_wrapper.sh : $(testbins) tests/test_wrapper.sh tests/pedantic-header-test.sh
+$(TESTNAME)/test_wrapper.sh : tests/test_wrapper.sh tests/pedantic-header-test.sh
 	rm -rf $(TESTNAME)
 	mkdir -p $(TESTNAME)/tests/
+	echo
+	echo $(testbins)
+	echo
 	cp $(testbins) $(TESTNAME)/tests/
 	cp tests/test_wrapper.sh $(TESTNAME)/
 	cp tests/pedantic-header-test.sh $(TESTNAME)/tests/
 	chmod u+x $@
 
 tests/test_wrapper.sh : tests/test_wrapper.sh.in
-	(cd tests/ ; make $@)
+	make $@

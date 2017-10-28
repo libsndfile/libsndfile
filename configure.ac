@@ -666,6 +666,7 @@ AC_CONFIG_FILES([
 	src/version-metadata.rc src/sndfile.h src/libsndfile.def
 	tests/test_wrapper.sh tests/pedantic-header-test.sh
 	doc/libsndfile.css libsndfile.spec sndfile.pc
+	Scripts/build-test-tarball.mk
 	])
 AC_OUTPUT
 
