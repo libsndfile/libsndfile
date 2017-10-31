@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2006-2014 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2006-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ win32_ordinal_test (void)
 	int k, ordinal, errors = 0 ;
 
 	for (k = 0 ; locations [k] != NULL ; k++)
-	{	snprintf (buffer, sizeof (buffer), "%s/libsndfile.def", locations [k]) ;
+	{	snprintf (buffer, sizeof (buffer), "%s/libsndfile-1.def", locations [k]) ;
 		if ((file = fopen (buffer, "r")) != NULL)
 			break ;
 		} ;

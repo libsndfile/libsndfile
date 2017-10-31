@@ -663,7 +663,7 @@ AC_SUBST(TEST_BINDIR)
 
 AC_CONFIG_FILES([
 	Makefile Octave/Makefile
-	src/version-metadata.rc src/sndfile.h src/libsndfile.def
+	src/version-metadata.rc src/sndfile.h
 	tests/test_wrapper.sh tests/pedantic-header-test.sh
 	doc/libsndfile.css libsndfile.spec sndfile.pc
 	Scripts/build-test-tarball.mk
