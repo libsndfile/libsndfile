@@ -590,6 +590,9 @@ sf_format_check	(const SF_INFO *info)
 					return 1 ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
 					return 1 ;
+				if ((subformat == SF_FORMAT_NMS_ADPCM_16 || subformat == SF_FORMAT_NMS_ADPCM_24 ||
+							subformat == SF_FORMAT_NMS_ADPCM_32) && info->channels == 1)
+					return 1 ;
 				break ;
 
 		case SF_FORMAT_WAVEX :
