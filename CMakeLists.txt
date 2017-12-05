@@ -741,7 +741,8 @@ set (html_DATA
 	doc/lists.html
 	doc/embedded_files.html
 	doc/octave.html
-	doc/tutorial.html)
+	doc/tutorial.html
+	doc/formats.html)
 install (FILES ${html_DATA} DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)

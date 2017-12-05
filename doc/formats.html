@@ -1,0 +1,525 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+
+<head>
+	<META NAME="Author"      CONTENT="Erik de Castro Lopo (erikd AT mega-nerd DOT com)">
+	<META NAME="Description" CONTENT="libsndfile formats">
+	<META NAME="Keywords"    CONTENT="WAV AIFF AU libsndfile sound audio dsp Linux">
+	<LINK REL="stylesheet" HREF="libsndfile.css" TYPE="text/css" MEDIA="all">
+	<LINK REL="stylesheet" HREF="print.css" TYPE="text/css" MEDIA="print">
+    <title>libsndfile formats</title>
+</head>
+
+<body>
+    <h1>libsndfile formats</h1>
+    <p>The following table lists the file formats and encodings that libsndfile can read and write. The file formats are arranged
+        across the top and encodings along the left edge.</p>
+
+    <TABLE BORDER="1" cellpadding="2">
+        <TR>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">Micro- soft
+                <br>WAV</TD>
+            <TD ALIGN="center">SGI / Apple
+                <br>AIFF / AIFC</TD>
+            <TD ALIGN="center">Sun / DEC /
+                <br>NeXT
+                <br>AU / SND</TD>
+            <TD ALIGN="center">Header- less
+                <br>RAW</TD>
+            <TD ALIGN="center">Paris Audio
+                <br>File
+                <br>PAF</TD>
+            <TD ALIGN="center">Commo- dore
+                <br>Amiga
+                <br>IFF / SVX</TD>
+            <TD ALIGN="center">Sphere
+                <br>Nist
+                <br>WAV</TD>
+            <TD ALIGN="center">IRCAM
+                <br>SF</TD>
+            <TD ALIGN="center">Creative
+                <br>VOC</TD>
+            <TD ALIGN="center">Sound forge
+                <br>W64</TD>
+            <TD ALIGN="center">
+                <A HREF="octave.html">GNU Octave 2.0</A>
+                <br>MAT4</TD>
+            <TD ALIGN="center">
+                <A HREF="octave.html">GNU Octave 2.1</A>
+                <br>MAT5</TD>
+            <TD ALIGN="center">Portable Voice Format
+                <br>PVF</TD>
+            <TD ALIGN="center">Fasttracker 2
+                <br>XI</TD>
+            <TD ALIGN="center">HMM Tool Kit
+                <br>HTK</TD>
+            <TD ALIGN="center">Apple
+                <br>CAF</TD>
+            <TD ALIGN="center">Sound
+                <br>Designer II
+                <br>SD2</TD>
+            <TD ALIGN="center">Free Lossless Audio Codec
+                <br>FLAC</TD>
+        </TR>
+        <TR>
+            <TD>Unsigned 8 bit PCM</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+
+        <TR>
+            <TD>Signed 8 bit PCM</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+        </TR>
+
+        <TR>
+            <TD>Signed 16 bit PCM</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+        </TR>
+
+        <TR>
+            <TD>Signed 24 bit PCM</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+        </TR>
+
+        <TR>
+            <TD>Signed 32 bit PCM</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+
+        <TR>
+            <TD>32 bit float</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+
+        <TR>
+            <TD>64 bit double</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+
+        <TR>
+            <TD>u-law encoding</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+        <TR>
+            <TD>A-law encoding</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+
+        <TR>
+            <TD>IMA ADPCM</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+
+        <TR>
+            <TD>MS ADPCM</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+
+        <TR>
+            <TD>GSM 6.10</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+
+        <TR>
+            <TD>G721 ADPCM 32kbps</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+
+        <TR>
+            <TD>G723 ADPCM 24kbps</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+
+        <TR>
+            <TD>G723 ADPCM 40kbps</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+
+        <TR>
+            <TD>12 bit DWVW</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+
+        <TR>
+            <TD>16 bit DWVW</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+
+        <TR>
+            <TD>24 bit DWVW</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+        <TR>
+            <TD>Ok Dialogic ADPCM</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+        <TR>
+            <TD>8 bit DPCM</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+        <TR>
+            <TD>16 bit DPCM</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD ALIGN="center">R/W</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+            <TD>&nbsp;</TD>
+        </TR>
+    </TABLE>
+</body>
+
+</html>
