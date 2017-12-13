@@ -1031,7 +1031,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			if (data == NULL)
 				return SFE_BAD_COMMAND_PARAM ;
 			snprintf (data, datasize, "%s", psf->parselog.buf) ;
-			break ;
+			return strlen (data) ;
 
 		case SFC_CALC_SIGNAL_MAX :
 			if (data == NULL || datasize != sizeof (double))
