@@ -68,7 +68,7 @@ codec_close (SF_PRIVATE * psf)
 } /* code_close */
 
 int
-vox_adpcm_init (SF_PRIVATE *psf)
+vox_adpcm_init (SF_PRIVATE *psf, int variant)
 {	IMA_OKI_ADPCM *pvox = NULL ;
 
 	if (psf->file.mode == SFM_RDWR)
@@ -113,7 +113,7 @@ vox_adpcm_init (SF_PRIVATE *psf)
 	if (psf_fseek (psf, 0 , SEEK_SET) == -1)
 		return SFE_BAD_SEEK ;
 
-	ima_oki_adpcm_init (pvox, IMA_OKI_ADPCM_TYPE_OKI) ;
+	ima_oki_adpcm_init (pvox, IMA_OKI_ADPCM_TYPE_OKI, variant, psf->sf.samplerate) ;
 
 	return 0 ;
 } /* vox_adpcm_init */

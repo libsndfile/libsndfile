@@ -101,7 +101,7 @@ main (int argc, char *argv [])
 	float_scaled_test	("dwvw_16.raw", allow_exit, SF_FALSE, SF_FORMAT_RAW | SF_FORMAT_DWVW_16, -92.0) ;
 	float_scaled_test	("dwvw_24.raw", allow_exit, SF_FALSE, SF_FORMAT_RAW | SF_FORMAT_DWVW_24, -151.0) ;
 
-	float_scaled_test	("adpcm.vox", allow_exit, SF_FALSE, SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM, -40.0) ;
+	float_scaled_test	("adpcm.vox", allow_exit, SF_FALSE, SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM, -32.0) ;
 
 	float_scaled_test	("dpcm_16.xi", allow_exit, SF_FALSE, SF_FORMAT_XI | SF_FORMAT_DPCM_16, -90.0) ;
 	float_scaled_test	("dpcm_8.xi" , allow_exit, SF_FALSE, SF_FORMAT_XI | SF_FORMAT_DPCM_8 , -41.0) ;

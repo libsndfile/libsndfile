@@ -90,7 +90,7 @@ enum
 	SF_FORMAT_MS_ADPCM		= 0x0013,		/* Microsoft ADPCM. */
 
 	SF_FORMAT_GSM610		= 0x0020,		/* GSM 6.10 encoding. */
-	SF_FORMAT_VOX_ADPCM		= 0x0021,		/* OKI / Dialogix ADPCM */
+	SF_FORMAT_VOX_ADPCM		= 0x0021,		/* OKI / Dialogic ADPCM */
 
 	SF_FORMAT_G721_32		= 0x0030,		/* 32kbs G721 ADPCM encoding. */
 	SF_FORMAT_G723_24		= 0x0031,		/* 24kbs G723 ADPCM encoding. */

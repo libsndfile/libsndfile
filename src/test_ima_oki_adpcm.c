@@ -60,7 +60,7 @@ test_oki_adpcm (void)
 
 	print_test_name ("Testing ima/oki encoder") ;
 
-	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI) ;
+	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI, 0, 0) ;
 	for (i = 0 ; i < ARRAY_LEN (test_codes) ; i++)
 		for (j = 0, code = test_codes [i] ; j < 2 ; j++, code <<= 4)
 			if (adpcm_decode (&adpcm, code >> 4) != test_pcm [2 * i + j])
@@ -72,7 +72,7 @@ test_oki_adpcm (void)
 
 	print_test_name ("Testing ima/oki decoder") ;
 
-	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI) ;
+	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI, 0, 0) ;
 	for (i = 0 ; i < ARRAY_LEN (test_pcm) - 1 ; i += 2)
 	{	code = adpcm_encode (&adpcm, test_pcm [i]) ;
 		code = (code << 4) | adpcm_encode (&adpcm, test_pcm [i + 1]) ;
@@ -103,7 +103,7 @@ test_oki_adpcm_block (void)
 
 	print_test_name ("Testing ima/oki block encoder") ;
 
-	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI) ;
+	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI, 0, 0) ;
 
 	memcpy (adpcm.pcm, test_pcm, sizeof (adpcm.pcm [0]) * ARRAY_LEN (test_pcm)) ;
 	adpcm.pcm_count = ARRAY_LEN (test_pcm) ;
@@ -126,7 +126,7 @@ test_oki_adpcm_block (void)
 
 	print_test_name ("Testing ima/oki block decoder") ;
 
-	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI) ;
+	ima_oki_adpcm_init (&adpcm, IMA_OKI_ADPCM_TYPE_OKI, 0, 0) ;
 
 	memcpy (adpcm.codes, test_codes, sizeof (adpcm.codes [0]) * ARRAY_LEN (test_codes)) ;
 	adpcm.code_count = ARRAY_LEN (test_codes) ;

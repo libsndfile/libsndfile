@@ -930,7 +930,7 @@ int		float32_init	(SF_PRIVATE *psf) ;
 int		double64_init	(SF_PRIVATE *psf) ;
 int		dwvw_init		(SF_PRIVATE *psf, int bitwidth) ;
 int		gsm610_init		(SF_PRIVATE *psf) ;
-int		vox_adpcm_init	(SF_PRIVATE *psf) ;
+int		vox_adpcm_init	(SF_PRIVATE *psf, int variant) ;
 int		flac_init		(SF_PRIVATE *psf) ;
 int		g72x_init 		(SF_PRIVATE * psf) ;
 int		alac_init		(SF_PRIVATE *psf, const ALAC_DECODER_INFO * info) ;

@@ -93,7 +93,7 @@ raw_open	(SF_PRIVATE *psf)
 				break ;
 
 		case SF_FORMAT_VOX_ADPCM :
-				error = vox_adpcm_init (psf) ;
+				error = vox_adpcm_init (psf, 1) ;
 				break ;
 		/* Lite remove end */
 

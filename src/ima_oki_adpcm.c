@@ -22,6 +22,7 @@
 #include "sfconfig.h"
 
 #include <string.h>
+#include <math.h>
 
 /* Set up for libsndfile environment: */
 #include "common.h"
@@ -51,9 +52,15 @@ static int const oki_steps [] =	/* ~12-bit precision */
 static int const step_changes [] = { -1, -1, -1, -1, 2, 4, 6, 8 } ;
 
 void
-ima_oki_adpcm_init (IMA_OKI_ADPCM * state, IMA_OKI_ADPCM_TYPE type)
+ima_oki_adpcm_init (IMA_OKI_ADPCM * state, IMA_OKI_ADPCM_TYPE type, int variant, double rate)
 {
 	memset (state, 0, sizeof (*state)) ;
+
+	state->variant = variant ;
+	if (rate != 0)
+	{	state->b = exp (-120. / rate) ;
+		state->a = (state->b + 1) * .5 ;
+		}
 
 	if (type == IMA_OKI_ADPCM_TYPE_IMA)
 	{	state->max_step_index = ARRAY_LEN (ima_steps) - 1 ;
@@ -68,10 +75,11 @@ ima_oki_adpcm_init (IMA_OKI_ADPCM * state, IMA_OKI_ADPCM_TYPE type)
 
 } /* ima_oki_adpcm_init */
 
+#define WITH_DC_BLOCK 1
 
 int
 adpcm_decode (IMA_OKI_ADPCM * state, int code)
-{	int s ;
+{	int s, s1 ;
 
 	s = ((code & 7) << 1) | 1 ;
 	s = ((state->steps [state->step_index] * s) >> 3) & state->mask ;
@@ -79,6 +87,14 @@ adpcm_decode (IMA_OKI_ADPCM * state, int code)
 	if (code & 8)
 		s = -s ;
 	s += state->last_output ;
+
+	if (state->variant & WITH_DC_BLOCK)
+	{
+		state->last_output = s ;
+		s1 = (s - state->last_input) * state->b + state->last_output1 * state->a ;
+		state->last_input = s ;
+		state->last_output1 = s = s1 ;
+		}
 
 	if (s < MIN_SAMPLE || s > MAX_SAMPLE)
 	{	int grace ;
@@ -93,7 +109,8 @@ adpcm_decode (IMA_OKI_ADPCM * state, int code)
 
 	state->step_index += step_changes [code & 7] ;
 	state->step_index = SF_MIN (SF_MAX (state->step_index, 0), state->max_step_index) ;
-	state->last_output = s ;
+	if (! (state->variant & WITH_DC_BLOCK))
+		state->last_output = s ;
 
 	return s ;
 } /* adpcm_decode */
