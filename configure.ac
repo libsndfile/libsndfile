@@ -153,7 +153,7 @@ AC_ARG_ENABLE([external-libs],
 	[AS_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis [[default=no]]])])
 
 AC_ARG_ENABLE(octave,
-	[AS_HELP_STRING([--enable-octave], [disable building of GNU Octave module])])
+	[AS_HELP_STRING([--enable-octave], [enable building of GNU Octave module])])
 
 AC_ARG_ENABLE([full-suite],
 	[AS_HELP_STRING([--disable-full-suite], [disable building and installing programs, documentation, only build library [[default=no]]])])
