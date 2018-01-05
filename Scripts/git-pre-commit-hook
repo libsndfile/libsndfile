@@ -1,5 +1,4 @@
 #!/bin/sh
-#
 
 if git rev-parse --verify HEAD >/dev/null 2>&1 ; then
 	against=HEAD
@@ -7,13 +6,6 @@ else
 	# Initial commit: diff against an empty tree object
 	against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
 	fi
-
-SED="sed -r "  # BSD sed
-if test $(sed --version | grep -c GNU) -gt 0 ; then
-	SED="sed -E "
-	fi
-
-files=$(git diff-index --name-status --cached HEAD | grep -v ^D | ${SED} "s/^[A-Z]+[A-Z0-9]*[ \t]+/ /")
 
 # Redirect output to stderr.
 exec 1>&2
@@ -35,6 +27,14 @@ if test $(git diff --cached --name-only --diff-filter=A -z $against | LC_ALL=C t
 
 #-------------------------------------------------------------------------------
 # Check the formatting of all C files.
+
+# http://man.openbsd.org/sed#r
+# http://man.openbsd.org/sed#E
+# http://netbsd.gw.com/cgi-bin/man-cgi?sed++NetBSD-current
+# https://github.com/freebsd/freebsd/blob/master/usr.bin/sed/main.c
+# http://git.savannah.gnu.org/gitweb/?p=sed.git;a=blob;f=sed/sed.c
+# GNU has -r and -E (undocumented); MacOS has -E but not -r; Sunos has neither.
+files=$(git diff-index --name-status --cached HEAD | grep -v ^D | sed -E "s/^[A-Z]+[A-Z0-9]*[ \t]+/ /")
 
 cfiles=""
 for f in $files ; do
