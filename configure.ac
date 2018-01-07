@@ -1,4 +1,4 @@
-dnl Copyright (C) 1999-2017  Erik de Castro Lopo <erikd@mega-nerd.com>.
+dnl Copyright (C) 1999-2018  Erik de Castro Lopo <erikd@mega-nerd.com>.
 
 dnl Require autoconf version >= 2.69
 AC_PREREQ([2.69])
@@ -703,6 +703,7 @@ AC_MSG_RESULT([
     Experimental code : ................... ${enable_experimental:-no}
     Using ALSA in example programs : ...... ${enable_alsa:-no}
     External FLAC/Ogg/Vorbis : ............ ${enable_external_libs:-no}
+    Building Octave interface : ........... ${OCTAVE_BUILD}
 
   Tools :
 
