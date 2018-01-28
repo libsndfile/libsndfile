@@ -856,10 +856,6 @@ main (int argc, char *argv [])
 	printf ("OS X 10.8 and later have a new Audio API.\n") ;
 	printf ("Someone needs to write code to use that API.\n") ;
 	return 1 ;
-#elif defined (__BEOS__)
-	printf ("This program cannot be compiled on BeOS.\n") ;
-	printf ("Instead, compile the file sfplay_beos.cpp.\n") ;
-	return 1 ;
 #else
 	puts ("*** Playing sound not yet supported on this platform.") ;
 	puts ("*** Please feel free to submit a patch.") ;

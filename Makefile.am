@@ -426,9 +426,7 @@ endif
 # required by test-sndfile-metadata-set.py
 check_PROGRAMS += programs/sndfile-metadata-set programs/sndfile-metadata-get
 
-# This is the BeOS version of sndfile-play. It needs to be compiled with the C++
-# compiler.
-EXTRA_DIST += programs/sndfile-play-beos.cpp programs/test-sndfile-metadata-set.py
+EXTRA_DIST += programs/test-sndfile-metadata-set.py
 
 programs_sndfile_info_SOURCES = programs/sndfile-info.c programs/common.c programs/common.h
 programs_sndfile_info_LDADD = src/libsndfile.la
