@@ -5,7 +5,7 @@
   against the file.
 * If you are writing a program that uses libsndfile and you think there is a bug
   in libsndfile, reduce your program to the minimal example, make sure you compile
-  it with warnings on (for GCC I would recommaned at least `-Wall -Wextra`) and that
+  it with warnings on (for GCC I would recommend at least `-Wall -Wextra`) and that
   your program is warning free, and that is is error free when run under Valgrind
   or compiled with AddressSanitizer.
 
