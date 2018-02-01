@@ -186,6 +186,8 @@ set (COMMON
 	src/dither.c
 	src/cart.c
 	src/broadcast.c
+	src/axml.c
+	src/chna.c
 	src/audio_detect.c
  	src/ima_oki_adpcm.c
 	src/ima_oki_adpcm.h
@@ -233,6 +235,7 @@ set (FILESPECIFIC
 	src/xi.c
 	src/mpc2k.c
 	src/rf64.c
+	src/bw64.c
 	src/ogg_vorbis.c
 	src/ogg_speex.c
 	src/ogg_pcm.c
