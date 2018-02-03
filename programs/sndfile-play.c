@@ -61,10 +61,6 @@
 	#include 	<sys/ioctl.h>
 	#include 	<sys/soundcard.h>
 
-#elif (defined (__MACH__) && defined (__APPLE__))
-	#include <AvailabilityMacros.h>
-	#include <Availability.h>
-
 #elif HAVE_SNDIO_H
 	#include <sndio.h>
 
@@ -852,12 +848,8 @@ main (int argc, char *argv [])
 	solaris_play (argc, argv) ;
 #elif (OS_IS_WIN32 == 1)
 	win32_play (argc, argv) ;
-#elif (defined (__MACH__) && defined (__APPLE__))
-	printf ("OS X 10.8 and later have a new Audio API.\n") ;
-	printf ("Someone needs to write code to use that API.\n") ;
-	return 1 ;
 #else
-	puts ("*** Playing sound not yet supported on this platform.") ;
+	puts ("*** Playing sound not supported on this platform.") ;
 	puts ("*** Please feel free to submit a patch.") ;
 	return 1 ;
 #endif
