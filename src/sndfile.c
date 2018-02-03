@@ -253,6 +253,7 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_DWVW_BAD_BITWIDTH	, "Error : Bad bit width for DWVW encoding. Must be 12, 16 or 24." },
 	{	SFE_G72X_NOT_MONO		, "Error : G72x encoding does not support more than 1 channel." },
+	{	SFE_NMS_ADPCM_NOT_MONO	, "Error : NMS ADPCM encoding does not support more than 1 channel." },
 
 	{	SFE_VORBIS_ENCODER_BUG	, "Error : Sample rate chosen is known to trigger a Vorbis encoder bug on this CPU." },
 
@@ -672,6 +673,9 @@ sf_format_check	(const SF_INFO *info)
 				if (subformat == SF_FORMAT_GSM610 && info->channels == 1)
 					return 1 ;
 				if (subformat == SF_FORMAT_VOX_ADPCM && info->channels == 1)
+					return 1 ;
+				if ((subformat == SF_FORMAT_NMS_ADPCM_16 || subformat == SF_FORMAT_NMS_ADPCM_24 ||
+							subformat == SF_FORMAT_NMS_ADPCM_32) && info->channels == 1)
 					return 1 ;
 				break ;
 
@@ -1542,6 +1546,15 @@ sf_current_byterate (SNDFILE *sndfile)
 
 		case SF_FORMAT_GSM610 :
 			return (psf->sf.samplerate * psf->sf.channels * 13000) / 8000 ;
+
+		case SF_FORMAT_NMS_ADPCM_16:
+			return psf->sf.samplerate / 4 + 10 ;
+
+		case SF_FORMAT_NMS_ADPCM_24:
+			return psf->sf.samplerate * 3 / 8 + 10 ;
+
+		case SF_FORMAT_NMS_ADPCM_32:
+			return psf->sf.samplerate / 2 + 10 ;
 
 		case SF_FORMAT_G721_32 :	/* 32kbs G721 ADPCM encoding. */
 			return (psf->sf.samplerate * psf->sf.channels) / 2 ;

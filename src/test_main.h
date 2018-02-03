@@ -40,3 +40,5 @@ void test_psf_strlcpy_crlf (void) ;
 void test_broadcast_var (void) ;
 
 void test_cart_var (void) ;
+
+void test_nms_adpcm (void) ;
