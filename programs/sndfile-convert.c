@@ -114,6 +114,13 @@ report_format_error_exit (const char * argv0, SF_INFO * sfinfo)
 		exit (1) ;
 		} ;
 
+	int channels = sfinfo->channels;
+	sfinfo->channels = 1;
+	if (sf_format_check (sfinfo))
+	{	printf ("Error : output file format does not support %d channels.\n", channels) ;
+		exit (1) ;
+		} ;
+
 	printf ("\n"
 			"Error : output file format is invalid.\n"
 			"The '%s' container does not support '%s' codec data.\n"
