@@ -222,6 +222,42 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
+	/* Lite remove start */
+	if (do_all || strcmp (argv [1], "wav_nmsadpcm") == 0)
+	{	lcomp_test_short	("nms_16.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_16, 1, 0.37) ;
+		lcomp_test_int		("nms_16.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_16, 1, 0.31) ;
+		lcomp_test_float	("nms_16.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_16, 1, 0.34) ;
+		lcomp_test_double	("nms_16.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_16, 1, 0.34) ;
+
+		lcomp_test_short	("nms_24.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_24, 1, 0.15) ;
+		lcomp_test_int		("nms_24.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_24, 1, 0.10) ;
+		lcomp_test_float	("nms_24.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_24, 1, 0.14) ;
+		lcomp_test_double	("nms_24.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_24, 1, 0.14) ;
+
+		lcomp_test_short	("nms_32.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_32, 1, 0.036) ;
+		lcomp_test_int		("nms_32.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_32, 1, 0.045) ;
+		lcomp_test_float	("nms_32.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_32, 1, 0.035) ;
+		lcomp_test_double	("nms_32.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_32, 1, 0.035) ;
+
+		sdlcomp_test_short	("nms_16.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_16, 1, 0.16) ;
+		sdlcomp_test_int	("nms_16.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_16, 1, 0.16) ;
+		sdlcomp_test_float	("nms_16.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_16, 1, 0.16) ;
+		sdlcomp_test_double	("nms_16.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_16, 1, 0.16) ;
+
+		sdlcomp_test_short	("nms_24.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_24, 1, 0.06) ;
+		sdlcomp_test_int	("nms_24.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_24, 1, 0.06) ;
+		sdlcomp_test_float	("nms_24.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_24, 1, 0.06) ;
+		sdlcomp_test_double	("nms_24.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_24, 1, 0.06) ;
+
+		sdlcomp_test_short	("nms_32.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_32, 1, 0.017) ;
+		sdlcomp_test_int	("nms_32.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_32, 1, 0.018) ;
+		sdlcomp_test_float	("nms_32.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_32, 1, 0.018) ;
+		sdlcomp_test_double	("nms_32.wav", SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_32, 1, 0.018) ;
+
+		test_count++ ;
+		} ;
+	/* Lite remove end */
+
 	if (do_all || strcmp (argv [1], "aiff_ulaw") == 0)
 	{	lcomp_test_short	("ulaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ULAW, 2, 0.04) ;
 		lcomp_test_int		("ulaw.aiff", SF_FORMAT_AIFF | SF_FORMAT_ULAW, 2, 0.04) ;
