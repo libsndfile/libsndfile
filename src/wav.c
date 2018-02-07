@@ -881,9 +881,10 @@ wav_write_fmt_chunk (SF_PRIVATE *psf)
 						fmt_size = 2 + 2 + 4 + 4 + 2 + 2 ;
 
 						/* fmt : format, channels, samplerate */
-						psf_binheader_writef (psf, "4224", fmt_size, WAVE_FORMAT_NMS_VBXADPCM, psf->sf.channels, psf->sf.samplerate) ;
+						psf_binheader_writef (psf, "4224", BHW4 (fmt_size), BHW2 (WAVE_FORMAT_NMS_VBXADPCM),
+									BHW2 (psf->sf.channels), BHW4 (psf->sf.samplerate)) ;
 						/*  fmt : bytespersec, blockalign, bitwidth */
-						psf_binheader_writef (psf, "422", bytespersec, blockalign, bitwidth) ;
+						psf_binheader_writef (psf, "422", BHW4 (bytespersec), BHW2 (blockalign), BHW2 (bitwidth)) ;
 
 						add_fact_chunk = SF_TRUE ;
 						break ;
