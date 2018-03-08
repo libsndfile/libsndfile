@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -383,7 +383,7 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	if (psf->sf.channels < 1)
 		return SFE_CHANNEL_COUNT_ZERO ;
 
-	if (psf->sf.channels >= SF_MAX_CHANNELS)
+	if (psf->sf.channels > SF_MAX_CHANNELS)
 		return SFE_CHANNEL_COUNT ;
 
 	psf->endian = SF_ENDIAN_LITTLE ;		/* All W64 files are little endian. */
