@@ -1120,7 +1120,6 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 				break ;
 
 		case GSM_MARKER :
-				psf->sf.format = SF_FORMAT_AIFF ;
 				psf->sf.format = (SF_FORMAT_AIFF | SF_FORMAT_GSM610) ;
 				break ;
 
