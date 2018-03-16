@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
@@ -233,6 +234,40 @@ error_close_test (void)
 	puts ("ok") ;
 } /* error_close_test */
 
+static void
+unrecognised_test (void)
+{	const char	*filename = "unrecognised.bin" ;
+	SNDFILE		*sndfile ;
+	SF_INFO		sfinfo ;
+	FILE		*file ;
+	int			k ;
+
+	print_test_name (__func__, filename) ;
+
+	file = fopen (filename, "wb") ;
+	exit_if_true (file == NULL,
+		"\n\nLine %d : fopen ('%s') failed : %s\n", __LINE__, filename, strerror (errno)
+		) ;
+	fputs ("Unrecognised file", file) ;
+	fclose (file) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sndfile = sf_open (filename, SFM_READ, &sfinfo) ;
+
+	exit_if_true (sndfile != NULL,
+		"\n\nLine %d : SNDFILE* pointer (%p) should ne NULL.\n", __LINE__, sndfile
+		) ;
+
+	k = sf_error (sndfile) ;
+	exit_if_true (k != SF_ERR_UNRECOGNISED_FORMAT,
+		"\n\nLine %d : error (%d) should have been SF_ERR_UNRECOGNISED_FORMAT (%d).\n",
+		__LINE__, k, SF_ERR_UNRECOGNISED_FORMAT
+		) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* unrecognised_test */
+
 int
 main (void)
 {
@@ -244,6 +279,8 @@ main (void)
 	no_file_test ("no_file.wav") ;
 	zero_length_test ("zero_length.wav") ;
 	bad_wav_test ("bad_wav.wav") ;
+
+	unrecognised_test () ;
 
 	return 0 ;
 } /* main */
