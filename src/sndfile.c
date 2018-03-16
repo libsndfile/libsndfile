@@ -81,7 +81,6 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_UNIMPLEMENTED		, "File contains data in an unimplemented format." },
 	{	SFE_BAD_READ_ALIGN		, "Attempt to read a non-integer number of channels." },
 	{	SFE_BAD_WRITE_ALIGN 	, "Attempt to write a non-integer number of channels." },
-	{	SFE_UNKNOWN_FORMAT		, "File contains data in an unknown format." },
 	{	SFE_NOT_READMODE		, "Read attempted on file currently open for write." },
 	{	SFE_NOT_WRITEMODE		, "Write attempted on file currently open for read." },
 	{	SFE_BAD_MODE_RW			, "Error : This file format does not support read/write mode." },

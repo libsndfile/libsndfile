@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -405,7 +405,7 @@ voc_read_header	(SF_PRIVATE *psf)
 					break ;
 
 			default : /* Unknown */
-					return SFE_UNKNOWN_FORMAT ;
+					return SFE_VOC_BAD_FORMAT ;
 					break ;
 			} ;
 
