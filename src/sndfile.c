@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -3158,7 +3158,7 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 		/* Lite remove end */
 
 		default :
-				error = SFE_UNKNOWN_FORMAT ;
+				error = SF_ERR_UNRECOGNISED_FORMAT ;
 		} ;
 
 	if (error)
