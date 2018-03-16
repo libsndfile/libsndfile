@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -573,7 +573,6 @@ enum
 	SFE_UNIMPLEMENTED,
 	SFE_BAD_READ_ALIGN,
 	SFE_BAD_WRITE_ALIGN,
-	SFE_UNKNOWN_FORMAT,
 	SFE_NOT_READMODE,
 	SFE_NOT_WRITEMODE,
 	SFE_BAD_MODE_RW,
