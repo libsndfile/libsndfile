@@ -3310,7 +3310,6 @@ sf_get_chunk_size (const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_inf
 		return psf->get_chunk_size (psf, iterator, chunk_info) ;
 
 	return SFE_BAD_CHUNK_FORMAT ;
-	return 0 ;
 } /* sf_get_chunk_size */
 
 int
