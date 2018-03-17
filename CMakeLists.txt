@@ -66,7 +66,7 @@ if ((NOT BUILD_STATIC_LIBS) AND (NOT BUILD_SHARED_LIBS))
 	set (BUILD_STATIC_LIBS ON)
 endif ()
 
-if ((NOT BUILD_STATIC_LIBS) AND ENABLE_TESTING)
+if ((NOT BUILD_STATIC_LIBS) AND BUILD_TESTING)
 	set (BUILD_TESTING OFF)
 	message ("Build testing required static libraries. To prevent build errors BUILD_TESTING disabled.")
 endif ()
