@@ -478,7 +478,7 @@ if (BUILD_PROGRAMS)
 	add_executable (sndfile-play ${sndfile_play_SOURCES})
 	target_link_libraries(sndfile-play PUBLIC ${SNDFILE_TARGET})
 	if (WIN32)
-		target_link_libraries(sndfile-play PRIVATE Winmm.lib)
+		target_link_libraries(sndfile-play PRIVATE winmm)
 	# Maybe ALSA & Sndio are present in BeOS. They are not required
 	# so skip them anyway.
 	elseif ((NOT BEOS) AND ALSA_FOUND)
