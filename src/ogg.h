@@ -33,7 +33,7 @@ typedef struct
 	ogg_sync_state osync ;
 	/* Take physical pages, weld into a logical stream of packets */
 	ogg_stream_state ostream ;
-	/* One Ogg bitstream page.  Vorbis packets are inside */
+	/* One Ogg bitstream page. Codec packets are inside */
 	ogg_page opage ;
 	/* One raw packet of data for decode */
 	ogg_packet opacket ;
@@ -47,6 +47,6 @@ typedef struct
 								((buf [base + 1] << 8) & 0xff00) | \
 								(buf [base] & 0xff))
 
-
+int	ogg_read_first_page	(SF_PRIVATE *, OGG_PRIVATE *) ;
 
 #endif /* SF_SRC_OGG_H */

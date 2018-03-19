@@ -138,62 +138,9 @@ vorbis_read_header (SF_PRIVATE *psf, int log_data)
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 	char *buffer ;
 	int	bytes ;
-	int i, nn ;
+	int i ;
 
 	odata->eos = 0 ;
-
-	/* Weird stuff happens if these aren't called. */
-	ogg_stream_reset (&odata->ostream) ;
-	ogg_sync_reset (&odata->osync) ;
-
-	/*
-	**	Grab some data at the head of the stream.  We want the first page
-	**	(which is guaranteed to be small and only contain the Vorbis
-	**	stream initial header) We need the first page to get the stream
-	**	serialno.
-	*/
-
-	/* Expose the buffer */
-	buffer = ogg_sync_buffer (&odata->osync, 4096L) ;
-
-	/* Grab the part of the header that has already been read. */
-	memcpy (buffer, psf->header.ptr, psf->header.indx) ;
-	bytes = psf->header.indx ;
-
-	/* Submit a 4k block to libvorbis' Ogg layer */
-	bytes += psf_fread (buffer + psf->header.indx, 1, 4096 - psf->header.indx, psf) ;
-	ogg_sync_wrote (&odata->osync, bytes) ;
-
-	/* Get the first page. */
-	if ((nn = ogg_sync_pageout (&odata->osync, &odata->opage)) != 1)
-	{
-		/* Have we simply run out of data?  If so, we're done. */
-		if (bytes < 4096)
-			return 0 ;
-
-		/* Error case.  Must not be Vorbis data */
-		psf_log_printf (psf, "Input does not appear to be an Ogg bitstream.\n") ;
-		return SFE_MALFORMED_FILE ;
-		} ;
-
-	/*
-	**	Get the serial number and set up the rest of decode.
-	**	Serialno first ; use it to set up a logical stream.
-	*/
-	ogg_stream_clear (&odata->ostream) ;
-	ogg_stream_init (&odata->ostream, ogg_page_serialno (&odata->opage)) ;
-
-	if (ogg_stream_pagein (&odata->ostream, &odata->opage) < 0)
-	{	/* Error ; stream version mismatch perhaps. */
-		psf_log_printf (psf, "Error reading first page of Ogg bitstream data\n") ;
-		return SFE_MALFORMED_FILE ;
-		} ;
-
-	if (ogg_stream_packetout (&odata->ostream, &odata->opacket) != 1)
-	{	/* No page? must not be vorbis. */
-		psf_log_printf (psf, "Error reading initial header packet.\n") ;
-		return SFE_MALFORMED_FILE ;
-		} ;
 
 	/*
 	**	This function (vorbis_read_header) gets called multiple times, so the OGG
@@ -266,7 +213,7 @@ vorbis_read_header (SF_PRIVATE *psf, int log_data)
 			{	psf_log_printf (psf, "End of file before finding all Vorbis headers!\n") ;
 				return SFE_MALFORMED_FILE ;
 				} ;
-			nn = ogg_sync_wrote (&odata->osync, bytes) ;
+			ogg_sync_wrote (&odata->osync, bytes) ;
 			}
 		else if (result == 1)
 		{	/*
@@ -276,7 +223,7 @@ vorbis_read_header (SF_PRIVATE *psf, int log_data)
 			**	We can ignore any errors here as they'll also become apparent
 			**	at packetout.
 			*/
-			nn = ogg_stream_pagein (&odata->ostream, &odata->opage) ;
+			ogg_stream_pagein (&odata->ostream, &odata->opage) ;
 			while (i < 2)
 			{	result = ogg_stream_packetout (&odata->ostream, &odata->opacket) ;
 				if (result == 0)
@@ -508,9 +455,10 @@ ogg_vorbis_open (SF_PRIVATE *psf)
 	psf_log_printf (psf, "Vorbis library version : %s\n", vorbis_version_string ()) ;
 
 	if (psf->file.mode == SFM_READ)
-	{	/* Call this here so it only gets called once, so no memory is leaked. */
-		ogg_sync_init (&odata->osync) ;
-
+	{	/*
+		** First page of the ogg stream is already loaded by the ogg container
+		** when it classified the stream, no need to reload it.
+		*/
 		if ((error = vorbis_read_header (psf, 1)))
 			return error ;
 
@@ -878,8 +826,7 @@ vorbis_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 	{	sf_count_t target = offset - vdata->loc ;
 
 		if (target < 0)
-		{	/* 12 to allow for OggS bit */
-			psf_fseek (psf, 12, SEEK_SET) ;
+		{	ogg_read_first_page (psf, odata) ;
 			vorbis_read_header (psf, 0) ; /* Reset state */
 			target = offset ;
 			} ;
@@ -1161,8 +1108,8 @@ vorbis_length (SF_PRIVATE *psf)
 	psf_fseek (psf, 0, SEEK_SET) ;
 	length = vorbis_length_aux (psf) ;
 
-	psf_fseek (psf, 12, SEEK_SET) ;
-	if ((error = vorbis_read_header (psf, 0)) != 0)
+	if ((error = ogg_read_first_page (psf, (OGG_PRIVATE *) psf->container_data)) != 0 ||
+		(error = vorbis_read_header (psf, 0)) != 0)
 		psf->error = error ;
 
 	return length ;
