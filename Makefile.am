@@ -4,7 +4,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/src $(OS_SPECIFIC_CFLAGS)
 
 DISTCHECK_CONFIGURE_FLAGS = --enable-werror
 
-CLEANFILES = programs/*.wav
+CLEANFILES = programs/*.wav octave-workspace
 
 if FULL_SUITE
 if BUILD_OCTAVE_MOD
@@ -127,20 +127,24 @@ src_ALAC_libalac_la_SOURCES = src/ALAC/ALACAudioTypes.h src/ALAC/ALACBitUtilitie
 # builds the distribution tarball. There should be not need for the
 # end user to create these files.
 
-src/Symbols.gnu-binutils: $(top_srcdir)/src/create_symbols_file.py
-	$(PYTHON) $< linux $(VERSION) > $(top_srcdir)/$@
+# "$<" cannot portably be used in the recipe across Make implementations
+# https://www.gnu.org/software/autoconf/manual/autoconf.html#g_t_0024_003c-in-Ordinary-Make-Rules
+SYMBOL_SCRIPT = $(top_srcdir)/src/create_symbols_file.py
 
-src/Symbols.darwin: $(top_srcdir)/src/create_symbols_file.py
-	$(PYTHON) $< darwin $(VERSION) > $(top_srcdir)/$@
+src/Symbols.gnu-binutils: $(SYMBOL_SCRIPT)
+	$(PYTHON) $(SYMBOL_SCRIPT) linux $(VERSION) > $(top_srcdir)/$@
 
-src/libsndfile-1.def: $(top_srcdir)/src/create_symbols_file.py
-	$(PYTHON) $< win32 $(VERSION) > $(top_srcdir)/$@
+src/Symbols.darwin: $(SYMBOL_SCRIPT)
+	$(PYTHON) $(SYMBOL_SCRIPT) darwin $(VERSION) > $(top_srcdir)/$@
 
-src/Symbols.os2: $(top_srcdir)/src/create_symbols_file.py
-	$(PYTHON) $< os2 $(VERSION) > $(top_srcdir)/$@
+src/libsndfile-1.def: $(SYMBOL_SCRIPT)
+	$(PYTHON) $(SYMBOL_SCRIPT) win32 $(VERSION) > $(top_srcdir)/$@
 
-src/Symbols.static: $(top_srcdir)/src/create_symbols_file.py
-	$(PYTHON) $< static $(VERSION) > $(top_srcdir)/$@
+src/Symbols.os2: $(SYMBOL_SCRIPT)
+	$(PYTHON) $(SYMBOL_SCRIPT) os2 $(VERSION) > $(top_srcdir)/$@
+
+src/Symbols.static: $(SYMBOL_SCRIPT)
+	$(PYTHON) $(SYMBOL_SCRIPT) static $(VERSION) > $(top_srcdir)/$@
 
 #===============================================================================
 # Building windows resource files (if needed).
@@ -383,17 +387,31 @@ tests_scale_clip_test_LDADD = src/libsndfile.la
 
 #===============================================================================
 # Autogen generated sources.
-# These GNU style rules actually work. The old style suffix rules do not.
+# Coerce the multiple inputs -> multiple outputs problem
+# into suffix rules by "linearising" the dependency graph.
+# Yes, this sucks, but GNU make patterns aren't portable,
+# see also https://github.com/erikd/libsndfile/issues/369
 
-%.c : %.def %.tpl
+SUFFIXES = .tpl .def
+
+.tpl.def:
+	touch $@
+
+# unconditionally running touch on the .def
+# files is necessary to keep all timestamps
+# consistent, in order to prevent stale files
+# from calling autogen in tarball releases.
+.def.c:
+	$(MAKE) $(AM_MAKEFLAGS) $<
 	cd $(top_srcdir)/$(@D) && autogen --writable $(<F)
 
 # recommended Automake way for multi-output targets:
 # https://www.gnu.org/software/automake/manual/html_node/Multiple-Outputs.html
-%.h : %.c %.def %.tpl
+tests/utils.h : tests/utils.c
 	@if test -f $@; then :; else \
-	  rm -f $<; \
-	  $(MAKE) $(AM_MAKEFLAGS) $<; \
+	  cd $(top_srcdir) && \
+	  rm -f tests/utils.c && \
+	  $(MAKE) $(AM_MAKEFLAGS) tests/utils.c; \
 	fi
 
 ########
@@ -408,11 +426,11 @@ dist_man_MANS = man/sndfile-info.1 man/sndfile-play.1 man/sndfile-convert.1 man/
 # Same manpage for both programs.
 man/sndfile-metadata-set.1: man/sndfile-metadata-get.1
 	-rm -f $@
-	cd $(top_srcdir)/$(@D) && $(LN_S) $(<F) $(@F)
+	cd $(top_srcdir)/man && $(LN_S) sndfile-metadata-get.1 sndfile-metadata-set.1
 
 man/sndfile-deinterleave.1: man/sndfile-interleave.1
 	-rm -f $@
-	cd $(top_srcdir)/$(@D) && $(LN_S) $(<F) $(@F)
+	cd $(top_srcdir)/man && $(LN_S) sndfile-interleave.1 sndfile-deinterleave.1
 
 #############
 # programs/ #
