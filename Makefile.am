@@ -409,8 +409,9 @@ SUFFIXES = .tpl .def
 # https://www.gnu.org/software/automake/manual/html_node/Multiple-Outputs.html
 tests/utils.h : tests/utils.c
 	@if test -f $@; then :; else \
-	  rm -f $<; \
-	  $(MAKE) $(AM_MAKEFLAGS) $<; \
+	  cd $(top_srcdir) && \
+	  rm -f tests/utils.c && \
+	  $(MAKE) $(AM_MAKEFLAGS) tests/utils.c; \
 	fi
 
 ########
