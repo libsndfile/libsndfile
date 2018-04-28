@@ -1282,7 +1282,7 @@ static int
 wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 {	char buffer [512] ;
 	uint32_t thisread, bytesread = 0, dword, sampler_data, loop_count ;
-	uint32_t note, start, end, type = -1, count ;
+	uint32_t note, pitch, start, end, type = -1, count ;
 	int j, k ;
 
 	chunklen += (chunklen & 1) ;
@@ -1299,10 +1299,10 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 	bytesread += psf_binheader_readf (psf, "4", &note) ;
 	psf_log_printf (psf, "  Midi Note    : %u\n", note) ;
 
-	bytesread += psf_binheader_readf (psf, "4", &dword) ;
-	if (dword != 0)
+	bytesread += psf_binheader_readf (psf, "4", &pitch) ;
+	if (pitch != 0)
 	{	snprintf (buffer, sizeof (buffer), "%f",
-					(1.0 * 0x80000000) / ((uint32_t) dword)) ;
+					(1.0 * 0x80000000) / ((uint32_t) pitch)) ;
 		psf_log_printf (psf, "  Pitch Fract. : %s\n", buffer) ;
 		}
 	else
@@ -1408,6 +1408,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 		} ;
 
 	psf->instrument->basenote = note ;
+	psf->instrument->detune = (int8_t)(pitch / (0x40000000 / 25.0) + 0.5) ;
 	psf->instrument->gain = 1 ;
 	psf->instrument->velocity_lo = psf->instrument->key_lo = 0 ;
 	psf->instrument->velocity_hi = psf->instrument->key_hi = 127 ;

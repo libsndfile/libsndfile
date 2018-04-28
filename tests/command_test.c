@@ -768,7 +768,6 @@ instrument_test (const char *filename, int filetype)
 		**	write_inst struct to hold the default value that the WAV
 		**	module should hold.
 		*/
-		write_inst.detune = 0 ;
 		write_inst.key_lo = write_inst.velocity_lo = 0 ;
 		write_inst.key_hi = write_inst.velocity_hi = 127 ;
 		write_inst.gain = 1 ;
