@@ -22,6 +22,10 @@
 #include	<string.h>
 #include	<ctype.h>
 #include	<assert.h>
+#if OS_IS_WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
 
 #include	"sndfile.h"
 #include	"sfendian.h"
@@ -327,6 +331,18 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 
 	/* Ultimate sanity check. */
 	assert (sizeof (sf_count_t) == 8) ;
+
+#if OS_IS_WIN32
+
+	wchar_t wpath [SF_FILENAME_LEN] ;
+
+	int dwRet = MultiByteToWideChar (CP_UTF8, MB_ERR_INVALID_CHARS, path, -1,
+		wpath, SF_FILENAME_LEN );
+
+	if (dwRet == 0)
+		return sf_wchar_open(wpath, mode, sfinfo);
+
+#endif
 
 	if ((psf = psf_allocate ()) == NULL)
 	{	sf_errno = SFE_MALLOC_FAILED ;
