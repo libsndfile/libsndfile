@@ -336,11 +336,10 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 
 	wchar_t wpath [SF_FILENAME_LEN] ;
 
-	int dwRet = MultiByteToWideChar (CP_UTF8, MB_ERR_INVALID_CHARS, path, -1,
-		wpath, SF_FILENAME_LEN );
+	int dwRet = MultiByteToWideChar (CP_UTF8, MB_ERR_INVALID_CHARS, path, -1, wpath, SF_FILENAME_LEN) ;
 
 	if (dwRet == 0)
-		return sf_wchar_open(wpath, mode, sfinfo);
+		return sf_wchar_open (wpath, mode, sfinfo) ;
 
 #endif
 
