@@ -129,12 +129,6 @@ will use the filesystem character set.
 On Windows, there is also a Windows specific sf_wchar_open() that takes a
 UTF16_BE encoded filename.
 </P>
-<blockquote>
-<p><b>Note:</b></p>
-<p>Starting from 1.0.29 release, behavior of <code>sf_open()</code> on Windows
- platform was changed, <code>path</code> parameter is treated as UTF-8 string.
-</p>
-</blockquote>
 
 <PRE>
       SNDFILE*  sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo) ;
