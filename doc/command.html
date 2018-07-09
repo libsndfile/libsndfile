@@ -269,7 +269,14 @@
 	<TD><A HREF="#SFC_RF64_AUTO_DOWNGRADE">SFC_RF64_AUTO_DOWNGRADE</A></TD>
 	<TD>Enable auto downgrade from RF64 to WAV</TD>
 </TR>
-
+<TR>
+	<TD><A HREF="#SFC_GET_ORIGINAL_SAMPLERATE">SFC_GET_ORIGINAL_SAMPLERATE</A></TD>
+	<TD>Get original samplerate</TD>
+</TR>
+<TR>
+	<TD><A HREF="#SFC_SET_ORIGINAL_SAMPLERATE">SFC_SET_ORIGINAL_SAMPLERATE</A></TD>
+	<TD>Set original samplerate</TD>
+</TR>
 <!--
 <TR>
 	<TD><A HREF="#add-dither">add dither</A></TD>
@@ -1945,6 +1952,99 @@ Example:
 <DT>Return value:</DT>
 	<dd>Returns SF_TRUE if SFC_RF64_AUTO_DOWNGRADE is set and SF_FALSE
 	otherwise.
+</DL>
+
+
+<!-- ========================================================================= -->
+<A NAME="SFC_GET_ORIGINAL_SAMPLERATE"></A>
+<H2><BR><B>SFC_GET_ORIGINAL_SAMPLERATE</B></H2>
+<P>
+Get original samplerate metadata.
+</P>
+<P>
+The Opus audio codec stores audio data independent of samplerate, but only
+supports encoding or decoding at 8000Hz, 12000Hz, 16000Hz, 24000HZ or 48000Hz.
+Opus includes a header field to record the original source input samplerate, and
+a samplerate converter may be used if needed.
+</p>
+<P>
+This command gets the original samplerate header field. It does not enable any
+(non-existent) samplerate conversion, nor change the current decoder samplerate.
+</P>
+<p>
+Parameters:
+</p>
+<PRE>
+         sndfile  : A valid SNDFILE* pointer
+         cmd      : SFC_GET_ORIGINAL_SAMPLERATE
+         data     : pointer to an integer
+         datasize : sizeof (int)
+</PRE>
+<P>
+Example:
+</P>
+<PRE>
+         /* Get the original sample rate */
+         int original_samplerate ;
+         sf_command (sndfile, SFC_GET_ORIGINAL_SAMPLERATE, &amp;original_samplerate, sizeof (original_samplerate)) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<dd>Returns SF_TRUE on success, SF_FALSE otherwise.
+	<dd>The passed integer is set to the value of the original samplerate.
+</DL>
+
+
+<!-- ========================================================================= -->
+<A NAME="SFC_SET_ORIGINAL_SAMPLERATE"></A>
+<H2><BR><B>SFC_SET_ORIGINAL_SAMPLERATE</B></H2>
+<P>
+Set original samplerate metadata.
+</P>
+<P>
+The Opus audio codec stores audio data independent of samplerate, but only
+supports encoding or decoding at 8000Hz, 12000Hz, 16000Hz, 24000HZ or 48000Hz.
+Opus includes a header field to record the original source input samplerate, and
+a samplerate converter may be used if needed.
+</p>
+<p>
+When writing an Opus file this command sets the original samplerate header field
+to the provided value, which is then stored in the file. This has no effect on
+the current encoder samplerate.
+</p>
+<p>
+When reading an Opus file this command overrides the original samplerate value
+as read from the file. libsndfile uses this value to choose what samplerate
+to decode at, rounding up to the nearest valid Opus samplerate. After a
+successful call, the file samplerate and frames count may have changed.
+</p>
+<p>
+Note: This command should be issued before the first bit of audio data has been
+read from or written to the file.
+</p>
+<p>
+Parameters:
+</p>
+<PRE>
+         sndfile  : A valid SNDFILE* pointer
+         cmd      : SFC_SET_ORIGINAL_SAMPLERATE
+         data     : pointer to an integer
+         datasize : sizeof (int)
+</PRE>
+<P>
+Example:
+</P>
+<PRE>
+         /* Store the original sample rate as 44100 */
+         int original_samplerate 44100;
+         sf_command (sndfile, SFC_SET_ORIGINAL_SAMPLERATE, &amp;original_samplerate, sizeof (input_samplerate)) ;
+</PRE>
+<DL>
+<DT>Return value:</DT>
+	<dd>Returns SF_TRUE on success, SF_FALSE otherwise.
+	<dd>On write, can only succeed if no data has been written.
+	<dd>On read, if successful, <a HREF="#SFC_GET_CURRENT_SF_INFO">SFC_GET_CURRENT_SF_INFO</a>
+	    should be called to determine the new frames count and samplerate
 </DL>
 
 

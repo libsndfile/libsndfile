@@ -342,6 +342,16 @@ echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on OGG/VORBIS files."
 echo "----------------------------------------------------------------------"
 
+# opus-tests
+./tests/ogg_opus_test@EXEEXT@
+./tests/compression_size_test@EXEEXT@ opus
+./tests/lossy_comp_test@EXEEXT@ ogg_opus
+./tests/string_test@EXEEXT@ opus
+
+echo "----------------------------------------------------------------------"
+echo "  $sfversion passed tests on OPUS files."
+echo "----------------------------------------------------------------------"
+
 # io-tests
 ./tests/stdio_test@EXEEXT@
 ./tests/pipe_test@EXEEXT@

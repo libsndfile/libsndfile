@@ -156,6 +156,8 @@ ENDSWAP_64 (uint64_t x)
 	#error "Target CPU endian-ness unknown. May need to hand edit src/sfconfig.h"
 #endif
 
+#define LE2H_32_PTR(x)			(((x) [0]) + ((x) [1] << 8) + ((x) [2] << 16) + ((x) [3] << 24))
+
 #define LET2H_16_PTR(x)			((x) [1] + ((x) [2] << 8))
 #define LET2H_32_PTR(x)			(((x) [0] << 8) + ((x) [1] << 16) + ((x) [2] << 24))
 

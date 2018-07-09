@@ -55,7 +55,7 @@ include(SndFileChecks)
 
 
 cmake_dependent_option (BUILD_REGTEST "Build regtest" ON "SQLITE3_FOUND" OFF)
-cmake_dependent_option (ENABLE_EXTERNAL_LIBS "Enable FLAC and Vorbis codecs" ON "VORBISENC_FOUND;FLAC_FOUND" OFF)
+cmake_dependent_option (ENABLE_EXTERNAL_LIBS "Enable FLAC, Vorbis, and Opus codecs" ON "VORBISENC_FOUND;FLAC_FOUND;OPUS_FOUND" OFF)
 cmake_dependent_option (ENABLE_CPU_CLIP "Enable tricky cpu specific clipper" ON "CPU_CLIPS_POSITIVE;CPU_CLIPS_NEGATIVE" OFF)
 if (NOT ENABLE_CPU_CLIP)
 	set (CPU_CLIPS_POSITIVE FALSE)
@@ -70,9 +70,10 @@ set (HAVE_SNDIO_H ${SNDIO_FOUND})
 
 set (ENABLE_EXPERIMENTAL_CODE ${ENABLE_EXPERIMENTAL})
 set (HAVE_SPEEX ${ENABLE_EXPERIMENTAL})
+set (HAVE_OPUS ${ENABLE_EXPERIMENTAL})
 
 add_feature_info (BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
-add_feature_info (ENABLE_EXTERNAL_LIBS ENABLE_EXTERNAL_LIBS "enable FLAC and Vorbis codecs")
+add_feature_info (ENABLE_EXTERNAL_LIBS ENABLE_EXTERNAL_LIBS "enable FLAC, Vorbis, and Opus codecs")
 add_feature_info (ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info (BUILD_TESTING BUILD_TESTING "build tests")
 add_feature_info (BUILD_REGTEST BUILD_REGTEST "build regtest")
@@ -92,7 +93,7 @@ set_package_properties (Ogg PROPERTIES
 	TYPE RECOMMENDED
 	URL "www.xiph.org/ogg/"
 	DESCRIPTION "library for manipulating ogg bitstreams"
-	PURPOSE "Required to enable Vorbis, Speex and Opus support"
+	PURPOSE "Required to enable Vorbis, Speex, and Opus support"
 	)
 set_package_properties (VorbisEnc PROPERTIES
 	TYPE RECOMMENDED
@@ -105,6 +106,12 @@ set_package_properties (FLAC PROPERTIES
 	URL "www.xiph.org/flac/"
 	DESCRIPTION "Free Lossless Audio Codec Library"
 	PURPOSE "Enables FLAC support"
+	)
+set_package_properties(Opus PROPERTIES
+	TYPE RECOMMENDED
+	URL	"www.opus-codec.org/"
+	DESCRIPTION "Standardized open source low-latency fullband codec"
+	PURPOSE	"Enables experimental Opus support"
 	)
 set_package_properties(Speex PROPERTIES TYPE OPTIONAL
 	URL "www.speex.org/"
@@ -230,6 +237,7 @@ add_library (sndfile
 	src/ogg_speex.c
 	src/ogg_pcm.c
 	src/ogg_opus.c
+	src/ogg_vcomment.c
 	src/nms_adpcm.c
 	src/GSM610/config.h
 	src/GSM610/gsm.h
@@ -288,6 +296,7 @@ target_link_libraries (sndfile
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Vorbis::VorbisEnc>
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:FLAC::FLAC>
 		$<$<AND:$<BOOL:${ENABLE_EXPERIMENTAL}>,$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>,$<BOOL:${HAVE_SPEEX}>>:Speex::Speex>
+		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Opus::Opus>
 	)
 set_target_properties (sndfile PROPERTIES
 	PUBLIC_HEADER "${sndfile_HDRS}"
@@ -1022,6 +1031,14 @@ if (BUILD_TESTING)
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
 
+	add_executable (ogg_opus_test tests/ogg_opus_test.c)
+	target_link_libraries (ogg_opus_test
+		PRIVATE
+			sndfile
+			test_utils
+			$<$<BOOL:${LIBM_REQUIRED}>:m>
+		)
+
 	add_executable (stdin_test tests/stdin_test.c)
 	target_link_libraries (stdin_test
 		PRIVATE
@@ -1241,6 +1258,12 @@ if (BUILD_TESTING)
 	add_test (lossy_comp_test_ogg_vorbis lossy_comp_test ogg_vorbis)
 	add_test (string_test_ogg string_test ogg)
 	add_test (misc_test_ogg misc_test ogg)
+
+	### opus-tests ###
+	add_test (ogg_opus_test ogg_opus_test)
+	add_test (compression_size_test_opus compression_size_test opus)
+	add_test (lossy_comp_test_ogg_opus lossy_comp_test ogg_opus)
+	add_test (string_test_opus string_test opus)
 
 	### io-tests
 	add_test (stdio_test stdio_test)

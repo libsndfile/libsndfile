@@ -61,6 +61,7 @@ main (int argc, char *argv [])
 		printf ("           aiff - test adding strings to AIFF files\n") ;
 		printf ("           flac - test adding strings to FLAC files\n") ;
 		printf ("           ogg  - test adding strings to OGG files\n") ;
+		printf ("           opus - test adding strings to OPUS files\n") ;
 		printf ("           all  - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -114,9 +115,17 @@ main (int argc, char *argv [])
 
 	if (do_all || ! strcmp (argv [1], "ogg"))
 	{	if (HAVE_EXTERNAL_XIPH_LIBS)
-			string_start_test ("vorbis.oga", SF_FORMAT_OGG) ;
+			string_start_test ("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS) ;
 		else
 			puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "opus"))
+	{	if (HAVE_EXTERNAL_XIPH_LIBS)
+			string_start_test ("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS) ;
+		else
+			puts ("    No Ogg/Opus tests because Ogg/Opus support was not compiled in.") ;
 		test_count++ ;
 		} ;
 
@@ -340,11 +349,12 @@ string_start_end_test (const char *filename, int typemajor)
 } /* string_start_end_test */
 
 static void
-string_start_test (const char *filename, int typemajor)
+string_start_test (const char *filename, int formattype)
 {	const char	*cptr ;
 	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	int			errors = 0 ;
+	int			typemajor = SF_FORMAT_TYPEMASK & formattype ;
 
 	print_test_name ("string_start_test", filename) ;
 
@@ -353,15 +363,20 @@ string_start_test (const char *filename, int typemajor)
 	sfinfo.channels		= 1 ;
 	sfinfo.frames		= 0 ;
 
-	switch (typemajor)
-	{	case SF_FORMAT_OGG :
-			sfinfo.format = typemajor | SF_FORMAT_VORBIS ;
+	switch (formattype)
+	{	case SF_FORMAT_OGG | SF_FORMAT_OPUS :
+			/* Opus only supports some discrete sample rates. */
+			sfinfo.samplerate = 48000 ;
+			break ;
+
+		case SF_FORMAT_OGG | SF_FORMAT_VORBIS :
 			break ;
 
 		default :
-			sfinfo.format = typemajor | SF_FORMAT_PCM_16 ;
+			formattype |= SF_FORMAT_PCM_16 ;
 			break ;
 		} ;
+	sfinfo.format = formattype ;
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 

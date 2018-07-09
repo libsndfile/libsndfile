@@ -109,6 +109,7 @@ enum
 	SF_FORMAT_DPCM_16		= 0x0051,		/* 16 bit differential PCM (XI only) */
 
 	SF_FORMAT_VORBIS		= 0x0060,		/* Xiph Vorbis encoding. */
+	SF_FORMAT_OPUS			= 0x0064,		/* Xiph/Skype Opus encoding. */
 
 	SF_FORMAT_ALAC_16		= 0x0070,		/* Apple Lossless Audio Codec (16 bit). */
 	SF_FORMAT_ALAC_20		= 0x0071,		/* Apple Lossless Audio Codec (20 bit). */
@@ -217,6 +218,10 @@ enum
 	/* Cart Chunk support */
 	SFC_SET_CART_INFO				= 0x1400,
 	SFC_GET_CART_INFO				= 0x1401,
+
+	/* Opus files original samplerate metadata */
+	SFC_SET_ORIGINAL_SAMPLERATE		= 0x1500,
+	SFC_GET_ORIGINAL_SAMPLERATE		= 0x1501,
 
 	/* Following commands for testing only. */
 	SFC_TEST_IEEE_FLOAT_REPLACE		= 0x6001,

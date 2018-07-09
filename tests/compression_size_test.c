@@ -177,6 +177,7 @@ main (int argc, char *argv [])
 			"    Where <test> is one of:\n"
 			"        vorbis - test Ogg/Vorbis\n"
 			"        flac   - test FLAC\n"
+			"        opus   - test Opus\n"
 			"        all    - perform all tests\n",
 			argv [0]) ;
 		exit (0) ;
@@ -198,6 +199,11 @@ main (int argc, char *argv [])
 
 	if (all_tests || strcmp (argv [1], "flac") == 0)
 	{	compression_size_test (SF_FORMAT_FLAC | SF_FORMAT_PCM_16, "pcm16.flac") ;
+		tests ++ ;
+		} ;
+
+	if (all_tests || strcmp (argv [1], "opus") == 0)
+	{	compression_size_test (SF_FORMAT_OGG | SF_FORMAT_OPUS, "opus.opus") ;
 		tests ++ ;
 		} ;
 

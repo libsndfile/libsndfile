@@ -11,7 +11,7 @@ if (OGG_INCLUDE_DIR)
 endif ()
 
 find_package (PkgConfig QUIET)
-pkg_check_modules (PC_OGG QUIET ogg)
+pkg_check_modules (PC_OGG QUIET ogg>=1.3.0)
 
 set (OGG_VERSION ${PC_OGG_VERSION})
 
