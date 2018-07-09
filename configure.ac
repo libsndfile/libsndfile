@@ -336,7 +336,7 @@ AS_IF([test -n "$PKG_CONFIG"], [
 				dnl Make sure the FLAC_CFLAGS value is sane.
 				FLAC_CFLAGS=`echo $FLAC_CFLAGS | $SED "s|include/FLAC|include|"`
 
-				PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
+				PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.3.0, ac_cv_ogg=yes, ac_cv_ogg=no)
 
 				AS_IF([test "x$enable_experimental" = "xyes"], [
 						PKG_CHECK_MOD_VERSION(SPEEX, speex >= 1.2, ac_cv_speex=yes, ac_cv_speex=no)
@@ -350,15 +350,17 @@ AS_IF([test -n "$PKG_CONFIG"], [
 				dnl See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
 				PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.3, ac_cv_vorbis=yes, ac_cv_vorbis=no)
 				PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.3, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
+
+				PKG_CHECK_MOD_VERSION(OPUS, opus >= 1.1, ac_cv_opus=yes, ac_cv_opus=no)
 				enable_external_libs=yes
 			])
 
-			AS_IF([test "x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc" = "xyesyesyesyes"], [
+			AS_IF([test "x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc$ac_cv_opus" = "xyesyesyesyesyes"], [
 					HAVE_EXTERNAL_XIPH_LIBS=1
 					enable_external_libs=yes
 
-					EXTERNAL_XIPH_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBIS_CFLAGS $VORBISENC_CFLAGS $SPEEX_CFLAGS"
-					EXTERNAL_XIPH_LIBS="$FLAC_LIBS $OGG_LIBS $VORBIS_LIBS $VORBISENC_LIBS $SPEEX_LIBS "
+					EXTERNAL_XIPH_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBIS_CFLAGS $VORBISENC_CFLAGS $SPEEX_CFLAGS $OPUS_CFLAGS"
+					EXTERNAL_XIPH_LIBS="$FLAC_LIBS $OGG_LIBS $VORBIS_LIBS $VORBISENC_LIBS $SPEEX_LIBS $OPUS_LIBS "
 				], [
 					AS_ECHO([""])
 					AC_MSG_WARN([[*** One or more of the external libraries (ie libflac, libogg and]])
@@ -372,7 +374,7 @@ AS_IF([test -n "$PKG_CONFIG"], [
 				])
 	])
 
-AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_XIPH_LIBS], [$HAVE_EXTERNAL_XIPH_LIBS], [Will be set to 1 if flac, ogg and vorbis are available.])
+AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_XIPH_LIBS], [$HAVE_EXTERNAL_XIPH_LIBS], [Will be set to 1 if flac, ogg, vorbis, and opus are available.])
 
 dnl ====================================================================================
 dnl  Check for libsqlite3 (only used in regtest).
@@ -702,7 +704,7 @@ AC_MSG_RESULT([
 
     Experimental code : ................... ${enable_experimental:-no}
     Using ALSA in example programs : ...... ${enable_alsa:-no}
-    External FLAC/Ogg/Vorbis : ............ ${enable_external_libs:-no}
+    External FLAC/Ogg/Vorbis/Opus : ....... ${enable_external_libs:-no}
     Building Octave interface : ........... ${OCTAVE_BUILD}
 
   Tools :

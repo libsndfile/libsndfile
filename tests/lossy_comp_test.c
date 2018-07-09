@@ -70,6 +70,8 @@ static void		check_comment (SNDFILE * file, int format, int lineno) ;
 
 static int		is_lossy (int filetype) ;
 
+static int		check_opus_version (SNDFILE *file) ;
+
 /*
 ** Force the start of these buffers to be double aligned. Sparc-solaris will
 ** choke if they are not.
@@ -459,6 +461,20 @@ main (int argc, char *argv [])
 			}
 		else
 			puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
+
+		test_count++ ;
+		} ;
+
+	if (do_all || strcmp (argv [1], "ogg_opus") == 0)
+	{	if (HAVE_EXTERNAL_XIPH_LIBS)
+		{	/* Don't do lcomp_test_XXX as the errors are too big. */
+			sdlcomp_test_short	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.57) ;
+			sdlcomp_test_int	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.54) ;
+			sdlcomp_test_float	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.55) ;
+			sdlcomp_test_double	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.55) ;
+			}
+		else
+			puts ("    No Ogg/Opus tests because Ogg/Opus support was not compiled in.") ;
 
 		test_count++ ;
 		} ;
@@ -1428,21 +1444,33 @@ channels = 1 ;
 	/*	The Vorbis encoder has a bug on PowerPC and X86-64 with sample rates
 	**	<= 22050. Increasing the sample rate to 32000 avoids triggering it.
 	**	See https://trac.xiph.org/ticket/1229
+	**
+	**	Opus only supports discrete sample rates. Choose supported 12000.
 	*/
 	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
 	{	const char * errstr ;
 
 		errstr = sf_strerror (NULL) ;
-		if (strstr (errstr, "Sample rate chosen is known to trigger a Vorbis") == NULL)
+		if (strstr (errstr, "Sample rate chosen is known to trigger a Vorbis") != NULL)
+		{	printf ("\n                                  Sample rate -> 32kHz    ") ;
+			sfinfo.samplerate = 32000 ;
+			}
+		else if (strstr (errstr, "Opus only supports sample rates of") != NULL)
+		{	printf ("\n                                  Sample rate -> 12kHz    ") ;
+			sfinfo.samplerate = 12000 ;
+			}
+		else
 		{	printf ("Line %d: sf_open_fd (SFM_WRITE) failed : %s\n", __LINE__, errstr) ;
 			dump_log_buffer (NULL) ;
 			exit (1) ;
 			} ;
 
-		printf ("\n                                  Sample rate -> 32kHz    ") ;
-		sfinfo.samplerate = 32000 ;
-
 		file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+		} ;
+
+	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_OPUS && !check_opus_version (file))
+	{	sf_close (file) ;
+		return ;
 		} ;
 
 	test_write_short_or_die (file, 0, orig, datalen, __LINE__) ;
@@ -1636,21 +1664,33 @@ channels = 1 ;
 	/*	The Vorbis encoder has a bug on PowerPC and X86-64 with sample rates
 	**	<= 22050. Increasing the sample rate to 32000 avoids triggering it.
 	**	See https://trac.xiph.org/ticket/1229
+	**
+	**	Opus only supports discrete sample rates. Choose supported 12000.
 	*/
 	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
 	{	const char * errstr ;
 
 		errstr = sf_strerror (NULL) ;
-		if (strstr (errstr, "Sample rate chosen is known to trigger a Vorbis") == NULL)
+		if (strstr (errstr, "Sample rate chosen is known to trigger a Vorbis") != NULL)
+		{	printf ("\n                                  Sample rate -> 32kHz    ") ;
+			sfinfo.samplerate = 32000 ;
+			}
+		else if (strstr (errstr, "Opus only supports sample rates of") != NULL)
+		{	printf ("\n                                  Sample rate -> 12kHz    ") ;
+			sfinfo.samplerate = 12000 ;
+			}
+		else
 		{	printf ("Line %d: sf_open_fd (SFM_WRITE) failed : %s\n", __LINE__, errstr) ;
 			dump_log_buffer (NULL) ;
 			exit (1) ;
 			} ;
 
-		printf ("\n                                  Sample rate -> 32kHz    ") ;
-		sfinfo.samplerate = 32000 ;
-
 		file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+		} ;
+
+	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_OPUS && !check_opus_version (file))
+	{	sf_close (file) ;
+		return ;
 		} ;
 
 	test_writef_int_or_die (file, 0, orig, datalen, __LINE__) ;
@@ -1827,15 +1867,28 @@ channels = 1 ;
 
 	print_test_name ("sdlcomp_test_float", filename) ;
 
-	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_VORBIS)
-		/*  Vorbis starts to loose fidelity with floating point values outside
-		**  the range of approximately [-2000.0, 2000.0] (Determined
-		**  experimentally, not know if it is a limitation of Vorbis or
-		**  libvorbis.)
-		*/
-		scale = 16.0 ;
-	else
-		scale = 1.0 ;
+	switch ((filetype & SF_FORMAT_SUBMASK))
+	{	case SF_FORMAT_VORBIS :
+			/*	Vorbis starts to loose fidelity with floating point values outside
+			**	the range of approximately [-2000.0, 2000.0] (Determined
+			**	experimentally, not know if it is a limitation of Vorbis or
+			**	libvorbis.)
+			*/
+			scale = 16.0 ; /* 32000/16 = 2000 */
+			break ;
+
+		case SF_FORMAT_OPUS :
+			/*	The Opus spec says that non-normalized floating point value
+			**	support (extended dynamic range in its terms) is optional and
+			**	cannot be relied upon.
+			*/
+			scale = 32000.0 ; /* 32000/32000 = 1 */
+			break ;
+
+		default :
+			scale = 1.0 ;
+			break ;
+		} ;
 
 	datalen = BUFFER_SIZE ;
 
@@ -1852,7 +1905,39 @@ channels = 1 ;
 	sfinfo.channels		= channels ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+
+	/*	The Vorbis encoder has a bug on PowerPC and X86-64 with sample rates
+	**	<= 22050. Increasing the sample rate to 32000 avoids triggering it.
+	**	See https://trac.xiph.org/ticket/1229
+	**
+	**	Opus only supports discrete sample rates. Choose supported 12000.
+	*/
+	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
+	{	const char * errstr ;
+
+		errstr = sf_strerror (NULL) ;
+		if (strstr (errstr, "Sample rate chosen is known to trigger a Vorbis") != NULL)
+		{	printf ("\n                                  Sample rate -> 32kHz    ") ;
+			sfinfo.samplerate = 32000 ;
+			}
+		else if (strstr (errstr, "Opus only supports sample rates of") != NULL)
+		{	printf ("\n                                  Sample rate -> 12kHz    ") ;
+			sfinfo.samplerate = 12000 ;
+			}
+		else
+		{	printf ("Line %d: sf_open_fd (SFM_WRITE) failed : %s\n", __LINE__, errstr) ;
+			dump_log_buffer (NULL) ;
+			exit (1) ;
+			} ;
+
+		file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+		} ;
+
+	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_OPUS && !check_opus_version (file))
+	{	sf_close (file) ;
+		return ;
+		} ;
+
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 	test_write_float_or_die (file, 0, orig, datalen, __LINE__) ;
 	sf_set_string (file, SF_STR_COMMENT, long_comment) ;
@@ -2025,15 +2110,28 @@ sdlcomp_test_double	(const char *filename, int filetype, int channels, double ma
 channels = 1 ;
 	print_test_name ("sdlcomp_test_double", filename) ;
 
-	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_VORBIS)
-		/*  Vorbis starts to loose fidelity with floating point values outside
-		**  the range of approximately [-2000.0, 2000.0] (Determined
-		**  experimentally, not know if it is a limitation of Vorbis or
-		**  libvorbis.)
-		*/
-		scale = 16.0 ;
-	else
-		scale = 1.0 ;
+	switch ((filetype & SF_FORMAT_SUBMASK))
+	{	case SF_FORMAT_VORBIS :
+			/*	Vorbis starts to loose fidelity with floating point values outside
+			**	the range of approximately [-2000.0, 2000.0] (Determined
+			**	experimentally, not know if it is a limitation of Vorbis or
+			**	libvorbis.)
+			*/
+			scale = 16.0 ; /* 32000/16 = 2000 */
+			break ;
+
+		case SF_FORMAT_OPUS :
+			/*	The Opus spec says that non-normalized floating point value
+			**	support (extended dynamic range in its terms) is optional and
+			**	cannot be relied upon.
+			*/
+			scale = 32000.0 ; /* 32000/32000 = 1 */
+			break ;
+
+		default :
+			scale = 1.0 ;
+			break ;
+		} ;
 
 	datalen = BUFFER_SIZE ;
 
@@ -2048,7 +2146,38 @@ channels = 1 ;
 	sfinfo.channels		= channels ;
 	sfinfo.format		= filetype ;
 
-	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	/*	The Vorbis encoder has a bug on PowerPC and X86-64 with sample rates
+	**	<= 22050. Increasing the sample rate to 32000 avoids triggering it.
+	**	See https://trac.xiph.org/ticket/1229
+	**
+	**	Opus only supports discrete sample rates. Choose supported 12000.
+	*/
+	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
+	{	const char * errstr ;
+
+		errstr = sf_strerror (NULL) ;
+		if (strstr (errstr, "Sample rate chosen is known to trigger a Vorbis") != NULL)
+		{	printf ("\n                                  Sample rate -> 32kHz    ") ;
+			sfinfo.samplerate = 32000 ;
+			}
+		else if (strstr (errstr, "Opus only supports sample rates of") != NULL)
+		{	printf ("\n                                  Sample rate -> 12kHz    ") ;
+			sfinfo.samplerate = 12000 ;
+			}
+		else
+		{	printf ("Line %d: sf_open_fd (SFM_WRITE) failed : %s\n", __LINE__, errstr) ;
+			dump_log_buffer (NULL) ;
+			exit (1) ;
+			} ;
+
+		file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+		} ;
+
+	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_OPUS && !check_opus_version (file))
+	{	sf_close (file) ;
+		return ;
+		} ;
+
 	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
 	test_write_double_or_die (file, 0, orig, datalen, __LINE__) ;
 	sf_set_string (file, SF_STR_COMMENT, long_comment) ;
@@ -2455,3 +2584,34 @@ is_lossy (int filetype)
 	return 1 ;
 } /* is_lossy */
 
+
+static int
+check_opus_version (SNDFILE *file)
+{	char log_buf [256] ;
+	char *str, *p ;
+	const char *str_libopus = "Opus library version: " ;
+	int ver_major, ver_minor ;
+
+	sf_command (file, SFC_GET_LOG_INFO, log_buf, sizeof (log_buf)) ;
+	str = strstr (log_buf, str_libopus) ;
+	if (str)
+	{	str += strlen (str_libopus) ;
+		if ((p = strchr (str, '\n')))
+			*p = '\0' ;
+		if (sscanf (str, "libopus %d.%d", &ver_major, &ver_minor) == 2)
+		{	/* Reject versions prior to 1.3 */
+			if (ver_major > 1 || (ver_major == 1 && ver_minor >= 3))
+			{	/*
+				** Make sure that the libopus in use is not fixed-point, as it
+				** sacrifices accuracy. libopus API documentation explicitly
+				** allows checking for this suffix to determine if it is.
+				*/
+				if (!strstr (str, "-fixed"))
+					return 1 ;
+				} ;
+			} ;
+		} ;
+
+	printf ("skipping (%s)\n", str ? str : "unknown libopus version") ;
+	return 0 ;
+} /* check_opus_version */

@@ -758,6 +758,8 @@ enum
 	SFE_FILENAME_TOO_LONG,
 	SFE_NEGATIVE_RW_LEN,
 
+	SFE_OPUS_BAD_SAMPLERATE,
+
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
 

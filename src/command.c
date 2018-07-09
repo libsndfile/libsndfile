@@ -66,6 +66,10 @@ static SF_FORMAT_INFO const simple_formats [] =
 		},
 
 #if HAVE_EXTERNAL_XIPH_LIBS
+	{	SF_FORMAT_OGG | SF_FORMAT_OPUS,
+		"Ogg Opus (Xiph Foundation)", "opus"
+		},
+
 	{	SF_FORMAT_OGG | SF_FORMAT_VORBIS,
 		"Ogg Vorbis (Xiph Foundation)", "oga"
 		},
@@ -208,6 +212,7 @@ static SF_FORMAT_INFO subtype_formats [] =
 
 #if HAVE_EXTERNAL_XIPH_LIBS
 	{	SF_FORMAT_VORBIS,		"Vorbis",				NULL 	},
+	{	SF_FORMAT_OPUS,			"Opus",					NULL 	},
 #endif
 
 	{	SF_FORMAT_ALAC_16,		"16 bit ALAC",			NULL	},
