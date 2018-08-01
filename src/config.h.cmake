@@ -40,8 +40,8 @@
 /* Define to 1 if you have the <endian.h> header file. */
 #cmakedefine01 HAVE_ENDIAN_H
 
-/* Will be set to 1 if flac, ogg and vorbis are available. */
-#cmakedefine01 HAVE_EXTERNAL_XIPH_LIBS
+/* Will be set to 1 if FLAC is available. */
+#cmakedefine01 HAVE_FLAC
 
 /* Define to 1 if you have the `floor' function. */
 #cmakedefine01 HAVE_FLOOR
@@ -121,6 +121,9 @@
 /* Define to 1 if you have the `open' function. */
 #cmakedefine01 HAVE_OPEN
 
+/* Will be set to 1 if ogg is available. */
+#cmakedefine01 HAVE_OGG
+
 /* Define to 1 if you have the `pipe' function. */
 #cmakedefine01 HAVE_PIPE
 
@@ -138,6 +141,9 @@
 
 /* Define to 1 if you have the `snprintf' function. */
 #cmakedefine01 HAVE_SNPRINTF
+
+/* Will be set to 1 if speex is available. */
+#cmakedefine01 HAVE_SPEEX
 
 /* Set to 1 if you have libsqlite3. */
 #cmakedefine01 HAVE_SQLITE3
@@ -171,6 +177,9 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #cmakedefine01 HAVE_UNISTD_H
+
+/* Will be set to 1 if vorbis is available. */
+#cmakedefine01 HAVE_VORBIS
 
 /* Define to 1 if you have the `vsnprintf' function. */
 #cmakedefine01 HAVE_VSNPRINTF

@@ -59,7 +59,7 @@ endif
 lib_LTLIBRARIES = src/libsndfile.la
 include_HEADERS = src/sndfile.hh
 nodist_include_HEADERS = src/sndfile.h
-src_libsndfile_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS)
+src_libsndfile_la_CFLAGS = $(EXTERNAL_CODEC_CFLAGS)
 # MinGW requires -no-undefined if a DLL is to be built.
 src_libsndfile_la_LDFLAGS = -no-undefined -version-info $(SHARED_VERSION_INFO) $(SHLIB_VERSION_ARG)
 src_libsndfile_la_SOURCES = src/sndfile.c src/aiff.c src/au.c src/avr.c src/caf.c src/dwd.c src/flac.c src/g72x.c src/htk.c src/ircam.c \
@@ -69,11 +69,11 @@ src_libsndfile_la_SOURCES = src/sndfile.c src/aiff.c src/au.c src/avr.c src/caf.
 	src/sf_unistd.h src/ogg.h src/chanmap.h
 nodist_src_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
 src_libsndfile_la_LIBADD = src/GSM610/libgsm.la src/G72x/libg72x.la src/ALAC/libalac.la \
-	src/libcommon.la $(EXTERNAL_XIPH_LIBS) -lm
+	src/libcommon.la $(EXTERNAL_CODEC_LIBS) -lm
 EXTRA_src_libsndfile_la_DEPENDENCIES = $(SYMBOL_FILES)
 
 noinst_LTLIBRARIES = src/libcommon.la
-src_libcommon_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS)
+src_libcommon_la_CFLAGS = $(EXTERNAL_CODEC_CFLAGS)
 src_libcommon_la_SOURCES = src/common.c src/file_io.c src/command.c src/pcm.c src/ulaw.c src/alaw.c \
 	src/float32.c src/double64.c src/ima_adpcm.c src/ms_adpcm.c src/gsm610.c src/dwvw.c src/vox_adpcm.c \
 	src/interleave.c src/strings.c src/dither.c src/cart.c src/broadcast.c src/audio_detect.c \

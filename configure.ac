@@ -149,8 +149,17 @@ AC_ARG_ENABLE([sqlite],
 AC_ARG_ENABLE([alsa],
 	[AS_HELP_STRING([--disable-alsa], [disable ALSA support (default=autodetect)])], [], [enable_alsa=auto])
 
-AC_ARG_ENABLE([external-libs],
-	[AS_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis [[default=no]]])])
+AC_ARG_ENABLE([ogg],
+	[AS_HELP_STRING([--disable-ogg], [disable Ogg support (default=autodetected)])], [], [enable_ogg=auto])
+
+AC_ARG_ENABLE([vorbis],
+	[AS_HELP_STRING([--disable-vorbis], [disable Vorbis support (default=autodetected)])], [], [enable_vorbis=auto])
+
+AC_ARG_ENABLE([flac],
+	[AS_HELP_STRING([--disable-flac], [disable FLAC support (default=autodetected)])], [], [enable_flac=auto])
+
+AC_ARG_ENABLE([speex],
+	[AS_HELP_STRING([--disable-speex], [disable Speex Support (default=autodetected if experimental enabled)])], [], [enable_speex=auto])
 
 AC_ARG_ENABLE(octave,
 	[AS_HELP_STRING([--enable-octave], [enable building of GNU Octave module])])
@@ -316,63 +325,105 @@ AS_IF([test "x$cross_compiling" = "xno"], [
 	])
 
 dnl ====================================================================================
-dnl  Check for Ogg, Vorbis and FLAC.
+dnl  Check for Ogg, Vorbis, FLAC and Speex.
 
-HAVE_EXTERNAL_XIPH_LIBS=0
-EXTERNAL_XIPH_CFLAGS=""
-EXTERNAL_XIPH_LIBS=""
+EXTERNAL_CODEC_CFLAGS=""
+EXTERNAL_CODEC_LIBS=""
 
 dnl Check for pkg-config outside the if statement.
 PKG_PROG_PKG_CONFIG
 AX_REQUIRE_DEFINED([PKG_INSTALLDIR])
 PKG_INSTALLDIR
 
+ac_cv_ogg=0
+ac_cv_vorbis=0
+ac_cv_flac=0
+ac_cv_speex=0
+
 AS_IF([test -n "$PKG_CONFIG"], [
-		AS_IF([test "x$enable_external_libs" = "xno"], [
-				AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
+		AS_IF([test "x$enable_ogg" = "xno"], [
+				AC_MSG_WARN([[*** Ogg disabled. ***]])
 			], [
-				PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.3.1, ac_cv_flac=yes, ac_cv_flac=no)
+				PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=1, ac_cv_ogg=0)
+				AS_IF([test "x$ac_cv_ogg" = "x1"], [
+						EXTERNAL_CODEC_CFLAGS+="$OGG_CFLAGS "
+						EXTERNAL_CODEC_LIBS+="$OGG_LIBS "
+					])
+			])
+
+		AS_IF([test "x$enable_vorbis" = "xno"], [
+				AC_MSG_WARN([[*** Vorbis disabled. ***]])
+			], [
+				AS_IF([test "x$ac_cv_ogg" == "x0"], [
+						AC_MSG_WARN([[*** Vorbis support requires Ogg. ***]])
+					], [
+						dnl Vorbis versions earlier than 1.2.3 have bugs that cause the libsndfile
+						dnl test suite to fail on MIPS, PowerPC and others.
+						dnl See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
+						PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.3, ac_cv_vorbis=1, ac_cv_vorbis=0)
+						PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.3, ac_cv_vorbisenc=1, ac_cv_vorbisenc=0)
+
+						AS_IF([test "x$ac_cv_vorbis$ac_cv_vorbisenc" = "x10"], [
+								AC_MSG_WARN([[*** vorbis found, but vorbisenc was not.]])
+								AC_MSG_WARN([[*** Disabling Vorbis support.]])
+								ac_cv_vorbis=0
+							])
+
+						AS_IF([test "x$ac_cv_vorbis" = "x1"], [
+								EXTERNAL_CODEC_CFLAGS+="$VORIBS_CFLAGS $VORBISENC_CFLAGS "
+								EXTERNAL_CODEC_LIBS+="$VORBIS_LIBS $VORBISENC_LIBS "
+							])
+					])
+			])
+
+		AS_IF([test "x$enable_flac" = "xno"], [
+				AC_MSG_WARN([[*** FLAC disabled. ***]])
+			], [
+				PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.3.1, ac_cv_flac=1, ac_cv_flac=0)
 
 				dnl Make sure the FLAC_CFLAGS value is sane.
 				FLAC_CFLAGS=`echo $FLAC_CFLAGS | $SED "s|include/FLAC|include|"`
 
-				PKG_CHECK_MOD_VERSION(OGG, ogg >= 1.1.3, ac_cv_ogg=yes, ac_cv_ogg=no)
-
-				AS_IF([test "x$enable_experimental" = "xyes"], [
-						PKG_CHECK_MOD_VERSION(SPEEX, speex >= 1.2, ac_cv_speex=yes, ac_cv_speex=no)
-					], [
-						SPEEX_CFLAGS=""
-						SPEEX_LIBS=""
+				AS_IF([test "x$ac_cv_flac" = "x1"], [
+						EXTERNAL_CODEC_CFLAGS+="$FLAC_CFLAGS "
+						EXTERNAL_CODEC_LIBS+="$FLAC_LIBS "
 					])
-
-				dnl Vorbis versions earlier than 1.2.3 have bugs that cause the libsndfile
-				dnl test suite to fail on MIPS, PowerPC and others.
-				dnl See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=549899
-				PKG_CHECK_MOD_VERSION(VORBIS, vorbis >= 1.2.3, ac_cv_vorbis=yes, ac_cv_vorbis=no)
-				PKG_CHECK_MOD_VERSION(VORBISENC, vorbisenc >= 1.2.3, ac_cv_vorbisenc=yes, ac_cv_vorbisenc=no)
-				enable_external_libs=yes
 			])
 
-			AS_IF([test "x$ac_cv_flac$ac_cv_ogg$ac_cv_vorbis$ac_cv_vorbisenc" = "xyesyesyesyes"], [
-					HAVE_EXTERNAL_XIPH_LIBS=1
-					enable_external_libs=yes
-
-					EXTERNAL_XIPH_CFLAGS="$FLAC_CFLAGS $OGG_CFLAGS $VORBIS_CFLAGS $VORBISENC_CFLAGS $SPEEX_CFLAGS"
-					EXTERNAL_XIPH_LIBS="$FLAC_LIBS $OGG_LIBS $VORBIS_LIBS $VORBISENC_LIBS $SPEEX_LIBS "
-				], [
-					AS_ECHO([""])
-					AC_MSG_WARN([[*** One or more of the external libraries (ie libflac, libogg and]])
-					AC_MSG_WARN([[*** libvorbis) is either missing (possibly only the development]])
-					AC_MSG_WARN([[*** headers) or is of an unsupported version.]])
-					AC_MSG_WARN([[***]])
-					AC_MSG_WARN([[*** Unfortunately, for ease of maintenance, the external libs]])
-					AC_MSG_WARN([[*** are an all or nothing affair.]])
-					AS_ECHO([""])
-					enable_external_libs=no
-				])
+		AS_IF([test "x$enable_experimental" = "xyes"], [
+				AS_IF([test "x$enable_speex" = "xno"], [
+						AC_MSG_WARN([[*** Speex disabled. ***]])
+					], [
+						AS_IF([test "x$ac_cv_ogg" = "x0"], [
+								AC_MSG_WARN([[*** Speex support requires Ogg. ***]])
+							], [
+								PKG_CHECK_MOD_VERSION(SPEEX, speex > 1.2, ac_cv_speex=1, ac_cv_speex=0)
+								AS_IF([test "x$ac_cv_speex" = "x1"], [
+										EXTERNAL_CODEC_CFLAGS+="$SPEEX_CFLAGS "
+										EXTERNAL_CODEC_LIBS+="$SPEEX_LIBS "
+									])
+							])
+					])
+			], [
+				AS_IF([test "x$enable_speex" = "xyes"], [
+						dnl Check for explicitly enabled Speex
+						AC_MSG_WARN([[*** To enable Speex support you must enable experimental support.]])
+					])
+			])
 	])
 
-AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_XIPH_LIBS], [$HAVE_EXTERNAL_XIPH_LIBS], [Will be set to 1 if flac, ogg and vorbis are available.])
+AS_IF([test "x$ac_cv_ogg" = "x1"], [enable_ogg="yes"], [enable_ogg="no"])
+AC_DEFINE_UNQUOTED([HAVE_OGG], $ac_cv_ogg, [Will be set to 1 if ogg is available.])
+
+AS_IF([test "x$ac_cv_vorbis" = "x1"], [enable_vorbis="yes"], [enable_vorbis="no"])
+AC_DEFINE_UNQUOTED([HAVE_VORBIS], $ac_cv_vorbis, [Will be set to 1 if vorbis is available.])
+
+AS_IF([test "x$ac_cv_flac" = "x1"], [enable_flac="yes"], [enable_flac="no"])
+AC_DEFINE_UNQUOTED([HAVE_FLAC], $ac_cv_flac, [Will be set to 1 if FLAC is available.])
+
+AS_IF([test "x$ac_cv_speex" = "x1"], [enable_speex="yes"], [enable_speex="no"])
+AC_DEFINE_UNQUOTED([HAVE_SPEEX], $ac_cv_speex, [Will be set to 1 if speex is available.])
+
 
 dnl ====================================================================================
 dnl  Check for libsqlite3 (only used in regtest).
@@ -651,13 +702,16 @@ AC_SUBST(GEN_TOOL)
 
 AC_SUBST(WIN_RC_VERSION)
 
-AC_SUBST(HAVE_EXTERNAL_XIPH_LIBS)
+AC_SUBST(HAVE_OGG)
+AC_SUBST(HAVE_VORBIS)
+AC_SUBST(HAVE_FLAC)
+AC_SUBST(HAVE_SPEEX)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(SNDIO_LIBS)
 
-AC_SUBST(EXTERNAL_XIPH_CFLAGS)
-AC_SUBST(EXTERNAL_XIPH_LIBS)
+AC_SUBST(EXTERNAL_CODEC_CFLAGS)
+AC_SUBST(EXTERNAL_CODEC_LIBS)
 AC_SUBST(SRC_BINDIR)
 AC_SUBST(TEST_BINDIR)
 
@@ -700,9 +754,12 @@ AC_MSG_RESULT([
     CPPFLAGS : ............................ ${CPPFLAGS}
     LDFLAGS : ............................. ${LDFLAGS}
 
+    Ogg support : ......................... ${enable_ogg}
+    Vorbis support : ...................... ${enable_vorbis}
+    FLAC support : ........................ ${enable_flac}
     Experimental code : ................... ${enable_experimental:-no}
+    Speex support (experimental) : ........ ${enable_speex}
     Using ALSA in example programs : ...... ${enable_alsa:-no}
-    External FLAC/Ogg/Vorbis : ............ ${enable_external_libs:-no}
     Building Octave interface : ........... ${OCTAVE_BUILD}
 
   Tools :

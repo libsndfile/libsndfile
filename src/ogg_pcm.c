@@ -36,7 +36,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if (ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_XIPH_LIBS)
+#if (ENABLE_EXPERIMENTAL_CODE && HAVE_OGG)
 
 #include <ogg/ogg.h>
 
@@ -154,12 +154,12 @@ duration = audio_samples / rate
          = 3.947
 */
 
-#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_XIPH_LIBS */
+#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_OGG */
 
 int
 ogg_pcm_open (SF_PRIVATE *psf)
 {
-	psf_log_printf (psf, "This version of libsndfile was compiled without Ogg/Speex support.\n") ;
+	psf_log_printf (psf, "This version of libsndfile was compiled without Ogg/PCM support.\n") ;
 	return SFE_UNIMPLEMENTED ;
 } /* ogg_pcm_open */
 

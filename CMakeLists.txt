@@ -50,8 +50,11 @@ option (BUILD_PROGRAMS "Build programs" ON)
 option (BUILD_EXAMPLES "Build examples" ON)
 option (BUILD_TESTING "Build tests" ON)
 option (ENABLE_CPACK "Enable CPack support" ON)
-option (DISABLE_EXTERNAL_LIBS "Disable use of FLAC, Ogg and Vorbis" OFF)
+option (ENABLE_OGG "Enable use of Ogg" ON)
+cmake_dependent_option (ENABLE_VORBIS "Enable use of Vorbis" ON "ENABLE_OGG" OFF)
+option (ENABLE_FLAC "Enable use of FLAC" ON)
 option (ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
+cmake_dependent_option (ENABLE_SPEEX "enable use of Speex" OFF "ENABLE_EXPERIMENTAL AND ENABLE_OGG" OFF)
 option (DISABLE_CPU_CLIP "Disable tricky cpu specific clipper" OFF)
 option (ENABLE_BOW_DOCS "Enable black-on-white html docs" OFF)
 if (MSVC OR MINGW)
@@ -83,8 +86,11 @@ cmake_dependent_option (BUILD_REGTEST "Build regtest" ON "HAVE_SQLITE3" OFF)
 
 add_feature_info(BUILD_STATIC_LIBS BUILD_STATIC_LIBS "build static libraries")
 add_feature_info(BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
-add_feature_info(DISABLE_EXTERNAL_LIBS DISABLE_EXTERNAL_LIBS "disable use of FLAC, Ogg and Vorbis")
+add_feature_info(ENABLE_OGG ENABLE_OGG "enable use of Ogg")
+add_feature_info(ENABLE_VORBIS ENABLE_VORBIS "enable use of Vorbis")
+add_feature_info(ENABLE_FLAC ENABLE_FLAC "enable use of FLAC")
 add_feature_info(ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental code")
+add_feature_info(ENABLE_SPEEX ENABLE_SPEEX "enable use of Speex")
 add_feature_info(BUILD_TESTING BUILD_TESTING "build tests")
 add_feature_info(BUILD_REGTEST BUILD_REGTEST "build regtest")
 add_feature_info(ENABLE_CPACK ENABLE_CPACK "enable CPack support")
@@ -140,10 +146,7 @@ set (PC_EXEC_PREFIX "\$\{prefix\}")
 set (PC_LIBDIR "\$\{prefix\}/${CMAKE_INSTALL_LIBDIR}")
 set (PC_INCLUDEDIR "\$\{prefix\}/${CMAKE_INSTALL_INCLUDEDIR}")
 set (PC_VERSION ${PROJECT_VERSION})
-if (EXTERNAL_XIPH_LIBS)
-	set (PC_PRIVATE_LIBS "-lFLAC  -lvorbisenc")
-endif ()
-
+set (PC_PRIVATE_LIBS ${EXTERNAL_CODEC_LIBS})
 
 file(REMOVE "${CMAKE_CURRENT_SOURCE_DIR}/sndfile.pc")
 configure_file (sndfile.pc.cmake.in sndfile.pc @ONLY)
@@ -310,22 +313,34 @@ if (BUILD_STATIC_LIBS)
 			$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src>
 			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
+	target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC
+		${EXTERNAL_CODEC_LIBS})
+
 	if (LIBM_REQUIRED)
 		target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${M_LIBRARY})
 	endif ()
-	if (NOT DISABLE_EXTERNAL_LIBS)
-		target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${EXTERNAL_XIPH_LIBS})
+
+	if (HAVE_OGG)
 		target_include_directories (${SNDFILE_STATIC_TARGET} PRIVATE
-			${OGG_INCLUDE_DIRS}
-			${VORBIS_INCLUDE_DIRS}
-			${FLAC_INCLUDE_DIRS})
-			target_compile_definitions (${SNDFILE_STATIC_TARGET} PRIVATE ${FLAC_DEFINITIONS})
-		if (ENABLE_EXPERIMENTAL)
-			target_link_libraries (${SNDFILE_STATIC_TARGET} PUBLIC ${SPEEX_LIBRARIES})
-			target_include_directories (${SNDFILE_STATIC_TARGET} PRIVATE
-				${SPEEX_INCLUDE_DIRS})
-		endif ()
+			${OGG_INCLUDE_DIRS})
 	endif ()
+
+	if (HAVE_VORBIS)
+		target_include_directories (${SNDFILE_STATIC_TARGET} PRIVATE
+			${VORBIS_INCLUDE_DIRS})
+	endif ()
+
+	if (HAVE_FLAC)
+		target_include_directories (${SNDFILE_STATIC_TARGET} PRIVATE
+			${FLAC_INCLUDE_DIRS})
+		target_compile_definitions (${SNDFILE_STATIC_TARGET} PRIVATE ${FLAC_DEFINITIONS})
+	endif ()
+
+	if (HAVE_SPEEX)
+		target_include_directories (${SNDFILE_STATIC_TARGET} PRIVATE
+			${SPEEX_INCLUDE_DIRS})
+	endif ()
+
 	if (WIN32)
 		set_target_properties (${SNDFILE_STATIC_TARGET} PROPERTIES PREFIX "lib")
 	endif ()
@@ -343,7 +358,7 @@ if (BUILD_SHARED_LIBS)
 		set (VERSION_MAJOR ${CPACK_PACKAGE_VERSION_MAJOR})
 		set (PACKAGE_NAME ${CPACK_PACKAGE_NAME})
 		set (GEN_TOOL cmake)
-		
+
 		set (WIN_RC_VERSION "${CPACK_PACKAGE_VERSION_MAJOR},${CPACK_PACKAGE_VERSION_MINOR},${CPACK_PACKAGE_VERSION_PATCH}")
 		set (CLEAN_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 		set (PACKAGE_VERSION ${CPACK_PACKAGE_VERSION})
@@ -362,23 +377,33 @@ if (BUILD_SHARED_LIBS)
 			$<INSTALL_INTERFACE:${CMAKE_INSTALL_LIBDIR}>
 			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>)
 
+	target_link_libraries (${SNDFILE_SHARED_TARGET} PRIVATE
+		${EXTERNAL_CODEC_LIBS})
+
 	if (LIBM_REQUIRED)
 		target_link_libraries (${SNDFILE_SHARED_TARGET} PRIVATE ${M_LIBRARY})
 	endif (LIBM_REQUIRED)
 
-	if (NOT DISABLE_EXTERNAL_LIBS)
-		target_link_libraries (${SNDFILE_SHARED_TARGET} PRIVATE ${EXTERNAL_XIPH_LIBS})
+	if (HAVE_OGG)
 		target_include_directories (${SNDFILE_SHARED_TARGET} PRIVATE
-			${OGG_INCLUDE_DIRS}
-			${VORBIS_INCLUDE_DIRS}
+			${OGG_INCLUDE_DIRS})
+	endif ()
+
+	if (HAVE_VORBIS)
+		target_include_directories (${SNDFILE_SHARED_TARGET} PRIVATE
+			${VORBIS_INCLUDE_DIRS})
+	endif ()
+
+	if (HAVE_FLAC)
+		target_include_directories (${SNDFILE_SHARED_TARGET} PRIVATE
 			${FLAC_INCLUDE_DIRS})
-			target_compile_definitions (${SNDFILE_SHARED_TARGET} PRIVATE ${FLAC_DEFINITIONS})
-		if (ENABLE_EXPERIMENTAL)
-			target_link_libraries (${SNDFILE_SHARED_TARGET} PRIVATE ${SPEEX_LIBRARIES})
-			target_include_directories (${SNDFILE_SHARED_TARGET} PRIVATE
+		target_compile_definitions (${SNDFILE_SHARED_TARGET} PRIVATE ${FLAC_DEFINITIONS})
+	endif ()
+
+	if (HAVE_SPEEX)
+		target_include_directories (${SNDFILE_SHARED_TARGET} PRIVATE
 			${SPEEX_INCLUDE_DIRS})
-		endif (ENABLE_EXPERIMENTAL)
-	endif (NOT DISABLE_EXTERNAL_LIBS)
+	endif ()
 
 	set_target_properties (${SNDFILE_SHARED_TARGET} PROPERTIES
 		PUBLIC_HEADER "${libsndfile_PUBLIC_HEADERS}"

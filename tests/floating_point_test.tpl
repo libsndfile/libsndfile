@@ -115,11 +115,13 @@ main (int argc, char *argv [])
 	float_scaled_test	("alac_24.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_24, -153.0) ;
 	float_scaled_test	("alac_20.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_20, -125.0) ;
 
-#if HAVE_EXTERNAL_XIPH_LIBS
+#if HAVE_FLAC
 	float_scaled_test	("flac_8.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_S8, -39.0) ;
 	float_scaled_test	("flac_16.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_16, -87.0) ;
 	float_scaled_test	("flac_24.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_24, -138.0) ;
+#endif
 
+#if (HAVE_VORBIS && HAVE_OGG)
 	float_scaled_test	("vorbis.oga", allow_exit, SF_FALSE, SF_FORMAT_OGG | SF_FORMAT_VORBIS, -31.0) ;
 #endif
 
@@ -172,11 +174,13 @@ main (int argc, char *argv [])
 	double_scaled_test	("alac_24.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_24, -153.0) ;
 	double_scaled_test	("alac_32.caf", allow_exit, SF_FALSE, SF_FORMAT_CAF | SF_FORMAT_ALAC_32, -186.0) ;
 
-#if HAVE_EXTERNAL_XIPH_LIBS
+#if HAVE_FLAC
 	double_scaled_test	("flac_8.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_S8, -39.0) ;
 	double_scaled_test	("flac_16.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_16, -87.0) ;
 	double_scaled_test	("flac_24.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_24, -138.0) ;
+#endif
 
+#if (HAVE_VORBIS && HAVE_OGG)
 	double_scaled_test	("vorbis.oga", allow_exit, SF_FALSE, SF_FORMAT_OGG | SF_FORMAT_VORBIS, -29.0) ;
 #endif
 
