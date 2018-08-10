@@ -36,7 +36,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if (ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_XIPH_LIBS)
+#if (ENABLE_EXPERIMENTAL_CODE && HAVE_OGG)
 
 #include <ogg/ogg.h>
 
@@ -139,7 +139,7 @@ ogg_opus_close (SF_PRIVATE * UNUSED (psf))
 } /* ogg_opus_close */
 
 
-#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_EXTERNAL_XIPH_LIBS */
+#else /* ENABLE_EXPERIMENTAL_CODE && HAVE_OGG */
 
 int
 ogg_opus_open (SF_PRIVATE *psf)

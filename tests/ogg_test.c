@@ -332,7 +332,7 @@ ogg_stereo_seek_test (const char * filename, int format)
 int
 main (void)
 {
-	if (HAVE_EXTERNAL_XIPH_LIBS)
+	if (HAVE_VORBIS && HAVE_OGG)
 	{	ogg_short_test () ;
 		ogg_int_test () ;
 		ogg_float_test () ;

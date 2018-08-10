@@ -36,7 +36,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if HAVE_EXTERNAL_XIPH_LIBS
+#if HAVE_OGG
 
 #include <ogg/ogg.h>
 
@@ -271,12 +271,12 @@ ogg_page_classify (SF_PRIVATE * psf, const ogg_page * og)
 	return 0 ;
 } /* ogg_page_classify */
 
-#else /* HAVE_EXTERNAL_XIPH_LIBS */
+#else /* HAVE_OGG */
 
 int
 ogg_open	(SF_PRIVATE *psf)
 {
-	psf_log_printf (psf, "This version of libsndfile was compiled without Ogg/Vorbis support.\n") ;
+	psf_log_printf (psf, "This version of libsndfile was compiled without Ogg support.\n") ;
 	return SFE_UNIMPLEMENTED ;
 } /* ogg_open */
 
