@@ -14,15 +14,14 @@ endif
 
 EXTRA_DIST = libsndfile.spec.in sndfile.pc.in Scripts/android-configure.sh \
 	Scripts/linux-to-win-cross-configure.sh \
-	CMakeLists.txt $(cmake_files) sndfile.pc.cmake.in Win32
+	CMakeLists.txt $(cmake_files) Win32
 
 cmake_files = cmake/ClipMode.cmake cmake/FindFLAC.cmake \
 	cmake/CMakeAutoGen.cmake cmake/CMakeAutoGenScript.cmake \
-	cmake/FindFLAC.cmake cmake/FindOgg.cmake cmake/FindSndio.cmake \
-	cmake/FindSpeex.cmake cmake/FindSQLite3.cmake cmake/FindVorbis.cmake \
+	cmake/FindOgg.cmake cmake/FindVorbis.cmake cmake/FindSndio.cmake \
+	cmake/FindSpeex.cmake cmake/FindSQLite3.cmake cmake/FindVorbisEnc.cmake \
 	cmake/SndFileChecks.cmake cmake/TestInline.cmake \
-	cmake/TestLargeFiles.cmake cmake/LibSndFileConfig.cmake.in \
-	cmake/TestInline.c.in
+	cmake/TestLargeFiles.cmake cmake/TestInline.c.in
 
 pkgconfig_DATA = sndfile.pc
 
