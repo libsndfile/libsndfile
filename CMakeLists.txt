@@ -61,6 +61,7 @@ if (NOT ENABLE_CPU_CLIP)
 	set (CPU_CLIPS_POSITIVE FALSE)
 	set (CPU_CLIPS_NEGATIVE FALSE)
 endif ()
+cmake_dependent_option (ENABLE_COMPATIBLE_LIBSNDFILE_NAME "Set DLL name to libsndfile-1.dll (canonical name), sndfile.dll otherwise" ON "WIN32;NOT MINGW;BUILD_SHARED_LIBS" OFF)
 
 set (HAVE_EXTERNAL_XIPH_LIBS ${ENABLE_EXTERNAL_LIBS})
 set (HAVE_SQLITE3 ${BUILD_REGTEST})
@@ -79,6 +80,9 @@ add_feature_info (ENABLE_CPACK ENABLE_CPACK "enable CPack support")
 add_feature_info (ENABLE_CPU_CLIP ENABLE_CPU_CLIP "Enable tricky cpu specific clipper")
 add_feature_info (ENABLE_BOW_DOCS ENABLE_BOW_DOCS "enable black-on-white html docs")
 add_feature_info (ENABLE_PACKAGE_CONFIG ENABLE_PACKAGE_CONFIG "generate and install package config file")
+if (WIN32 AND (NOT MINGW) AND BUILD_SHARED_LIBS)
+	add_feature_info (ENABLE_COMPATIBLE_LIBSNDFILE_NAME ENABLE_COMPATIBLE_LIBSNDFILE_NAME "Set DLL name to libsndfile-1.dll (canonical name), sndfile.dll otherwise")
+endif ()
 
 if (MSVC OR MINGW)
 	add_feature_info (ENABLE_STATIC_RUNTIME ENABLE_STATIC_RUNTIME "Enable static runtime")
@@ -286,8 +290,14 @@ target_link_libraries (sndfile
 		$<$<AND:$<BOOL:${ENABLE_EXPERIMENTAL}>,$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>,$<BOOL:${HAVE_SPEEX}>>:Speex::Speex>
 	)
 set_target_properties (sndfile PROPERTIES
-	PUBLIC_HEADER "${sndfile_HDRS}"
+	RUNTIME_OUTPUT_NAME "${sndfile_HDRS}"
 	)
+
+if (ENABLE_COMPATIBLE_LIBSNDFILE_NAME)
+	set_target_properties (sndfile PROPERTIES
+		RUNTIME_OUTPUT_NAME "libsndfile-1"
+		)
+endif ()
 
 if (BUILD_SHARED_LIBS)
 
