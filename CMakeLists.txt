@@ -51,7 +51,7 @@ list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # Setup definitions
 #
 
-include(${CMAKE_MODULE_PATH}/SndFileChecks.cmake)
+include(SndFileChecks)
 
 
 cmake_dependent_option (BUILD_REGTEST "Build regtest" ON "SQLITE3_FOUND" OFF)
@@ -673,7 +673,7 @@ if (BUILD_TESTING)
 
 	enable_testing ()
 
-	include (${CMAKE_MODULE_PATH}/CMakeAutoGen.cmake)
+	include (CMakeAutoGen)
 
 	# generate tests sources from autogen templates
 	lsf_autogen (tests benchmark c)
