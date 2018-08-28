@@ -89,6 +89,13 @@ main (int argc, char **argv)
 		exit (1) ;
 		} ;
 
+	if (sfinfo.channels > MAX_CHANNELS)
+	{	printf ("\nError : Input file '%s' has too many (%d) channels. Limit is %d.\n",
+			argv [1], sfinfo.channels, MAX_CHANNELS) ;
+		exit (1) ;
+		} ;
+
+
 	state.channels = sfinfo.channels ;
 	sfinfo.channels = 1 ;
 
