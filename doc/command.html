@@ -50,6 +50,10 @@
 	<TD>Retrieve the internal per-file operation log.</TD>
 </TR>
 <TR>
+	<TD><A HREF="#SFC_GET_CURRENT_SF_INFO">SFC_GET_CURRENT_SF_INFO</A></TD>
+	<TD>Retrieve <CODE>SF_INFO</CODE> struct of opened file.</TD>
+</TR>
+<TR>
 	<TD><A HREF="#SFC_CALC_SIGNAL_MAX">SFC_CALC_SIGNAL_MAX</A></TD>
 	<TD>Calculate the measured maximum signal value.</TD>
 </TR>
@@ -335,6 +339,38 @@ Example:
 <DD>
 The string returned in the buffer passed to this function will not overflow
 the buffer and will always be null terminated .
+</DL>
+
+<!-- ========================================================================= -->
+<A NAME="SFC_GET_CURRENT_SF_INFO"></A>
+<H2><BR><B>SFC_GET_CURRENT_SF_INFO</B></H2>
+<P>
+Retrieve <CODE>SF_INFO</CODE> struct of opened file.
+</P>
+<P>
+<CODE>SFC_GET_CURRENT_SF_INFO</CODE> command copies <CODE>SF_INFO</CODE> struct of
+<CODE>sndfile</CODE> object to provided buffer.
+</P>
+
+<P>
+Parameters:
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_GET_CURRENT_SF_INFO
+        data     : A pointer to a valid SF_INFO* pointer
+        datasize : sizeof (SF_INFO)
+</PRE>
+<P>
+Example:
+</P>
+<PRE>
+        SF_INFO  sfinfo ;
+        sf_command (sndfile, SFC_GET_CURRENT_SF_INFO, sfinfo, sizeof (SF_INFO)) ;
+</PRE>
+
+<DL>
+<DT>Return value:</DT>
+        <DD><DD>Zero on success, non-zero otherwise.
 </DL>
 
 <!-- ========================================================================= -->
