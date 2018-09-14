@@ -562,7 +562,7 @@ AS_IF([test "x$enable_werror" = "xyes"], [
 	])
 
 common_flags="-Wall -Wextra -Wpointer-arith -Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wundef -Wuninitialized -Winit-self"
-AX_APPEND_COMPILE_FLAGS([${common_flags} -Wdeclaration-after-statement -Wvla -Wbad-function-cast -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return], [CFLAGS])
+AX_APPEND_COMPILE_FLAGS([${common_flags} -Wvla -Wbad-function-cast -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return], [CFLAGS])
 
 AC_LANG_PUSH([C++])
 AX_APPEND_COMPILE_FLAGS([${common_flags} -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo], [CXXFLAGS])
