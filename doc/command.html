@@ -201,7 +201,7 @@
 </TR>
 
 <TR>
-	<TD><A HREF="#SFC_RAW_NEEDS_ENDSWAP">SFC_RAW_NEEDS_ENDSWAP</a></td>
+	<TD><A HREF="#SFC_RAW_DATA_NEEDS_ENDSWAP">SFC_RAW_DATA_NEEDS_ENDSWAP</a></td>
 	<TD>Determine if raw data needs endswapping</TD>
 </TR>
 
@@ -1431,8 +1431,8 @@ The command must be sent before any audio data is written to the file.
 </DL>
 
 <!-- ========================================================================= -->
-<A NAME="SFC_RAW_NEEDS_ENDSWAP"></A>
-<H2><BR><B>SFC_RAW_NEEDS_ENDSWAP</B></H2>
+<A NAME="SFC_RAW_DATA_NEEDS_ENDSWAP"></A>
+<H2><BR><B>SFC_RAW_DATA_NEEDS_ENDSWAP</B></H2>
 <P>
 Determine if raw data read using
 	<a href="api.html#raw">
@@ -1448,7 +1448,7 @@ machine.
 Parameters:
 <PRE>
         sndfile  : A valid SNDFILE* pointer
-        cmd      : SFC_RAW_NEEDS_ENDSWAP
+        cmd      : SFC_RAW_DATA_NEEDS_ENDSWAP
         data     : NULL
         datasize : 0
 </PRE>
