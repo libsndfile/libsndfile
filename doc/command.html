@@ -216,6 +216,16 @@
 </TR>
 
 <TR>
+	<TD><A HREF="#SFC_GET_CHANNEL_MAP_INFO">SFC_GET_CHANNEL_MAP_INFO</A></TD>
+	<TD>Retrieve the channel map info</TD>
+</TR>
+
+<TR>
+	<TD><A HREF="#SFC_SET_CHANNEL_MAP_INFO">SFC_SET_CHANNEL_MAP_INFO</A></TD>
+	<TD>Set the channel map info</TD>
+</TR>
+
+<TR>
 	<TD><A HREF="#SFC_SET_CART_INFO">SFC_SET_CART_INFO</A></TD>
 	<TD>Set the Cart Chunk info</TD>
 </TR>
@@ -1512,6 +1522,53 @@ Parameters:
 	otherwise.
 
 </DL>
+
+<!-- ========================================================================= -->
+<A NAME="SFC_GET_CHANNEL_MAP_INFO"></A>
+<H2><BR><B>SFC_GET_CHANNEL_MAP_INFO</B></H2>
+<P>
+Retrieve the channel map contained in an AIFF or CAF Channel Layout chunk.
+</P>
+<p>
+Parameters:
+</p>
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_GET_CHANNEL_MAP_INFO
+        data     : a pointer to an array of int, the same size as the number of channels in the file
+        datasize : number of channels * sizeof (int)
+</PRE>
+<P>
+Channel map positions are defined in an enum in &lt;sndfile.h&gt;.
+</P>
+
+<DL>
+<DT>Return value: </DT>
+	<DD>SF_TRUE if the file contained a Channel Layout chunk or SF_FALSE otherwise.
+</DL>
+
+<!-- ========================================================================= -->
+<A NAME="SFC_SET_CHANNEL_MAP_INFO"></A>
+<H2><BR><B>SFC_SET_CHANNEL_MAP_INFO</B></H2>
+<P>
+Set the channel map contained in an AIFF or CAF Channel Layout chunk.
+</P>
+<p>
+Parameters:
+</p>
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_SET_CHANNEL_MAP_INFO
+        data     : a pointer to an array of int, the same size as the number of channels in the file
+        datasize : number of channels * sizeof (int)
+</PRE>
+
+<DL>
+<DT>Return value: </DT>
+	<DD>SF_TRUE if setting the Channel Layout chunk was successful and SF_FALSE otherwise.
+
+</DL>
+
 
 <!-- ========================================================================= -->
 <A NAME="SFC_GET_CART_INFO"></A>
