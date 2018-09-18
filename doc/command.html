@@ -181,12 +181,12 @@
 </TR>
 
 <TR>
-	<TD><A HREF="#SFC_WAVEX_GET_AMBISONIC">SFC_GET_AMBISONIC</A></TD>
+	<TD><A HREF="#SFC_WAVEX_GET_AMBISONIC">SFC_WAVEX_GET_AMBISONIC</A></TD>
 	<TD>Test a WAVEX file for Ambisonic format</TD>
 </TR>
 
 <TR>
-	<TD><A HREF="#SFC_WAVEX_SET_AMBISONIC">SFC_SET_AMBISONIC</A></TD>
+	<TD><A HREF="#SFC_WAVEX_SET_AMBISONIC">SFC_WAVEX_SET_AMBISONIC</A></TD>
 	<TD>Modify a WAVEX header for Ambisonic format</TD>
 </TR>
 
@@ -201,7 +201,7 @@
 </TR>
 
 <TR>
-	<TD><A HREF="#SFC_RAW_NEEDS_ENDSWAP">SFC_RAW_NEEDS_ENDSWAP</a></td>
+	<TD><A HREF="#SFC_RAW_DATA_NEEDS_ENDSWAP">SFC_RAW_DATA_NEEDS_ENDSWAP</a></td>
 	<TD>Determine if raw data needs endswapping</TD>
 </TR>
 
@@ -213,6 +213,16 @@
 <TR>
 	<TD><A HREF="#SFC_SET_BROADCAST_INFO">SFC_SET_BROADCAST_INFO</A></TD>
 	<TD>Set the Broadcast Chunk info</TD>
+</TR>
+
+<TR>
+	<TD><A HREF="#SFC_GET_CHANNEL_MAP_INFO">SFC_GET_CHANNEL_MAP_INFO</A></TD>
+	<TD>Retrieve the channel map info</TD>
+</TR>
+
+<TR>
+	<TD><A HREF="#SFC_SET_CHANNEL_MAP_INFO">SFC_SET_CHANNEL_MAP_INFO</A></TD>
+	<TD>Set the channel map info</TD>
 </TR>
 
 <TR>
@@ -1421,8 +1431,8 @@ The command must be sent before any audio data is written to the file.
 </DL>
 
 <!-- ========================================================================= -->
-<A NAME="SFC_RAW_NEEDS_ENDSWAP"></A>
-<H2><BR><B>SFC_RAW_NEEDS_ENDSWAP</B></H2>
+<A NAME="SFC_RAW_DATA_NEEDS_ENDSWAP"></A>
+<H2><BR><B>SFC_RAW_DATA_NEEDS_ENDSWAP</B></H2>
 <P>
 Determine if raw data read using
 	<a href="api.html#raw">
@@ -1438,7 +1448,7 @@ machine.
 Parameters:
 <PRE>
         sndfile  : A valid SNDFILE* pointer
-        cmd      : SFC_RAW_NEEDS_ENDSWAP
+        cmd      : SFC_RAW_DATA_NEEDS_ENDSWAP
         data     : NULL
         datasize : 0
 </PRE>
@@ -1512,6 +1522,53 @@ Parameters:
 	otherwise.
 
 </DL>
+
+<!-- ========================================================================= -->
+<A NAME="SFC_GET_CHANNEL_MAP_INFO"></A>
+<H2><BR><B>SFC_GET_CHANNEL_MAP_INFO</B></H2>
+<P>
+Retrieve the channel map contained in an AIFF or CAF Channel Layout chunk.
+</P>
+<p>
+Parameters:
+</p>
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_GET_CHANNEL_MAP_INFO
+        data     : a pointer to an array of int, the same size as the number of channels in the file
+        datasize : number of channels * sizeof (int)
+</PRE>
+<P>
+Channel map positions are defined in an enum in &lt;sndfile.h&gt;.
+</P>
+
+<DL>
+<DT>Return value: </DT>
+	<DD>SF_TRUE if the file contained a Channel Layout chunk or SF_FALSE otherwise.
+</DL>
+
+<!-- ========================================================================= -->
+<A NAME="SFC_SET_CHANNEL_MAP_INFO"></A>
+<H2><BR><B>SFC_SET_CHANNEL_MAP_INFO</B></H2>
+<P>
+Set the channel map contained in an AIFF or CAF Channel Layout chunk.
+</P>
+<p>
+Parameters:
+</p>
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_SET_CHANNEL_MAP_INFO
+        data     : a pointer to an array of int, the same size as the number of channels in the file
+        datasize : number of channels * sizeof (int)
+</PRE>
+
+<DL>
+<DT>Return value: </DT>
+	<DD>SF_TRUE if setting the Channel Layout chunk was successful and SF_FALSE otherwise.
+
+</DL>
+
 
 <!-- ========================================================================= -->
 <A NAME="SFC_GET_CART_INFO"></A>
