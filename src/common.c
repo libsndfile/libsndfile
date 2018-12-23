@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -1243,7 +1243,11 @@ psf_memset (void *s, int c, sf_count_t len)
 
 typedef SF_CUES_VAR (0) SF_CUES_0 ;
 
+/* calculate size of SF_CUES struct given number of cues */
 #define SF_CUES_VAR_SIZE(count)	(sizeof (SF_CUES_0) + count * sizeof (SF_CUE_POINT))
+
+/* calculate number of cues in SF_CUES struct given data size */
+#define SF_CUES_COUNT(datasize) (((datasize) - sizeof (uint32_t)) / sizeof (SF_CUE_POINT))
 
 SF_CUES *
 psf_cues_alloc (uint32_t cue_count)
@@ -1254,11 +1258,16 @@ psf_cues_alloc (uint32_t cue_count)
 } /* psf_cues_alloc */
 
 SF_CUES *
-psf_cues_dup (const void * ptr)
+psf_cues_dup (const void * ptr, size_t datasize)
 {	const SF_CUES *pcues = ptr ;
-	SF_CUES *pnew = psf_cues_alloc (pcues->cue_count) ;
+	SF_CUES *pnew = NULL ;
 
-	memcpy (pnew, pcues, SF_CUES_VAR_SIZE (pcues->cue_count)) ;
+	if (pcues->cue_count <= SF_CUES_COUNT (datasize))
+	{	/* check that passed-in datasize is consistent with cue_count in passed-in SF_CUES struct */
+		pnew = psf_cues_alloc (pcues->cue_count) ;
+		memcpy (pnew, pcues, SF_CUES_VAR_SIZE (pcues->cue_count)) ;
+	}
+
 	return pnew ;
 } /* psf_cues_dup */
 
@@ -1266,7 +1275,7 @@ void
 psf_get_cues (SF_PRIVATE * psf, void * data, size_t datasize)
 {
 	if (psf->cues)
-	{	uint32_t cue_count = (datasize - sizeof (uint32_t)) / sizeof (SF_CUE_POINT) ;
+	{	uint32_t cue_count = SF_CUES_COUNT (datasize) ;
 
 		cue_count = SF_MIN (cue_count, psf->cues->cue_count) ;
 		memcpy (data, psf->cues, SF_CUES_VAR_SIZE (cue_count)) ;
