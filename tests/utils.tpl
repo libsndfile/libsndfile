@@ -1,6 +1,6 @@
 [+ AutoGen5 template h c +]
 /*
-** Copyright (C) 2002-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -202,7 +202,7 @@ sf_count_t		file_length_fd (int fd) ;
 #define	M_PI		3.14159265358979323846264338
 #endif
 
-#define	LOG_BUFFER_SIZE		2048
+#define	LOG_BUFFER_SIZE		4096
 
 /*
 **	Neat solution to the Win32/OS2 binary file flage requirement.
