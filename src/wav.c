@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2019 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004-2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -1142,6 +1142,8 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "44", BHW4 (0), BHW4 (0)) ; /* SMTPE format */
 		psf_binheader_writef (psf, "44", BHW4 (psf->instrument->loop_count), BHW4 (0)) ;
 
+		/* Loop count is signed 16 bit number so we limit it range to something sensible. */
+		psf->instrument->loop_count &= 0x7fff ;
 		for (tmp = 0 ; tmp < psf->instrument->loop_count ; tmp++)
 		{	int type ;
 
@@ -1408,7 +1410,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 		} ;
 
 	psf->instrument->basenote = note ;
-	psf->instrument->detune = (int8_t)(pitch / (0x40000000 / 25.0) + 0.5) ;
+	psf->instrument->detune = (int8_t) (pitch / (0x40000000 / 25.0) + 0.5) ;
 	psf->instrument->gain = 1 ;
 	psf->instrument->velocity_lo = psf->instrument->key_lo = 0 ;
 	psf->instrument->velocity_hi = psf->instrument->key_hi = 127 ;
