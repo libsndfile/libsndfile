@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2019 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -148,7 +148,7 @@ main (int argc, char *argv [])
 
 	if (do_all || strcmp (argv [1], "cue") == 0)
 	{	/* 2500 is close to the largest number of cues possible because of block sizes (enforced in aiff.c, wav.c) */
-		int cuecounts [] = { -1, 0, 1, 10, 100, 101, 1000, 1001, 2500 } ;
+		int cuecounts [] = { 0, 1, 10, 100, 101, 1000, 1001, 2500 } ;
 		unsigned int i ;
 
 		cue_test ("cue.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
@@ -1044,6 +1044,8 @@ cue_test_var (const char *filename, int filetype, int count)
 		exit (1) ;
 		} ;
 
+	free (write_cue) ;
+	free (read_cue) ;
 	unlink (filename) ;
 	puts ("ok") ;
 } /* cue_test_var */
