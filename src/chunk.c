@@ -219,6 +219,7 @@ psf_save_write_chunk (WRITE_CHUNKS * pchk, const SF_CHUNK_INFO * chunk_info)
 {	union
 	{	uint32_t marker ;
 		char str [5] ;
+		/* Update snprintf() format string below when changing this */
 	} u ;
 	uint32_t len ;
 
@@ -241,7 +242,7 @@ psf_save_write_chunk (WRITE_CHUNKS * pchk, const SF_CHUNK_INFO * chunk_info)
 	len = chunk_info->datalen ;
 	while (len & 3) len ++ ;
 
-	snprintf (u.str, sizeof (u.str), "%s", chunk_info->id) ;
+	snprintf (u.str, sizeof (u.str), "%.4s", chunk_info->id) ;
 
 	pchk->chunks [pchk->used].hash = strlen (chunk_info->id) > 4 ? hash_of_str (chunk_info->id) : u.marker ;
 	pchk->chunks [pchk->used].mark32 = u.marker ;
