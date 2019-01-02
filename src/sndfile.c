@@ -384,9 +384,15 @@ sf_open_virtual	(SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo, void *user
 {	SF_PRIVATE 	*psf ;
 
 	/* Make sure we have a valid set ot virtual pointers. */
-	if (sfvirtual->get_filelen == NULL || sfvirtual->seek == NULL || sfvirtual->tell == NULL)
+	if (sfvirtual->get_filelen == NULL)
 	{	sf_errno = SFE_BAD_VIRTUAL_IO ;
-		snprintf (sf_parselog, sizeof (sf_parselog), "Bad vio_get_filelen / vio_seek / vio_tell in SF_VIRTUAL_IO struct.\n") ;
+		snprintf (sf_parselog, sizeof (sf_parselog), "Bad vio_get_filelen in SF_VIRTUAL_IO struct.\n") ;
+		return NULL ;
+		} ;
+
+	if ((sfvirtual->seek == NULL || sfvirtual->tell == NULL) && sfinfo->seekable)
+	{	sf_errno = SFE_BAD_VIRTUAL_IO ;
+		snprintf (sf_parselog, sizeof (sf_parselog), "Bad vio_seek / vio_tell in SF_VIRTUAL_IO struct.\n") ;
 		return NULL ;
 		} ;
 
