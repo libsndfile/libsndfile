@@ -116,8 +116,13 @@ main (int argc, char **argv)
 
 	for (ch = 0 ; ch < state.channels ; ch++)
 	{	char filename [520] ;
+		size_t count ;
 
-		snprintf (filename, sizeof (filename), "%s_%02d%s", pathname, ch, ext) ;
+		count = snprintf (filename, sizeof (filename), "%s_%02d%s", pathname, ch, ext) ;
+
+		if (count >= sizeof (filename))
+		{	printf ("File name truncated to %s\n", filename) ;
+			} ;
 
 		if ((state.outfile [ch] = sf_open (filename, SFM_WRITE, &sfinfo)) == NULL)
 		{	printf ("Not able to open output file '%s'\n%s\n", filename, sf_strerror (NULL)) ;
