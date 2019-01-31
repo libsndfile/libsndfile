@@ -174,7 +174,7 @@ if (WIN32)
 		set (WIN32_TARGET_DLL 1)
 	endif ()
 	if (MINGW)
-		set (__USE_MINGW_ANSI_STDIO 1)
+		add_definitions (-D__USE_MINGW_ANSI_STDIO=1)
 	endif ()
 endif ()
 
