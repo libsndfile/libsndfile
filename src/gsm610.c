@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2019 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -568,6 +568,8 @@ gsm610_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 
 		total += count ;
 		len -= writecount ;
+		if (count != writecount)
+			break ;
 		} ;
 	return total ;
 } /* gsm610_write_f */

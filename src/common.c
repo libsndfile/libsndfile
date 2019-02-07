@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2019 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -385,6 +385,9 @@ psf_asciiheader_printf (SF_PRIVATE *psf, const char *format, ...)
 	int		maxlen ;
 	char	*start ;
 
+	if (! format)
+		return ;
+
 	maxlen = strlen ((char*) psf->header.ptr) ;
 	start	= ((char*) psf->header.ptr) + maxlen ;
 	maxlen	= psf->header.len - maxlen ;
@@ -558,9 +561,10 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 	void			*bindata ;
 	size_t			size ;
 	char			c, *strptr ;
-	int				count = 0, trunc_8to4 ;
+	int				count = 0, trunc_8to4 = SF_FALSE ;
 
-	trunc_8to4 = SF_FALSE ;
+	if (! format)
+		return psf_ftell (psf) ;
 
 	va_start (argptr, format) ;
 
