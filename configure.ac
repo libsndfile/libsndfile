@@ -148,6 +148,9 @@ AC_ARG_ENABLE([alsa],
 AC_ARG_ENABLE([external-libs],
 	[AS_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis [[default=no]]])])
 
+AC_ARG_ENABLE([mpeg],
+	[AS_HELP_STRING([--disable-mpeg], [disable use of LAME/MPG123 for MPEG (MP3) [[defaults=no]]])])
+
 AC_ARG_ENABLE(octave,
 	[AS_HELP_STRING([--enable-octave], [enable building of GNU Octave module])])
 
@@ -387,6 +390,51 @@ AS_IF([test -n "$PKG_CONFIG"], [
 	])
 
 AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_XIPH_LIBS], [$HAVE_EXTERNAL_XIPH_LIBS], [Will be set to 1 if flac, ogg, vorbis, and opus are available.])
+
+dnl ====================================================================================
+dnl  Check for MPEG libraris liblame
+
+ac_cv_lame="no"
+ac_cv_mpg123="no"
+HAVE_MPEG=0
+MPEG_CFLAGS=""
+MPEG_LIBS=""
+
+AS_IF([test -n "$PKG_CONFIG"], [
+		AS_IF([test "x$enable_mpeg" = "xno"], [
+				AC_MSG_WARN([[*** MPEG (Lame/MPG123) disabled. ***]])
+			], [
+				AC_CHECK_HEADER(lame/lame.h,
+								lame_header_found="yes",
+								lame_header_found="no")
+				AC_SEARCH_LIBS(lame_set_VBR_q, [lame mp3lame], [lame_lib_found="yes"], [lame_lib_found="no"])
+				AS_IF([test "x$lame_lib_found$lame_header_found" = "xyesyes"], [
+						ac_cv_lame="yes"
+					], [
+						AC_MSG_WARN([["MPEG support selected but external Lame library cannot be found.]])
+					])
+
+				PKG_CHECK_MOD_VERSION([MPG123], [libmpg123 >= 1.25.10], [
+						ac_cv_mpg123="yes"
+					], [
+						AC_MSG_WARN([["MPEG support selected but external MPG123 library cannot be found.]])
+					])
+
+				AS_IF([test "x$ac_cv_lame$ac_cv_mpg123" = "xyesyes"], [
+						enable_mpeg="yes"
+						HAVE_MPEG=1
+						MPEG_CFLAGS="$MPG123_CFLAGS"
+						MPEG_LIBS="$MPG123_LIBS"
+					], [
+						enable_mpeg="no"
+						AS_ECHO([""])
+						AC_MSG_WARN([[*** MPEG support disabled.]])
+						AS_ECHO([""])
+					])
+			])
+	])
+
+AC_DEFINE_UNQUOTED([HAVE_MPEG], [$HAVE_MPEG], [Will be set to 1 if lame, mpg123 mpeg support is available.])
 
 dnl ====================================================================================
 dnl  Check for libsqlite3 (only used in regtest).
@@ -666,6 +714,7 @@ AC_SUBST(GEN_TOOL)
 AC_SUBST(WIN_RC_VERSION)
 
 AC_SUBST(HAVE_EXTERNAL_XIPH_LIBS)
+AC_SUBST(HAVE_MPEG)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(SNDIO_LIBS)
@@ -673,6 +722,10 @@ AC_SUBST(SNDIO_LIBS)
 AC_SUBST(EXTERNAL_XIPH_CFLAGS)
 AC_SUBST(EXTERNAL_XIPH_LIBS)
 AC_SUBST(EXTERNAL_XIPH_REQUIRE)
+AC_SUBST(MPG123_CFLAGS)
+AC_SUBST(MPG123_LIBS)
+AC_SUBST(MPEG_CFLAGS)
+AC_SUBST(MPEG_LIBS)
 AC_SUBST(SRC_BINDIR)
 AC_SUBST(TEST_BINDIR)
 
@@ -718,6 +771,7 @@ AC_MSG_RESULT([
     Experimental code : ................... ${enable_experimental:-no}
     Using ALSA in example programs : ...... ${enable_alsa:-no}
     External FLAC/Ogg/Vorbis/Opus : ....... ${enable_external_libs:-no}
+    External MPEG Lame/MPG123 : ........... ${enable_mpeg:-no}
     Building Octave interface : ........... ${OCTAVE_BUILD}
 
   Tools :

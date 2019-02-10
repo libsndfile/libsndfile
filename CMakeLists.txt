@@ -78,6 +78,7 @@ include(SndFileChecks)
 
 cmake_dependent_option (BUILD_REGTEST "Build regtest" ON "SQLITE3_FOUND" OFF)
 cmake_dependent_option (ENABLE_EXTERNAL_LIBS "Enable FLAC, Vorbis, and Opus codecs" ON "Vorbis_FOUND;FLAC_FOUND;OPUS_FOUND" OFF)
+cmake_dependent_option (ENABLE_MPEG "Enable MPEG codecs" ON "LAME_FOUND;MPG123_FOUND" OFF)
 cmake_dependent_option (ENABLE_CPU_CLIP "Enable tricky cpu specific clipper" ON "CPU_CLIPS_POSITIVE;CPU_CLIPS_NEGATIVE" OFF)
 if (NOT ENABLE_CPU_CLIP)
 	set (CPU_CLIPS_POSITIVE FALSE)
@@ -104,11 +105,12 @@ set (HAVE_ALSA_ASOUNDLIB_H ${ALSA_FOUND})
 set (HAVE_SNDIO_H ${SNDIO_FOUND})
 
 set (ENABLE_EXPERIMENTAL_CODE ${ENABLE_EXPERIMENTAL})
+set (HAVE_MPEG_LIBS ${ENABLE_MPEG})
 set (HAVE_SPEEX ${ENABLE_EXPERIMENTAL})
-set (HAVE_OPUS ${ENABLE_EXPERIMENTAL})
 
 add_feature_info (BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
 add_feature_info (ENABLE_EXTERNAL_LIBS ENABLE_EXTERNAL_LIBS "enable FLAC, Vorbis, and Opus codecs")
+add_feature_info (ENABLE_MPEG ENABLE_MPEG "enable MPEG audio (including mp3) codecs")
 add_feature_info (ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info (BUILD_TESTING BUILD_TESTING "build tests")
 add_feature_info (BUILD_REGTEST BUILD_REGTEST "build regtest")
@@ -146,6 +148,18 @@ set_package_properties (FLAC PROPERTIES
 	URL "www.xiph.org/flac/"
 	DESCRIPTION "Free Lossless Audio Codec Library"
 	PURPOSE "Enables FLAC support"
+	)
+set_package_properties (LAME PROPERTIES
+	TYPE OPTIONAL
+	URL "https://lame.sourceforge.io/"
+	DESCRIPTION "High quality MPEG Audio Layer III (MP3) encoder"
+	PURPOSE "Enables MPEG layer III (MP3) writing support"
+	)
+set_package_properties (MPG123 PROPERTIES
+	TYPE OPTIONAL
+	URL "https://www.mpg123.de/"
+	DESCRIPTION "MPEG Audio Layer I/II/III decoder"
+	PURPOSE "Enables MPEG Audio reading support"
 	)
 set_package_properties(Opus PROPERTIES
 	TYPE RECOMMENDED
@@ -247,6 +261,7 @@ add_library (sndfile
 	src/ogg.c
 	src/chanmap.h
 	src/chanmap.c
+	src/id3.h
 	src/id3.c
 	$<$<BOOL:${WIN32}>:src/windows.c>
 	src/sndfile.c
@@ -284,8 +299,12 @@ add_library (sndfile
 	src/ogg_speex.c
 	src/ogg_pcm.c
 	src/ogg_opus.c
+	src/ogg_vcomment.h
 	src/ogg_vcomment.c
 	src/nms_adpcm.c
+	src/mp3.c
+	src/mpeg_decode.c
+	src/mpeg_l3_encode.c
 	src/GSM610/config.h
 	src/GSM610/gsm.h
 	src/GSM610/gsm610_priv.h
@@ -349,6 +368,8 @@ target_link_libraries (sndfile
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:FLAC::FLAC>
 		$<$<AND:$<BOOL:${ENABLE_EXPERIMENTAL}>,$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>,$<BOOL:${HAVE_SPEEX}>>:Speex::Speex>
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Opus::opus>
+		$<$<BOOL:${HAVE_MPEG_LIBS}>:MPG123::libmpg123>
+		$<$<BOOL:${HAVE_MPEG_LIBS}>:Lame::Lame>
 	)
 set_target_properties (sndfile PROPERTIES
 	PUBLIC_HEADER "${sndfile_HDRS}"
@@ -1187,6 +1208,14 @@ if (BUILD_TESTING)
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
 
+	add_executable (mp3_test tests/mp3_test.c)
+	target_link_libraries (mp3_test
+		PRIVATE
+			sndfile
+			test_utils
+			$<$<BOOL:${LIBM_REQUIRED}>:m>
+		)
+
 	add_executable (stdin_test tests/stdin_test.c)
 	target_link_libraries (stdin_test
 		PRIVATE
@@ -1417,6 +1446,10 @@ if (BUILD_TESTING)
 	add_test (compression_size_test_opus compression_size_test opus)
 	add_test (lossy_comp_test_ogg_opus lossy_comp_test ogg_opus)
 	add_test (string_test_opus string_test opus)
+
+	### mp3-tests ###
+	add_test (mp3_test mp3_test)
+	add_test (compression_size_test_mpeg compression_size_test mpeg)
 
 	### io-tests
 	add_test (stdio_test stdio_test)

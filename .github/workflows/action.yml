@@ -28,24 +28,28 @@ jobs:
             os: ubuntu-latest
             cc: gcc
             cxx: g++
+            autotools-options: --enable-werror
             build-system: autotools
 
           - name: ubuntu-clang-autotools
             os: ubuntu-latest
             cc: clang
             cxx: clang++
+            autotools-options: --enable-werror
             build-system: autotools
 
           - name: ubuntu-gcc-ossfuzz
             os: ubuntu-latest
             cc: gcc
             cxx: g++
+            autotools-options: --enable-werror
             build-system: ossfuzz
 
           - name: macos-autotools
             os: macos-latest
             cc: clang
             cxx: clang++
+            autotools-options: --enable-werror
             build-system: autotools
 
           - name: ubuntu-gcc-cmake
@@ -179,16 +183,16 @@ jobs:
       - name: Install MacOS dependencies
         if: startsWith(matrix.os,'macos')
         run: |
-          brew install automake autogen speex
+          brew install automake autogen speex mpg123
 
-      - name: Install Lunux dependencies
+      - name: Install Linux dependencies
         if: startsWith(matrix.os,'ubuntu')
-        run: sudo apt-get install -y autogen ninja-build libogg-dev libvorbis-dev libflac-dev libopus-dev libasound2-dev libsqlite3-dev libspeex-dev
+        run: sudo apt-get install -y autogen ninja-build libogg-dev libvorbis-dev libflac-dev libopus-dev libasound2-dev libsqlite3-dev libspeex-dev libmp3lame-dev libmpg123-dev
 
       - name: Install Windows dependencies
         if: startsWith(matrix.os,'windows')
         run: |
-          vcpkg install libvorbis libflac opus sqlite3 speex --triplet ${{matrix.triplet}}
+          vcpkg install libvorbis libflac opus sqlite3 speex mp3lame mpg123 --triplet ${{matrix.triplet}}
 
       - name: Configure, build and test with Autotools
         env:

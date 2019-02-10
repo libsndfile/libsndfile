@@ -115,6 +115,14 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
+	if (do_all || ! strcmp (argv [1], "mpeg"))
+	{	if (HAVE_MPEG)
+			string_start_test ("mpeg.mp3", SF_FORMAT_MP3 | SF_FORMAT_MPEG_LAYER_III) ;
+		else
+			puts ("    No MP3 tests because MPEG support was not compiled in.") ;
+		test_count++ ;
+		} ;
+
 	if (do_all || ! strcmp (argv [1], "ogg"))
 	{	if (HAVE_EXTERNAL_XIPH_LIBS)
 			string_start_test ("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS) ;
@@ -197,7 +205,9 @@ static const char
 	long_title	[]	= "This is a very long and very boring title for this file",
 	long_artist	[]	= "The artist who kept on changing its name",
 	genre		[]	= "The genre",
-	trackno		[]	= "Track three" ;
+	trackno		[]	= "Track three",
+	id3v1_genre	[]	= "Rock",
+	year		[]	= "2001" ;
 
 
 static	short	data_out [BUFFER_LEN] ;
@@ -374,6 +384,7 @@ string_start_test (const char *filename, int formattype)
 			break ;
 
 		case SF_FORMAT_OGG | SF_FORMAT_VORBIS :
+		case SF_FORMAT_MP3 | SF_FORMAT_MPEG_LAYER_III :
 			break ;
 
 		default :
@@ -390,9 +401,15 @@ string_start_test (const char *filename, int formattype)
 	sf_set_string (file, SF_STR_ARTIST, artist) ;
 	sf_set_string (file, SF_STR_COPYRIGHT, copyright) ;
 	sf_set_string (file, SF_STR_COMMENT, comment) ;
-	sf_set_string (file, SF_STR_DATE, date) ;
 	sf_set_string (file, SF_STR_ALBUM, album) ;
 	sf_set_string (file, SF_STR_LICENSE, license) ;
+	if (typemajor == SF_FORMAT_MP3)
+	{	sf_set_string (file, SF_STR_GENRE, id3v1_genre) ;
+		sf_set_string (file, SF_STR_DATE, year) ;
+		}
+	else
+	{	sf_set_string (file, SF_STR_DATE, date) ;
+		} ;
 
 	/* Write data to file. */
 	test_write_short_or_die (file, 0, data_out, BUFFER_LEN, __LINE__) ;
@@ -415,24 +432,35 @@ string_start_test (const char *filename, int formattype)
 		printf ("    Bad filename  : %s\n", cptr) ;
 		} ;
 
-	cptr = sf_get_string (file, SF_STR_COPYRIGHT) ;
-	if (cptr == NULL || strcmp (copyright, cptr) != 0)
-	{	if (errors++ == 0)
-			puts ("\n") ;
-		printf ("    Bad copyright : %s\n", cptr) ;
+	if (typemajor != SF_FORMAT_MP3)
+	{	cptr = sf_get_string (file, SF_STR_COPYRIGHT) ;
+		if (cptr == NULL || strcmp (copyright, cptr) != 0)
+		{	if (errors++ == 0)
+				puts ("\n") ;
+			printf ("    Bad copyright : %s\n", cptr) ;
+			} ;
+
+		cptr = sf_get_string (file, SF_STR_SOFTWARE) ;
+		if (cptr == NULL || strstr (cptr, software) != cptr)
+		{	if (errors++ == 0)
+				puts ("\n") ;
+			printf ("    Bad software  : %s\n", cptr) ;
+			} ;
+
+		if (cptr && str_count (cptr, "libsndfile") != 1)
+		{	if (errors++ == 0)
+				puts ("\n") ;
+			printf ("    Bad software  : %s\n", cptr) ;
+			} ;
 		} ;
 
-	cptr = sf_get_string (file, SF_STR_SOFTWARE) ;
-	if (cptr == NULL || strstr (cptr, software) != cptr)
-	{	if (errors++ == 0)
-			puts ("\n") ;
-		printf ("    Bad software  : %s\n", cptr) ;
-		} ;
-
-	if (cptr && str_count (cptr, "libsndfile") != 1)
-	{	if (errors++ == 0)
-			puts ("\n") ;
-		printf ("    Bad software  : %s\n", cptr) ;
+	if (typemajor == SF_FORMAT_MP3)
+	{	cptr = sf_get_string (file, SF_STR_GENRE) ;
+		if (cptr == NULL || strcmp (id3v1_genre, cptr) != 0)
+		{	if (errors++ == 0)
+				puts ("\n") ;
+			printf ("    Bad genre     : %s\n", cptr) ;
+			} ;
 		} ;
 
 	cptr = sf_get_string (file, SF_STR_ARTIST) ;
@@ -449,13 +477,29 @@ string_start_test (const char *filename, int formattype)
 		printf ("    Bad comment   : %s\n", cptr) ;
 		} ;
 
-	if (typemajor != SF_FORMAT_AIFF)
-	{	cptr = sf_get_string (file, SF_STR_DATE) ;
-		if (cptr == NULL || strcmp (date, cptr) != 0)
-		{	if (errors++ == 0)
-				puts ("\n") ;
-			printf ("    Bad date      : %s\n", cptr) ;
-			} ;
+	switch (typemajor)
+	{	case SF_FORMAT_AIFF :
+			/* not supported */
+			break ;
+
+		case SF_FORMAT_MP3 :
+			/* id3 only supports years */
+			cptr = sf_get_string (file, SF_STR_DATE) ;
+			if (cptr == NULL || strcmp (year, cptr) != 0)
+			{	if (errors++ == 0)
+					puts ("\n") ;
+				printf ("    Bad date      : %s\n", cptr) ;
+				} ;
+			break ;
+
+		default :
+			cptr = sf_get_string (file, SF_STR_DATE) ;
+			if (cptr == NULL || strcmp (date, cptr) != 0)
+			{	if (errors++ == 0)
+					puts ("\n") ;
+				printf ("    Bad date      : %s\n", cptr) ;
+				} ;
+			break ;
 		} ;
 
 	if (typemajor != SF_FORMAT_WAV && typemajor != SF_FORMAT_AIFF)
@@ -467,13 +511,21 @@ string_start_test (const char *filename, int formattype)
 			} ;
 		} ;
 
-	if (typemajor != SF_FORMAT_WAV && typemajor != SF_FORMAT_AIFF && typemajor != SF_FORMAT_RF64)
-	{	cptr = sf_get_string (file, SF_STR_LICENSE) ;
-		if (cptr == NULL || strcmp (license, cptr) != 0)
-		{	if (errors++ == 0)
-				puts ("\n") ;
-			printf ("    Bad license   : %s\n", cptr) ;
-			} ;
+	switch (typemajor)
+	{	case SF_FORMAT_WAV :
+		case SF_FORMAT_AIFF :
+		case SF_FORMAT_RF64 :
+		case SF_FORMAT_MP3 :
+			/* not supported */
+			break ;
+
+		default:
+			cptr = sf_get_string (file, SF_STR_LICENSE) ;
+			if (cptr == NULL || strcmp (license, cptr) != 0)
+			{	if (errors++ == 0)
+					puts ("\n") ;
+				printf ("    Bad license   : %s\n", cptr) ;
+				} ;
 		} ;
 
 	if (errors > 0)
