@@ -62,26 +62,26 @@ endif
 lib_LTLIBRARIES = src/libsndfile.la
 include_HEADERS = include/sndfile.hh
 nodist_include_HEADERS = include/sndfile.h
-src_libsndfile_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS)
+src_libsndfile_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS) $(MPEG_CFLAGS)
 # MinGW requires -no-undefined if a DLL is to be built.
 src_libsndfile_la_LDFLAGS = -no-undefined -version-info $(SHARED_VERSION_INFO) $(SHLIB_VERSION_ARG)
 src_libsndfile_la_SOURCES = src/sndfile.c src/aiff.c src/au.c src/avr.c src/caf.c src/dwd.c src/flac.c src/g72x.c src/htk.c src/ircam.c \
 	src/macos.c src/mat4.c src/mat5.c src/nist.c src/paf.c src/pvf.c src/raw.c src/rx2.c src/sd2.c \
 	src/sds.c src/svx.c src/txw.c src/voc.c src/wve.c src/w64.c src/wavlike.c src/wav.c src/xi.c src/mpc2k.c src/rf64.c \
-	src/ogg_vorbis.c src/ogg_speex.c src/ogg_pcm.c src/ogg_opus.c src/ogg_vcomment.c \
-	src/common.h src/sfconfig.h src/sfendian.h src/wavlike.h src/sf_unistd.h src/ogg.h src/chanmap.h src/ogg_vcomment.h
+	src/ogg.c src/ogg.h src/ogg_vorbis.c src/ogg_speex.c src/ogg_pcm.c src/ogg_opus.c src/ogg_vcomment.c src/ogg_vcomment.h \
+	src/common.h src/sfconfig.h src/sfendian.h src/wavlike.h src/sf_unistd.h src/chanmap.h src/mp3.c
 nodist_src_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
 src_libsndfile_la_LIBADD = src/GSM610/libgsm.la src/G72x/libg72x.la src/ALAC/libalac.la \
-	src/libcommon.la $(EXTERNAL_XIPH_LIBS) -lm
+	src/libcommon.la $(EXTERNAL_XIPH_LIBS) -lm $(MPEG_LIBS)
 EXTRA_src_libsndfile_la_DEPENDENCIES = $(SYMBOL_FILES)
 
 noinst_LTLIBRARIES = src/libcommon.la
-src_libcommon_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS)
+src_libcommon_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS) $(MPEG_CFLAGS)
 src_libcommon_la_SOURCES = src/common.c src/file_io.c src/command.c src/pcm.c src/ulaw.c src/alaw.c \
 	src/float32.c src/double64.c src/ima_adpcm.c src/ms_adpcm.c src/gsm610.c src/dwvw.c src/vox_adpcm.c \
 	src/interleave.c src/strings.c src/dither.c src/cart.c src/broadcast.c src/audio_detect.c \
-	src/ima_oki_adpcm.c src/ima_oki_adpcm.h src/alac.c src/chunk.c src/ogg.c src/chanmap.c \
-	src/windows.c src/id3.c src/nms_adpcm.c $(WIN_VERSION_FILE)
+	src/ima_oki_adpcm.c src/ima_oki_adpcm.h src/alac.c src/chunk.c src/chanmap.c \
+	src/windows.c src/id3.c src/id3.h src/nms_adpcm.c src/mpeg_decode.c src/mpeg_l3_encode.c src/mpeg.h $(WIN_VERSION_FILE)
 
 check_PROGRAMS = src/test_main
 src_test_main_SOURCES = src/test_main.c src/test_main.h src/test_conversions.c src/test_float.c src/test_endswap.c \
@@ -221,7 +221,8 @@ check_PROGRAMS += tests/sfversion tests/floating_point_test tests/write_read_tes
 	tests/locale_test tests/win32_ordinal_test tests/ogg_test tests/compression_size_test \
 	tests/checksum_test tests/external_libs_test tests/rdwr_test tests/format_check_test $(CPP_TEST) \
 	tests/channel_test tests/long_read_write_test tests/stdin_test tests/stdout_test \
-	tests/dither_test tests/fix_this tests/largefile_test tests/benchmark tests/ogg_opus_test
+	tests/dither_test tests/fix_this tests/largefile_test tests/benchmark tests/ogg_opus_test \
+	tests/mp3_test
 
 BUILT_SOURCES += \
 	tests/write_read_test.c \
@@ -376,6 +377,9 @@ tests_cpp_test_LDADD = src/libsndfile.la
 
 tests_checksum_test_SOURCES = tests/checksum_test.c tests/utils.c tests/utils.h
 tests_checksum_test_LDADD = src/libsndfile.la
+
+tests_mp3_test_SOURCES = tests/mp3_test.c tests/utils.c tests/utils.h
+tests_mp3_test_LDADD = src/libsndfile.la
 
 # Lite remove start
 tests_dwvw_test_SOURCES = tests/dwvw_test.c tests/utils.c tests/utils.h

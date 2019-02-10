@@ -352,6 +352,15 @@ echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on OPUS files."
 echo "----------------------------------------------------------------------"
 
+# mpeg-tests
+./tests/mp3_test@EXEEXT@
+./tests/compression_size_test@EXEEXT@ mpeg
+./tests/string_test@EXEEXT@ mpeg
+
+echo "----------------------------------------------------------------------"
+echo "  $sfversion passed tests on MPEG files."
+echo "----------------------------------------------------------------------"
+
 # io-tests
 ./tests/stdio_test@EXEEXT@
 ./tests/pipe_test@EXEEXT@

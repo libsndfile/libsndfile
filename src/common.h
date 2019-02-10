@@ -736,6 +736,8 @@ enum
 
 	SFE_MPC_NO_MARKER,
 
+	SFE_MPEG_BAD_SAMPLERATE,
+
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
 
@@ -891,10 +893,10 @@ int		ogg_pcm_open	(SF_PRIVATE *psf) ;
 int		ogg_opus_open	(SF_PRIVATE *psf) ;
 int		ogg_open	(SF_PRIVATE *psf) ;
 
+int		mp3_open	(SF_PRIVATE *psf) ;
 
 /* In progress. Do not currently work. */
 
-int		mpeg_open	(SF_PRIVATE *psf) ;
 int		rx2_open	(SF_PRIVATE *psf) ;
 int		txw_open	(SF_PRIVATE *psf) ;
 int		wve_open	(SF_PRIVATE *psf) ;
@@ -1011,6 +1013,7 @@ typedef struct
 
 int audio_detect (SF_PRIVATE * psf, AUDIO_DETECT *ad, const unsigned char * data, int datalen) ;
 int id3_skip (SF_PRIVATE * psf) ;
+const char *id3_lookup_v1_genre (int number) ;
 
 void	alac_get_desc_chunk_items (int subformat, uint32_t *fmt_flags, uint32_t *frames_per_packet) ;
 

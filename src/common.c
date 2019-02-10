@@ -104,7 +104,7 @@ void
 psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 {	va_list		ap ;
 	uint32_t	u ;
-	int			d, tens, shift, width, width_specifier, left_align, slen ;
+	int			d, tens, shift, width, width_specifier, left_align, slen, precision ;
 	char		c, *strptr, istr [5], lead_char, sign_char ;
 
 	va_start (ap, format) ;
@@ -153,6 +153,12 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 		while ((c = *format++) && isdigit (c))
 			width_specifier = width_specifier * 10 + (c - '0') ;
 
+		precision = 0 ;
+		if (c == '.')
+		{	while ((c = *format++) && isdigit (c))
+				precision = precision * 10 + (c - '0') ;
+			} ;
+
 		switch (c)
 		{	case 0 : /* NULL character. */
 					va_end (ap) ;
@@ -162,12 +168,15 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					strptr = va_arg (ap, char *) ;
 					if (strptr == NULL)
 						break ;
-					slen = strlen (strptr) ;
+					if (precision > 0)
+						slen = strnlen (strptr, precision) ;
+					else
+						slen = strlen (strptr) ;
 					width_specifier = width_specifier >= slen ? width_specifier - slen : 0 ;
 					if (left_align == SF_FALSE)
 						while (width_specifier -- > 0)
 							log_putchar (psf, ' ') ;
-					while (*strptr)
+					while (slen--)
 						log_putchar (psf, *strptr++) ;
 					while (width_specifier -- > 0)
 						log_putchar (psf, ' ') ;
@@ -877,7 +886,7 @@ header_seek (SF_PRIVATE *psf, sf_count_t position, int whence)
 				psf_bump_header_allocation (psf, position) ;
 			if (position > psf->header.len)
 			{	/* Too much header to cache so just seek instead. */
-				psf->header.indx = psf->header.end ;
+				psf->header.indx = psf->header.end = 0 ;
 				psf_fseek (psf, position, whence) ;
 				return ;
 				} ;
@@ -1563,6 +1572,7 @@ str_of_major_format (int format)
 		CASE_NAME (SF_FORMAT_CAF) ;
 		CASE_NAME (SF_FORMAT_WVE) ;
 		CASE_NAME (SF_FORMAT_OGG) ;
+		CASE_NAME (SF_FORMAT_MP3) ;
 		default :
 			break ;
 		} ;
@@ -1599,6 +1609,9 @@ str_of_minor_format (int format)
 		CASE_NAME (SF_FORMAT_DPCM_8) ;
 		CASE_NAME (SF_FORMAT_DPCM_16) ;
 		CASE_NAME (SF_FORMAT_VORBIS) ;
+		CASE_NAME (SF_FORMAT_MPEG_LAYER_I) ;
+		CASE_NAME (SF_FORMAT_MPEG_LAYER_II) ;
+		CASE_NAME (SF_FORMAT_MPEG_LAYER_III) ;
 		default :
 			break ;
 		} ;

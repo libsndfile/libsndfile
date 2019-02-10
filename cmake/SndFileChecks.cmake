@@ -56,6 +56,14 @@ else ()
 	set (HAVE_EXTERNAL_XIPH_LIBS 0)
 endif ()
 
+find_package (Lame)
+find_package (Mpg123 1.25.10)
+if (LAME_FOUND AND MPG123_FOUND)
+	set (HAVE_MPEG_LIBS 1)
+else ()
+	set (HAVE_MPEG_LIBS 0)
+endif()
+
 find_package (Speex)
 find_package (SQLite3)
 
