@@ -231,11 +231,11 @@ vorbis_read_header (SF_PRIVATE *psf)
 	psf->dataoffset	= ogg_sync_ftell (psf) ;
 
 	/*
-	** Caculate the granule position offset. The first page with a payload
-	** packet shouldn't end in a continued packet. The difference between the
-	** page's granule position and the sum of frames on the page tells us the
-	** granule position offset.
-	** See https://xiph.org/vorbis/doc/Vorbis_I_spec.html#x1-132000A.2
+	**	Caculate the granule position offset. The first page with a payload
+	**	packet shouldn't end in a continued packet. The difference between the
+	**	page's granule position and the sum of frames on the page tells us the
+	**	granule position offset.
+	**	See https://xiph.org/vorbis/doc/Vorbis_I_spec.html#x1-132000A.2
 	*/
 	ogg_stream_unpack_page (psf, odata) ;
 	vdata->pcm_start = odata->pkt [odata->pkt_len - 1].granulepos ;
@@ -246,10 +246,13 @@ vorbis_read_header (SF_PRIVATE *psf)
 	else
 		vdata->pcm_start = 0 ;
 
+	/*
+	**	Find the end of the stream, save it. Only works if the file is seekable.
+	*/
 	vdata->loc = vdata->pcm_start ;
 	vdata->pcm_end = (uint64_t) -1 ;
 	psf->datalength = psf->filelength ;
-	if (psf->sf.seekable)
+	if (!psf->is_pipe)
 	{	sf_count_t last_page ;
 		sf_count_t saved_offset ;
 
@@ -496,26 +499,18 @@ ogg_vorbis_open (SF_PRIVATE *psf)
 		psf->write_float	= vorbis_write_f ;
 		psf->write_double	= vorbis_write_d ;
 
-		psf->sf.frames = SF_COUNT_MAX ; /* Unknown really */
+		psf->sf.frames = 0 ;
+		psf->datalength = 0 ;
+		psf->filelength = 0 ;
+		psf->dataoffset = 0 ;
 		psf->strings.flags = SF_STR_ALLOW_START ;
 		} ;
 
 	psf->seek = vorbis_seek ;
 	psf->command = vorbis_command ;
 	psf->byterate = vorbis_byterate ;
-
-	/* FIXME, FIXME, FIXME : Hack these here for now and correct later. */
 	psf->sf.format = SF_FORMAT_OGG | SF_FORMAT_VORBIS ;
 	psf->sf.sections = 1 ;
-
-	if (psf->dataoffset != -1)
-		psf->datalength = psf->filelength - psf->dataoffset ;
-	else
-	{	psf->datalength = 1 ;
-		psf->dataoffset = 0 ;
-		} ;
-
-	/* End FIXME. */
 
 	return error ;
 } /* ogg_vorbis_open */
