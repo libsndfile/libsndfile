@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2019 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** All rights reserved.
 **
@@ -82,6 +82,7 @@ usage_exit (const char *progname)
 		"        -dwvw16    : 16 bit DWVW (AIFF only)\n"
 		"        -dwvw24    : 24 bit DWVW (AIFF only)\n"
 		"        -vorbis    : Vorbis (OGG only)\n"
+		"        -opus      : Opus (OGG only)\n"
 		) ;
 
 	puts (
@@ -242,6 +243,10 @@ main (int argc, char * argv [])
 		{	outfileminor = SF_FORMAT_VORBIS ;
 			continue ;
 			} ;
+		if (! strcmp (argv [k], "-opus"))
+		{	outfileminor = SF_FORMAT_OPUS ;
+			continue ;
+			} ;
 
 		if (strstr (argv [k], "-override-sample-rate=") == argv [k])
 		{	const char *ptr ;
@@ -346,6 +351,7 @@ main (int argc, char * argv [])
 	if (normalize
 			|| (outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT)
 			|| (infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT)
+			|| (infileminor == SF_FORMAT_OPUS) || (outfileminor == SF_FORMAT_OPUS)
 			|| (infileminor == SF_FORMAT_VORBIS) || (outfileminor == SF_FORMAT_VORBIS))
 		sfe_copy_data_fp (outfile, infile, sfinfo.channels, normalize) ;
 	else
