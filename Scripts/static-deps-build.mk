@@ -1,16 +1,19 @@
 #!/usr/bin/make -f
 
 # Build libsndfile as a dynamic/shared library, but statically link to
-# libFLAC, libogg and libvorbis
+# libFLAC, libogg, libopus and libvorbis
 
-ogg_version = libogg-1.3.2
-ogg_md5sum = 5c3a34309d8b98640827e5d0991a4015
+ogg_version = libogg-1.3.3
+ogg_sha256sum = 4f3fc6178a533d392064f14776b23c397ed4b9f48f5de297aba73b643f955c08
 
-vorbis_version = libvorbis-1.3.5
-vorbis_md5sum = 28cb28097c07a735d6af56e598e1c90f
+vorbis_version = libvorbis-1.3.6
+vorbis_sha256sum = af00bb5a784e7c9e69f56823de4637c350643deedaf333d0fa86ecdba6fcb415
 
 flac_version = flac-1.3.2
-flac_md5sum = 454f1bfa3f93cc708098d7890d0499bd
+flac_sha256sum = 91cfc3ed61dc40f47f050a109b08610667d73477af6ef36dcad31c31a4a8d53f
+
+opus_version = opus-1.3
+opus_sha256sum = 4f3d69aefdf2dbaf9825408e452a8a414ffc60494c70633560700398820dc550
 
 #-------------------------------------------------------------------------------
 # Code follows.
@@ -18,6 +21,7 @@ flac_md5sum = 454f1bfa3f93cc708098d7890d0499bd
 ogg_tarball = $(ogg_version).tar.xz
 vorbis_tarball = $(vorbis_version).tar.xz
 flac_tarball = $(flac_version).tar.xz
+opus_tarball = $(opus_version).tar.gz
 
 download_url = http://downloads.xiph.org/releases/
 tarball_dir = Build/Tarballs
@@ -44,7 +48,7 @@ build : Build/Stamp/build
 clean :
 	rm -rf Build/flac-* Build/libogg-* Build/libvorbis-*
 	rm -rf Build/bin Build/include Build/lib Build/share
-	rm -f Build/Stamp/install Build/Stamp/extract Build/Stamp/md5sum
+	rm -f Build/Stamp/install Build/Stamp/extract Build/Stamp/sha256sum
 
 Build/Stamp/init :
 	mkdir -p $(stamp_dir) $(tarball_dir)
@@ -62,25 +66,32 @@ Build/Tarballs/$(vorbis_tarball) : Build/Stamp/init
 	(cd $(tarball_dir) && wget $(download_url)vorbis/$(vorbis_tarball) -O $(vorbis_tarball))
 	touch $@
 
-Build/Stamp/tarballs : Build/Tarballs/$(flac_tarball) Build/Tarballs/$(ogg_tarball) Build/Tarballs/$(vorbis_tarball)
+Build/Tarballs/$(opus_tarball) : Build/Stamp/init
+	(cd $(tarball_dir) && wget https://archive.mozilla.org/pub/opus/$(opus_tarball) -O $(opus_tarball))
 	touch $@
 
-Build/Stamp/md5sum : Build/Stamp/tarballs
-	test `md5sum $(tarball_dir)/$(ogg_tarball) | sed "s/ .*//"` = $(ogg_md5sum)
-	test `md5sum $(tarball_dir)/$(vorbis_tarball) | sed "s/ .*//"` = $(vorbis_md5sum)
-	test `md5sum $(tarball_dir)/$(flac_tarball) | sed "s/ .*//"` = $(flac_md5sum)
+Build/Stamp/tarballs : Build/Tarballs/$(flac_tarball) Build/Tarballs/$(ogg_tarball) Build/Tarballs/$(vorbis_tarball) Build/Tarballs/$(opus_tarball)
 	touch $@
 
-Build/Stamp/extract : Build/Stamp/md5sum
+Build/Stamp/sha256sum : Build/Stamp/tarballs
+	test `sha256sum $(tarball_dir)/$(ogg_tarball) | sed "s/ .*//"` = $(ogg_sha256sum)
+	test `sha256sum $(tarball_dir)/$(vorbis_tarball) | sed "s/ .*//"` = $(vorbis_sha256sum)
+	test `sha256sum $(tarball_dir)/$(flac_tarball) | sed "s/ .*//"` = $(flac_sha256sum)
+	test `sha256sum $(tarball_dir)/$(opus_tarball) | sed "s/ .*//"` = $(opus_sha256sum)
+	touch $@
+
+Build/Stamp/extract : Build/Stamp/sha256sum
 	(cd Build && tar xf Tarballs/$(ogg_tarball))
 	(cd Build && tar xf Tarballs/$(flac_tarball))
 	(cd Build && tar xf Tarballs/$(vorbis_tarball))
+	(cd Build && tar xf Tarballs/$(opus_tarball))
 	touch $@
 
 Build/Stamp/install-libs : Build/Stamp/extract
 	(cd Build/$(ogg_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
 	(cd Build/$(vorbis_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
 	(cd Build/$(flac_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
+	(cd Build/$(opus_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
 	touch $@
 
 configure : configure.ac
@@ -89,7 +100,7 @@ configure : configure.ac
 Build/Stamp/configure : Build/Stamp/install-libs configure
 	PKG_CONFIG_LIBDIR=Build/lib/pkgconfig ./configure
 	sed -i 's#^EXTERNAL_XIPH_CFLAGS.*#EXTERNAL_XIPH_CFLAGS = -I$(pwd)/Build/include#' src/Makefile
-	sed -i 's#^EXTERNAL_XIPH_LIBS.*#EXTERNAL_XIPH_LIBS = -static $(pwd)/Build/lib/libFLAC.la $(pwd)/Build/lib/libogg.la $(pwd)/Build/lib/libvorbis.la $(pwd)/Build/lib/libvorbisenc.la -dynamic #' src/Makefile
+	sed -i 's#^EXTERNAL_XIPH_LIBS.*#EXTERNAL_XIPH_LIBS = -static $(pwd)/Build/lib/libFLAC.la $(pwd)/Build/lib/libvorbis.la $(pwd)/Build/lib/libvorbisenc.la $(pwd)/Build/lib/libopus.la $(pwd)/Build/lib/libogg.la -dynamic #' src/Makefile
 	make clean
 	touch $@
 
