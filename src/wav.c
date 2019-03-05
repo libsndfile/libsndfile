@@ -1146,8 +1146,10 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "44", BHW4 (0), BHW4 (0)) ; /* SMTPE format */
 		psf_binheader_writef (psf, "44", BHW4 (psf->instrument->loop_count), BHW4 (0)) ;
 
-		/* Loop count is signed 16 bit number so we limit it range to something sensible. */
-		psf->instrument->loop_count &= 0x7fff ;
+		/* Make sure we don't read past the loops array end. */
+		if (psf->instrument->loop_count > ARRAY_LEN (psf->instrument->loops))
+			psf->instrument->loop_count = ARRAY_LEN (psf->instrument->loops) ;
+
 		for (tmp = 0 ; tmp < psf->instrument->loop_count ; tmp++)
 		{	int type ;
 
