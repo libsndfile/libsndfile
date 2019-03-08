@@ -1,5 +1,9 @@
 #!/usr/bin/make -f
 
+# If this is set to true (via the environment) then CRC checking will be
+# disabled in libogg giving fuzzers a better chance at finding something.
+disable_ogg_crc ?= false
+
 # Build libsndfile as a dynamic/shared library, but statically link to
 # libFLAC, libogg, libopus and libvorbis
 
@@ -28,7 +32,7 @@ tarball_dir = Build/Tarballs
 stamp_dir = Build/Stamp
 
 build_dir = $(shell pwd)/Build
-config_options = --prefix=$(build_dir) --disable-shared
+config_options = --prefix=$(build_dir) --disable-shared --enable-option-checking
 
 pwd = $(shell pwd)
 
@@ -46,9 +50,9 @@ config : Build/Stamp/configure
 build : Build/Stamp/build
 
 clean :
-	rm -rf Build/flac-* Build/libogg-* Build/libvorbis-*
+	rm -rf Build/flac-* Build/libogg-* Build/libvorbis-* Build/opus-*
 	rm -rf Build/bin Build/include Build/lib Build/share
-	rm -f Build/Stamp/install Build/Stamp/extract Build/Stamp/sha256sum
+	rm -f Build/Stamp/install Build/Stamp/extract Build/Stamp/sha256sum Build/Stamp/build-ogg
 
 Build/Stamp/init :
 	mkdir -p $(stamp_dir) $(tarball_dir)
@@ -81,14 +85,25 @@ Build/Stamp/sha256sum : Build/Stamp/tarballs
 	touch $@
 
 Build/Stamp/extract : Build/Stamp/sha256sum
-	(cd Build && tar xf Tarballs/$(ogg_tarball))
+	# (cd Build && tar xf Tarballs/$(ogg_tarball))
 	(cd Build && tar xf Tarballs/$(flac_tarball))
 	(cd Build && tar xf Tarballs/$(vorbis_tarball))
 	(cd Build && tar xf Tarballs/$(opus_tarball))
 	touch $@
 
-Build/Stamp/install-libs : Build/Stamp/extract
+Build/Stamp/build-ogg : Build/Stamp/sha256sum
+ifeq ($(disable_ogg_crc), true)
+	echo "Ogg/CRC enabled"
+	(cd Build && git clone https://github.com/xiph/ogg $(ogg_version))
+	(cd Build/$(ogg_version) && ./autogen.sh && CFLAGS=-fPIC ./configure $(config_options) --disable-crc && make all install)
+else
+	echo "Ogg/CRC disabled"
+	(cd Build && tar xf Tarballs/$(ogg_tarball))
 	(cd Build/$(ogg_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
+endif
+	touch $@
+
+Build/Stamp/install-libs : Build/Stamp/extract Build/Stamp/build-ogg
 	(cd Build/$(vorbis_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
 	(cd Build/$(flac_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
 	(cd Build/$(opus_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
