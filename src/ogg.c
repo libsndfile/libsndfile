@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2002-2019 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2007 John ffitch
 ** Copyright (C) 2018 Arthur Taylor <art@ified.ca>
 **
@@ -418,10 +418,8 @@ ogg_sync_last_page_before (SF_PRIVATE *psf, OGG_PRIVATE *odata, uint64_t *gp_out
 		left_link = 0 ;
 		while (position < end)
 		{	ret = ogg_sync_next_page (psf, &odata->opage, end - position, &position) ;
-			if (ret < 0)
+			if (ret <= 0)
 				return -1 ;
-			if (ret == 0)
-				break ;
 			if (ogg_page_serialno (&odata->opage) == serialno)
 			{	uint64_t page_gp = ogg_page_granulepos (&odata->opage) ;
 				if (page_gp != (uint64_t) -1)
@@ -527,7 +525,7 @@ ogg_stream_seek_page_search (SF_PRIVATE *psf, OGG_PRIVATE *odata, uint64_t targe
 		*/
 		while (begin < end)
 		{	ret = ogg_sync_next_page (psf, &page, boundary - seek_pos, &seek_pos) ;
-			if (ret < 0)
+			if (ret <= 0)
 				return ret ;
 			page_offset = seek_pos ;
 			if (ret == 0)

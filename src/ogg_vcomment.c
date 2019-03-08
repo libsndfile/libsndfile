@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2008-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2008-2019 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2018 Arthur Taylor <art@ified.ca>
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -60,6 +60,11 @@ static STR_PAIR vorbiscomment_mapping [] =
 static int	vorbiscomment_lookup_id (const char *name) ;
 static const char *	vorbiscomment_lookup_name (int id) ;
 
+static inline size_t read_32bit_size_t (const unsigned char * ptr)
+{	/* Read a 32 bit positive value from the provided pointer. */
+	return LE2H_32_PTR (ptr) & 0x7fffffff ;
+} /* read_32bit_size_t */
+
 /*-----------------------------------------------------------------------------------------------
 ** Exported functions.
 */
@@ -103,7 +108,8 @@ vorbiscomment_read_tags (SF_PRIVATE *psf, ogg_packet *packet, vorbiscomment_iden
 	/*
 	** Vendor tag, manditory, no field name.
 	*/
-	tag_len = LE2H_32_PTR (p) ; p += 4 ;
+	tag_len = read_32bit_size_t (p) ;
+	p += 4 ;
 	if (tag_len > 0)
 	{	/* Bound checking. 4 bytes for remaining manditory fields. */
 		if (p + tag_len + 4 > ep)
@@ -127,13 +133,15 @@ vorbiscomment_read_tags (SF_PRIVATE *psf, ogg_packet *packet, vorbiscomment_iden
 	** List of tags of the form NAME=value
 	** Allowable characters for NAME are the same as shell variable names.
 	*/
-	ntags = LE2H_32_PTR (p) ; p += 4 ;
+	ntags = read_32bit_size_t (p) ;
+	p += 4 ;
 	for (i = 0 ; i < ntags ; i++)
 	{	if (p + 4 > ep)
 		{	ret = SFE_MALFORMED_FILE ;
 			goto free_tag_out ;
 			} ;
-		tag_len = LE2H_32_PTR (p) ; p += 4 ;
+		tag_len = read_32bit_size_t (p) ;
+		p += 4 ;
 		if (p + tag_len > ep)
 		{	ret = SFE_MALFORMED_FILE ;
 			goto free_tag_out ;

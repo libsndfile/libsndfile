@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2013-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2013-2019 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2018 Arthur Taylor <art@ified.ca>
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -622,9 +622,11 @@ ogg_opus_setup_decoder (SF_PRIVATE *psf, int input_samplerate)
 	** expects.
 	*/
 	if (oopus->buffer)
-		free (oopus->buffer) ;
-	oopus->buffersize = (20 * psf->sf.samplerate / 1000) ;
-	oopus->buffer = (float *) malloc (sizeof (float) * psf->sf.channels * oopus->buffersize) ;
+	{	free (oopus->buffer) ;
+		oopus->buffer = NULL ;
+		} ;
+	oopus->buffersize = 20 * psf->sf.samplerate / 1000 ;
+	oopus->buffer = malloc (sizeof (float) * psf->sf.channels * oopus->buffersize) ;
 	if (oopus->buffer == NULL)
 		return SFE_MALLOC_FAILED ;
 
@@ -713,7 +715,7 @@ ogg_opus_setup_encoder (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus
 	oopus->header.preskip *= oopus->sr_factor ;
 
 	oopus->len = OGG_OPUS_ENCODE_PACKET_LEN (psf->sf.samplerate) ;
-	oopus->buffer = (float *) malloc (sizeof (float) * psf->sf.channels * oopus->len) ;
+	oopus->buffer = malloc (sizeof (float) * psf->sf.channels * oopus->len) ;
 	if (oopus->buffer == NULL)
 		return SFE_MALLOC_FAILED ;
 
@@ -975,7 +977,7 @@ ogg_opus_read_refill (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 	if (odata->pkt_indx == odata->pkt_len)
 		return 0 ;
 
-	ppkt = &odata->pkt [odata->pkt_indx] ;
+	ppkt = odata->pkt + odata->pkt_indx ;
 	nsamp = opus_multistream_decode_float (oopus->u.decode.state,
 				ppkt->packet, ppkt->bytes, oopus->buffer, oopus->buffersize, 0) ;
 
@@ -990,6 +992,7 @@ ogg_opus_read_refill (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 		oopus->buffersize = nsamp ;
 
 		free (oopus->buffer) ;
+		oopus->buffer = NULL ;
 		oopus->buffer = malloc (sizeof (float) * oopus->buffersize * psf->sf.channels) ;
 		if (oopus->buffer == NULL)
 		{	psf->error = SFE_MALLOC_FAILED ;
@@ -1043,6 +1046,17 @@ ogg_opus_read_refill (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 			} ;
 		} ;
 
+	if (oopus->len > oopus->buffersize)
+	{	free (oopus->buffer) ;
+		oopus->buffersize = oopus->len ;
+		oopus->buffer = malloc (sizeof (float) * oopus->buffersize * psf->sf.channels) ;
+		if (oopus->buffer == NULL)
+		{	psf->error = SFE_MALLOC_FAILED ;
+			oopus->buffersize = 0 ;
+			return -1 ;
+			} ;
+		} ;
+
 	/*
 	** Check for if this decoded packet contains samples from before the pre-
 	** skip point, indicating that these samples are padding to get the decoder
@@ -1054,6 +1068,7 @@ ogg_opus_read_refill (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 		oopus->loc = 0 ;
 
 	oopus->pkt_pos = pkt_granulepos ;
+
 	return nsamp ;
 } /* ogg_opus_read_refill */
 
@@ -1120,15 +1135,15 @@ ogg_opus_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	sf_count_t readlen, i ;
 	float *iptr ;
 
-	for ( ; total < len ; )
+	while (total < len)
 	{	if (oopus->loc == oopus->len)
 		{	if (ogg_opus_read_refill (psf, odata, oopus) <= 0)
 				return total ;
 			} ;
 
-		readlen = SF_MIN ((int) (len - total), (oopus->len - oopus->loc) * psf->sf.channels) ;
+		readlen = SF_MIN (len - total, (sf_count_t) (oopus->len - oopus->loc) * psf->sf.channels) ;
 		if (readlen > 0)
-		{	iptr = &(oopus->buffer [oopus->loc * psf->sf.channels]) ;
+		{	iptr = oopus->buffer + oopus->loc * psf->sf.channels ;
 			i = total ;
 			total += readlen ;
 
@@ -1157,15 +1172,15 @@ ogg_opus_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	sf_count_t readlen, i ;
 	float *iptr ;
 
-	for ( ; total < len ; )
+	while (total < len)
 	{	if (oopus->loc == oopus->len)
 		{	if (ogg_opus_read_refill (psf, odata, oopus) <= 0)
 				return total ;
 			} ;
 
-		readlen = SF_MIN ((int) (len - total), (oopus->len - oopus->loc) * psf->sf.channels) ;
+		readlen = SF_MIN (len - total, (sf_count_t) (oopus->len - oopus->loc) * psf->sf.channels) ;
 		if (readlen > 0)
-		{	iptr = &(oopus->buffer [oopus->loc * psf->sf.channels]) ;
+		{	iptr = oopus->buffer + oopus->loc * psf->sf.channels ;
 			i = total ;
 			total += readlen ;
 
@@ -1193,13 +1208,13 @@ ogg_opus_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sf_count_t total = 0 ;
 	sf_count_t readlen ;
 
-	for ( ; total < len ; )
+	while (total < len)
 	{	if (oopus->loc == oopus->len)
 		{	if (ogg_opus_read_refill (psf, odata, oopus) <= 0)
 				return total ;
 			} ;
 
-		readlen = SF_MIN ((int) (len - total), (oopus->len - oopus->loc) * psf->sf.channels) ;
+		readlen = SF_MIN (len - total, (sf_count_t) (oopus->len - oopus->loc) * psf->sf.channels) ;
 		if (readlen > 0)
 		{	memcpy (&(ptr [total]), &(oopus->buffer [oopus->loc * psf->sf.channels]), sizeof (float) * readlen) ;
 			total += readlen ;
@@ -1215,23 +1230,24 @@ ogg_opus_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
 	sf_count_t total = 0 ;
 	sf_count_t readlen, i ;
-	float *iptr ;
+	float *fptr ;
 
-	for ( ; total < len ; )
-	{	if (oopus->loc == oopus->len)
+	while (total < len)
+	{	if (oopus->loc >= oopus->len)
 		{	if (ogg_opus_read_refill (psf, odata, oopus) <= 0)
 				return total ;
 			} ;
 
-		readlen = SF_MIN ((int) (len - total), (oopus->len - oopus->loc) * psf->sf.channels) ;
+		readlen = SF_MIN (len - total, (sf_count_t) (oopus->len - oopus->loc) * psf->sf.channels) ;
+
 		if (readlen > 0)
-		{	iptr = &(oopus->buffer [oopus->loc * psf->sf.channels]) ;
+		{	fptr = oopus->buffer + oopus->loc * psf->sf.channels ;
 			i = total ;
 			total += readlen ;
 			for ( ; i < total ; i++)
-			{	ptr [i] = *(iptr++) ;
+			{	ptr [i] = *fptr++ ;
 				} ;
-			oopus->loc += (readlen / psf->sf.channels) ;
+			oopus->loc += readlen / psf->sf.channels ;
 			} ;
 		} ;
 	return total ;
@@ -1249,19 +1265,19 @@ ogg_opus_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 		oopus->u.encode.lsb = 16 ;
 
 	for (total = 0 ; total < len ; )
-	{	if (oopus->loc == oopus->len)
+	{	if (oopus->loc >= oopus->len)
 		{	/* Need to encode the buffer */
 			if (ogg_opus_write_out (psf, odata, oopus) <= 0)
 				return total ;
 			} ;
 
-		writelen = SF_MIN ((int) (len - total), (oopus->len - oopus->loc) * psf->sf.channels) ;
+		writelen = SF_MIN (len - total, (sf_count_t) (oopus->len - oopus->loc) * psf->sf.channels) ;
 		if (writelen)
-		{	optr = &(oopus->buffer [oopus->loc * psf->sf.channels]) ;
+		{	optr = oopus->buffer + oopus->loc * psf->sf.channels ;
 			i = total ;
 			total += writelen ;
 			for ( ; i < total ; i++)
-			{	*(optr++) = (float) (ptr [i]) / 32767.0f ;
+			{	*optr++ = (float) (ptr [i]) / 32767.0f ;
 				}
 			oopus->loc += (writelen / psf->sf.channels) ;
 			} ;
@@ -1281,19 +1297,19 @@ ogg_opus_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 		oopus->u.encode.lsb = 24 ;
 
 	for (total = 0 ; total < len ; )
-	{	if (oopus->loc == oopus->len)
+	{	if (oopus->loc >= oopus->len)
 		{	/* Need to encode the buffer */
 			if (ogg_opus_write_out (psf, odata, oopus) <= 0)
 				return total ;
 			} ;
 
-		writelen = SF_MIN ((int) (len - total), (oopus->len - oopus->loc) * psf->sf.channels) ;
+		writelen = SF_MIN (len - total, (sf_count_t) (oopus->len - oopus->loc) * psf->sf.channels) ;
 		if (writelen)
-		{	optr = &(oopus->buffer [oopus->loc * psf->sf.channels]) ;
+		{	optr = oopus->buffer + oopus->loc * psf->sf.channels ;
 			i = total ;
 			total += writelen ;
 			for ( ; i < total ; i++)
-			{	*(optr++) = (float) (ptr [i]) / 2147483647.0f ;
+			{	*optr++ = (float) (ptr [i]) / 2147483647.0f ;
 				} ;
 			oopus->loc += (writelen / psf->sf.channels) ;
 			} ;
@@ -1312,13 +1328,13 @@ ogg_opus_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 		oopus->u.encode.lsb = 24 ;
 
 	for (total = 0 ; total < len ; )
-	{	if (oopus->loc == oopus->len)
+	{	if (oopus->loc >= oopus->len)
 		{	/* Need to encode the buffer */
 			if (ogg_opus_write_out (psf, odata, oopus) <= 0)
 				return total ;
 			} ;
 
-		writelen = SF_MIN ((int) (len - total), (oopus->len - oopus->loc) * psf->sf.channels) ;
+		writelen = SF_MIN (len - total, (sf_count_t) (oopus->len - oopus->loc) * psf->sf.channels) ;
 		if (writelen)
 		{	memcpy (&(oopus->buffer [oopus->loc * psf->sf.channels]), &(ptr [total]), sizeof (float) * writelen) ;
 			total += writelen ;
@@ -1340,19 +1356,19 @@ ogg_opus_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 		oopus->u.encode.lsb = 24 ;
 
 	for (total = 0 ; total < len ; )
-	{	if (oopus->loc == oopus->len)
+	{	if (oopus->loc >= oopus->len)
 		{	/* Need to encode the buffer */
 			if (ogg_opus_write_out (psf, odata, oopus) <= 0)
 				return total ;
 			} ;
 
-		writelen = SF_MIN ((int) (len - total), (oopus->len - oopus->loc) * psf->sf.channels) ;
+		writelen = SF_MIN (len - total, (sf_count_t) (oopus->len - oopus->loc) * psf->sf.channels) ;
 		if (writelen)
-		{	optr = &(oopus->buffer [oopus->loc * psf->sf.channels]) ;
+		{	optr = oopus->buffer + oopus->loc * psf->sf.channels ;
 			i = total ;
 			total += writelen ;
 			for ( ; i < total ; i++)
-			{	*(optr++) = (float) (ptr [i]) ;
+			{	*optr++ = (float) (ptr [i]) ;
 				} ;
 			oopus->loc += (writelen / psf->sf.channels) ;
 			} ;
@@ -1398,7 +1414,13 @@ ogg_opus_analyze_file (SF_PRIVATE *psf)
 	error = ogg_opus_unpack_next_page (psf, odata, oopus) ;
 	if (error < 0 && psf->error)
 		return psf->error ;
+
 	gp = ogg_opus_calculate_page_duration (odata) ;
+	if (gp <= 0)
+	{	psf_log_printf (psf, "Opus : Page duration of zero!\n") ;
+		return SFE_MALFORMED_FILE ;
+		} ;
+
 	if (!ogg_page_eos (&odata->opage))
 	{	if (gp > oopus->pg_pos)
 		{	psf_log_printf (psf, "Opus : First data page's granule position is less than total number of samples on the page!\n") ;
