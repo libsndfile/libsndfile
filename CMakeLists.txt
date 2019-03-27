@@ -629,7 +629,7 @@ else ()
 
 endif ()
 
-if (Unix)
+if (UNIX)
 	set (man_MANS
 		man/sndfile-info.1
 		man/sndfile-play.1
@@ -642,7 +642,7 @@ if (Unix)
 		#man/sndfile-deinterleave.1
 		man/sndfile-salvage.1
 		)
-	install (FILES ${man_MANS} DESTINATION ${CMAKE_INSTALL_MANDIR}/man1 PATTERN "*.1")
+	install (FILES ${man_MANS} DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
 endif ()
 
 if (ENABLE_BOW_DOCS)
