@@ -329,7 +329,9 @@ main (int argc, char * argv [])
 			} ;
 
 	if (sf_format_check (&sfinfo) == 0)
+	{	sf_close (infile) ;
 		report_format_error_exit (argv [0], &sfinfo) ;
+		} ;
 
 	if ((sfinfo.format & SF_FORMAT_SUBMASK) == SF_FORMAT_GSM610 && sfinfo.samplerate != 8000)
 	{	printf (
