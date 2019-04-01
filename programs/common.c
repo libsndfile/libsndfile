@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2019 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2008 George Blood Audio
 **
 ** All rights reserved.
@@ -282,6 +282,7 @@ typedef struct
 	int			format ;
 } OUTPUT_FORMAT_MAP ;
 
+/* Map a file name extension to a container format. */
 static OUTPUT_FORMAT_MAP format_map [] =
 {
 	{	"wav", 		0,	SF_FORMAT_WAV	},
@@ -316,6 +317,7 @@ static OUTPUT_FORMAT_MAP format_map [] =
 	{	"prc",		0,	SF_FORMAT_WVE	},
 	{	"ogg",		0,	SF_FORMAT_OGG	},
 	{	"oga",		0,	SF_FORMAT_OGG	},
+	{	"opus",		0,	SF_FORMAT_OGG	}, /*  Opus data in an Ogg container. */
 	{	"mpc",		0,	SF_FORMAT_MPC2K	},
 	{	"rf64",		0,	SF_FORMAT_RF64	},
 } ; /* format_map */
@@ -460,6 +462,7 @@ sfe_codec_name (int format)
 		case SF_FORMAT_ALAC_20 : return "20 bit ALAC" ;
 		case SF_FORMAT_ALAC_24 : return "24 bit ALAC" ;
 		case SF_FORMAT_ALAC_32 : return "32 bit ALAC" ;
+		case SF_FORMAT_OPUS : return "Opus" ;
 		default : break ;
 		} ;
 	return "unknown" ;
