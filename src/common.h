@@ -116,7 +116,7 @@
 #define		COMPILE_TIME_ASSERT(e)	(sizeof (struct { int : - !! (e) ; }))
 
 
-#define		SF_MAX_CHANNELS		1024
+#define		SF_MAX_CHANNELS		32766
 
 
 /*
