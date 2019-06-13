@@ -1,3 +1,11 @@
+Version 1.0.29 (2019-06-??)
+  * Add support for Opus files.
+  * Autotool build system improvements.
+  * CMake build system improvements.
+  * Fixes for: CVE-2017-12562, CVE-2017-17456, CVE-2017-17457, CVE-2018-19661,
+    CVE-2018-19662 and CVE-2019-3832.
+  * Minor bug fixes and improvements.
+
 Version 1.0.28 (2017-04-02)
   * Fix buffer overruns in FLAC and ID3 handling code.
   * Move to variable length header storage.
