@@ -1022,7 +1022,7 @@ cue_test_var (const char *filename, int filetype, int count)
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 	if (sf_command (file, SFC_SET_CUE, write_cue, cues_size) == SF_FALSE)
-	{	printf ("\n\nLine %d : sf_command (SFC_SET_CUE) failed with %d cues, datasize %ld --> error: %s\n\n", __LINE__, count, cues_size, sf_strerror (file)) ;
+	{	printf ("\n\nLine %d : sf_command (SFC_SET_CUE) failed with %d cues, datasize %zu --> error: %s\n\n", __LINE__, count, cues_size, sf_strerror (file)) ;
 		exit (1) ;
 		} ;
 	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
@@ -1033,7 +1033,7 @@ cue_test_var (const char *filename, int filetype, int count)
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 
 	if (sf_command (file, SFC_GET_CUE, read_cue, cues_size) == SF_FALSE)
-	{	printf ("\n\nLine %d : sf_command (SFC_GET_CUE) failed with %d cues, datasize %ld --> error: %s\n\n", __LINE__, count, cues_size, sf_strerror (file)) ;
+	{	printf ("\n\nLine %d : sf_command (SFC_GET_CUE) failed with %d cues, datasize %zu --> error: %s\n\n", __LINE__, count, cues_size, sf_strerror (file)) ;
 		exit (1) ;
 		} ;
 	check_log_buffer_or_die (file, __LINE__) ;
