@@ -163,6 +163,16 @@ AC_ARG_ENABLE([test-coverage],
 	[AS_HELP_STRING([--enable-test-coverage], [enable test coverage])])
 AM_CONDITIONAL([ENABLE_TEST_COVERAGE], [test "x$enable_test_coverage" = "xyes"])
 
+AC_ARG_ENABLE([ossfuzzers],
+  [AS_HELP_STRING([--enable-ossfuzzers],
+    [Whether to generate the fuzzers for OSS-Fuzz])],
+  [have_ossfuzzers=yes], [have_ossfuzzers=no])
+AM_CONDITIONAL([USE_OSSFUZZERS], [test "x$have_ossfuzzers" = "xyes"])
+
+AC_SUBST([LIB_FUZZING_ENGINE])
+AM_CONDITIONAL([USE_OSSFUZZ_FLAG], [test "x$LIB_FUZZING_ENGINE" = "x-fsanitize=fuzzer"])
+AM_CONDITIONAL([USE_OSSFUZZ_STATIC], [test -f "$LIB_FUZZING_ENGINE"])
+
 dnl ====================================================================================
 dnl  Check types and their sizes.
 

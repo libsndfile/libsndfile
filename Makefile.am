@@ -26,6 +26,8 @@ cmake_files = cmake/ClipMode.cmake cmake/FindFLAC.cmake \
 
 pkgconfig_DATA = sndfile.pc
 
+noinst_PROGRAMS =
+
 #===============================================================================
 
 test: check
@@ -434,6 +436,39 @@ man/sndfile-metadata-set.1: man/sndfile-metadata-get.1
 man/sndfile-deinterleave.1: man/sndfile-interleave.1
 	-rm -f $@
 	cd $(top_srcdir)/man && $(LN_S) sndfile-interleave.1 sndfile-deinterleave.1
+
+############
+# ossfuzz/ #
+############
+
+if USE_OSSFUZZ_FLAG
+FUZZ_FLAG = $(LIB_FUZZING_ENGINE)
+FUZZ_LDADD =
+else
+if USE_OSSFUZZ_STATIC
+FUZZ_LDADD = $(LIB_FUZZING_ENGINE)
+FUZZ_FLAG =
+else
+FUZZ_LDADD = libstandaloneengine.la
+FUZZ_FLAG =
+endif
+endif
+
+if USE_OSSFUZZERS
+noinst_PROGRAMS += \
+	ossfuzz/sndfile_fuzzer
+
+noinst_LTLIBRARIES += \
+	ossfuzz/libstandaloneengine.la
+endif
+
+ossfuzz_sndfile_fuzzer_SOURCES = ossfuzz/sndfile_fuzzer.cc
+ossfuzz_sndfile_fuzzer_CXXFLAGS = $(AM_CXXFLAGS) $(FUZZ_FLAG)
+ossfuzz_sndfile_fuzzer_LDFLAGS = $(AM_LDFLAGS) -static
+ossfuzz_sndfile_fuzzer_LDADD = src/libsndfile.la $(FUZZ_LDADD)
+
+ossfuzz_libstandaloneengine_la_SOURCES = ossfuzz/standaloneengine.cc ossfuzz/testinput.h
+ossfuzz_libstandaloneengine_la_CXXFLAGS = $(AM_CXXFLAGS)
 
 #############
 # programs/ #
