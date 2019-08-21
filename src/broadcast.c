@@ -87,7 +87,7 @@ broadcast_var_set (SF_PRIVATE *psf, const SF_BROADCAST_INFO * info, size_t datas
 	psf->broadcast_16k->coding_history_size = len ;
 
 	/* Currently writing this version. */
-	psf->broadcast_16k->version = 1 ;
+	psf->broadcast_16k->version = 2 ;
 
 	return SF_TRUE ;
 } /* broadcast_var_set */
@@ -188,4 +188,3 @@ gen_coding_history (char * added_history, int added_history_max, const SF_INFO *
 
 	return count ;
 } /* gen_coding_history */
-
