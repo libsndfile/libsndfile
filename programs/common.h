@@ -54,6 +54,11 @@ typedef struct
 	const char * origination_date ;
 	const char * origination_time ;
 	const char * umid ;
+	const char * loudness_value ;
+	const char * loudness_range ;
+	const char * max_true_peak_level ;
+	const char * max_momentary_loudness ;
+	const char * max_shortterm_loudness ;
 	const char * coding_history ;
 	const char * time_ref ;
 } METADATA_INFO ;
@@ -75,4 +80,3 @@ const char * program_name (const char * argv0) ;
 const char * sfe_endian_name (int format) ;
 const char * sfe_container_name (int format) ;
 const char * sfe_codec_name (int format) ;
-

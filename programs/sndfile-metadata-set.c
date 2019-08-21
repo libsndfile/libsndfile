@@ -100,6 +100,11 @@ main (int argc, char *argv [])
 		HANDLE_BEXT_ARG ("--bext-umid", umid) ;
 		HANDLE_BEXT_ARG ("--bext-orig-date", origination_date) ;
 		HANDLE_BEXT_ARG ("--bext-orig-time", origination_time) ;
+		HANDLE_BEXT_ARG ("--bext-loudness-value", loudness_value) ;
+		HANDLE_BEXT_ARG ("--bext-loudness-range", loudness_range) ;
+		HANDLE_BEXT_ARG ("--bext-max-truepeak", max_true_peak_level) ;
+		HANDLE_BEXT_ARG ("--bext-max-momentary", max_momentary_loudness) ;
+		HANDLE_BEXT_ARG ("--bext-max-shortterm", max_shortterm_loudness) ;
 		HANDLE_BEXT_ARG ("--bext-coding-hist", coding_history) ;
 		HANDLE_BEXT_ARG ("--bext-time-ref", time_ref) ;
 
@@ -206,6 +211,11 @@ usage_exit (const char *progname, int exit_code)
 		"    --bext-umid              Set the 'bext' UMID.\n"
 		"    --bext-orig-date         Set the 'bext' origination date.\n"
 		"    --bext-orig-time         Set the 'bext' origination time.\n"
+		"    --bext-loudness-value    Set the 'bext' loudness value.\n"
+		"    --bext-loudness-range    Set the 'bext' loudness range.\n"
+		"    --bext-max-truepeak      Set the 'bext' max. true peak level\n"
+		"    --bext-max-momentary     Set the 'bext' max. momentary loudness\n"
+		"    --bext-max-shortterm     Set the 'bext' max. short term loudness\n"
 		"    --bext-coding-hist       Set the 'bext' coding history.\n"
 		"    --bext-time-ref          Set the 'bext' Time ref.\n"
 		"\n"
@@ -256,6 +266,9 @@ has_bext_fields_set (const METADATA_INFO * info)
 	if (info->origination_date || info->origination_time || info->umid || info->coding_history || info->time_ref)
 		return 1 ;
 
+	if (info->loudness_value || info->loudness_range || info->max_true_peak_level || info->max_momentary_loudness || info->max_shortterm_loudness)
+		return 1 ;
+
 	return 0 ;
 } /* has_bext_fields_set */
 
@@ -280,4 +293,3 @@ read_localtime (struct tm * timedata)
 
 	return ;
 } /* read_localtime */
-

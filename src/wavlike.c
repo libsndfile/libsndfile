@@ -753,7 +753,10 @@ wavlike_read_bext_chunk (SF_PRIVATE *psf, uint32_t chunksize)
 	bytes += psf_binheader_readf (psf, "b", b->origination_date, sizeof (b->origination_date)) ;
 	bytes += psf_binheader_readf (psf, "b", b->origination_time, sizeof (b->origination_time)) ;
 	bytes += psf_binheader_readf (psf, "442", &b->time_reference_low, &b->time_reference_high, &b->version) ;
-	bytes += psf_binheader_readf (psf, "bj", &b->umid, sizeof (b->umid), 190) ;
+	bytes += psf_binheader_readf (psf, "b", &b->umid, sizeof (b->umid)) ;
+	bytes += psf_binheader_readf (psf, "22", &b->loudness_value, &b->loudness_range) ;
+	bytes += psf_binheader_readf (psf, "222", &b->max_true_peak_level, &b->max_momentary_loudness, &b->max_shortterm_loudness) ;
+	bytes += psf_binheader_readf (psf, "j", 180) ;
 
 	if (chunksize > WAV_BEXT_MIN_CHUNK_SIZE)
 	{	/* File has coding history data. */
@@ -793,7 +796,9 @@ wavlike_write_bext_chunk (SF_PRIVATE *psf)
 	psf_binheader_writef (psf, "b", BHWv (b->origination_time), BHWz (sizeof (b->origination_time))) ;
 	psf_binheader_writef (psf, "442", BHW4 (b->time_reference_low), BHW4 (b->time_reference_high), BHW2 (b->version)) ;
 	psf_binheader_writef (psf, "b", BHWv (b->umid), BHWz (sizeof (b->umid))) ;
-	psf_binheader_writef (psf, "z", BHWz (190)) ;
+	psf_binheader_writef (psf, "22", BHW2 (b->loudness_value), BHW2 (b->loudness_range)) ;
+	psf_binheader_writef (psf, "222", BHW2 (b->max_true_peak_level), BHW2 (b->max_momentary_loudness), BHW2 (b->max_shortterm_loudness)) ;
+	psf_binheader_writef (psf, "z", BHWz (180)) ;
 
 	if (b->coding_history_size > 0)
 		psf_binheader_writef (psf, "b", BHWv (b->coding_history), BHWz (b->coding_history_size)) ;
@@ -1021,7 +1026,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
  						{	unsigned int i = 0 ;
 
 							/* find id to store label */
-							while (i < psf->cues->cue_count  &&  psf->cues->cue_points [i].indx != mark_id)
+							while (i < psf->cues->cue_count && psf->cues->cue_points [i].indx != mark_id)
 								i++ ;
 
 							if (i < psf->cues->cue_count)

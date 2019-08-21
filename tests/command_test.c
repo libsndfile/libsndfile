@@ -1140,7 +1140,7 @@ broadcast_test (const char *filename, int filetype)
 	check_log_buffer_or_die (file, __LINE__) ;
 	sf_close (file) ;
 
-	if (bc_read.version != 1)
+	if (bc_read.version != 2)
 	{	printf ("\n\nLine %d : Read bad version number %d.\n\n", __LINE__, bc_read.version) ;
 		exit (1) ;
 		return ;

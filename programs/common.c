@@ -36,6 +36,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdint.h>
+#include <math.h>
 
 #include <sndfile.h>
 
@@ -146,6 +147,18 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 	REPLACE_IF_NEW (origination_date) ;
 	REPLACE_IF_NEW (origination_time) ;
 	REPLACE_IF_NEW (umid) ;
+
+	/* Special case loudness values */
+#define REPLACE_IF_NEW_INT(x) \
+		if (info->x != NULL) \
+		{	binfo.x = round (atof (info->x) * 100.0) ; \
+		} ;
+
+	REPLACE_IF_NEW_INT (loudness_value) ;
+	REPLACE_IF_NEW_INT (loudness_range) ;
+	REPLACE_IF_NEW_INT (max_true_peak_level) ;
+	REPLACE_IF_NEW_INT (max_momentary_loudness) ;
+	REPLACE_IF_NEW_INT (max_shortterm_loudness) ;
 
 	/* Special case for Time Ref. */
 	if (info->time_ref != NULL)
@@ -467,4 +480,3 @@ sfe_codec_name (int format)
 		} ;
 	return "unknown" ;
 } /* sfe_codec_name */
-

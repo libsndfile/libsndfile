@@ -502,7 +502,12 @@ typedef struct
 				uint32_t	time_reference_high ; \
 				short		version ; \
 				char		umid [64] ; \
-				char		reserved [190] ; \
+				int16_t	loudness_value ; \
+				int16_t	loudness_range ; \
+				int16_t	max_true_peak_level ; \
+				int16_t	max_momentary_loudness ; \
+				int16_t	max_shortterm_loudness ; \
+				char		reserved [180] ; \
 				uint32_t	coding_history_size ; \
 				char		coding_history [coding_hist_size] ; \
 			}
@@ -864,4 +869,3 @@ sf_get_chunk_data (const SF_CHUNK_ITERATOR * it, SF_CHUNK_INFO * chunk_info) ;
 #endif	/* __cplusplus */
 
 #endif	/* SNDFILE_H */
-

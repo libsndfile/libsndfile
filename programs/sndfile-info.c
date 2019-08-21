@@ -357,20 +357,38 @@ broadcast_dump (const char *filename)
 
 	time_ref_sec = ((pow (2.0, 32) * bext.time_reference_high) + (1.0 * bext.time_reference_low)) / sfinfo.samplerate ;
 
-	printf ("Description      : %.*s\n", (int) sizeof (bext.description), bext.description) ;
-	printf ("Originator       : %.*s\n", (int) sizeof (bext.originator), bext.originator) ;
-	printf ("Origination ref  : %.*s\n", (int) sizeof (bext.originator_reference), bext.originator_reference) ;
-	printf ("Origination date : %.*s\n", (int) sizeof (bext.origination_date), bext.origination_date) ;
-	printf ("Origination time : %.*s\n", (int) sizeof (bext.origination_time), bext.origination_time) ;
+	printf ("Description              : %.*s\n", (int) sizeof (bext.description), bext.description) ;
+	printf ("Originator               : %.*s\n", (int) sizeof (bext.originator), bext.originator) ;
+	printf ("Origination ref          : %.*s\n", (int) sizeof (bext.originator_reference), bext.originator_reference) ;
+	printf ("Origination date         : %.*s\n", (int) sizeof (bext.origination_date), bext.origination_date) ;
+	printf ("Origination time         : %.*s\n", (int) sizeof (bext.origination_time), bext.origination_time) ;
 
 	if (bext.time_reference_high == 0 && bext.time_reference_low == 0)
-		printf ("Time ref         : 0\n") ;
+		printf ("Time ref                 : 0\n") ;
 	else
-		printf ("Time ref         : 0x%x%08x (%.6f seconds)\n", bext.time_reference_high, bext.time_reference_low, time_ref_sec) ;
+		printf ("Time ref                 : 0x%x%08x (%.6f seconds)\n", bext.time_reference_high, bext.time_reference_low, time_ref_sec) ;
 
-	printf ("BWF version      : %d\n", bext.version) ;
-	printf ("UMID             : %.*s\n", (int) sizeof (bext.umid), bext.umid) ;
-	printf ("Coding history   : %.*s\n", bext.coding_history_size, bext.coding_history) ;
+	printf ("BWF version              : %d\n", bext.version) ;
+
+	if (bext.version >= 1)
+	{
+		printf ("UMID                     : %.*s\n", (int) sizeof (bext.umid), bext.umid) ;
+	}
+
+	if (bext.version >= 2)
+	{
+		/* 0x7fff shall be used to designate an unused value */
+		/* valid range: -99.99 .. 99.99 */
+		printf ("Loudness value           : %6.2f LUFS\n", bext.loudness_value / 100.0) ;
+		/* valid range: 0.00 .. 99.99 */
+		printf ("Loudness range           : %6.2f LU\n", bext.loudness_range / 100.0) ;
+		/* valid range: -99.99 .. 99.99 */
+		printf ("Max. true peak level     : %6.2f dBTP\n", bext.max_true_peak_level / 100.0) ;
+		printf ("Max. momentary loudness  : %6.2f LUFS\n", bext.max_momentary_loudness / 100.0) ;
+		printf ("Max. short term loudness : %6.2f LUFS\n", bext.max_shortterm_loudness / 100.0) ;
+	}
+
+	printf ("Coding history           : %.*s\n", bext.coding_history_size, bext.coding_history) ;
 
 	return 0 ;
 } /* broadcast_dump */
