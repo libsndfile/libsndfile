@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.1.3)
 
-project(libsndfile VERSION 1.0.29)
+project(sndfile VERSION 1.0.29)
 
 #
 # Variables
@@ -10,7 +10,7 @@ set (CMAKE_C_STANDARD 99)
 set (CMAKE_C_STANDARD_REQUIRED TRUE)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set (PACKAGE_NAME ${PROJECT_NAME})
+set (PACKAGE_NAME lib${PROJECT_NAME})
 set (CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
 set (CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
 set (CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
@@ -21,6 +21,11 @@ set (CPACK_PACKAGE_VERSION_FULL "${PROJECT_VERSION}${CPACK_PACKAGE_VERSION_STAGE
 # System-wide includes
 #
 
+# Set proper default documentation install directory based on canonical
+# package name, not CMake project name. This option can still be overridden.
+if(NOT CMAKE_INSTALL_DOCDIR)
+	set(CMAKE_INSTALL_DOCDIR "${CMAKE_INSTALL_DATAROOTDIR}/doc/libsndfile")
+endif()
 include (GNUInstallDirs)
 include (FeatureSummary)
 include (CMakeDependentOption)
