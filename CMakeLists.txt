@@ -196,12 +196,14 @@ add_library (sndfile
 	src/cart.c
 	src/broadcast.c
 	src/audio_detect.c
- 	src/ima_oki_adpcm.c
+	src/ima_oki_adpcm.c
 	src/ima_oki_adpcm.h
 	src/alac.c
 	src/chunk.c
 	src/ogg.h
 	src/ogg.c
+	src/mp3.h
+	src/mp3.c
 	src/chanmap.h
 	src/chanmap.c
 	src/id3.c
