@@ -407,6 +407,7 @@ if (BUILD_PROGRAMS)
 		$<$<NOT:$<BOOL:${BEOS}>>:programs/sndfile-play.c>
 		$<$<BOOL:${BEOS}>:programs/sndfile-play-beos.cpp>
 		)
+	target_link_libraries (sndfile-play PRIVATE $<$<BOOL:${LIBM_REQUIRED}>:m>)
 	target_link_libraries (sndfile-play PRIVATE sndfile)
 	if (WIN32)
 		target_link_libraries(sndfile-play PRIVATE winmm)
@@ -426,7 +427,7 @@ if (BUILD_PROGRAMS)
 		programs/common.c
 		programs/common.h
 		)
-	target_link_libraries (sndfile-convert PRIVATE sndfile)
+	target_link_libraries (sndfile-convert PRIVATE sndfile $<$<BOOL:${LIBM_REQUIRED}>:m>)
 
 # sndfile-cmp
 
@@ -435,7 +436,7 @@ if (BUILD_PROGRAMS)
 		programs/common.c
 		programs/common.h
 		)
-	target_link_libraries (sndfile-cmp PRIVATE sndfile)
+	target_link_libraries (sndfile-cmp PRIVATE sndfile $<$<BOOL:${LIBM_REQUIRED}>:m>)
 
 # sndfile-metadata-set
 
@@ -444,7 +445,7 @@ if (BUILD_PROGRAMS)
 		programs/common.c
 		programs/common.h
 		)
-	target_link_libraries (sndfile-metadata-set PRIVATE sndfile)
+	target_link_libraries (sndfile-metadata-set PRIVATE sndfile $<$<BOOL:${LIBM_REQUIRED}>:m>)
 
 # sndfile-metadata-get
 
@@ -453,7 +454,7 @@ if (BUILD_PROGRAMS)
 		programs/common.c
 		programs/common.h
 		)
-	target_link_libraries (sndfile-metadata-get PRIVATE sndfile)
+	target_link_libraries (sndfile-metadata-get PRIVATE sndfile $<$<BOOL:${LIBM_REQUIRED}>:m>)
 
 # sndfile-interleave
 
@@ -462,7 +463,7 @@ if (BUILD_PROGRAMS)
 		programs/common.c
 		programs/common.h
 		)
-	target_link_libraries (sndfile-interleave PRIVATE sndfile)
+	target_link_libraries (sndfile-interleave PRIVATE sndfile $<$<BOOL:${LIBM_REQUIRED}>:m>)
 
 # sndfile-deinterleave
 
@@ -471,7 +472,7 @@ if (BUILD_PROGRAMS)
 		programs/common.c
 		programs/common.h
 		)
-	target_link_libraries (sndfile-deinterleave PRIVATE sndfile)
+	target_link_libraries (sndfile-deinterleave PRIVATE sndfile $<$<BOOL:${LIBM_REQUIRED}>:m>)
 
 # sndfile-concat
 
@@ -480,7 +481,7 @@ if (BUILD_PROGRAMS)
 		programs/common.c
 		programs/common.h
 		)
-	target_link_libraries (sndfile-concat PRIVATE sndfile)
+	target_link_libraries (sndfile-concat PRIVATE sndfile $<$<BOOL:${LIBM_REQUIRED}>:m>)
 
 # sndfile-salvage
 
@@ -489,7 +490,7 @@ if (BUILD_PROGRAMS)
 		programs/common.c
 		programs/common.h
 		)
-	target_link_libraries (sndfile-salvage PRIVATE sndfile)
+	target_link_libraries (sndfile-salvage PRIVATE sndfile $<$<BOOL:${LIBM_REQUIRED}>:m>)
 
 	set (SNDFILE_PROGRAM_TARGETS
 		sndfile-info
