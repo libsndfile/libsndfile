@@ -871,6 +871,7 @@ sf_format_check	(const SF_INFO *info)
 					return 1 ;
 				break ;
 		case SF_FORMAT_MP3 :
+				return 1 ;
 		default : break ;
 		} ;
 
@@ -3165,6 +3166,7 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 				break ;
 
 		case	SF_FORMAT_MP3 :
+				printf ("**** Calling mp3_open\n") ;
 				error = mp3_open (psf) ;
 				break ;
 

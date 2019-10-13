@@ -58,9 +58,10 @@ int mp3_close_lame (SF_PRIVATE *psf) ;
 
 int
 mp3_open (SF_PRIVATE *psf)
-{	int	subformat, error = 0 ;
+{
+	int	subformat, error = 0 ;
 	MP3_PRIVATE* mdata ;
-
+	printf ("*** in mp3_open\n") ;
 	if ((mdata = calloc (1, sizeof (MP3_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 	psf->container_data = mdata ;
@@ -69,8 +70,10 @@ mp3_open (SF_PRIVATE *psf)
 		return SFE_BAD_MODE_RW ;
 
 	if (psf->file.mode == SFM_WRITE)
+	{
+		printf ("*** callinf mp3_open_lame\n") ;
 		return mp3_open_lame (psf) ;
-
+	}
 	if (psf->file.mode == SFM_RDWR)
 		return SFE_UNIMPLEMENTED ;
 
@@ -90,10 +93,10 @@ mp3_open_lame (SF_PRIVATE *psf)
 	MP3_PRIVATE *p = (MP3_PRIVATE*) psf->container_data ;
 	lame_global_flags *gfp = p->gfp = lame_init () ;
 	int error = 0 , format ;
-
+	printf ("** in mp3_open_lame\n") ;
 	format = SF_CONTAINER (psf->sf.format) ;
 	if (format != SF_FORMAT_MP3)
-		return	SFE_BAD_OPEN_FORMAT ;
+		return SFE_BAD_OPEN_FORMAT ;
 	lame_set_num_channels (gfp, psf->sf.channels) ;
 	lame_set_in_samplerate (gfp, psf->sf.samplerate) ;
 	lame_set_brate (gfp, 256) ;	/* FIXME to parameter */
@@ -101,7 +104,12 @@ mp3_open_lame (SF_PRIVATE *psf)
 	lame_set_quality (gfp, 2) ;	/* 2=high	5 = medium  7=low */
 	if ((error = lame_init_params (gfp)) <0)
 		return SFE_BAD_OPEN_FORMAT ;
-	psf->container_close = mp3_close_lame ;
+	if ((p->mp3buffer = calloc (1, MP3BUFFER_SIZE)) == NULL)
+		return SFE_MALLOC_FAILED ;
+	if ((p->mp3data_l = calloc (1, MP3DATA_SIZE*sizeof (double))) == NULL)
+		return SFE_MALLOC_FAILED ;
+	if ((p->mp3data_r = calloc (1, MP3DATA_SIZE*sizeof (double))) == NULL)
+		return SFE_MALLOC_FAILED ;
 	//psf->command = mp3_command ;
 	return error ;
 }
