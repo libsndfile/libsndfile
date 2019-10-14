@@ -111,6 +111,7 @@ mp3_open_lame (SF_PRIVATE *psf)
 	if ((p->mp3data_r = calloc (1, MP3DATA_SIZE*sizeof (double))) == NULL)
 		return SFE_MALLOC_FAILED ;
 	//psf->command = mp3_command ;
+	psf->datalength = 0 ;
 	return error ;
 }
 
@@ -120,10 +121,13 @@ mp3_close_lame (SF_PRIVATE *psf)
 	MP3_PRIVATE *p = psf->container_data ;
 	lame_global_flags *gfp = p->gfp ;
 	int bytes = lame_encode_flush (gfp, p->mp3buffer, p->mp3buffer_size) ;
-	if (bytes > 0) fwrite (p->mp3buffer, 1, bytes, p->fout) ;
-	lame_mp3_tags_fid (gfp, p->fout) ;
+	if (bytes > 0) psf_fwrite (p->mp3buffer, 1, bytes, psf) ;
+	//lame_mp3_tags_fid (gfp, p->fout) ;
 	lame_close (gfp) ;
 
+	free (p->mp3buffer) ;
+	free (p->mp3data_l) ;
+	free (p->mp3data_r) ;
 	p->gfp = NULL ;
 	return 0 ;
 

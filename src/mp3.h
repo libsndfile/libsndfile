@@ -32,4 +32,5 @@ typedef struct
 
 #define MP3BUFFER_SIZE	(9000)
 #define MP3DATA_SIZE	(1024)
+
 #endif /* SF_SRC_MP3_H */
