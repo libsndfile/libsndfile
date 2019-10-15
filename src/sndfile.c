@@ -3166,7 +3166,6 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 				break ;
 
 		case	SF_FORMAT_MP3 :
-				printf ("**** Calling mp3_open\n") ;
 				error = mp3_open (psf) ;
 				break ;
 

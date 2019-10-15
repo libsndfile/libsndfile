@@ -25,12 +25,10 @@ typedef struct
 	lame_global_flags *gfp ;
 	void		*mp3buffer ;
 	int		mp3buffer_size ;
-	void		*mp3data_l ;
-	void		*mp3data_r ;
 	FILE		*fout ;
 } MP3_PRIVATE ;
 
-#define MP3BUFFER_SIZE	(9000)
 #define MP3DATA_SIZE	(1024)
+#define MP3BUFFER_SIZE	(5 * MP3DATA_SIZE / 4 + 7200)
 
 #endif /* SF_SRC_MP3_H */
