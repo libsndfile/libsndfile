@@ -25,7 +25,8 @@ typedef struct
 	lame_global_flags *gfp ;
 	void		*mp3buffer ;
 	int		mp3buffer_size ;
-	FILE		*fout ;
+	void		*mp3data ;
+	int		quality ;
 } MP3_PRIVATE ;
 
 #define MP3DATA_SIZE	(1024)
