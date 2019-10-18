@@ -71,7 +71,7 @@ enum
 	SF_FORMAT_OGG			= 0x200000,		/* Xiph OGG container */
 	SF_FORMAT_MPC2K			= 0x210000,		/* Akai MPC 2000 sampler */
 	SF_FORMAT_RF64			= 0x220000,		/* RF64 WAV file */
-
+	SF_FORMAT_MP3			= 0x230000,		/* MP3 file */
 	/* Subtypes from here on. */
 
 	SF_FORMAT_PCM_S8		= 0x0001,		/* Signed 8 bit data */
@@ -116,7 +116,14 @@ enum
 	SF_FORMAT_ALAC_24		= 0x0072,		/* Apple Lossless Audio Codec (24 bit). */
 	SF_FORMAT_ALAC_32		= 0x0073,		/* Apple Lossless Audio Codec (32 bit). */
 
-	/* Endian-ness options. */
+	SF_FORMAT_MP3_STEREO		= 0x0080,		/* MP3 MODE. */
+	SF_FORMAT_MP3_JTSTEREO		= 0x0081,		/* MP3 MODE. */
+	SF_FORMAT_MP3_DUAL		= 0x0082,		/* MP3 MODE. */
+	SF_FORMAT_MP3_MONO		= 0x0083,		/* MP3 MODE. */
+	/* Endian-nes
+
+
+ options. */
 
 	SF_ENDIAN_FILE			= 0x00000000,	/* Default file endian-ness. */
 	SF_ENDIAN_LITTLE		= 0x10000000,	/* Force little endian-ness. */
@@ -223,6 +230,10 @@ enum
 	SFC_SET_ORIGINAL_SAMPLERATE		= 0x1500,
 	SFC_GET_ORIGINAL_SAMPLERATE		= 0x1501,
 
+	/* MP3 quality controls */
+	SFC_SET_QUALITY_LEVEL			= 0x1601,
+	SFC_SET_BITRATE				= 0x1602,
+	
 	/* Following commands for testing only. */
 	SFC_TEST_IEEE_FLOAT_REPLACE		= 0x6001,
 
