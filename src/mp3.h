@@ -24,7 +24,6 @@ typedef struct
 {	/* Structure for writing via LAME */
 	lame_global_flags *gfp ;
 	void		*mp3buffer ;
-	int		mp3buffer_size ;
 	void		*mp3data ;
 	int		quality ;
 	int		initialised ;

@@ -52,14 +52,15 @@ mp3_open	(SF_PRIVATE *psf)
 
 static int mp3_open_lame (SF_PRIVATE *psf) ;
 static int mp3_close_lame (SF_PRIVATE *psf) ;
-static int mp3_lame_write_short (SF_PRIVATE *psf, short int *ptr, sf_count_t items) ;
-static int mp3_lame_write_int (SF_PRIVATE *psf, int *ptr, sf_count_t items) ;
-static int mp3_lame_write_float (SF_PRIVATE *psf, float *ptr, sf_count_t items) ;
-static int mp3_lame_write_double (SF_PRIVATE *psf, double *ptr, sf_count_t items) ;
-static int mp3_lame_write_short_M (SF_PRIVATE *psf, short int *ptr, sf_count_t items) ;
-static int mp3_lame_write_int_M (SF_PRIVATE *psf, int *ptr, sf_count_t items) ;
-static int mp3_lame_write_float_M (SF_PRIVATE *psf, float *ptr, sf_count_t items) ;
-static int mp3_lame_write_double_M (SF_PRIVATE *psf, double *ptr, sf_count_t items) ;
+
+static sf_count_t mp3_lame_write_short (SF_PRIVATE *psf, const short *ptr, sf_count_t items) ;
+static sf_count_t mp3_lame_write_int (SF_PRIVATE *psf, const int *ptr, sf_count_t items) ;
+static sf_count_t mp3_lame_write_float (SF_PRIVATE *psf, const float *ptr, sf_count_t items) ;
+static sf_count_t mp3_lame_write_double (SF_PRIVATE *psf, const double *ptr, sf_count_t items) ;
+static sf_count_t mp3_lame_write_short_M (SF_PRIVATE *psf, const short *ptr, sf_count_t items) ;
+static sf_count_t mp3_lame_write_int_M (SF_PRIVATE *psf, const int *ptr, sf_count_t items) ;
+static sf_count_t mp3_lame_write_float_M (SF_PRIVATE *psf, const float *ptr, sf_count_t items) ;
+static sf_count_t mp3_lame_write_double_M (SF_PRIVATE *psf, const double *ptr, sf_count_t items) ;
 static int mp3_command (SF_PRIVATE * psf, int command, void * data, int datasize) ;
 
 /*------------------------------------------------------------------------------
@@ -141,7 +142,7 @@ static int
 mp3_close_lame (SF_PRIVATE *psf)
 {	MP3_PRIVATE *p = psf->container_data ;
 	lame_global_flags *gfp = p->gfp ;
-	int bytes = lame_encode_flush (gfp, p->mp3buffer, p->mp3buffer_size) ;
+	int bytes = lame_encode_flush (gfp, p->mp3buffer, MP3BUFFER_SIZE) ;
 	if (bytes > 0) psf_fwrite (p->mp3buffer, 1, bytes, psf) ;
 	//lame_mp3_tags_fid (gfp, p->fout) ;
 	lame_close (gfp) ;
@@ -165,8 +166,8 @@ mp3_lame_parameters (lame_global_flags *gfp, MP3_PRIVATE *p)
 }
 
 /* **** Note that if mode is MONO (3) then left and right channels are averaged and the data is changed.  Hence the _M functions **** */
-static int
-mp3_lame_write_short (SF_PRIVATE *psf, short int *ptr, sf_count_t items)
+static sf_count_t
+mp3_lame_write_short (SF_PRIVATE *psf, const short int *ptr, sf_count_t items)
 {	MP3_PRIVATE *p = psf->container_data ;
 	lame_global_flags *gfp = p->gfp ;
 
@@ -177,13 +178,13 @@ mp3_lame_write_short (SF_PRIVATE *psf, short int *ptr, sf_count_t items)
 	do
 	{	count = (items > MP3DATA_SIZE ? MP3DATA_SIZE : items) ;
 		if (psf->sf.channels == 2)
-			bytes = lame_encode_buffer_interleaved (gfp, ptr,
+		bytes = lame_encode_buffer_interleaved (gfp, (short *) ptr,
 								count, p->mp3buffer,
-								p->mp3buffer_size) ;
+								MP3BUFFER_SIZE) ;
 		else
-			bytes = lame_encode_buffer (gfp, ptr, ptr,
+			bytes = lame_encode_buffer (gfp, (short *) ptr, (short *) ptr,
 							count, p->mp3buffer,
-							p->mp3buffer_size) ;
+							MP3BUFFER_SIZE) ;
 		if (bytes > 0) psf_fwrite (p->mp3buffer, 1, bytes, psf) ;
 		if (bytes < 0) return 0 ;
 		ptr += count * psf->sf.channels ;
@@ -192,8 +193,8 @@ mp3_lame_write_short (SF_PRIVATE *psf, short int *ptr, sf_count_t items)
 	return 1 ;
 }
 
-static int
-mp3_lame_write_int (SF_PRIVATE *psf, int *ptr, sf_count_t items)
+static sf_count_t
+mp3_lame_write_int (SF_PRIVATE *psf, const int *ptr, sf_count_t items)
 {	MP3_PRIVATE *p = psf->container_data ;
 	lame_global_flags *gfp = p->gfp ;
 
@@ -206,11 +207,11 @@ mp3_lame_write_int (SF_PRIVATE *psf, int *ptr, sf_count_t items)
 		if (psf->sf.channels == 2)
 			bytes = lame_encode_buffer_interleaved_int (gfp, ptr,
 								count, p->mp3buffer,
-								p->mp3buffer_size) ;
+								MP3BUFFER_SIZE) ;
 		else
 			bytes = lame_encode_buffer_int (gfp, ptr, ptr,
 								count, p->mp3buffer,
-								p->mp3buffer_size) ;
+								MP3BUFFER_SIZE) ;
 		if (bytes > 0) psf_fwrite (p->mp3buffer, 1, bytes, psf) ;
 		if (bytes < 0) return 0 ;
 		ptr += count * psf->sf.channels ;
@@ -219,8 +220,8 @@ mp3_lame_write_int (SF_PRIVATE *psf, int *ptr, sf_count_t items)
 	return 1 ;
 }
 
-static int
-mp3_lame_write_float (SF_PRIVATE *psf, float *ptr, sf_count_t items)
+static sf_count_t
+mp3_lame_write_float (SF_PRIVATE *psf, const float *ptr, sf_count_t items)
 {	MP3_PRIVATE *p = psf->container_data ;
 	lame_global_flags *gfp = p->gfp ;
 
@@ -233,11 +234,11 @@ mp3_lame_write_float (SF_PRIVATE *psf, float *ptr, sf_count_t items)
 		if (psf->sf.channels == 2)
 			bytes = lame_encode_buffer_interleaved_ieee_float (gfp, ptr,
 							count, p->mp3buffer,
-							p->mp3buffer_size) ;
+							MP3BUFFER_SIZE) ;
 		else
 			bytes = lame_encode_buffer_ieee_float (gfp, ptr, ptr,
 							count, p->mp3buffer,
-							p->mp3buffer_size) ;
+							MP3BUFFER_SIZE) ;
 		if (bytes > 0) psf_fwrite (p->mp3buffer, 1, bytes, psf) ;
 		if (bytes < 0) return 0 ;
 		items -= count ;
@@ -246,8 +247,8 @@ mp3_lame_write_float (SF_PRIVATE *psf, float *ptr, sf_count_t items)
 	return 1 ;
 }
 
-static int
-mp3_lame_write_double (SF_PRIVATE *psf, double *ptr, sf_count_t items)
+static sf_count_t
+mp3_lame_write_double (SF_PRIVATE *psf, const double *ptr, sf_count_t items)
 {	MP3_PRIVATE *p = psf->container_data ;
 	lame_global_flags *gfp = p->gfp ;
 
@@ -260,11 +261,11 @@ mp3_lame_write_double (SF_PRIVATE *psf, double *ptr, sf_count_t items)
 		if (psf->sf.channels == 2)
 			bytes = lame_encode_buffer_interleaved_ieee_double (gfp, ptr,
 								count, p->mp3buffer,
-								p->mp3buffer_size) ;
+								MP3BUFFER_SIZE) ;
 		else
 			bytes = lame_encode_buffer_ieee_double (gfp, ptr, ptr,
 								count, p->mp3buffer,
-								p->mp3buffer_size) ;
+								MP3BUFFER_SIZE) ;
 		if (bytes > 0) psf_fwrite (p->mp3buffer, 1, bytes, psf) ;
 		if (bytes < 0) return 0 ;
 		items -= count ;
@@ -274,8 +275,8 @@ mp3_lame_write_double (SF_PRIVATE *psf, double *ptr, sf_count_t items)
 }
 /* **************** MONO cases to avoid overwriting ************ */
 
-static int
-mp3_lame_write_short_M (SF_PRIVATE *psf, short int *ptr, sf_count_t items)
+static sf_count_t
+mp3_lame_write_short_M (SF_PRIVATE *psf, const short *ptr, sf_count_t items)
 {	MP3_PRIVATE *p = psf->container_data ;
 	lame_global_flags *gfp = p->gfp ;
 
@@ -299,7 +300,7 @@ mp3_lame_write_short_M (SF_PRIVATE *psf, short int *ptr, sf_count_t items)
 			}
 		bytes = lame_encode_buffer (gfp, left, right,
 						count, p->mp3buffer,
-						p->mp3buffer_size) ;
+						MP3BUFFER_SIZE) ;
 		if (bytes > 0) psf_fwrite (p->mp3buffer, 1, bytes, psf) ;
 		if (bytes < 0) return 0 ;
 		ptr += count * psf->sf.channels ;
@@ -308,8 +309,8 @@ mp3_lame_write_short_M (SF_PRIVATE *psf, short int *ptr, sf_count_t items)
 	return 1 ;
 }
 
-static int
-mp3_lame_write_int_M (SF_PRIVATE *psf, int *ptr, sf_count_t items)
+static	sf_count_t
+mp3_lame_write_int_M (SF_PRIVATE *psf, const int *ptr, sf_count_t items)
 {	MP3_PRIVATE *p = psf->container_data ;
 	lame_global_flags *gfp = p->gfp ;
 
@@ -333,7 +334,7 @@ mp3_lame_write_int_M (SF_PRIVATE *psf, int *ptr, sf_count_t items)
 			}
 		bytes = lame_encode_buffer_int (gfp, left, right,
 						count, p->mp3buffer,
-						p->mp3buffer_size) ;
+						MP3BUFFER_SIZE) ;
 		if (bytes > 0) psf_fwrite (p->mp3buffer, 1, bytes, psf) ;
 		if (bytes < 0) return 0 ;
 		ptr += count * psf->sf.channels ;
@@ -341,8 +342,8 @@ mp3_lame_write_int_M (SF_PRIVATE *psf, int *ptr, sf_count_t items)
 		} while (count > 0) ;
 	return 1 ;
 }
-static int
-mp3_lame_write_float_M (SF_PRIVATE *psf, float *ptr, sf_count_t items)
+static sf_count_t
+mp3_lame_write_float_M (SF_PRIVATE *psf, const float *ptr, sf_count_t items)
 {	MP3_PRIVATE *p = psf->container_data ;
 	lame_global_flags *gfp = p->gfp ;
 
@@ -366,7 +367,7 @@ mp3_lame_write_float_M (SF_PRIVATE *psf, float *ptr, sf_count_t items)
 			}
 		bytes = lame_encode_buffer_ieee_float (gfp, left, right,
 						count, p->mp3buffer,
-						p->mp3buffer_size) ;
+						MP3BUFFER_SIZE) ;
 		if (bytes > 0) psf_fwrite (p->mp3buffer, 1, bytes, psf) ;
 		if (bytes < 0) return 0 ;
 		ptr += count ;
@@ -375,8 +376,8 @@ mp3_lame_write_float_M (SF_PRIVATE *psf, float *ptr, sf_count_t items)
 	return 1 ;
 }
 
-static int
-mp3_lame_write_double_M (SF_PRIVATE *psf, double *ptr, sf_count_t items)
+static sf_count_t
+mp3_lame_write_double_M (SF_PRIVATE *psf, const double *ptr, sf_count_t items)
 {	MP3_PRIVATE *p = psf->container_data ;
 	lame_global_flags *gfp = p->gfp ;
 
@@ -400,7 +401,7 @@ mp3_lame_write_double_M (SF_PRIVATE *psf, double *ptr, sf_count_t items)
 			}
 		bytes = lame_encode_buffer_ieee_double (gfp, left, right,
 						count, p->mp3buffer,
-						p->mp3buffer_size) ;
+						MP3BUFFER_SIZE) ;
 		if (bytes > 0) psf_fwrite (p->mp3buffer, 1, bytes, psf) ;
 		if (bytes < 0) return 0 ;
 		items -= count ;
@@ -409,7 +410,6 @@ mp3_lame_write_double_M (SF_PRIVATE *psf, double *ptr, sf_count_t items)
 	return 1 ;
 }
 
-#endif
 /* ********************************************************* */
 
 static int
@@ -425,12 +425,12 @@ mp3_command (SF_PRIVATE * psf, int command, void * data, int datasize)
 			if (psf->have_written)
 				return SF_FALSE ;
 
-			/* FLAC compression level is in the range  [0, 9] while libsndfile takes
+			/* MP3 quality is in the range  [0, 9] while libsndfile takes
 			** values in the range [0.0, 1.0]. Massage the libsndfile value here.
 			*/
 			quality = (*((double *) data)) * 9.0 ;
 			/* Clip range. */
-			p->quality = lrint (SF_MAX (0.0, SF_MIN (90, quality))) ;
+			p->quality = lrint (SF_MAX (0.0, SF_MIN (9.0, quality))) ;
 			lame_set_quality (p->gfp, p->quality) ;
 
 			psf_log_printf (psf, "%s : Setting SFC_SET_QUALITY_LEVEL to %u.\n", __func__, p->quality) ;
@@ -443,3 +443,7 @@ mp3_command (SF_PRIVATE * psf, int command, void * data, int datasize)
 
 	return SF_FALSE ;
 } /* mp3_command */
+
+
+
+#endif
