@@ -27,6 +27,7 @@ typedef struct
 	int		mp3buffer_size ;
 	void		*mp3data ;
 	int		quality ;
+	int		initialised ;
 } MP3_PRIVATE ;
 
 #define MP3DATA_SIZE	(1024)
