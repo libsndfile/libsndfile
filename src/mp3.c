@@ -416,6 +416,7 @@ static int
 mp3_command (SF_PRIVATE * psf, int command, void * data, int datasize)
 {	MP3_PRIVATE* p = (MP3_PRIVATE*) psf->container_data ;
 	double quality ;
+	int i, bitrate ;
 
 	switch (command)
 	{	case SFC_SET_QUALITY_LEVEL :
@@ -425,7 +426,7 @@ mp3_command (SF_PRIVATE * psf, int command, void * data, int datasize)
 			if (psf->have_written)
 				return SF_FALSE ;
 
-			/* MP3 quality is in the range  [0, 9] while libsndfile takes
+			/* MP3 quality is in the range	[0, 9] while libsndfile takes
 			** values in the range [0.0, 1.0]. Massage the libsndfile value here.
 			*/
 			quality = (*((double *) data)) * 9.0 ;
@@ -436,6 +437,24 @@ mp3_command (SF_PRIVATE * psf, int command, void * data, int datasize)
 			psf_log_printf (psf, "%s : Setting SFC_SET_QUALITY_LEVEL to %u.\n", __func__, p->quality) ;
 
 			return SF_TRUE ;
+
+		case SFC_SET_BITRATE:
+			if (data == NULL || datasize != sizeof (int))
+				return SF_FALSE ;
+
+			if (psf->have_written)
+				return SF_FALSE ;
+			bitrate = (*((int *) data)) ;
+			i = 0 ;
+			while (mp3_bitrates [i] != 0)
+			{	if (mp3_bitrates [i] >= bitrate)
+				{	p->bitrate = mp3_bitrates [i] ;
+					lame_set_brate (p->gfp, p->bitrate) ;
+					return SF_TRUE ;
+				}
+			i++ ;
+			}
+			return SF_FALSE ;
 
 		default :
 			return SF_FALSE ;

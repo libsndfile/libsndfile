@@ -26,10 +26,14 @@ typedef struct
 	void		*mp3buffer ;
 	void		*mp3data ;
 	int		quality ;
+	int		bitrate ;
 	int		initialised ;
 } MP3_PRIVATE ;
 
 #define MP3DATA_SIZE	(1024)
 #define MP3BUFFER_SIZE	(5 * MP3DATA_SIZE / 4 + 7200)
+static int mp3_bitrates [] =
+	{ 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0
+		} ;
 
 #endif /* SF_SRC_MP3_H */
