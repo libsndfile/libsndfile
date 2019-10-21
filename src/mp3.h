@@ -24,10 +24,16 @@ typedef struct
 {	/* Structure for writing via LAME */
 	lame_global_flags *gfp ;
 	void		*mp3buffer ;
-	void		*mp3data ;
+//	void		*mp3data ;
 	int		quality ;
 	int		bitrate ;
 	int		initialised ;
+/* read controls */
+	hip_t		hgf ;
+	short		*left, *right ;
+	mp3data_struct	mp3data ;
+	int		count ;
+	int		start ;
 } MP3_PRIVATE ;
 
 #define MP3DATA_SIZE	(1024)

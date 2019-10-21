@@ -8,7 +8,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU Lesser General Public License for more details.
 **
 ** You should have received a copy of the GNU Lesser General Public License
@@ -59,7 +59,7 @@ ErrorStruct SndfileErrors [] =
 	/* Public error values and their associated strings. */
 	{	SF_ERR_NO_ERROR				, "No Error." },
 	{	SF_ERR_UNRECOGNISED_FORMAT	, "Format not recognised." },
-	{	SF_ERR_SYSTEM				, "System error." /* Often replaced. */		},
+	{	SF_ERR_SYSTEM				, "System error." /* Often replaced. */ },
 	{	SF_ERR_MALFORMED_FILE		, "Supported file format but file is malformed." },
 	{	SF_ERR_UNSUPPORTED_ENCODING	, "Supported file format but unsupported encoding." },
 
@@ -325,7 +325,7 @@ static char	sf_syserr [SF_SYSERR_LEN] = { 0 } ;
 
 SNDFILE*
 sf_open	(const char *path, int mode, SF_INFO *sfinfo)
-{	SF_PRIVATE	*psf ;
+{	SF_PRIVATE *psf ;
 
 	/* Ultimate sanity check. */
 	assert (sizeof (sf_count_t) == 8) ;
@@ -871,6 +871,8 @@ sf_format_check	(const SF_INFO *info)
 					return 1 ;
 				break ;
 		case SF_FORMAT_MP3 :
+				if (info->channels > 2)
+					return 0 ;
 				return 1 ;
 		default : break ;
 		} ;
@@ -2648,6 +2650,9 @@ format_from_extension (SF_PRIVATE *psf)
 	{	psf->sf.channels = 1 ;
 		psf->sf.samplerate = 8000 ;
 		format = SF_FORMAT_RAW | SF_FORMAT_GSM610 ;
+		}
+	else if (strcmp (cptr, "mp3") == 0)
+	{	format = SF_FORMAT_MP3 ;
 		}
 
 	/* For RAW files, make sure the dataoffset if set correctly. */
