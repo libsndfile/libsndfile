@@ -54,6 +54,9 @@ static sf_count_t mp3_lame_write_double_M (SF_PRIVATE *psf, const double *ptr, s
 static int mp3_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 
 static sf_count_t mp3_read_short (SF_PRIVATE *psf, short *ptr, sf_count_t items) ;
+static sf_count_t mp3_read_int (SF_PRIVATE *psf, int *ptr, sf_count_t items) ;
+static sf_count_t mp3_read_float (SF_PRIVATE *psf, float *ptr, sf_count_t items) ;
+static sf_count_t mp3_read_double (SF_PRIVATE *psf, double *ptr, sf_count_t items) ;
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -407,6 +410,8 @@ static int mp3_close_read (SF_PRIVATE *psf)
 }
 
 #define CHUNK_SIZE	(512)
+#define FRAME_SIZE	(1152)
+#define NORMALISE	(0.000030517578125)
 
 static int mp3_open_read (SF_PRIVATE *psf)
 {	MP3_PRIVATE *p = (MP3_PRIVATE*) psf->container_data ;
@@ -414,16 +419,17 @@ static int mp3_open_read (SF_PRIVATE *psf)
 	if ((p->mp3buffer = calloc (4, MP3DATA_SIZE)) == NULL)
 		return SFE_MALLOC_FAILED ;
 	p->hgf = hip_decode_init () ;
-	if ((p->left = calloc (1, MP3DATA_SIZE*sizeof (short))) == NULL)
+
+	if ((p->left = calloc (1, FRAME_SIZE*sizeof (short))) == NULL)
 		return SFE_MALLOC_FAILED ;
-	if ((p->right = calloc (1, MP3DATA_SIZE*sizeof (short))) == NULL)
+	if ((p->right = calloc (1, FRAME_SIZE*sizeof (short))) == NULL)
 		return SFE_MALLOC_FAILED ;
 	do
 	{	err = psf_fread (p->mp3buffer, 1, CHUNK_SIZE, psf) ;
-		printf ("*** fread= %d\n", err) ;
+		//printf ("*** fread= %d\n", err) ;
 		err = hip_decode1_headers (p->hgf, p->mp3buffer, CHUNK_SIZE,
 					p->left, p->right, &p->mp3data) ;
-		printf ("*** decode-headers= %d\n", err) ;
+		//printf ("*** decode-headers= %d\n", err) ;
 		} while (err == 0) ;
 	p->count = err ;
 	p->start = 0 ;
@@ -434,13 +440,13 @@ static int mp3_open_read (SF_PRIVATE *psf)
 	psf->dataoffset = 0 ;
 
 	psf->read_short = mp3_read_short ;
+	psf->read_int = mp3_read_int ;
+	psf->read_float = mp3_read_float ;
+	psf->read_double = mp3_read_double ;
 #if 0
 	psf->container_close = mp3_close_read ;
 	psf->seek = mp3_read_seek ;
 
-	psf->read_int = mp3_read_2i ;
-	psf->read_float = mp3_read_2f ;
-	psf->read_double = mp3_read_2d ;
 #endif
 	return 0 ;
 }
@@ -476,10 +482,135 @@ static sf_count_t mp3_read_short (SF_PRIVATE *psf, short *ptr, sf_count_t items)
 	start = 0 ;
 	do
 	{	count = psf_fread (p->mp3buffer, 1, CHUNK_SIZE, psf) ;
-		printf ("*** fread= %d\n", count) ;
+		if (count <= 0)
+		{	//printf ("EOF? %d\n", count) ;
+			return total * psf->sf.channels ;
+			}
 		count = hip_decode1 (p->hgf, p->mp3buffer, CHUNK_SIZE,
 				p->left, p->right) ;
-		printf ("*** decode1 = %d\n", count) ;
+		} while (count == 0) ;
+	goto more ;
+}
+
+static sf_count_t mp3_read_int (SF_PRIVATE *psf, int *ptr, sf_count_t items)
+{	MP3_PRIVATE *p = (MP3_PRIVATE*) psf->container_data ;
+	sf_count_t count = p->count ;
+	sf_count_t start = p->start ;
+	int i ;
+	sf_count_t total = 0 ;
+	int stereo = (p->mp3data.stereo == 2) ;
+	items /= psf->sf.channels ;
+ more:
+	if (items <= count)
+	{	for (i = 0 ; i < items ; i++)
+		{	*ptr++ = (int) p->left [start] ;
+			if (stereo) *ptr++ = (int) p->right [start] ;
+			start++ ;
+			}
+		total += items ;
+		p->count = count - items ;
+		p->start - start ;
+		return total * psf->sf.channels ;
+		}
+	/* Need more data */
+	for (i = 0 ; i < count ; i++)
+	{	*ptr++ = (int) p->left [start] ;
+		if (stereo) *ptr++ = (int) p->right [start] ;
+		start++ ;
+		}
+	total += count ;
+	items -= count ;
+	start = 0 ;
+	do
+	{	count = psf_fread (p->mp3buffer, 1, CHUNK_SIZE, psf) ;
+		if (count <= 0)
+		{	//printf ("EOF? %d\n", count) ;
+			return total * psf->sf.channels ;
+			}
+		count = hip_decode1 (p->hgf, p->mp3buffer, CHUNK_SIZE,
+				p->left, p->right) ;
+		} while (count == 0) ;
+	goto more ;
+}
+
+static sf_count_t mp3_read_float (SF_PRIVATE *psf, float *ptr, sf_count_t items)
+{	MP3_PRIVATE *p = (MP3_PRIVATE*) psf->container_data ;
+	sf_count_t count = p->count ;
+	sf_count_t start = p->start ;
+	int i ;
+	sf_count_t total = 0 ;
+	int stereo = (p->mp3data.stereo == 2) ;
+	items /= psf->sf.channels ;
+ more:
+	if (items <= count)
+	{	for (i = 0 ; i < items ; i++)
+		{	*ptr++ = (float) p->left [start] * NORMALISE ;
+			if (stereo) *ptr++ = (float) p->right [start] * NORMALISE ;
+			start++ ;
+			}
+		total += items ;
+		p->count = count - items ;
+		p->start - start ;
+		return total * psf->sf.channels ;
+		}
+	/* Need more data */
+	for (i = 0 ; i < count ; i++)
+	{	*ptr++ = (float) p->left [start] * NORMALISE ;
+		if (stereo) *ptr++ = (float) p->right [start] * NORMALISE ;
+		start++ ;
+		}
+	total += count ;
+	items -= count ;
+	start = 0 ;
+	do
+	{	count = psf_fread (p->mp3buffer, 1, CHUNK_SIZE, psf) ;
+		if (count <= 0)
+		{	//printf ("EOF? %d\n", count) ;
+			return total * psf->sf.channels ;
+			}
+		count = hip_decode1 (p->hgf, p->mp3buffer, CHUNK_SIZE,
+				p->left, p->right) ;
+		} while (count == 0) ;
+	goto more ;
+}
+
+static sf_count_t mp3_read_double (SF_PRIVATE *psf, double *ptr, sf_count_t items)
+{	MP3_PRIVATE *p = (MP3_PRIVATE*) psf->container_data ;
+	sf_count_t count = p->count ;
+	sf_count_t start = p->start ;
+	int i ;
+	sf_count_t total = 0 ;
+	int stereo = (p->mp3data.stereo == 2) ;
+	items /= psf->sf.channels ;
+ more:
+	if (items <= count)
+	{	for (i = 0 ; i < items ; i++)
+		{	*ptr++ = (double) p->left [start] * NORMALISE ;
+			if (stereo) *ptr++ = (double) p->right [start] * NORMALISE ;
+			start++ ;
+			}
+		total += items ;
+		p->count = count - items ;
+		p->start - start ;
+		return total * psf->sf.channels ;
+		}
+	/* Need more data */
+	for (i = 0 ; i < count ; i++)
+	{	*ptr++ = (double) p->left [start] * NORMALISE ;
+		if (stereo) *ptr++ = (double) p->right [start] * NORMALISE ;
+		start++ ;
+		}
+	total += count ;
+	items -= count ;
+	start = 0 ;
+	do
+	{	count = psf_fread (p->mp3buffer, 1, CHUNK_SIZE, psf) ;
+		if (count <= 0)
+		{	//printf ("EOF? %d\n", count) ;
+			return total * psf->sf.channels ;
+			}
+		count = hip_decode1 (p->hgf, p->mp3buffer, CHUNK_SIZE,
+				p->left, p->right) ;
 		} while (count == 0) ;
 	goto more ;
 }
