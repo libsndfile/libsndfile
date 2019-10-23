@@ -412,7 +412,7 @@ static int mp3_close_read (SF_PRIVATE *psf)
 #define CHUNK_SIZE	(512)
 #define FRAME_SIZE	(1152)
 #define NORMALISE	(0.000030517578125)
-#define NORMALISEI	(32768)
+#define NORMALISEI	(65536)
 
 static int mp3_open_read (SF_PRIVATE *psf)
 {	MP3_PRIVATE *p = (MP3_PRIVATE*) psf->container_data ;
