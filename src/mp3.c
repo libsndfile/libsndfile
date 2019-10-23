@@ -503,8 +503,8 @@ static sf_count_t mp3_read_int (SF_PRIVATE *psf, int *ptr, sf_count_t items)
  more:
 	if (items <= count)
 	{	for (i = 0 ; i < items ; i++)
-		{	*ptr++ = (int) p->left [start] ;
-			if (stereo) *ptr++ = (int) p->right [start] ;
+		{	*ptr++ = (int) p->left [start] * NORMALISE ;
+			if (stereo) *ptr++ = (int) p->right [start] * NORMALISE ;
 			start++ ;
 			}
 		total += items ;
@@ -514,8 +514,8 @@ static sf_count_t mp3_read_int (SF_PRIVATE *psf, int *ptr, sf_count_t items)
 		}
 	/* Need more data */
 	for (i = 0 ; i < count ; i++)
-	{	*ptr++ = (int) p->left [start] ;
-		if (stereo) *ptr++ = (int) p->right [start] ;
+	{	*ptr++ = (int) p->left [start] * NORMALISE ;
+		if (stereo) *ptr++ = (int) p->right [start] * NORMALISE ;
 		start++ ;
 		}
 	total += count ;
