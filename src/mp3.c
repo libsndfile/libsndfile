@@ -412,6 +412,7 @@ static int mp3_close_read (SF_PRIVATE *psf)
 #define CHUNK_SIZE	(512)
 #define FRAME_SIZE	(1152)
 #define NORMALISE	(0.000030517578125)
+#define NORMALISEI	(32768)
 
 static int mp3_open_read (SF_PRIVATE *psf)
 {	MP3_PRIVATE *p = (MP3_PRIVATE*) psf->container_data ;
@@ -503,8 +504,8 @@ static sf_count_t mp3_read_int (SF_PRIVATE *psf, int *ptr, sf_count_t items)
  more:
 	if (items <= count)
 	{	for (i = 0 ; i < items ; i++)
-		{	*ptr++ = (int) p->left [start] * NORMALISE ;
-			if (stereo) *ptr++ = (int) p->right [start] * NORMALISE ;
+		{	*ptr++ = (int) p->left [start] * NORMALISEI ;
+			if (stereo) *ptr++ = (int) p->right [start] * NORMALISEI ;
 			start++ ;
 			}
 		total += items ;
@@ -514,8 +515,8 @@ static sf_count_t mp3_read_int (SF_PRIVATE *psf, int *ptr, sf_count_t items)
 		}
 	/* Need more data */
 	for (i = 0 ; i < count ; i++)
-	{	*ptr++ = (int) p->left [start] * NORMALISE ;
-		if (stereo) *ptr++ = (int) p->right [start] * NORMALISE ;
+	{	*ptr++ = (int) p->left [start] * NORMALISEI ;
+		if (stereo) *ptr++ = (int) p->right [start] * NORMALISEI ;
 		start++ ;
 		}
 	total += count ;
