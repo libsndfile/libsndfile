@@ -19,6 +19,7 @@
 #ifndef SF_SRC_MP3_H
 
 #include "lame.h"
+#include "mpg123.h"
 
 typedef struct
 {	/* Structure for writing via LAME */
@@ -28,13 +29,15 @@ typedef struct
 	int		quality ;
 	int		bitrate ;
 	int		initialised ;
-/* read controls */
-	hip_t		hgf ;
+} MP3_PRIVATE_W ;
+
+typedef struct	/* read controls */
+{	hip_t		hgf ;
 	short		*left, *right ;
 	mp3data_struct	mp3data ;
 	int		count ;
 	int		start ;
-} MP3_PRIVATE ;
+} MP3_PRIVATE_R ;
 
 #define MP3DATA_SIZE	(1024)
 #define MP3BUFFER_SIZE	(5 * MP3DATA_SIZE / 4 + 7200)
