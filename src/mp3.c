@@ -438,10 +438,8 @@ static int mp3_open_read (SF_PRIVATE *psf)
 		return SFE_MALLOC_FAILED ;
 	do
 	{	err = psf_fread (p->mp3buffer, 1, CHUNK_SIZE, psf) ;
-		//printf ("*** fread= %d\n", err) ;
 		err = hip_decode1_headers (p->hgf, p->mp3buffer, CHUNK_SIZE,
 					p->left, p->right, &p->mp3data) ;
-		//printf ("*** decode-headers= %d\n", err) ;
 		} while (err == 0) ;
 	p->left = realloc (p->left, p->mp3data.framesize * sizeof (short)) ;
 	p->right = realloc (p->right, p->mp3data.framesize * sizeof (short)) ;
@@ -722,6 +720,7 @@ mp3_read_header (SF_PRIVATE * psf, mpg123_handle * decoder)
 		psf->sf.samplerate = sample_rate ;
 		}
 	psf->sf.frames = mpg123_length (decoder) ;
+	//printf("****format = %x encoding= %x\n", psf->sf.format, encoding) ;
 	return decoder_err ;
 }
 
@@ -751,7 +750,9 @@ mp3_read_as (SF_PRIVATE *psf, unsigned char * buffer, int encoding, size_t elem_
 		}
 	else
 		psf_log_printf (psf, "Failed to set mpg123_format.\n") ;
-	return psf->sf.channels * n_decoded / elem_size ;
+	//printf ("**** n_decoded = %d channels = %d elem_size = %d\n",
+	//	n_decoded, psf->sf.channels, elem_size) ;
+	return n_decoded / elem_size ;
 }
 
 static sf_count_t
