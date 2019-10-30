@@ -1,5 +1,6 @@
 /*
 ** Copyright (C) 2002-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2017 Foolswood
 ** Copyright (C) 2019 John ffitch
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -53,12 +54,6 @@ static sf_count_t mp3_lame_write_float_M (SF_PRIVATE *psf, const float *ptr, sf_
 static sf_count_t mp3_lame_write_double_M (SF_PRIVATE *psf, const double *ptr, sf_count_t items) ;
 static int mp3_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 
-#ifdef HIP
-static sf_count_t mp3_read_short (SF_PRIVATE *psf, short *ptr, sf_count_t items) ;
-static sf_count_t mp3_read_int (SF_PRIVATE *psf, int *ptr, sf_count_t items) ;
-static sf_count_t mp3_read_float (SF_PRIVATE *psf, float *ptr, sf_count_t items) ;
-static sf_count_t mp3_read_double (SF_PRIVATE *psf, double *ptr, sf_count_t items) ;
-#else
 static	int		mp3_read_header		(SF_PRIVATE * psf, mpg123_handle * decoder) ;
 static	sf_count_t	mp3_read_2s		(SF_PRIVATE * psf, short * ptr, sf_count_t len) ;
 static	sf_count_t	mp3_read_2i		(SF_PRIVATE * psf, int * ptr, sf_count_t len) ;
@@ -68,7 +63,6 @@ static	sf_count_t	mp3_read_seek		(SF_PRIVATE *psf, int whence, sf_count_t offset
 static	ssize_t		mp3_read_sf_handle	(void * handle, void * buffer, size_t bytes) ;
 static	off_t		mp3_seek_sf_handle	(void * handle, off_t offset, int whence) ;
 static	int		mp3_format_to_encoding	(int encoding) ;
-#endif
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -98,6 +92,11 @@ mp3_open (SF_PRIVATE *psf)
 /*------------------------------------------------------------------------------
 */
 
+// FIXME: what shold it do?
+void lame_error_handler_function (const char *format, va_list ap)
+{	return ;
+}
+
 static int
 mp3_open_lame (SF_PRIVATE *psf)
 {	MP3_PRIVATE_W *p ;
@@ -110,6 +109,10 @@ mp3_open_lame (SF_PRIVATE *psf)
 	format = SF_CONTAINER (psf->sf.format) ;
 	if (format != SF_FORMAT_MP3)
 		return SFE_BAD_OPEN_FORMAT ;
+	// Local message handling
+	lame_set_errorf (gfp, lame_error_handler_function) ;
+	lame_set_debugf (gfp, lame_error_handler_function) ;
+	lame_set_msgf (gfp, lame_error_handler_function) ;
 	lame_set_num_channels (gfp, psf->sf.channels) ;
 	lame_set_in_samplerate (gfp, psf->sf.samplerate) ;
 	lame_set_brate (gfp, 256) ;	/* FIXME to parameter */
@@ -416,224 +419,9 @@ mp3_command (SF_PRIVATE * psf, int command, void * data, int datasize)
 
 /* ====================================================================== */
 
-#ifdef HIP
-static int mp3_close_read (SF_PRIVATE *psf)
-{	return SFE_UNIMPLEMENTED ;
-}
-
-#define CHUNK_SIZE	(512)
-/* #define FRAME_SIZE	(1152) */
-#define NORMALISE	(0.000030517578125)
-#define NORMALISEI	(65536)
-
-static int mp3_open_read (SF_PRIVATE *psf)
-{	MP3_PRIVATE_R *p = (MP3_PRIVATE_R*) psf->container_data ;
-	int err ;
-	if ((p->mp3buffer = calloc (4, MP3DATA_SIZE)) == NULL)
-		return SFE_MALLOC_FAILED ;
-	p->hgf = hip_decode_init () ;
-	if ((p->left = calloc (1, 8192)) == NULL)
-		return SFE_MALLOC_FAILED ;
-	if ((p->right = calloc (1, 8193)) == NULL)
-		return SFE_MALLOC_FAILED ;
-	do
-	{	err = psf_fread (p->mp3buffer, 1, CHUNK_SIZE, psf) ;
-		err = hip_decode1_headers (p->hgf, p->mp3buffer, CHUNK_SIZE,
-					p->left, p->right, &p->mp3data) ;
-		} while (err == 0) ;
-	p->left = realloc (p->left, p->mp3data.framesize * sizeof (short)) ;
-	p->right = realloc (p->right, p->mp3data.framesize * sizeof (short)) ;
-	p->count = err ;
-	p->start = 0 ;
-	psf->sf.format = SF_FORMAT_MP3 | 1 ;
-	psf->sf.channels = p->mp3data.stereo ;
-	psf->sf.samplerate = p->mp3data.samplerate ;
-	psf->datalength = psf->sf.frames = SF_COUNT_MAX ; /* Unknown really */
-	psf->dataoffset = 0 ;
-
-	psf->read_short = mp3_read_short ;
-	psf->read_int = mp3_read_int ;
-	psf->read_float = mp3_read_float ;
-	psf->read_double = mp3_read_double ;
-#if 0
-	psf->container_close = mp3_close_read ;
-	psf->seek = mp3_read_seek ;
-
-#endif
-	return 0 ;
-}
-
-static sf_count_t mp3_read_short (SF_PRIVATE *psf, short *ptr, sf_count_t items)
-{	MP3_PRIVATE_R *p = (MP3_PRIVATE_R*) psf->container_data ;
-	sf_count_t count = p->count ;
-	sf_count_t start = p->start ;
-	int i ;
-	sf_count_t total = 0 ;
-	int stereo = (p->mp3data.stereo == 2) ;
-	items /= psf->sf.channels ;
- more:
-	if (items <= count)
-	{	for (i = 0 ; i < items ; i++)
-		{	*ptr++ = p->left [start] ;
-			if (stereo) *ptr++ = p->right [start] ;
-			start++ ;
-			}
-		total += items ;
-		p->count = count - items ;
-		p->start - start ;
-		return total * psf->sf.channels ;
-		}
-	/* Need more data */
-	for (i = 0 ; i < count ; i++)
-	{	*ptr++ = p->left [start] ;
-		if (stereo) *ptr++ = p->right [start] ;
-		start++ ;
-		}
-	total += count ;
-	items -= count ;
-	start = 0 ;
-	do
-	{	count = psf_fread (p->mp3buffer, 1, CHUNK_SIZE, psf) ;
-		if (count <= 0)
-		{	//printf ("EOF? %d\n", count) ;
-			return total * psf->sf.channels ;
-			}
-		count = hip_decode1 (p->hgf, p->mp3buffer, CHUNK_SIZE,
-				p->left, p->right) ;
-		} while (count == 0) ;
-	goto more ;
-}
-
-static sf_count_t mp3_read_int (SF_PRIVATE *psf, int *ptr, sf_count_t items)
-{	MP3_PRIVATE_R *p = (MP3_PRIVATE_R*) psf->container_data ;
-	sf_count_t count = p->count ;
-	sf_count_t start = p->start ;
-	int i ;
-	sf_count_t total = 0 ;
-	int stereo = (p->mp3data.stereo == 2) ;
-	items /= psf->sf.channels ;
- more:
-	if (items <= count)
-	{	for (i = 0 ; i < items ; i++)
-		{	*ptr++ = (int) p->left [start] * NORMALISEI ;
-			if (stereo) *ptr++ = (int) p->right [start] * NORMALISEI ;
-			start++ ;
-			}
-		total += items ;
-		p->count = count - items ;
-		p->start - start ;
-		return total * psf->sf.channels ;
-		}
-	/* Need more data */
-	for (i = 0 ; i < count ; i++)
-	{	*ptr++ = (int) p->left [start] * NORMALISEI ;
-		if (stereo) *ptr++ = (int) p->right [start] * NORMALISEI ;
-		start++ ;
-		}
-	total += count ;
-	items -= count ;
-	start = 0 ;
-	do
-	{	count = psf_fread (p->mp3buffer, 1, CHUNK_SIZE, psf) ;
-		if (count <= 0)
-		{	//printf ("EOF? %d\n", count) ;
-			return total * psf->sf.channels ;
-			}
-		count = hip_decode1 (p->hgf, p->mp3buffer, CHUNK_SIZE,
-				p->left, p->right) ;
-		} while (count == 0) ;
-	goto more ;
-}
-
-static sf_count_t mp3_read_float (SF_PRIVATE *psf, float *ptr, sf_count_t items)
-{	MP3_PRIVATE_R *p = (MP3_PRIVATE_R*) psf->container_data ;
-	sf_count_t count = p->count ;
-	sf_count_t start = p->start ;
-	int i ;
-	sf_count_t total = 0 ;
-	int stereo = (p->mp3data.stereo == 2) ;
-	items /= psf->sf.channels ;
- more:
-	if (items <= count)
-	{	for (i = 0 ; i < items ; i++)
-		{	*ptr++ = (float) p->left [start] * NORMALISE ;
-			if (stereo) *ptr++ = (float) p->right [start] * NORMALISE ;
-			start++ ;
-			}
-		total += items ;
-		p->count = count - items ;
-		p->start - start ;
-		return total * psf->sf.channels ;
-		}
-	/* Need more data */
-	for (i = 0 ; i < count ; i++)
-	{	*ptr++ = (float) p->left [start] * NORMALISE ;
-		if (stereo) *ptr++ = (float) p->right [start] * NORMALISE ;
-		start++ ;
-		}
-	total += count ;
-	items -= count ;
-	start = 0 ;
-	do
-	{	count = psf_fread (p->mp3buffer, 1, CHUNK_SIZE, psf) ;
-		if (count <= 0)
-		{	//printf ("EOF? %d\n", count) ;
-			return total * psf->sf.channels ;
-			}
-		count = hip_decode1 (p->hgf, p->mp3buffer, CHUNK_SIZE,
-				p->left, p->right) ;
-		} while (count == 0) ;
-	goto more ;
-}
-
-static sf_count_t mp3_read_double (SF_PRIVATE *psf, double *ptr, sf_count_t items)
-{	MP3_PRIVATE_R *p = (MP3_PRIVATE_R*) psf->container_data ;
-	sf_count_t count = p->count ;
-	sf_count_t start = p->start ;
-	int i ;
-	sf_count_t total = 0 ;
-	int stereo = (p->mp3data.stereo == 2) ;
-	items /= psf->sf.channels ;
- more:
-	if (items <= count)
-	{	for (i = 0 ; i < items ; i++)
-		{	*ptr++ = (double) p->left [start] * NORMALISE ;
-			if (stereo) *ptr++ = (double) p->right [start] * NORMALISE ;
-			start++ ;
-			}
-		total += items ;
-		p->count = count - items ;
-		p->start - start ;
-		return total * psf->sf.channels ;
-		}
-	/* Need more data */
-	for (i = 0 ; i < count ; i++)
-	{	*ptr++ = (double) p->left [start] * NORMALISE ;
-		if (stereo) *ptr++ = (double) p->right [start] * NORMALISE ;
-		start++ ;
-		}
-	total += count ;
-	items -= count ;
-	start = 0 ;
-	do
-	{	count = psf_fread (p->mp3buffer, 1, CHUNK_SIZE, psf) ;
-		if (count <= 0)
-		{	//printf ("EOF? %d\n", count) ;
-			return total * psf->sf.channels ;
-			}
-		count = hip_decode1 (p->hgf, p->mp3buffer, CHUNK_SIZE,
-				p->left, p->right) ;
-		} while (count == 0) ;
-	goto more ;
-}
-#else
-
-/* ******************************************************** */
-
 // FIXME: This initialisation should have a better hook
 static int mpg123_initialised = 0 ;
 
-// FIXME: use mpg123 error string reporting
 static int
 mp3_open_read (SF_PRIVATE * psf)
 {
@@ -642,7 +430,8 @@ mp3_open_read (SF_PRIVATE * psf)
 	if (mpg123_initialised == 0)
 	{	int decoder_init_err = mpg123_init () ;
 		if (decoder_init_err != MPG123_OK)
-		{	psf_log_printf (psf, "Failed to init mpg123.\n") ;
+		{	psf_log_printf (psf, "Failed to init mpg123 (%s).\n",
+				mpg123_plain_strerror (decoder_init_err)) ;
 			return SFE_UNIMPLEMENTED ; // FIXME: semantically wrong return code
 			}
 		}
@@ -661,7 +450,8 @@ mp3_open_read (SF_PRIVATE * psf)
 		decoder_err = mp3_read_header (psf, decoder) ;
 
 	if (decoder_err != MPG123_OK)
-	{	psf_log_printf (psf, "Failed to initialise mp3 decoder.\n") ;
+	{	psf_log_printf (psf, "Failed to initialise mp3 decoder.(%s)\n",
+			mpg123_plain_strerror (decoder_err)) ;
 		return SFE_UNIMPLEMENTED ; // FIXME: semantically wrong return code
 		}
 
@@ -746,10 +536,12 @@ mp3_read_as (SF_PRIVATE *psf, unsigned char * buffer, int encoding, size_t elem_
 			(unsigned char *) buffer, len * elem_size,
 			&n_decoded) ;
 		if (decoder_err != MPG123_OK)
-			psf_log_printf (psf, "Errors occured during mpg123_read.") ;
+			psf_log_printf (psf, "Errors occured during mpg123_read.(%s)",
+				mpg123_plain_strerror (decoder_err)) ;
 		}
 	else
-		psf_log_printf (psf, "Failed to set mpg123_format.\n") ;
+		psf_log_printf (psf, "Failed to set mpg123_format.(%s)\n",
+				mpg123_plain_strerror (decoder_err)) ;
 	//printf ("**** n_decoded = %d channels = %d elem_size = %d\n",
 	//	n_decoded, psf->sf.channels, elem_size) ;
 	return n_decoded / elem_size ;
@@ -775,4 +567,5 @@ mp3_read_2d (SF_PRIVATE * psf, double * ptr, sf_count_t len)
 {	return mp3_read_as (psf, (unsigned char *) ptr, MPG123_ENC_FLOAT_64, sizeof (double), len) ;
 }
 
-#endif /* HIP */
+/* EOF */
+

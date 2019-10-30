@@ -1,5 +1,7 @@
 /*
 ** Copyright (C) 2008-2011 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2017 Foolswood
+** Copyright (C) 2019 John ffitch <jpff@cdemist.co.uk>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -25,18 +27,15 @@ typedef struct
 {	/* Structure for writing via LAME */
 	lame_global_flags *gfp ;
 	void		*mp3buffer ;
-//	void		*mp3data ;
 	int		quality ;
 	int		bitrate ;
 	int		initialised ;
 } MP3_PRIVATE_W ;
 
-typedef struct	/* read controls */
-{	hip_t		hgf ;
-	short		*left, *right ;
-	mp3data_struct	mp3data ;
-	int		count ;
-	int		start ;
+ typedef struct
+{
+	lame_global_flags * gfp ;
+	unsigned char * encbuffer ;
 } MP3_PRIVATE_R ;
 
 #define MP3DATA_SIZE	(1024)
