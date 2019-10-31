@@ -65,7 +65,7 @@ src_libsndfile_la_LDFLAGS = -no-undefined -version-info $(SHARED_VERSION_INFO) $
 src_libsndfile_la_SOURCES = src/sndfile.c src/aiff.c src/au.c src/avr.c src/caf.c src/dwd.c src/flac.c src/g72x.c src/htk.c src/ircam.c \
 	src/macos.c src/mat4.c src/mat5.c src/nist.c src/paf.c src/pvf.c src/raw.c src/rx2.c src/sd2.c \
 	src/sds.c src/svx.c src/txw.c src/voc.c src/wve.c src/w64.c src/wavlike.c src/wav.c src/xi.c src/mpc2k.c src/rf64.c \
-	src/ogg_vorbis.c src/ogg_speex.c src/ogg_pcm.c src/ogg_opus.c src/ogg_vcomment.c \
+	src/ogg_vorbis.c src/ogg_speex.c src/ogg_pcm.c src/ogg_opus.c src/ogg_vcomment.c src/mp3.c src/mp3.h \
 	src/common.h src/sfconfig.h src/sfendian.h src/wavlike.h src/sf_unistd.h src/ogg.h src/chanmap.h src/ogg_vcomment.h
 nodist_src_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
 src_libsndfile_la_LIBADD = src/GSM610/libgsm.la src/G72x/libg72x.la src/ALAC/libalac.la \

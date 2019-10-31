@@ -70,7 +70,7 @@ static	int		mp3_format_to_encoding	(int encoding) ;
 
 int
 mp3_open (SF_PRIVATE *psf)
-{	int	subformat, error = 0 ;
+{	int	error = 0 ;
 
 	if (psf->file.mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
@@ -92,7 +92,7 @@ mp3_open (SF_PRIVATE *psf)
 /*------------------------------------------------------------------------------
 */
 
-// FIXME: what shold it do?
+// FIXME: what should it do?  Cannot use psf_log_printf as no sccess to psf
 void lame_error_handler_function (const char *format, va_list ap)
 {	return ;
 }
@@ -104,7 +104,7 @@ mp3_open_lame (SF_PRIVATE *psf)
 		return SFE_MALLOC_FAILED ;
 	psf->container_data = p ;
 	lame_global_flags *gfp = p->gfp = lame_init () ;
-	int error = 0, format, mode ;
+	int error = 0, format, mode = (psf->sf.channels == 1 ? 3 : 1) ;
 
 	format = SF_CONTAINER (psf->sf.format) ;
 	if (format != SF_FORMAT_MP3)
@@ -115,7 +115,7 @@ mp3_open_lame (SF_PRIVATE *psf)
 	lame_set_msgf (gfp, lame_error_handler_function) ;
 	lame_set_num_channels (gfp, psf->sf.channels) ;
 	lame_set_in_samplerate (gfp, psf->sf.samplerate) ;
-	lame_set_brate (gfp, 256) ;	/* FIXME to parameter */
+	lame_set_brate (gfp, 256) ;
 	lame_set_mode (gfp, mode) ;
 	p->quality = 2 ;
 	if ((p->mp3buffer = calloc (1, MP3BUFFER_SIZE)) == NULL)
@@ -172,7 +172,6 @@ static sf_count_t
 mp3_lame_write_short (SF_PRIVATE *psf, const short int *ptr, sf_count_t items)
 {	MP3_PRIVATE_W *p = psf->container_data ;
 	lame_global_flags *gfp = p->gfp ;
-	sf_count_t total = items ;
 	int bytes, count ;
 	items /= 2 ;
 	if (p->initialised == 0)
@@ -231,7 +230,7 @@ mp3_lame_write_float (SF_PRIVATE *psf, const float *ptr, sf_count_t items)
 		items -= count ;
 		ptr += count * 2 ;
 		} while (count > 0) ;
-	return 1 ;
+	return total ;
 }
 
 static sf_count_t
@@ -271,7 +270,7 @@ mp3_lame_write_short_M (SF_PRIVATE *psf, const short *ptr, sf_count_t items)
 	{	count = (items > MP3DATA_SIZE ? MP3DATA_SIZE : items) ;
 		/* memcpy(left, ptr, count * sizeof (short)) ; */
 		/* memcpy(right, ptr, count * sizeof (short)) ; */
-		bytes = lame_encode_buffer (gfp, ptr, NULL,
+		bytes = lame_encode_buffer (gfp, (short *) ptr, NULL,
 						count, p->mp3buffer,
 						MP3BUFFER_SIZE) ;
 		if (bytes > 0) psf_fwrite (p->mp3buffer, 1, bytes, psf) ;
@@ -279,17 +278,15 @@ mp3_lame_write_short_M (SF_PRIVATE *psf, const short *ptr, sf_count_t items)
 		ptr += count ;
 		items -= count ;
 		} while (count > 0) ;
-	return 1 ;
+	return total ;
 }
 
 static	sf_count_t
 mp3_lame_write_int_M (SF_PRIVATE *psf, const int *ptr, sf_count_t items)
 {	MP3_PRIVATE_W *p = psf->container_data ;
 	lame_global_flags *gfp = p->gfp ;
-
+	sf_count_t total = items ;
 	int bytes, count ;
-	/* int *left = (int *) p->mp3data ; */
-	/* int *right = left+MP3DATA_SIZE ; */
 	if (p->initialised == 0)
 		mp3_lame_parameters (gfp, p) ;
 	do
@@ -304,7 +301,7 @@ mp3_lame_write_int_M (SF_PRIVATE *psf, const int *ptr, sf_count_t items)
 		ptr += count ;
 		items -= count ;
 		} while (count > 0) ;
-	return items ;
+	return total ;
 }
 static sf_count_t
 mp3_lame_write_float_M (SF_PRIVATE *psf, const float *ptr, sf_count_t items)
@@ -450,7 +447,7 @@ mp3_open_read (SF_PRIVATE * psf)
 		decoder_err = mp3_read_header (psf, decoder) ;
 
 	if (decoder_err != MPG123_OK)
-	{	psf_log_printf (psf, "Failed to initialise mp3 decoder.(%s)\n",
+	{	psf_log_printf (psf, "Failed to initialise mp3 decoder (%s).\n",
 			mpg123_plain_strerror (decoder_err)) ;
 		return SFE_UNIMPLEMENTED ; // FIXME: semantically wrong return code
 		}
@@ -536,11 +533,11 @@ mp3_read_as (SF_PRIVATE *psf, unsigned char * buffer, int encoding, size_t elem_
 			(unsigned char *) buffer, len * elem_size,
 			&n_decoded) ;
 		if (decoder_err != MPG123_OK)
-			psf_log_printf (psf, "Errors occured during mpg123_read.(%s)",
+			psf_log_printf (psf, "Errors occured during mpg123_read (%s).",
 				mpg123_plain_strerror (decoder_err)) ;
 		}
 	else
-		psf_log_printf (psf, "Failed to set mpg123_format.(%s)\n",
+		psf_log_printf (psf, "Failed to set mpg123_format (%s).\n",
 				mpg123_plain_strerror (decoder_err)) ;
 	//printf ("**** n_decoded = %d channels = %d elem_size = %d\n",
 	//	n_decoded, psf->sf.channels, elem_size) ;
