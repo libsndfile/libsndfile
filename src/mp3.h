@@ -20,8 +20,8 @@
 
 #ifndef SF_SRC_MP3_H
 
-#include "lame.h"
-#include "mpg123.h"
+#include <lame/lame.h>
+#include <mpg123.h>
 
 typedef struct
 {	/* Structure for writing via LAME */

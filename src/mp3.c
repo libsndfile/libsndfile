@@ -417,6 +417,9 @@ mp3_command (SF_PRIVATE * psf, int command, void * data, int datasize)
 /* ====================================================================== */
 
 // FIXME: This initialisation should have a better hook
+// Documentation suggests that repeated calls will only fill tables with same values
+// but might not be thread-safe
+
 static int mpg123_initialised = 0 ;
 
 static int
@@ -445,6 +448,9 @@ mp3_open_read (SF_PRIVATE * psf)
 
 	if (decoder_err == MPG123_OK)
 		decoder_err = mp3_read_header (psf, decoder) ;
+
+	/* if (decoder_err == MPG123_OK) */
+	/* 	decoder_err = mpg123_scan (decoder) ; */
 
 	if (decoder_err != MPG123_OK)
 	{	psf_log_printf (psf, "Failed to initialise mp3 decoder (%s).\n",
@@ -484,7 +490,7 @@ mp3_close_read (SF_PRIVATE * psf)
 static sf_count_t
 mp3_read_seek (SF_PRIVATE *psf, int whence, sf_count_t offset)
 {	mpg123_handle * decoder = psf->codec_data ;
-	return mpg123_seek (decoder, whence, offset) ;
+	return mpg123_seek_frame (decoder, offset, whence & 03) ; // Hack until exlained
 }
 
 static int
