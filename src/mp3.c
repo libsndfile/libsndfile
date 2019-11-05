@@ -57,7 +57,7 @@ static int mp3_command (SF_PRIVATE *psf, int command, void *data, int datasize) 
 static	int		mp3_read_header		(SF_PRIVATE * psf, mpg123_handle * decoder) ;
 static	sf_count_t	mp3_read_2s		(SF_PRIVATE * psf, short * ptr, sf_count_t len) ;
 static	sf_count_t	mp3_read_2i		(SF_PRIVATE * psf, int * ptr, sf_count_t len) ;
-static	sf_count_t	mp3_read_2f		(SF_PRIVATE * psf, float * ptr, sf_count_t len) ;
+static	sf_count_t	mp3_read_2f		(SF_PRIVATE * psf, float * ptr, sf_ckkount_t len) ;
 static	sf_count_t	mp3_read_2d		(SF_PRIVATE * psf, double * ptr, sf_count_t len) ;
 static	sf_count_t	mp3_read_seek		(SF_PRIVATE *psf, int whence, sf_count_t offset) ;
 static	ssize_t		mp3_read_sf_handle	(void * handle, void * buffer, size_t bytes) ;
@@ -75,13 +75,8 @@ mp3_open (SF_PRIVATE *psf)
 	if (psf->file.mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
-
 	if (psf->file.mode == SFM_WRITE)
 		return mp3_open_lame (psf) ;
-
-	if (psf->file.mode == SFM_RDWR)
-		return SFE_UNIMPLEMENTED ;
-
 
 	if (psf->file.mode == SFM_READ)
 		return mp3_open_read (psf) ;
@@ -490,7 +485,7 @@ mp3_close_read (SF_PRIVATE * psf)
 static sf_count_t
 mp3_read_seek (SF_PRIVATE *psf, int whence, sf_count_t offset)
 {	mpg123_handle * decoder = psf->codec_data ;
-	return mpg123_seek_frame (decoder, offset, whence & 03) ; // Hack until exlained
+	return mpg123_seek_frame (decoder, offset, whence & 03) ;
 }
 
 static int
