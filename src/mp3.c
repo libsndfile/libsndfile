@@ -104,6 +104,8 @@ mp3_open_lame (SF_PRIVATE *psf)
 	format = SF_CONTAINER (psf->sf.format) ;
 	if (format != SF_FORMAT_MP3)
 		return SFE_BAD_OPEN_FORMAT ;
+	if (psf->sf.format & SF_FORMAT_SUBMASK == SF_FORMAT_MP3_VBR)
+		lame_set_VBR (gfp, vbr_default) ;
 	// Local message handling
 	lame_set_errorf (gfp, lame_error_handler_function) ;
 	lame_set_debugf (gfp, lame_error_handler_function) ;
@@ -485,7 +487,10 @@ mp3_close_read (SF_PRIVATE * psf)
 static sf_count_t
 mp3_read_seek (SF_PRIVATE *psf, int whence, sf_count_t offset)
 {	mpg123_handle * decoder = psf->codec_data ;
-	return mpg123_seek_frame (decoder, offset, whence & 03) ;
+	off_t xx = mpg123_seek (decoder, offset * psf->sf.channels, whence & 03) ;
+	//printf ("seek returns %ld\n", xx) ;
+	//printf ("tell = %ld\n", mpg123_tellframe (decoder)) ;
+	return xx / psf->sf.channels ;
 }
 
 static int
@@ -533,7 +538,7 @@ mp3_read_as (SF_PRIVATE *psf, unsigned char * buffer, int encoding, size_t elem_
 			decoder,
 			(unsigned char *) buffer, len * elem_size,
 			&n_decoded) ;
-		if (decoder_err != MPG123_OK)
+		if (decoder_err != MPG123_OK && decoder_err != MPG123_DONE)
 			psf_log_printf (psf, "Errors occured during mpg123_read (%s).",
 				mpg123_plain_strerror (decoder_err)) ;
 		}
@@ -542,6 +547,7 @@ mp3_read_as (SF_PRIVATE *psf, unsigned char * buffer, int encoding, size_t elem_
 				mpg123_plain_strerror (decoder_err)) ;
 	//printf ("**** n_decoded = %d channels = %d elem_size = %d\n",
 	//	n_decoded, psf->sf.channels, elem_size) ;
+	//if (n_decoded == 0 && decoder_err == MPG123_DONE) return 0 ;
 	return n_decoded / elem_size ;
 }
 

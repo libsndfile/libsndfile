@@ -67,7 +67,7 @@ mp3_short_test (void)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	/* Set up output file type. */
-	sfinfo.format = SF_FORMAT_MP3 ;
+	sfinfo.format = SF_FORMAT_MP3 | SF_FORMAT_MP3_CBR ;
 	sfinfo.channels = 1 ;
 	sfinfo.samplerate = SAMPLE_RATE ;
 
@@ -125,7 +125,7 @@ mp3_int_test (void)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	/* Set up output file type. */
-	sfinfo.format = SF_FORMAT_MP3 ;
+	sfinfo.format = SF_FORMAT_MP3 | SF_FORMAT_MP3_CBR ;
 	sfinfo.channels = 1 ;
 	sfinfo.samplerate = SAMPLE_RATE ;
 
@@ -174,7 +174,7 @@ mp3_float_test (void)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	/* Set up output file type. */
-	sfinfo.format = SF_FORMAT_MP3 ;
+	sfinfo.format = SF_FORMAT_MP3 | SF_FORMAT_MP3_CBR ;
 	sfinfo.channels = 1 ;
 	sfinfo.samplerate = SAMPLE_RATE ;
 
@@ -223,7 +223,7 @@ mp3_double_test (void)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	/* Set up output file type. */
-	sfinfo.format = SF_FORMAT_MP3 ;
+	sfinfo.format = SF_FORMAT_MP3 | SF_FORMAT_MP3_CBR ;
 	sfinfo.channels = 1 ;
 	sfinfo.samplerate = SAMPLE_RATE ;
 
@@ -337,7 +337,7 @@ main (void)
 	mp3_double_test () ;
 
 	/*-mp3_stereo_seek_test ("pcm.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;-*/
-	mp3_stereo_seek_test ("mp3_seek.mp3", SF_FORMAT_MP3) ;
+	mp3_stereo_seek_test ("mp3_seek.mp3", SF_FORMAT_MP3 | SF_FORMAT_MP3_CBR) ;
 
 	return 0 ;
 } /* main */
