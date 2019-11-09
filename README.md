@@ -24,14 +24,14 @@ system is documented below.
 Setting up a build environment for libsndfile on Debian or Ubuntu is as simple as:
 
     sudo apt install autoconf autogen automake build-essential libasound2-dev \
-        libflac-dev libogg-dev libtool libvorbis-dev pkg-config python
+      libflac-dev libogg-dev libtool libvorbis-dev libopus-dev pkg-config python
 
 For other Linux distributions or any of the *BSDs, the setup should be similar
 although the package install tools and package names may be slightly different.
 
 Similarly on Mac OS X, assuming [brew] is already installed:
 
-    brew install autoconf autogen automake flac libogg libtool libvorbis pkg-config
+    brew install autoconf autogen automake flac libogg libtool libvorbis libopus pkg-config
 
 Once the build environment has been set up, building and testing libsndfile is
 as simple as:
@@ -123,8 +123,8 @@ You can pass additional options with `/D<parameter>=<value>` when you run
 * `BUILD_EXAMPLES` - build examples, `ON` by default.
 * `BUILD_TESTING` - build tests. Then you can run tests with `ctest` command,
   `ON` by default. Setting `BUILD_SHARED_LIBS` to `ON` disables this option.
-* `ENABLE_EXTERNAL_LIBS` - enable Ogg, Vorbis and FLAC support. This option is
-  available and set to `ON` if all dependency libraries were found.
+* `ENABLE_EXTERNAL_LIBS` - enable Ogg, Vorbis, FLAC and Opus support. This
+  option is available and set to `ON` if all dependency libraries were found.
 * `ENABLE_CPU_CLIP` - enable tricky cpu specific clipper. Enabled and set to
   `ON` when CPU clips negative\positive. Don't touch it if you are not sure
 * `ENABLE_BOW_DOCS` - enable black-on-white documentation theme, `OFF` by
@@ -194,7 +194,7 @@ on runtime DLLs.
 Second advice is about Ogg, Vorbis and FLAC support. Searching external
 libraries under Windows is a little bit tricky. The best way is to use
 [Vcpkg](https://github.com/Microsoft/vcpkg). You need to install static libogg,
-libvorbis and libflac libraries:
+libvorbis, libflac and libopus libraries:
 
     vcpkg install libogg:x64-windows-static libvorbis:x64-windows-static
     libflac:x64-windows-static libogg:x86-windows-static
