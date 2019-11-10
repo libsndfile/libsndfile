@@ -104,8 +104,8 @@ mp3_open_lame (SF_PRIVATE *psf)
 	format = SF_CONTAINER (psf->sf.format) ;
 	if (format != SF_FORMAT_MP3)
 		return SFE_BAD_OPEN_FORMAT ;
-	if (psf->sf.format & SF_FORMAT_SUBMASK == SF_FORMAT_MP3_VBR)
-		lame_set_VBR (gfp, vbr_default) ;
+	if ((psf->sf.format & SF_FORMAT_SUBMASK) == SF_FORMAT_MP3_VBR)
+		if (lame_get_VBR (gfp) == vbr_off) lame_set_VBR (gfp, vbr_default) ;
 	// Local message handling
 	lame_set_errorf (gfp, lame_error_handler_function) ;
 	lame_set_debugf (gfp, lame_error_handler_function) ;
@@ -164,6 +164,16 @@ mp3_lame_parameters (lame_global_flags *gfp, MP3_PRIVATE_W *p)
 	return 1 ;
 }
 
+static int
+mp3_lame_parameters_V (lame_global_flags *gfp, MP3_PRIVATE_W *p)
+{	int error ;
+	lame_set_VBR_q (gfp, p->quality) ;
+	if ((error = lame_init_params (gfp)) < 0)
+		return SFE_BAD_OPEN_FORMAT ;
+	p->initialised = 1 ;
+	return 1 ;
+}
+
 /* **** Note that if mode is MONO (3) then left and right channels are averaged and the data is changed.  Hence the _M functions **** */
 static sf_count_t
 mp3_lame_write_short (SF_PRIVATE *psf, const short int *ptr, sf_count_t items)
@@ -194,7 +204,11 @@ mp3_lame_write_int (SF_PRIVATE *psf, const int *ptr, sf_count_t items)
 	int bytes, count ;
 	items /= 2 ;
 	if (p->initialised == 0)
-		mp3_lame_parameters (gfp, p) ;
+	{	if ((psf->sf.format & SF_FORMAT_SUBMASK) == SF_FORMAT_MP3_VBR)
+			mp3_lame_parameters_V (gfp, p) ;
+		else
+			mp3_lame_parameters (gfp, p) ;
+		}
 	do
 	{	count = (items > MP3DATA_SIZE ? MP3DATA_SIZE : items) ;
 		bytes = lame_encode_buffer_interleaved_int (gfp, ptr,
@@ -498,8 +512,8 @@ mp3_format_to_encoding (int encoding)
 {	// FIXME: This function isn't done.
 	// https://www.mpg123.de/api/fmt123_8h_source.shtml
 	// http://www.mega-nerd.com/libsndfile/api.html
-	encoding++ ;// FIXME: this is just to suppress warning
-	return SF_FORMAT_MP3 | SF_FORMAT_PCM_16 ;
+	printf ("encoding - %d\n", encoding++) ;// FIXME: this is just to suppress warning
+	return SF_FORMAT_MP3 | SF_FORMAT_MP3_CBR ;
 }
 
 static int
@@ -513,7 +527,7 @@ mp3_read_header (SF_PRIVATE * psf, mpg123_handle * decoder)
 		psf->sf.samplerate = sample_rate ;
 		}
 	psf->sf.frames = mpg123_length (decoder) ;
-	//printf("****format = %x encoding= %x\n", psf->sf.format, encoding) ;
+	//printf ("**** err = %d format = %x encoding= %x frames = %d\n", decoder_err, psf->sf.format, encoding, psf->sf.frames);
 	return decoder_err ;
 }
 
@@ -532,21 +546,24 @@ mp3_read_as (SF_PRIVATE *psf, unsigned char * buffer, int encoding, size_t elem_
 {
 	size_t n_decoded = 0 ;
 	mpg123_handle * decoder = psf->codec_data ;
-	int decoder_err = mpg123_format (decoder, psf->sf.samplerate, psf->sf.channels, encoding) ;
+	int decoder_err = mpg123_format_none (decoder) ;
+	if (decoder_err == MPG123_OK)
+		decoder_err = mpg123_format (
+			decoder, psf->sf.samplerate, psf->sf.channels, encoding) ;
 	if (decoder_err == MPG123_OK)
 	{	decoder_err = mpg123_read (
 			decoder,
 			(unsigned char *) buffer, len * elem_size,
 			&n_decoded) ;
 		if (decoder_err != MPG123_OK && decoder_err != MPG123_DONE)
-			psf_log_printf (psf, "Errors occured during mpg123_read (%s).",
+			psf_log_printf (psf, "Errors occurred during mpg123_read (%s).",
 				mpg123_plain_strerror (decoder_err)) ;
 		}
 	else
 		psf_log_printf (psf, "Failed to set mpg123_format (%s).\n",
 				mpg123_plain_strerror (decoder_err)) ;
-	//printf ("**** n_decoded = %d channels = %d elem_size = %d\n",
-	//	n_decoded, psf->sf.channels, elem_size) ;
+	printf ("**** n_decoded = %d channels = %d elem_size = %d\n",
+		n_decoded, psf->sf.channels, elem_size) ;
 	//if (n_decoded == 0 && decoder_err == MPG123_DONE) return 0 ;
 	return n_decoded / elem_size ;
 }
