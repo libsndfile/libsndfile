@@ -520,9 +520,14 @@ static int
 mp3_read_header (SF_PRIVATE * psf, mpg123_handle * decoder)
 {	int decoder_err, channels, encoding ;
 	long sample_rate ;
+	struct mpg123_frameinfo info ;
 	decoder_err = mpg123_getformat (decoder, &sample_rate, &channels, &encoding) ;
 	if (decoder_err == MPG123_OK)
-	{	psf->sf.format = mp3_format_to_encoding (encoding) ;
+		decoder_err = mpg123_info (decoder, &info) ;
+	if (decoder_err == MPG123_OK)
+	{	psf->sf.format = SF_FORMAT_MP3 |
+			((info.vbr == MPG123_VBR) ? SF_FORMAT_MP3_VBR :
+				SF_FORMAT_MP3_CBR) ;
 		psf->sf.channels = channels ;
 		psf->sf.samplerate = sample_rate ;
 		}
@@ -562,8 +567,8 @@ mp3_read_as (SF_PRIVATE *psf, unsigned char * buffer, int encoding, size_t elem_
 	else
 		psf_log_printf (psf, "Failed to set mpg123_format (%s).\n",
 				mpg123_plain_strerror (decoder_err)) ;
-	printf ("**** n_decoded = %d channels = %d elem_size = %d\n",
-		n_decoded, psf->sf.channels, elem_size) ;
+	printf ("**** err = %d n_decoded = %d channels = %d elem_size = %d\n",
+		decoder_err, n_decoded, psf->sf.channels, elem_size) ;
 	//if (n_decoded == 0 && decoder_err == MPG123_DONE) return 0 ;
 	return n_decoded / elem_size ;
 }
