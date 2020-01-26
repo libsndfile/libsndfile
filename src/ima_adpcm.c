@@ -779,6 +779,9 @@ wavlike_ima_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 	if (offset == 0)
 	{	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 		pima->blockcount = 0 ;
+		if (!pima->decode_block) {
+			return PSF_SEEK_ERROR ;
+		}
 		pima->decode_block (psf, pima) ;
 		pima->samplecount = 0 ;
 		return 0 ;
