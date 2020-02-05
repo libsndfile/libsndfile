@@ -326,37 +326,30 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 			case levl_HASH16 :
 					psf_log_printf (psf, "levl : %D\n", chunk_size) ;
-					chunk_size -= 24 ;
 					break ;
 
 			case list_HASH16 :
 					psf_log_printf (psf, "list : %D\n", chunk_size) ;
-					chunk_size -= 24 ;
 					break ;
 
 			case junk_HASH16 :
 					psf_log_printf (psf, "junk : %D\n", chunk_size) ;
-					chunk_size -= 24 ;
 					break ;
 
 			case bext_HASH16 :
 					psf_log_printf (psf, "bext : %D\n", chunk_size) ;
-					chunk_size -= 24 ;
 					break ;
 
 			case MARKER_HASH16 :
 					psf_log_printf (psf, "marker : %D\n", chunk_size) ;
-					chunk_size -= 24 ;
 					break ;
 
 			case SUMLIST_HASH16 :
 					psf_log_printf (psf, "summary list : %D\n", chunk_size) ;
-					chunk_size -= 24 ;
 					break ;
 
 			default :
-					psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D with length %D. Exiting parser.\n", marker, psf_ftell (psf) - 8, chunk_size) ;
-					done = SF_TRUE ;
+					psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D with length %D. Skipping and continuing.\n", marker, psf_ftell (psf) - 8, chunk_size) ;
 					break ;
 			} ;	/* switch (dword) */
 
