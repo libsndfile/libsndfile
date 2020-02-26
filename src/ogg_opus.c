@@ -169,7 +169,6 @@
 #include "ogg_vcomment.h"
 
 #define OGG_OPUS_COMMENT_PAD (512) /* Same as oggenc default */
-#define OGG_OPUS_PAGE_LATENCY (1000 * 48) /* 1 second */
 
 /*
 ** Opus packets can be any multiple of 2.5ms (at 48kHz). We use the recommended
@@ -254,6 +253,7 @@ typedef struct
 			int last_segments ;
 
 			int bitrate ;
+            unsigned long latency ;
 
 			/* Least significant bit of the source (aka bitwidth) */
 			int lsb ;
@@ -636,6 +636,9 @@ ogg_opus_setup_decoder (SF_PRIVATE *psf, int input_samplerate)
 static int
 ogg_opus_setup_encoder (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 {	int error ;
+
+    /* default page latency value (1000ms) */
+    oopus->u.encode.latency = 1000 * 48 ;
 
 	switch (psf->sf.samplerate)
 	{	case 8000 :
@@ -1098,11 +1101,12 @@ ogg_opus_write_out (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 	/*
 	** Decide whether to flush the Ogg page *before* adding the new packet to
 	** it. Check both for if there is more than 1 second of audio (our default
-	** Ogg page latency) or if adding the packet would cause a continued page,
+    ** Ogg page latency, this latency can be modified using sf_command())
+    ** or if adding the packet would cause a continued page,
 	** in which case we might as well make a new page anyways.
 	*/
 	for ( ; ; )
-	{	if (oopus->pkt_pos - oopus->pg_pos >= OGG_OPUS_PAGE_LATENCY || oopus->u.encode.last_segments >= 255)
+    {	if (oopus->pkt_pos - oopus->pg_pos >= oopus->u.encode.latency || oopus->u.encode.last_segments >= 255)
 			nbytes = ogg_stream_flush_fill (&odata->ostream, &odata->opage, 255 * 255) ;
 		else
 			nbytes = ogg_stream_pageout_fill (&odata->ostream, &odata->opage, 255 * 255) ;
@@ -1643,12 +1647,32 @@ ogg_opus_command (SF_PRIVATE *psf, int command, void *data, int datasize)
 {	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
 	double quality ;
+    double latency ;
 	int error ;
 
 	switch (command)
 	{	case SFC_SET_CHANNEL_MAP_INFO :
 			/* TODO: figure this out */
 			break ;
+
+        case SFC_SET_OGG_PAGE_LATENCY :
+            /*
+            ** Argument: double, range 50 to 1600.
+            ** Average length of OGG page in ms.
+            ** This length drive the flush of pages.
+            */
+            if (data == NULL || datasize != SIGNED_SIZEOF (double))
+                return SFE_BAD_COMMAND_PARAM ;
+
+            latency = *((double *) data) ;
+            if(latency < 50 )
+                latency = 50 ;
+
+            if(latency > 1600)
+                latency = 1600 ;
+
+            oopus->u.encode.latency = ((unsigned long)latency)*48 ;
+            break ;
 
 		case SFC_SET_COMPRESSION_LEVEL :
 			/*
