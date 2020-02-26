@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2013-2019 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2013-2020 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2018 Arthur Taylor <art@ified.ca>
 **
 ** This program is free software ; you can redistribute it and/or modify
@@ -54,7 +54,7 @@
 /*
 ** TODO:
 **  - Channel mapping modification / reporting
-**     - connect psf->channel_map and Opus channel mapping somehow?
+**	 - connect psf->channel_map and Opus channel mapping somehow?
 **  - Gain parameters and their mappings
 */
 
@@ -70,10 +70,10 @@
 ** All this means that one has to be careful with what is meant by each term.
 ** In an attempt to avoid ambiguity, this file adopts the following terms:
 **  - Samples shall refer to discrete PCM values, regardless of any channel
-**    considerations. This is the same as what libsndfile calls samples.
+**	considerations. This is the same as what libsndfile calls samples.
 **  - Samples/channel shall refer to groups of samples, one for each channel.
-**    This is what Opus calles samples, and what libsndfile calles frames. It
-**    has the advantage that its name is also the formula to calculate it.
+**	This is what Opus calles samples, and what libsndfile calles frames. It
+**	has the advantage that its name is also the formula to calculate it.
 **
 **
 ** Opus vs OggOpus
@@ -169,7 +169,6 @@
 #include "ogg_vcomment.h"
 
 #define OGG_OPUS_COMMENT_PAD (512) /* Same as oggenc default */
-#define OGG_OPUS_PAGE_LATENCY (1000 * 48) /* 1 second */
 
 /*
 ** Opus packets can be any multiple of 2.5ms (at 48kHz). We use the recommended
@@ -254,6 +253,7 @@ typedef struct
 			int last_segments ;
 
 			int bitrate ;
+			unsigned long latency ;
 
 			/* Least significant bit of the source (aka bitwidth) */
 			int lsb ;
@@ -409,10 +409,10 @@ static void
 opus_print_header (SF_PRIVATE *psf, OpusHeader *h)
 {	psf_log_printf (psf, "Opus Header Metadata\n") ;
 	psf_log_printf (psf, "  OggOpus version  : %d\n", h->version) ;
-	psf_log_printf (psf, "  Channels         : %d\n", h->channels) ;
-	psf_log_printf (psf, "  Preskip          : %d samples @48kHz\n", h->preskip) ;
+	psf_log_printf (psf, "  Channels		 : %d\n", h->channels) ;
+	psf_log_printf (psf, "  Preskip		  : %d samples @48kHz\n", h->preskip) ;
 	psf_log_printf (psf, "  Input Samplerate : %d Hz\n", h->input_samplerate) ;
-	psf_log_printf (psf, "  Gain             : %d.%d\n", arith_shift_right (h->gain & 0xF0, 8), h->gain & 0x0F) ;
+	psf_log_printf (psf, "  Gain			 : %d.%d\n", arith_shift_right (h->gain & 0xF0, 8), h->gain & 0x0F) ;
 	psf_log_printf (psf, "  Channel Mapping  : ") ;
 	switch (h->channel_mapping)
 	{	case 0 :	psf_log_printf (psf, "0 (mono or stereo)\n") ; break ;
@@ -425,7 +425,7 @@ opus_print_header (SF_PRIVATE *psf, OpusHeader *h)
 	{	int i ;
 		psf_log_printf (psf, "   streams total   : %d\n", h->nb_streams) ;
 		psf_log_printf (psf, "   streams coupled : %d\n", h->nb_coupled) ;
-		psf_log_printf (psf, "    stream mapping : [") ;
+		psf_log_printf (psf, "	stream mapping : [") ;
 		for (i = 0 ; i < h->channels - 1 ; i++)
 			psf_log_printf (psf, "%d,", h->stream_map [i]) ;
 		psf_log_printf (psf, "%d]\n", h->stream_map [i]) ;
@@ -636,6 +636,9 @@ ogg_opus_setup_decoder (SF_PRIVATE *psf, int input_samplerate)
 static int
 ogg_opus_setup_encoder (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 {	int error ;
+
+	/* default page latency value (1000ms) */
+	oopus->u.encode.latency = 1000 * 48 ;
 
 	switch (psf->sf.samplerate)
 	{	case 8000 :
@@ -1033,12 +1036,12 @@ ogg_opus_read_refill (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 		else
 		{	/*
 			** From https://wiki.xiph.org/OggOpus#Granule_Position
-			**    A decoder MUST reject as invalid any stream where the granule
-			**    position is smaller than the number of samples contained in
-			**    packets that complete on the first page with a completed
-			**    packet, unless that page has the 'end of stream' flag set. It
-			**    MAY defer this action until it decodes the last packet
-			**    completed on that page.
+			**	A decoder MUST reject as invalid any stream where the granule
+			**	position is smaller than the number of samples contained in
+			**	packets that complete on the first page with a completed
+			**	packet, unless that page has the 'end of stream' flag set. It
+			**	MAY defer this action until it decodes the last packet
+			**	completed on that page.
 			*/
 			psf_log_printf (psf, "Opus : Mid-strem page's granule position %d is less than total samples of %d\n", oopus->pg_pos, pkt_granulepos) ;
 			psf->error = SFE_MALFORMED_FILE ;
@@ -1098,11 +1101,12 @@ ogg_opus_write_out (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 	/*
 	** Decide whether to flush the Ogg page *before* adding the new packet to
 	** it. Check both for if there is more than 1 second of audio (our default
-	** Ogg page latency) or if adding the packet would cause a continued page,
+	** Ogg page latency, this latency can be modified using sf_command())
+	** or if adding the packet would cause a continued page,
 	** in which case we might as well make a new page anyways.
 	*/
 	for ( ; ; )
-	{	if (oopus->pkt_pos - oopus->pg_pos >= OGG_OPUS_PAGE_LATENCY || oopus->u.encode.last_segments >= 255)
+	{	if (oopus->pkt_pos - oopus->pg_pos >= oopus->u.encode.latency || oopus->u.encode.last_segments >= 255)
 			nbytes = ogg_stream_flush_fill (&odata->ostream, &odata->opage, 255 * 255) ;
 		else
 			nbytes = ogg_stream_pageout_fill (&odata->ostream, &odata->opage, 255 * 255) ;
@@ -1643,11 +1647,31 @@ ogg_opus_command (SF_PRIVATE *psf, int command, void *data, int datasize)
 {	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
 	double quality ;
+	double latency ;
 	int error ;
 
 	switch (command)
 	{	case SFC_SET_CHANNEL_MAP_INFO :
 			/* TODO: figure this out */
+			break ;
+
+		case SFC_SET_OGG_PAGE_LATENCY :
+			/*
+			** Argument: double, range 50 to 1600.
+			** Average length of OGG page in ms.
+			** This length drive the flush of pages.
+			*/
+			if (data == NULL || datasize != SIGNED_SIZEOF (double))
+				return SFE_BAD_COMMAND_PARAM ;
+
+			latency = *((double *) data) ;
+			if (latency < 50)
+				latency = 50 ;
+
+			if (latency > 1600)
+				latency = 1600 ;
+
+			oopus->u.encode.latency = ((unsigned long) latency) * 48 ;
 			break ;
 
 		case SFC_SET_COMPRESSION_LEVEL :
