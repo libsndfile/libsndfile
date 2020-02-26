@@ -897,6 +897,7 @@ int
 sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 {	SF_PRIVATE *psf = (SF_PRIVATE *) sndfile ;
 	double quality ;
+    double latency ;
 	int old_value ;
 
 	/* This set of commands do not need the sndfile parameter. */
@@ -1376,6 +1377,12 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			quality = 1.0 - SF_MAX (0.0, SF_MIN (1.0, quality)) ;
 			return sf_command (sndfile, SFC_SET_COMPRESSION_LEVEL, &quality, sizeof (quality)) ;
 
+        case SFC_SET_OGG_PAGE_LATENCY_MS :
+            if (data == NULL || datasize != sizeof (double))
+                return SF_FALSE ;
+
+            latency = *((double *) data) ;
+            return sf_command (sndfile, SFC_SET_OGG_PAGE_LATENCY, &latency, sizeof (latency)) ;
 
 		default :
 			/* Must be a file specific command. Pass it on. */
