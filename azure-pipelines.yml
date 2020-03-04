@@ -4,7 +4,7 @@ jobs:
       vmImage: 'Ubuntu-16.04'
     steps:
     - script: |
-        sudo apt-get install -y autogen libogg-dev libvorbis-dev libflac-dev libasound2-dev libsqlite3-dev libspeex-dev
+        sudo apt-get install -y autogen libogg-dev libvorbis-dev libflac-dev libopus-dev libasound2-dev libsqlite3-dev libspeex-dev
       displayName: Installing dependencies
     - script: |
         mkdir build
@@ -26,7 +26,7 @@ jobs:
     pool:
       vmImage: 'Ubuntu-16.04'
     steps:
-    - script: sudo apt-get install -y autogen libogg-dev libvorbis-dev libflac-dev libasound2-dev libsqlite3-dev libspeex-dev
+    - script: sudo apt-get install -y autogen libogg-dev libvorbis-dev libflac-dev libopus-dev libasound2-dev libsqlite3-dev libspeex-dev
       displayName: Installing dependencies
     - script: ./autogen.sh
       displayName: Bootstrapping
@@ -47,7 +47,7 @@ jobs:
       displayName: Bootstraping Vcpkg
     - script: .\vcpkg\bootstrap-vcpkg.bat
       displayName: Bootstraping Vcpkg
-    - script: .\vcpkg\vcpkg.exe install libogg libvorbis libflac sqlite3 speex
+    - script: .\vcpkg\vcpkg.exe install libogg libvorbis libflac opus sqlite3 speex
       displayName: Installing dependencies
     - script: |
         mkdir build
@@ -73,7 +73,7 @@ jobs:
       displayName: Bootstraping Vcpkg
     - script: .\vcpkg\bootstrap-vcpkg.bat
       displayName: Bootstraping Vcpkg
-    - script: .\vcpkg\vcpkg.exe install libogg:x64-windows libvorbis:x64-windows libflac:x64-windows sqlite3:x64-windows speex:x64-windows
+    - script: .\vcpkg\vcpkg.exe install libogg:x64-windows libvorbis:x64-windows libflac:x64-windows opus:x64-windows sqlite3:x64-windows speex:x64-windows
       displayName: Installing dependencies
     - script: |
         mkdir build
@@ -99,7 +99,7 @@ jobs:
       displayName: Bootstraping Vcpkg
     - script: .\vcpkg\bootstrap-vcpkg.bat
       displayName: Bootstraping Vcpkg
-    - script: .\vcpkg\vcpkg.exe install libogg libvorbis libflac sqlite3 speex
+    - script: .\vcpkg\vcpkg.exe install libogg libvorbis libflac opus sqlite3 speex
       displayName: Installing dependencies
     - script: |
         mkdir build
@@ -125,7 +125,7 @@ jobs:
       displayName: Bootstraping Vcpkg
     - script: .\vcpkg\bootstrap-vcpkg.bat
       displayName: Bootstraping Vcpkg
-    - script: .\vcpkg\vcpkg.exe install libogg:x64-windows libvorbis:x64-windows libflac:x64-windows sqlite3:x64-windows speex:x64-windows
+    - script: .\vcpkg\vcpkg.exe install libogg:x64-windows libvorbis:x64-windows libflac:x64-windows opus:x64-windows sqlite3:x64-windows speex:x64-windows
       displayName: Installing dependencies
     - script: |
         mkdir build
@@ -149,7 +149,7 @@ jobs:
     steps:
     - script: |
         brew update
-        brew install autogen libogg libvorbis flac sqlite3 speex
+        brew install autogen libogg libvorbis flac opus sqlite3 speex
       displayName: Installing dependencies
     - script: |
         mkdir build
