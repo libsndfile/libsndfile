@@ -321,6 +321,7 @@ dnl  Check for Ogg, Vorbis and FLAC.
 HAVE_EXTERNAL_XIPH_LIBS=0
 EXTERNAL_XIPH_CFLAGS=""
 EXTERNAL_XIPH_LIBS=""
+EXTERNAL_XIPH_REQUIRE=""
 
 dnl Check for pkg-config outside the if statement.
 PKG_PROG_PKG_CONFIG
@@ -361,6 +362,11 @@ AS_IF([test -n "$PKG_CONFIG"], [
 
 					EXTERNAL_XIPH_CFLAGS="$FLAC_CFLAGS $VORBIS_CFLAGS $VORBISENC_CFLAGS $SPEEX_CFLAGS $OPUS_CFLAGS $OGG_CFLAGS "
 					EXTERNAL_XIPH_LIBS="$FLAC_LIBS $VORBIS_LIBS $VORBISENC_LIBS $SPEEX_LIBS $OPUS_LIBS $OGG_LIBS "
+					EXTERNAL_XIPH_REQUIRE="flac ogg vorbis vorbisenc opus"
+
+					if test x$ac_cv_speex = "xyes" ; then
+						EXTERNAL_XIPH_REQUIRE="$EXTERNAL_XIPH_REQUIRE speex"
+					fi
 				], [
 					AS_ECHO([""])
 					AC_MSG_WARN([[*** One or more of the external libraries (ie libflac, libogg and]])
@@ -660,6 +666,7 @@ AC_SUBST(SNDIO_LIBS)
 
 AC_SUBST(EXTERNAL_XIPH_CFLAGS)
 AC_SUBST(EXTERNAL_XIPH_LIBS)
+AC_SUBST(EXTERNAL_XIPH_REQUIRE)
 AC_SUBST(SRC_BINDIR)
 AC_SUBST(TEST_BINDIR)
 
