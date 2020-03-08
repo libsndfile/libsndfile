@@ -137,6 +137,9 @@ You can pass additional options with `/D<parameter>=<value>` when you run
   This option is `ON` by default.
 * `ENABLE_STATIC_RUNTIME` - enable static runtime on Windows platform, `OFF` by
   default.
+
+  **Note**: For MSVC compiler this option is depecated. Use `CMAKE_MSVC_RUNTIME_LIBRARY`
+  option instead (CMake >= 3.15).
 * `ENABLE_COMPATIBLE_LIBSNDFILE_NAME` - set DLL name to `libsndfile-1.dll`
   (canonical name) on Windows platform, `sndfile.dll` otherwise, `OFF` by
   default. Library name can be different depending on platform. The well known
@@ -159,8 +162,16 @@ Deprecated options:
 
 ### Linking from CMake projects
 
-When `libsndfile` built and installed with `ENABLE_PACKAGE_CONFIG` option set
- to `ON`, you can find library from your `CMakeLists.txt` with this command:
+First you need to add `FindOgg.cmake`, `FindVorbis.cmake`, `FindVorbisEnc.cmake`,
+ `FindFLAC.cmake` and `FindOpus.cmake` files to some directory inside your CMake
+ project (usually `cmake`) and add it to `CMAKE_MODULE_PATH`:
+
+    project(SomeApplication)
+    
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+Now you can search `libsndfile` library from your `CMakeLists.txt`
+ with this command:
 
     find_package(SndFile)
 
@@ -191,14 +202,14 @@ To link `libsndfile` library use:
 First advice - set `ENABLE_STATIC_RUNTIME` to ON. This will remove dependencies
 on runtime DLLs.
 
-Second advice is about Ogg, Vorbis and FLAC support. Searching external
+Second advice is about Ogg, Vorbis FLAC and Opus support. Searching external
 libraries under Windows is a little bit tricky. The best way is to use
 [Vcpkg](https://github.com/Microsoft/vcpkg). You need to install static libogg,
 libvorbis, libflac and libopus libraries:
 
     vcpkg install libogg:x64-windows-static libvorbis:x64-windows-static
-    libflac:x64-windows-static libogg:x86-windows-static
-    libvorbis:x86-windows-static libflac:x86-windows-static
+    libflac:x64-windows-static opus:x64-windows-static libogg:x86-windows-static
+    libvorbis:x86-windows-static libflac:x86-windows-static opus:x86-windows-static
 
 Then and add this parameter to cmake command line:
 

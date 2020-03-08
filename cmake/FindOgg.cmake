@@ -49,9 +49,9 @@ if (OGG_FOUND)
 	set (OGG_LIBRARIES ${OGG_LIBRARY})
 	set (OGG_INCLUDE_DIRS ${OGG_INCLUDE_DIR})
 	
-	if(NOT TARGET Ogg::Ogg)
-	add_library(Ogg::Ogg UNKNOWN IMPORTED)
-		set_target_properties(Ogg::Ogg PROPERTIES
+	if(NOT TARGET Ogg::ogg)
+	add_library(Ogg::ogg UNKNOWN IMPORTED)
+		set_target_properties(Ogg::ogg PROPERTIES
 			INTERFACE_INCLUDE_DIRECTORIES "${OGG_INCLUDE_DIRS}"
 			IMPORTED_LOCATION "${OGG_LIBRARIES}"
 		)
