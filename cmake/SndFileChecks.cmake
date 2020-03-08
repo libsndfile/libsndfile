@@ -27,6 +27,7 @@ if (NOT WIN32)
 	find_package (Sndio)
 endif ()
 
+find_package(Ogg 1.3)
 find_package (VorbisEnc)
 find_package (FLAC)
 find_package (Opus)

@@ -1,5 +1,9 @@
 cmake_minimum_required (VERSION 3.1.3)
 
+if (POLICY CMP0091)
+	cmake_policy(SET CMP0091 NEW)
+endif ()
+
 project(sndfile VERSION 1.0.29)
 
 #
@@ -304,7 +308,7 @@ target_link_libraries (sndfile
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Vorbis::VorbisEnc>
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:FLAC::FLAC>
 		$<$<AND:$<BOOL:${ENABLE_EXPERIMENTAL}>,$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>,$<BOOL:${HAVE_SPEEX}>>:Speex::Speex>
-		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Opus::Opus>
+		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Opus::opus>
 	)
 set_target_properties (sndfile PROPERTIES
 	PUBLIC_HEADER "${sndfile_HDRS}"
@@ -600,15 +604,15 @@ endif ()
 
 if (ENABLE_PACKAGE_CONFIG)
 
-	if (UNIX)
-		 set (CMAKE_INSTALL_PACKAGEDIR ${CMAKE_INSTALL_LIBDIR}/cmake/SndFile)
-	 elseif(WIN32)
-		 set (CMAKE_INSTALL_PACKAGEDIR cmake)
+	if (WIN32 AND (NOT MINGW) AND (NOT CYGWIN))
+		set (CMAKE_INSTALL_PACKAGEDIR cmake) 
+	 else ()
+	 	set (CMAKE_INSTALL_PACKAGEDIR ${CMAKE_INSTALL_LIBDIR}/cmake/SndFile)
 	 endif()
 
 
 	install (TARGETS sndfile ${SNDFILE_PROGRAM_TARGETS}
-		EXPORT SndFileConfig
+		EXPORT SndFileTargets
 		RUNTIME DESTINATION			${CMAKE_INSTALL_BINDIR}
 		ARCHIVE DESTINATION			${CMAKE_INSTALL_LIBDIR}
 		LIBRARY DESTINATION			${CMAKE_INSTALL_LIBDIR}
@@ -617,14 +621,27 @@ if (ENABLE_PACKAGE_CONFIG)
 
 	include (CMakePackageConfigHelpers)
 
+	if (ENABLE_EXTERNAL_LIBS)
+		set (SndFile_WITH_EXTERNAL_LIBS 1)
+	else ()
+		set (SndFile_WITH_EXTERNAL_LIBS 0)
+	endif ()
+
+	set (INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})
+	configure_package_config_file(cmake/SndFileConfig.cmake.in SndFileConfig.cmake
+		INSTALL_DESTINATION ${CMAKE_INSTALL_PACKAGEDIR}
+		PATH_VARS INCLUDE_INSTALL_DIR
+		)
 	write_basic_package_version_file (SndFileConfigVersion.cmake COMPATIBILITY SameMajorVersion)
 
-	install(EXPORT SndFileConfig
+	install(EXPORT SndFileTargets
 		NAMESPACE SndFile::
 		DESTINATION ${CMAKE_INSTALL_PACKAGEDIR}
 		)
 	install(
-		FILES ${CMAKE_CURRENT_BINARY_DIR}/SndFileConfigVersion.cmake
+		FILES
+			${CMAKE_CURRENT_BINARY_DIR}/SndFileConfig.cmake
+			${CMAKE_CURRENT_BINARY_DIR}/SndFileConfigVersion.cmake
 		DESTINATION	${CMAKE_INSTALL_PACKAGEDIR}
 		)
 

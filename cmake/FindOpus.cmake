@@ -55,9 +55,9 @@ if (OPUS_FOUND)
 	set (OPUS_LIBRARIES ${OPUS_LIBRARY})
 	set (OPUS_INCLUDE_DIRS ${OPUS_INCLUDE_DIR})
 
-	if (NOT TARGET Opus::Opus)
-		add_library (Opus::Opus UNKNOWN IMPORTED)
-		set_target_properties (Opus::Opus PROPERTIES
+	if (NOT TARGET Opus::opus)
+		add_library (Opus::opus UNKNOWN IMPORTED)
+		set_target_properties (Opus::opus PROPERTIES
 			INTERFACE_INCLUDE_DIRECTORIES "${OPUS_INCLUDE_DIRS}"
 			IMPORTED_LOCATION "${OPUS_LIBRARIES}"
 		)

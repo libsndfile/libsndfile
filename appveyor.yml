@@ -13,7 +13,7 @@ before_build:
   - cd CMakeBuild
   - if %platform%==Win32 set CMAKE_GENERATOR=Visual Studio 15 2017
   - if %platform%==x64 set CMAKE_GENERATOR=Visual Studio 15 2017 Win64
-  - cmake .. -G"%CMAKE_GENERATOR%" -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+  - cmake .. -G"%CMAKE_GENERATOR%" -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake
 build:
   project: c:\projects\libsndfile\CMakeBuild\sndfile.sln
   verbosity: minimal
