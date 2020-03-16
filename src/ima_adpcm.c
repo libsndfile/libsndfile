@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2020 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -325,73 +325,58 @@ aiff_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 {	int		chan, k, step, diff, vpdiff, blockindx, indx ;
 	short	bytecode, mask ;
 
-	/* Encode the block header. */
+	k = 0 ;
 	for (chan = 0 ; chan < pima->channels ; chan ++)
 	{	blockindx = chan * pima->blocksize ;
+		/* Encode the block header. */
+		pima->block [blockindx++] = (pima->previous [chan] >> 8) & 0xFF ;
+		pima->block [blockindx++] = (pima->previous [chan] & 0x80) + (pima->stepindx [chan] & 0x7F) ;
 
-		pima->block [blockindx] = (pima->samples [chan] >> 8) & 0xFF ;
-		pima->block [blockindx + 1] = (pima->samples [chan] & 0x80) + (pima->stepindx [chan] & 0x7F) ;
+		/* Encode the samples as 4 bit. */
+		for (indx = chan ; indx < pima->samplesperblock * pima->channels ; indx += pima->channels)
+		{	diff = pima->samples [indx] - pima->previous [chan] ;
 
-		pima->previous [chan] = pima->samples [chan] ;
-		} ;
-
-	/* Encode second and later samples for every block as a 4 bit value. */
-	for (k = pima->channels ; k < (pima->samplesperblock * pima->channels) ; k ++)
-	{	chan = (pima->channels > 1) ? (k % 2) : 0 ;
-
-		diff = pima->samples [k] - pima->previous [chan] ;
-
-		bytecode = 0 ;
-		step = ima_step_size [pima->stepindx [chan]] ;
-		vpdiff = step >> 3 ;
-		if (diff < 0)
-		{	bytecode = 8 ;
-			diff = -diff ;
-			} ;
-		mask = 4 ;
-		while (mask)
-		{	if (diff >= step)
-			{	bytecode |= mask ;
-				diff -= step ;
-				vpdiff += step ;
+			bytecode = 0 ;
+			step = ima_step_size [pima->stepindx [chan]] ;
+			vpdiff = step >> 3 ;
+			if (diff < 0)
+			{	bytecode = 8 ;
+				diff = -diff ;
 				} ;
-			step >>= 1 ;
-			mask >>= 1 ;
-			} ;
+			mask = 4 ;
+			while (mask)
+			{	if (diff >= step)
+				{	bytecode |= mask ;
+					diff -= step ;
+					vpdiff += step ;
+					} ;
+				step >>= 1 ;
+				mask >>= 1 ;
+				} ;
 
-		if (bytecode & 8)
-			pima->previous [chan] -= vpdiff ;
-		else
+			if (bytecode & 8)
+				vpdiff = -vpdiff ;
 			pima->previous [chan] += vpdiff ;
 
-		if (pima->previous [chan] > 32767)
-			pima->previous [chan] = 32767 ;
-		else if (pima->previous [chan] < -32768)
-			pima->previous [chan] = -32768 ;
+			if (pima->previous [chan] > 32767)
+				pima->previous [chan] = 32767 ;
+			else if (pima->previous [chan] < -32768)
+				pima->previous [chan] = -32768 ;
 
-		pima->stepindx [chan] += ima_indx_adjust [bytecode] ;
+			pima->stepindx [chan] += ima_indx_adjust [bytecode] ;
 
-		pima->stepindx [chan] = clamp_ima_step_index (pima->stepindx [chan]) ;
-		pima->samples [k] = bytecode ;
-		} ;
-
-	/* Pack the 4 bit encoded samples. */
-
-	for (chan = 0 ; chan < pima->channels ; chan ++)
-	{	for (indx = pima->channels ; indx < pima->channels * pima->samplesperblock ; indx += 2 * pima->channels)
-		{	blockindx = chan * pima->blocksize + 2 + indx / 2 ;
-
-			pima->block [blockindx] = pima->samples [indx] & 0x0F ;
-			pima->block [blockindx] |= (pima->samples [indx + chan] << 4) & 0xF0 ;
+			pima->stepindx [chan] = clamp_ima_step_index (pima->stepindx [chan]) ;
+			pima->block [blockindx] = (bytecode << (4 * k)) | pima->block [blockindx] ;
+			blockindx += k ;
+			k = 1 - k ;
 			} ;
 		} ;
 
 	/* Write the block to disk. */
-
 	if ((k = psf_fwrite (pima->block, 1, pima->channels * pima->blocksize, psf)) != pima->channels * pima->blocksize)
 		psf_log_printf (psf, "*** Warning : short write (%d != %d).\n", k, pima->channels * pima->blocksize) ;
 
-	memset (pima->samples, 0, pima->channels * pima->samplesperblock * sizeof (short)) ;
+	memset (pima->block, 0, pima->channels * pima->blocksize) ;
 	pima->samplecount = 0 ;
 	pima->blockcount ++ ;
 
@@ -779,9 +764,9 @@ wavlike_ima_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 	if (offset == 0)
 	{	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 		pima->blockcount = 0 ;
-		if (!pima->decode_block) {
+		if (!pima->decode_block)
 			return PSF_SEEK_ERROR ;
-		}
+
 		pima->decode_block (psf, pima) ;
 		pima->samplecount = 0 ;
 		return 0 ;
@@ -823,7 +808,20 @@ ima_writer_init (SF_PRIVATE *psf, int blockalign)
 	if (psf->file.mode != SFM_WRITE)
 		return SFE_BAD_MODE_RW ;
 
-	samplesperblock = 2 * (blockalign - 4 * psf->sf.channels) / psf->sf.channels + 1 ;
+	switch (SF_CONTAINER (psf->sf.format))
+	{	case SF_FORMAT_WAV :
+		case SF_FORMAT_W64 :
+				samplesperblock = 2 * (blockalign - 4 * psf->sf.channels) / psf->sf.channels + 1 ;
+				break ;
+
+		case SF_FORMAT_AIFF :
+				samplesperblock = 2 * ((blockalign - 2) * psf->sf.channels) / psf->sf.channels ;
+				break ;
+
+		default :
+				psf_log_printf (psf, "ima_reader_init: bad psf->sf.format\n") ;
+				return SFE_INTERNAL ;
+		} ;
 
 	pimasize = sizeof (IMA_ADPCM_PRIVATE) + blockalign + 3 * psf->sf.channels * samplesperblock ;
 
