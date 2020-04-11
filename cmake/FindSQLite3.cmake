@@ -33,7 +33,7 @@ find_library (SQLITE3_LIBRARY
 
 include (FindPackageHandleStandardArgs)
 
-find_package_handle_standard_args (SQLITE3
+find_package_handle_standard_args (SQLite3
     REQUIRED_VARS
         SQLITE3_LIBRARY
         SQLITE3_INCLUDE_DIR

@@ -64,7 +64,7 @@ include(SndFileChecks)
 
 
 cmake_dependent_option (BUILD_REGTEST "Build regtest" ON "SQLITE3_FOUND" OFF)
-cmake_dependent_option (ENABLE_EXTERNAL_LIBS "Enable FLAC, Vorbis, and Opus codecs" ON "VORBISENC_FOUND;FLAC_FOUND;OPUS_FOUND" OFF)
+cmake_dependent_option (ENABLE_EXTERNAL_LIBS "Enable FLAC, Vorbis, and Opus codecs" ON "Vorbis_FOUND;FLAC_FOUND;OPUS_FOUND" OFF)
 cmake_dependent_option (ENABLE_CPU_CLIP "Enable tricky cpu specific clipper" ON "CPU_CLIPS_POSITIVE;CPU_CLIPS_NEGATIVE" OFF)
 if (NOT ENABLE_CPU_CLIP)
 	set (CPU_CLIPS_POSITIVE FALSE)
@@ -104,7 +104,7 @@ set_package_properties (Ogg PROPERTIES
 	DESCRIPTION "library for manipulating ogg bitstreams"
 	PURPOSE "Required to enable Vorbis, Speex, and Opus support"
 	)
-set_package_properties (VorbisEnc PROPERTIES
+set_package_properties (Vorbis PROPERTIES
 	TYPE RECOMMENDED
 	URL "www.vorbis.com/"
 	DESCRIPTION "open source lossy audio codec"
@@ -305,7 +305,7 @@ target_include_directories(sndfile
 target_link_libraries (sndfile
 	PRIVATE
 		$<$<BOOL:${LIBM_REQUIRED}>:m>
-		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Vorbis::VorbisEnc>
+		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Vorbis::vorbisenc>
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:FLAC::FLAC>
 		$<$<AND:$<BOOL:${ENABLE_EXPERIMENTAL}>,$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>,$<BOOL:${HAVE_SPEEX}>>:Speex::Speex>
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Opus::opus>

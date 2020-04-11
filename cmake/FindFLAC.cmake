@@ -46,7 +46,7 @@ find_package_handle_standard_args (FLAC
 	REQUIRED_VARS
 		FLAC_LIBRARY
 		FLAC_INCLUDE_DIR
-		OGG_FOUND
+		Ogg_FOUND
 	VERSION_VAR
         FLAC_VERSION
 	)
