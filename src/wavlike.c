@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2020 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004-2005 David Viens <davidv@plogue.com>
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -1030,7 +1030,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 								i++ ;
 
 							if (i < psf->cues->cue_count)
-								strncpy (psf->cues->cue_points [i].name, buffer, 256) ;
+								memcpy (psf->cues->cue_points [i].name, buffer, sizeof (psf->cues->cue_points [i].name)) ;
 							} ;
 						} ;
 					break ;
