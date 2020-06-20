@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2020 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2004 Paavo Jumppanen
 **
 ** This program is free software; you can redistribute it and/or modify
@@ -516,6 +516,7 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 	str_offset = rsrc->string_offset ;
 	psf_log_printf (psf, "  Offset    RsrcId    dlen    slen    Value\n") ;
 
+
 	for (k = 0 ; data_offset + data_len < rsrc->rsrc_len ; k++)
 	{	int slen ;
 
@@ -541,6 +542,11 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 		read_rsrc_str (rsrc, data_offset + 5, value, SF_MIN (SIGNED_SIZEOF (value), slen + 1)) ;
 
 		psf_log_printf (psf, "  0x%04x     %4d     %4d     %3d    '%s'\n", data_offset, rsrc_id, data_len, slen, value) ;
+
+		if (strstr (value, "Photoshop"))
+		{	psf_log_printf (psf, "Exiting parser on Photoshop data.\n", data_offset) ;
+			break ;
+			} ;
 
 		if (rsrc_id == 1000 && rsrc->sample_size == 0)
 			rsrc->sample_size = strtol (value, NULL, 10) ;
