@@ -39,58 +39,6 @@ jobs:
     - script: make distcheck
       displayName: Testing distribution
 
-  - job: Windows_CMake_VS2015_Win32
-    pool:
-      vmImage: 'vs2015-win2012r2'
-    steps:
-    - script: git clone https://github.com/microsoft/vcpkg
-      displayName: Bootstraping Vcpkg
-    - script: .\vcpkg\bootstrap-vcpkg.bat
-      displayName: Bootstraping Vcpkg
-    - script: .\vcpkg\vcpkg.exe install libogg libvorbis libflac opus sqlite3 speex
-      displayName: Installing dependencies
-    - script: |
-        mkdir build
-      displayName: Creating build directory
-    - task: CMake@1
-      inputs:
-        workingDirectory: 'build'
-        cmakeArgs: ' -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake ..'
-    - script: |
-        cd build
-        cmake --build .
-      displayName: Building
-    - script: |
-        cd build
-        ctest
-      displayName: Testing
-
-  - job: Windows_CMake_VS2015_Win64
-    pool:
-      vmImage: 'vs2015-win2012r2'
-    steps:
-    - script: git clone https://github.com/microsoft/vcpkg
-      displayName: Bootstraping Vcpkg
-    - script: .\vcpkg\bootstrap-vcpkg.bat
-      displayName: Bootstraping Vcpkg
-    - script: .\vcpkg\vcpkg.exe install libogg:x64-windows libvorbis:x64-windows libflac:x64-windows opus:x64-windows sqlite3:x64-windows speex:x64-windows
-      displayName: Installing dependencies
-    - script: |
-        mkdir build
-      displayName: Creating build directory
-    - task: CMake@1
-      inputs:
-        workingDirectory: 'build'
-        cmakeArgs: ' -G "Visual Studio 14 2015" -A x64 -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake ..'
-    - script: |
-        cd build
-        cmake --build .
-      displayName: Building
-    - script: |
-        cd build
-        ctest
-      displayName: Testing
-
   - job: Windows_CMake_VS2017_Win32
     pool:
       vmImage: 'vs2017-win2016'
@@ -143,9 +91,61 @@ jobs:
         ctest
       displayName: Testing
 
+  - job: Windows_CMake_VS2019_Win32
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+    - script: git clone https://github.com/microsoft/vcpkg
+      displayName: Bootstraping Vcpkg
+    - script: .\vcpkg\bootstrap-vcpkg.bat
+      displayName: Bootstraping Vcpkg
+    - script: .\vcpkg\vcpkg.exe install libogg libvorbis libflac opus sqlite3 speex
+      displayName: Installing dependencies
+    - script: |
+        mkdir build
+      displayName: Creating build directory
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'build'
+        cmakeArgs: ' -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake ..'
+    - script: |
+        cd build
+        cmake --build .
+      displayName: Building
+    - script: |
+        cd build
+        ctest
+      displayName: Testing
+
+  - job: Windows_CMake_VS2019_Win64
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+    - script: git clone https://github.com/microsoft/vcpkg
+      displayName: Bootstraping Vcpkg
+    - script: .\vcpkg\bootstrap-vcpkg.bat
+      displayName: Bootstraping Vcpkg
+    - script: .\vcpkg\vcpkg.exe install libogg:x64-windows libvorbis:x64-windows libflac:x64-windows opus:x64-windows sqlite3:x64-windows speex:x64-windows
+      displayName: Installing dependencies
+    - script: |
+        mkdir build
+      displayName: Creating build directory
+    - task: CMake@1
+      inputs:
+        workingDirectory: 'build'
+        cmakeArgs: ' -G "Visual Studio 16 2019" -A x64 -DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake ..'
+    - script: |
+        cd build
+        cmake --build .
+      displayName: Building
+    - script: |
+        cd build
+        ctest
+      displayName: Testing
+
   - job: MacOS
     pool:
-      vmImage: 'macOS-10.13'
+      vmImage: 'macOS-10.15'
     steps:
     - script: |
         brew update
