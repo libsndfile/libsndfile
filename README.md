@@ -31,7 +31,7 @@ although the package install tools and package names may be slightly different.
 
 Similarly on Mac OS X, assuming [brew] is already installed:
 
-    brew install autoconf autogen automake flac libogg libtool libvorbis libopus pkg-config
+    brew install autoconf autogen automake flac libogg libtool libvorbis opus pkg-config
 
 Once the build environment has been set up, building and testing libsndfile is
 as simple as:
