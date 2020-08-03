@@ -1,7 +1,6 @@
 # libsndfile
 
-[![Build Status](https://secure.travis-ci.org/erikd/libsndfile.svg?branch=master)](http://travis-ci.org/erikd/libsndfile)
-[![Build status](https://ci.appveyor.com/api/projects/status/github/erikd/libsndfile?branch=master?svg=true)](https://ci.appveyor.com/project/Erik13183/libsndfile)
+![C/C++ CI](https://github.com/erikd/libsndfile/workflows/C/C++%20CI/badge.svg)
 
 libsndfile is a C library for reading and writing files containing sampled audio
 data.
