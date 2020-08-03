@@ -1,8 +1,4 @@
-cmake_minimum_required (VERSION 3.1.3)
-
-if (POLICY CMP0091)
-	cmake_policy(SET CMP0091 NEW)
-endif ()
+cmake_minimum_required (VERSION 3.1..3.18)
 
 project(sndfile VERSION 1.0.29)
 
@@ -49,7 +45,7 @@ option (BUILD_EXAMPLES "Build examples" ON)
 option (ENABLE_CPACK "Enable CPack support" ON)
 option (ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
 option (ENABLE_BOW_DOCS "Enable black-on-white html docs" OFF)
-if (MSVC OR MINGW)
+if (MSVC)
 	option (ENABLE_STATIC_RUNTIME "Enable static runtime" OFF)
 endif ()
 option (ENABLE_PACKAGE_CONFIG "Generate and install package config file" ON)
@@ -94,7 +90,7 @@ if (WIN32 AND (NOT MINGW) AND BUILD_SHARED_LIBS)
 	add_feature_info (ENABLE_COMPATIBLE_LIBSNDFILE_NAME ENABLE_COMPATIBLE_LIBSNDFILE_NAME "Set DLL name to libsndfile-1.dll (canonical name), sndfile.dll otherwise")
 endif ()
 
-if (MSVC OR MINGW)
+if (MSVC)
 	add_feature_info (ENABLE_STATIC_RUNTIME ENABLE_STATIC_RUNTIME "Enable static runtime")
 endif ()
 
@@ -213,7 +209,7 @@ add_library (sndfile
 	src/chanmap.c
 	src/id3.c
 	$<$<BOOL:${WIN32}>:src/windows.c>
-	$<$<AND:$<BOOL:${WIN32}>,$<BOOL:${WIN32}>>:src/version-metadata.rc>
+	$<$<AND:$<BOOL:${WIN32}>,$<BOOL:${BUILD_SHARED_LIBS}>>:src/version-metadata.rc>
 	src/sndfile.c
 	src/aiff.c
 	src/au.c
@@ -295,6 +291,8 @@ add_library (sndfile
 	${sndfile_HDRS}
 	${CMAKE_CURRENT_BINARY_DIR}/src/config.h
 	)
+
+add_library (SndFile::sndfile ALIAS sndfile)
 
 target_include_directories(sndfile
 	PUBLIC
@@ -610,8 +608,11 @@ if (ENABLE_PACKAGE_CONFIG)
 	 	set (CMAKE_INSTALL_PACKAGEDIR ${CMAKE_INSTALL_LIBDIR}/cmake/SndFile)
 	 endif()
 
+	 install (TARGETS ${SNDFILE_PROGRAM_TARGETS}
+		RUNTIME DESTINATION			${CMAKE_INSTALL_BINDIR}
+ 	)
 
-	install (TARGETS sndfile ${SNDFILE_PROGRAM_TARGETS}
+	install (TARGETS sndfile
 		EXPORT SndFileTargets
 		RUNTIME DESTINATION			${CMAKE_INSTALL_BINDIR}
 		ARCHIVE DESTINATION			${CMAKE_INSTALL_LIBDIR}

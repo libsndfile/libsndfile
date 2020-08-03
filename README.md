@@ -162,9 +162,9 @@ Deprecated options:
 
 ### Linking from CMake projects
 
-First you need to add `FindOgg.cmake`, `FindVorbis.cmake`, `FindVorbisEnc.cmake`,
- `FindFLAC.cmake` and `FindOpus.cmake` files to some directory inside your CMake
- project (usually `cmake`) and add it to `CMAKE_MODULE_PATH`:
+First you need to add `FindOgg.cmake`, `FindVorbis.cmake`, `FindFLAC.cmake` and
+`FindOpus.cmake` files to some directory inside your CMake project (usually
+`cmake`) and add it to `CMAKE_MODULE_PATH`:
 
     project(SomeApplication)
     
