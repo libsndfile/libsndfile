@@ -196,6 +196,11 @@
 </TR>
 
 <TR>
+	<TD><A HREF="#SFC_SET_OGG_PAGE_LATENCY_MS">SFC_SET_OGG_PAGE_LATENCY_MS</A></TD>
+	<TD>Set Ogg page latency for Opus file.</TD>
+</TR>
+
+<TR>
 	<TD><A HREF="#SFC_SET_COMPRESSION_LEVEL">SFC_SET_COMPRESSION_LEVEL</A></TD>
 	<TD>Set the compression level.</TD>
 </TR>
@@ -1406,6 +1411,29 @@ The command must be sent before any audio data is written to the file.
 <DT>Return value:</DT>
 	<dd>SF_TRUE if VBR encoding quality was set.
     SF_FALSE otherwise.
+</DL>
+
+<!-- ========================================================================= -->
+<A NAME="SFC_SET_OGG_PAGE_LATENCY_MS"></A>
+<H2><BR><B>SFC_SET_OGG_PAGE_LATENCY_MS</B></H2>
+<P>
+Set page latency for Ogg Opus file in milliseconds.
+The value should be between 50.0 and 1600.0.
+This command is only implemented for Ogg Opus files.
+</P>
+<P>
+Parameters:
+<PRE>
+        sndfile  : A valid SNDFILE* pointer
+        cmd      : SFC_SET_OGG_PAGE_LATENCY_MS
+        data     : A pointer to a double value
+        datasize : sizeof (double)
+</PRE>
+<P>
+</P>
+<DL>
+<DT>Return value:</DT>
+	<dd>0 on success and non-zero otherwise.
 </DL>
 
 <!-- ========================================================================= -->

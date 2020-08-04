@@ -6,7 +6,7 @@
 	libsndfile
 	</TITLE>
 	<META NAME="Author"      CONTENT="Erik de Castro Lopo (erikd AT mega-nerd DOT com)">
-    <META NAME="Version"     CONTENT="libsndfile-1.0.28">
+    <META NAME="Version"     CONTENT="libsndfile-1.0.29">
 	<META NAME="Description" CONTENT="The libsndfile Home Page">
 	<META NAME="Keywords"    CONTENT="WAV AIFF AU SVX PAF NIST W64 libsndfile sound audio dsp Linux">
 	<META NAME="ROBOTS" 	 CONTENT="NOFOLLOW">
@@ -279,6 +279,11 @@ and
 	<a href="http://www.vorbis.com/">Ogg/Vorbis</a>.
 </p>
 
+<p>
+	From version 1.0.29, libsndfile can read and write
+		<a href="https://opus-codec.org/">Ogg/Opus</a>.
+</p>
+
 <!-- pepper -->
 
 <P>
@@ -287,15 +292,8 @@ and
 	<UL>
 	<LI> Kurzweil K2000 sampler files.
 	<LI> Ogg Speex.
+	<LI> MPEG Layer 3 (commonly known as MP3)
 	</UL>
-<P>
-	I have decided that I will not be adding support for MPEG Layer 3 (commonly
-	known as MP3) due to the patent issues surrounding this file format.
-	See
-		<a href="FAQ.html#Q020">
-		the FAQ</a>
-	for more.
-</P>
 <P>
 	Other file formats may also be added on request.
 </P>
@@ -374,6 +372,7 @@ and
 				for CAF and RF64. FIx PAF endian-ness issue.
 	<LI>Version 1.0.28 (April 2 2017) Fix buffer overruns in FLAC and ID3 handling code. Reduce default
 				header memory requirements. Fix detection of Large File Support for 32 bit systems.
+	<LI>Version 1.0.29 (August 15 2020) Opus support, build system improvements and bug fixes.
 	</UL>
 
 <A NAME="Similar"></A>
@@ -431,40 +430,7 @@ and
 <A NAME="Download"></A>
 <H1><B>Download</B></H1>
 <P>
-	Here is the latest version. It is available in the following formats:
-</P>
-	<UL>
-	<LI>Source code as a .tar.gz :
-			<A HREF="files/libsndfile-1.0.28.tar.gz">libsndfile-1.0.28.tar.gz</A>
-			and
-			<A HREF="files/libsndfile-1.0.28.tar.gz.asc">GPG signature</A>.
-	<LI>Win32 installer:
-			<A HREF="files/libsndfile-1.0.28-w32-setup.exe">
-			libsndfile-1.0.28-w32-setup.exe</A> (thoroughly tested under
-			<a href="http://www.winehq.com/">Wine</a>)
-			and
-			<A HREF="files/libsndfile-1.0.28-w32-setup.exe.asc">GPG signature</A>.
-	<LI>Win64 installer:
-			<A HREF="files/libsndfile-1.0.28-w64-setup.exe">
-			libsndfile-1.0.28-w64-setup.exe</A> (thoroughly tested under
-			<a href="http://www.winehq.com/">Wine</a>)
-			and
-			<A HREF="files/libsndfile-1.0.28-w64-setup.exe.asc">GPG signature</A>.
-	</UL>
-<P>
-    The GPG signature can be validated at
-		<A HREF="https://keybase.io/erikd/">Keybase.IO</A>.
-</P>
-<P>
-The Win32 installer should work on Windows Vista or later.
-</p>
-
-<P>
-	Pre-release versions of libsndfile are available
-			<A HREF="http://www.mega-nerd.com/tmp/">here</A>
-	and are announced on the
-			<A HREF="lists.html">libsndfile-devel</A>
-	mailing list.
+	Check latest version on <A HREF="https://github.com/erikd/libsndfile/releases">GitHub Releases page</A>.
 </P>
 
 <A NAME="SeeAlso"></A>

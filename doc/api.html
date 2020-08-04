@@ -229,7 +229,11 @@ Not all combinations of endian-ness and major and minor file types are valid.
           SF_FORMAT_MS_ADPCM     = 0x0013,       /* Microsoft ADPCM. */
 
           SF_FORMAT_GSM610       = 0x0020,       /* GSM 6.10 encoding. */
-          SF_FORMAT_VOX_ADPCM    = 0x0021,       /* Oki Dialogic ADPCM encoding. */
+          SF_FORMAT_VOX_ADPCM    = 0x0021,       /* OKI / Dialogix ADPCM */
+
+          SF_FORMAT_NMS_ADPCM_16 = 0x0022,       /* 16kbs NMS G721-variant encoding. */
+          SF_FORMAT_NMS_ADPCM_24 = 0x0023,       /* 24kbs NMS G721-variant encoding. */
+          SF_FORMAT_NMS_ADPCM_32 = 0x0024,       /* 32kbs NMS G721-variant encoding. */
 
           SF_FORMAT_G721_32      = 0x0030,       /* 32kbs G721 ADPCM encoding. */
           SF_FORMAT_G723_24      = 0x0031,       /* 24kbs G723 ADPCM encoding. */
@@ -244,6 +248,12 @@ Not all combinations of endian-ness and major and minor file types are valid.
           SF_FORMAT_DPCM_16      = 0x0051,       /* 16 bit differential PCM (XI only) */
 
           SF_FORMAT_VORBIS       = 0x0060,       /* Xiph Vorbis encoding. */
+          SF_FORMAT_OPUS         = 0x0064,       /* Xiph/Skype Opus encoding. */
+
+          SF_FORMAT_ALAC_16      = 0x0070,       /* Apple Lossless Audio Codec (16 bit). */
+          SF_FORMAT_ALAC_20      = 0x0071,       /* Apple Lossless Audio Codec (20 bit). */
+          SF_FORMAT_ALAC_24      = 0x0072,       /* Apple Lossless Audio Codec (24 bit). */
+          SF_FORMAT_ALAC_32      = 0x0073,       /* Apple Lossless Audio Codec (32 bit). */
 
           /* Endian-ness options. */
 
@@ -799,7 +809,7 @@ and a parameter of SF_TRUE to force correct scaling.
 		<A HREF="http://www.mega-nerd.com/libsndfile/">here</A>.
 </P>
 <P>
-Version : 1.0.28
+Version : 1.0.29
 </P>
 <!-- pepper -->
 <!-- pepper -->

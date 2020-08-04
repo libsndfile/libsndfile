@@ -20,22 +20,21 @@ main web page.
 </B></P>
 
 <P>
-There is currently only one way of building libsndfile for Win32 and Win64;
-cross compiling from Linux using the MinGW cross compiler.
+There are currently two build systems; the official GNU autotool based one and
+a more limited and experimental CMake based build system.
 </P>
 
 <P>
 libsndfile is written to be compiled by a compiler which supports large
-chunks of the 1999 ISO C Standard.
-Unfortunately, the microsoft compiler supports close to nothing of this
-standard and hence is not suitable for libsndfile.
+chunks of the 1999 ISO C Standard (tested with GCC, Clang and Visual
+Studio 2015).
 </P>
 
 <P>
-It <b>may</b> be possible to compile libsndfile on windows using the
+It is recommended to use CMake and Visual Studio to build libsndfile on Windows
+but you can try the
 	<a href="http://www.mingw.org/">MinGW</a>
-compiler suite, but I haven't tested that and have no interest in supporting
-that.
+compiler suite with Autotools or CMake buildsystem.
 </P>
 
 <!--===========================================================================-->
