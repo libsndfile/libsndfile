@@ -7,17 +7,17 @@ disable_ogg_crc ?= false
 # Build libsndfile as a dynamic/shared library, but statically link to
 # libFLAC, libogg, libopus and libvorbis
 
-ogg_version = libogg-1.3.3
-ogg_sha256sum = 4f3fc6178a533d392064f14776b23c397ed4b9f48f5de297aba73b643f955c08
+ogg_version = libogg-1.3.4
+ogg_sha256sum = c163bc12bc300c401b6aa35907ac682671ea376f13ae0969a220f7ddf71893fe
 
-vorbis_version = libvorbis-1.3.6
-vorbis_sha256sum = af00bb5a784e7c9e69f56823de4637c350643deedaf333d0fa86ecdba6fcb415
+vorbis_version = libvorbis-1.3.7
+vorbis_sha256sum = b33cc4934322bcbf6efcbacf49e3ca01aadbea4114ec9589d1b1e9d20f72954b
 
-flac_version = flac-1.3.2
-flac_sha256sum = 91cfc3ed61dc40f47f050a109b08610667d73477af6ef36dcad31c31a4a8d53f
+flac_version = flac-1.3.3
+flac_sha256sum = 213e82bd716c9de6db2f98bcadbc4c24c7e2efe8c75939a1a84e28539c4e1748
 
-opus_version = opus-1.3
-opus_sha256sum = 4f3d69aefdf2dbaf9825408e452a8a414ffc60494c70633560700398820dc550
+opus_version = opus-1.3.1
+opus_sha256sum = 65b58e1e25b2a114157014736a3d9dfeaad8d41be1c8179866f144a2fb44ff9d
 
 #-------------------------------------------------------------------------------
 # Code follows.
