@@ -627,7 +627,9 @@ int		sf_perror		(SNDFILE *sndfile) ;
 int		sf_error_str	(SNDFILE *sndfile, char* str, size_t len) ;
 
 
-/* Return TRUE if fields of the SF_INFO struct are a valid combination of values. */
+/* Allow the caller to retrieve information from or change aspects of the
+** library behaviour.
+*/
 
 int		sf_command	(SNDFILE *sndfile, int command, void *data, int datasize) ;
 
