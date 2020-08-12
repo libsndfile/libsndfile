@@ -416,6 +416,7 @@ OS_SPECIFIC_CFLAGS=""
 OS_SPECIFIC_LINKS=""
 os_is_win32=0
 os_is_openbsd=0
+os_is_mingw=0
 use_windows_api=0
 AS_CASE([$host_os],
 	[darwin* | rhapsody*], [
@@ -427,6 +428,7 @@ AS_CASE([$host_os],
 		OS_SPECIFIC_LINKS="-framework CoreAudio -framework AudioToolbox -framework CoreFoundation"],
 	[mingw*], [
 		os_is_win32=1
+		os_is_mingw=1
 		use_windows_api=1
 		OS_SPECIFIC_LINKS="-lwinmm"],
 	[openbsd*], [
@@ -588,7 +590,10 @@ AS_IF([test "x$enable_test_coverage" = "xyes"], [
 dnl some distributions (such as Gentoo) have _FORTIFY_SOURCE always
 dnl enabled. We test for this situation in order to prevent polluting
 dnl the console with messages of macro redefinitions.
-AX_ADD_FORTIFY_SOURCE
+dnl Update: MinGW is buggy and should be excluded.
+AS_IF([test "x$os_is_mingw" = 0], [
+		AX_ADD_FORTIFY_SOURCE
+	])
 
 AS_IF([test "x$ax_cv_c_compiler_vendor" = "xgnu"], [
 		dnl OS specific tweaks.
