@@ -1345,3 +1345,7 @@ if (BUILD_TESTING)
 	set_target_properties(${SNDFILE_TEST_TARGETS} PROPERTIES FOLDER Tests)
 
 endif ()
+
+if (ENABLE_CPACK)
+	include (CPack)
+endif ()
