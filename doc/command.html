@@ -751,7 +751,7 @@ Parameters:
 </P>
 <PRE>
         sndfile  : A valid SNDFILE* pointer
-        cmd      : SFC_SET_SCALE_FLOAT_INT_READ
+        cmd      : SFC_SET_SCALE_INT_FLOAT_WRITE
         data     : NULL
         datasize : TRUE or FALSE
 </PRE>
@@ -1147,7 +1147,7 @@ to the <B>sf_write*</B> functions.
 Parameters:
 <PRE>
         sndfile  : A valid SNDFILE* pointer
-        cmd      : SFC_UPDATE_HEADER_NOW
+        cmd      : SFC_SET_UPDATE_HEADER_AUTO
         data     : Not used (should be NULL)
         datasize : SF_TRUE or SF_FALSE
 </PRE>
@@ -1304,7 +1304,7 @@ larger file.
 Parameters:
 <PRE>
         sndfile  : A valid SNDFILE* pointer
-        cmd      : SFC_GET_CLIPPING
+        cmd      : SFC_GET_EMBED_FILE_INFO
         data     : a pointer to an  SF_EMBED_FILE_INFO struct
         datasize : sizeof (SF_EMBED_FILE_INFO)
 </PRE>
@@ -1822,7 +1822,7 @@ Example:
 
 <!-- ========================================================================= -->
 
-<A NAME="SFC_GET_CUE"></A>
+<A NAME="SFC_GET_CUE_COUNT"></A>
 <H2><BR><B>SFC_GET_CUE_COUNT</B></H2>
 <P>
 Retrieve the number of cue markers available for retrieval using the
@@ -1833,7 +1833,7 @@ Parameters:
 </P>
 <PRE>
          sndfile  : A valid SNDFILE* pointer
-         cmd      : SFC_GET_CUE
+         cmd      : SFC_GET_CUE_COUNT
          data     : a pointer to a uint32_t
          datasize : sizeof (uint32_t)
 </PRE>
