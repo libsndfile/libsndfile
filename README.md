@@ -134,6 +134,7 @@ You can pass additional options with `/D<parameter>=<value>` when you run
 * `ENABLE_CPACK` - enable [CPack](https://cmake.org/cmake/help/latest/module/CPack.html) support.
   This option is `ON` by default.
 * `ENABLE_PACKAGE_CONFIG` - generate and install [package config file](https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html#config-file-packages).
+* `INSTALL_PKGCONFIG_MODULE` - generate and install [pkg-config module](https://people.freedesktop.org/~dbn/pkg-config-guide.html).
   This option is `ON` by default.
 * `ENABLE_STATIC_RUNTIME` - enable static runtime on Windows platform, `OFF` by
   default.
