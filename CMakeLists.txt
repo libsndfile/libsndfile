@@ -49,6 +49,7 @@ if (MSVC)
 	option (ENABLE_STATIC_RUNTIME "Enable static runtime" OFF)
 endif ()
 option (ENABLE_PACKAGE_CONFIG "Generate and install package config file" ON)
+option (INSTALL_PKGCONFIG_MODULE "Generate and install pkg-config module" ON)
 
 list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -86,6 +87,7 @@ add_feature_info (ENABLE_CPACK ENABLE_CPACK "enable CPack support")
 add_feature_info (ENABLE_CPU_CLIP ENABLE_CPU_CLIP "Enable tricky cpu specific clipper")
 add_feature_info (ENABLE_BOW_DOCS ENABLE_BOW_DOCS "enable black-on-white html docs")
 add_feature_info (ENABLE_PACKAGE_CONFIG ENABLE_PACKAGE_CONFIG "generate and install package config file")
+add_feature_info (INSTALL_PKGCONFIG_MODULE INSTALL_PKGCONFIG_MODULE "generate and install pkg-config module")
 if (WIN32 AND (NOT MINGW) AND BUILD_SHARED_LIBS)
 	add_feature_info (ENABLE_COMPATIBLE_LIBSNDFILE_NAME ENABLE_COMPATIBLE_LIBSNDFILE_NAME "Set DLL name to libsndfile-1.dll (canonical name), sndfile.dll otherwise")
 endif ()
@@ -148,18 +150,23 @@ configure_file (src/config.h.cmake src/config.h)
 
 configure_file (src/sndfile.h.in src/sndfile.h)
 
-set (prefix ${CMAKE_INSTALL_PREFIX})
-set (exec_prefix "\$\{prefix\}")
-set (libdir "\$\{prefix\}/${CMAKE_INSTALL_LIBDIR}")
-set (includedir "\$\{prefix\}/${CMAKE_INSTALL_INCLUDEDIR}")
-set (VERSION ${PROJECT_VERSION})
-if (ENABLE_EXTERNAL_LIBS)
-	set (EXTERNAL_XIPH_REQUIRE "flac ogg vorbis vorbisenc opus")
-	if (ENABLE_EXPERIMENTAL)
-		set (EXTERNAL_XIPH_REQUIRE "${EXTERNAL_XIPH_REQUIRE} speex")
+if (INSTALL_PKGCONFIG_MODULE)
+
+	set (prefix ${CMAKE_INSTALL_PREFIX})
+	set (exec_prefix "\$\{prefix\}")
+	set (libdir "\$\{prefix\}/${CMAKE_INSTALL_LIBDIR}")
+	set (includedir "\$\{prefix\}/${CMAKE_INSTALL_INCLUDEDIR}")
+	set (VERSION ${PROJECT_VERSION})
+	if (ENABLE_EXTERNAL_LIBS)
+		set (EXTERNAL_XIPH_REQUIRE "flac ogg vorbis vorbisenc opus")
+		if (ENABLE_EXPERIMENTAL)
+			set (EXTERNAL_XIPH_REQUIRE "${EXTERNAL_XIPH_REQUIRE} speex")
+		endif ()
 	endif ()
+
+	configure_file (sndfile.pc.in sndfile.pc @ONLY)
+
 endif ()
-configure_file (sndfile.pc.in sndfile.pc @ONLY)
 
 #
 # libsndfile
@@ -699,7 +706,9 @@ set (html_DATA
 	)
 install (FILES ${html_DATA} DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+if (INSTALL_PKGCONFIG_MODULE)
+	install (FILES ${CMAKE_CURRENT_BINARY_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+endif ()
 
 #
 # Testing
