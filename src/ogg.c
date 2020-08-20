@@ -168,7 +168,7 @@ ogg_read_first_page (SF_PRIVATE *psf, OGG_PRIVATE *odata)
 	memcpy (buffer, psf->header.ptr, psf->header.indx) ;
 	ogg_sync_wrote (&odata->osync, psf->header.indx) ;
 
-	ret = ogg_sync_next_page (psf, &odata->opage, SF_MAX (0l, 4096 - psf->header.indx), NULL) ;
+	ret = ogg_sync_next_page (psf, &odata->opage, SF_MAX ((sf_count_t) 0, 4096 - psf->header.indx), NULL) ;
 
 	/* Have we simply run out of data?  If so, we're done. */
 	if (ret == 0)
@@ -570,7 +570,7 @@ ogg_stream_seek_page_search (SF_PRIVATE *psf, OGG_PRIVATE *odata, uint64_t targe
 			next_boundary = SF_MIN (page_offset, next_boundary) ;
 
 			/* If not from our stream, continue. */
-			if (odata->ostream.serialno != (uint32_t) ogg_page_serialno (&page))
+			if (odata->ostream.serialno != ogg_page_serialno (&page))
 				continue ;
 
 			/*
