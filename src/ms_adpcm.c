@@ -520,7 +520,8 @@ static int
 msadpcm_encode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 {	unsigned int	blockindx ;
 	unsigned char	byte ;
-	int				chan, k, predict, bpred [2], idelta [2], errordelta, newsamp ;
+	int				chan, k, predict, bpred [2] = { 0 }, idelta [2] = { 0 },
+					errordelta, newsamp ;
 
 	choose_predictor (pms->channels, pms->samples, bpred, idelta) ;
 
