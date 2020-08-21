@@ -1071,7 +1071,7 @@ ogg_opus_read_refill (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 	** to converge and should be dropped.
 	*/
 	if (oopus->pkt_pos < oopus->u.decode.gp_preskip)
-		oopus->loc = SF_MIN ((oopus->u.decode.gp_preskip - oopus->pkt_pos) / oopus->sr_factor, oopus->len) ;
+		oopus->loc = SF_MIN ((int) (oopus->u.decode.gp_preskip - oopus->pkt_pos) / oopus->sr_factor, oopus->len) ;
 	else
 		oopus->loc = 0 ;
 
