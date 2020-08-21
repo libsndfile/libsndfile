@@ -242,6 +242,7 @@ typedef struct
 			OpusMSDecoder *state ;
 			uint64_t gp_start ;
 			uint64_t gp_end ;
+			uint64_t gp_preskip ;
 			sf_count_t last_offset ;
 		} decode ;
 
@@ -334,6 +335,10 @@ ogg_opus_open (SF_PRIVATE *psf)
 			return error ;
 		if ((error = ogg_opus_analyze_file (psf)))
 			return error ;
+
+		psf_log_printf (psf, "OggOpus Stream Structure\n") ;
+		psf_log_printf (psf, "  First GranulePos : %d\n", oopus->u.decode.gp_start) ;
+		psf_log_printf (psf, "  Last GranulePos  : %d\n", oopus->u.decode.gp_end) ;
 
 		psf->read_short		= ogg_opus_read_s ;
 		psf->read_int		= ogg_opus_read_i ;
@@ -1065,8 +1070,8 @@ ogg_opus_read_refill (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 	** skip point, indicating that these samples are padding to get the decoder
 	** to converge and should be dropped.
 	*/
-	if (oopus->pkt_pos < (unsigned) oopus->header.preskip)
-		oopus->loc = SF_MIN ((oopus->header.preskip - (int) oopus->pkt_pos) / oopus->sr_factor, oopus->len) ;
+	if (oopus->pkt_pos < oopus->u.decode.gp_preskip)
+		oopus->loc = SF_MIN ((oopus->u.decode.gp_preskip - oopus->pkt_pos) / oopus->sr_factor, oopus->len) ;
 	else
 		oopus->loc = 0 ;
 
@@ -1407,14 +1412,17 @@ ogg_opus_analyze_file (SF_PRIVATE *psf)
 	** having to modify all following granule positions, or for recording/
 	** joining a live stream in the middle. To figure out the offset, we need
 	** to sum up how many samples are in all the packets that complete in the
-	** page and subtract it from the page granule position.
+	** first payload page and subtract it from the page's granule position.
 	**
-	** If this is the last page of the steam (EOS set), this is not possible,
-	** as the granule position may be /less/ than the number of samples, to
-	** indicate how many samples are end-padding. In this case the granule
-	** position offset of the file must be 0, as otherwise it is considered
-	** malformed.
+	** The last payload page of an OggOpus stream (EOS bit set) can have a granule
+	** position less than the number of samples in the page, the difference
+	** indicating how many end padding samples there are.
+	**
+	** If the first payload page is also the last, the stream's starting granule
+	** position MUST be zero, as otherwise there is no way to know what samples
+	** are pre-skip, data or end-padding.
 	*/
+
 	error = ogg_opus_unpack_next_page (psf, odata, oopus) ;
 	if (error < 0 && psf->error)
 		return psf->error ;
@@ -1437,6 +1445,7 @@ ogg_opus_analyze_file (SF_PRIVATE *psf)
 		return SFE_MALFORMED_FILE ;
 		} ;
 	oopus->u.decode.gp_start = oopus->pkt_pos ;
+	oopus->u.decode.gp_preskip = oopus->u.decode.gp_start + oopus->header.preskip ;
 
 	if (!psf->sf.seekable)
 		return 0 ;
@@ -1457,8 +1466,7 @@ ogg_opus_analyze_file (SF_PRIVATE *psf)
 		oopus->u.decode.last_offset = last_page ;
 
 		if (oopus->u.decode.gp_end != (uint64_t) -1)
-		{	psf->sf.frames = (oopus->u.decode.gp_end - oopus->u.decode.gp_start
-				- oopus->header.preskip) / oopus->sr_factor ;
+		{	psf->sf.frames = (oopus->u.decode.gp_end - oopus->u.decode.gp_preskip) / oopus->sr_factor ;
 			} ;
 	}
 
@@ -1638,7 +1646,7 @@ ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 	** now decode until we hit it.
 	*/
 	offset = ogg_opus_seek_null_read (psf, target_gp / oopus->sr_factor) ;
-	return offset - ((oopus->header.preskip + oopus->u.decode.gp_start) / oopus->sr_factor) ;
+	return offset - ((oopus->u.decode.gp_preskip) / oopus->sr_factor) ;
 
 } /* ogg_opus_seek */
 
@@ -1715,8 +1723,7 @@ ogg_opus_command (SF_PRIVATE *psf, int command, void *data, int datasize)
 				odata->pkt_indx = 0 ;
 				/* Adjust file frames count. */
 				if (oopus->u.decode.gp_end != (uint64_t) -1)
-					psf->sf.frames = (oopus->u.decode.gp_end - oopus->u.decode.gp_start
-						- oopus->header.preskip) / oopus->sr_factor ;
+					psf->sf.frames = (oopus->u.decode.gp_end - oopus->u.decode.gp_preskip) / oopus->sr_factor ;
 				} ;
 			return SF_TRUE ;
 
