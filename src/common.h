@@ -24,10 +24,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if HAVE_STDINT_H
-#include <stdint.h>
-#elif HAVE_INTTYPES_H
+#if HAVE_INTTYPES_H
 #include <inttypes.h>
+#elif HAVE_STDINT_H
+#include <stdint.h>
 #endif
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
