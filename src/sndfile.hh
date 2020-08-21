@@ -261,7 +261,7 @@ SndfileHandle::SndfileHandle (SF_VIRTUAL_IO &sfvirtual, void *user_data, int mod
 
 inline
 SndfileHandle::~SndfileHandle (void)
-{	if (p != nullptr && --p->ref == 0)
+{	if (p != nullptr && -- p->ref == 0)
 		delete p ;
 } /* SndfileHandle destructor */
 
@@ -270,7 +270,7 @@ inline
 SndfileHandle::SndfileHandle (const SndfileHandle &orig)
 : p (orig.p)
 {	if (p != nullptr)
-		++p->ref ;
+		++ p->ref ;
 } /* SndfileHandle copy constructor */
 
 inline SndfileHandle &
@@ -278,12 +278,12 @@ SndfileHandle::operator = (const SndfileHandle &rhs)
 {
 	if (&rhs == this)
 		return *this ;
-	if (p != nullptr && --p->ref == 0)
+	if (p != nullptr && -- p->ref == 0)
 		delete p ;
 
 	p = rhs.p ;
 	if (p != nullptr)
-		++p->ref ;
+		++ p->ref ;
 
 	return *this ;
 } /* SndfileHandle assignment operator */
