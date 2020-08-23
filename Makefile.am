@@ -162,7 +162,7 @@ AUTOHEADER=echo
 
 if FULL_SUITE
 dist_html_DATA = doc/index.html doc/libsndfile.jpg doc/libsndfile.css doc/print.css doc/api.html \
-	doc/command.html doc/bugs.html doc/sndfile_info.html doc/new_file_type.HOWTO \
+	doc/command.html doc/bugs.html doc/formats.html doc/sndfile_info.html doc/new_file_type.HOWTO \
 	doc/win32.html doc/FAQ.html doc/lists.html doc/embedded_files.html doc/octave.html \
 	doc/tutorial.html
 endif

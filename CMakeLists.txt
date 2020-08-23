@@ -695,6 +695,7 @@ set (html_DATA
 	doc/api.html
 	doc/command.html
 	doc/bugs.html
+	doc/formats.html
 	doc/sndfile_info.html
 	doc/new_file_type.HOWTO
 	doc/win32.html
