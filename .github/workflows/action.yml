@@ -64,14 +64,14 @@ jobs:
             triplet: 'x64-windows-static'
             build-system: cmake
             cmake-generator: 'Visual Studio 16 2019'
-            cmake-options: '-DENABLE_STATIC_RUNTIME=ON -DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake'
+            cmake-options: '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug> -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake'
 
           - name: windows-latest-vs2019-Win32
             os: windows-latest
             triplet: 'x86-windows-static'
             build-system: cmake
             cmake-generator: 'Visual Studio 16 2019'
-            cmake-options: '-DENABLE_STATIC_RUNTIME=ON -DCMAKE_GENERATOR_PLATFORM=Win32 -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x86-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake'
+            cmake-options: '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug> -DCMAKE_GENERATOR_PLATFORM=Win32 -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x86-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake'
 
     runs-on: ${{ matrix.os }}    
     steps:
