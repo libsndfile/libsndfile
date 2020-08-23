@@ -108,6 +108,15 @@ The functions of libsndfile are defined as follows:
       const char* <A HREF="#string">sf_get_string</A>    (SNDFILE *sndfile, int str_type) ;
       int         <A HREF="#string">sf_set_string</A>    (SNDFILE *sndfile, int str_type, const char* str) ;
 
+      const char* <A HREF="#version_string">sf_set_string</A>     (void) ;
+
+      int         <A HREF="#current_byterate">sf_current_byterate</A>     (SNDFILE *sndfile) ;
+
+      int                     <A HREF="#set_chunk">sf_set_chunk</A>           (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info) ;
+      SF_CHUNK_ITERATOR *     <A HREF="#get_chunk_iterator">sf_get_chunk_iterator</A>  (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info) ;
+      SF_CHUNK_ITERATOR *     <A HREF="#next_chunk_iterator">sf_next_chunk_iterator</A> (SF_CHUNK_ITERATOR * iterator) ;
+      int                     <A HREF="#get_chunk_size">sf_get_chunk_size</A>      (const SF_CHUNK_ITERATOR * it, SF_CHUNK_INFO * chunk_info) ;
+      int                     <A HREF="#get_chunk_data">sf_get_chunk_data</A>      (const SF_CHUNK_ITERATOR * it, SF_CHUNK_INFO * chunk_info) ;
 </PRE>
 <!-- pepper -->
 <P>
@@ -756,6 +765,188 @@ assume they are utf-8.
 Similarly if you have a string in some exotic format like utf-16, it should be
 encoded to utf-8 before being written using libsndfile.
 </P>
+
+<div id="version_string">
+<h2>Function for retrieving library version</h2>
+<pre>
+      const char * sf_version_string (void) ;
+</pre>
+<p>
+Return the library version string.
+</p>    
+</div>
+
+<div id="current_byterate">
+<h2>Function for retrieving current byterate</h2>
+<pre>
+      int sf_current_byterate (SNDFILE *sndfile) ;
+</pre>
+<p>
+Return the current byterate at this point in the file. The byte rate in this
+case is the number of bytes per second of audio data. For instance, for a
+stereo, 18 bit PCM encoded file with an 16kHz sample rate, the byte rate
+would be 2 (stereo) * 2 (two bytes per sample) * 16000 => 64000 bytes/sec.
+</p>
+<p>
+For some file formats the returned value will be accurate and exact, for some
+it will be a close approximation, for some it will be the average bitrate for
+the whole file and for some it will be a time varying value that was accurate
+when the file was most recently read or written.
+</p>
+<p>
+To get the bitrate, multiple this value by 8.
+</p>
+<p>
+<code>sf_current_byterate</code> returns byte per second or -1 if byterate is
+unknown.
+</p>
+</div>
+
+<div id="chunk">
+<h2>Functions to get and set chunks from within a sound file</h2>
+<p>
+These functions allow the getting and setting of chunks within a sound file
+(for those formats which allow it).
+</p>
+<p>
+These functions fail safely. Specifically, they will not allow you to overwrite
+existing chunks or add extra versions of format specific reserved chunks but
+should allow you to retrieve any and all chunks (may not be implemented for
+all chunks or all file formats).
+</p>
+<div id="set_chunk">
+<h3>sf_set_chunk</h3>
+<pre>
+      int sf_set_chunk (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info) ;
+</pre>
+<p>
+Set the specified chunk info (must be done before any audio data is written
+to the file). This will fail for format specific reserved chunks.
+The <code>chunk_info->data</code> pointer must be valid until the file is
+closed.
+</p>
+<p>
+The <code>SF_CHUNK_INFO</code> struct is documented as follows:
+</p>
+<pre>
+      struct SF_CHUNK_INFO
+      {     char        id [64] ;   /* The chunk identifier. */
+            unsigned    id_size ;   /* The size of the chunk identifier. */
+            unsigned    datalen ;   /* The size of that data. */
+            void        *data ;     /* Pointer to the data. */
+      } ;
+      
+      typedef struct SF_CHUNK_INFO SF_CHUNK_INFO ;
+</pre>
+<p>
+<code>sf_set_chunk</code> returns <code>SF_ERR_NO_ERROR</code> on success or
+non-zero on failure.
+</p>
+</div>
+<div id="get_chunk_iterator">
+<h3>sf_get_chunk_iterator</h3>
+<pre>
+      SF_CHUNK_ITERATOR *
+      sf_get_chunk_iterator (SNDFILE * sndfile, const SF_CHUNK_INFO * chunk_info) ;
+</pre>
+<p>
+Get an iterator for all chunks matching <code>chunk_info</code>.
+</p>
+<p><code>SF_CHUNK_ITERATOR</code> is an opaque structure to an iterator over
+the all chunks of a given id and defined as follows:</p>
+<pre>
+typedef	struct SF_CHUNK_ITERATOR SF_CHUNK_ITERATOR ;
+</pre>
+<p>The iterator will point to the first chunk matching <code>chunk_info</code>.
+Chunks are matching, if (<code>chunk_info->id</code>) matches the first (
+<code>chunk_info->id_size</code>) bytes of a chunk found in the
+<code>SNDFILE*</code> handle. If <code>chunk_info</code> is <code>NULL</code>,
+an iterator to all chunks in the <code>SNDFILE*</code> handle is returned. The
+values of <code>chunk_info->datalen</code> and <code>chunk_info->data</code>
+are ignored. If no matching chunks are found in the sndfile, <code>NULL</code>
+is returned.
+</p>
+<p>
+The returned iterator will stay valid until one of the following occurs:
+</p>
+<ol type="a">
+<li>The sndfile is closed.</li>
+<li>A new chunk is added using <a href="#set_chunk"><code>sf_set_chunk()</code>
+</a>.</li>
+<li>Another chunk iterator function is called on the same <code>SNDFILE*</code>
+handle that causes the iterator to be modified.</li>
+</ol>
+<p>The memory for the iterator belongs to the SNDFILE* handle and is freed when
+<a href="#close">sf_close()</code></a> is called.</p>
+</div>
+<div id="next_chunk_iterator">
+<h3>sf_next_chunk_iterator</h3>
+<pre>
+      sf_next_chunk_iterator (SF_CHUNK_ITERATOR * iterator) ;
+</pre>
+<p>
+Iterate through chunks by incrementing the iterator.
+</p>
+<p>
+Increments the iterator and returns a handle to the new one. After this call,
+iterator will no longer be valid, and you must use the newly returned handle
+from now on. The returned handle can be used to access the next chunk matching
+the criteria as defined in <a href="#get_chunk_iterator"><code>
+sf_get_chunk_iterator()</code></a>. If iterator points to the last chunk, this
+will free all resources associated with iterator and return <code>NULL</code>.
+The returned iterator will stay valid until <code>sf_get_next_chunk_iterator
+</code> is called again, the sndfile is closed or a new chunk us added.
+</p>
+</div>
+<div id="get_chunk_size">
+<h3>sf_get_chunk_size</h3>
+<pre>
+      int
+      sf_get_chunk_size (const SF_CHUNK_ITERATOR * it, SF_CHUNK_INFO * chunk_info) ;
+</pre>
+<p>
+Get the size of the specified chunk.
+</p>
+<p>
+If the specified chunk exists, the size will be returned in the <code>datalen
+</code> field of the <code>SF_CHUNK_INFO</code> struct. Additionally, the id of
+the chunk will be copied to the <code>id</code> field of the <code>
+SF_CHUNK_INFO</code> struct and it's <code>id_size</code> field will be updated
+accordingly.
+</p>
+<p>
+If the chunk doesn't exist <code>chunk_info->datalen</code> will be zero, and
+the <code>id</code> and <code>id_size</code> fields will be undefined.
+</p>
+<p>
+The function will return <code>SF_ERR_NO_ERROR</code> on success or non-zero on
+failure.
+</p>
+</div>
+<div id="get_chunk_data">
+<h3>sf_get_chunk_data</h3>
+<pre>
+      int
+      sf_get_chunk_data (const SF_CHUNK_ITERATOR * it, SF_CHUNK_INFO * chunk_info) ;
+</pre>
+<p>
+Get the specified chunk data.
+</p>
+<p>
+If the specified chunk exists, up to <code>chunk_info->datalen</code> bytes of
+the chunk data will be copied into the <code>chunk_info->data</code> buffer
+(allocated by the caller) and the <code>chunk_info->datalen</code> field
+updated to reflect the size of the data. The <code>id</code> and <code>id_size
+</code> field will be updated according to the retrieved chunk. If the chunk
+doesn't exist <code>chunk_info->datalen</code> will be zero, and the <code>id
+</code> and <code>id_size</code> fields will be undefined.
+</p>
+<p>
+The function will return <code>SF_ERR_NO_ERROR</code> on success or non-zero on
+failure.
+</p>
+</div>
+</div>
 
 <HR>
 
