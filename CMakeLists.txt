@@ -1,5 +1,9 @@
 cmake_minimum_required (VERSION 3.1..3.18)
 
+# MSVC runtime library flags are selected by an abstraction, CMake >= 3.15
+# This policy still need to be set even with cmake_minimum_required() command above.
+cmake_policy (SET CMP0091 NEW)
+
 project(sndfile VERSION 1.0.29)
 
 #
@@ -45,7 +49,7 @@ option (BUILD_EXAMPLES "Build examples" ON)
 option (ENABLE_CPACK "Enable CPack support" ON)
 option (ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
 option (ENABLE_BOW_DOCS "Enable black-on-white html docs" OFF)
-if (MSVC)
+if (MSVC AND (CMAKE_VERSION VERSION_LESS 3.15))
 	option (ENABLE_STATIC_RUNTIME "Enable static runtime" OFF)
 endif ()
 option (ENABLE_PACKAGE_CONFIG "Generate and install package config file" ON)
@@ -92,7 +96,7 @@ if (WIN32 AND (NOT MINGW) AND BUILD_SHARED_LIBS)
 	add_feature_info (ENABLE_COMPATIBLE_LIBSNDFILE_NAME ENABLE_COMPATIBLE_LIBSNDFILE_NAME "Set DLL name to libsndfile-1.dll (canonical name), sndfile.dll otherwise")
 endif ()
 
-if (MSVC)
+if (MSVC AND (CMAKE_VERSION VERSION_LESS 3.15))
 	add_feature_info (ENABLE_STATIC_RUNTIME ENABLE_STATIC_RUNTIME "Enable static runtime")
 endif ()
 
