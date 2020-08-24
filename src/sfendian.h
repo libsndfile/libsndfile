@@ -167,30 +167,30 @@ ENDSWAP_64 (uint64_t x)
 static inline void
 psf_put_be64 (uint8_t *ptr, int offset, int64_t value)
 {
-	ptr [offset] = value >> 56 ;
-	ptr [offset + 1] = value >> 48 ;
-	ptr [offset + 2] = value >> 40 ;
-	ptr [offset + 3] = value >> 32 ;
-	ptr [offset + 4] = value >> 24 ;
-	ptr [offset + 5] = value >> 16 ;
-	ptr [offset + 6] = value >> 8 ;
-	ptr [offset + 7] = value ;
+	ptr [offset] = (uint8_t) (value >> 56) ;
+	ptr [offset + 1] = (uint8_t) (value >> 48) ;
+	ptr [offset + 2] = (uint8_t) (value >> 40) ;
+	ptr [offset + 3] = (uint8_t) (value >> 32) ;
+	ptr [offset + 4] = (uint8_t) (value >> 24) ;
+	ptr [offset + 5] = (uint8_t) (value >> 16) ;
+	ptr [offset + 6] = (uint8_t) (value >> 8) ;
+	ptr [offset + 7] = (uint8_t) value ;
 } /* psf_put_be64 */
 
 static inline void
 psf_put_be32 (uint8_t *ptr, int offset, int32_t value)
 {
-	ptr [offset] = value >> 24 ;
-	ptr [offset + 1] = value >> 16 ;
-	ptr [offset + 2] = value >> 8 ;
-	ptr [offset + 3] = value ;
+	ptr [offset] = (uint8_t) (value >> 24) ;
+	ptr [offset + 1] = (uint8_t) (value >> 16) ;
+	ptr [offset + 2] = (uint8_t) (value >> 8) ;
+	ptr [offset + 3] = (uint8_t) value ;
 } /* psf_put_be32 */
 
 static inline void
 psf_put_be16 (uint8_t *ptr, int offset, int16_t value)
 {
-	ptr [offset] = value >> 8 ;
-	ptr [offset + 1] = value ;
+	ptr [offset] = (uint8_t) (value >> 8) ;
+	ptr [offset + 1] = (uint8_t) value ;
 } /* psf_put_be16 */
 
 static inline int64_t
@@ -202,7 +202,7 @@ psf_get_be64 (uint8_t *ptr, int offset)
 	value += ptr [offset + 2] << 8 ;
 	value += ptr [offset + 3] ;
 
-	value = ((uint64_t) value) << 32 ;
+	value = (int64_t) (((uint64_t) value) << 32) ;
 
 	value += ((uint32_t) ptr [offset + 4]) << 24 ;
 	value += ptr [offset + 5] << 16 ;
@@ -220,7 +220,7 @@ psf_get_le64 (uint8_t *ptr, int offset)
 	value += ptr [offset + 5] << 8 ;
 	value += ptr [offset + 4] ;
 
-	value = ((uint64_t) value) << 32 ;
+	value = (int64_t) (((uint64_t) value) << 32) ;
 
 	value += ((uint32_t) ptr [offset + 3]) << 24 ;
 	value += ptr [offset + 2] << 16 ;
@@ -273,7 +273,7 @@ psf_get_le24 (uint8_t *ptr, int offset)
 
 static inline int16_t
 psf_get_be16 (uint8_t *ptr, int offset)
-{	return (ptr [offset] << 8) + ptr [offset + 1] ;
+{	return (int16_t) (ptr [offset] << 8) + ptr [offset + 1] ;
 } /* psf_get_be16 */
 
 /*-----------------------------------------------------------------------------------------------
