@@ -24,33 +24,47 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-
 #if HAVE_BYTESWAP_H			/* Linux, any CPU */
 #include <byteswap.h>
 
 #define	ENDSWAP_16(x)		(bswap_16 (x))
 #define	ENDSWAP_32(x)		(bswap_32 (x))
 #define	ENDSWAP_64(x)		(bswap_64 (x))
+
+#elif defined __has_builtin
+
+#if __has_builtin (__builtin_bswap16)
+#define ENDSWAP_16(x) ((int16_t) __builtin_bswap16 ((uint16_t) x))
 #endif
 
+#if __has_builtin (__builtin_bswap32)
+#define ENDSWAP_32(x) ((int32_t) __builtin_bswap32 ((uint32_t) x))
+#endif
 
-#if (HAVE_BYTESWAP_H == 0) && COMPILER_IS_GCC
+#if __has_builtin (__builtin_bswap64)
+#define ENDSWAP_64(x) ((int64_t) __builtin_bswap64 ((uint64_t) x))
+#endif
+
+#elif COMPILER_IS_GCC
 
 #if CPU_IS_X86
 
 static inline int16_t
-ENDSWAP_16 (int16_t x)
+ENDSWAP_16X (int16_t x)
 {	int16_t y ;
 	__asm__ ("rorw $8, %w0" : "=r" (y) : "0" (x) : "cc") ;
 	return y ;
 } /* ENDSWAP_16 */
 
 static inline int32_t
-ENDSWAP_32 (int32_t x)
+ENDSWAP_32X (int32_t x)
 {	int32_t y ;
 	__asm__ ("bswap %0" : "=r" (y) : "0" (x)) ;
 	return y ;
 } /* ENDSWAP_32 */
+
+#define ENDSWAP_16 ENDSWAP_16X
+#define ENDSWAP_32 ENDSWAP_32X
 
 #endif
 
@@ -66,9 +80,8 @@ ENDSWAP_64X (int64_t x)
 #define ENDSWAP_64 ENDSWAP_64X
 
 #endif
-#endif
 
-#ifdef _MSC_VER
+#elif _MSC_VER
 #include <stdlib.h>
 
 #define	ENDSWAP_16(x)		(_byteswap_ushort (x))
