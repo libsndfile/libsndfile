@@ -388,7 +388,7 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 	psf->is_pipe = psf_is_pipe (psf) ;
 	psf->fileoffset = psf_ftell (psf) ;
 
-	SNDFILE *result = psf_open_file (psf, sfinfo) ;
+	result = psf_open_file (psf, sfinfo) ;
 	if (result != NULL && ! close_desc)
 			psf->file.do_not_close_descriptor = SF_TRUE ;
 
