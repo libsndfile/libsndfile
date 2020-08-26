@@ -27,6 +27,12 @@
 #include	"sfendian.h"
 #include	"common.h"
 
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#elif defined _WIN32
+#include <io.h>
+#endif
+
 #define		SNDFILE_MAGICK	0x1234C0DE
 
 #ifdef __APPLE__
@@ -356,14 +362,21 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 SNDFILE*
 sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 {	SF_PRIVATE 	*psf ;
+	SNDFILE		*result ;
 
 	if ((SF_CONTAINER (sfinfo->format)) == SF_FORMAT_SD2)
 	{	sf_errno = SFE_SD2_FD_DISALLOWED ;
+		if (close_desc)
+			close (fd) ;
+
 		return	NULL ;
 		} ;
 
 	if ((psf = psf_allocate ()) == NULL)
 	{	sf_errno = SFE_MALLOC_FAILED ;
+		if (close_desc)
+			close (fd) ;
+
 		return	NULL ;
 		} ;
 
@@ -375,10 +388,11 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 	psf->is_pipe = psf_is_pipe (psf) ;
 	psf->fileoffset = psf_ftell (psf) ;
 
-	if (! close_desc)
-		psf->file.do_not_close_descriptor = SF_TRUE ;
+	result = psf_open_file (psf, sfinfo) ;
+	if (result != NULL && ! close_desc)
+			psf->file.do_not_close_descriptor = SF_TRUE ;
 
-	return psf_open_file (psf, sfinfo) ;
+	return result ;
 } /* sf_open_fd */
 
 SNDFILE*
