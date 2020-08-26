@@ -362,6 +362,7 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 SNDFILE*
 sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 {	SF_PRIVATE 	*psf ;
+	SNDFILE		*result ;
 
 	if ((SF_CONTAINER (sfinfo->format)) == SF_FORMAT_SD2)
 	{	sf_errno = SFE_SD2_FD_DISALLOWED ;
@@ -387,10 +388,11 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 	psf->is_pipe = psf_is_pipe (psf) ;
 	psf->fileoffset = psf_ftell (psf) ;
 
-	if (! close_desc)
-		psf->file.do_not_close_descriptor = SF_TRUE ;
+	SNDFILE *result = psf_open_file (psf, sfinfo) ;
+	if (result != NULL && ! close_desc)
+			psf->file.do_not_close_descriptor = SF_TRUE ;
 
-	return psf_open_file (psf, sfinfo) ;
+	return result ;
 } /* sf_open_fd */
 
 SNDFILE*
