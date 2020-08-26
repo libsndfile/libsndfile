@@ -27,6 +27,12 @@
 #include	"sfendian.h"
 #include	"common.h"
 
+#if HAVE_UNISTD_H
+#include <unistd.h>
+#elif defined _WIN32
+#include <io.h>
+#endif
+
 #define		SNDFILE_MAGICK	0x1234C0DE
 
 #ifdef __APPLE__
@@ -359,11 +365,17 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 
 	if ((SF_CONTAINER (sfinfo->format)) == SF_FORMAT_SD2)
 	{	sf_errno = SFE_SD2_FD_DISALLOWED ;
+		if (close_desc)
+			close (fd) ;
+
 		return	NULL ;
 		} ;
 
 	if ((psf = psf_allocate ()) == NULL)
 	{	sf_errno = SFE_MALLOC_FAILED ;
+		if (close_desc)
+			close (fd) ;
+
 		return	NULL ;
 		} ;
 
