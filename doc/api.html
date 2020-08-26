@@ -618,7 +618,8 @@ reached during the read, the return value should equal the number of
 objects requested. Attempts to read beyond the end of the file will
 not result in an error but will cause the read functions to return
 less than the number of objects requested or 0 if already at the end
-of the file.
+of the file. When the buffer is not is not completely filled, unused
+buffer space is filled by zeroes.
 </P>
 
 <A NAME="write"></A>
