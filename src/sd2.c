@@ -529,7 +529,7 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 		if (id_offset < 0 || id_offset + 1 >= rsrc->rsrc_len)
 		{	psf_log_printf (psf, "Exiting parser on id_offset of %d.\n", id_offset) ;
 			break ;
-		}
+			}
 		rsrc_id = read_rsrc_short (rsrc, id_offset) ;
 
 		data_offset = rsrc->data_offset + read_rsrc_int (rsrc, rsrc->item_offset + k * 12 + 4) ;
