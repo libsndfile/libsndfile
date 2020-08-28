@@ -12,10 +12,15 @@ jobs:
           ubuntu-latest-clang-autotools,
           macos-latest-autotools,
           ubuntu-latest-gcc-cmake,
+          ubuntu-latest-gcc-cmake-shared,
           ubuntu-latest-clang-cmake,
+          ubuntu-latest-clang-cmake-shared,
           macos-latest-cmake,
+          macos-latest-cmake-shared,
           windows-latest-vs2019-x64,
-          windows-latest-vs2019-Win32
+          windows-latest-vs2019-x64-shared,
+          windows-latest-vs2019-Win32,
+          windows-latest-vs2019-Win32-shared
         ]
         include:
           - name: ubuntu-latest-gcc-autotools
@@ -44,6 +49,14 @@ jobs:
             cmake-generator: 'Ninja'
             cmake-options: '-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-Wall -Wextra" -DCMAKE_VERBOSE_MAKEFILE=ON'
 
+          - name: ubuntu-latest-gcc-cmake-shared
+            os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+            build-system: cmake
+            cmake-generator: 'Ninja'
+            cmake-options: '-DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_C_FLAGS="-Wall -Wextra" -DCMAKE_VERBOSE_MAKEFILE=ON'
+
           - name: ubuntu-latest-clang-cmake
             os: ubuntu-latest
             cc: clang
@@ -51,6 +64,14 @@ jobs:
             build-system: cmake
             cmake-generator: 'Ninja'
             cmake-options: '-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-Wall -Wextra" -DCMAKE_VERBOSE_MAKEFILE=ON'
+
+          - name: ubuntu-latest-clang-cmake-shared
+            os: ubuntu-latest
+            cc: clang
+            cxx: clang++
+            build-system: cmake
+            cmake-generator: 'Ninja'
+            cmake-options: '-DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_C_FLAGS="-Wall -Wextra" -DCMAKE_VERBOSE_MAKEFILE=ON'
 
           - name: macos-latest-cmake
             os: macos-latest
@@ -60,6 +81,14 @@ jobs:
             cmake-generator: 'Unix Makefiles'
             cmake-options: '-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-Wall -Wextra" -DCMAKE_VERBOSE_MAKEFILE=ON'
 
+          - name: macos-latest-cmake-shared
+            os: macos-latest
+            cc: clang
+            cxx: clang++
+            build-system: cmake
+            cmake-generator: 'Unix Makefiles'
+            cmake-options: '-DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_C_FLAGS="-Wall -Wextra" -DCMAKE_VERBOSE_MAKEFILE=ON'
+
           - name: windows-latest-vs2019-x64
             os: windows-latest
             triplet: 'x64-windows-static'
@@ -67,12 +96,26 @@ jobs:
             cmake-generator: 'Visual Studio 16 2019'
             cmake-options: '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug> -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake'
 
+          - name: windows-latest-vs2019-x64-shared
+            os: windows-latest
+            triplet: 'x64-windows-static'
+            build-system: cmake
+            cmake-generator: 'Visual Studio 16 2019'
+            cmake-options: '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug> -DBUILD_SHARED_LIBS=ON -DBUILD_REGTEST=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_PKGCONFIG_MODULE=OFF -DCPACK_PACKAGE_NAME=libsndfile -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x64-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake'
+
           - name: windows-latest-vs2019-Win32
             os: windows-latest
             triplet: 'x86-windows-static'
             build-system: cmake
             cmake-generator: 'Visual Studio 16 2019'
             cmake-options: '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug> -DCMAKE_GENERATOR_PLATFORM=Win32 -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x86-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake'
+
+          - name: windows-latest-vs2019-Win32-shared
+            os: windows-latest
+            triplet: 'x86-windows-static'
+            build-system: cmake
+            cmake-generator: 'Visual Studio 16 2019'
+            cmake-options: '-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug> -DCMAKE_GENERATOR_PLATFORM=Win32 -DBUILD_SHARED_LIBS=ON -DBUILD_REGTEST=OFF -DBUILD_EXAMPLES=OFF -DINSTALL_PKGCONFIG_MODULE=OFF -DCPACK_PACKAGE_NAME=libsndfile -DCMAKE_BUILD_TYPE=Release -DVCPKG_TARGET_TRIPLET=x86-windows-static -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake'
 
     runs-on: ${{ matrix.os }}    
     steps:
