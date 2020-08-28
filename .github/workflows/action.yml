@@ -42,7 +42,7 @@ jobs:
             cxx: g++
             build-system: cmake
             cmake-generator: 'Ninja'
-            cmake-options: '-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-Wall -Wextra"'
+            cmake-options: '-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-Wall -Wextra" -DCMAKE_VERBOSE_MAKEFILE=ON'
 
           - name: ubuntu-latest-clang-cmake
             os: ubuntu-latest
@@ -50,7 +50,7 @@ jobs:
             cxx: clang++
             build-system: cmake
             cmake-generator: 'Ninja'
-            cmake-options: '-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-Wall -Wextra"'
+            cmake-options: '-DCMAKE_BUILD_TYPE=Release -DCMAKE_C_FLAGS="-Wall -Wextra" -DCMAKE_VERBOSE_MAKEFILE=ON'
 
           - name: macos-latest-cmake
             os: macos-latest
