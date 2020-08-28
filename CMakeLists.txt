@@ -389,19 +389,31 @@ if (BUILD_SHARED_LIBS)
 				)
 		elseif (SYMBOL_OS MATCHES "darwin")
 			add_dependencies (sndfile GENFILES)
-			set_property (TARGET sndfile APPEND_STRING PROPERTY
-				LINK_FLAGS " -Wl,-exported_symbols_list -Wl,${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}"
-				)
+			if (CMAKE_VERSION VERSION_LESS 3.13)
+				set_property (TARGET sndfile APPEND_STRING PROPERTY
+					LINK_FLAGS "-Wl,-exported_symbols_list -Wl,${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}"
+					)
+			else ()
+				target_link_options (sndfile PRIVATE "LINKER:-exported_symbols_list,${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}")
+			endif()
 		elseif (SYMBOL_OS MATCHES "os")
 			add_dependencies (sndfile GENFILES)
-			set_property (TARGET sndfile APPEND_STRING PROPERTY
-				LINK_FLAGS " -Wl,-export-symbols ${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}"
-				)
+			if (CMAKE_VERSION VERSION_LESS 3.13)
+				set_property (TARGET sndfile APPEND_STRING PROPERTY
+					LINK_FLAGS "-Wl,-export-symbols ${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}"
+					)
+			else ()
+				target_link_options (sndfile PRIVATE "LINKER:-export-symbols ${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}")
+			endif()
 		elseif (UNIX)
 			add_dependencies (sndfile GENFILES)
-			set_property (TARGET sndfile APPEND_STRING PROPERTY
-				LINK_FLAGS " -Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}"
-				)
+			if (CMAKE_VERSION VERSION_LESS 3.13)
+				set_property (TARGET sndfile APPEND_STRING PROPERTY
+					LINK_FLAGS "-Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}"
+					)
+			else ()
+				target_link_options (sndfile PRIVATE "LINKER:--version-script,${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}")
+			endif()
 		endif()
 	endif()
 
