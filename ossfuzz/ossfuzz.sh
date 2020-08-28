@@ -16,12 +16,15 @@ echo "OUT: ${OUT:-}"
 export MAKEFLAGS+="-j$(nproc)"
 
 # Install dependencies
-apt-get -y install autoconf autogen automake libasound2-dev \
-    libflac-dev libogg-dev libopus-dev libtool libvorbis-dev pkg-config python
+apt-get -y install autoconf autogen automake libtool pkg-config python
+
+# For now, do not install the following libraries (as they won't be in the
+# final image):
+# libasound2-dev libflac-dev libogg-dev libopus-dev libvorbis-dev
 
 # Compile the fuzzer.
 ./autogen.sh
-./configure --enable-ossfuzzers
+./configure --disable-shared --enable-ossfuzzers
 make V=1
 
 # Copy the fuzzer to the output directory.
