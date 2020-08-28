@@ -712,10 +712,10 @@ if (UNIX)
 		man/sndfile-convert.1
 		man/sndfile-cmp.1
 		man/sndfile-metadata-get.1
-		#man/sndfile-metadata-set.1
+		man/sndfile-metadata-set.1
 		man/sndfile-concat.1
 		man/sndfile-interleave.1
-		#man/sndfile-deinterleave.1
+		man/sndfile-deinterleave.1
 		man/sndfile-salvage.1
 		)
 	install (FILES ${man_MANS} DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
