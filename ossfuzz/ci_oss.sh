@@ -7,8 +7,10 @@ PROJECT_NAME=libsndfile
 # Clone the oss-fuzz repository
 git clone https://github.com/google/oss-fuzz.git /tmp/ossfuzz
 
-# TODO: Verify that the GITHUB variables below are correct for a PR
+# TODO: Verify that the GITHUB variables below are correct for a PR. Exit
+# before proceeding any further.
 env | grep "GITHUB_"
+exit 0
 
 if [[ ! -d /tmp/ossfuzz/projects/${PROJECT_NAME} ]]
 then

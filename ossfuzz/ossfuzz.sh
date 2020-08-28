@@ -21,7 +21,7 @@ apt-get -y install autoconf autogen automake libasound2-dev \
 
 # Compile the fuzzer.
 ./autogen.sh
-./configure --enable-werror --enable-ossfuzzers
+./configure --enable-ossfuzzers
 make V=1
 
 # Copy the fuzzer to the output directory.
