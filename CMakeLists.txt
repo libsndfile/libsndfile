@@ -71,7 +71,7 @@ if (NOT ENABLE_CPU_CLIP)
 	set (CPU_CLIPS_POSITIVE FALSE)
 	set (CPU_CLIPS_NEGATIVE FALSE)
 endif ()
-cmake_dependent_option (ENABLE_COMPATIBLE_LIBSNDFILE_NAME "Set DLL name to libsndfile-1.dll (canonical name), sndfile.dll otherwise" OFF "WIN32;NOT MINGW;BUILD_SHARED_LIBS" OFF)
+cmake_dependent_option (ENABLE_COMPATIBLE_LIBSNDFILE_NAME "Set DLL name to libsndfile-1.dll (canonical name), sndfile.dll otherwise" OFF "WIN32;BUILD_SHARED_LIBS" OFF)
 
 set (HAVE_EXTERNAL_XIPH_LIBS ${ENABLE_EXTERNAL_LIBS})
 set (HAVE_SQLITE3 ${BUILD_REGTEST})
@@ -92,7 +92,7 @@ add_feature_info (ENABLE_CPU_CLIP ENABLE_CPU_CLIP "Enable tricky cpu specific cl
 add_feature_info (ENABLE_BOW_DOCS ENABLE_BOW_DOCS "enable black-on-white html docs")
 add_feature_info (ENABLE_PACKAGE_CONFIG ENABLE_PACKAGE_CONFIG "generate and install package config file")
 add_feature_info (INSTALL_PKGCONFIG_MODULE INSTALL_PKGCONFIG_MODULE "generate and install pkg-config module")
-if (WIN32 AND (NOT MINGW) AND BUILD_SHARED_LIBS)
+if (WIN32 AND BUILD_SHARED_LIBS)
 	add_feature_info (ENABLE_COMPATIBLE_LIBSNDFILE_NAME ENABLE_COMPATIBLE_LIBSNDFILE_NAME "Set DLL name to libsndfile-1.dll (canonical name), sndfile.dll otherwise")
 endif ()
 
@@ -327,9 +327,15 @@ set_target_properties (sndfile PROPERTIES
 	)
 
 if (ENABLE_COMPATIBLE_LIBSNDFILE_NAME)
-	set_target_properties (sndfile PROPERTIES
-		RUNTIME_OUTPUT_NAME "libsndfile-1"
-		)
+	if (MINGW OR CYGWIN)
+		set_target_properties (sndfile PROPERTIES
+			RUNTIME_OUTPUT_NAME "sndfile-1"
+			)
+	else ()
+		set_target_properties (sndfile PROPERTIES
+			RUNTIME_OUTPUT_NAME "libsndfile-1"
+			)
+	endif ()
 endif ()
 
 if (BUILD_SHARED_LIBS)
