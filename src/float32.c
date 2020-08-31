@@ -549,7 +549,7 @@ host_read_f2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 
 	convert = (psf->add_clipping) ? f2i_clip_array : f2i_array ;
 	bufferlen = ARRAY_LEN (ubuf.fbuf) ;
-	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFFFFFF / psf->float_max ;
+	scale = (psf->float_int_mult == 0) ? 1.0 : 2147483648.0f / psf->float_max ;
 
 	while (len > 0)
 	{	if (len < bufferlen)

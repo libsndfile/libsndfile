@@ -159,7 +159,7 @@ static void Fast_Autocorrelation (
 		for (i = k ; i < 160 ; ++i) L_temp2 += sf [i] * sfl [i] ;
 		f_L_ACF [k] = L_temp2 ;
 		}
-	scale = MAX_LONGWORD / f_L_ACF [0] ;
+	scale = 2147483648.0f / f_L_ACF [0] ;
 
 	for (k = 0 ; k <= 8 ; k++)
 		L_ACF [k] = f_L_ACF [k] * scale ;
