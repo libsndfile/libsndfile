@@ -63,7 +63,7 @@ void	write_mono_file (const char * filename, int format, int srate, float * outp
 #ifdef __GNUC__
 static inline void
 exit_if_true (int test, const char *format, ...)
-#if (defined (__USE_MINGW_ANSI_STDIO) && __USE_MINGW_ANSI_STDIO)
+#if (defined (__USE_MINGW_ANSI_STDIO) && __USE_MINGW_ANSI_STDIO && !defined (__clang__))
 	__attribute__ ((format (gnu_printf, 2, 3))) ;
 #else
 	__attribute__ ((format (printf, 2, 3))) ;
