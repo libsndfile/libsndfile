@@ -108,7 +108,7 @@ float_checksum (SNDFILE * file, int start)
 	do
 	{	count = (int) sf_read_float (file, data.f, ARRAY_LEN (data.f)) ;
 		for (k = 0 ; k < count ; k++)
-			start = start * BIG_PRIME + lrintf (0x7FFFFFFF * data.f [k]) ;
+			start = start * BIG_PRIME + lrintf (2147483648.0f * data.f [k]) ;
 		}
 	while (count > 0) ;
 

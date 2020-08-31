@@ -233,7 +233,7 @@ dither_write_short	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 			return pdither->write_short (psf, ptr, len) ;
 		} ;
 
-	bufferlen = sizeof (pdither->buffer) / sizeof (short) ;
+	bufferlen = sizeof (pdither->buffer) / (sizeof (short)) ;
 
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
@@ -279,7 +279,7 @@ dither_write_int	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 		} ;
 
 
-	bufferlen = sizeof (pdither->buffer) / sizeof (int) ;
+	bufferlen = sizeof (pdither->buffer) / (sizeof (int)) ;
 
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
@@ -324,7 +324,7 @@ dither_write_float	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 			return pdither->write_float (psf, ptr, len) ;
 		} ;
 
-	bufferlen = sizeof (pdither->buffer) / sizeof (float) ;
+	bufferlen = sizeof (pdither->buffer) / (sizeof (float)) ;
 
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (float) len ;

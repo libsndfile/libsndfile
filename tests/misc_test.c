@@ -313,8 +313,8 @@ permission_test (const char *filename, int typemajor)
 {
 #if (OS_IS_WIN32)
 	/* Avoid compiler warnings. */
-	filename = filename ;
-	typemajor = typemajor ;
+	(void) filename ;
+	(void) typemajor ;
 
 	/* Can't run this test on Win32 so return. */
 	return ;
