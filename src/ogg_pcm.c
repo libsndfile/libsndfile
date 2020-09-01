@@ -60,6 +60,7 @@ ogg_pcm_open (SF_PRIVATE *psf)
 
 	if (odata == NULL)
 	{	psf_log_printf (psf, "%s : odata is NULL???\n", __func__) ;
+		free (opcm) ;
 		return SFE_INTERNAL ;
 		} ;
 
