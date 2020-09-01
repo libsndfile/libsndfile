@@ -28,7 +28,9 @@
 ** type and use SIZEOF_TRIBYTE instead of (tribyte).
 */
 
-typedef	void	tribyte ;
+typedef	struct tribyte
+{	uint8_t bytes [3] ;
+	} tribyte ;
 
 #define	SIZEOF_TRIBYTE	3
 
@@ -295,24 +297,14 @@ uc2s_array	(unsigned char *src, int count, short *dest)
 
 static inline void
 let2s_array (tribyte *src, int count, short *dest)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		dest [count] = LET2H_16_PTR (ucptr) ;
-		} ;
+{	while (--count >= 0)
+		dest [count] = LET2H_16_PTR (src [count].bytes) ;
 } /* let2s_array */
 
 static inline void
 bet2s_array (tribyte *src, int count, short *dest)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		dest [count] = BET2H_16_PTR (ucptr) ;
-		} ;
+{	while (--count >= 0)
+		dest [count] = BET2H_16_PTR (src [count].bytes) ;
 } /* bet2s_array */
 
 static inline void
@@ -374,24 +366,14 @@ les2i_array (short *src, int count, int *dest)
 
 static inline void
 bet2i_array (tribyte *src, int count, int *dest)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		dest [count] = psf_get_be24 (ucptr, 0) ;
-		} ;
+{	while (--count >= 0)
+		dest [count] = psf_get_be24 (src [count].bytes, 0) ;
 } /* bet2i_array */
 
 static inline void
 let2i_array (tribyte *src, int count, int *dest)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) src) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		dest [count] = psf_get_le24 (ucptr, 0) ;
-		} ;
+{	while (--count >= 0)
+		dest [count] = psf_get_le24 (src [count].bytes, 0) ;
 } /* let2i_array */
 
 /*--------------------------------------------------------------------------
@@ -433,26 +415,20 @@ bes2f_array (short *src, int count, float *dest, float normfact)
 
 static inline void
 let2f_array (tribyte *src, int count, float *dest, float normfact)
-{	unsigned char	*ucptr ;
-	int 			value ;
+{	int value ;
 
-	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = psf_get_le24 (ucptr, 0) ;
+	{	value = psf_get_le24 (src [count].bytes, 0) ;
 		dest [count] = ((float) value) * normfact ;
 		} ;
 } /* let2f_array */
 
 static inline void
 bet2f_array (tribyte *src, int count, float *dest, float normfact)
-{	unsigned char	*ucptr ;
-	int				value ;
+{	int value ;
 
-	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = psf_get_be24 (ucptr, 0) ;
+	{	value = psf_get_be24 (src [count].bytes, 0) ;
 		dest [count] = ((float) value) * normfact ;
 		} ;
 } /* bet2f_array */
@@ -518,26 +494,20 @@ bes2d_array (short *src, int count, double *dest, double normfact)
 
 static inline void
 let2d_array (tribyte *src, int count, double *dest, double normfact)
-{	unsigned char	*ucptr ;
-	int				value ;
+{	int value ;
 
-	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = psf_get_le24 (ucptr, 0) ;
+	{	value = psf_get_le24 (src [count].bytes, 0) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
 } /* let2d_array */
 
 static inline void
 bet2d_array (tribyte *src, int count, double *dest, double normfact)
-{	unsigned char	*ucptr ;
-	int				value ;
+{	int value ;
 
-	ucptr = ((unsigned char*) src) + 3 * count ;
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = psf_get_be24 (ucptr, 0) ;
+	{	value = psf_get_be24 (src [count].bytes, 0) ;
 		dest [count] = ((double) value) * normfact ;
 		} ;
 } /* bet2d_array */
@@ -581,27 +551,19 @@ s2uc_array	(const short *src, unsigned char *dest, int count)
 
 static inline void
 s2let_array (const short *src, tribyte *dest, int count)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) dest) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		ucptr [0] = 0 ;
-		ucptr [1] = src [count] ;
-		ucptr [2] = src [count] >> 8 ;
+{	while (--count >= 0)
+	{	dest [count].bytes [0] = 0 ;
+		dest [count].bytes [1] = src [count] ;
+		dest [count].bytes [2] = src [count] >> 8 ;
 		} ;
 } /* s2let_array */
 
 static inline void
 s2bet_array (const short *src, tribyte *dest, int count)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) dest) + 3 * count ;
-	while (--count >= 0)
-	{	ucptr -= 3 ;
-		ucptr [2] = 0 ;
-		ucptr [1] = src [count] ;
-		ucptr [0] = src [count] >> 8 ;
+{	while (--count >= 0)
+	{	dest [count].bytes [2] = 0 ;
+		dest [count].bytes [1] = src [count] ;
+		dest [count].bytes [0] = src [count] >> 8 ;
 		} ;
 } /* s2bet_array */
 
@@ -674,31 +636,25 @@ i2les_array (const int *src, short *dest, int count)
 
 static inline void
 i2let_array (const int *src, tribyte *dest, int count)
-{	unsigned char	*ucptr ;
-	int				value ;
+{	int value ;
 
-	ucptr = ((unsigned char*) dest) + 3 * count ;
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = src [count] >> 8 ;
-		ucptr [0] = value ;
-		ucptr [1] = value >> 8 ;
-		ucptr [2] = value >> 16 ;
+	{	value = src [count] >> 8 ;
+		dest [count].bytes [0] = value ;
+		dest [count].bytes [1] = value >> 8 ;
+		dest [count].bytes [2] = value >> 16 ;
 		} ;
 } /* i2let_array */
 
 static inline void
 i2bet_array (const int *src, tribyte *dest, int count)
-{	unsigned char	*ucptr ;
-	int				value ;
+{	int value ;
 
-	ucptr = ((unsigned char*) dest) + 3 * count ;
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = src [count] >> 8 ;
-		ucptr [2] = value ;
-		ucptr [1] = value >> 8 ;
-		ucptr [0] = value >> 16 ;
+	{	value = src [count] >> 8 ;
+		dest [count].bytes [2] = value ;
+		dest [count].bytes [1] = value >> 8 ;
+		dest [count].bytes [0] = value >> 16 ;
 		} ;
 } /* i2bet_array */
 
@@ -2069,51 +2025,45 @@ pcm_write_f2les	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 
 static void
 f2let_array (const float *src, tribyte *dest, int count, int normalize)
-{	unsigned char	*ucptr ;
-	float 			normfact ;
-	int				value ;
+{	float	normfact ;
+	int		value ;
 
 	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0 ;
-	ucptr = ((unsigned char*) dest) + 3 * count ;
 
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = lrintf (src [count] * normfact) ;
-		ucptr [0] = value ;
-		ucptr [1] = value >> 8 ;
-		ucptr [2] = value >> 16 ;
+	{	value = lrintf (src [count] * normfact) ;
+		dest [count].bytes [0] = value ;
+		dest [count].bytes [1] = value >> 8 ;
+		dest [count].bytes [2] = value >> 16 ;
 		} ;
 } /* f2let_array */
 
 static void
 f2let_clip_array (const float *src, tribyte *dest, int count, int normalize)
-{	unsigned char	*ucptr ;
-	float			normfact, scaled_value ;
-	int				value ;
+{	float	normfact, scaled_value ;
+	int		value ;
 
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100) ;
-	ucptr = ((unsigned char*) dest) + 3 * count ;
 
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		scaled_value = src [count] * normfact ;
+	{	scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
-		{	ucptr [0] = 0xFF ;
-			ucptr [1] = 0xFF ;
-			ucptr [2] = 0x7F ;
+		{	dest [count].bytes [0] = 0xFF ;
+			dest [count].bytes [1] = 0xFF ;
+			dest [count].bytes [2] = 0x7F ;
 			continue ;
 			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
-		{	ucptr [0] = 0x00 ;
-			ucptr [1] = 0x00 ;
-			ucptr [2] = 0x80 ;
+		{	dest [count].bytes [0] = 0x00 ;
+			dest [count].bytes [1] = 0x00 ;
+			dest [count].bytes [2] = 0x80 ;
 			continue ;
 		} ;
 
 		value = lrintf (scaled_value) ;
-		ucptr [0] = value >> 8 ;
-		ucptr [1] = value >> 16 ;
-		ucptr [2] = value >> 24 ;
+		dest [count].bytes [0] = value >> 8 ;
+		dest [count].bytes [1] = value >> 16 ;
+		dest [count].bytes [2] = value >> 24 ;
 		} ;
 } /* f2let_clip_array */
 
@@ -2146,51 +2096,45 @@ pcm_write_f2let	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 
 static void
 f2bet_array (const float *src, tribyte *dest, int count, int normalize)
-{	unsigned char	*ucptr ;
-	float 			normfact ;
-	int				value ;
+{	float	normfact ;
+	int		value ;
 
 	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0 ;
-	ucptr = ((unsigned char*) dest) + 3 * count ;
 
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = lrintf (src [count] * normfact) ;
-		ucptr [0] = value >> 16 ;
-		ucptr [1] = value >> 8 ;
-		ucptr [2] = value ;
+	{	value = lrintf (src [count] * normfact) ;
+		dest [count].bytes [0] = value >> 16 ;
+		dest [count].bytes [1] = value >> 8 ;
+		dest [count].bytes [2] = value ;
 		} ;
 } /* f2bet_array */
 
 static void
 f2bet_clip_array (const float *src, tribyte *dest, int count, int normalize)
-{	unsigned char	*ucptr ;
-	float			normfact, scaled_value ;
-	int				value ;
+{	float	normfact, scaled_value ;
+	int		value ;
 
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100) ;
-	ucptr = ((unsigned char*) dest) + 3 * count ;
 
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		scaled_value = src [count] * normfact ;
+	{	scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
-		{	ucptr [0] = 0x7F ;
-			ucptr [1] = 0xFF ;
-			ucptr [2] = 0xFF ;
+		{	dest [count].bytes [0] = 0x7F ;
+			dest [count].bytes [1] = 0xFF ;
+			dest [count].bytes [2] = 0xFF ;
 			continue ;
 			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
-		{	ucptr [0] = 0x80 ;
-			ucptr [1] = 0x00 ;
-			ucptr [2] = 0x00 ;
+		{	dest [count].bytes [0] = 0x80 ;
+			dest [count].bytes [1] = 0x00 ;
+			dest [count].bytes [2] = 0x00 ;
 			continue ;
 		} ;
 
 		value = lrint (scaled_value) ;
-		ucptr [0] = value >> 24 ;
-		ucptr [1] = value >> 16 ;
-		ucptr [2] = value >> 8 ;
+		dest [count].bytes [0] = value >> 24 ;
+		dest [count].bytes [1] = value >> 16 ;
+		dest [count].bytes [2] = value >> 8 ;
 		} ;
 } /* f2bet_clip_array */
 
@@ -2648,51 +2592,45 @@ pcm_write_d2les	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 static void
 d2let_array (const double *src, tribyte *dest, int count, int normalize)
-{	unsigned char	*ucptr ;
-	int				value ;
-	double			normfact ;
+{	int		value ;
+	double	normfact ;
 
 	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0 ;
-	ucptr = ((unsigned char*) dest) + 3 * count ;
 
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = lrint (src [count] * normfact) ;
-		ucptr [0] = value ;
-		ucptr [1] = value >> 8 ;
-		ucptr [2] = value >> 16 ;
+	{	value = lrint (src [count] * normfact) ;
+		dest [count].bytes [0] = value ;
+		dest [count].bytes [1] = value >> 8 ;
+		dest [count].bytes [2] = value >> 16 ;
 		} ;
 } /* d2let_array */
 
 static void
 d2let_clip_array (const double *src, tribyte *dest, int count, int normalize)
-{	unsigned char	*ucptr ;
-	int				value ;
-	double			normfact, scaled_value ;
+{	int		value ;
+	double	normfact, scaled_value ;
 
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100) ;
-	ucptr = ((unsigned char*) dest) + 3 * count ;
 
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		scaled_value = src [count] * normfact ;
+	{	scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
-		{	ucptr [0] = 0xFF ;
-			ucptr [1] = 0xFF ;
-			ucptr [2] = 0x7F ;
+		{	dest [count].bytes [0] = 0xFF ;
+			dest [count].bytes [1] = 0xFF ;
+			dest [count].bytes [2] = 0x7F ;
 			continue ;
 			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
-		{	ucptr [0] = 0x00 ;
-			ucptr [1] = 0x00 ;
-			ucptr [2] = 0x80 ;
+		{	dest [count].bytes [0] = 0x00 ;
+			dest [count].bytes [1] = 0x00 ;
+			dest [count].bytes [2] = 0x80 ;
 			continue ;
 			} ;
 
 		value = lrint (scaled_value) ;
-		ucptr [0] = value >> 8 ;
-		ucptr [1] = value >> 16 ;
-		ucptr [2] = value >> 24 ;
+		dest [count].bytes [0] = value >> 8 ;
+		dest [count].bytes [1] = value >> 16 ;
+		dest [count].bytes [2] = value >> 24 ;
 		} ;
 } /* d2let_clip_array */
 
@@ -2725,51 +2663,45 @@ pcm_write_d2let	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 static void
 d2bet_array (const double *src, tribyte *dest, int count, int normalize)
-{	unsigned char	*ucptr ;
-	int				value ;
-	double			normfact ;
+{	int		value ;
+	double	normfact ;
 
 	normfact = normalize ? (1.0 * 0x7FFFFF) : 1.0 ;
-	ucptr = ((unsigned char*) dest) + 3 * count ;
 
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		value = lrint (src [count] * normfact) ;
-		ucptr [2] = value ;
-		ucptr [1] = value >> 8 ;
-		ucptr [0] = value >> 16 ;
+	{	value = lrint (src [count] * normfact) ;
+		dest [count].bytes [2] = value ;
+		dest [count].bytes [1] = value >> 8 ;
+		dest [count].bytes [0] = value >> 16 ;
 		} ;
 } /* d2bet_array */
 
 static void
 d2bet_clip_array (const double *src, tribyte *dest, int count, int normalize)
-{	unsigned char	*ucptr ;
-	int				value ;
-	double			normfact, scaled_value ;
+{	int		value ;
+	double	normfact, scaled_value ;
 
 	normfact = normalize ? (8.0 * 0x10000000) : (1.0 * 0x100) ;
-	ucptr = ((unsigned char*) dest) + 3 * count ;
 
 	while (--count >= 0)
-	{	ucptr -= 3 ;
-		scaled_value = src [count] * normfact ;
+	{	scaled_value = src [count] * normfact ;
 		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
-		{	ucptr [2] = 0xFF ;
-			ucptr [1] = 0xFF ;
-			ucptr [0] = 0x7F ;
+		{	dest [count].bytes [2] = 0xFF ;
+			dest [count].bytes [1] = 0xFF ;
+			dest [count].bytes [0] = 0x7F ;
 			continue ;
 			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
-		{	ucptr [2] = 0x00 ;
-			ucptr [1] = 0x00 ;
-			ucptr [0] = 0x80 ;
+		{	dest [count].bytes [2] = 0x00 ;
+			dest [count].bytes [1] = 0x00 ;
+			dest [count].bytes [0] = 0x80 ;
 			continue ;
 			} ;
 
 		value = lrint (scaled_value) ;
-		ucptr [2] = value >> 8 ;
-		ucptr [1] = value >> 16 ;
-		ucptr [0] = value >> 24 ;
+		dest [count].bytes [2] = value >> 8 ;
+		dest [count].bytes [1] = value >> 16 ;
+		dest [count].bytes [0] = value >> 24 ;
 		} ;
 } /* d2bet_clip_array */
 
