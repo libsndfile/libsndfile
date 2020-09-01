@@ -207,7 +207,7 @@ psf_put_be16 (uint8_t *ptr, int offset, int16_t value)
 } /* psf_put_be16 */
 
 static inline int64_t
-psf_get_be64 (uint8_t *ptr, int offset)
+psf_get_be64 (const uint8_t *ptr, int offset)
 {	int64_t value ;
 
 	value = ((uint32_t) ptr [offset]) << 24 ;
@@ -225,7 +225,7 @@ psf_get_be64 (uint8_t *ptr, int offset)
 } /* psf_get_be64 */
 
 static inline int64_t
-psf_get_le64 (uint8_t *ptr, int offset)
+psf_get_le64 (const uint8_t *ptr, int offset)
 {	int64_t value ;
 
 	value = ((uint32_t) ptr [offset + 7]) << 24 ;
@@ -243,7 +243,7 @@ psf_get_le64 (uint8_t *ptr, int offset)
 } /* psf_get_le64 */
 
 static inline int32_t
-psf_get_be32 (uint8_t *ptr, int offset)
+psf_get_be32 (const uint8_t *ptr, int offset)
 {	int32_t value ;
 
 	value = ((uint32_t) ptr [offset]) << 24 ;
@@ -254,7 +254,7 @@ psf_get_be32 (uint8_t *ptr, int offset)
 } /* psf_get_be32 */
 
 static inline int32_t
-psf_get_le32 (uint8_t *ptr, int offset)
+psf_get_le32 (const uint8_t *ptr, int offset)
 {	int32_t value ;
 
 	value = ((uint32_t) ptr [offset + 3]) << 24 ;
@@ -265,7 +265,7 @@ psf_get_le32 (uint8_t *ptr, int offset)
 } /* psf_get_le32 */
 
 static inline int32_t
-psf_get_be24 (uint8_t *ptr, int offset)
+psf_get_be24 (const uint8_t *ptr, int offset)
 {	int32_t value ;
 
 	value = ((uint32_t) ptr [offset]) << 24 ;
@@ -275,7 +275,7 @@ psf_get_be24 (uint8_t *ptr, int offset)
 } /* psf_get_be24 */
 
 static inline int32_t
-psf_get_le24 (uint8_t *ptr, int offset)
+psf_get_le24 (const uint8_t *ptr, int offset)
 {	int32_t value ;
 
 	value = ((uint32_t) ptr [offset + 2]) << 24 ;
@@ -285,7 +285,7 @@ psf_get_le24 (uint8_t *ptr, int offset)
 } /* psf_get_le24 */
 
 static inline int16_t
-psf_get_be16 (uint8_t *ptr, int offset)
+psf_get_be16 (const uint8_t *ptr, int offset)
 {	return (int16_t) (ptr [offset] << 8) + ptr [offset + 1] ;
 } /* psf_get_be16 */
 
