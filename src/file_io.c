@@ -599,6 +599,10 @@ psf_fsync (SF_PRIVATE *psf)
 #include <windows.h>
 #include <io.h>
 
+#ifndef WINAPI_PARTITION_SYSTEM
+#define WINAPI_PARTITION_SYSTEM 0
+#endif
+
 static int psf_close_handle (HANDLE handle) ;
 static HANDLE psf_open_handle (PSF_FILE * pfile) ;
 static sf_count_t psf_get_filelen_handle (HANDLE handle) ;
