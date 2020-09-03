@@ -127,7 +127,7 @@ avr_read_header (SF_PRIVATE *psf)
 	psf_log_printf (psf, "  Channels    : %d\n  Bit width   : %d\n  Signed      : %s\n",
 			(hdr.mono & 1) + 1, hdr.rez, hdr.sign ? "yes" : "no") ;
 
-	switch ((hdr.rez << 16) + (hdr.sign & 1))
+	switch (arith_shift_left (hdr.rez, 16) + (hdr.sign & 1))
 	{	case ((8 << 16) + 0) :
 			psf->sf.format = SF_FORMAT_AVR | SF_FORMAT_PCM_U8 ;
 			psf->bytewidth = 1 ;
