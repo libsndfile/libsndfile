@@ -509,7 +509,8 @@ win32_play_data (Win32_Audio_Data *audio_data)
 	/* fill a buffer if there is more data and we can read it sucessfully */
 	readcount = (audio_data->remaining > audio_data->bufferlen) ? audio_data->bufferlen : (int) audio_data->remaining ;
 
-	thisread = (int) sf_read_short (audio_data->sndfile, (short *) (audio_data->whdr [audio_data->current].lpData), readcount) ;
+	short *lpData = (short *) (void *) audio_data->whdr [audio_data->current].lpData ;
+	thisread = (int) sf_read_short (audio_data->sndfile, lpData, readcount) ;
 
 	audio_data->remaining -= thisread ;
 
