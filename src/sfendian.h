@@ -81,7 +81,7 @@ ENDSWAP_64X (int64_t x)
 
 #endif
 
-#elif _MSC_VER
+#elif defined _MSC_VER
 #include <stdlib.h>
 
 #define	ENDSWAP_16(x)		(_byteswap_ushort (x))
