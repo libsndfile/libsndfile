@@ -740,10 +740,17 @@ wavlike_read_bext_chunk (SF_PRIVATE *psf, uint32_t chunksize)
 
 	psf_log_printf (psf, "bext : %u\n", chunksize) ;
 
-	if ((psf->broadcast_16k = broadcast_var_alloc ()) == NULL)
-	{	psf->error = SFE_MALLOC_FAILED ;
-		return psf->error ;
-		} ;
+	if (!psf->broadcast_16k)
+	{	psf->broadcast_16k = broadcast_var_alloc () ;
+		if (!psf->broadcast_16k)
+		{	psf->error = SFE_MALLOC_FAILED ;
+			return psf->error ;
+			}
+		}
+	else
+	{	psf_log_printf (psf, "bext : found more than one bext chunk, using last one.\n") ;
+		memset (psf->broadcast_16k, 0, sizeof (SF_BROADCAST_INFO_16K)) ;
+		}
 
 	b = psf->broadcast_16k ;
 
