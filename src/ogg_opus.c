@@ -183,32 +183,32 @@
 #define OGG_OPUS_PREROLL (80 * 48) /* 80 milliseconds */
 
 typedef struct
-{	int version ;
+{	uint8_t version ;
 
 	/* Number of channels, 1...255 */
-	int channels ;
+	uint8_t channels ;
 
 	/* Encoder latency, the amount to skip before valid data comes out. */
-	int preskip ;
+	uint16_t preskip ;
 
 	/* The sample rate of a the encoded source, as it may have been converted. */
-	int input_samplerate ;
+	int32_t input_samplerate ;
 
 	/* 'baked-in' gain to apply, dB S7.8 format. Should be zero when possible. */
 	int16_t gain ;
 
 	/* Channel mapping type. See OggOpus spec */
-	int channel_mapping ;
+	uint8_t channel_mapping ;
 
 	/* The rest is only used if channel_mapping != 0 */
 	/* How many streams are there? */
-	int nb_streams ;
+	uint8_t nb_streams ;
 
 	/* How man of those streams are coupled? (aka stereo) */
-	int nb_coupled ;
+	uint8_t nb_coupled ;
 
 	/* Mapping of opus streams to output channels */
-	unsigned char stream_map [255] ;
+	uint8_t stream_map [255] ;
 } OpusHeader ;
 
 typedef struct
@@ -637,6 +637,9 @@ ogg_opus_setup_decoder (SF_PRIVATE *psf, int input_samplerate)
 static int
 ogg_opus_setup_encoder (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 {	int error ;
+	int lookahead ;
+	int nb_streams ;
+	int nb_coupled ;
 
 	/* default page latency value (1000ms) */
 	oopus->u.encode.latency = 1000 * 48 ;
@@ -655,16 +658,16 @@ ogg_opus_setup_encoder (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus
 
 	if (psf->sf.channels <= 2)
 	{	oopus->header.channel_mapping = 0 ;
-		oopus->header.nb_streams = 1 ;
-		oopus->header.nb_coupled = psf->sf.channels - 1 ;
+		nb_streams = 1 ;
+		nb_coupled = psf->sf.channels - 1 ;
 		oopus->header.stream_map [0] = 0 ;
 		oopus->header.stream_map [1] = 1 ;
 
 		oopus->u.encode.state = opus_multistream_encoder_create (
 			psf->sf.samplerate,
 			psf->sf.channels,
-			oopus->header.nb_streams,
-			oopus->header.nb_coupled,
+			nb_streams,
+			nb_coupled,
 			oopus->header.stream_map,
 			OPUS_APPLICATION_AUDIO,
 			&error) ;
@@ -683,17 +686,20 @@ ogg_opus_setup_encoder (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus
 			psf->sf.samplerate,
 			psf->sf.channels,
 			oopus->header.channel_mapping,
-			&oopus->header.nb_streams,
-			&oopus->header.nb_coupled,
+			&nb_streams,
+			&nb_coupled,
 			oopus->header.stream_map,
 			OPUS_APPLICATION_AUDIO,
 			&error) ;
+
 		}
 
 	if (error != OPUS_OK)
 	{	psf_log_printf (psf, "Opus : Error, opus_multistream_encoder_create returned %s\n", opus_strerror (error)) ;
 		return SFE_BAD_OPEN_FORMAT ;
 		} ;
+	oopus->header.nb_streams = nb_streams ;
+	oopus->header.nb_coupled = nb_coupled ;
 
 	opus_multistream_encoder_ctl (oopus->u.encode.state, OPUS_GET_BITRATE (&oopus->u.encode.bitrate)) ;
 	psf_log_printf (psf, "Encoding at target bitrate of %dbps\n", oopus->u.encode.bitrate) ;
@@ -711,12 +717,12 @@ ogg_opus_setup_encoder (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus
 	** GOTCHA: This returns the preskip at the encoder samplerate, not the
 	** granulepos rate of 48000Hz needed for header.preskip.
 	*/
-	error = opus_multistream_encoder_ctl (oopus->u.encode.state, OPUS_GET_LOOKAHEAD (&oopus->header.preskip)) ;
+	error = opus_multistream_encoder_ctl (oopus->u.encode.state, OPUS_GET_LOOKAHEAD (&lookahead)) ;
 	if (error != OPUS_OK)
 	{	psf_log_printf (psf, "Opus : OPUS_GET_LOOKAHEAD returned: %s\n", opus_strerror (error)) ;
 		return SFE_BAD_OPEN_FORMAT ;
 		} ;
-	oopus->header.preskip *= oopus->sr_factor ;
+	oopus->header.preskip = lookahead * oopus->sr_factor ;
 
 	oopus->len = OGG_OPUS_ENCODE_PACKET_LEN (psf->sf.samplerate) ;
 	oopus->buffer = malloc (sizeof (float) * psf->sf.channels * oopus->len) ;
