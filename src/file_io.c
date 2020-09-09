@@ -34,11 +34,21 @@
 
 #include "sfconfig.h"
 
+#if USE_WINDOWS_API
+
+/* Don't include rarely used headers, speed up build */
+#define WIN32_LEAN_AND_MEAN
+
+#include <windows.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #if HAVE_UNISTD_H
 #include <unistd.h>
+#else
+#include <io.h>
 #endif
 
 #if (HAVE_DECL_S_IRGRP == 0)
@@ -595,9 +605,6 @@ psf_fsync (SF_PRIVATE *psf)
 #elif	USE_WINDOWS_API
 
 /* Win32 file i/o functions implemented using native Win32 API */
-
-#include <windows.h>
-#include <io.h>
 
 #ifndef WINAPI_PARTITION_SYSTEM
 #define WINAPI_PARTITION_SYSTEM 0
