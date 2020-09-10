@@ -38,6 +38,7 @@
 
 #if HAVE_SQLITE3
 
+#include <ctype.h>
 #include <sqlite3.h>
 
 typedef struct
@@ -75,9 +76,11 @@ static const char *db_basename (const char *fname);
 
 /* Windows accepts both '\\' and '/' in paths */
 #ifdef _WIN32
-  #define IS_SLASH(c)  ((c) == '\\' || (c) == '/')
+  #define IS_SLASH(c)			((c) == '\\' || (c) == '/')
+  #define HAS_DRIVELETTER(path)	(isalpha ((int)(path[0])) && path[1] == ':' && IS_SLASH(path[2]))
 #else
-  #define IS_SLASH(c)  ((c) == '/')
+  #define IS_SLASH(c)			((c) == '/')
+  #define HAS_DRIVELETTER(path)	0
 #endif
 
 REG_DB *
@@ -189,7 +192,7 @@ db_add_file (REG_DB * db_handle, const char * filepath)
 	sf_close (sndfile) ;
 
 	if (sndfile == NULL)
-	{	printf ("    %s : could not open : %s\n", db->filename, sf_strerror (NULL)) ;
+	{	printf ("    %s : could not open : %s, filepath: '%s'\n", db->filename, sf_strerror (NULL), filepath) ;
 		puts (db->logbuf) ;
 		return 1 ;
 		} ;
@@ -423,10 +426,13 @@ check_file_by_ekey (REGTEST_DB * db, int ekey)
 
 static void
 get_filename_pathname (REGTEST_DB * db, const char *filepath)
-{	const char * basename ;
+{
+	const char * basename = db_basename (filepath) ;
 	int slen ;
 
-	if (!IS_SLASH(filepath [0]))
+	/* Test for a relative path
+	 */
+	if (!IS_SLASH(filepath [0]) && !HAS_DRIVELETTER(filepath))
 	{	memset (db->pathname, 0, sizeof (db->pathname)) ;
 		if (getcwd (db->pathname, sizeof (db->pathname)) == NULL)
 		{	perror ("\ngetcwd failed") ;
@@ -434,19 +440,19 @@ get_filename_pathname (REGTEST_DB * db, const char *filepath)
 			} ;
 
 		slen = strlen (db->pathname) ;
-		db->pathname [slen ++] = '/' ;  /* a '/' is fine for Windows too */
-		snprintf (db->pathname + slen, sizeof (db->pathname) - slen, "%s", filepath) ;
+		/* a '/' is fine for Windows too */
+		snprintf (db->pathname + slen, sizeof (db->pathname) - slen, "/%s", filepath) ;
 		}
 	else
 		snprintf (db->pathname, sizeof (db->pathname), "%s", filepath) ;
+
+	snprintf (db->filename, sizeof (db->filename), "%s", basename) ;
 
 	basename = db_basename (db->pathname) ;
 	if (basename == db->pathname)
 	{	printf ("\nError : bad pathname %s\n", filepath) ;
 		exit (1) ;
 		} ;
-
-	snprintf (db->filename, sizeof (db->filename), "%s", basename) ;
 } /* get filename_pathname */
 
 static void
@@ -499,12 +505,12 @@ callback (void *unused, int argc, char **argv, char **colname)
  */
 static const char *db_basename (const char *fname)
 {
-	const char *base = fname ;
+  const char *base = fname;
 
 #if !defined(_WIN32)
-	const char *slash = strrchr (base, '/') ;
+  const char *slash = strrchr (base, '/');
 
-	if (slash)
+  if (slash)
 		base = slash + 1 ;
 #else
 	if (fname[0] && fname[1] == ':')  {
