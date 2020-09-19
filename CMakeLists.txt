@@ -6,6 +6,8 @@ if (POLICY CMP0091)
 	cmake_policy (SET CMP0091 NEW)
 endif ()
 
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version")
+
 project(sndfile VERSION 1.0.30)
 
 #
