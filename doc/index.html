@@ -6,7 +6,7 @@
 	libsndfile
 	</TITLE>
 	<META NAME="Author"      CONTENT="Erik de Castro Lopo (erikd AT mega-nerd DOT com)">
-    <META NAME="Version"     CONTENT="libsndfile-1.0.29">
+    <META NAME="Version"     CONTENT="libsndfile-1.0.30">
 	<META NAME="Description" CONTENT="The libsndfile Home Page">
 	<META NAME="Keywords"    CONTENT="WAV AIFF AU SVX PAF NIST W64 libsndfile sound audio dsp Linux">
 	<META NAME="ROBOTS" 	 CONTENT="NOFOLLOW">
@@ -185,6 +185,13 @@
 	<LI>Version 1.0.28 (April 2 2017) Fix buffer overruns in FLAC and ID3 handling code. Reduce default
 				header memory requirements. Fix detection of Large File Support for 32 bit systems.
 	<LI>Version 1.0.29 (August 15 2020) Opus support, build system improvements and bug fixes.
+	<LI>Version 1.0.30 (September 19 2020) Bugfix release. Fix file descriptor leaks in sf_open_fd ()
+				function. Fix critical CMake bug leading to broken ABI on Linux platforms. Other
+				numerous fixes to CMake build system, consider it stable now. Fix some memory leaks.
+				Fix handling of some SD2 files. Update documentation. Integrate GitHub Actions for
+				faster test builds and Oss-Fuzz for fuzzing tests. Move sndfile.h.in from src/
+				to include/ directory. To avoid problems, delete old generated sndfile.h from
+				$(top_builddir)/src.
 	</UL>
 
 <A NAME="Similar"></A>

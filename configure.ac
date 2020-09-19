@@ -3,7 +3,7 @@ dnl Copyright (C) 1999-2020  Erik de Castro Lopo <erikd@mega-nerd.com>.
 dnl Require autoconf version >= 2.69
 AC_PREREQ([2.69])
 
-AC_INIT([libsndfile],[1.0.29],[sndfile@mega-nerd.com],
+AC_INIT([libsndfile],[1.0.30],[sndfile@mega-nerd.com],
 		[libsndfile],[http://www.mega-nerd.com/libsndfile/])
 
 dnl Check whether we want to set defaults for CFLAGS, CXXFLAGS, CPPFLAGS and LDFLAGS

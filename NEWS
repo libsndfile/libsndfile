@@ -1,3 +1,34 @@
+Version 1.0.30 (2020-09-18)
+
+  * Fix critical CMake bug with broken ABI of shared libsndfile library.
+  * CMake build system considered to be stable.
+  * Move sndfile.h.in from src/ to include/ directory. To avoid problems,
+    delete old generated sndfile.h from $(top_builddir)/src.
+  * Huge documentation update.
+  * Fix opus test failures on BE platforms, thanks to
+    Arthur Taylor <art@ified.ca>.
+  * Fix bug when sf_open_fd() function sometimes leaves filehandle open, even
+    if `close_desc` parameter is TRUE, thanks to @umläute.
+  * Fix infinite loops on some pathological SD2 files, thanks to
+    Jeremy Friesner <jaf@meyersound.com>.
+  * Switch to GitHub Actions for continuous integration.
+  * Add OSS-Fuzz tests to GitHub Actions workflow, thanks to
+    Max Dymond <cmeister2@gmail.com>.
+  * Fix memory leak in wavlike_read_bext_chunk() function, credit to OSS-Fuzz.
+  * Fix undefined behavior in avr-read_header() function, credit to OSS-Fuzz.
+  * Add INSTALL_PKGCONFIG_MODULE CMake option to control sndfile.pc file
+    installation, see README.md for details.
+  * Add INSTALL_MANPAGES CMake option, see README.md for details.
+  * Fix ENABLE_COMPATIBLE_LIBSNDFILE_NAME CMake option, now it works on MinGW
+    platform too.
+  * Fix ENABLE_CPACK CMake option, see README.md for details.
+  * Fix ENABLE_STATIC_RUNTIME and CMAKE_MSVC_RUNTIME_LIBRARY behavior, see
+    README.md for details.
+  * Fix CMake man pages installation bug when sndfile-deinterleave.1 and
+    sndfile-metadata-set.1 were not installed.
+  * Fix sndfile-regtest paths handling on Windows platform, thanks to
+    Gisle Vanem <gvanem@yahoo.no>.
+
 Version 1.0.29 (2020-08-15)
   * Add support for Opus files.
   * Autotool build system improvements.
