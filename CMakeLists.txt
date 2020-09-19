@@ -6,7 +6,7 @@ if (POLICY CMP0091)
 	cmake_policy (SET CMP0091 NEW)
 endif ()
 
-project(sndfile VERSION 1.0.29)
+project(sndfile VERSION 1.0.30)
 
 #
 # Variables
