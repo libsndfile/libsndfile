@@ -11,18 +11,6 @@ test -z "$srcdir" && srcdir=.
 cd "$srcdir"
 DIE=0
 
-printf "checking for autogen ... "
-result="yes"
-(autogen --version) < /dev/null > /dev/null 2>&1 || {
-        echo
-        echo "You must have GNU autogen installed to compile $package."
-        echo "Download the appropriate package for your distribution,"
-        echo "or get the source tarball at ftp://ftp.gnu.org/pub/gnu/"
-		result="no"
-        DIE=1
-}
-echo $result
-
 printf "checking for autoconf ... "
 result="yes"
 (autoconf --version) < /dev/null > /dev/null 2>&1 || {

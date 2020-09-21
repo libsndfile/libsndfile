@@ -16,7 +16,7 @@ echo "OUT: ${OUT:-}"
 export MAKEFLAGS+="-j$(nproc)"
 
 # Install dependencies
-apt-get -y install autoconf autogen automake libtool pkg-config python
+apt-get -y install autoconf automake libtool pkg-config python
 
 # For now, do not install the following libraries (as they won't be in the
 # final image):

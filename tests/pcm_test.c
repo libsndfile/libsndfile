@@ -1,4 +1,3 @@
-[+ AutoGen5 template c +]
 /*
 ** Copyright (C) 1999-2013 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
@@ -39,10 +38,11 @@
 
 static void	lrintf_test (void) ;
 
-[+ FOR data_type
-+]static void	pcm_test_[+ (get "name") +]	(const char *filename, int filetype, uint64_t hash) ;
-[+ ENDFOR data_type
-+]
+static void	pcm_test_bits_8	(const char *filename, int filetype, uint64_t hash) ;
+static void	pcm_test_bits_16	(const char *filename, int filetype, uint64_t hash) ;
+static void	pcm_test_bits_24	(const char *filename, int filetype, uint64_t hash) ;
+static void	pcm_test_bits_32	(const char *filename, int filetype, uint64_t hash) ;
+
 static void pcm_test_float	(const char *filename, int filetype, uint64_t hash, int replace_float) ;
 static void pcm_test_double	(const char *filename, int filetype, uint64_t hash, int replace_float) ;
 
@@ -125,9 +125,8 @@ lrintf_test (void)
 	printf ("ok\n") ;
 } /* lrintf_test */
 
-[+ FOR data_type
-+]static void
-pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
+static void
+pcm_test_bits_8 (const char *filename, int filetype, uint64_t hash)
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	int			k, items, zero_count ;
@@ -138,16 +137,16 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 	double		*double_out, *double_in ;
 	/* Lite remove end */
 
-	print_test_name ("pcm_test_[+ (get "name") +]", filename) ;
+	print_test_name ("pcm_test_bits_8", filename) ;
 
-	items = [+ (get "item_count") +] ;
+	items = 127 ;
 
 	short_out = data_out.s ;
 	short_in = data_in.s ;
 
 	zero_count = 0 ;
 	for (k = 0 ; k < items ; k++)
-	{	short_out [k] = [+ (get "short_func") +] ;
+	{	short_out [k] = arith_shift_left (k * ((k % 2) ? 1 : -1), 8) ;
 		zero_count = short_out [k] ? zero_count : zero_count + 1 ;
 		} ;
 
@@ -209,7 +208,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 	int_out = data_out.i ;
 	int_in = data_in.i ;
 	for (k = 0 ; k < items ; k++)
-	{	int_out [k] = [+ (get "int_func") +] ;
+	{	int_out [k] = arith_shift_left (k * ((k % 2) ? 1 : -1), 24) ;
 		zero_count = int_out [k] ? zero_count : zero_count + 1 ;
 		} ;
 
@@ -269,7 +268,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 	float_out = data_out.f ;
 	float_in = data_in.f ;
 	for (k = 0 ; k < items ; k++)
-	{	float_out [k] = [+ (get "float_func") +] ;
+	{	float_out [k] = (k * ((k % 2) ? 1 : -1)) ;
 		zero_count = (fabs (float_out [k]) > 1e-10) ? zero_count : zero_count + 1 ;
 		} ;
 
@@ -332,7 +331,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 	double_out = data_out.d ;
 	double_in = data_in.d ;
 	for (k = 0 ; k < items ; k++)
-	{	double_out [k] = [+ (get "float_func") +] ;
+	{	double_out [k] = (k * ((k % 2) ? 1 : -1)) ;
 		zero_count = (fabs (double_out [k]) > 1e-10) ? zero_count : zero_count + 1 ;
 		} ;
 
@@ -390,10 +389,807 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 	unlink (filename) ;
 
 	puts ("ok") ;
-} /* pcm_test_[+ (get "name") +] */
+} /* pcm_test_bits_8 */
 
-[+ ENDFOR data_type
-+]
+static void
+pcm_test_bits_16 (const char *filename, int filetype, uint64_t hash)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	int			k, items, zero_count ;
+	short		*short_out, *short_in ;
+	int			*int_out, *int_in ;
+	/* Lite remove start */
+	float		*float_out, *float_in ;
+	double		*double_out, *double_in ;
+	/* Lite remove end */
+
+	print_test_name ("pcm_test_bits_16", filename) ;
+
+	items = 1024 ;
+
+	short_out = data_out.s ;
+	short_in = data_in.s ;
+
+	zero_count = 0 ;
+	for (k = 0 ; k < items ; k++)
+	{	short_out [k] = (k * ((k % 2) ? 3 : -3)) ;
+		zero_count = short_out [k] ? zero_count : zero_count + 1 ;
+		} ;
+
+	if (zero_count > items / 4)
+	{	printf ("\n\nLine %d: too many zeros.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	test_write_short_or_die (file, 0, short_out, items, __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (short_in, 0, items * sizeof (short)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != items)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	test_read_short_or_die (file, 0, short_in, items, __LINE__) ;
+
+	for (k = 0 ; k < items ; k++)
+		if (short_out [k] != short_in [k])
+		{	printf ("\n\nLine %d: Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, short_out [k], short_in [k]) ;
+			exit (1) ;
+			} ;
+
+	sf_close (file) ;
+
+	/* Finally, check the file hash. */
+	check_file_hash_or_die (filename, hash, __LINE__) ;
+
+	/*--------------------------------------------------------------------------
+	** Test sf_read/write_int ()
+	*/
+	zero_count = 0 ;
+
+	int_out = data_out.i ;
+	int_in = data_in.i ;
+	for (k = 0 ; k < items ; k++)
+	{	int_out [k] = arith_shift_left (k * ((k % 2) ? 3 : -3), 16) ;
+		zero_count = int_out [k] ? zero_count : zero_count + 1 ;
+		} ;
+
+	if (zero_count > items / 4)
+	{	printf ("\n\nLine %d: too many zeros.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	test_write_int_or_die (file, 0, int_out, items, __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (int_in, 0, items * sizeof (int)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != items)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	test_read_int_or_die (file, 0, int_in, items, __LINE__) ;
+
+	for (k = 0 ; k < items ; k++)
+		if (int_out [k] != int_in [k])
+		{	printf ("\n\nLine %d: int : Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, int_out [k], int_in [k]) ;
+			exit (1) ;
+			} ;
+
+	sf_close (file) ;
+
+	/* Lite remove start */
+	/*--------------------------------------------------------------------------
+	** Test sf_read/write_float ()
+	*/
+	zero_count = 0 ;
+
+	float_out = data_out.f ;
+	float_in = data_in.f ;
+	for (k = 0 ; k < items ; k++)
+	{	float_out [k] = (k * ((k % 2) ? 3 : -3)) ;
+		zero_count = (fabs (float_out [k]) > 1e-10) ? zero_count : zero_count + 1 ;
+		} ;
+
+	if (zero_count > items / 4)
+	{	printf ("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items) ;
+		exit (1) ;
+		} ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
+
+	test_write_float_or_die (file, 0, float_out, items, __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (float_in, 0, items * sizeof (float)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != items)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
+
+	test_read_float_or_die (file, 0, float_in, items, __LINE__) ;
+
+	for (k = 0 ; k < items ; k++)
+		if (fabs (float_out [k] - float_in [k]) > 1e-10)
+		{	printf ("\n\nLine %d: float : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, (double) float_out [k], (double) float_in [k]) ;
+			exit (1) ;
+			} ;
+
+	sf_close (file) ;
+
+	/*--------------------------------------------------------------------------
+	** Test sf_read/write_double ()
+	*/
+	zero_count = 0 ;
+
+	double_out = data_out.d ;
+	double_in = data_in.d ;
+	for (k = 0 ; k < items ; k++)
+	{	double_out [k] = (k * ((k % 2) ? 3 : -3)) ;
+		zero_count = (fabs (double_out [k]) > 1e-10) ? zero_count : zero_count + 1 ;
+		} ;
+
+	if (zero_count > items / 4)
+	{	printf ("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items) ;
+		exit (1) ;
+		} ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
+
+	test_write_double_or_die (file, 0, double_out, items, __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (double_in, 0, items * sizeof (double)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != items)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
+
+	test_read_double_or_die (file, 0, double_in, items, __LINE__) ;
+
+	for (k = 0 ; k < items ; k++)
+		if (fabs (double_out [k] - double_in [k]) > 1e-10)
+		{	printf ("\n\nLine %d: double : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, double_out [k], double_in [k]) ;
+			exit (1) ;
+			} ;
+
+	sf_close (file) ;
+	/* Lite remove end */
+	unlink (filename) ;
+
+	puts ("ok") ;
+} /* pcm_test_bits_16 */
+
+static void
+pcm_test_bits_24 (const char *filename, int filetype, uint64_t hash)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	int			k, items, zero_count ;
+	short		*short_out, *short_in ;
+	int			*int_out, *int_in ;
+	/* Lite remove start */
+	float		*float_out, *float_in ;
+	double		*double_out, *double_in ;
+	/* Lite remove end */
+
+	print_test_name ("pcm_test_bits_24", filename) ;
+
+	items = 1024 ;
+
+	short_out = data_out.s ;
+	short_in = data_in.s ;
+
+	zero_count = 0 ;
+	for (k = 0 ; k < items ; k++)
+	{	short_out [k] = (k * ((k % 2) ? 3 : -3)) ;
+		zero_count = short_out [k] ? zero_count : zero_count + 1 ;
+		} ;
+
+	if (zero_count > items / 4)
+	{	printf ("\n\nLine %d: too many zeros.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	test_write_short_or_die (file, 0, short_out, items, __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (short_in, 0, items * sizeof (short)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != items)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	test_read_short_or_die (file, 0, short_in, items, __LINE__) ;
+
+	for (k = 0 ; k < items ; k++)
+		if (short_out [k] != short_in [k])
+		{	printf ("\n\nLine %d: Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, short_out [k], short_in [k]) ;
+			exit (1) ;
+			} ;
+
+	sf_close (file) ;
+
+	/* Finally, check the file hash. */
+	check_file_hash_or_die (filename, hash, __LINE__) ;
+
+	/*--------------------------------------------------------------------------
+	** Test sf_read/write_int ()
+	*/
+	zero_count = 0 ;
+
+	int_out = data_out.i ;
+	int_in = data_in.i ;
+	for (k = 0 ; k < items ; k++)
+	{	int_out [k] = arith_shift_left (k * ((k % 2) ? 3333 : -3333), 8) ;
+		zero_count = int_out [k] ? zero_count : zero_count + 1 ;
+		} ;
+
+	if (zero_count > items / 4)
+	{	printf ("\n\nLine %d: too many zeros.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	test_write_int_or_die (file, 0, int_out, items, __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (int_in, 0, items * sizeof (int)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != items)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	test_read_int_or_die (file, 0, int_in, items, __LINE__) ;
+
+	for (k = 0 ; k < items ; k++)
+		if (int_out [k] != int_in [k])
+		{	printf ("\n\nLine %d: int : Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, int_out [k], int_in [k]) ;
+			exit (1) ;
+			} ;
+
+	sf_close (file) ;
+
+	/* Lite remove start */
+	/*--------------------------------------------------------------------------
+	** Test sf_read/write_float ()
+	*/
+	zero_count = 0 ;
+
+	float_out = data_out.f ;
+	float_in = data_in.f ;
+	for (k = 0 ; k < items ; k++)
+	{	float_out [k] = (k * ((k % 2) ? 3333 : -3333)) ;
+		zero_count = (fabs (float_out [k]) > 1e-10) ? zero_count : zero_count + 1 ;
+		} ;
+
+	if (zero_count > items / 4)
+	{	printf ("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items) ;
+		exit (1) ;
+		} ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
+
+	test_write_float_or_die (file, 0, float_out, items, __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (float_in, 0, items * sizeof (float)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != items)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
+
+	test_read_float_or_die (file, 0, float_in, items, __LINE__) ;
+
+	for (k = 0 ; k < items ; k++)
+		if (fabs (float_out [k] - float_in [k]) > 1e-10)
+		{	printf ("\n\nLine %d: float : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, (double) float_out [k], (double) float_in [k]) ;
+			exit (1) ;
+			} ;
+
+	sf_close (file) ;
+
+	/*--------------------------------------------------------------------------
+	** Test sf_read/write_double ()
+	*/
+	zero_count = 0 ;
+
+	double_out = data_out.d ;
+	double_in = data_in.d ;
+	for (k = 0 ; k < items ; k++)
+	{	double_out [k] = (k * ((k % 2) ? 3333 : -3333)) ;
+		zero_count = (fabs (double_out [k]) > 1e-10) ? zero_count : zero_count + 1 ;
+		} ;
+
+	if (zero_count > items / 4)
+	{	printf ("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items) ;
+		exit (1) ;
+		} ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
+
+	test_write_double_or_die (file, 0, double_out, items, __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (double_in, 0, items * sizeof (double)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != items)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
+
+	test_read_double_or_die (file, 0, double_in, items, __LINE__) ;
+
+	for (k = 0 ; k < items ; k++)
+		if (fabs (double_out [k] - double_in [k]) > 1e-10)
+		{	printf ("\n\nLine %d: double : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, double_out [k], double_in [k]) ;
+			exit (1) ;
+			} ;
+
+	sf_close (file) ;
+	/* Lite remove end */
+	unlink (filename) ;
+
+	puts ("ok") ;
+} /* pcm_test_bits_24 */
+
+static void
+pcm_test_bits_32 (const char *filename, int filetype, uint64_t hash)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	int			k, items, zero_count ;
+	short		*short_out, *short_in ;
+	int			*int_out, *int_in ;
+	/* Lite remove start */
+	float		*float_out, *float_in ;
+	double		*double_out, *double_in ;
+	/* Lite remove end */
+
+	print_test_name ("pcm_test_bits_32", filename) ;
+
+	items = 1024 ;
+
+	short_out = data_out.s ;
+	short_in = data_in.s ;
+
+	zero_count = 0 ;
+	for (k = 0 ; k < items ; k++)
+	{	short_out [k] = (k * ((k % 2) ? 3 : -3)) ;
+		zero_count = short_out [k] ? zero_count : zero_count + 1 ;
+		} ;
+
+	if (zero_count > items / 4)
+	{	printf ("\n\nLine %d: too many zeros.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	test_write_short_or_die (file, 0, short_out, items, __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (short_in, 0, items * sizeof (short)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != items)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	test_read_short_or_die (file, 0, short_in, items, __LINE__) ;
+
+	for (k = 0 ; k < items ; k++)
+		if (short_out [k] != short_in [k])
+		{	printf ("\n\nLine %d: Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, short_out [k], short_in [k]) ;
+			exit (1) ;
+			} ;
+
+	sf_close (file) ;
+
+	/* Finally, check the file hash. */
+	check_file_hash_or_die (filename, hash, __LINE__) ;
+
+	/*--------------------------------------------------------------------------
+	** Test sf_read/write_int ()
+	*/
+	zero_count = 0 ;
+
+	int_out = data_out.i ;
+	int_in = data_in.i ;
+	for (k = 0 ; k < items ; k++)
+	{	int_out [k] = (k * ((k % 2) ? 333333 : -333333)) ;
+		zero_count = int_out [k] ? zero_count : zero_count + 1 ;
+		} ;
+
+	if (zero_count > items / 4)
+	{	printf ("\n\nLine %d: too many zeros.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	test_write_int_or_die (file, 0, int_out, items, __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (int_in, 0, items * sizeof (int)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != items)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	test_read_int_or_die (file, 0, int_in, items, __LINE__) ;
+
+	for (k = 0 ; k < items ; k++)
+		if (int_out [k] != int_in [k])
+		{	printf ("\n\nLine %d: int : Incorrect sample (#%d : 0x%x => 0x%x).\n", __LINE__, k, int_out [k], int_in [k]) ;
+			exit (1) ;
+			} ;
+
+	sf_close (file) ;
+
+	/* Lite remove start */
+	/*--------------------------------------------------------------------------
+	** Test sf_read/write_float ()
+	*/
+	zero_count = 0 ;
+
+	float_out = data_out.f ;
+	float_in = data_in.f ;
+	for (k = 0 ; k < items ; k++)
+	{	float_out [k] = (k * ((k % 2) ? 333333 : -333333)) ;
+		zero_count = (fabs (float_out [k]) > 1e-10) ? zero_count : zero_count + 1 ;
+		} ;
+
+	if (zero_count > items / 4)
+	{	printf ("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items) ;
+		exit (1) ;
+		} ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
+
+	test_write_float_or_die (file, 0, float_out, items, __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (float_in, 0, items * sizeof (float)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != items)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
+
+	test_read_float_or_die (file, 0, float_in, items, __LINE__) ;
+
+	for (k = 0 ; k < items ; k++)
+		if (fabs (float_out [k] - float_in [k]) > 1e-10)
+		{	printf ("\n\nLine %d: float : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, (double) float_out [k], (double) float_in [k]) ;
+			exit (1) ;
+			} ;
+
+	sf_close (file) ;
+
+	/*--------------------------------------------------------------------------
+	** Test sf_read/write_double ()
+	*/
+	zero_count = 0 ;
+
+	double_out = data_out.d ;
+	double_in = data_in.d ;
+	for (k = 0 ; k < items ; k++)
+	{	double_out [k] = (k * ((k % 2) ? 333333 : -333333)) ;
+		zero_count = (fabs (double_out [k]) > 1e-10) ? zero_count : zero_count + 1 ;
+		} ;
+
+	if (zero_count > items / 4)
+	{	printf ("\n\nLine %d: too many zeros (%d/%d).\n", __LINE__, zero_count, items) ;
+		exit (1) ;
+		} ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
+
+	test_write_double_or_die (file, 0, double_out, items, __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (double_in, 0, items * sizeof (double)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.format != filetype)
+	{	printf ("\n\nLine %d: Returned format incorrect (0x%08X => 0x%08X).\n", __LINE__, filetype, sfinfo.format) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != items)
+	{	printf ("\n\nLine %d: Incorrect number of frames in file. (%d => %" PRId64 ")\n", __LINE__, items, sfinfo.frames) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
+
+	test_read_double_or_die (file, 0, double_in, items, __LINE__) ;
+
+	for (k = 0 ; k < items ; k++)
+		if (fabs (double_out [k] - double_in [k]) > 1e-10)
+		{	printf ("\n\nLine %d: double : Incorrect sample (#%d : %f => %f).\n", __LINE__, k, double_out [k], double_in [k]) ;
+			exit (1) ;
+			} ;
+
+	sf_close (file) ;
+	/* Lite remove end */
+	unlink (filename) ;
+
+	puts ("ok") ;
+} /* pcm_test_bits_32 */
+
+
 
 /*==============================================================================
 */

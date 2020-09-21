@@ -1,4 +1,3 @@
-[+ AutoGen5 template c +]
 /*
 ** Copyright (C) 2001-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
@@ -50,10 +49,11 @@
 static void	update_header_test (const char *filename, int typemajor) ;
 static void	update_header_before_write_test (const char *filename, int typemajor) ;
 
-[+ FOR data_type
-+]static void	update_seek_[+ (get "name") +]_test	(const char *filename, int filetype) ;
-[+ ENDFOR data_type
-+]
+static void	update_seek_short_test	(const char *filename, int filetype) ;
+static void	update_seek_int_test	(const char *filename, int filetype) ;
+static void	update_seek_float_test	(const char *filename, int filetype) ;
+static void	update_seek_double_test	(const char *filename, int filetype) ;
+
 
 static void extra_header_test (const char *filename, int filetype) ;
 
@@ -365,22 +365,21 @@ update_header_before_write_test (const char *filename, int typemajor)
 /*==============================================================================
 */
 
-[+ FOR data_type
-+]static void
-update_seek_[+ (get "name") +]_test	(const char *filename, int filetype)
+static void
+update_seek_short_test	(const char *filename, int filetype)
 {	SNDFILE *outfile, *infile ;
 	SF_INFO sfinfo ;
 	sf_count_t frames ;
-	[+ (get "name") +] buffer [8] ;
+	short buffer [8] ;
 	int k ;
 
-	print_test_name ("update_seek_[+ (get "name") +]_test", filename) ;
+	print_test_name ("update_seek_short_test", filename) ;
 
 	memset (buffer, 0, sizeof (buffer)) ;
 
 	/* Create sound outfile with no data. */
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
-	sfinfo.format = filetype | [+ (get "format") +] ;
+	sfinfo.format = filetype | SF_FORMAT_PCM_16 ;
 	sfinfo.samplerate = 48000 ;
 	sfinfo.channels = 2 ;
 
@@ -422,9 +421,9 @@ update_seek_[+ (get "name") +]_test	(const char *filename, int filetype)
 			} ;
 
 		if ((k & 1) == 0)
-			test_write_[+ (get "name") +]_or_die (outfile, k, buffer, sfinfo.channels * frames, __LINE__) ;
+			test_write_short_or_die (outfile, k, buffer, sfinfo.channels * frames, __LINE__) ;
 		else
-			test_writef_[+ (get "name") +]_or_die (outfile, k, buffer, frames, __LINE__) ;
+			test_writef_short_or_die (outfile, k, buffer, frames, __LINE__) ;
 		} ;
 
 	sf_close (outfile) ;
@@ -432,10 +431,213 @@ update_seek_[+ (get "name") +]_test	(const char *filename, int filetype)
 
 	puts ("ok") ;
 	return ;
-} /* update_seek_[+ (get "name") +]_test */
+} /* update_seek_short_test */
 
-[+ ENDFOR data_type
-+]
+static void
+update_seek_int_test	(const char *filename, int filetype)
+{	SNDFILE *outfile, *infile ;
+	SF_INFO sfinfo ;
+	sf_count_t frames ;
+	int buffer [8] ;
+	int k ;
+
+	print_test_name ("update_seek_int_test", filename) ;
+
+	memset (buffer, 0, sizeof (buffer)) ;
+
+	/* Create sound outfile with no data. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.format = filetype | SF_FORMAT_PCM_32 ;
+	sfinfo.samplerate = 48000 ;
+	sfinfo.channels = 2 ;
+
+	if (sf_format_check (&sfinfo) == SF_FALSE)
+		sfinfo.channels = 1 ;
+
+	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	sf_close (outfile) ;
+
+	/* Open again for read/write. */
+	outfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__) ;
+
+	/*
+	** In auto header update mode, seeking to the end of the file with
+	** SEEK_SET will fail from the 2nd seek on.  seeking to 0, SEEK_END
+	** will seek to 0 anyway
+	*/
+	if (sf_command (outfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE) == 0)
+	{	printf ("\n\nError : sf_command (SFC_SET_UPDATE_HEADER_AUTO) return error : %s\n\n", sf_strerror (outfile)) ;
+		exit (1) ;
+		} ;
+
+	/* Now write some frames. */
+	frames = ARRAY_LEN (buffer) / sfinfo.channels ;
+
+	for (k = 0 ; k < 6 ; k++)
+	{	test_seek_or_die (outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, __LINE__) ;
+		test_seek_or_die (outfile, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__) ;
+
+		/* Open file again and make sure no errors in log buffer. */
+		infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+		check_log_buffer_or_die (infile, __LINE__) ;
+		sf_close (infile) ;
+
+		if (sfinfo.frames != k * frames)
+		{	printf ("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %" PRId64 ")\n", __LINE__, sfinfo.frames, k + frames) ;
+			dump_log_buffer (infile) ;
+			exit (1) ;
+			} ;
+
+		if ((k & 1) == 0)
+			test_write_int_or_die (outfile, k, buffer, sfinfo.channels * frames, __LINE__) ;
+		else
+			test_writef_int_or_die (outfile, k, buffer, frames, __LINE__) ;
+		} ;
+
+	sf_close (outfile) ;
+	unlink (filename) ;
+
+	puts ("ok") ;
+	return ;
+} /* update_seek_int_test */
+
+static void
+update_seek_float_test	(const char *filename, int filetype)
+{	SNDFILE *outfile, *infile ;
+	SF_INFO sfinfo ;
+	sf_count_t frames ;
+	float buffer [8] ;
+	int k ;
+
+	print_test_name ("update_seek_float_test", filename) ;
+
+	memset (buffer, 0, sizeof (buffer)) ;
+
+	/* Create sound outfile with no data. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.format = filetype | SF_FORMAT_FLOAT ;
+	sfinfo.samplerate = 48000 ;
+	sfinfo.channels = 2 ;
+
+	if (sf_format_check (&sfinfo) == SF_FALSE)
+		sfinfo.channels = 1 ;
+
+	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	sf_close (outfile) ;
+
+	/* Open again for read/write. */
+	outfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__) ;
+
+	/*
+	** In auto header update mode, seeking to the end of the file with
+	** SEEK_SET will fail from the 2nd seek on.  seeking to 0, SEEK_END
+	** will seek to 0 anyway
+	*/
+	if (sf_command (outfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE) == 0)
+	{	printf ("\n\nError : sf_command (SFC_SET_UPDATE_HEADER_AUTO) return error : %s\n\n", sf_strerror (outfile)) ;
+		exit (1) ;
+		} ;
+
+	/* Now write some frames. */
+	frames = ARRAY_LEN (buffer) / sfinfo.channels ;
+
+	for (k = 0 ; k < 6 ; k++)
+	{	test_seek_or_die (outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, __LINE__) ;
+		test_seek_or_die (outfile, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__) ;
+
+		/* Open file again and make sure no errors in log buffer. */
+		infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+		check_log_buffer_or_die (infile, __LINE__) ;
+		sf_close (infile) ;
+
+		if (sfinfo.frames != k * frames)
+		{	printf ("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %" PRId64 ")\n", __LINE__, sfinfo.frames, k + frames) ;
+			dump_log_buffer (infile) ;
+			exit (1) ;
+			} ;
+
+		if ((k & 1) == 0)
+			test_write_float_or_die (outfile, k, buffer, sfinfo.channels * frames, __LINE__) ;
+		else
+			test_writef_float_or_die (outfile, k, buffer, frames, __LINE__) ;
+		} ;
+
+	sf_close (outfile) ;
+	unlink (filename) ;
+
+	puts ("ok") ;
+	return ;
+} /* update_seek_float_test */
+
+static void
+update_seek_double_test	(const char *filename, int filetype)
+{	SNDFILE *outfile, *infile ;
+	SF_INFO sfinfo ;
+	sf_count_t frames ;
+	double buffer [8] ;
+	int k ;
+
+	print_test_name ("update_seek_double_test", filename) ;
+
+	memset (buffer, 0, sizeof (buffer)) ;
+
+	/* Create sound outfile with no data. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.format = filetype | SF_FORMAT_DOUBLE ;
+	sfinfo.samplerate = 48000 ;
+	sfinfo.channels = 2 ;
+
+	if (sf_format_check (&sfinfo) == SF_FALSE)
+		sfinfo.channels = 1 ;
+
+	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	sf_close (outfile) ;
+
+	/* Open again for read/write. */
+	outfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__) ;
+
+	/*
+	** In auto header update mode, seeking to the end of the file with
+	** SEEK_SET will fail from the 2nd seek on.  seeking to 0, SEEK_END
+	** will seek to 0 anyway
+	*/
+	if (sf_command (outfile, SFC_SET_UPDATE_HEADER_AUTO, NULL, SF_TRUE) == 0)
+	{	printf ("\n\nError : sf_command (SFC_SET_UPDATE_HEADER_AUTO) return error : %s\n\n", sf_strerror (outfile)) ;
+		exit (1) ;
+		} ;
+
+	/* Now write some frames. */
+	frames = ARRAY_LEN (buffer) / sfinfo.channels ;
+
+	for (k = 0 ; k < 6 ; k++)
+	{	test_seek_or_die (outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, __LINE__) ;
+		test_seek_or_die (outfile, 0, SEEK_END, k * frames, sfinfo.channels, __LINE__) ;
+
+		/* Open file again and make sure no errors in log buffer. */
+		infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+		check_log_buffer_or_die (infile, __LINE__) ;
+		sf_close (infile) ;
+
+		if (sfinfo.frames != k * frames)
+		{	printf ("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %" PRId64 ")\n", __LINE__, sfinfo.frames, k + frames) ;
+			dump_log_buffer (infile) ;
+			exit (1) ;
+			} ;
+
+		if ((k & 1) == 0)
+			test_write_double_or_die (outfile, k, buffer, sfinfo.channels * frames, __LINE__) ;
+		else
+			test_writef_double_or_die (outfile, k, buffer, frames, __LINE__) ;
+		} ;
+
+	sf_close (outfile) ;
+	unlink (filename) ;
+
+	puts ("ok") ;
+	return ;
+} /* update_seek_double_test */
+
+
 
 static void
 header_shrink_test (const char *filename, int filetype)
@@ -501,9 +703,9 @@ extra_header_test (const char *filename, int filetype)
 	frames = ARRAY_LEN (buffer) / sfinfo.channels ;
 
 	/* Test the file with extra header data. */
-	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, [+ (tpl-file-line "%2$d") +]) ;
+	outfile = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, 504) ;
 	sf_set_string (outfile, SF_STR_TITLE, filename) ;
-	test_writef_short_or_die (outfile, k, buffer, frames, [+ (tpl-file-line "%2$d") +]) ;
+	test_writef_short_or_die (outfile, k, buffer, frames, 506) ;
 	sf_set_string (outfile, SF_STR_COPYRIGHT, "(c) 1980 Erik") ;
 	sf_close (outfile) ;
 
@@ -530,7 +732,7 @@ extra_header_test (const char *filename, int filetype)
 	hexdump_file (filename, 0, 100000) ;
 
 	/* Open again for read/write. */
-	outfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, [+ (tpl-file-line "%2$d") +]) ;
+	outfile = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, 533) ;
 
 	/*
 	** In auto header update mode, seeking to the end of the file with
@@ -551,26 +753,26 @@ extra_header_test (const char *filename, int filetype)
 		memset (buffer, 0xA0 + k, sizeof (buffer)) ;
 
 
-		test_seek_or_die (outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, [+ (tpl-file-line "%2$d") +]) ;
-		test_seek_or_die (outfile, 0, SEEK_END, k * frames, sfinfo.channels, [+ (tpl-file-line "%2$d") +]) ;
+		test_seek_or_die (outfile, k * frames, SEEK_SET, k * frames, sfinfo.channels, 554) ;
+		test_seek_or_die (outfile, 0, SEEK_END, k * frames, sfinfo.channels, 555) ;
 
 		/* Open file again and make sure no errors in log buffer. */
 		if (0)
-		{	infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, [+ (tpl-file-line "%2$d") +]) ;
-			check_log_buffer_or_die (infile, [+ (tpl-file-line "%2$d") +]) ;
+		{	infile = test_open_file_or_die (filename, SFM_READ, &sfinfo, 559) ;
+			check_log_buffer_or_die (infile, 560) ;
 			sf_close (infile) ;
 			} ;
 
 		if (sfinfo.frames != k * frames)
-		{	printf ("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %" PRId64 ")\n", [+ (tpl-file-line "%2$d") +], sfinfo.frames, k + frames) ;
+		{	printf ("\n\nLine %d : Incorrect sample count (%" PRId64 " should be %" PRId64 ")\n", 565, sfinfo.frames, k + frames) ;
 			dump_log_buffer (infile) ;
 			exit (1) ;
 			} ;
 
 		if ((k & 1) == 0)
-			test_write_short_or_die (outfile, k, buffer, sfinfo.channels * frames, [+ (tpl-file-line "%2$d") +]) ;
+			test_write_short_or_die (outfile, k, buffer, sfinfo.channels * frames, 571) ;
 		else
-			test_writef_short_or_die (outfile, k, buffer, frames, [+ (tpl-file-line "%2$d") +]) ;
+			test_writef_short_or_die (outfile, k, buffer, frames, 573) ;
 		hexdump_file (filename, 0, 100000) ;
 		} ;
 

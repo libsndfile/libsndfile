@@ -1,4 +1,3 @@
-[+ AutoGen5 template c +]
 /*
 ** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
@@ -41,10 +40,15 @@
 static void	float_scaled_test	(const char *filename, int allow_exit, int replace_float, int filetype, double target_snr) ;
 static void	double_scaled_test	(const char *filename, int allow_exit, int replace_float, int filetype, double target_snr) ;
 
-[+ FOR float_type +][+ FOR int_type +][+ FOR endian_type
-+]static void [+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test (const char * filename) ;
-[+ ENDFOR endian_type +][+ ENDFOR int_type +][+ ENDFOR float_type
-+]
+static void float_short_little_test (const char * filename) ;
+static void float_short_big_test (const char * filename) ;
+static void float_int_little_test (const char * filename) ;
+static void float_int_big_test (const char * filename) ;
+static void double_short_little_test (const char * filename) ;
+static void double_short_big_test (const char * filename) ;
+static void double_int_little_test (const char * filename) ;
+static void double_int_big_test (const char * filename) ;
+
 
 static	double	double_data [DFT_DATA_LENGTH] ;
 static	double	double_test [DFT_DATA_LENGTH] ;
@@ -187,10 +191,15 @@ main (int argc, char *argv [])
 
 	putchar ('\n') ;
 	/* Float int tests. */
-[+ FOR float_type +][+ FOR int_type +][+ FOR endian_type
-+]	[+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test ("[+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +].au") ;
-[+ ENDFOR endian_type +][+ ENDFOR int_type +][+ ENDFOR float_type
-+]
+	float_short_little_test ("float_short_little.au") ;
+	float_short_big_test ("float_short_big.au") ;
+	float_int_little_test ("float_int_little.au") ;
+	float_int_big_test ("float_int_big.au") ;
+	double_short_little_test ("double_short_little.au") ;
+	double_short_big_test ("double_short_big.au") ;
+	double_int_little_test ("double_int_little.au") ;
+	double_int_big_test ("double_int_big.au") ;
+
 
 	return 0 ;
 } /* main */
@@ -308,32 +317,31 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 /*==============================================================================
 */
 
-[+ FOR float_type +][+ FOR int_type +][+ FOR endian_type
-+]
+
 static void
-[+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test (const char * filename)
+float_short_little_test (const char * filename)
 {	SNDFILE		*file ;
 	SF_INFO		sfinfo ;
 	int			max ;
 	unsigned	k ;
 
-	print_test_name ("[+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test", filename) ;
+	print_test_name ("float_short_little_test", filename) ;
 
-	gen_windowed_sine_[+ (get "float_name") +] ([+ (get "float_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), 0.9999) ;
+	gen_windowed_sine_float (float_data, ARRAY_LEN (float_data), 0.9999) ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
-	sfinfo.frames		= ARRAY_LEN ([+ (get "int_name") +]_data) ;
+	sfinfo.frames		= ARRAY_LEN (short_data) ;
 	sfinfo.channels		= 1 ;
-	sfinfo.format		= [+ (get "end_type") +] | SF_FORMAT_AU | [+ (get "minor_type") +] ;
+	sfinfo.format		= SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_FLOAT ;
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
-	test_write_[+ (get "float_name") +]_or_die (file, 0, [+ (get "float_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), __LINE__) ;
+	test_write_float_or_die (file, 0, float_data, ARRAY_LEN (float_data), __LINE__) ;
 	sf_close (file) ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 
-	if (sfinfo.frames != ARRAY_LEN ([+ (get "float_name") +]_data))
+	if (sfinfo.frames != ARRAY_LEN (float_data))
 	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, DFT_DATA_LENGTH) ;
 		exit (1) ;
 		} ;
@@ -345,21 +353,385 @@ static void
 
 	sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
 
-	test_read_[+ (get "int_name") +]_or_die (file, 0, [+ (get "int_name") +]_data, ARRAY_LEN ([+ (get "int_name") +]_data), __LINE__) ;
+	test_read_short_or_die (file, 0, short_data, ARRAY_LEN (short_data), __LINE__) ;
 	sf_close (file) ;
 
 	max = 0 ;
-	for (k = 0 ; k < ARRAY_LEN ([+ (get "int_name") +]_data) ; k++)
-		if (abs ([+ (get "int_name") +]_data [k]) > max)
-			max = abs ([+ (get "int_name") +]_data [k]) ;
+	for (k = 0 ; k < ARRAY_LEN (short_data) ; k++)
+		if (abs (short_data [k]) > max)
+			max = abs (short_data [k]) ;
 
-	if (1.0 * abs (max - [+ (get "int_max") +]) / [+ (get "int_max") +] > 0.01)
-	{	printf ("\n\nLine %d: Bad maximum (%d should be %d).\n\n", __LINE__, max, [+ (get "int_max") +]) ;
+	if (1.0 * abs (max - 0x7FFF) / 0x7FFF > 0.01)
+	{	printf ("\n\nLine %d: Bad maximum (%d should be %d).\n\n", __LINE__, max, 0x7FFF) ;
 		exit (1) ;
 		} ;
 
 	unlink (filename) ;
 	puts ("ok") ;
-} /* [+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test */
-[+ ENDFOR endian_type +][+ ENDFOR int_type +][+ ENDFOR float_type +]
+} /* float_short_little_test */
+
+static void
+float_short_big_test (const char * filename)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	int			max ;
+	unsigned	k ;
+
+	print_test_name ("float_short_big_test", filename) ;
+
+	gen_windowed_sine_float (float_data, ARRAY_LEN (float_data), 0.9999) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.frames		= ARRAY_LEN (short_data) ;
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_FLOAT ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	test_write_float_or_die (file, 0, float_data, ARRAY_LEN (float_data), __LINE__) ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.frames != ARRAY_LEN (float_data))
+	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, DFT_DATA_LENGTH) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
+
+	test_read_short_or_die (file, 0, short_data, ARRAY_LEN (short_data), __LINE__) ;
+	sf_close (file) ;
+
+	max = 0 ;
+	for (k = 0 ; k < ARRAY_LEN (short_data) ; k++)
+		if (abs (short_data [k]) > max)
+			max = abs (short_data [k]) ;
+
+	if (1.0 * abs (max - 0x7FFF) / 0x7FFF > 0.01)
+	{	printf ("\n\nLine %d: Bad maximum (%d should be %d).\n\n", __LINE__, max, 0x7FFF) ;
+		exit (1) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* float_short_big_test */
+
+static void
+float_int_little_test (const char * filename)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	int			max ;
+	unsigned	k ;
+
+	print_test_name ("float_int_little_test", filename) ;
+
+	gen_windowed_sine_float (float_data, ARRAY_LEN (float_data), 0.9999) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.frames		= ARRAY_LEN (int_data) ;
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_FLOAT ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	test_write_float_or_die (file, 0, float_data, ARRAY_LEN (float_data), __LINE__) ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.frames != ARRAY_LEN (float_data))
+	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, DFT_DATA_LENGTH) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
+
+	test_read_int_or_die (file, 0, int_data, ARRAY_LEN (int_data), __LINE__) ;
+	sf_close (file) ;
+
+	max = 0 ;
+	for (k = 0 ; k < ARRAY_LEN (int_data) ; k++)
+		if (abs (int_data [k]) > max)
+			max = abs (int_data [k]) ;
+
+	if (1.0 * abs (max - 0x7FFFFFFF) / 0x7FFFFFFF > 0.01)
+	{	printf ("\n\nLine %d: Bad maximum (%d should be %d).\n\n", __LINE__, max, 0x7FFFFFFF) ;
+		exit (1) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* float_int_little_test */
+
+static void
+float_int_big_test (const char * filename)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	int			max ;
+	unsigned	k ;
+
+	print_test_name ("float_int_big_test", filename) ;
+
+	gen_windowed_sine_float (float_data, ARRAY_LEN (float_data), 0.9999) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.frames		= ARRAY_LEN (int_data) ;
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_FLOAT ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	test_write_float_or_die (file, 0, float_data, ARRAY_LEN (float_data), __LINE__) ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.frames != ARRAY_LEN (float_data))
+	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, DFT_DATA_LENGTH) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
+
+	test_read_int_or_die (file, 0, int_data, ARRAY_LEN (int_data), __LINE__) ;
+	sf_close (file) ;
+
+	max = 0 ;
+	for (k = 0 ; k < ARRAY_LEN (int_data) ; k++)
+		if (abs (int_data [k]) > max)
+			max = abs (int_data [k]) ;
+
+	if (1.0 * abs (max - 0x7FFFFFFF) / 0x7FFFFFFF > 0.01)
+	{	printf ("\n\nLine %d: Bad maximum (%d should be %d).\n\n", __LINE__, max, 0x7FFFFFFF) ;
+		exit (1) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* float_int_big_test */
+
+static void
+double_short_little_test (const char * filename)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	int			max ;
+	unsigned	k ;
+
+	print_test_name ("double_short_little_test", filename) ;
+
+	gen_windowed_sine_double (double_data, ARRAY_LEN (double_data), 0.9999) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.frames		= ARRAY_LEN (short_data) ;
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_DOUBLE ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	test_write_double_or_die (file, 0, double_data, ARRAY_LEN (double_data), __LINE__) ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.frames != ARRAY_LEN (double_data))
+	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, DFT_DATA_LENGTH) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
+
+	test_read_short_or_die (file, 0, short_data, ARRAY_LEN (short_data), __LINE__) ;
+	sf_close (file) ;
+
+	max = 0 ;
+	for (k = 0 ; k < ARRAY_LEN (short_data) ; k++)
+		if (abs (short_data [k]) > max)
+			max = abs (short_data [k]) ;
+
+	if (1.0 * abs (max - 0x7FFF) / 0x7FFF > 0.01)
+	{	printf ("\n\nLine %d: Bad maximum (%d should be %d).\n\n", __LINE__, max, 0x7FFF) ;
+		exit (1) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* double_short_little_test */
+
+static void
+double_short_big_test (const char * filename)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	int			max ;
+	unsigned	k ;
+
+	print_test_name ("double_short_big_test", filename) ;
+
+	gen_windowed_sine_double (double_data, ARRAY_LEN (double_data), 0.9999) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.frames		= ARRAY_LEN (short_data) ;
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_DOUBLE ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	test_write_double_or_die (file, 0, double_data, ARRAY_LEN (double_data), __LINE__) ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.frames != ARRAY_LEN (double_data))
+	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, DFT_DATA_LENGTH) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
+
+	test_read_short_or_die (file, 0, short_data, ARRAY_LEN (short_data), __LINE__) ;
+	sf_close (file) ;
+
+	max = 0 ;
+	for (k = 0 ; k < ARRAY_LEN (short_data) ; k++)
+		if (abs (short_data [k]) > max)
+			max = abs (short_data [k]) ;
+
+	if (1.0 * abs (max - 0x7FFF) / 0x7FFF > 0.01)
+	{	printf ("\n\nLine %d: Bad maximum (%d should be %d).\n\n", __LINE__, max, 0x7FFF) ;
+		exit (1) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* double_short_big_test */
+
+static void
+double_int_little_test (const char * filename)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	int			max ;
+	unsigned	k ;
+
+	print_test_name ("double_int_little_test", filename) ;
+
+	gen_windowed_sine_double (double_data, ARRAY_LEN (double_data), 0.9999) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.frames		= ARRAY_LEN (int_data) ;
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= SF_ENDIAN_LITTLE | SF_FORMAT_AU | SF_FORMAT_DOUBLE ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	test_write_double_or_die (file, 0, double_data, ARRAY_LEN (double_data), __LINE__) ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.frames != ARRAY_LEN (double_data))
+	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, DFT_DATA_LENGTH) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
+
+	test_read_int_or_die (file, 0, int_data, ARRAY_LEN (int_data), __LINE__) ;
+	sf_close (file) ;
+
+	max = 0 ;
+	for (k = 0 ; k < ARRAY_LEN (int_data) ; k++)
+		if (abs (int_data [k]) > max)
+			max = abs (int_data [k]) ;
+
+	if (1.0 * abs (max - 0x7FFFFFFF) / 0x7FFFFFFF > 0.01)
+	{	printf ("\n\nLine %d: Bad maximum (%d should be %d).\n\n", __LINE__, max, 0x7FFFFFFF) ;
+		exit (1) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* double_int_little_test */
+
+static void
+double_int_big_test (const char * filename)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	int			max ;
+	unsigned	k ;
+
+	print_test_name ("double_int_big_test", filename) ;
+
+	gen_windowed_sine_double (double_data, ARRAY_LEN (double_data), 0.9999) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.frames		= ARRAY_LEN (int_data) ;
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= SF_ENDIAN_BIG | SF_FORMAT_AU | SF_FORMAT_DOUBLE ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	test_write_double_or_die (file, 0, double_data, ARRAY_LEN (double_data), __LINE__) ;
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	if (sfinfo.frames != ARRAY_LEN (double_data))
+	{	printf ("\n\nLine %d: Incorrect number of frames in file (too short). (%" PRId64 " should be %d)\n", __LINE__, sfinfo.frames, DFT_DATA_LENGTH) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.channels != 1)
+	{	printf ("\n\nLine %d: Incorrect number of channels in file.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
+
+	test_read_int_or_die (file, 0, int_data, ARRAY_LEN (int_data), __LINE__) ;
+	sf_close (file) ;
+
+	max = 0 ;
+	for (k = 0 ; k < ARRAY_LEN (int_data) ; k++)
+		if (abs (int_data [k]) > max)
+			max = abs (int_data [k]) ;
+
+	if (1.0 * abs (max - 0x7FFFFFFF) / 0x7FFFFFFF > 0.01)
+	{	printf ("\n\nLine %d: Bad maximum (%d should be %d).\n\n", __LINE__, max, 0x7FFFFFFF) ;
+		exit (1) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* double_int_big_test */
+
 

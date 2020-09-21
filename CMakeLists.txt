@@ -786,27 +786,13 @@ if (BUILD_TESTING)
 
 	enable_testing ()
 
-	include (CMakeAutoGen)
-
-	# generate tests sources from autogen templates
-	lsf_autogen (tests benchmark c)
-	lsf_autogen (tests floating_point_test c)
-	lsf_autogen (tests header_test c)
-	lsf_autogen (tests pcm_test c)
-	lsf_autogen (tests pipe_test c)
-	lsf_autogen (tests rdwr_test c)
-	lsf_autogen (tests scale_clip_test c)
-	lsf_autogen (tests utils c h)
-	lsf_autogen (tests write_read_test c)
-	lsf_autogen (src test_endswap c)
-
 	# utils static library
 	add_library(test_utils STATIC tests/utils.c)
 	target_include_directories (test_utils
 		PUBLIC
 			src
+			tests
 			${CMAKE_CURRENT_BINARY_DIR}/src
-			${CMAKE_CURRENT_BINARY_DIR}/tests
 		)
 	target_link_libraries(test_utils PRIVATE sndfile)
 

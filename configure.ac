@@ -65,7 +65,6 @@ AC_PROG_LN_S
 
 AM_PATH_PYTHON
 
-AC_CHECK_PROG([HAVE_AUTOGEN], [autogen], [yes], [no])
 AC_CHECK_PROG([HAVE_WINE], [wine], [yes], [no])
 AC_CHECK_PROG([HAVE_XCODE_SELECT], [xcode-select], [yes], [no])
 
