@@ -17,7 +17,6 @@ EXTRA_DIST = libsndfile.spec.in sndfile.pc.in Scripts/android-configure.sh \
 	CMakeLists.txt $(cmake_files) Win32
 
 cmake_files = cmake/ClipMode.cmake cmake/FindFLAC.cmake \
-	cmake/CMakeAutoGen.cmake cmake/CMakeAutoGenScript.cmake \
 	cmake/FindOgg.cmake cmake/FindVorbis.cmake cmake/FindSndio.cmake \
 	cmake/FindSpeex.cmake cmake/FindSQLite3.cmake \
 	cmake/SndFileChecks.cmake cmake/TestInline.cmake \
@@ -39,11 +38,9 @@ checkprograms: $(check_PROGRAMS)
 # src/ #
 ########
 
-BUILT_SOURCES = src/test_endswap.c
-
 SYMBOL_FILES = src/Symbols.gnu-binutils src/Symbols.darwin src/libsndfile-1.def src/Symbols.os2 src/Symbols.static
 
-EXTRA_DIST += include/sndfile.h.in src/config.h.in src/test_endswap.tpl src/test_endswap.def \
+EXTRA_DIST += include/sndfile.h.in src/config.h.in \
 	$(SYMBOL_FILES) src/create_symbols_file.py src/binheader_writef_check.py \
 	src/GSM610/README src/GSM610/COPYRIGHT src/GSM610/ChangeLog \
 	src/G72x/README src/G72x/README.original src/G72x/ChangeLog \
@@ -222,28 +219,6 @@ check_PROGRAMS += tests/sfversion tests/floating_point_test tests/write_read_tes
 	tests/channel_test tests/long_read_write_test tests/stdin_test tests/stdout_test \
 	tests/dither_test tests/fix_this tests/largefile_test tests/benchmark tests/ogg_opus_test
 
-BUILT_SOURCES += \
-	tests/write_read_test.c \
-	tests/pcm_test.c \
-	tests/header_test.c \
-	tests/utils.c \
-	tests/scale_clip_test.c \
-	tests/pipe_test.c \
-	tests/rdwr_test.c \
-	tests/floating_point_test.c \
-	tests/benchmark.c
-
-EXTRA_DIST += $(BUILT_SOURCES) \
-	tests/write_read_test.tpl     tests/write_read_test.def \
-	tests/pcm_test.tpl            tests/pcm_test.def \
-	tests/header_test.tpl         tests/header_test.def \
-	tests/utils.tpl               tests/utils.def \
-	tests/scale_clip_test.tpl     tests/scale_clip_test.def \
-	tests/pipe_test.tpl           tests/pipe_test.def \
-	tests/rdwr_test.tpl           tests/rdwr_test.def \
-	tests/floating_point_test.tpl tests/floating_point_test.def \
-	tests/benchmark.tpl           tests/benchmark.def
-
 # If we're cross compiling from Linux to Windows and running the test suite
 # under Wine, we need a symbolic link to the generated libsndfile DLL.
 
@@ -389,35 +364,6 @@ tests_peak_chunk_test_LDADD = src/libsndfile.la
 tests_scale_clip_test_SOURCES = tests/scale_clip_test.c tests/utils.c tests/utils.h
 tests_scale_clip_test_LDADD = src/libsndfile.la
 # Lite remove end
-
-#===============================================================================
-# Autogen generated sources.
-# Coerce the multiple inputs -> multiple outputs problem
-# into suffix rules by "linearising" the dependency graph.
-# Yes, this sucks, but GNU make patterns aren't portable,
-# see also https://github.com/erikd/libsndfile/issues/369
-
-SUFFIXES = .tpl .def
-
-.tpl.def:
-	touch $@
-
-# unconditionally running touch on the .def
-# files is necessary to keep all timestamps
-# consistent, in order to prevent stale files
-# from calling autogen in tarball releases.
-.def.c:
-	$(MAKE) $(AM_MAKEFLAGS) $<
-	cd $(top_srcdir)/$(@D) && autogen --writable $(<F)
-
-# recommended Automake way for multi-output targets:
-# https://www.gnu.org/software/automake/manual/html_node/Multiple-Outputs.html
-tests/utils.h : tests/utils.c
-	@if test -f $@; then :; else \
-	  cd $(top_srcdir) && \
-	  rm -f tests/utils.c && \
-	  $(MAKE) $(AM_MAKEFLAGS) tests/utils.c; \
-	fi
 
 ########
 # man/ #

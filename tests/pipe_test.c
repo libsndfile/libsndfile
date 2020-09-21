@@ -1,4 +1,3 @@
-[+ AutoGen5 template c +]
 /*
 ** Copyright (C) 2001-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
@@ -173,11 +172,11 @@ pipe_write_test (const char *ext)
 /*==============================================================================
 */
 
-[+ FOR data_type +]
+
 static void
-useek_pipe_rw_[+ (get "type_name") +] (const char * ext, SF_INFO * psfinfo_write, SF_INFO * psfinfo_read)
-{	static [+ (get "type_name") +] buffer [PIPE_TEST_LEN] ;
-	static [+ (get "type_name") +] data [PIPE_TEST_LEN] ;
+useek_pipe_rw_short (const char * ext, SF_INFO * psfinfo_write, SF_INFO * psfinfo_read)
+{	static short buffer [PIPE_TEST_LEN] ;
+	static short data [PIPE_TEST_LEN] ;
 	SNDFILE *outfile ;
 	SNDFILE *infile_piped ;
 
@@ -222,14 +221,14 @@ useek_pipe_rw_[+ (get "type_name") +] (const char * ext, SF_INFO * psfinfo_write
 
 	/* Fork a child process that will write directly into the pipe. */
 	if ((pida = fork ()) == 0) /* child process */
-	{	test_writef_[+ (get "type_name") +]_or_die (outfile, 0, data, PIPE_TEST_LEN, __LINE__) ;
+	{	test_writef_short_or_die (outfile, 0, data, PIPE_TEST_LEN, __LINE__) ;
 		exit (0) ;
 		} ;
 
 	/* In the parent process, read from the pipe and compare what is read
 	** to what is written, if they match everything went as planned.
 	*/
-	test_readf_[+ (get "type_name") +]_or_die (infile_piped, 0, buffer, PIPE_TEST_LEN, __LINE__) ;
+	test_readf_short_or_die (infile_piped, 0, buffer, PIPE_TEST_LEN, __LINE__) ;
 	if (memcmp (buffer, data, sizeof (buffer)) != 0)
 	{	printf ("\n\n%s %d : unseekable pipe test failed for file type \"%s\".\n\n", __func__, __LINE__, ext) ;
 		exit (1) ;
@@ -247,9 +246,161 @@ useek_pipe_rw_[+ (get "type_name") +] (const char * ext, SF_INFO * psfinfo_write
 		} ;
 
 	return ;
-} /* useek_pipe_rw_[+ (get "type_name") +] */
+} /* useek_pipe_rw_short */
 
-[+ ENDFOR data_type +]
+
+static void
+useek_pipe_rw_float (const char * ext, SF_INFO * psfinfo_write, SF_INFO * psfinfo_read)
+{	static float buffer [PIPE_TEST_LEN] ;
+	static float data [PIPE_TEST_LEN] ;
+	SNDFILE *outfile ;
+	SNDFILE *infile_piped ;
+
+	int k, status = 0 ;
+	int pipefd [2] ;
+	pid_t pida ;
+
+	for (k = 0 ; k < PIPE_TEST_LEN ; k++)
+		data [k] = PIPE_INDEX (k) ;
+
+	/*
+	** Create the pipe.
+	*/
+	exit_if_true (pipe (pipefd) != 0, "\n\n%s %d : pipe failed : %s\n", __func__, __LINE__, strerror (errno)) ;
+
+	/*
+	** Attach the write end of the pipe to be written to.
+	*/
+	if ((outfile = sf_open_fd (pipefd [1], SFM_WRITE, psfinfo_write, SF_TRUE)) == NULL)
+	{	printf ("\n\n%s %d : unable to create unseekable pipe for write type \"%s\".\n", __func__, __LINE__, ext) ;
+		printf ("\t%s\n\n", sf_strerror (outfile)) ;
+		exit (1) ;
+		} ;
+
+	if (sf_error (outfile) != SF_ERR_NO_ERROR)
+	{	printf ("\n\n%s %d : unable to open unseekable pipe for write type \"%s\".\n\n", __func__, __LINE__, ext) ;
+		exit (1) ;
+		} ;
+
+	/*
+	** Attach the read end of the pipe to be read from.
+	*/
+	if ((infile_piped = sf_open_fd (pipefd [0], SFM_READ, psfinfo_read, SF_TRUE)) == NULL)
+	{	printf ("\n\n%s %d : unable to create unseekable pipe for read type. \"%s\".\n\n", __func__, __LINE__, ext) ;
+		exit (1) ;
+		} ;
+
+	if (sf_error (infile_piped) != SF_ERR_NO_ERROR)
+	{	printf ("\n\n%s %d : unable to open unseekable pipe for read type \"%s\".\n\n", __func__, __LINE__, ext) ;
+		exit (1) ;
+		} ;
+
+	/* Fork a child process that will write directly into the pipe. */
+	if ((pida = fork ()) == 0) /* child process */
+	{	test_writef_float_or_die (outfile, 0, data, PIPE_TEST_LEN, __LINE__) ;
+		exit (0) ;
+		} ;
+
+	/* In the parent process, read from the pipe and compare what is read
+	** to what is written, if they match everything went as planned.
+	*/
+	test_readf_float_or_die (infile_piped, 0, buffer, PIPE_TEST_LEN, __LINE__) ;
+	if (memcmp (buffer, data, sizeof (buffer)) != 0)
+	{	printf ("\n\n%s %d : unseekable pipe test failed for file type \"%s\".\n\n", __func__, __LINE__, ext) ;
+		exit (1) ;
+		} ;
+
+	/* Wait for the child process to return. */
+	waitpid (pida, &status, 0) ;
+	status = WEXITSTATUS (status) ;
+	sf_close (outfile) ;
+	sf_close (infile_piped) ;
+
+	if (status != 0)
+	{	printf ("\n\n%s %d : status of child process is %d for file type %s.\n\n", __func__, __LINE__, status, ext) ;
+		exit (1) ;
+		} ;
+
+	return ;
+} /* useek_pipe_rw_float */
+
+
+static void
+useek_pipe_rw_double (const char * ext, SF_INFO * psfinfo_write, SF_INFO * psfinfo_read)
+{	static double buffer [PIPE_TEST_LEN] ;
+	static double data [PIPE_TEST_LEN] ;
+	SNDFILE *outfile ;
+	SNDFILE *infile_piped ;
+
+	int k, status = 0 ;
+	int pipefd [2] ;
+	pid_t pida ;
+
+	for (k = 0 ; k < PIPE_TEST_LEN ; k++)
+		data [k] = PIPE_INDEX (k) ;
+
+	/*
+	** Create the pipe.
+	*/
+	exit_if_true (pipe (pipefd) != 0, "\n\n%s %d : pipe failed : %s\n", __func__, __LINE__, strerror (errno)) ;
+
+	/*
+	** Attach the write end of the pipe to be written to.
+	*/
+	if ((outfile = sf_open_fd (pipefd [1], SFM_WRITE, psfinfo_write, SF_TRUE)) == NULL)
+	{	printf ("\n\n%s %d : unable to create unseekable pipe for write type \"%s\".\n", __func__, __LINE__, ext) ;
+		printf ("\t%s\n\n", sf_strerror (outfile)) ;
+		exit (1) ;
+		} ;
+
+	if (sf_error (outfile) != SF_ERR_NO_ERROR)
+	{	printf ("\n\n%s %d : unable to open unseekable pipe for write type \"%s\".\n\n", __func__, __LINE__, ext) ;
+		exit (1) ;
+		} ;
+
+	/*
+	** Attach the read end of the pipe to be read from.
+	*/
+	if ((infile_piped = sf_open_fd (pipefd [0], SFM_READ, psfinfo_read, SF_TRUE)) == NULL)
+	{	printf ("\n\n%s %d : unable to create unseekable pipe for read type. \"%s\".\n\n", __func__, __LINE__, ext) ;
+		exit (1) ;
+		} ;
+
+	if (sf_error (infile_piped) != SF_ERR_NO_ERROR)
+	{	printf ("\n\n%s %d : unable to open unseekable pipe for read type \"%s\".\n\n", __func__, __LINE__, ext) ;
+		exit (1) ;
+		} ;
+
+	/* Fork a child process that will write directly into the pipe. */
+	if ((pida = fork ()) == 0) /* child process */
+	{	test_writef_double_or_die (outfile, 0, data, PIPE_TEST_LEN, __LINE__) ;
+		exit (0) ;
+		} ;
+
+	/* In the parent process, read from the pipe and compare what is read
+	** to what is written, if they match everything went as planned.
+	*/
+	test_readf_double_or_die (infile_piped, 0, buffer, PIPE_TEST_LEN, __LINE__) ;
+	if (memcmp (buffer, data, sizeof (buffer)) != 0)
+	{	printf ("\n\n%s %d : unseekable pipe test failed for file type \"%s\".\n\n", __func__, __LINE__, ext) ;
+		exit (1) ;
+		} ;
+
+	/* Wait for the child process to return. */
+	waitpid (pida, &status, 0) ;
+	status = WEXITSTATUS (status) ;
+	sf_close (outfile) ;
+	sf_close (infile_piped) ;
+
+	if (status != 0)
+	{	printf ("\n\n%s %d : status of child process is %d for file type %s.\n\n", __func__, __LINE__, status, ext) ;
+		exit (1) ;
+		} ;
+
+	return ;
+} /* useek_pipe_rw_double */
+
+
 
 
 static void
