@@ -139,7 +139,6 @@ jobs:
               -DBUILD_REGTEST=OFF
               -DBUILD_EXAMPLES=OFF
               -DINSTALL_PKGCONFIG_MODULE=OFF
-              -DCPACK_PACKAGE_NAME=libsndfile
               -DCMAKE_BUILD_TYPE=Release
               -DVCPKG_TARGET_TRIPLET=x64-windows-static
               -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake
