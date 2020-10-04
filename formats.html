@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <TITLE>
+    libsndfile: Supported formats
+  </TITLE>
+  <meta name="Author" content="Erik de Castro Lopo (erikd AT mega-nerd DOT com)">
+  <meta name="Version" content="libsndfile-1.0.30">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="libsndfile.css" type="text/css" media="all">
+  <link rel="stylesheet" href="print.css" type="text/css" media="print">
+  <style type="text/css">
+    td,
+    th {
+      text-align: center;
+      font-size: small;
+    }
+
+    td:first-child {
+      text-align: left
+    }
+  </style>
+</head>
+
+<body>
+  <h1>libsndfile : Supported formats</h1>
+  <p>
+    The following table lists the file formats and encodings that libsndfile
+    can read and write.
+    The file formats are arranged across the top and encodings along the left
+    edge.
+  </p>
+
+  <table border="1" cellpadding="2">
+    <thead>
+      <tr>
+        <td>&nbsp;</td>
+        <td>Microsoft WAV</td>
+        <td>SGI / Apple AIFF / AIFC</td>
+        <td>Sun / DEC / NeXT AU / SND</td>
+        <td>Headerless RAW</td>
+        <td>Paris Audio File PAF</td>
+        <td>Commodore Amiga IFF / SVX</td>
+        <td>Sphere Nist WAV</td>
+        <td>IRCAM SF</td>
+        <td>Creative VOC</td>
+        <td>Soundforge W64</td>
+        <td><a href="octave.html">GNU Octave&nbsp;2.0</a> MAT4</td>
+        <td><a href="octave.html">GNU Octave&nbsp;2.1</a> MAT5</td>
+        <td>Portable Voice Format PVF</td>
+        <td>Fasttracker&nbsp;2 XI</td>
+        <td>HMM Tool Kit HTK</td>
+        <td>Apple CAF</td>
+        <td>Sound Designer&nbsp;II SD2</td>
+        <td>Free Lossless Audio Codec FLAC</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Unsigned 8 bit PCM</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>Signed 8 bit PCM</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+      </tr>
+
+      <tr>
+        <td>Signed 16 bit PCM</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+      </tr>
+
+      <tr>
+        <td>Signed 24 bit PCM</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+      </tr>
+
+      <tr>
+        <td>Signed 32 bit PCM</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>32 bit float</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>64 bit double</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>u-law encoding</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>A-law encoding</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>IMA ADPCM</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>MS ADPCM</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>GSM 6.10</td>
+        <td>R/W</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>G721 ADPCM 32kbps</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>G723 ADPCM 24kbps</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>G723 ADPCM 40kbps</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>12 bit DWVW</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>16 bit DWVW</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+
+      <tr>
+        <td>24 bit DWVW</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>Ok Dialogic ADPCM</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>8 bit DPCM</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>16 bit DPCM</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>R/W</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>
+    From version 1.0.18, libsndfile also reads and writes
+    <a href="https://xiph.org/flac/">FLAC</a>
+    and
+    <a href="https://xiph.org/vorbis/">Ogg/Vorbis</a>.
+  </p>
+
+  <p>
+    From version 1.0.29, libsndfile can read and write
+    <a href="https://opus-codec.org/">Ogg/Opus</a>.
+  </p>
+  <p>
+    Some of the file formats I am also interested in adding are:
+  </p>
+  <ul>
+    <li> Kurzweil K2000 sampler files.</li>
+    <li> Ogg Speex.</li>
+    <li> MPEG Layer 3 (commonly known as MP3)</li>
+  </ul>
+  <p>
+    Other file formats may also be added on request.
+  </p>
+</body>
+
+</html>
