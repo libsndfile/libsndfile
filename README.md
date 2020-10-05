@@ -1,6 +1,6 @@
 # libsndfile
 
-![C/C++ CI](https://github.com/erikd/libsndfile/workflows/C/C++%20CI/badge.svg)
+![C/C++ CI](https://github.com/libsndfile/libsndfile/workflows/C/C++%20CI/badge.svg)
 
 libsndfile is a C library for reading and writing files containing sampled audio
 data.
@@ -8,11 +8,11 @@ data.
 ## Hacking
 
 The canonical source code repository for libsndfile is at
-[https://github.com/erikd/libsndfile/][github].
+[http://libsndfile.github.io/libsndfile/][github].
 
 You can grab the source code using:
 
-    git clone git://github.com/erikd/libsndfile.git
+    git clone https://github.com/libsndfile/libsndfile.git
 
 For building for Android see [BuildingForAndroid][BuildingForAndroid].
 
@@ -227,5 +227,5 @@ You also need to set `VCPKG_TARGET_TRIPLET` because you use static libraries:
 See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 [brew]: http://brew.sh/
-[github]: https://github.com/erikd/libsndfile/
-[BuildingForAndroid]: https://github.com/erikd/libsndfile/blob/master/Building-for-Android.md
+[github]: http://libsndfile.github.io/libsndfile/
+[BuildingForAndroid]: https://github.com/libsndfile/libsndfile/blob/master/Building-for-Android.md

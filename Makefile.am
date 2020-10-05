@@ -395,7 +395,7 @@ tests_scale_clip_test_LDADD = src/libsndfile.la
 # Coerce the multiple inputs -> multiple outputs problem
 # into suffix rules by "linearising" the dependency graph.
 # Yes, this sucks, but GNU make patterns aren't portable,
-# see also https://github.com/erikd/libsndfile/issues/369
+# see also https://github.com/libsndfile/libsndfile/issues/369
 
 SUFFIXES = .tpl .def
 
