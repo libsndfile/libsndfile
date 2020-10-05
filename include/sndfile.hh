@@ -46,7 +46,7 @@
 ** file. There is no separate implementation file.
 **
 ** API documentation is in the doc/ directory of the source code tarball
-** and at http://www.mega-nerd.com/libsndfile/api.html.
+** and at http://libsndfile.github.io/libsndfile/api.html.
 */
 
 #ifndef SNDFILE_HH

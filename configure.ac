@@ -4,7 +4,7 @@ dnl Require autoconf version >= 2.69
 AC_PREREQ([2.69])
 
 AC_INIT([libsndfile],[1.0.30],[sndfile@mega-nerd.com],
-		[libsndfile],[http://www.mega-nerd.com/libsndfile/])
+		[libsndfile],[http://libsndfile.github.io/libsndfile/])
 
 dnl Check whether we want to set defaults for CFLAGS, CXXFLAGS, CPPFLAGS and LDFLAGS
 AC_MSG_CHECKING([whether configure should try to set CFLAGS/CXXFLAGS/CPPFLAGS/LDFLAGS])

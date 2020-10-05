@@ -42,13 +42,13 @@
 	*/
 	#ifdef __BIG_ENDIAN__
 		#if (CPU_IS_LITTLE_ENDIAN == 1)
-			#error "Universal binary compile detected. See http://www.mega-nerd.com/libsndfile/FAQ.html#Q018"
+			#error "Universal binary compile detected. See http://libsndfile.github.io/libsndfile/FAQ.html#Q018"
 		#endif
 	#endif
 
 	#ifdef __LITTLE_ENDIAN__
 		#if (CPU_IS_BIG_ENDIAN == 1)
-			#error "Universal binary compile detected. See http://www.mega-nerd.com/libsndfile/FAQ.html#Q018"
+			#error "Universal binary compile detected. See http://libsndfile.github.io/libsndfile/FAQ.html#Q018"
 		#endif
 	#endif
 #endif
