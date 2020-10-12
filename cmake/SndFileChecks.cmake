@@ -234,35 +234,31 @@ endif ()
 
 if (DEFINED ENABLE_STATIC_RUNTIME)
 	if (MSVC)
-		if (CMAKE_VERSION VERSION_LESS 3.15)
-			if (ENABLE_STATIC_RUNTIME)
-				foreach (flag_var
-					CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-					CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
-					CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
-					CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
-					)
-					if (${flag_var} MATCHES "/MD")
-						string (REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-					endif ()
-				endforeach (flag_var)
-			else ()
-				foreach (flag_var
-					CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-					CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
-					CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
-					CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
-					)
-					if (${flag_var} MATCHES "/MT")
-						string (REGEX REPLACE "/MT" "/MD" ${flag_var} "${${flag_var}}")
-					endif (${flag_var} MATCHES "/MT")
-				endforeach (flag_var)
-			endif ( )
+		if (ENABLE_STATIC_RUNTIME)
+			foreach (flag_var
+				CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+				CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
+				CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
+				CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
+				)
+				if (${flag_var} MATCHES "/MD")
+					string (REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+				endif ()
+			endforeach (flag_var)
 		else ()
-			message (FATAL_ERROR "ENABLE_STATIC_RUNTIME option is for CMake < 3.15, use CMAKE_MSVC_RUNTIME_LIBRARY standard option instead.")
-		endif ()
+			foreach (flag_var
+				CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+				CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
+				CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
+				CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
+				)
+				if (${flag_var} MATCHES "/MT")
+					string (REGEX REPLACE "/MT" "/MD" ${flag_var} "${${flag_var}}")
+				endif (${flag_var} MATCHES "/MT")
+			endforeach (flag_var)
+		endif ( )
 	else ()
-		message(AUTHOR_WARNING "ENABLE_STATIC_RUNTIME option is for MSVC compiler only.")
+		message (AUTHOR_WARNING "ENABLE_STATIC_RUNTIME option is for MSVC compiler only.")
 	endif ()
 endif ()
 

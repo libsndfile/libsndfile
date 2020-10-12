@@ -1,3 +1,22 @@
+Unreleased
+
+  * Change behaviour of ENABLE_STATIC_RUNTIME option. In short:
+    * You can use ENABLE_STATIC_RUNTIME for CMake >= 3.15 without error.
+    * You can use your our method to set MSVC runtime library flags if none of
+      ENABLE_STATIC_RUNTIME and CMAKE_MSVC_RUNTIME_LIBRARY were set.
+    Advanced information:
+    * If this option is defined (set to ON or OFF), set CMP0091 policy to OLD
+      (we handle MSVC runtime library flags using compiler flags), set
+      corresponding compiler flags for user.
+    * NEW: If this option is not defined, set CMP0091 policy to OLD (we handle
+      MSVC runtime library flags using compiler flags), don't touch compiler
+      options, allow user to set it manually.
+    * NEW: If new CMake option CMAKE_MSVC_RUNTIME_LIBRARY is set, change
+      CMP0091 policy to NEW (we handle MSVC runtime library flags using that
+      option), don't touch compiler flags.
+    * NEW: If both ENABLE_STATIC_RUNTIME and CMAKE_MSVC_RUNTIME_LIBRARY are set,
+      terminate configuration with fatal error.
+
 Version 1.0.30 (2020-09-18)
 
   * Fix critical CMake bug with broken ABI of shared libsndfile library.
