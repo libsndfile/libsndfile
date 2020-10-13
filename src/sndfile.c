@@ -22,6 +22,7 @@
 #include	<string.h>
 #include	<ctype.h>
 #include	<assert.h>
+#include	<math.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
@@ -1001,8 +1002,17 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 			psf->float_int_mult = (datasize != 0) ? SF_TRUE : SF_FALSE ;
 			if (psf->float_int_mult && psf->float_max < 0.0)
-				/* Scale to prevent wrap-around distortion. */
-				psf->float_max = (32768.0 / 32767.0) * psf_calc_signal_max (psf, SF_FALSE) ;
+			{	if (NULL == data)
+				{	/* Scale to prevent wrap-around distortion. */
+					psf->float_max = (32768.0 / 32767.0) * psf_calc_signal_max (psf, SF_FALSE) ;
+					}
+				else
+				{	if (isfinite(*(float *)data) && *(float *)data > 0.0)
+						psf->float_max = *(float *)data;
+					else
+						return (sf_errno = SFE_BAD_COMMAND_PARAM) ;
+					}
+				}
 			return old_value ;
 
 		case SFC_SET_SCALE_INT_FLOAT_WRITE :
