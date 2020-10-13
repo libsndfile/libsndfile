@@ -1,5 +1,5 @@
 Unreleased
-
+  * Change CMake's project name from sndfile to libsndfile as it should be.
   * Change behaviour of ENABLE_STATIC_RUNTIME option. In short:
     * You can use ENABLE_STATIC_RUNTIME for CMake >= 3.15 without error.
     * You can use your our method to set MSVC runtime library flags if none of
