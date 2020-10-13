@@ -16,6 +16,9 @@ Unreleased
       option), don't touch compiler flags.
     * NEW: If both ENABLE_STATIC_RUNTIME and CMAKE_MSVC_RUNTIME_LIBRARY are set,
       terminate configuration with fatal error.
+    * For MinGW toolchain this option is experimental. If you enabled it and
+      then disabled again, you need to clear CMake cache (delete
+      CMakeCache.txt).
 
 Version 1.0.30 (2020-09-18)
 
