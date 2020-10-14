@@ -1335,6 +1335,11 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 	*/
 	bytesread += psf_binheader_readf (psf, "4", &sampler_data) ;
 
+	if (psf->instrument)
+	{	psf_log_printf (psf, "  Found more than one SMPL chunk, using last one.\n") ;
+		free (psf->instrument) ;
+		psf->instrument = NULL ;
+		} ;
 	if ((psf->instrument = psf_instrument_alloc ()) == NULL)
 		return SFE_MALLOC_FAILED ;
 
