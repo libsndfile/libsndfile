@@ -800,6 +800,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 							break ;
 						} ;
 
+						if (psf->cues)
+						{	free (psf->cues) ;
+							psf->cues = NULL ;
+							} ;
 						if ((psf->cues = psf_cues_alloc (mark_count)) == NULL)
 							return SFE_MALLOC_FAILED ;
 
