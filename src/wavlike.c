@@ -838,6 +838,12 @@ wavlike_read_cart_chunk (SF_PRIVATE *psf, uint32_t chunksize)
 
 	psf_log_printf (psf, "cart : %u\n", chunksize) ;
 
+	if (psf->cart_16k)
+	{	psf_log_printf (psf, "  Found more than one cart chunk, using last one.\n") ;
+		free (psf->cart_16k) ;
+		psf->cart_16k = NULL ;
+		} ;
+
 	if ((psf->cart_16k = cart_var_alloc ()) == NULL)
 	{	psf->error = SFE_MALLOC_FAILED ;
 		return psf->error ;
