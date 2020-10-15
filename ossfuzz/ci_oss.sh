@@ -20,7 +20,7 @@ fi
 BRANCH=${GITHUB_REF}
 
 # Modify the oss-fuzz Dockerfile so that we're checking out the current reference on CI.
-sed -i "s@RUN.*@RUN git config --global remote.origin.fetch '+refs/pull/*:refs/remotes/origin/pull/*' \&\& git clone https://github.com/erikd/libsndfile.git /src/libsndfile \&\& cd /src/libsndfile \&\& git checkout -b ${BRANCH}@" /tmp/ossfuzz/projects/${PROJECT_NAME}/Dockerfile
+sed -i "s@RUN.*@RUN git config --global remote.origin.fetch '+refs/pull/*:refs/remotes/origin/pull/*' \&\& git clone https://github.com/libsndfile/libsndfile.git /src/libsndfile \&\& cd /src/libsndfile \&\& git checkout -b ${BRANCH}@" /tmp/ossfuzz/projects/${PROJECT_NAME}/Dockerfile
 
 # Try and build the fuzzers
 pushd /tmp/ossfuzz
