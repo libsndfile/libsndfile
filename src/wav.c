@@ -481,6 +481,11 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 						psf_log_printf (psf, "  Count : %d\n", cue_count) ;
 
+						if (psf->cues)
+						{	free (psf->cues) ;
+							psf->cues = NULL ;
+							} ;
+
 						if ((psf->cues = psf_cues_alloc (cue_count)) == NULL)
 							return SFE_MALLOC_FAILED ;
 
