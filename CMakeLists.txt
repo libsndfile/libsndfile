@@ -759,26 +759,25 @@ else ()
 	set (HTML_BGCOLOUR "black")
 	set (HTML_FGCOLOUR "white")
 endif ()
-configure_file (doc/libsndfile.css.in doc/libsndfile.css)
-set (html_DATA
-	doc/index.html
-	doc/libsndfile.jpg
-	"${CMAKE_CURRENT_BINARY_DIR}/doc/libsndfile.css"
-	doc/print.css
-	doc/api.html
-	doc/command.html
-	doc/bugs.html
-	doc/formats.html
-	doc/sndfile_info.html
-	doc/new_file_type.HOWTO
-	doc/win32.html
-	doc/FAQ.html
-	doc/lists.html
-	doc/embedded_files.html
-	doc/octave.html
-	doc/tutorial.html
+set (dist_doc_DATA
+	docs/index.md
+	docs/libsndfile.jpg
+	docs/libsndfile.css
+	docs/print.css
+	docs/api.md
+	docs/command.md
+	docs/bugs.md
+	docs/formats.md
+	docs/sndfile_info.md
+	docs/new_file_type_howto.md
+	docs/win32.md
+	docs/FAQ.md
+	docs/lists.md
+	docs/embedded_files.md
+	docs/octave.md
+	docs/tutorial.md
 	)
-install (FILES ${html_DATA} DESTINATION ${CMAKE_INSTALL_DOCDIR})
+install (FILES ${dist_doc_DATA} DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
 if (INSTALL_PKGCONFIG_MODULE)
 	install (FILES ${CMAKE_CURRENT_BINARY_DIR}/sndfile.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
