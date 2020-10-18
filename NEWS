@@ -1,4 +1,9 @@
 Unreleased
+  * Documentation:
+    * Move site to new URL: http://libsndfile.github.io/libsndfile/
+    * Convert documentation pages from HTML to Markdown
+    * Use GitHub's Jekyll static site generator to generate static HTML pages
+      for site
   * Change CMake's project name from sndfile to libsndfile as it should be.
   * Change behaviour of ENABLE_STATIC_RUNTIME option. In short:
     * You can use ENABLE_STATIC_RUNTIME for CMake >= 3.15 without error.

@@ -1,13 +1,15 @@
 body {
-	background : @HTML_BGCOLOUR@ ;
-	color : @HTML_FGCOLOUR@ ;
+	background : black ;
+	color : white ;
 	font-family : arial, helvetica, sans-serif ;
 	line-height: 1.5 ;
+	margin-left: 6%;
+	margin-right: 6%;
 }
 td {
 	font-family : arial, helvetica, sans-serif ;
-	background : @HTML_BGCOLOUR@ ;
-	color : @HTML_FGCOLOUR@ ;
+	background : black ;
+	color : white ;
 }
 center {
 	font-family : arial, helvetica, sans-serif ;
@@ -15,14 +17,10 @@ center {
 p {
 	font-family : arial, helvetica, sans-serif ;
 	text-align : left ;
-	margin-left : 3% ;
-	margin-right : 3% ;
 }
 .indent_block {
 	font-family : arial, helvetica, sans-serif ;
 	text-align : left ;
-	margin-left : 10% ;
-	margin-right : 10% ;
 }
 br {
 	font-family : arial, helvetica, sans-serif ;
@@ -33,58 +31,42 @@ form {
 ul {
 	font-family : arial, helvetica, sans-serif ;
 	text-align : left ;
-	margin-left : 3% ;
-	margin-right : 6% ;
 }
 ol {
 	font-family : arial, helvetica, sans-serif ;
 	text-align : left ;
-	margin-left : 3% ;
-	margin-right : 6% ;
 }
 dl {
 	font-family : arial, helvetica, sans-serif ;
 	text-align : left ;
-	margin-left : 3% ;
-	margin-right : 3% ;
 }
 h1 {
 	font-size : xx-large ;
-	background : @HTML_BGCOLOUR@ ;
+	background : black ;
 	color : #5050FF ;
 	text-align : left ;
-	margin-left : 3% ;
-	margin-right : 3% ;
 }
 h2 {
 	font-size : x-large ;
-	background : @HTML_BGCOLOUR@ ;
+	background : black ;
 	color : #5050FF ;
 	text-align : left ;
-	margin-left : 3% ;
-	margin-right : 3% ;
 }
 h3 {
 	font-size : large ;
-	background : @HTML_BGCOLOUR@ ;
+	background : black ;
 	color : #5050FF ;
 	text-align : left ;
-	margin-left : 3% ;
-	margin-right : 3% ;
 }
 h4 {
 	font-size : medium ;
-	background : @HTML_BGCOLOUR@ ;
+	background : black ;
 	color : #5050FF ;
 	text-align : left ;
-	margin-left : 3% ;
-	margin-right : 3% ;
 }
 pre {
 	font-family : courier, monospace ;
 	font-size : medium ;
-	margin-left : 6% ;
-	margin-right : 6% ;
 }
 code,
 kbd,
@@ -97,3 +79,23 @@ a:link { color : #9090FF ; }
 a:visited { color : #5050FF ; }
 a:active { color : #FF00FF ; }
 a:hover { background-color : #202080 ; }
+
+table.formats-table {
+	text-align: center;
+	font-size: small;
+	border-collapse: collapse;
+}
+
+table.formats-table, table.formats-table th, table.formats-table td {
+	border: 1px solid white;
+}
+
+.image-logo {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+nav {
+	text-align: center;
+}

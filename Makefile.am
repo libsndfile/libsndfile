@@ -159,14 +159,14 @@ src/Symbols.static: $(SYMBOL_SCRIPT)
 AUTOHEADER=echo
 
 ########
-# doc/ #
+# docs/ #
 ########
 
 if FULL_SUITE
-dist_html_DATA = doc/index.html doc/libsndfile.jpg doc/libsndfile.css doc/print.css doc/api.html \
-	doc/command.html doc/bugs.html doc/formats.html doc/sndfile_info.html doc/new_file_type.HOWTO \
-	doc/win32.html doc/FAQ.html doc/lists.html doc/embedded_files.html doc/octave.html \
-	doc/tutorial.html
+dist_doc_DATA = docs/index.md docs/libsndfile.jpg docs/libsndfile.css docs/print.css docs/api.md \
+	docs/command.md docs/bugs.md docs/formats.md docs/sndfile_info.md docs/new_file_type_howto.md \
+	docs/win32.md docs/FAQ.md docs/lists.md docs/embedded_files.md docs/octave.md \
+	docs/tutorial.md
 endif
 
 #############
