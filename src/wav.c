@@ -1496,6 +1496,11 @@ wav_read_acid_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 
 	psf_binheader_readf (psf, "j", chunklen - bytesread) ;
 
+	if (psf->loop_info)
+	{	psf_log_printf (psf, "  Found existing loop info, using last one.\n") ;
+		free (psf->loop_info) ;
+		psf->loop_info = NULL ;
+		} ;
 	if ((psf->loop_info = calloc (1, sizeof (SF_LOOP_INFO))) == NULL)
 		return SFE_MALLOC_FAILED ;
 
