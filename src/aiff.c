@@ -243,6 +243,8 @@ aiff_open (SF_PRIVATE *psf)
 	if ((psf->container_data = calloc (1, sizeof (AIFF_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
 
+	psf->container_close = aiff_close ;
+
 	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = aiff_read_header (psf, &comm_fmt)))
 			return error ;
@@ -283,7 +285,6 @@ aiff_open (SF_PRIVATE *psf)
 		psf->set_chunk		= aiff_set_chunk ;
 		} ;
 
-	psf->container_close = aiff_close ;
 	psf->command = aiff_command ;
 
 	switch (SF_CODEC (psf->sf.format))
@@ -982,8 +983,10 @@ aiff_close (SF_PRIVATE *psf)
 		} ;
 
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
-	{	aiff_write_tailer (psf) ;
-		aiff_write_header (psf, SF_TRUE) ;
+	{	if (psf->have_written)
+		{	aiff_write_tailer (psf) ;
+			aiff_write_header (psf, SF_TRUE) ;
+			} ;
 		} ;
 
 	return 0 ;
