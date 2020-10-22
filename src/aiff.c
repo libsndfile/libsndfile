@@ -983,10 +983,8 @@ aiff_close (SF_PRIVATE *psf)
 		} ;
 
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
-	{	if (psf->have_written)
-		{	aiff_write_tailer (psf) ;
-			aiff_write_header (psf, SF_TRUE) ;
-			} ;
+	{	aiff_write_tailer (psf) ;
+		aiff_write_header (psf, SF_TRUE) ;
 		} ;
 
 	return 0 ;
