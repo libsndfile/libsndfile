@@ -179,6 +179,8 @@ jobs:
       - name: Install MacOS dependencies
         if: startsWith(matrix.os,'macos')
         run: |
+          brew untap local/homebrew-openssl
+          brew untap local/homebrew-python2
           brew update
           brew install autoconf automake libtool autogen libogg libvorbis flac opus sqlite3 speex
 
