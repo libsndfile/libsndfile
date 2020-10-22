@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sndfile.h>
+#include <inttypes.h>
 
 typedef struct
 {
@@ -20,24 +21,44 @@ static sf_count_t vfget_filelen (void *user_data)
 static sf_count_t vfseek (sf_count_t offset, int whence, void *user_data)
 {
   VIO_DATA *vf = (VIO_DATA *)user_data;
+  sf_count_t new_offset;
 
   switch (whence)
   {
     case SEEK_SET:
-      vf->offset = offset;
+      new_offset = offset;
       break ;
 
     case SEEK_CUR:
-      vf->offset = vf->offset + offset;
+      new_offset = vf->offset + offset;
       break ;
 
     case SEEK_END:
-      vf->offset = vf->length + offset;
+      new_offset = vf->length + offset;
       break;
 
     default:
       break;
   }
+
+  /* Ensure you can't seek outside the data */
+  if (new_offset > vf->length)
+  {
+    /* Trying to seek past the end of the data */
+    printf("vf overseek: new_offset(%" PRId64 ") > vf->length(%" PRId64 ");"
+           "  whence(%d), vf->offset(%" PRId64 "), offset(%" PRId64 ")\n",
+           new_offset, vf->length, whence, vf->offset, offset);
+    new_offset = vf->length;
+  }
+  else if (new_offset < 0)
+  {
+    /* Trying to seek before the start of the data */
+    printf("vf underseek: new_offset(%" PRId64 ") < 0;  whence(%d), vf->offset"
+           "(%" PRId64 "), vf->length(%" PRId64 "), offset(%" PRId64 ")\n",
+           new_offset, whence, vf->offset, vf->length, offset);
+    new_offset = 0;
+  }
+  vf->offset = new_offset;
 
   return vf->offset;
 }
