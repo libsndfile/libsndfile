@@ -139,7 +139,7 @@ You can pass additional options with `/D<parameter>=<value>` when you run
 * `ENABLE_STATIC_RUNTIME` - enable static runtime on Windows platform (MSVC and
   MinGW), `OFF` by default.
 
-  **Note**: For MSVC compiler this option is deprecated and disabled for CMake >= 3.15, see
+  **Note**: For MSVC compiler this option is deprecated for CMake >= 3.15, see
   policy [CMP0091](https://cmake.org/cmake/help/latest/policy/CMP0091.html).
   Use `CMAKE_MSVC_RUNTIME_LIBRARY` option instead.
 
@@ -204,8 +204,50 @@ To link `libsndfile` library use:
 
 ### Notes for Windows users
 
-First advice - set `ENABLE_STATIC_RUNTIME` to ON. This will remove dependencies
-on runtime DLLs.
+#### System CRT library
+
+First advice about Visual Studio [system CRT libraries](https://docs.microsoft.com/en-us/cpp/c-runtime-library/c-run-time-library-reference?view=vs-2019),
+it is system code linked as static or dynamic library to every C application.
+
+You can find related option in Visual Studio project properties:
+
+    C/C++ -> Code Generation -> Runtime Library
+
+Dynamic version of system CRT library is defaut and it means that end user needs
+to have the same runtime library installed on his system. Most likely it is so,
+but if it is not, the user will see this error message using libsndfile DLL:
+
+    "The program can't start because <crt-dll-name>.dll is missing from your computer. Try reinstalling the program to fix this problem. "
+
+To avoid this, you may want to enable static CRT library linking. In this case
+the size of your DLL will increase slightly the size will increase slightly, but
+you can redistribute the libsndfile DLL without having to install the correct
+version of the system CRT library.
+
+CMake project will use dynamic system CRT libraries by default, just like
+Visual Studio does. But you can change it using `ENABLE_STATIC_RUNTIME` or
+`CMAKE_MSVC_RUNTIME_LIBRARY` options.
+
+**Note**: You cannot use both options at the same time, it will lead to a
+configuration error.
+
+If you have CMake >= 3.15 you should use
+[`CMAKE_MSVC_RUNTIME_LIBRARY`](https://cmake.org/cmake/help/v3.15/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html) option.
+
+This will enable static linking:
+
+    cmake .. -D"MultiThreaded$<$<CONFIG:Debug>:Debug>"
+
+You can use libsndfile `ENABLE_STATIC_RUNTIME` option to to control CRT library
+linking for CMake project: `OFF` or unset (default) for dynamic, and `ON` for
+static linking:
+
+    cmake .. -DENABLE_STATIC_RUNTIME=ON
+
+**Note**: This option is deprecated and may be removed in far future because we
+have standard option `CMAKE_MSVC_RUNTIME_LIBRARY` now.
+
+#### Using Vcpkg package manager
 
 Second advice is about Ogg, Vorbis FLAC and Opus support. Searching external
 libraries under Windows is a little bit tricky. The best way is to use
@@ -223,6 +265,10 @@ Then and add this parameter to cmake command line:
 You also need to set `VCPKG_TARGET_TRIPLET` because you use static libraries:
 
     -DVCPKG_TARGET_TRIPLET=x64-windows-static
+
+**Note**: Use must use the same CRT library for external libraries and the
+libsndfile library itself. For `*-static` triplets Vcpkg uses
+[static CRT](https://vcpkg.readthedocs.io/en/latest/users/triplets/).
 
 ## Submitting Patches
 
