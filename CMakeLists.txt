@@ -15,8 +15,6 @@ if (POLICY CMP0091)
 	endif ()
 endif ()
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version")
-
 project(libsndfile VERSION 1.0.30)
 
 #
