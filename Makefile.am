@@ -19,7 +19,7 @@ EXTRA_DIST = libsndfile.spec.in sndfile.pc.in Scripts/android-configure.sh \
 cmake_files = cmake/ClipMode.cmake cmake/FindFLAC.cmake \
 	cmake/CMakeAutoGen.cmake cmake/CMakeAutoGenScript.cmake \
 	cmake/FindOgg.cmake cmake/FindVorbis.cmake cmake/FindSndio.cmake \
-	cmake/FindSpeex.cmake cmake/FindSQLite3.cmake \
+	cmake/FindSpeex.cmake cmake/sqlite/FindSQLite3.cmake \
 	cmake/SndFileChecks.cmake cmake/TestInline.cmake \
 	cmake/TestLargeFiles.cmake cmake/TestInline.c.in \
 	cmake/FindOpus.cmake cmake/SndFileConfig.cmake.in
