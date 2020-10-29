@@ -1724,6 +1724,11 @@ aiff_read_basc_chunk (SF_PRIVATE * psf, int datasize)
 
 	psf_log_printf (psf, "  Loop Type : 0x%x (%s)\n", bc.loopType, type_str) ;
 
+	if (psf->loop_info)
+	{	psf_log_printf (psf, "  Found existing loop info, using last one.\n") ;
+		free (psf->loop_info) ;
+		psf->loop_info = NULL ;
+		} ;
 	if ((psf->loop_info = calloc (1, sizeof (SF_LOOP_INFO))) == NULL)
 		return SFE_MALLOC_FAILED ;
 
