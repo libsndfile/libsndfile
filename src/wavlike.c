@@ -1193,6 +1193,11 @@ wavlike_read_peak_chunk (SF_PRIVATE * psf, size_t chunk_size)
 		return SFE_WAV_BAD_PEAK ;
 		} ;
 
+	if (psf->peak_info)
+	{	psf_log_printf (psf, "*** Found existing peak info, using last one.\n") ;
+		free (psf->peak_info) ;
+		psf->peak_info = NULL ;
+		} ;
 	if ((psf->peak_info = peak_info_calloc (psf->sf.channels)) == NULL)
 		return SFE_MALLOC_FAILED ;
 
