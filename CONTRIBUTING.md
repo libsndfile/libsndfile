@@ -1,4 +1,6 @@
- ## Submitting Issues.
+# Contributing
+
+## Submitting Issues
 
 * If your issue is that libsndfile is not able to or is incorrectly reading one
   of your files, please include the output of the `sndfile-info` program run
@@ -9,7 +11,7 @@
   your program is warning free, and that is is error free when run under Valgrind
   or compiled with AddressSanitizer.
 
-## Submitting Patches.
+## Submitting Patches
 
 * Patches should pass all existing tests
 * Patches should pass all pre-commit hook tests.
