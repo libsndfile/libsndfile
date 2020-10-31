@@ -1560,7 +1560,7 @@ data
 datasize
 : sizeof (SF_LOOP_INFO)
 
-The SF_BROADCAST_INFO struct is defined in *sndfile.h* as:
+The SF_LOOP_INFO struct is defined in *sndfile.h* as:
 
 ```c
 typedef struct
