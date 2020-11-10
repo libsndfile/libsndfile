@@ -233,7 +233,6 @@ add_library (sndfile
 	src/chanmap.c
 	src/id3.c
 	$<$<BOOL:${WIN32}>:src/windows.c>
-	$<$<AND:$<BOOL:${WIN32}>,$<BOOL:${BUILD_SHARED_LIBS}>>:src/version-metadata.rc>
 	src/sndfile.c
 	src/aiff.c
 	src/au.c
@@ -362,6 +361,7 @@ if (BUILD_SHARED_LIBS)
 		set (PACKAGE_VERSION ${CPACK_PACKAGE_VERSION})
 
 		configure_file (src/version-metadata.rc.in src/version-metadata.rc @ONLY)
+		target_sources (sndfile PRIVATE ${PROJECT_BINARY_DIR}/src/version-metadata.rc)
 	endif ()
 
 	set_target_properties (sndfile PROPERTIES
