@@ -185,7 +185,7 @@ libsndfile, the command would be:
 
 ## Q9 : How about adding the ability to write/read sound files to/from memory buffers? {#Q009}
 
-This has been added for version 1.0.13.
+This has been [added](api.md#open_virtual) for version 1.0.12.
 
 ## Q10 : Reading a 16 bit PCM file as normalised floats and then writing them back changes some sample values. Why? {#Q010}
 

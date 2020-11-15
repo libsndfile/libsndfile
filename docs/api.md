@@ -222,9 +222,9 @@ SNDFILE*    sf_open_virtual (SF_VIRTUAL_IO *sfvirtual, int mode, SF_INFO *sfinfo
 ```
 
 Opens a soundfile from a virtual file I/O context which is provided by the
-caller. This is usually used to interface libsndfile to a stream or buffer based
-system. Apart from the sfvirtual and the user_data parameters this function
-behaves like [sf_open()](#open).
+caller. This is usually used to interface libsndfile to write/read from memory
+with a stream or buffer based system. Apart from the sfvirtual and the user_data
+parameters this function behaves like [sf_open()](#open).
 
 ```c
     typedef struct
