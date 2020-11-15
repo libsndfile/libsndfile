@@ -1269,7 +1269,7 @@ exif_fill_and_sink (SF_PRIVATE *psf, char* buf, size_t bufsz, size_t toread)
 */
 static int
 exif_subchunk_parse (SF_PRIVATE *psf, uint32_t length)
-{	uint32_t marker, dword, vmajor = -1, vminor = -1, bytesread = 0 ;
+{	uint32_t marker, dword = 0, vmajor = -1, vminor = -1, bytesread = 0 ;
 	char buf [4096] ;
 	int thisread ;
 
