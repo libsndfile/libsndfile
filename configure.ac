@@ -609,8 +609,6 @@ AS_IF([test "x$ax_cv_c_compiler_vendor" = "xgnu"], [
 				temp_CFLAGS=`echo $CFLAGS | $SED "s/-Wall -pedantic//" | $SED "s/-Wshadow//" | $SED "s/-Waggregate-return//"`
 				CFLAGS=$temp_CFLAGS
 				SHLIB_VERSION_ARG="-Wl,-exported_symbols_list -Wl,\$(top_srcdir)/src/Symbols.darwin"],
-			[linux*|kfreebsd*-gnu*|gnu*], [
-				SHLIB_VERSION_ARG="-Wl,--version-script=\$(top_srcdir)/src/Symbols.gnu-binutils"],
 			[mingw*], [
 				SHLIB_VERSION_ARG="-Wc,-static-libgcc -Wl,\$(top_srcdir)/src/libsndfile-1.def"
 				win32_target_dll=1
@@ -625,6 +623,8 @@ AS_IF([test "x$ax_cv_c_compiler_vendor" = "xgnu"], [
 
 		COMPILER_IS_GCC=1
 	])
+
+AS_CASE([$host_os], [linux*|kfreebsd*-gnu*|gnu*],  [SHLIB_VERSION_ARG="-Wl,--version-script=\$(top_srcdir)/src/Symbols.gnu-binutils"])
 
 AC_DEFINE_UNQUOTED([WIN32_TARGET_DLL], [${win32_target_dll}], [Set to 1 if windows DLL is being built.])
 AC_DEFINE_UNQUOTED([COMPILER_IS_GCC], [${COMPILER_IS_GCC}], [Set to 1 if the compile is GNU GCC.])
