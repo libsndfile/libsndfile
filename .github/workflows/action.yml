@@ -189,6 +189,10 @@ jobs:
         if: startsWith(matrix.os,'ubuntu')
         run: sudo apt-get install -y autogen ninja-build libogg-dev libvorbis-dev libflac-dev libopus-dev libasound2-dev libsqlite3-dev libspeex-dev libmp3lame-dev libmpg123-dev
 
+      - name: Workaround vcpkg yasm-tools for x64-windows
+        if: (startsWith(matrix.os, 'windows') && startsWith(matrix.triplet, 'x64-windows'))
+        run: vcpkg install yasm-tool:x86-windows
+
       - name: Install Windows dependencies
         if: startsWith(matrix.os,'windows')
         run: |
