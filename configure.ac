@@ -156,6 +156,9 @@ AC_ARG_ENABLE([external-libs],
 AC_ARG_ENABLE([mpeg],
 	[AS_HELP_STRING([--disable-mpeg], [disable use of LAME/MPG123 for MPEG (MP3) [[defaults=no]]])])
 
+AC_ARG_ENABLE([wavpack],
+	[AS_HELP_STRING([--disable-wavpack], [disable use of Wavpack [[default=no]]])])
+
 AC_ARG_ENABLE(octave,
 	[AS_HELP_STRING([--enable-octave], [enable building of GNU Octave module])])
 
@@ -387,6 +390,19 @@ AS_IF([test -n "$PKG_CONFIG"], [
 	])
 
 AC_DEFINE_UNQUOTED([HAVE_MPEG], [$HAVE_MPEG], [Will be set to 1 if lame, mpg123 mpeg support is available.])
+
+dnl ====================================================================================
+dnl  Check for Wavpack.
+
+ac_cv_wavpack=0
+AS_IF([test "x$enable_wavpack" = "xno"], [
+  AC_MSG_WARN([[*** Wavpack disabled. ***]])
+], [
+  enable_wavpack=yes
+  PKG_CHECK_MOD_VERSION([WAVPACK], [wavpack >= 1.2], [ac_cv_wavpack=1], [ac_cv_wavpack=0])
+])
+AC_DEFINE_UNQUOTED([HAVE_WAVPACK], [${ac_cv_wavpack}], [Set to 1 if you want to build with Wavpack support.])
+AM_CONDITIONAL([HAVE_WAVPACK], [test "x$ac_cv_wavpack" = "x1"])
 
 dnl ====================================================================================
 dnl  Check for libsqlite3 (only used in regtest).
@@ -655,6 +671,7 @@ AC_SUBST(WIN_RC_VERSION)
 
 AC_SUBST(HAVE_EXTERNAL_XIPH_LIBS)
 AC_SUBST(HAVE_MPEG)
+AC_SUBST(HAVE_WAVPACK_LIBS)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(SNDIO_LIBS)
@@ -714,6 +731,7 @@ AC_MSG_RESULT([
     Using ALSA in example programs : ...... ${enable_alsa:-no}
     External FLAC/Ogg/Vorbis/Opus : ....... ${enable_external_libs:-no}
     External MPEG Lame/MPG123 : ........... ${enable_mpeg:-no}
+    External Wavpack : .................... ${enable_wavpack:-no}
     Building Octave interface : ........... ${OCTAVE_BUILD}
 
   Tools :
