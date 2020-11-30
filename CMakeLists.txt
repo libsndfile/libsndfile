@@ -109,6 +109,7 @@ if (BUILD_REGTEST AND (NOT SQLITE3_FOUND))
 	set (BUILD_REGTEST OFF)
 endif()
 
+cmake_dependent_option (ENABLE_WAVPACK "Enable Wavpack codec" ON "WAVPACK_FOUND" OFF)
 cmake_dependent_option (ENABLE_COMPATIBLE_LIBSNDFILE_NAME "Set DLL name to libsndfile-1.dll (canonical name), sndfile.dll otherwise" OFF "WIN32;BUILD_SHARED_LIBS" OFF)
 cmake_dependent_option (INSTALL_MANPAGES "Install man pages for programs" ON "BUILD_PROGRAMS" OFF)
 
@@ -132,6 +133,7 @@ if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 4)
 endif ()
 
 set (HAVE_EXTERNAL_XIPH_LIBS ${ENABLE_EXTERNAL_LIBS})
+set (HAVE_WAVPACK ${ENABLE_WAVPACK})
 set (HAVE_SQLITE3 ${BUILD_REGTEST})
 set (HAVE_ALSA_ASOUNDLIB_H ${ALSA_FOUND})
 set (HAVE_SNDIO_H ${SNDIO_FOUND})
@@ -143,6 +145,7 @@ set (HAVE_SPEEX ${ENABLE_EXPERIMENTAL})
 add_feature_info (BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
 add_feature_info (ENABLE_EXTERNAL_LIBS ENABLE_EXTERNAL_LIBS "enable FLAC, Vorbis, and Opus codecs")
 add_feature_info (ENABLE_MPEG ENABLE_MPEG "enable MPEG audio (including mp3) codecs")
+add_feature_info (ENABLE_WAVPACK ENABLE_WAVPACK "enable Wavpack codec")
 add_feature_info (ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info (BUILD_TESTING BUILD_TESTING "build tests")
 add_feature_info (BUILD_REGTEST BUILD_REGTEST "build regtest")
@@ -197,6 +200,12 @@ set_package_properties(Opus PROPERTIES
 	DESCRIPTION "Standardized open source low-latency fullband codec"
 	PURPOSE	"Enables experimental Opus support"
 	)
+set_package_properties (Wavpack PROPERTIES
+	TYPE RECOMMENDED
+	URL "www.wavpack.com/"
+	DESCRIPTION "Hybrid Lossless Audio Compression"
+	PURPOSE "Enables Wavpack support"
+	)
 set_package_properties(Speex PROPERTIES TYPE OPTIONAL
 	URL "www.speex.org/"
 	DESCRIPTION "an audio codec tuned for speech"
@@ -242,6 +251,10 @@ if (INSTALL_PKGCONFIG_MODULE)
 		set (EXTERNAL_MPEG_REQUIRE "libmpg123")
 		set (EXTERNAL_MPEG_LIBS "-lmp3lame")
 	endif ()
+
+	if (ENABLE_WAVPACK)
+    set (EXTERNAL_WAVPACK_REQUIRE "wavpack")
+  endif ()
 
 	configure_file (sndfile.pc.in sndfile.pc @ONLY)
 
@@ -324,6 +337,7 @@ add_library (sndfile
 	src/wavlike.h
 	src/wavlike.c
 	src/wav.c
+	src/wavpack.c
 	src/xi.c
 	src/mpc2k.c
 	src/rf64.c
@@ -403,6 +417,7 @@ target_link_libraries (sndfile
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Opus::opus>
 		$<$<BOOL:${HAVE_MPEG}>:MPG123::libmpg123>
 		$<$<BOOL:${HAVE_MPEG}>:mp3lame::mp3lame>
+		$<$<BOOL:${HAVE_WAVPACK}>:Wavpack::wavpack>
 	)
 set_target_properties (sndfile PROPERTIES
 	PUBLIC_HEADER "${sndfile_HDRS}"
@@ -447,7 +462,7 @@ if (BUILD_SHARED_LIBS)
 	if (WIN32)
 		set (VERSION_MAJOR ${CPACK_PACKAGE_VERSION_MAJOR})
 		set (GEN_TOOL cmake)
-		
+
 		set (WIN_RC_VERSION "${CPACK_PACKAGE_VERSION_MAJOR},${CPACK_PACKAGE_VERSION_MINOR},${CPACK_PACKAGE_VERSION_PATCH}")
 		set (CLEAN_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 		set (PACKAGE_VERSION ${CPACK_PACKAGE_VERSION})
@@ -1306,6 +1321,14 @@ if (BUILD_TESTING)
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
 
+	add_executable (wavpack_test tests/wavpack_test.c)
+	target_link_libraries (wavpack_test
+		PRIVATE
+			sndfile
+			test_utils
+			$<$<BOOL:${LIBM_REQUIRED}>:m>
+		)
+
 	add_executable (stdin_test tests/stdin_test.c)
 	target_link_libraries (stdin_test
 		PRIVATE
@@ -1543,6 +1566,9 @@ if (BUILD_TESTING)
 	### mpeg-tests ###
 	add_test (mpeg_test mpeg_test)
 	add_test (compression_size_test_mpeg compression_size_test mpeg)
+
+	### wavpack-tests ###
+	add_test (wavpack_test wavpack_test)
 
 	### io-tests
 	add_test (stdio_test stdio_test)
