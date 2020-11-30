@@ -352,6 +352,13 @@ echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on OPUS files."
 echo "----------------------------------------------------------------------"
 
+# wavpack-tests
+./tests/wavpack_test@EXEEXT@
+
+echo "----------------------------------------------------------------------"
+echo "  $sfversion passed tests on WAVPACK files."
+echo "----------------------------------------------------------------------"
+
 # io-tests
 ./tests/stdio_test@EXEEXT@
 ./tests/pipe_test@EXEEXT@

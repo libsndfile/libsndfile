@@ -338,6 +338,7 @@ int		wavlike_srate2blocksize (int srate_chan_product) ;
 int		wavlike_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize) ;
 void	wavlike_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat) ;
 void	wavlike_analyze (SF_PRIVATE *psf) ;
+int *	wavlike_gen_channel_map (int channel_mask) ;
 int		wavlike_gen_channel_mask (const int *chan_map, int channels) ;
 
 int		wavlike_read_bext_chunk (SF_PRIVATE *psf, uint32_t chunksize) ;

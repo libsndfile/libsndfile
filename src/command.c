@@ -95,6 +95,19 @@ static SF_FORMAT_INFO const simple_formats [] =
 		"WAV (Microsoft 8 bit PCM)", "wav"
 		},
 
+#if HAVE_WAVPACK
+	{	SF_FORMAT_WAVPACK | SF_FORMAT_PCM_16,
+		"Wavpack (16 bit PCM)", "wv"
+		},
+
+	{	SF_FORMAT_WAVPACK | SF_FORMAT_FLOAT,
+		"Wavpack (32 bit float)", "wv"
+		},
+
+	{	SF_FORMAT_WAVPACK | SF_FORMAT_PCM_U8,
+		"Wavpack (8 bit PCM)", "wv"
+		},
+#endif
 } ; /* simple_formats */
 
 int
@@ -149,8 +162,10 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_NIST,		"WAV (NIST Sphere)",					"wav"	},
 	{	SF_FORMAT_WAVEX,	"WAVEX (Microsoft)",					"wav"	},
 	{	SF_FORMAT_WVE,		"WVE (Psion Series 3)",					"wve"	},
+#if HAVE_WAVPACK
+	{	SF_FORMAT_WAVPACK,	"Wavpack (Wavpack)",					"wv"	},
+#endif
 	{	SF_FORMAT_XI,		"XI (FastTracker 2)",					"xi"	},
-
 } ; /* major_formats */
 
 int

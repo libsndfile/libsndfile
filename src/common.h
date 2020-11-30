@@ -760,6 +760,13 @@ enum
 
 	SFE_OPUS_BAD_SAMPLERATE,
 
+	SFE_WAVPACK_NEW_DECODER,
+	SFE_WAVPACK_NEW_ENCODER,
+	SFE_WAVPACK_WRITE_HEADER,
+	SFE_WAVPACK_PACK_SAMPLES,
+	SFE_WAVPACK_UNPACK_SAMPLES,
+	SFE_WAVPACK_DEAD,
+
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
 
@@ -906,6 +913,7 @@ int		flac_open	(SF_PRIVATE *psf) ;
 int		caf_open	(SF_PRIVATE *psf) ;
 int		mpc2k_open	(SF_PRIVATE *psf) ;
 int		rf64_open	(SF_PRIVATE *psf) ;
+int		wavpack_open	(SF_PRIVATE *psf) ;
 
 int		ogg_vorbis_open	(SF_PRIVATE *psf) ;
 int		ogg_speex_open	(SF_PRIVATE *psf) ;
