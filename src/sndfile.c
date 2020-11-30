@@ -295,6 +295,13 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_MPC_NO_MARKER		, "Error : No marker in MPC2K file." },
 
+	{	SFE_WAVPACK_NEW_DECODER	, "Error : Failed to create wavpack decoder." },
+	{	SFE_WAVPACK_NEW_ENCODER	, "Error : Failed to create wavpack encoder." },
+	{	SFE_WAVPACK_WRITE_HEADER, "Error : Failed to write wavpack header." },
+	{	SFE_WAVPACK_PACK_SAMPLES, "Error : Failed to encode wavpack data." },
+	{	SFE_WAVPACK_UNPACK_SAMPLES, "Error : Failed to decode wavpack data." },
+	{	SFE_WAVPACK_DEAD, "Error : Wavpack instance is dead, file may be corrupted." },
+
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
 } ;
@@ -959,6 +966,7 @@ sf_format_check	(const SF_INFO *info)
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
 					return 1 ;
 				break ;
+<<<<<<< HEAD
 
 		case SF_FORMAT_MPEG :
 				if (info->channels > 2)
@@ -968,6 +976,20 @@ sf_format_check	(const SF_INFO *info)
 				if (subformat == SF_FORMAT_MPEG_LAYER_I || subformat == SF_FORMAT_MPEG_LAYER_II || subformat == SF_FORMAT_MPEG_LAYER_III)
 					return 1 ;
 				break ;
+||||||| constructed merge base
+=======
+
+		case SF_FORMAT_WAVPACK :
+				if (info->channels > 31)
+					return 0 ;
+				if (endian != SF_ENDIAN_FILE)
+					return 0 ;
+				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
+					return 1 ;
+				if (subformat == SF_FORMAT_FLOAT)
+					return 1 ;
+				break ;
+>>>>>>> implemented wavpack support
 		default : break ;
 		} ;
 
@@ -2879,8 +2901,17 @@ retry:
 	if (buffer [0] == MAKE_MARKER ('R', 'F', '6', '4') && buffer [2] == MAKE_MARKER ('W', 'A', 'V', 'E'))
 		return SF_FORMAT_RF64 ;
 
+<<<<<<< HEAD
 	if (buffer [0] == MAKE_MARKER ('I', 'D', '3', 2) || buffer [0] == MAKE_MARKER ('I', 'D', '3', 3)
 			|| buffer [0] == MAKE_MARKER ('I', 'D', '3', 4))
+||||||| constructed merge base
+	if (buffer [0] == MAKE_MARKER ('I', 'D', '3', 3))
+=======
+	if (buffer [0] == MAKE_MARKER ('w', 'v', 'p', 'k'))
+		return SF_FORMAT_WAVPACK ;
+
+	if (buffer [0] == MAKE_MARKER ('I', 'D', '3', 3))
+>>>>>>> implemented wavpack support
 	{	psf_log_printf (psf, "Found 'ID3' marker.\n") ;
 		if (id3_skip (psf))
 			goto retry ;
@@ -3272,6 +3303,10 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 
 		case	SF_FORMAT_MPEG :
 				error = mpeg_open (psf) ;
+				break ;
+
+		case	SF_FORMAT_WAVPACK :
+				error = wavpack_open (psf) ;
 				break ;
 
 		/* Lite remove end */
