@@ -86,11 +86,14 @@ wavpack_short_test (int otype, int channels, int len)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	assert (sfinfo.format == (SF_FORMAT_WAVPACK | otype)) ;
+
 	test_read_short_or_die (file, 0, data_in.s, len_items, __LINE__) ;
 	sf_close (file) ;
 
 	for (unsigned i = 0 ; i < (unsigned) len_items ; ++ i)
-	{	if ((otype & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_U8)
+	{	int subformat = otype & SF_FORMAT_SUBMASK ;
+		if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8)
 			assert ((data_in.s [i] / 256) == (int) (data_out.s [i] / 256)) ;
 		else
 			assert (data_in.s [i] == data_out.s [i]) ;
@@ -157,16 +160,18 @@ wavpack_int_test (int otype, int channels, int len)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	assert (sfinfo.format == (SF_FORMAT_WAVPACK | otype)) ;
+
 	test_read_int_or_die (file, 0, data_in.i, len_items, __LINE__) ;
 	sf_close (file) ;
 
 	for (unsigned i = 0 ; i < (unsigned) len_items ; ++ i)
-	{	//printf ("%d | %d \n", (data_in.i [i]), (int) (data_out.i [i])) ;
-		if ((otype & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_U8)
+	{	int subformat = otype & SF_FORMAT_SUBMASK ;
+		if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8)
 			assert ((data_in.i [i] / 16777216) == (int) (data_out.i [i] / 16777216)) ;
-		else if ((otype & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_16)
+		else if (subformat == SF_FORMAT_PCM_16)
 			assert ((data_in.i [i] / 65536) == (int) (data_out.i [i] / 65536)) ;
-		else if ((otype & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_24)
+		else if (subformat == SF_FORMAT_PCM_24)
 			assert ((data_in.i [i] / 256) == (int) (data_out.i [i] / 256)) ;
 		else
 			assert (data_in.i [i] == data_out.i [i]) ;
@@ -224,18 +229,20 @@ wavpack_float_test (int otype, int channels, int len)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	assert (sfinfo.format == (SF_FORMAT_WAVPACK | otype)) ;
+
 	test_read_float_or_die (file, 0, data_in.f, len_items, __LINE__) ;
 	sf_close (file) ;
 
 	for (unsigned i = 0 ; i < (unsigned) len_items ; ++ i)
-	{	// printf ("%f | %f \n", (data_in.f [i]), (int) (data_out.f [i])) ;
-		if ((otype & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_U8)
+	{	int subformat = otype & SF_FORMAT_SUBMASK ;
+		if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8)
 			assert (fabs (data_in.f [i] - data_out.f [i]) <= 1.0f / 128.0f) ;
-		else if ((otype & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_16)
+		else if (subformat == SF_FORMAT_PCM_16)
 			assert (fabs (data_in.f [i] - data_out.f [i]) <= 1.0f / 32768.0f) ;
-		else if ((otype & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_24)
+		else if (subformat == SF_FORMAT_PCM_24)
 			assert (fabs (data_in.f [i] - data_out.f [i]) <= 1.0f / 16777216.0f) ;
-		else if ((otype & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_32)
+		else if (subformat == SF_FORMAT_PCM_32)
 			assert (fabs (data_in.f [i] - data_out.f [i]) <= 1.0f / 2147483648.0f) ;
 		else
 			assert (data_in.f [i] == data_out.f [i]) ;
@@ -293,18 +300,20 @@ wavpack_double_test (int otype, int channels, int len)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	assert (sfinfo.format == (SF_FORMAT_WAVPACK | otype)) ;
+
 	test_read_double_or_die (file, 0, data_in.d, len_items, __LINE__) ;
 	sf_close (file) ;
 
 	for (unsigned i = 0 ; i < (unsigned) len_items ; ++ i)
-	{	// printf ("%lf | %lf \n", (data_in.d [i]), (int) (data_out.d [i])) ;
-		if ((otype & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_U8)
+	{	int subformat = otype & SF_FORMAT_SUBMASK ;
+		if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8)
 			assert (fabs (data_in.d [i] - data_out.d [i]) <= 1.0f / 128.0f) ;
-		else if ((otype & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_16)
+		else if (subformat == SF_FORMAT_PCM_16)
 			assert (fabs (data_in.d [i] - data_out.d [i]) <= 1.0f / 32768.0f) ;
-		else if ((otype & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_24)
+		else if (subformat == SF_FORMAT_PCM_24)
 			assert (fabs (data_in.d [i] - data_out.d [i]) <= 1.0f / 16777216.0f) ;
-		else if ((otype & SF_FORMAT_SUBMASK) == SF_FORMAT_PCM_32)
+		else if (subformat == SF_FORMAT_PCM_32)
 			assert (fabs (data_in.d [i] - data_out.d [i]) <= 1.0f / 2147483648.0f) ;
 		else
 			assert (((float) data_in.d [i]) == ((float) data_out.d [i])) ;
@@ -408,8 +417,7 @@ wavpack_multich_seek_test (const char * filename, int format, int channels)
 
 int
 main (void)
-{
-	static int otype_list [] = { SF_FORMAT_PCM_U8, SF_FORMAT_PCM_16, SF_FORMAT_PCM_24, SF_FORMAT_PCM_32, SF_FORMAT_FLOAT } ;
+{	static int otype_list [] = { SF_FORMAT_PCM_S8, SF_FORMAT_PCM_U8, SF_FORMAT_PCM_16, SF_FORMAT_PCM_24, SF_FORMAT_PCM_32, SF_FORMAT_FLOAT } ;
 	static int len_list [] = { 1233, 2048, 6000, 8192, 9001 } ;
 	if (HAVE_WAVPACK)
 	{	for (int channels = 1 ; channels <= 19 ; ++ channels)
