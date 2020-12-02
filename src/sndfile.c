@@ -897,7 +897,7 @@ sf_format_check	(const SF_INFO *info)
 					return 0 ;
 				if (endian != SF_ENDIAN_FILE)
 					return 0 ;
-				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
+				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
 					return 1 ;
 				if (subformat == SF_FORMAT_FLOAT)
 					return 1 ;

@@ -315,10 +315,10 @@ wavpack_read_header (SF_PRIVATE *psf)
 	int mode = WavpackGetMode (pwvpk->context) ;
 
 	if (bit_depth == 8)
-	{	if (qmode ^ QMODE_SIGNED_BYTES)
- 			psf->sf.format |= SF_FORMAT_PCM_U8 ;
+	{	if (qmode & QMODE_SIGNED_BYTES)
+			psf->sf.format |= SF_FORMAT_PCM_S8 ;
 		else
-			return SFE_UNIMPLEMENTED ;
+ 			psf->sf.format |= SF_FORMAT_PCM_U8 ;
 	}
 	else if (qmode & QMODE_UNSIGNED_WORDS)
 	{	psf_log_printf (psf, "wavpack_read_header: `bit_depth = %u, qmode = %d` not implemented\n", bit_depth, qmode) ;
@@ -411,7 +411,12 @@ wavpack_enc_init (SF_PRIVATE *psf)
 			break ;
 		} ;
 	switch (SF_CODEC (psf->sf.format))
-	{	case SF_FORMAT_PCM_U8 :
+	{	case SF_FORMAT_PCM_S8 :
+			pwvpk->config.bytes_per_sample = 1 ;
+			pwvpk->config.bits_per_sample = 8 ;
+			pwvpk->config.qmode |= QMODE_SIGNED_BYTES ;
+			break ;
+		case SF_FORMAT_PCM_U8 :
 			pwvpk->config.bytes_per_sample = 1 ;
 			pwvpk->config.bits_per_sample = 8 ;
 			break ;
@@ -567,7 +572,7 @@ wavpack_unpack_buffer_single_any
 	if (otype == SF_FORMAT_DOUBLE)
 	{	if (itype == SF_FORMAT_FLOAT)
 			wavpack_cvtf32f64 (((const float *) buffer), out_ptr_double, item_count) ;
-		else if (itype == SF_FORMAT_PCM_U8)
+		else if (itype == SF_FORMAT_PCM_U8 || itype == SF_FORMAT_PCM_S8)
 			wavpack_cvt32i8f64 (buffer, out_ptr_double, item_count, 1) ;
 		else if (itype == SF_FORMAT_PCM_16)
 			wavpack_cvt32i16f64 (buffer, out_ptr_double, item_count, 1) ;
@@ -581,7 +586,7 @@ wavpack_unpack_buffer_single_any
 	else if (otype == SF_FORMAT_FLOAT)
 	{	if (itype == SF_FORMAT_FLOAT)
 			memcpy (out_ptr_float, buffer, item_count * sizeof (float)) ;
-		else if (itype == SF_FORMAT_PCM_U8)
+		else if (itype == SF_FORMAT_PCM_U8 || itype == SF_FORMAT_PCM_S8)
 			wavpack_cvt32i8f32 (buffer, out_ptr_float, item_count, 1) ;
 		else if (itype == SF_FORMAT_PCM_16)
 			wavpack_cvt32i16f32 (buffer, out_ptr_float, item_count, 1) ;
@@ -600,7 +605,7 @@ wavpack_unpack_buffer_single_any
 		else
 			abort () ;
 		}
-	else if (itype == SF_FORMAT_PCM_16 || itype == SF_FORMAT_PCM_24 || itype == SF_FORMAT_PCM_32 || itype == SF_FORMAT_PCM_U8)
+	else if (itype == SF_FORMAT_PCM_16 || itype == SF_FORMAT_PCM_24 || itype == SF_FORMAT_PCM_32 || itype == SF_FORMAT_PCM_U8 || itype == SF_FORMAT_PCM_S8)
 	{	if (otype == SF_FORMAT_PCM_32)
 			wavpack_shifti32i32 (buffer, out_ptr_int, item_count, shl, voffset) ;
 		else if (otype == SF_FORMAT_PCM_16)
@@ -661,6 +666,7 @@ wavpack_unpack_buffer_any (SF_PRIVATE *psf, void *ptr, sf_count_t sample_count, 
 		case SF_FORMAT_PCM_16:
 			switch (itype)
 			{	case SF_FORMAT_PCM_U8 :
+				case SF_FORMAT_PCM_S8 :
 					shl = 8 ;
 					break ;
 				case SF_FORMAT_PCM_16 :
@@ -681,6 +687,7 @@ wavpack_unpack_buffer_any (SF_PRIVATE *psf, void *ptr, sf_count_t sample_count, 
 		case SF_FORMAT_PCM_32:
 			switch (itype)
 			{	case SF_FORMAT_PCM_U8 :
+				case SF_FORMAT_PCM_S8 :
 					shl = 24 ;
 					break ;
 				case SF_FORMAT_PCM_16 :
@@ -752,6 +759,7 @@ wavpack_pack_buffer_any (SF_PRIVATE *psf, const void *ptr, sf_count_t sample_cou
 		case SF_FORMAT_DOUBLE:
 			switch (otype)
 			{	case SF_FORMAT_PCM_U8 :
+				case SF_FORMAT_PCM_S8 :
 					vlim = 128.0 ;
 					break ;
 				case SF_FORMAT_PCM_16 :
@@ -772,6 +780,7 @@ wavpack_pack_buffer_any (SF_PRIVATE *psf, const void *ptr, sf_count_t sample_cou
 		case SF_FORMAT_PCM_16:
 			switch (otype)
 			{	case SF_FORMAT_PCM_U8 :
+				case SF_FORMAT_PCM_S8 :
 					shl = -8 ;
 					break ;
 				case SF_FORMAT_PCM_16 :
@@ -791,6 +800,7 @@ wavpack_pack_buffer_any (SF_PRIVATE *psf, const void *ptr, sf_count_t sample_cou
 		case SF_FORMAT_PCM_32:
 			switch (otype)
 			{	case SF_FORMAT_PCM_U8 :
+				case SF_FORMAT_PCM_S8 :
 					shl = -24 ;
 					break ;
 				case SF_FORMAT_PCM_16 :
