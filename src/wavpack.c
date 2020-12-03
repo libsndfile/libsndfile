@@ -48,13 +48,13 @@
 static void \
 FUNC_NAME (const FTYPE *src, ITYPE *dest, sf_count_t count, int normalize, FTYPE vlim, ITYPE offset, int use_clip) \
 {	FTYPE normfact = normalize ? (vlim) : 1.0 ; \
-		\
+	sf_count_t i ; \
 	if ((use_clip)) \
-	{	for (int i = 0 ; i < count ; ++ i) \
+	{	for (i = 0 ; i < count ; ++ i) \
 			dest [i] = LRFUNC (MAXFUNC (- (vlim), MINFUNC (src [i] * normfact, ((vlim) - 1.0)))) + (offset) ; \
 		} \
 	else \
-	{	for (int i = 0 ; i < count ; ++ i) \
+	{	for (i = 0 ; i < count ; ++ i) \
 			dest [i] = LRFUNC (src [i] * normfact) + (offset) ; \
 		} ; \
 } /* FUNC_NAME */
@@ -63,48 +63,49 @@ FUNC_NAME (const FTYPE *src, ITYPE *dest, sf_count_t count, int normalize, FTYPE
 static void \
 FUNC_NAME (void *src_dest, sf_count_t count, int normalize, FTYPE vlim, ITYPE offset, int use_clip) \
 {	FTYPE normfact = normalize ? (vlim) : 1.0 ; \
-		\
+	sf_count_t i ; \
 	if ((use_clip)) \
-	{	for (int i = 0 ; i < count ; ++ i) \
+	{	for (i = 0 ; i < count ; ++ i) \
 			* (((ITYPE *) src_dest) + i) = LRFUNC (MAXFUNC (- (vlim), MINFUNC ((* (((const FTYPE *) src_dest) + i)) * normfact, ((vlim) - 1.0)))) + (offset) ; \
 		} \
 	else \
-	{	for (int i = 0 ; i < count ; ++ i) \
+	{	for (i = 0 ; i < count ; ++ i) \
 			* (((ITYPE *) src_dest) + i) = LRFUNC ((* (((const FTYPE *) src_dest) + i)) * normfact) + (offset) ; \
 		} ; \
 } /* FUNC_NAME */
 
 #define WAVPACK_GENERATE_INT_TO_FLOAT_FUNC(FUNC_NAME, ITYPE, FTYPE, VLIM, OFFSET) \
 static void \
-FUNC_NAME (const ITYPE *src, FTYPE *dest, int count, int normalize) \
+FUNC_NAME (const ITYPE *src, FTYPE *dest, sf_count_t count, int normalize) \
 {	FTYPE normfact = normalize ? (VLIM) : 1.0 ; \
-		\
-	for (int i = 0 ; i < count ; ++ i) \
+	sf_count_t i ; \
+	for (i = 0 ; i < count ; ++ i) \
 		dest [i] = (((FTYPE) src [i]) - (OFFSET)) / normfact ; \
 } /* FUNC_NAME */
 
 #define WAVPACK_GENERATE_INT_TO_FLOAT_FUNC_INPLACE(FUNC_NAME, ITYPE, FTYPE, VLIM, OFFSET) \
 static void \
-FUNC_NAME (void *src_dest, int count, int normalize) \
+FUNC_NAME (void *src_dest, sf_count_t count, int normalize) \
 {	FTYPE normfact = normalize ? (VLIM) : 1.0 ; \
-		\
-	for (int i = 0 ; i < count ; ++ i) \
+	sf_count_t i ; \
+	for (i = 0 ; i < count ; ++ i) \
 		* (((FTYPE *) src_dest) + i) = (((FTYPE) (* (((const ITYPE *) src_dest) + i))) - (OFFSET)) / normfact ; \
 } /* FUNC_NAME */
 
 #define WAVPACK_GENERATE_SHIFT_FUNC(FUNC_NAME, ITYPE, OTYPE) \
 static void \
-FUNC_NAME (const ITYPE *src, OTYPE *dest, int count, int shl, int offset) \
-{	if (shl == 0 && offset == 0) \
-	{	for (int i = 0 ; i < count ; ++ i) \
+FUNC_NAME (const ITYPE *src, OTYPE *dest, sf_count_t count, int shl, int offset) \
+{	sf_count_t i ; \
+	if (shl == 0 && offset == 0) \
+	{	for (i = 0 ; i < count ; ++ i) \
 			dest [i] = (OTYPE) src [i] ; \
 		} \
 	else if (shl >= 0) \
-	{	for (int i = 0 ; i < count ; ++ i) \
+	{	for (i = 0 ; i < count ; ++ i) \
 			dest [i] = (((OTYPE) src [i]) * (((OTYPE) 1) << shl)) + ((OTYPE) offset) ; \
 		} \
 	else \
-	{	for (int i = 0 ; i < count ; ++ i) \
+	{	for (i = 0 ; i < count ; ++ i) \
 			dest [i] = (OTYPE) ((src [i] / (((ITYPE) 1) << (-shl))) + ((ITYPE) offset)) ; \
 		} ; \
 } /* FUNC_NAME */
@@ -126,33 +127,39 @@ typedef struct
 
 #define WAVPACK_BUFFER_LENGTH 131072
 
+#define WVPK_UNPACK_FAST_PATH_MAX_SAMPLES 0x7fffffff
+#define WVPK_INT32_VLIM 0x80000000
+#define WVPK_INT24_VLIM 0x800000
+#define WVPK_INT16_VLIM 0x8000
+#define WVPK_INT8_VLIM 0x80
+
 WAVPACK_GENERATE_FLOAT_TO_INT_FUNC (wavpack_cvtf32i32, int32_t, float, lrintf, fmaxf, fminf)
 WAVPACK_GENERATE_FLOAT_TO_INT_FUNC (wavpack_cvtf64i32, int32_t, double, lrint, fmax, fmin)
 WAVPACK_GENERATE_FLOAT_TO_INT_FUNC (wavpack_cvtf32i16, int16_t, float, lrintf, fmaxf, fminf)
 
 WAVPACK_GENERATE_FLOAT_TO_INT_FUNC_INPLACE (wavpack_cvtf32i32_inplace, int32_t, float, lrintf, fmaxf, fminf)
 
-WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvti16f32, short, float, 32768, 0)
+WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvti16f32, short, float, WVPK_INT16_VLIM, 0)
 
-WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvt32i8f32, int32_t, float, 128, 0)
-WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvt32i16f32, int32_t, float, 32768, 0)
-WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvt32i24f32, int32_t, float, 8388608, 0)
-WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvti32f32, int32_t, float, 2147483648, 0)
+WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvt32i8f32, int32_t, float, WVPK_INT8_VLIM, 0)
+WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvt32i16f32, int32_t, float, WVPK_INT16_VLIM, 0)
+WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvt32i24f32, int32_t, float, WVPK_INT24_VLIM, 0)
+WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvti32f32, int32_t, float, WVPK_INT32_VLIM, 0)
 
-WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvt32i8f64, int32_t, double, 128, 0)
-WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvt32i16f64, int32_t, double, 32768, 0)
-WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvt32i24f64, int32_t, double, 8388608, 0)
-WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvti32f64, int32_t, double, 2147483648, 0)
+WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvt32i8f64, int32_t, double, WVPK_INT8_VLIM, 0)
+WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvt32i16f64, int32_t, double, WVPK_INT16_VLIM, 0)
+WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvt32i24f64, int32_t, double, WVPK_INT24_VLIM, 0)
+WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvti32f64, int32_t, double, WVPK_INT32_VLIM, 0)
 
-WAVPACK_GENERATE_INT_TO_FLOAT_FUNC_INPLACE (wavpack_cvti32f32_inplace, int32_t, float, 2147483648, 0)
+WAVPACK_GENERATE_INT_TO_FLOAT_FUNC_INPLACE (wavpack_cvti32f32_inplace, int32_t, float, WVPK_INT32_VLIM, 0)
 
 WAVPACK_GENERATE_SHIFT_FUNC (wavpack_shifti32i16, int32_t, int16_t) ;
 WAVPACK_GENERATE_SHIFT_FUNC (wavpack_shifti16i32, int16_t, int32_t) ;
 WAVPACK_GENERATE_SHIFT_FUNC (wavpack_shifti32i32, int32_t, int32_t) ;
 
 
-static void		wavpack_cvtf64f32 (const double *src, float *dest, int count) ;
-static void		wavpack_cvtf32f64 (const float *src, double *dest, int count) ;
+static void		wavpack_cvtf64f32 (const double *src, float *dest, sf_count_t count) ;
+static void		wavpack_cvtf32f64 (const float *src, double *dest, sf_count_t count) ;
 
 static inline int	wavpack_pack_buffer_single_any
 (	SF_PRIVATE *psf, sf_count_t *total_packed_count, const void *ptr, sf_count_t i_chunk, sf_count_t chunk_item_count, sf_count_t item_count, int32_t *buffer,
@@ -635,7 +642,7 @@ wavpack_unpack_buffer_any (SF_PRIVATE *psf, void *ptr, sf_count_t sample_count, 
 	int itype = SF_CODEC (psf->sf.format) ;
 
 	/* fast path */
-	if (sample_count <= 2147483647 && (itype == SF_FORMAT_PCM_32 || itype == SF_FORMAT_FLOAT) && (otype == SF_FORMAT_PCM_32 || otype == SF_FORMAT_FLOAT))
+	if (sample_count <= WVPK_UNPACK_FAST_PATH_MAX_SAMPLES && (itype == SF_FORMAT_PCM_32 || itype == SF_FORMAT_FLOAT) && (otype == SF_FORMAT_PCM_32 || otype == SF_FORMAT_FLOAT))
 	{	if (WavpackUnpackSamples (pwvpk->context, ptr, sample_count / psf->sf.channels) == 0)
 			return 0 ;
 		if (itype != otype)
@@ -678,7 +685,7 @@ wavpack_unpack_buffer_any (SF_PRIVATE *psf, void *ptr, sf_count_t sample_count, 
 					shl = -16 ;
 					break ;
 				case SF_FORMAT_FLOAT :
-					vlim = 32768.0 ;
+					vlim = (float) WVPK_INT16_VLIM ;
 					break ;
 				default :
 					abort () ;
@@ -699,7 +706,7 @@ wavpack_unpack_buffer_any (SF_PRIVATE *psf, void *ptr, sf_count_t sample_count, 
 				case SF_FORMAT_PCM_32 :
 					break ;
 				case SF_FORMAT_FLOAT :
-					vlim = 2147483648.0 ;
+					vlim = (float) WVPK_INT32_VLIM ;
 					break ;
 				default :
 					abort () ;
@@ -760,16 +767,16 @@ wavpack_pack_buffer_any (SF_PRIVATE *psf, const void *ptr, sf_count_t sample_cou
 			switch (otype)
 			{	case SF_FORMAT_PCM_U8 :
 				case SF_FORMAT_PCM_S8 :
-					vlim = 128.0 ;
+					vlim = (float) WVPK_INT8_VLIM ;
 					break ;
 				case SF_FORMAT_PCM_16 :
-					vlim = 32768.0 ;
+					vlim = (float) WVPK_INT16_VLIM ;
 					break ;
 				case SF_FORMAT_PCM_24 :
-					vlim = 8388608.0 ;
+					vlim = (float) WVPK_INT24_VLIM ;
 					break ;
 				case SF_FORMAT_PCM_32 :
-					vlim = 2147483648.0 ;
+					vlim = (float) WVPK_INT32_VLIM ;
 					break ;
 				case SF_FORMAT_FLOAT :
 					break ;
@@ -932,14 +939,16 @@ wavpack_byterate (SF_PRIVATE *psf)
 } /* wavpack_byterate */
 
 static void
-wavpack_cvtf64f32 (const double *src, float *dest, int count)
-{	for (int i = 0 ; i < count ; ++ i)
+wavpack_cvtf64f32 (const double *src, float *dest, sf_count_t count)
+{	sf_count_t i ;
+	for (i = 0 ; i < count ; ++ i)
 		dest [i] = (float) src [i] ;
 } /* wavpack_cvtf64f32 */
 
 static void
-wavpack_cvtf32f64 (const float *src, double *dest, int count)
-{	for (int i = 0 ; i < count ; ++ i)
+wavpack_cvtf32f64 (const float *src, double *dest, sf_count_t count)
+{	sf_count_t i ;
+	for (i = 0 ; i < count ; ++ i)
 		dest [i] = (double) src [i] ;
 } /* wavpack_cvtf32f64 */
 
