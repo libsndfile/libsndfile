@@ -24,7 +24,7 @@ sed -i "s@RUN.*@RUN git config --global remote.origin.fetch '+refs/pull/*:refs/r
 
 # Try and build the fuzzers
 pushd /tmp/ossfuzz
-python infra/helper.py build_image --pull ${PROJECT_NAME}
-python infra/helper.py build_fuzzers ${PROJECT_NAME}
-python infra/helper.py check_build ${PROJECT_NAME} --engine libfuzzer --sanitizer address --architecture x86_64
+python3 infra/helper.py build_image --pull ${PROJECT_NAME}
+python3 infra/helper.py build_fuzzers ${PROJECT_NAME}
+python3 infra/helper.py check_build ${PROJECT_NAME} --engine libfuzzer --sanitizer address --architecture x86_64
 popd
