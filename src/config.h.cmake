@@ -172,6 +172,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #cmakedefine01 HAVE_UNISTD_H
 
+/* Define to 1 if you have the <immintrin.h> header file. */
+#cmakedefine01 HAVE_IMMINTRIN_H
+
 /* Define to 1 if you have the `vsnprintf' function. */
 #cmakedefine01 HAVE_VSNPRINTF
 

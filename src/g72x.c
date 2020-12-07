@@ -538,7 +538,7 @@ g72x_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
-			sptr [k] = lrintf (normfact * ptr [total + k]) ;
+			sptr [k] = psf_lrintf (normfact * ptr [total + k]) ;
 		count = g72x_write_block (psf, pg72x, sptr, writecount) ;
 
 		total += count ;
@@ -570,7 +570,7 @@ g72x_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
-			sptr [k] = lrint (normfact * ptr [total + k]) ;
+			sptr [k] = psf_lrint (normfact * ptr [total + k]) ;
 		count = g72x_write_block (psf, pg72x, sptr, writecount) ;
 
 		total += count ;

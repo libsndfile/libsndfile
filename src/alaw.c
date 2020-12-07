@@ -340,9 +340,9 @@ static inline void
 f2alaw_array (const float *ptr, int count, unsigned char *buffer, float normfact)
 {	while (--count >= 0)
 	{	if (ptr [count] >= 0)
-			buffer [count] = alaw_encode [lrintf (normfact * ptr [count])] ;
+			buffer [count] = alaw_encode [psf_lrintf (normfact * ptr [count])] ;
 		else
-			buffer [count] = 0x7F & alaw_encode [- lrintf (normfact * ptr [count])] ;
+			buffer [count] = 0x7F & alaw_encode [- psf_lrintf (normfact * ptr [count])] ;
 		} ;
 } /* f2alaw_array */
 
@@ -352,9 +352,9 @@ d2alaw_array (const double *ptr, int count, unsigned char *buffer, double normfa
 	{	if (!isfinite (ptr [count]))
 			buffer [count] = 0 ;
 		else if (ptr [count] >= 0)
-			buffer [count] = alaw_encode [lrint (normfact * ptr [count])] ;
+			buffer [count] = alaw_encode [psf_lrint (normfact * ptr [count])] ;
 		else
-			buffer [count] = 0x7F & alaw_encode [- lrint (normfact * ptr [count])] ;
+			buffer [count] = 0x7F & alaw_encode [- psf_lrint (normfact * ptr [count])] ;
 		} ;
 } /* d2alaw_array */
 

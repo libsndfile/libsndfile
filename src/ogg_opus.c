@@ -1161,12 +1161,12 @@ ogg_opus_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 			if (psf->float_int_mult)
 			{	float inverse = 1.0 / psf->float_max ;
 				for ( ; i < total ; i++)
-				{	ptr [i] = lrintf (((*(iptr++)) * inverse) * 32767.0f) ;
+				{	ptr [i] = psf_lrintf (((*(iptr++)) * inverse) * 32767.0f) ;
 					} ;
 				}
 			else
 			{	for ( ; i < total ; i++)
-				{	ptr [i] = lrintf ((*(iptr++)) * 32767.0f) ;
+				{	ptr [i] = psf_lrintf ((*(iptr++)) * 32767.0f) ;
 					} ;
 				} ;
 			oopus->loc += (readlen / psf->sf.channels) ;
@@ -1198,12 +1198,12 @@ ogg_opus_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 			if (psf->float_int_mult)
 			{	float inverse = 1.0 / psf->float_max ;
 				for ( ; i < total ; i++)
-				{	ptr [i] = lrintf (((*(iptr++)) * inverse) * 2147483647.0f) ;
+				{	ptr [i] = psf_lrintf (((*(iptr++)) * inverse) * 2147483647.0f) ;
 					}
 				}
 			else
 			{	for ( ; i < total ; i++)
-				{	ptr [i] = lrintf ((*(iptr++)) * 2147483647.0f) ;
+				{	ptr [i] = psf_lrintf ((*(iptr++)) * 2147483647.0f) ;
 					}
 				} ;
 			oopus->loc += (readlen / psf->sf.channels) ;

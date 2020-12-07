@@ -37,6 +37,10 @@
 #include "sndfile.h"
 #endif
 
+#ifdef USE_SSE2
+#include <immintrin.h>
+#endif
+
 #ifdef __cplusplus
 #error "This code is not designed to be compiled with a C++ compiler."
 #endif
@@ -546,6 +550,8 @@ typedef struct sf_private_tag
 	SF_CHUNK_ITERATOR *	(*next_chunk_iterator)	(struct sf_private_tag*, SF_CHUNK_ITERATOR * iterator) ;
 	int					(*get_chunk_size)	(struct sf_private_tag*, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
 	int					(*get_chunk_data)	(struct sf_private_tag*, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
+
+	int cpu_flags ;
 } SF_PRIVATE ;
 
 
@@ -997,6 +1003,28 @@ psf_strlcpy (char *dest, size_t n, const char *src)
 {	strncpy (dest, src, n - 1) ;
 	dest [n - 1] = 0 ;
 } /* psf_strlcpy */
+
+/*------------------------------------------------------------------------------------
+** SIMD optimized math functions.
+*/
+
+static inline int psf_lrintf (float x)
+{
+	#ifdef USE_SSE2
+ 		return _mm_cvtss_si32 (_mm_load_ss (&x)) ;
+	#else
+		return lrintf (x) ;
+	#endif
+} /* psf_lrintf */
+
+static inline int psf_lrint (double x)
+{
+	#ifdef USE_SSE2
+ 		return _mm_cvtsd_si32 (_mm_load_sd (&x)) ;
+	#else
+		return lrint (x) ;
+	#endif
+} /* psf_lrintf */
 
 /*------------------------------------------------------------------------------------
 ** Other helper functions.

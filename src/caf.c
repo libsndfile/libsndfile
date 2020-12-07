@@ -370,7 +370,7 @@ caf_read_header (SF_PRIVATE *psf)
 		return SFE_MALFORMED_FILE ;
 		} ;
 
-	psf->sf.samplerate = lrint (srate) ;
+	psf->sf.samplerate = psf_lrint (srate) ;
 
 	psf_binheader_readf (psf, "mE44444", &desc.fmt_id, &desc.fmt_flags, &desc.pkt_bytes, &desc.frames_per_packet,
 			&desc.channels_per_frame, &desc.bits_per_chan) ;
