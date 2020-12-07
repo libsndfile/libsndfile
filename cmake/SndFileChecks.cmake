@@ -67,6 +67,7 @@ check_include_file (stdint.h		HAVE_STDINT_H)
 check_include_file (sys/time.h		HAVE_SYS_TIME_H)
 check_include_file (sys/types.h		HAVE_SYS_TYPES_H)
 check_include_file (unistd.h		HAVE_UNISTD_H)
+check_include_file (immintrin.h		HAVE_IMMINTRIN_H)
 
 # Never checked
 # check_include_file (stdlib.h		HAVE_STDLIB_H)

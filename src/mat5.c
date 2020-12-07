@@ -370,7 +370,7 @@ mat5_read_header (SF_PRIVATE *psf)
 					snprintf (name, sizeof (name), "%f\n", samplerate) ;
 					psf_log_printf (psf, "    Val  : %s\n", name) ;
 
-					psf->sf.samplerate = lrint (samplerate) ;
+					psf->sf.samplerate = psf_lrint (samplerate) ;
 					} ;
 				break ;
 

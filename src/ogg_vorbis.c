@@ -558,13 +558,13 @@ vorbis_rshort (SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, 
 		float inverse = 1.0 / psf->float_max ;
 		for (j = 0 ; j < samples ; j++)
 			for (n = 0 ; n < channels ; n++)
-				ptr [i++] = lrintf ((pcm [n][j] * inverse) * 32767.0f) ;
+				ptr [i++] = psf_lrintf ((pcm [n][j] * inverse) * 32767.0f) ;
 	}
 	else
 	{
 		for (j = 0 ; j < samples ; j++)
 			for (n = 0 ; n < channels ; n++)
-				ptr [i++] = lrintf (pcm [n][j] * 32767.0f) ;
+				ptr [i++] = psf_lrintf (pcm [n][j] * 32767.0f) ;
 	}
 	return i ;
 } /* vorbis_rshort */
@@ -580,13 +580,13 @@ vorbis_rint (SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, fl
 		float inverse = 1.0 / psf->float_max ;
 		for (j = 0 ; j < samples ; j++)
 			for (n = 0 ; n < channels ; n++)
-				ptr [i++] = lrintf ((pcm [n][j] * inverse) * 2147483647.0f) ;
+				ptr [i++] = psf_lrintf ((pcm [n][j] * inverse) * 2147483647.0f) ;
 	}
 	else
 	{
 		for (j = 0 ; j < samples ; j++)
 			for (n = 0 ; n < channels ; n++)
-				ptr [i++] = lrintf (pcm [n][j] * 2147483647.0f) ;
+				ptr [i++] = psf_lrintf (pcm [n][j] * 2147483647.0f) ;
 	}
 	return i ;
 } /* vorbis_rint */

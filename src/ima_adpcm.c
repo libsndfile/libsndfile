@@ -959,7 +959,7 @@ ima_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
-			sptr [k] = lrintf (normfact * ptr [total + k]) ;
+			sptr [k] = psf_lrintf (normfact * ptr [total + k]) ;
 		count = ima_write_block (psf, pima, sptr, writecount) ;
 		total += count ;
 		len -= writecount ;
@@ -990,7 +990,7 @@ ima_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
-			sptr [k] = lrint (normfact * ptr [total + k]) ;
+			sptr [k] = psf_lrint (normfact * ptr [total + k]) ;
 		count = ima_write_block (psf, pima, sptr, writecount) ;
 		total += count ;
 		len -= writecount ;

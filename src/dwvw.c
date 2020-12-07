@@ -628,7 +628,7 @@ dwvw_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
-			iptr [k] = lrintf (normfact * ptr [total + k]) ;
+			iptr [k] = psf_lrintf (normfact * ptr [total + k]) ;
 		count = dwvw_encode_data (psf, pdwvw, iptr, writecount) ;
 
 		total += count ;
@@ -660,7 +660,7 @@ dwvw_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : len ;
 		for (k = 0 ; k < writecount ; k++)
-			iptr [k] = lrint (normfact * ptr [total + k]) ;
+			iptr [k] = psf_lrint (normfact * ptr [total + k]) ;
 		count = dwvw_encode_data (psf, pdwvw, iptr, writecount) ;
 
 		total += count ;

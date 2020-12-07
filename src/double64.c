@@ -368,7 +368,7 @@ double64_be_write (double in, unsigned char *out)
 	out [1] |= (exponent << 4) & 0xF0 ;
 
 	in *= 0x20000000 ;
-	mantissa = lrint (floor (in)) ;
+	mantissa = psf_lrint (floor (in)) ;
 
 	out [1] |= (mantissa >> 24) & 0xF ;
 	out [2] = (mantissa >> 16) & 0xFF ;
@@ -377,7 +377,7 @@ double64_be_write (double in, unsigned char *out)
 
 	in = fmod (in, 1.0) ;
 	in *= 0x1000000 ;
-	mantissa = lrint (floor (in)) ;
+	mantissa = psf_lrint (floor (in)) ;
 
 	out [5] = (mantissa >> 16) & 0xFF ;
 	out [6] = (mantissa >> 8) & 0xFF ;
@@ -408,7 +408,7 @@ double64_le_write (double in, unsigned char *out)
 	out [6] |= (exponent << 4) & 0xF0 ;
 
 	in *= 0x20000000 ;
-	mantissa = lrint (floor (in)) ;
+	mantissa = psf_lrint (floor (in)) ;
 
 	out [6] |= (mantissa >> 24) & 0xF ;
 	out [5] = (mantissa >> 16) & 0xFF ;
@@ -417,7 +417,7 @@ double64_le_write (double in, unsigned char *out)
 
 	in = fmod (in, 1.0) ;
 	in *= 0x1000000 ;
-	mantissa = lrint (floor (in)) ;
+	mantissa = psf_lrint (floor (in)) ;
 
 	out [2] = (mantissa >> 16) & 0xFF ;
 	out [1] = (mantissa >> 8) & 0xFF ;
@@ -487,7 +487,7 @@ double64_get_capability	(SF_PRIVATE *psf)
 static void
 d2s_array (const double *src, int count, short *dest, double scale)
 {	while (--count >= 0)
-	{	dest [count] = lrint (scale * src [count]) ;
+	{	dest [count] = psf_lrint (scale * src [count]) ;
 		} ;
 } /* d2s_array */
 
@@ -501,14 +501,14 @@ d2s_clip_array (const double *src, int count, short *dest, double scale)
 		else if (CPU_CLIPS_NEGATIVE == 0 && tmp < -32768.0)
 			dest [count] = SHRT_MIN ;
 		else
-			dest [count] = lrint (tmp) ;
+			dest [count] = psf_lrint (tmp) ;
 		} ;
 } /* d2s_clip_array */
 
 static void
 d2i_array (const double *src, int count, int *dest, double scale)
 {	while (--count >= 0)
-	{	dest [count] = lrint (scale * src [count]) ;
+	{	dest [count] = psf_lrint (scale * src [count]) ;
 		} ;
 } /* d2i_array */
 
@@ -522,7 +522,7 @@ d2i_clip_array (const double *src, int count, int *dest, double scale)
 		else if (CPU_CLIPS_NEGATIVE == 0 && tmp < (-1.0 * INT_MAX))
 			dest [count] = INT_MIN ;
 		else
-			dest [count] = lrint (tmp) ;
+			dest [count] = psf_lrint (tmp) ;
 		} ;
 } /* d2i_clip_array */
 
