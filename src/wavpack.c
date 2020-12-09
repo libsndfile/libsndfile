@@ -224,6 +224,9 @@ wavpack_open	(SF_PRIVATE *psf)
 	int		error = 0 ;
 
 	WAVPACK_PRIVATE* pwvpk = calloc (1, sizeof (WAVPACK_PRIVATE)) ;
+	if (pwvpk == NULL)
+		return SFE_MALLOC_FAILED ;
+
 	psf->codec_data = pwvpk ;
 	psf->dataoffset = 0 ;
 
@@ -288,10 +291,14 @@ static int
 wavpack_command (SF_PRIVATE *psf, int command, void *UNUSED (data), int UNUSED (datasize))
 {	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
 	if (pwvpk == NULL)
-		return SFE_WAVPACK_DEAD ;
+	{	psf_log_printf (psf, "wavpack_command: null pwvpk\n") ;
+		return SFE_INTERNAL ;
+	}
 
 	if (pwvpk->context == NULL)
+	{	psf_log_printf (psf, "wavpack_command: null pwvpk->context\n") ;
 		return SFE_INTERNAL ;
+	}
 
 	switch (command)
 	{	case SFC_SET_CHANNEL_MAP_INFO :
@@ -309,7 +316,14 @@ static int
 wavpack_read_header (SF_PRIVATE *psf)
 {	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
 	if (pwvpk == NULL)
-		return SFE_WAVPACK_DEAD ;
+	{	psf_log_printf (psf, "wavpack_read_header: null pwvpk\n") ;
+		return SFE_INTERNAL ;
+	}
+
+	if (pwvpk->context == NULL)
+	{	psf_log_printf (psf, "wavpack_read_header: null pwvpk->context\n") ;
+		return SFE_INTERNAL ;
+	}
 
 	// now let's read header
 	psf->sf.samplerate = WavpackGetSampleRate (pwvpk->context) ;
@@ -366,16 +380,16 @@ wavpack_dec_init (SF_PRIVATE *psf)
 		return psf->error ;
 
 	if (pwvpk->context)
-		WavpackCloseFile (pwvpk->context) ;
+		pwvpk->context = WavpackCloseFile (pwvpk->context) ;
 
 	if ((pwvpk->context = WavpackOpenFileInputEx64 (&wavpack_reader_wrapper, psf, NULL, error_buf, pwvpk->config.flags, 0)) == NULL)
-	{	psf_log_printf (psf, "Failed to call `WavpackOpenFileInputEx64`: `%s`\n", error_buf) ;
-		return SFE_WAVPACK_NEW_DECODER ;
+	{	psf_log_printf (psf, "wavpack_dec_init: failed to call `WavpackOpenFileInputEx64`: `%s`\n", error_buf) ;
+		return SF_ERR_UNSUPPORTED_ENCODING ;
 		} ;
 
 	if ((err = wavpack_read_header (psf)) != SFE_NO_ERROR)
-	{	psf_log_printf (psf, "Failed to call `wavpack_read_header`, err is %d\n", err) ;
-		WavpackCloseFile (pwvpk->context) ;
+	{	psf_log_printf (psf, "wavpack_dec_init: failed to call `wavpack_read_header`, err is %d\n", err) ;
+		pwvpk->context = WavpackCloseFile (pwvpk->context) ;
 		return err ;
 		} ;
 
@@ -393,8 +407,10 @@ wavpack_enc_init (SF_PRIVATE *psf)
 	*/
 	pwvpk->config.num_channels = psf->sf.channels ;
 	pwvpk->config.sample_rate = psf->sf.samplerate ;
-	if (pwvpk->config.num_channels <= 0 || pwvpk->config.sample_rate <= 0)
-		return SFE_INTERNAL ;
+	if (pwvpk->config.num_channels <= 0)
+		return SFE_CHANNEL_COUNT_BAD ;
+	if (pwvpk->config.sample_rate <= 0)
+		return SF_ERR_UNSUPPORTED_ENCODING ;
 
 	switch (psf->sf.channels)
 	{	case 1 :	/* center channel mono */
@@ -452,11 +468,11 @@ wavpack_enc_init (SF_PRIVATE *psf)
 		return psf->error ;
 
 	if (pwvpk->context)
-		WavpackCloseFile (pwvpk->context) ;
+		pwvpk->context = WavpackCloseFile (pwvpk->context) ;
 
 	if ((pwvpk->context = WavpackOpenFileOutput (wavpack_reader_wrapper.write_bytes, psf, NULL)) == NULL)
-	{	psf_log_printf (psf, "Failed to call `WavpackOpenFileOutput`\n") ;
-		return SFE_WAVPACK_NEW_ENCODER ;
+	{	psf_log_printf (psf, "wavpack_enc_init: failed to call `WavpackOpenFileOutput`\n") ;
+		return SF_ERR_UNSUPPORTED_ENCODING ;
 		} ;
 
 	return 0 ;
@@ -465,26 +481,30 @@ wavpack_enc_init (SF_PRIVATE *psf)
 static int
 wavpack_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 {	WAVPACK_PRIVATE* pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
+	int err ;
+
+	if (psf->have_written)
+		return SFE_CMD_HAS_DATA ;
 
 	// wavpack_write_strings (psf, pwvpk) ;
 
+	if (pwvpk->context && (err = wavpack_enc_init (psf)) != SFE_NO_ERROR)
+	{	psf_log_printf (psf, "wavpack_write_header: failed to reinitialize encoder\n") ;
+		return err ;
+		} ;
+
 	int64_t total_samples = psf->sf.frames <= 0 ? -1 : psf->sf.frames ;
 	if (WavpackSetConfiguration64 (pwvpk->context, &pwvpk->config, total_samples, NULL) == 0)
-	{
-		psf_log_printf (psf, "Failed to call `WavpackSetConfiguration64`\n") ;
-		return SFE_WAVPACK_WRITE_HEADER ;
+	{	psf_log_printf (psf, "wavpack_write_header: failed to call `WavpackSetConfiguration64`\n") ;
+		return SF_ERR_UNSUPPORTED_ENCODING ;
 		} ;
 	if (WavpackPackInit (pwvpk->context) == 0)
-	{
-		psf_log_printf (psf, "Failed to call `WavpackPackInit`\n") ;
-		return SFE_WAVPACK_WRITE_HEADER ;
+	{	psf_log_printf (psf, "wavpack_write_header: failed to call `WavpackPackInit`\n") ;
+		return SF_ERR_UNSUPPORTED_ENCODING ;
 		} ;
 
 	if (psf->error == SFE_NO_ERROR)
 		psf->dataoffset = psf_ftell (psf) ;
-
-	/* this function can be called only once */
-	psf->write_header = NULL ;
 
 	return psf->error ;
 } /* wavpack_write_header */
@@ -537,7 +557,7 @@ wavpack_pack_buffer_single_any
 		else if (itype == SF_FORMAT_PCM_32)
 			wavpack_cvti32f32 (in_ptr_int, ((float *) buffer), item_count, 1) ;
 		else
-			abort () ;
+			goto on_internal_error ;
 		}
 	else if (itype == SF_FORMAT_FLOAT)
 		// wavpack_cvtf*i* (const FTYPE *src, ITYPE *dest, sf_count_t count, int normalize, FTYPE vlim, ITYPE offset, int use_clip)
@@ -549,15 +569,19 @@ wavpack_pack_buffer_single_any
 	else if (itype == SF_FORMAT_PCM_32)
 		wavpack_shifti32i32 (in_ptr_int, buffer, item_count, shl, voffset) ;
 	else
-		abort () ;
+		goto on_internal_error ;
 
 	if (WavpackPackSamples (pwvpk->context, buffer, item_count / psf->sf.channels) == 0)
-	{	psf_log_printf (psf, "Failed to pack all samples in `WavpackPackSamples (context, buffer, %ld)`.\n", item_count) ;
-		return SFE_INTERNAL ;
+	{	psf_log_printf (psf, "wavpack_pack_buffer_single_any: failed to pack %ld samples`.\n", item_count) ;
+		return SFE_SYSTEM ;
 		} ;
 
 	*total_packed_count += item_count ;
 	return SFE_NO_ERROR ;
+
+on_internal_error:
+	psf_log_printf (psf, "wavpack_pack_buffer_single_any: invalid (itype, otype) = (%d, %d).\n", itype, otype) ;
+	return SFE_INTERNAL ;
 }
 
 static inline int
@@ -572,8 +596,8 @@ wavpack_unpack_buffer_single_any
 	double *out_ptr_double = (((double *) ptr) + i_chunk * chunk_item_count) ;
 
 	if (WavpackUnpackSamples (pwvpk->context, buffer, item_count / psf->sf.channels) == 0)
-	{	psf_log_printf (psf, "Failed to unpack samples in `WavpackUnpackSamples (context, buffer, %ld)`.\n", item_count) ;
-		return SFE_WAVPACK_UNPACK_SAMPLES ;
+	{	psf_log_printf (psf, "wavpack_unpack_buffer_single_any: failed to unpack %ld samples`.\n", item_count) ;
+		return SF_ERR_MALFORMED_FILE ;
 	}
 
 	if (otype == SF_FORMAT_DOUBLE)
@@ -588,7 +612,7 @@ wavpack_unpack_buffer_single_any
 		else if (itype == SF_FORMAT_PCM_32)
 			wavpack_cvti32f64 (buffer, out_ptr_double, item_count, 1) ;
 		else
-			abort () ;
+			goto on_internal_error ;
 		}
 	else if (otype == SF_FORMAT_FLOAT)
 	{	if (itype == SF_FORMAT_FLOAT)
@@ -602,7 +626,7 @@ wavpack_unpack_buffer_single_any
 		else if (itype == SF_FORMAT_PCM_32)
 			wavpack_cvti32f32 (buffer, out_ptr_float, item_count, 1) ;
 		else
-			abort () ;
+			goto on_internal_error ;
 		}
 	else if (itype == SF_FORMAT_FLOAT)
 	{	if (otype == SF_FORMAT_PCM_32)
@@ -610,7 +634,7 @@ wavpack_unpack_buffer_single_any
 		else if (otype == SF_FORMAT_PCM_16)
 			wavpack_cvtf32i16 ((const float *) buffer, out_ptr_short, item_count, 1, vlim, voffset, psf->add_clipping) ;
 		else
-			abort () ;
+			goto on_internal_error ;
 		}
 	else if (itype == SF_FORMAT_PCM_16 || itype == SF_FORMAT_PCM_24 || itype == SF_FORMAT_PCM_32 || itype == SF_FORMAT_PCM_U8 || itype == SF_FORMAT_PCM_S8)
 	{	if (otype == SF_FORMAT_PCM_32)
@@ -618,46 +642,70 @@ wavpack_unpack_buffer_single_any
 		else if (otype == SF_FORMAT_PCM_16)
 			wavpack_shifti32i16 (buffer, out_ptr_short, item_count, shl, voffset) ;
 		else
-			abort () ;
+			goto on_internal_error ;
 		}
 	else
-		abort () ;
+		goto on_internal_error ;
 
 	*total_packed_count += item_count ;
 	return SFE_NO_ERROR ;
+
+on_internal_error:
+	psf_log_printf (psf, "wavpack_unpack_buffer_single_any: invalid (itype, otype) = (%d, %d).\n", itype, otype) ;
+	return SFE_INTERNAL ;
 }
 
 static sf_count_t
 wavpack_unpack_buffer_any (SF_PRIVATE *psf, void *ptr, sf_count_t sample_count, int otype)
 {	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
+	int err ;
+
 	if (pwvpk == NULL)
-	{	psf_log_printf (psf, "wavpack instance is dead") ;
+	{	psf_log_printf (psf, "wavpack_unpack_buffer_any: null pwvpk\n") ;
+		psf->error = SFE_INTERNAL ;
 		return 0 ;
 	}
+
+	if (pwvpk->context == NULL)
+	{	psf_log_printf (psf, "wavpack_unpack_buffer_any: null pwvpk->context\n") ;
+		psf->error = SFE_INTERNAL ;
+		return 0 ;
+	}
+
 	if (pwvpk->is_seek_end)
-	{	psf_log_printf (psf, "wavpack seek end") ;
+	{	psf_log_printf (psf, "wavpack_unpack_buffer_any: reach seek end\n") ;
 		return 0 ;
 	}
+	if (sample_count == 0)
+		return 0 ;
 
 	int itype = SF_CODEC (psf->sf.format) ;
 
 	/* fast path */
 	if (sample_count <= WVPK_UNPACK_FAST_PATH_MAX_SAMPLES && (itype == SF_FORMAT_PCM_32 || itype == SF_FORMAT_FLOAT) && (otype == SF_FORMAT_PCM_32 || otype == SF_FORMAT_FLOAT))
 	{	if (WavpackUnpackSamples (pwvpk->context, ptr, sample_count / psf->sf.channels) == 0)
+		{	psf_log_printf (psf, "wavpack_unpack_buffer_any: failed to unpack %ld samples\n", sample_count) ;
+			psf->error = SF_ERR_MALFORMED_FILE ;
 			return 0 ;
+		}
 		if (itype != otype)
 		{	if (itype == SF_FORMAT_PCM_32)
 				wavpack_cvti32f32_inplace (ptr, sample_count, 1) ;
 			else if (itype == SF_FORMAT_FLOAT)
 				wavpack_cvtf32i32_inplace (ptr, sample_count, 1, 2147483648.0, 0, psf->add_clipping) ;
 			else
-				abort () ;
+				goto on_internal_error ;
 			} ;
 		return sample_count ;
 		} ;
 
 	/* general path */
 	int32_t *buffer = wavpack_ensure_buffer (pwvpk) ;
+	if (buffer == NULL)
+	{	psf->error = SFE_MALLOC_FAILED ;
+		return 0 ;
+	}
+
 	sf_count_t buffer_sample_count = WAVPACK_BUFFER_LENGTH / sizeof (int32_t) / psf->sf.channels ;
 	sf_count_t full_chunk_count = (sample_count / psf->sf.channels) / buffer_sample_count ;
 	sf_count_t chunk_item_count = buffer_sample_count * psf->sf.channels ;
@@ -688,7 +736,7 @@ wavpack_unpack_buffer_any (SF_PRIVATE *psf, void *ptr, sf_count_t sample_count, 
 					vlim = (float) WVPK_INT16_VLIM ;
 					break ;
 				default :
-					abort () ;
+					goto on_internal_error ;
 				} ;
 			break ;
 		case SF_FORMAT_PCM_32:
@@ -709,47 +757,76 @@ wavpack_unpack_buffer_any (SF_PRIVATE *psf, void *ptr, sf_count_t sample_count, 
 					vlim = (float) WVPK_INT32_VLIM ;
 					break ;
 				default :
-					abort () ;
+					goto on_internal_error ;
 				} ;
 			break ;
 		default:
-			abort () ;
+			goto on_internal_error ;
 	} ;
 
 
 	sf_count_t total_unpacked_count = 0 ;
 	/* full chunks */
 	for (sf_count_t i_chunk = 0 ; i_chunk < full_chunk_count ; ++ i_chunk)
-	{	int err = wavpack_unpack_buffer_single_any
+	{	err = wavpack_unpack_buffer_single_any
 		(	psf, &total_unpacked_count, ptr, i_chunk, chunk_item_count, chunk_item_count, buffer,
 			itype, otype, vlim, shl, voffset
 			) ;
 		if (err != SFE_NO_ERROR)
+		{	psf->error = err ;
 			return total_unpacked_count ;
+			} ;
 		} ;
 
 	/* remain */
-	wavpack_unpack_buffer_single_any
+	err = wavpack_unpack_buffer_single_any
 	(	psf, &total_unpacked_count, ptr, full_chunk_count, chunk_item_count, remain_item_count, buffer,
 		itype, otype, vlim, shl, voffset
 		) ;
 
+	if (err != SFE_NO_ERROR)
+		psf->error = err ;
+
 	return total_unpacked_count ;
+
+on_internal_error:
+	psf_log_printf (psf, "wavpack_unpack_buffer_any: invalid (itype, otype, sample_count) = (%d, %d, %ld)\n", itype, otype, sample_count) ;
+	psf->error = SFE_INTERNAL ;
+	return 0 ;
 }
 
 static sf_count_t
 wavpack_pack_buffer_any (SF_PRIVATE *psf, const void *ptr, sf_count_t sample_count, int itype)
 {	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
+	int err ;
+
 	if (pwvpk == NULL)
-	{	psf_log_printf (psf, "wavpack instance is dead") ;
-		return 0 ;
-	}
-	if (pwvpk->is_seek_end)
-	{	psf_log_printf (psf, "wavpack seek end") ;
+	{	psf_log_printf (psf, "wavpack_pack_buffer_any: null pwvpk\n") ;
+		psf->error = SFE_INTERNAL ;
 		return 0 ;
 	}
 
+	if (pwvpk->context == NULL)
+	{	psf_log_printf (psf, "wavpack_pack_buffer_any: null pwvpk->context\n") ;
+		psf->error = SFE_INTERNAL ;
+		return 0 ;
+	}
+
+	if (pwvpk->is_seek_end)
+	{	psf_log_printf (psf, "wavpack_pack_buffer_any: seek end flag should not exists here\n") ;
+		psf->error = SFE_INTERNAL ;
+		return 0 ;
+	}
+
+	if (sample_count == 0)
+		return 0 ;
+
 	int32_t *buffer = wavpack_ensure_buffer (pwvpk) ;
+	if (buffer == NULL)
+	{	psf->error = SFE_MALLOC_FAILED ;
+		return 0 ;
+	}
+
 	sf_count_t buffer_sample_count = WAVPACK_BUFFER_LENGTH / sizeof (int32_t) / psf->sf.channels ;
 	sf_count_t full_chunk_count = (sample_count / psf->sf.channels) / buffer_sample_count ;
 	sf_count_t chunk_item_count = buffer_sample_count * psf->sf.channels ;
@@ -781,7 +858,7 @@ wavpack_pack_buffer_any (SF_PRIVATE *psf, const void *ptr, sf_count_t sample_cou
 				case SF_FORMAT_FLOAT :
 					break ;
 				default :
-					abort () ;
+					goto on_internal_error ;
 				} ;
 			break ;
 		case SF_FORMAT_PCM_16:
@@ -801,7 +878,7 @@ wavpack_pack_buffer_any (SF_PRIVATE *psf, const void *ptr, sf_count_t sample_cou
 				case SF_FORMAT_FLOAT :
 					break ;
 				default :
-					abort () ;
+					goto on_internal_error ;
 				} ;
 			break ;
 		case SF_FORMAT_PCM_32:
@@ -821,31 +898,41 @@ wavpack_pack_buffer_any (SF_PRIVATE *psf, const void *ptr, sf_count_t sample_cou
 				case SF_FORMAT_FLOAT :
 					break ;
 				default :
-					abort () ;
+					goto on_internal_error ;
 				} ;
 			break ;
 		default:
-			abort () ;
+			goto on_internal_error ;
 		} ;
 
 	sf_count_t total_packed_count = 0 ;
 	/* full chunks */
 	for (sf_count_t i_chunk = 0 ; i_chunk < full_chunk_count ; ++ i_chunk)
-	{	int err = wavpack_pack_buffer_single_any
+	{	err = wavpack_pack_buffer_single_any
 		(	psf, &total_packed_count, ptr, i_chunk, chunk_item_count, chunk_item_count, buffer,
 			itype, otype, vlim, shl, voffset
 			) ;
 		if (err != SFE_NO_ERROR)
+		{	psf->error = err ;
 			return total_packed_count ;
+			} ;
 		} ;
 
 	/* remain */
-	wavpack_pack_buffer_single_any
+	err = wavpack_pack_buffer_single_any
 	(	psf, &total_packed_count, ptr, full_chunk_count, chunk_item_count, remain_item_count, buffer,
 		itype, otype, vlim, shl, voffset
 		) ;
 
+	if (err != SFE_NO_ERROR)
+		psf->error = err ;
+
 	return total_packed_count ;
+
+on_internal_error:
+	psf_log_printf (psf, "wavpack_pack_buffer_any: invalid (itype, otype, sample_count) = (%d, %d, %ld)\n", itype, otype, sample_count) ;
+	psf->error = SFE_INTERNAL ;
+	return 0 ;
 }
 
 static sf_count_t
@@ -872,13 +959,13 @@ static int
 wavpack_close (SF_PRIVATE *psf)
 {	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
 	if (pwvpk == NULL)
-		return SFE_WAVPACK_DEAD ;
+		return SFE_NO_ERROR ;
 
 	int err = SFE_NO_ERROR ;
 
 	if (pwvpk->context)
 	{	if (psf->file.mode == SFM_WRITE)
-			err = WavpackFlushSamples (pwvpk->context) != 0 ? SFE_NO_ERROR : SFE_WAVPACK_PACK_SAMPLES ;
+			err = WavpackFlushSamples (pwvpk->context) != 0 ? SFE_NO_ERROR : SFE_SYSTEM ;
 		pwvpk->context = WavpackCloseFile (pwvpk->context) ;
 		} ;
 
@@ -897,16 +984,24 @@ wavpack_close (SF_PRIVATE *psf)
 static sf_count_t
 wavpack_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 {	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
-	if (pwvpk == NULL)
-		return SFE_WAVPACK_DEAD ;
+
+	if (psf->file.mode != SFM_READ)
+	{	psf_log_printf (psf, "wavpack_seek: not seekable for file mode %d\n", psf->file.mode) ;
+		psf->error = SFE_NOT_SEEKABLE ;
+		return -1 ;
+	} ;
 
 	if (pwvpk == NULL)
-	{	psf_log_printf (psf, "wavpack instance is dead\n") ;
+	{	psf_log_printf (psf, "wavpack_seek: null pwvpk\n") ;
+		psf->error = SFE_INTERNAL ;
 		return -1 ;
 	}
 
 	if (pwvpk->context == NULL)
-		abort () ;
+	{	psf_log_printf (psf, "wavpack_seek: null pwvpk->context\n") ;
+		psf->error = SFE_INTERNAL ;
+		return -1 ;
+	}
 
 	if (psf->dataoffset < 0)
 	{	psf->error = SFE_BAD_SEEK ;
@@ -920,14 +1015,13 @@ wavpack_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 
 	pwvpk->is_seek_end = 0 ;
 
-	if (psf->file.mode == SFM_READ)
-	{	if (WavpackSeekSample64 (pwvpk->context, offset) != 0)
-			return offset ;
-		} ;
-
-	psf->error = SFE_BAD_SEEK ;
-	wavpack_close (psf) ;
-	return -1 ;
+	if (WavpackSeekSample64 (pwvpk->context, offset) != 0)
+		return offset ;
+	else
+	{	psf->error = SFE_SEEK_FAILED ;
+		wavpack_close (psf) ;
+		return -1 ;
+	} ;
 } /* wavpack_seek */
 
 static int
