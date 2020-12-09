@@ -279,13 +279,6 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_OPUS_BAD_SAMPLERATE	, "Error : Opus only supports sample rates of 8000, 12000, 16000, 24000 and 48000." },
 
-	{	SFE_WAVPACK_NEW_DECODER	, "Error : Failed to create wavpack decoder." },
-	{	SFE_WAVPACK_NEW_ENCODER	, "Error : Failed to create wavpack encoder." },
-	{	SFE_WAVPACK_WRITE_HEADER, "Error : Failed to write wavpack header." },
-	{	SFE_WAVPACK_PACK_SAMPLES, "Error : Failed to encode wavpack data." },
-	{	SFE_WAVPACK_UNPACK_SAMPLES, "Error : Failed to decode wavpack data." },
-	{	SFE_WAVPACK_DEAD, "Error : Wavpack instance is dead, file may be corrupted." },
-
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
 } ;
