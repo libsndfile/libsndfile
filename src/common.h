@@ -37,6 +37,8 @@
 #include "sndfile.h"
 #endif
 
+#include <math.h>
+
 #ifdef USE_SSE2
 #include <immintrin.h>
 #endif
