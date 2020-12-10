@@ -1,7 +1,8 @@
 Unreleased
   * Implement fast SSE2 optimized psf_lrintf() and psf_lrintf() functions to
     improve perfomance when libsndfile is built using Visual C++ (especially)
-    and other compilers on x86 and AMD64 platforms.
+    and other compilers on x86 and AMD64 platforms. See also description of
+    ENABLE_SSE2 CMake option in README.md.
   * Documentation:
     * Move site to new URL: http://libsndfile.github.io/libsndfile/
     * Convert documentation pages from HTML to Markdown
