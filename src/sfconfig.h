@@ -124,7 +124,7 @@
 #define CPU_IS_X86_64	0
 #endif
 
-#if CPU_IS_X86 && HAVE_IMMINTRIN_H
+#if (defined (__SSE2__) || defined (_M_AMD64) || (defined (_M_IX86_FP) && (_M_IX86_FP >= 2)) && HAVE_IMMINTRIN_H)
 #define USE_SSE2
 #endif
 
