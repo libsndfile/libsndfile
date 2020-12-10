@@ -124,10 +124,6 @@
 #define CPU_IS_X86_64	0
 #endif
 
-#if CPU_IS_X86 && HAVE_IMMINTRIN_H
-#define USE_SSE2
-#endif
-
 #ifndef HAVE_SSIZE_T
 #define HAVE_SSIZE_T 0
 #endif

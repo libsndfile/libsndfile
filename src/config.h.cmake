@@ -193,6 +193,9 @@
 /* Set to 1 if compiling for Win32 */
 #cmakedefine01 OS_IS_WIN32
 
+/* Set to 1 if SSE2 is enabled */
+#cmakedefine USE_SSE2
+
 /* Name of package */
 #define PACKAGE "@PACKAGE_NAME@"
 

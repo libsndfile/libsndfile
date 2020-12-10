@@ -7,7 +7,8 @@ include (TestBigEndian)
 
 include (TestInline)
 include (ClipMode)
-include(TestLargeFiles)
+include (TestLargeFiles)
+include (CheckCPUArch)
 
 test_large_files (_LARGEFILES)
 
@@ -68,6 +69,12 @@ check_include_file (sys/time.h		HAVE_SYS_TIME_H)
 check_include_file (sys/types.h		HAVE_SYS_TYPES_H)
 check_include_file (unistd.h		HAVE_UNISTD_H)
 check_include_file (immintrin.h		HAVE_IMMINTRIN_H)
+
+check_cpu_arch_x86 (CPU_IS_X86)
+check_cpu_arch_x64 (CPU_IS_X64)
+if ((CPU_IS_X86 OR CPU_IS_X64) AND HAVE_IMMINTRIN_H)
+	set (HAVE_SSE2 1)
+endif ()
 
 # Never checked
 # check_include_file (stdlib.h		HAVE_STDLIB_H)

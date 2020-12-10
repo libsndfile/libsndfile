@@ -40,6 +40,7 @@ include (GNUInstallDirs)
 include (FeatureSummary)
 include (CMakeDependentOption)
 include (CTest)
+include (CheckCCompilerFlag)
 
 #
 # Options
@@ -84,6 +85,23 @@ if (NOT ENABLE_CPU_CLIP)
 endif ()
 cmake_dependent_option (ENABLE_COMPATIBLE_LIBSNDFILE_NAME "Set DLL name to libsndfile-1.dll (canonical name), sndfile.dll otherwise" OFF "WIN32;BUILD_SHARED_LIBS" OFF)
 cmake_dependent_option (INSTALL_MANPAGES "Install man pages for programs" ON "BUILD_PROGRAMS" OFF)
+if (HAVE_SSE2)
+	if (CPU_IS_X64)
+		set (ENABLE_SSE2 ON)
+	else ()
+		cmake_dependent_option (ENABLE_SSE2 "Enable SSE2" ON "HAVE_SSE2" OFF)
+	endif ()
+endif ()
+
+if (ENABLE_SSE2)
+	set (USE_SSE2 1)
+	if (NOT MSVC)
+		check_c_compiler_flag (-msse2 HAVE_MSSE2_COMPILER_FLAG)
+		if (HAVE_MSSE2_COMPILER_FLAG)
+			add_compile_options (-msse2)
+		endif ()
+	endif ()
+endif ()
 
 set (HAVE_EXTERNAL_XIPH_LIBS ${ENABLE_EXTERNAL_LIBS})
 set (HAVE_SQLITE3 ${BUILD_REGTEST})
@@ -110,8 +128,11 @@ if (WIN32 AND BUILD_SHARED_LIBS)
 endif ()
 
 if ((MSVC AND (DEFINED ENABLE_STATIC_RUNTIME)) OR MINGW)
-	add_feature_info (ENABLE_STATIC_RUNTIME ENABLE_STATIC_RUNTIME "Enable static runtime")
+	add_feature_info (ENABLE_SSE2 ENABLE_SSE2 "enable SSE2")
 endif ()
+
+
+
 
 set_package_properties (Ogg PROPERTIES
 	TYPE RECOMMENDED
