@@ -22,9 +22,10 @@ else ()
 endif ()
 set (SF_COUNT_MAX 0x7fffffffffffffffll)
 
-if (NOT WIN32)
-	find_package (ALSA)
+if (CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
 	find_package (Sndio)
+elseif (NOT WIN32)
+	find_package (ALSA)
 endif ()
 
 if (VCPKG_TOOLCHAIN AND (NOT CMAKE_VERSION VERSION_LESS 3.15))

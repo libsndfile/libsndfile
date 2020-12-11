@@ -471,7 +471,7 @@ if (BUILD_PROGRAMS)
 	elseif ((NOT BEOS) AND ALSA_FOUND)
 		target_include_directories (sndfile-play PRIVATE ${ALSA_INCLUDE_DIRS})
 		target_link_libraries (sndfile-play PRIVATE ${ALSA_LIBRARIES})
-	elseif ((NOT BEOS) AND SNDIO_FOUND)
+	elseif (CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
 		target_link_libraries (sndfile-play PRIVATE Sndio::Sndio)
 	endif ()
 
