@@ -583,7 +583,7 @@ sf_format_check	(const SF_INFO *info)
 	subformat = SF_CODEC (info->format) ;
 	endian = SF_ENDIAN (info->format) ;
 
-	/* This is the place where each file format can check if the suppiled
+	/* This is the place where each file format can check if the supplied
 	** SF_INFO struct is valid.
 	** Return 0 on failure, 1 ons success.
 	*/
