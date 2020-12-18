@@ -41,7 +41,7 @@ The available commands are as follows:
 | [SFC_GET_NORM_DOUBLE](#sfc_get_norm_double)                       | Get double normalisation behaviour.                     |
 | [SFC_SET_SCALE_FLOAT_INT_READ](#sfc_set_scale_float_int_read)     | Control scale factor on read.                           |
 | [SFC_SET_SCALE_INT_FLOAT_WRITE](#sfc_set_scale_int_float_write)   | Control scale factor on write.                          |
-| [SFC_GET_SIMPLE_FORMAT_COUNT](#sfc_get_simple_format_count)       | Get simple formats counf.                               |
+| [SFC_GET_SIMPLE_FORMAT_COUNT](#sfc_get_simple_format_count)       | Get simple formats count.                               |
 | [SFC_GET_SIMPLE_FORMAT](#sfc_get_simple_format)                   | Get information about a simple format.                  |
 | [SFC_GET_FORMAT_INFO](#sfc_get_format_info)                       | Get information about a major or subtype format.        |
 | [SFC_GET_FORMAT_MAJOR_COUNT](#sfc_get_format_major_count)         | Get the number of major formats.                        |
@@ -56,12 +56,12 @@ The available commands are as follows:
 | [SFC_SET_CLIPPING](#sfc_set_clipping)                             | Control automatic clipping behaviour.                   |
 | [SFC_GET_CLIPPING](#sfc_get_clipping)                             | Get current clipping setting.                           |
 | [SFC_GET_EMBED_FILE_INFO](#sfc_get_embed_file_info)               | Get information about embedded audio files.             |
-| [SFC_WAVEX_GET_AMBISONIC](#sfc_wavex_get_ambisonic)               | Test a WAVEX file for Ambisonic format                  |
-| [SFC_WAVEX_SET_AMBISONIC](#sfc_wavex_set_ambisonic)               | Modify a WAVEX header for Ambisonic format              |
-| [SFC_SET_VBR_ENCODING_QUALITY](#sfc_set_vbr_encoding_quality)     | Set the Variable Bit Rate encoding quality              |
+| [SFC_WAVEX_GET_AMBISONIC](#sfc_wavex_get_ambisonic)               | Test a WAVEX file for Ambisonic format.                 |
+| [SFC_WAVEX_SET_AMBISONIC](#sfc_wavex_set_ambisonic)               | Modify a WAVEX header for Ambisonic format.             |
+| [SFC_SET_VBR_ENCODING_QUALITY](#sfc_set_vbr_encoding_quality)     | Set the Variable Bit Rate encoding quality.             |
 | [SFC_SET_OGG_PAGE_LATENCY_MS](#sfc_set_ogg_page_latency_ms)       | Set Ogg page latency for Opus file.                     |
 | [SFC_SET_COMPRESSION_LEVEL](#sfc_set_compression_level)           | Set the compression level.                              |
-| [SFC_RAW_DATA_NEEDS_ENDSWAP](#sfc_raw_data_needs_endswap)         | Determine if raw data needs endswapping                 |
+| [SFC_RAW_DATA_NEEDS_ENDSWAP](#sfc_raw_data_needs_endswap)         | Determine if raw data needs endswapping.                |
 | [SFC_GET_BROADCAST_INFO](#sfc_get_broadcast_info)                 | Get the Broadcast Chunk info.                           |
 | [SFC_SET_BROADCAST_INFO](#sfc_set_broadcast_info)                 | Set the Broadcast Chunk info.                           |
 | [SFC_GET_CHANNEL_MAP_INFO](#sfc_get_channel_map_info)             | Get the channel map info.                               |
