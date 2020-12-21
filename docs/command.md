@@ -53,6 +53,10 @@ The available commands are as follows:
 | [SFC_SET_UPDATE_HEADER_AUTO](#sfc_set_update_header_auto)         | Update the file header on each write.                   |
 | [SFC_FILE_TRUNCATE](#sfc_file_truncate)                           | Truncate a file open for write or for read/write.       |
 | [SFC_SET_RAW_START_OFFSET](#sfc_set_raw_start_offset)             | Change the data start offset for raw files.             |
+| SFC_SET_DITHER_ON_WRITE                                           | Not implemented.                                        |
+| SFC_SET_DITHER_ON_READ                                            | Not implemented.                                        |
+| SFC_GET_DITHER_INFO_COUNT                                         | Not implemented.                                        |
+| SFC_GET_DITHER_INFO                                               | Not implemented.                                        |
 | [SFC_SET_CLIPPING](#sfc_set_clipping)                             | Control automatic clipping behaviour.                   |
 | [SFC_GET_CLIPPING](#sfc_get_clipping)                             | Get current clipping setting.                           |
 | [SFC_GET_EMBED_FILE_INFO](#sfc_get_embed_file_info)               | Get information about embedded audio files.             |
