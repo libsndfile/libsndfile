@@ -312,7 +312,7 @@ instrument_dump (const char *filename)
 	printf ("  Key         : %d - %d\n", (int) inst.key_lo, (int) inst.key_hi) ;
 	printf ("  Loop points : %d\n", inst.loop_count) ;
 
-	for (k = 0 ; k < inst.loop_count ; k++)
+	for (k = 0 ; k < inst.loop_count && k < ARRAY_LEN (inst.loops) ; k++)
 		printf ("  %-2d    Mode : %s    Start : %6d   End : %6d   Count : %6d\n", k, str_of_type (inst.loops [k].mode), inst.loops [k].start, inst.loops [k].end, inst.loops [k].count) ;
 
 	putchar ('\n') ;
