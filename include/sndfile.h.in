@@ -173,6 +173,7 @@ enum
 
 	SFC_SET_RAW_START_OFFSET		= 0x1090,
 
+	/* Commands reserved for dithering, which is not implemented. */
 	SFC_SET_DITHER_ON_WRITE			= 0x10A0,
 	SFC_SET_DITHER_ON_READ			= 0x10A1,
 
@@ -386,8 +387,7 @@ typedef struct
 
 /*
 ** Enums and typedefs for adding dither on read and write.
-** See the html documentation for sf_command(), SFC_SET_DITHER_ON_WRITE
-** and SFC_SET_DITHER_ON_READ.
+** Reserved for future implementation.
 */
 
 enum
