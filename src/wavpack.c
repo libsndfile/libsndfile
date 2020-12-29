@@ -118,7 +118,10 @@ typedef struct
 {	WavpackConfig config ;
 	WavpackContext *context ;
 	void *buffer ;
-	int is_seek_end ;
+	void *first_block ;
+	int64_t first_pos ;
+	int32_t first_bcount ;
+	int is_seek_end, is_in_close ;
 } WAVPACK_PRIVATE ;
 
 /*------------------------------------------------------------------------------
@@ -376,8 +379,6 @@ wavpack_dec_init (SF_PRIVATE *psf)
 	int err ;
 
 	psf_fseek (psf, 0, SEEK_SET) ;
-	if (psf->error != 0)
-		return psf->error ;
 
 	if (pwvpk->context)
 		pwvpk->context = WavpackCloseFile (pwvpk->context) ;
@@ -464,11 +465,13 @@ wavpack_enc_init (SF_PRIVATE *psf)
 		} ;
 
 	psf_fseek (psf, 0, SEEK_SET) ;
-	if (psf->error != 0)
-		return psf->error ;
 
 	if (pwvpk->context)
 		pwvpk->context = WavpackCloseFile (pwvpk->context) ;
+	if (pwvpk->first_block)
+	{	free (pwvpk->first_block) ;
+		pwvpk->first_block = NULL ;
+	}
 
 	if ((pwvpk->context = WavpackOpenFileOutput (wavpack_reader_wrapper.write_bytes, psf, NULL)) == NULL)
 	{	psf_log_printf (psf, "wavpack_enc_init: failed to call `WavpackOpenFileOutput`\n") ;
@@ -958,14 +961,46 @@ wavpack_write_int (SF_PRIVATE *psf, const int *ptr, sf_count_t sample_count)
 static int
 wavpack_close (SF_PRIVATE *psf)
 {	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
-	if (pwvpk == NULL)
+	if (pwvpk == NULL || pwvpk->is_in_close)
 		return SFE_NO_ERROR ;
 
 	int err = SFE_NO_ERROR ;
+	pwvpk->is_in_close = 1 ;
 
 	if (pwvpk->context)
 	{	if (psf->file.mode == SFM_WRITE)
-			err = WavpackFlushSamples (pwvpk->context) != 0 ? SFE_NO_ERROR : SFE_SYSTEM ;
+		{	err = WavpackFlushSamples (pwvpk->context) != 0 ? SFE_NO_ERROR : SFE_SYSTEM ;
+			if (err != SFE_NO_ERROR)
+			{	psf_log_printf (psf, "wavpack_close: failed to flush samples\n") ;
+				goto context_clean_up ;
+				} ;
+			if (pwvpk->first_block && sf_wavpack_can_seek_callback (psf))
+			{	WavpackUpdateNumSamples (pwvpk->context, pwvpk->first_block) ;
+				int64_t orig_pos = sf_wavpack_get_pos_callback (psf) ;
+				if (orig_pos == -1)
+				{	err = psf->error ;
+					psf_log_printf (psf, "wavpack_close: failed to compute `orig_pos`\n") ;
+					goto context_clean_up ;
+					} ;
+				if (sf_wavpack_set_pos_abs_callback (psf, pwvpk->first_pos) != 0)
+				{	err = psf->error ;
+					psf_log_printf (psf, "wavpack_close: failed to seek to `first_pos`\n") ;
+					goto context_clean_up ;
+					} ;
+				if (sf_wavpack_write_bytes_callback (psf, pwvpk->first_block, pwvpk->first_bcount) != pwvpk->first_bcount)
+				{	err = psf->error ;
+					psf_log_printf (psf, "wavpack_close: failed to write `first_block`\n") ;
+					goto context_clean_up ;
+					} ;
+				if (sf_wavpack_set_pos_abs_callback (psf, orig_pos) != 0)
+				{	err = psf->error ;
+					psf_log_printf (psf, "wavpack_close: failed to seek to `orig_pos`\n") ;
+					goto context_clean_up ;
+					} ;
+				} ;
+			} ;
+
+context_clean_up:
 		pwvpk->context = WavpackCloseFile (pwvpk->context) ;
 		} ;
 
@@ -973,6 +1008,11 @@ wavpack_close (SF_PRIVATE *psf)
 	{
 		free (pwvpk->buffer) ;
 		pwvpk->buffer = NULL ;
+		} ;
+
+	if (pwvpk->first_block)
+	{	free (pwvpk->first_block) ;
+		pwvpk->first_block = NULL ;
 		} ;
 
 	free (pwvpk) ;
@@ -989,19 +1029,19 @@ wavpack_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 	{	psf_log_printf (psf, "wavpack_seek: not seekable for file mode %d\n", psf->file.mode) ;
 		psf->error = SFE_NOT_SEEKABLE ;
 		return -1 ;
-	} ;
+		} ;
 
 	if (pwvpk == NULL)
 	{	psf_log_printf (psf, "wavpack_seek: null pwvpk\n") ;
 		psf->error = SFE_INTERNAL ;
 		return -1 ;
-	}
+		} ;
 
 	if (pwvpk->context == NULL)
 	{	psf_log_printf (psf, "wavpack_seek: null pwvpk->context\n") ;
 		psf->error = SFE_INTERNAL ;
 		return -1 ;
-	}
+		} ;
 
 	if (psf->dataoffset < 0)
 	{	psf->error = SFE_BAD_SEEK ;
@@ -1011,10 +1051,9 @@ wavpack_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 	if (offset == psf->sf.frames)
 	{	pwvpk->is_seek_end = 1 ;
 		return offset ;
-	}
+		} ;
 
 	pwvpk->is_seek_end = 0 ;
-
 	if (WavpackSeekSample64 (pwvpk->context, offset) != 0)
 		return offset ;
 	else
@@ -1059,8 +1098,25 @@ sf_wavpack_read_bytes_callback (void *client_data, void *data, int32_t bcount)
 static int32_t
 sf_wavpack_write_bytes_callback (void *client_data, void *data, int32_t bcount)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
+	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
+
+	if (!pwvpk->first_block)
+	{	pwvpk->first_bcount = bcount ;
+		pwvpk->first_pos = sf_wavpack_get_pos_callback (client_data) ;
+		if (pwvpk->first_pos == -1)
+		{	psf_log_printf (psf, "sf_wavpack_write_bytes_callback: failed to compute `first_pos`\n") ;
+			return 0 ;
+			} ;
+		pwvpk->first_block = calloc ((bcount + 15) / 16, 16) ;
+		if (!pwvpk->first_block)
+		{	psf->error = SFE_MALLOC_FAILED ;
+			return 0 ;
+		}
+		memcpy (pwvpk->first_block, data, bcount) ;
+		} ;
 
 	sf_count_t bytes = psf_fwrite (data, 1, bcount, psf) ;
+
 	if (psf->error == 0)
 		return bytes ;
 	else
@@ -1128,7 +1184,7 @@ sf_wavpack_get_length_callback (void *client_data)
 static int
 sf_wavpack_can_seek_callback (void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
-	return psf->sf.seekable ;
+	return !psf->is_pipe ;
 } /* sf_wavpack_can_seek_callback */
 
 /*------------------------------------------------------------------------------
