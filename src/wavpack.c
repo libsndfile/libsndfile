@@ -178,6 +178,8 @@ static sf_count_t	wavpack_pack_buffer_any (SF_PRIVATE *psf, const void *ptr, sf_
 
 static int 		wavpack_enc_init (SF_PRIVATE *psf) ;
 static int 		wavpack_dec_init (SF_PRIVATE *psf) ;
+static int		wavpack_read_strings (SF_PRIVATE *psf) ;
+static int		wavpack_write_strings (SF_PRIVATE *psf) ;
 static int		wavpack_write_header (SF_PRIVATE *psf, int UNUSED (calc_length)) ;
 static int		wavpack_command (SF_PRIVATE *psf, int command, void *UNUSED (data), int UNUSED (datasize)) ;
 static int 		wavpack_close (SF_PRIVATE *psf) ;
@@ -202,6 +204,7 @@ static int		sf_wavpack_set_pos_rel_callback (void *client_data, int64_t delta, i
 static int		sf_wavpack_push_back_byte_callback (void *id, int c) ;
 static int64_t	sf_wavpack_get_length_callback (void *client_data) ;
 static int		sf_wavpack_can_seek_callback (void *client_data) ;
+static int		sf_wavpack_truncate_here (void *client_data) ;
 
 static WavpackStreamReader64	wavpack_reader_wrapper =
 {	sf_wavpack_read_bytes_callback,
@@ -212,10 +215,9 @@ static WavpackStreamReader64	wavpack_reader_wrapper =
 	sf_wavpack_push_back_byte_callback,
 	sf_wavpack_get_length_callback,
 	sf_wavpack_can_seek_callback,
-	NULL,
+	sf_wavpack_truncate_here,
 	NULL
 } ;
-
 
 /*------------------------------------------------------------------------------
 ** Public function.
@@ -251,7 +253,7 @@ wavpack_open	(SF_PRIVATE *psf)
 		psf->endian = SF_ENDIAN_LITTLE ;
 		psf->sf.seekable = 0 ;
 
-		psf->strings.flags = SF_STR_ALLOW_START ;
+		psf->strings.flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END ;
 
 		if ((error = wavpack_enc_init (psf)))
 			return error ;
@@ -318,6 +320,7 @@ wavpack_command (SF_PRIVATE *psf, int command, void *UNUSED (data), int UNUSED (
 static int
 wavpack_read_header (SF_PRIVATE *psf)
 {	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
+	int err = SFE_NO_ERROR ;
 	if (pwvpk == NULL)
 	{	psf_log_printf (psf, "wavpack_read_header: null pwvpk\n") ;
 		return SFE_INTERNAL ;
@@ -369,6 +372,11 @@ wavpack_read_header (SF_PRIVATE *psf)
 
 	psf->dataoffset = psf_ftell (psf) ;
 
+	if ((err = wavpack_read_strings (psf)) != SFE_NO_ERROR)
+	{	psf_log_printf (psf, "wavpack_read_header: failed to call `wavpack_read_strings`.\n") ;
+		return err ;
+		} ;
+
 	return SFE_NO_ERROR ;
 }
 
@@ -382,6 +390,8 @@ wavpack_dec_init (SF_PRIVATE *psf)
 
 	if (pwvpk->context)
 		pwvpk->context = WavpackCloseFile (pwvpk->context) ;
+
+	pwvpk->config.flags = OPEN_TAGS ;
 
 	if ((pwvpk->context = WavpackOpenFileInputEx64 (&wavpack_reader_wrapper, psf, NULL, error_buf, pwvpk->config.flags, 0)) == NULL)
 	{	psf_log_printf (psf, "wavpack_dec_init: failed to call `WavpackOpenFileInputEx64`: `%s`\n", error_buf) ;
@@ -482,14 +492,179 @@ wavpack_enc_init (SF_PRIVATE *psf)
 } /* wavpack_enc_init */
 
 static int
+wavpack_read_strings (SF_PRIVATE *psf)
+{	static const struct
+	{	int sf_tag_type ;
+		const char *key ;
+	} tag_key_table [] =
+	{	{ SF_STR_TITLE, "title" },
+		{ SF_STR_ARTIST, "artist" },
+		{ SF_STR_ALBUM, "album" },
+		{ SF_STR_DATE, "year" },
+		{ SF_STR_GENRE, "genre" },
+		{ SF_STR_TRACKNUMBER, "track" },
+		{ SF_STR_COMMENT, "comment" },
+		{ SF_STR_COPYRIGHT, "copyright" },
+		{ SF_STR_LICENSE, "license" },
+		{ SF_STR_SOFTWARE, "software" }
+		} ;
+
+	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
+	if (pwvpk == NULL)
+	{	psf_log_printf (psf, "wavpack_write_strings: null pwvpk\n") ;
+		psf->error = SFE_INTERNAL ;
+		return 0 ;
+	}
+
+	int tag_count = WavpackGetNumTagItems (pwvpk->context) ;
+	int i ;
+
+	for (i = 0 ; i < tag_count ; ++ i)
+	{	/* query key */
+		int key_length = WavpackGetTagItemIndexed (pwvpk->context, i, NULL, 0) ;
+		if (key_length < 4 || key_length > 11) // shortest is `date`, longest is `tracknumber`
+		{	psf_log_printf (psf, "wavpack_read_strings: unknown key, length is %d\n", key_length) ;
+			continue ;
+			} ;
+		char *key = calloc (key_length + 1, 1) ;
+		if (key == NULL)
+			return SFE_MALLOC_FAILED ;
+		WavpackGetTagItemIndexed (pwvpk->context, i, key, key_length + 1) ;
+
+		/* lowercase */
+		int k ;
+		for (k = 0 ; k < key_length ; ++ k)
+		{	char codepoint = key [k] ;
+			if (codepoint >= 0x20 && codepoint <= 0x7E)
+				key [k] = tolower (codepoint) ;
+			else
+			{	psf_log_printf (psf, "wavpack_read_strings: unknown key: `%s`\n", key) ;
+				free (key) ;
+				continue ;
+				} ;
+			} ;
+
+		/* query libsndfile tag type from key */
+		int sf_tag_type = 1 ;
+		for (k = 0 ; k < (int) ARRAY_LEN (tag_key_table) ; ++ k)
+		{	if (strcmp (tag_key_table [k].key, key) == 0)
+			{	sf_tag_type = tag_key_table [k].sf_tag_type ;
+				break ;
+				} ;
+			} ;
+		if (sf_tag_type == 0)
+		{	psf_log_printf (psf, "wavpack_read_strings: unknown key: `%s`\n", key) ;
+			free (key) ;
+			continue ;
+			} ;
+
+		/* query value */
+		int val_length = WavpackGetTagItem (pwvpk->context, key, NULL, 0) ;
+		if (val_length == 0)
+		{	free (key) ;
+			continue ;
+			} ;
+		char *val = calloc (val_length + 1, 1) ;
+		if (val == NULL)
+			return SFE_MALLOC_FAILED ;
+		WavpackGetTagItem (pwvpk->context, key, val, val_length + 1) ;
+
+		/* store and cleanup */
+		int err = psf_store_string (psf, sf_tag_type, val) ;
+		psf_log_printf (psf, "wavpack_read_strings: got string key=`%s`, val=`%s`\n", key, val) ;
+		free (key) ;
+		free (val) ;
+		if (err != SFE_NO_ERROR)
+		{	psf_log_printf (psf, "wavpack_read_strings: failed to call `psf_store_string`, err=%d.\n", err) ;
+			return err ;
+			} ;
+		} ;
+
+	return SFE_NO_ERROR ;
+} /* wavpack_read_strings */
+
+static int
+wavpack_write_strings (SF_PRIVATE *psf)
+{	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
+	if (pwvpk == NULL)
+	{	psf_log_printf (psf, "wavpack_write_strings: null pwvpk\n") ;
+		psf->error = SFE_INTERNAL ;
+		return 0 ;
+	}
+
+	int k, string_count = 0 ;
+
+	for (k = 0 ; k < SF_MAX_STRINGS ; ++ k)
+	{	if (psf->strings.data [k].type != 0)
+			string_count ++ ;
+		} ;
+
+	if (string_count == 0)
+		return SFE_NO_ERROR ;
+
+	for (k = 0 ; k < SF_MAX_STRINGS && psf->strings.data [k].type != 0 ; ++ k)
+	{	const char *key, *value ;
+
+		switch (psf->strings.data [k].type)
+		{	case SF_STR_SOFTWARE :
+				key = "software" ;
+				break ;
+			case SF_STR_TITLE :
+				key = "title" ;
+				break ;
+			case SF_STR_COPYRIGHT :
+				key = "copyright" ;
+				break ;
+			case SF_STR_ARTIST :
+				key = "artist" ;
+				break ;
+			case SF_STR_COMMENT :
+				key = "comment" ;
+				break ;
+			case SF_STR_DATE :
+				key = "year" ;
+				break ;
+			case SF_STR_ALBUM :
+				key = "album" ;
+				break ;
+			case SF_STR_LICENSE :
+				key = "license" ;
+				break ;
+			case SF_STR_TRACKNUMBER :
+				key = "track" ;
+				break ;
+			case SF_STR_GENRE :
+				key = "genre" ;
+				break ;
+			default :
+				psf_log_printf (psf, "wavpack_write_strings: Unknown tag type `%d` @ string.data[%d]\n", psf->strings.data [k].type, k) ;
+				continue ;
+			} ;
+
+		value = psf->strings.storage + psf->strings.data [k].offset ;
+		psf_log_printf (psf, "wavpack_write_strings: key=`%s`, val=`%s`\n", key, value) ;
+
+		if (WavpackAppendTagItem (pwvpk->context, key, value, strlen (value)) == 0)
+		{	psf_log_printf (psf, "wavpack_write_strings: failed to call `WavpackAppendTagItem`, idx=%d, key=`%s`, value=`%s`\n", k, key, value) ;
+			return SFE_STR_WEIRD ;
+			} ;
+		} ;
+
+	if (WavpackWriteTag (pwvpk->context) == 0)
+	{	psf_log_printf (psf, "wavpack_write_strings: failed to call `WavpackWriteTag`\n") ;
+		return SFE_STR_WEIRD ;
+		} ;
+
+	return SFE_NO_ERROR ;
+} /* wavpack_write_strings */
+
+static int
 wavpack_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 {	WAVPACK_PRIVATE* pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
 	int err ;
 
 	if (psf->have_written)
 		return SFE_CMD_HAS_DATA ;
-
-	// wavpack_write_strings (psf, pwvpk) ;
 
 	if (pwvpk->context && (err = wavpack_enc_init (psf)) != SFE_NO_ERROR)
 	{	psf_log_printf (psf, "wavpack_write_header: failed to reinitialize encoder\n") ;
@@ -998,6 +1173,11 @@ wavpack_close (SF_PRIVATE *psf)
 					goto context_clean_up ;
 					} ;
 				} ;
+			err = wavpack_write_strings (psf) ;
+			if (err != SFE_NO_ERROR)
+			{	psf_log_printf (psf, "wavpack_close: failed to call `wavpack_write_strings`\n") ;
+				goto context_clean_up ;
+				} ;
 			} ;
 
 context_clean_up:
@@ -1005,15 +1185,10 @@ context_clean_up:
 		} ;
 
 	if (pwvpk->buffer)
-	{
 		free (pwvpk->buffer) ;
-		pwvpk->buffer = NULL ;
-		} ;
 
 	if (pwvpk->first_block)
-	{	free (pwvpk->first_block) ;
-		pwvpk->first_block = NULL ;
-		} ;
+		free (pwvpk->first_block) ;
 
 	free (pwvpk) ;
 	psf->codec_data = NULL ;
@@ -1186,6 +1361,23 @@ sf_wavpack_can_seek_callback (void *client_data)
 {	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 	return !psf->is_pipe ;
 } /* sf_wavpack_can_seek_callback */
+
+static int
+sf_wavpack_truncate_here (void *client_data)
+{	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
+
+	int64_t pos = sf_wavpack_get_pos_callback (client_data) ;
+	if (pos < 0)
+	{	psf_log_printf (psf, "sf_wavpack_truncate_here: failed to compute current file position.\n") ;
+		return -1 ;
+		} ;
+	if (psf_ftruncate (psf, pos) != 0)
+	{	psf_log_printf (psf, "sf_wavpack_truncate_here: failed to call `psf_ftruncate`, current position is %lld.\n", pos) ;
+		return -1 ;
+		} ;
+
+	return 0 ;
+} /* sf_wavpack_truncate_here */
 
 /*------------------------------------------------------------------------------
 */
