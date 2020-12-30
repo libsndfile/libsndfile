@@ -365,6 +365,7 @@ echo "----------------------------------------------------------------------"
 ./tests/wavpack_test@EXEEXT@
 ./tests/write_read_test@EXEEXT@ wvpk
 ./tests/string_test@EXEEXT@ wvpk
+./tests/header_test@EXEEXT@ wvpk
 
 echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on WAVPACK files."
