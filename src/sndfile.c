@@ -959,7 +959,6 @@ sf_format_check	(const SF_INFO *info)
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
 					return 1 ;
 				break ;
-<<<<<<< HEAD
 
 		case SF_FORMAT_MPEG :
 				if (info->channels > 2)
@@ -969,8 +968,6 @@ sf_format_check	(const SF_INFO *info)
 				if (subformat == SF_FORMAT_MPEG_LAYER_I || subformat == SF_FORMAT_MPEG_LAYER_II || subformat == SF_FORMAT_MPEG_LAYER_III)
 					return 1 ;
 				break ;
-||||||| constructed merge base
-=======
 
 		case SF_FORMAT_WAVPACK :
 				if (info->channels > 31)
@@ -982,7 +979,7 @@ sf_format_check	(const SF_INFO *info)
 				if (subformat == SF_FORMAT_FLOAT)
 					return 1 ;
 				break ;
->>>>>>> implemented wavpack support
+
 		default : break ;
 		} ;
 
@@ -2803,6 +2800,10 @@ retry:
 		return 0 ;
 		} ;
 
+	/* reading wavpack from fifo stream requires full header, only read necessary data here */
+	if (buffer [0] == MAKE_MARKER ('w', 'v', 'p', 'k'))
+		return SF_FORMAT_WAVPACK ;
+
 	if ((buffer [0] == MAKE_MARKER ('R', 'I', 'F', 'F') || buffer [0] == MAKE_MARKER ('R', 'I', 'F', 'X'))
 			&& buffer [2] == MAKE_MARKER ('W', 'A', 'V', 'E'))
 		return SF_FORMAT_WAV ;
@@ -2894,17 +2895,8 @@ retry:
 	if (buffer [0] == MAKE_MARKER ('R', 'F', '6', '4') && buffer [2] == MAKE_MARKER ('W', 'A', 'V', 'E'))
 		return SF_FORMAT_RF64 ;
 
-<<<<<<< HEAD
 	if (buffer [0] == MAKE_MARKER ('I', 'D', '3', 2) || buffer [0] == MAKE_MARKER ('I', 'D', '3', 3)
 			|| buffer [0] == MAKE_MARKER ('I', 'D', '3', 4))
-||||||| constructed merge base
-	if (buffer [0] == MAKE_MARKER ('I', 'D', '3', 3))
-=======
-	if (buffer [0] == MAKE_MARKER ('w', 'v', 'p', 'k'))
-		return SF_FORMAT_WAVPACK ;
-
-	if (buffer [0] == MAKE_MARKER ('I', 'D', '3', 3))
->>>>>>> implemented wavpack support
 	{	psf_log_printf (psf, "Found 'ID3' marker.\n") ;
 		if (id3_skip (psf))
 			goto retry ;
@@ -2914,6 +2906,9 @@ retry:
 	/* ID3v2 tags + MPEG */
 	if (psf->id3_header.len > 0 && (format = identify_mpeg (buffer [0])) != 0)
 		return format ;
+
+	if (buffer [0] == MAKE_MARKER ('w', 'v', 'p', 'k'))
+		return SF_FORMAT_WAVPACK ;
 
 	/* Turtle Beach SMP 16-bit */
 	if (buffer [0] == MAKE_MARKER ('S', 'O', 'U', 'N') && buffer [1] == MAKE_MARKER ('D', ' ', 'S', 'A'))
