@@ -2691,7 +2691,16 @@ static int
 guess_file_type (SF_PRIVATE *psf)
 {	uint32_t buffer [3], format ;
 
-	if (psf_binheader_readf (psf, "b", &buffer, SIGNED_SIZEOF (buffer)) != SIGNED_SIZEOF (buffer))
+	if (psf_binheader_readf (psf, "b", &buffer, SIGNED_SIZEOF (uint32_t)) != SIGNED_SIZEOF (uint32_t))
+	{	psf->error = SFE_BAD_FILE_READ ;
+		return 0 ;
+		} ;
+
+	/* reading wavpack from fifo stream requires full header, only read necessary data here */
+	if (buffer [0] == MAKE_MARKER ('w', 'v', 'p', 'k'))
+		return SF_FORMAT_WAVPACK ;
+
+	if (psf_binheader_readf (psf, "b", (buffer + 1), SIGNED_SIZEOF (buffer) - SIGNED_SIZEOF (uint32_t)) != SIGNED_SIZEOF (buffer) - SIGNED_SIZEOF (uint32_t))
 	{	psf->error = SFE_BAD_FILE_READ ;
 		return 0 ;
 		} ;
@@ -2786,9 +2795,6 @@ guess_file_type (SF_PRIVATE *psf)
 
 	if (buffer [0] == MAKE_MARKER ('R', 'F', '6', '4') && buffer [2] == MAKE_MARKER ('W', 'A', 'V', 'E'))
 		return SF_FORMAT_RF64 ;
-
-	if (buffer [0] == MAKE_MARKER ('w', 'v', 'p', 'k'))
-		return SF_FORMAT_WAVPACK ;
 
 	if (buffer [0] == MAKE_MARKER ('I', 'D', '3', 3))
 	{	psf_log_printf (psf, "Found 'ID3' marker.\n") ;
