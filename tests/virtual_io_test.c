@@ -40,7 +40,12 @@ main (void)
 	vio_test ("vio_pcm24.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
 	vio_test ("vio_float.au", SF_FORMAT_AU | SF_FORMAT_FLOAT) ;
 	vio_test ("vio_pcm24.paf", SF_FORMAT_PAF | SF_FORMAT_PCM_24) ;
-
+#if HAVE_WAVPACK
+	vio_test ("vio_wavpack16.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_16) ;
+	vio_test ("vio_wavpack24.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_24) ;
+	vio_test ("vio_wavpack32.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_32) ;
+	vio_test ("vio_wavpackf32.wv", SF_FORMAT_WAVPACK | SF_FORMAT_FLOAT) ;
+#endif
 	return 0 ;
 } /* main */
 

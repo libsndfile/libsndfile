@@ -125,6 +125,13 @@ main (int argc, char *argv [])
 	float_scaled_test	("opus.opus", allow_exit, SF_FALSE, SF_FORMAT_OGG | SF_FORMAT_OPUS, -32.0) ;
 #endif
 
+#if HAVE_WAVPACK
+	float_scaled_test	("wavpack_8.wv", allow_exit, SF_FALSE, SF_FORMAT_WAVPACK | SF_FORMAT_PCM_U8, -39.0) ;
+	float_scaled_test	("wavpack_16.wv", allow_exit, SF_FALSE, SF_FORMAT_WAVPACK | SF_FORMAT_PCM_16, -87.0) ;
+	float_scaled_test	("wavpack_24.wv", allow_exit, SF_FALSE, SF_FORMAT_WAVPACK | SF_FORMAT_PCM_24, -138.0) ;
+	float_scaled_test	("wavpack_32.wv", allow_exit, SF_FALSE, SF_FORMAT_WAVPACK | SF_FORMAT_PCM_32, -163.0) ;
+#endif
+
 	float_scaled_test	("replace_float.raw", allow_exit, SF_TRUE, SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_FLOAT, -163.0) ;
 
 	/*==============================================================================
@@ -181,6 +188,13 @@ main (int argc, char *argv [])
 
 	double_scaled_test	("vorbis.oga", allow_exit, SF_FALSE, SF_FORMAT_OGG | SF_FORMAT_VORBIS, -29.0) ;
 	double_scaled_test	("opus.opus", allow_exit, SF_FALSE, SF_FORMAT_OGG | SF_FORMAT_OPUS, -32.0) ;
+#endif
+
+#if HAVE_WAVPACK
+	double_scaled_test	("wavpack_8.wv", allow_exit, SF_FALSE, SF_FORMAT_WAVPACK | SF_FORMAT_PCM_U8, -39.0) ;
+	double_scaled_test	("wavpack_16.wv", allow_exit, SF_FALSE, SF_FORMAT_WAVPACK | SF_FORMAT_PCM_16, -87.0) ;
+	double_scaled_test	("wavpack_24.wv", allow_exit, SF_FALSE, SF_FORMAT_WAVPACK | SF_FORMAT_PCM_24, -138.0) ;
+	double_scaled_test	("wavpack_32.wv", allow_exit, SF_FALSE, SF_FORMAT_WAVPACK | SF_FORMAT_PCM_32, -163.0) ;
 #endif
 
 	double_scaled_test	("replace_double.raw", allow_exit, SF_TRUE, SF_FORMAT_RAW | SF_FORMAT_DOUBLE, -201.0) ;
