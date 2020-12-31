@@ -54,7 +54,7 @@ main (void)
 static void
 major_format_test (void)
 {	SF_FORMAT_INFO	info ;
-	int have_ogg = 0, have_flac = 0 ;
+	int have_ogg = 0, have_flac = 0, have_wavpack = 0 ;
 	int m, major_count ;
 
 	print_test_name (__func__, NULL) ;
@@ -67,6 +67,7 @@ major_format_test (void)
 
 		have_flac = info.format == SF_FORMAT_FLAC ? 1 : have_flac ;
 		have_ogg = info.format == SF_FORMAT_OGG ? 1 : have_ogg ;
+		have_wavpack = info.format == SF_FORMAT_WAVPACK ? 1 : have_wavpack ;
 		} ;
 
 	if (HAVE_EXTERNAL_XIPH_LIBS)
@@ -77,6 +78,11 @@ major_format_test (void)
 	{	exit_if_true (have_flac, "\n\nLine %d : FLAC should not be available.\n\n", __LINE__) ;
 		exit_if_true (have_ogg, "\n\nLine %d : Ogg/Vorbis should not be available.\n\n", __LINE__) ;
 		} ;
+
+	if (HAVE_WAVPACK)
+		exit_if_true (have_wavpack == 0, "\n\nLine %d : WavPack should be available.\n\n", __LINE__) ;
+	else
+		exit_if_true (have_wavpack, "\n\nLine %d : WavPack should not be available.\n\n", __LINE__) ;
 
 	puts ("ok") ;
 } /* major_format_test */
@@ -114,7 +120,7 @@ subtype_format_test (void)
 static void
 simple_format_test (void)
 {	SF_FORMAT_INFO	info ;
-	int have_flac = 0, have_ogg = 0, have_vorbis = 0, have_opus = 0 ;
+	int have_flac = 0, have_ogg = 0, have_vorbis = 0, have_opus = 0, have_wavpack = 0 ;
 	int s, simple_count ;
 
 	print_test_name (__func__, NULL) ;
@@ -132,6 +138,10 @@ simple_format_test (void)
 
 			case SF_FORMAT_OGG :
 				have_ogg = 1 ;
+				break ;
+
+			case SF_FORMAT_WAVPACK :
+				have_wavpack = 1 ;
 				break ;
 
 			default :
@@ -165,6 +175,11 @@ simple_format_test (void)
 		exit_if_true (have_vorbis, "\n\nLine %d : Ogg/Vorbis should not be available.\n\n", __LINE__) ;
 		exit_if_true (have_opus, "\n\nLine %d : Ogg/Opus should not be available.\n\n", __LINE__) ;
 		} ;
+
+	if (HAVE_WAVPACK)
+		exit_if_true (have_wavpack == 0, "\n\nLine %d : WavPack should be available.\n\n", __LINE__) ;
+	else
+		exit_if_true (have_wavpack, "\n\nLine %d : WavPack should not be available.\n\n", __LINE__) ;
 
 	puts ("ok") ;
 } /* simple_format_test */
