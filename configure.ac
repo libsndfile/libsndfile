@@ -397,12 +397,22 @@ dnl  Check for Wavpack.
 ac_cv_wavpack=0
 AS_IF([test "x$enable_wavpack" = "xno"], [
   AC_MSG_WARN([[*** Wavpack disabled. ***]])
+  HAVE_WAVPACK=0
 ], [
-  enable_wavpack=yes
-  PKG_CHECK_MOD_VERSION([WAVPACK], [wavpack >= 1.2], [ac_cv_wavpack=1], [ac_cv_wavpack=0])
+  PKG_CHECK_MOD_VERSION(WAVPACK, wavpack >= 1.2, ac_cv_wavpack=yes, ac_cv_wavpack=no)
+  AS_IF([test "x$ac_cv_wavpack" = "xyes"], [
+    HAVE_WAVPACK=1
+    enable_wavpack=yes
+  ], [
+    AS_ECHO([""])
+    AC_MSG_WARN([[*** WavPack is missing or is of an unsupported version. ]])
+    AC_MSG_WARN([[*** (possibly only the development headers) ]])
+    AS_ECHO([""])
+    HAVE_WAVPACK=0
+    enable_wavpack=no
+  ])
 ])
-AC_DEFINE_UNQUOTED([HAVE_WAVPACK], [${ac_cv_wavpack}], [Set to 1 if you want to build with Wavpack support.])
-AM_CONDITIONAL([HAVE_WAVPACK], [test "x$ac_cv_wavpack" = "x1"])
+AC_DEFINE_UNQUOTED([HAVE_WAVPACK], [$HAVE_WAVPACK], [Will be set to 1 if WavPack is available.])
 
 dnl ====================================================================================
 dnl  Check for libsqlite3 (only used in regtest).
@@ -731,7 +741,7 @@ AC_MSG_RESULT([
     Using ALSA in example programs : ...... ${enable_alsa:-no}
     External FLAC/Ogg/Vorbis/Opus : ....... ${enable_external_libs:-no}
     External MPEG Lame/MPG123 : ........... ${enable_mpeg:-no}
-    External Wavpack : .................... ${enable_wavpack:-no}
+    Wavpack : ............................. ${enable_wavpack:-no}
     Building Octave interface : ........... ${OCTAVE_BUILD}
 
   Tools :
