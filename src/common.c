@@ -877,6 +877,7 @@ header_seek (SF_PRIVATE *psf, sf_count_t position, int whence)
 				psf_bump_header_allocation (psf, position) ;
 			if (position > psf->header.len)
 			{	/* Too much header to cache so just seek instead. */
+				psf->header.indx = psf->header.end ;
 				psf_fseek (psf, position, whence) ;
 				return ;
 				} ;
