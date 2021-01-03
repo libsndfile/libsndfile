@@ -47,10 +47,10 @@ id3_skip (SF_PRIVATE * psf)
 			return 0 ;
 
 		/* Calculate new file offset and position ourselves there. */
-		psf->fileoffset += offset + 10 ;
-
-		if (psf->fileoffset < psf->filelength)
-		{	psf_binheader_readf (psf, "p", psf->fileoffset) ;
+		offset += 10 ;
+		if (psf->fileoffset + offset < psf->filelength)
+		{	psf_binheader_readf (psf, "p", offset) ;
+			psf->fileoffset += offset ;
 			return 1 ;
 			} ;
 		} ;
