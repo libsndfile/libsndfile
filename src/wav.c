@@ -1332,6 +1332,9 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 	bytesread += psf_binheader_readf (psf, "4", &loop_count) ;
 	psf_log_printf (psf, "  Loop Count   : %u\n", loop_count) ;
 
+	if (loop_count > 16)
+		return SFE_CHANNEL_COUNT_BAD ;
+
 	if (loop_count == 0 && chunklen == bytesread)
 		return 0 ;
 
