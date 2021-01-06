@@ -1390,12 +1390,17 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 					psf->instrument->loops [j].mode = SF_LOOP_NONE ;
 					break ;
 				} ;
-			actually_loop_count ++ ;
 			} ;
+		actually_loop_count ++ ;
 		} ;
 
-	if (loop_count != actually_loop_count)
-	{	psf_log_printf (psf, "*** Warning, Loop Count is not matched or exceeds, change to %d.\n", actually_loop_count) ;
+	if (actually_loop_count > ARRAY_LEN (psf->instrument->loops))
+	{
+		psf_log_printf (psf, "*** Warning, actual Loop Points count exceeds %u, changing Loop Count from %u to %u\n", ARRAY_LEN (psf->instrument->loops), loop_count, ARRAY_LEN (psf->instrument->loops)) ;
+		psf->instrument->loop_count = ARRAY_LEN (psf->instrument->loops) ;
+		}
+	else if (loop_count != actually_loop_count)
+	{	psf_log_printf (psf, "*** Warning, actual Loop Points count != Loop Count, changing Loop Count from %u to %u\n", loop_count, actually_loop_count) ;
 		psf->instrument->loop_count = actually_loop_count ;
 		} ;
 
