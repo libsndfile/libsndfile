@@ -1294,7 +1294,7 @@ wav_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
 static int
 wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 {	char buffer [512] ;
-	uint32_t thisread, bytesread = 0, dword, sampler_data, loop_count ;
+	uint32_t thisread, bytesread = 0, dword, sampler_data, loop_count, actually_loop_count = 0 ;
 	uint32_t note, pitch, start, end, type = -1, count ;
 	int j, k ;
 
@@ -1391,8 +1391,17 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 					break ;
 				} ;
 			} ;
+		actually_loop_count ++ ;
+		} ;
 
-		loop_count -- ;
+	if (actually_loop_count > ARRAY_LEN (psf->instrument->loops))
+	{
+		psf_log_printf (psf, "*** Warning, actual Loop Points count exceeds %u, changing Loop Count from %u to %u\n", ARRAY_LEN (psf->instrument->loops), loop_count, ARRAY_LEN (psf->instrument->loops)) ;
+		psf->instrument->loop_count = ARRAY_LEN (psf->instrument->loops) ;
+		}
+	else if (loop_count != actually_loop_count)
+	{	psf_log_printf (psf, "*** Warning, actual Loop Points count != Loop Count, changing Loop Count from %u to %u\n", loop_count, actually_loop_count) ;
+		psf->instrument->loop_count = actually_loop_count ;
 		} ;
 
 	if (chunklen - bytesread == 0)
