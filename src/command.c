@@ -71,7 +71,7 @@ static SF_FORMAT_INFO const simple_formats [] =
 		},
 
 	{	SF_FORMAT_OGG | SF_FORMAT_VORBIS,
-		"Ogg Vorbis (Xiph Foundation)", "oga"
+		"Ogg Vorbis (Xiph Foundation)", "ogg"
 		},
 #endif
 
