@@ -41,8 +41,8 @@
 ** This file is concerned only with the most common case of MPEG Layer III
 ** audio without a container but with the additional metadata standards.
 **
-** For the purposes of libsndfile, the major format of SF_FORMAT_MP3 means the
-** following assumptions. A file of major format type SF_FORMAT_MP3:
+** For the purposes of libsndfile, the major format of SF_FORMAT_MPEG means the
+** following assumptions. A file of major format type SF_FORMAT_MPEG:
 ** - Contains only layer III audio frames (SF_FORMAT_MPEG_LAYER_III)
 ** - All MPEG frames contained in the file have the same channel count
 ** - All MPEG frames contained in the file have the same samplerate

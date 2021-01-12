@@ -71,7 +71,7 @@ enum
 	SF_FORMAT_OGG			= 0x200000,		/* Xiph OGG container */
 	SF_FORMAT_MPC2K			= 0x210000,		/* Akai MPC 2000 sampler */
 	SF_FORMAT_RF64			= 0x220000,		/* RF64 WAV file */
-	SF_FORMAT_MP3			= 0x230000,		/* So-called MP3 file. */
+	SF_FORMAT_MPEG			= 0x230000,		/* MPEG-1/2 audio stream */
 
 	/* Subtypes from here on. */
 

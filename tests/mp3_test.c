@@ -68,7 +68,7 @@ mp3_short_test (void)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	/* Set up output file type. */
-	sfinfo.format = SF_FORMAT_MP3 | SF_FORMAT_MPEG_LAYER_III ;
+	sfinfo.format = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III ;
 	sfinfo.channels = 1 ;
 	sfinfo.samplerate = SAMPLE_RATE ;
 
@@ -126,7 +126,7 @@ mp3_int_test (void)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	/* Set up output file type. */
-	sfinfo.format = SF_FORMAT_MP3 | SF_FORMAT_MPEG_LAYER_III ;
+	sfinfo.format = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III ;
 	sfinfo.channels = 1 ;
 	sfinfo.samplerate = SAMPLE_RATE ;
 
@@ -175,7 +175,7 @@ mp3_float_test (void)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	/* Set up output file type. */
-	sfinfo.format = SF_FORMAT_MP3 | SF_FORMAT_MPEG_LAYER_III ;
+	sfinfo.format = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III ;
 	sfinfo.channels = 1 ;
 	sfinfo.samplerate = SAMPLE_RATE ;
 
@@ -224,7 +224,7 @@ mp3_double_test (void)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	/* Set up output file type. */
-	sfinfo.format = SF_FORMAT_MP3 | SF_FORMAT_MPEG_LAYER_III ;
+	sfinfo.format = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III ;
 	sfinfo.channels = 1 ;
 	sfinfo.samplerate = SAMPLE_RATE ;
 
@@ -339,7 +339,7 @@ main (void)
 		mp3_float_test () ;
 		mp3_double_test () ;
 
-		mp3_stereo_seek_test ("mpeg_seek.mp3", SF_FORMAT_MP3 | SF_FORMAT_MPEG_LAYER_III) ;
+		mp3_stereo_seek_test ("mpeg_seek.mp3", SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III) ;
 		}
 	else
 		puts ("    No MPEG tests because mpg123/lame support was not compiled in.") ;

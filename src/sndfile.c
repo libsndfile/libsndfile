@@ -962,7 +962,7 @@ sf_format_check	(const SF_INFO *info)
 					return 1 ;
 				break ;
 
-		case SF_FORMAT_MP3 :
+		case SF_FORMAT_MPEG :
 				if (info->channels > 2)
 					return 0 ;
 				if (endian != SF_ENDIAN_FILE)
@@ -2760,7 +2760,7 @@ format_from_extension (SF_PRIVATE *psf)
 		 * MPEG streams are quite tollerate of crap. If we couldn't identify a
 		 * MP3 stream, but it has a .mp3 extension, let libmpg123 have a try.
 		 */
-		format = SF_FORMAT_MP3 ;
+		format = SF_FORMAT_MPEG ;
 		}
 
 	/* For RAW files, make sure the dataoffset if set correctly. */
@@ -2876,7 +2876,7 @@ retry:
 		(buffer [0] & MAKE_MARKER (0, 0x06, 0, 0)) != MAKE_MARKER (0, 0, 0, 0) && /* Valid layer description */
 		(buffer [0] & MAKE_MARKER (0, 0, 0xF0, 0)) != MAKE_MARKER (0, 0, 0xF0, 0) && /* Valid bitrate */
 		(buffer [0] & MAKE_MARKER (0, 0, 0x0C, 0)) != MAKE_MARKER (0, 0, 0x0C, 0)) /* Valid samplerate */
-		return SF_FORMAT_MP3 ;
+		return SF_FORMAT_MPEG ;
 
 	if (buffer [0] == MAKE_MARKER ('I', 'D', '3', 2) || buffer [0] == MAKE_MARKER ('I', 'D', '3', 3)
 			|| buffer [0] == MAKE_MARKER ('I', 'D', '3', 4))
@@ -2885,7 +2885,7 @@ retry:
 		/* Guess MP3, try and open it as such. Allows libmpg123 to parse the ID3v2 headers */
 		if (psf->file.mode == SFM_READ)
 		{	if (mp3_open (psf) == 0)
-				return SF_FORMAT_MP3 | ((~SF_FORMAT_TYPEMASK) & psf->sf.format) ;
+				return SF_FORMAT_MPEG | ((~SF_FORMAT_TYPEMASK) & psf->sf.format) ;
 			else if (psf->codec_close)
 				psf->codec_close (psf) ;
 			} ;
@@ -3269,7 +3269,7 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 				error = mpc2k_open (psf) ;
 				break ;
 
-		case	SF_FORMAT_MP3 :
+		case	SF_FORMAT_MPEG :
 				error = mp3_open (psf) ;
 				break ;
 
@@ -3293,7 +3293,7 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 				/* Actual embedded files. */
 				break ;
 
-			case SF_FORMAT_MP3 :
+			case SF_FORMAT_MPEG :
 			case SF_FORMAT_FLAC :
 				/* Flac with an ID3v2 header? */
 				break ;
