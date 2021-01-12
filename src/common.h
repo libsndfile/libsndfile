@@ -893,7 +893,7 @@ int		ogg_pcm_open	(SF_PRIVATE *psf) ;
 int		ogg_opus_open	(SF_PRIVATE *psf) ;
 int		ogg_open	(SF_PRIVATE *psf) ;
 
-int		mp3_open	(SF_PRIVATE *psf) ;
+int		mpeg_open	(SF_PRIVATE *psf) ;
 
 /* In progress. Do not currently work. */
 

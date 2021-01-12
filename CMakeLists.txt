@@ -302,7 +302,7 @@ add_library (sndfile
 	src/ogg_vcomment.h
 	src/ogg_vcomment.c
 	src/nms_adpcm.c
-	src/mp3.c
+	src/mpeg.c
 	src/mpeg_decode.c
 	src/mpeg_l3_encode.c
 	src/GSM610/config.h
@@ -1208,8 +1208,8 @@ if (BUILD_TESTING)
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
 
-	add_executable (mp3_test tests/mp3_test.c)
-	target_link_libraries (mp3_test
+	add_executable (mpeg_test tests/mpeg_test.c)
+	target_link_libraries (mpeg_test
 		PRIVATE
 			sndfile
 			test_utils
@@ -1447,8 +1447,8 @@ if (BUILD_TESTING)
 	add_test (lossy_comp_test_ogg_opus lossy_comp_test ogg_opus)
 	add_test (string_test_opus string_test opus)
 
-	### mp3-tests ###
-	add_test (mp3_test mp3_test)
+	### mpeg-tests ###
+	add_test (mpeg_test mpeg_test)
 	add_test (compression_size_test_mpeg compression_size_test mpeg)
 
 	### io-tests

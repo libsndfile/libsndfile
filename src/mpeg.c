@@ -1,6 +1,6 @@
 /*
 ** Copyright (C) 2019 Erik de Castro Lopo <erikd@mega-nerd.com>
-** Copyright (C) 2019 Arthur Taylor <art@ified.ca>
+** Copyright (C) 2021 Arthur Taylor <art@ified.ca>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -17,47 +17,6 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-/*
-** What is an MP3 file anyways?
-**
-** Believe it or not, MP3 files don't exist.
-**
-** The MPEG-1 standard defined a few audio codecs. The standard only defined a
-** streaming format of semi-independent frames of audio meant for broadcasting,
-** with no details or hints about stored on-disk formats. Each frame defines
-** it's own bitrate, channel count, sample rate. However, they aren't
-** completely independent.
-**
-** With its amazing-for-the-time compression ratio, the layer III audio codec
-** became quite popular with file sharers and the internet. A stream of layer
-** III audio would simply be written as a file, usually with the extension
-** .mp3. Over time enthusiast and proprietary encoders sprung up adding
-** different metadata headers and trailers, file seeking tables, and fiddling
-** with the codecs parameters. These changes are only really based on consensus.
-**
-** MPEG-1 I/II/III audio can be embedded in a few container formats (including
-** WAV), stored raw, or with additional metadata extension headers and trailers.
-**
-** This file is concerned only with the most common case of MPEG Layer III
-** audio without a container but with the additional metadata standards.
-**
-** For the purposes of libsndfile, the major format of SF_FORMAT_MPEG means the
-** following assumptions. A file of major format type SF_FORMAT_MPEG:
-** - Contains only layer III audio frames (SF_FORMAT_MPEG_LAYER_III)
-** - All MPEG frames contained in the file have the same channel count
-** - All MPEG frames contained in the file have the same samplerate
-** - Has at least one of:
-**   - an ID3v1 trailer
-**   - an ID3v2 header or trailer
-**   - A Lame/Xing/Info header
-**
-** Testing has revealed that, more than any other format, MP3 suffers from
-** corrupt files in the wild that most other software 'just works' with. This is
-** usually because the MP3 decoders are very lenient. They are aided by the
-** presence of a regular sync frame, but this makes it hard to classify them
-** in a library that consumes other better-specified file formats.
-*/
-
 #include	"sfconfig.h"
 
 #include	"sndfile.h"
@@ -67,15 +26,15 @@
 
 #include "mpeg.h"
 
-static int	mp3_write_header (SF_PRIVATE *psf, int calc_length) ;
-static int	mp3_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
+static int	mpeg_write_header (SF_PRIVATE *psf, int calc_length) ;
+static int	mpeg_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 
 /*------------------------------------------------------------------------------
  * Private functions
  */
 
 static int
-mp3_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
+mpeg_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 {
 	if (psf->have_written)
 		return 0 ;
@@ -84,7 +43,7 @@ mp3_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 } ;
 
 static int
-mp3_command (SF_PRIVATE *psf, int command, void *data, int datasize)
+mpeg_command (SF_PRIVATE *psf, int command, void *data, int datasize)
 {	int bitrate_mode ;
 
 	switch (command)
@@ -129,7 +88,7 @@ mp3_command (SF_PRIVATE *psf, int command, void *data, int datasize)
  */
 
 int
-mp3_open (SF_PRIVATE *psf)
+mpeg_open (SF_PRIVATE *psf)
 {	int error ;
 
 	if (psf->file.mode == SFM_RDWR)
@@ -147,7 +106,7 @@ mp3_open (SF_PRIVATE *psf)
 
 		/* ID3 support */
 		psf->strings.flags = SF_STR_ALLOW_START ;
-		psf->write_header = mp3_write_header ;
+		psf->write_header = mpeg_write_header ;
 		psf->datalength = 0 ;
 		psf->dataoffset = 0 ;
 		} ;
@@ -157,7 +116,7 @@ mp3_open (SF_PRIVATE *psf)
 			return error ;
 		} ;
 
-	psf->command = mp3_command ;
+	psf->command = mpeg_command ;
 
 	return 0 ;
 } /* mpeg_open */
@@ -165,7 +124,7 @@ mp3_open (SF_PRIVATE *psf)
 #else /* HAVE_MPEG */
 
 int
-mp3_open (SF_PRIVATE *psf)
+mpeg_open (SF_PRIVATE *psf)
 {
 	psf_log_printf (psf, "This version of libsndfile was compiled without MP3 support.\n") ;
 	return SFE_UNIMPLEMENTED ;
