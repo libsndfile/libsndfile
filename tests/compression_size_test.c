@@ -223,7 +223,7 @@ main (int argc, char *argv [])
 
 	if (all_tests || strcmp (argv [1], "mpeg") == 0)
 	{	if (HAVE_MPEG)
-		{	compression_size_test (SF_FORMAT_MP3 | SF_FORMAT_MPEG_LAYER_III, "mpeg.mp3") ;
+		{	compression_size_test (SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III, "mpeg.mp3") ;
 			tests ++ ;
 			}
 		else
