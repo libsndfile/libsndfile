@@ -48,7 +48,7 @@ static BUFFER data_out ;
 static BUFFER data_in ;
 
 static void
-mp3_short_test (void)
+mpeg_short_test (void)
 {	const char * filename = "mpeg_short.mp3" ;
 
 	SNDFILE * file ;
@@ -106,7 +106,7 @@ mp3_short_test (void)
 } /* mpeg_short_test */
 
 static void
-mp3_int_test (void)
+mpeg_int_test (void)
 {	const char * filename = "mpeg_int.mp3" ;
 
 	SNDFILE * file ;
@@ -161,7 +161,7 @@ mp3_int_test (void)
 } /* mpeg_int_test */
 
 static void
-mp3_float_test (void)
+mpeg_float_test (void)
 {	const char * filename = "mpeg_float.mp3" ;
 
 	SNDFILE * file ;
@@ -210,7 +210,7 @@ mp3_float_test (void)
 } /* mpeg_float_test */
 
 static void
-mp3_double_test (void)
+mpeg_double_test (void)
 {	const char * filename = "mpeg_double.mp3" ;
 
 	SNDFILE * file ;
@@ -260,7 +260,7 @@ mp3_double_test (void)
 
 
 static void
-mp3_stereo_seek_test (const char * filename, int format)
+mpeg_stereo_seek_test (const char * filename, int format)
 {	static float data [SAMPLE_RATE] ;
 	static float stereo_out [SAMPLE_RATE * 2] ;
 
@@ -334,12 +334,12 @@ int
 main (void)
 {
 	if (HAVE_MPEG)
-	{	mp3_short_test () ;
-		mp3_int_test () ;
-		mp3_float_test () ;
-		mp3_double_test () ;
+	{	mpeg_short_test () ;
+		mpeg_int_test () ;
+		mpeg_float_test () ;
+		mpeg_double_test () ;
 
-		mp3_stereo_seek_test ("mpeg_seek.mp3", SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III) ;
+		mpeg_stereo_seek_test ("mpeg_seek.mp3", SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III) ;
 		}
 	else
 		puts ("    No MPEG tests because mpg123/lame support was not compiled in.") ;

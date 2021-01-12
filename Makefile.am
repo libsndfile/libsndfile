@@ -69,7 +69,7 @@ src_libsndfile_la_SOURCES = src/sndfile.c src/aiff.c src/au.c src/avr.c src/caf.
 	src/macos.c src/mat4.c src/mat5.c src/nist.c src/paf.c src/pvf.c src/raw.c src/rx2.c src/sd2.c \
 	src/sds.c src/svx.c src/txw.c src/voc.c src/wve.c src/w64.c src/wavlike.c src/wav.c src/xi.c src/mpc2k.c src/rf64.c \
 	src/ogg.c src/ogg.h src/ogg_vorbis.c src/ogg_speex.c src/ogg_pcm.c src/ogg_opus.c src/ogg_vcomment.c src/ogg_vcomment.h \
-	src/common.h src/sfconfig.h src/sfendian.h src/wavlike.h src/sf_unistd.h src/chanmap.h src/mp3.c
+	src/common.h src/sfconfig.h src/sfendian.h src/wavlike.h src/sf_unistd.h src/chanmap.h src/mpeg.c
 nodist_src_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
 src_libsndfile_la_LIBADD = src/GSM610/libgsm.la src/G72x/libg72x.la src/ALAC/libalac.la \
 	src/libcommon.la $(EXTERNAL_XIPH_LIBS) -lm $(MPEG_LIBS)
@@ -222,7 +222,7 @@ check_PROGRAMS += tests/sfversion tests/floating_point_test tests/write_read_tes
 	tests/checksum_test tests/external_libs_test tests/rdwr_test tests/format_check_test $(CPP_TEST) \
 	tests/channel_test tests/long_read_write_test tests/stdin_test tests/stdout_test \
 	tests/dither_test tests/fix_this tests/largefile_test tests/benchmark tests/ogg_opus_test \
-	tests/mp3_test
+	tests/mpeg_test
 
 BUILT_SOURCES += \
 	tests/write_read_test.c \
@@ -378,8 +378,8 @@ tests_cpp_test_LDADD = src/libsndfile.la
 tests_checksum_test_SOURCES = tests/checksum_test.c tests/utils.c tests/utils.h
 tests_checksum_test_LDADD = src/libsndfile.la
 
-tests_mp3_test_SOURCES = tests/mp3_test.c tests/utils.c tests/utils.h
-tests_mp3_test_LDADD = src/libsndfile.la
+tests_mpeg_test_SOURCES = tests/mpeg_test.c tests/utils.c tests/utils.h
+tests_mpeg_test_LDADD = src/libsndfile.la
 
 # Lite remove start
 tests_dwvw_test_SOURCES = tests/dwvw_test.c tests/utils.c tests/utils.h

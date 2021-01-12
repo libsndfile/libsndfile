@@ -2884,7 +2884,7 @@ retry:
 
 		/* Guess MP3, try and open it as such. Allows libmpg123 to parse the ID3v2 headers */
 		if (psf->file.mode == SFM_READ)
-		{	if (mp3_open (psf) == 0)
+		{	if (mpeg_open (psf) == 0)
 				return SF_FORMAT_MPEG | ((~SF_FORMAT_TYPEMASK) & psf->sf.format) ;
 			else if (psf->codec_close)
 				psf->codec_close (psf) ;
@@ -3270,7 +3270,7 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 				break ;
 
 		case	SF_FORMAT_MPEG :
-				error = mp3_open (psf) ;
+				error = mpeg_open (psf) ;
 				break ;
 
 		/* Lite remove end */
