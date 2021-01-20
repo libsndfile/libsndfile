@@ -522,6 +522,7 @@ retrieved from files opened for read where supported by the given file type. The
 **str_type** parameter can be any one of the following string types:
 
 | Name               | Value | Description   |
+|:-------------------|:------|:--------------|
 | SF_STR_TITLE       | 0x01  | Title.        |
 | SF_STR_COPYRIGHT   | 0x02  | Copyright.    |
 | SF_STR_SOFTWARE    | 0x03  | Software.     |
