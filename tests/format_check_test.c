@@ -121,6 +121,11 @@ format_combo_test (void)
 				__LINE__
 				) ;
 
+			/* Only have decode, not encode support for MPEG Layer I and II */
+			if (subtype_fmt_info.format == SF_FORMAT_MPEG_LAYER_I ||
+					subtype_fmt_info.format == SF_FORMAT_MPEG_LAYER_II)
+				continue ;
+
 			snprintf (filename, sizeof (filename), "format-check.%s", major_fmt_info.extension) ;
 
 			sndfile = sf_open (filename, SFM_WRITE, &info) ;
