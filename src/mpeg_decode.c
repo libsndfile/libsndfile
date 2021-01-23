@@ -265,28 +265,29 @@ mpeg_dec_fill_sfinfo (mpg123_handle *mh, SF_INFO *info)
 static void
 mpeg_dec_print_frameinfo (SF_PRIVATE *psf, const struct mpg123_frameinfo *fi)
 {	psf_log_printf (psf, "MPEG-1/2 Audio\n----------------------------------------\n") ;
-	psf_log_printf (psf, "  version: %s\n",
+	psf_log_printf (psf, "  MPEG version   : %s\n",
 		fi->version == MPG123_1_0 ? "MPEG 1.0" :
 		fi->version == MPG123_2_0 ? "MPEG 2.0" :
-		fi->version == MPG123_2_5 ? "MPEG 2.5" : "?") ;
-	psf_log_printf (psf, "  layer: %d\n", fi->layer) ;
-	psf_log_printf (psf, "  rate: %d\n", fi->rate) ;
-	psf_log_printf (psf, "  mode: %s\n",
+		fi->version == MPG123_2_5 ? "MPEG 2.5" : "???") ;
+	psf_log_printf (psf, "  layer          : %d\n", fi->layer) ;
+	psf_log_printf (psf, "  rate           : %d\n", fi->rate) ;
+	psf_log_printf (psf, "  mode           : %s\n",
 		fi->mode == MPG123_M_STEREO ? "stereo" :
 		fi->mode == MPG123_M_JOINT ? "joint stereo" :
 		fi->mode == MPG123_M_DUAL ? "dual channel" :
-		fi->mode == MPG123_M_MONO ? "mono" : "?") ;
-	psf_log_printf (psf, "  mode ext: %d\n", fi->mode_ext) ;
-	psf_log_printf (psf, "  framesize: %d\n", fi->framesize) ;
-	psf_log_printf (psf, "  crc: %c\n", fi->flags & MPG123_CRC ? '1' : '0') ;
-	psf_log_printf (psf, "  copyright flag: %c\n", fi->flags & MPG123_COPYRIGHT ? '1' : '0') ;
-	psf_log_printf (psf, "  private flag: %c\n", fi->flags & MPG123_PRIVATE ? '1' : '0') ;
-	psf_log_printf (psf, "  original flag: %c\n", fi->flags & MPG123_ORIGINAL ? '1' : '0') ;
-	psf_log_printf (psf, "  emphasis: %d\n", fi->emphasis) ;
-	psf_log_printf (psf, "  bitrate mode: ") ;
+		fi->mode == MPG123_M_MONO ? "mono" : "???") ;
+	psf_log_printf (psf, "  mode ext       : %d\n", fi->mode_ext) ;
+	psf_log_printf (psf, "  framesize      : %d\n", fi->framesize) ;
+	psf_log_printf (psf, "  crc            : %d\n", !! (fi->flags & MPG123_CRC)) ;
+	psf_log_printf (psf, "  copyright flag : %d\n", !! (fi->flags & MPG123_COPYRIGHT)) ;
+	psf_log_printf (psf, "  private flag   : %d\n", !! (fi->flags & MPG123_PRIVATE)) ;
+	psf_log_printf (psf, "  original flag  : %d\n", !! (fi->flags & MPG123_ORIGINAL)) ;
+	psf_log_printf (psf, "  emphasis       : %d\n", fi->emphasis) ;
+	psf_log_printf (psf, "  bitrate mode   : ") ;
 	switch (fi->vbr)
 	{	case MPG123_CBR :
 			psf_log_printf (psf, "constant\n") ;
+			psf_log_printf (psf, "  bitrate        : %d kbps\n", fi->bitrate) ;
 			break ;
 		case MPG123_VBR :
 			psf_log_printf (psf, "variable\n") ;
@@ -294,10 +295,13 @@ mpeg_dec_print_frameinfo (SF_PRIVATE *psf, const struct mpg123_frameinfo *fi)
 
 		case MPG123_ABR :
 			psf_log_printf (psf, "average\n") ;
-			psf_log_printf (psf, "  ABR target: %d\n", fi->abr_rate) ;
+			psf_log_printf (psf, "  ABR target     : %d\n", fi->abr_rate) ;
+			break ;
+
+		default :
+			psf_log_printf (psf, "(%d) ???\n", fi->vbr) ;
 			break ;
 		} ;
-	psf_log_printf (psf, "  bitrate: %d kbps\n", fi->bitrate) ;
 } /* mpeg_dec_print_frameinfo */
 
 /*
