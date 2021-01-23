@@ -532,7 +532,7 @@ format_tests	(void)
 	/* Now test subtype formats. */
 	sf_command (NULL, SFC_GET_FORMAT_SUBTYPE_COUNT, &count, sizeof (int)) ;
 
-	if (count < 0 || count > 30)
+	if (count < 0 || count > 33)
 	{	printf ("Line %d: Weird count.\n", __LINE__) ;
 		exit (1) ;
 		} ;
