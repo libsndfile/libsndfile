@@ -344,6 +344,7 @@ static OUTPUT_FORMAT_MAP format_map [] =
 	{	"opus",		0,	SF_FORMAT_OGG | SF_FORMAT_OPUS },
 	{	"mpc",		0,	SF_FORMAT_MPC2K	},
 	{	"rf64",		0,	SF_FORMAT_RF64	},
+	{	"mp3",		0,	SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III },
 } ; /* format_map */
 
 int
