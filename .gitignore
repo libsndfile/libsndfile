@@ -61,6 +61,7 @@ examples/sfprocess
 examples/sndfile-loopify
 examples/sndfile-to-text
 examples/sndfilehandle
+include/sndfile.h
 libsndfile-1.0.*
 libsndfile-testsuite-*
 libsndfile.spec
@@ -92,7 +93,6 @@ src/config.h.in
 src/config.h.in~
 src/libsndfile.so*
 libsndfile*.def
-src/sndfile.h
 src/stamp-h1
 src/test_endswap.c
 src/test_main
