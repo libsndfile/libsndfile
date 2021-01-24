@@ -1,4 +1,7 @@
 Unreleased
+
+  * The releaser of libsndfile starting from this version is the libsndfile team
+    member @SoapGentoo, see AUTHORS for details.
   * Implement fast SSE2 optimized psf_lrintf() and psf_lrintf() functions to
     improve perfomance when libsndfile is built using Visual C++ (especially)
     and other compilers on x86 and AMD64 platforms. See also description of
@@ -8,6 +11,8 @@ Unreleased
     * Convert documentation pages from HTML to Markdown
     * Use GitHub's Jekyll static site generator to generate static HTML pages
       for site
+    * Fix api.md table error, thanks to @zodf0055980
+    * Other docuemntation fixes and updates
   * Change CMake's project name from sndfile to libsndfile as it should be.
   * Change behaviour of ENABLE_STATIC_RUNTIME option. In short:
     * You can use ENABLE_STATIC_RUNTIME for CMake >= 3.15 without error.
@@ -28,6 +33,26 @@ Unreleased
     * For MinGW toolchain this option is experimental. If you enabled it and
       then disabled again, you need to clear CMake cache (delete
       CMakeCache.txt).
+  * Make CMake clip test faster.
+  * Fix CMake bug with sndio library dependency, thanks to @drhenault.
+  * Fix memory leak in wav_read_smpl_chunk() function, credit to OSS-Fuzz.
+  * Fix aiff_read_header() memory leak(), credit to OSS-Fuzz.
+  * Fix leak in wav_read_header(), credit to OSS-Fuzz.
+  * Fix leak in wavlike_read_cart_chunk(), credit to OSS-Fuzz.
+  * Fix memory leak in wav_read_acid_chunk(), credit to OSS-Fuzz.
+  * Fix memory leak in aiff_read_basc_chunk(), credit to OSS-Fuzz.
+  * Fix memory leak in wavlike_read_peak_chunk(), credit to OSS-Fuzz.
+  * Fix memory leak in aiff_read_header(), credit to OSS-Fuzz.
+  * Fix use of uninitialized value in exif_subchunk_parse(), credit to OSS-Fuzz.
+  * Fix use of uninitialized value in endswap_int64_t_array(), credit to
+    OSS-Fuzz.
+  * Fix up the fuzzer so that it can't under or overseek,
+    thanks to Max Dymond <cmeister2@gmail.com>.
+  * Fix Autotools configure on macOS, thanks to @tmcguire and @nwh.
+  * Exclude repository-configuration from git-archive, thanks to @umlaeute.
+  * Use version-script when compiling with clang on Unix with Autotools, thanks
+    to @tstellar.
+  * Improve handling of SMPL chunks in WAV files, thanks to @zodf0055980.
 
 Version 1.0.30 (2020-09-18)
 
