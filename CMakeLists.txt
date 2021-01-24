@@ -15,7 +15,7 @@ if (POLICY CMP0091)
 	endif ()
 endif ()
 
-project(libsndfile VERSION 1.0.30)
+project(libsndfile VERSION 1.0.31)
 
 #
 # Variables

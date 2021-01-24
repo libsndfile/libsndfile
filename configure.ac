@@ -1,9 +1,9 @@
-dnl Copyright (C) 1999-2020  Erik de Castro Lopo <erikd@mega-nerd.com>.
+dnl Copyright (C) 1999-2021  Erik de Castro Lopo <erikd@mega-nerd.com>.
 
 dnl Require autoconf version >= 2.69
 AC_PREREQ([2.69])
 
-AC_INIT([libsndfile],[1.0.30],[sndfile@mega-nerd.com],
+AC_INIT([libsndfile],[1.0.31],[sndfile@mega-nerd.com],
 		[libsndfile],[http://libsndfile.github.io/libsndfile/])
 
 dnl Check whether we want to set defaults for CFLAGS, CXXFLAGS, CPPFLAGS and LDFLAGS
@@ -84,13 +84,7 @@ dnl   5. If any interfaces have been added since the last public release, then i
 dnl      age.
 dnl   6. If any interfaces have been removed since the last public release, then set age
 dnl      to 0.
-
-CLEAN_VERSION=`echo $PACKAGE_VERSION | $SED "s/p.*//"`
-VERSION_MAJOR=`echo $PACKAGE_VERSION | $SED "s/\..*//"`
-VERSION_MINOR=`echo $CLEAN_VERSION | $SED "s/.*\.//"`
-GEN_TOOL="autoconf"
-
-SHARED_VERSION_INFO="$VERSION_MAJOR:$VERSION_MINOR:0"
+SHARED_VERSION_INFO="1:31:0"
 
 dnl ------------------------------------------------------------------------------------
 

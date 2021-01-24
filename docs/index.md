@@ -140,6 +140,8 @@ Here is the release history for libsndfile:
   documentation. Integrate GitHub Actions for faster test builds and Oss-Fuzz
   for fuzzing tests. Move sndfile.h.in from src/ to include/ directory. To avoid
   problems, delete old generated sndfile.h from $(top_builddir)/src.
+* Version 1.0.31 (January 24 2021) Bugfix release. Fix multiple memory leaks
+  reported by OSS-Fuzz. More SSE2-optimized functions for x86 and amd64.
 
 ## Similar or Related Projects
 

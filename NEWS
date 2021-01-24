@@ -1,4 +1,4 @@
-Unreleased
+Version 1.0.31 (2021-01-24)
 
   * The releaser of libsndfile starting from this version is the libsndfile team
     member @SoapGentoo, see AUTHORS for details.
