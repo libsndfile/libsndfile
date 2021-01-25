@@ -117,7 +117,6 @@ mpeg_l3_encoder_init (SF_PRIVATE *psf, int info_tag)
 	psf->sf.seekable	= 0 ;
 	psf->codec_close	= mpeg_l3_encoder_close ;
 	psf->byterate		= mpeg_l3_encoder_byterate ;
-	psf->dataoffset		= 0 ;
 	psf->datalength		= 0 ;
 
 	return 0 ;

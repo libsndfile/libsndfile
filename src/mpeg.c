@@ -88,27 +88,34 @@ mpeg_command (SF_PRIVATE *psf, int command, void *data, int datasize)
  */
 
 int
-mpeg_open (SF_PRIVATE *psf)
+mpeg_init (SF_PRIVATE *psf, int bitrate_mode, int write_metadata)
 {	int error ;
 
 	if (psf->file.mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
 	if (psf->file.mode == SFM_WRITE)
-	{	if (SF_CODEC (psf->sf.format) != SF_FORMAT_MPEG_LAYER_III)
-			return SFE_BAD_OPEN_FORMAT ;
+	{	switch (SF_CODEC (psf->sf.format))
+		{	case SF_FORMAT_MPEG_LAYER_III :
+				if ((error = mpeg_l3_encoder_init (psf, write_metadata)))
+					return error ;
+				mpeg_l3_encoder_set_bitrate_mode (psf, bitrate_mode) ;
+				if (write_metadata)
+				{	/* ID3 support */
+					psf->strings.flags = SF_STR_ALLOW_START ;
+					psf->write_header = mpeg_write_header ;
+					} ;
+				break ;
 
-		if ((error = mpeg_l3_encoder_init (psf, SF_TRUE)))
-			return error ;
+			case SF_FORMAT_MPEG_LAYER_I :
+			case SF_FORMAT_MPEG_LAYER_II :
+				psf_log_printf (psf, "MPEG Layer I and II encoding is not yet supported.\n") ;
+				return SFE_UNIMPLEMENTED ;
 
-		/* Choose variable bitrate mode by default for standalone (mp3) files.*/
-		mpeg_l3_encoder_set_bitrate_mode (psf, SF_BITRATE_MODE_VARIABLE) ;
-
-		/* ID3 support */
-		psf->strings.flags = SF_STR_ALLOW_START ;
-		psf->write_header = mpeg_write_header ;
-		psf->datalength = 0 ;
-		psf->dataoffset = 0 ;
+			default:
+				psf_log_printf (psf, "%s: bad psf->sf.format 0x%x.\n", __func__, psf->sf.format) ;
+				return SFE_INTERNAL ;
+			} ;
 		} ;
 
 	if (psf->file.mode == SFM_READ)
@@ -116,12 +123,31 @@ mpeg_open (SF_PRIVATE *psf)
 			return error ;
 		} ;
 
+	return 0 ;
+} /* mpeg_init */
+
+int
+mpeg_open (SF_PRIVATE *psf)
+{	int error ;
+
+	/* Choose variable bitrate mode by default for standalone files.*/
+	if ((error = mpeg_init (psf, SF_BITRATE_MODE_VARIABLE, SF_TRUE)))
+		return error ;
+
+	psf->dataoffset = 0 ;
 	psf->command = mpeg_command ;
 
 	return 0 ;
 } /* mpeg_open */
 
 #else /* HAVE_MPEG */
+
+int
+mpeg_init (SF_PRIVATE *psf, int UNUSED (bitrate_mode) , int UNUSED (write_metadata))
+{
+	psf_log_printf (psf, "This version of libsndfile was compiled without MPEG support.\n") ;
+	return SFE_UNIMPLEMENTED ;
+} /* mpeg_init */
 
 int
 mpeg_open (SF_PRIVATE *psf)
