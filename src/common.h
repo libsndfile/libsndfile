@@ -918,6 +918,7 @@ int		vox_adpcm_init	(SF_PRIVATE *psf) ;
 int		flac_init		(SF_PRIVATE *psf) ;
 int		g72x_init 		(SF_PRIVATE * psf) ;
 int		alac_init		(SF_PRIVATE *psf, const ALAC_DECODER_INFO * info) ;
+int		mpeg_init		(SF_PRIVATE *psf, int bitrate_mode, int write_metadata) ;
 
 int 	dither_init		(SF_PRIVATE *psf, int mode) ;
 
