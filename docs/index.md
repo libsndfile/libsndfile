@@ -194,7 +194,7 @@ long as you abide by [the license](http://www.gnu.org/copyleft/lesser.html).
 Check latest version on
 [GitHub Releases page](https://github.com/libsndfile/libsndfile/releases/).
 
-Binatries and source packages are signed by current releaser David Seifert aka
+Binaries and source packages are signed by current releaser David Seifert aka
 @SoapGentoo. You can verify signatures with his public GPG key:
 
 ```
