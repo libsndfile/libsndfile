@@ -647,6 +647,11 @@ if (BUILD_EXAMPLES)
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
 
+# generate
+
+	add_executable (generate examples/generate.c)
+	target_link_libraries (generate PRIVATE sndfile)
+
 # sndfilehandle
 
 	add_executable (sndfilehandle examples/sndfilehandle.cc)
@@ -658,6 +663,7 @@ if (BUILD_EXAMPLES)
 		make_sine
 		sfprocess
 		list_formats
+		generate
 		sndfilehandle
 		)
 
