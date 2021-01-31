@@ -44,6 +44,8 @@
 
 #define		LCT_MAX(x, y)	((x) > (y) ? (x) : (y))
 
+static const char LCT_TEST_PREFIX[] = "lct" ;
+
 static	void	lcomp_test_short	(const char *filename, int filetype, int chan, double margin) ;
 static	void	lcomp_test_int		(const char *filename, int filetype, int chan, double margin) ;
 static	void	lcomp_test_float	(const char *filename, int filetype, int chan, double margin) ;
@@ -651,6 +653,7 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 	sf_count_t		datalen ;
 	short			*orig, *data ;
 
+	get_unique_test_name (&filename, LCT_TEST_PREFIX) ;
 	print_test_name ("lcomp_test_short", filename) ;
 
 	datalen = BUFFER_SIZE / channels ;
@@ -838,6 +841,7 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 	double			scale, max_val ;
 	int				*orig, *data ;
 
+	get_unique_test_name (&filename, LCT_TEST_PREFIX) ;
 	print_test_name ("lcomp_test_int", filename) ;
 
 	datalen = BUFFER_SIZE / channels ;
@@ -1035,6 +1039,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 	float			*orig, *data ;
 	double			half_max_abs ;
 
+	get_unique_test_name (&filename, LCT_TEST_PREFIX) ;
 	print_test_name ("lcomp_test_float", filename) ;
 
 	datalen = BUFFER_SIZE / channels ;
@@ -1229,6 +1234,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 	double			*orig, *data ;
 	double			half_max_abs ;
 
+	get_unique_test_name (&filename, LCT_TEST_PREFIX) ;
 	print_test_name ("lcomp_test_double", filename) ;
 
 	datalen = BUFFER_SIZE / channels ;
@@ -1424,6 +1430,8 @@ sdlcomp_test_short	(const char *filename, int filetype, int channels, double mar
 	short			*orig, *data, *smooth ;
 
 channels = 1 ;
+
+	get_unique_test_name (&filename, LCT_TEST_PREFIX) ;
 	print_test_name ("sdlcomp_test_short", filename) ;
 
 	datalen = BUFFER_SIZE ;
@@ -1644,6 +1652,7 @@ sdlcomp_test_int	(const char *filename, int filetype, int channels, double margi
 
 channels = 1 ;
 
+	get_unique_test_name (&filename, LCT_TEST_PREFIX) ;
 	print_test_name ("sdlcomp_test_int", filename) ;
 
 	datalen = BUFFER_SIZE ;
@@ -1867,6 +1876,7 @@ sdlcomp_test_float	(const char *filename, int filetype, int channels, double mar
 
 channels = 1 ;
 
+	get_unique_test_name (&filename, LCT_TEST_PREFIX) ;
 	print_test_name ("sdlcomp_test_float", filename) ;
 
 	switch ((filetype & SF_FORMAT_SUBMASK))
@@ -2111,6 +2121,8 @@ sdlcomp_test_double	(const char *filename, int filetype, int channels, double ma
 	double			*orig, *data, *smooth, half_max_abs, scale ;
 
 channels = 1 ;
+
+	get_unique_test_name (&filename, LCT_TEST_PREFIX) ;
 	print_test_name ("sdlcomp_test_double", filename) ;
 
 	switch ((filetype & SF_FORMAT_SUBMASK))
@@ -2352,6 +2364,7 @@ read_raw_test (const char *filename, int filetype, int channels)
 	short			*orig, *data ;
 	int				k ;
 
+	get_unique_test_name (&filename, LCT_TEST_PREFIX) ;
 	print_test_name ("read_raw_test", filename) ;
 
 	datalen = ARRAY_LEN (orig_buffer.s) / 2 ;

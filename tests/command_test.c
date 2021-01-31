@@ -115,8 +115,8 @@ main (int argc, char *argv [])
 	{	/*	Preliminary float/double normalisation tests. More testing
 		**	is done in the program 'floating_point_test'.
 		*/
-		float_norm_test		("float.wav") ;
-		double_norm_test	("double.wav") ;
+		float_norm_test		("cmd_float.wav") ;
+		double_norm_test	("cmd_double.wav") ;
 		test_count ++ ;
 		} ;
 

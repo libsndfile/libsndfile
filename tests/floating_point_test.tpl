@@ -38,6 +38,8 @@
 
 #define	SAMPLE_RATE			16000
 
+static const char FPT_TEST_PREFIX[] = "fpt" ;
+
 static void	float_scaled_test	(const char *filename, int allow_exit, int replace_float, int filetype, double target_snr) ;
 static void	double_scaled_test	(const char *filename, int allow_exit, int replace_float, int filetype, double target_snr) ;
 
@@ -206,6 +208,7 @@ float_scaled_test (const char *filename, int allow_exit, int replace_float, int 
 	double		snr ;
 	int			byterate ;
 
+	get_unique_test_name (&filename, FPT_TEST_PREFIX) ;
 	print_test_name ("float_scaled_test", filename) ;
 
 	gen_windowed_sine_float (float_data, DFT_DATA_LENGTH, 0.9999) ;
@@ -259,6 +262,7 @@ double_scaled_test (const char *filename, int allow_exit, int replace_float, int
 	double		snr ;
 	int			byterate ;
 
+	get_unique_test_name (&filename, FPT_TEST_PREFIX) ;
 	print_test_name ("double_scaled_test", filename) ;
 
 	gen_windowed_sine_double (double_data, DFT_DATA_LENGTH, 0.9999) ;
@@ -317,6 +321,7 @@ static void
 	int			max ;
 	unsigned	k ;
 
+	get_unique_test_name (&filename, FPT_TEST_PREFIX) ;
 	print_test_name ("[+ (get "float_name") +]_[+ (get "int_name") +]_[+ (get "end_name") +]_test", filename) ;
 
 	gen_windowed_sine_[+ (get "float_name") +] ([+ (get "float_name") +]_data, ARRAY_LEN ([+ (get "float_name") +]_data), 0.9999) ;

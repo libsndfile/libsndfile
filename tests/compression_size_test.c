@@ -37,6 +37,8 @@
 #define	SAMPLE_RATE		16000
 #define	DATA_LENGTH		(SAMPLE_RATE)
 
+static const char CMP_TEST_PREFIX[] = "cmp" ;
+
 static float data_out [DATA_LENGTH] ;
 
 static inline float
@@ -52,6 +54,8 @@ vorbis_test (void)
 	SF_INFO sfinfo ;
 	float max_abs = 0.0 ;
 	unsigned k ;
+
+	get_unique_test_name (&filename, CMP_TEST_PREFIX) ;
 
 	print_test_name ("vorbis_test", filename) ;
 
@@ -122,6 +126,8 @@ compression_size_test (int format, const char * filename)
 	int q3_size, q6_size ;
 	double quality ;
 	int k ;
+
+	get_unique_test_name (&filename, CMP_TEST_PREFIX) ;
 
 	snprintf (q3_fname, sizeof (q3_fname), "q3_%s", filename) ;
 	snprintf (q6_fname, sizeof (q6_fname), "q6_%s", filename) ;

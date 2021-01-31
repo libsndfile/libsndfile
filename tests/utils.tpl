@@ -104,6 +104,8 @@ void	count_open_files (void) ;
 void	increment_open_file_count (void) ;
 void	check_open_file_count_or_die (int lineno) ;
 
+void	get_unique_test_name (const char ** filename, const char * test) ;
+
 #ifdef SNDFILE_H
 
 static inline void
@@ -850,6 +852,15 @@ check_open_file_count_or_die (int lineno)
 		} ;
 #endif
 } /* check_open_file_count_or_die */
+
+void
+get_unique_test_name (const char ** filename, const char * test)
+{	static char	buffer [1024] ;
+
+	snprintf (buffer, sizeof (buffer), "%s_%s", test, *filename) ;
+
+	*filename = buffer ;
+} /* get_unique_test_name */
 
 void
 write_mono_file (const char * filename, int format, int srate, float * output, int len)

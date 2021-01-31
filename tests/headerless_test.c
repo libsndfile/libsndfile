@@ -44,11 +44,11 @@ main (void)
 {
 	old_test () ;
 
-	headerless_test ("raw.vox", SF_FORMAT_VOX_ADPCM, SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM) ;
-	headerless_test ("raw.gsm", SF_FORMAT_GSM610, SF_FORMAT_RAW | SF_FORMAT_GSM610) ;
+	headerless_test ("headerless.vox", SF_FORMAT_VOX_ADPCM, SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM) ;
+	headerless_test ("headerless.gsm", SF_FORMAT_GSM610, SF_FORMAT_RAW | SF_FORMAT_GSM610) ;
 
-	headerless_test ("raw.snd", SF_FORMAT_ULAW, SF_FORMAT_RAW | SF_FORMAT_ULAW) ;
-	headerless_test ("raw.au" , SF_FORMAT_ULAW, SF_FORMAT_RAW | SF_FORMAT_ULAW) ;
+	headerless_test ("headerless.snd", SF_FORMAT_ULAW, SF_FORMAT_RAW | SF_FORMAT_ULAW) ;
+	headerless_test ("headerless.au" , SF_FORMAT_ULAW, SF_FORMAT_RAW | SF_FORMAT_ULAW) ;
 
 	return 0 ;
 } /* main */
