@@ -787,7 +787,7 @@ replace_read_f2i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	float		scale ;
 
 	bufferlen = ARRAY_LEN (ubuf.fbuf) ;
-	scale = (psf->float_int_mult == 0) ? 1.0 : 0x7FFF / psf->float_max ;
+	scale = (psf->float_int_mult == 0) ? 1.0 : 2147483648.0f / psf->float_max ;
 
 	while (len > 0)
 	{	if (len < bufferlen)
