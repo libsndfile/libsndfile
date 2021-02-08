@@ -620,7 +620,7 @@ psf_fopen (SF_PRIVATE *psf)
 	psf->error = 0 ;
 	psf->file.handle = psf_open_handle (&psf->file) ;
 
-	if (psf->file.handle == NULL)
+	if (psf->file.handle == INVALID_HANDLE_VALUE)
 		psf_log_syserr (psf, GetLastError ()) ;
 
 	return psf->error ;
@@ -634,14 +634,14 @@ psf_fclose (SF_PRIVATE *psf)
 		return 0 ;
 
 	if (psf->file.do_not_close_descriptor)
-	{	psf->file.handle = NULL ;
+	{	psf->file.handle = INVALID_HANDLE_VALUE ;
 		return 0 ;
 		} ;
 
 	if ((retval = psf_close_handle (psf->file.handle)) == -1)
 		psf_log_syserr (psf, GetLastError ()) ;
 
-	psf->file.handle = NULL ;
+	psf->file.handle = INVALID_HANDLE_VALUE ;
 
 	return retval ;
 } /* psf_fclose */
@@ -649,13 +649,13 @@ psf_fclose (SF_PRIVATE *psf)
 /* USE_WINDOWS_API */ int
 psf_open_rsrc (SF_PRIVATE *psf)
 {
-	if (psf->rsrc.handle != NULL)
+	if (psf->rsrc.handle != INVALID_HANDLE_VALUE)
 		return 0 ;
 
 	/* Test for MacOSX style resource fork on HPFS or HPFS+ filesystems. */
 	snprintf (psf->rsrc.path.c, sizeof (psf->rsrc.path.c), "%s/rsrc", psf->file.path.c) ;
 	psf->error = SFE_NO_ERROR ;
-	if ((psf->rsrc.handle = psf_open_handle (&psf->rsrc)) != NULL)
+	if ((psf->rsrc.handle = psf_open_handle (&psf->rsrc)) != INVALID_HANDLE_VALUE)
 	{	psf->rsrclength = psf_get_filelen_handle (psf->rsrc.handle) ;
 		return SFE_NO_ERROR ;
 		} ;
@@ -666,7 +666,7 @@ psf_open_rsrc (SF_PRIVATE *psf)
 	*/
 	snprintf (psf->rsrc.path.c, sizeof (psf->rsrc.path.c), "%s._%s", psf->file.dir.c, psf->file.name.c) ;
 	psf->error = SFE_NO_ERROR ;
-	if ((psf->rsrc.handle = psf_open_handle (&psf->rsrc)) != NULL)
+	if ((psf->rsrc.handle = psf_open_handle (&psf->rsrc)) != INVALID_HANDLE_VALUE)
 	{	psf->rsrclength = psf_get_filelen_handle (psf->rsrc.handle) ;
 		return SFE_NO_ERROR ;
 		} ;
@@ -677,16 +677,14 @@ psf_open_rsrc (SF_PRIVATE *psf)
 	*/
 	snprintf (psf->rsrc.path.c, sizeof (psf->rsrc.path.c), "%s.AppleDouble/%s", psf->file.dir.c, psf->file.name.c) ;
 	psf->error = SFE_NO_ERROR ;
-	if ((psf->rsrc.handle = psf_open_handle (&psf->rsrc)) != NULL)
+	if ((psf->rsrc.handle = psf_open_handle (&psf->rsrc)) != INVALID_HANDLE_VALUE)
 	{	psf->rsrclength = psf_get_filelen_handle (psf->rsrc.handle) ;
 		return SFE_NO_ERROR ;
 		} ;
 
 	/* No resource file found. */
-	if (psf->rsrc.handle == NULL)
+	if (psf->rsrc.handle == INVALID_HANDLE_VALUE)
 		psf_log_syserr (psf, GetLastError ()) ;
-
-	psf->rsrc.handle = NULL ;
 
 	return psf->error ;
 } /* psf_open_rsrc */
@@ -738,9 +736,9 @@ psf_get_filelen (SF_PRIVATE *psf)
 
 /* USE_WINDOWS_API */ void
 psf_init_files (SF_PRIVATE *psf)
-{	psf->file.handle = NULL ;
-	psf->rsrc.handle = NULL ;
-	psf->file.hsaved = NULL ;
+{	psf->file.handle = INVALID_HANDLE_VALUE ;
+	psf->rsrc.handle = INVALID_HANDLE_VALUE ;
+	psf->file.hsaved = INVALID_HANDLE_VALUE ;
 } /* psf_init_files */
 
 /* USE_WINDOWS_API */ void
@@ -798,9 +796,6 @@ psf_open_handle (PSF_FILE * pfile)
 
 	handle = CreateFile2 (pfile->path.wc, dwDesiredAccess, dwShareMode, dwCreationDistribution, &cfParams) ;
 
-	if (handle == INVALID_HANDLE_VALUE)
-		return NULL ;
-
 	return handle ;
 #else
 	if (pfile->use_wchar)
@@ -823,9 +818,6 @@ psf_open_handle (PSF_FILE * pfile)
 					FILE_ATTRIBUTE_NORMAL,		/* file attributes (could use FILE_FLAG_SEQUENTIAL_SCAN) */
 					NULL						/* handle to file with attributes to copy */
 					) ;
-
-	if (handle == INVALID_HANDLE_VALUE)
-		return NULL ;
 
 	return handle ;
 #endif
@@ -860,14 +852,14 @@ psf_log_syserr (SF_PRIVATE *psf, int error)
 /* USE_WINDOWS_API */ int
 psf_close_rsrc (SF_PRIVATE *psf)
 {	psf_close_handle (psf->rsrc.handle) ;
-	psf->rsrc.handle = NULL ;
+	psf->rsrc.handle = INVALID_HANDLE_VALUE ;
 	return 0 ;
 } /* psf_close_rsrc */
 
 
 /* USE_WINDOWS_API */ int
 psf_set_stdio (SF_PRIVATE *psf)
-{	HANDLE	handle = NULL ;
+{	HANDLE	handle = INVALID_HANDLE_VALUE ;
 	int	error = 0 ;
 
 	switch (psf->file.mode)
@@ -909,9 +901,7 @@ psf_set_file (SF_PRIVATE *psf, int fd)
 
 /* USE_WINDOWS_API */ int
 psf_file_valid (SF_PRIVATE *psf)
-{	if (psf->file.handle == NULL)
-		return SF_FALSE ;
-	if (psf->file.handle == INVALID_HANDLE_VALUE)
+{	if (psf->file.handle == INVALID_HANDLE_VALUE)
 		return SF_FALSE ;
 	return SF_TRUE ;
 } /* psf_set_file */
