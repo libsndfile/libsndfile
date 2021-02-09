@@ -783,12 +783,12 @@ psf_open_handle (PSF_FILE * pfile)
 				break ;
 
 		default :
-				return NULL ;
+				return INVALID_HANDLE_VALUE ;
 		} ;
 
 #if defined (WINAPI_FAMILY_PARTITION) && !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_SYSTEM)
 	if (!pfile->use_wchar)
-		return NULL ;
+		return INVALID_HANDLE_VALUE ;
 
 	CREATEFILE2_EXTENDED_PARAMETERS cfParams = { 0 } ;
 	cfParams.dwSize = sizeof (CREATEFILE2_EXTENDED_PARAMETERS) ;
@@ -1063,7 +1063,7 @@ psf_ftell (SF_PRIVATE *psf)
 
 /* USE_WINDOWS_API */ static int
 psf_close_handle (HANDLE handle)
-{	if (handle == NULL)
+{	if (handle == INVALID_HANDLE_VALUE)
 		return 0 ;
 
 	if (CloseHandle (handle) == 0)
