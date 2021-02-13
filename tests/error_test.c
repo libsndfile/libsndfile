@@ -255,7 +255,7 @@ unrecognised_test (void)
 	sndfile = sf_open (filename, SFM_READ, &sfinfo) ;
 
 	exit_if_true (sndfile != NULL,
-		"\n\nLine %d : SNDFILE* pointer (%p) should ne NULL.\n", __LINE__, sndfile
+		"\n\nLine %d : SNDFILE* pointer (%p) should be NULL.\n", __LINE__, (void *) sndfile
 		) ;
 
 	k = sf_error (sndfile) ;
