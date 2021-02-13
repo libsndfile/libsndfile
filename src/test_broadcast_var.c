@@ -89,7 +89,7 @@ test_broadcast_var_set (void)
 static void
 test_broadcast_var_zero (void)
 {	SF_PRIVATE	sf_private, *psf ;
-	SF_BROADCAST_INFO_VAR (0) bi ;
+	SF_BROADCAST_INFO_VAR () bi ;
 
 	psf = &sf_private ;
 	memset (psf, 0, sizeof (sf_private)) ;
