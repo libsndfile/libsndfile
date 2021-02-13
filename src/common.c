@@ -1625,7 +1625,7 @@ psf_f2s_clip_array (const float *src, short *dest, int count, int normalize)
 			continue ;
 			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x1000))
-		{	dest [count] = 0x8000 ;
+		{	dest [count] = -0x7FFF - 1 ;
 			continue ;
 			} ;
 
@@ -1659,7 +1659,7 @@ psf_d2s_clip_array (const double *src, short *dest, int count, int normalize)
 			continue ;
 			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x1000))
-		{	dest [count] = 0x8000 ;
+		{	dest [count] = -0x7FFF - 1 ;
 			continue ;
 			} ;
 
