@@ -77,13 +77,13 @@
 
 
 enum
-{	HAVE_RIFF	= 0x01,
-	HAVE_WAVE	= 0x02,
-	HAVE_fmt	= 0x04,
-	HAVE_fact	= 0x08,
-	HAVE_PEAK	= 0x10,
-	HAVE_data	= 0x20,
-	HAVE_other	= 0x80000000
+{	HAVE_RIFF	= 1 << 0,
+	HAVE_WAVE	= 1 << 1,
+	HAVE_fmt	= 1 << 2,
+	HAVE_fact	= 1 << 3,
+	HAVE_PEAK	= 1 << 4,
+	HAVE_data	= 1 << 5,
+	HAVE_other	= 1 << 6
 } ;
 
 
