@@ -337,7 +337,7 @@ enum
 
 /* A SNDFILE* pointer can be passed around much like stdio.h's FILE* pointer. */
 
-typedef	struct SNDFILE_tag	SNDFILE ;
+typedef	struct sf_private_tag	SNDFILE ;
 
 /* The following typedef is system specific and is defined when libsndfile is
 ** compiled. sf_count_t will be a 64 bit value when the underlying OS allows
