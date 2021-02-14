@@ -28,8 +28,6 @@
 #define TWOBIT_MARKER	(MAKE_MARKER ('2', 'B', 'I', 'T'))
 #define	AVR_HDR_SIZE	128
 
-#define	SFE_AVR_X	666
-
 /*
 ** From: hyc@hanauma.Jpl.Nasa.Gov (Howard Chu)
 **
@@ -116,7 +114,7 @@ avr_read_header (SF_PRIVATE *psf)
 	psf_log_printf (psf, "%M\n", hdr.marker) ;
 
 	if (hdr.marker != TWOBIT_MARKER)
-		return SFE_AVR_X ;
+		return SFE_AVR_NOT_AVR ;
 
 	psf_log_printf (psf, "  Name        : %s\n", hdr.name) ;
 
@@ -145,7 +143,7 @@ avr_read_header (SF_PRIVATE *psf)
 
 		default :
 			psf_log_printf (psf, "Error : bad rez/sign combination.\n") ;
-			return SFE_AVR_X ;
+			return SFE_AVR_BAD_REZ_SIGN ;
 		} ;
 
 	psf_binheader_readf (psf, "E4444", &hdr.srate, &hdr.frames, &hdr.lbeg, &hdr.lend) ;

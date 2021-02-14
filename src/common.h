@@ -754,6 +754,15 @@ enum
 
 	SFE_OPUS_BAD_SAMPLERATE,
 
+	SFE_CAF_NOT_CAF,
+	SFE_CAF_NO_DESC,
+	SFE_CAF_BAD_PEAK,
+
+	SFE_AVR_NOT_AVR,
+	SFE_AVR_BAD_REZ_SIGN,
+
+	SFE_MPC_NO_MARKER,
+
 	SFE_MAX_ERROR			/* This must be last in list. */
 } ;
 

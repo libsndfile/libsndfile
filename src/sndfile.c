@@ -279,6 +279,15 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_OPUS_BAD_SAMPLERATE	, "Error : Opus only supports sample rates of 8000, 12000, 16000, 24000 and 48000." },
 
+	{	SFE_CAF_NOT_CAF			, "Error : Not a CAF file." },
+	{	SFE_CAF_NO_DESC			, "Error : No 'desc' marker in CAF file." },
+	{	SFE_CAF_BAD_PEAK		, "Error : Bad 'PEAK' chunk in CAF file." },
+
+	{	SFE_AVR_NOT_AVR			, "Error : Not an AVR file." },
+	{	SFE_AVR_BAD_REZ_SIGN	, "Error : Bad rez/sign combination." },
+
+	{	SFE_MPC_NO_MARKER		, "Error : No marker in MPC2K file." },
+
 	{	SFE_MAX_ERROR			, "Maximum error number." },
 	{	SFE_MAX_ERROR + 1		, NULL }
 } ;
