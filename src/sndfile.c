@@ -2680,6 +2680,7 @@ static int
 guess_file_type (SF_PRIVATE *psf)
 {	uint32_t buffer [3], format ;
 
+retry:
 	if (psf_binheader_readf (psf, "b", &buffer, SIGNED_SIZEOF (buffer)) != SIGNED_SIZEOF (buffer))
 	{	psf->error = SFE_BAD_FILE_READ ;
 		return 0 ;
@@ -2780,7 +2781,7 @@ guess_file_type (SF_PRIVATE *psf)
 			|| buffer [0] == MAKE_MARKER ('I', 'D', '3', 4))
 	{	psf_log_printf (psf, "Found 'ID3' marker.\n") ;
 		if (id3_skip (psf))
-			return guess_file_type (psf) ;
+			goto retry ;
 		return 0 ;
 		} ;
 
