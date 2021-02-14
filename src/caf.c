@@ -66,10 +66,6 @@
 
 #define CAF_PEAK_CHUNK_SIZE(ch) 	((int) (sizeof (int) + ch * (sizeof (float) + 8)))
 
-#define SFE_CAF_NOT_CAF	666
-#define SFE_CAF_NO_DESC	667
-#define SFE_CAF_BAD_PEAK 668
-
 /*------------------------------------------------------------------------------
 ** Typedefs.
 */

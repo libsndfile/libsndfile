@@ -46,8 +46,6 @@
 #define HEADER_LENGTH		42	/* Sum of above data fields. */
 #define HEADER_NAME_LEN		17	/* Length of name string. */
 
-#define	SFE_MPC_NO_MARKER	666
-
 /*------------------------------------------------------------------------------
 ** Private static functions.
 */
