@@ -18,6 +18,7 @@
 * Patches should always be submitted via a either Github "pull request" or a
   via emailed patches created using "git format-patch".
 * Patches for new features should include tests and documentation.
+* Commit messages should follow the ["How to Write a Git Commit Message"](https://chris.beams.io/posts/git-commit/) guide.
 * Patches to fix bugs should either pass all tests, or modify the tests in some
   sane way.
 * When a new feature is added for a particular file format and that feature
