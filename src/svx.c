@@ -307,7 +307,8 @@ svx_read_header	(SF_PRIVATE *psf)
 					if ((chunk_size = psf_ftell (psf)) & 0x03)
 					{	psf_log_printf (psf, "  Unknown chunk marker at position %d. Resynching.\n", chunk_size - 4) ;
 
-						psf_binheader_readf (psf, "j", -3) ;
+						chunk_size = chunk_size & 3 ;
+						psf_binheader_readf (psf, "j", 4 - chunk_size) ;
 						break ;
 						} ;
 					psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D. Exiting parser.\n", marker, psf_ftell (psf) - 8) ;
