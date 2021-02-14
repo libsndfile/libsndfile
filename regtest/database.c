@@ -267,14 +267,14 @@ db_check_all (REG_DB * db_handle)
 int
 db_list_all (REG_DB * db_handle)
 {
-	printf ("%s : %p\n", __func__, db_handle) ;
+	printf ("%s : %p\n", __func__, (void *) db_handle) ;
 	return 0 ;
 } /* db_list_all */
 
 int
 db_del_entry (REG_DB * db_handle, const char * entry)
 {
-	printf ("%s : %p %s\n", __func__, db_handle, entry) ;
+	printf ("%s : %p %s\n", __func__, (void *) db_handle, entry) ;
 	return 0 ;
 } /* db_del_entry */
 

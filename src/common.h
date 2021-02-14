@@ -101,22 +101,8 @@
 
 #define		NOT(x)			(! (x))
 
-#if COMPILER_IS_GCC
-#define		SF_MAX(x, y)	({ \
-								typeof (x) sf_max_x1 = (x) ; \
-								typeof (y) sf_max_y1 = (y) ; \
-								(void) (&sf_max_x1 == &sf_max_y1) ; \
-								sf_max_x1 > sf_max_y1 ? sf_max_x1 : sf_max_y1 ; })
-
-#define		SF_MIN(x, y)	({ \
-								typeof (x) sf_min_x2 = (x) ; \
-								typeof (y) sf_min_y2 = (y) ; \
-								(void) (&sf_min_x2 == &sf_min_y2) ; \
-								sf_min_x2 < sf_min_y2 ? sf_min_x2 : sf_min_y2 ; })
-#else
 #define		SF_MAX(a, b)	((a) > (b) ? (a) : (b))
 #define		SF_MIN(a, b)	((a) < (b) ? (a) : (b))
-#endif
 
 
 #define		COMPILE_TIME_ASSERT(e)	(sizeof (struct { int : - !! (e) ; }))

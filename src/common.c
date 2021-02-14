@@ -1246,7 +1246,7 @@ psf_memset (void *s, int c, sf_count_t len)
 ** bodgy something up instead.
 */
 
-typedef SF_CUES_VAR (0) SF_CUES_0 ;
+typedef SF_CUES_VAR () SF_CUES_0 ;
 
 /* calculate size of SF_CUES struct given number of cues */
 #define SF_CUES_VAR_SIZE(count)	(sizeof (SF_CUES_0) + count * sizeof (SF_CUE_POINT))
@@ -1625,7 +1625,7 @@ psf_f2s_clip_array (const float *src, short *dest, int count, int normalize)
 			continue ;
 			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x1000))
-		{	dest [count] = 0x8000 ;
+		{	dest [count] = -0x7FFF - 1 ;
 			continue ;
 			} ;
 
@@ -1659,7 +1659,7 @@ psf_d2s_clip_array (const double *src, short *dest, int count, int normalize)
 			continue ;
 			} ;
 		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x1000))
-		{	dest [count] = 0x8000 ;
+		{	dest [count] = -0x7FFF - 1 ;
 			continue ;
 			} ;
 
