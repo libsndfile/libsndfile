@@ -147,6 +147,9 @@ AC_ARG_ENABLE([alsa],
 AC_ARG_ENABLE([external-libs],
 	[AS_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis [[default=no]]])])
 
+AC_ARG_ENABLE([wavpack],
+	[AS_HELP_STRING([--disable-wavpack], [disable use of Wavpack [[default=no]]])])
+
 AC_ARG_ENABLE(octave,
 	[AS_HELP_STRING([--enable-octave], [enable building of GNU Octave module])])
 
@@ -386,6 +389,29 @@ AS_IF([test -n "$PKG_CONFIG"], [
 	])
 
 AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_XIPH_LIBS], [$HAVE_EXTERNAL_XIPH_LIBS], [Will be set to 1 if flac, ogg, vorbis, and opus are available.])
+
+dnl ====================================================================================
+dnl  Check for Wavpack.
+
+ac_cv_wavpack=0
+AS_IF([test "x$enable_wavpack" = "xno"], [
+  AC_MSG_WARN([[*** Wavpack disabled. ***]])
+  HAVE_WAVPACK=0
+], [
+  PKG_CHECK_MOD_VERSION(WAVPACK, wavpack >= 1.2, ac_cv_wavpack=yes, ac_cv_wavpack=no)
+  AS_IF([test "x$ac_cv_wavpack" = "xyes"], [
+    HAVE_WAVPACK=1
+    enable_wavpack=yes
+  ], [
+    AS_ECHO([""])
+    AC_MSG_WARN([[*** WavPack is missing or is of an unsupported version. ]])
+    AC_MSG_WARN([[*** (possibly only the development headers) ]])
+    AS_ECHO([""])
+    HAVE_WAVPACK=0
+    enable_wavpack=no
+  ])
+])
+AC_DEFINE_UNQUOTED([HAVE_WAVPACK], [$HAVE_WAVPACK], [Will be set to 1 if WavPack is available.])
 
 dnl ====================================================================================
 dnl  Check for libsqlite3 (only used in regtest).
@@ -665,6 +691,7 @@ AC_SUBST(GEN_TOOL)
 AC_SUBST(WIN_RC_VERSION)
 
 AC_SUBST(HAVE_EXTERNAL_XIPH_LIBS)
+AC_SUBST(HAVE_WAVPACK_LIBS)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(SNDIO_LIBS)
@@ -717,6 +744,7 @@ AC_MSG_RESULT([
     Experimental code : ................... ${enable_experimental:-no}
     Using ALSA in example programs : ...... ${enable_alsa:-no}
     External FLAC/Ogg/Vorbis/Opus : ....... ${enable_external_libs:-no}
+    Wavpack : ............................. ${enable_wavpack:-no}
     Building Octave interface : ........... ${OCTAVE_BUILD}
 
   Tools :

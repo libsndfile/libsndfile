@@ -884,6 +884,17 @@ sf_format_check	(const SF_INFO *info)
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
 					return 1 ;
 				break ;
+
+		case SF_FORMAT_WAVPACK :
+				if (info->channels > 31)
+					return 0 ;
+				if (endian != SF_ENDIAN_FILE)
+					return 0 ;
+				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
+					return 1 ;
+				if (subformat == SF_FORMAT_FLOAT)
+					return 1 ;
+				break ;
 		default : break ;
 		} ;
 
@@ -2680,7 +2691,16 @@ static int
 guess_file_type (SF_PRIVATE *psf)
 {	uint32_t buffer [3], format ;
 
-	if (psf_binheader_readf (psf, "b", &buffer, SIGNED_SIZEOF (buffer)) != SIGNED_SIZEOF (buffer))
+	if (psf_binheader_readf (psf, "b", &buffer, SIGNED_SIZEOF (uint32_t)) != SIGNED_SIZEOF (uint32_t))
+	{	psf->error = SFE_BAD_FILE_READ ;
+		return 0 ;
+		} ;
+
+	/* reading wavpack from fifo stream requires full header, only read necessary data here */
+	if (buffer [0] == MAKE_MARKER ('w', 'v', 'p', 'k'))
+		return SF_FORMAT_WAVPACK ;
+
+	if (psf_binheader_readf (psf, "b", (buffer + 1), SIGNED_SIZEOF (buffer) - SIGNED_SIZEOF (uint32_t)) != SIGNED_SIZEOF (buffer) - SIGNED_SIZEOF (uint32_t))
 	{	psf->error = SFE_BAD_FILE_READ ;
 		return 0 ;
 		} ;
@@ -3185,6 +3205,9 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 				error = mpc2k_open (psf) ;
 				break ;
 
+		case	SF_FORMAT_WAVPACK :
+				error = wavpack_open (psf) ;
+				break ;
 		/* Lite remove end */
 
 		default :

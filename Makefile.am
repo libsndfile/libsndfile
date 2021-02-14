@@ -67,12 +67,12 @@ src_libsndfile_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS)
 src_libsndfile_la_LDFLAGS = -no-undefined -version-info $(SHARED_VERSION_INFO) $(SHLIB_VERSION_ARG)
 src_libsndfile_la_SOURCES = src/sndfile.c src/aiff.c src/au.c src/avr.c src/caf.c src/dwd.c src/flac.c src/g72x.c src/htk.c src/ircam.c \
 	src/macos.c src/mat4.c src/mat5.c src/nist.c src/paf.c src/pvf.c src/raw.c src/rx2.c src/sd2.c \
-	src/sds.c src/svx.c src/txw.c src/voc.c src/wve.c src/w64.c src/wavlike.c src/wav.c src/xi.c src/mpc2k.c src/rf64.c \
+	src/sds.c src/svx.c src/txw.c src/voc.c src/wve.c src/w64.c src/wavlike.c src/wav.c src/wavpack.c src/xi.c src/mpc2k.c src/rf64.c \
 	src/ogg_vorbis.c src/ogg_speex.c src/ogg_pcm.c src/ogg_opus.c src/ogg_vcomment.c \
 	src/common.h src/sfconfig.h src/sfendian.h src/wavlike.h src/sf_unistd.h src/ogg.h src/chanmap.h src/ogg_vcomment.h
 nodist_src_libsndfile_la_SOURCES = $(nodist_include_HEADERS)
 src_libsndfile_la_LIBADD = src/GSM610/libgsm.la src/G72x/libg72x.la src/ALAC/libalac.la \
-	src/libcommon.la $(EXTERNAL_XIPH_LIBS) -lm
+	src/libcommon.la $(EXTERNAL_XIPH_LIBS) $(WAVPACK_LIBS) -lm
 EXTRA_src_libsndfile_la_DEPENDENCIES = $(SYMBOL_FILES)
 
 noinst_LTLIBRARIES = src/libcommon.la
@@ -221,7 +221,7 @@ check_PROGRAMS += tests/sfversion tests/floating_point_test tests/write_read_tes
 	tests/locale_test tests/win32_ordinal_test tests/ogg_test tests/compression_size_test \
 	tests/checksum_test tests/external_libs_test tests/rdwr_test tests/format_check_test $(CPP_TEST) \
 	tests/channel_test tests/long_read_write_test tests/stdin_test tests/stdout_test \
-	tests/dither_test tests/fix_this tests/largefile_test tests/benchmark tests/ogg_opus_test
+	tests/dither_test tests/fix_this tests/largefile_test tests/benchmark tests/ogg_opus_test tests/wavpack_test
 
 BUILT_SOURCES += \
 	tests/write_read_test.c \
@@ -345,6 +345,9 @@ tests_ogg_test_LDADD = src/libsndfile.la
 
 tests_ogg_opus_test_SOURCES = tests/ogg_opus_test.c tests/utils.c tests/utils.h
 tests_ogg_opus_test_LDADD = src/libsndfile.la
+
+tests_wavpack_test_SOURCES = tests/wavpack_test.c tests/utils.c tests/utils.h
+tests_wavpack_test_LDADD = src/libsndfile.la
 
 tests_compression_size_test_SOURCES = tests/compression_size_test.c tests/utils.c tests/utils.h tests/dft_cmp.h
 tests_compression_size_test_LDADD = src/libsndfile.la
