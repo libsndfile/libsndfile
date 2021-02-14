@@ -22,5 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Typo in `docs/index.md`.
 * Memory leak in `caf_read_header`(), credit to OSS-Fuzz ([issue 30375](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=30375)).
+* Normalisation issue when scaling floating point data to `int` in
+  `replace_read_f2i`() (#702).
 
 [Unreleased]: https://github.com/libsndfile/libsndfile/compare/1.0.31...HEAD
