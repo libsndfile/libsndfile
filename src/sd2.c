@@ -240,7 +240,7 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 	/* Very start of resource fork. */
 	psf_binheader_writef (psf, "E444", BHW4 (rsrc.data_offset), BHW4 (rsrc.map_offset), BHW4 (rsrc.data_length)) ;
 
-	psf_binheader_writef (psf, "Eop", BHWo (0x30), BHWp (psf->file.name.c)) ;
+	psf_binheader_writef (psf, "Eop", BHWo (0x30), BHWp (psf->file.name)) ;
 	psf_binheader_writef (psf, "Eo2mm", BHWo (0x50), BHW2 (0), BHWm (Sd2f_MARKER), BHWm (lsf1_MARKER)) ;
 
 	/* Very start of resource map. */

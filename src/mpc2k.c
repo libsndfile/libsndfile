@@ -129,7 +129,7 @@ mpc2k_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->is_pipe == SF_FALSE)
 		psf_fseek (psf, 0, SEEK_SET) ;
 
-	snprintf (sample_name, sizeof (sample_name), "%-*.*s", HEADER_NAME_LEN, HEADER_NAME_LEN, psf->file.name.c) ;
+	snprintf (sample_name, sizeof (sample_name), "%-*.*s", HEADER_NAME_LEN, HEADER_NAME_LEN, psf->file.name) ;
 
 	psf_binheader_writef (psf, "e11b", BHW1 (1), BHW1 (4), BHWv (sample_name), BHWz (HEADER_NAME_LEN)) ;
 	psf_binheader_writef (psf, "e111", BHW1 (100), BHW1 (0), BHW1 ((psf->sf.channels - 1) & 1)) ;

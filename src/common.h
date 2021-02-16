@@ -323,36 +323,23 @@ psf_isprint (int ch)
 
 typedef struct
 {
-	union
-	{	char		c [SF_FILENAME_LEN] ;
-		sfwchar_t	wc [SF_FILENAME_LEN] ;
-	} path ;
-
-	union
-	{	char		c [SF_FILENAME_LEN] ;
-		sfwchar_t	wc [SF_FILENAME_LEN] ;
-	} dir ;
-
-	union
-	{	char		c [SF_FILENAME_LEN / 4] ;
-		sfwchar_t	wc [SF_FILENAME_LEN / 4] ;
-	} name ;
+	char	path [SF_FILENAME_LEN] ;
+	char	dir [SF_FILENAME_LEN] ;
+	char	name [SF_FILENAME_LEN / 4] ;
 
 #if USE_WINDOWS_API
 	/*
 	**	These fields can only be used in src/file_io.c.
 	**	They are basically the same as a windows file HANDLE.
 	*/
-	void 			*handle, *hsaved ;
-
-	int				use_wchar ;
+	void 	*handle, *hsaved ;
 #else
 	/* These fields can only be used in src/file_io.c. */
-	int 			filedes, savedes ;
+	int 	filedes, savedes ;
 #endif
 
-	int				do_not_close_descriptor ;
-	int				mode ;			/* Open mode : SFM_READ, SFM_WRITE or SFM_RDWR. */
+	int		do_not_close_descriptor ;
+	int		mode ;			/* Open mode : SFM_READ, SFM_WRITE or SFM_RDWR. */
 } PSF_FILE ;
 
 
@@ -877,6 +864,8 @@ int psf_fclose (SF_PRIVATE *psf) ;
 /* Open and close the resource fork of a file. */
 int psf_open_rsrc (SF_PRIVATE *psf) ;
 int psf_close_rsrc (SF_PRIVATE *psf) ;
+
+int	psf_copy_filename (SF_PRIVATE *psf, const char *path) ;
 
 /*
 void psf_fclearerr (SF_PRIVATE *psf) ;

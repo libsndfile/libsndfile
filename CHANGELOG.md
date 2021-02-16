@@ -32,6 +32,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   These steps are no longer required and the `sf_wchar_open`() function is
   always available on the Windows platform.
+* Use UTF-8 as internal path encoding on Windows platform.
+
+  This is an internal change to unify and simplify the handling of file paths.
+
+  On the Windows platform, the file path is always converted to UTF-8 and
+  converted to UTF-16 only for calls to WinAPI functions.
+
+  The behavior of the functions for opening files on other platforms does not
+  change.
 
 ### Fixed
 

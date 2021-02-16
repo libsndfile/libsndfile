@@ -62,7 +62,7 @@ conversion_test (char endian)
 	memset (psf, 0, sizeof (sf_private)) ;
 
 	psf->file.mode = SFM_WRITE ;
-	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", filename) ;
+	snprintf (psf->file.path, sizeof (psf->file.path), "%s", filename) ;
 
 	if (psf_fopen (psf) != 0)
 	{	printf ("\n\nError : failed to open file '%s' for write.\n\n", filename) ;
@@ -77,7 +77,7 @@ conversion_test (char endian)
 	memset (psf, 0, sizeof (sf_private)) ;
 
 	psf->file.mode = SFM_READ ;
-	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", filename) ;
+	snprintf (psf->file.path, sizeof (psf->file.path), "%s", filename) ;
 
 	if (psf_fopen (psf) != 0)
 	{	printf ("\n\nError : failed to open file '%s' for read.\n\n", filename) ;
