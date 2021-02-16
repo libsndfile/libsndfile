@@ -240,12 +240,12 @@ svx_read_header	(SF_PRIVATE *psf)
 
 					psf_log_printf (psf, " %M : %u\n", marker, chunk_size) ;
 
-					if (strlen (psf->file.name.c) != chunk_size)
-					{	if (chunk_size > sizeof (psf->file.name.c) - 1)
+					if (strlen (psf->file.name) != chunk_size)
+					{	if (chunk_size > sizeof (psf->file.name) - 1)
 							return SFE_SVX_BAD_NAME_LENGTH ;
 
-						psf_binheader_readf (psf, "b", psf->file.name.c, chunk_size) ;
-						psf->file.name.c [chunk_size] = 0 ;
+						psf_binheader_readf (psf, "b", psf->file.name, chunk_size) ;
+						psf->file.name [chunk_size] = 0 ;
 						}
 					else
 						psf_binheader_readf (psf, "j", chunk_size) ;
@@ -381,7 +381,7 @@ svx_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "Em44", BHWm (CHAN_MARKER), BHW4 (4), BHW4 (6)) ;
 
 	/* Filename and annotation strings. */
-	psf_binheader_writef (psf, "Emsms", BHWm (NAME_MARKER), BHWs (psf->file.name.c), BHWm (ANNO_MARKER), BHWs (annotation)) ;
+	psf_binheader_writef (psf, "Emsms", BHWm (NAME_MARKER), BHWs (psf->file.name), BHWm (ANNO_MARKER), BHWs (annotation)) ;
 
 	/* BODY marker and size. */
 	psf_binheader_writef (psf, "Etm8", BHWm (BODY_MARKER), BHW8 ((psf->datalength < 0) ?

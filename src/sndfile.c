@@ -33,6 +33,11 @@
 #include <io.h>
 #endif
 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
 #define		SNDFILE_MAGICK	0x1234C0DE
 
 #ifdef __APPLE__
@@ -300,7 +305,6 @@ static int	guess_file_type (SF_PRIVATE *psf) ;
 static int	validate_sfinfo (SF_INFO *sfinfo) ;
 static int	validate_psf (SF_PRIVATE *psf) ;
 static void	save_header_info (SF_PRIVATE *psf) ;
-static int	copy_filename (SF_PRIVATE *psf, const char *path) ;
 static int	psf_close (SF_PRIVATE *psf) ;
 
 static int	try_resource_fork (SF_PRIVATE * psf) ;
@@ -341,6 +345,14 @@ static char	sf_syserr [SF_SYSERR_LEN] = { 0 } ;
 SNDFILE*
 sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 {	SF_PRIVATE 	*psf ;
+	const char *utf8path_ptr ;
+#ifdef _WIN32
+	LPWSTR wpath ;
+	int nResult ;
+	int wpath_len ;
+	char utf8path [SF_FILENAME_LEN] ;
+	DWORD dwError ;
+#endif
 
 	/* Ultimate sanity check. */
 	assert (sizeof (sf_count_t) == 8) ;
@@ -354,8 +366,62 @@ sf_open	(const char *path, int mode, SF_INFO *sfinfo)
 
 	psf_log_printf (psf, "File : %s\n", path) ;
 
-	if (copy_filename (psf, path) != 0)
+#ifdef _WIN32
+	nResult = MultiByteToWideChar (CP_ACP, 0, path, -1, NULL, 0) ;
+	if (nResult == 0)
+	{	sf_errno = SF_ERR_UNSUPPORTED_ENCODING ;
+		psf_close (psf) ;
+		return NULL ;
+		} ;
+
+	wpath_len = nResult ;
+	wpath = malloc (wpath_len * sizeof (WCHAR)) ;
+	if (!wpath)
+	{	sf_errno = SFE_MALLOC_FAILED ;
+		psf_close (psf) ;
+		return NULL ;
+		} ;
+
+	nResult = MultiByteToWideChar (CP_ACP, 0, path, -1, wpath, wpath_len) ;
+	if (nResult == 0)
+	{	sf_errno = SF_ERR_UNSUPPORTED_ENCODING ;
+		free (wpath) ;
+		psf_close (psf) ;
+		return NULL ;
+		} ;
+
+	nResult = WideCharToMultiByte (CP_UTF8, 0, wpath, wpath_len, NULL, 0, NULL,
+		NULL) ;
+	if (nResult == 0)
+	{	sf_errno = SF_ERR_UNSUPPORTED_ENCODING ;
+		free (wpath) ;
+		psf_close (psf) ;
+		return NULL ;
+		} ;
+
+	nResult = WideCharToMultiByte (CP_UTF8, 0, wpath, wpath_len, utf8path,
+		SF_FILENAME_LEN, NULL, NULL) ;
+
+	free (wpath) ;
+
+	if (nResult == 0)
+	{	dwError = GetLastError () ;
+		if (dwError == ERROR_INSUFFICIENT_BUFFER)
+			sf_errno = SFE_FILENAME_TOO_LONG ;
+		else
+			sf_errno = SF_ERR_UNSUPPORTED_ENCODING ;
+		psf_close (psf) ;
+		return NULL ;
+		} ;
+
+	utf8path_ptr = utf8path ;
+#else
+	utf8path_ptr = path ;
+#endif
+
+	if (psf_copy_filename (psf, utf8path_ptr) != 0)
 	{	sf_errno = psf->error ;
+		psf_close (psf) ;
 		return	NULL ;
 		} ;
 
@@ -390,7 +456,7 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 		} ;
 
 	psf_init_files (psf) ;
-	copy_filename (psf, "") ;
+	psf_copy_filename (psf, "") ;
 
 	psf->file.mode = mode ;
 	psf_set_file (psf, fd) ;
@@ -2621,7 +2687,7 @@ try_resource_fork (SF_PRIVATE * psf)
 		} ;
 
 	/* More checking here. */
-	psf_log_printf (psf, "Resource fork : %s\n", psf->rsrc.path.c) ;
+	psf_log_printf (psf, "Resource fork : %s\n", psf->rsrc.path) ;
 
 	return SF_FORMAT_SD2 ;
 } /* try_resource_fork */
@@ -2632,7 +2698,7 @@ format_from_extension (SF_PRIVATE *psf)
 	char buffer [16] ;
 	int format = 0 ;
 
-	if ((cptr = strrchr (psf->file.name.c, '.')) == NULL)
+	if ((cptr = strrchr (psf->file.name, '.')) == NULL)
 		return 0 ;
 
 	cptr ++ ;
@@ -2853,34 +2919,6 @@ static void
 save_header_info (SF_PRIVATE *psf)
 {	snprintf (sf_parselog, sizeof (sf_parselog), "%s", psf->parselog.buf) ;
 } /* save_header_info */
-
-static int
-copy_filename (SF_PRIVATE *psf, const char *path)
-{	const char *ccptr ;
-	char *cptr ;
-
-	if (strlen (path) > 1 && strlen (path) - 1 >= sizeof (psf->file.path.c))
-	{	psf->error = SFE_FILENAME_TOO_LONG ;
-		return psf->error ;
-		} ;
-
-	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", path) ;
-	if ((ccptr = strrchr (path, '/')) || (ccptr = strrchr (path, '\\')))
-		ccptr ++ ;
-	else
-		ccptr = path ;
-
-	snprintf (psf->file.name.c, sizeof (psf->file.name.c), "%s", ccptr) ;
-
-	/* Now grab the directory. */
-	snprintf (psf->file.dir.c, sizeof (psf->file.dir.c), "%s", path) ;
-	if ((cptr = strrchr (psf->file.dir.c, '/')) || (cptr = strrchr (psf->file.dir.c, '\\')))
-		cptr [1] = 0 ;
-	else
-		psf->file.dir.c [0] = 0 ;
-
-	return 0 ;
-} /* copy_filename */
 
 /*==============================================================================
 */
