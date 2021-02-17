@@ -1246,7 +1246,11 @@ psf_memset (void *s, int c, sf_count_t len)
 ** bodgy something up instead.
 */
 
+#ifdef _MSC_VER
+typedef SF_CUES_VAR (0) SF_CUES_0 ;
+#else
 typedef SF_CUES_VAR () SF_CUES_0 ;
+#endif
 
 /* calculate size of SF_CUES struct given number of cues */
 #define SF_CUES_VAR_SIZE(count)	(sizeof (SF_CUES_0) + count * sizeof (SF_CUE_POINT))
