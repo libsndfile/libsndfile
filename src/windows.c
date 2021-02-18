@@ -27,7 +27,6 @@
 #if OS_IS_WIN32
 #include <windows.h>
 
-#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES 1
 #include "sndfile.h"
 #include "common.h"
 

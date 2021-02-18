@@ -17,6 +17,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * `SFC_SET_DITHER_ON_READ` and `SFC_SET_DITHER_ON_WRITE` enums comments in
   public header, thanks @SmiVan (issue #677).
+* `ENABLE_SNDFILE_WINDOWS_PROTOTYPES` define is deprecated and not needed
+  anymore.
+
+  Previously, in order for the [`sf_wchar_open`()](http://libsndfile.github.io/libsndfile/api.html#open)
+  function to become available on   the Windows platform, it was required to
+  perform certain actions:
+
+  ```c
+  #include <windows.h>
+  #define ENABLE_SNDFILE_WINDOWS_PROTOTYPES 1
+  #including <sndfile.h>
+  ```
+
+  These steps are no longer required and the `sf_wchar_open`() function is
+  always available on the Windows platform.
 
 ### Fixed
 
