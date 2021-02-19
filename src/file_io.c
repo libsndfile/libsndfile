@@ -790,7 +790,7 @@ psf_open_handle (PSF_FILE * pfile)
 	DWORD dwShareMode ;
 	DWORD dwCreationDistribution ;
 	HANDLE handle ;
-	LPCWSTR pwszPath = NULL ;
+	LPWSTR pwszPath = NULL ;
 
 	switch (pfile->mode)
 	{	case SFM_READ :
