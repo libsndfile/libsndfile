@@ -363,13 +363,6 @@ typedef union
 
 typedef struct sf_private_tag
 {
-	/* Canary in a coal mine. */
-	union
-	{	/* Place a double here to encourage double alignment. */
-		double d [2] ;
-		char c [16] ;
-		} canary ;
-
 	PSF_FILE		file, rsrc ;
 
 	char			syserr		[SF_SYSERR_LEN] ;
