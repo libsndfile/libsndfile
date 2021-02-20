@@ -1470,6 +1470,7 @@ channels = 1 ;
 
 	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_OPUS && !check_opus_version (file))
 	{	sf_close (file) ;
+		unlink (filename) ;
 		return ;
 		} ;
 
@@ -1690,6 +1691,7 @@ channels = 1 ;
 
 	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_OPUS && !check_opus_version (file))
 	{	sf_close (file) ;
+		unlink (filename) ;
 		return ;
 		} ;
 
@@ -1935,6 +1937,7 @@ channels = 1 ;
 
 	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_OPUS && !check_opus_version (file))
 	{	sf_close (file) ;
+		unlink (filename) ;
 		return ;
 		} ;
 
@@ -2175,6 +2178,7 @@ channels = 1 ;
 
 	if ((filetype & SF_FORMAT_SUBMASK) == SF_FORMAT_OPUS && !check_opus_version (file))
 	{	sf_close (file) ;
+		unlink (filename) ;
 		return ;
 		} ;
 
