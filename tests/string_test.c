@@ -37,6 +37,8 @@
 #define	BUFFER_LEN			(1 << 10)
 #define LOG_BUFFER_SIZE		1024
 
+static const char STR_TEST_PREFIX[] = "str" ;
+
 static void	string_start_test (const char *filename, int typemajor) ;
 static void	string_start_end_test (const char *filename, int typemajor) ;
 static void	string_multi_set_test (const char *filename, int typemajor) ;
@@ -207,6 +209,7 @@ string_start_end_test (const char *filename, int typemajor)
 	SF_INFO		sfinfo ;
 	int			errors = 0 ;
 
+	get_unique_test_name (&filename, STR_TEST_PREFIX) ;
 	print_test_name ("string_start_end_test", filename) ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
@@ -356,6 +359,7 @@ string_start_test (const char *filename, int formattype)
 	int			errors = 0 ;
 	int			typemajor = SF_FORMAT_TYPEMASK & formattype ;
 
+	get_unique_test_name (&filename, STR_TEST_PREFIX) ;
 	print_test_name ("string_start_test", filename) ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
@@ -497,6 +501,7 @@ string_multi_set_test (const char *filename, int typemajor)
 	SF_INFO		sfinfo ;
 	int			count ;
 
+	get_unique_test_name (&filename, STR_TEST_PREFIX) ;
 	print_test_name (__func__, filename) ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
@@ -566,6 +571,7 @@ string_rdwr_test (const char *filename, int typemajor)
 	sf_count_t frames ;
 	const char * str ;
 
+	get_unique_test_name (&filename, STR_TEST_PREFIX) ;
 	print_test_name (__func__, filename) ;
 	create_short_sndfile (filename, typemajor | SF_FORMAT_PCM_16, 2) ;
 
@@ -618,6 +624,7 @@ string_short_rdwr_test (const char *filename, int typemajor)
 	sf_count_t frames = BUFFER_LEN ;
 	const char * str ;
 
+	get_unique_test_name (&filename, STR_TEST_PREFIX) ;
 	print_test_name (__func__, filename) ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
@@ -687,6 +694,7 @@ static void
 software_string_test (const char *filename)
 {	size_t k ;
 
+	get_unique_test_name (&filename, STR_TEST_PREFIX) ;
 	print_test_name (__func__, filename) ;
 
 	for (k = 0 ; k < 50 ; k++)
@@ -727,6 +735,7 @@ string_rdwr_grow_test (const char *filename, int typemajor)
 	sf_count_t frames ;
 	const char * str ;
 
+	get_unique_test_name (&filename, STR_TEST_PREFIX) ;
 	print_test_name (__func__, filename) ;
 
 	/* Create a file that contains some strings. Then open the file in RDWR mode and
@@ -785,6 +794,7 @@ string_header_update (const char *filename, int typemajor)
 	const char * str ;
 	const int GROW_BUFFER_AMOUNT = 4 ; /* this should be less than half the size of the string header */
 
+	get_unique_test_name (&filename, STR_TEST_PREFIX) ;
 	print_test_name (__func__, filename) ;
 
 	/* Create a short file. */

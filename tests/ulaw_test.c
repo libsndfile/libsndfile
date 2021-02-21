@@ -49,7 +49,7 @@ main (void)
 
 	print_test_name ("ulaw_test", "encoder") ;
 
-	filename = "test.raw" ;
+	filename = "ulaw_test.raw" ;
 
 	sf_info_setup (&sfinfo, SF_FORMAT_RAW | SF_FORMAT_ULAW, 44100, 1) ;
 
