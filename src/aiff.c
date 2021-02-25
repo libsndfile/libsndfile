@@ -234,7 +234,7 @@ static int aiff_get_chunk_data (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * itera
 int
 aiff_open (SF_PRIVATE *psf)
 {	COMM_CHUNK comm_fmt ;
-	int error, subformat ;
+	int error = 0, subformat ;
 
 	memset (&comm_fmt, 0, sizeof (comm_fmt)) ;
 
