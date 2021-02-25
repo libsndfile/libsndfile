@@ -391,7 +391,7 @@ aiff_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 static int
 wavlike_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 {	int		chan, k, predictor, blockindx, indx, indxstart, diff ;
-	short	step, bytecode, stepindx [2] ;
+	short	step, bytecode, stepindx [2] = { 0 };
 
 	pima->blockcount ++ ;
 	pima->samplecount = 0 ;
