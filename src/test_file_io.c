@@ -302,13 +302,13 @@ file_truncate_test (const char *filename)
 
 	for (k = 0 ; k < SIGNED_SIZEOF (buffer) / 2 ; k++)
 		if (buffer [k] != 0xEE)
-		{	printf ("\n\nLine %d : buffer [%d] = %d (should be 0xEE)\n\n", __LINE__, k, buffer [k]) ;
+		{	printf ("\n\nLine %d : buffer [%d] = %hhu (should be 0xEE)\n\n", __LINE__, k, buffer [k]) ;
 			exit (1) ;
 			} ;
 
 	for (k = SIGNED_SIZEOF (buffer) / 2 ; k < SIGNED_SIZEOF (buffer) ; k++)
 		if (buffer [k] != 0)
-		{	printf ("\n\nLine %d : buffer [%d] = %d (should be 0)\n\n", __LINE__, k, buffer [k]) ;
+		{	printf ("\n\nLine %d : buffer [%d] = %hhu (should be 0)\n\n", __LINE__, k, buffer [k]) ;
 			exit (1) ;
 			} ;
 
