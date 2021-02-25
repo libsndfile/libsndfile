@@ -850,7 +850,7 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 
 			count ++ ;
 			if (count > 5 || bcount + count > pakt_size)
-			{	printf ("%s %d : Ooops! count %d    bcount %d\n", __func__, __LINE__, count, bcount) ;
+			{	printf ("%s %d : Ooops! count %" PRIi32 "    bcount %" PRIu32 "\n", __func__, __LINE__, count, bcount) ;
 				value = 0 ;
 				break ;
 				} ;
