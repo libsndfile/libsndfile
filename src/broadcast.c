@@ -146,7 +146,7 @@ gen_coding_history (char * added_history, int added_history_max, const SF_INFO *
 			break ;
 
 		default :
-			snprintf (chnstr, sizeof (chnstr), "%uchn", psfinfo->channels) ;
+			snprintf (chnstr, sizeof (chnstr), "%dchn", psfinfo->channels) ;
 			break ;
 		} ;
 
@@ -180,7 +180,7 @@ gen_coding_history (char * added_history, int added_history_max, const SF_INFO *
 		} ;
 
 	count = snprintf (added_history, added_history_max,
-							"A=PCM,F=%u,W=%d,M=%s,T=%s-%s\r\n",
+							"A=PCM,F=%d,W=%d,M=%s,T=%s-%s\r\n",
 							psfinfo->samplerate, width, chnstr, PACKAGE_NAME, PACKAGE_VERSION) ;
 
 	if (count >= added_history_max)
