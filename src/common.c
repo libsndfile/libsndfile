@@ -1624,14 +1624,18 @@ psf_f2s_clip_array (const float *src, short *dest, int count, int normalize)
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFF))
 		{	dest [count] = 0x7FFF ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x1000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x1000))
 		{	dest [count] = -0x7FFF - 1 ;
 			continue ;
 			} ;
+#endif
 
 		dest [count] = psf_lrintf (scaled_value) ;
 		} ;
@@ -1658,14 +1662,18 @@ psf_d2s_clip_array (const double *src, short *dest, int count, int normalize)
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFF))
 		{	dest [count] = 0x7FFF ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x1000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x1000))
 		{	dest [count] = -0x7FFF - 1 ;
 			continue ;
 			} ;
+#endif
 
 		dest [count] = psf_lrint (scaled_value) ;
 		} ;
@@ -1693,14 +1701,18 @@ psf_f2i_clip_array (const float *src, int *dest, int count, int normalize)
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 0x7FFFFFFF ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [count] = 0x80000000 ;
 			continue ;
 			} ;
+#endif
 
 		dest [count] = psf_lrintf (scaled_value) ;
 		} ;
@@ -1727,14 +1739,18 @@ psf_d2i_clip_array (const double *src, int *dest, int count, int normalize)
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 0x7FFFFFFF ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [count] = 0x80000000 ;
 			continue ;
 			} ;
+#endif
 
 		dest [count] = psf_lrint (scaled_value) ;
 		} ;

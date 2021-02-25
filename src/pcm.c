@@ -1778,14 +1778,18 @@ f2sc_clip_array (const float *src, signed char *dest, int count, int normalize)
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 127 ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [count] = -128 ;
 			continue ;
 			} ;
+#endif
 
 		dest [count] = psf_lrintf (scaled_value) >> 24 ;
 		} ;
@@ -1837,14 +1841,18 @@ f2uc_clip_array	(const float *src, unsigned char *dest, int count, int normalize
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 0xFF ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [count] = 0 ;
 			continue ;
 			} ;
+#endif
 
 		dest [count] = (psf_lrintf (scaled_value) >> 24) + 128 ;
 		} ;
@@ -1906,16 +1914,20 @@ f2bes_clip_array (const float *src, short *dest, int count, int normalize)
 	while (--count >= 0)
 	{	ucptr -= 2 ;
 		scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [1] = 0xFF ;
 			ucptr [0] = 0x7F ;
 			continue ;
 		} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [1] = 0x00 ;
 			ucptr [0] = 0x80 ;
 			continue ;
 			} ;
+#endif
 
 		value = psf_lrintf (scaled_value) ;
 		ucptr [1] = value >> 16 ;
@@ -1979,16 +1991,20 @@ f2les_clip_array (const float *src, short *dest, int count, int normalize)
 	while (--count >= 0)
 	{	ucptr -= 2 ;
 		scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
 			ucptr [1] = 0x7F ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [0] = 0x00 ;
 			ucptr [1] = 0x80 ;
 			continue ;
 			} ;
+#endif
 
 		value = psf_lrintf (scaled_value) ;
 		ucptr [0] = value >> 16 ;
@@ -2047,18 +2063,22 @@ f2let_clip_array (const float *src, tribyte *dest, int count, int normalize)
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count].bytes [0] = 0xFF ;
 			dest [count].bytes [1] = 0xFF ;
 			dest [count].bytes [2] = 0x7F ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [count].bytes [0] = 0x00 ;
 			dest [count].bytes [1] = 0x00 ;
 			dest [count].bytes [2] = 0x80 ;
 			continue ;
 		} ;
+#endif
 
 		value = psf_lrintf (scaled_value) ;
 		dest [count].bytes [0] = value >> 8 ;
@@ -2118,18 +2138,22 @@ f2bet_clip_array (const float *src, tribyte *dest, int count, int normalize)
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count].bytes [0] = 0x7F ;
 			dest [count].bytes [1] = 0xFF ;
 			dest [count].bytes [2] = 0xFF ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [count].bytes [0] = 0x80 ;
 			dest [count].bytes [1] = 0x00 ;
 			dest [count].bytes [2] = 0x00 ;
 			continue ;
 		} ;
+#endif
 
 		value = psf_lrint (scaled_value) ;
 		dest [count].bytes [0] = value >> 24 ;
@@ -2195,20 +2219,24 @@ f2bei_clip_array (const float *src, int *dest, int count, int normalize)
 	while (--count >= 0)
 	{	ucptr -= 4 ;
 		scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= 1.0 * 0x7FFFFFFF)
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= 1.0 * 0x7FFFFFFF)
 		{	ucptr [0] = 0x7F ;
 			ucptr [1] = 0xFF ;
 			ucptr [2] = 0xFF ;
 			ucptr [3] = 0xFF ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [0] = 0x80 ;
 			ucptr [1] = 0x00 ;
 			ucptr [2] = 0x00 ;
 			ucptr [3] = 0x00 ;
 			continue ;
 		} ;
+#endif
 
 		value = psf_lrintf (scaled_value) ;
 		ucptr [0] = value >> 24 ;
@@ -2276,20 +2304,24 @@ f2lei_clip_array (const float *src, int *dest, int count, int normalize)
 	while (--count >= 0)
 	{	ucptr -= 4 ;
 		scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
 			ucptr [1] = 0xFF ;
 			ucptr [2] = 0xFF ;
 			ucptr [3] = 0x7F ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [0] = 0x00 ;
 			ucptr [1] = 0x00 ;
 			ucptr [2] = 0x00 ;
 			ucptr [3] = 0x80 ;
 			continue ;
 			} ;
+#endif
 
 		value = psf_lrintf (scaled_value) ;
 		ucptr [0] = value ;
@@ -2345,14 +2377,18 @@ d2sc_clip_array	(const double *src, signed char *dest, int count, int normalize)
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 127 ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [count] = -128 ;
 			continue ;
 			} ;
+#endif
 
 		dest [count] = psf_lrintf (scaled_value) >> 24 ;
 		} ;
@@ -2404,14 +2440,18 @@ d2uc_clip_array	(const double *src, unsigned char *dest, int count, int normaliz
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count] = 255 ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [count] = 0 ;
 			continue ;
 			} ;
+#endif
 
 		dest [count] = (psf_lrint (src [count] * normfact) >> 24) + 128 ;
 		} ;
@@ -2473,16 +2513,20 @@ d2bes_clip_array (const double *src, short *dest, int count, int normalize)
 	while (--count >= 0)
 	{	ucptr -= 2 ;
 		scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [1] = 0xFF ;
 			ucptr [0] = 0x7F ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [1] = 0x00 ;
 			ucptr [0] = 0x80 ;
 			continue ;
 			} ;
+#endif
 
 		value = psf_lrint (scaled_value) ;
 		ucptr [1] = value >> 16 ;
@@ -2546,16 +2590,20 @@ d2les_clip_array (const double *src, short *dest, int count, int normalize)
 	while (--count >= 0)
 	{	ucptr -= 2 ;
 		scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
 			ucptr [1] = 0x7F ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [0] = 0x00 ;
 			ucptr [1] = 0x80 ;
 			continue ;
 			} ;
+#endif
 
 		value = psf_lrint (scaled_value) ;
 		ucptr [0] = value >> 16 ;
@@ -2614,18 +2662,22 @@ d2let_clip_array (const double *src, tribyte *dest, int count, int normalize)
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count].bytes [0] = 0xFF ;
 			dest [count].bytes [1] = 0xFF ;
 			dest [count].bytes [2] = 0x7F ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [count].bytes [0] = 0x00 ;
 			dest [count].bytes [1] = 0x00 ;
 			dest [count].bytes [2] = 0x80 ;
 			continue ;
 			} ;
+#endif
 
 		value = psf_lrint (scaled_value) ;
 		dest [count].bytes [0] = value >> 8 ;
@@ -2685,18 +2737,22 @@ d2bet_clip_array (const double *src, tribyte *dest, int count, int normalize)
 
 	while (--count >= 0)
 	{	scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [count].bytes [2] = 0xFF ;
 			dest [count].bytes [1] = 0xFF ;
 			dest [count].bytes [0] = 0x7F ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [count].bytes [2] = 0x00 ;
 			dest [count].bytes [1] = 0x00 ;
 			dest [count].bytes [0] = 0x80 ;
 			continue ;
 			} ;
+#endif
 
 		value = psf_lrint (scaled_value) ;
 		dest [count].bytes [2] = value >> 8 ;
@@ -2763,20 +2819,24 @@ d2bei_clip_array (const double *src, int *dest, int count, int normalize)
 	while (--count >= 0)
 	{	ucptr -= 4 ;
 		scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [3] = 0xFF ;
 			ucptr [2] = 0xFF ;
 			ucptr [1] = 0xFF ;
 			ucptr [0] = 0x7F ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [3] = 0x00 ;
 			ucptr [2] = 0x00 ;
 			ucptr [1] = 0x00 ;
 			ucptr [0] = 0x80 ;
 			continue ;
 			} ;
+#endif
 
 		value = psf_lrint (scaled_value) ;
 		ucptr [0] = value >> 24 ;
@@ -2844,20 +2904,24 @@ d2lei_clip_array (const double *src, int *dest, int count, int normalize)
 	while (--count >= 0)
 	{	ucptr -= 4 ;
 		scaled_value = src [count] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFFFF))
+#if CPU_CLIPS_POSITIVE == 0
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
 			ucptr [1] = 0xFF ;
 			ucptr [2] = 0xFF ;
 			ucptr [3] = 0x7F ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10000000))
+#endif
+#if CPU_CLIPS_NEGATIVE == 0
+		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [0] = 0x00 ;
 			ucptr [1] = 0x00 ;
 			ucptr [2] = 0x00 ;
 			ucptr [3] = 0x80 ;
 			continue ;
 			} ;
+#endif
 
 		value = psf_lrint (scaled_value) ;
 		ucptr [0] = value ;
