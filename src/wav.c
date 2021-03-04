@@ -1325,8 +1325,9 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 	psf_log_printf (psf, "  SMPTE Format : %u\n", dword) ;
 
 	bytesread += psf_binheader_readf (psf, "4", &dword) ;
-	snprintf (buffer, sizeof (buffer), "%02d:%02d:%02d %02d",
-				(dword >> 24) & 0x7F, (dword >> 16) & 0x7F, (dword >> 8) & 0x7F, dword & 0x7F) ;
+	snprintf (buffer, sizeof (buffer), "%02"PRIu32 ":%02"PRIu32 ":%02"PRIu32
+				" %02"PRIu32 "", (dword >> 24) & 0x7F, (dword >> 16) & 0x7F,
+				(dword >> 8) & 0x7F, dword & 0x7F) ;
 	psf_log_printf (psf, "  SMPTE Offset : %s\n", buffer) ;
 
 	bytesread += psf_binheader_readf (psf, "4", &loop_count) ;
