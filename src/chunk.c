@@ -112,6 +112,9 @@ psf_store_read_chunk (READ_CHUNKS * pchk, const READ_CHUNK * rchunk)
 	{	pchk->used = 0 ;
 		pchk->count = 20 ;
 		pchk->chunks = calloc (pchk->count, sizeof (READ_CHUNK)) ;
+		if (!pchk->chunks)
+		{	return SFE_MALLOC_FAILED ;
+			} ;
 		}
 	else if (pchk->used > pchk->count)
 		return SFE_INTERNAL ;
@@ -227,6 +230,9 @@ psf_save_write_chunk (WRITE_CHUNKS * pchk, const SF_CHUNK_INFO * chunk_info)
 	{	pchk->used = 0 ;
 		pchk->count = 20 ;
 		pchk->chunks = calloc (pchk->count, sizeof (WRITE_CHUNK)) ;
+		if (!pchk->chunks)
+		{	return SFE_MALLOC_FAILED ;
+			} ;
 		}
 	else if (pchk->used >= pchk->count)
 	{	WRITE_CHUNK * old_ptr = pchk->chunks ;
