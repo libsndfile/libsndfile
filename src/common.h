@@ -306,10 +306,7 @@ void *psf_memdup (const void *src, size_t n) ;
 **	This version of isprint specifically ignores any locale info. Its used for
 **	determining which characters can be printed in things like hexdumps.
 */
-static inline int
-psf_isprint (int ch)
-{	return (ch >= ' ' && ch <= '~') ;
-} /* psf_isprint */
+int psf_isprint (int ch) ;
 
 /*=======================================================================================
 **	SF_PRIVATE stuct - a pointer to this struct is passed back to the caller of the

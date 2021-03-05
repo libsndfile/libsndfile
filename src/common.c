@@ -1221,6 +1221,11 @@ psf_log_SF_INFO (SF_PRIVATE *psf)
 /*========================================================================================
 */
 
+int
+psf_isprint (int ch)
+{	return (ch >= ' ' && ch <= '~') ;
+} /* psf_isprint */
+
 void
 psf_strlcat (char *dest, size_t n, const char *src)
 {	strncat (dest, src, n - strlen (dest) - 1) ;
