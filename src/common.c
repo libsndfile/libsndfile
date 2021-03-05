@@ -1221,6 +1221,21 @@ psf_log_SF_INFO (SF_PRIVATE *psf)
 /*========================================================================================
 */
 
+void
+psf_strlcat (char *dest, size_t n, const char *src)
+{	strncat (dest, src, n - strlen (dest) - 1) ;
+	dest [n - 1] = 0 ;
+} /* psf_strlcat */
+
+void
+psf_strlcpy (char *dest, size_t n, const char *src)
+{	strncpy (dest, src, n - 1) ;
+	dest [n - 1] = 0 ;
+} /* psf_strlcpy */
+
+/*========================================================================================
+*/
+
 void*
 psf_memset (void *s, int c, sf_count_t len)
 {	char	*ptr ;

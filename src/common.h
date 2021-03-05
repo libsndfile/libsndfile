@@ -965,17 +965,8 @@ int		psf_find_write_chunk (WRITE_CHUNKS * pchk, const char * marker) ;
 ** compiler errors if code is carelessly converted from one to the other.
 */
 
-static inline void
-psf_strlcat (char *dest, size_t n, const char *src)
-{	strncat (dest, src, n - strlen (dest) - 1) ;
-	dest [n - 1] = 0 ;
-} /* psf_strlcat */
-
-static inline void
-psf_strlcpy (char *dest, size_t n, const char *src)
-{	strncpy (dest, src, n - 1) ;
-	dest [n - 1] = 0 ;
-} /* psf_strlcpy */
+void psf_strlcat (char *dest, size_t n, const char *src) ;
+void psf_strlcpy (char *dest, size_t n, const char *src) ;
 
 /*------------------------------------------------------------------------------------
 ** SIMD optimized math functions.
