@@ -953,17 +953,6 @@ int		psf_find_read_chunk_iterator (const READ_CHUNKS * pchk, const SF_CHUNK_ITER
 
 int		psf_find_write_chunk (WRITE_CHUNKS * pchk, const char * marker) ;
 
-static inline int
-fourcc_to_marker (const SF_CHUNK_INFO * chunk_info)
-{	const unsigned char * cptr ;
-
-	if (chunk_info->id_size != 4)
-		return 0 ;
-
-	cptr = (const unsigned char *) chunk_info->id ;
-	return (cptr [3] << 24) + (cptr [2] << 16) + (cptr [1] << 8) + cptr [0] ;
-} /* fourcc_to_marker */
-
 /*------------------------------------------------------------------------------------
 ** Functions that work like OpenBSD's strlcpy/strlcat to replace strncpy/strncat.
 **
