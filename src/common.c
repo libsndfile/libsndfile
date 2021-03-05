@@ -1236,6 +1236,17 @@ psf_strlcpy (char *dest, size_t n, const char *src)
 /*========================================================================================
 */
 
+void *
+psf_memdup (const void *src, size_t n)
+{	if (src == NULL)
+		return NULL ;
+
+	void * mem = calloc (1, n & 3 ? n + 4 - (n & 3) : n) ;
+	if (mem != NULL)
+		memcpy (mem, src, n) ;
+	return mem ;
+} /* psf_memdup */
+
 void*
 psf_memset (void *s, int c, sf_count_t len)
 {	char	*ptr ;
