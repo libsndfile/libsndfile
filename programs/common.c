@@ -157,7 +157,7 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 	/* Special case loudness values */
 #define REPLACE_IF_NEW_INT(x) \
 		if (info->x != NULL) \
-		{	binfo.x = (int16_t) round (atof (info->x) * 100.0) ; \
+		{	binfo.x = (int16_t) (double) round (atof (info->x) * 100.0) ; \
 			} ;
 
 	REPLACE_IF_NEW_INT (loudness_value) ;
