@@ -57,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `replace_read_f2i`(), thanks @bobsayshilol, (issue #702).
 * Missing samples when doing a partial read of Ogg file from index till the end
   of file, thanks @arthurt (issue #643).
+* sndfile-salvage: Handle files > 4 GB on Windows OS
 
 ### Security
 
