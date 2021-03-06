@@ -388,7 +388,7 @@ copy_metadata (SNDFILE *outfile, SNDFILE *infile, int channels)
 	memset (&binfo, 0, sizeof (binfo)) ;
 
 	if (channels < ARRAY_LEN (chanmap))
-	{	size_t size = channels * sizeof (chanmap [0]) ;
+	{	int size = channels * sizeof (chanmap [0]) ;
 
 		if (sf_command (infile, SFC_GET_CHANNEL_MAP_INFO, chanmap, size) == SF_TRUE)
 			sf_command (outfile, SFC_SET_CHANNEL_MAP_INFO, chanmap, size) ;

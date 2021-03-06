@@ -79,7 +79,7 @@ cart_var_set (SF_PRIVATE *psf, const SF_CART_INFO * info, size_t datasize)
 	len = strlen (psf->cart_16k->tag_text) ;
 	len += (len & 1) ? 1 : 2 ;
 
-	psf->cart_16k->tag_text_size = len ;
+	psf->cart_16k->tag_text_size = (uint32_t) len ;
 
 	return SF_TRUE ;
 } /* cart_var_set */

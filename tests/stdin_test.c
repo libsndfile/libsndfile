@@ -185,7 +185,7 @@ stdin_test	(int typemajor, int count)
 		} ;
 
 	total = 0 ;
-	while ((k = sf_read_short (file, data + total, BUFFER_LEN - total)) > 0)
+	while ((k = (int) sf_read_short (file, data + total, BUFFER_LEN - total)) > 0)
 		total += k ;
 
 	if (total != count)

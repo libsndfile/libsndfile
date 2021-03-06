@@ -91,7 +91,7 @@ sfe_copy_data_int (SNDFILE *outfile, SNDFILE *infile, int channels)
 	readcount = frames ;
 
 	while (readcount > 0)
-	{	readcount = sf_readf_int (infile, data, frames) ;
+	{	readcount = (int) sf_readf_int (infile, data, frames) ;
 		sf_writef_int (outfile, data, readcount) ;
 		} ;
 
@@ -157,7 +157,7 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 	/* Special case loudness values */
 #define REPLACE_IF_NEW_INT(x) \
 		if (info->x != NULL) \
-		{	binfo.x = round (atof (info->x) * 100.0) ; \
+		{	binfo.x = (int16_t) round (atof (info->x) * 100.0) ; \
 			} ;
 
 	REPLACE_IF_NEW_INT (loudness_value) ;
@@ -177,7 +177,7 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 	/* Special case for coding_history because we may want to append. */
 	if (info->coding_history != NULL)
 	{	if (info->coding_hist_append)
-		{	int slen = strlen (binfo.coding_history) ;
+		{	int slen = (int) strlen (binfo.coding_history) ;
 
 			while (slen > 1 && isspace (binfo.coding_history [slen - 1]))
 				slen -- ;
@@ -189,7 +189,7 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 
 			memset (binfo.coding_history, 0, sizeof (binfo.coding_history)) ;
 			memcpy (binfo.coding_history, info->coding_history, slen) ;
-			binfo.coding_history_size = slen ;
+			binfo.coding_history_size = (uint32_t) slen ;
 			} ;
 		} ;
 

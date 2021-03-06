@@ -239,9 +239,9 @@ float_norm_test (const char *filename)
 
 	/* Create float_data with all values being less than 1.0. */
 	for (k = 0 ; k < BUFFER_LEN / 2 ; k++)
-		float_data [k] = (k + 5) / (2.0 * BUFFER_LEN) ;
+		float_data [k] = (k + 5) / (2.0f * BUFFER_LEN) ;
 	for (k = BUFFER_LEN / 2 ; k < BUFFER_LEN ; k++)
-		float_data [k] = (k + 5) ;
+		float_data [k] = (float) (k + 5) ;
 
 	if (! (file = sf_open (filename, SFM_WRITE, &sfinfo)))
 	{	printf ("Line %d: sf_open_write failed with error : ", __LINE__) ;
@@ -252,7 +252,7 @@ float_norm_test (const char *filename)
 
 	/* Normalisation is on by default so no need to do anything here. */
 
-	if ((k = sf_write_float (file, float_data, BUFFER_LEN / 2)) != BUFFER_LEN / 2)
+	if ((k = (unsigned int) sf_write_float (file, float_data, BUFFER_LEN / 2)) != BUFFER_LEN / 2)
 	{	printf ("Line %d: sf_write_float failed with short write (%d ->%d)\n", __LINE__, BUFFER_LEN, k) ;
 		exit (1) ;
 		} ;
@@ -260,7 +260,7 @@ float_norm_test (const char *filename)
 	/* Turn normalisation off. */
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 
-	if ((k = sf_write_float (file, float_data + BUFFER_LEN / 2, BUFFER_LEN / 2)) != BUFFER_LEN / 2)
+	if ((k = (unsigned int) sf_write_float (file, float_data + BUFFER_LEN / 2, BUFFER_LEN / 2)) != BUFFER_LEN / 2)
 	{	printf ("Line %d: sf_write_float failed with short write (%d ->%d)\n", __LINE__, BUFFER_LEN, k) ;
 		exit (1) ;
 		} ;
@@ -291,7 +291,7 @@ float_norm_test (const char *filename)
 		} ;
 
 	/* Read float_data and check that it is normalised (ie default). */
-	if ((k = sf_read_float (file, float_data, BUFFER_LEN)) != BUFFER_LEN)
+	if ((k = (unsigned int) sf_read_float (file, float_data, BUFFER_LEN)) != BUFFER_LEN)
 	{	printf ("\n\nLine %d: sf_read_float failed with short read (%d ->%d)\n", __LINE__, BUFFER_LEN, k) ;
 		exit (1) ;
 		} ;
@@ -306,7 +306,7 @@ float_norm_test (const char *filename)
 	sf_seek (file, 0, SEEK_SET) ;
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
 
-	if ((k = sf_read_float (file, float_data, BUFFER_LEN)) != BUFFER_LEN)
+	if ((k = (unsigned int) sf_read_float (file, float_data, BUFFER_LEN)) != BUFFER_LEN)
 	{	printf ("\n\nLine %d: sf_read_float failed with short read (%d ->%d)\n", __LINE__, BUFFER_LEN, k) ;
 		exit (1) ;
 		} ;
@@ -321,7 +321,7 @@ float_norm_test (const char *filename)
 	sf_seek (file, 0, SEEK_SET) ;
 	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_TRUE) ;
 
-	if ((k = sf_read_float (file, float_data, BUFFER_LEN)) != BUFFER_LEN)
+	if ((k = (unsigned int) sf_read_float (file, float_data, BUFFER_LEN)) != BUFFER_LEN)
 	{	printf ("\n\nLine %d: sf_read_float failed with short read (%d ->%d)\n", __LINE__, BUFFER_LEN, k) ;
 		exit (1) ;
 		} ;
@@ -369,7 +369,7 @@ double_norm_test (const char *filename)
 	/* Normailsation is on by default so no need to do anything here. */
 	/*-sf_command (file, "set-norm-double", "true", 0) ;-*/
 
-	if ((k = sf_write_double (file, double_data, BUFFER_LEN / 2)) != BUFFER_LEN / 2)
+	if ((k = (unsigned int) sf_write_double (file, double_data, BUFFER_LEN / 2)) != BUFFER_LEN / 2)
 	{	printf ("Line %d: sf_write_double failed with short write (%d ->%d)\n", __LINE__, BUFFER_LEN, k) ;
 		exit (1) ;
 		} ;
@@ -377,7 +377,7 @@ double_norm_test (const char *filename)
 	/* Turn normalisation off. */
 	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
 
-	if ((k = sf_write_double (file, double_data + BUFFER_LEN / 2, BUFFER_LEN / 2)) != BUFFER_LEN / 2)
+	if ((k = (unsigned int) sf_write_double (file, double_data + BUFFER_LEN / 2, BUFFER_LEN / 2)) != BUFFER_LEN / 2)
 	{	printf ("Line %d: sf_write_double failed with short write (%d ->%d)\n", __LINE__, BUFFER_LEN, k) ;
 		exit (1) ;
 		} ;
@@ -407,7 +407,7 @@ double_norm_test (const char *filename)
 		} ;
 
 	/* Read double_data and check that it is normalised (ie default). */
-	if ((k = sf_read_double (file, double_data, BUFFER_LEN)) != BUFFER_LEN)
+	if ((k = (unsigned int) sf_read_double (file, double_data, BUFFER_LEN)) != BUFFER_LEN)
 	{	printf ("\n\nLine %d: sf_read_double failed with short read (%d ->%d)\n", __LINE__, BUFFER_LEN, k) ;
 		exit (1) ;
 		} ;
@@ -422,7 +422,7 @@ double_norm_test (const char *filename)
 	sf_seek (file, 0, SEEK_SET) ;
 	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
 
-	if ((k = sf_read_double (file, double_data, BUFFER_LEN)) != BUFFER_LEN)
+	if ((k = (unsigned int) sf_read_double (file, double_data, BUFFER_LEN)) != BUFFER_LEN)
 	{	printf ("\n\nLine %d: sf_read_double failed with short read (%d ->%d)\n", __LINE__, BUFFER_LEN, k) ;
 		exit (1) ;
 		} ;
@@ -437,7 +437,7 @@ double_norm_test (const char *filename)
 	sf_seek (file, 0, SEEK_SET) ;
 	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_TRUE) ;
 
-	if ((k = sf_read_double (file, double_data, BUFFER_LEN)) != BUFFER_LEN)
+	if ((k = (unsigned int) sf_read_double (file, double_data, BUFFER_LEN)) != BUFFER_LEN)
 	{	printf ("\n\nLine %d: sf_read_double failed with short read (%d ->%d)\n", __LINE__, BUFFER_LEN, k) ;
 		exit (1) ;
 		} ;
@@ -1021,7 +1021,7 @@ cue_test_var (const char *filename, int filetype, int count)
 	sfinfo.channels		= 1 ;
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
-	if (sf_command (file, SFC_SET_CUE, write_cue, cues_size) == SF_FALSE)
+	if (sf_command (file, SFC_SET_CUE, write_cue, (int) cues_size) == SF_FALSE)
 	{	printf ("\n\nLine %d : sf_command (SFC_SET_CUE) failed with %d cues, datasize %zu --> error: %s\n\n", __LINE__, count, cues_size, sf_strerror (file)) ;
 		exit (1) ;
 		} ;
@@ -1032,7 +1032,7 @@ cue_test_var (const char *filename, int filetype, int count)
 
 	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
 
-	if (sf_command (file, SFC_GET_CUE, read_cue, cues_size) == SF_FALSE)
+	if (sf_command (file, SFC_GET_CUE, read_cue, (int) cues_size) == SF_FALSE)
 	{	printf ("\n\nLine %d : sf_command (SFC_GET_CUE) failed with %d cues, datasize %zu --> error: %s\n\n", __LINE__, count, cues_size, sf_strerror (file)) ;
 		exit (1) ;
 		} ;
@@ -1351,7 +1351,7 @@ broadcast_coding_history_test (const char *filename)
 		exit (1) ;
 		} ;
 
-	bc_write.coding_history_size = strlen (supplied_history) ;
+	bc_write.coding_history_size = (uint32_t) strlen (supplied_history) ;
 	bc_write.coding_history_size = snprintf (bc_write.coding_history, sizeof (bc_write.coding_history), "%s", supplied_history) ;
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
@@ -1423,7 +1423,7 @@ broadcast_coding_history_size (const char *filename)
 	for (k = 0 ; bc_write.coding_history_size < 512 ; k++)
 	{	snprintf (bc_write.coding_history + bc_write.coding_history_size,
 			sizeof (bc_write.coding_history) - bc_write.coding_history_size, "line %4d\n", k) ;
-		bc_write.coding_history_size = strlen (bc_write.coding_history) ;
+		bc_write.coding_history_size = (uint32_t) strlen (bc_write.coding_history) ;
 		} ;
 
 	exit_if_true (bc_write.coding_history_size < 512,
@@ -1493,7 +1493,7 @@ cart_test (const char *filename, int filetype)
 	ca_write.level_reference = 42 ;
 	snprintf (ca_write.url, sizeof (ca_write.url), "http://www.test.com/test_url") ;
 	snprintf (ca_write.tag_text, sizeof (ca_write.tag_text), "tag text test! \r\n") ; // must be terminated \r\n to be valid
-	ca_write.tag_text_size = strlen (ca_write.tag_text) ;
+	ca_write.tag_text_size = (uint32_t) strlen (ca_write.tag_text) ;
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 	if (sf_command (file, SFC_SET_CART_INFO, &ca_write, sizeof (ca_write)) == SF_FALSE)
@@ -1652,7 +1652,7 @@ cart_rdwr_test (const char *filename, int filetype)
 	cinfo.level_reference = 42 ;
 	snprintf (cinfo.url, sizeof (cinfo.url), "http://www.test.com/test_url") ;
 	snprintf (cinfo.tag_text, sizeof (cinfo.tag_text), "tag text test!\r\n") ;
-	cinfo.tag_text_size = strlen (cinfo.tag_text) ;
+	cinfo.tag_text_size = (uint32_t) strlen (cinfo.tag_text) ;
 
 	file = test_open_file_or_die (filename, SFM_RDWR, &sfinfo, SF_TRUE, __LINE__) ;
 	frames = sfinfo.frames ;

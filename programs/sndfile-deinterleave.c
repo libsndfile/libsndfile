@@ -190,7 +190,7 @@ deinterleave_int (STATE * state)
 	int ch, k ;
 
 	do
-	{	read_len = sf_readf_int (state->infile, state->din.i, BUFFER_LEN) ;
+	{	read_len = (int) sf_readf_int (state->infile, state->din.i, BUFFER_LEN) ;
 
 		for (ch = 0 ; ch < state->channels ; ch ++)
 		{	for (k = 0 ; k < read_len ; k++)
@@ -208,7 +208,7 @@ deinterleave_double (STATE * state)
 	int ch, k ;
 
 	do
-	{	read_len = sf_readf_double (state->infile, state->din.d, BUFFER_LEN) ;
+	{	read_len = (int) sf_readf_double (state->infile, state->din.d, BUFFER_LEN) ;
 
 		for (ch = 0 ; ch < state->channels ; ch ++)
 		{	for (k = 0 ; k < read_len ; k++)

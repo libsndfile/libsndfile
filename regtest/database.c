@@ -428,7 +428,7 @@ static void
 get_filename_pathname (REGTEST_DB * db, const char *filepath)
 {
 	const char * basename = db_basename (filepath) ;
-	int slen ;
+	size_t slen ;
 
 	/* Test for a relative path
 	 */

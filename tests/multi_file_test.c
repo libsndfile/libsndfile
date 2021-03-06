@@ -161,7 +161,7 @@ multi_file_test (const char *filename, int *formats, int format_count)
 			printf ("This offset : %" PRId64 "\n", embed_info.offset + embed_info.length) ;
 			} ;
 
-		if (lseek (fd, embed_info.offset + embed_info.length, SEEK_SET) < 0)
+		if (lseek (fd, (long) (embed_info.offset + embed_info.length), SEEK_SET) < 0)
 		{	printf ("\n\nLine %d: lseek failed : %s\n", __LINE__, strerror (errno)) ;
 			exit (1) ;
 			} ;

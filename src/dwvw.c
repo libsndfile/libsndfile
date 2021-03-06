@@ -198,7 +198,7 @@ dwvw_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	iptr = ubuf.ibuf ;
 	bufferlen = ARRAY_LEN (ubuf.ibuf) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
 		for (k = 0 ; k < readcount ; k++)
 			ptr [total + k] = iptr [k] >> 16 ;
@@ -255,7 +255,7 @@ dwvw_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	iptr = ubuf.ibuf ;
 	bufferlen = ARRAY_LEN (ubuf.ibuf) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
 		for (k = 0 ; k < readcount ; k++)
 			ptr [total + k] = normfact * (float) (iptr [k]) ;
@@ -287,7 +287,7 @@ dwvw_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	iptr = ubuf.ibuf ;
 	bufferlen = ARRAY_LEN (ubuf.ibuf) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
 		for (k = 0 ; k < readcount ; k++)
 			ptr [total + k] = normfact * (double) (iptr [k]) ;
@@ -377,7 +377,7 @@ dwvw_decode_load_bits (SF_PRIVATE *psf, DWVW_PRIVATE *pdwvw, int bit_count)
 	/* Load bits in bit reseviour. */
 	while (pdwvw->bit_count < bit_count)
 	{	if (pdwvw->b.index >= pdwvw->b.end)
-		{	pdwvw->b.end = psf_fread (pdwvw->b.buffer, 1, sizeof (pdwvw->b.buffer), psf) ;
+		{	pdwvw->b.end = (int) psf_fread (pdwvw->b.buffer, 1, sizeof (pdwvw->b.buffer), psf) ;
 			pdwvw->b.index = 0 ;
 			} ;
 
@@ -569,7 +569,7 @@ dwvw_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	iptr = ubuf.ibuf ;
 	bufferlen = ARRAY_LEN (ubuf.ibuf) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
 			iptr [k] = arith_shift_left (ptr [total + k], 16) ;
 		count = dwvw_encode_data (psf, pdwvw, iptr, writecount) ;
@@ -626,7 +626,7 @@ dwvw_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	iptr = ubuf.ibuf ;
 	bufferlen = ARRAY_LEN (ubuf.ibuf) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
 			iptr [k] = psf_lrintf (normfact * ptr [total + k]) ;
 		count = dwvw_encode_data (psf, pdwvw, iptr, writecount) ;
@@ -658,7 +658,7 @@ dwvw_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	iptr = ubuf.ibuf ;
 	bufferlen = ARRAY_LEN (ubuf.ibuf) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
 			iptr [k] = psf_lrint (normfact * ptr [total + k]) ;
 		count = dwvw_encode_data (psf, pdwvw, iptr, writecount) ;

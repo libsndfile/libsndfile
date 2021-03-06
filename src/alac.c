@@ -471,7 +471,7 @@ alac_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 			break ;
 
 		readcount = (plac->frames_this_block - plac->partial_block_frames) * plac->channels ;
-		readcount = readcount > len ? len : readcount ;
+		readcount = readcount > len ? (int) len : readcount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -501,7 +501,7 @@ alac_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 			break ;
 
 		readcount = (plac->frames_this_block - plac->partial_block_frames) * plac->channels ;
-		readcount = readcount > len ? len : readcount ;
+		readcount = readcount > len ? (int) len : readcount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -534,7 +534,7 @@ alac_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 			break ;
 
 		readcount = (plac->frames_this_block - plac->partial_block_frames) * plac->channels ;
-		readcount = readcount > len ? len : readcount ;
+		readcount = readcount > len ? (int) len : readcount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -567,7 +567,7 @@ alac_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 			break ;
 
 		readcount = (plac->frames_this_block - plac->partial_block_frames) * plac->channels ;
-		readcount = readcount > len ? len : readcount ;
+		readcount = readcount > len ? (int) len : readcount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -648,7 +648,7 @@ alac_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 
 	while (len > 0)
 	{	writecount = (plac->frames_per_block - plac->partial_block_frames) * plac->channels ;
-		writecount = (writecount == 0 || writecount > len) ? len : writecount ;
+		writecount = (writecount == 0 || writecount > len) ? (int) len : writecount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -679,7 +679,7 @@ alac_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 
 	while (len > 0)
 	{	writecount = (plac->frames_per_block - plac->partial_block_frames) * plac->channels ;
-		writecount = (writecount == 0 || writecount > len) ? len : writecount ;
+		writecount = (writecount == 0 || writecount > len) ? (int) len : writecount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -713,7 +713,7 @@ alac_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 
 	while (len > 0)
 	{	writecount = (plac->frames_per_block - plac->partial_block_frames) * plac->channels ;
-		writecount = (writecount == 0 || writecount > len) ? len : writecount ;
+		writecount = (writecount == 0 || writecount > len) ? (int) len : writecount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -746,7 +746,7 @@ alac_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 	while (len > 0)
 	{	writecount = (plac->frames_per_block - plac->partial_block_frames) * plac->channels ;
-		writecount = (writecount == 0 || writecount > len) ? len : writecount ;
+		writecount = (writecount == 0 || writecount > len) ? (int) len : writecount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 

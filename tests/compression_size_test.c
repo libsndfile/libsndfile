@@ -102,7 +102,7 @@ vorbis_test (void)
 	sf_close (file) ;
 
 	for (k = 0 ; k < ARRAY_LEN (float_data) ; k ++)
-		max_abs = max_float (max_abs, fabs (float_data [k])) ;
+		max_abs = max_float (max_abs, fabsf (float_data [k])) ;
 
 	exit_if_true (max_abs > 1.023,
 		"\n\nLine %d : max_abs %f should be < 1.023.\n\n", __LINE__, max_abs) ;
@@ -160,8 +160,8 @@ compression_size_test (int format, const char * filename)
 	sf_close (q3_file) ;
 	sf_close (q6_file) ;
 
-	q3_size = file_length (q3_fname) ;
-	q6_size = file_length (q6_fname) ;
+	q3_size = (int) file_length (q3_fname) ;
+	q6_size = (int) file_length (q6_fname) ;
 
 	exit_if_true (q3_size >= q6_size,
 		"\n\nLine %d : q3 size (%d) >= q6 size (%d)\n\n", __LINE__, q3_size, q6_size) ;

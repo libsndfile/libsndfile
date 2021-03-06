@@ -241,7 +241,9 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			psf_binheader_readf (psf, "j", 8 - (psf->header.indx & 0x7)) ;
 
 		/* Generate hash of 16 byte marker. */
-		marker = chunk_size = 0 ;
+		marker = 0 ;
+		chunk_size = 0 ;
+
 		bytesread = psf_binheader_readf (psf, "eh8", &marker, &chunk_size) ;
 		if (bytesread == 0)
 			break ;

@@ -75,7 +75,7 @@ psf_get_chunk_iterator (SF_PRIVATE * psf, const char * marker_str)
 		hash = marker_len > 4 ? hash_of_str (marker_str) : u.marker ;
 
 		memcpy (psf->iterator->id, marker_str, marker_len) ;
-		psf->iterator->id_size = marker_len ;
+		psf->iterator->id_size = (unsigned) marker_len ;
 		psf->iterator->hash = hash ;
 		}
 
@@ -211,7 +211,7 @@ psf_store_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str, sf_count_
 	rchunk.offset = offset ;
 	rchunk.len = len ;
 
-	rchunk.id_size = marker_len > 64 ? 64 : marker_len ;
+	rchunk.id_size = marker_len > 64 ? 64 : (unsigned) marker_len ;
 	memcpy (rchunk.id, marker_str, rchunk.id_size) ;
 
 	return psf_store_read_chunk (pchk, &rchunk) ;

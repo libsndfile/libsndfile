@@ -702,7 +702,7 @@ static int
 psf_nms_adpcm_decode_block (SF_PRIVATE *psf, NMS_ADPCM_PRIVATE *pnms)
 {	int k ;
 
-	if ((k = psf_fread (pnms->block, sizeof (short), pnms->shortsperblock, psf)) != pnms->shortsperblock)
+	if ((k = (int) psf_fread (pnms->block, sizeof (short), pnms->shortsperblock, psf)) != pnms->shortsperblock)
 	{	psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, pnms->shortsperblock) ;
 		memset (pnms->block + (k * sizeof (short)), 0, (pnms->shortsperblock - k) * sizeof (short)) ;
 		} ;
@@ -785,7 +785,7 @@ nms_adpcm_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = nms_adpcm_read_block (psf, pnms, sptr, readcount) ;
 
 		for (k = 0 ; k < readcount ; k++)
@@ -818,7 +818,7 @@ nms_adpcm_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = nms_adpcm_read_block (psf, pnms, sptr, readcount) ;
 		for (k = 0 ; k < readcount ; k++)
 			ptr [total + k] = normfact * sptr [k] ;
@@ -850,7 +850,7 @@ nms_adpcm_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = nms_adpcm_read_block (psf, pnms, sptr, readcount) ;
 		for (k = 0 ; k < readcount ; k++)
 			ptr [total + k] = normfact * (double) (sptr [k]) ;
@@ -875,7 +875,7 @@ psf_nms_adpcm_encode_block (SF_PRIVATE *psf, NMS_ADPCM_PRIVATE *pnms)
 		endswap_short_array ((signed short *) pnms->block, pnms->shortsperblock) ;
 
 	/* Write the block to disk. */
-	if ((k = psf_fwrite (pnms->block, sizeof (short), pnms->shortsperblock, psf)) != pnms->shortsperblock)
+	if ((k = (int) psf_fwrite (pnms->block, sizeof (short), pnms->shortsperblock, psf)) != pnms->shortsperblock)
 		psf_log_printf (psf, "*** Warning : short write (%d != %d).\n", k, pnms->shortsperblock) ;
 
 	pnms->sample_curr = 0 ;
@@ -945,7 +945,7 @@ nms_adpcm_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
 			sptr [k] = ptr [total + k] >> 16 ;
 		count = nms_adpcm_write_block (psf, pnms, sptr, writecount) ;
@@ -976,7 +976,7 @@ nms_adpcm_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
 			sptr [k] = psf_lrintf (normfact * ptr [total + k]) ;
 		count = nms_adpcm_write_block (psf, pnms, sptr, writecount) ;
@@ -1008,7 +1008,7 @@ nms_adpcm_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
 			sptr [k] = psf_lrint (normfact * ptr [total + k]) ;
 		count = nms_adpcm_write_block (psf, pnms, sptr, writecount) ;

@@ -198,7 +198,7 @@ gsm610_wav_decode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
 		return 1 ;
 		} ;
 
-	if ((k = psf_fread (pgsm610->block, 1, WAVLIKE_GSM610_BLOCKSIZE, psf)) != WAVLIKE_GSM610_BLOCKSIZE)
+	if ((k = (int) psf_fread (pgsm610->block, 1, WAVLIKE_GSM610_BLOCKSIZE, psf)) != WAVLIKE_GSM610_BLOCKSIZE)
 		psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, WAVLIKE_GSM610_BLOCKSIZE) ;
 
 	if (gsm_decode (pgsm610->gsm_data, pgsm610->block, pgsm610->samples) < 0)
@@ -226,7 +226,7 @@ gsm610_decode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
 		return 1 ;
 		} ;
 
-	if ((k = psf_fread (pgsm610->block, 1, GSM610_BLOCKSIZE, psf)) != GSM610_BLOCKSIZE)
+	if ((k = (int) psf_fread (pgsm610->block, 1, GSM610_BLOCKSIZE, psf)) != GSM610_BLOCKSIZE)
 		psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, GSM610_BLOCKSIZE) ;
 
 	if (gsm_decode (pgsm610->gsm_data, pgsm610->block, pgsm610->samples) < 0)
@@ -302,7 +302,7 @@ gsm610_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = gsm610_read_block (psf, pgsm610, sptr, readcount) ;
 		for (k = 0 ; k < readcount ; k++)
 			ptr [total + k] = arith_shift_left (sptr [k], 16) ;
@@ -331,7 +331,7 @@ gsm610_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = gsm610_read_block (psf, pgsm610, sptr, readcount) ;
 		for (k = 0 ; k < readcount ; k++)
 			ptr [total + k] = normfact * sptr [k] ;
@@ -360,7 +360,7 @@ gsm610_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = gsm610_read_block (psf, pgsm610, sptr, readcount) ;
 		for (k = 0 ; k < readcount ; k++)
 			ptr [total + k] = normfact * sptr [k] ;
@@ -437,7 +437,7 @@ gsm610_encode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
 	gsm_encode (pgsm610->gsm_data, pgsm610->samples, pgsm610->block) ;
 
 	/* Write the block to disk. */
-	if ((k = psf_fwrite (pgsm610->block, 1, GSM610_BLOCKSIZE, psf)) != GSM610_BLOCKSIZE)
+	if ((k = (int) psf_fwrite (pgsm610->block, 1, GSM610_BLOCKSIZE, psf)) != GSM610_BLOCKSIZE)
 		psf_log_printf (psf, "*** Warning : short write (%d != %d).\n", k, GSM610_BLOCKSIZE) ;
 
 	pgsm610->samplecount = 0 ;
@@ -458,7 +458,7 @@ gsm610_wav_encode_block	(SF_PRIVATE *psf, GSM610_PRIVATE *pgsm610)
 	gsm_encode (pgsm610->gsm_data, pgsm610->samples+WAVLIKE_GSM610_SAMPLES / 2, pgsm610->block+WAVLIKE_GSM610_BLOCKSIZE / 2) ;
 
 	/* Write the block to disk. */
-	if ((k = psf_fwrite (pgsm610->block, 1, WAVLIKE_GSM610_BLOCKSIZE, psf)) != WAVLIKE_GSM610_BLOCKSIZE)
+	if ((k = (int) psf_fwrite (pgsm610->block, 1, WAVLIKE_GSM610_BLOCKSIZE, psf)) != WAVLIKE_GSM610_BLOCKSIZE)
 		psf_log_printf (psf, "*** Warning : short write (%d != %d).\n", k, WAVLIKE_GSM610_BLOCKSIZE) ;
 
 	pgsm610->samplecount = 0 ;
@@ -532,7 +532,7 @@ gsm610_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
 			sptr [k] = ptr [total + k] >> 16 ;
 		count = gsm610_write_block (psf, pgsm610, sptr, writecount) ;
@@ -561,7 +561,7 @@ gsm610_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
 			sptr [k] = psf_lrintf (normfact * ptr [total + k]) ;
 		count = gsm610_write_block (psf, pgsm610, sptr, writecount) ;
@@ -592,7 +592,7 @@ gsm610_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
 			sptr [k] = psf_lrint (normfact * ptr [total + k]) ;
 		count = gsm610_write_block (psf, pgsm610, sptr, writecount) ;

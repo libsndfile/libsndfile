@@ -407,7 +407,7 @@ caf_read_header (SF_PRIVATE *psf)
 		{	case peak_MARKER :
 				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
 				if (chunk_size != CAF_PEAK_CHUNK_SIZE (psf->sf.channels))
-				{	psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
+				{	psf_binheader_readf (psf, "j", (size_t) chunk_size) ;
 					psf_log_printf (psf, "*** File PEAK chunk %D should be %d.\n", chunk_size, CAF_PEAK_CHUNK_SIZE (psf->sf.channels)) ;
 					return SFE_CAF_BAD_PEAK ;
 					} ;
@@ -443,7 +443,7 @@ caf_read_header (SF_PRIVATE *psf)
 			case chan_MARKER :
 				if (chunk_size < 12)
 				{	psf_log_printf (psf, "%M : %D (should be >= 12)\n", marker, chunk_size) ;
-					psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
+					psf_binheader_readf (psf, "j", (size_t) chunk_size) ;
 					break ;
 					}
 
@@ -455,7 +455,7 @@ caf_read_header (SF_PRIVATE *psf)
 
 			case free_MARKER :
 				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
-				psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
+				psf_binheader_readf (psf, "j", (size_t) chunk_size) ;
 				break ;
 
 			case data_MARKER :
@@ -480,14 +480,14 @@ caf_read_header (SF_PRIVATE *psf)
 				if (psf->datalength + psf->dataoffset < psf->filelength)
 					psf->dataend = psf->datalength + psf->dataoffset ;
 
-				psf_binheader_readf (psf, "j", make_size_t (psf->datalength)) ;
+				psf_binheader_readf (psf, "j", (size_t) psf->datalength) ;
 				have_data = 1 ;
 				break ;
 
 			case kuki_MARKER :
 				psf_log_printf (psf, "%M : %D\n", marker, chunk_size) ;
 				pcaf->alac.kuki_offset = psf_ftell (psf) - 12 ;
-				psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
+				psf_binheader_readf (psf, "j", (size_t) chunk_size) ;
 				break ;
 
 			case pakt_MARKER :
@@ -519,7 +519,7 @@ caf_read_header (SF_PRIVATE *psf)
 					psf_log_printf (psf, "*** 'pakt' chunk header is all zero.\n") ;
 
 				pcaf->alac.pakt_offset = psf_ftell (psf) - 12 ;
-				psf_binheader_readf (psf, "j", make_size_t (chunk_size) - 24) ;
+				psf_binheader_readf (psf, "j", (size_t) chunk_size - 24) ;
 				break ;
 
 			case info_MARKER :
@@ -538,7 +538,7 @@ caf_read_header (SF_PRIVATE *psf)
 
 			default :
 				psf_log_printf (psf, "%M : %D (skipped)\n", marker, chunk_size) ;
-				psf_binheader_readf (psf, "j", make_size_t (chunk_size)) ;
+				psf_binheader_readf (psf, "j", (size_t) chunk_size) ;
 				break ;
 			} ;
 
@@ -846,7 +846,7 @@ caf_read_strings (SF_PRIVATE * psf, sf_count_t chunk_size)
 	if ((buf = malloc (chunk_size + 1)) == NULL)
 		return (psf->error = SFE_MALLOC_FAILED) ;
 
-	psf_binheader_readf (psf, "E4b", &count, buf, make_size_t (chunk_size)) ;
+	psf_binheader_readf (psf, "E4b", &count, buf, (size_t) chunk_size) ;
 	psf_log_printf (psf, " count: %u\n", count) ;
 
 	/* Force terminate `buf` to make sure. */

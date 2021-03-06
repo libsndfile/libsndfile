@@ -233,7 +233,7 @@ find_data_offset (int fd, int format)
 			exit (1) ;
 		} ;
 
-	slen = strlen (target) ;
+	slen = (int) strlen (target) ;
 
 	lseek_or_die (fd, 0, SEEK_SET) ;
 

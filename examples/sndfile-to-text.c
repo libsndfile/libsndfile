@@ -68,7 +68,7 @@ convert_to_text (SNDFILE * infile, FILE * outfile, int channels, int full_precis
 
 	frames = BLOCK_SIZE / channels ;
 
-	while ((readcount = sf_readf_float (infile, buf, frames)) > 0)
+	while ((readcount = (int) sf_readf_float (infile, buf, frames)) > 0)
 	{	for (k = 0 ; k < readcount ; k++)
 		{	for (m = 0 ; m < channels ; m++)
 				if (full_precision)

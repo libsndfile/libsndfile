@@ -159,7 +159,7 @@ interleave_int (STATE * state)
 	{	max_read_len = 0 ;
 
 		for (ch = 0 ; ch < state->channels ; ch ++)
-		{	read_len = sf_read_int (state->infile [ch], state->din.i, BUFFER_LEN) ;
+		{	read_len = (int) sf_read_int (state->infile [ch], state->din.i, BUFFER_LEN) ;
 			if (read_len < BUFFER_LEN)
 				memset (state->din.i + read_len, 0, sizeof (state->din.i [0]) * (BUFFER_LEN - read_len)) ;
 
@@ -185,7 +185,7 @@ interleave_double (STATE * state)
 	{	max_read_len = 0 ;
 
 		for (ch = 0 ; ch < state->channels ; ch ++)
-		{	read_len = sf_read_double (state->infile [ch], state->din.d, BUFFER_LEN) ;
+		{	read_len = (int) sf_read_double (state->infile [ch], state->din.d, BUFFER_LEN) ;
 			if (read_len < BUFFER_LEN)
 				memset (state->din.d + read_len, 0, sizeof (state->din.d [0]) * (BUFFER_LEN - read_len)) ;
 

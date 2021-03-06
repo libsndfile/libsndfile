@@ -110,7 +110,7 @@ main (void)
 	/* While there are.frames in the input file, read them, process
 	** them and write them to the output file.
 	*/
-	while ((readcount = sf_read_double (infile, data, BUFFER_LEN)))
+	while ((readcount = (int) sf_read_double (infile, data, BUFFER_LEN)))
 	{	process_data (data, readcount, sfinfo.channels) ;
 		sf_write_double (outfile, data, readcount) ;
 		} ;

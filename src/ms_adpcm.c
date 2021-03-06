@@ -230,7 +230,7 @@ msadpcm_decode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 		return 1 ;
 		} ;
 
-	if ((k = psf_fread (pms->block, 1, pms->blocksize, psf)) != pms->blocksize)
+	if ((k = (int) psf_fread (pms->block, 1, pms->blocksize, psf)) != pms->blocksize)
 	{	psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, pms->blocksize) ;
 		if (k <= 0)
 			return 1 ;
@@ -355,7 +355,7 @@ msadpcm_read_s	(SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	while (len > 0)
 	{	readcount = (len > 0x10000000) ? 0x10000000 : (int) len ;
 
-		if ((count = msadpcm_read_block (psf, pms, ptr, readcount)) <= 0)
+		if ((count = (int) msadpcm_read_block (psf, pms, ptr, readcount)) <= 0)
 			return -1 ;
 
 		total += count ;
@@ -382,9 +382,9 @@ msadpcm_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 
-		if ((count = msadpcm_read_block (psf, pms, sptr, readcount)) <= 0)
+		if ((count = (int) msadpcm_read_block (psf, pms, sptr, readcount)) <= 0)
 			return -1 ;
 
 		for (k = 0 ; k < readcount ; k++)
@@ -414,9 +414,9 @@ msadpcm_read_f	(SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 
-		if ((count = msadpcm_read_block (psf, pms, sptr, readcount)) <= 0)
+		if ((count = (int) msadpcm_read_block (psf, pms, sptr, readcount)) <= 0)
 			return -1 ;
 
 		for (k = 0 ; k < readcount ; k++)
@@ -446,9 +446,9 @@ msadpcm_read_d	(SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 
-		if ((count = msadpcm_read_block (psf, pms, sptr, readcount)) <= 0)
+		if ((count = (int) msadpcm_read_block (psf, pms, sptr, readcount)) <= 0)
 			return -1 ;
 
 		for (k = 0 ; k < readcount ; k++)
@@ -633,7 +633,7 @@ msadpcm_encode_block	(SF_PRIVATE *psf, MSADPCM_PRIVATE *pms)
 
 	/* Write the block to disk. */
 
-	if ((k = psf_fwrite (pms->block, 1, pms->blocksize, psf)) != pms->blocksize)
+	if ((k = (int) psf_fwrite (pms->block, 1, pms->blocksize, psf)) != pms->blocksize)
 		psf_log_printf (psf, "*** Warning : short write (%d != %d).\n", k, pms->blocksize) ;
 
 	memset (pms->samples, 0, pms->samplesperblock * sizeof (short)) ;
@@ -679,7 +679,7 @@ msadpcm_write_s	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len > 0x10000000) ? 0x10000000 : (int) len ;
 
-		count = msadpcm_write_block (psf, pms, ptr, writecount) ;
+		count = (int) msadpcm_write_block (psf, pms, ptr, writecount) ;
 
 		total += count ;
 		len -= count ;
@@ -705,10 +705,10 @@ msadpcm_write_i	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
 			sptr [k] = ptr [total + k] >> 16 ;
-		count = msadpcm_write_block (psf, pms, sptr, writecount) ;
+		count = (int) msadpcm_write_block (psf, pms, sptr, writecount) ;
 		total += count ;
 		len -= writecount ;
 		if (count != writecount)
@@ -735,10 +735,10 @@ msadpcm_write_f	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
 			sptr [k] = psf_lrintf (normfact * ptr [total + k]) ;
-		count = msadpcm_write_block (psf, pms, sptr, writecount) ;
+		count = (int) msadpcm_write_block (psf, pms, sptr, writecount) ;
 		total += count ;
 		len -= writecount ;
 		if (count != writecount)
@@ -765,10 +765,10 @@ msadpcm_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = ARRAY_LEN (ubuf.sbuf) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
 			sptr [k] = psf_lrint (normfact * ptr [total + k]) ;
-		count = msadpcm_write_block (psf, pms, sptr, writecount) ;
+		count = (int) msadpcm_write_block (psf, pms, sptr, writecount) ;
 		total += count ;
 		len -= writecount ;
 		if (count != writecount)

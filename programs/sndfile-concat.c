@@ -143,7 +143,7 @@ concat_data_fp (SNDFILE *wfile, SNDFILE *rofile, int channels)
 	sf_seek (wfile, 0, SEEK_END) ;
 
 	while (readcount > 0)
-	{	readcount = sf_readf_double (rofile, data, frames) ;
+	{	readcount = (int) sf_readf_double (rofile, data, frames) ;
 		sf_writef_double (wfile, data, readcount) ;
 		} ;
 
@@ -161,7 +161,7 @@ concat_data_int (SNDFILE *wfile, SNDFILE *rofile, int channels)
 	sf_seek (wfile, 0, SEEK_END) ;
 
 	while (readcount > 0)
-	{	readcount = sf_readf_int (rofile, data, frames) ;
+	{	readcount = (int) sf_readf_int (rofile, data, frames) ;
 		sf_writef_int (wfile, data, readcount) ;
 		} ;
 

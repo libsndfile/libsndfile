@@ -143,7 +143,7 @@ sfe_copy_data_int (SNDFILE *outfile, SNDFILE *infile, int channels)
 	readcount = frames ;
 
 	while (readcount > 0)
-	{	readcount = sf_readf_int (infile, data, frames) ;
+	{	readcount = (int) sf_readf_int (infile, data, frames) ;
 		sf_writef_int (outfile, data, readcount) ;
 		} ;
 
