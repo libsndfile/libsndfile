@@ -47,6 +47,8 @@
 **
 ** API documentation is in the doc/ directory of the source code tarball
 ** and at http://libsndfile.github.io/libsndfile/api.html.
+**
+** This file is intended to compile with C++98 and newer.
 */
 
 #ifndef SNDFILE_HH
