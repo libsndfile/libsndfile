@@ -24,6 +24,10 @@
 #include <stdint.h>
 #include <inttypes.h>
 
+#ifndef __has_builtin
+#define __has_builtin(x) 0
+#endif
+
 #if HAVE_BYTESWAP_H			/* Linux, any CPU */
 #include <byteswap.h>
 
@@ -31,19 +35,11 @@
 #define	ENDSWAP_32(x)		(bswap_32 (x))
 #define	ENDSWAP_64(x)		(bswap_64 (x))
 
-#elif defined __has_builtin
+#elif __has_builtin(__builtin_bswap16) && __has_builtin(__builtin_bswap32) && __has_builtin(__builtin_bswap64)
 
-#if __has_builtin (__builtin_bswap16)
 #define ENDSWAP_16(x) ((int16_t) __builtin_bswap16 ((uint16_t) x))
-#endif
-
-#if __has_builtin (__builtin_bswap32)
 #define ENDSWAP_32(x) ((int32_t) __builtin_bswap32 ((uint32_t) x))
-#endif
-
-#if __has_builtin (__builtin_bswap64)
 #define ENDSWAP_64(x) ((int64_t) __builtin_bswap64 ((uint64_t) x))
-#endif
 
 #elif COMPILER_IS_GCC
 
