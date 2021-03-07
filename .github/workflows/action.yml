@@ -198,9 +198,9 @@ jobs:
         run: |
           ./autogen.sh
           if [[ "${CC}" == "clang" ]]; then
-            ./configure --enable-werror && make clean all check && make distcheck
+            ./configure --enable-werror && make distcheck
           else
-            Scripts/asan-configure.sh --enable-werror && make clean all check && make distcheck
+            Scripts/asan-configure.sh --enable-werror && make distcheck
           fi
 
       - name: Configure, build and test with CMake
