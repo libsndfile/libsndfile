@@ -51,7 +51,7 @@ generate_file (const char * filename, int format, int len)
 
 static inline float
 rand_float (void)
-{	return rand () / (0.5f * RAND_MAX) - 1.0f ;
+{	return rand () / (0.5f * (float) RAND_MAX) - 1.0f ;
 } /* rand_float */
 
 static float
