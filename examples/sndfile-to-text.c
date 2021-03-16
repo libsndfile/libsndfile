@@ -163,6 +163,6 @@ cleanup :
 	if (outfile != NULL)
 		fclose (outfile) ;
 
-	return 0 ;
+	return ret ;
 } /* main */
 
