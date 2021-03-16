@@ -154,14 +154,16 @@ main (int argc, char **argv)
 	else
 		deinterleave_int (state) ;
 
-	sf_close (state->infile) ;
-	for (ch = 0 ; ch < MAX_CHANNELS ; ch++)
-		if (state->outfile [ch] != NULL)
-			sf_close (state->outfile [ch]) ;
-
 	ret = 0 ;
 
 cleanup :
+
+	if (state != NULL)
+	{	sf_close (state->infile) ;
+		for (ch = 0 ; ch < MAX_CHANNELS ; ch++)
+			if (state->outfile [ch] != NULL)
+				sf_close (state->outfile [ch]) ;
+		} ;
 
 	free (state) ;
 
@@ -181,7 +183,6 @@ usage_exit (void)
 		"a_00.wav, a_01.wav and so on.\n"
 		) ;
 	printf ("Using %s.\n\n", sf_version_string ()) ;
-	exit (1) ;
 } /* usage_exit */
 
 static void
