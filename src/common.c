@@ -571,7 +571,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 	while ((c = *format++))
 	{
 		if (psf->header.indx + 16 >= psf->header.len && psf_bump_header_allocation (psf, 16))
-			return count ;
+			break ;
 
 		switch (c)
 		{	case ' ' : /* Do nothing. Just used to space out format string. */
@@ -687,7 +687,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					size = strlen (strptr) + 1 ;
 
 					if (psf->header.indx + 4 + (sf_count_t) size + (sf_count_t) (size & 1) > psf->header.len && psf_bump_header_allocation (psf, 4 + size + (size & 1)))
-						return count ;
+						break ;
 
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						header_put_be_int (psf, size + (size & 1)) ;
@@ -708,7 +708,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					strptr = va_arg (argptr, char *) ;
 					size = strlen (strptr) ;
 					if (psf->header.indx + 4 + (sf_count_t) size + (sf_count_t) (size & 1) > psf->header.len && psf_bump_header_allocation (psf, 4 + size + (size & 1)))
-						return count ;
+						break ;
 					if (psf->rwf_endian == SF_ENDIAN_BIG)
 						header_put_be_int (psf, size) ;
 					else
@@ -728,7 +728,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					size = (size > 254) ? 254 : size ;
 
 					if (psf->header.indx + 1 + (sf_count_t) size > psf->header.len && psf_bump_header_allocation (psf, 1 + size))
-						return count ;
+						break ;
 
 					header_put_byte (psf, size) ;
 					memcpy (&(psf->header.ptr [psf->header.indx]), strptr, size) ;
@@ -741,7 +741,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					size	= va_arg (argptr, size_t) ;
 
 					if (psf->header.indx + (sf_count_t) size > psf->header.len && psf_bump_header_allocation (psf, size))
-						return count ;
+						break ;
 
 					memcpy (&(psf->header.ptr [psf->header.indx]), bindata, size) ;
 					psf->header.indx += size ;
@@ -752,7 +752,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					size = va_arg (argptr, size_t) ;
 
 					if (psf->header.indx + (sf_count_t) size > psf->header.len && psf_bump_header_allocation (psf, size))
-						return count ;
+						break ;
 
 					count += size ;
 					while (size)
@@ -773,7 +773,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					size = va_arg (argptr, size_t) ;
 
 					if (psf->header.indx + (sf_count_t) size > psf->header.len && psf_bump_header_allocation (psf, size))
-						return count ;
+						break ;
 
 					psf->header.indx += size ;
 					count += size ;
@@ -783,7 +783,7 @@ psf_binheader_writef (SF_PRIVATE *psf, const char *format, ...)
 					size = va_arg (argptr, size_t) ;
 
 					if ((sf_count_t) size >= psf->header.len && psf_bump_header_allocation (psf, size))
-						return count ;
+						break ;
 
 					psf->header.indx = size ;
 					break ;
@@ -971,7 +971,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 	while ((c = *format++))
 	{
 		if (psf->header.indx + 16 >= psf->header.len && psf_bump_header_allocation (psf, 16))
-			return count ;
+			break ;
 
 		switch (c)
 		{	case 'e' : /* All conversions are now from LE to host. */
@@ -1098,7 +1098,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 					memset (charptr, 0, count) ;
 
 					if (psf->header.indx + count >= psf->header.len && psf_bump_header_allocation (psf, count))
-						return 0 ;
+						break ;
 
 					byte_count += header_gets (psf, charptr, count) ;
 					break ;
