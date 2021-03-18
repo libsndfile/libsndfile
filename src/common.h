@@ -77,8 +77,22 @@
 
 #ifdef __GNUC__
 #	define WARN_UNUSED	__attribute__ ((warn_unused_result))
+#	define PSF_FORMAT_PRINTF_FUNC_ATTR(format_index, first_to_check)  __attribute__ ((format (printf, format_index, first_to_check)))
 #else
 #	define WARN_UNUSED
+#	define PSF_FORMAT_PRINTF_FUNC_ATTR(format_index, first_to_check)
+#endif
+
+#undef PSF_FORMAT_PRINTF_PARAM
+#if (defined _MSC_VER) && (_MSC_VER >= 1400)
+#	include <sal.h>
+#	if _MSC_VER > 1400
+#		define PSF_FORMAT_PRINTF_PARAM(p) _Printf_format_string_ p
+#	else
+# 		define PSF_FORMAT_PRINTF_PARAM(p) __format_string p
+#	endif /* FORMAT_STRING */
+#else
+#	define PSF_FORMAT_PRINTF_PARAM(p) p
 #endif
 
 #define	SF_BUFFER_LEN			(8192)
@@ -763,7 +777,10 @@ void	double64_le_write	(double in, unsigned char *out) ;
 
 /* Functions for writing to the internal logging buffer. */
 
+/* Deprecated, use psf_log_printf instead */
 void	psf_log_printf		(SF_PRIVATE *psf, const char *format, ...) ;
+void	psf_log_printf2		(SF_PRIVATE *psf, PSF_FORMAT_PRINTF_PARAM (const char *format), ...)
+							PSF_FORMAT_PRINTF_FUNC_ATTR (2, 3) ;
 void	psf_log_SF_INFO 	(SF_PRIVATE *psf) ;
 
 int32_t	psf_rand_int32 (void) ;

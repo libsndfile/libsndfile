@@ -371,6 +371,17 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 	return ;
 } /* psf_log_printf */
 
+void
+psf_log_printf2 (SF_PRIVATE *psf, const char *format, ...)
+{	va_list ap ;
+	va_start (ap, format) ;
+	int count = vsnprintf (&psf->parselog.buf [psf->parselog.indx],
+							SF_PARSELOG_LEN - psf->parselog.indx, format, ap) ;
+	if (count > 0)
+		psf->parselog.indx += count ;
+	va_end (ap) ;
+} /* psf_log_printf2 */
+
 /*-----------------------------------------------------------------------------------------------
 **  ASCII header printf functions.
 **  Some formats (ie NIST) use ascii text in their headers.
