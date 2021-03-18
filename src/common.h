@@ -777,7 +777,7 @@ void	double64_le_write	(double in, unsigned char *out) ;
 
 /* Functions for writing to the internal logging buffer. */
 
-/* Deprecated, use psf_log_printf instead */
+/* Deprecated, use psf_log_printf2 instead */
 void	psf_log_printf		(SF_PRIVATE *psf, const char *format, ...) ;
 void	psf_log_printf2		(SF_PRIVATE *psf, PSF_FORMAT_PRINTF_PARAM (const char *format), ...)
 							PSF_FORMAT_PRINTF_FUNC_ATTR (2, 3) ;
