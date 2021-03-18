@@ -23,6 +23,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+#if HAVE_STDBOOL_H
+#include <stdbool.h>
+#endif
 
 #if HAVE_INTTYPES_H
 #include <inttypes.h>

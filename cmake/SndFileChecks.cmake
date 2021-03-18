@@ -70,6 +70,7 @@ check_include_file (sys/time.h		HAVE_SYS_TIME_H)
 check_include_file (sys/types.h		HAVE_SYS_TYPES_H)
 check_include_file (unistd.h		HAVE_UNISTD_H)
 check_include_file (immintrin.h		HAVE_IMMINTRIN_H)
+check_include_file (stdbool.h		HAVE_STDBOOL_H)
 
 check_cpu_arch_x86 (CPU_IS_X86)
 check_cpu_arch_x64 (CPU_IS_X64)
