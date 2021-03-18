@@ -95,6 +95,7 @@ AC_CHECK_HEADERS([byteswap.h])
 AC_CHECK_HEADERS([locale.h])
 AC_CHECK_HEADERS([sys/time.h])
 AC_CHECK_HEADERS([immintrin.h])
+AC_CHECK_HEADERS([stdbool.h])
 
 AC_HEADER_SYS_WAIT
 
