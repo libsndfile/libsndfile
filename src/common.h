@@ -99,8 +99,6 @@
 
 #define		ARRAY_LEN(x)	((int) (sizeof (x) / sizeof ((x) [0])))
 
-#define		NOT(x)			(! (x))
-
 #define		SF_MAX(a, b)	((a) > (b) ? (a) : (b))
 #define		SF_MIN(a, b)	((a) < (b) ? (a) : (b))
 

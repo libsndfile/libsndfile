@@ -1301,7 +1301,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 				return SF_FALSE ;
 				} ;
 
-			if (NOT (broadcast_var_set (psf, data, datasize)))
+			if (!broadcast_var_set (psf, data, datasize))
 				return SF_FALSE ;
 
 			if (psf->write_header)
@@ -1330,7 +1330,7 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			{	psf->error = SFE_CMD_HAS_DATA ;
 				return SF_FALSE ;
 				} ;
-			if (NOT (cart_var_set (psf, data, datasize)))
+			if (!cart_var_set (psf, data, datasize))
 				return SF_FALSE ;
 			if (psf->write_header)
 				psf->write_header (psf, SF_TRUE) ;
