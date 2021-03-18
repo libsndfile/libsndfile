@@ -77,11 +77,11 @@
 
 #ifdef __GNUC__
 #	define WARN_UNUSED	__attribute__ ((warn_unused_result))
-#	define PSF_FORMAT_PRINTF_FUNC_ATTR(format_index, first_to_check)  __attribute__ ((format (printf, format_index, first_to_check)))
 #else
 #	define WARN_UNUSED
-#	define PSF_FORMAT_PRINTF_FUNC_ATTR(format_index, first_to_check)
 #endif
+
+/* Annotations for printf-like functions. */
 
 #undef PSF_FORMAT_PRINTF_PARAM
 #if (defined _MSC_VER) && (_MSC_VER >= 1400)
@@ -90,9 +90,15 @@
 #		define PSF_FORMAT_PRINTF_PARAM(p) _Printf_format_string_ p
 #	else
 # 		define PSF_FORMAT_PRINTF_PARAM(p) __format_string p
-#	endif /* FORMAT_STRING */
+#	endif
 #else
 #	define PSF_FORMAT_PRINTF_PARAM(p) p
+#endif
+
+#ifdef __GNUC__
+#	define PSF_FORMAT_PRINTF_FUNC_ATTR(format_index, first_to_check)  __attribute__ ((format (printf, format_index, first_to_check)))
+#else
+#	define PSF_FORMAT_PRINTF_FUNC_ATTR(format_index, first_to_check)
 #endif
 
 #define	SF_BUFFER_LEN			(8192)
