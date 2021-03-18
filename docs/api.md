@@ -97,6 +97,11 @@ calling **sf_open**(). The only exception to this is the case of RAW files where
 the caller has to set the **samplerate**, **channels** and **format** fields to
 valid values. All other fields of the structure are filled in by the library.
 
+**Note:** The libsndfile library will reject values ​​for **samplerate** field
+that are greater than `655350` and values ​​for field **channels** that are
+greater than `1024`. These values ​​represent the maximum theoretical limit and
+may be less for specific formats.
+
 When opening a file for write, the caller must fill in structure members
 **samplerate**, **channels**, and **format**.
 

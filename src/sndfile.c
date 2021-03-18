@@ -2881,11 +2881,11 @@ retry:
 
 static int
 validate_sfinfo (SF_INFO *sfinfo)
-{	if (sfinfo->samplerate < 1)
+{	if ((sfinfo->samplerate < 1) || (sfinfo->samplerate > SF_MAX_SAMPLERATE))
 		return 0 ;
 	if (sfinfo->frames < 0)
 		return 0 ;
-	if (sfinfo->channels < 1)
+	if ((sfinfo->channels < 1) || (sfinfo->channels > SF_MAX_CHANNELS))
 		return 0 ;
 	if ((SF_CONTAINER (sfinfo->format)) == 0)
 		return 0 ;

@@ -109,6 +109,8 @@
 
 
 #define		SF_MAX_CHANNELS		1024
+/* Max FLAC sample rate : https://xiph.org/flac/format.html */
+#define		SF_MAX_SAMPLERATE	655350
 
 
 /*
