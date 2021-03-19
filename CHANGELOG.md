@@ -58,10 +58,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Missing samples when doing a partial read of Ogg file from index till the end
   of file, thanks @arthurt (issue #643).
 * sndfile-salvage: Handle files > 4 GB on Windows OS
+* Undefined shift in `dyn_get_32bit`(), credit to OSS-Fuzz
+  ([issue 27366](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=27366)).
+* Integer overflow in `nms_adpcm_update`(), credit to OSS-Fuzz
+  ([issue 25522](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25522)).
 
 ### Security
 
 * Heap buffer overflow in `wavlike_ima_decode_block`(), thanks @bobsayshilol,
   credit to OSS-Fuzz ([issue 25530](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25530)).
+* Heap buffer overflow in `msadpcm_decode_block`(), thanks @bobsayshilol,
+  credit to OSS-Fuzz ([issue 26803](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=26803)).
+* Heap buffer overflow in `psf_binheader_readf`(), thanks @bobsayshilol,
+  credit to OSS-Fuzz ([issue 26026](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=26026)).
+* Index out of bounds in `psf_nms_adpcm_decode_block`(), credit to OSS-Fuzz
+  ([issue 25561](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25561)).
 
 [Unreleased]: https://github.com/libsndfile/libsndfile/compare/1.0.31...HEAD
