@@ -373,12 +373,27 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 
 void
 psf_log_printf2 (SF_PRIVATE *psf, const char *format, ...)
-{	va_list ap ;
+{	int buffer_size = SF_BUFFER_LEN - psf->parselog.indx - 1 ;
+	/* No room in log buffer, exit. */
+	if (buffer_size <= 0)
+		return ;
+
+	va_list ap ;
 	va_start (ap, format) ;
+
 	int count = vsnprintf (&psf->parselog.buf [psf->parselog.indx],
-							SF_PARSELOG_LEN - psf->parselog.indx, format, ap) ;
+							buffer_size + 1, format, ap) ;
+
 	if (count > 0)
+	{	/* vsnprintf() return size of formatted string, not count of chars
+		** written to buffer. We need to handle the case where the formatted
+		** string was truncated.
+		*/
+		if (count > buffer_size)
+			count = buffer_size ;
 		psf->parselog.indx += count ;
+		} ;
+
 	va_end (ap) ;
 } /* psf_log_printf2 */
 
