@@ -372,7 +372,7 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 } /* psf_log_printf */
 
 void
-psf_log_printf2 (SF_PRIVATE *psf, const char *format, ...)
+psf_log_printf2 (SF_PRIVATE *psf, PSF_FORMAT_PRINTF_PARAM (const char *format), ...)
 {	int buffer_size = SF_BUFFER_LEN - psf->parselog.indx - 1 ;
 	/* No room in log buffer, exit. */
 	if (buffer_size <= 0)
