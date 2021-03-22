@@ -47,6 +47,14 @@
 #error "This code is not designed to be compiled with a C++ compiler."
 #endif
 
+#if SIZEOF_SF_COUNT_T == 4
+#	define PRISF_COUNT_T PRId32
+#elif SIZEOF_SF_COUNT_T == 8
+#	define PRISF_COUNT_T PRId64
+#else
+#	define PRISF_COUNT_T "d"
+#endif
+
 #ifdef INT64_C
 #	define	SF_PLATFORM_S64(x)		INT64_C (x)
 #elif (SIZEOF_LONG == 8)
