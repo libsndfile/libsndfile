@@ -371,6 +371,26 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 	return ;
 } /* psf_log_printf */
 
+const char *
+psf_marker2str (int marker)
+{	static char str [5] ;
+	if (CPU_IS_LITTLE_ENDIAN)
+	{	str [0] = marker & 0xFF ;
+		str [1] = (marker >> 8) & 0xFF ;
+		str [2] = (marker >> 16) & 0xFF ;
+		str [3] = (marker >> 24) & 0xFF ;
+		}
+	else
+	{	str [3] = marker & 0xFF ;
+		str [2] = (marker >> 8) & 0xFF ;
+		str [1] = (marker >> 16) & 0xFF ;
+		str [0] = (marker >> 24) & 0xFF ;
+		} ;
+	str [4] = 0 ;
+
+	return str ;
+} /* psf_marker2str */
+
 void
 psf_log_printf2 (SF_PRIVATE *psf, PSF_FORMAT_PRINTF_PARAM (const char *format), ...)
 {	int buffer_size = SF_BUFFER_LEN - psf->parselog.indx - 1 ;

@@ -793,6 +793,7 @@ void	double64_le_write	(double in, unsigned char *out) ;
 
 /* Deprecated, use psf_log_printf2 instead */
 void	psf_log_printf		(SF_PRIVATE *psf, const char *format, ...) ;
+const char *psf_marker2str	(int marker) ;
 void	psf_log_printf2		(SF_PRIVATE *psf, PSF_FORMAT_PRINTF_PARAM (const char *format), ...)
 							PSF_FORMAT_PRINTF_FUNC_ATTR (2, 3) ;
 void	psf_log_SF_INFO 	(SF_PRIVATE *psf) ;
