@@ -63,31 +63,39 @@ id3_lookup_v1_genre (int UNUSED (number))
 
 #endif
 
-
 int
 id3_skip (SF_PRIVATE * psf)
 {	unsigned char	buf [10] ;
+	int	offset ;
 
 	memset (buf, 0, sizeof (buf)) ;
 	psf_binheader_readf (psf, "pb", 0, buf, 10) ;
 
 	if (buf [0] == 'I' && buf [1] == 'D' && buf [2] == '3')
-	{	int	offset = buf [6] & 0x7f ;
+	{	psf->id3_header.minor_version = buf [3] ;
+		offset = buf [6] & 0x7f ;
 		offset = (offset << 7) | (buf [7] & 0x7f) ;
 		offset = (offset << 7) | (buf [8] & 0x7f) ;
 		offset = (offset << 7) | (buf [9] & 0x7f) ;
 
-		psf_log_printf (psf, "ID3 length : %d\n--------------------\n", offset) ;
+		/*
+		** ID3 count field is how many bytes of ID3v2 header FOLLOW the ten
+		** bytes of header magic and offset, NOT the total ID3v2 header len.
+		*/
+		psf->id3_header.len = offset + 10 ;
+		psf->id3_header.offset = psf->fileoffset ;
+
+		psf_log_printf (psf, "  ID3v2.%d header length :	%d\n----------------------------------------\n",
+			psf->id3_header.minor_version, psf->id3_header.len) ;
 
 		/* Never want to jump backwards in a file. */
 		if (offset < 0)
 			return 0 ;
 
-		/* Calculate new file offset and position ourselves there. */
-		offset += 10 ;
-		if (psf->fileoffset + offset < psf->filelength)
-		{	psf_binheader_readf (psf, "p", offset) ;
-			psf->fileoffset += offset ;
+		/* Position ourselves at the new file offset. */
+		if (psf->fileoffset + psf->id3_header.len < psf->filelength)
+		{	psf_binheader_readf (psf, "p!", psf->id3_header.len) ;
+			psf->fileoffset += psf->id3_header.len ;
 			return 1 ;
 			} ;
 		} ;

@@ -967,7 +967,6 @@ sf_format_check	(const SF_INFO *info)
 					return 0 ;
 				if (endian != SF_ENDIAN_FILE)
 					return 0 ;
-				/* TODO */
 				if (subformat == SF_FORMAT_MPEG_LAYER_I || subformat == SF_FORMAT_MPEG_LAYER_II || subformat == SF_FORMAT_MPEG_LAYER_III)
 					return 1 ;
 				break ;
@@ -2881,16 +2880,6 @@ retry:
 	if (buffer [0] == MAKE_MARKER ('I', 'D', '3', 2) || buffer [0] == MAKE_MARKER ('I', 'D', '3', 3)
 			|| buffer [0] == MAKE_MARKER ('I', 'D', '3', 4))
 	{	psf_log_printf (psf, "Found 'ID3' marker.\n") ;
-
-		/* Guess MP3, try and open it as such. Allows libmpg123 to parse the ID3v2 headers */
-		if (psf->file.mode == SFM_READ)
-		{	if (mpeg_open (psf) == 0)
-				return SF_FORMAT_MPEG | ((~SF_FORMAT_TYPEMASK) & psf->sf.format) ;
-			else if (psf->codec_close)
-				psf->codec_close (psf) ;
-			} ;
-
-		/* Otherwise, seek to after the ID3 header */
 		if (id3_skip (psf))
 			goto retry ;
 		return 0 ;

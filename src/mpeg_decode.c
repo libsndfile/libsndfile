@@ -527,17 +527,6 @@ mpeg_decoder_init (SF_PRIVATE *psf)
 		return SFE_INTERNAL ;
 
 	/*
-	** Check to see if we have already successfully opened the file when we
-	** guessed it was an MP3 based on seeing an ID3 header.
-	*/
-	if (psf->codec_data != NULL &&
-			(SF_CODEC (psf->sf.format) == SF_FORMAT_MPEG_LAYER_I
-				|| SF_CODEC (psf->sf.format) == SF_FORMAT_MPEG_LAYER_II
-				|| SF_CODEC (psf->sf.format) == SF_FORMAT_MPEG_LAYER_III)
-			&& ((MPEG_DEC_PRIVATE *) psf->codec_data)->unique_id == psf->unique_id)
-		return 0 ;
-
-	/*
 	** *** FIXME - Threading issues ***
 	**
 	** mpg123_init() is a global call that should only be called once, and
@@ -580,15 +569,31 @@ mpeg_decoder_init (SF_PRIVATE *psf)
 #endif
 
 	psf->dataoffset = 0 ;
-
+	/*
+	** Need to pass the first MPEG frame to libmpg123, but that frame was read
+	** into psf->binheader in order that we could identify the stream.
+	*/
 	if (psf->is_pipe)
-	{	// Need to read data in the binheader buffer. Avoid a file seek.
+	{	/*
+		** Can't seek, so setup our libmpg123 io callbacks to read the binheader
+		** buffer first.
+		*/
 		psf_binheader_readf (psf, "p", 0) ;
 		pmp3d->header_remaining = psf_binheader_readf (psf, NULL) ;
+
+		/* Tell libmpg123 we can't seek the file. */
 		mpg123_param (pmp3d->pmh, MPG123_ADD_FLAGS, MPG123_NO_PEEK_END, 1.0) ;
 		}
 	else
+	{	/*
+		** libmpg123 can parse the ID3v2 header. Undo the embedded file offset if the
+		** enclosing file data is the ID3v2 header.
+		*/
+		if (psf->id3_header.len > 0 && psf->id3_header.len + psf->id3_header.offset == psf->fileoffset)
+			psf->fileoffset = psf->id3_header.offset ;
+
 		psf_fseek (psf, 0, SEEK_SET) ;
+		} ;
 
 	error = mpg123_open_handle (pmp3d->pmh, psf) ;
 	if (error != MPG123_OK)

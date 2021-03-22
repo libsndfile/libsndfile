@@ -296,6 +296,12 @@ typedef SF_BROADCAST_INFO_VAR (16 * 1024) SF_BROADCAST_INFO_16K ;
 
 typedef SF_CART_INFO_VAR (16 * 1024) SF_CART_INFO_16K ;
 
+typedef struct
+{	sf_count_t	offset ;
+	sf_count_t	len ;
+	unsigned	minor_version ;
+} ID3V2_HEADER_INFO ;
+
 #if SIZEOF_WCHAR_T == 2
 typedef wchar_t	sfwchar_t ;
 #else
@@ -516,6 +522,8 @@ typedef struct sf_private_tag
 	int					(*get_chunk_data)	(struct sf_private_tag*, const SF_CHUNK_ITERATOR * iterator, SF_CHUNK_INFO * chunk_info) ;
 
 	int cpu_flags ;
+
+	ID3V2_HEADER_INFO	id3_header ;
 } SF_PRIVATE ;
 
 

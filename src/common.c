@@ -1136,6 +1136,10 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 					byte_count += count ;
 					break ;
 
+			case '!' : /* Clear buffer, forcing re-read. */
+					psf->header.end = psf->header.indx = 0 ;
+					break ;
+
 			default :
 				psf_log_printf (psf, "*** Invalid format specifier `%c'\n", c) ;
 				psf->error = SFE_INTERNAL ;
