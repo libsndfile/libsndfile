@@ -312,10 +312,6 @@ xi_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 
 	psf_binheader_writef (psf, "b", BHWv (pxi->sample_name), BHWz (sizeof (pxi->sample_name))) ;
 
-
-
-
-
 	/* Header construction complete so write it out. */
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
@@ -408,8 +404,6 @@ xi_read_header (SF_PRIVATE *psf)
 		psf_log_printf (psf, "Sample #%d\n  name    : %s\n", k + 1, name) ;
 
 		psf_log_printf (psf, "  size    : %d\n", sample_sizes [k]) ;
-
-
 
 		psf_log_printf (psf, "  loop\n    begin : %d\n    end   : %d\n", loop_begin, loop_end) ;
 
@@ -1227,4 +1221,3 @@ d2dles_array (XI_PRIVATE *pxi, const double *src, short *dest, int count, double
 
 	pxi->last_16 = last_val ;
 } /* d2dles_array */
-
