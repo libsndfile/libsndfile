@@ -91,7 +91,6 @@ enum
 } ;
 
 
-
 /*  known WAVEFORMATEXTENSIBLE GUIDS  */
 static const EXT_SUBFORMAT MSGUID_SUBTYPE_PCM =
 {	0x00000001, 0x0000, 0x0010, {	0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 }
@@ -276,6 +275,10 @@ wav_open	(SF_PRIVATE *psf)
 
 		case SF_FORMAT_GSM610 :
 					error = gsm610_init (psf) ;
+					break ;
+
+		case SF_FORMAT_MPEG_LAYER_III :
+					error = mpeg_init (psf, SF_BITRATE_MODE_CONSTANT, SF_FALSE) ;
 					break ;
 
 		default : 	return SFE_UNIMPLEMENTED ;
@@ -696,8 +699,6 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			break ;
 
 		case WAVE_FORMAT_NMS_VBXADPCM :
-			*blockalign = wav_fmt->min.blockalign ;
-			*framesperblock = 160 ;
 			switch (wav_fmt->min.bitwidth)
 			{	case 2 :
 					psf->sf.format = SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_16 ;
@@ -751,6 +752,12 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 		case WAVE_FORMAT_G721_ADPCM :
 					psf->sf.format = SF_FORMAT_WAV | SF_FORMAT_G721_32 ;
+					break ;
+
+		case WAVE_FORMAT_MPEGLAYER3 :
+					psf->sf.format = SF_FORMAT_WAV | SF_FORMAT_MPEG_LAYER_III ;
+					if (parsestage & HAVE_fact)
+						psf->sf.frames = fact_chunk.frames ;
 					break ;
 
 		default : return SFE_UNIMPLEMENTED ;
@@ -932,6 +939,57 @@ wav_write_fmt_chunk (SF_PRIVATE *psf)
 
 						/* fmt : blockalign, bitwidth, extrabytes, framesperblock. */
 						psf_binheader_writef (psf, "2222", BHW2 (blockalign), BHW2 (0), BHW2 (2), BHW2 (framesperblock)) ;
+						} ;
+
+					add_fact_chunk = SF_TRUE ;
+					break ;
+
+		case SF_FORMAT_MPEG_LAYER_III :
+					{	int bytespersec, blockalign, flags, blocksize, samplesperblock, codecdelay ;
+
+						/* Intended to be set as the average sample rate.
+						** TODO: Maybe re-write this on close with final average
+						** byterate? */
+						bytespersec		= psf->byterate (psf) ;
+
+						/* Average block size. Info only I think. */
+						blocksize		= (1152 * bytespersec) / psf->sf.samplerate ;
+
+						/* Can be set to block size IFF the block size is
+						** constant, set to 1 otherwise. Constant sized
+						** MPEG block streams are uncommon (CBR @ 32kHz and
+						** 48kHz only. Meh. */
+						blockalign		= 1 ;
+
+						/* TODO: Only flags defined are padding-type. I /think/
+						** Lame does ISO style padding by default, which has a
+						** flag value of 0.
+						*/
+						flags			= 0 ;
+
+						/* Should only vary per MPEG 1.0/2.0 vs '2.5'.
+						** TODO: Move this out to MPEG specific place? */
+						samplesperblock	= psf->sf.samplerate >= 32000 ? 1152 : 576 ;
+
+						/* Set as 0 if unknown.
+						** TODO: Plumb this cleanly from Lame.
+						*/
+						codecdelay		= 0 ;
+
+						/* fmt chunk. */
+						fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 + 4 + 2 + 2 + 2 ;
+
+						/* fmt : size, WAV format type, channels. */
+						psf_binheader_writef (psf, "422", BHW4 (fmt_size), BHW2 (WAVE_FORMAT_MPEGLAYER3), BHW2 (psf->sf.channels)) ;
+
+						/* fmt : samplerate, bytespersec. */
+						psf_binheader_writef (psf, "44", BHW4 (psf->sf.samplerate), BHW4 (bytespersec)) ;
+
+						/* fmt : blockalign, bitwidth, extrabytes, id. */
+						psf_binheader_writef (psf, "2222", BHW2 (blockalign), BHW2 (0), BHW2 (12), BHW2 (1)) ;
+
+						/* fmt : flags, blocksize, samplesperblock, codecdelay */
+						psf_binheader_writef (psf, "4222", BHW4 (flags), BHW2 (blocksize), BHW2 (samplesperblock), BHW2 (codecdelay)) ;
 						} ;
 
 					add_fact_chunk = SF_TRUE ;
