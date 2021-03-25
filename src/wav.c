@@ -73,6 +73,10 @@
 #define wvpk_MARKER (MAKE_MARKER ('w', 'v', 'p', 'k'))
 #define OggS_MARKER (MAKE_MARKER ('O', 'g', 'g', 'S'))
 
+/* ID3v1 trailer which can show up at the end and erronerously look like a chunk. */
+#define TAG__MARKER (MAKE_MARKER ('T', 'A', 'G', 0))
+#define TAG__MARKER_MASK (MAKE_MARKER (0xff, 0xff, 0xff, 0))
+
 #define WAVLIKE_PEAK_CHUNK_SIZE(ch) 	(2 * sizeof (int) + ch * (sizeof (float) + sizeof (int)))
 
 
@@ -602,6 +606,15 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if (chunk_size >= 0xffff0000)
 					{	done = SF_TRUE ;
 						psf_log_printf (psf, "*** Unknown chunk marker (%X) at position %D with length %u. Exiting parser.\n", marker, psf_ftell (psf) - 8, chunk_size) ;
+						break ;
+						} ;
+
+					if ((marker & TAG__MARKER_MASK) == TAG__MARKER &&
+						psf_ftell (psf) - 8 + 128 == psf->filelength)
+					{	psf_log_printf (psf, "*** Hit ID3v1 trailer. Exiting parser.\n") ;
+						chunk_size = 128 ;
+						done = SF_TRUE ;
+						parsestage |= HAVE_other ;
 						break ;
 						} ;
 
