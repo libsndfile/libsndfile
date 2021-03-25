@@ -264,6 +264,21 @@ typedef	struct
 } GSM610_WAV_FMT ;
 
 typedef struct
+{	unsigned short	format ;
+	unsigned short	channels ;
+	unsigned int	samplerate ;
+	unsigned int	bytespersec ;
+	unsigned short	blockalign ;
+	unsigned short	bitwidth ;
+	unsigned short	extrabytes ;
+	unsigned short	id ;
+	unsigned int	flags ;
+	unsigned short	blocksize ;
+	unsigned short	samplesperblock ;
+	unsigned short	codecdelay ;
+} MPEGLAYER3_WAV_FMT ;
+
+typedef struct
 {	unsigned int	esf_field1 ;
 	unsigned short	esf_field2 ;
 	unsigned short	esf_field3 ;
@@ -291,6 +306,7 @@ typedef union
 	G72x_ADPCM_WAV_FMT	g72x ;
 	EXTENSIBLE_WAV_FMT	ext ;
 	GSM610_WAV_FMT		gsm610 ;
+	MPEGLAYER3_WAV_FMT	mpeg3 ;
 	WAV_FMT_SIZE20		size20 ;
 	char				padding [512] ;
 } WAV_FMT ;
