@@ -691,6 +691,8 @@ sf_format_check	(const SF_INFO *info)
 				if ((subformat == SF_FORMAT_NMS_ADPCM_16 || subformat == SF_FORMAT_NMS_ADPCM_24 ||
 							subformat == SF_FORMAT_NMS_ADPCM_32) && info->channels == 1)
 					return 1 ;
+				if (subformat == SF_FORMAT_MPEG_LAYER_III && info->channels <= 2)
+					return 1 ;
 				break ;
 
 		case SF_FORMAT_WAVEX :
