@@ -173,6 +173,7 @@ wavlike_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 	{	switch (wav_fmt->format)
 		{	case WAVE_FORMAT_GSM610 :
 			case WAVE_FORMAT_IPP_ITU_G_723_1 :
+			case WAVE_FORMAT_MPEGLAYER3 :
 					psf_log_printf (psf, "  Bit Width     : %d\n", wav_fmt->min.bitwidth) ;
 					break ;
 			default :
@@ -183,7 +184,8 @@ wavlike_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 	{	switch (wav_fmt->format)
 		{	case WAVE_FORMAT_GSM610 :
 			case WAVE_FORMAT_IPP_ITU_G_723_1 :
-		psf_log_printf (psf, "  Bit Width     : %d (should be 0)\n", wav_fmt->min.bitwidth) ;
+			case WAVE_FORMAT_MPEGLAYER3 :
+					psf_log_printf (psf, "  Bit Width     : %d (should be 0)\n", wav_fmt->min.bitwidth) ;
 					break ;
 			default :
 					psf_log_printf (psf, "  Bit Width     : %d\n", wav_fmt->min.bitwidth) ;
@@ -304,6 +306,23 @@ wavlike_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize)
 
 				psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->gsm610.extrabytes) ;
 				psf_log_printf (psf, "  Samples/Block : %d\n", wav_fmt->gsm610.samplesperblock) ;
+				break ;
+
+		case WAVE_FORMAT_MPEGLAYER3 :
+				bytesread += psf_binheader_readf (psf, "24222", &(wav_fmt->mpeg3.extrabytes),
+					&(wav_fmt->mpeg3.id), &(wav_fmt->mpeg3.flags), &(wav_fmt->mpeg3.blocksize),
+					&(wav_fmt->mpeg3.samplesperblock), &(wav_fmt->mpeg3.codecdelay)) ;
+
+				psf_log_printf (psf, "  Bytes/sec     : %d\n", wav_fmt->mpeg3.bytespersec) ;
+				psf_log_printf (psf, "  Extra Bytes   : %d\n", wav_fmt->mpeg3.extrabytes) ;
+				if (wav_fmt->mpeg3.id != 1)
+					psf_log_printf (psf, "  ID            : %d (unknown, should be 1)\n", wav_fmt->mpeg3.id) ;
+				else
+					psf_log_printf (psf, "  ID            : MPEGLAYER3_ID_MPEG\n") ;
+				psf_log_printf (psf, "  Flags         : 0x%08x\n", wav_fmt->mpeg3.flags) ;
+				psf_log_printf (psf, "  Block Size    : %d\n", wav_fmt->mpeg3.blocksize) ;
+				psf_log_printf (psf, "  Samples/Block : %d\n", wav_fmt->mpeg3.samplesperblock) ;
+				psf_log_printf (psf, "  Codec Delay   : %d samples\n", wav_fmt->mpeg3.codecdelay) ;
 				break ;
 
 		case WAVE_FORMAT_EXTENSIBLE :
