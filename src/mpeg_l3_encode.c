@@ -496,11 +496,11 @@ mpeg_l3_encode_write_short_stereo (SF_PRIVATE *psf, const short *ptr, sf_count_t
 	MPEG_L3_ENC_PRIVATE *pmpeg = (MPEG_L3_ENC_PRIVATE*) psf->codec_data ;
 	sf_count_t total = 0 ;
 	int nbytes, writecount, writen ;
-	const sf_count_t max_samples = SF_MIN (ARRAY_LEN (ubuf.sbuf), pmpeg->frame_samples) ;
 
 	if ((psf->error = mpeg_l3_encoder_construct (psf)))
 		return 0 ;
 
+	const sf_count_t max_samples = SF_MIN (ARRAY_LEN (ubuf.sbuf), pmpeg->frame_samples) ;
 	while (len)
 	{	writecount = SF_MIN (len, max_samples) ;
 		/*
@@ -645,11 +645,11 @@ mpeg_l3_encode_write_float_stereo (SF_PRIVATE *psf, const float *ptr, sf_count_t
 	MPEG_L3_ENC_PRIVATE *pmpeg = (MPEG_L3_ENC_PRIVATE*) psf->codec_data ;
 	sf_count_t total = 0 ;
 	int nbytes, writecount, writen ;
-	const sf_count_t max_samples = SF_MIN (ARRAY_LEN (ubuf.fbuf), pmpeg->frame_samples) ;
 
 	if ((psf->error = mpeg_l3_encoder_construct (psf)))
 		return 0 ;
 
+	const sf_count_t max_samples = SF_MIN (ARRAY_LEN (ubuf.fbuf), pmpeg->frame_samples) ;
 	while (len)
 	{	writecount = SF_MIN (len, max_samples) ;
 
@@ -695,11 +695,11 @@ mpeg_l3_encode_write_double_mono (SF_PRIVATE *psf, const double *ptr, sf_count_t
 	MPEG_L3_ENC_PRIVATE *pmpeg = (MPEG_L3_ENC_PRIVATE*) psf->codec_data ;
 	sf_count_t total = 0 ;
 	int nbytes, writecount, writen ;
-	const sf_count_t max_samples = SF_MIN (ARRAY_LEN (ubuf.dbuf), pmpeg->frame_samples) ;
 
 	if ((psf->error = mpeg_l3_encoder_construct (psf)))
 		return 0 ;
 
+	const sf_count_t max_samples = SF_MIN (ARRAY_LEN (ubuf.dbuf), pmpeg->frame_samples) ;
 	while (len)
 	{	writecount = SF_MIN (len, max_samples) ;
 
@@ -737,11 +737,11 @@ mpeg_l3_encode_write_double_stereo (SF_PRIVATE *psf, const double *ptr, sf_count
 	MPEG_L3_ENC_PRIVATE *pmpeg = (MPEG_L3_ENC_PRIVATE*) psf->codec_data ;
 	sf_count_t total = 0 ;
 	int nbytes, writecount, writen ;
-	const sf_count_t max_samples = SF_MIN (ARRAY_LEN (ubuf.dbuf), pmpeg->frame_samples) ;
 
 	if ((psf->error = mpeg_l3_encoder_construct (psf)))
 		return 0 ;
 
+	const sf_count_t max_samples = SF_MIN (ARRAY_LEN (ubuf.dbuf), pmpeg->frame_samples) ;
 	while (len)
 	{	writecount = SF_MIN (len, max_samples) ;
 
