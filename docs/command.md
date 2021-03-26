@@ -81,6 +81,8 @@ The available commands are as follows:
 | [SFC_RF64_AUTO_DOWNGRADE](#sfc_rf64_auto_downgrade)               | Set auto downgrade from RF64 to WAV.                    |
 | [SFC_GET_ORIGINAL_SAMPLERATE](#sfc_get_original_samplerate)       | Get original samplerate metadata.                       |
 | [SFC_SET_ORIGINAL_SAMPLERATE](#sfc_set_original_samplerate)       | Set original samplerate metadata.                       |
+| [SFC_GET_BITRATE_MODE](#sfc_get_bitrate_mode)                     | Get bitrate mode.
+| [SFC_SET_BITRATE_MODE](#sfc_set_bitrate_mode)                     | Set bitrate mode.
 
 ---
 
@@ -1927,3 +1929,63 @@ Returns SF_TRUE on success, SF_FALSE otherwise.
 On write, can only succeed if no data has been written. On read, if successful,
 [SFC_GET_CURRENT_SF_INFO](#sfc_get_current_sf_info) should be called to
 determine the new frames count and samplerate
+
+## SFC_GET_BITRATE_MODE
+
+Get bitrate mode.
+
+The bitrate mode is one of:
+
+| Name                     | Value | Description       |
+|:-------------------------|:------|:------------------|
+| SF_BITRATE_MODE_CONSTANT | 800   | Constant bitrate. |
+| SF_BITRATE_MODE_AVERAGE  | 801   | Average bitrate.  |
+| SF_BITRATE_MODE_VARIABLE | 802   | Variable bitrate. |
+
+### Parameters
+
+sndfile
+: A valid SNDFILE* pointer
+
+cmd
+: SFC_GET_BITRATE_MODE
+
+data
+: NULL
+
+datasize
+: anything
+
+### Return value
+
+Returns one of `SF_BITRATE_MODE_XXX` on success, `-1` otherwise.
+
+## SFC_SET_BITRATE_MODE
+
+Set bitrate mode.
+
+The bitrate mode is one of:
+
+| Name                     | Value | Description       |
+|:-------------------------|:------|:------------------|
+| SF_BITRATE_MODE_CONSTANT | 800   | Constant bitrate. |
+| SF_BITRATE_MODE_AVERAGE  | 801   | Average bitrate.  |
+| SF_BITRATE_MODE_VARIABLE | 802   | Variable bitrate. |
+
+### Parameters
+
+sndfile
+: A valid SNDFILE* pointer
+
+cmd
+: SFC_SET_BITRATE_MODE
+
+data
+: pointer to an integer
+
+datasize
+: sizeof (int)
+
+### Return value
+
+Returns `SF_TRUE` on success, `SF_FALSE` otherwise.

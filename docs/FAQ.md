@@ -438,10 +438,12 @@ Use CMake project.
 
 ## Q20 : Why doesn't libsndfile support MP3? {#Q020}
 
-In the past, MP3 was not supported because the technology behind MP3 was
+~~In the past, MP3 was not supported because the technology behind MP3 was
 patented. Those patents have now expired and there is an
 [open ticket](https://github.com/libsndfile/libsndfile/issues/258) to implement
-MP3 support.
+MP3 support.~~
+
+**Update :** Starting from version 1.1.0 libsndfile supports MP3 format.
 
 ## Q21 : How do I use libsndfile in a closed source or commercial program and comply with the license? {#Q021}
 

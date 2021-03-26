@@ -9,6 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+* MPEG Encode/Decode Support.
+
+  Uses libmpg123 for decode, liblame for encode. Encoding and decoding support
+  is independent of each other and is split into separate files. MPEG support
+  is generalized as subformats, `SF_FORMAT_MPEG_LAYER`(I,II,III) so that it
+  might be used by other containers (`MPEG1WAVEFORMAT` for example), but also
+  contains a major format `SF_FORMAT_MPEG` for 'mp3 files.'
+
+  Encoding Status:
+  * Layer III encoding
+  * ID3v1 writing
+  * ID3v2 writing
+  * Lame/Xing Tag writing
+  * Bitrate selection command
+  * VBR or CBR
+  
+  Decoding Status:
+  * Layers I/II/III decoding
+  * ID3v1 reading
+  * ID3v2 reading
+  * Seeking
 * This `CHANGELOG.md`. All notable changes to this project will be documented in
   this file. The old `NEWS` file has been renamed to `NEWS.OLD` and is no longer
   updated.

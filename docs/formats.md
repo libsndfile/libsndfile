@@ -40,11 +40,12 @@ From version 1.0.18, libsndfile also reads and writes
 From version 1.0.29, libsndfile can read and write
 [Ogg/Opus](https://opus-codec.org/).
 
+From version 1.1.0, libsndfile can read and write MP3.
+
 Some of the file formats I am also interested in adding are:
 
 - Kurzweil K2000 sampler files.
 - Ogg Speex.
-- MPEG Layer 3 (commonly known as MP3)
 
 Other file formats may also be added on request.
 
