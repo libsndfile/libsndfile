@@ -78,7 +78,7 @@ include(SndFileChecks)
 
 cmake_dependent_option (BUILD_REGTEST "Build regtest" ON "SQLITE3_FOUND" OFF)
 cmake_dependent_option (ENABLE_EXTERNAL_LIBS "Enable FLAC, Vorbis, and Opus codecs" ON "Vorbis_FOUND;FLAC_FOUND;OPUS_FOUND" OFF)
-cmake_dependent_option (ENABLE_MPEG "Enable MPEG codecs" ON "LAME_FOUND;MPG123_FOUND" OFF)
+cmake_dependent_option (ENABLE_MPEG "Enable MPEG codecs" ON "HAVE_MPEG_LIBS" OFF)
 cmake_dependent_option (ENABLE_CPU_CLIP "Enable tricky cpu specific clipper" ON "CPU_CLIPS_POSITIVE;CPU_CLIPS_NEGATIVE" OFF)
 if (NOT ENABLE_CPU_CLIP)
 	set (CPU_CLIPS_POSITIVE FALSE)
@@ -105,7 +105,7 @@ set (HAVE_ALSA_ASOUNDLIB_H ${ALSA_FOUND})
 set (HAVE_SNDIO_H ${SNDIO_FOUND})
 
 set (ENABLE_EXPERIMENTAL_CODE ${ENABLE_EXPERIMENTAL})
-set (HAVE_MPEG_LIBS ${ENABLE_MPEG})
+set (HAVE_MPEG ${ENABLE_MPEG})
 set (HAVE_SPEEX ${ENABLE_EXPERIMENTAL})
 
 add_feature_info (BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
@@ -368,8 +368,8 @@ target_link_libraries (sndfile
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:FLAC::FLAC>
 		$<$<AND:$<BOOL:${ENABLE_EXPERIMENTAL}>,$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>,$<BOOL:${HAVE_SPEEX}>>:Speex::Speex>
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Opus::opus>
-		$<$<BOOL:${HAVE_MPEG_LIBS}>:MPG123::libmpg123>
-		$<$<BOOL:${HAVE_MPEG_LIBS}>:Lame::Lame>
+		$<$<BOOL:${HAVE_MPEG}>:MPG123::libmpg123>
+		$<$<BOOL:${HAVE_MPEG}>:Lame::Lame>
 	)
 set_target_properties (sndfile PROPERTIES
 	PUBLIC_HEADER "${sndfile_HDRS}"
