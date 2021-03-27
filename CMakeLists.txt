@@ -149,14 +149,14 @@ set_package_properties (FLAC PROPERTIES
 	DESCRIPTION "Free Lossless Audio Codec Library"
 	PURPOSE "Enables FLAC support"
 	)
-set_package_properties (LAME PROPERTIES
-	TYPE OPTIONAL
+set_package_properties (Lame PROPERTIES
+	TYPE RECOMMENDED
 	URL "https://lame.sourceforge.io/"
 	DESCRIPTION "High quality MPEG Audio Layer III (MP3) encoder"
 	PURPOSE "Enables MPEG layer III (MP3) writing support"
 	)
 set_package_properties (MPG123 PROPERTIES
-	TYPE OPTIONAL
+	TYPE RECOMMENDED
 	URL "https://www.mpg123.de/"
 	DESCRIPTION "MPEG Audio Layer I/II/III decoder"
 	PURPOSE "Enables MPEG Audio reading support"
