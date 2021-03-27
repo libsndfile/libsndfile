@@ -58,7 +58,7 @@ endif ()
 
 find_package (Lame)
 find_package (Mpg123 1.25.10)
-if (LAME_FOUND AND MPG123_FOUND)
+if (LAME_FOUND AND (TARGET MPG123::libmpg123))
 	set (HAVE_MPEG_LIBS 1)
 else ()
 	set (HAVE_MPEG_LIBS 0)
