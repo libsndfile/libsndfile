@@ -564,17 +564,6 @@ mpeg_decoder_init (SF_PRIVATE *psf)
 
 	mpg123_param (pmp3d->pmh, MPG123_REMOVE_FLAGS, MPG123_AUTO_RESAMPLE, 1.0) ;
 	mpg123_param (pmp3d->pmh, MPG123_ADD_FLAGS, MPG123_FORCE_FLOAT | MPG123_GAPLESS, 1.0) ;
-	/*
-	** Enable useful MPG123_NO_FRANKENSTEIN mode if supported (disallow
-	** different MPEG streams stiched together).
-	** Do not use MPG123_NO_FRANKENSTEIN flag directly, because this mode is too
-	** new and must be checked with MPG123_API_VERSION, but on Windows platform
-	** libmpg123 built with MS Studio project has broken (unconfigured)
-	** MPG123_API_VERSION value.
-	** If MPG123_NO_FRANKENSTEIN is not supported, mpg123_param () silently
-	** rejects this flag.
-	*/
-	mpg123_param (pmp3d->pmh, MPG123_ADD_FLAGS, 0x1000000, 1.0) ;
 
 	psf->dataoffset = 0 ;
 	/*
