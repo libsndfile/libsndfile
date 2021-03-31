@@ -167,6 +167,8 @@ calc_decibels (SF_INFO * sfinfo, double max)
 
 		case SF_FORMAT_FLOAT :
 		case SF_FORMAT_DOUBLE :
+		case SF_FORMAT_VORBIS :
+		case SF_FORMAT_OPUS :
 			decibels = max / 1.0 ;
 			break ;
 
