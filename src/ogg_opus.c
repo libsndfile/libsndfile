@@ -410,10 +410,10 @@ static void
 opus_print_header (SF_PRIVATE *psf, OpusHeader *h)
 {	psf_log_printf (psf, "Opus Header Metadata\n") ;
 	psf_log_printf (psf, "  OggOpus version  : %d\n", h->version) ;
-	psf_log_printf (psf, "  Channels		 : %d\n", h->channels) ;
-	psf_log_printf (psf, "  Preskip		  : %d samples @48kHz\n", h->preskip) ;
+	psf_log_printf (psf, "  Channels         : %d\n", h->channels) ;
+	psf_log_printf (psf, "  Preskip          : %d samples @48kHz\n", h->preskip) ;
 	psf_log_printf (psf, "  Input Samplerate : %d Hz\n", h->input_samplerate) ;
-	psf_log_printf (psf, "  Gain			 : %d.%d\n", arith_shift_right (h->gain & 0xF0, 8), h->gain & 0x0F) ;
+	psf_log_printf (psf, "  Gain             : %d.%d\n", arith_shift_right (h->gain & 0xF0, 8), h->gain & 0x0F) ;
 	psf_log_printf (psf, "  Channel Mapping  : ") ;
 	switch (h->channel_mapping)
 	{	case 0 :	psf_log_printf (psf, "0 (mono or stereo)\n") ; break ;
@@ -426,7 +426,7 @@ opus_print_header (SF_PRIVATE *psf, OpusHeader *h)
 	{	int i ;
 		psf_log_printf (psf, "   streams total   : %d\n", h->nb_streams) ;
 		psf_log_printf (psf, "   streams coupled : %d\n", h->nb_coupled) ;
-		psf_log_printf (psf, "	stream mapping : [") ;
+		psf_log_printf (psf, "   stream mapping : [") ;
 		for (i = 0 ; i < h->channels - 1 ; i++)
 			psf_log_printf (psf, "%d,", h->stream_map [i]) ;
 		psf_log_printf (psf, "%d]\n", h->stream_map [i]) ;
