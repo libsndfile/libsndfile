@@ -354,7 +354,10 @@ main (int argc, char * argv [])
 			|| (outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT)
 			|| (infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT)
 			|| (infileminor == SF_FORMAT_OPUS) || (outfileminor == SF_FORMAT_OPUS)
-			|| (infileminor == SF_FORMAT_VORBIS) || (outfileminor == SF_FORMAT_VORBIS))
+			|| (infileminor == SF_FORMAT_VORBIS) || (outfileminor == SF_FORMAT_VORBIS)
+			|| (infileminor == SF_FORMAT_MPEG_LAYER_I)
+			|| (infileminor == SF_FORMAT_MPEG_LAYER_II)
+			|| (infileminor == SF_FORMAT_MPEG_LAYER_III) || (outfileminor == SF_FORMAT_MPEG_LAYER_III))
 	{	if (sfe_copy_data_fp (outfile, infile, sfinfo.channels, normalize) != 0)
 		{	printf ("Error : Not able to decode input file %s.\n", infilename) ;
 			return 1 ;
