@@ -564,6 +564,9 @@ mpeg_decoder_init (SF_PRIVATE *psf)
 
 	mpg123_param (pmp3d->pmh, MPG123_REMOVE_FLAGS, MPG123_AUTO_RESAMPLE, 1.0) ;
 	mpg123_param (pmp3d->pmh, MPG123_ADD_FLAGS, MPG123_FORCE_FLOAT | MPG123_GAPLESS, 1.0) ;
+	#if MPG123_API_VERSION >= 45
+		mpg123_param (pmp3d->pmh, MPG123_ADD_FLAGS, MPG123_NO_FRANKENSTEIN, 1.0) ;
+	#endif
 
 	psf->dataoffset = 0 ;
 	/*
