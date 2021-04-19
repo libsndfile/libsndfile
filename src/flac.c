@@ -62,7 +62,6 @@ typedef struct
 	FLAC__StreamMetadata *metadata ;
 
 	const int32_t * const * wbuffer ;
-	unsigned wbuffer_size ;
 	int32_t * rbuffer [FLAC__MAX_CHANNELS] ;
 
 	int32_t* encbuffer ;
@@ -185,12 +184,6 @@ flac_buffer_copy (SF_PRIVATE *psf)
 	*/
 	if (frame->header.blocksize > FLAC__MAX_BLOCK_SIZE)
 	{	psf_log_printf (psf, "Ooops : frame->header.blocksize (%d) > FLAC__MAX_BLOCK_SIZE (%d)\n", __func__, __LINE__, frame->header.blocksize, FLAC__MAX_BLOCK_SIZE) ;
-		psf->error = SFE_INTERNAL ;
-		return 0 ;
-		} ;
-
-	if (frame->header.blocksize > pflac->wbuffer_size)
-	{	psf_log_printf (psf, "Ooops : frame->header.blocksize (%d) > pflac->wbuffer_size (%d)\n", __func__, __LINE__, frame->header.blocksize, pflac->wbuffer_size) ;
 		psf->error = SFE_INTERNAL ;
 		return 0 ;
 		} ;
@@ -400,7 +393,6 @@ sf_flac_write_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC
 	pflac->bufferpos = 0 ;
 
 	pflac->wbuffer = buffer ;
-	pflac->wbuffer_size = pflac->frame->header.blocksize ;
 
 	flac_buffer_copy (psf) ;
 
@@ -956,7 +948,10 @@ flac_read_loop (SF_PRIVATE *psf, unsigned len)
 	/* Decode some more. */
 	while (pflac->pos < pflac->len)
 	{	if (FLAC__stream_decoder_process_single (pflac->fsd) == 0)
+		{	/* Current frame is busted, so NULL the pointer. */
+			pflac->frame = NULL ;
 			break ;
+			} ;
 		state = FLAC__stream_decoder_get_state (pflac->fsd) ;
 		if (state >= FLAC__STREAM_DECODER_END_OF_STREAM)
 		{	psf_log_printf (psf, "FLAC__stream_decoder_get_state returned %s\n", FLAC__StreamDecoderStateString [state]) ;
