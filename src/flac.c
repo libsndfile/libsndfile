@@ -948,7 +948,11 @@ flac_read_loop (SF_PRIVATE *psf, unsigned len)
 	/* Decode some more. */
 	while (pflac->pos < pflac->len)
 	{	if (FLAC__stream_decoder_process_single (pflac->fsd) == 0)
+		{	psf_log_printf (psf, "FLAC__stream_decoder_process_single returned false\n") ;
+			/* Current frame is busted, so NULL the pointer. */
+			pflac->frame = NULL ;
 			break ;
+			} ;
 		state = FLAC__stream_decoder_get_state (pflac->fsd) ;
 		if (state >= FLAC__STREAM_DECODER_END_OF_STREAM)
 		{	psf_log_printf (psf, "FLAC__stream_decoder_get_state returned %s\n", FLAC__StreamDecoderStateString [state]) ;
