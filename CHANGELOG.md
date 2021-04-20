@@ -94,5 +94,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   credit to OSS-Fuzz ([issue 26026](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=26026)).
 * Index out of bounds in `psf_nms_adpcm_decode_block`(), credit to OSS-Fuzz
   ([issue 25561](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25561)).
+* Heap buffer overflow in `flac_buffer_copy`(), thanks @yuawn,  @bobsayshilol.
 
 [Unreleased]: https://github.com/libsndfile/libsndfile/compare/1.0.31...HEAD
