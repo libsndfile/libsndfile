@@ -282,148 +282,69 @@ double64_init	(SF_PRIVATE *psf)
 
 double
 double64_be_read (const unsigned char *cptr)
-{	int		exponent, negative, upper, lower ;
+{
 	double	dvalue ;
+	uint8_t *dbytes = (uint8_t *) &dvalue ;
 
-	negative = (cptr [0] & 0x80) ? 1 : 0 ;
-	exponent = ((cptr [0] & 0x7F) << 4) | ((cptr [1] >> 4) & 0xF) ;
-
-	/* Might not have a 64 bit long, so load the mantissa into a double. */
-	upper = (((cptr [1] & 0xF) << 24) | (cptr [2] << 16) | (cptr [3] << 8) | cptr [4]) ;
-	lower = (cptr [5] << 16) | (cptr [6] << 8) | cptr [7] ;
-
-	if (exponent == 0 && upper == 0 && lower == 0)
-		return 0.0 ;
-
-	dvalue = upper + lower / ((double) 0x1000000) ;
-	dvalue += 0x10000000 ;
-
-	exponent = exponent - 0x3FF ;
-
-	dvalue = dvalue / ((double) 0x10000000) ;
-
-	if (negative)
-		dvalue *= -1 ;
-
-	if (exponent > 0)
-		dvalue *= pow (2.0, exponent) ;
-	else if (exponent < 0)
-		dvalue /= pow (2.0, abs (exponent)) ;
+	dbytes [0] = cptr [7] ;
+	dbytes [1] = cptr [6] ;
+	dbytes [2] = cptr [5] ;
+	dbytes [3] = cptr [4] ;
+	dbytes [4] = cptr [3] ;
+	dbytes [5] = cptr [2] ;
+	dbytes [6] = cptr [1] ;
+	dbytes [7] = cptr [0] ;
 
 	return dvalue ;
 } /* double64_be_read */
 
 double
 double64_le_read (const unsigned char *cptr)
-{	int		exponent, negative, upper, lower ;
+{
 	double	dvalue ;
+	uint8_t *dbytes = (uint8_t *) &dvalue ;
 
-	negative = (cptr [7] & 0x80) ? 1 : 0 ;
-	exponent = ((cptr [7] & 0x7F) << 4) | ((cptr [6] >> 4) & 0xF) ;
-
-	/* Might not have a 64 bit long, so load the mantissa into a double. */
-	upper = ((cptr [6] & 0xF) << 24) | (cptr [5] << 16) | (cptr [4] << 8) | cptr [3] ;
-	lower = (cptr [2] << 16) | (cptr [1] << 8) | cptr [0] ;
-
-	if (exponent == 0 && upper == 0 && lower == 0)
-		return 0.0 ;
-
-	dvalue = upper + lower / ((double) 0x1000000) ;
-	dvalue += 0x10000000 ;
-
-	exponent = exponent - 0x3FF ;
-
-	dvalue = dvalue / ((double) 0x10000000) ;
-
-	if (negative)
-		dvalue *= -1 ;
-
-	if (exponent > 0)
-		dvalue *= pow (2.0, exponent) ;
-	else if (exponent < 0)
-		dvalue /= pow (2.0, abs (exponent)) ;
+	dbytes [0] = cptr [0] ;
+	dbytes [1] = cptr [1] ;
+	dbytes [2] = cptr [2] ;
+	dbytes [3] = cptr [3] ;
+	dbytes [4] = cptr [4] ;
+	dbytes [5] = cptr [5] ;
+	dbytes [6] = cptr [6] ;
+	dbytes [7] = cptr [7] ;
 
 	return dvalue ;
 } /* double64_le_read */
 
 void
 double64_be_write (double in, unsigned char *out)
-{	int		exponent, mantissa ;
+{
 
-	memset (out, 0, sizeof (double)) ;
+	uint8_t *dbytes = (uint8_t *) &in ;
 
-	if (fabs (in) < 1e-30)
-		return ;
-
-	if (in < 0.0)
-	{	in *= -1.0 ;
-		out [0] |= 0x80 ;
-		} ;
-
-	in = frexp (in, &exponent) ;
-
-	exponent += 1022 ;
-
-	out [0] |= (exponent >> 4) & 0x7F ;
-	out [1] |= (exponent << 4) & 0xF0 ;
-
-	in *= 0x20000000 ;
-	mantissa = psf_lrint (floor (in)) ;
-
-	out [1] |= (mantissa >> 24) & 0xF ;
-	out [2] = (mantissa >> 16) & 0xFF ;
-	out [3] = (mantissa >> 8) & 0xFF ;
-	out [4] = mantissa & 0xFF ;
-
-	in = fmod (in, 1.0) ;
-	in *= 0x1000000 ;
-	mantissa = psf_lrint (floor (in)) ;
-
-	out [5] = (mantissa >> 16) & 0xFF ;
-	out [6] = (mantissa >> 8) & 0xFF ;
-	out [7] = mantissa & 0xFF ;
-
-	return ;
+	out[0] = dbytes[7];
+	out[1] = dbytes[6];
+	out[2] = dbytes[5];
+	out[3] = dbytes[4];
+	out[4] = dbytes[3];
+	out[5] = dbytes[2];
+	out[6] = dbytes[1];
+	out[7] = dbytes[0];
 } /* double64_be_write */
 
 void
 double64_le_write (double in, unsigned char *out)
-{	int		exponent, mantissa ;
+{
+	uint8_t *dbytes = (uint8_t *) &in ;
 
-	memset (out, 0, sizeof (double)) ;
-
-	if (fabs (in) < 1e-30)
-		return ;
-
-	if (in < 0.0)
-	{	in *= -1.0 ;
-		out [7] |= 0x80 ;
-		} ;
-
-	in = frexp (in, &exponent) ;
-
-	exponent += 1022 ;
-
-	out [7] |= (exponent >> 4) & 0x7F ;
-	out [6] |= (exponent << 4) & 0xF0 ;
-
-	in *= 0x20000000 ;
-	mantissa = psf_lrint (floor (in)) ;
-
-	out [6] |= (mantissa >> 24) & 0xF ;
-	out [5] = (mantissa >> 16) & 0xFF ;
-	out [4] = (mantissa >> 8) & 0xFF ;
-	out [3] = mantissa & 0xFF ;
-
-	in = fmod (in, 1.0) ;
-	in *= 0x1000000 ;
-	mantissa = psf_lrint (floor (in)) ;
-
-	out [2] = (mantissa >> 16) & 0xFF ;
-	out [1] = (mantissa >> 8) & 0xFF ;
-	out [0] = mantissa & 0xFF ;
-
-	return ;
+	out [0] = dbytes [0] ;
+	out [1] = dbytes [1] ;
+	out [2] = dbytes [2] ;
+	out [3] = dbytes [3] ;
+	out [4] = dbytes [4] ;
+	out [5] = dbytes [5] ;
+	out [6] = dbytes [6] ;
+	out [7] = dbytes [7] ;
 } /* double64_le_write */
 
 /*==============================================================================================

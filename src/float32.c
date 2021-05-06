@@ -253,128 +253,52 @@ float32_init	(SF_PRIVATE *psf)
 
 float
 float32_be_read (const unsigned char *cptr)
-{	int		exponent, mantissa, negative ;
+{
 	float	fvalue ;
+	uint8_t *fbytes = (uint8_t *) &fvalue ;
 
-	negative = cptr [0] & 0x80 ;
-	exponent = ((cptr [0] & 0x7F) << 1) | ((cptr [1] & 0x80) ? 1 : 0) ;
-	mantissa = ((cptr [1] & 0x7F) << 16) | (cptr [2] << 8) | (cptr [3]) ;
-
-	if (! (exponent || mantissa))
-		return 0.0 ;
-
-	mantissa |= 0x800000 ;
-	exponent = exponent ? exponent - 127 : 0 ;
-
-	fvalue = mantissa ? ((float) mantissa) / ((float) 0x800000) : 0.0 ;
-
-	if (negative)
-		fvalue *= -1 ;
-
-	if (exponent > 0)
-		fvalue *= pow (2.0, exponent) ;
-	else if (exponent < 0)
-		fvalue /= pow (2.0, abs (exponent)) ;
+	fbytes [0] = cptr[3] ;
+	fbytes [1] = cptr[2] ;
+	fbytes [2] = cptr[1] ;
+	fbytes [3] = cptr[0] ;
 
 	return fvalue ;
 } /* float32_be_read */
 
 float
 float32_le_read (const unsigned char *cptr)
-{	int		exponent, mantissa, negative ;
+{
 	float	fvalue ;
+	uint8_t *fbytes = (uint8_t *) &fvalue ;
 
-	negative = cptr [3] & 0x80 ;
-	exponent = ((cptr [3] & 0x7F) << 1) | ((cptr [2] & 0x80) ? 1 : 0) ;
-	mantissa = ((cptr [2] & 0x7F) << 16) | (cptr [1] << 8) | (cptr [0]) ;
-
-	if (! (exponent || mantissa))
-		return 0.0 ;
-
-	mantissa |= 0x800000 ;
-	exponent = exponent ? exponent - 127 : 0 ;
-
-	fvalue = mantissa ? ((float) mantissa) / ((float) 0x800000) : 0.0 ;
-
-	if (negative)
-		fvalue *= -1 ;
-
-	if (exponent > 0)
-		fvalue *= pow (2.0, exponent) ;
-	else if (exponent < 0)
-		fvalue /= pow (2.0, abs (exponent)) ;
+	fbytes [0] = cptr [0] ;
+	fbytes [1] = cptr [1] ;
+	fbytes [2] = cptr [2] ;
+	fbytes [3] = cptr [3] ;
 
 	return fvalue ;
 } /* float32_le_read */
 
 void
 float32_le_write (float in, unsigned char *out)
-{	int		exponent, mantissa, negative = 0 ;
+{
+	uint8_t *fbytes = (uint8_t *) &in ;
 
-	memset (out, 0, sizeof (int)) ;
-
-	if (fabs (in) < 1e-30)
-		return ;
-
-	if (in < 0.0)
-	{	in *= -1.0 ;
-		negative = 1 ;
-		} ;
-
-	in = frexp (in, &exponent) ;
-
-	exponent += 126 ;
-
-	in *= (float) 0x1000000 ;
-	mantissa = (((int) in) & 0x7FFFFF) ;
-
-	if (negative)
-		out [3] |= 0x80 ;
-
-	if (exponent & 0x01)
-		out [2] |= 0x80 ;
-
-	out [0] = mantissa & 0xFF ;
-	out [1] = (mantissa >> 8) & 0xFF ;
-	out [2] |= (mantissa >> 16) & 0x7F ;
-	out [3] |= (exponent >> 1) & 0x7F ;
-
-	return ;
+	out [0] = fbytes [0] ;
+	out [1] = fbytes [1] ;
+	out [2] = fbytes [2] ;
+	out [3] = fbytes [3] ;
 } /* float32_le_write */
 
 void
 float32_be_write (float in, unsigned char *out)
-{	int		exponent, mantissa, negative = 0 ;
+{
+	uint8_t *fbytes = (uint8_t *) &in ;
 
-	memset (out, 0, sizeof (int)) ;
-
-	if (fabs (in) < 1e-30)
-		return ;
-
-	if (in < 0.0)
-	{	in *= -1.0 ;
-		negative = 1 ;
-		} ;
-
-	in = frexp (in, &exponent) ;
-
-	exponent += 126 ;
-
-	in *= (float) 0x1000000 ;
-	mantissa = (((int) in) & 0x7FFFFF) ;
-
-	if (negative)
-		out [0] |= 0x80 ;
-
-	if (exponent & 0x01)
-		out [1] |= 0x80 ;
-
-	out [3] = mantissa & 0xFF ;
-	out [2] = (mantissa >> 8) & 0xFF ;
-	out [1] |= (mantissa >> 16) & 0x7F ;
-	out [0] |= (exponent >> 1) & 0x7F ;
-
-	return ;
+	out [0] = fbytes [3] ;
+	out [1] = fbytes [2] ;
+	out [2] = fbytes [1] ;
+	out [3] = fbytes [0] ;
 } /* float32_be_write */
 
 /*==============================================================================================
