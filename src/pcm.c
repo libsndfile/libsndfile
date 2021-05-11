@@ -570,16 +570,9 @@ s2bet_array (const short *src, tribyte *dest, int count)
 
 static inline void
 s2lei_array (const short *src, int *dest, int count)
-{	unsigned char	*ucptr ;
-
-	ucptr = ((unsigned char*) dest) + 4 * count ;
-	while (--count >= 0)
-	{	ucptr -= 4 ;
-		ucptr [0] = 0 ;
-		ucptr [1] = 0 ;
-		ucptr [2] = src [count] ;
-		ucptr [3] = src [count] >> 8 ;
-		} ;
+{
+	for (int i = 0 ; i < count ; i++)
+		dest [i] = arith_shift_left (src [i], 16) ;
 } /* s2lei_array */
 
 static inline void
