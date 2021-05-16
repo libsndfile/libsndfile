@@ -27,6 +27,14 @@ set (SNDFILE_ABI_VERSION_PATCH 31)
 set (SNDFILE_ABI_VERSION "${SNDFILE_ABI_VERSION_MAJOR}.${SNDFILE_ABI_VERSION_MINOR}.${SNDFILE_ABI_VERSION_PATCH}")
 
 #
+# Apple platform current and compatibility versions.
+#
+
+math (EXPR SNDFILE_MACHO_CURRENT_VERSION_MAJOR "${SNDFILE_ABI_VERSION_MAJOR} + ${SNDFILE_ABI_VERSION_MINOR} + 1")
+set (SNDFILE_MACHO_CURRENT_VERSION "${SNDFILE_MACHO_CURRENT_VERSION_MAJOR}.${SNDFILE_ABI_VERSION_PATCH}.0")
+set (SNDFILE_MACHO_COMPATIBILITY_VERSION "${SNDFILE_MACHO_CURRENT_VERSION_MAJOR}.0.0")
+
+#
 # Variables
 #
 
@@ -410,10 +418,22 @@ if (BUILD_SHARED_LIBS)
 		target_sources (sndfile PRIVATE ${PROJECT_BINARY_DIR}/src/version-metadata.rc)
 	endif ()
 
+
 	set_target_properties (sndfile PROPERTIES
 		SOVERSION ${SNDFILE_ABI_VERSION_MAJOR}
 		VERSION ${SNDFILE_ABI_VERSION}
 		)
+
+	if (APPLE)
+		if (NOT (CMAKE_VERSION VERSION_LESS 3.17))
+			set_target_properties (sndfile PROPERTIES
+				MACHO_CURRENT_VERSION ${SNDFILE_MACHO_CURRENT_VERSION}
+				MACHO_COMPATIBILITY_VERSION ${SNDFILE_MACHO_COMPATIBILITY_VERSION}
+				)
+		else ()
+			message (FATAL_ERROR "Apple platform requires cmake >= 3.17 to build dylib.")
+		endif ()
+	endif ()
 
 	# Symbol files generation
 

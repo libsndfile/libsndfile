@@ -83,6 +83,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   ([issue 27366](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=27366)).
 * Integer overflow in `nms_adpcm_update`(), credit to OSS-Fuzz
   ([issue 25522](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25522)).
+* ABI version incompatibility between Autotools and CMake build on Apple
+  platforms.
+
+  Now ABI must be compatible with Autotools builds. Note that this change
+  requires CMake >= 3.17 for building dylib on Apple platforms.
 
 ### Security
 
