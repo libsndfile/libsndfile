@@ -135,19 +135,19 @@ src_ALAC_libalac_la_SOURCES = src/ALAC/ALACAudioTypes.h src/ALAC/ALACBitUtilitie
 SYMBOL_SCRIPT = $(top_srcdir)/src/create_symbols_file.py
 
 src/Symbols.gnu-binutils: $(SYMBOL_SCRIPT)
-	$(PYTHON) $(SYMBOL_SCRIPT) linux $(VERSION) > $(top_srcdir)/$@
+	$(PYTHON) $(SYMBOL_SCRIPT) linux $(ABI_VERSION) > $(top_srcdir)/$@
 
 src/Symbols.darwin: $(SYMBOL_SCRIPT)
-	$(PYTHON) $(SYMBOL_SCRIPT) darwin $(VERSION) > $(top_srcdir)/$@
+	$(PYTHON) $(SYMBOL_SCRIPT) darwin $(ABI_VERSION) > $(top_srcdir)/$@
 
 src/libsndfile-1.def: $(SYMBOL_SCRIPT)
-	$(PYTHON) $(SYMBOL_SCRIPT) win32 $(VERSION) > $(top_srcdir)/$@
+	$(PYTHON) $(SYMBOL_SCRIPT) win32 $(ABI_VERSION) > $(top_srcdir)/$@
 
 src/Symbols.os2: $(SYMBOL_SCRIPT)
-	$(PYTHON) $(SYMBOL_SCRIPT) os2 $(VERSION) > $(top_srcdir)/$@
+	$(PYTHON) $(SYMBOL_SCRIPT) os2 $(ABI_VERSION) > $(top_srcdir)/$@
 
 src/Symbols.static: $(SYMBOL_SCRIPT)
-	$(PYTHON) $(SYMBOL_SCRIPT) static $(VERSION) > $(top_srcdir)/$@
+	$(PYTHON) $(SYMBOL_SCRIPT) static $(ABI_VERSION) > $(top_srcdir)/$@
 
 #===============================================================================
 # Building windows resource files (if needed).

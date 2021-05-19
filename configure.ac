@@ -84,7 +84,20 @@ dnl   5. If any interfaces have been added since the last public release, then i
 dnl      age.
 dnl   6. If any interfaces have been removed since the last public release, then set age
 dnl      to 0.
-SHARED_VERSION_INFO="1:31:0"
+
+dnl   This is libtool version of library, we add it to `--version-info` property.
+
+m4_define([lt_current], [1])
+m4_define([lt_revision], [31])
+m4_define([lt_age], [0])
+
+dnl This is ABI version for linker scripts, CMake uses the same format for
+dnl VERSION property of shared library.
+dnl The formula is: c:r:a -> c-a:a:r
+
+m4_define([abi_version_major], [m4_eval(lt_current - lt_age)])
+m4_define([abi_version_minor], [lt_age])
+m4_define([abi_version_patch], [lt_revision])
 
 dnl ------------------------------------------------------------------------------------
 
@@ -706,7 +719,8 @@ AC_SUBST(HTML_BGCOLOUR)
 AC_SUBST(HTML_FGCOLOUR)
 
 AC_SUBST(SHLIB_VERSION_ARG)
-AC_SUBST(SHARED_VERSION_INFO)
+AC_SUBST([SHARED_VERSION_INFO], [lt_current:lt_revision:lt_age])
+AC_SUBST([ABI_VERSION], [abi_version_major.abi_version_minor.abi_version_patch])
 AC_SUBST(CLEAN_VERSION)
 AC_SUBST(VERSION_MAJOR)
 AC_SUBST(GEN_TOOL)
