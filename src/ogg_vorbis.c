@@ -552,13 +552,19 @@ vorbis_rshort (SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, 
 		float inverse = 1.0 / psf->float_max ;
 		for (j = 0 ; j < samples ; j++)
 			for (n = 0 ; n < channels ; n++)
-				ptr [i++] = psf_lrintf ((pcm [n][j] * inverse) * 32767.0f) ;
+			{
+				int x = psf_lrintf ((pcm [n][j] * inverse) * 32767.0f) ;
+				ptr [i++] = x > SHRT_MAX ? SHRT_MAX : x < SHRT_MIN ? SHRT_MIN : x ;
+			}
 	}
 	else
 	{
 		for (j = 0 ; j < samples ; j++)
 			for (n = 0 ; n < channels ; n++)
-				ptr [i++] = psf_lrintf (pcm [n][j] * 32767.0f) ;
+			{
+				int x = psf_lrintf (pcm [n][j] * 32767.0f) ;
+				ptr [i++] = x > SHRT_MAX ? SHRT_MAX : x < SHRT_MIN ? SHRT_MIN : x ;
+			}
 	}
 	return i ;
 } /* vorbis_rshort */
