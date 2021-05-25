@@ -18,23 +18,6 @@ endif ()
 project(libsndfile VERSION 1.0.31)
 
 #
-# ABI version of library.
-#
-
-set (SNDFILE_ABI_VERSION_MAJOR 1)
-set (SNDFILE_ABI_VERSION_MINOR 0)
-set (SNDFILE_ABI_VERSION_PATCH 31)
-set (SNDFILE_ABI_VERSION "${SNDFILE_ABI_VERSION_MAJOR}.${SNDFILE_ABI_VERSION_MINOR}.${SNDFILE_ABI_VERSION_PATCH}")
-
-#
-# Apple platform current and compatibility versions.
-#
-
-math (EXPR SNDFILE_MACHO_CURRENT_VERSION_MAJOR "${SNDFILE_ABI_VERSION_MAJOR} + ${SNDFILE_ABI_VERSION_MINOR} + 1")
-set (SNDFILE_MACHO_CURRENT_VERSION "${SNDFILE_MACHO_CURRENT_VERSION_MAJOR}.${SNDFILE_ABI_VERSION_PATCH}.0")
-set (SNDFILE_MACHO_COMPATIBILITY_VERSION "${SNDFILE_MACHO_CURRENT_VERSION_MAJOR}.0.0")
-
-#
 # Variables
 #
 
@@ -405,6 +388,28 @@ if (ENABLE_COMPATIBLE_LIBSNDFILE_NAME)
 endif ()
 
 if (BUILD_SHARED_LIBS)
+
+	#
+	# ABI version of library.
+	#
+
+	#
+	# Read libtool version from `configure.ac` and set libsndfile ABI version:
+	#
+	#   SNDFILE_ABI_VERSION_MAJOR
+	#   SNDFILE_ABI_VERSION_MINOR
+	#   SNDFILE_ABI_VERSION_PATCH
+	#   SNDFILE_ABI_VERSION
+	#
+	# and Mach-O current and compatibility versions:
+	#
+	#   SNDFILE_MACHO_CURRENT_VERSION
+	#   SNDFILE_MACHO_COMPATIBILITY_VERSION
+	#
+
+	include (SetupABIVersions)
+
+	setup_abi_versions()
 
 	if (WIN32)
 		set (VERSION_MAJOR ${CPACK_PACKAGE_VERSION_MAJOR})
