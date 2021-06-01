@@ -100,5 +100,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Index out of bounds in `psf_nms_adpcm_decode_block`(), credit to OSS-Fuzz
   ([issue 25561](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25561)).
 * Heap buffer overflow in `flac_buffer_copy`(), thanks @yuawn,  @bobsayshilol.
+* Heap buffer overflow in `copyPredictorTo24`(), thanks @bobsayshilol,
+  credit to OSS-Fuzz ([issue 27503](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=27503)).
+
 
 [Unreleased]: https://github.com/libsndfile/libsndfile/compare/1.0.31...HEAD
