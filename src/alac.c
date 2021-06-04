@@ -750,7 +750,7 @@ alac_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
-		convert (ptr, iptr, writecount, psf->norm_float) ;
+		convert (ptr, iptr, writecount, psf->norm_double) ;
 
 		plac->partial_block_frames += writecount / plac->channels ;
 		total += writecount ;
