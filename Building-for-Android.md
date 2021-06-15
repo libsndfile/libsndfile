@@ -43,4 +43,4 @@ cd build
 make [-j <number of parallel jobs>]
 ```
 
-This will build libsndfile for android
+This will build libsndfile for android.
