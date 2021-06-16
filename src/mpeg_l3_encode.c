@@ -42,7 +42,7 @@ typedef struct
 	size_t block_len ;
 	int frame_samples ;
 	double compression ;
-	int initialized : 1 ;
+	int initialized ;
 } MPEG_L3_ENC_PRIVATE ;
 
 
