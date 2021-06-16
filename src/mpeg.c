@@ -40,7 +40,7 @@ mpeg_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		return 0 ;
 
 	return mpeg_l3_encoder_write_id3tag (psf) ;
-} ;
+}
 
 static int
 mpeg_command (SF_PRIVATE *psf, int command, void *data, int datasize)
