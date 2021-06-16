@@ -702,7 +702,7 @@ AS_IF([test "$HOST_TRIPLET" = "x86_64-w64-mingw32"], [
 		OS_SPECIFIC_LINKS=" -static-libgcc $OS_SPECIFIC_LINKS"
 	])
 
-WIN_RC_VERSION=`echo $PACKAGE_VERSION | $SED -e "s/p.*//" -e "s/\./,/g"`
+WIN_RC_VERSION=`echo $PACKAGE_VERSION | $SED -e "s/pre.*//" -e "s/beta.*//" -e "s/\./,/g"`
 
 
 AS_IF([test "x$enable_static" = "xno"], [
