@@ -89,6 +89,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Now ABI must be compatible with Autotools builds. Note that this change
   requires CMake >= 3.17 for building dylib on Apple platforms.
 
+* Fix build with Autotools + MinGW toolchain on Windows platform.
+
+  See https://github.com/msys2/MINGW-packages/issues/5803 for details.
+
 ### Security
 
 * Heap buffer overflow in `wavlike_ima_decode_block`(), thanks @bobsayshilol,
