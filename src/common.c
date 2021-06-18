@@ -1659,8 +1659,8 @@ psf_f2s_array (const float *src, short *dest, int count, int normalize)
 {	float 			normfact ;
 
 	normfact = normalize ? (1.0 * 0x7FFF) : 1.0 ;
-	while (--count >= 0)
-		dest [count] = psf_lrintf (src [count] * normfact) ;
+	for (int i = 0 ; i < count ; i++)
+		dest [i] = psf_lrintf (src [i] * normfact) ;
 
 	return ;
 } /* psf_f2s_array */
@@ -1671,22 +1671,22 @@ psf_f2s_clip_array (const float *src, short *dest, int count, int normalize)
 
 	normfact = normalize ? (1.0 * 0x8000) : 1.0 ;
 
-	while (--count >= 0)
-	{	scaled_value = src [count] * normfact ;
+	for (int i = 0 ; i < count ; i++)
+	{	scaled_value = src [i] * normfact ;
 #if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFF))
-		{	dest [count] = 0x7FFF ;
+		{	dest [i] = 0x7FFF ;
 			continue ;
 			} ;
 #endif
 #if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x1000))
-		{	dest [count] = -0x7FFF - 1 ;
+		{	dest [i] = -0x7FFF - 1 ;
 			continue ;
 			} ;
 #endif
 
-		dest [count] = psf_lrintf (scaled_value) ;
+		dest [i] = psf_lrintf (scaled_value) ;
 		} ;
 
 	return ;
@@ -1697,8 +1697,8 @@ psf_d2s_array (const double *src, short *dest, int count, int normalize)
 {	double 			normfact ;
 
 	normfact = normalize ? (1.0 * 0x7FFF) : 1.0 ;
-	while (--count >= 0)
-		dest [count] = psf_lrint (src [count] * normfact) ;
+	for (int i = 0 ; i < count ; i++)
+		dest [i] = psf_lrint (src [i] * normfact) ;
 
 	return ;
 } /* psf_f2s_array */
@@ -1709,22 +1709,22 @@ psf_d2s_clip_array (const double *src, short *dest, int count, int normalize)
 
 	normfact = normalize ? (1.0 * 0x8000) : 1.0 ;
 
-	while (--count >= 0)
-	{	scaled_value = src [count] * normfact ;
+	for (int i = 0 ; i < count ; i++)
+	{	scaled_value = src [i] * normfact ;
 #if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFF))
-		{	dest [count] = 0x7FFF ;
+		{	dest [i] = 0x7FFF ;
 			continue ;
 			} ;
 #endif
 #if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x1000))
-		{	dest [count] = -0x7FFF - 1 ;
+		{	dest [i] = -0x7FFF - 1 ;
 			continue ;
 			} ;
 #endif
 
-		dest [count] = psf_lrint (scaled_value) ;
+		dest [i] = psf_lrint (scaled_value) ;
 		} ;
 
 	return ;
@@ -1736,8 +1736,8 @@ psf_f2i_array (const float *src, int *dest, int count, int normalize)
 {	float 			normfact ;
 
 	normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0 ;
-	while (--count >= 0)
-		dest [count] = psf_lrintf (src [count] * normfact) ;
+	for (int i = 0 ; i < count ; i++)
+		dest [i] = psf_lrintf (src [i] * normfact) ;
 
 	return ;
 } /* psf_f2i_array */
@@ -1748,22 +1748,22 @@ psf_f2i_clip_array (const float *src, int *dest, int count, int normalize)
 
 	normfact = normalize ? (8.0 * 0x10000000) : 1.0 ;
 
-	while (--count >= 0)
-	{	scaled_value = src [count] * normfact ;
+	for (int i = 0 ; i < count ; i++)
+	{	scaled_value = src [i] * normfact ;
 #if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFFFF))
-		{	dest [count] = 0x7FFFFFFF ;
+		{	dest [i] = 0x7FFFFFFF ;
 			continue ;
 			} ;
 #endif
 #if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
-		{	dest [count] = 0x80000000 ;
+		{	dest [i] = 0x80000000 ;
 			continue ;
 			} ;
 #endif
 
-		dest [count] = psf_lrintf (scaled_value) ;
+		dest [i] = psf_lrintf (scaled_value) ;
 		} ;
 
 	return ;
@@ -1774,8 +1774,8 @@ psf_d2i_array (const double *src, int *dest, int count, int normalize)
 {	double 			normfact ;
 
 	normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0 ;
-	while (--count >= 0)
-		dest [count] = psf_lrint (src [count] * normfact) ;
+	for (int i = 0 ; i < count ; i++)
+		dest [i] = psf_lrint (src [i] * normfact) ;
 
 	return ;
 } /* psf_f2i_array */
@@ -1786,22 +1786,22 @@ psf_d2i_clip_array (const double *src, int *dest, int count, int normalize)
 
 	normfact = normalize ? (8.0 * 0x10000000) : 1.0 ;
 
-	while (--count >= 0)
-	{	scaled_value = src [count] * normfact ;
+	for (int i = 0 ; i < count ; i++)
+	{	scaled_value = src [i] * normfact ;
 #if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFFFF))
-		{	dest [count] = 0x7FFFFFFF ;
+		{	dest [i] = 0x7FFFFFFF ;
 			continue ;
 			} ;
 #endif
 #if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
-		{	dest [count] = 0x80000000 ;
+		{	dest [i] = 0x80000000 ;
 			continue ;
 			} ;
 #endif
 
-		dest [count] = psf_lrint (scaled_value) ;
+		dest [i] = psf_lrint (scaled_value) ;
 		} ;
 
 	return ;

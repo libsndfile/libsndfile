@@ -107,8 +107,8 @@ static sf_count_t mpeg_dec_decode (SF_PRIVATE *psf, MPEG_DEC_PRIVATE *pmp3d, flo
 
 static inline void
 f2s_array (const float *src, int count, short *dest)
-{	while (--count >= 0)
-	{	dest [count] = psf_lrintf (src [count] * (float) 0x7FFF) ;
+{	for (int i = 0 ; i < count ; i++)
+	{	dest [i] = psf_lrintf (src [i] * (float) 0x7FFF) ;
 		} ;
 } /* f2s_array */
 
@@ -137,8 +137,8 @@ mpeg_dec_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 
 static inline void
 f2i_array (const float *src, int count, int *dest)
-{	while (--count >= 0)
-	{	dest [count] = psf_lrintf (src [count] * (float) 0x7FFFFFFF) ;
+{	for (int i = 0 ; i < count ; i++)
+	{	dest [i] = psf_lrintf (src [i] * (float) 0x7FFFFFFF) ;
 		} ;
 } /* f2i_array */
 
@@ -178,8 +178,8 @@ mpeg_dec_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 	if (psf->norm_float == SF_FALSE)
 	{	count = done ;
-		while (--count >= 0)
-		{	ptr [count] *= (double) 0x8000 ;
+		for (int i = 0 ; i < count ; i++)
+		{	ptr [i] *= (double) 0x8000 ;
 			} ;
 		} ;
 
