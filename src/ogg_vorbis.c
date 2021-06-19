@@ -512,6 +512,15 @@ ogg_vorbis_open (SF_PRIVATE *psf)
 	psf->sf.format = SF_FORMAT_OGG | SF_FORMAT_VORBIS ;
 	psf->sf.sections = 1 ;
 
+
+	/*
+	** Vorbis appears prone to increasing the amplitude of some signals. Encoded
+	** signals close to 0db may exceede 0db on decode. Set clipping on by
+	** default. The performance hit is trivial compared to the rest of the
+	** decoder.
+	*/
+	psf->add_clipping = SF_TRUE ;
+
 	return error ;
 } /* ogg_vorbis_open */
 
