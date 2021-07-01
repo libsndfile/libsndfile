@@ -235,7 +235,7 @@ You can find related option in Visual Studio project properties:
 
     C/C++ -> Code Generation -> Runtime Library
 
-Dynamic version of system CRT library is defaut and it means that end user needs
+Dynamic version of system CRT library is default and it means that end user needs
 to have the same runtime library installed on his system. Most likely it is so,
 but if it is not, the user will see this error message using libsndfile DLL:
 
