@@ -84,8 +84,10 @@ mpeg_dec_close (SF_PRIVATE *psf)
 	return 0 ;
 } /* mpeg_dec_close */
 
-static sf_count_t mpeg_dec_decode (SF_PRIVATE *psf, MPEG_DEC_PRIVATE *pmp3d, float *ptr, sf_count_t len)
-{	size_t done ;
+static sf_count_t
+mpeg_dec_decode (SF_PRIVATE *psf, float *ptr, sf_count_t len)
+{	MPEG_DEC_PRIVATE *pmp3d = (MPEG_DEC_PRIVATE *) psf->codec_data ;
+	size_t done ;
 	int error ;
 
 	error = mpg123_read (pmp3d->pmh, (unsigned char *) ptr, len * sizeof (float), &done) ;
@@ -105,85 +107,58 @@ static sf_count_t mpeg_dec_decode (SF_PRIVATE *psf, MPEG_DEC_PRIVATE *pmp3d, flo
 	return -1 ;
 } /* mpeg_dec_decode */
 
-static inline void
-f2s_array (const float *src, int count, short *dest)
-{	for (int i = 0 ; i < count ; i++)
-	{	dest [i] = psf_lrintf (src [i] * (float) 0x7FFF) ;
-		} ;
-} /* f2s_array */
-
 static sf_count_t
 mpeg_dec_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 {	BUF_UNION ubuf ;
-	MPEG_DEC_PRIVATE *pmp3d = (MPEG_DEC_PRIVATE *) psf->codec_data ;
-	sf_count_t total = 0 ;
-	sf_count_t done ;
+	sf_count_t total, readlen ;
+	void (*convert) (const float *, short *, int, int) ;
 	const sf_count_t buflen = ARRAY_LEN (ubuf.fbuf) ;
 
-	while (len > 0)
-	{	done = mpeg_dec_decode (psf, pmp3d, ubuf.fbuf, SF_MIN (buflen, len)) ;
-
-		if (done <= 0)
+	convert = (psf->add_clipping) ? psf_f2s_clip_array : psf_f2s_array ;
+	for (total = 0 ; total < len ; total += readlen)
+	{	readlen = mpeg_dec_decode (psf, ubuf.fbuf, SF_MIN (buflen, len - total)) ;
+		if (readlen <= 0)
 			break ;
 
-		f2s_array (ubuf.fbuf, done, ptr + total) ;
-
-		total += done ;
-		len -= done ;
-		}
+		convert (ubuf.fbuf, ptr + total, readlen, SF_TRUE) ;
+		} ;
 
 	return total ;
 } /*mpeg_dec_read_s */
 
-static inline void
-f2i_array (const float *src, int count, int *dest)
-{	for (int i = 0 ; i < count ; i++)
-	{	dest [i] = psf_lrintf (src [i] * (float) 0x7FFFFFFF) ;
-		} ;
-} /* f2i_array */
-
 static sf_count_t
 mpeg_dec_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 {	BUF_UNION ubuf ;
-	MPEG_DEC_PRIVATE *pmp3d = (MPEG_DEC_PRIVATE *) psf->codec_data ;
-	sf_count_t total = 0 ;
-	sf_count_t done ;
+	sf_count_t total, readlen ;
+	void (*convert) (const float *, int *, int, int) ;
 	const sf_count_t buflen = ARRAY_LEN (ubuf.fbuf) ;
 
-	while (len > 0)
-	{	done = mpeg_dec_decode (psf, pmp3d, ubuf.fbuf, SF_MIN (buflen, len)) ;
-
-		if (done <= 0)
+	convert = (psf->add_clipping) ? psf_f2i_clip_array : psf_f2i_array ;
+	for (total = 0 ; total < len ; total += readlen)
+	{	readlen = mpeg_dec_decode (psf, ubuf.fbuf, SF_MIN (buflen, len - total)) ;
+		if (readlen <= 0)
 			break ;
 
-		f2i_array (ubuf.fbuf, done, ptr + total) ;
-
-		total += done ;
-		len -= done ;
-		}
+		convert (ubuf.fbuf, ptr + total, readlen, SF_TRUE) ;
+		} ;
 
 	return total ;
 } /* mpeg_dec_read_i */
 
 static sf_count_t
 mpeg_dec_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
-{	MPEG_DEC_PRIVATE *pmp3d = (MPEG_DEC_PRIVATE *) psf->codec_data ;
-	sf_count_t done ;
-	sf_count_t count ;
+{	sf_count_t readlen ;
 
-	done = mpeg_dec_decode (psf, pmp3d, ptr, len) ;
-
-	if (done <= 0)
+	readlen = mpeg_dec_decode (psf, ptr, len) ;
+	if (readlen <= 0)
 		return 0 ;
 
 	if (psf->norm_float == SF_FALSE)
-	{	count = done ;
-		for (int i = 0 ; i < count ; i++)
-		{	ptr [i] *= (double) 0x8000 ;
+		for (int i = 0 ; i < readlen ; i++)
+		{	ptr [i] *= (1.0f * 0x8000) ;
 			} ;
-		} ;
 
-	return done ;
+	return readlen ;
 } /* mpeg_dec_read_f */
 
 static inline void
@@ -195,20 +170,22 @@ f2d_array (const float *src, int count, double *dest, double normfact)
 
 static sf_count_t
 mpeg_dec_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
-{	MPEG_DEC_PRIVATE *pmp3d = (MPEG_DEC_PRIVATE *) psf->codec_data ;
-	sf_count_t done ;
+{	BUF_UNION ubuf ;
+	sf_count_t total, readlen ;
 	double normfact ;
+	const sf_count_t buflen = ARRAY_LEN (ubuf.fbuf) ;
 
-	normfact = (psf->norm_double == SF_TRUE) ? 1.0 : (double) 0x8000 ;
+	normfact = (psf->norm_double == SF_TRUE) ? 1.0 : (1.0 * 0x8000) ;
 
-	done = mpeg_dec_decode (psf, pmp3d, (float *) ptr, len) ;
+	for (total = 0 ; total < len ; total += readlen)
+	{	readlen = mpeg_dec_decode (psf, ubuf.fbuf, SF_MIN (buflen, len - total)) ;
+		if (readlen <= 0)
+			break ;
 
-	if (done <= 0)
-		return 0 ;
+		f2d_array (ubuf.fbuf, readlen, ptr + total, normfact) ;
+		} ;
 
-	f2d_array ((float *) ptr, done, ptr, normfact) ;
-
-	return done ;
+	return total ;
 } /* mpeg_dec_read_d */
 
 static sf_count_t
