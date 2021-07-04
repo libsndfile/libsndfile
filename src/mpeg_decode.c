@@ -188,8 +188,8 @@ mpeg_dec_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 static inline void
 f2d_array (const float *src, int count, double *dest, double normfact)
-{	while (--count >= 0)
-	{	dest [count] = src [count] * normfact ;
+{	for (int i = 0 ; i < count ; i++)
+	{	dest [i] = src [i] * normfact ;
 		}
 } /* f2d_array */
 
