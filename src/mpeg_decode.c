@@ -1,6 +1,6 @@
 /*
+** Copyright (C) 2019 - 2021 Arthur Taylor <art@ified.ca>
 ** Copyright (C) 2019 Erik de Castro Lopo <erikd@mega-nerd.com>
-** Copyright (C) 2019 Arthur Taylor <art@ified.ca>
 **
 ** This program is free software ; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -35,7 +35,6 @@
 typedef struct
 {	mpg123_handle *pmh ;
 	size_t header_remaining ;
-	unsigned unique_id ;
 } MPEG_DEC_PRIVATE ;
 
 static int mpeg_dec_close (SF_PRIVATE *psf) ;
@@ -437,27 +436,27 @@ mpeg_decoder_read_strings_id3v2 (SF_PRIVATE *psf, mpg123_id3v2 *tags)
 			text_frame->description.p, text_frame->text.p) ;
 		} ;
 
-	if (title)
+	if (title != NULL)
 		psf_store_string (psf, SF_STR_TITLE, title) ;
-	if (copyright)
+	if (copyright != NULL)
 		psf_store_string (psf, SF_STR_COPYRIGHT, copyright) ;
-	if (software)
+	if (software != NULL)
 		psf_store_string (psf, SF_STR_SOFTWARE, software) ;
-	if (artist)
+	if (artist != NULL)
 		psf_store_string (psf, SF_STR_ARTIST, artist) ;
-	if (comment)
+	if (comment != NULL)
 		psf_store_string (psf, SF_STR_COMMENT, comment) ;
-	if (date)
+	if (date != NULL)
 		psf_store_string (psf, SF_STR_DATE, date) ;
-	if (album)
+	if (album != NULL)
 		psf_store_string (psf, SF_STR_ALBUM, album) ;
-	if (license)
+	if (license != NULL)
 		psf_store_string (psf, SF_STR_LICENSE, license) ;
-	if (tracknumber)
+	if (tracknumber != NULL)
 		psf_store_string (psf, SF_STR_TRACKNUMBER, tracknumber) ;
-	if (genre)
+	if (genre != NULL)
 		psf_store_string (psf, SF_STR_GENRE, id3_process_v2_genre (genre)) ;
-	if (tlen)
+	if (tlen != NULL)
 	{	/* If non-seekable, set framecount? Can we trust it? */
 		} ;
 } /* mpeg_decoder_read_strings_id3v2 */
@@ -520,6 +519,10 @@ mpeg_decoder_init (SF_PRIVATE *psf)
 	** > tables are filled with the same values anyway.
 	**
 	** Note that calling mpg123_init() after it has already completed is a NOP.
+	**
+	** Update 2021-07-04
+	** mpg123 upstream has confirmed that mpg132_init() will become a NOP in future,
+	** so this is moot.
 	*/
 	if (mpg123_init () != MPG123_OK)
 		return SFE_INTERNAL ;
@@ -541,9 +544,9 @@ mpeg_decoder_init (SF_PRIVATE *psf)
 
 	mpg123_param (pmp3d->pmh, MPG123_REMOVE_FLAGS, MPG123_AUTO_RESAMPLE, 1.0) ;
 	mpg123_param (pmp3d->pmh, MPG123_ADD_FLAGS, MPG123_FORCE_FLOAT | MPG123_GAPLESS, 1.0) ;
-	#if MPG123_API_VERSION >= 45
-		mpg123_param (pmp3d->pmh, MPG123_ADD_FLAGS, MPG123_NO_FRANKENSTEIN, 1.0) ;
-	#endif
+#if MPG123_API_VERSION >= 45
+	mpg123_param (pmp3d->pmh, MPG123_ADD_FLAGS, MPG123_NO_FRANKENSTEIN, 1.0) ;
+#endif
 
 	psf->dataoffset = 0 ;
 	/*
@@ -612,7 +615,6 @@ mpeg_decoder_init (SF_PRIVATE *psf)
 	else
 		psf->datalength = SF_COUNT_MAX ;
 
-	pmp3d->unique_id = psf->unique_id ;
 	return 0 ;
 } /* mpeg_decoder_init */
 
@@ -642,4 +644,4 @@ int mpeg_decoder_init (SF_PRIVATE *psf)
 	return SFE_UNIMPLEMENTED ;
 } /* mpeg_decoder_init */
 
-#endif
+#endif /* HAVE_MPEG */
