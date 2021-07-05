@@ -282,34 +282,34 @@ psf_get_be16 (const uint8_t *ptr, int offset)
 static inline void
 endswap_short_array (short *ptr, int len)
 {
-	while (--len >= 0)
-	{	short temp = ptr [len] ;
-		ptr [len] = ENDSWAP_16 (temp) ;
+	for (int i = 0 ; i < len ; i++)
+	{	short temp = ptr [i] ;
+		ptr [i] = ENDSWAP_16 (temp) ;
 		} ;
 } /* endswap_short_array */
 
 static inline void
 endswap_short_copy (short *dest, const short *src, int len)
 {
-	while (--len >= 0)
-	{	dest [len] = ENDSWAP_16 (src [len]) ;
+	for (int i = 0 ; i < len ; i++)
+	{	dest [i] = ENDSWAP_16 (src [i]) ;
 		} ;
 } /* endswap_short_copy */
 
 static inline void
 endswap_int_array (int *ptr, int len)
 {
-	while (--len >= 0)
-	{	int temp = ptr [len] ;
-		ptr [len] = ENDSWAP_32 (temp) ;
+	for (int i = 0 ; i < len ; i++)
+	{	int temp = ptr [i] ;
+		ptr [i] = ENDSWAP_32 (temp) ;
 		} ;
 } /* endswap_int_array */
 
 static inline void
 endswap_int_copy (int *dest, const int *src, int len)
 {
-	while (--len >= 0)
-	{	dest [len] = ENDSWAP_32 (src [len]) ;
+	for (int i = 0 ; i < len ; i++)
+	{	dest [i] = ENDSWAP_32 (src [i]) ;
 		} ;
 } /* endswap_int_copy */
 
@@ -319,18 +319,18 @@ endswap_int_copy (int *dest, const int *src, int len)
 static inline void
 endswap_int64_t_array (int64_t *ptr, int len)
 {
-	while (--len >= 0)
-	{	int64_t value = ptr [len] ;
-		ptr [len] = ENDSWAP_64 (value) ;
+	for (int i = 0 ; i < len ; i++)
+	{	int64_t value = ptr [i] ;
+		ptr [i] = ENDSWAP_64 (value) ;
 		} ;
 } /* endswap_int64_t_array */
 
 static inline void
 endswap_int64_t_copy (int64_t *dest, const int64_t *src, int len)
 {
-	while (--len >= 0)
-	{	int64_t value = src [len] ;
-		dest [len] = ENDSWAP_64 (value) ;
+	for (int i = 0 ; i < len ; i++)
+	{	int64_t value = src [i] ;
+		dest [i] = ENDSWAP_64 (value) ;
 		} ;
 } /* endswap_int64_t_copy */
 

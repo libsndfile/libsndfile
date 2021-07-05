@@ -437,71 +437,71 @@ float32_get_capability	(SF_PRIVATE *psf)
 static void
 f2s_array (const float *src, int count, short *dest, float scale)
 {
-	while (--count >= 0)
-	{	dest [count] = psf_lrintf (scale * src [count]) ;
+	for (int i = 0 ; i < count ; i++)
+	{	dest [i] = psf_lrintf (scale * src [i]) ;
 		} ;
 } /* f2s_array */
 
 static void
 f2s_clip_array (const float *src, int count, short *dest, float scale)
-{	while (--count >= 0)
-	{	float tmp = scale * src [count] ;
+{	for (int i = 0 ; i < count ; i++)
+	{	float tmp = scale * src [i] ;
 
 		if (CPU_CLIPS_POSITIVE == 0 && tmp > 32767.0)
-			dest [count] = SHRT_MAX ;
+			dest [i] = SHRT_MAX ;
 		else if (CPU_CLIPS_NEGATIVE == 0 && tmp < -32768.0)
-			dest [count] = SHRT_MIN ;
+			dest [i] = SHRT_MIN ;
 		else
-			dest [count] = psf_lrintf (tmp) ;
+			dest [i] = psf_lrintf (tmp) ;
 		} ;
 } /* f2s_clip_array */
 
 static inline void
 f2i_array (const float *src, int count, int *dest, float scale)
-{	while (--count >= 0)
-	{	dest [count] = psf_lrintf (scale * src [count]) ;
+{	for (int i = 0 ; i < count ; i++)
+	{	dest [i] = psf_lrintf (scale * src [i]) ;
 		} ;
 } /* f2i_array */
 
 static inline void
 f2i_clip_array (const float *src, int count, int *dest, float scale)
-{	while (--count >= 0)
-	{	float tmp = scale * src [count] ;
+{	for (int i = 0 ; i < count ; i++)
+	{	float tmp = scale * src [i] ;
 
 		if (CPU_CLIPS_POSITIVE == 0 && tmp > (1.0 * INT_MAX))
-			dest [count] = INT_MAX ;
+			dest [i] = INT_MAX ;
 		else if (CPU_CLIPS_NEGATIVE == 0 && tmp < (-1.0 * INT_MAX))
-			dest [count] = INT_MIN ;
+			dest [i] = INT_MIN ;
 		else
-			dest [count] = psf_lrintf (tmp) ;
+			dest [i] = psf_lrintf (tmp) ;
 		} ;
 } /* f2i_clip_array */
 
 static inline void
 f2d_array (const float *src, int count, double *dest)
-{	while (--count >= 0)
-	{	dest [count] = src [count] ;
+{	for (int i = 0 ; i < count ; i++)
+	{	dest [i] = src [i] ;
 		} ;
 } /* f2d_array */
 
 static inline void
 s2f_array (const short *src, float *dest, int count, float scale)
-{	while (--count >= 0)
-	{	dest [count] = scale * src [count] ;
+{	for (int i = 0 ; i < count ; i++)
+	{	dest [i] = scale * src [i] ;
 		} ;
 } /* s2f_array */
 
 static inline void
 i2f_array (const int *src, float *dest, int count, float scale)
-{	while (--count >= 0)
-	{	dest [count] = scale * src [count] ;
+{	for (int i = 0 ; i < count ; i++)
+	{	dest [i] = scale * src [i] ;
 		} ;
 } /* i2f_array */
 
 static inline void
 d2f_array (const double *src, float *dest, int count)
-{	while (--count >= 0)
-	{	dest [count] = src [count] ;
+{	for (int i = 0 ; i < count ; i++)
+	{	dest [i] = src [i] ;
 		} ;
 } /* d2f_array */
 
@@ -1003,15 +1003,15 @@ replace_write_d2f	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 static void
 bf2f_array (float *buffer, int count)
-{	while (--count >= 0)
-	{	buffer [count] = FLOAT32_READ ((unsigned char *) (buffer + count)) ;
+{	for (int i = 0 ; i < count ; i++)
+	{	buffer [i] = FLOAT32_READ ((unsigned char *) &buffer [i]) ;
 		} ;
 } /* bf2f_array */
 
 static void
 f2bf_array (float *buffer, int count)
-{	while (--count >= 0)
-	{	FLOAT32_WRITE (buffer [count], (unsigned char*) (buffer + count)) ;
+{	for (int i = 0 ; i < count ; i++)
+	{	FLOAT32_WRITE (buffer [i], (unsigned char*) &buffer [i]) ;
 		} ;
 } /* f2bf_array */
 
