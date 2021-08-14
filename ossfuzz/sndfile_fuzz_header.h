@@ -1,3 +1,6 @@
+#ifndef SNDFILE_FUZZ_HEADER_H
+#define SNDFILE_FUZZ_HEADER_H
+
 typedef struct
 {
   sf_count_t offset ;
@@ -112,3 +115,5 @@ int sf_init_file(const uint8_t *data,
 
    return 0;
 }
+
+#endif
