@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   * ID3v1 reading
   * ID3v2 reading
   * Seeking
+* New fuzzer for OSS-Fuzz, thanks @DavidKorczynski.
 * This `CHANGELOG.md`. All notable changes to this project will be documented in
   this file. The old `NEWS` file has been renamed to `NEWS.OLD` and is no longer
   updated.
