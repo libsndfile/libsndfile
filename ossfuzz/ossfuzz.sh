@@ -29,3 +29,4 @@ make V=1
 
 # Copy the fuzzer to the output directory.
 cp -v ossfuzz/sndfile_fuzzer $OUT/
+cp -v ossfuzz/sndfile_alt_fuzzer $OUT/
