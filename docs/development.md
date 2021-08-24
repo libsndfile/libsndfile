@@ -9,7 +9,7 @@ interested in helping can raise an issue on Github.
 
 The main repository can be found on Github:
 
-<http://libsndfile.github.io/libsndfile/">
+<https://github.com/libsndfile/libsndfile/>
 
 and includes [instuctions](https://github.com/libsndfile/libsndfile/blob/master/README.md)
 on how to build libsndfile from the Git repo.
