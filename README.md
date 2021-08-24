@@ -18,7 +18,7 @@ for details.
 ## Hacking
 
 The canonical source code repository for libsndfile is at
-[http://libsndfile.github.io/libsndfile/][github].
+<https://github.com/libsndfile/libsndfile>.
 
 You can grab the source code using:
 
