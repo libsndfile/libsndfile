@@ -391,8 +391,8 @@ AS_IF([test -n "$PKG_CONFIG"], [
 					fi
 				], [
 					AS_ECHO([""])
-					AC_MSG_WARN([[*** One or more of the external libraries (ie libflac, libogg and]])
-					AC_MSG_WARN([[*** libvorbis) is either missing (possibly only the development]])
+					AC_MSG_WARN([[*** One or more of the external libraries (ie libflac, libogg,]])
+					AC_MSG_WARN([[*** libvorbis and libopus) is either missing (possibly only the development]])
 					AC_MSG_WARN([[*** headers) or is of an unsupported version.]])
 					AC_MSG_WARN([[***]])
 					AC_MSG_WARN([[*** Unfortunately, for ease of maintenance, the external libs]])
