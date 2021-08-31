@@ -46,12 +46,6 @@
 
 #define BUFFER_LEN		(1 << 14)
 
-
-typedef	struct
-{	char	*infilename, *outfilename ;
-	SF_INFO	infileinfo, outfileinfo ;
-} OptionData ;
-
 const char * program_name (const char * argv0) ;
 static void sfe_copy_data_int (SNDFILE *outfile, SNDFILE *infile, int channels) ;
 static void add_instrument_data (SNDFILE *outfile, const SF_INFO * in_info) ;
