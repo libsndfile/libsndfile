@@ -99,6 +99,7 @@ main (int argc, char * argv [])
 	/* Open the output file. */
 	if ((outfile = sf_open (outfilename, SFM_WRITE, &out_sfinfo)) == NULL)
 	{	printf ("Not able to open output file %s : %s\n", outfilename, sf_strerror (NULL)) ;
+		sf_close (infile) ;
 		return 1 ;
 		} ;
 
