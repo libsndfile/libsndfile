@@ -98,12 +98,14 @@ main (void)
 
 	if (sfinfo.channels > MAX_CHANNELS)
 	{	printf ("Not able to process more than %d channels\n", MAX_CHANNELS) ;
+		sf_close (infile) ;
 		return 1 ;
 		} ;
 	/* Open the output file. */
 	if (! (outfile = sf_open (outfilename, SFM_WRITE, &sfinfo)))
 	{	printf ("Not able to open output file %s.\n", outfilename) ;
 		puts (sf_strerror (NULL)) ;
+		sf_close (infile) ;
 		return 1 ;
 		} ;
 
