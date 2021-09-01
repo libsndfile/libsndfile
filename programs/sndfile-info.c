@@ -110,8 +110,6 @@ main (int argc, char *argv [])
 **	Print version and usage.
 */
 
-static double	data [BUFFER_LEN] ;
-
 static void
 usage_exit (const char *progname)
 {	printf ("Usage :\n  %s <file> ...\n", progname) ;
