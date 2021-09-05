@@ -63,6 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   The behavior of the functions for opening files on other platforms does not
   change.
+* Switch to .xz over .bz2 for release tarballs.
 
 ### Fixed
 
