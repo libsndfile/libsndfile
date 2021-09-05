@@ -48,6 +48,7 @@ build-test-tarball.mk
 config.log
 config.status
 configure
+configure~
 doc/AUTHORS
 doc/ChangeLog
 doc/NEWS
@@ -62,7 +63,7 @@ examples/sndfile-loopify
 examples/sndfile-to-text
 examples/sndfilehandle
 include/sndfile.h
-libsndfile-1.0.*
+libsndfile-*.tar.xz
 libsndfile-testsuite-*
 libsndfile.spec
 libtool
