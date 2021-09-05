@@ -101,8 +101,6 @@ m4_define([abi_version_patch], [lt_revision])
 
 dnl ------------------------------------------------------------------------------------
 
-AC_HEADER_STDC
-
 AC_CHECK_HEADERS([endian.h])
 AC_CHECK_HEADERS([byteswap.h])
 AC_CHECK_HEADERS([locale.h])
