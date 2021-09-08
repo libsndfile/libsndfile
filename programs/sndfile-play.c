@@ -328,10 +328,12 @@ alsa_write_float (snd_pcm_t *alsa_dev, float *data, int frames, int channels)
 					return 0 ;
 					break ;
 
+#if defined ESTRPIPE && ESTRPIPE != EPIPE
 			case -ESTRPIPE :
 					fprintf (stderr, "alsa_write_float: Suspend event.n") ;
 					return 0 ;
 					break ;
+#endif
 
 			case -EIO :
 					puts ("alsa_write_float: EIO") ;
