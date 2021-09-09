@@ -766,8 +766,6 @@ solaris_play (int argc, char *argv [])
 		audio_info.play.channels = sfinfo.channels ;
 		audio_info.play.precision = 16 ;
 		audio_info.play.encoding = AUDIO_ENCODING_LINEAR ;
-		audio_info.play.gain = AUDIO_MAX_GAIN ;
-		audio_info.play.balance = AUDIO_MID_BALANCE ;
 
 		if ((error = ioctl (audio_fd, AUDIO_SETINFO, &audio_info)))
 		{	perror ("ioctl (AUDIO_SETINFO) failed") ;
