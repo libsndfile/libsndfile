@@ -141,9 +141,6 @@ AC_DEFINE_UNQUOTED([ENABLE_EXPERIMENTAL_CODE], [${EXPERIMENTAL_CODE}], [Set to 1
 AC_ARG_ENABLE([werror],
 	[AS_HELP_STRING([--enable-werror], [enable -Werror in all Makefiles])])
 
-AC_ARG_ENABLE([stack-smash-protection],
-	[AS_HELP_STRING([--enable-stack-smash-protection], [Enable GNU GCC stack smash protection])])
-
 AC_ARG_ENABLE([cpu-clip],
 	[AS_HELP_STRING([--disable-cpu-clip], [disable tricky cpu specific clipper])])
 
@@ -643,11 +640,6 @@ AC_LANG_PUSH([C++])
 AX_APPEND_COMPILE_FLAGS([${common_flags} -Wctor-dtor-privacy -Wnon-virtual-dtor -Woverloaded-virtual -Wreorder -Wsign-promo], [CXXFLAGS])
 AC_LANG_POP([C++])
 
-AS_IF([test "x$enable_stack_smash_protection" = "xyes"], [
-		XIPH_GCC_STACK_PROTECTOR
-		XIPH_GXX_STACK_PROTECTOR
-	])
-
 AS_IF([test "x$enable_test_coverage" = "xyes"], [
 		AX_APPEND_COMPILE_FLAGS([-coverage], [CFLAGS])
 	])
@@ -795,7 +787,6 @@ AC_MSG_RESULT([
     CXX Compiler Vendor is : .............. ${ax_cv_cxx_compiler_vendor} (${ax_cv_cxx_compiler_version})
 
     Sanitizer enabled : ................... ${enable_sanitizer:-no}
-    Stack smash protection : .............. ${enable_stack_smash_protection:-no}
 
   Installation directories :
 
