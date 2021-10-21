@@ -609,11 +609,6 @@ mpeg_decoder_init (SF_PRIVATE *psf)
 
 	mpeg_decoder_read_strings (psf) ;
 
-	if (psf->filelength != SF_COUNT_MAX)
-		psf->datalength = psf->filelength - psf->dataoffset ;
-	else
-		psf->datalength = SF_COUNT_MAX ;
-
 	return 0 ;
 } /* mpeg_decoder_init */
 
