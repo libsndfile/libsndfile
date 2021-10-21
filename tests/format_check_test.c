@@ -126,6 +126,11 @@ format_combo_test (void)
 					subtype_fmt_info.format == SF_FORMAT_MPEG_LAYER_II)
 				continue ;
 
+			/* MPEG Layer III in WAV is decode only currently */
+			if (subtype_fmt_info.format == SF_FORMAT_MPEG_LAYER_III &&
+					major_fmt_info.format == SF_FORMAT_WAV)
+				continue ;
+
 			snprintf (filename, sizeof (filename), "format-check.%s", major_fmt_info.extension) ;
 
 			sndfile = sf_open (filename, SFM_WRITE, &info) ;
