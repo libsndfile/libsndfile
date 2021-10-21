@@ -207,6 +207,14 @@ wav_open	(SF_PRIVATE *psf)
 			psf->sf.frames = 0 ;
 			} ;
 
+#if (ENABLE_EXPERIMENTAL_CODE == 0)
+		/* For now, don't support writing MPEGLAYER3 WAVs, as we can't guarentee that
+		** such a file written by libsndfile would have the same length when opened again.
+		*/
+		if (subformat == SF_FORMAT_MPEG_LAYER_III)
+			return SFE_UNSUPPORTED_ENCODING ;
+#endif
+
 		if (subformat == SF_FORMAT_IMA_ADPCM || subformat == SF_FORMAT_MS_ADPCM)
 		{	blockalign = wavlike_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
 			framesperblock = -1 ; /* Corrected later. */
@@ -944,6 +952,7 @@ wav_write_fmt_chunk (SF_PRIVATE *psf)
 					add_fact_chunk = SF_TRUE ;
 					break ;
 
+#if (ENABLE_EXPERIMENTAL_CODE == 0)
 		case SF_FORMAT_MPEG_LAYER_III :
 					{	int bytespersec, blockalign, flags, blocksize, samplesperblock, codecdelay ;
 
@@ -994,6 +1003,7 @@ wav_write_fmt_chunk (SF_PRIVATE *psf)
 
 					add_fact_chunk = SF_TRUE ;
 					break ;
+#endif
 
 		default : 	return SFE_UNIMPLEMENTED ;
 		} ;
