@@ -77,7 +77,7 @@ main (int argc, char **argv)
 		goto cleanup ;
 		} ;
 
-	state = calloc (1, sizeof (state)) ;
+	state = calloc (1, sizeof (*state)) ;
 	if (!state)
 	{	printf ("\nError : Out of memory.\n") ;
 		goto cleanup ;
