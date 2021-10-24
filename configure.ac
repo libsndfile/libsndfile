@@ -57,7 +57,7 @@ AC_LANG_POP([C++])
 AC_PROG_SED
 AM_PROG_AR
 
-LT_INIT([win32-dll])
+LT_INIT([disable-static win32-dll])
 LT_PROG_RC
 
 AC_PROG_INSTALL
