@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * This `CHANGELOG.md`. All notable changes to this project will be documented in
   this file. The old `NEWS` file has been renamed to `NEWS.OLD` and is no longer
   updated.
+* Add support for decoding MPEG III Audio in WAV files.
 
 ### Changed
 
