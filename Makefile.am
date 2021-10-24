@@ -14,7 +14,7 @@ endif
 
 EXTRA_DIST = libsndfile.spec.in sndfile.pc.in Scripts/android-configure.sh \
 	NEWS.OLD CHANGELOG.md Scripts/linux-to-win-cross-configure.sh \
-	CMakeLists.txt $(cmake_files) Win32
+	CMakeLists.txt $(cmake_files) Win32 SECURITY.md
 
 cmake_files = cmake/ClipMode.cmake cmake/FindFLAC.cmake \
 	cmake/CMakeAutoGen.cmake cmake/CMakeAutoGenScript.cmake \
