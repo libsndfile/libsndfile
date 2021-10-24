@@ -35,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   this file. The old `NEWS` file has been renamed to `NEWS.OLD` and is no longer
   updated.
 * Add support for decoding MPEG III Audio in WAV files.
+* `SECURITY.md` file to give people instructions for reporting security
+  vulnerabilities, thanks @zidingz.
 
 ### Changed
 
