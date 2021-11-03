@@ -103,8 +103,8 @@ log_putchar (SF_PRIVATE *psf, char ch)
 void
 psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 {	va_list		ap ;
-	uint32_t	u ;
-	int			d, tens, shift, width, width_specifier, left_align, slen, precision ;
+	uint32_t	u, tens ;
+	int			d, shift, width, width_specifier, left_align, slen, precision ;
 	char		c, *strptr, istr [5], lead_char, sign_char ;
 
 	va_start (ap, format) ;
@@ -186,15 +186,19 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					d = va_arg (ap, int) ;
 
 					if (d < 0)
-					{	d = -d ;
-						sign_char = '-' ;
+					{	sign_char = '-' ;
 						if (lead_char != '0' && left_align == SF_FALSE)
 							width_specifier -- ;
-						} ;
+
+						u = - ((unsigned) d) ;
+						}
+					else
+					{	u = (unsigned) d ;
+						}
 
 					tens = 1 ;
 					width = 1 ;
-					while (d / tens >= 10)
+					while (u / tens >= 10)
 					{	tens *= 10 ;
 						width ++ ;
 						} ;
@@ -224,8 +228,8 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 							log_putchar (psf, lead_char) ;
 
 					while (tens > 0)
-					{	log_putchar (psf, '0' + d / tens) ;
-						d %= tens ;
+					{	log_putchar (psf, '0' + u / tens) ;
+						u %= tens ;
 						tens /= 10 ;
 						} ;
 
@@ -234,7 +238,8 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					break ;
 
 			case 'D': /* sf_count_t */
-					{	sf_count_t		D, Tens ;
+					{	sf_count_t	D ;
+						uint64_t	U, Tens ;
 
 						D = va_arg (ap, sf_count_t) ;
 
@@ -244,13 +249,19 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 							log_putchar (psf, '0') ;
 							break ;
 							}
-						if (D < 0)
-						{	log_putchar (psf, '-') ;
-							D = -D ;
-							} ;
+						else
+						{	if (D < 0)
+							{	log_putchar (psf, '-') ;
+								U = -((uint64_t) D) ;
+								}
+							else
+							{	U = (uint64_t) D;
+								}
+							}
+
 						Tens = 1 ;
 						width = 1 ;
-						while (D / Tens >= 10)
+						while (U / Tens >= 10)
 						{	Tens *= 10 ;
 							width ++ ;
 							} ;
@@ -261,8 +272,8 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 							} ;
 
 						while (Tens > 0)
-						{	log_putchar (psf, '0' + D / Tens) ;
-							D %= Tens ;
+						{	log_putchar (psf, '0' + U / Tens) ;
+							U %= Tens ;
 							Tens /= 10 ;
 							} ;
 						} ;
