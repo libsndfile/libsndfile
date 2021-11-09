@@ -89,7 +89,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Integer overflow in `nms_adpcm_update`(), credit to OSS-Fuzz
   ([issue 25522](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25522)).
 * Integer overflow in `psf_log_printf`(), credit to OSS-Fuzz
-  ([issue 28441](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=28441)).
+  ([issue 28441](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=28441)),
+  ([issue 25624](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25624)).
 * ABI version incompatibility between Autotools and CMake build on Apple
   platforms.
 
