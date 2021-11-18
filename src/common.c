@@ -974,7 +974,7 @@ int
 psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 {	va_list			argptr ;
 	sf_count_t		*countptr, countdata ;
-	unsigned char	*ucptr, sixteen_bytes [16] ;
+	unsigned char	*ucptr, sixteen_bytes [16] = { 0 } ;
 	unsigned int 	*intptr, intdata ;
 	unsigned short	*shortptr ;
 	char			*charptr ;
