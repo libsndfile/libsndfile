@@ -103,6 +103,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   See https://github.com/msys2/MINGW-packages/issues/5803 for details.
 
+* Fix unintialized variable in psf_binheader_readf(), thanks @shao-hua-li
+
 ### Security
 
 * Heap buffer overflow in `wavlike_ima_decode_block`(), thanks @bobsayshilol,
