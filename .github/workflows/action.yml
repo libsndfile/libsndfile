@@ -189,6 +189,20 @@ jobs:
         if: startsWith(matrix.os,'ubuntu')
         run: sudo apt-get update -y && sudo apt-get install -y autogen ninja-build libogg-dev libvorbis-dev libflac-dev libopus-dev libasound2-dev libsqlite3-dev libspeex-dev libmp3lame-dev libmpg123-dev
 
+      - name: Setup NuGet Credentials
+        env:
+          VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
+        if: startsWith(matrix.os,'windows')
+        shell: 'bash'
+        run: >
+          `vcpkg fetch nuget | tail -n 1`
+          sources add
+          -source "https://nuget.pkg.github.com/libsndfile/index.json"
+          -storepasswordincleartext
+          -name "GitHub"
+          -username "evpobr"
+          -password "${{ secrets.GITHUB_TOKEN }}"
+
       - name: Configure, build and test with Autotools
         env:
           CC: ${{ matrix.cc }}
@@ -206,6 +220,7 @@ jobs:
         env:
           CC: ${{ matrix.cc }}
           CXX: ${{ matrix.cxx }}
+          VCPKG_BINARY_SOURCES: 'clear;nuget,GitHub,readwrite'
         if: startsWith(matrix.build-system,'cmake')
         run: |
           mkdir build
