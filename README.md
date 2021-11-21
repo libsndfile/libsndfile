@@ -273,21 +273,34 @@ have standard option `CMAKE_MSVC_RUNTIME_LIBRARY` now.
 
 Second advice is about Ogg, Vorbis FLAC and Opus support. Searching external
 libraries under Windows is a little bit tricky. The best way is to use
-[Vcpkg](https://github.com/Microsoft/vcpkg). You need to install static libogg,
-libvorbis, libflac and libopus libraries:
+[Vcpkg](https://github.com/Microsoft/vcpkg).
 
-    vcpkg install libogg:x64-windows-static libvorbis:x64-windows-static
-    libflac:x64-windows-static opus:x64-windows-static libogg:x86-windows-static
-    libvorbis:x86-windows-static libflac:x86-windows-static opus:x86-windows-static
-    mp3lame:x86-windows-static mpg123:x86-windows-static
-
-Then and add this parameter to cmake command line:
+Install Vcpkg and then add this parameter to cmake command line:
 
     -DCMAKE_TOOLCHAIN_FILE=<path-to-vcpkg>/scripts/buildsystems/vcpkg.cmake
 
-You also need to set `VCPKG_TARGET_TRIPLET` because you use static libraries:
+You also need to set `VCPKG_TARGET_TRIPLET` if you want to use static libraries:
 
     -DVCPKG_TARGET_TRIPLET=x64-windows-static
+
+Then you need to install static libogg, libvorbis, libflac, libopus, mpg123 and
+mp3lame Vcpkg packages.
+
+After 1.1.0beta2 you don't need to install dependencies manually. Libsndfile
+now supports [Vcpkg manifest mode](https://vcpkg.readthedocs.io/en/latest/users/manifests/)
+and all dependencies are installed automatically.
+
+However, you can turn off the manifest mode and return to the classic mode using
+the `VCPKG_MANIFEST_MODE` parameter from the command line:
+
+    -DVCPKG_MANIFEST_MODE=OFF
+
+In classic mode, you need to install the required libraries manually:
+
+    vcpkg install libvorbis:x64-windows-static libflac:x64-windows-static
+    opus:x64-windows-static mp3lame:x86-windows-static mpg123:x86-windows-static
+    libvorbis:x86-windows-static libflac:x86-windows-static
+    opus:x86-windows-static mp3lame:x86-windows-static mpg123:x86-windows-static
 
 **Note**: Use must use the same CRT library for external libraries and the
 libsndfile library itself. For `*-static` triplets Vcpkg uses

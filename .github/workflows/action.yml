@@ -189,11 +189,6 @@ jobs:
         if: startsWith(matrix.os,'ubuntu')
         run: sudo apt-get update -y && sudo apt-get install -y autogen ninja-build libogg-dev libvorbis-dev libflac-dev libopus-dev libasound2-dev libsqlite3-dev libspeex-dev libmp3lame-dev libmpg123-dev
 
-      - name: Install Windows dependencies
-        if: startsWith(matrix.os,'windows')
-        run: |
-          vcpkg install libvorbis libflac opus sqlite3 speex mp3lame mpg123 --triplet ${{matrix.triplet}}
-
       - name: Configure, build and test with Autotools
         env:
           CC: ${{ matrix.cc }}

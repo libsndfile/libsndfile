@@ -37,6 +37,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Add support for decoding MPEG III Audio in WAV files.
 * `SECURITY.md` file to give people instructions for reporting security
   vulnerabilities, thanks @zidingz.
+* Support for [Vcpkg manifest mode](https://vcpkg.readthedocs.io/en/latest/users/manifests/).
+
+  If you have problems with manifest mode, disable it with `VCPKG_MANIFEST_MODE`
+  switch.
 
 ### Changed
 
