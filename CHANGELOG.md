@@ -77,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 * Typo in `docs/index.md`.
+* Typo in `programs/sndfile-convert.c`, thanks @fjl.
 * Memory leak in `caf_read_header`(), credit to OSS-Fuzz ([issue 30375](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=30375)).
 * Stack overflow in `guess_file_type`(), thanks @bobsayshilol, credit to
   OSS-Fuzz ([issue 29339](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=29339)).
