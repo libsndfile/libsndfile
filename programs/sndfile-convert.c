@@ -281,7 +281,7 @@ main (int argc, char * argv [])
 			continue ;
 			} ;
 
-		printf ("Error : Not able to decode argunment '%s'.\n", argv [k]) ;
+		printf ("Error : Not able to decode argument '%s'.\n", argv [k]) ;
 		exit (1) ;
 		} ;
 
