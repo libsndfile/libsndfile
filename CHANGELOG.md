@@ -107,8 +107,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   See https://github.com/msys2/MINGW-packages/issues/5803 for details.
 
-* Fix unintialized variable in psf_binheader_readf(), thanks @shao-hua-li
-
 ### Security
 
 * Heap buffer overflow in `wavlike_ima_decode_block`(), thanks @bobsayshilol,
@@ -122,6 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Heap buffer overflow in `flac_buffer_copy`(), thanks @yuawn,  @bobsayshilol.
 * Heap buffer overflow in `copyPredictorTo24`(), thanks @bobsayshilol,
   credit to OSS-Fuzz ([issue 27503](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=27503)).
-
+* Uninitialized variable in `psf_binheader_readf`(), thanks @shao-hua-li,
+  credit to OSS-Fuzz ([issue 25364](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25364)).
 
 [Unreleased]: https://github.com/libsndfile/libsndfile/compare/1.0.31...HEAD
