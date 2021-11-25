@@ -418,6 +418,23 @@ opus_print_header (SF_PRIVATE *psf, OpusHeader *h)
 	switch (h->channel_mapping)
 	{	case 0 :	psf_log_printf (psf, "0 (mono or stereo)\n") ; break ;
 		case 1 :	psf_log_printf (psf, "1 (surround, AC3 channel order)\n") ; break ;
+		case 2 :	psf_log_printf (psf, "2 (ambisonics, ACN channel order)\n") ; break ;
+		case 3 :	psf_log_printf (psf, "3 (ambisonics with demixing matrix)\n") ; break ;
+		case 240 :
+		case 241 :
+		case 242 :
+		case 243 :
+		case 244 :
+		case 245 :
+		case 246 :
+		case 247 :
+		case 248 :
+		case 249 :
+		case 250 :
+		case 251 :
+		case 252 :
+		case 253 :
+		case 254 :	psf_log_printf (psf, "%d (experimental)\n", h->channel_mapping) ; break ;
 		case 255 :	psf_log_printf (psf, "255 (no channel order)\n") ; break ;
 		default :	psf_log_printf (psf, "%d (unknown or unsupported)\n", h->channel_mapping) ; break ;
 		} ;
