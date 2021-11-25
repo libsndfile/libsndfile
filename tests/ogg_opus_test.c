@@ -405,6 +405,66 @@ ogg_opus_original_samplerate_test (void)
 } /* ogg_opus_original_samplerate_test */
 
 
+static void
+ogg_opus_channel_mapping_family_test (const char *filename, int write_family)
+{	SNDFILE * file ;
+	SF_INFO sfinfo ;
+	int read_family ;
+
+	print_test_name (__func__, filename) ;
+
+	gen_windowed_sine_double (data_out.d, ARRAY_LEN (data_out.d), 0.95) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	/* Set up output file type. */
+	sfinfo.format = SF_FORMAT_OGG | SF_FORMAT_OPUS ;
+	sfinfo.channels = 1 ;
+	sfinfo.samplerate = SAMPLE_RATE ;
+
+	/* Write the output file. */
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	if (sf_command (file, SFC_SET_OPUS_CHANNEL_MAPPING_FAMILY, &write_family, sizeof (write_family)) != SF_TRUE)
+	{	printf ("\nCommand SFC_SET_OPUS_CHANNEL_MAPPING_FAMILY failed!\n") ;
+		exit (1) ;
+		} ;
+	if (sf_command (file, SFC_GET_OPUS_CHANNEL_MAPPING_FAMILY, &read_family, sizeof (read_family)) != SF_TRUE)
+	{	printf ("\nCommand SFC_GET_OPUS_CHANNEL_MAPPING_FAMILY failed!\n") ;
+		exit (1) ;
+		} ;
+	if (read_family != write_family)
+	{	printf ("\n\nLine %d: Read channel mapping family (%d) different than what was written (%d).\n", __LINE__, read_family, write_family) ;
+		exit (1) ;
+		} ;
+	test_write_double_or_die (file, 0, data_out.d, ARRAY_LEN (data_out.d), __LINE__) ;
+	if (sf_command (file, SFC_SET_OPUS_CHANNEL_MAPPING_FAMILY, &write_family, sizeof (write_family)) == SF_TRUE)
+	{	printf ("\nCommand SFC_SET_OPUS_CHANNEL_MAPPING_FAMILY succeeded when it should have failed!\n") ;
+		exit (1) ;
+		} ;
+	sf_close (file) ;
+
+	/* Read the file in again. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	read_family = -1 ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	test_read_double_or_die (file, 0, data_in.d, 8, __LINE__) ;
+	if (sf_command (file, SFC_GET_OPUS_CHANNEL_MAPPING_FAMILY, &read_family, sizeof (read_family)) != SF_TRUE)
+	{	printf ("\nCommand SFC_GET_OPUS_CHANNEL_MAPPING_FAMILY failed!\n") ;
+		exit (1) ;
+		} ;
+	if (read_family != write_family)
+	{	printf ("\n\nLine %d: Read channel mapping family (%d) different than what was written (%d).\n", __LINE__, read_family, write_family) ;
+		exit (1) ;
+		} ;
+	sf_close (file) ;
+
+	puts ("ok") ;
+
+	unlink (filename) ;
+} /* ogg_opus_channel_mapping_family_test */
+
+
 int
 main (void)
 {
@@ -416,6 +476,13 @@ main (void)
 
 		ogg_opus_stereo_seek_test ("ogg_opus_seek.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS) ;
 		ogg_opus_original_samplerate_test () ;
+		ogg_opus_channel_mapping_family_test ("ogg_opus_channel_mapping_family_0.opus", 0) ;
+		ogg_opus_channel_mapping_family_test ("ogg_opus_channel_mapping_family_1.opus", 1) ;
+		ogg_opus_channel_mapping_family_test ("ogg_opus_channel_mapping_family_2.opus", 2) ;
+		ogg_opus_channel_mapping_family_test ("ogg_opus_channel_mapping_family_3.opus", 3) ;
+		ogg_opus_channel_mapping_family_test ("ogg_opus_channel_mapping_family_240.opus", 240) ;
+		ogg_opus_channel_mapping_family_test ("ogg_opus_channel_mapping_family_254.opus", 254) ;
+		ogg_opus_channel_mapping_family_test ("ogg_opus_channel_mapping_family_255.opus", 255) ;
 		}
 	else
 		puts ("    No Ogg/Opus tests because Ogg/Opus support was not compiled in.") ;

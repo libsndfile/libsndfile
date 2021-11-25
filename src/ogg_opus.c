@@ -1750,6 +1750,26 @@ ogg_opus_command (SF_PRIVATE *psf, int command, void *data, int datasize)
 			*((int *) data) = oopus->header.input_samplerate ;
 			return SF_TRUE ;
 
+		case SFC_GET_OPUS_CHANNEL_MAPPING_FAMILY :
+			if (data == NULL || datasize != SIGNED_SIZEOF (int))
+				return SFE_BAD_COMMAND_PARAM ;
+
+			*((int *) data) = (int) oopus->header.channel_mapping ;
+			return SF_TRUE ;
+
+		case SFC_SET_OPUS_CHANNEL_MAPPING_FAMILY :
+			if (data == NULL || datasize != SIGNED_SIZEOF (int))
+				return SFE_BAD_COMMAND_PARAM ;
+
+			if (psf->file.mode != SFM_WRITE && psf->file.mode != SFM_RDWR)
+				return SF_FALSE ;
+
+			if (psf->have_written)
+				return SF_FALSE ;
+
+			oopus->header.channel_mapping = (uint8_t) *((int *) data) ;
+			return SF_TRUE ;
+
 		default :
 			break ;
 	}
