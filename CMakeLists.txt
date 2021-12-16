@@ -819,6 +819,8 @@ if (ENABLE_PACKAGE_CONFIG)
 		PUBLIC_HEADER DESTINATION	${CMAKE_INSTALL_INCLUDEDIR}
 	)
 
+	export (EXPORT SndFileTargets NAMESPACE SndFile:: FILE ${PROJECT_BINARY_DIR}/SndFileTargets.cmake)
+
 	include (CMakePackageConfigHelpers)
 
 	if (ENABLE_EXTERNAL_LIBS)
@@ -829,6 +831,11 @@ if (ENABLE_PACKAGE_CONFIG)
 
 	set (INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})
 	configure_package_config_file(cmake/SndFileConfig.cmake.in SndFileConfig.cmake
+		INSTALL_DESTINATION ${PROJECT_BINARY_DIR}
+		INSTALL_PREFIX ${PROJECT_BINARY_DIR}
+		PATH_VARS INCLUDE_INSTALL_DIR
+		)
+	configure_package_config_file(cmake/SndFileConfig.cmake.in SndFileConfig2.cmake
 		INSTALL_DESTINATION ${CMAKE_INSTALL_PACKAGEDIR}
 		PATH_VARS INCLUDE_INSTALL_DIR
 		)
@@ -839,8 +846,12 @@ if (ENABLE_PACKAGE_CONFIG)
 		DESTINATION ${CMAKE_INSTALL_PACKAGEDIR}
 		)
 	install(
+		FILES ${CMAKE_CURRENT_BINARY_DIR}/SndFileConfig2.cmake
+		RENAME SndFileConfig.cmake
+		DESTINATION	${CMAKE_INSTALL_PACKAGEDIR}
+		)
+	install(
 		FILES
-			${CMAKE_CURRENT_BINARY_DIR}/SndFileConfig.cmake
 			${CMAKE_CURRENT_BINARY_DIR}/SndFileConfigVersion.cmake
 		DESTINATION	${CMAKE_INSTALL_PACKAGEDIR}
 		)
