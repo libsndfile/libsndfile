@@ -829,6 +829,12 @@ if (ENABLE_PACKAGE_CONFIG)
 		set (SndFile_WITH_EXTERNAL_LIBS 0)
 	endif ()
 
+	if(ENABLE_MPEG)
+		set (SndFile_WITH_MPEG 1)
+	else ()
+		set (SndFile_WITH_MPEG 0)
+	endif ()
+
 	set (INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})
 	configure_package_config_file(cmake/SndFileConfig.cmake.in SndFileConfig.cmake
 		INSTALL_DESTINATION ${PROJECT_BINARY_DIR}
