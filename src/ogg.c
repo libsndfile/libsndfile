@@ -624,13 +624,13 @@ ogg_stream_seek_page_search (SF_PRIVATE *psf, OGG_PRIVATE *odata, uint64_t targe
 					** remember the end of the page.
 					*/
 					best_start = page_offset ;
-					} ;
-				/*
-				** Then force buffering on, so that if a packet starts (but
-				** does not end) on the next page, we still avoid the extra
-				** seek back.
-				*/
-				buffering = SF_TRUE ;
+					/*
+					** Then force buffering on, so that if a packet starts (but
+					** does not end) on the next page, we still avoid the extra
+					** seek back.
+					*/
+					buffering = SF_TRUE ;
+				} ;
 				*best_gp = pcm_start = gp ;
 				if (target_gp - gp > 48000)
 				{	/* Out by over a second. Try another bisection. */
