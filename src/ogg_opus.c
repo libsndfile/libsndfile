@@ -409,27 +409,27 @@ ogg_opus_close (SF_PRIVATE *psf)
 static void
 opus_print_header (SF_PRIVATE *psf, OpusHeader *h)
 {	psf_log_printf (psf, "Opus Header Metadata\n") ;
-	psf_log_printf (psf, "  OggOpus version  : %d\n", h->version) ;
-	psf_log_printf (psf, "  Channels         : %d\n", h->channels) ;
-	psf_log_printf (psf, "  Preskip          : %d samples @48kHz\n", h->preskip) ;
-	psf_log_printf (psf, "  Input Samplerate : %d Hz\n", h->input_samplerate) ;
-	psf_log_printf (psf, "  Gain             : %d.%d\n", arith_shift_right (h->gain & 0xF0, 8), h->gain & 0x0F) ;
+	psf_log_printf (psf, "  OggOpus version  : %d\n", (int) h->version) ;
+	psf_log_printf (psf, "  Channels         : %d\n", (int) h->channels) ;
+	psf_log_printf (psf, "  Preskip          : %d samples @48kHz\n", (int) h->preskip) ;
+	psf_log_printf (psf, "  Input Samplerate : %d Hz\n", (int) h->input_samplerate) ;
+	psf_log_printf (psf, "  Gain             : %d.%d\n", (int) arith_shift_right (h->gain & 0xF0, 8), h->gain & 0x0F) ;
 	psf_log_printf (psf, "  Channel Mapping  : ") ;
 	switch (h->channel_mapping)
 	{	case 0 :	psf_log_printf (psf, "0 (mono or stereo)\n") ; break ;
 		case 1 :	psf_log_printf (psf, "1 (surround, AC3 channel order)\n") ; break ;
 		case 255 :	psf_log_printf (psf, "255 (no channel order)\n") ; break ;
-		default :	psf_log_printf (psf, "%d (unknown or unsupported)\n", h->channel_mapping) ; break ;
+		default :	psf_log_printf (psf, "%d (unknown or unsupported)\n", (int) h->channel_mapping) ; break ;
 		} ;
 
 	if (h->channel_mapping > 0)
 	{	int i ;
-		psf_log_printf (psf, "   streams total   : %d\n", h->nb_streams) ;
-		psf_log_printf (psf, "   streams coupled : %d\n", h->nb_coupled) ;
+		psf_log_printf (psf, "   streams total   : %d\n", (int) h->nb_streams) ;
+		psf_log_printf (psf, "   streams coupled : %d\n", (int) h->nb_coupled) ;
 		psf_log_printf (psf, "   stream mapping : [") ;
 		for (i = 0 ; i < h->channels - 1 ; i++)
-			psf_log_printf (psf, "%d,", h->stream_map [i]) ;
-		psf_log_printf (psf, "%d]\n", h->stream_map [i]) ;
+			psf_log_printf (psf, "%d,", (int) (h->stream_map [i])) ;
+		psf_log_printf (psf, "%d]\n", (int) (h->stream_map [i])) ;
 		} ;
 } /* opus_print_header */
 
@@ -458,7 +458,7 @@ opus_read_header_packet (SF_PRIVATE *psf, OpusHeader *h, ogg_packet *opacket)
 
 	count = psf_binheader_readf (psf, "ep1", 8, &h->version) ;
 	if (! (h->version == 1 || h->version == 0))
-	{	psf_log_printf (psf, "Opus : Unknown / unsupported embedding scheme version: %d.\n", h->version) ;
+	{	psf_log_printf (psf, "Opus : Unknown / unsupported embedding scheme version: %d.\n", (int) h->version) ;
 		return SFE_UNIMPLEMENTED ;
 		} ;
 
@@ -955,8 +955,8 @@ ogg_opus_unpack_next_page (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oo
 		oopus->pg_pos = odata->pkt [odata->pkt_len - 1].granulepos ;
 		gp = ogg_opus_calculate_page_duration (odata) ;
 		oopus->pkt_pos = oopus->pg_pos - gp ;
-		psf_log_printf (psf, "Opus : Hole found appears to be of length %d samples.\n",
-				(oopus->pkt_pos - last_page) / oopus->sr_factor) ;
+		psf_log_printf (psf, "Opus : Hole found appears to be of length %D samples.\n",
+				(oopus->pkt_pos - last_page) / (uint64_t) oopus->sr_factor) ;
 		/*
 		** Could save the hole size here, and have ogg_opus_read_refill()
 		** do packet loss concealment until the hole is gone, but libopus does
@@ -1050,7 +1050,7 @@ ogg_opus_read_refill (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 			**	MAY defer this action until it decodes the last packet
 			**	completed on that page.
 			*/
-			psf_log_printf (psf, "Opus : Mid-strem page's granule position %d is less than total samples of %d\n", oopus->pg_pos, pkt_granulepos) ;
+			psf_log_printf (psf, "Opus : Mid-stream page's granule position %D is less than total samples of %D\n", oopus->pg_pos, pkt_granulepos) ;
 			psf->error = SFE_MALFORMED_FILE ;
 			return -1 ;
 			} ;
@@ -1467,7 +1467,12 @@ ogg_opus_analyze_file (SF_PRIVATE *psf)
 		{	psf->sf.frames = (oopus->u.decode.gp_end - oopus->u.decode.gp_start
 				- oopus->header.preskip) / oopus->sr_factor ;
 			} ;
-	}
+		} ;
+
+
+	psf_log_printf (psf, "  Granule pos offset  : %D\n", oopus->u.decode.gp_start) ;
+	if (oopus->u.decode.gp_end != (uint64_t) -1)
+		psf_log_printf (psf, "  Last Granule pos : %D\n", oopus->u.decode.gp_end) ;
 
 	/* Go back to where we left off. */
 	ogg_sync_fseek (psf, saved_offset, SEEK_SET) ;
