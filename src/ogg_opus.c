@@ -1118,11 +1118,7 @@ ogg_opus_write_out (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 		else
 			nbytes = ogg_stream_pageout_fill (&odata->ostream, &odata->opage, 255 * 255) ;
 		if (nbytes > 0)
-		{	/*
-			** LibOgg documentation is noted as being bad by it's author. Ogg
-			** page header byte 26 is the segment count.
-			*/
-			oopus->u.encode.last_segments -= odata->opage.header [26] ;
+		{	oopus->u.encode.last_segments -= ogg_page_segments (&odata->opage) ;
 			oopus->pg_pos = oopus->pkt_pos ;
 			ogg_write_page (psf, &odata->opage) ;
 			}

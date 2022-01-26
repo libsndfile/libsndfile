@@ -614,7 +614,7 @@ ogg_stream_seek_page_search (SF_PRIVATE *psf, OGG_PRIVATE *odata, uint64_t targe
 				if (buffering)
 					ogg_stream_reset (&odata->ostream) ;
 				/* Check to see if the last packet continues. */
-				if (page.header [27 + page.header [26] - 1] == 255)
+				if (ogg_page_continues (&page))
 				{	ogg_page_search_continued_data (odata, &page) ;
 					/*
 					** If we have a continued packet, remember the offset of

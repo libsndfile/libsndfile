@@ -57,6 +57,13 @@ typedef struct
 								((buf [base + 2] <<16) & 0xff0000) | \
 								((buf [base + 1] << 8) & 0xff00) | \
 								(buf [base] & 0xff))
+/*
+** LibOgg documentation is noted as being bad by it's author.
+** Add some useful utility macros for introspecting Ogg pages.
+*/
+#define ogg_page_segments(page_ptr) ((page_ptr)->header [26])
+
+#define ogg_page_continues(page_ptr) ((page_ptr)->header [27 + (page_ptr)->header [26] - 1] == 255)
 
 int	ogg_read_first_page	(SF_PRIVATE *, OGG_PRIVATE *) ;
 
