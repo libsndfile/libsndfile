@@ -264,9 +264,9 @@ vorbis_read_header (SF_PRIVATE *psf)
 		ogg_sync_fseek (psf, saved_offset, SEEK_SET) ;
 		}
 
-	psf_log_printf (psf, "PCM offset  : %d\n", vdata->pcm_start) ;
+	psf_log_printf (psf, "PCM offset  : %D\n", vdata->pcm_start) ;
 	if (vdata->pcm_end != (uint64_t) -1)
-		psf_log_printf (psf, "PCM end     : %d\n", vdata->pcm_end) ;
+		psf_log_printf (psf, "PCM end     : %D\n", vdata->pcm_end) ;
 	else
 		psf_log_printf (psf, "PCM end     : unknown\n") ;
 
