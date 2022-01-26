@@ -1733,6 +1733,13 @@ ogg_opus_command (SF_PRIVATE *psf, int command, void *data, int datasize)
 			*((int *) data) = oopus->header.input_samplerate ;
 			return SF_TRUE ;
 
+		case SFC_GET_OGG_STREAM_SERIALNO :
+			if (data == NULL || datasize != sizeof (int32_t))
+				return SF_FALSE ;
+
+			*((int32_t *) data) = odata->ostream.serialno ;
+			return SF_TRUE ;
+
 		default :
 			break ;
 	}
