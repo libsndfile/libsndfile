@@ -1398,6 +1398,7 @@ d2flac24_array (const double *src, int32_t *dest, int count, int normalize)
 static sf_count_t
 flac_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 {	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->codec_data ;
+	FLAC__StreamDecoderState state ;
 
 	if (pflac == NULL)
 		return 0 ;
@@ -1413,13 +1414,24 @@ flac_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 	{	if (FLAC__stream_decoder_seek_absolute (pflac->fsd, offset))
 			return offset ;
 
-		if (offset == psf->sf.frames)
+		if (offset == psf->sf.frames) /* and state is probably FLAC__STREAM_DECODER_END_OF_STREAM */
 		{	/*
 			** If we've been asked to seek to the very end of the file, libFLAC
 			** will return an error. However, we know the length of the file so
 			** instead of returning an error, we can return the offset.
 			*/
 			return offset ;
+			} ;
+
+		state = FLAC__stream_decoder_get_state (pflac->fsd) ;
+		if (state == FLAC__STREAM_DECODER_SEEK_ERROR)
+		{
+			if (!FLAC__stream_decoder_flush (pflac->fsd))
+			{	psf_log_printf (psf, "FLAC__stream_decoder_flush after FLAC__STREAM_DECODER_SEEK_ERROR returned false\n") ;
+				} ;
+			}
+		else
+		{	psf_log_printf (psf, "FLAC__stream_decoder_get_state after failed FLAC__stream_decoder_seek_absolute returned %s\n", FLAC__StreamDecoderStateString [state]) ;
 			} ;
 
 		psf->error = SFE_BAD_SEEK ;
