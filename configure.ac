@@ -392,8 +392,7 @@ AS_IF([test -n "$PKG_CONFIG"], [
 					AC_MSG_WARN([[***]])
 					AC_MSG_WARN([[*** Unfortunately, for ease of maintenance, the external libs]])
 					AC_MSG_WARN([[*** are an all or nothing affair.]])
-					AS_ECHO([""])
-					enable_external_libs=no
+					AC_MSG_ERROR(["You requested external libraries, but not all were found"])
 				])
 	])
 
