@@ -41,6 +41,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
   If you have problems with manifest mode, disable it with `VCPKG_MANIFEST_MODE`
   switch.
+* [Export CMake targets from the build tree (PR #802)](https://cmake.org/cmake/help/latest/guide/importing-exporting/index.html#exporting-targets-from-the-build-tree)
+* CIFuzz fuzzer, thanks to @AdamKorcz (PR #796)
 
 ### Changed
 
