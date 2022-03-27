@@ -2,7 +2,7 @@
     "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
     "name": "libsndfile",
     "description": "A library for reading and writing audio files",
-    "version-semver": "1.1.0-beta.2",
+    "version-semver": "1.1.0",
     "default-features": [
         "external-libs",
         "mpeg"

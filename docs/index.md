@@ -142,6 +142,8 @@ Here is the release history for libsndfile:
   problems, delete old generated sndfile.h from $(top_builddir)/src.
 * Version 1.0.31 (January 24 2021) Bugfix release. Fix multiple memory leaks
   reported by OSS-Fuzz. More SSE2-optimized functions for x86 and amd64.
+* Version 1.1.0 (March 27 2022) Minor release, backward compatible with previous
+  releases. Added long-awaited MP3 support. Numerous improvements and bugfixes.
 
 ## Similar or Related Projects
 
