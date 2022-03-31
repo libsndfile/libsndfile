@@ -925,8 +925,22 @@ header_seek (SF_PRIVATE *psf, sf_count_t position, int whence)
 
 			if (psf->header.indx + position > psf->header.len)
 			{	/* Need to jump this without caching it. */
+				position -= (psf->header.end - psf->header.indx) ;
 				psf->header.indx = psf->header.end ;
-				psf_fseek (psf, position, SEEK_CUR) ;
+				if (psf->is_pipe)
+				{
+					/* seeking is not supported on pipe input, so we read instead */
+					size_t skip = position ;
+					while (skip)
+					{	char junk [16 * 1024] ;
+						size_t to_skip = SF_MIN (skip, sizeof (junk)) ;
+						psf_fread (junk, 1, to_skip, psf) ;
+						skip -= to_skip ;
+						}
+					}
+				else
+				{	psf_fseek (psf, position, SEEK_CUR) ;
+					}
 				break ;
 				} ;
 

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * CMake build from Autotools tarball (issue #816).
 * Build on UWP platform (issue #824).
 * Fix signed integer overflow (issue #785).
+* Skipping large wav chunks on stdin (PR #819).
 
 ## [1.1.0] - 2022-03-27
 
