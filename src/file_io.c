@@ -361,7 +361,7 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 		count = read (psf->file.filedes, ((char*) ptr) + total, (size_t) count) ;
 
 		if (count == -1)
-		{	if (errno == EINTR)
+		{	if (errno == EINTR || errno == EAGAIN)
 				continue ;
 
 			psf_log_syserr (psf, errno) ;
