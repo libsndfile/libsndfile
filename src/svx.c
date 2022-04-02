@@ -134,7 +134,7 @@ svx_read_header	(SF_PRIVATE *psf)
 	int				filetype = 0, parsestage = 0, done = 0 ;
 	int 			bytecount = 0, channels ;
 
-	if (psf->filelength > SF_PLATFORM_S64 (0xffffffff))
+	if (psf->filelength > 0xFFFFFFFFLL)
 		psf_log_printf (psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n") ;
 
 	memset (&vhdr, 0, sizeof (vhdr)) ;

@@ -404,7 +404,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	char		*cptr ;
 	int			instr_found = 0, mark_found = 0 ;
 
-	if (psf->filelength > SF_PLATFORM_S64 (0xffffffff))
+	if (psf->filelength > 0xFFFFFFFFLL)
 		psf_log_printf (psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n") ;
 
 	if ((paiff = psf->container_data) == NULL)
