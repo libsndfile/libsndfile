@@ -174,7 +174,7 @@ set_package_properties (FLAC PROPERTIES
 	DESCRIPTION "Free Lossless Audio Codec Library"
 	PURPOSE "Enables FLAC support"
 	)
-set_package_properties (Lame PROPERTIES
+set_package_properties (mp3lame PROPERTIES
 	TYPE RECOMMENDED
 	URL "https://lame.sourceforge.io/"
 	DESCRIPTION "High quality MPEG Audio Layer III (MP3) encoder"
@@ -237,20 +237,7 @@ if (INSTALL_PKGCONFIG_MODULE)
 	endif ()
 	if (ENABLE_MPEG)
 		set (EXTERNAL_MPEG_REQUIRE "libmpg123")
-		get_filename_component(LAME_WE ${LAME_LIBRARY} NAME_WE)
-		if (LAME_HIP_LIBRARY)
-			get_filename_component(LAME_HIP_WE ${LAME_HIP_LIBRARY} NAME_WE)
-		endif ()
-		if (CMAKE_IMPORT_LIBRARY_PREFIX)
-			string (REGEX REPLACE "^${CMAKE_IMPORT_LIBRARY_PREFIX}" "" LAME_WE_NO_PREFIX ${LAME_WE})
-			if (LAME_HIP_LIBRARY)
-				string (REGEX REPLACE "^${CMAKE_IMPORT_LIBRARY_PREFIX}" "" LAME_HIP_WE_NO_PREFIX ${LAME_HIP_WE})
-			endif ()
-		endif ()
-		set (EXTERNAL_MPEG_LIBS "-l${LAME_WE_NO_PREFIX}")
-		if (LAME_HIP_LIBRARY)
-			set (EXTERNAL_MPEG_LIBS "${MPEG_LIBS} -l${LAME_HIP_WE}")
-		endif ()
+		set (EXTERNAL_MPEG_LIBS "-lmp3lame")
 	endif ()
 
 	configure_file (sndfile.pc.in sndfile.pc @ONLY)
@@ -411,7 +398,7 @@ target_link_libraries (sndfile
 		$<$<AND:$<BOOL:${ENABLE_EXPERIMENTAL}>,$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>,$<BOOL:${HAVE_SPEEX}>>:Speex::Speex>
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Opus::opus>
 		$<$<BOOL:${HAVE_MPEG}>:MPG123::libmpg123>
-		$<$<BOOL:${HAVE_MPEG}>:Lame::Lame>
+		$<$<BOOL:${HAVE_MPEG}>:mp3lame::mp3lame>
 	)
 set_target_properties (sndfile PROPERTIES
 	PUBLIC_HEADER "${sndfile_HDRS}"
