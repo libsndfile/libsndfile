@@ -827,9 +827,6 @@ psf_open_handle (PSF_FILE * pfile)
 		} ;
 
 #if defined (WINAPI_FAMILY_PARTITION) && !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP | WINAPI_PARTITION_SYSTEM)
-	if (!pfile->use_wchar)
-		return INVALID_HANDLE_VALUE ;
-
 	CREATEFILE2_EXTENDED_PARAMETERS cfParams = { 0 } ;
 	cfParams.dwSize = sizeof (CREATEFILE2_EXTENDED_PARAMETERS) ;
 	cfParams.dwFileAttributes = FILE_ATTRIBUTE_NORMAL ;
