@@ -171,16 +171,26 @@
 #define OGG_OPUS_COMMENT_PAD (512) /* Same as oggenc default */
 
 /*
-** Opus packets can be any multiple of 2.5ms (at 48kHz). We use the recommended
+** When encoding, we can choose the size of the Opus frames.
+** Valid values are 2.5, 5, 10, 20, 40, and 60 milliseconds.
+**
+** Frames smaller than 10ms can't use CELT (MDCT) mode.
+** Frames larger than 20ms "are only interesting at fairly low bitrates."
+**
+** We choose the suggested default of 20ms for high-fidelity audio, however,
+** maybe this could be user-selected, or triggered by bitrate command.
 ** default for non-realtime of 20ms. While longer packets reduce the overhead
 ** data somewhat, it also decreases the quality.
 */
 #define OGG_OPUS_ENCODE_PACKET_LEN(samplerate) ((20 * (samplerate)) / 1000)
 
 /*
-** How long does it take for a decoder to converge (avoiding flush on seek.
+** The pre-roll is how long it takes for the decoder to converge. It converges
+** pretty quickly, to within -40db within 80ms. However, this also depends on
+** the signal. From experimentation, use the conservative pre-roll amount of
+** 660ms after which the output is 32-bit-exact with high probability.
 */
-#define OGG_OPUS_PREROLL (80 * 48) /* 80 milliseconds */
+#define OGG_OPUS_PREROLL (660 * 48) /* 660 milliseconds (33 packets of 20ms) */
 
 typedef struct
 {	uint8_t version ;
@@ -215,10 +225,12 @@ typedef struct
 {	uint32_t serialno ;
 	OpusHeader header ;
 
-	/* Granule position before the current packet */
+	/* Encode: Granule position after the previous packet.
+	 * Decode: Granule position after the current packet */
 	uint64_t pkt_pos ;
 
-	/* Granule position at the end of the current page (encode: last completed) */
+	/* Encode: Granule position at the end of the previous page.
+	 * Decode: Granule position at the end of the current page. */
 	uint64_t pg_pos ;
 
 	/* integer coefficient of (current sample rate) / 48000Hz */
