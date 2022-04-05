@@ -303,9 +303,9 @@ static sf_count_t	ogg_opus_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_
 static sf_count_t	ogg_opus_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static sf_count_t	ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
-static sf_count_t	ogg_opus_seek_null_read (SF_PRIVATE *psf, sf_count_t offset) ;
-static sf_count_t	ogg_opus_seek_manual (SF_PRIVATE *psf, uint64_t target_gp) ;
-static int			ogg_opus_seek_page_search (SF_PRIVATE *psf, uint64_t target_gp) ;
+static sf_count_t	ogg_opus_null_read (SF_PRIVATE *psf, sf_count_t offset) ;
+static sf_count_t	ogg_opus_page_seek_manual (SF_PRIVATE *psf, uint64_t target_gp) ;
+static int			ogg_opus_page_seek_search (SF_PRIVATE *psf, uint64_t target_gp) ;
 
 static int			ogg_opus_analyze_file (SF_PRIVATE *psf) ;
 static int			ogg_opus_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
@@ -1488,13 +1488,13 @@ ogg_opus_analyze_file (SF_PRIVATE *psf)
 } /* ogg_opus_analyze_file */
 
 /*
-** ogg_opus_seek_null_read
+** ogg_opus_null_read
 **
 ** Decode samples, doing nothing with them, until the desired granule position
 ** is reached.
 */
 static sf_count_t
-ogg_opus_seek_null_read (SF_PRIVATE *psf, sf_count_t offset)
+ogg_opus_null_read (SF_PRIVATE *psf, sf_count_t offset)
 {	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
 	sf_count_t total ;
@@ -1517,14 +1517,16 @@ ogg_opus_seek_null_read (SF_PRIVATE *psf, sf_count_t offset)
 			} ;
 		} ;
 	return total ;
-} /* ogg_opus_seek_null_read */
+} /* ogg_opus_null_read */
 
 /*
+** ogg_opus_page_seek_search
+**
 ** Search within the file for the page with the highest granule position at or
 ** before our target.
 */
 static int
-ogg_opus_seek_page_search (SF_PRIVATE *psf, uint64_t target_gp)
+ogg_opus_page_seek_search (SF_PRIVATE *psf, uint64_t target_gp)
 {	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
 	uint64_t pcm_start ;
@@ -1559,10 +1561,16 @@ ogg_opus_seek_page_search (SF_PRIVATE *psf, uint64_t target_gp)
 	opus_multistream_decoder_ctl (oopus->u.decode.state, OPUS_RESET_STATE) ;
 
 	return 0 ;
-} /* ogg_opus_seek_page_search */
+} /* ogg_opus_page_seek_search */
 
+/*
+** ogg_opus_page_seek_manual
+**
+** Seek to the beginning of the Ogg stream and read pages until we find one with
+** a granule position at or before our target.
+*/
 static sf_count_t
-ogg_opus_seek_manual (SF_PRIVATE *psf, uint64_t target_gp)
+ogg_opus_page_seek_manual (SF_PRIVATE *psf, uint64_t target_gp)
 {	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
 	sf_count_t pos ;
@@ -1584,7 +1592,7 @@ ogg_opus_seek_manual (SF_PRIVATE *psf, uint64_t target_gp)
 		} ;
 
 	return 1 ;
-} /* ogg_opus_seek_manual */
+} /* ogg_opus_page_seek_manual */
 
 static sf_count_t
 ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
@@ -1629,10 +1637,10 @@ ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 			** Don't know the end of the file. Could be a chained file we don't yet
 			** support. Oh well, just do it manually.
 			*/
-			ogg_opus_seek_manual (psf, preroll_gp) ;
+			ogg_opus_page_seek_manual (psf, preroll_gp) ;
 			}
 		else
-		{	ret = ogg_opus_seek_page_search (psf, preroll_gp) ;
+		{	ret = ogg_opus_page_seek_search (psf, preroll_gp) ;
 			if (ret < 0)
 			{	/*
 				** Page seek failed, what to do? Could be bad data. We can
@@ -1640,7 +1648,7 @@ ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 				** from the beginning has the advantage of finding where the
 				** file goes bad.
 				*/
-				ret = ogg_opus_seek_manual (psf, preroll_gp) ;
+				ret = ogg_opus_page_seek_manual (psf, preroll_gp) ;
 				if (ret < 0)
 				{	/*
 					** If were here, and there is no error, we can be pretty
@@ -1674,7 +1682,7 @@ ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 	** We've seeked or skipped through pages until just before our target,
 	** now decode until we hit it.
 	*/
-	offset = ogg_opus_seek_null_read (psf, target_gp / oopus->sr_factor) ;
+	offset = ogg_opus_null_read (psf, target_gp / oopus->sr_factor) ;
 	return offset - ((oopus->header.preskip + oopus->u.decode.gp_start) / oopus->sr_factor) ;
 
 } /* ogg_opus_seek */
