@@ -1498,13 +1498,15 @@ ogg_opus_seek_null_read (SF_PRIVATE *psf, sf_count_t offset)
 {	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
 	sf_count_t total ;
-	sf_count_t readlen ;
 
-	total = oopus->pkt_pos / oopus->sr_factor ;
-	total += oopus->loc ;
-
+	total = (oopus->pkt_pos / oopus->sr_factor) - (oopus->len - oopus->loc) ;
 	for ( ; total < offset ; )
-	{	if (oopus->loc == oopus->len)
+	{	sf_count_t readlen = SF_MIN ((int) (offset - total), (oopus->len - oopus->loc)) ;
+		if (readlen > 0)
+		{	total += readlen ;
+			oopus->loc += readlen ;
+			} ;
+		if (oopus->loc == oopus->len)
 		{	if (ogg_opus_read_refill (psf, odata, oopus) <= 0)
 				return total ;
 			/*
@@ -1512,12 +1514,6 @@ ogg_opus_seek_null_read (SF_PRIVATE *psf, sf_count_t offset)
 			** arugment to offset, so we need to count it.
 			*/
 			oopus->loc = 0 ;
-			} ;
-
-		readlen = SF_MIN ((int) (offset - total), (oopus->len - oopus->loc)) ;
-		if (readlen > 0)
-		{	total += readlen ;
-			oopus->loc += readlen ;
 			} ;
 		} ;
 	return total ;
@@ -1610,12 +1606,20 @@ ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 		return PSF_SEEK_ERROR ;
 		} ;
 
-	current = oopus->pkt_pos + oopus->loc * oopus->sr_factor ;
+	/*
+	** Use the start of the current decoded buffer as the current position,
+	** avoids doing an actual seek if the target is within the current buffer.
+	*/
+	oopus->loc = 0 ;
+	current = oopus->pkt_pos - (uint64_t) (oopus->len * oopus->sr_factor) ;
+
 	/*
 	** Remember, there are preskip granulepos worth of samples at the front of
 	** the stream which are bunk. Also, granule positions can be offset.
 	*/
-	target_gp = offset * oopus->sr_factor + oopus->u.decode.gp_start + oopus->header.preskip ;
+	target_gp = offset * oopus->sr_factor ;
+	target_gp += oopus->u.decode.gp_start ;
+	target_gp += oopus->header.preskip ;
 
 	if (oopus->u.decode.gp_end == (uint64_t) -1)
 	{	/*
@@ -1628,9 +1632,9 @@ ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 	{	/*
 		** Avoid seeking in the file if where we want is just ahead or exactly
 		** were we are. To avoid needing to flush the decoder we choose pre-
-		** roll plus 10ms.
+		** roll.
 		*/
-		if (target_gp < current || target_gp - current > OGG_OPUS_PREROLL + 10 * 48)
+		if (target_gp < current || target_gp - current > OGG_OPUS_PREROLL)
 		{	ret = ogg_opus_seek_page_search (psf, target_gp) ;
 			if (ret < 0)
 			{	/*
