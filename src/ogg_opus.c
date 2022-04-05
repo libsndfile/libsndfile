@@ -1532,31 +1532,42 @@ ogg_opus_seek_page_search (SF_PRIVATE *psf, uint64_t target_gp)
 	uint64_t best_gp ;
 	sf_count_t begin ;
 	sf_count_t end ;
+	sf_count_t old_pos ;
 	int ret ;
 
 	best_gp = pcm_start = oopus->u.decode.gp_start ;
 	pcm_end = oopus->u.decode.gp_end ;
 	begin = psf->dataoffset ;
 
-	/* Adjust the target to give time to converge. */
-	if (target_gp >= OGG_OPUS_PREROLL)
-		target_gp -= OGG_OPUS_PREROLL ;
-	if (target_gp < pcm_start)
-		target_gp = pcm_start ;
-
-	/* Seek to beginning special case */
-	if (target_gp < pcm_start + (uint64_t) oopus->header.preskip)
-		end = begin ;
-	else
+	/*
+	** Adjust the search for a page at least OGG_OPUS_PREROLL before our actual
+	** target, to give time for the decoder to converge.
+	*/
+	if (target_gp >= OGG_OPUS_PREROLL + pcm_start + (uint64_t) oopus->header.preskip)
+	{	target_gp -= OGG_OPUS_PREROLL ;
 		end = oopus->u.decode.last_offset ;
+		}
+	else
+	{	target_gp = pcm_start + (uint64_t) oopus->header.preskip ;
+		end = begin ;
+		} ;
 
-	ogg_stream_seek_page_search (psf, odata, target_gp, pcm_start, pcm_end, &best_gp, begin, end) ;
+	/* Search the Ogg stream for such a page */
+	old_pos = ogg_sync_ftell (psf) ;
+	ret = ogg_stream_seek_page_search (psf, odata, target_gp, pcm_start, pcm_end, &best_gp, begin, end) ;
+	if (ret != 0)
+	{	ogg_sync_fseek (psf, old_pos, SEEK_SET) ;
+		return ret ;
+		} ;
 
+	/* Load the page that contains our pre-roll target */
 	oopus->loc = 0 ;
 	oopus->len = 0 ;
 	if ((ret = ogg_opus_unpack_next_page (psf, odata, oopus)) != 1)
 		return ret ;
 	oopus->pkt_pos = best_gp ;
+
+	/* Reset the decoder (gain settings survive the reset) */
 	opus_multistream_decoder_ctl (oopus->u.decode.state, OPUS_RESET_STATE) ;
 	/* Gain decoder settings survive resets. */
 
