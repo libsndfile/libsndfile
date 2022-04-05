@@ -1084,8 +1084,8 @@ ogg_opus_read_refill (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 	** skip point, indicating that these samples are padding to get the decoder
 	** to converge and should be dropped.
 	*/
-	if (oopus->pkt_pos < oopus->u.decode.gp_start + (uint64_t) oopus->header.preskip)
-		oopus->loc = SF_MIN ((int) ((uint64_t) oopus->header.preskip + oopus->u.decode.gp_start - oopus->pkt_pos) / oopus->sr_factor, oopus->len) ;
+	if (oopus->pkt_pos < (unsigned) oopus->header.preskip)
+		oopus->loc = SF_MIN ((oopus->header.preskip - (int) oopus->pkt_pos) / oopus->sr_factor, oopus->len) ;
 	else
 		oopus->loc = 0 ;
 
@@ -1538,19 +1538,7 @@ ogg_opus_seek_page_search (SF_PRIVATE *psf, uint64_t target_gp)
 	best_gp = pcm_start = oopus->u.decode.gp_start ;
 	pcm_end = oopus->u.decode.gp_end ;
 	begin = psf->dataoffset ;
-
-	/*
-	** Adjust the search for a page at least OGG_OPUS_PREROLL before our actual
-	** target, to give time for the decoder to converge.
-	*/
-	if (target_gp >= OGG_OPUS_PREROLL + pcm_start + (uint64_t) oopus->header.preskip)
-	{	target_gp -= OGG_OPUS_PREROLL ;
-		end = oopus->u.decode.last_offset ;
-		}
-	else
-	{	target_gp = pcm_start + (uint64_t) oopus->header.preskip ;
-		end = begin ;
-		} ;
+	end = oopus->u.decode.last_offset ;
 
 	/* Search the Ogg stream for such a page */
 	old_pos = ogg_sync_ftell (psf) ;
@@ -1569,7 +1557,6 @@ ogg_opus_seek_page_search (SF_PRIVATE *psf, uint64_t target_gp)
 
 	/* Reset the decoder (gain settings survive the reset) */
 	opus_multistream_decoder_ctl (oopus->u.decode.state, OPUS_RESET_STATE) ;
-	/* Gain decoder settings survive resets. */
 
 	return 0 ;
 } /* ogg_opus_seek_page_search */
@@ -1580,11 +1567,6 @@ ogg_opus_seek_manual (SF_PRIVATE *psf, uint64_t target_gp)
 	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
 	sf_count_t pos ;
 	int nn ;
-
-	if (target_gp > OGG_OPUS_PREROLL)
-		target_gp -= OGG_OPUS_PREROLL ;
-	if (target_gp < oopus->pg_pos)
-		target_gp = oopus->pg_pos ;
 
 	if (oopus->pg_pos > target_gp)
 	{	ogg_stream_reset (&odata->ostream) ;
@@ -1606,9 +1588,9 @@ ogg_opus_seek_manual (SF_PRIVATE *psf, uint64_t target_gp)
 
 static sf_count_t
 ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
-{	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
-	uint64_t target_gp ;
-	uint64_t current ;
+{	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
+	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
+	uint64_t target_gp, current_gp ;
 	int ret ;
 
 	/* Only support seeking in read mode. */
@@ -1617,36 +1599,40 @@ ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 		return PSF_SEEK_ERROR ;
 		} ;
 
-	/*
-	** Use the start of the current decoded buffer as the current position,
-	** avoids doing an actual seek if the target is within the current buffer.
-	*/
+	/* Figure out the current position granule pos. Use the start of the
+	 * current buffer, to avoid backwards seeking if the target is on the page
+	 * but before the current locaiton. */
 	oopus->loc = 0 ;
-	current = oopus->pkt_pos - (uint64_t) (oopus->len * oopus->sr_factor) ;
+	current_gp = oopus->pkt_pos - (uint64_t) (oopus->len * oopus->sr_factor) ;
 
-	/*
-	** Remember, there are preskip granulepos worth of samples at the front of
-	** the stream which are bunk. Also, granule positions can be offset.
-	*/
+	/* Calculate the target granule pos. This includes the decoder delay and
+	 * the file granule position offset. */
 	target_gp = offset * oopus->sr_factor ;
 	target_gp += oopus->u.decode.gp_start ;
 	target_gp += oopus->header.preskip ;
 
-	if (oopus->u.decode.gp_end == (uint64_t) -1)
-	{	/*
-		** Don't know the end of the file. Could be a chained file we don't yet
-		** support. Oh well, just do it manually.
-		*/
-		ogg_opus_seek_manual (psf, target_gp) ;
-		}
-	else
-	{	/*
-		** Avoid seeking in the file if where we want is just ahead or exactly
-		** were we are. To avoid needing to flush the decoder we choose pre-
-		** roll.
-		*/
-		if (target_gp < current || target_gp - current > OGG_OPUS_PREROLL)
-		{	ret = ogg_opus_seek_page_search (psf, target_gp) ;
+	/* Check if we need to do a page seek. */
+	if (target_gp < current_gp || target_gp - current_gp > OGG_OPUS_PREROLL)
+	{	uint64_t preroll_gp ;
+
+		/* For a page seek, use an earlier target granule pos, giving the
+		 * decoder samples to converge before the actual target. */
+		if (target_gp >= OGG_OPUS_PREROLL + oopus->u.decode.gp_start + (uint64_t) oopus->header.preskip)
+		{	preroll_gp = target_gp - OGG_OPUS_PREROLL ;
+			}
+		else
+		{	preroll_gp = oopus->u.decode.gp_start + (uint64_t) oopus->header.preskip ;
+			} ;
+
+		if (oopus->u.decode.gp_end == (uint64_t) -1)
+		{	/*
+			** Don't know the end of the file. Could be a chained file we don't yet
+			** support. Oh well, just do it manually.
+			*/
+			ogg_opus_seek_manual (psf, preroll_gp) ;
+			}
+		else
+		{	ret = ogg_opus_seek_page_search (psf, preroll_gp) ;
 			if (ret < 0)
 			{	/*
 				** Page seek failed, what to do? Could be bad data. We can
@@ -1654,7 +1640,7 @@ ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 				** from the beginning has the advantage of finding where the
 				** file goes bad.
 				*/
-				ret = ogg_opus_seek_manual (psf, target_gp) ;
+				ret = ogg_opus_seek_manual (psf, preroll_gp) ;
 				if (ret < 0)
 				{	/*
 					** If were here, and there is no error, we can be pretty
@@ -1665,6 +1651,22 @@ ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 					return ret ;
 					} ;
 				} ;
+			} ;
+
+		/*
+		** Skip over packets on the found page that are before our pre-roll
+		** target to avoid unnecessary decoding, and make decoder convergence
+		** independent of page boundaries for more visible errors.
+		*/
+		for ( ; odata->pkt_indx != odata->pkt_len ; )
+		{	ogg_packet *ppkt = &odata->pkt [odata->pkt_indx] ;
+			int nsamp = opus_packet_get_nb_samples (ppkt->packet, ppkt->bytes, 48000) ;
+			if (oopus->pkt_pos + nsamp < preroll_gp)
+			{	oopus->pkt_pos += nsamp ;
+				odata->pkt_indx++ ;
+				}
+			else
+				break ;
 			} ;
 		} ;
 
