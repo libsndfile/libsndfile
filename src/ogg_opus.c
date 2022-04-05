@@ -1084,8 +1084,8 @@ ogg_opus_read_refill (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 	** skip point, indicating that these samples are padding to get the decoder
 	** to converge and should be dropped.
 	*/
-	if (oopus->pkt_pos < (unsigned) oopus->header.preskip)
-		oopus->loc = SF_MIN ((oopus->header.preskip - (int) oopus->pkt_pos) / oopus->sr_factor, oopus->len) ;
+	if (oopus->pkt_pos < oopus->u.decode.gp_start + (uint64_t) oopus->header.preskip)
+		oopus->loc = SF_MIN ((int) ((uint64_t) oopus->header.preskip + oopus->u.decode.gp_start - oopus->pkt_pos) / oopus->sr_factor, oopus->len) ;
 	else
 		oopus->loc = 0 ;
 
