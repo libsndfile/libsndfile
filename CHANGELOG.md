@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * Searching for LAME dependency with CMake build system (issue #821).
 * CMake build from Autotools tarball (issue #816).
-* Build on UWP platform (isse #824).
+* Build on UWP platform (issue #824).
 * Fix signed integer overflow (issue #785).
 
 ## [1.1.0] - 2022-03-27
