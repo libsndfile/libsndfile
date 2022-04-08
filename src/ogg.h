@@ -57,14 +57,36 @@ typedef struct
 								((buf [base + 2] <<16) & 0xff0000) | \
 								((buf [base + 1] << 8) & 0xff00) | \
 								(buf [base] & 0xff))
+/*-----------------------------------------------------------------------------------------------
+** Inline functions.
+*/
+
 /*
 ** LibOgg documentation is noted as being bad by it's author.
-** Add some useful utility macros for introspecting Ogg pages.
+** Add some useful utility inline functions for introspecting Ogg pages.
 */
-#define ogg_page_segments(page_ptr) ((page_ptr)->header [26])
 
-#define ogg_page_continues(page_ptr) ((page_ptr)->header [27 + (page_ptr)->header [26] - 1] == 255)
+/* ogg_page_segments returns how many segments are in this page. */
+static inline int
+ogg_page_segments (ogg_page *pg)
+{	return (int) (pg->header [26]) ; }
 
+/* ogg_page_continues returns true if this page ends in a continued packet. */
+static inline int
+ogg_page_continues (ogg_page *pg)
+{	return pg->header [27 + pg->header [26] - 1] == 255 ;
+}
+
+/*-----------------------------------------------------------------------------------------------
+** Exported functions.
+*/
+
+/*
+** ogg_read_first_page loads the first Ogg page found in the file, and sets the
+** OGG_PRIVATE serialno to match the logical stream of the page. Data is read
+** without seeking backwards, loading any data present from psf->header into
+** the ogg_sync state first, so that this function works with pipes.
+*/
 int	ogg_read_first_page	(SF_PRIVATE *, OGG_PRIVATE *) ;
 
 /*
