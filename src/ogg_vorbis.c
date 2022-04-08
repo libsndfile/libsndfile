@@ -899,7 +899,7 @@ vorbis_seek_trysearch (SF_PRIVATE *psf, uint64_t target_gp)
 	search_target_gp = search_target_gp < target_gp ? target_gp - search_target_gp : 0 ;
 
 	ret = ogg_stream_seek_page_search (psf, odata, search_target_gp, vdata->pcm_start,
-			vdata->pcm_end, &best_gp, psf->dataoffset, vdata->last_page) ;
+			vdata->pcm_end, &best_gp, psf->dataoffset, vdata->last_page, vdata->vinfo.rate) ;
 	if (ret < 0)
 		return ret ;
 

@@ -1544,7 +1544,7 @@ ogg_opus_page_seek_search (SF_PRIVATE *psf, uint64_t target_gp)
 
 	/* Search the Ogg stream for such a page */
 	old_pos = ogg_sync_ftell (psf) ;
-	ret = ogg_stream_seek_page_search (psf, odata, target_gp, pcm_start, pcm_end, &best_gp, begin, end) ;
+	ret = ogg_stream_seek_page_search (psf, odata, target_gp, pcm_start, pcm_end, &best_gp, begin, end, 48000) ;
 	if (ret != 0)
 	{	ogg_sync_fseek (psf, old_pos, SEEK_SET) ;
 		return ret ;
