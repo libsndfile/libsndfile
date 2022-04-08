@@ -154,10 +154,16 @@ int ogg_stream_unpack_page (SF_PRIVATE *psf, OGG_PRIVATE *odata) ;
 ** Preforms a bisection search. If not found exactly, the best result is
 ** returned in *best_gp. Found page is loaded into the virtual bitstream,
 ** ready for unpacking. Arguments pcm_start and pcm_end are the highest and
-** lowest granule positions of the file. begin and end are the file offsets.
+** lowest granule positions of the file. begin and end are the file offset
+** range to search. gp_rate is an information hint so granule positions can
+** be correlated to playback time, so the search can figure out how close it
+** is, should be granule positions per second.
 */
 int ogg_stream_seek_page_search (SF_PRIVATE *psf, OGG_PRIVATE *odata,
-								uint64_t target_gp, uint64_t pcm_start, uint64_t pcm_end,
-								uint64_t *best_gp, sf_count_t begin, sf_count_t end) ;
+								uint64_t target_gp,
+								uint64_t pcm_start, uint64_t pcm_end,
+								uint64_t *best_gp,
+								sf_count_t begin, sf_count_t end,
+								uint64_t gp_rate) ;
 
 #endif /* SF_SRC_OGG_H */

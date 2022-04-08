@@ -447,7 +447,9 @@ ogg_sync_last_page_before (SF_PRIVATE *psf, OGG_PRIVATE *odata, uint64_t *gp_out
 } /* ogg_sync_last_page_before */
 
 int
-ogg_stream_seek_page_search (SF_PRIVATE *psf, OGG_PRIVATE *odata, uint64_t target_gp, uint64_t pcm_start, uint64_t pcm_end, uint64_t *best_gp, sf_count_t begin, sf_count_t end)
+ogg_stream_seek_page_search (SF_PRIVATE *psf, OGG_PRIVATE *odata,
+	uint64_t target_gp, uint64_t pcm_start, uint64_t pcm_end, uint64_t *best_gp,
+	sf_count_t begin, sf_count_t end, uint64_t gp_rate)
 {	ogg_page page ;
 	uint64_t gp ;
 	sf_count_t d0, d1, d2 ;
@@ -632,7 +634,7 @@ ogg_stream_seek_page_search (SF_PRIVATE *psf, OGG_PRIVATE *odata, uint64_t targe
 					buffering = SF_TRUE ;
 				} ;
 				*best_gp = pcm_start = gp ;
-				if (target_gp - gp > 48000)
+				if (target_gp - gp > gp_rate)
 				{	/* Out by over a second. Try another bisection. */
 					break ;
 					}
