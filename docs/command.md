@@ -1286,7 +1286,7 @@ sndfile
 : A valid SNDFILE* pointer
 
 cmd
-: SFC_SET_OGG_PAGE_LATENCY_MS
+: SFC_SET_OGG_STREAM_SERIALNO
 
 data
 : A pointer to a 32-bit int value
