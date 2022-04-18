@@ -18,10 +18,10 @@ jobs:
           ubuntu-clang-cmake-shared,
           macos-cmake,
           macos-cmake-shared,
-          windows-vs2019-x64,
-          windows-vs2019-x64-shared,
-          windows-vs2019-Win32,
-          windows-vs2019-Win32-shared
+          windows-vs2022-x64,
+          windows-vs2022-x64-shared,
+          windows-vs2022-Win32,
+          windows-vs2022-Win32-shared
         ]
         include:
           - name: ubuntu-gcc-autotools
@@ -121,22 +121,22 @@ jobs:
               -DCMAKE_C_FLAGS="-Wall -Wextra"
               -DCMAKE_VERBOSE_MAKEFILE=ON
 
-          - name: windows-vs2019-x64
+          - name: windows-vs2022-x64
             os: windows-latest
             triplet: 'x64-windows-static'
             build-system: cmake
-            cmake-generator: 'Visual Studio 16 2019'
+            cmake-generator: 'Visual Studio 17 2022'
             cmake-options: >-
               -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug>
               -DCMAKE_BUILD_TYPE=Release
               -DVCPKG_TARGET_TRIPLET=x64-windows-static
               -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-          - name: windows-vs2019-x64-shared
+          - name: windows-vs2022-x64-shared
             os: windows-latest
             triplet: 'x64-windows-static'
             build-system: cmake
-            cmake-generator: 'Visual Studio 16 2019'
+            cmake-generator: 'Visual Studio 17 2022'
             cmake-options: >-
               -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug>
               -DBUILD_SHARED_LIBS=ON
@@ -147,11 +147,11 @@ jobs:
               -DVCPKG_TARGET_TRIPLET=x64-windows-static
               -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-          - name: windows-vs2019-Win32
+          - name: windows-vs2022-Win32
             os: windows-latest
             triplet: 'x86-windows-static'
             build-system: cmake
-            cmake-generator: 'Visual Studio 16 2019'
+            cmake-generator: 'Visual Studio 17 2022'
             cmake-options: >-
               -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug>
               -DCMAKE_GENERATOR_PLATFORM=Win32
@@ -159,11 +159,11 @@ jobs:
               -DVCPKG_TARGET_TRIPLET=x86-windows-static
               -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-          - name: windows-vs2019-Win32-shared
+          - name: windows-vs2022-Win32-shared
             os: windows-latest
             triplet: 'x86-windows-static'
             build-system: cmake
-            cmake-generator: 'Visual Studio 16 2019'
+            cmake-generator: 'Visual Studio 17 2022'
             cmake-options: >-
               -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug>
               -DCMAKE_GENERATOR_PLATFORM=Win32
