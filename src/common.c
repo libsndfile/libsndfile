@@ -190,7 +190,7 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 						if (lead_char != '0' && left_align == SF_FALSE)
 							width_specifier -- ;
 
-						u = - ((unsigned) d) ;
+						u = - (int32_t) ((unsigned) d) ;
 						}
 					else
 					{	u = (unsigned) d ;
@@ -252,7 +252,7 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 						else
 						{	if (D < 0)
 							{	log_putchar (psf, '-') ;
-								U = -((uint64_t) D) ;
+								U = - (int64_t) ((uint64_t) D) ;
 								}
 							else
 							{	U = (uint64_t) D;
