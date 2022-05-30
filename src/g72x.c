@@ -141,7 +141,7 @@ g72x_init (SF_PRIVATE * psf)
 		else
 			pg72x->blocks_total = psf->datalength / pg72x->blocksize ;
 
-		psf->sf.frames = pg72x->blocks_total * pg72x->samplesperblock ;
+		psf->sf.frames = (sf_count_t) pg72x->blocks_total * pg72x->samplesperblock ;
 
 		psf_g72x_decode_block (psf, pg72x) ;
 		}
