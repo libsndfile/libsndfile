@@ -2908,7 +2908,7 @@ retry:
 
 static int
 validate_sfinfo (SF_INFO *sfinfo)
-{	if ((sfinfo->samplerate < 1) || (sfinfo->samplerate > SF_MAX_SAMPLERATE))
+{	if (sfinfo->samplerate < 1)
 		return 0 ;
 	if (sfinfo->frames < 0)
 		return 0 ;
