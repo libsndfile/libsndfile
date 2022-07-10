@@ -15,6 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Fix signed integer overflow (issue #785).
 * Skipping large wav chunks on stdin (PR #819).
 
+### Removed
+
+* Maximum samplerate limit, thanks @drmpeg, @justacec (issue #850).
+  
+  In version 1.1.0, an artificial limit of 655350 Hz was created, but as it
+  turned out, this is not enough for some scenarios.
+
 ## [1.1.0] - 2022-03-27
 
 ### Added
