@@ -183,7 +183,7 @@ jobs:
       - name: Install MacOS dependencies
         if: startsWith(matrix.os,'macos')
         run: |
-          brew install automake autogen speex mpg123
+          brew install automake autogen speex mpg123 lame
 
       - name: Install Linux dependencies
         if: startsWith(matrix.os,'ubuntu')
