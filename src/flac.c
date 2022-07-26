@@ -43,6 +43,15 @@
 
 #define ENC_BUFFER_SIZE 8192
 
+/*
+** READ_LOOP_MAX_LEN is the maximum 'len' that will be passed to
+** flac_read_loop().  This is somewhat arbitrary, but must be less
+** than (UINT_MAX - FLAC__MAX_CHANNELS * FLAC__MAX_BLOCK_SIZE) to
+** avoid overflows, and must also be a multiple of the number of
+** channels (which is between 1 and 8.)
+*/
+#define READ_LOOP_MAX_LEN (0x10000 * 3 * 5 * 7)
+
 typedef enum
 {	PFLAC_PCM_SHORT = 50,
 	PFLAC_PCM_INT = 51,
@@ -977,7 +986,7 @@ flac_read_flac2s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 
 	while (total < len)
 	{	pflac->ptr = ptr + total ;
-		readlen = (len - total > 0x1000000) ? 0x1000000 : (unsigned) (len - total) ;
+		readlen = (len - total > READ_LOOP_MAX_LEN) ? READ_LOOP_MAX_LEN : (unsigned) (len - total) ;
 		current = flac_read_loop (psf, readlen) ;
 		if (current == 0)
 			break ;
@@ -997,7 +1006,7 @@ flac_read_flac2i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 
 	while (total < len)
 	{	pflac->ptr = ptr + total ;
-		readlen = (len - total > 0x1000000) ? 0x1000000 : (unsigned) (len - total) ;
+		readlen = (len - total > READ_LOOP_MAX_LEN) ? READ_LOOP_MAX_LEN : (unsigned) (len - total) ;
 		current = flac_read_loop (psf, readlen) ;
 		if (current == 0)
 			break ;
@@ -1017,7 +1026,7 @@ flac_read_flac2f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 	while (total < len)
 	{	pflac->ptr = ptr + total ;
-		readlen = (len - total > 0x1000000) ? 0x1000000 : (unsigned) (len - total) ;
+		readlen = (len - total > READ_LOOP_MAX_LEN) ? READ_LOOP_MAX_LEN : (unsigned) (len - total) ;
 		current = flac_read_loop (psf, readlen) ;
 		if (current == 0)
 			break ;
@@ -1037,7 +1046,7 @@ flac_read_flac2d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 
 	while (total < len)
 	{	pflac->ptr = ptr + total ;
-		readlen = (len - total > 0x1000000) ? 0x1000000 : (unsigned) (len - total) ;
+		readlen = (len - total > READ_LOOP_MAX_LEN) ? READ_LOOP_MAX_LEN : (unsigned) (len - total) ;
 
 		current = flac_read_loop (psf, readlen) ;
 		if (current == 0)
