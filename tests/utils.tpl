@@ -193,6 +193,7 @@ sf_count_t		file_length_fd (int fd) ;
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
+#include <float.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 
@@ -214,6 +215,28 @@ sf_count_t		file_length_fd (int fd) ;
 #ifndef O_BINARY
 #define O_BINARY 0
 #endif
+
+
+/*
+**      Compare for equality, with epsilon
+*/
+static inline int
+equals_short (const short a, const short b)
+{        return (a == b);
+} /* equals_short */
+static inline int
+equals_int (const int a, const int b)
+{        return (a == b);
+} /* equals_int */
+static inline int
+equals_float (const float a, const float b)
+{        return (fabsf(a - b) <= FLT_EPSILON);
+} /* equals_float */
+static inline int
+equals_double (const double a, const double b)
+{       return (fabs(a - b) <= DBL_EPSILON);
+} /* equals_double */
+
 
 [+ FOR float_type +]
 void
@@ -752,8 +775,8 @@ compare_[+ (get "io_element") +]_or_die (const [+ (get "io_element") +] *expecte
 	unsigned k ;
 
 	for (k = 0 ; k < count ; k++)
-		if (expected [k] != actual [k])
-		{	printf ("\n\nLine %d : Error at index %d, got " [+ (get "format_str") +] ", should be " [+ (get "format_str") +] ".\n\n", line_num, k, actual [k], expected [k]) ;
+		if (!equals_[+ (get "io_element") +](expected [k], actual [k]))
+		{	printf ("\n\nLine %d : Error at index %d, got " [+ (get "format_str") +] ", should be " [+ (get "format_str") +] "(delta=" [+ (get "format_str") +] " ).\n\n", line_num, k, actual [k], expected [k], actual [k] - expected [k]) ;
 			exit (1) ;
 			} ;
 
