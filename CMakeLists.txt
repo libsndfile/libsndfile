@@ -220,8 +220,6 @@ feature_summary (WHAT ALL)
 
 configure_file (src/config.h.cmake src/config.h)
 
-configure_file (include/sndfile.h.in include/sndfile.h)
-
 if (INSTALL_PKGCONFIG_MODULE)
 
 	set (prefix ${CMAKE_INSTALL_PREFIX})
@@ -250,8 +248,8 @@ endif ()
 
 # Public libsndfile headers
 set (sndfile_HDRS
+	include/sndfile.h
 	include/sndfile.hh
-	${CMAKE_CURRENT_BINARY_DIR}/include/sndfile.h
 	)
 
 #

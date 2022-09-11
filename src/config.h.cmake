@@ -223,9 +223,6 @@
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "@CPACK_PACKAGE_VERSION_FULL@"
 
-/* Set to maximum allowed value of sf_count_t type. */
-#define SF_COUNT_MAX @SF_COUNT_MAX@
-
 /* The size of `double', as computed by sizeof. */
 @SIZEOF_DOUBLE_CODE@
 
@@ -253,9 +250,6 @@
 /* The size of `off_t', as computed by sizeof. */
 @SIZEOF_OFF_T_CODE@
 
-/* Set to sizeof (long) if unknown. */
-@SIZEOF_SF_COUNT_T_CODE@
-
 /* The size of `short', as computed by sizeof. */
 @SIZEOF_SHORT_CODE@
 
@@ -270,9 +264,6 @@
 
 /* The size of `wchar_t', as computed by sizeof. */
 @SIZEOF_WCHAR_T_CODE@
-
-/* Set to long if unknown. */
-#define TYPEOF_SF_COUNT_T @TYPEOF_SF_COUNT_T@
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
