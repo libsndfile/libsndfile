@@ -365,9 +365,9 @@ typedef	struct sf_private_tag	SNDFILE ;
 ** and the Microsoft compiler.
 */
 
-typedef @TYPEOF_SF_COUNT_T@	sf_count_t ;
+typedef int64_t			sf_count_t ;
 #ifndef SF_COUNT_MAX
-#define SF_COUNT_MAX		@SF_COUNT_MAX@
+#define SF_COUNT_MAX		0x7FFFFFFFFFFFFFFFLL
 #endif
 
 

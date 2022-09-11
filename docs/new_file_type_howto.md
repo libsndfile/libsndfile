@@ -55,7 +55,7 @@ to disable gcc optimisations and make debugging with gdb/ddd easier.
 
 Add a unique identifier for the new file type.
 
-Edit src/sndfile.h.in and find the enum containing the SF_FORMAT_XXX identifiers.
+Edit src/sndfile.h and find the enum containing the SF_FORMAT_XXX identifiers.
 Since you will be adding a major file type you should add your identifier to the
 top part of the list where the values are above 0x10000 in value. The easiest
 way to do this is to find the largest value in the list, add 0x10000 to it and
