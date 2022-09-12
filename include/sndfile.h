@@ -367,7 +367,7 @@ typedef	struct sf_private_tag	SNDFILE ;
 
 typedef int64_t			sf_count_t ;
 #ifndef SF_COUNT_MAX
-#define SF_COUNT_MAX		0x7FFFFFFFFFFFFFFFLL
+#define SF_COUNT_MAX	INT64_MAX
 #endif
 
 
