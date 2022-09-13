@@ -47,7 +47,10 @@
 
 #include "common.h"
 
-#if HAVE_ALSA_ASOUNDLIB_H
+#if HAVE_SNDIO_H
+	#include <sndio.h>
+
+#elif HAVE_ALSA_ASOUNDLIB_H
 	#define ALSA_PCM_NEW_HW_PARAMS_API
 	#define ALSA_PCM_NEW_SW_PARAMS_API
 	#include <alsa/asoundlib.h>
@@ -60,9 +63,6 @@
 	#include 	<fcntl.h>
 	#include 	<sys/ioctl.h>
 	#include 	<sys/soundcard.h>
-
-#elif HAVE_SNDIO_H
-	#include <sndio.h>
 
 #elif (defined (sun) && defined (unix)) || defined(__NetBSD__)
 	#include <fcntl.h>
