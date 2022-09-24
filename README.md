@@ -46,7 +46,7 @@ Similarly on Mac OS X, assuming [brew] is already installed:
 Once the build environment has been set up, building and testing libsndfile is
 as simple as:
 
-    ./autogen.sh
+    autoreconf -vif
     ./configure --enable-werror
     make
     make check

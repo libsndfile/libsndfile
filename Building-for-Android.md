@@ -3,7 +3,7 @@
 Assuming the Android Ndk is installed at location `/path/to/toolchain`, building
 libsndfile for Android (arm-linux-androideabi) should be as simple as:
 ```
-./autogen.sh
+autoreconf -vif
 export ANDROID_TOOLCHAIN_HOME=/path/to/android/toolchain
 ./Scripts/android-configure.sh
 make

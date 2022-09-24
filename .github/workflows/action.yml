@@ -209,7 +209,7 @@ jobs:
           CXX: ${{ matrix.cxx }}
         if: startsWith(matrix.build-system,'autotools')
         run: |
-          ./autogen.sh
+          autoreconf -vif
           if [[ "${CC}" == "clang" ]]; then
             ./configure --enable-werror && make distcheck
           else
