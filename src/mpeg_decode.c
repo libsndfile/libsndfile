@@ -91,11 +91,8 @@ mpeg_dec_decode (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 
 	error = mpg123_read (pmp3d->pmh, (unsigned char *) ptr, len * sizeof (float), &done) ;
 
-	if (error == MPG123_OK)
+	if (error == MPG123_OK || error == MPG123_DONE)
 		return done / sizeof (float) ;
-
-	if (error == MPG123_DONE)
-		return 0 ;
 
 	if (error == MPG123_NEW_FORMAT)
 	{	psf->error = SFE_MALFORMED_FILE ;
