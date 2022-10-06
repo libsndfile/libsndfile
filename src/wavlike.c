@@ -952,7 +952,7 @@ int
 wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 {	sf_count_t	current_pos ;
 	char		buffer [2048] ;
-	uint32_t	chunk_size, data_size, bytesread = 0 ;
+	uint32_t	chunk_size, bytesread = 0 ;
 
 	current_pos = psf_fseek (psf, 0, SEEK_CUR) ;
 
@@ -1012,12 +1012,12 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 
 		/* Read data size */
 		if (bytesread + 4 <= chunk_length)
-		{	thisread = psf_binheader_readf (psf, "4", &data_size) ;
+		{	thisread = psf_binheader_readf (psf, "4", &chunk_size) ;
 			bytesread += thisread ;
 			if (thisread < 4)
 				return psf->error ;
 			/* subchunks are rounded up to the nearest 16-bit offset */
-			chunk_size = data_size + (data_size & 1) ;
+			chunk_size += (chunk_size & 1) ;
 			}
 		else
 		{	psf_log_printf (psf, "  *** Chunk ended unexpectedly. Corrupt chunk size?.\n") ;
@@ -1050,7 +1050,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 					bytesread += thisread ;
 					if (thisread < chunk_size)
 						return psf->error ;
-					buffer [data_size] = 0 ;
+					buffer [chunk_size] = 0 ;
 
 					psf_log_printf (psf, "    %M : %s\n", chunk, buffer) ;
 
@@ -1094,8 +1094,8 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 							goto cleanup_subchunk_parse ;
 							} ;
 
-						if (data_size < 4)
-						{	psf_log_printf (psf, "  *** %M : %u (too small)\n", chunk, data_size) ;
+						if (chunk_size < 4)
+						{	psf_log_printf (psf, "  *** %M : %u (too small)\n", chunk, chunk_size) ;
 							goto cleanup_subchunk_parse ;
 							}
 
@@ -1103,7 +1103,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 						bytesread += thisread ;
 						if (thisread < chunk_size)
 							return psf->error ;
-						buffer [data_size - 4] = 0 ;
+						buffer [chunk_size - 4] = 0 ;
 
 						if (mark_id < 10) /* avoid swamping log buffer with labels */
 							psf_log_printf (psf, "    %M : %u : %s\n", chunk, mark_id, buffer) ;
