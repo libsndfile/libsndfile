@@ -1786,18 +1786,14 @@ f2sc_clip_array (const float *src, signed char *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [i] = 127 ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [i] = -128 ;
 			continue ;
 			} ;
-#endif
 
 		dest [i] = psf_lrintf (scaled_value) >> 24 ;
 		} ;
@@ -1849,18 +1845,14 @@ f2uc_clip_array	(const float *src, unsigned char *dest, int count, int normalize
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [i] = 0xFF ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [i] = 0 ;
 			continue ;
 			} ;
-#endif
 
 		dest [i] = (psf_lrintf (scaled_value) >> 24) + 128 ;
 		} ;
@@ -1920,20 +1912,16 @@ f2bes_clip_array (const float *src, short *dest, int count, int normalize)
 	for (int i = 0 ; i < count ; i++)
 	{	ucptr = (unsigned char*) &dest [i] ;
 		scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [1] = 0xFF ;
 			ucptr [0] = 0x7F ;
 			continue ;
 		} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [1] = 0x00 ;
 			ucptr [0] = 0x80 ;
 			continue ;
 			} ;
-#endif
 
 		value = psf_lrintf (scaled_value) ;
 		ucptr [1] = value >> 16 ;
@@ -1995,20 +1983,16 @@ f2les_clip_array (const float *src, short *dest, int count, int normalize)
 	for (int i = 0 ; i < count ; i++)
 	{	ucptr = (unsigned char*) &dest [i] ;
 		scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
 			ucptr [1] = 0x7F ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [0] = 0x00 ;
 			ucptr [1] = 0x80 ;
 			continue ;
 			} ;
-#endif
 
 		value = psf_lrintf (scaled_value) ;
 		ucptr [0] = value >> 16 ;
@@ -2378,18 +2362,14 @@ d2sc_clip_array	(const double *src, signed char *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [i] = 127 ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [i] = -128 ;
 			continue ;
 			} ;
-#endif
 
 		dest [i] = psf_lrintf (scaled_value) >> 24 ;
 		} ;
@@ -2441,18 +2421,14 @@ d2uc_clip_array	(const double *src, unsigned char *dest, int count, int normaliz
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	dest [i] = 255 ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
 		{	dest [i] = 0 ;
 			continue ;
 			} ;
-#endif
 
 		dest [i] = (psf_lrint (src [i] * normfact) >> 24) + 128 ;
 		} ;
@@ -2512,20 +2488,16 @@ d2bes_clip_array (const double *src, short *dest, int count, int normalize)
 	for (int i = 0 ; i < count ; i++)
 	{	ucptr = (unsigned char*) &dest [i] ;
 		scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [1] = 0xFF ;
 			ucptr [0] = 0x7F ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [1] = 0x00 ;
 			ucptr [0] = 0x80 ;
 			continue ;
 			} ;
-#endif
 
 		value = psf_lrint (scaled_value) ;
 		ucptr [1] = value >> 16 ;
@@ -2587,20 +2559,16 @@ d2les_clip_array (const double *src, short *dest, int count, int normalize)
 	for (int i = 0 ; i < count ; i++)
 	{	ucptr = (unsigned char*) &dest [i] ;
 		scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
 			ucptr [1] = 0x7F ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [0] = 0x00 ;
 			ucptr [1] = 0x80 ;
 			continue ;
 			} ;
-#endif
 
 		value = psf_lrint (scaled_value) ;
 		ucptr [0] = value >> 16 ;

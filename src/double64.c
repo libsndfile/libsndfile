@@ -496,9 +496,9 @@ d2s_clip_array (const double *src, int count, short *dest, double scale)
 {	for (int i = 0 ; i < count ; i++)
 	{	double tmp = scale * src [i] ;
 
-		if (CPU_CLIPS_POSITIVE == 0 && tmp > 32767.0)
+		if (tmp > 32767.0)
 			dest [i] = SHRT_MAX ;
-		else if (CPU_CLIPS_NEGATIVE == 0 && tmp < -32768.0)
+		else if (tmp < -32768.0)
 			dest [i] = SHRT_MIN ;
 		else
 			dest [i] = psf_lrint (tmp) ;

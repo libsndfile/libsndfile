@@ -1692,18 +1692,14 @@ psf_f2s_clip_array (const float *src, short *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFF))
 		{	dest [i] = 0x7FFF ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x1000))
 		{	dest [i] = -0x7FFF - 1 ;
 			continue ;
 			} ;
-#endif
 
 		dest [i] = psf_lrintf (scaled_value) ;
 		} ;
@@ -1730,18 +1726,14 @@ psf_d2s_clip_array (const double *src, short *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFF))
 		{	dest [i] = 0x7FFF ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x1000))
 		{	dest [i] = -0x7FFF - 1 ;
 			continue ;
 			} ;
-#endif
 
 		dest [i] = psf_lrint (scaled_value) ;
 		} ;

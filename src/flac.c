@@ -1191,11 +1191,11 @@ f2flac8_clip_array (const float *src, int32_t *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7F))
+		if (scaled_value >= (1.0 * 0x7F))
 		{	dest [i] = 0x7F ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10))
+		if (scaled_value <= (-8.0 * 0x10))
 		{	dest [i] = -0x80 ;
 			continue ;
 			} ;
@@ -1213,11 +1213,11 @@ f2flac16_clip_array (const float *src, int32_t *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFF))
+		if (scaled_value >= (1.0 * 0x7FFF))
 		{	dest [i] = 0x7FFF ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x1000))
+		if (scaled_value <= (-8.0 * 0x1000))
 		{	dest [i] = -0x8000 ;
 			continue ;
 			} ;
@@ -1233,12 +1233,12 @@ f2flac24_clip_array (const float *src, int32_t *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFF))
+		if (scaled_value >= (1.0 * 0x7FFFFF))
 		{	dest [i] = 0x7FFFFF ;
 			continue ;
 			} ;
 
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x100000))
+		if (scaled_value <= (-8.0 * 0x100000))
 		{	dest [i] = -0x800000 ;
 			continue ;
 			}
@@ -1322,11 +1322,11 @@ d2flac8_clip_array (const double *src, int32_t *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7F))
+		if (scaled_value >= (1.0 * 0x7F))
 		{	dest [i] = 0x7F ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x10))
+		if (scaled_value <= (-8.0 * 0x10))
 		{	dest [i] = -0x80 ;
 			continue ;
 			} ;
@@ -1344,11 +1344,11 @@ d2flac16_clip_array (const double *src, int32_t *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFF))
+		if (scaled_value >= (1.0 * 0x7FFF))
 		{	dest [i] = 0x7FFF ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x1000))
+		if (scaled_value <= (-8.0 * 0x1000))
 		{	dest [i] = -0x8000 ;
 			continue ;
 			} ;
@@ -1366,11 +1366,11 @@ d2flac24_clip_array (const double *src, int32_t *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-		if (CPU_CLIPS_POSITIVE == 0 && scaled_value >= (1.0 * 0x7FFFFF))
+		if (scaled_value >= (1.0 * 0x7FFFFF))
 		{	dest [i] = 0x7FFFFF ;
 			continue ;
 			} ;
-		if (CPU_CLIPS_NEGATIVE == 0 && scaled_value <= (-8.0 * 0x100000))
+		if (scaled_value <= (-8.0 * 0x100000))
 		{	dest [i] = -0x800000 ;
 			continue ;
 			} ;
