@@ -981,7 +981,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 		switch (chunk)
 		{	case adtl_MARKER :
 			case INFO_MARKER :
-					/* These markers don't contain anything, not even a chunk lebgth. */
+					/* These markers don't contain anything, not even a chunk length. */
 					psf_log_printf (psf, "  %M\n", chunk) ;
 					continue ;
 
