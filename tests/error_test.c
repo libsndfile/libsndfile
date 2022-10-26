@@ -199,17 +199,15 @@ wav_list_recover_test (const char * filename)
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sndfile = sf_open (filename, SFM_READ, &sfinfo) ;
 
-	if (sndfile)
-	{	printf ("\n\nLine %d : expected failure - issue 374 reports no recovery from bogus LIST content.\n", __LINE__) ;
+	if (!sndfile)
+	{	printf ("\n\nLine %d : expected recovery from bogus LIST content.\n", __LINE__) ;
 		exit (1) ;
 		} ;
 
-	/*
 	if (sfinfo.frames != 2)
 	{	printf ("\n\nLine %d : Should have read data chunk with 2 stereo frames, got %ld.\n\n", __LINE__, (long)sfinfo.frames) ;
 		exit (1) ;
 		} ;
-	*/
 
 	unlink (filename) ;
 	puts ("ok") ;

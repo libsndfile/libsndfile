@@ -1089,7 +1089,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 					chunk_size += (chunk_size & 1) ;
 					psf_log_printf (psf, "    *** %M : %u\n", chunk, chunk_size) ;
 					if (bytesread + chunk_size > chunk_length)
-					{	bytesread += psf_binheader_readf (psf, "j", chunk_length - bytesread + 4) ;
+					{	bytesread += psf_binheader_readf (psf, "j", chunk_length - bytesread) ;
 						continue ;
 						}
 					else
