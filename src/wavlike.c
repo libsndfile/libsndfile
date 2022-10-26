@@ -1026,7 +1026,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 			case ITRK_MARKER :
 					bytesread += psf_binheader_readf (psf, "4", &chunk_size) ;
 					chunk_size += (chunk_size & 1) ;
-					if (chunk_size >= SIGNED_SIZEOF (buffer) || chunk_size >= chunk_length)
+					if (chunk_size >= SIGNED_SIZEOF (buffer) || bytesread + chunk_size > chunk_length)
 					{	psf_log_printf (psf, "  *** %M : %u (too big)\n", chunk, chunk_size) ;
 						goto cleanup_subchunk_parse ;
 						} ;
@@ -1042,7 +1042,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 						bytesread += psf_binheader_readf (psf, "44", &chunk_size, &mark_id) ;
 						chunk_size -= 4 ;
 						chunk_size += (chunk_size & 1) ;
-						if (chunk_size < 1 || chunk_size >= SIGNED_SIZEOF (buffer) || chunk_size >= chunk_length)
+						if (chunk_size < 1 || chunk_size >= SIGNED_SIZEOF (buffer) || bytesread + chunk_size > chunk_length)
 						{	psf_log_printf (psf, "  *** %M : %u (too big)\n", chunk, chunk_size) ;
 							goto cleanup_subchunk_parse ;
 							} ;
@@ -1073,7 +1073,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 			case note_MARKER :
 					bytesread += psf_binheader_readf (psf, "4", &chunk_size) ;
 					chunk_size += (chunk_size & 1) ;
-					if (chunk_size >= SIGNED_SIZEOF (buffer) || chunk_size >= chunk_length)
+					if (chunk_size >= SIGNED_SIZEOF (buffer) || bytesread + chunk_size > chunk_length)
 					{	psf_log_printf (psf, "  *** %M : %u (too big)\n", chunk, chunk_size) ;
 						goto cleanup_subchunk_parse ;
 						} ;
