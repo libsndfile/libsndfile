@@ -375,7 +375,7 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 					strptr = istr ;
 					while (*strptr)
 					{	c = *strptr++ ;
-						log_putchar (psf, c) ;
+						log_putchar (psf, psf_isprint (c) ? c : '.') ;
 						} ;
 					break ;
 
