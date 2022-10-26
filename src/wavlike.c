@@ -1087,13 +1087,15 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 			default :
 					bytesread += psf_binheader_readf (psf, "4", &chunk_size) ;
 					chunk_size += (chunk_size & 1) ;
-					psf_log_printf (psf, "    *** %M : %u\n", chunk, chunk_size) ;
 					if (bytesread + chunk_size > chunk_length)
-					{	bytesread += psf_binheader_readf (psf, "j", chunk_length - bytesread) ;
+					{	psf_log_printf (psf, "  *** %M : %u (too big)\n", chunk, chunk_size) ;
+						bytesread += psf_binheader_readf (psf, "j", chunk_length - bytesread) ;
 						continue ;
 						}
 					else
+					{	psf_log_printf (psf, "    %M : %u\n", chunk, chunk_size) ;
 						bytesread += psf_binheader_readf (psf, "j", chunk_size) ;
+						} ;
 
 					if (chunk_size >= chunk_length)
 						return 0 ;
