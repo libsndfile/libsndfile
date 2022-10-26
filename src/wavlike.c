@@ -1003,10 +1003,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 					**	the rest of the chunk is garbage.
 					*/
 					psf_log_printf (psf, "    *** Found weird-ass zero marker. Jumping to end of chunk.\n") ;
-					if (bytesread < chunk_length)
-						bytesread += psf_binheader_readf (psf, "j", chunk_length - bytesread) ;
-					psf_log_printf (psf, "    *** Offset is now : 0x%X\n", psf_fseek (psf, 0, SEEK_CUR)) ;
-					return 0 ;
+					goto cleanup_subchunk_parse ;
 
 			default :
 					break ;
@@ -1089,8 +1086,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 					chunk_size += (chunk_size & 1) ;
 					if (bytesread + chunk_size > chunk_length)
 					{	psf_log_printf (psf, "  *** %M : %u (too big)\n", chunk, chunk_size) ;
-						bytesread += psf_binheader_readf (psf, "j", chunk_length - bytesread) ;
-						continue ;
+						goto cleanup_subchunk_parse ;
 						}
 					else
 					{	psf_log_printf (psf, "    %M : %u\n", chunk, chunk_size) ;
