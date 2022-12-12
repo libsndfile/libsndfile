@@ -165,6 +165,8 @@ ogg_read_first_page (SF_PRIVATE *psf, OGG_PRIVATE *odata)
 		return SFE_NOT_SEEKABLE ;
 
 	buffer = ogg_sync_buffer (&odata->osync, psf->header.indx) ;
+	if (buffer == NULL)
+		return SFE_MALLOC_FAILED ;
 	memcpy (buffer, psf->header.ptr, psf->header.indx) ;
 	ogg_sync_wrote (&odata->osync, psf->header.indx) ;
 
@@ -297,6 +299,10 @@ ogg_sync_next_page (SF_PRIVATE * psf, ogg_page *og, sf_count_t readmax, sf_count
 		else
 			nb_read = OGG_SYNC_READ_SIZE ;
 		buffer = (unsigned char *) ogg_sync_buffer (&odata->osync, nb_read) ;
+		if (buffer == NULL)
+		{	psf->error = SFE_MALLOC_FAILED ;
+			return -1 ;
+			}
 		read_ret = psf_fread (buffer, 1, nb_read, psf) ;
 		if (read_ret == 0)
 			return psf->error ? -1 : 0 ;
