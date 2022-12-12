@@ -902,6 +902,9 @@ wavlike_read_cart_chunk (SF_PRIVATE *psf, uint32_t chunksize)
 		bytes += psf_binheader_readf (psf, "b", c->tag_text, make_size_t (c->tag_text_size)) ;
 		} ;
 
+	if (bytes < chunksize)
+		psf_log_printf (psf, "  %d trailing bytes in cart chunk.\n", chunksize - bytes) ;
+
 	return 0 ;
 } /* wavlike_read_cart_chunk */
 
