@@ -7,13 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* `SFC_GET_OGG_STREAM_SERIALNO` command, thanks @arthurt.
+  Add command SFC_GET_OGG_STREAM_SERIALNO returning the current stream serialno.
+  Useful for debugging.
+
+### Changed
+
+* Make `sndfile.h` independent of build system variables, thanks @manxorist
+  (issue #868).
+
 ### Fixed
 
+* MP3 streams identification, thanks @arthurt (#issue 830).
+* MP3 parser ignoring bytes from mpg123_read.
+* Reading a large number of samples at once from FLAC files, thanks @bemoody.
+* Clipping of non-int32 numbers, thanks @umlaeute (#issue 882).
 * Searching for LAME dependency with CMake build system (issue #821).
 * CMake build from Autotools tarball (issue #816).
 * Build on UWP platform (issue #824).
-* Fix signed integer overflow (issue #785).
+* Signed integer overflow (issue #785).
 * Skipping large wav chunks on stdin (PR #819).
+* Many other WAV parsing bugs, thanks @arthurt, @kiilerix.
+* Many Ogg parsing bugs, thanks @arthurt.
+* Broken `configure.ac` `--enable-ossfuzzers` option, thanks @SoapGentoo.
+* Tests "rounding errors for many non-x86 architectures, thanks @umlaeute
+  (issue #866).
+* `EXTERNAL_MPEG_LIBS` subtitution in `sndfile.pc`, thanks @cho-m.
 
 ### Removed
 
@@ -21,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   
   In version 1.1.0, an artificial limit of 655350 Hz was created, but as it
   turned out, this is not enough for some scenarios.
+* `autogen.sh`, thanks @SoapGentoo. Use `autoreconf -vif` instead.
 
 ## [1.1.0] - 2022-03-27
 
