@@ -1,4 +1,4 @@
-This is libsndfile, 1.1.0
+This is libsndfile, 1.2.0
 
 libsndfile is a library of C routines for reading and writing
 files containing sampled audio data.
