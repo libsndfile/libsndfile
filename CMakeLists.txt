@@ -35,7 +35,7 @@ if (BUILD_REGTEST)
 	list (APPEND VCPKG_MANIFEST_FEATURES "regtest")
 endif ()
 
-project(libsndfile VERSION 1.1.0)
+project(libsndfile VERSION 1.2.0)
 
 #
 # Variables
