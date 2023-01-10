@@ -144,6 +144,8 @@ Here is the release history for libsndfile:
   reported by OSS-Fuzz. More SSE2-optimized functions for x86 and amd64.
 * Version 1.1.0 (March 27 2022) Minor release, backward compatible with previous
   releases. Added long-awaited MP3 support. Numerous improvements and bugfixes.
+* Version 1.2.0 (December 25 2022) Various bugfixes,
+  removed artificial samplerate limit
 
 ## Similar or Related Projects
 
