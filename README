@@ -26,7 +26,7 @@ released under the Apache license.
 
 LINUX
 -----
-Whereever possible, you should use the packages supplied by your Linux
+Wherever possible, you should use the packages supplied by your Linux
 distribution.
 
 If you really do need to compile from source it should be as easy as:
