@@ -144,9 +144,6 @@ AC_ARG_ENABLE([werror],
 AC_ARG_ENABLE([cpu-clip],
 	[AS_HELP_STRING([--disable-cpu-clip], [disable tricky cpu specific clipper])])
 
-AC_ARG_ENABLE([bow-docs],
-	[AS_HELP_STRING([--enable-bow-docs], [enable black-on-white html docs])])
-
 AC_ARG_ENABLE([sqlite],
 	[AS_HELP_STRING([--disable-sqlite], [disable use of sqlite])])
 
@@ -538,17 +535,6 @@ AS_IF([test "x$ac_cv_prog_HAVE_AUTOGEN" = "xno"], [
 	])
 
 dnl ====================================================================================
-dnl  Settings for the HTML documentation.
-
-AS_IF([test "x$enable_bow_docs" = "xyes"], [
-		HTML_BGCOLOUR="white"
-		HTML_FGCOLOUR="black"
-	], [
-		HTML_BGCOLOUR="black"
-		HTML_FGCOLOUR="white"
-	])
-
-dnl ====================================================================================
 dnl  Now use the information from the checking stage.
 
 win32_target_dll=0
@@ -662,9 +648,6 @@ AS_IF([test "x$enable_static" = "xno"], [
 dnl -------------------------------------------------------------------------------
 
 AC_SUBST(HOST_TRIPLET)
-
-AC_SUBST(HTML_BGCOLOUR)
-AC_SUBST(HTML_FGCOLOUR)
 
 AC_SUBST(SHLIB_VERSION_ARG)
 AC_SUBST([SHARED_VERSION_INFO], [lt_current:lt_revision:lt_age])
