@@ -697,7 +697,7 @@ AC_CONFIG_FILES([
 	Makefile Octave/Makefile
 	src/version-metadata.rc
 	tests/test_wrapper.sh tests/pedantic-header-test.sh
-	libsndfile.spec sndfile.pc
+	sndfile.pc
 	Scripts/build-test-tarball.mk
 	])
 AC_OUTPUT

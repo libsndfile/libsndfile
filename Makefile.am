@@ -12,7 +12,7 @@ SUBDIRS = Octave
 endif
 endif
 
-EXTRA_DIST = libsndfile.spec.in sndfile.pc.in Scripts/android-configure.sh \
+EXTRA_DIST = sndfile.pc.in Scripts/android-configure.sh \
 	NEWS.OLD CHANGELOG.md Scripts/linux-to-win-cross-configure.sh \
 	CMakeLists.txt $(cmake_files) Win32 SECURITY.md
 
