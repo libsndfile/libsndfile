@@ -135,8 +135,9 @@ enum
 
 /*
 ** The following are the valid command numbers for the sf_command()
-** interface.  The use of these commands is documented in the file
-** command.html in the doc directory of the source code distribution.
+** interface.  The use of these commands is documented in docs/command.md in
+** the source code distribution (and at
+** http://libsndfile.github.io/libsndfile/command.html).
 */
 
 enum
