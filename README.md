@@ -137,8 +137,6 @@ You can pass additional options with `/D<parameter>=<value>` when you run
   option is available and set to `ON` if all dependency libraries were found.
 * `ENABLE_MPEG` - MP3 support. This option is available and set to `ON` if all
   dependency libraries were found.
-* `ENABLE_BOW_DOCS` - enable black-on-white documentation theme, `OFF` by
-  default.
 * `ENABLE_EXPERIMENTAL` - enable experimental code. Don't use it if you are
   not sure. This option is `OFF` by default.
 * `ENABLE_CPACK` - enable [CPack](https://cmake.org/cmake/help/latest/module/CPack.html) support.
