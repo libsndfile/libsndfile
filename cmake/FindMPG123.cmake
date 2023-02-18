@@ -3,7 +3,7 @@
 #
 #  MPG123_INCLUDE_DIRS - where to find mpg123.h, etc.
 #  MPG123_LIBRARIES    - List of libraries when using mpg123.
-#  MPG123_FOUND        - True if Mpg123 found.
+#  MPG123_FOUND        - True if MPG123 found.
 
 if (MPG123_INCLUDE_DIR)
     # Already in cache, be silent
@@ -40,7 +40,7 @@ find_library (MPG123_LIBRARY
 # Handle the QUIETLY and REQUIRED arguments and set MPG123_FOUND
 # to TRUE if all listed variables are TRUE.
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args (Mpg123
+find_package_handle_standard_args (MPG123
 	REQUIRED_VARS
 		MPG123_LIBRARY
 		MPG123_INCLUDE_DIR

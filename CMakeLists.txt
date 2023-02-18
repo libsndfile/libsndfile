@@ -846,7 +846,24 @@ if (ENABLE_PACKAGE_CONFIG)
 			${CMAKE_CURRENT_BINARY_DIR}/SndFileConfigVersion.cmake
 		DESTINATION	${CMAKE_INSTALL_PACKAGEDIR}
 		)
-
+        if (SndFile_WITH_EXTERNAL_LIBS AND NOT BUILD_SHARED_LIBS)
+            install(FILES
+                    ${PROJECT_SOURCE_DIR}/cmake/FindFLAC.cmake
+                    ${PROJECT_SOURCE_DIR}/cmake/FindOgg.cmake
+                    ${PROJECT_SOURCE_DIR}/cmake/FindOpus.cmake
+                    ${PROJECT_SOURCE_DIR}/cmake/FindSndio.cmake
+                    ${PROJECT_SOURCE_DIR}/cmake/FindSpeex.cmake
+                    ${PROJECT_SOURCE_DIR}/cmake/FindVorbis.cmake
+                    DESTINATION ${CMAKE_INSTALL_PACKAGEDIR}
+                    )
+        endif()
+        if (SndFile_WITH_MPEG AND NOT BUILD_SHARED_LIBS)
+            install(FILES
+                    ${PROJECT_SOURCE_DIR}/cmake/FindMPG123.cmake
+                    ${PROJECT_SOURCE_DIR}/cmake/Findmp3lame.cmake
+                    DESTINATION ${CMAKE_INSTALL_PACKAGEDIR}
+                    )
+        endif()
 else ()
 
 	install (TARGETS sndfile ${sdnfile_PROGRAMS}
