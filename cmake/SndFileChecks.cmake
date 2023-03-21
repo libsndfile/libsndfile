@@ -50,7 +50,7 @@ else ()
 endif ()
 
 find_package (mp3lame)
-find_package (Mpg123 1.25.10)
+find_package (mpg123 1.25.10)
 if (TARGET mp3lame::mp3lame AND (TARGET MPG123::libmpg123))
 	set (HAVE_MPEG_LIBS 1)
 else ()

@@ -19,7 +19,7 @@ endif ()
 
 if (SndFile_WITH_MPEG AND NOT @BUILD_SHARED_LIBS@)
 	find_dependency (mp3lame)
-	find_dependency (MPG123)
+	find_dependency (mpg123)
 endif ()
 
 include (${CMAKE_CURRENT_LIST_DIR}/SndFileTargets.cmake)
