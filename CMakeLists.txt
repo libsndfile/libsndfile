@@ -180,7 +180,7 @@ set_package_properties (mp3lame PROPERTIES
 	DESCRIPTION "High quality MPEG Audio Layer III (MP3) encoder"
 	PURPOSE "Enables MPEG layer III (MP3) writing support"
 	)
-set_package_properties (MPG123 PROPERTIES
+set_package_properties (mpg123 PROPERTIES
 	TYPE RECOMMENDED
 	URL "https://www.mpg123.de/"
 	DESCRIPTION "MPEG Audio Layer I/II/III decoder"
