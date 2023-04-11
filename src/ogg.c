@@ -430,7 +430,7 @@ ogg_sync_last_page_before (SF_PRIVATE *psf, OGG_PRIVATE *odata, uint64_t *gp_out
 			if (ogg_page_serialno (&odata->opage) == serialno)
 			{	uint64_t page_gp = ogg_page_granulepos (&odata->opage) ;
 				if (page_gp != (uint64_t) -1)
-				{	offset = ret ;
+				{	offset = position ;
 					gp = page_gp ;
 					}
 				}
