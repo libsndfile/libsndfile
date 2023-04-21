@@ -222,9 +222,8 @@ check_PROGRAMS += tests/sfversion tests/floating_point_test tests/write_read_tes
 	tests/locale_test tests/win32_ordinal_test tests/ogg_test tests/compression_size_test \
 	tests/checksum_test tests/external_libs_test tests/rdwr_test tests/format_check_test $(CPP_TEST) \
 	tests/channel_test tests/long_read_write_test tests/stdin_test tests/stdout_test \
-	tests/dither_test tests/fix_this tests/largefile_test tests/benchmark tests/ogg_opus_test \
-	tests/mpeg_test
-	tests/dither_test tests/fix_this tests/largefile_test tests/benchmark tests/ogg_opus_test tests/wavpack_test
+	tests/dither_test tests/fix_this tests/largefile_test tests/benchmark \
+	tests/ogg_opus_test tests/mpeg_test tests/wavpack_test
 
 BUILT_SOURCES += \
 	tests/write_read_test.c \
