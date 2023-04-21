@@ -34,10 +34,6 @@
 
 #if HAVE_WAVPACK
 
-#if SIZEOF_SF_COUNT_T != 8
-	#error Unsupported SIZEOF_SF_COUNT_T for WavPack wrapper.
-#endif
-
 #include	<wavpack/wavpack.h>
 
 /*------------------------------------------------------------------------------
