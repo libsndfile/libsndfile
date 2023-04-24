@@ -970,8 +970,6 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_WAVPACK :
-				if (info->channels > 31)
-					return 0 ;
 				if (endian != SF_ENDIAN_FILE)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
