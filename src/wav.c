@@ -79,7 +79,7 @@
 
 #define WAVLIKE_PEAK_CHUNK_SIZE(ch) 	(2 * sizeof (int) + ch * (sizeof (float) + sizeof (int)))
 
-
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
 enum
 {	HAVE_RIFF	= 1 << 0,
 	HAVE_WAVE	= 1 << 1,
@@ -1172,9 +1172,9 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 	/* RIFF/RIFX marker, length, WAVE and 'fmt ' markers. */
 
 	if (psf->endian == SF_ENDIAN_LITTLE)
-		psf_binheader_writef (psf, "etm8", BHWm (RIFF_MARKER), BHW8 ((psf->filelength < 8) ? 8 : psf->filelength - 8)) ;
+        psf_binheader_writef (psf, "etm8", BHWm (RIFF_MARKER), BHW8 (psf->filelength < 8 ? 8 : MIN(psf->filelength - 8, UINT32_MAX))) ;
 	else
-		psf_binheader_writef (psf, "Etm8", BHWm (RIFX_MARKER), BHW8 ((psf->filelength < 8) ? 8 : psf->filelength - 8)) ;
+        psf_binheader_writef (psf, "Etm8", BHWm (RIFX_MARKER), BHW8 (psf->filelength < 8 ? 8 : MIN(psf->filelength - 8, UINT32_MAX))) ;
 
 	/* WAVE and 'fmt ' markers. */
 	psf_binheader_writef (psf, "mm", BHWm (WAVE_MARKER), BHWm (fmt_MARKER)) ;
@@ -1258,7 +1258,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "m4z", BHWm (PAD_MARKER), BHW4 (k), BHWz (k)) ;
 		} ;
 
-	psf_binheader_writef (psf, "tm8", BHWm (data_MARKER), BHW8 (psf->datalength)) ;
+    psf_binheader_writef (psf, "tm8", BHWm (data_MARKER), BHW8 (MIN(psf->datalength, UINT32_MAX))) ;
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 	if (psf->error)
 		return psf->error ;
