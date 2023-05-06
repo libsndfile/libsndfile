@@ -92,7 +92,7 @@
 #define		SF_MIN(a, b)	((a) < (b) ? (a) : (b))
 
 
-#define		COMPILE_TIME_ASSERT(e)	(sizeof (struct { int : - !! (e) ; }))
+#define		COMPILE_TIME_ASSERT(e)	(sizeof (struct { int : - ! (e) ; }))
 
 
 #define		SF_MAX_CHANNELS		1024

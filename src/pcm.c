@@ -28,11 +28,17 @@
 ** type and use SIZEOF_TRIBYTE instead of (tribyte).
 */
 
+#pragma pack(1)
+
 typedef	struct tribyte
 {	uint8_t bytes [3] ;
 	} tribyte ;
 
+#pragma pack()
+
 #define	SIZEOF_TRIBYTE	3
+
+static const int tribyte_assert = COMPILE_TIME_ASSERT(sizeof(tribyte) == SIZEOF_TRIBYTE);
 
 static sf_count_t	pcm_read_sc2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
 static sf_count_t	pcm_read_uc2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
