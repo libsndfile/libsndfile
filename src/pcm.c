@@ -28,11 +28,19 @@
 ** type and use SIZEOF_TRIBYTE instead of (tribyte).
 */
 
+/*
+** Buffers of raw bytes are read as arrays of tribyte, so it must be exactly
+** three bytes. Some ABIs (e.g. RISC OS) pad it to four unless it is packed.
+*/
+#pragma pack (1)
 typedef	struct tribyte
 {	uint8_t bytes [3] ;
 	} tribyte ;
+#pragma pack ()
 
 #define	SIZEOF_TRIBYTE	3
+
+typedef char tribyte_size_check [(sizeof (tribyte) == SIZEOF_TRIBYTE) ? 1 : -1] ;
 
 static sf_count_t	pcm_read_sc2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
 static sf_count_t	pcm_read_uc2s	(SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
