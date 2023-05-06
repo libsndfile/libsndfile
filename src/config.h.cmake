@@ -148,6 +148,10 @@
 /* Define to 1 if the system has the type `ssize_t'. */
 #cmakedefine01 HAVE_SSIZE_T
 
+#if (HAVE_SSIZE_T == 0)
+#define ssize_t intptr_t
+#endif
+
 /* Define to 1 if you have the <stdint.h> header file. */
 #cmakedefine01 HAVE_STDINT_H
 
