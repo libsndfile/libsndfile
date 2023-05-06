@@ -56,7 +56,7 @@
 
 #if defined (__ANDROID__)
 
-#elif defined (__linux__) || defined (__FreeBSD_kernel__) || defined (__FreeBSD__)
+#elif defined (__linux__) || defined (__FreeBSD_kernel__) || defined (__FreeBSD__) || defined (__riscos__)
 	#include 	<fcntl.h>
 	#include 	<sys/ioctl.h>
 	#include 	<sys/soundcard.h>
@@ -355,7 +355,7 @@ alsa_write_float (snd_pcm_t *alsa_dev, float *data, int frames, int channels)
 **	Linux/OSS functions for playing a sound.
 */
 
-#if !defined (__ANDROID__) && (defined (__linux__) || defined (__FreeBSD_kernel__) || defined (__FreeBSD__))
+#if !defined (__ANDROID__) && (defined (__linux__) || defined (__FreeBSD_kernel__) || defined (__FreeBSD__) || defined (__riscos__))
 
 static	int	opensoundsys_open_device (int channels, int srate) ;
 
@@ -841,7 +841,7 @@ main (int argc, char *argv [])
 		else
 	#endif
 		opensoundsys_play (argc, argv) ;
-#elif defined (__FreeBSD_kernel__) || defined (__FreeBSD__)
+#elif defined (__FreeBSD_kernel__) || defined (__FreeBSD__) || defined (__riscos__)
 	opensoundsys_play (argc, argv) ;
 #elif HAVE_SNDIO_H
 	sndio_play (argc, argv) ;
