@@ -128,12 +128,4 @@
 #define USE_SSE2
 #endif
 
-#ifndef HAVE_SSIZE_T
-#define HAVE_SSIZE_T 0
-#endif
-
-#if (HAVE_SSIZE_T == 0)
-#define ssize_t intptr_t
-#endif
-
 #endif
