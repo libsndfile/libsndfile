@@ -8,4 +8,4 @@
 
 ## Reporting a Vulnerability
 
-Please send report privately to evpobry@gmail.com, and include how would you like to be credited.
+Please send report privately to evpobr@gmail.com, and include how would you like to be credited.
