@@ -1059,6 +1059,13 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	else
 		psf_log_printf (psf, "  Sample Size : %d\n", comm_fmt->sampleSize) ;
 
+
+	if (psf->sf.channels != comm_fmt->numChannels && psf->peak_info)
+	{	psf_log_printf (psf, "  *** channel count changed, discarding existing PEAK chunk\n") ;
+		free (psf->peak_info) ;
+		psf->peak_info = NULL ;
+		} ;
+
 	subformat = s_bitwidth_to_subformat (comm_fmt->sampleSize) ;
 
 	psf->sf.samplerate = samplerate ;
