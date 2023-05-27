@@ -252,10 +252,10 @@ psf_log_printf (SF_PRIVATE *psf, const char *format, ...)
 						else
 						{	if (D < 0)
 							{	log_putchar (psf, '-') ;
-								U = -((uint64_t) D) ;
+								U = - ((uint64_t) D) ;
 								}
 							else
-							{	U = (uint64_t) D;
+							{	U = (uint64_t) D ;
 								}
 							}
 
