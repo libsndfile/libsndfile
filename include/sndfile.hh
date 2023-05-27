@@ -100,6 +100,11 @@ class SndfileHandle
 			SndfileHandle (const SndfileHandle &orig) ;
 			SndfileHandle & operator = (const SndfileHandle &rhs) ;
 
+#if (__cplusplus >= 201100L)
+			SndfileHandle (SndfileHandle &&orig) noexcept ;
+			SndfileHandle & operator = (SndfileHandle &&rhs) noexcept ;
+#endif
+
 		/* Mainly for debugging/testing. */
 		int refCount (void) const { return (p == SF_NULL) ? 0 : p->ref ; }
 
@@ -288,7 +293,32 @@ SndfileHandle::operator = (const SndfileHandle &rhs)
 		++ p->ref ;
 
 	return *this ;
-} /* SndfileHandle assignment operator */
+} /* SndfileHandle copy assignment */
+
+#if (__cplusplus >= 201100L)
+
+inline
+SndfileHandle::SndfileHandle (SndfileHandle &&orig) noexcept
+: p (orig.p)
+{
+	orig.p = SF_NULL ;
+} /* SndfileHandle move constructor */
+
+inline SndfileHandle &
+SndfileHandle::operator = (SndfileHandle &&rhs) noexcept
+{
+	if (&rhs == this)
+		return *this ;
+	if (p != SF_NULL && -- p->ref == 0)
+		delete p ;
+
+	p = rhs.p ;
+	rhs.p = SF_NULL ;
+
+	return *this ;
+} /* SndfileHandle move assignment */
+
+#endif
 
 inline int
 SndfileHandle::error (void) const
