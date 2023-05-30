@@ -122,10 +122,12 @@ psf_store_read_chunk (READ_CHUNKS * pchk, const READ_CHUNK * rchunk)
 	{	READ_CHUNK * old_ptr = pchk->chunks ;
 		int new_count = 3 * (pchk->count + 1) / 2 ;
 
-		pchk->chunks = realloc (old_ptr, new_count * sizeof (READ_CHUNK)) ;
-		if (pchk->chunks == NULL)
-		{	pchk->chunks = old_ptr ;
+		READ_CHUNK * new_chunks = realloc (old_ptr, new_count * sizeof (READ_CHUNK)) ;
+		if (new_chunks == NULL)
+		{
 			return SFE_MALLOC_FAILED ;
+			} else {
+			pchk->chunks = new_chunks;
 			} ;
 		pchk->count = new_count ;
 		} ;
@@ -238,10 +240,12 @@ psf_save_write_chunk (WRITE_CHUNKS * pchk, const SF_CHUNK_INFO * chunk_info)
 	{	WRITE_CHUNK * old_ptr = pchk->chunks ;
 		int new_count = 3 * (pchk->count + 1) / 2 ;
 
-		pchk->chunks = realloc (old_ptr, new_count * sizeof (WRITE_CHUNK)) ;
-		if (pchk->chunks == NULL)
-		{	pchk->chunks = old_ptr ;
+		WRITE_CHUNK * new_chunks = realloc (old_ptr, new_count * sizeof (WRITE_CHUNK)) ;
+		if (new_chunks == NULL)
+		{
 			return SFE_MALLOC_FAILED ;
+			} else {
+			pchk->chunks = new_chunks;
 			} ;
 		} ;
 

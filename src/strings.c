@@ -131,9 +131,12 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 
 		newlen = newlen < 256 ? 256 : newlen ;
 
-		if ((psf->strings.storage = realloc (temp, newlen)) == NULL)
-		{	psf->strings.storage = temp ;
+		char * new_storage = realloc(temp, newlen);
+		if (new_storage == NULL)
+		{
 			return SFE_MALLOC_FAILED ;
+			} else {
+			psf->strings.storage = new_storage;
 			} ;
 
 		psf->strings.storage_len = newlen ;
