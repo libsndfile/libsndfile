@@ -91,7 +91,7 @@ if (MSVC AND (DEFINED ENABLE_STATIC_RUNTIME))
 elseif (MINGW)
 	option (ENABLE_STATIC_RUNTIME "Enable static runtime" OFF)
 endif ()
-option (ENABLE_PACKAGE_CONFIG "Generate and install package config file" OFF)
+option (ENABLE_PACKAGE_CONFIG "Generate and install package config file" ON)
 option (INSTALL_PKGCONFIG_MODULE "Generate and install pkg-config module" ON)
 
 list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
