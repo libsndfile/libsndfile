@@ -1,5 +1,16 @@
 cmake_minimum_required (VERSION 3.1..3.18)
 
+if(APPLE)
+    # The workaround for try_compile failing with code signing
+    # since cmake-3.18.2, not required
+    set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
+        ${CMAKE_TRY_COMPILE_PLATFORM_VARIABLES}
+        "CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED"
+        "CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED")
+    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED NO)
+    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED NO)
+endif()
+
 # MSVC runtime library flags are selected by an abstraction, CMake >= 3.15
 # This policy still need to be set even with cmake_minimum_required() command above.
 if (POLICY CMP0091)
@@ -80,7 +91,7 @@ if (MSVC AND (DEFINED ENABLE_STATIC_RUNTIME))
 elseif (MINGW)
 	option (ENABLE_STATIC_RUNTIME "Enable static runtime" OFF)
 endif ()
-option (ENABLE_PACKAGE_CONFIG "Generate and install package config file" ON)
+option (ENABLE_PACKAGE_CONFIG "Generate and install package config file" OFF)
 option (INSTALL_PKGCONFIG_MODULE "Generate and install pkg-config module" ON)
 
 list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -522,7 +533,7 @@ if (BUILD_SHARED_LIBS)
 					LINK_FLAGS "-Wl,--version-script,${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}"
 					)
 			else ()
-				target_link_options (sndfile PRIVATE "LINKER:--version-script,${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}")
+				target_link_options (sndfile PRIVATE)
 			endif()
 		endif()
 	endif()
