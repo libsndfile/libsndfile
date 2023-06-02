@@ -1163,18 +1163,27 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 /*==========================================================================================
 */
 
-static void
+static int
 aiff_rewrite_header (SF_PRIVATE *psf)
-{
+{	AIFF_PRIVATE *paiff = psf->container_data ;
+
 	/* Assuming here that the header has already been written and just
 	** needs to be corrected for new data length. That means that we
 	** only change the length fields of the FORM and SSND chunks ;
 	** everything else can be skipped over.
 	*/
 	int k, ch, comm_size, comm_frames ;
+	sf_count_t header_len ;
 
+	/* Calculate the header length rather than use dataoffset, as AIFF files
+	** can have additional padding offset bytes which aren't usefully a part of
+	** the header.
+	*/
+	header_len = paiff->ssnd_offset + 8 + SIZEOF_SSND_CHUNK ;
+	if (psf->header.len < header_len || header_len > psf->dataoffset)
+		return SFE_INTERNAL ;
 	psf_fseek (psf, 0, SEEK_SET) ;
-	psf_fread (psf->header.ptr, psf->dataoffset, 1, psf) ;
+	psf_fread (psf->header.ptr, header_len, 1, psf) ;
 
 	psf->header.indx = 0 ;
 
@@ -1209,7 +1218,7 @@ aiff_rewrite_header (SF_PRIVATE *psf)
 	psf_fseek (psf, 0, SEEK_SET) ;
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
-	return ;
+	return 0 ;
 } /* aiff_rewrite_header */
 
 static int
@@ -1218,7 +1227,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	AIFF_PRIVATE	*paiff ;
 	uint8_t	comm_sample_rate [10], comm_zero_bytes [2] = { 0, 0 } ;
 	uint32_t	comm_type, comm_size, comm_encoding, comm_frames = 0, uk ;
-	int				k, endian, has_data = SF_FALSE ;
+	int				ret, k, endian, has_data = SF_FALSE ;
 	int16_t			bit_width ;
 
 	if ((paiff = psf->container_data) == NULL)
@@ -1241,7 +1250,8 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	if (psf->file.mode == SFM_RDWR && psf->dataoffset > 0 && psf->rchunks.count > 0)
-	{	aiff_rewrite_header (psf) ;
+	{	if ((ret = aiff_rewrite_header (psf)) != 0)
+			return ret ;
 		if (current > 0)
 			psf_fseek (psf, current, SEEK_SET) ;
 		return 0 ;
