@@ -1060,7 +1060,7 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 		psf_log_printf (psf, "  Sample Size : %d\n", comm_fmt->sampleSize) ;
 
 
-	if (psf->sf.channels != comm_fmt->numChannels && psf->peak_info)
+	if ((psf->sf.channels != comm_fmt->numChannels) && psf->peak_info)
 	{	psf_log_printf (psf, "  *** channel count changed, discarding existing PEAK chunk\n") ;
 		free (psf->peak_info) ;
 		psf->peak_info = NULL ;
