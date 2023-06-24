@@ -219,9 +219,9 @@ mpeg_dec_fill_sfinfo (SF_PRIVATE* psf, mpg123_handle *mh, SF_INFO *info)
 
 	length = mpg123_length (mh) ;
 	if (length <= 0 && !psf->is_pipe)
-	{	if ((error = mpg123_scan(mh)) != MPG123_OK)
+	{	if ((error = mpg123_scan (mh)) != MPG123_OK)
 			return error ;
-		length = mpg123_length(mh) ;
+		length = mpg123_length (mh) ;
 		}
 
 	if (length >= 0)
