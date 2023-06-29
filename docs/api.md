@@ -47,7 +47,7 @@ documented) [here](command.md).**
 | [sf_writef_short, sf_writef_int, sf_writef_float, sf_writef_double](#writef)                                | File frames write functions.                   |
 | [sf_read_raw, sf_write_raw](#raw)                                                                           | Raw read/write functions.                      |
 | [sf_get_string, sf_set_string](#string)                                                                     | Functions for reading and writing string data. |
-| [sf_version_string](#version_string)                                                                        | Retrive library version string.                |
+| [sf_version_string](#version_string)                                                                        | Retrieve library version string.                |
 | [sf_current_byterate](#current_byterate)                                                                    | Retrieve current byterate.                     |
 | [sf_set_chunk, sf_get_chunk_iterator, sf_next_chunk_iterator, sf_get_chunk_size, sf_get_chunk_data](#chunk) | RIFF chunks API.                               |
 
@@ -262,7 +262,7 @@ typedef sf_count_t  (*sf_vio_tell)        (void *user_data) ;
 typedef sf_count_t  (*sf_vio_get_filelen) (void *user_data) ;
 ```
 
-The virtual file contex must return the length of the virtual file in bytes.
+The virtual file context must return the length of the virtual file in bytes.
 
 #### sf_vio_seek
 
@@ -347,7 +347,7 @@ Note that the frames offset can be negative and in fact should be when SEEK_END
 is used for the whence parameter.
 
 sf_seek will return the offset in (multichannel) frames from the start of the
-audio data or -1 if an error occured (ie an attempt is made to seek beyond the
+audio data or -1 if an error occurred (ie an attempt is made to seek beyond the
 start or end of the file).
 
 ## Error Reporting Functions {#error}
@@ -557,7 +557,7 @@ others like WAV and AIFF officially only support ASCII. Writing utf-8 strings to
 WAV and AIF files with libsndfile will work when read back with libsndfile, but
 may not work with other programs.
 
-The suggested method of dealing with tags retrived using sf_get_string() is to
+The suggested method of dealing with tags retrieved using sf_get_string() is to
 assume they are utf-8. Similarly if you have a string in some exotic format like
 utf-16, it should be encoded to utf-8 before being written using libsndfile.
 
@@ -733,7 +733,7 @@ interface.
 
 ## Note 2
 
-Reading a file containg floating point data (allowable with WAV, AIFF, AU and
+Reading a file containing floating point data (allowable with WAV, AIFF, AU and
 other file formats) using integer read methods (sf_read_short() or
 sf_read_int()) can produce unexpected results. For instance the data in the file
 may have a maximum absolute value &lt; 1.0 which would mean that all sample

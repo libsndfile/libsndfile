@@ -14,7 +14,7 @@ Bugs I want to fix include any of the following problems (and probably others):
 
 - Compilation problems on new platforms.
 - Errors being detected during the `make check` process.
-- Segmentation faults occuring inside libsndfile.
+- Segmentation faults occurring inside libsndfile.
 - libsndfile hanging when opening a file.
 - Supported sound file types being incorrectly read or written.
 - Omissions, errors or spelling mistakes in the documentation.
@@ -24,7 +24,7 @@ When submitting a bug report you must include:
 - Your system (CPU and memory size should be enough).
 - The operating system you are using.
 - Whether you are using a package provided by your distribution or you compiled
-  it youself.
+  it yourself.
 - If you compiled it yourself, the compiler you are using. (Also make sure to
   run `make check`.)
 - A description of the problem.

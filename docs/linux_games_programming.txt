@@ -175,7 +175,7 @@ which can be directly translated to:
 
 and the same for pcmbitwitdhs of 24 and 32. For pcmbitwidth of 8
 you need to know that WAV files use SF_FORMAT_PCM_U8 and AIFF
-files use SF_FORMAT_PCM_S8. Thats all there is to it.
+files use SF_FORMAT_PCM_S8. That's all there is to it.
 
 Erik
 -- 
