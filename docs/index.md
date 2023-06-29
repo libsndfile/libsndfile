@@ -93,7 +93,7 @@ Here is the release history for libsndfile:
 * Version 1.0.6 (Feb 08 2004) Large file fix for Linux/Solaris, new
   functionality   and Win32 improvements.
 * Version 1.0.7 (Feb 24 2004) Fix build problems on MacOS X and fix ia64/MIPS
-  etc clip mode detction.
+  etc clip mode detection.
 * Version 1.0.8 (Mar 14 2004) Minor bug fixes.
 * Version 1.0.9 (Mar 30 2004) Add AVR format. Improve handling of some WAV
   files.
@@ -112,7 +112,7 @@ Here is the release history for libsndfile:
   enhancements and bug fixes.
 * Version 1.0.17 (Aug 31 2006) Add C++ wrapper sndfile.hh. Minor bug fixes and
   cleanups.
-* Version 1.0.18 (Feb 07 2009) Add Ogg/Vorbis suppport, remove captive
+* Version 1.0.18 (Feb 07 2009) Add Ogg/Vorbis support, remove captive
   libraries, many new features and bug fixes. Generate Win32 and Win64
   pre-compiled binaries.
 * Version 1.0.19 (Mar 02 2009) Fix for CVE-2009-0186. Huge number of minor fixes

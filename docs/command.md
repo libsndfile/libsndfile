@@ -1034,7 +1034,7 @@ sf_command (sndfile, SFC_FILE_TRUNCATE, &frames, sizeof (frames)) ;
 
 ### Return value
 
-Zero on sucess, non-zero otherwise.
+Zero on success, non-zero otherwise.
 
 ## SFC_SET_RAW_START_OFFSET
 
@@ -1228,7 +1228,7 @@ file format does not support ambisonic encoding.
 
 Set the Variable Bit Rate encoding quality. The encoding quality value
 should be between 0.0 (lowest quality) and 1.0 (highest quality).
-Currenly this command is only implemented for FLAC and Ogg/Vorbis files.
+Currently this command is only implemented for FLAC and Ogg/Vorbis files.
 It has no effect on un-compressed file formats.
 
 ### Parameters
@@ -1301,7 +1301,7 @@ datasize
 ## SFC_SET_COMPRESSION_LEVEL
 
 Set the compression level. The compression level should be between 0.0 (minimum
-compression level) and 1.0 (highest compression level). Currenly this command is
+compression level) and 1.0 (highest compression level). Currently this command is
 only implemented for FLAC and Ogg/Vorbis files. It has no effect on
 uncompressed file formats.
 
@@ -1604,7 +1604,7 @@ typedef struct
                               /* a full bar of 7/8 is 7 beats */
 
     float    bpm ;            /* suggestion, as it can be calculated using other fields:*/
-                              /* file's lenght, file's sampleRate and our time_sig_den*/
+                              /* file's length, file's sampleRate and our time_sig_den*/
                               /* -> bpms are always the amount of _quarter notes_ per minute */
 
     int    root_key ;         /* MIDI note, or -1 for None */
@@ -1627,7 +1627,7 @@ otherwise.
 ## SFC_GET_INSTRUMENT
 
 Retrieve instrument information from file including MIDI base note, keyboard
-mapping and looping informations(start/stop and mode).
+mapping and looping information (start/stop and mode).
 
 ### Parameters
 
@@ -1829,7 +1829,7 @@ sf_command (sndfile, SFC_SET_CUE, &cues, sizeof (cues)) ;
 
 Enable auto downgrade from RF64 to WAV.
 
-The EBU recomendation is that when writing RF64 files and the resulting file is
+The EBU recommendation is that when writing RF64 files and the resulting file is
 less than 4Gig in size, it should be downgraded to a WAV file (WAV files have a
 maximum size of 4Gig). libsndfile doesn't follow the EBU recommendations
 exactly, mainly because the test suite needs to be able test reading/writing

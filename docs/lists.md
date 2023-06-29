@@ -12,7 +12,7 @@ There are three mailing lists for libsndfile:
 
  - **libsndfile-announce@mega-nerd.com**  
   [Subscribe](mailto:libsndfile-announce-request@mega-nerd.com?subject=subscribe)  
-  A list which will announce each new release of libsndfile. Noone can
+  A list which will announce each new release of libsndfile. No one can
   post to this list except the author.  
 - **libsndfile-devel@mega-nerd.com**  
   [Subscribe](mailto:libsndfile-devel-request@mega-nerd.com?subject=subscribe)  
