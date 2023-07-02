@@ -381,7 +381,7 @@ wavpack_read_header (SF_PRIVATE *psf)
 	else if (mode & MODE_FLOAT)
 		psf->sf.format |= SF_FORMAT_FLOAT ;
 	else
-	{	switch (bit_depth)
+	{	switch ((bit_depth + 7) & 0x38)     // round up bitdepth to handle e.g. 20-bit files
 		{	case 16 :
 				psf->sf.format |= SF_FORMAT_PCM_16 ;
 				break ;
@@ -425,9 +425,13 @@ wavpack_dec_init (SF_PRIVATE *psf)
 			} ;
 		} ;
 
+        /* adjust float files that are [very rarely] not nomalized to +/- 1.0 (e.g., +/- 32768.0) */
+        /* also allow opening DSD files as 24-bit PCM (decimated 8x) */
+        pwvpk->config.flags = OPEN_NORMALIZE | OPEN_DSD_AS_PCM ;
+
 	/* tags in wavpack always at the end of file */
 	if (pwvpk->is_random_access_device)
-		pwvpk->config.flags = OPEN_TAGS ;
+		pwvpk->config.flags |= OPEN_TAGS ;
 
 	if ((pwvpk->context = WavpackOpenFileInputEx64 (&wavpack_reader_wrapper, psf, NULL, error_buf, pwvpk->config.flags, 0)) == NULL)
 	{	psf_log_printf (psf, "wavpack_dec_init: failed to call `WavpackOpenFileInputEx64`: `%s`\n", error_buf) ;
