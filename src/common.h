@@ -43,7 +43,11 @@
 #include <math.h>
 
 #ifdef USE_SSE2
-#include <immintrin.h>
+#	ifdef _MSC_VER
+#		include <intrin.h>
+#	else
+#		include <immintrin.h>
+#	endif
 #endif
 
 #ifdef __cplusplus
