@@ -461,6 +461,7 @@ sf_open_fd	(int fd, int mode, SF_INFO *sfinfo, int close_desc)
 	psf_copy_filename (psf, "") ;
 
 	psf->file.mode = mode ;
+	psf->file.do_not_close_descriptor = !close_desc;
 	psf_set_file (psf, fd) ;
 	psf->is_pipe = psf_is_pipe (psf) ;
 	psf->fileoffset = psf_ftell (psf) ;
