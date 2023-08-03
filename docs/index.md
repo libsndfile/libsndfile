@@ -146,6 +146,7 @@ Here is the release history for libsndfile:
   releases. Added long-awaited MP3 support. Numerous improvements and bugfixes.
 * Version 1.2.0 (December 25 2022) Various bugfixes,
   removed artificial samplerate limit
+* Version 1.2.1 (August 12 2023) Patch release, various bufixes.
 
 ## Similar or Related Projects
 

@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2023-08-12
+
+### Added
+
+* RISC OS support to `sndfile-play`, thanks @ccawley2011
+* Move semantics to `SndFileHandle` C++ class, thanks @haydaralaidrus
+
+### Fixed
+
+* Various typos, thanks @@uniontech-lilinjie
+* Handling of absolute `CMAKE_INSTALL_LIBDIR`/`CMAKE_INSTALL_INCLUDEDIR`, thanks
+  @Staudey (issue #908)
+* Add `localtime_s` support to `sndfile-metadata-set`, thanks @neheb (issue #907)
+* Linking with CMake against `Ogg::ogg`, thanks @FtZPetruska
+* CMake `mpg123` module handling bugs, thanks @FtZPetruska
+* CMake dependencies handling, thanks @FtZPetruska
+* Various `Ogg` & `Opus` format fixes, thanks @weiliang (issue #888)
+* Redefining `ssize_t` when building with Autotools, thanks @ccawley2011
+  (issue #934)
+* Bug related to incorrect `realloc` use, thanks @Halmoni100
+* Style errors, thanks to @arthurt
+* AIFF format related bugs, thanks to @arthurt
+* Reading of MP3 files without Xing or INFO headers, thanks @arthurt
+* Coding style of `src/mpeg_decode.c`, thanks @arthurt
+* Various documentation types, thanks @luzpaz
+* Intrinsics inclusion for MSVC and ARM64/ARM64EC, thanks @frysee
+* `sf_open_fd`() regression, thanks @brentr (PR #950)
+* WAV format related bug, thanks @magnus-nomono (issue #930)
+
+### Removed
+
+* Obsolete file `libsndfile.spec.in``, thanks @janstary
+
 ## [1.2.0] - 2022-12-25
 
 ### Fixed
@@ -143,5 +176,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Uninitialized variable in `psf_binheader_readf`(), thanks @shao-hua-li,
   credit to OSS-Fuzz ([issue 25364](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=25364)).
 
-[Unreleased]: https://github.com/libsndfile/libsndfile/compare/1.1.0...HEAD
+[Unreleased]: https://github.com/libsndfile/libsndfile/compare/1.2.1...HEAD
+[1.2.1]: https://github.com/libsndfile/libsndfile/compare/1.2.0...1.2.1
+[1.2.0]: https://github.com/libsndfile/libsndfile/compare/1.1.0...1.2.0
 [1.1.0]: https://github.com/libsndfile/libsndfile/compare/1.0.31...1.1.0

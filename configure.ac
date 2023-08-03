@@ -3,7 +3,7 @@ dnl Copyright (C) 1999-2022  Erik de Castro Lopo <erikd@mega-nerd.com>.
 dnl Require autoconf version >= 2.69
 AC_PREREQ([2.69])
 
-AC_INIT([libsndfile],[1.2.0],[sndfile@mega-nerd.com],
+AC_INIT([libsndfile],[1.2.1],[sndfile@mega-nerd.com],
 		[libsndfile],[http://libsndfile.github.io/libsndfile/])
 
 dnl Check whether we want to set defaults for CFLAGS, CXXFLAGS, CPPFLAGS and LDFLAGS
@@ -88,7 +88,7 @@ dnl      to 0.
 dnl   This is libtool version of library, we add it to `--version-info` property.
 
 m4_define([lt_current], [1])
-m4_define([lt_revision], [35])
+m4_define([lt_revision], [36])
 m4_define([lt_age], [0])
 
 dnl This is ABI version for linker scripts, CMake uses the same format for
