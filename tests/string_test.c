@@ -37,6 +37,8 @@
 #define	BUFFER_LEN			(1 << 10)
 #define LOG_BUFFER_SIZE		1024
 
+#define NULL_PRINTF_CHECK(X) (X ? X : "(null)")
+
 static const char STR_TEST_PREFIX[] = "str" ;
 
 static void	string_start_test (const char *filename, int typemajor) ;
@@ -263,21 +265,21 @@ string_start_end_test (const char *filename, int typemajor)
 	if (cptr == NULL || strcmp (filename, cptr) != 0)
 	{	if (errors++ == 0)
 			puts ("\n") ;
-		printf ("    Bad filename  : %s\n", cptr) ;
+		printf ("    Bad filename  : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 		} ;
 
 	cptr = sf_get_string (file, SF_STR_COPYRIGHT) ;
 	if (cptr == NULL || strcmp (copyright, cptr) != 0)
 	{	if (errors++ == 0)
 			puts ("\n") ;
-		printf ("    Bad copyright : %s\n", cptr) ;
+		printf ("    Bad copyright : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 		} ;
 
 	cptr = sf_get_string (file, SF_STR_SOFTWARE) ;
 	if (cptr == NULL || strstr (cptr, software) != cptr)
 	{	if (errors++ == 0)
 			puts ("\n") ;
-		printf ("    Bad software  : %s\n", cptr) ;
+		printf ("    Bad software  : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 		} ;
 
 	if (str_count (cptr, "libsndfile") != 1)
@@ -290,14 +292,14 @@ string_start_end_test (const char *filename, int typemajor)
 	if (cptr == NULL || strcmp (artist, cptr) != 0)
 	{	if (errors++ == 0)
 			puts ("\n") ;
-		printf ("    Bad artist    : %s\n", cptr) ;
+		printf ("    Bad artist    : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 		} ;
 
 	cptr = sf_get_string (file, SF_STR_COMMENT) ;
 	if (cptr == NULL || strcmp (comment, cptr) != 0)
 	{	if (errors++ == 0)
 			puts ("\n") ;
-		printf ("    Bad comment   : %s\n", cptr) ;
+		printf ("    Bad comment   : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 		} ;
 
 	if (typemajor != SF_FORMAT_AIFF)
@@ -305,14 +307,14 @@ string_start_end_test (const char *filename, int typemajor)
 		if (cptr == NULL || strcmp (date, cptr) != 0)
 		{	if (errors++ == 0)
 				puts ("\n") ;
-			printf ("    Bad date      : %s\n", cptr) ;
+			printf ("    Bad date      : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 			} ;
 
 		cptr = sf_get_string (file, SF_STR_GENRE) ;
 		if (cptr == NULL || strcmp (genre, cptr) != 0)
 		{	if (errors++ == 0)
 				puts ("\n") ;
-			printf ("    Bad genre     : %s\n", cptr) ;
+			printf ("    Bad genre     : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 			} ;
 		} ;
 
@@ -330,21 +332,21 @@ string_start_end_test (const char *filename, int typemajor)
 			if (cptr == NULL || strcmp (album, cptr) != 0)
 			{	if (errors++ == 0)
 					puts ("\n") ;
-				printf ("    Bad album     : %s\n", cptr) ;
+				printf ("    Bad album     : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 				} ;
 
 			cptr = sf_get_string (file, SF_STR_LICENSE) ;
 			if (cptr == NULL || strcmp (license, cptr) != 0)
 			{	if (errors++ == 0)
 					puts ("\n") ;
-				printf ("    Bad license   : %s\n", cptr) ;
+				printf ("    Bad license   : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 				} ;
 
 			cptr = sf_get_string (file, SF_STR_TRACKNUMBER) ;
 			if (cptr == NULL || strcmp (trackno, cptr) != 0)
 			{	if (errors++ == 0)
 					puts ("\n") ;
-				printf ("    Bad track no. : %s\n", cptr) ;
+				printf ("    Bad track no. : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 				} ;
 			break ;
 		} ;
@@ -429,7 +431,7 @@ string_start_test (const char *filename, int formattype)
 	if (cptr == NULL || strcmp (filename, cptr) != 0)
 	{	if (errors++ == 0)
 			puts ("\n") ;
-		printf ("    Bad filename  : %s\n", cptr) ;
+		printf ("    Bad filename  : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 		} ;
 
 	if (typemajor != SF_FORMAT_MPEG)
@@ -437,14 +439,14 @@ string_start_test (const char *filename, int formattype)
 		if (cptr == NULL || strcmp (copyright, cptr) != 0)
 		{	if (errors++ == 0)
 				puts ("\n") ;
-			printf ("    Bad copyright : %s\n", cptr) ;
+			printf ("    Bad copyright : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 			} ;
 
 		cptr = sf_get_string (file, SF_STR_SOFTWARE) ;
 		if (cptr == NULL || strstr (cptr, software) != cptr)
 		{	if (errors++ == 0)
 				puts ("\n") ;
-			printf ("    Bad software  : %s\n", cptr) ;
+			printf ("    Bad software  : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 			} ;
 
 		if (cptr && str_count (cptr, "libsndfile") != 1)
@@ -459,7 +461,7 @@ string_start_test (const char *filename, int formattype)
 		if (cptr == NULL || strcmp (id3v1_genre, cptr) != 0)
 		{	if (errors++ == 0)
 				puts ("\n") ;
-			printf ("    Bad genre     : %s\n", cptr) ;
+			printf ("    Bad genre     : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 			} ;
 		} ;
 
@@ -467,14 +469,14 @@ string_start_test (const char *filename, int formattype)
 	if (cptr == NULL || strcmp (artist, cptr) != 0)
 	{	if (errors++ == 0)
 			puts ("\n") ;
-		printf ("    Bad artist    : %s\n", cptr) ;
+		printf ("    Bad artist    : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 		} ;
 
 	cptr = sf_get_string (file, SF_STR_COMMENT) ;
 	if (cptr == NULL || strcmp (comment, cptr) != 0)
 	{	if (errors++ == 0)
 			puts ("\n") ;
-		printf ("    Bad comment   : %s\n", cptr) ;
+		printf ("    Bad comment   : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 		} ;
 
 	switch (typemajor)
@@ -488,7 +490,7 @@ string_start_test (const char *filename, int formattype)
 			if (cptr == NULL || strcmp (year, cptr) != 0)
 			{	if (errors++ == 0)
 					puts ("\n") ;
-				printf ("    Bad date      : %s\n", cptr) ;
+				printf ("    Bad date      : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 				} ;
 			break ;
 
@@ -497,7 +499,7 @@ string_start_test (const char *filename, int formattype)
 			if (cptr == NULL || strcmp (date, cptr) != 0)
 			{	if (errors++ == 0)
 					puts ("\n") ;
-				printf ("    Bad date      : %s\n", cptr) ;
+				printf ("    Bad date      : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 				} ;
 			break ;
 		} ;
@@ -507,7 +509,7 @@ string_start_test (const char *filename, int formattype)
 		if (cptr == NULL || strcmp (album, cptr) != 0)
 		{	if (errors++ == 0)
 				puts ("\n") ;
-			printf ("    Bad album     : %s\n", cptr) ;
+			printf ("    Bad album     : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 			} ;
 		} ;
 
@@ -524,7 +526,7 @@ string_start_test (const char *filename, int formattype)
 			if (cptr == NULL || strcmp (license, cptr) != 0)
 			{	if (errors++ == 0)
 					puts ("\n") ;
-				printf ("    Bad license   : %s\n", cptr) ;
+				printf ("    Bad license   : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 				} ;
 		} ;
 
