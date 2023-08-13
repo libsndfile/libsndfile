@@ -403,6 +403,7 @@ tests_scale_clip_test_LDADD = src/libsndfile.la
 # Yes, this sucks, but GNU make patterns aren't portable,
 # see also https://github.com/libsndfile/libsndfile/issues/369
 
+if HAVE_AUTOGEN
 SUFFIXES = .tpl .def
 
 .tpl.def:
@@ -424,6 +425,7 @@ tests/utils.h : tests/utils.c
 	  rm -f tests/utils.c && \
 	  $(MAKE) $(AM_MAKEFLAGS) tests/utils.c; \
 	fi
+endif
 
 ########
 # man/ #
