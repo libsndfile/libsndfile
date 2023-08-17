@@ -94,7 +94,7 @@
 #define MAC6_MARKER		(MAKE_MARKER ('M', 'A', 'C', '6'))
 #define ADP4_MARKER		(MAKE_MARKER ('A', 'D', 'P', '4'))
 
-/* Predfined chunk sizes. */
+/* Predefined chunk sizes. */
 #define SIZEOF_AIFF_COMM		18
 #define SIZEOF_AIFC_COMM_MIN	22
 #define SIZEOF_AIFC_COMM		24

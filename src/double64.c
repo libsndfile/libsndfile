@@ -461,7 +461,7 @@ double64_get_capability	(SF_PRIVATE *psf)
 		unsigned char	c [8] ;
 	} data ;
 
-	data.d = 1.234567890123456789 ; /* Some abitrary value. */
+	data.d = 1.234567890123456789 ; /* Some arbitrary value. */
 
 	if (! psf->ieee_replace)
 	{	/* If this test is true ints and floats are compatible and little endian. */

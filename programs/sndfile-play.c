@@ -508,7 +508,7 @@ static void
 win32_play_data (Win32_Audio_Data *audio_data)
 {	int thisread, readcount ;
 
-	/* fill a buffer if there is more data and we can read it sucessfully */
+	/* fill a buffer if there is more data and we can read it successfully */
 	readcount = (audio_data->remaining > audio_data->bufferlen) ? audio_data->bufferlen : (int) audio_data->remaining ;
 
 	short *lpData = (short *) (void *) audio_data->whdr [audio_data->current].lpData ;
@@ -759,7 +759,7 @@ solaris_play (int argc, char *argv [])
 			return ;
 			} ;
 
-		/*	Retrive standard values. */
+		/*	Retrieve standard values. */
 		AUDIO_INITINFO (&audio_info) ;
 
 		audio_info.play.sample_rate = sfinfo.samplerate ;

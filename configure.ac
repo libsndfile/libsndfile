@@ -264,7 +264,7 @@ AC_SEARCH_LIBS([floor], [m], [], [
 AC_CHECK_FUNCS([floor ceil fmod lrint lrintf])
 
 dnl ====================================================================================
-dnl  Check for requirements for building plugins for other languages/enviroments.
+dnl  Check for requirements for building plugins for other languages/environments.
 
 dnl Octave maths environment http://www.octave.org/
 AS_IF([test "x$cross_compiling" = "xno"], [
@@ -345,7 +345,7 @@ AS_IF([test -n "$PKG_CONFIG"], [
 AC_DEFINE_UNQUOTED([HAVE_EXTERNAL_XIPH_LIBS], [$HAVE_EXTERNAL_XIPH_LIBS], [Will be set to 1 if flac, ogg, vorbis, and opus are available.])
 
 dnl ====================================================================================
-dnl  Check for MPEG libraris liblame
+dnl  Check for MPEG libraries liblame
 
 ac_cv_lame="no"
 ac_cv_mpg123="no"

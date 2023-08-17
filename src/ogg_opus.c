@@ -72,7 +72,7 @@
 **  - Samples shall refer to discrete PCM values, regardless of any channel
 **	considerations. This is the same as what libsndfile calls samples.
 **  - Samples/channel shall refer to groups of samples, one for each channel.
-**	This is what Opus calles samples, and what libsndfile calles frames. It
+**	This is what Opus calls samples, and what libsndfile calls frames. It
 **	has the advantage that its name is also the formula to calculate it.
 **
 **
@@ -1448,7 +1448,7 @@ ogg_opus_analyze_file (SF_PRIVATE *psf)
 		oopus->pkt_pos = oopus->pg_pos - gp ;
 		}
 	else if (gp < oopus->pg_pos)
-	{	psf_log_printf (psf, "Opus : First data page is also the last, and granule position has an (ambigious) offset.\n") ;
+	{	psf_log_printf (psf, "Opus : First data page is also the last, and granule position has an (ambiguous) offset.\n") ;
 		return SFE_MALFORMED_FILE ;
 		} ;
 	oopus->u.decode.gp_start = oopus->pkt_pos ;
@@ -1511,7 +1511,7 @@ ogg_opus_null_read (SF_PRIVATE *psf, sf_count_t offset)
 				return total ;
 			/*
 			** Ignore pre-skip skipping. The preskip was accounted for in the
-			** arugment to offset, so we need to count it.
+			** argument to offset, so we need to count it.
 			*/
 			oopus->loc = 0 ;
 			} ;
@@ -1609,7 +1609,7 @@ ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 
 	/* Figure out the current position granule pos. Use the start of the
 	 * current buffer, to avoid backwards seeking if the target is on the page
-	 * but before the current locaiton. */
+	 * but before the current location. */
 	oopus->loc = 0 ;
 	current_gp = oopus->pkt_pos - (uint64_t) (oopus->len * oopus->sr_factor) ;
 
@@ -1644,7 +1644,7 @@ ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 			if (ret < 0)
 			{	/*
 				** Page seek failed, what to do? Could be bad data. We can
-				** either fall-back to manual seeking or bail. Manaul seeking
+				** either fall-back to manual seeking or bail. Manual seeking
 				** from the beginning has the advantage of finding where the
 				** file goes bad.
 				*/

@@ -53,10 +53,10 @@ struct nms_adpcm_state
 	/* Quantizer step size multiplier. Generated from yl. */
 	int y ;
 
-	/* Coefficents of the pole predictor */
+	/* Coefficients of the pole predictor */
 	int a [2] ;
 
-	/* Coefficents of the zero predictor  */
+	/* Coefficients of the zero predictor  */
 	int b [6] ;
 
 	/* Previous quantized deltas (multiplied by 2^14) */
@@ -206,7 +206,7 @@ nms_adpcm_update (struct nms_adpcm_state *s)
 		s->yl = 20480 ;
 	s->y = nms_adpcm_antilog (s->yl) ;
 
-	/* Update the zero predictor coefficents. */
+	/* Update the zero predictor coefficients. */
 	for (i = 0 ; i < 6 ; i++)
 	{	s->b [i] = (s->b [i] * 0xff) >> 8 ;
 		if ((s->d_q [0] ^ s->d_q [i + 1]) >= 0)
@@ -215,7 +215,7 @@ nms_adpcm_update (struct nms_adpcm_state *s)
 			s->b [i] -= 128 ;
 		}
 
-	/* Update the pole predictor coefficents. */
+	/* Update the pole predictor coefficients. */
 	fa1 = s->a [0] >> 5 ;
 	if (fa1 < -256)
 		fa1 = -256 ;

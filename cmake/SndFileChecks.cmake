@@ -104,7 +104,7 @@ check_type_size (wchar_t			SIZEOF_WCHAR_T)
 # Never checked
 # check_type_size (size_t			SIZEOF_SIZE_T)
 
-# Used in configre.ac
+# Used in configure.ac
 # check_type_size (double			SIZEOF_DOUBLE)
 # check_type_size (float			SIZEOF_FLOAT)
 # check_type_size (int				SIZEOF_INT)

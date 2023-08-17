@@ -383,7 +383,7 @@ ogg_stream_unpack_page (SF_PRIVATE *psf, OGG_PRIVATE *odata)
 	/*
 	** Unpack all the packets on the page. It is undocumented (like much of
 	** libOgg behavior) but all packets from a page read into the stream are
-	** guarenteed to remain valid in memory until a new page is read into the
+	** guaranteed to remain valid in memory until a new page is read into the
 	** stream.
 	*/
 	for (i = 1 ; ; i++)
@@ -819,7 +819,7 @@ ogg_stream_classify (SF_PRIVATE *psf, OGG_PRIVATE* odata)
 			break ;
 		} ;
 
-	psf_log_printf (psf, "This Ogg bitstream contains some uknown data type.\n") ;
+	psf_log_printf (psf, "This Ogg bitstream contains some unknown data type.\n") ;
 	return SFE_UNIMPLEMENTED ;
 } /* ogg_stream_classify */
 
