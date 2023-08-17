@@ -165,7 +165,7 @@ You can pass additional options with `/D<parameter>=<value>` when you run
   is native for MinGW ecosystem, Autotools constructs it using MinGW platform
   rules from `sndfile` target. But when you build with CMake using native
   Windows compiler, the name is `sndfile.dll`. This is name for native Windows
-  platform, because Windows has no library naming rules. It is preffered
+  platform, because Windows has no library naming rules. It is preferred
   because you can search library using package manager or CMake's
   `find_library` command on any platform using the same `sndfile` name.
 

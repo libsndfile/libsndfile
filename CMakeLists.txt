@@ -195,7 +195,7 @@ set_package_properties(Opus PROPERTIES
 set_package_properties(Speex PROPERTIES TYPE OPTIONAL
 	URL "www.speex.org/"
 	DESCRIPTION "an audio codec tuned for speech"
-	PURPOSE "Enables experemental Speex support"
+	PURPOSE "Enables experimental Speex support"
 	)
 set_package_properties (SQLite3 PROPERTIES
 	TYPE OPTIONAL

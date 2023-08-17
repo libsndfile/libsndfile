@@ -406,7 +406,7 @@ vorbis_close (SF_PRIVATE *psf)
 	if (odata == NULL || vdata == NULL)
 		return 0 ;
 
-	/*	Clean up this logical bitstream ; before exit we shuld see if we're
+	/*	Clean up this logical bitstream ; before exit we should see if we're
 	**	followed by another [chained]. */
 
 	if (psf->file.mode == SFM_WRITE)
