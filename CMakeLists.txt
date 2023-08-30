@@ -74,7 +74,6 @@ endif ()
 option (BUILD_PROGRAMS "Build programs" ON)
 option (BUILD_EXAMPLES "Build examples" ON)
 option (ENABLE_CPACK "Enable CPack support" ON)
-option (ENABLE_BOW_DOCS "Enable black-on-white html docs" OFF)
 if (MSVC AND (DEFINED ENABLE_STATIC_RUNTIME))
 	option (ENABLE_STATIC_RUNTIME "Enable static runtime" ${ENABLE_STATIC_RUNTIME})
 elseif (MINGW)
@@ -141,7 +140,6 @@ add_feature_info (BUILD_TESTING BUILD_TESTING "build tests")
 add_feature_info (BUILD_REGTEST BUILD_REGTEST "build regtest")
 add_feature_info (ENABLE_CPACK ENABLE_CPACK "enable CPack support")
 add_feature_info (ENABLE_CPU_CLIP ENABLE_CPU_CLIP "Enable tricky cpu specific clipper")
-add_feature_info (ENABLE_BOW_DOCS ENABLE_BOW_DOCS "enable black-on-white html docs")
 add_feature_info (ENABLE_PACKAGE_CONFIG ENABLE_PACKAGE_CONFIG "generate and install package config file")
 add_feature_info (INSTALL_PKGCONFIG_MODULE INSTALL_PKGCONFIG_MODULE "generate and install pkg-config module")
 add_feature_info (INSTALL_MANPAGES INSTALL_MANPAGES "install man pages for programs")
@@ -887,18 +885,10 @@ if (INSTALL_MANPAGES)
 	install (FILES man/sndfile-interleave.1 DESTINATION ${CMAKE_INSTALL_MANDIR}/man1 RENAME sndfile-deinterleave.1)
 endif ()
 
-if (ENABLE_BOW_DOCS)
-	set (HTML_BGCOLOUR "white")
-	set (HTML_FGCOLOUR "black")
-else ()
-	set (HTML_BGCOLOUR "black")
-	set (HTML_FGCOLOUR "white")
-endif ()
 set (dist_doc_DATA
 	docs/index.md
 	docs/libsndfile.jpg
 	docs/libsndfile.css
-	docs/print.css
 	docs/api.md
 	docs/command.md
 	docs/bugs.md

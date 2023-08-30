@@ -139,8 +139,6 @@ You can pass additional options with `/D<parameter>=<value>` when you run
   dependency libraries were found.
 * `ENABLE_CPU_CLIP` - enable tricky cpu specific clipper. Enabled and set to
   `ON` when CPU clips negative\positive. Don't touch it if you are not sure
-* `ENABLE_BOW_DOCS` - enable black-on-white documentation theme, `OFF` by
-  default.
 * `ENABLE_EXPERIMENTAL` - enable experimental code. Don't use it if you are
   not sure. This option is `OFF` by default.
 * `ENABLE_CPACK` - enable [CPack](https://cmake.org/cmake/help/latest/module/CPack.html) support.

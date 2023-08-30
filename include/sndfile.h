@@ -136,7 +136,7 @@ enum
 /*
 ** The following are the valid command numbers for the sf_command()
 ** interface.  The use of these commands is documented in the file
-** command.html in the doc directory of the source code distribution.
+** command.md in the doc directory of the source code distribution.
 */
 
 enum

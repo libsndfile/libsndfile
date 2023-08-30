@@ -165,7 +165,7 @@ AUTOHEADER=echo
 ########
 
 if FULL_SUITE
-dist_doc_DATA = docs/index.md docs/libsndfile.jpg docs/libsndfile.css docs/print.css docs/api.md \
+dist_doc_DATA = docs/index.md docs/libsndfile.jpg docs/libsndfile.css docs/api.md \
 	docs/command.md docs/bugs.md docs/formats.md docs/sndfile_info.md docs/new_file_type_howto.md \
 	docs/win32.md docs/FAQ.md docs/lists.md docs/embedded_files.md docs/octave.md \
 	docs/tutorial.md
