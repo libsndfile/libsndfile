@@ -2051,22 +2051,18 @@ f2let_clip_array (const float *src, tribyte *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFF))
 		{	dest [i].bytes [0] = 0xFF ;
 			dest [i].bytes [1] = 0xFF ;
 			dest [i].bytes [2] = 0x7F ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x100000))
 		{	dest [i].bytes [0] = 0x00 ;
 			dest [i].bytes [1] = 0x00 ;
 			dest [i].bytes [2] = 0x80 ;
 			continue ;
 		} ;
-#endif
 
 		value = psf_lrintf (scaled_value) ;
 		dest [i].bytes [0] = value ;
@@ -2126,22 +2122,18 @@ f2bet_clip_array (const float *src, tribyte *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFF))
 		{	dest [i].bytes [0] = 0x7F ;
 			dest [i].bytes [1] = 0xFF ;
 			dest [i].bytes [2] = 0xFF ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x100000))
 		{	dest [i].bytes [0] = 0x80 ;
 			dest [i].bytes [1] = 0x00 ;
 			dest [i].bytes [2] = 0x00 ;
 			continue ;
 		} ;
-#endif
 
 		value = psf_lrint (scaled_value) ;
 		dest [i].bytes [0] = value >> 16 ;
@@ -2627,22 +2619,18 @@ d2let_clip_array (const double *src, tribyte *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFF))
 		{	dest [i].bytes [0] = 0xFF ;
 			dest [i].bytes [1] = 0xFF ;
 			dest [i].bytes [2] = 0x7F ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x100000))
 		{	dest [i].bytes [0] = 0x00 ;
 			dest [i].bytes [1] = 0x00 ;
 			dest [i].bytes [2] = 0x80 ;
 			continue ;
 			} ;
-#endif
 
 		value = psf_lrint (scaled_value) ;
 		dest [i].bytes [0] = value ;
@@ -2702,22 +2690,18 @@ d2bet_clip_array (const double *src, tribyte *dest, int count, int normalize)
 
 	for (int i = 0 ; i < count ; i++)
 	{	scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFF))
 		{	dest [i].bytes [2] = 0xFF ;
 			dest [i].bytes [1] = 0xFF ;
 			dest [i].bytes [0] = 0x7F ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x100000))
 		{	dest [i].bytes [2] = 0x00 ;
 			dest [i].bytes [1] = 0x00 ;
 			dest [i].bytes [0] = 0x80 ;
 			continue ;
 			} ;
-#endif
 
 		value = psf_lrint (scaled_value) ;
 		dest [i].bytes [2] = value ;
