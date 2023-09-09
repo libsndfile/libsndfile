@@ -6,7 +6,6 @@ include (CheckTypeSize)
 include (TestBigEndian)
 
 include (TestInline)
-include (ClipMode)
 include (TestLargeFiles)
 include (CheckCPUArch)
 
@@ -196,7 +195,6 @@ if (CMAKE_COMPILER_IS_GNUCC OR (CMAKE_C_COMPILER_ID MATCHES "Clang"))
 endif ()
 
 test_inline ()
-clip_mode ()
 
 if (MSVC)
 	add_definitions (-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE)
