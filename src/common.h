@@ -964,7 +964,7 @@ void psf_strlcpy (char *dest, size_t n, const char *src) ;
 static inline int psf_lrintf (float x)
 {
 	#ifdef USE_SSE2
- 		return _mm_cvtss_si32 (_mm_load_ss (&x)) ;
+		return _mm_cvtss_si32 (_mm_load_ss (&x)) ;
 	#else
 		return lrintf (x) ;
 	#endif
@@ -973,7 +973,7 @@ static inline int psf_lrintf (float x)
 static inline int psf_lrint (double x)
 {
 	#ifdef USE_SSE2
- 		return _mm_cvtsd_si32 (_mm_load_sd (&x)) ;
+		return _mm_cvtsd_si32 (_mm_load_sd (&x)) ;
 	#else
 		return lrint (x) ;
 	#endif

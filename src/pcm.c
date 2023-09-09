@@ -2198,7 +2198,6 @@ f2bei_clip_array (const float *src, int *dest, int count, int normalize)
 	for (int i = 0 ; i < count ; i++)
 	{	ucptr = (unsigned char*) &dest [i] ;
 		scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= 1.0 * 0x7FFFFFFF)
 		{	ucptr [0] = 0x7F ;
 			ucptr [1] = 0xFF ;
@@ -2206,8 +2205,6 @@ f2bei_clip_array (const float *src, int *dest, int count, int normalize)
 			ucptr [3] = 0xFF ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [0] = 0x80 ;
 			ucptr [1] = 0x00 ;
@@ -2215,7 +2212,6 @@ f2bei_clip_array (const float *src, int *dest, int count, int normalize)
 			ucptr [3] = 0x00 ;
 			continue ;
 		} ;
-#endif
 
 		value = psf_lrintf (scaled_value) ;
 		ucptr [0] = value >> 24 ;
@@ -2281,7 +2277,6 @@ f2lei_clip_array (const float *src, int *dest, int count, int normalize)
 	for (int i = 0 ; i < count ; i++)
 	{	ucptr = (unsigned char*) &dest [i] ;
 		scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
 			ucptr [1] = 0xFF ;
@@ -2289,8 +2284,6 @@ f2lei_clip_array (const float *src, int *dest, int count, int normalize)
 			ucptr [3] = 0x7F ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [0] = 0x00 ;
 			ucptr [1] = 0x00 ;
@@ -2298,7 +2291,6 @@ f2lei_clip_array (const float *src, int *dest, int count, int normalize)
 			ucptr [3] = 0x80 ;
 			continue ;
 			} ;
-#endif
 
 		value = psf_lrintf (scaled_value) ;
 		ucptr [0] = value ;
@@ -2766,7 +2758,6 @@ d2bei_clip_array (const double *src, int *dest, int count, int normalize)
 	for (int i = 0 ; i < count ; i++)
 	{	ucptr = (unsigned char*) &dest [i] ;
 		scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [3] = 0xFF ;
 			ucptr [2] = 0xFF ;
@@ -2774,8 +2765,6 @@ d2bei_clip_array (const double *src, int *dest, int count, int normalize)
 			ucptr [0] = 0x7F ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [3] = 0x00 ;
 			ucptr [2] = 0x00 ;
@@ -2783,7 +2772,6 @@ d2bei_clip_array (const double *src, int *dest, int count, int normalize)
 			ucptr [0] = 0x80 ;
 			continue ;
 			} ;
-#endif
 
 		value = psf_lrint (scaled_value) ;
 		ucptr [0] = value >> 24 ;
@@ -2849,7 +2837,6 @@ d2lei_clip_array (const double *src, int *dest, int count, int normalize)
 	for (int i = 0 ; i < count ; i++)
 	{	ucptr = (unsigned char*) &dest [i] ;
 		scaled_value = src [i] * normfact ;
-#if CPU_CLIPS_POSITIVE == 0
 		if (scaled_value >= (1.0 * 0x7FFFFFFF))
 		{	ucptr [0] = 0xFF ;
 			ucptr [1] = 0xFF ;
@@ -2857,8 +2844,6 @@ d2lei_clip_array (const double *src, int *dest, int count, int normalize)
 			ucptr [3] = 0x7F ;
 			continue ;
 			} ;
-#endif
-#if CPU_CLIPS_NEGATIVE == 0
 		if (scaled_value <= (-8.0 * 0x10000000))
 		{	ucptr [0] = 0x00 ;
 			ucptr [1] = 0x00 ;
@@ -2866,7 +2851,6 @@ d2lei_clip_array (const double *src, int *dest, int count, int normalize)
 			ucptr [3] = 0x80 ;
 			continue ;
 			} ;
-#endif
 
 		value = psf_lrint (scaled_value) ;
 		ucptr [0] = value ;
