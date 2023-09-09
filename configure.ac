@@ -141,9 +141,6 @@ AC_DEFINE_UNQUOTED([ENABLE_EXPERIMENTAL_CODE], [${EXPERIMENTAL_CODE}], [Set to 1
 AC_ARG_ENABLE([werror],
 	[AS_HELP_STRING([--enable-werror], [enable -Werror in all Makefiles])])
 
-AC_ARG_ENABLE([cpu-clip],
-	[AS_HELP_STRING([--disable-cpu-clip], [disable tricky cpu specific clipper])])
-
 AC_ARG_ENABLE([bow-docs],
 	[AS_HELP_STRING([--enable-bow-docs], [enable black-on-white html docs])])
 
@@ -401,22 +398,6 @@ AS_IF([test "x$enable_sqlite" != "xno"], [
 
 AC_DEFINE_UNQUOTED([HAVE_SQLITE3], [${ac_cv_sqlite3}], [Set to 1 if you have libsqlite3.])
 AM_CONDITIONAL([HAVE_SQLITE3], [test "x$ac_cv_sqlite3" = "x1"])
-
-dnl ====================================================================================
-dnl  Determine if the processor can do clipping on float to int conversions.
-
-AS_IF([test "x$enable_cpu_clip" != "xno"], [
-		MN_C_CLIP_MODE
-	], [
-		AS_ECHO(["checking processor clipping capabilities... disabled"])
-		ac_cv_c_clip_positive=0
-		ac_cv_c_clip_negative=0
-	])
-
-AC_DEFINE_UNQUOTED([CPU_CLIPS_POSITIVE], [${ac_cv_c_clip_positive}],
-	[Host processor clips on positive float to int conversion.])
-AC_DEFINE_UNQUOTED([CPU_CLIPS_NEGATIVE], [${ac_cv_c_clip_negative}],
-	[Host processor clips on negative float to int conversion.])
 
 dnl ====================================================================================
 dnl  Host OS specific stuff.

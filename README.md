@@ -137,8 +137,6 @@ You can pass additional options with `/D<parameter>=<value>` when you run
   option is available and set to `ON` if all dependency libraries were found.
 * `ENABLE_MPEG` - MP3 support. This option is available and set to `ON` if all
   dependency libraries were found.
-* `ENABLE_CPU_CLIP` - enable tricky cpu specific clipper. Enabled and set to
-  `ON` when CPU clips negative\positive. Don't touch it if you are not sure
 * `ENABLE_BOW_DOCS` - enable black-on-white documentation theme, `OFF` by
   default.
 * `ENABLE_EXPERIMENTAL` - enable experimental code. Don't use it if you are
@@ -183,8 +181,6 @@ Deprecated options:
 
 * `DISABLE_EXTERNAL_LIBS` - disable Ogg, Vorbis and FLAC support. Replaced by
   `ENABLE_EXTERNAL_LIBS`
-* `DISABLE_CPU_CLIP` - disable tricky cpu specific clipper. Replaced by
-  `ENABLE_CPU_CLIP`
 * `BUILD_STATIC_LIBS` - build static library. Use `BUILD_SHARED_LIBS` instead
 
 ### Linking from CMake projects
