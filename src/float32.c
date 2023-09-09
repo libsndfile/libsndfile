@@ -468,9 +468,9 @@ f2i_clip_array (const float *src, int count, int *dest, float scale)
 {	for (int i = 0 ; i < count ; i++)
 	{	float tmp = scale * src [i] ;
 
-		if (CPU_CLIPS_POSITIVE == 0 && tmp > (1.0 * INT_MAX))
+		if (tmp > (1.0 * INT_MAX))
 			dest [i] = INT_MAX ;
-		else if (CPU_CLIPS_NEGATIVE == 0 && tmp < (-1.0 * INT_MAX))
+		else if (tmp < (-1.0 * INT_MAX))
 			dest [i] = INT_MIN ;
 		else
 			dest [i] = psf_lrintf (tmp) ;
