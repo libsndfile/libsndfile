@@ -106,7 +106,7 @@ check_title (const SndfileHandle & file, const char * filename)
 	title = file.getString (SF_STR_TITLE) ;
 
 	if (title == NULL)
-	{	printf ("\n\n%s %d : Error : No title.\n\n", __func__, __LINE__) ;
+	{	printf ("\n\n%s %d : Error : No title for %s.\n\n", __func__, __LINE__, filename) ;
 		exit (1) ;
 		} ;
 

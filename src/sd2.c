@@ -240,7 +240,7 @@ sd2_write_rsrc_fork (SF_PRIVATE *psf, int UNUSED (calc_length))
 	/* Very start of resource fork. */
 	psf_binheader_writef (psf, "E444", BHW4 (rsrc.data_offset), BHW4 (rsrc.map_offset), BHW4 (rsrc.data_length)) ;
 
-	psf_binheader_writef (psf, "Eop", BHWo (0x30), BHWp (psf->file.name.c)) ;
+	psf_binheader_writef (psf, "Eop", BHWo (0x30), BHWp (psf->file.name)) ;
 	psf_binheader_writef (psf, "Eo2mm", BHWo (0x50), BHW2 (0), BHWm (Sd2f_MARKER), BHWm (lsf1_MARKER)) ;
 
 	/* Very start of resource map. */
@@ -524,7 +524,13 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 		read_rsrc_str (rsrc, str_offset + 1, name, SF_MIN (SIGNED_SIZEOF (name), slen + 1)) ;
 		str_offset += slen + 1 ;
 
-		rsrc_id = read_rsrc_short (rsrc, rsrc->item_offset + k * 12) ;
+		// work-around for GitHub issue #340
+		int id_offset = rsrc->item_offset + k * 12 ;
+		if (id_offset < 0 || id_offset + 1 >= rsrc->rsrc_len)
+		{	psf_log_printf (psf, "Exiting parser on id_offset of %d.\n", id_offset) ;
+			break ;
+			}
+		rsrc_id = read_rsrc_short (rsrc, id_offset) ;
 
 		data_offset = rsrc->data_offset + read_rsrc_int (rsrc, rsrc->item_offset + k * 12 + 4) ;
 		if (data_offset < 0 || data_offset > rsrc->rsrc_len)

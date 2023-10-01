@@ -1,4 +1,5 @@
 /*
+** Copyright (C) 2018-2021 Arthur Taylor <art@ified.ca>
 ** Copyright (C) 2002-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 ** Copyright (C) 2002-2005 Michael Smith <msmith@xiph.org>
 ** Copyright (C) 2007 John ffitch
@@ -19,7 +20,7 @@
 */
 
 /*
-**  Much of this code is based on the examples in libvorbis from the
+** Much of this code is based on the examples in libvorbis from the
 ** XIPHOPHORUS Company http://www.xiph.org/ which has a BSD-style Licence
 ** Copyright (c) 2002, Xiph.org Foundation
 **
@@ -78,6 +79,9 @@
 
 #include "ogg.h"
 
+/* How many seconds in the future to not bother bisection searching for. */
+#define VORBIS_SEEK_THRESHOLD 2
+
 typedef int convert_func (SF_PRIVATE *psf, int, void *, int, int, float **) ;
 
 static int	vorbis_read_header (SF_PRIVATE *psf) ;
@@ -85,7 +89,9 @@ static int	vorbis_write_header (SF_PRIVATE *psf, int calc_length) ;
 static int	vorbis_close (SF_PRIVATE *psf) ;
 static int	vorbis_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 static int	vorbis_byterate (SF_PRIVATE *psf) ;
-static sf_count_t	vorbis_calculate_page_duration (SF_PRIVATE *psf) ;
+static int	vorbis_calculate_granulepos (SF_PRIVATE *psf, uint64_t *gp_out) ;
+static int	vorbis_skip (SF_PRIVATE *psf, uint64_t target_gp) ;
+static int	vorbis_seek_trysearch (SF_PRIVATE *psf, uint64_t target_gp) ;
 static sf_count_t	vorbis_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
 static sf_count_t	vorbis_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
 static sf_count_t	vorbis_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
@@ -115,26 +121,22 @@ static STR_PAIRS vorbis_metatypes [] =
 	{	SF_STR_ALBUM,		"Album" },
 	{	SF_STR_LICENSE,		"License" },
 	{	SF_STR_TRACKNUMBER,	"Tracknumber" },
-	{	SF_STR_GENRE, 		"Genre" },
+	{	SF_STR_GENRE,		"Genre" },
 } ;
 
 typedef struct
-{	/* Count current location */
-	sf_count_t loc ;
+{	/* Current granule position. */
+	uint64_t gp ;
 	/* Struct that stores all the static vorbis bitstream settings */
 	vorbis_info	vinfo ;
 	/* Struct that stores all the bitstream user comments */
 	vorbis_comment vcomment ;
-	/* Ventral working state for the packet->PCM decoder */
+	/* Central working state for the packet->PCM decoder */
 	vorbis_dsp_state vdsp ;
 	/* Local working space for packet->PCM decode */
 	vorbis_block vblock ;
-
 	/* Encoding quality in range [0.0, 1.0]. */
 	double quality ;
-
-	/* Current granule position. */
-	uint64_t pcm_current ;
 	/* Offset of the first samples' granule position. */
 	uint64_t pcm_start ;
 	/* Last valid samples' granule position. */
@@ -147,9 +149,10 @@ static int
 vorbis_read_header (SF_PRIVATE *psf)
 {	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	sf_count_t duration ;
 	int printed_metadata_msg = 0 ;
-	int i, k, nn ;
+	int i, nn ;
+	sf_count_t last_page ;
+	sf_count_t saved_offset ;
 
 	/*
 	**  The first page of the Ogg stream we are told to try and open as Vorbis
@@ -184,8 +187,8 @@ vorbis_read_header (SF_PRIVATE *psf)
 	**	Vorbis decoder.
 	**
 	**	The next two packets in order are the comment and codebook headers.
-	**	They're likely large and may span multiple pages.  Thus we reead
-	**	and submit data until we get our two pacakets, watching that no
+	**	They're likely large and may span multiple pages.  Thus we read
+	**	and submit data until we get our two packets, watching that no
 	**	pages are missing.  If a page is missing, error out ; losing a
 	**	header page is the only place where missing data is fatal.
 	*/
@@ -231,32 +234,23 @@ vorbis_read_header (SF_PRIVATE *psf)
 	psf->dataoffset	= ogg_sync_ftell (psf) ;
 
 	/*
-	**	Caculate the granule position offset. The first page with a payload
+	**	Calculate the granule position offset. The first page with a payload
 	**	packet shouldn't end in a continued packet. The difference between the
 	**	page's granule position and the sum of frames on the page tells us the
 	**	granule position offset.
 	**	See https://xiph.org/vorbis/doc/Vorbis_I_spec.html#x1-132000A.2
 	*/
 	ogg_stream_unpack_page (psf, odata) ;
-	vdata->pcm_start = odata->pkt [odata->pkt_len - 1].granulepos ;
-	duration = vorbis_calculate_page_duration (psf) ;
-
-	if (duration < (sf_count_t) vdata->pcm_start)
-		vdata->pcm_start -= duration ;
-	else
-		vdata->pcm_start = 0 ;
+	vorbis_calculate_granulepos (psf, &vdata->pcm_start) ;
+	vdata->gp = vdata->pcm_start ;
 
 	/*
 	**	Find the end of the stream, save it. Only works if the file is seekable.
 	*/
-	vdata->loc = vdata->pcm_start ;
 	vdata->pcm_end = (uint64_t) -1 ;
 	psf->datalength = psf->filelength ;
 	if (!psf->is_pipe)
-	{	sf_count_t last_page ;
-		sf_count_t saved_offset ;
-
-		saved_offset = ogg_sync_ftell (psf) ;
+	{	saved_offset = ogg_sync_ftell (psf) ;
 		last_page = ogg_sync_last_page_before (psf, odata, &vdata->pcm_end, psf->filelength, odata->ostream.serialno) ;
 		if (last_page > 0)
 		{	if (!ogg_page_eos (&odata->opage))
@@ -270,17 +264,17 @@ vorbis_read_header (SF_PRIVATE *psf)
 		ogg_sync_fseek (psf, saved_offset, SEEK_SET) ;
 		}
 
-	psf_log_printf (psf, "PCM offset  : %d\n", vdata->pcm_start) ;
+	psf_log_printf (psf, "PCM offset  : %D\n", vdata->pcm_start) ;
 	if (vdata->pcm_end != (uint64_t) -1)
-		psf_log_printf (psf, "PCM end     : %d\n", vdata->pcm_end) ;
+		psf_log_printf (psf, "PCM end     : %D\n", vdata->pcm_end) ;
 	else
 		psf_log_printf (psf, "PCM end     : unknown\n") ;
 
 	/* Throw the comments plus a few lines about the bitstream we're decoding. */
-	for (k = 0 ; k < ARRAY_LEN (vorbis_metatypes) ; k++)
+	for (i = 0 ; i < ARRAY_LEN (vorbis_metatypes) ; i++)
 	{	char *dd ;
 
-		dd = vorbis_comment_query (&vdata->vcomment, vorbis_metatypes [k].name, 0) ;
+		dd = vorbis_comment_query (&vdata->vcomment, vorbis_metatypes [i].name, 0) ;
 		if (dd == NULL)
 			continue ;
 
@@ -289,8 +283,8 @@ vorbis_read_header (SF_PRIVATE *psf)
 			printed_metadata_msg = 1 ;
 			} ;
 
-		psf_store_string (psf, vorbis_metatypes [k].id, dd) ;
-		psf_log_printf (psf, "  %-10s : %s\n", vorbis_metatypes [k].name, dd) ;
+		psf_store_string (psf, vorbis_metatypes [i].id, dd) ;
+		psf_log_printf (psf, "  %-10s : %s\n", vorbis_metatypes [i].name, dd) ;
 		} ;
 	psf_log_printf (psf, "End\n") ;
 
@@ -306,7 +300,7 @@ vorbis_read_header (SF_PRIVATE *psf)
 
 	/*	Local state for most of the decode so multiple block decodes can
 	**	proceed in parallel. We could init multiple vorbis_block structures
-	**	for vd here. */
+	**	for vdsp here. */
 	vorbis_block_init (&vdata->vdsp, &vdata->vblock) ;
 
 	return 0 ;
@@ -334,7 +328,7 @@ vorbis_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 	if (ret)
 		return SFE_BAD_OPEN_FORMAT ;
 
-	vdata->loc = 0 ;
+	vdata->gp = 0 ;
 
 	/* add a comment */
 	vorbis_comment_init (&vdata->vcomment) ;
@@ -348,15 +342,15 @@ vorbis_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 
 		switch (psf->strings.data [k].type)
 		{	case SF_STR_TITLE :			name = "TITLE" ; break ;
-			case SF_STR_COPYRIGHT : 	name = "COPYRIGHT" ; break ;
+			case SF_STR_COPYRIGHT :		name = "COPYRIGHT" ; break ;
 			case SF_STR_SOFTWARE :		name = "SOFTWARE" ; break ;
 			case SF_STR_ARTIST :		name = "ARTIST" ; break ;
 			case SF_STR_COMMENT :		name = "COMMENT" ; break ;
 			case SF_STR_DATE :			name = "DATE" ; break ;
 			case SF_STR_ALBUM :			name = "ALBUM" ; break ;
 			case SF_STR_LICENSE :		name = "LICENSE" ; break ;
-			case SF_STR_TRACKNUMBER : 	name = "Tracknumber" ; break ;
-			case SF_STR_GENRE : 		name = "Genre" ; break ;
+			case SF_STR_TRACKNUMBER :	name = "Tracknumber" ; break ;
+			case SF_STR_GENRE :			name = "Genre" ; break ;
 
 			default : continue ;
 			} ;
@@ -412,7 +406,7 @@ vorbis_close (SF_PRIVATE *psf)
 	if (odata == NULL || vdata == NULL)
 		return 0 ;
 
-	/*	Clean up this logical bitstream ; before exit we shuld see if we're
+	/*	Clean up this logical bitstream ; before exit we should see if we're
 	**	followed by another [chained]. */
 
 	if (psf->file.mode == SFM_WRITE)
@@ -517,7 +511,8 @@ ogg_vorbis_open (SF_PRIVATE *psf)
 
 static int
 vorbis_command (SF_PRIVATE *psf, int command, void * data, int datasize)
-{	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
+{	OGG_PRIVATE* odata = psf->container_data ;
+	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
 
 	switch (command)
 	{	case SFC_SET_COMPRESSION_LEVEL :
@@ -533,6 +528,13 @@ vorbis_command (SF_PRIVATE *psf, int command, void * data, int datasize)
 			vdata->quality = SF_MAX (0.0, SF_MIN (1.0, vdata->quality)) ;
 
 			psf_log_printf (psf, "%s : Setting SFC_SET_VBR_ENCODING_QUALITY to %f.\n", __func__, vdata->quality) ;
+			return SF_TRUE ;
+
+		case SFC_GET_OGG_STREAM_SERIALNO :
+			if (data == NULL || datasize != sizeof (int32_t))
+				return SF_FALSE ;
+
+			*((int32_t *) data) = odata->ostream.serialno ;
 			return SF_TRUE ;
 
 		default :
@@ -558,13 +560,13 @@ vorbis_rshort (SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, 
 		float inverse = 1.0 / psf->float_max ;
 		for (j = 0 ; j < samples ; j++)
 			for (n = 0 ; n < channels ; n++)
-				ptr [i++] = lrintf ((pcm [n][j] * inverse) * 32767.0f) ;
+				ptr [i++] = psf_lrintf ((pcm [n][j] * inverse) * 32767.0f) ;
 	}
 	else
 	{
 		for (j = 0 ; j < samples ; j++)
 			for (n = 0 ; n < channels ; n++)
-				ptr [i++] = lrintf (pcm [n][j] * 32767.0f) ;
+				ptr [i++] = psf_lrintf (pcm [n][j] * 32767.0f) ;
 	}
 	return i ;
 } /* vorbis_rshort */
@@ -580,13 +582,13 @@ vorbis_rint (SF_PRIVATE *psf, int samples, void *vptr, int off, int channels, fl
 		float inverse = 1.0 / psf->float_max ;
 		for (j = 0 ; j < samples ; j++)
 			for (n = 0 ; n < channels ; n++)
-				ptr [i++] = lrintf ((pcm [n][j] * inverse) * 2147483647.0f) ;
+				ptr [i++] = psf_lrintf ((pcm [n][j] * inverse) * 2147483647.0f) ;
 	}
 	else
 	{
 		for (j = 0 ; j < samples ; j++)
 			for (n = 0 ; n < channels ; n++)
-				ptr [i++] = lrintf (pcm [n][j] * 2147483647.0f) ;
+				ptr [i++] = psf_lrintf (pcm [n][j] * 2147483647.0f) ;
 	}
 	return i ;
 } /* vorbis_rint */
@@ -636,9 +638,9 @@ vorbis_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *t
 			len -= samples ;
 			/* tell libvorbis how many samples we actually consumed */
 			vorbis_synthesis_read (&vdata->vdsp, samples) ;
-			vdata->loc += samples ;
+			vdata->gp += samples ;
 			if (len == 0)
-				return i ; /* Is this necessary */
+				return i ;
 			} ;
 
 		/* Out of samples, load the next packet. */
@@ -648,9 +650,9 @@ vorbis_read_sample (SF_PRIVATE *psf, void *ptr, sf_count_t lens, convert_func *t
 			if (nn <= 0)
 				return i ;
 			if (nn == 2)
-			{	/* Ran over a hole. loc is now out of date, need to recalculate. */
-				vdata->loc = odata->pkt [odata->pkt_len - 1].granulepos ;
-				vdata->loc -= vorbis_calculate_page_duration (psf) ;
+			{	/* Ran over a hole. gp is now out of date, need to recalculate. */
+				vorbis_synthesis_restart (&vdata->vdsp) ;
+				vorbis_calculate_granulepos (psf, &vdata->gp) ;
 				}
 			} ;
 
@@ -722,7 +724,7 @@ vorbis_write_samples (SF_PRIVATE *psf, OGG_PRIVATE *odata, VORBIS_PRIVATE *vdata
 			} ;
 		} ;
 
-	vdata->loc += in_frames ;
+	vdata->gp += in_frames ;
 } /* vorbis_write_data */
 
 
@@ -791,11 +793,131 @@ vorbis_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t lens)
 	return lens ;
 } /* vorbis_write_d */
 
+static int
+vorbis_skip (SF_PRIVATE *psf, uint64_t target)
+{	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
+	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
+	ogg_packet *pkt ;
+	int thisblock, lastblock, nn ;
+	const int blocksize = vorbis_info_blocksize (&vdata->vinfo, 1) ;
+
+	/*	Read out any samples that may be in the decoder from a seek without a
+	**	search. */
+	thisblock = vorbis_synthesis_pcmout (&vdata->vdsp, NULL) ;
+	if (thisblock > 0)
+	{	if ((uint64_t) thisblock + vdata->gp >= target)
+			thisblock = SF_MIN (thisblock, (int) (target - vdata->gp)) ;
+
+		vorbis_synthesis_read (&vdata->vdsp, thisblock) ;
+		vdata->gp += thisblock ;
+		if (vdata->gp == target)
+			return 0 ;
+		} ;
+
+	/* Read through packets that are before our target */
+	lastblock = 0 ;
+	for ( ; vdata->gp < target ; )
+	{	/* Ensure there are unpacked packets. */
+		if (odata->pkt_indx == odata->pkt_len)
+		{	/* Page out of packets, load and unpack the next page. */
+			nn = ogg_stream_unpack_page (psf, odata) ;
+			if (nn < 0)
+				return nn ;
+			if (nn == 0)
+				break ;
+			if (nn == 2)
+			{	/* Ran over a hole. gp is now out of date, need to recalculate. */
+				vorbis_synthesis_restart (&vdata->vdsp) ;
+				vorbis_calculate_granulepos (psf, &vdata->gp) ;
+				if (target < vdata->gp)
+				{	/* Our target is inside the hole :-( */
+					return 0 ;
+					} ;
+				} ;
+			} ;
+
+		pkt = &odata->pkt [odata->pkt_indx] ;
+		thisblock = vorbis_packet_blocksize (&vdata->vinfo, pkt) ;
+		if (thisblock < 0)
+		{	/* Not an audio packet */
+			odata->pkt_indx++ ;
+			continue ;
+			} ;
+
+		if (lastblock)
+		{	vdata->gp += ((lastblock + thisblock) / 4) ;
+			} ;
+
+		/* Check to see if the block contains our target */
+		if (vdata->gp + ((thisblock + blocksize) / 4) >= target)
+			break ;
+
+		/* Block is before the target. Track for state, but don't decode. */
+		odata->pkt_indx++ ;
+		vorbis_synthesis_trackonly (&vdata->vblock, pkt) ;
+		vorbis_synthesis_blockin (&vdata->vdsp, &vdata->vblock) ;
+		lastblock = thisblock ;
+		} ;
+
+	/*	We are at the correct block, but still need to consume samples to reach
+	**	our target. */
+	vorbis_read_sample (psf, (void *) NULL, (target - vdata->gp) * psf->sf.channels, vorbis_rnull) ;
+
+	return 0 ;
+} /* vorbis_skip */
+
+static int
+vorbis_seek_trysearch (SF_PRIVATE *psf, uint64_t target_gp)
+{	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
+	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
+	uint64_t best_gp, search_target_gp ;
+	int ret ;
+
+	/* Can't bisect a file we don't know the end of (cannot seek). */
+	if (vdata->pcm_end == (uint64_t) -1)
+		return 0 ;
+
+	/* If the target is for the near future, don't bother bisecting, just skip
+	** to it. */
+	if (target_gp >= vdata->gp &&
+		target_gp - vdata->gp < ((unsigned) (VORBIS_SEEK_THRESHOLD) * psf->sf.samplerate))
+		return 0 ;
+
+	/*	Search for a position a half large-block before our target. As Vorbis is
+	**	lapped, every sample position come from two blocks, the "left" half of
+	**	one block and the "right" half of the previous block.  The granule
+	**	position of an Ogg page of a Vorbis stream is the sample offset of the
+	**	last finished sample in the stream that can be decoded from a page.  A
+	**	page also contains another half-block of samples waiting to be lapped
+	**	with the first half-block of samples from the next page.
+	**
+	**	Searching for a sample one half of a large block before our target
+	**	guarantees we always load a page containing the previous half block
+	**	required to decode the target.  Downside is we can't use best_gp
+	**	parameter of the page seek function. */
+	search_target_gp = vorbis_info_blocksize (&vdata->vinfo, 1) / 2 ;
+	search_target_gp = search_target_gp < target_gp ? target_gp - search_target_gp : 0 ;
+
+	ret = ogg_stream_seek_page_search (psf, odata, search_target_gp, vdata->pcm_start,
+			vdata->pcm_end, &best_gp, psf->dataoffset, vdata->last_page, vdata->vinfo.rate) ;
+	if (ret < 0)
+		return ret ;
+
+	ret = ogg_stream_unpack_page (psf, odata) ;
+	if (ret > 0)
+	{	/* Reset the decoder, recalculate position */
+		vorbis_synthesis_restart (&vdata->vdsp) ;
+		ret = vorbis_calculate_granulepos (psf, &vdata->gp) ;
+		} ;
+
+	return ret ;
+} /* vorbis_seek_trysearch */
+
 static sf_count_t
 vorbis_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 {	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	sf_count_t target ;
+	uint64_t target_gp ;
 	int ret ;
 
 	if (odata == NULL || vdata == NULL)
@@ -807,62 +929,29 @@ vorbis_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 		} ;
 
 	if (psf->file.mode == SFM_READ)
-	{	target = offset + vdata->pcm_start ;
+	{	target_gp = (uint64_t) offset + vdata->pcm_start ;
 
-		/*
-		** If the end of the file is know, and the seek isn't for the near
-		** future, do a search of the file for a good place to start.
-		*/
-		ret = 0 ;
-		if ((vdata->pcm_end != (uint64_t) -1) &&
-			(target < vdata->loc || target - vdata->loc > (2 * psf->sf.samplerate)))
-		{	uint64_t best_gp ;
+		ret = vorbis_seek_trysearch (psf, target_gp) ;
 
-			best_gp = vdata->pcm_start ;
-
-			ret = ogg_stream_seek_page_search (psf, odata, target, vdata->pcm_start,
-				vdata->pcm_end, &best_gp, psf->dataoffset, vdata->last_page) ;
-			if (ret >= 0)
-			{	ret = ogg_stream_unpack_page (psf, odata) ;
-				if (ret == 1)
-				{	vdata->loc = best_gp ;
-					vorbis_synthesis_restart (&vdata->vdsp) ;
-					} ;
-				} ;
-			} ;
-
-		if (ret >= 0 && offset + (sf_count_t) vdata->pcm_start >= vdata->loc)
-			target = offset + vdata->pcm_start - vdata->loc ;
-		else
+		if (ret < 0 || vdata->gp > target_gp)
 		{	/* Search failed (bad data?), reset to the beginning of the stream. */
+			psf_log_printf (psf, "Vorbis: Seek search failed. Reading through stream from start.\n") ;
 			ogg_stream_reset_serialno (&odata->ostream, odata->ostream.serialno) ;
 			odata->pkt_len = 0 ;
 			odata->pkt_indx = 0 ;
 			ogg_sync_fseek (psf, psf->dataoffset, SEEK_SET) ;
-			vdata->loc = 0 ;
+			vdata->gp = vdata->pcm_start ;
 			vorbis_synthesis_restart (&vdata->vdsp) ;
-			target = offset ;
 			} ;
 
-		while (target > 0)
-		{	sf_count_t m = target > 4096 ? 4096 : target ;
+		vorbis_skip (psf, target_gp) ;
 
-			/*
-			**	Need to multiply by channels here because the seek is done in
-			**	terms of frames and the read function is done in terms of
-			**	samples.
-			*/
-			vorbis_read_sample (psf, (void *) NULL, m * psf->sf.channels, vorbis_rnull) ;
-
-			target -= m ;
-			} ;
-
-		return vdata->loc - vdata->pcm_start ;
+		return vdata->gp - vdata->pcm_start ;
 		} ;
 
-	return 0 ;
+	psf->error = SFE_BAD_SEEK ;
+	return ((sf_count_t) -1) ;
 } /* vorbis_seek */
-
 
 static int
 vorbis_byterate (SF_PRIVATE *psf)
@@ -873,27 +962,88 @@ vorbis_byterate (SF_PRIVATE *psf)
 	return -1 ;
 } /* vorbis_byterate */
 
-static sf_count_t
-vorbis_calculate_page_duration (SF_PRIVATE *psf)
+static int
+vorbis_calculate_granulepos (SF_PRIVATE *psf, uint64_t *gp_out)
 {	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	VORBIS_PRIVATE *vdata = (VORBIS_PRIVATE *) psf->codec_data ;
-	long thisblock, lastblock ;
-	sf_count_t duration ;
-	int i ;
+	ogg_packet *pkt ;
+	uint64_t last_gp ;
+	int thisblock, lastblock, i ;
+	unsigned duration ;
 
-	lastblock = -1 ;
-	duration = 0 ;
-	for (i = 0 ; i < odata->pkt_len ; i++)
-	{	thisblock = vorbis_packet_blocksize (&vdata->vinfo, &(odata->pkt [i])) ;
-		if (thisblock >= 0)
-		{	if (lastblock != -1)
-				duration += (lastblock + thisblock) >> 2 ;
-			lastblock = thisblock ;
+	/*	Calculate the granule position when dropped into the middle of a stream
+	**	with an un-primed decoder.
+	**
+	**	Normally the last unpacked packet contains the granule position of the
+	**	last completed sample from decoding all the blocks in the page's
+	**	packets.  By calculating how many samples we can decode from the blocks
+	**	in the page's packets and subtracting it from the final packet's granule
+	**	position we get the position of the first sample to be output from the
+	**	decoder after it primes.  That is, the current granule position.
+	**
+	**	However, there is an ambiguity if this is the last page of a stream. The
+	**	last page of a stream may have a granule position of fewer samples than
+	**	the page actually contains.  The excess samples are padding leftovers
+	**	for and exact sample length file. */
+
+	if (odata->pkt_len > 0)
+	{	/* Calculate how many samples can be decoded from blocks in this page,
+		** accounting for the fact that blocks are 1/2 lapped. */
+		lastblock = -1 ;
+		duration = 0 ;
+		pkt = odata->pkt ;
+		for (i = 0 ; i < odata->pkt_len ; i++)
+		{	thisblock = vorbis_packet_blocksize (&vdata->vinfo, &pkt [i]) ;
+			if (thisblock >= 0)
+			{	if (lastblock != -1)
+					duration += (lastblock + thisblock) >> 2 ;
+				lastblock = thisblock ;
+				} ;
 			} ;
+
+		pkt = &odata->pkt [odata->pkt_len - 1] ;
+		last_gp = pkt->granulepos ;
+		if (last_gp == (uint64_t) -1)
+		{	psf_log_printf (psf, "Vorbis: Ogg page has no granule position, cannot calculate sample position!\n") ;
+			psf->error = SFE_MALFORMED_FILE ;
+			return -1 ;
+			} ;
+
+		if (pkt->e_o_s)
+		{	if (last_gp <= duration)
+			{	/*	Corner case: One page stream. Ogg/Vorbis spec dictates the
+				**	granule position offset MUST be zero, hence this first (and
+				**	only) page must start at 0. */
+				*gp_out = 0 ;
+				return 1 ;
+				} ;
+
+			/*	Otherwise, we cannot know where we are without looking at the
+			**	blocks of the previous page.  (The granule position of the
+			**	previous page is not enough, we need the block sizes.)
+			**
+			**	We avoid this case by never allowing a bisection search to seek
+			**	beyond the second-to-last page, so the last page is always
+			**	approached with a known location and never dropped into.
+			**
+			**	The only way we should be able to end up here is if there was a
+			**	hole in stream just before the last page, in which case all bets
+			**	are off anyways. */
+			psf_log_printf (psf, "Vorbis: Cannot calculate ambiguous last page duration. Sample count may be wrong.\n") ;
+			} ;
+
+		if (last_gp < duration)
+		{	psf_log_printf (psf, "Vorbis: Granule position is nonsensical! (Missing end-of-stream marker?)\n") ;
+			psf->error = SFE_MALFORMED_FILE ;
+			return -1 ;
+			} ;
+
+		*gp_out = last_gp - duration ;
+		return 1 ;
 		} ;
 
-	return duration ;
-}
+	return 0 ;
+} /* vorbis_calculate_granulepos */
 
 #else /* HAVE_EXTERNAL_XIPH_LIBS */
 

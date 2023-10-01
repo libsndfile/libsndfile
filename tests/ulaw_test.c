@@ -49,7 +49,7 @@ main (void)
 
 	print_test_name ("ulaw_test", "encoder") ;
 
-	filename = "test.raw" ;
+	filename = "ulaw_test.raw" ;
 
 	sf_info_setup (&sfinfo, SF_FORMAT_RAW | SF_FORMAT_ULAW, 44100, 1) ;
 
@@ -152,7 +152,7 @@ main (void)
 
 
 /*=================================================================================
-**	The following routines came from the sox-12.15 (Sound eXcahcnge) distribution.
+**	The following routines came from the sox-12.15 (Sound eXchange) distribution.
 **
 **	This code is not compiled into libsndfile. It is only used to test the
 **	libsndfile lookup tables for correctness.

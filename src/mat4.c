@@ -248,7 +248,7 @@ mat4_read_header (SF_PRIVATE *psf)
 	if ((rows != 1) || (cols != 1))
 		return SFE_MAT4_NO_SAMPLERATE ;
 
-	psf->sf.samplerate = lrint (value) ;
+	psf->sf.samplerate = psf_lrint (value) ;
 
 	/* Now write out the audio data. */
 

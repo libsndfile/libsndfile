@@ -73,7 +73,7 @@ sfe_copy_data_fp (SNDFILE *outfile, SNDFILE *infile, int channels, int normalize
 			{	data [k] /= max ;
 
 				if (!isfinite (data [k])) /* infinite or NaN */
-					return 1;
+					return 1 ;
 				}
 			sf_writef_double (outfile, data, readcount) ;
 			} ;
@@ -91,7 +91,7 @@ sfe_copy_data_int (SNDFILE *outfile, SNDFILE *infile, int channels)
 	readcount = frames ;
 
 	while (readcount > 0)
-	{	readcount = sf_readf_int (infile, data, frames) ;
+	{	readcount = (int) sf_readf_int (infile, data, frames) ;
 		sf_writef_int (outfile, data, readcount) ;
 		} ;
 
@@ -119,6 +119,7 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 	{	case SF_FORMAT_PCM_16 :
 		case SF_FORMAT_PCM_24 :
 		case SF_FORMAT_PCM_32 :
+		case SF_FORMAT_MPEG_LAYER_III :
 			break ;
 
 		default :
@@ -177,7 +178,7 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 	/* Special case for coding_history because we may want to append. */
 	if (info->coding_history != NULL)
 	{	if (info->coding_hist_append)
-		{	int slen = strlen (binfo.coding_history) ;
+		{	int slen = (int) strlen (binfo.coding_history) ;
 
 			while (slen > 1 && isspace (binfo.coding_history [slen - 1]))
 				slen -- ;
@@ -189,7 +190,7 @@ merge_broadcast_info (SNDFILE * infile, SNDFILE * outfile, int format, const MET
 
 			memset (binfo.coding_history, 0, sizeof (binfo.coding_history)) ;
 			memcpy (binfo.coding_history, info->coding_history, slen) ;
-			binfo.coding_history_size = slen ;
+			binfo.coding_history_size = (uint32_t) slen ;
 			} ;
 		} ;
 
@@ -339,11 +340,12 @@ static OUTPUT_FORMAT_MAP format_map [] =
 	{	"caf",		0,	SF_FORMAT_CAF	},
 	{	"wve",		0,	SF_FORMAT_WVE	},
 	{	"prc",		0,	SF_FORMAT_WVE	},
-	{	"ogg",		0,	SF_FORMAT_OGG	},
 	{	"oga",		0,	SF_FORMAT_OGG	},
+	{	"ogg",		0,	SF_FORMAT_OGG | SF_FORMAT_VORBIS },
 	{	"opus",		0,	SF_FORMAT_OGG | SF_FORMAT_OPUS },
 	{	"mpc",		0,	SF_FORMAT_MPC2K	},
 	{	"rf64",		0,	SF_FORMAT_RF64	},
+	{	"mp3",		0,	SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III },
 } ; /* format_map */
 
 int
@@ -453,6 +455,7 @@ sfe_container_name (int format)
 		case SF_FORMAT_OGG : return "OGG" ;
 		case SF_FORMAT_MPC2K : return "MPC2K" ;
 		case SF_FORMAT_RF64 : return "RF64" ;
+		case SF_FORMAT_MPEG : return "MPEG" ;
 		default : break ;
 		} ;
 
@@ -491,6 +494,9 @@ sfe_codec_name (int format)
 		case SF_FORMAT_ALAC_24 : return "24 bit ALAC" ;
 		case SF_FORMAT_ALAC_32 : return "32 bit ALAC" ;
 		case SF_FORMAT_OPUS : return "Opus" ;
+		case SF_FORMAT_MPEG_LAYER_I : return "MPEG layer 1" ;
+		case SF_FORMAT_MPEG_LAYER_II : return "MPEG layer 2" ;
+		case SF_FORMAT_MPEG_LAYER_III : return "MPEG layer 3" ;
 		default : break ;
 		} ;
 	return "unknown" ;

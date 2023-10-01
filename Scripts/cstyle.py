@@ -37,7 +37,7 @@ class Preprocessor:
 
 	def comment_nesting (self):
 		"""
-		Return the currect comment nesting. At the start and end of the file,
+		Return the current comment nesting. At the start and end of the file,
 		this value should be zero. Inside C comments it should be 1 or
 		(possibly) more.
 		"""
@@ -150,7 +150,7 @@ class CStyleChecker:
 			# Open curly at end of line.
 			, ( re.compile ("\)\s*{\s*$"),	"open curly brace at end of line" )
 
-			# Pre and post increment/decrment.
+			# Pre and post increment/decrement.
 			, ( re.compile ("[^\(\[][+-]{2}[a-zA-Z0-9_]"),       "space after pre increment/decrement" )
 			, ( re.compile ("[a-zA-Z0-9_][+-]{2}[^\)\,]]"),       "space before post increment/decrement" )
 			]

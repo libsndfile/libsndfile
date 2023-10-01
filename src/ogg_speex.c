@@ -76,6 +76,7 @@ ogg_speex_open (SF_PRIVATE *psf)
 
 	if (odata == NULL)
 	{	psf_log_printf (psf, "%s : odata is NULL???\n", __func__) ;
+		free (spx) ;
 		return SFE_INTERNAL ;
 		} ;
 

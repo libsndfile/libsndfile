@@ -1,18 +1,28 @@
 # libsndfile
 
-![C/C++ CI](https://github.com/erikd/libsndfile/workflows/C/C++%20CI/badge.svg)
+![C/C++ CI](https://github.com/libsndfile/libsndfile/workflows/C/C++%20CI/badge.svg)
 
 libsndfile is a C library for reading and writing files containing sampled audio
 data.
 
+## Authors
+
+The libsndfile project was originally developed and maintained by
+Erik de Castro Lopo <erikd@mega-nerd.com> aka @erikd. The project was developed
+on Github at <https://github.com/erikd/libsndfile>.
+
+After the release of version 1.0.30, @erikd transferred the project to
+[the libsndfile team](https://github.com/libsndfile), see [AUTHORS](AUTHORS)
+for details.
+
 ## Hacking
 
 The canonical source code repository for libsndfile is at
-[https://github.com/erikd/libsndfile/][github].
+<https://github.com/libsndfile/libsndfile>.
 
 You can grab the source code using:
 
-    git clone git://github.com/erikd/libsndfile.git
+    git clone https://github.com/libsndfile/libsndfile.git
 
 For building for Android see [BuildingForAndroid][BuildingForAndroid].
 
@@ -23,19 +33,20 @@ below.
 Setting up a build environment for libsndfile on Debian or Ubuntu is as simple as:
 
     sudo apt install autoconf autogen automake build-essential libasound2-dev \
-      libflac-dev libogg-dev libtool libvorbis-dev libopus-dev pkg-config python
+      libflac-dev libogg-dev libtool libvorbis-dev libopus-dev libmp3lame-dev \
+      libmpg123-dev pkg-config python
 
 For other Linux distributions or any of the *BSDs, the setup should be similar
 although the package install tools and package names may be slightly different.
 
 Similarly on Mac OS X, assuming [brew] is already installed:
 
-    brew install autoconf autogen automake flac libogg libtool libvorbis opus pkg-config
+    brew install autoconf autogen automake flac libogg libtool libvorbis opus mpg123 pkg-config
 
 Once the build environment has been set up, building and testing libsndfile is
 as simple as:
 
-    ./autogen.sh
+    autoreconf -vif
     ./configure --enable-werror
     make
     make check
@@ -124,8 +135,8 @@ You can pass additional options with `/D<parameter>=<value>` when you run
   `ON` by default. Setting `BUILD_SHARED_LIBS` to `ON` disables this option.
 * `ENABLE_EXTERNAL_LIBS` - enable Ogg, Vorbis, FLAC and Opus support. This
   option is available and set to `ON` if all dependency libraries were found.
-* `ENABLE_CPU_CLIP` - enable tricky cpu specific clipper. Enabled and set to
-  `ON` when CPU clips negative\positive. Don't touch it if you are not sure
+* `ENABLE_MPEG` - MP3 support. This option is available and set to `ON` if all
+  dependency libraries were found.
 * `ENABLE_BOW_DOCS` - enable black-on-white documentation theme, `OFF` by
   default.
 * `ENABLE_EXPERIMENTAL` - enable experimental code. Don't use it if you are
@@ -134,15 +145,16 @@ You can pass additional options with `/D<parameter>=<value>` when you run
   This option is `ON` by default.
 * `ENABLE_PACKAGE_CONFIG` - generate and install [package config file](https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html#config-file-packages).
 * `INSTALL_PKGCONFIG_MODULE` - generate and install [pkg-config module](https://people.freedesktop.org/~dbn/pkg-config-guide.html).
-* `INSTALL_MANPAGES` - install [man pages](https://en.wikipedia.org/wiki/Man_page) for programs. This option is `ON` by default
-  on Unix, MinGW and Cygwin platforms
-  
-* `ENABLE_STATIC_RUNTIME` - enable static runtime on Windows platform, `OFF` by
-  default (CMake < 3.15).
+* `INSTALL_MANPAGES` - install [man pages](https://en.wikipedia.org/wiki/Man_page) for programs. This option is `ON` by  default
+* `ENABLE_STATIC_RUNTIME` - enable static runtime on Windows platform (MSVC and
+  MinGW), `OFF` by default.
 
-  **Note**: For MSVC compiler this option is deprecated and disabled for CMake >= 3.15, see
+  **Note**: For MSVC compiler this option is deprecated for CMake >= 3.15, see
   policy [CMP0091](https://cmake.org/cmake/help/latest/policy/CMP0091.html).
   Use `CMAKE_MSVC_RUNTIME_LIBRARY` option instead.
+
+  **Note**: For MinGW toolchain this option is experimental. If you enabled it
+  and then disabled again, you need to clear CMake cache (delete CMakeCache.txt).
 * `ENABLE_COMPATIBLE_LIBSNDFILE_NAME` - set DLL name to `libsndfile-1.dll`
   (canonical name) on Windows platform, `sndfile.dll` otherwise, `OFF` by
   default. Library name can be different depending on platform. The well known
@@ -151,16 +163,24 @@ You can pass additional options with `/D<parameter>=<value>` when you run
   is native for MinGW ecosystem, Autotools constructs it using MinGW platform
   rules from `sndfile` target. But when you build with CMake using native
   Windows compiler, the name is `sndfile.dll`. This is name for native Windows
-  platform, because Windows has no library naming rules. It is preffered
+  platform, because Windows has no library naming rules. It is preferred
   because you can search library using package manager or CMake's
   `find_library` command on any platform using the same `sndfile` name.
+
+* `ENABLE_SSE2` - add compiler flag to enable SSE2 if required, `ON` by default.
+
+  This option is for X86 and GCC compatible compilers configurations only.
+
+  If you compile for other SIMD set, e.g. AVX2, you may want to set
+  `ENABLE_SSE2` to `OFF`.
+
+  **Note**: This option is not active for X64 configuration, because SSE2 is
+  always available in this mode and all optimizations are enabled by default.
 
 Deprecated options:
 
 * `DISABLE_EXTERNAL_LIBS` - disable Ogg, Vorbis and FLAC support. Replaced by
   `ENABLE_EXTERNAL_LIBS`
-* `DISABLE_CPU_CLIP` - disable tricky cpu specific clipper. Replaced by
-  `ENABLE_CPU_CLIP`
 * `BUILD_STATIC_LIBS` - build static library. Use `BUILD_SHARED_LIBS` instead
 
 ### Linking from CMake projects
@@ -202,30 +222,90 @@ To link `libsndfile` library use:
 
 ### Notes for Windows users
 
-First advice - set `ENABLE_STATIC_RUNTIME` to ON. This will remove dependencies
-on runtime DLLs.
+#### System CRT library
+
+First advice about Visual Studio [system CRT libraries](https://docs.microsoft.com/en-us/cpp/c-runtime-library/c-run-time-library-reference?view=vs-2019),
+it is system code linked as static or dynamic library to every C application.
+
+You can find related option in Visual Studio project properties:
+
+    C/C++ -> Code Generation -> Runtime Library
+
+Dynamic version of system CRT library is default and it means that end user needs
+to have the same runtime library installed on his system. Most likely it is so,
+but if it is not, the user will see this error message using libsndfile DLL:
+
+    "The program can't start because <crt-dll-name>.dll is missing from your computer. Try reinstalling the program to fix this problem. "
+
+To avoid this, you may want to enable static CRT library linking. In this case
+the size of your DLL will increase slightly the size will increase slightly, but
+you can redistribute the libsndfile DLL without having to install the correct
+version of the system CRT library.
+
+CMake project will use dynamic system CRT libraries by default, just like
+Visual Studio does. But you can change it using `ENABLE_STATIC_RUNTIME` or
+`CMAKE_MSVC_RUNTIME_LIBRARY` options.
+
+**Note**: You cannot use both options at the same time, it will lead to a
+configuration error.
+
+If you have CMake >= 3.15 you should use
+[`CMAKE_MSVC_RUNTIME_LIBRARY`](https://cmake.org/cmake/help/v3.15/variable/CMAKE_MSVC_RUNTIME_LIBRARY.html) option.
+
+This will enable static linking:
+
+    cmake .. -D"MultiThreaded$<$<CONFIG:Debug>:Debug>"
+
+You can use libsndfile `ENABLE_STATIC_RUNTIME` option to to control CRT library
+linking for CMake project: `OFF` or unset (default) for dynamic, and `ON` for
+static linking:
+
+    cmake .. -DENABLE_STATIC_RUNTIME=ON
+
+**Note**: This option is deprecated and may be removed in far future because we
+have standard option `CMAKE_MSVC_RUNTIME_LIBRARY` now.
+
+#### Using Vcpkg package manager
 
 Second advice is about Ogg, Vorbis FLAC and Opus support. Searching external
 libraries under Windows is a little bit tricky. The best way is to use
-[Vcpkg](https://github.com/Microsoft/vcpkg). You need to install static libogg,
-libvorbis, libflac and libopus libraries:
+[Vcpkg](https://github.com/Microsoft/vcpkg).
 
-    vcpkg install libogg:x64-windows-static libvorbis:x64-windows-static
-    libflac:x64-windows-static opus:x64-windows-static libogg:x86-windows-static
-    libvorbis:x86-windows-static libflac:x86-windows-static opus:x86-windows-static
-
-Then and add this parameter to cmake command line:
+Install Vcpkg and then add this parameter to cmake command line:
 
     -DCMAKE_TOOLCHAIN_FILE=<path-to-vcpkg>/scripts/buildsystems/vcpkg.cmake
 
-You also need to set `VCPKG_TARGET_TRIPLET` because you use static libraries:
+You also need to set `VCPKG_TARGET_TRIPLET` if you want to use static libraries:
 
     -DVCPKG_TARGET_TRIPLET=x64-windows-static
+
+Then you need to install static libogg, libvorbis, libflac, libopus, mpg123 and
+mp3lame Vcpkg packages.
+
+After 1.1.0beta2 you don't need to install dependencies manually. Libsndfile
+now supports [Vcpkg manifest mode](https://vcpkg.readthedocs.io/en/latest/users/manifests/)
+and all dependencies are installed automatically.
+
+However, you can turn off the manifest mode and return to the classic mode using
+the `VCPKG_MANIFEST_MODE` parameter from the command line:
+
+    -DVCPKG_MANIFEST_MODE=OFF
+
+In classic mode, you need to install the required libraries manually:
+
+    vcpkg install libvorbis:x64-windows-static libflac:x64-windows-static
+    opus:x64-windows-static mp3lame:x86-windows-static mpg123:x86-windows-static
+    libvorbis:x86-windows-static libflac:x86-windows-static
+    opus:x86-windows-static mp3lame:x86-windows-static mpg123:x86-windows-static
+
+**Note**: Use must use the same CRT library for external libraries and the
+libsndfile library itself. For `*-static` triplets Vcpkg uses
+[static CRT](https://vcpkg.readthedocs.io/en/latest/users/triplets/).
 
 ## Submitting Patches
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 [brew]: http://brew.sh/
-[github]: https://github.com/erikd/libsndfile/
-[BuildingForAndroid]: https://github.com/erikd/libsndfile/blob/master/Building-for-Android.md
+[github]: http://libsndfile.github.io/libsndfile/
+[BuildingForAndroid]: https://github.com/libsndfile/libsndfile/blob/master/Building-for-Android.md

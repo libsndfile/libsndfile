@@ -115,9 +115,9 @@ dwd_close	(SF_PRIVATE * UNUSED (psf))
 ** No assumptions are made about the packing of this struct.
 */
 typedef struct
-{	unsigned char major, minor, compression, channels, bitwidth ;
-	unsigned short srate, maxval ;
-	unsigned int id, datalen, frames, offset ;
+{	uint8_t major, minor, compression, channels, bitwidth ;
+	uint16_t srate, maxval ;
+	uint32_t id, datalen, frames, offset ;
 } DWD_HEADER ;
 
 static int
@@ -173,7 +173,7 @@ dwd_read_header (SF_PRIVATE *psf)
 
 	if (psf->filelength != dwdh.offset + dwdh.datalen)
 	{	psf_log_printf (psf, "  Data Length   : %d (should be %D)\n", dwdh.datalen, psf->filelength - dwdh.offset) ;
-		dwdh.datalen = (unsigned int) (psf->filelength - dwdh.offset) ;
+		dwdh.datalen = (uint32_t) (psf->filelength - dwdh.offset) ;
 		}
 	else
 		psf_log_printf (psf, "  Data Length   : %d\n", dwdh.datalen) ;

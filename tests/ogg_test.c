@@ -62,7 +62,7 @@ ogg_short_test (void)
 
 	/* Convert to shorteger. */
 	for (k = 0 ; k < ARRAY_LEN (data_out.s) ; k++)
-		data_out.s [k] = lrintf (data_out.f [k]) ;
+		data_out.s [k] = (short) lrintf (data_out.f [k]) ;
 
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 

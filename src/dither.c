@@ -233,7 +233,7 @@ dither_write_short	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 			return pdither->write_short (psf, ptr, len) ;
 		} ;
 
-	bufferlen = sizeof (pdither->buffer) / sizeof (short) ;
+	bufferlen = sizeof (pdither->buffer) / (sizeof (short)) ;
 
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
@@ -242,7 +242,7 @@ dither_write_short	(SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 
 		dither_short (ptr, (short*) pdither->buffer, writecount / psf->sf.channels, psf->sf.channels) ;
 
-		thiswrite = pdither->write_short (psf, (short*) pdither->buffer, writecount) ;
+		thiswrite = (int) pdither->write_short (psf, (short*) pdither->buffer, writecount) ;
 		total += thiswrite ;
 		len -= thiswrite ;
 		if (thiswrite < writecount)
@@ -279,7 +279,7 @@ dither_write_int	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 		} ;
 
 
-	bufferlen = sizeof (pdither->buffer) / sizeof (int) ;
+	bufferlen = sizeof (pdither->buffer) / (sizeof (int)) ;
 
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
@@ -288,7 +288,7 @@ dither_write_int	(SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 
 		dither_int (ptr, (int*) pdither->buffer, writecount / psf->sf.channels, psf->sf.channels) ;
 
-		thiswrite = pdither->write_int (psf, (int*) pdither->buffer, writecount) ;
+		thiswrite = (int) pdither->write_int (psf, (int*) pdither->buffer, writecount) ;
 		total += thiswrite ;
 		len -= thiswrite ;
 		if (thiswrite < writecount)
@@ -324,16 +324,16 @@ dither_write_float	(SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 			return pdither->write_float (psf, ptr, len) ;
 		} ;
 
-	bufferlen = sizeof (pdither->buffer) / sizeof (float) ;
+	bufferlen = sizeof (pdither->buffer) / (sizeof (float)) ;
 
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : (float) len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		writecount /= psf->sf.channels ;
 		writecount *= psf->sf.channels ;
 
 		dither_float (ptr, (float*) pdither->buffer, writecount / psf->sf.channels, psf->sf.channels) ;
 
-		thiswrite = pdither->write_float (psf, (float*) pdither->buffer, writecount) ;
+		thiswrite = (int) pdither->write_float (psf, (float*) pdither->buffer, writecount) ;
 		total += thiswrite ;
 		len -= thiswrite ;
 		if (thiswrite < writecount)
@@ -373,13 +373,13 @@ dither_write_double	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	bufferlen = sizeof (pdither->buffer) / sizeof (double) ;
 
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : (double) len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		writecount /= psf->sf.channels ;
 		writecount *= psf->sf.channels ;
 
 		dither_double (ptr, (double*) pdither->buffer, writecount / psf->sf.channels, psf->sf.channels) ;
 
-		thiswrite = pdither->write_double (psf, (double*) pdither->buffer, writecount) ;
+		thiswrite = (int) pdither->write_double (psf, (double*) pdither->buffer, writecount) ;
 		total += thiswrite ;
 		len -= thiswrite ;
 		if (thiswrite < writecount)

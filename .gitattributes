@@ -13,3 +13,7 @@
 # to native line endings on checkout.
 *.c text
 *.h text
+
+# exclude repository configurations from 'git archive'
+.git*      	export-ignore
+.travis.yml	export-ignore

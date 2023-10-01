@@ -113,6 +113,8 @@ test_log_printf (void)
 	/* Test printing of strings. */
 	CMP_4_ARGS (__LINE__, errors, "B %s, %3s, %8s, %-8s", "str") ;
 
+	CMP_4_ARGS (__LINE__, errors, "B %.2s, %.8s, %-8.8s, %-4.2s", "str") ;
+
 	if (errors)
 	{	puts ("\nExiting due to errors.\n") ;
 		exit (1) ;

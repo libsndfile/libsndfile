@@ -128,7 +128,7 @@ vox_read_block (SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, short *ptr, int len)
 	while (indx < len)
 	{	pvox->code_count = (len - indx > IMA_OKI_ADPCM_PCM_LEN) ? IMA_OKI_ADPCM_CODE_LEN : (len - indx + 1) / 2 ;
 
-		if ((k = psf_fread (pvox->codes, 1, pvox->code_count, psf)) != pvox->code_count)
+		if ((k = (int) psf_fread (pvox->codes, 1, pvox->code_count, psf)) != pvox->code_count)
 		{	if (psf_ftell (psf) != psf->filelength)
 				psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, pvox->code_count) ;
 			if (k == 0)
@@ -275,7 +275,7 @@ vox_write_block (SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, const short *ptr, int len
 
 		ima_oki_adpcm_encode_block (pvox) ;
 
-		if ((k = psf_fwrite (pvox->codes, 1, pvox->code_count, psf)) != pvox->code_count)
+		if ((k = (int) psf_fwrite (pvox->codes, 1, pvox->code_count, psf)) != pvox->code_count)
 			psf_log_printf (psf, "*** Warning : short write (%d != %d).\n", k, pvox->code_count) ;
 
 		indx += pvox->pcm_count ;
@@ -356,7 +356,7 @@ vox_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
-			sptr [k] = lrintf (normfact * ptr [total + k]) ;
+			sptr [k] = psf_lrintf (normfact * ptr [total + k]) ;
 		count = vox_write_block (psf, pvox, sptr, writecount) ;
 		total += count ;
 		len -= writecount ;
@@ -387,7 +387,7 @@ vox_write_d	(SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
-			sptr [k] = lrint (normfact * ptr [total + k]) ;
+			sptr [k] = psf_lrint (normfact * ptr [total + k]) ;
 		count = vox_write_block (psf, pvox, sptr, writecount) ;
 		total += count ;
 		len -= writecount ;

@@ -182,7 +182,12 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 	if (psf->file.mode != SFM_READ)
 		return SFE_BAD_MODE_RW ;
 
-	pimasize = sizeof (IMA_ADPCM_PRIVATE) + blockalign * psf->sf.channels + 3 * psf->sf.channels * samplesperblock ;
+	/*
+	**	Allocate enough space for 1 more than a multiple of 8 samples
+	**	to avoid having to branch when pulling apart the nibbles.
+	*/
+	count = ((samplesperblock - 2) | 7) + 2 ;
+	pimasize = sizeof (IMA_ADPCM_PRIVATE) + psf->sf.channels * (blockalign + samplesperblock + sizeof(short) * count) ;
 
 	if (! (pima = calloc (1, pimasize)))
 		return SFE_MALLOC_FAILED ;
@@ -268,7 +273,7 @@ count ++ ;
 		return 1 ;
 		} ;
 
-	if ((k = psf_fread (pima->block, 1, pima->blocksize * pima->channels, psf)) != pima->blocksize * pima->channels)
+	if ((k = (int) psf_fread (pima->block, 1, pima->blocksize * pima->channels, psf)) != pima->blocksize * pima->channels)
 		psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, pima->blocksize) ;
 
 	/* Read and check the block header. */
@@ -373,7 +378,7 @@ aiff_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 		} ;
 
 	/* Write the block to disk. */
-	if ((k = psf_fwrite (pima->block, 1, pima->channels * pima->blocksize, psf)) != pima->channels * pima->blocksize)
+	if ((k = (int) psf_fwrite (pima->block, 1, pima->channels * pima->blocksize, psf)) != pima->channels * pima->blocksize)
 		psf_log_printf (psf, "*** Warning : short write (%d != %d).\n", k, pima->channels * pima->blocksize) ;
 
 	memset (pima->block, 0, pima->channels * pima->blocksize) ;
@@ -386,7 +391,7 @@ aiff_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 static int
 wavlike_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 {	int		chan, k, predictor, blockindx, indx, indxstart, diff ;
-	short	step, bytecode, stepindx [2] ;
+	short	step, bytecode, stepindx [2] = { 0 };
 
 	pima->blockcount ++ ;
 	pima->samplecount = 0 ;
@@ -396,7 +401,7 @@ wavlike_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 		return 1 ;
 		} ;
 
-	if ((k = psf_fread (pima->block, 1, pima->blocksize, psf)) != pima->blocksize)
+	if ((k = (int) psf_fread (pima->block, 1, pima->blocksize, psf)) != pima->blocksize)
 		psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, pima->blocksize) ;
 
 	/* Read and check the block header. */
@@ -552,7 +557,7 @@ wavlike_ima_encode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 
 	/* Write the block to disk. */
 
-	if ((k = psf_fwrite (pima->block, 1, pima->blocksize, psf)) != pima->blocksize)
+	if ((k = (int) psf_fwrite (pima->block, 1, pima->blocksize, psf)) != pima->blocksize)
 		psf_log_printf (psf, "*** Warning : short write (%d != %d).\n", k, pima->blocksize) ;
 
 	memset (pima->samples, 0, pima->samplesperblock * sizeof (short)) ;
@@ -959,7 +964,7 @@ ima_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
-			sptr [k] = lrintf (normfact * ptr [total + k]) ;
+			sptr [k] = psf_lrintf (normfact * ptr [total + k]) ;
 		count = ima_write_block (psf, pima, sptr, writecount) ;
 		total += count ;
 		len -= writecount ;
@@ -990,7 +995,7 @@ ima_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
-			sptr [k] = lrint (normfact * ptr [total + k]) ;
+			sptr [k] = psf_lrint (normfact * ptr [total + k]) ;
 		count = ima_write_block (psf, pima, sptr, writecount) ;
 		total += count ;
 		len -= writecount ;

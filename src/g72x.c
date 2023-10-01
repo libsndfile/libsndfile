@@ -141,7 +141,7 @@ g72x_init (SF_PRIVATE * psf)
 		else
 			pg72x->blocks_total = psf->datalength / pg72x->blocksize ;
 
-		psf->sf.frames = pg72x->blocks_total * pg72x->samplesperblock ;
+		psf->sf.frames = (sf_count_t) pg72x->blocks_total * pg72x->samplesperblock ;
 
 		psf_g72x_decode_block (psf, pg72x) ;
 		}
@@ -264,7 +264,7 @@ g72x_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = g72x_read_block (psf, pg72x, sptr, readcount) ;
 
 		for (k = 0 ; k < readcount ; k++)
@@ -297,7 +297,7 @@ g72x_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = g72x_read_block (psf, pg72x, sptr, readcount) ;
 		for (k = 0 ; k < readcount ; k++)
 			ptr [total + k] = normfact * sptr [k] ;
@@ -329,7 +329,7 @@ g72x_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
-	{	readcount = (len >= bufferlen) ? bufferlen : len ;
+	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = g72x_read_block (psf, pg72x, sptr, readcount) ;
 		for (k = 0 ; k < readcount ; k++)
 			ptr [total + k] = normfact * (double) (sptr [k]) ;
@@ -505,7 +505,7 @@ g72x_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
 			sptr [k] = ptr [total + k] >> 16 ;
 		count = g72x_write_block (psf, pg72x, sptr, writecount) ;
@@ -536,9 +536,9 @@ g72x_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
-			sptr [k] = lrintf (normfact * ptr [total + k]) ;
+			sptr [k] = psf_lrintf (normfact * ptr [total + k]) ;
 		count = g72x_write_block (psf, pg72x, sptr, writecount) ;
 
 		total += count ;
@@ -568,9 +568,9 @@ g72x_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 	sptr = ubuf.sbuf ;
 	bufferlen = SF_BUFFER_LEN / sizeof (short) ;
 	while (len > 0)
-	{	writecount = (len >= bufferlen) ? bufferlen : len ;
+	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
-			sptr [k] = lrint (normfact * ptr [total + k]) ;
+			sptr [k] = psf_lrint (normfact * ptr [total + k]) ;
 		count = g72x_write_block (psf, pg72x, sptr, writecount) ;
 
 		total += count ;

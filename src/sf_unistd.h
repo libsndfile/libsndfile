@@ -18,6 +18,7 @@
 
 /* Microsoft declares some 'unistd.h' functions in 'io.h'. */
 
+#include <sys/stat.h>
 #ifdef HAVE_IO_H
 #include <io.h>
 #endif
@@ -33,7 +34,7 @@
 #endif
 
 #ifndef X_OK
-#ifdef WIN32
+#ifdef _WIN32
 #define	X_OK	0
 #else
 #define	X_OK	1		/* execute permission - unsupported in windows*/
@@ -60,17 +61,39 @@
 #define		S_IXUSR	0000100	/* execute/search permission, owner */
 #endif
 
-/* Windows doesn't have group permissions so set all these to zero. */
-#define	S_IRWXG		0	/* rwx, group */
-#define		S_IRGRP	0	/* read permission, group */
-#define		S_IWGRP	0	/* write permission, grougroup */
-#define		S_IXGRP	0	/* execute/search permission, group */
+/* Windows (except MinGW) doesn't have group permissions so set all these to zero. */
+#ifndef S_IRWXG
+#define S_IRWXG		0	/* rwx, group */
+#endif
 
-/* Windows doesn't have others permissions so set all these to zero. */
-#define	S_IRWXO		0	/* rwx, other */
-#define		S_IROTH	0	/* read permission, other */
-#define		S_IWOTH	0	/* write permission, other */
-#define		S_IXOTH	0	/* execute/search permission, other */
+#ifndef S_IRGRP
+#define S_IRGRP		0	/* read permission, group */
+#endif
+
+#ifndef S_IWGRP
+#define S_IWGRP		0	/* write permission, grougroup */
+#endif
+
+#ifndef S_IXGRP
+#define S_IXGRP		0	/* execute/search permission, group */
+#endif
+
+/* Windows (except MinGW) doesn't have others permissions so set all these to zero. */
+#ifndef S_IRWXO
+#define S_IRWXO		0	/* rwx, other */
+#endif
+
+#ifndef S_IROTH
+#define S_IROTH		0	/* read permission, other */
+#endif
+
+#ifndef S_IWOTH
+#define S_IWOTH		0	/* write permission, other */
+#endif
+
+#ifndef S_IXOTH
+#define S_IXOTH		0	/* execute/search permission, other */
+#endif
 
 #ifndef S_ISFIFO
 #define S_ISFIFO(mode)	(((mode) & _S_IFMT) == _S_IFIFO)

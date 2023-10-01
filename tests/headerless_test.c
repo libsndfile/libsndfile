@@ -44,11 +44,11 @@ main (void)
 {
 	old_test () ;
 
-	headerless_test ("raw.vox", SF_FORMAT_VOX_ADPCM, SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM) ;
-	headerless_test ("raw.gsm", SF_FORMAT_GSM610, SF_FORMAT_RAW | SF_FORMAT_GSM610) ;
+	headerless_test ("headerless.vox", SF_FORMAT_VOX_ADPCM, SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM) ;
+	headerless_test ("headerless.gsm", SF_FORMAT_GSM610, SF_FORMAT_RAW | SF_FORMAT_GSM610) ;
 
-	headerless_test ("raw.snd", SF_FORMAT_ULAW, SF_FORMAT_RAW | SF_FORMAT_ULAW) ;
-	headerless_test ("raw.au" , SF_FORMAT_ULAW, SF_FORMAT_RAW | SF_FORMAT_ULAW) ;
+	headerless_test ("headerless.snd", SF_FORMAT_ULAW, SF_FORMAT_RAW | SF_FORMAT_ULAW) ;
+	headerless_test ("headerless.au" , SF_FORMAT_ULAW, SF_FORMAT_RAW | SF_FORMAT_ULAW) ;
 
 	return 0 ;
 } /* main */
@@ -74,7 +74,7 @@ headerless_test (const char * filename, int format, int expected)
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 
-	if ((k = sf_write_short (file, buffer, BUFFER_SIZE)) != BUFFER_SIZE)
+	if ((k = (int) sf_write_short (file, buffer, BUFFER_SIZE)) != BUFFER_SIZE)
 	{	printf ("Line %d: sf_write_short failed with short write (%d => %d).\n", __LINE__, BUFFER_SIZE, k) ;
 		fflush (stdout) ;
 		puts (sf_strerror (file)) ;
@@ -135,7 +135,7 @@ old_test (void)
 
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
 
-	if ((k = sf_write_short (file, buffer, BUFFER_SIZE)) != BUFFER_SIZE)
+	if ((k = (int) sf_write_short (file, buffer, BUFFER_SIZE)) != BUFFER_SIZE)
 	{	printf ("Line %d: sf_write_short failed with short write (%d => %d).\n", __LINE__, BUFFER_SIZE, k) ;
 		fflush (stdout) ;
 		puts (sf_strerror (file)) ;
@@ -168,7 +168,7 @@ old_test (void)
 
 	check_log_buffer_or_die (file, __LINE__) ;
 
-	if ((k = sf_read_short (file, buffer, BUFFER_SIZE)) != BUFFER_SIZE)
+	if ((k = (int) sf_read_short (file, buffer, BUFFER_SIZE)) != BUFFER_SIZE)
 	{	printf ("Line %d: short read (%d).\n", __LINE__, k) ;
 		exit (1) ;
 		} ;

@@ -44,7 +44,7 @@ conversion_test (char endian)
 {
 	SF_PRIVATE	sf_private, *psf ;
 	const char * filename = "conversion.bin" ;
-	int64_t i64 = SF_PLATFORM_S64 (0x0123456789abcdef), t64 = 0 ;
+	int64_t i64 = 0x0123456789ABCDEFLL, t64 = 0 ;
 	char format_str [16] ;
 	char test_name [64] ;
 	char i8 = 12, t8 = 0 ;
@@ -62,7 +62,7 @@ conversion_test (char endian)
 	memset (psf, 0, sizeof (sf_private)) ;
 
 	psf->file.mode = SFM_WRITE ;
-	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", filename) ;
+	snprintf (psf->file.path, sizeof (psf->file.path), "%s", filename) ;
 
 	if (psf_fopen (psf) != 0)
 	{	printf ("\n\nError : failed to open file '%s' for write.\n\n", filename) ;
@@ -77,7 +77,7 @@ conversion_test (char endian)
 	memset (psf, 0, sizeof (sf_private)) ;
 
 	psf->file.mode = SFM_READ ;
-	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", filename) ;
+	snprintf (psf->file.path, sizeof (psf->file.path), "%s", filename) ;
 
 	if (psf_fopen (psf) != 0)
 	{	printf ("\n\nError : failed to open file '%s' for read.\n\n", filename) ;

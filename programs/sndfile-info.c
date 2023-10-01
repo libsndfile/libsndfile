@@ -110,8 +110,6 @@ main (int argc, char *argv [])
 **	Print version and usage.
 */
 
-static double	data [BUFFER_LEN] ;
-
 static void
 usage_exit (const char *progname)
 {	printf ("Usage :\n  %s <file> ...\n", progname) ;
@@ -167,6 +165,8 @@ calc_decibels (SF_INFO * sfinfo, double max)
 
 		case SF_FORMAT_FLOAT :
 		case SF_FORMAT_DOUBLE :
+		case SF_FORMAT_VORBIS :
+		case SF_FORMAT_OPUS :
 			decibels = max / 1.0 ;
 			break ;
 
@@ -313,7 +313,9 @@ instrument_dump (const char *filename)
 	printf ("  Loop points : %d\n", inst.loop_count) ;
 
 	for (k = 0 ; k < inst.loop_count ; k++)
-		printf ("  %-2d    Mode : %s    Start : %6d   End : %6d   Count : %6d\n", k, str_of_type (inst.loops [k].mode), inst.loops [k].start, inst.loops [k].end, inst.loops [k].count) ;
+		printf ("  %-2d    Mode : %s    Start : %6" PRIu32 "   End : %6" PRIu32
+			"   Count : %6" PRIu32 "\n", k, str_of_type (inst.loops [k].mode),
+			inst.loops [k].start, inst.loops [k].end, inst.loops [k].count) ;
 
 	putchar ('\n') ;
 	return 0 ;

@@ -61,6 +61,12 @@ static SF_FORMAT_INFO const simple_formats [] =
 		},
 #endif
 
+#if HAVE_MPEG
+	{	SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III,
+		"MPEG Layer 3", "mp3"
+		},
+#endif
+
 	{	SF_FORMAT_RAW | SF_FORMAT_VOX_ADPCM,
 		"OKI Dialogic VOX ADPCM", "vox"
 		},
@@ -71,7 +77,7 @@ static SF_FORMAT_INFO const simple_formats [] =
 		},
 
 	{	SF_FORMAT_OGG | SF_FORMAT_VORBIS,
-		"Ogg Vorbis (Xiph Foundation)", "oga"
+		"Ogg Vorbis (Xiph Foundation)", "ogg"
 		},
 #endif
 
@@ -133,6 +139,9 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_MAT4,		"MAT4 (GNU Octave 2.0 / Matlab 4.2)",	"mat"	},
 	{	SF_FORMAT_MAT5,		"MAT5 (GNU Octave 2.1 / Matlab 5.0)",	"mat"	},
 	{	SF_FORMAT_MPC2K,	"MPC (Akai MPC 2k)",					"mpc"	},
+#if HAVE_MPEG
+	{	SF_FORMAT_MPEG,		"MPEG-1/2 Audio",						"m1a"	},
+#endif
 #if HAVE_EXTERNAL_XIPH_LIBS
 	{	SF_FORMAT_OGG,		"OGG (OGG Container format)",			"oga"	},
 #endif
@@ -213,6 +222,12 @@ static SF_FORMAT_INFO subtype_formats [] =
 #if HAVE_EXTERNAL_XIPH_LIBS
 	{	SF_FORMAT_VORBIS,		"Vorbis",				NULL 	},
 	{	SF_FORMAT_OPUS,			"Opus",					NULL 	},
+#endif
+
+#if HAVE_MPEG
+	{	SF_FORMAT_MPEG_LAYER_I,		"MPEG Layer I",		"mp1"	},
+	{	SF_FORMAT_MPEG_LAYER_II,	"MPEG Layer II",	"mp2"	},
+	{	SF_FORMAT_MPEG_LAYER_III,	"MPEG Layer III",	"mp3"	},
 #endif
 
 	{	SF_FORMAT_ALAC_16,		"16 bit ALAC",			NULL	},
@@ -309,7 +324,7 @@ psf_calc_signal_max (SF_PRIVATE *psf, int normalize)
 	len = ARRAY_LEN (ubuf.dbuf) - (ARRAY_LEN (ubuf.dbuf) % psf->sf.channels) ;
 
 	for (readcount = 1, max_val = 0.0 ; readcount > 0 ; /* nothing */)
-	{	readcount = sf_read_double ((SNDFILE*) psf, data, len) ;
+	{	readcount = (int) sf_read_double ((SNDFILE*) psf, data, len) ;
 		for (k = 0 ; k < readcount ; k++)
 		{	temp = fabs (data [k]) ;
 			max_val = temp > max_val ? temp : max_val ;
@@ -354,7 +369,7 @@ psf_calc_max_all_channels (SF_PRIVATE *psf, double *peaks, int normalize)
 	chan = 0 ;
 	readcount = len ;
 	while (readcount > 0)
-	{	readcount = sf_read_double ((SNDFILE*) psf, data, len) ;
+	{	readcount = (int) sf_read_double ((SNDFILE*) psf, data, len) ;
 		for (k = 0 ; k < readcount ; k++)
 		{	temp = fabs (data [k]) ;
 			peaks [chan] = temp > peaks [chan] ? temp : peaks [chan] ;

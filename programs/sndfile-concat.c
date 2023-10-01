@@ -51,7 +51,7 @@ usage_exit (const char *progname)
 	printf ("\nUsage : %s <infile1> <infile2>  ... <outfile>\n\n", progname) ;
 	puts (
 		"    Create a new output file <outfile> containing the concatenated\n"
-		"    audio data from froms <infile1> <infile2> ....\n"
+		"    audio data from <infile1> <infile2> ....\n"
 		"\n"
 		"    The joined file will be encoded in the same format as the data\n"
 		"    in infile1, with all the data in subsequent files automatically\n"
@@ -143,7 +143,7 @@ concat_data_fp (SNDFILE *wfile, SNDFILE *rofile, int channels)
 	sf_seek (wfile, 0, SEEK_END) ;
 
 	while (readcount > 0)
-	{	readcount = sf_readf_double (rofile, data, frames) ;
+	{	readcount = (int) sf_readf_double (rofile, data, frames) ;
 		sf_writef_double (wfile, data, readcount) ;
 		} ;
 
@@ -161,7 +161,7 @@ concat_data_int (SNDFILE *wfile, SNDFILE *rofile, int channels)
 	sf_seek (wfile, 0, SEEK_END) ;
 
 	while (readcount > 0)
-	{	readcount = sf_readf_int (rofile, data, frames) ;
+	{	readcount = (int) sf_readf_int (rofile, data, frames) ;
 		sf_writef_int (wfile, data, readcount) ;
 		} ;
 

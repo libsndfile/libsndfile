@@ -94,7 +94,7 @@
 #define MAC6_MARKER		(MAKE_MARKER ('M', 'A', 'C', '6'))
 #define ADP4_MARKER		(MAKE_MARKER ('A', 'D', 'P', '4'))
 
-/* Predfined chunk sizes. */
+/* Predefined chunk sizes. */
 #define SIZEOF_AIFF_COMM		18
 #define SIZEOF_AIFC_COMM_MIN	22
 #define SIZEOF_AIFC_COMM		24
@@ -234,7 +234,7 @@ static int aiff_get_chunk_data (SF_PRIVATE *psf, const SF_CHUNK_ITERATOR * itera
 int
 aiff_open (SF_PRIVATE *psf)
 {	COMM_CHUNK comm_fmt ;
-	int error, subformat ;
+	int error = 0, subformat ;
 
 	memset (&comm_fmt, 0, sizeof (comm_fmt)) ;
 
@@ -242,6 +242,8 @@ aiff_open (SF_PRIVATE *psf)
 
 	if ((psf->container_data = calloc (1, sizeof (AIFF_PRIVATE))) == NULL)
 		return SFE_MALLOC_FAILED ;
+
+	psf->container_close = aiff_close ;
 
 	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = aiff_read_header (psf, &comm_fmt)))
@@ -283,7 +285,6 @@ aiff_open (SF_PRIVATE *psf)
 		psf->set_chunk		= aiff_set_chunk ;
 		} ;
 
-	psf->container_close = aiff_close ;
 	psf->command = aiff_command ;
 
 	switch (SF_CODEC (psf->sf.format))
@@ -403,7 +404,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	char		*cptr ;
 	int			instr_found = 0, mark_found = 0 ;
 
-	if (psf->filelength > SF_PLATFORM_S64 (0xffffffff))
+	if (psf->filelength > 0xFFFFFFFFLL)
 		psf_log_printf (psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n") ;
 
 	if ((paiff = psf->container_data) == NULL)
@@ -498,10 +499,15 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						return SFE_WAV_BAD_PEAK ;
 						} ;
 
+					if (psf->peak_info)
+					{	psf_log_printf (psf, "*** Found existing peak info, using last one.\n") ;
+						free (psf->peak_info) ;
+						psf->peak_info = NULL ;
+						} ;
 					if ((psf->peak_info = peak_info_calloc (psf->sf.channels)) == NULL)
 						return SFE_MALLOC_FAILED ;
 
-					/* read in rest of PEAK chunk. */
+					/* Read in rest of PEAK chunk. */
 					psf_binheader_readf (psf, "E44", &(psf->peak_info->version), &(psf->peak_info->timestamp)) ;
 
 					if (psf->peak_info->version != 1)
@@ -800,6 +806,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 							break ;
 						} ;
 
+						if (psf->cues)
+						{	free (psf->cues) ;
+							psf->cues = NULL ;
+							} ;
 						if ((psf->cues = psf_cues_alloc (mark_count)) == NULL)
 							return SFE_MALLOC_FAILED ;
 
@@ -993,7 +1003,7 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	ubuf.scbuf [0] = 0 ;
 
 	/* The COMM chunk has an int aligned to an odd word boundary. Some
-	** procesors are not able to deal with this (ie bus fault) so we have
+	** processors are not able to deal with this (ie bus fault) so we have
 	** to take special care.
 	*/
 
@@ -1048,6 +1058,13 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 		}
 	else
 		psf_log_printf (psf, "  Sample Size : %d\n", comm_fmt->sampleSize) ;
+
+
+	if ((psf->sf.channels != comm_fmt->numChannels) && psf->peak_info)
+	{	psf_log_printf (psf, "  *** channel count changed, discarding existing PEAK chunk\n") ;
+		free (psf->peak_info) ;
+		psf->peak_info = NULL ;
+		} ;
 
 	subformat = s_bitwidth_to_subformat (comm_fmt->sampleSize) ;
 
@@ -1146,18 +1163,27 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 /*==========================================================================================
 */
 
-static void
+static int
 aiff_rewrite_header (SF_PRIVATE *psf)
-{
+{	AIFF_PRIVATE *paiff = psf->container_data ;
+
 	/* Assuming here that the header has already been written and just
 	** needs to be corrected for new data length. That means that we
 	** only change the length fields of the FORM and SSND chunks ;
 	** everything else can be skipped over.
 	*/
 	int k, ch, comm_size, comm_frames ;
+	sf_count_t header_len ;
 
+	/* Calculate the header length rather than use dataoffset, as AIFF files
+	** can have additional padding offset bytes which aren't usefully a part of
+	** the header.
+	*/
+	header_len = paiff->ssnd_offset + 8 + SIZEOF_SSND_CHUNK ;
+	if (psf->header.len < header_len || header_len > psf->dataoffset)
+		return SFE_INTERNAL ;
 	psf_fseek (psf, 0, SEEK_SET) ;
-	psf_fread (psf->header.ptr, psf->dataoffset, 1, psf) ;
+	psf_fread (psf->header.ptr, header_len, 1, psf) ;
 
 	psf->header.indx = 0 ;
 
@@ -1192,7 +1218,7 @@ aiff_rewrite_header (SF_PRIVATE *psf)
 	psf_fseek (psf, 0, SEEK_SET) ;
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 
-	return ;
+	return 0 ;
 } /* aiff_rewrite_header */
 
 static int
@@ -1201,7 +1227,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	AIFF_PRIVATE	*paiff ;
 	uint8_t	comm_sample_rate [10], comm_zero_bytes [2] = { 0, 0 } ;
 	uint32_t	comm_type, comm_size, comm_encoding, comm_frames = 0, uk ;
-	int				k, endian, has_data = SF_FALSE ;
+	int				ret, k, endian, has_data = SF_FALSE ;
 	int16_t			bit_width ;
 
 	if ((paiff = psf->container_data) == NULL)
@@ -1224,7 +1250,8 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 		} ;
 
 	if (psf->file.mode == SFM_RDWR && psf->dataoffset > 0 && psf->rchunks.count > 0)
-	{	aiff_rewrite_header (psf) ;
+	{	if ((ret = aiff_rewrite_header (psf)) != 0)
+			return ret ;
 		if (current > 0)
 			psf_fseek (psf, current, SEEK_SET) ;
 		return 0 ;
@@ -1719,6 +1746,11 @@ aiff_read_basc_chunk (SF_PRIVATE * psf, int datasize)
 
 	psf_log_printf (psf, "  Loop Type : 0x%x (%s)\n", bc.loopType, type_str) ;
 
+	if (psf->loop_info)
+	{	psf_log_printf (psf, "  Found existing loop info, using last one.\n") ;
+		free (psf->loop_info) ;
+		psf->loop_info = NULL ;
+		} ;
 	if ((psf->loop_info = calloc (1, sizeof (SF_LOOP_INFO))) == NULL)
 		return SFE_MALLOC_FAILED ;
 

@@ -50,15 +50,15 @@ eval "pkg_LIBS=\${pkg_cv_[]$1[]_LIBS}"
 CFLAGS="$CFLAGS $pkg_CFLAGS"
 LIBS="$LIBS $pkg_LIBS"
 
-AC_TRY_LINK([], puts ("");, pkg_link=yes, pkg_link=no)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <stdio.h>]], [puts ("")])], pkg_link=yes, pkg_link=no)
 
 CFLAGS=$pkg_link_saved_CFLAGS
 LIBS=$pkg_link_saved_LIBS
 
-if test $pkg_link = no ; then
-	$as_echo_n "link failed ... "
+AS_IF([test x$pkg_link = xno], [
+	AS_ECHO_N(["link failed ... "])
 	pkg_failed=yes
-	fi
+])
 
 m4_define([_PKG_TEXT], [Alternatively, you may set the environment variables $1[]_CFLAGS
 and $1[]_LIBS to avoid the need to call pkg-config.

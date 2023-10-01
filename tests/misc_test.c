@@ -293,7 +293,7 @@ filesystem_full_test (int format)
 	sfinfo.frames = 0 ;
 
 	if ((file = sf_open (filename, SFM_WRITE, &sfinfo)) != NULL)
-	{	printf ("\n\nLine %d : Error, file should not have openned.\n", __LINE__ - 1) ;
+	{	printf ("\n\nLine %d : Error, file should not have opened.\n", __LINE__ - 1) ;
 		exit (1) ;
 		} ;
 
@@ -313,8 +313,8 @@ permission_test (const char *filename, int typemajor)
 {
 #if (OS_IS_WIN32)
 	/* Avoid compiler warnings. */
-	filename = filename ;
-	typemajor = typemajor ;
+	(void) filename ;
+	(void) typemajor ;
 
 	/* Can't run this test on Win32 so return. */
 	return ;

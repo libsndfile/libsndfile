@@ -74,12 +74,12 @@ main (void)
 
 	if (sfinfo.channels == 1)
 	{	for (k = 0 ; k < SAMPLE_COUNT ; k++)
-			buffer [k] = AMPLITUDE * sin (LEFT_FREQ * 2 * k * M_PI) ;
+			buffer [k] = (int) (AMPLITUDE * sin (LEFT_FREQ * 2 * k * M_PI)) ;
 		}
 	else if (sfinfo.channels == 2)
 	{	for (k = 0 ; k < SAMPLE_COUNT ; k++)
-		{	buffer [2 * k] = AMPLITUDE * sin (LEFT_FREQ * 2 * k * M_PI) ;
-			buffer [2 * k + 1] = AMPLITUDE * sin (RIGHT_FREQ * 2 * k * M_PI) ;
+		{	buffer [2 * k] = (int) (AMPLITUDE * sin (LEFT_FREQ * 2 * k * M_PI)) ;
+			buffer [2 * k + 1] = (int) (AMPLITUDE * sin (RIGHT_FREQ * 2 * k * M_PI)) ;
 			} ;
 		}
 	else

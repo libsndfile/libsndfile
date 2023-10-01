@@ -51,12 +51,12 @@ typedef struct
 
 
 	/* Can't have a decoder and an encoder at the same time so stick
-	** them in an un-named union.
+	** them in a union.
 	*/
 	union
 	{	ALAC_DECODER decoder ;
 		ALAC_ENCODER encoder ;
-	} ;
+	} u ;
 
 	char enctmpname [512] ;
 	FILE *enctmp ;
@@ -169,7 +169,7 @@ alac_close	(SF_PRIVATE *psf)
 	plac = psf->codec_data ;
 
 	if (psf->file.mode == SFM_WRITE)
-	{	ALAC_ENCODER *penc = &plac->encoder ;
+	{	ALAC_ENCODER *penc = &plac->u.encoder ;
 		SF_CHUNK_INFO chunk_info ;
 		sf_count_t readcount ;
 		uint8_t kuki_data [1024] ;
@@ -268,14 +268,14 @@ alac_reader_init (SF_PRIVATE *psf, const ALAC_DECODER_INFO * info)
 	/* Read in the ALAC cookie data and pass it to the init function. */
 	kuki_size = alac_kuki_read (psf, info->kuki_offset, u.kuki, sizeof (u.kuki)) ;
 
-	if ((error = alac_decoder_init (&plac->decoder, u.kuki, kuki_size)) != ALAC_noErr)
+	if ((error = alac_decoder_init (&plac->u.decoder, u.kuki, kuki_size)) != ALAC_noErr)
 	{	psf_log_printf (psf, "*** alac_decoder_init() returned %s. ***\n", alac_error_string (error)) ;
 		return SFE_INTERNAL ;
 		} ;
 
 
-	if (plac->decoder.mNumChannels != (unsigned) psf->sf.channels)
-	{	psf_log_printf (psf, "*** Initialized decoder has %u channels, but it should be %d. ***\n", plac->decoder.mNumChannels, psf->sf.channels) ;
+	if (plac->u.decoder.mNumChannels != (unsigned) psf->sf.channels)
+	{	psf_log_printf (psf, "*** Initialized decoder has %u channels, but it should be %d. ***\n", plac->u.decoder.mNumChannels, psf->sf.channels) ;
 		return SFE_INTERNAL ;
 		} ;
 
@@ -357,7 +357,7 @@ alac_writer_init (SF_PRIVATE *psf)
 		return SFE_ALAC_FAIL_TMPFILE ;
 		} ;
 
-	alac_encoder_init (&plac->encoder, psf->sf.samplerate, psf->sf.channels, alac_format_flags, ALAC_FRAME_LENGTH) ;
+	alac_encoder_init (&plac->u.encoder, psf->sf.samplerate, psf->sf.channels, alac_format_flags, ALAC_FRAME_LENGTH) ;
 
 	return 0 ;
 } /* alac_writer_init */
@@ -402,7 +402,7 @@ alac_reader_calc_frames (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
 static int
 alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
-{	ALAC_DECODER *pdec = &plac->decoder ;
+{	ALAC_DECODER *pdec = &plac->u.decoder ;
 	uint32_t	packet_size ;
 	BitBuffer	bit_buffer ;
 
@@ -437,7 +437,7 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
 static int
 alac_encode_block (ALAC_PRIVATE *plac)
-{	ALAC_ENCODER *penc = &plac->encoder ;
+{	ALAC_ENCODER *penc = &plac->u.encoder ;
 	uint32_t num_bytes = 0 ;
 
 	alac_encode (penc, plac->partial_block_frames, plac->buffer, plac->byte_buffer, &num_bytes) ;
@@ -471,7 +471,7 @@ alac_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 			break ;
 
 		readcount = (plac->frames_this_block - plac->partial_block_frames) * plac->channels ;
-		readcount = readcount > len ? len : readcount ;
+		readcount = readcount > len ? (int) len : readcount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -501,7 +501,7 @@ alac_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 			break ;
 
 		readcount = (plac->frames_this_block - plac->partial_block_frames) * plac->channels ;
-		readcount = readcount > len ? len : readcount ;
+		readcount = readcount > len ? (int) len : readcount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -534,7 +534,7 @@ alac_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 			break ;
 
 		readcount = (plac->frames_this_block - plac->partial_block_frames) * plac->channels ;
-		readcount = readcount > len ? len : readcount ;
+		readcount = readcount > len ? (int) len : readcount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -567,7 +567,7 @@ alac_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 			break ;
 
 		readcount = (plac->frames_this_block - plac->partial_block_frames) * plac->channels ;
-		readcount = readcount > len ? len : readcount ;
+		readcount = readcount > len ? (int) len : readcount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -648,7 +648,7 @@ alac_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 
 	while (len > 0)
 	{	writecount = (plac->frames_per_block - plac->partial_block_frames) * plac->channels ;
-		writecount = (writecount == 0 || writecount > len) ? len : writecount ;
+		writecount = (writecount == 0 || writecount > len) ? (int) len : writecount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -679,7 +679,7 @@ alac_write_i (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 
 	while (len > 0)
 	{	writecount = (plac->frames_per_block - plac->partial_block_frames) * plac->channels ;
-		writecount = (writecount == 0 || writecount > len) ? len : writecount ;
+		writecount = (writecount == 0 || writecount > len) ? (int) len : writecount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -713,7 +713,7 @@ alac_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 
 	while (len > 0)
 	{	writecount = (plac->frames_per_block - plac->partial_block_frames) * plac->channels ;
-		writecount = (writecount == 0 || writecount > len) ? len : writecount ;
+		writecount = (writecount == 0 || writecount > len) ? (int) len : writecount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -746,7 +746,7 @@ alac_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 	while (len > 0)
 	{	writecount = (plac->frames_per_block - plac->partial_block_frames) * plac->channels ;
-		writecount = (writecount == 0 || writecount > len) ? len : writecount ;
+		writecount = (writecount == 0 || writecount > len) ? (int) len : writecount ;
 
 		iptr = plac->buffer + plac->partial_block_frames * plac->channels ;
 
@@ -824,6 +824,8 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 
 	pakt_size = chunk_info.datalen ;
 	chunk_info.data = pakt_data = malloc (pakt_size + 5) ;
+	if (!chunk_info.data)
+		return NULL ;
 
 	if ((bcount = psf->get_chunk_data (psf, chunk_iterator, &chunk_info)) != SF_ERR_NO_ERROR)
 	{	while (chunk_iterator)
@@ -850,7 +852,7 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 
 			count ++ ;
 			if (count > 5 || bcount + count > pakt_size)
-			{	printf ("%s %d : Ooops! count %d    bcount %d\n", __func__, __LINE__, count, bcount) ;
+			{	printf ("%s %d : Ooops! count %" PRIi32 "    bcount %" PRIu32 "\n", __func__, __LINE__, count, bcount) ;
 				value = 0 ;
 				break ;
 				} ;

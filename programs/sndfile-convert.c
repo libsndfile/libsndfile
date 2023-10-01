@@ -281,7 +281,7 @@ main (int argc, char * argv [])
 			continue ;
 			} ;
 
-		printf ("Error : Not able to decode argunment '%s'.\n", argv [k]) ;
+		printf ("Error : Not able to decode argument '%s'.\n", argv [k]) ;
 		exit (1) ;
 		} ;
 
@@ -336,7 +336,7 @@ main (int argc, char * argv [])
 	if ((sfinfo.format & SF_FORMAT_SUBMASK) == SF_FORMAT_GSM610 && sfinfo.samplerate != 8000)
 	{	printf (
 			"WARNING: GSM 6.10 data format only supports 8kHz sample rate. The converted\n"
-			"ouput file will contain the input data converted to the GSM 6.10 data format\n"
+			"output file will contain the input data converted to the GSM 6.10 data format\n"
 			"but not re-sampled.\n"
 			) ;
 		} ;
@@ -354,7 +354,10 @@ main (int argc, char * argv [])
 			|| (outfileminor == SF_FORMAT_DOUBLE) || (outfileminor == SF_FORMAT_FLOAT)
 			|| (infileminor == SF_FORMAT_DOUBLE) || (infileminor == SF_FORMAT_FLOAT)
 			|| (infileminor == SF_FORMAT_OPUS) || (outfileminor == SF_FORMAT_OPUS)
-			|| (infileminor == SF_FORMAT_VORBIS) || (outfileminor == SF_FORMAT_VORBIS))
+			|| (infileminor == SF_FORMAT_VORBIS) || (outfileminor == SF_FORMAT_VORBIS)
+			|| (infileminor == SF_FORMAT_MPEG_LAYER_I)
+			|| (infileminor == SF_FORMAT_MPEG_LAYER_II)
+			|| (infileminor == SF_FORMAT_MPEG_LAYER_III) || (outfileminor == SF_FORMAT_MPEG_LAYER_III))
 	{	if (sfe_copy_data_fp (outfile, infile, sfinfo.channels, normalize) != 0)
 		{	printf ("Error : Not able to decode input file %s.\n", infilename) ;
 			return 1 ;
@@ -388,7 +391,7 @@ copy_metadata (SNDFILE *outfile, SNDFILE *infile, int channels)
 	memset (&binfo, 0, sizeof (binfo)) ;
 
 	if (channels < ARRAY_LEN (chanmap))
-	{	size_t size = channels * sizeof (chanmap [0]) ;
+	{	int size = channels * sizeof (chanmap [0]) ;
 
 		if (sf_command (infile, SFC_GET_CHANNEL_MAP_INFO, chanmap, size) == SF_TRUE)
 			sf_command (outfile, SFC_SET_CHANNEL_MAP_INFO, chanmap, size) ;

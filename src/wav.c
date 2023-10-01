@@ -73,19 +73,22 @@
 #define wvpk_MARKER (MAKE_MARKER ('w', 'v', 'p', 'k'))
 #define OggS_MARKER (MAKE_MARKER ('O', 'g', 'g', 'S'))
 
+/* ID3v1 trailer which can show up at the end and erronerously look like a chunk. */
+#define TAG__MARKER (MAKE_MARKER ('T', 'A', 'G', 0))
+#define TAG__MARKER_MASK (MAKE_MARKER (0xff, 0xff, 0xff, 0))
+
 #define WAVLIKE_PEAK_CHUNK_SIZE(ch) 	(2 * sizeof (int) + ch * (sizeof (float) + sizeof (int)))
 
 
 enum
-{	HAVE_RIFF	= 0x01,
-	HAVE_WAVE	= 0x02,
-	HAVE_fmt	= 0x04,
-	HAVE_fact	= 0x08,
-	HAVE_PEAK	= 0x10,
-	HAVE_data	= 0x20,
-	HAVE_other	= 0x80000000
+{	HAVE_RIFF	= 1 << 0,
+	HAVE_WAVE	= 1 << 1,
+	HAVE_fmt	= 1 << 2,
+	HAVE_fact	= 1 << 3,
+	HAVE_PEAK	= 1 << 4,
+	HAVE_data	= 1 << 5,
+	HAVE_other	= 1 << 6
 } ;
-
 
 
 /*  known WAVEFORMATEXTENSIBLE GUIDS  */
@@ -204,6 +207,14 @@ wav_open	(SF_PRIVATE *psf)
 			psf->sf.frames = 0 ;
 			} ;
 
+#if (ENABLE_EXPERIMENTAL_CODE == 0)
+		/* For now, don't support writing MPEGLAYER3 WAVs, as we can't guarantee that
+		** such a file written by libsndfile would have the same length when opened again.
+		*/
+		if (subformat == SF_FORMAT_MPEG_LAYER_III)
+			return SFE_UNSUPPORTED_ENCODING ;
+#endif
+
 		if (subformat == SF_FORMAT_IMA_ADPCM || subformat == SF_FORMAT_MS_ADPCM)
 		{	blockalign = wavlike_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
 			framesperblock = -1 ; /* Corrected later. */
@@ -274,6 +285,10 @@ wav_open	(SF_PRIVATE *psf)
 					error = gsm610_init (psf) ;
 					break ;
 
+		case SF_FORMAT_MPEG_LAYER_III :
+					error = mpeg_init (psf, SF_BITRATE_MODE_CONSTANT, SF_FALSE) ;
+					break ;
+
 		default : 	return SFE_UNIMPLEMENTED ;
 		} ;
 
@@ -295,7 +310,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	uint32_t	marker, chunk_size = 0, RIFFsize = 0, done = 0 ;
 	int			parsestage = 0, error, format = 0 ;
 
-	if (psf->is_pipe == 0 && psf->filelength > SF_PLATFORM_S64 (0xffffffff))
+	if (psf->is_pipe == 0 && psf->filelength > 0xFFFFFFFFLL)
 		psf_log_printf (psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n") ;
 
 	if ((wpriv = psf->container_data) == NULL)
@@ -481,6 +496,11 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 						psf_log_printf (psf, "  Count : %d\n", cue_count) ;
 
+						if (psf->cues)
+						{	free (psf->cues) ;
+							psf->cues = NULL ;
+							} ;
+
 						if ((psf->cues = psf_cues_alloc (cue_count)) == NULL)
 							return SFE_MALLOC_FAILED ;
 
@@ -600,6 +620,15 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						break ;
 						} ;
 
+					if ((marker & TAG__MARKER_MASK) == TAG__MARKER &&
+						psf_ftell (psf) - 8 + 128 == psf->filelength)
+					{	psf_log_printf (psf, "*** Hit ID3v1 trailer. Exiting parser.\n") ;
+						chunk_size = 128 ;
+						done = SF_TRUE ;
+						parsestage |= HAVE_other ;
+						break ;
+						} ;
+
 					if (psf_isprint ((marker >> 24) & 0xFF) && psf_isprint ((marker >> 16) & 0xFF)
 						&& psf_isprint ((marker >> 8) & 0xFF) && psf_isprint (marker & 0xFF))
 					{	psf_log_printf (psf, "*** %M : %u (unknown marker)\n", marker, chunk_size) ;
@@ -678,8 +707,6 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 			break ;
 
 		case WAVE_FORMAT_NMS_VBXADPCM :
-			*blockalign = wav_fmt->min.blockalign ;
-			*framesperblock = 160 ;
 			switch (wav_fmt->min.bitwidth)
 			{	case 2 :
 					psf->sf.format = SF_FORMAT_WAV | SF_FORMAT_NMS_ADPCM_16 ;
@@ -733,6 +760,12 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 		case WAVE_FORMAT_G721_ADPCM :
 					psf->sf.format = SF_FORMAT_WAV | SF_FORMAT_G721_32 ;
+					break ;
+
+		case WAVE_FORMAT_MPEGLAYER3 :
+					psf->sf.format = SF_FORMAT_WAV | SF_FORMAT_MPEG_LAYER_III ;
+					if (parsestage & HAVE_fact)
+						psf->sf.frames = fact_chunk.frames ;
 					break ;
 
 		default : return SFE_UNIMPLEMENTED ;
@@ -919,6 +952,59 @@ wav_write_fmt_chunk (SF_PRIVATE *psf)
 					add_fact_chunk = SF_TRUE ;
 					break ;
 
+#if (ENABLE_EXPERIMENTAL_CODE == 0)
+		case SF_FORMAT_MPEG_LAYER_III :
+					{	int bytespersec, blockalign, flags, blocksize, samplesperblock, codecdelay ;
+
+						/* Intended to be set as the average sample rate.
+						** TODO: Maybe re-write this on close with final average
+						** byterate? */
+						bytespersec		= psf->byterate (psf) ;
+
+						/* Average block size. Info only I think. */
+						blocksize		= (1152 * bytespersec) / psf->sf.samplerate ;
+
+						/* Can be set to block size IFF the block size is
+						** constant, set to 1 otherwise. Constant sized
+						** MPEG block streams are uncommon (CBR @ 32kHz and
+						** 48kHz only. Meh. */
+						blockalign		= 1 ;
+
+						/* TODO: Only flags defined are padding-type. I /think/
+						** Lame does ISO style padding by default, which has a
+						** flag value of 0.
+						*/
+						flags			= 0 ;
+
+						/* Should only vary per MPEG 1.0/2.0 vs '2.5'.
+						** TODO: Move this out to MPEG specific place? */
+						samplesperblock	= psf->sf.samplerate >= 32000 ? 1152 : 576 ;
+
+						/* Set as 0 if unknown.
+						** TODO: Plumb this cleanly from Lame.
+						*/
+						codecdelay		= 0 ;
+
+						/* fmt chunk. */
+						fmt_size = 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 + 4 + 2 + 2 + 2 ;
+
+						/* fmt : size, WAV format type, channels. */
+						psf_binheader_writef (psf, "422", BHW4 (fmt_size), BHW2 (WAVE_FORMAT_MPEGLAYER3), BHW2 (psf->sf.channels)) ;
+
+						/* fmt : samplerate, bytespersec. */
+						psf_binheader_writef (psf, "44", BHW4 (psf->sf.samplerate), BHW4 (bytespersec)) ;
+
+						/* fmt : blockalign, bitwidth, extrabytes, id. */
+						psf_binheader_writef (psf, "2222", BHW2 (blockalign), BHW2 (0), BHW2 (12), BHW2 (1)) ;
+
+						/* fmt : flags, blocksize, samplesperblock, codecdelay */
+						psf_binheader_writef (psf, "4222", BHW4 (flags), BHW2 (blocksize), BHW2 (samplesperblock), BHW2 (codecdelay)) ;
+						} ;
+
+					add_fact_chunk = SF_TRUE ;
+					break ;
+#endif
+
 		default : 	return SFE_UNIMPLEMENTED ;
 		} ;
 
@@ -1086,9 +1172,9 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 	/* RIFF/RIFX marker, length, WAVE and 'fmt ' markers. */
 
 	if (psf->endian == SF_ENDIAN_LITTLE)
-		psf_binheader_writef (psf, "etm8", BHWm (RIFF_MARKER), BHW8 ((psf->filelength < 8) ? 8 : psf->filelength - 8)) ;
+        psf_binheader_writef (psf, "etm8", BHWm (RIFF_MARKER), BHW8 ((psf->filelength < 8) ? 8 : SF_MIN(psf->filelength - 8, UINT32_MAX))) ;
 	else
-		psf_binheader_writef (psf, "Etm8", BHWm (RIFX_MARKER), BHW8 ((psf->filelength < 8) ? 8 : psf->filelength - 8)) ;
+        psf_binheader_writef (psf, "Etm8", BHWm (RIFX_MARKER), BHW8 ((psf->filelength < 8) ? 8 : SF_MIN(psf->filelength - 8, UINT32_MAX))) ;
 
 	/* WAVE and 'fmt ' markers. */
 	psf_binheader_writef (psf, "mm", BHWm (WAVE_MARKER), BHWm (fmt_MARKER)) ;
@@ -1172,7 +1258,7 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "m4z", BHWm (PAD_MARKER), BHW4 (k), BHWz (k)) ;
 		} ;
 
-	psf_binheader_writef (psf, "tm8", BHWm (data_MARKER), BHW8 (psf->datalength)) ;
+    psf_binheader_writef (psf, "tm8", BHWm (data_MARKER), BHW8 (SF_MIN(psf->datalength, UINT32_MAX))) ;
 	psf_fwrite (psf->header.ptr, psf->header.indx, 1, psf) ;
 	if (psf->error)
 		return psf->error ;
@@ -1289,7 +1375,7 @@ wav_command (SF_PRIVATE *psf, int command, void * UNUSED (data), int datasize)
 static int
 wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 {	char buffer [512] ;
-	uint32_t thisread, bytesread = 0, dword, sampler_data, loop_count ;
+	uint32_t thisread, bytesread = 0, dword, sampler_data, loop_count, actually_loop_count = 0 ;
 	uint32_t note, pitch, start, end, type = -1, count ;
 	int j, k ;
 
@@ -1320,8 +1406,9 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 	psf_log_printf (psf, "  SMPTE Format : %u\n", dword) ;
 
 	bytesread += psf_binheader_readf (psf, "4", &dword) ;
-	snprintf (buffer, sizeof (buffer), "%02d:%02d:%02d %02d",
-				(dword >> 24) & 0x7F, (dword >> 16) & 0x7F, (dword >> 8) & 0x7F, dword & 0x7F) ;
+	snprintf (buffer, sizeof (buffer), "%02"PRIu32 ":%02"PRIu32 ":%02"PRIu32
+				" %02"PRIu32 "", (dword >> 24) & 0x7F, (dword >> 16) & 0x7F,
+				(dword >> 8) & 0x7F, dword & 0x7F) ;
 	psf_log_printf (psf, "  SMPTE Offset : %s\n", buffer) ;
 
 	bytesread += psf_binheader_readf (psf, "4", &loop_count) ;
@@ -1335,6 +1422,11 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 	*/
 	bytesread += psf_binheader_readf (psf, "4", &sampler_data) ;
 
+	if (psf->instrument)
+	{	psf_log_printf (psf, "  Found more than one SMPL chunk, using last one.\n") ;
+		free (psf->instrument) ;
+		psf->instrument = NULL ;
+		} ;
 	if ((psf->instrument = psf_instrument_alloc ()) == NULL)
 		return SFE_MALLOC_FAILED ;
 
@@ -1381,8 +1473,17 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 					break ;
 				} ;
 			} ;
+		actually_loop_count ++ ;
+		} ;
 
-		loop_count -- ;
+	if (actually_loop_count > ARRAY_LEN (psf->instrument->loops))
+	{
+		psf_log_printf (psf, "*** Warning, actual Loop Points count exceeds %u, changing Loop Count from %u to %u\n", ARRAY_LEN (psf->instrument->loops), loop_count, ARRAY_LEN (psf->instrument->loops)) ;
+		psf->instrument->loop_count = ARRAY_LEN (psf->instrument->loops) ;
+		}
+	else if (loop_count != actually_loop_count)
+	{	psf_log_printf (psf, "*** Warning, actual Loop Points count != Loop Count, changing Loop Count from %u to %u\n", loop_count, actually_loop_count) ;
+		psf->instrument->loop_count = actually_loop_count ;
 		} ;
 
 	if (chunklen - bytesread == 0)
@@ -1436,7 +1537,7 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 **
 **        0x01 On: One Shot         Off: Loop
 **        0x02 On: Root note is Set Off: No root
-**        0x04 On: Stretch is On,   Off: Strech is OFF
+**        0x04 On: Stretch is On,   Off: Stretch is OFF
 **        0x08 On: Disk Based       Off: Ram based
 **        0x10 On: ??????????       Off: ????????? (Acidizer puts that ON)
 **
@@ -1486,6 +1587,11 @@ wav_read_acid_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 
 	psf_binheader_readf (psf, "j", chunklen - bytesread) ;
 
+	if (psf->loop_info)
+	{	psf_log_printf (psf, "  Found existing loop info, using last one.\n") ;
+		free (psf->loop_info) ;
+		psf->loop_info = NULL ;
+		} ;
 	if ((psf->loop_info = calloc (1, sizeof (SF_LOOP_INFO))) == NULL)
 		return SFE_MALLOC_FAILED ;
 

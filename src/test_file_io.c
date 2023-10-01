@@ -73,7 +73,7 @@ file_open_test (const char *filename)
 		} ;
 
 	psf->file.mode = SFM_READ ;
-	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", filename) ;
+	snprintf (psf->file.path, sizeof (psf->file.path), "%s", filename) ;
 
 	/* Test that open for read fails if the file doesn't exist. */
 	error = psf_fopen (psf) ;
@@ -91,7 +91,7 @@ file_open_test (const char *filename)
 
 	test_close_or_die (psf, __LINE__) ;
 
-	unlink (psf->file.path.c) ;
+	unlink (psf->file.path) ;
 
 	/* Test file open in read/write mode for a non-existant file. */
 	psf->file.mode = SFM_RDWR ;
@@ -105,7 +105,7 @@ file_open_test (const char *filename)
 
 	test_close_or_die (psf, __LINE__) ;
 
-	unlink (psf->file.path.c) ;
+	unlink (psf->file.path) ;
 	puts ("ok") ;
 } /* file_open_test */
 
@@ -126,7 +126,7 @@ file_read_write_test (const char *filename)
 
 	memset (&sf_data, 0, sizeof (sf_data)) ;
 	psf = &sf_data ;
-	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", filename) ;
+	snprintf (psf->file.path, sizeof (psf->file.path), "%s", filename) ;
 
 	/* Test file open in write mode. */
 	psf->file.mode = SFM_WRITE ;
@@ -282,7 +282,7 @@ file_truncate_test (const char *filename)
 	memset (buffer, 0xEE, sizeof (buffer)) ;
 
 	psf = &sf_data ;
-	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", filename) ;
+	snprintf (psf->file.path, sizeof (psf->file.path), "%s", filename) ;
 
 	/*
 	** Open the file write mode, write 0xEE data and then extend the file
@@ -302,13 +302,13 @@ file_truncate_test (const char *filename)
 
 	for (k = 0 ; k < SIGNED_SIZEOF (buffer) / 2 ; k++)
 		if (buffer [k] != 0xEE)
-		{	printf ("\n\nLine %d : buffer [%d] = %d (should be 0xEE)\n\n", __LINE__, k, buffer [k]) ;
+		{	printf ("\n\nLine %d : buffer [%d] = %hhu (should be 0xEE)\n\n", __LINE__, k, buffer [k]) ;
 			exit (1) ;
 			} ;
 
 	for (k = SIGNED_SIZEOF (buffer) / 2 ; k < SIGNED_SIZEOF (buffer) ; k++)
 		if (buffer [k] != 0)
-		{	printf ("\n\nLine %d : buffer [%d] = %d (should be 0)\n\n", __LINE__, k, buffer [k]) ;
+		{	printf ("\n\nLine %d : buffer [%d] = %hhu (should be 0)\n\n", __LINE__, k, buffer [k]) ;
 			exit (1) ;
 			} ;
 
@@ -339,7 +339,7 @@ file_seek_with_offset_test (const char *filename)
 	memset (&sf_data, 0, sizeof (sf_data)) ;
 	psf = &sf_data ;
 	psf->file.mode = SFM_READ ;
-	snprintf (psf->file.path.c, sizeof (psf->file.path.c), "%s", filename) ;
+	snprintf (psf->file.path, sizeof (psf->file.path), "%s", filename) ;
 	test_open_or_die (psf, __LINE__) ;
 
 	/* Gather basic info before setting offset. */

@@ -66,7 +66,7 @@ main (int argc, char *argv [])
 	{	int value = k / 32 ;
 		int_data [k] = (value & 1 ? -1 : 1) * value ;
 		short_data [k] = int_data [k] ;
-		float_data [k] = int_data [k] / 32000.0 ;
+		float_data [k] = int_data [k] / 32000.0f ;
 		double_data [k] = int_data [k] / 32000.0 ;
 		}
 

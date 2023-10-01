@@ -27,18 +27,16 @@
 #if OS_IS_WIN32
 #include <windows.h>
 
-#define ENABLE_SNDFILE_WINDOWS_PROTOTYPES 1
 #include "sndfile.h"
 #include "common.h"
 
 extern int sf_errno ;
 
-static void copy_filename (SF_PRIVATE * psf, LPCWSTR wpath) ;
-
 SNDFILE*
 sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo)
 {	SF_PRIVATE 	*psf ;
-	char utf8name [512] ;
+	char utf8name [SF_BUFFER_LEN] ;
+	DWORD dwError ;
 
 	if ((psf = psf_allocate ()) == NULL)
 	{	sf_errno = SFE_MALLOC_FAILED ;
@@ -48,45 +46,25 @@ sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo)
 	psf_init_files (psf) ;
 
 	if (WideCharToMultiByte (CP_UTF8, 0, wpath, -1, utf8name, sizeof (utf8name), NULL, NULL) == 0)
-		psf->file.path.wc [0] = 0 ;
+	{	dwError = GetLastError () ;
+		if (dwError == ERROR_INSUFFICIENT_BUFFER)
+			sf_errno = SFE_FILENAME_TOO_LONG ;
+		else
+			sf_errno = SF_ERR_UNSUPPORTED_ENCODING ;
+
+		sf_close (psf) ;
+
+		return NULL ;
+		} ;
 
 	psf_log_printf (psf, "File : '%s' (utf-8 converted from ucs-2)\n", utf8name) ;
 
-	copy_filename (psf, wpath) ;
-	psf->file.use_wchar = SF_TRUE ;
+	psf_copy_filename (psf, utf8name) ;
 	psf->file.mode = mode ;
 
 	psf->error = psf_fopen (psf) ;
 
 	return psf_open_file (psf, sfinfo) ;
 } /* sf_wchar_open */
-
-
-static void
-copy_filename (SF_PRIVATE *psf, LPCWSTR wpath)
-{	const wchar_t *cwcptr ;
-	wchar_t *wcptr ;
-
-	wcsncpy (psf->file.path.wc, wpath, ARRAY_LEN (psf->file.path.wc)) ;
-	psf->file.path.wc [ARRAY_LEN (psf->file.path.wc) - 1] = 0 ;
-	if ((cwcptr = wcsrchr (wpath, '/')) || (cwcptr = wcsrchr (wpath, '\\')))
-		cwcptr ++ ;
-	else
-		cwcptr = wpath ;
-
-	wcsncpy (psf->file.name.wc, cwcptr, ARRAY_LEN (psf->file.name.wc)) ;
-	psf->file.name.wc [ARRAY_LEN (psf->file.name.wc) - 1] = 0 ;
-
-	/* Now grab the directory. */
-	wcsncpy (psf->file.dir.wc, wpath, ARRAY_LEN (psf->file.dir.wc)) ;
-	psf->file.dir.wc [ARRAY_LEN (psf->file.dir.wc) - 1] = 0 ;
-
-	if ((wcptr = wcsrchr (psf->file.dir.wc, '/')) || (wcptr = wcsrchr (psf->file.dir.wc, '\\')))
-		wcptr [1] = 0 ;
-	else
-		psf->file.dir.wc [0] = 0 ;
-
-	return ;
-} /* copy_filename */
 
 #endif

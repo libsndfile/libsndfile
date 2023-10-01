@@ -216,7 +216,7 @@ vio_test (const char *fname, int format)
 		fflush (stdout) ;
 		puts (sf_strerror (NULL)) ;
 
-		dump_data_to_file (fname, vio_data.data, vio_data.length) ;
+		dump_data_to_file (fname, vio_data.data, (unsigned int) vio_data.length) ;
 		exit (1) ;
 		} ;
 

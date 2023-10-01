@@ -197,7 +197,7 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 	else
 		psf_log_printf (psf, "%M : 0x%x (should be 0xFFFFFFFF)\n  %M\n", RF64_MARKER, WAVE_MARKER) ;
 
-	while (NOT (done))
+	while (!done)
 	{
 		marker = chunk_size = 0 ;
 		psf_binheader_readf (psf, "em4", &marker, &chunk_size) ;
@@ -328,7 +328,7 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if (psf->datalength + psf->dataoffset < psf->filelength)
 						psf->dataend = psf->datalength + psf->dataoffset ;
 
-					if (NOT (psf->sf.seekable) || psf->dataoffset < 0)
+					if (!psf->sf.seekable || psf->dataoffset < 0)
 						break ;
 
 					/* Seek past data and continue reading header. */
@@ -762,7 +762,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 
 	psf->dataoffset = psf->header.indx ;
 
-	if (NOT (has_data))
+	if (!has_data)
 		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 	else if (current > 0)
 		psf_fseek (psf, current, SEEK_SET) ;

@@ -60,46 +60,54 @@ typedef struct
 } STATE ;
 
 
-static void usage_exit (void) ;
+static void print_usage (void) ;
 static void interleave_int (STATE * state) ;
 static void interleave_double (STATE * state) ;
 
 
 int
 main (int argc, char **argv)
-{	STATE state ;
+{	STATE *state = NULL ;
 	SF_INFO sfinfo ;
 	int k, double_merge = 0 ;
+	int ret = 1 ;
 
 	if (argc < 5)
 	{	if (argc > 1)
 			puts ("\nError : need at least 2 input files.") ;
-		usage_exit () ;
+		print_usage () ;
+		goto cleanup ;
 		} ;
 
 	if (strcmp (argv [argc - 2], "-o") != 0)
 	{	puts ("\nError : second last command line parameter should be '-o'.\n") ;
-		usage_exit () ;
+		print_usage () ;
+		goto cleanup ;
 		} ;
 
 	if (argc - 3 > MAX_INPUTS)
 	{	printf ("\nError : Cannot handle more than %d input channels.\n\n", MAX_INPUTS) ;
-		exit (1) ;
+		goto cleanup ;
 		} ;
 
-	memset (&state, 0, sizeof (state)) ;
+	state = calloc (1, sizeof (STATE)) ;
+	if (state == NULL)
+	{	puts ("\nError : out of memory.\n") ;
+		goto cleanup ;
+		} ;
+
 	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	for (k = 1 ; k < argc - 2 ; k++)
 	{
-		if ((state.infile [k - 1] = sf_open (argv [k], SFM_READ, &sfinfo)) == NULL)
+		if ((state->infile [k - 1] = sf_open (argv [k], SFM_READ, &sfinfo)) == NULL)
 		{	printf ("\nError : Not able to open input file '%s'\n%s\n", argv [k], sf_strerror (NULL)) ;
-			exit (1) ;
+			goto cleanup ;
 			} ;
 
 		if (sfinfo.channels != 1)
 		{	printf ("\bError : Input file '%s' should be mono (has %d channels).\n", argv [k], sfinfo.channels) ;
-			exit (1) ;
+			goto cleanup ;
 			} ;
 
 		switch (sfinfo.format & SF_FORMAT_SUBMASK)
@@ -113,28 +121,36 @@ main (int argc, char **argv)
 				break ;
 			} ;
 
-		state.channels ++ ;
+		state->channels ++ ;
 		} ;
 
-	sfinfo.channels = state.channels ;
+	sfinfo.channels = state->channels ;
 	sfinfo.format = sfe_file_type_of_ext (argv [argc - 1], sfinfo.format) ;
 
-	if ((state.outfile = sf_open (argv [argc - 1], SFM_WRITE, &sfinfo)) == NULL)
+	if ((state->outfile = sf_open (argv [argc - 1], SFM_WRITE, &sfinfo)) == NULL)
 	{	printf ("Not able to open output file '%s'\n%s\n", argv [argc - 1], sf_strerror (NULL)) ;
-		exit (1) ;
+		goto cleanup ;
 		} ;
 
 	if (double_merge)
-		interleave_double (&state) ;
+		interleave_double (state) ;
 	else
-		interleave_int (&state) ;
+		interleave_int (state) ;
 
-	for (k = 0 ; k < MAX_INPUTS ; k++)
-		if (state.infile [k] != NULL)
-			sf_close (state.infile [k]) ;
-	sf_close (state.outfile) ;
+	ret = 0 ;
 
-	return 0 ;
+cleanup :
+
+	if (state != NULL)
+	{	for (k = 0 ; k < MAX_INPUTS ; k++)
+			if (state->infile [k] != NULL)
+				sf_close (state->infile [k]) ;
+		sf_close (state->outfile) ;
+		}
+
+	free (state) ;
+
+	return ret ;
 } /* main */
 
 /*------------------------------------------------------------------------------
@@ -142,12 +158,11 @@ main (int argc, char **argv)
 
 
 static void
-usage_exit (void)
+print_usage (void)
 {	puts ("\nUsage : sndfile-interleave <input 1> <input 2> ... -o <output file>\n") ;
 	puts ("Merge two or more mono files into a single multi-channel file.\n") ;
 	printf ("Using %s.\n\n", sf_version_string ()) ;
-	exit (1) ;
-} /* usage_exit */
+} /* print_usage */
 
 
 static void
@@ -159,7 +174,7 @@ interleave_int (STATE * state)
 	{	max_read_len = 0 ;
 
 		for (ch = 0 ; ch < state->channels ; ch ++)
-		{	read_len = sf_read_int (state->infile [ch], state->din.i, BUFFER_LEN) ;
+		{	read_len = (int) sf_read_int (state->infile [ch], state->din.i, BUFFER_LEN) ;
 			if (read_len < BUFFER_LEN)
 				memset (state->din.i + read_len, 0, sizeof (state->din.i [0]) * (BUFFER_LEN - read_len)) ;
 
@@ -185,7 +200,7 @@ interleave_double (STATE * state)
 	{	max_read_len = 0 ;
 
 		for (ch = 0 ; ch < state->channels ; ch ++)
-		{	read_len = sf_read_double (state->infile [ch], state->din.d, BUFFER_LEN) ;
+		{	read_len = (int) sf_read_double (state->infile [ch], state->din.d, BUFFER_LEN) ;
 			if (read_len < BUFFER_LEN)
 				memset (state->din.d + read_len, 0, sizeof (state->din.d [0]) * (BUFFER_LEN - read_len)) ;
 

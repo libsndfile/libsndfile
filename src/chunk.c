@@ -75,7 +75,7 @@ psf_get_chunk_iterator (SF_PRIVATE * psf, const char * marker_str)
 		hash = marker_len > 4 ? hash_of_str (marker_str) : u.marker ;
 
 		memcpy (psf->iterator->id, marker_str, marker_len) ;
-		psf->iterator->id_size = marker_len ;
+		psf->iterator->id_size = (unsigned) marker_len ;
 		psf->iterator->hash = hash ;
 		}
 
@@ -112,6 +112,9 @@ psf_store_read_chunk (READ_CHUNKS * pchk, const READ_CHUNK * rchunk)
 	{	pchk->used = 0 ;
 		pchk->count = 20 ;
 		pchk->chunks = calloc (pchk->count, sizeof (READ_CHUNK)) ;
+		if (!pchk->chunks)
+		{	return SFE_MALLOC_FAILED ;
+			} ;
 		}
 	else if (pchk->used > pchk->count)
 		return SFE_INTERNAL ;
@@ -119,10 +122,12 @@ psf_store_read_chunk (READ_CHUNKS * pchk, const READ_CHUNK * rchunk)
 	{	READ_CHUNK * old_ptr = pchk->chunks ;
 		int new_count = 3 * (pchk->count + 1) / 2 ;
 
-		pchk->chunks = realloc (old_ptr, new_count * sizeof (READ_CHUNK)) ;
-		if (pchk->chunks == NULL)
-		{	pchk->chunks = old_ptr ;
+		READ_CHUNK * new_chunks = realloc (old_ptr, new_count * sizeof (READ_CHUNK)) ;
+		if (new_chunks == NULL)
+		{
 			return SFE_MALLOC_FAILED ;
+			} else {
+			pchk->chunks = new_chunks;
 			} ;
 		pchk->count = new_count ;
 		} ;
@@ -208,7 +213,7 @@ psf_store_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str, sf_count_
 	rchunk.offset = offset ;
 	rchunk.len = len ;
 
-	rchunk.id_size = marker_len > 64 ? 64 : marker_len ;
+	rchunk.id_size = marker_len > 64 ? 64 : (unsigned) marker_len ;
 	memcpy (rchunk.id, marker_str, rchunk.id_size) ;
 
 	return psf_store_read_chunk (pchk, &rchunk) ;
@@ -227,15 +232,20 @@ psf_save_write_chunk (WRITE_CHUNKS * pchk, const SF_CHUNK_INFO * chunk_info)
 	{	pchk->used = 0 ;
 		pchk->count = 20 ;
 		pchk->chunks = calloc (pchk->count, sizeof (WRITE_CHUNK)) ;
+		if (!pchk->chunks)
+		{	return SFE_MALLOC_FAILED ;
+			} ;
 		}
 	else if (pchk->used >= pchk->count)
 	{	WRITE_CHUNK * old_ptr = pchk->chunks ;
 		int new_count = 3 * (pchk->count + 1) / 2 ;
 
-		pchk->chunks = realloc (old_ptr, new_count * sizeof (WRITE_CHUNK)) ;
-		if (pchk->chunks == NULL)
-		{	pchk->chunks = old_ptr ;
+		WRITE_CHUNK * new_chunks = realloc (old_ptr, new_count * sizeof (WRITE_CHUNK)) ;
+		if (new_chunks == NULL)
+		{
 			return SFE_MALLOC_FAILED ;
+			} else {
+			pchk->chunks = new_chunks;
 			} ;
 		} ;
 

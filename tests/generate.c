@@ -39,10 +39,10 @@ generate_file (const char * filename, int format, int len)
 
 	output = calloc (len, sizeof (float)) ;
 
-	maxabs = crappy_snare (output, len, 0, 0.95, maxabs) ;
-	maxabs = crappy_snare (output, len, len / 4, 0.85, maxabs) ;
-	maxabs = crappy_snare (output, len, 2 * len / 4, 0.85, maxabs) ;
-	crappy_snare (output, len, 3 * len / 4, 0.85, maxabs) ;
+	maxabs = crappy_snare (output, len, 0, 0.95f, maxabs) ;
+	maxabs = crappy_snare (output, len, len / 4, 0.85f, maxabs) ;
+	maxabs = crappy_snare (output, len, 2 * len / 4, 0.85f, maxabs) ;
+	crappy_snare (output, len, 3 * len / 4, 0.85f, maxabs) ;
 
 	write_mono_file (filename, format, 44100, output, len) ;
 
@@ -51,24 +51,24 @@ generate_file (const char * filename, int format, int len)
 
 static inline float
 rand_float (void)
-{	return rand () / (0.5 * RAND_MAX) - 1.0 ;
+{	return rand () / (0.5f * (float) RAND_MAX) - 1.0f ;
 } /* rand_float */
 
 static float
 crappy_snare (float *output, int len, int offset, float gain, float maxabs)
 {	int k ;
-	float env = 0.0 ;
+	float env = 0.0f ;
 
 	for (k = offset ; k < len && env < gain ; k++)
-	{	env += 0.03 ;
+	{	env += 0.03f ;
 		output [k] += env * rand_float () ;
-		maxabs = SF_MAX (maxabs, fabs (output [k])) ;
+		maxabs = SF_MAX (maxabs, fabsf (output [k])) ;
 		} ;
 
 	for ( ; k < len && env > 1e-8 ; k++)
-	{	env *= 0.995 ;
+	{	env *= 0.995f ;
 		output [k] += env * rand_float () ;
-		maxabs = SF_MAX (maxabs, fabs (output [k])) ;
+		maxabs = SF_MAX (maxabs, fabsf (output [k])) ;
 		} ;
 
 	return maxabs ;

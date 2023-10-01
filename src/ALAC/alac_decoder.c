@@ -110,7 +110,7 @@ alac_decoder_init (ALAC_DECODER *p, void * inMagicCookie, uint32_t inMagicCookie
 
 		RequireAction (p->mConfig.compatibleVersion <= kALACVersion, return kALAC_IncompatibleVersion ;) ;
 		RequireAction ((p->mConfig.bitDepth >= 8 && p->mConfig.bitDepth <= 32), return kALAC_BadBitWidth ;) ;
-		RequireAction ((p->mMixBufferU != NULL) && (p->mMixBufferV != NULL) && (p->mPredictor != NULL),
+		RequireAction ((p->mMixBufferU != NULL) && (p->mMixBufferV != NULL) && (p->u.mPredictor != NULL),
 						status = kALAC_MemFullError ; goto Exit ;) ;
 	}
 	else
@@ -247,18 +247,18 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 
 					// decompress
 					set_ag_params (&agParams, p->mConfig.mb, (pb * pbFactorU) / 4, p->mConfig.kb, numSamples, numSamples, p->mConfig.maxRun) ;
-					status = dyn_decomp (&agParams, bits, p->mPredictor, numSamples, chanBits, &bits1) ;
+					status = dyn_decomp (&agParams, bits, p->u.mPredictor, numSamples, chanBits, &bits1) ;
 					RequireNoErr (status, goto Exit ;) ;
 
 					if (modeU == 0)
 					{
-						unpc_block (p->mPredictor, p->mMixBufferU, numSamples, &coefsU [0], numU, chanBits, denShiftU) ;
+						unpc_block (p->u.mPredictor, p->mMixBufferU, numSamples, &coefsU [0], numU, chanBits, denShiftU) ;
 					}
 					else
 					{
 						// the special "numActive == 31" mode can be done in-place
-						unpc_block (p->mPredictor, p->mPredictor, numSamples, NULL, 31, chanBits, 0) ;
-						unpc_block (p->mPredictor, p->mMixBufferU, numSamples, &coefsU [0], numU, chanBits, denShiftU) ;
+						unpc_block (p->u.mPredictor, p->u.mPredictor, numSamples, NULL, 31, chanBits, 0) ;
+						unpc_block (p->u.mPredictor, p->mMixBufferU, numSamples, &coefsU [0], numU, chanBits, denShiftU) ;
 					}
 				}
 				else
@@ -300,7 +300,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 					//Assert (shift <= 16) ;
 
 					for (i = 0 ; i < numSamples ; i++)
-						p->mShiftBuffer [i] = (uint16_t) BitBufferRead (&shiftBits, (uint8_t) shift) ;
+						p->u.mShiftBuffer [i] = (uint16_t) BitBufferRead (&shiftBits, (uint8_t) shift) ;
 				}
 
 				// convert 32-bit integers into output buffer
@@ -318,14 +318,14 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 					case 24:
 						out32 = sampleBuffer + channelIndex ;
 						if (bytesShifted != 0)
-							copyPredictorTo24Shift (p->mMixBufferU, p->mShiftBuffer, out32, numChannels, numSamples, bytesShifted) ;
+							copyPredictorTo24Shift (p->mMixBufferU, p->u.mShiftBuffer, out32, numChannels, numSamples, bytesShifted) ;
 						else
 							copyPredictorTo24 (p->mMixBufferU, out32, numChannels, numSamples) ;
 						break ;
 					case 32:
 						out32 = sampleBuffer + channelIndex ;
 						if (bytesShifted != 0)
-							copyPredictorTo32Shift (p->mMixBufferU, p->mShiftBuffer, out32, numChannels, numSamples, bytesShifted) ;
+							copyPredictorTo32Shift (p->mMixBufferU, p->u.mShiftBuffer, out32, numChannels, numSamples, bytesShifted) ;
 						else
 							copyPredictorTo32 (p->mMixBufferU, out32, numChannels, numSamples) ;
 						break ;
@@ -408,34 +408,34 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 
 					// decompress and run predictor for "left" channel
 					set_ag_params (&agParams, p->mConfig.mb, (pb * pbFactorU) / 4, p->mConfig.kb, numSamples, numSamples, p->mConfig.maxRun) ;
-					status = dyn_decomp (&agParams, bits, p->mPredictor, numSamples, chanBits, &bits1) ;
+					status = dyn_decomp (&agParams, bits, p->u.mPredictor, numSamples, chanBits, &bits1) ;
 					RequireNoErr (status, goto Exit ;) ;
 
 					if (modeU == 0)
 					{
-						unpc_block (p->mPredictor, p->mMixBufferU, numSamples, &coefsU [0], numU, chanBits, denShiftU) ;
+						unpc_block (p->u.mPredictor, p->mMixBufferU, numSamples, &coefsU [0], numU, chanBits, denShiftU) ;
 					}
 					else
 					{
 						// the special "numActive == 31" mode can be done in-place
-						unpc_block (p->mPredictor, p->mPredictor, numSamples, NULL, 31, chanBits, 0) ;
-						unpc_block (p->mPredictor, p->mMixBufferU, numSamples, &coefsU [0], numU, chanBits, denShiftU) ;
+						unpc_block (p->u.mPredictor, p->u.mPredictor, numSamples, NULL, 31, chanBits, 0) ;
+						unpc_block (p->u.mPredictor, p->mMixBufferU, numSamples, &coefsU [0], numU, chanBits, denShiftU) ;
 					}
 
 					// decompress and run predictor for "right" channel
 					set_ag_params (&agParams, p->mConfig.mb, (pb * pbFactorV) / 4, p->mConfig.kb, numSamples, numSamples, p->mConfig.maxRun) ;
-					status = dyn_decomp (&agParams, bits, p->mPredictor, numSamples, chanBits, &bits2) ;
+					status = dyn_decomp (&agParams, bits, p->u.mPredictor, numSamples, chanBits, &bits2) ;
 					RequireNoErr (status, goto Exit ;) ;
 
 					if (modeV == 0)
 					{
-						unpc_block (p->mPredictor, p->mMixBufferV, numSamples, &coefsV [0], numV, chanBits, denShiftV) ;
+						unpc_block (p->u.mPredictor, p->mMixBufferV, numSamples, &coefsV [0], numV, chanBits, denShiftV) ;
 					}
 					else
 					{
 						// the special "numActive == 31" mode can be done in-place
-						unpc_block (p->mPredictor, p->mPredictor, numSamples, NULL, 31, chanBits, 0) ;
-						unpc_block (p->mPredictor, p->mMixBufferV, numSamples, &coefsV [0], numV, chanBits, denShiftV) ;
+						unpc_block (p->u.mPredictor, p->u.mPredictor, numSamples, NULL, 31, chanBits, 0) ;
+						unpc_block (p->u.mPredictor, p->mMixBufferV, numSamples, &coefsV [0], numV, chanBits, denShiftV) ;
 					}
 				}
 				else
@@ -488,8 +488,8 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 
 					for (i = 0 ; i < (numSamples * 2) ; i += 2)
 					{
-						p->mShiftBuffer [i + 0] = (uint16_t) BitBufferRead (&shiftBits, (uint8_t) shift) ;
-						p->mShiftBuffer [i + 1] = (uint16_t) BitBufferRead (&shiftBits, (uint8_t) shift) ;
+						p->u.mShiftBuffer [i + 0] = (uint16_t) BitBufferRead (&shiftBits, (uint8_t) shift) ;
+						p->u.mShiftBuffer [i + 1] = (uint16_t) BitBufferRead (&shiftBits, (uint8_t) shift) ;
 					}
 				}
 
@@ -508,12 +508,12 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 					case 24:
 						out32 = sampleBuffer + channelIndex ;
 						unmix24 (p->mMixBufferU, p->mMixBufferV, out32, numChannels, numSamples,
-									mixBits, mixRes, p->mShiftBuffer, bytesShifted) ;
+									mixBits, mixRes, p->u.mShiftBuffer, bytesShifted) ;
 						break ;
 					case 32:
 						out32 = sampleBuffer + channelIndex ;
 						unmix32 (p->mMixBufferU, p->mMixBufferV, out32, numChannels, numSamples,
-									mixBits, mixRes, p->mShiftBuffer, bytesShifted) ;
+									mixBits, mixRes, p->u.mShiftBuffer, bytesShifted) ;
 						break ;
 				}
 
@@ -554,7 +554,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 			}
 		}
 
-#if 0 // ! DEBUG
+#if 1 // ! DEBUG
 		// if we've decoded all of our channels, bail (but not in debug b/c we want to know if we're seeing bad bits)
 		// - this also protects us if the config does not match the bitstream or crap data bits follow the audio bits
 		if (channelIndex >= numChannels)

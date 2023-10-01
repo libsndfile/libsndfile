@@ -6,8 +6,8 @@ include (CheckTypeSize)
 include (TestBigEndian)
 
 include (TestInline)
-include (ClipMode)
-include(TestLargeFiles)
+include (TestLargeFiles)
+include (CheckCPUArch)
 
 test_large_files (_LARGEFILES)
 
@@ -15,16 +15,10 @@ if (LARGE_FILES_DEFINITIONS)
 	add_definitions(${LARGE_FILES_DEFINITIONS})
 endif ()
 
-if (WIN32)
-    set(TYPEOF_SF_COUNT_T __int64)
-else ()
-    set(TYPEOF_SF_COUNT_T int64_t)
-endif ()
-set (SF_COUNT_MAX 0x7fffffffffffffffll)
-
-if (NOT WIN32)
-	find_package (ALSA)
+if (CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
 	find_package (Sndio)
+elseif (NOT WIN32)
+	find_package (ALSA)
 endif ()
 
 if (VCPKG_TOOLCHAIN AND (NOT CMAKE_VERSION VERSION_LESS 3.15))
@@ -54,6 +48,14 @@ else ()
 	set (HAVE_EXTERNAL_XIPH_LIBS 0)
 endif ()
 
+find_package (mp3lame)
+find_package (mpg123 1.25.10)
+if (TARGET mp3lame::mp3lame AND (TARGET MPG123::libmpg123))
+	set (HAVE_MPEG_LIBS 1)
+else ()
+	set (HAVE_MPEG_LIBS 0)
+endif()
+
 find_package (Speex)
 find_package (SQLite3)
 
@@ -67,6 +69,14 @@ check_include_file (stdint.h		HAVE_STDINT_H)
 check_include_file (sys/time.h		HAVE_SYS_TIME_H)
 check_include_file (sys/types.h		HAVE_SYS_TYPES_H)
 check_include_file (unistd.h		HAVE_UNISTD_H)
+check_include_file (immintrin.h		HAVE_IMMINTRIN_H)
+check_include_file (stdbool.h		HAVE_STDBOOL_H)
+
+check_cpu_arch_x86 (CPU_IS_X86)
+check_cpu_arch_x64 (CPU_IS_X64)
+if ((CPU_IS_X86 OR CPU_IS_X64) AND HAVE_IMMINTRIN_H)
+	set (HAVE_SSE2 1)
+endif ()
 
 # Never checked
 # check_include_file (stdlib.h		HAVE_STDLIB_H)
@@ -93,7 +103,7 @@ check_type_size (wchar_t			SIZEOF_WCHAR_T)
 # Never checked
 # check_type_size (size_t			SIZEOF_SIZE_T)
 
-# Used in configre.ac
+# Used in configure.ac
 # check_type_size (double			SIZEOF_DOUBLE)
 # check_type_size (float			SIZEOF_FLOAT)
 # check_type_size (int				SIZEOF_INT)
@@ -102,28 +112,6 @@ check_type_size (wchar_t			SIZEOF_WCHAR_T)
 if (ENABLE_TESTING)
 	check_type_size (void*			SIZEOF_VOIDP)
 endif()
-
-if ((SIZEOF_OFF_T EQUAL 8) OR (SIZEOF_LOFF_T EQUAL 8) OR (SIZEOF_OFF64_T EQUAL 8))
-	set (TYPEOF_SF_COUNT_T "int64_t")
-	set (SF_COUNT_MAX "0x7FFFFFFFFFFFFFFFLL")
-	set (SIZEOF_SF_COUNT_T 8)
-else ()
-	if (WIN32)
-		set (TYPEOF_SF_COUNT_T "__int64")
-		set (SF_COUNT_MAX "0x7FFFFFFFFFFFFFFFLL")
-		set (SIZEOF_SF_COUNT_T 8)
-	else ()
-		message ("")
-		message ("*** The configure process has determined that this system is capable")
-		message ("*** of Large File Support but has not been able to find a type which")
-		message ("*** is an unambiguous 64 bit file offset.")
-		message ("*** Please contact the author to help resolve this problem.")
-		message ("")
-		message (FATAL_ERROR "Bad file offset type.")
-	endif ()
-endif ()
-
-check_type_size (${TYPEOF_SF_COUNT_T} SIZEOF_SF_COUNT_T)
 
 if (NOT WIN32)
 	check_library_exists (m floor "" LIBM_REQUIRED)
@@ -207,50 +195,57 @@ if (CMAKE_COMPILER_IS_GNUCC OR (CMAKE_C_COMPILER_ID MATCHES "Clang"))
 endif ()
 
 test_inline ()
-clip_mode ()
 
 if (MSVC)
 	add_definitions (-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE)
 endif (MSVC)
 
-if (MINGW)
-	set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc")
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
-	set (CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_C_FLAGS} -static-libgcc -s")
-	set (CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS} -static-libgcc -static-libstdc++ -s")
-endif ()
-
 if (DEFINED ENABLE_STATIC_RUNTIME)
 	if (MSVC)
-		if (CMAKE_VERSION VERSION_LESS 3.15)
-			if (ENABLE_STATIC_RUNTIME)
-				foreach (flag_var
-					CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-					CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
-					CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
-					CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
-					)
-					if (${flag_var} MATCHES "/MD")
-						string (REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
-					endif ()
-				endforeach (flag_var)
-			else ()
-				foreach (flag_var
-					CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-					CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
-					CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
-					CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
-					)
-					if (${flag_var} MATCHES "/MT")
-						string (REGEX REPLACE "/MT" "/MD" ${flag_var} "${${flag_var}}")
-					endif (${flag_var} MATCHES "/MT")
-				endforeach (flag_var)
-			endif ( )
+		if (ENABLE_STATIC_RUNTIME)
+			foreach (flag_var
+				CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+				CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
+				CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
+				CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
+				)
+				if (${flag_var} MATCHES "/MD")
+					string (REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+				endif ()
+			endforeach (flag_var)
 		else ()
-			message (FATAL_ERROR "ENABLE_STATIC_RUNTIME option is for CMake < 3.15, use CMAKE_MSVC_RUNTIME_LIBRARY standard option instead.")
+			foreach (flag_var
+				CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
+				CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO
+				CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE
+				CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
+				)
+				if (${flag_var} MATCHES "/MT")
+					string (REGEX REPLACE "/MT" "/MD" ${flag_var} "${${flag_var}}")
+				endif (${flag_var} MATCHES "/MT")
+			endforeach (flag_var)
+		endif ( )
+	elseif (MINGW)
+		if (ENABLE_STATIC_RUNTIME)
+			if (CMAKE_C_COMPILER_ID STREQUAL GNU)
+				set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static-libgcc")
+				set (CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_C_FLAGS} -static-libgcc -s")
+			endif ()
+			if (CMAKE_CXX_COMPILER_ID STREQUAL GNU)
+				set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
+				set (CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS} -static-libgcc -static-libstdc++ -s")
+			endif ()
+			if (CMAKE_C_COMPILER_ID STREQUAL Clang)
+				set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static")
+				set (CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_C_FLAGS} -static")
+			endif ()
+			if (CMAKE_CXX_COMPILER_ID STREQUAL Clang)
+				set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
+				set (CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "${CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS} -static")
+			endif ()
 		endif ()
 	else ()
-		message(AUTHOR_WARNING "ENABLE_STATIC_RUNTIME option is for MSVC compiler only.")
+		message (AUTHOR_WARNING "ENABLE_STATIC_RUNTIME option is for MSVC or MinGW only.")
 	endif ()
 endif ()
 

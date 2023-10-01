@@ -72,7 +72,7 @@
 **  - Samples shall refer to discrete PCM values, regardless of any channel
 **	considerations. This is the same as what libsndfile calls samples.
 **  - Samples/channel shall refer to groups of samples, one for each channel.
-**	This is what Opus calles samples, and what libsndfile calles frames. It
+**	This is what Opus calls samples, and what libsndfile calls frames. It
 **	has the advantage that its name is also the formula to calculate it.
 **
 **
@@ -171,54 +171,66 @@
 #define OGG_OPUS_COMMENT_PAD (512) /* Same as oggenc default */
 
 /*
-** Opus packets can be any multiple of 2.5ms (at 48kHz). We use the recommended
+** When encoding, we can choose the size of the Opus frames.
+** Valid values are 2.5, 5, 10, 20, 40, and 60 milliseconds.
+**
+** Frames smaller than 10ms can't use CELT (MDCT) mode.
+** Frames larger than 20ms "are only interesting at fairly low bitrates."
+**
+** We choose the suggested default of 20ms for high-fidelity audio, however,
+** maybe this could be user-selected, or triggered by bitrate command.
 ** default for non-realtime of 20ms. While longer packets reduce the overhead
 ** data somewhat, it also decreases the quality.
 */
 #define OGG_OPUS_ENCODE_PACKET_LEN(samplerate) ((20 * (samplerate)) / 1000)
 
 /*
-** How long does it take for a decoder to converge (avoiding flush on seek.
+** The pre-roll is how long it takes for the decoder to converge. It converges
+** pretty quickly, to within -40db within 80ms. However, this also depends on
+** the signal. From experimentation, use the conservative pre-roll amount of
+** 660ms after which the output is 32-bit-exact with high probability.
 */
-#define OGG_OPUS_PREROLL (80 * 48) /* 80 milliseconds */
+#define OGG_OPUS_PREROLL (660 * 48) /* 660 milliseconds (33 packets of 20ms) */
 
 typedef struct
-{	int version ;
+{	uint8_t version ;
 
 	/* Number of channels, 1...255 */
-	int channels ;
+	uint8_t channels ;
 
 	/* Encoder latency, the amount to skip before valid data comes out. */
-	int preskip ;
+	uint16_t preskip ;
 
 	/* The sample rate of a the encoded source, as it may have been converted. */
-	int input_samplerate ;
+	int32_t input_samplerate ;
 
 	/* 'baked-in' gain to apply, dB S7.8 format. Should be zero when possible. */
 	int16_t gain ;
 
 	/* Channel mapping type. See OggOpus spec */
-	int channel_mapping ;
+	uint8_t channel_mapping ;
 
 	/* The rest is only used if channel_mapping != 0 */
 	/* How many streams are there? */
-	int nb_streams ;
+	uint8_t nb_streams ;
 
 	/* How man of those streams are coupled? (aka stereo) */
-	int nb_coupled ;
+	uint8_t nb_coupled ;
 
 	/* Mapping of opus streams to output channels */
-	unsigned char stream_map [255] ;
+	uint8_t stream_map [255] ;
 } OpusHeader ;
 
 typedef struct
 {	uint32_t serialno ;
 	OpusHeader header ;
 
-	/* Granule position before the current packet */
+	/* Encode: Granule position after the previous packet.
+	 * Decode: Granule position after the current packet */
 	uint64_t pkt_pos ;
 
-	/* Granule position at the end of the current page (encode: last completed) */
+	/* Encode: Granule position at the end of the previous page.
+	 * Decode: Granule position at the end of the current page. */
 	uint64_t pg_pos ;
 
 	/* integer coefficient of (current sample rate) / 48000Hz */
@@ -291,9 +303,9 @@ static sf_count_t	ogg_opus_write_f (SF_PRIVATE *psf, const float *ptr, sf_count_
 static sf_count_t	ogg_opus_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len) ;
 
 static sf_count_t	ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset) ;
-static sf_count_t	ogg_opus_seek_null_read (SF_PRIVATE *psf, sf_count_t offset) ;
-static sf_count_t	ogg_opus_seek_manual (SF_PRIVATE *psf, uint64_t target_gp) ;
-static int			ogg_opus_seek_page_search (SF_PRIVATE *psf, uint64_t target_gp) ;
+static sf_count_t	ogg_opus_null_read (SF_PRIVATE *psf, sf_count_t offset) ;
+static sf_count_t	ogg_opus_page_seek_manual (SF_PRIVATE *psf, uint64_t target_gp) ;
+static int			ogg_opus_page_seek_search (SF_PRIVATE *psf, uint64_t target_gp) ;
 
 static int			ogg_opus_analyze_file (SF_PRIVATE *psf) ;
 static int			ogg_opus_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
@@ -316,6 +328,7 @@ ogg_opus_open (SF_PRIVATE *psf)
 
 	if (odata == NULL)
 	{	psf_log_printf (psf, "%s : odata is NULL???\n", __func__) ;
+		free (oopus) ;
 		return SFE_INTERNAL ;
 		} ;
 
@@ -408,27 +421,27 @@ ogg_opus_close (SF_PRIVATE *psf)
 static void
 opus_print_header (SF_PRIVATE *psf, OpusHeader *h)
 {	psf_log_printf (psf, "Opus Header Metadata\n") ;
-	psf_log_printf (psf, "  OggOpus version  : %d\n", h->version) ;
-	psf_log_printf (psf, "  Channels		 : %d\n", h->channels) ;
-	psf_log_printf (psf, "  Preskip		  : %d samples @48kHz\n", h->preskip) ;
-	psf_log_printf (psf, "  Input Samplerate : %d Hz\n", h->input_samplerate) ;
-	psf_log_printf (psf, "  Gain			 : %d.%d\n", arith_shift_right (h->gain & 0xF0, 8), h->gain & 0x0F) ;
+	psf_log_printf (psf, "  OggOpus version  : %d\n", (int) h->version) ;
+	psf_log_printf (psf, "  Channels         : %d\n", (int) h->channels) ;
+	psf_log_printf (psf, "  Preskip          : %d samples @48kHz\n", (int) h->preskip) ;
+	psf_log_printf (psf, "  Input Samplerate : %d Hz\n", (int) h->input_samplerate) ;
+	psf_log_printf (psf, "  Gain             : %d.%d\n", (int) arith_shift_right (h->gain & 0xF0, 8), h->gain & 0x0F) ;
 	psf_log_printf (psf, "  Channel Mapping  : ") ;
 	switch (h->channel_mapping)
 	{	case 0 :	psf_log_printf (psf, "0 (mono or stereo)\n") ; break ;
 		case 1 :	psf_log_printf (psf, "1 (surround, AC3 channel order)\n") ; break ;
 		case 255 :	psf_log_printf (psf, "255 (no channel order)\n") ; break ;
-		default :	psf_log_printf (psf, "%d (unknown or unsupported)\n", h->channel_mapping) ; break ;
+		default :	psf_log_printf (psf, "%d (unknown or unsupported)\n", (int) h->channel_mapping) ; break ;
 		} ;
 
 	if (h->channel_mapping > 0)
 	{	int i ;
-		psf_log_printf (psf, "   streams total   : %d\n", h->nb_streams) ;
-		psf_log_printf (psf, "   streams coupled : %d\n", h->nb_coupled) ;
-		psf_log_printf (psf, "	stream mapping : [") ;
+		psf_log_printf (psf, "   streams total   : %d\n", (int) h->nb_streams) ;
+		psf_log_printf (psf, "   streams coupled : %d\n", (int) h->nb_coupled) ;
+		psf_log_printf (psf, "   stream mapping : [") ;
 		for (i = 0 ; i < h->channels - 1 ; i++)
-			psf_log_printf (psf, "%d,", h->stream_map [i]) ;
-		psf_log_printf (psf, "%d]\n", h->stream_map [i]) ;
+			psf_log_printf (psf, "%d,", (int) (h->stream_map [i])) ;
+		psf_log_printf (psf, "%d]\n", (int) (h->stream_map [i])) ;
 		} ;
 } /* opus_print_header */
 
@@ -457,7 +470,7 @@ opus_read_header_packet (SF_PRIVATE *psf, OpusHeader *h, ogg_packet *opacket)
 
 	count = psf_binheader_readf (psf, "ep1", 8, &h->version) ;
 	if (! (h->version == 1 || h->version == 0))
-	{	psf_log_printf (psf, "Opus : Unknown / unsupported embedding scheme version: %d.\n", h->version) ;
+	{	psf_log_printf (psf, "Opus : Unknown / unsupported embedding scheme version: %d.\n", (int) h->version) ;
 		return SFE_UNIMPLEMENTED ;
 		} ;
 
@@ -636,6 +649,9 @@ ogg_opus_setup_decoder (SF_PRIVATE *psf, int input_samplerate)
 static int
 ogg_opus_setup_encoder (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 {	int error ;
+	int lookahead ;
+	int nb_streams ;
+	int nb_coupled ;
 
 	/* default page latency value (1000ms) */
 	oopus->u.encode.latency = 1000 * 48 ;
@@ -654,16 +670,16 @@ ogg_opus_setup_encoder (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus
 
 	if (psf->sf.channels <= 2)
 	{	oopus->header.channel_mapping = 0 ;
-		oopus->header.nb_streams = 1 ;
-		oopus->header.nb_coupled = psf->sf.channels - 1 ;
+		nb_streams = 1 ;
+		nb_coupled = psf->sf.channels - 1 ;
 		oopus->header.stream_map [0] = 0 ;
 		oopus->header.stream_map [1] = 1 ;
 
 		oopus->u.encode.state = opus_multistream_encoder_create (
 			psf->sf.samplerate,
 			psf->sf.channels,
-			oopus->header.nb_streams,
-			oopus->header.nb_coupled,
+			nb_streams,
+			nb_coupled,
 			oopus->header.stream_map,
 			OPUS_APPLICATION_AUDIO,
 			&error) ;
@@ -682,17 +698,20 @@ ogg_opus_setup_encoder (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus
 			psf->sf.samplerate,
 			psf->sf.channels,
 			oopus->header.channel_mapping,
-			&oopus->header.nb_streams,
-			&oopus->header.nb_coupled,
+			&nb_streams,
+			&nb_coupled,
 			oopus->header.stream_map,
 			OPUS_APPLICATION_AUDIO,
 			&error) ;
+
 		}
 
 	if (error != OPUS_OK)
 	{	psf_log_printf (psf, "Opus : Error, opus_multistream_encoder_create returned %s\n", opus_strerror (error)) ;
 		return SFE_BAD_OPEN_FORMAT ;
 		} ;
+	oopus->header.nb_streams = nb_streams ;
+	oopus->header.nb_coupled = nb_coupled ;
 
 	opus_multistream_encoder_ctl (oopus->u.encode.state, OPUS_GET_BITRATE (&oopus->u.encode.bitrate)) ;
 	psf_log_printf (psf, "Encoding at target bitrate of %dbps\n", oopus->u.encode.bitrate) ;
@@ -710,12 +729,12 @@ ogg_opus_setup_encoder (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus
 	** GOTCHA: This returns the preskip at the encoder samplerate, not the
 	** granulepos rate of 48000Hz needed for header.preskip.
 	*/
-	error = opus_multistream_encoder_ctl (oopus->u.encode.state, OPUS_GET_LOOKAHEAD (&oopus->header.preskip)) ;
+	error = opus_multistream_encoder_ctl (oopus->u.encode.state, OPUS_GET_LOOKAHEAD (&lookahead)) ;
 	if (error != OPUS_OK)
 	{	psf_log_printf (psf, "Opus : OPUS_GET_LOOKAHEAD returned: %s\n", opus_strerror (error)) ;
 		return SFE_BAD_OPEN_FORMAT ;
 		} ;
-	oopus->header.preskip *= oopus->sr_factor ;
+	oopus->header.preskip = lookahead * oopus->sr_factor ;
 
 	oopus->len = OGG_OPUS_ENCODE_PACKET_LEN (psf->sf.samplerate) ;
 	oopus->buffer = malloc (sizeof (float) * psf->sf.channels * oopus->len) ;
@@ -948,8 +967,8 @@ ogg_opus_unpack_next_page (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oo
 		oopus->pg_pos = odata->pkt [odata->pkt_len - 1].granulepos ;
 		gp = ogg_opus_calculate_page_duration (odata) ;
 		oopus->pkt_pos = oopus->pg_pos - gp ;
-		psf_log_printf (psf, "Opus : Hole found appears to be of length %d samples.\n",
-				(oopus->pkt_pos - last_page) / oopus->sr_factor) ;
+		psf_log_printf (psf, "Opus : Hole found appears to be of length %D samples.\n",
+				(oopus->pkt_pos - last_page) / (uint64_t) oopus->sr_factor) ;
 		/*
 		** Could save the hole size here, and have ogg_opus_read_refill()
 		** do packet loss concealment until the hole is gone, but libopus does
@@ -1043,7 +1062,7 @@ ogg_opus_read_refill (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 			**	MAY defer this action until it decodes the last packet
 			**	completed on that page.
 			*/
-			psf_log_printf (psf, "Opus : Mid-strem page's granule position %d is less than total samples of %d\n", oopus->pg_pos, pkt_granulepos) ;
+			psf_log_printf (psf, "Opus : Mid-stream page's granule position %D is less than total samples of %D\n", oopus->pg_pos, pkt_granulepos) ;
 			psf->error = SFE_MALFORMED_FILE ;
 			return -1 ;
 			} ;
@@ -1111,11 +1130,7 @@ ogg_opus_write_out (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 		else
 			nbytes = ogg_stream_pageout_fill (&odata->ostream, &odata->opage, 255 * 255) ;
 		if (nbytes > 0)
-		{	/*
-			** LibOgg documentation is noted as being bad by it's author. Ogg
-			** page header byte 26 is the segment count.
-			*/
-			oopus->u.encode.last_segments -= odata->opage.header [26] ;
+		{	oopus->u.encode.last_segments -= ogg_page_segments (&odata->opage) ;
 			oopus->pg_pos = oopus->pkt_pos ;
 			ogg_write_page (psf, &odata->opage) ;
 			}
@@ -1154,12 +1169,12 @@ ogg_opus_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 			if (psf->float_int_mult)
 			{	float inverse = 1.0 / psf->float_max ;
 				for ( ; i < total ; i++)
-				{	ptr [i] = lrintf (((*(iptr++)) * inverse) * 32767.0f) ;
+				{	ptr [i] = psf_lrintf (((*(iptr++)) * inverse) * 32767.0f) ;
 					} ;
 				}
 			else
 			{	for ( ; i < total ; i++)
-				{	ptr [i] = lrintf ((*(iptr++)) * 32767.0f) ;
+				{	ptr [i] = psf_lrintf ((*(iptr++)) * 32767.0f) ;
 					} ;
 				} ;
 			oopus->loc += (readlen / psf->sf.channels) ;
@@ -1191,12 +1206,12 @@ ogg_opus_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 			if (psf->float_int_mult)
 			{	float inverse = 1.0 / psf->float_max ;
 				for ( ; i < total ; i++)
-				{	ptr [i] = lrintf (((*(iptr++)) * inverse) * 2147483647.0f) ;
+				{	ptr [i] = psf_lrintf (((*(iptr++)) * inverse) * 2147483647.0f) ;
 					}
 				}
 			else
 			{	for ( ; i < total ; i++)
-				{	ptr [i] = lrintf ((*(iptr++)) * 2147483647.0f) ;
+				{	ptr [i] = psf_lrintf ((*(iptr++)) * 2147483647.0f) ;
 					}
 				} ;
 			oopus->loc += (readlen / psf->sf.channels) ;
@@ -1433,7 +1448,7 @@ ogg_opus_analyze_file (SF_PRIVATE *psf)
 		oopus->pkt_pos = oopus->pg_pos - gp ;
 		}
 	else if (gp < oopus->pg_pos)
-	{	psf_log_printf (psf, "Opus : First data page is also the last, and granule position has an (ambigious) offset.\n") ;
+	{	psf_log_printf (psf, "Opus : First data page is also the last, and granule position has an (ambiguous) offset.\n") ;
 		return SFE_MALFORMED_FILE ;
 		} ;
 	oopus->u.decode.gp_start = oopus->pkt_pos ;
@@ -1460,7 +1475,12 @@ ogg_opus_analyze_file (SF_PRIVATE *psf)
 		{	psf->sf.frames = (oopus->u.decode.gp_end - oopus->u.decode.gp_start
 				- oopus->header.preskip) / oopus->sr_factor ;
 			} ;
-	}
+		} ;
+
+
+	psf_log_printf (psf, "  Granule pos offset  : %D\n", oopus->u.decode.gp_start) ;
+	if (oopus->u.decode.gp_end != (uint64_t) -1)
+		psf_log_printf (psf, "  Last Granule pos : %D\n", oopus->u.decode.gp_end) ;
 
 	/* Go back to where we left off. */
 	ogg_sync_fseek (psf, saved_offset, SEEK_SET) ;
@@ -1468,47 +1488,45 @@ ogg_opus_analyze_file (SF_PRIVATE *psf)
 } /* ogg_opus_analyze_file */
 
 /*
-** ogg_opus_seek_null_read
+** ogg_opus_null_read
 **
 ** Decode samples, doing nothing with them, until the desired granule position
 ** is reached.
 */
 static sf_count_t
-ogg_opus_seek_null_read (SF_PRIVATE *psf, sf_count_t offset)
+ogg_opus_null_read (SF_PRIVATE *psf, sf_count_t offset)
 {	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
 	sf_count_t total ;
-	sf_count_t readlen ;
 
-	total = oopus->pkt_pos / oopus->sr_factor ;
-	total += oopus->loc ;
-
+	total = (oopus->pkt_pos / oopus->sr_factor) - (oopus->len - oopus->loc) ;
 	for ( ; total < offset ; )
-	{	if (oopus->loc == oopus->len)
-		{	if (ogg_opus_read_refill (psf, odata, oopus) <= 0)
-				return total ;
-			/*
-			** Ignore pre-skip skipping. The preskip was accounted for in the
-			** arugment to offset, so we need to count it.
-			*/
-			oopus->loc = 0 ;
-			} ;
-
-		readlen = SF_MIN ((int) (offset - total), (oopus->len - oopus->loc)) ;
+	{	sf_count_t readlen = SF_MIN ((int) (offset - total), (oopus->len - oopus->loc)) ;
 		if (readlen > 0)
 		{	total += readlen ;
 			oopus->loc += readlen ;
 			} ;
+		if (oopus->loc == oopus->len)
+		{	if (ogg_opus_read_refill (psf, odata, oopus) <= 0)
+				return total ;
+			/*
+			** Ignore pre-skip skipping. The preskip was accounted for in the
+			** argument to offset, so we need to count it.
+			*/
+			oopus->loc = 0 ;
+			} ;
 		} ;
 	return total ;
-} /* ogg_opus_seek_null_read */
+} /* ogg_opus_null_read */
 
 /*
+** ogg_opus_page_seek_search
+**
 ** Search within the file for the page with the highest granule position at or
 ** before our target.
 */
 static int
-ogg_opus_seek_page_search (SF_PRIVATE *psf, uint64_t target_gp)
+ogg_opus_page_seek_search (SF_PRIVATE *psf, uint64_t target_gp)
 {	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
 	uint64_t pcm_start ;
@@ -1516,48 +1534,47 @@ ogg_opus_seek_page_search (SF_PRIVATE *psf, uint64_t target_gp)
 	uint64_t best_gp ;
 	sf_count_t begin ;
 	sf_count_t end ;
+	sf_count_t old_pos ;
 	int ret ;
 
 	best_gp = pcm_start = oopus->u.decode.gp_start ;
 	pcm_end = oopus->u.decode.gp_end ;
 	begin = psf->dataoffset ;
+	end = oopus->u.decode.last_offset ;
 
-	/* Adjust the target to give time to converge. */
-	if (target_gp >= OGG_OPUS_PREROLL)
-		target_gp -= OGG_OPUS_PREROLL ;
-	if (target_gp < pcm_start)
-		target_gp = pcm_start ;
+	/* Search the Ogg stream for such a page */
+	old_pos = ogg_sync_ftell (psf) ;
+	ret = ogg_stream_seek_page_search (psf, odata, target_gp, pcm_start, pcm_end, &best_gp, begin, end, 48000) ;
+	if (ret != 0)
+	{	ogg_sync_fseek (psf, old_pos, SEEK_SET) ;
+		return ret ;
+		} ;
 
-	/* Seek to beginning special case */
-	if (target_gp < pcm_start + (uint64_t) oopus->header.preskip)
-		end = begin ;
-	else
-		end = oopus->u.decode.last_offset ;
-
-	ogg_stream_seek_page_search (psf, odata, target_gp, pcm_start, pcm_end, &best_gp, begin, end) ;
-
+	/* Load the page that contains our pre-roll target */
 	oopus->loc = 0 ;
 	oopus->len = 0 ;
 	if ((ret = ogg_opus_unpack_next_page (psf, odata, oopus)) != 1)
 		return ret ;
 	oopus->pkt_pos = best_gp ;
+
+	/* Reset the decoder (gain settings survive the reset) */
 	opus_multistream_decoder_ctl (oopus->u.decode.state, OPUS_RESET_STATE) ;
-	/* Gain decoder settings survive resets. */
 
 	return 0 ;
-} /* ogg_opus_seek_page_search */
+} /* ogg_opus_page_seek_search */
 
+/*
+** ogg_opus_page_seek_manual
+**
+** Seek to the beginning of the Ogg stream and read pages until we find one with
+** a granule position at or before our target.
+*/
 static sf_count_t
-ogg_opus_seek_manual (SF_PRIVATE *psf, uint64_t target_gp)
+ogg_opus_page_seek_manual (SF_PRIVATE *psf, uint64_t target_gp)
 {	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
 	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
 	sf_count_t pos ;
 	int nn ;
-
-	if (target_gp > OGG_OPUS_PREROLL)
-		target_gp -= OGG_OPUS_PREROLL ;
-	if (target_gp < oopus->pg_pos)
-		target_gp = oopus->pg_pos ;
 
 	if (oopus->pg_pos > target_gp)
 	{	ogg_stream_reset (&odata->ostream) ;
@@ -1575,13 +1592,13 @@ ogg_opus_seek_manual (SF_PRIVATE *psf, uint64_t target_gp)
 		} ;
 
 	return 1 ;
-} /* ogg_opus_seek_manual */
+} /* ogg_opus_page_seek_manual */
 
 static sf_count_t
 ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
-{	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
-	uint64_t target_gp ;
-	uint64_t current ;
+{	OGG_PRIVATE *odata = (OGG_PRIVATE *) psf->container_data ;
+	OPUS_PRIVATE *oopus = (OPUS_PRIVATE *) psf->codec_data ;
+	uint64_t target_gp, current_gp ;
 	int ret ;
 
 	/* Only support seeking in read mode. */
@@ -1590,36 +1607,48 @@ ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 		return PSF_SEEK_ERROR ;
 		} ;
 
-	current = oopus->pkt_pos + oopus->loc * oopus->sr_factor ;
-	/*
-	** Remember, there are preskip granulepos worth of samples at the front of
-	** the stream which are bunk. Also, granule positions can be offset.
-	*/
-	target_gp = offset * oopus->sr_factor + oopus->u.decode.gp_start + oopus->header.preskip ;
+	/* Figure out the current position granule pos. Use the start of the
+	 * current buffer, to avoid backwards seeking if the target is on the page
+	 * but before the current location. */
+	oopus->loc = 0 ;
+	current_gp = oopus->pkt_pos - (uint64_t) (oopus->len * oopus->sr_factor) ;
 
-	if (oopus->u.decode.gp_end == (uint64_t) -1)
-	{	/*
-		** Don't know the end of the file. Could be a chained file we don't yet
-		** support. Oh well, just do it manually.
-		*/
-		ogg_opus_seek_manual (psf, target_gp) ;
-		}
-	else
-	{	/*
-		** Avoid seeking in the file if where we want is just ahead or exactly
-		** were we are. To avoid needing to flush the decoder we choose pre-
-		** roll plus 10ms.
-		*/
-		if (target_gp < current || target_gp - current > OGG_OPUS_PREROLL + 10 * 48)
-		{	ret = ogg_opus_seek_page_search (psf, target_gp) ;
+	/* Calculate the target granule pos. This includes the decoder delay and
+	 * the file granule position offset. */
+	target_gp = offset * oopus->sr_factor ;
+	target_gp += oopus->u.decode.gp_start ;
+	target_gp += oopus->header.preskip ;
+
+	/* Check if we need to do a page seek. */
+	if (target_gp < current_gp || target_gp - current_gp > OGG_OPUS_PREROLL)
+	{	uint64_t preroll_gp ;
+
+		/* For a page seek, use an earlier target granule pos, giving the
+		 * decoder samples to converge before the actual target. */
+		if (target_gp >= OGG_OPUS_PREROLL + oopus->u.decode.gp_start + (uint64_t) oopus->header.preskip)
+		{	preroll_gp = target_gp - OGG_OPUS_PREROLL ;
+			}
+		else
+		{	preroll_gp = oopus->u.decode.gp_start + (uint64_t) oopus->header.preskip ;
+			} ;
+
+		if (oopus->u.decode.gp_end == (uint64_t) -1)
+		{	/*
+			** Don't know the end of the file. Could be a chained file we don't yet
+			** support. Oh well, just do it manually.
+			*/
+			ogg_opus_page_seek_manual (psf, preroll_gp) ;
+			}
+		else
+		{	ret = ogg_opus_page_seek_search (psf, preroll_gp) ;
 			if (ret < 0)
 			{	/*
 				** Page seek failed, what to do? Could be bad data. We can
-				** either fall-back to manual seeking or bail. Manaul seeking
+				** either fall-back to manual seeking or bail. Manual seeking
 				** from the beginning has the advantage of finding where the
 				** file goes bad.
 				*/
-				ret = ogg_opus_seek_manual (psf, target_gp) ;
+				ret = ogg_opus_page_seek_manual (psf, preroll_gp) ;
 				if (ret < 0)
 				{	/*
 					** If were here, and there is no error, we can be pretty
@@ -1631,13 +1660,29 @@ ogg_opus_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 					} ;
 				} ;
 			} ;
+
+		/*
+		** Skip over packets on the found page that are before our pre-roll
+		** target to avoid unnecessary decoding, and make decoder convergence
+		** independent of page boundaries for more visible errors.
+		*/
+		for ( ; odata->pkt_indx != odata->pkt_len ; )
+		{	ogg_packet *ppkt = &odata->pkt [odata->pkt_indx] ;
+			int nsamp = opus_packet_get_nb_samples (ppkt->packet, ppkt->bytes, 48000) ;
+			if (oopus->pkt_pos + nsamp < preroll_gp)
+			{	oopus->pkt_pos += nsamp ;
+				odata->pkt_indx++ ;
+				}
+			else
+				break ;
+			} ;
 		} ;
 
 	/*
 	** We've seeked or skipped through pages until just before our target,
 	** now decode until we hit it.
 	*/
-	offset = ogg_opus_seek_null_read (psf, target_gp / oopus->sr_factor) ;
+	offset = ogg_opus_null_read (psf, target_gp / oopus->sr_factor) ;
 	return offset - ((oopus->header.preskip + oopus->u.decode.gp_start) / oopus->sr_factor) ;
 
 } /* ogg_opus_seek */
@@ -1724,6 +1769,13 @@ ogg_opus_command (SF_PRIVATE *psf, int command, void *data, int datasize)
 			if (data == NULL || datasize != SIGNED_SIZEOF (int))
 				return SFE_BAD_COMMAND_PARAM ;
 			*((int *) data) = oopus->header.input_samplerate ;
+			return SF_TRUE ;
+
+		case SFC_GET_OGG_STREAM_SERIALNO :
+			if (data == NULL || datasize != sizeof (int32_t))
+				return SF_FALSE ;
+
+			*((int32_t *) data) = odata->ostream.serialno ;
 			return SF_TRUE ;
 
 		default :

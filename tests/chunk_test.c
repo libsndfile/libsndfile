@@ -38,8 +38,8 @@
 #define LOG_BUFFER_SIZE		1024
 
 static void	chunk_test (const char *filename, int format) ;
-static void wav_subchunk_test (size_t chunk_size) ;
-static void	large_free_test (const char *filename, int format, size_t chunk_size) ;
+static void wav_subchunk_test (unsigned int chunk_size) ;
+static void	large_free_test (const char *filename, int format, unsigned int chunk_size) ;
 
 int
 main (int argc, char *argv [])
@@ -133,7 +133,7 @@ chunk_test_helper (const char *filename, int format, const char * testdata)
 	snprintf (chunk_info.id, sizeof (chunk_info.id), "Test") ;
 	chunk_info.id_size = 4 ;
 	chunk_info.data = strdup (testdata) ;
-	chunk_info.datalen = strlen (chunk_info.data) ;
+	chunk_info.datalen = (unsigned int) strlen (chunk_info.data) ;
 
 	length_before = chunk_info.datalen ;
 
@@ -224,7 +224,7 @@ multichunk_test_helper (const char *filename, int format, const char * testdata 
 		chunk_info.id_size = 4 ;
 
 		chunk_info.data = strdup (testdata [i]) ;
-		chunk_info.datalen = strlen (chunk_info.data) ;
+		chunk_info.datalen = (unsigned int) strlen (chunk_info.data) ;
 
 		length_before [i] = chunk_info.datalen ;
 
@@ -316,7 +316,7 @@ chunk_test (const char *filename, int format)
 
 
 static void
-wav_subchunk_test (size_t chunk_size)
+wav_subchunk_test (unsigned int chunk_size)
 {	SNDFILE 		* file ;
 	SF_INFO			sfinfo ;
 	SF_CHUNK_INFO	chunk_info ;
@@ -325,7 +325,7 @@ wav_subchunk_test (size_t chunk_size)
 	short audio [16] ;
 	int	err, value ;
 
-	snprintf (filename, sizeof (filename), "subchunk_%04d.wav", (int) chunk_size) ;
+	snprintf (filename, sizeof (filename), "subchunk_%04u.wav", chunk_size) ;
 	print_test_name (__func__, filename) ;
 
 	exit_if_true (sizeof (chunk_data) < chunk_size, "\n\nLine %d : sizeof (data) < chunk_size\n\n", __LINE__) ;
@@ -353,7 +353,7 @@ wav_subchunk_test (size_t chunk_size)
 	snprintf (chunk_info.id, sizeof (chunk_info.id), "LIST") ;
 	chunk_info.id_size = 4 ;
 	chunk_info.data = chunk_data ;
-	chunk_info.datalen = chunk_size ;
+	chunk_info.datalen = (unsigned int) chunk_size ;
 
 	err = sf_set_chunk (file, &chunk_info) ;
 	exit_if_true (
@@ -386,7 +386,7 @@ wav_subchunk_test (size_t chunk_size)
 } /* wav_subchunk_test */
 
 static void
-large_free_test (const char *filename, int format, size_t chunk_size)
+large_free_test (const char *filename, int format, unsigned int chunk_size)
 {	SNDFILE 		* file ;
 	SF_INFO			sfinfo ;
 	SF_CHUNK_INFO	chunk_info ;

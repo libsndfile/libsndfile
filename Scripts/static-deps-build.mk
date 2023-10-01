@@ -95,7 +95,7 @@ Build/Stamp/build-ogg : Build/Stamp/sha256sum
 ifeq ($(disable_ogg_crc), true)
 	echo "Ogg/CRC enabled"
 	(cd Build && git clone https://github.com/xiph/ogg $(ogg_version))
-	(cd Build/$(ogg_version) && ./autogen.sh && CFLAGS=-fPIC ./configure $(config_options) --disable-crc && make all install)
+	(cd Build/$(ogg_version) && autoreconf -vif && CFLAGS=-fPIC ./configure $(config_options) --disable-crc && make all install)
 else
 	echo "Ogg/CRC disabled"
 	(cd Build && tar xf Tarballs/$(ogg_tarball))
@@ -110,7 +110,7 @@ Build/Stamp/install-libs : Build/Stamp/extract Build/Stamp/build-ogg
 	touch $@
 
 configure : configure.ac
-	./autogen.sh
+	autoreconf -vif
 
 Build/Stamp/configure : Build/Stamp/install-libs configure
 	PKG_CONFIG_LIBDIR=Build/lib/pkgconfig ./configure

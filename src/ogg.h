@@ -57,7 +57,36 @@ typedef struct
 								((buf [base + 2] <<16) & 0xff0000) | \
 								((buf [base + 1] << 8) & 0xff00) | \
 								(buf [base] & 0xff))
+/*-----------------------------------------------------------------------------------------------
+** Inline functions.
+*/
 
+/*
+** LibOgg documentation is noted as being bad by it's author.
+** Add some useful utility inline functions for introspecting Ogg pages.
+*/
+
+/* ogg_page_segments returns how many segments are in this page. */
+static inline int
+ogg_page_segments (ogg_page *pg)
+{	return (int) (pg->header [26]) ; }
+
+/* ogg_page_continues returns true if this page ends in a continued packet. */
+static inline int
+ogg_page_continues (ogg_page *pg)
+{	return pg->header [27 + pg->header [26] - 1] == 255 ;
+}
+
+/*-----------------------------------------------------------------------------------------------
+** Exported functions.
+*/
+
+/*
+** ogg_read_first_page loads the first Ogg page found in the file, and sets the
+** OGG_PRIVATE serialno to match the logical stream of the page. Data is read
+** without seeking backwards, loading any data present from psf->header into
+** the ogg_sync state first, so that this function works with pipes.
+*/
 int	ogg_read_first_page	(SF_PRIVATE *, OGG_PRIVATE *) ;
 
 /*
@@ -122,13 +151,19 @@ int ogg_stream_unpack_page (SF_PRIVATE *psf, OGG_PRIVATE *odata) ;
 
 /*
 ** Seek within the Ogg virtual bitstream for a page containing target_gp.
-** Preforms a bisection search. If not found exactly, the best result is
+** Performs a bisection search. If not found exactly, the best result is
 ** returned in *best_gp. Found page is loaded into the virtual bitstream,
 ** ready for unpacking. Arguments pcm_start and pcm_end are the highest and
-** lowest granule positions of the file. begin and end are the file offsets.
+** lowest granule positions of the file. begin and end are the file offset
+** range to search. gp_rate is an information hint so granule positions can
+** be correlated to playback time, so the search can figure out how close it
+** is, should be granule positions per second.
 */
 int ogg_stream_seek_page_search (SF_PRIVATE *psf, OGG_PRIVATE *odata,
-								uint64_t target_gp, uint64_t pcm_start, uint64_t pcm_end,
-								uint64_t *best_gp, sf_count_t begin, sf_count_t end) ;
+								uint64_t target_gp,
+								uint64_t pcm_start, uint64_t pcm_end,
+								uint64_t *best_gp,
+								sf_count_t begin, sf_count_t end,
+								uint64_t gp_rate) ;
 
 #endif /* SF_SRC_OGG_H */

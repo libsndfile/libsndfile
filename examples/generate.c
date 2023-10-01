@@ -118,7 +118,7 @@ encode_file (const char *infilename, const char *outfilename, int filetype)
 		exit (1) ;
 		} ;
 
-	while ((readcount = sf_read_float (infile, buffer, BUFFER_LEN)) > 0)
+	while ((readcount = (int) sf_read_float (infile, buffer, BUFFER_LEN)) > 0)
 		sf_write_float (outfile, buffer, readcount) ;
 
 	sf_close (infile) ;

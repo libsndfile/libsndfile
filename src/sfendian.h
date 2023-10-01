@@ -24,6 +24,9 @@
 #include <stdint.h>
 #include <inttypes.h>
 
+#ifndef __has_builtin
+#define __has_builtin(x) 0
+#endif
 
 #if HAVE_BYTESWAP_H			/* Linux, any CPU */
 #include <byteswap.h>
@@ -31,26 +34,33 @@
 #define	ENDSWAP_16(x)		(bswap_16 (x))
 #define	ENDSWAP_32(x)		(bswap_32 (x))
 #define	ENDSWAP_64(x)		(bswap_64 (x))
-#endif
 
+#elif __has_builtin(__builtin_bswap16) && __has_builtin(__builtin_bswap32) && __has_builtin(__builtin_bswap64)
 
-#if (HAVE_BYTESWAP_H == 0) && COMPILER_IS_GCC
+#define ENDSWAP_16(x) ((int16_t) __builtin_bswap16 ((uint16_t) x))
+#define ENDSWAP_32(x) ((int32_t) __builtin_bswap32 ((uint32_t) x))
+#define ENDSWAP_64(x) ((int64_t) __builtin_bswap64 ((uint64_t) x))
+
+#elif COMPILER_IS_GCC
 
 #if CPU_IS_X86
 
 static inline int16_t
-ENDSWAP_16 (int16_t x)
+ENDSWAP_16X (int16_t x)
 {	int16_t y ;
 	__asm__ ("rorw $8, %w0" : "=r" (y) : "0" (x) : "cc") ;
 	return y ;
 } /* ENDSWAP_16 */
 
 static inline int32_t
-ENDSWAP_32 (int32_t x)
+ENDSWAP_32X (int32_t x)
 {	int32_t y ;
 	__asm__ ("bswap %0" : "=r" (y) : "0" (x)) ;
 	return y ;
 } /* ENDSWAP_32 */
+
+#define ENDSWAP_16 ENDSWAP_16X
+#define ENDSWAP_32 ENDSWAP_32X
 
 #endif
 
@@ -66,9 +76,8 @@ ENDSWAP_64X (int64_t x)
 #define ENDSWAP_64 ENDSWAP_64X
 
 #endif
-#endif
 
-#ifdef _MSC_VER
+#elif defined _MSC_VER
 #include <stdlib.h>
 
 #define	ENDSWAP_16(x)		(_byteswap_ushort (x))
@@ -194,46 +203,42 @@ psf_put_be16 (uint8_t *ptr, int offset, int16_t value)
 } /* psf_put_be16 */
 
 static inline int64_t
-psf_get_be64 (uint8_t *ptr, int offset)
+psf_get_be64 (const uint8_t *ptr, int offset)
 {	int64_t value ;
 
-	value = ((uint32_t) ptr [offset]) << 24 ;
-	value += ptr [offset + 1] << 16 ;
-	value += ptr [offset + 2] << 8 ;
+	value = (int64_t) ((uint64_t) ptr [offset] << 24) ;
+	value += (int64_t) ((uint64_t) ptr [offset + 1] << 16) ;
+	value += (int64_t) ((uint64_t) ptr [offset + 2] << 8) ;
 	value += ptr [offset + 3] ;
 
 	value = (int64_t) (((uint64_t) value) << 32) ;
 
-	value += ((uint32_t) ptr [offset + 4]) << 24 ;
-	value += ptr [offset + 5] << 16 ;
-	value += ptr [offset + 6] << 8 ;
+	value += (int64_t) ((uint64_t) ptr [offset + 4] << 24) ;
+	value += (int64_t) ((uint64_t) ptr [offset + 5] << 16) ;
+	value += (int64_t) ((uint64_t) ptr [offset + 6] << 8) ;
 	value += ptr [offset + 7] ;
 	return value ;
 } /* psf_get_be64 */
 
 static inline int64_t
-psf_get_le64 (uint8_t *ptr, int offset)
-{	int64_t value ;
-
-	value = ((uint32_t) ptr [offset + 7]) << 24 ;
-	value += ptr [offset + 6] << 16 ;
-	value += ptr [offset + 5] << 8 ;
+psf_get_le64 (const uint8_t *ptr, int offset)
+{	int64_t value = (int64_t) ((uint64_t) ptr [offset + 7] << 24) ;
+	value += (int64_t) ((uint64_t) ptr [offset + 6] << 16) ;
+	value += (int64_t) ((uint64_t) ptr [offset + 5] << 8) ;
 	value += ptr [offset + 4] ;
 
 	value = (int64_t) (((uint64_t) value) << 32) ;
 
-	value += ((uint32_t) ptr [offset + 3]) << 24 ;
-	value += ptr [offset + 2] << 16 ;
-	value += ptr [offset + 1] << 8 ;
+	value += (int64_t) ((uint64_t) ptr [offset + 3] << 24) ;
+	value += (int64_t) ((uint64_t) ptr [offset + 2] << 16) ;
+	value += (int64_t) ((uint64_t) ptr [offset + 1] << 8) ;
 	value += ptr [offset] ;
 	return value ;
 } /* psf_get_le64 */
 
 static inline int32_t
-psf_get_be32 (uint8_t *ptr, int offset)
-{	int32_t value ;
-
-	value = ((uint32_t) ptr [offset]) << 24 ;
+psf_get_be32 (const uint8_t *ptr, int offset)
+{	int32_t value = ((uint32_t) ptr [offset]) << 24 ;
 	value += ptr [offset + 1] << 16 ;
 	value += ptr [offset + 2] << 8 ;
 	value += ptr [offset + 3] ;
@@ -241,10 +246,8 @@ psf_get_be32 (uint8_t *ptr, int offset)
 } /* psf_get_be32 */
 
 static inline int32_t
-psf_get_le32 (uint8_t *ptr, int offset)
-{	int32_t value ;
-
-	value = ((uint32_t) ptr [offset + 3]) << 24 ;
+psf_get_le32 (const uint8_t *ptr, int offset)
+{	int32_t value = ((uint32_t) ptr [offset + 3]) << 24 ;
 	value += ptr [offset + 2] << 16 ;
 	value += ptr [offset + 1] << 8 ;
 	value += ptr [offset] ;
@@ -252,27 +255,23 @@ psf_get_le32 (uint8_t *ptr, int offset)
 } /* psf_get_le32 */
 
 static inline int32_t
-psf_get_be24 (uint8_t *ptr, int offset)
-{	int32_t value ;
-
-	value = ((uint32_t) ptr [offset]) << 24 ;
+psf_get_be24 (const uint8_t *ptr, int offset)
+{	int32_t value = ((uint32_t) ptr [offset]) << 24 ;
 	value += ptr [offset + 1] << 16 ;
 	value += ptr [offset + 2] << 8 ;
 	return value ;
 } /* psf_get_be24 */
 
 static inline int32_t
-psf_get_le24 (uint8_t *ptr, int offset)
-{	int32_t value ;
-
-	value = ((uint32_t) ptr [offset + 2]) << 24 ;
+psf_get_le24 (const uint8_t *ptr, int offset)
+{	int32_t value = ((uint32_t) ptr [offset + 2]) << 24 ;
 	value += ptr [offset + 1] << 16 ;
 	value += ptr [offset] << 8 ;
 	return value ;
 } /* psf_get_le24 */
 
 static inline int16_t
-psf_get_be16 (uint8_t *ptr, int offset)
+psf_get_be16 (const uint8_t *ptr, int offset)
 {	return (int16_t) (ptr [offset] << 8) + ptr [offset + 1] ;
 } /* psf_get_be16 */
 
@@ -282,37 +281,35 @@ psf_get_be16 (uint8_t *ptr, int offset)
 
 static inline void
 endswap_short_array (short *ptr, int len)
-{	short	temp ;
-
-	while (--len >= 0)
-	{	temp = ptr [len] ;
-		ptr [len] = ENDSWAP_16 (temp) ;
+{
+	for (int i = 0 ; i < len ; i++)
+	{	short temp = ptr [i] ;
+		ptr [i] = ENDSWAP_16 (temp) ;
 		} ;
 } /* endswap_short_array */
 
 static inline void
 endswap_short_copy (short *dest, const short *src, int len)
 {
-	while (--len >= 0)
-	{	dest [len] = ENDSWAP_16 (src [len]) ;
+	for (int i = 0 ; i < len ; i++)
+	{	dest [i] = ENDSWAP_16 (src [i]) ;
 		} ;
 } /* endswap_short_copy */
 
 static inline void
 endswap_int_array (int *ptr, int len)
-{	int temp ;
-
-	while (--len >= 0)
-	{	temp = ptr [len] ;
-		ptr [len] = ENDSWAP_32 (temp) ;
+{
+	for (int i = 0 ; i < len ; i++)
+	{	int temp = ptr [i] ;
+		ptr [i] = ENDSWAP_32 (temp) ;
 		} ;
 } /* endswap_int_array */
 
 static inline void
 endswap_int_copy (int *dest, const int *src, int len)
 {
-	while (--len >= 0)
-	{	dest [len] = ENDSWAP_32 (src [len]) ;
+	for (int i = 0 ; i < len ; i++)
+	{	dest [i] = ENDSWAP_32 (src [i]) ;
 		} ;
 } /* endswap_int_copy */
 
@@ -321,21 +318,19 @@ endswap_int_copy (int *dest, const int *src, int len)
 
 static inline void
 endswap_int64_t_array (int64_t *ptr, int len)
-{	int64_t value ;
-
-	while (--len >= 0)
-	{	value = ptr [len] ;
-		ptr [len] = ENDSWAP_64 (value) ;
+{
+	for (int i = 0 ; i < len ; i++)
+	{	int64_t value = ptr [i] ;
+		ptr [i] = ENDSWAP_64 (value) ;
 		} ;
 } /* endswap_int64_t_array */
 
 static inline void
 endswap_int64_t_copy (int64_t *dest, const int64_t *src, int len)
-{	int64_t value ;
-
-	while (--len >= 0)
-	{	value = src [len] ;
-		dest [len] = ENDSWAP_64 (value) ;
+{
+	for (int i = 0 ; i < len ; i++)
+	{	int64_t value = src [i] ;
+		dest [i] = ENDSWAP_64 (value) ;
 		} ;
 } /* endswap_int64_t_copy */
 
