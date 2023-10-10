@@ -320,7 +320,7 @@ mat4_read_header (SF_PRIVATE *psf)
 				psf->filelength - psf->dataoffset, psf->sf.channels * psf->sf.frames * psf->bytewidth) ;
 		}
 	else if ((psf->filelength - psf->dataoffset) > psf->sf.channels * psf->sf.frames * psf->bytewidth)
-		psf->dataend = psf->dataoffset + rows * cols * psf->bytewidth ;
+		psf->dataend = psf->dataoffset + (sf_count_t) rows * (sf_count_t) cols * psf->bytewidth ;
 
 	psf->datalength = psf->filelength - psf->dataoffset - psf->dataend ;
 
