@@ -88,8 +88,7 @@ int sf_init_file(const uint8_t *data,
                 SNDFILE **sndfile, 
                 VIO_DATA *vio_data, 
                 SF_VIRTUAL_IO *vio, SF_INFO *sndfile_info)
-{  float* read_buffer = NULL ;
-
+{
    // Initialize the virtual IO structure.
    vio->get_filelen = vfget_filelen ;
    vio->seek = vfseek ;
