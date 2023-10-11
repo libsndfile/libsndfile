@@ -456,7 +456,7 @@ if USE_OSSFUZZ_STATIC
 FUZZ_LDADD = $(LIB_FUZZING_ENGINE)
 FUZZ_FLAG =
 else
-FUZZ_LDADD = libstandaloneengine.la
+FUZZ_LDADD = ossfuzz/libstandaloneengine.la
 FUZZ_FLAG =
 endif
 endif
