@@ -439,7 +439,7 @@ typedef struct sf_private_tag
 	sf_count_t		datalength ;	/* Length in bytes of the audio data. */
 	sf_count_t		dataend ;		/* Offset to file tailer. */
 
-	int				blockwidth ;	/* Size in bytes of one set of interleaved samples. */
+	sf_count_t		blockwidth ;	/* Size in bytes of one set of interleaved samples. */
 	int				bytewidth ;		/* Size in bytes of one sample (one channel). */
 
 	void			*dither ;
