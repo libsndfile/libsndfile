@@ -1,6 +1,8 @@
 #ifndef SNDFILE_FUZZ_HEADER_H
 #define SNDFILE_FUZZ_HEADER_H
 
+#include <errno.h>
+
 typedef struct
 {
   sf_count_t offset ;
@@ -32,6 +34,9 @@ static sf_count_t vfseek (sf_count_t offset, int whence, void *user_data)
         break ;
 
     default :
+        // SEEK_DATA and SEEK_HOLE are not supported by this function.
+        errno = EINVAL ;
+        return -1 ;
         break ;
   }
 
