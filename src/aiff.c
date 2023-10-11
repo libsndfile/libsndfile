@@ -1702,7 +1702,7 @@ static int
 aiff_read_basc_chunk (SF_PRIVATE * psf, int datasize)
 {	const char * type_str ;
 	basc_CHUNK bc ;
-	int count ;
+	sf_count_t count ;
 
 	count = psf_binheader_readf (psf, "E442", &bc.version, &bc.numBeats, &bc.rootNote) ;
 	count += psf_binheader_readf (psf, "E222", &bc.scaleType, &bc.sigNumerator, &bc.sigDenominator) ;
