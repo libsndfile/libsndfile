@@ -32,6 +32,8 @@ static sf_count_t vfseek (sf_count_t offset, int whence, void *user_data)
         break ;
 
     default :
+        // Default to SEEK_SET to avoid use of uninitialized `new_offset`
+        new_offset = offset ;
         break ;
   }
 
@@ -88,8 +90,7 @@ int sf_init_file(const uint8_t *data,
                 SNDFILE **sndfile, 
                 VIO_DATA *vio_data, 
                 SF_VIRTUAL_IO *vio, SF_INFO *sndfile_info)
-{  float* read_buffer = NULL ;
-
+{  
    // Initialize the virtual IO structure.
    vio->get_filelen = vfget_filelen ;
    vio->seek = vfseek ;
@@ -104,8 +105,23 @@ int sf_init_file(const uint8_t *data,
 
    memset(sndfile_info, 0, sizeof(SF_INFO)) ;
 
+   // Randomly choose which file mode to open the file based on the file contents
+   unsigned int rand_num = 0 ;
+   for(int i = 0; i < (int)size; i++) {
+     rand_num += data[i] ; 
+   }
+
+   // Xorshift to shuffle bits around
+   rand_num ^= rand_num << 13 ;
+   rand_num ^= rand_num >> 17 ;
+   rand_num ^= rand_num << 5 ;
+
+   // Choose one of the file modes
+   int modes[3] = {SFM_READ, SFM_WRITE, SFM_RDWR} ;
+   int mode = modes[rand_num % 3] ;
+
    // Try and open the virtual file.
-   *sndfile = sf_open_virtual(vio, SFM_READ, sndfile_info, vio_data) ;
+   *sndfile = sf_open_virtual(vio, mode, sndfile_info, vio_data) ;
 
    if (sndfile_info->channels == 0)
 		 return -1 ;
