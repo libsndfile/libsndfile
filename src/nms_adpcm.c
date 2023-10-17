@@ -1091,7 +1091,7 @@ nms_adpcm_init (SF_PRIVATE *psf)
 	else
 		pnms->blocks_total = psf->datalength / (pnms->shortsperblock * sizeof (short)) ;
 
-	psf->sf.frames		= pnms->blocks_total * NMS_SAMPLES_PER_BLOCK ;
+	psf->sf.frames		= (sf_count_t) pnms->blocks_total * NMS_SAMPLES_PER_BLOCK ;
 	psf->codec_close	= nms_adpcm_close ;
 	psf->seek			= nms_adpcm_seek ;
 
