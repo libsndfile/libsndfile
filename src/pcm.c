@@ -127,7 +127,7 @@ pcm_init (SF_PRIVATE *psf)
 		return SFE_INTERNAL ;
 		} ;
 
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 	if ((SF_CODEC (psf->sf.format)) == SF_FORMAT_PCM_S8)
 		chars = SF_CHARS_SIGNED ;
