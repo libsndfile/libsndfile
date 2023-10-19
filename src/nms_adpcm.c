@@ -258,7 +258,7 @@ nms_adpcm_update (struct nms_adpcm_state *s)
 		} ;
 
 	/* Compute the signal estimate. */
-	s->s_e = s->a [0] * s->s_r [0] + s->a [1] * s->s_r [1] + s->s_ez ;
+	s->s_e = (int_fast16_t) s->a [0] * s->s_r [0] + (int_fast16_t) s->a [1] * s->s_r [1] + (int_fast16_t) s->s_ez ;
 
 	/* Return to scale */
 	s->s_ez >>= 14 ;
