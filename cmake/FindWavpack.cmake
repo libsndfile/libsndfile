@@ -4,7 +4,7 @@
 #  WAVPACK_INCLUDE_DIRS - where to find Wavpack headers.
 #  WAVPACK_LIBRARIES    - List of libraries when using Wavpack.
 #  WAVPACK_FOUND        - True if Wavpack found.
-#  WAVPACK_DEFINITIONS  - Wavpack compile definitons 
+#  WAVPACK_DEFINITIONS  - Wavpack compile definitions
 
 if (WAVPACK_INCLUDE_DIR)
     # Already in cache, be silent
@@ -14,7 +14,7 @@ endif ()
 find_package (Ogg QUIET)
 
 find_package (PkgConfig QUIET)
-pkg_check_modules(PC_WAVPACK QUIET wavpack)
+pkg_check_modules(PC_WAVPACK wavpack QUIET)
 
 set(WAVPACK_VERSION ${PC_WAVPACK_VERSION})
 
