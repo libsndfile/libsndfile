@@ -561,11 +561,11 @@ common_cflags="${common_flags}"
 dnl Clang doesn't know about -Wno-format-truncation
 dnl and would spew tons of warnings otherwise.
 AS_IF([test "x$ax_cv_c_compiler_vendor" = "xgnu"], [
-		common_cflags+=" -Wno-format-truncation"
+		common_cflags="${common_cflags} -Wno-format-truncation"
 	])
 common_cxxflags="${common_flags}"
 AS_IF([test "x$ax_cv_cxx_compiler_vendor" = "xgnu"], [
-		common_cxxflags+=" -Wno-format-truncation"
+		common_cxxflags="${common_cxxflags} -Wno-format-truncation"
 	])
 
 AX_APPEND_COMPILE_FLAGS([${common_cflags} -Wvla -Wbad-function-cast -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return], [CFLAGS])
