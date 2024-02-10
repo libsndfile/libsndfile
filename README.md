@@ -127,7 +127,7 @@ You can pass additional options with `/D<parameter>=<value>` when you run
  Useful libsndfile options:
 
 * `BUILD_SHARED_LIBS` - build shared library (DLL under Windows) when `ON`,
-  build static library othervise. This option is `OFF` by default.
+  build static library otherwise. This option is `OFF` by default.
 * `BUILD_PROGRAMS` - build libsndfile's utilities from `programs/` directory,
   `ON` by default.
 * `BUILD_EXAMPLES` - build examples, `ON` by default.
