@@ -40,6 +40,9 @@
 /* Will be set to 1 if lame and mpg123 are available. */
 #cmakedefine01 HAVE_MPEG
 
+/* Will be set to 1 if wavpack is available. */
+#cmakedefine01 HAVE_WAVPACK
+
 /* Define to 1 if you have the `floor' function. */
 #cmakedefine01 HAVE_FLOOR
 

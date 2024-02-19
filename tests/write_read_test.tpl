@@ -86,6 +86,7 @@ main (int argc, char **argv)
 		printf ("           flac  - test FLAC file functions\n") ;
 		printf ("           mpc2k - test MPC 2000 file functions\n") ;
 		printf ("           rf64  - test RF64 file functions\n") ;
+		printf ("           wvpk  - test Wavpack file functions\n") ;
 		printf ("           all   - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -397,6 +398,21 @@ main (int argc, char **argv)
 		test_count++ ;
 		} ;
 
+	if (do_all || ! strcmp (argv [1], "wvpk"))
+	{	if (HAVE_WAVPACK)
+		{	pcm_test_char	("char.wv"		, SF_FORMAT_WAVPACK | SF_FORMAT_PCM_S8, SF_TRUE) ;
+			pcm_test_char	("char.wv"		, SF_FORMAT_WAVPACK | SF_FORMAT_PCM_U8, SF_TRUE) ;
+			pcm_test_short	("short.wv"	, SF_FORMAT_WAVPACK | SF_FORMAT_PCM_16, SF_TRUE) ;
+			pcm_test_24bit	("24bit.wv"	, SF_FORMAT_WAVPACK | SF_FORMAT_PCM_24, SF_TRUE) ;
+			pcm_test_int	("int.wv"		, SF_FORMAT_WAVPACK | SF_FORMAT_PCM_32, SF_TRUE) ;
+
+			pcm_test_float	("float.wv"	, SF_FORMAT_WAVPACK | SF_FORMAT_FLOAT , SF_TRUE) ;
+			}
+		else
+			puts ("    No Wavpack tests because Wavpack support was not compiled in.") ;
+		test_count++ ;
+		} ;
+
 	if (test_count == 0)
 	{	printf ("Mono : ************************************\n") ;
 		printf ("Mono : *  No '%s' test defined.\n", argv [1]) ;
@@ -478,6 +494,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 		} ;
 
 	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_FLAC
+		&& (format & SF_FORMAT_TYPEMASK) != SF_FORMAT_WAVPACK
 		&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_16
 		&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20
 		&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24
@@ -500,6 +517,7 @@ pcm_test_[+ (get "type_name") +] (const char *filename, int format, int long_fil
 	if ((format & SF_FORMAT_TYPEMASK) != SF_FORMAT_PAF
 			&& (format & SF_FORMAT_TYPEMASK) != SF_FORMAT_VOC
 			&& (format & SF_FORMAT_TYPEMASK) != SF_FORMAT_FLAC
+			&& (format & SF_FORMAT_TYPEMASK) != SF_FORMAT_WAVPACK
 			&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_16
 			&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_20
 			&& (format & SF_FORMAT_SUBMASK) != SF_FORMAT_ALAC_24
@@ -1132,6 +1150,7 @@ write_seek_extend_test (const char * filename, int format)
 	/* This test doesn't work on the following container formats. */
 	switch (format & SF_FORMAT_TYPEMASK)
 	{	case SF_FORMAT_FLAC :
+		case SF_FORMAT_WAVPACK :
 		case SF_FORMAT_HTK :
 		case SF_FORMAT_PAF :
 		case SF_FORMAT_SDS :
