@@ -74,6 +74,7 @@ The available commands are as follows:
 | [SFC_SET_CART_INFO](#sfc_set_cart_info)                           | Set the Cart Chunk info.                                |
 | [SFC_GET_CART_INFO](#sfc_get_cart_info)                           | Get the Cart Chunk info.                                |
 | [SFC_GET_LOOP_INFO](#sfc_get_loop_info)                           | Get loop info.                                          |
+| [SFC_SET_LOOP_INFO](#sfc_set_loop_info)                           | Set loop info.                                          |
 | [SFC_GET_INSTRUMENT](#sfc_get_instrument)                         | Get instrument info.                                    |
 | [SFC_SET_INSTRUMENT](#sfc_set_instrument)                         | Set instrument info.                                    |
 | [SFC_GET_CUE_COUNT](#sfc_get_cue_count)                           | Get the cue marker count.                               |
@@ -1622,6 +1623,58 @@ sf_command (sndfile, SFC_GET_LOOP_INFO, &loop, sizeof (loop)) ;
 ### Return value
 
 `SF_TRUE` if the file header contains loop information for the file, `SF_FALSE`
+otherwise.
+
+## SFC_SET_LOOP_INFO
+
+Set loop information for file including time signature, length in beats and
+original MIDI base note
+
+### Parameters
+
+sndfile
+: A valid SNDFILE* pointer
+
+cmd
+: SFC_SET_LOOP_INFO
+
+data
+: a pointer to an SF_LOOP_INFO struct
+
+datasize
+: sizeof (SF_LOOP_INFO)
+
+The SF_LOOP_INFO struct is defined in *sndfile.h* as:
+
+```c
+typedef struct
+{   short    time_sig_num ;   /* any positive integer    > 0  */
+    short    time_sig_den ;   /* any positive power of 2 > 0  */
+    int        loop_mode ;    /* see SF_LOOP enum             */
+
+    int        num_beats ;    /* this is NOT the amount of quarter notes !!!*/
+                              /* a full bar of 4/4 is 4 beats */
+                              /* a full bar of 7/8 is 7 beats */
+
+    float    bpm ;            /* suggestion, as it can be calculated using other fields:*/
+                              /* file's length, file's sampleRate and our time_sig_den*/
+                              /* -> bpms are always the amount of _quarter notes_ per minute */
+
+    int    root_key ;         /* MIDI note, or -1 for None */
+    int future [6] ;
+} SF_LOOP_INFO ;
+```
+
+### Examples
+
+```c
+SF_LOOP_INFO loop;
+sf_command (sndfile, SFC_SET_LOOP_INFO, &loop, sizeof (loop)) ;
+```
+
+### Return value
+
+`SF_TRUE` if the loop information is valid, `SF_FALSE`
 otherwise.
 
 ## SFC_GET_INSTRUMENT
