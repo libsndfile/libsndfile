@@ -15,10 +15,9 @@ if (LARGE_FILES_DEFINITIONS)
 	add_definitions(${LARGE_FILES_DEFINITIONS})
 endif ()
 
-if (CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
-	find_package (Sndio)
-elseif (NOT WIN32)
+if (NOT WIN32)
 	find_package (ALSA)
+	find_package (Sndio)
 endif ()
 
 if (VCPKG_TOOLCHAIN AND (NOT CMAKE_VERSION VERSION_LESS 3.15))

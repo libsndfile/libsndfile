@@ -666,7 +666,7 @@ win32_play (int argc, char *argv [])
 #endif /* Win32 */
 
 /*------------------------------------------------------------------------------
-**	OpenBSD's sndio.
+**	Sndio.
 */
 
 #if HAVE_SNDIO_H

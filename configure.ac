@@ -150,6 +150,9 @@ AC_ARG_ENABLE([sqlite],
 AC_ARG_ENABLE([alsa],
 	[AS_HELP_STRING([--disable-alsa], [disable ALSA support (default=autodetect)])], [], [enable_alsa=auto])
 
+AC_ARG_ENABLE([sndio],
+	[AS_HELP_STRING([--disable-sndio], [disable Sndio support (default=autodetect)])], [], [enable_sndio=auto])
+
 AC_ARG_ENABLE([external-libs],
 	[AS_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis [[default=no]]])])
 
@@ -471,20 +474,26 @@ AS_IF([test "x$enable_alsa" != "xno"], [
 	])
 
 dnl ====================================================================================
-dnl  Check for OpenBSD's sndio.
+dnl  Check for Sndio.
 
-SNDIO_LIBS=""
-HAVE_SNDIO_H=0
-AS_CASE([$host_os],
-	[openbsd*], [
-		AC_CHECK_HEADERS(sndio.h)
-		AS_IF([test "x$ac_cv_header_sndio_h" = "xyes"], [
-				SNDIO_LIBS="-lsndio"
-				HAVE_SNDIO_H=1
+AS_IF([test "x$enable_sndio" != "xno"], [
+		PKG_CHECK_MODULES([SNDIO], [sndio], [
+				AC_DEFINE([HAVE_SNDIO_H], [1], [Set to 1 if <sndio.h> is available.])
+				ac_cv_sndio="yes"
+			], [
+				ac_cv_sndio="no"
+			])
+
+		AS_IF([test "x$ac_cv_sndio" = "xno"], [
+				AS_IF([test "x$enable_sndio" = "xyes"], [
+						dnl explicitly passed --enable-sndio, hence error out loud and clearly
+						AC_MSG_ERROR([You explicitly requested sndio support, but sndio could not be found!])
+                                        ], [
+						dnl did not explicitly pass --enable-sndio, relying on default automagic on
+						enable_sndio="no (auto)"
+					])
 			])
 	])
-
-AC_DEFINE_UNQUOTED([HAVE_SNDIO_H], [${HAVE_SNDIO_H}], [Set to 1 if <sndio.h> is available.])
 
 dnl ====================================================================================
 dnl  Test for sanity when cross-compiling.
