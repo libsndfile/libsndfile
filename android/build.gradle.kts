@@ -23,8 +23,8 @@ android {
         }
         externalNativeBuild {
             // build static libs and testing binaries only when running :libsndfileTest
-            val buildSharedLibs = if (isTestBuild) "OFF" else "ON"
-            val buildTesting = if (isTestBuild) "ON" else "OFF"
+            val buildSharedLibs = if (isTestBuild()) "OFF" else "ON"
+            val buildTesting = if (isTestBuild()) "ON" else "OFF"
 
             cmake {
                 cppFlags += "-std=c++17"
@@ -67,11 +67,7 @@ android {
     }
 }
 
-val testTaskName: String = "libsndfileTest"
-
-val isTestBuild: Boolean = gradle.startParameter.taskNames.contains(testTaskName)
-
-tasks.register<Exec>(testTaskName) {
+tasks.register<Exec>(getTestTaskName()) {
     commandLine("./android-test.sh")
 }
 
@@ -92,7 +88,7 @@ afterEvaluate {
     tasks.named("assembleRelease").configure {
         mustRunAfter("clean")
     }
-    tasks.named(testTaskName).configure {
+    tasks.named(getTestTaskName()).configure {
         dependsOn("clean", "assembleRelease")
     }
     tasks.named("publish${project.name.cap()}PublicationToMavenLocal").configure {
@@ -111,11 +107,15 @@ afterEvaluate {
     ).forEach {
         tasks.named(it) {
             doLast {
-                println(":$it task not supported; use :$testTaskName to run tests via adb")
+                println(":$it task not supported; use :${getTestTaskName()} to run tests via adb")
             }
         }
     }
 }
+
+fun getTestTaskName(): String = "libsndfileTest"
+
+fun isTestBuild(): Boolean = gradle.startParameter.taskNames.contains(getTestTaskName())
 
 // capitalize the first letter to make task names matched when written in camel case
 fun String.cap(): String = this.replaceFirstChar { it.uppercase() }
