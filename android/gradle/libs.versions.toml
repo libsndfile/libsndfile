@@ -1,0 +1,10 @@
+[versions]
+agp = "8.4.0"
+minsdk = "21"
+compilesdk = "34"
+buildtools = "34.0.0"
+ndk = "26.3.11579264"
+cmake = "3.22.1"
+
+[plugins]
+library = { id = "com.android.library", version.ref = "agp" }
