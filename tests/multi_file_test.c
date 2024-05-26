@@ -235,4 +235,3 @@ write_file_at_end (int fd, int filetype, int channels, int file_num)
 
 	sf_close (sndfile) ;
 } /* write_file_at_end */
-
