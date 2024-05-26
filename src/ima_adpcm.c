@@ -262,9 +262,6 @@ aiff_ima_decode_block (SF_PRIVATE *psf, IMA_ADPCM_PRIVATE *pima)
 	int		chan, k, diff, bytecode, predictor ;
 	short	step, stepindx, *sampledata ;
 
-static int count = 0 ;
-count ++ ;
-
 	pima->blockcount += pima->channels ;
 	pima->samplecount = 0 ;
 
@@ -1005,4 +1002,3 @@ ima_write_d (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 
 	return total ;
 } /* ima_write_d */
-
