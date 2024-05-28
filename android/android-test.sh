@@ -1,25 +1,39 @@
 #!/usr/bin/env bash
+SCRIPT_DIR=$(dirname $0)
+TEST_DIR="/data/local/tmp/libaudio/test"
+
+# remove existing test files
+adb $@ shell "rm -r $TEST_DIR" > /dev/null
+adb $@ shell "mkdir -p $TEST_DIR" > /dev/null
+
 ABIS=`adb $@ shell getprop ro.product.cpu.abilist`
 
-for ABI in $(echo $ABIS | tr "," "\n"); do
-    echo "libsndfile: testing ABI [$ABI]"
-    TEST_DIR="/data/local/tmp/libsndfile/test/$ABI"
-    set -o xtrace
+print_message() {
+  echo "[==========================================================]"
+  echo "| [libsndfile]: $1"
+  echo "[==========================================================]"
+}
 
-    # remove existing test files
-    adb $@ shell rm -rv $TEST_DIR
-    adb $@ shell mkdir -pv $TEST_DIR
+for ABI in $(echo $ABIS | tr "," "\n"); do
+    if [ $ABI == "armeabi" ]; then
+        print_message "skipping deprecated ABI: [$ABI]"; echo
+        continue
+    fi
+    print_message "testing ABI [$ABI]"
+
+    # create test abi directory
+    TEST_ABI_DIR="$TEST_DIR/$ABI"
+    adb $@ shell mkdir -p $TEST_ABI_DIR > /dev/null
 
     # push test files to device
-    pushd build/intermediates/cmake/release/obj/$ABI
-    adb $@ push ./* $TEST_DIR
-    popd
+    pushd "$SCRIPT_DIR/build/intermediates/cmake/release/obj/$ABI" > /dev/null
+    adb $@ push * $TEST_ABI_DIR > /dev/null
+    popd > /dev/null
 
     # run tests
-    adb $@ shell "cd $TEST_DIR && find . -type f -executable -exec {} all \;"
-
-    set +o xtrace
+    adb $@ shell -t "cd $TEST_ABI_DIR && export LD_LIBRARY_PATH=. && find . -type f -not -name '*.so' -executable -exec {} all \;"
+    echo
 done
 
-echo "Tests finished for ABIs: $ABIS"
-echo "NOTE: make sure to verify the test results manually. This :task will not fail if tests fail"
+print_message "tests finished for ABIS: [$ABIS]"; echo
+echo "NOTE: make sure to verify the test results manually. This task will not fail if tests fail"
