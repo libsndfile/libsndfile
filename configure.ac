@@ -291,7 +291,8 @@ AS_IF([test -n "$PKG_CONFIG"], [
 		AS_IF([test "x$enable_external_libs" = "xno"], [
 				AC_MSG_WARN([[*** External libs (FLAC, Ogg, Vorbis) disabled. ***]])
 			], [
-				PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.3.1, ac_cv_flac=yes, ac_cv_flac=no)
+				dnl Support for 32-bit PCM introduced in FLAC 1.4.0
+				PKG_CHECK_MOD_VERSION(FLAC, flac >= 1.4.0, ac_cv_flac=yes, ac_cv_flac=no)
 
 				dnl Make sure the FLAC_CFLAGS value is sane.
 				FLAC_CFLAGS=`echo $FLAC_CFLAGS | $SED "s|include/FLAC|include|"`
