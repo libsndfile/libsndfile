@@ -1161,8 +1161,8 @@ broadcast_test (const char *filename, int filetype)
 	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
 	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
 	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (bc_write.origination_date, "2006/03/30", sizeof (bc_write.origination_date)) ;
+	memcpy (bc_write.origination_time, "20:27:00", sizeof (bc_write.origination_time)) ;
 	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
 	bc_write.coding_history_size = 0 ;
 
@@ -1209,12 +1209,12 @@ broadcast_test (const char *filename, int filetype)
 		} ;
 
 	if (memcmp (bc_write.origination_date, bc_read.origination_date, sizeof (bc_write.origination_date)) != 0)
-	{	printf ("\n\nLine %d : origination_date mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, bc_write.origination_date, bc_read.origination_date) ;
+	{	printf ("\n\nLine %d : origination_date mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (bc_write.origination_date), bc_write.origination_date, (int) sizeof (bc_read.origination_date), bc_read.origination_date) ;
 		errors ++ ;
 		} ;
 
 	if (memcmp (bc_write.origination_time, bc_read.origination_time, sizeof (bc_write.origination_time)) != 0)
-	{	printf ("\n\nLine %d : origination_time mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, bc_write.origination_time, bc_read.origination_time) ;
+	{	printf ("\n\nLine %d : origination_time mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (bc_write.origination_time), bc_write.origination_time, (int) sizeof (bc_read.origination_time), bc_read.origination_time) ;
 		errors ++ ;
 		} ;
 
@@ -1247,8 +1247,8 @@ broadcast_rdwr_test (const char *filename, int filetype)
 	snprintf (binfo.description, sizeof (binfo.description), "Test description") ;
 	snprintf (binfo.originator, sizeof (binfo.originator), "Test originator") ;
 	snprintf (binfo.originator_reference, sizeof (binfo.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (binfo.origination_date, sizeof (binfo.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (binfo.origination_time, sizeof (binfo.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (binfo.origination_date, "2006/03/30", sizeof (binfo.origination_date)) ;
+	memcpy (binfo.origination_time, "20:27:00", sizeof (binfo.origination_time)) ;
 	snprintf (binfo.umid, sizeof (binfo.umid), "Some umid") ;
 	binfo.coding_history_size = 0 ;
 
@@ -1284,8 +1284,8 @@ check_coding_history_newlines (const char *filename)
 	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
 	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
 	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (bc_write.origination_date, "2006/03/30", sizeof (bc_write.origination_date)) ;
+	memcpy (bc_write.origination_time, "20:27:00", sizeof (bc_write.origination_time)) ;
 	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
 	bc_write.coding_history_size = snprintf (bc_write.coding_history, sizeof (bc_write.coding_history), "This has\nUnix\nand\rMac OS9\rline endings.\nLast line") ; ;
 
@@ -1359,8 +1359,8 @@ broadcast_coding_history_test (const char *filename)
 	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
 	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
 	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (bc_write.origination_date, "2006/03/30", sizeof (bc_write.origination_date)) ;
+	memcpy (bc_write.origination_time, "20:27:00", sizeof (bc_write.origination_time)) ;
 	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
 	/* Coding history will be filled in by the library. */
 	bc_write.coding_history_size = 0 ;
@@ -1460,8 +1460,8 @@ broadcast_coding_history_size (const char *filename)
 	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
 	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
 	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (bc_write.origination_date, "2006/03/30", sizeof (bc_write.origination_date)) ;
+	memcpy (bc_write.origination_time, "20:27:00", sizeof (bc_write.origination_time)) ;
 	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
 	bc_write.coding_history_size = 0 ;
 
@@ -1522,16 +1522,16 @@ cart_test (const char *filename, int filetype)
 
 	// example test data
 	snprintf (ca_write.artist, sizeof (ca_write.artist), "Test artist") ;
-	snprintf (ca_write.version, sizeof (ca_write.version), "Test version") ;
+	memcpy (ca_write.version, "0101", sizeof (ca_write.version)) ;
 	snprintf (ca_write.cut_id, sizeof (ca_write.cut_id), "Test cut ID") ;
 	snprintf (ca_write.client_id, sizeof (ca_write.client_id), "Test client ID") ;
 	snprintf (ca_write.category, sizeof (ca_write.category), "Test category") ;
 	snprintf (ca_write.classification, sizeof (ca_write.classification), "Test classification") ;
 	snprintf (ca_write.out_cue, sizeof (ca_write.out_cue), "Test out cue") ;
-	snprintf (ca_write.start_date, sizeof (ca_write.start_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (ca_write.start_time, sizeof (ca_write.start_time), "%02d:%02d:%02d", 20, 27, 0) ;
-	snprintf (ca_write.end_date, sizeof (ca_write.end_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (ca_write.end_time, sizeof (ca_write.end_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (ca_write.start_date, "2006/03/30", sizeof (ca_write.start_date)) ;
+	memcpy (ca_write.start_time, "20:27:00", sizeof (ca_write.start_time)) ;
+	memcpy (ca_write.end_date, "2006/03/30", sizeof (ca_write.end_date)) ;
+	memcpy (ca_write.end_time, "20:27:00", sizeof (ca_write.end_time)) ;
 	snprintf (ca_write.producer_app_id, sizeof (ca_write.producer_app_id), "Test producer app id") ;
 	snprintf (ca_write.producer_app_version, sizeof (ca_write.producer_app_version), "Test producer app version") ;
 	snprintf (ca_write.user_def, sizeof (ca_write.user_def), "test user def test test") ;
@@ -1565,7 +1565,7 @@ cart_test (const char *filename, int filetype)
 		} ;
 
 	if (memcmp (ca_write.version, ca_read.version, sizeof (ca_write.version)) != 0)
-	{	printf ("\n\nLine %d : version mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, ca_write.version, ca_read.version) ;
+	{	printf ("\n\nLine %d : version mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (ca_write.version), ca_write.version, (int) sizeof (ca_read.version), ca_read.version) ;
 		errors ++ ;
 		} ;
 
@@ -1595,25 +1595,25 @@ cart_test (const char *filename, int filetype)
 		} ;
 
 	if (memcmp (ca_write.start_date, ca_read.start_date, sizeof (ca_write.start_date)) != 0)
-	{	printf ("\n\nLine %d : start_date mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, ca_write.start_date, ca_read.start_date) ;
+	{	printf ("\n\nLine %d : start_date mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (ca_write.start_date), ca_write.start_date, (int) sizeof (ca_read.start_date), ca_read.start_date) ;
 		errors ++ ;
 		} ;
 
 
 	if (memcmp (ca_write.start_time, ca_read.start_time, sizeof (ca_write.start_time)) != 0)
-	{	printf ("\n\nLine %d : start_time mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, ca_write.start_time, ca_read.start_time) ;
+	{	printf ("\n\nLine %d : start_time mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (ca_write.start_time), ca_write.start_time, (int) sizeof (ca_read.start_time), ca_read.start_time) ;
 		errors ++ ;
 		} ;
 
 
 	if (memcmp (ca_write.end_date, ca_read.end_date, sizeof (ca_write.end_date)) != 0)
-	{	printf ("\n\nLine %d : end_date mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, ca_write.end_date, ca_read.end_date) ;
+	{	printf ("\n\nLine %d : end_date mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (ca_write.end_date), ca_write.end_date, (int) sizeof (ca_read.end_date), ca_read.end_date) ;
 		errors ++ ;
 		} ;
 
 
 	if (memcmp (ca_write.end_time, ca_read.end_time, sizeof (ca_write.end_time)) != 0)
-	{	printf ("\n\nLine %d : end_time mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, ca_write.end_time, ca_read.end_time) ;
+	{	printf ("\n\nLine %d : end_time mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (ca_write.end_time), ca_write.end_time, (int) sizeof (ca_read.end_time), ca_read.end_time) ;
 		errors ++ ;
 		} ;
 
@@ -1681,16 +1681,16 @@ cart_rdwr_test (const char *filename, int filetype)
 	memset (&cinfo, 0, sizeof (cinfo)) ;
 
 	snprintf (cinfo.artist, sizeof (cinfo.artist), "Test artist") ;
-	snprintf (cinfo.version, sizeof (cinfo.version), "Test version") ;
+	memcpy (cinfo.version, "0101", sizeof (cinfo.version)) ;
 	snprintf (cinfo.cut_id, sizeof (cinfo.cut_id), "Test cut ID") ;
 	snprintf (cinfo.client_id, sizeof (cinfo.client_id), "Test client ID") ;
 	snprintf (cinfo.category, sizeof (cinfo.category), "Test category") ;
 	snprintf (cinfo.classification, sizeof (cinfo.classification), "Test classification") ;
 	snprintf (cinfo.out_cue, sizeof (cinfo.out_cue), "Test out cue") ;
-	snprintf (cinfo.start_date, sizeof (cinfo.start_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (cinfo.start_time, sizeof (cinfo.start_time), "%02d:%02d:%02d", 20, 27, 0) ;
-	snprintf (cinfo.end_date, sizeof (cinfo.end_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (cinfo.end_time, sizeof (cinfo.end_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (cinfo.start_date, "2006/03/30", sizeof (cinfo.start_date)) ;
+	memcpy (cinfo.start_time, "20:27:00", sizeof (cinfo.start_time)) ;
+	memcpy (cinfo.end_date, "2006/03/30", sizeof (cinfo.end_date)) ;
+	memcpy (cinfo.end_time, "20:27:00", sizeof (cinfo.end_time)) ;
 	snprintf (cinfo.producer_app_id, sizeof (cinfo.producer_app_id), "Test producer app id") ;
 	snprintf (cinfo.producer_app_version, sizeof (cinfo.producer_app_version), "Test producer app version") ;
 	snprintf (cinfo.user_def, sizeof (cinfo.user_def), "test user def test test") ;
