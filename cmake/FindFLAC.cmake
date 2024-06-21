@@ -14,7 +14,7 @@ endif ()
 find_package (Ogg QUIET)
 
 find_package (PkgConfig QUIET)
-pkg_check_modules(PC_FLAC QUIET flac)
+pkg_check_modules(PC_FLAC QUIET flac>=1.4)
 
 set(FLAC_VERSION ${PC_FLAC_VERSION})
 
