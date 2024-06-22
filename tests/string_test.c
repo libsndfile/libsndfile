@@ -213,6 +213,7 @@ static const char
 	long_artist	[]	= "The artist who kept on changing its name",
 	genre		[]	= "The genre",
 	trackno		[]	= "Track three",
+	discno		[]	= "2",
 	id3v1_genre	[]	= "Rock",
 	year		[]	= "2001" ;
 
@@ -410,6 +411,7 @@ string_start_test (const char *filename, int formattype)
 	sf_set_string (file, SF_STR_COMMENT, comment) ;
 	sf_set_string (file, SF_STR_ALBUM, album) ;
 	sf_set_string (file, SF_STR_LICENSE, license) ;
+	sf_set_string (file, SF_STR_DISCNUMBER, discno) ;
 	if (typemajor == SF_FORMAT_MPEG)
 	{	sf_set_string (file, SF_STR_GENRE, id3v1_genre) ;
 		sf_set_string (file, SF_STR_DATE, year) ;
@@ -515,6 +517,16 @@ string_start_test (const char *filename, int formattype)
 		{	if (errors++ == 0)
 				puts ("\n") ;
 			printf ("    Bad album     : %s\n", NULL_PRINTF_CHECK(cptr)) ;
+			} ;
+		} ;
+
+	if (typemajor != SF_FORMAT_CAF && typemajor != SF_FORMAT_AIFF)
+	{
+		cptr = sf_get_string (file, SF_STR_DISCNUMBER) ;
+		if (cptr == NULL || strcmp (discno, cptr) != 0)
+		{	if (errors++ == 0)
+				puts ("\n") ;
+			printf ("    Bad discno    : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 			} ;
 		} ;
 
@@ -926,7 +938,7 @@ string_identity_test (const char *filename, int typemajor)
 		album,
 		NULL, /* license */
 		trackno,
-		"2", /* discnumber */
+		discno,
 		"Test album artist",
 		"Test performer",
 		"Test label",
