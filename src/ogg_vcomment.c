@@ -49,6 +49,11 @@ static STR_PAIR vorbiscomment_mapping [] =
 	{	SF_STR_ALBUM,		"ALBUM"			},
 	{	SF_STR_LICENSE,		"LICENSE",		},
 	{	SF_STR_TRACKNUMBER,	"TRACKNUMBER",	},
+	{	SF_STR_DISCNUMBER,	"DISCNUMBER",	},
+	{	SF_STR_ALBUMARTIST,	"ALBUMARTIST",	},
+	{	SF_STR_PERFORMER,	"PERFORMER",	},
+	{	SF_STR_LABEL,		"LABEL",		},
+	{	SF_STR_ISRC,		"ISRC",			},
 	{	SF_STR_GENRE,		"GENRE",		},
 	{	0,					NULL,			},
 } ;
