@@ -476,9 +476,10 @@ AS_IF([test "x$enable_alsa" != "xno"], [
 dnl ====================================================================================
 dnl  Check for Sndio.
 
+HAVE_SNDIO_H=0
 AS_IF([test "x$enable_sndio" != "xno"], [
 		PKG_CHECK_MODULES([SNDIO], [sndio], [
-				AC_DEFINE([HAVE_SNDIO_H], [1], [Set to 1 if <sndio.h> is available.])
+				HAVE_SNDIO_H=1
 				ac_cv_sndio="yes"
 			], [
 				ac_cv_sndio="no"
@@ -494,6 +495,8 @@ AS_IF([test "x$enable_sndio" != "xno"], [
 					])
 			])
 	])
+
+AC_DEFINE_UNQUOTED([HAVE_SNDIO_H], [${HAVE_SNDIO_H}], [Set to 1 if <sndio.h> is available.])
 
 dnl ====================================================================================
 dnl  Test for sanity when cross-compiling.
