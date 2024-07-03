@@ -112,6 +112,22 @@ main (void)
 	short_dbl_scale_write_test	("short_dbl.au"	, SF_ENDIAN_BIG		| SF_FORMAT_AU | SF_FORMAT_DOUBLE) ;
 	int_dbl_scale_write_test	("int_dbl.au"	, SF_ENDIAN_LITTLE	| SF_FORMAT_AU | SF_FORMAT_DOUBLE) ;
 
+	if (HAVE_WAVPACK)
+	{	flt_scale_clip_test_08 ("scale_clip_s8.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_S8, 1.0 * 0x80) ;
+		flt_scale_clip_test_08 ("scale_clip_u8.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_U8, 1.0 * 0x80) ;
+		flt_scale_clip_test_16 ("scale_clip_16.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_16, 1.0 * 0x8000) ;
+		flt_scale_clip_test_24 ("scale_clip_24.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_24, 1.0 * 0x800000) ;
+		flt_scale_clip_test_32 ("scale_clip_32.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_32, 1.0 * 0x80000000) ;
+
+		dbl_scale_clip_test_08 ("scale_clip_s8.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_S8, 1.0 * 0x80) ;
+		dbl_scale_clip_test_08 ("scale_clip_u8.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_U8, 1.0 * 0x80) ;
+		dbl_scale_clip_test_16 ("scale_clip_16.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_16, 1.0 * 0x8000) ;
+		dbl_scale_clip_test_24 ("scale_clip_24.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_24, 1.0 * 0x800000) ;
+		dbl_scale_clip_test_32 ("scale_clip_32.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_32, 1.0 * 0x80000000) ;
+		}
+	else
+		puts ("    No Wavpack tests because Wavpack support was not compiled in.") ;
+
 	return 0 ;
 } /* main */
 

@@ -75,6 +75,7 @@ main (int argc, char *argv [])
 		printf ("    Where <test> is one of the following:\n") ;
 		printf ("           wav  - test WAV file peak chunk\n") ;
 		printf ("           aiff - test AIFF file PEAK chunk\n") ;
+		printf ("           wvpk - test WavPack file\n") ;
 		printf ("           all  - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -232,6 +233,14 @@ main (int argc, char *argv [])
 			update_header_before_write_test ("header.flac", SF_FORMAT_FLAC) ;
 		else
 			puts ("    No FLAC tests because FLAC support was not compiled in.") ;
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "wvpk"))
+	{	if (HAVE_WAVPACK)
+			update_header_before_write_test ("header.wv", SF_FORMAT_WAVPACK) ;
+		else
+			puts ("    No WavPack tests because WavPack support was not compiled in.") ;
 		test_count++ ;
 		} ;
 
