@@ -1421,12 +1421,17 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 
 		case SFC_GET_CHANNEL_MAP_INFO :
 			if (psf->channel_map == NULL)
-				return SF_FALSE ;
 
 			if (data == NULL || datasize != SIGNED_SIZEOF (psf->channel_map [0]) * psf->sf.channels)
 			{	psf->error = SFE_BAD_COMMAND_PARAM ;
 				return SF_FALSE ;
 				} ;
+
+			if (datasize > SIGNED_SIZEOF (psf->channel_map [0]) * psf->sf.channels)
+			{
+				psf->error = SFE_BAD_COMMAND_PARAM ;
+				return SF_FALSE ;
+			} ;
 
 			memcpy (data, psf->channel_map, datasize) ;
 			return SF_TRUE ;
