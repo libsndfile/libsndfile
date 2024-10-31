@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 SCRIPT_DIR=$(dirname $0)
-TEST_DIR="/data/local/tmp/libaudio/test"
+
+LIB_NAME="sndfile"
+TEST_DIR="/data/local/tmp/lib${LIB_NAME}/test"
 
 # remove existing test files
 adb $@ shell "rm -r $TEST_DIR" > /dev/null
@@ -10,7 +12,7 @@ ABIS=`adb $@ shell getprop ro.product.cpu.abilist`
 
 print_message() {
   echo "[==========================================================]"
-  echo "| [libsndfile]: $1"
+  echo "| [lib${LIB_NAME}]: $1"
   echo "[==========================================================]"
 }
 

@@ -1,5 +1,9 @@
 @file:Suppress("UnstableApiUsage")
 
+require(gradle.gradleVersion == "8.9") {
+    "Gradle version 8.9 required (current version: ${gradle.gradleVersion})"
+}
+
 plugins {
     alias(libs.plugins.library)
     id("maven-publish")
@@ -68,7 +72,11 @@ android {
 }
 
 tasks.register<Exec>(getTestTaskName()) {
-    commandLine("./android-test.sh")
+    commandLine("./ndk-test.sh")
+}
+
+tasks.named<Delete>("clean") {
+    delete.add(".cxx")
 }
 
 publishing {
@@ -85,17 +93,21 @@ publishing {
 }
 
 afterEvaluate {
-    tasks.named("assembleRelease").configure {
+    tasks.named("preBuild").configure {
         mustRunAfter("clean")
     }
     tasks.named(getTestTaskName()).configure {
         dependsOn("clean", "assembleRelease")
     }
-    tasks.named("publish${project.name.cap()}PublicationToMavenLocal").configure {
+
+    tasks.named("generatePomFileFor${project.name.cap()}Publication") {
+        mustRunAfter("assembleRelease")
+    }
+    tasks.named("publishToMavenLocal").configure {
         dependsOn("clean", "assembleRelease")
     }
 
-    // suggests running ":libsndfileTest" task instead of default testing tasks
+    // suggests running ":ndkTest" task instead of default testing tasks
     listOf(
         "check",
         "test",
@@ -113,7 +125,7 @@ afterEvaluate {
     }
 }
 
-fun getTestTaskName(): String = "libsndfileTest"
+fun getTestTaskName(): String = "ndkTest"
 
 fun isTestBuild(): Boolean = gradle.startParameter.taskNames.contains(getTestTaskName())
 
