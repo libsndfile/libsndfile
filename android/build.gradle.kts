@@ -26,15 +26,16 @@ android {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
         externalNativeBuild {
-            // build static libs and testing binaries only when running :libsndfileTest
+            // build static libs and testing binaries only when running :ndkTest
             val buildSharedLibs = if (isTestBuild()) "OFF" else "ON"
             val buildTesting = if (isTestBuild()) "ON" else "OFF"
 
             cmake {
                 cppFlags += "-std=c++17"
                 arguments += "-DANDROID_STL=c++_shared"
-                arguments += "-DBUILD_SHARED_LIBS=$buildSharedLibs"
+                arguments += "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
 
+                arguments += "-DBUILD_SHARED_LIBS=$buildSharedLibs"
                 arguments += "-DBUILD_TESTING=$buildTesting"
                 arguments += "-DBUILD_PROGRAMS=OFF"
                 arguments += "-DBUILD_EXAMPLES=OFF"
