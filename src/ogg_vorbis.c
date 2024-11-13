@@ -403,7 +403,7 @@ vorbis_close (SF_PRIVATE *psf)
 {	OGG_PRIVATE* odata = psf->container_data ;
 	VORBIS_PRIVATE *vdata = psf->codec_data ;
 
-	if (odata == NULL || vdata == NULL)
+	if (odata == NULL || vdata == NULL || vdata->vdsp.vi == NULL)
 		return 0 ;
 
 	/*	Clean up this logical bitstream ; before exit we should see if we're
