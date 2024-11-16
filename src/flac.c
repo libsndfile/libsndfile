@@ -420,6 +420,11 @@ sf_flac_meta_get_vorbiscomments (SF_PRIVATE *psf, const FLAC__StreamMetadata *me
 		{ "album", SF_STR_ALBUM },
 		{ "license", SF_STR_LICENSE },
 		{ "tracknumber", SF_STR_TRACKNUMBER },
+		{ "discnumber", SF_STR_DISCNUMBER },
+		{ "albumartist", SF_STR_ALBUMARTIST },
+		{ "performer", SF_STR_PERFORMER },
+		{ "label", SF_STR_LABEL },
+		{ "isrc", SF_STR_ISRC },
 		{ "genre", SF_STR_GENRE }
 		} ;
 
@@ -636,6 +641,21 @@ flac_write_strings (SF_PRIVATE *psf, FLAC_PRIVATE* pflac)
 				break ;
 			case SF_STR_TRACKNUMBER :
 				key = "tracknumber" ;
+				break ;
+			case SF_STR_DISCNUMBER :
+				key = "discnumber" ;
+				break ;
+			case SF_STR_ALBUMARTIST :
+				key = "albumartist" ;
+				break ;
+			case SF_STR_PERFORMER :
+				key = "performer" ;
+				break ;
+			case SF_STR_LABEL :
+				key = "label" ;
+				break ;
+			case SF_STR_ISRC :
+				key = "isrc" ;
 				break ;
 			case SF_STR_GENRE :
 				key = "genre" ;
