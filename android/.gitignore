@@ -1,0 +1,6 @@
+local.properties
+.cxx/
+.gradle/
+.idea/
+build/
+
