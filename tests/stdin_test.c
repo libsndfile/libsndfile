@@ -124,6 +124,13 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
+#if HAVE_WAVPACK
+	if (do_all || ! strcmp (argv [1], "wv"))
+	{	stdin_test	(SF_FORMAT_WAVPACK, PIPE_TEST_LEN) ;
+		test_count++ ;
+		} ;
+#endif
+
 	if (test_count == 0)
 	{	fprintf (stderr, "\n*****************************************\n") ;
 		fprintf (stderr, "*  stdin_test : No '%s' test defined.\n", argv [1]) ;
