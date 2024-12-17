@@ -32,6 +32,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "sfendian.h"
@@ -45,12 +46,6 @@
 #include "ALACBitUtilities.h"
 #include "ALACAudioTypes.h"
 #include "EndianPortable.h"
-
-typedef enum
-{
-	false = 0,
-	true = 1
-} bool ;
 
 static void	GetConfig (ALAC_ENCODER *p, ALACSpecificConfig * config) ;
 
