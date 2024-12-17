@@ -669,7 +669,7 @@ win32_play (int argc, char *argv [])
 **	Sndio.
 */
 
-#if HAVE_SNDIO_H
+#if HAVE_SNDIO_H && !(defined (__linux__) || defined (__FreeBSD_kernel__) || defined (__FreeBSD__) || defined (__riscos__))
 
 static void
 sndio_play (int argc, char *argv [])
