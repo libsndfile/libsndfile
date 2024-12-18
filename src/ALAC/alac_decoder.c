@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "alac_codec.h"
@@ -39,11 +40,6 @@
 
 #include "ALACBitUtilities.h"
 #include "EndianPortable.h"
-
-typedef enum
-{	false = 0,
-	true = 1
-} bool ;
 
 // constants/data
 const uint32_t kMaxBitDepth = 32 ;			// max allowed bit depth is 32
