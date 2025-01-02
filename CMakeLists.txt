@@ -390,6 +390,12 @@ target_link_libraries (sndfile-OBJ
 		$<$<BOOL:${HAVE_MPEG}>:mp3lame::mp3lame>
 	)
 
+# Compile with position independent code if the user requested a shared lib, i.e. no PIC if static requested.
+# This is cmakes default behavior, but here it's explicitly required due to the use of sndfile-OBJ as object library,
+# which would otherwise always be compiled without PIC.
+set_target_properties (sndfile-OBJ PROPERTIES
+	POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS})
+
 add_library (sndfile 
 	$<TARGET_OBJECTS:sndfile-OBJ>
 	${sndfile_HDRS})
@@ -399,6 +405,7 @@ add_library (SndFile::sndfile ALIAS sndfile)
 install( TARGETS sndfile-OBJ
     EXPORT SndFileTargets
     OBJECTS )
+
 target_link_libraries (sndfile PUBLIC sndfile-OBJ)
 
 set_target_properties (sndfile PROPERTIES
