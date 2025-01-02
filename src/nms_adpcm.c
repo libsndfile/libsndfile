@@ -38,61 +38,8 @@
 #include	"sndfile.h"
 #include	"sfendian.h"
 #include	"common.h"
+#include	"nms_adpcm.h"
 
-
-#define NMS_SAMPLES_PER_BLOCK 160
-#define NMS_BLOCK_SHORTS_32 41
-#define NMS_BLOCK_SHORTS_24 31
-#define NMS_BLOCK_SHORTS_16 21
-
-/* Variable names from ITU G.726 spec */
-struct nms_adpcm_state
-{	/* Log of the step size multiplier. Operated on by codewords. */
-	short yl ;
-
-	/* Quantizer step size multiplier. Generated from yl. */
-	short y ;
-
-	/* Coefficients of the pole predictor */
-	short a [2] ;
-
-	/* Coefficients of the zero predictor  */
-	short b [6] ;
-
-	/* Previous quantized deltas (multiplied by 2^14) */
-	short d_q [7] ;
-
-	/* d_q [x] + s_ez [x], used by the pole-predictor for signs only. */
-	short p [3] ;
-
-	/* Previous reconstructed signal values. */
-	short s_r [2] ;
-
-	/* Zero predictor components of the signal estimate. */
-	short s_ez ;
-
-	/* Signal estimate, (including s_ez). */
-	short s_e ;
-
-	/* The most recent codeword (enc:generated, dec:inputted) */
-	char Ik ;
-
-	char parity ;
-
-	/*
-	** Offset into code tables for the bitrate.
-	** 2-bit words: +0
-	** 3-bit words: +8
-	** 4-bit words: +16
-	*/
-	int t_off ;
-} ;
-
-enum nms_enc_type
-{	NMS16,
-	NMS24,
-	NMS32
-} ;
 
 typedef struct
 {	struct nms_adpcm_state state ;
@@ -143,19 +90,12 @@ static short table_step_search [] =
 */
 
 static void nms_adpcm_update (struct nms_adpcm_state *s) ;
-static void nms_adpcm_codec_init (struct nms_adpcm_state *s, enum nms_enc_type type) ;
 
 static int16_t nms_adpcm_reconstruct_sample (struct nms_adpcm_state *s, uint8_t I) ;
-static uint8_t nms_adpcm_encode_sample (struct nms_adpcm_state *s, int16_t sl) ;
-static int16_t nms_adpcm_decode_sample (struct nms_adpcm_state *s, uint8_t code) ;
 
 static void nms_adpcm_block_pack_16 (const int16_t codewords [], uint16_t block [], int16_t rms) ;
 static void nms_adpcm_block_pack_24 (const int16_t codewords [], uint16_t block [], int16_t rms) ;
 static void nms_adpcm_block_pack_32 (const int16_t codewords [], uint16_t block [], int16_t rms) ;
-
-static void nms_adpcm_block_unpack_16 (const uint16_t block [], int16_t codewords [], int16_t *rms) ;
-static void nms_adpcm_block_unpack_24 (const uint16_t block [], int16_t codewords [], int16_t *rms) ;
-static void nms_adpcm_block_unpack_32 (const uint16_t block [], int16_t codewords [], int16_t *rms) ;
 
 static int nms_adpcm_decode_block (SF_PRIVATE *psf, NMS_ADPCM_PRIVATE *pnms, uint16_t block [], int16_t samples []) ;
 static int nms_adpcm_encode_block (SF_PRIVATE *psf, NMS_ADPCM_PRIVATE *pnms, int16_t samples [], uint16_t block []) ;
@@ -298,7 +238,7 @@ nms_adpcm_reconstruct_sample (struct nms_adpcm_state *s, uint8_t I)
 	return s->s_r [0] ;
 } /* nms_adpcm_reconstruct_sample */
 
-static void
+void
 nms_adpcm_codec_init (struct nms_adpcm_state *s, enum nms_enc_type type)
 {	memset (s, 0, sizeof (struct nms_adpcm_state)) ;
 	s->t_off = (type == NMS32) ? 16 : (type == NMS24) ? 8 : 0 ;
@@ -310,7 +250,7 @@ nms_adpcm_codec_init (struct nms_adpcm_state *s, enum nms_enc_type type)
 ** Encode a linear 16-bit pcm sample into a 2, 3, or 4 bit NMS-ADPCM codeword
 ** using and updating the predictor state.
 */
-static uint8_t
+uint8_t
 nms_adpcm_encode_sample (struct nms_adpcm_state *s, int16_t sl)
 {	/* Variable names from ITU G.726 spec */
 	int_fast32_t d ;
@@ -404,7 +344,7 @@ nms_adpcm_encode_sample (struct nms_adpcm_state *s, int16_t sl)
 ** Given a 2,3 or 4-bit NMS-ADPCM codeword, decode the next 16-bit linear PCM
 ** sample using and updating the predictor state.
 */
-static int16_t
+int16_t
 nms_adpcm_decode_sample (struct nms_adpcm_state *s, uint8_t I)
 {	int_fast32_t sl ;
 
@@ -448,7 +388,7 @@ nms_adpcm_decode_sample (struct nms_adpcm_state *s, uint8_t I)
 ** each to its sequential array index of codewords. If rms is non-null, the
 ** read block rms is copied to its location.
 */
-static void
+void
 nms_adpcm_block_unpack_16 (const uint16_t block [], int16_t codewords [], int16_t *rms)
 {	int k ;
 	uint16_t w = 0 ;
@@ -481,7 +421,7 @@ nms_adpcm_block_unpack_16 (const uint16_t block [], int16_t codewords [], int16_
 ** each to its sequential array index of codewords. If rms is non-null, the
 ** read block rms is copied to its location.
 */
-static void
+void
 nms_adpcm_block_unpack_24 (const uint16_t block [], int16_t codewords [], int16_t *rms)
 {	int k ;
 	uint16_t w = 0, residual = 0 ;
@@ -518,7 +458,7 @@ nms_adpcm_block_unpack_24 (const uint16_t block [], int16_t codewords [], int16_
 ** each to its sequential array index of codewords. If rms is non-null, the
 ** read block rms is copied to its location.
 */
-static void
+void
 nms_adpcm_block_unpack_32 (const uint16_t block [], int16_t codewords [], int16_t *rms)
 {	int k ;
 	uint16_t w = 0 ;

@@ -21,9 +21,9 @@
 
 #include <stdio.h>
 
+#include "common.h"
 #include "test_main.h"
-
-#include "nms_adpcm.c"
+#include "nms_adpcm.h"
 
 static const short pcm_data_src [] =
 {	505, 743, 805, 409, 101, -552, -709, -679,
