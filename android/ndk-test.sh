@@ -33,7 +33,7 @@ for ABI in $(echo $ABIS | tr "," "\n"); do
     popd > /dev/null
 
     # run tests
-    adb $@ shell -t "cd $TEST_ABI_DIR && export LD_LIBRARY_PATH=. && find . -type f -not -name '*.so' -executable -exec {} all \;"
+    adb $@ shell -t "cd $TEST_ABI_DIR && export LD_LIBRARY_PATH=. && find . -type f -not -name '*.so' -exec {} all \;"
     echo
 done
 

@@ -3,4 +3,6 @@ local.properties
 .gradle/
 .idea/
 build/
-
+gradle/wrapper
+gradlew
+gradlew.bat

@@ -20,5 +20,20 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        listOf(
+            "jg-hot" to "libogg-android",
+            "jg-hot" to "libvorbis-android",
+            "jg-hot" to "libopus-android",
+            "jg-hot" to "libflac-android",
+        ).forEach { (user, repo) ->
+            maven {
+                name = "gpr:$repo"
+                url = uri("https://maven.pkg.github.com/$user/$repo")
+                credentials {
+                    username = extra.properties["gpr.user"].toString()
+                    password = extra.properties["gpr.key"].toString()
+                }
+            }
+        }
     }
 }

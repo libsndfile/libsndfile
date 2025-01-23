@@ -37,6 +37,10 @@ android {
 
                 arguments += "-DBUILD_SHARED_LIBS=$buildSharedLibs"
                 arguments += "-DBUILD_TESTING=$buildTesting"
+                arguments += "-DENABLE_EXTERNAL_LIBS=ON"
+                arguments += "-DENABLE_MPEG=OFF"
+                arguments += "-DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON"
+
                 arguments += "-DBUILD_PROGRAMS=OFF"
                 arguments += "-DBUILD_EXAMPLES=OFF"
                 arguments += "-DENABLE_CPACK=OFF"
@@ -55,6 +59,7 @@ android {
     }
 
     buildFeatures {
+        prefab = true
         prefabPublishing = true
     }
 
@@ -72,25 +77,40 @@ android {
     }
 }
 
+dependencies {
+    // ogg is a transitive dependency or vorbis, so we don't need to specify it explicitly
+    implementation(libs.vorbis)
+    implementation(libs.opus)
+    implementation(libs.flac)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>(project.name) {
+            artifact("${project.projectDir}/build/outputs/aar/${project.name}-release.aar")
+            artifactId = "${project.name}-android"
+
+            pom {
+                withXml {
+                    val dependencies = asNode().appendNode("dependencies")
+                    configurations.implementation.get().allDependencies.forEach {
+                        val dependency = dependencies.appendNode("dependency")
+                        dependency.appendNode("groupId", it.group)
+                        dependency.appendNode("artifactId", it.name)
+                        dependency.appendNode("version", it.version)
+                    }
+                }
+            }
+        }
+    }
+}
+
 tasks.register<Exec>(getTestTaskName()) {
     commandLine("./ndk-test.sh")
 }
 
 tasks.named<Delete>("clean") {
     delete.add(".cxx")
-}
-
-publishing {
-    repositories {
-        mavenLocal()
-    }
-
-    publications {
-        create<MavenPublication>(project.name) {
-            artifact("${project.projectDir}/build/outputs/aar/${project.name}-release.aar")
-            artifactId = "${project.name}-android"
-        }
-    }
 }
 
 afterEvaluate {
