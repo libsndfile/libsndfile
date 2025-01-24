@@ -6,6 +6,8 @@
     "Ogg",
     "Vorbis",
     "Opus",
-    "FLAC"
+    "FLAC",
+    "MPG123",
+    "mp3lame"
   ]
 }

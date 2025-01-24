@@ -4,7 +4,9 @@
     "//Vorbis:vorbis",
     "//Vorbis:vorbisenc",
     "//Opus:opus",
-    "//FLAC:FLAC"
+    "//FLAC:FLAC",
+    "//MPG123:libmpg123",
+    "//mp3lame:mp3lame"
   ],
   "android": {}
 }

@@ -11,7 +11,7 @@ plugins {
 
 // project.name ("sndfile") defined in settings.gradle.kts
 project.group = "com.meganerd"
-project.version = "1.2.2-android-rc2"
+project.version = "1.2.2-android-r1"
 
 val abis = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
 
@@ -40,7 +40,7 @@ android {
                 arguments += "-DBUILD_SHARED_LIBS=$buildSharedLibs"
                 arguments += "-DBUILD_TESTING=$buildTesting"
                 arguments += "-DENABLE_EXTERNAL_LIBS=ON"
-                arguments += "-DENABLE_MPEG=OFF"
+                arguments += "-DENABLE_MPEG=ON"
                 arguments += "-DCMAKE_FIND_PACKAGE_PREFER_CONFIG=ON"
 
                 arguments += "-DBUILD_PROGRAMS=OFF"
@@ -70,6 +70,8 @@ dependencies {
     implementation(libs.vorbis)
     implementation(libs.opus)
     implementation(libs.flac)
+    implementation(libs.mpg123)
+    implementation(libs.lame)
 }
 
 tasks.register<Zip>("prefabAar") {

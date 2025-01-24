@@ -25,6 +25,8 @@ dependencyResolutionManagement {
             "jg-hot" to "libvorbis-android",
             "jg-hot" to "libopus-android",
             "jg-hot" to "libflac-android",
+            "jg-hot" to "libmpg123-android",
+            "jg-hot" to "libmp3lame-android",
         ).forEach { (user, repo) ->
             maven {
                 name = "gpr:$repo"
