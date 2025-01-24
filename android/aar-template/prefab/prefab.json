@@ -1,0 +1,11 @@
+{
+  "schema_version": 2,
+  "name": "Sndfile",
+  "version": "1.2.2",
+  "dependencies": [
+    "Ogg",
+    "Vorbis",
+    "Opus",
+    "FLAC"
+  ]
+}

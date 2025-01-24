@@ -13,6 +13,8 @@ plugins {
 project.group = "com.meganerd"
 project.version = "1.2.2-android-rc2"
 
+val abis = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+
 android {
     namespace = "${project.group}.${project.name}"
     compileSdk = libs.versions.compilesdk.get().toInt()
@@ -23,7 +25,7 @@ android {
         buildToolsVersion = libs.versions.buildtools.get()
         ndkVersion = libs.versions.ndk.get()
         ndk {
-            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            abiFilters += abis
         }
         externalNativeBuild {
             // build static libs and testing binaries only when running :ndkTest
@@ -53,54 +55,37 @@ android {
 
     externalNativeBuild {
         cmake {
-            path = file("${project.projectDir.parentFile}/CMakeLists.txt")
+            path = file("${projectDir.parentFile}/CMakeLists.txt")
             version = libs.versions.cmake.get()
         }
     }
 
     buildFeatures {
         prefab = true
-        prefabPublishing = true
-    }
-
-    prefab {
-        create(project.name) {
-            headers = "${project.projectDir.parentFile}/include"
-        }
-    }
-
-    packaging {
-        // avoids duplicating libs in .aar due to using prefab
-        jniLibs {
-            excludes += "**/*"
-        }
     }
 }
 
 dependencies {
-    // ogg is a transitive dependency or vorbis, so we don't need to specify it explicitly
+    // ogg is a transitive dependency of vorbis, so it doesn't need to be specified explicitly
     implementation(libs.vorbis)
     implementation(libs.opus)
     implementation(libs.flac)
 }
 
-publishing {
-    publications {
-        create<MavenPublication>(project.name) {
-            artifact("${project.projectDir}/build/outputs/aar/${project.name}-release.aar")
-            artifactId = "${project.name}-android"
+tasks.register<Zip>("prefabAar") {
+    archiveFileName = "${project.name}-release.aar"
+    destinationDirectory = file("build/outputs/prefab-aar")
 
-            pom {
-                withXml {
-                    val dependencies = asNode().appendNode("dependencies")
-                    configurations.implementation.get().allDependencies.forEach {
-                        val dependency = dependencies.appendNode("dependency")
-                        dependency.appendNode("groupId", it.group)
-                        dependency.appendNode("artifactId", it.name)
-                        dependency.appendNode("version", it.version)
-                    }
-                }
-            }
+    from("aar-template")
+    from("${projectDir.parentFile}/include") {
+        include("**/*.h")
+        include("**/*.hh")
+        into("prefab/modules/${project.name}/include")
+    }
+    abis.forEach { abi ->
+        from("build/intermediates/cmake/release/obj/$abi") {
+            include("lib${project.name}.so")
+            into("prefab/modules/${project.name}/libs/android.$abi")
         }
     }
 }
@@ -114,33 +99,58 @@ tasks.named<Delete>("clean") {
 }
 
 afterEvaluate {
-    tasks.named("preBuild").configure {
+    tasks.named("preBuild") {
         mustRunAfter("clean")
     }
-    tasks.named(getTestTaskName()).configure {
-        dependsOn("clean", "assembleRelease")
+
+    tasks.named("prefabAar") {
+        dependsOn("externalNativeBuildRelease")
     }
 
     tasks.named("generatePomFileFor${project.name.cap()}Publication") {
-        mustRunAfter("assembleRelease")
+        mustRunAfter("prefabAar")
     }
-    tasks.named("publishToMavenLocal").configure {
-        dependsOn("clean", "assembleRelease")
+    tasks.named("publish") {
+        dependsOn("clean", "prefabAar")
     }
 
-    // suggests running ":ndkTest" task instead of default testing tasks
-    listOf(
-        "check",
-        "test",
-        "testDebugUnitTest",
-        "testReleaseUnitTest",
-        "connectedCheck",
-        "connectedAndroidTest",
-        "connectedDebugAndroidTest",
-    ).forEach {
-        tasks.named(it) {
-            doLast {
-                println(":$it task not supported; use :${getTestTaskName()} to run tests via adb")
+    tasks.named(getTestTaskName()) {
+        dependsOn("clean", "externalNativeBuildRelease")
+    }
+}
+
+
+publishing {
+    val githubPackagesUrl = "https://maven.pkg.github.com/jg-hot/libsndfile-android"
+
+    repositories {
+        maven {
+            url = uri(githubPackagesUrl)
+            credentials {
+                username = properties["gpr.user"]?.toString()
+                password = properties["gpr.key"]?.toString()
+            }
+        }
+    }
+
+    publications {
+        create<MavenPublication>(project.name) {
+            artifact("build/outputs/prefab-aar/${project.name}-release.aar")
+            artifactId = "${project.name}-android"
+
+            pom {
+                distributionManagement {
+                    downloadUrl = githubPackagesUrl
+                }
+                withXml {
+                    val dependencies = asNode().appendNode("dependencies")
+                    configurations.implementation.get().dependencies.forEach {
+                        val dependency = dependencies.appendNode("dependency")
+                        dependency.appendNode("groupId", it.group)
+                        dependency.appendNode("artifactId", it.name)
+                        dependency.appendNode("version", it.version)
+                    }
+                }
             }
         }
     }

@@ -1,0 +1,10 @@
+{
+  "export_libraries": [
+    "//Ogg:ogg",
+    "//Vorbis:vorbis",
+    "//Vorbis:vorbisenc",
+    "//Opus:opus",
+    "//FLAC:FLAC"
+  ],
+  "android": {}
+}
