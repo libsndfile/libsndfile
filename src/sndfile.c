@@ -968,6 +968,17 @@ sf_format_check	(const SF_INFO *info)
 				if (subformat == SF_FORMAT_MPEG_LAYER_I || subformat == SF_FORMAT_MPEG_LAYER_II || subformat == SF_FORMAT_MPEG_LAYER_III)
 					return 1 ;
 				break ;
+
+		case SF_FORMAT_WAVPACK :
+				/* WavPack is strictly little endian. */
+				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
+					return 0 ;
+				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
+					return 1 ;
+				if (subformat == SF_FORMAT_FLOAT)
+					return 1 ;
+				break ;
+
 		default : break ;
 		} ;
 
@@ -2788,6 +2799,10 @@ retry:
 		return 0 ;
 		} ;
 
+	/* reading wavpack from fifo stream requires full header, only read necessary data here */
+	if (buffer [0] == MAKE_MARKER ('w', 'v', 'p', 'k'))
+		return SF_FORMAT_WAVPACK ;
+
 	if ((buffer [0] == MAKE_MARKER ('R', 'I', 'F', 'F') || buffer [0] == MAKE_MARKER ('R', 'I', 'F', 'X'))
 			&& buffer [2] == MAKE_MARKER ('W', 'A', 'V', 'E'))
 		return SF_FORMAT_WAV ;
@@ -2890,6 +2905,9 @@ retry:
 	/* ID3v2 tags + MPEG */
 	if (psf->id3_header.len > 0 && (format = identify_mpeg (buffer [0])) != 0)
 		return format ;
+
+	if (buffer [0] == MAKE_MARKER ('w', 'v', 'p', 'k'))
+		return SF_FORMAT_WAVPACK ;
 
 	/* Turtle Beach SMP 16-bit */
 	if (buffer [0] == MAKE_MARKER ('S', 'O', 'U', 'N') && buffer [1] == MAKE_MARKER ('D', ' ', 'S', 'A'))
@@ -3272,6 +3290,10 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 
 		case	SF_FORMAT_MPEG :
 				error = mpeg_open (psf) ;
+				break ;
+
+		case	SF_FORMAT_WAVPACK :
+				error = wavpack_open (psf) ;
 				break ;
 
 		/* Lite remove end */

@@ -66,6 +66,7 @@ main (int argc, char *argv [])
 		printf ("           flac - test adding strings to FLAC files\n") ;
 		printf ("           ogg  - test adding strings to OGG files\n") ;
 		printf ("           opus - test adding strings to OPUS files\n") ;
+		printf ("           wvpk - test adding strings to WavPack files\n") ;
 		printf ("           all  - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -177,6 +178,17 @@ main (int argc, char *argv [])
 		string_short_rdwr_test ("short_rdwr.w64", SF_FORMAT_W64) ;
 		string_header_update ("header_update.w64", SF_FORMAT_W64) ;
 		*/
+		test_count++ ;
+		} ;
+
+	if (do_all || ! strcmp (argv [1], "wvpk"))
+	{	if (HAVE_WAVPACK)
+		{	string_start_test ("strings.wv", SF_FORMAT_WAVPACK) ;
+			// string_start_end_test ("strings.wv", SF_FORMAT_WAVPACK) ;
+			string_multi_set_test ("multi.wv", SF_FORMAT_WAVPACK) ;
+			}
+		else
+			puts ("    No WavPack tests because WavPack support was not compiled in.") ;
 		test_count++ ;
 		} ;
 
