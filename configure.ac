@@ -477,23 +477,27 @@ dnl ============================================================================
 dnl  Check for Sndio.
 
 HAVE_SNDIO_H=0
-AS_IF([test "x$enable_sndio" != "xno"], [
-		PKG_CHECK_MODULES([SNDIO], [sndio], [
-				HAVE_SNDIO_H=1
-				ac_cv_sndio="yes"
-			], [
-				ac_cv_sndio="no"
-			])
-
-		AS_IF([test "x$ac_cv_sndio" = "xno"], [
-				AS_IF([test "x$enable_sndio" = "xyes"], [
-						dnl explicitly passed --enable-sndio, hence error out loud and clearly
-						AC_MSG_ERROR([You explicitly requested sndio support, but sndio could not be found!])
-                                        ], [
-						dnl did not explicitly pass --enable-sndio, relying on default automagic on
-						enable_sndio="no (auto)"
+AS_IF([test "x$alsa_works" != "xyes"], [
+		AS_IF([test "x$enable_sndio" != "xno"], [
+				PKG_CHECK_MODULES([SNDIO], [sndio], [
+						HAVE_SNDIO_H=1
+						ac_cv_sndio="yes"
+					], [
+						ac_cv_sndio="no"
+					])
+		
+				AS_IF([test "x$ac_cv_sndio" = "xno"], [
+						AS_IF([test "x$enable_sndio" = "xyes"], [
+								dnl explicitly passed --enable-sndio, hence error out loud and clearly
+								AC_MSG_ERROR([You explicitly requested sndio support, but sndio could not be found!])
+							], [
+								dnl did not explicitly pass --enable-sndio, relying on default automagic on
+								enable_sndio="no (auto)"
+							])
 					])
 			])
+	], [
+		AC_MSG_WARN([You have requested ALSA already, disable ALSA if you want to use Sndio.])
 	])
 
 AC_DEFINE_UNQUOTED([HAVE_SNDIO_H], [${HAVE_SNDIO_H}], [Set to 1 if <sndio.h> is available.])
