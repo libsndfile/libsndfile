@@ -256,6 +256,14 @@ typedef sf_count_t  (*sf_vio_write)       (const void *ptr, sf_count_t count, vo
 typedef sf_count_t  (*sf_vio_tell)        (void *user_data) ;
 ```
 
+Note that not all callbacks are required. If your stream is not seekable, set
+"seek", "get_filelen", and "tell" callbacks to NULL. In this case, the library
+will treat your stream as a non-seekable virtual pipe. Note that not all operations
+are available for pipes. For example you can open a WAV file for read but it's
+impossible to write WAV file to a pipe because the WAV format requires a length
+of file to be written at beginning of the file which is impossible without
+supporting of "seek".
+
 #### sf_vio_get_filelen
 
 ```c
@@ -263,6 +271,8 @@ typedef sf_count_t  (*sf_vio_get_filelen) (void *user_data) ;
 ```
 
 The virtual file context must return the length of the virtual file in bytes.
+This callback may be set to NULL in case "seek" is NULL. See description for
+the "sf_vio_seek" callback.
 
 #### sf_vio_seek
 
@@ -274,6 +284,9 @@ The virtual file context must seek to offset using the seek mode provided by
 whence which is one of SEEK_CUR, SEEK_SET, SEEK_END.
 
 The return value must contain the new offset in the file.
+If this callback is set to NULL, the library will treat your stream as
+a non-seekable virtual pipe. If so, the library will not use "tell" and
+"get_filelen" callbacks so they can be set to NULL as well.
 
 #### sf_vio_read
 
@@ -292,6 +305,7 @@ typedef sf_count_t  (*sf_vio_write)       (const void *ptr, sf_count_t count, vo
 
 The virtual file context must process "count" bytes stored in the buffer passed
 with ptr and return the count of actually processed bytes.
+This callback is only required when "mode" is either SFM_WRITE or SFM_RDWR.
 
 #### sf_vio_tell
 
@@ -300,6 +314,8 @@ typedef sf_count_t  (*sf_vio_tell)        (void *user_data) ;
 ```
 
 Return the current position of the virtual file context.
+This callback may be set to NULL in case "seek" is NULL. See description for
+the "sf_vio_seek" callback.
 
 ## Format Check Function {#chek}
 
