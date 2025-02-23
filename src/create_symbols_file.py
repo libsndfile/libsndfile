@@ -80,6 +80,7 @@ ALL_SYMBOLS = (
 	(	"sf_get_chunk_iterator",	103 ),
 	(	"sf_next_chunk_iterator",	104 ),
 	(	"sf_current_byterate",	110 )
+	(	"sf_get_format_check_failure_reason", 111 ),
 	)
 
 #-------------------------------------------------------------------------------
