@@ -1,0 +1,7 @@
+{
+  "abi": "arm64-v8a",
+  "api": 21,
+  "ndk": 27,
+  "stl": "none",
+  "static": false
+}
