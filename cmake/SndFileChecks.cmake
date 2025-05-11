@@ -249,5 +249,5 @@ if (DEFINED ENABLE_STATIC_RUNTIME)
 endif ()
 
 if (BUILD_SHARED_LIBS)
-	find_package (PythonInterp REQUIRED)
+	find_package (Python REQUIRED)
 endif()
