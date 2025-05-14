@@ -104,29 +104,12 @@ usage_exit (const char *progname)
 } /* usage_exit */
 
 static void
-report_format_error_exit (const char * argv0, SF_INFO * sfinfo)
-{	int old_format = sfinfo->format ;
-	int endian = sfinfo->format & SF_FORMAT_ENDMASK ;
-	int channels = sfinfo->channels ;
-
-	sfinfo->format = old_format & (SF_FORMAT_TYPEMASK | SF_FORMAT_SUBMASK) ;
-
-	if (endian && sf_format_check (sfinfo))
-	{	printf ("Error : output file format does not support %s endian-ness.\n", sfe_endian_name (endian)) ;
-		exit (1) ;
-		} ;
-
-	sfinfo->channels = 1 ;
-	if (sf_format_check (sfinfo))
-	{	printf ("Error : output file format does not support %d channels.\n", channels) ;
-		exit (1) ;
-		} ;
-
+report_format_error_exit (const char * argv0, const SF_INFO * sfinfo)
+{
 	printf ("\n"
-			"Error : output file format is invalid.\n"
-			"The '%s' container does not support '%s' codec data.\n"
+			"Error : output file format is invalid (%s).\n"
 			"Run '%s --help' for clues.\n\n",
-			sfe_container_name (sfinfo->format), sfe_codec_name (sfinfo->format), program_name (argv0)) ;
+			sf_get_format_check_failure_reason(sfinfo), program_name (argv0)) ;
 	exit (1) ;
 } /* report_format_error_exit */
 
