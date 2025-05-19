@@ -1,5 +1,16 @@
 cmake_minimum_required (VERSION 3.5...4.0)
 
+if(APPLE)
+    # The workaround for try_compile failing with code signing
+    # since cmake-3.18.2, not required
+    set(CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
+        ${CMAKE_TRY_COMPILE_PLATFORM_VARIABLES}
+        "CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED"
+        "CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED")
+    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED NO)
+    set(CMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED NO)
+endif()
+
 # MSVC runtime library flags are selected by an abstraction, CMake >= 3.15
 # This policy still need to be set even with cmake_minimum_required() command above.
 if (POLICY CMP0091)
@@ -511,6 +522,15 @@ if (BUILD_SHARED_LIBS)
 			else ()
 				target_link_options (sndfile PRIVATE "LINKER:-export-symbols ${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}")
 			endif()
+        elseif (APPLE)
+            add_dependencies (sndfile GENFILES)
+            if (CMAKE_VERSION VERSION_LESS 3.13)
+                set_property (TARGET sndfile APPEND_STRING PROPERTY
+                    LINK_FLAGS "-Wl"
+                    )
+            else ()
+                target_link_options (sndfile PRIVATE)
+            endif()
 		elseif (UNIX)
 			add_dependencies (sndfile GENFILES)
 			if (CMAKE_VERSION VERSION_LESS 3.13)
