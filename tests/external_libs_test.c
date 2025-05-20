@@ -186,7 +186,8 @@ flac_subset_test (void)
 	print_test_name (__func__, NULL) ;
 
 	for (samplerate = 65536 ; samplerate < 655350 ; samplerate *= 4)
-	{	sfinfo.samplerate	= samplerate ;
+	{	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+		sfinfo.samplerate	= samplerate ;
 		sfinfo.channels		= 1 ;
 		sfinfo.frames		= 0 ;
 		sfinfo.format = SF_FORMAT_FLAC | SF_FORMAT_PCM_16 ;

@@ -148,14 +148,13 @@ stdin_test	(int typemajor, int count)
 	SF_INFO		sfinfo ;
 	int			k, total, err ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	if (typemajor == SF_FORMAT_RAW)
 	{	sfinfo.samplerate	= 44100 ;
 		sfinfo.format		= SF_FORMAT_RAW | SF_FORMAT_PCM_16 ;
 		sfinfo.channels		= 1 ;
 		sfinfo.frames		= 0 ;
-		}
-	else
-		memset (&sfinfo, 0, sizeof (sfinfo)) ;
+		} ;
 
 	if ((file = sf_open_fd (fileno (stdin), SFM_READ, &sfinfo, SF_TRUE)) == NULL)
 	{	fprintf (stderr, "sf_open_fd failed with error : ") ;

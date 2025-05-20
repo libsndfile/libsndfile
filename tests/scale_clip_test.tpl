@@ -153,6 +153,7 @@ main (void)
 		data_out [k + HALF_BUFFER_SIZE] = data_out [k] * maxval ;
 		} ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
 	sfinfo.channels		= 1 ;

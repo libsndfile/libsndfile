@@ -169,6 +169,7 @@ ErrorStruct SndfileErrors [] =
 	{	SFE_AIFF_UNKNOWN_CHUNK	, "Error in AIFF file, unknown chunk." },
 	{	SFE_AIFF_COMM_CHUNK_SIZE, "Error in AIFF file, bad 'COMM' chunk size." },
 	{	SFE_AIFF_BAD_COMM_CHUNK , "Error in AIFF file, bad 'COMM' chunk." },
+	{	SFE_AIFF_WAVE_B4_COMM	, "Error in AIFF file. 'wave' chunk found before 'COMM' chunk." },
 	{	SFE_AIFF_PEAK_B4_COMM	, "Error in AIFF file. 'PEAK' chunk found before 'COMM' chunk." },
 	{	SFE_AIFF_BAD_PEAK		, "Error in AIFF file. Bad 'PEAK' chunk." },
 	{	SFE_AIFF_NO_SSND		, "Error in AIFF file, bad 'SSND' chunk." },
@@ -670,6 +671,8 @@ sf_format_check	(const SF_INFO *info)
 	switch (SF_CONTAINER (info->format))
 	{	case SF_FORMAT_WAV :
 				/* WAV now allows both endian, RIFF or RIFX (little or big respectively) */
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16)
 					return 1 ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
@@ -692,6 +695,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_WAVEX :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16)
@@ -705,9 +710,32 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_AIFF :
-				/* AIFF does allow both endian-nesses for PCM data.*/
-				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
+				switch (info->interop_mode)
+				{	case SF_INTEROP_MODE_DEFAULT :
+					case SF_INTEROP_MODE_APPLE :
+					case SF_INTEROP_MODE_FLAC :
+						break;
+
+					default : return 0 ;
+					} ;
+				/* AIFF allows endian-nesses for integer PCM data... */
+				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32) return 1 ;
+				if (info->interop_mode == SF_INTEROP_MODE_APPLE)
+				{	/* ...and also allows endian-nesses for double and
+					** float PCM, albeit only for SF_INTEROP_MODE_APPLE.
+					*/
+					if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
+						return 1 ;
+
+					/* For subformats that can be carried in both AIFF
+					** and AIFC, aiff.c treats SF_ENDIAN_BIG as a signal
+					** to write AIFC instead of AIFF. Permit this for
+					** SF_FORMAT_PCM_S8 also when Apple interoperability
+					** is desired.
+					*/
+					if (subformat == SF_FORMAT_PCM_S8 && endian == SF_ENDIAN_BIG)
+						return 1 ;
+				}
 				/* For other encodings reject any endian-ness setting. */
 				if (endian != 0)
 					return 0 ;
@@ -727,6 +755,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_AU :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
 					return 1 ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
@@ -744,6 +774,13 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_CAF :
+				switch (info->interop_mode)
+				{	case SF_INTEROP_MODE_DEFAULT :
+					case SF_INTEROP_MODE_APPLE :
+						break;
+
+					default : return 0 ;
+					} ;
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
 					return 1 ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
@@ -759,6 +796,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_RAW :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
 					return 1 ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
@@ -780,11 +819,15 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_PAF :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24)
 					return 1 ;
 				break ;
 
 		case SF_FORMAT_SVX :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				/* SVX only supports writing mono SVX files. */
 				if (info->channels > 1)
 					return 0 ;
@@ -797,6 +840,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_NIST :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
 					return 1 ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
@@ -806,6 +851,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_IRCAM :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (info->channels > 256)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_32)
@@ -815,6 +862,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_VOC :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (info->channels > 2)
 					return 0 ;
 				/* VOC is strictly little endian. */
@@ -827,6 +876,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_W64 :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				/* W64 is strictly little endian. */
 				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
 					return 0 ;
@@ -845,6 +896,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_MAT4 :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_32)
 					return 1 ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
@@ -852,6 +905,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_MAT5 :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_32)
 					return 1 ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
@@ -859,11 +914,15 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_PVF :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_32)
 					return 1 ;
 				break ;
 
 		case SF_FORMAT_XI :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (info->channels != 1)
 					return 0 ;
 				if (subformat == SF_FORMAT_DPCM_8 || subformat == SF_FORMAT_DPCM_16)
@@ -871,6 +930,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_HTK :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (info->channels != 1)
 					return 0 ;
 				/* HTK is strictly big endian. */
@@ -881,6 +942,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_SDS :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (info->channels != 1)
 					return 0 ;
 				/* SDS is strictly big endian. */
@@ -891,6 +954,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_AVR :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (info->channels > 2)
 					return 0 ;
 				/* SDS is strictly big endian. */
@@ -901,6 +966,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_FLAC :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				/* FLAC can't do more than 8 channels. */
 				if (info->channels > 8)
 					return 0 ;
@@ -913,6 +980,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_SD2 :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				/* SD2 is strictly big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
 					return 0 ;
@@ -921,6 +990,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_WVE :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (info->channels > 1)
 					return 0 ;
 				/* WVE is strictly big endian. */
@@ -931,6 +1002,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_OGG :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (endian != SF_ENDIAN_FILE)
 					return 0 ;
 				if (subformat == SF_FORMAT_VORBIS)
@@ -940,6 +1013,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_MPC2K :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (info->channels > 2)
 					return 0 ;
 				/* MPC2000 is strictly little endian. */
@@ -950,6 +1025,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_RF64 :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16)
@@ -963,6 +1040,8 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_MPEG :
+				if (info->interop_mode != SF_INTEROP_MODE_DEFAULT)
+					return 0 ;
 				if (info->channels > 2)
 					return 0 ;
 				if (endian != SF_ENDIAN_FILE)

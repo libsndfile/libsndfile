@@ -686,6 +686,7 @@ lcomp_test_short (const char *filename, int filetype, int channels, double margi
 	for (k = 0 ; k < channels * datalen ; k++)
 		orig [k] = (short) (orig_buffer.d [k]) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= channels ;
@@ -884,6 +885,7 @@ lcomp_test_int (const char *filename, int filetype, int channels, double margin)
 	for (k = 0 ; k < channels * datalen ; k++)
 		orig [k] = lrint (orig_buffer.d [k]) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= channels ;
@@ -1072,6 +1074,7 @@ lcomp_test_float (const char *filename, int filetype, int channels, double margi
 	for (k = 0 ; k < channels * datalen ; k++)
 		orig [k] = (float) orig_buffer.d [k] ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= channels ;
@@ -1267,6 +1270,7 @@ lcomp_test_double (const char *filename, int filetype, int channels, double marg
 	for (k = 0 ; k < channels * datalen ; k++)
 		orig [k] = orig_buffer.d [k] ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= channels ;
@@ -1465,6 +1469,7 @@ channels = 1 ;
 	for (k = 0 ; k < datalen ; k++)
 		orig [k] = (short) lrint (orig_buffer.d [k]) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= channels ;
@@ -1687,6 +1692,7 @@ channels = 1 ;
 	for (k = 0 ; k < datalen ; k++)
 		orig [k] = lrint (orig_buffer.d [k]) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= channels ;
@@ -1933,6 +1939,7 @@ channels = 1 ;
 	for (k = 0 ; k < datalen ; k++)
 		orig [k] = (float) orig_buffer.d [k] ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= channels ;
@@ -2177,6 +2184,7 @@ channels = 1 ;
 
 	gen_signal_double (orig_buffer.d, 32000.0 / scale, channels, (int) datalen) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= channels ;
@@ -2397,6 +2405,7 @@ read_raw_test (const char *filename, int filetype, int channels)
 	for (k = 0 ; k < datalen ; k++)
 		orig [k] = (short) lrint (orig_buffer.d [k]) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= channels ;
@@ -2473,6 +2482,7 @@ write_seek_test (const char *filename, int filetype, int channels)
 	for (k = 0 ; k < datalen ; k++)
 		orig [k] = (short) lrint (orig_buffer.d [k]) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 0 ;
 	sfinfo.channels		= channels ;

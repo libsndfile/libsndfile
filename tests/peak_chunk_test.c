@@ -325,6 +325,7 @@ read_write_peak_test (const char *filename, int filetype)
 	for (k = 0 ; k < ARRAY_LEN (small_data) ; k ++)
 		small_data [k] = 0.1 ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 2 ;
 	sfinfo.format		= filetype ;

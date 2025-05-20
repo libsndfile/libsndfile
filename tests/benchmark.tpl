@@ -242,6 +242,7 @@ calc_[+ (get "type_name") +]_performance (int format, double read_rate, double w
 	printf ("    Write %-5s   to  %s : ", "[+ (get "type_name") +]", subtype) ;
 	fflush (stdout) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.channels = 1 ;
 	sfinfo.format = format ;
 	sfinfo.frames = 1 ;

@@ -130,6 +130,8 @@ stdout_test	(int typemajor, int count)
 	SF_INFO		sfinfo ;
 	int			k, total, this_write ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.format		= (typemajor | SF_FORMAT_PCM_16) ;
 	sfinfo.channels		= 1 ;

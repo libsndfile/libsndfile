@@ -211,6 +211,7 @@ write_file_at_end (int fd, int filetype, int channels, int file_num)
 
 	frames = DATA_LENGTH / channels ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.format = filetype ;
 	sfinfo.channels = channels ;
 	sfinfo.samplerate = 44100 ;

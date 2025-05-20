@@ -127,6 +127,7 @@ chunk_test_helper (const char *filename, int format, const char * testdata)
 			break ;
 		} ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 1 ;
 	sfinfo.frames		= 0 ;
@@ -207,6 +208,7 @@ multichunk_test_helper (const char *filename, int format, const char * testdata 
 		) ;
 
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 1 ;
 	sfinfo.frames		= 0 ;
@@ -328,6 +330,7 @@ chunk_id_test_helper (const char *filename, int format)
 			break ;
 		} ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 1 ;
 	sfinfo.frames		= 0 ;
@@ -500,6 +503,7 @@ wav_subchunk_test (unsigned int chunk_size)
 	value = H2LE_32 (chunk_size - 12) ;
 	memcpy (chunk_data + 8, &value, sizeof (value)) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 1 ;
 	sfinfo.frames		= 0 ;
@@ -560,6 +564,7 @@ large_free_test (const char *filename, int format, unsigned int chunk_size)
 	memset (chunk_data, 53, sizeof (chunk_data)) ;
 	chunk_data [chunk_size] = 0 ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 1 ;
 	sfinfo.frames		= 0 ;

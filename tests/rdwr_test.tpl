@@ -78,6 +78,7 @@ rdwr_[+ (get "name") +]_test	(const char *filename)
 	memset (buffer, 0, sizeof (buffer)) ;
 
 	/* Create sound file with no data. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.format = SF_FORMAT_WAV | [+ (get "format") +] ;
 	sfinfo.samplerate = 16000 ;
 	sfinfo.channels = 1 ;

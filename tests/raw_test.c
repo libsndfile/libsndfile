@@ -67,6 +67,8 @@ raw_offset_test (const char *filename, int typeminor)
 
 	print_test_name ("raw_offset_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.format		= SF_FORMAT_RAW | typeminor ;
 	sfinfo.channels		= 1 ;
@@ -165,6 +167,8 @@ bad_raw_test (void)
 
 	fprintf (textfile, "This is not a valid file.\n") ;
 	fclose (textfile) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.format		= SF_FORMAT_RAW | 0xABCD ;

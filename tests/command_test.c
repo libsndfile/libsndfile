@@ -280,6 +280,7 @@ float_norm_test (const char *filename)
 
 	print_test_name ("float_norm_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.format		= (SF_FORMAT_RAW | SF_FORMAT_PCM_16) ;
 	sfinfo.channels		= 1 ;
@@ -396,6 +397,7 @@ double_norm_test (const char *filename)
 
 	print_test_name ("double_norm_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.format		= (SF_FORMAT_RAW | SF_FORMAT_PCM_16) ;
 	sfinfo.channels		= 1 ;
@@ -512,6 +514,7 @@ silent_scale_test (const char *filename, int subformat)
 
 	print_test_name ("silent_scale_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.format		= SF_FORMAT_WAV | subformat ;
 	sfinfo.channels		= 1 ;
@@ -657,6 +660,7 @@ calc_peak_test (int filetype, const char *filename, int channels)
 	buffer_len = BUFFER_LEN - (BUFFER_LEN % channels) ;
 	frame_count = buffer_len / channels ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.format		= format ;
 	sfinfo.channels		= channels ;
@@ -763,6 +767,7 @@ truncate_test (const char *filename, int filetype)
 
 	print_test_name ("truncate_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 11025 ;
 	sfinfo.format		= filetype ;
 	sfinfo.channels		= 2 ;
@@ -838,6 +843,7 @@ instrument_test (const char *filename, int filetype)
 
 	print_test_name ("instrument_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 11025 ;
 	sfinfo.format		= filetype ;
 	sfinfo.channels		= 1 ;
@@ -1044,6 +1050,7 @@ cue_test (const char *filename, int filetype)
 
 	print_test_name ("cue_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 11025 ;
 	sfinfo.format		= filetype ;
 	sfinfo.channels		= 1 ;
@@ -1104,6 +1111,7 @@ cue_test_var (const char *filename, int filetype, int count)
 			snprintf (write_cue->cue_points [i].name, sizeof (write_cue->cue_points [i].name), "Cue%03d", i) ;
 		} ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 11025 ;
 	sfinfo.format		= filetype ;
 	sfinfo.channels		= 1 ;
@@ -1145,6 +1153,7 @@ current_sf_info_test	(const char *filename)
 
 	print_test_name ("current_sf_info_test", filename) ;
 
+	memset (&outinfo, 0, sizeof (outinfo)) ;
 	outinfo.samplerate	= 44100 ;
 	outinfo.format		= (SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 	outinfo.channels	= 1 ;
@@ -1318,6 +1327,7 @@ check_coding_history_newlines (const char *filename)
 	SF_INFO	sfinfo ;
 	unsigned k ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 22050 ;
 	sfinfo.format		= SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
 	sfinfo.channels		= 1 ;
@@ -1393,6 +1403,7 @@ broadcast_coding_history_test (const char *filename)
 
 	print_test_name ("broadcast_coding_history_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 22050 ;
 	sfinfo.format		= SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
 	sfinfo.channels		= 1 ;
@@ -1494,6 +1505,7 @@ broadcast_coding_history_size (const char *filename)
 
 	print_test_name (__func__, filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 22050 ;
 	sfinfo.format		= SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
 	sfinfo.channels		= 1 ;

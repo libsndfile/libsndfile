@@ -67,6 +67,7 @@ headerless_test (const char * filename, int format, int expected)
 	for (k = 0 ; k < BUFFER_SIZE ; k++)
 		buffer [k] = k ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 8000 ;
 	sfinfo.frames		= 0 ;
 	sfinfo.channels		= 1 ;
@@ -128,6 +129,7 @@ old_test (void)
 
 	filetype = SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 32000 ;
 	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
 	sfinfo.channels		= 1 ;

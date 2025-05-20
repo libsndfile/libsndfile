@@ -156,6 +156,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 		exit (1) ;
 		} ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
 	sfinfo.channels		= 1 ;
@@ -218,6 +219,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 		exit (1) ;
 		} ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
 	sfinfo.channels		= 1 ;
@@ -278,6 +280,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 		exit (1) ;
 		} ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
 	sfinfo.channels		= 1 ;
@@ -341,6 +344,7 @@ pcm_test_[+ (get "name") +] (const char *filename, int filetype, uint64_t hash)
 		exit (1) ;
 		} ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= 123456789 ; /* Wrong length. Library should correct this on sf_close. */
 	sfinfo.channels		= 1 ;
@@ -416,6 +420,7 @@ pcm_test_float (const char *filename, int filetype, uint64_t hash, int replace_f
 		sign = (sign > 0) ? -1 : 1 ;
 		} ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= items ;
 	sfinfo.channels		= 1 ;
@@ -541,6 +546,7 @@ pcm_test_float (const char *filename, int filetype, uint64_t hash, int replace_f
 	for (sign = -1, k = 0 ; k < items ; k++)
 		data [k] = ((double) k) / 100.0 * (sign *= -1) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= items ;
 	sfinfo.channels		= 2 ;
@@ -675,6 +681,7 @@ pcm_test_double (const char *filename, int	filetype, uint64_t hash, int replace_
 		sign = (sign > 0) ? -1 : 1 ;
 		} ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= items ;
 	sfinfo.channels		= 1 ;
@@ -800,6 +807,7 @@ pcm_test_double (const char *filename, int	filetype, uint64_t hash, int replace_
 	for (sign = -1, k = 0 ; k < items ; k++)
 		data [k] = ((double) k) / 100.0 * (sign *= -1) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= items ;
 	sfinfo.channels		= 2 ;

@@ -97,6 +97,7 @@ short_lrw_test (const char *filename, int filetype, const short * output, int ou
 
 	exit_if_true (BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n", __LINE__) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= out_len ;
 	sfinfo.channels		= 1 ;
@@ -143,6 +144,7 @@ int_lrw_test (const char *filename, int filetype, const int * output, int out_le
 
 	exit_if_true (BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n", __LINE__) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= out_len ;
 	sfinfo.channels		= 1 ;
@@ -189,6 +191,7 @@ float_lrw_test (const char *filename, int filetype, const float * output, int ou
 
 	exit_if_true (BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n", __LINE__) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= out_len ;
 	sfinfo.channels		= 1 ;
@@ -235,6 +238,7 @@ double_lrw_test (const char *filename, int filetype, const double * output, int 
 
 	exit_if_true (BUFFER_LENGTH > out_len, "\n\nLine %d: Bad array length.\n", __LINE__) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= out_len ;
 	sfinfo.channels		= 1 ;
