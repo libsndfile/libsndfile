@@ -80,6 +80,11 @@
 #define GSM_MARKER		(MAKE_MARKER ('G', 'S', 'M', ' '))
 #define ima4_MARKER		(MAKE_MARKER ('i', 'm', 'a', '4'))
 
+#define wave_MARKER		(MAKE_MARKER ('w', 'a', 'v', 'e'))
+#define frma_MARKER		(MAKE_MARKER ('f', 'r', 'm', 'a'))
+#define enda_MARKER		(MAKE_MARKER ('e', 'n', 'd', 'a'))
+#define term_MARKER		(MAKE_MARKER (0, 0, 0, 0))
+
 /*
 **	This value is officially assigned to Mega Nerd Pty Ltd by Apple
 **	Corportation as the Application marker for libsndfile.
@@ -131,6 +136,10 @@ typedef struct
 	uint32_t	encoding ;
 	char			zero_bytes [2] ;
 } COMM_CHUNK ;
+
+typedef struct
+{	uint32_t	size ;
+} WAVE_CHUNK ;
 
 typedef struct
 {	uint32_t	offset ;
@@ -203,6 +212,7 @@ static int	tenbytefloat2int (uint8_t *bytes) ;
 static void uint2tenbytefloat (uint32_t num, uint8_t *bytes) ;
 
 static int	aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt) ;
+static int	aiff_read_wave_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt, WAVE_CHUNK *wave_fmt) ;
 
 static int	aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt) ;
 
@@ -397,6 +407,7 @@ marker_to_position (const MARK_ID_POS *m, uint16_t n, int marksize)
 static int
 aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 {	SSND_CHUNK	ssnd_fmt ;
+	WAVE_CHUNK	wave_fmt ;
 	AIFF_PRIVATE *paiff ;
 	BUF_UNION	ubuf ;
 	uint32_t	chunk_size = 0, FORMsize, SSNDsize, bytesread, mark_count = 0 ;
@@ -485,6 +496,13 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						return error ;
 
 					found_chunk |= HAVE_COMM ;
+					break ;
+
+			case wave_MARKER :
+					chunk_size += chunk_size & 1 ;
+					wave_fmt.size = chunk_size ;
+					if ((error = aiff_read_wave_chunk (psf, comm_fmt, &wave_fmt)) != 0)
+						return error ;
 					break ;
 
 			case PEAK_MARKER :
@@ -1159,6 +1177,61 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	return 0 ;
 } /* aiff_read_comm_chunk */
 
+static int
+aiff_read_wave_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt, WAVE_CHUNK *wave_fmt)
+{
+	uint32_t chunkRemaining = wave_fmt->size ;
+	uint32_t atomSize, atomType, encoding ;
+	uint16_t endianness ;	// 0 for big, 1 for little
+
+	switch (comm_fmt->encoding)
+	{	case in24_MARKER :
+		case in32_MARKER :
+		case fl32_MARKER :
+		case FL32_MARKER :
+		case fl64_MARKER :
+		case FL64_MARKER :
+			// Expecting chunk contents as follows:
+			//	uint32_t 12, 'frma', 4cc encoding, uint32_t 10, 'enda', uint16_t 0 or 1, uint32_t 8, uint32_t 0.
+			if (chunkRemaining < 30)
+				break ;
+
+			psf_binheader_readf (psf, "E4mm", &atomSize, &atomType, &encoding) ;
+			chunkRemaining -= 12 ;
+
+			if (atomSize != 12 || atomType != frma_MARKER || encoding != comm_fmt->encoding)
+				break ;
+
+			psf_binheader_readf (psf, "E4m", &atomSize, &atomType) ;
+			chunkRemaining -= 8 ;
+
+			if (atomSize != 10 || atomType != enda_MARKER)
+				break ;
+
+			psf_binheader_readf (psf, "E2", &endianness) ;
+			chunkRemaining -= 2 ;
+
+			psf_binheader_readf (psf, "E4m", &atomSize, &atomType) ;
+			chunkRemaining -= 8 ;
+
+			if (atomSize != 8 || atomType != term_MARKER)
+				break ;
+
+			if (endianness == 1)
+			{
+				psf->endian = SF_ENDIAN_LITTLE ;
+				psf->sf.format = ((psf->sf.format & ~SF_ENDIAN_BIG) | SF_ENDIAN_LITTLE) ;
+				} ;
+
+			break ;
+		} ;
+
+	if (chunkRemaining > 0)
+		psf_binheader_readf (psf, "j", chunkRemaining) ;
+
+	return 0 ;
+} /* aiff_read_wave_chunk */
+
 
 /*==========================================================================================
 */
@@ -1305,7 +1378,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			psf->endian = SF_ENDIAN_LITTLE ;
 			comm_type = AIFC_MARKER ;
 			comm_size = SIZEOF_AIFC_COMM ;
-			comm_encoding = ni24_MARKER ;
+			comm_encoding = in24_MARKER ;	// For interoperability with older revisions, revert to ni24_MARKER.
 			break ;
 
 		case SF_FORMAT_PCM_32 | SF_ENDIAN_BIG :
@@ -1319,7 +1392,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			psf->endian = SF_ENDIAN_LITTLE ;
 			comm_type = AIFC_MARKER ;
 			comm_size = SIZEOF_AIFC_COMM ;
-			comm_encoding = ni32_MARKER ;
+			comm_encoding = in32_MARKER ;	// For interoperability with older revisions, revert to ni24_MARKER.
 			break ;
 
 		case SF_FORMAT_PCM_S8 :			/* SF_ENDIAN_FILE */
@@ -1339,8 +1412,22 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 				comm_encoding = FL32_MARKER ;	/* Use 'FL32' because its easier to read. */
 				break ;
 
+		case SF_FORMAT_FLOAT | SF_ENDIAN_LITTLE :	/* Little endian floating point. */
+				psf->endian = SF_ENDIAN_LITTLE ;
+				comm_type = AIFC_MARKER ;
+				comm_size = SIZEOF_AIFC_COMM ;
+				comm_encoding = FL32_MARKER ;	/* Use 'FL32' because its easier to read. */
+				break ;
+
 		case SF_FORMAT_DOUBLE :					/* Big endian double precision floating point. */
 				psf->endian = SF_ENDIAN_BIG ;
+				comm_type = AIFC_MARKER ;
+				comm_size = SIZEOF_AIFC_COMM ;
+				comm_encoding = FL64_MARKER ;	/* Use 'FL64' because its easier to read. */
+				break ;
+
+		case SF_FORMAT_DOUBLE | SF_ENDIAN_LITTLE :	/* Little endian double precision floating point. */
+				psf->endian = SF_ENDIAN_LITTLE ;
 				comm_type = AIFC_MARKER ;
 				comm_size = SIZEOF_AIFC_COMM ;
 				comm_encoding = FL64_MARKER ;	/* Use 'FL64' because its easier to read. */
@@ -1445,7 +1532,22 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 
 	/* AIFC chunks have some extra data. */
 	if (comm_type == AIFC_MARKER)
+	{
 		psf_binheader_writef (psf, "mb", BHWm (comm_encoding), BHWv (comm_zero_bytes), BHWz (sizeof (comm_zero_bytes))) ;
+		if (psf->endian == SF_ENDIAN_LITTLE)
+		{
+			switch (comm_encoding)
+			{	case in24_MARKER :
+				case in32_MARKER :
+				case fl32_MARKER :
+				case FL32_MARKER :
+				case fl64_MARKER :
+				case FL64_MARKER :
+					psf_binheader_writef (psf, "Em44mm4m24m", BHWm (wave_MARKER), BHW4 (30), BHW4 (12), BHWm (frma_MARKER), BHWm (comm_encoding), BHW4 (10), BHWm (enda_MARKER), BHW2 (1), BHW4 (8), BHWm (term_MARKER)) ;
+					break ;
+				} ;
+			} ;
+		} ;
 
 	if (psf->channel_map && paiff->chanmap_tag)
 		psf_binheader_writef (psf, "Em4444", BHWm (CHAN_MARKER), BHW4 (12), BHW4 (paiff->chanmap_tag), BHW4 (0), BHW4 (0)) ;
