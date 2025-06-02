@@ -358,6 +358,11 @@ mpeg_decoder_read_strings_id3v2 (SF_PRIVATE *psf, mpg123_id3v2 *tags)
 	const char *album		= NULL ;
 	const char *license		= NULL ;
 	const char *tracknumber	= NULL ;
+	const char *discnumber	= NULL ;
+	const char *albumartist	= NULL ;
+	const char *performer	= NULL ;
+	const char *label		= NULL ;
+	const char *isrc		= NULL ;
 	const char *genre		= NULL ;
 	const char *tlen		= NULL ;
 
@@ -413,6 +418,26 @@ mpeg_decoder_read_strings_id3v2 (SF_PRIVATE *psf, mpg123_id3v2 *tags)
 				tracknumber = text_frame->text.p ;
 				break ;
 
+			case MAKE_MARKER ('T', 'P', 'O', 'S') :
+				discnumber = text_frame->text.p ;
+				break ;
+
+			case MAKE_MARKER ('T', 'P', 'E', '2') :
+				albumartist = text_frame->text.p ;
+				break ;
+
+			case MAKE_MARKER ('T', 'P', 'L', 'S') :
+				performer = text_frame->text.p ;
+				break ;
+
+			case MAKE_MARKER ('T', 'P', 'U', 'B') :
+				label = text_frame->text.p ;
+				break ;
+
+			case MAKE_MARKER ('T', 'S', 'R', 'C') :
+				isrc = text_frame->text.p ;
+				break ;
+
 			case MAKE_MARKER ('T', 'C', 'O', 'N') :
 				genre = text_frame->text.p ;
 				break ;
@@ -457,6 +482,16 @@ mpeg_decoder_read_strings_id3v2 (SF_PRIVATE *psf, mpg123_id3v2 *tags)
 		psf_store_string (psf, SF_STR_LICENSE, license) ;
 	if (tracknumber != NULL)
 		psf_store_string (psf, SF_STR_TRACKNUMBER, tracknumber) ;
+	if (discnumber != NULL)
+		psf_store_string (psf, SF_STR_DISCNUMBER, discnumber) ;
+	if (albumartist != NULL)
+		psf_store_string (psf, SF_STR_ALBUMARTIST, albumartist) ;
+	if (performer != NULL)
+		psf_store_string (psf, SF_STR_PERFORMER, performer) ;
+	if (label != NULL)
+		psf_store_string (psf, SF_STR_LABEL, label) ;
+	if (isrc != NULL)
+		psf_store_string (psf, SF_STR_ISRC, isrc) ;
 	if (genre != NULL)
 		psf_store_string (psf, SF_STR_GENRE, id3_process_v2_genre (genre)) ;
 	if (tlen != NULL)
