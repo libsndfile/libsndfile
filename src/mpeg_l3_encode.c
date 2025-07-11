@@ -87,7 +87,8 @@ mpeg_l3_encoder_init (SF_PRIVATE *psf, int info_tag)
 	if (! (pmpeg->lamef = lame_init ()))
 		return SFE_MALLOC_FAILED ;
 
-	pmpeg->compression = -1.0 ; /* Unset */
+	psf->codec_close	= mpeg_l3_encoder_close ; /* Set psf->codec_close early*/
+ 	pmpeg->compression = -1.0 ; /* Unset */
 
 	lame_set_in_samplerate (pmpeg->lamef, psf->sf.samplerate) ;
 	lame_set_num_channels (pmpeg->lamef, psf->sf.channels) ;
@@ -115,7 +116,6 @@ mpeg_l3_encoder_init (SF_PRIVATE *psf, int info_tag)
 		}
 
 	psf->sf.seekable	= 0 ;
-	psf->codec_close	= mpeg_l3_encoder_close ;
 	psf->byterate		= mpeg_l3_encoder_byterate ;
 	psf->datalength		= 0 ;
 
