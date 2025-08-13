@@ -343,7 +343,7 @@ flac_buffer_copy (SF_PRIVATE *psf)
 static FLAC__StreamDecoderReadStatus
 sf_flac_pipe_read_callback (const FLAC__StreamDecoder * UNUSED (decoder), FLAC__byte buffer [], size_t *bytes, void *client_data)
 {
-	// Seperate function for reading from pipe, as we need to inject the header buffer into the stream again
+	// Separate function for reading from pipe, as we need to inject the header buffer into the stream again
 	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
 	if(psf->header.indx < psf->header.end) {
 		*bytes = psf_binheader_readf(psf, "b", buffer, *bytes) ;
