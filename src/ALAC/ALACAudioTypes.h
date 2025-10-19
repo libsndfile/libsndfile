@@ -120,7 +120,7 @@ enum
 	kALACChannelLayoutTag_MPEG_7_1_B	= (127 << 16) | 8	// C Lc Rc L R Ls Rs LFE	(doc: IS-13818-7 MPEG2-AAC)
 } ;
 
-// ALAC currently only utilizes these channels layouts. There is a one for one correspondance between a
+// ALAC currently only utilizes these channels layouts. There is a one for one correspondence between a
 // given number of channels and one of these layout tags
 static const ALACChannelLayoutTag	ALACChannelLayoutTags [kALACMaxChannels] =
 {

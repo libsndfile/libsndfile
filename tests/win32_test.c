@@ -135,7 +135,7 @@ show_fstat_error (void)
 
 	printf ("2) Now use system (\"%s %s\") to show the file length.\n\n", dir_cmd, filename) ;
 
-	/* Would use snprintf, but thats not really available on windows. */
+	/* Would use snprintf, but that's not really available on windows. */
 	memset (data, 0, sizeof (data)) ;
 	strncpy (data, dir_cmd, sizeof (data) - 1) ;
 	strncat (data, " ", sizeof (data) - 1 - strlen (data)) ;
@@ -155,7 +155,7 @@ show_fstat_error (void)
 	close (fd) ;
 
 	if (statbuf.st_size != 2 * sizeof (data))
-		printf ("but thats just plain ***WRONG***.\n\n") ;
+		printf ("but that's just plain ***WRONG***.\n\n") ;
 	else
 	{	printf ("which is correct.\n\n") ;
 		unlink (filename) ;
@@ -196,7 +196,7 @@ show_lseek_error (void)
 
 	printf ("2) Now use system (\"%s %s\") to show the file length.\n\n", dir_cmd, filename) ;
 
-	/* Would use snprintf, but thats not really available on windows. */
+	/* Would use snprintf, but that's not really available on windows. */
 	memset (data, 0, sizeof (data)) ;
 	strncpy (data, dir_cmd, sizeof (data) - 1) ;
 	strncat (data, " ", sizeof (data) - 1 - strlen (data)) ;
@@ -213,7 +213,7 @@ show_lseek_error (void)
 	close (fd) ;
 
 	if (retval != 2 * sizeof (data))
-		printf ("but thats just plain ***WRONG***.\n\n") ;
+		printf ("but that's just plain ***WRONG***.\n\n") ;
 	else
 	{	printf ("which is correct.\n\n") ;
 		unlink (filename) ;
@@ -262,7 +262,7 @@ show_stat_fstat_error (void)
 
 
 	if (stat_size == 0 || stat_size != fstat_size)
-		printf ("but thats just plain ***WRONG***.\n\n") ;
+		printf ("but that's just plain ***WRONG***.\n\n") ;
 	else
 		printf ("which is correct.\n\n") ;
 
