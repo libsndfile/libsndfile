@@ -121,6 +121,7 @@ static int flac_command (SF_PRIVATE *psf, int command, void *data, int datasize)
 
 /* Decoder Callbacks */
 static FLAC__StreamDecoderReadStatus sf_flac_read_callback (const FLAC__StreamDecoder *decoder, FLAC__byte buffer [], size_t *bytes, void *client_data) ;
+static FLAC__StreamDecoderReadStatus sf_flac_pipe_read_callback (const FLAC__StreamDecoder *decoder, FLAC__byte buffer [], size_t *bytes, void *client_data) ;
 static FLAC__StreamDecoderSeekStatus sf_flac_seek_callback (const FLAC__StreamDecoder *decoder, FLAC__uint64 absolute_byte_offset, void *client_data) ;
 static FLAC__StreamDecoderTellStatus sf_flac_tell_callback (const FLAC__StreamDecoder *decoder, FLAC__uint64 *absolute_byte_offset, void *client_data) ;
 static FLAC__StreamDecoderLengthStatus sf_flac_length_callback (const FLAC__StreamDecoder *decoder, FLAC__uint64 *stream_length, void *client_data) ;
@@ -339,6 +340,21 @@ flac_buffer_copy (SF_PRIVATE *psf)
 	return offset ;
 } /* flac_buffer_copy */
 
+static FLAC__StreamDecoderReadStatus
+sf_flac_pipe_read_callback (const FLAC__StreamDecoder * UNUSED (decoder), FLAC__byte buffer [], size_t *bytes, void *client_data)
+{
+	// Separate function for reading from pipe, as we need to inject the header buffer into the stream again
+	SF_PRIVATE *psf = (SF_PRIVATE*) client_data ;
+	if(psf->header.indx < psf->header.end) {
+		*bytes = psf_binheader_readf(psf, "b", buffer, *bytes) ;
+	} else {
+		*bytes = psf_fread (buffer, 1, *bytes, psf) ;
+	}
+	if (*bytes > 0 && psf->error == 0)
+		return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE ;
+	
+	return FLAC__STREAM_DECODER_READ_STATUS_ABORT ;
+} /* sf_flac_pipe_read_callback */
 
 static FLAC__StreamDecoderReadStatus
 sf_flac_read_callback (const FLAC__StreamDecoder * UNUSED (decoder), FLAC__byte buffer [], size_t *bytes, void *client_data)
@@ -845,7 +861,6 @@ static int
 flac_read_header (SF_PRIVATE *psf)
 {	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->codec_data ;
 
-	psf_fseek (psf, 0, SEEK_SET) ;
 	if (pflac->fsd)
 		FLAC__stream_decoder_delete (pflac->fsd) ;
 	if ((pflac->fsd = FLAC__stream_decoder_new ()) == NULL)
@@ -853,9 +868,15 @@ flac_read_header (SF_PRIVATE *psf)
 
 	FLAC__stream_decoder_set_metadata_respond_all (pflac->fsd) ;
 
-	if (FLAC__stream_decoder_init_stream (pflac->fsd, sf_flac_read_callback, sf_flac_seek_callback, sf_flac_tell_callback, sf_flac_length_callback, sf_flac_eof_callback, sf_flac_write_callback, sf_flac_meta_callback, sf_flac_error_callback, psf) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
-		return SFE_FLAC_INIT_DECODER ;
-
+	if (psf->is_pipe){
+		psf_binheader_readf (psf, "p", 0) ;
+		if (FLAC__stream_decoder_init_stream (pflac->fsd, sf_flac_pipe_read_callback, NULL, NULL, NULL, NULL, sf_flac_write_callback, sf_flac_meta_callback, sf_flac_error_callback, psf) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
+			return SFE_FLAC_INIT_DECODER ;
+	} else {
+		psf_fseek (psf, 0, SEEK_SET) ;
+		if (FLAC__stream_decoder_init_stream (pflac->fsd, sf_flac_read_callback, sf_flac_seek_callback, sf_flac_tell_callback, sf_flac_length_callback, sf_flac_eof_callback, sf_flac_write_callback, sf_flac_meta_callback, sf_flac_error_callback, psf) != FLAC__STREAM_DECODER_INIT_STATUS_OK)
+			return SFE_FLAC_INIT_DECODER ;
+	}
 	FLAC__stream_decoder_process_until_end_of_metadata (pflac->fsd) ;
 
 	psf_log_printf (psf, "End\n") ;
