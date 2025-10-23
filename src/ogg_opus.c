@@ -839,7 +839,7 @@ ogg_opus_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		} ;
 
 	/*
-	** Metadata Tags (manditory)
+	** Metadata Tags (mandatory)
 	**
 	** All tags must be in one packet, which may span pages, and these pages
 	** must not contain any other packets, so flush. The vendor string should

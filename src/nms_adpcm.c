@@ -539,7 +539,7 @@ nms_adpcm_block_unpack_32 (const uint16_t block [], int16_t codewords [], int16_
 } /* nms_adpcm_unpack_32 */
 
 /*
-** Reads 160 indicies of codewords for one 2-bit codeword each, packing them
+** Reads 160 indices of codewords for one 2-bit codeword each, packing them
 ** into 20 shorts of block, and writes the short rms for a total of 42 bytes.
 */
 static void
@@ -565,7 +565,7 @@ nms_adpcm_block_pack_16 (const int16_t codewords [], uint16_t block [], int16_t 
 } /* nms_adpcm_pack_16 */
 
 /*
-** Reads 160 indicies of codewords for one 3-bit codeword each, packing them
+** Reads 160 indices of codewords for one 3-bit codeword each, packing them
 ** into 30 shorts of block, and writes the short rms for a total of 62 bytes.
 */
 static void
@@ -612,7 +612,7 @@ nms_adpcm_block_pack_24 (const int16_t codewords [], uint16_t block [], int16_t 
 } /* nms_adpcm_pack_24 */
 
 /*
-** Reads 160 indicies of codewords for one 4-bit codeword each, packing them
+** Reads 160 indices of codewords for one 4-bit codeword each, packing them
 ** into 40 shorts of block, and writes the short rms for a total of 82 bytes.
 */
 static void
