@@ -1354,7 +1354,7 @@ datasize
 
 ## SFC_GET_BROADCAST_INFO
 
-Retrieve the Broadcast Extension Chunk from WAV (and related) files.
+Retrieve the [Broadcast Audio Extension Chunk](https://tech.ebu.ch/docs/tech/tech3285.pdf) from WAV (and related) files.
 
 ### Parameters
 
@@ -1374,18 +1374,23 @@ The SF_BROADCAST_INFO struct is defined in *sndfile.h* as:
 
 ```c
 typedef struct
-{   char            description [256] ;
-    char            originator [32] ;
-    char            originator_reference [32] ;
-    char            origination_date [10] ;
-    char            origination_time [8] ;
-    unsigned int    time_reference_low ;
-    unsigned int    time_reference_high ;
-    short           version ;
-    char            umid [64] ;
-    char            reserved [190] ;
-    unsigned int    coding_history_size ;
-    char            coding_history [256] ;
+{   char      description [256] ;         /* null terminated if len < 256 */
+    char      originator [32] ;           /* null terminated if len < 32 */
+    char      originator_reference [32] ; /* null terminated if len < 32 */
+    char      origination_date [10] ;     /* 10 ASCII chars */
+    char      origination_time [8] ;      /* 8 ASCII chars */
+    uint32_t  time_reference_low ;        /* 64-bit timecode, low word */
+    uint32_t  time_reference_high ;       /* 64-bit timecode, high word */
+    short     version ;                   /* current is 0002h */
+    char      umid [64] ;                 /* 64 byte Unique Material Identifier */
+    int16_t   loudness_value ;            /* 100x the Integrated Loudness Value in LUFS */
+    int16_t   loudness_range ;            /* 100x the Loudness Range in LU */
+    int16_t   max_true_peak_level ;       /* 100x the Maximum True Peak Value in dBTP */
+    int16_t   max_momentary_loudness ;    /* 100x the highest value of the Momentary Loudness Level in LUFS */
+    int16_t   max_shortterm_loudness ;    /* 100x the highest value of the Short-term Loudness Level in LUFS */
+    char      reserved [180] ;            /* set to a NULL (zero) value in version 1 or 2 */
+    uint32_t  coding_history_size ;
+    char     coding_history [coding_hist_size] ; /* Collection of CRLF-terminated ASCII chars */
 } SF_BROADCAST_INFO ;
 ```
 
