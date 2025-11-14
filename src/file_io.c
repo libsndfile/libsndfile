@@ -305,15 +305,16 @@ sf_count_t
 psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence)
 {	sf_count_t	absolute_position ;
 
-	if (psf->virtual_io)
-		return psf->vio.seek (offset, whence, psf->vio_user_data) ;
-
 	/* When decoding from pipes sometimes see seeks to the pipeoffset, which appears to mean do nothing. */
 	if (psf->is_pipe)
-	{	if (whence != SEEK_SET || offset != psf->pipeoffset)
-			psf_log_printf (psf, "psf_fseek : pipe seek to value other than pipeoffset\n") ;
-		return offset ;
+	{	if ((whence == SEEK_SET && offset == psf->pipeoffset) || (whence == SEEK_CUR && offset == 0))
+			return offset ;
+		psf_log_printf (psf, "psf_fseek : pipe seek to value other than pipeoffset\n") ;
+		return -1;
 		}
+
+	if (psf->virtual_io)
+		return psf->vio.seek (offset, whence, psf->vio_user_data) ;
 
 	switch (whence)
 	{	case SEEK_SET :
@@ -342,37 +343,40 @@ psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence)
 
 sf_count_t
 psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
-{	sf_count_t total = 0 ;
+{	sf_count_t total ;
 	ssize_t	count ;
 
-	if (psf->virtual_io)
-		return psf->vio.read (ptr, bytes*items, psf->vio_user_data) / bytes ;
-
 	items *= bytes ;
-
 	/* Do this check after the multiplication above. */
 	if (items <= 0)
 		return 0 ;
 
-	while (items > 0)
-	{	/* Break the read down to a sensible size. */
-		count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : (ssize_t) items ;
+	if (psf->virtual_io)
+	{	if ((total = psf->vio.read (ptr, items, psf->vio_user_data)) == -1)
+			return -1 ;
+		}
+	else
+	{	total = 0 ;
+		while (items > 0)
+		{	/* Break the read down to a sensible size. */
+			count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : (ssize_t) items ;
 
-		count = read (psf->file.filedes, ((char*) ptr) + total, (size_t) count) ;
+			count = read (psf->file.filedes, ((char*) ptr) + total, (size_t) count) ;
 
-		if (count == -1)
-		{	if (errno == EINTR)
-				continue ;
+			if (count == -1)
+			{	if (errno == EINTR)
+					continue ;
 
-			psf_log_syserr (psf, errno) ;
-			break ;
+				psf_log_syserr (psf, errno) ;
+				break ;
+				} ;
+
+			if (count == 0)
+				break ;
+
+			total += count ;
+			items -= count ;
 			} ;
-
-		if (count == 0)
-			break ;
-
-		total += count ;
-		items -= count ;
 		} ;
 
 	if (psf->is_pipe)
@@ -383,40 +387,43 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 
 sf_count_t
 psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
-{	sf_count_t total = 0 ;
+{	sf_count_t total ;
 	ssize_t	count ;
 
 	if (bytes == 0 || items == 0)
 		return 0 ;
 
-	if (psf->virtual_io)
-		return psf->vio.write (ptr, bytes*items, psf->vio_user_data) / bytes ;
-
 	items *= bytes ;
-
 	/* Do this check after the multiplication above. */
 	if (items <= 0)
 		return 0 ;
 
-	while (items > 0)
-	{	/* Break the writes down to a sensible size. */
-		count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : items ;
+	if (psf->virtual_io)
+	{	if ((total = psf->vio.write (ptr, items, psf->vio_user_data)) == -1)
+			return -1 ;
+		}
+	else
+	{	total = 0 ;
+		while (items > 0)
+		{	/* Break the writes down to a sensible size. */
+			count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : items ;
 
-		count = write (psf->file.filedes, ((const char*) ptr) + total, count) ;
+			count = write (psf->file.filedes, ((const char*) ptr) + total, count) ;
 
-		if (count == -1)
-		{	if (errno == EINTR)
+			if (count == -1)
+			{	if (errno == EINTR)
 				continue ;
 
-			psf_log_syserr (psf, errno) ;
-			break ;
+				psf_log_syserr (psf, errno) ;
+				break ;
+				} ;
+
+			if (count == 0)
+				break ;
+
+			total += count ;
+			items -= count ;
 			} ;
-
-		if (count == 0)
-			break ;
-
-		total += count ;
-		items -= count ;
 		} ;
 
 	if (psf->is_pipe)
@@ -429,11 +436,11 @@ sf_count_t
 psf_ftell (SF_PRIVATE *psf)
 {	sf_count_t pos ;
 
-	if (psf->virtual_io)
-		return psf->vio.tell (psf->vio_user_data) ;
-
 	if (psf->is_pipe)
 		return psf->pipeoffset ;
+
+	if (psf->virtual_io)
+		return psf->vio.tell (psf->vio_user_data) ;
 
 	pos = lseek (psf->file.filedes, 0, SEEK_CUR) ;
 
@@ -488,7 +495,7 @@ psf_is_pipe (SF_PRIVATE *psf)
 {	struct stat statbuf ;
 
 	if (psf->virtual_io)
-		return SF_FALSE ;
+		return psf->vio.seek == NULL ;
 
 	if (fstat (psf->file.filedes, &statbuf) == -1)
 	{	psf_log_syserr (psf, errno) ;
@@ -939,6 +946,14 @@ psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence)
 	BOOL fResult ;
 	DWORD dwError ;
 
+	/* When decoding from pipes sometimes see seeks to the pipeoffset, which appears to mean do nothing. */
+	if (psf->is_pipe)
+	{	if ((whence == SEEK_SET && offset == psf->pipeoffset) || (whence == SEEK_CUR && offset == 0))
+			return offset ;
+		psf_log_printf (psf, "psf_fseek : pipe seek to value other than pipeoffset\n") ;
+		return -1;
+		}
+
 	if (psf->virtual_io)
 		return psf->vio.seek (offset, whence, psf->vio_user_data) ;
 
@@ -978,35 +993,38 @@ psf_fseek (SF_PRIVATE *psf, sf_count_t offset, int whence)
 
 /* USE_WINDOWS_API */ sf_count_t
 psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
-{	sf_count_t total = 0 ;
+{	sf_count_t total ;
 	ssize_t count ;
 	DWORD dwNumberOfBytesRead ;
 
-	if (psf->virtual_io)
-		return psf->vio.read (ptr, bytes*items, psf->vio_user_data) / bytes ;
-
 	items *= bytes ;
-
 	/* Do this check after the multiplication above. */
 	if (items <= 0)
 		return 0 ;
 
-	while (items > 0)
-	{	/* Break the writes down to a sensible size. */
-		count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : (ssize_t) items ;
+	if (psf->virtual_io)
+	{	if ((total = psf->vio.read (ptr, items, psf->vio_user_data)) == -1)
+			return -1 ;
+		}
+	else
+	{	total = 0 ;
+		while (items > 0)
+		{	/* Break the writes down to a sensible size. */
+			count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : (ssize_t) items ;
 
-		if (ReadFile (psf->file.handle, ((char*) ptr) + total, count, &dwNumberOfBytesRead, 0) == 0)
-		{	psf_log_syserr (psf, GetLastError ()) ;
-			break ;
-			}
-		else
-			count = dwNumberOfBytesRead ;
+			if (ReadFile (psf->file.handle, ((char*) ptr) + total, count, &dwNumberOfBytesRead, 0) == 0)
+			{	psf_log_syserr (psf, GetLastError ()) ;
+				break ;
+				}
+			else
+				count = dwNumberOfBytesRead ;
 
-		if (count == 0)
-			break ;
+			if (count == 0)
+				break ;
 
-		total += count ;
-		items -= count ;
+			total += count ;
+			items -= count ;
+			} ;
 		} ;
 
 	if (psf->is_pipe)
@@ -1017,35 +1035,38 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 
 /* USE_WINDOWS_API */ sf_count_t
 psf_fwrite (const void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
-{	sf_count_t total = 0 ;
+{	sf_count_t total ;
 	ssize_t	count ;
 	DWORD dwNumberOfBytesWritten ;
 
-	if (psf->virtual_io)
-		return psf->vio.write (ptr, bytes * items, psf->vio_user_data) / bytes ;
-
 	items *= bytes ;
-
 	/* Do this check after the multiplication above. */
 	if (items <= 0)
 		return 0 ;
 
-	while (items > 0)
-	{	/* Break the writes down to a sensible size. */
-		count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : (ssize_t) items ;
+	if (psf->virtual_io)
+	{	if ((total = psf->vio.write (ptr, items, psf->vio_user_data)) == -1)
+			return -1 ;
+		}
+	else
+	{	total = 0 ;
+		while (items > 0)
+		{	/* Break the writes down to a sensible size. */
+			count = (items > SENSIBLE_SIZE) ? SENSIBLE_SIZE : (ssize_t) items ;
 
-		if (WriteFile (psf->file.handle, ((const char*) ptr) + total, count, &dwNumberOfBytesWritten, 0) == 0)
-		{	psf_log_syserr (psf, GetLastError ()) ;
-			break ;
-			}
-		else
-			count = dwNumberOfBytesWritten ;
+			if (WriteFile (psf->file.handle, ((const char*) ptr) + total, count, &dwNumberOfBytesWritten, 0) == 0)
+			{	psf_log_syserr (psf, GetLastError ()) ;
+				break ;
+				}
+			else
+				count = dwNumberOfBytesWritten ;
 
-		if (count == 0)
-			break ;
+			if (count == 0)
+				break ;
 
-		total += count ;
-		items -= count ;
+			total += count ;
+			items -= count ;
+			} ;
 		} ;
 
 	if (psf->is_pipe)
@@ -1061,11 +1082,11 @@ psf_ftell (SF_PRIVATE *psf)
 	BOOL fResult ;
 	DWORD dwError ;
 
-	if (psf->virtual_io)
-		return psf->vio.tell (psf->vio_user_data) ;
-
 	if (psf->is_pipe)
 		return psf->pipeoffset ;
+
+	if (psf->virtual_io)
+		return psf->vio.tell (psf->vio_user_data) ;
 
 	liDistanceToMove.QuadPart = 0 ;
 
@@ -1125,7 +1146,7 @@ psf_fgets (char *buffer, sf_count_t bufsize, SF_PRIVATE *psf)
 psf_is_pipe (SF_PRIVATE *psf)
 {
 	if (psf->virtual_io)
-		return SF_FALSE ;
+		return psf->vio.seek == NULL ;
 
 	if (GetFileType (psf->file.handle) == FILE_TYPE_DISK)
 		return SF_FALSE ;
