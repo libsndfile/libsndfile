@@ -1027,6 +1027,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 			case ISRC_MARKER :
 			case IAUT_MARKER :
 			case ITRK_MARKER :
+			case PRT1_MARKER :
 					bytesread += psf_binheader_readf (psf, "4", &chunk_size) ;
 					chunk_size += (chunk_size & 1) ;
 					if (chunk_size >= SIGNED_SIZEOF (buffer) || bytesread + chunk_size > chunk_length)
@@ -1126,6 +1127,9 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 			case ITRK_MARKER :
 					psf_store_string (psf, SF_STR_TRACKNUMBER, buffer) ;
 					break ;
+			case PRT1_MARKER :
+					psf_store_string (psf, SF_STR_DISCNUMBER, buffer) ;
+					break ;
 			} ;
 		} ;
 
@@ -1189,6 +1193,10 @@ wavlike_write_strings (SF_PRIVATE *psf, int location)
 
 			case SF_STR_TRACKNUMBER :
 				psf_binheader_writef (psf, "ms", BHWm (ITRK_MARKER), BHWs (psf->strings.storage + psf->strings.data [k].offset)) ;
+				break ;
+
+			case SF_STR_DISCNUMBER :
+				psf_binheader_writef (psf, "ms", BHWm (PRT1_MARKER), BHWs (psf->strings.storage + psf->strings.data [k].offset)) ;
 				break ;
 
 			default :
