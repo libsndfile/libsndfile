@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.5...4.0)
+cmake_minimum_required (VERSION 3.14...4.0)
 
 # MSVC runtime library flags are selected by an abstraction, CMake >= 3.15
 # This policy still need to be set even with cmake_minimum_required() command above.
