@@ -17,7 +17,7 @@ pkg_check_modules(PC_OPUS QUIET opus>=1.1)
 
 set (OPUS_VERSION ${PC_OPUS_VERSION})
 
-find_path (OPUS_INCLUDE_DIR opus/opus.h
+find_path (OPUS_INCLUDE_DIR opus.h
 	HINTS
 		${PC_OPUS_INCLUDEDIR}
 		${PC_OPUS_INCLUDE_DIRS}
