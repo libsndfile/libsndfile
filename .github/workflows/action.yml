@@ -25,21 +25,21 @@ jobs:
         ]
         include:
           - name: ubuntu-gcc-autotools
-            os: ubuntu-latest
+            os: ubuntu-24.04
             cc: gcc
             cxx: g++
             autotools-options: --enable-werror
             build-system: autotools
 
           - name: ubuntu-clang-autotools
-            os: ubuntu-latest
+            os: ubuntu-24.04
             cc: clang
             cxx: clang++
             autotools-options: --enable-werror
             build-system: autotools
 
           - name: ubuntu-gcc-ossfuzz
-            os: ubuntu-latest
+            os: ubuntu-24.04
             cc: gcc
             cxx: g++
             autotools-options: --enable-werror
@@ -53,7 +53,7 @@ jobs:
             build-system: autotools
 
           - name: ubuntu-gcc-cmake
-            os: ubuntu-latest
+            os: ubuntu-24.04
             cc: gcc
             cxx: g++
             build-system: cmake
@@ -64,7 +64,7 @@ jobs:
               -DCMAKE_VERBOSE_MAKEFILE=ON
 
           - name: ubuntu-gcc-cmake-shared
-            os: ubuntu-latest
+            os: ubuntu-24.04
             cc: gcc
             cxx: g++
             build-system: cmake
@@ -76,7 +76,7 @@ jobs:
               -DCMAKE_VERBOSE_MAKEFILE=ON
 
           - name: ubuntu-clang-cmake
-            os: ubuntu-latest
+            os: ubuntu-24.04
             cc: clang
             cxx: clang++
             build-system: cmake
@@ -87,7 +87,7 @@ jobs:
               -DCMAKE_VERBOSE_MAKEFILE=ON
 
           - name: ubuntu-clang-cmake-shared
-            os: ubuntu-latest
+            os: ubuntu-24.04
             cc: clang
             cxx: clang++
             build-system: cmake
