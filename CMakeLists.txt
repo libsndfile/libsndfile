@@ -85,10 +85,10 @@ endif ()
 option (ENABLE_PACKAGE_CONFIG "Generate and install package config file" ON)
 option (INSTALL_PKGCONFIG_MODULE "Generate and install pkg-config module" ON)
 
-list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 if (CMAKE_VERSION VERSION_LESS 3.14)
 	list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/sqlite")
 endif ()
+list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 #
 # Setup definitions
