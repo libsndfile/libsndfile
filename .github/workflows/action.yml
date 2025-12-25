@@ -225,7 +225,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -G "${{matrix.cmake-generator}}" ${{matrix.cmake-options}}
+          cmake .. -G "${{matrix.cmake-generator}}" ${{matrix.cmake-options}} -DBUILD_TESTING=ON
           cmake --build . --config Release
           ctest
 
