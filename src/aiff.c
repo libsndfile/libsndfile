@@ -1794,7 +1794,7 @@ aiff_read_chanmap (SF_PRIVATE * psf, unsigned dword)
 
 		free (psf->channel_map) ;
 
-		if ((psf->channel_map = malloc (chanmap_size)) == NULL)
+		if ((psf->channel_map = malloc (SIGNED_SIZEOF (psf->channel_map[0]) * psf->sf.channels)) == NULL)
 			return SFE_MALLOC_FAILED ;
 
 		memcpy (psf->channel_map, map_info->channel_map, chanmap_size) ;
