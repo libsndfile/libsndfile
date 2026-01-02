@@ -508,7 +508,7 @@ mpeg_l3_encode_write_short_stereo (SF_PRIVATE *psf, const short *ptr, sf_count_t
 		 * An oversight, but lame_encode_buffer_interleaved() lacks a const.
 		 * As such, need another memcpy to not cause a warning.
 		 */
-		memcpy (ubuf.sbuf, ptr + total, writecount) ;
+		memcpy (ubuf.sbuf, ptr + total, writecount * 2) ;
 		nbytes = lame_encode_buffer_interleaved (pmpeg->lamef, ubuf.sbuf, writecount / 2, pmpeg->block, pmpeg->block_len) ;
 		if (nbytes < 0)
 		{	psf_log_printf (psf, "lame_encode_buffer returned %d\n", nbytes) ;
