@@ -106,12 +106,12 @@ vorbiscomment_read_tags (SF_PRIVATE *psf, ogg_packet *packet, vorbiscomment_iden
 	psf_log_printf (psf, "VorbisComment Metadata\n") ;
 
 	/*
-	** Vendor tag, manditory, no field name.
+	** Vendor tag, mandatory, no field name.
 	*/
 	tag_len = read_32bit_size_t (p) ;
 	p += 4 ;
 	if (tag_len > 0)
-	{	/* Bound checking. 4 bytes for remaining manditory fields. */
+	{	/* Bound checking. 4 bytes for remaining mandatory fields. */
 		if (p + tag_len + 4 > ep)
 		{	ret = SFE_MALFORMED_FILE ;
 			goto free_tag_out ;
@@ -191,7 +191,7 @@ vorbiscomment_write_tags (SF_PRIVATE *psf, ogg_packet *packet, vorbiscomment_ide
 	if (ident)
 		psf_binheader_writef (psf, "eb", BHWv (ident->ident), BHWz (ident->length)) ;
 
-	/* Manditory Vendor Tag */
+	/* Mandatory Vendor Tag */
 	tag_name_len = vendor ? strlen (vendor) : 0 ;
 	psf_binheader_writef (psf, "e4b", BHW4 (tag_name_len), BHWv (vendor), BHWz (tag_name_len)) ;
 
