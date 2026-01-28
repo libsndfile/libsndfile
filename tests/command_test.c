@@ -1103,6 +1103,7 @@ broadcast_test (const char *filename, int filetype)
 	SNDFILE	*file ;
 	SF_INFO	sfinfo ;
 	int errors = 0 ;
+	char temp [16];
 
 	print_test_name ("broadcast_test", filename) ;
 
@@ -1116,8 +1117,10 @@ broadcast_test (const char *filename, int filetype)
 	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
 	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
 	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	snprintf (temp, sizeof (temp), "%04d/%02d/%02d", 2006, 3, 30) ;
+	memmove (bc_write.origination_date, temp, sizeof (bc_write.origination_date)) ;
+	snprintf (temp, sizeof (temp), "%02d:%02d:%02d", 20, 27, 0) ;
+	memmove (bc_write.origination_time, temp, sizeof (bc_write.origination_time)) ;
 	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
 	bc_write.coding_history_size = 0 ;
 
@@ -1191,6 +1194,7 @@ broadcast_rdwr_test (const char *filename, int filetype)
 	SNDFILE *file ;
 	SF_INFO sfinfo ;
 	sf_count_t frames ;
+	char temp [16];
 
 	print_test_name (__func__, filename) ;
 
@@ -1202,8 +1206,10 @@ broadcast_rdwr_test (const char *filename, int filetype)
 	snprintf (binfo.description, sizeof (binfo.description), "Test description") ;
 	snprintf (binfo.originator, sizeof (binfo.originator), "Test originator") ;
 	snprintf (binfo.originator_reference, sizeof (binfo.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (binfo.origination_date, sizeof (binfo.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (binfo.origination_time, sizeof (binfo.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	snprintf (temp, sizeof (temp), "%04d/%02d/%02d", 2006, 3, 30) ;
+	memmove (binfo.origination_date, temp, sizeof (binfo.origination_date)) ;
+	snprintf (temp, sizeof (temp), "%02d:%02d:%02d", 20, 27, 0) ;
+	memmove (binfo.origination_time, temp, sizeof (binfo.origination_time)) ;
 	snprintf (binfo.umid, sizeof (binfo.umid), "Some umid") ;
 	binfo.coding_history_size = 0 ;
 
@@ -1229,6 +1235,7 @@ check_coding_history_newlines (const char *filename)
 	SNDFILE	*file ;
 	SF_INFO	sfinfo ;
 	unsigned k ;
+	char temp [16] ;
 
 	sfinfo.samplerate	= 22050 ;
 	sfinfo.format		= SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
@@ -1239,8 +1246,10 @@ check_coding_history_newlines (const char *filename)
 	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
 	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
 	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	snprintf (temp, sizeof (temp), "%04d/%02d/%02d", 2006, 3, 30) ;
+	memmove (bc_write.origination_date, temp, sizeof (bc_write.origination_date)) ;
+	snprintf (temp, sizeof (temp), "%02d:%02d:%02d", 20, 27, 0) ;
+	memmove (bc_write.origination_time, temp, sizeof (bc_write.origination_time)) ;
 	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
 	bc_write.coding_history_size = snprintf (bc_write.coding_history, sizeof (bc_write.coding_history), "This has\nUnix\nand\rMac OS9\rline endings.\nLast line") ; ;
 
@@ -1302,6 +1311,7 @@ broadcast_coding_history_test (const char *filename)
 	const char *supplied_history =
 					"A=PCM,F=44100,W=24,M=mono,T=other\r\n"
 					"A=PCM,F=22050,W=16,M=mono,T=yet_another\r\n" ;
+	char temp [16] ;
 
 	print_test_name ("broadcast_coding_history_test", filename) ;
 
@@ -1314,8 +1324,10 @@ broadcast_coding_history_test (const char *filename)
 	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
 	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
 	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	snprintf (temp, sizeof (temp), "%04d/%02d/%02d", 2006, 3, 30) ;
+	memmove (bc_write.origination_date, temp, sizeof (bc_write.origination_date)) ;
+	snprintf (temp, sizeof (temp), "%02d:%02d:%02d", 20, 27, 0) ;
+	memmove (bc_write.origination_time, temp, sizeof (bc_write.origination_time)) ;
 	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
 	/* Coding history will be filled in by the library. */
 	bc_write.coding_history_size = 0 ;
@@ -1403,6 +1415,7 @@ broadcast_coding_history_size (const char *filename)
 	SNDFILE	*file ;
 	SF_INFO	sfinfo ;
 	int k ;
+	char temp [16];
 
 	print_test_name (__func__, filename) ;
 
@@ -1415,8 +1428,10 @@ broadcast_coding_history_size (const char *filename)
 	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
 	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
 	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	snprintf (temp, sizeof (temp), "%04d/%02d/%02d", 2006, 3, 30) ;
+	memmove (bc_write.origination_date, temp, sizeof (bc_write.origination_date)) ;
+	snprintf (temp, sizeof (temp), "%02d:%02d:%02d", 20, 27, 0) ;
+	memmove (bc_write.origination_time, temp, sizeof (bc_write.origination_time)) ;
 	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
 	bc_write.coding_history_size = 0 ;
 
@@ -1466,6 +1481,7 @@ cart_test (const char *filename, int filetype)
 	SNDFILE	*file ;
 	SF_INFO	sfinfo ;
 	int errors = 0 ;
+	char temp [16] ;
 
 	print_test_name ("cart_test", filename) ;
 
@@ -1477,16 +1493,21 @@ cart_test (const char *filename, int filetype)
 
 	// example test data
 	snprintf (ca_write.artist, sizeof (ca_write.artist), "Test artist") ;
-	snprintf (ca_write.version, sizeof (ca_write.version), "Test version") ;
+	snprintf (temp, sizeof (temp), "0101") ;
+	memmove (ca_write.version, temp, sizeof (ca_write.version)) ;
 	snprintf (ca_write.cut_id, sizeof (ca_write.cut_id), "Test cut ID") ;
 	snprintf (ca_write.client_id, sizeof (ca_write.client_id), "Test client ID") ;
 	snprintf (ca_write.category, sizeof (ca_write.category), "Test category") ;
 	snprintf (ca_write.classification, sizeof (ca_write.classification), "Test classification") ;
 	snprintf (ca_write.out_cue, sizeof (ca_write.out_cue), "Test out cue") ;
-	snprintf (ca_write.start_date, sizeof (ca_write.start_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (ca_write.start_time, sizeof (ca_write.start_time), "%02d:%02d:%02d", 20, 27, 0) ;
-	snprintf (ca_write.end_date, sizeof (ca_write.end_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (ca_write.end_time, sizeof (ca_write.end_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	snprintf (temp, sizeof (temp), "%04d/%02d/%02d", 2006, 3, 30) ;
+	memmove (ca_write.start_date, temp, sizeof (ca_write.start_date)) ;
+	snprintf (temp, sizeof (temp), "%02d:%02d:%02d", 20, 27, 0) ;
+	memmove (ca_write.start_time, temp, sizeof (ca_write.start_time)) ;
+	snprintf (temp, sizeof (temp), "%04d/%02d/%02d", 2006, 3, 30) ;
+	memmove (ca_write.end_date, temp, sizeof (ca_write.end_date)) ;
+	snprintf (temp, sizeof (temp), "%02d:%02d:%02d", 20, 27, 0) ;
+	memmove (ca_write.end_time, temp, sizeof (ca_write.end_time)) ;
 	snprintf (ca_write.producer_app_id, sizeof (ca_write.producer_app_id), "Test producer app id") ;
 	snprintf (ca_write.producer_app_version, sizeof (ca_write.producer_app_version), "Test producer app version") ;
 	snprintf (ca_write.user_def, sizeof (ca_write.user_def), "test user def test test") ;
@@ -1627,6 +1648,7 @@ cart_rdwr_test (const char *filename, int filetype)
 	SNDFILE *file ;
 	SF_INFO sfinfo ;
 	sf_count_t frames ;
+	char temp [16] ;
 
 	print_test_name (__func__, filename) ;
 
@@ -1636,16 +1658,21 @@ cart_rdwr_test (const char *filename, int filetype)
 	memset (&cinfo, 0, sizeof (cinfo)) ;
 
 	snprintf (cinfo.artist, sizeof (cinfo.artist), "Test artist") ;
-	snprintf (cinfo.version, sizeof (cinfo.version), "Test version") ;
+	snprintf (temp, sizeof (temp), "0101") ;
+	memmove (cinfo.version, temp, sizeof (cinfo.version)) ;
 	snprintf (cinfo.cut_id, sizeof (cinfo.cut_id), "Test cut ID") ;
 	snprintf (cinfo.client_id, sizeof (cinfo.client_id), "Test client ID") ;
 	snprintf (cinfo.category, sizeof (cinfo.category), "Test category") ;
 	snprintf (cinfo.classification, sizeof (cinfo.classification), "Test classification") ;
 	snprintf (cinfo.out_cue, sizeof (cinfo.out_cue), "Test out cue") ;
-	snprintf (cinfo.start_date, sizeof (cinfo.start_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (cinfo.start_time, sizeof (cinfo.start_time), "%02d:%02d:%02d", 20, 27, 0) ;
-	snprintf (cinfo.end_date, sizeof (cinfo.end_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (cinfo.end_time, sizeof (cinfo.end_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	snprintf (temp, sizeof (temp), "%04d/%02d/%02d", 2006, 3, 30) ;
+	memmove (cinfo.start_date, temp, sizeof (cinfo.start_date)) ;
+	snprintf (temp, sizeof (temp), "%02d:%02d:%02d", 20, 27, 0) ;
+	memmove (cinfo.start_time, temp, sizeof (cinfo.start_time)) ;
+	snprintf (temp, sizeof (temp), "%04d/%02d/%02d", 2006, 3, 30) ;
+	memmove (cinfo.end_date, temp, sizeof (cinfo.end_date)) ;
+	snprintf (temp, sizeof (temp), "%02d:%02d:%02d", 20, 27, 0) ;
+	memmove (cinfo.end_time, temp, sizeof (cinfo.end_time)) ;
 	snprintf (cinfo.producer_app_id, sizeof (cinfo.producer_app_id), "Test producer app id") ;
 	snprintf (cinfo.producer_app_version, sizeof (cinfo.producer_app_version), "Test producer app version") ;
 	snprintf (cinfo.user_def, sizeof (cinfo.user_def), "test user def test test") ;
