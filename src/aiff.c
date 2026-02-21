@@ -62,7 +62,7 @@
 #define twos_MARKER		(MAKE_MARKER ('t', 'w', 'o', 's'))
 #define raw_MARKER		(MAKE_MARKER ('r', 'a', 'w', ' '))
 #define in24_MARKER		(MAKE_MARKER ('i', 'n', '2', '4'))
-#define ni24_MARKER		(MAKE_MARKER ('4', '2', 'n', '1'))
+#define ni24_MARKER		(MAKE_MARKER ('4', '2', 'n', 'i'))
 #define in32_MARKER		(MAKE_MARKER ('i', 'n', '3', '2'))
 #define ni32_MARKER		(MAKE_MARKER ('2', '3', 'n', 'i'))
 
