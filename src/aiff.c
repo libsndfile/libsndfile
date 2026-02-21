@@ -62,7 +62,7 @@
 #define twos_MARKER		(MAKE_MARKER ('t', 'w', 'o', 's'))
 #define raw_MARKER		(MAKE_MARKER ('r', 'a', 'w', ' '))
 #define in24_MARKER		(MAKE_MARKER ('i', 'n', '2', '4'))
-#define ni24_MARKER		(MAKE_MARKER ('4', '2', 'n', '1'))
+#define ni24_MARKER		(MAKE_MARKER ('4', '2', 'n', 'i'))
 #define in32_MARKER		(MAKE_MARKER ('i', 'n', '3', '2'))
 #define ni32_MARKER		(MAKE_MARKER ('2', '3', 'n', 'i'))
 
@@ -1266,21 +1266,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	comm_frames = (psf->sf.frames > 0xFFFFFFFF) ? 0xFFFFFFFF : psf->sf.frames ;
 
 	switch (SF_CODEC (psf->sf.format) | endian)
-	{	case SF_FORMAT_PCM_S8 | SF_ENDIAN_BIG :
-			psf->endian = SF_ENDIAN_BIG ;
-			comm_type = AIFC_MARKER ;
-			comm_size = SIZEOF_AIFC_COMM ;
-			comm_encoding = twos_MARKER ;
-			break ;
-
-		case SF_FORMAT_PCM_S8 | SF_ENDIAN_LITTLE :
-			psf->endian = SF_ENDIAN_LITTLE ;
-			comm_type = AIFC_MARKER ;
-			comm_size = SIZEOF_AIFC_COMM ;
-			comm_encoding = sowt_MARKER ;
-			break ;
-
-		case SF_FORMAT_PCM_16 | SF_ENDIAN_BIG :
+	{	case SF_FORMAT_PCM_16 | SF_ENDIAN_BIG :
 			psf->endian = SF_ENDIAN_BIG ;
 			comm_type = AIFC_MARKER ;
 			comm_size = SIZEOF_AIFC_COMM ;
@@ -1336,14 +1322,14 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 				psf->endian = SF_ENDIAN_BIG ;
 				comm_type = AIFC_MARKER ;
 				comm_size = SIZEOF_AIFC_COMM ;
-				comm_encoding = FL32_MARKER ;	/* Use 'FL32' because its easier to read. */
+				comm_encoding = fl32_MARKER ;
 				break ;
 
 		case SF_FORMAT_DOUBLE :					/* Big endian double precision floating point. */
 				psf->endian = SF_ENDIAN_BIG ;
 				comm_type = AIFC_MARKER ;
 				comm_size = SIZEOF_AIFC_COMM ;
-				comm_encoding = FL64_MARKER ;	/* Use 'FL64' because its easier to read. */
+				comm_encoding = fl64_MARKER ;
 				break ;
 
 		case SF_FORMAT_ULAW :
