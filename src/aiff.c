@@ -1266,21 +1266,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	comm_frames = (psf->sf.frames > 0xFFFFFFFF) ? 0xFFFFFFFF : psf->sf.frames ;
 
 	switch (SF_CODEC (psf->sf.format) | endian)
-	{	case SF_FORMAT_PCM_S8 | SF_ENDIAN_BIG :
-			psf->endian = SF_ENDIAN_BIG ;
-			comm_type = AIFC_MARKER ;
-			comm_size = SIZEOF_AIFC_COMM ;
-			comm_encoding = twos_MARKER ;
-			break ;
-
-		case SF_FORMAT_PCM_S8 | SF_ENDIAN_LITTLE :
-			psf->endian = SF_ENDIAN_LITTLE ;
-			comm_type = AIFC_MARKER ;
-			comm_size = SIZEOF_AIFC_COMM ;
-			comm_encoding = sowt_MARKER ;
-			break ;
-
-		case SF_FORMAT_PCM_16 | SF_ENDIAN_BIG :
+	{	case SF_FORMAT_PCM_16 | SF_ENDIAN_BIG :
 			psf->endian = SF_ENDIAN_BIG ;
 			comm_type = AIFC_MARKER ;
 			comm_size = SIZEOF_AIFC_COMM ;
