@@ -150,6 +150,9 @@ AC_ARG_ENABLE([sqlite],
 AC_ARG_ENABLE([alsa],
 	[AS_HELP_STRING([--disable-alsa], [disable ALSA support (default=autodetect)])], [], [enable_alsa=auto])
 
+AC_ARG_ENABLE([sndio],
+	[AS_HELP_STRING([--disable-sndio], [disable Sndio support (default=autodetect)])], [], [enable_sndio=auto])
+
 AC_ARG_ENABLE([external-libs],
 	[AS_HELP_STRING([--disable-external-libs], [disable use of FLAC, Ogg and Vorbis [[default=no]]])])
 
@@ -471,17 +474,30 @@ AS_IF([test "x$enable_alsa" != "xno"], [
 	])
 
 dnl ====================================================================================
-dnl  Check for OpenBSD's sndio.
+dnl  Check for Sndio.
 
-SNDIO_LIBS=""
 HAVE_SNDIO_H=0
-AS_CASE([$host_os],
-	[openbsd*], [
-		AC_CHECK_HEADERS(sndio.h)
-		AS_IF([test "x$ac_cv_header_sndio_h" = "xyes"], [
-				SNDIO_LIBS="-lsndio"
-				HAVE_SNDIO_H=1
+AS_IF([test "x$alsa_works" != "xyes"], [
+		AS_IF([test "x$enable_sndio" != "xno"], [
+				PKG_CHECK_MODULES([SNDIO], [sndio], [
+						HAVE_SNDIO_H=1
+						ac_cv_sndio="yes"
+					], [
+						ac_cv_sndio="no"
+					])
+		
+				AS_IF([test "x$ac_cv_sndio" = "xno"], [
+						AS_IF([test "x$enable_sndio" = "xyes"], [
+								dnl explicitly passed --enable-sndio, hence error out loud and clearly
+								AC_MSG_ERROR([You explicitly requested sndio support, but sndio could not be found!])
+							], [
+								dnl did not explicitly pass --enable-sndio, relying on default automagic on
+								enable_sndio="no (auto)"
+							])
+					])
 			])
+	], [
+		AC_MSG_WARN([You have requested ALSA already, disable ALSA if you want to use Sndio.])
 	])
 
 AC_DEFINE_UNQUOTED([HAVE_SNDIO_H], [${HAVE_SNDIO_H}], [Set to 1 if <sndio.h> is available.])
@@ -556,17 +572,9 @@ AS_IF([test "x$enable_werror" = "xyes"], [
 		AC_LANG_POP([C++])
 	])
 
-common_flags="-Wall -Wextra -Wpointer-arith -Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wundef -Wuninitialized -Winit-self"
+common_flags="-Wall -Wextra -Wpointer-arith -Wcast-align -Wcast-qual -Wshadow -Wwrite-strings -Wundef -Wuninitialized -Winit-self -Wno-format-truncation"
 common_cflags="${common_flags}"
-dnl Clang doesn't know about -Wno-format-truncation
-dnl and would spew tons of warnings otherwise.
-AS_IF([test "x$ax_cv_c_compiler_vendor" = "xgnu"], [
-		common_cflags="${common_cflags} -Wno-format-truncation"
-	])
 common_cxxflags="${common_flags}"
-AS_IF([test "x$ax_cv_cxx_compiler_vendor" = "xgnu"], [
-		common_cxxflags="${common_cxxflags} -Wno-format-truncation"
-	])
 
 AX_APPEND_COMPILE_FLAGS([${common_cflags} -Wvla -Wbad-function-cast -Wnested-externs -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Waggregate-return], [CFLAGS])
 

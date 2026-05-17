@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.5..3.26)
+cmake_minimum_required (VERSION 3.5...4.0)
 
 # MSVC runtime library flags are selected by an abstraction, CMake >= 3.15
 # This policy still need to be set even with cmake_minimum_required() command above.
@@ -483,7 +483,7 @@ if (BUILD_SHARED_LIBS)
 	if (DEFINED SYMBOL_OS)
 		add_custom_command (
 			OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}
-			COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/src/create_symbols_file.py ${SYMBOL_OS} ${SNDFILE_ABI_VERSION} > ${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}
+			COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/src/create_symbols_file.py ${SYMBOL_OS} ${SNDFILE_ABI_VERSION} > ${CMAKE_CURRENT_BINARY_DIR}/src/${SYMBOL_FILENAME}
 			COMMENT "Generating ${SYMBOL_FILENAME}..."
 			)
 
@@ -566,8 +566,9 @@ if (BUILD_PROGRAMS)
 	elseif ((NOT BEOS) AND ALSA_FOUND)
 		target_include_directories (sndfile-play PRIVATE ${ALSA_INCLUDE_DIRS})
 		target_link_libraries (sndfile-play PRIVATE ${ALSA_LIBRARIES})
-	elseif (CMAKE_SYSTEM_NAME STREQUAL "OpenBSD")
-		target_link_libraries (sndfile-play PRIVATE Sndio::Sndio)
+	elseif ((NOT BEOS) AND SNDIO_FOUND)
+		target_include_directories (sndfile-play PRIVATE ${SNDIO_INCLUDE_DIRS})
+		target_link_libraries (sndfile-play PRIVATE ${SNDIO_LIBRARIES})
 	endif ()
 
 # sndfile-convert

@@ -827,15 +827,16 @@ ogg_opus_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 
 	/* The first page MUST only contain the header, so flush it out now */
 	ogg_stream_packetin (&odata->ostream, &op) ;
-	for ( ; (nn = ogg_stream_flush (&odata->ostream, &odata->opage)) ; )
-	{	if (! (nn = ogg_write_page (psf, &odata->opage)))
+	while (ogg_stream_flush (&odata->ostream, &odata->opage))
+	{	nn = ogg_write_page (psf, &odata->opage) ;
+		if (nn < 0)
 		{	psf_log_printf (psf, "Opus : Failed to write header!\n") ;
 			if (psf->error)
 				return psf->error ;
 			return SFE_INTERNAL ;
 			} ;
 		psf->dataoffset += nn ;
-		}
+		} ;
 
 	/*
 	** Metadata Tags (manditory)
@@ -850,15 +851,16 @@ ogg_opus_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 	vorbiscomment_write_tags (psf, &op, &opustags_ident, opus_get_version_string (), - (OGG_OPUS_COMMENT_PAD)) ;
 	op.packetno = 2 ;
 	ogg_stream_packetin (&odata->ostream, &op) ;
-	for ( ; (nn = ogg_stream_flush (&odata->ostream, &odata->opage)) ; )
-	{	if (! (nn = ogg_write_page (psf, &odata->opage)))
+	while (ogg_stream_flush (&odata->ostream, &odata->opage))
+	{	nn = ogg_write_page (psf, &odata->opage) ;
+		if (nn < 0)
 		{	psf_log_printf (psf, "Opus : Failed to write comments!\n") ;
 			if (psf->error)
 				return psf->error ;
 			return SFE_INTERNAL ;
 			} ;
 		psf->dataoffset += nn ;
-		}
+		} ;
 
 	return 0 ;
 } /* ogg_opus_write_header */
@@ -1132,7 +1134,8 @@ ogg_opus_write_out (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus)
 		if (nbytes > 0)
 		{	oopus->u.encode.last_segments -= ogg_page_segments (&odata->opage) ;
 			oopus->pg_pos = oopus->pkt_pos ;
-			ogg_write_page (psf, &odata->opage) ;
+			if (ogg_write_page (psf, &odata->opage) < 0)
+				return -1 ;
 			}
 		else
 			break ;
