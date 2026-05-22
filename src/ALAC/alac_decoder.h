@@ -29,11 +29,9 @@
 
 #include "ALACAudioTypes.h"
 
-typedef enum
-{
-	false = 0,
-	ALAC_TRUE = 1
-} bool ;
+#include <stdbool.h>
+
+#define ALAC_TRUE true
 
 struct BitBuffer ;
 
