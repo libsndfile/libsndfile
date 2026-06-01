@@ -191,7 +191,7 @@ wav_open	(SF_PRIVATE *psf)
 		if (format != SF_FORMAT_WAV && format != SF_FORMAT_WAVEX)
 			return	SFE_BAD_OPEN_FORMAT ;
 
-		psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+		psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 		/* RIFF WAVs are little-endian, RIFX WAVs are big-endian, default to little */
 		psf->endian = SF_ENDIAN (psf->sf.format) ;

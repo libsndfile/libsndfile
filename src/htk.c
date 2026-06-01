@@ -76,7 +76,7 @@ htk_open	(SF_PRIVATE *psf)
 
 	psf->container_close = htk_close ;
 
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 	switch (subformat)
 	{	case SF_FORMAT_PCM_16 :	/* 16-bit linear PCM. */
@@ -216,7 +216,7 @@ htk_read_header (SF_PRIVATE *psf)
 
 	psf->datalength = psf->filelength - psf->dataoffset ;
 
-	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
+	psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 
 	if (! psf->sf.frames && psf->blockwidth)
 		psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;
