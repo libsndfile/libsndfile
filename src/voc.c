@@ -126,7 +126,7 @@ voc_open	(SF_PRIVATE *psf)
 		psf->write_header = voc_write_header ;
 		} ;
 
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 	psf->container_close = voc_close ;
 
@@ -431,7 +431,7 @@ voc_write_header (SF_PRIVATE *psf, int calc_length)
 		if (psf->dataend)
 			psf->datalength -= psf->filelength - psf->dataend ;
 
-		psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
+		psf->sf.frames = psf->datalength / ((sf_count_t) psf->bytewidth * psf->sf.channels) ;
 		} ;
 
 	subformat = SF_CODEC (psf->sf.format) ;

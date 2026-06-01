@@ -110,7 +110,7 @@ xi_open	(SF_PRIVATE *psf)
 
 	psf->sf.seekable = SF_FALSE ;
 
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 	switch (subformat)
 	{	case SF_FORMAT_DPCM_8 :		/* 8-bit differential PCM. */
@@ -161,7 +161,7 @@ dpcm_init (SF_PRIVATE *psf)
 {	if (psf->bytewidth == 0 || psf->sf.channels == 0)
 		return SFE_INTERNAL ;
 
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 	if (psf->file.mode == SFM_READ || psf->file.mode == SFM_RDWR)
 	{	switch (psf->bytewidth)
@@ -476,7 +476,7 @@ xi_read_header (SF_PRIVATE *psf)
 	psf->sf.channels = 1 ; /* Always mono */
 	psf->sf.samplerate = 44100 ; /* Always */
 
-	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
+	psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 
 	if (! psf->sf.frames && psf->blockwidth)
 		psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;

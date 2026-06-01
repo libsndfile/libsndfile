@@ -88,7 +88,7 @@ svx_open	(SF_PRIVATE *psf)
 
 		psf->endian = SF_ENDIAN_BIG ;			/* All SVX files are big endian. */
 
-		psf->blockwidth = psf->sf.channels * psf->bytewidth ;
+		psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 		if (psf->blockwidth)
 			psf->sf.frames = psf->datalength / psf->blockwidth ;
 
@@ -355,7 +355,7 @@ svx_write_header (SF_PRIVATE *psf, int calc_length)
 		if (psf->dataend)
 			psf->datalength -= psf->filelength - psf->dataend ;
 
-		psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
+		psf->sf.frames = psf->datalength / ((sf_count_t) psf->bytewidth * psf->sf.channels) ;
 		} ;
 
 	psf->header.ptr [0] = 0 ;

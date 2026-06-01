@@ -40,7 +40,7 @@ raw_open	(SF_PRIVATE *psf)
 	else if (CPU_IS_LITTLE_ENDIAN && (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU))
 		psf->endian = SF_ENDIAN_LITTLE ;
 
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 	psf->dataoffset = 0 ;
 	psf->datalength = psf->filelength ;
 

@@ -116,7 +116,7 @@ rf64_open (SF_PRIVATE *psf)
 	{	if (psf->is_pipe)
 			return SFE_NO_PIPE_WRITE ;
 
-		psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+		psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 		if ((error = rf64_write_header (psf, SF_FALSE)))
 			return error ;
@@ -655,7 +655,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 			psf->datalength -= psf->filelength - psf->dataend ;
 
 		if (psf->bytewidth > 0)
-			psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
+			psf->sf.frames = psf->datalength / ((sf_count_t) psf->bytewidth * psf->sf.channels) ;
 		} ;
 
 	/* Reset the current header length to zero. */

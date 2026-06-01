@@ -70,7 +70,7 @@ nist_open	(SF_PRIVATE *psf)
 		if (psf->endian == 0 || psf->endian == SF_ENDIAN_CPU)
 			psf->endian = (CPU_IS_BIG_ENDIAN) ? SF_ENDIAN_BIG : SF_ENDIAN_LITTLE ;
 
-		psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+		psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 		psf->sf.frames = 0 ;
 
 		if ((error = nist_write_header (psf, SF_FALSE)))
@@ -224,7 +224,7 @@ nist_read_header (SF_PRIVATE *psf)
 		return SFE_NIST_BAD_ENCODING ;
 		} ;
 
-	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
+	psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 	psf->datalength = psf->filelength - psf->dataoffset ;
 
 	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
@@ -300,7 +300,7 @@ nist_write_header (SF_PRIVATE *psf, int calc_length)
 			psf->datalength -= psf->filelength - psf->dataend ;
 
 		if (psf->bytewidth > 0)
-			psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
+			psf->sf.frames = psf->datalength / ((sf_count_t) psf->bytewidth * psf->sf.channels) ;
 		} ;
 
 	if (psf->endian == SF_ENDIAN_BIG)

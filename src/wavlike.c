@@ -559,14 +559,14 @@ wavlike_analyze (SF_PRIVATE *psf)
 			psf_log_printf (psf, "wavlike_analyze : found format : 0x%X\n", format) ;
 			psf->sf.format = (psf->sf.format & ~SF_FORMAT_SUBMASK) + format ;
 			psf->bytewidth = 4 ;
-			psf->blockwidth = psf->sf.channels * psf->bytewidth ;
+			psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 			break ;
 
 		case SF_FORMAT_PCM_24 :
 			psf_log_printf (psf, "wavlike_analyze : found format : 0x%X\n", format) ;
 			psf->sf.format = (psf->sf.format & ~SF_FORMAT_SUBMASK) + format ;
 			psf->bytewidth = 3 ;
-			psf->blockwidth = psf->sf.channels * psf->bytewidth ;
+			psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 			break ;
 
 		default :

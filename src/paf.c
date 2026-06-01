@@ -223,7 +223,7 @@ paf_read_header	(SF_PRIVATE *psf)
 
 					psf->sf.format |= SF_FORMAT_PCM_S8 ;
 
-					psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+					psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 					psf->sf.frames = psf->datalength / psf->blockwidth ;
 					break ;
 
@@ -233,7 +233,7 @@ paf_read_header	(SF_PRIVATE *psf)
 
 					psf->sf.format |= SF_FORMAT_PCM_16 ;
 
-					psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+					psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 					psf->sf.frames = psf->datalength / psf->blockwidth ;
 					break ;
 
