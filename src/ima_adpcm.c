@@ -164,7 +164,7 @@ ima_close	(SF_PRIVATE *psf)
 		if (pima->samplecount && pima->samplecount < pima->samplesperblock)
 			pima->encode_block (psf, pima) ;
 
-		psf->sf.frames = pima->samplesperblock * pima->blockcount / psf->sf.channels ;
+		psf->sf.frames = (sf_count_t) pima->samplesperblock * pima->blockcount / psf->sf.channels ;
 		} ;
 
 	return 0 ;
@@ -232,7 +232,7 @@ ima_reader_init (SF_PRIVATE *psf, int blockalign, int samplesperblock)
 
 				pima->decode_block = wavlike_ima_decode_block ;
 
-				psf->sf.frames = pima->samplesperblock * pima->blocks ;
+				psf->sf.frames = (sf_count_t) pima->samplesperblock * pima->blocks ;
 				break ;
 
 		case SF_FORMAT_AIFF :
