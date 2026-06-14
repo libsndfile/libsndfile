@@ -408,7 +408,7 @@ ogg_opus_original_samplerate_test (void)
 int
 main (void)
 {
-	if (HAVE_EXTERNAL_XIPH_LIBS)
+	if (HAVE_OGG && HAVE_OPUS)
 	{	ogg_opus_short_test () ;
 		ogg_opus_int_test () ;
 		ogg_opus_float_test () ;
