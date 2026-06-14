@@ -16,6 +16,12 @@ jobs:
           ubuntu-gcc-cmake-shared,
           ubuntu-clang-cmake,
           ubuntu-clang-cmake-shared,
+          ubuntu-gcc-cmake-no-external,
+          ubuntu-gcc-cmake-only-flac,
+          ubuntu-gcc-cmake-only-ogg-vorbis,
+          ubuntu-gcc-cmake-only-ogg-opus,
+          ubuntu-gcc-cmake-ogg-vorbis-opus,
+          ubuntu-gcc-autotools-negative,
           macos-cmake,
           macos-cmake-shared,
           windows-vs2022-x64,
@@ -97,6 +103,81 @@ jobs:
               -DBUILD_SHARED_LIBS=ON
               -DCMAKE_C_FLAGS="-Wall -Wextra"
               -DCMAKE_VERBOSE_MAKEFILE=ON
+
+          - name: ubuntu-gcc-cmake-no-external
+            os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+            build-system: cmake
+            cmake-generator: 'Ninja'
+            cmake-options: >-
+              -DCMAKE_BUILD_TYPE=Release
+              -DENABLE_EXTERNAL_LIBS=OFF
+              -DENABLE_MPEG=OFF
+              -DCMAKE_C_FLAGS="-Wall -Wextra"
+              -DCMAKE_VERBOSE_MAKEFILE=ON
+
+          - name: ubuntu-gcc-cmake-only-flac
+            os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+            build-system: cmake
+            cmake-generator: 'Ninja'
+            cmake-options: >-
+              -DCMAKE_BUILD_TYPE=Release
+              -DENABLE_OGG=OFF
+              -DENABLE_VORBIS=OFF
+              -DENABLE_OPUS=OFF
+              -DENABLE_MPEG=OFF
+              -DCMAKE_C_FLAGS="-Wall -Wextra"
+              -DCMAKE_VERBOSE_MAKEFILE=ON
+
+          - name: ubuntu-gcc-cmake-only-ogg-vorbis
+            os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+            build-system: cmake
+            cmake-generator: 'Ninja'
+            cmake-options: >-
+              -DCMAKE_BUILD_TYPE=Release
+              -DENABLE_FLAC=OFF
+              -DENABLE_OPUS=OFF
+              -DENABLE_MPEG=OFF
+              -DCMAKE_C_FLAGS="-Wall -Wextra"
+              -DCMAKE_VERBOSE_MAKEFILE=ON
+
+          - name: ubuntu-gcc-cmake-only-ogg-opus
+            os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+            build-system: cmake
+            cmake-generator: 'Ninja'
+            cmake-options: >-
+              -DCMAKE_BUILD_TYPE=Release
+              -DENABLE_FLAC=OFF
+              -DENABLE_VORBIS=OFF
+              -DENABLE_MPEG=OFF
+              -DCMAKE_C_FLAGS="-Wall -Wextra"
+              -DCMAKE_VERBOSE_MAKEFILE=ON
+
+          - name: ubuntu-gcc-cmake-ogg-vorbis-opus
+            os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+            build-system: cmake
+            cmake-generator: 'Ninja'
+            cmake-options: >-
+              -DCMAKE_BUILD_TYPE=Release
+              -DENABLE_FLAC=OFF
+              -DENABLE_MPEG=OFF
+              -DCMAKE_C_FLAGS="-Wall -Wextra"
+              -DCMAKE_VERBOSE_MAKEFILE=ON
+
+          - name: ubuntu-gcc-autotools-negative
+            os: ubuntu-latest
+            cc: gcc
+            cxx: g++
+            build-system: autotools-negative
 
           - name: macos-cmake
             os: macos-latest
@@ -228,6 +309,20 @@ jobs:
           cmake .. -G "${{matrix.cmake-generator}}" ${{matrix.cmake-options}}
           cmake --build . --config Release
           ctest
+
+      - name: Verify autotools rejects contradictory codec flags
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        if: matrix.build-system == 'autotools-negative'
+        run: |
+          autoreconf -vif
+          if ./configure --enable-vorbis --disable-ogg 2>err.log; then
+            echo "configure should have failed when --enable-vorbis was given without --enable-ogg"
+            cat err.log
+            exit 1
+          fi
+          grep -q "Vorbis support requires Ogg" err.log
 
       - name: Configure, build and test with OSSFuzz
         env:
