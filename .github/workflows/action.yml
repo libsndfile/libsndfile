@@ -2,6 +2,9 @@ name: C/C++ CI
 
 on: [push, pull_request]
 
+permissions:
+  contents: read
+
 jobs:
   build:
     strategy:
@@ -178,7 +181,7 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
 
       - name: Install MacOS dependencies
         if: startsWith(matrix.os,'macos')
