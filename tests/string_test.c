@@ -110,7 +110,7 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "flac"))
-	{	if (HAVE_EXTERNAL_XIPH_LIBS)
+	{	if (HAVE_FLAC)
 			string_start_test ("strings.flac", SF_FORMAT_FLAC) ;
 		else
 			puts ("    No FLAC tests because FLAC support was not compiled in.") ;
@@ -126,7 +126,7 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "ogg"))
-	{	if (HAVE_EXTERNAL_XIPH_LIBS)
+	{	if (HAVE_OGG && HAVE_VORBIS)
 			string_start_test ("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS) ;
 		else
 			puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
@@ -134,7 +134,7 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || ! strcmp (argv [1], "opus"))
-	{	if (HAVE_EXTERNAL_XIPH_LIBS)
+	{	if (HAVE_OGG && HAVE_OPUS)
 			string_start_test ("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS) ;
 		else
 			puts ("    No Ogg/Opus tests because Ogg/Opus support was not compiled in.") ;

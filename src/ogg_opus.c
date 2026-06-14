@@ -159,7 +159,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if HAVE_EXTERNAL_XIPH_LIBS
+#if (HAVE_OGG && HAVE_OPUS)
 
 #include <ogg/ogg.h>
 #include <opus.h>
@@ -1817,7 +1817,7 @@ ogg_opus_byterate (SF_PRIVATE *psf)
 	return -1 ;
 } /* ogg_opus_byterate */
 
-#else /* HAVE_EXTERNAL_XIPH_LIBS */
+#else /* HAVE_OGG && HAVE_OPUS */
 
 int
 ogg_opus_open (SF_PRIVATE *psf)

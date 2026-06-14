@@ -133,12 +133,20 @@ You can pass additional options with `/D<parameter>=<value>` when you run
 * `BUILD_EXAMPLES` - build examples, `ON` by default.
 * `BUILD_TESTING` - build tests. Then you can run tests with `ctest` command,
   `ON` by default. Setting `BUILD_SHARED_LIBS` to `ON` disables this option.
-* `ENABLE_EXTERNAL_LIBS` - enable Ogg, Vorbis, FLAC and Opus support. This
-  option is available and set to `ON` if all dependency libraries were found.
+* `ENABLE_EXTERNAL_LIBS` - master switch for Ogg, Vorbis, FLAC and Opus
+  support, `ON` by default. When `OFF`, all four codecs are disabled regardless
+  of the per-codec options below. Set to `OFF` automatically if none of Vorbis,
+  FLAC or Opus was found.
+* `ENABLE_OGG`, `ENABLE_VORBIS`, `ENABLE_FLAC`, `ENABLE_OPUS` - enable the
+  individual codecs, `ON` by default and only available when
+  `ENABLE_EXTERNAL_LIBS` is `ON`. Each one is turned off if its dependency
+  library was not found. Vorbis and Opus also require Ogg.
 * `ENABLE_MPEG` - MP3 support. This option is available and set to `ON` if all
   dependency libraries were found.
 * `ENABLE_EXPERIMENTAL` - enable experimental code. Don't use it if you are
   not sure. This option is `OFF` by default.
+* `ENABLE_SPEEX` - enable Speex support, `ON` by default and only available
+  when `ENABLE_EXPERIMENTAL` is `ON`. Requires Ogg.
 * `ENABLE_CPACK` - enable [CPack](https://cmake.org/cmake/help/latest/module/CPack.html) support.
   This option is `ON` by default.
 * `ENABLE_PACKAGE_CONFIG` - generate and install [package config file](https://cmake.org/cmake/help/latest/manual/cmake-packages.7.html#config-file-packages).
@@ -183,9 +191,11 @@ Deprecated options:
 
 ### Linking from CMake projects
 
-First you need to add `FindOgg.cmake`, `FindVorbis.cmake`, `FindFLAC.cmake` and
-`FindOpus.cmake` files to some directory inside your CMake project (usually
-`cmake`) and add it to `CMAKE_MODULE_PATH`:
+First you need to add `FindOgg.cmake` and the Find modules of the codecs
+libsndfile was built with (`FindVorbis.cmake`, `FindFLAC.cmake`,
+`FindOpus.cmake`, `FindSpeex.cmake`) to some directory inside your CMake project
+(usually `cmake`) and add it to `CMAKE_MODULE_PATH`. Static builds install
+exactly these modules next to `SndFileConfig.cmake`:
 
     project(SomeApplication)
     

@@ -455,7 +455,7 @@ main (int argc, char *argv [])
 	/* Lite remove end */
 
 	if (do_all || strcmp (argv [1], "ogg_vorbis") == 0)
-	{	if (HAVE_EXTERNAL_XIPH_LIBS)
+	{	if (HAVE_OGG && HAVE_VORBIS)
 		{	/* Don't do lcomp_test_XXX as the errors are too big. */
 #if defined (_MSC_VER) && defined (_WIN64)
 			/* VS x64 produces slightly larger numeric drift for Vorbis. */
@@ -477,7 +477,7 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || strcmp (argv [1], "ogg_opus") == 0)
-	{	if (HAVE_EXTERNAL_XIPH_LIBS)
+	{	if (HAVE_OGG && HAVE_OPUS)
 		{	/* Don't do lcomp_test_XXX as the errors are too big.
 			** The margins track libopus output, which drifts between releases
 			** and compilers: libopus 1.6.1 with GCC 16 peaks at 0.74.

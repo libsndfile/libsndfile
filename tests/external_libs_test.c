@@ -45,7 +45,7 @@ main (void)
 	subtype_format_test () ;
 	simple_format_test () ;
 
-	if (HAVE_EXTERNAL_XIPH_LIBS)
+	if (HAVE_FLAC)
 		flac_subset_test () ;
 
 	return 0 ;
@@ -69,14 +69,15 @@ major_format_test (void)
 		have_ogg = info.format == SF_FORMAT_OGG ? 1 : have_ogg ;
 		} ;
 
-	if (HAVE_EXTERNAL_XIPH_LIBS)
-	{	exit_if_true (have_flac == 0, "\n\nLine %d : FLAC should be available.\n\n", __LINE__) ;
-		exit_if_true (have_ogg == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;
-		}
+	if (HAVE_FLAC)
+		exit_if_true (have_flac == 0, "\n\nLine %d : FLAC should be available.\n\n", __LINE__) ;
 	else
-	{	exit_if_true (have_flac, "\n\nLine %d : FLAC should not be available.\n\n", __LINE__) ;
-		exit_if_true (have_ogg, "\n\nLine %d : Ogg/Vorbis should not be available.\n\n", __LINE__) ;
-		} ;
+		exit_if_true (have_flac, "\n\nLine %d : FLAC should not be available.\n\n", __LINE__) ;
+
+	if (HAVE_OGG && (HAVE_VORBIS || HAVE_OPUS))
+		exit_if_true (have_ogg == 0, "\n\nLine %d : Ogg should be available.\n\n", __LINE__) ;
+	else
+		exit_if_true (have_ogg, "\n\nLine %d : Ogg should not be available.\n\n", __LINE__) ;
 
 	puts ("ok") ;
 } /* major_format_test */
@@ -99,14 +100,15 @@ subtype_format_test (void)
 		have_opus = info.format == SF_FORMAT_OPUS ? 1 : have_opus ;
 		} ;
 
-	if (HAVE_EXTERNAL_XIPH_LIBS)
-	{	exit_if_true (have_vorbis == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;
-		exit_if_true (have_opus == 0, "\n\nLine %d : Ogg/Opus should be available.\n\n", __LINE__) ;
-		}
+	if (HAVE_OGG && HAVE_VORBIS)
+		exit_if_true (have_vorbis == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;
 	else
-	{	exit_if_true (have_vorbis, "\n\nLine %d : Ogg/Vorbis should not be available.\n\n", __LINE__) ;
+		exit_if_true (have_vorbis, "\n\nLine %d : Ogg/Vorbis should not be available.\n\n", __LINE__) ;
+
+	if (HAVE_OGG && HAVE_OPUS)
+		exit_if_true (have_opus == 0, "\n\nLine %d : Ogg/Opus should be available.\n\n", __LINE__) ;
+	else
 		exit_if_true (have_opus, "\n\nLine %d : Ogg/Opus should not be available.\n\n", __LINE__) ;
-		} ;
 
 	puts ("ok") ;
 } /* subtype_format_test */
@@ -153,18 +155,25 @@ simple_format_test (void)
 
 		} ;
 
-	if (HAVE_EXTERNAL_XIPH_LIBS)
-	{	exit_if_true (have_flac == 0, "\n\nLine %d : FLAC should be available.\n\n", __LINE__) ;
-		exit_if_true (have_ogg == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;
-		exit_if_true (have_vorbis == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;
-		exit_if_true (have_opus == 0, "\n\nLine %d : Ogg/Opus should be available.\n\n", __LINE__) ;
-		}
+	if (HAVE_FLAC)
+		exit_if_true (have_flac == 0, "\n\nLine %d : FLAC should be available.\n\n", __LINE__) ;
 	else
-	{	exit_if_true (have_flac, "\n\nLine %d : FLAC should not be available.\n\n", __LINE__) ;
-		exit_if_true (have_ogg, "\n\nLine %d : Ogg/Vorbis should not be available.\n\n", __LINE__) ;
+		exit_if_true (have_flac, "\n\nLine %d : FLAC should not be available.\n\n", __LINE__) ;
+
+	if (HAVE_OGG && (HAVE_VORBIS || HAVE_OPUS))
+		exit_if_true (have_ogg == 0, "\n\nLine %d : Ogg should be available.\n\n", __LINE__) ;
+	else
+		exit_if_true (have_ogg, "\n\nLine %d : Ogg should not be available.\n\n", __LINE__) ;
+
+	if (HAVE_OGG && HAVE_VORBIS)
+		exit_if_true (have_vorbis == 0, "\n\nLine %d : Ogg/Vorbis should be available.\n\n", __LINE__) ;
+	else
 		exit_if_true (have_vorbis, "\n\nLine %d : Ogg/Vorbis should not be available.\n\n", __LINE__) ;
+
+	if (HAVE_OGG && HAVE_OPUS)
+		exit_if_true (have_opus == 0, "\n\nLine %d : Ogg/Opus should be available.\n\n", __LINE__) ;
+	else
 		exit_if_true (have_opus, "\n\nLine %d : Ogg/Opus should not be available.\n\n", __LINE__) ;
-		} ;
 
 	puts ("ok") ;
 } /* simple_format_test */
