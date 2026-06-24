@@ -107,15 +107,19 @@ static sf_count_t	flac_write_d2flac (SF_PRIVATE *psf, const double *ptr, sf_coun
 static void		f2flac8_array (const float *src, int32_t *dest, int count, int normalize) ;
 static void		f2flac16_array (const float *src, int32_t *dest, int count, int normalize) ;
 static void		f2flac24_array (const float *src, int32_t *dest, int count, int normalize) ;
+static void		f2flac32_array (const float *src, int32_t *dest, int count, int normalize) ;
 static void		f2flac8_clip_array (const float *src, int32_t *dest, int count, int normalize) ;
 static void		f2flac16_clip_array (const float *src, int32_t *dest, int count, int normalize) ;
 static void		f2flac24_clip_array (const float *src, int32_t *dest, int count, int normalize) ;
+static void		f2flac32_clip_array (const float *src, int32_t *dest, int count, int normalize) ;
 static void		d2flac8_array (const double *src, int32_t *dest, int count, int normalize) ;
 static void		d2flac16_array (const double *src, int32_t *dest, int count, int normalize) ;
 static void		d2flac24_array (const double *src, int32_t *dest, int count, int normalize) ;
+static void		d2flac32_array (const double *src, int32_t *dest, int count, int normalize) ;
 static void		d2flac8_clip_array (const double *src, int32_t *dest, int count, int normalize) ;
 static void		d2flac16_clip_array (const double *src, int32_t *dest, int count, int normalize) ;
 static void		d2flac24_clip_array (const double *src, int32_t *dest, int count, int normalize) ;
+static void		d2flac32_clip_array (const double *src, int32_t *dest, int count, int normalize) ;
 
 static int flac_command (SF_PRIVATE *psf, int command, void *data, int datasize) ;
 
@@ -153,6 +157,12 @@ s2flac24_array (const short *src, int32_t *dest, int count)
 } /* s2flac24_array */
 
 static void
+s2flac32_array (const short *src, int32_t *dest, int count)
+{	for (int i = 0 ; i < count ; i++)
+		dest [i] = src [i] << 16 ;
+} /* s2flac32_array */
+
+static void
 i2flac8_array (const int *src, int32_t *dest, int count)
 {	for (int i = 0 ; i < count ; i++)
 		dest [i] = src [i] >> 24 ;
@@ -170,6 +180,12 @@ i2flac24_array (const int *src, int32_t *dest, int count)
 {	for (int i = 0 ; i < count ; i++)
 		dest [i] = src [i] >> 8 ;
 } /* i2flac24_array */
+
+static void
+i2flac32_array (const int *src, int32_t *dest, int count)
+{	for (int i = 0 ; i < count ; i++)
+		dest [i] = src [i] ;
+} /* i2flac32_array */
 
 static sf_count_t
 flac_buffer_copy (SF_PRIVATE *psf)
@@ -289,7 +305,7 @@ flac_buffer_copy (SF_PRIVATE *psf)
 
 		case PFLAC_PCM_FLOAT :
 			{	float *retpcm = (float*) pflac->ptr ;
-				float norm = (psf->norm_float == SF_TRUE) ? 1.0 / (1 << (frame->header.bits_per_sample - 1)) : 1.0 ;
+				float norm = (psf->norm_float == SF_TRUE) ? 1.0 / ((int64_t) 1 << (frame->header.bits_per_sample - 1)) : 1.0 ;
 
 				for (i = 0 ; i < len && pflac->remain > 0 ; i++)
 				{	offset = pflac->pos + i * channels ;
@@ -310,7 +326,7 @@ flac_buffer_copy (SF_PRIVATE *psf)
 
 		case PFLAC_PCM_DOUBLE :
 			{	double *retpcm = (double*) pflac->ptr ;
-				double norm = (psf->norm_double == SF_TRUE) ? 1.0 / (1 << (frame->header.bits_per_sample - 1)) : 1.0 ;
+				double norm = (psf->norm_double == SF_TRUE) ? 1.0 / ((int64_t) 1 << (frame->header.bits_per_sample - 1)) : 1.0 ;
 
 				for (i = 0 ; i < len && pflac->remain > 0 ; i++)
 				{	offset = pflac->pos + i * channels ;
@@ -488,6 +504,10 @@ sf_flac_meta_callback (const FLAC__StreamDecoder * UNUSED (decoder), const FLAC_
 				case 24 :
 					psf->sf.format |= SF_FORMAT_PCM_24 ;
 					bitwidth = 24 ;
+					break ;
+				case 32 :
+					psf->sf.format |= SF_FORMAT_PCM_32 ;
+					bitwidth = 32 ;
 					break ;
 				default :
 					psf_log_printf (psf, "sf_flac_meta_callback : bits_per_sample %d not yet implemented.\n", metadata->data.stream_info.bits_per_sample) ;
@@ -737,6 +757,7 @@ flac_open	(SF_PRIVATE *psf)
 	{	case SF_FORMAT_PCM_S8 :	/* 8-bit FLAC.  */
 		case SF_FORMAT_PCM_16 :	/* 16-bit FLAC. */
 		case SF_FORMAT_PCM_24 :	/* 24-bit FLAC. */
+		case SF_FORMAT_PCM_32 :	/* 32-bit FLAC. */
 			error = flac_init (psf) ;
 			break ;
 
@@ -806,6 +827,9 @@ flac_enc_init (SF_PRIVATE *psf)
 			break ;
 		case SF_FORMAT_PCM_24 :
 			bps = 24 ;
+			break ;
+		case SF_FORMAT_PCM_32 :
+			bps = 32 ;
 			break ;
 
 		default :
@@ -1075,6 +1099,9 @@ flac_write_s2flac (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 		case SF_FORMAT_PCM_24 :
 			convert = s2flac24_array ;
 			break ;
+		case SF_FORMAT_PCM_32 :
+			convert = s2flac32_array ;
+			break ;
 		default :
 			return -1 ;
 		} ;
@@ -1117,6 +1144,9 @@ flac_write_i2flac (SF_PRIVATE *psf, const int *ptr, sf_count_t len)
 		case SF_FORMAT_PCM_24 :
 			convert = i2flac24_array ;
 			break ;
+		case SF_FORMAT_PCM_32 :
+			convert = i2flac32_array ;
+			break ;
 		default :
 			return -1 ;
 		} ;
@@ -1158,6 +1188,9 @@ flac_write_f2flac (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 			break ;
 		case SF_FORMAT_PCM_24 :
 			convert = (psf->add_clipping) ? f2flac24_clip_array : f2flac24_array ;
+			break ;
+		case SF_FORMAT_PCM_32 :
+			convert = (psf->add_clipping) ? f2flac32_clip_array : f2flac32_array ;
 			break ;
 		default :
 			return -1 ;
@@ -1249,6 +1282,29 @@ f2flac24_clip_array (const float *src, int32_t *dest, int count, int normalize)
 } /* f2flac24_clip_array */
 
 static void
+f2flac32_clip_array (const float *src, int32_t *dest, int count, int normalize)
+{	float normfact, scaled_value ;
+
+	normfact = normalize ? (8.0 * 0x10000000) : 1.0 ;
+
+	for (int i = 0 ; i < count ; i++)
+	{	scaled_value = src [i] * normfact ;
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
+		{	dest [i] = 0x7FFFFFFF ;
+			continue ;
+			} ;
+
+		if (scaled_value <= (-8.0 * 0x10000000))
+		{	dest [i] = ~INT32_C(0x7FFFFFFF) ;
+			continue ;
+			}
+		dest [i] = psf_lrintf (scaled_value) ;
+		} ;
+
+	return ;
+} /* f2flac32_clip_array */
+
+static void
 f2flac8_array (const float *src, int32_t *dest, int count, int normalize)
 {	float normfact = normalize ? (1.0 * 0x7F) : 1.0 ;
 
@@ -1272,6 +1328,14 @@ f2flac24_array (const float *src, int32_t *dest, int count, int normalize)
 		dest [i] = psf_lrintf (src [i] * normfact) ;
 } /* f2flac24_array */
 
+static void
+f2flac32_array (const float *src, int32_t *dest, int count, int normalize)
+{	float normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0 ;
+
+	for (int i = 0 ; i < count ; i++)
+		dest [i] = psf_lrintf (src [i] * normfact) ;
+} /* f2flac32_array */
+
 static sf_count_t
 flac_write_d2flac (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	FLAC_PRIVATE* pflac = (FLAC_PRIVATE*) psf->codec_data ;
@@ -1289,6 +1353,9 @@ flac_write_d2flac (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 			break ;
 		case SF_FORMAT_PCM_24 :
 			convert = (psf->add_clipping) ? d2flac24_clip_array : d2flac24_array ;
+			break ;
+		case SF_FORMAT_PCM_32 :
+			convert = (psf->add_clipping) ? d2flac32_clip_array : d2flac32_array ;
 			break ;
 		default :
 			return -1 ;
@@ -1381,6 +1448,28 @@ d2flac24_clip_array (const double *src, int32_t *dest, int count, int normalize)
 } /* d2flac24_clip_array */
 
 static void
+d2flac32_clip_array (const double *src, int32_t *dest, int count, int normalize)
+{	double normfact, scaled_value ;
+
+	normfact = normalize ? (8.0 * 0x10000000) : 1.0 ;
+
+	for (int i = 0 ; i < count ; i++)
+	{	scaled_value = src [i] * normfact ;
+		if (scaled_value >= (1.0 * 0x7FFFFFFF))
+		{	dest [i] = 0x7FFFFFFF ;
+			continue ;
+			} ;
+		if (scaled_value <= (-8.0 * 0x10000000))
+		{	dest [i] = ~INT32_C(0x7FFFFFFF) ;
+			continue ;
+			} ;
+		dest [i] = psf_lrint (scaled_value) ;
+		} ;
+
+	return ;
+} /* d2flac32_clip_array */
+
+static void
 d2flac8_array (const double *src, int32_t *dest, int count, int normalize)
 {	double normfact = normalize ? (1.0 * 0x7F) : 1.0 ;
 
@@ -1403,6 +1492,14 @@ d2flac24_array (const double *src, int32_t *dest, int count, int normalize)
 	for (int i = 0 ; i < count ; i++)
 		dest [i] = psf_lrint (src [i] * normfact) ;
 } /* d2flac24_array */
+
+static void
+d2flac32_array (const double *src, int32_t *dest, int count, int normalize)
+{	double normfact = normalize ? (1.0 * 0x7FFFFFFF) : 1.0 ;
+
+	for (int i = 0 ; i < count ; i++)
+		dest [i] = psf_lrint (src [i] * normfact) ;
+} /* d2flac32_array */
 
 static sf_count_t
 flac_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
