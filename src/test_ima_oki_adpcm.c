@@ -21,9 +21,9 @@
 
 #include <stdio.h>
 
+#include "common.h"
 #include "test_main.h"
-
-#include "ima_oki_adpcm.c"
+#include "ima_oki_adpcm.h"
 
 static const unsigned char test_codes [] =
 {	0x08, 0x08, 0x04, 0x7f, 0x72, 0xf7, 0x9f, 0x7c, 0xd7, 0xbc, 0x7a, 0xa7, 0xb8,
