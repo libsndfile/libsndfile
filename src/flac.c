@@ -646,8 +646,14 @@ flac_write_strings (SF_PRIVATE *psf, FLAC_PRIVATE* pflac)
 
 		value = psf->strings.storage + psf->strings.data [k].offset ;
 
-		FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair (&entry, key, value) ;
-		FLAC__metadata_object_vorbiscomment_append_comment (pflac->metadata, entry, /* copy */ SF_FALSE) ;
+		/*
+		**	entry_from_name_value_pair fails (and leaves entry untouched) when
+		**	value is not valid UTF-8. Without this check the stale entry from the
+		**	previous iteration is appended a second time with copy == false, so
+		**	the same buffer is owned twice and freed twice on cleanup.
+		*/
+		if (FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair (&entry, key, value))
+			FLAC__metadata_object_vorbiscomment_append_comment (pflac->metadata, entry, /* copy */ SF_FALSE) ;
 		} ;
 
 	if (! FLAC__stream_encoder_set_metadata (pflac->fse, &pflac->metadata, 1))
