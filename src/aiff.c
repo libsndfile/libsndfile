@@ -1790,14 +1790,20 @@ aiff_read_chanmap (SF_PRIVATE * psf, unsigned dword)
 		psf_binheader_readf (psf, "j", dword - bytesread) ;
 
 	if (map_info->channel_map != NULL)
-	{	size_t chanmap_size = SF_MIN (psf->sf.channels, layout_tag & 0xffff) * sizeof (psf->channel_map [0]) ;
+	{	/* The channel map buffer must hold psf->sf.channels entries, because that
+		** is how many SFC_GET_CHANNEL_MAP_INFO and the channel-layout matcher read
+		** back. The layout tag may describe fewer channels than the file declares,
+		** so size the allocation by the channel count and copy only the smaller of
+		** the two to avoid a heap over-read. */
+		size_t chanmap_size = (size_t) psf->sf.channels * sizeof (psf->channel_map [0]) ;
+		size_t copy_size = SF_MIN (psf->sf.channels, layout_tag & 0xffff) * sizeof (psf->channel_map [0]) ;
 
 		free (psf->channel_map) ;
 
-		if ((psf->channel_map = malloc (chanmap_size)) == NULL)
+		if ((psf->channel_map = calloc (1, chanmap_size)) == NULL)
 			return SFE_MALLOC_FAILED ;
 
-		memcpy (psf->channel_map, map_info->channel_map, chanmap_size) ;
+		memcpy (psf->channel_map, map_info->channel_map, copy_size) ;
 		} ;
 
 	return 0 ;
