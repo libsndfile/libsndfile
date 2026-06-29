@@ -194,7 +194,7 @@ main (int argc, char *argv [])
 		all_tests = 1 ;
 
 	if (all_tests || strcmp (argv [1], "vorbis") == 0)
-	{	if (HAVE_EXTERNAL_XIPH_LIBS)
+	{	if (HAVE_OGG && HAVE_VORBIS)
 		{	vorbis_test () ;
 			compression_size_test (SF_FORMAT_OGG | SF_FORMAT_VORBIS, "vorbis.oga") ;
 			}
@@ -203,7 +203,7 @@ main (int argc, char *argv [])
 		} ;
 
 	if (all_tests || strcmp (argv [1], "flac") == 0)
-	{	if (HAVE_EXTERNAL_XIPH_LIBS)
+	{	if (HAVE_FLAC)
 		{	compression_size_test (SF_FORMAT_FLAC | SF_FORMAT_PCM_16, "pcm16.flac") ;
 			}
 		else
@@ -211,7 +211,7 @@ main (int argc, char *argv [])
 		} ;
 
 	if (all_tests || strcmp (argv [1], "opus") == 0)
-	{	if (HAVE_EXTERNAL_XIPH_LIBS)
+	{	if (HAVE_OGG && HAVE_OPUS)
 		{	compression_size_test (SF_FORMAT_OGG | SF_FORMAT_OPUS, "opus.opus") ;
 			}
 		else
