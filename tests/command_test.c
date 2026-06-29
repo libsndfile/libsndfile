@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2019 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 2001-2025 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,6 +52,7 @@ static	void	cue_test				(const char *filename, int filetype) ;
 static	void	cue_test_var			(const char *filename, int filetype, int count) ;
 static	void	channel_map_test		(const char *filename, int filetype) ;
 static	void	current_sf_info_test	(const char *filename) ;
+static	void	au_desc_test			(void) ;
 static	void	raw_needs_endswap_test	(const char *filename, int filetype) ;
 
 static	void	broadcast_test			(const char *filename, int filetype) ;
@@ -90,6 +91,7 @@ main (int argc, char *argv [])
 		printf ("           bext    - test set/get of SF_BROADCAST_INFO.\n") ;
 		printf ("           bextch  - test set/get of SF_BROADCAST_INFO coding_history.\n") ;
 		printf ("           cart    - test set/get of SF_CART_INFO.\n") ;
+		printf ("           au      - test set/get of description in .au\n");
 		printf ("           rawend  - test SFC_RAW_NEEDS_ENDSWAP.\n") ;
 		printf ("           all     - perform all tests\n") ;
 		exit (1) ;
@@ -198,6 +200,11 @@ main (int argc, char *argv [])
 		channel_map_test ("chanmap.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
 		channel_map_test ("chanmap.aifc" , SF_FORMAT_AIFF | SF_FORMAT_PCM_16) ;
 		channel_map_test ("chanmap.caf" , SF_FORMAT_CAF | SF_FORMAT_PCM_16) ;
+		test_count ++ ;
+		} ;
+
+	if (do_all || strcmp (argv [1], "au") == 0)
+	{	au_desc_test () ;
 		test_count ++ ;
 		} ;
 
@@ -1804,3 +1811,165 @@ raw_needs_endswap_test (const char *filename, int filetype)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* raw_needs_endswap_test */
+
+static	void
+au_desc_test ()
+{
+	char	buffer[32];
+	SNDFILE	*file ;
+	SF_INFO	fileinfo;
+	int 	k, r;
+
+	fileinfo.frames 	= 0;
+	fileinfo.samplerate	= 48000;
+	fileinfo.channels 	= 1;
+	fileinfo.format 	= SF_FORMAT_AU | SF_ENDIAN_CPU | SF_FORMAT_PCM_24;
+
+	/* Create float_data with all values being less than 1.0. */
+	for (k = 0 ; k < BUFFER_LEN ; k++)
+		float_data [k] = (k + 5) / (2.0f * BUFFER_LEN) ;
+
+	/* Test 1: Set desc length to zero after open; should succeed */
+	print_test_name ("au_description_test", "cmd-test-1.au") ;
+	file = test_open_file_or_die ("cmd-test-1.au", SFM_WRITE, & fileinfo, SF_TRUE, __LINE__) ;
+
+	/* A newly-opened file has description length 4 */
+	r = sf_command (file, SFC_GET_AU_DESCRIPTION_SIZE, NULL, 0) ;
+	exit_if_true ((r != 4), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* The description in the newly-opened file consists of a string of zeros */
+	snprintf(buffer, 5, "%s", "test");
+	r = sf_command (file, SFC_GET_AU_DESCRIPTION, buffer, sizeof(buffer)) ;
+	exit_if_true ((r != 4), "\n Failed at line %d.\n", __LINE__) ;
+	exit_if_true ((buffer[0] != '\0'), "\n Failed at line %d.\n", __LINE__) ;
+	exit_if_true ((buffer[1] != '\0'), "\n Failed at line %d.\n", __LINE__) ;
+	exit_if_true ((buffer[2] != '\0'), "\n Failed at line %d.\n", __LINE__) ;
+	exit_if_true ((buffer[3] != '\0'), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Set desc length to 0. */
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION_SIZE, NULL, 0) ;
+	exit_if_true ((r != 0), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Set description; the return value indicating stored length should be 0 */
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION_STR, "ABCDEFG", 5) ;
+	exit_if_true ((r != 0), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Write data to file */
+	sf_writef_float (file, float_data, BUFFER_LEN);
+
+	/* Attempt to set desc length > 0 after writing should fail */
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION_SIZE, NULL, 4);
+	exit_if_true ((r >= 0), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Get desc size and desc */
+	r = sf_command ( file, SFC_GET_AU_DESCRIPTION_SIZE, NULL, 0) ;
+	exit_if_true ((r != 0), "\n Failed at line %d. (%d) \n", __LINE__, r) ;
+	r = sf_command (file, SFC_GET_AU_DESCRIPTION, buffer, sizeof(buffer)) ;
+	exit_if_true ((r != 0), "\n Failed at line %d. (%d) \n", __LINE__, r) ;
+
+	sf_close(file);
+
+	/* Now reopen the file */
+	file = NULL;
+	file = test_open_file_or_die ("cmd-test-1.au", SFM_RDWR, & fileinfo, SF_TRUE, __LINE__) ;
+
+	/* Get desc size and desc */
+	r = sf_command ( file, SFC_GET_AU_DESCRIPTION_SIZE, NULL, 0) ;
+	exit_if_true ((r != 0), "\n Failed at line %d. (%d) \n", __LINE__, r) ;
+	r = sf_command (file, SFC_GET_AU_DESCRIPTION, buffer, sizeof(buffer)) ;
+	exit_if_true ((r != 0), "\n Failed at line %d. (%d) \n", __LINE__, r) ;
+
+	sf_close(file);
+	unlink ("cmd-test-1.au") ;
+	puts ("ok") ;
+
+	/* Test 2: Set length after open, then set data before close */
+	print_test_name ("au_description_test", "cmd-test-2.au") ;
+	file = test_open_file_or_die ("cmd-test-2.au", SFM_WRITE, & fileinfo, SF_TRUE, __LINE__) ;
+
+	/* Set the length to 23 (actual length will be 24) */
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION_SIZE, NULL, 23) ;
+	exit_if_true ((r != 0), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* write data */
+	sf_writef_float(file, float_data, BUFFER_LEN);
+
+	/* An ttempt to change the description length should fail. */
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION_SIZE, NULL, 25) ;
+	exit_if_true ((r == 0), "\n Failed at line %d.\n", __LINE__) ;
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION_SIZE, NULL, 19) ;
+	exit_if_true ((r == 0), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Store binary data that fits in the description field */
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION, float_data, 24) ;
+	exit_if_true ((r != 0), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Try to store a null string */
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION_STR, NULL, 20) ;
+	exit_if_true ((r >= 0), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Store a 24-byte string */
+	const char * str_24 = "1____2____3____4____5___";
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION_STR, (void *) str_24, 24 );
+	exit_if_true ((r != 24), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Read the string back into a larger buffer; it should be null-terminated */
+	buffer[24] = 'b';
+	r = sf_command(file, SFC_GET_AU_DESCRIPTION, buffer, sizeof(buffer)) ;
+	exit_if_true ((r != 24), "\n Failed at line %d (%d). \n", __LINE__, r) ;
+	exit_if_true ((strcmp(buffer, str_24) != 0), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Store a string that fits in the description field, using len -1 */
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION_STR, "This file (1)", -1) ;
+	exit_if_true ((r != 13), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Supply a length that is shorter than the actual string */
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION_STR, "This file (2)", 10) ;
+	exit_if_true ((r != 10), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Supply a length that is longer than the actual string */
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION_STR, "This file (3)", 24) ;
+	exit_if_true ((r != 13), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Attempt to set binary description data that is null */
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION, NULL, 20) ;
+	exit_if_true ((r == 0), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Attempt to set binary description data that is too long */
+	r = sf_command (file, SFC_SET_AU_DESCRIPTION, buffer, 28) ;
+	exit_if_true ((r == 0), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Get length of description. Should be 24. */
+	r = sf_command (file, SFC_GET_AU_DESCRIPTION_SIZE, NULL, 0) ;
+	exit_if_true ((r != 24), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Get desc, where buffer is larger than description */
+	r = sf_command(file, SFC_GET_AU_DESCRIPTION, buffer, sizeof(buffer)) ;
+	exit_if_true ((r != 24), "\n Failed at line %d. (%d) \n", __LINE__, r) ;
+	exit_if_true ((strcmp(buffer, "This file (3)") != 0), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Get desc, where buffer is smaller than description */
+	r = sf_command(file, SFC_GET_AU_DESCRIPTION, buffer, 8) ;
+	exit_if_true ((r != 8), "\n Failed at line %d. (%d) \n", __LINE__, r) ;
+	exit_if_true ((strncmp(buffer, "This fil", 8) != 0), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Close the file */
+	sf_close(file);
+
+	/* Reopen the file */
+	file = test_open_file_or_die ("cmd-test-2.au", SFM_READ, & fileinfo, SF_TRUE, __LINE__) ;
+
+	/* Read the description size */
+	r = sf_command (file, SFC_GET_AU_DESCRIPTION_SIZE, NULL, 0) ;
+	exit_if_true ((r != 24), "\n Failed at line %d.\n", __LINE__) ;
+
+	/* Read the description */
+	r = sf_command(file, SFC_GET_AU_DESCRIPTION, buffer, sizeof(buffer)) ;
+	exit_if_true ((r != 24), "\n Failed at line %d. (%d) \n", __LINE__, r) ;
+	exit_if_true ((strcmp(buffer, "This file (3)") != 0), "\n Failed at line %d.\n", __LINE__) ;
+
+	sf_close(file);
+	unlink ("cmd-test-2.au") ;
+	puts ("ok") ;
+
+} /* au_desc_test */
