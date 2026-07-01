@@ -139,6 +139,7 @@ vox_read_block (SF_PRIVATE *psf, IMA_OKI_ADPCM *pvox, short *ptr, int len)
 
 		ima_oki_adpcm_decode_block (pvox) ;
 
+		pvox->pcm_count = SF_MIN (pvox->pcm_count, len - indx) ;
 		memcpy (&(ptr [indx]), pvox->pcm, pvox->pcm_count * sizeof (short)) ;
 		indx += pvox->pcm_count ;
 		} ;
