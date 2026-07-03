@@ -703,7 +703,7 @@ psf_nms_adpcm_decode_block (SF_PRIVATE *psf, NMS_ADPCM_PRIVATE *pnms)
 
 	if ((k = (int) psf_fread (pnms->block, sizeof (short), pnms->shortsperblock, psf)) != pnms->shortsperblock)
 	{	psf_log_printf (psf, "*** Warning : short read (%d != %d).\n", k, pnms->shortsperblock) ;
-		memset (pnms->block + (k * sizeof (short)), 0, (pnms->shortsperblock - k) * sizeof (short)) ;
+		memset (pnms->block + k, 0, (pnms->shortsperblock - k) * sizeof (short)) ;
 		} ;
 
 	if (CPU_IS_BIG_ENDIAN)
