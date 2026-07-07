@@ -119,9 +119,9 @@ id3_process_v2_genre (const char *genre)
 	** We'll just convert the simple case here, strings of the format "(nnn)".
 	*/
 	ptr = genre ;
-	if (ptr [0] == '(' && (c = *++ ptr) && isdigit (c))
+	if (ptr [0] == '(' && (c = *++ ptr) && isdigit ((unsigned char) c))
 	{	num = c - '0' ;
-		while ((c == *++ ptr) && isdigit (c))
+		while ((c == *++ ptr) && isdigit ((unsigned char) c))
 			num = num * 10 + (c - '0') ;
 		if (c == ')' && (c = *++ ptr) == '\0' && num < 256)
 			if ((ptr = id3_lookup_v1_genre (num)))
