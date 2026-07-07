@@ -246,6 +246,7 @@ psf_save_write_chunk (WRITE_CHUNKS * pchk, const SF_CHUNK_INFO * chunk_info)
 			return SFE_MALLOC_FAILED ;
 			} else {
 			pchk->chunks = new_chunks;
+			pchk->count = new_count ;
 			} ;
 		} ;
 
