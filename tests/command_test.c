@@ -492,7 +492,7 @@ format_tests	(void)
 		sfinfo.format = format_info.format ;
 
 		if (! sf_format_check (&sfinfo))
-		{	printf ("\n\nLine %d: sf_format_check failed.\n", __LINE__) ;
+		{	printf ("\n\nLine %d: sf_format_check failed, because [%s]\n", __LINE__, sf_get_format_check_failure_reason(&sfinfo) ) ;
 			printf ("        Name : %s\n", format_info.name) ;
 			printf ("        Format      : 0x%X\n", sfinfo.format) ;
 			printf ("        Channels    : 0x%X\n", sfinfo.channels) ;

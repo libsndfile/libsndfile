@@ -36,6 +36,7 @@ documented) [here](command.md).**
 | [sf_open_fd](#open_fd)                                                                                      | Open sound file using file descriptor.         |
 | [sf_open_virtual](#open_virtual)                                                                            | Open sound file using virtual API.             |
 | [sf_format_check](#check)                                                                                   | Validate sound file info.                      |
+| [sf_get_format_check_failure_reason](#checkfr)                                                              | Validate sound file info or return error str.  |
 | [sf_seek](#seek)                                                                                            | Seek position in sound file.                   |
 | [sf_command](command.md)                                                                                    | Command interface.                             |
 | [sf_error, sf_strerror, sf_error_number, sf_perror, sf_error_str](#error)                                   | Error functions.                               |
@@ -301,7 +302,7 @@ typedef sf_count_t  (*sf_vio_tell)        (void *user_data) ;
 
 Return the current position of the virtual file context.
 
-## Format Check Function {#chek}
+## Format Check Function {#check}
 
 ```c
 int  sf_format_check (const SF_INFO *info) ;
@@ -310,7 +311,22 @@ int  sf_format_check (const SF_INFO *info) ;
 This function allows the caller to check if a set of parameters in the SF_INFO
 struct is valid before calling [sf_open](#open) (SFM_WRITE).
 
-sf_format_check() returns TRUE if the parameters are valid and FALSE otherwise.
+sf_format_check() returns TRUE if the parameters are valid or FALSE otherwise.
+
+## Get Format Check Failure Reason Function {#checkfr}
+
+```c
+const char *  sf_get_format_check_failure_reason (const SF_INFO *info) ;
+```
+
+This function allows the caller to check if a set of parameters in the SF_INFO
+struct is valid before calling [sf_open](#open) (SFM_WRITE).
+
+sf_format_check() returns NULL if the parameters are valid or a pointer
+to a human-readable NUL-terminated string describing the problem otherwise.
+
+This function is logically equivalent to sf_format_check(), but with
+a different return type.
 
 ## File Seek Functions
 
