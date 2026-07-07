@@ -2720,7 +2720,7 @@ format_from_extension (SF_PRIVATE *psf)
 	/* Convert everything in the buffer to lower case. */
 	cptr = buffer ;
 	while (*cptr)
-	{	*cptr = tolower (*cptr) ;
+	{	*cptr = tolower ((unsigned char) *cptr) ;
 		cptr ++ ;
 		} ;
 
