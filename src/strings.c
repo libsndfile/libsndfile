@@ -114,6 +114,11 @@ psf_store_string (SF_PRIVATE *psf, int str_type, const char *str)
 		case SF_STR_ALBUM :
 		case SF_STR_LICENSE :
 		case SF_STR_TRACKNUMBER :
+		case SF_STR_DISCNUMBER :
+		case SF_STR_ALBUMARTIST :
+		case SF_STR_PERFORMER :
+		case SF_STR_LABEL :
+		case SF_STR_ISRC :
 		case SF_STR_GENRE :
 				break ;
 
