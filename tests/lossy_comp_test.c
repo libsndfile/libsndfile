@@ -454,7 +454,7 @@ main (int argc, char *argv [])
 	/* Lite remove end */
 
 	if (do_all || strcmp (argv [1], "ogg_vorbis") == 0)
-	{	if (HAVE_EXTERNAL_XIPH_LIBS)
+	{	if (HAVE_OGG && HAVE_VORBIS)
 		{	/* Don't do lcomp_test_XXX as the errors are too big. */
 			sdlcomp_test_short	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
 			sdlcomp_test_int	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
@@ -468,7 +468,7 @@ main (int argc, char *argv [])
 		} ;
 
 	if (do_all || strcmp (argv [1], "ogg_opus") == 0)
-	{	if (HAVE_EXTERNAL_XIPH_LIBS)
+	{	if (HAVE_OGG && HAVE_OPUS)
 		{	/* Don't do lcomp_test_XXX as the errors are too big. */
 			sdlcomp_test_short	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.57) ;
 			sdlcomp_test_int	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.54) ;
