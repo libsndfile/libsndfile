@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2025 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -217,6 +217,13 @@ enum
 	** recommendations.
 	*/
 	SFC_RF64_AUTO_DOWNGRADE			= 0x1210,
+
+	/* Set and get DESCRIPTION field of AU files. */
+	SFC_SET_AU_DESCRIPTION_SIZE		= 0x1220,
+	SFC_SET_AU_DESCRIPTION_STR		= 0x1221,
+	SFC_SET_AU_DESCRIPTION			= 0x1222,
+	SFC_GET_AU_DESCRIPTION_SIZE		= 0x1223,
+	SFC_GET_AU_DESCRIPTION			= 0x1224,
 
 	SFC_SET_VBR_ENCODING_QUALITY	= 0x1300,
 	SFC_SET_COMPRESSION_LEVEL		= 0x1301,
