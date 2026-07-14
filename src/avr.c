@@ -157,7 +157,7 @@ avr_read_header (SF_PRIVATE *psf)
 	psf_binheader_readf (psf, "E222", &hdr.res1, &hdr.res2, &hdr.res3) ;
 	psf_binheader_readf (psf, "bb", hdr.ext, sizeof (hdr.ext), hdr.user, sizeof (hdr.user)) ;
 
-	psf_log_printf (psf, "  Ext         : %s\n  User        : %s\n", hdr.ext, hdr.user) ;
+	psf_log_printf (psf, "  Ext         : %.20s\n  User        : %.64s\n", hdr.ext, hdr.user) ;
 
 	psf->endian = SF_ENDIAN_BIG ;
 
