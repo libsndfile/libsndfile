@@ -22,6 +22,8 @@
 #include	<fcntl.h>
 #include	<string.h>
 #include	<ctype.h>
+#include	<math.h>
+#include	<limits.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
@@ -159,8 +161,15 @@ ircam_read_header	(SF_PRIVATE *psf)
 		psf->endian = SF_ENDIAN_BIG ;
 		} ;
 
+	/* Final channel bounds after endianness resolution. */
+	if (psf->sf.channels < 1 || psf->sf.channels > SF_MAX_CHANNELS)
+		return SFE_IRCAM_BAD_CHANNELS ;
+
 	psf_log_printf (psf, "marker: 0x%X\n", marker) ;
 
+	/* Validate samplerate before downcast to int. */
+	if (!isfinite (samplerate) || samplerate <= 0.0f || samplerate > (float) INT_MAX)
+		return SFE_MALFORMED_FILE ;
 	psf->sf.samplerate = (int) samplerate ;
 
 	psf_log_printf (psf,	"  Sample Rate : %d\n"
@@ -171,35 +180,30 @@ ircam_read_header	(SF_PRIVATE *psf)
 	switch (encoding)
 	{	case IRCAM_PCM_16 :
 				psf->bytewidth = 2 ;
-				psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 
 				psf->sf.format = SF_FORMAT_IRCAM | SF_FORMAT_PCM_16 ;
 				break ;
 
 		case IRCAM_PCM_32 :
 				psf->bytewidth = 4 ;
-				psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 
 				psf->sf.format = SF_FORMAT_IRCAM | SF_FORMAT_PCM_32 ;
 				break ;
 
 		case IRCAM_FLOAT :
 				psf->bytewidth = 4 ;
-				psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 
 				psf->sf.format = SF_FORMAT_IRCAM | SF_FORMAT_FLOAT ;
 				break ;
 
 		case IRCAM_ALAW :
 				psf->bytewidth = 1 ;
-				psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 
 				psf->sf.format = SF_FORMAT_IRCAM | SF_FORMAT_ALAW ;
 				break ;
 
 		case IRCAM_ULAW :
 				psf->bytewidth = 1 ;
-				psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 
 				psf->sf.format = SF_FORMAT_IRCAM | SF_FORMAT_ULAW ;
 				break ;
@@ -217,11 +221,31 @@ ircam_read_header	(SF_PRIVATE *psf)
 	if (error)
 		return error ;
 
+	/* Overflow-safe blockwidth calculation in sf_count_t. */
+	{
+		/* Pre-multiply guard ensuring bw <= SF_COUNT_MAX. */
+		if ((sf_count_t) psf->sf.channels >
+				(SF_COUNT_MAX / (sf_count_t) psf->bytewidth))
+			return SFE_MALFORMED_FILE ;
+
+		psf->blockwidth = (sf_count_t) psf->sf.channels * (sf_count_t) psf->bytewidth ;
+		if (psf->blockwidth <= 0)
+			return SFE_MALFORMED_FILE ;
+	}
+
+	/* Data region must start at the fixed IRCAM offset. */
+	if (psf->filelength < IRCAM_DATA_OFFSET)
+		return SFE_MALFORMED_FILE ;
+
 	psf->dataoffset = IRCAM_DATA_OFFSET ;
 	psf->datalength = psf->filelength - psf->dataoffset ;
 
-	if (psf->sf.frames == 0 && psf->blockwidth)
-		psf->sf.frames = psf->datalength / psf->blockwidth ;
+	if (psf->sf.frames == 0)
+	{
+		if (psf->blockwidth == 0)
+			return SFE_MALFORMED_FILE ;
+	    psf->sf.frames = psf->datalength / psf->blockwidth ;
+	}
 
 	psf_log_printf (psf, "  Samples     : %d\n", psf->sf.frames) ;
 
