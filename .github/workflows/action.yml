@@ -24,7 +24,9 @@ jobs:
           windows-vs2022-x64,
           windows-vs2022-x64-shared,
           windows-vs2022-Win32,
-          windows-vs2022-Win32-shared
+          windows-vs2022-Win32-shared,
+          windows-vs2022-ARM64,
+          windows-vs2022-ARM64-shared
         ]
         include:
           - name: ubuntu-gcc-autotools
@@ -177,6 +179,34 @@ jobs:
               -DCPACK_PACKAGE_NAME=libsndfile
               -DCMAKE_BUILD_TYPE=Release
               -DVCPKG_TARGET_TRIPLET=x86-windows-static
+              -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+          - name: windows-vs2022-ARM64
+            os: windows-11-arm
+            triplet: 'arm64-windows-static'
+            build-system: cmake
+            cmake-generator: 'Visual Studio 17 2022'
+            cmake-options: >-
+              -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug>
+              -DCMAKE_GENERATOR_PLATFORM=ARM64
+              -DCMAKE_BUILD_TYPE=Release
+              -DVCPKG_TARGET_TRIPLET=arm64-windows-static
+              -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake
+
+          - name: windows-vs2022-ARM64-shared
+            os: windows-11-arm
+            triplet: 'arm64-windows-static'
+            build-system: cmake
+            cmake-generator: 'Visual Studio 17 2022'
+            cmake-options: >-
+              -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded$<$<CONFIG:Debug>:Debug>
+              -DCMAKE_GENERATOR_PLATFORM=ARM64
+              -DBUILD_SHARED_LIBS=ON
+              -DBUILD_REGTEST=OFF
+              -DBUILD_EXAMPLES=OFF
+              -DINSTALL_PKGCONFIG_MODULE=OFF
+              -DCMAKE_BUILD_TYPE=Release
+              -DVCPKG_TARGET_TRIPLET=arm64-windows-static
               -DCMAKE_TOOLCHAIN_FILE=c:/vcpkg/scripts/buildsystems/vcpkg.cmake
 
     runs-on: ${{ matrix.os }}
