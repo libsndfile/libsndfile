@@ -823,6 +823,8 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 	psf->get_chunk_size (psf, chunk_iterator, &chunk_info) ;
 
 	pakt_size = chunk_info.datalen ;
+	if (pakt_size > UINT32_MAX-5 )
+		return NULL;
 	chunk_info.data = pakt_data = malloc (pakt_size + 5) ;
 	if (!chunk_info.data)
 		return NULL ;
