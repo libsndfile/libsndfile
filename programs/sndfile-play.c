@@ -605,7 +605,7 @@ win32_audio_out_callback (HWAVEOUT hwave, UINT msg, DWORD_PTR data, DWORD param1
 
 	/*
 	** I consider this technique of passing a pointer via an integer as
-	** fundamentally broken but thats the way microsoft has defined the
+	** fundamentally broken but that's the way microsoft has defined the
 	** interface.
 	*/
 	audio_data = (Win32_Audio_Data*) data ;
