@@ -1293,6 +1293,18 @@ sf_command	(SNDFILE *sndfile, int command, void *data, int datasize)
 			memcpy (data, psf->loop_info, sizeof (SF_LOOP_INFO)) ;
 			return SF_TRUE ;
 
+		case SFC_SET_LOOP_INFO :
+			if (datasize != sizeof (SF_LOOP_INFO) || data == NULL)
+			{	psf->error = SFE_BAD_COMMAND_PARAM ;
+				return SF_FALSE ;
+				} ;
+			if (psf->loop_info == NULL)
+				return SF_FALSE ;
+
+			if (psf->write_header)
+				psf->write_header (psf, SF_TRUE) ;
+			return SF_TRUE ;
+
 		case SFC_SET_BROADCAST_INFO :
 			{	int format = SF_CONTAINER (psf->sf.format) ;
 
