@@ -162,8 +162,8 @@
 #if HAVE_EXTERNAL_XIPH_LIBS
 
 #include <ogg/ogg.h>
-#include <opus/opus.h>
-#include <opus/opus_multistream.h>
+#include <opus.h>
+#include <opus_multistream.h>
 
 #include "ogg.h"
 #include "ogg_vcomment.h"
