@@ -47,8 +47,18 @@ else ()
 	set (HAVE_EXTERNAL_XIPH_LIBS 0)
 endif ()
 
-find_package (mp3lame)
-find_package (mpg123 1.25.10)
+if (CMAKE_FIND_PACKAGE_PREFER_CONFIG)
+	find_package (mp3lame CONFIG)
+	find_package (MPG123 1.25.10 CONFIG)
+else ()
+	# lowercase `mpg123` in upstream source doesn't match the convention in the TARGET directive
+	# below and also doesn't match in target_link_libraries() directive in the root CMakeLists.txt
+	# both of these use uppercase `MPG123`. i'm not sure if this is intentional so I'm leaving it as is.
+	# if CMAKE_FIND_PACKAGE_PREFER_CONFIG is set (i.e. for Android builds) it will use uppercase
+	find_package (mp3lame)
+	find_package (mpg123 1.25.10)
+endif()
+
 if (TARGET mp3lame::mp3lame AND (TARGET MPG123::libmpg123))
 	set (HAVE_MPEG_LIBS 1)
 else ()
