@@ -161,7 +161,7 @@ ircam_read_header	(SF_PRIVATE *psf)
 
 	psf_log_printf (psf, "marker: 0x%X\n", marker) ;
 
-	psf->sf.samplerate = (int) samplerate ;
+	psf->sf.samplerate = psf_lrintf (samplerate) ;
 
 	psf_log_printf (psf,	"  Sample Rate : %d\n"
 							"  Channels    : %d\n"
