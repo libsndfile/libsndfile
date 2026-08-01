@@ -27,7 +27,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if HAVE_EXTERNAL_XIPH_LIBS
+#if HAVE_OGG
 
 #include <ogg/ogg.h>
 
@@ -274,4 +274,4 @@ vorbiscomment_lookup_name (int id)
 	return NULL ;
 } /* vorbiscomment_lookup_name */
 
-#endif /* HAVE_EXTERNAL_XIPH_LIBS */
+#endif /* HAVE_OGG */

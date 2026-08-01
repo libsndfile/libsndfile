@@ -34,8 +34,20 @@
 /* Define to 1 if you have the <endian.h> header file. */
 #cmakedefine01 HAVE_ENDIAN_H
 
-/* Will be set to 1 if flac, ogg and vorbis are available. */
-#cmakedefine01 HAVE_EXTERNAL_XIPH_LIBS
+/* Will be set to 1 if FLAC is available. */
+#cmakedefine01 HAVE_FLAC
+
+/* Will be set to 1 if Ogg is available. */
+#cmakedefine01 HAVE_OGG
+
+/* Will be set to 1 if Vorbis is available. */
+#cmakedefine01 HAVE_VORBIS
+
+/* Will be set to 1 if Opus is available. */
+#cmakedefine01 HAVE_OPUS
+
+/* Will be set to 1 if Speex is available. */
+#cmakedefine01 HAVE_SPEEX
 
 /* Will be set to 1 if lame and mpg123 are available. */
 #cmakedefine01 HAVE_MPEG

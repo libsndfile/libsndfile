@@ -55,7 +55,7 @@ static SF_FORMAT_INFO const simple_formats [] =
 		"CAF (Apple 16 bit PCM)", "caf"
 		},
 
-#if HAVE_EXTERNAL_XIPH_LIBS
+#if HAVE_FLAC
 	{	SF_FORMAT_FLAC | SF_FORMAT_PCM_16,
 		"FLAC 16 bit", "flac"
 		},
@@ -71,11 +71,13 @@ static SF_FORMAT_INFO const simple_formats [] =
 		"OKI Dialogic VOX ADPCM", "vox"
 		},
 
-#if HAVE_EXTERNAL_XIPH_LIBS
+#if (HAVE_OGG && HAVE_OPUS)
 	{	SF_FORMAT_OGG | SF_FORMAT_OPUS,
 		"Ogg Opus (Xiph Foundation)", "opus"
 		},
+#endif
 
+#if (HAVE_OGG && HAVE_VORBIS)
 	{	SF_FORMAT_OGG | SF_FORMAT_VORBIS,
 		"Ogg Vorbis (Xiph Foundation)", "ogg"
 		},
@@ -131,7 +133,7 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_AU,		"AU (Sun/NeXT)", 						"au"	},
 	{	SF_FORMAT_AVR,		"AVR (Audio Visual Research)",			"avr"	},
 	{	SF_FORMAT_CAF,		"CAF (Apple Core Audio File)",			"caf"	},
-#if HAVE_EXTERNAL_XIPH_LIBS
+#if HAVE_FLAC
 	{	SF_FORMAT_FLAC,		"FLAC (Free Lossless Audio Codec)",		"flac"	},
 #endif
 	{	SF_FORMAT_HTK,		"HTK (HMM Tool Kit)",					"htk"	},
@@ -142,7 +144,7 @@ static SF_FORMAT_INFO const major_formats [] =
 #if HAVE_MPEG
 	{	SF_FORMAT_MPEG,		"MPEG-1/2 Audio",						"m1a"	},
 #endif
-#if HAVE_EXTERNAL_XIPH_LIBS
+#if (HAVE_OGG && (HAVE_VORBIS || HAVE_OPUS))
 	{	SF_FORMAT_OGG,		"OGG (OGG Container format)",			"oga"	},
 #endif
 	{	SF_FORMAT_PAF,		"PAF (Ensoniq PARIS)", 					"paf"	},
@@ -219,8 +221,11 @@ static SF_FORMAT_INFO subtype_formats [] =
 	{	SF_FORMAT_DPCM_16,		"16 bit DPCM",			NULL 	},
 	{	SF_FORMAT_DPCM_8,		"8 bit DPCM",			NULL 	},
 
-#if HAVE_EXTERNAL_XIPH_LIBS
+#if HAVE_VORBIS
 	{	SF_FORMAT_VORBIS,		"Vorbis",				NULL 	},
+#endif
+
+#if HAVE_OPUS
 	{	SF_FORMAT_OPUS,			"Opus",					NULL 	},
 #endif
 

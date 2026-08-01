@@ -71,7 +71,7 @@
 #include "sfendian.h"
 #include "common.h"
 
-#if HAVE_EXTERNAL_XIPH_LIBS
+#if (HAVE_OGG && HAVE_VORBIS)
 
 #include <ogg/ogg.h>
 #include <vorbis/codec.h>
@@ -1067,7 +1067,7 @@ vorbis_calculate_granulepos (SF_PRIVATE *psf, uint64_t *gp_out)
 	return 0 ;
 } /* vorbis_calculate_granulepos */
 
-#else /* HAVE_EXTERNAL_XIPH_LIBS */
+#else /* HAVE_OGG && HAVE_VORBIS */
 
 int
 ogg_vorbis_open	(SF_PRIVATE *psf)
