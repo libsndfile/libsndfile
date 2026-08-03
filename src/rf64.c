@@ -257,6 +257,12 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 				break ;
 
 			case fmt_MARKER:
+					if (parsestage & HAVE_fmt)
+					{	psf_log_printf (psf, "*** Second 'fmt ' chunk?\n") ;
+						psf_binheader_readf (psf, "j", chunk_size) ;
+						break ;
+						} ;
+
 					psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
 					if ((error = wavlike_read_fmt_chunk (psf, chunk_size)) != 0)
 						return error ;
