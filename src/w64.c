@@ -277,6 +277,11 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					if ((parsestage & (HAVE_riff | HAVE_wave)) != (HAVE_riff | HAVE_wave))
 						return SFE_WAV_NO_FMT ;
 
+					if (parsestage & HAVE_fmt)
+					{	psf_log_printf (psf, "*** Second 'fmt ' chunk?\n") ;
+						break ;
+						} ;
+
 					psf_log_printf (psf, " fmt : %D\n", chunk_size) ;
 
 					/* size of 16 byte marker and 8 byte chunk_size value. */
