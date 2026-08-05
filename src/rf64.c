@@ -257,12 +257,20 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 				break ;
 
 			case fmt_MARKER:
+			    if (!(parsestage & HAVE_fmt)) {  
+					// Only process the fmt chunk if it hasn't been handled yet
 					psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
 					if ((error = wavlike_read_fmt_chunk (psf, chunk_size)) != 0)
 						return error ;
 					format = wav_fmt->format ;
 					parsestage |= HAVE_fmt ;
 					break ;
+				} else {
+					// Duplicate fmt chunk detected
+					psf_log_printf(psf, "*** Multiple 'fmt ' chunks detected!", chunk_size);
+					// Return error code SFE_WAV_BAD_FMT
+					return SFE_WAV_BAD_FMT;
+				}
 
 			case bext_MARKER :
 					if ((error = wavlike_read_bext_chunk (psf, chunk_size)) != 0)
