@@ -350,7 +350,7 @@ void	wavlike_msadpcm_write_adapt_coeffs (SF_PRIVATE *psf) ;
 
 char const* wavlike_format_str (int k) ;
 
-int		wavlike_srate2blocksize (int srate_chan_product) ;
+int		wavlike_srate2blocksize (sf_count_t srate_chan_product) ;
 int		wavlike_read_fmt_chunk (SF_PRIVATE *psf, int fmtsize) ;
 void	wavlike_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat) ;
 void	wavlike_analyze (SF_PRIVATE *psf) ;

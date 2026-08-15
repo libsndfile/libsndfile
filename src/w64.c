@@ -148,7 +148,7 @@ w64_open	(SF_PRIVATE *psf)
 		psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 		if (subformat == SF_FORMAT_IMA_ADPCM || subformat == SF_FORMAT_MS_ADPCM)
-		{	blockalign = wavlike_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
+		{	blockalign = wavlike_srate2blocksize ((sf_count_t) psf->sf.samplerate * psf->sf.channels) ;
 			framesperblock = -1 ;
 
 			/*
@@ -531,9 +531,9 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		case SF_FORMAT_IMA_ADPCM :
 					{	int		blockalign, framesperblock, bytespersec ;
 
-						blockalign		= wavlike_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
+						blockalign		= wavlike_srate2blocksize ((sf_count_t) psf->sf.samplerate * psf->sf.channels) ;
 						framesperblock	= 2 * (blockalign - 4 * psf->sf.channels) / psf->sf.channels + 1 ;
-						bytespersec		= (psf->sf.samplerate * blockalign) / framesperblock ;
+						bytespersec		= ((sf_count_t) psf->sf.samplerate * blockalign) / framesperblock ;
 
 						/* fmt chunk. */
 						fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 ;
@@ -556,9 +556,9 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		case SF_FORMAT_MS_ADPCM :
 					{	int blockalign, framesperblock, bytespersec, extrabytes ;
 
-						blockalign		= wavlike_srate2blocksize (psf->sf.samplerate * psf->sf.channels) ;
+						blockalign		= wavlike_srate2blocksize ((sf_count_t) psf->sf.samplerate * psf->sf.channels) ;
 						framesperblock	= 2 + 2 * (blockalign - 7 * psf->sf.channels) / psf->sf.channels ;
-						bytespersec		= (psf->sf.samplerate * blockalign) / framesperblock ;
+						bytespersec		= ((sf_count_t) psf->sf.samplerate * blockalign) / framesperblock ;
 
 						/* fmt chunk. */
 						extrabytes	= 2 + 2 + WAVLIKE_MSADPCM_ADAPT_COEFF_COUNT * (2 + 2) ;
