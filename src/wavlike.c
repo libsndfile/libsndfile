@@ -723,7 +723,7 @@ wavlike_format_str (int k)
 } /* wavlike_format_str */
 
 int
-wavlike_srate2blocksize (int srate_chan_product)
+wavlike_srate2blocksize (sf_count_t srate_chan_product)
 {	if (srate_chan_product < 12000)
 		return 256 ;
 	if (srate_chan_product < 23000)
