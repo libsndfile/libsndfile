@@ -129,6 +129,7 @@ int 	string_in_log_buffer (SNDFILE *file, const char *s) ;
 void	hexdump_file (const char * filename, sf_count_t offset, sf_count_t length) ;
 
 void	test_sf_format_or_die	(const SF_INFO *info, int line_num) ;
+int		format_is_supported		(int format) ;
 
 SNDFILE *test_open_file_or_die
 			(const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num) ;
@@ -534,6 +535,18 @@ test_sf_format_or_die (const SF_INFO *info, int line_num)
 
 	return ;
 } /* test_sf_format_or_die */
+
+int
+format_is_supported (int format)
+{	SF_INFO info ;
+
+	memset (&info, 0, sizeof (info)) ;
+	info.format = format ;
+	info.channels = 1 ;
+	info.samplerate = 44100 ;
+
+	return sf_format_check (&info) ;
+} /* format_is_supported */
 
 SNDFILE *
 test_open_file_or_die (const char *filename, int mode, SF_INFO *sfinfo, int allow_fd, int line_num)
