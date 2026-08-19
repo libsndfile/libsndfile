@@ -908,6 +908,8 @@ sf_format_check	(const SF_INFO *info)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24)
 					return 1 ;
+				if (subformat == SF_FORMAT_PCM_32 && flac_supports_pcm32 ())
+					return 1 ;
 				break ;
 
 		case SF_FORMAT_SD2 :

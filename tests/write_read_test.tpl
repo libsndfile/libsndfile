@@ -374,6 +374,8 @@ main (int argc, char **argv)
 		{	pcm_test_char	("char.flac"	, SF_FORMAT_FLAC | SF_FORMAT_PCM_S8, SF_TRUE) ;
 			pcm_test_short	("short.flac"	, SF_FORMAT_FLAC | SF_FORMAT_PCM_16, SF_TRUE) ;
 			pcm_test_24bit	("24bit.flac"	, SF_FORMAT_FLAC | SF_FORMAT_PCM_24, SF_TRUE) ;
+			if (format_is_supported (SF_FORMAT_FLAC | SF_FORMAT_PCM_32))
+				pcm_test_int	("int.flac"	, SF_FORMAT_FLAC | SF_FORMAT_PCM_32, SF_TRUE) ;
 			}
 		else
 			puts ("    No FLAC tests because FLAC support was not compiled in.") ;

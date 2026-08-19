@@ -13,8 +13,8 @@ ogg_sha256sum = c163bc12bc300c401b6aa35907ac682671ea376f13ae0969a220f7ddf71893fe
 vorbis_version = libvorbis-1.3.7
 vorbis_sha256sum = b33cc4934322bcbf6efcbacf49e3ca01aadbea4114ec9589d1b1e9d20f72954b
 
-flac_version = flac-1.3.3
-flac_sha256sum = 213e82bd716c9de6db2f98bcadbc4c24c7e2efe8c75939a1a84e28539c4e1748
+flac_version = flac-1.4.3
+flac_sha256sum = 6c58e69cd22348f441b861092b825e591d0b822e106de6eb0ee4d05d27205b70
 
 opus_version = opus-1.3.1
 opus_sha256sum = 65b58e1e25b2a114157014736a3d9dfeaad8d41be1c8179866f144a2fb44ff9d
