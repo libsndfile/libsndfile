@@ -95,12 +95,24 @@ main (void)
 	flt_scale_clip_test_32 ("scale_clip_be32.au", SF_ENDIAN_BIG	| SF_FORMAT_AU | SF_FORMAT_PCM_32, 1.0 * 0x80000000) ;
 	flt_scale_clip_test_32 ("scale_clip_le32.au", SF_ENDIAN_LITTLE	| SF_FORMAT_AU | SF_FORMAT_PCM_32, 1.0 * 0x80000000) ;
 
+#if HAVE_EXTERNAL_XIPH_LIBS
+	flt_scale_clip_test_16 ("scale_clip_16.flac", SF_FORMAT_FLAC | SF_FORMAT_PCM_16, 1.0 * 0x8000) ;
+	flt_scale_clip_test_24 ("scale_clip_24.flac", SF_FORMAT_FLAC | SF_FORMAT_PCM_24, 1.0 * 0x800000) ;
+	flt_scale_clip_test_32 ("scale_clip_32.flac", SF_FORMAT_FLAC | SF_FORMAT_PCM_32, 1.0 * 0x80000000) ;
+#endif
+
 	dbl_scale_clip_test_16 ("scale_clip_be16.au", SF_ENDIAN_BIG	| SF_FORMAT_AU | SF_FORMAT_PCM_16, 1.0 * 0x8000) ;
 	dbl_scale_clip_test_16 ("scale_clip_le16.au", SF_ENDIAN_LITTLE	| SF_FORMAT_AU | SF_FORMAT_PCM_16, 1.0 * 0x8000) ;
 	dbl_scale_clip_test_24 ("scale_clip_be24.au", SF_ENDIAN_BIG	| SF_FORMAT_AU | SF_FORMAT_PCM_24, 1.0 * 0x800000) ;
 	dbl_scale_clip_test_24 ("scale_clip_le24.au", SF_ENDIAN_LITTLE	| SF_FORMAT_AU | SF_FORMAT_PCM_24, 1.0 * 0x800000) ;
 	dbl_scale_clip_test_32 ("scale_clip_be32.au", SF_ENDIAN_BIG	| SF_FORMAT_AU | SF_FORMAT_PCM_32, 1.0 * 0x80000000) ;
 	dbl_scale_clip_test_32 ("scale_clip_le32.au", SF_ENDIAN_LITTLE	| SF_FORMAT_AU | SF_FORMAT_PCM_32, 1.0 * 0x80000000) ;
+
+#if HAVE_EXTERNAL_XIPH_LIBS
+	dbl_scale_clip_test_16 ("scale_clip_16.flac", SF_FORMAT_FLAC | SF_FORMAT_PCM_16, 1.0 * 0x8000) ;
+	dbl_scale_clip_test_24 ("scale_clip_24.flac", SF_FORMAT_FLAC | SF_FORMAT_PCM_24, 1.0 * 0x800000) ;
+	dbl_scale_clip_test_32 ("scale_clip_32.flac", SF_FORMAT_FLAC | SF_FORMAT_PCM_32, 1.0 * 0x80000000) ;
+#endif
 
 	flt_short_clip_read_test	("flt_short.au"	, SF_ENDIAN_BIG		| SF_FORMAT_AU | SF_FORMAT_FLOAT) ;
 	flt_int_clip_read_test		("flt_int.au"	, SF_ENDIAN_LITTLE	| SF_FORMAT_AU | SF_FORMAT_FLOAT) ;
