@@ -750,7 +750,8 @@ ogg_opus_setup_encoder (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus
 	odata->opacket.packet = malloc (oopus->buffersize) ;
 	odata->opacket.packetno = 2 ;
 	if (odata->opacket.packet == NULL){
-		free(oopus->buffer);
+		free (oopus->buffer) ;
+		oopus->buffer = NULL ;
 		return SFE_MALLOC_FAILED ;
 	}
 
