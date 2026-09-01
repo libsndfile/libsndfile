@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2017 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2025 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -34,7 +34,7 @@
 #define DOTSND_MARKER	(MAKE_MARKER ('.', 's', 'n', 'd'))
 #define DNSDOT_MARKER	(MAKE_MARKER ('d', 'n', 's', '.'))
 
-#define AU_DATA_OFFSET	24
+#define AU_START_DESC	24
 
 /*------------------------------------------------------------------------------
 ** Known AU file encoding types.
@@ -85,6 +85,10 @@ typedef	struct
 	int		channels ;
 } AU_FMT ;
 
+typedef struct
+{	int		length ;		/* rounded up to a multiple of four */
+	char *	data ;  		/* padded with nulls to full length */
+} AU_DESC ;
 
 /*------------------------------------------------------------------------------
 ** Private static functions.
@@ -97,6 +101,35 @@ static	int 	au_format_to_encoding	(int format) ;
 static int		au_write_header (SF_PRIVATE *psf, int calc_length) ;
 static int		au_read_header (SF_PRIVATE *psf) ;
 
+static AU_DESC *	au_allocate_description (void) ;
+static void			au_desc_init (AU_DESC * desc, int size) ;
+static int			au_command (SF_PRIVATE *psf, int cmd, void *data, int size) ;
+static void			au_free_description(SF_PRIVATE * psf) ;
+
+AU_DESC *
+au_allocate_description ()
+{	return (AU_DESC *) calloc(1, sizeof(AU_DESC));
+} /* au_allocate_description */
+
+void
+au_desc_init (AU_DESC * desc, int size)
+{	desc->data = calloc(1, size);
+	if (desc->data != NULL)
+		desc->length = size;
+} /* au_desc_init */
+
+void
+au_free_description (SF_PRIVATE * psf)
+{	AU_DESC * desc = (AU_DESC *) psf->container_data ;
+	psf->container_data = NULL ;
+
+	if (desc != NULL)
+	{	free (desc->data) ;
+		free (desc) ;
+		}
+} /* au_free_description */
+
+
 /*------------------------------------------------------------------------------
 ** Public function.
 */
@@ -106,10 +139,14 @@ au_open	(SF_PRIVATE *psf)
 {	int		subformat ;
 	int		error = 0 ;
 
+	psf->container_data = au_allocate_description () ;
+
 	if (psf->file.mode == SFM_READ || (psf->file.mode == SFM_RDWR && psf->filelength > 0))
 	{	if ((error = au_read_header (psf)))
 			return error ;
-		} ;
+		}
+	else
+		au_desc_init (psf->container_data, 4) ;
 
 	if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_AU)
 		return	SFE_BAD_OPEN_FORMAT ;
@@ -180,6 +217,8 @@ au_open	(SF_PRIVATE *psf)
 		default :	break ;
 		} ;
 
+		psf->command = au_command;
+
 	return error ;
 } /* au_open */
 
@@ -191,6 +230,7 @@ au_close	(SF_PRIVATE *psf)
 {
 	if (psf->file.mode == SFM_WRITE || psf->file.mode == SFM_RDWR)
 		au_write_header (psf, SF_TRUE) ;
+	au_free_description (psf) ;
 
 	return 0 ;
 } /* au_close */
@@ -198,7 +238,8 @@ au_close	(SF_PRIVATE *psf)
 static int
 au_write_header (SF_PRIVATE *psf, int calc_length)
 {	sf_count_t	current ;
-	int			encoding, datalength ;
+	int			encoding, datalength, dataoffset ;
+	AU_DESC *	desc;
 
 	if (psf->pipeoffset > 0)
 		return 0 ;
@@ -238,12 +279,15 @@ au_write_header (SF_PRIVATE *psf, int calc_length)
 	else
 		datalength = (int) (psf->datalength & 0x7FFFFFFF) ;
 
+    desc = (AU_DESC *) psf->container_data ;
+    dataoffset = AU_START_DESC + desc->length;
+
 	if (psf->endian == SF_ENDIAN_BIG)
-	{	psf_binheader_writef (psf, "Em4", BHWm (DOTSND_MARKER), BHW4 (AU_DATA_OFFSET)) ;
+	{	psf_binheader_writef (psf, "Em4", BHWm (DOTSND_MARKER), BHW4 (dataoffset)) ;
 		psf_binheader_writef (psf, "E4444", BHW4 (datalength), BHW4 (encoding), BHW4 (psf->sf.samplerate), BHW4 (psf->sf.channels)) ;
 		}
 	else if (psf->endian == SF_ENDIAN_LITTLE)
-	{	psf_binheader_writef (psf, "em4", BHWm (DNSDOT_MARKER), BHW4 (AU_DATA_OFFSET)) ;
+	{	psf_binheader_writef (psf, "em4", BHWm (DNSDOT_MARKER), BHW4 (dataoffset)) ;
 		psf_binheader_writef (psf, "e4444", BHW4 (datalength), BHW4 (encoding), BHW4 (psf->sf.samplerate), BHW4 (psf->sf.channels)) ;
 		}
 	else
@@ -255,9 +299,11 @@ au_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->error)
 		return psf->error ;
 
-	psf->dataoffset = psf->header.indx ;
+	/* Write out the description */
+	int c = psf_fwrite (desc->data, desc->length, 1, psf);
+	psf->dataoffset = dataoffset ;
 
-	if (current > 0)
+	if (current > dataoffset)
 		psf_fseek (psf, current, SEEK_SET) ;
 
 	return psf->error ;
@@ -338,11 +384,13 @@ au_read_header (SF_PRIVATE *psf)
  	psf->dataoffset = au_fmt.dataoffset ;
 	psf->datalength = psf->filelength - psf->dataoffset ;
 
-	if (psf_ftell (psf) < psf->dataoffset)
-		psf_binheader_readf (psf, "j", psf->dataoffset - psf_ftell (psf)) ;
-
 	psf->sf.samplerate	= au_fmt.samplerate ;
 	psf->sf.channels 	= au_fmt.channels ;
+
+	AU_DESC * desc = (AU_DESC *) psf->container_data ;
+	desc->length = psf->dataoffset - AU_START_DESC ;
+	desc->data = malloc (desc->length) ;
+	psf_fread (desc->data, desc->length, 1, psf) ;
 
 	/* Only fill in type major. */
 	if (psf->endian == SF_ENDIAN_BIG)
@@ -453,4 +501,86 @@ au_read_header (SF_PRIVATE *psf)
 
 	return 0 ;
 } /* au_read_header */
+
+int
+au_command (SF_PRIVATE *psf, int command, void *data, int datasize)
+{
+	AU_DESC *	desc;
+	char *		string = (char *) data ;
+	int			actual_len, max ;
+	bool		data_written, change_header, new_string, truncate ;
+
+	desc = (AU_DESC *) psf->container_data ;
+	if (desc == NULL)
+		return -1 ;
+
+	switch (command)
+	{	case SFC_SET_AU_DESCRIPTION_SIZE:
+			if (! (psf->file.mode & SFM_WRITE))
+				return -2 ;
+
+			/* You cannot change the header after starting to write audio data */
+			if (psf->write_current > 0)
+				return -3;
+
+			/* Round up to a multiple of 4 */
+			while (datasize % 4)
+				datasize += 1 ;
+
+			desc->length = datasize;
+			au_write_header(psf, 0) ;
+			return 0;
+
+		case SFC_SET_AU_DESCRIPTION_STR:
+			if (string == NULL)
+				return -4;
+
+			free (desc->data) ;
+			desc->data = calloc (1, desc->length) ;
+			max = desc->length ;
+			if (datasize > 0 && datasize < max)
+				max = datasize ;
+			actual_len = strnlen (string, max) ;
+			memcpy(desc->data, string, actual_len) ;
+			return actual_len ;
+
+		case SFC_SET_AU_DESCRIPTION:
+			if (data == NULL)
+				return -4 ;
+
+			if (datasize < 0 || datasize > desc->length)
+				return -5 ;
+
+			free (desc->data) ;
+			desc->data = calloc (1, desc->length) ;
+			memcpy (desc->data, data, datasize) ;
+			return 0 ;
+
+		case SFC_GET_AU_DESCRIPTION_SIZE :
+			if(psf->dataoffset >= AU_START_DESC)
+				return psf->dataoffset - AU_START_DESC;
+			return -1;
+
+		case SFC_GET_AU_DESCRIPTION :
+			if (data == NULL)
+				return -4 ;
+
+			if (datasize < 0)
+				return -5 ;
+
+			max = desc->length ;
+			if (datasize < max)
+				max = datasize ;
+
+			memcpy (data, desc->data, max);
+			if (max < datasize)
+				* (string + max) = '\0';
+
+			return max;
+
+		default :
+			return -1 ;
+		} ;
+
+} /* au_command */
 

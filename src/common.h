@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999-2018 Erik de Castro Lopo <erikd@mega-nerd.com>
+** Copyright (C) 1999-2025 Erik de Castro Lopo <erikd@mega-nerd.com>
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Lesser General Public License as published by
@@ -305,7 +305,7 @@ void *psf_memdup (const void *src, size_t n) ;
 int psf_isprint (int ch) ;
 
 /*=======================================================================================
-**	SF_PRIVATE struct - a pointer to this struct is passed back to the caller of the
+**	PSF_FILE struct - a pointer to this struct is passed back to the caller of the
 **	sf_open_XXXX functions. The caller however has no knowledge of the struct's
 **	contents.
 */

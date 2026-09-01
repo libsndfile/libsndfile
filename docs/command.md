@@ -84,6 +84,11 @@ The available commands are as follows:
 | [SFC_SET_ORIGINAL_SAMPLERATE](#sfc_set_original_samplerate)       | Set original samplerate metadata.                       |
 | [SFC_GET_BITRATE_MODE](#sfc_get_bitrate_mode)                     | Get bitrate mode.                                       |
 | [SFC_SET_BITRATE_MODE](#sfc_set_bitrate_mode)                     | Set bitrate mode.                                       |
+| [SFC_SET_AU_DESCRIPTION_SIZE](#sfc_set_au_description_size)       | Set size of description area in AU file.                |
+| [SFC_SET_AU_DESCRIPTION_STR](#sfc_set_au_description_str)         | Store a character string in AU description area.        |
+| [SFC_SET_AU_DESCRIPTION](#sfc_set_au_description)                 | Store binary data in AU description area.               |
+| [SFC_GET_AU_DESCRIPTION_SIZE](#sfc_get_au_description_size)       | Retrieve size of description area from AU file.         |
+| [SFC_GET_AU_DESCRIPTION](#sfc_get_au_description)                 | Read stored value from AU description area.             |
 
 ---
 
@@ -2014,3 +2019,137 @@ datasize
 ### Return value
 
 Returns `SF_TRUE` on success, `SF_FALSE` otherwise.
+
+## SFC_SET_AU_DESCRIPTION_SIZE
+
+Set the length in bytes of the description area of an AU file, a region between
+the header and the audio data, which may be used to store a text string or any
+binary data. The length of the description area must be set immediately after
+opening the file, before any audio data is written. By default, a newly-created
+AU file will have a 4-byte description area containing a string of four zeros.
+The length may be set to zero or to any positive value, but in order to guarantee
+alignment of the audio data that follows the description, it will be rounded up
+to a multiple of 4 bytes.
+
+### Parameters
+
+sndfile
+: A valid SNDFILE* pointer
+
+cmd
+: SFC_SET_AU_DESCRIPTION_SIZE
+
+data
+: this parameter is unused
+
+datasize
+: the desired size of the description field, in bytes.
+
+### Return value
+
+Returns 0 on success, or a negative value on error.
+
+## SFC_SET_AU_DESCRIPTION_STR
+
+Store a character string in the desciption field of an AU file. This may be
+done at any time while the file is open. The length of the string stored in
+the file will not be greater than the size of the file's description area.
+If the string is smaller than the description area, a null byte will be
+written after the string.
+
+### Parameters
+
+sndfile
+: A valid SNDFILE* pointer
+
+cmd
+: SFC_SET_AU_DESCRIPTION_STR
+
+data
+: pointer to a null-terminated string value
+
+datasize
+: length of the provided string buffer. If the value -1 is supplied, the buffer
+will be read up to the size of the file's description area or until a null
+terminator is encountered.
+
+### Return value
+
+On success, return a non-negative value indicating the length of the string
+stored in the description area. Returns a negative value on error.
+
+## SFC_SET_AU_DESCRIPTION
+
+Store binary data in the description field of an AU file. This may be done
+at any time while the file is open.
+
+### Parameters
+
+sndfile
+: A valid SNDFILE* pointer
+
+cmd
+: SFC_SET_AU_DESCRIPTION
+
+data
+: pointer to data to be stored
+
+datasize
+: the length of the data to be stored. This value must be less than or equal to
+the size of the file's description area.
+
+### Return value
+
+Returns 0 on success, or a negative value on error.
+
+
+## SFC_GET_AU_DESCRIPTION_SIZE
+
+Returns the size of the description field for an open au file.
+
+### Parameters
+
+sndfile
+: A valid SNDFILE* pointer
+
+cmd
+: SFC_GET_AU_DESCRIPTION_SIZE
+
+data
+: this parameter is unused
+
+datasize
+: this parameter is unused
+
+### Return value
+: on success, returns non-negative size of the description field of the open
+  au file. On error, returns -1.
+
+## SFC_GET_AU_DESCRIPTION
+
+Copy the description field from an AU file into a user-supplied buffer. If
+the buffer is longer than the stored data, it will be padded with trailing
+NUL characters. This means a user can supply a buffer one byte longer than the
+field length to guarantee that string data is always null-terminated. If the
+buffer is smaller than the description field, the description data will be
+truncated.
+
+### Parameters
+
+sndfile
+: A valid SNDFILE* pointer
+
+cmd
+: SFC_GET_AU_DESCRIPTION
+
+data
+: pointer to a buffer that will be used to hold the description data.
+
+datasize
+: maximum number of bytes that may be used in the buffer.
+
+### Return value
+
+On success, return a non-negative value indicating the length of the description
+data copied into the buffer; this will always be the smaller of the buffer
+size and the description size. Returns a negative value on error.
