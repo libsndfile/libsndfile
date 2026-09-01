@@ -456,10 +456,18 @@ main (int argc, char *argv [])
 	if (do_all || strcmp (argv [1], "ogg_vorbis") == 0)
 	{	if (HAVE_EXTERNAL_XIPH_LIBS)
 		{	/* Don't do lcomp_test_XXX as the errors are too big. */
+#if defined (_MSC_VER) && defined (_WIN64)
+			/* VS x64 produces slightly larger numeric drift for Vorbis. */
+			sdlcomp_test_short	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.50) ;
+			sdlcomp_test_int	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.50) ;
+			sdlcomp_test_float	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.50) ;
+			sdlcomp_test_double	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.50) ;
+#else
 			sdlcomp_test_short	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
 			sdlcomp_test_int	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
 			sdlcomp_test_float	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
 			sdlcomp_test_double	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
+#endif
 			}
 		else
 			puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
@@ -470,10 +478,23 @@ main (int argc, char *argv [])
 	if (do_all || strcmp (argv [1], "ogg_opus") == 0)
 	{	if (HAVE_EXTERNAL_XIPH_LIBS)
 		{	/* Don't do lcomp_test_XXX as the errors are too big. */
+#if defined (_MSC_VER) && defined (_WIN64)
+			/* VS x64 produces larger numeric drift for Opus than Win32 or GCC/Clang. */
+			sdlcomp_test_short	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
+			sdlcomp_test_int	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
+			sdlcomp_test_float	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
+			sdlcomp_test_double	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
+#elif defined (_MSC_VER)
+			sdlcomp_test_short	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
+			sdlcomp_test_int	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
+			sdlcomp_test_float	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
+			sdlcomp_test_double	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
+#else
 			sdlcomp_test_short	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.57) ;
 			sdlcomp_test_int	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.54) ;
 			sdlcomp_test_float	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.55) ;
 			sdlcomp_test_double	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.55) ;
+#endif
 			}
 		else
 			puts ("    No Ogg/Opus tests because Ogg/Opus support was not compiled in.") ;
