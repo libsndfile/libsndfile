@@ -121,6 +121,13 @@ if (ENABLE_SSE2)
 	add_compile_options (-msse2)
 endif ()
 
+if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+	add_compile_options (
+		$<$<COMPILE_LANGUAGE:C>:/fp:precise>
+		$<$<COMPILE_LANGUAGE:C>:/arch:SSE2>
+		)
+endif ()
+
 set (HAVE_EXTERNAL_XIPH_LIBS ${ENABLE_EXTERNAL_LIBS})
 set (HAVE_SQLITE3 ${BUILD_REGTEST})
 set (HAVE_ALSA_ASOUNDLIB_H ${ALSA_FOUND})
