@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* Unseekable steams support (pipes) for Virtual IOs
+
+  If your stream is not seekable, set "seek", "get_filelen", and "tell" callbacks
+  to NULL in SF_VIRTUAL_IO. In this case, the library will treat your stream as
+  a non-seekable virtual pipe. Note that not all operations are available for pipes.
+  For example you can open a WAV file for read but it's impossible to write WAV file
+  to a pipe because the WAV format requires a length of file to be written at beginning
+  of the file which is impossible without supporting of "seek".
+
 ### Fixed
 
 * Disable autogen rules when autogen cannot be found
