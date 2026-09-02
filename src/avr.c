@@ -34,7 +34,7 @@
 ** A lot of PD software exists to play Mac .snd files on the ST. One other
 ** format that seems pretty popular (used by a number of commercial packages)
 ** is the AVR format (from Audio Visual Research). This format has a 128 byte
-** header that looks like this (its actually packed, but thats not portable):
+** header that looks like this (its actually packed, but that's not portable):
 */
 
 typedef struct

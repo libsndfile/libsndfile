@@ -53,7 +53,7 @@ cmd = sprintf ("sndfile-play %s", filename) ;
 [output, status] = system (cmd) ;
 
 if (status),
-	disp (outout) ;
+	disp (output) ;
 	endif
 
 endfunction
