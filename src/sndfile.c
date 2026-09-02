@@ -651,328 +651,335 @@ sf_error_str (SNDFILE *sndfile, char *str, size_t maxlen)
 
 int
 sf_format_check	(const SF_INFO *info)
-{	int	subformat, endian ;
+{
+	/* Return SF_FALSE on failure, or SF_TRUE on success.
+	*/
+	return (sf_get_format_check_failure_reason(info) == NULL) ? SF_TRUE : SF_FALSE;
+}
 
+/*==============================================================================
+*/
+
+const char *
+sf_get_format_check_failure_reason(const SF_INFO *info)
+{	int	subformat, endian ;
 	subformat = SF_CODEC (info->format) ;
 	endian = SF_ENDIAN (info->format) ;
 
 	/* This is the place where each file format can check if the supplied
 	** SF_INFO struct is valid.
-	** Return 0 on failure, 1 on success.
+	** Return a human-readable error string on failure, or NULL on success.
 	*/
 
-	if (info->channels < 1 || info->channels > SF_MAX_CHANNELS)
-		return 0 ;
+	if (info->channels < 1)
+		return "channel-count cannot be less than 1" ;
+
+	if (info->channels > SF_MAX_CHANNELS)
+		return "maximum channel-count exceeded" ;
 
 	if (info->samplerate < 0)
-		return 0 ;
+		return "negative sample rates are not supported" ;
 
 	switch (SF_CONTAINER (info->format))
 	{	case SF_FORMAT_WAV :
 				/* WAV now allows both endian, RIFF or RIFX (little or big respectively) */
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
-				if ((subformat == SF_FORMAT_IMA_ADPCM || subformat == SF_FORMAT_MS_ADPCM) && info->channels <= 2)
-					return 1 ;
-				if (subformat == SF_FORMAT_GSM610 && info->channels == 1)
-					return 1 ;
-				if (subformat == SF_FORMAT_G721_32 && info->channels == 1)
-					return 1 ;
+					return NULL ;
+				if (subformat == SF_FORMAT_IMA_ADPCM || subformat == SF_FORMAT_MS_ADPCM)
+					return (info->channels <= 2) ? NULL : "WAV format supports a maximum of 2 channels in ADPCM subformats" ;
+				if (subformat == SF_FORMAT_GSM610)
+					return (info->channels == 1) ? NULL : "WAV format supports only 1 channel in GSM610 subformat" ;
+				if (subformat == SF_FORMAT_G721_32)
+					return (info->channels == 1) ? NULL : "WAV format supports only 1 channel in G721_32 subformat" ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
-					return 1 ;
-				if ((subformat == SF_FORMAT_NMS_ADPCM_16 || subformat == SF_FORMAT_NMS_ADPCM_24 ||
-							subformat == SF_FORMAT_NMS_ADPCM_32) && info->channels == 1)
-					return 1 ;
-				if (subformat == SF_FORMAT_MPEG_LAYER_III && info->channels <= 2)
-					return 1 ;
+					return NULL ;
+				if (subformat == SF_FORMAT_NMS_ADPCM_16 || subformat == SF_FORMAT_NMS_ADPCM_24 || subformat == SF_FORMAT_NMS_ADPCM_32)
+					return (info->channels == 1) ? NULL : "WAV format supports only 1 channel in NMS_ADPCM subformats" ;
+				if (subformat == SF_FORMAT_MPEG_LAYER_III)
+					return (info->channels <= 2) ? NULL : "WAV format supports a maximum of 2 channels in MPEG_LAYER_III subformat" ;
 				break ;
 
 		case SF_FORMAT_WAVEX :
 				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
-					return 0 ;
+					return "WaveX supports only little-endian samples" ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_AIFF :
 				/* AIFF does allow both endian-nesses for PCM data.*/
 				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
+					return NULL ;
 				/* For other encodings reject any endian-ness setting. */
 				if (endian != 0)
-					return 0 ;
+					return "AIFF doesn't support non-zero endian settings except in PCM mode" ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
-					return 1 ;
-				if ((subformat == SF_FORMAT_DWVW_12 || subformat == SF_FORMAT_DWVW_16 ||
-							subformat == SF_FORMAT_DWVW_24) && info-> channels == 1)
-					return 1 ;
-				if (subformat == SF_FORMAT_GSM610 && info->channels == 1)
-					return 1 ;
-				if (subformat == SF_FORMAT_IMA_ADPCM && (info->channels == 1 || info->channels == 2))
-					return 1 ;
+					return NULL ;
+				if (subformat == SF_FORMAT_DWVW_12 || subformat == SF_FORMAT_DWVW_16 || subformat == SF_FORMAT_DWVW_24)
+					return (info->channels == 1) ? NULL : "AIFF format supports only 1 channel in DWVW subformats" ;
+				if (subformat == SF_FORMAT_GSM610)
+					return (info->channels == 1) ? NULL : "AIFF format supports only 1 channel in GSM610 subformat" ;
+				if (subformat == SF_FORMAT_IMA_ADPCM)
+					return (info->channels <= 2) ? NULL : "AIFF format supports a maximum of 2 channels in IMA_ADPCM subformat" ;
 				break ;
 
 		case SF_FORMAT_AU :
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
-					return 1 ;
-				if (subformat == SF_FORMAT_G721_32 && info->channels == 1)
-					return 1 ;
-				if (subformat == SF_FORMAT_G723_24 && info->channels == 1)
-					return 1 ;
-				if (subformat == SF_FORMAT_G723_40 && info->channels == 1)
-					return 1 ;
+					return NULL ;
+				if (subformat == SF_FORMAT_G721_32 || subformat == SF_FORMAT_G723_24 || subformat == SF_FORMAT_G723_40)
+					return (info->channels == 1) ? NULL : "AU format supports only 1 channel in G72x subformats" ;
 				break ;
 
 		case SF_FORMAT_CAF :
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_ALAC_16 || subformat == SF_FORMAT_ALAC_20)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_ALAC_24 || subformat == SF_FORMAT_ALAC_32)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_RAW :
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_ALAW || subformat == SF_FORMAT_ULAW)
-					return 1 ;
-				if ((subformat == SF_FORMAT_DWVW_12 || subformat == SF_FORMAT_DWVW_16 ||
-							subformat == SF_FORMAT_DWVW_24) && info-> channels == 1)
-					return 1 ;
-				if (subformat == SF_FORMAT_GSM610 && info->channels == 1)
-					return 1 ;
-				if (subformat == SF_FORMAT_VOX_ADPCM && info->channels == 1)
-					return 1 ;
-				if ((subformat == SF_FORMAT_NMS_ADPCM_16 || subformat == SF_FORMAT_NMS_ADPCM_24 ||
-							subformat == SF_FORMAT_NMS_ADPCM_32) && info->channels == 1)
-					return 1 ;
+					return NULL ;
+				if (subformat == SF_FORMAT_DWVW_12 || subformat == SF_FORMAT_DWVW_16 || subformat == SF_FORMAT_DWVW_24)
+					return (info->channels == 1) ? NULL : "RAW format supports only 1 channel in DWVW subformats" ;
+				if (subformat == SF_FORMAT_GSM610)
+					return (info->channels == 1) ? NULL : "RAW format supports only 1 channel in GSM610 subformat" ;
+				if (subformat == SF_FORMAT_VOX_ADPCM)
+					return (info->channels == 1) ? NULL : "RAW format supports only 1 channel in VOX_ADPCM subformat" ;
+				if (subformat == SF_FORMAT_NMS_ADPCM_16 || subformat == SF_FORMAT_NMS_ADPCM_24 || subformat == SF_FORMAT_NMS_ADPCM_32)
+					return (info->channels == 1) ? NULL : "RAW format supports only 1 channel in NMS_ADPCM subformats" ;
 				break ;
 
 		case SF_FORMAT_PAF :
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_SVX :
 				/* SVX only supports writing mono SVX files. */
 				if (info->channels > 1)
-					return 0 ;
+					return "SVX format supports only 1-channel files" ;
 				/* Always big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
-					return 0 ;
+					return "SVX format supports only big-endian sample-format" ;
 
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_NIST :
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_IRCAM :
 				if (info->channels > 256)
-					return 0 ;
+					return "IRCAM format supports a maximum of 256 channels" ;
 				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW || subformat == SF_FORMAT_FLOAT)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_VOC :
 				if (info->channels > 2)
-					return 0 ;
+					return "VOC format supports only 1 or 2 channels" ;
 				/* VOC is strictly little endian. */
 				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
-					return 0 ;
+					return "VOC format supports only little-endian samples" ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_W64 :
 				/* W64 is strictly little endian. */
 				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
-					return 0 ;
+					return "W64 format supports only little-endian samples" ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
-				if ((subformat == SF_FORMAT_IMA_ADPCM || subformat == SF_FORMAT_MS_ADPCM) && info->channels <= 2)
-					return 1 ;
+					return NULL ;
+				if (subformat == SF_FORMAT_IMA_ADPCM || subformat == SF_FORMAT_MS_ADPCM)
+					return (info->channels <= 2) ? NULL : "W64 format supports a maximum of 2 channels in ADPCM subformats" ;
 				if (subformat == SF_FORMAT_GSM610 && info->channels == 1)
-					return 1 ;
+					return (info->channels == 1) ? NULL : "W64 format supports only 1 channel in GSM610 subformat" ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_MAT4 :
 				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_MAT5 :
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_PVF :
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_XI :
 				if (info->channels != 1)
-					return 0 ;
+					return "XI format supports only 1-channel files" ;
 				if (subformat == SF_FORMAT_DPCM_8 || subformat == SF_FORMAT_DPCM_16)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_HTK :
 				if (info->channels != 1)
-					return 0 ;
+					return "HTK format supports only 1-channel files" ;
 				/* HTK is strictly big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
-					return 0 ;
+					return "HTK format supports only big-endian samples" ;
 				if (subformat == SF_FORMAT_PCM_16)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_SDS :
 				if (info->channels != 1)
-					return 0 ;
+					return "SDS format supports only 1-channel files" ;
 				/* SDS is strictly big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
-					return 0 ;
+					return "SDS format supports only big-endian samples" ;
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_AVR :
 				if (info->channels > 2)
-					return 0 ;
+					return "AVR format supports a maximum of 2 channels" ;
 				/* SDS is strictly big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_FLAC :
 				/* FLAC can't do more than 8 channels. */
 				if (info->channels > 8)
-					return 0 ;
+					return "FLAC format supports a maximum of 8 channels" ;
 				if (endian != SF_ENDIAN_FILE)
-					return 0 ;
+					return "FLAC format supports only file-native-endian samples" ;
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_SD2 :
 				/* SD2 is strictly big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
-					return 0 ;
+					return "SD2 supports only big-endian samples" ;
 				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_WVE :
 				if (info->channels > 1)
-					return 0 ;
+					return "WVE format supports only 1-channel files" ;
 				/* WVE is strictly big endian. */
 				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
-					return 0 ;
+					return "WVE format supports only big-endian samples" ;
 				if (subformat == SF_FORMAT_ALAW)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_OGG :
 				if (endian != SF_ENDIAN_FILE)
-					return 0 ;
+					return "OGG format supports only file-native-endian smaples" ;
 				if (subformat == SF_FORMAT_VORBIS)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_OPUS)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_MPC2K :
 				if (info->channels > 2)
-					return 0 ;
+					return "MPC2K format supports a maximum of 2 channels" ;
 				/* MPC2000 is strictly little endian. */
 				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
-					return 0 ;
+					return "MPC2K format supports only little-endian samples" ;
 				if (subformat == SF_FORMAT_PCM_16)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_RF64 :
 				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
-					return 0 ;
+					return "RF64 format supports only little-endian samples" ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
-					return 1 ;
+					return NULL ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
-					return 1 ;
+					return NULL ;
 				break ;
 
 		case SF_FORMAT_MPEG :
 				if (info->channels > 2)
-					return 0 ;
+					return "MPEG format supports a maximum of 2 channels" ;
 				if (endian != SF_ENDIAN_FILE)
-					return 0 ;
+					return "MPEG format supports only file-native-endian samples" ;
 				if (subformat == SF_FORMAT_MPEG_LAYER_I || subformat == SF_FORMAT_MPEG_LAYER_II || subformat == SF_FORMAT_MPEG_LAYER_III)
-					return 1 ;
+					return NULL ;
 				break ;
-		default : break ;
+
+		default :
+			return "unknown container format";
 		} ;
 
-	return 0 ;
-} /* sf_format_check */
+	return "specified subformat is not supported by the specified container format" ;
+} /* sf_get_format_check_failure_reason */
 
 /*------------------------------------------------------------------------------
 */

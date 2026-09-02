@@ -132,6 +132,7 @@ class SndfileHandle
 		const char* getString (int str_type) const ;
 
 		static int formatCheck (int format, int channels, int samplerate) ;
+		static const char * getFormatCheckFailureReason (int format, int channels, int samplerate) ;
 
 		sf_count_t read (short *ptr, sf_count_t items) ;
 		sf_count_t read (int *ptr, sf_count_t items) ;
@@ -363,6 +364,22 @@ SndfileHandle::formatCheck (int fmt, int chans, int srate)
 
 	return sf_format_check (&sfinfo) ;
 }
+
+inline const char  *
+SndfileHandle::getFormatCheckFailureReason (int fmt, int chans, int srate)
+{
+	SF_INFO sfinfo ;
+
+	sfinfo.frames = 0 ;
+	sfinfo.channels = chans ;
+	sfinfo.format = fmt ;
+	sfinfo.samplerate = srate ;
+	sfinfo.sections = 0 ;
+	sfinfo.seekable = 0 ;
+
+	return sf_get_format_check_failure_reason (&sfinfo) ;
+}
+
 
 /*---------------------------------------------------------------------*/
 
