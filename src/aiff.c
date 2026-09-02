@@ -1336,14 +1336,14 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 				psf->endian = SF_ENDIAN_BIG ;
 				comm_type = AIFC_MARKER ;
 				comm_size = SIZEOF_AIFC_COMM ;
-				comm_encoding = FL32_MARKER ;	/* Use 'FL32' because its easier to read. */
+				comm_encoding = fl32_MARKER ;
 				break ;
 
 		case SF_FORMAT_DOUBLE :					/* Big endian double precision floating point. */
 				psf->endian = SF_ENDIAN_BIG ;
 				comm_type = AIFC_MARKER ;
 				comm_size = SIZEOF_AIFC_COMM ;
-				comm_encoding = FL64_MARKER ;	/* Use 'FL64' because its easier to read. */
+				comm_encoding = fl64_MARKER ;
 				break ;
 
 		case SF_FORMAT_ULAW :
