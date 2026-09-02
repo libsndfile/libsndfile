@@ -69,10 +69,6 @@ include (CheckCCompilerFlag)
 #
 
 option (BUILD_SHARED_LIBS "Build shared libraries" OFF)
-if (BUILD_SHARED_LIBS AND BUILD_TESTING)
-	set (BUILD_TESTING OFF)
-	message ("Build testing required static libraries. To prevent build errors BUILD_TESTING disabled.")
-endif ()
 option (BUILD_PROGRAMS "Build programs" ON)
 option (BUILD_EXAMPLES "Build examples" ON)
 option (ENABLE_CPACK "Enable CPack support" ON)
@@ -259,7 +255,7 @@ set (sndfile_HDRS
 # libsndfile static library
 #
 
-add_library (sndfile
+add_library (sndfile-OBJ OBJECT
 	src/sfconfig.h
 	src/sfendian.h
 	src/sf_unistd.h
@@ -380,9 +376,7 @@ add_library (sndfile
 	${CMAKE_CURRENT_BINARY_DIR}/src/config.h
 	)
 
-add_library (SndFile::sndfile ALIAS sndfile)
-
-target_include_directories (sndfile
+target_include_directories (sndfile-OBJ
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
@@ -391,8 +385,8 @@ target_include_directories (sndfile
 		src
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/src>
 	)
-target_link_libraries (sndfile
-	PRIVATE
+target_link_libraries (sndfile-OBJ
+	PUBLIC
 		$<$<BOOL:${LIBM_REQUIRED}>:m>
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Ogg::ogg>
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Vorbis::vorbisenc>
@@ -402,6 +396,25 @@ target_link_libraries (sndfile
 		$<$<BOOL:${HAVE_MPEG}>:MPG123::libmpg123>
 		$<$<BOOL:${HAVE_MPEG}>:mp3lame::mp3lame>
 	)
+
+# Compile with position independent code if the user requested a shared lib, i.e. no PIC if static requested.
+# This is cmakes default behavior, but here it's explicitly required due to the use of sndfile-OBJ as object library,
+# which would otherwise always be compiled without PIC.
+set_target_properties (sndfile-OBJ PROPERTIES
+	POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS})
+
+add_library (sndfile 
+	$<TARGET_OBJECTS:sndfile-OBJ>
+	${sndfile_HDRS})
+add_library (SndFile::sndfile ALIAS sndfile)
+# This doesn't install any object file at all!
+# it is only a trick for exporting targets
+install( TARGETS sndfile-OBJ
+    EXPORT SndFileTargets
+    OBJECTS )
+
+target_link_libraries (sndfile PUBLIC sndfile-OBJ)
+
 set_target_properties (sndfile PROPERTIES
 	PUBLIC_HEADER "${sndfile_HDRS}"
 	)
@@ -952,7 +965,7 @@ if (BUILD_TESTING)
 			${CMAKE_CURRENT_BINARY_DIR}/src
 			${CMAKE_CURRENT_BINARY_DIR}/tests
 		)
-	target_link_libraries(test_utils PRIVATE sndfile)
+	target_link_libraries(test_utils PRIVATE sndfile-OBJ)
 
 	### test_main
 
@@ -978,7 +991,7 @@ if (BUILD_TESTING)
 			${CMAKE_CURRENT_BINARY_DIR}/src
 			${CMAKE_CURRENT_BINARY_DIR}/tests
 		)
-	target_link_libraries (test_main PRIVATE sndfile)
+	target_link_libraries (test_main PRIVATE sndfile-OBJ)
 	if (MSVC)
 		target_compile_definitions (test_main PRIVATE _USE_MATH_DEFINES)
 	endif ()
@@ -992,7 +1005,7 @@ if (BUILD_TESTING)
 			src
 			${CMAKE_CURRENT_BINARY_DIR}/src
 		)
-	target_link_libraries (sfversion sndfile)
+	target_link_libraries (sfversion sndfile-OBJ)
 	add_test (sfversion sfversion)
 	set_tests_properties (sfversion PROPERTIES
 		PASS_REGULAR_EXPRESSION "${PACKAGE_NAME}-${CPACK_PACKAGE_VERSION_FULL}"
@@ -1003,7 +1016,7 @@ if (BUILD_TESTING)
 	add_executable (error_test tests/error_test.c)
 	target_link_libraries (error_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1013,7 +1026,7 @@ if (BUILD_TESTING)
 	add_executable (ulaw_test tests/ulaw_test.c)
 	target_link_libraries (ulaw_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1023,7 +1036,7 @@ if (BUILD_TESTING)
 	add_executable (alaw_test tests/alaw_test.c)
 	target_link_libraries (alaw_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1034,7 +1047,7 @@ if (BUILD_TESTING)
 	add_executable (dwvw_test tests/dwvw_test.c)
 	target_link_libraries (dwvw_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1045,7 +1058,7 @@ if (BUILD_TESTING)
 	add_executable (command_test tests/command_test.c)
 	target_link_libraries (command_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1059,7 +1072,7 @@ if (BUILD_TESTING)
 		)
 	target_link_libraries (floating_point_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1071,7 +1084,7 @@ if (BUILD_TESTING)
 	add_executable (checksum_test tests/checksum_test.c)
 	target_link_libraries (checksum_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1082,7 +1095,7 @@ if (BUILD_TESTING)
 	add_executable (scale_clip_test tests/scale_clip_test.c)
 	target_link_libraries (scale_clip_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1093,7 +1106,7 @@ if (BUILD_TESTING)
 	add_executable (headerless_test tests/headerless_test.c)
 	target_link_libraries (headerless_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1104,7 +1117,7 @@ if (BUILD_TESTING)
 	add_executable (rdwr_test tests/rdwr_test.c)
 	target_link_libraries (rdwr_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1115,7 +1128,7 @@ if (BUILD_TESTING)
 	add_executable (locale_test tests/locale_test.c)
 	target_link_libraries (locale_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1123,19 +1136,18 @@ if (BUILD_TESTING)
 
 	### win32_ordinal_test
 
-# Disabled because we cannot test with shared sndfile library
-#	if (WIN32 AND BUILD_SHARED_LIBS)
-#		add_executable (win32_ordinal_test tests/win32_ordinal_test.c)
-#		target_link_libraries (win32_ordinal_test PRIVATE sndfile test_utils)
-#		add_test (win32_ordinal_test win32_ordinal_test)
-#	endif ()
+	if (WIN32 AND BUILD_SHARED_LIBS)
+		add_executable (win32_ordinal_test tests/win32_ordinal_test.c)
+		target_link_libraries (win32_ordinal_test PRIVATE sndfile-OBJ test_utils)
+		add_test (win32_ordinal_test win32_ordinal_test)
+	endif ()
 
 	### cpp_test
 
 	add_executable (cpp_test tests/cpp_test.cc)
 	target_link_libraries (cpp_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1146,7 +1158,7 @@ if (BUILD_TESTING)
 	add_executable (external_libs_test tests/external_libs_test.c)
 	target_link_libraries (external_libs_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1157,7 +1169,7 @@ if (BUILD_TESTING)
 	add_executable (format_check_test tests/format_check_test.c)
 	target_link_libraries (format_check_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1168,7 +1180,7 @@ if (BUILD_TESTING)
 	add_executable (channel_test tests/channel_test.c)
 	target_link_libraries (channel_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1179,7 +1191,7 @@ if (BUILD_TESTING)
 	add_executable (pcm_test tests/pcm_test.c)
 	target_link_libraries (pcm_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1193,7 +1205,7 @@ if (BUILD_TESTING)
 	)
 	target_link_libraries (write_read_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1202,7 +1214,7 @@ if (BUILD_TESTING)
 	add_executable (lossy_comp_test tests/lossy_comp_test.c)
 	target_link_libraries (lossy_comp_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1210,7 +1222,7 @@ if (BUILD_TESTING)
 	add_executable (peak_chunk_test tests/peak_chunk_test.c)
 	target_link_libraries (peak_chunk_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1218,7 +1230,7 @@ if (BUILD_TESTING)
 	add_executable (header_test tests/header_test.c)
 	target_link_libraries (header_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1226,7 +1238,7 @@ if (BUILD_TESTING)
 	add_executable (misc_test tests/misc_test.c)
 	target_link_libraries (misc_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1234,7 +1246,7 @@ if (BUILD_TESTING)
 	add_executable (string_test tests/string_test.c)
 	target_link_libraries (string_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1242,7 +1254,7 @@ if (BUILD_TESTING)
 	add_executable (multi_file_test tests/multi_file_test.c)
 	target_link_libraries (multi_file_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1250,7 +1262,7 @@ if (BUILD_TESTING)
 	add_executable (aiff_rw_test tests/aiff_rw_test.c)
 	target_link_libraries (aiff_rw_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1258,7 +1270,7 @@ if (BUILD_TESTING)
 	add_executable (chunk_test tests/chunk_test.c)
 	target_link_libraries (chunk_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1266,7 +1278,7 @@ if (BUILD_TESTING)
 	add_executable (long_read_write_test tests/long_read_write_test.c)
 	target_link_libraries (long_read_write_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1274,7 +1286,7 @@ if (BUILD_TESTING)
 	add_executable (raw_test tests/raw_test.c)
 	target_link_libraries (raw_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1282,7 +1294,7 @@ if (BUILD_TESTING)
 	add_executable (compression_size_test tests/compression_size_test.c)
 	target_link_libraries (compression_size_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1290,7 +1302,7 @@ if (BUILD_TESTING)
 	add_executable (ogg_test tests/ogg_test.c)
 	target_link_libraries (ogg_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1298,7 +1310,7 @@ if (BUILD_TESTING)
 	add_executable (ogg_opus_test tests/ogg_opus_test.c)
 	target_link_libraries (ogg_opus_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1306,7 +1318,7 @@ if (BUILD_TESTING)
 	add_executable (mpeg_test tests/mpeg_test.c)
 	target_link_libraries (mpeg_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1314,7 +1326,7 @@ if (BUILD_TESTING)
 	add_executable (stdin_test tests/stdin_test.c)
 	target_link_libraries (stdin_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1323,7 +1335,7 @@ if (BUILD_TESTING)
 	add_executable (stdout_test tests/stdout_test.c)
 	target_link_libraries (stdout_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1332,7 +1344,7 @@ if (BUILD_TESTING)
 	add_executable (stdio_test tests/stdio_test.c)
 	target_link_libraries (stdio_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1340,7 +1352,7 @@ if (BUILD_TESTING)
 	add_executable (pipe_test tests/pipe_test.c)
 	target_link_libraries (pipe_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1348,7 +1360,7 @@ if (BUILD_TESTING)
 	add_executable (virtual_io_test tests/virtual_io_test.c)
 	target_link_libraries (virtual_io_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			test_utils
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
@@ -1363,7 +1375,7 @@ if (BUILD_TESTING)
 		)
 	target_link_libraries (g72x_test
 		PRIVATE
-			sndfile
+			sndfile-OBJ
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
 	add_test (g72x_test g72x_test all)
@@ -1592,9 +1604,9 @@ if (BUILD_TESTING)
 		g72x_test
 		)
 
-#	if (WIN32 AND BUILD_SHARED_LIBS)
-#		list (APPEND SNDFILE_TEST_TARGETS win32_ordinal_test)
-#	endif ()
+	if (WIN32 AND BUILD_SHARED_LIBS)
+		list (APPEND SNDFILE_TEST_TARGETS win32_ordinal_test)
+	endif ()
 
 	set_target_properties(${SNDFILE_TEST_TARGETS} PROPERTIES FOLDER Tests)
 
