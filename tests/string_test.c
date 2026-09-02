@@ -18,6 +18,7 @@
 
 #include "sfconfig.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -48,10 +49,12 @@ static void	string_rdwr_test (const char *filename, int typemajor) ;
 static void	string_short_rdwr_test (const char *filename, int typemajor) ;
 static void	string_rdwr_grow_test (const char *filename, int typemajor) ;
 static void	string_header_update (const char *filename, int typemajor) ;
+static void	string_identity_test (const char *filename, int typemajor) ;
 
 static void	software_string_test (const char *filename) ;
 
 static int str_count (const char * haystack, const char * needle) ;
+static char *string_nullable_dup_or_die (const char *in) ;
 
 int
 main (int argc, char *argv [])
@@ -111,7 +114,9 @@ main (int argc, char *argv [])
 
 	if (do_all || ! strcmp (argv [1], "flac"))
 	{	if (HAVE_EXTERNAL_XIPH_LIBS)
-			string_start_test ("strings.flac", SF_FORMAT_FLAC) ;
+		{	string_start_test ("strings.flac", SF_FORMAT_FLAC) ;
+			string_identity_test ("strings.flac", SF_FORMAT_FLAC) ;
+			}
 		else
 			puts ("    No FLAC tests because FLAC support was not compiled in.") ;
 		test_count++ ;
@@ -208,6 +213,7 @@ static const char
 	long_artist	[]	= "The artist who kept on changing its name",
 	genre		[]	= "The genre",
 	trackno		[]	= "Track three",
+	discno		[]	= "2",
 	id3v1_genre	[]	= "Rock",
 	year		[]	= "2001" ;
 
@@ -405,6 +411,7 @@ string_start_test (const char *filename, int formattype)
 	sf_set_string (file, SF_STR_COMMENT, comment) ;
 	sf_set_string (file, SF_STR_ALBUM, album) ;
 	sf_set_string (file, SF_STR_LICENSE, license) ;
+	sf_set_string (file, SF_STR_DISCNUMBER, discno) ;
 	if (typemajor == SF_FORMAT_MPEG)
 	{	sf_set_string (file, SF_STR_GENRE, id3v1_genre) ;
 		sf_set_string (file, SF_STR_DATE, year) ;
@@ -510,6 +517,16 @@ string_start_test (const char *filename, int formattype)
 		{	if (errors++ == 0)
 				puts ("\n") ;
 			printf ("    Bad album     : %s\n", NULL_PRINTF_CHECK(cptr)) ;
+			} ;
+		} ;
+
+	if (typemajor != SF_FORMAT_CAF && typemajor != SF_FORMAT_AIFF)
+	{
+		cptr = sf_get_string (file, SF_STR_DISCNUMBER) ;
+		if (cptr == NULL || strcmp (discno, cptr) != 0)
+		{	if (errors++ == 0)
+				puts ("\n") ;
+			printf ("    Bad discno    : %s\n", NULL_PRINTF_CHECK(cptr)) ;
 			} ;
 		} ;
 
@@ -905,3 +922,150 @@ string_header_update (const char *filename, int typemajor)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* string_header_update */
+
+static void
+string_identity_test (const char *filename, int typemajor)
+{	char *strings_map [SF_STR_LAST - SF_STR_FIRST + 1] = { 0 } ;
+	char ok = 1 ;
+	char create_reference = 0 ; /* set this to 1 to generate the TEST_DATA */
+	const char *strings_write [] =
+	{	title,
+		NULL, /* copyright */
+		NULL, /* software */
+		artist,
+		NULL, /* comment */
+		date,
+		album,
+		NULL, /* license */
+		trackno,
+		discno,
+		"Test album artist",
+		"Test performer",
+		"Test label",
+		NULL, /* ISRC */
+		NULL, /* 0x0f */
+		NULL, /* genre */
+		} ;
+	const char TEST_DATA [] =
+	{	0x66, 0x4c, 0x61, 0x43, 0x00, 0x00, 0x00, 0x22, 0x10, 0x00, 0x10,
+		0x00, 0x00, 0x00, 0x0e, 0x00, 0x00, 0x0e, 0x0a, 0xc4, 0x42, 0xf0,
+		0x00, 0x00, 0x02, 0x00, 0xc9, 0x9a, 0x74, 0xc5, 0x55, 0x37, 0x1a,
+		0x43, 0x3d, 0x12, 0x1f, 0x55, 0x1d, 0x6c, 0x63, 0x98, 0x84, 0x00,
+		0x00, 0xfa, 0x20, 0x00, 0x00, 0x00, 0x72, 0x65, 0x66, 0x65, 0x72,
+		0x65, 0x6e, 0x63, 0x65, 0x20, 0x6c, 0x69, 0x62, 0x46, 0x4c, 0x41,
+		0x43, 0x20, 0x31, 0x2e, 0x34, 0x2e, 0x32, 0x20, 0x32, 0x30, 0x32,
+		0x32, 0x31, 0x30, 0x32, 0x32, 0x09, 0x00, 0x00, 0x00, 0x17, 0x00,
+		0x00, 0x00, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x3d, 0x54, 0x68, 0x69,
+		0x73, 0x20, 0x69, 0x73, 0x20, 0x74, 0x68, 0x65, 0x20, 0x74, 0x69,
+		0x74, 0x6c, 0x65, 0x11, 0x00, 0x00, 0x00, 0x61, 0x72, 0x74, 0x69,
+		0x73, 0x74, 0x3d, 0x54, 0x68, 0x65, 0x20, 0x41, 0x72, 0x74, 0x69,
+		0x73, 0x74, 0x0f, 0x00, 0x00, 0x00, 0x64, 0x61, 0x74, 0x65, 0x3d,
+		0x32, 0x30, 0x30, 0x31, 0x2f, 0x30, 0x31, 0x2f, 0x32, 0x37, 0x0f,
+		0x00, 0x00, 0x00, 0x61, 0x6c, 0x62, 0x75, 0x6d, 0x3d, 0x54, 0x68,
+		0x65, 0x20, 0x41, 0x6c, 0x62, 0x75, 0x6d, 0x17, 0x00, 0x00, 0x00,
+		0x74, 0x72, 0x61, 0x63, 0x6b, 0x6e, 0x75, 0x6d, 0x62, 0x65, 0x72,
+		0x3d, 0x54, 0x72, 0x61, 0x63, 0x6b, 0x20, 0x74, 0x68, 0x72, 0x65,
+		0x65, 0x0c, 0x00, 0x00, 0x00, 0x64, 0x69, 0x73, 0x63, 0x6e, 0x75,
+		0x6d, 0x62, 0x65, 0x72, 0x3d, 0x32, 0x1d, 0x00, 0x00, 0x00, 0x61,
+		0x6c, 0x62, 0x75, 0x6d, 0x61, 0x72, 0x74, 0x69, 0x73, 0x74, 0x3d,
+		0x54, 0x65, 0x73, 0x74, 0x20, 0x61, 0x6c, 0x62, 0x75, 0x6d, 0x20,
+		0x61, 0x72, 0x74, 0x69, 0x73, 0x74, 0x18, 0x00, 0x00, 0x00, 0x70,
+		0x65, 0x72, 0x66, 0x6f, 0x72, 0x6d, 0x65, 0x72, 0x3d, 0x54, 0x65,
+		0x73, 0x74, 0x20, 0x70, 0x65, 0x72, 0x66, 0x6f, 0x72, 0x6d, 0x65,
+		0x72, 0x10, 0x00, 0x00, 0x00, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0x3d,
+		0x54, 0x65, 0x73, 0x74, 0x20, 0x6c, 0x61, 0x62, 0x65, 0x6c, 0xff,
+		0xf8, 0x99, 0x18, 0x00, 0xe6, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x9a, 0xaa
+		} ;
+
+	int i ;
+	SNDFILE *file ;
+	SF_INFO sfinfo ;
+
+	/* Right now it supports only FLAC */
+	if (typemajor != SF_FORMAT_FLAC)
+		return ;
+
+	get_unique_test_name (&filename, STR_TEST_PREFIX) ;
+	print_test_name (__func__, filename) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	/* Create reference file */
+	if (create_reference)
+	{	assert (sizeof (strings_write) == sizeof (strings_map)) ;
+		sfinfo.samplerate	= 44100 ;
+		sfinfo.channels		= 2 ;
+		sfinfo.frames		= 441 ;
+		sfinfo.format		= typemajor | SF_FORMAT_PCM_16 ;
+
+		file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+		for (i = SF_STR_FIRST ; i <= SF_STR_LAST ; i++)
+			if (strings_write [i - SF_STR_FIRST] != NULL)
+				sf_set_string (file, i, strings_write [i - SF_STR_FIRST]) ;
+		test_write_short_or_die (file, 0, data_out, BUFFER_LEN, __LINE__) ;
+		sf_close (file) ;
+		hexdump_file (filename, 0, 9000) ;
+		check_file_hash_or_die (filename, 0x4f3b3b5c31e9b, __LINE__) ;
+		}
+	else
+	{	dump_data_to_file (filename, TEST_DATA, sizeof (TEST_DATA)) ;
+		} ;
+
+	/* Read file strings into RAM */
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	for (i = SF_STR_FIRST ; i <= SF_STR_LAST ; i++)
+		strings_map [i - SF_STR_FIRST] = string_nullable_dup_or_die (sf_get_string (file, i)) ;
+	sf_close (file) ;
+
+	/* Write file that is a copy */
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	for (i = SF_STR_FIRST ; i <= SF_STR_LAST ; i++)
+	{	char *value = strings_map [i - SF_STR_FIRST] ;
+		if (value != NULL)
+		{	sf_set_string (file, i, value) ;
+			free (value) ;
+			} ;
+		} ;
+	test_write_short_or_die (file, 0, data_out, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	if (create_reference)
+	{	/* Copy must still identify the same strings */
+		file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+		for (i = SF_STR_FIRST ; i <= SF_STR_LAST ; i++)
+		{	const char *assoc_val = sf_get_string (file, i) ;
+			if (strings_write [i - SF_STR_FIRST] != NULL)
+			{	if (assoc_val == NULL)
+				{	fprintf (stderr, "\n\nLine %d: No value for %d, expected %s\n", __LINE__, i, strings_write [i - SF_STR_FIRST]) ;
+					ok = 0 ;
+					}
+				else if (strcmp (assoc_val, strings_write [i - SF_STR_FIRST]) != 0)
+				{	fprintf (stderr, "\n\nLine %d: Mismatch, got %s, expected %s\n", __LINE__, assoc_val, strings_write [i - SF_STR_FIRST]) ;
+					} ;
+				} ;
+			} ;
+		sf_close (file) ;
+		}
+	else
+	{	/* Re-written file equals test data! */
+		check_file_hash_or_die (filename, 0x4f3b3b5c31e9b, __LINE__) ;
+		unlink (filename) ;
+		} ;
+
+	if (ok)
+		puts ("ok") ;
+}
+
+static char
+*string_nullable_dup_or_die (const char *in)
+{	size_t string_size ;
+	char *cpy ;
+	if (in == NULL)
+		return NULL ;
+	string_size = strlen (in) + 1 ;
+	cpy = malloc (string_size) ;
+	assert (cpy != NULL) ;
+	memcpy (cpy, in, string_size) ;
+	return cpy ;
+}

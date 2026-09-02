@@ -269,6 +269,11 @@ enum
 	SF_STR_ALBUM					= 0x07,
 	SF_STR_LICENSE					= 0x08,
 	SF_STR_TRACKNUMBER				= 0x09,
+	SF_STR_DISCNUMBER				= 0x0a,
+	SF_STR_ALBUMARTIST				= 0x0b,
+	SF_STR_PERFORMER				= 0x0c,
+	SF_STR_LABEL					= 0x0d,
+	SF_STR_ISRC						= 0x0e,
 	SF_STR_GENRE					= 0x10
 } ;
 

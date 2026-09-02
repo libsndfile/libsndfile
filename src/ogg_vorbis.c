@@ -99,6 +99,11 @@ static STR_PAIRS vorbis_metatypes [] =
 	{	SF_STR_ALBUM,		"Album" },
 	{	SF_STR_LICENSE,		"License" },
 	{	SF_STR_TRACKNUMBER,	"Tracknumber" },
+	{	SF_STR_DISCNUMBER,	"Discnumber" },
+	{	SF_STR_ALBUMARTIST,	"Albumartist" },
+	{	SF_STR_PERFORMER,	"Performer" },
+	{	SF_STR_LABEL,		"Label" },
+	{	SF_STR_ISRC,		"ISRC" },
 	{	SF_STR_GENRE,		"Genre" },
 } ;
 
@@ -367,6 +372,11 @@ vorbis_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 			case SF_STR_ALBUM :			name = "ALBUM" ; break ;
 			case SF_STR_LICENSE :		name = "LICENSE" ; break ;
 			case SF_STR_TRACKNUMBER :	name = "Tracknumber" ; break ;
+			case SF_STR_DISCNUMBER :	name = "DISCNUMBER" ; break ;
+			case SF_STR_ALBUMARTIST :	name = "ALBUMARTIST" ; break ;
+			case SF_STR_PERFORMER :		name = "PERFORMER" ; break ;
+			case SF_STR_LABEL :			name = "LABEL" ; break ;
+			case SF_STR_ISRC :			name = "ISRC" ; break ;
 			case SF_STR_GENRE :			name = "Genre" ; break ;
 
 			default : continue ;

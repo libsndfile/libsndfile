@@ -529,18 +529,23 @@ These functions allow strings to be set on files opened for write and to be
 retrieved from files opened for read where supported by the given file type. The
 **str_type** parameter can be any one of the following string types:
 
-| Name               | Value | Description   |
-|:-------------------|:------|:--------------|
-| SF_STR_TITLE       | 0x01  | Title.        |
-| SF_STR_COPYRIGHT   | 0x02  | Copyright.    |
-| SF_STR_SOFTWARE    | 0x03  | Software.     |
-| SF_STR_ARTIST      | 0x04  | Artist.       |
-| SF_STR_COMMENT     | 0x05  | Comment.      |
-| SF_STR_DATE        | 0x06  | Date.         |
-| SF_STR_ALBUM       | 0x07  | Album.        |
-| SF_STR_LICENSE     | 0x08  | License.      |
-| SF_STR_TRACKNUMBER | 0x09  | Track number. |
-| SF_STR_GENRE       | 0x10  | Genre.        |
+| Name               | Value | Description                            |
+|:-------------------|:------|:---------------------------------------|
+| SF_STR_TITLE       | 0x01  | Title.                                 |
+| SF_STR_COPYRIGHT   | 0x02  | Copyright.                             |
+| SF_STR_SOFTWARE    | 0x03  | Software.                              |
+| SF_STR_ARTIST      | 0x04  | Artist.                                |
+| SF_STR_COMMENT     | 0x05  | Comment.                               |
+| SF_STR_DATE        | 0x06  | Date.                                  |
+| SF_STR_ALBUM       | 0x07  | Album.                                 |
+| SF_STR_LICENSE     | 0x08  | License.                               |
+| SF_STR_TRACKNUMBER | 0x09  | Track number.                          |
+| SF_STR_DISCNUMBER  | 0x0a  | Disc number.                           |
+| SF_STR_ALBUMARTIST | 0x0b  | Album artist.                          |
+| SF_STR_PERFORMER   | 0x0c  | Performer.                             |
+| SF_STR_LABEL       | 0x0d  | Record label.                          |
+| SF_STR_ISRC        | 0x0e  | International Standard Recording Code. |
+| SF_STR_GENRE       | 0x10  | Genre.                                 |
 
 The sf_get_string() function returns the specified string if it exists and a
 NULL pointer otherwise. In addition to the string ids above, SF_STR_FIRST (==
