@@ -276,9 +276,24 @@ mat4_read_header (SF_PRIVATE *psf)
 	{	psf_log_printf (psf, "*** Error : zero channel count.\n") ;
 		return SFE_CHANNEL_COUNT_ZERO ;
 		}
-	else if (rows > SF_MAX_CHANNELS)
-	{	psf_log_printf (psf, "*** Error : channel count %d > SF_MAX_CHANNELS.\n", rows) ;
+	else if (rows < 0 || rows > SF_MAX_CHANNELS)
+	{	psf_log_printf (psf, "*** Error : channel count %d out of range (1 to %d).\n", rows, SF_MAX_CHANNELS) ;
 		return SFE_CHANNEL_COUNT ;
+		} ;
+
+	/*
+	** cols becomes the frame count below and is otherwise unchecked. A
+	** negative value (rows and cols share the same "444" pseudo-samplerate
+	** header, so this mirrors the sign check that already exists there)
+	** combined with a negative or large rows lets channels * frames overflow
+	** the signed sf_count_t arithmetic a few lines down, in the file-length
+	** sanity check and the dataend calculation, which is undefined behaviour
+	** and can leave dataend/datalength describing far more data than the
+	** file actually holds.
+	*/
+	if (cols < 0)
+	{	psf_log_printf (psf, "*** Error : negative frame count %d.\n", cols) ;
+		return SFE_MAT4_BAD_DIMENSION ;
 		} ;
 
 	psf->sf.channels	= rows ;
