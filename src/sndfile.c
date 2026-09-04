@@ -225,6 +225,7 @@ ErrorStruct SndfileErrors [] =
 
 	{	SFE_MAT4_BAD_NAME		, "Error in MAT4 file. No variable name." },
 	{	SFE_MAT4_NO_SAMPLERATE	, "Error in MAT4 file. No sample rate." },
+	{	SFE_MAT4_BAD_DIMENSION	, "Error in MAT4 file. Bad row/column count." },
 
 	{	SFE_MAT5_BAD_ENDIAN		, "Error in MAT5 file. Not able to determine endian-ness." },
 	{	SFE_MAT5_NO_BLOCK		, "Error in MAT5 file. Bad block structure." },
