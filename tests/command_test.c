@@ -44,6 +44,7 @@
 
 static	void	float_norm_test			(const char *filename) ;
 static	void	double_norm_test		(const char *filename) ;
+static	void	silent_scale_test		(const char *filename, int subformat) ;
 static	void	format_tests			(void) ;
 static	void	calc_peak_test			(int filetype, const char *filename, int channels) ;
 static	void	truncate_test			(const char *filename, int filetype) ;
@@ -157,6 +158,8 @@ main (int argc, char *argv [])
 		*/
 		float_norm_test		("cmd_float.wav") ;
 		double_norm_test	("cmd_double.wav") ;
+		silent_scale_test	("cmd_silent_float.wav", SF_FORMAT_FLOAT) ;
+		silent_scale_test	("cmd_silent_double.wav", SF_FORMAT_DOUBLE) ;
 		test_count ++ ;
 		} ;
 
@@ -500,6 +503,46 @@ double_norm_test (const char *filename)
 
 	printf ("ok\n") ;
 } /* double_norm_test */
+
+static void
+silent_scale_test (const char *filename, int subformat)
+{	SNDFILE			*file ;
+	SF_INFO			sfinfo ;
+	unsigned int	k ;
+
+	print_test_name ("silent_scale_test", filename) ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.format		= SF_FORMAT_WAV | subformat ;
+	sfinfo.channels		= 1 ;
+	sfinfo.frames		= BUFFER_LEN ;
+
+	memset (double_data, 0, sizeof (double_data)) ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	/*
+	**	The signal peak of a silent file is zero, and the int readers divide
+	**	by it. That gave INT_MIN for every sample, or SIGFPE with
+	**	FE_DIVBYZERO trapped (#1157).
+	*/
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
+	test_read_int_or_die (file, 0, int_data, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	for (k = 0 ; k < BUFFER_LEN ; k++)
+		if (int_data [k] != 0)
+		{	printf ("\n\nLine %d: int_data [%u] == %d, should be 0\n", __LINE__, k, int_data [k]) ;
+			exit (1) ;
+			} ;
+
+	unlink (filename) ;
+
+	printf ("ok\n") ;
+} /* silent_scale_test */
 
 static	void
 format_tests	(void)
