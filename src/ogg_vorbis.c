@@ -466,6 +466,8 @@ ogg_vorbis_open (SF_PRIVATE *psf)
 	if (psf->file.mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
+	psf->codec_close = vorbis_close ;
+
 	psf_log_printf (psf, "Vorbis library version : %s\n", vorbis_version_string ()) ;
 
 	if (psf->file.mode == SFM_READ)
@@ -478,7 +480,6 @@ ogg_vorbis_open (SF_PRIVATE *psf)
 		psf->read_double	= vorbis_read_d ;
 		} ;
 
-	psf->codec_close = vorbis_close ;
 	if (psf->file.mode == SFM_WRITE)
 	{
 		/* Set the default vorbis quality here. */

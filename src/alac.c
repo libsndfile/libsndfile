@@ -438,14 +438,16 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 static int
 alac_encode_block (ALAC_PRIVATE *plac)
 {	ALAC_ENCODER *penc = &plac->u.encoder ;
+	PAKT_INFO *info ;
 	uint32_t num_bytes = 0 ;
 
 	alac_encode (penc, plac->partial_block_frames, plac->buffer, plac->byte_buffer, &num_bytes) ;
 
 	if (fwrite (plac->byte_buffer, 1, num_bytes, plac->enctmp) != num_bytes)
 		return 0 ;
-	if ((plac->pakt_info = alac_pakt_append (plac->pakt_info, num_bytes)) == NULL)
+	if ((info = alac_pakt_append (plac->pakt_info, num_bytes)) == NULL)
 		return 0 ;
+	plac->pakt_info = info ;
 
 	plac->partial_block_frames = 0 ;
 
@@ -803,7 +805,7 @@ alac_pakt_append (PAKT_INFO * info, uint32_t value)
 static PAKT_INFO *
 alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 {	SF_CHUNK_INFO chunk_info ;
-	PAKT_INFO * info = NULL ;
+	PAKT_INFO * info = NULL, * temp ;
 	uint8_t *pakt_data = NULL ;
 	uint32_t bcount, value = 1, pakt_size ;
 	SF_CHUNK_ITERATOR * chunk_iterator ;
@@ -863,8 +865,9 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 
 		bcount += count ;
 
-		if ((info = alac_pakt_append (info, value)) == NULL)
+		if ((temp = alac_pakt_append (info, value)) == NULL)
 			goto FreeExit ;
+		info = temp ;
 		} ;
 
 	free (pakt_data) ;
