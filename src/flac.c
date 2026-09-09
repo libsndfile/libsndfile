@@ -697,6 +697,7 @@ flac_open	(SF_PRIVATE *psf)
 
 	FLAC_PRIVATE* pflac = calloc (1, sizeof (FLAC_PRIVATE)) ;
 	psf->codec_data = pflac ;
+	psf->container_close = flac_close ;
 
 	/* Set the default value here. Over-ridden later if necessary. */
 	pflac->compression = FLAC_DEFAULT_COMPRESSION_LEVEL ;
@@ -733,7 +734,6 @@ flac_open	(SF_PRIVATE *psf)
 	psf->datalength = psf->filelength ;
 	psf->dataoffset = 0 ;
 
-	psf->container_close = flac_close ;
 	psf->seek = flac_seek ;
 	psf->byterate = flac_byterate ;
 
@@ -766,13 +766,13 @@ flac_close	(SF_PRIVATE *psf)
 	if (pflac->metadata != NULL)
 		FLAC__metadata_object_delete (pflac->metadata) ;
 
-	if (psf->file.mode == SFM_WRITE)
+	if (pflac->fse != NULL)
 	{	FLAC__stream_encoder_finish (pflac->fse) ;
 		FLAC__stream_encoder_delete (pflac->fse) ;
 		free (pflac->encbuffer) ;
 		} ;
 
-	if (psf->file.mode == SFM_READ)
+	if (pflac->fsd != NULL)
 	{	FLAC__stream_decoder_finish (pflac->fsd) ;
 		FLAC__stream_decoder_delete (pflac->fsd) ;
 		} ;
@@ -866,9 +866,7 @@ flac_read_header (SF_PRIVATE *psf)
 
 	psf_log_printf (psf, "End\n") ;
 
-	if (psf->error != 0)
-		FLAC__stream_decoder_delete (pflac->fsd) ;
-	else
+	if (psf->error == 0)
 	{	FLAC__uint64 position ;
 
 		FLAC__stream_decoder_get_decode_position (pflac->fsd, &position) ;

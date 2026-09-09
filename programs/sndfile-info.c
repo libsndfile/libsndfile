@@ -411,6 +411,7 @@ chanmap_dump (const char *filename)
 
 	if ((channel_map = calloc (sfinfo.channels, sizeof (int))) == NULL)
 	{	printf ("Error : malloc failed.\n\n") ;
+		sf_close (file) ;
 		return 1 ;
 		} ;
 

@@ -142,14 +142,14 @@ main (int argc, char *argv [])
 
 		if (strcmp (argv [k], "--bext-auto-date") == 0)
 		{	snprintf (date, sizeof (date), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
-			info.origination_date = strdup (date) ;
+			info.origination_date = date ;
 			continue ;
 			} ;
 
 		if (strcmp (argv [k], "--str-auto-date") == 0)
 		{	snprintf (date, sizeof (date), "%04d-%02d-%02d", timedata.tm_year + 1900, timedata.tm_mon + 1, timedata.tm_mday) ;
 
-			info.date = strdup (date) ;
+			info.date = date ;
 			continue ;
 			} ;
 

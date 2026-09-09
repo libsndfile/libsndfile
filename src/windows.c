@@ -52,7 +52,8 @@ sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo)
 		else
 			sf_errno = SF_ERR_UNSUPPORTED_ENCODING ;
 
-		sf_close (psf) ;
+		free (psf->header.ptr) ;
+		free (psf) ;
 
 		return NULL ;
 		} ;
