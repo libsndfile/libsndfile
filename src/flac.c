@@ -149,7 +149,7 @@ s2flac16_array (const short *src, int32_t *dest, int count)
 static void
 s2flac24_array (const short *src, int32_t *dest, int count)
 {	for (int i = 0 ; i < count ; i++)
-		dest [i] = src [i] << 8 ;
+		dest [i] = arith_shift_left (src [i], 8) ;
 } /* s2flac24_array */
 
 static void

@@ -720,7 +720,7 @@ paf24_write_s (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
 	while (len > 0)
 	{	writecount = (len >= bufferlen) ? bufferlen : (int) len ;
 		for (k = 0 ; k < writecount ; k++)
-			iptr [k] = ptr [total + k] << 16 ;
+			iptr [k] = arith_shift_left (ptr [total + k], 16) ;
 		count = paf24_write (psf, ppaf24, iptr, writecount) ;
 		total += count ;
 		len -= writecount ;
