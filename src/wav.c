@@ -484,6 +484,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 					{	uint32_t thisread, bytesread, cue_count, position, offset ;
 						int id, chunk_id, chunk_start, block_start, cue_index ;
+						SF_CUE_POINT *cue_points ;
 
 						bytesread = psf_binheader_readf (psf, "4", &cue_count) ;
 						psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
@@ -504,6 +505,7 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						if ((psf->cues = psf_cues_alloc (cue_count)) == NULL)
 							return SFE_MALLOC_FAILED ;
 
+						cue_points = psf_cues_points (psf->cues) ;
 						cue_index = 0 ;
 
 						while (cue_count)
@@ -521,13 +523,13 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 							else if (cue_index == 10)
 								psf_log_printf (psf,	"   (Skipping)\n") ;
 
-							psf->cues->cue_points [cue_index].indx = id ;
-							psf->cues->cue_points [cue_index].position = position ;
-							psf->cues->cue_points [cue_index].fcc_chunk = chunk_id ;
-							psf->cues->cue_points [cue_index].chunk_start = chunk_start ;
-							psf->cues->cue_points [cue_index].block_start = block_start ;
-							psf->cues->cue_points [cue_index].sample_offset = offset ;
-							psf->cues->cue_points [cue_index].name [0] = '\0' ;
+							cue_points [cue_index].indx = id ;
+							cue_points [cue_index].position = position ;
+							cue_points [cue_index].fcc_chunk = chunk_id ;
+							cue_points [cue_index].chunk_start = chunk_start ;
+							cue_points [cue_index].block_start = block_start ;
+							cue_points [cue_index].sample_offset = offset ;
+							cue_points [cue_index].name [0] = '\0' ;
 							cue_count -- ;
 							cue_index ++ ;
 							} ;
@@ -1210,13 +1212,14 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 
 	if (psf->cues != NULL)
 	{	uint32_t k ;
+		SF_CUE_POINT *cue_points = psf_cues_points (psf->cues) ;
 
 		psf_binheader_writef (psf, "em44", BHWm (cue_MARKER), BHW4 (4 + psf->cues->cue_count * 6 * 4), BHW4 (psf->cues->cue_count)) ;
 
 		for (k = 0 ; k < psf->cues->cue_count ; k++)
-			psf_binheader_writef (psf, "e44m444", BHW4 (psf->cues->cue_points [k].indx), BHW4 (psf->cues->cue_points [k].position),
-						BHWm (psf->cues->cue_points [k].fcc_chunk), BHW4 (psf->cues->cue_points [k].chunk_start),
-						BHW4 (psf->cues->cue_points [k].block_start), BHW4 (psf->cues->cue_points [k].sample_offset)) ;
+			psf_binheader_writef (psf, "e44m444", BHW4 (cue_points [k].indx), BHW4 (cue_points [k].position),
+						BHWm (cue_points [k].fcc_chunk), BHW4 (cue_points [k].chunk_start),
+						BHW4 (cue_points [k].block_start), BHW4 (cue_points [k].sample_offset)) ;
 		} ;
 
 	if (psf->instrument != NULL)
