@@ -206,6 +206,7 @@ mat4_read_header (SF_PRIVATE *psf)
 {	char	buffer [256] ;
 	uint32_t marker, namesize ;
 	int		rows, cols, imag ;
+	sf_count_t	datasize ;
 	double	value ;
 	const char *marker_str ;
 	char	name [64] ;
@@ -276,6 +277,10 @@ mat4_read_header (SF_PRIVATE *psf)
 	{	psf_log_printf (psf, "*** Error : zero channel count.\n") ;
 		return SFE_CHANNEL_COUNT_ZERO ;
 		}
+	else if (rows < 0)
+	{	psf_log_printf (psf, "*** Error : negative channel count %d.\n", rows) ;
+		return SFE_CHANNEL_COUNT_BAD ;
+		}
 	else if (rows > SF_MAX_CHANNELS)
 	{	psf_log_printf (psf, "*** Error : channel count %d > SF_MAX_CHANNELS.\n", rows) ;
 		return SFE_CHANNEL_COUNT ;
@@ -315,12 +320,17 @@ mat4_read_header (SF_PRIVATE *psf)
 				return SFE_UNIMPLEMENTED ;
 		} ;
 
-	if ((psf->filelength - psf->dataoffset) < psf->sf.channels * psf->sf.frames * psf->bytewidth)
+	/* rows and cols are 32 bit values taken from the file. Now that rows has
+	** been checked to be in the range [1, SF_MAX_CHANNELS] the product cannot
+	** overflow sf_count_t. */
+	datasize = (sf_count_t) rows * (sf_count_t) cols * psf->bytewidth ;
+
+	if ((psf->filelength - psf->dataoffset) < datasize)
 	{	psf_log_printf (psf, "*** File seems to be truncated. %D <--> %D\n",
-				psf->filelength - psf->dataoffset, psf->sf.channels * psf->sf.frames * psf->bytewidth) ;
+				psf->filelength - psf->dataoffset, datasize) ;
 		}
-	else if ((psf->filelength - psf->dataoffset) > psf->sf.channels * psf->sf.frames * psf->bytewidth)
-		psf->dataend = psf->dataoffset + (sf_count_t) rows * (sf_count_t) cols * psf->bytewidth ;
+	else if ((psf->filelength - psf->dataoffset) > datasize)
+		psf->dataend = psf->dataoffset + datasize ;
 
 	psf->datalength = psf->filelength - psf->dataoffset - psf->dataend ;
 
@@ -388,4 +398,3 @@ mat4_marker_to_str (int marker)
 	snprintf (str, sizeof (str) - 1, "%08X", marker) ;
 	return str ;
 } /* mat4_marker_to_str */
-
