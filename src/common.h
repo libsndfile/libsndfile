@@ -989,6 +989,16 @@ SF_CUES * psf_cues_dup (const void * ptr, size_t datasize) ;
 SF_CUES * psf_cues_alloc (uint32_t cue_count) ;
 void psf_get_cues (SF_PRIVATE * psf, void * data, size_t datasize) ;
 
+/* The cue array is allocated with room for the actual cue count (see
+** psf_cues_alloc()), but the public SF_CUES type declares it with a fixed
+** length of 100.  Index it through a pointer so that compilers do not flag
+** accesses to the longer, correctly allocated array (issue #832).
+*/
+static inline SF_CUE_POINT *
+psf_cues_points (SF_CUES *cues)
+{	return cues->cue_points ;
+} /* psf_cues_points */
+
 SF_INSTRUMENT * psf_instrument_alloc (void) ;
 
 void	psf_sanitize_string (char * cptr, int len) ;

@@ -403,6 +403,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 	int			k, found_chunk = 0, done = 0, error = 0 ;
 	char		*cptr ;
 	int			instr_found = 0, mark_found = 0 ;
+	SF_CUE_POINT *cue_points = NULL ;
 
 	if (psf->filelength > 0xFFFFFFFFLL)
 		psf_log_printf (psf, "Warning : filelength > 0xffffffff. This is bad!!!!\n") ;
@@ -813,6 +814,8 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 						if ((psf->cues = psf_cues_alloc (mark_count)) == NULL)
 							return SFE_MALLOC_FAILED ;
 
+						cue_points = psf_cues_points (psf->cues) ;
+
 						for (n = 0 ; n < mark_count && bytesread < chunk_size ; n++)
 						{	uint32_t pstr_len ;
 							uint8_t ch ;
@@ -820,12 +823,12 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 							bytesread += psf_binheader_readf (psf, "E241", &mark_id, &position, &ch) ;
 							psf_log_printf (psf, "   Mark ID  : %u\n   Position : %u\n", mark_id, position) ;
 
-							psf->cues->cue_points [n].indx = mark_id ;
-							psf->cues->cue_points [n].position = 0 ;
-							psf->cues->cue_points [n].fcc_chunk = MAKE_MARKER ('d', 'a', 't', 'a') ; /* always data */
-							psf->cues->cue_points [n].chunk_start = 0 ;
-							psf->cues->cue_points [n].block_start = 0 ;
-							psf->cues->cue_points [n].sample_offset = position ;
+							cue_points [n].indx = mark_id ;
+							cue_points [n].position = 0 ;
+							cue_points [n].fcc_chunk = MAKE_MARKER ('d', 'a', 't', 'a') ; /* always data */
+							cue_points [n].chunk_start = 0 ;
+							cue_points [n].block_start = 0 ;
+							cue_points [n].sample_offset = position ;
 
 							pstr_len = (ch & 1) ? ch : ch + 1 ;
 
@@ -841,7 +844,7 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 							psf_log_printf (psf, "   Name     : %s\n", ubuf.scbuf) ;
 
-							psf_strlcpy (psf->cues->cue_points [n].name, sizeof (psf->cues->cue_points [n].name), ubuf.cbuf) ;
+							psf_strlcpy (cue_points [n].name, sizeof (cue_points [n].name), ubuf.cbuf) ;
 
 							paiff->markstr [n].markerID = mark_id ;
 							paiff->markstr [n].position = position ;
@@ -940,14 +943,14 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 			for (j = 0 ; j < psf->cues->cue_count - (uint32_t) (psf->instrument->loop_count * 2) ; j ++)
 			{	/* This simply copies the information in cues above loop positions and writes it at current count instead */
-				psf->cues->cue_points [j].indx = psf->cues->cue_points [j + psf->instrument->loop_count * 2].indx ;
-				psf->cues->cue_points [j].position = psf->cues->cue_points [j + psf->instrument->loop_count * 2].position ;
-				psf->cues->cue_points [j].fcc_chunk = psf->cues->cue_points [j + psf->instrument->loop_count * 2].fcc_chunk ;
-				psf->cues->cue_points [j].chunk_start = psf->cues->cue_points [j + psf->instrument->loop_count * 2].chunk_start ;
-				psf->cues->cue_points [j].block_start = psf->cues->cue_points [j + psf->instrument->loop_count * 2].block_start ;
-				psf->cues->cue_points [j].sample_offset = psf->cues->cue_points [j + psf->instrument->loop_count * 2].sample_offset ;
+				cue_points [j].indx = cue_points [j + psf->instrument->loop_count * 2].indx ;
+				cue_points [j].position = cue_points [j + psf->instrument->loop_count * 2].position ;
+				cue_points [j].fcc_chunk = cue_points [j + psf->instrument->loop_count * 2].fcc_chunk ;
+				cue_points [j].chunk_start = cue_points [j + psf->instrument->loop_count * 2].chunk_start ;
+				cue_points [j].block_start = cue_points [j + psf->instrument->loop_count * 2].block_start ;
+				cue_points [j].sample_offset = cue_points [j + psf->instrument->loop_count * 2].sample_offset ;
 				for (str_index = 0 ; str_index < 256 ; str_index++)
-					psf->cues->cue_points [j].name [str_index] = psf->cues->cue_points [j + psf->instrument->loop_count * 2].name [str_index] ;
+					cue_points [j].name [str_index] = cue_points [j + psf->instrument->loop_count * 2].name [str_index] ;
 				} ;
 			psf->cues->cue_count -= psf->instrument->loop_count * 2 ;
 			} else
@@ -1461,10 +1464,11 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 	{	/* There are cues but no loops */
 		uint32_t idx ;
 		int totalStringLength = 0, stringLength ;
+		SF_CUE_POINT *cue_points = psf_cues_points (psf->cues) ;
 
 		/* Here we count how many bytes will the pascal strings need */
 		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-		{	stringLength = strlen (psf->cues->cue_points [idx].name) + 1 ; /* We'll count the first byte also of every pascal string */
+		{	stringLength = strlen (cue_points [idx].name) + 1 ; /* We'll count the first byte also of every pascal string */
 			totalStringLength += stringLength + (stringLength % 2 == 0 ? 0 : 1) ;
 			} ;
 
@@ -1472,7 +1476,7 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			BHWm (MARK_MARKER), BHW4 (2 + psf->cues->cue_count * (2 + 4) + totalStringLength), BHW2 (psf->cues->cue_count)) ;
 
 		for (idx = 0 ; idx < psf->cues->cue_count ; idx++)
-			psf_binheader_writef (psf, "E24p", BHW2 (psf->cues->cue_points [idx].indx), BHW4 (psf->cues->cue_points [idx].sample_offset), BHWp (psf->cues->cue_points [idx].name)) ;
+			psf_binheader_writef (psf, "E24p", BHW2 (cue_points [idx].indx), BHW4 (cue_points [idx].sample_offset), BHWp (cue_points [idx].name)) ;
 		} ;
 
 	if (psf->strings.flags & SF_STR_LOCATE_START)

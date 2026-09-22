@@ -1060,13 +1060,14 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 
 						if (psf->cues)
  						{	unsigned int i = 0 ;
+							SF_CUE_POINT *cue_points = psf_cues_points (psf->cues) ;
 
 							/* find id to store label */
-							while (i < psf->cues->cue_count && psf->cues->cue_points [i].indx != mark_id)
+							while (i < psf->cues->cue_count && cue_points [i].indx != mark_id)
 								i++ ;
 
 							if (i < psf->cues->cue_count)
-								memcpy (psf->cues->cue_points [i].name, buffer, sizeof (psf->cues->cue_points [i].name)) ;
+								memcpy (cue_points [i].name, buffer, sizeof (cue_points [i].name)) ;
 							} ;
 						} ;
 					break ;
