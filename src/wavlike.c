@@ -1067,7 +1067,7 @@ wavlike_subchunk_parse (SF_PRIVATE *psf, int chunk, uint32_t chunk_length)
 								i++ ;
 
 							if (i < psf->cues->cue_count)
-								memcpy (cue_points [i].name, buffer, sizeof (cue_points [i].name)) ;
+								psf_strlcpy (cue_points [i].name, sizeof (cue_points [i].name), buffer) ;
 							} ;
 						} ;
 					break ;
