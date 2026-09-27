@@ -476,7 +476,8 @@ wav_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
 					if ((error = wavlike_read_peak_chunk (psf, chunk_size)) != 0)
 						return error ;
-					psf->peak_info->peak_loc = ((parsestage & HAVE_data) == 0) ? SF_PEAK_START : SF_PEAK_END ;
+					if (psf->peak_info != NULL)
+						psf->peak_info->peak_loc = ((parsestage & HAVE_data) == 0) ? SF_PEAK_START : SF_PEAK_END ;
 					break ;
 
 			case cue_MARKER :
