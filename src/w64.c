@@ -590,7 +590,7 @@ w64_write_header (SF_PRIVATE *psf, int calc_length)
 		case SF_FORMAT_GSM610 :
 					{	int bytespersec ;
 
-						bytespersec = (psf->sf.samplerate * WAVLIKE_GSM610_BLOCKSIZE) / WAVLIKE_GSM610_SAMPLES ;
+						bytespersec = ((sf_count_t) psf->sf.samplerate * WAVLIKE_GSM610_BLOCKSIZE) / WAVLIKE_GSM610_SAMPLES ;
 
 						/* fmt chunk. */
 						fmt_size = 24 + 2 + 2 + 4 + 4 + 2 + 2 + 2 + 2 ;

@@ -915,7 +915,7 @@ wav_write_fmt_chunk (SF_PRIVATE *psf)
 
 						bitwidth 	= subformat == SF_FORMAT_NMS_ADPCM_16 ? 2 : subformat == SF_FORMAT_NMS_ADPCM_24 ? 3 : 4 ;
 						blockalign 	= 20 * bitwidth + 2 ;
-						bytespersec	= psf->sf.samplerate * blockalign / 160 ;
+						bytespersec	= ((sf_count_t) psf->sf.samplerate * blockalign) / 160 ;
 
 						/* fmt chunk. */
 						fmt_size = 2 + 2 + 4 + 4 + 2 + 2 ;
