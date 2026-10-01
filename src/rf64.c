@@ -732,6 +732,9 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 		psf_binheader_writef (psf, "44", BHW4 (0), BHW4 (0)) ; /* Manufacturer zero is everyone */
 		tmp = (int) (1.0e9 / psf->sf.samplerate) ; /* Sample period in nano seconds */
 		psf_binheader_writef (psf, "44", BHW4 (tmp), BHW4 (psf->instrument->basenote)) ;
+
+		psf->instrument->detune = SF_MIN (SF_MAX (psf->instrument->detune, -50), 50) ;
+
 		i64 = (int64_t) (psf->instrument->detune * dtune + 0.5) ;
 		i64 = SF_MIN (SF_MAX (i64, INT32_MIN), INT32_MAX) ;
 		tmp = (int) i64 ;
