@@ -1524,7 +1524,9 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 		} ;
 
 	psf->instrument->basenote = note ;
-	psf->instrument->detune = (int8_t) (pitch / (0x40000000 / 25.0) + 0.5) ;
+	{	double d = (int32_t) pitch / (0x40000000 / 25.0) ;
+		psf->instrument->detune = (int8_t) (d >= 0 ? d + 0.5 : d - 0.5) ;
+	}
 	psf->instrument->gain = 1 ;
 	psf->instrument->velocity_lo = psf->instrument->key_lo = 0 ;
 	psf->instrument->velocity_hi = psf->instrument->key_hi = 127 ;
