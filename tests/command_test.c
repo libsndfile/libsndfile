@@ -49,6 +49,7 @@ static	void	format_tests			(void) ;
 static	void	calc_peak_test			(int filetype, const char *filename, int channels) ;
 static	void	truncate_test			(const char *filename, int filetype) ;
 static	void	instrument_test			(const char *filename, int filetype) ;
+static	void	signed_detune_test		(const char *filename) ;
 static	void	cue_test				(const char *filename, int filetype) ;
 static	void	cue_test_var			(const char *filename, int filetype, int count) ;
 static	void	channel_map_test		(const char *filename, int filetype) ;
@@ -186,6 +187,7 @@ main (int argc, char *argv [])
 	{	instrument_test ("instrument.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		/*-instrument_test ("instrument.aiff" , SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;-*/
 		/*-instrument_test ("instrument.xi", SF_FORMAT_XI | SF_FORMAT_DPCM_16) ;-*/
+		signed_detune_test ("detune.wav") ;
 		test_count ++ ;
 		} ;
 
@@ -933,6 +935,75 @@ instrument_test (const char *filename, int filetype)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* instrument_test */
+
+static void
+signed_detune_test (const char *filename)
+{	int	detunes [] = { -50, -49, -25, -5, -1, 0, 1, 5, 25, 49, 50 } ;
+	int	ndetunes = (int) (sizeof (detunes) / sizeof (detunes [0])) ;
+	int	i ;
+
+	print_test_name ("signed_detune_test", filename) ;
+
+	for (i = 0 ; i < ndetunes ; i ++)
+	{	SF_INSTRUMENT	w, r ;
+		SF_INFO		info ;
+		SNDFILE		*psf ;
+		short		short_data [100] ;
+		int		j ;
+
+		memset (&w, 0, sizeof (w)) ;
+		w.basenote = 60 ;
+		w.detune = detunes [i] ;
+		w.loop_count = 1 ;
+		w.loops [0].mode = SF_LOOP_FORWARD ;
+		w.loops [0].start = 0 ;
+		w.loops [0].end = 100 ;
+		w.loops [0].count = 0 ;
+
+		memset (&info, 0, sizeof (info)) ;
+		info.channels = 1 ;
+		info.samplerate = 44100 ;
+		info.frames = 100 ;
+		info.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
+
+		psf = sf_open (filename, SFM_WRITE, &info) ;
+		if (psf == NULL)
+		{	printf ("Line %d : sf_open write failed: %s\n", __LINE__, sf_strerror (NULL)) ;
+			exit (1) ;
+			}
+		if (sf_command (psf, SFC_SET_INSTRUMENT, &w, sizeof (w)) == SF_FALSE)
+		{	printf ("Line %d : SFC_SET_INSTRUMENT failed: %s\n", __LINE__, sf_strerror (psf)) ;
+			exit (1) ;
+			}
+		for (j = 0 ; j < 100 ; j ++)
+			short_data [j] = j * 10 ;
+		if (sf_writef_short (psf, short_data, 100) != 100)
+		{	printf ("Line %d : sf_writef_short failed: %s\n", __LINE__, sf_strerror (psf)) ;
+			exit (1) ;
+			}
+		sf_close (psf) ;
+
+		memset (&r, 0, sizeof (r)) ;
+		psf = sf_open (filename, SFM_READ, &info) ;
+		if (psf == NULL)
+		{	printf ("Line %d : sf_open read failed: %s\n", __LINE__, sf_strerror (NULL)) ;
+			exit (1) ;
+			}
+		if (sf_command (psf, SFC_GET_INSTRUMENT, &r, sizeof (r)) == SF_FALSE)
+		{	printf ("Line %d : SFC_GET_INSTRUMENT failed: %s\n", __LINE__, sf_strerror (psf)) ;
+			exit (1) ;
+			}
+		sf_close (psf) ;
+
+		if ((int) r.detune != detunes [i])
+		{	printf ("Line %d : detune %d read back as %d\n", __LINE__, detunes [i], (int) r.detune) ;
+			exit (1) ;
+			}
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* signed_detune_test */
 
 static void
 print_cue (SF_CUES *cue, int i)
