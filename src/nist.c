@@ -155,7 +155,10 @@ nist_read_header (SF_PRIVATE *psf)
 	/* Determine sample encoding, start by assuming PCM. */
 	encoding = SF_FORMAT_PCM_U8 ;
 	if ((cptr = strstr (psf_header, "sample_coding -s")))
-	{	sscanf (cptr, "sample_coding -s%d %63s", &count, str) ;
+	{	if (sscanf (cptr, "sample_coding -s%d %63s", &count, str) != 2)
+		{	psf_log_printf (psf, "*** Could not parse 'sample_coding' field.\n") ;
+			return SFE_NIST_BAD_ENCODING ;
+			} ;
 
 		if (strcmp (str, "pcm") == 0)
 		{	/* Correct this later when we find out the bitwidth. */
@@ -178,8 +181,8 @@ nist_read_header (SF_PRIVATE *psf)
 		sscanf (cptr, "sample_rate -i %d", &(psf->sf.samplerate)) ;
 
 	if ((cptr = strstr (psf_header, "sample_count -i ")) != NULL)
-	{	sscanf (cptr, "sample_count -i %ld", &samples) ;
-		psf->sf.frames = samples ;
+	{	if (sscanf (cptr, "sample_count -i %ld", &samples) == 1)
+			psf->sf.frames = samples ;
 		} ;
 
 	if ((cptr = strstr (psf_header, "sample_n_bytes -i ")) != NULL)
