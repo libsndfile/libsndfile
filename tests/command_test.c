@@ -63,6 +63,7 @@ static	void	broadcast_coding_history_size	(const char *filename) ;
 /* Cart Chunk tests */
 static void	cart_test				(const char *filename, int filetype) ;
 static void	cart_rdwr_test			(const char *filename, int filetype) ;
+static void	cart_no_tag_text_test	(const char *filename) ;
 
 /* Force the start of this buffer to be double aligned. Sparc-solaris will
 ** choke if its not.
@@ -223,6 +224,7 @@ main (int argc, char *argv [])
 		cart_rdwr_test ("cart.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		cart_test ("cart.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
 		cart_rdwr_test ("cart.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
+		cart_no_tag_text_test ("cart_no_tag_text.wav") ;
 		test_count ++ ;
 		} ;
 
@@ -1712,6 +1714,51 @@ cart_rdwr_test (const char *filename, int filetype)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* cart_rdwr_test */
+
+static	void
+cart_no_tag_text_test (const char *filename)
+{	/* WAV file header up to and including the header of a 'cart' chunk which
+	** is exactly the 2048 bytes of the fixed fields, ie it has no tag text.
+	*/
+	static const unsigned char wav_head [] =
+	{	0x52, 0x49, 0x46, 0x46, 0x30, 0x08, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45,
+		0x66, 0x6d, 0x74, 0x20, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00,
+		0x40, 0x1f, 0x00, 0x00, 0x80, 0x3e, 0x00, 0x00, 0x02, 0x00, 0x10, 0x00,
+		0x63, 0x61, 0x72, 0x74, 0x00, 0x08, 0x00, 0x00,
+		} ;
+	static const unsigned char wav_data [] =
+	{	0x64, 0x61, 0x74, 0x61, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		} ;
+	static unsigned char wav_file [sizeof (wav_head) + 2048 + sizeof (wav_data)] ;
+	static SF_CART_INFO cinfo ;
+	SNDFILE *file ;
+	SF_INFO sfinfo ;
+
+	print_test_name (__func__, filename) ;
+
+	memset (wav_file, 0, sizeof (wav_file)) ;
+	memcpy (wav_file, wav_head, sizeof (wav_head)) ;
+	memcpy (wav_file + sizeof (wav_head) + 2048, wav_data, sizeof (wav_data)) ;
+	dump_data_to_file (filename, wav_file, sizeof (wav_file)) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	memset (&cinfo, 0xff, sizeof (cinfo)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	exit_if_true (
+		sf_command (file, SFC_GET_CART_INFO, &cinfo, sizeof (cinfo)) != SF_TRUE,
+		"\n\nLine %d : sf_command (SFC_GET_CART_INFO) failed.\n\n", __LINE__
+		) ;
+	sf_close (file) ;
+
+	exit_if_true (
+		cinfo.tag_text_size != 0,
+		"\n\nLine %d : tag_text_size is %u, should be 0.\n\n", __LINE__, cinfo.tag_text_size
+		) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* cart_no_tag_text_test */
 
 /*==============================================================================
 */
