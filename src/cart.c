@@ -38,9 +38,7 @@ cart_min_size (const SF_CART_INFO* info)
 
 SF_CART_INFO_16K*
 cart_var_alloc (void)
-{	SF_CART_INFO_16K* thing ;
-	thing = malloc (sizeof (SF_CART_INFO_16K)) ;
-	return thing ;
+{	return calloc (1, sizeof (SF_CART_INFO_16K)) ;
 } /* cart_var_alloc */
 
 int
