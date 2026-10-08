@@ -1807,7 +1807,7 @@ ogg_opus_byterate (SF_PRIVATE *psf)
 			return (ppkt->bytes * 8000) / opus_packet_get_nb_samples (ppkt->packet, ppkt->bytes, 8000) ;
 			} ;
 
-		if (psf->datalength != SF_COUNT_MAX)
+		if (psf->datalength != SF_COUNT_MAX && psf->sf.frames > 0)
 			return (psf->datalength * psf->sf.samplerate) / psf->sf.frames ;
 		} ;
 
