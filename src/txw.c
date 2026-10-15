@@ -252,8 +252,10 @@ txw_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 		for (k = 0 ; k < readcount ; k += 2)
 		{	sample = (ucptr [0] << 8) | (ucptr [1] & 0xF0) ;
 			ptr [total + k] = sample ;
-			sample = (ucptr [2] << 8) | ((ucptr [1] & 0xF) << 4) ;
-			ptr [total + k + 1] = sample ;
+			if (k + 1 < readcount)
+			{	sample = (ucptr [2] << 8) | ((ucptr [1] & 0xF) << 4) ;
+				ptr [total + k + 1] = sample ;
+				} ;
 			ucptr += 3 ;
 			} ;
 
@@ -282,8 +284,10 @@ txw_read_i (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 		for (k = 0 ; k < readcount ; k += 2)
 		{	sample = (ucptr [0] << 8) | (ucptr [1] & 0xF0) ;
 			ptr [total + k] = sample << 16 ;
-			sample = (ucptr [2] << 8) | ((ucptr [1] & 0xF) << 4) ;
-			ptr [total + k + 1] = sample << 16 ;
+			if (k + 1 < readcount)
+			{	sample = (ucptr [2] << 8) | ((ucptr [1] & 0xF) << 4) ;
+				ptr [total + k + 1] = sample << 16 ;
+				} ;
 			ucptr += 3 ;
 			} ;
 
@@ -318,8 +322,10 @@ txw_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 		for (k = 0 ; k < readcount ; k += 2)
 		{	sample = (ucptr [0] << 8) | (ucptr [1] & 0xF0) ;
 			ptr [total + k] = normfact * sample ;
-			sample = (ucptr [2] << 8) | ((ucptr [1] & 0xF) << 4) ;
-			ptr [total + k + 1] = normfact * sample ;
+			if (k + 1 < readcount)
+			{	sample = (ucptr [2] << 8) | ((ucptr [1] & 0xF) << 4) ;
+				ptr [total + k + 1] = normfact * sample ;
+				} ;
 			ucptr += 3 ;
 			} ;
 
@@ -354,8 +360,10 @@ txw_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 		for (k = 0 ; k < readcount ; k += 2)
 		{	sample = (ucptr [0] << 8) | (ucptr [1] & 0xF0) ;
 			ptr [total + k] = normfact * sample ;
-			sample = (ucptr [2] << 8) | ((ucptr [1] & 0xF) << 4) ;
-			ptr [total + k + 1] = normfact * sample ;
+			if (k + 1 < readcount)
+			{	sample = (ucptr [2] << 8) | ((ucptr [1] & 0xF) << 4) ;
+				ptr [total + k + 1] = normfact * sample ;
+				} ;
 			ucptr += 3 ;
 			} ;
 
