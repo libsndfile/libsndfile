@@ -61,7 +61,7 @@ SNDFILE*  sf_open    (const char *path, int mode, SF_INFO *sfinfo) ;
 
 The sf_open() function opens the sound file at the specified path. The filename is byte encoded, but may be utf-8 on
 Linux, while on Mac OS X it will use the filesystem character set. On Windows, there is also a Windows specific
-sf_wchar_open() that takes a UTF16_BE encoded filename.
+sf_wchar_open() that takes a UTF16_LE encoded filename.
 
 ```c
 SNDFILE*  sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo) ;
