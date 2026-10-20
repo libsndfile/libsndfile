@@ -577,7 +577,7 @@ int sf_current_byterate (SNDFILE *sndfile) ;
 
 Return the current byterate at this point in the file. The byte rate in this
 case is the number of bytes per second of audio data. For instance, for a
-stereo, 18 bit PCM encoded file with an 16kHz sample rate, the byte rate
+stereo, 16 bit PCM encoded file with a 16kHz sample rate, the byte rate
 would be 2 (stereo) \* 2 (two bytes per sample) * 16000 => 64000 bytes/sec.
 
 For some file formats the returned value will be accurate and exact, for some
