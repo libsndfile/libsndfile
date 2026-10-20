@@ -145,6 +145,51 @@ main (void)
 
 	puts ("ok") ;
 
+	print_test_name ("ulaw_test", "float clipping") ;
+
+	/* Float and double samples outside [-1.0, 1.0] must be clipped to
+	** full scale rather than indexing past the end of the encode table.
+	*/
+
+	{	static const float	fdata [4] = { 1.5f, -1.5f, 1.0e6f, -1.0e6f } ;
+		static const double	ddata [4] = { 1.5, -1.5, 1.0e6, -1.0e6 } ;
+
+		if (! (file = sf_open (filename, SFM_WRITE, &sfinfo)))
+		{	printf ("sf_open_write failed with error : ") ;
+			puts (sf_strerror (NULL)) ;
+			exit (1) ;
+			} ;
+
+		sf_write_float (file, fdata, ARRAY_LEN (fdata)) ;
+		sf_write_double (file, ddata, ARRAY_LEN (ddata)) ;
+		sf_close (file) ;
+
+		if (! (file = sf_open (filename, SFM_READ, &sfinfo)))
+		{	printf ("sf_open_write failed with error : ") ;
+			puts (sf_strerror (NULL)) ;
+			exit (1) ;
+			} ;
+
+		if (sf_read_raw (file, ulaw_buffer, 8) != 8)
+		{	printf ("sf_read_raw : ") ;
+			puts (sf_strerror (file)) ;
+			exit (1) ;
+			} ;
+
+		for (k = 0 ; k < 8 ; k++)
+		{	unsigned char expected = ulaw_encode ((k & 1) ? -32768 : 32767) ;
+
+			if (ulaw_buffer [k] != expected)
+			{	printf ("Clipping error : sample #%d (0x%02X should be 0x%02X)\n", k, ulaw_buffer [k], expected) ;
+				exit (1) ;
+				} ;
+			} ;
+
+		sf_close (file) ;
+		} ;
+
+	puts ("ok") ;
+
 	unlink (filename) ;
 
 	return 0 ;
