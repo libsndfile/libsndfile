@@ -840,22 +840,28 @@ i2ulaw_array (const int *ptr, int count, unsigned char *buffer)
 static inline void
 f2ulaw_array (const float *ptr, int count, unsigned char *buffer, float normfact)
 {	for (int i = 0 ; i < count ; i++)
-	{	if (ptr [i] >= 0)
-			buffer [i] = ulaw_encode [psf_lrintf (normfact * ptr [i])] ;
+	{	float x = normfact * ptr [i] ;
+
+		if (!isfinite (ptr [i]))
+			buffer [i] = 0 ;
+		else if (ptr [i] >= 0)
+			buffer [i] = ulaw_encode [x < 8192 ? psf_lrintf (x) : 8192] ;
 		else
-			buffer [i] = 0x7F & ulaw_encode [- psf_lrintf (normfact * ptr [i])] ;
+			buffer [i] = 0x7F & ulaw_encode [x > -8192 ? - psf_lrintf (x) : 8192] ;
 		} ;
 } /* f2ulaw_array */
 
 static inline void
 d2ulaw_array (const double *ptr, int count, unsigned char *buffer, double normfact)
 {	for (int i = 0 ; i < count ; i++)
-	{	if (!isfinite (ptr [i]))
+	{	double x = normfact * ptr [i] ;
+
+		if (!isfinite (ptr [i]))
 			buffer [i] = 0 ;
 		else if (ptr [i] >= 0)
-			buffer [i] = ulaw_encode [psf_lrint (normfact * ptr [i])] ;
+			buffer [i] = ulaw_encode [x < 8192 ? psf_lrint (x) : 8192] ;
 		else
-			buffer [i] = 0x7F & ulaw_encode [- psf_lrint (normfact * ptr [i])] ;
+			buffer [i] = 0x7F & ulaw_encode [x > -8192 ? - psf_lrint (x) : 8192] ;
 		} ;
 } /* d2ulaw_array */
 
