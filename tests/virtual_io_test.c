@@ -32,6 +32,7 @@
 #include "utils.h"
 
 static void vio_test (const char *fname, int format) ;
+static void vio_empty_chunk_test (void) ;
 
 int
 main (void)
@@ -40,6 +41,7 @@ main (void)
 	vio_test ("vio_pcm24.aiff", SF_FORMAT_AIFF | SF_FORMAT_PCM_24) ;
 	vio_test ("vio_float.au", SF_FORMAT_AU | SF_FORMAT_FLOAT) ;
 	vio_test ("vio_pcm24.paf", SF_FORMAT_PAF | SF_FORMAT_PCM_24) ;
+	vio_empty_chunk_test () ;
 
 	return 0 ;
 } /* main */
@@ -235,3 +237,71 @@ vio_test (const char *fname, int format)
 	puts ("ok") ;
 } /* vio_test */
 
+
+static void
+vio_empty_chunk_test (void)
+{	static VIO_DATA vio_data ;
+	static const unsigned char aiff_data [] =
+	{	'F' , 'O' , 'R' , 'M' ,
+		0x00, 0x00, 0x00, 0x36, /* FORM length */
+		'A' , 'I' , 'F' , 'F' ,
+		'C' , 'O' , 'M' , 'M' ,
+		0x00, 0x00, 0x00, 0x12, /* COMM length */
+		0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x18, 0x40, 0x0E, 0xAC, 0x44,
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		'A' , 'N' , 'N' , 'O' ,
+		0x00, 0x00, 0x00, 0x00, /* ANNO length */
+		'S' , 'S' , 'N' , 'D' ,
+		0x00, 0x00, 0x00, 0x08, /* SSND length */
+		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		} ;
+
+	SF_VIRTUAL_IO vio ;
+	SNDFILE * file ;
+	SF_INFO sfinfo ;
+	SF_CHUNK_INFO chunk_info ;
+	SF_CHUNK_ITERATOR * iterator ;
+	unsigned char byte ;
+	int err ;
+
+	print_test_name ("virtual i/o test", "empty chunk") ;
+
+	vio.get_filelen = vfget_filelen ;
+	vio.seek = vfseek ;
+	vio.read = vfread ;
+	vio.write = vfwrite ;
+	vio.tell = vftell ;
+
+	memcpy (vio_data.data, aiff_data, sizeof (aiff_data)) ;
+	vio_data.offset = 0 ;
+	vio_data.length = sizeof (aiff_data) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	if ((file = sf_open_virtual (&vio, SFM_READ, &sfinfo, &vio_data)) == NULL)
+	{	printf ("\n\nLine %d : sf_open_virtual failed with error : ", __LINE__) ;
+		fflush (stdout) ;
+		puts (sf_strerror (NULL)) ;
+		exit (1) ;
+		} ;
+
+	memset (&chunk_info, 0, sizeof (chunk_info)) ;
+	memcpy (chunk_info.id, "ANNO", 4) ;
+	chunk_info.id_size = 4 ;
+
+	if ((iterator = sf_get_chunk_iterator (file, &chunk_info)) == NULL)
+	{	printf ("\n\nLine %d : sf_get_chunk_iterator returned NULL.\n\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	chunk_info.data = &byte ;
+
+	if ((err = sf_get_chunk_data (iterator, &chunk_info)) != SF_ERR_NO_ERROR)
+	{	printf ("\n\nLine %d : sf_get_chunk_data returned %s.\n\n", __LINE__, sf_error_number (err)) ;
+		exit (1) ;
+		} ;
+
+	sf_close (file) ;
+
+	puts ("ok") ;
+} /* vio_empty_chunk_test */
