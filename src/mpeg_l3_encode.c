@@ -596,22 +596,77 @@ mpeg_l3_encode_write_int_stereo (SF_PRIVATE *psf, const int *ptr, sf_count_t len
 }
 
 
+/* LAME's ieee_float / ieee_double entry points require input samples in the
+** range [-1.0, +1.0] ("data must be scaled to +/- 1 full scale", lame/lame.h).
+** Crafted input files can deliver NaNs, infinities, or huge finite values
+** through the public sf_writef_float / sf_writef_double API ; passing those
+** straight to LAME trips assertions inside LAME (psymodel.c : calc_energy :
+** `el >= 0') and aborts the host application (CVE-2024-50613,
+** https://github.com/libsndfile/libsndfile/issues/1034). Clamp here so the
+** encoder only ever sees in-contract input. Samples already in range pass
+** through unchanged.
+*/
+
+static inline float
+sanitize_float_sample (float x)
+{	if (!isfinite (x))
+		return 0.0f ;
+	if (x > 1.0f)
+		return 1.0f ;
+	if (x < -1.0f)
+		return -1.0f ;
+	return x ;
+} /* sanitize_float_sample */
+
+static inline double
+sanitize_double_sample (double x)
+{	if (!isfinite (x))
+		return 0.0 ;
+	if (x > 1.0)
+		return 1.0 ;
+	if (x < -1.0)
+		return -1.0 ;
+	return x ;
+} /* sanitize_double_sample */
+
+static inline void
+normalize_float (float *dest, const float *src, sf_count_t count, float norm_fact)
+{	while (--count >= 0)
+		dest [count] = sanitize_float_sample (src [count] * norm_fact) ;
+} /* normalize_float */
+
+static inline void
+normalize_double (double *dest, const double *src, sf_count_t count, double norm_fact)
+{	while (--count >= 0)
+		dest [count] = sanitize_double_sample (src [count] * norm_fact) ;
+} /* normalize_double */
+
+
 static sf_count_t
 mpeg_l3_encode_write_float_mono (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
-{	MPEG_L3_ENC_PRIVATE *pmpeg = (MPEG_L3_ENC_PRIVATE*) psf->codec_data ;
+{	BUF_UNION ubuf ;
+	MPEG_L3_ENC_PRIVATE *pmpeg = (MPEG_L3_ENC_PRIVATE*) psf->codec_data ;
 	sf_count_t total = 0 ;
 	int nbytes, writecount, writen ;
 
 	if ((psf->error = mpeg_l3_encoder_construct (psf)))
 		return 0 ;
 
+	const sf_count_t max_samples = SF_MIN (ARRAY_LEN (ubuf.fbuf), pmpeg->frame_samples) ;
 	while (len)
-	{	writecount = SF_MIN (len, (sf_count_t) pmpeg->frame_samples) ;
+	{	writecount = SF_MIN (len, max_samples) ;
 
 		if (psf->norm_float)
-			nbytes = lame_encode_buffer_ieee_float (pmpeg->lamef, ptr + total, NULL, writecount, pmpeg->block, pmpeg->block_len) ;
+		{	normalize_float (ubuf.fbuf, ptr + total, writecount, 1.0f) ;
+			nbytes = lame_encode_buffer_ieee_float (pmpeg->lamef, ubuf.fbuf, NULL, writecount, pmpeg->block, pmpeg->block_len) ;
+			}
 		else
-			nbytes = lame_encode_buffer_float (pmpeg->lamef, ptr + total, NULL, writecount, pmpeg->block, pmpeg->block_len) ;
+		{	/* Lame lacks a non-normalized mono float write, so scale to
+			** ieee full scale here, mirroring the stereo path below.
+			*/
+			normalize_float (ubuf.fbuf, ptr + total, writecount, 1.0 / (float) 0x8000) ;
+			nbytes = lame_encode_buffer_ieee_float (pmpeg->lamef, ubuf.fbuf, NULL, writecount, pmpeg->block, pmpeg->block_len) ;
+			}
 		if (nbytes < 0)
 		{	psf_log_printf (psf, "lame_encode_buffer returned %d\n", nbytes) ;
 			break ;
@@ -632,14 +687,6 @@ mpeg_l3_encode_write_float_mono (SF_PRIVATE *psf, const float *ptr, sf_count_t l
 }
 
 
-static inline void
-normalize_float (float *dest, const float *src, sf_count_t count, float norm_fact)
-{	while (--count >= 0)
-	{	dest [count] = src [count] * norm_fact ;
-		} ;
-}
-
-
 static sf_count_t
 mpeg_l3_encode_write_float_stereo (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
 {	BUF_UNION ubuf ;
@@ -655,7 +702,9 @@ mpeg_l3_encode_write_float_stereo (SF_PRIVATE *psf, const float *ptr, sf_count_t
 	{	writecount = SF_MIN (len, max_samples) ;
 
 		if (psf->norm_float)
-			nbytes = lame_encode_buffer_interleaved_ieee_float (pmpeg->lamef, ptr + total, writecount / 2, pmpeg->block, pmpeg->block_len) ;
+		{	normalize_float (ubuf.fbuf, ptr + total, writecount, 1.0f) ;
+			nbytes = lame_encode_buffer_interleaved_ieee_float (pmpeg->lamef, ubuf.fbuf, writecount / 2, pmpeg->block, pmpeg->block_len) ;
+			}
 		else
 		{	/* Lame lacks a non-normalized interleaved float write. Bummer. */
 			normalize_float (ubuf.fbuf, ptr + total, writecount, 1.0 / (float) 0x8000) ;
@@ -682,14 +731,6 @@ mpeg_l3_encode_write_float_stereo (SF_PRIVATE *psf, const float *ptr, sf_count_t
 }
 
 
-static inline void
-normalize_double (double *dest, const double *src, sf_count_t count, double norm_fact)
-{	while (--count >= 0)
-	{	dest [count] = src [count] * norm_fact ;
-		} ;
-}
-
-
 static sf_count_t
 mpeg_l3_encode_write_double_mono (SF_PRIVATE *psf, const double *ptr, sf_count_t len)
 {	BUF_UNION ubuf ;
@@ -705,7 +746,9 @@ mpeg_l3_encode_write_double_mono (SF_PRIVATE *psf, const double *ptr, sf_count_t
 	{	writecount = SF_MIN (len, max_samples) ;
 
 		if (psf->norm_double)
-			nbytes = lame_encode_buffer_ieee_double (pmpeg->lamef, ptr + total, NULL, writecount, pmpeg->block, pmpeg->block_len) ;
+		{	normalize_double (ubuf.dbuf, ptr + total, writecount, 1.0) ;
+			nbytes = lame_encode_buffer_ieee_double (pmpeg->lamef, ubuf.dbuf, NULL, writecount, pmpeg->block, pmpeg->block_len) ;
+			}
 		else
 		{	/* Lame lacks non-normalized double writing */
 			normalize_double (ubuf.dbuf, ptr + total, writecount, 1.0 / (double) 0x8000) ;
@@ -747,7 +790,9 @@ mpeg_l3_encode_write_double_stereo (SF_PRIVATE *psf, const double *ptr, sf_count
 	{	writecount = SF_MIN (len, max_samples) ;
 
 		if (psf->norm_double)
-			nbytes = lame_encode_buffer_interleaved_ieee_double (pmpeg->lamef, ptr + total, writecount / 2, pmpeg->block, pmpeg->block_len) ;
+		{	normalize_double (ubuf.dbuf, ptr + total, writecount, 1.0) ;
+			nbytes = lame_encode_buffer_interleaved_ieee_double (pmpeg->lamef, ubuf.dbuf, writecount / 2, pmpeg->block, pmpeg->block_len) ;
+			}
 		else
 		{	/* Lame lacks interleaved non-normalized double writing */
 			normalize_double (ubuf.dbuf, ptr + total, writecount, 1.0 / (double) 0x8000) ;

@@ -258,6 +258,162 @@ mpeg_double_test (void)
 	unlink (filename) ;
 } /* mpeg_double_test */
 
+/* Hostile input (CVE-2024-50613) : NaNs, infinities and huge finite values
+** must be sanitized before reaching LAME, not abort it. One helper covers
+** mono and stereo (channels == 2 exercises the interleaved_ieee paths),
+** with float normalization on or off.
+*/
+static void
+mpeg_hostile_float_case (int channels, int normalize)
+{	char filename [64] ;
+	SNDFILE * file ;
+	SF_INFO sfinfo ;
+	unsigned k ;
+	size_t samples = ARRAY_LEN (data_out.f) ;
+
+	snprintf (filename, sizeof (filename), "mpeg_hostile_float_%dch_%s.mp3",
+		channels, normalize ? "norm" : "nonorm") ;
+
+	print_test_name ("mpeg_hostile_float_test", filename) ;
+
+	if (channels == 1)
+	{	gen_windowed_sine_float (data_out.f, samples, normalize ? 0.95 : 1.0 * 0x7F00) ;
+		}
+	else
+	{	/* Interleave two mirrored channels. data_in.f is scratch here ;
+		** it is overwritten by the read-back below.
+		*/
+		gen_windowed_sine_float (data_in.f, samples / 2, normalize ? 0.95 : 1.0 * 0x7F00) ;
+		for (k = 0 ; k < samples / 2 ; k++)
+		{	data_out.f [2 * k] = data_in.f [k] ;
+			data_out.f [2 * k + 1] = data_in.f [samples / 2 - k - 1] ;
+			} ;
+		} ;
+
+	data_out.f [0] = NAN ;
+	data_out.f [1] = INFINITY ;
+	data_out.f [2] = -INFINITY ;
+	data_out.f [3] = 1.0e30f ;
+	data_out.f [4] = -1.0e30f ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	/* Set up output file type. */
+	sfinfo.format = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III ;
+	sfinfo.channels = channels ;
+	sfinfo.samplerate = SAMPLE_RATE ;
+
+	/* Write the output file. */
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	if (! normalize)
+		sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
+	test_write_float_or_die (file, 0, data_out.f, samples, __LINE__) ;
+	sf_close (file) ;
+
+	/* Read the file in again. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	test_read_float_or_die (file, 0, data_in.f, samples, __LINE__) ;
+	sf_close (file) ;
+
+	/* The decoded output must be finite and within a sane range. MP3 is
+	** lossy so decoded peaks may overshoot the encoder's +/-1 clamp
+	** slightly ; a generous bound catches scale errors without
+	** false-failing on codec noise. Explicit checks (no assert.h
+	** dependency) match the surrounding test style.
+	*/
+	for (k = 0 ; k < samples ; k++)
+		if (! isfinite (data_in.f [k]) || fabsf (data_in.f [k]) > 4.0f)
+		{	printf ("\n\nLine %d : bad decoded sample at index %u : %f.\n\n", __LINE__, k, data_in.f [k]) ;
+			exit (1) ;
+			} ;
+
+	puts ("ok") ;
+
+	unlink (filename) ;
+} /* mpeg_hostile_float_case */
+
+static void
+mpeg_hostile_float_test (void)
+{	mpeg_hostile_float_case (1, SF_TRUE) ;
+	mpeg_hostile_float_case (1, SF_FALSE) ;
+	mpeg_hostile_float_case (2, SF_TRUE) ;
+	mpeg_hostile_float_case (2, SF_FALSE) ;
+} /* mpeg_hostile_float_test */
+
+/* Double-precision version of the helper above. */
+static void
+mpeg_hostile_double_case (int channels, int normalize)
+{	char filename [64] ;
+	SNDFILE * file ;
+	SF_INFO sfinfo ;
+	unsigned k ;
+	size_t samples = ARRAY_LEN (data_out.d) ;
+
+	snprintf (filename, sizeof (filename), "mpeg_hostile_double_%dch_%s.mp3",
+		channels, normalize ? "norm" : "nonorm") ;
+
+	print_test_name ("mpeg_hostile_double_test", filename) ;
+
+	if (channels == 1)
+	{	gen_windowed_sine_double (data_out.d, samples, normalize ? 0.95 : 1.0 * 0x7F00) ;
+		}
+	else
+	{	gen_windowed_sine_double (data_in.d, samples / 2, normalize ? 0.95 : 1.0 * 0x7F00) ;
+		for (k = 0 ; k < samples / 2 ; k++)
+		{	data_out.d [2 * k] = data_in.d [k] ;
+			data_out.d [2 * k + 1] = data_in.d [samples / 2 - k - 1] ;
+			} ;
+		} ;
+
+	data_out.d [0] = NAN ;
+	data_out.d [1] = INFINITY ;
+	data_out.d [2] = -INFINITY ;
+	data_out.d [3] = 1.0e300 ;
+	data_out.d [4] = -1.0e300 ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	/* Set up output file type. */
+	sfinfo.format = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III ;
+	sfinfo.channels = channels ;
+	sfinfo.samplerate = SAMPLE_RATE ;
+
+	/* Write the output file. */
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	if (! normalize)
+		sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
+	test_write_double_or_die (file, 0, data_out.d, samples, __LINE__) ;
+	sf_close (file) ;
+
+	/* Read the file in again. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	test_read_double_or_die (file, 0, data_in.d, samples, __LINE__) ;
+	sf_close (file) ;
+
+	/* Finite and sane, as above. */
+	for (k = 0 ; k < samples ; k++)
+		if (! isfinite (data_in.d [k]) || fabs (data_in.d [k]) > 4.0)
+		{	printf ("\n\nLine %d : bad decoded sample at index %u : %f.\n\n", __LINE__, k, data_in.d [k]) ;
+			exit (1) ;
+			} ;
+
+	puts ("ok") ;
+
+	unlink (filename) ;
+} /* mpeg_hostile_double_case */
+
+static void
+mpeg_hostile_double_test (void)
+{	mpeg_hostile_double_case (1, SF_TRUE) ;
+	mpeg_hostile_double_case (1, SF_FALSE) ;
+	mpeg_hostile_double_case (2, SF_TRUE) ;
+	mpeg_hostile_double_case (2, SF_FALSE) ;
+} /* mpeg_hostile_double_test */
+
 
 static void
 mpeg_stereo_seek_test (const char * filename, int format)
@@ -338,6 +494,8 @@ main (void)
 		mpeg_int_test () ;
 		mpeg_float_test () ;
 		mpeg_double_test () ;
+		mpeg_hostile_float_test () ;
+		mpeg_hostile_double_test () ;
 
 		mpeg_stereo_seek_test ("mpeg_seek.mp3", SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III) ;
 		}
