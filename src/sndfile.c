@@ -3117,6 +3117,12 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 		{	error = SFE_BAD_OPEN_FORMAT ;
 			goto error_exit ;
 			} ;
+
+		/* Header writers divide by the sample rate (htk.c, sds.c, voc.c). */
+		if (psf->sf.samplerate < 1)
+		{	error = SFE_BAD_SF_INFO ;
+			goto error_exit ;
+			} ;
 		}
 	else if ((SF_CONTAINER (psf->sf.format)) != SF_FORMAT_RAW)
 	{	/* If type RAW has not been specified then need to figure out file type. */
