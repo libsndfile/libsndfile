@@ -258,6 +258,182 @@ mpeg_double_test (void)
 	unlink (filename) ;
 } /* mpeg_double_test */
 
+static void
+mpeg_hostile_float_test (void)
+{	const char * filename = "mpeg_hostile_float.mp3" ;
+
+	SNDFILE * file ;
+	SF_INFO sfinfo ;
+	unsigned k ;
+
+	print_test_name ("mpeg_hostile_float_test", filename) ;
+
+	/* Hostile input (CVE-2024-50613) : NaNs, infinities and huge finite
+	** values must be sanitized before reaching LAME, not abort it.
+	*/
+	gen_windowed_sine_float (data_out.f, ARRAY_LEN (data_out.f), 0.95) ;
+	data_out.f [0] = NAN ;
+	data_out.f [1] = INFINITY ;
+	data_out.f [2] = -INFINITY ;
+	data_out.f [3] = 1.0e30f ;
+	data_out.f [4] = -1.0e30f ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	/* Set up output file type. */
+	sfinfo.format = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III ;
+	sfinfo.channels = 1 ;
+	sfinfo.samplerate = SAMPLE_RATE ;
+
+	/* Write the output file. */
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	test_write_float_or_die (file, 0, data_out.f, ARRAY_LEN (data_out.f), __LINE__) ;
+	sf_close (file) ;
+
+	/* Read the file in again. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	test_read_float_or_die (file, 0, data_in.f, ARRAY_LEN (data_in.f), __LINE__) ;
+	sf_close (file) ;
+
+	/* The decoded output must be finite throughout. */
+	for (k = 0 ; k < ARRAY_LEN (data_in.f) ; k++)
+		if (! isfinite (data_in.f [k]))
+		{	printf ("\n\nLine %d : non-finite decoded sample at index %u.\n\n", __LINE__, k) ;
+			exit (1) ;
+			} ;
+
+	puts ("ok") ;
+
+	/* Same hostile input with normalization disabled exercises the
+	** non-normalized encoder path (short-int scale).
+	*/
+	print_test_name ("mpeg_hostile_float_nonorm_test", filename) ;
+
+	gen_windowed_sine_float (data_out.f, ARRAY_LEN (data_out.f), 1.0 * 0x7F00) ;
+	data_out.f [0] = NAN ;
+	data_out.f [1] = INFINITY ;
+	data_out.f [2] = -INFINITY ;
+	data_out.f [3] = 1.0e30f ;
+	data_out.f [4] = -1.0e30f ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	sfinfo.format = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III ;
+	sfinfo.channels = 1 ;
+	sfinfo.samplerate = SAMPLE_RATE ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	sf_command (file, SFC_SET_NORM_FLOAT, NULL, SF_FALSE) ;
+	test_write_float_or_die (file, 0, data_out.f, ARRAY_LEN (data_out.f), __LINE__) ;
+	sf_close (file) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	test_read_float_or_die (file, 0, data_in.f, ARRAY_LEN (data_in.f), __LINE__) ;
+	sf_close (file) ;
+
+	for (k = 0 ; k < ARRAY_LEN (data_in.f) ; k++)
+		if (! isfinite (data_in.f [k]))
+		{	printf ("\n\nLine %d : non-finite decoded sample at index %u.\n\n", __LINE__, k) ;
+			exit (1) ;
+			} ;
+
+	puts ("ok") ;
+
+	unlink (filename) ;
+} /* mpeg_hostile_float_test */
+
+static void
+mpeg_hostile_double_test (void)
+{	const char * filename = "mpeg_hostile_double.mp3" ;
+
+	SNDFILE * file ;
+	SF_INFO sfinfo ;
+	unsigned k ;
+
+	print_test_name ("mpeg_hostile_double_test", filename) ;
+
+	/* Hostile input (CVE-2024-50613) : NaNs, infinities and huge finite
+	** values must be sanitized before reaching LAME, not abort it.
+	*/
+	gen_windowed_sine_double (data_out.d, ARRAY_LEN (data_out.d), 0.95) ;
+	data_out.d [0] = NAN ;
+	data_out.d [1] = INFINITY ;
+	data_out.d [2] = -INFINITY ;
+	data_out.d [3] = 1.0e300 ;
+	data_out.d [4] = -1.0e300 ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	/* Set up output file type. */
+	sfinfo.format = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III ;
+	sfinfo.channels = 1 ;
+	sfinfo.samplerate = SAMPLE_RATE ;
+
+	/* Write the output file. */
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	test_write_double_or_die (file, 0, data_out.d, ARRAY_LEN (data_out.d), __LINE__) ;
+	sf_close (file) ;
+
+	/* Read the file in again. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	test_read_double_or_die (file, 0, data_in.d, ARRAY_LEN (data_in.d), __LINE__) ;
+	sf_close (file) ;
+
+	/* The decoded output must be finite throughout. */
+	for (k = 0 ; k < ARRAY_LEN (data_in.d) ; k++)
+		if (! isfinite (data_in.d [k]))
+		{	printf ("\n\nLine %d : non-finite decoded sample at index %u.\n\n", __LINE__, k) ;
+			exit (1) ;
+			} ;
+
+	puts ("ok") ;
+
+	/* Same hostile input with normalization disabled exercises the
+	** non-normalized encoder path (short-int scale).
+	*/
+	print_test_name ("mpeg_hostile_double_nonorm_test", filename) ;
+
+	gen_windowed_sine_double (data_out.d, ARRAY_LEN (data_out.d), 1.0 * 0x7F00) ;
+	data_out.d [0] = NAN ;
+	data_out.d [1] = INFINITY ;
+	data_out.d [2] = -INFINITY ;
+	data_out.d [3] = 1.0e300 ;
+	data_out.d [4] = -1.0e300 ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	sfinfo.format = SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III ;
+	sfinfo.channels = 1 ;
+	sfinfo.samplerate = SAMPLE_RATE ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	sf_command (file, SFC_SET_NORM_DOUBLE, NULL, SF_FALSE) ;
+	test_write_double_or_die (file, 0, data_out.d, ARRAY_LEN (data_out.d), __LINE__) ;
+	sf_close (file) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	test_read_double_or_die (file, 0, data_in.d, ARRAY_LEN (data_in.d), __LINE__) ;
+	sf_close (file) ;
+
+	for (k = 0 ; k < ARRAY_LEN (data_in.d) ; k++)
+		if (! isfinite (data_in.d [k]))
+		{	printf ("\n\nLine %d : non-finite decoded sample at index %u.\n\n", __LINE__, k) ;
+			exit (1) ;
+			} ;
+
+	puts ("ok") ;
+
+	unlink (filename) ;
+} /* mpeg_hostile_double_test */
+
 
 static void
 mpeg_stereo_seek_test (const char * filename, int format)
@@ -338,6 +514,8 @@ main (void)
 		mpeg_int_test () ;
 		mpeg_float_test () ;
 		mpeg_double_test () ;
+		mpeg_hostile_float_test () ;
+		mpeg_hostile_double_test () ;
 
 		mpeg_stereo_seek_test ("mpeg_seek.mp3", SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III) ;
 		}

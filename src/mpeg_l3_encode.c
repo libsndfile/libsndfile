@@ -54,6 +54,13 @@ static int mpeg_l3_encoder_close (SF_PRIVATE *psf) ;
 static int mpeg_l3_encoder_construct (SF_PRIVATE *psf) ;
 static int mpeg_l3_encoder_byterate (SF_PRIVATE *psf) ;
 
+static inline float sanitize_float_sample (float x) ;
+static inline double sanitize_double_sample (double x) ;
+static inline float sanitize_float_sample_nonorm (float x) ;
+static inline void copy_sanitize_float (float *dest, const float *src, sf_count_t count) ;
+static inline void copy_sanitize_double (double *dest, const double *src, sf_count_t count) ;
+static inline void copy_sanitize_float_nonorm (float *dest, const float *src, sf_count_t count) ;
+
 static sf_count_t mpeg_l3_encode_write_short_stereo (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
 static sf_count_t mpeg_l3_encode_write_int_stereo (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
 static sf_count_t mpeg_l3_encode_write_float_stereo (SF_PRIVATE *psf, const float *ptr, sf_count_t len) ;
@@ -598,20 +605,31 @@ mpeg_l3_encode_write_int_stereo (SF_PRIVATE *psf, const int *ptr, sf_count_t len
 
 static sf_count_t
 mpeg_l3_encode_write_float_mono (SF_PRIVATE *psf, const float *ptr, sf_count_t len)
-{	MPEG_L3_ENC_PRIVATE *pmpeg = (MPEG_L3_ENC_PRIVATE*) psf->codec_data ;
+{	BUF_UNION ubuf ;
+	MPEG_L3_ENC_PRIVATE *pmpeg = (MPEG_L3_ENC_PRIVATE*) psf->codec_data ;
 	sf_count_t total = 0 ;
 	int nbytes, writecount, writen ;
 
 	if ((psf->error = mpeg_l3_encoder_construct (psf)))
 		return 0 ;
 
+	const sf_count_t max_samples = SF_MIN (ARRAY_LEN (ubuf.fbuf), pmpeg->frame_samples) ;
 	while (len)
-	{	writecount = SF_MIN (len, (sf_count_t) pmpeg->frame_samples) ;
+	{	writecount = SF_MIN (len, max_samples) ;
 
 		if (psf->norm_float)
-			nbytes = lame_encode_buffer_ieee_float (pmpeg->lamef, ptr + total, NULL, writecount, pmpeg->block, pmpeg->block_len) ;
+		{	/* Clamp to the [-1, 1] range LAME requires (CVE-2024-50613). */
+			copy_sanitize_float (ubuf.fbuf, ptr + total, writecount) ;
+			nbytes = lame_encode_buffer_ieee_float (pmpeg->lamef, ubuf.fbuf, NULL, writecount, pmpeg->block, pmpeg->block_len) ;
+			}
 		else
-			nbytes = lame_encode_buffer_float (pmpeg->lamef, ptr + total, NULL, writecount, pmpeg->block, pmpeg->block_len) ;
+		{	/* Non-normalized input is in short-int scale. Clamp to the
+			** +/- 32768 range lame_encode_buffer_float requires and
+			** silence non-finite samples (CVE-2024-50613).
+			*/
+			copy_sanitize_float_nonorm (ubuf.fbuf, ptr + total, writecount) ;
+			nbytes = lame_encode_buffer_float (pmpeg->lamef, ubuf.fbuf, NULL, writecount, pmpeg->block, pmpeg->block_len) ;
+			}
 		if (nbytes < 0)
 		{	psf_log_printf (psf, "lame_encode_buffer returned %d\n", nbytes) ;
 			break ;
@@ -632,12 +650,78 @@ mpeg_l3_encode_write_float_mono (SF_PRIVATE *psf, const float *ptr, sf_count_t l
 }
 
 
+/* LAME's ieee_float / ieee_double entry points require input samples in the
+** range [-1.0, +1.0]. Crafted input files can deliver NaNs, infinities, or
+** huge finite values through the public sf_writef_float / sf_writef_double
+** API ; passing those straight to LAME trips assertions inside LAME
+** (psymodel.c : calc_energy : `el >= 0') and aborts the host application
+** (CVE-2024-50613, https://github.com/libsndfile/libsndfile/issues/1034).
+** Clamp here so the encoder only ever sees in-contract input. Samples
+** already in range pass through unchanged.
+*/
+
+static inline float
+sanitize_float_sample (float x)
+{	if (!isfinite (x))
+		return 0.0f ;
+	if (x > 1.0f)
+		return 1.0f ;
+	if (x < -1.0f)
+		return -1.0f ;
+	return x ;
+} /* sanitize_float_sample */
+
+static inline double
+sanitize_double_sample (double x)
+{	if (!isfinite (x))
+		return 0.0 ;
+	if (x > 1.0)
+		return 1.0 ;
+	if (x < -1.0)
+		return -1.0 ;
+	return x ;
+} /* sanitize_double_sample */
+
+static inline void
+copy_sanitize_float (float *dest, const float *src, sf_count_t count)
+{	while (--count >= 0)
+		dest [count] = sanitize_float_sample (src [count]) ;
+} /* copy_sanitize_float */
+
+static inline void
+copy_sanitize_double (double *dest, const double *src, sf_count_t count)
+{	while (--count >= 0)
+		dest [count] = sanitize_double_sample (src [count]) ;
+} /* copy_sanitize_double */
+
+/* LAME's non-ieee float entry point takes data in short-int scale
+** (+/- 32768), not [-1, 1]. Silence non-finite samples and clamp finite
+** samples to that scale so the encoder only ever sees in-contract input
+** (CVE-2024-50613). Samples already in range pass through unchanged.
+*/
+
+static inline float
+sanitize_float_sample_nonorm (float x)
+{	if (!isfinite (x))
+		return 0.0f ;
+	if (x > 32768.0f)
+		return 32768.0f ;
+	if (x < -32768.0f)
+		return -32768.0f ;
+	return x ;
+} /* sanitize_float_sample_nonorm */
+
+static inline void
+copy_sanitize_float_nonorm (float *dest, const float *src, sf_count_t count)
+{	while (--count >= 0)
+		dest [count] = sanitize_float_sample_nonorm (src [count]) ;
+} /* copy_sanitize_float_nonorm */
+
 static inline void
 normalize_float (float *dest, const float *src, sf_count_t count, float norm_fact)
 {	while (--count >= 0)
-	{	dest [count] = src [count] * norm_fact ;
-		} ;
-}
+		dest [count] = sanitize_float_sample (src [count] * norm_fact) ;
+} /* normalize_float */
 
 
 static sf_count_t
@@ -655,7 +739,10 @@ mpeg_l3_encode_write_float_stereo (SF_PRIVATE *psf, const float *ptr, sf_count_t
 	{	writecount = SF_MIN (len, max_samples) ;
 
 		if (psf->norm_float)
-			nbytes = lame_encode_buffer_interleaved_ieee_float (pmpeg->lamef, ptr + total, writecount / 2, pmpeg->block, pmpeg->block_len) ;
+		{	/* Clamp to the [-1, 1] range LAME requires (CVE-2024-50613). */
+			copy_sanitize_float (ubuf.fbuf, ptr + total, writecount) ;
+			nbytes = lame_encode_buffer_interleaved_ieee_float (pmpeg->lamef, ubuf.fbuf, writecount / 2, pmpeg->block, pmpeg->block_len) ;
+			}
 		else
 		{	/* Lame lacks a non-normalized interleaved float write. Bummer. */
 			normalize_float (ubuf.fbuf, ptr + total, writecount, 1.0 / (float) 0x8000) ;
@@ -685,9 +772,8 @@ mpeg_l3_encode_write_float_stereo (SF_PRIVATE *psf, const float *ptr, sf_count_t
 static inline void
 normalize_double (double *dest, const double *src, sf_count_t count, double norm_fact)
 {	while (--count >= 0)
-	{	dest [count] = src [count] * norm_fact ;
-		} ;
-}
+		dest [count] = sanitize_double_sample (src [count] * norm_fact) ;
+} /* normalize_double */
 
 
 static sf_count_t
@@ -705,7 +791,10 @@ mpeg_l3_encode_write_double_mono (SF_PRIVATE *psf, const double *ptr, sf_count_t
 	{	writecount = SF_MIN (len, max_samples) ;
 
 		if (psf->norm_double)
-			nbytes = lame_encode_buffer_ieee_double (pmpeg->lamef, ptr + total, NULL, writecount, pmpeg->block, pmpeg->block_len) ;
+		{	/* Clamp to the [-1, 1] range LAME requires (CVE-2024-50613). */
+			copy_sanitize_double (ubuf.dbuf, ptr + total, writecount) ;
+			nbytes = lame_encode_buffer_ieee_double (pmpeg->lamef, ubuf.dbuf, NULL, writecount, pmpeg->block, pmpeg->block_len) ;
+			}
 		else
 		{	/* Lame lacks non-normalized double writing */
 			normalize_double (ubuf.dbuf, ptr + total, writecount, 1.0 / (double) 0x8000) ;
@@ -747,7 +836,10 @@ mpeg_l3_encode_write_double_stereo (SF_PRIVATE *psf, const double *ptr, sf_count
 	{	writecount = SF_MIN (len, max_samples) ;
 
 		if (psf->norm_double)
-			nbytes = lame_encode_buffer_interleaved_ieee_double (pmpeg->lamef, ptr + total, writecount / 2, pmpeg->block, pmpeg->block_len) ;
+		{	/* Clamp to the [-1, 1] range LAME requires (CVE-2024-50613). */
+			copy_sanitize_double (ubuf.dbuf, ptr + total, writecount) ;
+			nbytes = lame_encode_buffer_interleaved_ieee_double (pmpeg->lamef, ubuf.dbuf, writecount / 2, pmpeg->block, pmpeg->block_len) ;
+			}
 		else
 		{	/* Lame lacks interleaved non-normalized double writing */
 			normalize_double (ubuf.dbuf, ptr + total, writecount, 1.0 / (double) 0x8000) ;
