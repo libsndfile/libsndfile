@@ -718,7 +718,12 @@ aiff_ima_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 		} ;
 
 	if (offset == 0)
-	{	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
+	{	if (!pima->decode_block)
+		{	psf->error = SFE_BAD_SEEK ;
+			return PSF_SEEK_ERROR ;
+			} ;
+
+		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
 		pima->blockcount = 0 ;
 		pima->decode_block (psf, pima) ;
 		pima->samplecount = 0 ;
@@ -764,11 +769,13 @@ wavlike_ima_seek (SF_PRIVATE *psf, int mode, sf_count_t offset)
 		} ;
 
 	if (offset == 0)
-	{	psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
-		pima->blockcount = 0 ;
-		if (!pima->decode_block)
+	{	if (!pima->decode_block)
+		{	psf->error = SFE_BAD_SEEK ;
 			return PSF_SEEK_ERROR ;
+			} ;
 
+		psf_fseek (psf, psf->dataoffset, SEEK_SET) ;
+		pima->blockcount = 0 ;
 		pima->decode_block (psf, pima) ;
 		pima->samplecount = 0 ;
 		return 0 ;
