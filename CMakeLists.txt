@@ -1432,6 +1432,9 @@ if (BUILD_TESTING)
 	add_test (header_test_w64 header_test w64)
 	add_test (misc_test_w64 misc_test w64)
 
+	### ima-adpcm-tests (all containers)
+	add_test (lossy_comp_test_ima_seek lossy_comp_test ima_seek)
+
 	### rf64-tests
 
 	add_test (write_read_test_rf64 write_read_test rf64)

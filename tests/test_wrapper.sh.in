@@ -181,6 +181,12 @@ echo "----------------------------------------------------------------------"
 echo "  $sfversion passed tests on W64 files."
 echo "----------------------------------------------------------------------"
 
+# ima-adpcm-tests (all containers)
+./tests/lossy_comp_test@EXEEXT@ ima_seek
+echo "----------------------------------------------------------------------"
+echo "  $sfversion passed IMA ADPCM seek tests."
+echo "----------------------------------------------------------------------"
+
 # rf64-tests
 ./tests/write_read_test@EXEEXT@ rf64
 ./tests/header_test@EXEEXT@ rf64
