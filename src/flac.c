@@ -1450,7 +1450,7 @@ flac_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 static int
 flac_byterate (SF_PRIVATE *psf)
 {
-	if (psf->file.mode == SFM_READ)
+	if (psf->file.mode == SFM_READ && psf->sf.frames > 0)
 		return (psf->datalength * psf->sf.samplerate) / psf->sf.frames ;
 
 	return -1 ;

@@ -223,7 +223,7 @@ alac_close	(SF_PRIVATE *psf)
 static int
 alac_byterate	(SF_PRIVATE *psf)
 {
-	if (psf->file.mode == SFM_READ)
+	if (psf->file.mode == SFM_READ && psf->sf.frames > 0)
 		return (psf->datalength * psf->sf.samplerate) / psf->sf.frames ;
 
 	return -1 ;
