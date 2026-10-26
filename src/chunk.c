@@ -66,6 +66,8 @@ psf_get_chunk_iterator (SF_PRIVATE * psf, const char * marker_str)
 			char str [5] ;
 		} u ;
 
+		/* snprintf () stops at the terminator, so clear the rest first. */
+		u.marker = 0 ;
 		snprintf (u.str, sizeof (u.str), "%s", marker_str) ;
 
 		marker_len = strlen (marker_str) ;
@@ -165,6 +167,8 @@ psf_find_read_chunk_str (const READ_CHUNKS * pchk, const char * marker_str)
 		char str [5] ;
 	} u ;
 
+	/* snprintf () stops at the terminator, so clear the rest first. */
+	u.marker = 0 ;
 	snprintf (u.str, sizeof (u.str), "%s", marker_str) ;
 
 	hash = strlen (marker_str) > 4 ? hash_of_str (marker_str) : u.marker ;
@@ -204,6 +208,9 @@ psf_store_read_chunk_str (READ_CHUNKS * pchk, const char * marker_str, sf_count_
 	size_t marker_len ;
 
 	memset (&rchunk, 0, sizeof (rchunk)) ;
+
+	/* snprintf () stops at the terminator, so clear the rest first. */
+	u.marker = 0 ;
 	snprintf (u.str, sizeof (u.str), "%s", marker_str) ;
 
 	marker_len = strlen (marker_str) ;
@@ -253,6 +260,8 @@ psf_save_write_chunk (WRITE_CHUNKS * pchk, const SF_CHUNK_INFO * chunk_info)
 	len = chunk_info->datalen ;
 	while (len & 3) len ++ ;
 
+	/* snprintf () stops at the terminator, so clear the rest first. */
+	u.marker = 0 ;
 	snprintf (u.str, sizeof (u.str), "%.4s", chunk_info->id) ;
 
 	pchk->chunks [pchk->used].hash = strlen (chunk_info->id) > 4 ? hash_of_str (chunk_info->id) : u.marker ;

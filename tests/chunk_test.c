@@ -298,6 +298,157 @@ multichunk_test_helper (const char *filename, int format, const char * testdata 
 } /* multichunk_test_helper */
 
 
+/*
+**	sndfile.h : "Chunks are matching, if (chunk_info->id) matches the first
+**	(chunk_info->id_size) bytes of a chunk". Check that an id which is not
+**	NUL terminated within its id_size bytes is found, and that an id_size
+**	left at zero still behaves as it did when the id was read as a C string.
+*/
+
+static void
+chunk_id_test_helper (const char *filename, int format)
+{	SNDFILE			*file ;
+	SF_INFO			sfinfo ;
+	SF_CHUNK_INFO	chunk_info ;
+	SF_CHUNK_ITERATOR * iterator ;
+	int				err, allow_fd ;
+
+	switch (format & SF_FORMAT_SUBMASK)
+	{	case SF_FORMAT_ALAC_16 :
+			allow_fd = SF_FALSE ;
+			break ;
+		default :
+			allow_fd = SF_TRUE ;
+			break ;
+		} ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.channels		= 1 ;
+	sfinfo.frames		= 0 ;
+	sfinfo.format		= format ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, allow_fd, __LINE__) ;
+
+	memset (&chunk_info, 0, sizeof (chunk_info)) ;
+	snprintf (chunk_info.id, sizeof (chunk_info.id), "abcd") ;
+	chunk_info.id_size = 4 ;
+	chunk_info.data = strdup ("first") ;
+	chunk_info.datalen = (unsigned int) strlen (chunk_info.data) ;
+
+	err = sf_set_chunk (file, &chunk_info) ;
+	exit_if_true (
+		err != SF_ERR_NO_ERROR,
+		"\n\nLine %d : sf_set_chunk returned : %s\n\n", __LINE__, sf_error_number (err)
+		) ;
+	free (chunk_info.data) ;
+
+	/* The same, with id_size left at zero. */
+	memset (&chunk_info, 0, sizeof (chunk_info)) ;
+	snprintf (chunk_info.id, sizeof (chunk_info.id), "efgh") ;
+	chunk_info.data = strdup ("second") ;
+	chunk_info.datalen = (unsigned int) strlen (chunk_info.data) ;
+
+	err = sf_set_chunk (file, &chunk_info) ;
+	exit_if_true (
+		err != SF_ERR_NO_ERROR,
+		"\n\nLine %d : sf_set_chunk returned : %s\n\n", __LINE__, sf_error_number (err)
+		) ;
+	free (chunk_info.data) ;
+
+	/* An id_size of less than four leaves no room for a chunk marker, so the
+	** chunk has to be refused rather than written NUL padded.
+	*/
+	memset (&chunk_info, 0, sizeof (chunk_info)) ;
+	snprintf (chunk_info.id, sizeof (chunk_info.id), "ijkl") ;
+	chunk_info.id_size = 2 ;
+	chunk_info.data = strdup ("third") ;
+	chunk_info.datalen = (unsigned int) strlen (chunk_info.data) ;
+
+	err = sf_set_chunk (file, &chunk_info) ;
+	exit_if_true (
+		err == SF_ERR_NO_ERROR,
+		"\n\nLine %d : sf_set_chunk with id_size 2 should have failed.\n\n", __LINE__
+		) ;
+	free (chunk_info.data) ;
+
+	sf_close (file) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, allow_fd, __LINE__) ;
+
+	/* A NUL terminated id with id_size set, which has always worked. */
+	memset (&chunk_info, 0, sizeof (chunk_info)) ;
+	snprintf (chunk_info.id, sizeof (chunk_info.id), "abcd") ;
+	chunk_info.id_size = 4 ;
+
+	iterator = sf_get_chunk_iterator (file, &chunk_info) ;
+	exit_if_true (
+		iterator == NULL,
+		"\n\nLine %d : chunk 'abcd' not found.\n\n", __LINE__
+		) ;
+
+	/* The first id_size bytes match, but the id is not NUL terminated. */
+	memset (&chunk_info, 0, sizeof (chunk_info)) ;
+	memset (chunk_info.id, 'X', sizeof (chunk_info.id)) ;
+	memcpy (chunk_info.id, "abcd", 4) ;
+	chunk_info.id_size = 4 ;
+
+	iterator = sf_get_chunk_iterator (file, &chunk_info) ;
+	exit_if_true (
+		iterator == NULL,
+		"\n\nLine %d : chunk 'abcd' not found with an id that is not NUL terminated.\n\n", __LINE__
+		) ;
+
+	/* A NUL terminated id with id_size left at zero. */
+	memset (&chunk_info, 0, sizeof (chunk_info)) ;
+	snprintf (chunk_info.id, sizeof (chunk_info.id), "abcd") ;
+
+	iterator = sf_get_chunk_iterator (file, &chunk_info) ;
+	exit_if_true (
+		iterator == NULL,
+		"\n\nLine %d : chunk 'abcd' not found with id_size zero.\n\n", __LINE__
+		) ;
+
+	/* The chunk written with id_size zero kept its id. */
+	memset (&chunk_info, 0, sizeof (chunk_info)) ;
+	snprintf (chunk_info.id, sizeof (chunk_info.id), "efgh") ;
+	chunk_info.id_size = 4 ;
+
+	iterator = sf_get_chunk_iterator (file, &chunk_info) ;
+	exit_if_true (
+		iterator == NULL,
+		"\n\nLine %d : chunk 'efgh', written with id_size zero, not found.\n\n", __LINE__
+		) ;
+
+	/* The refused id_size 2 chunk is not in the file. Reaching here at all
+	** means the file re-opened, which is the point: a NUL padded marker
+	** stops the parser and the audio after it is never found.
+	*/
+	memset (&chunk_info, 0, sizeof (chunk_info)) ;
+	snprintf (chunk_info.id, sizeof (chunk_info.id), "ijkl") ;
+	chunk_info.id_size = 2 ;
+
+	iterator = sf_get_chunk_iterator (file, &chunk_info) ;
+	exit_if_true (
+		iterator != NULL,
+		"\n\nLine %d : chunk 'ij' was refused on write, but was found.\n\n", __LINE__
+		) ;
+
+	/* An id that does not match any chunk still finds nothing. */
+	memset (&chunk_info, 0, sizeof (chunk_info)) ;
+	snprintf (chunk_info.id, sizeof (chunk_info.id), "nope") ;
+	chunk_info.id_size = 4 ;
+
+	iterator = sf_get_chunk_iterator (file, &chunk_info) ;
+	exit_if_true (
+		iterator != NULL,
+		"\n\nLine %d : chunk 'nope' was never written, but was found.\n\n", __LINE__
+		) ;
+
+	sf_close (file) ;
+	unlink (filename) ;
+} /* chunk_id_test_helper */
+
+
 static void
 chunk_test (const char *filename, int format)
 {	const char*		testdata [] =
@@ -310,6 +461,8 @@ chunk_test (const char *filename, int format)
 		chunk_test_helper (filename, format, testdata [k]) ;
 
 	multichunk_test_helper (filename, format, testdata, ARRAY_LEN (testdata)) ;
+
+	chunk_id_test_helper (filename, format) ;
 
 	puts ("ok") ;
 } /* chunk_test */
