@@ -336,13 +336,29 @@ i2alaw_array (const int *ptr, int count, unsigned char *buffer)
 		} ;
 } /* i2alaw_array */
 
+/* Encode a sample already scaled to the table range, clipping values beyond
+** it: unclipped, an out-of-range sample indexed past the end of alaw_encode. */
+static inline unsigned char
+alaw_encode_f (float x)
+{	if (x >= 0)
+		return alaw_encode [x >= 2048.0f ? 2048 : psf_lrintf (x)] ;
+	return 0x7F & alaw_encode [x <= -2048.0f ? 2048 : - psf_lrintf (x)] ;
+} /* alaw_encode_f */
+
+static inline unsigned char
+alaw_encode_d (double x)
+{	if (x >= 0)
+		return alaw_encode [x >= 2048.0 ? 2048 : psf_lrint (x)] ;
+	return 0x7F & alaw_encode [x <= -2048.0 ? 2048 : - psf_lrint (x)] ;
+} /* alaw_encode_d */
+
 static inline void
 f2alaw_array (const float *ptr, int count, unsigned char *buffer, float normfact)
 {	for (int i = 0 ; i < count ; i++)
-	{	if (ptr [i] >= 0)
-			buffer [i] = alaw_encode [psf_lrintf (normfact * ptr [i])] ;
+	{	if (!isfinite (ptr [i]))
+			buffer [i] = 0 ;
 		else
-			buffer [i] = 0x7F & alaw_encode [- psf_lrintf (normfact * ptr [i])] ;
+			buffer [i] = alaw_encode_f (normfact * ptr [i]) ;
 		} ;
 } /* f2alaw_array */
 
@@ -351,10 +367,8 @@ d2alaw_array (const double *ptr, int count, unsigned char *buffer, double normfa
 {	for (int i = 0 ; i < count ; i++)
 	{	if (!isfinite (ptr [i]))
 			buffer [i] = 0 ;
-		else if (ptr [i] >= 0)
-			buffer [i] = alaw_encode [psf_lrint (normfact * ptr [i])] ;
 		else
-			buffer [i] = 0x7F & alaw_encode [- psf_lrint (normfact * ptr [i])] ;
+			buffer [i] = alaw_encode_d (normfact * ptr [i]) ;
 		} ;
 } /* d2alaw_array */
 
