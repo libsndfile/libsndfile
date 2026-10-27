@@ -842,8 +842,8 @@ f2ulaw_array (const float *ptr, int count, unsigned char *buffer, float normfact
 {	for (int i = 0 ; i < count ; i++)
 	{	float x = normfact * ptr [i] ;
 
-		if (!isfinite (ptr [i]))
-			buffer [i] = 0 ;
+		if (isnan (ptr [i]))
+			buffer [i] = ulaw_encode [0] ;
 		else if (ptr [i] >= 0)
 			buffer [i] = ulaw_encode [x < 8192 ? psf_lrintf (x) : 8192] ;
 		else
@@ -856,8 +856,8 @@ d2ulaw_array (const double *ptr, int count, unsigned char *buffer, double normfa
 {	for (int i = 0 ; i < count ; i++)
 	{	double x = normfact * ptr [i] ;
 
-		if (!isfinite (ptr [i]))
-			buffer [i] = 0 ;
+		if (isnan (ptr [i]))
+			buffer [i] = ulaw_encode [0] ;
 		else if (ptr [i] >= 0)
 			buffer [i] = ulaw_encode [x < 8192 ? psf_lrint (x) : 8192] ;
 		else
