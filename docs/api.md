@@ -322,7 +322,7 @@ const char *  sf_get_format_check_failure_reason (const SF_INFO *info) ;
 This function allows the caller to check if a set of parameters in the SF_INFO
 struct is valid before calling [sf_open](#open) (SFM_WRITE).
 
-sf_format_check() returns NULL if the parameters are valid or a pointer
+sf_format_check_failure_reason() returns NULL if the parameters are valid or a pointer
 to a human-readable NUL-terminated string describing the problem otherwise.
 
 This function is logically equivalent to sf_format_check(), but with

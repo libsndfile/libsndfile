@@ -654,8 +654,8 @@ sf_format_check	(const SF_INFO *info)
 {
 	/* Return SF_FALSE on failure, or SF_TRUE on success.
 	*/
-	return (sf_get_format_check_failure_reason(info) == NULL) ? SF_TRUE : SF_FALSE;
-}
+	return (sf_get_format_check_failure_reason (info) == NULL) ? SF_TRUE : SF_FALSE ;
+} /* sf_format_check */
 
 /*==============================================================================
 */
@@ -841,7 +841,7 @@ sf_get_format_check_failure_reason(const SF_INFO *info)
 					return NULL ;
 				if (subformat == SF_FORMAT_IMA_ADPCM || subformat == SF_FORMAT_MS_ADPCM)
 					return (info->channels <= 2) ? NULL : "W64 format supports a maximum of 2 channels in ADPCM subformats" ;
-				if (subformat == SF_FORMAT_GSM610 && info->channels == 1)
+				if (subformat == SF_FORMAT_GSM610)
 					return (info->channels == 1) ? NULL : "W64 format supports only 1 channel in GSM610 subformat" ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
 					return NULL ;
@@ -900,7 +900,7 @@ sf_get_format_check_failure_reason(const SF_INFO *info)
 					return "AVR format supports a maximum of 2 channels" ;
 				/* SDS is strictly big endian. */
 				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
-					return 0 ;
+					return "AVR format supports only big-endian samples" ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_16)
 					return NULL ;
 				break ;
@@ -927,7 +927,7 @@ sf_get_format_check_failure_reason(const SF_INFO *info)
 				if (info->channels > 1)
 					return "WVE format supports only 1-channel files" ;
 				/* WVE is strictly big endian. */
-				if (endian == SF_ENDIAN_BIG || endian == SF_ENDIAN_CPU)
+				if (endian == SF_ENDIAN_LITTLE || endian == SF_ENDIAN_CPU)
 					return "WVE format supports only big-endian samples" ;
 				if (subformat == SF_FORMAT_ALAW)
 					return NULL ;
@@ -935,7 +935,7 @@ sf_get_format_check_failure_reason(const SF_INFO *info)
 
 		case SF_FORMAT_OGG :
 				if (endian != SF_ENDIAN_FILE)
-					return "OGG format supports only file-native-endian smaples" ;
+					return "OGG format supports only file-native-endian samples" ;
 				if (subformat == SF_FORMAT_VORBIS)
 					return NULL ;
 				if (subformat == SF_FORMAT_OPUS)
@@ -975,7 +975,7 @@ sf_get_format_check_failure_reason(const SF_INFO *info)
 				break ;
 
 		default :
-			return "unknown container format";
+			return "unknown container format" ;
 		} ;
 
 	return "specified subformat is not supported by the specified container format" ;

@@ -651,7 +651,7 @@ int		sf_command	(SNDFILE *sndfile, int command, void *data, int datasize) ;
 
 
 /* Return SF_TRUE if fields of the SF_INFO struct are a valid combination of values,
- * of SF_FALSE if they cannot be used.
+** or SF_FALSE if they cannot be used.
 ** Note this function is logically equivalent to:
 **    return (sf_get_format_check_failure_reason(info) == NULL) ? SF_TRUE : SF_FALSE;
 */
@@ -660,9 +660,14 @@ int		sf_format_check	(const SF_INFO *info) ;
 
 
 /* Return NULL if fields of the SF_INFO struct are a valid combination of values,
-** or a human-readable explanation-string describing the problem otherwise.
+** or else a human-readable English string describing the problem.
 ** Note that this function is logically equivalent to sf_format_check(), just with
 ** a different return-type.
+** The returned string is static and must not be freed by the caller.
+** Note that the strings returned by this function are not considered part
+** of the stable libsndfile API; in particular they may change from one release of
+** libsndfile to the next, so callers should avoid parsing the returned strings or
+** comparing them to any fixed values.
 */
 
 const char *		sf_get_format_check_failure_reason (const SF_INFO *info) ;

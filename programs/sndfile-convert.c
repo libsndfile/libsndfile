@@ -109,7 +109,7 @@ report_format_error_exit (const char * argv0, const SF_INFO * sfinfo)
 	printf ("\n"
 			"Error : output file format is invalid (%s).\n"
 			"Run '%s --help' for clues.\n\n",
-			sf_get_format_check_failure_reason(sfinfo), program_name (argv0)) ;
+			sf_get_format_check_failure_reason (sfinfo), program_name (argv0)) ;
 	exit (1) ;
 } /* report_format_error_exit */
 

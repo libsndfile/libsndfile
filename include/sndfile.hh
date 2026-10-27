@@ -365,7 +365,7 @@ SndfileHandle::formatCheck (int fmt, int chans, int srate)
 	return sf_format_check (&sfinfo) ;
 }
 
-inline const char  *
+inline const char *
 SndfileHandle::getFormatCheckFailureReason (int fmt, int chans, int srate)
 {
 	SF_INFO sfinfo ;
@@ -379,7 +379,6 @@ SndfileHandle::getFormatCheckFailureReason (int fmt, int chans, int srate)
 
 	return sf_get_format_check_failure_reason (&sfinfo) ;
 }
-
 
 /*---------------------------------------------------------------------*/
 
