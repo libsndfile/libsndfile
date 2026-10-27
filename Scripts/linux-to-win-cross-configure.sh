@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 case "$1" in
 	w32)
@@ -18,5 +18,5 @@ shift
 build_cpu=$(dpkg-architecture -qDEB_BUILD_GNU_CPU)
 build_host=$build_cpu-linux
 
-./configure --host=$compiler_name --target=$compiler_name --build=$build_host \
-		--program-prefix='' --disable-sqlite --disable-static $@
+./configure --host="${compiler_name}" --target="${compiler_name}" --build="${build_host}" \
+		--program-prefix='' --disable-sqlite --disable-static "$@"

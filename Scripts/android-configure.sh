@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/usr/bin/env sh
+
+set -e
 
 # Copyright (C) 2013-2016 Erik de Castro Lopo <erikd@mega-nerd.com>
 #
@@ -37,7 +39,7 @@ ANDROID_API_VER=${ANDROID_API_VER:-14}
 
 ANDROID_TARGET=${ANDROID_TARGET:-arm-linux-androideabi}
 
-if test -z ${ANDROID_TOOLCHAIN_HOME} ; then
+if test -z "${ANDROID_TOOLCHAIN_HOME}" ; then
 	echo "Environment variable ANDROID_TOOLCHAIN_HOME not defined."
 	echo "This should point to the directory containing the Android NDK."
     exit 1
@@ -46,42 +48,42 @@ if test -z ${ANDROID_TOOLCHAIN_HOME} ; then
 #-------------------------------------------------------------------------------
 # No more user config beyond here.
 
-BUILD_MACHINE=$(uname -s | tr 'A-Z' 'a-z')-$(uname -m)
+BUILD_MACHINE=$(uname -s | tr '[:upper:]' '[:lower:]')-$(uname -m)
 
-function die_with {
-	echo $1
+die_with() {
+	echo "$1"
 	exit 1
 }
 
-export CROSS_COMPILE=${ANDROID_TARGET}
+export CROSS_COMPILE="${ANDROID_TARGET}"
 
 # Don't forget to adjust this to your NDK path
-export ANDROID_NDK=${ANDROID_TOOLCHAIN_HOME}/android-ndk-${ANDROID_NDK_VER}
-test -d ${ANDROID_NDK} || die_with "Error : ANDROID_NDK '$ANDROID_NDK' does not exist."
+export ANDROID_NDK="${ANDROID_TOOLCHAIN_HOME}/android-ndk-${ANDROID_NDK_VER}"
+test -d "${ANDROID_NDK}" || die_with "Error : ANDROID_NDK '${ANDROID_NDK}' does not exist."
 
-export ANDROID_PREFIX=${ANDROID_NDK}/toolchains/arm-linux-androideabi-${ANDROID_GCC_VER}/prebuilt/${BUILD_MACHINE}
-test -d ${ANDROID_PREFIX} || die_with "Error : ANDROID_PREFIX '$ANDROID_PREFIX' does not exist."
+export ANDROID_PREFIX="${ANDROID_NDK}/toolchains/arm-linux-androideabi-${ANDROID_GCC_VER}/prebuilt/${BUILD_MACHINE}"
+test -d "${ANDROID_PREFIX}" || die_with "Error : ANDROID_PREFIX '${ANDROID_PREFIX}' does not exist."
 
-export SYSROOT=${ANDROID_NDK}/platforms/android-${ANDROID_API_VER}/arch-arm
-test -d ${SYSROOT} || die_with "Error : SYSROOT '$SYSROOT' does not exist."
+export SYSROOT="${ANDROID_NDK}/platforms/android-${ANDROID_API_VER}/arch-arm"
+test -d "${SYSROOT}" || die_with "Error : SYSROOT '${SYSROOT}' does not exist."
 
-export CROSS_PREFIX=${ANDROID_PREFIX}/bin/${CROSS_COMPILE}
-test -f ${CROSS_PREFIX}-gcc || die_with "Error : CROSS_PREFIX compiler '${CROSS_PREFIX}-gcc' does not exist."
+export CROSS_PREFIX="${ANDROID_PREFIX}/bin/${CROSS_COMPILE}"
+test -f "${CROSS_PREFIX}-gcc" || die_with "Error : CROSS_PREFIX compiler '${CROSS_PREFIX}-gcc' does not exist."
 
 
 # Non-exhaustive lists of compiler + binutils
 # Depending on what you compile, you might need more binutils than that
-export CPP=${CROSS_PREFIX}-cpp
-export AR=${CROSS_PREFIX}-ar
-export AS=${CROSS_PREFIX}-as
-export NM=${CROSS_PREFIX}-nm
-export CC=${CROSS_PREFIX}-gcc
-export CXX=${CROSS_PREFIX}-g++
-export LD=${CROSS_PREFIX}-ld
-export RANLIB=${CROSS_PREFIX}-ranlib
+export CPP="${CROSS_PREFIX}-cpp"
+export AR="${CROSS_PREFIX}-ar"
+export AS="${CROSS_PREFIX}-as"
+export NM="${CROSS_PREFIX}-nm"
+export CC="${CROSS_PREFIX}-gcc"
+export CXX="${CROSS_PREFIX}-g++"
+export LD="${CROSS_PREFIX}-ld"
+export RANLIB="${CROSS_PREFIX}-ranlib"
 
 # Don't mix up .pc files from your host and build target
-export PKG_CONFIG_PATH=${PREFIX}/lib/pkgconfig
+export PKG_CONFIG_PATH="${PREFIX}/lib/pkgconfig"
 
 # Set up the needed FLAGS.
 export CFLAGS="${CFLAGS} -gstabs --sysroot=${SYSROOT} -I${SYSROOT}/usr/include -I${ANDROID_PREFIX}/include"
@@ -91,6 +93,6 @@ export CPPFLAGS="${CFLAGS}"
 export LDFLAGS="${LDFLAGS} -L${SYSROOT}/usr/lib -L${ANDROID_PREFIX}/lib"
 
 # Create a symlink to the gdbclient.
-test -h gdbclient || ln -s ${ANDROID_PREFIX}/bin/arm-linux-androideabi-gdb gdbclient
+test -h gdbclient || ln -s "${ANDROID_PREFIX}/bin/arm-linux-androideabi-gdb" gdbclient
 
-./configure --host=${CROSS_COMPILE} --with-sysroot=${SYSROOT} "$@"
+./configure --host="${CROSS_COMPILE}" --with-sysroot="${SYSROOT}" "$@"

@@ -95,18 +95,18 @@ Build/Stamp/build-ogg : Build/Stamp/sha256sum
 ifeq ($(disable_ogg_crc), true)
 	echo "Ogg/CRC enabled"
 	(cd Build && git clone https://github.com/xiph/ogg $(ogg_version))
-	(cd Build/$(ogg_version) && autoreconf -vif && CFLAGS=-fPIC ./configure $(config_options) --disable-crc && make all install)
+	(cd Build/$(ogg_version) && autoreconf -vif && CFLAGS=-fPIC ./configure $(config_options) --disable-crc && $(MAKE) all install)
 else
 	echo "Ogg/CRC disabled"
 	(cd Build && tar xf Tarballs/$(ogg_tarball))
-	(cd Build/$(ogg_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
+	(cd Build/$(ogg_version) && CFLAGS=-fPIC ./configure $(config_options) && $(MAKE) all install)
 endif
 	touch $@
 
 Build/Stamp/install-libs : Build/Stamp/extract Build/Stamp/build-ogg
-	(cd Build/$(vorbis_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
-	(cd Build/$(flac_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
-	(cd Build/$(opus_version) && CFLAGS=-fPIC ./configure $(config_options) && make all install)
+	(cd Build/$(vorbis_version) && CFLAGS=-fPIC ./configure $(config_options) && $(MAKE) all install)
+	(cd Build/$(flac_version) && CFLAGS=-fPIC ./configure $(config_options) && $(MAKE) all install)
+	(cd Build/$(opus_version) && CFLAGS=-fPIC ./configure $(config_options) && $(MAKE) all install)
 	touch $@
 
 configure : configure.ac
@@ -114,12 +114,14 @@ configure : configure.ac
 
 Build/Stamp/configure : Build/Stamp/install-libs configure
 	PKG_CONFIG_LIBDIR=Build/lib/pkgconfig ./configure
-	sed -i 's#^EXTERNAL_XIPH_CFLAGS.*#EXTERNAL_XIPH_CFLAGS = -I$(pwd)/Build/include#' Makefile
-	sed -i 's#^EXTERNAL_XIPH_LIBS.*#EXTERNAL_XIPH_LIBS = -static $(pwd)/Build/lib/libFLAC.la $(pwd)/Build/lib/libvorbis.la $(pwd)/Build/lib/libvorbisenc.la $(pwd)/Build/lib/libopus.la $(pwd)/Build/lib/libogg.la -dynamic #' Makefile
-	make clean
+	sed -e "s#^EXTERNAL_XIPH_CFLAGS.*#EXTERNAL_XIPH_CFLAGS = -I$$(pwd)/Build/include#" \
+		-e "s#^EXTERNAL_XIPH_LIBS.*#EXTERNAL_XIPH_LIBS = -static $$(pwd)/Build/lib/libFLAC.la $$(pwd)/Build/lib/libvorbis.la $$(pwd)/Build/lib/libvorbisenc.la $$(pwd)/Build/lib/libopus.la $$(pwd)/Build/lib/libogg.la -dynamic #" \
+		Makefile > Makefile.tmp
+	mv Makefile.tmp Makefile
+	$(MAKE) clean
 	touch $@
 
 Build/Stamp/build : Build/Stamp/configure
-	make all check
+	$(MAKE) all check
 	touch $@
 
