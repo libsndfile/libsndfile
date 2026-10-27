@@ -528,7 +528,7 @@ test_sf_format_or_die (const SF_INFO *info, int line_num)
 {	int res ;
 
 	if ((res = sf_format_check (info)) != 1)
-	{	printf ("\n\nLine %d : sf_format_check returned error (%d)\n\n", line_num, res) ;
+	{	printf ("\n\nLine %d : sf_format_check returned error (%d) (%s)\n\n", line_num, res, sf_get_format_check_failure_reason (info)) ;
 		exit (1) ;
 		} ;
 

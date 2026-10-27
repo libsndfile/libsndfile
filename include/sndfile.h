@@ -650,9 +650,22 @@ int		sf_error_str	(SNDFILE *sndfile, char* str, size_t len) ;
 int		sf_command	(SNDFILE *sndfile, int command, void *data, int datasize) ;
 
 
-/* Return TRUE if fields of the SF_INFO struct are a valid combination of values. */
+/* Return SF_TRUE if fields of the SF_INFO struct are a valid combination of values,
+ * of SF_FALSE if they cannot be used.
+** Note this function is logically equivalent to:
+**    return (sf_get_format_check_failure_reason(info) == NULL) ? SF_TRUE : SF_FALSE;
+*/
 
 int		sf_format_check	(const SF_INFO *info) ;
+
+
+/* Return NULL if fields of the SF_INFO struct are a valid combination of values,
+** or a human-readable explanation-string describing the problem otherwise.
+** Note that this function is logically equivalent to sf_format_check(), just with
+** a different return-type.
+*/
+
+const char *		sf_get_format_check_failure_reason (const SF_INFO *info) ;
 
 
 /* Seek within the waveform data chunk of the SNDFILE. sf_seek () uses
