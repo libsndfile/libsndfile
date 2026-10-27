@@ -405,6 +405,7 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 {	ALAC_DECODER *pdec = &plac->u.decoder ;
 	uint32_t	packet_size ;
 	BitBuffer	bit_buffer ;
+	int32_t		error ;
 
 	packet_size = alac_reader_next_packet_size (plac->pakt_info) ;
 	if (packet_size == 0)
@@ -427,7 +428,11 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
 	plac->input_data_pos += packet_size ;
 	plac->frames_this_block = 0 ;
-	alac_decode (pdec, &bit_buffer, plac->buffer, plac->frames_per_block, &plac->frames_this_block) ;
+	if ((error = alac_decode (pdec, &bit_buffer, plac->buffer, plac->frames_per_block, &plac->frames_this_block)) != ALAC_noErr)
+	{	psf_log_printf (psf, "*** alac_decode() returned %s. ***\n", alac_error_string (error)) ;
+		plac->frames_this_block = 0 ;
+		return 0 ;
+		} ;
 
 	plac->partial_block_frames = 0 ;
 

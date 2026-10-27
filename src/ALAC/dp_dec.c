@@ -61,7 +61,7 @@ unpc_block (const int32_t * pc1, int32_t * out, int32_t num, int16_t * coefs, in
 	int32_t *			pout ;
 	int32_t				del, del0 ;
 	uint32_t			chanshift = 32 - chanbits ;
-	int32_t				denhalf = 1 << (denshift - 1) ;
+	int32_t				denhalf = denshift ? 1 << (denshift - 1) : 0 ;
 
 	out [0] = pc1 [0] ;
 	if (numactive == 0)

@@ -108,6 +108,8 @@ alac_decoder_init (ALAC_DECODER *p, void * inMagicCookie, uint32_t inMagicCookie
 
 		RequireAction (p->mConfig.compatibleVersion <= kALACVersion, return kALAC_IncompatibleVersion ;) ;
 		RequireAction ((p->mConfig.bitDepth >= 8 && p->mConfig.bitDepth <= 32), return kALAC_BadBitWidth ;) ;
+		// dyn_get_32bit () needs prefix + 1 + kb <= 32 with a prefix below MAX_PREFIX_32 (9).
+		RequireAction ((p->mConfig.kb >= 1 && p->mConfig.kb <= 23), return kALAC_ParamError ;) ;
 		RequireAction ((p->mMixBufferU != NULL) && (p->mMixBufferV != NULL) && (p->u.mPredictor != NULL),
 						status = kALAC_MemFullError ; goto Exit ;) ;
 	}
@@ -208,6 +210,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 				escapeFlag = headerByte & 0x1 ;
 
 				chanBits = p->mConfig.bitDepth - (bytesShifted * 8) ;
+				RequireAction (chanBits >= 1 && chanBits <= 32, status = kALAC_ParamError ; goto Exit ;) ;
 
 				// check for partial frame to override requested numSamples
 				if (partialFrame != 0)
@@ -270,7 +273,7 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 						for (i = 0 ; i < numSamples ; i++)
 						{
 							val = (int32_t) BitBufferRead (bits, (uint8_t) chanBits) ;
-							val = (val << shift) >> shift ;
+							val = arith_shift_left (val, shift) >> shift ;
 							p->mMixBufferU [i] = val ;
 						}
 					}
@@ -376,6 +379,10 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 					// compressed frame, read rest of parameters
 					mixBits		= (uint8_t) BitBufferRead (bits, 8) ;
 					mixRes		= (int8_t) BitBufferRead (bits, 8) ;
+					RequireAction (mixBits < 32, status = kALAC_ParamError ; goto Exit ;) ;
+
+					// Not checked with the header: an uncompressed frame replaces chanBits with the bit depth.
+					RequireAction (chanBits >= 1 && chanBits <= 32, status = kALAC_ParamError ; goto Exit ;) ;
 
 					headerByte	= (uint8_t) BitBufferRead (bits, 8) ;
 					modeU		= headerByte >> 4 ;
@@ -448,11 +455,11 @@ alac_decode (ALAC_DECODER *p, struct BitBuffer * bits, int32_t * sampleBuffer, u
 						for (i = 0 ; i < numSamples ; i++)
 						{
 							val = (int32_t) BitBufferRead (bits, (uint8_t) chanBits) ;
-							val = (val << shift) >> shift ;
+							val = arith_shift_left (val, shift) >> shift ;
 							p->mMixBufferU [i] = val ;
 
 							val = (int32_t) BitBufferRead (bits, (uint8_t) chanBits) ;
-							val = (val << shift) >> shift ;
+							val = arith_shift_left (val, shift) >> shift ;
 							p->mMixBufferV [i] = val ;
 						}
 					}
