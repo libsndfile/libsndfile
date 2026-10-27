@@ -477,24 +477,14 @@ main (int argc, char *argv [])
 
 	if (do_all || strcmp (argv [1], "ogg_opus") == 0)
 	{	if (HAVE_EXTERNAL_XIPH_LIBS)
-		{	/* Don't do lcomp_test_XXX as the errors are too big. */
-#if defined (_MSC_VER) && defined (_WIN64)
-			/* VS x64 produces larger numeric drift for Opus than Win32 or GCC/Clang. */
+		{	/* Don't do lcomp_test_XXX as the errors are too big.
+			** The margins track libopus output, which drifts between releases
+			** and compilers: libopus 1.6.1 with GCC 16 peaks at 0.74.
+			*/
 			sdlcomp_test_short	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
 			sdlcomp_test_int	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
 			sdlcomp_test_float	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
 			sdlcomp_test_double	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
-#elif defined (_MSC_VER)
-			sdlcomp_test_short	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
-			sdlcomp_test_int	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
-			sdlcomp_test_float	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
-			sdlcomp_test_double	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
-#else
-			sdlcomp_test_short	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.57) ;
-			sdlcomp_test_int	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.54) ;
-			sdlcomp_test_float	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.55) ;
-			sdlcomp_test_double	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.55) ;
-#endif
 			}
 		else
 			puts ("    No Ogg/Opus tests because Ogg/Opus support was not compiled in.") ;
