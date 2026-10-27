@@ -341,8 +341,8 @@ f2alaw_array (const float *ptr, int count, unsigned char *buffer, float normfact
 {	for (int i = 0 ; i < count ; i++)
 	{	float x = normfact * ptr [i] ;
 
-		if (!isfinite (ptr [i]))
-			buffer [i] = 0 ;
+		if (isnan (ptr [i]))
+			buffer [i] = alaw_encode [0] ;
 		else if (ptr [i] >= 0)
 			buffer [i] = alaw_encode [x < 2048 ? psf_lrintf (x) : 2048] ;
 		else
@@ -355,8 +355,8 @@ d2alaw_array (const double *ptr, int count, unsigned char *buffer, double normfa
 {	for (int i = 0 ; i < count ; i++)
 	{	double x = normfact * ptr [i] ;
 
-		if (!isfinite (ptr [i]))
-			buffer [i] = 0 ;
+		if (isnan (ptr [i]))
+			buffer [i] = alaw_encode [0] ;
 		else if (ptr [i] >= 0)
 			buffer [i] = alaw_encode [x < 2048 ? psf_lrint (x) : 2048] ;
 		else

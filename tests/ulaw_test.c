@@ -18,6 +18,7 @@
 
 #include "sfconfig.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -181,6 +182,59 @@ main (void)
 
 			if (ulaw_buffer [k] != expected)
 			{	printf ("Clipping error : sample #%d (0x%02X should be 0x%02X)\n", k, ulaw_buffer [k], expected) ;
+				exit (1) ;
+				} ;
+			} ;
+
+		sf_close (file) ;
+		} ;
+
+	puts ("ok") ;
+
+	print_test_name ("ulaw_test", "NaN and inf") ;
+
+	/* A NaN sample has no sign and no magnitude, so it encodes as silence.
+	** An infinity has a sign, so it clips to full scale like any other
+	** out of range sample.
+	*/
+
+	{	static const float	fdata [4] = { NAN, -NAN, INFINITY, -INFINITY } ;
+		static const double	ddata [4] = { NAN, -NAN, INFINITY, -INFINITY } ;
+
+		if (! (file = sf_open (filename, SFM_WRITE, &sfinfo)))
+		{	printf ("sf_open_write failed with error : ") ;
+			puts (sf_strerror (NULL)) ;
+			exit (1) ;
+			} ;
+
+		sf_write_float (file, fdata, ARRAY_LEN (fdata)) ;
+		sf_write_double (file, ddata, ARRAY_LEN (ddata)) ;
+		sf_close (file) ;
+
+		if (! (file = sf_open (filename, SFM_READ, &sfinfo)))
+		{	printf ("sf_open_write failed with error : ") ;
+			puts (sf_strerror (NULL)) ;
+			exit (1) ;
+			} ;
+
+		if (sf_read_raw (file, ulaw_buffer, 8) != 8)
+		{	printf ("sf_read_raw : ") ;
+			puts (sf_strerror (file)) ;
+			exit (1) ;
+			} ;
+
+		for (k = 0 ; k < 8 ; k++)
+		{	unsigned char expected ;
+
+			switch (k % 4)
+			{	case 0 :
+				case 1 :	expected = ulaw_encode (0) ;		break ;
+				case 2 :	expected = ulaw_encode (32767) ;	break ;
+				default :	expected = ulaw_encode (-32768) ;	break ;
+				} ;
+
+			if (ulaw_buffer [k] != expected)
+			{	printf ("NaN/inf error : sample #%d (0x%02X should be 0x%02X)\n", k, ulaw_buffer [k], expected) ;
 				exit (1) ;
 				} ;
 			} ;
