@@ -644,10 +644,10 @@ main (int argc, char *argv [])
 	/* Lite remove end */
 
 	if (do_all || strcmp (argv [1], "ima_seek") == 0)
-	{	write_seek_test ("ima.wav", SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2) ;
-		write_seek_test ("ima.aiff", SF_FORMAT_AIFF | SF_FORMAT_IMA_ADPCM, 2) ;
+	{	write_seek_test ("ima_seek.wav", SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2) ;
+		write_seek_test ("ima_seek.aiff", SF_FORMAT_AIFF | SF_FORMAT_IMA_ADPCM, 2) ;
 		/* Lite remove start */
-		write_seek_test ("ima.w64", SF_FORMAT_W64 | SF_FORMAT_IMA_ADPCM, 2) ;
+		write_seek_test ("ima_seek.w64", SF_FORMAT_W64 | SF_FORMAT_IMA_ADPCM, 2) ;
 		/* Lite remove end */
 		test_count++ ;
 		} ;
