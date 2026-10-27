@@ -58,4 +58,4 @@ $(TESTNAME)/test_wrapper.sh : tests/test_wrapper.sh tests/pedantic-header-test.s
 	chmod u+x $@
 
 tests/test_wrapper.sh : tests/test_wrapper.sh.in
-	make $@
+	$(MAKE) $@

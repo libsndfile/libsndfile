@@ -1,4 +1,6 @@
-#!/bin/bash -e
+#!/usr/bin/env sh
+
+set -e
 
 # This script takes a static library and removes all non-public symbols.
 # Ie, it makes a static lib whose symbols are far less likely to clash with

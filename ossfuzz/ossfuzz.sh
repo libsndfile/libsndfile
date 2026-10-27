@@ -1,10 +1,12 @@
-#!/bin/bash -eu
+#!/usr/bin/env sh
+
+set -eu
 
 # This script is called by the oss-fuzz main project when compiling the fuzz
 # targets. This script is regression tested by ci_oss.sh.
 
 # Save off the current folder as the build root.
-export BUILD_ROOT=$PWD
+export BUILD_ROOT="${PWD}"
 
 echo "CC: ${CC:-}"
 echo "CXX: ${CXX:-}"
@@ -13,7 +15,8 @@ echo "CFLAGS: ${CFLAGS:-}"
 echo "CXXFLAGS: ${CXXFLAGS:-}"
 echo "OUT: ${OUT:-}"
 
-export MAKEFLAGS+="-j$(nproc)"
+MAKEFLAGS="${MAKEFLAGS:+${MAKEFLAGS} }-j$(nproc)"
+export MAKEFLAGS
 
 # Install dependencies
 apt-get -y install autoconf autogen automake libtool pkg-config python
@@ -28,6 +31,6 @@ autoreconf -vif
 make V=1
 
 # Copy the fuzzer to the output directory.
-cp -v ossfuzz/sndfile_fuzzer $OUT/
-cp -v ossfuzz/sndfile_alt_fuzzer $OUT/
-cp -v ossfuzz/sndfile_fmt_fuzzer $OUT/
+cp -v ossfuzz/sndfile_fuzzer "${OUT}/"
+cp -v ossfuzz/sndfile_alt_fuzzer "${OUT}/"
+cp -v ossfuzz/sndfile_fmt_fuzzer "${OUT}/"

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 # This is known to work with clang-3.4 from Debian testing/unstable.
 # 2013/07/14
