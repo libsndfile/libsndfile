@@ -540,10 +540,16 @@ cmd:
 SFC_SET_SCALE_FLOAT_INT_READ
 
 data
-: NULL
+: A pointer to a float
 
 datasize
-: TRUE or FALSE
+: SF_TRUE or SF_FALSE
+
+When datasize is SF_TRUE, the library reads the float parameter as the maximum input peak value.
+In normal usage, you will often set this to 1.0 so an input value 1.0 will be mapped to INT_MAX or SHRT_MAX.
+
+You may also pass a NULL pointer, and the library will scan the input file seeking for the actual peak value.
+In this case optimal scaling will be applied, so the signal real peak value will be mapped to INT_MAX or SHRT_MAX.
 
 Example:
 
