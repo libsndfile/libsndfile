@@ -350,7 +350,8 @@ static OUTPUT_FORMAT_MAP format_map [] =
 
 int
 sfe_file_type_of_ext (const char *str, int format)
-{	char	buffer [16], *cptr ;
+{	char	buffer [16] ;
+	const char *cptr ;
 	int		k ;
 
 	format &= SF_FORMAT_SUBMASK ;
