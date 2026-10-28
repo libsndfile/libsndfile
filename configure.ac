@@ -106,7 +106,6 @@ AC_CHECK_HEADERS([byteswap.h])
 AC_CHECK_HEADERS([locale.h])
 AC_CHECK_HEADERS([sys/time.h])
 AC_CHECK_HEADERS([immintrin.h])
-AC_CHECK_HEADERS([stdbool.h])
 
 AC_HEADER_SYS_WAIT
 
@@ -178,16 +177,10 @@ AM_CONDITIONAL([USE_OSSFUZZ_STATIC], [test -f "$LIB_FUZZING_ENGINE"])
 dnl ====================================================================================
 dnl  Check types and their sizes.
 
-AC_CHECK_SIZEOF([wchar_t], [4])
 AC_CHECK_SIZEOF([short], [2])
 AC_CHECK_SIZEOF([int], [4])
-AC_CHECK_SIZEOF([long], [4])
 AC_CHECK_SIZEOF([float], [4])
 AC_CHECK_SIZEOF([double], [4])
-AC_CHECK_SIZEOF([void*], [8])
-AC_CHECK_SIZEOF([size_t], [4])
-AC_CHECK_SIZEOF([int64_t], [8])
-AC_CHECK_SIZEOF([long long], [8])
 
 dnl  Check for common 64 bit file offset types.
 AC_CHECK_SIZEOF([off_t], [1])
@@ -246,10 +239,8 @@ AC_DEFINE_UNQUOTED([CPU_IS_LITTLE_ENDIAN], [${ac_cv_c_little_endian}], [Host pro
 dnl ====================================================================================
 dnl  Check for functions.
 
-AC_CHECK_FUNCS([malloc calloc realloc free])
 AC_CHECK_FUNCS([open read write lseek lseek64])
 AC_CHECK_FUNCS([fstat fstat64 ftruncate fsync])
-AC_CHECK_FUNCS([snprintf vsnprintf])
 AC_CHECK_FUNCS([gmtime gmtime_r localtime localtime_r gettimeofday])
 AC_CHECK_FUNCS([mmap getpagesize])
 AC_CHECK_FUNCS([setlocale])
@@ -258,7 +249,6 @@ AC_CHECK_FUNCS([pipe waitpid])
 AC_SEARCH_LIBS([floor], [m], [], [
 		AC_MSG_ERROR([unable to find the floor() function!])
 	])
-AC_CHECK_FUNCS([floor ceil fmod lrint lrintf])
 
 dnl ====================================================================================
 dnl  Check for requirements for building plugins for other languages/environments.

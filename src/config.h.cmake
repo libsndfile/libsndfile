@@ -16,12 +16,6 @@
 /* Define to 1 if you have the <byteswap.h> header file. */
 #cmakedefine01 HAVE_BYTESWAP_H
 
-/* Define to 1 if you have the `calloc' function. */
-#cmakedefine01 HAVE_CALLOC
-
-/* Define to 1 if you have the `ceil' function. */
-#cmakedefine01 HAVE_CEIL
-
 /* Set to 1 if S_IRGRP is defined. */
 #cmakedefine01 HAVE_DECL_S_IRGRP
 
@@ -39,15 +33,6 @@
 
 /* Will be set to 1 if lame and mpg123 are available. */
 #cmakedefine01 HAVE_MPEG
-
-/* Define to 1 if you have the `floor' function. */
-#cmakedefine01 HAVE_FLOOR
-
-/* Define to 1 if you have the `fmod' function. */
-#cmakedefine01 HAVE_FMOD
-
-/* Define to 1 if you have the `free' function. */
-#cmakedefine01 HAVE_FREE
 
 /* Define to 1 if you have the `fstat' function. */
 #cmakedefine01 HAVE_FSTAT
@@ -73,9 +58,6 @@
 /* Define if you have the `gmtime_r' function. */
 #cmakedefine HAVE_GMTIME_R
 
-/* Define to 1 if you have the <inttypes.h> header file. */
-#cmakedefine01 HAVE_INTTYPES_H
-
 /* Define to 1 if you have the <io.h> header file. */
 #cmakedefine HAVE_IO_H
 
@@ -91,12 +73,6 @@
 /* Define if you have the `localtime_r' function. */
 #cmakedefine HAVE_LOCALTIME_R
 
-/* Define if you have C99's lrint function. */
-#cmakedefine01 HAVE_LRINT
-
-/* Define if you have C99's lrintf function. */
-#cmakedefine01 HAVE_LRINTF
-
 /* Define to 1 if you have the `lround' function. */
 #cmakedefine01 HAVE_LROUND
 
@@ -105,9 +81,6 @@
 
 /* Define to 1 if you have the `lseek64' function. */
 #cmakedefine01 HAVE_LSEEK64
-
-/* Define to 1 if you have the `malloc' function. */
-#cmakedefine01 HAVE_MALLOC
 
 /* Define to 1 if you have the <memory.h> header file. */
 #cmakedefine01 HAVE_MEMORY_H
@@ -124,17 +97,11 @@
 /* Define to 1 if you have the `read' function. */
 #cmakedefine01 HAVE_READ
 
-/* Define to 1 if you have the `realloc' function. */
-#cmakedefine01 HAVE_REALLOC
-
 /* Define to 1 if you have the `setlocale' function. */
 #cmakedefine01 HAVE_SETLOCALE
 
 /* Set to 1 if <sndio.h> is available. */
 #cmakedefine01 HAVE_SNDIO_H
-
-/* Define to 1 if you have the `snprintf' function. */
-#cmakedefine01 HAVE_SNPRINTF
 
 /* Set to 1 if you have libsqlite3. */
 #cmakedefine01 HAVE_SQLITE3
@@ -145,9 +112,6 @@
 #if (HAVE_SSIZE_T == 0)
 #define ssize_t intptr_t
 #endif
-
-/* Define to 1 if you have the <stdint.h> header file. */
-#cmakedefine01 HAVE_STDINT_H
 
 /* Define to 1 if you have the <stdlib.h> header file. */
 #cmakedefine01 HAVE_STDLIB_H
@@ -175,12 +139,6 @@
 
 /* Define to 1 if you have the <immintrin.h> header file. */
 #cmakedefine01 HAVE_IMMINTRIN_H
-
-/* Define to 1 if you have the <stdbool.h> header file. */
-#cmakedefine01 HAVE_STDBOOL_H
-
-/* Define to 1 if you have the `vsnprintf' function. */
-#cmakedefine01 HAVE_VSNPRINTF
 
 /* Define to 1 if you have the `waitpid' function. */
 #cmakedefine01 HAVE_WAITPID
@@ -230,17 +188,8 @@
 /* The size of `int', as computed by sizeof. */
 @SIZEOF_INT_CODE@
 
-/* The size of `int64_t', as computed by sizeof. */
-@SIZEOF_INT64_T_CODE@
-
 /* The size of `loff_t', as computed by sizeof. */
 @SIZEOF_LOFF_T_CODE@
-
-/* The size of `long', as computed by sizeof. */
-@SIZEOF_LONG_CODE@
-
-/* The size of `long long', as computed by sizeof. */
-@SIZEOF_LONG_LONG_CODE@
 
 /* The size of `off64_t', as computed by sizeof. */
 @SIZEOF_OFF64_T_CODE@
@@ -251,17 +200,8 @@
 /* The size of `short', as computed by sizeof. */
 @SIZEOF_SHORT_CODE@
 
-/* The size of `size_t', as computed by sizeof. */
-@SIZEOF_SIZE_T_CODE@
-
 /* The size of `ssize_t', as computed by sizeof. */
 @SIZEOF_SSIZE_T_CODE@
-
-/* The size of `void*', as computed by sizeof. */
-@SIZEOF_VOIDP_CODE@
-
-/* The size of `wchar_t', as computed by sizeof. */
-@SIZEOF_WCHAR_T_CODE@
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE

@@ -62,14 +62,11 @@ check_include_file (byteswap.h		HAVE_BYTESWAP_H)
 check_include_file (dlfcn.h			HAVE_DLFCN_H)
 check_include_file (direct.h		HAVE_DIRECT_H)
 check_include_file (endian.h		HAVE_ENDIAN_H)
-check_include_file (inttypes.h		HAVE_INTTYPES_H)
 check_include_file (io.h			HAVE_IO_H)
-check_include_file (stdint.h		HAVE_STDINT_H)
 check_include_file (sys/time.h		HAVE_SYS_TIME_H)
 check_include_file (sys/types.h		HAVE_SYS_TYPES_H)
 check_include_file (unistd.h		HAVE_UNISTD_H)
 check_include_file (immintrin.h		HAVE_IMMINTRIN_H)
-check_include_file (stdbool.h		HAVE_STDBOOL_H)
 
 check_cpu_arch_x86 (CPU_IS_X86)
 check_cpu_arch_x64 (CPU_IS_X64)
@@ -89,28 +86,17 @@ if (BUILD_TESTING)
 	check_include_file (sys/wait.h	HAVE_SYS_WAIT_H)
 endif ()
 
-check_type_size (int64_t			SIZEOF_INT64_T)
-check_type_size (long				SIZEOF_LONG)
-check_type_size (long\ long			SIZEOF_LONG_LONG)
 check_type_size (ssize_t			SIZEOF_SSIZE_T)
-check_type_size (wchar_t			SIZEOF_WCHAR_T)
 
 # Never used
 # check_type_size (loff_t			SIZEOF_LOFF_T)
 # check_type_size (offt64_t			SIZEOF_OFF64_T)
-
-# Never checked
-# check_type_size (size_t			SIZEOF_SIZE_T)
 
 # Used in configure.ac
 # check_type_size (double			SIZEOF_DOUBLE)
 # check_type_size (float			SIZEOF_FLOAT)
 # check_type_size (int				SIZEOF_INT)
 # check_type_size (short			SIZEOF_SHORT)
-
-if (ENABLE_TESTING)
-	check_type_size (void*			SIZEOF_VOIDP)
-endif()
 
 if (NOT WIN32)
 	check_library_exists (m floor "" LIBM_REQUIRED)
@@ -132,8 +118,6 @@ check_function_exists (lseek      		HAVE_LSEEK)
 check_function_exists (open				HAVE_OPEN)
 check_function_exists (read				HAVE_READ)
 check_function_exists (write			HAVE_WRITE)
-check_function_exists (lrint			HAVE_LRINT)
-check_function_exists (lrintf			HAVE_LRINTF)
 
 if (NOT WIN32)
 	check_function_exists (ftruncate	HAVE_FTRUNCATE)
@@ -147,19 +131,10 @@ if (BUILD_TESTING)
 endif ()
 
 # Never checked
-# check_function_exists (calloc			HAVE_CALLOC)
-# check_function_exists (free			HAVE_FREE)
 # check_function_exists (getpagesize	HAVE_GETPAGESIZE)
-# check_function_exists (malloc			HAVE_MALLOC)
-# check_function_exists (realloc		HAVE_REALLOC)
-# check_function_exists (snprintf		HAVE_SNPRINTF)
-# check_function_exists (vsnprintf		HAVE_VSNPRINTF)
-# check_function_exists (floor			HAVE_FLOOR)
-# check_function_exists (fmod			HAVE_FMOD)
 
 # Never used
 # check_function_exists (mmap			HAVE_MMAP)
-# check_function_exists (ceil			HAVE_CEIL)
 # check_function_exists (lround			HAVE_LROUND)
 # check_function_exists (lseek64		HAVE_LSEEK64)
 

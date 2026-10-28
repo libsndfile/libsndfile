@@ -56,7 +56,7 @@
 	#define		FSTAT	_fstati64
 
 	typedef		struct _stati64		STATBUF ;
-	typedef		__int64				INT64 ;
+	typedef		int64_t				INT64 ;
 
 	static char dir_cmd [] = "dir" ;
 
