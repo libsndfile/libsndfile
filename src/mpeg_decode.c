@@ -226,7 +226,7 @@ mpeg_dec_fill_sfinfo (SF_PRIVATE* psf, mpg123_handle *mh, SF_INFO *info)
 
 	if (length >= 0)
 	{	info->frames = length ;
-		info->seekable = SF_TRUE ;
+		/* Length might come from Info frame, so no guarantee file is seekable */
 		}
 	else
 	{	info->frames = SF_COUNT_MAX ;
