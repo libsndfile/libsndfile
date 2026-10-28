@@ -16,6 +16,13 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
+/* - strnlen() in <string.h>
+ * - gmtime_r() in <time.h>
+ */
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif
+
 #include <config.h>
 
 #include <limits.h>

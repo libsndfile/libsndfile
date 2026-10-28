@@ -45,6 +45,10 @@ project(libsndfile VERSION 1.2.2)
 
 set (CMAKE_C_STANDARD 99)
 set (CMAKE_C_STANDARD_REQUIRED TRUE)
+# MinGW's headers hide the Microsoft CRT functions (fileno, strdup, ...) in strict mode.
+if (NOT MINGW)
+	set (CMAKE_C_EXTENSIONS OFF)
+endif ()
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set (PACKAGE_NAME ${PROJECT_NAME})

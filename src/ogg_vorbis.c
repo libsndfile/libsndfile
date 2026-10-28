@@ -160,7 +160,7 @@ vorbis_log_error(SF_PRIVATE *psf, int error) {
 		case OV_EINVAL:
 		default: psf->error = SFE_INTERNAL ;
 		} ;
-} ;
+} /* vorbis_log_error */
 
 static int
 vorbis_read_header (SF_PRIVATE *psf)
