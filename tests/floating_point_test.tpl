@@ -65,11 +65,6 @@ main (int argc, char *argv [])
 	if (argc == 2 && ! strstr (argv [1], "no-exit"))
 		allow_exit = 0 ;
 
-#if (HAVE_LRINTF == 0)
-	puts ("*** Cannot run this test on this platform because it lacks lrintf().") ;
-	exit (0) ;
-#endif
-
 	/* Float tests. */
 	float_scaled_test	("float.raw", allow_exit, SF_FALSE, SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_FLOAT,
 									OS_IS_OPENBSD ? -98.0 : -163.0) ;

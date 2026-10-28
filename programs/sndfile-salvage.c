@@ -59,7 +59,7 @@
 #ifndef _WIN32
 typedef off_t sf_off_t ;
 #else
-typedef long long sf_off_t ;
+typedef int64_t sf_off_t ;
 #endif
 
 
