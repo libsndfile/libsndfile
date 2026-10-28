@@ -31,6 +31,12 @@
 ** ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/* - localtime_r() in <time.h>
+ */
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif
+
 #include <config.h>
 
 #include <stdio.h>

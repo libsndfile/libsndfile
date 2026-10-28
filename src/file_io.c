@@ -32,6 +32,13 @@
 **	that large file support is enabled correctly on Unix systems.
 */
 
+/* - ftruncate() in <unistd.h>
+ * - S_ISSOCK() in <sys/stat.h>
+ */
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif
+
 #include "sfconfig.h"
 
 #if USE_WINDOWS_API

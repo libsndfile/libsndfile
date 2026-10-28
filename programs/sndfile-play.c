@@ -30,6 +30,12 @@
 ** ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/* - struct timeval in <sys/time.h>, which ALSA otherwise defines itself
+ */
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif
+
 #include "sfconfig.h"
 
 #include <stdio.h>
