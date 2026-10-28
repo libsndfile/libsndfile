@@ -705,15 +705,13 @@ sf_format_check	(const SF_INFO *info)
 				break ;
 
 		case SF_FORMAT_AIFF :
-				/* AIFF does allow both endian-nesses for PCM data.*/
-				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
+				/* AIFF does allow both endian-nesses for PCM data, integer or float.*/
+				if (subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32 || subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
 					return 1 ;
 				/* For other encodings reject any endian-ness setting. */
 				if (endian != 0)
 					return 0 ;
 				if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8)
-					return 1 ;
-				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
 					return 1 ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
 					return 1 ;
