@@ -34,3 +34,11 @@ make V=1
 cp -v ossfuzz/sndfile_fuzzer "${OUT}/"
 cp -v ossfuzz/sndfile_alt_fuzzer "${OUT}/"
 cp -v ossfuzz/sndfile_fmt_fuzzer "${OUT}/"
+cp -v ossfuzz/sndfile_rw_fuzzer "${OUT}/"
+
+# Structured seed corpus for the write->read round-trip harness: covers the
+# whole container/codec row table (see sndfile_rw_seeds.py). Optional: a
+# failure to build the corpus must not fail the fuzzers themselves.
+if command -v python3 >/dev/null 2>&1 ; then
+	python3 ossfuzz/sndfile_rw_seeds.py "${OUT}" || echo "seed generation failed (non-fatal)"
+fi
