@@ -53,6 +53,7 @@ static void	permission_test (const char *filename, int typemajor) ;
 static void	wavex_amb_test (const char *filename) ;
 static void rf64_downgrade_test (const char *filename) ;
 static void rf64_long_file_downgrade_test (const char *filename) ;
+static void sds_partial_block_test (const char *filename, int format) ;
 
 int
 main (int argc, char *argv [])
@@ -191,6 +192,9 @@ main (int argc, char *argv [])
 	{	zero_data_test ("zerolen.sds", SF_FORMAT_SDS | SF_FORMAT_PCM_16) ;
 		filesystem_full_test (SF_FORMAT_SDS | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.sds", SF_FORMAT_SDS) ;
+		sds_partial_block_test ("partial_s8.sds", SF_FORMAT_SDS | SF_FORMAT_PCM_S8) ;
+		sds_partial_block_test ("partial_16.sds", SF_FORMAT_SDS | SF_FORMAT_PCM_16) ;
+		sds_partial_block_test ("partial_24.sds", SF_FORMAT_SDS | SF_FORMAT_PCM_24) ;
 		test_count++ ;
 		} ;
 
@@ -531,3 +535,54 @@ rf64_long_file_downgrade_test (const char *filename)
 
 	return ;
 } /* rf64_long_file_downgrade_test */
+
+static void
+sds_partial_block_test (const char *filename, int format)
+{	static short	output	[121] ;
+	static short	input	[ARRAY_LEN (output)] ;
+
+	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	unsigned	k ;
+
+	print_test_name (__func__, filename) ;
+
+	/*
+	**	121 samples leaves a single sample in the last block for every SDS
+	**	sample width (60, 40 or 30 samples per block).
+	*/
+	for (k = 0 ; k < ARRAY_LEN (output) ; k++)
+		output [k] = (k + 1) * 256 ;
+
+	sf_info_clear (&sfinfo) ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= format ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	test_write_short_or_die (file, 0, output, ARRAY_LEN (output), __LINE__) ;
+	sf_close (file) ;
+
+	memset (input, 0, sizeof (input)) ;
+	sf_info_clear (&sfinfo) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	exit_if_true (sfinfo.frames != ARRAY_LEN (output), "\n\nLine %d: Incorrect number of frames in file (%d should be %d).\n", __LINE__, (int) sfinfo.frames, (int) ARRAY_LEN (output)) ;
+
+	/* Read one frame at a time, right up to the end of the last block. */
+	for (k = 0 ; k < ARRAY_LEN (input) ; k++)
+		test_readf_short_or_die (file, 0, input + k, 1, __LINE__) ;
+
+	sf_close (file) ;
+
+	for (k = 0 ; k < ARRAY_LEN (input) ; k++)
+		exit_if_true (input [k] != output [k],
+			"\n\nLine: %d: Error on input %d, expected %d, got %d\n", __LINE__, k, output [k], input [k]) ;
+
+	puts ("ok") ;
+	unlink (filename) ;
+
+	return ;
+} /* sds_partial_block_test */
