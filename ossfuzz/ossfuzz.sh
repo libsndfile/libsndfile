@@ -34,3 +34,12 @@ make V=1
 cp -v ossfuzz/sndfile_fuzzer "${OUT}/"
 cp -v ossfuzz/sndfile_alt_fuzzer "${OUT}/"
 cp -v ossfuzz/sndfile_fmt_fuzzer "${OUT}/"
+cp -v ossfuzz/sndfile_cmd_fuzzer "${OUT}/"
+cp -v ossfuzz/sndfile_cmd_fuzzer.dict "${OUT}/"
+
+# Seed corpus for the command-surface harness: minimal valid containers with
+# control words for each command group (see sndfile_cmd_seeds.py). Optional:
+# a failure to build the corpus must not fail the fuzzers themselves.
+if command -v python3 >/dev/null 2>&1 ; then
+	python3 ossfuzz/sndfile_cmd_seeds.py "${OUT}" || echo "seed generation failed (non-fatal)"
+fi

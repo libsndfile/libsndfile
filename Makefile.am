@@ -465,7 +465,8 @@ if USE_OSSFUZZERS
 noinst_PROGRAMS += \
 	ossfuzz/sndfile_fuzzer \
 	ossfuzz/sndfile_alt_fuzzer \
-	ossfuzz/sndfile_fmt_fuzzer
+	ossfuzz/sndfile_fmt_fuzzer \
+	ossfuzz/sndfile_cmd_fuzzer
 
 noinst_LTLIBRARIES += \
 	ossfuzz/libstandaloneengine.la
@@ -480,6 +481,11 @@ ossfuzz_sndfile_fmt_fuzzer_SOURCES = ossfuzz/sndfile_fmt_fuzzer.cc
 ossfuzz_sndfile_fmt_fuzzer_CXXFLAGS = $(AM_CXXFLAGS) $(FUZZ_FLAG)
 ossfuzz_sndfile_fmt_fuzzer_LDFLAGS = $(AM_LDFLAGS) -static
 ossfuzz_sndfile_fmt_fuzzer_LDADD = src/libsndfile.la $(FUZZ_LDADD)
+
+ossfuzz_sndfile_cmd_fuzzer_SOURCES = ossfuzz/sndfile_cmd_fuzzer.cc
+ossfuzz_sndfile_cmd_fuzzer_CXXFLAGS = $(AM_CXXFLAGS) $(FUZZ_FLAG)
+ossfuzz_sndfile_cmd_fuzzer_LDFLAGS = $(AM_LDFLAGS) -static
+ossfuzz_sndfile_cmd_fuzzer_LDADD = src/libsndfile.la $(FUZZ_LDADD)
 
 ossfuzz_sndfile_alt_fuzzer_SOURCES = ossfuzz/sndfile_alt_fuzzer.cc
 ossfuzz_sndfile_alt_fuzzer_CXXFLAGS = $(AM_CXXFLAGS) $(FUZZ_FLAG)
