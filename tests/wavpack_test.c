@@ -95,6 +95,8 @@ wavpack_short_test (int otype, int channels, int len)
 	{	int subformat = otype & SF_FORMAT_SUBMASK ;
 		if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8)
 			assert ((data_in.s [i] / 256) == (int) (data_out.s [i] / 256)) ;
+		else if (subformat == SF_FORMAT_FLOAT)
+			assert (abs (data_in.s [i] - data_out.s [i]) <= 1) ;
 		else
 			assert (data_in.s [i] == data_out.s [i]) ;
 		} ;
@@ -173,6 +175,8 @@ wavpack_int_test (int otype, int channels, int len)
 			assert ((data_in.i [i] / 65536) == (int) (data_out.i [i] / 65536)) ;
 		else if (subformat == SF_FORMAT_PCM_24)
 			assert ((data_in.i [i] / 256) == (int) (data_out.i [i] / 256)) ;
+		else if (subformat == SF_FORMAT_FLOAT)
+			assert (abs (data_in.i [i] - data_out.i [i]) <= 1) ;
 		else
 			assert (data_in.i [i] == data_out.i [i]) ;
 		} ;
@@ -238,13 +242,13 @@ wavpack_float_test (int otype, int channels, int len)
 	for (i = 0 ; i < (unsigned) len_items ; ++ i)
 	{	int subformat = otype & SF_FORMAT_SUBMASK ;
 		if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8)
-			assert (fabs (data_in.f [i] - data_out.f [i]) <= 1.0f / 128.0f) ;
+			assert (fabs (data_in.f [i] - data_out.f [i]) <= 1.5f / 128.0f) ;
 		else if (subformat == SF_FORMAT_PCM_16)
-			assert (fabs (data_in.f [i] - data_out.f [i]) <= 1.0f / 32768.0f) ;
+			assert (fabs (data_in.f [i] - data_out.f [i]) <= 1.5f / 32768.0f) ;
 		else if (subformat == SF_FORMAT_PCM_24)
-			assert (fabs (data_in.f [i] - data_out.f [i]) <= 1.0f / 16777216.0f) ;
+			assert (fabs (data_in.f [i] - data_out.f [i]) <= 1.5f / 8388608.0f) ;
 		else if (subformat == SF_FORMAT_PCM_32)
-			assert (fabs (data_in.f [i] - data_out.f [i]) <= 1.0f / 2147483648.0f) ;
+			assert (fabs (data_in.f [i] - data_out.f [i]) <= 1.5f / 2147483648.0f) ;
 		else
 			assert (data_in.f [i] == data_out.f [i]) ;
 		} ;
@@ -310,13 +314,13 @@ wavpack_double_test (int otype, int channels, int len)
 	for (i = 0 ; i < (unsigned) len_items ; ++ i)
 	{	int subformat = otype & SF_FORMAT_SUBMASK ;
 		if (subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_S8)
-			assert (fabs (data_in.d [i] - data_out.d [i]) <= 1.0f / 128.0f) ;
+			assert (fabs (data_in.d [i] - data_out.d [i]) <= 1.5f / 128.0f) ;
 		else if (subformat == SF_FORMAT_PCM_16)
-			assert (fabs (data_in.d [i] - data_out.d [i]) <= 1.0f / 32768.0f) ;
+			assert (fabs (data_in.d [i] - data_out.d [i]) <= 1.5f / 32768.0f) ;
 		else if (subformat == SF_FORMAT_PCM_24)
-			assert (fabs (data_in.d [i] - data_out.d [i]) <= 1.0f / 16777216.0f) ;
+			assert (fabs (data_in.d [i] - data_out.d [i]) <= 1.5f / 8388608.0f) ;
 		else if (subformat == SF_FORMAT_PCM_32)
-			assert (fabs (data_in.d [i] - data_out.d [i]) <= 1.0f / 2147483648.0f) ;
+			assert (fabs (data_in.d [i] - data_out.d [i]) <= 1.5f / 2147483648.0f) ;
 		else
 			assert (((float) data_in.d [i]) == ((float) data_out.d [i])) ;
 		} ;

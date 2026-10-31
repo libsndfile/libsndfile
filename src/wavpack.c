@@ -40,6 +40,7 @@
 ** Macros
 */
 
+/* As in pcm.c, scale by vlim and clip, or by (vlim - 1) when not clipping. */
 #define WAVPACK_GENERATE_FLOAT_TO_INT_FUNC(FUNC_NAME, ITYPE, FTYPE, LRFUNC, MAXFUNC, MINFUNC) \
 static void \
 FUNC_NAME (const FTYPE *src, ITYPE *dest, sf_count_t count, int normalize, FTYPE vlim, ITYPE offset, int use_clip) \
@@ -50,7 +51,8 @@ FUNC_NAME (const FTYPE *src, ITYPE *dest, sf_count_t count, int normalize, FTYPE
 			dest [i] = lrint (fmax (- ((double) vlim), fmin (((double) src [i]) * normfact, (((double) vlim) - 1.0)))) + (offset) ; \
 		} \
 	else \
-	{	for (i = 0 ; i < count ; ++ i) \
+	{	normfact = normalize ? ((double) vlim) - 1.0 : 1.0 ; \
+		for (i = 0 ; i < count ; ++ i) \
 			dest [i] = lrint (((double) src [i]) * normfact) + (offset) ; \
 		} ; \
 } /* FUNC_NAME */
@@ -65,7 +67,8 @@ FUNC_NAME (void *src_dest, sf_count_t count, int normalize, FTYPE vlim, ITYPE of
 			* (((ITYPE *) src_dest) + i) = lrint (fmax (- ((double) vlim), fmin (((double) (* (((const FTYPE *) src_dest) + i))) * normfact, (((double) vlim) - 1.0)))) + (offset) ; \
 		} \
 	else \
-	{	for (i = 0 ; i < count ; ++ i) \
+	{	normfact = normalize ? ((double) vlim) - 1.0 : 1.0 ; \
+		for (i = 0 ; i < count ; ++ i) \
 			* (((ITYPE *) src_dest) + i) = lrint (((double) (* (((const FTYPE *) src_dest) + i))) * normfact) + (offset) ; \
 		} ; \
 } /* FUNC_NAME */
