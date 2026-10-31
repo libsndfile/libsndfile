@@ -428,11 +428,10 @@ wavpack_dec_init (SF_PRIVATE *psf)
 			} ;
 		} ;
 
-	/* tags in wavpack always at the end of file */
-	if (pwvpk->is_random_access_device)
-		pwvpk->config.flags = OPEN_TAGS ;
+	/* Float data is normalized to +/-1.0, tags in wavpack always at the end of file. */
+	int flags = OPEN_NORMALIZE | (pwvpk->is_random_access_device ? OPEN_TAGS : 0) ;
 
-	if ((pwvpk->context = WavpackOpenFileInputEx64 (&wavpack_reader_wrapper, psf, NULL, error_buf, pwvpk->config.flags, 0)) == NULL)
+	if ((pwvpk->context = WavpackOpenFileInputEx64 (&wavpack_reader_wrapper, psf, NULL, error_buf, flags, 0)) == NULL)
 	{	psf_log_printf (psf, "wavpack_dec_init: failed to call `WavpackOpenFileInputEx64`: `%s`\n", error_buf) ;
 		return SFE_UNSUPPORTED_ENCODING ;
 		} ;
@@ -876,7 +875,7 @@ wavpack_unpack_buffer_any (SF_PRIVATE *psf, void *ptr, sf_count_t sample_count, 
 		{	if (itype == SF_FORMAT_PCM_32)
 				wavpack_cvti32f32_inplace (ptr, sample_count, psf->norm_float) ;
 			else if (itype == SF_FORMAT_FLOAT)
-				wavpack_cvtf32i32_inplace (ptr, sample_count, psf->norm_float, 2147483648.0, 0, psf->add_clipping) ;
+				wavpack_cvtf32i32_inplace (ptr, sample_count, 1, 2147483648.0, 0, psf->add_clipping) ;
 			else
 				goto on_internal_error ;
 			} ;
