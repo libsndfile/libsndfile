@@ -42,6 +42,10 @@ From version 1.0.29, libsndfile can read and write
 
 From version 1.1.0, libsndfile can read and write MP3.
 
+libsndfile can also read and write [WavPack](https://www.wavpack.com/) files
+with 8, 16, 24 and 32 bit PCM or 32 bit float data. This requires libwavpack
+5.0.0 or later.
+
 32 bit PCM in FLAC requires libFLAC 1.4.0 or later.
 
 Some of the file formats I am also interested in adding are:

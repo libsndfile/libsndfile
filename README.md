@@ -34,14 +34,14 @@ Setting up a build environment for libsndfile on Debian or Ubuntu is as simple a
 
     sudo apt install autoconf autogen automake build-essential libasound2-dev \
       libflac-dev libogg-dev libtool libvorbis-dev libopus-dev libmp3lame-dev \
-      libmpg123-dev pkg-config python
+      libmpg123-dev libwavpack-dev pkg-config python
 
 For other Linux distributions or any of the *BSDs, the setup should be similar
 although the package install tools and package names may be slightly different.
 
 Similarly on Mac OS X, assuming [brew] is already installed:
 
-    brew install autoconf autogen automake flac libogg libtool libvorbis opus mpg123 pkg-config
+    brew install autoconf autogen automake flac libogg libtool libvorbis opus mpg123 wavpack pkg-config
 
 Once the build environment has been set up, building and testing libsndfile is
 as simple as:
@@ -137,6 +137,8 @@ You can pass additional options with `/D<parameter>=<value>` when you run
   option is available and set to `ON` if all dependency libraries were found.
 * `ENABLE_MPEG` - MP3 support. This option is available and set to `ON` if all
   dependency libraries were found.
+* `ENABLE_WAVPACK` - WavPack support. This option is available and set to `ON`
+  if the WavPack library was found.
 * `ENABLE_EXPERIMENTAL` - enable experimental code. Don't use it if you are
   not sure. This option is `OFF` by default.
 * `ENABLE_CPACK` - enable [CPack](https://cmake.org/cmake/help/latest/module/CPack.html) support.
