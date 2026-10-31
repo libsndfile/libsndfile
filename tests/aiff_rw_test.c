@@ -92,6 +92,7 @@ static unsigned char aifc_data [] =
 } ;
 
 static void rw_test (const char *filename) ;
+static void odd_length_test (const char *filename) ;
 
 int
 main (void)
@@ -106,6 +107,9 @@ main (void)
 	unlink (filename) ;
 
 	puts ("ok") ;
+
+	odd_length_test ("odd.aiff") ;
+
 	return 0 ;
 } /* main */
 
@@ -167,3 +171,36 @@ rw_test (const char *filename)
 	return ;
 } /* rw_test */
 
+static void
+odd_length_test (const char *filename)
+{	const int data [] = { 16777216, 33554432, 50331648 } ;
+	int buffer [4] ;
+	SNDFILE *file ;
+	SF_INFO sfinfo ;
+	sf_count_t count ;
+
+	print_test_name ("aiff_odd_length_test", filename) ;
+
+	sf_info_setup (&sfinfo, SF_FORMAT_AIFF | SF_FORMAT_PCM_S8, 48000, 1) ;
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	test_writef_int_or_die (file, 0, data, ARRAY_LEN (data), __LINE__) ;
+	exit_if_true (sf_close (file) != 0, "\nLine %d : sf_close failed.\n", __LINE__) ;
+
+	/* The file must include an alignment byte after the three audio bytes. */
+	exit_if_true (file_length (filename) != 58, "\nLine %d : Incorrect file length.\n", __LINE__) ;
+
+	sf_info_clear (&sfinfo) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+	exit_if_true (sfinfo.frames != ARRAY_LEN (data), "\nLine %d : Incorrect frame count (%" PRId64 ").\n",
+		__LINE__, sfinfo.frames) ;
+	exit_if_true (! string_in_log_buffer (file, " SSND : 11\n"), "\nLine %d : Incorrect SSND size.\n", __LINE__) ;
+	check_log_buffer_or_die (file, __LINE__) ;
+
+	count = sf_readf_int (file, buffer, ARRAY_LEN (buffer)) ;
+	exit_if_true (count != ARRAY_LEN (data), "\nLine %d : Incorrect read count (%" PRId64 ").\n", __LINE__, count) ;
+	compare_int_or_die (data, buffer, ARRAY_LEN (data), __LINE__) ;
+	exit_if_true (sf_close (file) != 0, "\nLine %d : sf_close failed.\n", __LINE__) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* odd_length_test */

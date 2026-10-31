@@ -1526,11 +1526,9 @@ aiff_write_tailer (SF_PRIVATE *psf)
 
 	psf->dataend = psf_fseek (psf, 0, SEEK_END) ;
 
-	/* Make sure tailer data starts at even byte offset. Pad if necessary. */
+	/* Pad to an even byte offset without including the pad in the audio data. */
 	if (psf->dataend % 2 == 1)
-	{	psf_fwrite (psf->header.ptr, 1, 1, psf) ;
-		psf->dataend ++ ;
-		} ;
+		psf_fwrite (psf->header.ptr, 1, 1, psf) ;
 
 	if (psf->peak_info != NULL && psf->peak_info->peak_loc == SF_PEAK_END)
 	{	psf_binheader_writef (psf, "Em4", BHWm (PEAK_MARKER), BHW4 (AIFF_PEAK_CHUNK_SIZE (psf->sf.channels))) ;
