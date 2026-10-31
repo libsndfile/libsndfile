@@ -685,8 +685,10 @@ wavpack_write_header (SF_PRIVATE *psf, int calc_length)
 	if (calc_length || psf->have_written)
 		return SFE_NO_ERROR ;
 
-	int64_t total_samples = psf->sf.frames <= 0 ? -1 : psf->sf.frames ;
-	if (WavpackSetConfiguration64 (pwvpk->context, &pwvpk->config, total_samples, NULL) == 0)
+	/* SF_INFO.frames is not an input when writing, the length stays unknown
+	** until the first block is rewritten at close (seekable files only).
+	*/
+	if (WavpackSetConfiguration64 (pwvpk->context, &pwvpk->config, -1, NULL) == 0)
 	{	psf_log_printf (psf, "wavpack_write_header: failed to call `WavpackSetConfiguration64`\n") ;
 		return SFE_UNSUPPORTED_ENCODING ;
 		} ;
