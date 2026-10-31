@@ -1501,14 +1501,14 @@ wavpack_io_feature_test (SF_PRIVATE *psf)
 	if ((is_pipe = psf_is_pipe (psf)) != 0)
 		return 0 ;
 
+	/* Virtual I/O reports failures only through the return values. */
 	orig_pos = psf_ftell (psf) ;
-	if (psf->error != SFE_NO_ERROR)
+	if (orig_pos < 0 || psf->error != SFE_NO_ERROR)
 	{	psf_log_printf (psf, "wavpack_io_feature_test: failed to call `psf_ftell`, error is `%s`(%d)\n", sf_strerror ((SNDFILE*) psf), psf->error) ;
 		goto on_sequential_device ;
 		} ;
 
-	psf_fseek (psf, orig_pos, SEEK_SET) ;
-	if (psf->error != SFE_NO_ERROR)
+	if (psf_fseek (psf, orig_pos, SEEK_SET) != orig_pos || psf->error != SFE_NO_ERROR)
 	{	psf_log_printf (psf, "wavpack_io_feature_test: failed to call `psf_fseek (psf, orig_pos, SEEK_SET)`, error is `%s`(%d)\n", sf_strerror ((SNDFILE*) psf), psf->error) ;
 		goto on_sequential_device ;
 		} ;
