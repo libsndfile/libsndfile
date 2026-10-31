@@ -21,6 +21,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+/* The checks below use assert (), keep them in release builds. */
+#undef NDEBUG
 #include <assert.h>
 #if HAVE_UNISTD_H
 #include <unistd.h>

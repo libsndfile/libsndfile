@@ -1584,6 +1584,9 @@ if (BUILD_TESTING)
 
 	### wavpack-tests ###
 	add_test (wavpack_test wavpack_test)
+	add_test (write_read_test_wvpk write_read_test wvpk)
+	add_test (string_test_wvpk string_test wvpk)
+	add_test (header_test_wvpk header_test wvpk)
 
 	### io-tests
 	add_test (stdio_test stdio_test)

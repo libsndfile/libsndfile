@@ -184,7 +184,6 @@ main (int argc, char *argv [])
 	if (do_all || ! strcmp (argv [1], "wvpk"))
 	{	if (HAVE_WAVPACK)
 		{	string_start_test ("strings.wv", SF_FORMAT_WAVPACK) ;
-			// string_start_end_test ("strings.wv", SF_FORMAT_WAVPACK) ;
 			string_multi_set_test ("multi.wv", SF_FORMAT_WAVPACK) ;
 			}
 		else
