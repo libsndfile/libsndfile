@@ -367,35 +367,34 @@ wavpack_read_header (SF_PRIVATE *psf)
 	if ((psf->sf.frames = WavpackGetNumSamples64 (pwvpk->context)) < 0)
 		psf->sf.frames = 0 ;
 
-	uint32_t bit_depth = WavpackGetBitsPerSample (pwvpk->context) ;
+	/* Samples are left justified in bytes_per_sample and always returned signed,
+	** whatever QMODE_UNSIGNED_WORDS says about the source file.
+	*/
+	int bytes_per_sample = WavpackGetBytesPerSample (pwvpk->context) ;
 	int qmode = WavpackGetQualifyMode (pwvpk->context) ;
 	int mode = WavpackGetMode (pwvpk->context) ;
 
-	if (bit_depth == 8)
+	if (bytes_per_sample == 1)
 	{	if (qmode & QMODE_SIGNED_BYTES)
 			psf->sf.format |= SF_FORMAT_PCM_S8 ;
 		else
  			psf->sf.format |= SF_FORMAT_PCM_U8 ;
 		}
-	else if (qmode & QMODE_UNSIGNED_WORDS)
-	{	psf_log_printf (psf, "wavpack_read_header: `bit_depth = %u, qmode = %d` not implemented\n", bit_depth, qmode) ;
-		return SFE_UNIMPLEMENTED ;
-		}
 	else if (mode & MODE_FLOAT)
 		psf->sf.format |= SF_FORMAT_FLOAT ;
 	else
-	{	switch (bit_depth)
-		{	case 16 :
+	{	switch (bytes_per_sample)
+		{	case 2 :
 				psf->sf.format |= SF_FORMAT_PCM_16 ;
 				break ;
-			case 24 :
+			case 3 :
 				psf->sf.format |= SF_FORMAT_PCM_24 ;
 				break ;
-			case 32 :
+			case 4 :
 				psf->sf.format |= SF_FORMAT_PCM_32 ;
 				break ;
 			default :
-				psf_log_printf (psf, "wavpack_read_header: `bit_depth = %u, qmode = %d` not implemented\n", bit_depth, qmode) ;
+				psf_log_printf (psf, "wavpack_read_header: `bytes_per_sample = %d, qmode = %d` not implemented\n", bytes_per_sample, qmode) ;
 				return SFE_UNIMPLEMENTED ;
 			} ;
 		} ;
