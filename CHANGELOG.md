@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* WavPack support (`SF_FORMAT_WAVPACK`), thanks @tuxzz
+
 ### Fixed
 
 * Disable autogen rules when autogen cannot be found

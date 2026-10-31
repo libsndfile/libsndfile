@@ -72,6 +72,7 @@ enum
 	SF_FORMAT_MPC2K			= 0x210000,		/* Akai MPC 2000 sampler */
 	SF_FORMAT_RF64			= 0x220000,		/* RF64 WAV file */
 	SF_FORMAT_MPEG			= 0x230000,		/* MPEG-1/2 audio stream */
+	SF_FORMAT_WAVPACK		= 0x240000,		/* WavPack file */
 
 	/* Subtypes from here on. */
 

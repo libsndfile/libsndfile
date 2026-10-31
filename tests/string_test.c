@@ -66,6 +66,7 @@ main (int argc, char *argv [])
 		printf ("           flac - test adding strings to FLAC files\n") ;
 		printf ("           ogg  - test adding strings to OGG files\n") ;
 		printf ("           opus - test adding strings to OPUS files\n") ;
+		printf ("           wvpk - test adding strings to WavPack files\n") ;
 		printf ("           all  - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -180,6 +181,17 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 
+	if (do_all || ! strcmp (argv [1], "wvpk"))
+	{	if (HAVE_WAVPACK)
+		{	string_start_test ("strings.wv", SF_FORMAT_WAVPACK) ;
+			string_start_end_test ("strings.wv", SF_FORMAT_WAVPACK) ;
+			string_multi_set_test ("multi.wv", SF_FORMAT_WAVPACK) ;
+			}
+		else
+			puts ("    No WavPack tests because WavPack support was not compiled in.") ;
+		test_count++ ;
+		} ;
+
 	if (test_count == 0)
 	{	printf ("Mono : ************************************\n") ;
 		printf ("Mono : *  No '%s' test defined.\n", argv [1]) ;
@@ -241,7 +253,9 @@ string_start_end_test (const char *filename, int typemajor)
 
 	/* Write data to file. */
 	test_write_short_or_die (file, 0, data_out, BUFFER_LEN, __LINE__) ;
-	test_seek_or_die (file, 0, SEEK_SET, 0, sfinfo.channels, __LINE__) ;
+	/* WavPack accepts end tags on its sequential write stream. */
+	if (typemajor != SF_FORMAT_WAVPACK)
+		test_seek_or_die (file, 0, SEEK_SET, 0, sfinfo.channels, __LINE__) ;
 
 	/* Write more stuff at end of file. */
 	sf_set_string (file, SF_STR_COPYRIGHT, copyright) ;

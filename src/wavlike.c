@@ -491,6 +491,22 @@ wavlike_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat)
 					BHWv (subformat->esf_field4), BHWz (8)) ;
 } /* wavlike_write_guid */
 
+int *
+wavlike_gen_channel_map (int channel_mask, int channels)
+{	int *chan_map ;
+	unsigned bit ;
+	int k ;
+
+	if ((chan_map = calloc (channels, sizeof (chan_map [0]))) == NULL)
+		return NULL ;
+
+	/* Channels not covered by the mask are left as SF_CHANNEL_MAP_INVALID. */
+	for (bit = k = 0 ; bit < ARRAY_LEN (channel_mask_bits) && k < channels ; bit++)
+		if (channel_mask & (1 << bit))
+			chan_map [k++] = channel_mask_bits [bit].id ;
+
+	return chan_map ;
+} /* wavlike_gen_channel_map */
 
 int
 wavlike_gen_channel_mask (const int *chan_map, int channels)

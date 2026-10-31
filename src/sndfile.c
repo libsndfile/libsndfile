@@ -970,6 +970,15 @@ sf_format_check	(const SF_INFO *info)
 				if (subformat == SF_FORMAT_MPEG_LAYER_I || subformat == SF_FORMAT_MPEG_LAYER_II || subformat == SF_FORMAT_MPEG_LAYER_III)
 					return 1 ;
 				break ;
+
+		case SF_FORMAT_WAVPACK :
+				if (endian != SF_ENDIAN_FILE)
+					return 0 ;
+				if (subformat == SF_FORMAT_PCM_S8 || subformat == SF_FORMAT_PCM_U8 || subformat == SF_FORMAT_PCM_16 || subformat == SF_FORMAT_PCM_24 || subformat == SF_FORMAT_PCM_32)
+					return 1 ;
+				if (subformat == SF_FORMAT_FLOAT)
+					return 1 ;
+				break ;
 		default : break ;
 		} ;
 
@@ -2789,7 +2798,16 @@ guess_file_type (SF_PRIVATE *psf)
 {	uint32_t buffer [3], format ;
 
 retry:
-	if (psf_binheader_readf (psf, "b", &buffer, SIGNED_SIZEOF (buffer)) != SIGNED_SIZEOF (buffer))
+	if (psf_binheader_readf (psf, "b", &buffer, SIGNED_SIZEOF (uint32_t)) != SIGNED_SIZEOF (uint32_t))
+	{	psf->error = SFE_BAD_FILE_READ ;
+		return 0 ;
+		} ;
+
+	/* reading wavpack from fifo stream requires full header, only read necessary data here */
+	if (buffer [0] == MAKE_MARKER ('w', 'v', 'p', 'k'))
+		return SF_FORMAT_WAVPACK ;
+
+	if (psf_binheader_readf (psf, "b", (buffer + 1), SIGNED_SIZEOF (buffer) - SIGNED_SIZEOF (uint32_t)) != SIGNED_SIZEOF (buffer) - SIGNED_SIZEOF (uint32_t))
 	{	psf->error = SFE_BAD_FILE_READ ;
 		return 0 ;
 		} ;
@@ -2969,7 +2987,7 @@ save_header_info (SF_PRIVATE *psf)
 static int
 psf_close (SF_PRIVATE *psf)
 {	uint32_t k ;
-	int	error = 0 ;
+	int	error = 0, close_error ;
 
 	if (psf->codec_close)
 	{	error = psf->codec_close (psf) ;
@@ -2978,9 +2996,14 @@ psf_close (SF_PRIVATE *psf)
 		} ;
 
 	if (psf->container_close)
-		error = psf->container_close (psf) ;
+	{	close_error = psf->container_close (psf) ;
+		if (error == 0)
+			error = close_error ;
+		} ;
 
-	error = psf_fclose (psf) ;
+	close_error = psf_fclose (psf) ;
+	if (error == 0)
+		error = close_error ;
 	psf_close_rsrc (psf) ;
 
 	/* For an ISO C compliant implementation it is ok to free a NULL pointer. */
@@ -3284,6 +3307,10 @@ psf_open_file (SF_PRIVATE *psf, SF_INFO *sfinfo)
 
 		case	SF_FORMAT_MPEG :
 				error = mpeg_open (psf) ;
+				break ;
+
+		case	SF_FORMAT_WAVPACK :
+				error = wavpack_open (psf) ;
 				break ;
 
 		/* Lite remove end */

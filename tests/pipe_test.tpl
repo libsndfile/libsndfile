@@ -103,6 +103,11 @@ main (void)
 	for (k = 0 ; read_write_types [k].format ; k++)
 		useek_pipe_rw_test (read_write_types [k].format, read_write_types [k].ext) ;
 
+	if (HAVE_WAVPACK)
+	{	pipe_read_test (SF_FORMAT_WAVPACK, "wv") ;
+		pipe_write_test ("wv") ;
+		} ;
+
 	if (0)
 		pipe_test_others (read_write_types, read_only_types) ;
 

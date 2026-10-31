@@ -27,6 +27,11 @@ if (ENABLE_MPEG)
 	list (APPEND VCPKG_MANIFEST_FEATURES "mpeg")
 endif ()
 
+option (ENABLE_WAVPACK "Enable WavPack codec" ON)
+if (ENABLE_WAVPACK)
+	list (APPEND VCPKG_MANIFEST_FEATURES "wavpack")
+endif ()
+
 option (ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
 if (ENABLE_EXPERIMENTAL)
 	list (APPEND VCPKG_MANIFEST_FEATURES "speex")
@@ -105,6 +110,9 @@ endif()
 if(ENABLE_MPEG AND (NOT HAVE_MPEG_LIBS))
 	set (ENABLE_MPEG OFF)
 endif()
+if (ENABLE_WAVPACK AND (NOT HAVE_WAVPACK_LIBS))
+	set (ENABLE_WAVPACK OFF)
+endif ()
 if (BUILD_REGTEST AND (NOT SQLITE3_FOUND))
 	set (BUILD_REGTEST OFF)
 endif()
@@ -132,6 +140,7 @@ if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 4)
 endif ()
 
 set (HAVE_EXTERNAL_XIPH_LIBS ${ENABLE_EXTERNAL_LIBS})
+set (HAVE_WAVPACK ${ENABLE_WAVPACK})
 set (HAVE_SQLITE3 ${BUILD_REGTEST})
 set (HAVE_ALSA_ASOUNDLIB_H ${ALSA_FOUND})
 set (HAVE_SNDIO_H ${SNDIO_FOUND})
@@ -143,6 +152,7 @@ set (HAVE_SPEEX ${ENABLE_EXPERIMENTAL})
 add_feature_info (BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
 add_feature_info (ENABLE_EXTERNAL_LIBS ENABLE_EXTERNAL_LIBS "enable FLAC, Vorbis, and Opus codecs")
 add_feature_info (ENABLE_MPEG ENABLE_MPEG "enable MPEG audio (including mp3) codecs")
+add_feature_info (ENABLE_WAVPACK ENABLE_WAVPACK "enable WavPack codec")
 add_feature_info (ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info (BUILD_TESTING BUILD_TESTING "build tests")
 add_feature_info (BUILD_REGTEST BUILD_REGTEST "build regtest")
@@ -197,6 +207,12 @@ set_package_properties(Opus PROPERTIES
 	DESCRIPTION "Standardized open source low-latency fullband codec"
 	PURPOSE	"Enables experimental Opus support"
 	)
+set_package_properties (WavPack PROPERTIES
+	TYPE RECOMMENDED
+	URL "www.wavpack.com/"
+	DESCRIPTION "Hybrid Lossless Audio Compression"
+	PURPOSE "Enables WavPack support"
+	)
 set_package_properties(Speex PROPERTIES TYPE OPTIONAL
 	URL "www.speex.org/"
 	DESCRIPTION "an audio codec tuned for speech"
@@ -241,6 +257,10 @@ if (INSTALL_PKGCONFIG_MODULE)
 	if (ENABLE_MPEG)
 		set (EXTERNAL_MPEG_REQUIRE "libmpg123")
 		set (EXTERNAL_MPEG_LIBS "-lmp3lame")
+	endif ()
+
+	if (ENABLE_WAVPACK)
+		set (EXTERNAL_WAVPACK_REQUIRE "wavpack")
 	endif ()
 
 	configure_file (sndfile.pc.in sndfile.pc @ONLY)
@@ -324,6 +344,7 @@ add_library (sndfile
 	src/wavlike.h
 	src/wavlike.c
 	src/wav.c
+	src/wavpack.c
 	src/xi.c
 	src/mpc2k.c
 	src/rf64.c
@@ -403,6 +424,7 @@ target_link_libraries (sndfile
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Opus::opus>
 		$<$<BOOL:${HAVE_MPEG}>:MPG123::libmpg123>
 		$<$<BOOL:${HAVE_MPEG}>:mp3lame::mp3lame>
+		$<$<BOOL:${HAVE_WAVPACK}>:WavPack::WavPack>
 	)
 set_target_properties (sndfile PROPERTIES
 	PUBLIC_HEADER "${sndfile_HDRS}"
@@ -447,7 +469,7 @@ if (BUILD_SHARED_LIBS)
 	if (WIN32)
 		set (VERSION_MAJOR ${CPACK_PACKAGE_VERSION_MAJOR})
 		set (GEN_TOOL cmake)
-		
+
 		set (WIN_RC_VERSION "${CPACK_PACKAGE_VERSION_MAJOR},${CPACK_PACKAGE_VERSION_MINOR},${CPACK_PACKAGE_VERSION_PATCH}")
 		set (CLEAN_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 		set (PACKAGE_VERSION ${CPACK_PACKAGE_VERSION})
@@ -833,6 +855,14 @@ if (ENABLE_PACKAGE_CONFIG)
 			${CMAKE_CURRENT_LIST_DIR}/cmake/Findmp3lame.cmake)
 	else ()
 		set (SndFile_WITH_MPEG 0)
+	endif ()
+
+	if (ENABLE_WAVPACK)
+		set (SndFile_WITH_WAVPACK 1)
+		list (APPEND FIND_MODULES_INSTALL_LIST
+			${CMAKE_CURRENT_LIST_DIR}/cmake/FindWavPack.cmake)
+	else ()
+		set (SndFile_WITH_WAVPACK 0)
 	endif ()
 
 	set (INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})
@@ -1306,6 +1336,15 @@ if (BUILD_TESTING)
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
 
+	add_executable (wavpack_test tests/wavpack_test.c)
+	target_link_libraries (wavpack_test
+		PRIVATE
+			sndfile
+			test_utils
+			$<$<BOOL:${HAVE_WAVPACK}>:WavPack::WavPack>
+			$<$<BOOL:${LIBM_REQUIRED}>:m>
+		)
+
 	add_executable (stdin_test tests/stdin_test.c)
 	target_link_libraries (stdin_test
 		PRIVATE
@@ -1543,6 +1582,12 @@ if (BUILD_TESTING)
 	### mpeg-tests ###
 	add_test (mpeg_test mpeg_test)
 	add_test (compression_size_test_mpeg compression_size_test mpeg)
+
+	### wavpack-tests ###
+	add_test (wavpack_test wavpack_test)
+	add_test (write_read_test_wvpk write_read_test wvpk)
+	add_test (string_test_wvpk string_test wvpk)
+	add_test (header_test_wvpk header_test wvpk)
 
 	### io-tests
 	add_test (stdio_test stdio_test)
