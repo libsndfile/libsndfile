@@ -157,7 +157,7 @@ sds_close	(SF_PRIVATE *psf)
 			} ;
 
 		if (psds->write_count > 0)
-		{	memset (&(psds->write_data [psds->write_count]), 0, (psds->samplesperblock - psds->write_count) * sizeof (int)) ;
+		{	memset (&(psds->write_samples [psds->write_count]), 0, (psds->samplesperblock - psds->write_count) * sizeof (int)) ;
 			psds->writer (psf, psds) ;
 			} ;
 
@@ -426,7 +426,7 @@ sds_2byte_read (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 	psds->read_block ++ ;
 	psds->read_count = 0 ;
 
-	if (psds->read_block * psds->samplesperblock > psds->frames)
+	if ((psds->read_block - 1) * psds->samplesperblock >= psds->frames)
 	{	memset (psds->read_samples, 0, psds->samplesperblock * sizeof (int)) ;
 		return 1 ;
 		} ;
@@ -470,7 +470,7 @@ sds_3byte_read (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 	psds->read_block ++ ;
 	psds->read_count = 0 ;
 
-	if (psds->read_block * psds->samplesperblock > psds->frames)
+	if ((psds->read_block - 1) * psds->samplesperblock >= psds->frames)
 	{	memset (psds->read_samples, 0, psds->samplesperblock * sizeof (int)) ;
 		return 1 ;
 		} ;
@@ -514,7 +514,7 @@ sds_4byte_read (SF_PRIVATE *psf, SDS_PRIVATE *psds)
 	psds->read_block ++ ;
 	psds->read_count = 0 ;
 
-	if (psds->read_block * psds->samplesperblock > psds->frames)
+	if ((psds->read_block - 1) * psds->samplesperblock >= psds->frames)
 	{	memset (psds->read_samples, 0, psds->samplesperblock * sizeof (int)) ;
 		return 1 ;
 		} ;
@@ -659,7 +659,7 @@ sds_read (SF_PRIVATE *psf, SDS_PRIVATE *psds, int *ptr, int len)
 {	int	count, total = 0 ;
 
 	while (total < len)
-	{	if (psds->read_block * psds->samplesperblock >= psds->frames)
+	{	if ((psds->read_block - 1) * psds->samplesperblock + psds->read_count >= psds->frames)
 		{	memset (&(ptr [total]), 0, (len - total) * sizeof (int)) ;
 			return total ;
 			} ;
