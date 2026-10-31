@@ -1642,6 +1642,7 @@ str_of_major_format (int format)
 		CASE_NAME (SF_FORMAT_WVE) ;
 		CASE_NAME (SF_FORMAT_OGG) ;
 		CASE_NAME (SF_FORMAT_MPEG) ;
+		CASE_NAME (SF_FORMAT_WAVPACK) ;
 		default :
 			break ;
 		} ;

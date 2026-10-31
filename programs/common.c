@@ -346,6 +346,7 @@ static OUTPUT_FORMAT_MAP format_map [] =
 	{	"mpc",		0,	SF_FORMAT_MPC2K	},
 	{	"rf64",		0,	SF_FORMAT_RF64	},
 	{	"mp3",		0,	SF_FORMAT_MPEG | SF_FORMAT_MPEG_LAYER_III },
+	{	"wv",		0,	SF_FORMAT_WAVPACK	},
 } ; /* format_map */
 
 int
@@ -457,6 +458,7 @@ sfe_container_name (int format)
 		case SF_FORMAT_MPC2K : return "MPC2K" ;
 		case SF_FORMAT_RF64 : return "RF64" ;
 		case SF_FORMAT_MPEG : return "MPEG" ;
+		case SF_FORMAT_WAVPACK : return "WAVPACK" ;
 		default : break ;
 		} ;
 

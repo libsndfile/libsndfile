@@ -103,15 +103,15 @@ static SF_FORMAT_INFO const simple_formats [] =
 
 #if HAVE_WAVPACK
 	{	SF_FORMAT_WAVPACK | SF_FORMAT_PCM_16,
-		"Wavpack (16 bit PCM)", "wv"
+		"WavPack (16 bit PCM)", "wv"
 		},
 
 	{	SF_FORMAT_WAVPACK | SF_FORMAT_FLOAT,
-		"Wavpack (32 bit float)", "wv"
+		"WavPack (32 bit float)", "wv"
 		},
 
 	{	SF_FORMAT_WAVPACK | SF_FORMAT_PCM_U8,
-		"Wavpack (8 bit PCM)", "wv"
+		"WavPack (8 bit PCM)", "wv"
 		},
 #endif
 } ; /* simple_formats */
@@ -172,7 +172,7 @@ static SF_FORMAT_INFO const major_formats [] =
 	{	SF_FORMAT_WAVEX,	"WAVEX (Microsoft)",					"wav"	},
 	{	SF_FORMAT_WVE,		"WVE (Psion Series 3)",					"wve"	},
 #if HAVE_WAVPACK
-	{	SF_FORMAT_WAVPACK,	"Wavpack (Wavpack)",					"wv"	},
+	{	SF_FORMAT_WAVPACK,	"WavPack (Hybrid Lossless Audio Compression)",	"wv"	},
 #endif
 	{	SF_FORMAT_XI,		"XI (FastTracker 2)",					"xi"	},
 } ; /* major_formats */
