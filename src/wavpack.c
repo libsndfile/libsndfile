@@ -568,22 +568,13 @@ wavpack_read_strings (SF_PRIVATE *psf)
 			return SFE_MALLOC_FAILED ;
 		WavpackGetTagItemIndexed (pwvpk->context, i, key, key_length + 1) ;
 
-		/* lowercase */
+		/* lowercase, APEv2 keys are case insensitive */
 		int k ;
 		for (k = 0 ; k < key_length ; ++ k)
-		{	char codepoint = key [k] ;
-			/* APEv2 tag only allows 0x20 to 0x7E in keys */
-			if (codepoint >= 0x20 && codepoint <= 0x7E)
-				key [k] = tolower (codepoint) ;
-			else
-			{	psf_log_printf (psf, "wavpack_read_strings: unknown key: `%s`\n", key) ;
-				free (key) ;
-				continue ;
-				} ;
-			} ;
+			key [k] = tolower ((unsigned char) key [k]) ;
 
 		/* query libsndfile tag type from key */
-		int sf_tag_type = 1 ;
+		int sf_tag_type = 0 ;
 		for (k = 0 ; k < (int) ARRAY_LEN (tag_key_table) ; ++ k)
 		{	if (strcmp (tag_key_table [k].key, key) == 0)
 			{	sf_tag_type = tag_key_table [k].sf_tag_type ;
@@ -604,7 +595,9 @@ wavpack_read_strings (SF_PRIVATE *psf)
 			} ;
 		char *val = calloc (val_length + 1, 1) ;
 		if (val == NULL)
+		{	free (key) ;
 			return SFE_MALLOC_FAILED ;
+			} ;
 		WavpackGetTagItem (pwvpk->context, key, val, val_length + 1) ;
 
 		/* store and cleanup */
