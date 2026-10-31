@@ -814,10 +814,8 @@ wavpack_unpack_buffer_single_any
 	float *out_ptr_float = (((float *) ptr) + i_chunk * chunk_item_count) ;
 	double *out_ptr_double = (((double *) ptr) + i_chunk * chunk_item_count) ;
 
-	if (WavpackUnpackSamples (pwvpk->context, buffer, item_count / psf->sf.channels) == 0)
-	{	psf_log_printf (psf, "wavpack_unpack_buffer_single_any: failed to unpack %ld samples`.\n", item_count) ;
-		return SFE_MALFORMED_FILE ;
-		} ;
+	/* May return less than requested at end of file. */
+	item_count = (sf_count_t) WavpackUnpackSamples (pwvpk->context, buffer, item_count / psf->sf.channels) * psf->sf.channels ;
 
 	if (otype == SF_FORMAT_DOUBLE)
 	{	if (itype == SF_FORMAT_FLOAT)
@@ -902,11 +900,7 @@ wavpack_unpack_buffer_any (SF_PRIVATE *psf, void *ptr, sf_count_t sample_count, 
 
 	/* fast path */
 	if (sample_count <= WVPK_UNPACK_FAST_PATH_MAX_SAMPLES && (itype == SF_FORMAT_PCM_32 || itype == SF_FORMAT_FLOAT) && (otype == SF_FORMAT_PCM_32 || otype == SF_FORMAT_FLOAT))
-	{	if (WavpackUnpackSamples (pwvpk->context, ptr, sample_count / psf->sf.channels) == 0)
-		{	psf_log_printf (psf, "wavpack_unpack_buffer_any: failed to unpack %ld samples\n", sample_count) ;
-			psf->error = SFE_MALFORMED_FILE ;
-			return 0 ;
-		}
+	{	sample_count = (sf_count_t) WavpackUnpackSamples (pwvpk->context, ptr, sample_count / psf->sf.channels) * psf->sf.channels ;
 		if (itype != otype)
 		{	if (itype == SF_FORMAT_PCM_32)
 				wavpack_cvti32f32_inplace (ptr, sample_count, psf->norm_float) ;
@@ -995,6 +989,9 @@ wavpack_unpack_buffer_any (SF_PRIVATE *psf, void *ptr, sf_count_t sample_count, 
 		{	psf->error = err ;
 			return total_unpacked_count ;
 			} ;
+		/* short decode, end of file reached */
+		if (total_unpacked_count < (i_chunk + 1) * chunk_item_count)
+			return total_unpacked_count ;
 		} ;
 
 	/* remain */
@@ -1242,15 +1239,15 @@ static sf_count_t
 wavpack_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 {	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
 
-	if (!psf->sf.seekable)
-	{	psf_log_printf (psf, "wavpack_seek: not seekable for file mode %d, is_random_access_device=%d\n", psf->file.mode, pwvpk->is_random_access_device) ;
-		psf->error = SFE_NOT_SEEKABLE ;
-		return -1 ;
-		} ;
-
 	if (pwvpk == NULL)
 	{	psf_log_printf (psf, "wavpack_seek: null pwvpk\n") ;
 		psf->error = SFE_INTERNAL ;
+		return -1 ;
+		} ;
+
+	if (!psf->sf.seekable)
+	{	psf_log_printf (psf, "wavpack_seek: not seekable for file mode %d, is_random_access_device=%d\n", psf->file.mode, pwvpk->is_random_access_device) ;
+		psf->error = SFE_NOT_SEEKABLE ;
 		return -1 ;
 		} ;
 
@@ -1274,8 +1271,9 @@ wavpack_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 	if (WavpackSeekSample64 (pwvpk->context, offset) != 0)
 		return offset ;
 	else
-	{	psf->error = SFE_SEEK_FAILED ;
-		wavpack_close (psf) ;
+	{	/* The context must not be used after a failed seek, only closed. */
+		psf->error = SFE_SEEK_FAILED ;
+		pwvpk->context = WavpackCloseFile (pwvpk->context) ;
 		return -1 ;
 		} ;
 } /* wavpack_seek */
