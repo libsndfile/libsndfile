@@ -91,6 +91,7 @@ FUNC_NAME (void *src_dest, sf_count_t count, int normalize) \
 		* (((FTYPE *) src_dest) + i) = (((FTYPE) (* (((const ITYPE *) src_dest) + i))) - (OFFSET)) / normfact ; \
 } /* FUNC_NAME */
 
+/* As in pcm.c, an arithmetic right shift drops the low bits. */
 #define WAVPACK_GENERATE_SHIFT_FUNC(FUNC_NAME, ITYPE, OTYPE) \
 static void \
 FUNC_NAME (const ITYPE *src, OTYPE *dest, sf_count_t count, int shl, int offset) \
@@ -105,7 +106,7 @@ FUNC_NAME (const ITYPE *src, OTYPE *dest, sf_count_t count, int shl, int offset)
 		} \
 	else \
 	{	for (i = 0 ; i < count ; ++ i) \
-			dest [i] = (OTYPE) ((src [i] / (((ITYPE) 1) << (-shl))) + ((ITYPE) offset)) ; \
+			dest [i] = (OTYPE) ((src [i] >> (-shl)) + ((ITYPE) offset)) ; \
 		} ; \
 } /* FUNC_NAME */
 
