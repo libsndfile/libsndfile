@@ -156,7 +156,7 @@ AC_ARG_ENABLE([mpeg],
 	[AS_HELP_STRING([--disable-mpeg], [disable use of LAME/MPG123 for MPEG (MP3) [[defaults=no]]])])
 
 AC_ARG_ENABLE([wavpack],
-	[AS_HELP_STRING([--disable-wavpack], [disable use of Wavpack [[default=no]]])])
+	[AS_HELP_STRING([--disable-wavpack], [disable use of WavPack [[default=no]]])])
 
 AC_ARG_ENABLE(octave,
 	[AS_HELP_STRING([--enable-octave], [enable building of GNU Octave module])])
@@ -382,12 +382,12 @@ AS_IF([test -n "$PKG_CONFIG"], [
 AC_DEFINE_UNQUOTED([HAVE_MPEG], [$HAVE_MPEG], [Will be set to 1 if lame, mpg123 mpeg support is available.])
 
 dnl ====================================================================================
-dnl  Check for Wavpack.
+dnl  Check for WavPack.
 
 ac_cv_wavpack=0
 EXTERNAL_WAVPACK_REQUIRE=""
 AS_IF([test "x$enable_wavpack" = "xno"], [
-  AC_MSG_WARN([[*** Wavpack disabled. ***]])
+  AC_MSG_WARN([[*** WavPack disabled. ***]])
   HAVE_WAVPACK=0
 ], [
   PKG_CHECK_MOD_VERSION(WAVPACK, wavpack >= 5.0.0, ac_cv_wavpack=yes, ac_cv_wavpack=no)
@@ -724,7 +724,7 @@ AC_MSG_RESULT([
     Using ALSA in example programs : ...... ${enable_alsa:-no}
     External FLAC/Ogg/Vorbis/Opus : ....... ${enable_external_libs:-no}
     External MPEG Lame/MPG123 : ........... ${enable_mpeg:-no}
-    Wavpack : ............................. ${enable_wavpack:-no}
+    WavPack : ............................. ${enable_wavpack:-no}
     Building Octave interface : ........... ${OCTAVE_BUILD}
 
   Tools :

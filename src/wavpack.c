@@ -249,7 +249,7 @@ wavpack_open	(SF_PRIVATE *psf)
 
 	pwvpk->is_random_access_device = wavpack_io_feature_test (psf) ;
 	if (pwvpk->is_random_access_device < 0)
-	{	psf_log_printf (psf, "wavpack_open: failed to call `wavpack_io_feature_test`, err=%d", pwvpk->is_random_access_device) ;
+	{	psf_log_printf (psf, "wavpack_open: failed to call `wavpack_io_feature_test`, err=%d\n", pwvpk->is_random_access_device) ;
 		error = SFE_OPEN_FAILED ;
 		goto on_error ;
 		} ;
@@ -257,7 +257,7 @@ wavpack_open	(SF_PRIVATE *psf)
 	if (psf->file.mode == SFM_READ)
 	{	psf->sf.seekable = pwvpk->is_random_access_device ;
 		if ((error = wavpack_dec_init (psf)))
-		{	psf_log_printf (psf, "wavpack_open: failed to call `wavpack_dec_init`, error is `%s`(%d)\n", sf_strerror ((SNDFILE*) psf), psf->error) ;
+		{	psf_log_printf (psf, "wavpack_open: failed to call `wavpack_dec_init`, error is `%s`(%d)\n", sf_error_number (error), error) ;
 			goto on_error ;
 			} ;
 		} ;
@@ -275,7 +275,7 @@ wavpack_open	(SF_PRIVATE *psf)
 		psf->strings.flags = SF_STR_ALLOW_START | SF_STR_ALLOW_END ;
 
 		if ((error = wavpack_enc_init (psf)))
-		{	psf_log_printf (psf, "wavpack_open: failed to call `wavpack_enc_init`, error is `%s`(%d)\n", sf_strerror ((SNDFILE*) psf), psf->error) ;
+		{	psf_log_printf (psf, "wavpack_open: failed to call `wavpack_enc_init`, error is `%s`(%d)\n", sf_error_number (error), error) ;
 			goto on_error ;
 			} ;
 
@@ -379,7 +379,7 @@ wavpack_read_header (SF_PRIVATE *psf)
 	{	if (qmode & QMODE_SIGNED_BYTES)
 			psf->sf.format |= SF_FORMAT_PCM_S8 ;
 		else
- 			psf->sf.format |= SF_FORMAT_PCM_U8 ;
+			psf->sf.format |= SF_FORMAT_PCM_U8 ;
 		}
 	else if (mode & MODE_FLOAT)
 		psf->sf.format |= SF_FORMAT_FLOAT ;
@@ -416,7 +416,7 @@ wavpack_dec_init (SF_PRIVATE *psf)
 
 	if (pwvpk->context)
 	{	pwvpk->context = WavpackCloseFile (pwvpk->context) ;
-		psf_log_printf (psf, "wavpack_dec_init: reinitialization for decoder is not unexpected, this is a bug.\n") ;
+		psf_log_printf (psf, "wavpack_dec_init: reinitialization for decoder is unexpected, this is a bug.\n") ;
 		return SFE_INTERNAL ;
 		} ;
 
@@ -545,8 +545,8 @@ wavpack_read_strings (SF_PRIVATE *psf)
 	for (i = 0 ; i < tag_count ; ++ i)
 	{	/* query key */
 		int key_length = WavpackGetTagItemIndexed (pwvpk->context, i, NULL, 0) ;
-		/* every key in tag_key_table is 4 to 11 characters long */
-		if (key_length < 4 || key_length > 11)
+		/* shortest key in tag_key_table is `year`, longest is `copyright` */
+		if (key_length < 4 || key_length > 9)
 		{	psf_log_printf (psf, "wavpack_read_strings: unknown key, length is %d\n", key_length) ;
 			continue ;
 			} ;
@@ -1527,7 +1527,7 @@ on_sequential_device:
 
 int
 wavpack_open	(SF_PRIVATE *psf)
-{	psf_log_printf (psf, "This version of libsndfile was compiled without Wavpack support.\n") ;
+{	psf_log_printf (psf, "This version of libsndfile was compiled without WavPack support.\n") ;
 	return SFE_UNIMPLEMENTED ;
 } /* wavpack_open */
 

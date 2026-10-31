@@ -62,7 +62,7 @@ wavpack_short_test (int otype, int channels, int len)
 	short seek_data [190] ;
 	unsigned k, i ;
 
-	sprintf (str_buf, "wavpack_short_test_%d_%d_%d", otype, channels, len) ;
+	snprintf (str_buf, sizeof (str_buf), "wavpack_short_test_%d_%d_%d", otype, channels, len) ;
 	print_test_name (str_buf, filename) ;
 
 	/* Generate float data. */
@@ -107,7 +107,7 @@ wavpack_short_test (int otype, int channels, int len)
 
 	/* Test seeking. */
 	if (otype == SF_FORMAT_PCM_16)
-	{	sprintf (str_buf, "wavpack_short_seek_test_%d_%d_%d", otype, channels, len) ;
+	{	snprintf (str_buf, sizeof (str_buf), "wavpack_short_seek_test_%d_%d_%d", otype, channels, len) ;
 		print_test_name (str_buf, filename) ;
 
 		file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
@@ -138,7 +138,7 @@ wavpack_int_test (int otype, int channels, int len)
 
 	int len_items = len * channels ;
 
-	sprintf (str_buf, "wavpack_int_test_%d_%d_%d", otype, channels, len) ;
+	snprintf (str_buf, sizeof (str_buf), "wavpack_int_test_%d_%d_%d", otype, channels, len) ;
 	print_test_name (str_buf, filename) ;
 
 	/* Generate float data. */
@@ -187,7 +187,7 @@ wavpack_int_test (int otype, int channels, int len)
 
 	/* Test seeking. */
 	if (otype == SF_FORMAT_PCM_32)
-	{	sprintf (str_buf, "wavpack_int_seek_test_%d_%d_%d", otype, channels, len) ;
+	{	snprintf (str_buf, sizeof (str_buf), "wavpack_int_seek_test_%d_%d_%d", otype, channels, len) ;
 		print_test_name (str_buf, filename) ;
 
 		file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
@@ -215,7 +215,7 @@ wavpack_float_test (int otype, int channels, int len)
 
 	int len_items = len * channels ;
 
-	sprintf (str_buf, "wavpack_float_test_%d_%d_%d", otype, channels, len) ;
+	snprintf (str_buf, sizeof (str_buf), "wavpack_float_test_%d_%d_%d", otype, channels, len) ;
 	print_test_name (str_buf, filename) ;
 
 	gen_windowed_sine_float (data_out.f, len_items, 0.95) ;
@@ -259,7 +259,7 @@ wavpack_float_test (int otype, int channels, int len)
 
 	/* Test seeking. */
 	if (otype == SF_FORMAT_FLOAT)
-	{	sprintf (str_buf, "wavpack_float_seek_test_%d_%d_%d", otype, channels, len) ;
+	{	snprintf (str_buf, sizeof (str_buf), "wavpack_float_seek_test_%d_%d_%d", otype, channels, len) ;
 		print_test_name (str_buf, filename) ;
 
 		file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
@@ -287,7 +287,7 @@ wavpack_double_test (int otype, int channels, int len)
 
 	int len_items = len * channels ;
 
-	sprintf (str_buf, "wavpack_double_test_%d_%d_%d", otype, channels, len) ;
+	snprintf (str_buf, sizeof (str_buf), "wavpack_double_test_%d_%d_%d", otype, channels, len) ;
 	print_test_name (str_buf, filename) ;
 
 	gen_windowed_sine_double (data_out.d, len_items, 0.95) ;
@@ -331,7 +331,7 @@ wavpack_double_test (int otype, int channels, int len)
 
 	/* Test seeking. */
 	if (otype == SF_FORMAT_FLOAT)
-	{	sprintf (str_buf, "wavpack_double_test_%d_%d_%d", otype, channels, len) ;
+	{	snprintf (str_buf, sizeof (str_buf), "wavpack_double_seek_test_%d_%d_%d", otype, channels, len) ;
 		print_test_name (str_buf, filename) ;
 
 		file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
@@ -360,7 +360,7 @@ wavpack_multich_seek_test (const char * filename, int format, int channels)
 	sf_count_t pos ;
 	unsigned k ;
 
-	sprintf (str_buf, "wavpack_multich_seek_test_%d_%d", format & SF_FORMAT_SUBMASK, channels) ;
+	snprintf (str_buf, sizeof (str_buf), "wavpack_multich_seek_test_%d_%d", format & SF_FORMAT_SUBMASK, channels) ;
 	print_test_name (str_buf, filename) ;
 
 	gen_windowed_sine_float (data, ARRAY_LEN (data), 0.95) ;
@@ -444,7 +444,7 @@ main (void)
 			} ;
 		}
 	else
-		puts ("    No Wavpack tests because Wavpack support was not compiled in.") ;
+		puts ("    No WavPack tests because WavPack support was not compiled in.") ;
 
 	return 0 ;
 } /* main */

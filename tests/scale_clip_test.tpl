@@ -140,7 +140,7 @@ main (void)
 		dbl_scale_clip_test_32 ("scale_clip_32.wv", SF_FORMAT_WAVPACK | SF_FORMAT_PCM_32, 1.0 * 0x80000000) ;
 		}
 	else
-		puts ("    No Wavpack tests because Wavpack support was not compiled in.") ;
+		puts ("    No WavPack tests because WavPack support was not compiled in.") ;
 
 	return 0 ;
 } /* main */

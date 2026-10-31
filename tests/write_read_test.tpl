@@ -86,7 +86,7 @@ main (int argc, char **argv)
 		printf ("           flac  - test FLAC file functions\n") ;
 		printf ("           mpc2k - test MPC 2000 file functions\n") ;
 		printf ("           rf64  - test RF64 file functions\n") ;
-		printf ("           wvpk  - test Wavpack file functions\n") ;
+		printf ("           wvpk  - test WavPack file functions\n") ;
 		printf ("           all   - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -411,7 +411,7 @@ main (int argc, char **argv)
 			pcm_test_float	("float.wv"	, SF_FORMAT_WAVPACK | SF_FORMAT_FLOAT , SF_TRUE) ;
 			}
 		else
-			puts ("    No Wavpack tests because Wavpack support was not compiled in.") ;
+			puts ("    No WavPack tests because WavPack support was not compiled in.") ;
 		test_count++ ;
 		} ;
 
