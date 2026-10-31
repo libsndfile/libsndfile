@@ -326,12 +326,12 @@ wavpack_command (SF_PRIVATE *psf, int command, void *UNUSED (data), int UNUSED (
 {	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
 	if (pwvpk == NULL)
 	{	psf_log_printf (psf, "wavpack_command: null pwvpk\n") ;
-		return SFE_INTERNAL ;
+		return SF_FALSE ;
 		} ;
 
 	if (pwvpk->context == NULL)
 	{	psf_log_printf (psf, "wavpack_command: null pwvpk->context\n") ;
-		return SFE_INTERNAL ;
+		return SF_FALSE ;
 		} ;
 
 	switch (command)
@@ -1340,7 +1340,7 @@ sf_wavpack_write_bytes_callback (void *client_data, void *data, int32_t bcount)
 
 	sf_count_t bytes = psf_fwrite (data, 1, bcount, psf) ;
 
-	if (psf->error == SFE_NO_ERROR)
+	if (psf->error == SFE_NO_ERROR && bytes == bcount)
 		return bytes ;
 	else
 		return 0 ;
