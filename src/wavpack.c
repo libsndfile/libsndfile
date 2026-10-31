@@ -121,7 +121,7 @@ typedef struct
 	int64_t first_pos ;
 	int32_t first_bcount ;
 	int64_t sequential_pos ;
-	int is_seek_end, is_in_close, is_random_access_device, is_header_written ;
+	int is_seek_end, is_in_close, is_random_access_device ;
 	unsigned char last_char, last_char_status ;
 } WAVPACK_PRIVATE ;
 
@@ -186,7 +186,7 @@ static int 		wavpack_enc_init (SF_PRIVATE *psf) ;
 static int 		wavpack_dec_init (SF_PRIVATE *psf) ;
 static int		wavpack_read_strings (SF_PRIVATE *psf) ;
 static int		wavpack_write_strings (SF_PRIVATE *psf) ;
-static int		wavpack_write_header (SF_PRIVATE *psf, int UNUSED (calc_length)) ;
+static int		wavpack_write_header (SF_PRIVATE *psf, int calc_length) ;
 static int		wavpack_command (SF_PRIVATE *psf, int command, void *UNUSED (data), int UNUSED (datasize)) ;
 static int 		wavpack_close (SF_PRIVATE *psf) ;
 static sf_count_t	wavpack_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset) ;
@@ -449,21 +449,6 @@ static int
 wavpack_enc_init (SF_PRIVATE *psf)
 {	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
 
-	if (pwvpk->context)
-		pwvpk->context = WavpackCloseFile (pwvpk->context) ;
-	if (pwvpk->first_block)
-	{	free (pwvpk->first_block) ;
-		pwvpk->first_block = NULL ;
-		} ;
-
-	if (pwvpk->is_random_access_device)
-	{	psf_fseek (psf, 0, SEEK_SET) ;
-		if (psf->error != SFE_NO_ERROR)
-		{	psf_log_printf (psf, "wavpack_enc_init: failed to call `psf_fseek`, error is `%s`(%d)\n", sf_strerror ((SNDFILE*) psf), psf->error) ;
-			return psf->error ;
-			} ;
-		} ;
-
 	pwvpk->config.num_channels = psf->sf.channels ;
 	pwvpk->config.sample_rate = psf->sf.samplerate ;
 	if (pwvpk->config.num_channels <= 0)
@@ -691,25 +676,14 @@ wavpack_write_strings (SF_PRIVATE *psf)
 } /* wavpack_write_strings */
 
 static int
-wavpack_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
+wavpack_write_header (SF_PRIVATE *psf, int calc_length)
 {	WAVPACK_PRIVATE* pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
-	int err ;
 
-	if (psf->have_written)
-		return SFE_CMD_HAS_DATA ;
-	if (pwvpk->is_header_written)
-	{	if (pwvpk->is_random_access_device)
-		{	if (pwvpk->context && (err = wavpack_enc_init (psf)) != SFE_NO_ERROR)
-			{	psf_log_printf (psf, "wavpack_write_header: failed to reinitialize encoder\n") ;
-				return err ;
-				} ;
-			pwvpk->is_header_written = 0 ;
-			}
-		else
-		{	psf_log_printf (psf, "wavpack_write_header: unable to reinitialize encoder on sequential device.\n") ;
-			return SFE_NOT_SEEKABLE ;
-			} ;
-		} ;
+	/* Nothing is stored before the first samples, so the encoder is only
+	** configured once, right before the first write.
+	*/
+	if (calc_length || psf->have_written)
+		return SFE_NO_ERROR ;
 
 	int64_t total_samples = psf->sf.frames <= 0 ? -1 : psf->sf.frames ;
 	if (WavpackSetConfiguration64 (pwvpk->context, &pwvpk->config, total_samples, NULL) == 0)
@@ -721,8 +695,6 @@ wavpack_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 	{	psf_log_printf (psf, "wavpack_write_header: failed to call `WavpackPackInit`\n") ;
 		return SFE_UNSUPPORTED_ENCODING ;
 		} ;
-
-	pwvpk->is_header_written = 1 ;
 
 	return SFE_NO_ERROR ;
 } /* wavpack_write_header */

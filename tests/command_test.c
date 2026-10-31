@@ -242,6 +242,8 @@ main (int argc, char *argv [])
 		channel_map_test ("chanmap.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
 		channel_map_test ("chanmap.aifc" , SF_FORMAT_AIFF | SF_FORMAT_PCM_16) ;
 		channel_map_test ("chanmap.caf" , SF_FORMAT_CAF | SF_FORMAT_PCM_16) ;
+		if (HAVE_WAVPACK)
+			channel_map_test ("chanmap.wv" , SF_FORMAT_WAVPACK | SF_FORMAT_PCM_16) ;
 
 		second_fmt_chunk_test ("second_fmt.rf64", rf64_two_fmt, sizeof (rf64_two_fmt)) ;
 		second_fmt_chunk_test ("second_fmt.w64", w64_two_fmt, sizeof (w64_two_fmt)) ;
@@ -1845,8 +1847,9 @@ channel_map_test (const char *filename, int filetype)
 			break ;
 		} ;
 
-	/* Write file with a channel map. */
+	/* Write file with a channel map, set after an early header update. */
 	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	sf_command (file, SFC_UPDATE_HEADER_NOW, NULL, 0) ;
 	exit_if_true (
 		sf_command (file, SFC_SET_CHANNEL_MAP_INFO, channel_map_write, sizeof (channel_map_write)) == SF_FALSE,
 		"\n\nLine %d : sf_command (SFC_SET_CHANNEL_MAP_INFO) failed.\n\n", __LINE__
