@@ -23,7 +23,7 @@ cmake_files = cmake/CMakeAutoGen.cmake cmake/CMakeAutoGenScript.cmake \
 	cmake/TestLargeFiles.cmake cmake/TestInline.c.in \
 	cmake/FindOpus.cmake cmake/SndFileConfig.cmake.in \
 	cmake/CheckCPUArch.cmake cmake/CheckCPUArch.c.in \
-	cmake/Findmp3lame.cmake cmake/Findmpg123.cmake \
+	cmake/Findmp3lame.cmake cmake/Findmpg123.cmake cmake/FindWavPack.cmake \
 	cmake/FindFLAC.cmake cmake/SetupABIVersions.cmake
 
 pkgconfig_DATA = sndfile.pc
@@ -62,7 +62,7 @@ endif
 
 lib_LTLIBRARIES = src/libsndfile.la
 include_HEADERS = include/sndfile.h include/sndfile.hh
-src_libsndfile_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS) $(MPEG_CFLAGS)
+src_libsndfile_la_CFLAGS = $(EXTERNAL_XIPH_CFLAGS) $(MPEG_CFLAGS) $(WAVPACK_CFLAGS)
 # MinGW requires -no-undefined if a DLL is to be built.
 src_libsndfile_la_LDFLAGS = -no-undefined -version-info $(SHARED_VERSION_INFO) $(SHLIB_VERSION_ARG)
 src_libsndfile_la_SOURCES = src/sndfile.c src/aiff.c src/au.c src/avr.c src/caf.c src/dwd.c src/flac.c src/g72x.c src/htk.c src/ircam.c \

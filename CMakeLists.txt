@@ -27,6 +27,11 @@ if (ENABLE_MPEG)
 	list (APPEND VCPKG_MANIFEST_FEATURES "mpeg")
 endif ()
 
+option (ENABLE_WAVPACK "Enable WavPack codec" ON)
+if (ENABLE_WAVPACK)
+	list (APPEND VCPKG_MANIFEST_FEATURES "wavpack")
+endif ()
+
 option (ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
 if (ENABLE_EXPERIMENTAL)
 	list (APPEND VCPKG_MANIFEST_FEATURES "speex")
@@ -105,11 +110,13 @@ endif()
 if(ENABLE_MPEG AND (NOT HAVE_MPEG_LIBS))
 	set (ENABLE_MPEG OFF)
 endif()
+if (ENABLE_WAVPACK AND (NOT HAVE_WAVPACK_LIBS))
+	set (ENABLE_WAVPACK OFF)
+endif ()
 if (BUILD_REGTEST AND (NOT SQLITE3_FOUND))
 	set (BUILD_REGTEST OFF)
 endif()
 
-cmake_dependent_option (ENABLE_WAVPACK "Enable Wavpack codec" ON "WAVPACK_FOUND" OFF)
 cmake_dependent_option (ENABLE_COMPATIBLE_LIBSNDFILE_NAME "Set DLL name to libsndfile-1.dll (canonical name), sndfile.dll otherwise" OFF "WIN32;BUILD_SHARED_LIBS" OFF)
 cmake_dependent_option (INSTALL_MANPAGES "Install man pages for programs" ON "BUILD_PROGRAMS" OFF)
 
@@ -145,7 +152,7 @@ set (HAVE_SPEEX ${ENABLE_EXPERIMENTAL})
 add_feature_info (BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
 add_feature_info (ENABLE_EXTERNAL_LIBS ENABLE_EXTERNAL_LIBS "enable FLAC, Vorbis, and Opus codecs")
 add_feature_info (ENABLE_MPEG ENABLE_MPEG "enable MPEG audio (including mp3) codecs")
-add_feature_info (ENABLE_WAVPACK ENABLE_WAVPACK "enable Wavpack codec")
+add_feature_info (ENABLE_WAVPACK ENABLE_WAVPACK "enable WavPack codec")
 add_feature_info (ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info (BUILD_TESTING BUILD_TESTING "build tests")
 add_feature_info (BUILD_REGTEST BUILD_REGTEST "build regtest")
@@ -200,11 +207,11 @@ set_package_properties(Opus PROPERTIES
 	DESCRIPTION "Standardized open source low-latency fullband codec"
 	PURPOSE	"Enables experimental Opus support"
 	)
-set_package_properties (Wavpack PROPERTIES
+set_package_properties (WavPack PROPERTIES
 	TYPE RECOMMENDED
 	URL "www.wavpack.com/"
 	DESCRIPTION "Hybrid Lossless Audio Compression"
-	PURPOSE "Enables Wavpack support"
+	PURPOSE "Enables WavPack support"
 	)
 set_package_properties(Speex PROPERTIES TYPE OPTIONAL
 	URL "www.speex.org/"
@@ -253,8 +260,8 @@ if (INSTALL_PKGCONFIG_MODULE)
 	endif ()
 
 	if (ENABLE_WAVPACK)
-    set (EXTERNAL_WAVPACK_REQUIRE "wavpack")
-  endif ()
+		set (EXTERNAL_WAVPACK_REQUIRE "wavpack")
+	endif ()
 
 	configure_file (sndfile.pc.in sndfile.pc @ONLY)
 
@@ -417,7 +424,7 @@ target_link_libraries (sndfile
 		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Opus::opus>
 		$<$<BOOL:${HAVE_MPEG}>:MPG123::libmpg123>
 		$<$<BOOL:${HAVE_MPEG}>:mp3lame::mp3lame>
-		$<$<BOOL:${HAVE_WAVPACK}>:Wavpack::wavpack>
+		$<$<BOOL:${HAVE_WAVPACK}>:WavPack::WavPack>
 	)
 set_target_properties (sndfile PROPERTIES
 	PUBLIC_HEADER "${sndfile_HDRS}"
@@ -848,6 +855,14 @@ if (ENABLE_PACKAGE_CONFIG)
 			${CMAKE_CURRENT_LIST_DIR}/cmake/Findmp3lame.cmake)
 	else ()
 		set (SndFile_WITH_MPEG 0)
+	endif ()
+
+	if (ENABLE_WAVPACK)
+		set (SndFile_WITH_WAVPACK 1)
+		list (APPEND FIND_MODULES_INSTALL_LIST
+			${CMAKE_CURRENT_LIST_DIR}/cmake/FindWavPack.cmake)
+	else ()
+		set (SndFile_WITH_WAVPACK 0)
 	endif ()
 
 	set (INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR})

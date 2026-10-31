@@ -5,7 +5,8 @@
     "version-semver": "1.2.2",
     "default-features": [
         "external-libs",
-        "mpeg"
+        "mpeg",
+        "wavpack"
     ],
     "features": {
         "external-libs": {
@@ -21,6 +22,12 @@
             "dependencies": [
                 "mpg123",
                 "mp3lame"
+            ]
+        },
+        "wavpack": {
+            "description": "Enable WavPack codec",
+            "dependencies": [
+                "wavpack"
             ]
         },
         "regtest": {

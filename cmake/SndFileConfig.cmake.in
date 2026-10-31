@@ -5,6 +5,7 @@ set(SndFile_VERSION_PATCH @PROJECT_VERSION_PATCH@)
 
 set (SndFile_WITH_EXTERNAL_LIBS @SndFile_WITH_EXTERNAL_LIBS@)
 set (SndFile_WITH_MPEG @SndFile_WITH_MPEG@)
+set (SndFile_WITH_WAVPACK @SndFile_WITH_WAVPACK@)
 
 @PACKAGE_INIT@
 
@@ -24,6 +25,10 @@ endif ()
 if (SndFile_WITH_MPEG AND NOT @BUILD_SHARED_LIBS@)
 	find_dependency (mp3lame)
 	find_dependency (mpg123)
+endif ()
+
+if (SndFile_WITH_WAVPACK AND NOT @BUILD_SHARED_LIBS@)
+	find_dependency (WavPack)
 endif ()
 
 if (NOT @BUILD_SHARED_LIBS@)

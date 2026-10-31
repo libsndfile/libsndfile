@@ -385,14 +385,16 @@ dnl ============================================================================
 dnl  Check for Wavpack.
 
 ac_cv_wavpack=0
+EXTERNAL_WAVPACK_REQUIRE=""
 AS_IF([test "x$enable_wavpack" = "xno"], [
   AC_MSG_WARN([[*** Wavpack disabled. ***]])
   HAVE_WAVPACK=0
 ], [
-  PKG_CHECK_MOD_VERSION(WAVPACK, wavpack >= 1.2, ac_cv_wavpack=yes, ac_cv_wavpack=no)
+  PKG_CHECK_MOD_VERSION(WAVPACK, wavpack >= 5.0.0, ac_cv_wavpack=yes, ac_cv_wavpack=no)
   AS_IF([test "x$ac_cv_wavpack" = "xyes"], [
     HAVE_WAVPACK=1
     enable_wavpack=yes
+    EXTERNAL_WAVPACK_REQUIRE="wavpack"
   ], [
     AS_ECHO([""])
     AC_MSG_WARN([[*** WavPack is missing or is of an unsupported version. ]])
@@ -662,7 +664,6 @@ AC_SUBST(WIN_RC_VERSION)
 
 AC_SUBST(HAVE_EXTERNAL_XIPH_LIBS)
 AC_SUBST(HAVE_MPEG)
-AC_SUBST(HAVE_WAVPACK_LIBS)
 AC_SUBST(OS_SPECIFIC_CFLAGS)
 AC_SUBST(OS_SPECIFIC_LINKS)
 AC_SUBST(SNDIO_LIBS)
@@ -672,6 +673,7 @@ AC_SUBST(EXTERNAL_XIPH_LIBS)
 AC_SUBST(EXTERNAL_XIPH_REQUIRE)
 AC_SUBST(EXTERNAL_MPEG_LIBS)
 AC_SUBST(EXTERNAL_MPEG_REQUIRE)
+AC_SUBST(EXTERNAL_WAVPACK_REQUIRE)
 AC_SUBST(MPG123_CFLAGS)
 AC_SUBST(MPG123_LIBS)
 AC_SUBST(MPEG_CFLAGS)
