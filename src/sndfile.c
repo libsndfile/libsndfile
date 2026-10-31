@@ -2987,7 +2987,7 @@ save_header_info (SF_PRIVATE *psf)
 static int
 psf_close (SF_PRIVATE *psf)
 {	uint32_t k ;
-	int	error = 0 ;
+	int	error = 0, close_error ;
 
 	if (psf->codec_close)
 	{	error = psf->codec_close (psf) ;
@@ -2996,9 +2996,14 @@ psf_close (SF_PRIVATE *psf)
 		} ;
 
 	if (psf->container_close)
-		error = psf->container_close (psf) ;
+	{	close_error = psf->container_close (psf) ;
+		if (error == 0)
+			error = close_error ;
+		} ;
 
-	error = psf_fclose (psf) ;
+	close_error = psf_fclose (psf) ;
+	if (error == 0)
+		error = close_error ;
 	psf_close_rsrc (psf) ;
 
 	/* For an ISO C compliant implementation it is ok to free a NULL pointer. */

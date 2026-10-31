@@ -28,7 +28,7 @@ if (SndFile_WITH_MPEG AND NOT @BUILD_SHARED_LIBS@)
 endif ()
 
 if (SndFile_WITH_WAVPACK AND NOT @BUILD_SHARED_LIBS@)
-	find_dependency (WavPack)
+	find_dependency (WavPack MODULE)
 endif ()
 
 if (NOT @BUILD_SHARED_LIBS@)

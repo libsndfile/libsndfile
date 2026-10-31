@@ -348,7 +348,8 @@ tests_ogg_opus_test_SOURCES = tests/ogg_opus_test.c tests/utils.c tests/utils.h
 tests_ogg_opus_test_LDADD = src/libsndfile.la
 
 tests_wavpack_test_SOURCES = tests/wavpack_test.c tests/utils.c tests/utils.h
-tests_wavpack_test_LDADD = src/libsndfile.la
+tests_wavpack_test_CFLAGS = $(WAVPACK_CFLAGS)
+tests_wavpack_test_LDADD = src/libsndfile.la $(WAVPACK_LIBS)
 
 tests_compression_size_test_SOURCES = tests/compression_size_test.c tests/utils.c tests/utils.h tests/dft_cmp.h
 tests_compression_size_test_LDADD = src/libsndfile.la

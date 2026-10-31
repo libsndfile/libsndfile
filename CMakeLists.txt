@@ -1341,6 +1341,7 @@ if (BUILD_TESTING)
 		PRIVATE
 			sndfile
 			test_utils
+			$<$<BOOL:${HAVE_WAVPACK}>:WavPack::WavPack>
 			$<$<BOOL:${LIBM_REQUIRED}>:m>
 		)
 
