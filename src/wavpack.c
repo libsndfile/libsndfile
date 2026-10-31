@@ -365,7 +365,7 @@ wavpack_read_header (SF_PRIVATE *psf)
 	if (channel_mask != 0 && (psf->channel_map = wavlike_gen_channel_map (channel_mask, psf->sf.channels)) == NULL)
 		return SFE_MALLOC_FAILED ;
 	if ((psf->sf.frames = WavpackGetNumSamples64 (pwvpk->context)) < 0)
-		psf->sf.frames = 0 ;
+		psf->sf.frames = SF_COUNT_MAX ; /* Unknown, e.g. streamed through a pipe. */
 
 	/* Samples are left justified in bytes_per_sample and always returned signed,
 	** whatever QMODE_UNSIGNED_WORDS says about the source file.
@@ -1278,7 +1278,7 @@ wavpack_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 
 static int
 wavpack_byterate (SF_PRIVATE *psf)
-{	if (psf->file.mode == SFM_READ && psf->sf.frames > 0)
+{	if (psf->file.mode == SFM_READ && psf->datalength != SF_COUNT_MAX && psf->sf.frames > 0)
 		return (psf->datalength * psf->sf.samplerate) / psf->sf.frames ;
 	return -1 ;
 } /* wavpack_byterate */
@@ -1380,10 +1380,9 @@ sf_wavpack_get_pos_callback (void *client_data)
 	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
 	sf_count_t absolute_byte_offset ;
 
+	/* WavPack asks for this on every block, unknown is fine for pipes. */
 	if (!pwvpk->is_random_access_device)
-	{	psf_log_printf (psf, "sf_wavpack_get_pos_callback: unable to do this on a sequential device\n") ;
 		return -1 ;
-		} ;
 
 	absolute_byte_offset = psf_ftell (psf) ;
 	if (psf->error == SFE_NO_ERROR)
