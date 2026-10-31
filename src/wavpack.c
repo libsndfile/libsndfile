@@ -764,7 +764,7 @@ wavpack_pack_buffer_single_any
 
 	if (WavpackPackSamples (pwvpk->context, buffer, item_count / psf->sf.channels) == 0)
 	{	psf_log_printf (psf, "wavpack_pack_buffer_single_any: failed to pack %D samples.\n", item_count) ;
-		return SFE_INTERNAL ;
+		return psf->error ? psf->error : SFE_INTERNAL ;
 		} ;
 
 	*total_packed_count += item_count ;
