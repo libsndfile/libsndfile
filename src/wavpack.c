@@ -359,8 +359,10 @@ wavpack_read_header (SF_PRIVATE *psf)
 
 	// now let's read header
 	psf->sf.samplerate = WavpackGetSampleRate (pwvpk->context) ;
-	psf->channel_map = wavlike_gen_channel_map (WavpackGetChannelMask (pwvpk->context)) ;
 	psf->sf.channels = WavpackGetNumChannels (pwvpk->context) ;
+	int channel_mask = WavpackGetChannelMask (pwvpk->context) ;
+	if (channel_mask != 0 && (psf->channel_map = wavlike_gen_channel_map (channel_mask, psf->sf.channels)) == NULL)
+		return SFE_MALLOC_FAILED ;
 	if ((psf->sf.frames = WavpackGetNumSamples64 (pwvpk->context)) < 0)
 		psf->sf.frames = 0 ;
 

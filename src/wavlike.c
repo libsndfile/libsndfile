@@ -492,32 +492,18 @@ wavlike_write_guid (SF_PRIVATE *psf, const EXT_SUBFORMAT * subformat)
 } /* wavlike_write_guid */
 
 int *
-wavlike_gen_channel_map (int channel_mask)
-{	if (channel_mask == 0)
-		return NULL ;
-	if (channel_mask < 0 || channel_mask >= (1 << ARRAY_LEN (channel_mask_bits)))
-	{	printf ("Unsupported `channel_mask`=%d\n", channel_mask) ;
-		return NULL ;
-		} ;
+wavlike_gen_channel_map (int channel_mask, int channels)
+{	int *chan_map ;
+	unsigned bit ;
+	int k ;
 
-	/* popcnt */
-	int channels = 0 ;
-	int v = channel_mask ;
-	while (v != 0)
-	{	if ((v & 1) == 1)
-			channels += 1 ;
-		v >>= 1 ;
-		} ;
+	if ((chan_map = calloc (channels, sizeof (chan_map [0]))) == NULL)
+		return NULL ;
 
-	/* alloc and set chan_map */
-	int *chan_map = malloc (channels * sizeof (int)) ;
-	int i_chan = 0 ;
-	v = channel_mask ;
-	for (int i_bit = 0 ; v != 0 ; ++ i_bit)
-	{	if ((v & 1) == 1)
-			chan_map [i_chan ++] = channel_mask_bits [i_bit].id ;
-		v >>= 1 ;
-		} ;
+	/* Channels not covered by the mask are left as SF_CHANNEL_MAP_INVALID. */
+	for (bit = k = 0 ; bit < ARRAY_LEN (channel_mask_bits) && k < channels ; bit++)
+		if (channel_mask & (1 << bit))
+			chan_map [k++] = channel_mask_bits [bit].id ;
 
 	return chan_map ;
 } /* wavlike_gen_channel_map */
