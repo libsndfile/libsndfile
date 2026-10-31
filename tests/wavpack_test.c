@@ -422,7 +422,7 @@ wavpack_multich_seek_test (const char * filename, int format, int channels)
 	unlink (filename) ;
 
 	free (multichannel_out) ;
-} /* wavpack_stereo_seek_test */
+} /* wavpack_multich_seek_test */
 
 int
 main (void)

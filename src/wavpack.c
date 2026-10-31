@@ -162,9 +162,9 @@ WAVPACK_GENERATE_INT_TO_FLOAT_FUNC (wavpack_cvti32f64, int32_t, double, WVPK_INT
 
 WAVPACK_GENERATE_INT_TO_FLOAT_FUNC_INPLACE (wavpack_cvti32f32_inplace, int32_t, float, WVPK_INT32_VLIM, 0)
 
-WAVPACK_GENERATE_SHIFT_FUNC (wavpack_shifti32i16, int32_t, int16_t) ;
-WAVPACK_GENERATE_SHIFT_FUNC (wavpack_shifti16i32, int16_t, int32_t) ;
-WAVPACK_GENERATE_SHIFT_FUNC (wavpack_shifti32i32, int32_t, int32_t) ;
+WAVPACK_GENERATE_SHIFT_FUNC (wavpack_shifti32i16, int32_t, int16_t)
+WAVPACK_GENERATE_SHIFT_FUNC (wavpack_shifti16i32, int16_t, int32_t)
+WAVPACK_GENERATE_SHIFT_FUNC (wavpack_shifti32i32, int32_t, int32_t)
 
 
 static void		wavpack_cvtf64f32 (const double *src, float *dest, sf_count_t count) ;
@@ -233,8 +233,7 @@ static WavpackStreamReader64	wavpack_reader_wrapper =
 
 int
 wavpack_open	(SF_PRIVATE *psf)
-{	// int		subformat ;
-	int		error = 0 ;
+{	int		error = 0 ;
 
 	if (psf->file.mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
@@ -360,7 +359,6 @@ wavpack_read_header (SF_PRIVATE *psf)
 		return SFE_INTERNAL ;
 		} ;
 
-	// now let's read header
 	psf->sf.samplerate = WavpackGetSampleRate (pwvpk->context) ;
 	psf->sf.channels = WavpackGetNumChannels (pwvpk->context) ;
 	int channel_mask = WavpackGetChannelMask (pwvpk->context) ;
@@ -408,7 +406,7 @@ wavpack_read_header (SF_PRIVATE *psf)
 		} ;
 
 	return SFE_NO_ERROR ;
-}
+} /* wavpack_read_header */
 
 static int
 wavpack_dec_init (SF_PRIVATE *psf)
@@ -553,9 +551,8 @@ wavpack_read_strings (SF_PRIVATE *psf)
 
 	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
 	if (pwvpk == NULL)
-	{	psf_log_printf (psf, "wavpack_write_strings: null pwvpk\n") ;
-		psf->error = SFE_INTERNAL ;
-		return 0 ;
+	{	psf_log_printf (psf, "wavpack_read_strings: null pwvpk\n") ;
+		return SFE_INTERNAL ;
 		} ;
 
 	int tag_count = WavpackGetNumTagItems (pwvpk->context) ;
@@ -564,7 +561,8 @@ wavpack_read_strings (SF_PRIVATE *psf)
 	for (i = 0 ; i < tag_count ; ++ i)
 	{	/* query key */
 		int key_length = WavpackGetTagItemIndexed (pwvpk->context, i, NULL, 0) ;
-		if (key_length < 4 || key_length > 11) // shortest is `date`, longest is `tracknumber`
+		/* every key in tag_key_table is 4 to 11 characters long */
+		if (key_length < 4 || key_length > 11)
 		{	psf_log_printf (psf, "wavpack_read_strings: unknown key, length is %d\n", key_length) ;
 			continue ;
 			} ;
@@ -624,8 +622,7 @@ wavpack_write_strings (SF_PRIVATE *psf)
 {	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
 	if (pwvpk == NULL)
 	{	psf_log_printf (psf, "wavpack_write_strings: null pwvpk\n") ;
-		psf->error = SFE_INTERNAL ;
-		return 0 ;
+		return SFE_INTERNAL ;
 		} ;
 
 	int k, string_count = 0 ;
@@ -751,12 +748,12 @@ wavpack_read_double (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 static sf_count_t
 wavpack_read_int (SF_PRIVATE *psf, int *ptr, sf_count_t len)
 {	return wavpack_unpack_buffer_any (psf, ptr, len, SF_FORMAT_PCM_32) ;
-} /* wavpack_read_double */
+} /* wavpack_read_int */
 
 static sf_count_t
 wavpack_read_short (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 {	return wavpack_unpack_buffer_any (psf, ptr, len, SF_FORMAT_PCM_16) ;
-} /* wavpack_read_double */
+} /* wavpack_read_short */
 
 static inline int
 wavpack_pack_buffer_single_any
@@ -782,7 +779,6 @@ wavpack_pack_buffer_single_any
 			goto on_internal_error ;
 		}
 	else if (itype == SF_FORMAT_FLOAT)
-		// wavpack_cvtf*i* (const FTYPE *src, ITYPE *dest, sf_count_t count, int normalize, FTYPE vlim, ITYPE offset, int use_clip)
 		wavpack_cvtf32i32 (in_ptr_float, buffer, item_count, psf->norm_float, vlim, voffset, psf->add_clipping) ;
 	else if (itype == SF_FORMAT_DOUBLE)
 		wavpack_cvtf64i32 (in_ptr_double, buffer, item_count, psf->norm_double, vlim, voffset, psf->add_clipping) ;
@@ -794,7 +790,7 @@ wavpack_pack_buffer_single_any
 		goto on_internal_error ;
 
 	if (WavpackPackSamples (pwvpk->context, buffer, item_count / psf->sf.channels) == 0)
-	{	psf_log_printf (psf, "wavpack_pack_buffer_single_any: failed to pack %ld samples`.\n", item_count) ;
+	{	psf_log_printf (psf, "wavpack_pack_buffer_single_any: failed to pack %D samples.\n", item_count) ;
 		return SFE_INTERNAL ;
 		} ;
 
@@ -804,7 +800,7 @@ wavpack_pack_buffer_single_any
 on_internal_error:
 	psf_log_printf (psf, "wavpack_pack_buffer_single_any: invalid (itype, otype) = (%d, %d).\n", itype, otype) ;
 	return SFE_INTERNAL ;
-}
+} /* wavpack_pack_buffer_single_any */
 
 static inline int
 wavpack_unpack_buffer_single_any
@@ -873,7 +869,7 @@ wavpack_unpack_buffer_single_any
 on_internal_error:
 	psf_log_printf (psf, "wavpack_unpack_buffer_single_any: invalid (itype, otype) = (%d, %d).\n", itype, otype) ;
 	return SFE_INTERNAL ;
-}
+} /* wavpack_unpack_buffer_single_any */
 
 static sf_count_t
 wavpack_unpack_buffer_any (SF_PRIVATE *psf, void *ptr, sf_count_t sample_count, int otype)
@@ -1009,10 +1005,10 @@ wavpack_unpack_buffer_any (SF_PRIVATE *psf, void *ptr, sf_count_t sample_count, 
 	return total_unpacked_count ;
 
 on_internal_error:
-	psf_log_printf (psf, "wavpack_unpack_buffer_any: invalid (itype, otype, sample_count) = (%d, %d, %ld)\n", itype, otype, sample_count) ;
+	psf_log_printf (psf, "wavpack_unpack_buffer_any: invalid (itype, otype, sample_count) = (%d, %d, %D)\n", itype, otype, sample_count) ;
 	psf->error = SFE_INTERNAL ;
 	return 0 ;
-}
+} /* wavpack_unpack_buffer_any */
 
 static sf_count_t
 wavpack_pack_buffer_any (SF_PRIVATE *psf, const void *ptr, sf_count_t sample_count, int itype)
@@ -1149,10 +1145,10 @@ wavpack_pack_buffer_any (SF_PRIVATE *psf, const void *ptr, sf_count_t sample_cou
 	return total_packed_count ;
 
 on_internal_error:
-	psf_log_printf (psf, "wavpack_pack_buffer_any: invalid (itype, otype, sample_count) = (%d, %d, %ld)\n", itype, otype, sample_count) ;
+	psf_log_printf (psf, "wavpack_pack_buffer_any: invalid (itype, otype, sample_count) = (%d, %d, %D)\n", itype, otype, sample_count) ;
 	psf->error = SFE_INTERNAL ;
 	return 0 ;
-}
+} /* wavpack_pack_buffer_any */
 
 static sf_count_t
 wavpack_write_float (SF_PRIVATE *psf, const float *ptr, sf_count_t sample_count)
@@ -1342,19 +1338,6 @@ sf_wavpack_read_bytes_callback (void *client_data, void *data, int32_t bcount)
 			} ;
 		} ;
 
-	/*
-	fprintf (stderr, "devtype=%d read %d bytes: `", pwvpk->is_random_access_device, bcount) ;
-	for (int i = 0; i < read_bcount; ++i)
-	{	unsigned char v = ((unsigned char*)data)[i] ;
-		fprintf (stderr, "%02x", (int)v) ;
-		if (v < 0x20 || v > 0x7e)
-			fprintf (stderr, ":? ") ;
-		else
-			fprintf (stderr, ":%c ", v) ;
-		} ;
-	fprintf (stderr, "`\n") ;
-	*/
-
 	if (psf->error == SFE_NO_ERROR)
 		return read_bcount ;
 	else
@@ -1380,7 +1363,7 @@ sf_wavpack_write_bytes_callback (void *client_data, void *data, int32_t bcount)
 		if (!pwvpk->first_block)
 		{	psf->error = SFE_MALLOC_FAILED ;
 			return 0 ;
-		}
+			} ;
 		memcpy (pwvpk->first_block, data, bcount) ;
 		} ;
 
@@ -1418,7 +1401,7 @@ sf_wavpack_set_pos_abs_callback (void *client_data, int64_t pos)
 	WAVPACK_PRIVATE *pwvpk = (WAVPACK_PRIVATE*) psf->codec_data ;
 
 	if (!pwvpk->is_random_access_device)
-	{	psf_log_printf (psf, "sf_wavpack_set_pos_abs_callback: unable to do this on a sequential device, pos=%ld\n", pos) ;
+	{	psf_log_printf (psf, "sf_wavpack_set_pos_abs_callback: unable to do this on a sequential device, pos=%D\n", pos) ;
 		return -1 ;
 		} ;
 
@@ -1467,7 +1450,7 @@ sf_wavpack_push_back_byte_callback (void *client_data, int c)
 			return -1 ;
 		}
 	else
-	{	// we need not check `c` because wavpack does not modify it
+	{	/* we need not check `c` because wavpack does not modify it */
 		psf_fseek (psf, -1, SEEK_CUR) ;
 		if (psf->error == SFE_NO_ERROR)
 			return c ;
@@ -1501,7 +1484,7 @@ sf_wavpack_get_length_callback (void *client_data)
 		goto on_error ;
 	return file_len ;
 
-on_error :
+on_error:
 	psf_log_printf (psf, "sf_wavpack_get_length_callback: failed, error is `%s`(%d)\n", sf_strerror ((SNDFILE*) psf), psf->error) ;
 	return 0 ;
 } /* sf_wavpack_get_length_callback */
@@ -1531,7 +1514,7 @@ sf_wavpack_truncate_here (void *client_data)
 		return -1 ;
 		} ;
 	if (psf_ftruncate (psf, pos) != 0)
-	{	psf_log_printf (psf, "sf_wavpack_truncate_here: failed to call `psf_ftruncate`, current position is %lld.\n", pos) ;
+	{	psf_log_printf (psf, "sf_wavpack_truncate_here: failed to call `psf_ftruncate`, current position is %D.\n", pos) ;
 		return -1 ;
 		} ;
 
@@ -1559,7 +1542,7 @@ wavpack_io_feature_test (SF_PRIVATE *psf)
 		} ;
 
 	psf_log_printf (psf, "wavpack_io_feature_test: device feature level is `random access device`\n") ;
-	return 1 ; // random_access_device
+	return 1 ; /* random_access_device */
 
 on_sequential_device:
 	psf_log_printf (psf, "wavpack_io_feature_test: device feature level is `sequential device`\n") ;
