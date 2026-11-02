@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+* sf_get_format_check_failure_reason() function, for better error-reporting
+
+### Changed
+
+* sndfile-convert now prints the reason why an output file format check failed.
+
 ### Fixed
 
 * Disable autogen rules when autogen cannot be found

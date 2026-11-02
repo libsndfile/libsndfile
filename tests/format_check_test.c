@@ -116,6 +116,12 @@ format_combo_test (void)
 			check_is_valid = sf_format_check (&info) ;
 
 			exit_if_true (
+				check_is_valid != (sf_get_format_check_failure_reason(&info) == NULL),
+				"\n\nLine %d : sf_format_check() and sf_get_format_check_failure_reason() returned inconsistent results.\n",
+				__LINE__
+				) ;
+
+			exit_if_true (
 				NOT (subtype_is_valid) && check_is_valid,
 				"\n\nLine %d : Subtype is not valid but checks ok.\n",
 				__LINE__
