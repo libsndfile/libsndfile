@@ -162,8 +162,8 @@
 #if HAVE_EXTERNAL_XIPH_LIBS
 
 #include <ogg/ogg.h>
-#include <opus/opus.h>
-#include <opus/opus_multistream.h>
+#include <opus.h>
+#include <opus_multistream.h>
 
 #include "ogg.h"
 #include "ogg_vcomment.h"
@@ -750,7 +750,10 @@ ogg_opus_setup_encoder (SF_PRIVATE *psf, OGG_PRIVATE *odata, OPUS_PRIVATE *oopus
 	odata->opacket.packet = malloc (oopus->buffersize) ;
 	odata->opacket.packetno = 2 ;
 	if (odata->opacket.packet == NULL)
+	{	free (oopus->buffer) ;
+		oopus->buffer = NULL ;
 		return SFE_MALLOC_FAILED ;
+		} ;
 
 	oopus->serialno = psf_rand_int32 () ;
 	ogg_stream_init (&odata->ostream, oopus->serialno) ;
@@ -839,7 +842,7 @@ ogg_opus_write_header (SF_PRIVATE *psf, int UNUSED (calc_length))
 		} ;
 
 	/*
-	** Metadata Tags (manditory)
+	** Metadata Tags (mandatory)
 	**
 	** All tags must be in one packet, which may span pages, and these pages
 	** must not contain any other packets, so flush. The vendor string should
@@ -1804,7 +1807,7 @@ ogg_opus_byterate (SF_PRIVATE *psf)
 			return (ppkt->bytes * 8000) / opus_packet_get_nb_samples (ppkt->packet, ppkt->bytes, 8000) ;
 			} ;
 
-		if (psf->datalength != SF_COUNT_MAX)
+		if (psf->datalength != SF_COUNT_MAX && psf->sf.frames > 0)
 			return (psf->datalength * psf->sf.samplerate) / psf->sf.frames ;
 		} ;
 

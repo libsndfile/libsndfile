@@ -757,7 +757,7 @@ sds_seek (SF_PRIVATE *psf, int mode, sf_count_t seek_from_start)
 static int
 sds_byterate (SF_PRIVATE * psf)
 {
-	if (psf->file.mode == SFM_READ)
+	if (psf->file.mode == SFM_READ && psf->sf.frames > 0)
 		return (psf->datalength * psf->sf.samplerate) / psf->sf.frames ;
 
 	return -1 ;

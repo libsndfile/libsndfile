@@ -30,6 +30,12 @@
 ** ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/* - struct timeval in <sys/time.h>, which ALSA otherwise defines itself
+ */
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif
+
 #include "sfconfig.h"
 
 #include <stdio.h>
@@ -105,11 +111,14 @@ alsa_play (int argc, char *argv [])
 
 		if (sfinfo.channels < 1 || sfinfo.channels > 2)
 		{	printf ("Error : channels = %d.\n", sfinfo.channels) ;
+			sf_close (sndfile) ;
 			continue ;
 			} ;
 
 		if ((alsa_dev = alsa_open (sfinfo.channels, (unsigned) sfinfo.samplerate, SF_FALSE)) == NULL)
+		{	sf_close (sndfile) ;
 			continue ;
+			} ;
 
 		subformat = sfinfo.format & SF_FORMAT_SUBMASK ;
 
@@ -372,11 +381,13 @@ sndio_play (int argc, char *argv [])
 
 		if (sfinfo.channels < 1 || sfinfo.channels > 2)
 		{	printf ("Error : channels = %d.\n", sfinfo.channels) ;
+			sf_close (sndfile) ;
 			continue ;
 			} ;
 
 		if ((hdl = sio_open (NULL, SIO_PLAY, 0)) == NULL)
 		{	fprintf (stderr, "open sndio device failed") ;
+			sf_close (sndfile) ;
 			return ;
 			} ;
 
@@ -389,11 +400,15 @@ sndio_play (int argc, char *argv [])
 
 		if (! sio_setpar (hdl, &par) || ! sio_getpar (hdl, &par))
 		{	fprintf (stderr, "set sndio params failed") ;
+			sio_close (hdl) ;
+			sf_close (sndfile) ;
 			return ;
 			} ;
 
 		if (! sio_start (hdl))
 		{	fprintf (stderr, "sndio start failed") ;
+			sio_close (hdl) ;
+			sf_close (sndfile) ;
 			return ;
 			} ;
 
@@ -401,6 +416,7 @@ sndio_play (int argc, char *argv [])
 			sio_write (hdl, buffer, readcount * sizeof (short)) ;
 
 		sio_close (hdl) ;
+		sf_close (sndfile) ;
 		} ;
 
 	return ;
@@ -434,6 +450,7 @@ opensoundsys_play (int argc, char *argv [])
 
 		if (sfinfo.channels < 1 || sfinfo.channels > 2)
 		{	printf ("Error : channels = %d.\n", sfinfo.channels) ;
+			sf_close (sndfile) ;
 			continue ;
 			} ;
 
@@ -605,7 +622,7 @@ win32_audio_out_callback (HWAVEOUT hwave, UINT msg, DWORD_PTR data, DWORD param1
 
 	/*
 	** I consider this technique of passing a pointer via an integer as
-	** fundamentally broken but thats the way microsoft has defined the
+	** fundamentally broken but that's the way microsoft has defined the
 	** interface.
 	*/
 	audio_data = (Win32_Audio_Data*) data ;
@@ -661,7 +678,7 @@ win32_play (int argc, char *argv [])
 		if (error)
 		{	puts ("waveOutOpen failed.") ;
 			audio_data.hwave = 0 ;
-			continue ;
+			goto cleanup ;
 			} ;
 
 		audio_data.whdr [0].lpData = (char*) audio_data.buffer ;
@@ -680,14 +697,14 @@ win32_play (int argc, char *argv [])
 		if ((error = waveOutPrepareHeader (audio_data.hwave, &(audio_data.whdr [0]), sizeof (WAVEHDR))))
 		{	printf ("waveOutPrepareHeader [0] failed : %08X\n", error) ;
 			waveOutClose (audio_data.hwave) ;
-			continue ;
+			goto cleanup ;
 			} ;
 
 		if ((error = waveOutPrepareHeader (audio_data.hwave, &(audio_data.whdr [1]), sizeof (WAVEHDR))))
 		{	printf ("waveOutPrepareHeader [1] failed : %08X\n", error) ;
 			waveOutUnprepareHeader (audio_data.hwave, &(audio_data.whdr [0]), sizeof (WAVEHDR)) ;
 			waveOutClose (audio_data.hwave) ;
-			continue ;
+			goto cleanup ;
 			} ;
 
 		/* Fill up both buffers with audio data */
@@ -711,6 +728,8 @@ win32_play (int argc, char *argv [])
 		waveOutClose (audio_data.hwave) ;
 		audio_data.hwave = 0 ;
 
+	cleanup :
+		CloseHandle (audio_data.Event) ;
 		DeleteCriticalSection (&audio_data.mutex) ;
 
 		sf_close (audio_data.sndfile) ;
@@ -743,12 +762,14 @@ solaris_play (int argc, char *argv [])
 
 		if (sfinfo.channels < 1 || sfinfo.channels > 2)
 		{	printf ("Error : channels = %d.\n", sfinfo.channels) ;
+			sf_close (sndfile) ;
 			continue ;
 			} ;
 
 		/* open the audio device - write only, non-blocking */
 		if ((audio_fd = open ("/dev/audio", O_WRONLY | O_NONBLOCK)) < 0)
 		{	perror ("open (/dev/audio) failed") ;
+			sf_close (sndfile) ;
 			return ;
 			} ;
 
@@ -762,6 +783,8 @@ solaris_play (int argc, char *argv [])
 
 		if ((error = ioctl (audio_fd, AUDIO_SETINFO, &audio_info)))
 		{	perror ("ioctl (AUDIO_SETINFO) failed") ;
+			close (audio_fd) ;
+			sf_close (sndfile) ;
 			return ;
 			} ;
 
@@ -795,6 +818,7 @@ solaris_play (int argc, char *argv [])
 			} ; /* while (! done) */
 
 		close (audio_fd) ;
+		sf_close (sndfile) ;
 		} ;
 
 	return ;

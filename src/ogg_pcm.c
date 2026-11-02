@@ -107,7 +107,7 @@ ogg_pcm_open (SF_PRIVATE *psf)
 		} ;
 
 	psf->bytewidth = 1 ;
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 #if 0
 	psf->seek = opcm_seek ;

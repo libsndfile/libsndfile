@@ -23,15 +23,10 @@
 
 #include <stdlib.h>
 #include <string.h>
-#if HAVE_STDBOOL_H
 #include <stdbool.h>
-#endif
-
-#if HAVE_INTTYPES_H
-#include <inttypes.h>
-#elif HAVE_STDINT_H
 #include <stdint.h>
-#endif
+#include <inttypes.h>
+
 #if HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
@@ -95,8 +90,6 @@
 #define		SF_MAX(a, b)	((a) > (b) ? (a) : (b))
 #define		SF_MIN(a, b)	((a) < (b) ? (a) : (b))
 
-
-#define		COMPILE_TIME_ASSERT(e)	(sizeof (struct { int : - !! (e) ; }))
 
 
 #define		SF_MAX_CHANNELS		1024
@@ -289,12 +282,6 @@ typedef struct
 	unsigned	minor_version ;
 } ID3V2_HEADER_INFO ;
 
-#if SIZEOF_WCHAR_T == 2
-typedef wchar_t	sfwchar_t ;
-#else
-typedef int16_t sfwchar_t ;
-#endif
-
 
 void *psf_memdup (const void *src, size_t n) ;
 
@@ -335,11 +322,7 @@ typedef struct
 
 typedef union
 {	double			dbuf	[SF_BUFFER_LEN / sizeof (double)] ;
-#if (defined (SIZEOF_INT64_T) && (SIZEOF_INT64_T == 8))
 	int64_t			lbuf	[SF_BUFFER_LEN / sizeof (int64_t)] ;
-#else
-	long			lbuf	[SF_BUFFER_LEN / sizeof (double)] ;
-#endif
 	float			fbuf	[SF_BUFFER_LEN / sizeof (float)] ;
 	int				ibuf	[SF_BUFFER_LEN / sizeof (int)] ;
 	short			sbuf	[SF_BUFFER_LEN / sizeof (short)] ;
@@ -881,6 +864,7 @@ int		w64_open	(SF_PRIVATE *psf) ;
 int		wav_open	(SF_PRIVATE *psf) ;
 int		xi_open		(SF_PRIVATE *psf) ;
 int		flac_open	(SF_PRIVATE *psf) ;
+int		flac_supports_pcm32 (void) ;
 int		caf_open	(SF_PRIVATE *psf) ;
 int		mpc2k_open	(SF_PRIVATE *psf) ;
 int		rf64_open	(SF_PRIVATE *psf) ;
@@ -988,6 +972,16 @@ void	*psf_memset (void *s, int c, sf_count_t n) ;
 SF_CUES * psf_cues_dup (const void * ptr, size_t datasize) ;
 SF_CUES * psf_cues_alloc (uint32_t cue_count) ;
 void psf_get_cues (SF_PRIVATE * psf, void * data, size_t datasize) ;
+
+/* The cue array is allocated with room for the actual cue count (see
+** psf_cues_alloc()), but the public SF_CUES type declares it with a fixed
+** length of 100.  Index it through a pointer so that compilers do not flag
+** accesses to the longer, correctly allocated array (issue #832).
+*/
+static inline SF_CUE_POINT *
+psf_cues_points (SF_CUES *cues)
+{	return cues->cue_points ;
+} /* psf_cues_points */
 
 SF_INSTRUMENT * psf_instrument_alloc (void) ;
 

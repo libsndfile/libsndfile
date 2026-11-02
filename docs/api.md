@@ -62,7 +62,7 @@ SNDFILE*  sf_open    (const char *path, int mode, SF_INFO *sfinfo) ;
 
 The sf_open() function opens the sound file at the specified path. The filename is byte encoded, but may be utf-8 on
 Linux, while on Mac OS X it will use the filesystem character set. On Windows, there is also a Windows specific
-sf_wchar_open() that takes a UTF16_BE encoded filename.
+sf_wchar_open() that takes a UTF16_LE encoded filename.
 
 ```c
 SNDFILE*  sf_wchar_open (LPCWSTR wpath, int mode, SF_INFO *sfinfo) ;
@@ -593,7 +593,7 @@ int sf_current_byterate (SNDFILE *sndfile) ;
 
 Return the current byterate at this point in the file. The byte rate in this
 case is the number of bytes per second of audio data. For instance, for a
-stereo, 18 bit PCM encoded file with an 16kHz sample rate, the byte rate
+stereo, 16 bit PCM encoded file with a 16kHz sample rate, the byte rate
 would be 2 (stereo) \* 2 (two bytes per sample) * 16000 => 64000 bytes/sec.
 
 For some file formats the returned value will be accurate and exact, for some

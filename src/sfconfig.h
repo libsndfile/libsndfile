@@ -69,14 +69,6 @@
 #define HAVE_LOCALE_H 0
 #endif
 
-#ifndef HAVE_LRINT
-#define HAVE_LRINT 0
-#endif
-
-#ifndef HAVE_LRINTF
-#define HAVE_LRINTF 0
-#endif
-
 #ifndef HAVE_MMAP
 #define HAVE_MMAP 0
 #endif
@@ -87,10 +79,6 @@
 
 #ifndef HAVE_SQLITE3
 #define HAVE_SQLITE3 0
-#endif
-
-#ifndef HAVE_STDINT_H
-#define HAVE_STDINT_H 0
 #endif
 
 #ifndef HAVE_SYS_WAIT_H

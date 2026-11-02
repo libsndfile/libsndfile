@@ -1,4 +1,6 @@
-#!/bin/bash -eu
+#!/usr/bin/env sh
 
-CFLAGS="-fsanitize=address -g" CXXFLAGS=${CFLAGS} ./configure
+set -eu
+
+CFLAGS="-fsanitize=address -g" CXXFLAGS="-fsanitize=address -g" ./configure
 

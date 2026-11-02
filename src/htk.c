@@ -76,7 +76,7 @@ htk_open	(SF_PRIVATE *psf)
 
 	psf->container_close = htk_close ;
 
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 	switch (subformat)
 	{	case SF_FORMAT_PCM_16 :	/* 16-bit linear PCM. */
@@ -196,14 +196,18 @@ htk_read_header (SF_PRIVATE *psf)
 
 	psf->sf.channels = 1 ;
 
-	if (sample_period > 0)
+	/*
+	**	A period above 10000000 (one sample per second) truncates the sample
+	**	rate to zero, which the header writer then divides by.
+	*/
+	if (sample_period > 0 && sample_period <= 10000000)
 	{	psf->sf.samplerate = 10000000 / sample_period ;
 		psf_log_printf (psf, "HTK Waveform file\n  Sample Count  : %d\n  Sample Period : %d => %d Hz\n",
 					sample_count, sample_period, psf->sf.samplerate) ;
 		}
 	else
 	{	psf->sf.samplerate = 16000 ;
-		psf_log_printf (psf, "HTK Waveform file\n  Sample Count  : %d\n  Sample Period : %d (should be > 0) => Guessed sample rate %d Hz\n",
+		psf_log_printf (psf, "HTK Waveform file\n  Sample Count  : %d\n  Sample Period : %d (should be 1 to 10000000) => Guessed sample rate %d Hz\n",
 					sample_count, sample_period, psf->sf.samplerate) ;
 		} ;
 
@@ -216,7 +220,7 @@ htk_read_header (SF_PRIVATE *psf)
 
 	psf->datalength = psf->filelength - psf->dataoffset ;
 
-	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
+	psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 
 	if (! psf->sf.frames && psf->blockwidth)
 		psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;

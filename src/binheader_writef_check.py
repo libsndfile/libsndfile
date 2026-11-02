@@ -31,7 +31,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-# This parses C code using regexes (yes, thats horrible) and makes sure
+# This parses C code using regexes (yes, that's horrible) and makes sure
 # that calling conventions to the function psf_binheader_writef are
 # correct.
 

@@ -65,11 +65,6 @@ main (int argc, char *argv [])
 	if (argc == 2 && ! strstr (argv [1], "no-exit"))
 		allow_exit = 0 ;
 
-#if (HAVE_LRINTF == 0)
-	puts ("*** Cannot run this test on this platform because it lacks lrintf().") ;
-	exit (0) ;
-#endif
-
 	/* Float tests. */
 	float_scaled_test	("float.raw", allow_exit, SF_FALSE, SF_ENDIAN_LITTLE | SF_FORMAT_RAW | SF_FORMAT_FLOAT,
 									OS_IS_OPENBSD ? -98.0 : -163.0) ;
@@ -121,6 +116,8 @@ main (int argc, char *argv [])
 	float_scaled_test	("flac_8.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_S8, -39.0) ;
 	float_scaled_test	("flac_16.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_16, -87.0) ;
 	float_scaled_test	("flac_24.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_24, -138.0) ;
+	if (format_is_supported (SF_FORMAT_FLAC | SF_FORMAT_PCM_32))
+		float_scaled_test	("flac_32.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_32, -184.0) ;
 
 	float_scaled_test	("vorbis.oga", allow_exit, SF_FALSE, SF_FORMAT_OGG | SF_FORMAT_VORBIS, -31.0) ;
 
@@ -184,6 +181,8 @@ main (int argc, char *argv [])
 	double_scaled_test	("flac_8.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_S8, -39.0) ;
 	double_scaled_test	("flac_16.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_16, -87.0) ;
 	double_scaled_test	("flac_24.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_24, -138.0) ;
+	if (format_is_supported (SF_FORMAT_FLAC | SF_FORMAT_PCM_32))
+		double_scaled_test	("flac_32.flac", allow_exit, SF_FALSE, SF_FORMAT_FLAC | SF_FORMAT_PCM_32, -184.0) ;
 
 	double_scaled_test	("vorbis.oga", allow_exit, SF_FALSE, SF_FORMAT_OGG | SF_FORMAT_VORBIS, -29.0) ;
 	double_scaled_test	("opus.opus", allow_exit, SF_FALSE, SF_FORMAT_OGG | SF_FORMAT_OPUS, -32.0) ;

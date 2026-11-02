@@ -59,7 +59,7 @@
 #ifndef _WIN32
 typedef off_t sf_off_t ;
 #else
-typedef long long sf_off_t ;
+typedef int64_t sf_off_t ;
 #endif
 
 
@@ -176,6 +176,7 @@ salvage_file (const char * broken_wav, const char * fixed_w64)
 	lseek_or_die (fd, data_offset, SEEK_SET) ;
 
 	copy_data (fd, sndfile, read_size) ;
+	close (fd) ;
 
 	sf_close (sndfile) ;
 
@@ -291,7 +292,7 @@ copy_data (int fd, SNDFILE * sndfile, int readsize)
 
 		if ((count = sf_write_raw (sndfile, buffer, readlen)) != readlen)
 		{	printf ("Error : sf_write_raw returned %" PRId64 " : %s\n", count, sf_strerror (sndfile)) ;
-			return ;
+			break ;
 			} ;
 		} ;
 

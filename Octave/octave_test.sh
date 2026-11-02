@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 
 # Check where we're being run from.
 if test -d Octave ; then
-	cd Octave
+	cd Octave || exit 1
 	octave_src_dir=$(pwd)
 elif test -z "$octave_src_dir" ; then
 	echo
@@ -11,7 +11,7 @@ elif test -z "$octave_src_dir" ; then
 	echo
 	exit 1
 else
-	octave_src_dir=$(cd $octave_src_dir && pwd)
+	octave_src_dir=$(cd "${octave_src_dir}" && pwd)
 	fi
 
 # Find libsndfile shared object.
@@ -32,7 +32,7 @@ else
 	echo
 	fi
 
-libsndfile_lib_location=`(cd $libsndfile_lib_location && pwd)`
+libsndfile_lib_location=$(cd "${libsndfile_lib_location}" && pwd)
 
 
 # Find sndfile.oct
@@ -47,7 +47,7 @@ else
 	exit 1
 	fi
 
-case `file -b $sndfile_oct_location/sndfile.oct` in
+case $(file -b "${sndfile_oct_location}/sndfile.oct") in
 	ELF*)
 		;;
 	Mach*)
@@ -68,14 +68,14 @@ unset TERM
 # echo "sndfile_oct_location : $sndfile_oct_location"
 
 if test ! -f PKG_ADD ; then
-	cp $octave_src_dir/PKG_ADD .
+	cp "${octave_src_dir}/PKG_ADD" .
 	fi
 
 export LD_LIBRARY_PATH="$libsndfile_lib_location:$LD_LIBRARY_PATH"
 
 octave_script="$octave_src_dir/octave_test.m"
 
-(cd $sndfile_oct_location && octave -qH $octave_script)
+(cd "${sndfile_oct_location}" && octave -qH "${octave_script}")
 res=$?
 echo
 exit $res

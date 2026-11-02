@@ -143,7 +143,7 @@ sd2_open (SF_PRIVATE *psf)
 
 	psf->container_close = sd2_close ;
 
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 	switch (subformat)
 	{	case SF_FORMAT_PCM_S8 :	/* 8-bit linear PCM. */

@@ -32,6 +32,13 @@
 **	that large file support is enabled correctly on Unix systems.
 */
 
+/* - ftruncate() in <unistd.h>
+ * - S_ISSOCK() in <sys/stat.h>
+ */
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 700
+#endif
+
 #include "sfconfig.h"
 
 #if USE_WINDOWS_API
@@ -345,14 +352,14 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 {	sf_count_t total = 0 ;
 	ssize_t	count ;
 
-	if (psf->virtual_io)
-		return psf->vio.read (ptr, bytes*items, psf->vio_user_data) / bytes ;
-
 	items *= bytes ;
 
 	/* Do this check after the multiplication above. */
 	if (items <= 0)
 		return 0 ;
+
+	if (psf->virtual_io)
+		return psf->vio.read (ptr, items, psf->vio_user_data) / bytes ;
 
 	while (items > 0)
 	{	/* Break the read down to a sensible size. */
@@ -982,14 +989,14 @@ psf_fread (void *ptr, sf_count_t bytes, sf_count_t items, SF_PRIVATE *psf)
 	ssize_t count ;
 	DWORD dwNumberOfBytesRead ;
 
-	if (psf->virtual_io)
-		return psf->vio.read (ptr, bytes*items, psf->vio_user_data) / bytes ;
-
 	items *= bytes ;
 
 	/* Do this check after the multiplication above. */
 	if (items <= 0)
 		return 0 ;
+
+	if (psf->virtual_io)
+		return psf->vio.read (ptr, items, psf->vio_user_data) / bytes ;
 
 	while (items > 0)
 	{	/* Break the writes down to a sensible size. */

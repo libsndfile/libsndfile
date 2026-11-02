@@ -34,7 +34,7 @@
 ** A lot of PD software exists to play Mac .snd files on the ST. One other
 ** format that seems pretty popular (used by a number of commercial packages)
 ** is the AVR format (from Audio Visual Research). This format has a 128 byte
-** header that looks like this (its actually packed, but thats not portable):
+** header that looks like this (its actually packed, but that's not portable):
 */
 
 typedef struct
@@ -97,7 +97,7 @@ avr_open	(SF_PRIVATE *psf)
 
 	psf->container_close = avr_close ;
 
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 	error = pcm_init (psf) ;
 
@@ -157,7 +157,7 @@ avr_read_header (SF_PRIVATE *psf)
 	psf_binheader_readf (psf, "E222", &hdr.res1, &hdr.res2, &hdr.res3) ;
 	psf_binheader_readf (psf, "bb", hdr.ext, sizeof (hdr.ext), hdr.user, sizeof (hdr.user)) ;
 
-	psf_log_printf (psf, "  Ext         : %s\n  User        : %s\n", hdr.ext, hdr.user) ;
+	psf_log_printf (psf, "  Ext         : %.20s\n  User        : %.64s\n", hdr.ext, hdr.user) ;
 
 	psf->endian = SF_ENDIAN_BIG ;
 
@@ -170,7 +170,7 @@ avr_read_header (SF_PRIVATE *psf)
 	if (psf_ftell (psf) != psf->dataoffset)
 		psf_binheader_readf (psf, "j", psf->dataoffset - psf_ftell (psf)) ;
 
-	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
+	psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 
 	if (psf->sf.frames == 0 && psf->blockwidth)
 		psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;
@@ -195,7 +195,7 @@ avr_write_header (SF_PRIVATE *psf, int calc_length)
 		if (psf->dataend)
 			psf->datalength -= psf->filelength - psf->dataend ;
 
-		psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
+		psf->sf.frames = psf->datalength / ((sf_count_t) psf->bytewidth * psf->sf.channels) ;
 		} ;
 
 	/* Reset the current header length to zero. */

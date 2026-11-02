@@ -44,6 +44,7 @@
 
 static	void	float_norm_test			(const char *filename) ;
 static	void	double_norm_test		(const char *filename) ;
+static	void	silent_scale_test		(const char *filename, int subformat) ;
 static	void	format_tests			(void) ;
 static	void	calc_peak_test			(int filetype, const char *filename, int channels) ;
 static	void	truncate_test			(const char *filename, int filetype) ;
@@ -51,6 +52,7 @@ static	void	instrument_test			(const char *filename, int filetype) ;
 static	void	cue_test				(const char *filename, int filetype) ;
 static	void	cue_test_var			(const char *filename, int filetype, int count) ;
 static	void	channel_map_test		(const char *filename, int filetype) ;
+static	void	second_fmt_chunk_test	(const char *filename, const unsigned char *data, unsigned int datalen) ;
 static	void	current_sf_info_test	(const char *filename) ;
 static	void	raw_needs_endswap_test	(const char *filename, int filetype) ;
 
@@ -62,6 +64,7 @@ static	void	broadcast_coding_history_size	(const char *filename) ;
 /* Cart Chunk tests */
 static void	cart_test				(const char *filename, int filetype) ;
 static void	cart_rdwr_test			(const char *filename, int filetype) ;
+static void	cart_no_tag_text_test	(const char *filename) ;
 
 /* Force the start of this buffer to be double aligned. Sparc-solaris will
 ** choke if its not.
@@ -70,6 +73,44 @@ static void	cart_rdwr_test			(const char *filename, int filetype) ;
 static	int		int_data	[BUFFER_LEN] ;
 static	float	float_data	[BUFFER_LEN] ;
 static	double	double_data	[BUFFER_LEN] ;
+
+/* RF64 file holding 'ds64', 'fmt ' (1 channel), 'PEAK', a second 'fmt '
+** claiming 64 channels, and 'data'.
+*/
+static const unsigned char rf64_two_fmt [] =
+{	0x52, 0x46, 0x36, 0x34, 0xff, 0xff, 0xff, 0xff, 0x57, 0x41, 0x56, 0x45,
+	0x64, 0x73, 0x36, 0x34, 0x1c, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
+	0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x66, 0x6d, 0x74, 0x20, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00,
+	0x40, 0x1f, 0x00, 0x00, 0x80, 0x3e, 0x00, 0x00, 0x02, 0x00, 0x10, 0x00,
+	0x50, 0x45, 0x41, 0x4b, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3f, 0x00, 0x00, 0x00, 0x00,
+	0x66, 0x6d, 0x74, 0x20, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x40, 0x00,
+	0x40, 0x1f, 0x00, 0x00, 0x00, 0xa0, 0x0f, 0x00, 0x80, 0x00, 0x10, 0x00,
+	0x64, 0x61, 0x74, 0x61, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	} ;
+
+/* W64 file holding a WAVE_FORMAT_EXTENSIBLE 'fmt ' (1 channel, so a channel
+** map is allocated), a second 'fmt ' claiming 64 channels, and 'data'.
+*/
+static const unsigned char w64_two_fmt [] =
+{	0x72, 0x69, 0x66, 0x66, 0x2e, 0x91, 0xcf, 0x11, 0xa5, 0xd6, 0x28, 0xdb,
+	0x04, 0xc1, 0x00, 0x00, 0xb0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x77, 0x61, 0x76, 0x65, 0xf3, 0xac, 0xd3, 0x11, 0x8c, 0xd1, 0x00, 0xc0,
+	0x4f, 0x8e, 0xdb, 0x8a, 0x66, 0x6d, 0x74, 0x20, 0xf3, 0xac, 0xd3, 0x11,
+	0x8c, 0xd1, 0x00, 0xc0, 0x4f, 0x8e, 0xdb, 0x8a, 0x40, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0xfe, 0xff, 0x01, 0x00, 0x40, 0x1f, 0x00, 0x00,
+	0x80, 0x3e, 0x00, 0x00, 0x02, 0x00, 0x10, 0x00, 0x16, 0x00, 0x10, 0x00,
+	0x04, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
+	0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71, 0x66, 0x6d, 0x74, 0x20,
+	0xf3, 0xac, 0xd3, 0x11, 0x8c, 0xd1, 0x00, 0xc0, 0x4f, 0x8e, 0xdb, 0x8a,
+	0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x40, 0x00,
+	0x40, 0x1f, 0x00, 0x00, 0x00, 0xa0, 0x0f, 0x00, 0x80, 0x00, 0x10, 0x00,
+	0x64, 0x61, 0x74, 0x61, 0xf3, 0xac, 0xd3, 0x11, 0x8c, 0xd1, 0x00, 0xc0,
+	0x4f, 0x8e, 0xdb, 0x8a, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	} ;
 
 int
 main (int argc, char *argv [])
@@ -117,6 +158,8 @@ main (int argc, char *argv [])
 		*/
 		float_norm_test		("cmd_float.wav") ;
 		double_norm_test	("cmd_double.wav") ;
+		silent_scale_test	("cmd_silent_float.wav", SF_FORMAT_FLOAT) ;
+		silent_scale_test	("cmd_silent_double.wav", SF_FORMAT_DOUBLE) ;
 		test_count ++ ;
 		} ;
 
@@ -184,6 +227,7 @@ main (int argc, char *argv [])
 		cart_rdwr_test ("cart.wav", SF_FORMAT_WAV | SF_FORMAT_PCM_16) ;
 		cart_test ("cart.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
 		cart_rdwr_test ("cart.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
+		cart_no_tag_text_test ("cart_no_tag_text.wav") ;
 		test_count ++ ;
 		} ;
 
@@ -198,6 +242,10 @@ main (int argc, char *argv [])
 		channel_map_test ("chanmap.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
 		channel_map_test ("chanmap.aifc" , SF_FORMAT_AIFF | SF_FORMAT_PCM_16) ;
 		channel_map_test ("chanmap.caf" , SF_FORMAT_CAF | SF_FORMAT_PCM_16) ;
+
+		second_fmt_chunk_test ("second_fmt.rf64", rf64_two_fmt, sizeof (rf64_two_fmt)) ;
+		second_fmt_chunk_test ("second_fmt.w64", w64_two_fmt, sizeof (w64_two_fmt)) ;
+
 		test_count ++ ;
 		} ;
 
@@ -455,6 +503,46 @@ double_norm_test (const char *filename)
 
 	printf ("ok\n") ;
 } /* double_norm_test */
+
+static void
+silent_scale_test (const char *filename, int subformat)
+{	SNDFILE			*file ;
+	SF_INFO			sfinfo ;
+	unsigned int	k ;
+
+	print_test_name ("silent_scale_test", filename) ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.format		= SF_FORMAT_WAV | subformat ;
+	sfinfo.channels		= 1 ;
+	sfinfo.frames		= BUFFER_LEN ;
+
+	memset (double_data, 0, sizeof (double_data)) ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	/*
+	**	The signal peak of a silent file is zero, and the int readers divide
+	**	by it. That gave INT_MIN for every sample, or SIGFPE with
+	**	FE_DIVBYZERO trapped (#1157).
+	*/
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	sf_command (file, SFC_SET_SCALE_FLOAT_INT_READ, NULL, SF_TRUE) ;
+	test_read_int_or_die (file, 0, int_data, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	for (k = 0 ; k < BUFFER_LEN ; k++)
+		if (int_data [k] != 0)
+		{	printf ("\n\nLine %d: int_data [%u] == %d, should be 0\n", __LINE__, k, int_data [k]) ;
+			exit (1) ;
+			} ;
+
+	unlink (filename) ;
+
+	printf ("ok\n") ;
+} /* silent_scale_test */
 
 static	void
 format_tests	(void)
@@ -1116,8 +1204,8 @@ broadcast_test (const char *filename, int filetype)
 	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
 	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
 	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (bc_write.origination_date, "2006/03/30", sizeof (bc_write.origination_date)) ;
+	memcpy (bc_write.origination_time, "20:27:00", sizeof (bc_write.origination_time)) ;
 	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
 	bc_write.coding_history_size = 0 ;
 
@@ -1164,12 +1252,12 @@ broadcast_test (const char *filename, int filetype)
 		} ;
 
 	if (memcmp (bc_write.origination_date, bc_read.origination_date, sizeof (bc_write.origination_date)) != 0)
-	{	printf ("\n\nLine %d : origination_date mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, bc_write.origination_date, bc_read.origination_date) ;
+	{	printf ("\n\nLine %d : origination_date mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (bc_write.origination_date), bc_write.origination_date, (int) sizeof (bc_read.origination_date), bc_read.origination_date) ;
 		errors ++ ;
 		} ;
 
 	if (memcmp (bc_write.origination_time, bc_read.origination_time, sizeof (bc_write.origination_time)) != 0)
-	{	printf ("\n\nLine %d : origination_time mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, bc_write.origination_time, bc_read.origination_time) ;
+	{	printf ("\n\nLine %d : origination_time mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (bc_write.origination_time), bc_write.origination_time, (int) sizeof (bc_read.origination_time), bc_read.origination_time) ;
 		errors ++ ;
 		} ;
 
@@ -1202,8 +1290,8 @@ broadcast_rdwr_test (const char *filename, int filetype)
 	snprintf (binfo.description, sizeof (binfo.description), "Test description") ;
 	snprintf (binfo.originator, sizeof (binfo.originator), "Test originator") ;
 	snprintf (binfo.originator_reference, sizeof (binfo.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (binfo.origination_date, sizeof (binfo.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (binfo.origination_time, sizeof (binfo.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (binfo.origination_date, "2006/03/30", sizeof (binfo.origination_date)) ;
+	memcpy (binfo.origination_time, "20:27:00", sizeof (binfo.origination_time)) ;
 	snprintf (binfo.umid, sizeof (binfo.umid), "Some umid") ;
 	binfo.coding_history_size = 0 ;
 
@@ -1239,8 +1327,8 @@ check_coding_history_newlines (const char *filename)
 	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
 	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
 	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (bc_write.origination_date, "2006/03/30", sizeof (bc_write.origination_date)) ;
+	memcpy (bc_write.origination_time, "20:27:00", sizeof (bc_write.origination_time)) ;
 	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
 	bc_write.coding_history_size = snprintf (bc_write.coding_history, sizeof (bc_write.coding_history), "This has\nUnix\nand\rMac OS9\rline endings.\nLast line") ; ;
 
@@ -1314,8 +1402,8 @@ broadcast_coding_history_test (const char *filename)
 	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
 	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
 	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (bc_write.origination_date, "2006/03/30", sizeof (bc_write.origination_date)) ;
+	memcpy (bc_write.origination_time, "20:27:00", sizeof (bc_write.origination_time)) ;
 	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
 	/* Coding history will be filled in by the library. */
 	bc_write.coding_history_size = 0 ;
@@ -1415,8 +1503,8 @@ broadcast_coding_history_size (const char *filename)
 	snprintf (bc_write.description, sizeof (bc_write.description), "Test description") ;
 	snprintf (bc_write.originator, sizeof (bc_write.originator), "Test originator") ;
 	snprintf (bc_write.originator_reference, sizeof (bc_write.originator_reference), "%08x-%08x", (unsigned int) time (NULL), (unsigned int) (~ time (NULL))) ;
-	snprintf (bc_write.origination_date, sizeof (bc_write.origination_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (bc_write.origination_time, sizeof (bc_write.origination_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (bc_write.origination_date, "2006/03/30", sizeof (bc_write.origination_date)) ;
+	memcpy (bc_write.origination_time, "20:27:00", sizeof (bc_write.origination_time)) ;
 	snprintf (bc_write.umid, sizeof (bc_write.umid), "Some umid") ;
 	bc_write.coding_history_size = 0 ;
 
@@ -1477,16 +1565,16 @@ cart_test (const char *filename, int filetype)
 
 	// example test data
 	snprintf (ca_write.artist, sizeof (ca_write.artist), "Test artist") ;
-	snprintf (ca_write.version, sizeof (ca_write.version), "Test version") ;
+	memcpy (ca_write.version, "0101", sizeof (ca_write.version)) ;
 	snprintf (ca_write.cut_id, sizeof (ca_write.cut_id), "Test cut ID") ;
 	snprintf (ca_write.client_id, sizeof (ca_write.client_id), "Test client ID") ;
 	snprintf (ca_write.category, sizeof (ca_write.category), "Test category") ;
 	snprintf (ca_write.classification, sizeof (ca_write.classification), "Test classification") ;
 	snprintf (ca_write.out_cue, sizeof (ca_write.out_cue), "Test out cue") ;
-	snprintf (ca_write.start_date, sizeof (ca_write.start_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (ca_write.start_time, sizeof (ca_write.start_time), "%02d:%02d:%02d", 20, 27, 0) ;
-	snprintf (ca_write.end_date, sizeof (ca_write.end_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (ca_write.end_time, sizeof (ca_write.end_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (ca_write.start_date, "2006/03/30", sizeof (ca_write.start_date)) ;
+	memcpy (ca_write.start_time, "20:27:00", sizeof (ca_write.start_time)) ;
+	memcpy (ca_write.end_date, "2006/03/30", sizeof (ca_write.end_date)) ;
+	memcpy (ca_write.end_time, "20:27:00", sizeof (ca_write.end_time)) ;
 	snprintf (ca_write.producer_app_id, sizeof (ca_write.producer_app_id), "Test producer app id") ;
 	snprintf (ca_write.producer_app_version, sizeof (ca_write.producer_app_version), "Test producer app version") ;
 	snprintf (ca_write.user_def, sizeof (ca_write.user_def), "test user def test test") ;
@@ -1520,7 +1608,7 @@ cart_test (const char *filename, int filetype)
 		} ;
 
 	if (memcmp (ca_write.version, ca_read.version, sizeof (ca_write.version)) != 0)
-	{	printf ("\n\nLine %d : version mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, ca_write.version, ca_read.version) ;
+	{	printf ("\n\nLine %d : version mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (ca_write.version), ca_write.version, (int) sizeof (ca_read.version), ca_read.version) ;
 		errors ++ ;
 		} ;
 
@@ -1550,25 +1638,25 @@ cart_test (const char *filename, int filetype)
 		} ;
 
 	if (memcmp (ca_write.start_date, ca_read.start_date, sizeof (ca_write.start_date)) != 0)
-	{	printf ("\n\nLine %d : start_date mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, ca_write.start_date, ca_read.start_date) ;
+	{	printf ("\n\nLine %d : start_date mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (ca_write.start_date), ca_write.start_date, (int) sizeof (ca_read.start_date), ca_read.start_date) ;
 		errors ++ ;
 		} ;
 
 
 	if (memcmp (ca_write.start_time, ca_read.start_time, sizeof (ca_write.start_time)) != 0)
-	{	printf ("\n\nLine %d : start_time mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, ca_write.start_time, ca_read.start_time) ;
+	{	printf ("\n\nLine %d : start_time mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (ca_write.start_time), ca_write.start_time, (int) sizeof (ca_read.start_time), ca_read.start_time) ;
 		errors ++ ;
 		} ;
 
 
 	if (memcmp (ca_write.end_date, ca_read.end_date, sizeof (ca_write.end_date)) != 0)
-	{	printf ("\n\nLine %d : end_date mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, ca_write.end_date, ca_read.end_date) ;
+	{	printf ("\n\nLine %d : end_date mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (ca_write.end_date), ca_write.end_date, (int) sizeof (ca_read.end_date), ca_read.end_date) ;
 		errors ++ ;
 		} ;
 
 
 	if (memcmp (ca_write.end_time, ca_read.end_time, sizeof (ca_write.end_time)) != 0)
-	{	printf ("\n\nLine %d : end_time mismatch :\n\twrite : '%s'\n\tread  : '%s'\n\n", __LINE__, ca_write.end_time, ca_read.end_time) ;
+	{	printf ("\n\nLine %d : end_time mismatch :\n\twrite : '%.*s'\n\tread  : '%.*s'\n\n", __LINE__, (int) sizeof (ca_write.end_time), ca_write.end_time, (int) sizeof (ca_read.end_time), ca_read.end_time) ;
 		errors ++ ;
 		} ;
 
@@ -1636,16 +1724,16 @@ cart_rdwr_test (const char *filename, int filetype)
 	memset (&cinfo, 0, sizeof (cinfo)) ;
 
 	snprintf (cinfo.artist, sizeof (cinfo.artist), "Test artist") ;
-	snprintf (cinfo.version, sizeof (cinfo.version), "Test version") ;
+	memcpy (cinfo.version, "0101", sizeof (cinfo.version)) ;
 	snprintf (cinfo.cut_id, sizeof (cinfo.cut_id), "Test cut ID") ;
 	snprintf (cinfo.client_id, sizeof (cinfo.client_id), "Test client ID") ;
 	snprintf (cinfo.category, sizeof (cinfo.category), "Test category") ;
 	snprintf (cinfo.classification, sizeof (cinfo.classification), "Test classification") ;
 	snprintf (cinfo.out_cue, sizeof (cinfo.out_cue), "Test out cue") ;
-	snprintf (cinfo.start_date, sizeof (cinfo.start_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (cinfo.start_time, sizeof (cinfo.start_time), "%02d:%02d:%02d", 20, 27, 0) ;
-	snprintf (cinfo.end_date, sizeof (cinfo.end_date), "%d/%02d/%02d", 2006, 3, 30) ;
-	snprintf (cinfo.end_time, sizeof (cinfo.end_time), "%02d:%02d:%02d", 20, 27, 0) ;
+	memcpy (cinfo.start_date, "2006/03/30", sizeof (cinfo.start_date)) ;
+	memcpy (cinfo.start_time, "20:27:00", sizeof (cinfo.start_time)) ;
+	memcpy (cinfo.end_date, "2006/03/30", sizeof (cinfo.end_date)) ;
+	memcpy (cinfo.end_time, "20:27:00", sizeof (cinfo.end_time)) ;
 	snprintf (cinfo.producer_app_id, sizeof (cinfo.producer_app_id), "Test producer app id") ;
 	snprintf (cinfo.producer_app_version, sizeof (cinfo.producer_app_version), "Test producer app version") ;
 	snprintf (cinfo.user_def, sizeof (cinfo.user_def), "test user def test test") ;
@@ -1669,6 +1757,51 @@ cart_rdwr_test (const char *filename, int filetype)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* cart_rdwr_test */
+
+static	void
+cart_no_tag_text_test (const char *filename)
+{	/* WAV file header up to and including the header of a 'cart' chunk which
+	** is exactly the 2048 bytes of the fixed fields, ie it has no tag text.
+	*/
+	static const unsigned char wav_head [] =
+	{	0x52, 0x49, 0x46, 0x46, 0x30, 0x08, 0x00, 0x00, 0x57, 0x41, 0x56, 0x45,
+		0x66, 0x6d, 0x74, 0x20, 0x10, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00,
+		0x40, 0x1f, 0x00, 0x00, 0x80, 0x3e, 0x00, 0x00, 0x02, 0x00, 0x10, 0x00,
+		0x63, 0x61, 0x72, 0x74, 0x00, 0x08, 0x00, 0x00,
+		} ;
+	static const unsigned char wav_data [] =
+	{	0x64, 0x61, 0x74, 0x61, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+		} ;
+	static unsigned char wav_file [sizeof (wav_head) + 2048 + sizeof (wav_data)] ;
+	static SF_CART_INFO cinfo ;
+	SNDFILE *file ;
+	SF_INFO sfinfo ;
+
+	print_test_name (__func__, filename) ;
+
+	memset (wav_file, 0, sizeof (wav_file)) ;
+	memcpy (wav_file, wav_head, sizeof (wav_head)) ;
+	memcpy (wav_file + sizeof (wav_head) + 2048, wav_data, sizeof (wav_data)) ;
+	dump_data_to_file (filename, wav_file, sizeof (wav_file)) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	memset (&cinfo, 0xff, sizeof (cinfo)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	exit_if_true (
+		sf_command (file, SFC_GET_CART_INFO, &cinfo, sizeof (cinfo)) != SF_TRUE,
+		"\n\nLine %d : sf_command (SFC_GET_CART_INFO) failed.\n\n", __LINE__
+		) ;
+	sf_close (file) ;
+
+	exit_if_true (
+		cinfo.tag_text_size != 0,
+		"\n\nLine %d : tag_text_size is %u, should be 0.\n\n", __LINE__, cinfo.tag_text_size
+		) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* cart_no_tag_text_test */
 
 /*==============================================================================
 */
@@ -1738,6 +1871,31 @@ channel_map_test (const char *filename, int filetype)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* channel_map_test */
+
+static	void
+second_fmt_chunk_test (const char *filename, const unsigned char *data, unsigned int datalen)
+{	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
+
+	print_test_name ("second_fmt_chunk_test", filename) ;
+
+	dump_data_to_file (filename, data, datalen) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+
+	/* peak_info and channel_map were sized from the first 'fmt ' chunk, so the
+	** channel count must still be the one it declared.
+	*/
+	exit_if_true (
+		sfinfo.channels != 1,
+		"\n\nLine %d : Channel count is %d, should be 1.\n\n", __LINE__, sfinfo.channels
+		) ;
+
+	sf_close (file) ;
+	unlink (filename) ;
+	puts ("ok") ;
+} /* second_fmt_chunk_test */
 
 static	void
 raw_needs_endswap_test (const char *filename, int filetype)

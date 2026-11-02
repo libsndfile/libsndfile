@@ -93,7 +93,7 @@ file_open_test (const char *filename)
 
 	unlink (psf->file.path) ;
 
-	/* Test file open in read/write mode for a non-existant file. */
+	/* Test file open in read/write mode for a non-existent file. */
 	psf->file.mode = SFM_RDWR ;
 	test_open_or_die (psf, __LINE__) ;
 

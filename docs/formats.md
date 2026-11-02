@@ -16,7 +16,7 @@ the left edge.
 | Signed 8 bit PCM   |               | R/W                     | R/W                      | R/W            | R/W                  | R/W                       | R/W             |          |              |                |                     |                     | R/W                       |                  |                  | R/W       | R/W                   | R/W                            |
 | Signed 16 bit PCM  | R/W           | R/W                     | R/W                      | R/W            | R/W                  | R/W                       | R/W             | R/W      | R/W          | R/W            | R/W                 | R/W                 | R/W                       |                  | R/W              | R/W       | R/W                   | R/W                            |
 | Signed 24 bit PCM  | R/W           | R/W                     | R/W                      | R/W            | R/W                  |                           | R/W             |          |              | R/W            |                     |                     |                           |                  |                  | R/W       | R/W                   | R/W                            |
-| Signed 32 bit PCM  | R/W           | R/W                     | R/W                      | R/W            |                      |                           | R/W             | R/W      |              | R/W            | R/W                 | R/W                 | R/W                       |                  |                  | R/W       |                       |                                |
+| Signed 32 bit PCM  | R/W           | R/W                     | R/W                      | R/W            |                      |                           | R/W             | R/W      |              | R/W            | R/W                 | R/W                 | R/W                       |                  |                  | R/W       |                       | R/W                            |
 | 32 bit float       | R/W           | R/W                     | R/W                      | R/W            |                      |                           |                 | R/W      |              | R/W            | R/W                 | R/W                 |                           |                  |                  | R/W       |                       |                                |
 | 64 bit double      | R/W           | R/W                     | R/W                      | R/W            |                      |                           |                 |          |              | R/W            | R/W                 | R/W                 |                           |                  |                  | R/W       |                       |                                |
 | u-law encoding     | R/W           | R/W                     | R/W                      | R/W            |                      |                           | R/W             | R/W      | R/W          | R/W            |                     |                     |                           |                  |                  | R/W       |                       |                                |
@@ -41,6 +41,8 @@ From version 1.0.29, libsndfile can read and write
 [Ogg/Opus](https://opus-codec.org/).
 
 From version 1.1.0, libsndfile can read and write MP3.
+
+32 bit PCM in FLAC requires libFLAC 1.4.0 or later.
 
 Some of the file formats I am also interested in adding are:
 

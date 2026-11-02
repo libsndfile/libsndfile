@@ -1,7 +1,7 @@
 # CMake implementation of AutoGen
 # Copyright (C) 2017 Anonymous Maarten <anonymous.maarten@gmail.com>
 
-set(AUTOGEN_SCRIPT "${CMAKE_MODULE_PATH}/CMakeAutoGenScript.cmake")
+set(AUTOGEN_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/CMakeAutoGenScript.cmake")
 
 function(lsf_autogen DIR_REL NAME_WE)
 	set(EXTS ${ARGN})

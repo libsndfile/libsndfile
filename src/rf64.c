@@ -55,6 +55,7 @@
 #define OggS_MARKER		MAKE_MARKER ('O', 'g', 'g', 'S')
 #define wvpk_MARKER		MAKE_MARKER ('w', 'v', 'p', 'k')
 #define LIST_MARKER		MAKE_MARKER ('L', 'I', 'S', 'T')
+#define iXML_MARKER		MAKE_MARKER ('i', 'X', 'M', 'L')
 
 /*
 ** The file size limit in bytes below which we can, if requested, write this
@@ -116,7 +117,7 @@ rf64_open (SF_PRIVATE *psf)
 	{	if (psf->is_pipe)
 			return SFE_NO_PIPE_WRITE ;
 
-		psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+		psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 		if ((error = rf64_write_header (psf, SF_FALSE)))
 			return error ;
@@ -257,6 +258,12 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 				break ;
 
 			case fmt_MARKER:
+					if (parsestage & HAVE_fmt)
+					{	psf_log_printf (psf, "*** Second 'fmt ' chunk?\n") ;
+						psf_binheader_readf (psf, "j", chunk_size) ;
+						break ;
+						} ;
+
 					psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
 					if ((error = wavlike_read_fmt_chunk (psf, chunk_size)) != 0)
 						return error ;
@@ -292,7 +299,8 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					psf_log_printf (psf, "%M : %u\n", marker, chunk_size) ;
 					if ((error = wavlike_read_peak_chunk (psf, chunk_size)) != 0)
 						return error ;
-					psf->peak_info->peak_loc = ((parsestage & HAVE_data) == 0) ? SF_PEAK_START : SF_PEAK_END ;
+					if (psf->peak_info != NULL)
+						psf->peak_info->peak_loc = ((parsestage & HAVE_data) == 0) ? SF_PEAK_START : SF_PEAK_END ;
 					break ;
 
 			case data_MARKER :
@@ -339,6 +347,7 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					} ;
 				break ;
 
+			case iXML_MARKER :
 			case JUNK_MARKER :
 			case PAD_MARKER :
 				psf_log_printf (psf, "%M : %d\n", marker, chunk_size) ;
@@ -545,7 +554,7 @@ rf64_write_fmt_chunk (SF_PRIVATE *psf)
 			/* fmt : format, channels, samplerate */
 			psf_binheader_writef (psf, "4224", BHW4 (fmt_size), BHW2 (WAVE_FORMAT_EXTENSIBLE), BHW2 (psf->sf.channels), BHW4 (psf->sf.samplerate)) ;
 			/*  fmt : bytespersec */
-			psf_binheader_writef (psf, "4", BHW4 (psf->sf.samplerate * psf->bytewidth * psf->sf.channels)) ;
+			psf_binheader_writef (psf, "4", BHW4 ((sf_count_t) psf->sf.samplerate * psf->bytewidth * psf->sf.channels)) ;
 			/*  fmt : blockalign, bitwidth */
 			psf_binheader_writef (psf, "22", BHW2 (psf->bytewidth * psf->sf.channels), BHW2 (psf->bytewidth * 8)) ;
 
@@ -655,7 +664,7 @@ rf64_write_header (SF_PRIVATE *psf, int calc_length)
 			psf->datalength -= psf->filelength - psf->dataend ;
 
 		if (psf->bytewidth > 0)
-			psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
+			psf->sf.frames = psf->datalength / ((sf_count_t) psf->bytewidth * psf->sf.channels) ;
 		} ;
 
 	/* Reset the current header length to zero. */

@@ -86,8 +86,8 @@ unmix16 (const int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t
 		/* Conventional separated stereo. */
 		for (j = 0 ; j < numSamples ; j++)
 		{
-			out [0] = u [j] << 16 ;
-			out [1] = v [j] << 16 ;
+			out [0] = arith_shift_left (u [j], 16) ;
+			out [1] = arith_shift_left (v [j], 16) ;
 			out += stride ;
 		}
 	}
@@ -164,8 +164,8 @@ unmix24 (const int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t
 				l = u [j] + v [j] - ((mixres * v [j]) >> mixbits) ;
 				r = l - v [j] ;
 
-				out [0] = l << 8 ;
-				out [1] = r << 8 ;
+				out [0] = arith_shift_left (l, 8) ;
+				out [1] = arith_shift_left (r, 8) ;
 				out += stride ;
 			}
 		}
@@ -180,11 +180,11 @@ unmix24 (const int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t
 				l = u [j] ;
 				r = v [j] ;
 
-				l = (l << shift) | (uint32_t) shiftUV [k + 0] ;
-				r = (r << shift) | (uint32_t) shiftUV [k + 1] ;
+				l = arith_shift_left (l, shift) | (uint32_t) shiftUV [k + 0] ;
+				r = arith_shift_left (r, shift) | (uint32_t) shiftUV [k + 1] ;
 
-				out [0] = l << 8 ;
-				out [1] = r << 8 ;
+				out [0] = arith_shift_left (l, 8) ;
+				out [1] = arith_shift_left (r, 8) ;
 				out += stride ;
 			}
 		}
@@ -192,8 +192,8 @@ unmix24 (const int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t
 		{
 			for (j = 0 ; j < numSamples ; j++)
 			{
-				out [0] = u [j] << 8 ;
-				out [1] = v [j] << 8 ;
+				out [0] = arith_shift_left (u [j], 8) ;
+				out [1] = arith_shift_left (v [j], 8) ;
 				out += stride ;
 			}
 		}
@@ -250,8 +250,8 @@ unmix32 (const int32_t * u, int32_t * v, int32_t * out, uint32_t stride, int32_t
 			/* interleaving with shift */
 			for (j = 0, k = 0 ; j < numSamples ; j++, k += 2)
 			{
-				out [0] = (u [j] << shift) | (uint32_t) shiftUV [k + 0] ;
-				out [1] = (v [j] << shift) | (uint32_t) shiftUV [k + 1] ;
+				out [0] = arith_shift_left (u [j], shift) | (uint32_t) shiftUV [k + 0] ;
+				out [1] = arith_shift_left (v [j], shift) | (uint32_t) shiftUV [k + 1] ;
 				out += stride ;
 			}
 		}
@@ -267,7 +267,7 @@ copyPredictorTo24 (const int32_t * in, int32_t * out, uint32_t stride, int32_t n
 
 	for (j = 0 ; j < numSamples ; j++)
 	{
-		out [0] = in [j] << 8 ;
+		out [0] = arith_shift_left (in [j], 8) ;
 		out += stride ;
 	}
 }

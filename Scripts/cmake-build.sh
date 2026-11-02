@@ -1,4 +1,6 @@
-#!/bin/bash -eu
+#!/usr/bin/env sh
+
+set -eu
 
 rm -rf CMakeCache.txt CMakeFiles/ _Build
 

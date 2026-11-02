@@ -284,6 +284,7 @@ main (int argc, char * argv [])
 
 	if ((sfinfo.format = sfe_file_type_of_ext (outfilename, sfinfo.format)) == 0)
 	{	printf ("Error : Not able to determine output file type for %s.\n", outfilename) ;
+	 	sf_close (infile) ;
 		return 1 ;
 		} ;
 
@@ -327,6 +328,7 @@ main (int argc, char * argv [])
 	/* Open the output file. */
 	if ((outfile = sf_open (outfilename, SFM_WRITE, &sfinfo)) == NULL)
 	{	printf ("Not able to open output file %s : %s\n", outfilename, sf_strerror (NULL)) ;
+	 	sf_close (infile) ;
 		return 1 ;
 		} ;
 
@@ -343,6 +345,8 @@ main (int argc, char * argv [])
 			|| (infileminor == SF_FORMAT_MPEG_LAYER_III) || (outfileminor == SF_FORMAT_MPEG_LAYER_III))
 	{	if (sfe_copy_data_fp (outfile, infile, sfinfo.channels, normalize) != 0)
 		{	printf ("Error : Not able to decode input file %s.\n", infilename) ;
+		 	sf_close (infile) ;
+		 	sf_close (outfile) ;
 			return 1 ;
 			} ;
 		}

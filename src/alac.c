@@ -223,7 +223,7 @@ alac_close	(SF_PRIVATE *psf)
 static int
 alac_byterate	(SF_PRIVATE *psf)
 {
-	if (psf->file.mode == SFM_READ)
+	if (psf->file.mode == SFM_READ && psf->sf.frames > 0)
 		return (psf->datalength * psf->sf.samplerate) / psf->sf.frames ;
 
 	return -1 ;
@@ -405,6 +405,7 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 {	ALAC_DECODER *pdec = &plac->u.decoder ;
 	uint32_t	packet_size ;
 	BitBuffer	bit_buffer ;
+	int32_t		error ;
 
 	packet_size = alac_reader_next_packet_size (plac->pakt_info) ;
 	if (packet_size == 0)
@@ -427,7 +428,11 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 
 	plac->input_data_pos += packet_size ;
 	plac->frames_this_block = 0 ;
-	alac_decode (pdec, &bit_buffer, plac->buffer, plac->frames_per_block, &plac->frames_this_block) ;
+	if ((error = alac_decode (pdec, &bit_buffer, plac->buffer, plac->frames_per_block, &plac->frames_this_block)) != ALAC_noErr)
+	{	psf_log_printf (psf, "*** alac_decode() returned %s. ***\n", alac_error_string (error)) ;
+		plac->frames_this_block = 0 ;
+		return 0 ;
+		} ;
 
 	plac->partial_block_frames = 0 ;
 
@@ -438,14 +443,16 @@ alac_decode_block (SF_PRIVATE *psf, ALAC_PRIVATE *plac)
 static int
 alac_encode_block (ALAC_PRIVATE *plac)
 {	ALAC_ENCODER *penc = &plac->u.encoder ;
+	PAKT_INFO *info ;
 	uint32_t num_bytes = 0 ;
 
 	alac_encode (penc, plac->partial_block_frames, plac->buffer, plac->byte_buffer, &num_bytes) ;
 
 	if (fwrite (plac->byte_buffer, 1, num_bytes, plac->enctmp) != num_bytes)
 		return 0 ;
-	if ((plac->pakt_info = alac_pakt_append (plac->pakt_info, num_bytes)) == NULL)
+	if ((info = alac_pakt_append (plac->pakt_info, num_bytes)) == NULL)
 		return 0 ;
+	plac->pakt_info = info ;
 
 	plac->partial_block_frames = 0 ;
 
@@ -803,7 +810,7 @@ alac_pakt_append (PAKT_INFO * info, uint32_t value)
 static PAKT_INFO *
 alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 {	SF_CHUNK_INFO chunk_info ;
-	PAKT_INFO * info = NULL ;
+	PAKT_INFO * info = NULL, * temp ;
 	uint8_t *pakt_data = NULL ;
 	uint32_t bcount, value = 1, pakt_size ;
 	SF_CHUNK_ITERATOR * chunk_iterator ;
@@ -823,6 +830,8 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 	psf->get_chunk_size (psf, chunk_iterator, &chunk_info) ;
 
 	pakt_size = chunk_info.datalen ;
+	if (pakt_size > UINT32_MAX-5 )
+		return NULL;
 	chunk_info.data = pakt_data = malloc (pakt_size + 5) ;
 	if (!chunk_info.data)
 		return NULL ;
@@ -861,8 +870,9 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 
 		bcount += count ;
 
-		if ((info = alac_pakt_append (info, value)) == NULL)
+		if ((temp = alac_pakt_append (info, value)) == NULL)
 			goto FreeExit ;
+		info = temp ;
 		} ;
 
 	free (pakt_data) ;

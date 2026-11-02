@@ -138,7 +138,7 @@ caf_open (SF_PRIVATE *psf)
 		if (format != SF_FORMAT_CAF)
 			return	SFE_BAD_OPEN_FORMAT ;
 
-		psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+		psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 		if (psf->file.mode != SFM_RDWR || psf->filelength < 44)
 		{	psf->filelength = 0 ;
@@ -600,7 +600,7 @@ caf_write_header (SF_PRIVATE *psf, int calc_length)
 			psf->datalength -= psf->filelength - psf->dataend ;
 
 		if (psf->bytewidth > 0)
-			psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
+			psf->sf.frames = psf->datalength / ((sf_count_t) psf->bytewidth * psf->sf.channels) ;
 		} ;
 
 	/* Reset the current header length to zero. */
@@ -811,14 +811,20 @@ caf_read_chanmap (SF_PRIVATE * psf, sf_count_t chunk_size)
 		psf_binheader_readf (psf, "j", chunk_size - bytesread) ;
 
 	if (map_info && map_info->channel_map != NULL)
-	{	size_t chanmap_size = SF_MIN (psf->sf.channels, layout_tag & 0xff) * sizeof (psf->channel_map [0]) ;
+	{	/* The channel map buffer must hold psf->sf.channels entries, because that
+		** is how many SFC_GET_CHANNEL_MAP_INFO and the channel-layout matcher read
+		** back. The layout tag may describe fewer channels than the file declares,
+		** so size the allocation by the channel count and copy only the smaller of
+		** the two to avoid a heap over-read. */
+		size_t chanmap_size = (size_t) psf->sf.channels * sizeof (psf->channel_map [0]) ;
+		size_t copy_size = SF_MIN (psf->sf.channels, layout_tag & 0xff) * sizeof (psf->channel_map [0]) ;
 
 		free (psf->channel_map) ;
 
-		if ((psf->channel_map = malloc (chanmap_size)) == NULL)
+		if ((psf->channel_map = calloc (1, chanmap_size)) == NULL)
 			return SFE_MALLOC_FAILED ;
 
-		memcpy (psf->channel_map, map_info->channel_map, chanmap_size) ;
+		memcpy (psf->channel_map, map_info->channel_map, copy_size) ;
 		} ;
 
 	return 0 ;

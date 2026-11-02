@@ -57,6 +57,7 @@ static	void	sdlcomp_test_float	(const char *filename, int filetype, int chan, do
 static	void	sdlcomp_test_double	(const char *filename, int filetype, int chan, double margin) ;
 
 static void		read_raw_test (const char *filename, int filetype, int chan) ;
+static void		write_seek_test (const char *filename, int filetype, int chan) ;
 
 static	int		error_function (double data, double orig, double margin) ;
 static	int		decay_response (int k) ;
@@ -456,10 +457,18 @@ main (int argc, char *argv [])
 	if (do_all || strcmp (argv [1], "ogg_vorbis") == 0)
 	{	if (HAVE_EXTERNAL_XIPH_LIBS)
 		{	/* Don't do lcomp_test_XXX as the errors are too big. */
+#if defined (_MSC_VER) && defined (_WIN64)
+			/* VS x64 produces slightly larger numeric drift for Vorbis. */
+			sdlcomp_test_short	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.50) ;
+			sdlcomp_test_int	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.50) ;
+			sdlcomp_test_float	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.50) ;
+			sdlcomp_test_double	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.50) ;
+#else
 			sdlcomp_test_short	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
 			sdlcomp_test_int	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
 			sdlcomp_test_float	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
 			sdlcomp_test_double	("vorbis.oga", SF_FORMAT_OGG | SF_FORMAT_VORBIS, 1, 0.30) ;
+#endif
 			}
 		else
 			puts ("    No Ogg/Vorbis tests because Ogg/Vorbis support was not compiled in.") ;
@@ -469,11 +478,14 @@ main (int argc, char *argv [])
 
 	if (do_all || strcmp (argv [1], "ogg_opus") == 0)
 	{	if (HAVE_EXTERNAL_XIPH_LIBS)
-		{	/* Don't do lcomp_test_XXX as the errors are too big. */
-			sdlcomp_test_short	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.57) ;
-			sdlcomp_test_int	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.54) ;
-			sdlcomp_test_float	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.55) ;
-			sdlcomp_test_double	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.55) ;
+		{	/* Don't do lcomp_test_XXX as the errors are too big.
+			** The margins track libopus output, which drifts between releases
+			** and compilers: libopus 1.6.1 with GCC 16 peaks at 0.74.
+			*/
+			sdlcomp_test_short	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
+			sdlcomp_test_int	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
+			sdlcomp_test_float	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
+			sdlcomp_test_double	("opus.opus", SF_FORMAT_OGG | SF_FORMAT_OPUS, 1, 0.80) ;
 			}
 		else
 			puts ("    No Ogg/Opus tests because Ogg/Opus support was not compiled in.") ;
@@ -630,6 +642,15 @@ main (int argc, char *argv [])
 		test_count++ ;
 		} ;
 	/* Lite remove end */
+
+	if (do_all || strcmp (argv [1], "ima_seek") == 0)
+	{	write_seek_test ("ima_seek.wav", SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 2) ;
+		write_seek_test ("ima_seek.aiff", SF_FORMAT_AIFF | SF_FORMAT_IMA_ADPCM, 2) ;
+		/* Lite remove start */
+		write_seek_test ("ima_seek.w64", SF_FORMAT_W64 | SF_FORMAT_IMA_ADPCM, 2) ;
+		/* Lite remove end */
+		test_count++ ;
+		} ;
 
 	if (test_count == 0)
 	{	printf ("************************************\n") ;
@@ -2426,6 +2447,69 @@ read_raw_test (const char *filename, int filetype, int channels)
 	unlink (filename) ;
 	printf ("ok\n") ;
 } /* read_raw_test */
+
+/*
+**	A seek to the start of a file open for writing cannot be honoured by the
+**	block based codecs, so it has to fail. Having failed, it must leave the
+**	file alone: a caller that checks the return value and keeps writing should
+**	end up with every frame it wrote, not a file truncated back to the seek.
+*/
+
+static void
+write_seek_test (const char *filename, int filetype, int channels)
+{	SNDFILE		*file ;
+	SF_INFO		sfinfo ;
+	sf_count_t	datalen, seekpos ;
+	short		*orig ;
+	int			k ;
+
+	get_unique_test_name (&filename, LCT_TEST_PREFIX) ;
+	print_test_name ("write_seek_test", filename) ;
+
+	datalen = ARRAY_LEN (orig_buffer.s) / 2 ;
+
+	orig = orig_buffer.s ;
+	gen_signal_double (orig_buffer.d, 32000.0, channels, (int) datalen) ;
+	for (k = 0 ; k < datalen ; k++)
+		orig [k] = (short) lrint (orig_buffer.d [k]) ;
+
+	sfinfo.samplerate	= SAMPLE_RATE ;
+	sfinfo.frames		= 0 ;
+	sfinfo.channels		= channels ;
+	sfinfo.format		= filetype ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+
+	test_write_short_or_die (file, 0, orig, datalen / 2, __LINE__) ;
+
+	if ((seekpos = sf_seek (file, 0, SEEK_SET)) != -1)
+	{	printf ("\n\nLine %d : sf_seek on a file open for write returned %" PRId64 ", should be -1.\n", __LINE__, seekpos) ;
+		exit (1) ;
+		} ;
+
+	if (sf_error (file) == SF_ERR_NO_ERROR)
+	{	printf ("\n\nLine %d : sf_seek failed but sf_error returns SF_ERR_NO_ERROR.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	/* The failed seek must not have moved the write position. */
+	test_write_short_or_die (file, 0, orig + datalen / 2, datalen / 2, __LINE__) ;
+	sf_close (file) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+
+	if (sfinfo.frames < datalen / channels)
+	{	printf ("\n\nLine %d : file has %" PRId64 " frames, should have at least %" PRId64 " - the failed seek truncated it.\n",
+			__LINE__, sfinfo.frames, datalen / channels) ;
+		exit (1) ;
+		} ;
+
+	sf_close (file) ;
+
+	unlink (filename) ;
+	printf ("ok\n") ;
+} /* write_seek_test */
 
 /*========================================================================================
 **	Auxiliary functions

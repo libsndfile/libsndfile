@@ -160,7 +160,7 @@ vorbis_log_error(SF_PRIVATE *psf, int error) {
 		case OV_EINVAL:
 		default: psf->error = SFE_INTERNAL ;
 		} ;
-} ;
+} /* vorbis_log_error */
 
 static int
 vorbis_read_header (SF_PRIVATE *psf)
@@ -466,6 +466,8 @@ ogg_vorbis_open (SF_PRIVATE *psf)
 	if (psf->file.mode == SFM_RDWR)
 		return SFE_BAD_MODE_RW ;
 
+	psf->codec_close = vorbis_close ;
+
 	psf_log_printf (psf, "Vorbis library version : %s\n", vorbis_version_string ()) ;
 
 	if (psf->file.mode == SFM_READ)
@@ -478,7 +480,6 @@ ogg_vorbis_open (SF_PRIVATE *psf)
 		psf->read_double	= vorbis_read_d ;
 		} ;
 
-	psf->codec_close = vorbis_close ;
 	if (psf->file.mode == SFM_WRITE)
 	{
 		/* Set the default vorbis quality here. */
@@ -978,7 +979,7 @@ vorbis_seek (SF_PRIVATE *psf, int UNUSED (mode), sf_count_t offset)
 static int
 vorbis_byterate (SF_PRIVATE *psf)
 {
-	if (psf->file.mode == SFM_READ)
+	if (psf->file.mode == SFM_READ && psf->sf.frames > 0)
 		return (psf->datalength * psf->sf.samplerate) / psf->sf.frames ;
 
 	return -1 ;

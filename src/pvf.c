@@ -72,7 +72,7 @@ pvf_open	(SF_PRIVATE *psf)
 
 	psf->container_close = pvf_close ;
 
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 	switch (subformat)
 	{	case SF_FORMAT_PCM_S8 :	/* 8-bit linear PCM. */
@@ -179,7 +179,7 @@ pvf_read_header (SF_PRIVATE *psf)
 	psf->endian = SF_ENDIAN_BIG ;
 
 	psf->datalength = psf->filelength - psf->dataoffset ;
-	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
+	psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 
 	if (! psf->sf.frames && psf->blockwidth)
 		psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;

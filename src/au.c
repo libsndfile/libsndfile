@@ -131,7 +131,7 @@ au_open	(SF_PRIVATE *psf)
 
 	psf->container_close = au_close ;
 
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 	switch (subformat)
 	{	case SF_FORMAT_ULAW :	/* 8-bit Ulaw encoding. */
@@ -446,7 +446,7 @@ au_read_header (SF_PRIVATE *psf)
 
 	psf_log_printf (psf, "  Channels    : %d\n", au_fmt.channels) ;
 
-	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
+	psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 
 	if (! psf->sf.frames && psf->blockwidth)
 		psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;

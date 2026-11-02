@@ -126,7 +126,7 @@ voc_open	(SF_PRIVATE *psf)
 		psf->write_header = voc_write_header ;
 		} ;
 
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 	psf->container_close = voc_close ;
 
@@ -353,6 +353,16 @@ voc_read_header	(SF_PRIVATE *psf)
 								"  bit width   : %d\n"
 								"  channels    : %d\n", psf->sf.samplerate, bitwidth, channels) ;
 
+		/*
+		**	Unlike the other blocks, this one carries the sample rate as it
+		**	stands instead of a constant to derive it from, so it is the one
+		**	place a file can hand us a rate the header writer would divide by.
+		*/
+		if (psf->sf.samplerate < 1)
+		{	psf_log_printf (psf, "*** Sample rate should be > 0.\n") ;
+			return SFE_MALFORMED_FILE ;
+			} ;
+
 		if (bitwidth == 16 && encoding == 0)
 		{	encoding = 4 ;
 			psf_log_printf (psf, "  encoding    : 0 (SoX bug: should be 4 for 16 bit signed PCM)\n") ;
@@ -431,7 +441,7 @@ voc_write_header (SF_PRIVATE *psf, int calc_length)
 		if (psf->dataend)
 			psf->datalength -= psf->filelength - psf->dataend ;
 
-		psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
+		psf->sf.frames = psf->datalength / ((sf_count_t) psf->bytewidth * psf->sf.channels) ;
 		} ;
 
 	subformat = SF_CODEC (psf->sf.format) ;

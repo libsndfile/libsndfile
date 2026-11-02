@@ -80,7 +80,7 @@ mpc2k_open	(SF_PRIVATE *psf)
 
 	psf->container_close = mpc2k_close ;
 
-	psf->blockwidth = psf->bytewidth * psf->sf.channels ;
+	psf->blockwidth = (sf_count_t) psf->bytewidth * psf->sf.channels ;
 
 	error = pcm_init (psf) ;
 
@@ -115,7 +115,7 @@ mpc2k_write_header (SF_PRIVATE *psf, int calc_length)
 		psf->dataoffset = HEADER_LENGTH ;
 		psf->datalength = psf->filelength - psf->dataoffset ;
 
-		psf->sf.frames = psf->datalength / (psf->bytewidth * psf->sf.channels) ;
+		psf->sf.frames = psf->datalength / ((sf_count_t) psf->bytewidth * psf->sf.channels) ;
 		} ;
 
 	/* Reset the current header length to zero. */
@@ -192,7 +192,7 @@ mpc2k_read_header (SF_PRIVATE *psf)
 	psf->endian = SF_ENDIAN_LITTLE ;
 
 	psf->datalength = psf->filelength - psf->dataoffset ;
-	psf->blockwidth = psf->sf.channels * psf->bytewidth ;
+	psf->blockwidth = (sf_count_t) psf->sf.channels * psf->bytewidth ;
 	psf->sf.frames = psf->datalength / psf->blockwidth ;
 
 	psf->sf.frames = (psf->filelength - psf->dataoffset) / psf->blockwidth ;
