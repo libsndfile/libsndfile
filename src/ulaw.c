@@ -24,6 +24,10 @@
 #include	"sndfile.h"
 #include	"common.h"
 
+#if defined(__ARM_FEATURE_SVE2)
+#include <arm_sve.h>
+#endif
+
 static sf_count_t ulaw_read_ulaw2s (SF_PRIVATE *psf, short *ptr, sf_count_t len) ;
 static sf_count_t ulaw_read_ulaw2i (SF_PRIVATE *psf, int *ptr, sf_count_t len) ;
 static sf_count_t ulaw_read_ulaw2f (SF_PRIVATE *psf, float *ptr, sf_count_t len) ;
@@ -799,14 +803,59 @@ ulaw2s_array (unsigned char *buffer, int count, short *ptr)
 
 static inline void
 ulaw2i_array (unsigned char *buffer, int count, int *ptr)
-{	for (int i = 0 ; i < count ; i++)
+{	
+#if defined(__ARM_FEATURE_SVE2)
+	int	i = 0 ;
+	int	vl8 = (int) svcntw () ;
+	svbool_t pgb  = svptrue_b8 () ;
+	svbool_t pg16 = svptrue_b16 () ;
+	svbool_t pg32 = svptrue_b32 () ;
+
+	ulaw_prep32 () ;
+
+	for ( ; i + vl8 <= count ; i += vl8)
+	{	
+		svuint8_t  b   = svld1_u8 (pgb, buffer + i) ;
+		svuint16_t w   = svunpklo_u16 (b) ;
+		svuint32_t idx = svunpklo_u32 (w) ;
+		svint32_t  d   = svld1_gather_u32index_s32 (pg32, ulaw_dec32, idx) ;
+		svst1_s32 (pg32, ptr + i, svlsl_n_s32_x (pg32, d, 16)) ;
+	} ;
+	for ( ; i < count ; i++)
 		ptr [i] = ((uint32_t) ulaw_decode [buffer [i]]) << 16 ;
+#else
+	for (int i = 0 ; i < count ; i++)
+		ptr [i] = ((uint32_t) ulaw_decode [buffer [i]]) << 16 ;
+#endif
 } /* ulaw2i_array */
 
 static inline void
 ulaw2f_array (unsigned char *buffer, int count, float *ptr, float normfact)
-{	for (int i = 0 ; i < count ; i++)
+{	
+#if defined(__ARM_FEATURE_SVE2)
+	int	i = 0 ;
+	int	vl8 = (int) svcntw () ;
+	svfloat32_t nf = svdup_f32 (normfact) ;
+	svbool_t pgb  = svptrue_b8 () ;
+	svbool_t pg16 = svptrue_b16 () ;
+	svbool_t pg32 = svptrue_b32 () ;
+
+	ulaw_prep32 () ;
+
+	for ( ; i + vl8 <= count ; i += vl8)
+	{	svuint8_t  b   = svld1_u8 (pgb, buffer + i) ;
+		svuint16_t w   = svunpklo_u16 (b) ;
+		svuint32_t idx = svunpklo_u32 (w) ;
+		svint32_t  d   = svld1_gather_u32index_s32 (pg32, ulaw_dec32, idx) ;
+		svfloat32_t f  = svmul_f32_x (pg32, svcvt_f32_s32_x (pg32, d), nf) ;
+		svst1_f32 (pg32, ptr + i, f) ;
+	} ;
+	for ( ; i < count ; i++)
 		ptr [i] = normfact * ulaw_decode [(int) buffer [i]] ;
+#else
+	for (int i = 0 ; i < count ; i++)
+		ptr [i] = normfact * ulaw_decode [(int) buffer [i]] ;
+#endif
 } /* ulaw2f_array */
 
 static inline void
