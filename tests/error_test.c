@@ -220,6 +220,46 @@ wav_list_recover_test (const char * filename)
 } /* wav_list_recover_test */
 
 static void
+wav_list_huge_subchunk_test (const char * filename)
+{	SNDFILE		*sndfile ;
+	SF_INFO		sfinfo ;
+
+	FILE		*file ;
+	const char	data [] =
+		"RIFF" "H\000\000\000"
+		"WAVE" "fmt " "\020\000\000\000" "\001\000\001\000D\254\000\000\210X\001\000\002\000\020\000"
+		"LIST" "\030\000\000\000" "INFO" "abcd" "\370\377\377\377" "123456789012" /* abcd size 0xfffffff8 */
+		"data" "\004\000\000\000" "abcd" ;
+
+	print_test_name (__func__, filename) ;
+
+	if ((file = fopen (filename, "wb")) == NULL)
+	{	printf ("\n\nLine %d : fopen returned NULL.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	exit_if_true (fwrite (data, sizeof (data) - 1, 1, file) != 1, "\n\nLine %d : fwrite failed.\n", __LINE__) ;
+	fclose (file) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sndfile = sf_open (filename, SFM_READ, &sfinfo) ;
+
+	if (!sndfile)
+	{	printf ("\n\nLine %d : expected recovery from oversized LIST sub-chunk.\n", __LINE__) ;
+		exit (1) ;
+		} ;
+
+	if (sfinfo.frames != 2)
+	{	printf ("\n\nLine %d : Should have read data chunk with 2 stereo frames, got %ld.\n\n", __LINE__, (long)sfinfo.frames) ;
+		exit (1) ;
+		} ;
+
+	sf_close (sndfile) ;
+	unlink (filename) ;
+	puts ("ok") ;
+} /* wav_list_huge_subchunk_test */
+
+static void
 error_close_test (void)
 {	static short buffer [SHORT_BUFFER] ;
 	const char	*filename = "error_close.wav" ;
@@ -722,6 +762,7 @@ main (void)
 	zero_length_test ("zero_length.wav") ;
 	bad_wav_test ("bad_wav.wav") ;
 	wav_list_recover_test ("list_recover.wav") ;
+	wav_list_huge_subchunk_test ("list_huge_subchunk.wav") ;
 
 	unrecognised_test () ;
 
