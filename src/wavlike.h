@@ -55,6 +55,8 @@
 #define IAUT_MARKER		MAKE_MARKER ('I', 'A', 'U', 'T')
 #define ITRK_MARKER		MAKE_MARKER ('I', 'T', 'R', 'K')
 
+#define PRT1_MARKER		MAKE_MARKER ('P', 'R', 'T', '1')
+
 #define exif_MARKER		MAKE_MARKER ('e', 'x', 'i', 'f')
 #define ever_MARKER		MAKE_MARKER ('e', 'v', 'e', 'r')
 #define etim_MARKER		MAKE_MARKER ('e', 't', 'i', 'm')

@@ -53,6 +53,7 @@ typedef struct
 static int mpeg_l3_encoder_close (SF_PRIVATE *psf) ;
 static int mpeg_l3_encoder_construct (SF_PRIVATE *psf) ;
 static int mpeg_l3_encoder_byterate (SF_PRIVATE *psf) ;
+static int mpeg_l3_encoder_add_id3v2_tag (SF_PRIVATE *psf, const char *key_id, const char *value) ;
 
 static sf_count_t mpeg_l3_encode_write_short_stereo (SF_PRIVATE *psf, const short *ptr, sf_count_t len) ;
 static sf_count_t mpeg_l3_encode_write_int_stereo (SF_PRIVATE *psf, const int *ptr, sf_count_t len) ;
@@ -141,33 +142,62 @@ mpeg_l3_encoder_write_id3tag (SF_PRIVATE *psf)
 	id3tag_init (pmpeg->lamef) ;
 
 	for (i = 0 ; i < SF_MAX_STRINGS ; i++)
-	{	switch (psf->strings.data [i].type)
+	{	const char *value = psf->strings.storage + psf->strings.data [i].offset ;
+		switch (psf->strings.data [i].type)
 		{	case SF_STR_TITLE :
-				id3tag_set_title (pmpeg->lamef, psf->strings.storage + psf->strings.data [i].offset) ;
+				id3tag_set_title (pmpeg->lamef, value) ;
+				break ;
+
+			case SF_STR_COPYRIGHT :
+				mpeg_l3_encoder_add_id3v2_tag (psf, "TCOP", value) ;
+				break ;
+
+			case SF_STR_SOFTWARE :
+				mpeg_l3_encoder_add_id3v2_tag (psf, "TENC", value) ;
 				break ;
 
 			case SF_STR_ARTIST :
-				id3tag_set_artist (pmpeg->lamef, psf->strings.storage + psf->strings.data [i].offset) ;
+				id3tag_set_artist (pmpeg->lamef, value) ;
 				break ;
 
 			case SF_STR_ALBUM :
-				id3tag_set_album (pmpeg->lamef, psf->strings.storage + psf->strings.data [i].offset) ;
+				id3tag_set_album (pmpeg->lamef, value) ;
 				break ;
 
 			case SF_STR_DATE :
-				id3tag_set_year (pmpeg->lamef, psf->strings.storage + psf->strings.data [i].offset) ;
+				id3tag_set_year (pmpeg->lamef, value) ;
 				break ;
 
 			case SF_STR_COMMENT :
-				id3tag_set_comment (pmpeg->lamef, psf->strings.storage + psf->strings.data [i].offset) ;
+				id3tag_set_comment (pmpeg->lamef, value) ;
 				break ;
 
 			case SF_STR_GENRE :
-				id3tag_set_genre (pmpeg->lamef, psf->strings.storage + psf->strings.data [i].offset) ;
+				id3tag_set_genre (pmpeg->lamef, value) ;
 				break ;
 
 			case SF_STR_TRACKNUMBER :
-				id3tag_set_track (pmpeg->lamef, psf->strings.storage + psf->strings.data [i].offset) ;
+				id3tag_set_track (pmpeg->lamef, value) ;
+				break ;
+
+			case SF_STR_DISCNUMBER :
+				mpeg_l3_encoder_add_id3v2_tag (psf, "TPOS", value) ;
+				break ;
+
+			case SF_STR_ALBUMARTIST :
+				mpeg_l3_encoder_add_id3v2_tag (psf, "TPE2", value) ;
+				break ;
+
+			case SF_STR_PERFORMER :
+				mpeg_l3_encoder_add_id3v2_tag (psf, "TPLS", value) ;
+				break ;
+
+			case SF_STR_LABEL :
+				mpeg_l3_encoder_add_id3v2_tag (psf, "TPUB", value) ;
+				break ;
+
+			case SF_STR_ISRC :
+				mpeg_l3_encoder_add_id3v2_tag (psf, "TSRC", value) ;
 				break ;
 
 			default:
@@ -457,6 +487,30 @@ mpeg_l3_encoder_byterate (SF_PRIVATE *psf)
 
 	return byterate ;
 } /* mpeg_l3_encoder_byterate */
+
+static int
+mpeg_l3_encoder_add_id3v2_tag (SF_PRIVATE *psf, const char *key_id, const char *value)
+{	MPEG_L3_ENC_PRIVATE *pmpeg = (MPEG_L3_ENC_PRIVATE *) psf->codec_data ;
+	size_t id_len = strlen (key_id) ;
+	size_t value_size = strlen (value) + 1 ;
+	size_t buf_size = id_len + 1 + value_size ;
+	char *buf = malloc (buf_size) ;
+	int rc ;
+
+	if (buf == NULL)
+	{	psf_log_printf (psf, "Out of memory while adding tag '%s'\n", key_id) ;
+		return SFE_MALLOC_FAILED ;
+		} ;
+
+	memcpy (buf, key_id, id_len) ;
+	buf [id_len] = '=' ;
+	memcpy (buf + id_len + 1, value, value_size) ;
+
+	rc = id3tag_set_fieldvalue (pmpeg->lamef, buf) ;
+
+	free (buf) ;
+	return rc == 0 ? SFE_NO_ERROR : SFE_STR_NO_SUPPORT ;
+} /* mpeg_l3_encoder_add_id3v2_tag */
 
 static sf_count_t
 mpeg_l3_encode_write_short_mono (SF_PRIVATE *psf, const short *ptr, sf_count_t len)
