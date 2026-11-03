@@ -17,8 +17,16 @@ if (POLICY CMP0091)
 	endif ()
 endif ()
 
-option (ENABLE_EXTERNAL_LIBS "Enable FLAC, Vorbis, and Opus codecs" ON)
-if (ENABLE_EXTERNAL_LIBS)
+include (CMakeDependentOption)
+
+# ENABLE_EXTERNAL_LIBS=OFF forces ENABLE_OGG/VORBIS/FLAC/OPUS off, also in an existing build tree.
+option (ENABLE_EXTERNAL_LIBS "Enable FLAC, Vorbis, and Opus codecs (master switch for ENABLE_OGG/VORBIS/FLAC/OPUS)" ON)
+cmake_dependent_option (ENABLE_OGG    "Enable Ogg support"    ON "ENABLE_EXTERNAL_LIBS" OFF)
+cmake_dependent_option (ENABLE_VORBIS "Enable Vorbis support" ON "ENABLE_EXTERNAL_LIBS" OFF)
+cmake_dependent_option (ENABLE_FLAC   "Enable FLAC support"   ON "ENABLE_EXTERNAL_LIBS" OFF)
+cmake_dependent_option (ENABLE_OPUS   "Enable Opus support"   ON "ENABLE_EXTERNAL_LIBS" OFF)
+
+if (ENABLE_VORBIS OR ENABLE_OPUS OR ENABLE_FLAC)
 	list (APPEND VCPKG_MANIFEST_FEATURES "external-libs")
 endif ()
 
@@ -28,7 +36,8 @@ if (ENABLE_MPEG)
 endif ()
 
 option (ENABLE_EXPERIMENTAL "Enable experimental code" OFF)
-if (ENABLE_EXPERIMENTAL)
+cmake_dependent_option (ENABLE_SPEEX "Enable Speex support (requires ENABLE_EXPERIMENTAL and Ogg)" ON "ENABLE_EXPERIMENTAL" OFF)
+if (ENABLE_SPEEX)
 	list (APPEND VCPKG_MANIFEST_FEATURES "speex")
 endif ()
 
@@ -99,7 +108,23 @@ endif ()
 
 include(SndFileChecks)
 
-if (ENABLE_EXTERNAL_LIBS AND NOT (Vorbis_FOUND OR FLAC_FOUND OR OPUS_FOUND))
+# Reconcile each ENABLE_* with whether the corresponding library was actually found
+if (ENABLE_OGG AND NOT HAVE_OGG)
+	set (ENABLE_OGG OFF)
+endif ()
+if (ENABLE_VORBIS AND NOT HAVE_VORBIS)
+	set (ENABLE_VORBIS OFF)
+endif ()
+if (ENABLE_FLAC AND NOT HAVE_FLAC)
+	set (ENABLE_FLAC OFF)
+endif ()
+if (ENABLE_OPUS AND NOT HAVE_OPUS)
+	set (ENABLE_OPUS OFF)
+endif ()
+if (ENABLE_SPEEX AND NOT HAVE_SPEEX)
+	set (ENABLE_SPEEX OFF)
+endif ()
+if (ENABLE_EXTERNAL_LIBS AND NOT (ENABLE_VORBIS OR ENABLE_FLAC OR ENABLE_OPUS))
 	set (ENABLE_EXTERNAL_LIBS OFF)
 endif()
 if(ENABLE_MPEG AND (NOT HAVE_MPEG_LIBS))
@@ -131,17 +156,26 @@ if (MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 4)
 		)
 endif ()
 
-set (HAVE_EXTERNAL_XIPH_LIBS ${ENABLE_EXTERNAL_LIBS})
+# Reflect final enable state into the HAVE_* defines that end up in config.h
+set (HAVE_OGG    ${ENABLE_OGG})
+set (HAVE_VORBIS ${ENABLE_VORBIS})
+set (HAVE_FLAC   ${ENABLE_FLAC})
+set (HAVE_OPUS   ${ENABLE_OPUS})
+set (HAVE_SPEEX  ${ENABLE_SPEEX})
 set (HAVE_SQLITE3 ${BUILD_REGTEST})
 set (HAVE_ALSA_ASOUNDLIB_H ${ALSA_FOUND})
 set (HAVE_SNDIO_H ${SNDIO_FOUND})
 
 set (ENABLE_EXPERIMENTAL_CODE ${ENABLE_EXPERIMENTAL})
 set (HAVE_MPEG ${ENABLE_MPEG})
-set (HAVE_SPEEX ${ENABLE_EXPERIMENTAL})
 
 add_feature_info (BUILD_SHARED_LIBS BUILD_SHARED_LIBS "build shared libraries")
 add_feature_info (ENABLE_EXTERNAL_LIBS ENABLE_EXTERNAL_LIBS "enable FLAC, Vorbis, and Opus codecs")
+add_feature_info (ENABLE_OGG ENABLE_OGG "enable Ogg support")
+add_feature_info (ENABLE_VORBIS ENABLE_VORBIS "enable Vorbis support")
+add_feature_info (ENABLE_FLAC ENABLE_FLAC "enable FLAC support")
+add_feature_info (ENABLE_OPUS ENABLE_OPUS "enable Opus support")
+add_feature_info (ENABLE_SPEEX ENABLE_SPEEX "enable Speex support (experimental)")
 add_feature_info (ENABLE_MPEG ENABLE_MPEG "enable MPEG audio (including mp3) codecs")
 add_feature_info (ENABLE_EXPERIMENTAL ENABLE_EXPERIMENTAL "enable experimental code")
 add_feature_info (BUILD_TESTING BUILD_TESTING "build tests")
@@ -232,12 +266,23 @@ if (INSTALL_PKGCONFIG_MODULE)
 	set (libdir "${CMAKE_INSTALL_FULL_LIBDIR}")
 	set (includedir "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
 	set (VERSION ${PROJECT_VERSION})
-	if (ENABLE_EXTERNAL_LIBS)
-		set (EXTERNAL_XIPH_REQUIRE "flac ogg vorbis vorbisenc opus")
-		if (ENABLE_EXPERIMENTAL)
-			set (EXTERNAL_XIPH_REQUIRE "${EXTERNAL_XIPH_REQUIRE} speex")
-		endif ()
+	set (EXTERNAL_XIPH_REQUIRE "")
+	if (HAVE_FLAC)
+		set (EXTERNAL_XIPH_REQUIRE "${EXTERNAL_XIPH_REQUIRE} flac")
 	endif ()
+	if (HAVE_OGG)
+		set (EXTERNAL_XIPH_REQUIRE "${EXTERNAL_XIPH_REQUIRE} ogg")
+	endif ()
+	if (HAVE_VORBIS)
+		set (EXTERNAL_XIPH_REQUIRE "${EXTERNAL_XIPH_REQUIRE} vorbis vorbisenc")
+	endif ()
+	if (HAVE_OPUS)
+		set (EXTERNAL_XIPH_REQUIRE "${EXTERNAL_XIPH_REQUIRE} opus")
+	endif ()
+	if (HAVE_SPEEX)
+		set (EXTERNAL_XIPH_REQUIRE "${EXTERNAL_XIPH_REQUIRE} speex")
+	endif ()
+	string (STRIP "${EXTERNAL_XIPH_REQUIRE}" EXTERNAL_XIPH_REQUIRE)
 	if (ENABLE_MPEG)
 		set (EXTERNAL_MPEG_REQUIRE "libmpg123")
 		set (EXTERNAL_MPEG_LIBS "-lmp3lame")
@@ -396,11 +441,11 @@ target_include_directories (sndfile
 target_link_libraries (sndfile
 	PRIVATE
 		$<$<BOOL:${LIBM_REQUIRED}>:m>
-		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Ogg::ogg>
-		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Vorbis::vorbisenc>
-		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:FLAC::FLAC>
-		$<$<AND:$<BOOL:${ENABLE_EXPERIMENTAL}>,$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>,$<BOOL:${HAVE_SPEEX}>>:Speex::Speex>
-		$<$<BOOL:${HAVE_EXTERNAL_XIPH_LIBS}>:Opus::opus>
+		$<$<BOOL:${HAVE_OGG}>:Ogg::ogg>
+		$<$<BOOL:${HAVE_VORBIS}>:Vorbis::vorbisenc>
+		$<$<BOOL:${HAVE_FLAC}>:FLAC::FLAC>
+		$<$<AND:$<BOOL:${ENABLE_EXPERIMENTAL}>,$<BOOL:${HAVE_SPEEX}>>:Speex::Speex>
+		$<$<BOOL:${HAVE_OPUS}>:Opus::opus>
 		$<$<BOOL:${HAVE_MPEG}>:MPG123::libmpg123>
 		$<$<BOOL:${HAVE_MPEG}>:mp3lame::mp3lame>
 	)
@@ -815,15 +860,31 @@ if (ENABLE_PACKAGE_CONFIG)
 
 	include (CMakePackageConfigHelpers)
 
-	if (ENABLE_EXTERNAL_LIBS)
+	if (HAVE_VORBIS OR HAVE_FLAC OR HAVE_OPUS)
 		set (SndFile_WITH_EXTERNAL_LIBS 1)
-		list (APPEND FIND_MODULES_INSTALL_LIST 
-			${CMAKE_CURRENT_LIST_DIR}/cmake/FindFLAC.cmake
-			${CMAKE_CURRENT_LIST_DIR}/cmake/FindOgg.cmake
-			${CMAKE_CURRENT_LIST_DIR}/cmake/FindOpus.cmake
-			${CMAKE_CURRENT_LIST_DIR}/cmake/FindVorbis.cmake)
 	else ()
 		set (SndFile_WITH_EXTERNAL_LIBS 0)
+	endif ()
+	if (HAVE_FLAC)
+		list (APPEND FIND_MODULES_INSTALL_LIST
+			${CMAKE_CURRENT_LIST_DIR}/cmake/FindFLAC.cmake)
+	endif ()
+	# FindFLAC, FindVorbis and FindOpus all look for Ogg
+	if (HAVE_OGG OR HAVE_FLAC OR HAVE_VORBIS OR HAVE_OPUS)
+		list (APPEND FIND_MODULES_INSTALL_LIST
+			${CMAKE_CURRENT_LIST_DIR}/cmake/FindOgg.cmake)
+	endif ()
+	if (HAVE_OPUS)
+		list (APPEND FIND_MODULES_INSTALL_LIST
+			${CMAKE_CURRENT_LIST_DIR}/cmake/FindOpus.cmake)
+	endif ()
+	if (HAVE_VORBIS)
+		list (APPEND FIND_MODULES_INSTALL_LIST
+			${CMAKE_CURRENT_LIST_DIR}/cmake/FindVorbis.cmake)
+	endif ()
+	if (HAVE_SPEEX)
+		list (APPEND FIND_MODULES_INSTALL_LIST
+			${CMAKE_CURRENT_LIST_DIR}/cmake/FindSpeex.cmake)
 	endif ()
 
 	if(ENABLE_MPEG)
