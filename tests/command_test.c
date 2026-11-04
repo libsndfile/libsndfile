@@ -55,6 +55,7 @@ static	void	channel_map_test		(const char *filename, int filetype) ;
 static	void	second_fmt_chunk_test	(const char *filename, const unsigned char *data, unsigned int datalen) ;
 static	void	current_sf_info_test	(const char *filename) ;
 static	void	raw_needs_endswap_test	(const char *filename, int filetype) ;
+static	void	byterate_test			(const char *filename) ;
 
 static	void	broadcast_test			(const char *filename, int filetype) ;
 static	void	broadcast_rdwr_test		(const char *filename, int filetype) ;
@@ -132,6 +133,7 @@ main (int argc, char *argv [])
 		printf ("           bextch  - test set/get of SF_BROADCAST_INFO coding_history.\n") ;
 		printf ("           cart    - test set/get of SF_CART_INFO.\n") ;
 		printf ("           rawend  - test SFC_RAW_NEEDS_ENDSWAP.\n") ;
+		printf ("           byterate - test sf_current_byterate.\n") ;
 		printf ("           all     - perform all tests\n") ;
 		exit (1) ;
 		} ;
@@ -255,6 +257,11 @@ main (int argc, char *argv [])
 		raw_needs_endswap_test ("raw_end.rifx", SF_ENDIAN_BIG | SF_FORMAT_WAV) ;
 		raw_needs_endswap_test ("raw_end.aiff", SF_FORMAT_AIFF) ;
 		raw_needs_endswap_test ("raw_end.aiff_le", SF_ENDIAN_LITTLE | SF_FORMAT_AIFF) ;
+		test_count ++ ;
+		} ;
+
+	if (do_all || strcmp (argv [1], "byterate") == 0)
+	{	byterate_test ("byterate.wav") ;
 		test_count ++ ;
 		} ;
 
@@ -1962,3 +1969,49 @@ raw_needs_endswap_test (const char *filename, int filetype)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* raw_needs_endswap_test */
+
+static void
+byterate_test (const char *filename)
+{	static const struct
+	{	int format ;
+		int samplerate ;
+		int channels ;
+		int byterate ;
+	} tests [] =
+	{	/* 192000 * 13000 does not fit in an int, the result does. */
+		{	SF_FORMAT_WAV | SF_FORMAT_GSM610, 192000, 1, 312000 },
+		{	SF_FORMAT_WAV | SF_FORMAT_IMA_ADPCM, 0x40000000, 2, 0x40000000 },
+		{	SF_FORMAT_WAV | SF_FORMAT_PCM_16, 0x1FFFFFFF, 2, 0x7FFFFFFC },
+		/* 0x40000000 * 2 * 2 does not fit in an int, so it is unknown. */
+		{	SF_FORMAT_WAV | SF_FORMAT_PCM_16, 0x40000000, 2, -1 },
+		} ;
+	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
+	unsigned k ;
+	int byterate ;
+
+	print_test_name (__func__, filename) ;
+
+	for (k = 0 ; k < ARRAY_LEN (tests) ; k++)
+	{	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+		sfinfo.format		= tests [k].format ;
+		sfinfo.samplerate	= tests [k].samplerate ;
+		sfinfo.channels		= tests [k].channels ;
+
+		file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+		byterate = sf_current_byterate (file) ;
+		exit_if_true (byterate != tests [k].byterate,
+			"\n\nLine %d : byterate of test %u is %d, should be %d.\n\n", __LINE__, k, byterate, tests [k].byterate) ;
+		sf_close (file) ;
+
+		memset (&sfinfo, 0, sizeof (sfinfo)) ;
+		file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+		byterate = sf_current_byterate (file) ;
+		exit_if_true (byterate != tests [k].byterate,
+			"\n\nLine %d : byterate of test %u is %d, should be %d.\n\n", __LINE__, k, byterate, tests [k].byterate) ;
+		sf_close (file) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* byterate_test */

@@ -22,6 +22,7 @@
 #include	<string.h>
 #include	<ctype.h>
 #include	<assert.h>
+#include	<limits.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
@@ -1645,6 +1646,14 @@ sf_set_string (SNDFILE *sndfile, int str_type, const char* str)
 /*------------------------------------------------------------------------------
 */
 
+/* The sample rate can be anything up to INT_MAX, so the byte rate is worked
+** out in sf_count_t. A byte rate that does not fit in an int is unknown.
+*/
+static int
+byterate_to_int (sf_count_t byterate)
+{	return byterate <= INT_MAX ? (int) byterate : -1 ;
+} /* byterate_to_int */
+
 int
 sf_current_byterate (SNDFILE *sndfile)
 {	SF_PRIVATE 	*psf ;
@@ -1656,7 +1665,7 @@ sf_current_byterate (SNDFILE *sndfile)
 
 	/* This should cover all PCM and floating point formats. */
 	if (psf->bytewidth)
-		return psf->sf.samplerate * psf->sf.channels * psf->bytewidth ;
+		return byterate_to_int ((sf_count_t) psf->sf.samplerate * psf->sf.channels * psf->bytewidth) ;
 
 	if (psf->byterate)
 		return psf->byterate (psf) ;
@@ -1665,28 +1674,28 @@ sf_current_byterate (SNDFILE *sndfile)
 	{	case SF_FORMAT_IMA_ADPCM :
 		case SF_FORMAT_MS_ADPCM :
 		case SF_FORMAT_VOX_ADPCM :
-			return (psf->sf.samplerate * psf->sf.channels) / 2 ;
+			return byterate_to_int (((sf_count_t) psf->sf.samplerate * psf->sf.channels) / 2) ;
 
 		case SF_FORMAT_GSM610 :
-			return (psf->sf.samplerate * psf->sf.channels * 13000) / 8000 ;
+			return byterate_to_int (((sf_count_t) psf->sf.samplerate * psf->sf.channels * 13000) / 8000) ;
 
 		case SF_FORMAT_NMS_ADPCM_16:
 			return psf->sf.samplerate / 4 + 10 ;
 
 		case SF_FORMAT_NMS_ADPCM_24:
-			return psf->sf.samplerate * 3 / 8 + 10 ;
+			return byterate_to_int ((sf_count_t) psf->sf.samplerate * 3 / 8 + 10) ;
 
 		case SF_FORMAT_NMS_ADPCM_32:
 			return psf->sf.samplerate / 2 + 10 ;
 
 		case SF_FORMAT_G721_32 :	/* 32kbs G721 ADPCM encoding. */
-			return (psf->sf.samplerate * psf->sf.channels) / 2 ;
+			return byterate_to_int (((sf_count_t) psf->sf.samplerate * psf->sf.channels) / 2) ;
 
 		case SF_FORMAT_G723_24 :	/* 24kbs G723 ADPCM encoding. */
-			return (psf->sf.samplerate * psf->sf.channels * 3) / 8 ;
+			return byterate_to_int (((sf_count_t) psf->sf.samplerate * psf->sf.channels * 3) / 8) ;
 
 		case SF_FORMAT_G723_40 :	/* 40kbs G723 ADPCM encoding. */
-			return (psf->sf.samplerate * psf->sf.channels * 5) / 8 ;
+			return byterate_to_int (((sf_count_t) psf->sf.samplerate * psf->sf.channels * 5) / 8) ;
 
 		default :
 			break ;
