@@ -74,6 +74,7 @@ echo "Running end-to-end tests from tests/ directory."
 ./tests/command_test@EXEEXT@ bextch
 ./tests/command_test@EXEEXT@ chanmap
 ./tests/command_test@EXEEXT@ cart
+./tests/command_test@EXEEXT@ byterate
 ./tests/floating_point_test@EXEEXT@
 ./tests/checksum_test@EXEEXT@
 ./tests/scale_clip_test@EXEEXT@
