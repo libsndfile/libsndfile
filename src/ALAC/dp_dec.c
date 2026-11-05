@@ -88,7 +88,7 @@ unpc_block (const int32_t * pc1, int32_t * out, int32_t num, int16_t * coefs, in
 		for (j = 1 ; j < num ; j++)
 		{
 			del = pc1 [j] + prev ;
-			prev = (del << chanshift) >> chanshift ;
+			prev = arith_shift_left (del, chanshift) >> chanshift ;
 			out [j] = prev ;
 		}
 		return ;
@@ -350,7 +350,7 @@ unpc_block (const int32_t * pc1, int32_t * out, int32_t num, int16_t * coefs, in
 			del0 = del ;
 			sg = sign_of_int (del) ;
 			del += top + ((sum1 + denhalf) >> denshift) ;
-			out [j] = (del << chanshift) >> chanshift ;
+			out [j] = arith_shift_left (del, chanshift) >> chanshift ;
 
 			if (sg > 0)
 			{
