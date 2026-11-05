@@ -47,7 +47,7 @@ typedef struct alac_decoder_s
 	union
 	{
 		int32_t			mPredictor [ALAC_FRAME_LENGTH] ;
-		uint16_t		mShiftBuffer [ALAC_FRAME_LENGTH] ;
+		uint16_t		mShiftBuffer [2 * ALAC_FRAME_LENGTH] ;
 	} u ;
 	uint32_t			mNumChannels ;
 } ALAC_DECODER ;
