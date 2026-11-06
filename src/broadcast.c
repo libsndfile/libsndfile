@@ -104,6 +104,10 @@ broadcast_var_get (SF_PRIVATE *psf, SF_BROADCAST_INFO * data, size_t datasize)
 
 	memcpy (data, psf->broadcast_16k, size) ;
 
+	/* Only report the coding history that fitted in the caller's struct. */
+	if (size >= offsetof (SF_BROADCAST_INFO, coding_history))
+		data->coding_history_size = (uint32_t) (size - offsetof (SF_BROADCAST_INFO, coding_history)) ;
+
 	return SF_TRUE ;
 } /* broadcast_var_get */
 
