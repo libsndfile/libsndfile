@@ -93,6 +93,10 @@ cart_var_get (SF_PRIVATE *psf, SF_CART_INFO * data, size_t datasize)
 
 	memcpy (data, psf->cart_16k, size) ;
 
+	/* Only report the tag text that fitted in the caller's struct. */
+	if (size >= offsetof (SF_CART_INFO, tag_text))
+		data->tag_text_size = (uint32_t) (size - offsetof (SF_CART_INFO, tag_text)) ;
+
 	return SF_TRUE ;
 } /* cart_var_get */
 

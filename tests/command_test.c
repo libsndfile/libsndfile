@@ -65,6 +65,7 @@ static	void	broadcast_coding_history_size	(const char *filename) ;
 static void	cart_test				(const char *filename, int filetype) ;
 static void	cart_rdwr_test			(const char *filename, int filetype) ;
 static void	cart_no_tag_text_test	(const char *filename) ;
+static void	cart_tag_text_size_test	(const char *filename) ;
 
 /* Force the start of this buffer to be double aligned. Sparc-solaris will
 ** choke if its not.
@@ -228,6 +229,7 @@ main (int argc, char *argv [])
 		cart_test ("cart.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
 		cart_rdwr_test ("cart.rf64", SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
 		cart_no_tag_text_test ("cart_no_tag_text.wav") ;
+		cart_tag_text_size_test ("cart_tag_text_size.wav") ;
 		test_count ++ ;
 		} ;
 
@@ -1488,6 +1490,7 @@ broadcast_coding_history_size (const char *filename)
 {	/* SF_BROADCAST_INFO struct with coding_history field of 1024 bytes. */
 	static SF_BROADCAST_INFO_VAR (1024) bc_write ;
 	static SF_BROADCAST_INFO_VAR (1024) bc_read ;
+	static SF_BROADCAST_INFO bc_short ;
 	SNDFILE	*file ;
 	SF_INFO	sfinfo ;
 	int k ;
@@ -1541,6 +1544,21 @@ broadcast_coding_history_size (const char *filename)
 
 	exit_if_true (strstr (bc_read.coding_history, "libsndfile") == NULL,
 			"\n\nLine %d : coding history incomplete (should contain 'libsndfile').\n\n", __LINE__) ;
+
+	/* With a smaller struct, only the coding history that fits is reported. */
+	memset (&bc_short, 0, sizeof (bc_short)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	exit_if_true (sf_command (file, SFC_GET_BROADCAST_INFO, &bc_short, sizeof (bc_short)) == SF_FALSE,
+			"\n\nLine %d : sf_command (SFC_GET_BROADCAST_INFO) failed.\n\n", __LINE__) ;
+	sf_close (file) ;
+
+	exit_if_true (bc_short.coding_history_size != sizeof (bc_short.coding_history),
+			"\n\nLine %d : coding history size is %u, should be %u.\n\n", __LINE__,
+			bc_short.coding_history_size, (unsigned) sizeof (bc_short.coding_history)) ;
+
+	exit_if_true (memcmp (bc_short.coding_history, bc_read.coding_history, sizeof (bc_short.coding_history)) != 0,
+			"\n\nLine %d : coding history mismatch.\n\n", __LINE__) ;
 
 	unlink (filename) ;
 	puts ("ok") ;
@@ -1802,6 +1820,56 @@ cart_no_tag_text_test (const char *filename)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* cart_no_tag_text_test */
+
+static void
+cart_tag_text_size_test (const char *filename)
+{	/* Write more tag text than fits in a plain SF_CART_INFO. */
+	static SF_CART_INFO_VAR (1024) ca_write ;
+	static SF_CART_INFO ca_read ;
+	SNDFILE	*file ;
+	SF_INFO	sfinfo ;
+	int k ;
+
+	print_test_name (__func__, filename) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.samplerate	= 11025 ;
+	sfinfo.format		= SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
+	sfinfo.channels		= 1 ;
+
+	memset (&ca_write, 0, sizeof (ca_write)) ;
+	memcpy (ca_write.version, "0101", sizeof (ca_write.version)) ;
+
+	for (k = 0 ; ca_write.tag_text_size < 512 ; k++)
+	{	snprintf (ca_write.tag_text + ca_write.tag_text_size,
+			sizeof (ca_write.tag_text) - ca_write.tag_text_size, "line %4d\r\n", k) ;
+		ca_write.tag_text_size = (uint32_t) strlen (ca_write.tag_text) ;
+		} ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+	exit_if_true (sf_command (file, SFC_SET_CART_INFO, &ca_write, sizeof (ca_write)) == SF_FALSE,
+			"\n\nLine %d : sf_command (SFC_SET_CART_INFO) failed.\n\n", __LINE__) ;
+	test_write_double_or_die (file, 0, double_data, BUFFER_LEN, __LINE__) ;
+	sf_close (file) ;
+
+	memset (&ca_read, 0, sizeof (ca_read)) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+	exit_if_true (sf_command (file, SFC_GET_CART_INFO, &ca_read, sizeof (ca_read)) == SF_FALSE,
+			"\n\nLine %d : sf_command (SFC_GET_CART_INFO) failed.\n\n", __LINE__) ;
+	check_log_buffer_or_die (file, __LINE__) ;
+	sf_close (file) ;
+
+	exit_if_true (ca_read.tag_text_size != sizeof (ca_read.tag_text),
+			"\n\nLine %d : tag_text_size is %u, should be %u.\n\n", __LINE__,
+			ca_read.tag_text_size, (unsigned) sizeof (ca_read.tag_text)) ;
+
+	exit_if_true (memcmp (ca_read.tag_text, ca_write.tag_text, sizeof (ca_read.tag_text)) != 0,
+			"\n\nLine %d : tag text mismatch.\n\n", __LINE__) ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* cart_tag_text_size_test */
 
 /*==============================================================================
 */
