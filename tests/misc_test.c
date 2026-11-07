@@ -52,6 +52,7 @@ static void	filesystem_full_test (int format) ;
 static void	permission_test (const char *filename, int typemajor) ;
 static void	wavex_amb_test (const char *filename) ;
 static void rf64_downgrade_test (const char *filename) ;
+static void rf64_downgrade_seek_test (const char *filename) ;
 static void rf64_long_file_downgrade_test (const char *filename) ;
 
 int
@@ -146,6 +147,7 @@ main (int argc, char *argv [])
 		filesystem_full_test (SF_FORMAT_RF64 | SF_FORMAT_PCM_16) ;
 		permission_test ("readonly.rf64", SF_FORMAT_RF64) ;
 		rf64_downgrade_test ("downgrade.wav") ;
+		rf64_downgrade_seek_test ("downgrade_seek.wav") ;
 		/* Disable this by default, because it needs to write 4 gigabytes of data. */
 		if (SF_FALSE)
 			rf64_long_file_downgrade_test ("no-downgrade.rf64") ;
@@ -477,6 +479,68 @@ rf64_downgrade_test (const char *filename)
 
 	return ;
 } /* rf64_downgrade_test */
+
+
+static void
+rf64_downgrade_seek_test (const char *filename)
+{	static short	output	[BUFFER_LEN] ;
+	static short	input	[BUFFER_LEN + 1] ;
+
+	SNDFILE			*file ;
+	SF_INFO			sfinfo ;
+	unsigned		k ;
+	const sf_count_t	offset = 1 ;
+
+	print_test_name (__func__, filename) ;
+
+	for (k = 0 ; k < ARRAY_LEN (output) ; k++)
+		output [k] = (short) (k * 3 + 1) ;
+
+	sf_info_clear (&sfinfo) ;
+
+	sfinfo.samplerate	= 44100 ;
+	sfinfo.channels		= 1 ;
+	sfinfo.format		= SF_FORMAT_RF64 | SF_FORMAT_PCM_16 ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_TRUE, __LINE__) ;
+
+	exit_if_true (sf_command (file, SFC_RF64_AUTO_DOWNGRADE, NULL, SF_TRUE) != SF_TRUE,
+			"\n\nLine %d: sf_command failed.\n", __LINE__) ;
+
+	exit_if_true (sf_seek (file, offset, SEEK_SET) != offset,
+			"\n\nLine %d: sf_seek failed.\n", __LINE__) ;
+
+	test_write_short_or_die (file, 0, output, ARRAY_LEN (output), __LINE__) ;
+
+	sf_close (file) ;
+
+	memset (input, 0, sizeof (input)) ;
+	sf_info_clear (&sfinfo) ;
+
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_TRUE, __LINE__) ;
+
+	exit_if_true (sfinfo.format != (SF_FORMAT_WAVEX | SF_FORMAT_PCM_16),
+			"\n\nLine %d: RF64 to WAV downgrade failed.\n", __LINE__) ;
+	exit_if_true (sfinfo.frames != ARRAY_LEN (output) + offset,
+			"\n\nLine %d: Incorrect number of frames in file (%d should be %d)\n",
+			__LINE__, (int) sfinfo.frames, (int) (ARRAY_LEN (output) + offset)) ;
+
+	test_read_short_or_die (file, 0, input, ARRAY_LEN (input), __LINE__) ;
+
+	sf_close (file) ;
+
+	exit_if_true (input [0] != 0,
+			"\n\nLine %d: Expected silence at frame 0, got %d\n", __LINE__, input [0]) ;
+	for (k = 0 ; k < ARRAY_LEN (output) ; k++)
+		exit_if_true (input [k + offset] != output [k],
+			"\n\nLine: %d: Error on input %d, expected %d, got %d\n",
+			__LINE__, k, output [k], input [k + offset]) ;
+
+	puts ("ok") ;
+	unlink (filename) ;
+
+	return ;
+} /* rf64_downgrade_seek_test */
 
 static void
 rf64_long_file_downgrade_test (const char *filename)
