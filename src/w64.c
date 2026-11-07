@@ -247,6 +247,10 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 		bytesread = psf_binheader_readf (psf, "eh8", &marker, &chunk_size) ;
 		if (bytesread == 0)
 			break ;
+		if (chunk_size < 0)
+			return SFE_MALFORMED_FILE ;
+		if (chunk_size > SF_COUNT_MAX - 7)
+			return SFE_MALFORMED_FILE ;
 		switch (marker)
 		{	case riff_HASH16 :
 					if (parsestage)
@@ -274,6 +278,9 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					return SFE_UNIMPLEMENTED ;
 
 			case fmt_HASH16 :
+					if (chunk_size < 24)
+						return SFE_MALFORMED_FILE ;
+
 					if ((parsestage & (HAVE_riff | HAVE_wave)) != (HAVE_riff | HAVE_wave))
 						return SFE_WAV_NO_FMT ;
 
@@ -310,6 +317,9 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 
 			case data_HASH16 :
+					if (chunk_size < 24)
+						return SFE_MALFORMED_FILE ;
+
 					if ((parsestage & (HAVE_riff | HAVE_wave | HAVE_fmt)) != (HAVE_riff | HAVE_wave | HAVE_fmt))
 						return SFE_W64_NO_DATA ;
 

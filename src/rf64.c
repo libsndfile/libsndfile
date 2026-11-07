@@ -222,6 +222,8 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 					/* Read ds64 sizes (3 8-byte words). */
 					bytesread = psf_binheader_readf (psf, "888", &riff_size, &ds64_datalength, &frame_count) ;
+					if (ds64_datalength < 0)
+						return SFE_MALFORMED_FILE ;
 
 					/* Read table length. */
 					bytesread += psf_binheader_readf (psf, "4", &table_len) ;
@@ -325,6 +327,10 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					} ;
 
 				psf->dataoffset = psf_ftell (psf) ;
+
+				if (HAVE_CHUNK (HAVE_ds64) && psf->dataoffset > 0
+						&& psf->datalength > SF_COUNT_MAX - psf->dataoffset)
+					return SFE_MALFORMED_FILE ;
 
 				if (psf->dataoffset > 0)
 				{	if (chunk_size == 0 && riff_size == 8 && psf->filelength > 44)
