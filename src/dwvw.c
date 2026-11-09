@@ -200,7 +200,7 @@ dwvw_read_s (SF_PRIVATE *psf, short *ptr, sf_count_t len)
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
-		for (k = 0 ; k < readcount ; k++)
+		for (k = 0 ; k < count ; k++)
 			ptr [total + k] = iptr [k] >> 16 ;
 
 		total += count ;
@@ -257,7 +257,7 @@ dwvw_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
-		for (k = 0 ; k < readcount ; k++)
+		for (k = 0 ; k < count ; k++)
 			ptr [total + k] = normfact * (float) (iptr [k]) ;
 
 		total += count ;
@@ -289,7 +289,7 @@ dwvw_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = dwvw_decode_data (psf, pdwvw, iptr, readcount) ;
-		for (k = 0 ; k < readcount ; k++)
+		for (k = 0 ; k < count ; k++)
 			ptr [total + k] = normfact * (double) (iptr [k]) ;
 
 		total += count ;

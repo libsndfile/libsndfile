@@ -189,7 +189,7 @@ vox_read_i	(SF_PRIVATE *psf, int *ptr, sf_count_t len)
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = vox_read_block (psf, pvox, sptr, readcount) ;
-		for (k = 0 ; k < readcount ; k++)
+		for (k = 0 ; k < count ; k++)
 			ptr [total + k] = arith_shift_left (sptr [k], 16) ;
 		total += count ;
 		len -= readcount ;
@@ -220,7 +220,7 @@ vox_read_f (SF_PRIVATE *psf, float *ptr, sf_count_t len)
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = vox_read_block (psf, pvox, sptr, readcount) ;
-		for (k = 0 ; k < readcount ; k++)
+		for (k = 0 ; k < count ; k++)
 			ptr [total + k] = normfact * (float) (sptr [k]) ;
 		total += count ;
 		len -= readcount ;
@@ -251,7 +251,7 @@ vox_read_d (SF_PRIVATE *psf, double *ptr, sf_count_t len)
 	while (len > 0)
 	{	readcount = (len >= bufferlen) ? bufferlen : (int) len ;
 		count = vox_read_block (psf, pvox, sptr, readcount) ;
-		for (k = 0 ; k < readcount ; k++)
+		for (k = 0 ; k < count ; k++)
 			ptr [total + k] = normfact * (double) (sptr [k]) ;
 		total += count ;
 		len -= readcount ;
