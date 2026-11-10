@@ -333,8 +333,9 @@ rf64_read_header (SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 						} ;
 
 					/* Only set dataend if there really is data at the end. */
-					if (psf->datalength + psf->dataoffset < psf->filelength)
-						psf->dataend = psf->datalength + psf->dataoffset ;
+					if (psf->dataoffset < psf->filelength &&
+					    psf->datalength < psf->filelength - psf->dataoffset)
+						psf->dataend = psf->dataoffset + psf->datalength ;
 
 					if (!psf->sf.seekable || psf->dataoffset < 0)
 						break ;
