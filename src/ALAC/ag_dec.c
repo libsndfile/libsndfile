@@ -332,6 +332,7 @@ int32_t dyn_decomp (AGParamRecPtr params, BitBuffer * bitstream, int32_t * pc, i
 		{
 			zmode = 1 ;
 			k = lead (mb) - BITOFF + ((mb + MOFF) >> MDENSHIFT) ;
+			RequireAction (k < 32, status = kALAC_ParamError ; goto Exit ;) ;
 			mz = ((1 << k) - 1) & wb_local ;
 
 			n = dyn_get (in, &bitPos, mz, k) ;
