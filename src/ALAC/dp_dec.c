@@ -125,7 +125,7 @@ unpc_block (const int32_t * pc1, int32_t * out, int32_t num, int16_t * coefs, in
 			ib2 = top - pout [-2] ;
 			ib3 = top - pout [-3] ;
 
-			sum1 = (denhalf - ia0 * ib0 - ia1 * ib1 - ia2 * ib2 - ia3 * ib3) >> denshift ;
+			sum1 = (int32_t)(((int64_t)denhalf - (int64_t)ia0 * ib0 - (int64_t)ia1 * ib1 - (int64_t)ia2 * ib2 - (int64_t)ia3 * ib3) >> denshift) ;
 
 			del = pc1 [j] ;
 			del0 = del ;
@@ -218,8 +218,8 @@ unpc_block (const int32_t * pc1, int32_t * out, int32_t num, int16_t * coefs, in
 			b7 = top - (*pout) ;
 			pout += 8 ;
 
-			sum1 = (denhalf - a0 * b0 - a1 * b1 - a2 * b2 - a3 * b3
-					- a4 * b4 - a5 * b5 - a6 * b6 - a7 * b7) >> denshift ;
+			sum1 = (int32_t)(((int64_t)denhalf - (int64_t)a0 * b0 - (int64_t)a1 * b1 - (int64_t)a2 * b2 - (int64_t)a3 * b3
+					- (int64_t)a4 * b4 - (int64_t)a5 * b5 - (int64_t)a6 * b6 - (int64_t)a7 * b7) >> denshift) ;
 
 			del = pc1 [j] ;
 			del0 = del ;
