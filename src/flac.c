@@ -938,6 +938,11 @@ flac_command (SF_PRIVATE * psf, int command, void * data, int datasize)
 			if (data == NULL || datasize != sizeof (double))
 				return SF_FALSE ;
 
+			if (psf->file.mode != SFM_WRITE)
+			{	psf->error = SFE_NOT_WRITEMODE ;
+				return SF_FALSE ;
+				} ;
+
 			if (psf->have_written)
 				return SF_FALSE ;
 
