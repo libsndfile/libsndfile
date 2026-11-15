@@ -33,12 +33,14 @@
 
 static void format_error_test (void) ;
 static void format_combo_test (void) ;
+static void format_alac_channels_test (void) ;
 
 int
 main (void)
 {
 	format_error_test () ;
 	format_combo_test () ;
+	format_alac_channels_test () ;
 
 	return 0 ;
 } /* main */
@@ -164,3 +166,30 @@ format_combo_test (void)
 	puts ("ok") ;
 } /* format_combo_test */
 
+static void
+format_alac_channels_test (void)
+{	static const int codecs [] =
+	{	SF_FORMAT_ALAC_16, SF_FORMAT_ALAC_20, SF_FORMAT_ALAC_24, SF_FORMAT_ALAC_32
+		} ;
+	const char *filename = "format-alac-channels.caf" ;
+	SNDFILE *file ;
+	SF_INFO info ;
+	unsigned k ;
+
+	print_test_name (__func__, NULL) ;
+
+	for (k = 0 ; k < ARRAY_LEN (codecs) ; k++)
+	{	sf_info_setup (&info, SF_FORMAT_CAF | codecs [k], 44100, 8) ;
+		exit_if_true (sf_format_check (&info) == 0, "\n\nLine %d : 8 channel ALAC should be valid.\n\n", __LINE__) ;
+
+		/* The ALAC encoder only has state for 8 channels. */
+		sf_info_setup (&info, SF_FORMAT_CAF | codecs [k], 44100, 9) ;
+		exit_if_true (sf_format_check (&info) != 0, "\n\nLine %d : 9 channel ALAC should not be valid.\n\n", __LINE__) ;
+
+		file = sf_open (filename, SFM_WRITE, &info) ;
+		exit_if_true (file != NULL, "\n\nLine %d : 9 channel ALAC file should not open.\n\n", __LINE__) ;
+		} ;
+
+	unlink (filename) ;
+	puts ("ok") ;
+} /* format_alac_channels_test */

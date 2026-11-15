@@ -750,9 +750,10 @@ sf_format_check	(const SF_INFO *info)
 					return 1 ;
 				if (subformat == SF_FORMAT_ULAW || subformat == SF_FORMAT_ALAW)
 					return 1 ;
-				if (subformat == SF_FORMAT_ALAC_16 || subformat == SF_FORMAT_ALAC_20)
+				/* The ALAC encoder can't do more than 8 channels. */
+				if ((subformat == SF_FORMAT_ALAC_16 || subformat == SF_FORMAT_ALAC_20) && info->channels <= 8)
 					return 1 ;
-				if (subformat == SF_FORMAT_ALAC_24 || subformat == SF_FORMAT_ALAC_32)
+				if ((subformat == SF_FORMAT_ALAC_24 || subformat == SF_FORMAT_ALAC_32) && info->channels <= 8)
 					return 1 ;
 				if (subformat == SF_FORMAT_FLOAT || subformat == SF_FORMAT_DOUBLE)
 					return 1 ;
