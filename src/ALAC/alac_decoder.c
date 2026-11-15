@@ -71,14 +71,16 @@ alac_decoder_init (ALAC_DECODER *p, void * inMagicCookie, uint32_t inMagicCookie
 	// See ALACMagicCookieDescription.txt for additional documentation concerning the 'magic cookie'
 
 	// skip format ('frma') atom if present
-	if (theActualCookie [4] == 'f' && theActualCookie [5] == 'r' && theActualCookie [6] == 'm' && theActualCookie [7] == 'a')
+	if (theCookieBytesRemaining >= 12 &&
+		theActualCookie [4] == 'f' && theActualCookie [5] == 'r' && theActualCookie [6] == 'm' && theActualCookie [7] == 'a')
 	{
 		theActualCookie += 12 ;
 		theCookieBytesRemaining -= 12 ;
 	}
 
 	// skip 'alac' atom header if present
-	if (theActualCookie [4] == 'a' && theActualCookie [5] == 'l' && theActualCookie [6] == 'a' && theActualCookie [7] == 'c')
+	if (theCookieBytesRemaining >= 12 &&
+		theActualCookie [4] == 'a' && theActualCookie [5] == 'l' && theActualCookie [6] == 'a' && theActualCookie [7] == 'c')
 	{
 		theActualCookie += 12 ;
 		theCookieBytesRemaining -= 12 ;
