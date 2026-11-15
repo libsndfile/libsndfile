@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 #if HAVE_UNISTD_H
 #include <unistd.h>
 #else
@@ -173,6 +174,53 @@ compression_size_test (int format, const char * filename)
 
 
 
+static void
+read_mode_test (int format, const char * filename)
+{	/*
+	**	Encoder settings must be rejected on a file open for read. The
+	**	decoder state must not be touched and the file must still read to
+	**	the end.
+	*/
+	SNDFILE *file ;
+	SF_INFO sfinfo ;
+	sf_count_t count, total = 0 ;
+	double quality ;
+	int k ;
+
+	get_unique_test_name (&filename, CMP_TEST_PREFIX) ;
+	print_test_name (__func__, filename) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.format = format ;
+	sfinfo.channels = 1 ;
+	sfinfo.samplerate = SAMPLE_RATE ;
+
+	file = test_open_file_or_die (filename, SFM_WRITE, &sfinfo, SF_FALSE, __LINE__) ;
+	for (k = 0 ; k < 5 ; k++)
+	{	gen_lowpass_signal_float (data_out, ARRAY_LEN (data_out)) ;
+		test_write_float_or_die (file, 0, data_out, ARRAY_LEN (data_out), __LINE__) ;
+		} ;
+	sf_close (file) ;
+
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	file = test_open_file_or_die (filename, SFM_READ, &sfinfo, SF_FALSE, __LINE__) ;
+
+	quality = 0.0 ;
+	exit_if_true (sf_command (file, SFC_SET_COMPRESSION_LEVEL, &quality, sizeof (quality)) != SF_FALSE,
+		"\n\nLine %d : SFC_SET_COMPRESSION_LEVEL should fail in read mode.\n\n", __LINE__) ;
+
+	while ((count = sf_read_float (file, data_out, ARRAY_LEN (data_out))) > 0)
+		total += count ;
+
+	exit_if_true (total != sfinfo.frames,
+		"\n\nLine %d : read %" PRId64 " frames, expected %" PRId64 ".\n\n", __LINE__, total, sfinfo.frames) ;
+
+	sf_close (file) ;
+
+	puts ("ok") ;
+	unlink (filename) ;
+} /* read_mode_test */
+
 int
 main (int argc, char *argv [])
 {	int all_tests = 0 ;
@@ -205,6 +253,7 @@ main (int argc, char *argv [])
 	if (all_tests || strcmp (argv [1], "flac") == 0)
 	{	if (HAVE_EXTERNAL_XIPH_LIBS)
 		{	compression_size_test (SF_FORMAT_FLAC | SF_FORMAT_PCM_16, "pcm16.flac") ;
+			read_mode_test (SF_FORMAT_FLAC | SF_FORMAT_PCM_16, "read_mode.flac") ;
 			}
 		else
 			puts ("    No FLAC tests because support was not compiled in.") ;
@@ -213,6 +262,7 @@ main (int argc, char *argv [])
 	if (all_tests || strcmp (argv [1], "opus") == 0)
 	{	if (HAVE_EXTERNAL_XIPH_LIBS)
 		{	compression_size_test (SF_FORMAT_OGG | SF_FORMAT_OPUS, "opus.opus") ;
+			read_mode_test (SF_FORMAT_OGG | SF_FORMAT_OPUS, "read_mode.opus") ;
 			}
 		else
 			puts ("    No Opus tests because support was not compiled in.") ;

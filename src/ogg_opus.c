@@ -1714,6 +1714,10 @@ ogg_opus_command (SF_PRIVATE *psf, int command, void *data, int datasize)
 			*/
 			if (data == NULL || datasize != SIGNED_SIZEOF (double))
 				return SFE_BAD_COMMAND_PARAM ;
+			if (psf->file.mode != SFM_WRITE)
+			{	psf->error = SFE_NOT_WRITEMODE ;
+				return SF_FALSE ;
+				} ;
 
 			latency = *((double *) data) ;
 			if (latency < 50)
@@ -1732,6 +1736,10 @@ ogg_opus_command (SF_PRIVATE *psf, int command, void *data, int datasize)
 			*/
 			if (data == NULL || datasize != SIGNED_SIZEOF (double))
 				return SFE_BAD_COMMAND_PARAM ;
+			if (psf->file.mode != SFM_WRITE)
+			{	psf->error = SFE_NOT_WRITEMODE ;
+				return SF_FALSE ;
+				} ;
 
 			/* Usable bitrate range is  [6, 256] kbps per channel. */
 			quality = *((double *) data) ;
