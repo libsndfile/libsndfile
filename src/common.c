@@ -1292,6 +1292,8 @@ psf_log_SF_INFO (SF_PRIVATE *psf)
 	psf_log_printf (psf, " Format      :   0x%X\n", psf->sf.format) ;
 	psf_log_printf (psf, " Sections    :   %d\n", psf->sf.sections) ;
 	psf_log_printf (psf, " Seekable    :   %s\n", psf->sf.seekable ? "TRUE" : "FALSE") ;
+	if (psf->sf.interop_mode != SF_INTEROP_MODE_DEFAULT)
+		psf_log_printf (psf, " Interop mode:   %u\n", psf->sf.interop_mode) ;
 
 	psf_log_printf (psf, "---------------------------------\n") ;
 } /* psf_dump_SFINFO */

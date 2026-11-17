@@ -64,6 +64,7 @@ wchar_test (void)
 
 	print_test_name (__func__, "test.wav") ;
 
+	memset (&info, 0, sizeof (info)) ;
 	info.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16 ;
 	info.channels = 1 ;
 	info.samplerate = 44100 ;
@@ -145,6 +146,7 @@ locale_test (const LOCALE_DATA * ldata)
 	printf ("    locale_test           %-8s : %s %*c ", ldata->locale, ldata->filename, 24 - ldata->width, ' ') ;
 	fflush (stdout) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.format = SF_FORMAT_AU | SF_FORMAT_PCM_16 ;
 	sfinfo.channels = 1 ;
 	sfinfo.samplerate = 44100 ;

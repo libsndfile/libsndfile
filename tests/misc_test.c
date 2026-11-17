@@ -239,6 +239,8 @@ zero_data_test (const char *filename, int format)
 
 	print_test_name ("zero_data_test", filename) ;
 
+	sf_info_clear (&sfinfo) ;
+
 	sfinfo.samplerate = 44100 ;
 	sfinfo.format = format ;
 	sfinfo.channels = 1 ;
@@ -286,6 +288,8 @@ filesystem_full_test (int format)
 	{	puts ("/dev/full is not a device file") ;
 		return ;
 		} ;
+
+	sf_info_clear (&sfinfo) ;
 
 	sfinfo.samplerate = 44100 ;
 	sfinfo.format = format ;
@@ -357,6 +361,8 @@ permission_test (const char *filename, int typemajor)
 		exit (1) ;
 		} ;
 
+	sf_info_clear (&sfinfo) ;
+
 	sfinfo.samplerate = 44100 ;
 	sfinfo.format = (typemajor | SF_FORMAT_PCM_16) ;
 	sfinfo.channels = 1 ;
@@ -397,6 +403,7 @@ wavex_amb_test (const char *filename)
 
 	print_test_name (__func__, filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate = 44100 ;
 	sfinfo.format = SF_FORMAT_WAVEX | SF_FORMAT_PCM_16 ;
 	sfinfo.channels = 4 ;
@@ -435,7 +442,6 @@ rf64_downgrade_test (const char *filename)
 	print_test_name (__func__, filename) ;
 
 	sf_info_clear (&sfinfo) ;
-
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.frames		= ARRAY_LEN (output) ;
 	sfinfo.channels		= 1 ;

@@ -55,6 +55,7 @@ largefile_test (int filetype, const char * filename)
 
 	print_test_name ("largefile_test", filename) ;
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= 44100 ;
 	sfinfo.channels		= 2 ;
 	sfinfo.frames		= 0 ;

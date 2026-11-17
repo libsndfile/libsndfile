@@ -57,6 +57,146 @@
 #define basc_MARKER		(MAKE_MARKER ('b', 'a', 's', 'c'))
 
 /* Supported AIFC encodings.*/
+
+/*	A brief history of AIFF-C compressionTypes for LPCM
+**
+**	Although both Apple's own AIFF-C specification and the header file
+**	AIFF.h that’s still present in current macOS SDKs define only one
+**	compressionType for the carriage of uncompressed LPCM audio in
+**	AIFF-C, ’NONE’, over two separate generations of long-lived
+**	audiovisual media software Apple has supported — and at this writing
+**	still supports — the following additional compressionTypes in AIFF-C
+**	for carriage of various representations of LPCM:
+**
+**	  'raw ' 'twos' 'sowt' 'fl32' 'fl64' 'in24' 'in32'
+**
+**	These FourCCs are best understood according to their original
+**	purpose: for the enumeration and instantiation of Macintosh Sound
+**	Manager components for conversion of LPCM input formats to the LPCM
+**	output format matching that of the underlying sound hardware. For
+**	reasons dictated by the design of the Sound Manager and some of its
+**	programming interfaces, each FourCC signifies a distinct LPCM input
+**	format, including a specific numeric representation and sample
+**	width, and in some cases also a specific endianness. This
+**	significance is readily apparent in the declaration of symbols for
+**	each of the FourCCs in the old Sound Manager header file Sound.h,
+**	which at this writing can still be found online within an archive of
+**	older Mac OS SDKs. (These declarations, copied immediately below,
+**	are divided here into two separate groups for reasons that will
+**	become apparent below.)
+**
+**	Defined prior to 1997:
+**
+**	  k8BitOffsetBinaryFormat       = 'raw ', // 8-bit offset binary
+**	  k16BitBigEndianFormat         = 'twos', // 16-bit big endian
+**
+**	Added with Sound Manager 3.3 and QuickTime 3 in 1997:
+**
+**	  k16BitLittleEndianFormat      = 'sowt', // 16-bit little endian
+**	  kFloat32Format                = 'fl32', // 32-bit floating point
+**	  kFloat64Format                = 'fl64', // 64-bit floating point
+**	  k24BitFormat                  = 'in24', // 24-bit integer
+**	  k32BitFormat                  = 'in32', // 32-bit integer
+**
+**	Regarding endianness: while everything Macintosh in its original
+**	Motorola 68k- and subsequent PowerPC-based incarnations was assumed
+**	to be big-endian, the addition of support for little-endian
+**	representations of LPCM became imperative with the port of Sound
+**	Manager and QuickTime to Windows, released in 1997 as Sound Manager
+**	3.3 and QuickTime 3.0. Because the 'twos' component had already
+**	existed on Macintosh prior to that release, instead of adding
+**	support to it for the corresponding little-endian representation —
+**	thereby introducing a means to confound Macintosh developers who
+**	might then make the mistaken assumption that it had always provided
+**	such support — Apple added a second component for 16-bit integer
+**	LPCM for the little-endian case, 'sowt'. However, for 24-, 32-, and
+**	64-bit LPCM, the components added in 1997 were given the ability
+**	from their inception to be configured for either big- and
+**	little-endian input, obviating a pairing of components for newly
+**	supported LPCM formats analogous to that of 'twos' and 'sowt'. In
+**	particular, neither a '42ni' component nor a '23ni' component ever
+**	existed.
+**
+**	The specific bits for configuration of the newer components followed
+**	the established convention of "decompression parameters" for Sound
+**	Manager decoders, which took the form of a sequence of Atoms as
+**	defined in Apple's QuickTime File Format Specification and as Boxes
+**	in the subsequent MPEG specification for the ISO Base Media File
+**	Format. The atoms recognized for configuration of these components
+**	comprised an AudioFormatAtom, an AudioEndianAtom, and an
+**	AudioTerminatorAtom, in that order. C structs for each are declared
+**	within the very same header file mentioned above, Sound.h.
+**
+**	Perhaps with the intention of easing the burden of internal testing
+**	the Sound Manager components enumerated above, Apple added but did
+**	not thoroughly document support for the carriage of each of their
+**	LPCM input formats within QuickTime movie and AIFF-C files, via the
+**	use of the same FourCCs as SoundDescription dataFormats and as
+**	AIFF-C Common Chunk compressionTypes, along with, where needed,
+**	the same decompression parameters. In QuickTime movie files
+**	decompression parameters were and still are found within a 'wave'
+**	atom that extends a SoundDescription, and in AIFF-C they were and
+**	still are found within a 'wave' chunk immediately following a 'COMM'
+**	chunk.
+**
+**	Even though the Sound Manager component for which 'twos' was
+**	originally defined supported 16-bit integer LPCM only, and even
+**	though Apple's QuickTime File Format Specification says that 'twos'
+**	is to be used in QuickTime movie files for 16-bit LPCM only, in
+**	Apple's AIFF-C parser 'twos' was implemented by treating it as a
+**	synonym for 'NONE', thereby making it eligible for use with any LPCM
+**	integer width. In spite of this, 'sowt' wasn't granted similar
+**	latitude; as of this writing, even in Apple's second generation
+**	AIFF-C parser its use remains limited to 16-bit little-endian
+**	integer LPCM, even if the sampleSize field of the Common Chunk
+**	contains a value other than 16. In Apple's implementation the same
+**	precedence of the compressionType for indicating the sample size
+**	over the sampleSize field of the Common Chunk is also observed for
+**	each of the other LPCM compressionTypes added in 1997.
+**
+**	In ensuring years Apple took action to deprecate its original
+**	hodgepodge of FourCCs for LCPM formats, first with its replacement
+**	for Sound Manager, known as CoreAudio when initially released in
+**	2003, with QuickTime 7 in 2005, with the emergence of the CoreMedia
+**	and AVFoundation frameworks later in that decade, and most recently
+**	at this writing in its proposal for carriage of uncompressed audio
+**	in MPEG-4 and ISO BMFF, published as ISO/IEC 23003-5 in 2020.
+**	However, for AIFF-C compressionTypes for LPCM formats Apple has
+**	remained faithful to the conventions first embodied in its software
+**	releases of 1997.
+**
+**	And those conventions remain, in a word, tortuous. As Apple defined
+**	and implemented them some of the compressionTypes can be used in
+**	AIFF-C with varying sample sizes while others cannot, some have a
+**	mirror twin for endianness while others do not, and the use of
+**	several is configurable via the use of decompression parameters
+**	while that of others is not. When searching among them for a
+**	unifying motif one has to admit that there is ’NONE’.
+**
+**	In the absence of comprehensive documentation from Apple — and
+**	perhaps even if such documentation had been published — incompatible
+**	assumptions about the appropriate use of AIFF-C compressionTypes for
+**	LPCM, and also about their complement of further compressionTypes
+**	according to one or another of the existing but conflicting patterns
+**	of definition, may well have been inevitable. For example:
+**
+**		- In contravention of Apple's original implementation, the flac
+**		tool, the LibAIFF library, Oxide/oxideav-iff, and libsndfile
+**		each implement 'sowt' for reading, and each of them other than
+**		libsndfile's default behavior also for writing, under the
+**		assumption that the sampleSize field of the Common Chunk
+**		provides the authoritative integer width.
+**
+**		- libsndfile reads and writes mirror or near-mirror twins of
+**		'in24' and ‘in32' for little-endian LPCM, namely '42n1' and
+**		'23ni', even though Apple never established their usage for
+**		that purpose (either with or without typographical errors).
+**
+**		- from 1997 to the date of integration of the changes that
+**		include this note, no known implementation other than Apple's
+**		has read or written the optional decompression parameters
+**		for 'in24' et al.
+*/
 #define NONE_MARKER		(MAKE_MARKER ('N', 'O', 'N', 'E'))
 #define sowt_MARKER		(MAKE_MARKER ('s', 'o', 'w', 't'))
 #define twos_MARKER		(MAKE_MARKER ('t', 'w', 'o', 's'))
@@ -78,7 +218,13 @@
 
 #define DWVW_MARKER		(MAKE_MARKER ('D', 'W', 'V', 'W'))
 #define GSM_MARKER		(MAKE_MARKER ('G', 'S', 'M', ' '))
+#define AGSM_MARKER		(MAKE_MARKER ('a', 'g', 's', 'm'))
 #define ima4_MARKER		(MAKE_MARKER ('i', 'm', 'a', '4'))
+
+#define wave_MARKER		(MAKE_MARKER ('w', 'a', 'v', 'e'))
+#define frma_MARKER		(MAKE_MARKER ('f', 'r', 'm', 'a'))
+#define enda_MARKER		(MAKE_MARKER ('e', 'n', 'd', 'a'))
+#define term_MARKER		(MAKE_MARKER (0, 0, 0, 0))
 
 /*
 **	This value is officially assigned to Mega Nerd Pty Ltd by Apple
@@ -191,6 +337,8 @@ typedef struct
 	int32_t		chanmap_tag ;
 
 	MARK_ID_POS *markstr ;
+
+	int			interop_mode ;
 } AIFF_PRIVATE ;
 
 /*------------------------------------------------------------------------------
@@ -202,7 +350,8 @@ static int	aiff_close (SF_PRIVATE *psf) ;
 static int	tenbytefloat2int (uint8_t *bytes) ;
 static void uint2tenbytefloat (uint32_t num, uint8_t *bytes) ;
 
-static int	aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt) ;
+static int	aiff_read_comm_chunk (SF_PRIVATE *psf, int is_aifc, COMM_CHUNK *comm_fmt) ;
+static int	aiff_read_wave_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt, uint32_t wave_size) ;
 
 static int	aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt) ;
 
@@ -454,8 +603,10 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					psf_binheader_readf (psf, "m", &marker) ;
 					switch (marker)
 					{	case AIFC_MARKER :
+							found_chunk |= (HAVE_AIFC | HAVE_AIFF) ;
+							break ;
 						case AIFF_MARKER :
-							found_chunk |= (marker == AIFC_MARKER) ? (HAVE_AIFC | HAVE_AIFF) : HAVE_AIFF ;
+							found_chunk |= HAVE_AIFF ;
 							break ;
 						default :
 							break ;
@@ -482,10 +633,20 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 					paiff->comm_offset = psf_ftell (psf) - 8 ;
 					chunk_size += chunk_size & 1 ;
 					comm_fmt->size = chunk_size ;
-					if ((error = aiff_read_comm_chunk (psf, comm_fmt)) != 0)
+					if ((error = aiff_read_comm_chunk (psf, (found_chunk & (HAVE_AIFC)) ? 1 : 0, comm_fmt)) != 0)
 						return error ;
 
 					found_chunk |= HAVE_COMM ;
+					break ;
+
+			case wave_MARKER :
+					/* Must have COMM chunk before wave chunk. */
+					if ((found_chunk & (HAVE_FORM | HAVE_AIFF | HAVE_COMM)) != (HAVE_FORM | HAVE_AIFF | HAVE_COMM))
+						return SFE_AIFF_WAVE_B4_COMM ;
+
+					chunk_size += chunk_size & 1 ;
+					if ((error = aiff_read_wave_chunk (psf, comm_fmt, chunk_size)) != 0)
+						return error ;
 					break ;
 
 			case PEAK_MARKER :
@@ -999,7 +1160,7 @@ aiff_close (SF_PRIVATE *psf)
 } /* aiff_close */
 
 static int
-aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
+aiff_read_comm_chunk (SF_PRIVATE *psf, int is_aifc, COMM_CHUNK *comm_fmt)
 {	BUF_UNION	ubuf ;
 	int subformat, samplerate ;
 
@@ -1080,7 +1241,10 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 	switch (comm_fmt->encoding)
 	{	case NONE_MARKER :
-				psf->sf.format = (SF_FORMAT_AIFF | subformat) ;
+				if (is_aifc)
+					psf->sf.format = (SF_ENDIAN_BIG | SF_FORMAT_AIFF | subformat) ;
+				else
+					psf->sf.format = (SF_FORMAT_AIFF | subformat) ;
 				break ;
 
 		case twos_MARKER :
@@ -1140,6 +1304,7 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 				break ;
 
 		case GSM_MARKER :
+		case AGSM_MARKER :
 				psf->sf.format = (SF_FORMAT_AIFF | SF_FORMAT_GSM610) ;
 				break ;
 
@@ -1161,6 +1326,82 @@ aiff_read_comm_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 	return 0 ;
 } /* aiff_read_comm_chunk */
+
+static int
+aiff_read_wave_chunk (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt, uint32_t wave_size)
+{	uint32_t chunkRemaining = wave_size ;
+	uint32_t atomSize, atomType, encoding ;
+	uint16_t endianness ;	/* 0 for big, 1 for little */
+
+	psf_log_printf (psf, " wave : %d\n", wave_size) ;
+
+	switch (comm_fmt->encoding)
+	{	case in24_MARKER :
+		case in32_MARKER :
+		case fl32_MARKER :
+		case FL32_MARKER :
+		case fl64_MARKER :
+		case FL64_MARKER :
+			/* Expecting chunk contents as follows, all values big-endian:
+			**   uint32_t 12, 'frma', 4cc encoding, uint32_t 10, 'enda',
+			**   uint16_t 0 or 1, uint32_t 8, uint32_t 0.
+			** (Because of a known old bug in QuickTime for Windows, only the
+			** low byte of the 16-bit payload of the 'enda' atom is examined.)
+			*/
+			if (chunkRemaining < 30)
+			{	psf_log_printf (psf, "AIFC/wave : Unexpected wave chunk size\n", chunkRemaining) ;
+				break ;
+				} ;
+
+			psf_binheader_readf (psf, "E4mm", &atomSize, &atomType, &encoding) ;
+			chunkRemaining -= 12 ;
+
+			if (atomSize != 12 || atomType != frma_MARKER)
+			{	psf_log_printf (psf, "AIFC/wave/frma : Unexpected atom type (%M) or size (%u)\n", atomType, atomSize) ;
+				break ;
+				} ;
+
+			if (encoding != comm_fmt->encoding)
+			{	psf_log_printf (psf, "AIFC/wave/frma : Unexpected encoding type (%M)\n", encoding) ;
+				break ;
+				} ;
+
+			psf_binheader_readf (psf, "E4m", &atomSize, &atomType) ;
+			chunkRemaining -= 8 ;
+
+			if (atomSize != 10 || atomType != enda_MARKER)
+			{	psf_log_printf (psf, "AIFC/wave/enda : Unexpected atom type (%M) or size (%u)\n", atomType, atomSize) ;
+				break ;
+			}
+
+			psf_binheader_readf (psf, "E2", &endianness) ;
+			endianness &= 0x00FF;
+			chunkRemaining -= 2 ;
+
+			psf_binheader_readf (psf, "E4m", &atomSize, &atomType) ;
+			chunkRemaining -= 8 ;
+
+			if (atomSize != 8 || atomType != term_MARKER)
+			{	psf_log_printf (psf, "AIFC/wave/0x00000000 : Unexpected atom type (%M) or size (%u)\n", atomType, atomSize) ;
+				break ;
+			}
+
+			psf_log_printf (psf, "  Encoding   : %M\n", encoding) ;
+			psf_log_printf (psf, "  Endianness : %u (%s)\n", endianness, endianness == 1 ? "little" : "big") ;
+
+			if (endianness == 1)
+			{	psf->endian = SF_ENDIAN_LITTLE ;
+				psf->sf.format = ((psf->sf.format & ~SF_ENDIAN_BIG) | SF_ENDIAN_LITTLE) ;
+				} ;
+
+			break ;
+		} ;
+
+	if (chunkRemaining > 0)
+		psf_binheader_readf (psf, "j", chunkRemaining) ;
+
+	return 0 ;
+} /* aiff_read_wave_chunk */
 
 
 /*==========================================================================================
@@ -1273,7 +1514,16 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			psf->endian = SF_ENDIAN_BIG ;
 			comm_type = AIFC_MARKER ;
 			comm_size = SIZEOF_AIFC_COMM ;
-			comm_encoding = twos_MARKER ;
+			switch (psf->sf.interop_mode)
+			{	case SF_INTEROP_MODE_DEFAULT :
+					comm_encoding = twos_MARKER ;
+					break ;
+
+				case SF_INTEROP_MODE_APPLE :
+				case SF_INTEROP_MODE_FLAC :
+					comm_encoding = NONE_MARKER ;
+					break ;
+				} ;
 			break ;
 
 		case SF_FORMAT_PCM_S8 | SF_ENDIAN_LITTLE :
@@ -1287,7 +1537,16 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			psf->endian = SF_ENDIAN_BIG ;
 			comm_type = AIFC_MARKER ;
 			comm_size = SIZEOF_AIFC_COMM ;
-			comm_encoding = twos_MARKER ;
+			switch (psf->sf.interop_mode)
+			{	case SF_INTEROP_MODE_DEFAULT :
+					comm_encoding = twos_MARKER ;
+					break ;
+
+				case SF_INTEROP_MODE_APPLE :
+				case SF_INTEROP_MODE_FLAC :
+					comm_encoding = NONE_MARKER ;
+					break ;
+				} ;
 			break ;
 
 		case SF_FORMAT_PCM_16 | SF_ENDIAN_LITTLE :
@@ -1301,28 +1560,70 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			psf->endian = SF_ENDIAN_BIG ;
 			comm_type = AIFC_MARKER ;
 			comm_size = SIZEOF_AIFC_COMM ;
-			comm_encoding = in24_MARKER ;
+			switch (psf->sf.interop_mode)
+			{	case SF_INTEROP_MODE_DEFAULT :
+					comm_encoding = in24_MARKER ;
+					break ;
+
+				case SF_INTEROP_MODE_APPLE :
+				case SF_INTEROP_MODE_FLAC :
+					comm_encoding = NONE_MARKER ;
+					break ;
+				} ;
 			break ;
 
 		case SF_FORMAT_PCM_24 | SF_ENDIAN_LITTLE :
 			psf->endian = SF_ENDIAN_LITTLE ;
 			comm_type = AIFC_MARKER ;
 			comm_size = SIZEOF_AIFC_COMM ;
-			comm_encoding = ni24_MARKER ;
+			switch (psf->sf.interop_mode)
+			{	case SF_INTEROP_MODE_DEFAULT :
+					comm_encoding = ni24_MARKER ;
+					break ;
+
+				case SF_INTEROP_MODE_APPLE :
+					comm_encoding = in24_MARKER ;
+					break ;
+
+				case SF_INTEROP_MODE_FLAC :
+					comm_encoding = sowt_MARKER ;
+					break ;
+				} ;
 			break ;
 
 		case SF_FORMAT_PCM_32 | SF_ENDIAN_BIG :
 			psf->endian = SF_ENDIAN_BIG ;
 			comm_type = AIFC_MARKER ;
 			comm_size = SIZEOF_AIFC_COMM ;
-			comm_encoding = in32_MARKER ;
+			switch (psf->sf.interop_mode)
+			{	case SF_INTEROP_MODE_DEFAULT :
+					comm_encoding = in32_MARKER ;
+					break ;
+
+				case SF_INTEROP_MODE_APPLE :
+				case SF_INTEROP_MODE_FLAC :
+					comm_encoding = NONE_MARKER ;
+					break ;
+				} ;
 			break ;
 
 		case SF_FORMAT_PCM_32 | SF_ENDIAN_LITTLE :
 			psf->endian = SF_ENDIAN_LITTLE ;
 			comm_type = AIFC_MARKER ;
 			comm_size = SIZEOF_AIFC_COMM ;
-			comm_encoding = ni32_MARKER ;
+			switch (psf->sf.interop_mode)
+			{	case SF_INTEROP_MODE_DEFAULT :
+					comm_encoding = ni32_MARKER ;
+					break ;
+
+				case SF_INTEROP_MODE_APPLE :
+					comm_encoding = in32_MARKER ;
+					break ;
+
+				case SF_INTEROP_MODE_FLAC :
+					comm_encoding = sowt_MARKER ;
+					break ;
+				} ;
 			break ;
 
 		case SF_FORMAT_PCM_S8 :			/* SF_ENDIAN_FILE */
@@ -1336,17 +1637,39 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 			break ;
 
 		case SF_FORMAT_FLOAT :					/* Big endian floating point. */
+		case SF_FORMAT_FLOAT | SF_ENDIAN_BIG :
 				psf->endian = SF_ENDIAN_BIG ;
 				comm_type = AIFC_MARKER ;
 				comm_size = SIZEOF_AIFC_COMM ;
 				comm_encoding = fl32_MARKER ;
 				break ;
 
+		case SF_FORMAT_FLOAT | SF_ENDIAN_LITTLE :	/* Little endian floating point. */
+				psf->endian = SF_ENDIAN_LITTLE ;
+				comm_type = AIFC_MARKER ;
+				comm_size = SIZEOF_AIFC_COMM ;
+				if (psf->sf.interop_mode == SF_INTEROP_MODE_APPLE)
+					comm_encoding = fl32_MARKER ;
+				else
+					return SFE_UNSUPPORTED_ENCODING ;
+				break ;
+
 		case SF_FORMAT_DOUBLE :					/* Big endian double precision floating point. */
+		case SF_FORMAT_DOUBLE | SF_ENDIAN_BIG :
 				psf->endian = SF_ENDIAN_BIG ;
 				comm_type = AIFC_MARKER ;
 				comm_size = SIZEOF_AIFC_COMM ;
 				comm_encoding = fl64_MARKER ;
+				break ;
+
+		case SF_FORMAT_DOUBLE | SF_ENDIAN_LITTLE :	/* Little endian double precision floating point. */
+				psf->endian = SF_ENDIAN_LITTLE ;
+				comm_type = AIFC_MARKER ;
+				comm_size = SIZEOF_AIFC_COMM ;
+				if (psf->sf.interop_mode == SF_INTEROP_MODE_APPLE)
+					comm_encoding = fl64_MARKER ;
+				else
+					return SFE_UNSUPPORTED_ENCODING ;
 				break ;
 
 		case SF_FORMAT_ULAW :
@@ -1404,7 +1727,10 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 				psf->endian = SF_ENDIAN_BIG ;
 				comm_type = AIFC_MARKER ;
 				comm_size = SIZEOF_AIFC_COMM ;
-				comm_encoding = GSM_MARKER ;
+				if (psf->sf.interop_mode == SF_INTEROP_MODE_APPLE)
+					comm_encoding = AGSM_MARKER ;
+				else
+					comm_encoding = GSM_MARKER ;
 
 				/* Override standard value here.*/
 				bit_width = 16 ;
@@ -1448,7 +1774,21 @@ aiff_write_header (SF_PRIVATE *psf, int calc_length)
 
 	/* AIFC chunks have some extra data. */
 	if (comm_type == AIFC_MARKER)
-		psf_binheader_writef (psf, "mb", BHWm (comm_encoding), BHWv (comm_zero_bytes), BHWz (sizeof (comm_zero_bytes))) ;
+	{	psf_binheader_writef (psf, "mb", BHWm (comm_encoding), BHWv (comm_zero_bytes), BHWz (sizeof (comm_zero_bytes))) ;
+		if (psf->sf.interop_mode == SF_INTEROP_MODE_APPLE && psf->endian == SF_ENDIAN_LITTLE)
+		{
+			switch (comm_encoding)
+			{	case in24_MARKER :
+				case in32_MARKER :
+				case fl32_MARKER :
+				case FL32_MARKER :
+				case fl64_MARKER :
+				case FL64_MARKER :
+					psf_binheader_writef (psf, "Em44mm4m24m", BHWm (wave_MARKER), BHW4 (30), BHW4 (12), BHWm (frma_MARKER), BHWm (comm_encoding), BHW4 (10), BHWm (enda_MARKER), BHW2 (1), BHW4 (8), BHWm (term_MARKER)) ;
+					break ;
+				} ;
+			} ;
+		} ;
 
 	if (psf->channel_map && paiff->chanmap_tag)
 		psf_binheader_writef (psf, "Em4444", BHWm (CHAN_MARKER), BHW4 (12), BHW4 (paiff->chanmap_tag), BHW4 (0), BHW4 (0)) ;

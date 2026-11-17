@@ -354,6 +354,14 @@ enum
 	SF_BITRATE_MODE_VARIABLE
 } ;
 
+/* AIFF-C mode values (for use with SFC_SET_AIFF_INTEROP_MODE)
+*/
+enum
+{	SF_INTEROP_MODE_DEFAULT = 0,			/* When writing files prefer backward compatibility with earlier versions of libsndfile */
+	SF_INTEROP_MODE_APPLE,					/* When writing files prefer interoperability with Apple software */
+	SF_INTEROP_MODE_FLAC					/* When writing files prefer interoperability with the flac tool */
+} ;
+
 
 /* A SNDFILE* pointer can be passed around much like stdio.h's FILE* pointer. */
 
@@ -384,6 +392,7 @@ struct SF_INFO
 	int			format ;
 	int			sections ;
 	int			seekable ;
+	int			interop_mode ;
 } ;
 
 typedef	struct SF_INFO SF_INFO ;

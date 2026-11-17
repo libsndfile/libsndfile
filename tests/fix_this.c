@@ -98,6 +98,7 @@ lcomp_test_int (const char *str, const char *filename, int filetype, double marg
 		orig [k] = orig_buffer.d [k] ;
 
 
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
 	sfinfo.samplerate	= SAMPLE_RATE ;
 	sfinfo.frames		= 123456789 ;	/* Ridiculous value. */
 	sfinfo.channels		= 1 ;

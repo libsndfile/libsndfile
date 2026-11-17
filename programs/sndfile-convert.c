@@ -58,6 +58,8 @@ usage_exit (const char *progname)
 		"        -endian=big              : force output file to big endian data\n"
 		"        -endian=cpu              : force output file same endian-ness as the CPU\n"
 		"        -normalize               : normalize the data in the output file\n"
+		"        -interop=Apple           : prefer interoperability with Apple software (AIFF output only)\n"
+		"        -interop=flac            : prefer interoperability with the flac tool (AIFF output only)\n"
 		) ;
 
 	puts (
@@ -138,10 +140,11 @@ main (int argc, char * argv [])
 	int			k, outfilemajor, outfileminor = 0, infileminor ;
 	int			override_sample_rate = 0 ; /* assume no sample rate override. */
 	int			endian = SF_ENDIAN_FILE, normalize = SF_FALSE ;
+	int			interop_mode = SF_INTEROP_MODE_DEFAULT ;
 
 	progname = program_name (argv [0]) ;
 
-	if (argc < 3 || argc > 5)
+	if (argc < 3 || argc > 6)
 		usage_exit (progname) ;
 
 	infilename = argv [argc-2] ;
@@ -281,6 +284,16 @@ main (int argc, char * argv [])
 			continue ;
 			} ;
 
+		if (! strcmp (argv [k], "-interop=Apple"))
+		{	interop_mode = SF_INTEROP_MODE_APPLE ;
+			continue ;
+			} ;
+
+		if (! strcmp (argv [k], "-interop=flac"))
+		{	interop_mode = SF_INTEROP_MODE_FLAC ;
+			continue ;
+			} ;
+
 		printf ("Error : Not able to decode argument '%s'.\n", argv [k]) ;
 		exit (1) ;
 		} ;
@@ -329,6 +342,7 @@ main (int argc, char * argv [])
 					break ;
 			} ;
 
+	sfinfo.interop_mode = interop_mode ;
 	if (sf_format_check (&sfinfo) == 0)
 	{	sf_close (infile) ;
 		report_format_error_exit (argv [0], &sfinfo) ;

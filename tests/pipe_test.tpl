@@ -263,12 +263,12 @@ useek_pipe_rw_test (int filetype, const char *ext)
 	** Setup the INFO structures for the filetype we will be
 	** working with.
 	*/
+	memset (&sfinfo_write, 0, sizeof (sfinfo_write)) ;
 	sfinfo_write.format = filetype | SF_FORMAT_PCM_16 ;
 	sfinfo_write.channels = 1 ;
 	sfinfo_write.samplerate = 44100 ;
 
-
-	sfinfo_read.format = 0 ;
+	memset (&sfinfo_read, 0, sizeof (sfinfo_read)) ;
 	if (filetype == SF_FORMAT_RAW)
 	{	sfinfo_read.format = filetype | SF_FORMAT_PCM_16 ;
 		sfinfo_read.channels = 1 ;
