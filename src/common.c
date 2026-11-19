@@ -1039,6 +1039,7 @@ psf_binheader_readf (SF_PRIVATE *psf, char const *format, ...)
 	while ((c = *format++))
 	{
 		read_bytes = 0 ;
+		memset (sixteen_bytes, 0, sizeof (sixteen_bytes)) ;
 		if (psf->header.indx + 16 >= psf->header.len && psf_bump_header_allocation (psf, 16))
 			break ;
 
