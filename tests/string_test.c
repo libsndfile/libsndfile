@@ -50,6 +50,7 @@ static void	string_rdwr_grow_test (const char *filename, int typemajor) ;
 static void	string_header_update (const char *filename, int typemajor) ;
 
 static void	software_string_test (const char *filename) ;
+static void	aiff_appl_string_test (const char *filename) ;
 
 static int str_count (const char * haystack, const char * needle) ;
 
@@ -97,6 +98,7 @@ main (int argc, char *argv [])
 	if (do_all || ! strcmp (argv [1], "aiff"))
 	{	string_start_test ("strings.aiff", SF_FORMAT_AIFF) ;
 		string_start_end_test ("strings.aiff", SF_FORMAT_AIFF) ;
+		aiff_appl_string_test ("appl_string.aiff") ;
 		/*
 		TODO : Fix src/aiff.c so these tests pass.
 		string_multi_set_test ("multi.aiff", SF_FORMAT_AIFF) ;
@@ -780,6 +782,44 @@ software_string_test (const char *filename)
 	unlink (filename) ;
 	puts ("ok") ;
 } /* software_string_test */
+
+/* AIFF file holding 'COMM', 'NAME' ("Title string"), an 'APPL' chunk with
+** signature 'abcd' and the 4 byte name "Soft", and 'SSND'.
+*/
+static const unsigned char aiff_appl [] =
+{	0x46, 0x4f, 0x52, 0x4d, 0x00, 0x00, 0x00, 0x5a, 0x41, 0x49, 0x46, 0x46,
+	0x43, 0x4f, 0x4d, 0x4d, 0x00, 0x00, 0x00, 0x12, 0x00, 0x01, 0x00, 0x00,
+	0x00, 0x04, 0x00, 0x10, 0x40, 0x0e, 0xac, 0x44, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x4e, 0x41, 0x4d, 0x45, 0x00, 0x00, 0x00, 0x0c, 0x54, 0x69,
+	0x74, 0x6c, 0x65, 0x20, 0x73, 0x74, 0x72, 0x69, 0x6e, 0x67, 0x41, 0x50,
+	0x50, 0x4c, 0x00, 0x00, 0x00, 0x08, 0x61, 0x62, 0x63, 0x64, 0x53, 0x6f,
+	0x66, 0x74, 0x53, 0x53, 0x4e, 0x44, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00,
+	} ;
+
+static void
+aiff_appl_string_test (const char *filename)
+{	const char *result ;
+	SNDFILE *file ;
+	SF_INFO info ;
+
+	get_unique_test_name (&filename, STR_TEST_PREFIX) ;
+	print_test_name (__func__, filename) ;
+
+	dump_data_to_file (filename, aiff_appl, sizeof (aiff_appl)) ;
+
+	memset (&info, 0, sizeof (info)) ;
+	file = test_open_file_or_die (filename, SFM_READ, &info, SF_FALSE, __LINE__) ;
+	result = sf_get_string (file, SF_STR_SOFTWARE) ;
+
+	exit_if_true (result == NULL || strcmp (result, "Soft") != 0,
+		"\n\nLine %d : SF_STR_SOFTWARE should be 'Soft', got '%s'.\n\n", __LINE__, NULL_PRINTF_CHECK (result)) ;
+
+	sf_close (file) ;
+	unlink (filename) ;
+	puts ("ok") ;
+} /* aiff_appl_string_test */
 
 
 static void
