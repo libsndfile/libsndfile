@@ -103,10 +103,57 @@ conversion_test (char endian)
 	puts ("ok") ;
 } /* conversion_test */
 
+static void
+short_read_test (void)
+{
+	SF_PRIVATE	sf_private, *psf ;
+	const char * filename = "short_read.bin" ;
+	int i32 = 0x0a0b0c0d, t32 = 0, u32 = -1 ;
+
+	print_test_name ("Testing short header read") ;
+
+	psf = &sf_private ;
+	memset (psf, 0, sizeof (sf_private)) ;
+
+	psf->file.mode = SFM_WRITE ;
+	snprintf (psf->file.path, sizeof (psf->file.path), "%s", filename) ;
+
+	if (psf_fopen (psf) != 0)
+	{	printf ("\n\nError : failed to open file '%s' for write.\n\n", filename) ;
+		exit (1) ;
+		} ;
+
+	psf_binheader_writef (psf, "E4", BHW4 (i32)) ;
+	psf_fwrite (psf->header.ptr, 1, psf->header.indx, psf) ;
+	free (psf->header.ptr) ;
+	psf_fclose (psf) ;
+
+	memset (psf, 0, sizeof (sf_private)) ;
+
+	psf->file.mode = SFM_READ ;
+	snprintf (psf->file.path, sizeof (psf->file.path), "%s", filename) ;
+
+	if (psf_fopen (psf) != 0)
+	{	printf ("\n\nError : failed to open file '%s' for read.\n\n", filename) ;
+		exit (1) ;
+		} ;
+
+	psf_binheader_readf (psf, "E44", &t32, &u32) ;
+	free (psf->header.ptr) ;
+	psf_fclose (psf) ;
+
+	cmp_test (__LINE__, i32, t32, "\n\nLine %d : 32 bit int failed 0x%x -> 0x%x.\n\n") ;
+	cmp_test (__LINE__, 0, u32, "\n\nLine %d : short read should give %d, got 0x%x.\n\n") ;
+
+	remove (filename) ;
+	puts ("ok") ;
+} /* short_read_test */
+
 void
 test_conversions (void)
 {
 	conversion_test ('E') ;
 	conversion_test ('e') ;
+	short_read_test () ;
 } /* test_conversion */
 
