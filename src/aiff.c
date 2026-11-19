@@ -666,9 +666,9 @@ aiff_read_header (SF_PRIVATE *psf, COMM_CHUNK *comm_fmt)
 
 					cptr = ubuf.cbuf ;
 					psf_binheader_readf (psf, "mb", &appl_marker, cptr, chunk_size + (chunk_size & 1) - 4) ;
-					cptr [chunk_size] = 0 ;
+					cptr [chunk_size - 4] = 0 ;
 
-					for (k = 0 ; k < (int) chunk_size ; k++)
+					for (k = 0 ; k < (int) chunk_size - 4 ; k++)
 						if (! psf_isprint (cptr [k]))
 						{	cptr [k] = 0 ;
 							break ;
