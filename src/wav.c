@@ -1226,12 +1226,18 @@ wav_write_header (SF_PRIVATE *psf, int calc_length)
 	if (psf->instrument != NULL)
 	{	int		tmp ;
 		double	dtune = (double) (0x40000000) / 25.0 ;
+		int64_t	i64 ;
 
 		psf_binheader_writef (psf, "m4", BHWm (smpl_MARKER), BHW4 (9 * 4 + psf->instrument->loop_count * 6 * 4)) ;
 		psf_binheader_writef (psf, "44", BHW4 (0), BHW4 (0)) ; /* Manufacturer zero is everyone */
 		tmp = (int) (1.0e9 / psf->sf.samplerate) ; /* Sample period in nano seconds */
 		psf_binheader_writef (psf, "44", BHW4 (tmp), BHW4 (psf->instrument->basenote)) ;
-		tmp = (uint32_t) (psf->instrument->detune * dtune + 0.5) ;
+
+		psf->instrument->detune = SF_MIN (SF_MAX (psf->instrument->detune, -50), 50) ;
+
+		i64 = (int64_t) (psf->instrument->detune * dtune + 0.5) ;
+		i64 = SF_MIN (SF_MAX (i64, INT32_MIN), INT32_MAX) ;
+		tmp = (int) i64 ;
 		psf_binheader_writef (psf, "4", BHW4 (tmp)) ;
 		psf_binheader_writef (psf, "44", BHW4 (0), BHW4 (0)) ; /* SMTPE format */
 		psf_binheader_writef (psf, "44", BHW4 (psf->instrument->loop_count), BHW4 (0)) ;
@@ -1521,7 +1527,9 @@ wav_read_smpl_chunk (SF_PRIVATE *psf, uint32_t chunklen)
 		} ;
 
 	psf->instrument->basenote = note ;
-	psf->instrument->detune = (int8_t) (pitch / (0x40000000 / 25.0) + 0.5) ;
+	{	double d = (int32_t) pitch / (0x40000000 / 25.0) ;
+		psf->instrument->detune = (int8_t) (d >= 0 ? d + 0.5 : d - 0.5) ;
+	}
 	psf->instrument->gain = 1 ;
 	psf->instrument->velocity_lo = psf->instrument->key_lo = 0 ;
 	psf->instrument->velocity_hi = psf->instrument->key_hi = 127 ;

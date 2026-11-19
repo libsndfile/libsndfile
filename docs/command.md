@@ -1653,7 +1653,8 @@ The `SF_INSTRUMENT` struct is defined in *sndfile.h* as:
 ```c
 typedef struct
 {   int gain ;
-    char basenote, detune ;
+    char basenote ;
+    int8_t detune ;
     char velocity_lo, velocity_hi ;
     char key_lo, key_hi ;
     int loop_count ;
