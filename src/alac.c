@@ -848,6 +848,10 @@ alac_pakt_read_decode (SF_PRIVATE * psf, uint32_t UNUSED (pakt_offset))
 		chunk_iterator = psf->next_chunk_iterator (psf, chunk_iterator) ;
 
 	info = alac_pakt_alloc (pakt_size / 4) ;
+	if (info == NULL)
+	{	free (pakt_data) ;
+		return NULL ;
+		} ;
 
 	/* Start at 24 bytes in, skipping over the 'pakt' chunks header. */
 	for (bcount = 24 ; bcount < pakt_size && value != 0 ; )
