@@ -33,6 +33,7 @@
 #include	<stdlib.h>
 #include	<string.h>
 #include	<ctype.h>
+#include	<limits.h>
 
 #include	"sndfile.h"
 #include	"sfendian.h"
@@ -81,6 +82,12 @@ typedef struct
 	char value [32] ;
 	int value_len ;
 } STR_RSRC ;
+
+/*
+** Resource forks only hold a few short strings. Bounding the length keeps every
+** sum of the offsets and lengths read from the fork well inside an int.
+*/
+#define SD2_RSRC_MAX_LEN	(INT_MAX / 4)
 
 /*------------------------------------------------------------------------------
  * Private static functions.
@@ -320,7 +327,7 @@ read_rsrc_char (const SD2_RSRC *prsrc, int offset)
 static inline int
 read_rsrc_short (const SD2_RSRC *prsrc, int offset)
 {	const unsigned char * data = prsrc->rsrc_data ;
-	if (offset < 0 || offset + 1 >= prsrc->rsrc_len)
+	if (offset < 0 || offset > prsrc->rsrc_len - 2)
 		return 0 ;
 	return (data [offset] << 8) + data [offset + 1] ;
 } /* read_rsrc_short */
@@ -328,7 +335,7 @@ read_rsrc_short (const SD2_RSRC *prsrc, int offset)
 static inline int
 read_rsrc_int (const SD2_RSRC *prsrc, int offset)
 {	const unsigned char * data = prsrc->rsrc_data ;
-	if (offset < 0 || offset + 3 >= prsrc->rsrc_len)
+	if (offset < 0 || offset > prsrc->rsrc_len - 4)
 		return 0 ;
 	return (((uint32_t) data [offset]) << 24) + (data [offset + 1] << 16) + (data [offset + 2] << 8) + data [offset + 3] ;
 } /* read_rsrc_int */
@@ -337,7 +344,7 @@ static inline int
 read_rsrc_marker (const SD2_RSRC *prsrc, int offset)
 {	const unsigned char * data = prsrc->rsrc_data ;
 
-	if (offset < 0 || offset + 3 >= prsrc->rsrc_len)
+	if (offset < 0 || offset > prsrc->rsrc_len - 4)
 		return 0 ;
 
 	if (CPU_IS_BIG_ENDIAN)
@@ -355,7 +362,7 @@ read_rsrc_str (const SD2_RSRC *prsrc, int offset, char * buffer, int buffer_len)
 
 	memset (buffer, 0, buffer_len) ;
 
-	if (offset < 0 || offset + buffer_len >= prsrc->rsrc_len)
+	if (offset < 0 || buffer_len >= prsrc->rsrc_len - offset)
 		return ;
 
 	for (k = 0 ; k < buffer_len - 1 ; k++)
@@ -369,17 +376,28 @@ read_rsrc_str (const SD2_RSRC *prsrc, int offset, char * buffer, int buffer_len)
 static int
 sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 {	SD2_RSRC rsrc ;
+	sf_count_t rsrc_filelen ;
 	int k, marker, error = 0 ;
 
 	psf_use_rsrc (psf, SF_TRUE) ;
 
 	memset (&rsrc, 0, sizeof (rsrc)) ;
 
-	rsrc.rsrc_len = psf_get_filelen (psf) ;
+	rsrc_filelen = psf_get_filelen (psf) ;
+	if (rsrc_filelen < 0 || rsrc_filelen > SD2_RSRC_MAX_LEN)
+	{	psf_log_printf (psf, "Error : resource length %D is out of range.\n", rsrc_filelen) ;
+		error = SFE_SD2_BAD_RSRC ;
+		goto parse_rsrc_fork_cleanup ;
+		} ;
+
+	rsrc.rsrc_len = (int) rsrc_filelen ;
 	psf_log_printf (psf, "Resource length : %d (0x%04X)\n", rsrc.rsrc_len, rsrc.rsrc_len) ;
 
 	if (rsrc.rsrc_len > psf->header.len)
-	{	rsrc.rsrc_data = calloc (1, rsrc.rsrc_len) ;
+	{	if ((rsrc.rsrc_data = calloc (1, rsrc.rsrc_len)) == NULL)
+		{	error = SFE_MALLOC_FAILED ;
+			goto parse_rsrc_fork_cleanup ;
+			} ;
 		rsrc.need_to_free_rsrc_data = SF_TRUE ;
 		}
 	else
@@ -412,25 +430,25 @@ sd2_parse_rsrc_fork (SF_PRIVATE *psf)
 				"  data length : 0x%04X\n  map  length : 0x%04X\n",
 				rsrc.data_offset, rsrc.map_offset, rsrc.data_length, rsrc.map_length) ;
 
-	if (rsrc.data_offset > rsrc.rsrc_len)
+	if (rsrc.data_offset < 0 || rsrc.data_offset > rsrc.rsrc_len)
 	{	psf_log_printf (psf, "Error : rsrc.data_offset (%d, 0x%x) > len\n", rsrc.data_offset, rsrc.data_offset) ;
 		error = SFE_SD2_BAD_DATA_OFFSET ;
 		goto parse_rsrc_fork_cleanup ;
 		} ;
 
-	if (rsrc.map_offset > rsrc.rsrc_len)
+	if (rsrc.map_offset < 0 || rsrc.map_offset > rsrc.rsrc_len)
 	{	psf_log_printf (psf, "Error : rsrc.map_offset > len\n") ;
 		error = SFE_SD2_BAD_MAP_OFFSET ;
 		goto parse_rsrc_fork_cleanup ;
 		} ;
 
-	if (rsrc.data_length > rsrc.rsrc_len)
+	if (rsrc.data_length < 0 || rsrc.data_length > rsrc.rsrc_len)
 	{	psf_log_printf (psf, "Error : rsrc.data_length > len\n") ;
 		error = SFE_SD2_BAD_DATA_LENGTH ;
 		goto parse_rsrc_fork_cleanup ;
 		} ;
 
-	if (rsrc.map_length > rsrc.rsrc_len)
+	if (rsrc.map_length < 0 || rsrc.map_length > rsrc.rsrc_len)
 	{	psf_log_printf (psf, "Error : rsrc.map_length > len\n") ;
 		error = SFE_SD2_BAD_MAP_LENGTH ;
 		goto parse_rsrc_fork_cleanup ;
@@ -509,7 +527,7 @@ parse_rsrc_fork_cleanup :
 static int
 parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 {	char name [32], value [32] ;
-	int k, str_offset, rsrc_id, data_offset = 0, data_len = 0 ;
+	int k, str_offset, rsrc_id, item_data, data_offset = 0, data_len = 0 ;
 
 	psf_log_printf (psf, "Finding parameters :\n") ;
 
@@ -532,11 +550,13 @@ parse_str_rsrc (SF_PRIVATE *psf, SD2_RSRC * rsrc)
 			}
 		rsrc_id = read_rsrc_short (rsrc, id_offset) ;
 
-		data_offset = rsrc->data_offset + read_rsrc_int (rsrc, rsrc->item_offset + k * 12 + 4) ;
-		if (data_offset < 0 || data_offset > rsrc->rsrc_len)
-		{	psf_log_printf (psf, "Exiting parser on data offset of %d.\n", data_offset) ;
+		item_data = read_rsrc_int (rsrc, rsrc->item_offset + k * 12 + 4) ;
+		if (item_data < 0 || item_data > rsrc->rsrc_len - rsrc->data_offset)
+		{	psf_log_printf (psf, "Exiting parser on data offset of %d.\n", item_data) ;
 			break ;
 			} ;
+
+		data_offset = rsrc->data_offset + item_data ;
 
 		data_len = read_rsrc_int (rsrc, data_offset) ;
 		if (data_len < 0 || data_len > rsrc->rsrc_len)

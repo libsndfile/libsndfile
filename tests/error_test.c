@@ -710,6 +710,101 @@ alac_bad_params_test (void)
 	puts ("ok") ;
 } /* alac_bad_params_test */
 
+/*
+** SD2 keeps its metadata in a resource fork. Every offset and length in that
+** fork is attacker controlled, so they must be range checked before they are
+** added together or used as an index.
+*/
+
+static void
+sd2_rsrc_put_u32 (unsigned char * ptr, unsigned value)
+{	ptr [0] = value >> 24 ;
+	ptr [1] = value >> 16 ;
+	ptr [2] = value >> 8 ;
+	ptr [3] = value ;
+} /* sd2_rsrc_put_u32 */
+
+static unsigned
+sd2_rsrc_get_u32 (const unsigned char * ptr)
+{	return ((unsigned) ptr [0] << 24) | (ptr [1] << 16) | (ptr [2] << 8) | ptr [3] ;
+} /* sd2_rsrc_get_u32 */
+
+static void
+sd2_bad_rsrc_test (void)
+{	static const char *filename = "bad_rsrc.sd2" ;
+	static const char *rsrc_name = "._bad_rsrc.sd2" ;
+
+	static short	data [10] ;
+	unsigned char	rsrc [1024] ;
+	SNDFILE		*sndfile ;
+	SF_INFO		sfinfo ;
+	FILE		*file ;
+	size_t		rsrc_len ;
+	unsigned	map_offset, item_offset ;
+	int			variant, k ;
+
+	print_test_name (__func__, filename) ;
+
+	/* Let libsndfile write a valid file and resource fork. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sfinfo.samplerate = 44100 ;
+	sfinfo.channels = 1 ;
+	sfinfo.format = SF_FORMAT_SD2 | SF_FORMAT_PCM_16 ;
+
+	sndfile = sf_open (filename, SFM_WRITE, &sfinfo) ;
+	exit_if_true (sndfile == NULL, "\n\nLine %d : sf_open failed : %s\n", __LINE__, sf_strerror (NULL)) ;
+	exit_if_true (sf_write_short (sndfile, data, ARRAY_LEN (data)) != ARRAY_LEN (data), "\n\nLine %d : sf_write_short failed.\n", __LINE__) ;
+	sf_close (sndfile) ;
+
+	file = fopen (rsrc_name, "rb") ;
+	exit_if_true (file == NULL, "\n\nLine %d : cannot open resource fork '%s'.\n", __LINE__, rsrc_name) ;
+	rsrc_len = fread (rsrc, 1, sizeof (rsrc), file) ;
+	fclose (file) ;
+	exit_if_true (rsrc_len < 0x100 || rsrc_len == sizeof (rsrc), "\n\nLine %d : unexpected resource fork length %d.\n", __LINE__, (int) rsrc_len) ;
+
+	map_offset = sd2_rsrc_get_u32 (rsrc + 4) ;
+	/* Two resource types of 8 bytes each sit between the map header and the items. */
+	item_offset = map_offset + 30 + 2 * 8 ;
+	exit_if_true (item_offset + 3 * 12 > rsrc_len, "\n\nLine %d : unexpected resource fork layout.\n", __LINE__) ;
+
+	/* Control : the unmodified fork must still open. */
+	memset (&sfinfo, 0, sizeof (sfinfo)) ;
+	sndfile = sf_open (filename, SFM_READ, &sfinfo) ;
+	exit_if_true (sndfile == NULL, "\n\nLine %d : valid file failed to open : %s\n", __LINE__, sf_strerror (NULL)) ;
+	exit_if_true (sfinfo.samplerate != 44100 || sfinfo.channels != 1,
+		"\n\nLine %d : bad parameters %d Hz, %d channels.\n", __LINE__, sfinfo.samplerate, sfinfo.channels) ;
+	sf_close (sndfile) ;
+
+	for (variant = 0 ; variant < 2 ; variant++)
+	{	if (variant == 0)
+		{	/* Shift the data offset and length by 2^31. The signed sum used to wrap
+			** back to the value the validity check expects. */
+			sd2_rsrc_put_u32 (rsrc, sd2_rsrc_get_u32 (rsrc) + 0x80000000u) ;
+			sd2_rsrc_put_u32 (rsrc + 8, sd2_rsrc_get_u32 (rsrc + 8) + 0x80000000u) ;
+			for (k = 0 ; k < 3 ; k++)
+				sd2_rsrc_put_u32 (rsrc + item_offset + k * 12 + 4, sd2_rsrc_get_u32 (rsrc + item_offset + k * 12 + 4) + 0x80000000u) ;
+			}
+		else
+		{	/* A resource item whose data offset is close to INT_MAX. */
+			sd2_rsrc_put_u32 (rsrc, sd2_rsrc_get_u32 (rsrc) - 0x80000000u) ;
+			sd2_rsrc_put_u32 (rsrc + 8, sd2_rsrc_get_u32 (rsrc + 8) - 0x80000000u) ;
+			for (k = 0 ; k < 3 ; k++)
+				sd2_rsrc_put_u32 (rsrc + item_offset + k * 12 + 4, 0x7ffffff0u) ;
+			} ;
+
+		dump_data_to_file (rsrc_name, rsrc, rsrc_len) ;
+
+		memset (&sfinfo, 0, sizeof (sfinfo)) ;
+		sndfile = sf_open (filename, SFM_READ, &sfinfo) ;
+		exit_if_true (sndfile != NULL, "\n\nLine %d : variant %d : corrupt resource fork was accepted.\n", __LINE__, variant) ;
+		} ;
+
+	unlink (filename) ;
+	unlink (rsrc_name) ;
+
+	puts ("ok") ;
+} /* sd2_bad_rsrc_test */
+
 int
 main (void)
 {
@@ -727,6 +822,7 @@ main (void)
 
 	zero_samplerate_write_test () ;
 	bad_header_samplerate_test () ;
+	sd2_bad_rsrc_test () ;
 	alac_bad_params_test () ;
 
 	return 0 ;
