@@ -975,7 +975,10 @@ alac_kuki_read (SF_PRIVATE * psf, uint32_t kuki_offset, uint8_t * kuki, size_t k
 		return 0 ;
 		} ;
 
-	psf_fread (kuki, 1, kuki_size, psf) ;
+	if (psf_fread (kuki, 1, kuki_size, psf) != (sf_count_t) kuki_size)
+	{	psf_log_printf (psf, "%s : Short read of 'kuki' chunk.\n", __func__) ;
+		return 0 ;
+		} ;
 
 	return kuki_size ;
 } /* alac_kuki_read */
