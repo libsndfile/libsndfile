@@ -400,9 +400,11 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 	switch (format)
 	{	case WAVE_FORMAT_PCM :
-		case WAVE_FORMAT_EXTENSIBLE :
-					/* extensible might be FLOAT, MULAW, etc as well! */
 					psf->sf.format = SF_FORMAT_W64 | u_bitwidth_to_subformat (psf->bytewidth * 8) ;
+					break ;
+
+		case WAVE_FORMAT_EXTENSIBLE :
+					psf->sf.format = SF_FORMAT_W64 | SF_CODEC (psf->sf.format) ;
 					break ;
 
 		case WAVE_FORMAT_MULAW :
@@ -415,8 +417,6 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 
 		case WAVE_FORMAT_MS_ADPCM :
 					psf->sf.format = (SF_FORMAT_W64 | SF_FORMAT_MS_ADPCM) ;
-					*blockalign = wav_fmt->msadpcm.blockalign ;
-					*framesperblock = wav_fmt->msadpcm.samplesperblock ;
 					break ;
 
 		case WAVE_FORMAT_IMA_ADPCM :
@@ -435,6 +435,11 @@ w64_read_header	(SF_PRIVATE *psf, int *blockalign, int *framesperblock)
 					break ;
 
 		default : return SFE_UNIMPLEMENTED ;
+		} ;
+
+	if (SF_CODEC (psf->sf.format) == SF_FORMAT_MS_ADPCM)
+	{	*blockalign = wav_fmt->msadpcm.blockalign ;
+		*framesperblock = wav_fmt->msadpcm.samplesperblock ;
 		} ;
 
 	return 0 ;
